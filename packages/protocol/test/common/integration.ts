@@ -708,7 +708,10 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
   //   c) Confirm mento is functional
   describe('When the contracts have been unfrozen and the mento has been activated', () => {
     before(async () => {
-      const reserve: ReserveInstance = await getDeployedProxiedContract('Reserve', artifacts)
+      const reserve: ReserveInstance = await getDeployedProxiedContract(
+        'Reserve',
+        MySingleton.getInstance()
+      )
       const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract(
         'FeeCurrencyWhitelist',
         artifacts
