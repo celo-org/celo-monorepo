@@ -179,7 +179,7 @@ async function generateFilesForContractKit(outdir: string) {
     new Web3V1Celo({
       cwd,
       rawConfig: {
-        files: `${BUILD_DIR}/mento/@(${contractKitContracts.join('|')}).json`,
+        files: `${BUILD_DIR}/contracts-mento/@(${contractKitContracts.join('|')}).json`,
         outDir: relativePath, // TODO change this path to a Mento folder, so that they don't get overwritten
       },
     })
