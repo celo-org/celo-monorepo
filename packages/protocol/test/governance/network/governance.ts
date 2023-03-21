@@ -3831,7 +3831,6 @@ contract('Governance', (accounts: string[]) => {
 
         it('Should return correct number of votes', async () => {
           const totalVotesByAccount = await governance.getAmountOfGoldUsedForVoting(accounts[0])
-
           assertEqualBN(totalVotesByAccount, 100)
         })
       })
