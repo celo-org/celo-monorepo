@@ -45,7 +45,7 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
 
     const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<SortedOraclesInstance>(
       'SortedOracles',
-      MySingleton.getInstance('mento')
+      artifacts // MySingleton.getInstance('mento')
     ) // TODO use registry rather than truffle
 
     for (const oracle of config.stableToken.oracles) {

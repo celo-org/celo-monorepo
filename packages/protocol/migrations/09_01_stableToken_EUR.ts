@@ -39,13 +39,13 @@ module.exports = deploymentForCoreContract<StableTokenEURInstance>(
     if (config.stableTokenEUR.frozen) {
       const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
         'Freezer',
-        MySingleton.getInstance('mento')
+        artifacts
       )
       await freezer.freeze(stableToken.address)
     }
     const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<SortedOraclesInstance>(
       'SortedOracles',
-      MySingleton.getInstance('mento')
+      artifacts
     )
 
     for (const oracle of config.stableTokenEUR.oracles) {

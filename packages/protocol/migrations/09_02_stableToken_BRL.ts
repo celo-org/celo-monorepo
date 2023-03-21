@@ -45,7 +45,7 @@ module.exports = deploymentForCoreContract<StableTokenBRLInstance>(
     }
     const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<SortedOraclesInstance>(
       'SortedOracles',
-      MySingleton.getInstance('mento')
+      artifacts
     )
 
     for (const oracle of config.stableTokenBRL.oracles) {

@@ -1,19 +1,18 @@
 /* tslint:disable:no-console */
 // TODO(asa): Refactor and rename to 'deployment-utils.ts'
 import { Address, CeloTxObject } from '@celo/connect'
-import { Artifact } from '@celo/protocol/lib/compatibility/internal' // maybe is not truffle, it's a OZ
 import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { BigNumber } from 'bignumber.js'
+import path from 'path'
 import prompts from 'prompts'
 import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types'
 import { StableTokenInstance } from 'types/mento'
 import Web3 from 'web3'
 import { MySingleton } from '../migrations/singletonArtifacts'
-
 
 
 
@@ -152,15 +151,16 @@ export function checkFunctionArgsLength(args: any[], abi: any) {
 
 export async function setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
->(web3: Web3, artifacts: any, contractName: string, deployedContract?:any, deployedProxy?:any, ...args: any[]): Promise<ContractInstance> {
+>(web3: Web3, artifacts: any, contractName: string, path: string, ...args: any[]): Promise<ContractInstance> {
   console.log("Made it here1")
   let Contract, ContractProxy
-  if (deployedContract){
-    Contract = deployedContract
-    ContractProxy = deployedProxy
-    // TODO change the path to something more general
-    MySingleton.getInstance('mento').addArtifact(contractName, Contract) // Add a key to avoid colition?
-    MySingleton.getInstance('mento').addArtifact(contractName + 'Proxy', ContractProxy) // Add a key to avoid colition?
+  if (path){
+    // Contract = deployedContract
+    // ContractProxy = deployedProxy
+
+    // TODO change the path to something more generalrequire
+    Contract = MySingleton.getInstance(path).require(contractName) // Add a key to avoid colition?
+    ContractProxy = MySingleton.getInstance(path).require(contractName + 'Proxy') // Add a key to avoid colition?
     // Contract = makeTruffleContract(require(`../build/${artifactPath}/${contractName}.json`), web3)
     // ContractProxy = makeTruffleContract(require(`../build/${artifactPath}/${contractName + 'Proxy'}.json`), web3)
   } else {
@@ -175,9 +175,9 @@ export async function setInitialProxyImplementation<
   
   console.log("artifacts ok1")
 
-  console.log("network id", await web3.eth.net.getId())
-  console.log("networks:", Contract.networks)
-  console.log("network type:", Contract.networkType)
+  // console.log("network id", await web3.eth.net.getId())
+  // console.log("networks:", Contract.networks)
+  // console.log("network type:", Contract.networkType)
   const implementation: ContractInstance = await Contract.deployed()
   console.log(11)
   const proxy: ProxyInstance = await ContractProxy.deployed()
@@ -294,8 +294,8 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
 }
 
 
-
-export const makeTruffleContract = (artifact: Artifact, web3: Web3) => {
+export const makeTruffleContract = (contractName:string, contractPath:string, web3: Web3) => {
+  const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath}/${contractName}.json`)
   const Contract = truffleContract({
     abi: artifact.abi,
     unlinked_binary: artifact.bytecode,
@@ -335,6 +335,7 @@ export const makeTruffleContract = (artifact: Artifact, web3: Web3) => {
   // });
   // console.log("before return")
   Contract.defaults({from:"0x5409ed021d9299bf6814279a6a1411a7e866a631", gas: 13000000})
+  MySingleton.getInstance(contractPath).addArtifact(contractName, Contract)
   return Contract
 }
 
@@ -352,8 +353,8 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   let Contract 
   let ContractProxy
   if (artifactPath){
-    Contract = makeTruffleContract(require(`../build/contracts-${artifactPath}/${name}.json`), web3)
-    ContractProxy = makeTruffleContract(require(`../build/contracts-${artifactPath}/${name + 'Proxy'}.json`), web3)
+    Contract = makeTruffleContract(name, artifactPath, web3)
+    ContractProxy = makeTruffleContract(name + 'Proxy', artifactPath, web3)
   } else {
     Contract = artifacts.require(name)
     ContractProxy = artifacts.require(name + 'Proxy')
@@ -401,7 +402,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
       // console.log("Contract.networks1", Contract.networks)
       const proxiedContract: ContractInstance = await setInitialProxyImplementation<
         ContractInstance
-      >(web3, artifacts, name, Contract, ContractProxy, ...(await args(networkName)))
+      >(web3, artifacts, name, artifactPath, ...(await args(networkName)))
       console.log(3)
       if (registerAddress) {
         console.log(4)
