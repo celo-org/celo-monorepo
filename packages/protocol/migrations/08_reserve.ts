@@ -39,7 +39,7 @@ const initializeArgs = async (): Promise<
     config.reserve.tobinTaxReserveRatio,
   ]
 }
-console.log('Singleton initialized', MySingleton.getInstance().initialized)
+console.log('Singleton initialized', MySingleton.getInstance('mento').initialized)
 
 module.exports = deploymentForCoreContract<ReserveInstance>(
   web3,
@@ -76,7 +76,7 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
 
     const reserveSpenderMultiSig: ReserveSpenderMultiSigInstance = await getDeployedProxiedContract<ReserveSpenderMultiSigInstance>(
       CeloContractName.ReserveSpenderMultiSig,
-      MySingleton.getInstance()
+      MySingleton.getInstance('mento')
     )
     console.info(`Marking ${reserveSpenderMultiSig.address} as a reserve spender`)
     await reserve.addSpender(reserveSpenderMultiSig.address)

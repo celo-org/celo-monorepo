@@ -146,14 +146,17 @@ function compile(outdir: string) {
 }
 
 function generateFilesForTruffle(outdir: string) {
+  for (var externalContract of externalContracts) {
+    const outdirExternal = outdir + '-' + externalContract
+    console.log(
+      `protocol: Generating Truffle Types for external dependency ${externalContract} to ${outdirExternal}`
+    )
+    const path = `${BUILD_DIR}/contracts-${externalContract}/*.json`
+    exec(`yarn run --silent typechain --target=truffle --outDir "${outdirExternal}" "${path}" `)
+  }
+
   console.log(`protocol: Generating Truffle Types to ${outdir}`)
   exec(`rm -rf "${outdir}"`)
-
-  for (var externalContract in externalContracts) {
-    const mentoPath = `${BUILD_DIR}/contracts-${externalContract}/*.json`
-    console.log(`protocol: Generating Truffle Types for ${mentoPath} to ${mentoPath}`)
-    exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}-mento" "${mentoPath}" `)
-  }
   const globPattern = `${BUILD_DIR}/contracts/*.json`
   exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}" `)
 }
@@ -176,6 +179,8 @@ async function generateFilesForContractKit(outdir: string) {
     },
   })
 
+  await tsGenerator({ cwd, loggingLvl: 'info' }, web3Generator)
+
   for (var externalContract in externalContracts) {
     await tsGenerator(
       { cwd, loggingLvl: 'info' },
@@ -185,13 +190,11 @@ async function generateFilesForContractKit(outdir: string) {
           files: `${BUILD_DIR}/contracts-${externalContract}/@(${contractKitContracts.join(
             '|'
           )}).json`,
-          outDir: relativePath,
+          outDir: relativePath, // TODO change web3 path
         },
       })
     )
   }
-
-  await tsGenerator({ cwd, loggingLvl: 'info' }, web3Generator)
 
   exec(`yarn prettier --write "${outdir}/**/*.ts"`)
 }

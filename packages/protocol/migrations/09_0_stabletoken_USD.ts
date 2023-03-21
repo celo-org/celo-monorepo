@@ -45,7 +45,7 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
 
     const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<SortedOraclesInstance>(
       'SortedOracles',
-      MySingleton.getInstance()
+      MySingleton.getInstance('mento')
     ) // TODO use registry rather than truffle
 
     for (const oracle of config.stableToken.oracles) {
@@ -72,7 +72,7 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       )
       const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
         'Reserve',
-        MySingleton.getInstance()
+        MySingleton.getInstance('mento')
       )
       console.info('Adding StableToken (USD) to Reserve')
       await reserve.addToken(stableToken.address)

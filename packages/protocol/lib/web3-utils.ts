@@ -158,8 +158,9 @@ export async function setInitialProxyImplementation<
   if (deployedContract){
     Contract = deployedContract
     ContractProxy = deployedProxy
-    MySingleton.getInstance().addArtifact(contractName, Contract) // Add a key to avoid colition?
-    MySingleton.getInstance().addArtifact(contractName + 'Proxy', ContractProxy) // Add a key to avoid colition?
+    // TODO change the path to something more general
+    MySingleton.getInstance('mento').addArtifact(contractName, Contract) // Add a key to avoid colition?
+    MySingleton.getInstance('mento').addArtifact(contractName + 'Proxy', ContractProxy) // Add a key to avoid colition?
     // Contract = makeTruffleContract(require(`../build/${artifactPath}/${contractName}.json`), web3)
     // ContractProxy = makeTruffleContract(require(`../build/${artifactPath}/${contractName + 'Proxy'}.json`), web3)
   } else {

@@ -7,7 +7,7 @@ import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { MySingleton } from '../../migrations/singletonArtifacts'
 
 const getProxiedContract = async (contractName: string) => {
-  // console.log("MySingleton.getInstance().artifacts", Object.keys(MySingleton.getInstance().artifacts))
+  // console.log("MySingleton.getInstance('mento').artifacts", Object.keys(MySingleton.getInstance('mento').artifacts))
   // TODO remove catch
   // if (type !== undefined) {
   //   throw 'Wrong type'
@@ -21,7 +21,7 @@ const getProxiedContract = async (contractName: string) => {
   } catch {
     // console.log(22)
     /* tslint:disable-next-line */
-    return await getDeployedProxiedContract(contractName, MySingleton.getInstance())
+    return await getDeployedProxiedContract(contractName, MySingleton.getInstance('mento'))
   }
 }
 
@@ -35,7 +35,7 @@ const getContract = async (contractName: string, type: string) => {
     } catch {
       // console.log(2)
       /* tslint:disable-next-line */
-      return await MySingleton.getInstance().require(contractName).deployed()
+      return await MySingleton.getInstance('mento').require(contractName).deployed()
     }
   }
   // TODO remove catch
@@ -46,7 +46,7 @@ const getContract = async (contractName: string, type: string) => {
     } catch {
       // console.log(12)
       /* tslint:disable-next-line */
-      return await MySingleton.getInstance()
+      return await MySingleton.getInstance('mento')
         .require(contractName + 'Proxy')
         .deployed()
     }

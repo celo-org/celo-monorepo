@@ -29,7 +29,7 @@ module.exports = deploymentForCoreContract<GrandaMentoInstance>(
     // Add as a spender of the Reserve
     const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
       'Reserve',
-      MySingleton.getInstance()
+      MySingleton.getInstance('mento')
     )
     await reserve.addExchangeSpender(grandaMento.address)
 

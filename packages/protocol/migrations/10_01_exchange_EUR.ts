@@ -38,7 +38,7 @@ module.exports = deploymentForCoreContract<ExchangeEURInstance>(
 
     const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
       'Reserve',
-      MySingleton.getInstance()
+      MySingleton.getInstance('mento')
     )
     // cUSD doesn't need to be added as it is currently harcoded in Reserve.sol
     await reserve.addExchangeSpender(exchange.address)

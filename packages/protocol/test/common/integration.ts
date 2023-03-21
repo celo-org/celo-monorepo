@@ -312,12 +312,12 @@ contract('Integration: Governance', (accounts: string[]) => {
         } catch {
           contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
             contractName,
-            MySingleton.getInstance()
+            MySingleton.getInstance('mento')
           )
           selectors = getFunctionSelectorsForContract(
             contract,
             contractName,
-            MySingleton.getInstance()
+            MySingleton.getInstance('mento')
           )
         }
 
@@ -432,13 +432,16 @@ Array.from([
     const decimals = 18
 
     before(async () => {
-      exchange = await getDeployedProxiedContract(exchangeId, MySingleton.getInstance())
-      stableToken = await getDeployedProxiedContract(stableTokenId, MySingleton.getInstance())
+      exchange = await getDeployedProxiedContract(exchangeId, MySingleton.getInstance('mento'))
+      stableToken = await getDeployedProxiedContract(
+        stableTokenId,
+        MySingleton.getInstance('mento')
+      )
       multiSig = await getDeployedProxiedContract(
         'ReserveSpenderMultiSig',
-        MySingleton.getInstance()
+        MySingleton.getInstance('mento')
       )
-      reserve = await getDeployedProxiedContract('Reserve', MySingleton.getInstance())
+      reserve = await getDeployedProxiedContract('Reserve', MySingleton.getInstance('mento'))
       goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
     })
 
@@ -710,7 +713,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
     before(async () => {
       const reserve: ReserveInstance = await getDeployedProxiedContract(
         'Reserve',
-        MySingleton.getInstance()
+        MySingleton.getInstance('mento')
       )
       const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract(
         'FeeCurrencyWhitelist',

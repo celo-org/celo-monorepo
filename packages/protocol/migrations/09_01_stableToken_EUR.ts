@@ -39,13 +39,13 @@ module.exports = deploymentForCoreContract<StableTokenEURInstance>(
     if (config.stableTokenEUR.frozen) {
       const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
         'Freezer',
-        MySingleton.getInstance()
+        MySingleton.getInstance('mento')
       )
       await freezer.freeze(stableToken.address)
     }
     const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<SortedOraclesInstance>(
       'SortedOracles',
-      MySingleton.getInstance()
+      MySingleton.getInstance('mento')
     )
 
     for (const oracle of config.stableTokenEUR.oracles) {
@@ -72,7 +72,7 @@ module.exports = deploymentForCoreContract<StableTokenEURInstance>(
       )
       const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
         'Reserve',
-        MySingleton.getInstance()
+        MySingleton.getInstance('mento')
       )
       console.info('Adding StableToken (EUR) to Reserve')
       await reserve.addToken(stableToken.address)

@@ -1,19 +1,20 @@
 export class MySingleton {
-  public static getInstance(): MySingleton {
-    if (!MySingleton.instance) {
-      MySingleton.instance = new MySingleton()
+  public static getInstance(namespace: string): MySingleton {
+    if (!(namespace in MySingleton.instances)) {
+      MySingleton.instances[namespace] = new MySingleton()
     }
 
-    return MySingleton.instance
+    return MySingleton.instances[namespace]
   }
 
-  private static instance: MySingleton
+  private static instances: { [key: string]: MySingleton } = {}
 
   public initialized = false
   public artifacts: { [key: string]: any } = {}
   private constructor() {}
 
   public addArtifact(key: string, value: any) {
+    // TODO namespace in this.artifacts, this.artifacts[namespace] = {}
     this.artifacts[key] = value
   }
 

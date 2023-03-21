@@ -532,7 +532,7 @@ export async function assumeOwnership(contractsToOwn: string[], to: string, prop
         try {
         contractAddress = (await getDeployedProxiedContract(contractName, artifacts)).address
         }catch{
-          contractAddress = (await getDeployedProxiedContract(contractName, MySingleton.getInstance())).address
+          contractAddress = (await getDeployedProxiedContract(contractName, MySingleton.getInstance('mento'))).address
         }
       } 
 			return {

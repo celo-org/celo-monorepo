@@ -45,7 +45,7 @@ module.exports = deploymentForCoreContract<StableTokenBRLInstance>(
     }
     const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<SortedOraclesInstance>(
       'SortedOracles',
-      MySingleton.getInstance()
+      MySingleton.getInstance('mento')
     )
 
     for (const oracle of config.stableTokenBRL.oracles) {
@@ -72,7 +72,7 @@ module.exports = deploymentForCoreContract<StableTokenBRLInstance>(
       )
       const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
         'Reserve',
-        MySingleton.getInstance()
+        MySingleton.getInstance('mento')
       )
       console.info('Adding StableToken (BRL) to Reserve')
       await reserve.addToken(stableToken.address)

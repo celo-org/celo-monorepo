@@ -66,12 +66,12 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           // TODO remove this catch
           contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
             contractName,
-            MySingleton.getInstance()
+            MySingleton.getInstance('mento')
           )
           selectors = getFunctionSelectorsForContract(
             contract,
             contractName,
-            MySingleton.getInstance()
+            MySingleton.getInstance('mento')
           )
         }
 
@@ -135,7 +135,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           await transferOwnershipOfProxyAndImplementation(
             contractName,
             governance.address,
-            MySingleton.getInstance()
+            MySingleton.getInstance('mento')
           )
         }
       }

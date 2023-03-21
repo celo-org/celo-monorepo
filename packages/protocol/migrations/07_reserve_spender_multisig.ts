@@ -35,8 +35,8 @@ module.exports = deploymentForProxiedContract<ReserveSpenderMultiSigInstance>(
     // TODO replace with singleton
     await transferOwnershipOfProxyExternal(proxy, reserveSpenderMultiSig.address)
 
-    MySingleton.getInstance().initialized = true
-    // MySingleton.getInstance().addArtifact(CeloContractName.ReserveSpenderMultiSig, proxy)
+    MySingleton.getInstance('mento').initialized = true
+    // MySingleton.getInstance('mento').addArtifact(CeloContractName.ReserveSpenderMultiSig, proxy)
     // await transferOwnershipOfProxy(
     //   CeloContractName.ReserveSpenderMultiSig,
     //   reserveSpenderMultiSig.address,

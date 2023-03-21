@@ -12,7 +12,7 @@ import { MySingleton } from './singletonArtifacts'
 const initializeArgs = async (): Promise<[string, string, string, string, string[], string[]]> => {
   const stableToken: StableTokenInstance = await getDeployedProxiedContract<StableTokenInstance>(
     'StableToken',
-    MySingleton.getInstance()
+    MySingleton.getInstance('mento')
   )
 
   const attestationFee = await convertToContractDecimals(
