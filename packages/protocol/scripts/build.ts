@@ -21,7 +21,7 @@ export const ProxyContracts = [
   'ExchangeEURProxy',
   'ExchangeProxy',
   'FederatedAttestationsProxy',
-  'FeeBurnerProxy',
+  'FeeHandlerProxy',
   'FeeCurrencyWhitelistProxy',
   'GasPriceMinimumProxy',
   'GoldTokenProxy',
@@ -44,7 +44,7 @@ export const CoreContracts = [
   // common
   'Accounts',
   'GasPriceMinimum',
-  'FeeBurner',
+  'FeeHandler',
   'FeeCurrencyWhitelist',
   'GoldToken',
   'MetaTransactionWallet',
