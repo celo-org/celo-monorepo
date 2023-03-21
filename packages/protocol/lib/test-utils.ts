@@ -221,9 +221,9 @@ export const assertProxiesSet = async (getContract: any) => {
 }
 
 export const assertContractsRegistered = async (getContract: any) => {
-  const registry: RegistryInstance = await getContract('Registry', 'proxiedContract')
+  const registry: RegistryInstance = await getContract('Registry')
   for (const contractName of hasEntryInRegistry) {
-    const contract: Truffle.ContractInstance = await getContract(contractName, 'proxiedContract')
+    const contract: Truffle.ContractInstance = await getContract(contractName)
     assert.equal(
       contract.address.toLowerCase(),
       (await registry.getAddressFor(soliditySha3(contractName))).toLowerCase(),
@@ -233,9 +233,9 @@ export const assertContractsRegistered = async (getContract: any) => {
 }
 
 export const assertRegistryAddressesSet = async (getContract: any) => {
-  const registry: RegistryInstance = await getContract('Registry', 'proxiedContract')
+  const registry: RegistryInstance = await getContract('Registry')
   for (const contractName of usesRegistry) {
-    const contract: UsingRegistryInstance = await getContract(contractName, 'proxiedContract')
+    const contract: UsingRegistryInstance = await getContract(contractName)
     assert.equal(
       registry.address.toLowerCase(),
       (await contract.registry()).toLowerCase(),

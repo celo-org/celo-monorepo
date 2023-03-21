@@ -6,37 +6,44 @@ import {
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { MySingleton } from '../../migrations/singletonArtifacts'
 
-const getContract = async (contractName: string, type: string) => {
+const getProxiedContract = async (contractName: string, type?: string) => {
   // console.log("MySingleton.getInstance().artifacts", Object.keys(MySingleton.getInstance().artifacts))
-  console.log(contractName, type)
-  if (type === 'proxiedContract') {
-    // TODO remove catch
-    try {
-      console.log(21)
-      return getDeployedProxiedContract(contractName, artifacts)
-    } catch {
-      console.log(22)
-      return getDeployedProxiedContract(contractName, MySingleton.getInstance())
-    }
+  // TODO remove catch
+  if (type !== undefined) {
+    throw 'Wrong type'
   }
+
+  try {
+    console.log(21)
+    const out = await getDeployedProxiedContract(contractName, artifacts)
+    console.log(211, out)
+    return out
+  } catch {
+    console.log(22)
+    return await getDeployedProxiedContract(contractName, MySingleton.getInstance())
+  }
+}
+
+const getContract = async (contractName: string, type: string) => {
+  console.log(contractName, type)
   if (type === 'contract') {
     // TODO remove catch
     console.log(1)
     try {
-      return artifacts.require(contractName).deployed()
+      return await artifacts.require(contractName).deployed()
     } catch {
       console.log(2)
-      return MySingleton.getInstance().require(contractName).deployed()
+      return await MySingleton.getInstance().require(contractName).deployed()
     }
   }
   // TODO remove catch
   if (type === 'proxy') {
     try {
       console.log(11)
-      return artifacts.require(contractName + 'Proxy').deployed()
+      return await artifacts.require(contractName + 'Proxy').deployed()
     } catch {
       console.log(12)
-      return MySingleton.getInstance()
+      return await MySingleton.getInstance()
         .require(contractName + 'Proxy')
         .deployed()
     }
@@ -52,13 +59,13 @@ contract('Migration', () => {
 
   describe('Checking the registry', () => {
     it('should have the correct entry in the registry for all contracts used by the registry', async () => {
-      await assertContractsRegistered(getContract)
+      await assertContractsRegistered(getProxiedContract)
     })
   })
 
   describe('Checking contracts that use the registry', () => {
     it('should have set the registry address properly in all contracts that use it', async () => {
-      await assertRegistryAddressesSet(getContract)
+      await assertRegistryAddressesSet(getProxiedContract)
     })
   })
 })
