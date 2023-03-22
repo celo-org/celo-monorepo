@@ -209,14 +209,18 @@ export async function waitForPortOpen(host: string, port: number, seconds: numbe
 }
 
 export const assertProxiesSet = async (getContract: any) => {
-  for (const contractName of proxiedContracts) {
-    const contract = await getContract(contractName, 'contract')
-    const proxy: ProxyInstance = await getContract(contractName, 'proxy')
-    assert.equal(
-      contract.address.toLowerCase(),
-      (await proxy._getImplementation()).toLowerCase(),
-      contractName + 'Proxy not pointing to the ' + contractName + ' implementation'
-    )
+  for (const contractPackage of proxiedContracts) {
+    for (const contractName of contractPackage.contracts) {
+
+      const contract = await getContract(contractName, 'contract', contractPackage.__path)
+      const proxy: ProxyInstance = await getContract(contractName, 'proxy', contractPackage.__path)
+      assert.equal(
+        contract.address.toLowerCase(),
+        (await proxy._getImplementation()).toLowerCase(),
+        contractName + 'Proxy not pointing to the ' + contractName + ' implementation'
+      )
+    }
+    
   }
 }
 
@@ -425,25 +429,40 @@ export const isSameAddress = (minerAddress, otherAddress) => {
 }
 
 // TODO(amy): Pull this list from the build artifacts instead
-export const proxiedContracts: string[] = [
-  'Attestations',
-  'Escrow',
-  'GoldToken',
-  'Registry',
-  'Reserve',
-  'SortedOracles',
-  'StableToken',
+const proxiedContracts = [{
+  contracts: [
+    'Attestations',
+    'Escrow',
+    'GoldToken',
+    'Registry',
+    'SortedOracles',
+
+  ]
+  },{
+  contracts: [
+    'Reserve',
+    'StableToken',
+  ],
+  __path: 'mento'
+ }
 ]
 
 // TODO(asa): Pull this list from the build artifacts instead
-export const ownedContracts: string[] = [
-  'Attestations',
-  'Escrow',
-  'Exchange',
-  'Registry',
-  'Reserve',
-  'SortedOracles',
-  'StableToken',
+const ownedContracts = [{
+  contracts: [
+    'Attestations',
+    'Escrow',
+    'Registry',
+    'SortedOracles',
+  ]
+  },{
+  contracts: [
+    'Reserve',
+    'Exchange',
+    'StableToken'
+  ],
+  __path: 'mento'
+ }
 ]
 
 export function getOffsetForMinerSelection(
@@ -504,7 +523,7 @@ enum VoteValue {
   Yes,
 }
 
-export async function assumeOwnership(contractsToOwn: string[], to: string, proposalId: number = 1, dequeuedIndex: number = 0) {
+export async function assumeOwnership(contractsToOwn: string[], to: string, proposalId: number = 1, dequeuedIndex: number = 0, path='') {
 	const governance: GovernanceInstance = await getDeployedProxiedContract('Governance', artifacts)
 	const lockedGold: LockedGoldInstance = await getDeployedProxiedContract('LockedGold', artifacts)
 
@@ -522,19 +541,18 @@ export async function assumeOwnership(contractsToOwn: string[], to: string, prop
 	// @ts-ignore
   const transferOwnershipData = Buffer.from(stripHexEncoding(registry.contract.methods.transferOwnership(to).encodeABI()), 'hex')
 	const proposalTransactions = await Promise.all(
+
+
 		contractsToOwn.map(async (contractName: string) => {
       let contractAddress:string
       // TODO remove this nested try
-      try{
-        contractAddress = await registry.getAddressForStringOrDie(contractName)
+      if (path){
+        contractAddress = (await getDeployedProxiedContract(contractName, ArtifactsSingleton.getInstance(path))).address
       }
-      catch{
-        try {
+      else {
         contractAddress = (await getDeployedProxiedContract(contractName, artifacts)).address
-        }catch{
-          contractAddress = (await getDeployedProxiedContract(contractName, ArtifactsSingleton.getInstance('mento'))).address
-        }
-      } 
+
+      }
 			return {
 				value: 0,
 				// destination: (await getDeployedProxiedContract(contractName, artifacts)).address,

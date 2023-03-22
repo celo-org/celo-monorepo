@@ -55,25 +55,17 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       for (const contractName of constitutionContractNames) {
         console.log(`\tSetting constitution thresholds for ${contractName}`)
 
-        let selectors
-        try {
-          contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
-            contractName,
-            artifacts
-          )
-          selectors = getFunctionSelectorsForContract(contract, contractName, artifacts)
-        } catch {
-          // TODO remove this catch
-          contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
-            contractName,
-            ArtifactsSingleton.getInstance('mento')
-          )
-          selectors = getFunctionSelectorsForContract(
-            contract,
-            contractName,
-            ArtifactsSingleton.getInstance('mento')
-          )
+        let artifactsObject = artifacts
+        if (constitution[contractName].__path) {
+          const path = constitution[contractName].__path
+          artifactsObject = ArtifactsSingleton.getInstance(path)
         }
+
+        contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
+          contractName,
+          artifactsObject
+        )
+        const selectors = getFunctionSelectorsForContract(contract, contractName, artifactsObject)
 
         selectors.default = ['0x00000000']
         const thresholds = { ...constitution.proxy, ...constitution[contractName] }
@@ -89,53 +81,65 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       }
     }
 
+    // const proxyAndImplementationOwnedByGovernance =
+
+    const proxyAndImplementationMentoOwnedByGovernance = []
+
     const proxyAndImplementationOwnedByGovernance = [
-      'Accounts',
-      'Attestations',
-      // BlockchainParameters ownership transitioned to governance in a follow-up script.
-      // 'BlockchainParameters',
-      'DoubleSigningSlasher',
-      'DowntimeSlasher',
-      'Election',
-      'EpochRewards',
-      'Escrow',
-      'Exchange',
-      'ExchangeEUR',
-      'ExchangeBRL',
-      'FederatedAttestations',
-      'FeeCurrencyWhitelist',
-      'Freezer',
-      'GasPriceMinimum',
-      'GoldToken',
-      'Governance',
-      'GovernanceSlasher',
-      'GrandaMento',
-      'LockedGold',
-      'OdisPayments',
-      'Random',
-      'Registry',
-      'Reserve',
-      'SortedOracles',
-      'StableToken',
-      'StableTokenEUR',
-      'StableTokenBRL',
-      'Validators',
+      {
+        contracts: [
+          'Accounts',
+          'Attestations',
+          // BlockchainParameters ownership transitioned to governance in a follow-up script.
+          // 'BlockchainParameters',
+          'DoubleSigningSlasher',
+          'DowntimeSlasher',
+          'Election',
+          'EpochRewards',
+          'Escrow',
+          'FeeBurner',
+          'FederatedAttestations',
+          'FeeCurrencyWhitelist',
+          'Freezer',
+          'GasPriceMinimum',
+          'GoldToken',
+          'Governance',
+          'GovernanceSlasher',
+          'LockedGold',
+          'OdisPayments',
+          'Random',
+          'Registry',
+          'Reserve',
+          'SortedOracles',
+          'Validators',
+        ],
+      },
+      {
+        contracts: [
+          'Exchange',
+          'ExchangeEUR',
+          'ExchangeBRL',
+          'GrandaMento',
+          'StableToken',
+          'StableTokenEUR',
+          'StableTokenBRL',
+        ],
+        __path: 'mento',
+      },
     ]
 
     if (!config.governance.skipTransferOwnership) {
-      for (const contractName of proxyAndImplementationOwnedByGovernance) {
-        try {
+      let artifactsInstance = artifacts
+      for (const contractPackage of proxyAndImplementationOwnedByGovernance) {
+        if (contractPackage.__path) {
+          artifactsInstance = ArtifactsSingleton.getInstance(contractPackage.__path)
+        }
+
+        for (const contractName of contractPackage.contracts) {
           await transferOwnershipOfProxyAndImplementation(
             contractName,
             governance.address,
             artifacts
-          )
-        } catch {
-          // TODO remove this catch
-          await transferOwnershipOfProxyAndImplementation(
-            contractName,
-            governance.address,
-            ArtifactsSingleton.getInstance('mento')
           )
         }
       }

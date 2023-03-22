@@ -6,50 +6,25 @@ import {
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { ArtifactsSingleton } from '../../migrations/singletonArtifacts'
 
-const getProxiedContract = async (contractName: string) => {
-  // console.log("ArtifactsSingleton.getInstance('mento').artifacts", Object.keys(ArtifactsSingleton.getInstance('mento').artifacts))
-  // TODO remove catch
-  // if (type !== undefined) {
-  //   throw 'Wrong type'
-  // }
-
-  try {
-    // console.log(21)
-    const out = await getDeployedProxiedContract(contractName, artifacts)
-    // console.log(211, out)
-    return out
-  } catch {
-    // console.log(22)
-    /* tslint:disable-next-line */
-    return await getDeployedProxiedContract(contractName, ArtifactsSingleton.getInstance('mento'))
+const getProxiedContract = async (contractName: string, path: string) => {
+  let artifactsObject = artifacts
+  if (path) {
+    artifactsObject = ArtifactsSingleton.getInstance(path)
   }
+
+  return await getDeployedProxiedContract(contractName, artifactsObject)
 }
 
-const getContract = async (contractName: string, type: string) => {
-  // console.log(contractName, type)
-  if (type === 'contract') {
-    // TODO remove catch
-    // console.log(1)
-    try {
-      return await artifacts.require(contractName).deployed()
-    } catch {
-      // console.log(2)
-      /* tslint:disable-next-line */
-      return await ArtifactsSingleton.getInstance('mento').require(contractName).deployed()
-    }
+const getContract = async (contractName: string, type: string, path: string) => {
+  let artifactsObject = artifacts
+  if (path) {
+    artifactsObject = ArtifactsSingleton.getInstance(path)
   }
-  // TODO remove catch
+  if (type === 'contract') {
+    return await artifactsObject.require(contractName).deployed()
+  }
   if (type === 'proxy') {
-    try {
-      // console.log(11)
-      return await artifacts.require(contractName + 'Proxy').deployed()
-    } catch {
-      // console.log(12)
-      /* tslint:disable-next-line */
-      return await ArtifactsSingleton.getInstance('mento')
-        .require(contractName + 'Proxy')
-        .deployed()
-    }
+    return await artifactsObject.require(contractName + 'Proxy').deployed()
   }
 }
 
