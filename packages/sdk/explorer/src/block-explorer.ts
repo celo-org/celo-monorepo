@@ -136,18 +136,10 @@ export class BlockExplorer {
     return null
   }
 
-  getContractMethodAbi = async (
-    address: string,
-    selector: string,
-    onlyCoreContracts = false
-  ): Promise<ContractNameAndMethodAbi | null> => {
-    let contractMapping
-    if (onlyCoreContracts) {
-      contractMapping = await this.getContractMappingFromCore(address)
-    } else {
-      contractMapping = await this.getContractMappingWithSelector(address, selector)
-    }
-
+  private getContractMethodAbiFromMapping = (
+    contractMapping: ContractMapping,
+    selector: string
+  ): ContractNameAndMethodAbi | null => {
     if (contractMapping === undefined) {
       return null
     }
@@ -162,6 +154,41 @@ export class BlockExplorer {
       contractName: contractMapping.details.name,
       abi: methodAbi,
     }
+  }
+
+  getContractMethodAbi = async (
+    address: string,
+    selector: string,
+    onlyCoreContracts = false
+  ): Promise<ContractNameAndMethodAbi | null> => {
+    const contractMapping =
+      onlyCoreContracts === true
+        ? await this.getContractMappingWithSelector(address, selector, [
+            this.getContractMappingFromCore,
+          ])
+        : await this.getContractMappingWithSelector(address, selector)
+
+    if (contractMapping === undefined) {
+      return null
+    }
+
+    return this.getContractMethodAbiFromMapping(contractMapping, selector)
+  }
+
+  getContractMethodAbiFromSourcify = async (
+    address: string,
+    selector: string
+  ): Promise<ContractNameAndMethodAbi | null> => {
+    const contractMapping = await this.getContractMappingWithSelector(address, selector, [
+      this.getContractMappingFromSourcify,
+      this.getContractMappingFromSourcifyAsProxy,
+    ])
+
+    if (contractMapping === undefined) {
+      return null
+    }
+
+    return this.getContractMethodAbiFromMapping(contractMapping, selector)
   }
 
   buildCallDetails(contract: ContractDetails, abi: ABIDefinition, input: string): CallDetails {
@@ -230,16 +257,17 @@ export class BlockExplorer {
 
   async getContractMappingWithSelector(
     address: string,
-    selector: string
-  ): Promise<ContractMapping | undefined> {
-    for (const strategy of [
+    selector: string,
+    strategies = [
       this.getContractMappingFromCore,
       this.getContractMappingFromSourcify,
       this.getContractMappingFromSourcifyAsProxy,
-    ]) {
-      const contractDetails = await strategy(address)
-      if (contractDetails && contractDetails.fnMapping.get(selector)) {
-        return contractDetails
+    ]
+  ): Promise<ContractMapping | undefined> {
+    for (const strategy of strategies) {
+      const contractMapping = await strategy(address)
+      if (contractMapping && contractMapping.fnMapping.get(selector)) {
+        return contractMapping
       }
     }
   }
