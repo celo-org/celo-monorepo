@@ -81,10 +81,6 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       }
     }
 
-    // const proxyAndImplementationOwnedByGovernance =
-
-    const proxyAndImplementationMentoOwnedByGovernance = []
-
     const proxyAndImplementationOwnedByGovernance = [
       {
         contracts: [
@@ -139,7 +135,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           await transferOwnershipOfProxyAndImplementation(
             contractName,
             governance.address,
-            artifacts
+            artifactsInstance
           )
         }
       }
