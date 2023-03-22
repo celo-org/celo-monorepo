@@ -11,7 +11,7 @@ const getProxiedContract = async (contractName: string, path: string) => {
   if (path) {
     artifactsObject = ArtifactsSingleton.getInstance(path)
   }
-
+  /* tslint:disable-next-line */
   return await getDeployedProxiedContract(contractName, artifactsObject)
 }
 
@@ -21,9 +21,11 @@ const getContract = async (contractName: string, type: string, path: string) => 
     artifactsObject = ArtifactsSingleton.getInstance(path)
   }
   if (type === 'contract') {
+    /* tslint:disable-next-line */
     return await artifactsObject.require(contractName).deployed()
   }
   if (type === 'proxy') {
+    /* tslint:disable-next-line */
     return await artifactsObject.require(contractName + 'Proxy').deployed()
   }
 }
