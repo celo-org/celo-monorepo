@@ -1,7 +1,7 @@
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
-import { MySingleton } from '@celo/protocol/migrations/singletonArtifacts'
+import { ArtifactsSingleton } from '@celo/protocol/migrations/singletonArtifacts'
 import { config } from '@celo/protocol/migrationsConfig'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
@@ -532,7 +532,7 @@ export async function assumeOwnership(contractsToOwn: string[], to: string, prop
         try {
         contractAddress = (await getDeployedProxiedContract(contractName, artifacts)).address
         }catch{
-          contractAddress = (await getDeployedProxiedContract(contractName, MySingleton.getInstance('mento'))).address
+          contractAddress = (await getDeployedProxiedContract(contractName, ArtifactsSingleton.getInstance('mento'))).address
         }
       } 
 			return {

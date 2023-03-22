@@ -11,7 +11,7 @@ import {
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance } from 'types'
-import { MySingleton } from './singletonArtifacts'
+import { ArtifactsSingleton } from './singletonArtifacts'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
   const governanceApproverMultiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract<GovernanceApproverMultiSigInstance>(
@@ -66,12 +66,12 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           // TODO remove this catch
           contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
             contractName,
-            MySingleton.getInstance('mento')
+            ArtifactsSingleton.getInstance('mento')
           )
           selectors = getFunctionSelectorsForContract(
             contract,
             contractName,
-            MySingleton.getInstance('mento')
+            ArtifactsSingleton.getInstance('mento')
           )
         }
 
@@ -135,7 +135,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           await transferOwnershipOfProxyAndImplementation(
             contractName,
             governance.address,
-            MySingleton.getInstance('mento')
+            ArtifactsSingleton.getInstance('mento')
           )
         }
       }

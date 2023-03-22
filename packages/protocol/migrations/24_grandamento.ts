@@ -8,7 +8,7 @@ import {
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { GrandaMentoInstance, ReserveInstance } from 'types/mento'
-import { MySingleton } from './singletonArtifacts'
+import { ArtifactsSingleton } from './singletonArtifacts'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [
@@ -29,7 +29,7 @@ module.exports = deploymentForCoreContract<GrandaMentoInstance>(
     // Add as a spender of the Reserve
     const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
       'Reserve',
-      MySingleton.getInstance('mento')
+      ArtifactsSingleton.getInstance('mento')
     )
     await reserve.addExchangeSpender(grandaMento.address)
 

@@ -37,7 +37,7 @@ import {
   StableTokenContract,
   StableTokenInstance,
 } from 'types/mento'
-import { MySingleton } from '../../migrations/singletonArtifacts'
+import { ArtifactsSingleton } from '../../migrations/singletonArtifacts'
 import { SECONDS_IN_A_WEEK } from '../constants'
 
 enum VoteValue {
@@ -312,12 +312,12 @@ contract('Integration: Governance', (accounts: string[]) => {
         } catch {
           contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
             contractName,
-            MySingleton.getInstance('mento')
+            ArtifactsSingleton.getInstance('mento')
           )
           selectors = getFunctionSelectorsForContract(
             contract,
             contractName,
-            MySingleton.getInstance('mento')
+            ArtifactsSingleton.getInstance('mento')
           )
         }
 
@@ -432,16 +432,19 @@ Array.from([
     const decimals = 18
 
     before(async () => {
-      exchange = await getDeployedProxiedContract(exchangeId, MySingleton.getInstance('mento'))
+      exchange = await getDeployedProxiedContract(
+        exchangeId,
+        ArtifactsSingleton.getInstance('mento')
+      )
       stableToken = await getDeployedProxiedContract(
         stableTokenId,
-        MySingleton.getInstance('mento')
+        ArtifactsSingleton.getInstance('mento')
       )
       multiSig = await getDeployedProxiedContract(
         'ReserveSpenderMultiSig',
-        MySingleton.getInstance('mento')
+        ArtifactsSingleton.getInstance('mento')
       )
-      reserve = await getDeployedProxiedContract('Reserve', MySingleton.getInstance('mento'))
+      reserve = await getDeployedProxiedContract('Reserve', ArtifactsSingleton.getInstance('mento'))
       goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
     })
 
@@ -706,7 +709,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
     before(async () => {
       const reserve: ReserveInstance = await getDeployedProxiedContract(
         'Reserve',
-        MySingleton.getInstance('mento')
+        ArtifactsSingleton.getInstance('mento')
       )
       const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract(
         'FeeCurrencyWhitelist',

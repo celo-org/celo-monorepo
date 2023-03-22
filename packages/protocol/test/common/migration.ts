@@ -4,10 +4,10 @@ import {
   assertRegistryAddressesSet,
 } from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
-import { MySingleton } from '../../migrations/singletonArtifacts'
+import { ArtifactsSingleton } from '../../migrations/singletonArtifacts'
 
 const getProxiedContract = async (contractName: string) => {
-  // console.log("MySingleton.getInstance('mento').artifacts", Object.keys(MySingleton.getInstance('mento').artifacts))
+  // console.log("ArtifactsSingleton.getInstance('mento').artifacts", Object.keys(ArtifactsSingleton.getInstance('mento').artifacts))
   // TODO remove catch
   // if (type !== undefined) {
   //   throw 'Wrong type'
@@ -21,7 +21,7 @@ const getProxiedContract = async (contractName: string) => {
   } catch {
     // console.log(22)
     /* tslint:disable-next-line */
-    return await getDeployedProxiedContract(contractName, MySingleton.getInstance('mento'))
+    return await getDeployedProxiedContract(contractName, ArtifactsSingleton.getInstance('mento'))
   }
 }
 
@@ -35,7 +35,7 @@ const getContract = async (contractName: string, type: string) => {
     } catch {
       // console.log(2)
       /* tslint:disable-next-line */
-      return await MySingleton.getInstance('mento').require(contractName).deployed()
+      return await ArtifactsSingleton.getInstance('mento').require(contractName).deployed()
     }
   }
   // TODO remove catch
@@ -46,7 +46,7 @@ const getContract = async (contractName: string, type: string) => {
     } catch {
       // console.log(12)
       /* tslint:disable-next-line */
-      return await MySingleton.getInstance('mento')
+      return await ArtifactsSingleton.getInstance('mento')
         .require(contractName + 'Proxy')
         .deployed()
     }

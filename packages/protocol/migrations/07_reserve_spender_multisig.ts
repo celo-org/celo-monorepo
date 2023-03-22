@@ -6,7 +6,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { ReserveSpenderMultiSigInstance } from 'types/mento'
-import { MySingleton } from './singletonArtifacts'
+import { ArtifactsSingleton } from './singletonArtifacts'
 
 // const Artifactor = require('truffle-artifactor')
 // console.log("require", artifacts.require('/Users/martinvol/celo/celo-monorepo/packages/protocol/build/mento/ReserveSpenderMultiSig.json'))
@@ -35,8 +35,8 @@ module.exports = deploymentForProxiedContract<ReserveSpenderMultiSigInstance>(
     // TODO replace with singleton
     await transferOwnershipOfProxyExternal(proxy, reserveSpenderMultiSig.address)
 
-    MySingleton.getInstance('mento').initialized = true
-    // MySingleton.getInstance('mento').addArtifact(CeloContractName.ReserveSpenderMultiSig, proxy)
+    ArtifactsSingleton.getInstance('mento').initialized = true
+    // ArtifactsSingleton.getInstance('mento').addArtifact(CeloContractName.ReserveSpenderMultiSig, proxy)
     // await transferOwnershipOfProxy(
     //   CeloContractName.ReserveSpenderMultiSig,
     //   reserveSpenderMultiSig.address,

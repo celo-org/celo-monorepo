@@ -12,7 +12,7 @@ import prompts from 'prompts'
 import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types'
 import { StableTokenInstance } from 'types/mento'
 import Web3 from 'web3'
-import { MySingleton } from '../migrations/singletonArtifacts'
+import { ArtifactsSingleton } from '../migrations/singletonArtifacts'
 
 
 
@@ -159,8 +159,8 @@ export async function setInitialProxyImplementation<
     // ContractProxy = deployedProxy
 
     // TODO change the path to something more generalrequire
-    Contract = MySingleton.getInstance(contractPath).require(contractName) // Add a key to avoid colition?
-    ContractProxy = MySingleton.getInstance(contractPath).require(contractName + 'Proxy') // Add a key to avoid colition?
+    Contract = ArtifactsSingleton.getInstance(contractPath).require(contractName) // Add a key to avoid colition?
+    ContractProxy = ArtifactsSingleton.getInstance(contractPath).require(contractName + 'Proxy') // Add a key to avoid colition?
     // Contract = makeTruffleContract(require(`../build/${artifactPath}/${contractName}.json`), web3)
     // ContractProxy = makeTruffleContract(require(`../build/${artifactPath}/${contractName + 'Proxy'}.json`), web3)
   } else {
@@ -335,7 +335,7 @@ export const makeTruffleContract = (contractName:string, contractPath:string, we
   // });
   // console.log("before return")
   Contract.defaults({from:"0x5409ed021d9299bf6814279a6a1411a7e866a631", gas: 13000000})
-  MySingleton.getInstance(contractPath).addArtifact(contractName, Contract)
+  ArtifactsSingleton.getInstance(contractPath).addArtifact(contractName, Contract)
   return Contract
 }
 
