@@ -99,7 +99,7 @@ contract Governance is
   mapping(address => uint256) public refundedDeposits;
   mapping(address => ContractConstitution) private constitution;
   mapping(uint256 => Proposals.Proposal) private proposals;
-  mapping(address => Voter) private voters;
+  mapping(address => Voter) internal voters;
   mapping(bytes32 => HotfixRecord) public hotfixes;
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
@@ -1474,9 +1474,11 @@ contract Governance is
       }
 
       VoteRecord storage voteRecord = voter.referendumVotes[index];
+      uint256 votesCast = voteRecord.yesVotes.add(voteRecord.noVotes).add(voteRecord.abstainVotes);
       maxUsed = Math.max(
         maxUsed,
-        voteRecord.yesVotes.add(voteRecord.noVotes).add(voteRecord.abstainVotes)
+        // backward compatibility for transition period - this should be updated later on
+        votesCast == 0 ? voteRecord.deprecated_weight : votesCast
       );
     }
     return maxUsed;
