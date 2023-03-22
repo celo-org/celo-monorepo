@@ -69,14 +69,17 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
 
         selectors.default = ['0x00000000']
         const thresholds = { ...constitution.proxy, ...constitution[contractName] }
+        console.log('thresholds', thresholds)
         await Promise.all(
-          Object.keys(thresholds).map((func) =>
-            Promise.all(
-              selectors[func].map((selector) =>
-                governance.setConstitution(contract.address, selector, toFixed(thresholds[func]))
+          Object.keys(thresholds)
+            .filter((method) => method !== '__path')
+            .map((func) =>
+              Promise.all(
+                selectors[func].map((selector) =>
+                  governance.setConstitution(contract.address, selector, toFixed(thresholds[func]))
+                )
               )
             )
-          )
         )
       }
     }
@@ -93,7 +96,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           'Election',
           'EpochRewards',
           'Escrow',
-          'FeeBurner',
+          // 'FeeBurner', // TODO ADD
           'FederatedAttestations',
           'FeeCurrencyWhitelist',
           'Freezer',
@@ -105,7 +108,6 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           'OdisPayments',
           'Random',
           'Registry',
-          'Reserve',
           'SortedOracles',
           'Validators',
         ],
@@ -116,6 +118,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           'ExchangeEUR',
           'ExchangeBRL',
           'GrandaMento',
+          'Reserve',
           'StableToken',
           'StableTokenEUR',
           'StableTokenBRL',

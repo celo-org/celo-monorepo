@@ -544,15 +544,13 @@ export async function assumeOwnership(contractsToOwn: string[], to: string, prop
 
 
 		contractsToOwn.map(async (contractName: string) => {
-      let contractAddress:string
-      // TODO remove this nested try
+      let artifactsInstance = artifacts
       if (path){
-        contractAddress = (await getDeployedProxiedContract(contractName, ArtifactsSingleton.getInstance(path))).address
+        artifactsInstance = ArtifactsSingleton.getInstance(path)
       }
-      else {
-        contractAddress = (await getDeployedProxiedContract(contractName, artifacts)).address
 
-      }
+      const contractAddress = (await getDeployedProxiedContract(contractName, artifactsInstance)).address
+      
 			return {
 				value: 0,
 				// destination: (await getDeployedProxiedContract(contractName, artifacts)).address,
