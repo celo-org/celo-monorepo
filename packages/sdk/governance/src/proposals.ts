@@ -367,11 +367,6 @@ export class ProposalBuilder {
     }
 
     const input = this.kit.connection.getAbiCoder().encodeFunctionCall(methodABI, tx.args)
-    // let to: string = tx.contract
-    // if (metadata && metadata.contractName) {
-    //   to = tx.contract
-    // }
-
     return { input, to: tx.address, value: tx.value }
   }
 

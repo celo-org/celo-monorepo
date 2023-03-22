@@ -14,6 +14,11 @@ import {
 import { fetchMetadata, tryGetProxyImplementation } from './sourcify'
 
 const debug = debugFactory('kit:explorer:block')
+export interface ContractNameAndMethodAbi {
+  abi: ABIDefinition
+  contract: string
+  contractName?: string
+}
 
 export interface CallDetails {
   contract: string
@@ -61,10 +66,13 @@ export class BlockExplorer {
     )
   }
 
-  async updateContractDetailsMapping(name: string, address: string) {
+  async updateContractDetailsMapping(name: CeloContract, address: string) {
     if (isCoreContract(name)) {
-      const cd = await getContractDetailsFromContract(this.kit, name, address)
-      this.addressMapping.set(cd.address, getContractMappingFromDetails(cd))
+      const contractDetails = await getContractDetailsFromContract(this.kit, name, address)
+      this.addressMapping.set(
+        contractDetails.address,
+        getContractMappingFromDetails(contractDetails)
+      )
     }
   }
 
@@ -126,6 +134,34 @@ export class BlockExplorer {
       return this.buildCallDetails(contractMapping.details, methodAbi, input)
     }
     return null
+  }
+
+  getContractMethodAbi = async (
+    address: string,
+    selector: string,
+    onlyCoreContracts = false
+  ): Promise<ContractNameAndMethodAbi | null> => {
+    let contractMapping
+    if (onlyCoreContracts) {
+      contractMapping = await this.getContractMappingFromCore(address)
+    } else {
+      contractMapping = await this.getContractMappingWithSelector(address, selector)
+    }
+
+    if (contractMapping === undefined) {
+      return null
+    }
+
+    const methodAbi = contractMapping.fnMapping.get(selector)
+    if (methodAbi === undefined) {
+      return null
+    }
+
+    return {
+      contract: contractMapping.details.address,
+      contractName: contractMapping.details.name,
+      abi: methodAbi,
+    }
   }
 
   buildCallDetails(contract: ContractDetails, abi: ABIDefinition, input: string): CallDetails {

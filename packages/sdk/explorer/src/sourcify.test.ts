@@ -11,8 +11,6 @@ import { fetchMetadata, Metadata, tryGetProxyImplementation } from './sourcify'
 
 // This is taken from protocol/contracts/build/Account.json
 const CONTRACT_METADATA = require('../fixtures/contract.metadata.json')
-// This is taken from protocol/contracts/build/AccountProxy.json
-// const PROXY_METADATA = require('../fixtures/proxy.metadata.json')
 
 describe('sourcify helpers', () => {
   let connection: Connection
