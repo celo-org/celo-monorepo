@@ -156,6 +156,14 @@ export class BlockExplorer {
     }
   }
 
+  /**
+   * Returns the contract name and ABI of the method by looking up
+   * the contract address either in all possible contract mappings.
+   * @param address
+   * @param selector
+   * @param onlyCoreContracts
+   * @returns The contract name and ABI of the method or null if not found
+   */
   getContractMethodAbi = async (
     address: string,
     selector: string,
@@ -175,6 +183,13 @@ export class BlockExplorer {
     return this.getContractMethodAbiFromMapping(contractMapping, selector)
   }
 
+  /**
+   * Returns the contract name and ABI of the method by looking up
+   * the contract address in Sourcify.
+   * @param address
+   * @param selector
+   * @returns The contract name and ABI of the method or null if not found
+   */
   getContractMethodAbiFromSourcify = async (
     address: string,
     selector: string
@@ -223,10 +238,22 @@ export class BlockExplorer {
     }
   }
 
+  /**
+   * Returns the ContractMapping for the contract at that address, or undefined
+   * by looking up the contract address in the core mappings.
+   * @param address
+   * @returns The ContractMapping for the contract at that address, or undefined
+   */
   getContractMappingFromCore = async (address: string): Promise<ContractMapping | undefined> => {
     return this.addressMapping.get(address)
   }
 
+  /**
+   * Returns the ContractMapping for the contract at that address, or undefined
+   * by looking up the contract address in Sourcify.
+   * @param address
+   * @returns The ContractMapping for the contract at that address, or undefined
+   */
   getContractMappingFromSourcify = async (
     address: string
   ): Promise<ContractMapping | undefined> => {
@@ -234,6 +261,18 @@ export class BlockExplorer {
     return metadata?.toContractMapping()
   }
 
+  /**
+   * Returns the ContractMapping for the contract at that address, or undefined
+   * by looking up the contract address in Sourcify but using heuristis to treat
+   * it as a proxy.
+   *
+   * This function is also included by the proxyImplementationOverrides map,
+   * which can be used to override the implementation address for a given proxy.
+   * This is exceptionally useful for parsing governence proposals that either
+   * initialize a proxy or upgrade it, and then calls methods on the new implementation.
+   * @param address
+   * @returns The ContractMapping for the contract at that address, or undefined
+   */
   getContractMappingFromSourcifyAsProxy = async (
     address: string
   ): Promise<ContractMapping | undefined> => {
@@ -255,6 +294,14 @@ export class BlockExplorer {
     }
   }
 
+  /**
+   * Uses all of the strategies available to find a contract mapping that contains
+   * the given method selector.
+   * @param address
+   * @param selector
+   * @param strategies
+   * @returns The ContractMapping for the contract which has the function selector, or undefined
+   */
   async getContractMappingWithSelector(
     address: string,
     selector: string,
