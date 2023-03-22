@@ -381,6 +381,10 @@ export class ProposalBuilder {
     const address =
       this.getRegistryAddition(tx.contract) ?? (await this.kit.registry.addressFor(tx.contract))
 
+    if (tx.address && address !== tx.address) {
+      throw new Error(`Address mismatch for ${tx.contract}: ${address} !== ${tx.address}`)
+    }
+
     if (tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name && Array.isArray(tx.args[1])) {
       // Transform array of initialize arguments (if provided) into delegate call data
       tx.args[1] = this.kit.connection
