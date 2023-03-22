@@ -154,7 +154,7 @@ export async function setInitialProxyImplementation<
 >(web3: Web3, artifacts: any, contractName: string, contractPath: string, ...args: any[]): Promise<ContractInstance> {
   console.log("Made it here1")
   let Contract, ContractProxy
-  if (path){
+  if (contractPath){
     // Contract = deployedContract
     // ContractProxy = deployedProxy
 
