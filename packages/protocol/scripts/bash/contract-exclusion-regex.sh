@@ -9,3 +9,11 @@ if [ $VERSION_NUMBER -gt 6 ]
   then
   CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|^UsingRegistry"
 fi
+
+
+if [ $VERSION_NUMBER -gt 7 ]
+  then
+  # keeping track of contracts moved to other repos so they are ignored in version check and deployment
+  # for other packages, like attestations, this may not be expected, as releasing it may be important as well.
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|^Exchange*|StableToken*|GrandaMento|Reserve"
+fi
