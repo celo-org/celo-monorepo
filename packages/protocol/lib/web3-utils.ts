@@ -155,35 +155,18 @@ export async function setInitialProxyImplementation<
   console.log("Made it here1")
   let Contract, ContractProxy
   if (contractPath){
-    // Contract = deployedContract
-    // ContractProxy = deployedProxy
-
-    // TODO change the path to something more generalrequire
-    Contract = ArtifactsSingleton.getInstance(contractPath).require(contractName) // Add a key to avoid colition?
-    ContractProxy = ArtifactsSingleton.getInstance(contractPath).require(contractName + 'Proxy') // Add a key to avoid colition?
-    // Contract = makeTruffleContract(require(`../build/${artifactPath}/${contractName}.json`), web3)
-    // ContractProxy = makeTruffleContract(require(`../build/${artifactPath}/${contractName + 'Proxy'}.json`), web3)
+    Contract = ArtifactsSingleton.getInstance(contractPath).require(contractName)
+    ContractProxy = ArtifactsSingleton.getInstance(contractPath).require(contractName + 'Proxy')
   } else {
     Contract = artifacts.require(contractName)
     ContractProxy = artifacts.require(contractName + 'Proxy')
   }
 
-
-
   await Contract.detectNetwork()
   await ContractProxy.detectNetwork()
-  
-  console.log("artifacts ok1")
-
-  // console.log("network id", await web3.eth.net.getId())
-  // console.log("networks:", Contract.networks)
-  // console.log("network type:", Contract.networkType)
   const implementation: ContractInstance = await Contract.deployed()
-  console.log(11)
   const proxy: ProxyInstance = await ContractProxy.deployed()
-  console.log(12)
   await _setInitialProxyImplementation(web3, implementation, proxy, contractName, { from: null, value: null }, ...args)
-  console.log(13)
   return Contract.at(proxy.address) as ContractInstance
 }
 
@@ -300,40 +283,14 @@ export const makeTruffleContract = (contractName:string, contractPath:string, we
     abi: artifact.abi,
     unlinked_binary: artifact.bytecode,
   })
-
-  // https://ethereum.stackexchange.com/questions/51240/error-deploying-using-truffle-contracts-cannot-read-property-apply-of-undefin
-  // if (typeof Contract.currentProvider.sendAsync !== "function") {
-  //   Contract.currentProvider.sendAsync = function() {
-  //     return Contract.currentProvider.send.apply(
-  //       Contract.currentProvider,
-  //           arguments
-  //     );
-  //   };
-  // }
   
-
-
-  const {createInterfaceAdapter}= require("@truffle/interface-adapter")
-  console.log("Provider ")
-  // Contract.web3 = web3
+  const {createInterfaceAdapter} = require("@truffle/interface-adapter")
+  
   Contract.setProvider(web3.currentProvider)
   Contract.setNetwork(1101)
-  // Contract.setNetwork("development")
-  // Contract.configureNetwork() funct doesn't exist
   Contract.interfaceAdapter = createInterfaceAdapter({networkType:"ethereum", provider:web3.currentProvider})
-
   Contract.configureNetwork({networkType:"ethereum", provider:web3.currentProvider})
-  // Contract._constructorMethods.configureNetwork({networkType:"ethereum", provider:web3.currentProvider})
-  // Contract._constructorMethods().configureNetwork()
   
-  
-  // web3.eth.net.getId().then((networkId) => {
-  //   Contract.setNetwork(networkId)
-  //   console.log(`set ${networkId}`)
-  // }).catch((error) => {
-  //   console.error(error);
-  // });
-  // console.log("before return")
   Contract.defaults({from:"0x5409ed021d9299bf6814279a6a1411a7e866a631", gas: 13000000})
   ArtifactsSingleton.getInstance(contractPath).addArtifact(contractName, Contract)
   return Contract
