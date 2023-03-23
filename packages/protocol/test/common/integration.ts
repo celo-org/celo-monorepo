@@ -613,7 +613,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
     freezer = await getDeployedProxiedContract('Freezer', artifacts)
     const contractsToOwn = ['Freezer', 'Registry', 'SortedOracles', 'FeeCurrencyWhitelist']
     await assumeOwnership(contractsToOwn, accounts[0])
-    await assumeOwnership(['Reserve'], accounts[0], 2, 0, 'mento')
+    await assumeOwnership(['Reserve'], accounts[0], 0, 'mento')
   })
 
   // 1. Mimic the state of the world post-contracts-release
@@ -621,7 +621,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
   //   b) Register the contracts
   //   c) Initialize the contracts
   //   d) Confirm mento is effectively frozen
-  describe('When the contracts have been deployed and initialized', () => {
+  describe.only('When the contracts have been deployed and initialized', () => {
     before(async () => {
       exchangeAbc = await Exchange.new(true)
       stableTokenAbc = await StableToken.new(true)

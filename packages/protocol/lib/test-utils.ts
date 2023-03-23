@@ -211,7 +211,7 @@ export async function waitForPortOpen(host: string, port: number, seconds: numbe
 export const assertProxiesSet = async (getContract: any) => {
   for (const contractPackage of proxiedContracts) {
     for (const contractName of contractPackage.contracts) {
-
+      console.log("contractName", contractName)
       const contract = await getContract(contractName, 'contract', contractPackage.__path)
       const proxy: ProxyInstance = await getContract(contractName, 'proxy', contractPackage.__path)
       assert.equal(
@@ -530,7 +530,7 @@ enum VoteValue {
   Yes,
 }
 
-export async function assumeOwnership(contractsToOwn: string[], to: string, proposalId: number = 1, dequeuedIndex: number = 0, path='') {
+export async function assumeOwnership(contractsToOwn: string[], to: string, dequeuedIndex: number = 0, path='') {
 	const governance: GovernanceInstance = await getDeployedProxiedContract('Governance', artifacts)
 	const lockedGold: LockedGoldInstance = await getDeployedProxiedContract('LockedGold', artifacts)
 
@@ -577,8 +577,9 @@ export async function assumeOwnership(contractsToOwn: string[], to: string, prop
 		{ value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
 	)
 
-	await governance.upvote(proposalId, 0, 0)
-	await timeTravel(config.governance.dequeueFrequency, web3)
+  const proposalId = (await governance.proposalCount()).toNumber()
+
+	await timeTravel(config.governance.dequeueFrequency + 1, web3)
 	// @ts-ignore
 	const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
 	await multiSig.submitTransaction(governance.address, 0, txData)
