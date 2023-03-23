@@ -315,8 +315,6 @@ contract('Integration: Governance', (accounts: string[]) => {
         selectors.default = ['0x00000000']
 
         const thresholds = { ...constitution.proxy, ...constitution[contractName] }
-        console.log('thresholds', thresholds)
-        console.log('contractName', contractName)
         await Promise.all(
           Object.keys(thresholds)
             .filter((k) => k !== '__path')
