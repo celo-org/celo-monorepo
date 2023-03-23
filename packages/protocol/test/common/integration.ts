@@ -315,18 +315,22 @@ contract('Integration: Governance', (accounts: string[]) => {
         selectors.default = ['0x00000000']
 
         const thresholds = { ...constitution.proxy, ...constitution[contractName] }
+        console.log('thresholds', thresholds)
+        console.log('contractName', contractName)
         await Promise.all(
-          Object.keys(thresholds).map((func) =>
-            Promise.all(
-              selectors[func].map(async (selector) => {
-                assertEqualBN(
-                  await governance.getConstitution(contract.address, selector),
-                  toFixed(thresholds[func]),
-                  'Threshold set incorrectly for function ' + func
-                )
-              })
+          Object.keys(thresholds)
+            .filter((k) => k !== '__path')
+            .map((func) =>
+              Promise.all(
+                selectors[func].map(async (selector) => {
+                  assertEqualBN(
+                    await governance.getConstitution(contract.address, selector),
+                    toFixed(thresholds[func]),
+                    'Threshold set incorrectly for function ' + func
+                  )
+                })
+              )
             )
-          )
         )
       })
     }
