@@ -621,7 +621,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
   //   b) Register the contracts
   //   c) Initialize the contracts
   //   d) Confirm mento is effectively frozen
-  describe.only('When the contracts have been deployed and initialized', () => {
+  describe('When the contracts have been deployed and initialized', () => {
     before(async () => {
       exchangeAbc = await Exchange.new(true)
       stableTokenAbc = await StableToken.new(true)
