@@ -211,6 +211,7 @@ export async function waitForPortOpen(host: string, port: number, seconds: numbe
 export const assertProxiesSet = async (getContract: any) => {
   for (const contractPackage of proxiedContracts) {
     for (const contractName of contractPackage.contracts) {
+      // tslint:disable-next-line
       console.log("contractName", contractName)
       const contract = await getContract(contractName, 'contract', contractPackage.__path)
       const proxy: ProxyInstance = await getContract(contractName, 'proxy', contractPackage.__path)
