@@ -172,8 +172,6 @@ export const proposalToJSON = async (
       value: parsedTx.tx.value,
     }
 
-    debug(jsonTx)
-
     if (isProxySetFunction(jsonTx)) {
       jsonTx.contract = suffixProxy(jsonTx.contract)
       await blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
