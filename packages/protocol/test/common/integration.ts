@@ -300,26 +300,17 @@ contract('Integration: Governance', (accounts: string[]) => {
   describe('Checking governance thresholds', () => {
     for (const contractName of Object.keys(constitution).filter((k) => k !== 'proxy')) {
       it('should have correct thresholds for ' + contractName, async () => {
-        let contract: any
-        let selectors: { [index: string]: string[] }
-        try {
-          contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
-            contractName,
-            artifacts
-          )
-
-          selectors = getFunctionSelectorsForContract(contract, contractName, artifacts)
-        } catch {
-          contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
-            contractName,
-            ArtifactsSingleton.getInstance('mento')
-          )
-          selectors = getFunctionSelectorsForContract(
-            contract,
-            contractName,
-            ArtifactsSingleton.getInstance('mento')
-          )
+        let artifactsInstance = artifacts
+        if (constitution[contractName].__path) {
+          artifactsInstance = ArtifactsSingleton.getInstance('mento')
         }
+
+        const contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
+          contractName,
+          artifactsInstance
+        )
+
+        const selectors = getFunctionSelectorsForContract(contract, contractName, artifactsInstance)
 
         selectors.default = ['0x00000000']
 

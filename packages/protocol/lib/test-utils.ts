@@ -212,6 +212,8 @@ export const assertProxiesSet = async (getContract: any) => {
   for (const contractPackage of proxiedContracts) {
     for (const contractName of contractPackage.contracts) {
 
+      // console.log("contractPackage.__path", contractPackage.__path)
+      // console.log("contractName",contractName)
       const contract = await getContract(contractName, 'contract', contractPackage.__path)
       const proxy: ProxyInstance = await getContract(contractName, 'proxy', contractPackage.__path)
       assert.equal(
@@ -226,20 +228,22 @@ export const assertProxiesSet = async (getContract: any) => {
 
 export const assertContractsRegistered = async (getContract: any) => {
   const registry: RegistryInstance = await getContract('Registry')
-  for (const contractName of hasEntryInRegistry) {
-    const contract: Truffle.ContractInstance = await getContract(contractName)
-    assert.equal(
-      contract.address.toLowerCase(),
-      (await registry.getAddressFor(soliditySha3(contractName))).toLowerCase(),
-      'Registry does not have the correct information for ' + contractName
-    )
+  for (const proxyPackage of hasEntryInRegistry) {
+    for (const contractName of proxyPackage.contracts) {
+      const contract: Truffle.ContractInstance = await getContract(contractName, proxyPackage.__path)
+      assert.equal(
+        contract.address.toLowerCase(),
+        (await registry.getAddressFor(soliditySha3(contractName))).toLowerCase(),
+        'Registry does not have the correct information for ' + contractName
+      )
+    }
   }
 }
 
 export const assertRegistryAddressesSet = async (getContract: any) => {
   const registry: RegistryInstance = await getContract('Registry')
   for (const contractName of usesRegistry) {
-    const contract: UsingRegistryInstance = await getContract(contractName)
+    const contract: UsingRegistryInstance = await getContract(contractName, 'mento')
     assert.equal(
       registry.address.toLowerCase(),
       (await contract.registry()).toLowerCase(),
@@ -250,15 +254,19 @@ export const assertRegistryAddressesSet = async (getContract: any) => {
 
 export const assertContractsOwnedByMultiSig = async (getContract: any) => {
   const multiSigAddress = (await getContract('MultiSig', 'proxiedContract')).address
-  for (const contractName of ownedContracts) {
-    const contractOwner: string = await (await getContract(contractName, 'proxiedContract')).owner()
-    assert.equal(contractOwner, multiSigAddress, contractName + ' is not owned by the MultiSig')
+  // TODO fix here
+  for (const contractPackage of ownedContracts) {
+    for (const contractName of contractPackage.contracts) {
+      const contractOwner: string = await (await getContract(contractName, 'proxiedContract', contractPackage.__path)).owner()
+      assert.equal(contractOwner, multiSigAddress, contractName + ' is not owned by the MultiSig')
+    }
   }
 
-  for (const contractName of proxiedContracts) {
-    const proxyOwner = await (await getContract(contractName, 'proxy'))._getOwner()
-    assert.equal(proxyOwner, multiSigAddress, contractName + 'Proxy is not owned by the MultiSig')
-  }
+  for (const contractPackage of proxiedContracts) {
+    for (const contractName of contractPackage.contracts) {
+      const proxyOwner = await (await getContract(contractName, 'proxy', contractPackage.__path))._getOwner()
+      assert.equal(proxyOwner, multiSigAddress, contractName + 'Proxy is not owned by the MultiSig')
+    }}
 }
 
 export const assertFloatEquality = (
@@ -438,7 +446,8 @@ const proxiedContracts = [{
     'SortedOracles',
 
   ]
-  },{
+  },
+  {
   contracts: [
     'Reserve',
     'StableToken',

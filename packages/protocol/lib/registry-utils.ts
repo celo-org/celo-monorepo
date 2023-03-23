@@ -48,25 +48,34 @@ export const usesRegistry = [
   CeloContractName.StableToken,
 ]
 
-export const hasEntryInRegistry: string[] = [
-  CeloContractName.Accounts,
-  CeloContractName.Attestations,
-  CeloContractName.BlockchainParameters,
-  CeloContractName.DoubleSigningSlasher,
-  CeloContractName.DowntimeSlasher,
-  CeloContractName.Election,
-  CeloContractName.Escrow,
-  CeloContractName.Exchange,
-  CeloContractName.FederatedAttestations,
-  CeloContractName.FeeCurrencyWhitelist,
-  CeloContractName.Freezer,
-  CeloContractName.GasPriceMinimum,
-  CeloContractName.GoldToken,
-  CeloContractName.GovernanceSlasher,
-  CeloContractName.GrandaMento,
-  CeloContractName.OdisPayments,
-  CeloContractName.Random,
-  CeloContractName.Reserve,
-  CeloContractName.SortedOracles,
-  CeloContractName.StableToken,
+export const hasEntryInRegistry= [
+  {
+    contracts:[
+      CeloContractName.Accounts,
+      CeloContractName.Attestations,
+      CeloContractName.BlockchainParameters,
+      CeloContractName.DoubleSigningSlasher,
+      CeloContractName.DowntimeSlasher,
+      CeloContractName.Election,
+      CeloContractName.Escrow,
+      CeloContractName.FederatedAttestations,
+      CeloContractName.FeeCurrencyWhitelist,
+      CeloContractName.Freezer,
+      CeloContractName.GasPriceMinimum,
+      CeloContractName.GoldToken,
+      CeloContractName.GovernanceSlasher,
+      CeloContractName.OdisPayments,
+      CeloContractName.Random,
+      CeloContractName.SortedOracles,
+    ]
+  },
+  {
+    contracts:[
+      CeloContractName.Exchange,
+      CeloContractName.GrandaMento,
+      CeloContractName.Reserve,
+      CeloContractName.StableToken,
+    ],
+    __path: 'mento'
+  }
 ]
