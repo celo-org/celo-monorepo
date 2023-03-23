@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 
-// import "celo-foundry/Test.sol";
+import "celo-foundry/Test.sol";
 // import "contracts/common/GoldToken.sol";
 // import "contracts/stability/StableToken.sol";
 
