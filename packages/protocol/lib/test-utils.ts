@@ -212,8 +212,6 @@ export const assertProxiesSet = async (getContract: any) => {
   for (const contractPackage of proxiedContracts) {
     for (const contractName of contractPackage.contracts) {
 
-      // console.log("contractPackage.__path", contractPackage.__path)
-      // console.log("contractName",contractName)
       const contract = await getContract(contractName, 'contract', contractPackage.__path)
       const proxy: ProxyInstance = await getContract(contractName, 'proxy', contractPackage.__path)
       assert.equal(
