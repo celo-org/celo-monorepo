@@ -64,8 +64,8 @@ spec:
         imagePullPolicy: Always
         command:
         - /bin/bash
-        - "-c"
         args:
+        - "-c"
         - |-
           [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
           RID=${BASH_REMATCH[1]}
@@ -73,17 +73,17 @@ spec:
           echo "Generating private key for rid=$RID"
           celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index "$RID" > /root/.celo/pkey
           echo 'Generating address'
-          celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/address
+          celotooljs.sh generate account-address --private-key $(cat /root/.celo/pkey) > /root/.celo/address
 
           # If this is a proxied validator, it will not have an external IP address
           # and EXTERNAL_IP_ADDRESS will be empty
-          EXTERNAL_IP_ADDRESS=`echo -n "$IP_ADDRESSES" | cut -d '/' -f $((RID + 1))`
+          EXTERNAL_IP_ADDRESS=$(echo -n "$IP_ADDRESSES" | cut -d '/' -f $((RID + 1)))
           echo "$EXTERNAL_IP_ADDRESS" > /root/.celo/externalIpAddress
 
           # Put the proxies per validator array into a comma separated string
           # so we can index it at runtime
           PROXIES_PER_VALIDATOR="{{ join "," .Values.geth.proxiesPerValidator }}"
-          PROXY_COUNT=`echo -n $PROXIES_PER_VALIDATOR | cut -d ',' -f $((RID + 1))`
+          PROXY_COUNT=$(echo -n $PROXIES_PER_VALIDATOR | cut -d ',' -f $((RID + 1)))
           echo -n "$PROXY_COUNT" > /root/.celo/proxyCount
 
           if [[ -z "$EXTERNAL_IP_ADDRESS" ]]; then
@@ -113,7 +113,7 @@ spec:
             ALL_VALIDATOR_PROXY_IPS='{{ join "," .Values.geth.proxyIPAddressesPerValidatorArray }}'
             [[ $ALL_VALIDATOR_PROXY_IPS = '<nil>' ]] && ALL_VALIDATOR_PROXY_IPS=''
 
-            PROXY_IPS=`echo -n $ALL_VALIDATOR_PROXY_IPS | cut -d ',' -f $((RID + 1))`
+            PROXY_IPS=$(echo -n $ALL_VALIDATOR_PROXY_IPS | cut -d ',' -f $((RID + 1)))
 
             # Clear the proxy enode file because it's persisted
             rm -f /root/.celo/proxyEnodeUrlPairs
@@ -125,7 +125,7 @@ spec:
               fi
 
               # gives us PROXY_ENODE_URL_PAIR
-              {{- include "celo.proxyenodeurlpair" . | indent 14 }}
+              {{- include "celo.proxyenodeurlpair" . | nindent 14 }}
               echo -n $PROXY_ENODE_URL_PAIR >> /root/.celo/proxyEnodeUrlPairs
 
               PROXY_INDEX=$(( $PROXY_INDEX + 1 ))
@@ -265,6 +265,10 @@ spec:
         - name: account
           mountPath: /root/.celo/account
           readOnly: true
+      {{- with .Values.geth.secondaryAffinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.secondayNodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
