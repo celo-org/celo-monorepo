@@ -17,8 +17,10 @@ const getProxiedContract = async (contractName: string, path: string) => {
 
 const getContract = async (contractName: string, type: string, path: string) => {
   let artifactsObject = artifacts
+  /* tslint:disable-next-line */
   console.log(1)
   if (path !== undefined) {
+    /* tslint:disable-next-line */
     console.log(2)
     artifactsObject = ArtifactsSingleton.getInstance(path)
   }
