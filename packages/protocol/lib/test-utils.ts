@@ -212,8 +212,10 @@ export const assertProxiesSet = async (getContract: any) => {
   for (const contractPackage of proxiedContracts) {
     for (const contractName of contractPackage.contracts) {
       // tslint:disable-next-line
-      console.log("contractName", contractName)
+      console.log("contractName", contractName, contractPackage.__path)
       const contract = await getContract(contractName, 'contract', contractPackage.__path)
+      // tslint:disable-next-line
+      console.log("made it to proxy", contractName, contractPackage.__path)
       const proxy: ProxyInstance = await getContract(contractName, 'proxy', contractPackage.__path)
       assert.equal(
         contract.address.toLowerCase(),
@@ -447,11 +449,11 @@ const proxiedContracts = [{
   ]
   },
   {
-  contracts: [
-    'Reserve',
-    'StableToken',
-  ],
-  __path: 'mento'
+    contracts: [
+      'Reserve',
+      'StableToken',
+    ],
+    __path: 'mento'
  }
 ]
 
