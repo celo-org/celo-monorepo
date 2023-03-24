@@ -17,9 +17,6 @@ export const ProxyContracts = [
   'ElectionProxy',
   'EpochRewardsProxy',
   'EscrowProxy',
-  // 'ExchangeBRLProxy',
-  // 'ExchangeEURProxy',
-  // 'ExchangeProxy',
   'FederatedAttestationsProxy',
   'FeeBurnerProxy',
   'FeeCurrencyWhitelistProxy',
@@ -27,18 +24,23 @@ export const ProxyContracts = [
   'GoldTokenProxy',
   'GovernanceApproverMultiSigProxy',
   'GovernanceProxy',
-  // 'GrandaMentoProxy',
   'LockedGoldProxy',
   'MetaTransactionWalletProxy',
   'MetaTransactionWalletDeployerProxy',
   'OdisPaymentsProxy',
   'RegistryProxy',
-  // 'ReserveProxy',
-  // 'ReserveSpenderMultiSigProxy',
-  // 'StableTokenBRLProxy',
-  // 'StableTokenEURProxy',
-  // 'StableTokenProxy',
   'SortedOraclesProxy',
+
+  // mento
+  'ExchangeBRLProxy',
+  'ExchangeEURProxy',
+  'ExchangeProxy',
+  'GrandaMentoProxy',
+  'ReserveProxy',
+  'ReserveSpenderMultiSigProxy',
+  'StableTokenBRLProxy',
+  'StableTokenEURProxy',
+  'StableTokenProxy',
 ]
 export const CoreContracts = [
   // common
@@ -74,19 +76,19 @@ export const CoreContracts = [
   'Random',
   'OdisPayments',
 
+  // stability
   'SortedOracles',
-  // stability - Mento
-  // 'Exchange',
-  // 'ExchangeEUR',
-  // 'ExchangeBRL',
-  // 'Reserve',
-  // 'ReserveSpenderMultiSig',
-  // 'StableToken',
-  // 'StableTokenEUR',
-  // 'StableTokenBRL',
 
-  // liquidity
-  // 'GrandaMento',
+  // Mento
+  'Exchange',
+  'ExchangeEUR',
+  'ExchangeBRL',
+  'GrandaMento',
+  'Reserve',
+  'ReserveSpenderMultiSig',
+  'StableToken',
+  'StableTokenEUR',
+  'StableTokenBRL',
 ]
 
 const OtherContracts = [
@@ -122,9 +124,12 @@ function compile(outdir: string) {
   // TODO change paths
   // the reason to generate a different folder is to avoid paths for coliding, which could be very dangerous
 
-  exec(
-    `yarn run truffle compile --contracts_directory=./lib/mento-core/contracts --contracts_build_directory=./build/contracts-mento`
-  )
+  for (const extercalContract of externalContracts) {
+    console.log(`Building external contracts for ${extercalContract}`)
+    exec(
+      `yarn run truffle compile --silent --contracts_directory=./lib/${extercalContract}-core/contracts --contracts_build_directory=./build/contracts-${extercalContract}}`
+    )
+  }
 
   exec(`yarn run --silent truffle compile --build_directory=${outdir}`)
 
@@ -193,7 +198,8 @@ async function generateFilesForContractKit(outdir: string) {
           files: `${BUILD_DIR}/contracts-${externalContract}/@(${contractKitContracts.join(
             '|'
           )}).json`,
-          outDir: relativePath, // TODO change web3 path
+          // This path should be generalized if there's ever a conflic of names with the artifacts from external contracts
+          outDir: relativePath,
         },
       })
     )
