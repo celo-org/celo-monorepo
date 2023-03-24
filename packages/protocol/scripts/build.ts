@@ -17,9 +17,9 @@ export const ProxyContracts = [
   'ElectionProxy',
   'EpochRewardsProxy',
   'EscrowProxy',
-  'ExchangeBRLProxy',
-  'ExchangeEURProxy',
-  'ExchangeProxy',
+  // 'ExchangeBRLProxy',
+  // 'ExchangeEURProxy',
+  // 'ExchangeProxy',
   'FederatedAttestationsProxy',
   'FeeBurnerProxy',
   'FeeCurrencyWhitelistProxy',
@@ -27,17 +27,17 @@ export const ProxyContracts = [
   'GoldTokenProxy',
   'GovernanceApproverMultiSigProxy',
   'GovernanceProxy',
-  'GrandaMentoProxy',
+  // 'GrandaMentoProxy',
   'LockedGoldProxy',
   'MetaTransactionWalletProxy',
   'MetaTransactionWalletDeployerProxy',
   'OdisPaymentsProxy',
   'RegistryProxy',
-  'ReserveProxy',
-  'ReserveSpenderMultiSigProxy',
-  'StableTokenBRLProxy',
-  'StableTokenEURProxy',
-  'StableTokenProxy',
+  // 'ReserveProxy',
+  // 'ReserveSpenderMultiSigProxy',
+  // 'StableTokenBRLProxy',
+  // 'StableTokenEURProxy',
+  // 'StableTokenProxy',
   'SortedOraclesProxy',
 ]
 export const CoreContracts = [
@@ -74,19 +74,19 @@ export const CoreContracts = [
   'Random',
   'OdisPayments',
 
-  // stability - Mento
-  'Exchange',
-  'ExchangeEUR',
-  'ExchangeBRL',
-  'Reserve',
-  'ReserveSpenderMultiSig',
-  'StableToken',
-  'StableTokenEUR',
-  'StableTokenBRL',
   'SortedOracles',
+  // stability - Mento
+  // 'Exchange',
+  // 'ExchangeEUR',
+  // 'ExchangeBRL',
+  // 'Reserve',
+  // 'ReserveSpenderMultiSig',
+  // 'StableToken',
+  // 'StableTokenEUR',
+  // 'StableTokenBRL',
 
   // liquidity
-  'GrandaMento',
+  // 'GrandaMento',
 ]
 
 const OtherContracts = [
