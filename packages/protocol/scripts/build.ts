@@ -120,14 +120,11 @@ function hasEmptyBytecode(contract: any) {
 function compile(outdir: string) {
   console.log(`protocol: Compiling solidity to ${outdir}`)
 
-  // Build dependencies first
-  // TODO change paths
   // the reason to generate a different folder is to avoid paths for coliding, which could be very dangerous
-
   for (const extercalContract of externalContracts) {
     console.log(`Building external contracts for ${extercalContract}`)
     exec(
-      `yarn run truffle compile --silent --contracts_directory=./lib/${extercalContract}-core/contracts --contracts_build_directory=./build/contracts-${extercalContract}}`
+      `yarn run truffle compile --silent --contracts_directory=./lib/${extercalContract}-core/contracts --contracts_build_directory=./build/contracts-${extercalContract}`
     )
   }
 
