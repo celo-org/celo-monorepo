@@ -22,6 +22,8 @@ COPY packages/sdk/wallets/wallet-hsm packages/sdk/wallets/wallet-hsm
 COPY packages/sdk/wallets/wallet-hsm-azure packages/sdk/wallets/wallet-hsm-azure
 COPY packages/sdk/wallets/wallet-local packages/sdk/wallets/wallet-local
 COPY packages/sdk/wallets/wallet-remote packages/sdk/wallets/wallet-remote
+# Makes build fail if it doesn't copy git, will be removed after build
+COPY .git .git 
 
 ##### Main stage
 FROM node:12
@@ -43,6 +45,7 @@ COPY --from=packages celo-phone-number-privacy/packages/${PACKAGE_SELECTOR} pack
 # Install dependencies and build.
 RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 RUN yarn build
+RUN rm -r .git
 
 # Setup and run the signer application.
 ENV NODE_ENV production
