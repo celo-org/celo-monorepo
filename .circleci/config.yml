@@ -322,7 +322,7 @@ jobs:
       - run:
           name: Unit tests
           # force cache clean
-          command: yarn cwd packages/protocol clean && yarn --cwd packages/protocol test common/
+          command: yarn --cwd packages/protocol clean && yarn --cwd packages/protocol build && yarn --cwd packages/protocol test common/
 
   protocol-test-compatibility:
     <<: *defaults
