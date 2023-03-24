@@ -27,6 +27,7 @@ COPY packages/metadata-crawler/package.json packages/metadata-crawler/
 COPY packages/flake-tracker/package.json packages/flake-tracker/package.json
 # Makes build fail if it doesn't copy git, will be removed after build
 COPY .git .git 
+COPY .gitmodules .gitmodules 
 
 RUN yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
 
@@ -48,6 +49,7 @@ COPY packages/flake-tracker packages/flake-tracker
 # build all
 RUN yarn build
 RUN rm -r .git
+RUN rm .gitmodules
 
 WORKDIR /celo-monorepo/packages/metadata-crawler
 
