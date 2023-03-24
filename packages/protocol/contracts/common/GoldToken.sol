@@ -89,7 +89,7 @@ contract GoldToken is
     external
     returns (bool)
   {
-    bool succeeded = _transfer(to, value);
+    bool succeeded = _transferWithCheck(to, value);
     emit TransferComment(comment);
     return succeeded;
   }
@@ -159,7 +159,7 @@ contract GoldToken is
     require(value <= balanceOf(from), "transfer value exceeded balance of sender");
     require(
       value <= allowed[from][msg.sender],
-      "transfer value exceeded sender's allowance for recipient"
+      "transfer value exceeded sender's allowance for spender"
     );
 
     bool success;
