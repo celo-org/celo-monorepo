@@ -11,7 +11,7 @@ if [ $VERSION_NUMBER -gt 6 ]
 fi
 
 
-if [ $VERSION_NUMBER -gt 8 ]
+if [ $VERSION_NUMBER -gt 7 ]
   then
   # keeping track of contracts moved to other repos so they are ignored in version check and deployment
   # for other packages, like attestations, this may not be expected, as releasing it may be important as well.
