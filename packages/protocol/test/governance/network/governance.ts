@@ -3824,6 +3824,17 @@ contract('Governance', (accounts: string[]) => {
         await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
       })
 
+      describe('When account voted on proposal in V8', () => {
+        beforeEach(async () => {
+          await governance.setDeprecatedWeight(accounts[0], 0, 100)
+        })
+
+        it('Should return correct number of votes', async () => {
+          const totalVotesByAccount = await governance.getAmountOfGoldUsedForVoting(accounts[0])
+          assertEqualBN(totalVotesByAccount, 100)
+        })
+      })
+
       describe(`when account has partially voted on proposal`, () => {
         const yes = 10
         const no = 30
