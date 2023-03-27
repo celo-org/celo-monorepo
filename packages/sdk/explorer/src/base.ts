@@ -1,11 +1,17 @@
 import { concurrentMap } from '@celo/base/lib/async'
-import { AbiItem, Address } from '@celo/connect'
+import { ABIDefinition, AbiItem, Address } from '@celo/connect'
 import { CeloContract, ContractKit } from '@celo/contractkit'
 
 export interface ContractDetails {
   name: string
   address: Address
   jsonInterface: AbiItem[]
+  isCore: boolean
+}
+
+export interface ContractMapping {
+  details: ContractDetails
+  fnMapping: Map<string, ABIDefinition>
 }
 
 export const getContractDetailsFromContract = async (
@@ -18,6 +24,7 @@ export const getContractDetailsFromContract = async (
     name: celoContract,
     address: address ?? contract.options.address,
     jsonInterface: contract.options.jsonInterface,
+    isCore: true,
   }
 }
 
