@@ -22,8 +22,6 @@ COPY packages/sdk/wallets/wallet-hsm packages/sdk/wallets/wallet-hsm
 COPY packages/sdk/wallets/wallet-hsm-azure packages/sdk/wallets/wallet-hsm-azure
 COPY packages/sdk/wallets/wallet-local packages/sdk/wallets/wallet-local
 COPY packages/sdk/wallets/wallet-remote packages/sdk/wallets/wallet-remote
-# Makes build fail if it doesn't copy git, will be removed after build
-COPY .git .git 
 
 ##### Main stage
 FROM node:12
@@ -35,6 +33,10 @@ COPY lerna.json package.json yarn.lock ./
 COPY scripts/ scripts/
 COPY patches/ patches/
 
+# Makes build fail if it doesn't copy git, will be removed after build
+COPY .git .git 
+COPY .gitmodules .gitmodules 
+
 # Setting ONLY_PUBLISHED_DEPENDENCIES to true or any non-empty string results in only the
 # phone-number-privacy package being copied into the image, and therefore it will only build using
 # published dependencies. Setting ONLY_PUBLISHED_DEPENDENCIES to "" will copy in all dependecies.
@@ -45,7 +47,9 @@ COPY --from=packages celo-phone-number-privacy/packages/${PACKAGE_SELECTOR} pack
 # Install dependencies and build.
 RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 RUN yarn build
+
 RUN rm -r .git
+RUN rm .gitmodules
 
 # Setup and run the signer application.
 ENV NODE_ENV production

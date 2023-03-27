@@ -36,7 +36,8 @@ COPY patches/ patches/
 COPY scripts/ scripts/
 COPY packages/sdk/phone-utils/package.json packages/sdk/phone-utils/package.json
 # Makes build fail if it doesn't copy git, will be removed after build
-COPY .git .git
+COPY .git .git 
+COPY .gitmodules .gitmodules 
 
 RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 
@@ -64,6 +65,8 @@ COPY packages/sdk/phone-utils packages/sdk/phone-utils/
 RUN yarn build
 
 RUN rm -r .git
+RUN rm .gitmodules
+
 ENV PATH="/celo-monorepo/packages/celotool/bin:${PATH}"
 
 COPY --from=golang:1.16-stretch /usr/local/go/ /usr/local/go/
