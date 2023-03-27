@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: {{ .Release.Namespace }}-forno-ingress
   labels:
-    {{- include "common.standard.labels" . | nindent 4 }}
+{{ include "common.standard.labels" .  | indent 4 }}
     component: forno
   annotations:
     kubernetes.io/tls-acme: "true"
