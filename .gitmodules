@@ -9,4 +9,4 @@
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
 [submodule "packages/protocol/lib/mento-core"]
 	path = packages/protocol/lib/mento-core
-	url = git@github.com:mento-protocol/mento-core.git
+	url = https://github.com/mento-protocol/mento-core
