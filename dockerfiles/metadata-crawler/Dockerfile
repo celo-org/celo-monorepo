@@ -6,6 +6,10 @@ RUN apt-get update && \
   apt-get install -y libusb-dev lsb-release libudev-dev libusb-1.0-0 && \
   rm -rf /var/lib/apt/lists/*
 
+# make sure github keys are correct
+RUN ssh-keygen -R github.com
+RUN curl -L https://api.github.com/meta | jq -r '.ssh_keys | .[]' | sed -e 's/^/github.com /' >> ~/.ssh/known_hosts
+
 # ensure yarn.lock is evaluated by kaniko cache diff
 COPY lerna.json package.json yarn.lock ./
 COPY scripts/ scripts/
@@ -46,8 +50,6 @@ COPY packages/sdk/contractkit packages/sdk/contractkit/
 COPY packages/metadata-crawler packages/metadata-crawler/
 COPY packages/flake-tracker packages/flake-tracker
 
-RUN ssh-keygen -R github.com
-RUN curl -L https://api.github.com/meta | jq -r '.ssh_keys | .[]' | sed -e 's/^/github.com /' >> ~/.ssh/known_hosts
 
 # build all
 RUN yarn build
