@@ -64,3 +64,20 @@ export const SaltType = t.string
 
 export type Signature = t.TypeOf<typeof SignatureType>
 export type Address = t.TypeOf<typeof AddressType>
+
+export const AttestationServiceStatusResponseType = t.type({
+  status: t.literal('ok'),
+  smsProviders: t.array(t.string),
+  blacklistedRegionCodes: t.union([t.array(t.string), t.undefined]),
+  accountAddress: AddressType,
+  signature: t.union([SignatureType, t.undefined]),
+  version: t.string,
+  latestBlock: t.number,
+  ageOfLatestBlock: t.number,
+  isNodeSyncing: t.boolean,
+  appSignature: t.string,
+  smsProvidersRandomized: t.boolean,
+  maxDeliveryAttempts: t.number,
+  maxRerequestMins: t.number,
+  twilioVerifySidProvided: t.boolean,
+})

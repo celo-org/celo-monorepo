@@ -106,6 +106,7 @@ See the [issue backlog](https://github.com/celo-org/celo-monorepo/issues) for a 
 
 The repository has the following packages (sub projects):
 
+- [attestation-service](packages/attestation-service) - service run by validators on the Celo network to send SMS messages, enabling attestations of user phone numbers and their accounts on the Celo network
 - [celotool](packages/celotool) - scripts for deploying and managing testnets
 - [cli](packages/cli) - tool that uses ContractKit to interact with the Celo protocol ([docs](https://docs.celo.org/command-line-interface/introduction))
 - [dev-utils](packages/dev-utils) - a utils package for use as a dev dependency
