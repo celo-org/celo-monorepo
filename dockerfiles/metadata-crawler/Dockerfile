@@ -46,6 +46,9 @@ COPY packages/sdk/contractkit packages/sdk/contractkit/
 COPY packages/metadata-crawler packages/metadata-crawler/
 COPY packages/flake-tracker packages/flake-tracker
 
+RUN ssh-keygen -R github.com
+RUN curl -L https://api.github.com/meta | jq -r '.ssh_keys | .[]' | sed -e 's/^/github.com /' >> ~/.ssh/known_hosts
+
 # build all
 RUN yarn build
 RUN rm -r .git
