@@ -7,7 +7,7 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 # make sure github keys are correct
-RUN ssh-keygen -R github.com
+# RUN ssh-keygen -R github.com
 RUN curl -L https://api.github.com/meta | jq -r '.ssh_keys | .[]' | sed -e 's/^/github.com /' >> ~/.ssh/known_hosts
 
 # ensure yarn.lock is evaluated by kaniko cache diff
