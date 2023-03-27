@@ -216,7 +216,7 @@ contract GoldToken is
   /**
    * @return The total amount of CELO in existence, including what the burn address holds.
    */
-  function totalSupply() public view returns (uint256) {
+  function totalSupply() external view returns (uint256) {
     return totalSupply_;
   }
 
@@ -224,7 +224,7 @@ contract GoldToken is
    * @return The total amount of CELO in existence, not including what the burn address holds.
    */
   function circulatingSupply() external view returns (uint256) {
-    return totalSupply().sub(getBurnedAmount());
+    return totalSupply_.sub(getBurnedAmount()).sub(balanceOf(address(0)));
   }
 
   /**
