@@ -161,14 +161,6 @@
       "@celo/utils"
     ]
   },
-  "@celo/dappkit": {
-    "location": "packages/sdk/dappkit",
-    "dependencies": [
-      "@celo/connect",
-      "@celo/contractkit",
-      "@celo/utils"
-    ]
-  },
   "@celo/encrypted-backup": {
     "location": "packages/sdk/encrypted-backup",
     "dependencies": [
