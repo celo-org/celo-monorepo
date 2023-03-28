@@ -1,7 +1,6 @@
 pragma solidity ^0.5.13;
 
 // TODO move to IStableToken when it adds method getExchangeRegistryId
-import { StableToken } from "../../lib/mento-core/contracts/StableToken.sol";
 import { IExchange } from "../../lib/mento-core/contracts/interfaces/IExchange.sol";
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -12,6 +11,8 @@ import "./UsingRegistry.sol";
 import "../common/Freezable.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
+
+import "../common/interfaces/mento/IStableTokenMento.sol";
 
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/interfaces/ICeloToken.sol";
@@ -231,7 +232,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
     * @param tokenAddress The address of the token to burn.
     */
   function burnSingleMentoToken(address tokenAddress) public onlyWhenNotFrozen {
-    StableToken stableToken = StableToken(tokenAddress);
+    IStableTokenMento stableToken = IStableTokenMento(tokenAddress);
     uint256 balanceToBurn = stableToken.balanceOf(address(this));
 
     if (dailyBurnLimitHit(tokenAddress, balanceToBurn)) {
