@@ -3,38 +3,44 @@ oracle:
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
-      maxPercentageDeviation: 0.05
-      maxPercentageBidAskSpread: 0.025
-      # minReportPriceChangeThreshold
+      maxPercentageDeviation: 0.025
+      maxPercentageBidAskSpread: 0.015
   metrics:
     enabled: true
     prometheusPort: 9090
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
-  priceSources: "[
-      [
-        {exchange: 'BITTREX', symbol: 'CELOUSD', toInvert: false}
-      ],
-      [
-        {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false}
-      ],
-      [
-        {exchange: 'OKCOIN', symbol: 'CELOUSD', toInvert: false}
-      ],
-      [
-        {exchange: 'BINANCE', symbol: 'CELOBUSD', toInvert: false},
-        {exchange: 'COINBASE', symbol: 'BUSDUSD', toInvert: false}
-      ],
-      [
-        {exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false},
-        {exchange: 'BINANCEUS', symbol: 'BTCUSD', toInvert: false}
-      ],
-      [
-        { exchange: 'BINANCEUS', symbol: 'CELOUSD', toInvert: false }
-      ]
+  gasPriceMultiplier: 1.5
+  priceSources: "[ 
+    [ 
+      {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false} 
+    ],
+    [ 
+      {exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false}, 
+      {exchange: 'COINBASE', symbol: 'BTCUSD', toInvert: false} 
+    ],
+    [ 
+      {exchange: 'BINANCE', symbol: 'CELOBUSD', toInvert: false}, 
+      {exchange: 'COINBASE', symbol: 'BUSDUSD', toInvert: false} 
+    ], 
+    [ 
+      {exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false}, 
+      {exchange: 'KRAKEN', symbol: 'USDTUSD', toInvert: false} 
+    ], 
+    [ 
+      {exchange: 'BINANCEUS', symbol: 'CELOUSD', toInvert: false }
+    ],  
+    [ 
+      {exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false}, 
+      {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false} 
+    ], 
+    [ 
+      {exchange: 'KUCOIN', symbol: 'CELOUSDT', toInvert: false}, 
+      {exchange: 'KRAKEN', symbol: 'USDTUSD', toInvert: false} 
+    ],
     ]"
   minPriceSourceCount: 2
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
-      minReportPriceChangeThreshold: 0.005 # 0.5%
+      minReportPriceChangeThreshold: 0.005

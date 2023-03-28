@@ -7,9 +7,6 @@
 
 # directory and file-level owners. Feel free to add to this!
 
-/packages/attestation-proxy/ @celo-org/identity
-/packages/attestation-service/ @celo-org/identity
-/packages/azure/ @celo-org/devopsre
 /packages/celotool/ @celo-org/devopsre
 /packages/cli/ @celo-org/applications
 /packages/dev-utils/ @celo-org/applications
@@ -20,7 +17,7 @@
 /packages/helm-charts/ @celo-org/devopsre
 /packages/helm-charts/blockscout/ @celo-org/data-services @celo-org/devopsre
 /packages/helm-charts/oracle/ @celo-org/mento  @celo-org/devopsre
-/packages/metadata-crawler/ @celo-org/identity
+/packages/metadata-crawler/ @celo-org/data-services
 /packages/phone-number-privacy/ @celo-org/identity
 /packages/protocol/ @celo-org/primitives @celo-org/identity
 /packages/sdk/ @celo-org/applications

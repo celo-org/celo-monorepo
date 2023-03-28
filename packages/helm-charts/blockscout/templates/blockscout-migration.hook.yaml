@@ -19,6 +19,8 @@ spec:
       initContainers:
 {{ include "celo.blockscout.initContainer.secrets-init" . | indent 6 }}
       containers:
+{{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.indexer.db }}
+{{ include "celo.blockscout.container.db-terminating-sidecar" $data | indent 6 }}
       - name: blockscout-migration
         image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.blockscout.image.pullPolicy }}
@@ -43,9 +45,7 @@ spec:
         env:
         - name: DROP_DB
           value: "{{ default "false" .Values.blockscout.db.drop }}"
-{{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.indexer.db }}
 {{ include "celo.blockscout.env-vars" $data  | indent 8 }}
-{{ include "celo.blockscout.container.db-terminating-sidecar" $data | indent 6 }}
       volumes:
 {{ include "celo.blockscout.volume.cloudsql-credentials" . | indent 8 }}
 {{ include "celo.blockscout.volume.temporary-dir" . | indent 8 }}

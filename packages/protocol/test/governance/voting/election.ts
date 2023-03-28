@@ -1009,6 +1009,61 @@ contract('Election', (accounts: string[]) => {
         await election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS)
       })
 
+      describe('when the validator group has votes but is ineligible', () => {
+        const index = 0
+        const revokedValue = value - 1
+        const remaining = value - revokedValue
+        let resp: any
+        beforeEach(async () => {
+          await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+          await election.markGroupIneligible(group)
+          resp = await election.revokePending(
+            group,
+            revokedValue,
+            NULL_ADDRESS,
+            NULL_ADDRESS,
+            index
+          )
+        })
+
+        it("should decrement the account's pending votes for the group", async () => {
+          assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), remaining)
+        })
+
+        it("should decrement the account's total votes for the group", async () => {
+          assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), remaining)
+        })
+
+        it("should decrement the account's total votes", async () => {
+          assertEqualBN(await election.getTotalVotesByAccount(voter), remaining)
+        })
+
+        it('should decrement the total votes for the group', async () => {
+          assertEqualBN(await election.getTotalVotesForGroup(group), remaining)
+        })
+
+        it('should decrement the total votes', async () => {
+          assertEqualBN(await election.getTotalVotes(), remaining)
+        })
+
+        it("should increment the account's nonvoting locked gold balance", async () => {
+          assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter), revokedValue)
+        })
+
+        it('should emit the ValidatorGroupPendingVoteRevoked event', async () => {
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertContainSubset(log, {
+            event: 'ValidatorGroupPendingVoteRevoked',
+            args: {
+              account: voter,
+              group,
+              value: new BigNumber(revokedValue),
+            },
+          })
+        })
+      })
+
       describe('when the revoked value is less than the pending votes', () => {
         const index = 0
         const revokedValue = value - 1
@@ -1145,6 +1200,66 @@ contract('Election', (accounts: string[]) => {
         await mineBlocks(EPOCH, web3)
         await election.activate(group, { from: voter1 })
         await assertConsistentSums()
+      })
+
+      describe('when the validator group has votes but is ineligible', () => {
+        const index = 0
+        const remaining = 1
+        const revokedValue = voteValue0 + reward0 - remaining
+        let resp: any
+
+        beforeEach(async () => {
+          await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+          await election.markGroupIneligible(group)
+          resp = await election.revokeActive(group, revokedValue, accounts[1], accounts[3], index)
+        })
+
+        it('should be consistent', async () => {
+          await assertConsistentSums()
+        })
+
+        it("should decrement the account's active votes for the group", async () => {
+          assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter0), remaining)
+        })
+
+        it("should decrement the account's total votes for the group", async () => {
+          assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter0), remaining)
+        })
+
+        it("should decrement the account's total votes", async () => {
+          assertEqualBN(await election.getTotalVotesByAccount(voter0), remaining)
+        })
+
+        it('should decrement the total votes for the group', async () => {
+          assertEqualBN(
+            await election.getTotalVotesForGroup(group),
+            voteValue0 + reward0 + voteValue1 - revokedValue
+          )
+        })
+
+        it('should decrement the total votes', async () => {
+          assertEqualBN(
+            await election.getTotalVotes(),
+            voteValue0 + reward0 + voteValue1 - revokedValue
+          )
+        })
+
+        it("should increment the account's nonvoting locked gold balance", async () => {
+          assertEqualBN(await mockLockedGold.nonvotingAccountBalance(voter0), revokedValue)
+        })
+
+        it('should emit the ValidatorGroupActiveVoteRevoked event', async () => {
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertContainSubset(log, {
+            event: 'ValidatorGroupActiveVoteRevoked',
+            args: {
+              account: voter0,
+              group,
+              value: new BigNumber(revokedValue),
+            },
+          })
+        })
       })
 
       describe('when the revoked value is less than the active votes', () => {

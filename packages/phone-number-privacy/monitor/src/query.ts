@@ -29,7 +29,8 @@ const newPrivateKey = async () => {
 export const queryOdisForSalt = async (
   blockchainProvider: string,
   contextName: OdisContextName,
-  endpoint: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
+  endpoint: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN,
+  timeoutMs: number = 10000
 ) => {
   console.log(`contextName: ${contextName}`) // tslint:disable-line:no-console
   console.log(`blockchain provider: ${blockchainProvider}`) // tslint:disable-line:no-console
@@ -45,8 +46,16 @@ export const queryOdisForSalt = async (
     authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
     contractKit,
   }
-  return OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+
+  const abortController = new AbortController()
+  const timeout = setTimeout(() => {
+    abortController.abort()
+    console.log(`ODIS salt request timed out after ${timeoutMs} ms`) // tslint:disable-line:no-console
+  }, timeoutMs)
+
+  const res = await OdisUtils.Identifier.getObfuscatedIdentifier(
     phoneNumber,
+    OdisUtils.Identifier.IdentifierPrefix.PHONE_NUMBER,
     accountAddress,
     authSigner,
     serviceContext,
@@ -55,8 +64,52 @@ export const queryOdisForSalt = async (
     undefined,
     genSessionID(),
     undefined,
-    endpoint
+    endpoint,
+    abortController
   )
+
+  clearTimeout(timeout)
+
+  return res
+}
+
+export const queryOdisForQuota = async (
+  blockchainProvider: string,
+  contextName: OdisContextName,
+  timeoutMs: number = 10000
+) => {
+  console.log(`contextName: ${contextName}`) // tslint:disable-line:no-console
+  console.log(`blockchain provider: ${blockchainProvider}`) // tslint:disable-line:no-console
+
+  const serviceContext = getServiceContext(contextName, OdisAPI.PNP)
+
+  const contractKit = newKit(blockchainProvider, new LocalWallet())
+  const privateKey = await newPrivateKey()
+  const accountAddress = normalizeAddressWith0x(privateKeyToAddress(privateKey))
+  contractKit.connection.addAccount(privateKey)
+  contractKit.defaultAccount = accountAddress
+  const authSigner: AuthSigner = {
+    authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
+    contractKit,
+  }
+
+  const abortController = new AbortController()
+  const timeout = setTimeout(() => {
+    abortController.abort()
+  }, timeoutMs)
+
+  const res = await OdisUtils.Quota.getPnpQuotaStatus(
+    accountAddress,
+    authSigner,
+    serviceContext,
+    undefined,
+    undefined,
+    abortController
+  )
+
+  clearTimeout(timeout)
+
+  return res
 }
 
 export const queryOdisDomain = async (contextName: OdisContextName) => {

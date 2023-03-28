@@ -1,4 +1,9 @@
-import { isE164Number } from '@celo/base'
+import {
+  getIdentifierHash as baseGetIdentifierHash,
+  getPrefixedIdentifier,
+  IdentifierPrefix,
+  isE164Number,
+} from '@celo/base'
 import {
   CombinerEndpointPNP,
   KEY_VERSION_HEADER,
@@ -22,16 +27,38 @@ const debug = debugFactory('kit:odis:identifier')
 const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
 
 const PEPPER_CHAR_LENGTH = 13
-const PEPPER_SEPARATOR = '__'
 
-// using DID methods as prefixes when they exist
-// https://w3c.github.io/did-spec-registries/#did-methods
-export enum IdentifierPrefix {
-  PHONE_NUMBER = 'tel',
-  EMAIL = 'mailto',
-  TWITTER = 'twit',
-  // feel free to put up a PR to add more types!
-}
+// Docstring is duplicated in @celo/base; make sure to update in both places.
+/**
+ * Standardized prefixes for ODIS identifiers.
+ *
+ * @remarks These prefixes prevent collisions between off-chain identifiers.
+ * i.e. if a user's instagram and twitter handles are the same,
+ * these prefixes prevent the ODIS identifers from being the same.
+ *
+ * If you would like to use a prefix that isn't included, please put up a PR
+ * adding it to @celo/base (in celo-monorepo/packages/sdk/base/src/identifier.ts)
+ * to ensure interoperability with other projects. When adding new prefixes,
+ * please use either the full platform name in all lowercase (e.g. 'facebook')
+ * or DID methods https://w3c.github.io/did-spec-registries/#did-methods.
+ * Make sure to add the expected value for the unit test case in
+ * `celo-monorepo/packages/sdk/base/src/identifier.test.ts`,
+ * otherwise the test will fail.
+ *
+ * The NULL prefix is included to allow projects to use the sdk without selecting
+ * a predefined prefix or adding their own. Production use of the NULL prefix is
+ * discouraged since identifiers will not be interoperable with other projects.
+ * Please think carefully before using the NULL prefix.
+ */
+export { IdentifierPrefix }
+// Docstring is duplicated in @celo/base; make sure to update in both places.
+/**
+ * Concatenates the identifierPrefix and plaintextIdentifier with the separator '://'
+ *
+ * @param plaintextIdentifier Off-chain identifier, ex: phone number, twitter handle, email, etc.
+ * @param identifierPrefix Standardized prefix used to prevent collisions between identifiers
+ */
+export { getPrefixedIdentifier }
 
 /**
  * Steps from the private plaintext identifier to the obfuscated identifier, which can be made public.
@@ -59,9 +86,22 @@ export interface IdentifierHashDetails {
  * Retrieve the obfuscated identifier for the provided plaintext identifier
  * Performs blinding, querying, and unblinding
  *
- * This function will send a request to ODIS, authorized by the provided signer.
+ * @remarks This function will send a request to ODIS, authorized by the provided signer.
  * This method consumes ODIS quota on the account provided by the signer.
  * You can use the DEK as your signer to decrease quota usage
+ *
+ * @param plaintextIdentifier Off-chain identifier, ex: phone number, twitter handle, email, etc.
+ * @param identifierPrefix Standardized prefix used to prevent collisions between identifiers
+ * @param account The address making the request to ODIS, from which quota will be charged
+ * @param signer Object containing the private key used to authenticate the ODIS request
+ * @param context Specifies which ODIS combiner url should be queried (i.e. mainnet or alfajores)
+ * @param blindingFactor Optional Private seed used to blind identifers before they are sent to ODIS
+ * @param clientVersion Optional Specifies the client software version
+ * @param blsBlindingClient Optional Performs blinding and unblinding, defaults to WasmBlsBlindingClient
+ * @param sessionID Optional Used to track user sessions across the client and ODIS
+ * @param keyVersion Optional For testing. Specifies which version key ODIS should use
+ * @param endpoint Optional Allows client to specify the legacy endpoint if they desire (will be deprecated)
+ * @param abortController Optional Allows client to specify a timeout for the ODIS request
  */
 export async function getObfuscatedIdentifier(
   plaintextIdentifier: string,
@@ -74,7 +114,8 @@ export async function getObfuscatedIdentifier(
   blsBlindingClient?: BlsBlindingClient,
   sessionID?: string,
   keyVersion?: number,
-  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
+  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN,
+  abortController?: AbortController
 ): Promise<IdentifierHashDetails> {
   debug('Getting identifier pepper')
 
@@ -106,7 +147,8 @@ export async function getObfuscatedIdentifier(
     clientVersion,
     sessionID,
     keyVersion,
-    endpoint ?? CombinerEndpointPNP.PNP_SIGN
+    endpoint ?? CombinerEndpointPNP.PNP_SIGN,
+    abortController
   )
 
   return getObfuscatedIdentifierFromSignature(
@@ -119,10 +161,16 @@ export async function getObfuscatedIdentifier(
 
 /**
  * Blinds the plaintext identifier in preparation for the ODIS request
- * Caller should use the same blsBlindingClient instance for unblinding
+ *
+ * @remarks Caller should use the same blsBlindingClient instance for unblinding
+ *
+ * @param plaintextIdentifier Off-chain identifier, ex: phone number, twitter handle, email, etc.
+ * @param identifierPrefix Standardized prefix used to prevent collisions between identifiers
+ * @param blsBlindingClient Optional Performs blinding and unblinding, defaults to WasmBlsBlindingClient
+ * @param seed Optional Buffer generated from the blindingFactor, if provided
  */
 export async function getBlindedIdentifier(
-  identifier: string,
+  plaintextIdentifier: string,
   identifierPrefix: IdentifierPrefix,
   blsBlindingClient: BlsBlindingClient,
   seed?: Buffer
@@ -130,20 +178,32 @@ export async function getBlindedIdentifier(
   debug('Retrieving blinded message')
   // phone number identifiers don't have prefixes in the blinding stage
   // to maintain backwards compatibility wih ASv1
-  let _identifier = getPrefixedIdentifier(identifier, identifierPrefix)
+  let identifier = getPrefixedIdentifier(plaintextIdentifier, identifierPrefix)
   if (identifierPrefix === IdentifierPrefix.PHONE_NUMBER) {
-    if (!isE164Number(identifier)) {
-      throw new Error(`Invalid phone number: ${identifier}`)
+    if (!isE164Number(plaintextIdentifier)) {
+      throw new Error(`Invalid phone number: ${plaintextIdentifier}`)
     }
-    _identifier = identifier
+    identifier = plaintextIdentifier
   }
-  return blsBlindingClient.blindMessage(Buffer.from(_identifier).toString('base64'), seed)
+  return blsBlindingClient.blindMessage(Buffer.from(identifier).toString('base64'), seed)
 }
 
 /**
  * Query ODIS for the blinded signature
+ *
+ * @remarks
  * Response can be passed into getObfuscatedIdentifierFromSignature
  * to retrieve the obfuscated identifier
+ *
+ * @param account The address making the request to ODIS, from which quota will be charged
+ * @param signer Object containing the private key used to authenticate the ODIS request
+ * @param context Specifies which ODIS combiner url should be queried (i.e. mainnet or alfajores)
+ * @param base64BlindedMessage The blinded prefixed identifier to be sent to ODIS
+ * @param clientVersion Optional Specifies the client software version
+ * @param sessionID Optional Used to track user sessions across the client and ODIS
+ * @param keyVersion Optional For testing. Specifies which version key ODIS should use
+ * @param endpoint Optional Allows client to specify the legacy endpoint if they desire (will be deprecated)
+ * @param abortController Optional Allows client to specify a timeout for the ODIS request
  */
 export async function getBlindedIdentifierSignature(
   account: string,
@@ -153,7 +213,8 @@ export async function getBlindedIdentifierSignature(
   clientVersion?: string,
   sessionID?: string,
   keyVersion?: number,
-  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
+  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN,
+  abortControlller?: AbortController
 ): Promise<string> {
   const body: SignMessageRequest = {
     account,
@@ -171,7 +232,8 @@ export async function getBlindedIdentifierSignature(
     {
       [KEY_VERSION_HEADER]: keyVersion?.toString(),
       Authorization: await getOdisPnpRequestAuth(body, signer),
-    }
+    },
+    abortControlller
   )
 
   if (!response.success) {
@@ -183,10 +245,15 @@ export async function getBlindedIdentifierSignature(
 
 /**
  * Unblind the response and return the obfuscated identifier
+ *
+ * @param plaintextIdentifier Off-chain identifier, ex: phone number, twitter handle, email, etc.
+ * @param identifierPrefix Standardized prefix used to prevent collisions between identifiers
+ * @param base64BlindedSignature The blinded signed identifier returned by ODIS
+ * @param blsBlindingClient Optional Performs blinding and unblinding, defaults to WasmBlsBlindingClient
  */
 export async function getObfuscatedIdentifierFromSignature(
   plaintextIdentifier: string,
-  identifierType: IdentifierPrefix,
+  identifierPrefix: IdentifierPrefix,
   base64BlindedSignature: string,
   blsBlindingClient: BlsBlindingClient
 ): Promise<IdentifierHashDetails> {
@@ -196,7 +263,7 @@ export async function getObfuscatedIdentifierFromSignature(
 
   debug('Converting sig to pepper')
   const pepper = getPepperFromThresholdSignature(sigBuf)
-  const obfuscatedIdentifier = getIdentifierHash(plaintextIdentifier, identifierType, pepper)
+  const obfuscatedIdentifier = getIdentifierHash(plaintextIdentifier, identifierPrefix, pepper)
   return {
     plaintextIdentifier,
     obfuscatedIdentifier,
@@ -205,31 +272,33 @@ export async function getObfuscatedIdentifierFromSignature(
   }
 }
 
-export const getPrefixedIdentifier = (
-  plaintextIdentifier: string,
-  identifierPrefix: IdentifierPrefix
-): string => identifierPrefix + '://' + plaintextIdentifier
-
+/**
+ * Generates final identifier that is published on-chain.
+ *
+ * @remarks
+ * Concatenates the plaintext prefixed identifier with the pepper derived by hashing the unblinded
+ * signature returned by ODIS.
+ *
+ * @param plaintextIdentifier Off-chain identifier, ex: phone number, twitter handle, email, etc.
+ * @param identifierPrefix Standardized prefix used to prevent collisions between identifiers
+ * @param pepper Hash of the unblinded signature returned by ODIS
+ */
 export const getIdentifierHash = (
   plaintextIdentifier: string,
   identifierPrefix: IdentifierPrefix,
   pepper: string
 ): string => {
-  // hashing the identifier before appending the pepper to avoid domain collisions where the
-  // identifier may contain underscores
-  // not doing this for phone numbers to maintain backwards compatibility
-  const value =
-    identifierPrefix === IdentifierPrefix.PHONE_NUMBER
-      ? getPrefixedIdentifier(plaintextIdentifier, identifierPrefix) + PEPPER_SEPARATOR + pepper
-      : (sha3(getPrefixedIdentifier(plaintextIdentifier, identifierPrefix)) as string) +
-        PEPPER_SEPARATOR +
-        pepper
-  return sha3(value) as string
+  return baseGetIdentifierHash(sha3, plaintextIdentifier, identifierPrefix, pepper)
 }
 
-// This is the algorithm that creates a pepper from the unblinded message signatures
-// It simply hashes it with sha256 and encodes it to hex
+/**
+ * This is the algorithm that creates a pepper from the unblinded message signatures
+ * It simply hashes it with sha256 and encodes it to hex
+ *
+ * @remarks Currently uses 13 chars for a 78 bit pepper
+ *
+ * @param sigBuf Unblinded signature returned by ODIS
+ */
 export function getPepperFromThresholdSignature(sigBuf: Buffer) {
-  // Currently uses 13 chars for a 78 bit pepper
   return createHash('sha256').update(sigBuf).digest('base64').slice(0, PEPPER_CHAR_LENGTH)
 }
