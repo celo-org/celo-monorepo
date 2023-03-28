@@ -19,7 +19,11 @@ async function startGanache() {
       blockGasLimit: 20000000,
       defaultGasPrice: network.defaultGasPrice,
     },
-    chain: { networkId: network.network_id, allowUnlimitedContractSize: true },
+    chain: {
+      networkId: network.network_id,
+      chainId: 1,
+      allowUnlimitedContractSize: true,
+    },
   })
 
   server.listen(8545, (err, blockchain) => {

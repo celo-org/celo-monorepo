@@ -1,4 +1,5 @@
-import { NULL_ADDRESS } from '@celo/base/lib/address'
+// TODO: (soloseng) gas price;
+import { NULL_ADDRESS, trimLeading0x } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
@@ -6,6 +7,7 @@ import {
   assertEqualBN,
   assertLogMatches2,
   assertRevert,
+  assertTXRevertWithReason,
   matchAny,
   mineToNextEpoch,
   stripHexEncoding,
@@ -14,8 +16,10 @@ import {
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fixed1, multiply, toFixed } from '@celo/utils/lib/fixidity'
+import { bufferToHex, toBuffer } from '@ethereumjs/util'
 import BigNumber from 'bignumber.js'
-import { keccak256 } from 'ethereumjs-util'
+import { keccak256 } from 'ethereum-cryptography/keccak'
+import { hexToBytes, utf8ToBytes } from 'ethereum-cryptography/utils'
 import {
   AccountsContract,
   AccountsInstance,
@@ -150,50 +154,41 @@ contract('Governance', (accounts: string[]) => {
     transactionSuccess1 = {
       value: 0,
       destination: testTransactions.address,
-      data: Buffer.from(
-        stripHexEncoding(
-          // @ts-ignore
-          testTransactions.contract.methods.setValue(1, 1, true).encodeABI()
-        ),
-        'hex'
+      data: toBuffer(
+        // @ts-ignore
+        testTransactions.contract.methods.setValue(1, 1, true).encodeABI()
       ),
     }
     transactionSuccess2 = {
       value: 0,
       destination: testTransactions.address,
-      data: Buffer.from(
-        stripHexEncoding(
-          // @ts-ignore
-          testTransactions.contract.methods.setValue(2, 1, true).encodeABI()
-        ),
-        'hex'
+      data: toBuffer(
+        // @ts-ignore
+        testTransactions.contract.methods.setValue(2, 1, true).encodeABI()
       ),
     }
     transactionFail = {
       value: 0,
       destination: testTransactions.address,
-      data: Buffer.from(
-        stripHexEncoding(
-          // @ts-ignore
-          testTransactions.contract.methods.setValue(3, 1, false).encodeABI()
-        ),
-        'hex'
+      data: toBuffer(
+        // @ts-ignore
+        testTransactions.contract.methods.setValue(3, 1, false).encodeABI()
       ),
     }
     salt = '0x657ed9d64e84fa3d1af43b3a307db22aba2d90a158015df1c588c02e24ca08f0'
-    hotfixHash = keccak256(
-      web3.eth.abi.encodeParameters(
-        ['uint256[]', 'address[]', 'bytes', 'uint256[]', 'bytes32'],
-        [
-          [String(transactionSuccess1.value)],
-          [transactionSuccess1.destination.toString()],
-          transactionSuccess1.data,
-          [String(transactionSuccess1.data.length)],
-          salt,
-        ]
-      )
-    ) as Buffer
-    hotfixHashStr = '0x' + hotfixHash.toString('hex')
+    const encoded_param = web3.eth.abi.encodeParameters(
+      ['uint256[]', 'address[]', 'bytes', 'uint256[]', 'bytes32'],
+      [
+        [String(transactionSuccess1.value)],
+        [transactionSuccess1.destination.toString()],
+        transactionSuccess1.data,
+        [String(transactionSuccess1.data.length)],
+        salt,
+      ]
+    )
+
+    hotfixHash = toBuffer(keccak256(hexToBytes(trimLeading0x(encoded_param))))
+    hotfixHashStr = bufferToHex(hotfixHash)
   })
 
   describe('#initialize()', () => {
@@ -3161,7 +3156,7 @@ contract('Governance', (accounts: string[]) => {
   })
 
   describe('#hotfixWhitelistValidatorTally', () => {
-    const newHotfixHash = '0x' + keccak256('celo bug fix').toString('hex')
+    const newHotfixHash = bufferToHex(toBuffer(keccak256(utf8ToBytes('celo bug fix'))))
 
     const validators = zip(
       (_account, signer) => ({ account: _account, signer }),
@@ -3295,24 +3290,26 @@ contract('Governance', (accounts: string[]) => {
   })
 
   describe('#executeHotfix()', () => {
-    const executeHotfixTx = () =>
-      governance.executeHotfix(
+    const executeHotfixTx = () => {
+      return governance.executeHotfix(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
         // @ts-ignore bytes type
-        transactionSuccess1.data,
+        transactionSuccess1.data, //submitting TX
         [transactionSuccess1.data.length],
-        salt
+        salt,
+        { gas: 2000000 }
       )
+    }
 
     it('should revert when hotfix not approved', async () => {
-      await assertRevert(executeHotfixTx())
+      await assertTXRevertWithReason(executeHotfixTx(), 'hotfix not approved')
     })
 
     it('should revert when hotfix not prepared for current epoch', async () => {
       await mineToNextEpoch(web3)
       await governance.approveHotfix(hotfixHashStr, { from: approver })
-      await assertRevert(executeHotfixTx())
+      await assertTXRevertWithReason(executeHotfixTx(), 'hotfix must be prepared for this epoch')
     })
 
     it('should revert when hotfix prepared but not for current epoch', async () => {
@@ -3322,7 +3319,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.whitelistHotfix(hotfixHashStr, { from: accounts[2] })
       await governance.prepareHotfix(hotfixHashStr, { from: accounts[2] })
       await mineToNextEpoch(web3)
-      await assertRevert(executeHotfixTx())
+      await assertTXRevertWithReason(executeHotfixTx(), 'hotfix must be prepared for this epoch')
     })
 
     describe('when hotfix is approved and prepared for current epoch', () => {
@@ -3361,7 +3358,7 @@ contract('Governance', (accounts: string[]) => {
 
       it('should not be executable again', async () => {
         await executeHotfixTx()
-        await assertRevert(executeHotfixTx())
+        await assertTXRevertWithReason(executeHotfixTx(), 'hotfix already executed')
       })
     })
   })

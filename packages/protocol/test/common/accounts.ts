@@ -1,4 +1,4 @@
-import { Address, ensureLeading0x, NULL_ADDRESS } from '@celo/base/lib/address'
+import { Address, NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
@@ -14,6 +14,7 @@ import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
 import { generateTypedDataHash } from '@celo/utils/src/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/src/signatureUtils'
+import { bufferToHex } from '@ethereumjs/util'
 import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
@@ -358,7 +359,7 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
-  describe.only('#batchGetMetadataURL', () => {
+  describe('#batchGetMetadataURL', () => {
     it('returns multiple metadata URLs', async () => {
       const randomStrings = accounts.map((_) => web3.utils.randomHex(20).slice(2))
       await Promise.all(
@@ -593,31 +594,21 @@ contract('Accounts', (accounts: string[]) => {
     role: string,
     accountsContractAddress: string
   ) => {
+    const chainID = await web3.eth.getChainId()
     const typedData = buildAuthorizeSignerTypedData({
       account: _account,
       signer,
-      accountsContractAddress,
+      chainId: chainID,
       role,
-      chainId: 1,
+      accountsContractAddress,
     })
 
-    const signature = await new Promise<string>((resolve, reject) => {
-      web3.currentProvider.send(
-        {
-          method: 'eth_signTypedData',
-          params: [signer, typedData],
-        },
-        (error, resp) => {
-          if (error) {
-            reject(error)
-          } else {
-            resolve(resp.result)
-          }
-        }
-      )
+    const signature = await web3.currentProvider.request({
+      method: 'eth_signTypedData',
+      params: [signer, typedData],
     })
 
-    const messageHash = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
+    const messageHash = bufferToHex(generateTypedDataHash(typedData))
     const parsedSignature = parseSignatureWithoutPrefix(messageHash, signature, signer)
     return parsedSignature
   }
