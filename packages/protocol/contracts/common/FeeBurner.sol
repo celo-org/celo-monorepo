@@ -12,7 +12,7 @@ import "../common/Freezable.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 
-import "../common/interfaces/mento/IStableTokenMento.sol";
+import "../common/interfaces/IStableTokenMento.sol";
 
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/interfaces/ICeloToken.sol";
