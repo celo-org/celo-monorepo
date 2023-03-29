@@ -2,7 +2,7 @@
 
 - change all @celo/** dependencies which are pointing to the unpublished -dev version to published versions
 
-- check that @celo/phone-number-privacy-common in @celo/identity  and @celo/encrypted-backup packages points to a published version.
+- check that @celo/phone-number-privacy-common in @celo/identity  and @celo/encrypted-backup packages points to a published version. (actually check on npm because just removing -dev might not be enough)
 
 - update cli version in cli/package.json to next version with a pre-release (eg -beta.x) suffix
 
