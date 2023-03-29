@@ -120,8 +120,8 @@ contract Election is
 
   event ElectableValidatorsSet(uint256 min, uint256 max);
   event MaxNumGroupsVotedForSet(uint256 maxNumGroupsVotedFor);
-  event AllowedToVoteOverMaxNumberOfGroups(address indexed account, bool flag);
   event ElectabilityThresholdSet(uint256 electabilityThreshold);
+  event AllowedToVoteOverMaxNumberOfGroups(address indexed account, bool flag);
   event ValidatorGroupMarkedEligible(address indexed group);
   event ValidatorGroupMarkedIneligible(address indexed group);
   event ValidatorGroupVoteCast(address indexed account, address indexed group, uint256 value);
