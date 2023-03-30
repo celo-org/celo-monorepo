@@ -26,10 +26,10 @@ contract GoldToken is
   string constant NAME = "Celo native asset";
   string constant SYMBOL = "CELO";
   uint8 constant DECIMALS = 18;
-  uint256 internal totalSupply_;
+  uint256 internal _totalSupply;
   // solhint-enable state-visibility
 
-  mapping(address => mapping(address => uint256)) internal allowed;
+  mapping(address => mapping(address => uint256)) internal _allowed;
 
   // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
   address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
@@ -62,7 +62,7 @@ contract GoldToken is
    * @param registryAddress Address of the Registry contract.
    */
   function initialize(address registryAddress) external initializer {
-    totalSupply_ = 0;
+    _totalSupply = 0;
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
   }
@@ -113,7 +113,7 @@ contract GoldToken is
    */
   function approve(address spender, uint256 value) external returns (bool) {
     require(spender != address(0), "cannot set allowance for 0");
-    allowed[msg.sender][spender] = value;
+    _allowed[msg.sender][spender] = value;
     emit Approval(msg.sender, spender, value);
     return true;
   }
@@ -126,9 +126,9 @@ contract GoldToken is
    */
   function increaseAllowance(address spender, uint256 value) external returns (bool) {
     require(spender != address(0), "cannot set allowance for 0");
-    uint256 oldValue = allowed[msg.sender][spender];
+    uint256 oldValue = _allowed[msg.sender][spender];
     uint256 newValue = oldValue.add(value);
-    allowed[msg.sender][spender] = newValue;
+    _allowed[msg.sender][spender] = newValue;
     emit Approval(msg.sender, spender, newValue);
     return true;
   }
@@ -140,9 +140,9 @@ contract GoldToken is
    * @return True if the transaction succeeds.
    */
   function decreaseAllowance(address spender, uint256 value) external returns (bool) {
-    uint256 oldValue = allowed[msg.sender][spender];
+    uint256 oldValue = _allowed[msg.sender][spender];
     uint256 newValue = oldValue.sub(value);
-    allowed[msg.sender][spender] = newValue;
+    _allowed[msg.sender][spender] = newValue;
     emit Approval(msg.sender, spender, newValue);
     return true;
   }
@@ -158,7 +158,7 @@ contract GoldToken is
     require(to != address(0), "transfer attempted to reserved address 0x0");
     require(value <= balanceOf(from), "transfer value exceeded balance of sender");
     require(
-      value <= allowed[from][msg.sender],
+      value <= _allowed[from][msg.sender],
       "transfer value exceeded sender's allowance for spender"
     );
 
@@ -166,7 +166,7 @@ contract GoldToken is
     (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(from, to, value));
     require(success, "CELO transfer failed");
 
-    allowed[from][msg.sender] = allowed[from][msg.sender].sub(value);
+    _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
     emit Transfer(from, to, value);
     return true;
   }
@@ -182,7 +182,7 @@ contract GoldToken is
     }
 
     require(to != address(0), "mint attempted to reserved address 0x0");
-    totalSupply_ = totalSupply_.add(value);
+    _totalSupply = _totalSupply.add(value);
 
     bool success;
     (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(address(0), to, value));
@@ -217,24 +217,24 @@ contract GoldToken is
    * @return The total amount of CELO in existence, including what the burn address holds.
    */
   function totalSupply() external view returns (uint256) {
-    return totalSupply_;
+    return _totalSupply;
   }
 
   /**
    * @return The total amount of CELO in existence, not including what the burn address holds.
    */
   function circulatingSupply() external view returns (uint256) {
-    return totalSupply_.sub(getBurnedAmount()).sub(balanceOf(address(0)));
+    return _totalSupply.sub(getBurnedAmount()).sub(balanceOf(address(0)));
   }
 
   /**
-   * @notice Gets the amount of owner's CELO allowed to be spent by spender.
+   * @notice Gets the amount of owner's CELO _allowed to be spent by spender.
    * @param owner The owner of the CELO.
    * @param spender The spender of the CELO.
    * @return The amount of CELO owner is allowing spender to spend.
    */
   function allowance(address owner, address spender) external view returns (uint256) {
-    return allowed[owner][spender];
+    return _allowed[owner][spender];
   }
 
   /**
@@ -242,7 +242,7 @@ contract GoldToken is
    * @param amount The amount to increase counter by
    */
   function increaseSupply(uint256 amount) external onlyVm {
-    totalSupply_ = totalSupply_.add(amount);
+    _totalSupply = _totalSupply.add(amount);
   }
 
   /**
