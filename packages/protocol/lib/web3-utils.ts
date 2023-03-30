@@ -15,8 +15,6 @@ import Web3 from 'web3'
 import { ArtifactsSingleton } from '../migrations/singletonArtifacts'
 
 
-
-// import truffleContract = require('truffle-contract')
 const truffleContract = require('@truffle/contract');
 
 
@@ -152,7 +150,7 @@ export function checkFunctionArgsLength(args: any[], abi: any) {
 export async function setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
 >(web3: Web3, artifacts: any, contractName: string, contractPath: string, ...args: any[]): Promise<ContractInstance> {
-  console.log("Made it here1")
+
   let Contract, ContractProxy
   if (contractPath){
     Contract = ArtifactsSingleton.getInstance(contractPath).require(contractName)
@@ -209,20 +207,6 @@ export async function _setInitialProxyImplementation<
   }
   return receipt.tx
 }
-
-
-// export async function getDeployedProxiedContractExternal<ContractInstance extends Truffle.ContractInstance>(
-//   Contract: any,
-
-//   artifacts: any
-// ): Promise<ContractInstance> {
-//   const Proxy: ProxyContract = artifacts.require(contractName + 'Proxy')
-//   const Contract: Truffle.Contract<ContractInstance> = artifacts.require(contractName)
-//   const proxy: ProxyInstance = await Proxy.deployed()
-//   // @ts-ignore
-//   Contract.numberFormat = 'BigNumber'
-//   return Contract.at(proxy.address) as ContractInstance
-// }
 
 export async function getDeployedProxiedContract<ContractInstance extends Truffle.ContractInstance>(
   contractName: string,
@@ -316,62 +300,28 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
     Contract = artifacts.require(name)
     ContractProxy = artifacts.require(name + 'Proxy')
   }
-  console.log("type is", typeof(Contract))
-  console.log("Good artifacts2")
  
   const testingDeployment = false
   return (deployer: any, networkName: string, _accounts: string[]) => {
-    // web3.eth.defaultAccount = _accounts[0]
-    // Contract.address =  _accounts[0]
-    // Contract.web3 = web3
     console.log('\n-> Deploying', name)
 
     ContractProxy.defaults({ from:"0x5409ed021d9299bf6814279a6a1411a7e866a631" })
-    // Contract.defaults({ from:"0x5409ed021d9299bf6814279a6a1411a7e866a631" })
-    console.log("Contract.defaults()", Contract.defaults())
     
     deployer.deploy(ContractProxy)
-    // console.log(JSON.stringify(ContractProxy))
-    console.log("deployed proxy")
     deployer.deploy(Contract, testingDeployment)
-    // console.log(JSON.stringify(Contract))
-    console.log("deployed contract")
-
-
-    // Contract.at("0x0cDF34e216DAB593f00a95B2a4aaB735A1b421fC")
-    // Contract.new(testingDeployment)
-    console.log("testing works")
-
-    // console.log("web3 version:", web3.version)
-    // console.log("_accounts", _accounts)
-    // console.log("interfaceAdapter", Contract.interfaceAdapter)
-    // console.log(Contract.toJSON())
-    
 
     deployer.then(async () => {
-      console.log(0)
-      // console.log("await web3.eth.getAccounts()", await web3.eth.getAccounts())
       const proxy: ProxyInstance = await ContractProxy.deployed()
-      console.log(1)
       await proxy._transferOwnership(ContractProxy.defaults().from)
-      console.log(2)
-      // console.log(networkName)
-      // console.log("Contract.networks1", Contract.networks)
       const proxiedContract: ContractInstance = await setInitialProxyImplementation<
         ContractInstance
       >(web3, artifacts, name, artifactPath, ...(await args(networkName)))
-      console.log(3)
       if (registerAddress) {
-        console.log(4)
         const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
-        console.log(5)
         await registry.setAddressFor(name, proxiedContract.address)
       }
-      console.log(7)
       if (then) {
-        console.log(8)
         await then(proxiedContract, web3, networkName, ContractProxy)
-        console.log(9)
       }
     })
   }
@@ -398,7 +348,6 @@ export async function transferOwnershipOfProxyExternal(
   Proxy: any,
   owner: string,
 ) {
-  // const Proxy = artifacts.require(contractName + 'Proxy')
   const proxy: ProxyInstance = await Proxy.deployed()
   await proxy._transferOwnership(owner)
 }

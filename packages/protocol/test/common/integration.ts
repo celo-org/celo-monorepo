@@ -671,7 +671,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
       const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract(
         'SortedOracles',
         artifacts
-      ) // Todo fix this
+      )
       await sortedOracles.addOracle(stableTokenAbc.address, ensureLeading0x(accounts[0]))
       await freezer.freeze(stableTokenAbc.address)
       await freezer.freeze(exchangeAbc.address)
@@ -702,7 +702,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
       const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract(
         'FeeCurrencyWhitelist',
         artifacts
-      ) // TODO fix this
+      )
       await reserve.addToken(stableTokenAbc.address)
       await reserve.addExchangeSpender(exchangeAbc.address)
       await freezer.unfreeze(stableTokenAbc.address)

@@ -228,10 +228,6 @@ module.exports = {
   mocha: flakeTrackingConfig,
 }
 
-if (process.argv.includes('--contracts_directory')) {
-  console.log('saw the flag')
-}
-
 if (process.argv.includes('--gas')) {
   module.exports = {
     compilers: {

@@ -7,15 +7,6 @@ RUN apt-get update && \
   apt-get install -y libusb-dev lsb-release libudev-dev libusb-1.0-0 && \
   rm -rf /var/lib/apt/lists/*
 
-# make sure github keys are correct
-
-# RUN mkdir -p /root/.ssh && chmod 700 /root/.ssh
-# RUN touch /root/.ssh/known_hosts
-# RUN chmod 644 /root/.ssh/known_hosts
-
-# RUN ssh-keygen -R github.com
-# RUN curl -L https://api.github.com/meta | jq -r '.ssh_keys | .[]' | sed -e 's/^/github.com /' >> ~/.ssh/known_hosts
-
 # ensure yarn.lock is evaluated by kaniko cache diff
 COPY lerna.json package.json yarn.lock ./
 COPY scripts/ scripts/

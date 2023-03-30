@@ -255,7 +255,6 @@ export const assertRegistryAddressesSet = async (getContract: any) => {
 
 export const assertContractsOwnedByMultiSig = async (getContract: any) => {
   const multiSigAddress = (await getContract('MultiSig', 'proxiedContract')).address
-  // TODO fix here
   for (const contractPackage of ownedContracts) {
     for (const contractName of contractPackage.contracts) {
       const contractOwner: string = await (await getContract(contractName, 'proxiedContract', contractPackage.__path)).owner()
@@ -563,7 +562,6 @@ export async function assumeOwnership(contractsToOwn: string[], to: string, dequ
       
 			return {
 				value: 0,
-				// destination: (await getDeployedProxiedContract(contractName, artifacts)).address,
         destination: contractAddress,
 				data: transferOwnershipData,
 			}
