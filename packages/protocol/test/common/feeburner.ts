@@ -48,8 +48,8 @@ const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
 const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSortedOracles')
 const MockReserve: MockReserveContract = artifacts.require('MockReserve')
 
-const Exchange: ExchangeContract = makeTruffleContract('Exchange', 'mento', web3) // artifacts.require('Exchange')
-const StableToken: StableTokenContract = makeTruffleContract('StableToken', 'mento', web3) // artifacts.require('StableToken')
+const Exchange: ExchangeContract = makeTruffleContract('Exchange', 'mento', web3)
+const StableToken: StableTokenContract = makeTruffleContract('StableToken', 'mento', web3)
 
 const UniswapRouter: MockUniswapV2Router02Contract = artifacts.require('MockUniswapV2Router02')
 const UniswapV2Factory: MockUniswapV2FactoryContract = artifacts.require('MockUniswapV2Factory')
