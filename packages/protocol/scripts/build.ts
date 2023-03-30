@@ -42,6 +42,19 @@ export const ProxyContracts = [
   'StableTokenEURProxy',
   'StableTokenProxy',
 ]
+
+export const MentoContracts = [
+  'Exchange',
+  'ExchangeEUR',
+  'ExchangeBRL',
+  'GrandaMento',
+  'Reserve',
+  'ReserveSpenderMultiSig',
+  'StableToken',
+  'StableTokenEUR',
+  'StableTokenBRL',
+]
+
 export const CoreContracts = [
   // common
   'Accounts',
@@ -78,17 +91,6 @@ export const CoreContracts = [
 
   // stability
   'SortedOracles',
-
-  // Mento
-  'Exchange',
-  'ExchangeEUR',
-  'ExchangeBRL',
-  'GrandaMento',
-  'Reserve',
-  'ReserveSpenderMultiSig',
-  'StableToken',
-  'StableTokenEUR',
-  'StableTokenBRL',
 ]
 
 const OtherContracts = [
@@ -171,7 +173,9 @@ async function generateFilesForContractKit(outdir: string) {
   exec(`rm -rf ${outdir}`)
   const relativePath = path.relative(ROOT_DIR, outdir)
 
-  const contractKitContracts = CoreContracts.concat('Proxy').concat(Interfaces)
+  const contractKitContracts = CoreContracts.concat('Proxy')
+    .concat(Interfaces)
+    .concat(MentoContracts)
   const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
 
   const cwd = process.cwd()
