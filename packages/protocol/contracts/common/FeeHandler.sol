@@ -9,6 +9,9 @@ import "../common/Freezable.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 
+import "../common/interfaces/IFeeHandler.sol";
+import "../common/interfaces/IFeeHandlerSeller.sol";
+
 // TODO move to IStableToken when it adds method getExchangeRegistryId
 import "../stability/StableToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
@@ -20,7 +23,14 @@ import "../stability/interfaces/ISortedOracles.sol";
 import "../uniswap/interfaces/IUniswapV2RouterMin.sol";
 import "../uniswap/interfaces/IUniswapV2FactoryMin.sol";
 
-contract FeeHandler is Ownable, Initializable, UsingRegistry, ICeloVersionedContract, Freezable {
+contract FeeHandler is
+  Ownable,
+  Initializable,
+  UsingRegistry,
+  ICeloVersionedContract,
+  Freezable,
+  IFeeHandler
+{
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -42,6 +52,18 @@ contract FeeHandler is Ownable, Initializable, UsingRegistry, ICeloVersionedCont
 
   // Max slippage that can be accepted when burning a token
   mapping(address => FixidityLib.Fraction) public maxSlippage;
+
+  FixidityLib.Fraction public burnFraction;
+
+  struct TokenState {
+    address handler;
+    bool active;
+    uint256 maxSlippage;
+    uint256 dailyBurnLimit;
+    uint256 currentDateLimit;
+  }
+
+  mapping(address => TokenState) public tokenStates;
 
   event SoldAndBurnedToken(address token, uint256 value);
   event DailyLimitSet(address tokenAddress, uint256 newLimit);
@@ -92,6 +114,66 @@ contract FeeHandler is Ownable, Initializable, UsingRegistry, ICeloVersionedCont
         _setRouter(tokens[i], newRouters[i]);
       }
     }
+  }
+
+  function _setBurnFraction(uint256 newFraction) private {
+    FixidityLib.Fraction memory fraction = FixidityLib.wrap(newFraction);
+    require(
+      FixidityLib.lte(fraction, FixidityLib.fixed1()),
+      "Burn fraction must be less than or equal to 1"
+    );
+    burnFraction = fraction;
+    // emit TODO
+  }
+
+  function setBurnFraction(uint256 fraction) external onlyOwner {
+    return _setBurnFraction(fraction);
+  }
+
+  function sell(address tokenAddress) external {
+    return _sell(tokenAddress);
+  }
+
+  function addToken(address tokenAddress, address handlerAddress) external {
+    IFeeHandlerSeller(handlerAddress);
+
+    // Check that the contract implements the interface
+    TokenState storage tokenState = tokenStates[tokenAddress];
+    tokenState.active = true;
+    tokenState.handler = handlerAddress;
+  }
+
+  function removeToken(address tokenAddress) external {}
+
+  // TODO no reentrant
+  function _sell(address tokenAddress) private {
+    IERC20 token = IERC20(tokenAddress);
+    uint256 balanceToBurn = token.balanceOf(address(this));
+
+    TokenState memory tokenState = tokenStates[tokenAddress];
+
+    if (dailyBurnLimitHit(tokenAddress, balanceToBurn)) {
+      // in case the limit is hit, burn the max possible
+      // TODO move to state
+      balanceToBurn = currentDayLimit[tokenAddress];
+      emit DailyLimitHit(tokenAddress, balanceToBurn);
+    }
+
+    // small numbers cause rounding errors and zero case should be skipped
+    if (balanceToBurn <= MIN_BURN) {
+      return;
+    }
+
+    IFeeHandlerSeller handler = IFeeHandlerSeller(tokenState.handler);
+    token.transfer(address(handler), balanceToBurn);
+    handler.sell(tokenAddress, balanceToBurn, address(this));
+
+    updateLimits(tokenAddress, balanceToBurn);
+
+    emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
+
+    // TODO UpdateBurn amount
+
   }
 
   /**

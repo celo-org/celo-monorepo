@@ -173,6 +173,21 @@ contract('FeeHandler', (accounts: string[]) => {
     )
   })
 
+  describe.only('#setBurnFraction()', () => {
+    it('updates burn fraction correctly', async () => {
+      await feeHandler.setBurnFraction(toFixed(80 / 100))
+      assertEqualBN(await feeHandler.burnFraction(), toFixed(80 / 100))
+    })
+
+    it('only allows owner to change the burn fraction', async () => {
+      await assertRevert(feeHandler.setBurnFraction(toFixed(80 / 100), { from: user }))
+    })
+
+    it("doesn't allow numbers bigger than one", async () => {
+      await assertRevert(feeHandler.setBurnFraction(toFixed(80 / 100), { from: user }))
+    })
+  })
+
   describe('#calculateMinAmount()', () => {
     it('calculated the min correclty', async () => {
       const midprice = new BigNumber('1e18') // (1 Stabletoken = 1 Celo)
