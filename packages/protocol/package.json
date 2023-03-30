@@ -71,6 +71,7 @@
     "elliptic": "^6.5.4",
     "ethereumjs-abi": "^0.6.8",
     "ethereumjs-wallet": "^0.6.3",
+    "ethereum-cryptography": "1.2.0",
     "fs-extra": "^5.0.0",
     "ganache": "npm:@soloseng/ganache@7.7.5-beta.3",
     "glob-fs": "^0.1.7",
