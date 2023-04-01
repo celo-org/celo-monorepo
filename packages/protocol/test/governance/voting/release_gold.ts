@@ -1,4 +1,3 @@
-// TODO: (soloseng)  error caused by non-zero gasprice
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
@@ -10,7 +9,7 @@ import {
   assertSameAddress,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { addressToPublicKey, Signature } from '@celo/utils/lib/signatureUtils'
+import { Signature, addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import _ from 'lodash'
 import {

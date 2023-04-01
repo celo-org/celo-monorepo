@@ -1,4 +1,3 @@
-// TODO: (soloseng) gas price;
 import { NULL_ADDRESS, trimLeading0x } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
