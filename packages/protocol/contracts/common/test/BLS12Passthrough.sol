@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT OR Apache-2.0
 pragma solidity >=0.5.10;
 
-import { CeloB12_377Lib, B12_381Lib, B12 } from "../B12.sol";
+import { B12_377Lib, B12_381Lib, B12 } from "../B12.sol";
 import { TypedMemView } from "@summa-tx/memview.sol/contracts/TypedMemView.sol";
 
 contract Common {
@@ -232,7 +232,7 @@ contract BLS12_381Passthrough is Common {
       input[i].scalar = ref.indexUint(idx + 0x80, 32);
     }
 
-    return CeloB12_377Lib.g1MultiExp(input).serializeG1();
+    return B12_377Lib.g1MultiExp(input).serializeG1();
   }
 
   function g2Add(bytes calldata args) external view returns (bytes memory) {
@@ -272,15 +272,15 @@ contract BLS12_381Passthrough is Common {
 }
 
 contract BLS12_377Passthrough is Common {
-  using CeloB12_377Lib for B12.G1Point;
-  using CeloB12_377Lib for B12.G2Point;
-  using CeloB12_377Lib for B12.Fp;
-  using CeloB12_377Lib for B12.Fp2;
+  using B12_377Lib for B12.G1Point;
+  using B12_377Lib for B12.G2Point;
+  using B12_377Lib for B12.Fp;
+  using B12_377Lib for B12.Fp2;
   using B12 for B12.G1Point;
   using B12 for B12.G2Point;
   using B12 for B12.Fp;
   using B12 for B12.Fp2;
-  using CeloB12_377Lib for bytes;
+  using B12_377Lib for bytes;
   using B12 for bytes;
 
   using TypedMemView for bytes;
@@ -315,7 +315,7 @@ contract BLS12_377Passthrough is Common {
       input[i].scalar = ref.indexUint(idx + 0x80, 32);
     }
 
-    return CeloB12_377Lib.g1MultiExp(input).serializeG1();
+    return B12_377Lib.g1MultiExp(input).serializeG1();
   }
 
   function g2Add(bytes calldata args) external view returns (bytes memory) {
@@ -350,6 +350,6 @@ contract BLS12_377Passthrough is Common {
       input[i].scalar = ref.indexUint(idx + 0x100, 32);
     }
 
-    return CeloB12_377Lib.g2MultiExp(input).serializeG2();
+    return B12_377Lib.g2MultiExp(input).serializeG2();
   }
 }
