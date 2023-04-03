@@ -1,5 +1,4 @@
-//SPDX-License-Identifier: MIT OR Apache-2.0
-pragma solidity >=0.5.10;
+pragma solidity ^0.5.13;
 
 import { B12_377Lib, B12_381Lib, B12 } from "../B12.sol";
 import { TypedMemView } from "@summa-tx/memview.sol/contracts/TypedMemView.sol";
