@@ -1,6 +1,5 @@
-//SPDX-License-Identifier: MIT OR Apache-2.0
 // From https://github.com/prestwich/cip20-sol
-pragma solidity >=0.5.10;
+pragma solidity ^0.5.13;
 
 library CIP20Lib {
   uint8 private constant CIP20_ADDRESS = 0xE2;

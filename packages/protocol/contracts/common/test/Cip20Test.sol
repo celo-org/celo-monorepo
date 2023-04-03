@@ -1,5 +1,4 @@
-//SPDX-License-Identifier: MIT OR Apache-2.0
-pragma solidity >=0.5.10;
+pragma solidity ^0.5.13;
 
 import "../CIP20Lib.sol";
 
