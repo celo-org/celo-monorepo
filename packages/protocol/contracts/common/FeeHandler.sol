@@ -53,7 +53,11 @@ contract FeeHandler is
   // Max slippage that can be accepted when burning a token
   mapping(address => FixidityLib.Fraction) public maxSlippage;
 
-  FixidityLib.Fraction public burnFraction;
+  FixidityLib.Fraction public burnFraction; // 80%
+
+  address feeBeneficiary;
+
+  mapping(address => TokenState) public tokenStates;
 
   struct TokenState {
     address handler;
@@ -61,9 +65,8 @@ contract FeeHandler is
     uint256 maxSlippage;
     uint256 dailyBurnLimit;
     uint256 currentDateLimit;
+    uint256 toDistribute;
   }
-
-  mapping(address => TokenState) public tokenStates;
 
   event SoldAndBurnedToken(address token, uint256 value);
   event DailyLimitSet(address tokenAddress, uint256 newLimit);
@@ -146,11 +149,24 @@ contract FeeHandler is
   function removeToken(address tokenAddress) external {}
 
   // TODO no reentrant
-  function _sell(address tokenAddress) private {
+  function _sell(address tokenAddress) private onlyWhenNotFrozen {
     IERC20 token = IERC20(tokenAddress);
-    uint256 balanceToBurn = token.balanceOf(address(this));
 
-    TokenState memory tokenState = tokenStates[tokenAddress];
+    TokenState storage tokenState = tokenStates[tokenAddress];
+    FixidityLib.Fraction memory balanceOfTokenToBurn = FixidityLib.newFixed(
+      token.balanceOf(address(this))
+    );
+
+    uint256 balanceToBurn = (burnFraction.multiply(balanceOfTokenToBurn).fromFixed()).sub(
+      tokenState.toDistribute
+    );
+
+    tokenState.toDistribute += (token.balanceOf(address(this)).sub(balanceToBurn));
+
+    // small numbers cause rounding errors and zero case should be skipped
+    if (balanceToBurn <= MIN_BURN) {
+      return;
+    }
 
     if (dailyBurnLimitHit(tokenAddress, balanceToBurn)) {
       // in case the limit is hit, burn the max possible
@@ -159,21 +175,33 @@ contract FeeHandler is
       emit DailyLimitHit(tokenAddress, balanceToBurn);
     }
 
-    // small numbers cause rounding errors and zero case should be skipped
-    if (balanceToBurn <= MIN_BURN) {
-      return;
-    }
-
+    token.transfer(address(tokenState.handler), balanceToBurn);
     IFeeHandlerSeller handler = IFeeHandlerSeller(tokenState.handler);
-    token.transfer(address(handler), balanceToBurn);
-    handler.sell(tokenAddress, balanceToBurn, address(this));
+    handler.sell(
+      tokenAddress,
+      registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
+      balanceToBurn,
+      FixidityLib.unwrap(maxSlippage[tokenAddress])
+    );
 
+    pastBurn[tokenAddress] = pastBurn[tokenAddress].add(balanceToBurn);
     updateLimits(tokenAddress, balanceToBurn);
 
     emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
 
     // TODO UpdateBurn amount
 
+  }
+
+  function distribute(address tokenAddress) external {
+    return _distribute(tokenAddress);
+  }
+
+  function _distribute(address tokenAddress) private {
+    TokenState storage tokenState = tokenStates[tokenAddress];
+    IERC20 token = IERC20(tokenAddress);
+    token.transfer(feeBeneficiary, tokenState.toDistribute);
+    tokenState.toDistribute = 0;
   }
 
   /**
@@ -474,7 +502,7 @@ contract FeeHandler is
     FixidityLib.Fraction memory totalAmount = price.multiply(amountFraction);
 
     return
-      (price.multiply(amountFraction))
+      totalAmount
         .subtract((price.multiply(maxSlippage[tokenAddress])).multiply(amountFraction))
         .fromFixed();
   }

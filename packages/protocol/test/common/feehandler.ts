@@ -14,6 +14,8 @@ import {
   FreezerInstance,
   GoldTokenContract,
   GoldTokenInstance,
+  MentoFeeHandlerSellerContract,
+  MentoFeeHandlerSellerInstance,
   MockERC20Contract,
   MockERC20Instance,
   MockReserveContract,
@@ -54,6 +56,10 @@ const ERC20: MockERC20Contract = artifacts.require('MockERC20')
 
 const FeeCurrencyWhitelist: FeeCurrencyWhitelistContract = artifacts.require('FeeCurrencyWhitelist')
 
+const MentoFeeHandlerSeller: MentoFeeHandlerSellerContract = artifacts.require(
+  'MentoFeeHandlerSeller'
+)
+
 contract('FeeHandler', (accounts: string[]) => {
   let feeHandler: FeeHandlerInstance
   let exchange: ExchangeInstance
@@ -63,6 +69,7 @@ contract('FeeHandler', (accounts: string[]) => {
   let mockSortedOracles: MockSortedOraclesInstance
   let mockReserve: MockReserveInstance
   let freezer: FreezerInstance
+  let mentoSeller: MentoFeeHandlerSellerInstance
 
   let uniswapFactory: MockUniswapV2FactoryInstance
   let uniswapFactory2: MockUniswapV2FactoryInstance
@@ -99,6 +106,7 @@ contract('FeeHandler', (accounts: string[]) => {
     feeHandler = await FeeHandler.new(true)
     freezer = await Freezer.new(true)
     feeCurrencyWhitelist = await FeeCurrencyWhitelist.new(true)
+    mentoSeller = await MentoFeeHandlerSeller.new(true)
 
     tokenA = await ERC20.new()
     await feeCurrencyWhitelist.initialize()
@@ -127,6 +135,8 @@ contract('FeeHandler', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Reserve, mockReserve.address)
     await mockReserve.setGoldToken(goldToken.address)
     await mockReserve.addToken(stableToken.address)
+
+    await mentoSeller.initialize(registry.address)
 
     await goldToken.initialize(registry.address)
     // TODO: use MockStableToken for this
@@ -173,7 +183,7 @@ contract('FeeHandler', (accounts: string[]) => {
     )
   })
 
-  describe.only('#setBurnFraction()', () => {
+  describe('#setBurnFraction()', () => {
     it('updates burn fraction correctly', async () => {
       await feeHandler.setBurnFraction(toFixed(80 / 100))
       assertEqualBN(await feeHandler.burnFraction(), toFixed(80 / 100))
@@ -185,6 +195,68 @@ contract('FeeHandler', (accounts: string[]) => {
 
     it("doesn't allow numbers bigger than one", async () => {
       await assertRevert(feeHandler.setBurnFraction(toFixed(80 / 100), { from: user }))
+    })
+  })
+
+  describe.only('#sell()', () => {
+    beforeEach(async () => {
+      const goldTokenAmount = new BigNumber(1e18)
+
+      await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
+      await exchange.sell(goldTokenAmount, 0, true, { from: user })
+      await feeHandler.addToken(stableToken.address, mentoSeller.address)
+      await feeHandler.setBurnFraction(toFixed(80 / 100))
+    })
+
+    it('burns with mento', async () => {
+      console.log(1)
+      console.log('balance of user is', (await stableToken.balanceOf(user)).toString())
+      await stableToken.transfer(feeHandler.address, new BigNumber('1e18'), {
+        from: user,
+      })
+      console.log(2)
+      assertEqualBN(await feeHandler.getPastBurnForToken(stableToken.address), 0)
+      console.log(3)
+      const burnedAmountStable = await stableToken.balanceOf(feeHandler.address)
+      console.log(4)
+      await feeHandler.sell(stableToken.address)
+      console.log(5)
+      assertEqualBN(
+        await feeHandler.getPastBurnForToken(stableToken.address),
+        new BigNumber(burnedAmountStable).multipliedBy('0.8')
+      )
+      console.log(6)
+      assertEqualBN(await stableToken.balanceOf(feeHandler.address), new BigNumber('0.2e18'))
+      console.log(7)
+      // assertEqualBN(await goldToken.balanceOf(feeHandler.address), new BigNumber("994020886585092876"))
+      assertEqualBN((await feeHandler.tokenStates(stableToken.address))[5], new BigNumber('0.2e18'))
+
+      console.log(8)
+    })
+
+    it.only("Doesn't burn balance if it hasn't distributed", async () => {
+      await stableToken.transfer(
+        feeHandler.address,
+        //  await stableToken.balanceOf(user),
+        new BigNumber('1e18'),
+        {
+          from: user,
+        }
+      )
+      await feeHandler.sell(stableToken.address)
+      console.log(1)
+      const balanceFefore = await stableToken.balanceOf(feeHandler.address)
+      console.log(
+        '(await feeHandler.tokenStates(stableToken.address))[5]',
+        (await feeHandler.tokenStates(stableToken.address))[5].toString()
+      )
+      console.log(
+        '(await stableToken.balanceOf(feeHandler.address)',
+        (await stableToken.balanceOf(feeHandler.address)).toString()
+      )
+      await feeHandler.sell(stableToken.address)
+      console.log(2)
+      assertEqualBN(balanceFefore, await stableToken.balanceOf(feeHandler.address))
     })
   })
 
