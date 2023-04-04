@@ -45,7 +45,7 @@ library CIP20Lib {
       mstore(input, len)
     }
 
-    require(success, "keccak512 failed");
+    require(success, "CIP-20 hashing failed");
     return output;
   }
 
