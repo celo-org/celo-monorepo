@@ -298,15 +298,12 @@ library B12 {
   }
 
   function parseSimplePoint(bytes memory h, uint256 offset, Fp memory p) internal pure {
-    /* (uint256 a, uint256 b, uint256 byt) = parsePointGen(h, offset);
-    a = a + (byt << 15*8); */
     uint256 a;
     uint256 b;
     assembly {
       a := mload(add(0x20, add(h, offset)))
       b := mload(add(0x40, add(h, offset)))
     }
-    // p.a = a & (0xffffffffffffffffffffffffffffffff << (16*8));
     p.a = a;
     p.b = b;
   }
