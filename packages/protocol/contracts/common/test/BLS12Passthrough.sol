@@ -163,28 +163,6 @@ contract Common {
 
     require(success, "failed");
   }
-
-  function simple(bytes calldata input, uint8 addr, uint256 output_len)
-    external
-    view
-    returns (bytes memory)
-  {
-    return executePrecompile(input, addr, output_len);
-  }
-
-  function simpleTx(bytes calldata input, uint8 addr, uint256 output_len)
-    external
-    returns (bytes memory output)
-  {
-    output = executePrecompile(input, addr, output_len);
-    uint256 a;
-    assembly {
-      a := output
-    }
-    dumpMem(a + 0x20);
-    return output;
-  }
-
 }
 
 contract BLS12_381Passthrough is Common {
