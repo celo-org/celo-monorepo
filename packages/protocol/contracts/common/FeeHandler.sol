@@ -78,6 +78,7 @@ contract FeeHandler is
   event RouterUsed(address router);
   event ReceivedQuote(address router, uint256 quote);
   event FeeBeneficiarySet(address newBeneficiary);
+  event BurnFractionSet(uint256 fraction);
 
   /**
    * @notice Sets initialized == true on implementation contracts.
@@ -136,7 +137,7 @@ contract FeeHandler is
       "Burn fraction must be less than or equal to 1"
     );
     burnFraction = fraction;
-    // emit TODO
+    emit BurnFractionSet(newFraction);
   }
 
   function setBurnFraction(uint256 fraction) external onlyOwner {
@@ -206,6 +207,7 @@ contract FeeHandler is
   }
 
   function _distribute(address tokenAddress) private {
+    require(feeBeneficiary != address(0), "Can't distribute to the zero address");
     TokenState storage tokenState = tokenStates[tokenAddress];
     IERC20 token = IERC20(tokenAddress);
     token.transfer(feeBeneficiary, tokenState.toDistribute);
@@ -290,12 +292,50 @@ contract FeeHandler is
     return routerAddresses[token];
   }
 
+  function burnCelo() external {
+    return _burnCelo();
+  }
+
+  function handle(address tokenAddress) external {
+    return _handle(tokenAddress);
+  }
+
+  function _handle(address tokenAddress) private {
+    // Celo doesn't have to be exchanged for anything
+    if (tokenAddress != registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)) {
+      _sell(tokenAddress);
+    }
+    _burnCelo();
+    _distribute(tokenAddress);
+  }
+
   /**
     * @notice Burns all the Celo balance of this contract.
     */
-  function burnAllCelo() public {
+  function _burnCelo() private {
+    // FixidityLib.Fraction memory balanceOfTokenToBurn = FixidityLib.newFixed(
+    //   token.balanceOf(address(this)).sub(tokenState.toDistribute)
+    // );
+
+    // uint256 balanceToBurn = (burnFraction.multiply(balanceOfTokenToBurn).fromFixed());
+
+    TokenState storage tokenState = tokenStates[registry.getAddressForOrDie(
+      GOLD_TOKEN_REGISTRY_ID
+    )];
     ICeloToken celo = ICeloToken(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
-    celo.burn(celo.balanceOf(address(this)));
+
+    uint256 balanceOfCelo = celo.balanceOf(address(this));
+    uint256 balanceToProcess = balanceOfCelo.sub(tokenState.toDistribute);
+    uint256 balanceToBurn = FixidityLib
+      .newFixed(balanceToProcess)
+      .multiply(burnFraction)
+      .fromFixed();
+    celo.burn(balanceToBurn);
+    // balanceToProcess or balanceToBurn?
+    tokenState.toDistribute = balanceToProcess - balanceToBurn;
+
+    // emit?
+
   }
 
   /**
@@ -535,7 +575,7 @@ contract FeeHandler is
   function burn() external {
     burnMentoTokens();
     burnNonMentoTokens();
-    burnAllCelo();
+    // burnAllCelo();
   }
 
   /**

@@ -1,3 +1,5 @@
+/* tslint:disable */
+
 // TODO remove magic numbers
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertEqualBN, assertGtBN, assertRevert, timeTravel } from '@celo/protocol/lib/test-utils'
@@ -231,13 +233,66 @@ contract('FeeHandler', (accounts: string[]) => {
       await feeHandler.sell(stableToken.address)
     })
 
-    it.only('burns with mento', async () => {
+    it('distributes after a burn', async () => {
       await feeHandler.distribute(stableToken.address)
       assertEqualBN(await stableToken.balanceOf(feeHandler.address), 0)
       assertEqualBN(
         await stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS),
         new BigNumber('0.2e18')
       )
+    })
+  })
+
+  describe.only('#burnCelo()', () => {
+    beforeEach(async () => {
+      await feeHandler.setBurnFraction(toFixed(80 / 100))
+      console.log('balance 1', (await goldToken.balanceOf(feeHandler.address)).toString())
+      await goldToken.transfer(feeHandler.address, new BigNumber('1e18'), {
+        from: user,
+      })
+
+      console.log('balance 2', (await goldToken.balanceOf(feeHandler.address)).toString())
+      await feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS)
+      // assertEqualBN(await goldToken.balanceOf(feeHandler.address), new BigNumber("0")) // balance should start as zero
+    })
+
+    it('distribute correctly', async () => {
+      console.log('balance 4', (await goldToken.balanceOf(feeHandler.address)).toString())
+      await feeHandler.burnCelo()
+      // await feeHandler.distribute(stableToken.address)
+      assertEqualBN(await goldToken.balanceOf(feeHandler.address), new BigNumber('0.2e18'))
+      assertEqualBN(await goldToken.getBurnedAmount(), new BigNumber('0.8e18'))
+    })
+
+    it('burns correctly', async () => {
+      console.log('balance 3', (await goldToken.balanceOf(feeHandler.address)).toString())
+      await feeHandler.burnCelo()
+      // await feeHandler.distribute(stableToken.address)
+      assertEqualBN(await goldToken.balanceOf(feeHandler.address), new BigNumber('0.2e18'))
+      assertEqualBN(await goldToken.getBurnedAmount(), new BigNumber('0.8e18'))
+    })
+
+    // it("Doesn't burn what it's pending distributio", async () => {
+    //   console.log("balance 4", (await goldToken.balanceOf(feeHandler.address)).toString())
+    //   await feeHandler.burnCelo();
+    //   // await feeHandler.distribute(stableToken.address)
+    //   console.log("toDistribute", ((await feeHandler.tokenStates(goldToken.address))[5]).toString())
+    //   assertEqualBN(await goldToken.balanceOf(feeHandler.address), new BigNumber("0.2e18"))
+    //   assertEqualBN(await goldToken.getBurnedAmount(), new BigNumber("0.8e18"))
+
+    //   console.log("here")
+    //   await feeHandler.burnCelo();
+    //   assertEqualBN(await goldToken.balanceOf(feeHandler.address), new BigNumber("0.2e18"))
+    //   assertEqualBN(await goldToken.getBurnedAmount(), new BigNumber("0.8e18"))
+    // })
+
+    it('distributes correcly after a burn', async () => {
+      console.log('balance 5', (await goldToken.balanceOf(feeHandler.address)).toString())
+      await feeHandler.burnCelo()
+      // await feeHandler.distribute(stableToken.address)
+      assertEqualBN(await goldToken.balanceOf(feeHandler.address), new BigNumber('0.2e18'))
+      await feeHandler.distribute(goldToken.address)
+      assertEqualBN(await goldToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), new BigNumber('0.2e18'))
     })
   })
 
@@ -303,6 +358,31 @@ contract('FeeHandler', (accounts: string[]) => {
     })
   })
 
+  describe('#handle()', () => {
+    beforeEach(async () => {
+      // const goldTokenAmount = new BigNumber(1e18)
+
+      // await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
+      // await exchange.sell(goldTokenAmount, 0, true, { from: user })
+      // await feeHandler.addToken(stableToken.address, mentoSeller.address)
+      await goldToken.transfer(feeHandler.address, new BigNumber('1e18'), {
+        from: user,
+      })
+      await feeHandler.setBurnFraction(toFixed(80 / 100))
+      await feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS)
+    })
+
+    it('handles Celo', async () => {
+      // basically it just does a burn
+      await feeHandler.handle(goldToken.address)
+      assertEqualBN(await goldToken.getBurnedAmount(), new BigNumber('0.8e18'))
+      assertEqualBN(await goldToken.balanceOf(feeHandler.address), new BigNumber('0.2e18'))
+    })
+
+    // it("Handles other tokens", async () => {
+
+    // })
+  })
   describe('#calculateMinAmount()', () => {
     it('calculated the min correclty', async () => {
       const midprice = new BigNumber('1e18') // (1 Stabletoken = 1 Celo)
