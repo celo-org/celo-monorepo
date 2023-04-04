@@ -209,7 +209,7 @@ contract BLS12_381Passthrough is Common {
       input[i].scalar = ref.indexUint(idx + 0x80, 32);
     }
 
-    return B12_377Lib.g1MultiExp(input).serializeG1();
+    return B12_381Lib.g1MultiExp(input).serializeG1();
   }
 
   function g2Add(bytes calldata args) external view returns (bytes memory) {
