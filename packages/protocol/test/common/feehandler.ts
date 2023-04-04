@@ -31,7 +31,7 @@ import {
   StableTokenContract,
   StableTokenInstance,
 } from 'types'
-import { SECONDS_IN_A_WEEK } from '../constants'
+import { SECONDS_IN_A_WEEK, ZERO_ADDRESS } from '../constants'
 
 const goldAmountForRate = new BigNumber('1000000000000000000000000')
 const stableAmountForRate = new BigNumber(2).times(goldAmountForRate)
@@ -59,6 +59,8 @@ const FeeCurrencyWhitelist: FeeCurrencyWhitelistContract = artifacts.require('Fe
 const MentoFeeHandlerSeller: MentoFeeHandlerSellerContract = artifacts.require(
   'MentoFeeHandlerSeller'
 )
+
+const EXAMPLE_BENEFICIARY_ADDRESS = '0x2A486910DBC72cACcbb8d0e1439C96b03B2A4699'
 
 contract('FeeHandler', (accounts: string[]) => {
   let feeHandler: FeeHandlerInstance
@@ -198,7 +200,48 @@ contract('FeeHandler', (accounts: string[]) => {
     })
   })
 
-  describe.only('#sell()', () => {
+  describe('#setFeeBeneficiary()', () => {
+    it('updates address correctly', async () => {
+      await feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS)
+      assert(await feeHandler.feeBeneficiary(), EXAMPLE_BENEFICIARY_ADDRESS)
+    })
+
+    it('only allows owner to change the burn fraction', async () => {
+      await assertRevert(feeHandler.setBurnFraction(EXAMPLE_BENEFICIARY_ADDRESS, { from: user }))
+    })
+
+    it("doesn't allow the zero address", async () => {
+      await assertRevert(feeHandler.setFeeBeneficiary(ZERO_ADDRESS))
+    })
+  })
+
+  describe('#distribute()', () => {
+    beforeEach(async () => {
+      const goldTokenAmount = new BigNumber(1e18)
+
+      await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
+      await exchange.sell(goldTokenAmount, 0, true, { from: user })
+      await feeHandler.addToken(stableToken.address, mentoSeller.address)
+      await feeHandler.setBurnFraction(toFixed(80 / 100))
+      await stableToken.transfer(feeHandler.address, new BigNumber('1e18'), {
+        from: user,
+      })
+
+      await feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS)
+      await feeHandler.sell(stableToken.address)
+    })
+
+    it.only('burns with mento', async () => {
+      await feeHandler.distribute(stableToken.address)
+      assertEqualBN(await stableToken.balanceOf(feeHandler.address), 0)
+      assertEqualBN(
+        await stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS),
+        new BigNumber('0.2e18')
+      )
+    })
+  })
+
+  describe('#sell()', () => {
     beforeEach(async () => {
       const goldTokenAmount = new BigNumber(1e18)
 
@@ -234,7 +277,7 @@ contract('FeeHandler', (accounts: string[]) => {
       console.log(8)
     })
 
-    it.only("Doesn't burn balance if it hasn't distributed", async () => {
+    it("Doesn't burn balance if it hasn't distributed", async () => {
       await stableToken.transfer(
         feeHandler.address,
         //  await stableToken.balanceOf(user),

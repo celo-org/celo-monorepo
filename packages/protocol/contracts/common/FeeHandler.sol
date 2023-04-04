@@ -55,7 +55,7 @@ contract FeeHandler is
 
   FixidityLib.Fraction public burnFraction; // 80%
 
-  address feeBeneficiary;
+  address public feeBeneficiary;
 
   mapping(address => TokenState) public tokenStates;
 
@@ -77,6 +77,7 @@ contract FeeHandler is
   event RouterAddressRemoved(address token, address router);
   event RouterUsed(address router);
   event ReceivedQuote(address router, uint256 quote);
+  event FeeBeneficiarySet(address newBeneficiary);
 
   /**
    * @notice Sets initialized == true on implementation contracts.
@@ -119,6 +120,15 @@ contract FeeHandler is
     }
   }
 
+  function setFeeBeneficiary(address beneficiary) external onlyOwner {
+    return _setFeeBeneficiary(beneficiary);
+  }
+
+  function _setFeeBeneficiary(address beneficiary) private {
+    feeBeneficiary = beneficiary;
+    emit FeeBeneficiarySet(beneficiary);
+  }
+
   function _setBurnFraction(uint256 newFraction) private {
     FixidityLib.Fraction memory fraction = FixidityLib.wrap(newFraction);
     require(
@@ -154,12 +164,10 @@ contract FeeHandler is
 
     TokenState storage tokenState = tokenStates[tokenAddress];
     FixidityLib.Fraction memory balanceOfTokenToBurn = FixidityLib.newFixed(
-      token.balanceOf(address(this))
+      token.balanceOf(address(this)).sub(tokenState.toDistribute)
     );
 
-    uint256 balanceToBurn = (burnFraction.multiply(balanceOfTokenToBurn).fromFixed()).sub(
-      tokenState.toDistribute
-    );
+    uint256 balanceToBurn = (burnFraction.multiply(balanceOfTokenToBurn).fromFixed());
 
     tokenState.toDistribute += (token.balanceOf(address(this)).sub(balanceToBurn));
 
