@@ -10,7 +10,7 @@ library CIP20Lib {
   uint8 private constant SHA2_512_SELECTOR = 0x03;
   uint8 private constant BLAKE2S_SELECTOR = 0x10;
 
-  // BLAKE2S_DEFAULT_CONFIG = createConfig(32, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0)
+  // BLAKE2S_DEFAULT_CONFIG = createBlake2sConfig(32, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0)
   bytes32 private constant BLAKE2S_DEFAULT_CONFIG = 0x2000010100000000000000000000000000000000000000000000000000000000;
 
   // Accepts a fully formed input blob. This should include any config
@@ -84,7 +84,7 @@ library CIP20Lib {
     return blake2sWithConfig(BLAKE2S_DEFAULT_CONFIG, hex"", preimage);
   }
 
-  function createConfig(
+  function createBlake2sConfig(
     uint8 digestSize,
     uint8 keyLength,
     uint8 fanout,
@@ -97,7 +97,7 @@ library CIP20Lib {
     bytes8 salt,
     bytes8 personalize
   ) internal pure returns (bytes32 config) {
-    require(keyLength <= 32, "CIP20Lib/createConfig -- keyLength must be 32 or less");
+    require(keyLength <= 32, "CIP20Lib/createBlake2sConfig -- keyLength must be 32 or less");
     config = writeU8(config, 0, digestSize);
     config = writeU8(config, 1, keyLength);
 
