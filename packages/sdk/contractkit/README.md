@@ -29,7 +29,7 @@ npm install @celo/contractkit
 yarn add @celo/contractkit
 ```
 
-You will need Node.js v12.x. or greater.
+You will need Node.js v18.x. or greater.
 
 To start working with contractkit you need a `kit` instance:
 

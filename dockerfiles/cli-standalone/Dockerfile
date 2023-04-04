@@ -3,7 +3,7 @@
 # Example build command:
 #
 #   VERSION=x.y.z; docker build . --build-arg VERSION=$VERSION -t gcr.io/celo-testnet/celocli-standalone:$VERSION
-FROM node:10-alpine
+FROM node:18-alpine
 
 # Install cli install dependencies.
 RUN apk add --no-cache python git make gcc g++ bash libusb-dev linux-headers eudev-dev

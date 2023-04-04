@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:18
 
 RUN apt-get update -y
 RUN apt-get install lsb-release libudev-dev libusb-dev -y --no-install-recommends apt-utils

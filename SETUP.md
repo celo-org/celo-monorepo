@@ -42,7 +42,7 @@ Once you have go installed run the following to install gobind
 
 #### Install Node
 
-Currently Node.js v12.x is required in order to work with this repo.
+Currently Node.js v18.x is required in order to work with this repo.
 
 Install `nvm` (allows you to manage multiple versions of Node) by following the [instructions here](https://github.com/nvm-sh/nvm).
 
@@ -50,8 +50,8 @@ Once `nvm` is successfully installed, restart the terminal and run the following
 
 ```bash
 # restart the terminal after installing nvm
-nvm install 12
-nvm alias default 12
+nvm install 18
+nvm alias default 18
 ```
 
 ### MacOS
@@ -114,8 +114,8 @@ source ~/.bashrc
 With Rust binaries in your PATH you should be able to run:
 
 ```bash
-rustup install 1.42.0
-rustup default 1.42.0
+rustup install 1.68.2
+rustup default 1.68.2
 ```
 
 If you're building Geth for Android, you need a NDK that has a cross-compilation toolchain. We need version 19.

@@ -24,7 +24,7 @@ COPY packages/sdk/wallets/wallet-local packages/sdk/wallets/wallet-local
 COPY packages/sdk/wallets/wallet-remote packages/sdk/wallets/wallet-remote
 
 ##### Main stage
-FROM node:12
+FROM node:18
 
 WORKDIR /celo-phone-number-privacy/
 

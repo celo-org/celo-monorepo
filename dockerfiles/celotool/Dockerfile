@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:18
 WORKDIR /celo-monorepo
 
 # Needed for gsutil
@@ -63,9 +63,8 @@ RUN yarn build
 
 ENV PATH="/celo-monorepo/packages/celotool/bin:${PATH}"
 
-COPY --from=golang:1.16-stretch /usr/local/go/ /usr/local/go/
+COPY --from=golang:1.19-stretch /usr/local/go/ /usr/local/go/
 
 ENV PATH="/usr/local/go/bin:${PATH}"
 
 CMD ["celotooljs.sh"]
-
