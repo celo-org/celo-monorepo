@@ -7,6 +7,7 @@ import {
   assertLogMatches,
   assertRevert,
   assertSameAddress,
+  assertTXRevertWithReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { Signature, addressToPublicKey } from '@celo/utils/lib/signatureUtils'
@@ -456,7 +457,10 @@ contract('ReleaseGold', (accounts: string[]) => {
         const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
         releaseGoldSchedule.numReleasePeriods = Number.MAX_SAFE_INTEGER
         releaseGoldSchedule.amountReleasedPerPeriod = new BigNumber(2).pow(300)
-        await assertRevert(createNewReleaseGoldInstance(releaseGoldSchedule, web3))
+        await assertTXRevertWithReason(
+          createNewReleaseGoldInstance(releaseGoldSchedule, web3),
+          'value out-of-bounds'
+        )
       })
     })
   })
