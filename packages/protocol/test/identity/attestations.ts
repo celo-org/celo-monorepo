@@ -32,7 +32,6 @@ import {
 } from 'types'
 import Web3 from 'web3'
 import { soliditySha3 } from 'web3-utils'
-import { beforeEachWithRetries } from '../customHooks'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 /* We use a contract that behaves like the actual Attestations contract, but
@@ -82,7 +81,8 @@ contract('Attestations', (accounts: string[]) => {
     return accounts[nonIssuerIndex]
   }
 
-  beforeEachWithRetries('Attestations setup', 3, 3000, async () => {
+  beforeEach('Attestations setup', async () => {
+    // beforeEachWithRetries('Attestations setup', 3, 3000, async () => {
     accountsInstance = await Accounts.new(true)
     mockERC20Token = await MockERC20Token.new()
     otherMockERC20Token = await MockERC20Token.new()
@@ -95,27 +95,45 @@ contract('Attestations', (accounts: string[]) => {
     registry = await Registry.new(true)
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
-
     const tokenBalance = web3.utils.toWei('10', 'ether').toString()
-    await Promise.all(
-      accounts.map(async (account) => {
-        await mockERC20Token.mint(account, tokenBalance)
-        await otherMockERC20Token.mint(account, tokenBalance)
-        await accountsInstance.createAccount({ from: account })
-        await unlockAndAuthorizeKey(
-          KeyOffsets.VALIDATING_KEY_OFFSET,
-          accountsInstance.authorizeValidatorSigner,
-          account,
-          accounts
-        )
-        await unlockAndAuthorizeKey(
-          KeyOffsets.ATTESTING_KEY_OFFSET,
-          accountsInstance.authorizeAttestationSigner,
-          account,
-          accounts
-        )
-      })
-    )
+    // await Promise.all(
+    //   accounts.map(async (account) => {
+    //     console.log('account:', account)
+    //     await mockERC20Token.mint(account, tokenBalance)
+    //     await otherMockERC20Token.mint(account, tokenBalance)
+    //     await accountsInstance.createAccount({ from: account })
+    //     await unlockAndAuthorizeKey(
+    //       KeyOffsets.VALIDATING_KEY_OFFSET,
+    //       accountsInstance.authorizeValidatorSigner,
+    //       account,
+    //       accounts
+    //     )
+    //     // await unlockAndAuthorizeKey(
+    //     //   KeyOffsets.ATTESTING_KEY_OFFSET,
+    //     //   accountsInstance.authorizeAttestationSigner,
+    //     //   account,
+    //     //   accounts
+    //     // )
+    //   })
+    // )
+
+    for (let account of accounts) {
+      await mockERC20Token.mint(account, tokenBalance)
+      await otherMockERC20Token.mint(account, tokenBalance)
+      await accountsInstance.createAccount({ from: account })
+      await unlockAndAuthorizeKey(
+        KeyOffsets.VALIDATING_KEY_OFFSET,
+        accountsInstance.authorizeValidatorSigner,
+        account,
+        accounts
+      )
+      await unlockAndAuthorizeKey(
+        KeyOffsets.ATTESTING_KEY_OFFSET,
+        accountsInstance.authorizeAttestationSigner,
+        account,
+        accounts
+      )
+    }
 
     mockElection = await MockElection.new()
     await mockElection.setElectedValidators(

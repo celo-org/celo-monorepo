@@ -3164,7 +3164,17 @@ contract('Governance', (accounts: string[]) => {
     )
 
     beforeEach(async () => {
-      await concurrentMap(5, validators, async (validator) => {
+      // await concurrentMap(5, validators, async (validator) => {
+      //   await accountsInstance.createAccount({ from: validator.account })
+      //   const sig = await getParsedSignatureOfAddress(web3, validator.account, validator.signer)
+      //   await accountsInstance.authorizeValidatorSigner(validator.signer, sig.v, sig.r, sig.s, {
+      //     from: validator.account,
+      //   })
+      //   // add signers for mock precompile
+      //   await governance.addValidator(validator.signer)
+      // })
+
+      for (let validator of validators) {
         await accountsInstance.createAccount({ from: validator.account })
         const sig = await getParsedSignatureOfAddress(web3, validator.account, validator.signer)
         await accountsInstance.authorizeValidatorSigner(validator.signer, sig.v, sig.r, sig.s, {
@@ -3172,7 +3182,7 @@ contract('Governance', (accounts: string[]) => {
         })
         // add signers for mock precompile
         await governance.addValidator(validator.signer)
-      })
+      }
     })
 
     const whitelistFrom = (t: keyof typeof validators[0]) =>
