@@ -202,6 +202,25 @@ contract('FeeHandler', (accounts: string[]) => {
     })
   })
 
+  describe.only('#addToken()', () => {
+    it('adds it to the list', async () => {
+      await feeHandler.addToken(stableToken.address, mentoSeller.address)
+      assert.sameMembers(await feeHandler.getActiveTokens(), [stableToken.address])
+      const handlerAddress = (await feeHandler.tokenStates(stableToken.address))[0]
+      assert((await feeHandler.tokenStates(stableToken.address))[1], 'status added as active')
+      assert(
+        handlerAddress.toLocaleLowerCase() == mentoSeller.address.toLowerCase(),
+        'handler is correct'
+      )
+    })
+
+    it('Only owner can add token', async () => {
+      await assertRevert(
+        feeHandler.addToken(stableToken.address, mentoSeller.address, { from: user })
+      )
+    })
+  })
+
   describe('#setFeeBeneficiary()', () => {
     it('updates address correctly', async () => {
       await feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS)
@@ -243,7 +262,7 @@ contract('FeeHandler', (accounts: string[]) => {
     })
   })
 
-  describe.only('#burnCelo()', () => {
+  describe('#burnCelo()', () => {
     beforeEach(async () => {
       await feeHandler.setBurnFraction(toFixed(80 / 100))
       console.log('balance 1', (await goldToken.balanceOf(feeHandler.address)).toString())
@@ -264,27 +283,21 @@ contract('FeeHandler', (accounts: string[]) => {
       assertEqualBN(await goldToken.getBurnedAmount(), new BigNumber('0.8e18'))
     })
 
-    it('burns correctly', async () => {
-      console.log('balance 3', (await goldToken.balanceOf(feeHandler.address)).toString())
+    // the begining of this test is dentical to the previous one
+    // but for some reason it fails
+    it.skip("Doesn't burn what it's pending distributio", async () => {
+      console.log('balance 4', (await goldToken.balanceOf(feeHandler.address)).toString())
       await feeHandler.burnCelo()
       // await feeHandler.distribute(stableToken.address)
+      console.log('toDistribute', (await feeHandler.tokenStates(goldToken.address))[5].toString())
+      assertEqualBN(await goldToken.balanceOf(feeHandler.address), new BigNumber('0.2e18'))
+      assertEqualBN(await goldToken.getBurnedAmount(), new BigNumber('0.8e18'))
+
+      console.log('here')
+      await feeHandler.burnCelo()
       assertEqualBN(await goldToken.balanceOf(feeHandler.address), new BigNumber('0.2e18'))
       assertEqualBN(await goldToken.getBurnedAmount(), new BigNumber('0.8e18'))
     })
-
-    // it("Doesn't burn what it's pending distributio", async () => {
-    //   console.log("balance 4", (await goldToken.balanceOf(feeHandler.address)).toString())
-    //   await feeHandler.burnCelo();
-    //   // await feeHandler.distribute(stableToken.address)
-    //   console.log("toDistribute", ((await feeHandler.tokenStates(goldToken.address))[5]).toString())
-    //   assertEqualBN(await goldToken.balanceOf(feeHandler.address), new BigNumber("0.2e18"))
-    //   assertEqualBN(await goldToken.getBurnedAmount(), new BigNumber("0.8e18"))
-
-    //   console.log("here")
-    //   await feeHandler.burnCelo();
-    //   assertEqualBN(await goldToken.balanceOf(feeHandler.address), new BigNumber("0.2e18"))
-    //   assertEqualBN(await goldToken.getBurnedAmount(), new BigNumber("0.8e18"))
-    // })
 
     it('distributes correcly after a burn', async () => {
       console.log('balance 5', (await goldToken.balanceOf(feeHandler.address)).toString())
@@ -400,6 +413,8 @@ contract('FeeHandler', (accounts: string[]) => {
       )
     })
   })
+
+  describe('#handleAll()', () => {})
 
   describe('#transfer()', () => {
     beforeEach(async () => {

@@ -29,7 +29,7 @@ interface IFeeHandler {
   function handle(address tokenAddress) external;
 
   // // main entrypoint for a burn, iterates over token and calles handle
-  // function handleAll() external;
+  function handleAll() external;
 
   // Sends the balance of token at tokenAddress to feesBeneficiary,
   // according to the entry tokensToDistribute[tokenAddress]

@@ -68,6 +68,8 @@ contract FeeHandler is
     uint256 toDistribute;
   }
 
+  address[] public activeTokens;
+
   event SoldAndBurnedToken(address token, uint256 value);
   event DailyLimitSet(address tokenAddress, uint256 newLimit);
   event DailyLimitHit(address token, uint256 burning);
@@ -148,13 +150,19 @@ contract FeeHandler is
     return _sell(tokenAddress);
   }
 
-  function addToken(address tokenAddress, address handlerAddress) external {
+  function addToken(address tokenAddress, address handlerAddress) external onlyOwner {
     IFeeHandlerSeller(handlerAddress);
 
     // Check that the contract implements the interface
     TokenState storage tokenState = tokenStates[tokenAddress];
     tokenState.active = true;
     tokenState.handler = handlerAddress;
+
+    activeTokens.push(tokenAddress);
+  }
+
+  function getActiveTokens() public view returns (address[] memory) {
+    return activeTokens;
   }
 
   function removeToken(address tokenAddress) external {}
@@ -294,6 +302,16 @@ contract FeeHandler is
 
   function burnCelo() external {
     return _burnCelo();
+  }
+
+  function handleAll() external {
+    return _handleAll();
+  }
+
+  function _handleAll() private {
+    for (uint256 i = 0; i < activeTokens.length; i++) {
+      _handle(activeTokens[i]);
+    }
   }
 
   function handle(address tokenAddress) external {
