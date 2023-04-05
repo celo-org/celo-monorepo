@@ -11,7 +11,7 @@ contract MockGoldToken is GoldToken(true) {
   mapping(address => uint256) balances;
 
   function setTotalSupply(uint256 value) external {
-    totalSupply_ = value;
+    _totalSupply = value;
   }
 
   function transfer(address to, uint256 amount) external returns (bool) {
