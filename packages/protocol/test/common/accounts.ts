@@ -362,12 +362,6 @@ contract('Accounts', (accounts: string[]) => {
   describe('#batchGetMetadataURL', () => {
     it('returns multiple metadata URLs', async () => {
       const randomStrings = accounts.map((_) => web3.utils.randomHex(20).slice(2))
-      // await Promise.all(
-      //   accounts.map(async (mappedAccount, i) => {
-      //     await accountsInstance.createAccount({ from: mappedAccount })
-      //     await accountsInstance.setMetadataURL(randomStrings[i], { from: mappedAccount })
-      //   })
-      // )
 
       for (let i = 0; i < accounts.length; i++) {
         await accountsInstance.createAccount({ from: accounts[i] })
@@ -375,12 +369,10 @@ contract('Accounts', (accounts: string[]) => {
       }
 
       const [stringLengths, data] = await accountsInstance.batchGetMetadataURL(accounts)
-
       const strings = parseSolidityStringArray(
         stringLengths.map((x) => x.toNumber()),
         data as unknown as string
       )
-
       for (let i = 0; i < accounts.length; i++) {
         assert.equal(strings[i], randomStrings[i])
       }

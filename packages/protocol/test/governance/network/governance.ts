@@ -3164,16 +3164,6 @@ contract('Governance', (accounts: string[]) => {
     )
 
     beforeEach(async () => {
-      // await concurrentMap(5, validators, async (validator) => {
-      //   await accountsInstance.createAccount({ from: validator.account })
-      //   const sig = await getParsedSignatureOfAddress(web3, validator.account, validator.signer)
-      //   await accountsInstance.authorizeValidatorSigner(validator.signer, sig.v, sig.r, sig.s, {
-      //     from: validator.account,
-      //   })
-      //   // add signers for mock precompile
-      //   await governance.addValidator(validator.signer)
-      // })
-
       for (let validator of validators) {
         await accountsInstance.createAccount({ from: validator.account })
         const sig = await getParsedSignatureOfAddress(web3, validator.account, validator.signer)
@@ -3304,7 +3294,7 @@ contract('Governance', (accounts: string[]) => {
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
         // @ts-ignore bytes type
-        transactionSuccess1.data, //submitting TX
+        transactionSuccess1.data,
         [transactionSuccess1.data.length],
         salt,
         { gas: 2000000 }
