@@ -23,7 +23,7 @@ module.exports = deploymentForCoreContract<FeeHandlerInstance>(
   CeloContractName.FeeHandler,
   initializeArgs,
   async (feeHandler: FeeHandlerInstance) => {
-    for (let token of ['StableToken', 'StableTokenEUR', 'StableTokenBRL']) {
+    for (const token of ['StableToken', 'StableTokenEUR', 'StableTokenBRL']) {
       const stableToken: StableTokenInstance = await getDeployedProxiedContract<StableTokenInstance>(
         token,
         artifacts
