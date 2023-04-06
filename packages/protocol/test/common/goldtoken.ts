@@ -1,4 +1,3 @@
-// TODO (soloseng) gas price issue
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
@@ -161,8 +160,7 @@ contract('GoldToken', (accounts: string[]) => {
     it('should transfer balance from one user to another', async () => {
       const startBalanceFrom = await goldToken.balanceOf(sender)
       const startBalanceTo = await goldToken.balanceOf(receiver)
-      const resp = await goldToken.transfer(receiver, ONE_GOLDTOKEN)
-      console.log('TX receipt:', resp.receipt)
+      await goldToken.transfer(receiver, ONE_GOLDTOKEN)
       await assertBalance(sender, startBalanceFrom.minus(ONE_GOLDTOKEN))
       await assertBalance(receiver, startBalanceTo.plus(ONE_GOLDTOKEN))
     })

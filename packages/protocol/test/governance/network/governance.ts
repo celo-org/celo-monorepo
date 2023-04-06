@@ -1,4 +1,3 @@
-// TODO: (soloseng) gas price;
 import { NULL_ADDRESS, trimLeading0x } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
@@ -3165,7 +3164,7 @@ contract('Governance', (accounts: string[]) => {
     )
 
     beforeEach(async () => {
-      await concurrentMap(5, validators, async (validator) => {
+      for (let validator of validators) {
         await accountsInstance.createAccount({ from: validator.account })
         const sig = await getParsedSignatureOfAddress(web3, validator.account, validator.signer)
         await accountsInstance.authorizeValidatorSigner(validator.signer, sig.v, sig.r, sig.s, {
@@ -3173,7 +3172,7 @@ contract('Governance', (accounts: string[]) => {
         })
         // add signers for mock precompile
         await governance.addValidator(validator.signer)
-      })
+      }
     })
 
     const whitelistFrom = (t: keyof typeof validators[0]) =>
@@ -3295,7 +3294,7 @@ contract('Governance', (accounts: string[]) => {
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
         // @ts-ignore bytes type
-        transactionSuccess1.data, //submitting TX
+        transactionSuccess1.data,
         [transactionSuccess1.data.length],
         salt,
         { gas: 2000000 }

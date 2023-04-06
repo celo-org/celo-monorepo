@@ -1,4 +1,3 @@
-// TODO (soloseng) gas price issue
 import { ensureLeading0x, NULL_ADDRESS } from '@celo/base/lib/address'
 import { constitution } from '@celo/protocol/governanceConstitution'
 import {

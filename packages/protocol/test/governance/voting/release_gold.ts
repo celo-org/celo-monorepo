@@ -1,4 +1,3 @@
-// TODO: (soloseng)  error caused by non-zero gasprice
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
@@ -8,9 +7,10 @@ import {
   assertLogMatches,
   assertRevert,
   assertSameAddress,
+  assertTXRevertWithReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { addressToPublicKey, Signature } from '@celo/utils/lib/signatureUtils'
+import { Signature, addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import _ from 'lodash'
 import {
@@ -457,7 +457,10 @@ contract('ReleaseGold', (accounts: string[]) => {
         const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
         releaseGoldSchedule.numReleasePeriods = Number.MAX_SAFE_INTEGER
         releaseGoldSchedule.amountReleasedPerPeriod = new BigNumber(2).pow(300)
-        await assertRevert(createNewReleaseGoldInstance(releaseGoldSchedule, web3))
+        await assertTXRevertWithReason(
+          createNewReleaseGoldInstance(releaseGoldSchedule, web3),
+          'value out-of-bounds'
+        )
       })
     })
   })

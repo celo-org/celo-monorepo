@@ -8,7 +8,7 @@ import assert from 'assert';
 import BigNumber from 'bignumber.js';
 import chai from 'chai';
 import chaiSubset from 'chai-subset';
-import { spawn, SpawnOptions } from 'child_process';
+import { SpawnOptions, spawn } from 'child_process';
 import { keccak256 } from 'ethereum-cryptography/keccak';
 import {
   GovernanceApproverMultiSigInstance,
