@@ -221,7 +221,7 @@ contract('FeeHandler', (accounts: string[]) => {
       const handlerAddress = await feeHandler.getTokenHandler(stableToken.address)
       assert(await feeHandler.getTokenActive(stableToken.address), 'status added as active')
       assert(
-        handlerAddress.toLocaleLowerCase() == mentoSeller.address.toLowerCase(),
+        handlerAddress.toLocaleLowerCase() === mentoSeller.address.toLowerCase(),
         'handler is correct'
       )
     })
@@ -359,7 +359,9 @@ contract('FeeHandler', (accounts: string[]) => {
         await feeHandler.addToken(tokenA.address, uniswapFeeHandlerSeller.address)
       })
 
-      it('sells nonMento tokens', async () => {})
+      it('sells nonMento tokens', async () => {
+        // TODO complete when able to burn nonMento tokens
+      })
     })
   })
 
