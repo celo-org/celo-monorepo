@@ -41,14 +41,9 @@ contract FeeHandler is
 
   // Min units that can be burned
   uint256 public constant MIN_BURN = 200;
-  // Historical amounts burned by this contract
-  mapping(address => uint256) public pastBurn; // TODO DELETE ME
 
   // last day the daily limits were updated
   uint256 public lastLimitDay;
-
-  // Max slippage that can be accepted when burning a token
-  mapping(address => FixidityLib.Fraction) public maxSlippage;
 
   FixidityLib.Fraction public burnFraction; // 80%
 
@@ -68,6 +63,8 @@ contract FeeHandler is
     // Max amounts that can be burned today for a token
     uint256 currentDayLimit;
     uint256 toDistribute;
+    // Historical amounts burned by this contract
+    uint256 pastBurn;
   }
 
   address[] public activeTokens;
@@ -221,7 +218,7 @@ contract FeeHandler is
       FixidityLib.unwrap(tokenState.maxSlippage)
     );
 
-    pastBurn[tokenAddress] = pastBurn[tokenAddress].add(balanceToBurn);
+    tokenState.pastBurn = tokenState.pastBurn.add(balanceToBurn);
     updateLimits(tokenAddress, balanceToBurn);
 
     emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
@@ -339,7 +336,7 @@ contract FeeHandler is
     * @return The amount burned for a token.
     */
   function getPastBurnForToken(address token) external view returns (uint256) {
-    return pastBurn[token];
+    return tokenStates[token].pastBurn;
   }
 
   /**
