@@ -9,7 +9,7 @@ import { FeeHandlerInstance, StableTokenInstance } from 'types'
 const initializeArgs = async () => {
   return [
     config.registry.predeployedProxyAddress,
-    config.registry.feeHandler.beneficiaryAddress,
+    config.feeHandler.beneficiaryAddress,
     [],
     [],
     [],
