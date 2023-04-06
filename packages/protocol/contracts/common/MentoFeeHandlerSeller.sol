@@ -45,6 +45,9 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, UsingRegistry, Initializabl
     if (maxSlippage != 0) {
       // max slippage is set
       // use sorted oracles as reference
+
+      // TODO check amount of reports or that the bucket hasn't been updated in 5 minutes
+      // safetyCheck() or modifier
       ISortedOracles sortedOracles = getSortedOracles();
       (uint256 rateNumerator, uint256 rateDenominator) = sortedOracles.medianRate(sellTokenAddress);
       minAmount = calculateMinAmount(rateNumerator, rateDenominator, amount, maxSlippage);
@@ -60,6 +63,7 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, UsingRegistry, Initializabl
 
   }
 
+  // TODO move this to abstract class
   function calculateMinAmount(
     uint256 midPriceNumerator,
     uint256 midPriceDenominator,

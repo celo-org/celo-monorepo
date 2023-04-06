@@ -310,8 +310,12 @@ contract FeeHandler is
 
   function _handleAll() private {
     for (uint256 i = 0; i < activeTokens.length; i++) {
-      _handle(activeTokens[i]);
+      // calling _handle will trigger a lot of burn Celo that can be just batched at the end
+      // _handle(activeTokens[i]);
+      _sell(activeTokens[i]);
+      _distribute(activeTokens[i]); // TODO move to _distributeAll()
     }
+    _burnCelo();
   }
 
   function handle(address tokenAddress) external {

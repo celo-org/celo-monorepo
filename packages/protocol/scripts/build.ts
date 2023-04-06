@@ -40,6 +40,7 @@ export const ProxyContracts = [
   'StableTokenEURProxy',
   'StableTokenProxy',
   'SortedOraclesProxy',
+  'UniswapSellerProxy',
 ]
 export const CoreContracts = [
   // common
@@ -47,6 +48,7 @@ export const CoreContracts = [
   'GasPriceMinimum',
   'FeeHandler',
   'MentoFeeHandlerSeller',
+  'UniswapSellerProxy',
   'FeeCurrencyWhitelist',
   'GoldToken',
   'MetaTransactionWallet',
