@@ -90,6 +90,7 @@ const DefaultConfig = {
   },
   feeHandler: {
     beneficiaryAddress: '0x2A486910DBC72cACcbb8d0e1439C96b03B2A4699',
+    burnFraction: 80 / 100,
   },
   gasPriceMinimum: {
     minimumFloor: 100000000,

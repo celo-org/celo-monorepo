@@ -4,12 +4,14 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { FeeHandlerInstance, StableTokenInstance } from 'types'
+import { toFixed } from '@celo/utils/src/fixidity'
+import { FeeHandlerInstance, MentoFeeHandlerSellerInstance, StableTokenInstance } from 'types'
 
 const initializeArgs = async () => {
   return [
     config.registry.predeployedProxyAddress,
     config.feeHandler.beneficiaryAddress,
+    toFixed(config.feeHandler.burnFraction).toString(),
     [],
     [],
     [],
@@ -28,7 +30,13 @@ module.exports = deploymentForCoreContract<FeeHandlerInstance>(
         token,
         artifacts
       )
-      await feeHandler.addToken(stableToken.address, feeHandler.address)
+
+      const mentoFeeHandlerSeller: MentoFeeHandlerSellerInstance = await getDeployedProxiedContract<MentoFeeHandlerSellerInstance>(
+        CeloContractName.MentoFeeHandlerSeller,
+        artifacts
+      )
+
+      await feeHandler.addToken(stableToken.address, mentoFeeHandlerSeller.address)
     }
   }
 )
