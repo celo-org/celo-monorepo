@@ -1,6 +1,7 @@
 pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
@@ -194,8 +195,12 @@ contract FeeHandler is
     );
 
     uint256 balanceToBurn = (burnFraction.multiply(balanceOfTokenToBurn).fromFixed());
+    uint256 contractBalance = token.balanceOf(address(this));
 
-    tokenState.toDistribute += (token.balanceOf(address(this)).sub(balanceToBurn));
+    // safety check, try to burn more than what it has
+    balanceToBurn = Math.min(balanceToBurn, contractBalance);
+
+    tokenState.toDistribute += (contractBalance.sub(balanceToBurn));
 
     // small numbers cause rounding errors and zero case should be skipped
     if (balanceToBurn <= MIN_BURN) {
@@ -232,7 +237,12 @@ contract FeeHandler is
     require(feeBeneficiary != address(0), "Can't distribute to the zero address");
     TokenState storage tokenState = tokenStates[tokenAddress];
     IERC20 token = IERC20(tokenAddress);
-    token.transfer(feeBeneficiary, tokenState.toDistribute);
+    uint256 tokenBalance = token.balanceOf(address(this));
+
+    // safty check to avoid a revert due balance
+    uint256 balanceToDistribute = Math.min(tokenBalance, tokenState.toDistribute);
+
+    token.transfer(feeBeneficiary, balanceToDistribute);
     tokenState.toDistribute = 0;
   }
 

@@ -47,6 +47,7 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, UsingRegistry, Initializabl
     );
 
     StableToken stableToken = StableToken(sellTokenAddress);
+    require(amount <= stableToken.balanceOf(address(this)), "Balance of token to burn not enoug");
 
     address exchangeAddress = registry.getAddressForOrDie(stableToken.getExchangeRegistryId());
 
@@ -99,7 +100,7 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, UsingRegistry, Initializabl
 
     return
       totalAmount
-        .subtract((price.multiply(maxSlippageFraction)).multiply(amountFraction))
+        .subtract(price.multiply(maxSlippageFraction).multiply(amountFraction))
         .fromFixed();
   }
 

@@ -45,6 +45,8 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, UsingRegistry, Initializa
       "Buy token can only be gold token"
     );
 
+    require(routerAddresses[sellTokenAddress].length > 0, "routerAddresses should be non empty");
+
     // An improvement to this function would be to allow the user to pass a path as argument
     // and if it generates a better outcome that the ones enabled that gets used
     // and the user gets a reward
@@ -57,8 +59,6 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, UsingRegistry, Initializa
 
     address[] memory path = new address[](2);
     // address[] memory thisTokenRouterAddresses = routerAddresses[sellTokenAddress];
-
-    require(routerAddresses[sellTokenAddress].length > 0, "routerAddresses should be non empty");
 
     // IERC20 token = IERC20(sellTokenAddress);
     uint256 balanceToBurn = IERC20(sellTokenAddress).balanceOf(address(this));
