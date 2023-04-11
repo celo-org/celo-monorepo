@@ -689,15 +689,15 @@ const getTxConf = async (dataTest: boolean) => {
 
   // randomly choose which token to use
   const useGold = Boolean(Math.round(Math.random()))
-  const transferFn = useGold ? transferCeloGold : transferCeloDollars
-  const tokenName = useGold ? 'cGLD' : 'cUSD'
+  const _transferFn = useGold ? transferCeloGold : transferCeloDollars
+  const _tokenName = useGold ? 'cGLD' : 'cUSD'
 
   // randomly choose which gas currency to use
-  const feeCurrencyGold = Boolean(Math.round(Math.random()))
+  const _feeCurrencyGold = Boolean(Math.round(Math.random()))
   return {
-    feeCurrencyGold: feeCurrencyGold,
-    tokenName: tokenName,
-    transferFn: transferFn,
+    feeCurrencyGold: _feeCurrencyGold,
+    tokenName: _tokenName,
+    transferFn: _transferFn,
   }
 }
 
@@ -709,22 +709,22 @@ const getNonce = async (
   gasPrice: BigNumber,
   lastGasPriceMinimum: BigNumber
 ) => {
-  let nonce, newPrice
-  newPrice = gasPrice
+  let _nonce, _newPrice
+  _newPrice = gasPrice
   if (lastTx === '' || lastNonce === -1) {
-    nonce = await kit.web3.eth.getTransactionCount(senderAddress, 'latest')
+    _nonce = await kit.web3.eth.getTransactionCount(senderAddress, 'latest')
   } else if ((await kit.connection.getTransactionReceipt(lastTx))?.blockNumber) {
-    nonce = await kit.web3.eth.getTransactionCount(senderAddress, 'latest')
+    _nonce = await kit.web3.eth.getTransactionCount(senderAddress, 'latest')
   } else {
-    nonce = (await kit.web3.eth.getTransactionCount(senderAddress, 'latest')) - 1
-    newPrice = BigNumber.max(gasPrice.toNumber(), lastGasPriceMinimum.times(1.15)).dp(0)
+    _nonce = (await kit.web3.eth.getTransactionCount(senderAddress, 'latest')) - 1
+    _newPrice = BigNumber.max(gasPrice.toNumber(), lastGasPriceMinimum.times(1.15)).dp(0)
     console.warn(
-      `TX ${lastTx} was not mined. Replacing tx reusing nonce ${nonce} and gasPrice ${gasPrice}`
+      `TX ${lastTx} was not mined. Replacing tx reusing nonce ${_nonce} and gasPrice ${_newPrice}`
     )
   }
   return {
-    newPrice: newPrice,
-    nonce: nonce,
+    newPrice: _newPrice,
+    nonce: _nonce,
   }
 }
 
