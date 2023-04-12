@@ -104,11 +104,6 @@ contract FeeHandler is
     require(tokens.length == newLimits.length, "maxSlippage length should match tokens");
     require(tokens.length == newMaxSlippages.length, "maxSlippage length should match tokens");
 
-    TokenState storage tokenState = tokenStates[registry.getAddressForOrDie(
-      GOLD_TOKEN_REGISTRY_ID
-    )];
-    tokenState.active = true;
-
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
     _setFeeBeneficiary(newFeeBeneficiary);
@@ -119,6 +114,10 @@ contract FeeHandler is
       _setDailyBurnLimit(tokens[i], newLimits[i]);
       _setMaxSplippage(tokens[i], newMaxSlippages[i]);
     }
+    TokenState storage tokenState = tokenStates[registry.getAddressForOrDie(
+      GOLD_TOKEN_REGISTRY_ID
+    )];
+    tokenState.active = true;
   }
 
   function() external payable {}
