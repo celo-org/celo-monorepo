@@ -196,7 +196,7 @@ contract('FeeHandler', (accounts: string[]) => {
     await exchange.activateStable()
     await exchange2.activateStable()
 
-    await feeHandler.initialize(registry.address, EXAMPLE_BENEFICIARY_ADDRESS, [], [], [], [])
+    await feeHandler.initialize(registry.address, EXAMPLE_BENEFICIARY_ADDRESS, 0, [], [], [], [])
   })
 
   describe('#setBurnFraction()', () => {
