@@ -104,7 +104,10 @@ contract FeeHandler is
     require(tokens.length == newLimits.length, "maxSlippage length should match tokens");
     require(tokens.length == newMaxSlippages.length, "maxSlippage length should match tokens");
 
-    // TODO configure Celo
+    TokenState storage tokenState = tokenStates[registry.getAddressForOrDie(
+      GOLD_TOKEN_REGISTRY_ID
+    )];
+    tokenState.active = true;
 
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
@@ -308,7 +311,8 @@ contract FeeHandler is
       // calling _handle will trigger a lot of burn Celo that can be just batched at the end
       // _handle(activeTokens[i]);
       _sell(activeTokens[i]);
-      _distribute(activeTokens[i]); // TODO move to _distributeAll(), this should thisitrbute celo as well
+      // TODO move to _distributeAll(), this should thisitrbute celo as well
+      _distribute(activeTokens[i]);
     }
     _burnCelo();
   }
