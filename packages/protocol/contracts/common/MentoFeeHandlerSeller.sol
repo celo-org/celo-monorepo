@@ -19,6 +19,8 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, UsingRegistry, Initializabl
    */
   constructor(bool test) public Initializable(test) {}
 
+  function() external payable {}
+
   function initialize(address _registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
@@ -47,7 +49,7 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, UsingRegistry, Initializabl
     );
 
     StableToken stableToken = StableToken(sellTokenAddress);
-    require(amount <= stableToken.balanceOf(address(this)), "Balance of token to burn not enoug");
+    require(amount <= stableToken.balanceOf(address(this)), "Balance of token to burn not enough");
 
     address exchangeAddress = registry.getAddressForOrDie(stableToken.getExchangeRegistryId());
 
@@ -70,9 +72,7 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, UsingRegistry, Initializabl
     exchange.sell(amount, minAmount, false);
 
     IERC20 goldToken = getGoldToken();
-    // IERC20 stableAsERC20 = IERC20(sellTokenAddress);
     goldToken.transfer(msg.sender, goldToken.balanceOf(address(this)));
-
   }
 
   // TODO move this to abstract class

@@ -94,6 +94,7 @@ contract FeeHandler is
   function initialize(
     address _registryAddress,
     address newFeeBeneficiary,
+    uint256 newBurnFraction,
     address[] calldata tokens,
     address[] calldata handlers,
     uint256[] calldata newLimits,
@@ -103,9 +104,12 @@ contract FeeHandler is
     require(tokens.length == newLimits.length, "maxSlippage length should match tokens");
     require(tokens.length == newMaxSlippages.length, "maxSlippage length should match tokens");
 
+    // TODO configure Celo
+
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
     _setFeeBeneficiary(newFeeBeneficiary);
+    _setBurnFraction(newBurnFraction);
 
     for (uint256 i = 0; i < tokens.length; i++) {
       _addToken(tokens[i], handlers[i]);
@@ -113,6 +117,8 @@ contract FeeHandler is
       _setMaxSplippage(tokens[i], newMaxSlippages[i]);
     }
   }
+
+  function() external payable {}
 
   function getTokenHandler(address tokenAddress) external view returns (address) {
     return tokenStates[tokenAddress].handler;
@@ -166,9 +172,9 @@ contract FeeHandler is
   }
 
   function _addToken(address tokenAddress, address handlerAddress) private {
+    // Check that the contract implements the interface
     IFeeHandlerSeller(handlerAddress);
 
-    // Check that the contract implements the interface
     TokenState storage tokenState = tokenStates[tokenAddress];
     tokenState.active = true;
     tokenState.handler = handlerAddress;
@@ -214,8 +220,10 @@ contract FeeHandler is
       emit DailyLimitHit(tokenAddress, balanceToBurn);
     }
 
-    token.transfer(address(tokenState.handler), balanceToBurn);
+    // TODO check handler tokenState.handler
+    token.transfer(tokenState.handler, balanceToBurn);
     IFeeHandlerSeller handler = IFeeHandlerSeller(tokenState.handler);
+
     handler.sell(
       tokenAddress,
       registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
@@ -300,7 +308,7 @@ contract FeeHandler is
       // calling _handle will trigger a lot of burn Celo that can be just batched at the end
       // _handle(activeTokens[i]);
       _sell(activeTokens[i]);
-      _distribute(activeTokens[i]); // TODO move to _distributeAll()
+      _distribute(activeTokens[i]); // TODO move to _distributeAll(), this should thisitrbute celo as well
     }
     _burnCelo();
   }
