@@ -49,7 +49,7 @@ library UniswapV2Library {
     view
     returns (uint256 reserveA, uint256 reserveB)
   {
-    (address token0, address _) = sortTokens(tokenA, tokenB);
+    (address token0, ) = sortTokens(tokenA, tokenB);
 
     // require(false, "revert here");
     (uint256 reserve0, uint256 reserve1, ) = IUniswapV2Pair(pairFor(factory, tokenA, tokenB))
