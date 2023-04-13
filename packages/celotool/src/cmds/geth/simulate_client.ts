@@ -63,7 +63,7 @@ export const builder = () => {
       default: false,
     })
     .options('test-mode', {
-      type: 'number',
+      type: 'string',
       description: 'Load test mode: mixed transaction types, big calldatas, or simple transfers',
       choices: [TestMode.Mixed, TestMode.Data, TestMode.Transfer],
       default: TestMode.Mixed,
