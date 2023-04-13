@@ -644,7 +644,7 @@ export const simulateClient = async (
         ...baseLogMessage,
       })
     }
-    const dataStr = testMode == TestMode.Data ? getBigData(119750) : undefined // aim for half million gas txs
+    const dataStr = testMode === TestMode.Data ? getBigData(119750) : undefined // aim for half million gas txs
     // We purposely do not use await syntax so we sleep after sending the transaction,
     // not after processing a transaction's result. Also running below the 128kb limit from the tx pool
     await txConf
@@ -685,14 +685,14 @@ const getBigData = (size: number) => {
 }
 
 const getTxConf = async (testMode: TestMode) => {
-  if (testMode == TestMode.Data) {
+  if (testMode === TestMode.Data) {
     return {
       feeCurrencyGold: true,
       tokenName: 'cGLD.L',
       transferFn: transferCalldata,
     }
   }
-  if (testMode == TestMode.Transfer) {
+  if (testMode === TestMode.Transfer) {
     return {
       feeCurrencyGold: true,
       tokenName: 'cGLD',

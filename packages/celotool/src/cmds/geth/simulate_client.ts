@@ -103,7 +103,7 @@ export const handler = async (argv: SimulateClientArgv) => {
       argv.blockscoutUrl,
       argv.blockscoutMeasurePercent,
       argv.index,
-      (<any>TestMode)[argv.testMode],
+      argv.testMode as TestMode,
       thread,
       `http://localhost:${web3ProviderPort}`
     )
