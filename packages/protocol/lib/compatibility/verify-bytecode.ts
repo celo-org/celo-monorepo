@@ -20,6 +20,19 @@ const ignoredContracts = [
   // These contracts are not in the Registry (before release 1)
   'ReserveSpenderMultiSig',
   'GovernanceApproverMultiSig',
+
+  // These are Mento contracts which we are no longer maintaining
+  'Exchange',
+  'ExchangeBRL',
+  'ExchangeEUR',
+  'GrandaMento',
+  'Reserve',
+  'ReserveSpenderMultiSig',
+  'SortedOracles',
+  'StableToken',
+  'StableTokenBRL',
+  'StableTokenEUR',
+  'StableTokenRegistry',
 ]
 
 interface VerificationContext {

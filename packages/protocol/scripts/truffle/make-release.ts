@@ -24,6 +24,23 @@ import { RegistryInstance } from 'types'
  *   --initialize_data initialize_data.json --proposal proposal.json
  */
 
+const ignoredContracts = [
+  // These are Mento contracts which we are no longer maintaining
+  'Exchange',
+  'ExchangeBRL',
+  'ExchangeEUR',
+  'GrandaMento',
+  'Reserve',
+  'ReserveSpenderMultiSig',
+  'SortedOracles',
+  'StableToken',
+  'StableTokenBRL',
+  'StableTokenEUR',
+  'StableTokenRegistry',
+]
+
+const ignoredContractsSet = new Set(ignoredContracts)
+
 class ContractAddresses {
   static async create(
     contracts: string[],
@@ -235,9 +252,14 @@ module.exports = async (callback: (error?: any) => number) => {
     const report: ASTDetailedVersionedReport = fullReport.report
     const initializationData = readJsonSync(argv.initialize_data)
     const dependencies = getCeloContractDependencies()
-    const contracts = readdirSync(join(argv.build_directory, 'contracts')).map((x) =>
-      basename(x, '.json')
-    )
+    const contracts = readdirSync(join(argv.build_directory, 'contracts'))
+      .map((x) => basename(x, '.json'))
+      .filter(
+        (contract) =>
+          !ignoredContractsSet.has(contract) &&
+          !ignoredContractsSet.has(contract.replace('Proxy', ''))
+      )
+    console.log('ignoredContracts', ignoredContracts)
     const registry = await artifacts.require('Registry').at(celoRegistryAddress)
     const addresses = await ContractAddresses.create(contracts, registry, libraryMapping)
     const released: Set<string> = new Set([])
