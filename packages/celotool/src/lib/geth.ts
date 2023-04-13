@@ -647,9 +647,7 @@ export const simulateClient = async (
     const dataStr = testMode === TestMode.Data ? getBigData(119750) : undefined // aim for half million gas txs
     // Also running below the 128kb limit from the tx pool
 
-    // We purposely do not use await syntax so we sleep after sending the transaction,
-    // not after processing a transaction's result.
-    txConf
+    await txConf
       .transferFn(
         kit,
         senderAddress,
@@ -732,7 +730,7 @@ const getNonce = async (
     _nonce = await kit.web3.eth.getTransactionCount(senderAddress, 'latest')
   } else {
     _nonce = (await kit.web3.eth.getTransactionCount(senderAddress, 'latest')) - 1
-    _newPrice = BigNumber.max(gasPrice.toNumber(), lastGasPriceMinimum.times(1.15)).dp(0)
+    _newPrice = BigNumber.max(gasPrice.toNumber(), lastGasPriceMinimum.times(1.02)).dp(0)
     console.warn(
       `TX ${lastTx} was not mined. Replacing tx reusing nonce ${_nonce} and gasPrice ${_newPrice}`
     )
