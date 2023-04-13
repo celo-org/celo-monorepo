@@ -544,6 +544,12 @@ export const unlock = async (
   }
 }
 
+export enum TestMode {
+  Mixed = 'mixed',
+  Data = 'data',
+  Transfer = 'transfer',
+}
+
 export const simulateClient = async (
   senderAddress: string,
   recipientAddress: string,
@@ -551,7 +557,7 @@ export const simulateClient = async (
   blockscoutUrl: string,
   blockscoutMeasurePercent: number, // percent of time in range [0, 100] to measure blockscout for a tx
   index: number,
-  dataTest: boolean,
+  testMode: TestMode,
   thread: number,
   web3Provider: string = 'http://localhost:8545'
 ) => {
@@ -598,7 +604,7 @@ export const simulateClient = async (
       await unlock(kit, kit.defaultAccount, password, 9223372036)
       unlockNeeded = false
     }
-    const txConf = await getTxConf(dataTest)
+    const txConf = await getTxConf(testMode)
     baseLogMessage.tokenName = txConf.tokenName
 
     // randomly choose the recipientAddress if configured
@@ -638,7 +644,7 @@ export const simulateClient = async (
         ...baseLogMessage,
       })
     }
-    const dataStr = dataTest ? getBigData(119750) : undefined // aim for half million gas txs
+    const dataStr = testMode == TestMode.Data ? getBigData(119750) : undefined // aim for half million gas txs
     // We purposely do not use await syntax so we sleep after sending the transaction,
     // not after processing a transaction's result. Also running below the 128kb limit from the tx pool
     await txConf
@@ -678,12 +684,19 @@ const getBigData = (size: number) => {
   return '0x' + '00'.repeat(size)
 }
 
-const getTxConf = async (dataTest: boolean) => {
-  if (dataTest) {
+const getTxConf = async (testMode: TestMode) => {
+  if (testMode == TestMode.Data) {
     return {
       feeCurrencyGold: true,
       tokenName: 'cGLD.L',
       transferFn: transferCalldata,
+    }
+  }
+  if (testMode == TestMode.Transfer) {
+    return {
+      feeCurrencyGold: true,
+      tokenName: 'cGLD',
+      transferFn: transferCeloGold,
     }
   }
 
