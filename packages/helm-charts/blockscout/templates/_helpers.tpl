@@ -26,7 +26,11 @@ the `volumes` section.
 */ -}}
 {{- define "celo.blockscout.container.db-terminating-sidecar" -}}
 - name: cloudsql-proxy
-  image: gcr.io/cloudsql-docker/gce-proxy:1.11
+  image: gcr.io/cloudsql-docker/gce-proxy:1.19.1-alpine
+  lifecycle:
+    postStart:
+      exec:
+        command: ["/bin/sh", "-c", "until nc -z {{ .Database.proxy.host }}:{{ .Database.proxy.port }}; do sleep 1; done"]
   command:
   - /bin/sh
   args:
@@ -95,7 +99,11 @@ the `volumes` section.
 */ -}}
 {{- define "celo.blockscout.container.db-sidecar" -}}
 - name: cloudsql-proxy
-  image: gcr.io/cloudsql-docker/gce-proxy:1.19.1
+  image: gcr.io/cloudsql-docker/gce-proxy:1.19.1-alpine
+  lifecycle:
+    postStart:
+      exec:
+        command: ["/bin/sh", "-c", "until nc -z {{ .Database.proxy.host }}:{{ .Database.proxy.port }}; do sleep 1; done"]
   command: ["/cloud_sql_proxy",
             "-instances={{ .Database.connectionName }}=tcp:{{ .Database.port }}",
             "-credential_file=/secrets/cloudsql/credentials.json",
@@ -155,6 +163,8 @@ blockscout components.
 - name: SUBNETWORK
   value: {{ .Values.blockscout.chain.subnetwork }}
 - name: COIN
+  value: CELO
+- name: COIN_NAME
   value: CELO
 - name: ECTO_USE_SSL
   value: "false"

@@ -3,7 +3,6 @@ import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
 import { handler as contractsHandler } from '../initial/contracts'
-import { handler as attestationServiceHandler } from './attestation-service'
 import { handler as blockscoutHandler } from './blockscout'
 import { handler as celostatsHandler } from './celostats'
 import { handler as testnetHandler } from './testnet'
@@ -64,7 +63,4 @@ export const handler = async (argv: AllArgv) => {
     console.info('Deploy contracts')
     await contractsHandler(argv)
   }
-
-  console.info('Deploy attestation-service')
-  await attestationServiceHandler(argv)
 }

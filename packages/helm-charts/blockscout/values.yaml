@@ -1,5 +1,34 @@
 ingressClassName: nginx
 blockscout:
+  eventStream:
+    strategy:
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 0
+    port: 4000
+    resources:
+      requests:
+        memory: 1000Mi
+        cpu: 2
+    enableEventStream: false
+    beanstalkdPort: ""
+    beanstalkdHost: ""
+    beanstalkdTube: ""
+    replicas: 0
+    readinessProbe:
+      enabled: false
+      initialDelaySeconds: 30
+      periodSeconds: 5
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
+    livenessProbe:
+      enabled: false
+      initialDelaySeconds: 30
+      periodSeconds: 5
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
   indexer:
     terminationGracePeriodSeconds: 60
     port: 4001
@@ -35,18 +64,18 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    poolSize: 30
+    poolSize: 200
     poolSizeReplica: 5
     readinessProbe:
       enabled: true
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
       failureThreshold: 5
     livenessProbe:
       enabled: false
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
@@ -55,6 +84,13 @@ blockscout:
       requests:
         memory: 1000Mi
         cpu: 2
+    affinity: {}
+    nodeSelector: {}
+    rpcRegion: "indexer"  
+    primaryRpcRegion: "indexer"  
+    fetchers:
+      blockRewards:
+        enabled: false
   api:
     suffix:
       enabled: false
@@ -69,6 +105,8 @@ blockscout:
         minReplicas: 2
         target:
           cpu: 70
+    rpcRegion: "api"  
+    primaryRpcRegion: "indexer"  
     db:
       name: blockscout
       connectionName: project:region:db-name
@@ -102,14 +140,14 @@ blockscout:
     rateLimit: "1000000"
     readinessProbe:
       enabled: true
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
       failureThreshold: 5
     livenessProbe:
       enabled: true
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
@@ -118,11 +156,15 @@ blockscout:
       requests:
         memory: 500Mi
         cpu: 500m
+    affinity: {}
+    nodeSelector: {}
   web:
     host: ""
     suffix:
       enabled: false
       path: ""
+    # used once to create additional resources for proper routing
+    # of multiple environments on the same domain
     extraEnvironments:
       # format:
       # -
@@ -177,14 +219,14 @@ blockscout:
     poolSizeReplica: 5
     readinessProbe:
       enabled: true
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
       failureThreshold: 5
     livenessProbe:
       enabled: true
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
@@ -197,6 +239,8 @@ blockscout:
       requests:
         memory: 250M
         cpu: 500m
+    affinity: {}
+    nodeSelector: {}
     appsMenu:
       enabled: true
       swapList: '[{"url":"https://ubeswap.org/", "title":"Ubeswap"}, {"url":"https://symmetric.finance/", "title":"Symmetric"}, {"url":"https://www.mobius.money/", "title":"Mobius"}, {"url":"https://mento.finance/", "title":"Mento-fi"}, {"url":"https://swap.bitssa.com/", "title":"Swap Bitssa"}]'
@@ -213,6 +257,18 @@ blockscout:
       enabled: false
       reportUrl: ""
       makerdojo: ""
+    rpcRegion: "web"  
+    primaryRpcRegion: "indexer"
+    liveUpdates:
+      disabled: true
+    homepage:
+      showPrice: true
+      showTxs: false
+    accountPoolSize: 1
+    tokenIcons:
+      enabled: false
+    basicAuth:
+      enabled: false
   metadataCrawler:
     enabled: false
     schedule: "0 */2 * * *" # every 2 hours
@@ -226,6 +282,8 @@ blockscout:
     jsonrpcPublicHttp: ""
   metrics:
     enabled: false
+  affinity: {}
+  nodeSelector: {}
   image:
     repository: gcr.io/celo-testnet/blockscout
     pullPolicy: IfNotPresent
@@ -236,7 +294,7 @@ blockscout:
   db:
     drop: "false"
   epochRewards:
-    enabled: false
+    enabled: true
   campaignBanner:
     refreshInterval: "60"
   grafanaUrl: https://clabs.grafana.net
@@ -255,6 +313,7 @@ blockscout:
       projectId: ""
       siteKey: ""
       apiKey: ""
+      secretKey: ""
     erlang:
       cookie: ""
     campaignBannerApiUrl: ""

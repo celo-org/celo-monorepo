@@ -1,9 +1,7 @@
-import { Signature } from '@celo/base/lib/signatureUtils'
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { AttestationUtils } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
@@ -307,13 +305,43 @@ export function assertObjectWithBNEqual(
     } else if (isNumber(actual[k]) || isNumber(expected[k])) {
       assertEqualBN(actual[k], expected[k], fieldErrorMsg(k))
     } else if (Array.isArray(actual[k])) {
-      assert.deepEqual(actual[k], expected[k], fieldErrorMsg(k))
+      const actualArray = actual[k] as []
+      const expectedArray = expected[k] as []
+      if (actualArray.length === expectedArray.length 
+        && actualArray.every(actualValue => isNumber(actualValue)) 
+        && expectedArray.every(expectedValue => isNumber(expectedValue))) {
+        // if this is array of BNs, deepEqual will not work
+        // since it is not able to compare number/string/BN
+        // with each other and we have to compare it manually
+        for (let i = 0; i < actualArray.length; i++) {
+          assertEqualBN(actualArray[i], expectedArray[i], fieldErrorMsg(k))
+        }
+      } else  {
+        assert.deepEqual(actual[k], expected[k], fieldErrorMsg(k))
+      }
     }
     else {
       assert.equal(actual[k], expected[k], fieldErrorMsg(k))
     }
   }
 }
+
+export function assertBNArrayEqual(
+  actualArray: any[],
+  expectedArray: any[]
+) {
+  assert(Array.isArray(actualArray), `Actual is not an array`)
+  assert(Array.isArray(expectedArray), `Expected is not an array`)
+  assert(actualArray.length === expectedArray.length, `Different array sizes; actual: ${actualArray.length} expected: ${expectedArray.length}`)
+  assert(actualArray.every(actualValue => isNumber(actualValue)) 
+      && expectedArray.every(expectedValue => isNumber(expectedValue)),
+      `Expected all elements to be numbers`)
+      
+  for (let i = 0; i < actualArray.length; i++) {
+    assertEqualBN(actualArray[i], expectedArray[i])
+  }
+}
+
 
 export function assertEqualBN(
   actual: number | BN | BigNumber,
@@ -379,6 +407,18 @@ export function assertGteBN(
   )
 }
 
+export function assertGtBN(
+  value: number | BN | BigNumber,
+  expected: number | BN | BigNumber,
+  msg?: string
+) {
+  assert(
+    web3.utils.toBN(value).gt(web3.utils.toBN(expected)),
+    `expected ${value.toString()} to be greater than to ${expected.toString()}. ${msg ||
+      ''}`
+  )
+}
+
 export const isSameAddress = (minerAddress, otherAddress) => {
   return minerAddress.toLowerCase() === otherAddress.toLowerCase()
 }
@@ -386,7 +426,6 @@ export const isSameAddress = (minerAddress, otherAddress) => {
 // TODO(amy): Pull this list from the build artifacts instead
 export const proxiedContracts: string[] = [
   'Attestations',
-  // TODO ASv2 revisit if we need to update test-utils
   'Escrow',
   'GoldToken',
   'Registry',
@@ -398,7 +437,6 @@ export const proxiedContracts: string[] = [
 // TODO(asa): Pull this list from the build artifacts instead
 export const ownedContracts: string[] = [
   'Attestations',
-  // TODO ASv2 revisit if we need to update test-utils
   'Escrow',
   'Exchange',
   'Registry',
@@ -534,16 +572,6 @@ export const accountPrivateKeys: string[] = [
   '0xb2fd4d29c1390b71b8795ae81196bfd60293adf99f9d32a0aff06288fcdac55f',
   '0x23cb7121166b9a2f93ae0b7c05bde02eae50d64449b2cbb42bc84e9d38d6cc89',
 ]
-
-export async function getVerificationCodeSignature(
-  account: string,
-  issuer: string,
-  identifier: string,
-  accounts: string[]
-): Promise<Signature> {
-  const privateKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, issuer, accounts)
-  return AttestationUtils.attestToIdentifier(identifier, account, privateKey)
-}
 
 export const getDerivedKey = (offset: number, address: string, accounts: string[]) => {
   const pKey = accountPrivateKeys[accounts.indexOf(address)]

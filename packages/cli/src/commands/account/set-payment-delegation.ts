@@ -1,7 +1,6 @@
-import { valueToFixidityString } from '@celo/contractkit/src/wrappers/BaseWrapper'
+import { valueToFixidityString } from '@celo/contractkit/lib/wrappers/BaseWrapper'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
-import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
@@ -27,7 +26,6 @@ export default class SetPaymentDelegation extends BaseCommand {
     this.kit.defaultAccount = res.flags.account
     const accounts = await this.kit.contracts.getAccounts()
 
-    await newCheckBuilder(this).isAccount(res.flags.beneficiary).runChecks()
     await displaySendTx(
       'setPaymentDelegation',
       accounts.setPaymentDelegation(
