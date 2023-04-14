@@ -70,18 +70,6 @@ contract FeeHandler is
 
   address[] public activeTokens;
 
-  FixidityLib.Fraction public burnFraction;
-
-  struct TokenState {
-    address handler;
-    bool active;
-    uint256 maxSlippage;
-    uint256 dailyBurnLimit;
-    uint256 currentDateLimit;
-  }
-
-  mapping(address => TokenState) public tokenStates;
-
   event SoldAndBurnedToken(address token, uint256 value);
   event DailyLimitSet(address tokenAddress, uint256 newLimit);
   event DailyLimitHit(address token, uint256 burning);
@@ -266,66 +254,6 @@ contract FeeHandler is
 
     token.transfer(feeBeneficiary, balanceToDistribute);
     tokenState.toDistribute = 0;
-  }
-
-  function _setBurnFraction(uint256 newFraction) private {
-    FixidityLib.Fraction memory fraction = FixidityLib.wrap(newFraction);
-    require(
-      FixidityLib.lte(fraction, FixidityLib.fixed1()),
-      "Burn fraction must be less than or equal to 1"
-    );
-    burnFraction = fraction;
-    // emit TODO
-  }
-
-  function setBurnFraction(uint256 fraction) external onlyOwner {
-    return _setBurnFraction(fraction);
-  }
-
-  function sell(address tokenAddress) external {
-    return _sell(tokenAddress);
-  }
-
-  function addToken(address tokenAddress, address handlerAddress) external {
-    IFeeHandlerSeller(handlerAddress);
-
-    // Check that the contract implements the interface
-    TokenState storage tokenState = tokenStates[tokenAddress];
-    tokenState.active = true;
-    tokenState.handler = handlerAddress;
-  }
-
-  function removeToken(address tokenAddress) external {}
-
-  // TODO no reentrant
-  function _sell(address tokenAddress) private {
-    IERC20 token = IERC20(tokenAddress);
-    uint256 balanceToBurn = token.balanceOf(address(this));
-
-    TokenState memory tokenState = tokenStates[tokenAddress];
-
-    if (dailyBurnLimitHit(tokenAddress, balanceToBurn)) {
-      // in case the limit is hit, burn the max possible
-      // TODO move to state
-      balanceToBurn = currentDayLimit[tokenAddress];
-      emit DailyLimitHit(tokenAddress, balanceToBurn);
-    }
-
-    // small numbers cause rounding errors and zero case should be skipped
-    if (balanceToBurn <= MIN_BURN) {
-      return;
-    }
-
-    IFeeHandlerSeller handler = IFeeHandlerSeller(tokenState.handler);
-    token.transfer(address(handler), balanceToBurn);
-    handler.sell(tokenAddress, balanceToBurn, address(this));
-
-    updateLimits(tokenAddress, balanceToBurn);
-
-    emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
-
-    // TODO UpdateBurn amount
-
   }
 
   /**
