@@ -26,16 +26,17 @@ interface IFeeHandler {
   function sell(address tokenAddress) external;
 
   // // calls exchange(tokenAddress), and distribute(tokenAddress)
-  // function handle(address tokenAddress) external;
+  function handle(address tokenAddress) external;
 
   // // main entrypoint for a burn, iterates over token and calles handle
-  // function handleAll() external;
+  function handleAll() external;
 
-  // // Sends the balance of token at tokenAddress to feesBeneficiary, according to the entry tokensToDistribute[tokenAddress]
-  // function distribute(address tokenAddress) external;
+  // Sends the balance of token at tokenAddress to feesBeneficiary,
+  // according to the entry tokensToDistribute[tokenAddress]
+  function distribute(address tokenAddress) external;
 
   // // burns the balance of Celo in the contract minus the entry of tokensToDistribute[CeloAddress]
-  // function burnCelo() external;
+  function burnCelo() external;
 
   // // calls distribute for all the nonCeloTokens
   // function distributeAll() external;
