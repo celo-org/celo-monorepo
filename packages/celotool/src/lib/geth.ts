@@ -644,7 +644,11 @@ export const simulateClient = async (
         ...baseLogMessage,
       })
     }
-    const dataStr = testMode === TestMode.Data ? getBigData(119750) : undefined // aim for half million gas txs
+    const intrinsicGas = 21000
+    const totalTxGas = 500000 // aim for half million gas txs
+    const calldataGas = totalTxGas - intrinsicGas
+    const calldataSize = calldataGas / 4 // 119750 < tx pool size limit (128k)
+    const dataStr = testMode === TestMode.Data ? getBigData(calldataSize) : undefined // aim for half million gas txs
     // Also running below the 128kb limit from the tx pool
 
     await txConf
