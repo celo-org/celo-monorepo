@@ -674,7 +674,7 @@ export const simulateClient = async (
         )
       })
       .catch((error: any) => {
-        if (transferFnCatch(error, baseLogMessage)) {
+        if (catchNeedUnlock(error, baseLogMessage)) {
           unlockNeeded = true
         }
       })
@@ -745,7 +745,9 @@ const getNonce = async (
   }
 }
 
-const transferFnCatch = (error: any, baseLogMessage: any) => {
+// Catch errors from the transfer Fn, and returns if an account unlock
+// is needed.
+const catchNeedUnlock = (error: any, baseLogMessage: any) => {
   let unlockNeeded = false
   if (
     typeof error === 'string' &&
