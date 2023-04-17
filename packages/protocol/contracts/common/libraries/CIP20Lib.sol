@@ -15,7 +15,7 @@ library CIP20Lib {
 
   // Accepts a fully formed input blob. This should include any config
   // options and the preimage, but not the selector.
-  function executeCip20(bytes memory input, uint8 selector, uint256 output_len)
+  function executeCIP20(bytes memory input, uint8 selector, uint256 output_len)
     internal
     view
     returns (bytes memory)
@@ -51,19 +51,19 @@ library CIP20Lib {
   }
 
   function sha3_256(bytes memory input) internal view returns (bytes memory) {
-    return executeCip20(input, SHA3_256_SELECTOR, 32);
+    return executeCIP20(input, SHA3_256_SELECTOR, 32);
   }
 
   function sha3_512(bytes memory input) internal view returns (bytes memory) {
-    return executeCip20(input, SHA3_512_SELECTOR, 64);
+    return executeCIP20(input, SHA3_512_SELECTOR, 64);
   }
 
   function keccak512(bytes memory input) internal view returns (bytes memory) {
-    return executeCip20(input, KECCAK_512_SELECTOR, 64);
+    return executeCIP20(input, KECCAK_512_SELECTOR, 64);
   }
 
   function sha2_512(bytes memory input) internal view returns (bytes memory) {
-    return executeCip20(input, SHA2_512_SELECTOR, 64);
+    return executeCIP20(input, SHA2_512_SELECTOR, 64);
   }
 
   function blake2sWithConfig(bytes32 config, bytes memory key, bytes memory preimage)
@@ -76,7 +76,7 @@ library CIP20Lib {
       "CIP20Lib/blake2sWithConfig - Provided key length does not match key length in config"
     );
     bytes memory configuredInput = abi.encodePacked(config, preimage);
-    return executeCip20(configuredInput, BLAKE2S_SELECTOR, uint256(uint8(config[0])));
+    return executeCIP20(configuredInput, BLAKE2S_SELECTOR, uint256(uint8(config[0])));
   }
 
   // default settings, no key

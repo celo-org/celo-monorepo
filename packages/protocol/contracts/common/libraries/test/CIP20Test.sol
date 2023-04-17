@@ -2,7 +2,7 @@ pragma solidity ^0.5.13;
 
 import "../CIP20Lib.sol";
 
-contract Cip20Test {
+contract CIP20Test {
   using CIP20Lib for bytes;
 
   function sha3_256(bytes calldata input) external view returns (bytes memory) {
