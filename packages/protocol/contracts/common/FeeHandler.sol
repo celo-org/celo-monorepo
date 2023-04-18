@@ -186,6 +186,16 @@ contract FeeHandler is
     activeTokens.add(tokenAddress);
   }
 
+  function deactivateToken(address tokenAddress) external onlyOwner {
+    _deactivateToken(tokenAddress);
+  }
+
+  function _deactivateToken(address tokenAddress) private {
+    activeTokens.remove(tokenAddress);
+    TokenState storage tokenState = tokenStates[tokenAddress];
+    tokenState.active = false;
+  }
+
   function addToken(address tokenAddress, address handlerAddress) external onlyOwner {
     _addToken(tokenAddress, handlerAddress);
   }
@@ -194,7 +204,7 @@ contract FeeHandler is
     return activeTokens.values;
   }
 
-  function removeToken(address tokenAddress) external {}
+  function removeToken(address tokenAddress) external onlyOwner {}
 
   function _sell(address tokenAddress) private onlyWhenNotFrozen nonReentrant {
     IERC20 token = IERC20(tokenAddress);
@@ -317,7 +327,7 @@ contract FeeHandler is
     for (uint256 i = 0; i < EnumerableSet.length(activeTokens); i++) {
       // calling _handle will trigger a lot of burn Celo that can be just batched at the end
       // _handle(activeTokens[i]);
-      address token = EnumerableSet.get(activeTokens, i);
+      address token = activeTokens.get(i);
       _sell(token);
       // TODO move to _distributeAll(), this should thisitrbute celo as well
       _distribute(token);
