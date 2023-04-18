@@ -129,7 +129,7 @@ spec:
                 echo -n "," >> /root/.celo/proxyEnodeUrlPairs
               fi
               # gives us PROXY_ENODE_URL_PAIR
-              {{- include "celo.proxyenodeurlpair" . | indent 14 }}
+              {{- include "celo.proxyenodeurlpair" . | nindent 14 }}
               echo -n $PROXY_ENODE_URL_PAIR >> /root/.celo/proxyEnodeUrlPairs
               PROXY_INDEX=$(( $PROXY_INDEX + 1 ))
             done
@@ -211,7 +211,6 @@ spec:
           {{- include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,net,web3,debug" "ws_port" "8545" "listen_address" "0.0.0.0") | nindent 10 }}
 
           {{- .Values.geth.validatorExtraSnippet | nindent 10 }}
-
           exec geth \
             $BOOTNODE_FLAG \
             --datadir /root/.celo \
@@ -277,6 +276,10 @@ spec:
           mountPath: /root/.celo/account
           readOnly: true
       terminationGracePeriodSeconds: {{ .Values.geth.terminationGracePeriodSeconds | default 300 }}
+      {{- with .Values.geth.validatorAffinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.geth.validatorNodeSelector }}
       nodeSelector:
         {{ toYaml . | nindent 8 }}

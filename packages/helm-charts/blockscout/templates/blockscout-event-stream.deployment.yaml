@@ -86,12 +86,14 @@ spec:
         env:
         - name: METRICS_ENABLED
           value: "{{.Values.blockscout.metrics.enabled}}"
-        - name: ENABLE_EVENT_STREAM
+        - name: ENABLE_BEANSTALKD
           value: {{ .Values.blockscout.eventStream.enableEventStream | quote }}
         - name: BEANSTALKD_PORT
           value: {{ .Values.blockscout.eventStream.beanstalkdPort | quote }}
         - name: BEANSTALKD_HOST
           value: {{ .Values.blockscout.eventStream.beanstalkdHost | quote }}
+        - name: BEANSTALKD_TUBE
+          value: {{ .Values.blockscout.eventStream.beanstalkdTube | quote }}
         - name: ERLANG_COOKIE
           value: {{ .Values.blockscout.secrets.erlang.cookie }}
         - name: POD_IP
