@@ -71,7 +71,7 @@ async function launchServer(opts: { verbose?: boolean; from_targz?: boolean }, c
     logging: { logger: { log: logFn } },
     database: { dbPath: chain },
     miner: { blockGasLimit: 20000000 },
-    chain: { networkId: 1101, allowUnlimitedContractSize: true },
+    chain: { networkId: 1101, allowUnlimitedContractSize: true, hardfork: 'istanbul' },
   })
 
   server.listen(8545, async (err: any) => {
