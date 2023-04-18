@@ -33,7 +33,7 @@ import {
   UniswapFeeHandlerSellerContract,
   UniswapFeeHandlerSellerInstance,
 } from 'types'
-import { SECONDS_IN_A_WEEK } from '../constants'
+import { SECONDS_IN_A_WEEK, ZERO_ADDRESS } from '../constants'
 
 const goldAmountForRate = new BigNumber('1000000000000000000000000')
 const stableAmountForRate = new BigNumber(2).times(goldAmountForRate)
@@ -214,7 +214,7 @@ contract('FeeHandler', (accounts: string[]) => {
     })
   })
 
-  describe.only('#addToken()', () => {
+  describe('#addToken()', () => {
     it('adds it to the list', async () => {
       await feeHandler.addToken(stableToken.address, mentoSeller.address)
       assert.sameMembers(await feeHandler.getActiveTokens(), [stableToken.address])
@@ -234,16 +234,29 @@ contract('FeeHandler', (accounts: string[]) => {
     })
   })
 
-  describe.only('#deactivateToken()', () => {
+  describe('#removeToken()', () => {
+    it('Removes form the list', async () => {
+      await feeHandler.addToken(stableToken.address, mentoSeller.address)
+      await feeHandler.removeToken(stableToken.address)
+      assert(
+        (await feeHandler.getTokenActive(stableToken.address)) === false,
+        'status is not active'
+      )
+      assert.sameMembers(await feeHandler.getActiveTokens(), [])
+      assert((await feeHandler.getTokenHandler(stableToken.address)) === ZERO_ADDRESS)
+    })
+
+    it('Only owner can remove token', async () => {
+      await assertRevert(feeHandler.removeToken(stableToken.address, { from: user }))
+    })
+  })
+
+  describe('#deactivateToken()', () => {
     it('Removes form the list', async () => {
       await feeHandler.addToken(stableToken.address, mentoSeller.address)
       await feeHandler.deactivateToken(stableToken.address)
-      console.log(
-        'await feeHandler.getTokenActive(stableToken.address)',
-        await feeHandler.getTokenActive(stableToken.address)
-      )
       assert(
-        (await feeHandler.getTokenActive(stableToken.address)) == false,
+        (await feeHandler.getTokenActive(stableToken.address)) === false,
         'status is not active'
       )
       assert.sameMembers(await feeHandler.getActiveTokens(), [])

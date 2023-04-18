@@ -204,7 +204,15 @@ contract FeeHandler is
     return activeTokens.values;
   }
 
-  function removeToken(address tokenAddress) external onlyOwner {}
+  function removeToken(address tokenAddress) external onlyOwner {
+    _removeToken(tokenAddress);
+  }
+
+  function _removeToken(address tokenAddress) private {
+    _deactivateToken(tokenAddress);
+    TokenState storage tokenState = tokenStates[tokenAddress];
+    tokenState.handler = address(0);
+  }
 
   function _sell(address tokenAddress) private onlyWhenNotFrozen nonReentrant {
     IERC20 token = IERC20(tokenAddress);
