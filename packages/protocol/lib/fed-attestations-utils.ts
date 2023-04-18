@@ -1,8 +1,10 @@
-import { ensureLeading0x } from '@celo/base'
-import { Address } from '@celo/utils/lib/address'
-import { generateTypedDataHash, structHash } from '@celo/utils/lib/sign-typed-data-utils'
-import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
-import { registerAttestation as getTypedData } from '@celo/utils/lib/typed-data-constructors'
+import { Address } from '@celo/utils/lib/address';
+import { generateTypedDataHash, structHash } from '@celo/utils/lib/sign-typed-data-utils';
+import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils';
+import { registerAttestation as getTypedData } from '@celo/utils/lib/typed-data-constructors';
+import {
+  bufferToHex
+} from '@ethereumjs/util';
 
 export const getSignatureForAttestation = async (
   identifier: string,
@@ -31,14 +33,12 @@ export const getSignatureForAttestation = async (
     )
   })
 
-  const messageHash = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
+  const messageHash = bufferToHex(generateTypedDataHash(typedData))
   const parsedSignature = parseSignatureWithoutPrefix(messageHash, signature, signer)
   return parsedSignature
 }
 
 export const getDomainDigest = (contractAddress: Address) => {
   const typedData = getTypedData(1, contractAddress)
-  return ensureLeading0x(
-    structHash('EIP712Domain', typedData.domain, typedData.types).toString('hex')
-  )
+  return  bufferToHex( structHash('EIP712Domain', typedData.domain, typedData.types))
 }

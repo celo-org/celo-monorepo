@@ -1,6 +1,7 @@
 import { ensureLeading0x, toChecksumAddress } from '@celo/utils/lib/address'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix, Signature } from '@celo/utils/lib/signatureUtils'
+import { bufferToHex } from '@ethereumjs/util'
 import debugFactory from 'debug'
 import Web3 from 'web3'
 import { AbiCoder } from './abi-types'
@@ -306,7 +307,7 @@ export class Connection {
       )
     })
 
-    const messageHash = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
+    const messageHash = bufferToHex(generateTypedDataHash(typedData))
     return parseSignatureWithoutPrefix(messageHash, signature, signer)
   }
 

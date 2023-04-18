@@ -3,6 +3,7 @@ import { CeloTx, EncodedTransaction, RLPEncodedTx } from '@celo/connect'
 import { inputCeloTxFormatter } from '@celo/connect/lib/utils/formatter'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
+import { bufferToHex } from '@ethereumjs/util'
 import debugFactory from 'debug'
 // @ts-ignore-next-line
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
@@ -217,9 +218,8 @@ export function verifyEIP712TypedDataSigner(
   signedData: string,
   expectedAddress: string
 ): boolean {
-  const dataBuff = generateTypedDataHash(typedData)
-  const trimmedData = dataBuff.toString('hex')
-  return verifySignatureWithoutPrefix(ensureLeading0x(trimmedData), signedData, expectedAddress)
+  const dataHex = bufferToHex(generateTypedDataHash(typedData))
+  return verifySignatureWithoutPrefix(dataHex, signedData, expectedAddress)
 }
 
 export function verifySignatureWithoutPrefix(

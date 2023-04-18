@@ -104,6 +104,7 @@ contract UsingPrecompiles {
    * @param index Index of requested validator in the validator set.
    * @return Address of validator at the requested index.
    */
+  // TODO: (soloseng) add to precompiles
   function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
     bytes memory out;
     bool success;
@@ -134,6 +135,7 @@ contract UsingPrecompiles {
    * @notice Gets the size of the current elected validator set.
    * @return Size of the current elected validator set.
    */
+  // TODO:(soloseng) add to precompiles.
   function numberValidatorsInCurrentSet() public view returns (uint256) {
     bytes memory out;
     bool success;
@@ -268,5 +270,4 @@ contract UsingPrecompiles {
   function minQuorumSizeInCurrentSet() public view returns (uint256) {
     return minQuorumSize(block.number);
   }
-
 }

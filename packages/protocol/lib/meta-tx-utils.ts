@@ -1,6 +1,9 @@
-import { Address, ensureLeading0x } from '@celo/utils/lib/address'
-import { generateTypedDataHash, structHash } from '@celo/utils/lib/sign-typed-data-utils'
-import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
+import { Address } from '@celo/utils/lib/address';
+import { generateTypedDataHash, structHash } from '@celo/utils/lib/sign-typed-data-utils';
+import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils';
+import {
+  bufferToHex
+} from '@ethereumjs/util';
 
 export interface MetaTransaction {
   destination: Address
@@ -40,14 +43,14 @@ const getTypedData = (walletAddress: Address, tx?: MetaTransaction) => {
 
 export const getDomainDigest = (walletAddress: Address) => {
   const typedData = getTypedData(walletAddress)
-  return ensureLeading0x(
-    structHash('EIP712Domain', typedData.domain, typedData.types).toString('hex')
+  return bufferToHex(
+    structHash('EIP712Domain', typedData.domain, typedData.types)
   )
 }
 
 export const constructMetaTransactionExecutionDigest = (walletAddress: Address, tx: MetaTransaction) => {
   const typedData = getTypedData(walletAddress, tx)
-  return ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
+  return bufferToHex(generateTypedDataHash(typedData) )
 }
 
 export const getSignatureForMetaTransaction = async (
@@ -57,21 +60,7 @@ export const getSignatureForMetaTransaction = async (
 ) => {
   const typedData = getTypedData(walletAddress, tx)
 
-  const signature = await new Promise<string>((resolve, reject) => {
-    web3.currentProvider.send(
-      {
-        method: 'eth_signTypedData',
-        params: [signer, typedData],
-      },
-      (error, resp) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(resp.result)
-        }
-      }
-    )
-  })
+  const signature= await web3.currentProvider.request({  method: 'eth_signTypedData',params: [signer, typedData],})
 
   const messageHash = constructMetaTransactionExecutionDigest(walletAddress, tx)
   const parsedSignature = parseSignatureWithoutPrefix(messageHash, signature, signer)

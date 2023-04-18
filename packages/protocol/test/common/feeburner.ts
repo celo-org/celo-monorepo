@@ -1,6 +1,11 @@
 // TODO remove magic numbers
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertEqualBN, assertGtBN, assertRevert, timeTravel } from '@celo/protocol/lib/test-utils'
+import {
+  assertEqualBN,
+  assertGtBN,
+  assertTXRevertWithReason,
+  timeTravel,
+} from '@celo/protocol/lib/test-utils'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
@@ -197,8 +202,9 @@ contract('FeeBurner', (accounts: string[]) => {
     })
 
     it('Only owner can take tokens out', async () => {
-      await assertRevert(
-        feeBurner.transfer(tokenA.address, user, new BigNumber(1e18), { from: user })
+      await assertTXRevertWithReason(
+        feeBurner.transfer(tokenA.address, user, new BigNumber(1e18), { from: user }),
+        'Ownable: caller is not the owner'
       )
     })
 
@@ -226,7 +232,10 @@ contract('FeeBurner', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(feeBurner.initialize(registry.address, [], [], [], [], { from: user }))
+      await assertTXRevertWithReason(
+        feeBurner.initialize(registry.address, [], [], [], [], { from: user }),
+        'contract already initialized'
+      )
     })
   })
 
@@ -257,22 +266,25 @@ contract('FeeBurner', (accounts: string[]) => {
     })
 
     it("doesn't remove if the indexes doesn't match", async () => {
-      await assertRevert(feeBurner.removeRouter(tokenA.address, exchange.address, 0))
+      await assertTXRevertWithReason(feeBurner.removeRouter(tokenA.address, exchange.address, 0)),
+        'Index does not match'
     })
   })
 
   describe('#setDailyBurnLimit()', () => {
     it('should only be called by owner', async () => {
-      await assertRevert(
-        feeBurner.setDailyBurnLimit(stableToken.address, goldAmountForRate, { from: user })
+      await assertTXRevertWithReason(
+        feeBurner.setDailyBurnLimit(stableToken.address, goldAmountForRate, { from: user }),
+        'Ownable: caller is not the owner'
       )
     })
   })
 
   describe('#setMaxSplipagge()', () => {
     it('should only be called by owner', async () => {
-      await assertRevert(
-        feeBurner.setMaxSplippage(stableToken.address, maxSlippage, { from: user })
+      await assertTXRevertWithReason(
+        feeBurner.setMaxSplippage(stableToken.address, maxSlippage, { from: user }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -285,9 +297,12 @@ contract('FeeBurner', (accounts: string[]) => {
       await exchange.sell(goldTokenAmount, 0, true, { from: user })
     })
 
-    it("Can't burn when forzen", async () => {
+    it("Can't burn when frozen", async () => {
       await freezer.freeze(feeBurner.address)
-      await assertRevert(feeBurner.burnMentoTokens())
+      await assertTXRevertWithReason(
+        feeBurner.burnMentoTokens(),
+        "can't call when contract is frozen"
+      )
     })
 
     it('burns contract balance', async () => {
@@ -330,7 +345,10 @@ contract('FeeBurner', (accounts: string[]) => {
         from: user,
       })
 
-      await assertRevert(feeBurner.burn())
+      await assertTXRevertWithReason(
+        feeBurner.burn(),
+        'Calculated buyAmount was less than specified minBuyAmount'
+      )
 
       assertEqualBN(await stableToken.balanceOf(feeBurner.address), new BigNumber(3000))
     })
@@ -366,7 +384,7 @@ contract('FeeBurner', (accounts: string[]) => {
     // Uniswap can get the address of a pair by using an init code pair hash. Unfortunately, this hash is harcoded
     // in the file UniswapV2Library.sol. The hash writen now there is meant to run in the CI. If you're seeing this problem you can
     // 1. Skip these tests locally, as they will run in the CI anyway or
-    // 2. Change the hash, you can get the hash for the parciular test deployment with the following:
+    // 2. Change the hash, you can get the hash for the particular test deployment with the following:
     // // tslint:disable-next-line
     // console.log('Uniswap INIT CODE PAIR HASH:', await uniswapFactory.INIT_CODE_PAIR_HASH())
 
@@ -396,7 +414,10 @@ contract('FeeBurner', (accounts: string[]) => {
 
     it("Can't burn when frozen", async () => {
       await freezer.freeze(feeBurner.address)
-      await assertRevert(feeBurner.burnNonMentoTokens())
+      await assertTXRevertWithReason(
+        feeBurner.burnNonMentoTokens(),
+        "can't call when contract is frozen"
+      )
     })
 
     it('Uniswap trade test', async () => {
@@ -449,7 +470,10 @@ contract('FeeBurner', (accounts: string[]) => {
 
     it("Doesn't exchange non-Mento when slippage is too high", async () => {
       await feeBurner.setMaxSplippage(tokenA.address, maxSlippage)
-      await assertRevert(feeBurner.burnNonMentoTokens())
+      await assertTXRevertWithReason(
+        feeBurner.burnNonMentoTokens(),
+        'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'
+      )
 
       assertEqualBN(await tokenA.balanceOf(feeBurner.address), new BigNumber(10e18))
     })

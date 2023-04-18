@@ -6,6 +6,7 @@ import {
   noNumber,
   noString,
 } from '@celo/utils/lib/sign-typed-data-utils'
+import { bufferToHex } from '@ethereumjs/util'
 import { DomainIdentifiers } from '../src/domains/constants'
 import { Domain, domainEIP712, DomainOptions } from '../src/domains/domains'
 import { SequentialDelayDomain } from '../src/domains/sequential-delay'
@@ -31,9 +32,9 @@ describe('domainEIP712()', () => {
       address: defined('0x0000000000000000000000000000000000000b0b'),
       salt: noString,
     }
-    const expectedHash = '966edacc6cdf76b4536da958e82e360213b957508767a393ccf5c6b73db241d1'
+    const expectedHash = '0x966edacc6cdf76b4536da958e82e360213b957508767a393ccf5c6b73db241d1'
     const typedData = domainEIP712(domain)
     // console.debug(JSON.stringify(typedData, null, 2))
-    expect(generateTypedDataHash(typedData).toString('hex')).toEqual(expectedHash)
+    expect(bufferToHex(generateTypedDataHash(typedData))).toEqual(expectedHash)
   })
 })

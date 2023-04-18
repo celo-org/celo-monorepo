@@ -15,8 +15,16 @@ const isCI = process.env.CI === 'true'
 async function startGanache() {
   const server = ganache.server({
     wallet: { mnemonic: network.mnemonic, defaultBalance: network.defaultBalance },
-    miner: { blockGasLimit: 20000000, gasPrice: network.gasPrice },
-    chain: { networkId: network.network_id, allowUnlimitedContractSize: true },
+    miner: {
+      blockGasLimit: 20000000,
+      defaultGasPrice: network.defaultGasPrice,
+    },
+    chain: {
+      networkId: network.network_id,
+      chainId: 1,
+      allowUnlimitedContractSize: true,
+      hardfork: 'istanbul',
+    },
   })
 
   server.listen(8545, (err, blockchain) => {

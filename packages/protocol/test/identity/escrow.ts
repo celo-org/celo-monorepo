@@ -7,6 +7,7 @@ import {
   assertObjectWithBNEqual,
   assertRevert,
   assertRevertWithReason,
+  assertTXRevertWithReason,
   assumeOwnership,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -179,7 +180,7 @@ contract('Escrow', (accounts: string[]) => {
       })
 
       it('should not allow more trusted issuers to be added', async () => {
-        await assertRevertWithReason(
+        await assertTXRevertWithReason(
           escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner }),
           "defaultTrustedIssuers.length can't exceed allowed number of trustedIssuers"
         )
@@ -189,10 +190,8 @@ contract('Escrow', (accounts: string[]) => {
         await escrow.removeDefaultTrustedIssuer(expectedTrustedIssuers[0], 0, { from: owner })
         await escrow.addDefaultTrustedIssuer(trustedIssuer1)
         expectedTrustedIssuers.push(trustedIssuer1)
-        assert.deepEqual(
-          (await escrow.getDefaultTrustedIssuers()).sort(),
-          expectedTrustedIssuers.slice(1).sort()
-        )
+        const sortedDefaultTrustedIssuers = [...(await escrow.getDefaultTrustedIssuers())].sort()
+        assert.deepEqual(sortedDefaultTrustedIssuers, expectedTrustedIssuers.slice(1).sort())
       })
     })
   })
@@ -854,7 +853,7 @@ contract('Escrow', (accounts: string[]) => {
             escrow.withdraw(uniquePaymentIDWithdraw, parsedSig.v, parsedSig.r, parsedSig.s, {
               from: receiver,
             }),
-            'Invalid withdraw value.'
+            'Invalid withdraw value'
           )
         })
       })
@@ -1005,7 +1004,7 @@ contract('Escrow', (accounts: string[]) => {
           await completeAttestations(receiver, aPhoneHash, minAttestations - 1)
           await assertRevertWithReason(
             withdrawAndCheckState(sender, receiver, aPhoneHash, uniquePaymentIDWithdraw, [], []),
-            'This account does not have the required attestations to withdraw this payment.'
+            'This account does not have the required attestations to withdraw this payment'
           )
         })
         it("should withdraw properly when sender's second payment has an identifier", async () => {
@@ -1068,7 +1067,7 @@ contract('Escrow', (accounts: string[]) => {
                   [],
                   []
                 ),
-                'This account does not have the required attestations to withdraw this payment.'
+                'This account does not have the required attestations to withdraw this payment'
               )
             })
             it('should allow users to withdraw if attestation is found in FederatedAttestations', async () => {
@@ -1115,7 +1114,7 @@ contract('Escrow', (accounts: string[]) => {
           it('should not allow a user to withdraw a payment if no attestations exist for trustedIssuers', async () => {
             await assertRevertWithReason(
               withdrawAndCheckState(sender, receiver, aPhoneHash, uniquePaymentIDWithdraw, [], []),
-              'This account does not have the required attestations to withdraw this payment.'
+              'This account does not have the required attestations to withdraw this payment'
             )
           })
         })
@@ -1251,7 +1250,7 @@ contract('Escrow', (accounts: string[]) => {
           it('should not allow sender to revoke payment before payment has expired', async () => {
             await assertRevertWithReason(
               escrow.revoke(uniquePaymentIDRevoke, { from: sender }),
-              'Transaction not redeemable for sender yet.'
+              'Transaction not redeemable for sender yet'
             )
           })
 
@@ -1259,7 +1258,7 @@ contract('Escrow', (accounts: string[]) => {
             await timeTravel(oneDayInSecs, web3)
             await assertRevertWithReason(
               escrow.revoke(uniquePaymentIDRevoke, { from: receiver }),
-              'Only sender of payment can attempt to revoke payment.'
+              'Only sender of payment can attempt to revoke payment'
             )
           })
         })

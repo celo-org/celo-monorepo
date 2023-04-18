@@ -230,6 +230,7 @@ contract('Proxy', (accounts: string[]) => {
   })
 
   it('recovers funds from an incorrectly intialized implementation', async () => {
+    //TODO: (soloseng) gasprice = 0 issue
     const Freezer: FreezerContract = artifacts.require('Freezer')
     const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
     // @ts-ignore
