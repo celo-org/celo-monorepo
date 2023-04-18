@@ -7,12 +7,10 @@ import {
   Provider,
 } from '@celo/connect'
 import Web3 from 'web3'
-import { fetchMetadata, Metadata } from './sourcify'
+import { Metadata, fetchMetadata, tryGetProxyImplementation } from './sourcify'
 
 // This is taken from protocol/contracts/build/Account.json
 const CONTRACT_METADATA = require('../fixtures/contract.metadata.json')
-// This is taken from protocol/contracts/build/AccountProxy.json
-const PROXY_METADATA = require('../fixtures/proxy.metadata.json')
 
 describe('sourcify helpers', () => {
   let connection: Connection
@@ -237,25 +235,17 @@ describe('sourcify helpers', () => {
     })
 
     describe('tryGetProxyImplementation', () => {
-      let proxyMetadata: Metadata
-      let contractMetadata: Metadata
-
-      beforeEach(() => {
-        contractMetadata = new Metadata(connection, address, CONTRACT_METADATA)
-        proxyMetadata = new Metadata(connection, proxyAddress, PROXY_METADATA)
-      })
-
       describe('with a cLabs proxy', () => {
         it('fetches the implementation', async () => {
-          const result = await proxyMetadata.tryGetProxyImplementation()
+          const result = await tryGetProxyImplementation(connection, proxyAddress)
           expect(result?.toLocaleLowerCase()).toEqual(implAddress.toLocaleLowerCase())
         })
       })
 
       describe('with a non-proxy', () => {
         it('returns null', async () => {
-          const result = await contractMetadata.tryGetProxyImplementation()
-          expect(result).toBeNull()
+          const result = await tryGetProxyImplementation(connection, address)
+          expect(result).toBeUndefined()
         })
       })
     })

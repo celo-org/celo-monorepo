@@ -34,10 +34,10 @@ spec:
     spec:
       serviceAccountName: {{ .Release.Name }}-rbac
       initContainers:
-{{ include "celo.blockscout.initContainer.secrets-init" . | indent 6 }}
+        {{- include "celo.blockscout.initContainer.secrets-init" . | nindent 6 }}
       containers:
-{{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.web.db }}
-{{ include "celo.blockscout.container.db-sidecar" $data | indent 6 }}
+      {{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.web.db }}
+      {{- include "celo.blockscout.container.db-sidecar" $data | nindent 6 }}
       - name: blockscout-web
         image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.blockscout.image.pullPolicy }}
@@ -172,11 +172,17 @@ spec:
         - name: DISPLAY_TOKEN_ICONS
           value: {{ .Values.blockscout.web.tokenIcons.enabled | quote }}
         {{- end }}
-{{ include "celo.blockscout.env-vars" $data | indent 8 }}
+        {{- include "celo.blockscout.env-vars" $data | nindent 8 }}
       volumes:
-{{ include "celo.blockscout.volume.cloudsql-credentials" . | indent 8 }}
-{{ include "celo.blockscout.volume.temporary-dir" . | indent 8 }}
-    {{- with .Values.nodeSelector }}
+        {{- include "celo.blockscout.volume.cloudsql-credentials" . | nindent 8 }}
+        {{- include "celo.blockscout.volume.temporary-dir" . | nindent 8 }}
+      {{- $affinity := default .Values.blockscout.affinity .Values.blockscout.web.affinity -}}
+      {{- with $affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- $nodeSelector := default .Values.blockscout.nodeSelector .Values.blockscout.web.nodeSelector -}}
+      {{- with $nodeSelector }}
       nodeSelector:
-{{ toYaml . | indent 8 }}
-    {{- end }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

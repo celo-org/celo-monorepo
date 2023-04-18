@@ -54,14 +54,19 @@ geth:
   txNodePrivateExtraSnippet: |
     echo "txnode-private"
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --http.timeout.read 600 --http.timeout.write 600 --http.timeout.idle 2400"
+  validatorAffinity: {}
   validatorNodeSelector: {}
   validatorTolerations: []
+  secondaryAffinity: {}
   secondaryNodeSelector: {}
   secondaryTolerations: []
+  proxyAffinity: {}
   proxyNodeSelector: {}
   proxyTolerations: []
+  txNodeAffinity: {}
   txNodeNodeSelector: {}
   txNodeTolerations: []
+  txNodePrivateAffinity: {}
   txNodePrivateNodeSelector: {}
   txNodePrivateTolerations: []
   storageClass: ssd
