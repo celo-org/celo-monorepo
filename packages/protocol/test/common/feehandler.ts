@@ -252,7 +252,7 @@ contract('FeeHandler', (accounts: string[]) => {
     it("doesn't distribute when balance is zero", async () => {
       assertEqualBN(await stableToken.balanceOf(feeHandler.address), 0)
       const res = await feeHandler.distribute(stableToken.address)
-      assert(res.logs.length == 0, 'No transfer should be done (nor event emitted)')
+      assert(res.logs.length === 0, 'No transfer should be done (nor event emitted)')
     })
 
     describe('#distribute() with balance', () => {
