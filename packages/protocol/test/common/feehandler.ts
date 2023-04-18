@@ -246,27 +246,38 @@ contract('FeeHandler', (accounts: string[]) => {
 
   describe('#distribute()', () => {
     beforeEach(async () => {
-      const goldTokenAmount = new BigNumber(1e18)
-
-      await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
-      await exchange.sell(goldTokenAmount, 0, true, { from: user })
-      await feeHandler.addToken(stableToken.address, mentoSeller.address)
-      await feeHandler.setBurnFraction(toFixed(80 / 100))
-      await stableToken.transfer(feeHandler.address, new BigNumber('1e18'), {
-        from: user,
-      })
-
       await feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS)
-      await feeHandler.sell(stableToken.address)
     })
 
-    it('distributes after a burn', async () => {
-      await feeHandler.distribute(stableToken.address)
+    it("doesn't distribute when balance is zero", async () => {
       assertEqualBN(await stableToken.balanceOf(feeHandler.address), 0)
-      assertEqualBN(
-        await stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS),
-        new BigNumber('0.2e18')
-      )
+      const res = await feeHandler.distribute(stableToken.address)
+      assert(res.logs.length == 0, 'No transfer should be done (nor event emitted)')
+    })
+
+    describe('#distribute() with balance', () => {
+      beforeEach(async () => {
+        const goldTokenAmount = new BigNumber(1e18)
+
+        await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
+        await exchange.sell(goldTokenAmount, 0, true, { from: user })
+        await feeHandler.addToken(stableToken.address, mentoSeller.address)
+        await feeHandler.setBurnFraction(toFixed(80 / 100))
+        await stableToken.transfer(feeHandler.address, new BigNumber('1e18'), {
+          from: user,
+        })
+
+        await feeHandler.sell(stableToken.address)
+      })
+
+      it('distributes after a burn', async () => {
+        await feeHandler.distribute(stableToken.address)
+        assertEqualBN(await stableToken.balanceOf(feeHandler.address), 0)
+        assertEqualBN(
+          await stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS),
+          new BigNumber('0.2e18')
+        )
+      })
     })
   })
 

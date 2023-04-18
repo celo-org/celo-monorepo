@@ -4,6 +4,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-solidity/contracts/utils/EnumerableSet.sol";
 
 import "./UsingRegistry.sol";
 import "../common/Freezable.sol";
@@ -36,6 +37,7 @@ contract FeeHandler is
 {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
+  using EnumerableSet for EnumerableSet.AddressSet;
 
   uint256 constant MAX_TIMESTAMP_BLOCK_EXCHANGE = 20;
   uint256 public constant FIXED1_UINT = 1000000000000000000000000;
@@ -68,7 +70,7 @@ contract FeeHandler is
     uint256 pastBurn;
   }
 
-  address[] public activeTokens;
+  EnumerableSet.AddressSet private activeTokens;
 
   event SoldAndBurnedToken(address token, uint256 value);
   event DailyLimitSet(address tokenAddress, uint256 newLimit);
@@ -181,7 +183,7 @@ contract FeeHandler is
     tokenState.active = true;
     tokenState.handler = handlerAddress;
 
-    activeTokens.push(tokenAddress);
+    activeTokens.add(tokenAddress);
   }
 
   function addToken(address tokenAddress, address handlerAddress) external onlyOwner {
@@ -189,7 +191,7 @@ contract FeeHandler is
   }
 
   function getActiveTokens() public view returns (address[] memory) {
-    return activeTokens;
+    return activeTokens.values;
   }
 
   function removeToken(address tokenAddress) external {}
@@ -245,12 +247,18 @@ contract FeeHandler is
 
   function _distribute(address tokenAddress) private {
     require(feeBeneficiary != address(0), "Can't distribute to the zero address");
-    TokenState storage tokenState = tokenStates[tokenAddress];
     IERC20 token = IERC20(tokenAddress);
     uint256 tokenBalance = token.balanceOf(address(this));
 
+    TokenState storage tokenState = tokenStates[tokenAddress];
+
     // safty check to avoid a revert due balance
     uint256 balanceToDistribute = Math.min(tokenBalance, tokenState.toDistribute);
+
+    if (balanceToDistribute == 0) {
+      // don't distribute with zero balance
+      return;
+    }
 
     token.transfer(feeBeneficiary, balanceToDistribute);
     tokenState.toDistribute = 0;
@@ -306,12 +314,13 @@ contract FeeHandler is
   }
 
   function _handleAll() private {
-    for (uint256 i = 0; i < activeTokens.length; i++) {
+    for (uint256 i = 0; i < EnumerableSet.length(activeTokens); i++) {
       // calling _handle will trigger a lot of burn Celo that can be just batched at the end
       // _handle(activeTokens[i]);
-      _sell(activeTokens[i]);
+      address token = EnumerableSet.get(activeTokens, i);
+      _sell(token);
       // TODO move to _distributeAll(), this should thisitrbute celo as well
-      _distribute(activeTokens[i]);
+      _distribute(token);
     }
     _burnCelo();
   }
