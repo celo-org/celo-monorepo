@@ -1,7 +1,7 @@
 pragma solidity ^0.5.13;
 
 import "../common/interfaces/IFeeHandlerSeller.sol";
-
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../stability/interfaces/IExchange.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 import "./UsingRegistry.sol";
@@ -9,8 +9,15 @@ import "../stability/StableToken.sol";
 import "../common/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "../common/Initializable.sol";
+import "./FeeHandlerSeller.sol";
 
-contract MentoFeeHandlerSeller is IFeeHandlerSeller, UsingRegistry, Initializable {
+contract MentoFeeHandlerSeller is
+  IFeeHandlerSeller,
+  Ownable,
+  UsingRegistry,
+  Initializable,
+  FeeHandlerSeller
+{
   using FixidityLib for FixidityLib.Fraction;
 
   /**
@@ -19,6 +26,7 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, UsingRegistry, Initializabl
    */
   constructor(bool test) public Initializable(test) {}
 
+  // without this line the contract can't receive native Celo transfers
   function() external payable {}
 
   function initialize(address _registryAddress) external initializer {
@@ -75,37 +83,39 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, UsingRegistry, Initializabl
     goldToken.transfer(msg.sender, goldToken.balanceOf(address(this)));
   }
 
-  // TODO move this to abstract class
-  function calculateMinAmount(
-    uint256 midPriceNumerator,
-    uint256 midPriceDenominator,
-    uint256 amount,
-    uint256 maxSlippage // as fraction
-  )
-    public
-    pure
-    returns (
-      // FixidityLib.Fraction memory maxSlippage
-      uint256
-    )
-  {
-    FixidityLib.Fraction memory maxSlippageFraction = FixidityLib.wrap(maxSlippage);
-
-    FixidityLib.Fraction memory price = FixidityLib.newFixedFraction(
-      midPriceNumerator,
-      midPriceDenominator
-    );
-    FixidityLib.Fraction memory amountFraction = FixidityLib.newFixed(amount);
-    FixidityLib.Fraction memory totalAmount = price.multiply(amountFraction);
-
-    return
-      totalAmount
-        .subtract(price.multiply(maxSlippageFraction).multiply(amountFraction))
-        .fromFixed();
+  // function bestQuote(address token, uint256 balance) external {
+  function bestQuote(address token, uint256 balance) external {
+    return;
   }
 
-  function bestQuote(address token, uint256 balance) external {}
-
   // in case some funds need to be returned or moved to another contract
-  function transfer(address token, uint256 amount, address to) external {}
+  // function transfer(address token, uint256 amount, address to) external onlyOwner returns (bool){}
+
+  // function calculateMinAmount(
+  //   uint256 midPriceNumerator,
+  //   uint256 midPriceDenominator,
+  //   uint256 amount,
+  //   uint256 maxSlippage // as fraction
+  // )
+  //   public
+  //   pure
+  //   returns (
+  //     uint256
+  //   )
+  // {
+  //   FixidityLib.Fraction memory maxSlippageFraction = FixidityLib.wrap(maxSlippage);
+
+  //   FixidityLib.Fraction memory price = FixidityLib.newFixedFraction(
+  //     midPriceNumerator,
+  //     midPriceDenominator
+  //   );
+  //   FixidityLib.Fraction memory amountFraction = FixidityLib.newFixed(amount);
+  //   FixidityLib.Fraction memory totalAmount = price.multiply(amountFraction);
+
+  //   return
+  //     totalAmount
+  //       .subtract(price.multiply(maxSlippageFraction).multiply(amountFraction))
+  //       .fromFixed();
+  // }
+
 }

@@ -12,5 +12,5 @@ interface IFeeHandlerSeller {
   function bestQuote(address token, uint256 balance) external;
 
   // in case some funds need to be returned or moved to another contract
-  function transfer(address token, uint256 amount, address to) external;
+  function transfer(address token, uint256 amount, address to) external returns (bool);
 }
