@@ -527,6 +527,7 @@ contract Governance is
     nonReentrant
     returns (bool)
   {
+    require(queue.contains(proposalId), "cannot upvote a proposal not in the queue");
     dequeueProposalsIfReady();
     // If acting on an expired proposal, expire the proposal and take no action.
     if (removeIfQueuedAndExpired(proposalId)) {
