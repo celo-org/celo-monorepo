@@ -128,43 +128,6 @@ contract UniswapFeeHandlerSeller is
     // _sendBackCeloBalance();
   }
 
-  // function _sendBackCeloBalance() private {
-  //   IERC20 goldToken = getGoldToken();
-  //   // IERC20 stableAsERC20 = IERC20(sellTokenAddress);
-  // }
-
-  // TODO move this to abstract class
-  //   function calculateMinAmount(
-  //     uint256 midPriceNumerator,
-  //     uint256 midPriceDenominator,
-  //     uint256 amount,
-  //     uint256 maxSlippage // as fraction
-  //   )
-  //     public
-  //     pure
-  //     returns (
-  //       // FixidityLib.Fraction memory maxSlippage
-  //       uint256
-  //     )
-  //   {
-  //     FixidityLib.Fraction memory maxSlippageFraction = FixidityLib.wrap(maxSlippage);
-
-  //     FixidityLib.Fraction memory price = FixidityLib.newFixedFraction(
-  //       midPriceNumerator,
-  //       midPriceDenominator
-  //     );
-  //     FixidityLib.Fraction memory amountFraction = FixidityLib.newFixed(amount);
-  //     FixidityLib.Fraction memory totalAmount = price.multiply(amountFraction);
-
-  //     return
-  //       totalAmount
-  //         .subtract((price.multiply(maxSlippageFraction)).multiply(amountFraction))
-  //         .fromFixed();
-  //   }
-
-  // // in case some funds need to be returned or moved to another contract
-  //   function transfer(address token, uint256 amount, address to) external onlyOwner returns (bool){}
-
   function bestQuote(address token, uint256 balance) external {
     return;
   }
