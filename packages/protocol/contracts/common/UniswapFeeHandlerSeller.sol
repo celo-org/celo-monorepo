@@ -29,6 +29,8 @@ contract UniswapFeeHandlerSeller is
 
   event ReceivedQuote(address router, uint256 quote);
   event RouterUsed(address router);
+  event RouterAddressSet(address token, address router);
+  event RouterAddressRemoved(address token, address router);
 
   /**
    * @notice Sets initialized == true on implementation contracts.
@@ -38,6 +40,45 @@ contract UniswapFeeHandlerSeller is
 
   // without this line the contract can't receive native Celo transfers
   function() external payable {}
+
+  /**
+    * @notice Allows owner to set the router for a token.
+    * @param token Address of the token to set.
+    * @param router The new router.
+    */
+  function setRouter(address token, address router) external onlyOwner {
+    _setRouter(token, router);
+  }
+
+  function _setRouter(address token, address router) private {
+    require(router != address(0), "Router can't be address zero");
+    routerAddresses[token].push(router);
+    emit RouterAddressSet(token, router);
+  }
+
+  /**
+    * @notice Allows owner to remove a router for a token.
+    * @param token Address of the token.
+    * @param router Address of the router to remove.
+    * @param index The index of the router to remove.
+    */
+  function removeRouter(address token, address router, uint256 index) external onlyOwner {
+    require(routerAddresses[token][index] == router, "Index does not match");
+
+    uint256 length = routerAddresses[token].length;
+    routerAddresses[token][index] = routerAddresses[token][length - 1];
+    routerAddresses[token].pop();
+    emit RouterAddressRemoved(token, router);
+  }
+
+  /**
+    * @notice Get the list of routers for a token.
+    * @param token The address of the token to query.
+    * @return An array of all the allowed router.
+    */
+  function getRoutersForToken(address token) external view returns (address[] memory) {
+    return routerAddresses[token];
+  }
 
   function initialize(address _registryAddress) external initializer {
     _transferOwnership(msg.sender);
@@ -125,7 +166,6 @@ contract UniswapFeeHandlerSeller is
 
     goldToken.transfer(msg.sender, goldToken.balanceOf(address(this)));
     emit RouterUsed(bestRouterAddress);
-    // _sendBackCeloBalance();
   }
 
   function bestQuote(address token, uint256 balance) external {

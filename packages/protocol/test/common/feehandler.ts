@@ -1,5 +1,4 @@
 // /* tslint:disable */
-
 // TODO remove magic numbers
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertEqualBN, assertGtBN, assertRevert } from '@celo/protocol/lib/test-utils'
@@ -331,7 +330,7 @@ contract('FeeHandler', (accounts: string[]) => {
       assertEqualBN(await goldToken.getBurnedAmount(), new BigNumber('0.8e18'))
     })
 
-    it("Doesn't burn what it's pending distributio", async () => {
+    it("Doesn't burn what it's pending distribution", async () => {
       const previousBurn = await goldToken.getBurnedAmount() // status is not reset inbetween tests, so keep track of the previus burn
 
       await feeHandler.burnCelo()
