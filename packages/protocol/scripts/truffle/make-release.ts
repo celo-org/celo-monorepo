@@ -39,7 +39,7 @@ const ignoredContracts = [
   'StableTokenRegistry',
 ]
 
-const ignoredContractsSet = new Set(ignoredContracts)
+let ignoredContractsSet = new Set()
 
 class ContractAddresses {
   static async create(
@@ -242,7 +242,15 @@ export interface ProposalTx {
 module.exports = async (callback: (error?: any) => number) => {
   try {
     const argv = require('minimist')(process.argv.slice(2), {
-      string: ['report', 'from', 'proposal', 'librariesFile', 'initialize_data', 'build_directory'],
+      string: [
+        'report',
+        'from',
+        'proposal',
+        'librariesFile',
+        'initialize_data',
+        'build_directory',
+        'branch',
+      ],
       boolean: ['dry_run'],
     })
     const fullReport = readJsonSync(argv.report)
@@ -250,8 +258,17 @@ module.exports = async (callback: (error?: any) => number) => {
       argv.librariesFile ?? 'libraries.json'
     )
     const report: ASTDetailedVersionedReport = fullReport.report
+    const branch = (argv.branch ? argv.branch : '') as string
     const initializationData = readJsonSync(argv.initialize_data)
     const dependencies = getCeloContractDependencies()
+
+    const regexp = /core-contracts.v(?<version>.*[0-9])/gm
+    const matches = regexp.exec(branch)
+    const version = parseInt(matches?.groups?.version ?? '0')
+    if (version >= 9) {
+      ignoredContractsSet = new Set(ignoredContracts)
+    }
+
     const contracts = readdirSync(join(argv.build_directory, 'contracts'))
       .map((x) => basename(x, '.json'))
       .filter(

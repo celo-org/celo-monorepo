@@ -31,10 +31,11 @@ const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry
 const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
 
 const argv = require('minimist')(process.argv.slice(2), {
-  string: ['build_artifacts', 'proposal', 'initialize_data', 'network', 'librariesFile'],
+  string: ['build_artifacts', 'proposal', 'initialize_data', 'network', 'librariesFile', 'branch'],
 })
 
 const artifactsDirectory = argv.build_artifacts ? argv.build_artifacts : './build/contracts'
+const branch = (argv.branch ? argv.branch : '') as string
 const network = argv.network ?? 'development'
 const proposal = argv.proposal ? readJsonSync(argv.proposal) : []
 const initializationData = argv.initialize_data ? readJsonSync(argv.initialize_data) : {}
@@ -42,6 +43,10 @@ const librariesFile = argv.librariesFile ?? 'libraries.json'
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
+    const regexp = /core-contracts.v(?<version>.*[0-9])/gm
+    const matches = regexp.exec(branch)
+    const version = parseInt(matches?.groups?.version ?? '0')
+
     const registry = await Registry.at(celoRegistryAddress)
     const buildArtifacts = getBuildArtifacts(artifactsDirectory)
     const libraryAddresses = await verifyBytecodes(
@@ -52,6 +57,7 @@ module.exports = async (callback: (error?: any) => number) => {
       Proxy,
       web3,
       initializationData,
+      version,
       network
     )
 
