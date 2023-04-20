@@ -13,6 +13,7 @@ blockscout:
     enableEventStream: false
     beanstalkdPort: ""
     beanstalkdHost: ""
+    beanstalkdTube: ""
     replicas: 0
     readinessProbe:
       enabled: false
@@ -83,6 +84,8 @@ blockscout:
       requests:
         memory: 1000Mi
         cpu: 2
+    affinity: {}
+    nodeSelector: {}
     rpcRegion: "indexer"  
     primaryRpcRegion: "indexer"  
     fetchers:
@@ -153,6 +156,8 @@ blockscout:
       requests:
         memory: 500Mi
         cpu: 500m
+    affinity: {}
+    nodeSelector: {}
   web:
     host: ""
     suffix:
@@ -234,6 +239,8 @@ blockscout:
       requests:
         memory: 250M
         cpu: 500m
+    affinity: {}
+    nodeSelector: {}
     appsMenu:
       enabled: true
       swapList: '[{"url":"https://ubeswap.org/", "title":"Ubeswap"}, {"url":"https://symmetric.finance/", "title":"Symmetric"}, {"url":"https://www.mobius.money/", "title":"Mobius"}, {"url":"https://mento.finance/", "title":"Mento-fi"}, {"url":"https://swap.bitssa.com/", "title":"Swap Bitssa"}]'
@@ -275,6 +282,8 @@ blockscout:
     jsonrpcPublicHttp: ""
   metrics:
     enabled: false
+  affinity: {}
+  nodeSelector: {}
   image:
     repository: gcr.io/celo-testnet/blockscout
     pullPolicy: IfNotPresent

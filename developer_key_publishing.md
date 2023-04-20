@@ -83,9 +83,9 @@ If you've generated a key on your local machine, it can be imported onto your Yu
 1. Insert the YubiKey into the USB port.
 2. `gpg --edit-key ${USER_NAME}@clabs.co`
 3. At the `gpg` prompt enter the following commands:
-    2. `keytocard` and select `1` to set the signature key on the YubiKey.
-    7. `keytocard` and select `3` to set the authentication key on the YubiKey.
-    8. `quit` and save your changes.
+   1. `keytocard` and select `1` to set the signature key on the YubiKey.
+   2. `keytocard` and select `3` to set the authentication key on the YubiKey.
+   3. `quit` and save your changes.
 
 See the [official YubiKey documentation](https://support.yubico.com/support/solutions/articles/15000006420-using-your-yubikey-with-openpgp)
 

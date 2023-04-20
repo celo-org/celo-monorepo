@@ -6,15 +6,15 @@ blockscout:
       proxy:
         resources:
           requests:
-            memory: 20M
-            cpu: 10m
+            memory: 40M
+            cpu: 25m
     poolSize: 200
     resources:
       requests:
-        memory: 700M
-        cpu: 0.5
+        memory: 400M
+        cpu: 0.4
       limits:
-        memory: 1400M
+        memory: 1G
         cpu: 1
     metrics:
       enabled: true
@@ -23,22 +23,22 @@ blockscout:
       maxReplicas: 3
       minReplicas: 2
       target:
-        cpu: 70
+        cpu: 80
     db:
       connectionName: celo-testnet-production:us-west1:baklava2-replica
       proxy:
         resources:
           requests:
-            memory: 20M
-            cpu: 10m
+            memory: 12M
+            cpu: 4m
     poolSize: 10
     resources:
       requests:
-        memory: 750M
-        cpu: 100m
+        memory: 300M
+        cpu: 40m
       limits:
-        memory: 1500M
-        cpu: 500m
+        memory: 500M
+        cpu: 200m
   web:
     host: explorer.celo.org
     suffix:
@@ -55,14 +55,14 @@ blockscout:
         resources:
           requests:
             memory: 20M
-            cpu: 10m
+            cpu: 14m
     poolSize: 20
     resources:
       requests:
-        memory: 750M
-        cpu: 0.5
+        memory: 350M
+        cpu: 0.4
       limits:
-        memory: 1500M
+        memory: 1G
         cpu: 1
   metadataCrawler:
     enabled: true
