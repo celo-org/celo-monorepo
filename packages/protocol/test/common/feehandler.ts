@@ -411,7 +411,7 @@ contract('FeeHandler', (accounts: string[]) => {
       })
     })
 
-    describe.only('Other tokens (non-Mento) (if this fails with "revert" please read comments of this tests)', async () => {
+    describe('Other tokens (non-Mento) (if this fails with "revert" please read comments of this tests)', async () => {
       // Uniswap can get the address of a pair by using an init code pair hash. Unfortunately, this hash is harcoded
       // in the file UniswapV2Library.sol. The hash writen now there is meant to run in the CI. If you're seeing this problem you can
       // 1. Skip these tests locally, as they will run in the CI anyway or
@@ -419,7 +419,6 @@ contract('FeeHandler', (accounts: string[]) => {
       // // tslint:disable-next-line
       // console.log('Uniswap INIT CODE PAIR HASH:', await uniswapFactory.INIT_CODE_PAIR_HASH())
       beforeEach(async () => {
-        console.log('uniswap2', uniswap2)
         deadline = (await web3.eth.getBlock('latest')).timestamp + 100
 
         uniswapFactory = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
@@ -436,7 +435,11 @@ contract('FeeHandler', (accounts: string[]) => {
           '0x0000000000000000000000000000000000000000'
         ) // _factory, _WETH
 
+        console.log('uniswap2', uniswap2.address)
+
         await feeCurrencyWhitelist.addNonMentoToken(tokenA.address)
+
+        await uniswapFeeHandlerSeller.initialize(registry.address)
         await uniswapFeeHandlerSeller.setRouter(tokenA.address, uniswap.address)
         await tokenA.mint(feeHandler.address, new BigNumber(10e18))
         await tokenA.mint(user, new BigNumber(10e18))
@@ -461,8 +464,37 @@ contract('FeeHandler', (accounts: string[]) => {
         await feeHandler.addToken(tokenA.address, uniswapFeeHandlerSeller.address)
       })
 
-      it('sells nonMento tokens', async () => {
-        // TODO complete when able to burn nonMento tokens
+      it('Uniswap trade test', async () => {
+        // Make sure our uniswap mock works
+
+        const balanceAbefore = await tokenA.balanceOf(user)
+        const balanceBbefore = await goldToken.balanceOf(user)
+
+        await tokenA.approve(uniswap.address, new BigNumber(1e18), { from: user })
+        await uniswap.swapExactTokensForTokens(
+          new BigNumber(1e18),
+          0,
+          [tokenA.address, goldToken.address],
+          user,
+          deadline,
+          { from: user }
+        )
+
+        assertGtBN(balanceAbefore, await tokenA.balanceOf(user))
+        assertGtBN(await goldToken.balanceOf(user), balanceBbefore)
+      })
+
+      it('Sells non-Mento tokens', async () => {
+        // await tokenA.mint(feeHandler.address, new BigNumber(10e18))
+
+        // safety check, check that the balance is not empty before the burn
+        console.log('balance before', (await tokenA.balanceOf(feeHandler.address)).toString())
+        await assertGtBN(await tokenA.balanceOf(feeHandler.address), 0)
+        await feeHandler.sell(tokenA.address)
+
+        console.log('balance after', (await tokenA.balanceOf(feeHandler.address)).toString())
+        // Burns only burn fraction, not all
+        assertEqualBN(await tokenA.balanceOf(feeHandler.address), new BigNumber('2e18'))
       })
     })
   })

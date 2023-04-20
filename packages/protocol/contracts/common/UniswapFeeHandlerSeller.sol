@@ -113,7 +113,7 @@ contract UniswapFeeHandlerSeller is
     // address[] memory thisTokenRouterAddresses = routerAddresses[sellTokenAddress];
 
     // IERC20 token = IERC20(sellTokenAddress);
-    uint256 balanceToBurn = IERC20(sellTokenAddress).balanceOf(address(this));
+    // uint256 balanceToBurn = IERC20(sellTokenAddress).balanceOf(address(this));
 
     for (uint256 i = 0; i < routerAddresses[sellTokenAddress].length; i++) {
       address poolAddress = routerAddresses[sellTokenAddress][i];
@@ -125,7 +125,7 @@ contract UniswapFeeHandlerSeller is
       // using the second return value becuase it's the last argument
       // the previous values show how many tokens are exchanged in each path
       // so the first value would be equivalent to balanceToBurn
-      uint256 wouldGet = router.getAmountsOut(balanceToBurn, path)[1];
+      uint256 wouldGet = router.getAmountsOut(amount, path)[1];
       emit ReceivedQuote(poolAddress, wouldGet);
       if (wouldGet > bestRouterQuote) {
         bestRouterQuote = wouldGet;
@@ -155,9 +155,9 @@ contract UniswapFeeHandlerSeller is
       );
     }
 
-    IERC20(sellTokenAddress).approve(bestRouterAddress, balanceToBurn);
+    IERC20(sellTokenAddress).approve(bestRouterAddress, amount);
     bestRouter.swapExactTokensForTokens(
-      balanceToBurn,
+      amount, // balanceToBurn, // amount
       minAmount,
       path,
       address(this),
