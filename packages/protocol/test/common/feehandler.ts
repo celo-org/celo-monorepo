@@ -1,4 +1,3 @@
-// /* tslint:disable */
 // TODO remove magic numbers
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertEqualBN, assertGtBN, assertRevert } from '@celo/protocol/lib/test-utils'
@@ -572,7 +571,7 @@ contract('FeeHandler', (accounts: string[]) => {
 
         await feeHandler.sell(tokenA.address)
 
-        // liquidity should have been taken by the uniswap2, because it has better liquidity, and thust higher quote
+        // liquidity should have been taken of uniswap2, because it has better liquidity, and thus higher quote
         // so the quote gets worse (smaller number)
 
         const quote1after = (

@@ -325,19 +325,31 @@ contract FeeHandler is
     return _burnCelo();
   }
 
+  function distributeAll() external {
+    return _distributeAll();
+  }
+
+  function _distributeAll() private {
+    for (uint256 i = 0; i < EnumerableSet.length(activeTokens); i++) {
+      address token = activeTokens.get(i);
+      _distribute(token);
+    }
+    // distribute Celo
+    _distribute(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
+  }
+
   function handleAll() external {
     return _handleAll();
   }
 
   function _handleAll() private {
     for (uint256 i = 0; i < EnumerableSet.length(activeTokens); i++) {
-      // calling _handle will trigger a lot of burn Celo that can be just batched at the end
-      // _handle(activeTokens[i]);
+      // calling _handle would trigger may burn Celo and distributions
+      // that can be just batched at the end
       address token = activeTokens.get(i);
       _sell(token);
-      // TODO move to _distributeAll(), this should thisitrbute celo as well
-      _distribute(token);
     }
+    _distributeAll(); // distributes Celo as well
     _burnCelo();
   }
 
@@ -352,6 +364,7 @@ contract FeeHandler is
     }
     _burnCelo();
     _distribute(tokenAddress);
+    _distribute(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 
   /**
