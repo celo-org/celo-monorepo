@@ -23,7 +23,7 @@
   ],
   "dependencies": {
     "@celo/base": "4.0.1-dev",
-    "@ethereumjs/util": "8.0.2",
+    "@ethereumjs/util": "8.0.5",
     "@types/bn.js": "^5.1.0",
     "@types/elliptic": "^6.4.9",
     "@types/node": "^10.12.18",
