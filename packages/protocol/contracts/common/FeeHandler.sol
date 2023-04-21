@@ -218,20 +218,19 @@ contract FeeHandler is
     IERC20 token = IERC20(tokenAddress);
 
     TokenState storage tokenState = tokenStates[tokenAddress];
+    require(tokenState.handler != address(0), "Handler has to be set to sell token");
     FixidityLib.Fraction memory balanceOfTokenToBurn = FixidityLib.newFixed(
       token.balanceOf(address(this)).sub(tokenState.toDistribute)
     );
 
     uint256 balanceToBurn = (burnFraction.multiply(balanceOfTokenToBurn).fromFixed());
-    uint256 contractBalance = token.balanceOf(address(this));
 
-    // safety check, try to burn more than what it has
-    balanceToBurn = Math.min(balanceToBurn, contractBalance);
+    uint256 contractBalance = token.balanceOf(address(this));
 
     tokenState.toDistribute += (contractBalance.sub(balanceToBurn));
 
     // small numbers cause rounding errors and zero case should be skipped
-    if (balanceToBurn <= MIN_BURN) {
+    if (balanceToBurn < MIN_BURN) {
       return;
     }
 
@@ -242,7 +241,6 @@ contract FeeHandler is
       emit DailyLimitHit(tokenAddress, balanceToBurn);
     }
 
-    // TODO check handler tokenState.handler
     token.transfer(tokenState.handler, balanceToBurn);
     IFeeHandlerSeller handler = IFeeHandlerSeller(tokenState.handler);
 
@@ -263,7 +261,7 @@ contract FeeHandler is
     return _distribute(tokenAddress);
   }
 
-  function _distribute(address tokenAddress) private {
+  function _distribute(address tokenAddress) private onlyWhenNotFrozen nonReentrant {
     require(feeBeneficiary != address(0), "Can't distribute to the zero address");
     IERC20 token = IERC20(tokenAddress);
     uint256 tokenBalance = token.balanceOf(address(this));
