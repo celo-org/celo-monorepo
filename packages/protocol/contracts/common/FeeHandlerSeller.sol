@@ -1,12 +1,12 @@
 pragma solidity ^0.5.13;
 
 import "../common/FixidityLib.sol";
-// import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
-contract FeeHandlerSeller {
-  // is Ownable
+contract FeeHandlerSeller is Ownable {
   using FixidityLib for FixidityLib.Fraction;
+  uint256 public minimumReports;
 
   // constructor(bool test) public {}
 
@@ -32,7 +32,7 @@ contract FeeHandlerSeller {
   }
 
   // in case some funds need to be returned or moved to another contract
-  function transfer(address token, uint256 amount, address to) external returns (bool) {
+  function transfer(address token, uint256 amount, address to) external onlyOwner returns (bool) {
     return IERC20(token).transfer(to, amount);
   }
 }
