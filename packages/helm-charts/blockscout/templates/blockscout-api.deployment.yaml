@@ -20,12 +20,12 @@ spec:
       component: blockscout-api
   template:
     metadata:
-      {{- if .Values.blockscout.metrics.enabled}}
+      {{- if .Values.blockscout.metrics.enabled }}
       annotations:
         prometheus.io/path: /metrics
         prometheus.io/port: "4000"
         prometheus.io/scrape: "true"
-      {{- end}}
+      {{- end }}
       labels:
         app: blockscout
         release: {{ .Release.Name }}
@@ -34,10 +34,10 @@ spec:
     spec:
       serviceAccountName: {{ .Release.Name }}-rbac
       initContainers:
-{{ include "celo.blockscout.initContainer.secrets-init" . | indent 6 }}
+        {{- include "celo.blockscout.initContainer.secrets-init" . | nindent 6 }}
       containers:
-{{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.api.db }}
-{{ include "celo.blockscout.container.db-sidecar" $data | indent 6 }}
+      {{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.api.db -}}
+      {{- include "celo.blockscout.container.db-sidecar" $data | nindent 6 }}
       - name: blockscout-api
         image: {{ .Values.blockscout.image.repository }}:api-{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.blockscout.image.pullPolicy }}
@@ -124,11 +124,17 @@ spec:
         - name: ACCOUNT_POOL_SIZE
           value: {{ .Values.blockscout.web.accountPoolSize | quote }}
         {{- end }}
-{{ include "celo.blockscout.env-vars" $data | indent 8 }}
+        {{- include "celo.blockscout.env-vars" $data | nindent 8 }}
       volumes:
-{{ include "celo.blockscout.volume.cloudsql-credentials" . | indent 8 }}
-{{ include "celo.blockscout.volume.temporary-dir" . | indent 8 }}
-    {{- with .Values.nodeSelector }}
+        {{- include "celo.blockscout.volume.cloudsql-credentials" . | nindent 8 }}
+        {{- include "celo.blockscout.volume.temporary-dir" . | nindent 8 }}
+      {{- $affinity := default .Values.blockscout.affinity .Values.blockscout.api.affinity -}}
+      {{- with $affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- $nodeSelector := default .Values.blockscout.nodeSelector .Values.blockscout.api.nodeSelector -}}
+      {{- with $nodeSelector }}
       nodeSelector:
-{{ toYaml . | indent 8 }}
-    {{- end }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

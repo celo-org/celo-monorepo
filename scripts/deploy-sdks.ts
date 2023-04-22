@@ -58,6 +58,19 @@ type Answers = {
 ;(async function () {
   prompt.start()
 
+  const { confirmNoDanglingDevs } = await prompt.get([
+    {
+      name: 'confirmNoDanglingDevs',
+      description: colors.yellow(
+        `Please ensure the @celo/phone-number-privacy-* packages in any sdk/**/package.json are using a published version. Y/N`
+      ),
+    },
+  ])
+
+  if (confirmNoDanglingDevs.toString().toUpperCase() !== 'Y') {
+    process.exit(1)
+  }
+
   // `getAnswers` will either prompt the user for a version and whether
   // or not to publish or it will use an existing failedSDKs.json file.
   const { packages, version, publish } = await getAnswers()

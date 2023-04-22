@@ -1,6 +1,10 @@
 blockscout:
   eventStream:
     replicas: 1
+    enableEventStream: true
+    beanstalkdPort: "11300"
+    beanstalkdHost: "rc1staging-webhooks-beanstalkd.webhooks.svc.cluster.local"
+    beanstalkdTube: "incoming"
   indexer:
     db:
       connectionName: celo-testnet-production:us-west1:rc1staging

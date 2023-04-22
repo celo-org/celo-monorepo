@@ -14,6 +14,10 @@ Other Changes
 
 ## Development (not published yet)
 
+Breaking Changes:
+
+Deleted dappkit following the [clabs announcement](https://forum.celo.org/t/sunsetting-dappkit/5336).
+
 ### **[2.0.0]**
 
 See [Upgrade Guide](https://docs.celo.org/developer-guide/contractkit/migrating-to-contractkit-v2)

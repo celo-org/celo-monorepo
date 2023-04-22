@@ -1,6 +1,5 @@
 import {
   ABIDefinition,
-  AbiItem,
   Address,
   Block,
   CeloTxPending,
@@ -14,16 +13,24 @@ import BigNumber from 'bignumber.js'
 import debugFactory from 'debug'
 import {
   ContractDetails,
+  ContractMapping,
   getContractDetailsFromContract,
   mapFromPairs,
   obtainKitContractDetails,
 } from './base'
-import { fetchMetadata } from './sourcify'
+import { fetchMetadata, tryGetProxyImplementation } from './sourcify'
 
 const debug = debugFactory('kit:explorer:block')
+export interface ContractNameAndMethodAbi {
+  abi: ABIDefinition
+  contract: string
+  contractName?: string
+}
 
 export interface CallDetails {
   contract: string
+  contractAddress: Address
+  isCoreContract: boolean
   function: string
   paramMap: Record<string, any>
   argList: any[]
@@ -39,17 +46,6 @@ export interface ParsedBlock {
   parsedTx: ParsedTx[]
 }
 
-interface ContractMapping {
-  details: ContractDetails
-  fnMapping: Map<string, ABIDefinition>
-}
-
-interface ContractNameAndMethodAbi {
-  abi: ABIDefinition
-  contract: string
-  contractName?: string
-}
-
 export async function newBlockExplorer(kit: ContractKit) {
   return new BlockExplorer(kit, await obtainKitContractDetails(kit))
 }
@@ -63,8 +59,11 @@ const getContractMappingFromDetails = (cd: ContractDetails) => ({
   ),
 })
 
+const isCoreContract = (contract: string): contract is CeloContract => contract in CeloContract
+
 export class BlockExplorer {
   private addressMapping: Map<Address, ContractMapping>
+  private proxyImplementationOverride: Map<Address, Address> = new Map()
 
   constructor(private kit: ContractKit, readonly contractDetails: ContractDetails[]) {
     this.addressMapping = mapFromPairs(
@@ -75,8 +74,18 @@ export class BlockExplorer {
   }
 
   async updateContractDetailsMapping(name: CeloContract, address: string) {
-    const cd = await getContractDetailsFromContract(this.kit, name, address)
-    this.addressMapping.set(cd.address, getContractMappingFromDetails(cd))
+    if (isCoreContract(name)) {
+      const contractDetails = await getContractDetailsFromContract(this.kit, name, address)
+      this.addressMapping.set(
+        contractDetails.address,
+        getContractMappingFromDetails(contractDetails)
+      )
+    }
+  }
+
+  async setProxyOverride(proxyAddress: Address, implementationAddress: Address) {
+    debug('Setting proxy override for %s to %s', proxyAddress, implementationAddress)
+    this.proxyImplementationOverride.set(proxyAddress, implementationAddress)
   }
 
   async fetchBlockByHash(blockHash: string): Promise<Block> {
@@ -111,7 +120,7 @@ export class BlockExplorer {
     }
   }
 
-  async tryParseTx(tx: CeloTxPending): Promise<null | ParsedTx> {
+  async tryParseTx(tx: CeloTxPending): Promise<ParsedTx | null> {
     const callDetails = await this.tryParseTxInput(tx.to!, tx.input)
     if (!callDetails) {
       return null
@@ -123,66 +132,120 @@ export class BlockExplorer {
     }
   }
 
-  getContractMethodAbiFromCore = (
-    address: string,
+  async tryParseTxInput(address: string, input: string): Promise<CallDetails | null> {
+    const selector = input.slice(0, 10)
+    const contractMapping = await this.getContractMappingWithSelector(address, selector)
+
+    if (contractMapping) {
+      const methodAbi = contractMapping.fnMapping.get(selector)!
+      return this.buildCallDetails(contractMapping.details, methodAbi, input)
+    }
+    return null
+  }
+
+  private getContractMethodAbiFromMapping = (
+    contractMapping: ContractMapping,
     selector: string
   ): ContractNameAndMethodAbi | null => {
-    const contractMapping = this.addressMapping.get(address)
-    if (contractMapping) {
-      const abi = contractMapping.fnMapping.get(selector)
-      if (abi) {
-        return {
-          contract: contractMapping.details.name,
-          abi,
-        }
-      } else {
-        console.warn(
-          `Function with signature ${selector} not found in contract ${contractMapping.details.name}(${address})`
-        )
-      }
+    if (contractMapping === undefined) {
+      return null
+    }
+
+    const methodAbi = contractMapping.fnMapping.get(selector)
+    if (methodAbi === undefined) {
+      return null
+    }
+
+    return {
+      contract: contractMapping.details.address,
+      contractName: contractMapping.details.name,
+      abi: methodAbi,
     }
 
     return null
   }
 
+  /**
+   * @deprecated use getContractMappingWithSelector instead
+   * Returns the contract name and ABI of the method by looking up
+   * the contract address either in all possible contract mappings.
+   * @param address
+   * @param selector
+   * @param onlyCoreContracts
+   * @returns The contract name and ABI of the method or null if not found
+   */
+  getContractMethodAbi = async (
+    address: string,
+    selector: string,
+    onlyCoreContracts = false
+  ): Promise<ContractNameAndMethodAbi | null> => {
+    if (onlyCoreContracts) {
+      return this.getContractMethodAbiFromCore(address, selector)
+    }
+
+    const contractMapping = await this.getContractMappingWithSelector(address, selector)
+    if (contractMapping === undefined) {
+      return null
+    }
+
+    return this.getContractMethodAbiFromMapping(contractMapping, selector)
+  }
+
+  /**
+   * Returns the contract name and ABI of the method by looking up
+   * the contract address but only in core contracts
+   * @param address
+   * @param selector
+   * @returns The contract name and ABI of the method or null if not found
+   */
+  getContractMethodAbiFromCore = async (
+    address: string,
+    selector: string
+  ): Promise<ContractNameAndMethodAbi | null> => {
+    const contractMapping = await this.getContractMappingWithSelector(address, selector, [
+      this.getContractMappingFromCore,
+    ])
+
+    if (contractMapping === undefined) {
+      return null
+    }
+
+    return this.getContractMethodAbiFromMapping(contractMapping, selector)
+  }
+
+  /**
+   * @deprecated use getContractMappingWithSelector instead
+   * Returns the contract name and ABI of the method by looking up
+   * the contract address in Sourcify.
+   * @param address
+   * @param selector
+   * @returns The contract name and ABI of the method or null if not found
+   */
   getContractMethodAbiFromSourcify = async (
     address: string,
     selector: string
   ): Promise<ContractNameAndMethodAbi | null> => {
-    let metadata = await fetchMetadata(this.kit.connection, address)
-    let abi: AbiItem | null = null
-    let contractName: string | null = null
+    const contractMapping = await this.getContractMappingWithSelector(address, selector, [
+      this.getContractMappingFromSourcify,
+      this.getContractMappingFromSourcifyAsProxy,
+    ])
 
-    if (metadata && metadata.abi) {
-      contractName = metadata.contractName
-      abi = metadata.abiForSelector(selector)
-
-      if (abi === null) {
-        const implAddress = await metadata.tryGetProxyImplementation()
-        console.log(implAddress)
-        if (implAddress) {
-          metadata = await fetchMetadata(this.kit.connection, implAddress)
-          if (metadata && metadata.abi) {
-            abi = metadata?.abiForSelector(selector)
-            contractName = metadata?.contractName
-          }
-        }
-      }
+    if (contractMapping === undefined) {
+      return null
     }
 
-    if (abi !== null) {
-      return {
-        abi: {
-          ...abi,
-          signature: selector,
-        },
-        contract: contractName ? `${contractName}(${address})` : `Unknown(${address})`,
-      }
-    }
-
-    return null
+    return this.getContractMethodAbiFromMapping(contractMapping, selector)
   }
 
+  /**
+   * @deprecated use getContractMappingWithSelector instead
+   * Returns the contract name and ABI of the method by looking up
+   * the selector in a list of known functions.
+   * @param address
+   * @param selector
+   * @param onlyCoreContracts
+   * @returns The contract name and ABI of the method or null if not found
+   */
   getContractMethodAbiFallback = (
     address: string,
     selector: string
@@ -203,26 +266,7 @@ export class BlockExplorer {
     return null
   }
 
-  getContractMethodAbi = async (
-    address: string,
-    selector: string,
-    onlyCoreContracts = false
-  ): Promise<ContractNameAndMethodAbi | null> => {
-    let resp = this.getContractMethodAbiFromCore(address, selector)
-    if (resp !== null) {
-      return resp
-    } else if (onlyCoreContracts) {
-      return null
-    }
-
-    resp = await this.getContractMethodAbiFromSourcify(address, selector)
-    if (resp !== null) {
-      return resp
-    }
-    return this.getContractMethodAbiFallback(address, selector)
-  }
-
-  buildCallDetails(contract: string, abi: ABIDefinition, input: string): CallDetails {
+  buildCallDetails(contract: ContractDetails, abi: ABIDefinition, input: string): CallDetails {
     const encodedParameters = input.slice(10)
     const { args, params } = parseDecodedParams(
       this.kit.connection.getAbiCoder().decodeParameters(abi.inputs!, encodedParameters)
@@ -245,20 +289,93 @@ export class BlockExplorer {
       })
 
     return {
-      contract,
+      contract: contract.name,
+      contractAddress: contract.address,
+      isCoreContract: contract.isCore,
       function: abi.name!,
       paramMap: params,
       argList: args,
     }
   }
 
-  async tryParseTxInput(address: string, input: string): Promise<CallDetails | null> {
-    const selector = input.slice(0, 10)
-    const resp = await this.getContractMethodAbi(address, selector)
+  /**
+   * Returns the ContractMapping for the contract at that address, or undefined
+   * by looking up the contract address in the core mappings.
+   * @param address
+   * @returns The ContractMapping for the contract at that address, or undefined
+   */
+  getContractMappingFromCore = async (address: string): Promise<ContractMapping | undefined> => {
+    return this.addressMapping.get(address)
+  }
 
-    if (resp !== null) {
-      return this.buildCallDetails(resp.contract, resp.abi, input)
+  /**
+   * Returns the ContractMapping for the contract at that address, or undefined
+   * by looking up the contract address in Sourcify.
+   * @param address
+   * @returns The ContractMapping for the contract at that address, or undefined
+   */
+  getContractMappingFromSourcify = async (
+    address: string
+  ): Promise<ContractMapping | undefined> => {
+    const metadata = await fetchMetadata(this.kit.connection, address)
+    return metadata?.toContractMapping()
+  }
+
+  /**
+   * Returns the ContractMapping for the contract at that address, or undefined
+   * by looking up the contract address in Sourcify but using heuristis to treat
+   * it as a proxy.
+   *
+   * This function is also included by the proxyImplementationOverrides map,
+   * which can be used to override the implementation address for a given proxy.
+   * This is exceptionally useful for parsing governence proposals that either
+   * initialize a proxy or upgrade it, and then calls methods on the new implementation.
+   * @param address
+   * @returns The ContractMapping for the contract at that address, or undefined
+   */
+  getContractMappingFromSourcifyAsProxy = async (
+    address: string
+  ): Promise<ContractMapping | undefined> => {
+    let implAddress = await tryGetProxyImplementation(this.kit.connection, address)
+    if (this.proxyImplementationOverride.has(address)) {
+      implAddress = this.proxyImplementationOverride.get(address)
     }
-    return null
+    if (implAddress) {
+      const contractMapping = await this.getContractMappingFromSourcify(implAddress)
+      if (contractMapping) {
+        return {
+          ...contractMapping,
+          details: {
+            ...contractMapping.details,
+            address, // Show the proxy address
+          },
+        }
+      }
+    }
+  }
+
+  /**
+   * Uses all of the strategies available to find a contract mapping that contains
+   * the given method selector.
+   * @param address
+   * @param selector
+   * @param strategies
+   * @returns The ContractMapping for the contract which has the function selector, or undefined
+   */
+  async getContractMappingWithSelector(
+    address: string,
+    selector: string,
+    strategies = [
+      this.getContractMappingFromCore,
+      this.getContractMappingFromSourcify,
+      this.getContractMappingFromSourcifyAsProxy,
+    ]
+  ): Promise<ContractMapping | undefined> {
+    for (const strategy of strategies) {
+      const contractMapping = await strategy(address)
+      if (contractMapping && contractMapping.fnMapping.get(selector)) {
+        return contractMapping
+      }
+    }
   }
 }
