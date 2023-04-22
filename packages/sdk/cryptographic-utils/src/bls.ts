@@ -1,7 +1,7 @@
 import { BLS } from '@celo/bls12377js'
 // this is an implementation of a subset of BLS12-377
 import { isValidAddress } from '@celo/utils/lib/address'
-import { keccak256 } from 'ethereumjs-util'
+import { keccak256 } from 'ethereum-cryptography/keccak'
 const BigInteger = require('bigi')
 const reverse = require('buffer-reverse')
 

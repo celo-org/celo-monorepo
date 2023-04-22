@@ -9,8 +9,8 @@ import {
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '@celo/wallet-base'
 import { publicKeyPrefix, Signature } from '@celo/wallet-hsm'
+import * as ethUtil from '@ethereumjs/util'
 import { BigNumber } from 'bignumber.js'
-import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
 import { AzureHSMWallet } from './azure-hsm-wallet'
 
@@ -131,7 +131,7 @@ describe('AzureHSMWallet class', () => {
                 const signature = ethUtil.ecsign(message, pkBuffer)
                 // Azure HSM doesn't add the byte prefix (+27) while ecsign does
                 // Subtract 27 to properly mock the HSM signer
-                return new Signature(signature.v - 27, signature.r, signature.s)
+                return new Signature(Number(signature.v) - 27, signature.r, signature.s)
               }
               throw new Error(`Unable to locate key: ${keyName}`)
             },

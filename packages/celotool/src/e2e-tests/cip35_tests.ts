@@ -246,7 +246,7 @@ class TestEnv {
 
   async generateUnprotectedTransaction(ethCompatible: boolean): Promise<string> {
     const encode = (ejsUtil as any).rlp.encode // the typescript typings are incomplete
-    const numToHex = (x: number | BigNumber) => ejsUtil.bufferToHex(ejsUtil.toBuffer(x))
+    const numToHex = (x: number | BigNumber) => ejsUtil.bufferToHex(ejsUtil.toBuffer(Number(x)))
     const nonce = await this.kit.connection.nonce(validatorAddress)
     const celoOnlyFields = ethCompatible ? [] : ['0x', '0x', '0x']
     const arr = [
@@ -262,9 +262,9 @@ class TestEnv {
     const pk = ejsUtil.addHexPrefix(validatorPrivateKey)
     const sig = ejsUtil.ecsign(signingHash, ejsUtil.toBuffer(pk))
     arr.push(
-      ejsUtil.bufferToHex(stripZeros(sig.v)),
-      ejsUtil.bufferToHex(stripZeros(sig.r)),
-      ejsUtil.bufferToHex(stripZeros(sig.s))
+      ejsUtil.bufferToHex(stripZeros(sig.v) as Buffer),
+      ejsUtil.bufferToHex(stripZeros(sig.r) as Buffer),
+      ejsUtil.bufferToHex(stripZeros(sig.s) as Buffer)
     )
     return ejsUtil.bufferToHex(encode(arr))
   }

@@ -6,6 +6,7 @@ import {
   Callback,
   CeloTx,
   EncodedTransaction,
+  Error,
   JsonRpcPayload,
   JsonRpcResponse,
   Provider,

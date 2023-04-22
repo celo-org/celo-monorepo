@@ -5,8 +5,8 @@ import {
   validateMnemonic,
 } from '@celo/cryptographic-utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { toChecksumAddress } from '@ethereumjs/util'
 import { flags } from '@oclif/command'
-import { toChecksumAddress } from 'ethereumjs-util'
 import { printValueMap } from '../../utils/cli'
 import NewAccount from './new'
 

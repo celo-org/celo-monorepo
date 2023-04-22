@@ -64,20 +64,16 @@ describe.skip('rpc-wallet', () => {
     const ipcProvider = new Web3.providers.IpcProvider(ipcUrl, net)
     const wallet = new RpcWallet(ipcProvider)
     await wallet.init()
-
     const account = await wallet.addAccount(PRIVATE_KEY1, PASSPHRASE)
     await wallet.unlockAccount(account, PASSPHRASE, DURATION)
-
     const tx = {
       from: ACCOUNT_ADDRESS1,
       to: ACCOUNT_ADDRESS2,
       value: 1000,
     }
-
     const result = await wallet.signTransaction(tx)
     // tslint:disable:no-console
     console.log(result)
-
     const connection = new Connection(new Web3(ipcUrl), wallet)
     const txResult = await connection.sendSignedTransaction(result.raw)
     // tslint:disable:no-console

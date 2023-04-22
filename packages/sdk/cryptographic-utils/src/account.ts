@@ -10,7 +10,8 @@ import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { levenshteinDistance } from '@celo/utils/lib/levenshtein'
 import BIP32Factory from 'bip32'
 import * as bip39 from 'bip39'
-import { keccak256 } from 'ethereumjs-util'
+import { keccak256 } from 'ethereum-cryptography/keccak'
+import { utf8ToBytes } from 'ethereum-cryptography/utils'
 import randomBytes from 'randombytes'
 import * as ecc from 'tiny-secp256k1'
 // Exports moved to @celo/base, forwarding them
@@ -411,6 +412,7 @@ export async function generateKeys(
   return generateKeysFromSeed(seed, changeIndex, addressIndex, derivationPath)
 }
 
+// XXX: (@soloseng) no test for this function?
 export function generateDeterministicInviteCode(
   recipientPhoneHash: string,
   recipientPepper: string,
@@ -418,7 +420,7 @@ export function generateDeterministicInviteCode(
   changeIndex: number = 0,
   derivationPath: string = CELO_DERIVATION_PATH_BASE
 ): { privateKey: string; publicKey: string } {
-  const seed = keccak256(recipientPhoneHash + recipientPepper) as Buffer
+  const seed = keccak256(utf8ToBytes(recipientPhoneHash + recipientPepper)) as Buffer
   return generateKeysFromSeed(seed, changeIndex, addressIndex, derivationPath)
 }
 

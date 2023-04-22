@@ -121,7 +121,9 @@ describe('newKitWithApiKey()', () => {
       method: '',
       params: [],
     }
-    httpProvider.send(rpcPayload, (error: Error | null) => expect(error).toBeNull())
+    httpProvider.send(rpcPayload, (error: Error | null) =>
+      expect(error?.message).toContain("Couldn't connect to node http://")
+    )
 
     // Api Key should be set in the request header
     expect(mockSetRequestHeader).toBeCalledTimes(2)
