@@ -531,7 +531,7 @@ contract('FeeHandler', (accounts: string[]) => {
 
       describe('Oracle check', async () => {
         beforeEach(async () => {
-          uniswapFeeHandlerSeller.setMinimumReports(tokenA.address, 1)
+          await uniswapFeeHandlerSeller.setMinimumReports(tokenA.address, 1)
           // tolerate high slippage, just to activate oracle check
           await feeHandler.setMaxSplippage(tokenA.address, toFixed(99 / 100))
           await mockSortedOracles.setMedianRate(
