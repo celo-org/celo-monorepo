@@ -20,6 +20,8 @@ contract MentoFeeHandlerSeller is
 {
   using FixidityLib for FixidityLib.Fraction;
 
+  event testEvent(uint256);
+
   /**
    * @notice Sets initialized == true on implementation contracts.
    * @param test Set to true to skip implementation initialisation.
@@ -29,9 +31,10 @@ contract MentoFeeHandlerSeller is
   // without this line the contract can't receive native Celo transfers
   function() external payable {}
 
-  function initialize(address _registryAddress) external initializer {
+  function initialize(address _registryAddress, uint256 newMininumReports) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
+    setMinimumReports(newMininumReports);
   }
 
   /**
@@ -71,6 +74,12 @@ contract MentoFeeHandlerSeller is
       // TODO check amount of reports or that the bucket hasn't been updated in 5 minutes
       // safetyCheck() or modifier
       ISortedOracles sortedOracles = getSortedOracles();
+
+      require(
+        sortedOracles.numRates(sellTokenAddress) >= minimumReports,
+        "Number of reports for token not enough"
+      );
+
       (uint256 rateNumerator, uint256 rateDenominator) = sortedOracles.medianRate(sellTokenAddress);
       minAmount = calculateMinAmount(rateNumerator, rateDenominator, amount, maxSlippage);
     }

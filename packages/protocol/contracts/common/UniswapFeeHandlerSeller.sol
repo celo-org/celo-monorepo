@@ -41,6 +41,12 @@ contract UniswapFeeHandlerSeller is
   // without this line the contract can't receive native Celo transfers
   function() external payable {}
 
+  function initialize(address _registryAddress, uint256 newMininumReports) external initializer {
+    _transferOwnership(msg.sender);
+    setRegistry(_registryAddress);
+    setMinimumReports(newMininumReports);
+  }
+
   /**
     * @notice Allows owner to set the router for a token.
     * @param token Address of the token to set.
@@ -80,11 +86,6 @@ contract UniswapFeeHandlerSeller is
     return routerAddresses[token];
   }
 
-  function initialize(address _registryAddress) external initializer {
-    _transferOwnership(msg.sender);
-    setRegistry(_registryAddress);
-  }
-
   // This function explicitly defines few variables because it was getting error "stack too deep"
   function sell(
     address sellTokenAddress,
@@ -103,29 +104,28 @@ contract UniswapFeeHandlerSeller is
     // and if it generates a better outcome that the ones enabled that gets used
     // and the user gets a reward
 
-    IERC20 goldToken = getGoldToken();
-    // address celoAddress = address(getGoldToken());
+    IERC20 celoToken = getGoldToken();
 
     uint256 bestRouterIndex = 0;
     uint256 bestRouterQuote = 0;
 
     address[] memory path = new address[](2);
-    // address[] memory thisTokenRouterAddresses = routerAddresses[sellTokenAddress];
-
-    // IERC20 token = IERC20(sellTokenAddress);
-    // uint256 balanceToBurn = IERC20(sellTokenAddress).balanceOf(address(this));
 
     for (uint256 i = 0; i < routerAddresses[sellTokenAddress].length; i++) {
       address poolAddress = routerAddresses[sellTokenAddress][i];
       IUniswapV2RouterMin router = IUniswapV2RouterMin(poolAddress);
 
       path[0] = sellTokenAddress;
-      path[1] = address(goldToken);
+      path[1] = address(celoToken);
 
       // using the second return value becuase it's the last argument
       // the previous values show how many tokens are exchanged in each path
       // so the first value would be equivalent to balanceToBurn
       uint256 wouldGet = router.getAmountsOut(amount, path)[1];
+
+      // todo add sortedOraclesCheck
+
+      // require(false, "fail");
       emit ReceivedQuote(poolAddress, wouldGet);
       if (wouldGet > bestRouterQuote) {
         bestRouterQuote = wouldGet;
@@ -145,11 +145,11 @@ contract UniswapFeeHandlerSeller is
     if (maxSlippage != 0) {
       address pair = IUniswapV2FactoryMin(bestRouter.factory()).getPair(
         sellTokenAddress,
-        address(goldToken)
+        address(celoToken)
       );
       minAmount = calculateMinAmount(
         IERC20(sellTokenAddress).balanceOf(pair),
-        goldToken.balanceOf(pair),
+        celoToken.balanceOf(pair),
         amount,
         maxSlippage
       );
@@ -164,7 +164,7 @@ contract UniswapFeeHandlerSeller is
       block.timestamp + MAX_TIMESTAMP_BLOCK_EXCHANGE
     );
 
-    goldToken.transfer(msg.sender, goldToken.balanceOf(address(this)));
+    celoToken.transfer(msg.sender, celoToken.balanceOf(address(this)));
     emit RouterUsed(bestRouterAddress);
   }
 

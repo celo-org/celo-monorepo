@@ -3,14 +3,6 @@ pragma solidity ^0.5.13;
 import "../FixidityLib.sol";
 
 interface IFeeHandler {
-  // FixidityLib.Fraction external burnFraction; // TODO move this to implementation
-
-  // // address that will get a fraction of the fees, currently the GreenFund.
-  // address external feesBeneficiary;
-
-  // tracks how much should be transfered and how much burn
-  // mapping(address => uint256) external tokensToDistribute;
-
   // sets the portion of the fee that should be burned.
   function setBurnFraction(uint256 fraction) external;
 
@@ -39,9 +31,9 @@ interface IFeeHandler {
   function burnCelo() external;
 
   // // calls distribute for all the nonCeloTokens
-  // function distributeAll() external;
+  function distributeAll() external;
 
   // // in case some funds need to be returned or moved to another contract
-  // function transfer(address token, uint256 amount, address to) external;
+  function transfer(address token, address recipient, uint256 value) external returns (bool);
 
 }
