@@ -1,6 +1,12 @@
 // TODO remove magic numbers
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertEqualBN, assertGtBN, assertRevert, timeTravel } from '@celo/protocol/lib/test-utils'
+import {
+  assertEqualBN,
+  assertGtBN,
+  assertRevert,
+  assertRevertWithReason,
+  timeTravel,
+} from '@celo/protocol/lib/test-utils' //
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
@@ -476,7 +482,7 @@ contract('FeeHandler', (accounts: string[]) => {
       })
     })
 
-    describe('Other tokens (non-Mento) (if this fails with "revert" please read comments of this tests)', async () => {
+    describe.only('Other tokens (non-Mento) (if this fails with "revert" please read comments of this tests)', async () => {
       // Uniswap can get the address of a pair by using an init code pair hash. Unfortunately, this hash is harcoded
       // in the file UniswapV2Library.sol. The hash writen now there is meant to run in the CI. If you're seeing this problem you can
       // 1. Skip these tests locally, as they will run in the CI anyway or
@@ -502,7 +508,7 @@ contract('FeeHandler', (accounts: string[]) => {
 
         await feeCurrencyWhitelist.addNonMentoToken(tokenA.address)
 
-        await uniswapFeeHandlerSeller.initialize(registry.address, 1)
+        await uniswapFeeHandlerSeller.initialize(registry.address, 0)
         await uniswapFeeHandlerSeller.setRouter(tokenA.address, uniswap.address)
         await tokenA.mint(feeHandler.address, new BigNumber(10e18))
         await tokenA.mint(user, new BigNumber(10e18))
@@ -525,6 +531,46 @@ contract('FeeHandler', (accounts: string[]) => {
         )
 
         await feeHandler.addToken(tokenA.address, uniswapFeeHandlerSeller.address)
+      })
+
+      describe.only('Oracle check', async () => {
+        beforeEach(async () => {
+          uniswapFeeHandlerSeller.setMinimumReports(1)
+          // tolerate high slippage, just to activate oracle check
+          await feeHandler.setMaxSplippage(tokenA.address, toFixed(99 / 100))
+          await mockSortedOracles.setMedianRate(
+            tokenA.address,
+            new BigNumber(1).times(goldAmountForRate)
+          )
+        })
+
+        it("Doesn't exchange when not enough reports", async () => {
+          await assertRevertWithReason(
+            feeHandler.sell(tokenA.address),
+            'Number of reports for token not enough'
+          )
+          assertEqualBN(await tokenA.balanceOf(feeHandler.address), new BigNumber(10e18))
+        })
+
+        it('Works with check', async () => {
+          await mockSortedOracles.setNumRates(tokenA.address, 2)
+          await feeHandler.sell(tokenA.address)
+          assertEqualBN(await tokenA.balanceOf(feeHandler.address), new BigNumber('2e18'))
+        })
+
+        it('Fails when oracle slippage is high check', async () => {
+          await mockSortedOracles.setNumRates(tokenA.address, 2)
+          await feeHandler.setMaxSplippage(tokenA.address, toFixed(80 / 100))
+          // The next tx is the one that should cause the revert, forcing a very
+          await mockSortedOracles.setMedianRate(
+            tokenA.address,
+            new BigNumber('300').times(goldAmountForRate)
+          )
+          await assertRevertWithReason(
+            feeHandler.sell(tokenA.address),
+            'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'
+          )
+        })
       })
 
       it('Uniswap trade test', async () => {
@@ -560,7 +606,10 @@ contract('FeeHandler', (accounts: string[]) => {
 
       it("Doesn't exchange when slippage is too high", async () => {
         await feeHandler.setMaxSplippage(tokenA.address, maxSlippage)
-        await assertRevert(feeHandler.sell(tokenA.address))
+        await assertRevertWithReason(
+          feeHandler.sell(tokenA.address),
+          'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'
+        )
         assertEqualBN(await tokenA.balanceOf(feeHandler.address), new BigNumber(10e18))
       })
 

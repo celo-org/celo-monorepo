@@ -1,12 +1,14 @@
 pragma solidity ^0.5.13;
 
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 contract FeeHandlerSeller is Ownable {
   using FixidityLib for FixidityLib.Fraction;
-  uint256 public minimumReports;
+  uint256 public minimumReports; // TODO change for token
+  using SafeMath for uint256;
 
   event MinimumReportsSet(uint256 minimumReports);
 

@@ -1,7 +1,7 @@
 pragma solidity ^0.5.13;
 
 import "../common/interfaces/IFeeHandlerSeller.sol";
-
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../stability/interfaces/IExchange.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 import "./UsingRegistry.sol";
@@ -10,6 +10,7 @@ import "../common/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "../common/Initializable.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/math/Math.sol";
 import "./FeeHandlerSeller.sol";
 
 import "../uniswap/interfaces/IUniswapV2RouterMin.sol";
@@ -22,9 +23,10 @@ contract UniswapFeeHandlerSeller is
   Initializable,
   FeeHandlerSeller
 {
+  using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
-  mapping(address => address[]) public routerAddresses;
 
+  mapping(address => address[]) public routerAddresses;
   uint256 constant MAX_TIMESTAMP_BLOCK_EXCHANGE = 20;
 
   event ReceivedQuote(address router, uint256 quote);
@@ -86,6 +88,42 @@ contract UniswapFeeHandlerSeller is
     return routerAddresses[token];
   }
 
+  function calculateAllMinAmount(
+    address sellTokenAddress,
+    uint256 maxSlippage,
+    uint256 amount,
+    IUniswapV2RouterMin bestRouter
+  ) private returns (uint256) {
+    ISortedOracles sortedOracles = getSortedOracles();
+    require(
+      sortedOracles.numRates(sellTokenAddress) >= minimumReports,
+      "Number of reports for token not enough"
+    );
+
+    (uint256 rateNumerator, uint256 rateDenominator) = sortedOracles.medianRate(sellTokenAddress);
+
+    uint256 minimalSortedOracles = calculateMinAmount(
+      rateNumerator,
+      rateDenominator,
+      amount,
+      maxSlippage
+    );
+
+    IERC20 celoToken = getGoldToken();
+    address pair = IUniswapV2FactoryMin(bestRouter.factory()).getPair(
+      sellTokenAddress,
+      address(celoToken)
+    );
+    uint256 minAmountPair = calculateMinAmount(
+      IERC20(sellTokenAddress).balanceOf(pair),
+      celoToken.balanceOf(pair),
+      amount,
+      maxSlippage
+    );
+
+    return Math.max(minAmountPair, minimalSortedOracles);
+  }
+
   // This function explicitly defines few variables because it was getting error "stack too deep"
   function sell(
     address sellTokenAddress,
@@ -123,8 +161,6 @@ contract UniswapFeeHandlerSeller is
       // so the first value would be equivalent to balanceToBurn
       uint256 wouldGet = router.getAmountsOut(amount, path)[1];
 
-      // todo add sortedOraclesCheck
-
       // require(false, "fail");
       emit ReceivedQuote(poolAddress, wouldGet);
       if (wouldGet > bestRouterQuote) {
@@ -143,16 +179,7 @@ contract UniswapFeeHandlerSeller is
 
     uint256 minAmount = 0;
     if (maxSlippage != 0) {
-      address pair = IUniswapV2FactoryMin(bestRouter.factory()).getPair(
-        sellTokenAddress,
-        address(celoToken)
-      );
-      minAmount = calculateMinAmount(
-        IERC20(sellTokenAddress).balanceOf(pair),
-        celoToken.balanceOf(pair),
-        amount,
-        maxSlippage
-      );
+      minAmount = calculateAllMinAmount(sellTokenAddress, maxSlippage, amount, bestRouter);
     }
 
     IERC20(sellTokenAddress).approve(bestRouterAddress, amount);

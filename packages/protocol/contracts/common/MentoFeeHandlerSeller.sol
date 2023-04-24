@@ -1,5 +1,6 @@
 pragma solidity ^0.5.13;
 
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/interfaces/IFeeHandlerSeller.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../stability/interfaces/IExchange.sol";
@@ -18,6 +19,7 @@ contract MentoFeeHandlerSeller is
   Initializable,
   FeeHandlerSeller
 {
+  using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
   event testEvent(uint256);
@@ -69,10 +71,7 @@ contract MentoFeeHandlerSeller is
     uint256 minAmount = 0;
     if (maxSlippage != 0) {
       // max slippage is set
-      // use sorted oracles as reference
 
-      // TODO check amount of reports or that the bucket hasn't been updated in 5 minutes
-      // safetyCheck() or modifier
       ISortedOracles sortedOracles = getSortedOracles();
 
       require(
