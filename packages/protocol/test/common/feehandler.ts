@@ -143,7 +143,7 @@ contract('FeeHandler', (accounts: string[]) => {
     await mockReserve.addToken(stableToken.address)
     await mockReserve.addToken(stableToken2.address)
 
-    await mentoSeller.initialize(registry.address, 1)
+    await mentoSeller.initialize(registry.address, [], [])
 
     await goldToken.initialize(registry.address)
     // TODO: use MockStableToken for this

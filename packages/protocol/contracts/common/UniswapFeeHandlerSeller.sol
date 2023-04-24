@@ -18,9 +18,9 @@ import "../uniswap/interfaces/IUniswapV2FactoryMin.sol";
 
 contract UniswapFeeHandlerSeller is
   IFeeHandlerSeller,
-  Ownable,
-  UsingRegistry,
-  Initializable,
+  // Ownable,
+  // UsingRegistry,
+  // Initializable,
   FeeHandlerSeller
 {
   using SafeMath for uint256;
@@ -42,12 +42,6 @@ contract UniswapFeeHandlerSeller is
 
   // without this line the contract can't receive native Celo transfers
   function() external payable {}
-
-  function initialize(address _registryAddress, uint256 newMininumReports) external initializer {
-    _transferOwnership(msg.sender);
-    setRegistry(_registryAddress);
-    setMinimumReports(newMininumReports);
-  }
 
   /**
     * @notice Allows owner to set the router for a token.
@@ -96,18 +90,22 @@ contract UniswapFeeHandlerSeller is
   ) private returns (uint256) {
     ISortedOracles sortedOracles = getSortedOracles();
     require(
-      sortedOracles.numRates(sellTokenAddress) >= minimumReports,
+      sortedOracles.numRates(sellTokenAddress) >= minimumReports[sellTokenAddress],
       "Number of reports for token not enough"
     );
 
-    (uint256 rateNumerator, uint256 rateDenominator) = sortedOracles.medianRate(sellTokenAddress);
+    uint256 minimalSortedOracles = 0;
+    // if minimumReports for this token is zero, assume the check is not needed
+    if (minimumReports[sellTokenAddress] > 0) {
+      (uint256 rateNumerator, uint256 rateDenominator) = sortedOracles.medianRate(sellTokenAddress);
 
-    uint256 minimalSortedOracles = calculateMinAmount(
-      rateNumerator,
-      rateDenominator,
-      amount,
-      maxSlippage
-    );
+      minimalSortedOracles = calculateMinAmount(
+        rateNumerator,
+        rateDenominator,
+        amount,
+        maxSlippage
+      );
+    }
 
     IERC20 celoToken = getGoldToken();
     address pair = IUniswapV2FactoryMin(bestRouter.factory()).getPair(
@@ -144,7 +142,7 @@ contract UniswapFeeHandlerSeller is
 
     IERC20 celoToken = getGoldToken();
 
-    uint256 bestRouterIndex = 0;
+    IUniswapV2RouterMin bestRouter;
     uint256 bestRouterQuote = 0;
 
     address[] memory path = new address[](2);
@@ -165,26 +163,20 @@ contract UniswapFeeHandlerSeller is
       emit ReceivedQuote(poolAddress, wouldGet);
       if (wouldGet > bestRouterQuote) {
         bestRouterQuote = wouldGet;
-        bestRouterIndex = i;
+        bestRouter = router;
       }
     }
 
-    // don't try to exchange on zero quotes
-    if (bestRouterQuote == 0) {
-      return;
-    }
-
-    address bestRouterAddress = routerAddresses[sellTokenAddress][bestRouterIndex];
-    IUniswapV2RouterMin bestRouter = IUniswapV2RouterMin(bestRouterAddress);
+    require(bestRouterQuote != 0, "Cam't exchange with zero quote");
 
     uint256 minAmount = 0;
     if (maxSlippage != 0) {
       minAmount = calculateAllMinAmount(sellTokenAddress, maxSlippage, amount, bestRouter);
     }
 
-    IERC20(sellTokenAddress).approve(bestRouterAddress, amount);
+    IERC20(sellTokenAddress).approve(address(bestRouter), amount);
     bestRouter.swapExactTokensForTokens(
-      amount, // balanceToBurn, // amount
+      amount,
       minAmount,
       path,
       address(this),
@@ -192,7 +184,7 @@ contract UniswapFeeHandlerSeller is
     );
 
     celoToken.transfer(msg.sender, celoToken.balanceOf(address(this)));
-    emit RouterUsed(bestRouterAddress);
+    emit RouterUsed(address(bestRouter));
   }
 
   function bestQuote(address token, uint256 balance) external {

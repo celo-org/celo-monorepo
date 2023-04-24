@@ -14,9 +14,9 @@ import "./FeeHandlerSeller.sol";
 
 contract MentoFeeHandlerSeller is
   IFeeHandlerSeller,
-  Ownable,
-  UsingRegistry,
-  Initializable,
+  // Ownable,
+  // UsingRegistry,
+  // Initializable,
   FeeHandlerSeller
 {
   using SafeMath for uint256;
@@ -32,12 +32,6 @@ contract MentoFeeHandlerSeller is
 
   // without this line the contract can't receive native Celo transfers
   function() external payable {}
-
-  function initialize(address _registryAddress, uint256 newMininumReports) external initializer {
-    _transferOwnership(msg.sender);
-    setRegistry(_registryAddress);
-    // setMinimumReports(newMininumReports);
-  }
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.

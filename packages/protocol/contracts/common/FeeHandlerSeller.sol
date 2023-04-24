@@ -4,8 +4,10 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "./UsingRegistry.sol";
+import "../common/Initializable.sol";
 
-contract FeeHandlerSeller is Ownable {
+contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -13,15 +15,18 @@ contract FeeHandlerSeller is Ownable {
 
   event MinimumReportsSet(address tokenAddress, uint256 minimumReports);
 
-  // function initialize(address _registryAddress, address[] calldata tokenAddresses, uint256[] calldata newMininumReports) external initializer {
-  //   _transferOwnership(msg.sender);
-  //   setRegistry(_registryAddress);
-  //   // setMinimumReports(newMininumReports);
+  function initialize(
+    address _registryAddress,
+    address[] calldata tokenAddresses,
+    uint256[] calldata newMininumReports
+  ) external initializer {
+    _transferOwnership(msg.sender);
+    setRegistry(_registryAddress);
 
-  //   for (uint256 i = 0; i < tokenAddresses.length; i++) {
-  //     _setMinimumReports(tokenAddresses[i], newMininumReports[i]);
-  //   }
-  // }
+    for (uint256 i = 0; i < tokenAddresses.length; i++) {
+      _setMinimumReports(tokenAddresses[i], newMininumReports[i]);
+    }
+  }
 
   /**
     * @notice Allows owner to set the minimum number of reports required
