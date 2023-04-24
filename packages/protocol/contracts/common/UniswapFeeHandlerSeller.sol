@@ -154,12 +154,11 @@ contract UniswapFeeHandlerSeller is
       path[0] = sellTokenAddress;
       path[1] = address(celoToken);
 
-      // using the second return value becuase it's the last argument
+      // Using the second return value becuase it's the last argument
       // the previous values show how many tokens are exchanged in each path
       // so the first value would be equivalent to balanceToBurn
       uint256 wouldGet = router.getAmountsOut(amount, path)[1];
 
-      // require(false, "fail");
       emit ReceivedQuote(poolAddress, wouldGet);
       if (wouldGet > bestRouterQuote) {
         bestRouterQuote = wouldGet;
