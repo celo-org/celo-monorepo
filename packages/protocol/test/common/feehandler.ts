@@ -458,15 +458,11 @@ contract('FeeHandler', (accounts: string[]) => {
             await feeHandler.getTokenToDistribute(stableToken.address),
             new BigNumber('0.2e18')
           )
-
-          console.log((await mockSortedOracles.numRates(stableToken.address)).toString())
-          console.log((await mentoSeller.minimumReports()).toString())
-          // throw "error"
         })
 
         it("Doesn't exchange when not enough reports", async () => {
-          await mentoSeller.setMinimumReports(2)
-          const balanceBefore = await stableToken.balanceOf(feeHandler.address)
+          await mentoSeller.setMinimumReports(tokenA.address, 2)
+          const balanceBefore = await stableToken.balanceOf(feeHandler.address) // TODO this balance is wrong
           await feeHandler.setMaxSplippage(tokenA.address, maxSlippage)
           await assertRevert(feeHandler.sell(tokenA.address))
           assertEqualBN(await stableToken.balanceOf(feeHandler.address), balanceBefore)
@@ -482,7 +478,7 @@ contract('FeeHandler', (accounts: string[]) => {
       })
     })
 
-    describe.only('Other tokens (non-Mento) (if this fails with "revert" please read comments of this tests)', async () => {
+    describe('Other tokens (non-Mento) (if this fails with "revert" please read comments of this tests)', async () => {
       // Uniswap can get the address of a pair by using an init code pair hash. Unfortunately, this hash is harcoded
       // in the file UniswapV2Library.sol. The hash writen now there is meant to run in the CI. If you're seeing this problem you can
       // 1. Skip these tests locally, as they will run in the CI anyway or
@@ -508,7 +504,7 @@ contract('FeeHandler', (accounts: string[]) => {
 
         await feeCurrencyWhitelist.addNonMentoToken(tokenA.address)
 
-        await uniswapFeeHandlerSeller.initialize(registry.address, 0)
+        await uniswapFeeHandlerSeller.initialize(registry.address, [], [])
         await uniswapFeeHandlerSeller.setRouter(tokenA.address, uniswap.address)
         await tokenA.mint(feeHandler.address, new BigNumber(10e18))
         await tokenA.mint(user, new BigNumber(10e18))
@@ -533,9 +529,9 @@ contract('FeeHandler', (accounts: string[]) => {
         await feeHandler.addToken(tokenA.address, uniswapFeeHandlerSeller.address)
       })
 
-      describe.only('Oracle check', async () => {
+      describe('Oracle check', async () => {
         beforeEach(async () => {
-          uniswapFeeHandlerSeller.setMinimumReports(1)
+          uniswapFeeHandlerSeller.setMinimumReports(tokenA.address, 1)
           // tolerate high slippage, just to activate oracle check
           await feeHandler.setMaxSplippage(tokenA.address, toFixed(99 / 100))
           await mockSortedOracles.setMedianRate(

@@ -6,19 +6,34 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 contract FeeHandlerSeller is Ownable {
-  using FixidityLib for FixidityLib.Fraction;
-  uint256 public minimumReports; // TODO change for token
   using SafeMath for uint256;
+  using FixidityLib for FixidityLib.Fraction;
 
-  event MinimumReportsSet(uint256 minimumReports);
+  mapping(address => uint256) public minimumReports;
+
+  event MinimumReportsSet(address tokenAddress, uint256 minimumReports);
+
+  // function initialize(address _registryAddress, address[] calldata tokenAddresses, uint256[] calldata newMininumReports) external initializer {
+  //   _transferOwnership(msg.sender);
+  //   setRegistry(_registryAddress);
+  //   // setMinimumReports(newMininumReports);
+
+  //   for (uint256 i = 0; i < tokenAddresses.length; i++) {
+  //     _setMinimumReports(tokenAddresses[i], newMininumReports[i]);
+  //   }
+  // }
 
   /**
     * @notice Allows owner to set the minimum number of reports required
     * @param newMininumReports The new update minimum number of reports required
     */
-  function setMinimumReports(uint256 newMininumReports) public onlyOwner {
-    minimumReports = newMininumReports;
-    emit MinimumReportsSet(newMininumReports);
+  function setMinimumReports(address tokenAddress, uint256 newMininumReports) public onlyOwner {
+    _setMinimumReports(tokenAddress, newMininumReports);
+  }
+
+  function _setMinimumReports(address tokenAddress, uint256 newMininumReports) internal {
+    minimumReports[tokenAddress] = newMininumReports;
+    emit MinimumReportsSet(tokenAddress, newMininumReports);
   }
 
   /**

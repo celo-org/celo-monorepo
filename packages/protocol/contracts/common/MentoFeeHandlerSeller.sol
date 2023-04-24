@@ -36,7 +36,7 @@ contract MentoFeeHandlerSeller is
   function initialize(address _registryAddress, uint256 newMininumReports) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
-    setMinimumReports(newMininumReports);
+    // setMinimumReports(newMininumReports);
   }
 
   /**
@@ -75,7 +75,7 @@ contract MentoFeeHandlerSeller is
       ISortedOracles sortedOracles = getSortedOracles();
 
       require(
-        sortedOracles.numRates(sellTokenAddress) >= minimumReports,
+        sortedOracles.numRates(sellTokenAddress) >= minimumReports[sellTokenAddress],
         "Number of reports for token not enough"
       );
 
