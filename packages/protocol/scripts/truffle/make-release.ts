@@ -9,6 +9,7 @@ import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
 import { TruffleContract } from 'truffle-contract'
 import { RegistryInstance } from 'types'
+import { getReleaseVersion, ignoredContractsV9 } from '../../lib/compatibility/ignored-contracts-v9'
 
 /*
  * A script that reads a backwards compatibility report, deploys changed contracts, and creates
@@ -23,21 +24,6 @@ import { RegistryInstance } from 'types'
  *   --network alfajores --build_directory build/alfajores/ --report report.json \
  *   --initialize_data initialize_data.json --proposal proposal.json
  */
-
-const ignoredContracts = [
-  // These are Mento contracts which we are no longer maintaining
-  'Exchange',
-  'ExchangeBRL',
-  'ExchangeEUR',
-  'GrandaMento',
-  'Reserve',
-  'ReserveSpenderMultiSig',
-  'SortedOracles',
-  'StableToken',
-  'StableTokenBRL',
-  'StableTokenEUR',
-  'StableTokenRegistry',
-]
 
 let ignoredContractsSet = new Set()
 
@@ -262,11 +248,10 @@ module.exports = async (callback: (error?: any) => number) => {
     const initializationData = readJsonSync(argv.initialize_data)
     const dependencies = getCeloContractDependencies()
 
-    const regexp = /core-contracts.v(?<version>.*[0-9])/gm
-    const matches = regexp.exec(branch)
-    const version = parseInt(matches?.groups?.version ?? '0')
+    const version = getReleaseVersion(branch)
+
     if (version >= 9) {
-      ignoredContractsSet = new Set(ignoredContracts)
+      ignoredContractsSet = new Set(ignoredContractsV9)
     }
 
     const contracts = readdirSync(join(argv.build_directory, 'contracts'))
@@ -276,7 +261,7 @@ module.exports = async (callback: (error?: any) => number) => {
           !ignoredContractsSet.has(contract) &&
           !ignoredContractsSet.has(contract.replace('Proxy', ''))
       )
-    console.log('ignoredContracts', ignoredContracts)
+    console.log('ignoredContracts', ignoredContractsV9)
     const registry = await artifacts.require('Registry').at(celoRegistryAddress)
     const addresses = await ContractAddresses.create(contracts, registry, libraryMapping)
     const released: Set<string> = new Set([])

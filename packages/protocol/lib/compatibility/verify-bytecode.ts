@@ -12,6 +12,7 @@ import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { ProxyInstance, RegistryInstance } from 'types'
 import Web3 from 'web3'
+import { ignoredContractsV9 } from './ignored-contracts-v9'
 
 let ignoredContracts = [
   // This contract is not proxied
@@ -20,21 +21,6 @@ let ignoredContracts = [
   // These contracts are not in the Registry (before release 1)
   'ReserveSpenderMultiSig',
   'GovernanceApproverMultiSig'
-]
-
-const ignoredContractsV9 = [
-  // These are Mento contracts which we are no longer maintaining
-  'Exchange',
-  'ExchangeBRL',
-  'ExchangeEUR',
-  'GrandaMento',
-  'Reserve',
-  'ReserveSpenderMultiSig',
-  'SortedOracles',
-  'StableToken',
-  'StableTokenBRL',
-  'StableTokenEUR',
-  'StableTokenRegistry',
 ]
 
 interface VerificationContext {
@@ -249,7 +235,7 @@ export const verifyBytecodes = async (
     ignoredContracts = [...ignoredContracts, ...ignoredContractsV9]
   }
 
-  let queue = contracts.filter(
+  const queue = contracts.filter(
     (contract) => !ignoredContracts.includes(contract) && compiledContracts.includes(contract)
   )
 

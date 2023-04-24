@@ -3,6 +3,7 @@ import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/regist
 import { getBuildArtifacts } from '@openzeppelin/upgrades'
 import { readJsonSync, writeJsonSync } from 'fs-extra'
 import { ProxyInstance, RegistryInstance } from 'types'
+import { getReleaseVersion } from '../../lib/compatibility/ignored-contracts-v9'
 
 /*
  * This script verifies that a given set of smart contract bytecodes corresponds
@@ -43,9 +44,7 @@ const librariesFile = argv.librariesFile ?? 'libraries.json'
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
-    const regexp = /core-contracts.v(?<version>.*[0-9])/gm
-    const matches = regexp.exec(branch)
-    const version = parseInt(matches?.groups?.version ?? '0')
+    const version = getReleaseVersion(branch)
 
     const registry = await Registry.at(celoRegistryAddress)
     const buildArtifacts = getBuildArtifacts(artifactsDirectory)
