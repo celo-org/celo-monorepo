@@ -40,6 +40,11 @@ contract LockedGold is
     PendingWithdrawal[] pendingWithdrawals;
   }
 
+  struct DelegatedGold {
+    address delegatee;
+    uint256 amount;
+  }
+
   mapping(address => Balances) internal balances;
 
   // Iterable map to store whitelisted identifiers.
@@ -61,6 +66,11 @@ contract LockedGold is
 
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
+
+  // delegator -> delegatee
+  mapping(address => DelegatedGold) delegatorGold;
+  // Gold that was delegated to this particular address
+  mapping(address => uint256) totalDelegatedGold;
 
   event UnlockingPeriodSet(uint256 period);
   event GoldLocked(address indexed account, uint256 value);
@@ -240,7 +250,7 @@ contract LockedGold is
    *   gold that has been unlocked but not yet withdrawn.
    * @return The total amount of locked gold in the system.
    */
-  function getTotalLockedGold() external view returns (uint256) {
+  function getTotalLockedGold() public view returns (uint256) {
     return totalNonvoting.add(getElection().getTotalVotes());
   }
 
@@ -252,6 +262,55 @@ contract LockedGold is
     return totalNonvoting;
   }
 
+  function delegateGovernanceVotes(address delegatee, uint256 amountToDelegate) external {
+    uint256 totalLockedGold = getTotalLockedGold();
+    require(totalLockedGold > amountToDelegate, "Not enough locked gold");
+
+    uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(msg.sender);
+    require(
+      totalReferendumVotes == totalReferendumVotes,
+      "It is not possible to delagate votes when already voting on proposal."
+    );
+
+    address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
+    DelegatedGold storage delegated = delegatorGold[msg.sender];
+    if (delegated.delegatee != address(0) && delegated.delegatee != delegateeAccount) {
+      revokeDelegatedGovernanceVotes(delegated.amount);
+    }
+
+    // can I ever decrese celo here ?
+    delegated.amount = amountToDelegate;
+    delegated.delegatee = delegateeAccount;
+    totalDelegatedGold[delegateeAccount] += amountToDelegate;
+  }
+
+  function revokeDelegatedGovernanceVotes(uint256 amountToRevoke) public {
+    // it is necessary to check if delegatee is voting for some proposal with the gold or not
+    DelegatedGold storage delegated = delegatorGold[msg.sender];
+    require(delegated.delegatee != address(0), "No delegated votes");
+    require(delegated.amount <= amountToRevoke, "Not enough delegated votes");
+
+    uint256 delegateeTotalVotingPower = getAccountTotalGovernanceVotingPower(delegated.delegatee);
+    uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(msg.sender);
+
+    uint256 unusedReferendumVotes = delegateeTotalVotingPower - totalReferendumVotes;
+    if (unusedReferendumVotes < amountToRevoke) {
+      getGovernance().removeVotesWhenRevokingDelegatedVotes(
+        delegated.delegatee,
+        delegateeTotalVotingPower - amountToRevoke
+      );
+    }
+
+    delegated.delegatee = address(0);
+    delegated.amount -= amountToRevoke;
+    totalDelegatedGold[delegated.delegatee] -= amountToRevoke;
+  }
+
+  function getDelegatee(address account) public view returns (address, uint256) {
+    DelegatedGold storage delegated = delegatorGold[account];
+    return (delegated.delegatee, delegated.amount);
+  }
+
   /**
    * @notice Returns the total amount of locked gold for an account.
    * @param account The account.
@@ -260,6 +319,16 @@ contract LockedGold is
   function getAccountTotalLockedGold(address account) public view returns (uint256) {
     uint256 total = balances[account].nonvoting;
     return total.add(getElection().getTotalVotesByAccount(account));
+  }
+
+  /**
+   * @notice Returns the total amount of locked gold + delegated gold for an account.
+   * @param account The account.
+   * @return The total amount of locked gold + delegated gold for an account.
+   */
+  function getAccountTotalGovernanceVotingPower(address account) public view returns (uint256) {
+    uint256 totalLockedGold = getAccountTotalLockedGold(account);
+    return totalLockedGold + totalDelegatedGold[account];
   }
 
   /**

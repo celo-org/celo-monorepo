@@ -650,11 +650,16 @@ contract Governance is
       return false;
     }
 
+    (address delegatee, ) = getLockedGold().getDelegatee(msg.sender);
+    require(
+      delegatee == address(0),
+      "It is not possible to vote on proposal while delegating votes"
+    );
     require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
     require(value != Proposals.VoteValue.None, "Vote value unset");
 
     address account = getAccounts().voteSignerToAccount(msg.sender);
-    uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
+    uint256 weight = getLockedGold().getAccountTotalGovernanceVotingPower(account);
     require(weight > 0, "Voter weight zero");
 
     _vote(
@@ -694,13 +699,19 @@ contract Governance is
     if (!proposal.exists()) {
       return false;
     }
+
+    (address delegatee, ) = getLockedGold().getDelegatee(msg.sender);
+    require(
+      delegatee == address(0),
+      "It is not possible to vote on proposal while delegating votes"
+    );
     require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
 
     address account = getAccounts().voteSignerToAccount(msg.sender);
-    uint256 totalLockedGold = getLockedGold().getAccountTotalLockedGold(account);
+    uint256 totalVotingPower = getLockedGold().getAccountTotalGovernanceVotingPower(account);
 
     require(
-      totalLockedGold >= yesVotes.add(noVotes).add(abstainVotes),
+      totalVotingPower >= yesVotes.add(noVotes).add(abstainVotes),
       "Voter doesn't have enough locked Celo (formerly known as Celo Gold)"
     );
     _vote(proposal, proposalId, index, account, yesVotes, noVotes, abstainVotes);
@@ -1480,6 +1491,54 @@ contract Governance is
       );
     }
     return maxUsed;
+  }
+
+  /**
+   * @notice Returns max number of votes cast by an account.
+   * @param account The address of the account.
+   * @return The total number of votes cast by an account.
+   */
+  function removeVotesWhenRevokingDelegatedVotes(address account, uint256 maxAmountAllowed) public {
+    Voter storage voter = voters[account];
+
+    //TODO: Only locked gold modifier
+
+    for (uint256 index = 0; index < dequeued.length; index = index.add(1)) {
+      Proposals.Proposal storage proposal = proposals[dequeued[index]];
+      bool isVotingReferendum = (getProposalDequeuedStage(proposal) == Proposals.Stage.Referendum);
+
+      if (!isVotingReferendum) {
+        continue;
+      }
+
+      VoteRecord storage voteRecord = voter.referendumVotes[index];
+      uint256 sumOfVotes = voteRecord.yesVotes.add(voteRecord.noVotes).add(voteRecord.abstainVotes);
+
+      if (sumOfVotes > maxAmountAllowed) {
+        uint256 amountToRemoveFromAbstain = Math.min(
+          voteRecord.abstainVotes,
+          sumOfVotes - maxAmountAllowed
+        );
+        voteRecord.abstainVotes -= amountToRemoveFromAbstain;
+        sumOfVotes -= amountToRemoveFromAbstain;
+        if (sumOfVotes > maxAmountAllowed) {
+          uint256 amountToRemoveFromYes = Math.min(
+            voteRecord.yesVotes,
+            sumOfVotes - maxAmountAllowed
+          );
+          voteRecord.yesVotes -= amountToRemoveFromYes;
+          sumOfVotes -= amountToRemoveFromYes;
+          if (sumOfVotes > maxAmountAllowed) {
+            uint256 amountToRemoveFromNo = Math.min(
+              voteRecord.noVotes,
+              sumOfVotes - maxAmountAllowed
+            );
+            voteRecord.noVotes -= amountToRemoveFromNo;
+            sumOfVotes -= amountToRemoveFromNo;
+          }
+        }
+      }
+    }
   }
 
   /**
