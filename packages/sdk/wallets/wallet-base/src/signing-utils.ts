@@ -217,7 +217,7 @@ export function verifyEIP712TypedDataSigner(
   signedData: string,
   expectedAddress: string
 ): boolean {
-  const dataHex = bufferToHex(generateTypedDataHash(typedData))
+  const dataHex = ethUtil.bufferToHex(generateTypedDataHash(typedData))
   return verifySignatureWithoutPrefix(dataHex, signedData, expectedAddress)
 }
 
