@@ -1,4 +1,4 @@
-FROM cimg/node:18.9
+FROM cimg/node:18.14.2
 
 RUN sudo apt-get update -y
 RUN sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 rsync -y
