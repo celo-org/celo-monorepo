@@ -44,6 +44,17 @@ contract UniswapFeeHandlerSeller is
   function() external payable {}
 
   /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 0, 0);
+  }
+
+  /**
     * @notice Allows owner to set the router for a token.
     * @param token Address of the token to set.
     * @param router The new router.
@@ -185,9 +196,4 @@ contract UniswapFeeHandlerSeller is
     celoToken.transfer(msg.sender, celoToken.balanceOf(address(this)));
     emit RouterUsed(address(bestRouter));
   }
-
-  function bestQuote(address token, uint256 balance) external {
-    return;
-  }
-
 }
