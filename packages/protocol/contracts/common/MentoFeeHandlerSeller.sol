@@ -22,8 +22,6 @@ contract MentoFeeHandlerSeller is
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
-  event testEvent(uint256);
-
   /**
    * @notice Sets initialized == true on implementation contracts.
    * @param test Set to true to skip implementation initialisation.
@@ -84,10 +82,4 @@ contract MentoFeeHandlerSeller is
     IERC20 goldToken = getGoldToken();
     goldToken.transfer(msg.sender, goldToken.balanceOf(address(this)));
   }
-
-  // function bestQuote(address token, uint256 balance) external {
-  function bestQuote(address token, uint256 balance) external {
-    return;
-  }
-
 }

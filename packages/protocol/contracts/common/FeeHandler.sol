@@ -240,6 +240,17 @@ contract FeeHandler is
     activeTokens.add(tokenAddress);
   }
 
+  // TODO test me
+  function activateToken(address tokenAddress) external onlyOwner {
+    _activateToken(tokenAddress);
+  }
+
+  function _activateToken(address tokenAddress) private {
+    activeTokens.add(tokenAddress);
+    TokenState storage tokenState = tokenStates[tokenAddress];
+    tokenState.active = true;
+  }
+
   /**
     @dev Deactivates the specified token by marking it as inactive.
     @param tokenAddress The address of the token to deactivate.
