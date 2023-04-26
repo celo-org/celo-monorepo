@@ -73,7 +73,7 @@ export class RpcSigner implements Signer {
 
   init = (privateKey: string, passphrase: string) =>
     this.callAndCheckResponse(RpcSignerEndpoint.ImportAccount, [
-      trimLeading0x(privateKey),
+      ensureLeading0x(privateKey),
       passphrase,
     ])
 
