@@ -1,4 +1,4 @@
-//TODO: (soloseng) fix: Argument of type 'string' is not assignable to parameter of type 'ProvidesHookCallback'.
+// TODO: (soloseng) fix: Argument of type 'string' is not assignable to parameter of type 'ProvidesHookCallback'.
 
 import { retryAsync } from '@celo/utils/lib/async'
 

@@ -10,9 +10,9 @@ import {
 } from '@celo/wallet-base'
 import * as ethUtil from '@ethereumjs/util'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
-import { keccak256 } from 'ethereum-cryptography/keccak'
 // @ts-ignore-next-line eth-lib types not found
 import { account as Account } from 'eth-lib'
+import { keccak256 } from 'ethereum-cryptography/keccak'
 import Web3 from 'web3'
 import { AddressValidation, LedgerWallet } from './ledger-wallet'
 

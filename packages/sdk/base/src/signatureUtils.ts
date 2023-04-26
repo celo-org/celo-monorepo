@@ -17,7 +17,7 @@ export function NativeSigner(
 }
 
 export interface Signature {
-  //TODO: (soloseng) should this be converted to Bigint?
+  // TODO: (soloseng) should this be converted to Bigint?
   v: number
   r: string
   s: string

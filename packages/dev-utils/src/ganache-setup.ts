@@ -75,7 +75,9 @@ async function launchServer(opts: { verbose?: boolean; from_targz?: boolean }, c
   })
 
   server.listen(8545, async (err: any) => {
-    if (err) throw err
+    if (err) {
+      throw err
+    }
   })
 
   return async () => {

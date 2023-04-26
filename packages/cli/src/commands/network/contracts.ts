@@ -57,7 +57,7 @@ export default class Contracts extends BaseCommand {
       }
     )
 
-    const tokenBalanceColumns: table.Columns<typeof contractInfo[number]> = {}
+    const tokenBalanceColumns: table.Columns<(typeof contractInfo)[number]> = {}
     await this.kit.celoTokens.forEachCeloToken(
       (token) =>
         (tokenBalanceColumns[token.symbol] = {

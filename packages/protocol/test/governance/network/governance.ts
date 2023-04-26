@@ -175,7 +175,7 @@ contract('Governance', (accounts: string[]) => {
       ),
     }
     salt = '0x657ed9d64e84fa3d1af43b3a307db22aba2d90a158015df1c588c02e24ca08f0'
-    const encoded_param = web3.eth.abi.encodeParameters(
+    const encodedParam = web3.eth.abi.encodeParameters(
       ['uint256[]', 'address[]', 'bytes', 'uint256[]', 'bytes32'],
       [
         [String(transactionSuccess1.value)],
@@ -186,7 +186,7 @@ contract('Governance', (accounts: string[]) => {
       ]
     )
 
-    hotfixHash = toBuffer(keccak256(hexToBytes(trimLeading0x(encoded_param))))
+    hotfixHash = toBuffer(keccak256(hexToBytes(trimLeading0x(encodedParam))))
     hotfixHashStr = bufferToHex(hotfixHash)
   })
 
@@ -3164,7 +3164,7 @@ contract('Governance', (accounts: string[]) => {
     )
 
     beforeEach(async () => {
-      for (let validator of validators) {
+      for (const validator of validators) {
         await accountsInstance.createAccount({ from: validator.account })
         const sig = await getParsedSignatureOfAddress(web3, validator.account, validator.signer)
         await accountsInstance.authorizeValidatorSigner(validator.signer, sig.v, sig.r, sig.s, {
@@ -3175,7 +3175,7 @@ contract('Governance', (accounts: string[]) => {
       }
     })
 
-    const whitelistFrom = (t: keyof typeof validators[0]) =>
+    const whitelistFrom = (t: keyof (typeof validators)[0]) =>
       concurrentMap(5, validators, (v) => governance.whitelistHotfix(newHotfixHash, { from: v[t] }))
 
     const checkTally = async () => {

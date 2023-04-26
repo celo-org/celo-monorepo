@@ -96,7 +96,7 @@ contract('Attestations', (accounts: string[]) => {
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     const tokenBalance = web3.utils.toWei('10', 'ether').toString()
-    for (let account of accounts) {
+    for (const account of accounts) {
       await mockERC20Token.mint(account, tokenBalance)
       await otherMockERC20Token.mint(account, tokenBalance)
       await accountsInstance.createAccount({ from: account })

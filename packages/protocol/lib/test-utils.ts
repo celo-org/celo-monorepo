@@ -8,6 +8,7 @@ import assert from 'assert';
 import BigNumber from 'bignumber.js';
 import chai from 'chai';
 import chaiSubset from 'chai-subset';
+// tslint:disable-next-line: ordered-imports
 import { SpawnOptions, spawn } from 'child_process';
 import { keccak256 } from 'ethereum-cryptography/keccak';
 import {

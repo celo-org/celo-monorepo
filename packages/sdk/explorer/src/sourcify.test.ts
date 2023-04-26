@@ -7,6 +7,7 @@ import {
   Provider,
 } from '@celo/connect'
 import Web3 from 'web3'
+// tslint:disable-next-line: ordered-imports
 import { Metadata, fetchMetadata, tryGetProxyImplementation } from './sourcify'
 
 // This is taken from protocol/contracts/build/Account.json

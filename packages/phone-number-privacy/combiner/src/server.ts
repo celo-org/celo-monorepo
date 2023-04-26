@@ -9,6 +9,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, RequestHandler, Response } from 'express'
+// tslint:disable-next-line: ordered-imports
 import { PerformanceObserver, performance } from 'perf_hooks'
 import { Controller } from './common/controller'
 import { CombinerConfig, getCombinerVersion } from './config'

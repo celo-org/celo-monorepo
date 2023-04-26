@@ -266,8 +266,10 @@ contract('FeeBurner', (accounts: string[]) => {
     })
 
     it("doesn't remove if the indexes doesn't match", async () => {
-      await assertTXRevertWithReason(feeBurner.removeRouter(tokenA.address, exchange.address, 0)),
+      await assertTXRevertWithReason(
+        feeBurner.removeRouter(tokenA.address, exchange.address, 0),
         'Index does not match'
+      )
     })
   })
 

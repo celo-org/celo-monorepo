@@ -4,7 +4,6 @@ import { inputCeloTxFormatter } from '@celo/connect/lib/utils/formatter'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import * as ethUtil from '@ethereumjs/util'
-import { bufferToHex } from '@ethereumjs/util'
 import debugFactory from 'debug'
 // @ts-ignore-next-line eth-lib types not found
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'

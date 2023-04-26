@@ -10,6 +10,7 @@ import {
   assertTXRevertWithReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+// tslint:disable-next-line: ordered-imports
 import { Signature, addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import _ from 'lodash'
