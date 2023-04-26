@@ -3,11 +3,11 @@ import { CeloTx, EncodedTransaction, RLPEncodedTx } from '@celo/connect'
 import { inputCeloTxFormatter } from '@celo/connect/lib/utils/formatter'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
+import * as ethUtil from '@ethereumjs/util'
 import { bufferToHex } from '@ethereumjs/util'
 import debugFactory from 'debug'
-// @ts-ignore-next-line
+// @ts-ignore-next-line eth-lib types not found
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
-import * as ethUtil from 'ethereumjs-util'
 
 const debug = debugFactory('wallet-base:tx:sign')
 

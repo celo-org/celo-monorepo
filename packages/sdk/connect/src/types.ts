@@ -48,11 +48,22 @@ export type CeloTxReceipt = TransactionReceipt & Partial<CeloParams>
 
 export type Callback<T> = (error: Error | null, result?: T) => void
 
+// export interface JsonRpcResponse {
+//   jsonrpc: string
+//   id: string | number
+//   result?: any
+//   error?: string | { message: string; code: number }
+// }
+
 export interface JsonRpcResponse {
   jsonrpc: string
-  id: number
+  id: string | number
   result?: any
-  error?: string | { message: string; code: number }
+  error?: {
+    readonly code?: number
+    readonly data?: unknown
+    readonly message: string
+  }
 }
 
 export interface JsonRpcPayload {
@@ -63,7 +74,23 @@ export interface JsonRpcPayload {
 }
 
 export interface Provider {
-  send(payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): void
+  send(
+    payload: JsonRpcPayload,
+    callback: (error: Error | null, result?: JsonRpcResponse) => void
+  ): void
+}
+
+export interface Error {
+  readonly code?: number
+  readonly data?: unknown
+  readonly message: string
+}
+
+export interface HttpProvider {
+  send(
+    payload: JsonRpcPayload,
+    callback: (error: Error | null, result?: JsonRpcResponse) => void
+  ): void
 }
 
 export interface RLPEncodedTx {

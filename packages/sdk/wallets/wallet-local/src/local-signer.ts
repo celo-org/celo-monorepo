@@ -4,9 +4,9 @@ import { computeSharedSecret as computeECDHSecret } from '@celo/utils/lib/ecdh'
 import { Decrypt } from '@celo/utils/lib/ecies'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { decodeSig, getHashFromEncoded } from '@celo/wallet-base'
-// @ts-ignore
+import * as ethUtil from '@ethereumjs/util'
+// @ts-ignore eth-lib types not found
 import { account as Account } from 'eth-lib'
-import * as ethUtil from 'ethereumjs-util'
 
 /**
  * Signs the EVM transaction using the provided private key
@@ -41,7 +41,7 @@ export class LocalSigner implements Signer {
 
     const sig = ethUtil.ecsign(msgHashBuff, pkBuffer)
     return {
-      v: parseInt(sig.v, 10),
+      v: Number(sig.v),
       r: Buffer.from(sig.r),
       s: Buffer.from(sig.s),
     }
@@ -54,7 +54,7 @@ export class LocalSigner implements Signer {
 
     const sig = ethUtil.ecsign(dataBuff, pkBuffer)
     return {
-      v: parseInt(sig.v, 10),
+      v: Number(sig.v),
       r: Buffer.from(sig.r),
       s: Buffer.from(sig.s),
     }

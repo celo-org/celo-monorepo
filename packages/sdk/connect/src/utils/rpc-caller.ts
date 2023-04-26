@@ -1,5 +1,5 @@
 import debugFactory from 'debug'
-import { Callback, JsonRpcPayload, JsonRpcResponse, Provider } from '../types'
+import { Callback, Error, HttpProvider, JsonRpcPayload, JsonRpcResponse, Provider } from '../types'
 
 const debugRpcPayload = debugFactory('rpc:payload')
 const debugRpcResponse = debugFactory('rpc:response')
@@ -53,7 +53,7 @@ function toRPCResponse(payload: JsonRpcPayload, result: any, error?: Error): Jso
 
   if (error != null) {
     response.error = {
-      message: error.message || error.stack || error.toString(),
+      message: error.message || error.toString(),
       code: -32000,
     }
   }
@@ -62,7 +62,10 @@ function toRPCResponse(payload: JsonRpcPayload, result: any, error?: Error): Jso
 
 export interface RpcCaller {
   call: (method: string, params: any[]) => Promise<JsonRpcResponse>
-  send: (payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>) => void
+  send: (
+    payload: JsonRpcPayload,
+    callback: (error: Error | null, result?: JsonRpcResponse) => void
+  ) => void
 }
 export class DefaultRpcCaller implements RpcCaller {
   constructor(readonly defaultProvider: Provider, readonly jsonrpcVersion: string = '2.0') {}
@@ -85,7 +88,68 @@ export class DefaultRpcCaller implements RpcCaller {
     })
   }
 
-  public send(payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>) {
+  public send(
+    payload: JsonRpcPayload,
+    callback: (error: Error | null, result?: JsonRpcResponse) => void
+  ): void {
+    debugRpcPayload('%O', payload)
+
+    const decoratedCallback: Callback<JsonRpcResponse> = (
+      error: Error | null,
+      result?: JsonRpcResponse
+    ): void => {
+      let err: Error | null = null
+      // error could be false
+      if (error) {
+        err = error
+      }
+      debugRpcResponse('%O', result)
+      // The provider send call will not provide an error to the callback if
+      // the result itself specifies an error. Here, we extract the error in the
+      // result.
+      if (
+        result &&
+        result.error != null &&
+        typeof result.error !== 'string' &&
+        result.error.message != null
+      ) {
+        err = new Error(result.error.message)
+      }
+      callback(err, result)
+    }
+
+    if (this.defaultProvider && typeof this.defaultProvider !== 'string') {
+      this.defaultProvider.send!(payload, decoratedCallback)
+    }
+  }
+}
+
+// TODO: @soloseng de-duplicate code by extending DefaultRpcCaller
+export class HttpRpcCaller implements RpcCaller {
+  constructor(readonly defaultProvider: HttpProvider, readonly jsonrpcVersion: string = '2.0') {}
+
+  public async call(method: string, params: any[]): Promise<JsonRpcResponse> {
+    return new Promise((resolve, reject) => {
+      const payload: JsonRpcPayload = {
+        id: getRandomId(),
+        jsonrpc: this.jsonrpcVersion,
+        method,
+        params,
+      }
+      this.send(payload, (err: any, response?: JsonRpcResponse) => {
+        if (err != null || !response) {
+          reject(err)
+        } else {
+          resolve(response)
+        }
+      })
+    })
+  }
+
+  public send(
+    payload: JsonRpcPayload,
+    callback: (error: Error | null, result?: JsonRpcResponse) => void
+  ): void {
     debugRpcPayload('%O', payload)
 
     const decoratedCallback: Callback<JsonRpcResponse> = (

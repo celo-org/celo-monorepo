@@ -27,12 +27,12 @@
     "@types/secp256k1": "^4.0.0",
     "@types/debug": "^4.1.5",
     "eth-lib": "^0.2.8",
-    "ethereumjs-util": "^5.2.0",
+    "@ethereumjs/util": "8.0.5",
     "asn1js": "^2.0.26",
     "elliptic": "^6.5.4",
     "secp256k1": "^4.0.0"
   },
   "engines": {
-    "node": ">=8.13.0"
+    "node": ">=8.14.2"
   }
 }

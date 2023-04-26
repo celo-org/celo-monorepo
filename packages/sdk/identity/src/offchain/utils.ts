@@ -3,8 +3,9 @@ import { Address, publicKeyToAddress } from '@celo/utils/lib/address'
 import { ensureCompressed, ensureUncompressed, trimUncompressedPrefix } from '@celo/utils/lib/ecdh'
 import { AES128Decrypt, AES128Encrypt, Encrypt, IV_LENGTH } from '@celo/utils/lib/ecies'
 import { EIP712Object, EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
+import { bufferToHex, toBuffer } from '@ethereumjs/util'
 import { createHmac, randomBytes } from 'crypto'
-import { keccak256 } from 'ethereumjs-util'
+import { keccak256 } from 'ethereum-cryptography/keccak'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { join, sep } from 'path'
@@ -316,7 +317,7 @@ export const buildEIP712TypedData = async <DataType>(
       ],
     }
     message = {
-      hash: keccak256(data).toString('hex'),
+      hash: bufferToHex(toBuffer(keccak256(data))),
     }
   } else {
     const Claim = buildEIP712Schema(type!)
