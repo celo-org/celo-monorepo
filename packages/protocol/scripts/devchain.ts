@@ -110,7 +110,11 @@ yargs
     (args) => exitOnError(compressChain(args.datadir, args.filename))
   ).argv
 
-async function startGanache(datadir: string, opts: { verbose?: boolean }) {
+async function startGanache(
+  datadir: string,
+  opts: { verbose?: boolean },
+  chainCopy?: tmp.DirResult
+) {
   const logFn = opts.verbose
     ? // tslint:disable-next-line: no-console
       (...args: any[]) => console.log(...args)
@@ -127,14 +131,20 @@ async function startGanache(datadir: string, opts: { verbose?: boolean }) {
   })
 
   server.listen(8545, async (err) => {
-    if (err) throw err
-
+    if (err) {
+      throw err
+    }
+    // tslint:disable-next-line: no-console
     console.log(chalk.red('Ganache STARTED'))
   })
 
   return async () => {
     try {
       await server.close()
+      if (chainCopy) {
+        chainCopy.removeCallback()
+      }
+      // tslint:disable-next-line: no-console
       console.log(chalk.red('GANACHE server closed'))
     } catch (e) {
       throw e
@@ -231,7 +241,7 @@ async function runDevChainFromTar(filename: string) {
 
   await decompressChain(filename, chainCopy.name)
 
-  const stopGanache = await startGanache(chainCopy.name, { verbose: true })
+  const stopGanache = await startGanache(chainCopy.name, { verbose: true }, chainCopy)
   return stopGanache
 }
 
