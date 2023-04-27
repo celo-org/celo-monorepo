@@ -181,6 +181,10 @@ contract FeeHandler is
     return tokenStates[tokenAddress].toDistribute;
   }
 
+  function getActiveTokens() public view returns (address[] memory) {
+    return activeTokens.values;
+  }
+
   /**
     @dev Sets the fee beneficiary address to the specified address.
     @param beneficiary The address to set as the fee beneficiary.
@@ -240,7 +244,10 @@ contract FeeHandler is
     activeTokens.add(tokenAddress);
   }
 
-  // TODO test me
+  /**
+    @notice Allows the owner to activate a specified token.
+    @param tokenAddress The address of the token to be activated.
+  */
   function activateToken(address tokenAddress) external onlyOwner {
     _activateToken(tokenAddress);
   }
@@ -265,20 +272,19 @@ contract FeeHandler is
     tokenState.active = false;
   }
 
-  // TODO test me
+  /**
+    @notice Allows the owner to set a handler contract for a specified token.
+    @param tokenAddress The address of the token to set the handler for.
+    @param handlerAddress The address of the handler contract to be set.
+  */
   function setHandler(address tokenAddress, address handlerAddress) external onlyOwner {
     _setHandler(tokenAddress, handlerAddress);
   }
 
-  // TODO test me
   function _setHandler(address tokenAddress, address handlerAddress) private {
     require(handlerAddress != address(0), "Can't set handler to zero, use deactivateToken");
     TokenState storage tokenState = tokenStates[tokenAddress];
     tokenState.handler = handlerAddress;
-  }
-
-  function getActiveTokens() public view returns (address[] memory) {
-    return activeTokens.values;
   }
 
   function removeToken(address tokenAddress) external onlyOwner {
@@ -290,10 +296,6 @@ contract FeeHandler is
     TokenState storage tokenState = tokenStates[tokenAddress];
     tokenState.handler = address(0);
   }
-
-  // function getMinimumReports() external returns(uint256){
-  //   return minimumReports;
-  // }
 
   function _sell(address tokenAddress) private onlyWhenNotFrozen nonReentrant {
     IERC20 token = IERC20(tokenAddress);

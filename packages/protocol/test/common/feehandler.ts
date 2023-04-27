@@ -231,6 +231,20 @@ contract('FeeHandler', (accounts: string[]) => {
     })
   })
 
+  describe('#setHandler()', () => {
+    it('sets handler', async () => {
+      await feeHandler.setHandler(stableToken.address, mentoSeller.address)
+      assert(await feeHandler.getTokenHandler(stableToken.address), mentoSeller.address)
+    })
+
+    it('Only owner can set handler', async () => {
+      await assertRevertWithReason(
+        feeHandler.setHandler(stableToken.address, mentoSeller.address, { from: user }),
+        'Ownable: caller is not the owner'
+      )
+    })
+  })
+
   describe('#addToken()', () => {
     it('adds it to the list', async () => {
       await feeHandler.addToken(stableToken.address, mentoSeller.address)
@@ -268,15 +282,21 @@ contract('FeeHandler', (accounts: string[]) => {
     })
   })
 
-  describe('#deactivateToken()', () => {
-    it('Removes form the list', async () => {
+  describe('#deactivateToken() and activateToken()', () => {
+    it('Removes form the list and adds it back', async () => {
       await feeHandler.addToken(stableToken.address, mentoSeller.address)
       await feeHandler.deactivateToken(stableToken.address)
       assert(
         (await feeHandler.getTokenActive(stableToken.address)) === false,
         'status is not active'
       )
+
       assert.sameMembers(await feeHandler.getActiveTokens(), [])
+
+      await feeHandler.activateToken(stableToken.address)
+      assert((await feeHandler.getTokenActive(stableToken.address)) === true, 'status is active')
+
+      assert.sameMembers(await feeHandler.getActiveTokens(), [stableToken.address])
     })
 
     it('Only owner can deactivate token', async () => {
