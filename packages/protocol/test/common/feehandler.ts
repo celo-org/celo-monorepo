@@ -1,8 +1,12 @@
-// /* tslint:disable */
-
 // TODO remove magic numbers
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertEqualBN, assertGtBN, assertRevert } from '@celo/protocol/lib/test-utils'
+import {
+  assertEqualBN,
+  assertGtBN,
+  assertRevert,
+  assertRevertWithReason,
+  timeTravel,
+} from '@celo/protocol/lib/test-utils' //
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
@@ -24,6 +28,10 @@ import {
   MockReserveInstance,
   MockSortedOraclesContract,
   MockSortedOraclesInstance,
+  MockUniswapV2FactoryContract,
+  MockUniswapV2FactoryInstance,
+  MockUniswapV2Router02Contract,
+  MockUniswapV2Router02Instance,
   RegistryContract,
   RegistryInstance,
   StableTokenContract,
@@ -33,7 +41,7 @@ import {
   UniswapFeeHandlerSellerContract,
   UniswapFeeHandlerSellerInstance,
 } from 'types'
-import { SECONDS_IN_A_WEEK } from '../constants'
+import { SECONDS_IN_A_WEEK, ZERO_ADDRESS } from '../constants'
 
 const goldAmountForRate = new BigNumber('1000000000000000000000000')
 const stableAmountForRate = new BigNumber(2).times(goldAmountForRate)
@@ -53,6 +61,9 @@ const StableToken: StableTokenContract = artifacts.require('StableToken')
 const StableTokenEUR: StableTokenEURContract = artifacts.require('StableTokenEUR')
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const ERC20: MockERC20Contract = artifacts.require('MockERC20')
+
+const UniswapRouter: MockUniswapV2Router02Contract = artifacts.require('MockUniswapV2Router02')
+const UniswapV2Factory: MockUniswapV2FactoryContract = artifacts.require('MockUniswapV2Factory')
 
 const FeeCurrencyWhitelist: FeeCurrencyWhitelistContract = artifacts.require('FeeCurrencyWhitelist')
 
@@ -80,6 +91,12 @@ contract('FeeHandler', (accounts: string[]) => {
   let mentoSeller: MentoFeeHandlerSellerInstance
   let uniswapFeeHandlerSeller: UniswapFeeHandlerSellerInstance
   let tokenA: MockERC20Instance
+
+  let uniswapFactory: MockUniswapV2FactoryInstance
+  let uniswapFactory2: MockUniswapV2FactoryInstance
+  let uniswap: MockUniswapV2Router02Instance
+  let uniswap2: MockUniswapV2Router02Instance
+  let deadline
 
   let feeCurrencyWhitelist: FeeCurrencyWhitelistInstance
 
@@ -126,7 +143,7 @@ contract('FeeHandler', (accounts: string[]) => {
     await mockReserve.addToken(stableToken.address)
     await mockReserve.addToken(stableToken2.address)
 
-    await mentoSeller.initialize(registry.address)
+    await mentoSeller.initialize(registry.address, [], [])
 
     await goldToken.initialize(registry.address)
     // TODO: use MockStableToken for this
@@ -214,12 +231,27 @@ contract('FeeHandler', (accounts: string[]) => {
     })
   })
 
+  describe('#setHandler()', () => {
+    it('sets handler', async () => {
+      await feeHandler.setHandler(stableToken.address, mentoSeller.address)
+      assert(await feeHandler.getTokenHandler(stableToken.address), mentoSeller.address)
+    })
+
+    it('Only owner can set handler', async () => {
+      await assertRevertWithReason(
+        feeHandler.setHandler(stableToken.address, mentoSeller.address, { from: user }),
+        'Ownable: caller is not the owner'
+      )
+    })
+  })
+
   describe('#addToken()', () => {
     it('adds it to the list', async () => {
       await feeHandler.addToken(stableToken.address, mentoSeller.address)
       assert.sameMembers(await feeHandler.getActiveTokens(), [stableToken.address])
       const handlerAddress = await feeHandler.getTokenHandler(stableToken.address)
       assert(await feeHandler.getTokenActive(stableToken.address), 'status added as active')
+      assert.sameMembers(await feeHandler.getActiveTokens(), [stableToken.address])
       assert(
         handlerAddress.toLocaleLowerCase() === mentoSeller.address.toLowerCase(),
         'handler is correct'
@@ -230,6 +262,45 @@ contract('FeeHandler', (accounts: string[]) => {
       await assertRevert(
         feeHandler.addToken(stableToken.address, mentoSeller.address, { from: user })
       )
+    })
+  })
+
+  describe('#removeToken()', () => {
+    it('Removes form the list', async () => {
+      await feeHandler.addToken(stableToken.address, mentoSeller.address)
+      await feeHandler.removeToken(stableToken.address)
+      assert(
+        (await feeHandler.getTokenActive(stableToken.address)) === false,
+        'status is not active'
+      )
+      assert.sameMembers(await feeHandler.getActiveTokens(), [])
+      assert((await feeHandler.getTokenHandler(stableToken.address)) === ZERO_ADDRESS)
+    })
+
+    it('Only owner can remove token', async () => {
+      await assertRevert(feeHandler.removeToken(stableToken.address, { from: user }))
+    })
+  })
+
+  describe('#deactivateToken() and activateToken()', () => {
+    it('Removes form the list and adds it back', async () => {
+      await feeHandler.addToken(stableToken.address, mentoSeller.address)
+      await feeHandler.deactivateToken(stableToken.address)
+      assert(
+        (await feeHandler.getTokenActive(stableToken.address)) === false,
+        'status is not active'
+      )
+
+      assert.sameMembers(await feeHandler.getActiveTokens(), [])
+
+      await feeHandler.activateToken(stableToken.address)
+      assert((await feeHandler.getTokenActive(stableToken.address)) === true, 'status is active')
+
+      assert.sameMembers(await feeHandler.getActiveTokens(), [stableToken.address])
+    })
+
+    it('Only owner can deactivate token', async () => {
+      await assertRevert(feeHandler.deactivateToken(stableToken.address, { from: user }))
     })
   })
 
@@ -246,27 +317,43 @@ contract('FeeHandler', (accounts: string[]) => {
 
   describe('#distribute()', () => {
     beforeEach(async () => {
-      const goldTokenAmount = new BigNumber(1e18)
-
-      await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
-      await exchange.sell(goldTokenAmount, 0, true, { from: user })
-      await feeHandler.addToken(stableToken.address, mentoSeller.address)
-      await feeHandler.setBurnFraction(toFixed(80 / 100))
-      await stableToken.transfer(feeHandler.address, new BigNumber('1e18'), {
-        from: user,
-      })
-
       await feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS)
-      await feeHandler.sell(stableToken.address)
     })
 
-    it('distributes after a burn', async () => {
-      await feeHandler.distribute(stableToken.address)
+    it("Can't distribute when frozen", async () => {
+      await freezer.freeze(feeHandler.address)
+      await assertRevert(feeHandler.distribute(stableToken.address))
+    })
+
+    it("doesn't distribute when balance is zero", async () => {
       assertEqualBN(await stableToken.balanceOf(feeHandler.address), 0)
-      assertEqualBN(
-        await stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS),
-        new BigNumber('0.2e18')
-      )
+      const res = await feeHandler.distribute(stableToken.address)
+      assert(res.logs.length === 0, 'No transfer should be done (nor event emitted)')
+    })
+
+    describe('#distribute() with balance', () => {
+      beforeEach(async () => {
+        const goldTokenAmount = new BigNumber(1e18)
+
+        await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
+        await exchange.sell(goldTokenAmount, 0, true, { from: user })
+        await feeHandler.addToken(stableToken.address, mentoSeller.address)
+        await feeHandler.setBurnFraction(toFixed(80 / 100))
+        await stableToken.transfer(feeHandler.address, new BigNumber('1e18'), {
+          from: user,
+        })
+
+        await feeHandler.sell(stableToken.address)
+      })
+
+      it('distributes after a burn', async () => {
+        await feeHandler.distribute(stableToken.address)
+        assertEqualBN(await stableToken.balanceOf(feeHandler.address), 0)
+        assertEqualBN(
+          await stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS),
+          new BigNumber('0.2e18')
+        )
+      })
     })
   })
 
@@ -286,7 +373,7 @@ contract('FeeHandler', (accounts: string[]) => {
       assertEqualBN(await goldToken.getBurnedAmount(), new BigNumber('0.8e18'))
     })
 
-    it("Doesn't burn what it's pending distributio", async () => {
+    it("Doesn't burn what it's pending distribution", async () => {
       const previousBurn = await goldToken.getBurnedAmount() // status is not reset inbetween tests, so keep track of the previus burn
 
       await feeHandler.burnCelo()
@@ -315,6 +402,11 @@ contract('FeeHandler', (accounts: string[]) => {
       await feeHandler.setBurnFraction(toFixed(80 / 100))
     })
 
+    it("Can't sell when frozen", async () => {
+      await freezer.freeze(feeHandler.address)
+      await assertRevert(feeHandler.sell(stableToken.address))
+    })
+
     describe('Mento tokens', async () => {
       beforeEach(async () => {
         const goldTokenAmount = new BigNumber(1e18)
@@ -324,48 +416,271 @@ contract('FeeHandler', (accounts: string[]) => {
         await feeHandler.addToken(stableToken.address, mentoSeller.address)
       })
 
-      it('burns with mento', async () => {
-        await stableToken.transfer(feeHandler.address, new BigNumber('1e18'), {
+      it("doesn't sell when balance is low", async () => {
+        await stableToken.transfer(feeHandler.address, new BigNumber(await feeHandler.MIN_BURN()), {
           from: user,
         })
-        assertEqualBN(await feeHandler.getPastBurnForToken(stableToken.address), 0)
-        const burnedAmountStable = await stableToken.balanceOf(feeHandler.address)
+
+        const balanceBefore = await stableToken.balanceOf(feeHandler.address)
+
         await feeHandler.sell(stableToken.address)
-        assertEqualBN(
-          await feeHandler.getPastBurnForToken(stableToken.address),
-          new BigNumber(burnedAmountStable).multipliedBy('0.8')
-        )
-        assertEqualBN(await stableToken.balanceOf(feeHandler.address), new BigNumber('0.2e18'))
-        assertEqualBN(
-          await feeHandler.getTokenToDistribute(stableToken.address),
-          new BigNumber('0.2e18')
-        )
+
+        assertEqualBN(await stableToken.balanceOf(feeHandler.address), balanceBefore)
       })
 
-      it("Doesn't burn balance if it hasn't distributed", async () => {
-        await stableToken.transfer(feeHandler.address, new BigNumber('1e18'), {
+      it('reset burn limit after 24 hours', async () => {
+        await feeHandler.setDailySellLimit(stableToken.address, new BigNumber(1000))
+
+        await stableToken.transfer(feeHandler.address, new BigNumber(3000), {
           from: user,
         })
+
         await feeHandler.sell(stableToken.address)
-        const balanceFefore = await stableToken.balanceOf(feeHandler.address)
+        await timeTravel(3600 * 24, web3)
         await feeHandler.sell(stableToken.address)
 
-        assertEqualBN(balanceFefore, await stableToken.balanceOf(feeHandler.address))
+        assertEqualBN(await stableToken.balanceOf(feeHandler.address), new BigNumber(1000))
+      })
+
+      it("doesn't burn when bigger than limit", async () => {
+        await feeHandler.setDailySellLimit(stableToken.address, new BigNumber(1000))
+
+        await stableToken.transfer(feeHandler.address, new BigNumber(3000), {
+          from: user,
+        })
+
+        await feeHandler.sell(stableToken.address)
+
+        assertEqualBN(await stableToken.balanceOf(feeHandler.address), new BigNumber(2000))
+
+        // burning again shouldn't do anything
+        await feeHandler.sell(stableToken.address)
+        assertEqualBN(await stableToken.balanceOf(feeHandler.address), new BigNumber(2000))
+      })
+
+      describe('load balance', async () => {
+        beforeEach(async () => {
+          await stableToken.transfer(feeHandler.address, new BigNumber('1e18'), {
+            from: user,
+          })
+        })
+
+        it('burns with mento', async () => {
+          assertEqualBN(await feeHandler.getPastBurnForToken(stableToken.address), 0)
+          const burnedAmountStable = await stableToken.balanceOf(feeHandler.address)
+          await feeHandler.sell(stableToken.address)
+          assertEqualBN(
+            await feeHandler.getPastBurnForToken(stableToken.address),
+            new BigNumber(burnedAmountStable).multipliedBy('0.8')
+          )
+          assertEqualBN(await stableToken.balanceOf(feeHandler.address), new BigNumber('0.2e18'))
+          assertEqualBN(
+            await feeHandler.getTokenToDistribute(stableToken.address),
+            new BigNumber('0.2e18')
+          )
+        })
+
+        it("Doesn't exchange when not enough reports", async () => {
+          await mentoSeller.setMinimumReports(tokenA.address, 2)
+          const balanceBefore = await stableToken.balanceOf(feeHandler.address) // TODO this balance is wrong
+          await feeHandler.setMaxSplippage(tokenA.address, maxSlippage)
+          await assertRevert(feeHandler.sell(tokenA.address))
+          assertEqualBN(await stableToken.balanceOf(feeHandler.address), balanceBefore)
+        })
+
+        it("Doesn't burn balance if it hasn't distributed", async () => {
+          await feeHandler.sell(stableToken.address)
+          const balanceFefore = await stableToken.balanceOf(feeHandler.address)
+          await feeHandler.sell(stableToken.address)
+
+          assertEqualBN(balanceFefore, await stableToken.balanceOf(feeHandler.address))
+        })
       })
     })
 
-    describe('Other tokens (non-Mento)', async () => {
+    describe('Other tokens (non-Mento) (if this fails with "revert" please read comments of this tests)', async () => {
+      // Uniswap can get the address of a pair by using an init code pair hash. Unfortunately, this hash is harcoded
+      // in the file UniswapV2Library.sol. The hash writen now there is meant to run in the CI. If you're seeing this problem you can
+      // 1. Skip these tests locally, as they will run in the CI anyway or
+      // 2. Change the hash, you can get the hash for the parciular test deployment with the following:
+      // // tslint:disable-next-line
+      // console.log('Uniswap INIT CODE PAIR HASH:', await uniswapFactory.INIT_CODE_PAIR_HASH())
       beforeEach(async () => {
+        deadline = (await web3.eth.getBlock('latest')).timestamp + 100
+
+        uniswapFactory = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
+
+        uniswap = await UniswapRouter.new(
+          uniswapFactory.address,
+          '0x0000000000000000000000000000000000000000'
+        ) // _factory, _WETH
+
+        uniswapFactory2 = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
+
+        uniswap2 = await UniswapRouter.new(
+          uniswapFactory2.address,
+          '0x0000000000000000000000000000000000000000'
+        ) // _factory, _WETH
+
+        await feeCurrencyWhitelist.addNonMentoToken(tokenA.address)
+
+        await uniswapFeeHandlerSeller.initialize(registry.address, [], [])
+        await uniswapFeeHandlerSeller.setRouter(tokenA.address, uniswap.address)
+        await tokenA.mint(feeHandler.address, new BigNumber(10e18))
+        await tokenA.mint(user, new BigNumber(10e18))
+        await goldToken.transfer(user, new BigNumber(10e18))
+        const toTransfer = new BigNumber(5e18)
+
+        await tokenA.approve(uniswap.address, toTransfer, { from: user })
+        await goldToken.approve(uniswap.address, toTransfer, { from: user })
+
+        await uniswap.addLiquidity(
+          tokenA.address,
+          goldToken.address,
+          toTransfer,
+          toTransfer,
+          toTransfer,
+          toTransfer,
+          user,
+          deadline,
+          { from: user }
+        )
+
         await feeHandler.addToken(tokenA.address, uniswapFeeHandlerSeller.address)
       })
 
-      it('sells nonMento tokens', async () => {
-        // TODO complete when able to burn nonMento tokens
+      describe('Oracle check', async () => {
+        beforeEach(async () => {
+          await uniswapFeeHandlerSeller.setMinimumReports(tokenA.address, 1)
+          // tolerate high slippage, just to activate oracle check
+          await feeHandler.setMaxSplippage(tokenA.address, toFixed(99 / 100))
+          await mockSortedOracles.setMedianRate(
+            tokenA.address,
+            new BigNumber(1).times(goldAmountForRate)
+          )
+        })
+
+        it("Doesn't exchange when not enough reports", async () => {
+          await assertRevertWithReason(
+            feeHandler.sell(tokenA.address),
+            'Number of reports for token not enough'
+          )
+          assertEqualBN(await tokenA.balanceOf(feeHandler.address), new BigNumber(10e18))
+        })
+
+        it('Works with check', async () => {
+          await mockSortedOracles.setNumRates(tokenA.address, 2)
+          await feeHandler.sell(tokenA.address)
+          assertEqualBN(await tokenA.balanceOf(feeHandler.address), new BigNumber('2e18'))
+        })
+
+        it('Fails when oracle slippage is high check', async () => {
+          await mockSortedOracles.setNumRates(tokenA.address, 2)
+          await feeHandler.setMaxSplippage(tokenA.address, toFixed(80 / 100))
+          // The next tx is the one that should cause the revert, forcing a very
+          await mockSortedOracles.setMedianRate(
+            tokenA.address,
+            new BigNumber('300').times(goldAmountForRate)
+          )
+          await assertRevertWithReason(
+            feeHandler.sell(tokenA.address),
+            'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'
+          )
+        })
+      })
+
+      it('Uniswap trade test', async () => {
+        // Make sure our uniswap mock works
+
+        const balanceAbefore = await tokenA.balanceOf(user)
+        const balanceBbefore = await goldToken.balanceOf(user)
+
+        await tokenA.approve(uniswap.address, new BigNumber(1e18), { from: user })
+        await uniswap.swapExactTokensForTokens(
+          new BigNumber(1e18),
+          0,
+          [tokenA.address, goldToken.address],
+          user,
+          deadline,
+          { from: user }
+        )
+
+        assertGtBN(balanceAbefore, await tokenA.balanceOf(user))
+        assertGtBN(await goldToken.balanceOf(user), balanceBbefore)
+      })
+
+      it('Sells non-Mento tokens', async () => {
+        // await tokenA.mint(feeHandler.address, new BigNumber(10e18))
+
+        // safety check, check that the balance is not empty before the burn
+        await assertGtBN(await tokenA.balanceOf(feeHandler.address), 0)
+        await feeHandler.sell(tokenA.address)
+
+        // Burns only burn fraction, not all
+        assertEqualBN(await tokenA.balanceOf(feeHandler.address), new BigNumber('2e18'))
+      })
+
+      it("Doesn't exchange when slippage is too high", async () => {
+        await feeHandler.setMaxSplippage(tokenA.address, maxSlippage)
+        await assertRevertWithReason(
+          feeHandler.sell(tokenA.address),
+          'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'
+        )
+        assertEqualBN(await tokenA.balanceOf(feeHandler.address), new BigNumber(10e18))
+      })
+
+      it('Tries to get the best rate with many exchanges', async () => {
+        await uniswapFeeHandlerSeller.setRouter(tokenA.address, uniswap2.address)
+        await tokenA.mint(user, new BigNumber(10e18))
+
+        // safety check, check that the balance is no empty before the burn
+        await assertGtBN(await tokenA.balanceOf(feeHandler.address), 0)
+
+        const toTransfer = new BigNumber(10e18) // make uniswap2 bigger, so it should get used
+
+        await tokenA.approve(uniswap2.address, toTransfer, { from: user })
+        await goldToken.approve(uniswap2.address, toTransfer, { from: user })
+
+        await uniswap2.addLiquidity(
+          tokenA.address,
+          goldToken.address,
+          toTransfer,
+          toTransfer,
+          toTransfer,
+          toTransfer,
+          user,
+          deadline,
+          { from: user }
+        )
+
+        const quote1before = (
+          await uniswap.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address])
+        )[1]
+        const quote2before = (
+          await uniswap2.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address])
+        )[1]
+
+        await feeHandler.sell(tokenA.address)
+
+        // liquidity should have been taken of uniswap2, because it has better liquidity, and thus higher quote
+        // so the quote gets worse (smaller number)
+
+        const quote1after = (
+          await uniswap.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address])
+        )[1]
+        const quote2after = (
+          await uniswap2.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address])
+        )[1]
+
+        assertEqualBN(quote1before, quote1after) // uniswap 1 should be untouched
+        assertGtBN(quote2before, quote2after)
+
+        assertEqualBN(await tokenA.balanceOf(feeHandler.address), new BigNumber('2e18')) // check that it burned
       })
     })
   })
 
-  describe('#handle()', () => {
+  describe('#handle() (Mento tokens only)', () => {
     beforeEach(async () => {
       await goldToken.transfer(feeHandler.address, new BigNumber('1e18'), {
         from: user,
@@ -461,10 +776,10 @@ contract('FeeHandler', (accounts: string[]) => {
     })
   })
 
-  describe('#setDailyBurnLimit()', () => {
+  describe('#setDailySellLimit()', () => {
     it('should only be called by owner', async () => {
       await assertRevert(
-        feeHandler.setDailyBurnLimit(stableToken.address, goldAmountForRate, { from: user })
+        feeHandler.setDailySellLimit(stableToken.address, goldAmountForRate, { from: user })
       )
     })
   })

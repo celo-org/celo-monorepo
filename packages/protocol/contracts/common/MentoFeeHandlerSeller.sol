@@ -1,7 +1,8 @@
 pragma solidity ^0.5.13;
 
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/interfaces/IFeeHandlerSeller.sol";
-
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../stability/interfaces/IExchange.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 import "./UsingRegistry.sol";
@@ -9,8 +10,10 @@ import "../stability/StableToken.sol";
 import "../common/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "../common/Initializable.sol";
+import "./FeeHandlerSeller.sol";
 
-contract MentoFeeHandlerSeller is IFeeHandlerSeller, UsingRegistry, Initializable {
+contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
+  using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
   /**
@@ -19,12 +22,8 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, UsingRegistry, Initializabl
    */
   constructor(bool test) public Initializable(test) {}
 
+  // without this line the contract can't receive native Celo transfers
   function() external payable {}
-
-  function initialize(address _registryAddress) external initializer {
-    _transferOwnership(msg.sender);
-    setRegistry(_registryAddress);
-  }
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
@@ -58,11 +57,14 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, UsingRegistry, Initializabl
     uint256 minAmount = 0;
     if (maxSlippage != 0) {
       // max slippage is set
-      // use sorted oracles as reference
 
-      // TODO check amount of reports or that the bucket hasn't been updated in 5 minutes
-      // safetyCheck() or modifier
       ISortedOracles sortedOracles = getSortedOracles();
+
+      require(
+        sortedOracles.numRates(sellTokenAddress) >= minimumReports[sellTokenAddress],
+        "Number of reports for token not enough"
+      );
+
       (uint256 rateNumerator, uint256 rateDenominator) = sortedOracles.medianRate(sellTokenAddress);
       minAmount = calculateMinAmount(rateNumerator, rateDenominator, amount, maxSlippage);
     }
@@ -73,39 +75,7 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, UsingRegistry, Initializabl
 
     IERC20 goldToken = getGoldToken();
     goldToken.transfer(msg.sender, goldToken.balanceOf(address(this)));
+
+    emit TokenSold(sellTokenAddress, amount);
   }
-
-  // TODO move this to abstract class
-  function calculateMinAmount(
-    uint256 midPriceNumerator,
-    uint256 midPriceDenominator,
-    uint256 amount,
-    uint256 maxSlippage // as fraction
-  )
-    public
-    pure
-    returns (
-      // FixidityLib.Fraction memory maxSlippage
-      uint256
-    )
-  {
-    FixidityLib.Fraction memory maxSlippageFraction = FixidityLib.wrap(maxSlippage);
-
-    FixidityLib.Fraction memory price = FixidityLib.newFixedFraction(
-      midPriceNumerator,
-      midPriceDenominator
-    );
-    FixidityLib.Fraction memory amountFraction = FixidityLib.newFixed(amount);
-    FixidityLib.Fraction memory totalAmount = price.multiply(amountFraction);
-
-    return
-      totalAmount
-        .subtract(price.multiply(maxSlippageFraction).multiply(amountFraction))
-        .fromFixed();
-  }
-
-  function bestQuote(address token, uint256 balance) external {}
-
-  // in case some funds need to be returned or moved to another contract
-  function transfer(address token, uint256 amount, address to) external {}
 }
