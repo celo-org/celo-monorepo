@@ -14,6 +14,7 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
   mapping(address => uint256) public minimumReports;
 
   event MinimumReportsSet(address tokenAddress, uint256 minimumReports);
+  event TokenSold(address tokenAddress, uint256 amount);
 
   function initialize(
     address _registryAddress,

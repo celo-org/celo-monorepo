@@ -16,13 +16,7 @@ import "./FeeHandlerSeller.sol";
 import "../uniswap/interfaces/IUniswapV2RouterMin.sol";
 import "../uniswap/interfaces/IUniswapV2FactoryMin.sol";
 
-contract UniswapFeeHandlerSeller is
-  IFeeHandlerSeller,
-  // Ownable,
-  // UsingRegistry,
-  // Initializable,
-  FeeHandlerSeller
-{
+contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -165,7 +159,7 @@ contract UniswapFeeHandlerSeller is
       path[0] = sellTokenAddress;
       path[1] = address(celoToken);
 
-      // Using the second return value becuase it's the last argument
+      // Using the second return value becuase it's the last argument,
       // the previous values show how many tokens are exchanged in each path
       // so the first value would be equivalent to balanceToBurn
       uint256 wouldGet = router.getAmountsOut(amount, path)[1];
@@ -195,5 +189,6 @@ contract UniswapFeeHandlerSeller is
 
     celoToken.transfer(msg.sender, celoToken.balanceOf(address(this)));
     emit RouterUsed(address(bestRouter));
+    emit TokenSold(sellTokenAddress, amount);
   }
 }

@@ -12,13 +12,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "../common/Initializable.sol";
 import "./FeeHandlerSeller.sol";
 
-contract MentoFeeHandlerSeller is
-  IFeeHandlerSeller,
-  // Ownable,
-  // UsingRegistry,
-  // Initializable,
-  FeeHandlerSeller
-{
+contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -81,5 +75,7 @@ contract MentoFeeHandlerSeller is
 
     IERC20 goldToken = getGoldToken();
     goldToken.transfer(msg.sender, goldToken.balanceOf(address(this)));
+
+    emit TokenSold(sellTokenAddress, amount);
   }
 }
