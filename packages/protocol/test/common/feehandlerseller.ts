@@ -73,4 +73,19 @@ contract('FeeHandlerSeller', (accounts: string[]) => {
       }
     })
   })
+
+  describe('#setMinimumReports()', () => {
+    it(`setMinimumReports works`, async () => {
+      for (const contract of contractsToTest) {
+        await contract.setMinimumReports(goldToken.address, 15)
+        assertEqualBN(await contract.minimumReports(goldToken.address), 15)
+      }
+    })
+
+    it('only owner can setMinimumReports', async () => {
+      for (const contract of contractsToTest) {
+        await assertRevert(contract.setMinimumReports(goldToken.address, 1, { from: user }))
+      }
+    })
+  })
 })
