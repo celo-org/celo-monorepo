@@ -4,7 +4,7 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { toFixed } from '@celo/utils/src/fixidity'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import { FeeHandlerInstance, MentoFeeHandlerSellerInstance, StableTokenInstance } from 'types'
 
 const initializeArgs = async () => {

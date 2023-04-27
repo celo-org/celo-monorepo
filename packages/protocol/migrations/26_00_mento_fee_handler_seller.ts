@@ -4,7 +4,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { MentoFeeHandlerSellerInstance } from 'types'
 
 const initializeArgs = async () => {
-  return [config.registry.predeployedProxyAddress]
+  return [config.registry.predeployedProxyAddress, [], []]
 }
 
 module.exports = deploymentForCoreContract<MentoFeeHandlerSellerInstance>(

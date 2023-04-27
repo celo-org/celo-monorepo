@@ -41,6 +41,7 @@ export enum CeloContractName {
   StableTokenEUR = 'StableTokenEUR',
   StableTokenBRL = 'StableTokenBRL',
   TransferWhitelist = 'TransferWhitelist',
+  UniswapFeeHandlerSeller = 'UniswapFeeHandlerSeller',
   Validators = 'Validators',
 }
 
