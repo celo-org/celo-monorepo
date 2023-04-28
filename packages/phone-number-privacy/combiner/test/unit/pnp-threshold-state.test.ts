@@ -28,11 +28,14 @@ describe('pnp threshold state', () => {
     const mockRequest = {
       body: {},
     } as Request
+
+    // @ts-ignore: missing some properties
     const mockResponse = {
       locals: {
         logger: rootLogger,
       },
     } as Response
+
     const session = new Session<PnpQuotaRequest | SignMessageRequest>(
       mockRequest,
       mockResponse,
