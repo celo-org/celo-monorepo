@@ -9,7 +9,6 @@ export class ArtifactsSingleton {
 
   private static instances: { [key: string]: ArtifactsSingleton } = {}
 
-  public initialized = false
   public artifacts: { [key: string]: any } = {}
   private constructor() {}
 

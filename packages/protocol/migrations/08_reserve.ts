@@ -39,7 +39,7 @@ const initializeArgs = async (): Promise<
     config.reserve.tobinTaxReserveRatio,
   ]
 }
-console.log('Singleton initialized', ArtifactsSingleton.getInstance('mento').initialized)
+// console.log('Singleton initialized', ArtifactsSingleton.getInstance('mento').initialized)
 
 module.exports = deploymentForCoreContract<ReserveInstance>(
   web3,
