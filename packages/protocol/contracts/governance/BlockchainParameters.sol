@@ -11,12 +11,6 @@ import "../common/UsingPrecompiles.sol";
 contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   using SafeMath for uint256;
 
-  struct ClientVersion {
-    uint256 major;
-    uint256 minor;
-    uint256 patch;
-  }
-
   struct LookbackWindow {
     // Value for lookbackWindow before `nextValueActivationBlock`
     uint256 oldValue;
@@ -26,7 +20,6 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
     uint256 nextValueActivationEpoch;
   }
 
-  ClientVersion private minimumClientVersion;
   uint256 public blockGasLimit;
   uint256 public intrinsicGasForAlternativeFeeCurrency;
   LookbackWindow public uptimeLookbackWindow;
@@ -43,21 +36,14 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-   * @param major Minimum client version that can be used in the chain, major version.
-   * @param minor Minimum client version that can be used in the chain, minor version.
-   * @param patch Minimum client version that can be used in the chain, patch level.
    * @param _gasForNonGoldCurrencies Intrinsic gas for non-gold gas currencies.
    * @param gasLimit Block gas limit.
    * @param lookbackWindow Lookback window for measuring validator uptime.
    */
-  function initialize(
-    uint256 major,
-    uint256 minor,
-    uint256 patch,
-    uint256 _gasForNonGoldCurrencies,
-    uint256 gasLimit,
-    uint256 lookbackWindow
-  ) external initializer {
+  function initialize(uint256 _gasForNonGoldCurrencies, uint256 gasLimit, uint256 lookbackWindow)
+    external
+    initializer
+  {
     _transferOwnership(msg.sender);
     setBlockGasLimit(gasLimit);
     setIntrinsicGasForAlternativeFeeCurrency(_gasForNonGoldCurrencies);
@@ -72,7 +58,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 0);
+    return (2, 2, 0, 0);
   }
 
   /**

@@ -20,11 +20,6 @@ const EPOCH = 100
 
 contract('BlockchainParameters', (accounts: string[]) => {
   let blockchainParameters: BlockchainParametersInstance
-  const version = {
-    major: 1,
-    minor: 8,
-    patch: 2,
-  }
   const gasLimit = 7000000
   const gasForNonGoldCurrencies = 50000
 
@@ -150,14 +145,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
     const lookbackWindow = 20
 
     it('should set the variables', async () => {
-      await blockchainParameters.initialize(
-        version.major,
-        version.minor,
-        version.patch,
-        gasForNonGoldCurrencies,
-        gasLimit,
-        lookbackWindow
-      )
+      await blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow)
       assert.equal((await blockchainParameters.blockGasLimit()).toNumber(), gasLimit)
 
       // need to wait an epoch for uptimeLookbackWindow
@@ -169,14 +157,11 @@ contract('BlockchainParameters', (accounts: string[]) => {
     })
     it('should emit correct events', async () => {
       const resp = await blockchainParameters.initialize(
-        version.major,
-        version.minor,
-        version.patch,
         gasForNonGoldCurrencies,
         gasLimit,
         lookbackWindow
       )
-      assert.equal(resp.logs.length, 5)
+      assert.equal(resp.logs.length, 4)
       assertContainSubset(resp.logs[2], {
         event: 'IntrinsicGasForAlternativeFeeCurrencySet',
         args: {
