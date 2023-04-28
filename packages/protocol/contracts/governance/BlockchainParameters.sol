@@ -31,7 +31,6 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   uint256 public intrinsicGasForAlternativeFeeCurrency;
   LookbackWindow public uptimeLookbackWindow;
 
-  event MinimumClientVersionSet(uint256 major, uint256 minor, uint256 patch);
   event IntrinsicGasForAlternativeFeeCurrencySet(uint256 gas);
   event BlockGasLimitSet(uint256 limit);
   event UptimeLookbackWindowSet(uint256 window, uint256 activationEpoch);
@@ -60,7 +59,6 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
     uint256 lookbackWindow
   ) external initializer {
     _transferOwnership(msg.sender);
-    setMinimumClientVersion(major, minor, patch);
     setBlockGasLimit(gasLimit);
     setIntrinsicGasForAlternativeFeeCurrency(_gasForNonGoldCurrencies);
     setUptimeLookbackWindow(lookbackWindow);
@@ -75,21 +73,6 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 2, 0, 0);
-  }
-
-  /**
-   * @notice Sets the minimum client version.
-   * @param major Major version.
-   * @param minor Minor version.
-   * @param patch Patch version.
-   * @dev For example if the version is 1.9.2, 1 is the major version, 9 is minor,
-   * and 2 is the patch level.
-   */
-  function setMinimumClientVersion(uint256 major, uint256 minor, uint256 patch) public onlyOwner {
-    minimumClientVersion.major = major;
-    minimumClientVersion.minor = minor;
-    minimumClientVersion.patch = patch;
-    emit MinimumClientVersionSet(major, minor, patch);
   }
 
   /**
@@ -147,20 +130,6 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
     } else {
       return uptimeLookbackWindow.oldValue;
     }
-  }
-
-  /**
-   * @notice Query minimum client version.   
-   * @return Major version number.
-   * @return Minor version number.
-   * @return Patch version number.
-   */
-  function getMinimumClientVersion()
-    external
-    view
-    returns (uint256 major, uint256 minor, uint256 patch)
-  {
-    return (minimumClientVersion.major, minimumClientVersion.minor, minimumClientVersion.patch);
   }
 
 }
