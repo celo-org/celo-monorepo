@@ -5,5 +5,4 @@ interface IGovernance {
     external;
   function isVoting(address) external view returns (bool);
   function getAmountOfGoldUsedForVoting(address account) external view returns (uint256);
-  function getAccountTotalGovernanceVotingPower(address account) external view returns (uint256);
 }

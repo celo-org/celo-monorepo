@@ -22,4 +22,8 @@ contract MockGovernance is IGovernance {
   function getAmountOfGoldUsedForVoting(address account) external view returns (uint256) {
     return totalVotes[account];
   }
+
+  function removeVotesWhenRevokingDelegatedVotes(address account, uint256 maxAmountAllowed)
+    external
+  {}
 }

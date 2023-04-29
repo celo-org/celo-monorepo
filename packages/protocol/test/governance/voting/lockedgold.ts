@@ -10,6 +10,7 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
+import { zeroAddress } from 'ethereumjs-util'
 import {
   AccountsContract,
   AccountsInstance,
@@ -769,6 +770,50 @@ contract('LockedGold', (accounts: string[]) => {
 
       assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(reporter), reward)
       assertEqualBN(await lockedGold.getAccountTotalLockedGold(reporter), reward)
+    })
+  })
+
+  describe.only('#delegateGovernanceVotes', () => {
+    it('should revert when no locked gold', async () => {
+      await assertRevert(
+        lockedGold.delegateGovernanceVotes(zeroAddress(), 10),
+        'Not enough locked gold'
+      )
+    })
+
+    describe('When some gold is locked', () => {
+      const value = 1000
+      const account = accounts[0]
+
+      // const reporter = accounts[3]
+
+      beforeEach(async () => {
+        await lockedGold.lock({ value } as any)
+      })
+
+      it('should revert when trying to delegate more than I have', async () => {
+        await assertRevert(
+          lockedGold.delegateGovernanceVotes(zeroAddress(), value * 2),
+          'Not enough locked gold'
+        )
+      })
+
+      it('should revert when delegatee is not an account', async () => {
+        await assertRevert(
+          lockedGold.delegateGovernanceVotes(zeroAddress(), value),
+          'not an account'
+        )
+      })
+
+      describe('When account is registered', () => {
+        beforeEach(async () => {
+          await accountsInstance.createAccount()
+        })
+
+        it('should delegate votes correctly', async () => {
+          await lockedGold.delegateGovernanceVotes(account, value)
+        })
+      })
     })
   })
 })

@@ -263,7 +263,8 @@ contract LockedGold is
   }
 
   function delegateGovernanceVotes(address delegatee, uint256 amountToDelegate) external {
-    uint256 totalLockedGold = getTotalLockedGold();
+    address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
+    uint256 totalLockedGold = getAccountTotalLockedGold(delegateeAccount);
     require(totalLockedGold > amountToDelegate, "Not enough locked gold");
 
     uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(msg.sender);
@@ -272,7 +273,6 @@ contract LockedGold is
       "It is not possible to delagate votes when already voting on proposal."
     );
 
-    address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
     DelegatedGold storage delegated = delegatorGold[msg.sender];
     if (delegated.delegatee != address(0) && delegated.delegatee != delegateeAccount) {
       revokeDelegatedGovernanceVotes(delegated.amount);
