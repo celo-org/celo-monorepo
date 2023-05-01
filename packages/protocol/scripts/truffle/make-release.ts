@@ -250,6 +250,8 @@ module.exports = async (callback: (error?: any) => number) => {
 
     const version = getReleaseVersion(branch)
 
+    console.log('version', version)
+
     if (version >= 9) {
       ignoredContractsSet = new Set(ignoredContractsV9)
     }
@@ -261,7 +263,8 @@ module.exports = async (callback: (error?: any) => number) => {
           !ignoredContractsSet.has(contract) &&
           !ignoredContractsSet.has(contract.replace('Proxy', ''))
       )
-    console.log('ignoredContracts', ignoredContractsV9)
+
+    console.log('ignoredContracts', Array.from(ignoredContractsSet))
     const registry = await artifacts.require('Registry').at(celoRegistryAddress)
     const addresses = await ContractAddresses.create(contracts, registry, libraryMapping)
     const released: Set<string> = new Set([])
@@ -277,6 +280,7 @@ module.exports = async (callback: (error?: any) => number) => {
       for (const dependency of contractDependencies) {
         await release(dependency)
       }
+      console.log('Dependencies for contract', contractName)
       // 2. Link dependencies.
       const contractArtifact = await artifacts.require(contractName)
       await Promise.all(contractDependencies.map((d) => contractArtifact.link(d, addresses.get(d))))
