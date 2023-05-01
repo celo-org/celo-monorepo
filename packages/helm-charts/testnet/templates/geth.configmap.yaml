@@ -1,1 +1,1 @@
-{{ include "common.geth-configmap" . }}
+{{- include "common.geth-configmap" . }}

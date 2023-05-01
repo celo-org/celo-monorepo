@@ -1,8 +1,0 @@
-name: attestation-bot
-version: 0.0.1
-description: Chart which is used to run attestations
-keywords:
-- ethereum
-- blockchain
-- attestation
-appVersion: v1.7.3

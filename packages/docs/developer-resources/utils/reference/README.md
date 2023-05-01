@@ -113,7 +113,6 @@ The repository has the following packages (sub projects):
 - [celotool](packages/celotool) - scripts for deploying and managing testnets
 - [cli](packages/cli) - tool that uses ContractKit to interact with the Celo protocol ([docs](https://docs.celo.org/command-line-interface/introduction))
 - [contractkit](packages/contractkit) - library to help developers and validators interact with the protocol and it's smart contracts ([docs](https://docs.celo.org/celo-sdk/contractkit))
-- [dappkit](packages/dappkit) - set of functions for mobile DApps to work with the wallet app (ex. sign transactions and access the user's account) ([docs](https://docs.celo.org/celo-sdk/dappkit))
 - [dev-utils](packages/dev-utils) - a utils package for use as a dev dependency
 - [docs](packages/docs) - technical documentation for the Celo project ([live](https://docs.celo.org/))
 - [faucet](packages/faucet) - faucet deployment configuration ([live](https://celo.org/build/faucet))
