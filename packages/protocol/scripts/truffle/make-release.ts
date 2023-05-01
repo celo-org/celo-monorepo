@@ -251,6 +251,7 @@ module.exports = async (callback: (error?: any) => number) => {
     const version = getReleaseVersion(branch)
 
     console.log('version', version)
+    console.log('branch', branch)
 
     if (version >= 9) {
       ignoredContractsSet = new Set(ignoredContractsV9)
