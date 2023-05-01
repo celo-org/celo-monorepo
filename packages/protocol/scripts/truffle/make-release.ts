@@ -250,9 +250,6 @@ module.exports = async (callback: (error?: any) => number) => {
 
     const version = getReleaseVersion(branch)
 
-    console.log('version', version)
-    console.log('branch', branch)
-
     if (version >= 9) {
       ignoredContractsSet = new Set(ignoredContractsV9)
     }
@@ -265,7 +262,6 @@ module.exports = async (callback: (error?: any) => number) => {
           !ignoredContractsSet.has(contract.replace('Proxy', ''))
       )
 
-    console.log('ignoredContracts', Array.from(ignoredContractsSet))
     const registry = await artifacts.require('Registry').at(celoRegistryAddress)
     const addresses = await ContractAddresses.create(contracts, registry, libraryMapping)
     const released: Set<string> = new Set([])
