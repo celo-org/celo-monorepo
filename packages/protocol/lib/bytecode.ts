@@ -133,7 +133,7 @@ export class LibraryAddresses {
     if (!this.addresses[library]) {
       this.addresses[library] = address
     }
-    console.log("addAddress", library, address, this.addresses[library]);
+    // console.log("addAddress", library, address, this.addresses[library]);
 
     return this.addresses[library] === address
   }
