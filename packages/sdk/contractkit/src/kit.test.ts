@@ -2,8 +2,7 @@ import { CeloTx, CeloTxObject, CeloTxReceipt, JsonRpcPayload, PromiEvent } from 
 import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
 import { HttpProvider } from 'web3-core'
-import { XMLHttpRequest } from 'xhr2-cookies'
-import { API_KEY_HEADER_KEY, newKitFromWeb3 as newFullKitFromWeb3, newKitWithApiKey } from './kit'
+import { newKitFromWeb3 as newFullKitFromWeb3, newKitWithApiKey } from './kit'
 import { newKitFromWeb3 as newMiniKitFromWeb3 } from './mini-kit'
 import { promiEventSpy } from './test-utils/PromiEventStub'
 
@@ -110,9 +109,11 @@ test('should retrieve currency gasPrice with feeCurrency', async () => {
 
 describe('newKitWithApiKey()', () => {
   const kit = newKitWithApiKey('http://', 'key')
-  const mockSetRequestHeader = jest.fn()
-  XMLHttpRequest.prototype.setRequestHeader = mockSetRequestHeader
-  XMLHttpRequest.prototype.send = jest.fn()
+  const fetchSpy = jest.spyOn(global, 'fetch')
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
 
   test('should set apiKey in request header', async () => {
     const httpProvider = kit.web3.currentProvider as HttpProvider
@@ -124,9 +125,14 @@ describe('newKitWithApiKey()', () => {
     httpProvider.send(rpcPayload, (error: Error | null) =>
       expect(error?.message).toContain("Couldn't connect to node http://")
     )
+    const headers: any = fetchSpy.mock.calls[0]?.[1]?.headers
+    if (headers.apiKey) {
+      // Api Key should be set in the request header of fetch
+      expect(headers.apiKey).toBe('key')
+    } else {
+      throw new Error('apiKey not set in request header')
+    }
 
-    // Api Key should be set in the request header
-    expect(mockSetRequestHeader).toBeCalledTimes(2)
-    expect(mockSetRequestHeader).toBeCalledWith(API_KEY_HEADER_KEY, 'key')
+    expect(fetchSpy).toHaveBeenCalled()
   })
 })
