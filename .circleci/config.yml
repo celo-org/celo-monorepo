@@ -187,7 +187,7 @@ jobs:
       - run:
           name: Debug
           command: |
-            tail -f /dev/null
+            exit 1
 
   lint-checks:
     <<: *defaults
