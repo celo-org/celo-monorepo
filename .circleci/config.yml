@@ -183,6 +183,11 @@ jobs:
           root: .
           paths:
             - .
+      
+      - run:
+          name: Debug
+          command: |
+            tail -f /dev/null
 
   lint-checks:
     <<: *defaults
