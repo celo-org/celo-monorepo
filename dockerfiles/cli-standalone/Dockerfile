@@ -6,7 +6,7 @@
 FROM node:12.22.12-alpine3.15
 
 # Install cli install dependencies.
-RUN apk add --no-cache python git make gcc g++ bash libusb-dev linux-headers eudev-dev
+RUN apk add --no-cache python3 git make gcc g++ bash libusb-dev linux-headers eudev-dev
 
 # Add an set as default a non-privileged user named celo.
 RUN adduser -D -S celo
