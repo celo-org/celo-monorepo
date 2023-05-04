@@ -128,7 +128,7 @@ export default class Show extends BaseCommand {
         schedule,
       })
 
-      if (Object.keys(requirements).length != 0) {
+      if (Object.keys(requirements).length !== 0) {
         console.log(
           'Note: required is the minimal amount of yes + abstain votes needed to pass the proposal'
         )
