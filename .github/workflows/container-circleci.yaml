@@ -2,8 +2,8 @@ name: Build CircleCI related containers
 
 on:
   push:
-    paths:
-      - 'dockerfiles/circleci/**'
+    # paths:
+    #   - 'dockerfiles/circleci/**'
     branches:
       - master
       - jcortejoso/gh-actions-containers
@@ -36,8 +36,8 @@ jobs:
   geth-build-dev:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
     if: |
-      ${{ needs.changes.outputs.geth == 'true' }} &&
-      github.ref != 'refs/heads/master'
+      ${{ needs.changes.outputs.geth == 'true' &&
+      github.ref != 'refs/heads/master' }}
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
       service-account: 'celo-monorepo-dev@devopsre.iam.gserviceaccount.com'
@@ -48,8 +48,8 @@ jobs:
   geth-build:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
     if: |
-      ${{ needs.changes.outputs.geth == 'true' }} &&
-      github.ref == 'refs/heads/master'
+      ${{ needs.changes.outputs.geth == 'true' &&
+      github.ref == 'refs/heads/master' }}
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo-master/providers/github-by-repos
       service-account: 'celo-monorepo@devopsre.iam.gserviceaccount.com'
@@ -60,8 +60,8 @@ jobs:
   node12-build-dev:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
     if: |
-      ${{ needs.changes.outputs.node12 == 'true' }} &&
-      github.ref != 'refs/heads/master'
+      ${{ needs.changes.outputs.node12 == 'true' &&
+      github.ref != 'refs/heads/master' }}
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
       service-account: 'celo-monorepo-dev@devopsre.iam.gserviceaccount.com'
@@ -72,8 +72,8 @@ jobs:
   node12-build:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
     if: |
-      ${{ needs.changes.outputs.node12 == 'true' }} &&
-      github.ref == 'refs/heads/master'
+      ${{ needs.changes.outputs.node12 == 'true' &&
+      github.ref == 'refs/heads/master' }}
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo-master/providers/github-by-repos
       service-account: 'celo-monorepo@devopsre.iam.gserviceaccount.com'
