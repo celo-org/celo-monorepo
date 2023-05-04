@@ -44,8 +44,8 @@ jobs:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
     needs: changes
     if: |
-      ${{ needs.changes.outputs.geth == 'true' &&
-      github.ref != 'refs/heads/master' }}
+      needs.changes.outputs.geth == 'true' &&
+      github.ref != 'refs/heads/master'
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
       service-account: 'celo-monorepo-dev@devopsre.iam.gserviceaccount.com'
@@ -57,8 +57,8 @@ jobs:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
     needs: changes
     if: |
-      ${{ needs.changes.outputs.geth == 'true' &&
-      github.ref == 'refs/heads/master' }}
+      needs.changes.outputs.geth == 'true' &&
+      github.ref == 'refs/heads/master'
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo-master/providers/github-by-repos
       service-account: 'celo-monorepo@devopsre.iam.gserviceaccount.com'
@@ -70,8 +70,8 @@ jobs:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
     needs: changes
     if: |
-      ${{ needs.changes.outputs.node12 == 'true' &&
-      github.ref != 'refs/heads/master' }}
+      needs.changes.outputs.node12 == 'true' &&
+      github.ref != 'refs/heads/master'
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
       service-account: 'celo-monorepo-dev@devopsre.iam.gserviceaccount.com'
@@ -83,8 +83,8 @@ jobs:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
     needs: changes
     if: |
-      ${{ needs.changes.outputs.node12 == 'true' &&
-      github.ref == 'refs/heads/master' }}
+      needs.changes.outputs.node12 == 'true' &&
+      github.ref == 'refs/heads/master'
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo-master/providers/github-by-repos
       service-account: 'celo-monorepo@devopsre.iam.gserviceaccount.com'
