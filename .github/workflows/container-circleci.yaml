@@ -33,8 +33,16 @@ jobs:
             gcloud:
               - dockerfiles/circleci/node10-gcloud/Dockerfile
 
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "${{ toJSON(needs.changes.outputs) }}"
+          echo "${{ toJSON(github) }}"
+
   geth-build-dev:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    needs: changes
     if: |
       ${{ needs.changes.outputs.geth == 'true' &&
       github.ref != 'refs/heads/master' }}
@@ -47,6 +55,7 @@ jobs:
 
   geth-build:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    needs: changes
     if: |
       ${{ needs.changes.outputs.geth == 'true' &&
       github.ref == 'refs/heads/master' }}
@@ -59,6 +68,7 @@ jobs:
 
   node12-build-dev:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    needs: changes
     if: |
       ${{ needs.changes.outputs.node12 == 'true' &&
       github.ref != 'refs/heads/master' }}
@@ -71,6 +81,7 @@ jobs:
 
   node12-build:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    needs: changes
     if: |
       ${{ needs.changes.outputs.node12 == 'true' &&
       github.ref == 'refs/heads/master' }}

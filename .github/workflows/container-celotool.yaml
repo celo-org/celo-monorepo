@@ -13,6 +13,11 @@ on:
   workflow_dispatch:
 
 jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "${{ toJSON(github) }}"
   celotool-build-dev:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
     if: |
@@ -23,6 +28,7 @@ jobs:
       artifact-registry: us-west1-docker.pkg.dev/devopsre/dev-images/celotool
       tag: testing
       context: .
+      file: dockerfiles/celotool/Dockerfile
 
   celotool-build:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
@@ -34,3 +40,4 @@ jobs:
       artifact-registry: us-west1-docker.pkg.dev/devopsre/celo-monorepo/celotool
       tag: latest
       context: .
+      file: dockerfiles/celotool/Dockerfile
