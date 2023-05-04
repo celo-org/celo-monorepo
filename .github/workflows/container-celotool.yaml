@@ -13,15 +13,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  debug:
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          echo "${{ toJSON(github) }}"
   celotool-build-dev:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
-    if: |
-      ${{ github.ref != 'refs/heads/master' }}
+    if: github.ref != 'refs/heads/master'
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
       service-account: 'celo-monorepo-dev@devopsre.iam.gserviceaccount.com'
@@ -32,8 +26,7 @@ jobs:
 
   celotool-build:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
-    if: |
-      ${{ github.ref == 'refs/heads/master' }}
+    if: github.ref == 'refs/heads/master'
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo-master/providers/github-by-repos
       service-account: 'celo-monorepo@devopsre.iam.gserviceaccount.com'
