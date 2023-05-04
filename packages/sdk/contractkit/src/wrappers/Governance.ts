@@ -232,6 +232,14 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
     }
   }
 
+  // function get support doesn't consider constitution parameteres that has an influence
+  // in the total of yes votes required
+  async getSupportWithConstution(proposalID: BigNumber.Value, constitution: BigNumber) {
+    const support = await this.getSupport(proposalID)
+    support.required = support.required.times(constitution)
+    return support
+  }
+
   // simulates proposal.getSupportWithQuorumPadding
   async getSupport(proposalID: BigNumber.Value) {
     const participation = await this.getParticipationParameters()

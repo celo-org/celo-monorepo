@@ -88,6 +88,7 @@ export default class Show extends BaseCommand {
 
       const record = await governance.getProposalRecord(id)
       const proposal = record.proposal
+
       if (!raw) {
         const builder = new ProposalBuilder(this.kit)
         if (res.flags.afterExecutingID) {
@@ -114,7 +115,7 @@ export default class Show extends BaseCommand {
       if (record.stage === 'Referendum' || record.stage === 'Execution') {
         // Identify the transaction with the highest constitutional requirement.
         const constitutionThreshold = await governance.getConstitution(proposal)
-        const support = await governance.getSupport(id)
+        const support = await governance.getSupportWithConstution(id, constitutionThreshold)
         requirements = {
           constitutionThreshold,
           ...support,
