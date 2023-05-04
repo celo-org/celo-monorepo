@@ -22,3 +22,6 @@ WORKDIR /home/celo/
 # Install @celo/celocli from NPM.
 ARG VERSION
 RUN npm install -g @celo/celocli@$VERSION
+
+ENTRYPOINT ["celocli"]
+CMD ["--help"]
