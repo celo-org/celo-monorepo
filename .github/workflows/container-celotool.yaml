@@ -1,0 +1,36 @@
+name: Build celo-monorepo
+
+on:
+  push:
+    paths:
+      - 'dockerfiles/celotool/**'
+    branches:
+      - master
+      - jcortejoso/gh-actions-containers
+  pull_request:
+    paths:
+      - 'dockerfiles/celotool/**'
+  workflow_dispatch:
+
+jobs:
+  celotool-build-dev:
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    if: |
+      github.ref != 'refs/heads/master'
+    with:
+      workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
+      service-account: 'celo-monorepo-dev@devopsre.iam.gserviceaccount.com'
+      artifact-registry: us-west1-docker.pkg.dev/devopsre/dev-images/celotool
+      tag: testing
+      context: dockerfiles/celotool
+
+  celotool-build:
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    if: |
+      github.ref != 'refs/heads/master'
+    with:
+      workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo-master/providers/github-by-repos
+      service-account: 'celo-monorepo@devopsre.iam.gserviceaccount.com'
+      artifact-registry: us-west1-docker.pkg.dev/devopsre/celo-monorepo/celotool
+      tag: latest
+      context: dockerfiles/celotool
