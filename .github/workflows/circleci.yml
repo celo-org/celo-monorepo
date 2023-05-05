@@ -11,7 +11,7 @@ on:
 
 defaults:
   run:
-    working-directory: ~/app
+    # working-directory: ~/app
     # TODO(jcortejoso): When using a self-hosted runner, we can use this if `/bin/bash` is installed. Not available in gh's ubuntu-latest
     shell: bash --login -eo pipefail {0}
     # shell: sh -e -u {0}
@@ -46,9 +46,7 @@ jobs:
           limit-access-to-actor: true
       - name: Verify setup for incremental testing
         run: |
-          # echo $0
-          # set -euo pipefail
-          cd ~/app
+          set -euo pipefail
           set -v
           # To get the "master" branch mapping
           git checkout master
