@@ -87,7 +87,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 10
-        if: false
+        if: true
         with:
           limit-access-to-actor: true
       - name: Install yarn dependencies
