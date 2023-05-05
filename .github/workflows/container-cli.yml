@@ -14,8 +14,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  celotool-build-dev:
+  celocli-build-dev:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    name: Build us-west1-docker.pkg.dev/devopsre/dev-images/celocli:testing
     if: |
       github.ref != 'refs/heads/master'
     with:
@@ -26,8 +27,9 @@ jobs:
       context: .
       file: dockerfiles/cli-standalone/Dockerfile
 
-  celotool-build:
+  celocli-build:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    name: Build us-west1-docker.pkg.dev/devopsre/celo-monorepo/celocli:latest
     if: |
       github.ref == 'refs/heads/master'
     with:
