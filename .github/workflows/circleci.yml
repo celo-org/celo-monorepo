@@ -13,8 +13,8 @@ defaults:
   run:
     working-directory: ~/app
     # TODO(jcortejoso): When using a self-hosted runner, we can use this if `/bin/bash` is installed. Not available in gh's ubuntu-latest
-    shell: /bin/bash --login -eo pipefail
-    # shell: /bin/sh -e
+    # shell: /bin/bash --login -eo pipefail
+    shell: /bin/sh -e -u
 
 env:
   # Increment these to force cache rebuilding
