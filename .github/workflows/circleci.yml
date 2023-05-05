@@ -26,7 +26,7 @@ env:
 jobs:
   install_dependencies:
     name: Install dependencies
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     # runs-on: ["self-hosted", "monorepo"]
     steps:
       - name: Restore .git cache
