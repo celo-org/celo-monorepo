@@ -67,6 +67,9 @@ jobs:
           echo "PACKAGE_JSON_CHECKSUM=${{ hashFiles('/tmp/package.json') }}" >> "$GITHUB_OUTPUT"
           find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat > /tmp/patches
           echo "PATCHES_CHECKSUM=${{ hashFiles('/tmp/patches') }}" >> "$GITHUB_OUTPUT"
+      - run: |
+          echo "PACKAGE_JSON_CHECKSUM: ${{ hashFiles('/tmp/package.json') }}"
+          echo "PATCHES_CHECKSUM: ${{ hashFiles('/tmp/patches') }}"
       - name: Restore node cache
         uses: actions/cache@v3
         id: cache_node
