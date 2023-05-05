@@ -33,8 +33,6 @@ jobs:
     outputs:
       package-json-checksum: ${{ steps.node-checksums.outputs.PACKAGE_JSON_CHECKSUM }}
     # runs-on: ubuntu-latest
-    # container:
-      # image: us-west1-docker.pkg.dev/devopsre/clabs-public-images/celo-monorepo:latest
     runs-on: ["self-hosted", "monorepo"]
     steps:
       - name: Restore .git cache
@@ -74,14 +72,6 @@ jobs:
           # TODO(jcortejoso): Think if remove this, to start clean with any change in deps
           restore-keys: |
             node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-
-      # - name: Install dependencies (temporal)
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y python2
-      #     sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
-      #     curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
-      #     sudo apt-get install -y nodejs
-      #     sudo npm install -g yarn
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 10
@@ -109,3 +99,21 @@ jobs:
             exit 0
           fi
           yarn check-licenses
+  lint_checks:
+    name: Lint code
+    runs-on: ["self-hosted", "monorepo"]
+    needs: install_dependencies
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - uses: actions/cache/restore@v3
+        id: cache_node
+        with:
+          path: node_modules
+          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+      - run: yarn run prettify:diff
+      - run: yarn run lint
