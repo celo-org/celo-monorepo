@@ -38,10 +38,12 @@ jobs:
           restore-keys: |
             git-
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 10
-        if: true
+        if: false
         with:
           limit-access-to-actor: true
       - name: Verify setup for incremental testing
