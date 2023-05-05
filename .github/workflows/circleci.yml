@@ -26,7 +26,9 @@ env:
 jobs:
   install_dependencies:
     name: Install dependencies
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:latest
     # runs-on: ["self-hosted", "monorepo"]
     steps:
       - name: Restore .git cache
@@ -51,14 +53,14 @@ jobs:
           # There output does not matter here, the fact that they finish successfully does.
           git rev-parse --abbrev-ref HEAD
           git fetch --all --tags
-      - name: Install dependencies (temporal)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python2
-          sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
-          curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
-          sudo apt-get install -y nodejs
-          sudo npm install -g yarn
+      # - name: Install dependencies (temporal)
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y python2
+      #     sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
+      #     curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
+      #     sudo apt-get install -y nodejs
+      #     sudo npm install -g yarn
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 10
