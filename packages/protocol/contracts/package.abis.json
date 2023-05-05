@@ -1,0 +1,12 @@
+{
+  "name": "@celo/abis",
+  "version": "8.0.0-beta.3",
+  "author": "cLabs",
+  "license": "LGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "hhttps://github.com/celo-org/celo-monorepo/tree/master/packages/protocol/contracts"
+  },
+  "scripts": {},
+  "dependencies": {}
+}

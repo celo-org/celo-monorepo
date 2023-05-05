@@ -21,6 +21,7 @@
     "pull-submodules": "git submodule update --init --recursive",
     "build:sol": "git submodule update --init --recursive && mkdir -p migrations && ts-node ./scripts/build.ts --solidity ${BUILD_DIR:-./build}",
     "build": "yarn pull-submodules && yarn build:sol && yarn build:ts",
+    "postbuild:sol": "cp ./contracts/package.abis.json ./build/contracts/package.json && cp ./contracts/README.abis.md ./build/contracts/README.md",
     "sourcify-publish": "ts-node ./scripts/sourcify-publish.ts",
     "migrate": "./scripts/bash/migrate.sh",
     "set_block_gas_limit": "./scripts/bash/set_block_gas_limit.sh",
