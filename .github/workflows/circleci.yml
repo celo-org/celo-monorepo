@@ -26,10 +26,10 @@ env:
 jobs:
   install_dependencies:
     name: Install dependencies
-    runs-on: ubuntu-latest
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:latest
-    # runs-on: ["self-hosted", "monorepo"]
+    # runs-on: ubuntu-latest
+    # container:
+      # image: us-west1-docker.pkg.dev/devopsre/clabs-public-images/celo-monorepo:latest
+    runs-on: ["self-hosted", "monorepo"]
     steps:
       - name: Restore .git cache
         uses: actions/cache@v3
