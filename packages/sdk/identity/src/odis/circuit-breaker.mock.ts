@@ -9,6 +9,7 @@ import {
   CircuitBreakerUnwrapKeyRequest,
   CircuitBreakerUnwrapKeyResponse,
 } from './circuit-breaker'
+import fetchMock from '../__mocks__/cross-fetch'
 
 const debug = debugFactory('kit:identity:odis:circuit-breaker:mock')
 
