@@ -16,6 +16,7 @@ on:
 jobs:
   celotool-build-dev:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    name: Build us-west1-docker.pkg.dev/devopsre/dev-images/celotool:testing
     if: |
       github.ref != 'refs/heads/master'
     with:
@@ -28,6 +29,7 @@ jobs:
 
   celotool-build:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    name: Build us-west1-docker.pkg.dev/devopsre/celo-monorepo/celotool:latest
     if: |
       github.ref == 'refs/heads/master'
     with:

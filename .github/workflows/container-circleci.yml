@@ -37,6 +37,7 @@ jobs:
 
   geth-build-dev:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    name: Build us-west1-docker.pkg.dev/devopsre/dev-images/circleci-geth:testing
     needs: changes
     if: |
       needs.changes.outputs.geth == 'true' &&
@@ -50,6 +51,7 @@ jobs:
 
   geth-build:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    name: Build us-west1-docker.pkg.dev/devopsre/celo-monorepo/circleci-geth:latest
     needs: changes
     if: |
       needs.changes.outputs.geth == 'true' &&
@@ -63,6 +65,7 @@ jobs:
 
   node12-build-dev:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    name: Build us-west1-docker.pkg.dev/devopsre/dev-images/circleci-node12:testing
     needs: changes
     if: |
       needs.changes.outputs.node12 == 'true' &&
@@ -76,6 +79,7 @@ jobs:
 
   node12-build:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    name: Build us-west1-docker.pkg.dev/devopsre/celo-monorepo/circleci-node12:latest
     needs: changes
     if: |
       needs.changes.outputs.node12 == 'true' &&
