@@ -73,7 +73,6 @@ jobs:
         with:
           path: node_modules
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ env.PACKAGE_JSON_CHECKSUM }}-${{ env.PATCHES_CHECKSUM }}
-          # TODO(jcortejoso): Think if remove this, to start clean with any change in deps
           restore-keys: |
             node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-
       # - name: Install dependencies (temporal)
@@ -92,10 +91,10 @@ jobs:
           limit-access-to-actor: true
       - name: Install yarn dependencies
         run: yarn install
-        if: setps.cache_node.outputs.cache-hit != 'true'
+        if: steps.cache_node.outputs.cache-hit != 'true'
       - name: Run yarn postinstall if cache hitted 
         run: yarn install
-        if: setps.cache_node.outputs.cache-hit == 'true'
+        if: steps.cache_node.outputs.cache-hit == 'true'
       - name: Fail if generated dependency graph doesn't match committed
         run: ./scripts/ci_check_dependency_graph_changed.sh
       - name: Build packages
