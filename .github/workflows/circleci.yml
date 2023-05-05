@@ -5,9 +5,9 @@ on:
   push:
     branches:
       - jcortejoso/circleci-github-actions
-  pull_request:
-    branches:
-      - master
+  # pull_request:
+  #   branches:
+  #     - master
 
 defaults:
   run:
@@ -41,10 +41,12 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 10
+        if: false
         with:
           limit-access-to-actor: true
       - name: Verify setup for incremental testing
         run: |
+          echo $0
           set -euo pipefail
           cd ~/app
           set -v
