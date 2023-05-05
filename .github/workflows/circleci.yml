@@ -1,0 +1,70 @@
+name: celo-monorepo
+run-name: celo-monorepo tests
+
+on:
+  push:
+    branches:
+      - jcortejoso/circleci-github-actions
+  pull_request:
+    branches:
+      - master
+
+defaults:
+  run:
+    working-directory: ~/app
+    shell: /bin/bash --login -eo pipefail
+
+env:
+  # Increment these to force cache rebuilding
+  NODE_MODULE_CACHE_VERSION: 1
+  NODE_OPTIONS: '--max-old-space-size=4096'
+  TERM: dumb
+  GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
+
+jobs:
+  install_dependencies:
+    name: Install dependencies
+    # TODO(jcortejoso): Move to a self-hosted runner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore .git cache
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+          restore-keys: |
+            git-
+      - uses: actions/checkout@v3
+      - name: Verify setup for incremental testing
+        run: |
+          set -euo pipefail
+          cd ~/app
+          set -v
+          # To get the "master" branch mapping
+          git checkout master
+          git checkout ${GITHUB_REF}
+          # Verify that following commands work, they are later called in the incremental testing script
+          # There output does not matter here, the fact that they finish successfully does.
+          git rev-parse --abbrev-ref HEAD
+          git fetch --all --tags
+      - name: Install yarn dependencies
+        run: yarn install
+      - name: Build packages
+        run: yarn build --ignore docs --include-dependencies
+      - name: Check licenses
+        run: |
+          if [ ! -e ~/.tmp/yarn_deps_have_changed ]; then
+            # Internally `yarn check-licenses` downloads dependencies into its cache again even if node_modules are up-to-date
+            # which happens when we've restored our cached node_modules.
+            # Making `yarn check-licenses` take ~45secs instead of ~3secs (depending on network conditions and build machine)
+            # So here we skip checking when it's unnecessary
+            echo "Skipping checking licenses, dependencies haven't changed"
+            exit 0
+          fi
+          yarn check-licenses
+      - name: Store building artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: workspace
+          path: ~/app
