@@ -22,6 +22,7 @@ WORKDIR /home/celo/
 # Install @celo/celocli from NPM.
 ARG VERSION
 RUN npm install -g @celo/celocli@$VERSION
+RUN celocli config:set --node https://forno.celo.org
 
 ENTRYPOINT ["celocli"]
 CMD ["--help"]
