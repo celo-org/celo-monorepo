@@ -40,12 +40,6 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 10
-        if: false
-        with:
-          limit-access-to-actor: true
       - name: Verify setup for incremental testing
         run: |
           set -euo pipefail
@@ -65,7 +59,12 @@ jobs:
           curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
           sudo apt-get install -y nodejs
           sudo npm install -g yarn
-
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 10
+        if: true
+        with:
+          limit-access-to-actor: true
       - name: Install yarn dependencies
         run: yarn install
       - name: Build packages
