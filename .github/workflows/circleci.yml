@@ -61,6 +61,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y python2
+          sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
       - name: Install yarn dependencies
         run: yarn install
       - name: Build packages
