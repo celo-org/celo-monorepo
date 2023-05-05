@@ -3,8 +3,8 @@ name: Build CircleCI related containers
 
 on:
   push:
-    # paths:
-    #   - 'dockerfiles/circleci/**'
+    paths:
+      - 'dockerfiles/circleci/**'
     branches:
       - master
       - jcortejoso/gh-actions-containers

@@ -3,8 +3,8 @@ name: Build celocli container
 
 on:
   push:
-    # paths:
-    #   - 'dockerfiles/cli-standalone/**'
+    paths:
+      - 'dockerfiles/cli-standalone/**'
     branches:
       - master
       - jcortejoso/gh-actions-containers
