@@ -46,8 +46,8 @@ jobs:
           limit-access-to-actor: true
       - name: Verify setup for incremental testing
         run: |
-          echo $0
-          set -euo pipefail
+          # echo $0
+          # set -euo pipefail
           cd ~/app
           set -v
           # To get the "master" branch mapping
