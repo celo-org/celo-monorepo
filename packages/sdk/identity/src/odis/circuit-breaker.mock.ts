@@ -1,5 +1,6 @@
 import * as crypto from 'crypto'
 import debugFactory from 'debug'
+import fetchMock from '../__mocks__/cross-fetch'
 import {
   BASE64_REGEXP,
   CircuitBreakerEndpoints,
@@ -9,7 +10,6 @@ import {
   CircuitBreakerUnwrapKeyRequest,
   CircuitBreakerUnwrapKeyResponse,
 } from './circuit-breaker'
-import fetchMock from '../__mocks__/cross-fetch'
 
 const debug = debugFactory('kit:identity:odis:circuit-breaker:mock')
 
