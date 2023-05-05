@@ -13,8 +13,8 @@ defaults:
   run:
     working-directory: ~/app
     # TODO(jcortejoso): When using a self-hosted runner, we can use this if `/bin/bash` is installed. Not available in gh's ubuntu-latest
-    # shell: /bin/bash --login -eo pipefail
-    shell: /bin/sh -e
+    shell: /bin/bash --login -eo pipefail
+    # shell: /bin/sh -e
 
 env:
   # Increment these to force cache rebuilding
@@ -38,6 +38,11 @@ jobs:
           restore-keys: |
             git-
       - uses: actions/checkout@v3
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 10
+        with:
+          limit-access-to-actor: true
       - name: Verify setup for incremental testing
         run: |
           set -euo pipefail
