@@ -72,7 +72,8 @@ jobs:
         id: cache_node
         with:
           path: node_modules
-          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ env.PACKAGE_JSON_CHECKSUM }}-${{ env.PATCHES_CHECKSUM }}
+          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ steps.node-checksums.outputs.PACKAGE_JSON_CHECKSUM }}-${{ steps.node-checksums.outputs.PATCHES_CHECKSUM }}
+          # TODO(jcortejoso): Think if remove this, to start clean with any change in deps
           restore-keys: |
             node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-
       # - name: Install dependencies (temporal)
