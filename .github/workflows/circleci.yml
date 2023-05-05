@@ -94,8 +94,3 @@ jobs:
             exit 0
           fi
           yarn check-licenses
-      # - name: Store building artifacts
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: workspace
-      #     path: ./
