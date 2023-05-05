@@ -59,8 +59,8 @@ jobs:
           git fetch --all --tags
       - name: Install dependencies (temporal)
         run: |
-          apt-get update
-          apt-get install -y python2
+          sudo apt-get update
+          sudo apt-get install -y python2
       - name: Install yarn dependencies
         run: yarn install
       - name: Build packages
