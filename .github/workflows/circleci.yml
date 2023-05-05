@@ -62,6 +62,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y python2
           sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
+          curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
+          sudo apt-get install -y nodejs
+          sudo npm install -g yarn
+
       - name: Install yarn dependencies
         run: yarn install
       - name: Build packages
