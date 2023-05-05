@@ -65,8 +65,6 @@ jobs:
           find . -maxdepth 5 -type f -name 'package.json' -not -path "*node_modules*" -print0 | sort -z | xargs -0 cat > package.checksum
           find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat > patches.checksum
           echo "PACKAGE_JSON_CHECKSUM=${{ hashFiles('*.checksum') }}" >> "$GITHUB_OUTPUT"
-      - run: |
-          echo "PACKAGE_JSON_CHECKSUM: ${{ hashFiles('*.checksum') }}"
       - name: Restore node cache
         uses: actions/cache@v3
         id: cache_node
@@ -87,7 +85,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 10
-        if: true
+        if: false
         with:
           limit-access-to-actor: true
       - name: Install yarn dependencies
