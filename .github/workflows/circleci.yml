@@ -9,6 +9,10 @@ on:
   #   branches:
   #     - master
 
+concurrency:
+  group: circle-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 defaults:
   run:
     # working-directory: ~/app
@@ -33,12 +37,20 @@ jobs:
     steps:
       - name: Restore .git cache
         uses: actions/cache@v3
-        id: cache
+        id: cache_git
         with:
           path: .git
           key: git-${{ github.ref }}
           restore-keys: |
             git-
+      - name: Restore node cache
+        uses: actions/cache@v3
+        id: cache_node
+        with:
+          path: node_modules
+          key: node-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            node-${{ env.NODE_MODULE_CACHE_VERSION }}-
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
@@ -82,8 +94,8 @@ jobs:
             exit 0
           fi
           yarn check-licenses
-      - name: Store building artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: workspace
-          path: ./
+      # - name: Store building artifacts
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: workspace
+      #     path: ./
