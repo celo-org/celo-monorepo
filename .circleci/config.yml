@@ -928,30 +928,30 @@ workflows:
       #     requires:
       #       - lint-checks
       #       - pre-protocol-test-release
-      # - protocol-test-release-snapshots:
-      #     requires:
-      #       - lint-checks
-      # - protocol-test-common:
-      #     requires:
-      #       - lint-checks
-      # - protocol-test-compatibility:
-      #     requires:
-      #       - lint-checks
-      # - protocol-test-governance-network:
-      #     requires:
-      #       - lint-checks
-      # - protocol-test-governance-validators:
-      #     requires:
-      #       - lint-checks
-      # - protocol-test-governance-voting:
-      #     requires:
-      #       - lint-checks
-      # - protocol-test-identity:
-      #     requires:
-      #       - lint-checks
-      # - protocol-test-stability:
-      #     requires:
-      #       - lint-checks
+      - protocol-test-release-snapshots:
+          requires:
+            - lint-checks
+      - protocol-test-common:
+          requires:
+            - lint-checks
+      - protocol-test-compatibility:
+          requires:
+            - lint-checks
+      - protocol-test-governance-network:
+          requires:
+            - lint-checks
+      - protocol-test-governance-validators:
+          requires:
+            - lint-checks
+      - protocol-test-governance-voting:
+          requires:
+            - lint-checks
+      - protocol-test-identity:
+          requires:
+            - lint-checks
+      - protocol-test-stability:
+          requires:
+            - lint-checks
       - typescript-test:
           requires:
             - install_dependencies
@@ -993,9 +993,9 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
-      # - odis-test:
-      #     requires:
-      #       - lint-checks
+      - odis-test:
+          requires:
+            - lint-checks
       # - flakey-test-summary:
       #     requires:
       #       - protocol-test-common
