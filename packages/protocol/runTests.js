@@ -14,6 +14,7 @@ const isCI = process.env.CI === 'true'
 
 async function startGanache() {
   const server = ganache.server({
+    logging: { quiet: true },
     wallet: { mnemonic: network.mnemonic, defaultBalance: network.defaultBalance },
     miner: {
       blockGasLimit: 20000000,
