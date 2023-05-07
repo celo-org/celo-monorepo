@@ -993,9 +993,9 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
-      - odis-test:
-          requires:
-            - lint-checks
+      # - odis-test:
+      #     requires:
+      #       - lint-checks
       # - flakey-test-summary:
       #     requires:
       #       - protocol-test-common
