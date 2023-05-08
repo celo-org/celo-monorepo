@@ -229,7 +229,8 @@ jobs:
     name: Protocol Tests
     runs-on: ["self-hosted", "monorepo"]
     needs: [install_dependencies, pre_protocol_test_release]
-    if: false && jobs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
+    if: |
+      false && jobs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
