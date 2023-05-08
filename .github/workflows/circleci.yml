@@ -152,3 +152,22 @@ jobs:
         with:
           name: Jest Test Results
           path: test-results/jest
+  wallet_test:
+    name: Wallet test
+    runs-on: ["self-hosted", "monorepo"]
+    needs: install_dependencies
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - uses: actions/cache/restore@v3
+        id: cache_node
+        with:
+          path: node_modules
+          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+      - name: Run Wallet tests
+        run: |
+          yarn run lerna --scope '@celo/wallet-*' run test
