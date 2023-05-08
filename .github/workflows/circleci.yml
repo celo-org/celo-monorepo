@@ -26,6 +26,8 @@ env:
   NODE_OPTIONS: '--max-old-space-size=4096'
   TERM: dumb
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
+  # Git Tag for contract release to use
+  RELEASE_TAG: core-contracts.v9
 
 jobs:
   install_dependencies:
@@ -134,6 +136,12 @@ jobs:
           path: node_modules
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
       - run: yarn run prettify:diff
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 10
+        if: true
+        with:
+          limit-access-to-actor: true
       - name: Run Jest Tests
         run: |
           mkdir -p test-results/jest
@@ -155,6 +163,7 @@ jobs:
   wallet_test:
     name: Wallet test
     runs-on: ["self-hosted", "monorepo"]
+    if: false
     needs: install_dependencies
     steps:
       - uses: actions/cache/restore@v3
@@ -171,3 +180,80 @@ jobs:
       - name: Run Wallet tests
         run: |
           yarn run lerna --scope '@celo/wallet-*' run test
+  pre_protocol_test_release:
+    name: Protocol Tests Prepare
+    runs-on: ["self-hosted", "monorepo"]
+    needs: install_dependencies
+    if: false
+    outputs:
+      protocol-test-must-run: ${{ steps.protocol-test-must-run.outputs.PROTOCOL_TEST_MUST_RUN }}
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - uses: actions/cache/restore@v3
+        id: cache_node
+        with:
+          path: node_modules
+          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+      - name: Check if the test should run
+        id: protocol-test-must-run
+        run: |
+          # TODO(jcortejoso): This script slightly depends on CircleCI
+          # Ideally refactor this to depend just on GitHub Actions
+          # ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+          echo "Protocol tests runs always"
+          echo "PROTOCOL_TEST_MUST_RUN=true" >> "$GITHUB_OUTPUT"
+      - name: Cache protocol devchain
+        uses: actions/cache@v3
+        id: cache_protocol
+        with:
+          path: packages/protocol/.tmp/released_chain
+          key: protocol-${{ github.sha }}
+          restore-keys: |
+            protocol-${{ github.sha }}
+      - name: Opcode tests
+        run: |
+          yarn --cwd packages/protocol check-opcodes
+      - name: Generate devchain of previous release
+        run: |
+          echo "Comparing against $RELEASE_TAG"
+          # Github has phased out the git protocol so we ensure that we use
+          # https for all git operations that yarn may perform.
+          git config --global url."https://github.com".insteadOf git://github.com
+          yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
+  protocol-test-release:
+    name: Protocol Tests
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install_dependencies, pre_protocol_test_release]
+    if: false && jobs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - uses: actions/cache/restore@v3
+        id: cache_node
+        with:
+          path: node_modules
+          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+      - uses: actions/cache/restore@v3
+        id: cache_protocol
+        with:
+          path: packages/protocol/.tmp/released_chain
+          key: protocol-${{ github.sha }}
+      - name: Copy DevChain and Build generated from released tag
+        run: |
+          BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
+          (cp -r packages/protocol/.tmp/released_chain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
+      - name: Test against current release
+        run: |
+          echo "Comparing against $RELEASE_TAG"
+          BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
+          yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
+
