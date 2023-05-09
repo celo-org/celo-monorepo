@@ -4,14 +4,11 @@ inputs: {}
 runs:
   using: "composite"
   steps:
-    - uses: actions/cache/restore@v3
-      id: cache_git
-      with:
-        path: .git
-        key: git-${{ github.ref }}
     - uses: actions/checkout@v3
     - uses: actions/cache/restore@v3
       id: cache_node
       with:
-        path: node_modules
+        path: |
+          node_modules
+          packages
         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}

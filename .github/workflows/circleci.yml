@@ -108,19 +108,14 @@ jobs:
     runs-on: ["self-hosted", "monorepo"]
     needs: install_dependencies
     steps:
+      # Restore .git cache as we need to checkout the local composite action to run it:
+      # https://github.com/orgs/community/discussions/11771
       - uses: actions/cache/restore@v3
         id: cache_git
         with:
           path: .git
           key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
-      - uses: actions/cache/restore@v3
-        id: cache_node
-        with:
-          path: |
-            node_modules
-            packages
-          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+      - uses: ./.github/actions/my-action
       - run: yarn run prettify:diff
       - run: yarn run lint
   general_test:
@@ -190,8 +185,7 @@ jobs:
   pre_protocol_test_release:
     name: Protocol Tests Prepare
     runs-on: ["self-hosted", "monorepo"]
-    needs: install_dependencies
-    if: false
+    needs: [lint_checks]
     outputs:
       protocol-test-must-run: ${{ steps.protocol-test-must-run.outputs.PROTOCOL_TEST_MUST_RUN }}
     steps:
@@ -237,7 +231,7 @@ jobs:
   protocol-test-release:
     name: Protocol Test Release
     runs-on: ["self-hosted", "monorepo"]
-    needs: [install_dependencies, pre_protocol_test_release]
+    needs: [lint_checks]
     if: |
       false && needs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
     steps:
@@ -271,7 +265,7 @@ jobs:
   protocol-test-release-snapshots:
     name: Protocol Test Reslease Snapshots
     runs-on: ["self-hosted", "monorepo"]
-    needs: [install_dependencies, pre_protocol_test_release]
+    needs: [lint_checks]
     if: |
       false && needs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
     steps:
@@ -293,3 +287,68 @@ jobs:
         with:
           path: packages/protocol/.tmp/released_chain
           key: protocol-${{ github.sha }}
+      - name: Run check-versions on exhaustive history of releases and compare to snapshots
+        run: |
+          yarn --cwd packages/protocol test:release-snapshots
+          if [[ $(git status packages/protocol/releaseData/versionReports --porcelain) ]]; then
+            git --no-pager diff packages/protocol/releaseData/versionReports
+            echo "There are git differences after generating release version report snapshots"
+            echo "If these changes are intended, update the 'releaseData/versionReports' accordingly"
+            exit 1
+          fi
+  protocol-test-common:
+    name: Protocol Test Unit tests
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [lint_checks]
+    if: |
+      false && needs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - uses: actions/cache/restore@v3
+        id: cache_node
+        with:
+          path: |
+            node_modules
+            packages
+          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+      - uses: actions/cache/restore@v3
+        id: cache_protocol
+        with:
+          path: packages/protocol/.tmp/released_chain
+          key: protocol-${{ github.sha }}
+      - name: Unit tests
+        run: |
+          yarn --cwd packages/protocol test common/
+  protocol-test-compatibility:
+    name: Protocol Test Compatibility
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [lint_checks]
+    if: |
+      false && needs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - uses: actions/cache/restore@v3
+        id: cache_node
+        with:
+          path: |
+            node_modules
+            packages
+          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+      - uses: actions/cache/restore@v3
+        id: cache_protocol
+        with:
+          path: packages/protocol/.tmp/released_chain
+          key: protocol-${{ github.sha }}
+      - name: Run protocol compatibility tests
+        run: |
+          yarn --cwd packages/protocol test compatibility/
