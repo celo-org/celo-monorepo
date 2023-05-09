@@ -171,7 +171,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 30
-        if: true
+        if: false
         with:
           limit-access-to-actor: true
       - name: Run Wallet tests
@@ -225,7 +225,7 @@ jobs:
     runs-on: ["self-hosted", "monorepo"]
     needs: [lint-checks, pre-protocol-test-release]
     if: |
-      false && needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
+      needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -252,11 +252,11 @@ jobs:
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
           yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
   protocol-test-matrix:
-    name: Protocol Test Matrix
+    name: Protocol Test Matrix - ${{ matrix.name }}
     runs-on: ["self-hosted", "monorepo"]
     needs: [lint-checks, pre-protocol-test-release]
     if: |
-      false && needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
+      needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
     strategy:
       matrix:
         include:
@@ -425,9 +425,10 @@ jobs:
           name: Protocol Test Coverage
           path: packages/protocol/coverage
   contractkit-tests:
-    name: Protocol Test with code coverage
+    name: ContractKit Tests
     runs-on: ["self-hosted", "monorepo"]
     needs: [install-dependencies]
+    if: false
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -438,4 +439,57 @@ jobs:
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }} 
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Generate DevChain
+        run: |
+          cd packages/sdk/contractkit
+          yarn test:reset
+      - name: Run tests
+        run: |
+          yarn --cwd=packages/sdk/contractkit test
+  identity-tests:
+    name: Identity Tests
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies]
+    if: false
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Generate DevChain
+        run: |
+          cd packages/sdk/identity
+          yarn test:reset
+      - name: Run tests
+        run: |
+          yarn --cwd=packages/sdk/identity test
+  transactions-uri-tests:
+    name: Transaction URI Tests
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies]
+    if: false
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Generate DevChain
+        run: |
+          cd packages/sdk/identity
+          yarn test:reset
+      - name: Run tests
+        run: |
+          yarn --cwd=packages/sdk/identity test
