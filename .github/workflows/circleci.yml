@@ -71,31 +71,8 @@ jobs:
         with:
           path: |
             node_modules
-            packages/celotool/node_modules
-            packages/cli/node_modules
-            packages/dev-utils/node_modules
-            packages/env-tests/node_modules
-            packages/flake-tracker/node_modules
-            packages/metadata-crawler/node_modules
-            packages/phone-number-privacy/combiner/node_modules
-            packages/phone-number-privacy/common/node_modules
-            packages/phone-number-privacy/monitor/node_modules
-            packages/phone-number-privacy/signer/node_modules
-            packages/protocol/node_modules
-            packages/sdk/base/node_modules
-            packages/sdk/connect/node_modules
-            packages/sdk/contractkit/node_modules
-            packages/sdk/cryptographic-utils/node_modules
-            packages/sdk/encrypted-backup/node_modules
-            packages/sdk/explorer/node_modules
-            packages/sdk/governance/node_modules
-            packages/sdk/identity/node_modules
-            packages/sdk/keystores/node_modules
-            packages/sdk/network-utils/node_modules
-            packages/sdk/phone-utils/node_modules
-            packages/sdk/transactions-uri/node_modules
-            packages/sdk/utils/node_modules
-            packages/typescript/node_modules
+            */node_modules
+            **/node_modules
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ steps.node-checksums.outputs.PACKAGE_JSON_CHECKSUM }}
           # TODO(jcortejoso): Think if remove this, to start clean with any change in deps
           restore-keys: |
@@ -141,7 +118,10 @@ jobs:
       - uses: actions/cache/restore@v3
         id: cache_node
         with:
-          path: node_modules
+          path: |
+            node_modules
+            */node_modules
+            **/node_modules
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
       - run: yarn run prettify:diff
       - run: yarn run lint
@@ -159,7 +139,10 @@ jobs:
       - uses: actions/cache/restore@v3
         id: cache_node
         with:
-          path: node_modules
+          path: |
+            node_modules
+            */node_modules
+            **/node_modules
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
@@ -200,7 +183,10 @@ jobs:
       - uses: actions/cache/restore@v3
         id: cache_node
         with:
-          path: node_modules
+          path: |
+            node_modules
+            */node_modules
+            **/node_modules
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
       - name: Run Wallet tests
         run: |
