@@ -16,9 +16,7 @@ concurrency:
 defaults:
   run:
     # working-directory: ~/app
-    # TODO(jcortejoso): When using a self-hosted runner, we can use this if `/bin/bash` is installed. Not available in gh's ubuntu-latest
     shell: bash --login -eo pipefail {0}
-    # shell: sh -e -u {0}
 
 env:
   # Increment these to force cache rebuilding
@@ -133,13 +131,10 @@ jobs:
           path: .git
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
-      - uses: actions/cache/restore@v3
-        id: cache_node
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
         with:
-          path: |
-            node_modules
-            packages
-          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+          package-json-checksum: ${{ needs.install_dependencies.outputs.package-json-checksum }}
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 30
@@ -167,7 +162,6 @@ jobs:
   wallet_test:
     name: Wallet test
     runs-on: ["self-hosted", "monorepo"]
-    if: false
     needs: install_dependencies
     steps:
       - uses: actions/cache/restore@v3
@@ -190,7 +184,6 @@ jobs:
     name: Protocol Tests Prepare
     runs-on: ["self-hosted", "monorepo"]
     needs: [lint_checks]
-    if: false
     outputs:
       protocol-test-must-run: ${{ steps.protocol-test-must-run.outputs.PROTOCOL_TEST_MUST_RUN }}
     steps:
@@ -236,7 +229,7 @@ jobs:
   protocol-test-release:
     name: Protocol Test Release
     runs-on: ["self-hosted", "monorepo"]
-    needs: [lint_checks]
+    needs: [lint_checks, pre_protocol_test_release]
     if: |
       false && needs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
     steps:
@@ -294,7 +287,6 @@ jobs:
           - name: Protocol Test Governance Network
             commnd: |
               yarn --cwd packages/protocol test governance/network/
-
           - name: Protocol Test Governance Validators
             commnd: |
               yarn --cwd packages/protocol test governance/validators/
