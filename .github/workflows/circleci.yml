@@ -116,7 +116,10 @@ jobs:
           path: .git
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
-      - uses: ./.github/actions/sync-workspace
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install_dependencies.outputs.package-json-checksum }}
       - run: yarn run prettify:diff
       - run: yarn run lint
   general_test:
@@ -291,6 +294,19 @@ jobs:
           - name: Protocol Test Governance Network
             commnd: |
               yarn --cwd packages/protocol test governance/network/
+
+          - name: Protocol Test Governance Validators
+            commnd: |
+              yarn --cwd packages/protocol test governance/validators/
+          - name: Protocol Test Governance Voting
+            commnd: |
+              yarn --cwd packages/protocol test governance/voting/
+          - name: Protocol Test Governance Identity
+            commnd: |
+              yarn --cwd packages/protocol test identity/
+          - name: Protocol Test Stability
+            commnd: |
+              yarn --cwd packages/protocol test stability/
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -306,40 +322,6 @@ jobs:
       - name: Execute matrix command for test
         run: |
           ${{ matrix.command }}
-  # protocol-test-release-snapshots:
-  #   name: Protocol Test Reslease Snapshots
-  #   runs-on: ["self-hosted", "monorepo"]
-  #   needs: [lint_checks, pre_protocol_test_release]
-  #   if: |
-  #     false && needs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
-  #   steps:
-  #     - uses: actions/cache/restore@v3
-  #       id: cache_git
-  #       with:
-  #         path: .git
-  #         key: git-${{ github.ref }}
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/cache/restore@v3
-  #       id: cache_node
-  #       with:
-  #         path: |
-  #           node_modules
-  #           packages
-  #         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
-  #     - uses: actions/cache/restore@v3
-  #       id: cache_protocol
-  #       with:
-  #         path: packages/protocol/.tmp/released_chain
-  #         key: protocol-${{ github.sha }}
-  #     - name: Run check-versions on exhaustive history of releases and compare to snapshots
-  #       run: |
-  #         yarn --cwd packages/protocol test:release-snapshots
-  #         if [[ $(git status packages/protocol/releaseData/versionReports --porcelain) ]]; then
-  #           git --no-pager diff packages/protocol/releaseData/versionReports
-  #           echo "There are git differences after generating release version report snapshots"
-  #           echo "If these changes are intended, update the 'releaseData/versionReports' accordingly"
-  #           exit 1
-  #         fi
   # protocol-test-common:
   #   name: Protocol Test Unit tests
   #   runs-on: ["self-hosted", "monorepo"]
@@ -424,3 +406,37 @@ jobs:
   #     - name: Run protocol compatibility tests
   #       run: |
   #         yarn --cwd packages/protocol test governance/network/
+
+  protocol-test-with-code-coverage:
+    name: Protocol Test with code coverage
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [lint_checks, pre_protocol_test_release]
+    if: |
+      false && needs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - uses: actions/cache/restore@v3
+        id: cache_node
+        with:
+          path: |
+            node_modules
+            packages
+          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+      - uses: actions/cache/restore@v3
+        id: cache_protocol
+        with:
+          path: packages/protocol/.tmp/released_chain
+          key: protocol-${{ github.sha }}
+      - name: Run unit tests with code coverage
+        run: |
+          yarn --cwd packages/protocol test:coverage
+      - name: Upload Coverage Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: Protocol Test Coverage
+          path: packages/protocol/coverage
