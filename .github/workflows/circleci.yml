@@ -28,7 +28,7 @@ env:
   RELEASE_TAG: core-contracts.v9
 
 jobs:
-  install_dependencies:
+  install-dependencies:
     name: Install dependencies
     outputs:
       package-json-checksum: ${{ steps.node-checksums.outputs.PACKAGE_JSON_CHECKSUM }}
@@ -84,7 +84,7 @@ jobs:
         run: yarn install
         if: steps.cache_node.outputs.cache-hit != 'true'
       - name: Run yarn postinstall if cache hitted 
-        run: yarn install
+        run: yarn install postinstall
         if: steps.cache_node.outputs.cache-hit == 'true'
       - name: Fail if generated dependency graph doesn't match committed
         run: ./scripts/ci_check_dependency_graph_changed.sh
@@ -101,10 +101,10 @@ jobs:
             exit 0
           fi
           yarn check-licenses
-  lint_checks:
+  lint-checks:
     name: Lint code
     runs-on: ["self-hosted", "monorepo"]
-    needs: install_dependencies
+    needs: install-dependencies
     steps:
       # Restore .git cache as we need to checkout the local composite action to run it:
       # https://github.com/orgs/community/discussions/11771
@@ -117,13 +117,13 @@ jobs:
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
-          package-json-checksum: ${{ needs.install_dependencies.outputs.package-json-checksum }}
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - run: yarn run prettify:diff
       - run: yarn run lint
   general_test:
     name: General jest test
     runs-on: ["self-hosted", "monorepo"]
-    needs: install_dependencies
+    needs: install-dependencies
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -134,13 +134,7 @@ jobs:
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
-          package-json-checksum: ${{ needs.install_dependencies.outputs.package-json-checksum }}
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 30
-        if: false
-        with:
-          limit-access-to-actor: true
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Run Jest Tests
         run: |
           mkdir -p test-results/jest
@@ -159,10 +153,10 @@ jobs:
         with:
           name: Jest Test Results
           path: test-results/jest
-  wallet_test:
+  wallet-test:
     name: Wallet test
     runs-on: ["self-hosted", "monorepo"]
-    needs: install_dependencies
+    needs: install-dependencies
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -170,20 +164,23 @@ jobs:
           path: .git
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
-      - uses: actions/cache/restore@v3
-        id: cache_node
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
         with:
-          path: |
-            node_modules
-            packages/
-          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 30
+        if: true
+        with:
+          limit-access-to-actor: true
       - name: Run Wallet tests
         run: |
           yarn run lerna --scope '@celo/wallet-*' run test
-  pre_protocol_test_release:
+  pre-protocol-test-release:
     name: Protocol Tests Prepare
     runs-on: ["self-hosted", "monorepo"]
-    needs: [lint_checks]
+    needs: [lint-checks]
     outputs:
       protocol-test-must-run: ${{ steps.protocol-test-must-run.outputs.PROTOCOL_TEST_MUST_RUN }}
     steps:
@@ -193,13 +190,10 @@ jobs:
           path: .git
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
-      - uses: actions/cache/restore@v3
-        id: cache_node
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
         with:
-          path: |
-            node_modules
-            packages
-          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Check if the test should run
         id: protocol-test-must-run
         run: |
@@ -229,9 +223,9 @@ jobs:
   protocol-test-release:
     name: Protocol Test Release
     runs-on: ["self-hosted", "monorepo"]
-    needs: [lint_checks, pre_protocol_test_release]
+    needs: [lint-checks, pre-protocol-test-release]
     if: |
-      false && needs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
+      false && needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -239,13 +233,10 @@ jobs:
           path: .git
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
-      - uses: actions/cache/restore@v3
-        id: cache_node
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
         with:
-          path: |
-            node_modules
-            packages
-          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - uses: actions/cache/restore@v3
         id: cache_protocol
         with:
@@ -263,9 +254,9 @@ jobs:
   protocol-test-matrix:
     name: Protocol Test Matrix
     runs-on: ["self-hosted", "monorepo"]
-    needs: [lint_checks, pre_protocol_test_release]
+    needs: [lint-checks, pre-protocol-test-release]
     if: |
-      false && needs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
+      false && needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
     strategy:
       matrix:
         include:
@@ -305,7 +296,11 @@ jobs:
         with:
           path: .git
           key: git-${{ github.ref }}
-      - uses: ./.github/actions/sync-workspace
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }} 
       - uses: actions/cache/restore@v3
         id: cache_protocol
         with:
@@ -317,9 +312,9 @@ jobs:
   # protocol-test-common:
   #   name: Protocol Test Unit tests
   #   runs-on: ["self-hosted", "monorepo"]
-  #   needs: [lint_checks, pre_protocol_test_release]
+  #   needs: [lint-checks, pre-protocol-test-release]
   #   if: |
-  #     false && needs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
+  #     false && needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
   #   steps:
   #     - uses: actions/cache/restore@v3
   #       id: cache_git
@@ -333,7 +328,7 @@ jobs:
   #         path: |
   #           node_modules
   #           packages
-  #         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+  #         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install-dependencies.outputs.package-json-checksum }}
   #     - uses: actions/cache/restore@v3
   #       id: cache_protocol
   #       with:
@@ -345,9 +340,9 @@ jobs:
   # protocol-test-compatibility:
   #   name: Protocol Test Compatibility
   #   runs-on: ["self-hosted", "monorepo"]
-  #   needs: [lint_checks, pre_protocol_test_release]
+  #   needs: [lint-checks, pre-protocol-test-release]
   #   if: |
-  #     false && needs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
+  #     false && needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
   #   steps:
   #     - uses: actions/cache/restore@v3
   #       id: cache_git
@@ -361,7 +356,7 @@ jobs:
   #         path: |
   #           node_modules
   #           packages
-  #         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+  #         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install-dependencies.outputs.package-json-checksum }}
   #     - uses: actions/cache/restore@v3
   #       id: cache_protocol
   #       with:
@@ -373,9 +368,9 @@ jobs:
   # protocol-test-governance-network:
   #   name: Protocol Test Governance Network
   #   runs-on: ["self-hosted", "monorepo"]
-  #   needs: [lint_checks, pre_protocol_test_release]
+  #   needs: [lint-checks, pre-protocol-test-release]
   #   if: |
-  #     false && needs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
+  #     false && needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
   #   steps:
   #     - uses: actions/cache/restore@v3
   #       id: cache_git
@@ -389,7 +384,7 @@ jobs:
   #         path: |
   #           node_modules
   #           packages
-  #         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+  #         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install-dependencies.outputs.package-json-checksum }}
   #     - uses: actions/cache/restore@v3
   #       id: cache_protocol
   #       with:
@@ -402,9 +397,9 @@ jobs:
   protocol-test-with-code-coverage:
     name: Protocol Test with code coverage
     runs-on: ["self-hosted", "monorepo"]
-    needs: [lint_checks, pre_protocol_test_release]
+    needs: [lint-checks, pre-protocol-test-release]
     if: |
-      false && needs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
+      false && needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -412,13 +407,10 @@ jobs:
           path: .git
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
-      - uses: actions/cache/restore@v3
-        id: cache_node
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
         with:
-          path: |
-            node_modules
-            packages
-          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }} 
       - uses: actions/cache/restore@v3
         id: cache_protocol
         with:
@@ -432,3 +424,18 @@ jobs:
         with:
           name: Protocol Test Coverage
           path: packages/protocol/coverage
+  contractkit-tests:
+    name: Protocol Test with code coverage
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies]
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }} 
