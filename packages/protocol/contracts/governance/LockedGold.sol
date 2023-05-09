@@ -7,6 +7,7 @@ import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 import "./interfaces/ILockedGold.sol";
 
+import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
@@ -22,6 +23,7 @@ contract LockedGold is
 {
   using SafeMath for uint256;
   using Address for address payable; // prettier-ignore
+  using FixidityLib for FixidityLib.Fraction;
 
   struct PendingWithdrawal {
     // The value of the pending withdrawal.
@@ -40,9 +42,17 @@ contract LockedGold is
     PendingWithdrawal[] pendingWithdrawals;
   }
 
-  struct DelegatedGold {
-    address delegatee;
-    uint256 amount;
+  struct DelegatedInfo {
+    uint256 percentage;
+    uint256 actualAmount;
+  }
+
+  struct DelegatedCelo {
+    // delegatees with how much percent they are getting -
+    // eg 0xDF => 20% and delegator total Celo which was 3000
+    // Celo at the time of delegation/latest update
+    mapping(address => DelegatedInfo) delegateesWithPercentagesAndAmount;
+    uint256 totalDelegatedCeloInPercents;
   }
 
   mapping(address => Balances) internal balances;
@@ -67,10 +77,10 @@ contract LockedGold is
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
-  // delegator -> delegatee
-  mapping(address => DelegatedGold) delegatorGold;
+  // delegator -> delegatee - how much votes did delegator delegated in total and to each delegatee
+  mapping(address => DelegatedCelo) delegatorCelo;
   // Gold that was delegated to this particular address
-  mapping(address => uint256) totalDelegatedGold;
+  mapping(address => uint256) totalDelegatedCelo;
 
   event UnlockingPeriodSet(uint256 period);
   event GoldLocked(address indexed account, uint256 value);
@@ -186,14 +196,26 @@ contract LockedGold is
   function unlock(uint256 value) external nonReentrant {
     require(getAccounts().isAccount(msg.sender), "Unknown account");
     Balances storage account = balances[msg.sender];
+
+    uint256 totalLockedGold = getAccountTotalLockedGold(msg.sender);
     // Prevent unlocking gold when voting on governance proposals so that the gold cannot be
     // used to vote more than once.
-    uint256 remainingLockedGold = getAccountTotalLockedGold(msg.sender).sub(value);
+    uint256 remainingLockedGold = totalLockedGold.sub(value);
 
     uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(msg.sender);
     require(
       remainingLockedGold >= totalReferendumVotes,
       "Not enough unlockable celo. Celo is locked in voting."
+    );
+
+    uint256 delegatedVotes = FixidityLib
+      .wrap(totalLockedGold)
+      .multiply(FixidityLib.newFixedFraction(getDelegatedAmountInPercents(msg.sender), 100))
+      .unwrap();
+
+    require(
+      totalLockedGold - delegatedVotes >= value,
+      "Not enough undelegated celo. Celo has to be removed from delegation first."
     );
 
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
@@ -262,53 +284,139 @@ contract LockedGold is
     return totalNonvoting;
   }
 
-  function delegateGovernanceVotes(address delegatee, uint256 amountToDelegate) external {
-    address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
-    uint256 totalLockedGold = getAccountTotalLockedGold(delegateeAccount);
-    require(totalLockedGold > amountToDelegate, "Not enough locked gold");
-
-    uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(msg.sender);
+  function delegateGovernanceVotes(address delegatee, uint256 percentageToDelegate) external {
     require(
-      totalReferendumVotes == totalReferendumVotes,
-      "It is not possible to delagate votes when already voting on proposal."
+      percentageToDelegate > 0 && percentageToDelegate <= 100,
+      "percents can be only between 1%..100%"
     );
 
-    DelegatedGold storage delegated = delegatorGold[msg.sender];
-    if (delegated.delegatee != address(0) && delegated.delegatee != delegateeAccount) {
-      revokeDelegatedGovernanceVotes(delegated.amount);
-    }
+    uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(msg.sender);
+    // Unless we prohibit this there is rather large overhead
+    // how to calculate and round percentage of current referendum votes
+    require(totalReferendumVotes == 0, "It is not possible to delegate when voting for proposal");
 
-    // can I ever decrese celo here ?
-    delegated.amount = amountToDelegate;
-    delegated.delegatee = delegateeAccount;
-    totalDelegatedGold[delegateeAccount] += amountToDelegate;
+    address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
+
+    DelegatedCelo storage delegated = delegatorCelo[msg.sender];
+    DelegatedInfo storage currentDelegateeInfo = delegated
+      .delegateesWithPercentagesAndAmount[delegateeAccount];
+
+    require(
+      percentageToDelegate > currentDelegateeInfo.percentage,
+      "Use revokeDelegatedGovernanceVotes to decrease delegated amount."
+    );
+
+    require(
+      delegated.totalDelegatedCeloInPercents -
+        currentDelegateeInfo.percentage +
+        percentageToDelegate <=
+        100,
+      "Cannot delegate more than 100%"
+    );
+
+    uint256 totalLockedGold = getAccountTotalLockedGold(msg.sender);
+
+    // amount that will really be delegated - whatever is already
+    // delegated to this particular delagatee is already subracted from this
+    uint256 amountToDelegate = FixidityLib
+      .wrap(totalLockedGold)
+      .multiply(FixidityLib.newFixedFraction(percentageToDelegate, 100))
+      .subtract(FixidityLib.wrap(currentDelegateeInfo.actualAmount))
+      .unwrap();
+
+    delegated.totalDelegatedCeloInPercents = delegated
+      .totalDelegatedCeloInPercents
+      .sub(currentDelegateeInfo.percentage)
+      .add(percentageToDelegate);
+    currentDelegateeInfo.percentage = percentageToDelegate;
+
+    currentDelegateeInfo.actualAmount = currentDelegateeInfo.actualAmount.add(amountToDelegate);
+    totalDelegatedCelo[delegateeAccount] = totalDelegatedCelo[delegateeAccount].add(
+      amountToDelegate
+    );
   }
 
-  function revokeDelegatedGovernanceVotes(uint256 amountToRevoke) public {
-    // it is necessary to check if delegatee is voting for some proposal with the gold or not
-    DelegatedGold storage delegated = delegatorGold[msg.sender];
-    require(delegated.delegatee != address(0), "No delegated votes");
-    require(delegated.amount <= amountToRevoke, "Not enough delegated votes");
+  function revokeDelegatedGovernanceVotes(address delegatee, uint256 percentageToRevoke) public {
+    require(
+      percentageToRevoke > 0 && percentageToRevoke <= 100,
+      "percents can be only between 1%..100%"
+    );
 
-    uint256 delegateeTotalVotingPower = getAccountTotalGovernanceVotingPower(delegated.delegatee);
+    // it is necessary to check if delegatee is voting for some proposal with the gold or not
+    DelegatedCelo storage delegated = delegatorCelo[msg.sender];
+    require(
+      delegated.totalDelegatedCeloInPercents >= percentageToRevoke,
+      "Not enough total delegated percents"
+    );
+
+    address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
+
+    DelegatedInfo storage currentDelegateeInfo = delegated
+      .delegateesWithPercentagesAndAmount[delegateeAccount];
+
+    require(currentDelegateeInfo.percentage >= percentageToRevoke, "Not enough delegated percents");
+
+    currentDelegateeInfo.percentage = currentDelegateeInfo.percentage.sub(percentageToRevoke);
+
+    uint256 delegateeTotalVotingPower = getAccountTotalGovernanceVotingPower(delegateeAccount);
     uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(msg.sender);
+
+    uint256 totalLockedGold = getAccountTotalLockedGold(msg.sender);
+
+    uint256 amountToRevoke = currentDelegateeInfo.percentage == 0
+      ? currentDelegateeInfo.actualAmount
+      : Math.min(
+        FixidityLib
+          .wrap(totalLockedGold)
+          .multiply(FixidityLib.newFixedFraction(percentageToRevoke, 100))
+          .unwrap(),
+        currentDelegateeInfo.actualAmount
+      );
 
     uint256 unusedReferendumVotes = delegateeTotalVotingPower - totalReferendumVotes;
     if (unusedReferendumVotes < amountToRevoke) {
       getGovernance().removeVotesWhenRevokingDelegatedVotes(
-        delegated.delegatee,
+        delegateeAccount,
         delegateeTotalVotingPower - amountToRevoke
       );
     }
 
-    delegated.delegatee = address(0);
-    delegated.amount -= amountToRevoke;
-    totalDelegatedGold[delegated.delegatee] -= amountToRevoke;
+    delegated.totalDelegatedCeloInPercents = delegated.totalDelegatedCeloInPercents.sub(
+      percentageToRevoke
+    );
+
+    currentDelegateeInfo.actualAmount = currentDelegateeInfo.actualAmount.sub(amountToRevoke);
+    totalDelegatedCelo[delegateeAccount] -= amountToRevoke;
   }
 
-  function getDelegatee(address account) public view returns (address, uint256) {
-    DelegatedGold storage delegated = delegatorGold[account];
-    return (delegated.delegatee, delegated.amount);
+  function updateDelegatedBalance(address delegator, address delegatee) external {
+    address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
+
+    DelegatedCelo storage delegated = delegatorCelo[delegator];
+    require(delegated.totalDelegatedCeloInPercents > 0, "delegator is not delegating");
+    DelegatedInfo storage currentDelegateeInfo = delegated
+      .delegateesWithPercentagesAndAmount[delegateeAccount];
+    require(currentDelegateeInfo.percentage > 0, "delegator is not delegating for delegatee");
+
+    uint256 totalLockedGold = getAccountTotalLockedGold(msg.sender);
+
+    // amount that will really be delegated - whatever is already
+    // delegated to this particular delagatee is already subracted from this
+    uint256 amountToDelegate = FixidityLib
+      .wrap(totalLockedGold)
+      .multiply(FixidityLib.newFixedFraction(currentDelegateeInfo.percentage, 100))
+      .subtract(FixidityLib.wrap(currentDelegateeInfo.actualAmount))
+      .unwrap();
+
+    currentDelegateeInfo.actualAmount = currentDelegateeInfo.actualAmount.add(amountToDelegate);
+    totalDelegatedCelo[delegateeAccount] = totalDelegatedCelo[delegateeAccount].add(
+      amountToDelegate
+    );
+  }
+
+  function getDelegatedAmountInPercents(address account) public view returns (uint256) {
+    DelegatedCelo storage delegated = delegatorCelo[account];
+    return delegated.totalDelegatedCeloInPercents;
   }
 
   /**
@@ -327,8 +435,15 @@ contract LockedGold is
    * @return The total amount of locked gold + delegated gold for an account.
    */
   function getAccountTotalGovernanceVotingPower(address account) public view returns (uint256) {
+    uint256 availableUndelegatedPercents = 100 - getDelegatedAmountInPercents(account);
     uint256 totalLockedGold = getAccountTotalLockedGold(account);
-    return totalLockedGold + totalDelegatedGold[account];
+
+    uint256 availableForVoting = FixidityLib
+      .wrap(totalLockedGold)
+      .multiply(FixidityLib.newFixedFraction(availableUndelegatedPercents, 100))
+      .unwrap();
+
+    return availableForVoting + totalDelegatedCelo[account];
   }
 
   /**

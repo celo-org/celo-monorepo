@@ -202,6 +202,11 @@ contract Governance is
     _;
   }
 
+  modifier onlyLockedGold() {
+    require(msg.sender == address(getLockedGold()));
+    _;
+  }
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -650,11 +655,6 @@ contract Governance is
       return false;
     }
 
-    (address delegatee, ) = getLockedGold().getDelegatee(msg.sender);
-    require(
-      delegatee == address(0),
-      "It is not possible to vote on proposal while delegating votes"
-    );
     require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
     require(value != Proposals.VoteValue.None, "Vote value unset");
 
@@ -700,11 +700,6 @@ contract Governance is
       return false;
     }
 
-    (address delegatee, ) = getLockedGold().getDelegatee(msg.sender);
-    require(
-      delegatee == address(0),
-      "It is not possible to vote on proposal while delegating votes"
-    );
     require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
 
     address account = getAccounts().voteSignerToAccount(msg.sender);
@@ -1498,10 +1493,11 @@ contract Governance is
    * @param account The address of the account.
    * @return The total number of votes cast by an account.
    */
-  function removeVotesWhenRevokingDelegatedVotes(address account, uint256 maxAmountAllowed) public {
+  function removeVotesWhenRevokingDelegatedVotes(address account, uint256 maxAmountAllowed)
+    public
+    onlyLockedGold
+  {
     Voter storage voter = voters[account];
-
-    //TODO: Only locked gold modifier
 
     for (uint256 index = 0; index < dequeued.length; index = index.add(1)) {
       Proposals.Proposal storage proposal = proposals[dequeued[index]];
@@ -1515,30 +1511,29 @@ contract Governance is
       uint256 sumOfVotes = voteRecord.yesVotes.add(voteRecord.noVotes).add(voteRecord.abstainVotes);
 
       if (sumOfVotes > maxAmountAllowed) {
-        uint256 amountToRemoveFromAbstain = Math.min(
-          voteRecord.abstainVotes,
-          sumOfVotes - maxAmountAllowed
-        );
-        voteRecord.abstainVotes -= amountToRemoveFromAbstain;
-        sumOfVotes -= amountToRemoveFromAbstain;
-        if (sumOfVotes > maxAmountAllowed) {
-          uint256 amountToRemoveFromYes = Math.min(
-            voteRecord.yesVotes,
-            sumOfVotes - maxAmountAllowed
-          );
-          voteRecord.yesVotes -= amountToRemoveFromYes;
-          sumOfVotes -= amountToRemoveFromYes;
-          if (sumOfVotes > maxAmountAllowed) {
-            uint256 amountToRemoveFromNo = Math.min(
-              voteRecord.noVotes,
-              sumOfVotes - maxAmountAllowed
-            );
-            voteRecord.noVotes -= amountToRemoveFromNo;
-            sumOfVotes -= amountToRemoveFromNo;
-          }
-        }
+        uint256 toRemove = sumOfVotes - maxAmountAllowed;
+
+        uint256 abstrainToRemove = getVotesPortion(toRemove, voteRecord.abstainVotes, sumOfVotes);
+        uint256 yesToRemove = getVotesPortion(toRemove, voteRecord.yesVotes, sumOfVotes);
+        uint256 noToRemove = getVotesPortion(toRemove, voteRecord.noVotes, sumOfVotes);
+
+        voteRecord.abstainVotes = voteRecord.abstainVotes.sub(abstrainToRemove);
+        voteRecord.yesVotes = voteRecord.yesVotes.sub(yesToRemove);
+        voteRecord.noVotes = voteRecord.noVotes.sub(noToRemove);
       }
     }
+  }
+
+  function getVotesPortion(uint256 totalToRemove, uint256 votes, uint256 sumOfAllVotes)
+    private
+    pure
+    returns (uint256)
+  {
+    return
+      FixidityLib
+        .wrap(totalToRemove)
+        .multiply(FixidityLib.newFixedFraction(votes, sumOfAllVotes))
+        .unwrap();
   }
 
   /**
