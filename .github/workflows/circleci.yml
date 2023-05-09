@@ -490,3 +490,42 @@ jobs:
       - name: Run tests
         run: |
           yarn --cwd=packages/sdk/identity test
+  cli-tests:
+    name: CeloCli Tests
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies]
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Generate DevChain
+        run: |
+          cd packages/cli
+          yarn test:reset
+      - name: Run tests
+        run: |
+          yarn --cwd=packages/cli test
+      - name: Fail if someone forgot to commit CLI docs
+        run: |
+          yarn --cwd=packages/cli docs
+          if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
+            git --no-pager diff packages/docs/command-line-interface
+            echo "There are git differences after generating CLI docs"
+            exit 1
+          fi
+      - name: Verify that a new account can be created
+        run: |
+          yarn --cwd=packages/cli run celocli account:new
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 20
+        if: true
+        with:
+          limit-access-to-actor: true
