@@ -399,7 +399,7 @@ jobs:
     runs-on: ["self-hosted", "monorepo"]
     needs: [lint-checks, pre-protocol-test-release]
     if: |
-      false && needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
+      needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -428,7 +428,6 @@ jobs:
     name: ContractKit Tests
     runs-on: ["self-hosted", "monorepo"]
     needs: [install-dependencies]
-    if: false
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -451,7 +450,6 @@ jobs:
     name: Identity Tests
     runs-on: ["self-hosted", "monorepo"]
     needs: [install-dependencies]
-    if: false
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -474,7 +472,6 @@ jobs:
     name: Transaction URI Tests
     runs-on: ["self-hosted", "monorepo"]
     needs: [install-dependencies]
-    if: false
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
