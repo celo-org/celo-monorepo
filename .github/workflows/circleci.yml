@@ -234,14 +234,9 @@ jobs:
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
       - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
+        uses: ./.github/actions/protocol-sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - uses: actions/cache/restore@v3
-        id: cache_protocol
-        with:
-          path: packages/protocol/.tmp/released_chain
-          key: protocol-${{ github.sha }}
       - name: Copy DevChain and Build generated from released tag
         run: |
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
@@ -298,14 +293,9 @@ jobs:
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
       - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
+        uses: ./.github/actions/protocol-sync-workspace
         with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }} 
-      - uses: actions/cache/restore@v3
-        id: cache_protocol
-        with:
-          path: packages/protocol/.tmp/released_chain
-          key: protocol-${{ github.sha }}
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Execute matrix command for test
         run: |
           ${{ matrix.command }}
@@ -408,14 +398,9 @@ jobs:
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
       - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
+        uses: ./.github/actions/protocol-sync-workspace
         with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }} 
-      - uses: actions/cache/restore@v3
-        id: cache_protocol
-        with:
-          path: packages/protocol/.tmp/released_chain
-          key: protocol-${{ github.sha }}
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Run unit tests with code coverage
         run: |
           yarn --cwd packages/protocol test:coverage
@@ -529,3 +514,10 @@ jobs:
         if: true
         with:
           limit-access-to-actor: true
+      # - name: Install and test the npm package
+      #   run: |
+      #     cd packages/cli
+      #     yarn pack
+      #     cd $RUNNER_TEMP
+      #     npm install $RUNNER_WORKSPACE/packages/cli/celo-cli-*.tgz
+      #     npx celocli account:new
