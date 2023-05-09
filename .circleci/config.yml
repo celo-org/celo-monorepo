@@ -197,6 +197,7 @@ jobs:
 
   general-test:
     <<: *defaults
+    # XXX (soloseng): Increased size because this test was hitting the ram limit and failing
     resource_class: xlarge
     steps:
       - attach_workspace:
@@ -235,8 +236,6 @@ jobs:
   # This pre script, generates the build and devchain, and adds it to the workspace to be used for the
   # other script
 
-  #XXX (soloseng): disabled due to node incompatibility in the RELEASE_TAG commit.
-  # (soloseng): Could use nvm to change version only for this build? This would require re-installing dependencies -_-
   pre-protocol-test-release:
     <<: *contract-defaults
     resource_class: large
@@ -264,8 +263,6 @@ jobs:
           root: .
           paths:
             - 'packages/protocol/.tmp/released_chain/*'
-  
-  #XXX (soloseng): disabled blocked by  pre-protocol-test-release
   protocol-test-release:
     <<: *contract-defaults
     resource_class: large
@@ -921,13 +918,13 @@ workflows:
       - transactions-uri-tests:
           requires:
             - contractkit-test
-      # - pre-protocol-test-release:
-      #     requires:
-      #       - lint-checks
-      # - protocol-test-release:
-      #     requires:
-      #       - lint-checks
-      #       - pre-protocol-test-release
+      - pre-protocol-test-release:
+          requires:
+            - lint-checks
+      - protocol-test-release:
+          requires:
+            - lint-checks
+            - pre-protocol-test-release
       - protocol-test-release-snapshots:
           requires:
             - lint-checks
