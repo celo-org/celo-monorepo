@@ -3,7 +3,6 @@
 
 version: 2.1
 
-
 parameters:
   # When you need to force a rebuild of the node modules cache then bump this version
   node-modules-cache-version:
@@ -130,7 +129,6 @@ jobs:
     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
     resource_class: large
     steps:
-
       - restore_cache:
           keys:
             - source-v1-{{ .Branch }}-{{ .Revision }}
@@ -199,7 +197,8 @@ jobs:
 
   general-test:
     <<: *defaults
-    resource_class: large
+    # XXX (soloseng): Increased size because this test was hitting the ram limit and failing
+    resource_class: xlarge
     steps:
       - attach_workspace:
           at: ~/app
@@ -236,6 +235,7 @@ jobs:
   # crashes on the second re-install.
   # This pre script, generates the build and devchain, and adds it to the workspace to be used for the
   # other script
+
   pre-protocol-test-release:
     <<: *contract-defaults
     resource_class: large
@@ -263,7 +263,6 @@ jobs:
           root: .
           paths:
             - 'packages/protocol/.tmp/released_chain/*'
-
   protocol-test-release:
     <<: *contract-defaults
     resource_class: large
@@ -994,24 +993,24 @@ workflows:
       - odis-test:
           requires:
             - lint-checks
-      - flakey-test-summary:
-          requires:
-            - protocol-test-common
-            - protocol-test-compatibility
-            - protocol-test-governance-network
-            - protocol-test-governance-validators
-            - protocol-test-governance-voting
-            - protocol-test-identity
-            - protocol-test-stability
-            - end-to-end-geth-transfer-test
-            - end-to-end-geth-blockchain-parameters-test
-            - end-to-end-geth-slashing-test
-            - end-to-end-geth-governance-test
-            - end-to-end-geth-replica-test
-            - end-to-end-geth-sync-test
-            - end-to-end-geth-validator-order-test
-            - end-to-end-cip35-eth-compatibility-test
-            - odis-test
+      # - flakey-test-summary:
+      #     requires:
+      #       - protocol-test-common
+      #       - protocol-test-compatibility
+      #       - protocol-test-governance-network
+      #       - protocol-test-governance-validators
+      #       - protocol-test-governance-voting
+      #       - protocol-test-identity
+      #       - protocol-test-stability
+      #       - end-to-end-geth-transfer-test
+      #       - end-to-end-geth-blockchain-parameters-test
+      #       - end-to-end-geth-slashing-test
+      #       - end-to-end-geth-governance-test
+      #       - end-to-end-geth-replica-test
+      #       - end-to-end-geth-sync-test
+      #       - end-to-end-geth-validator-order-test
+      #       - end-to-end-cip35-eth-compatibility-test
+      #       - odis-test
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
