@@ -71,8 +71,7 @@ jobs:
         with:
           path: |
             node_modules
-            */node_modules
-            **/node_modules
+            packages
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ steps.node-checksums.outputs.PACKAGE_JSON_CHECKSUM }}
           # TODO(jcortejoso): Think if remove this, to start clean with any change in deps
           restore-keys: |
@@ -120,8 +119,7 @@ jobs:
         with:
           path: |
             node_modules
-            */node_modules
-            **/node_modules
+            packages
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
       - run: yarn run prettify:diff
       - run: yarn run lint
@@ -141,8 +139,7 @@ jobs:
         with:
           path: |
             node_modules
-            */node_modules
-            **/node_modules
+            packages
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
@@ -185,8 +182,7 @@ jobs:
         with:
           path: |
             node_modules
-            */node_modules
-            **/node_modules
+            packages/
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
       - name: Run Wallet tests
         run: |
