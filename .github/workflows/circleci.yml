@@ -115,7 +115,7 @@ jobs:
         with:
           path: .git
           key: git-${{ github.ref }}
-      - uses: ./.github/actions/my-action
+      - uses: ./.github/actions/sync-workspace
       - run: yarn run prettify:diff
       - run: yarn run lint
   general_test:
@@ -352,3 +352,31 @@ jobs:
       - name: Run protocol compatibility tests
         run: |
           yarn --cwd packages/protocol test compatibility/
+  protocol-test-governance-network:
+    name: Protocol Test Compatibility
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [lint_checks]
+    if: |
+      false && needs.pre_protocol_test_release.outputs.protocol-test-must-run == 'true'
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - uses: actions/cache/restore@v3
+        id: cache_node
+        with:
+          path: |
+            node_modules
+            packages
+          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+      - uses: actions/cache/restore@v3
+        id: cache_protocol
+        with:
+          path: packages/protocol/.tmp/released_chain
+          key: protocol-${{ github.sha }}
+      - name: Run protocol compatibility tests
+        run: |
+          yarn --cwd packages/protocol test governance/network/
