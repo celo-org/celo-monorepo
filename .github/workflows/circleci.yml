@@ -115,12 +115,7 @@ jobs:
         with:
           path: .git
           key: git-${{ github.ref }}
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 10
-        if: true
-        with:
-          limit-access-to-actor: true
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/sync-workspace
       - run: yarn run prettify:diff
       - run: yarn run lint
