@@ -84,7 +84,7 @@ jobs:
         run: yarn install
         if: steps.cache_node.outputs.cache-hit != 'true'
       - name: Run yarn postinstall if cache hitted 
-        run: yarn install postinstall
+        run: yarn run postinstall
         if: steps.cache_node.outputs.cache-hit == 'true'
       - name: Fail if generated dependency graph doesn't match committed
         run: ./scripts/ci_check_dependency_graph_changed.sh
