@@ -74,13 +74,6 @@ jobs:
           # TODO(jcortejoso): Think if remove this, to start clean with any change in deps
           restore-keys: |
             node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-
-      # For debugging cache issues
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 10
-        if: false
-        with:
-          limit-access-to-actor: true
       - name: Install yarn dependencies
         run: yarn install
         if: steps.cache_node.outputs.cache-hit != 'true'
@@ -89,6 +82,10 @@ jobs:
         if: steps.cache_node.outputs.cache-hit == 'true'
       - name: Fail if generated dependency graph doesn't match committed
         run: ./scripts/ci_check_dependency_graph_changed.sh
+      - name: Fail if any file changed on git
+        run: |
+          # This fails if there is any change
+          git diff-index --quiet HEAD --
       - name: Build packages
         run: yarn build --ignore docs --include-dependencies
       - name: Check licenses
@@ -169,12 +166,6 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 30
-        if: false
-        with:
-          limit-access-to-actor: true
       - name: Run Wallet tests
         run: |
           yarn run lerna --scope '@celo/wallet-*' run test
@@ -200,20 +191,10 @@ jobs:
         uses: tj-actions/changed-files@v35
         with:
           fetch_depth: "100"
-      - name: List all changed files
-        run: |
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            echo "$file was changed"
-          done
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 20
-        if: false
-        with:
-          limit-access-to-actor: true
       - name: Export protocol test must run
         id: protocol-test-must-run
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/protocol')
+        # TODO(jcortejoso): Remove true
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/protocol') || true
         run: |
           # TODO(jcortejoso): This script slightly depends on CircleCI
           # Ideally refactor this to depend just on GitHub Actions
@@ -223,18 +204,18 @@ jobs:
       - name: Cache protocol devchain
         uses: actions/cache@v3
         id: cache_protocol
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/protocol')
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/protocol') || true
         with:
           path: packages/protocol/.tmp/released_chain
           key: protocol-${{ github.sha }}
           restore-keys: |
             protocol-${{ github.sha }}
       - name: Opcode tests
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/protocol')
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/protocol') || true
         run: |
           yarn --cwd packages/protocol check-opcodes
       - name: Generate devchain of previous release
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/protocol')
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/protocol') || true
         run: |
           echo "Comparing against $RELEASE_TAG"
           # Github has phased out the git protocol so we ensure that we use
@@ -529,12 +510,6 @@ jobs:
       - name: Verify that a new account can be created
         run: |
           yarn --cwd=packages/cli run celocli account:new
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 20
-        if: false
-        with:
-          limit-access-to-actor: true
       # TODO(jcortejoso): Review later
       # - name: Install and test the npm package
       #   run: |
