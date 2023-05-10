@@ -82,6 +82,12 @@ jobs:
         if: steps.cache_node.outputs.cache-hit == 'true'
       - name: Fail if generated dependency graph doesn't match committed
         run: ./scripts/ci_check_dependency_graph_changed.sh
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 20
+        if: true
+        with:
+          limit-access-to-actor: true
       - name: Fail if any file changed on git
         run: |
           # This fails if there is any change
