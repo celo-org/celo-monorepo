@@ -195,26 +195,40 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Check if the test should run
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
+        with:
+          fetch_depth: "100"
+      - name: Export protocol test must run
         id: protocol-test-must-run
+        if: steps.changed-files.outputs.files-changed.contains('packages/protocol')
         run: |
           # TODO(jcortejoso): This script slightly depends on CircleCI
           # Ideally refactor this to depend just on GitHub Actions
           # ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
           echo "Protocol tests runs always"
           echo "PROTOCOL_TEST_MUST_RUN=true" >> "$GITHUB_OUTPUT"
+      - name: Export protocol test must not run
+        id: protocol-test-must-run
+        if: !steps.changed-files.outputs.files-changed.contains('packages/protocol')
+        run: |
+          echo "PROTOCOL_TEST_MUST_RUN=false" >> "$GITHUB_OUTPUT"
       - name: Cache protocol devchain
         uses: actions/cache@v3
         id: cache_protocol
+        if: steps.changed-files.outputs.files-changed.contains('packages/protocol')
         with:
           path: packages/protocol/.tmp/released_chain
           key: protocol-${{ github.sha }}
           restore-keys: |
             protocol-${{ github.sha }}
       - name: Opcode tests
+        if: steps.changed-files.outputs.files-changed.contains('packages/protocol')
         run: |
           yarn --cwd packages/protocol check-opcodes
       - name: Generate devchain of previous release
+        if: steps.changed-files.outputs.files-changed.contains('packages/protocol')
         run: |
           echo "Comparing against $RELEASE_TAG"
           # Github has phased out the git protocol so we ensure that we use
