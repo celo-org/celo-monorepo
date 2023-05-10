@@ -77,6 +77,8 @@ jobs:
             packages/**/lib
             packages/**/dist
             packages/**/build
+            packages/protocol/*.js
+            packages/protocol/**/*.js
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ steps.node-checksums.outputs.PACKAGE_JSON_CHECKSUM }}
           # TODO(jcortejoso): Think if remove this, to start clean with any change in deps
           restore-keys: |

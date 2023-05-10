@@ -16,6 +16,8 @@ runs:
           packages/**/lib
           packages/**/dist
           packages/**/build
+          packages/protocol/*.js
+          packages/protocol/**/*.js
         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ inputs.package-json-checksum }}
         enableCrossOsArchive: true
         fail-on-cache-miss: true
