@@ -140,6 +140,16 @@ function generateFilesForTruffle(outdir: string) {
   exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}" `)
 }
 
+function generateFilesForEthers(outdir: string) {
+  console.log(`protocol: Generating Ethers Types to ${outdir}`)
+  exec(`rm -rf "${outdir}"`)
+
+  const contractKitContracts = CoreContracts.concat('Proxy').concat(Interfaces)
+  const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
+
+  exec(`yarn run --silent typechain --target=ethers-v5 --outDir "${outdir}" "${globPattern}"`)
+}
+
 async function generateFilesForContractKit(outdir: string) {
   console.log(`protocol: Generating Web3 Types to ${outdir}`)
   exec(`rm -rf ${outdir}`)
@@ -184,6 +194,7 @@ const _buildTargets = {
   solidity: undefined,
   truffleTypes: undefined,
   web3Types: undefined,
+  ethersTypes: undefined,
 }
 
 async function main(buildTargets: typeof _buildTargets) {
@@ -192,6 +203,9 @@ async function main(buildTargets: typeof _buildTargets) {
   }
   if (buildTargets.truffleTypes) {
     generateFilesForTruffle(buildTargets.truffleTypes)
+  }
+  if (buildTargets.ethersTypes) {
+    generateFilesForEthers(buildTargets.ethersTypes)
   }
   if (buildTargets.web3Types) {
     await generateFilesForContractKit(buildTargets.web3Types)

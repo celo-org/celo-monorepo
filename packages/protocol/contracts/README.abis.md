@@ -7,19 +7,29 @@ Smart contracts ABIS for the Celo protocol.
 ### Installation
 
 ```bash
-npm install @celo/abis@beta
+npm install @celo/abis
 ```
 
 or
 
 ```bash
-yarn add @celo/abis@beta
+yarn add @celo/abis
 ```
 
 ### In your javascript or ts
 
-```js
+```ts
+// json abi
 import Accounts from '@celo/abis/Accounts.json'
+
+// ethers
+import { Accounts } from '@celo/abis/types/ethers'
+
+// web3
+import Accounts from '@celo/abis/types/web3/Accounts'
+
+// truffle
+import { AccountsContract } from '@celo/abis/types/truffle'
 ```
 
 ## License

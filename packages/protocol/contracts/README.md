@@ -7,13 +7,13 @@ Smart contracts for the Celo protocol.
 ### Installation
 
 ```bash
-npm install @celo/contracts@beta
+npm install @celo/contracts
 ```
 
 or
 
 ```bash
-yarn add @celo/contracts@beta
+yarn add @celo/contracts
 ```
 
 ### In your Solidity contracts
