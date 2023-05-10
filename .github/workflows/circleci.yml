@@ -124,12 +124,6 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 20
-        if: true
-        with:
-          limit-access-to-actor: true
       - run: yarn run prettify:diff
       - run: yarn run lint
   general_test:
@@ -536,7 +530,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 20
-        if: false
+        if: true
         with:
           limit-access-to-actor: true
       - name: Install and test the npm package
