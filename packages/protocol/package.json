@@ -113,7 +113,7 @@
     "targz": "^1.0.1",
     "tmp": "^0.1.0",
     "truffle-typings": "^1.0.6",
-    "ts-node": "8.3.0",
+    "ts-node": "10.9.1",
     "typechain": "1.0.5",
     "typechain-target-truffle": "1.0.2",
     "yargs": "^14.0.0"

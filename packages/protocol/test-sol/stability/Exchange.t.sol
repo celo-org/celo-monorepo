@@ -54,9 +54,9 @@ contract ExchangeTest is Test, WithRegistry, TokenHelpers {
   function setUp() public {
     deployer = actor("deployer");
     rando = actor("rando");
-    // Go somwehre in the future
+    // Go somwhere in the future
     vm.warp(60 * 60 * 24 * 7 * 100);
-    changePrank(deployer);
+    vm.startPrank(deployer);
     freezer = new Freezer(true);
     celoToken = new GoldToken(true);
     reserve = new MockReserve();
