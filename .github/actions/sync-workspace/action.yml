@@ -12,5 +12,6 @@ runs:
       with:
         path: |
           node_modules
-          packages
+          packages/**/node_modules
+          packages/**/lib
         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ inputs.package-json-checksum }}
