@@ -105,7 +105,7 @@ circleci@7040a7660754:/tmp/tmp1$ ./node_modules/.bin/celocli
 CLI Tool for transacting with the Celo protocol
 
 VERSION
-  @celo/celocli/1.6.3 linux-x64 node-v18.16.0
+  @celo/celocli/1.6.3 linux-x64 node-v18.14.0
 
 USAGE
   $ celocli [COMMAND]
