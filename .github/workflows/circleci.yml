@@ -35,6 +35,7 @@ jobs:
       package-json-checksum: ${{ steps.node-checksums.outputs.PACKAGE_JSON_CHECKSUM }}
     # runs-on: ubuntu-latest
     runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
     steps:
       - name: Restore .git cache
         uses: actions/cache@v3
@@ -92,7 +93,7 @@ jobs:
       - name: Fail if any file changed on git
         run: |
           # This fails if there is any change
-          if ! git diff-index HEAD --; then
+          if ! git diff-index --quiet HEAD --; then
             echo "Git changes detected while building. If this is unexpected, bump NODE_MODULE_CACHE_VERSION in .github/workflows/circleci.yml"
             exit 1
           fi
@@ -112,6 +113,7 @@ jobs:
   lint-checks:
     name: Lint code
     runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
     needs: install-dependencies
     steps:
       # Restore .git cache as we need to checkout the local composite action to run it:
@@ -164,6 +166,7 @@ jobs:
   wallet-test:
     name: Wallet test
     runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
     needs: install-dependencies
     steps:
       - uses: actions/cache/restore@v3
@@ -182,6 +185,7 @@ jobs:
   pre-protocol-test-release:
     name: Protocol Tests Prepare
     runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
     needs: [install-dependencies, lint-checks]
     outputs:
       protocol-test-must-run: ${{ steps.protocol-test-must-run.outputs.PROTOCOL_TEST_MUST_RUN }}
@@ -235,6 +239,7 @@ jobs:
   protocol-test-release:
     name: Protocol Test Release
     runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
       needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
@@ -261,6 +266,7 @@ jobs:
   protocol-test-matrix:
     name: Protocol Test Matrix - ${{ matrix.name }}
     runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
       needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
@@ -315,6 +321,7 @@ jobs:
   protocol-test-with-code-coverage:
     name: Protocol Test with code coverage
     runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
       needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
@@ -340,6 +347,7 @@ jobs:
   contractkit-tests:
     name: ContractKit Tests
     runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
     needs: [install-dependencies]
     steps:
       - uses: actions/cache/restore@v3
@@ -362,6 +370,7 @@ jobs:
   identity-tests:
     name: Identity Tests
     runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
     needs: [install-dependencies]
     steps:
       - uses: actions/cache/restore@v3
@@ -384,6 +393,7 @@ jobs:
   transactions-uri-tests:
     name: Transaction URI Tests
     runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
     needs: [install-dependencies]
     steps:
       - uses: actions/cache/restore@v3
@@ -406,6 +416,7 @@ jobs:
   cli-tests:
     name: CeloCli Tests
     runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
     needs: [install-dependencies]
     steps:
       - uses: actions/cache/restore@v3
@@ -447,6 +458,7 @@ jobs:
   typescript-tests:
     name: Typescript package Tests
     runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
     needs: [install-dependencies]
     steps:
       - uses: actions/cache/restore@v3
@@ -495,6 +507,7 @@ jobs:
   base-test:
     name: SDK Base package Tests
     runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
     needs: [install-dependencies]
     steps:
       - uses: actions/cache/restore@v3
@@ -510,7 +523,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 20
-        if: true
+        if: false
         with:
           limit-access-to-actor: true
       - name: Install and test the npm package
@@ -519,11 +532,12 @@ jobs:
           cd packages/sdk/base
           yarn pack
           cd $RUNNER_TEMP
-          npm install $RUNNER_WORKSPACE/packages/base/*.tgz
+          npm install $RUNNER_WORKSPACE/packages/sdk/base/*.tgz
 
   utils-test:
     name: SDK Utils package Tests
     runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
     needs: [install-dependencies]
     steps:
       - uses: actions/cache/restore@v3
@@ -544,8 +558,8 @@ jobs:
           cd ../utils
           yarn pack
           cd $RUNNER_TEMP
-          npm install $RUNNER_WORKSPACE/packages/base/*.tgz
-          npm install $RUNNER_WORKSPACE/packages/utils/*.tgz
+          npm install $RUNNER_WORKSPACE/packages/sdk/base/*.tgz
+          npm install $RUNNER_WORKSPACE/packages/sdk/utils/*.tgz
 
   # end-to-end-geth-transfer-test:
   #   name: Celo-Blockchain E2E Transfer test
@@ -570,6 +584,7 @@ jobs:
   end-to-end-geth-matrix:
     name: Celo Blockchain e2e Test Matrix - ${{ matrix.name }}
     runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
       needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
