@@ -16,19 +16,19 @@ concurrency:
 defaults:
   run:
     # working-directory: ~/app
-    # TODO(jcortejoso): When using a self-hosted runner, we can use this if `/bin/bash` is installed. Not available in gh's ubuntu-latest
     shell: bash --login -eo pipefail {0}
-    # shell: sh -e -u {0}
 
 env:
   # Increment these to force cache rebuilding
-  NODE_MODULE_CACHE_VERSION: 1
+  NODE_MODULE_CACHE_VERSION: 2
   NODE_OPTIONS: '--max-old-space-size=4096'
   TERM: dumb
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
+  # Git Tag for contract release to use
+  RELEASE_TAG: core-contracts.v9
 
 jobs:
-  install_dependencies:
+  install-dependencies:
     name: Install dependencies
     outputs:
       package-json-checksum: ${{ steps.node-checksums.outputs.PACKAGE_JSON_CHECKSUM }}
@@ -67,7 +67,9 @@ jobs:
         uses: actions/cache@v3
         id: cache_node
         with:
-          path: node_modules
+          path: |
+            node_modules
+            packages
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ steps.node-checksums.outputs.PACKAGE_JSON_CHECKSUM }}
           # TODO(jcortejoso): Think if remove this, to start clean with any change in deps
           restore-keys: |
@@ -75,14 +77,14 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 10
-        if: false
+        if: true
         with:
           limit-access-to-actor: true
       - name: Install yarn dependencies
         run: yarn install
         if: steps.cache_node.outputs.cache-hit != 'true'
       - name: Run yarn postinstall if cache hitted 
-        run: yarn install
+        run: yarn run postinstall
         if: steps.cache_node.outputs.cache-hit == 'true'
       - name: Fail if generated dependency graph doesn't match committed
         run: ./scripts/ci_check_dependency_graph_changed.sh
@@ -99,28 +101,29 @@ jobs:
             exit 0
           fi
           yarn check-licenses
-  lint_checks:
+  lint-checks:
     name: Lint code
     runs-on: ["self-hosted", "monorepo"]
-    needs: install_dependencies
+    needs: install-dependencies
     steps:
+      # Restore .git cache as we need to checkout the local composite action to run it:
+      # https://github.com/orgs/community/discussions/11771
       - uses: actions/cache/restore@v3
         id: cache_git
         with:
           path: .git
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
-      - uses: actions/cache/restore@v3
-        id: cache_node
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
         with:
-          path: node_modules
-          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - run: yarn run prettify:diff
       - run: yarn run lint
   general_test:
     name: General jest test
     runs-on: ["self-hosted", "monorepo"]
-    needs: install_dependencies
+    needs: install-dependencies
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -128,12 +131,10 @@ jobs:
           path: .git
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
-      - uses: actions/cache/restore@v3
-        id: cache_node
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
         with:
-          path: node_modules
-          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install_dependencies.outputs.package-json-checksum }}
-      - run: yarn run prettify:diff
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Run Jest Tests
         run: |
           mkdir -p test-results/jest
@@ -152,3 +153,419 @@ jobs:
         with:
           name: Jest Test Results
           path: test-results/jest
+  wallet-test:
+    name: Wallet test
+    runs-on: ["self-hosted", "monorepo"]
+    needs: install-dependencies
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 30
+        if: false
+        with:
+          limit-access-to-actor: true
+      - name: Run Wallet tests
+        run: |
+          yarn run lerna --scope '@celo/wallet-*' run test
+  pre-protocol-test-release:
+    name: Protocol Tests Prepare
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies, lint-checks]
+    outputs:
+      protocol-test-must-run: ${{ steps.protocol-test-must-run.outputs.PROTOCOL_TEST_MUST_RUN }}
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Check if the test should run
+        id: protocol-test-must-run
+        run: |
+          # TODO(jcortejoso): This script slightly depends on CircleCI
+          # Ideally refactor this to depend just on GitHub Actions
+          # ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+          echo "Protocol tests runs always"
+          echo "PROTOCOL_TEST_MUST_RUN=true" >> "$GITHUB_OUTPUT"
+      - name: Cache protocol devchain
+        uses: actions/cache@v3
+        id: cache_protocol
+        with:
+          path: packages/protocol/.tmp/released_chain
+          key: protocol-${{ github.sha }}
+          restore-keys: |
+            protocol-${{ github.sha }}
+      - name: Opcode tests
+        run: |
+          yarn --cwd packages/protocol check-opcodes
+      - name: Generate devchain of previous release
+        run: |
+          echo "Comparing against $RELEASE_TAG"
+          # Github has phased out the git protocol so we ensure that we use
+          # https for all git operations that yarn may perform.
+          git config --global url."https://github.com".insteadOf git://github.com
+          yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
+  protocol-test-release:
+    name: Protocol Test Release
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies, lint-checks, pre-protocol-test-release]
+    if: |
+      needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/protocol-sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Copy DevChain and Build generated from released tag
+        run: |
+          BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
+          (cp -r packages/protocol/.tmp/released_chain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
+      - name: Test against current release
+        run: |
+          echo "Comparing against $RELEASE_TAG"
+          BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
+          yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
+  protocol-test-matrix:
+    name: Protocol Test Matrix - ${{ matrix.name }}
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies, lint-checks, pre-protocol-test-release]
+    if: |
+      needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
+    strategy:
+      matrix:
+        include:
+          - name: Protocol Test Reslease Snapshots
+            command: |
+              yarn --cwd packages/protocol test:release-snapshots
+              if [[ $(git status packages/protocol/releaseData/versionReports --porcelain) ]]; then
+                git --no-pager diff packages/protocol/releaseData/versionReports
+                echo "There are git differences after generating release version report snapshots"
+                echo "If these changes are intended, update the 'releaseData/versionReports' accordingly"
+                exit 1
+              fi
+          - name: Protocol Test Unit tests
+            commnd: |
+              yarn --cwd packages/protocol test common/
+          - name: Protocol Test Compatibility
+            commnd: |
+              yarn --cwd packages/protocol test compatibility/
+          - name: Protocol Test Governance Network
+            commnd: |
+              yarn --cwd packages/protocol test governance/network/
+          - name: Protocol Test Governance Validators
+            commnd: |
+              yarn --cwd packages/protocol test governance/validators/
+          - name: Protocol Test Governance Voting
+            commnd: |
+              yarn --cwd packages/protocol test governance/voting/
+          - name: Protocol Test Governance Identity
+            commnd: |
+              yarn --cwd packages/protocol test identity/
+          - name: Protocol Test Stability
+            commnd: |
+              yarn --cwd packages/protocol test stability/
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/protocol-sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Execute matrix command for test
+        run: |
+          ${{ matrix.command }}
+  # protocol-test-common:
+  #   name: Protocol Test Unit tests
+  #   runs-on: ["self-hosted", "monorepo"]
+  #   needs: [lint-checks, pre-protocol-test-release]
+  #   if: |
+  #     false && needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
+  #   steps:
+  #     - uses: actions/cache/restore@v3
+  #       id: cache_git
+  #       with:
+  #         path: .git
+  #         key: git-${{ github.ref }}
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/cache/restore@v3
+  #       id: cache_node
+  #       with:
+  #         path: |
+  #           node_modules
+  #           packages
+  #         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install-dependencies.outputs.package-json-checksum }}
+  #     - uses: actions/cache/restore@v3
+  #       id: cache_protocol
+  #       with:
+  #         path: packages/protocol/.tmp/released_chain
+  #         key: protocol-${{ github.sha }}
+  #     - name: Unit tests
+  #       run: |
+  #         yarn --cwd packages/protocol test common/
+  # protocol-test-compatibility:
+  #   name: Protocol Test Compatibility
+  #   runs-on: ["self-hosted", "monorepo"]
+  #   needs: [lint-checks, pre-protocol-test-release]
+  #   if: |
+  #     false && needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
+  #   steps:
+  #     - uses: actions/cache/restore@v3
+  #       id: cache_git
+  #       with:
+  #         path: .git
+  #         key: git-${{ github.ref }}
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/cache/restore@v3
+  #       id: cache_node
+  #       with:
+  #         path: |
+  #           node_modules
+  #           packages
+  #         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install-dependencies.outputs.package-json-checksum }}
+  #     - uses: actions/cache/restore@v3
+  #       id: cache_protocol
+  #       with:
+  #         path: packages/protocol/.tmp/released_chain
+  #         key: protocol-${{ github.sha }}
+  #     - name: Run protocol compatibility tests
+  #       run: |
+  #         yarn --cwd packages/protocol test compatibility/
+  # protocol-test-governance-network:
+  #   name: Protocol Test Governance Network
+  #   runs-on: ["self-hosted", "monorepo"]
+  #   needs: [lint-checks, pre-protocol-test-release]
+  #   if: |
+  #     false && needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
+  #   steps:
+  #     - uses: actions/cache/restore@v3
+  #       id: cache_git
+  #       with:
+  #         path: .git
+  #         key: git-${{ github.ref }}
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/cache/restore@v3
+  #       id: cache_node
+  #       with:
+  #         path: |
+  #           node_modules
+  #           packages
+  #         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install-dependencies.outputs.package-json-checksum }}
+  #     - uses: actions/cache/restore@v3
+  #       id: cache_protocol
+  #       with:
+  #         path: packages/protocol/.tmp/released_chain
+  #         key: protocol-${{ github.sha }}
+  #     - name: Run protocol compatibility tests
+  #       run: |
+  #         yarn --cwd packages/protocol test governance/network/
+
+  protocol-test-with-code-coverage:
+    name: Protocol Test with code coverage
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies, lint-checks, pre-protocol-test-release]
+    if: |
+      needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/protocol-sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Run unit tests with code coverage
+        run: |
+          yarn --cwd packages/protocol test:coverage
+      - name: Upload Coverage Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: Protocol Test Coverage
+          path: packages/protocol/coverage
+  contractkit-tests:
+    name: ContractKit Tests
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies]
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Generate DevChain
+        run: |
+          cd packages/sdk/contractkit
+          yarn test:reset
+      - name: Run tests
+        run: |
+          yarn --cwd=packages/sdk/contractkit test
+  identity-tests:
+    name: Identity Tests
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies]
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Generate DevChain
+        run: |
+          cd packages/sdk/identity
+          yarn test:reset
+      - name: Run tests
+        run: |
+          yarn --cwd=packages/sdk/identity test
+  transactions-uri-tests:
+    name: Transaction URI Tests
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies]
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Generate DevChain
+        run: |
+          cd packages/sdk/identity
+          yarn test:reset
+      - name: Run tests
+        run: |
+          yarn --cwd=packages/sdk/identity test
+  cli-tests:
+    name: CeloCli Tests
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies]
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Generate DevChain
+        run: |
+          cd packages/cli
+          yarn test:reset
+      - name: Run tests
+        run: |
+          yarn --cwd=packages/cli test
+      - name: Fail if someone forgot to commit CLI docs
+        run: |
+          yarn --cwd=packages/cli docs
+          if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
+            git --no-pager diff packages/docs/command-line-interface
+            echo "There are git differences after generating CLI docs"
+            exit 1
+          fi
+      - name: Verify that a new account can be created
+        run: |
+          yarn --cwd=packages/cli run celocli account:new
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 20
+        if: false
+        with:
+          limit-access-to-actor: true
+      # TODO(jcortejoso): Review later
+      # - name: Install and test the npm package
+      #   run: |
+      #     cd packages/cli
+      #     yarn pack
+      #     cd $RUNNER_TEMP
+      #     npm install $RUNNER_WORKSPACE/packages/cli/celo-cli-*.tgz
+      #     npx celocli account:new
+  typescript-tests:
+    name: Typescript package Tests
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies]
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Generate DevChain
+        run: |
+          cd packages/cli
+          yarn test:reset
+      - name: Run tests
+        run: |
+          yarn --cwd=packages/cli test
+      - name: Fail if someone forgot to commit CLI docs
+        run: |
+          yarn --cwd=packages/cli docs
+          if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
+            git --no-pager diff packages/docs/command-line-interface
+            echo "There are git differences after generating CLI docs"
+            exit 1
+          fi
+      - name: Verify that a new account can be created
+        run: |
+          yarn --cwd=packages/cli run celocli account:new
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 20
+        if: false
+        with:
+          limit-access-to-actor: true
+      # TODO(jcortejoso): Review later
+      # - name: Install and test the npm package
+      #   run: |
+      #     cd packages/cli
+      #     yarn pack
+      #     cd $RUNNER_TEMP
+      #     npm install $RUNNER_WORKSPACE/packages/cli/celo-cli-*.tgz
+      #     npx celocli account:new
