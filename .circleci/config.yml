@@ -183,12 +183,7 @@ jobs:
           root: .
           paths:
             - .
-      
-      - run:
-          name: Debug
-          command: |
-            exit 1
-
+  
   lint-checks:
     <<: *defaults
     resource_class: large
