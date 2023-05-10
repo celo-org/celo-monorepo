@@ -74,10 +74,11 @@ jobs:
           # TODO(jcortejoso): Think if remove this, to start clean with any change in deps
           restore-keys: |
             node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-
+      # For debugging cache issues
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 10
-        if: true
+        if: false
         with:
           limit-access-to-actor: true
       - name: Install yarn dependencies
