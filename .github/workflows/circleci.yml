@@ -213,33 +213,28 @@ jobs:
           limit-access-to-actor: true
       - name: Export protocol test must run
         id: protocol-test-must-run
-        if: contains(steps.changed-files.outputs.files-changed, 'packages/protocol')
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/protocol')
         run: |
           # TODO(jcortejoso): This script slightly depends on CircleCI
           # Ideally refactor this to depend just on GitHub Actions
           # ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
           echo "Protocol tests runs always"
           echo "PROTOCOL_TEST_MUST_RUN=true" >> "$GITHUB_OUTPUT"
-      - name: Export protocol test must not run
-        id: protocol-test-must-not-run
-        if: !contains(steps.changed-files.outputs.files-changed, 'packages/protocol')
-        run: |
-          echo "PROTOCOL_TEST_MUST_RUN=false" >> "$GITHUB_OUTPUT"
       - name: Cache protocol devchain
         uses: actions/cache@v3
         id: cache_protocol
-        if: contains(steps.changed-files.outputs.files-changed, 'packages/protocol')
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/protocol')
         with:
           path: packages/protocol/.tmp/released_chain
           key: protocol-${{ github.sha }}
           restore-keys: |
             protocol-${{ github.sha }}
       - name: Opcode tests
-        if: contains(steps.changed-files.outputs.files-changed, 'packages/protocol')
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/protocol')
         run: |
           yarn --cwd packages/protocol check-opcodes
       - name: Generate devchain of previous release
-        if: contains(steps.changed-files.outputs.files-changed, 'packages/protocol')
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/protocol')
         run: |
           echo "Comparing against $RELEASE_TAG"
           # Github has phased out the git protocol so we ensure that we use
