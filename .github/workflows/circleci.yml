@@ -571,3 +571,53 @@ jobs:
       #     cd $RUNNER_TEMP
       #     npm install $RUNNER_WORKSPACE/packages/cli/celo-cli-*.tgz
       #     npx celocli account:new
+
+  base-test:
+    name: SDK Base package Tests
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies]
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Install and test the npm package
+        run: |
+          set -euo pipefail
+          cd packages/sdk/base
+          yarn pack
+          cd $RUNNER_TEMP
+          npm install $RUNNER_WORKSPACE/packages/base/*.tgz
+
+  utils-test:
+    name: SDK Base package Tests
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies]
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Install and test the npm package
+        run: |
+          set -euo pipefail
+          cd packages/sdk/base
+          yarn pack
+          cd ../utils
+          yarn pack
+          cd $RUNNER_TEMP
+          npm install $RUNNER_WORKSPACE/packages/base/*.tgz
+          npm install $RUNNER_WORKSPACE/packages/utils/*.tgz
+
