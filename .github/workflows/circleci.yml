@@ -26,6 +26,7 @@ env:
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
   # Git Tag for contract release to use
   RELEASE_TAG: core-contracts.v9
+  CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
 
 jobs:
   install-dependencies:
@@ -307,90 +308,6 @@ jobs:
       - name: Execute matrix command for test
         run: |
           ${{ matrix.command }}
-  # protocol-test-common:
-  #   name: Protocol Test Unit tests
-  #   runs-on: ["self-hosted", "monorepo"]
-  #   needs: [lint-checks, pre-protocol-test-release]
-  #   if: |
-  #     false && needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
-  #   steps:
-  #     - uses: actions/cache/restore@v3
-  #       id: cache_git
-  #       with:
-  #         path: .git
-  #         key: git-${{ github.ref }}
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/cache/restore@v3
-  #       id: cache_node
-  #       with:
-  #         path: |
-  #           node_modules
-  #           packages
-  #         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install-dependencies.outputs.package-json-checksum }}
-  #     - uses: actions/cache/restore@v3
-  #       id: cache_protocol
-  #       with:
-  #         path: packages/protocol/.tmp/released_chain
-  #         key: protocol-${{ github.sha }}
-  #     - name: Unit tests
-  #       run: |
-  #         yarn --cwd packages/protocol test common/
-  # protocol-test-compatibility:
-  #   name: Protocol Test Compatibility
-  #   runs-on: ["self-hosted", "monorepo"]
-  #   needs: [lint-checks, pre-protocol-test-release]
-  #   if: |
-  #     false && needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
-  #   steps:
-  #     - uses: actions/cache/restore@v3
-  #       id: cache_git
-  #       with:
-  #         path: .git
-  #         key: git-${{ github.ref }}
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/cache/restore@v3
-  #       id: cache_node
-  #       with:
-  #         path: |
-  #           node_modules
-  #           packages
-  #         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install-dependencies.outputs.package-json-checksum }}
-  #     - uses: actions/cache/restore@v3
-  #       id: cache_protocol
-  #       with:
-  #         path: packages/protocol/.tmp/released_chain
-  #         key: protocol-${{ github.sha }}
-  #     - name: Run protocol compatibility tests
-  #       run: |
-  #         yarn --cwd packages/protocol test compatibility/
-  # protocol-test-governance-network:
-  #   name: Protocol Test Governance Network
-  #   runs-on: ["self-hosted", "monorepo"]
-  #   needs: [lint-checks, pre-protocol-test-release]
-  #   if: |
-  #     false && needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
-  #   steps:
-  #     - uses: actions/cache/restore@v3
-  #       id: cache_git
-  #       with:
-  #         path: .git
-  #         key: git-${{ github.ref }}
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/cache/restore@v3
-  #       id: cache_node
-  #       with:
-  #         path: |
-  #           node_modules
-  #           packages
-  #         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ needs.install-dependencies.outputs.package-json-checksum }}
-  #     - uses: actions/cache/restore@v3
-  #       id: cache_protocol
-  #       with:
-  #         path: packages/protocol/.tmp/released_chain
-  #         key: protocol-${{ github.sha }}
-  #     - name: Run protocol compatibility tests
-  #       run: |
-  #         yarn --cwd packages/protocol test governance/network/
 
   protocol-test-with-code-coverage:
     name: Protocol Test with code coverage
@@ -587,6 +504,12 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 20
+        if: false
+        with:
+          limit-access-to-actor: true
       - name: Install and test the npm package
         run: |
           set -euo pipefail
@@ -596,7 +519,7 @@ jobs:
           npm install $RUNNER_WORKSPACE/packages/base/*.tgz
 
   utils-test:
-    name: SDK Base package Tests
+    name: SDK Utils package Tests
     runs-on: ["self-hosted", "monorepo"]
     needs: [install-dependencies]
     steps:
@@ -621,3 +544,23 @@ jobs:
           npm install $RUNNER_WORKSPACE/packages/base/*.tgz
           npm install $RUNNER_WORKSPACE/packages/utils/*.tgz
 
+  end-to-end-geth-transfer-test:
+    name: Celo-Blockchain E2E Transfer test
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies, lint-checks, contractkit-tests]
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Run tests
+        run: |
+          set -e
+          cd packages/celotool
+          ./ci_test_transfers.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
