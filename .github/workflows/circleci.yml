@@ -94,7 +94,7 @@ jobs:
       - name: Fail if any file changed on git
         run: |
           # This fails if there is any change
-          if ! git diff-index --quiet HEAD --; then
+          if ! git diff-index HEAD --; then
             echo "Git changes detected while building. If this is unexpected, bump NODE_MODULE_CACHE_VERSION in .github/workflows/circleci.yml"
             exit 1
           fi
