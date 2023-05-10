@@ -202,18 +202,12 @@ jobs:
           fetch_depth: "100"
       - name: Export protocol test must run
         id: protocol-test-must-run
-        if: steps.changed-files.outputs.files-changed.contains('packages/protocol')
         run: |
           # TODO(jcortejoso): This script slightly depends on CircleCI
           # Ideally refactor this to depend just on GitHub Actions
           # ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
           echo "Protocol tests runs always"
-          echo "PROTOCOL_TEST_MUST_RUN=true" >> "$GITHUB_OUTPUT"
-      - name: Export protocol test must not run
-        id: protocol-test-must-not-run
-        if: ${{ !steps.changed-files.outputs.files-changed.contains('packages/protocol') }}
-        run: |
-          echo "PROTOCOL_TEST_MUST_RUN=false" >> "$GITHUB_OUTPUT"
+          echo "PROTOCOL_TEST_MUST_RUN=${{steps.changed-files.outputs.files-changed.contains('packages/protocol')}}" >> "$GITHUB_OUTPUT"
       - name: Cache protocol devchain
         uses: actions/cache@v3
         id: cache_protocol
