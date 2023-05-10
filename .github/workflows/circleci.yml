@@ -371,6 +371,12 @@ jobs:
         run: |
           cd packages/sdk/contractkit
           yarn test:reset
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 20
+        if: true
+        with:
+          limit-access-to-actor: true
       - name: Run tests
         if: contains(steps.changed-files.outputs.all_files_changed, 'packages/contractkit') || true
         run: |
@@ -456,12 +462,6 @@ jobs:
         uses: tj-actions/changed-files@v35
         with:
           fetch_depth: "100"
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 20
-        if: true
-        with:
-          limit-access-to-actor: true
       - name: Generate DevChain
         if: contains(steps.changed-files.outputs.all_files_changed, 'packages/cli') || true
         run: |
@@ -485,14 +485,14 @@ jobs:
         run: |
           yarn --cwd=packages/cli run celocli account:new
       # TODO(jcortejoso): Review later
-      # - name: Install and test the npm package
-      #   if: contains(steps.changed-files.outputs.all_files_changed, 'packages/cli') || true
-      #   run: |
-      #     cd packages/cli
-      #     yarn pack
-      #     cd $RUNNER_TEMP
-      #     npm install $RUNNER_WORKSPACE/packages/cli/celo-cli-*.tgz
-      #     npx celocli account:new
+      - name: Install and test the npm package
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/cli') || true
+        run: |
+          cd packages/cli
+          yarn pack
+          cd $RUNNER_TEMP
+          npm install $RUNNER_WORKSPACE/celo-monorepo/packages/cli/celo-cli-*.tgz
+          npx celocli account:new
   typescript-tests:
     name: Typescript package Tests
     runs-on: ["self-hosted", "monorepo"]
@@ -521,7 +521,7 @@ jobs:
           cd packages/typescript
           yarn pack
           cd $RUNNER_TEMP
-          npm install $RUNNER_WORKSPACE/packages/typescript/*.tgz
+          npm install $RUNNER_WORKSPACE/celo-monorepo/packages/typescript/*.tgz
   base-test:
     name: SDK Base package Tests
     runs-on: ["self-hosted", "monorepo"]
@@ -541,7 +541,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 20
-        if: true
+        if: false
         with:
           limit-access-to-actor: true
       - name: Install and test the npm package
@@ -550,8 +550,7 @@ jobs:
           cd packages/sdk/base
           yarn pack
           cd $RUNNER_TEMP
-          npm install $RUNNER_WORKSPACE/packages/sdk/base/*.tgz
-
+          npm install $RUNNER_WORKSPACE/celo-monorepo/packages/sdk/base/*.tgz
   utils-test:
     name: SDK Utils package Tests
     runs-on: ["self-hosted", "monorepo"]
@@ -576,8 +575,8 @@ jobs:
           cd ../utils
           yarn pack
           cd $RUNNER_TEMP
-          npm install $RUNNER_WORKSPACE/packages/sdk/base/*.tgz
-          npm install $RUNNER_WORKSPACE/packages/sdk/utils/*.tgz
+          npm install $RUNNER_WORKSPACE/celo-monorepo/packages/sdk/base/*.tgz
+          npm install $RUNNER_WORKSPACE/celo-monorepo/packages/sdk/utils/*.tgz
 
   # end-to-end-geth-transfer-test:
   #   name: Celo-Blockchain E2E Transfer test
