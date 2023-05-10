@@ -210,7 +210,7 @@ jobs:
           echo "Protocol tests runs always"
           echo "PROTOCOL_TEST_MUST_RUN=true" >> "$GITHUB_OUTPUT"
       - name: Export protocol test must not run
-        id: protocol-test-must-run
+        id: protocol-test-must-not-run
         if: !steps.changed-files.outputs.files-changed.contains('packages/protocol')
         run: |
           echo "PROTOCOL_TEST_MUST_RUN=false" >> "$GITHUB_OUTPUT"
