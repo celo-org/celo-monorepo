@@ -91,7 +91,7 @@ jobs:
       - name: Fail if any file changed on git
         run: |
           # This fails if there is any change
-          git diff-index --quiet HEAD --
+          git diff-index HEAD --
       - name: Build packages
         run: yarn build --ignore docs --include-dependencies
       - name: Check licenses
