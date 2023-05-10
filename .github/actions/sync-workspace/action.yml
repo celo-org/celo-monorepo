@@ -14,4 +14,5 @@ runs:
           node_modules
           packages/**/node_modules
           packages/**/lib
+          packages/**/dist
         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ inputs.package-json-checksum }}

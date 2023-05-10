@@ -73,6 +73,8 @@ jobs:
             node_modules
             packages/**/node_modules
             packages/**/lib
+            packages/**/dist
+            packages/**/
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ steps.node-checksums.outputs.PACKAGE_JSON_CHECKSUM }}
           # TODO(jcortejoso): Think if remove this, to start clean with any change in deps
           restore-keys: |
@@ -361,11 +363,18 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
+        with:
+          fetch_depth: "100"
       - name: Generate DevChain
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/contractkit') || true
         run: |
           cd packages/sdk/contractkit
           yarn test:reset
       - name: Run tests
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/contractkit') || true
         run: |
           yarn --cwd=packages/sdk/contractkit test
   identity-tests:
@@ -384,11 +393,18 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
+        with:
+          fetch_depth: "100"
       - name: Generate DevChain
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/identity') || true
         run: |
           cd packages/sdk/identity
           yarn test:reset
       - name: Run tests
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/identity') || true
         run: |
           yarn --cwd=packages/sdk/identity test
   transactions-uri-tests:
@@ -407,11 +423,18 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
+        with:
+          fetch_depth: "100"
       - name: Generate DevChain
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/sdk/transactions-uri') || true
         run: |
           cd packages/sdk/identity
           yarn test:reset
       - name: Run tests
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/sdk/transactions-uri') || true
         run: |
           yarn --cwd=packages/sdk/identity test
   cli-tests:
@@ -430,14 +453,22 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
+        with:
+          fetch_depth: "100"
       - name: Generate DevChain
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/cli') || true
         run: |
           cd packages/cli
           yarn test:reset
       - name: Run tests
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/cli') || true
         run: |
           yarn --cwd=packages/cli test
       - name: Fail if someone forgot to commit CLI docs
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/cli') || true
         run: |
           yarn --cwd=packages/cli docs
           if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
@@ -446,10 +477,12 @@ jobs:
             exit 1
           fi
       - name: Verify that a new account can be created
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/cli') || true
         run: |
           yarn --cwd=packages/cli run celocli account:new
       # TODO(jcortejoso): Review later
       # - name: Install and test the npm package
+      #   if: contains(steps.changed-files.outputs.all_files_changed, 'packages/cli') || true
       #   run: |
       #     cd packages/cli
       #     yarn pack
@@ -472,39 +505,19 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Generate DevChain
-        run: |
-          cd packages/cli
-          yarn test:reset
-      - name: Run tests
-        run: |
-          yarn --cwd=packages/cli test
-      - name: Fail if someone forgot to commit CLI docs
-        run: |
-          yarn --cwd=packages/cli docs
-          if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
-            git --no-pager diff packages/docs/command-line-interface
-            echo "There are git differences after generating CLI docs"
-            exit 1
-          fi
-      - name: Verify that a new account can be created
-        run: |
-          yarn --cwd=packages/cli run celocli account:new
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 20
-        if: false
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
         with:
-          limit-access-to-actor: true
-      # TODO(jcortejoso): Review later
-      # - name: Install and test the npm package
-      #   run: |
-      #     cd packages/cli
-      #     yarn pack
-      #     cd $RUNNER_TEMP
-      #     npm install $RUNNER_WORKSPACE/packages/cli/celo-cli-*.tgz
-      #     npx celocli account:new
-
+          fetch_depth: "100"
+      - name: Install and test the npm package
+        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/typescript') || true
+        run: |
+          set -euo pipefail
+          cd packages/typescript
+          yarn pack
+          cd $RUNNER_TEMP
+          npm install $RUNNER_WORKSPACE/packages/typescript/*.tgz
   base-test:
     name: SDK Base package Tests
     runs-on: ["self-hosted", "monorepo"]
