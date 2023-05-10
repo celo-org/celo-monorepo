@@ -180,7 +180,7 @@ jobs:
   pre-protocol-test-release:
     name: Protocol Tests Prepare
     runs-on: ["self-hosted", "monorepo"]
-    needs: [lint-checks]
+    needs: [install-dependencies, lint-checks]
     outputs:
       protocol-test-must-run: ${{ steps.protocol-test-must-run.outputs.PROTOCOL_TEST_MUST_RUN }}
     steps:
@@ -210,6 +210,12 @@ jobs:
           key: protocol-${{ github.sha }}
           restore-keys: |
             protocol-${{ github.sha }}
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 20
+        if: true
+        with:
+          limit-access-to-actor: true
       - name: Opcode tests
         run: |
           yarn --cwd packages/protocol check-opcodes
@@ -223,7 +229,7 @@ jobs:
   protocol-test-release:
     name: Protocol Test Release
     runs-on: ["self-hosted", "monorepo"]
-    needs: [lint-checks, pre-protocol-test-release]
+    needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
       needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
     steps:
@@ -249,7 +255,7 @@ jobs:
   protocol-test-matrix:
     name: Protocol Test Matrix - ${{ matrix.name }}
     runs-on: ["self-hosted", "monorepo"]
-    needs: [lint-checks, pre-protocol-test-release]
+    needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
       needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
     strategy:
@@ -387,7 +393,7 @@ jobs:
   protocol-test-with-code-coverage:
     name: Protocol Test with code coverage
     runs-on: ["self-hosted", "monorepo"]
-    needs: [lint-checks, pre-protocol-test-release]
+    needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
       needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
     steps:
@@ -511,9 +517,57 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 20
-        if: true
+        if: false
         with:
           limit-access-to-actor: true
+      # TODO(jcortejoso): Review later
+      # - name: Install and test the npm package
+      #   run: |
+      #     cd packages/cli
+      #     yarn pack
+      #     cd $RUNNER_TEMP
+      #     npm install $RUNNER_WORKSPACE/packages/cli/celo-cli-*.tgz
+      #     npx celocli account:new
+  typescript-tests:
+    name: Typescript package Tests
+    runs-on: ["self-hosted", "monorepo"]
+    needs: [install-dependencies]
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Generate DevChain
+        run: |
+          cd packages/cli
+          yarn test:reset
+      - name: Run tests
+        run: |
+          yarn --cwd=packages/cli test
+      - name: Fail if someone forgot to commit CLI docs
+        run: |
+          yarn --cwd=packages/cli docs
+          if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
+            git --no-pager diff packages/docs/command-line-interface
+            echo "There are git differences after generating CLI docs"
+            exit 1
+          fi
+      - name: Verify that a new account can be created
+        run: |
+          yarn --cwd=packages/cli run celocli account:new
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 20
+        if: false
+        with:
+          limit-access-to-actor: true
+      # TODO(jcortejoso): Review later
       # - name: Install and test the npm package
       #   run: |
       #     cd packages/cli
