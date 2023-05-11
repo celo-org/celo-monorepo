@@ -8,7 +8,7 @@ import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
 import chai from 'chai'
 import chaiSubset from 'chai-subset'
-import { spawn, SpawnOptions } from 'child_process'
+import { SpawnOptions, spawn } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
 import Web3 from 'web3'
@@ -211,11 +211,7 @@ export async function waitForPortOpen(host: string, port: number, seconds: numbe
 export const assertProxiesSet = async (getContract: any) => {
   for (const contractPackage of proxiedContracts) {
     for (const contractName of contractPackage.contracts) {
-      // tslint:disable-next-line
-      console.log("contractName", contractName, contractPackage.__path)
       const contract = await getContract(contractName, 'contract', contractPackage.__path)
-      // tslint:disable-next-line
-      console.log("made it to proxy", contractName, contractPackage.__path)
       const proxy: ProxyInstance = await getContract(contractName, 'proxy', contractPackage.__path)
       assert.equal(
         contract.address.toLowerCase(),

@@ -74,11 +74,6 @@ export function instantiateArtifacts(buildDirectory: string): BuildArtifacts {
   // "Cannot read property 'absolutePath' of undefined"
   ensureValidArtifacts(Contracts.listBuildArtifacts(buildDirectory))
   try {
-    // const paths = Contracts.listBuildArtifacts(buildDirectory)
-    // paths.concat(Contracts.listBuildArtifacts('mento'))
-    
-    // return BuildArtifacts(Contracts.listBuildArtifacts(path))
-
     return getBuildArtifacts(buildDirectory)
   } catch (error) {
     console.error(`ERROR: could not create BuildArtifacts on directory '${buildDirectory}`)
