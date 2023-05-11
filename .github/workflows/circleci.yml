@@ -382,12 +382,6 @@ jobs:
         run: |
           cd packages/sdk/contractkit
           yarn test:reset
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 20
-        if: false
-        with:
-          limit-access-to-actor: true
       - name: Run tests
         if: contains(steps.changed-files.outputs.all_files_changed, 'packages/contractkit') || true
         run: |
@@ -670,6 +664,12 @@ jobs:
         uses: ./.github/actions/protocol-sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 20
+        if: contains(matrix.command, 'ci_test_transfers.sh')
+        with:
+          limit-access-to-actor: true
       - name: Execute matrix command for test
         run: |
           ${{ matrix.command }}
