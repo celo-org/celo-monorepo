@@ -285,6 +285,7 @@ jobs:
     if: |
       needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: Protocol Test Reslease Snapshots
@@ -613,6 +614,7 @@ jobs:
     if: |
       needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: Transfer test
