@@ -1,6 +1,6 @@
 {
-  "oldArtifactsFolder": "/home/circleci/app/packages/protocol/build/core-contracts.v8/contracts",
-  "newArtifactsFolder": "/home/circleci/app/packages/protocol/build/core-contracts.v9/contracts",
+  "oldArtifactsFolder": "build/core-contracts.v8/contracts",
+  "newArtifactsFolder": "build/core-contracts.v9/contracts",
   "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles|^UsingRegistry/",
   "report": {
     "contracts": {
