@@ -73,7 +73,7 @@
     "ethereumjs-wallet": "^0.6.3",
     "ethereum-cryptography": "1.2.0",
     "fs-extra": "^5.0.0",
-    "ganache": "npm:@soloseng/ganache@7.8.0-beta.1",
+    "ganache": "npm:@soloseng/ganache@7.8.0-beta.2",
     "glob-fs": "^0.1.7",
     "graphql": "^14.1.1",
     "j6": "^1.0.2",
