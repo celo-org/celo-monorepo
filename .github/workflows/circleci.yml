@@ -219,6 +219,7 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v35
         with:
+          # Checking if changed in the last 100 commits in PRs
           fetch_depth: "100"
       - name: Export protocol test must run
         id: protocol-test-must-run
@@ -599,7 +600,7 @@ jobs:
 
   end-to-end-geth-matrix:
     # Keeping name short because GitHub UI does not handle long names well
-    name: e2e - ${{ matrix.name }}
+    name: e2e ${{ matrix.name }}
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
@@ -678,3 +679,99 @@ jobs:
       - name: Execute matrix command for test
         run: |
           ${{ matrix.command }}
+
+  # TODO: Ask Identity team to check if this is relevant
+  odis-test:
+    name: ODIS test
+    runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
+    needs: [install-dependencies, lint-checks]
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Run Tests for common package
+        run: |
+          yarn --cwd=packages/phone-number-privacy/common test:coverage
+      - name: Run Tests for combiner
+        run: |
+          yarn --cwd=packages/phone-number-privacy/combiner test:coverage
+      - name: Run Tests for signer
+        run: |
+          yarn --cwd=packages/phone-number-privacy/signer test:coverage
+
+  certora-test:
+    name: Certora test ${{ matrix.name }}
+    runs-on: ["self-hosted", "monorepo"]
+    timeout-minutes: 30
+    needs: [install-dependencies, lint-checks]
+    strategy:
+      matrix:
+        include:
+          - name: Locked Gold
+            command: |
+              cd packages/protocol
+              ./specs/scripts/lockedgold.sh
+          - name: Accounts
+            command: |
+              cd packages/protocol
+              ./specs/scripts/accounts.sh
+          - name: Accounts
+            command: |
+              cd packages/protocol
+              ./specs/scripts/accountsPrivileged.sh
+          - name: Accounts
+            command: |
+              cd packages/protocol
+              ./specs/scripts/applyHarness.sh
+              ./specs/scripts/governance.sh
+          - name: Accounts
+            command: |
+              cd packages/protocol
+              ./specs/scripts/reserve.sh
+    steps:
+      - uses: actions/cache/restore@v3
+        id: cache_git
+        with:
+          path: .git
+          key: git-${{ github.ref }}
+      - uses: actions/checkout@v3
+      - name: Sync workspace
+        uses: ./.github/actions/sync-workspace
+        with:
+          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
+        with:
+          fetch_depth: "100"
+      # TODO: Ask Volpe about this
+      - name: Disabling certora until the license is figured out
+        run: |
+          exit 1
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+          cache: 'maven'
+      - name: Certora dependencies
+        run: |
+          echo "export PATH=$PATH:~/.local/bin" >> $BASH_ENV
+          sudo apt-get update || sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo apt-get install python3-pip
+          pip3 install certora-cli
+          wget https://github.com/ethereum/solidity/releases/download/v0.5.13/solc-static-linux
+          chmod +x solc-static-linux
+          sudo mv solc-static-linux /usr/bin/solc
+      - name: Build and run command
+        run: |
+          ${{ matrix.command }}
+      
