@@ -4,7 +4,9 @@ import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
-import ejsUtil from 'ethereumjs-util'
+// import ejsUtil from 'ethereumjs-util'
+import * as ejsRlp from '@ethereumjs/rlp'
+import * as ejsUtil from '@ethereumjs/util'
 import lodash from 'lodash'
 import Web3 from 'web3'
 import { AccountType, generatePrivateKey } from '../lib/generate_utils'
@@ -258,7 +260,8 @@ class TestEnv {
       '0x05', // value: 5 wei
       '0x', // no data
     ]
-    const signingHash = ejsUtil.rlphash(arr)
+    const signingHash = ejsUtil.toBuffer(ejsRlp.encode(arr))
+    // const signingHash = ejsUtil.rlphash(arr)
     const pk = ejsUtil.addHexPrefix(validatorPrivateKey)
     const sig = ejsUtil.ecsign(signingHash, ejsUtil.toBuffer(pk))
     arr.push(
