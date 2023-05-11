@@ -88,7 +88,9 @@ jobs:
             packages/**/dist
             packages/**/build
             packages/protocol/*.js
+            packages/protocol/*.js.map
             packages/protocol/**/*.js
+            packages/protocol/**/*.js.map
             packages/sdk/contractkit/src/generated
           key: code-${{ github.sha }}
           restore-keys: |
@@ -329,6 +331,12 @@ jobs:
         uses: ./.github/actions/protocol-sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 20
+        if: contains(matrix.command, 'common/')
+        with:
+          limit-access-to-actor: true
       - name: Execute matrix command for test
         run: |
           ${{ matrix.command }}
