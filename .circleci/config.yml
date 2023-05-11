@@ -312,7 +312,7 @@ jobs:
 
   protocol-test-common:
     <<: *defaults
-    resource_class: large
+    resource_class: xlarge
     steps:
       - attach_workspace:
           at: ~/app
@@ -340,7 +340,7 @@ jobs:
 
   protocol-test-governance-network:
     <<: *defaults
-    resource_class: large
+    resource_class: xlarge
     steps:
       - attach_workspace:
           at: ~/app
@@ -354,7 +354,7 @@ jobs:
 
   protocol-test-governance-validators:
     <<: *defaults
-    resource_class: large
+    resource_class: xlarge
     steps:
       - attach_workspace:
           at: ~/app
@@ -368,7 +368,7 @@ jobs:
 
   protocol-test-governance-voting:
     <<: *defaults
-    resource_class: large
+    resource_class: xlarge
     steps:
       - attach_workspace:
           at: ~/app
@@ -382,7 +382,7 @@ jobs:
 
   protocol-test-identity:
     <<: *defaults
-    resource_class: large
+    resource_class: xlarge
     steps:
       - attach_workspace:
           at: ~/app
@@ -396,7 +396,7 @@ jobs:
 
   protocol-test-stability:
     <<: *defaults
-    resource_class: large
+    resource_class: xlarge
     steps:
       - attach_workspace:
           at: ~/app
