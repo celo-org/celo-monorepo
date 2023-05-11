@@ -763,7 +763,6 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '11'
-          cache: 'maven'
       - name: Certora dependencies
         run: |
           echo "export PATH=$PATH:~/.local/bin" >> $BASH_ENV
