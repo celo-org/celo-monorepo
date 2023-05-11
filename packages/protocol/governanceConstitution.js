@@ -92,7 +92,6 @@ const DefaultConstitution = {
   },
   LockedGold: {
     default: 0.9,
-
     setRegistry: 0.9,
     setUnlockingPeriod: 0.8,
     addSlasher: 0.9,

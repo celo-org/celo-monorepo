@@ -46,7 +46,6 @@ COPY packages/sdk/contractkit packages/sdk/contractkit/
 COPY packages/metadata-crawler packages/metadata-crawler/
 COPY packages/flake-tracker packages/flake-tracker
 
-
 # build all
 RUN yarn build
 RUN rm -r .git

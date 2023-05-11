@@ -16,7 +16,6 @@ import "../governance/interfaces/IValidators.sol";
 import "../identity/interfaces/IRandom.sol";
 import "../identity/interfaces/IAttestations.sol";
 
-// TODO try to make this paths more resonable
 import "../../lib/mento-core/contracts/interfaces/IExchange.sol";
 import "../../lib/mento-core/contracts/interfaces/IReserve.sol";
 import "../../lib/mento-core/contracts/interfaces/IStableToken.sol";
