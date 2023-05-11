@@ -30,7 +30,7 @@ defaults: &defaults
     - image: us.gcr.io/celo-testnet/circleci-node18:1.0.0
   environment:
     # To avoid ENOMEM problem when running node
-    NODE_OPTIONS: '--max-old-space-size=8192'
+    NODE_OPTIONS: '--max-old-space-size=12288'
 
 contract-defaults: &contract-defaults
   <<: *defaults
