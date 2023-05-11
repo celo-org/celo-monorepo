@@ -198,7 +198,9 @@ jobs:
     name: Protocol Tests Prepare
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
-    needs: [install-dependencies, lint-checks]
+    # Comment lint-checks dependency to speed up (as this is a dependency for many other jobs)
+    # needs: [install-dependencies, lint-checks]
+    needs: [install-dependencies]
     outputs:
       protocol-test-must-run: ${{ steps.protocol-test-must-run.outputs.PROTOCOL_TEST_MUST_RUN }}
     steps:
