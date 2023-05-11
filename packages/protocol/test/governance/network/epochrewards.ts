@@ -36,7 +36,7 @@ const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSortedOracles')
 const Registry: RegistryContract = artifacts.require('Registry')
-const Reserve: ReserveContract = makeTruffleContract('Reserve', 'mento', web3) // artifacts.require('Reserve')
+const Reserve: ReserveContract = makeTruffleContract('Reserve', 'mento', web3)
 
 // @ts-ignore
 // TODO(mcortesi): Use BN

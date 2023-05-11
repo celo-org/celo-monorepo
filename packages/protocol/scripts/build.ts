@@ -123,10 +123,10 @@ function compile(outdir: string) {
   console.log(`protocol: Compiling solidity to ${outdir}`)
 
   // the reason to generate a different folder is to avoid paths for colliding, which could be very dangerous
-  for (const extercalContract of externalContracts) {
-    console.log(`Building external contracts for ${extercalContract}`)
+  for (const externalContract of externalContracts) {
+    console.log(`Building external contracts for ${externalContract}`)
     exec(
-      `yarn run truffle compile --silent --contracts_directory=./lib/${extercalContract}-core/contracts --contracts_build_directory=./build/contracts-${extercalContract}`
+      `yarn run truffle compile --silent --contracts_directory=./lib/${externalContract}-core/contracts --contracts_build_directory=./build/contracts-${externalContract}`
     )
   }
 

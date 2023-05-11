@@ -597,8 +597,8 @@ Array.from([
 )
 
 contract('Integration: Adding StableToken', (accounts: string[]) => {
-  const Exchange: ExchangeContract = makeTruffleContract('Exchange', 'mento', web3) // artifacts.require('Exchange')
-  const StableToken: StableTokenContract = makeTruffleContract('StableToken', 'mento', web3) // artifacts.require('StableToken')
+  const Exchange: ExchangeContract = makeTruffleContract('Exchange', 'mento', web3)
+  const StableToken: StableTokenContract = makeTruffleContract('StableToken', 'mento', web3)
   let exchangeAbc: ExchangeInstance
   let freezer: FreezerInstance
   let goldToken: GoldTokenInstance
