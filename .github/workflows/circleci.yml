@@ -713,6 +713,7 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks]
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: Locked Gold
@@ -755,7 +756,9 @@ jobs:
       # TODO: Ask Volpe about this
       - name: Disabling certora until the license is figured out
         run: |
-          exit 1
+          echo "Certora is disabled until the license is figured out"
+          # TODO(jcortejoso)
+          echo "exit 1"
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
