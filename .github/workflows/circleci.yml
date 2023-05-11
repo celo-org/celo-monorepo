@@ -331,10 +331,13 @@ jobs:
         uses: ./.github/actions/protocol-sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+      - name: Build protocol
+        run: |
+          yarn --cwd packages/protocol build
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 20
-        if: contains(matrix.command, 'common/')
+        if: contains(matrix.command, 'common/') && false
         with:
           limit-access-to-actor: true
       - name: Execute matrix command for test
@@ -610,49 +613,49 @@ jobs:
             command: |
               set -e
               # Forcing to load go and rust paths
-              source ~/.bashrc
+              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
               cd packages/celotool
               ./ci_test_transfers.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
           - name: Blockchain Parameters test
             command: |
               set -e
-              source ~/.bashrc
+              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
               cd packages/celotool
               ./ci_test_blockchain_parameters.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
           - name: Slashing test
             command: |
               set -e
-              source ~/.bashrc
+              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
               cd packages/celotool
               ./ci_test_slashing.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
           - name: Governance test
             command: |
               set -e
-              source ~/.bashrc
+              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
               cd packages/celotool
               ./ci_test_governance.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
           - name: Replica test
             command: |
               set -e
-              source ~/.bashrc
+              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
               cd packages/celotool
               ./ci_test_replicas.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
           - name: Sync test
             command: |
               set -e
-              source ~/.bashrc
+              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
               cd packages/celotool
               ./ci_test_sync.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
           - name: Validator order test
             command: |
               set -e
-              source ~/.bashrc
+              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
               cd packages/celotool
               ./ci_test_validator_order.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
           - name: CIP35 eth compatibility test
             command: |
               set -e
-              source ~/.bashrc
+              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
               cd packages/celotool
               ./ci_test_cip35.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
     steps:
