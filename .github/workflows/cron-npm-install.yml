@@ -34,5 +34,5 @@ jobs:
       - name: Test celocli command
         if: matrix.package == '@celo/celocli'
         run: |
-          npx celocli account:new
+          yarn --cwd=packages/cli run celocli account:new
     
