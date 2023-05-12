@@ -272,7 +272,10 @@ export const makeTruffleContract = (contractName:string, contractPath:string, we
   
   Contract.setProvider(web3.currentProvider)
   Contract.setNetwork(1101)
-  Contract.interfaceAdapter = createInterfaceAdapter({networkType:"ethereum", provider:web3.currentProvider})
+  Contract.interfaceAdapter = createInterfaceAdapter({
+    networkType: "ethereum",
+    provider: web3.currentProvider
+  })
   Contract.configureNetwork({networkType:"ethereum", provider:web3.currentProvider})
   
   Contract.defaults({from:"0x5409ed021d9299bf6814279a6a1411a7e866a631", gas: 13000000})
