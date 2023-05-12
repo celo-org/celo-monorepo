@@ -241,7 +241,7 @@ async function runDevChainFromTar(filename: string) {
 
   await decompressChain(filename, chainCopy.name)
 
-  const stopGanache = await startGanache(chainCopy.name, { verbose: false }, chainCopy)
+  const stopGanache = await startGanache(chainCopy.name, { verbose: true }, chainCopy)
   return stopGanache
 }
 
@@ -277,7 +277,7 @@ async function runDevChain(
     await resetDir(datadir)
   }
   createDirIfMissing(datadir)
-  const stopGanache = await startGanache(datadir, { verbose: false })
+  const stopGanache = await startGanache(datadir, { verbose: true })
   if (opts.reset || opts.runMigrations) {
     const code = await runMigrations({ upto: opts.upto, migrationOverride: opts.migrationOverride })
     if (code !== 0) {
