@@ -50,7 +50,6 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       const constitutionContractNames = Object.keys(constitution).filter(
         (contractName) => contractName !== 'proxy'
       )
-      console.log('constitutionContractNames', constitutionContractNames)
       let contract: any
       for (const contractName of constitutionContractNames) {
         console.log(`\tSetting constitution thresholds for ${contractName}`)
@@ -69,7 +68,6 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
 
         selectors.default = ['0x00000000']
         const thresholds = { ...constitution.proxy, ...constitution[contractName] }
-        console.log('thresholds', thresholds)
         await Promise.all(
           Object.keys(thresholds)
             .filter((method) => method !== '__path')
