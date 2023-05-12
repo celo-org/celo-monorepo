@@ -529,7 +529,7 @@ enum VoteValue {
   Yes,
 }
 
-export async function assumeOwnershipWithTruffle(contractsToOwn: string[], to: string, dequeuedIndex: number = 0, path='') {
+export async function assumeOwnershipWithTruffle(contractsToOwn: string[], to: string, dequeuedIndex: number = 0, path?:string) {
   const governance: GovernanceInstance = await getDeployedProxiedContract('Governance', artifacts)
   const lockedGold: LockedGoldInstance = await getDeployedProxiedContract('LockedGold', artifacts)
   const multiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract(
@@ -571,7 +571,7 @@ export async function assumeOwnershipWithTruffle(contractsToOwn: string[], to: s
 
   const proposalId = (await governance.proposalCount()).toNumber()
 
-  await timeTravel(config.governance.dequeueFrequency + 1, web3)
+  await timeTravel(config.governance.dequeueFrequency, web3)
   // @ts-ignore
   const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
   await multiSig.submitTransaction(governance.address, 0, txData)
