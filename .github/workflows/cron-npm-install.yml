@@ -1,0 +1,30 @@
+name: NPM install testing workflow
+# By default the sha where it runs is latest commit on default branch
+# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+on:
+  schedule:
+  - cron: 0 19 * * *
+  workflow_dispatch:
+
+jobs:
+  install-npm-package:
+    name: Install NPM package
+    runs-on: ubuntu-latest
+    container:
+      image: node:12-stretch-slim
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+        - '@celo/typescript'
+        - '@celo/utils'
+        - '@celo/contractkit'
+        - '@celo/celocli'
+    steps:
+      - name: Installing npm package
+        run: yarn add ${{ matrix.package }}
+      - name: Test celocli command
+        if: matrix.package == '@celo/celocli'
+        run: |
+          npx celocli account:new
+    
