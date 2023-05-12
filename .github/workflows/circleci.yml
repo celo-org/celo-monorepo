@@ -763,12 +763,17 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '11'
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 20
+        if: contains(matrix.command, '/lockedgold.sh')
+        with:
+          limit-access-to-actor: true
       - name: Certora dependencies
         run: |
-          echo "export PATH=$PATH:~/.local/bin" >> $BASH_ENV
-          sudo apt-get update || sudo apt-get update
-          sudo apt-get install -y software-properties-common
-          sudo apt-get install python3-pip
+          echo "export PATH=$PATH:~/.local/bin" >> ~/.bashrc
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common python3-pip
           pip3 install certora-cli
           wget https://github.com/ethereum/solidity/releases/download/v0.5.13/solc-static-linux
           chmod +x solc-static-linux
