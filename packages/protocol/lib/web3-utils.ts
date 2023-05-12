@@ -255,7 +255,7 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
 }
 
 
-export const makeTruffleContract = (contractName:string, contractPath:string, web3: Web3) => {
+export const makeTruffleContract = (contractName: string, contractPath:string, web3: Web3) => {
   const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath}/${contractName}.json`)
   const Contract = truffleContract({
     abi: artifact.abi,
@@ -266,13 +266,14 @@ export const makeTruffleContract = (contractName:string, contractPath:string, we
   
   Contract.setProvider(web3.currentProvider)
   Contract.setNetwork(1101)
+  
   Contract.interfaceAdapter = createInterfaceAdapter({
     networkType: "ethereum",
     provider: web3.currentProvider
   })
-  Contract.configureNetwork({networkType:"ethereum", provider:web3.currentProvider})
+  Contract.configureNetwork({networkType: "ethereum", provider: web3.currentProvider})
   
-  Contract.defaults({from:"0x5409ed021d9299bf6814279a6a1411a7e866a631", gas: 13000000})
+  Contract.defaults({from: "0x5409ed021d9299bf6814279a6a1411a7e866a631", gas: 13000000})
   ArtifactsSingleton.getInstance(contractPath).addArtifact(contractName, Contract)
   return Contract
 }
@@ -290,7 +291,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   console.log("-> Started deployment for", name)
   let Contract 
   let ContractProxy
-  if (artifactPath){
+  if (artifactPath) {
     Contract = makeTruffleContract(name, artifactPath, web3)
     ContractProxy = makeTruffleContract(name + 'Proxy', artifactPath, web3)
   } else {
