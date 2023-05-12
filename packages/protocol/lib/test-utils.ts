@@ -13,6 +13,7 @@ import { keccak256 } from 'ethereumjs-util'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
 import Web3 from 'web3'
 
+
 // tslint:disable-next-line: ordered-imports
 import BN = require('bn.js')
 
@@ -549,10 +550,8 @@ export async function assumeOwnership(contractsToOwn: string[], to: string, dequ
 
 
 		contractsToOwn.map(async (contractName: string) => {
-      let artifactsInstance = artifacts
-      if (path){
-        artifactsInstance = ArtifactsSingleton.getInstance(path)
-      }
+      
+      const artifactsInstance = ArtifactsSingleton.getInstance(path, artifacts)
 
       const contractAddress = (await getDeployedProxiedContract(contractName, artifactsInstance)).address
       
