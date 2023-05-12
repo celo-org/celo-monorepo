@@ -1,3 +1,4 @@
+// tslint:disable: ordered-imports
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
@@ -13,8 +14,6 @@ import { keccak256 } from 'ethereumjs-util'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
 import Web3 from 'web3'
 
-
-// tslint:disable-next-line: ordered-imports
 import BN = require('bn.js')
 
 const isNumber = (x: any) =>
