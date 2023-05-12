@@ -32,6 +32,8 @@ jobs:
     name: Install dependencies
     outputs:
       package-json-checksum: ${{ steps.node-checksums.outputs.PACKAGE_JSON_CHECKSUM }}
+      # Propagate more outputs if you need https://github.com/tj-actions/changed-files#outputs
+      all_files_changed: ${{ steps.changed-files.outputs.all_files_changed }}
     # runs-on: ubuntu-latest
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
@@ -123,6 +125,13 @@ jobs:
             exit 0
           fi
           yarn check-licenses
+      - name: Detect files changed in PR, and exposed as output
+        id: changed-files
+        uses: tj-actions/changed-files@v35
+        with:
+          # Checking if changed in the last 100 commits in PRs
+          fetch_depth: "100"
+      - run: echo ${{ steps.changed-files.outputs.all_files_changed }}
   lint-checks:
     name: Lint code
     runs-on: ["self-hosted", "monorepo"]
@@ -215,16 +224,10 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v35
-        with:
-          # Checking if changed in the last 100 commits in PRs
-          fetch_depth: "100"
       - name: Export protocol test must run
         id: protocol-test-must-run
         # TODO(jcortejoso): Remove true
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/protocol') || true
+        if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') || true
         run: |
           # TODO(jcortejoso): This script slightly depends on CircleCI
           # Ideally refactor this to depend just on GitHub Actions
@@ -234,18 +237,18 @@ jobs:
       - name: Cache protocol devchain
         uses: actions/cache@v3
         id: cache_protocol
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/protocol') || true
+        if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') || true
         with:
           path: packages/protocol/.tmp/released_chain
           key: protocol-${{ github.sha }}
           restore-keys: |
             protocol-${{ github.sha }}
       - name: Opcode tests
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/protocol') || true
+        if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') || true
         run: |
           yarn --cwd packages/protocol check-opcodes
       - name: Generate devchain of previous release
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/protocol') || true
+        if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') || true
         run: |
           echo "Comparing against $RELEASE_TAG"
           # Github has phased out the git protocol so we ensure that we use
@@ -344,7 +347,6 @@ jobs:
       - name: Execute matrix command for test
         run: |
           ${{ matrix.command }}
-
   protocol-test-with-code-coverage:
     name: Protocol Test with code coverage
     runs-on: ["self-hosted", "monorepo"]
@@ -387,18 +389,13 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v35
-        with:
-          fetch_depth: "100"
       - name: Generate DevChain
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/contractkit') || true
+        if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/contractkit') || true
         run: |
           cd packages/sdk/contractkit
           yarn test:reset
       - name: Run tests
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/contractkit') || true
+        if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/contractkit') || true
         run: |
           yarn --cwd=packages/sdk/contractkit test
   identity-tests:
@@ -417,18 +414,13 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v35
-        with:
-          fetch_depth: "100"
       - name: Generate DevChain
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/identity') || true
+        if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/identity') || true
         run: |
           cd packages/sdk/identity
           yarn test:reset
       - name: Run tests
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/identity') || true
+        if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/identity') || true
         run: |
           yarn --cwd=packages/sdk/identity test
   transactions-uri-tests:
@@ -477,22 +469,17 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v35
-        with:
-          fetch_depth: "100"
       - name: Generate DevChain
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/cli') || true
+        if: contains(needs.install-dependencies.outputs, 'packages/cli') || true
         run: |
           cd packages/cli
           yarn test:reset
       - name: Run tests
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/cli') || true
+        if: contains(needs.install-dependencies.outputs, 'packages/cli') || true
         run: |
           yarn --cwd=packages/cli test
       - name: Fail if someone forgot to commit CLI docs
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/cli') || true
+        if: contains(needs.install-dependencies.outputs, 'packages/cli') || true
         run: |
           yarn --cwd=packages/cli docs
           if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
@@ -501,12 +488,12 @@ jobs:
             exit 1
           fi
       - name: Verify that a new account can be created
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/cli') || true
+        if: contains(needs.install-dependencies.outputs, 'packages/cli') || true
         run: |
           yarn --cwd=packages/cli run celocli account:new
       # TODO(jcortejoso): Review later
       - name: Install and test the npm package
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/cli') || true
+        if: contains(needs.install-dependencies.outputs, 'packages/cli') || true
         run: |
           cd packages/cli
           yarn pack
@@ -529,13 +516,8 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v35
-        with:
-          fetch_depth: "100"
       - name: Install and test the npm package
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/typescript') || true
+        if: contains(needs.install-dependencies.outputs, 'packages/typescript') || true
         run: |
           set -euo pipefail
           cd packages/typescript
@@ -686,6 +668,9 @@ jobs:
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks]
+    if: |
+      includes(needs.install-dependencies.outputs.all_files_changed, "packages/phone-number-privacy") ||
+      includes(needs.install-dependencies.outputs.all_files_changed, "package.json")
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -707,11 +692,17 @@ jobs:
         run: |
           yarn --cwd=packages/phone-number-privacy/signer test:coverage
 
+  # NOTE: This has not been fully tested as we don't have a license for certora
   certora-test:
     name: Certora test ${{ matrix.name }}
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks]
+    # Disable as certora license is not active
+    if: |
+      includes(needs.install-dependencies.outputs.all_files_changed, "packages/protocol") && false
+    env:
+      CERTORAKEY: NOT_ACTIVE
     strategy:
       fail-fast: false
       matrix:
@@ -748,17 +739,6 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v35
-        with:
-          fetch_depth: "100"
-      # TODO: Ask Volpe about this
-      - name: Disabling certora until the license is figured out
-        run: |
-          echo "Certora is disabled until the license is figured out"
-          # TODO(jcortejoso)
-          echo "exit 1"
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
