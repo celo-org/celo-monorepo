@@ -14,7 +14,7 @@ jobs:
     name: Install NPM package
     runs-on: ubuntu-latest
     container:
-      image: node:12-buster
+      image: node:14-bullseye
     strategy:
       fail-fast: false
       matrix:
