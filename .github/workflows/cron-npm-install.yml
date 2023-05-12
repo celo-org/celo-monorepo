@@ -35,4 +35,3 @@ jobs:
         if: matrix.package == '@celo/celocli'
         run: |
           yarn --cwd=packages/cli run celocli account:new
-    

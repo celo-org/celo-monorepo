@@ -2,9 +2,9 @@ name: celo-monorepo
 run-name: celo-monorepo tests
 
 on:
-  # push:
-  #   branches:
-  #     - jcortejoso/circleci-github-actions
+  push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
