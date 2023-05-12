@@ -247,7 +247,7 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
   artifacts: any,
   name: CeloContractName,
   args: (networkName?: string) => Promise<any[]> = async () => [],
-  then?: (contract: ContractInstance, web3: Web3, networkName: string, proxy?: ProxyInstance) => void,
+  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void,
   artifactPath?: string
 ) {
   return deploymentForContract(web3, artifacts, name, args, false, then, artifactPath);
@@ -340,14 +340,6 @@ export async function submitMultiSigTransaction(
     throw Error('Unable to execute MultiSig transaction')
   }
   return txId
-}
-
-export async function transferOwnershipOfProxyExternal(
-  Proxy: any,
-  owner: string,
-) {
-  const proxy: ProxyInstance = await Proxy.deployed()
-  await proxy._transferOwnership(owner)
 }
 
 export async function transferOwnershipOfProxy(
