@@ -12,7 +12,7 @@ import {
   assertRevert,
   assertRevertWithReason,
   assertThrowsAsync,
-  assumeOwnership,
+  assumeOwnershipWithTruffle,
 } from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
@@ -169,7 +169,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     registry = await getDeployedProxiedContract('Registry', artifacts)
     if ((await registry.owner()) !== owner) {
       // In CI we need to assume ownership, locally using quicktest we don't
-      await assumeOwnership(['Registry'], owner)
+      await assumeOwnershipWithTruffle(['Registry'], owner)
     }
   })
 

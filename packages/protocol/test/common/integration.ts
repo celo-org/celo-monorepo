@@ -4,7 +4,7 @@ import {
   addressMinedLatestBlock,
   assertEqualBN,
   assertRevert,
-  assumeOwnership,
+  assumeOwnershipWithTruffle,
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -612,8 +612,8 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
     goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
     freezer = await getDeployedProxiedContract('Freezer', artifacts)
     const contractsToOwn = ['Freezer', 'Registry', 'SortedOracles', 'FeeCurrencyWhitelist']
-    await assumeOwnership(contractsToOwn, accounts[0])
-    await assumeOwnership(['Reserve'], accounts[0], 0, 'mento')
+    await assumeOwnershipWithTruffle(contractsToOwn, accounts[0])
+    await assumeOwnershipWithTruffle(['Reserve'], accounts[0], 0, 'mento')
   })
 
   // 1. Mimic the state of the world post-contracts-release

@@ -3,7 +3,7 @@ import {
   assertEqualBN,
   assertLogMatches2,
   assertRevert,
-  assumeOwnership,
+  assumeOwnershipWithTruffle,
 } from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract, makeTruffleContract } from '@celo/protocol/lib/web3-utils'
 import { fixed1 } from '@celo/utils/src/fixidity'
@@ -37,7 +37,7 @@ contract('OdisPayments', (accounts: string[]) => {
     registry = await getDeployedProxiedContract('Registry', artifacts)
     if ((await registry.owner()) !== owner) {
       // In CI we need to assume ownership, locally using quicktest we don't
-      await assumeOwnership(['Registry'], owner)
+      await assumeOwnershipWithTruffle(['Registry'], owner)
     }
   })
 

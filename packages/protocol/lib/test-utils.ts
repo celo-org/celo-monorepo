@@ -249,6 +249,7 @@ export const assertRegistryAddressesSet = async (getContract: any) => {
   }
 }
 
+// 
 export const assertContractsOwnedByMultiSig = async (getContract: any) => {
   const multiSigAddress = (await getContract('MultiSig', 'proxiedContract')).address
   for (const contractPackage of ownedContracts) {
@@ -528,60 +529,56 @@ enum VoteValue {
   Yes,
 }
 
-export async function assumeOwnership(contractsToOwn: string[], to: string, dequeuedIndex: number = 0, path='') {
-	const governance: GovernanceInstance = await getDeployedProxiedContract('Governance', artifacts)
-	const lockedGold: LockedGoldInstance = await getDeployedProxiedContract('LockedGold', artifacts)
-
-
-	const multiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract(
-		'GovernanceApproverMultiSig',
-		artifacts
-	)
-	const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)
+export async function assumeOwnershipWithTruffle(contractsToOwn: string[], to: string, dequeuedIndex: number = 0, path='') {
+  const governance: GovernanceInstance = await getDeployedProxiedContract('Governance', artifacts)
+  const lockedGold: LockedGoldInstance = await getDeployedProxiedContract('LockedGold', artifacts)
+  const multiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract(
+    'GovernanceApproverMultiSig',
+    artifacts
+  )
+  const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)
   // Enough to pass the governance proposal unilaterally (and then some).
   const tenMillionCELO = '10000000000000000000000000'
-	// @ts-ignore
-	await lockedGold.lock({ value: tenMillionCELO })
+  // @ts-ignore
+  await lockedGold.lock({ value: tenMillionCELO })
   // Any contract's `transferOwnership` function will work here as the function signatures are all the same.
-	// @ts-ignore
+  // @ts-ignore
   const transferOwnershipData = Buffer.from(stripHexEncoding(registry.contract.methods.transferOwnership(to).encodeABI()), 'hex')
-	const proposalTransactions = await Promise.all(
-
-
-		contractsToOwn.map(async (contractName: string) => {
+  const proposalTransactions = await Promise.all(
+    contractsToOwn.map(async (contractName: string) => {
       
       const artifactsInstance = ArtifactsSingleton.getInstance(path, artifacts)
 
       const contractAddress = (await getDeployedProxiedContract(contractName, artifactsInstance)).address
       
-			return {
-				value: 0,
+      return {
+        value: 0,
         destination: contractAddress,
-				data: transferOwnershipData,
-			}
-		})
-	)
-	await governance.propose(
-		proposalTransactions.map((tx: any) => tx.value),
-		proposalTransactions.map((tx: any) => tx.destination),
-		// @ts-ignore
-		Buffer.concat(proposalTransactions.map((tx: any) => tx.data)),
-		proposalTransactions.map((tx: any) => tx.data.length),
-		'URL',
-		// @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-		{ value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
-	)
+        data: transferOwnershipData,
+      }
+    })
+  )
+  await governance.propose(
+    proposalTransactions.map((tx: any) => tx.value),
+    proposalTransactions.map((tx: any) => tx.destination),
+    // @ts-ignore
+    Buffer.concat(proposalTransactions.map((tx: any) => tx.data)),
+    proposalTransactions.map((tx: any) => tx.data.length),
+    'URL',
+    // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+    { value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
+  )
 
   const proposalId = (await governance.proposalCount()).toNumber()
 
-	await timeTravel(config.governance.dequeueFrequency + 1, web3)
-	// @ts-ignore
-	const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
-	await multiSig.submitTransaction(governance.address, 0, txData)
-	await timeTravel(config.governance.approvalStageDuration, web3)
-	await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
-	await timeTravel(config.governance.referendumStageDuration, web3)
-	await governance.execute(proposalId, dequeuedIndex)
+  await timeTravel(config.governance.dequeueFrequency + 1, web3)
+  // @ts-ignore
+  const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
+  await multiSig.submitTransaction(governance.address, 0, txData)
+  await timeTravel(config.governance.approvalStageDuration, web3)
+  await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
+  await timeTravel(config.governance.referendumStageDuration, web3)
+  await governance.execute(proposalId, dequeuedIndex)
 }
 
 /*
