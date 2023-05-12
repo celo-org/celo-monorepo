@@ -122,7 +122,7 @@ function hasEmptyBytecode(contract: any) {
 function compile(outdir: string) {
   console.log(`protocol: Compiling solidity to ${outdir}`)
 
-  // the reason to generate a different folder is to avoid paths for colliding, which could be very dangerous
+  // the reason to generate a different folder is to avoid path collisions, which could be very dangerous
   for (const externalContract of externalContracts) {
     console.log(`Building external contracts for ${externalContract}`)
     exec(
