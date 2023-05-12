@@ -668,7 +668,7 @@ jobs:
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks]
-    if: contains(needs.install-dependencies.outputs.all_files_changed, "packages/phone-number-privacy")
+    if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/phone-number-privacy')
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -698,7 +698,7 @@ jobs:
     needs: [install-dependencies, lint-checks]
     # Disable as certora license is not active
     if: |
-      contains(needs.install-dependencies.outputs.all_files_changed, "packages/protocol") && false
+      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') && false
     env:
       CERTORAKEY: NOT_ACTIVE
     strategy:
