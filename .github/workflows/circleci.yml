@@ -215,7 +215,7 @@ jobs:
     if: |
       contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock')
+      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
       true
     outputs:
       protocol-test-must-run: ${{ steps.protocol-test-must-run.outputs.PROTOCOL_TEST_MUST_RUN }}
@@ -230,30 +230,18 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Export protocol test must run
-        id: protocol-test-must-run
-        # TODO(jcortejoso): Remove true
-        run: |
-          # TODO(jcortejoso): This script slightly depends on CircleCI
-          # Ideally refactor this to depend just on GitHub Actions
-          # ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
-          echo "Protocol tests runs always"
-          echo "PROTOCOL_TEST_MUST_RUN=true" >> "$GITHUB_OUTPUT"
       - name: Cache protocol devchain
         uses: actions/cache@v3
         id: cache_protocol
-        if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') || true
         with:
           path: packages/protocol/.tmp/released_chain
           key: protocol-${{ github.sha }}
           restore-keys: |
             protocol-${{ github.sha }}
       - name: Opcode tests
-        if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') || true
         run: |
           yarn --cwd packages/protocol check-opcodes
       - name: Generate devchain of previous release
-        if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') || true
         run: |
           echo "Comparing against $RELEASE_TAG"
           # Github has phased out the git protocol so we ensure that we use
@@ -266,7 +254,10 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
-      needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
+      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      true
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -294,7 +285,10 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
-      needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
+      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      true
     strategy:
       fail-fast: false
       matrix:
@@ -358,7 +352,10 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
-      needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
+      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      true
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -383,6 +380,11 @@ jobs:
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
     needs: [install-dependencies]
+    if: |
+      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/contractkit') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      true
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -395,12 +397,10 @@ jobs:
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Generate DevChain
-        if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/contractkit') || true
         run: |
           cd packages/sdk/contractkit
           yarn test:reset
       - name: Run tests
-        if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/contractkit') || true
         run: |
           yarn --cwd=packages/sdk/contractkit test
   identity-tests:
@@ -408,6 +408,11 @@ jobs:
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
     needs: [install-dependencies]
+    if: |
+      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/identity') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      true
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -420,12 +425,10 @@ jobs:
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Generate DevChain
-        if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/identity') || true
         run: |
           cd packages/sdk/identity
           yarn test:reset
       - name: Run tests
-        if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/identity') || true
         run: |
           yarn --cwd=packages/sdk/identity test
   transactions-uri-tests:
@@ -433,6 +436,11 @@ jobs:
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
     needs: [install-dependencies]
+    if: |
+      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/sdk/transactions-uri') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      true
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -450,12 +458,10 @@ jobs:
         with:
           fetch_depth: "100"
       - name: Generate DevChain
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/sdk/transactions-uri') || true
         run: |
           cd packages/sdk/identity
           yarn test:reset
       - name: Run tests
-        if: contains(steps.changed-files.outputs.all_files_changed, 'packages/sdk/transactions-uri') || true
         run: |
           yarn --cwd=packages/sdk/identity test
   cli-tests:
@@ -463,6 +469,11 @@ jobs:
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
     needs: [install-dependencies]
+    if: |
+      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/cli') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      true
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -475,16 +486,13 @@ jobs:
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Generate DevChain
-        if: contains(needs.install-dependencies.outputs, 'packages/cli') || true
         run: |
           cd packages/cli
           yarn test:reset
       - name: Run tests
-        if: contains(needs.install-dependencies.outputs, 'packages/cli') || true
         run: |
           yarn --cwd=packages/cli test
       - name: Fail if someone forgot to commit CLI docs
-        if: contains(needs.install-dependencies.outputs, 'packages/cli') || true
         run: |
           yarn --cwd=packages/cli docs
           if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
@@ -493,12 +501,10 @@ jobs:
             exit 1
           fi
       - name: Verify that a new account can be created
-        if: contains(needs.install-dependencies.outputs, 'packages/cli') || true
         run: |
           yarn --cwd=packages/cli run celocli account:new
       # TODO(jcortejoso): Review later
       - name: Install and test the npm package
-        if: contains(needs.install-dependencies.outputs, 'packages/cli') || true
         run: |
           cd packages/cli
           yarn pack
