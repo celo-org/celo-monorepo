@@ -129,7 +129,7 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v35
         with:
-          files_separator: ","
+          separator: ","
           # Checking if changed in the last 100 commits in PRs
           fetch_depth: "100"
       - run: echo ",${{ toJson(steps.changed-files.outputs.all_changed_files) }}"
@@ -516,6 +516,11 @@ jobs:
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
     needs: [install-dependencies]
+    if: |
+      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/typescript') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      true
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -528,7 +533,6 @@ jobs:
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Install and test the npm package
-        if: contains(needs.install-dependencies.outputs, 'packages/typescript') || true
         run: |
           set -euo pipefail
           cd packages/typescript
@@ -540,6 +544,11 @@ jobs:
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
     needs: [install-dependencies]
+    if: |
+      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      true
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -569,6 +578,11 @@ jobs:
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
     needs: [install-dependencies]
+    if: |
+      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      true
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -598,7 +612,12 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
-      needs.pre-protocol-test-release.outputs.protocol-test-must-run == 'true'
+      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/celotool') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/sdk/contractkit') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      true
     strategy:
       fail-fast: false
       matrix:
@@ -679,7 +698,11 @@ jobs:
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks]
-    if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/phone-number-privacy')
+    if: |
+      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/phone-number-privacy') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      true
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -709,7 +732,11 @@ jobs:
     needs: [install-dependencies, lint-checks]
     # Disable as certora license is not active
     if: |
-      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') && false
+      false && (
+        contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
+        contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
+        contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock')
+      )
     env:
       CERTORAKEY: NOT_ACTIVE
     strategy:
