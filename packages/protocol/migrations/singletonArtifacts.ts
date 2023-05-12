@@ -1,5 +1,9 @@
 export class ArtifactsSingleton {
-  public static getInstance(namespace: string): ArtifactsSingleton {
+  public static getInstance(namespace: string, defaultArtifacts?: any): any {
+    if (namespace === undefined) {
+      return defaultArtifacts
+    }
+
     if (!(namespace in ArtifactsSingleton.instances)) {
       ArtifactsSingleton.instances[namespace] = new ArtifactsSingleton()
     }
