@@ -2,12 +2,12 @@ name: celo-monorepo
 run-name: celo-monorepo tests
 
 on:
-  push:
-    branches:
-      - jcortejoso/circleci-github-actions
-  # pull_request:
+  # push:
   #   branches:
-  #     - master
+  #     - jcortejoso/circleci-github-actions
+  pull_request:
+    branches:
+      - master
 
 concurrency:
   group: circle-ci-${{ github.ref }}
@@ -131,7 +131,7 @@ jobs:
         with:
           # Checking if changed in the last 100 commits in PRs
           fetch_depth: "100"
-      - run: echo ${{ steps.changed-files.outputs.all_files_changed }}
+      - run: echo ${{ steps.changed-files.outputs.all_changed_files }}
   lint-checks:
     name: Lint code
     runs-on: ["self-hosted", "monorepo"]
