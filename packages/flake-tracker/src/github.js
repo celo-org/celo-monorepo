@@ -14,8 +14,8 @@ const defaults = {
 const FlakeLabel = 'FLAKEY'
 const getLabels = () => {
   const labels = [FlakeLabel, utils.getPackageName()]
-  if (process.env.CIRCLECI) {
-    labels.push(process.env.CIRCLE_JOB)
+  if (config.isCI) {
+    labels.push(config.CiJob)
   }
   return labels
 }
@@ -46,7 +46,7 @@ class GitHub {
   }
 
   async report(flakes, skippedTests, obsoleteIssues) {
-    if (!process.env.CIRCLECI) return
+    if (!config.isCI) return
     const promises = []
     if (config.shouldCreateIssues) {
       // Check list of ALL flakey issues to ensure no duplicates
@@ -71,13 +71,13 @@ class GitHub {
   }
 
   async createIssues(flakes) {
-    if (!process.env.CIRCLECI) return
+    if (!config.isCI) return
     return Promise.all(flakes.map((f) => this.createIssue(f)))
   }
 
   async createIssue(flake) {
-    if (!process.env.CIRCLECI) return
-    flake.body = 'Discovered at commit ' + process.env.CIRCLE_SHA1 + '\n\n' + flake.body + '\n'
+    if (!config.isCI) return
+    flake.body = 'Discovered at commit ' + config.sha + '\n\n' + flake.body + '\n'
     const fn = () =>
       this.rest.issues.create({
         ...defaults,
@@ -90,8 +90,8 @@ class GitHub {
   }
 
   async fetchMandatoryTestsForPR() {
-    if (!process.env.CIRCLECI || process.env.CIRCLE_BRANCH === 'master') return []
-    const prNumber = utils.getPullNumber()
+    if (!config.isCI || config.branch === 'master') return []
+    const prNumber = config.prNumber
     const fn = () =>
       this.rest.pulls.get({
         ...defaults,
@@ -128,31 +128,27 @@ class GitHub {
   }
 
   async handleObsoleteIssues(obsoleteIssues) {
-    if (!process.env.CIRCLECI) return
+    if (!config.isCI) return
     const promises = [this.addObsoleteIssuesCheck(obsoleteIssues)]
-    if (process.env.CIRCLE_BRANCH === 'master') {
+    if (config.branch === 'master') {
       promises.push(this.closeIssues(obsoleteIssues))
     }
     return Promise.all(promises)
   }
 
   async closeIssues(issues) {
-    if (!process.env.CIRCLECI) return
+    if (!config.isCI) return
     return Promise.all(issues.map((i) => this.closeIssue(i)))
   }
 
   async closeIssue(issue) {
-    if (!process.env.CIRCLECI) return
+    if (!config.isCI) return
     const fn = () =>
       this.rest.issues.update({
         ...defaults,
         issue_number: issue.number,
         state: 'closed',
-        body:
-          'FlakeTracker closed this issue after commit ' +
-          process.env.CIRCLE_SHA1 +
-          '\n\n' +
-          issue.body,
+        body: 'FlakeTracker closed this issue after commit ' + config.sha + '\n\n' + issue.body,
       })
     console.log('\nClosing obsolete issue ' + issue.number + '...')
     const errMsg = 'Failed to close obsolete issue.'
@@ -160,19 +156,19 @@ class GitHub {
   }
 
   async addObsoleteIssuesCheck(obsoleteIssues) {
-    if (!process.env.CIRCLECI) return
+    if (!config.isCI) return
     if (obsoleteIssues.length) {
       await this.addCheckRun(
         {
           ...defaults,
           name: utils.getTestSuiteTitles().join(' -> '),
-          head_sha: process.env.CIRCLE_SHA1,
+          head_sha: config.sha,
           conclusion: 'neutral',
           output: {
             title: 'Obsolete Issues',
             summary: 'Some flakey test issues no longer correspond to actual tests',
             text:
-              (process.env.CIRCLE_BRANCH === 'master'
+              (config.branch === 'master'
                 ? 'Because these flakey test issues are now obsolete on master, they have been automatically closed.'
                 : 'If tests have been refactored or renamed please update the following issues accordingly (but not too long before your PR is merged, as to avoid interfering with other concurrent workflows). If left unchanged, these issues will be automatically closed when this PR is merged.') +
               '\n\n' +
@@ -187,15 +183,15 @@ class GitHub {
   // addSummaryCheck is called in a final job added to the CI workflow.
   // It provides a breakdown of where flakey tests are located.
   async addSummaryCheck() {
-    if (!process.env.CIRCLECI) return
+    if (!config.isCI) return
     const title = 'Flakey Test Summary'
-    const optsBase = { ...defaults, name: 'Summary', head_sha: process.env.CIRCLE_SHA1 }
+    const optsBase = { ...defaults, name: 'Summary', head_sha: config.sha }
 
     // Get FlakeTracker check runs added so far
     let fn = () =>
       this.rest.checks.listSuitesForRef({
         ...defaults,
-        ref: process.env.CIRCLE_SHA1,
+        ref: config.sha,
         app_id: config.flakeTrackerID,
       })
 
@@ -265,7 +261,7 @@ class GitHub {
   }
 
   async addFlakeCheck(flakes, skippedTests) {
-    if (!process.env.CIRCLECI) return
+    if (!config.isCI) return
     const conclusion = utils.getConclusion(flakes, skippedTests)
 
     // Only add checks when there's flakiness (otherwise check suite gets cluttered)
@@ -305,7 +301,7 @@ class GitHub {
       {
         ...defaults,
         name: name,
-        head_sha: process.env.CIRCLE_SHA1,
+        head_sha: config.sha,
         conclusion: conclusionToDisplay,
         output: output,
       },
@@ -314,7 +310,7 @@ class GitHub {
   }
 
   async addCheckRun(opts, errMsg) {
-    if (!process.env.CIRCLECI) return
+    if (!config.isCI) return
     const fn = () => {
       return this.rest.checks.create(opts)
     }
