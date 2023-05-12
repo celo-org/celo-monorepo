@@ -34,3 +34,5 @@ runs:
         key: code-${{ github.sha }}
         restore-keys: |
           code-${{ github.sha }}
+        enableCrossOsArchive: true
+        fail-on-cache-miss: true
