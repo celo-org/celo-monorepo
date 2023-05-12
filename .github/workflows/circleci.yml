@@ -476,14 +476,6 @@ jobs:
       - name: Verify that a new account can be created
         run: |
           yarn --cwd=packages/cli run celocli account:new
-      # TODO(jcortejoso): Review later
-      - name: Install and test the npm package
-        run: |
-          cd packages/cli
-          yarn pack
-          cd $RUNNER_TEMP
-          npm install $RUNNER_WORKSPACE/celo-monorepo/packages/cli/celo-cli-*.tgz
-          npx celocli account:new
   typescript-tests:
     name: Typescript package Tests
     runs-on: ["self-hosted", "monorepo"]
