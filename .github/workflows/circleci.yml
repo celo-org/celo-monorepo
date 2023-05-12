@@ -134,6 +134,7 @@ jobs:
           separator: ","
           # Checking if changed in the last 100 commits in PRs
           fetch_depth: "100"
+      - run: echo ",${{ steps.changed-files.outputs.all_files_changed }}"
   lint-checks:
     name: Lint code
     runs-on: ["self-hosted", "monorepo"]
