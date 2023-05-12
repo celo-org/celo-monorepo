@@ -33,6 +33,7 @@ jobs:
     outputs:
       package-json-checksum: ${{ steps.node-checksums.outputs.PACKAGE_JSON_CHECKSUM }}
       # Propagate more outputs if you need https://github.com/tj-actions/changed-files#outputs
+      # Adding a initial comma so ',<path>' matches also for the first file
       all_files_changed: ",${{ steps.changed-files.outputs.all_files_changed }}"
     # runs-on: ubuntu-latest
     runs-on: ["self-hosted", "monorepo"]
@@ -129,10 +130,10 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v35
         with:
+          # Using comma as separator to be able to easily match full paths (using ,<path>)
           separator: ","
           # Checking if changed in the last 100 commits in PRs
           fetch_depth: "100"
-      - run: echo ",${{ toJson(steps.changed-files.outputs.all_changed_files) }}"
   lint-checks:
     name: Lint code
     runs-on: ["self-hosted", "monorepo"]
@@ -216,7 +217,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
-      true
+      false
     outputs:
       protocol-test-must-run: ${{ steps.protocol-test-must-run.outputs.PROTOCOL_TEST_MUST_RUN }}
     steps:
@@ -257,7 +258,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
-      true
+      false
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -288,7 +289,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
-      true
+      false
     strategy:
       fail-fast: false
       matrix:
@@ -355,7 +356,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
-      true
+      false
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -384,7 +385,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_files_changed, 'packages/contractkit') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
-      true
+      false
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -412,7 +413,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_files_changed, 'packages/identity') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
-      true
+      false
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -440,7 +441,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_files_changed, 'packages/sdk/transactions-uri') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
-      true
+      false
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -473,7 +474,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_files_changed, 'packages/cli') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
-      true
+      false
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -520,7 +521,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_files_changed, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
-      true
+      false
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -548,7 +549,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_files_changed, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
-      true
+      false
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -582,7 +583,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_files_changed, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
-      true
+      false
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -617,7 +618,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_files_changed, 'packages/sdk/contractkit') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
-      true
+      false
     strategy:
       fail-fast: false
       matrix:
@@ -702,7 +703,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_files_changed, 'packages/phone-number-privacy') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
-      true
+      false
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
