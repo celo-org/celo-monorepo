@@ -11,7 +11,7 @@ on:
 
 jobs:
   install-npm-package:
-    name: Install NPM package
+    name: ${{ matrix.package }} NPM package install
     runs-on: ubuntu-latest
     container:
       image: node:14-bullseye
@@ -24,6 +24,11 @@ jobs:
         - '@celo/contractkit'
         - '@celo/celocli'
     steps:
+      - name: Install @celo/celocli dependencies
+        if: matrix.package == '@celo/celocli'
+        run: |
+          apt update
+          apt install -y libusb-1.0-0-dev
       - name: Installing npm package
         run: yarn add ${{ matrix.package }}
       - name: Test celocli command
