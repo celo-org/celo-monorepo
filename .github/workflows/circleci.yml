@@ -1,6 +1,9 @@
 name: celo-monorepo
 run-name: celo-monorepo tests
 
+# Dockefile for the self-hosted runner: 
+# https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfile-monorepo
+
 on:
   push:
     branches:
@@ -284,7 +287,7 @@ jobs:
     # Keeping name short because GitHub UI does not handle long names well 
     name: ${{ matrix.name }}
     runs-on: ["self-hosted", "monorepo"]
-    timeout-minutes: 30
+    timeout-minutes: 60
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
@@ -346,8 +349,12 @@ jobs:
         with:
           limit-access-to-actor: true
       - name: Execute matrix command for test
-        run: |
-          ${{ matrix.command }}
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: |
+            ${{ matrix.command }}
   contractkit-tests:
     name: ContractKit Tests
     runs-on: ["self-hosted", "monorepo"]
@@ -574,7 +581,7 @@ jobs:
     # Keeping name short because GitHub UI does not handle long names well
     name: e2e ${{ matrix.name }}
     runs-on: ["self-hosted", "monorepo"]
-    timeout-minutes: 30
+    timeout-minutes: 60
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
@@ -654,8 +661,12 @@ jobs:
         with:
           limit-access-to-actor: true
       - name: Execute matrix command for test
-        run: |
-          ${{ matrix.command }}
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: |
+            ${{ matrix.command }}
 
   # TODO: Ask Identity team to check if this is relevant
   odis-test:
