@@ -183,7 +183,7 @@ jobs:
           root: .
           paths:
             - .
-  
+
   lint-checks:
     <<: *defaults
     resource_class: large
