@@ -668,9 +668,7 @@ jobs:
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks]
-    if: |
-      contains(needs.install-dependencies.outputs.all_files_changed, "packages/phone-number-privacy") ||
-      contains(needs.install-dependencies.outputs.all_files_changed, "package.json")
+    if: contains(needs.install-dependencies.outputs.all_files_changed, "packages/phone-number-privacy")
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
