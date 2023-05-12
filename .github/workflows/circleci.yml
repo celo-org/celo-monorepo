@@ -129,11 +129,9 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v35
         with:
-          diff_relative: "true"
-          path: "."
           # Checking if changed in the last 100 commits in PRs
           fetch_depth: "100"
-      - run: echo ${{ steps.changed-files.outputs.all_changed_files }}
+      - run: echo ${{ toJson(steps.changed-files.outputs.all_changed_files) }}
   lint-checks:
     name: Lint code
     runs-on: ["self-hosted", "monorepo"]
@@ -213,6 +211,10 @@ jobs:
     # Comment lint-checks dependency to speed up (as this is a dependency for many other jobs)
     # needs: [install-dependencies, lint-checks]
     needs: [install-dependencies]
+    if: |
+      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
+      contains(toJson(needs.install-dependencies.outputs.all_files_changed), '\r\npackage.json') ||
+      true
     outputs:
       protocol-test-must-run: ${{ steps.protocol-test-must-run.outputs.PROTOCOL_TEST_MUST_RUN }}
     steps:
@@ -229,7 +231,6 @@ jobs:
       - name: Export protocol test must run
         id: protocol-test-must-run
         # TODO(jcortejoso): Remove true
-        if: contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') || true
         run: |
           # TODO(jcortejoso): This script slightly depends on CircleCI
           # Ideally refactor this to depend just on GitHub Actions
