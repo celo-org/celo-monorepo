@@ -55,7 +55,7 @@ jobs:
           set -v
           # To get the "master" branch mapping
           git checkout master
-          git checkout ${GITHUB_REF}
+          git checkout ${GITHUB_SHA}
           # Verify that following commands work, they are later called in the incremental testing script
           # There output does not matter here, the fact that they finish successfully does.
           git rev-parse --abbrev-ref HEAD
