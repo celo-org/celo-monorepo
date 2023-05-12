@@ -149,16 +149,10 @@ export function checkFunctionArgsLength(args: any[], abi: any) {
 
 export async function setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
->(web3: Web3, artifacts: any, contractName: string, contractPath: string, ...args: any[]): Promise<ContractInstance> {
-
-  let Contract, ContractProxy
-  if (contractPath){
-    Contract = ArtifactsSingleton.getInstance(contractPath).require(contractName)
-    ContractProxy = ArtifactsSingleton.getInstance(contractPath).require(contractName + 'Proxy')
-  } else {
-    Contract = artifacts.require(contractName)
-    ContractProxy = artifacts.require(contractName + 'Proxy')
-  }
+>(web3: Web3, artifacts: any, contractName: string, contractPath?: string, ...args: any[]): Promise<ContractInstance> {
+  
+  const Contract = ArtifactsSingleton.getInstance(contractPath, artifacts).require(contractName)
+  const ContractProxy = ArtifactsSingleton.getInstance(contractPath, artifacts).require(contractName + 'Proxy')
 
   await Contract.detectNetwork()
   await ContractProxy.detectNetwork()

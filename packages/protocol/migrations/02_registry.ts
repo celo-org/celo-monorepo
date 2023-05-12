@@ -26,6 +26,6 @@ module.exports = (deployer: any, _networkName: string, _accounts: string[]) => {
     const artifactor = new Artifactor(contractsDir)
 
     await artifactor.save(artifact)
-    await setInitialProxyImplementation<RegistryInstance>(web3, artifacts, name, '')
+    await setInitialProxyImplementation<RegistryInstance>(web3, artifacts, name)
   })
 }
