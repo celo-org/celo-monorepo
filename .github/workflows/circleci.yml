@@ -34,7 +34,7 @@ jobs:
       package-json-checksum: ${{ steps.node-checksums.outputs.PACKAGE_JSON_CHECKSUM }}
       # Propagate more outputs if you need https://github.com/tj-actions/changed-files#outputs
       # Adding a initial comma so ',<path>' matches also for the first file
-      all_files_changed: ",${{ steps.changed-files.outputs.all_files_changed }}"
+      all_modified_files: ",${{ steps.changed-files.outputs.all_modified_files }}"
     # runs-on: ubuntu-latest
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
@@ -126,7 +126,7 @@ jobs:
             exit 0
           fi
           yarn check-licenses
-      - name: Detect files changed in PR, and exposed as output
+      - name: Detect files changed in PR, and expose as output
         id: changed-files
         uses: tj-actions/changed-files@v35
         with:
@@ -134,7 +134,7 @@ jobs:
           separator: ","
           # Checking if changed in the last 100 commits in PRs
           fetch_depth: "150"
-      - run: echo ",${{ steps.changed-files.outputs.all_files_changed }}"
+      - run: echo ",${{ steps.changed-files.outputs.all_modified_files }}"
   lint-checks:
     name: Lint code
     runs-on: ["self-hosted", "monorepo"]
@@ -215,9 +215,9 @@ jobs:
     # needs: [install-dependencies, lint-checks]
     needs: [install-dependencies]
     if: |
-      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     outputs:
       protocol-test-must-run: ${{ steps.protocol-test-must-run.outputs.PROTOCOL_TEST_MUST_RUN }}
@@ -256,9 +256,9 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
-      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
       - uses: actions/cache/restore@v3
@@ -287,9 +287,9 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
-      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     strategy:
       fail-fast: false
@@ -354,9 +354,9 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
-      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
       - uses: actions/cache/restore@v3
@@ -383,9 +383,9 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
-      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/contractkit') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/contractkit') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
       - uses: actions/cache/restore@v3
@@ -411,9 +411,9 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
-      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/identity') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/identity') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
       - uses: actions/cache/restore@v3
@@ -439,9 +439,9 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
-      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/sdk/transactions-uri') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk/transactions-uri') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
       - uses: actions/cache/restore@v3
@@ -472,9 +472,9 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
-      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/cli') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/cli') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
       - uses: actions/cache/restore@v3
@@ -519,9 +519,9 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
-      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
       - uses: actions/cache/restore@v3
@@ -547,9 +547,9 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
-      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
       - uses: actions/cache/restore@v3
@@ -581,9 +581,9 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
-      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
       - uses: actions/cache/restore@v3
@@ -614,11 +614,11 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
-      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/celotool') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/sdk/contractkit') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/celotool') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk/contractkit') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     strategy:
       fail-fast: false
@@ -701,9 +701,9 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks]
     if: |
-      contains(needs.install-dependencies.outputs.all_files_changed, 'packages/phone-number-privacy') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/phone-number-privacy') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
       - uses: actions/cache/restore@v3
@@ -735,9 +735,9 @@ jobs:
     # Disable as certora license is not active
     if: |
       false && (
-        contains(needs.install-dependencies.outputs.all_files_changed, 'packages/protocol') ||
-        contains(needs.install-dependencies.outputs.all_files_changed, ',package.json') ||
-        contains(needs.install-dependencies.outputs.all_files_changed, ',yarn.lock')
+        contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+        contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+        contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock')
       )
     env:
       CERTORAKEY: NOT_ACTIVE
