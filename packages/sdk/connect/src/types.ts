@@ -48,13 +48,6 @@ export type CeloTxReceipt = TransactionReceipt & Partial<CeloParams>
 
 export type Callback<T> = (error: Error | null, result?: T) => void
 
-// export interface JsonRpcResponse {
-//   jsonrpc: string
-//   id: string | number
-//   result?: any
-//   error?: string | { message: string; code: number }
-// }
-
 export interface JsonRpcResponse {
   jsonrpc: string
   id: string | number

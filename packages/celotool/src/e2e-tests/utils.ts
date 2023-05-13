@@ -38,7 +38,7 @@ import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { stringToBoolean } from '../lib/utils'
 
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
-const verboseOutput = true
+const verboseOutput = true // TODO (soloseng): revert to false
 // The mnemonic used for the e2e tests
 export const mnemonic =
   'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'

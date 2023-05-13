@@ -40,5 +40,5 @@ export const getSignatureForAttestation = async (
 
 export const getDomainDigest = (contractAddress: Address) => {
   const typedData = getTypedData(1, contractAddress)
-  return  bufferToHex( structHash('EIP712Domain', typedData.domain, typedData.types))
+  return  bufferToHex(structHash('EIP712Domain', typedData.domain, typedData.types))
 }

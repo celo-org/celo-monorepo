@@ -52,9 +52,9 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
     // Ganache returns 1 in chainId assembly code
     // @ts-ignore
     wallet.chainId = () => Promise.resolve(chainId)
+
     // Give the wallet some funds
     await gold.transfer(wallet.address, new BigNumber(20e18).toFixed()).sendAndWaitForReceipt()
-    // .sendAndWaitForReceipt({ gasPrice: 100 })
     emptyAccounts = [0, 0, 0, 0, 0].map(() => web3.utils.randomHex(20))
   })
 

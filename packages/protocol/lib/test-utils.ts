@@ -165,12 +165,6 @@ export async function assertRevertWithReason(promise: any, expectedRevertReason:
     //  - satisfies all conditions set by Solidity `require` statements.
     //  - does not trigger a Solidity `revert` statement.`
     // Therefore we try to parse the instance of `${revertMessage}`.
-    
-    //  const foundRevertReason = error.message
-    //   .split('. Reason given: ')[0]
-    //   .split('Returned error: VM Exception while processing transaction: revert ')[1]
-    // assert.equal(foundRevertReason, expectedRevertReason, `Incorrect revert message: ${error.message} \n ${foundRevertReason}`)
-   
     const foundRevertReason = error.message
       .split(' Reason given: ')[1].split('.')[0]
     assert.strictEqual(foundRevertReason, expectedRevertReason, `Incorrect revert message: ${error.message} \n ${foundRevertReason}`)

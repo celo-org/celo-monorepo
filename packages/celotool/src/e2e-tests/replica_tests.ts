@@ -169,9 +169,6 @@ describe('replica swap tests', () => {
       const validatorWSWeb3Url = 'ws://localhost:8544'
       const validatorWSWeb3 = new Web3(validatorWSWeb3Url)
 
-      // validatoRPC = new DefaultRpcCaller(new Web3.providers.HttpProvider('http://localhost:8545'))
-      // proxyRPC = new DefaultRpcCaller(new Web3.providers.HttpProvider('http://localhost:8546'))
-      // replicaRPC = new DefaultRpcCaller(new Web3.providers.HttpProvider('http://localhost:8555'))
       validatoRPC = new HttpRpcCaller(new Web3.providers.HttpProvider('http://localhost:8545'))
       proxyRPC = new HttpRpcCaller(new Web3.providers.HttpProvider('http://localhost:8546'))
       replicaRPC = new HttpRpcCaller(new Web3.providers.HttpProvider('http://localhost:8555'))

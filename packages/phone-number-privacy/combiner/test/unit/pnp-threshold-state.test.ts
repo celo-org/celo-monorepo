@@ -35,7 +35,6 @@ describe('pnp threshold state', () => {
         logger: rootLogger,
       },
     } as Response
-
     const session = new Session<PnpQuotaRequest | SignMessageRequest>(
       mockRequest,
       mockResponse,

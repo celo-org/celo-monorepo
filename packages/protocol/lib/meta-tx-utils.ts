@@ -60,7 +60,9 @@ export const getSignatureForMetaTransaction = async (
 ) => {
   const typedData = getTypedData(walletAddress, tx)
 
-  const signature= await web3.currentProvider.request({  method: 'eth_signTypedData',params: [signer, typedData],})
+  const signature = await web3.currentProvider.request({ 
+    method: 'eth_signTypedData',params: [signer, typedData],
+  })
 
   const messageHash = constructMetaTransactionExecutionDigest(walletAddress, tx)
   const parsedSignature = parseSignatureWithoutPrefix(messageHash, signature, signer)

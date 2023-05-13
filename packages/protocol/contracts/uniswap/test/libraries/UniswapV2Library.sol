@@ -35,8 +35,9 @@ library UniswapV2Library {
             // This variable was hardcoded for Uniswap Eth Mainnet deployment
             // hex"96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f" // init code hash
             // Hash in the CI "bc307131606b79f0c50770dea78b35921ffca853421cbb031aa5a1ce5d6ea269"
-            //TODO:(soloseng) swicth back to this     // hex"bc307131606b79f0c50770dea78b35921ffca853421cbb031aa5a1ce5d6ea269"
+            // hex"bc307131606b79f0c50770dea78b35921ffca853421cbb031aa5a1ce5d6ea269"
             // hex"f0bd447d72bc4c5cd510462381a98e87f097a4d31106d6dd8b5922227696ef7a"
+            // the value of the hash is a function of the address it gets deployed to.
             hex"a3cc3b88aa878e73a27f19b6bb136f2e229563b9b45b3d86ced9b3725dd480ed"
           )
         )
