@@ -82,7 +82,6 @@ contract('Attestations', (accounts: string[]) => {
   }
 
   beforeEach('Attestations setup', async () => {
-    // beforeEachWithRetries('Attestations setup', 3, 3000, async () => {
     accountsInstance = await Accounts.new(true)
     mockERC20Token = await MockERC20Token.new()
     otherMockERC20Token = await MockERC20Token.new()

@@ -161,8 +161,6 @@ export class BlockExplorer {
       contractName: contractMapping.details.name,
       abi: methodAbi,
     }
-
-    return null
   }
 
   /**
