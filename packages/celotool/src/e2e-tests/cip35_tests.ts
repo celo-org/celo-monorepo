@@ -174,7 +174,7 @@ class TestEnv {
   replayProtectionIsNotMandatory: boolean
   hooks: ReturnType<typeof getHooks>
   stableTokenAddr: string = ''
-  gasPrice: string = '' //XXX this?
+  gasPrice: string = ''
 
   // There are three cases: (a), (b), and (c) below.
   // And, for each of these three cases, we have one which connects to the validator and one which
