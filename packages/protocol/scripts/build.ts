@@ -150,8 +150,9 @@ async function generateFilesForContractKit(outdir: string) {
   exec(`rm -rf ${outdir}`)
   const relativePath = path.relative(ROOT_DIR, outdir)
 
-  const contractKitContracts = CoreContracts.concat('Proxy').concat(Interfaces)
-  // .concat(MENTO_PACKAGE.contracts) // TODO this path is not correct for mento?
+  const contractKitContracts = CoreContracts.concat('Proxy')
+    .concat(Interfaces)
+    .concat(MENTO_PACKAGE.contracts) // TODO this path is not correct for mento?
 
   const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
 
