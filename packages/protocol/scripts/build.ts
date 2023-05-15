@@ -150,9 +150,8 @@ async function generateFilesForContractKit(outdir: string) {
   exec(`rm -rf ${outdir}`)
   const relativePath = path.relative(ROOT_DIR, outdir)
 
-  const contractKitContracts = CoreContracts.concat('Proxy')
-    .concat(Interfaces)
-    .concat(MENTO_PACKAGE.contracts) // TODO this path is not correct for mento?
+  const contractKitContracts = CoreContracts.concat('Proxy').concat(Interfaces)
+  // .concat(MENTO_PACKAGE.contracts) // TODO this path is not correct for mento?
 
   const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
 
@@ -174,9 +173,9 @@ async function generateFilesForContractKit(outdir: string) {
       new Web3V1Celo({
         cwd,
         rawConfig: {
-          files: `${BUILD_DIR}/contracts-${externalContract.name}/@(${contractKitContracts.join(
-            '|'
-          )}).json`,
+          files: `${BUILD_DIR}/contracts-${
+            externalContract.name
+          }/@(${externalContract.contracts.join('|')}).json`,
           // This path should be generalized if there's ever a conflic of names with the artifacts from external contracts
           outDir: relativePath,
         },
