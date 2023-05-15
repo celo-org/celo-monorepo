@@ -151,23 +151,24 @@ async function generateFilesForContractKit(outdir: string) {
   const relativePath = path.relative(ROOT_DIR, outdir)
 
   const contractKitContracts = CoreContracts.concat('Proxy').concat(Interfaces)
-  // .concat(MENTO_PACKAGE.contracts) // TODO this path is not correct for mento?
 
   const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
 
   const cwd = process.cwd()
 
-  const web3Generator = new Web3V1Celo({
-    cwd,
-    rawConfig: {
-      files: globPattern,
-      outDir: relativePath,
-    },
-  })
+  await tsGenerator(
+    { cwd, loggingLvl: 'info' },
+    new Web3V1Celo({
+      cwd,
+      rawConfig: {
+        files: globPattern,
+        outDir: relativePath,
+      },
+    })
+  )
 
-  await tsGenerator({ cwd, loggingLvl: 'info' }, web3Generator)
-  // tslint:disable-next-line
   for (let externalContract of externalContracts) {
+    console.log('building to', path.join(relativePath, externalContract.name))
     await tsGenerator(
       { cwd, loggingLvl: 'info' },
       new Web3V1Celo({
@@ -176,8 +177,7 @@ async function generateFilesForContractKit(outdir: string) {
           files: `${BUILD_DIR}/contracts-${
             externalContract.name
           }/@(${externalContract.contracts.join('|')}).json`,
-          // This path should be generalized if there's ever a conflic of names with the artifacts from external contracts
-          outDir: relativePath,
+          outDir: path.join(relativePath, externalContract.name),
         },
       })
     )
