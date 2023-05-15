@@ -118,7 +118,7 @@ contract LockedGold is
    * @notice Locks gold to be used for voting.
    */
   function lock() external payable nonReentrant {
-    require(getAccounts().isAccount(msg.sender), "not account");
+    require(getAccounts().isAccount(msg.sender), "must register address as an Account first");
     _incrementNonvotingAccountBalance(msg.sender, msg.value);
     emit GoldLocked(msg.sender, msg.value);
   }
