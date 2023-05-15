@@ -266,7 +266,7 @@ export const makeTruffleContract = (contractName: string, contractPath:ContractP
   const {createInterfaceAdapter} = require("@truffle/interface-adapter")
   
   Contract.setProvider(web3.currentProvider)
-  Contract.setNetwork(1101)
+  Contract.setNetwork(1101) // TODO use deasync to get this from web3
   
   Contract.interfaceAdapter = createInterfaceAdapter({
     networkType: "ethereum",

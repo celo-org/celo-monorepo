@@ -1,3 +1,4 @@
+// tslint:disable: ordered-imports
 import { ABIDefinition, AbiItem } from '@celo/connect'
 import Web3 from 'web3'
 import { ABI as AccountsABI } from './generated/Accounts'

@@ -1,3 +1,4 @@
+// tslint:disable: ordered-imports
 import debugFactory from 'debug'
 import { AddressRegistry } from './address-registry'
 import { CeloContract, ProxyContracts } from './base'
