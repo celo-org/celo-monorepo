@@ -38,7 +38,7 @@ import {
   StableTokenInstance,
 } from 'types/mento'
 import { MENTO_PACKAGE } from '../../contractPackages'
-import { ArtifactsSingleton } from '../../migrations/singletonArtifacts'
+import { ArtifactsSingleton } from '../../migrations/artifactsSingleton'
 import { SECONDS_IN_A_WEEK } from '../constants'
 
 enum VoteValue {
@@ -301,10 +301,10 @@ contract('Integration: Governance', (accounts: string[]) => {
   describe('Checking governance thresholds', () => {
     for (const contractName of Object.keys(constitution).filter((k) => k !== 'proxy')) {
       it('should have correct thresholds for ' + contractName, async () => {
-        let artifactsInstance = artifacts
-        if (constitution[contractName].__path) {
-          artifactsInstance = ArtifactsSingleton.getInstance(MENTO_PACKAGE)
-        }
+        const artifactsInstance = ArtifactsSingleton.getInstance(
+          constitution[contractName].__path,
+          artifacts
+        )
 
         const contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
           contractName,

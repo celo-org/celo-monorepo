@@ -8,7 +8,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { AttestationsInstance } from 'types'
 import { StableTokenInstance } from 'types/mento'
 import { MENTO_PACKAGE } from '../contractPackages'
-import { ArtifactsSingleton } from './singletonArtifacts'
+import { ArtifactsSingleton } from './artifactsSingleton'
 
 const initializeArgs = async (): Promise<[string, string, string, string, string[], string[]]> => {
   const stableToken: StableTokenInstance = await getDeployedProxiedContract<StableTokenInstance>(

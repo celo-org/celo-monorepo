@@ -1,6 +1,8 @@
 contractPackages = require('./contractPackages.js')
 
 const MENTO_PACKAGE = contractPackages.MENTO_PACKAGE
+// __path field is used to specify which contract package this contract belongs to
+// leaving it undefined assumes it's a monorepo contract
 
 const DefaultConstitution = {
   Accounts: {

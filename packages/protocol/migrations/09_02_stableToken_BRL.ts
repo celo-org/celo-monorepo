@@ -11,7 +11,7 @@ import { FeeCurrencyWhitelistInstance, FreezerInstance, SortedOraclesInstance } 
 import { ReserveInstance, StableTokenBRLInstance } from 'types/mento'
 import Web3 from 'web3'
 import { MENTO_PACKAGE } from '../contractPackages'
-import { ArtifactsSingleton } from './singletonArtifacts'
+import { ArtifactsSingleton } from './artifactsSingleton'
 
 const truffle = require('@celo/protocol/truffle-config.js')
 

@@ -5,7 +5,7 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { ContractPackage } from 'contractPackages'
-import { ArtifactsSingleton } from '../../migrations/singletonArtifacts'
+import { ArtifactsSingleton } from '../../migrations/artifactsSingleton'
 
 const getProxiedContract = async (contractName: string, path: ContractPackage) => {
   const artifactsObject = ArtifactsSingleton.getInstance(path, artifacts)

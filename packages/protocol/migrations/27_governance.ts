@@ -12,7 +12,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance } from 'types'
 import { MENTO_PACKAGE } from '../contractPackages'
-import { ArtifactsSingleton } from './singletonArtifacts'
+import { ArtifactsSingleton } from './artifactsSingleton'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
   const governanceApproverMultiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract<GovernanceApproverMultiSigInstance>(

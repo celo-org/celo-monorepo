@@ -13,7 +13,7 @@ import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, Pr
 import { StableTokenInstance } from 'types/mento'
 import Web3 from 'web3'
 import { ContractPackage } from '../contractPackages'
-import { ArtifactsSingleton } from '../migrations/singletonArtifacts'
+import { ArtifactsSingleton } from '../migrations/artifactsSingleton'
 
 
 const truffleContract = require('@truffle/contract');
