@@ -9,6 +9,7 @@ import { toFixed } from '@celo/utils/lib/fixidity'
 import { RegistryInstance } from 'types'
 import { ReserveInstance, ReserveSpenderMultiSigInstance } from 'types/mento'
 import Web3 from 'web3'
+import { MENTO_PACKAGE } from '../contractPackages'
 import { ArtifactsSingleton } from './singletonArtifacts'
 
 import Web3Utils = require('web3-utils')
@@ -72,10 +73,10 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
 
     const reserveSpenderMultiSig: ReserveSpenderMultiSigInstance = await getDeployedProxiedContract<ReserveSpenderMultiSigInstance>(
       CeloContractName.ReserveSpenderMultiSig,
-      ArtifactsSingleton.getInstance('mento')
+      ArtifactsSingleton.getInstance(MENTO_PACKAGE)
     )
     console.info(`Marking ${reserveSpenderMultiSig.address} as a reserve spender`)
     await reserve.addSpender(reserveSpenderMultiSig.address)
   },
-  'mento'
+  MENTO_PACKAGE
 )

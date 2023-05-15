@@ -4,6 +4,7 @@ import { execSync } from 'child_process'
 import { readJSONSync } from 'fs-extra'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
+import { MENTO_PACKAGE } from '../contractPackages'
 
 const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
 const BUILD_DIR = path.join(ROOT_DIR, process.env.BUILD_DIR ?? './build')
@@ -105,7 +106,7 @@ const OtherContracts = [
   'MockUniswapV2Factory',
 ]
 
-const externalContracts = ['mento']
+const externalContracts = [MENTO_PACKAGE]
 
 const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
 
@@ -124,9 +125,9 @@ function compile(outdir: string) {
 
   // the reason to generate a different folder is to avoid path collisions, which could be very dangerous
   for (const externalContract of externalContracts) {
-    console.log(`Building external contracts for ${externalContract}`)
+    console.log(`Building external contracts for ${externalContract.name}`)
     exec(
-      `yarn run truffle compile --silent --contracts_directory=./lib/${externalContract}-core/contracts --contracts_build_directory=./build/contracts-${externalContract}`
+      `yarn run truffle compile --silent --contracts_directory=./lib/${externalContract.path}/contracts --contracts_build_directory=./build/contracts-${externalContract.name}`
     )
   }
 
@@ -152,11 +153,11 @@ function compile(outdir: string) {
 function generateFilesForTruffle(outdir: string) {
   // tslint:disable-next-line
   for (let externalContract of externalContracts) {
-    const outdirExternal = outdir + '-' + externalContract
+    const outdirExternal = outdir + '-' + externalContract.name
     console.log(
-      `protocol: Generating Truffle Types for external dependency ${externalContract} to ${outdirExternal}`
+      `protocol: Generating Truffle Types for external dependency ${externalContract.name} to ${outdirExternal}`
     )
-    const artifactPath = `${BUILD_DIR}/contracts-${externalContract}/*.json`
+    const artifactPath = `${BUILD_DIR}/contracts-${externalContract.name}/*.json`
     exec(
       `yarn run --silent typechain --target=truffle --outDir "${outdirExternal}" "${artifactPath}" `
     )
@@ -176,6 +177,7 @@ async function generateFilesForContractKit(outdir: string) {
   const contractKitContracts = CoreContracts.concat('Proxy')
     .concat(Interfaces)
     .concat(MentoContracts)
+  // TODO this path is not correct for mento?
   const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
 
   const cwd = process.cwd()
@@ -196,7 +198,7 @@ async function generateFilesForContractKit(outdir: string) {
       new Web3V1Celo({
         cwd,
         rawConfig: {
-          files: `${BUILD_DIR}/contracts-${externalContract}/@(${contractKitContracts.join(
+          files: `${BUILD_DIR}/contracts-${externalContract.name}/@(${contractKitContracts.join(
             '|'
           )}).json`,
           // This path should be generalized if there's ever a conflic of names with the artifacts from external contracts

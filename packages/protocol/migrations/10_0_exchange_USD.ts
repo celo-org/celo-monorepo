@@ -9,6 +9,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { FreezerInstance } from 'types'
 import { ExchangeInstance } from 'types/mento'
+import { MENTO_PACKAGE } from '../contractPackages'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [
@@ -36,5 +37,5 @@ module.exports = deploymentForCoreContract<ExchangeInstance>(
     }
     await exchange.activateStable()
   },
-  'mento'
+  MENTO_PACKAGE
 )

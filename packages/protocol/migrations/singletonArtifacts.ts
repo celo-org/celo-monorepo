@@ -1,9 +1,12 @@
+import { ContractPackage } from '../contractPackages'
+
 export class ArtifactsSingleton {
-  public static getInstance(namespace: string, defaultArtifacts?: any): any {
-    if (namespace === undefined) {
+  public static getInstance(namespacePackage: ContractPackage, defaultArtifacts?: any): any {
+    if (namespacePackage === undefined) {
       return defaultArtifacts
     }
 
+    const namespace = namespacePackage.path
     if (!(namespace in ArtifactsSingleton.instances)) {
       ArtifactsSingleton.instances[namespace] = new ArtifactsSingleton()
     }

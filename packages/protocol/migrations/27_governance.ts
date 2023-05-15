@@ -11,6 +11,7 @@ import {
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance } from 'types'
+import { MENTO_PACKAGE } from '../contractPackages'
 import { ArtifactsSingleton } from './singletonArtifacts'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
@@ -54,11 +55,10 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       for (const contractName of constitutionContractNames) {
         console.log(`\tSetting constitution thresholds for ${contractName}`)
 
-        let artifactsObject = artifacts
-        if (constitution[contractName].__path) {
-          const path = constitution[contractName].__path
-          artifactsObject = ArtifactsSingleton.getInstance(path)
-        }
+        const artifactsObject = ArtifactsSingleton.getInstance(
+          constitution[contractName].__path,
+          artifacts
+        )
 
         contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
           contractName,
@@ -82,6 +82,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       }
     }
 
+    console.log(1)
     const proxyAndImplementationOwnedByGovernance = [
       {
         contracts: [
@@ -121,18 +122,17 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           'StableTokenEUR',
           'StableTokenBRL',
         ],
-        __path: 'mento',
+        __path: MENTO_PACKAGE, // TODO refactor this
       },
     ]
 
     if (!config.governance.skipTransferOwnership) {
-      let artifactsInstance = artifacts
       for (const contractPackage of proxyAndImplementationOwnedByGovernance) {
-        if (contractPackage.__path) {
-          artifactsInstance = ArtifactsSingleton.getInstance(contractPackage.__path)
-        }
-
+        console.log(2, contractPackage)
+        const artifactsInstance = ArtifactsSingleton.getInstance(contractPackage.__path, artifacts)
+        console.log(3)
         for (const contractName of contractPackage.contracts) {
+          console.log(4, contractName)
           await transferOwnershipOfProxyAndImplementation(
             contractName,
             governance.address,

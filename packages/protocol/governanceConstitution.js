@@ -1,3 +1,7 @@
+contractPackages = require('./contractPackages.js')
+
+const MENTO_PACKAGE = contractPackages.MENTO_PACKAGE
+
 const DefaultConstitution = {
   Accounts: {
     default: 0.6,
@@ -147,7 +151,7 @@ const constitutionExternal = {
     removeSpender: 0.8,
     addExchangeSpender: 0.9,
     removeExchangeSpender: 0.9,
-    __path: 'mento',
+    __path: MENTO_PACKAGE,
   },
   StableToken: {
     default: 0.8,
@@ -156,7 +160,7 @@ const constitutionExternal = {
     transfer: 0.6,
     transferWithComment: 0.6,
     approve: 0.6,
-    __path: 'mento',
+    __path: MENTO_PACKAGE,
   },
   StableTokenEUR: {
     default: 0.8,
@@ -165,7 +169,7 @@ const constitutionExternal = {
     transfer: 0.6,
     transferWithComment: 0.6,
     approve: 0.6,
-    __path: 'mento',
+    __path: MENTO_PACKAGE,
   },
   StableTokenBRL: {
     default: 0.8,
@@ -174,7 +178,7 @@ const constitutionExternal = {
     transfer: 0.6,
     transferWithComment: 0.6,
     approve: 0.6,
-    __path: 'mento',
+    __path: MENTO_PACKAGE,
   },
   GrandaMento: {
     default: 0.8,
@@ -183,7 +187,7 @@ const constitutionExternal = {
     setSpread: 0.8,
     setStableTokenExchangeLimits: 0.8,
     setVetoPeriodSeconds: 0.8,
-    __path: 'mento',
+    __path: MENTO_PACKAGE,
   },
   Exchange: {
     default: 0.8,
@@ -193,7 +197,7 @@ const constitutionExternal = {
     setStableToken: 0.8,
     setSpread: 0.8,
     setReserveFraction: 0.8,
-    __path: 'mento',
+    __path: MENTO_PACKAGE,
   },
   ExchangeEUR: {
     default: 0.8,
@@ -203,7 +207,7 @@ const constitutionExternal = {
     setStableToken: 0.8,
     setSpread: 0.8,
     setReserveFraction: 0.8,
-    __path: 'mento',
+    __path: MENTO_PACKAGE,
   },
   ExchangeBRL: {
     default: 0.8,
@@ -213,7 +217,7 @@ const constitutionExternal = {
     setStableToken: 0.8,
     setSpread: 0.8,
     setReserveFraction: 0.8,
-    __path: 'mento',
+    __path: MENTO_PACKAGE,
   },
 }
 

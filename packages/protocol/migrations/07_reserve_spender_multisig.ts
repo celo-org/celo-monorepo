@@ -5,6 +5,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { ReserveSpenderMultiSigInstance } from 'types/mento'
+import { MENTO_PACKAGE } from '../contractPackages'
 import { ArtifactsSingleton } from '../migrations/singletonArtifacts'
 
 const initializeArgs = async (): Promise<any[]> => {
@@ -24,8 +25,8 @@ module.exports = deploymentForProxiedContract<ReserveSpenderMultiSigInstance>(
     await transferOwnershipOfProxy(
       CeloContractName.ReserveSpenderMultiSig,
       reserveSpenderMultiSig.address,
-      ArtifactsSingleton.getInstance('mento')
+      ArtifactsSingleton.getInstance(MENTO_PACKAGE)
     )
   },
-  'mento'
+  MENTO_PACKAGE
 )

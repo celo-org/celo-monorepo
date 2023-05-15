@@ -4,15 +4,16 @@ import {
   assertRegistryAddressesSet,
 } from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import { ContractPackage } from 'contractPackages'
 import { ArtifactsSingleton } from '../../migrations/singletonArtifacts'
 
-const getProxiedContract = async (contractName: string, path: string) => {
+const getProxiedContract = async (contractName: string, path: ContractPackage) => {
   const artifactsObject = ArtifactsSingleton.getInstance(path, artifacts)
   /* tslint:disable-next-line */
   return await getDeployedProxiedContract(contractName, artifactsObject)
 }
 
-const getContract = async (contractName: string, type: string, path: string) => {
+const getContract = async (contractName: string, type: string, path: ContractPackage) => {
   // /* tslint:disable-next-line */
   const artifactsObject = ArtifactsSingleton.getInstance(path, artifacts)
 

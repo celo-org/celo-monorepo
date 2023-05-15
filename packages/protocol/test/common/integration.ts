@@ -37,6 +37,7 @@ import {
   StableTokenContract,
   StableTokenInstance,
 } from 'types/mento'
+import { MENTO_PACKAGE } from '../../contractPackages'
 import { ArtifactsSingleton } from '../../migrations/singletonArtifacts'
 import { SECONDS_IN_A_WEEK } from '../constants'
 
@@ -302,7 +303,7 @@ contract('Integration: Governance', (accounts: string[]) => {
       it('should have correct thresholds for ' + contractName, async () => {
         let artifactsInstance = artifacts
         if (constitution[contractName].__path) {
-          artifactsInstance = ArtifactsSingleton.getInstance('mento')
+          artifactsInstance = ArtifactsSingleton.getInstance(MENTO_PACKAGE)
         }
 
         const contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
@@ -427,17 +428,20 @@ Array.from([
     before(async () => {
       exchange = await getDeployedProxiedContract(
         exchangeId,
-        ArtifactsSingleton.getInstance('mento')
+        ArtifactsSingleton.getInstance(MENTO_PACKAGE)
       )
       stableToken = await getDeployedProxiedContract(
         stableTokenId,
-        ArtifactsSingleton.getInstance('mento')
+        ArtifactsSingleton.getInstance(MENTO_PACKAGE)
       )
       multiSig = await getDeployedProxiedContract(
         'ReserveSpenderMultiSig',
-        ArtifactsSingleton.getInstance('mento')
+        ArtifactsSingleton.getInstance(MENTO_PACKAGE)
       )
-      reserve = await getDeployedProxiedContract('Reserve', ArtifactsSingleton.getInstance('mento'))
+      reserve = await getDeployedProxiedContract(
+        'Reserve',
+        ArtifactsSingleton.getInstance(MENTO_PACKAGE)
+      )
       goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
     })
 
@@ -597,8 +601,8 @@ Array.from([
 )
 
 contract('Integration: Adding StableToken', (accounts: string[]) => {
-  const Exchange: ExchangeContract = makeTruffleContract('Exchange', 'mento', web3)
-  const StableToken: StableTokenContract = makeTruffleContract('StableToken', 'mento', web3)
+  const Exchange: ExchangeContract = makeTruffleContract('Exchange', MENTO_PACKAGE, web3)
+  const StableToken: StableTokenContract = makeTruffleContract('StableToken', MENTO_PACKAGE, web3)
   let exchangeAbc: ExchangeInstance
   let freezer: FreezerInstance
   let goldToken: GoldTokenInstance
@@ -613,7 +617,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
     freezer = await getDeployedProxiedContract('Freezer', artifacts)
     const contractsToOwn = ['Freezer', 'Registry', 'SortedOracles', 'FeeCurrencyWhitelist']
     await assumeOwnershipWithTruffle(contractsToOwn, accounts[0])
-    await assumeOwnershipWithTruffle(['Reserve'], accounts[0], 0, 'mento')
+    await assumeOwnershipWithTruffle(['Reserve'], accounts[0], 0, MENTO_PACKAGE)
   })
 
   // 1. Mimic the state of the world post-contracts-release
@@ -697,7 +701,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
     before(async () => {
       const reserve: ReserveInstance = await getDeployedProxiedContract(
         'Reserve',
-        ArtifactsSingleton.getInstance('mento')
+        ArtifactsSingleton.getInstance(MENTO_PACKAGE)
       )
       const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract(
         'FeeCurrencyWhitelist',

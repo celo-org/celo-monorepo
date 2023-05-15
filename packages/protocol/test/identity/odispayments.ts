@@ -15,10 +15,11 @@ import {
   RegistryInstance,
 } from 'types'
 import { StableTokenContract, StableTokenInstance } from 'types/mento'
+import { MENTO_PACKAGE } from '../../contractPackages'
 
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const OdisPayments: OdisPaymentsContract = artifacts.require('OdisPayments')
-const StableTokenCUSD: StableTokenContract = makeTruffleContract('StableToken', 'mento', web3)
+const StableTokenCUSD: StableTokenContract = makeTruffleContract('StableToken', MENTO_PACKAGE, web3)
 
 const SECONDS_IN_A_DAY = 60 * 60 * 24
 

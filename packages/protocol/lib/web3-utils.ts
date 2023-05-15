@@ -12,6 +12,7 @@ import prompts from 'prompts'
 import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types'
 import { StableTokenInstance } from 'types/mento'
 import Web3 from 'web3'
+import { ContractPackage } from '../contractPackages'
 import { ArtifactsSingleton } from '../migrations/singletonArtifacts'
 
 
@@ -149,7 +150,7 @@ export function checkFunctionArgsLength(args: any[], abi: any) {
 
 export async function setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
->(web3: Web3, artifacts: any, contractName: string, contractPath?: string, ...args: any[]): Promise<ContractInstance> {
+>(web3: Web3, artifacts: any, contractName: string, contractPath?: ContractPackage, ...args: any[]): Promise<ContractInstance> {
   
   const Contract = ArtifactsSingleton.getInstance(contractPath, artifacts).require(contractName)
   const ContractProxy = ArtifactsSingleton.getInstance(contractPath, artifacts).require(contractName + 'Proxy')
@@ -237,7 +238,7 @@ export function deploymentForCoreContract<ContractInstance extends Truffle.Contr
   name: CeloContractName,
   args: (networkName?: string) => Promise<any[]> = async () => [],
   then?: (contract: ContractInstance, web3: Web3, networkName: string) => void,
-  artifactPath?: string
+  artifactPath?: ContractPackage
 ) {
   return deploymentForContract(web3, artifacts, name, args, true, then, artifactPath);
 }
@@ -248,15 +249,15 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
   name: CeloContractName,
   args: (networkName?: string) => Promise<any[]> = async () => [],
   then?: (contract: ContractInstance, web3: Web3, networkName: string) => void,
-  artifactPath?: string
+  artifactPath?: ContractPackage
 ) {
   return deploymentForContract(web3, artifacts, name, args, false, then, artifactPath);
 
 }
 
 
-export const makeTruffleContract = (contractName: string, contractPath:string, web3: Web3) => {
-  const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath}/${contractName}.json`)
+export const makeTruffleContract = (contractName: string, contractPath:ContractPackage, web3: Web3) => {
+  const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath.name}/${contractName}.json`)
   const Contract = truffleContract({
     abi: artifact.abi,
     unlinked_binary: artifact.bytecode,
@@ -285,7 +286,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   args: (networkName?: string) => Promise<any[]> = async () => [],
   registerAddress: boolean,
   then?: (contract: ContractInstance, web3: Web3, networkName: string, proxy?: ProxyInstance) => void,
-  artifactPath?: string
+  artifactPath?: ContractPackage
 ) {
 
   console.log("-> Started deployment for", name)

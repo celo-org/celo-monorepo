@@ -13,6 +13,7 @@ import { SpawnOptions, spawn } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
 import Web3 from 'web3'
+import { ContractPackage } from '../contractPackages'
 
 import BN = require('bn.js')
 
@@ -529,7 +530,7 @@ enum VoteValue {
   Yes,
 }
 
-export async function assumeOwnershipWithTruffle(contractsToOwn: string[], to: string, dequeuedIndex: number = 0, path?:string) {
+export async function assumeOwnershipWithTruffle(contractsToOwn: string[], to: string, dequeuedIndex: number = 0, path?:ContractPackage) {
   const governance: GovernanceInstance = await getDeployedProxiedContract('Governance', artifacts)
   const lockedGold: LockedGoldInstance = await getDeployedProxiedContract('LockedGold', artifacts)
   const multiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract(
