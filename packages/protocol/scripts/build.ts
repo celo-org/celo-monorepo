@@ -19,7 +19,6 @@ export const ProxyContracts = [
   'EpochRewardsProxy',
   'EscrowProxy',
   'FederatedAttestationsProxy',
-  'FeeBurnerProxy',
   'FeeCurrencyWhitelistProxy',
   'GasPriceMinimumProxy',
   'GoldTokenProxy',
@@ -31,36 +30,12 @@ export const ProxyContracts = [
   'OdisPaymentsProxy',
   'RegistryProxy',
   'SortedOraclesProxy',
-
-  // mento
-  'ExchangeBRLProxy',
-  'ExchangeEURProxy',
-  'ExchangeProxy',
-  'GrandaMentoProxy',
-  'ReserveProxy',
-  'ReserveSpenderMultiSigProxy',
-  'StableTokenBRLProxy',
-  'StableTokenEURProxy',
-  'StableTokenProxy',
-]
-
-export const MentoContracts = [
-  'Exchange',
-  'ExchangeEUR',
-  'ExchangeBRL',
-  'GrandaMento',
-  'Reserve',
-  'ReserveSpenderMultiSig',
-  'StableToken',
-  'StableTokenEUR',
-  'StableTokenBRL',
 ]
 
 export const CoreContracts = [
   // common
   'Accounts',
   'GasPriceMinimum',
-  'FeeBurner',
   'FeeCurrencyWhitelist',
   'GoldToken',
   'MetaTransactionWallet',
@@ -143,6 +118,7 @@ function compile(outdir: string) {
         process.exit(1)
       }
     } catch (e) {
+      console.log(e)
       console.debug(
         `WARNING: ${contractName} artifact could not be fetched. Maybe it doesn't exist?`
       )
@@ -174,10 +150,9 @@ async function generateFilesForContractKit(outdir: string) {
   exec(`rm -rf ${outdir}`)
   const relativePath = path.relative(ROOT_DIR, outdir)
 
-  const contractKitContracts = CoreContracts.concat('Proxy')
-    .concat(Interfaces)
-    .concat(MentoContracts)
-  // TODO this path is not correct for mento?
+  const contractKitContracts = CoreContracts.concat('Proxy').concat(Interfaces)
+  // .concat(MENTO_PACKAGE.contracts) // TODO this path is not correct for mento?
+
   const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
 
   const cwd = process.cwd()

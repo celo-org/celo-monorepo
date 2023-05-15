@@ -82,7 +82,6 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       }
     }
 
-    console.log(1)
     const proxyAndImplementationOwnedByGovernance = [
       {
         contracts: [
@@ -95,7 +94,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           'Election',
           'EpochRewards',
           'Escrow',
-          // 'FeeBurner', // TODO ADD
+          // TODO add fee handler
           'FederatedAttestations',
           'FeeCurrencyWhitelist',
           'Freezer',
@@ -128,11 +127,8 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
 
     if (!config.governance.skipTransferOwnership) {
       for (const contractPackage of proxyAndImplementationOwnedByGovernance) {
-        console.log(2, contractPackage)
         const artifactsInstance = ArtifactsSingleton.getInstance(contractPackage.__path, artifacts)
-        console.log(3)
         for (const contractName of contractPackage.contracts) {
-          console.log(4, contractName)
           await transferOwnershipOfProxyAndImplementation(
             contractName,
             governance.address,

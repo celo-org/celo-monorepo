@@ -2,7 +2,7 @@ import { ContractPackage } from '../contractPackages'
 
 export class ArtifactsSingleton {
   public static getInstance(namespacePackage: ContractPackage, defaultArtifacts?: any): any {
-    if (namespacePackage === undefined) {
+    if (namespacePackage === undefined || namespacePackage.path === undefined) {
       return defaultArtifacts
     }
 

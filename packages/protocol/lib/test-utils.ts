@@ -13,7 +13,7 @@ import { SpawnOptions, spawn } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
 import Web3 from 'web3'
-import { ContractPackage } from '../contractPackages'
+import { ContractPackage, MENTO_PACKAGE } from '../contractPackages'
 
 import BN = require('bn.js')
 
@@ -228,7 +228,7 @@ export const assertContractsRegistered = async (getContract: any) => {
   const registry: RegistryInstance = await getContract('Registry')
   for (const proxyPackage of hasEntryInRegistry) {
     for (const contractName of proxyPackage.contracts) {
-      const contract: Truffle.ContractInstance = await getContract(contractName, proxyPackage.__path)
+      const contract: Truffle.ContractInstance = await getContract(contractName, proxyPackage)
       assert.equal(
         contract.address.toLowerCase(),
         (await registry.getAddressFor(soliditySha3(contractName))).toLowerCase(),
@@ -241,7 +241,7 @@ export const assertContractsRegistered = async (getContract: any) => {
 export const assertRegistryAddressesSet = async (getContract: any) => {
   const registry: RegistryInstance = await getContract('Registry')
   for (const contractName of usesRegistry) {
-    const contract: UsingRegistryInstance = await getContract(contractName, 'mento')
+    const contract: UsingRegistryInstance = await getContract(contractName, MENTO_PACKAGE)
     assert.equal(
       registry.address.toLowerCase(),
       (await contract.registry()).toLowerCase(),

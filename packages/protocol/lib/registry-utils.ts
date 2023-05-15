@@ -6,6 +6,8 @@
  * an environment.
  */
 
+import { MENTO_PACKAGE } from "../contractPackages"
+
 export const celoRegistryAddress = '0x000000000000000000000000000000000000ce10'
 
 export enum CeloContractName {
@@ -69,13 +71,13 @@ export const hasEntryInRegistry= [
       CeloContractName.SortedOracles,
     ]
   },
-  {
+  {...MENTO_PACKAGE,
+    // not all Mentro contracts are supposed to be in the Registry
     contracts:[
       CeloContractName.Exchange,
       CeloContractName.GrandaMento,
       CeloContractName.Reserve,
       CeloContractName.StableToken,
     ],
-    __path: 'mento'
   }
 ]
