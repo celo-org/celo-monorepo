@@ -5,7 +5,10 @@ import {
   assertRevert,
   assumeOwnershipWithTruffle,
 } from '@celo/protocol/lib/test-utils'
-import { getDeployedProxiedContract, makeTruffleContract } from '@celo/protocol/lib/web3-utils'
+import {
+  getDeployedProxiedContract,
+  makeTruffleContractForMigration,
+} from '@celo/protocol/lib/web3-utils'
 import { fixed1 } from '@celo/utils/src/fixidity'
 import {
   FreezerContract,
@@ -19,7 +22,11 @@ import { MENTO_PACKAGE } from '../../contractPackages'
 
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const OdisPayments: OdisPaymentsContract = artifacts.require('OdisPayments')
-const StableTokenCUSD: StableTokenContract = makeTruffleContract('StableToken', MENTO_PACKAGE, web3)
+const StableTokenCUSD: StableTokenContract = makeTruffleContractForMigration(
+  'StableToken',
+  MENTO_PACKAGE,
+  web3
+)
 
 const SECONDS_IN_A_DAY = 60 * 60 * 24
 

@@ -8,7 +8,7 @@ import {
   jsonRpc,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { makeTruffleContract } from '@celo/protocol/lib/web3-utils'
+import { makeTruffleContractForMigration } from '@celo/protocol/lib/web3-utils'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
@@ -37,7 +37,7 @@ const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSortedOracles')
 const Registry: RegistryContract = artifacts.require('Registry')
-const Reserve: ReserveContract = makeTruffleContract('Reserve', MENTO_PACKAGE, web3)
+const Reserve: ReserveContract = makeTruffleContractForMigration('Reserve', MENTO_PACKAGE, web3)
 
 // @ts-ignore
 // TODO(mcortesi): Use BN

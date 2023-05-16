@@ -7,6 +7,8 @@ import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { BigNumber } from 'bignumber.js'
+import { networks } from '../truffle-config.js'
+
 import path from 'path'
 import prompts from 'prompts'
 import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types'
@@ -256,7 +258,7 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
 }
 
 
-export const makeTruffleContract = (contractName: string, contractPath:ContractPackage, web3: Web3) => {
+export const makeTruffleContractForMigration = (contractName: string, contractPath:ContractPackage, web3: Web3) => { // TODO change to makeTruffleContract migrations
   const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath.name}/${contractName}.json`)
   const Contract = truffleContract({
     abi: artifact.abi,
@@ -266,15 +268,15 @@ export const makeTruffleContract = (contractName: string, contractPath:ContractP
   const {createInterfaceAdapter} = require("@truffle/interface-adapter")
   
   Contract.setProvider(web3.currentProvider)
-  Contract.setNetwork(1101) // TODO use deasync to get this from web3
+  Contract.setNetwork(networks.development.network_id)
   
   Contract.interfaceAdapter = createInterfaceAdapter({
     networkType: "ethereum",
     provider: web3.currentProvider
   })
   Contract.configureNetwork({networkType: "ethereum", provider: web3.currentProvider})
-  
-  Contract.defaults({from: "0x5409ed021d9299bf6814279a6a1411a7e866a631", gas: 13000000})
+
+  Contract.defaults({from: networks.development.from, gas: networks.development.gas})
   ArtifactsSingleton.getInstance(contractPath).addArtifact(contractName, Contract)
   return Contract
 }
@@ -293,8 +295,8 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   let Contract 
   let ContractProxy
   if (artifactPath) {
-    Contract = makeTruffleContract(name, artifactPath, web3)
-    ContractProxy = makeTruffleContract(name + 'Proxy', artifactPath, web3)
+    Contract = makeTruffleContractForMigration(name, artifactPath, web3)
+    ContractProxy = makeTruffleContractForMigration(name + 'Proxy', artifactPath, web3)
   } else {
     Contract = artifacts.require(name)
     ContractProxy = artifacts.require(name + 'Proxy')
@@ -304,8 +306,6 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   return (deployer: any, networkName: string, _accounts: string[]) => {
     console.log("\n-> Deploying", name)
 
-    ContractProxy.defaults({ from:"0x5409ed021d9299bf6814279a6a1411a7e866a631" })
-    
     deployer.deploy(ContractProxy)
     deployer.deploy(Contract, testingDeployment)
 

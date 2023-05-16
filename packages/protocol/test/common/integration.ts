@@ -11,7 +11,7 @@ import {
 import {
   getDeployedProxiedContract,
   getFunctionSelectorsForContract,
-  makeTruffleContract,
+  makeTruffleContractForMigration,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { linkedListChanges, zip } from '@celo/utils/lib/collections'
@@ -601,8 +601,16 @@ Array.from([
 )
 
 contract('Integration: Adding StableToken', (accounts: string[]) => {
-  const Exchange: ExchangeContract = makeTruffleContract('Exchange', MENTO_PACKAGE, web3)
-  const StableToken: StableTokenContract = makeTruffleContract('StableToken', MENTO_PACKAGE, web3)
+  const Exchange: ExchangeContract = makeTruffleContractForMigration(
+    'Exchange',
+    MENTO_PACKAGE,
+    web3
+  )
+  const StableToken: StableTokenContract = makeTruffleContractForMigration(
+    'StableToken',
+    MENTO_PACKAGE,
+    web3
+  )
   let exchangeAbc: ExchangeInstance
   let freezer: FreezerInstance
   let goldToken: GoldTokenInstance
