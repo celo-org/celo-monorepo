@@ -1,5 +1,5 @@
-// @ts-ignore
 import * as fs from 'fs-extra'
+// @ts-ignore
 import * as ganache from 'ganache'
 import * as path from 'path'
 import * as targz from 'targz'
