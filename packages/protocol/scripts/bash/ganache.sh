@@ -4,10 +4,10 @@ set -euo pipefail
 # Runs ganache with the mnemonic used in our tests.
 
 yarn run ganache \
-  --deterministic \
-  --mnemonic 'concert load couple harbor equip island argue ramp clarify fence smart topic' \
-  --gasPrice 0 \
-  --networkId 1101 \
-  --gasLimit 20000000 \
-  --defaultBalanceEther 200000000 \
-  --allowUnlimitedContractSize
+  --wallet.mnemonic='concert load couple harbor equip island argue ramp clarify fence smart topic' \
+  --miner.defaultGasPrice=0 \
+  --chain.networkId=1101 \
+  --miner.blockGasLimit=20000000 \
+  --wallet.defaultBalance=200000000 \
+  --chain.allowUnlimitedContractSize=true \
+  --chain.hardfork='istanbul'
