@@ -528,9 +528,8 @@ contract Governance is
     returns (bool)
   {
     require(queue.contains(proposalId), "cannot upvote a proposal not in the queue");
-    bool isProposalDequeued = dequeueProposalIfReady(proposalId);
 
-    if (isProposalDequeued) {
+    if (dequeueProposalIfReady(proposalId)) {
       return false;
     }
 
