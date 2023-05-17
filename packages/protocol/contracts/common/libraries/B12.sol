@@ -65,8 +65,10 @@ library B12 {
   }
 
   function fp2Gt(Fp2 memory a, Fp2 memory b) internal pure returns (bool) {
-    if (FpEq(a.b, b.b)) return fpGt(a.a, b.a);
-    else return fpGt(a.b, b.b);
+    if (FpEq(a.b, b.b))
+      return fpGt(a.a, b.a);
+    else
+      return fpGt(a.b, b.b);
   }
 
   function fpAdd2(uint256 a, uint256 b) internal pure returns (Fp memory) {
