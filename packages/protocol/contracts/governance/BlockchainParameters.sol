@@ -11,6 +11,13 @@ import "../common/UsingPrecompiles.sol";
 contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   using SafeMath for uint256;
 
+  // obsolete
+  struct ClientVersion {
+    uint256 major;
+    uint256 minor;
+    uint256 patch;
+  }
+
   struct LookbackWindow {
     // Value for lookbackWindow before `nextValueActivationBlock`
     uint256 oldValue;
@@ -20,6 +27,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
     uint256 nextValueActivationEpoch;
   }
 
+  ClientVersion private minimumClientVersion; // obsolete
   uint256 public blockGasLimit;
   uint256 public intrinsicGasForAlternativeFeeCurrency;
   LookbackWindow public uptimeLookbackWindow;
@@ -58,7 +66,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (2, 2, 0, 0);
+    return (1, 2, 0, 0);
   }
 
   /**
