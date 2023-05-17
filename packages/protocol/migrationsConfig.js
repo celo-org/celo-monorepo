@@ -206,10 +206,6 @@ const DefaultConfig = {
     oracles: [network.from],
     frozen: false,
   },
-  transferWhitelist: {
-    addresses: [],
-    registryIds: [],
-  },
   validators: {
     groupLockedGoldRequirements: {
       value: '10000000000000000000000', // 10k CELO per validator
