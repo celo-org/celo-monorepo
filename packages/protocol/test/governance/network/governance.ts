@@ -82,7 +82,6 @@ interface Transaction {
   data: Buffer
 }
 
-// TODO(asa): Test dequeueProposalsIfReady
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
 contract('Governance', (accounts: string[]) => {
   let governance: GovernanceTestInstance
