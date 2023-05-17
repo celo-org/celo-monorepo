@@ -1258,6 +1258,7 @@ contract Governance is
 
   /**
    * @notice Removes the proposal from the queue if `lastDequeue` time has passed.
+   * @param proposalId The ID of the proposal.
    * @dev If any of the top proposals have expired, they are deleted.
    */
   function dequeueProposalIfReady(uint256 proposalId) public returns (bool isProposalDequeued) {
