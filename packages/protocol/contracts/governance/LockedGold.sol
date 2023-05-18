@@ -333,6 +333,8 @@ contract LockedGold is
 
     uint256 totalLockedGold = getAccountTotalLockedGold(delegatorAddress);
 
+    require(totalLockedGold > 0, "No locked celo");
+
     // amount that will really be delegated - whatever is already
     // delegated to this particular delagatee is already subracted from this
     uint256 amountToDelegate = FixidityLib
@@ -358,26 +360,6 @@ contract LockedGold is
       percentageToDelegate,
       currentDelegateeInfo.currentAmount
     );
-  }
-
-  function uintToStr(uint256 _i) internal pure returns (string memory _uintAsString) {
-    uint256 number = _i;
-    if (number == 0) {
-      return "0";
-    }
-    uint256 j = number;
-    uint256 len;
-    while (j != 0) {
-      len++;
-      j /= 10;
-    }
-    bytes memory bstr = new bytes(len);
-    uint256 k = len - 1;
-    while (number != 0) {
-      bstr[k--] = bytes1(uint8(48 + (number % 10)));
-      number /= 10;
-    }
-    return string(bstr);
   }
 
   function revokeDelegatedGovernanceVotes(address delegatee, uint256 percentageToRevoke) public {
@@ -418,8 +400,6 @@ contract LockedGold is
       );
 
     uint256 unusedReferendumVotes = delegateeTotalVotingPower - totalReferendumVotes;
-    // unusedReferendumVotes = 100
-    // require(unusedReferendumVotes == 666, string(abi.encodePacked(uintToStr(delegateeTotalVotingPower), " ", uintToStr(totalReferendumVotes), " ", uintToStr(amountToRevoke))));
     if (unusedReferendumVotes < amountToRevoke) {
       getGovernance().removeVotesWhenRevokingDelegatedVotes(
         delegateeAccount,
@@ -442,7 +422,7 @@ contract LockedGold is
     );
   }
 
-  function updateDelegatedBalance(address delegator, address delegatee) external {
+  function updateDelegatedAmount(address delegator, address delegatee) external {
     address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
     address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
 
