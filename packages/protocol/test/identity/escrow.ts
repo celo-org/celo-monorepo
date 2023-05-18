@@ -7,7 +7,6 @@ import {
   assertObjectWithBNEqual,
   assertRevert,
   assertRevertWithReason,
-  assertTXRevertWithReason,
   assumeOwnership,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -180,7 +179,7 @@ contract('Escrow', (accounts: string[]) => {
       })
 
       it('should not allow more trusted issuers to be added', async () => {
-        await assertTXRevertWithReason(
+        await assertRevertWithReason(
           escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner }),
           "defaultTrustedIssuers.length can't exceed allowed number of trustedIssuers"
         )
@@ -233,7 +232,7 @@ contract('Escrow', (accounts: string[]) => {
     it('should revert if trusted issuer does not match index', async () => {
       await assertRevertWithReason(
         escrow.removeDefaultTrustedIssuer(trustedIssuer2, 0, { from: owner }),
-        'trustedIssuer does not match address found at defaultTrustedIssuers[index]'
+        'trustedIssuer does not match address found at defaultTrustedIssuers'
       )
     })
 

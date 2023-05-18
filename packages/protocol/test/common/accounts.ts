@@ -7,7 +7,6 @@ import {
   assertLogMatches2,
   assertRevert,
   assertRevertWithReason,
-  assertTXRevertWithReason,
 } from '@celo/protocol/lib/test-utils'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
@@ -100,7 +99,7 @@ contract('Accounts', (accounts: string[]) => {
     })
 
     it('should revert when the key is invalid', async () => {
-      await assertTXRevertWithReason(
+      await assertRevertWithReason(
         accountsInstance.setAccountDataEncryptionKey('0x32132931293'),
         'data encryption key length <= 32'
       )
@@ -267,7 +266,7 @@ contract('Accounts', (accounts: string[]) => {
 
       it('should set a revert with the wrong signature for a different address', async () => {
         const sig = await getParsedSignatureOfAddress(web3, account, accounts[1])
-        await assertTXRevertWithReason(
+        await assertRevertWithReason(
           accountsInstance.setAccount(name, dataEncryptionKey, accounts[2], sig.v, sig.r, sig.s),
           'Invalid signature'
         )
@@ -278,7 +277,7 @@ contract('Accounts', (accounts: string[]) => {
   describe('#setWalletAddress', () => {
     describe('when the account has not been created', () => {
       it('should revert', async () => {
-        await assertTXRevertWithReason(
+        await assertRevertWithReason(
           accountsInstance.setWalletAddress(caller, '0x0', '0x0', '0x0'),
           'Unknown account'
         )
@@ -321,7 +320,7 @@ contract('Accounts', (accounts: string[]) => {
 
       it('should set a revert with the wrong signature for a different address', async () => {
         const sig = await getParsedSignatureOfAddress(web3, account, accounts[1])
-        await assertTXRevertWithReason(
+        await assertRevertWithReason(
           accountsInstance.setWalletAddress(accounts[2], sig.v, sig.r, sig.s),
           'Invalid signature'
         )
@@ -332,7 +331,7 @@ contract('Accounts', (accounts: string[]) => {
   describe('#setMetadataURL', () => {
     describe('when the account has not been created', () => {
       it('should revert', async () => {
-        await assertTXRevertWithReason(accountsInstance.setMetadataURL(caller), 'Unknown account')
+        await assertRevertWithReason(accountsInstance.setMetadataURL(caller), 'Unknown account')
       })
     })
 
@@ -382,7 +381,7 @@ contract('Accounts', (accounts: string[]) => {
   describe('#addStorageRoot', () => {
     describe('when the account has not been created', () => {
       it('should revert', async () => {
-        await assertTXRevertWithReason(
+        await assertRevertWithReason(
           accountsInstance.addStorageRoot(storageRoot),
           'Unknown account'
         )
@@ -422,7 +421,7 @@ contract('Accounts', (accounts: string[]) => {
   describe('#removeStorageRoot', () => {
     describe('when the account has not been created', () => {
       it('should revert', async () => {
-        await assertTXRevertWithReason(accountsInstance.removeStorageRoot(0), 'Unknown account')
+        await assertRevertWithReason(accountsInstance.removeStorageRoot(0), 'Unknown account')
       })
     })
 
@@ -433,7 +432,7 @@ contract('Accounts', (accounts: string[]) => {
 
       describe('when there are no storage roots', async () => {
         it('should revert with message', async () => {
-          await assertTXRevertWithReason(
+          await assertRevertWithReason(
             accountsInstance.removeStorageRoot(0),
             'Invalid storage root index'
           )
@@ -477,7 +476,7 @@ contract('Accounts', (accounts: string[]) => {
     const badFraction = toFixed(1.2)
 
     it('should not be callable by a non-account', async () => {
-      await assertTXRevertWithReason(
+      await assertRevertWithReason(
         accountsInstance.setPaymentDelegation(beneficiary, fraction),
         'Not an account'
       )
@@ -498,14 +497,14 @@ contract('Accounts', (accounts: string[]) => {
       })
 
       it('should not allow a fraction greater than 1', async () => {
-        await assertTXRevertWithReason(
+        await assertRevertWithReason(
           accountsInstance.setPaymentDelegation(beneficiary, badFraction),
           'Fraction must not be greater than 1'
         )
       })
 
       it('should not allow a beneficiary with address 0x0', async () => {
-        await assertTXRevertWithReason(
+        await assertRevertWithReason(
           accountsInstance.setPaymentDelegation(NULL_ADDRESS, fraction),
           'Beneficiary cannot be address 0x0'
         )
@@ -558,7 +557,7 @@ contract('Accounts', (accounts: string[]) => {
   describe('#setName', () => {
     describe('when the account has not been created', () => {
       it('should revert', async () => {
-        await assertTXRevertWithReason(
+        await assertRevertWithReason(
           accountsInstance.setWalletAddress(caller, '0x0', '0x0', '0x0'),
           'Unknown account'
         )
@@ -641,7 +640,7 @@ contract('Accounts', (accounts: string[]) => {
 
     describe('smart contract signers', async () => {
       it("can't complete an authorization that hasn't been started", async () => {
-        await assertTXRevertWithReason(
+        await assertRevertWithReason(
           accountsInstance.completeSignerAuthorization(account, role, { from: signer }),
           'Signer authorization not started'
         )
@@ -782,7 +781,7 @@ contract('Accounts', (accounts: string[]) => {
       assert.isFalse(await accountsInstance.hasDefaultSigner(account, role))
       assert.equal(await accountsInstance.getDefaultSigner(account, role), account)
 
-      await assertTXRevertWithReason(
+      await assertRevertWithReason(
         accountsInstance.setIndexedSigner(signer, role),
         'Must authorize signer before setting as default'
       )
@@ -926,7 +925,7 @@ contract('Accounts', (accounts: string[]) => {
 
           it(`should revert if the ${description} is an account`, async () => {
             await accountsInstance.createAccount({ from: authorized })
-            await assertTXRevertWithReason(
+            await assertRevertWithReason(
               testInstance.fn(authorized, sig.v, sig.r, sig.s),
               'Cannot re-authorize address or locked gold account for another account'
             )
@@ -939,7 +938,7 @@ contract('Accounts', (accounts: string[]) => {
             await testInstance.fn(authorized, otherSig.v, otherSig.r, otherSig.s, {
               from: otherAccount,
             })
-            await assertTXRevertWithReason(
+            await assertRevertWithReason(
               testInstance.fn(authorized, sig.v, sig.r, sig.s),
               'Cannot re-authorize address or locked gold account for another account'
             )
@@ -948,7 +947,7 @@ contract('Accounts', (accounts: string[]) => {
           it('should revert if the signature is incorrect', async () => {
             const nonVoter = accounts[3]
             const incorrectSig = await getSignature(account, nonVoter)
-            await assertTXRevertWithReason(
+            await assertRevertWithReason(
               testInstance.fn(authorized, incorrectSig.v, incorrectSig.r, incorrectSig.s),
               'Invalid signature'
             )

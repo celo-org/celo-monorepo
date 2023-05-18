@@ -132,7 +132,7 @@ export const assertThrowsAsync = async (promise: any, errorMessage: string = '')
   assert.equal(true, failed, errorMessage)
 }
 
-export async function assertTXRevertWithReason(promise: any, expectedRevertReason: string = '') {
+export async function assertRevertWithReason(promise: any, expectedRevertReason: string = '') {
   try {
    await promise
     assert.fail('Expected transaction to revert')
@@ -143,31 +143,11 @@ export async function assertTXRevertWithReason(promise: any, expectedRevertReaso
     // When it's a transaction (eg a non-view send call), error.message has a shape like:
     // `Returned error: VM Exception while processing transaction: revert ${revertMessage} -- Reason given: ${revertMessage}.`
     // Therefore we try to parse the first instance of `${revertMessage}`.
-   
     const revertFound: boolean =
     error.message.search(expectedRevertReason) >= 0
     const msg: string =
     expectedRevertReason === '' ? `Expected "revert", got ${error} instead` : expectedRevertReason
     assert(revertFound, msg)
-  }
-}
-export async function assertRevertWithReason(promise: any, expectedRevertReason: string = '') {
-  try {
-    await promise
-    assert.fail('Expected transaction to revert')
-  } catch (error) {
-    // Only ever tested with ganache.
-    // When it's a view call, error.message has a shape like:
-    // `Returned error: VM Exception while processing transaction: revert ${revertMessage}`
-    // When it's a transaction (eg a non-view send call), error.message has a shape like:
-    // `Transaction: ${transactionHash} exited with an error (status 0). Reason given: ${revertMessage}.
-    //  Please check that the transaction:
-    //  - satisfies all conditions set by Solidity `require` statements.
-    //  - does not trigger a Solidity `revert` statement.`
-    // Therefore we try to parse the instance of `${revertMessage}`.
-    const foundRevertReason = error.message
-      .split(' Reason given: ')[1].split('.')[0]
-    assert.strictEqual(foundRevertReason, expectedRevertReason, `Incorrect revert message: ${error.message} \n ${foundRevertReason}`)
   }
 }
 

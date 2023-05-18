@@ -6,8 +6,8 @@ import {
   assertGteBN,
   assertLogMatches,
   assertRevert,
+  assertRevertWithReason,
   assertSameAddress,
-  assertTXRevertWithReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 // tslint:disable-next-line: ordered-imports
@@ -458,7 +458,7 @@ contract('ReleaseGold', (accounts: string[]) => {
         const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
         releaseGoldSchedule.numReleasePeriods = Number.MAX_SAFE_INTEGER
         releaseGoldSchedule.amountReleasedPerPeriod = new BigNumber(2).pow(300)
-        await assertTXRevertWithReason(
+        await assertRevertWithReason(
           createNewReleaseGoldInstance(releaseGoldSchedule, web3),
           'value out-of-bounds'
         )

@@ -6,7 +6,7 @@ import {
   assertEqualBN,
   assertLogMatches2,
   assertRevert,
-  assertTXRevertWithReason,
+  assertRevertWithReason,
   matchAny,
   mineToNextEpoch,
   stripHexEncoding,
@@ -3302,13 +3302,13 @@ contract('Governance', (accounts: string[]) => {
     }
 
     it('should revert when hotfix not approved', async () => {
-      await assertTXRevertWithReason(executeHotfixTx(), 'hotfix not approved')
+      await assertRevertWithReason(executeHotfixTx(), 'hotfix not approved')
     })
 
     it('should revert when hotfix not prepared for current epoch', async () => {
       await mineToNextEpoch(web3)
       await governance.approveHotfix(hotfixHashStr, { from: approver })
-      await assertTXRevertWithReason(executeHotfixTx(), 'hotfix must be prepared for this epoch')
+      await assertRevertWithReason(executeHotfixTx(), 'hotfix must be prepared for this epoch')
     })
 
     it('should revert when hotfix prepared but not for current epoch', async () => {
@@ -3318,7 +3318,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.whitelistHotfix(hotfixHashStr, { from: accounts[2] })
       await governance.prepareHotfix(hotfixHashStr, { from: accounts[2] })
       await mineToNextEpoch(web3)
-      await assertTXRevertWithReason(executeHotfixTx(), 'hotfix must be prepared for this epoch')
+      await assertRevertWithReason(executeHotfixTx(), 'hotfix must be prepared for this epoch')
     })
 
     describe('when hotfix is approved and prepared for current epoch', () => {
@@ -3357,7 +3357,7 @@ contract('Governance', (accounts: string[]) => {
 
       it('should not be executable again', async () => {
         await executeHotfixTx()
-        await assertTXRevertWithReason(executeHotfixTx(), 'hotfix already executed')
+        await assertRevertWithReason(executeHotfixTx(), 'hotfix already executed')
       })
     })
   })

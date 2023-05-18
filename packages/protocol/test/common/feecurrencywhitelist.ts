@@ -1,4 +1,4 @@
-import { assertTXRevertWithReason } from '@celo/protocol/lib/test-utils'
+import { assertRevertWithReason } from '@celo/protocol/lib/test-utils'
 import { FeeCurrencyWhitelistContract, FeeCurrencyWhitelistInstance } from 'types'
 
 const FeeCurrencyWhitelist: FeeCurrencyWhitelistContract = artifacts.require('FeeCurrencyWhitelist')
@@ -22,7 +22,7 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertTXRevertWithReason(
+      await assertRevertWithReason(
         feeCurrencyWhitelist.initialize(),
         'contract already initialized'
       )
@@ -37,7 +37,7 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
     })
 
     it('should not allow a non-owner to add a token', async () => {
-      await assertTXRevertWithReason(
+      await assertRevertWithReason(
         feeCurrencyWhitelist.addToken(aTokenAddress, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -55,7 +55,7 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
     })
 
     it('should not allow a non-owner to add a token', async () => {
-      await assertTXRevertWithReason(
+      await assertRevertWithReason(
         feeCurrencyWhitelist.addNonMentoToken(aTokenAddress, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -76,14 +76,14 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
       })
 
       it("Doesn't remove if the index is wrong", async () => {
-        await assertTXRevertWithReason(
+        await assertRevertWithReason(
           feeCurrencyWhitelist.removeToken(accounts[0], 0),
           'Index does not match'
         )
       })
 
       it('should not allow a non-owner to remove Mento token', async () => {
-        await assertTXRevertWithReason(
+        await assertRevertWithReason(
           feeCurrencyWhitelist.removeToken(accounts[0], 0, { from: nonOwner }),
           'Ownable: caller is not the owner'
         )
@@ -113,14 +113,14 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
       })
 
       it("Doesn't remove if the index is wrong", async () => {
-        await assertTXRevertWithReason(
+        await assertRevertWithReason(
           feeCurrencyWhitelist.removeNonMentoToken(accounts[0], 1, 1),
           'Index does not match'
         )
       })
 
       it('should not allow a non-owner to remove non-Mento token', async () => {
-        await assertTXRevertWithReason(
+        await assertRevertWithReason(
           feeCurrencyWhitelist.removeNonMentoToken(accounts[0], 1, 1, { from: nonOwner }),
           'Ownable: caller is not the owner'
         )

@@ -3,7 +3,7 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
   assertGtBN,
-  assertTXRevertWithReason,
+  assertRevertWithReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
@@ -202,7 +202,7 @@ contract('FeeBurner', (accounts: string[]) => {
     })
 
     it('Only owner can take tokens out', async () => {
-      await assertTXRevertWithReason(
+      await assertRevertWithReason(
         feeBurner.transfer(tokenA.address, user, new BigNumber(1e18), { from: user }),
         'Ownable: caller is not the owner'
       )
@@ -232,7 +232,7 @@ contract('FeeBurner', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertTXRevertWithReason(
+      await assertRevertWithReason(
         feeBurner.initialize(registry.address, [], [], [], [], { from: user }),
         'contract already initialized'
       )
@@ -266,7 +266,7 @@ contract('FeeBurner', (accounts: string[]) => {
     })
 
     it("doesn't remove if the indexes doesn't match", async () => {
-      await assertTXRevertWithReason(
+      await assertRevertWithReason(
         feeBurner.removeRouter(tokenA.address, exchange.address, 0),
         'Index does not match'
       )
@@ -275,7 +275,7 @@ contract('FeeBurner', (accounts: string[]) => {
 
   describe('#setDailyBurnLimit()', () => {
     it('should only be called by owner', async () => {
-      await assertTXRevertWithReason(
+      await assertRevertWithReason(
         feeBurner.setDailyBurnLimit(stableToken.address, goldAmountForRate, { from: user }),
         'Ownable: caller is not the owner'
       )
@@ -284,7 +284,7 @@ contract('FeeBurner', (accounts: string[]) => {
 
   describe('#setMaxSplipagge()', () => {
     it('should only be called by owner', async () => {
-      await assertTXRevertWithReason(
+      await assertRevertWithReason(
         feeBurner.setMaxSplippage(stableToken.address, maxSlippage, { from: user }),
         'Ownable: caller is not the owner'
       )
@@ -301,7 +301,7 @@ contract('FeeBurner', (accounts: string[]) => {
 
     it("Can't burn when frozen", async () => {
       await freezer.freeze(feeBurner.address)
-      await assertTXRevertWithReason(
+      await assertRevertWithReason(
         feeBurner.burnMentoTokens(),
         "can't call when contract is frozen"
       )
@@ -347,7 +347,7 @@ contract('FeeBurner', (accounts: string[]) => {
         from: user,
       })
 
-      await assertTXRevertWithReason(
+      await assertRevertWithReason(
         feeBurner.burn(),
         'Calculated buyAmount was less than specified minBuyAmount'
       )
@@ -416,7 +416,7 @@ contract('FeeBurner', (accounts: string[]) => {
 
     it("Can't burn when frozen", async () => {
       await freezer.freeze(feeBurner.address)
-      await assertTXRevertWithReason(
+      await assertRevertWithReason(
         feeBurner.burnNonMentoTokens(),
         "can't call when contract is frozen"
       )
@@ -472,7 +472,7 @@ contract('FeeBurner', (accounts: string[]) => {
 
     it("Doesn't exchange non-Mento when slippage is too high", async () => {
       await feeBurner.setMaxSplippage(tokenA.address, maxSlippage)
-      await assertTXRevertWithReason(
+      await assertRevertWithReason(
         feeBurner.burnNonMentoTokens(),
         'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'
       )
