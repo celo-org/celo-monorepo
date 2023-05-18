@@ -38,7 +38,7 @@ export enum IdentifierPrefix {
   DISCORD = 'discord',
   TELEGRAM = 'telegram',
   SIGNAL = 'signal',
-  GITHUB = 'github'
+  GITHUB = 'github',
 }
 
 // Docstring is duplicated in @celo/identity; make sure to update in both places.
