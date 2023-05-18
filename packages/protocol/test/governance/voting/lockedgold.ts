@@ -773,7 +773,7 @@ contract('LockedGold', (accounts: string[]) => {
     })
   })
 
-  describe.only('#delegateGovernanceVotes', () => {
+  describe('#delegateGovernanceVotes', () => {
     it('should revert when no locked gold', async () => {
       await assertRevert(
         lockedGold.delegateGovernanceVotes(zeroAddress(), 10),
@@ -786,9 +786,13 @@ contract('LockedGold', (accounts: string[]) => {
       const delegatee1 = accounts[5]
       const delegatee2 = accounts[6]
       const delegator = accounts[0]
+      const delegator2 = accounts[1]
 
       beforeEach(async () => {
+        await accountsInstance.createAccount({ from: delegator2 })
+
         await lockedGold.lock({ value: value, from: delegator })
+        await lockedGold.lock({ value: value, from: delegator2 })
       })
 
       it('should revert when trying to delegate more than I have', async () => {
@@ -805,7 +809,7 @@ contract('LockedGold', (accounts: string[]) => {
         )
       })
 
-      describe('When account is registered', () => {
+      describe('When delegatee account is registered', () => {
         const percentsToDelegate = 10
         const delegatedAmount = (value / 100) * percentsToDelegate
         beforeEach(async () => {
@@ -951,6 +955,37 @@ contract('LockedGold', (accounts: string[]) => {
             })
           })
         })
+
+        describe('When 2 delegators are delegating to delegatee1', () => {
+          beforeEach(async () => {
+            await lockedGold.delegateGovernanceVotes(delegatee1, percentsToDelegate, {
+              from: delegator,
+            })
+            await lockedGold.delegateGovernanceVotes(delegatee1, percentsToDelegate, {
+              from: delegator2,
+            })
+          })
+
+          it('should delegate votes correctly', async () => {
+            assertEqualBN(
+              await lockedGold.getAccountTotalGovernanceVotingPower(delegatee1),
+              delegatedAmount * 2
+            )
+            await assertDelegatorDelegateeAmounts(
+              delegator,
+              delegatee1,
+              percentsToDelegate,
+              delegatedAmount
+            )
+
+            await assertDelegatorDelegateeAmounts(
+              delegator2,
+              delegatee1,
+              percentsToDelegate,
+              delegatedAmount
+            )
+          })
+        })
       })
     })
   })
@@ -987,6 +1022,7 @@ contract('LockedGold', (accounts: string[]) => {
     describe('When having delegated amount', () => {
       const value = 1000
       const delegator = accounts[0]
+      const delegator2 = accounts[1]
       const delegatee1 = accounts[5]
       const delegatee2 = accounts[6]
 
@@ -994,10 +1030,12 @@ contract('LockedGold', (accounts: string[]) => {
       const delegatedAmount = (value / 100) * percentsToDelegate
 
       beforeEach(async () => {
-        await lockedGold.lock({ value: value, from: delegator })
-
+        await accountsInstance.createAccount({ from: delegator2 })
         await accountsInstance.createAccount({ from: delegatee1 })
         await accountsInstance.createAccount({ from: delegatee2 })
+
+        await lockedGold.lock({ value: value, from: delegator })
+        await lockedGold.lock({ value: value, from: delegator2 })
 
         await lockedGold.delegateGovernanceVotes(delegatee1, percentsToDelegate)
         assertEqualBN(
@@ -1015,7 +1053,7 @@ contract('LockedGold', (accounts: string[]) => {
       })
 
       describe('When revoking from delegatee1', () => {
-        const percentageToRevoke = 12
+        const percentageToRevoke = 2
         const amountToRevoke = (value / 100) * percentageToRevoke
         let resp: Truffle.TransactionResponse
 
@@ -1087,30 +1125,120 @@ contract('LockedGold', (accounts: string[]) => {
           assertEqualBN(await lockedGold.totalDelegatedCelo(delegatee2), delegatedAmount)
         })
 
-        describe('When delegator locked more gold', () => {
-          const percentageToRevokeAfterLock = percentageToRevoke / 2
-
+        describe('When delegator1 locked more gold + delegator2 also delegated to delegatee1', () => {
           beforeEach(async () => {
-            await lockedGold.lock({ value: value, from: delegator })
-            await lockedGold.revokeDelegatedGovernanceVotes(delegatee1, percentageToRevokeAfterLock)
-          })
-
-          it('should revoke votes correctly when delegatee not voting', async () => {
             assertEqualBN(
               await lockedGold.getAccountTotalGovernanceVotingPower(delegatee1),
               delegatedAmount - amountToRevoke
             )
-            await assertDelegatorDelegateeAmounts(
-              delegator,
-              delegatee1,
-              percentsToDelegate - percentageToRevokeAfterLock,
-              delegatedAmount - amountToRevoke
-            )
-
+            await lockedGold.delegateGovernanceVotes(delegatee1, percentsToDelegate, {
+              from: delegator2,
+            })
             assertEqualBN(
-              await lockedGold.totalDelegatedCelo(delegatee1),
-              delegatedAmount - amountToRevoke
+              await lockedGold.getAccountTotalGovernanceVotingPower(delegatee1),
+              delegatedAmount + (delegatedAmount - amountToRevoke)
             )
+            await lockedGold.lock({ value: value, from: delegator })
+          })
+
+          describe('When revoking percentage such as that with newly locked amount it would decrease below zero', () => {
+            const percentageToRevokeAfterLock = 6
+
+            beforeEach(async () => {
+              assertEqualBN(
+                await lockedGold.getAccountTotalDelegatedAmountInPercents(delegator),
+                percentsToDelegate - percentageToRevoke
+              )
+              await lockedGold.revokeDelegatedGovernanceVotes(
+                delegatee1,
+                percentageToRevokeAfterLock
+              )
+            })
+
+            it('should revoke votes correctly when delegatee not voting', async () => {
+              assertEqualBN(
+                await lockedGold.getAccountTotalGovernanceVotingPower(delegatee1),
+                delegatedAmount
+              )
+              await assertDelegatorDelegateeAmounts(
+                delegator,
+                delegatee1,
+                percentsToDelegate - percentageToRevoke - percentageToRevokeAfterLock,
+                0
+              )
+              await assertDelegatorDelegateeAmounts(
+                delegator2,
+                delegatee1,
+                percentsToDelegate,
+                delegatedAmount
+              )
+              assertEqualBN(await lockedGold.totalDelegatedCelo(delegatee1), delegatedAmount)
+            })
+          })
+
+          describe('When revoking percentage such as that with newly locked amount it would not decrease below zero', () => {
+            const percentageToRevokeAfterLock = 2
+            const amountRevokedAfterNewLockWithoutUpdate =
+              ((value * 2) / 100) * percentageToRevokeAfterLock
+            const amountRevokedAfterNewLockWitUpdate =
+              ((value * 2) / 100) * (percentageToRevoke + percentageToRevokeAfterLock)
+            const delegatedAmountAfterLock = ((value * 2) / 100) * percentsToDelegate
+
+            beforeEach(async () => {
+              assertEqualBN(
+                await lockedGold.getAccountTotalDelegatedAmountInPercents(delegator),
+                percentsToDelegate - percentageToRevoke
+              )
+              await lockedGold.revokeDelegatedGovernanceVotes(
+                delegatee1,
+                percentageToRevokeAfterLock
+              )
+            })
+
+            it('should revoke votes correctly when delegatee not voting', async () => {
+              assertEqualBN(
+                await lockedGold.getAccountTotalGovernanceVotingPower(delegatee1),
+                delegatedAmount +
+                  (delegatedAmount - amountToRevoke - amountRevokedAfterNewLockWithoutUpdate)
+              )
+              await assertDelegatorDelegateeAmounts(
+                delegator,
+                delegatee1,
+                percentsToDelegate - percentageToRevoke - percentageToRevokeAfterLock,
+                delegatedAmount - amountToRevoke - amountRevokedAfterNewLockWithoutUpdate
+              )
+              await assertDelegatorDelegateeAmounts(
+                delegator2,
+                delegatee1,
+                percentsToDelegate,
+                delegatedAmount
+              )
+              assertEqualBN(
+                await lockedGold.totalDelegatedCelo(delegatee1),
+                delegatedAmount +
+                  (delegatedAmount - amountToRevoke - amountRevokedAfterNewLockWithoutUpdate)
+              )
+            })
+
+            it.only('should update votes correctly', async () => {
+              await lockedGold.updateDelegatedBalance(delegator, delegatee1)
+
+              assertEqualBN(
+                await lockedGold.getAccountTotalGovernanceVotingPower(delegatee1),
+                delegatedAmount + (delegatedAmountAfterLock - amountRevokedAfterNewLockWitUpdate)
+              )
+
+              await assertDelegatorDelegateeAmounts(
+                delegator,
+                delegatee1,
+                percentsToDelegate - percentageToRevoke - percentageToRevokeAfterLock,
+                delegatedAmountAfterLock - amountRevokedAfterNewLockWitUpdate
+              )
+              assertEqualBN(
+                await lockedGold.totalDelegatedCelo(delegatee1),
+                delegatedAmount + (delegatedAmountAfterLock - amountRevokedAfterNewLockWitUpdate)
+              )
+            })
           })
         })
       })
