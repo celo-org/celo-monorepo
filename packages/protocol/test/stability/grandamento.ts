@@ -3,7 +3,6 @@ import {
   assertEqualBN,
   assertEqualBNArray,
   assertLogMatches2,
-  assertRevert,
   assertRevertWithReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -1087,7 +1086,7 @@ contract('GrandaMento', (accounts: string[]) => {
     })
 
     it('reverts when the spread is more than 1', async () => {
-      await assertRevert(
+      await assertRevertWithReason(
         grandaMento.setSpread(toFixed(1001 / 1000)),
         'Spread must be less than or equal to 1'
       )

@@ -137,14 +137,15 @@ export async function assertRevertWithReason(promise: any, expectedRevertReason:
    await promise
     assert.fail('Expected transaction to revert')
   } catch (error) {
+// XXX(soloseng): Some transactions revert without reason.
     // Only ever tested with ganache.
     // When it's a view call, error.message has a shape like:
-    // `Returned error: VM Exception while processing transaction: revert ${revertMessage}`
+    // `Returned error: VM Exception while processing transaction: revert ${expectedRevertReason}`
     // When it's a transaction (eg a non-view send call), error.message has a shape like:
-    // `Returned error: VM Exception while processing transaction: revert ${revertMessage} -- Reason given: ${revertMessage}.`
-    // Therefore we try to parse the first instance of `${revertMessage}`.
+    // 'StatusError: Transaction: ${transactionHash} exited with an error (status 0). Reason given: ${revertMessage}.'
+    // Therefore we try to search for `${expectedRevertReason}`.
     const revertFound: boolean =
-    error.message.search(expectedRevertReason) >= 0
+    error.message.search( expectedRevertReason) >= 0
     const msg: string =
     expectedRevertReason === '' ? `Expected "revert", got ${error} instead` : expectedRevertReason
     assert(revertFound, msg)
