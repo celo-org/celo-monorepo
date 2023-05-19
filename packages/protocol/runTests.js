@@ -18,7 +18,7 @@ async function startGanache() {
     wallet: { mnemonic: network.mnemonic, defaultBalance: network.defaultBalance },
     miner: {
       blockGasLimit: 20000000,
-      defaultGasPrice: network.defaultGasPrice,
+      defaultGasPrice: network.gasPrice,
     },
     chain: {
       networkId: network.network_id,
