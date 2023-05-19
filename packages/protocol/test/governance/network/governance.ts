@@ -6,6 +6,7 @@ import {
   assertEqualBN,
   assertLogMatches2,
   assertRevert,
+  assertRevertWithReason,
   matchAny,
   mineToNextEpoch,
   stripHexEncoding,
@@ -15,7 +16,7 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fixed1, multiply, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { keccak256 } from 'ethereumjs-util'
+import { keccak256, zeroAddress } from 'ethereumjs-util'
 import {
   AccountsContract,
   AccountsInstance,
@@ -3881,5 +3882,191 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe('#removeVotesWhenRevokingDelegatedVotes()', () => {})
+  describe('#removeVotesWhenRevokingDelegatedVotes()', () => {
+    it('should revert when not called by staked celo contract', async () => {
+      await assertRevertWithReason(
+        governance.removeVotesWhenRevokingDelegatedVotes(zeroAddress(), 0),
+        'msg.sender not lockedGold'
+      )
+    })
+
+    it('should should pass when no proposal is dequeued', async () => {
+      await governance.removeVotesWhenRevokingDelegatedVotesTest(zeroAddress(), 0)
+    })
+
+    describe.only('When having two proposals voted', () => {
+      const proposalId = 1
+      const index = 0
+
+      // const proposal2Id = 2
+      // const index2 = 1
+      beforeEach(async () => {
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+
+        await timeTravel(dequeueFrequency, web3)
+        await governance.approve(proposalId, index)
+
+        // await governance.propose(
+        //   [transactionSuccess2.value],
+        //   [transactionSuccess2.destination],
+        //   // @ts-ignore bytes type
+        //   transactionSuccess2.data,
+        //   [transactionSuccess2.data.length],
+        //   descriptionUrl,
+        //   // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+        //   { value: minDeposit }
+        // )
+
+        // await timeTravel(dequeueFrequency, web3)
+        // await governance.approve(proposal2Id, index2)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
+      })
+
+      describe('When voting only for yes', () => {
+        // const noVotes = 80
+        beforeEach(async () => {
+          await governance.votePartially(proposalId, index, yesVotes, 0, 0)
+          // await governance.votePartially(proposal2Id, index2, 0, noVotes, 0)
+          console.log('voted aaaa')
+          const [
+            recordProposalId,
+            ,
+            ,
+            yesVotesRecord,
+            noVotesRecord,
+            abstainVotesRecord,
+          ] = await governance.getVoteRecord(account, index)
+          console.log('recordProposalId', recordProposalId.toString())
+          console.log('yesVotesRecord', yesVotesRecord.toString())
+          assertEqualBN(recordProposalId, proposalId)
+          assertEqualBN(yesVotesRecord, yesVotes)
+          assertEqualBN(noVotesRecord, 0)
+          assertEqualBN(abstainVotesRecord, 0)
+
+          // console.log("bbb");
+          // const [
+          //   recordProposalId2,
+          //   ,
+          //   ,
+          //   yesVotesRecord2,
+          //   noVotesRecord2,
+          //   abstainVotesRecord2,
+          // ] = await governance.getVoteRecord(account, index2)
+          // assertEqualBN(recordProposalId2, proposal2Id)
+          // assertEqualBN(yesVotesRecord2, 0)
+          // assertEqualBN(noVotesRecord2, noVotes)
+          // assertEqualBN(abstainVotesRecord2, 0)
+          // console.log("ccc");
+        })
+
+        it('should adjust votes correctly to 0', async () => {
+          const maxAmount = 0
+
+          await governance.removeVotesWhenRevokingDelegatedVotesTest(account, maxAmount)
+          const [
+            recordProposalId,
+            ,
+            ,
+            yesVotesRecord,
+            noVotesRecord,
+            abstainVotesRecord,
+          ] = await governance.getVoteRecord(account, index)
+          assertEqualBN(recordProposalId, proposalId)
+          assertEqualBN(yesVotesRecord, maxAmount)
+          assertEqualBN(noVotesRecord, 0)
+          assertEqualBN(abstainVotesRecord, 0)
+        })
+
+        it('should adjust votes correctly to 30', async () => {
+          const maxAmount = 30
+
+          await governance.removeVotesWhenRevokingDelegatedVotesTest(account, maxAmount)
+          const [
+            recordProposalId,
+            ,
+            ,
+            yesVotesRecord,
+            noVotesRecord,
+            abstainVotesRecord,
+          ] = await governance.getVoteRecord(account, index)
+          assertEqualBN(recordProposalId, proposalId)
+          assertEqualBN(yesVotesRecord, maxAmount)
+          assertEqualBN(noVotesRecord, 0)
+          assertEqualBN(abstainVotesRecord, 0)
+        })
+      })
+
+      describe('When voting for all choices', () => {
+        const yes = 34
+        const no = 33
+        const abstain = 33
+        beforeEach(async () => {
+          await governance.votePartially(proposalId, index, yes, no, abstain)
+
+          const [
+            recordProposalId,
+            ,
+            ,
+            yesVotesRecord,
+            noVotesRecord,
+            abstainVotesRecord,
+          ] = await governance.getVoteRecord(account, index)
+          assertEqualBN(recordProposalId, proposalId)
+          assertEqualBN(yesVotesRecord, yes)
+          assertEqualBN(noVotesRecord, no)
+          assertEqualBN(abstainVotesRecord, abstain)
+        })
+
+        it('should adjust votes correctly to 0', async () => {
+          const maxAmount = 0
+
+          await governance.removeVotesWhenRevokingDelegatedVotesTest(account, maxAmount)
+          const [
+            recordProposalId,
+            ,
+            ,
+            yesVotesRecord,
+            noVotesRecord,
+            abstainVotesRecord,
+          ] = await governance.getVoteRecord(account, index)
+          assertEqualBN(recordProposalId, proposalId)
+          assertEqualBN(yesVotesRecord, maxAmount)
+          assertEqualBN(noVotesRecord, maxAmount)
+          assertEqualBN(abstainVotesRecord, maxAmount)
+        })
+
+        it('should adjust votes correctly to 50', async () => {
+          const maxAmount = 50
+          const sumOfVotes = yes + no + abstain
+          const toRemove = sumOfVotes - maxAmount
+          const yesPortion = (toRemove * yes) / sumOfVotes
+          const noPortion = (toRemove * no) / sumOfVotes
+          const abstainPortion = (toRemove * abstain) / sumOfVotes
+
+          await governance.removeVotesWhenRevokingDelegatedVotesTest(account, maxAmount)
+          const [
+            recordProposalId,
+            ,
+            ,
+            yesVotesRecord,
+            noVotesRecord,
+            abstainVotesRecord,
+          ] = await governance.getVoteRecord(account, index)
+          assertEqualBN(recordProposalId, proposalId)
+          assertEqualBN(yesVotesRecord, Math.floor(yesPortion))
+          assertEqualBN(noVotesRecord, Math.ceil(noPortion))
+          assertEqualBN(abstainVotesRecord, Math.ceil(abstainPortion))
+        })
+      })
+    })
+  })
 })

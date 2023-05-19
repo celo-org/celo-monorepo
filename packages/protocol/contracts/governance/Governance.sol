@@ -203,7 +203,7 @@ contract Governance is
   }
 
   modifier onlyLockedGold() {
-    require(msg.sender == address(getLockedGold()));
+    require(msg.sender == address(getLockedGold()), "msg.sender not lockedGold");
     _;
   }
 
@@ -1497,6 +1497,12 @@ contract Governance is
     public
     onlyLockedGold
   {
+    _removeVotesWhenRevokingDelegatedVotes(account, maxAmountAllowed);
+  }
+
+  function _removeVotesWhenRevokingDelegatedVotes(address account, uint256 maxAmountAllowed)
+    internal
+  {
     Voter storage voter = voters[account];
 
     for (uint256 index = 0; index < dequeued.length; index = index.add(1)) {
@@ -1531,9 +1537,9 @@ contract Governance is
   {
     return
       FixidityLib
-        .wrap(totalToRemove)
+        .newFixed(totalToRemove)
         .multiply(FixidityLib.newFixedFraction(votes, sumOfAllVotes))
-        .unwrap();
+        .fromFixed();
   }
 
   /**

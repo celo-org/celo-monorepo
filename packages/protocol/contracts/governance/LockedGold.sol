@@ -389,6 +389,7 @@ contract LockedGold is
 
     uint256 totalLockedGold = getAccountTotalLockedGold(delegatorAddress);
 
+    // in a worst case we will remove whole amount of delegator (even when amount is not updated)
     uint256 amountToRevoke = currentDelegateeInfo.percentage == 0
       ? currentDelegateeInfo.currentAmount
       : Math.min(

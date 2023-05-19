@@ -22,4 +22,11 @@ contract GovernanceTest is Governance(true) {
   function addValidator(address validator) external {
     validatorSet.push(validator);
   }
+
+  // exposes removeVotesWhenRevokingDelegatedVotes for tests
+  function removeVotesWhenRevokingDelegatedVotesTest(address account, uint256 maxAmountAllowed)
+    public
+  {
+    _removeVotesWhenRevokingDelegatedVotes(account, maxAmountAllowed);
+  }
 }
