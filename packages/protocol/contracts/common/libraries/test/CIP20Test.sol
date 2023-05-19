@@ -29,7 +29,6 @@ contract CIP20Test {
     return CIP20Lib.blake2sWithConfig(config, key, preimage);
   }
 
-  // default settings, no key
   function blake2s(bytes calldata input) external view returns (bytes memory) {
     return input.blake2s();
   }

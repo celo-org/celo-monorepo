@@ -79,7 +79,6 @@ library CIP20Lib {
     return executeCIP20(configuredInput, BLAKE2S_SELECTOR, uint256(uint8(config[0])));
   }
 
-  // default settings, no key
   function blake2s(bytes memory preimage) internal view returns (bytes memory) {
     return blake2sWithConfig(BLAKE2S_DEFAULT_CONFIG, hex"", preimage);
   }
