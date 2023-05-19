@@ -3880,4 +3880,6 @@ contract('Governance', (accounts: string[]) => {
       })
     })
   })
+
+  describe('#removeVotesWhenRevokingDelegatedVotes()', () => {})
 })
