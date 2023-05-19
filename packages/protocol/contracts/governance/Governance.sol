@@ -220,7 +220,7 @@ contract Governance is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 3, 1, 0);
+    return (1, 3, 0, 0);
   }
 
   /**
@@ -527,12 +527,8 @@ contract Governance is
     nonReentrant
     returns (bool)
   {
-    require(queue.contains(proposalId), "cannot upvote a proposal not in the queue");
-
-    if (dequeueProposalIfReady(proposalId)) {
-      return false;
-    }
-
+    dequeueProposalsIfReady();
+    // If acting on an expired proposal, expire the proposal and take no action.
     if (removeIfQueuedAndExpired(proposalId)) {
       return false;
     }
@@ -540,8 +536,11 @@ contract Governance is
     address account = getAccounts().voteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
     removeIfQueuedAndExpired(voter.upvote.proposalId);
+
+    // We can upvote a proposal in the queue if we're not already upvoting a proposal in the queue.
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
     require(weight > 0, "cannot upvote without locking gold");
+    require(queue.contains(proposalId), "cannot upvote a proposal not in the queue");
     require(
       voter.upvote.proposalId == 0 || !queue.contains(voter.upvote.proposalId),
       "cannot upvote more than one queued proposal"
@@ -550,9 +549,6 @@ contract Governance is
     queue.update(proposalId, upvotes, lesser, greater);
     voter.upvote = UpvoteRecord(proposalId, weight);
     emit ProposalUpvoted(proposalId, account, weight);
-
-    // dequeue other proposals if ready.
-    dequeueProposalsIfReady();
     return true;
   }
 
@@ -605,7 +601,7 @@ contract Governance is
   }
 
   /**
-   * @notice Approves a proposal in the approval stage or in the referendum stage.
+   * @notice Approves a proposal in the approval stage.
    * @param proposalId The ID of the proposal to approve.
    * @param index The index of the proposal ID in `dequeued`.
    * @return Whether or not the approval was made successfully.
@@ -760,6 +756,7 @@ contract Governance is
         noVotes,
         abstainVotes
       );
+
     } else {
       proposal.updateVote(
         previousVoteRecord.yesVotes,
@@ -1253,43 +1250,6 @@ contract Governance is
         lastDequeue = now;
       }
     }
-  }
-
-  /**
-   * @notice Removes the proposal from the queue if `lastDequeue` time has passed.
-   * @param proposalId The ID of the proposal.
-   * @dev If any of the top proposals have expired, they are deleted.
-   */
-  function dequeueProposalIfReady(uint256 proposalId) public returns (bool isProposalDequeued) {
-    isProposalDequeued = false;
-    // solhint-disable-next-line not-rely-on-time
-    if (now >= lastDequeue.add(dequeueFrequency)) {
-      Proposals.Proposal storage proposal = proposals[proposalId];
-      // Updating refunds back to proposer
-      refundedDeposits[proposal.proposer] = refundedDeposits[proposal.proposer].add(
-        proposal.deposit
-      );
-      queue.remove(proposalId);
-      // solhint-disable-next-line not-rely-on-time
-      proposal.timestamp = now;
-      if (emptyIndices.length > 0) {
-        uint256 indexOfLastEmptyIndex = emptyIndices.length.sub(1);
-        dequeued[emptyIndices[indexOfLastEmptyIndex]] = proposalId;
-        delete emptyIndices[indexOfLastEmptyIndex];
-        emptyIndices.length = indexOfLastEmptyIndex;
-      } else {
-        dequeued.push(proposalId);
-      }
-
-      // solhint-disable-next-line not-rely-on-time
-      emit ProposalDequeued(proposalId, now);
-      isProposalDequeued = true;
-
-      // solhint-disable-next-line not-rely-on-time
-      lastDequeue = now;
-    }
-
-    return isProposalDequeued;
   }
 
   /**
