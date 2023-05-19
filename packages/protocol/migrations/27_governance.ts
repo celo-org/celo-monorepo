@@ -56,7 +56,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
         console.log(`\tSetting constitution thresholds for ${contractName}`)
 
         const artifactsObject = ArtifactsSingleton.getInstance(
-          constitution[contractName].__path,
+          constitution[contractName].__contractPackage,
           artifacts
         )
 
@@ -70,7 +70,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
         const thresholds = { ...constitution.proxy, ...constitution[contractName] }
         await Promise.all(
           Object.keys(thresholds)
-            .filter((method) => method !== '__path')
+            .filter((method) => method !== '__contractPackage')
             .map((func) =>
               Promise.all(
                 selectors[func].map((selector) =>
@@ -121,13 +121,16 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           'StableTokenEUR',
           'StableTokenBRL',
         ],
-        __path: MENTO_PACKAGE, // TODO refactor this
+        __contractPackage: MENTO_PACKAGE, // TODO refactor this
       },
     ]
 
     if (!config.governance.skipTransferOwnership) {
       for (const contractPackage of proxyAndImplementationOwnedByGovernance) {
-        const artifactsInstance = ArtifactsSingleton.getInstance(contractPackage.__path, artifacts)
+        const artifactsInstance = ArtifactsSingleton.getInstance(
+          contractPackage.__contractPackage,
+          artifacts
+        )
         for (const contractName of contractPackage.contracts) {
           await transferOwnershipOfProxyAndImplementation(
             contractName,
