@@ -27,7 +27,6 @@ import { ABI as RegistryABI } from './generated/Registry'
 import { ABI as ReserveABI } from './generated/Reserve'
 import { ABI as SortedOraclesABI } from './generated/SortedOracles'
 import { ABI as StableTokenABI } from './generated/StableToken'
-import { ABI as TransferWhitelistABI } from './generated/TransferWhitelist'
 import { ABI as ValidatorsABI } from './generated/Validators'
 
 export const GET_IMPLEMENTATION_ABI: ABIDefinition = {
@@ -126,7 +125,6 @@ const initializeAbiMap = {
   StableTokenProxy: findInitializeAbi(StableTokenABI),
   StableTokenEURProxy: findInitializeAbi(StableTokenABI),
   StableTokenBRLProxy: findInitializeAbi(StableTokenABI),
-  TransferWhitelistProxy: findInitializeAbi(TransferWhitelistABI),
   ValidatorsProxy: findInitializeAbi(ValidatorsABI),
 }
 
