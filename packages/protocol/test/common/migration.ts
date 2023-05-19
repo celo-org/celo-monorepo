@@ -7,15 +7,19 @@ import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { ContractPackage } from 'contractPackages'
 import { ArtifactsSingleton } from '../../migrations/artifactsSingleton'
 
-const getProxiedContract = async (contractName: string, path: ContractPackage) => {
-  const artifactsObject = ArtifactsSingleton.getInstance(path, artifacts)
+const getProxiedContract = async (contractName: string, contractPackage: ContractPackage) => {
+  const artifactsObject = ArtifactsSingleton.getInstance(contractPackage, artifacts)
   /* tslint:disable-next-line */
   return await getDeployedProxiedContract(contractName, artifactsObject)
 }
 
-const getContract = async (contractName: string, type: string, path: ContractPackage) => {
+const getContract = async (
+  contractName: string,
+  type: string,
+  contractPackage: ContractPackage
+) => {
   // /* tslint:disable-next-line */
-  const artifactsObject = ArtifactsSingleton.getInstance(path, artifacts)
+  const artifactsObject = ArtifactsSingleton.getInstance(contractPackage, artifacts)
 
   if (type === 'contract') {
     /* tslint:disable-next-line */

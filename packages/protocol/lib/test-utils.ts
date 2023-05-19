@@ -210,10 +210,10 @@ export async function waitForPortOpen(host: string, port: number, seconds: numbe
 }
 
 export const assertProxiesSet = async (getContract: any) => {
-  for (const contractPackage of proxiedContracts) {
-    for (const contractName of contractPackage.contracts) {
-      const contract = await getContract(contractName, 'contract', contractPackage.__path)
-      const proxy: ProxyInstance = await getContract(contractName, 'proxy', contractPackage.__path)
+  for (const contractList of proxiedContracts) {
+    for (const contractName of contractList.contracts) {
+      const contract = await getContract(contractName, 'contract', contractList.__contractPackage)
+      const proxy: ProxyInstance = await getContract(contractName, 'proxy', contractList.__contractPackage)
       assert.equal(
         contract.address.toLowerCase(),
         (await proxy._getImplementation()).toLowerCase(),
@@ -250,19 +250,19 @@ export const assertRegistryAddressesSet = async (getContract: any) => {
   }
 }
 
-// 
+// This function is currently not in use, it should be converted to assertContractsOwnedByGovernance
 export const assertContractsOwnedByMultiSig = async (getContract: any) => {
   const multiSigAddress = (await getContract('MultiSig', 'proxiedContract')).address
-  for (const contractPackage of ownedContracts) {
-    for (const contractName of contractPackage.contracts) {
-      const contractOwner: string = await (await getContract(contractName, 'proxiedContract', contractPackage.__path)).owner()
+  for (const contractList of ownedContracts) {
+    for (const contractName of contractList.contracts) {
+      const contractOwner: string = await (await getContract(contractName, 'proxiedContract', contractList.__contractPackage)).owner()
       assert.equal(contractOwner, multiSigAddress, contractName + ' is not owned by the MultiSig')
     }
   }
 
-  for (const contractPackage of proxiedContracts) {
-    for (const contractName of contractPackage.contracts) {
-      const proxyOwner = await (await getContract(contractName, 'proxy', contractPackage.__path))._getOwner()
+  for (const contractList of proxiedContracts) {
+    for (const contractName of contractList.contracts) {
+      const proxyOwner = await (await getContract(contractName, 'proxy', contractList.__contractPackage))._getOwner()
       assert.equal(proxyOwner, multiSigAddress, contractName + 'Proxy is not owned by the MultiSig')
     }}
 }
@@ -450,7 +450,7 @@ const proxiedContracts = [{
       'Reserve',
       'StableToken',
     ],
-    __path: 'mento'
+    __contractPackage: 'mento'
  }
 ]
 
@@ -468,7 +468,7 @@ const ownedContracts = [{
     'Exchange',
     'StableToken'
   ],
-  __path: 'mento'
+  __contractPackage: 'mento'
  }
 ]
 
@@ -530,7 +530,7 @@ enum VoteValue {
   Yes,
 }
 
-export async function assumeOwnershipWithTruffle(contractsToOwn: string[], to: string, dequeuedIndex: number = 0, path?:ContractPackage) {
+export async function assumeOwnershipWithTruffle(contractsToOwn: string[], to: string, dequeuedIndex: number = 0, contractPackage?:ContractPackage) {
   const governance: GovernanceInstance = await getDeployedProxiedContract('Governance', artifacts)
   const lockedGold: LockedGoldInstance = await getDeployedProxiedContract('LockedGold', artifacts)
   const multiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract(
@@ -548,7 +548,7 @@ export async function assumeOwnershipWithTruffle(contractsToOwn: string[], to: s
   const proposalTransactions = await Promise.all(
     contractsToOwn.map(async (contractName: string) => {
       
-      const artifactsInstance = ArtifactsSingleton.getInstance(path, artifacts)
+      const artifactsInstance = ArtifactsSingleton.getInstance(contractPackage, artifacts)
 
       const contractAddress = (await getDeployedProxiedContract(contractName, artifactsInstance)).address
       

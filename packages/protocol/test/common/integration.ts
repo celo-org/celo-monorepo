@@ -302,7 +302,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     for (const contractName of Object.keys(constitution).filter((k) => k !== 'proxy')) {
       it('should have correct thresholds for ' + contractName, async () => {
         const artifactsInstance = ArtifactsSingleton.getInstance(
-          constitution[contractName].__path,
+          constitution[contractName].__contractPackage,
           artifacts
         )
 
@@ -318,7 +318,7 @@ contract('Integration: Governance', (accounts: string[]) => {
         const thresholds = { ...constitution.proxy, ...constitution[contractName] }
         await Promise.all(
           Object.keys(thresholds)
-            .filter((k) => k !== '__path')
+            .filter((k) => k !== '__contractPackage')
             .map((func) =>
               Promise.all(
                 selectors[func].map(async (selector) => {
