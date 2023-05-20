@@ -265,8 +265,10 @@ contract('LockedGold', (accounts: string[]) => {
         })
 
         it('should revert when requesting gold that is voted with', async () => {
-          await assertRevertWithReason(lockedGold.unlock(value)),
+          await assertRevertWithReason(
+            lockedGold.unlock(value),
             'Not enough unlockable celo. Celo is locked in voting.'
+          )
         })
 
         describe('when the account is requesting only non voting gold', () => {

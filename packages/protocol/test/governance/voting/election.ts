@@ -1438,9 +1438,9 @@ contract('Election', (accounts: string[]) => {
               NULL_ADDRESS,
               NULL_ADDRESS,
               index
-            )
-          ),
+            ),
             'Vote value larger than active votes'
+          )
         })
       })
     })
@@ -2272,9 +2272,9 @@ contract('Election', (accounts: string[]) => {
                 [NULL_ADDRESS, group2],
                 [0, 0],
                 { from: accounts[2] }
-              )
-            ),
+              ),
               'only registered contract'
+            )
           })
         })
 
