@@ -4,6 +4,7 @@ import {
   addressMinedLatestBlock,
   assertEqualBN,
   assertRevert,
+  assertRevertWithReason,
   assumeOwnership,
   stripHexEncoding,
   timeTravel,
@@ -664,12 +665,18 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
 
     it(`should be impossible to sell CELO`, async () => {
       await goldToken.approve(exchangeAbc.address, sellAmount)
-      await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, true))
+      await assertRevertWithReason(
+        exchangeAbc.sell(sellAmount, minBuyAmount, true),
+        "can't call when contract is frozen"
+      )
     })
 
     it(`should be impossible to sell stable token`, async () => {
       await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
-      await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, false))
+      await assertRevertWithReason(
+        exchangeAbc.sell(sellAmount, minBuyAmount, false),
+        "can't call when contract is frozen"
+      )
     })
   })
 

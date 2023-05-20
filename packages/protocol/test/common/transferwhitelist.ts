@@ -1,4 +1,4 @@
-import { assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertLogMatches2, assertRevertWithReason } from '@celo/protocol/lib/test-utils'
 import {
   RegistryContract,
   RegistryInstance,
@@ -43,7 +43,10 @@ contract('TransferWhitelist', (accounts: string[]) => {
     })
 
     it('should not allow a non-owner to add a token', async () => {
-      await assertRevert(transferWhitelist.whitelistAddress(anAddress, { from: nonOwner }))
+      await assertRevertWithReason(
+        transferWhitelist.whitelistAddress(anAddress, { from: nonOwner }),
+        'Ownable: caller is not the owner'
+      )
     })
   })
 
@@ -67,7 +70,10 @@ contract('TransferWhitelist', (accounts: string[]) => {
     })
 
     it('should not allow a non-owner to remove an address', async () => {
-      await assertRevert(transferWhitelist.removeAddress(anAddress, 0, { from: nonOwner }))
+      await assertRevertWithReason(
+        transferWhitelist.removeAddress(anAddress, 0, { from: nonOwner }),
+        'Ownable: caller is not the owner'
+      )
     })
   })
 
@@ -83,8 +89,9 @@ contract('TransferWhitelist', (accounts: string[]) => {
     })
 
     it('should not allow a non-owner to add a registry id', async () => {
-      await assertRevert(
-        transferWhitelist.whitelistRegisteredContract(anIdentifierHash, { from: nonOwner })
+      await assertRevertWithReason(
+        transferWhitelist.whitelistRegisteredContract(anIdentifierHash, { from: nonOwner }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -112,10 +119,11 @@ contract('TransferWhitelist', (accounts: string[]) => {
     })
 
     it('should not allow a non-owner to set the whitelist', async () => {
-      await assertRevert(
+      await assertRevertWithReason(
         transferWhitelist.setDirectlyWhitelistedAddresses([anAddress, anotherAddress], {
           from: nonOwner,
-        })
+        }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -136,13 +144,14 @@ contract('TransferWhitelist', (accounts: string[]) => {
     })
 
     it('should not allow a non-owner to set the list of registered contracts', async () => {
-      await assertRevert(
+      await assertRevertWithReason(
         transferWhitelist.setWhitelistedContractIdentifiers(
           [anIdentifierHash, anotherIdentifierHash],
           {
             from: nonOwner,
           }
-        )
+        ),
+        'Ownable: caller is not the owner'
       )
     })
   })

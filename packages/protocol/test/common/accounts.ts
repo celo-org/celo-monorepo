@@ -770,9 +770,9 @@ contract('Accounts', (accounts: string[]) => {
         accountsInstance.address
       )
       await accountsInstance.authorizeSignerWithSignature(signer, role, sig.v, sig.r, sig.s)
-      await assertRevert(
+      await assertRevertWithReason(
         accountsInstance.authorizeSignerWithSignature(signer, role, sigTwo.v, sigTwo.r, sigTwo.s),
-        'Cannot re-authorize address or locked gold account for another account'
+        'Invalid signature'
       )
     })
 

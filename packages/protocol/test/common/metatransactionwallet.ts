@@ -3,7 +3,12 @@ import {
   getDomainDigest,
   getSignatureForMetaTransaction,
 } from '@celo/protocol/lib/meta-tx-utils'
-import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
+import {
+  assertEqualBN,
+  assertLogMatches2,
+  assertRevert,
+  assertRevertWithReason,
+} from '@celo/protocol/lib/test-utils'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { MetaTransactionWalletContract, MetaTransactionWalletInstance } from 'types'
 
@@ -76,7 +81,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(wallet.initialize(signer))
+      await assertRevertWithReason(wallet.initialize(signer), 'contract already initialized')
     })
   })
 
@@ -130,7 +135,10 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
 
     describe('when called by the signer', () => {
       it('should revert', async () => {
-        await assertRevert(wallet.setSigner(newSigner, { from: signer }))
+        await assertRevertWithReason(
+          wallet.setSigner(newSigner, { from: signer }),
+          'Ownable: caller is not the owner'
+        )
       })
     })
   })
@@ -160,7 +168,10 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
 
     describe('when not called by the wallet contract', () => {
       it('should revert', async () => {
-        await assertRevert(wallet.setGuardian(guardian, { from: nonSigner }))
+        await assertRevertWithReason(
+          wallet.setGuardian(guardian, { from: nonSigner }),
+          'Ownable: caller is not the owner'
+        )
       })
     })
   })
@@ -194,13 +205,19 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
       })
 
       it('non guardian should not be able to recover wallet', async () => {
-        await assertRevert(wallet.recoverWallet(newSigner, { from: nonGuardian }))
+        await assertRevertWithReason(
+          wallet.recoverWallet(newSigner, { from: nonGuardian }),
+          'Caller is not the guardian'
+        )
       })
     })
 
     describe('when the guardian is not set', () => {
       it('should not be able to recover wallet', async () => {
-        await assertRevert(wallet.recoverWallet(newSigner, { from: guardian }))
+        await assertRevertWithReason(
+          wallet.recoverWallet(newSigner, { from: guardian }),
+          'Caller is not the guardian'
+        )
       })
     })
   })
@@ -245,8 +262,9 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
 
       describe('when the caller is not the signer', () => {
         it('should revert', async () => {
-          await assertRevert(
-            wallet.executeTransaction(destination, value, data, { from: nonSigner })
+          await assertRevertWithReason(
+            wallet.executeTransaction(destination, value, data, { from: nonSigner }),
+            'Invalid transaction sender'
           )
         })
       })
@@ -288,8 +306,9 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
 
         describe('when data is not empty', () => {
           it('should revert', async () => {
-            await assertRevert(
-              wallet.executeTransaction(destination, value, '0x1234', { from: signer })
+            await assertRevertWithReason(
+              wallet.executeTransaction(destination, value, '0x1234', { from: signer }),
+              'Invalid contract address'
             )
           })
         })
@@ -412,14 +431,15 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
 
         describe('when the data parameter has extra bytes appended', () => {
           it('reverts', async () => {
-            await assertRevert(
+            await assertRevertWithReason(
               wallet.executeTransactions(
                 transactions.map((t) => t.destination),
                 transactions.map((t) => t.value),
                 ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('deadbeef')),
                 transactions.map((t) => trimLeading0x(t.data).length / 2),
                 { from: signer }
-              )
+              ),
+              'data cannot have extra bytes appended'
             )
           })
         })
@@ -560,7 +580,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
         describe('when signed by a non-signer', () => {
           it('should revert', async () => {
             transferSigner = nonSigner
-            await assertRevert(doTransfer())
+            await assertRevertWithReason(doTransfer(), 'Invalid meta-transaction signer')
           })
         })
       })
@@ -574,7 +594,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
             transferSigner = signer
           })
           it('should revert', async () => {
-            await assertRevert(doTransfer())
+            await assertRevertWithReason(doTransfer(), 'Invalid meta-transaction signer')
           })
         })
       })
