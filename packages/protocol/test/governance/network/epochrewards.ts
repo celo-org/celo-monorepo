@@ -210,9 +210,9 @@ contract('EpochRewards', (accounts: string[]) => {
       describe('when the fraction is the same', () => {
         it('should revert', async () => {
           await assertRevertWithReason(
-            epochRewards.setTargetVotingGoldFraction(targetVotingGoldFraction)
-          ),
+            epochRewards.setTargetVotingGoldFraction(targetVotingGoldFraction),
             'Target voting gold fraction unchanged'
+          )
         })
       })
     })
@@ -255,9 +255,9 @@ contract('EpochRewards', (accounts: string[]) => {
       describe('when the fraction is the same', () => {
         it('should revert', async () => {
           await assertRevertWithReason(
-            epochRewards.setCommunityRewardFraction(communityRewardFraction)
-          ),
+            epochRewards.setCommunityRewardFraction(communityRewardFraction),
             'Value must be different from existing community reward fraction and less than 1'
+          )
         })
       })
     })
