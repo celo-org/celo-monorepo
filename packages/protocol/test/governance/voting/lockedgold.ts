@@ -307,6 +307,32 @@ contract('LockedGold', (accounts: string[]) => {
           })
         })
       })
+
+      describe('when the account is delegating', () => {
+        const delegatee = accounts[5]
+        const percentToDelagate = 50
+
+        beforeEach(async () => {
+          await accountsInstance.createAccount({ from: delegatee })
+          await lockedGold.delegateGovernanceVotes(delegatee, percentToDelagate)
+        })
+
+        it('should revert when trying to unlock also delegated amount', async () => {
+          await assertRevertWithReason(
+            lockedGold.unlock(value),
+            'Not enough undelegated celo. Celo has to be removed from delegation first.'
+          )
+        })
+
+        it('should correctly unlock when getting less or equal to locked amount', async () => {
+          const toUnlock = Math.ceil((value / 100) * percentToDelagate)
+          console.log('toUnlock', toUnlock)
+          await lockedGold.unlock(toUnlock)
+
+          const [val] = await lockedGold.getPendingWithdrawal(account, 0)
+          assertEqualBN(val, toUnlock)
+        })
+      })
     })
 
     describe('when there are balance requirements', () => {
@@ -826,13 +852,29 @@ contract('LockedGold', (accounts: string[]) => {
             )
           })
 
-          it('should revert when voting for proposal', async () => {
-            await mockGovernance.setTotalVotes(delegator, 1)
+          describe('When voting in referendum', () => {
+            beforeEach(async () => {
+              await mockGovernance.setTotalVotes(delegator, 1)
+            })
 
-            await assertRevertWithReason(
-              lockedGold.delegateGovernanceVotes(delegatee1, 99),
-              'It is not possible to delegate when voting for proposal'
-            )
+            it('should revert when voting for proposal with votes that are requested to be delegated', async () => {
+              await assertRevertWithReason(
+                lockedGold.delegateGovernanceVotes(delegatee1, 100),
+                'Voting in referendum with those votes'
+              )
+            })
+
+            it('should revert when voting for proposal with votes that are currently used in referendum (2 delegatees)', async () => {
+              await lockedGold.delegateGovernanceVotes(delegatee1, 99)
+              await assertRevertWithReason(
+                lockedGold.delegateGovernanceVotes(delegatee2, 1),
+                'Voting in referendum with those votes'
+              )
+            })
+
+            it('should delegate when voting for less than requested for delegation', async () => {
+              await lockedGold.delegateGovernanceVotes(delegatee1, 99)
+            })
           })
 
           describe('When delegating to delegatee1', () => {

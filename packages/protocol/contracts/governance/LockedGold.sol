@@ -221,11 +221,11 @@ contract LockedGold is
     );
 
     uint256 delegatedVotes = FixidityLib
-      .wrap(totalLockedGold)
+      .newFixed(totalLockedGold)
       .multiply(
       FixidityLib.newFixedFraction(getAccountTotalDelegatedAmountInPercents(msg.sender), 100)
     )
-      .unwrap();
+      .fromFixed();
 
     require(
       totalLockedGold - delegatedVotes >= value,
@@ -304,14 +304,7 @@ contract LockedGold is
       "percents can be only between 1%..100%"
     );
 
-    // TODO: check how does it work when voter signer is changed
     address delegatorAddress = getAccounts().voteSignerToAccount(msg.sender);
-
-    uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatorAddress);
-    // Unless we prohibit this there is rather large overhead
-    // how to calculate and round percentage of current referendum votes
-    require(totalReferendumVotes == 0, "It is not possible to delegate when voting for proposal");
-
     address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
 
     DelegatedCelo storage delegated = delegatorCelo[delegatorAddress];
@@ -323,17 +316,30 @@ contract LockedGold is
       "Use revokeDelegatedGovernanceVotes to decrease delegated amount."
     );
 
-    require(
-      delegated.totalDelegatedCeloInPercents -
-        currentDelegateeInfo.percentage +
-        percentageToDelegate <=
-        100,
-      "Cannot delegate more than 100%"
-    );
+    uint256 requestedToDelegate = delegated.totalDelegatedCeloInPercents -
+      currentDelegateeInfo.percentage +
+      percentageToDelegate;
+
+    require(requestedToDelegate <= 100, "Cannot delegate more than 100%");
 
     uint256 totalLockedGold = getAccountTotalLockedGold(delegatorAddress);
-
     require(totalLockedGold > 0, "No locked celo");
+
+    uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatorAddress);
+
+    if (totalReferendumVotes > 0) {
+      uint256 referendumVotesInPercents = FixidityLib
+        .newFixed(100)
+        .multiply(FixidityLib.newFixedFraction(totalReferendumVotes, totalLockedGold))
+        .fromFixed();
+      if (totalReferendumVotes % totalLockedGold != 0) {
+        referendumVotesInPercents++;
+      }
+      require(
+        referendumVotesInPercents + requestedToDelegate <= 100,
+        "Voting in referendum with those votes"
+      );
+    }
 
     // amount that will really be delegated - whatever is already
     // delegated to this particular delagatee is already subracted from this
@@ -360,6 +366,26 @@ contract LockedGold is
       percentageToDelegate,
       currentDelegateeInfo.currentAmount
     );
+  }
+
+  function uintToStr(uint256 _i) internal pure returns (string memory _uintAsString) {
+    uint256 number = _i;
+    if (number == 0) {
+      return "0";
+    }
+    uint256 j = number;
+    uint256 len;
+    while (j != 0) {
+      len++;
+      j /= 10;
+    }
+    bytes memory bstr = new bytes(len);
+    uint256 k = len - 1;
+    while (number != 0) {
+      bstr[k--] = bytes1(uint8(48 + (number % 10)));
+      number /= 10;
+    }
+    return string(bstr);
   }
 
   function revokeDelegatedGovernanceVotes(address delegatee, uint256 percentageToRevoke) public {
