@@ -3576,7 +3576,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.only('#dequeueProposalIfReady()', () => {
+  describe('#dequeueProposalIfReady()', () => {
     it('should not update lastDequeue proposal does not exist in the queue', async () => {
       const nonExistentProposalId = 7
       const originalLastDequeue = await governance.lastDequeue()
