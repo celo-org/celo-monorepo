@@ -803,14 +803,14 @@ contract('LockedGold', (accounts: string[]) => {
     it('should revert when delegatee is not account', async () => {
       await assertRevertWithReason(
         lockedGold.delegateGovernanceVotes(zeroAddress(), 10),
-        'not an account'
+        'Must first register address with Account.createAccount'
       )
     })
 
     it('should revert when delegator is not an account', async () => {
       await assertRevertWithReason(
         lockedGold.delegateGovernanceVotes(zeroAddress(), 10, { from: accounts[1] }),
-        'not an account'
+        'Must first register address with Account.createAccount'
       )
     })
 

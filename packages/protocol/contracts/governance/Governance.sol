@@ -225,7 +225,7 @@ contract Governance is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 3, 1, 0);
+    return (1, 4, 0, 0);
   }
 
   /**
@@ -545,7 +545,7 @@ contract Governance is
     address account = getAccounts().voteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
     removeIfQueuedAndExpired(voter.upvote.proposalId);
-    uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
+    uint256 weight = getLockedGold().getAccountTotalGovernanceVotingPower(account);
     require(weight > 0, "cannot upvote without locking gold");
     require(
       voter.upvote.proposalId == 0 || !queue.contains(voter.upvote.proposalId),
