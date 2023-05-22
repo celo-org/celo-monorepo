@@ -146,7 +146,7 @@ contract('Governance', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await accountsInstance.initialize(registry.address)
     await accountsInstance.createAccount()
-    await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+    await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
     await mockLockedGold.setTotalLockedGold(yesVotes)
     transactionSuccess1 = {
       value: 0,
@@ -988,7 +988,7 @@ contract('Governance', (accounts: string[]) => {
   describe('#upvote()', () => {
     const proposalId = new BigNumber(1)
     beforeEach(async () => {
-      await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+      await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
@@ -1076,7 +1076,7 @@ contract('Governance', (accounts: string[]) => {
         )
         const otherAccount1 = accounts[1]
         await accountsInstance.createAccount({ from: otherAccount1 })
-        await mockLockedGold.setAccountTotalLockedGold(otherAccount1, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(otherAccount1, yesVotes)
         await governance.upvote(otherProposalId, proposalId, 0, { from: otherAccount1 })
         await timeTravel(queueExpiry, web3)
       })
@@ -1211,7 +1211,7 @@ contract('Governance', (accounts: string[]) => {
   describe('#revokeUpvote()', () => {
     const proposalId = new BigNumber(1)
     beforeEach(async () => {
-      await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+      await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
@@ -1582,7 +1582,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.approve(1, 0)
       await governance.approve(2, 1)
       await governance.approve(3, 2)
-      await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+      await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
     })
 
     for (let numVoted = 0; numVoted < 3; numVoted++) {
@@ -1701,7 +1701,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       })
 
       it('should return true', async () => {
@@ -1759,7 +1759,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should revert when the account weight is 0', async () => {
-        await mockLockedGold.setAccountTotalLockedGold(account, 0)
+        await mockLockedGold.setAccountTotalGovernancePower(account, 0)
         await assertRevert(governance.vote(proposalId, index, value))
       })
 
@@ -1815,7 +1815,7 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(newDequeueFrequency, web3)
           await governance.approve(proposalId2, index2)
-          await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+          await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
         })
 
         it('should set mostRecentReferendumProposal to the youngest proposal voted on', async () => {
@@ -1984,7 +1984,7 @@ contract('Governance', (accounts: string[]) => {
           { value: minDeposit }
         )
         await timeTravel(dequeueFrequency, web3)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       })
 
       it('should return true', async () => {
@@ -2040,7 +2040,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should revert when the account weight is 0', async () => {
-        await mockLockedGold.setAccountTotalLockedGold(account, 0)
+        await mockLockedGold.setAccountTotalGovernancePower(account, 0)
         await assertRevert(governance.vote(proposalId, index, value))
       })
 
@@ -2081,7 +2081,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
         await governance.vote(proposalId, index, value)
         await timeTravel(referendumStageDuration, web3)
         await timeTravel(executionStageDuration, web3)
@@ -2115,7 +2115,7 @@ contract('Governance', (accounts: string[]) => {
 
         const otherAccount1 = accounts[1]
         await accountsInstance.createAccount({ from: otherAccount1 })
-        await mockLockedGold.setAccountTotalLockedGold(otherAccount1, otherAccountWeight)
+        await mockLockedGold.setAccountTotalGovernancePower(otherAccount1, otherAccountWeight)
         await governance.vote(proposalId2, index, value, { from: otherAccount1 })
 
         await governance.vote(proposalId2, index, VoteValue.No)
@@ -2149,7 +2149,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       })
 
       it('should return true', async () => {
@@ -2212,7 +2212,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should revert when the account weight is 0', async () => {
-        await mockLockedGold.setAccountTotalLockedGold(account, 0)
+        await mockLockedGold.setAccountTotalGovernancePower(account, 0)
         await assertRevert(governance.votePartially(proposalId, index, yesVotes, 0, 0))
       })
 
@@ -2277,7 +2277,7 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(newDequeueFrequency, web3)
           await governance.approve(proposalId2, index2)
-          await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+          await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
         })
 
         it('should set mostRecentReferendumProposal to the youngest proposal voted on', async () => {
@@ -2504,7 +2504,7 @@ contract('Governance', (accounts: string[]) => {
           { value: minDeposit }
         )
         await timeTravel(dequeueFrequency, web3)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       })
 
       it('should return true', async () => {
@@ -2560,7 +2560,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should revert when the account weight is 0', async () => {
-        await mockLockedGold.setAccountTotalLockedGold(account, 0)
+        await mockLockedGold.setAccountTotalGovernancePower(account, 0)
         await assertRevert(governance.votePartially(proposalId, index, yesVotes, 0, 0))
       })
 
@@ -2601,7 +2601,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
         await governance.votePartially(proposalId, index, yesVotes, 0, 0)
         await timeTravel(referendumStageDuration, web3)
         await timeTravel(executionStageDuration, web3)
@@ -2635,7 +2635,7 @@ contract('Governance', (accounts: string[]) => {
 
         const otherAccount1 = accounts[1]
         await accountsInstance.createAccount({ from: otherAccount1 })
-        await mockLockedGold.setAccountTotalLockedGold(otherAccount1, otherAccountWeight)
+        await mockLockedGold.setAccountTotalGovernancePower(otherAccount1, otherAccountWeight)
         await governance.votePartially(proposalId2, index, otherAccountWeight, 0, 0, {
           from: otherAccount1,
         })
@@ -2673,7 +2673,7 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
-          await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+          await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -2741,7 +2741,7 @@ contract('Governance', (accounts: string[]) => {
             { value: minDeposit }
           )
           await timeTravel(dequeueFrequency, web3)
-          await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+          await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration + 1, web3)
           await governance.approve(proposalId, index)
@@ -2810,7 +2810,7 @@ contract('Governance', (accounts: string[]) => {
             { value: minDeposit }
           )
           await timeTravel(dequeueFrequency, web3)
-          await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+          await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -2834,7 +2834,7 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
-          await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+          await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -2858,7 +2858,7 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
-          await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+          await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -2884,7 +2884,7 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
-          await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+          await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -2951,7 +2951,7 @@ contract('Governance', (accounts: string[]) => {
             )
             await timeTravel(dequeueFrequency, web3)
             await governance.approve(proposalId, index)
-            await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+            await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
           })
@@ -2975,7 +2975,7 @@ contract('Governance', (accounts: string[]) => {
             )
             await timeTravel(dequeueFrequency, web3)
             await governance.approve(proposalId, index)
-            await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+            await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
           })
@@ -3001,7 +3001,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
         await governance.vote(proposalId, index, value)
         await timeTravel(referendumStageDuration, web3)
         await timeTravel(executionStageDuration, web3)
@@ -3064,7 +3064,7 @@ contract('Governance', (accounts: string[]) => {
           { value: minDeposit }
         )
         await timeTravel(dequeueFrequency, web3)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       })
 
       it('should not emit ProposalExecuted when not approved', async () => {
@@ -3413,7 +3413,7 @@ contract('Governance', (accounts: string[]) => {
     describe('when the account has upvoted a proposal', () => {
       const proposalId = 1
       beforeEach(async () => {
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -3469,7 +3469,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
         await governance.vote(proposalId, index, value)
       })
 
@@ -3510,8 +3510,8 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when the adjusted support is greater than threshold', () => {
       beforeEach(async () => {
-        await mockLockedGold.setAccountTotalLockedGold(account, (yesVotes * 51) / 100)
-        await mockLockedGold.setAccountTotalLockedGold(otherAccount, (yesVotes * 49) / 100)
+        await mockLockedGold.setAccountTotalGovernancePower(account, (yesVotes * 51) / 100)
+        await mockLockedGold.setAccountTotalGovernancePower(otherAccount, (yesVotes * 49) / 100)
         await governance.vote(proposalId, index, VoteValue.Yes)
         await governance.vote(proposalId, index, VoteValue.No, { from: otherAccount })
       })
@@ -3524,8 +3524,8 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when the adjusted support is less than or equal to threshold', () => {
       beforeEach(async () => {
-        await mockLockedGold.setAccountTotalLockedGold(account, (yesVotes * 50) / 100)
-        await mockLockedGold.setAccountTotalLockedGold(otherAccount, (yesVotes * 50) / 100)
+        await mockLockedGold.setAccountTotalGovernancePower(account, (yesVotes * 50) / 100)
+        await mockLockedGold.setAccountTotalGovernancePower(otherAccount, (yesVotes * 50) / 100)
         await governance.vote(proposalId, index, VoteValue.Yes)
         await governance.vote(proposalId, index, VoteValue.No, { from: otherAccount })
       })
@@ -3785,7 +3785,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.approve(1, 0)
         await governance.approve(2, 1)
         await governance.approve(3, 2)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       })
       for (let numVoted = 0; numVoted < 3; numVoted++) {
         describe(`when account has partially voted on ${numVoted} proposals`, () => {
@@ -3822,7 +3822,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(1, 0)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       })
 
       describe(`when account has partially voted on proposal`, () => {
@@ -3865,7 +3865,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
         await governance.upvote(proposalId1, 0, 0)
       })
 

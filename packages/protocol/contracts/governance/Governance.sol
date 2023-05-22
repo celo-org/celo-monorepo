@@ -543,7 +543,7 @@ contract Governance is
     removeIfQueuedAndExpired(voter.upvote.proposalId);
 
     // We can upvote a proposal in the queue if we're not already upvoting a proposal in the queue.
-    uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
+    uint256 weight = getLockedGold().getAccountTotalGovernanceVotingPower(account);
     require(weight > 0, "cannot upvote without locking gold");
     require(queue.contains(proposalId), "cannot upvote a proposal not in the queue");
     require(
