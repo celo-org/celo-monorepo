@@ -1449,7 +1449,7 @@ contract('LockedGold', (accounts: string[]) => {
     })
   })
 
-  describe('#getDelegatorDelegateeExpectedAndActualAmount()', () => {
+  describe('#getDelegatorDelegateeExpectedAndRealAmount()', () => {
     const delegatee = accounts[5]
     const delegator = accounts[6]
 
@@ -1459,7 +1459,7 @@ contract('LockedGold', (accounts: string[]) => {
     })
 
     it('should return 0 when nothing delegated', async () => {
-      const [expected, actual] = await lockedGold.getDelegatorDelegateeExpectedAndActualAmount(
+      const [expected, actual] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
         delegator,
         delegatee
       )
@@ -1478,7 +1478,7 @@ contract('LockedGold', (accounts: string[]) => {
       })
 
       it('should return equal amounts', async () => {
-        const [expected, actual] = await lockedGold.getDelegatorDelegateeExpectedAndActualAmount(
+        const [expected, actual] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
           delegator,
           delegatee
         )
@@ -1493,7 +1493,7 @@ contract('LockedGold', (accounts: string[]) => {
         })
 
         it('should return unequal amounts', async () => {
-          const [expected, actual] = await lockedGold.getDelegatorDelegateeExpectedAndActualAmount(
+          const [expected, actual] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
             delegator,
             delegatee
           )

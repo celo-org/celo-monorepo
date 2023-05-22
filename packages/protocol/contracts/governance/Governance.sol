@@ -1489,18 +1489,25 @@ contract Governance is
   }
 
   /**
-   * @notice Returns max number of votes cast by an account.
+   * @notice When delegator removes votes from delegatee during the time when delegator is voting
+   * for governance proposal, this method will remove votes from voted proposal proportionally.
    * @param account The address of the account.
-   * @return The total number of votes cast by an account.
+   * @param newVotingPower The adjusted voting power of delegatee.
    */
-  function removeVotesWhenRevokingDelegatedVotes(address account, uint256 maxAmountAllowed)
+  function removeVotesWhenRevokingDelegatedVotes(address account, uint256 newVotingPower)
     public
     onlyLockedGold
   {
-    _removeVotesWhenRevokingDelegatedVotes(account, maxAmountAllowed);
+    _removeVotesWhenRevokingDelegatedVotes(account, newVotingPower);
   }
 
-  function _removeVotesWhenRevokingDelegatedVotes(address account, uint256 maxAmountAllowed)
+  /**
+   * @notice When delegator removes votes from delegatee during the time when delegator is voting
+   * for governance proposal, this method will remove votes from voted proposal proportionally.
+   * @param account The address of the account.
+   * @param newVotingPower The adjusted voting power of delegatee.
+   */
+  function _removeVotesWhenRevokingDelegatedVotes(address account, uint256 newVotingPower)
     internal
   {
     Voter storage voter = voters[account];
@@ -1516,8 +1523,8 @@ contract Governance is
       VoteRecord storage voteRecord = voter.referendumVotes[index];
       uint256 sumOfVotes = voteRecord.yesVotes.add(voteRecord.noVotes).add(voteRecord.abstainVotes);
 
-      if (sumOfVotes > maxAmountAllowed) {
-        uint256 toRemove = sumOfVotes - maxAmountAllowed;
+      if (sumOfVotes > newVotingPower) {
+        uint256 toRemove = sumOfVotes - newVotingPower;
 
         uint256 abstrainToRemove = getVotesPortion(toRemove, voteRecord.abstainVotes, sumOfVotes);
         uint256 yesToRemove = getVotesPortion(toRemove, voteRecord.yesVotes, sumOfVotes);
@@ -1530,6 +1537,12 @@ contract Governance is
     }
   }
 
+  /**
+   * Returns amount of votes that should be removed from delegatee's proposal voting.
+   * @param totalToRemove Total votes to be removed.
+   * @param votes Yes/no/abstrain votes
+   * @param sumOfAllVotes Sum of yes, no, and abstain votes.
+   */
   function getVotesPortion(uint256 totalToRemove, uint256 votes, uint256 sumOfAllVotes)
     private
     pure
