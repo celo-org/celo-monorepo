@@ -6,7 +6,7 @@
 
 - update cli version in cli/package.json to next version with a pre-release (eg -beta.x) suffix
 
-- run `yarn generate:shrinkwrap`
+- run `yarn generate:shrinkwrap` (if you got some nonsense about @celo/phone-number-privacy-signer not being found try removing from peer deps of combiner running yarn again and retrying)
 
 - commit the the package.json and shrinkwrap
 

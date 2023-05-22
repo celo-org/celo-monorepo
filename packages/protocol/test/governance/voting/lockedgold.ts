@@ -771,7 +771,7 @@ contract('LockedGold', (accounts: string[]) => {
           [0],
           { from: accounts[2] }
         ),
-        'Not an account'
+        'Must first register address with Account.createAccount'
       )
     })
 

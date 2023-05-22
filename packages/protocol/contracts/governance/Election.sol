@@ -120,8 +120,8 @@ contract Election is
 
   event ElectableValidatorsSet(uint256 min, uint256 max);
   event MaxNumGroupsVotedForSet(uint256 maxNumGroupsVotedFor);
-  event AllowedToVoteOverMaxNumberOfGroups(address account, bool flag);
   event ElectabilityThresholdSet(uint256 electabilityThreshold);
+  event AllowedToVoteOverMaxNumberOfGroups(address indexed account, bool flag);
   event ValidatorGroupMarkedEligible(address indexed group);
   event ValidatorGroupMarkedIneligible(address indexed group);
   event ValidatorGroupVoteCast(address indexed account, address indexed group, uint256 value);
@@ -491,7 +491,6 @@ contract Election is
    * @return The total number of votes cast by an account.
    */
   function getTotalVotesByAccount(address account) external view returns (uint256) {
-    bool allowedToVoteOverMaxNumberOfGroupsForAccount = allowedToVoteOverMaxNumberOfGroups[account];
     address[] memory groups = votes.groupsVotedFor[account];
 
     if (groups.length > maxNumGroupsVotedFor) {

@@ -89,7 +89,7 @@ contract GoldToken is
     external
     returns (bool)
   {
-    bool succeeded = _transfer(to, value);
+    bool succeeded = _transferWithCheck(to, value);
     emit TransferComment(comment);
     return succeeded;
   }
@@ -159,7 +159,7 @@ contract GoldToken is
     require(value <= balanceOf(from), "transfer value exceeded balance of sender");
     require(
       value <= allowed[from][msg.sender],
-      "transfer value exceeded sender's allowance for recipient"
+      "transfer value exceeded sender's allowance for spender"
     );
 
     bool success;
@@ -216,7 +216,7 @@ contract GoldToken is
   /**
    * @return The total amount of CELO in existence, including what the burn address holds.
    */
-  function totalSupply() public view returns (uint256) {
+  function totalSupply() external view returns (uint256) {
     return totalSupply_;
   }
 
@@ -224,7 +224,7 @@ contract GoldToken is
    * @return The total amount of CELO in existence, not including what the burn address holds.
    */
   function circulatingSupply() external view returns (uint256) {
-    return totalSupply().sub(getBurnedAmount());
+    return totalSupply_.sub(getBurnedAmount()).sub(balanceOf(address(0)));
   }
 
   /**
