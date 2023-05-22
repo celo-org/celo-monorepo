@@ -152,10 +152,10 @@ export function checkFunctionArgsLength(args: any[], abi: any) {
 
 export async function setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
->(web3: Web3, artifacts: any, contractName: string, contractPath?: ContractPackage, ...args: any[]): Promise<ContractInstance> {
+>(web3: Web3, artifacts: any, contractName: string, contractPackage?: ContractPackage, ...args: any[]): Promise<ContractInstance> {
   
-  const Contract = ArtifactsSingleton.getInstance(contractPath, artifacts).require(contractName)
-  const ContractProxy = ArtifactsSingleton.getInstance(contractPath, artifacts).require(contractName + 'Proxy')
+  const Contract = ArtifactsSingleton.getInstance(contractPackage, artifacts).require(contractName)
+  const ContractProxy = ArtifactsSingleton.getInstance(contractPackage, artifacts).require(contractName + 'Proxy')
 
   await Contract.detectNetwork()
   await ContractProxy.detectNetwork()
@@ -258,7 +258,7 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
 }
 
 
-export const makeTruffleContractForMigration = (contractName: string, contractPath:ContractPackage, web3: Web3) => { // TODO change to makeTruffleContract migrations
+export const makeTruffleContractForMigration = (contractName: string, contractPath:ContractPackage, web3: Web3) => {
   const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath.name}/${contractName}.json`)
   const Contract = truffleContract({
     abi: artifact.abi,
