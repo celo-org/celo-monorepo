@@ -75,10 +75,6 @@ const OtherContracts = [
   // abstract
   'Initializable',
   'UsingRegistry',
-
-  // only used for testing
-  'MockUniswapV2Router02',
-  'MockUniswapV2Factory',
 ]
 
 const externalContractPackages = [MENTO_PACKAGE]

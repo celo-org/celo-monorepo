@@ -3,7 +3,6 @@ import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
 import { handler as contractsHandler } from '../initial/contracts'
-import { handler as blockscoutHandler } from './blockscout'
 import { handler as celostatsHandler } from './celostats'
 import { handler as testnetHandler } from './testnet'
 
@@ -54,8 +53,6 @@ export const handler = async (argv: AllArgv) => {
   await testnetHandler(argv)
   console.info('Deploy celostats')
   await celostatsHandler(argv)
-  console.info('Deploy blockscout')
-  await blockscoutHandler(argv)
 
   if (argv.reset === true) {
     console.info('Sleeping for 5 minutes to let pods come up')

@@ -22,4 +22,12 @@ contract GovernanceTest is Governance(true) {
   function addValidator(address validator) external {
     validatorSet.push(validator);
   }
+
+  function setDeprecatedWeight(address voterAddress, uint256 proposalIndex, uint256 weight)
+    external
+  {
+    Voter storage voter = voters[voterAddress];
+    VoteRecord storage voteRecord = voter.referendumVotes[proposalIndex];
+    voteRecord.deprecated_weight = weight;
+  }
 }
