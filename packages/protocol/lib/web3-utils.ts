@@ -9,6 +9,7 @@ import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { BigNumber } from 'bignumber.js'
 import { networks } from '../truffle-config.js'
 
+import { createInterfaceAdapter } from '@truffle/interface-adapter'
 import path from 'path'
 import prompts from 'prompts'
 import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types'
@@ -16,7 +17,6 @@ import { StableTokenInstance } from 'types/mento'
 import Web3 from 'web3'
 import { ContractPackage } from '../contractPackages'
 import { ArtifactsSingleton } from '../migrations/artifactsSingleton'
-
 
 const truffleContract = require('@truffle/contract');
 
@@ -264,8 +264,6 @@ export const makeTruffleContractForMigration = (contractName: string, contractPa
     abi: artifact.abi,
     unlinked_binary: artifact.bytecode,
   })
-  
-  const {createInterfaceAdapter} = require("@truffle/interface-adapter")
   
   Contract.setProvider(web3.currentProvider)
   Contract.setNetwork(networks.development.network_id)
