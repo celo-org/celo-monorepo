@@ -51,7 +51,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       const constitutionContractNames = Object.keys(constitution).filter(
         (contractName) => contractName !== 'proxy'
       )
-      let contract: any
+
       for (const contractName of constitutionContractNames) {
         console.log(`\tSetting constitution thresholds for ${contractName}`)
 
@@ -60,7 +60,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           artifacts
         )
 
-        contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
+        const contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
           contractName,
           artifactsObject
         )

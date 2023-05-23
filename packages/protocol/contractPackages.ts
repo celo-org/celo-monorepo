@@ -1,8 +1,8 @@
 export interface ContractPackage {
-  path: string
-  name: string
+  path?: string
+  name?: string
   contracts: string[]
-  proxyContracts: string[]
+  proxyContracts?: string[]
 }
 
 export const MENTO_PACKAGE: ContractPackage = {

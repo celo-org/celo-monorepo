@@ -209,7 +209,19 @@ export async function waitForPortOpen(host: string, port: number, seconds: numbe
   return false
 }
 
-export const assertProxiesSet = async (getContract: any) => {
+type ProxiedContractGetter = (
+  contractName: string,
+  type: string,
+  contractPackage: ContractPackage, 
+  ) => Promise<any>
+
+type ContratGetter = (
+  contractName: string,
+  contractPackage?: ContractPackage, 
+  ) => Promise<any>
+
+
+export const assertProxiesSet = async (getContract: ProxiedContractGetter) => {
   for (const contractList of proxiedContracts) {
     for (const contractName of contractList.contracts) {
       const contract = await getContract(contractName, 'contract', contractList.__contractPackage)
@@ -224,7 +236,7 @@ export const assertProxiesSet = async (getContract: any) => {
   }
 }
 
-export const assertContractsRegistered = async (getContract: any) => {
+export const assertContractsRegistered = async (getContract: ContratGetter) => {
   const registry: RegistryInstance = await getContract('Registry')
   for (const proxyPackage of hasEntryInRegistry) {
     for (const contractName of proxyPackage.contracts) {
@@ -238,7 +250,7 @@ export const assertContractsRegistered = async (getContract: any) => {
   }
 }
 
-export const assertRegistryAddressesSet = async (getContract: any) => {
+export const assertRegistryAddressesSet = async (getContract: ContratGetter) => {
   const registry: RegistryInstance = await getContract('Registry')
   for (const contractName of usesRegistry) {
     const contract: UsingRegistryInstance = await getContract(contractName, MENTO_PACKAGE)
@@ -450,7 +462,7 @@ const proxiedContracts = [{
       'Reserve',
       'StableToken',
     ],
-    __contractPackage: 'mento'
+    __contractPackage: MENTO_PACKAGE
  }
 ]
 
@@ -468,7 +480,7 @@ const ownedContracts = [{
     'Exchange',
     'StableToken'
   ],
-  __contractPackage: 'mento'
+  __contractPackage: MENTO_PACKAGE
  }
 ]
 

@@ -70,7 +70,8 @@ export const hasEntryInRegistry= [
       CeloContractName.SortedOracles,
     ]
   },
-  {...MENTO_PACKAGE,
+  {
+    ...MENTO_PACKAGE,
     // not all Mentro contracts are supposed to be in the Registry
     contracts:[
       CeloContractName.Exchange,
