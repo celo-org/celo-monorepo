@@ -230,7 +230,10 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(federatedAttestations.initialize())
+      await assertRevertWithReason(
+        federatedAttestations.initialize(),
+        'contract already initialized'
+      )
     })
   })
 
@@ -668,7 +671,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         chainId,
         federatedAttestations.address
       )
-      await assertRevert(
+      await assertRevertWithReason(
         federatedAttestations.registerAttestation(
           identifier1,
           issuer1,
@@ -678,13 +681,14 @@ contract('FederatedAttestations', (accounts: string[]) => {
           sig2.v,
           sig2.r,
           sig2.s
-        )
+        ),
+        'Signature is invalid'
       )
     })
 
     it('should revert if signer has been deregistered', async () => {
       await accountsInstance.removeSigner(signer1, signerRole, { from: issuer1 })
-      await assertRevert(
+      await assertRevertWithReason(
         federatedAttestations.registerAttestation(
           identifier1,
           issuer1,
@@ -694,7 +698,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
           sig.v,
           sig.r,
           sig.s
-        )
+        ),
+        'not active authorized signer for role'
       )
     })
 
@@ -764,7 +769,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           1,
           federatedAttestations.address
         )
-        await assertRevert(
+        await assertRevertWithReason(
           federatedAttestations.registerAttestation(
             identifier1,
             issuer1,
@@ -775,7 +780,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
             sig2.r,
             sig2.s,
             { from: issuer1 }
-          )
+          ),
+          'Signature is invalid'
         )
       })
 
@@ -930,10 +936,11 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
     it('should revert when signer has been deregistered', async () => {
       await accountsInstance.removeSigner(signer1, signerRole, { from: issuer1 })
-      await assertRevert(
+      await assertRevertWithReason(
         federatedAttestations.revokeAttestation(identifier1, issuer1, account1, {
           from: signer1,
-        })
+        }),
+        'not active authorized signer for role'
       )
     })
 
@@ -1026,10 +1033,11 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
 
     it('should revert if an invalid user attempts to revoke the attestation', async () => {
-      await assertRevert(
+      await assertRevertWithReason(
         federatedAttestations.revokeAttestation(identifier1, issuer1, account1, {
           from: accounts[5],
-        })
+        }),
+        'not an account'
       )
     })
 
@@ -1037,7 +1045,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       await federatedAttestations.revokeAttestation(identifier1, issuer1, account1, {
         from: issuer1,
       })
-      await assertRevert(
+      await assertRevertWithReason(
         federatedAttestations.registerAttestation(
           identifier1,
           issuer1,
@@ -1048,7 +1056,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
           sig.r,
           sig.s,
           { from: issuer1 }
-        )
+        ),
+        'Attestation has been revoked'
       )
     })
   })
@@ -1176,23 +1185,25 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
     it('should revert if deregistered signer of issuer batch revokes attestations', async () => {
       await accountsInstance.removeSigner(signer1, signerRole, { from: issuer1 })
-      await assertRevert(
+      await assertRevertWithReason(
         federatedAttestations.batchRevokeAttestations(
           issuer1,
           [identifier2, identifier1],
           [account2, account1],
           { from: signer1 }
-        )
+        ),
+        'not active authorized signer for role'
       )
     })
     it('should revert if identifiers.length != accounts.length', async () => {
-      await assertRevert(
+      await assertRevertWithReason(
         federatedAttestations.batchRevokeAttestations(
           issuer1,
           [identifier2],
           [account2, account1],
           { from: signer1 }
-        )
+        ),
+        'Unequal number of identifiers and accounts'
       )
     })
     it('should revert if one of the (identifier, account) pairs is invalid', async () => {

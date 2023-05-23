@@ -169,6 +169,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
 
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
+      // TODO (soloseng): why does this revert without reason
       await assertRevert(identityProxyHub.makeCall(identifier, identityProxyTest.address, txData))
     })
 
@@ -186,6 +187,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
 
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
+      // TODO (soloseng): why does this revert without reason
       await assertRevert(identityProxyHub.makeCall(identifier, identityProxyTest.address, txData))
     })
 
@@ -201,6 +203,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
 
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
+      // TODO (soloseng): why does this revert without reason
       await assertRevert(identityProxyHub.makeCall(identifier, identityProxyTest.address, txData))
     })
   })

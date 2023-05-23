@@ -5,7 +5,6 @@ import {
   assertEqualBN,
   assertLogMatches2,
   assertObjectWithBNEqual,
-  assertRevert,
   assertRevertWithReason,
   assumeOwnership,
   timeTravel,
@@ -121,7 +120,7 @@ contract('Escrow', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(escrow.initialize())
+      await assertRevertWithReason(escrow.initialize(), 'contract already initialized')
     })
   })
 
@@ -133,7 +132,10 @@ contract('Escrow', (accounts: string[]) => {
     })
 
     it('reverts if non-owner attempts to add trustedIssuer', async () => {
-      await assertRevert(escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: trustedIssuer1 }))
+      await assertRevertWithReason(
+        escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: trustedIssuer1 }),
+        'Ownable: caller is not the owner'
+      )
     })
 
     it('should emit the DefaultTrustedIssuerAdded event', async () => {
@@ -207,8 +209,9 @@ contract('Escrow', (accounts: string[]) => {
     })
 
     it('reverts if non-owner attempts to remove trustedIssuer', async () => {
-      await assertRevert(
-        escrow.removeDefaultTrustedIssuer(trustedIssuer1, 0, { from: trustedIssuer1 })
+      await assertRevertWithReason(
+        escrow.removeDefaultTrustedIssuer(trustedIssuer1, 0, { from: trustedIssuer1 }),
+        'Ownable: caller is not the owner'
       )
     })
 
@@ -548,7 +551,7 @@ contract('Escrow', (accounts: string[]) => {
       })
 
       it('should not allow a transfer if token is 0', async () => {
-        await assertRevert(
+        await assertRevertWithReason(
           escrow.transferWithTrustedIssuers(
             aPhoneHash,
             NULL_ADDRESS,
@@ -560,12 +563,13 @@ contract('Escrow', (accounts: string[]) => {
             {
               from: sender,
             }
-          )
+          ),
+          'Invalid transfer inputs.'
         )
       })
 
       it('should not allow a transfer if value is 0', async () => {
-        await assertRevert(
+        await assertRevertWithReason(
           escrow.transferWithTrustedIssuers(
             aPhoneHash,
             mockERC20Token.address,
@@ -577,12 +581,13 @@ contract('Escrow', (accounts: string[]) => {
             {
               from: sender,
             }
-          )
+          ),
+          'Invalid transfer inputs.'
         )
       })
 
       it('should not allow a transfer if expirySeconds is 0', async () => {
-        await assertRevert(
+        await assertRevertWithReason(
           escrow.transferWithTrustedIssuers(
             aPhoneHash,
             mockERC20Token.address,
@@ -594,7 +599,8 @@ contract('Escrow', (accounts: string[]) => {
             {
               from: sender,
             }
-          )
+          ),
+          'Invalid transfer inputs.'
         )
       })
 
@@ -653,7 +659,7 @@ contract('Escrow', (accounts: string[]) => {
       })
 
       it('should revert if transfer value exceeds balance', async () => {
-        await assertRevert(
+        await assertRevertWithReason(
           escrow.transferWithTrustedIssuers(
             aPhoneHash,
             mockERC20Token.address,
@@ -665,7 +671,8 @@ contract('Escrow', (accounts: string[]) => {
             {
               from: sender,
             }
-          )
+          ),
+          'SafeERC20: low-level call failed'
         )
       })
 
@@ -1233,16 +1240,20 @@ contract('Escrow', (accounts: string[]) => {
             await escrow.withdraw(uniquePaymentIDRevoke, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
               from: receiver,
             })
-            await assertRevert(escrow.revoke(uniquePaymentIDRevoke, { from: sender }))
+            await assertRevertWithReason(
+              escrow.revoke(uniquePaymentIDRevoke, { from: sender }),
+              'Only sender of payment can attempt to revoke payment.'
+            )
           })
 
           it('should not allow receiver to redeem payment after sender revokes it', async () => {
             await timeTravel(oneDayInSecs, web3)
             await escrow.revoke(uniquePaymentIDRevoke, { from: sender })
-            await assertRevert(
+            await assertRevertWithReason(
               escrow.withdraw(uniquePaymentIDRevoke, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
                 from: receiver,
-              })
+              }),
+              'Invalid withdraw value.'
             )
           })
 

@@ -6,6 +6,7 @@ import {
   assertEqualBN,
   assertLogMatches2,
   assertRevert,
+  assertRevertWithReason,
   getDerivedKey,
   KeyOffsets,
   unlockAndAuthorizeKey,
@@ -151,7 +152,7 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(
+      await assertRevertWithReason(
         attestations.initialize(
           registry.address,
           attestationExpiryBlocks,
@@ -159,7 +160,8 @@ contract('Attestations', (accounts: string[]) => {
           maxAttestations,
           [mockERC20Token.address],
           [attestationFee]
-        )
+        ),
+        'contract already initialized'
       )
     })
   })
@@ -184,10 +186,11 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert when set by a non-owner', async () => {
-      await assertRevert(
+      await assertRevertWithReason(
         attestations.setAttestationExpiryBlocks(newMaxNumBlocksPerAttestation, {
           from: accounts[1],
-        })
+        }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -202,14 +205,18 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert when the fee is being set to 0', async () => {
-      await assertRevert(attestations.setAttestationRequestFee(mockERC20Token.address, 0))
+      await assertRevertWithReason(
+        attestations.setAttestationRequestFee(mockERC20Token.address, 0),
+        'You have to specify a fee greater than 0'
+      )
     })
 
     it('should not be settable by a non-owner', async () => {
-      await assertRevert(
+      await assertRevertWithReason(
         attestations.setAttestationRequestFee(mockERC20Token.address, newAttestationFee, {
           from: accounts[1],
-        })
+        }),
+        'Ownable: caller is not the owner'
       )
     })
 
@@ -250,10 +257,11 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert when set by a non-owner', async () => {
-      await assertRevert(
+      await assertRevertWithReason(
         attestations.setSelectIssuersWaitBlocks(newSelectIssuersWaitBlocks, {
           from: accounts[1],
-        })
+        }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -277,10 +285,11 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert when set by a non-owner', async () => {
-      await assertRevert(
+      await assertRevertWithReason(
         attestations.setMaxAttestations(newMaxAttestations, {
           from: accounts[1],
-        })
+        }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -346,7 +355,10 @@ contract('Attestations', (accounts: string[]) => {
         accounts
       )
       const signer = await accountsInstance.getVoteSigner(issuer)
-      await assertRevert(attestations.withdraw(mockERC20Token.address, { from: signer }))
+      await assertRevertWithReason(
+        attestations.withdraw(mockERC20Token.address, { from: signer }),
+        'not active authorized signer for role'
+      )
     })
 
     it('should emit the Withdrawal event', async () => {
@@ -366,8 +378,9 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should not allow someone with no pending withdrawals to withdraw', async () => {
-      await assertRevert(
-        attestations.withdraw(mockERC20Token.address, { from: await getNonIssuer() })
+      await assertRevertWithReason(
+        attestations.withdraw(mockERC20Token.address, { from: await getNonIssuer() }),
+        'value was negative/zero'
       )
     })
   })
