@@ -1,9 +1,9 @@
 const isCI = process.env.CIRCLECI || process.env.CI
 const org =
-  process.env.CIRCLE_PROJECT_USERNAME || process.env.GITHUB_REPOSITORY.split('/')[0] || 'celo-org'
+  process.env.CIRCLE_PROJECT_USERNAME || process.env.GITHUB_REPOSITORY?.split('/')[0] || 'celo-org'
 const repo =
   process.env.CIRCLE_PROJECT_REPONAME ||
-  process.env.GITHUB_REPOSITORY.split('/')[1] ||
+  process.env.GITHUB_REPOSITORY?.split('/')[1] ||
   'celo-monorepo'
 const branch = process.env.CIRCLE_BRANCH || process.env.GITHUB_REF_NAME
 const sha = process.env.CIRCLE_SHA1 || process.env.GITHUB_SHA
