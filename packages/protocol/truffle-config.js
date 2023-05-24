@@ -5,7 +5,6 @@ const WebsocketSubprovider = require('web3-provider-engine/subproviders/websocke
 const { TruffleArtifactAdapter } = require('@0x/sol-trace')
 const { CoverageSubprovider } = require('@0x/sol-coverage')
 const flakeTrackingConfig = require('@celo/flake-tracker/src/mocha/config.js')
-const mochaConfig = { enableTimeouts: false }
 var Web3 = require('web3')
 var net = require('net')
 
@@ -226,7 +225,7 @@ module.exports = {
     },
   },
   networks,
-  mocha: { ...flakeTrackingConfig, ...mochaConfig },
+  mocha: flakeTrackingConfig,
 }
 
 if (process.argv.includes('--gas')) {
