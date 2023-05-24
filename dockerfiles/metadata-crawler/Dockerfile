@@ -1,10 +1,11 @@
-FROM cimg/node:12.13
+FROM node:12-bullseye-slim
 WORKDIR /celo-monorepo
 
-RUN sudo apt-get update && \
-    sudo apt-get update -y && \
-    sudo apt-get install -y libusb-dev lsb-release libudev-dev libusb-1.0-0 && \
-    sudo rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get update -y && \
+    apt-get install -y libusb-dev lsb-release libudev-dev libusb-1.0-0 git python2 && \
+    apt-get install -y build-essential git python2 && \
+    rm -rf /var/lib/apt/lists/*
 
 # ensure yarn.lock is evaluated by kaniko cache diff
 COPY lerna.json package.json yarn.lock ./
@@ -26,7 +27,7 @@ COPY packages/sdk/contractkit/package.json packages/sdk/contractkit/
 COPY packages/metadata-crawler/package.json packages/metadata-crawler/
 COPY packages/flake-tracker/package.json packages/flake-tracker/package.json
 
-RUN sudo yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
+RUN yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
 
 # Copy the rest
 COPY packages/typescript packages/typescript/

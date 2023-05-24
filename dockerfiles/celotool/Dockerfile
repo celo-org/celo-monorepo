@@ -1,9 +1,10 @@
-FROM node:12.22.12-buster
+FROM node:12-bullseye-slim
 WORKDIR /celo-monorepo
 
 # Needed for gsutil
 RUN apt-get update && \
     apt-get install -y lsb-release && \
+    apt-get install -y build-essential git python2 && \
     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
