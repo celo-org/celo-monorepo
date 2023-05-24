@@ -1,6 +1,6 @@
 {
   "name": "@celo/protocol",
-  "version": "9.0.0",
+  "version": "1.0.0",
   "private": true,
   "main": "index.ts",
   "author": "Celo",
@@ -114,6 +114,7 @@
     "@types/lodash": "^4.14.199",
     "@types/tmp": "^0.1.0",
     "@types/yargs": "^13.0.2",
+    "@wagmi/cli": "^1.0.1",
     "cross-env": "^5.1.6",
     "eth-gas-reporter": "^0.2.16",
     "merkle-patricia-tree": "4.0.0",

@@ -39,3 +39,5 @@ deployedGrants.json
 cache/
 out/
 
+wagmi.config.js
+wagmi.config.js.map

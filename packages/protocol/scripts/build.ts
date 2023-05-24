@@ -1,10 +1,11 @@
 /* tslint:disable no-console */
 import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
-import { readJSONSync } from 'fs-extra'
+import { readFileSync } from 'fs'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
 import { MENTO_PACKAGE } from '../contractPackages'
+import minimist from 'minimist'
 
 const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
 const BUILD_DIR = path.join(ROOT_DIR, process.env.BUILD_DIR ?? './build')
@@ -105,8 +106,8 @@ function compile(outdir: string) {
 
   for (const contractName of ImplContracts) {
     try {
-      const fileStr = readJSONSync(`${outdir}/contracts/${contractName}.json`)
-      if (hasEmptyBytecode(fileStr)) {
+      const fileStr = readFileSync(`${outdir}/contracts/${contractName}.json`)
+      if (hasEmptyBytecode(JSON.parse(fileStr.toString()))) {
         console.error(
           `${contractName} has empty bytecode. Maybe you forgot to fully implement an interface?`
         )
@@ -212,7 +213,6 @@ async function main(buildTargets: typeof _buildTargets) {
   }
 }
 
-const minimist = require('minimist')
 const argv = minimist(process.argv.slice(2), {
   string: Object.keys(_buildTargets),
 })
