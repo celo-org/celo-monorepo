@@ -262,7 +262,7 @@ class TestEnv {
       '0x05', // value: 5 wei
       '0x', // no data
     ]
-    //Creates SHA-3 hash of the RLP encoded version of the input.
+    // Creates SHA-3 hash of the RLP encoded version of the input.
     const signingHash = ejsUtil.toBuffer(keccak256(ejsRlp.encode(arr)))
     const pk = ejsUtil.addHexPrefix(validatorPrivateKey)
     const sig = ejsUtil.ecsign(signingHash, ejsUtil.toBuffer(pk))
@@ -426,58 +426,58 @@ class TestEnv {
 describe('CIP-35 >', function (this: any) {
   this.timeout(0)
 
-  // describe('before activation', () => {
-  //   if (devFilter.cipIsActivated === true) {
-  //     return
-  //   }
-  //   const testEnv = new TestEnv(false, false) // not donut, not espresso
-  //   before(async function (this) {
-  //     this.timeout(0)
-  //     console.log('validatorAddress', validatorAddress)
-  //     await testEnv.before()
-  //   })
+  describe('before activation', () => {
+    if (devFilter.cipIsActivated === true) {
+      return
+    }
+    const testEnv = new TestEnv(false, false) // not donut, not espresso
+    before(async function (this) {
+      this.timeout(0)
+      console.log('validatorAddress', validatorAddress)
+      await testEnv.before()
+    })
 
-  //   if (replayProtectionTests !== 'only') {
-  //     for (const testCase of testEnv.testCases) {
-  //       testEnv.runTestCase(testCase)
-  //     }
-  //   }
+    if (replayProtectionTests !== 'only') {
+      for (const testCase of testEnv.testCases) {
+        testEnv.runTestCase(testCase)
+      }
+    }
 
-  //   if (replayProtectionTests !== 'skip') {
-  //     testEnv.runReplayProtectionTests()
-  //   }
+    if (replayProtectionTests !== 'skip') {
+      testEnv.runReplayProtectionTests()
+    }
 
-  //   after(async function (this: any) {
-  //     this.timeout(0)
-  //     await testEnv.hooks.after()
-  //   })
-  // })
+    after(async function (this: any) {
+      this.timeout(0)
+      await testEnv.hooks.after()
+    })
+  })
 
-  // describe('after activation', async () => {
-  //   if (devFilter.cipIsActivated === false) {
-  //     return
-  //   }
-  //   const testEnv = new TestEnv(true, false) // donut, not espresso
-  //   before(async function (this) {
-  //     this.timeout(0)
-  //     await testEnv.before()
-  //   })
+  describe('after activation', async () => {
+    if (devFilter.cipIsActivated === false) {
+      return
+    }
+    const testEnv = new TestEnv(true, false) // donut, not espresso
+    before(async function (this) {
+      this.timeout(0)
+      await testEnv.before()
+    })
 
-  //   if (replayProtectionTests !== 'only') {
-  //     for (const testCase of testEnv.testCases) {
-  //       testEnv.runTestCase(testCase)
-  //     }
-  //   }
+    if (replayProtectionTests !== 'only') {
+      for (const testCase of testEnv.testCases) {
+        testEnv.runTestCase(testCase)
+      }
+    }
 
-  //   if (replayProtectionTests !== 'skip') {
-  //     testEnv.runReplayProtectionTests()
-  //   }
+    if (replayProtectionTests !== 'skip') {
+      testEnv.runReplayProtectionTests()
+    }
 
-  //   after(async function (this: any) {
-  //     this.timeout(0)
-  //     await testEnv.hooks.after()
-  //   })
-  // })
+    after(async function (this: any) {
+      this.timeout(0)
+      await testEnv.hooks.after()
+    })
+  })
 
   describe('after cip50 (optional replay protection)', async () => {
     if (devFilter.cipIsActivated === false) {
