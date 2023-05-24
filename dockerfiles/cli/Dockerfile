@@ -22,8 +22,8 @@
 # To kill
 # docker kill cli_container
 
-ARG geth_tag=master
-ARG geth_project=celo-testnet
+ARG geth_tag=1.7.4
+ARG geth_project=celo-org
 
 # Get geth and related files
 FROM us.gcr.io/$geth_project/geth:$geth_tag as geth
@@ -34,26 +34,26 @@ ADD https://www.googleapis.com/storage/v1/b/genesis_blocks/o/${celo_env}?alt=med
 ADD https://www.googleapis.com/storage/v1/b/static_nodes/o/${celo_env}?alt=media /celo/static-nodes.json
 
 # Build Celocli
-FROM node:12.22.12-buster as node
+FROM node:12-alpine as node
 
 ARG celo_env
 
 RUN echo "geth_tag is ${geth_tag}" && echo "Env is ${celo_env}"
 # Required for celocli
-RUN apk update && apk add python git make gcc g++ pkgconfig libusb libusb-dev linux-headers eudev-dev
+RUN apk add --no-cache python2 git make gcc g++ pkgconfig libusb libusb-dev linux-headers eudev-dev
 
 WORKDIR /celo-monorepo/
 RUN npm install @celo/celocli
 
 # Build the combined image
-FROM node:12.22.12-buster as final_image
+FROM node:12-alpine as final_image
 
 ARG network_name="alfajores"
 ARG network_id="44787"
 
 # Without musl-dev, geth will fail with a confusing "No such file or directory" error.
 # bash is required for start_geth.sh
-RUN apk update && apk add musl-dev && apk add bash
+RUN apk add --no-cache musl-dev bash
 
 WORKDIR /celo-monorepo/
 
