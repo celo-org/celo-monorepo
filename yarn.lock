@@ -8591,14 +8591,6 @@ dayjs@^1.8.15:
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.8.20.tgz#724a5cb6ad1f6fc066b0bd9a800dedcc7886f19e"
   integrity sha512-mH0MCDxw6UCGJYxVN78h8ugWycZAO8thkj3bW6vApL5tS0hQplIDdAQcmbvl7n35H0AKdCJQaArTrIQw2xt4Qg==
 
-deasync@^0.1.28:
-  version "0.1.28"
-  resolved "https://registry.yarnpkg.com/deasync/-/deasync-0.1.28.tgz#9b447b79b3f822432f0ab6a8614c0062808b5ad2"
-  integrity sha512-QqLF6inIDwiATrfROIyQtwOQxjZuek13WRYZ7donU5wJPLoP67MnYxA6QtqdvdBy2mMqv5m3UefBVdJjvevOYg==
-  dependencies:
-    bindings "^1.5.0"
-    node-addon-api "^1.7.1"
-
 debug-fabulous@0.0.X:
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/debug-fabulous/-/debug-fabulous-0.0.4.tgz#fa071c5d87484685424807421ca4b16b0b1a0763"
@@ -17229,11 +17221,6 @@ node-abi@^2.7.0:
   integrity sha512-jmEOvv0eanWjhX8dX1pmjb7oJl1U1oR4FOh0b2GnvALwSYoOdU7sj+kLDSAyjo4pfC9aj/IxkloxdLJQhSSQBA==
   dependencies:
     semver "^5.4.1"
-
-node-addon-api@^1.7.1:
-  version "1.7.2"
-  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-1.7.2.tgz#3df30b95720b53c24e59948b49532b662444f54d"
-  integrity sha512-ibPK3iA+vaY1eEjESkQkM0BbCqFOaZMiXRTtdB0u7b4djtY6JnsjvPdUHVMg6xQt3B8fpTTWHI9A+ADjM9frzg==
 
 node-addon-api@^2.0.0:
   version "2.0.2"
