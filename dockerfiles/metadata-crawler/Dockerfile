@@ -1,10 +1,11 @@
-FROM node:12
+FROM node:12-bullseye-slim
 WORKDIR /celo-monorepo
 
 RUN apt-get update && \
-  apt-get update -y && \
-  apt-get install -y libusb-dev lsb-release libudev-dev libusb-1.0-0 && \
-  rm -rf /var/lib/apt/lists/*
+    apt-get update -y && \
+    apt-get install -y libusb-dev lsb-release libudev-dev libusb-1.0-0 git python2 && \
+    apt-get install -y build-essential git python2 && \
+    rm -rf /var/lib/apt/lists/*
 
 # ensure yarn.lock is evaluated by kaniko cache diff
 COPY lerna.json package.json yarn.lock ./
