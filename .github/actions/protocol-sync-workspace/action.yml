@@ -10,9 +10,11 @@ runs:
     - name: Sync workspace
       uses: ./.github/actions/sync-workspace
       with:
-        package-json-checksum: ${{ needs.install_dependencies.outputs.package-json-checksum }}
+        package-json-checksum: ${{ inputs.package-json-checksum }}
     - uses: actions/cache/restore@v3
       id: cache_protocol
       with:
         path: packages/protocol/.tmp/released_chain
         key: protocol-${{ github.sha }}
+        enableCrossOsArchive: true
+        fail-on-cache-miss: true

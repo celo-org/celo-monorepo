@@ -1,6 +1,15 @@
-const org = process.env.CIRCLE_PROJECT_USERNAME || 'celo-org'
-const repo = process.env.CIRCLE_PROJECT_REPONAME || 'celo-monorepo'
-const defaultNumRetries = process.env.CIRCLE_BRANCH === 'master' ? 15 : 5
+const isCI = process.env.CIRCLECI || process.env.CI
+const org =
+  process.env.CIRCLE_PROJECT_USERNAME || process.env.GITHUB_REPOSITORY.split('/')[0] || 'celo-org'
+const repo =
+  process.env.CIRCLE_PROJECT_REPONAME ||
+  process.env.GITHUB_REPOSITORY.split('/')[1] ||
+  'celo-monorepo'
+const branch = process.env.CIRCLE_BRANCH || process.env.GITHUB_REF_NAME
+const sha = process.env.CIRCLE_SHA1 || process.env.GITHUB_SHA
+const CiJob = process.env.CIRCLE_JOB || process.env.GITHUB_JOB
+const prNumber = getPullNumber()
+const defaultNumRetries = branch === 'master' ? 15 : 5
 const flakeTrackerID = 71131 // This is the FlakeTracker GitHub App ID.
 
 // NOTE: Avoid editing the following constants unless you are making changes to the flake trackers' functionality.
@@ -27,9 +36,7 @@ const flakeTrackerID = 71131 // This is the FlakeTracker GitHub App ID.
 
 // shouldTrackFlakes => tests are retried `numRetries` times and flakey results are logged w/ test output
 const shouldTrackFlakes =
-  (process.env.CIRCLECI &&
-    process.env.CIRCLE_PROJECT_REPONAME !== 'celo-blockchain' &&
-    process.env.FLAKEY !== 'false') ||
+  (isCI && repo !== 'celo-blockchain' && process.env.FLAKEY !== 'false') ||
   process.env.FLAKEY === 'true'
 
 // shouldLogRetryErrorsOnFailure => log raw test error immediately after every retry.
@@ -41,34 +48,47 @@ const numRetries = process.env.NUM_RETRIES ? Number(process.env.NUM_RETRIES) : d
 // shouldSkipKnownFlakes => flakey test issues are fetched from github and corresponding tests are skipped
 const shouldSkipKnownFlakes =
   shouldTrackFlakes &&
-  process.env.CIRCLECI &&
+  isCI &&
   process.env.FLAKE_TRACKER_SECRET &&
   process.env.SKIP_KNOWN_FLAKES !== 'false'
 
 // shouldAddCheckToPR => GitHub Check added to PR
-const shouldAddCheckToPR =
-  shouldTrackFlakes && process.env.CIRCLECI && process.env.FLAKE_TRACKER_SECRET
+const shouldAddCheckToPR = shouldTrackFlakes && isCI && process.env.FLAKE_TRACKER_SECRET
 
 // newFlakesShouldFailCheckSuite => determines whether GitHub Check has status 'failure' or 'neutral' when new flakey tests are found.
 const newFlakesShouldFailCheckSuite = shouldAddCheckToPR && process.env.FLAKES_FAIL_CHECK_SUITE
 
 // shouldCreateIssues => GitHub Issues created for new flakey tests
 const shouldCreateIssues =
-  shouldTrackFlakes &&
-  process.env.CIRCLECI &&
-  process.env.FLAKE_TRACKER_SECRET &&
-  process.env.CIRCLE_BRANCH === 'master'
+  shouldTrackFlakes && isCI && process.env.FLAKE_TRACKER_SECRET && branch === 'master'
 
 // For convenience...
 const shouldReportFlakes = shouldAddCheckToPR || shouldCreateIssues
 const shouldUseGitHub = shouldSkipKnownFlakes || shouldReportFlakes
 
+function getPullNumber() {
+  if (process.env.CIRCLE_PULL_REQUEST) {
+    return process.env.CIRCLE_PULL_REQUEST.split('/').slice(-1)[0]
+  } else if (process.env.GITHUB_REF_NAME) {
+    return process.env.GITHUB_REF_NAME.split('/')[2]
+  }
+  console.info(
+    'Unable to determine pull request number. Expected when run in local or not triggered by a PR event'
+  )
+  return null
+}
+
 module.exports = {
   flakeTrackerID: flakeTrackerID,
   newFlakesShouldFailCheckSuite: newFlakesShouldFailCheckSuite,
   numRetries: numRetries,
+  isCI: isCI,
   org: org,
   repo: repo,
+  branch: branch,
+  sha: sha,
+  CiJob: CiJob,
+  prNumber: prNumber,
   shouldAddCheckToPR: shouldAddCheckToPR,
   shouldCreateIssues: shouldCreateIssues,
   shouldLogRetryErrorsOnFailure: shouldLogRetryErrorsOnFailure,
