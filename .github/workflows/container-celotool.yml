@@ -7,7 +7,6 @@ on:
       - 'dockerfiles/celotool/**'
     branches:
       - master
-      - jcortejoso/gh-actions-containers
   pull_request:
     paths:
       - 'dockerfiles/celotool/**'
