@@ -33,7 +33,7 @@ const gatewayFeeRecipientAddress = '0xc77538d1e30C0e4ec44B0DcaD97FD3dc63fcaCC4'
 const bytecode =
   '0x608060405260008055348015601357600080fd5b5060358060216000396000f3006080604052600080fd00a165627a7a72305820c7f3f7c299940bb1d9b122d25e8f288817e45bbdeaccdd2f6e8801677ed934e70029'
 
-const verbose = true // TODO (soloseng): revert to false
+const verbose = false
 
 ///////// Configurable values to run only some of the tests during development ////////////////
 // ReplayProtectionTests lets you skip or run only the replay-protection tests during dev
