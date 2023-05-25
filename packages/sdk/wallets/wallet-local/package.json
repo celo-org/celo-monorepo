@@ -29,7 +29,7 @@
     "@ethereumjs/util": "8.0.5"
   },
   "devDependencies": {
-    "web3": "1.8.2"
+    "web3": "1.10.0"
   },
   "engines": {
     "node": ">=8.14.2"

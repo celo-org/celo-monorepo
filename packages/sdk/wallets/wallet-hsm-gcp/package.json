@@ -36,7 +36,7 @@
   "devDependencies": {
     "@celo/connect": "4.0.1-dev",
     "elliptic": "^6.5.4",
-    "web3": "1.8.2"
+    "web3": "1.10.0"
   },
   "engines": {
     "node": ">=8.14.2"

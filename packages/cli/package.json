@@ -74,7 +74,7 @@
     "randombytes": "^2.0.1",
     "save": "^2.4.0",
     "tslib": "^1",
-    "web3": "1.8.2"
+    "web3": "1.10.0"
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",

@@ -30,7 +30,7 @@
     "@celo/connect": "4.0.1-dev",
     "bn.js": "4.11.9",
     "qrcode": "1.4.4",
-    "web3-eth-abi": "1.8.2"
+    "web3-eth-abi": "1.10.0"
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
