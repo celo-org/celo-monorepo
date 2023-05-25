@@ -56,6 +56,8 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
         from: network.from,
         to: reserve.address,
         value: web3.utils.toWei(config.reserve.initialBalance.toString(), 'ether').toString(),
+        // @ts-ignore
+        type: 0,
       })
 
       if (config.reserve.frozenAssetsStartBalance && config.reserve.frozenAssetsDays) {
