@@ -62,7 +62,7 @@ jobs:
           git checkout master
           git checkout ${GITHUB_SHA}
           # Verify that following commands work, they are later called in the incremental testing script
-          # There output does not matter here, the fact that they finish successfully does.
+          # Their output does not matter here, the fact that they finish successfully does.
           git rev-parse --abbrev-ref HEAD
           git fetch --all --tags
       - name: Calculate node cache keys
@@ -84,6 +84,7 @@ jobs:
           restore-keys: |
             node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-
       # We use cache to share the build artifacts between jobs (gh artifacts are too slow...)
+      # For more context check https://github.com/actions/upload-artifact/issues/199
       - name: Restore build artifacts cache
         uses: actions/cache@v3
         id: cache_build_artifacts
@@ -120,15 +121,8 @@ jobs:
       - name: Build packages
         run: yarn build --ignore docs --include-dependencies
       - name: Check licenses
+        if: steps.cache_node.outputs.cache-hit != 'true'
         run: |
-          if [ ! -e ~/.tmp/yarn_deps_have_changed ]; then
-            # Internally `yarn check-licenses` downloads dependencies into its cache again even if node_modules are up-to-date
-            # which happens when we've restored our cached node_modules.
-            # Making `yarn check-licenses` take ~45secs instead of ~3secs (depending on network conditions and build machine)
-            # So here we skip checking when it's unnecessary
-            echo "Skipping checking licenses, dependencies haven't changed"
-            exit 0
-          fi
           yarn check-licenses
       - name: Detect files changed in PR, and expose as output
         id: changed-files
@@ -177,6 +171,7 @@ jobs:
       - name: Run Jest Tests
         run: |
           mkdir -p test-results/jest
+          # Skipping packages that have an specific job
           yarn run lerna \
             --ignore @celo/contractkit \
             --ignore @celo/protocol \
