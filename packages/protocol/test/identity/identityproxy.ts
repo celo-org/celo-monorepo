@@ -9,8 +9,7 @@ import {
 const IdentityProxy: IdentityProxyContract = artifacts.require('IdentityProxy')
 const IdentityProxyTest: IdentityProxyTestContract = artifacts.require('IdentityProxyTest')
 
-contract('IdentityProxyHub', (accounts: string[]) => {
-  // TODO (soloseng): see with identy about this contract name. should it be `identityproxy`
+contract('IdentityProxy', (accounts: string[]) => {
   let identityProxy: IdentityProxyInstance
   let identityProxyTest: IdentityProxyTestInstance
 

@@ -1,4 +1,4 @@
-import { assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertRevertWithoutReason } from '@celo/protocol/lib/test-utils'
 import {
   IdentityProxyContract,
   IdentityProxyHubContract,
@@ -169,8 +169,10 @@ contract('IdentityProxyHub', (accounts: string[]) => {
 
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
-      // TODO (soloseng): why does this revert without reason
-      await assertRevert(identityProxyHub.makeCall(identifier, identityProxyTest.address, txData))
+      // TODO (soloseng): add reason once added https://github.com/celo-org/celo-monorepo/blob/1701bf5b611448d247dc960b5bc09230888a31da/packages/protocol/contracts/identity/IdentityProxyHub.sol#L102
+      await assertRevertWithoutReason(
+        identityProxyHub.makeCall(identifier, identityProxyTest.address, txData)
+      )
     })
 
     it('fails to call if sender does not have more than 50% attestation completions', async () => {
@@ -187,8 +189,10 @@ contract('IdentityProxyHub', (accounts: string[]) => {
 
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
-      // TODO (soloseng): why does this revert without reason
-      await assertRevert(identityProxyHub.makeCall(identifier, identityProxyTest.address, txData))
+      // TODO (soloseng): add reason once added https://github.com/celo-org/celo-monorepo/blob/1701bf5b611448d247dc960b5bc09230888a31da/packages/protocol/contracts/identity/IdentityProxyHub.sol#L102
+      await assertRevertWithoutReason(
+        identityProxyHub.makeCall(identifier, identityProxyTest.address, txData)
+      )
     })
 
     it('fails to call if another address has more attestations completed', async () => {
@@ -203,8 +207,10 @@ contract('IdentityProxyHub', (accounts: string[]) => {
 
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
-      // TODO (soloseng): why does this revert without reason
-      await assertRevert(identityProxyHub.makeCall(identifier, identityProxyTest.address, txData))
+      // TODO (soloseng): add reason once added https://github.com/celo-org/celo-monorepo/blob/1701bf5b611448d247dc960b5bc09230888a31da/packages/protocol/contracts/identity/IdentityProxyHub.sol#L102
+      await assertRevertWithoutReason(
+        identityProxyHub.makeCall(identifier, identityProxyTest.address, txData)
+      )
     })
   })
 })
