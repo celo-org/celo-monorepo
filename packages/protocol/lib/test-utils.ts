@@ -33,7 +33,7 @@ chai.use(chaiSubset)
 export const EPOCH = 100
 
 export function stripHexEncoding(hexString: string) {
-  return hexString.substr(0, 2) === '0x' ? hexString.substr(2) : hexString
+  return hexString.substring(0, 2) === '0x' ? hexString.substring(2) : hexString
 }
 
 export function assertContainSubset(superset: any, subset: any) {
@@ -129,7 +129,7 @@ export const assertThrowsAsync = async (promise: any, errorMessage: string = '')
     failed = true
   }
 
-  assert.equal(true, failed, errorMessage)
+  assert.strictEqual(true, failed, errorMessage)
 }
 
 export async function assertRevertWithReason(promise: any, expectedRevertReason: string = '') {
@@ -235,7 +235,7 @@ export const assertProxiesSet = async (getContract: any) => {
   for (const contractName of proxiedContracts) {
     const contract = await getContract(contractName, 'contract')
     const proxy: ProxyInstance = await getContract(contractName, 'proxy')
-    assert.equal(
+    assert.strictEqual(
       contract.address.toLowerCase(),
       (await proxy._getImplementation()).toLowerCase(),
       contractName + 'Proxy not pointing to the ' + contractName + ' implementation'
@@ -247,7 +247,7 @@ export const assertContractsRegistered = async (getContract: any) => {
   const registry: RegistryInstance = await getContract('Registry', 'proxiedContract')
   for (const contractName of hasEntryInRegistry) {
     const contract: Truffle.ContractInstance = await getContract(contractName, 'proxiedContract')
-    assert.equal(
+    assert.strictEqual(
       contract.address.toLowerCase(),
       (await registry.getAddressFor(soliditySha3(contractName))).toLowerCase(),
       'Registry does not have the correct information for ' + contractName
@@ -259,7 +259,7 @@ export const assertRegistryAddressesSet = async (getContract: any) => {
   const registry: RegistryInstance = await getContract('Registry', 'proxiedContract')
   for (const contractName of usesRegistry) {
     const contract: UsingRegistryInstance = await getContract(contractName, 'proxiedContract')
-    assert.equal(
+    assert.strictEqual(
       registry.address.toLowerCase(),
       (await contract.registry()).toLowerCase(),
       'Registry address is not set properly in ' + contractName
@@ -271,12 +271,12 @@ export const assertContractsOwnedByMultiSig = async (getContract: any) => {
   const multiSigAddress = (await getContract('MultiSig', 'proxiedContract')).address
   for (const contractName of ownedContracts) {
     const contractOwner: string = await (await getContract(contractName, 'proxiedContract')).owner()
-    assert.equal(contractOwner, multiSigAddress, contractName + ' is not owned by the MultiSig')
+    assert.strictEqual(contractOwner, multiSigAddress, contractName + ' is not owned by the MultiSig')
   }
 
   for (const contractName of proxiedContracts) {
     const proxyOwner = await (await getContract(contractName, 'proxy'))._getOwner()
-    assert.equal(proxyOwner, multiSigAddress, contractName + 'Proxy is not owned by the MultiSig')
+    assert.strictEqual(proxyOwner, multiSigAddress, contractName + 'Proxy is not owned by the MultiSig')
   }
 }
 
@@ -301,7 +301,7 @@ export function assertLogMatches(
   event: string,
   args: Record<string, any>
 ) {
-  assert.equal(log.event, event, `Log event name doesn\'t match`)
+  assert.strictEqual(log.event, event, `Log event name doesn\'t match`)
   assertObjectWithBNEqual(log.args, args, (arg) => `Event ${event}, arg: ${arg} do not match`)
 }
 
@@ -316,7 +316,7 @@ export function assertObjectWithBNEqual(
     .filter((k) => k !== '__length__' && isNaN(parseInt(k, 10)))
     .sort()
 
-  assert.deepEqual(objectFields, Object.keys(expected).sort(), `Argument names do not match`)
+  assert.deepStrictEqual(objectFields, Object.keys(expected).sort(), `Argument names do not match`)
   for (const k of objectFields) {
     if (typeof expected[k] === 'function') {
       expected[k](actual[k], fieldErrorMsg(k))
@@ -335,11 +335,11 @@ export function assertObjectWithBNEqual(
           assertEqualBN(actualArray[i], expectedArray[i], fieldErrorMsg(k))
         }
       } else  {
-        assert.deepEqual(actual[k], expected[k], fieldErrorMsg(k))
+        assert.deepStrictEqual(actual[k], expected[k], fieldErrorMsg(k))
       }
     }
     else {
-      assert.equal(actual[k], expected[k], fieldErrorMsg(k))
+      assert.strictEqual(actual[k], expected[k], fieldErrorMsg(k))
     }
   }
 }
@@ -406,7 +406,7 @@ export function assertEqualBNArray(
   expected: number[] | BN[] | BigNumber[],
   msg?: string
 ) {
-  assert.equal(value.length, expected.length, msg)
+  assert.strictEqual(value.length, expected.length, msg)
   value.forEach((x, i) => assertEqualBN(x, expected[i]))
 }
 
@@ -485,7 +485,7 @@ export function getOffsetForMinerSelection(
 }
 
 export const assertSameAddress = (value: string, expected: string, msg?: string) => {
-  assert.equal(expected.toLowerCase(), value.toLowerCase(), msg)
+  assert.strictEqual(expected.toLowerCase(), value.toLowerCase(), msg)
 }
 
 export function createMatcher<A>(assertFn: (value: A, expected: A, msg?: string) => void) {

@@ -8,7 +8,7 @@ import fs from 'fs'
 import { merge, range, repeat } from 'lodash'
 import { tmpdir } from 'os'
 import path from 'path'
-import * as rlp from 'rlp'
+import * as rlp from 'rlp' // TODO(soloseng): update?
 import { MyceloGenesisConfig } from 'src/lib/interfaces/mycelo-genesis-config'
 import { CurrencyPair } from 'src/lib/k8s-oracle/base'
 import * as ecc from 'tiny-secp256k1'
@@ -360,24 +360,24 @@ export const generateIstanbulExtraData = (validators: Validator[]) => {
         validators.map((validator) => Buffer.from(validator.address, 'hex')),
         validators.map((validator) => Buffer.from(validator.blsPublicKey, 'hex')),
         // Removed validators
-        new Buffer(0),
+        Buffer.alloc(0),
         // Seal
         Buffer.from(repeat('0', ecdsaSignatureVanity * 2), 'hex'),
         [
           // AggregatedSeal.Bitmap
-          new Buffer(0),
+          Buffer.alloc(0),
           // AggregatedSeal.Signature
           Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
           // AggregatedSeal.Round
-          new Buffer(0),
+          Buffer.alloc(0),
         ],
         [
           // ParentAggregatedSeal.Bitmap
-          new Buffer(0),
+          Buffer.alloc(0),
           // ParentAggregatedSeal.Signature
           Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
           // ParentAggregatedSeal.Round
-          new Buffer(0),
+          Buffer.alloc(0),
         ],
       ])
       .toString('hex')

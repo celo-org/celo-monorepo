@@ -15,7 +15,7 @@ export const blsPrivateKeyToProcessedPrivateKey = (privateKeyHex: string) => {
   for (let i = 0; i < 256; i++) {
     const originalPrivateKeyBytes = Buffer.from(privateKeyHex, 'hex')
 
-    const iBuffer = new Buffer(1)
+    const iBuffer = Buffer.alloc(1)
     iBuffer[0] = i
     const keyBytes = Buffer.concat([
       Buffer.from('ecdsatobls', 'utf8'),

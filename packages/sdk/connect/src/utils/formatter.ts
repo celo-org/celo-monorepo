@@ -187,7 +187,7 @@ export function outputLogFormatter(log: any): Log {
         trimLeading0x(log.transactionHash) +
         trimLeading0x(log.logIndex)
     )!
-    log.id = 'log_' + trimLeading0x(shaId).substr(0, 8)
+    log.id = 'log_' + trimLeading0x(shaId).substring(0, 8)
   } else if (!log.id) {
     log.id = null
   }
