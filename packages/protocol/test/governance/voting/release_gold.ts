@@ -5,6 +5,7 @@ import {
   assertEqualBN,
   assertGteBN,
   assertLogMatches,
+  // tslint:disable-next-line: ordered-imports
   assertRevertWithReason,
   assertRevertWithoutReason,
   assertSameAddress,
