@@ -6,8 +6,9 @@ import {
 import {
   assertEqualBN,
   assertLogMatches2,
-  assertRevert,
+  // tslint:disable-next-line: ordered-imports
   assertRevertWithReason,
+  assertRevertWithoutReason,
 } from '@celo/protocol/lib/test-utils'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { MetaTransactionWalletContract, MetaTransactionWalletInstance } from 'types'
@@ -446,7 +447,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
 
         describe('when dataLengths has erroneous lengths', () => {
           it('reverts', async () => {
-            await assertRevert(
+            await assertRevertWithoutReason(
               wallet.executeTransactions(
                 transactions.map((t) => t.destination),
                 transactions.map((t) => t.value),

@@ -137,7 +137,6 @@ export async function assertRevertWithReason(promise: any, expectedRevertReason:
    await promise
     assert.fail('Expected transaction to revert')
   } catch (error) {
-// XXX(soloseng): Some transactions revert without reason.
     // Only ever tested with ganache.
     // When it's a view call, error.message has a shape like:
     // `Returned error: VM Exception while processing transaction: revert ${expectedRevertReason}`
@@ -145,9 +144,9 @@ export async function assertRevertWithReason(promise: any, expectedRevertReason:
     // 'StatusError: Transaction: ${transactionHash} exited with an error (status 0). Reason given: ${revertMessage}.'
     // Therefore we try to search for `${expectedRevertReason}`.
     const revertFound: boolean =
-    error.message.search( expectedRevertReason) >= 0
+    error.message.search(expectedRevertReason) >= 0
     const msg: string =
-    expectedRevertReason === '' ? `Expected "revert", got ${error} instead` : expectedRevertReason
+    expectedRevertReason === '' ? `Expected "StatusError", got ${error} instead` : `Expected ${expectedRevertReason}, got ${error} instead`
     assert(revertFound, msg)
   }
 }
@@ -164,6 +163,21 @@ export async function assertRevert(promise: any, errorMessage: string = '') {
       error.message.search('VM Exception while processing transaction: revert') >= 0
     const msg: string =
       errorMessage === '' ? `Expected "revert", got ${error} instead` : errorMessage
+    assert(revertFound, msg)
+  }
+}
+
+export async function assertRevertWithoutReason(promise: any, errorMessage: string = '') {
+  // When a transaction reverts without a reason, error.message has a shape like:
+  // 'Transaction: ${transactionHash} exited with an error (status 0).'
+  try {
+    await promise
+    assert.fail('Expected transaction to revert')
+  } catch (error) {
+    const revertFound: boolean =
+      error.message.search('exited with an error [(]status 0[)]') >= 0
+    const msg: string =
+      errorMessage === '' ? `Expected "StatusError", got ${error} instead` : errorMessage
     assert(revertFound, msg)
   }
 }

@@ -3,7 +3,7 @@ import { constitution } from '@celo/protocol/governanceConstitution'
 import {
   addressMinedLatestBlock,
   assertEqualBN,
-  assertRevert,
+  assertRevertWithoutReason,
   assertRevertWithReason,
   assumeOwnership,
   stripHexEncoding,
@@ -635,15 +635,15 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
         '1' // minimumReports, minimum possible to avoid having to mock multiple reports
       )
     })
-
+    // TODO (soloseng): add revert msg to https://github.com/celo-org/celo-monorepo/blob/1701bf5b611448d247dc960b5bc09230888a31da/packages/protocol/contracts/stability/SortedOracles.sol#L174
     it(`should be impossible to sell CELO`, async () => {
       await goldToken.approve(exchangeAbc.address, sellAmount)
-      await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, true))
+      await assertRevertWithoutReason(exchangeAbc.sell(sellAmount, minBuyAmount, true))
     })
 
     it(`should be impossible to sell stable token`, async () => {
       await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
-      await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, false))
+      await assertRevertWithoutReason(exchangeAbc.sell(sellAmount, minBuyAmount, false))
     })
   })
 

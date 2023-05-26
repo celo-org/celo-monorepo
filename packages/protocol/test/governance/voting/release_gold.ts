@@ -5,8 +5,8 @@ import {
   assertEqualBN,
   assertGteBN,
   assertLogMatches,
-  assertRevert,
   assertRevertWithReason,
+  assertRevertWithoutReason,
   assertSameAddress,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -1497,7 +1497,7 @@ contract('ReleaseGold', (accounts: string[]) => {
 
     it('should revert if beneficiary tries to lock up more than there is remaining in the contract', async () => {
       await releaseGoldInstance.createAccount({ from: beneficiary })
-      await assertRevert(
+      await assertRevertWithoutReason(
         releaseGoldInstance.lockGold(lockAmount.multipliedBy(1.1), {
           from: beneficiary,
         })
