@@ -41,7 +41,6 @@ e2e-defaults: &e2e-defaults
   <<: *defaults
   docker:
     - image: us-west1-docker.pkg.dev/devopsre/clabs-public-images/circleci:node18.14-go1.16
-    # - image: us-west1-docker.pkg.dev/devopsre/celo-monorepo/circleci-geth:latest
   environment:
     CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.7.x
 general:

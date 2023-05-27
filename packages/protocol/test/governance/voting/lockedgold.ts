@@ -195,7 +195,7 @@ contract('LockedGold', (accounts: string[]) => {
       await assertTransactionRevertWithReason(
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         lockedGold.lock({ value, from: accounts[1] }),
-        'not account'
+        'Must first register address with Account.createAccount'
       )
     })
   })

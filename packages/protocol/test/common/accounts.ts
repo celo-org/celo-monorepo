@@ -565,7 +565,7 @@ contract('Accounts', (accounts: string[]) => {
       it('should revert', async () => {
         await assertTransactionRevertWithReason(
           accountsInstance.setWalletAddress(caller, '0x0', '0x0', '0x0'),
-          'Register with createAccount to set account name'
+          'Unknown account'
         )
       })
     })
