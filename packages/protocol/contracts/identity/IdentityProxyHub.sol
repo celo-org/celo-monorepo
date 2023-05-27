@@ -99,7 +99,7 @@ contract IdentityProxyHub is UsingRegistry {
     payable
     returns (bytes memory)
   {
-    require(passesIdentityHeuristic(msg.sender, identifier));
+    require(passesIdentityHeuristic(msg.sender, identifier), "does not pass identity heuristic");
     return getOrDeployIdentityProxy(identifier).makeCall.value(msg.value)(destination, data);
   }
 
