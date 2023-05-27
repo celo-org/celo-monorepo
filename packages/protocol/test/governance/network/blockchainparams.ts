@@ -2,7 +2,7 @@ import {
   assertContainSubset,
   assertEqualBN,
   assertRevert,
-  assertRevertWithReason,
+  assertTransactionRevertWithReason,
   mineBlocks,
 } from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
@@ -63,7 +63,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
       })
     })
     it('only owner should be able to set', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         blockchainParameters.setMinimumClientVersion(version.major, version.minor, version.patch, {
           from: accounts[1],
         }),
@@ -89,7 +89,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
       })
     })
     it('only owner should be able to set', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         blockchainParameters.setBlockGasLimit(gasLimit, {
           from: accounts[1],
         }),
@@ -120,7 +120,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
       })
     })
     it('only owner should be able to set', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(gasLimit, {
           from: accounts[1],
         }),
@@ -172,7 +172,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
     })
 
     it('only owner should be able to set', () =>
-      assertRevertWithReason(
+      assertTransactionRevertWithReason(
         blockchainParameters.setUptimeLookbackWindow(newValue, {
           from: accounts[1],
         }),
@@ -180,19 +180,19 @@ contract('BlockchainParameters', (accounts: string[]) => {
       ))
 
     it('should fail when using value lower than safe minimum', () =>
-      assertRevertWithReason(
+      assertTransactionRevertWithReason(
         blockchainParameters.setUptimeLookbackWindow(2),
         'UptimeLookbackWindow must be within safe range'
       ))
 
     it('should fail when using value greater than safe maximum', () =>
-      assertRevertWithReason(
+      assertTransactionRevertWithReason(
         blockchainParameters.setUptimeLookbackWindow(721),
         'UptimeLookbackWindow must be within safe range'
       ))
 
     it('should fail when using value greater than epochSize - 2', () =>
-      assertRevertWithReason(
+      assertTransactionRevertWithReason(
         blockchainParameters.setUptimeLookbackWindow(EPOCH - 1),
         'UptimeLookbackWindow must be smaller or equal to epochSize - 2'
       ))

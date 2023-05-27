@@ -1,4 +1,4 @@
-import { assertRevertWithoutReason } from '@celo/protocol/lib/test-utils'
+import { assertTransactionRevertWithoutReason } from '@celo/protocol/lib/test-utils'
 import {
   IdentityProxyContract,
   IdentityProxyHubContract,
@@ -170,7 +170,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
       // TODO (soloseng): add reason once added https://github.com/celo-org/celo-monorepo/blob/1701bf5b611448d247dc960b5bc09230888a31da/packages/protocol/contracts/identity/IdentityProxyHub.sol#L102
-      await assertRevertWithoutReason(
+      await assertTransactionRevertWithoutReason(
         identityProxyHub.makeCall(identifier, identityProxyTest.address, txData)
       )
     })
@@ -190,7 +190,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
       // TODO (soloseng): add reason once added https://github.com/celo-org/celo-monorepo/blob/1701bf5b611448d247dc960b5bc09230888a31da/packages/protocol/contracts/identity/IdentityProxyHub.sol#L102
-      await assertRevertWithoutReason(
+      await assertTransactionRevertWithoutReason(
         identityProxyHub.makeCall(identifier, identityProxyTest.address, txData)
       )
     })
@@ -208,7 +208,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
       // TODO (soloseng): add reason once added https://github.com/celo-org/celo-monorepo/blob/1701bf5b611448d247dc960b5bc09230888a31da/packages/protocol/contracts/identity/IdentityProxyHub.sol#L102
-      await assertRevertWithoutReason(
+      await assertTransactionRevertWithoutReason(
         identityProxyHub.makeCall(identifier, identityProxyTest.address, txData)
       )
     })

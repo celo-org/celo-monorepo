@@ -4,7 +4,7 @@ import {
   assertContainSubset,
   assertEqualBN,
   assertEqualDpBN,
-  assertRevertWithReason,
+  assertTransactionRevertWithReason,
   jsonRpc,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -153,7 +153,7 @@ contract('EpochRewards', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         epochRewards.initialize(
           registry.address,
           targetVotingYieldParams.initial,
@@ -197,7 +197,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
         describe('when called by a non-owner', () => {
           it('should revert', async () => {
-            await assertRevertWithReason(
+            await assertTransactionRevertWithReason(
               epochRewards.setTargetVotingGoldFraction(newFraction, {
                 from: nonOwner,
               }),
@@ -209,7 +209,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
       describe('when the fraction is the same', () => {
         it('should revert', async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             epochRewards.setTargetVotingGoldFraction(targetVotingGoldFraction),
             'Target voting gold fraction unchanged'
           )
@@ -242,7 +242,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
         describe('when called by a non-owner', () => {
           it('should revert', async () => {
-            await assertRevertWithReason(
+            await assertTransactionRevertWithReason(
               epochRewards.setCommunityRewardFraction(newFraction, {
                 from: nonOwner,
               }),
@@ -254,7 +254,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
       describe('when the fraction is the same', () => {
         it('should revert', async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             epochRewards.setCommunityRewardFraction(communityRewardFraction),
             'Value must be different from existing community reward fraction and less than 1'
           )
@@ -287,7 +287,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
         describe('when the payment is the same', () => {
           it('should revert', async () => {
-            await assertRevertWithReason(
+            await assertTransactionRevertWithReason(
               epochRewards.setTargetValidatorEpochPayment(targetValidatorEpochPayment),
               'Target validator epoch payment unchanged'
             )
@@ -297,7 +297,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
       describe('when called by a non-owner', () => {
         it('should revert', async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             epochRewards.setTargetValidatorEpochPayment(newPayment, {
               from: nonOwner,
             }),
@@ -349,7 +349,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
         describe('when called by a non-owner', () => {
           it('should revert', async () => {
-            await assertRevertWithReason(
+            await assertTransactionRevertWithReason(
               epochRewards.setRewardsMultiplierParameters(
                 newParams.max,
                 newParams.underspend,
@@ -366,7 +366,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
       describe('when the parameters are the same', () => {
         it('should revert', async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             epochRewards.setRewardsMultiplierParameters(
               rewardsMultiplier.max,
               rewardsMultiplier.adjustments.underspend,
@@ -411,7 +411,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
         describe('when called by a non-owner', () => {
           it('should revert', async () => {
-            await assertRevertWithReason(
+            await assertTransactionRevertWithReason(
               epochRewards.setTargetVotingYieldParameters(newMax, newFactor, {
                 from: nonOwner,
               }),
@@ -423,7 +423,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
       describe('when the parameters are the same', () => {
         it('should revert', async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             epochRewards.setTargetVotingYieldParameters(
               targetVotingYieldParams.max,
               targetVotingYieldParams.adjustmentFactor
@@ -464,7 +464,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
     describe('when called by a non-owner', () => {
       it('should revert', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           epochRewards.setTargetVotingYield(newTarget, {
             from: nonOwner,
           }),
@@ -1180,7 +1180,7 @@ contract('EpochRewards', (accounts: string[]) => {
     })
 
     it('should make updateTargetVotingYield revert', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         epochRewards.updateTargetVotingYield(),
         "can't call when contract is frozen"
       )

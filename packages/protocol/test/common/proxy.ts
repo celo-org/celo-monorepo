@@ -1,6 +1,6 @@
 import { recoverFunds } from '@celo/protocol/lib/recover-funds'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertRevertWithReason } from '@celo/protocol/lib/test-utils'
+import { assertTransactionRevertWithReason } from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
 import {
   FreezerContract,
@@ -49,7 +49,7 @@ contract('Proxy', (accounts: string[]) => {
     })
 
     it('should not allow a non-owner to set an implementation', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         proxy._setImplementation(getSet.address, { from: accounts[1] }),
         'sender was not owner'
       )
@@ -126,7 +126,7 @@ contract('Proxy', (accounts: string[]) => {
     })
 
     it('should not allow to call a non contract address', async () =>
-      assertRevertWithReason(
+      assertTransactionRevertWithReason(
         proxy._setAndInitializeImplementation(accounts[1], initializeData(42), {
           from: accounts[1],
         }),
@@ -134,7 +134,7 @@ contract('Proxy', (accounts: string[]) => {
       ))
 
     it('should not allow a non-owner to set an implementation', async () =>
-      assertRevertWithReason(
+      assertTransactionRevertWithReason(
         proxy._setAndInitializeImplementation(hasInitializer.address, initializeData(42), {
           from: accounts[1],
         }),
@@ -143,7 +143,7 @@ contract('Proxy', (accounts: string[]) => {
 
     it('should not allow for a call to `initialize` after initialization', async () => {
       await proxy._setAndInitializeImplementation(hasInitializer.address, initializeData(42))
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         proxiedHasInitializer.initialize(43),
         'contract already initialized'
       )
@@ -158,7 +158,7 @@ contract('Proxy', (accounts: string[]) => {
     })
 
     it('should not allow a non-owner to transfer ownership', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         proxy._transferOwnership(accounts[2], { from: accounts[1] }),
         'sender was not owner'
       )
@@ -185,7 +185,7 @@ contract('Proxy', (accounts: string[]) => {
       })
 
       it('should not allow the previous owner to perform onlyOwner actions', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           proxy._setImplementation(getSet1.address),
           'sender was not owner'
         )

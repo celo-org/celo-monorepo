@@ -3,7 +3,7 @@ import {
   assertEqualBN,
   assertEqualBNArray,
   assertLogMatches2,
-  assertRevertWithReason,
+  assertTransactionRevertWithReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, reciprocal, toFixed } from '@celo/utils/lib/fixidity'
@@ -224,7 +224,7 @@ contract('GrandaMento', (accounts: string[]) => {
     })
 
     it('reverts when called again', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.initialize(
           registry.address,
           approver,
@@ -311,7 +311,7 @@ contract('GrandaMento', (accounts: string[]) => {
       await realStableToken.mint(owner, sellAmount)
       await realStableToken.approve(grandaMento.address, sellAmount)
 
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         createExchangeProposal(false, owner, stableTokenRegistryId, sellAmount),
         'overflow at divide'
       )
@@ -411,7 +411,7 @@ contract('GrandaMento', (accounts: string[]) => {
             ? getSellAmount(minExchangeAmount, fromFixed(oracleRate), spread).minus(1)
             : minExchangeAmount.minus(1)
 
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             grandaMento.createExchangeProposal(stableTokenRegistryId, _sellAmount, sellCelo),
             'Stable token exchange amount not within limits'
           )
@@ -421,7 +421,7 @@ contract('GrandaMento', (accounts: string[]) => {
           const _sellAmount = sellCelo
             ? getSellAmount(maxExchangeAmount, fromFixed(oracleRate), spread).plus(1)
             : maxExchangeAmount.plus(1)
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             grandaMento.createExchangeProposal(stableTokenRegistryId, _sellAmount, sellCelo),
             'Stable token exchange amount not within limits'
           )
@@ -431,7 +431,7 @@ contract('GrandaMento', (accounts: string[]) => {
           // Add an entry for StableTokenEUR so the tx doesn't revert
           // as a result of the registry lookup.
           await registry.setAddressFor(CeloContractName.StableTokenEUR, stableToken.address)
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             grandaMento.createExchangeProposal(
               CeloContractName.StableTokenEUR,
               stableTokenSellAmount,
@@ -443,7 +443,7 @@ contract('GrandaMento', (accounts: string[]) => {
 
         it('reverts when there is no oracle price for the stable token', async () => {
           await sortedOracles.setMedianRate(stableToken.address, 0)
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             grandaMento.createExchangeProposal(
               CeloContractName.StableToken,
               stableTokenSellAmount,
@@ -512,7 +512,7 @@ contract('GrandaMento', (accounts: string[]) => {
           // Just in excess of the max change
           const newCeloStableTokenRate = defaultCeloStableTokenRate.times(1 + rateChange)
           await sortedOracles.setMedianRate(stableToken.address, newCeloStableTokenRate)
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             grandaMento.approveExchangeProposal(proposalId, { from: approver }),
             'CELO exchange rate is too different from the proposed price'
           )
@@ -527,7 +527,7 @@ contract('GrandaMento', (accounts: string[]) => {
         // As a sanity check, make sure the exchange is in the None state,
         // indicating it doesn't exist.
         assert.equal(proposal.state, ExchangeProposalState.None)
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           grandaMento.approveExchangeProposal(nonexistentProposalId, { from: approver }),
           'Proposal must be in Proposed state'
         )
@@ -535,7 +535,7 @@ contract('GrandaMento', (accounts: string[]) => {
     })
 
     it('reverts if called by anyone other than the approver', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.approveExchangeProposal(proposalId, { from: accounts[2] }),
         'Sender must be approver'
       )
@@ -558,7 +558,7 @@ contract('GrandaMento', (accounts: string[]) => {
         // Get the exchange into the Approved state.
         await grandaMento.approveExchangeProposal(1, { from: approver })
         // Try to have Alice cancel it when the exchange proposal is in the Approved state.
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           grandaMento.cancelExchangeProposal(1, { from: alice }),
           'Sender must be owner'
         )
@@ -581,7 +581,7 @@ contract('GrandaMento', (accounts: string[]) => {
 
       it('reverts when the exchange proposal is not in the Approved state', async () => {
         // Try to cancel it when the exchange proposal is in the Proposed state.
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           grandaMento.cancelExchangeProposal(1, { from: owner }),
           'Sender must be exchanger'
         )
@@ -680,14 +680,14 @@ contract('GrandaMento', (accounts: string[]) => {
 
     it('reverts when called by a sender that is not permitted', async () => {
       await createExchangeProposal(false, alice)
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.cancelExchangeProposal(1, { from: approver }),
         'Sender must be exchanger'
       )
     })
 
     it('reverts when the proposalId does not exist', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.cancelExchangeProposal(1, { from: approver }),
         'Proposal must be in Proposed or Approved state'
       )
@@ -853,7 +853,7 @@ contract('GrandaMento', (accounts: string[]) => {
         // Traveling vetoPeriodSeconds - 1 can be flaky due to block times,
         // so instead just subtract by 10 to be safe.
         await timeTravel(vetoPeriodSeconds - 10, web3)
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           grandaMento.executeExchangeProposal(1),
           'Veto period not elapsed'
         )
@@ -861,7 +861,7 @@ contract('GrandaMento', (accounts: string[]) => {
     })
 
     it('reverts when the proposal is not in the Approved state', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.executeExchangeProposal(1),
         'Proposal must be in Approved state'
       )
@@ -873,7 +873,7 @@ contract('GrandaMento', (accounts: string[]) => {
       // Execute it
       await grandaMento.executeExchangeProposal(1)
       // Try executing it again
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.executeExchangeProposal(1),
         'Proposal must be in Approved state'
       )
@@ -881,7 +881,7 @@ contract('GrandaMento', (accounts: string[]) => {
 
     it('reverts when the proposalId does not exist', async () => {
       // No proposal exists with the ID 1
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.executeExchangeProposal(1),
         'Proposal must be in Approved state'
       )
@@ -930,14 +930,14 @@ contract('GrandaMento', (accounts: string[]) => {
     })
 
     it('reverts if the exchange proposal is active', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.removeFromActiveProposalIdsSuperset(0),
         'Exchange proposal not inactive'
       )
     })
 
     it('reverts if the provided index is out of bounds', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.removeFromActiveProposalIdsSuperset(3),
         'Index out of bounds'
       )
@@ -1028,7 +1028,7 @@ contract('GrandaMento', (accounts: string[]) => {
     })
 
     it('reverts when the sender is not the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.setApprover(newApprover, { from: accounts[1] }),
         'Ownable: caller is not the owner'
       )
@@ -1058,7 +1058,7 @@ contract('GrandaMento', (accounts: string[]) => {
     })
 
     it('reverts when the sender is not the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.setMaxApprovalExchangeRateChange(newMaxApprovalExchangeRateChangeFixed, {
           from: accounts[1],
         }),
@@ -1086,14 +1086,14 @@ contract('GrandaMento', (accounts: string[]) => {
     })
 
     it('reverts when the spread is more than 1', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.setSpread(toFixed(1001 / 1000)),
         'Spread must be less than or equal to 1'
       )
     })
 
     it('reverts when the sender is not the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.setSpread(newSpreadFixed, { from: accounts[1] }),
         'Ownable: caller is not the owner'
       )
@@ -1129,14 +1129,14 @@ contract('GrandaMento', (accounts: string[]) => {
     })
 
     it('reverts when the minExchangeAmount is greater than the maxExchangeAmount', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.setStableTokenExchangeLimits(stableTokenRegistryId, max, min),
         'Min exchange amount must not be greater than max'
       )
     })
 
     it('reverts when the sender is not the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.setStableTokenExchangeLimits(stableTokenRegistryId, min, max, {
           from: accounts[1],
         }),
@@ -1159,7 +1159,7 @@ contract('GrandaMento', (accounts: string[]) => {
       // Add an entry for StableTokenEUR so the tx doesn't revert
       // as a result of the registry lookup.
       await registry.setAddressFor(CeloContractName.StableTokenEUR, stableToken.address)
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.getStableTokenExchangeLimits(CeloContractName.StableTokenEUR),
         'Max stable token exchange amount must be defined'
       )
@@ -1185,14 +1185,14 @@ contract('GrandaMento', (accounts: string[]) => {
 
     it('reverts when the veto period is greater than 4 weeks', async () => {
       const fourWeeks = SECONDS_IN_A_WEEK * 4
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.setVetoPeriodSeconds(fourWeeks + 1),
         'Veto period cannot exceed 4 weeks'
       )
     })
 
     it('reverts when the sender is not the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         grandaMento.setVetoPeriodSeconds(newVetoPeriodSeconds, { from: accounts[1] }),
         'Ownable: caller is not the owner'
       )

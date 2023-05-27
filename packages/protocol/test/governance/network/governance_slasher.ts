@@ -1,5 +1,8 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertContainSubset, assertRevertWithReason } from '@celo/protocol/lib/test-utils'
+import {
+  assertContainSubset,
+  assertTransactionRevertWithReason,
+} from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
@@ -54,7 +57,7 @@ contract('GovernanceSlasher', (accounts: string[]) => {
       assert.equal(owner, accounts[0])
     })
     it('can only be called once', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         slasher.initialize(registry.address),
         'contract already initialized'
       )
@@ -74,7 +77,7 @@ contract('GovernanceSlasher', (accounts: string[]) => {
       assert.equal(amount.toNumber(), 2000)
     })
     it('can only be called by owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         slasher.approveSlashing(accounts[2], 1000, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -83,7 +86,7 @@ contract('GovernanceSlasher', (accounts: string[]) => {
 
   describe('#slash()', () => {
     it('fails if there is nothing to slash', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         slasher.slash(validator, [], [], []),
         'No penalty given by governance'
       )

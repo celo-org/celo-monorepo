@@ -1,4 +1,4 @@
-import { assertLogMatches2, assertRevertWithReason } from '@celo/protocol/lib/test-utils'
+import { assertLogMatches2, assertTransactionRevertWithReason } from '@celo/protocol/lib/test-utils'
 import {
   RegistryContract,
   RegistryInstance,
@@ -43,7 +43,7 @@ contract('TransferWhitelist', (accounts: string[]) => {
     })
 
     it('should not allow a non-owner to add a token', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         transferWhitelist.whitelistAddress(anAddress, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -70,7 +70,7 @@ contract('TransferWhitelist', (accounts: string[]) => {
     })
 
     it('should not allow a non-owner to remove an address', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         transferWhitelist.removeAddress(anAddress, 0, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -89,7 +89,7 @@ contract('TransferWhitelist', (accounts: string[]) => {
     })
 
     it('should not allow a non-owner to add a registry id', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         transferWhitelist.whitelistRegisteredContract(anIdentifierHash, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -119,7 +119,7 @@ contract('TransferWhitelist', (accounts: string[]) => {
     })
 
     it('should not allow a non-owner to set the whitelist', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         transferWhitelist.setDirectlyWhitelistedAddresses([anAddress, anotherAddress], {
           from: nonOwner,
         }),
@@ -144,7 +144,7 @@ contract('TransferWhitelist', (accounts: string[]) => {
     })
 
     it('should not allow a non-owner to set the list of registered contracts', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         transferWhitelist.setWhitelistedContractIdentifiers(
           [anIdentifierHash, anotherIdentifierHash],
           {

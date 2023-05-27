@@ -5,7 +5,7 @@ import {
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
-  assertRevertWithReason,
+  assertTransactionRevertWithReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { toFixed } from '@celo/utils/lib/fixidity'
@@ -96,7 +96,7 @@ contract('LockedGold', (accounts: string[]) => {
     })
 
     it('should revert if already initialized', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         lockedGold.initialize(registry.address, unlockingPeriod),
         'contract already initialized'
       )
@@ -112,7 +112,7 @@ contract('LockedGold', (accounts: string[]) => {
     })
 
     it('should revert when not called by the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         lockedGold.setRegistry(anAddress, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -139,14 +139,14 @@ contract('LockedGold', (accounts: string[]) => {
     })
 
     it('should revert when the unlockingPeriod is unchanged', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         lockedGold.setUnlockingPeriod(unlockingPeriod),
         'Unlocking period not changed'
       )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         lockedGold.setUnlockingPeriod(newUnlockingPeriod, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -193,7 +193,10 @@ contract('LockedGold', (accounts: string[]) => {
 
     it('should revert when the account does not exist', async () => {
       // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-      await assertRevertWithReason(lockedGold.lock({ value, from: accounts[1] }), 'not account')
+      await assertTransactionRevertWithReason(
+        lockedGold.lock({ value, from: accounts[1] }),
+        'not account'
+      )
     })
   })
 
@@ -265,7 +268,7 @@ contract('LockedGold', (accounts: string[]) => {
         })
 
         it('should revert when requesting gold that is voted with', async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             lockedGold.unlock(value),
             'Not enough unlockable celo. Celo is locked in voting.'
           )
@@ -334,7 +337,7 @@ contract('LockedGold', (accounts: string[]) => {
       describe('when unlocking would yield a locked gold balance less than the required value', () => {
         describe('when the the current time is earlier than the requirement time', () => {
           it('should revert', async () => {
-            await assertRevertWithReason(
+            await assertTransactionRevertWithReason(
               lockedGold.unlock(value),
               "Either account doesn't have enough locked Celo or locked Celo is being used for voting."
             )
@@ -440,7 +443,7 @@ contract('LockedGold', (accounts: string[]) => {
       describe('when relocking value greater than the value of the pending withdrawal', () => {
         const value = pendingWithdrawalValue + 1
         it('should revert', async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             lockedGold.relock(index, value),
             'Requested value larger than pending value'
           )
@@ -450,7 +453,7 @@ contract('LockedGold', (accounts: string[]) => {
 
     describe('when a pending withdrawal does not exist', () => {
       it('should revert', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           lockedGold.relock(index, pendingWithdrawalValue),
           'Bad pending withdrawal index'
         )
@@ -493,7 +496,7 @@ contract('LockedGold', (accounts: string[]) => {
 
       describe('when it is before the availablity time', () => {
         it('should revert', async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             lockedGold.withdraw(index),
             'Pending withdrawal not available'
           )
@@ -503,7 +506,10 @@ contract('LockedGold', (accounts: string[]) => {
 
     describe('when a pending withdrawal does not exist', () => {
       it('should revert', async () => {
-        await assertRevertWithReason(lockedGold.withdraw(index), 'Bad pending withdrawal index')
+        await assertTransactionRevertWithReason(
+          lockedGold.withdraw(index),
+          'Bad pending withdrawal index'
+        )
       })
     })
   })
@@ -521,14 +527,14 @@ contract('LockedGold', (accounts: string[]) => {
       assert.equal(bytes, (await lockedGold.getSlashingWhitelist())[0])
     })
     it('can only be called by owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         lockedGold.addSlasher(CeloContractName.DowntimeSlasher, { from: accounts[1] }),
         'Ownable: caller is not the owner'
       )
     })
     it('cannot add a slasher twice', async () => {
       await lockedGold.addSlasher(CeloContractName.DowntimeSlasher)
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         lockedGold.addSlasher(CeloContractName.DowntimeSlasher),
         'Cannot add slasher ID twice.'
       )
@@ -546,26 +552,26 @@ contract('LockedGold', (accounts: string[]) => {
       assert.equal(0, (await lockedGold.getSlashingWhitelist()).length)
     })
     it('can only be called by owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 0, { from: accounts[1] }),
         'Ownable: caller is not the owner'
       )
     })
     it('reverts when index too large', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 100),
         'Provided index exceeds whitelist bounds.'
       )
     })
     it('reverts when key does not exists', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         lockedGold.removeSlasher(CeloContractName.GovernanceSlasher, 100),
         'Cannot remove slasher ID not yet added.'
       )
     })
     it('reverts when index and key have mismatch', async () => {
       await lockedGold.addSlasher(CeloContractName.GovernanceSlasher)
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 1),
         "Index doesn't match identifier"
       )
@@ -640,7 +646,7 @@ contract('LockedGold', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           lockedGold.slash(
             account,
             penalty,
@@ -775,7 +781,7 @@ contract('LockedGold', (accounts: string[]) => {
       const penalty = value
       const reward = value / 2
 
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         lockedGold.slash(
           account,
           penalty,

@@ -1,5 +1,5 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
-import { assertRevertWithReason, assertSameAddress } from '@celo/protocol/lib/test-utils'
+import { assertSameAddress, assertTransactionRevertWithReason } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
   AddressSortedLinkedListWithMedianTestContract,
@@ -55,7 +55,7 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
     })
 
     it('should revert if key is 0', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         addressSortedLinkedListWithMedianTest.insert(
           NULL_ADDRESS,
           numerator,
@@ -67,14 +67,14 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
     })
 
     it('should revert if lesser is equal to key', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         addressSortedLinkedListWithMedianTest.insert(key, numerator, key, NULL_ADDRESS),
         'invalid key'
       )
     })
 
     it('should revert if greater is equal to key', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         addressSortedLinkedListWithMedianTest.insert(key, numerator, NULL_ADDRESS, key),
         'invalid key'
       )
@@ -91,7 +91,7 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
       })
 
       it('should revert when inserting an element already in the list', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           addressSortedLinkedListWithMedianTest.insert(key, numerator, NULL_ADDRESS, NULL_ADDRESS),
           'invalid key'
         )
@@ -123,7 +123,7 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
     })
 
     it('should revert if the key is not in the list', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         addressSortedLinkedListWithMedianTest.update(
           accounts[8],
           newNumerator,
@@ -135,14 +135,14 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
     })
 
     it('should revert if lesser is equal to key', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         addressSortedLinkedListWithMedianTest.update(key, newNumerator, key, NULL_ADDRESS),
         'invalid key'
       )
     })
 
     it('should revert if greater is equal to key', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         addressSortedLinkedListWithMedianTest.update(key, newNumerator, NULL_ADDRESS, key),
         'invalid key'
       )
@@ -182,7 +182,7 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
     })
 
     it('should revert if the key is not in the list', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         addressSortedLinkedListWithMedianTest.remove(accounts[8]),
         'key not in list'
       )

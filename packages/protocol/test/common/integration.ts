@@ -3,8 +3,8 @@ import { constitution } from '@celo/protocol/governanceConstitution'
 import {
   addressMinedLatestBlock,
   assertEqualBN,
-  assertRevertWithoutReason,
-  assertRevertWithReason,
+  assertTransactionRevertWithoutReason,
+  assertTransactionRevertWithReason,
   assumeOwnership,
   stripHexEncoding,
   timeTravel,
@@ -638,12 +638,12 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
     // TODO (soloseng): add revert msg to https://github.com/celo-org/celo-monorepo/blob/1701bf5b611448d247dc960b5bc09230888a31da/packages/protocol/contracts/stability/SortedOracles.sol#L174
     it(`should be impossible to sell CELO`, async () => {
       await goldToken.approve(exchangeAbc.address, sellAmount)
-      await assertRevertWithoutReason(exchangeAbc.sell(sellAmount, minBuyAmount, true))
+      await assertTransactionRevertWithoutReason(exchangeAbc.sell(sellAmount, minBuyAmount, true))
     })
 
     it(`should be impossible to sell stable token`, async () => {
       await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
-      await assertRevertWithoutReason(exchangeAbc.sell(sellAmount, minBuyAmount, false))
+      await assertTransactionRevertWithoutReason(exchangeAbc.sell(sellAmount, minBuyAmount, false))
     })
   })
 
@@ -665,7 +665,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
 
     it(`should be impossible to sell CELO`, async () => {
       await goldToken.approve(exchangeAbc.address, sellAmount)
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         exchangeAbc.sell(sellAmount, minBuyAmount, true),
         "can't call when contract is frozen"
       )
@@ -673,7 +673,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
 
     it(`should be impossible to sell stable token`, async () => {
       await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         exchangeAbc.sell(sellAmount, minBuyAmount, false),
         "can't call when contract is frozen"
       )

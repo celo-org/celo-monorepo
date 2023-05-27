@@ -2,7 +2,7 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertLogMatches2,
   assertRevert,
-  assertRevertWithReason,
+  assertTransactionRevertWithReason,
   getEpochNumberOfBlock,
   getFirstBlockNumberForEpoch,
   jsonRpc,
@@ -132,7 +132,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     })
 
     it('can only be called once', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         slasher.initialize(registry.address, 10000, 100, 2),
         'contract already initialized'
       )
@@ -141,7 +141,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
 
   describe('#setSlashingIncentives()', () => {
     it('can only be set by the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         slasher.setSlashingIncentives(123, 67, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -155,7 +155,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     })
 
     it('reward cannot be larger than penalty', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         slasher.setSlashingIncentives(123, 678),
         'Penalty has to be larger than reward'
       )
@@ -176,7 +176,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
 
   describe('#setSlashableDowntime()', () => {
     it('can only be set by the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         slasher.setSlashableDowntime(23, { from: nonOwner }),
         ' Ownable: caller is not the owner'
       )
@@ -283,7 +283,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       const resp = await slasher.setBitmapForInterval(blockNumber, blockNumber + 1)
       assert.equal(resp.logs.length, 1)
 
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         slasher.setBitmapForInterval(blockNumber, blockNumber + 1),
         'bitmap already set'
       )
@@ -391,7 +391,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         // First block with every validator signatures
         await presetParentSealForBlocks(startBlock, 1, [bitmapVI01])
         const slotArrays = await calculateEverySlot(startBlock)
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           slasher.slash(
             slotArrays.startBlocks,
             slotArrays.endBlocks,
@@ -419,7 +419,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         // Last block with every validator signatures
         await presetParentSealForBlocks(startBlock + slashableDowntime - 1, 1, [bitmapVI01])
         const slotArrays = await calculateEverySlot(startBlock)
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           slasher.slash(
             slotArrays.startBlocks,
             slotArrays.endBlocks,
@@ -447,7 +447,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         // Middle block with every validator signatures
         await presetParentSealForBlocks(startBlock + intervalSize, 1, [bitmapVI01])
         const slotArrays = await calculateEverySlot(startBlock)
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           slasher.slash(
             slotArrays.startBlocks,
             slotArrays.endBlocks,
@@ -475,7 +475,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         // First block with every validator signatures
         await presetParentSealForBlocks(startBlock, 1, [bitmapVI99])
         const slotArrays = await calculateEverySlot(startBlock)
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           slasher.slash(
             slotArrays.startBlocks,
             slotArrays.endBlocks,
@@ -572,7 +572,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
               ])
             }
             await generateProofs(startBlocks, endBlocks)
-            await assertRevertWithReason(
+            await assertTransactionRevertWithReason(
               slasher.slash(
                 startBlocks,
                 endBlocks,
@@ -603,7 +603,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
             ])
           }
           await generateProofs(startBlocks, endBlocks)
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             slasher.slash(
               startBlocks,
               endBlocks,
@@ -715,7 +715,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
           // Last block with every validator signatures
           await presetParentSealForBlocks(startBlock + slashableDowntime - 1, 1, [bitmapVI01])
           const slotArrays = await calculateEverySlot(startBlock)
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             slasher.slash(
               slotArrays.startBlocks,
               slotArrays.endBlocks,
@@ -744,7 +744,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
           // Last block with every validator signatures
           await presetParentSealForBlocks(startBlock + slashableDowntime - 1, 1, [bitmapVI01])
           const slotArrays = await calculateEverySlot(startBlock)
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             slasher.slash(
               slotArrays.startBlocks,
               slotArrays.endBlocks,
@@ -815,7 +815,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
             1,
             validatorIndexInEpoch,
           ])
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             slasher.slash(
               slotArrays.startBlocks,
               slotArrays.endBlocks,
@@ -863,7 +863,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
           const slotArrays = await ensureValidatorIsSlashable(newStartBlock, [
             validatorIndexInEpoch,
           ])
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             slasher.slash(
               slotArrays.startBlocks,
               slotArrays.endBlocks,

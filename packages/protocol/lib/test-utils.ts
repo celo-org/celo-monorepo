@@ -132,14 +132,12 @@ export const assertThrowsAsync = async (promise: any, errorMessage: string = '')
   assert.strictEqual(true, failed, errorMessage)
 }
 
-export async function assertRevertWithReason(promise: any, expectedRevertReason: string = '') {
+export async function assertTransactionRevertWithReason(promise: any, expectedRevertReason: string = '') {
   try {
    await promise
     assert.fail('Expected transaction to revert')
   } catch (error) {
     // Only ever tested with ganache.
-    // When it's a view call, error.message has a shape like:
-    // `Returned error: VM Exception while processing transaction: revert ${expectedRevertReason}`
     // When it's a transaction (eg a non-view send call), error.message has a shape like:
     // 'StatusError: Transaction: ${transactionHash} exited with an error (status 0). Reason given: ${revertMessage}.'
     // Therefore we try to search for `${expectedRevertReason}`.
@@ -151,23 +149,7 @@ export async function assertRevertWithReason(promise: any, expectedRevertReason:
   }
 }
 
-// TODO: Use assertRevert directly from openzeppelin-solidity
-// Note that errorMessage is not the expected revert message, but the
-// message that is provided if there is no revert.
-export async function assertRevert(promise: any, errorMessage: string = '') {
-  try {
-    await promise
-    assert.fail('Expected transaction to revert')
-  } catch (error) {
-    const revertFound: boolean =
-      error.message.search('VM Exception while processing transaction: revert') >= 0
-    const msg: string =
-      errorMessage === '' ? `Expected "revert", got ${error} instead` : errorMessage
-    assert(revertFound, msg)
-  }
-}
-
-export async function assertRevertWithoutReason(promise: any, errorMessage: string = '') {
+export async function assertTransactionRevertWithoutReason(promise: any, errorMessage: string = '') {
   // When a transaction reverts without a reason, error.message has a shape like:
   // 'Transaction: ${transactionHash} exited with an error (status 0).'
   try {
@@ -178,6 +160,25 @@ export async function assertRevertWithoutReason(promise: any, errorMessage: stri
       error.message.search('exited with an error [(]status 0[)]') >= 0
     const msg: string =
       errorMessage === '' ? `Expected "StatusError", got ${error} instead` : errorMessage
+    assert(revertFound, msg)
+  }
+}
+
+// TODO: Use assertRevert directly from openzeppelin-solidity
+// Note that errorMessage is not the expected revert message, but the
+// message that is provided if there is no revert.
+export async function assertRevert(promise: any, errorMessage: string = '') {
+  // Only ever tested with ganache.
+  // When it's a view call, error.message has a shape like:
+  // `Error: VM Exception while processing transaction: revert ${expectedRevertReason}`
+  try {
+    await promise
+    assert.fail('Expected transaction to revert')
+  } catch (error) {
+    const revertFound: boolean =
+      error.message.search('VM Exception while processing transaction: revert') >= 0
+    const msg: string =
+      errorMessage === '' ? `Expected "revert", got ${error} instead` : errorMessage
     assert(revertFound, msg)
   }
 }

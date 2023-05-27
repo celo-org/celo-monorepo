@@ -1,6 +1,10 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertBalance, assertEqualBN, assertRevertWithReason } from '@celo/protocol/lib/test-utils'
+import {
+  assertBalance,
+  assertEqualBN,
+  assertTransactionRevertWithReason,
+} from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
 import _ from 'lodash'
 import {
@@ -175,7 +179,7 @@ contract('GoldToken', (accounts: string[]) => {
     })
 
     it('should not allow transferring to the null address', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         goldToken.transfer(NULL_ADDRESS, ONE_GOLDTOKEN, { gasPrice: 0 }),
         'transfer attempted to reserved address 0x0'
       )
@@ -187,7 +191,7 @@ contract('GoldToken', (accounts: string[]) => {
       const value = web3.utils.toBN(
         (await goldToken.balanceOf(sender)).plus(ONE_GOLDTOKEN.times(4))
       )
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         goldToken.transfer(receiver, value),
         'transfer value exceeded balance of sender'
       )
@@ -208,7 +212,7 @@ contract('GoldToken', (accounts: string[]) => {
     })
 
     it('should not allow transferring to the null address', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         goldToken.transferFrom(sender, NULL_ADDRESS, ONE_GOLDTOKEN, { from: receiver }),
         'transfer attempted to reserved address 0x0'
       )
@@ -221,14 +225,14 @@ contract('GoldToken', (accounts: string[]) => {
         (await goldToken.balanceOf(sender)).plus(ONE_GOLDTOKEN.times(4))
       )
       await goldToken.approve(receiver, value)
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         goldToken.transferFrom(sender, receiver, value, { from: receiver }),
         'transfer value exceeded balance of sender'
       )
     })
 
     it('should not allow transferring more than the spender is allowed', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         goldToken.transferFrom(sender, receiver, ONE_GOLDTOKEN.plus(1), {
           from: receiver,
         }),

@@ -2,7 +2,7 @@ import {
   assertContainSubset,
   assertEqualBN,
   assertRevert,
-  assertRevertWithReason,
+  assertTransactionRevertWithReason,
   currentEpochNumber,
   EPOCH,
   timeTravel,
@@ -43,7 +43,7 @@ contract('Random', (accounts: string[]) => {
     })
 
     it('only owner can set', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         random.setRandomnessBlockRetentionWindow(1000, { from: accounts[1] }),
         'Ownable: caller is not the owner'
       )
@@ -177,7 +177,7 @@ contract('Random', (accounts: string[]) => {
       await random.setRandomnessBlockRetentionWindow(256)
     })
     it('cannot add zero commitment', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         random.testRevealAndCommit('0x0', hash0, accounts[0]),
         'cannot commit zero randomness'
       )

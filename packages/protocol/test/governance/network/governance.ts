@@ -6,7 +6,7 @@ import {
   assertEqualBN,
   assertLogMatches2,
   assertRevert,
-  assertRevertWithReason,
+  assertTransactionRevertWithReason,
   matchAny,
   mineToNextEpoch,
   stripHexEncoding,
@@ -238,7 +238,7 @@ contract('Governance', (accounts: string[]) => {
 
     // TODO(asa): Consider testing reversion when 0 values provided
     it('should not be callable again', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.initialize(
           registry.address,
           approver,
@@ -278,15 +278,21 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when approver is the null address', async () => {
-      await assertRevertWithReason(governance.setApprover(NULL_ADDRESS), 'Approver cannot be 0')
+      await assertTransactionRevertWithReason(
+        governance.setApprover(NULL_ADDRESS),
+        'Approver cannot be 0'
+      )
     })
 
     it('should revert when the approver is unchanged', async () => {
-      await assertRevertWithReason(governance.setApprover(approver), 'Approver unchanged')
+      await assertTransactionRevertWithReason(
+        governance.setApprover(approver),
+        'Approver unchanged'
+      )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setApprover(newApprover, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -313,14 +319,14 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when the minDeposit is unchanged', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setMinDeposit(minDeposit),
         'Minimum deposit unchanged'
       )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setMinDeposit(newMinDeposit, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -347,21 +353,21 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when concurrent proposals is 0', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setConcurrentProposals(0),
         'Number of proposals must be larger than zero'
       )
     })
 
     it('should revert when concurrent proposals is unchanged', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setConcurrentProposals(concurrentProposals),
         'Number of proposals unchanged'
       )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setConcurrentProposals(newConcurrentProposals, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -388,18 +394,21 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when queue expiry is 0', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setQueueExpiry(0),
         'QueueExpiry must be larger than 0'
       )
     })
 
     it('should revert when queue expiry is unchanged', async () => {
-      await assertRevertWithReason(governance.setQueueExpiry(queueExpiry), 'QueueExpiry unchanged')
+      await assertTransactionRevertWithReason(
+        governance.setQueueExpiry(queueExpiry),
+        'QueueExpiry unchanged'
+      )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setQueueExpiry(newQueueExpiry, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -426,21 +435,21 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when dequeue frequency is 0', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setDequeueFrequency(0),
         'dequeueFrequency must be larger than 0'
       )
     })
 
     it('should revert when dequeue frequency is unchanged', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setDequeueFrequency(dequeueFrequency),
         'dequeueFrequency unchanged'
       )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setDequeueFrequency(newDequeueFrequency, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -468,21 +477,21 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when referendum stage duration is 0', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setReferendumStageDuration(0),
         'Duration must be larger than 0'
       )
     })
 
     it('should revert when referendum stage duration is unchanged', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setReferendumStageDuration(referendumStageDuration),
         'Duration unchanged'
       )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setReferendumStageDuration(newReferendumStageDuration, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -510,21 +519,21 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when execution stage duration is 0', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setExecutionStageDuration(0),
         'Duration must be larger than 0'
       )
     })
 
     it('should revert when execution stage duration is unchanged', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setExecutionStageDuration(executionStageDuration),
         'Duration unchanged'
       )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setExecutionStageDuration(newExecutionStageDuration, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -553,14 +562,14 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert if new participation floor is above 1', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setParticipationFloor(toFixed(101 / 100)),
         'Participation floor greater than one'
       )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setParticipationFloor(differentParticipationFloor, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -589,14 +598,14 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert if new update coefficient is above 1', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setBaselineUpdateFactor(toFixed(101 / 100)),
         'Baseline update factor greater than one'
       )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setBaselineUpdateFactor(differentBaselineUpdateFactor, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -625,14 +634,14 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert if new critical baseline level is above 1', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setBaselineQuorumFactor(toFixed(101 / 100)),
         'Baseline quorum factor greater than one'
       )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setBaselineQuorumFactor(differentBaselineQuorumFactor, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -714,35 +723,35 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when the destination is the null address', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setConstitution(NULL_ADDRESS, nullFunctionId, threshold),
         'Destination cannot be zero'
       )
     })
 
     it('should revert when the threshold is zero', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setConstitution(destination, nullFunctionId, 0),
         'Threshold has to be greater than majority and not greater than unanimity'
       )
     })
 
     it('should revert when the threshold is not greater than a majority', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setConstitution(destination, nullFunctionId, toFixed(1 / 2)),
         'Threshold has to be greater than majority and not greater than unanimity'
       )
     })
 
     it('should revert when the threshold is greater than 100%', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setConstitution(destination, nullFunctionId, toFixed(101 / 100)),
         'Threshold has to be greater than majority and not greater than unanimity'
       )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.setConstitution(destination, nullFunctionId, threshold, {
           from: nonOwner,
         }),
@@ -1095,7 +1104,7 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when upvoting a proposal that is not queued', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.upvote(proposalId.plus(1), 0, 0),
         'cannot upvote a proposal not in the queue'
       )
@@ -1205,7 +1214,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should revert when upvoting a proposal that will be dequeued', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           governance.upvote(proposalId, 0, 0),
           'cannot upvote a proposal not in the queue'
         )
@@ -1326,7 +1335,7 @@ contract('Governance', (accounts: string[]) => {
 
     it('should revert when the account does not have an upvoted proposal', async () => {
       await governance.revokeUpvote(0, 0)
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.revokeUpvote(0, 0),
         'Account has no historical upvote'
       )
@@ -1422,7 +1431,7 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when the caller was not the proposer of a dequeued proposal', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.withdraw({ from: accounts[1] }),
         'Nothing to withdraw'
       )
@@ -1482,7 +1491,7 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when the index is out of bounds', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.approve(proposalId, index + 1),
         'Provided index greater than dequeue length.'
       )
@@ -1501,14 +1510,14 @@ contract('Governance', (accounts: string[]) => {
       )
       await timeTravel(dequeueFrequency, web3)
       const otherProposalId = 2
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.approve(otherProposalId, index),
         'Proposal not dequeued'
       )
     })
 
     it('should revert when not called by the approver', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.approve(proposalId, index, { from: nonApprover }),
         'msg.sender not approver'
       )
@@ -1525,7 +1534,7 @@ contract('Governance', (accounts: string[]) => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: minDeposit }
       )
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.approve(proposalId + 1, index),
         'Proposal not dequeued'
       )
@@ -1533,7 +1542,7 @@ contract('Governance', (accounts: string[]) => {
 
     it('should revert if the proposal has already been approved', async () => {
       await governance.approve(proposalId, index)
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.approve(proposalId, index),
         'Proposal already approved'
       )
@@ -1843,11 +1852,14 @@ contract('Governance', (accounts: string[]) => {
 
       it('should revert when the account weight is 0', async () => {
         await mockLockedGold.setAccountTotalLockedGold(account, 0)
-        await assertRevertWithReason(governance.vote(proposalId, index, value), 'Voter weight zero')
+        await assertTransactionRevertWithReason(
+          governance.vote(proposalId, index, value),
+          'Voter weight zero'
+        )
       })
 
       it('should revert when the index is out of bounds', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           governance.vote(proposalId, index + 1, value),
           'Provided index greater than dequeue length.'
         )
@@ -1866,7 +1878,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         const otherProposalId = 2
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           governance.vote(otherProposalId, index, value),
           'Proposal not dequeued'
         )
@@ -2118,11 +2130,14 @@ contract('Governance', (accounts: string[]) => {
 
       it('should revert when the account weight is 0', async () => {
         await mockLockedGold.setAccountTotalLockedGold(account, 0)
-        await assertRevertWithReason(governance.vote(proposalId, index, value), 'Voter weight zero')
+        await assertTransactionRevertWithReason(
+          governance.vote(proposalId, index, value),
+          'Voter weight zero'
+        )
       })
 
       it('should revert when the index is out of bounds', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           governance.vote(proposalId, index + 1, value),
           'Provided index greater than dequeue length.'
         )
@@ -2141,7 +2156,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         const otherProposalId = 2
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           governance.vote(otherProposalId, index, value),
           'Proposal not dequeued'
         )
@@ -2296,14 +2311,14 @@ contract('Governance', (accounts: string[]) => {
 
       it('should revert when the account weight is 0', async () => {
         await mockLockedGold.setAccountTotalLockedGold(account, 0)
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           governance.votePartially(proposalId, index, yesVotes, 0, 0),
           "Voter doesn't have enough locked Celo [(]formerly known as Celo Gold[)]"
         )
       })
 
       it('should revert when the account does not have enough gold', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           governance.votePartially(proposalId, index, yesVotes + 1, 0, 0),
           "Voter doesn't have enough locked Celo [(]formerly known as Celo Gold[)]"
         )
@@ -2311,14 +2326,14 @@ contract('Governance', (accounts: string[]) => {
 
       it('should revert when the account does not have enough gold when voting partially', async () => {
         const noVotes = yesVotes
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           governance.votePartially(proposalId, index, yesVotes, noVotes, 0),
           "Voter doesn't have enough locked Celo [(]formerly known as Celo Gold[)]"
         )
       })
 
       it('should revert when the index is out of bounds', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           governance.votePartially(proposalId, index + 1, yesVotes, 0, 0),
           'Provided index greater than dequeue length.'
         )
@@ -2337,7 +2352,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         const otherProposalId = 2
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           governance.votePartially(otherProposalId, index, yesVotes, 0, 0),
           'Proposal not dequeued'
         )
@@ -2641,14 +2656,14 @@ contract('Governance', (accounts: string[]) => {
 
       it('should revert when the account weight is 0', async () => {
         await mockLockedGold.setAccountTotalLockedGold(account, 0)
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           governance.votePartially(proposalId, index, yesVotes, 0, 0),
           "Voter doesn't have enough locked Celo [(]formerly known as Celo Gold[)]"
         )
       })
 
       it('should revert when the index is out of bounds', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           governance.votePartially(proposalId, index + 1, yesVotes, 0, 0),
           'Provided index greater than dequeue length.'
         )
@@ -2667,7 +2682,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         const otherProposalId = 2
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           governance.votePartially(otherProposalId, index, yesVotes, 0, 0),
           'Proposal not dequeued'
         )
@@ -2813,7 +2828,7 @@ contract('Governance', (accounts: string[]) => {
         })
 
         it('should revert when the index is out of bounds', async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             governance.execute(proposalId, index + 1),
             'Provided index greater than dequeue length.'
           )
@@ -2885,7 +2900,7 @@ contract('Governance', (accounts: string[]) => {
         })
 
         it('should revert when the index is out of bounds', async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             governance.execute(proposalId, index + 1),
             'Provided index greater than dequeue length.'
           )
@@ -2911,7 +2926,7 @@ contract('Governance', (accounts: string[]) => {
         })
 
         it('should revert', async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             governance.execute(proposalId, index),
             'Proposal not approved'
           )
@@ -2938,7 +2953,7 @@ contract('Governance', (accounts: string[]) => {
         })
 
         it('should revert', async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             governance.execute(proposalId, index),
             'Proposal execution failed'
           )
@@ -2965,7 +2980,7 @@ contract('Governance', (accounts: string[]) => {
         })
 
         it('should revert', async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             governance.execute(proposalId, index),
             'Invalid contract address'
           )
@@ -3061,7 +3076,7 @@ contract('Governance', (accounts: string[]) => {
           })
 
           it('should revert', async () => {
-            await assertRevertWithReason(
+            await assertTransactionRevertWithReason(
               governance.execute(proposalId, index),
               'Proposal execution failed'
             )
@@ -3088,7 +3103,7 @@ contract('Governance', (accounts: string[]) => {
           })
 
           it('should revert', async () => {
-            await assertRevertWithReason(
+            await assertTransactionRevertWithReason(
               governance.execute(proposalId, index),
               'Proposal execution failed'
             )
@@ -3281,7 +3296,7 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when called by non-approver', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.approveHotfix(hotfixHashStr, { from: accounts[2] }),
         'msg.sender not approver'
       )
@@ -3400,7 +3415,7 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when hotfix is not passing', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         governance.prepareHotfix(hotfixHashStr),
         'hotfix not whitelisted by 2f[+]1 validators'
       )
@@ -3436,7 +3451,7 @@ contract('Governance', (accounts: string[]) => {
 
       it('should revert when epoch == preparedEpoch', async () => {
         await governance.prepareHotfix(hotfixHashStr)
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           governance.prepareHotfix(hotfixHashStr),
           'hotfix already prepared for this epoch'
         )
@@ -3463,13 +3478,16 @@ contract('Governance', (accounts: string[]) => {
     }
 
     it('should revert when hotfix not approved', async () => {
-      await assertRevertWithReason(executeHotfixTx(), 'hotfix not approved')
+      await assertTransactionRevertWithReason(executeHotfixTx(), 'hotfix not approved')
     })
 
     it('should revert when hotfix not prepared for current epoch', async () => {
       await mineToNextEpoch(web3)
       await governance.approveHotfix(hotfixHashStr, { from: approver })
-      await assertRevertWithReason(executeHotfixTx(), 'hotfix must be prepared for this epoch')
+      await assertTransactionRevertWithReason(
+        executeHotfixTx(),
+        'hotfix must be prepared for this epoch'
+      )
     })
 
     it('should revert when hotfix prepared but not for current epoch', async () => {
@@ -3479,7 +3497,10 @@ contract('Governance', (accounts: string[]) => {
       await governance.whitelistHotfix(hotfixHashStr, { from: accounts[2] })
       await governance.prepareHotfix(hotfixHashStr, { from: accounts[2] })
       await mineToNextEpoch(web3)
-      await assertRevertWithReason(executeHotfixTx(), 'hotfix must be prepared for this epoch')
+      await assertTransactionRevertWithReason(
+        executeHotfixTx(),
+        'hotfix must be prepared for this epoch'
+      )
     })
 
     describe('when hotfix is approved and prepared for current epoch', () => {
@@ -3518,7 +3539,7 @@ contract('Governance', (accounts: string[]) => {
 
       it('should not be executable again', async () => {
         await executeHotfixTx()
-        await assertRevertWithReason(executeHotfixTx(), 'hotfix already executed')
+        await assertTransactionRevertWithReason(executeHotfixTx(), 'hotfix already executed')
       })
     })
   })

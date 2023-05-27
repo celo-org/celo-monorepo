@@ -2,7 +2,7 @@ import { NULL_ADDRESS } from '@celo/base/lib/address'
 import {
   assertEqualBN,
   assertLogMatches2,
-  assertRevertWithReason,
+  assertTransactionRevertWithReason,
   matchAddress,
   matchAny,
   timeTravel,
@@ -41,7 +41,7 @@ contract('SortedOracles', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         sortedOracles.initialize(aReportExpiry),
         'contract already initialized'
       )
@@ -69,7 +69,7 @@ contract('SortedOracles', (accounts: string[]) => {
     })
 
     it('should revert when called by a non-owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         sortedOracles.setReportExpiry(newReportExpiry, { from: accounts[1] }),
         'Ownable: caller is not the owner'
       )
@@ -99,7 +99,7 @@ contract('SortedOracles', (accounts: string[]) => {
     })
 
     it('should revert when called by a non-owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         sortedOracles.setReportExpiry(newReportExpiry, { from: accounts[1] }),
         'Ownable: caller is not the owner'
       )
@@ -126,14 +126,14 @@ contract('SortedOracles', (accounts: string[]) => {
     })
 
     it('should revert when token is the null address', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         sortedOracles.addOracle(NULL_ADDRESS, anOracle),
         'token addr was null or oracle addr was null or oracle addr is not an oracle for token addr'
       )
     })
 
     it('should revert when the oracle is the null address', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         sortedOracles.addOracle(aToken, NULL_ADDRESS),
         'token addr was null or oracle addr was null or oracle addr is not an oracle for token addr'
       )
@@ -141,14 +141,14 @@ contract('SortedOracles', (accounts: string[]) => {
 
     it('should revert when the oracle has already been added', async () => {
       await sortedOracles.addOracle(aToken, anOracle)
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         sortedOracles.addOracle(aToken, anOracle),
         'token addr was null or oracle addr was null or oracle addr is not an oracle for token addr'
       )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         sortedOracles.addOracle(aToken, anOracle, { from: accounts[1] }),
         'Ownable: caller is not the owner'
       )
@@ -183,7 +183,7 @@ contract('SortedOracles', (accounts: string[]) => {
     })
 
     it('should revert when no report exists', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         sortedOracles.removeExpiredReports(aToken, 1),
         'token addr null or trying to remove too many reports'
       )
@@ -197,7 +197,7 @@ contract('SortedOracles', (accounts: string[]) => {
       })
 
       it('should revert when only 1 report exists', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           sortedOracles.removeExpiredReports(aToken, 1),
           'token addr null or trying to remove too many reports'
         )
@@ -227,7 +227,7 @@ contract('SortedOracles', (accounts: string[]) => {
         })
 
         it('should revert when n>=numTimestamps', async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             sortedOracles.removeExpiredReports(aToken, 5),
             'token addr null or trying to remove too many reports'
           )
@@ -468,21 +468,21 @@ contract('SortedOracles', (accounts: string[]) => {
     })
 
     it('should revert when the wrong index is provided', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         sortedOracles.removeOracle(aToken, anOracle, 1),
         'token addr null or oracle addr null or index of token oracle not mapped to oracle addr'
       )
     })
 
     it('should revert when the wrong address is provided', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         sortedOracles.removeOracle(aToken, accounts[0], 0),
         'token addr null or oracle addr null or index of token oracle not mapped to oracle addr'
       )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         sortedOracles.removeOracle(aToken, anOracle, 0, { from: accounts[1] }),
         'Ownable: caller is not the owner'
       )
@@ -551,7 +551,7 @@ contract('SortedOracles', (accounts: string[]) => {
     })
 
     it('should revert when called by a non-oracle', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         sortedOracles.report(aToken, value, NULL_ADDRESS, NULL_ADDRESS),
         'sender was not an oracle for token addr'
       )

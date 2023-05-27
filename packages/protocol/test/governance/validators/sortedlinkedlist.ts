@@ -1,4 +1,4 @@
-import { assertRevertWithReason } from '@celo/protocol/lib/test-utils'
+import { assertTransactionRevertWithReason } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import { IntegerSortedLinkedListTestContract, IntegerSortedLinkedListTestInstance } from 'types'
 
@@ -46,15 +46,21 @@ contract('IntegerSortedLinkedListTest', () => {
     })
 
     it('should revert if key is 0', async () => {
-      await assertRevertWithReason(sortedListTest.insert(0, value, 0, 0), 'invalid key')
+      await assertTransactionRevertWithReason(sortedListTest.insert(0, value, 0, 0), 'invalid key')
     })
 
     it('should revert if lesser is equal to key', async () => {
-      await assertRevertWithReason(sortedListTest.insert(key, value, key, 0), 'invalid key')
+      await assertTransactionRevertWithReason(
+        sortedListTest.insert(key, value, key, 0),
+        'invalid key'
+      )
     })
 
     it('should revert if greater is equal to key', async () => {
-      await assertRevertWithReason(sortedListTest.insert(key, value, 0, key), 'invalid key')
+      await assertTransactionRevertWithReason(
+        sortedListTest.insert(key, value, 0, key),
+        'invalid key'
+      )
     })
 
     describe('when an element is already in the list', () => {
@@ -63,13 +69,16 @@ contract('IntegerSortedLinkedListTest', () => {
       })
 
       it('should revert when inserting an element already in the list', async () => {
-        await assertRevertWithReason(sortedListTest.insert(key, value, 0, key), 'invalid key')
+        await assertTransactionRevertWithReason(
+          sortedListTest.insert(key, value, 0, key),
+          'invalid key'
+        )
       })
 
       it('should revert when inserting a non-maximal element at the head of the list', async () => {
         const nonKey = key - 1
         const newKey = key + 1
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           sortedListTest.insert(newKey, value - 1, nonKey, 0),
           'greater and lesser key zero'
         )
@@ -96,18 +105,24 @@ contract('IntegerSortedLinkedListTest', () => {
     })
 
     it('should revert if the key is not in the list', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         sortedListTest.update(key + 1, newValue, 0, 0),
         'key not in list'
       )
     })
 
     it('should revert if lesser is equal to key', async () => {
-      await assertRevertWithReason(sortedListTest.update(key, newValue, key, 0), 'invalid key')
+      await assertTransactionRevertWithReason(
+        sortedListTest.update(key, newValue, key, 0),
+        'invalid key'
+      )
     })
 
     it('should revert if greater is equal to key', async () => {
-      await assertRevertWithReason(sortedListTest.update(key, newValue, 0, key), 'invalid key')
+      await assertTransactionRevertWithReason(
+        sortedListTest.update(key, newValue, 0, key),
+        'invalid key'
+      )
     })
   })
 
@@ -142,7 +157,7 @@ contract('IntegerSortedLinkedListTest', () => {
     })
 
     it('should revert if the key is not in the list', async () => {
-      await assertRevertWithReason(sortedListTest.remove(key + 1), 'key not in list')
+      await assertTransactionRevertWithReason(sortedListTest.remove(key + 1), 'key not in list')
     })
   })
 
@@ -192,7 +207,10 @@ contract('IntegerSortedLinkedListTest', () => {
     })
 
     it('should revert if n is greater than the number of elements', async () => {
-      await assertRevertWithReason(sortedListTest.popN(numElements + 1), 'not enough elements')
+      await assertTransactionRevertWithReason(
+        sortedListTest.popN(numElements + 1),
+        'not enough elements'
+      )
     })
   })
 

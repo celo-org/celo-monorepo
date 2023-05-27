@@ -1,5 +1,8 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertContainSubset, assertRevertWithReason } from '@celo/protocol/lib/test-utils'
+import {
+  assertContainSubset,
+  assertTransactionRevertWithReason,
+} from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
@@ -70,7 +73,7 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
       assert.equal(res[1].toNumber(), 100)
     })
     it('can only be called once', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         slasher.initialize(registry.address, 10000, 100),
         'contract already initialized'
       )
@@ -79,13 +82,13 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
 
   describe('#setSlashingIncentives()', () => {
     it('can only be set by the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         slasher.setSlashingIncentives(123, 67, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
     })
     it('reward cannot be larger than penalty', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         slasher.setSlashingIncentives(123, 678),
         'Penalty has to be larger than reward'
       )
@@ -131,26 +134,26 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
       await slasher.setVerifiedSealBitmap(headerC, bitmap)
     })
     it('fails if block numbers do not match', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         slasher.slash(validator, validatorIndex, headerA, headerB, 0, [], [], [], [], [], []),
         'Block headers are from different height'
       )
     })
     it('fails if is not signed at index', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         slasher.slash(accounts[4], validatorIndex + 1, headerA, headerC, 0, [], [], [], [], [], []),
         "Didn't sign first block"
       )
     })
     it('fails if epoch signer is wrong', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         slasher.slash(accounts[4], validatorIndex, headerA, headerC, 0, [], [], [], [], [], []),
         "Wasn't a signer with given index"
       )
     })
     it('fails if there are not enough signers', async () => {
       await slasher.setNumberValidators(100)
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], []),
         'Not enough signers in the first block'
       )
@@ -190,7 +193,7 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
     })
     it('fails when tried second time', async () => {
       await slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], []),
         ' Already slashed'
       )

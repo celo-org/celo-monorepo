@@ -4,7 +4,7 @@ import {
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
-  assertRevertWithReason,
+  assertTransactionRevertWithReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
@@ -92,7 +92,7 @@ contract('StableToken', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         stableToken.initialize(
           'Celo Dollar',
           'cUSD',
@@ -119,7 +119,7 @@ contract('StableToken', (accounts: string[]) => {
     })
 
     it('should not allow other users to set registry', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         stableToken.setRegistry(anAddress, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -169,7 +169,7 @@ contract('StableToken', (accounts: string[]) => {
     })
 
     it('should not allow anyone else to mint', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         stableToken.mint(validators, amountToMint, { from: accounts[3] }),
         'Sender not authorized to mint'
       )
@@ -201,7 +201,7 @@ contract('StableToken', (accounts: string[]) => {
     })
 
     it('should not allow transferring to the null address', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         stableToken.transferWithComment(NULL_ADDRESS, 1, comment),
         'transfer attempted to reserved address 0x0'
       )
@@ -209,7 +209,7 @@ contract('StableToken', (accounts: string[]) => {
 
     it('should not allow transferring more than the owner has', async () => {
       const value = (await stableToken.balanceOf(sender)).toNumber() + 1
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         stableToken.transferWithComment(receiver, value, comment),
         'transfer value exceeded balance of sender.'
       )
@@ -288,7 +288,7 @@ contract('StableToken', (accounts: string[]) => {
     })
 
     it('should revert when a zero rate is provided', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         stableToken.setInflationParameters(toFixed(0), SECONDS_IN_A_WEEK),
         'Must provide a non-zero inflation rate.'
       )
@@ -427,7 +427,7 @@ contract('StableToken', (accounts: string[]) => {
     })
 
     it('should not allow anyone else to burn', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         stableToken.burn(amountToBurn, { from: accounts[2] }),
         'Sender not authorized to burn'
       )
@@ -583,7 +583,7 @@ contract('StableToken', (accounts: string[]) => {
       })
 
       it('should not allow transferring to the null address', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           stableToken.transfer(NULL_ADDRESS, transferAmount),
           'transfer attempted to reserved address 0x0'
         )
@@ -593,7 +593,7 @@ contract('StableToken', (accounts: string[]) => {
         // We try to send four more tokens than the sender has, in case they happen to mine the
         // block with this transaction, which will reward them with 3 tokens.
         const value = (await stableToken.balanceOf(sender)).toNumber() + 4
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           stableToken.transfer(receiver, value),
           'transfer value exceeded balance of sender'
         )
@@ -614,7 +614,7 @@ contract('StableToken', (accounts: string[]) => {
       })
 
       it('should not allow transferring to the null address', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           stableToken.transferFrom(sender, NULL_ADDRESS, transferAmount, { from: receiver }),
           'transfer attempted to reserved address 0x0'
         )
@@ -625,14 +625,14 @@ contract('StableToken', (accounts: string[]) => {
         // block with this transaction, which will reward them with 3 tokens.
         const value = (await stableToken.balanceOf(sender)).toNumber() + 4
         await stableToken.approve(receiver, value)
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           stableToken.transferFrom(sender, receiver, value, { from: receiver }),
           'transfer value exceeded balance of sender'
         )
       })
 
       it('should not allow transferring more than the spender is allowed', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           stableToken.transferFrom(sender, receiver, 2, {
             from: receiver,
           }),

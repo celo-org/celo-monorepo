@@ -2,7 +2,7 @@ import { NULL_ADDRESS } from '@celo/base/lib/address'
 import {
   assertEqualBN,
   assertLogMatches2,
-  assertRevertWithReason,
+  assertTransactionRevertWithReason,
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
@@ -68,7 +68,7 @@ contract('GasPriceMinimum', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         gasPriceMinimum.initialize(
           registry.address,
           gasPriceMinimumFloor,
@@ -102,14 +102,14 @@ contract('GasPriceMinimum', (accounts: string[]) => {
     })
 
     it('should revert when the provided fraction is greater than one', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         gasPriceMinimum.setAdjustmentSpeed(toFixed(3 / 2)),
         'adjustment speed must be smaller than 1'
       )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         gasPriceMinimum.setAdjustmentSpeed(newAdjustmentSpeed, { from: nonOwner }),
         'Ownable: caller is not the owner'
       )
@@ -138,14 +138,14 @@ contract('GasPriceMinimum', (accounts: string[]) => {
     })
 
     it('should revert when the provided fraction is greater than one', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         gasPriceMinimum.setTargetDensity(toFixed(3 / 2)),
         'target density must be smaller than 1'
       )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         gasPriceMinimum.setTargetDensity(newTargetDensity, {
           from: nonOwner,
         }),
@@ -176,14 +176,14 @@ contract('GasPriceMinimum', (accounts: string[]) => {
     })
 
     it('should revert when the provided floor is zero', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         gasPriceMinimum.setGasPriceMinimumFloor(0),
         'gas price minimum floor must be greater than zero'
       )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         gasPriceMinimum.setGasPriceMinimumFloor(newGasPriceMinFloor, {
           from: nonOwner,
         }),
