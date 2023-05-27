@@ -236,7 +236,7 @@ contract('GoldToken', (accounts: string[]) => {
         goldToken.transferFrom(sender, receiver, ONE_GOLDTOKEN.plus(1), {
           from: receiver,
         }),
-        "transfer value exceeded sender's allowance for recipient"
+        "transfer value exceeded sender's allowance for spender"
       )
     })
   })

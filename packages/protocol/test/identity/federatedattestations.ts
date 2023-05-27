@@ -1037,7 +1037,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         federatedAttestations.revokeAttestation(identifier1, issuer1, account1, {
           from: accounts[5],
         }),
-        'not an account'
+        'Must first register address with Account.createAccount'
       )
     })
 

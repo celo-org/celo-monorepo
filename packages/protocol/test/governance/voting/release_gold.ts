@@ -702,7 +702,7 @@ contract('ReleaseGold', (accounts: string[]) => {
       it('should revert', async () => {
         await assertTransactionRevertWithReason(
           releaseGoldInstance.setAccountName(accountName, { from: beneficiary }),
-          'Unknown account'
+          'Register with createAccount to set account name'
         )
       })
     })
@@ -1492,7 +1492,7 @@ contract('ReleaseGold', (accounts: string[]) => {
         releaseGoldInstance.lockGold(lockAmount, {
           from: beneficiary,
         }),
-        'not account'
+        'Must first register address with Account.createAccount'
       )
     })
 

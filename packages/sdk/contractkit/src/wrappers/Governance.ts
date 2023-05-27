@@ -232,6 +232,14 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
     }
   }
 
+  // function get support doesn't consider constitution parameteres that has an influence
+  // in the total of yes votes required
+  async getSupportWithConstitutionThreshold(proposalID: BigNumber.Value, constitution: BigNumber) {
+    const support = await this.getSupport(proposalID)
+    support.required = support.required.times(constitution)
+    return support
+  }
+
   // simulates proposal.getSupportWithQuorumPadding
   async getSupport(proposalID: BigNumber.Value) {
     const participation = await this.getParticipationParameters()
@@ -830,17 +838,6 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
   }
 
   revokeVotes = proxySend(this.connection, this.contract.methods.revokeVotes)
-
-  /**
-   * Returns `voter`'s vote choice on a given proposal.
-   * @param proposalID Governance proposal UUID
-   * @param voter Address of voter
-   */
-  async getVoteValue(proposalID: BigNumber.Value, voter: Address) {
-    const proposalIndex = await this.getDequeueIndex(proposalID)
-    const res = await this.contract.methods.getVoteRecord(voter, proposalIndex).call()
-    return Object.keys(VoteValue)[valueToInt(res[1])] as VoteValue
-  }
 
   /**
    * Executes a given proposal's associated transactions.
