@@ -192,8 +192,8 @@ contract('LockedGold', (accounts: string[]) => {
     })
 
     it('should revert when the account does not exist', async () => {
-      // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
       await assertTransactionRevertWithReason(
+        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         lockedGold.lock({ value, from: accounts[1] }),
         'not account'
       )
