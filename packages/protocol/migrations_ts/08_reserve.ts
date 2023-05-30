@@ -56,7 +56,7 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
         from: network.from,
         to: reserve.address,
         value: web3.utils.toWei(config.reserve.initialBalance.toString(), 'ether').toString(),
-        // @ts-ignore
+        // @ts-ignore: typing not available https://github.com/web3/web3.js/issues/6123#issuecomment-1568250373
         type: 0,
       })
 
