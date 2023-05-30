@@ -19,8 +19,7 @@ library B12 {
 
   // Base field modulus from https://eips.ethereum.org/EIPS/eip-2539#specification
   uint256 constant BLS12_377_BASE_A = 0x1ae3a4617c510eac63b05c06ca1493b;
-  uint256 constant BLS12_377_BASE_B
-    = 0x1a22d9f300f5138f1ef3622fba094800170b5d44300000008508c00000000001;
+  uint256 constant BLS12_377_BASE_B = 0x1a22d9f300f5138f1ef3622fba094800170b5d44300000008508c00000000001;
 
   // Fp2 is an extension field element with the coefficient of the
   // quadratic non-residue stored in `b`, i.e. p = a + i * b
@@ -69,10 +68,8 @@ library B12 {
   }
 
   function fp2Gt(Fp2 memory a, Fp2 memory b) internal pure returns (bool) {
-    if (FpEq(a.b, b.b))
-      return fpGt(a.a, b.a);
-    else
-      return fpGt(a.b, b.b);
+    if (FpEq(a.b, b.b)) return fpGt(a.a, b.a);
+    else return fpGt(a.b, b.b);
   }
 
   function fpAdd2(uint256 a, uint256 b) internal pure returns (Fp memory) {

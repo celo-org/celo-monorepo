@@ -11,8 +11,7 @@ library CIP20Lib {
   uint8 private constant BLAKE2S_SELECTOR = 0x10;
 
   // BLAKE2S_DEFAULT_CONFIG = createBlake2sConfig(32, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0)
-  bytes32 private constant BLAKE2S_DEFAULT_CONFIG
-    = 0x2000010100000000000000000000000000000000000000000000000000000000;
+  bytes32 private constant BLAKE2S_DEFAULT_CONFIG = 0x2000010100000000000000000000000000000000000000000000000000000000;
 
   // Accepts a fully formed input blob. This should include any config
   // options and the preimage, but not the selector.
