@@ -1,5 +1,10 @@
 pragma solidity ^0.5.13;
 
+// Included into celo-monorepo from
+// https://github.com/prestwich/b12-sol/blob/main/contracts/B12.sol
+// which is largely based on
+// https://github.com/ralexstokes/deposit-verifier/blob/master/deposit_verifier.sol
+
 import { TypedMemView } from "@summa-tx/memview.sol/contracts/TypedMemView.sol";
 
 library B12 {
