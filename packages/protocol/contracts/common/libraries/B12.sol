@@ -18,10 +18,9 @@ library B12 {
   }
 
   // Base field modulus from https://eips.ethereum.org/EIPS/eip-2539#specification
-  Fp constant BLS12_377_BASE = Fp(
-    0x1ae3a4617c510eac63b05c06ca1493b,
-    0x1a22d9f300f5138f1ef3622fba094800170b5d44300000008508c00000000001
-  );
+  uint256 constant BLS12_377_BASE_A = 0x1ae3a4617c510eac63b05c06ca1493b;
+  uint256 constant BLS12_377_BASE_B
+    = 0x1a22d9f300f5138f1ef3622fba094800170b5d44300000008508c00000000001;
 
   // Fp2 is an extension field element with the coefficient of the
   // quadratic non-residue stored in `b`, i.e. p = a + i * b
@@ -95,7 +94,7 @@ library B12 {
   }
 
   function fpSub(Fp memory a, Fp memory b) internal pure returns (Fp memory) {
-    Fp memory x = fpAdd(a, BLS12_377_BASE);
+    Fp memory x = fpAdd(a, Fp(BLS12_377_BASE_A, BLS12_377_BASE_B));
     uint256 bb = x.b - b.b;
     uint256 aa = x.a - b.a - (bb <= x.b ? 0 : 1);
     return Fp(aa, bb);
@@ -226,11 +225,11 @@ library B12 {
   }
 
   function fpNormal2(Fp memory a, uint256 idx) internal view returns (Fp memory) {
-    return fpModExp2(a, idx, 1, BLS12_377_BASE);
+    return fpModExp2(a, idx, 1, Fp(BLS12_377_BASE_A, BLS12_377_BASE_B));
   }
 
   function fpNormal(Fp memory a) internal view returns (Fp memory) {
-    return fpModExp(a, 1, BLS12_377_BASE);
+    return fpModExp(a, 1, Fp(BLS12_377_BASE_A, BLS12_377_BASE_B));
   }
 
   function mapToG2(Fp2 memory x, Fp2 memory hint1, Fp2 memory hint2, bool greatest)
@@ -255,9 +254,9 @@ library B12 {
     returns (G1Point memory)
   {
     Fp memory one = Fp(0, 1);
-    Fp memory res = fpAdd(fpModExp(x, 3, BLS12_377_BASE), one);
-    Fp memory sqhint1 = fpModExp(hint1, 2, BLS12_377_BASE);
-    Fp memory sqhint2 = fpModExp(hint2, 2, BLS12_377_BASE);
+    Fp memory res = fpAdd(fpModExp(x, 3, Fp(BLS12_377_BASE_A, BLS12_377_BASE_B)), one);
+    Fp memory sqhint1 = fpModExp(hint1, 2, Fp(BLS12_377_BASE_A, BLS12_377_BASE_B));
+    Fp memory sqhint2 = fpModExp(hint2, 2, Fp(BLS12_377_BASE_A, BLS12_377_BASE_B));
     require(FpEq(sqhint1, res), "y1 not sqrt");
     require(FpEq(sqhint2, res), "y2 not sqrt");
     require(fpGt(hint1, hint2), "y1 not greatest");
