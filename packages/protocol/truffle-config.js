@@ -70,7 +70,6 @@ const networks = {
     gasPrice: 0,
     gas: gasLimit,
     defaultBalance: 200000000,
-    // maxFeePerGas: 875000000,
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
   },
   rc0: {
