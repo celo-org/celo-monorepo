@@ -3,6 +3,7 @@ name: NPM install testing workflow
 # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
 on:
   schedule:
+    # daily at 19:00 UTC
     - cron: 0 19 * * *
   workflow_dispatch:
   pull_request:

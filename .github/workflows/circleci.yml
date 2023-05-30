@@ -171,7 +171,7 @@ jobs:
       - name: Run Jest Tests
         run: |
           mkdir -p test-results/jest
-          # Skipping packages that have an specific job
+          # Skipping packages that are tested in a specific job below
           yarn run lerna \
             --ignore @celo/contractkit \
             --ignore @celo/protocol \
@@ -664,7 +664,6 @@ jobs:
           command: |
             ${{ matrix.command }}
 
-  # TODO: Ask Identity team to check if this is relevant
   odis-test:
     name: ODIS test
     runs-on: ["self-hosted", "monorepo"]

@@ -4,6 +4,7 @@ name: Protocol tests with coverage
 # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
 on:
   schedule:
+  # daily at 13:00 UTC
   - cron: 0 13 * * *
   workflow_dispatch:
 
