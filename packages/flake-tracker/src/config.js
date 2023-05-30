@@ -9,7 +9,7 @@ if (process.env.GITHUB_REPOSITORY) {
 }
 const branch = process.env.CIRCLE_BRANCH || process.env.GITHUB_REF_NAME
 const sha = process.env.CIRCLE_SHA1 || process.env.GITHUB_SHA
-const CiJob = process.env.CIRCLE_JOB || process.env.GITHUB_JOB
+const ciJob = process.env.CIRCLE_JOB || process.env.GITHUB_JOB
 const prNumber = getPullNumber()
 const defaultNumRetries = branch === 'master' ? 15 : 5
 const flakeTrackerID = 71131 // This is the FlakeTracker GitHub App ID.
@@ -89,7 +89,7 @@ module.exports = {
   repo: repo,
   branch: branch,
   sha: sha,
-  CiJob: CiJob,
+  ciJob: ciJob,
   prNumber: prNumber,
   shouldAddCheckToPR: shouldAddCheckToPR,
   shouldCreateIssues: shouldCreateIssues,

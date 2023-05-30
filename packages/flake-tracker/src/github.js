@@ -15,7 +15,7 @@ const FlakeLabel = 'FLAKEY'
 const getLabels = () => {
   const labels = [FlakeLabel, utils.getPackageName()]
   if (config.isCI) {
-    labels.push(config.CiJob)
+    labels.push(config.ciJob)
   }
   return labels
 }
