@@ -1,4 +1,5 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.8.7 <0.9.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -27,6 +28,7 @@ contract GasPriceMinimum is
   event GasPriceMinimumFloorSet(uint256 gasPriceMinimumFloor);
   event AdjustmentSpeedSet(uint256 adjustmentSpeed);
   event GasPriceMinimumUpdated(uint256 gasPriceMinimum);
+  event BaseFeeOpCodeActivationBlockSet(uint256 baseFeeOpCodeActivationBlock);
 
   uint256 public gasPriceMinimum;
   uint256 public gasPriceMinimumFloor;
@@ -36,6 +38,8 @@ contract GasPriceMinimum is
 
   // Speed of gas price minimum adjustment due to congestion.
   FixidityLib.Fraction public adjustmentSpeed;
+
+  uint256 public baseFeeOpCodeActivationBlock;
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -109,16 +113,36 @@ contract GasPriceMinimum is
   }
 
   /**
+   * @notice Set the activation block of the baseFee opCode.
+   * @param _baseFeeOpCodeActivationBlock Block number where the baseFee opCode is activated
+   * @dev Value is expected to be > 0.
+   */
+  function setBaseFeeOpCodeActivationBlock(uint256 _baseFeeOpCodeActivationBlock) public onlyOwner {
+    require(
+      _baseFeeOpCodeActivationBlock > 0,
+      "baseFee opCode activation block must be greater than zero"
+    );
+    baseFeeOpCodeActivationBlock = _baseFeeOpCodeActivationBlock;
+    emit BaseFeeOpCodeActivationBlockSet(_baseFeeOpCodeActivationBlock);
+  }
+
+  /**
    * @notice Retrieve the current gas price minimum for a currency.
    * @param tokenAddress The currency the gas price should be in (defaults to gold).
    * @return current gas price minimum in the requested currency
    */
   function getGasPriceMinimum(address tokenAddress) external view returns (uint256) {
+    uint256 _gasPriceMinimum;
+    if (baseFeeOpCodeActivationBlock > 0 && block.number >= baseFeeOpCodeActivationBlock) {
+      _gasPriceMinimum = block.basefee;
+    } else {
+      _gasPriceMinimum = gasPriceMinimum;
+    }
     if (
       tokenAddress == address(0) ||
       tokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)
     ) {
-      return gasPriceMinimum;
+      return _gasPriceMinimum;
     } else {
       ISortedOracles sortedOracles = ISortedOracles(
         registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
@@ -126,7 +150,7 @@ contract GasPriceMinimum is
       uint256 rateNumerator;
       uint256 rateDenominator;
       (rateNumerator, rateDenominator) = sortedOracles.medianRate(tokenAddress);
-      return (gasPriceMinimum.mul(rateNumerator).div(rateDenominator));
+      return (_gasPriceMinimum.mul(rateNumerator).div(rateDenominator));
     }
   }
 
@@ -173,8 +197,15 @@ contract GasPriceMinimum is
       ? FixidityLib.fixed1().add(adjustmentSpeed.multiply(densityDelta))
       : FixidityLib.fixed1().subtract(adjustmentSpeed.multiply(densityDelta));
 
+    uint256 _gasPriceMinimum;
+    if (baseFeeOpCodeActivationBlock > 0 && block.number >= baseFeeOpCodeActivationBlock) {
+      _gasPriceMinimum = block.basefee;
+    } else {
+      _gasPriceMinimum = gasPriceMinimum;
+    }
+
     uint256 newGasPriceMinimum = adjustment
-      .multiply(FixidityLib.newFixed(gasPriceMinimum))
+      .multiply(FixidityLib.newFixed(_gasPriceMinimum))
       .add(FixidityLib.fixed1())
       .fromFixed();
 
