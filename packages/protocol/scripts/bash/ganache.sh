@@ -10,4 +10,5 @@ yarn run ganache \
   --miner.blockGasLimit=20000000 \
   --wallet.defaultBalance=200000000 \
   --chain.allowUnlimitedContractSize=true \
+  --chain.chainId=1 \
   --chain.hardfork='istanbul'
