@@ -184,6 +184,7 @@ describe('governance tests', () => {
       churritoBlock: 0,
       donutBlock: 0,
       espressoBlock: 0,
+      gforkBlock: 0,
       epoch: 10,
     },
     instances: [

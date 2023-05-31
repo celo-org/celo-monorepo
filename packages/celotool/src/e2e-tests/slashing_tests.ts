@@ -102,6 +102,7 @@ describe('slashing tests', function (this: any) {
       churritoBlock: 0,
       donutBlock: 0,
       espressoBlock: 0,
+      gforkBlock: 0,
     },
     instances: [
       {
