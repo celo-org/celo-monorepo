@@ -318,7 +318,7 @@ contract LockedGold is
   function delegateGovernanceVotes(address delegatee, uint256 percentageToDelegate) external {
     require(
       percentageToDelegate > 0 && percentageToDelegate <= 100,
-      "percents can be only between 1%..100%"
+      "delagated percents can be only between 1%..100%"
     );
 
     address delegatorAddress = getAccounts().voteSignerToAccount(msg.sender);
