@@ -852,7 +852,7 @@ contract('LockedGold', (accounts: string[]) => {
             )
           })
 
-          describe('When voting in referendum', () => {
+          describe('When delegator is voting in referendum', () => {
             beforeEach(async () => {
               await mockGovernance.setTotalVotes(delegator, 1)
             })
