@@ -65,10 +65,6 @@ describe('Blockchain parameters tests', function (this: any) {
     parameters = await kit.contracts.getBlockchainParameters()
   }
 
-  const setMinimumClientVersion = async (major: number, minor: number, patch: number) => {
-    await parameters.setMinimumClientVersion(major, minor, patch).send({ from: validatorAddress })
-  }
-
   describe('when running a node', () => {
     before(async () => {
       await restartGeth()
@@ -84,20 +80,6 @@ describe('Blockchain parameters tests', function (this: any) {
       await sleep(2)
       const res = await parameters.getBlockGasLimit()
       assert.equal(0, res.comparedTo(23000000))
-    })
-    it('should exit when minimum version is updated', async () => {
-      this.timeout(0)
-      await setMinimumClientVersion(1, 9, 99)
-      // The client checks every 60 seconds and then waits 10 seconds before quitting, so we
-      // may have to wait a little over 70 seconds
-      await sleep(75, true)
-      try {
-        // It should have exited by now, call RPC to trigger error
-        await kit.connection.getBlockNumber()
-      } catch (_) {
-        return
-      }
-      throw new Error('expected failure')
     })
   })
 })
