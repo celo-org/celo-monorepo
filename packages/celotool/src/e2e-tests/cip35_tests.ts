@@ -433,7 +433,6 @@ describe('CIP-35 >', function (this: any) {
     const testEnv = new TestEnv(false, false) // not donut, not espresso
     before(async function (this) {
       this.timeout(0)
-      console.log('validatorAddress', validatorAddress)
       await testEnv.before()
     })
 
