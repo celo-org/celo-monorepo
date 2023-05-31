@@ -354,7 +354,7 @@ contract LockedGold is
       }
       require(
         referendumVotesInPercents + requestedToDelegate <= 100,
-        "Voting in referendum with those votes"
+        "Cannot delegate votes that are voting in referendum"
       );
     }
 
