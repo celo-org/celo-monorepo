@@ -317,7 +317,7 @@ contract('LockedGold', (accounts: string[]) => {
           await lockedGold.delegateGovernanceVotes(delegatee, percentToDelagate)
         })
 
-        it('should revert when trying to unlock also delegated amount', async () => {
+        it('should revert when trying to unlock CELO that is delegated', async () => {
           await assertRevertWithReason(
             lockedGold.unlock(value),
             'Not enough undelegated celo. Celo has to be removed from delegation first.'
