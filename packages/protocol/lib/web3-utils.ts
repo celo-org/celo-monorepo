@@ -266,7 +266,7 @@ export const makeTruffleContractForMigration = (contractName: string, contractPa
   })
   
   Contract.setProvider(web3.currentProvider)
-  Contract.setNetwork(networks.development.network_id)
+  Contract.setNetwork('development')
   
   Contract.interfaceAdapter = createInterfaceAdapter({
     networkType: "ethereum",
