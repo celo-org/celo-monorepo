@@ -15,6 +15,9 @@ import Web3 from 'web3'
 import { ignoredContractsV9 } from './ignored-contracts-v9'
 
 let ignoredContracts = [
+  // This contract is not proxied
+  'TransferWhitelist',
+
   // These contracts are not in the Registry (before release 1)
   'ReserveSpenderMultiSig',
   'GovernanceApproverMultiSig'
