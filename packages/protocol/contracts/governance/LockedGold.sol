@@ -311,7 +311,7 @@ contract LockedGold is
   }
 
   /**
-   * Delegates CELO to delegatee
+   * Delegates CELO to delegatee.
    * @param delegatee The delegatee account.
    * @param percentageToDelegate Percents of total CELO that will be delegated from delegatee.
    */
