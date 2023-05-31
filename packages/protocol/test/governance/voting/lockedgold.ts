@@ -857,7 +857,7 @@ contract('LockedGold', (accounts: string[]) => {
               await mockGovernance.setTotalVotes(delegator, 1)
             })
 
-            it('should revert when voting for proposal with votes that are requested to be delegated', async () => {
+            it('should revert when delagating votes that are currently voting for proposal', async () => {
               await assertRevertWithReason(
                 lockedGold.delegateGovernanceVotes(delegatee1, 100),
                 'Voting in referendum with those votes'
