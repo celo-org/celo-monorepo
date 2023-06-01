@@ -60,7 +60,7 @@ provider.getTransaction(...)
 
 I'll show the most "basic" interaction, which is a transfer. On CELO, it comes with a twist, you can transfer 4 currencies, CELO, cUSD, cEUR, and cREAL.
 
-You can get the addresses on these tokens by heading to the explorer and getting their abi and addresses, or you can also use our [registry contract](https://docs.celo.org/developer/contractkit/contracts-wrappers-registry).
+You can get the addresses on these tokens by heading to the explorer and getting their abi and addresses, or you can also use our [registry contract](https://docs.celo.org/developer/contractkit/contracts-wrappers-registry). You can also use the [`@celo/abis`](https://www.npmjs.com/package/@celo/abis) package to get the ABIs directly.
 
 ```ts
 // this address is constant
