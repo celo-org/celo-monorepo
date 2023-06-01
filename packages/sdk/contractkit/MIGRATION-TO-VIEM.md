@@ -1,6 +1,6 @@
 # Draft: Migration document from Contractkit
 
-Hello devs 🌱 this is a migration path away from contractkit following the [public deprecation notice](https://forum.celo.org/t/sunsetting-contractkit/5337/1) of contractkit. This aims to give examples to help you move to [viem](https://viem.sh/).
+Hello devs 🌱 this is a migration path away from contractkit. This aims to give examples to help you move to [viem](https://viem.sh/).
 
 ## Initialization
 
