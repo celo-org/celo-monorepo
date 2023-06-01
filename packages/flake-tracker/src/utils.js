@@ -1,3 +1,5 @@
+const { config } = require('process')
+
 // Emojis
 const fire = String.fromCodePoint(0x1f525)
 const partyFace = String.fromCodePoint(0x1f973)
@@ -40,13 +42,6 @@ function fmtIssueBody(errors) {
   return body
 }
 
-function getPullNumber() {
-  if (process.env.CIRCLECI && process.env.CIRCLE_BRANCH !== 'master') {
-    const prUrl = process.env.CIRCLE_PULL_REQUEST
-    return prUrl.slice(prUrl.lastIndexOf('/') + 1)
-  }
-}
-
 // Parses list of flakey test issues to ignore from the PR's body.
 // The tests corresponding to these issues will not be skipped.
 function parseMandatoryTestIssuesFromPullBody(prBody) {
@@ -70,8 +65,8 @@ function getTestSuiteDir() {
 
 function getTestSuiteTitles() {
   const titles = [getTestSuiteDir()]
-  if (process.env.CIRCLECI) {
-    titles.unshift(process.env.CIRCLE_JOB)
+  if (config.isCI) {
+    titles.unshift(config.ciJob)
   }
   return titles
 }
@@ -299,7 +294,6 @@ module.exports = {
   fmtWorkflowSummary: fmtWorkflowSummary,
   getConclusion: getConclusion,
   getPackageName: getPackageName,
-  getPullNumber: getPullNumber,
   getRandomSuccessImage: getRandomSuccessImage,
   getTestSuiteDir: getTestSuiteDir,
   getTestSuiteTitles: getTestSuiteTitles,
