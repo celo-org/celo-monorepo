@@ -220,7 +220,7 @@ contract Governance is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 3, 1, 0);
+    return (1, 4, 0, 0);
   }
 
   /**
@@ -1045,7 +1045,7 @@ contract Governance is
   function getProposal(uint256 proposalId)
     external
     view
-    returns (address, uint256, uint256, uint256, string memory)
+    returns (address, uint256, uint256, uint256, string memory, uint256, bool)
   {
     return proposals[proposalId].unpack();
   }
