@@ -18,7 +18,7 @@ const TMP_PATH = '/tmp/e2e'
 const safeMarginBlocks = 4
 
 function headerArray(block: any) {
-  return [
+  const headerHashData = [
     block.parentHash,
     block.miner,
     block.stateRoot,
@@ -30,6 +30,10 @@ function headerArray(block: any) {
     block.timestamp,
     block.extraData,
   ]
+  if (block.gasLimit) {
+    headerHashData.push(block.gasLimit)
+  }
+  return headerHashData
 }
 
 function headerFromBlock(block: any) {
