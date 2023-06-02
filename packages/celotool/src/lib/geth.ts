@@ -19,11 +19,11 @@ import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
   AccountType,
+  Validator,
   generateGenesis,
   generateGenesisWithMigrations,
   generatePrivateKey,
   privateKeyToPublicKey,
-  Validator,
 } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
@@ -559,6 +559,8 @@ export const simulateClient = async (
   index: number,
   testMode: TestMode,
   thread: number,
+  maxGasPrice: BigNumber = new BigNumber(0),
+  totalTxGas: number = 500000, // aim for half million gas txs
   web3Provider: string = 'http://localhost:8545'
 ) => {
   // Assume the node is accessible via localhost with senderAddress unlocked
@@ -631,6 +633,9 @@ export const simulateClient = async (
       )
       nonce = nonceResult.nonce
       gasPrice = nonceResult.newPrice
+      if (maxGasPrice.isGreaterThan(0)) {
+        gasPrice = BigNumber.min(gasPrice, maxGasPrice)
+      }
       lastGasPriceMinimum = gasPrice
       txOptions = {
         gasPrice: gasPrice.toString(),
@@ -645,7 +650,7 @@ export const simulateClient = async (
       })
     }
     const intrinsicGas = 21000
-    const totalTxGas = 500000 // aim for half million gas txs
+    // const totalTxGas = 500000 // aim for half million gas txs
     const calldataGas = totalTxGas - intrinsicGas
     const calldataSize = calldataGas / 4 // 119750 < tx pool size limit (128k)
     const dataStr = testMode === TestMode.Data ? getBigData(calldataSize) : undefined // aim for half million gas txs
