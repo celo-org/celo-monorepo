@@ -1,6 +1,6 @@
 /* tslint:disable no-console */
 import { AccountType, generateAddress } from 'src/lib/generate_utils'
-import { getIndexForLoadTestThread, simulateClient, TestMode } from 'src/lib/geth'
+import { TestMode, getIndexForLoadTestThread, simulateClient } from 'src/lib/geth'
 import * as yargs from 'yargs'
 export const command = 'simulate-client'
 
@@ -13,6 +13,8 @@ interface SimulateClientArgv extends yargs.Argv {
   index: number
   mnemonic: string
   recipientIndex: number
+  contractAddress: string
+  contractData: string
   clientCount: number
   reuseClient: boolean
   testMode: string
@@ -47,6 +49,16 @@ export const builder = () => {
         'Index of the load test account to send transactions to. Used to generate account address',
       default: 0,
     })
+    .options('contract-address', {
+      type: 'string',
+      description: `Contract Address to send to when using test mode: ${TestMode.ContractCall}`,
+      default: '',
+    })
+    .options('contract-data', {
+      type: 'string',
+      description: `Data to send to when using test mode: ${TestMode.ContractCall}`,
+      default: '',
+    })
     .options('mnemonic', {
       type: 'string',
       description: 'Mnemonic used to generate account addresses',
@@ -64,8 +76,9 @@ export const builder = () => {
     })
     .options('test-mode', {
       type: 'string',
-      description: 'Load test mode: mixed transaction types, big calldatas, or simple transfers',
-      choices: [TestMode.Mixed, TestMode.Data, TestMode.Transfer],
+      description:
+        'Load test mode: mixed transaction types, big calldatas, simple transfers, or contract calls',
+      choices: [TestMode.Mixed, TestMode.Data, TestMode.Transfer, TestMode.ContractCall],
       default: TestMode.Mixed,
     })
 }
@@ -99,6 +112,8 @@ export const handler = async (argv: SimulateClientArgv) => {
     simulateClient(
       senderAddress,
       recipientAddress,
+      argv.contractAddress,
+      argv.contractData,
       argv.delay,
       argv.blockscoutUrl,
       argv.blockscoutMeasurePercent,

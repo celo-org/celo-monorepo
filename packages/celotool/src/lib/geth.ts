@@ -19,11 +19,11 @@ import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
   AccountType,
+  Validator,
   generateGenesis,
   generateGenesisWithMigrations,
   generatePrivateKey,
   privateKeyToPublicKey,
-  Validator,
 } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
@@ -548,11 +548,14 @@ export enum TestMode {
   Mixed = 'mixed',
   Data = 'data',
   Transfer = 'transfer',
+  ContractCall = 'contract-call',
 }
 
 export const simulateClient = async (
   senderAddress: string,
   recipientAddress: string,
+  contractAddress: string,
+  contractData: string,
   txPeriodMs: number, // time between new transactions in ms
   blockscoutUrl: string,
   blockscoutMeasurePercent: number, // percent of time in range [0, 100] to measure blockscout for a tx
@@ -648,8 +651,16 @@ export const simulateClient = async (
     const totalTxGas = 500000 // aim for half million gas txs
     const calldataGas = totalTxGas - intrinsicGas
     const calldataSize = calldataGas / 4 // 119750 < tx pool size limit (128k)
-    const dataStr = testMode === TestMode.Data ? getBigData(calldataSize) : undefined // aim for half million gas txs
+    let dataStr = testMode === TestMode.Data ? getBigData(calldataSize) : undefined // aim for half million gas txs
     // Also running below the 128kb limit from the tx pool
+
+    if (testMode === TestMode.ContractCall) {
+      if (!contractData || !contractAddress) {
+        throw new Error('Contract address and data must be provided for TestMode.ContractCall')
+      }
+      dataStr = contractData
+      recipientAddressFinal = contractAddress
+    }
 
     await txConf
       .transferFn(
@@ -689,32 +700,40 @@ const getBigData = (size: number) => {
 }
 
 const getTxConf = async (testMode: TestMode) => {
-  if (testMode === TestMode.Data) {
-    return {
-      feeCurrencyGold: true,
-      tokenName: 'cGLD.L',
-      transferFn: transferCalldata,
-    }
-  }
-  if (testMode === TestMode.Transfer) {
-    return {
-      feeCurrencyGold: true,
-      tokenName: 'cGLD',
-      transferFn: transferCeloGold,
-    }
-  }
+  switch (testMode) {
+    case TestMode.Data:
+      return {
+        feeCurrencyGold: true,
+        tokenName: 'cGLD.L',
+        transferFn: transferCalldata,
+      }
+    case TestMode.Transfer:
+      return {
+        feeCurrencyGold: true,
+        tokenName: 'cGLD',
+        transferFn: transferCeloGold,
+      }
+    case TestMode.Mixed:
+      // randomly choose which token to use
+      const useGold = Boolean(Math.round(Math.random()))
+      const _transferFn = useGold ? transferCeloGold : transferCeloDollars
+      const _tokenName = useGold ? 'cGLD' : 'cUSD'
 
-  // randomly choose which token to use
-  const useGold = Boolean(Math.round(Math.random()))
-  const _transferFn = useGold ? transferCeloGold : transferCeloDollars
-  const _tokenName = useGold ? 'cGLD' : 'cUSD'
-
-  // randomly choose which gas currency to use
-  const _feeCurrencyGold = Boolean(Math.round(Math.random()))
-  return {
-    feeCurrencyGold: _feeCurrencyGold,
-    tokenName: _tokenName,
-    transferFn: _transferFn,
+      // randomly choose which gas currency to use
+      const _feeCurrencyGold = Boolean(Math.round(Math.random()))
+      return {
+        feeCurrencyGold: _feeCurrencyGold,
+        tokenName: _tokenName,
+        transferFn: _transferFn,
+      }
+    case TestMode.ContractCall:
+      return {
+        feeCurrencyGold: true,
+        tokenName: 'contract', // For logging
+        transferFn: transferCalldata,
+      }
+    default:
+      throw new Error(`Unimplemented TestMode: ${testMode}`)
   }
 }
 
