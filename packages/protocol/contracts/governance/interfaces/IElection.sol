@@ -1,4 +1,5 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.5.13 <0.9.0;
 
 interface IElection {
   function electValidatorSigners() external view returns (address[] memory);
@@ -18,6 +19,7 @@ interface IElection {
     address[] calldata,
     uint256[] calldata
   ) external returns (uint256);
+  function setAllowedToVoteOverMaxNumberOfGroups(bool flag) external;
 
   // view functions
   function getElectableValidators() external view returns (uint256, uint256);
@@ -47,6 +49,8 @@ interface IElection {
   function getCurrentValidatorSigners() external view returns (address[] memory);
   function canReceiveVotes(address, uint256) external view returns (bool);
   function hasActivatablePendingVotes(address, address) external view returns (bool);
+  function validatorSignerAddressFromCurrentSet(uint256 index) external view returns (address);
+  function numberValidatorsInCurrentSet() external view returns (uint256);
 
   // only owner
   function setElectableValidators(uint256, uint256) external returns (bool);
