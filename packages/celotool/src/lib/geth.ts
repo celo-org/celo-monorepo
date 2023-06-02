@@ -592,6 +592,23 @@ export const simulateClient = async (
   console.info(`Sleeping for ${randomSleep} ms`)
   await sleep(randomSleep)
 
+  const intrinsicGas = 21000
+  const totalTxGas = 500000 // aim for half million gas txs
+  const calldataGas = totalTxGas - intrinsicGas
+  const calldataSize = calldataGas / 4 // 119750 < tx pool size limit (128k)
+  let dataStr = testMode === TestMode.Data ? getBigData(calldataSize) : undefined // aim for half million gas txs
+  // Also running below the 128kb limit from the tx pool
+  let transferAmount = LOAD_TEST_TRANSFER_WEI
+
+  if (testMode === TestMode.ContractCall) {
+    if (!contractData || !contractAddress) {
+      throw new Error('Contract address and data must be provided for TestMode.ContractCall')
+    }
+    dataStr = contractData
+    recipientAddressFinal = contractAddress
+    transferAmount = new BigNumber(0)
+  }
+
   const baseLogMessage: any = {
     loadTestID: index,
     threadID: thread,
@@ -647,30 +664,9 @@ export const simulateClient = async (
         ...baseLogMessage,
       })
     }
-    const intrinsicGas = 21000
-    const totalTxGas = 500000 // aim for half million gas txs
-    const calldataGas = totalTxGas - intrinsicGas
-    const calldataSize = calldataGas / 4 // 119750 < tx pool size limit (128k)
-    let dataStr = testMode === TestMode.Data ? getBigData(calldataSize) : undefined // aim for half million gas txs
-    // Also running below the 128kb limit from the tx pool
-
-    if (testMode === TestMode.ContractCall) {
-      if (!contractData || !contractAddress) {
-        throw new Error('Contract address and data must be provided for TestMode.ContractCall')
-      }
-      dataStr = contractData
-      recipientAddressFinal = contractAddress
-    }
 
     await txConf
-      .transferFn(
-        kit,
-        senderAddress,
-        recipientAddressFinal,
-        LOAD_TEST_TRANSFER_WEI,
-        dataStr,
-        txOptions
-      )
+      .transferFn(kit, senderAddress, recipientAddressFinal, transferAmount, dataStr, txOptions)
       .then(async (txResult: TransactionResult) => {
         lastTx = await txResult.getHash()
         lastNonce = (await kit.web3.eth.getTransaction(lastTx)).nonce
