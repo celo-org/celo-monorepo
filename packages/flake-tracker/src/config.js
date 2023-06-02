@@ -1,18 +1,18 @@
-const isCI = process.env.CIRCLECI || process.env.CI;
-let org, repo;
+const isCI = process.env.CIRCLECI || process.env.CI
+let org, repo
 if (process.env.GITHUB_REPOSITORY) {
-  org = process.env.GITHUB_REPOSITORY.split("/")[0];
-  repo = process.env.GITHUB_REPOSITORY.split("/")[1];
+  org = process.env.GITHUB_REPOSITORY.split('/')[0]
+  repo = process.env.GITHUB_REPOSITORY.split('/')[1]
 } else {
-  org = process.env.CIRCLE_PROJECT_USERNAME || "celo-org";
-  repo = process.env.CIRCLE_PROJECT_REPONAME || "celo-monorepo";
+  org = process.env.CIRCLE_PROJECT_USERNAME || 'celo-org'
+  repo = process.env.CIRCLE_PROJECT_REPONAME || 'celo-monorepo'
 }
-const branch = process.env.CIRCLE_BRANCH || process.env.GITHUB_REF_NAME;
-const sha = process.env.CIRCLE_SHA1 || process.env.GITHUB_SHA;
-const ciJob = process.env.CIRCLE_JOB || process.env.GITHUB_JOB;
-const prNumber = getPullNumber();
-const defaultNumRetries = branch === "master" ? 15 : 5;
-const flakeTrackerID = 71131; // This is the FlakeTracker GitHub App ID.
+const branch = process.env.CIRCLE_BRANCH || process.env.GITHUB_REF_NAME
+const sha = process.env.CIRCLE_SHA1 || process.env.GITHUB_SHA
+const ciJob = process.env.CIRCLE_JOB || process.env.GITHUB_JOB
+const prNumber = getPullNumber()
+const defaultNumRetries = branch === 'master' ? 15 : 5
+const flakeTrackerID = 71131 // This is the FlakeTracker GitHub App ID.
 
 // NOTE: Avoid editing the following constants unless you are making changes to the flake trackers' functionality.
 // This file serves mainly to distill various environment variables into easy to use booleans for the rest of the project.
@@ -39,56 +39,48 @@ const flakeTrackerID = 71131; // This is the FlakeTracker GitHub App ID.
 // shouldTrackFlakes => tests are retried `numRetries` times and flakey results are logged w/ test output
 
 // XXX (soloseng and jcortejoso): disabling to skip flaker test on CI
-const shouldTrackFlakes = false;
+const shouldTrackFlakes = false
 // const shouldTrackFlakes =
 //   (isCI && repo !== 'celo-blockchain' && process.env.FLAKEY !== 'false') ||
 //   process.env.FLAKEY === 'true'
 
 // shouldLogRetryErrorsOnFailure => log raw test error immediately after every retry.
-const shouldLogRetryErrorsOnFailure =
-  shouldTrackFlakes && process.env.LOG_ALL_RETRY_ERRORS;
+const shouldLogRetryErrorsOnFailure = shouldTrackFlakes && process.env.LOG_ALL_RETRY_ERRORS
 
 // numRetries === times test is run after the initial failure
-const numRetries = process.env.NUM_RETRIES
-  ? Number(process.env.NUM_RETRIES)
-  : defaultNumRetries;
+const numRetries = process.env.NUM_RETRIES ? Number(process.env.NUM_RETRIES) : defaultNumRetries
 
 // shouldSkipKnownFlakes => flakey test issues are fetched from github and corresponding tests are skipped
 const shouldSkipKnownFlakes =
   shouldTrackFlakes &&
   isCI &&
   process.env.FLAKE_TRACKER_SECRET &&
-  process.env.SKIP_KNOWN_FLAKES !== "false";
+  process.env.SKIP_KNOWN_FLAKES !== 'false'
 
 // shouldAddCheckToPR => GitHub Check added to PR
-const shouldAddCheckToPR =
-  shouldTrackFlakes && isCI && process.env.FLAKE_TRACKER_SECRET;
+const shouldAddCheckToPR = shouldTrackFlakes && isCI && process.env.FLAKE_TRACKER_SECRET
 
 // newFlakesShouldFailCheckSuite => determines whether GitHub Check has status 'failure' or 'neutral' when new flakey tests are found.
-const newFlakesShouldFailCheckSuite =
-  shouldAddCheckToPR && process.env.FLAKES_FAIL_CHECK_SUITE;
+const newFlakesShouldFailCheckSuite = shouldAddCheckToPR && process.env.FLAKES_FAIL_CHECK_SUITE
 
 // shouldCreateIssues => GitHub Issues created for new flakey tests
 const shouldCreateIssues =
-  shouldTrackFlakes &&
-  isCI &&
-  process.env.FLAKE_TRACKER_SECRET &&
-  branch === "master";
+  shouldTrackFlakes && isCI && process.env.FLAKE_TRACKER_SECRET && branch === 'master'
 
 // For convenience...
-const shouldReportFlakes = shouldAddCheckToPR || shouldCreateIssues;
-const shouldUseGitHub = shouldSkipKnownFlakes || shouldReportFlakes;
+const shouldReportFlakes = shouldAddCheckToPR || shouldCreateIssues
+const shouldUseGitHub = shouldSkipKnownFlakes || shouldReportFlakes
 
 function getPullNumber() {
   if (process.env.CIRCLE_PULL_REQUEST) {
-    return process.env.CIRCLE_PULL_REQUEST.split("/").slice(-1)[0];
+    return process.env.CIRCLE_PULL_REQUEST.split('/').slice(-1)[0]
   } else if (process.env.GITHUB_REF_NAME) {
-    return process.env.GITHUB_REF_NAME.split("/")[2];
+    return process.env.GITHUB_REF_NAME.split('/')[2]
   }
   console.info(
-    "Unable to determine pull request number. Expected when run in local or not triggered by a PR event"
-  );
-  return null;
+    'Unable to determine pull request number. Expected when run in local or not triggered by a PR event'
+  )
+  return null
 }
 
 module.exports = {
@@ -109,4 +101,4 @@ module.exports = {
   shouldSkipKnownFlakes: shouldSkipKnownFlakes,
   shouldTrackFlakes: shouldTrackFlakes,
   shouldUseGitHub: shouldUseGitHub,
-};
+}
