@@ -64,12 +64,14 @@ contract GasPriceMinimum is
    * @param _gasPriceMinimumFloor The lowest value the gas price minimum can be.
    * @param _targetDensity The target gas fullness of blocks, expressed as a fixidity fraction.
    * @param _adjustmentSpeed How quickly the minimum changes, expressed as a fixidity fraction.
+   * @param _baseFeeOpCodeActivationBlock Block number where the baseFee opCode is activated
    */
   function initialize(
     address _registryAddress,
     uint256 _gasPriceMinimumFloor,
     uint256 _targetDensity,
-    uint256 _adjustmentSpeed
+    uint256 _adjustmentSpeed,
+    uint256 _baseFeeOpCodeActivationBlock
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
@@ -77,6 +79,7 @@ contract GasPriceMinimum is
     setGasPriceMinimumFloor(_gasPriceMinimumFloor);
     setTargetDensity(_targetDensity);
     setAdjustmentSpeed(_adjustmentSpeed);
+    setBaseFeeOpCodeActivationBlock(_baseFeeOpCodeActivationBlock);
   }
 
   /**

@@ -92,6 +92,7 @@ const DefaultConfig = {
     minimumFloor: 100000000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
+    baseFeeOpCodeActivationBlock: 0,
   },
   goldToken: {
     frozen: false,
