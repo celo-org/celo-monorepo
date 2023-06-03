@@ -2,7 +2,7 @@ import { hexToBuffer } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
 import Logger from 'bunyan'
 import { Request } from 'express'
-import { ErrorMessage, ErrorType } from '../../lib'
+import { ErrorMessage, ErrorType, FULL_NODE_TIMEOUT_IN_MS } from '../../lib'
 import { AuthenticationMethod } from '../../src/interfaces/requests'
 import * as auth from '../../src/utils/authentication'
 
@@ -28,6 +28,7 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
+        FULL_NODE_TIMEOUT_IN_MS,
         true,
         warnings
       )
@@ -49,6 +50,7 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
+        FULL_NODE_TIMEOUT_IN_MS,
         true,
         warnings
       )
@@ -73,6 +75,7 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
+        FULL_NODE_TIMEOUT_IN_MS,
         true,
         warnings
       )
@@ -97,6 +100,7 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
+        FULL_NODE_TIMEOUT_IN_MS,
         false,
         warnings
       )
@@ -131,6 +135,7 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
+        FULL_NODE_TIMEOUT_IN_MS,
         true,
         warnings
       )
@@ -161,7 +166,12 @@ describe('Authentication test suite', () => {
 
       const warnings: ErrorType[] = []
 
-      const success = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        FULL_NODE_TIMEOUT_IN_MS
+      )
 
       expect(success).toBe(false)
       expect(warnings).toEqual([])
@@ -202,6 +212,7 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
+        FULL_NODE_TIMEOUT_IN_MS,
         true,
         warnings
       )
@@ -253,6 +264,7 @@ describe('Authentication test suite', () => {
           sampleRequest,
           mockContractKit,
           logger,
+          FULL_NODE_TIMEOUT_IN_MS,
           true,
           warnings
         )
@@ -299,6 +311,7 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
+        FULL_NODE_TIMEOUT_IN_MS,
         true,
         warnings
       )
@@ -346,6 +359,7 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
+        FULL_NODE_TIMEOUT_IN_MS,
         true,
         warnings
       )
@@ -390,6 +404,7 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
+        FULL_NODE_TIMEOUT_IN_MS,
         true,
         warnings
       )
