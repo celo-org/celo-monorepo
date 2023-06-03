@@ -32,7 +32,6 @@ export const queryOdisForSalt = async (
   endpoint: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN,
   timeoutMs: number = 10000
 ) => {
-  console.log(`### contextName: ${contextName}`) // tslint:disable-line:no-console
   console.log(`contextName: ${contextName}`) // tslint:disable-line:no-console
   console.log(`blockchain provider: ${blockchainProvider}`) // tslint:disable-line:no-console
 
