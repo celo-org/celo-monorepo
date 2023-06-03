@@ -1,31 +1,54 @@
 import { OdisContextName } from '@celo/identity/lib/odis/query'
-import { concurrentLoadTest } from '../test'
+import yargs from 'yargs'
+import { concurrentLoadTest, serialLoadTest } from '../test'
 
 /* tslint:disable:no-console */
 
-const args = process.argv.slice(2)
+const runLoadTest = (contextName: string, numWorker: number, isSerial: boolean) => {
+  let blockchainProvider: string
+  switch (contextName) {
+    case 'alfajoresstaging':
+    case 'alfajores':
+      blockchainProvider = 'https://alfajores-forno.celo-testnet.org'
+      break
+    case 'mainnet':
+      blockchainProvider = 'https://forno.celo.org'
+      break
+    default:
+      console.error('invalid contextName')
+      process.exit(1)
+  }
 
-const printHelpAndExit = () => {
-  console.log('Usage: yarn loadTest <contextname> <numWorkers>')
-  process.exit(1)
+  if (isSerial) {
+    serialLoadTest(numWorker, blockchainProvider!, contextName as OdisContextName)
+  } else {
+    concurrentLoadTest(numWorker, blockchainProvider!, contextName as OdisContextName) // tslint:disable-line:no-floating-promises
+  }
 }
 
-if (args[0] === '--help' || args.length !== 2) {
-  printHelpAndExit()
-}
-
-let blockchainProvider: string
-switch (args[0]) {
-  case 'alfajoresstaging':
-  case 'alfajores':
-    blockchainProvider = 'https://alfajores-forno.celo-testnet.org'
-    break
-  case 'mainnet':
-    blockchainProvider = 'https://forno.celo.org'
-    break
-  default:
-    printHelpAndExit()
-    break
-}
-
-concurrentLoadTest(Number(args[1]), blockchainProvider!, args[0] as OdisContextName) // tslint:disable-line:no-floating-promises
+yargs
+  .scriptName('ODIS-load-test')
+  .recommendCommands()
+  .demandCommand(1)
+  .strict(true)
+  .showHelpOnFail(true)
+  .command(
+    'run <contextName> <numWorkers>',
+    'Load test ODIS.',
+    (args) =>
+      args
+        .positional('contextName', {
+          type: 'string',
+          description: 'Desired network.',
+        })
+        .positional('numWorkers', {
+          type: 'number',
+          description: 'Number of machines that will be sending request to ODIS.',
+        })
+        .option('isSerial', {
+          type: 'boolean',
+          description: 'run test workers in series.',
+          default: false,
+        }),
+    (args) => runLoadTest(args.contextName!, args.numWorkers!, args.isSerial)
+  ).argv
