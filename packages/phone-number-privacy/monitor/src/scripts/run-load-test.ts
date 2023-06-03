@@ -20,12 +20,12 @@ const runLoadTest = (contextName: string, numWorker: number, isSerial: boolean) 
   }
 
   if (isSerial) {
-    serialLoadTest(numWorker, blockchainProvider!, contextName as OdisContextName)
+    serialLoadTest(numWorker, blockchainProvider!, contextName as OdisContextName) // tslint:disable-line:no-floating-promises
   } else {
     concurrentLoadTest(numWorker, blockchainProvider!, contextName as OdisContextName) // tslint:disable-line:no-floating-promises
   }
 }
-
+// tslint:disable-next-line: no-unused-expression
 yargs
   .scriptName('ODIS-load-test')
   .recommendCommands()
