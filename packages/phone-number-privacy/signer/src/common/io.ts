@@ -26,7 +26,8 @@ export abstract class IO<R extends OdisRequest> {
   abstract authenticate(
     request: Request<{}, {}, R>,
     warnings?: string[],
-    logger?: Logger
+    logger?: Logger,
+    timeoutMs?: number
   ): Promise<boolean>
 
   abstract sendFailure(

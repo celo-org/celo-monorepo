@@ -27,7 +27,8 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   constructor(
     readonly enabled: boolean,
     readonly shouldFailOpen: boolean,
-    readonly kit: ContractKit
+    readonly kit: ContractKit,
+    readonly timeoutMs: number
   ) {
     super(enabled)
   }
@@ -62,7 +63,14 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     warnings: ErrorType[],
     logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger, this.shouldFailOpen, warnings)
+    return authenticateUser(
+      request,
+      this.kit,
+      logger,
+      this.timeoutMs,
+      this.shouldFailOpen,
+      warnings
+    )
   }
 
   sendSuccess(
