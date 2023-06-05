@@ -117,5 +117,8 @@
     "typechain": "1.0.5",
     "typechain-target-truffle": "1.0.2",
     "yargs": "^14.0.0"
+  },
+  "resolutions": {
+    "node-gyp": "^9.3.1"
   }
 }

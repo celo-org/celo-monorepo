@@ -1,4 +1,5 @@
-patch-package
+diff --git a/node_modules/tslint/lib/linter.js b/node_modules/tslint/lib/linter.js
+index c5b074a..1112767 100644
 --- a/node_modules/tslint/lib/linter.js
 +++ b/node_modules/tslint/lib/linter.js
 @@ -193,7 +193,7 @@ var Linter = /** @class */ (function () {
