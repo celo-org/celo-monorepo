@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - master
+      - jcortejoso/ganache-upgrade
   pull_request:
     branches:
       - master
@@ -22,7 +23,7 @@ defaults:
 
 env:
   # Increment these to force cache rebuilding
-  NODE_MODULE_CACHE_VERSION: 3
+  NODE_MODULE_CACHE_VERSION: 4
   NODE_OPTIONS: '--max-old-space-size=4096'
   TERM: dumb
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
@@ -242,6 +243,12 @@ jobs:
       - name: Opcode tests
         run: |
           yarn --cwd packages/protocol check-opcodes
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 30
+        if: true
+        with:
+          limit-access-to-actor: true
       - name: Generate devchain of previous release
         run: |
           echo "Comparing against $RELEASE_TAG"
