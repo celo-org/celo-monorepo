@@ -595,7 +595,7 @@ export const simulateClient = async (
   await sleep(randomSleep)
 
   const intrinsicGas = 21000
-  const totalTxGas = 500000 // aim for half million gas txs
+  // const totalTxGas = 500000 // aim for half million gas txs
   const calldataGas = totalTxGas - intrinsicGas
   const calldataSize = calldataGas / 4 // 119750 < tx pool size limit (128k)
   let dataStr = testMode === TestMode.Data ? getBigData(calldataSize) : undefined // aim for half million gas txs
@@ -669,12 +669,6 @@ export const simulateClient = async (
         ...baseLogMessage,
       })
     }
-    const intrinsicGas = 21000
-    // const totalTxGas = 500000 // aim for half million gas txs
-    const calldataGas = totalTxGas - intrinsicGas
-    const calldataSize = calldataGas / 4 // 119750 < tx pool size limit (128k)
-    let dataStr = testMode === TestMode.Data ? getBigData(calldataSize) : undefined // aim for half million gas txs
-    // Also running below the 128kb limit from the tx pool
 
     if (testMode === TestMode.ContractCall) {
       if (!contractData || !contractAddress) {
