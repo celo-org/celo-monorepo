@@ -398,6 +398,7 @@ export const generateGenesis = ({
   churritoBlock,
   donutBlock,
   espressoBlock,
+  gingerbreadBlock,
 }: GenesisConfig): string => {
   const genesis: any = { ...TEMPLATE }
 
@@ -413,6 +414,9 @@ export const generateGenesis = ({
   }
   if (typeof espressoBlock === 'number') {
     genesis.config.espressoBlock = espressoBlock
+  }
+  if (typeof gingerbreadBlock === 'number') {
+    genesis.config.gingerbreadBlock = gingerbreadBlock
   }
 
   genesis.config.chainId = chainId
@@ -541,6 +545,9 @@ export const generateGenesisWithMigrations = async ({
   }
   if (genesisConfig.espressoBlock !== undefined) {
     mcConfig.hardforks.espressoBlock = genesisConfig.espressoBlock
+  }
+  if (genesisConfig.gingerbreadBlock !== undefined) {
+    mcConfig.hardforks.gingerbreadBlock = genesisConfig.gingerbreadBlock
   }
   if (genesisConfig.timestamp !== undefined) {
     mcConfig.genesisTimestamp = genesisConfig.timestamp
