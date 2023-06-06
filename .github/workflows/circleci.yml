@@ -284,7 +284,7 @@ jobs:
     name: ${{ matrix.name }}
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 60
-    needs: [install-dependencies, lint-checks, pre-protocol-test-release]
+    needs: [install-dependencies, lint-checks]
     if: |
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
@@ -332,7 +332,7 @@ jobs:
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
       - name: Sync workspace
-        uses: ./.github/actions/protocol-sync-workspace
+        uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Build protocol
