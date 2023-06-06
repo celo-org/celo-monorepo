@@ -383,7 +383,7 @@ jobs:
     name: Identity Tests
     runs-on: ["self-hosted", "monorepo-node18"]
     timeout-minutes: 30
-    needs: [install-dependencies]
+    needs: [install-dependencies, contractkit-tests]
     if: |
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/identity') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
@@ -411,7 +411,7 @@ jobs:
     name: Transaction URI Tests
     runs-on: ["self-hosted", "monorepo-node18"]
     timeout-minutes: 30
-    needs: [install-dependencies]
+    needs: [install-dependencies, contractkit-tests]
     if: |
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk/transactions-uri') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
@@ -578,7 +578,7 @@ jobs:
     name: e2e ${{ matrix.name }}
     runs-on: ["self-hosted", "monorepo-node18"]
     timeout-minutes: 60
-    needs: [install-dependencies, lint-checks, pre-protocol-test-release]
+    needs: [install-dependencies, lint-checks, contractkit-tests]
     if: |
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/celotool') ||
