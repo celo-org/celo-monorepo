@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.7 <0.9.0;
+pragma solidity >=0.8.7;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./CalledByVm.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloVersionedContract.sol";
 import "./FixidityLib.sol";
-import "./UsingRegistry.sol";
+import "./UsingRegistry8.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 
 /**
@@ -22,7 +21,6 @@ contract GasPriceMinimum is
   CalledByVm
 {
   using FixidityLib for FixidityLib.Fraction;
-  using SafeMath for uint256;
 
   event TargetDensitySet(uint256 targetDensity);
   event GasPriceMinimumFloorSet(uint256 gasPriceMinimumFloor);
@@ -54,7 +52,7 @@ contract GasPriceMinimum is
    * @return Minor version of the contract.
    * @return Patch version of the contract.
    */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+  function getVersionNumber() external pure override returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 1, 0);
   }
 
@@ -150,7 +148,7 @@ contract GasPriceMinimum is
       uint256 rateNumerator;
       uint256 rateDenominator;
       (rateNumerator, rateDenominator) = sortedOracles.medianRate(tokenAddress);
-      return (_gasPriceMinimum.mul(rateNumerator).div(rateDenominator));
+      return (_gasPriceMinimum * rateNumerator) / rateDenominator;
     }
   }
 
