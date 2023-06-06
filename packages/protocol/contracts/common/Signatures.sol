@@ -1,6 +1,6 @@
 pragma solidity ^0.5.13;
 
-import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/cryptography/ECDSA.sol";
 
 library Signatures {
   /**

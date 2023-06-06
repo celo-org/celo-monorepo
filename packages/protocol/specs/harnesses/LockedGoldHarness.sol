@@ -1,7 +1,7 @@
 pragma solidity ^0.5.13;
 
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 import "contracts/governance/LockedGold.sol";
 import "./GoldTokenHarness.sol";
 

@@ -2,7 +2,7 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 import "celo-foundry/Test.sol";
 
 import "../utils/WithRegistry.sol";

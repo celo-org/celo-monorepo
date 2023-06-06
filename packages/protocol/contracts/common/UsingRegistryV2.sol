@@ -1,7 +1,7 @@
 pragma solidity ^0.5.13;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IAccounts.sol";
 import "./interfaces/IFeeCurrencyWhitelist.sol";

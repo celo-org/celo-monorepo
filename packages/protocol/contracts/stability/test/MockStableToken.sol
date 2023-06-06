@@ -1,7 +1,7 @@
 pragma solidity ^0.5.13;
 // solhint-disable no-unused-vars
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 
 import "../../common/FixidityLib.sol";
 

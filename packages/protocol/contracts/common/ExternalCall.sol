@@ -1,6 +1,6 @@
 pragma solidity ^0.5.13;
 
-import "openzeppelin-solidity/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
 library ExternalCall {
   /**

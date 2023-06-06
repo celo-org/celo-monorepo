@@ -1,6 +1,6 @@
 pragma solidity ^0.5.13;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 
 contract MockERC20Token {
   using SafeMath for uint256;

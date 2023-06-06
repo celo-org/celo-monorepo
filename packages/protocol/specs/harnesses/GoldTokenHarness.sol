@@ -1,7 +1,7 @@
 pragma solidity ^0.5.13;
 
 import "contracts/common/GoldToken.sol";
-import "openzeppelin-solidity/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
 contract GoldTokenHarness is GoldToken {
   using Address for address payable; // prettier-ignore

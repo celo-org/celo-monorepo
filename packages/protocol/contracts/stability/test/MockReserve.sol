@@ -1,7 +1,7 @@
 pragma solidity ^0.5.13;
 // solhint-disable no-unused-vars
 
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title A mock Reserve for testing.

@@ -1,7 +1,7 @@
 pragma solidity ^0.5.13;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "../common/FixidityLib.sol";
