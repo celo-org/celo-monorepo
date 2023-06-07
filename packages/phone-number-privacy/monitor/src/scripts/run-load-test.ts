@@ -15,17 +15,22 @@ const runLoadTest = (contextName: string, numWorker: number, isSerial: boolean) 
       blockchainProvider = 'https://forno.celo.org'
       break
     default:
-      console.error('invalid contextName')
+      console.error('Invalid contextName')
+      yargs.showHelp()
       process.exit(1)
   }
-
+  if (numWorker < 1) {
+    console.error('Invalid numWorkers')
+    yargs.showHelp()
+    process.exit(1)
+  }
   if (isSerial) {
-    serialLoadTest(numWorker, blockchainProvider!, contextName as OdisContextName) // tslint:disable-line:no-floating-promises
+    serialLoadTest(numWorker, blockchainProvider!, contextName as OdisContextName)
   } else {
     concurrentLoadTest(numWorker, blockchainProvider!, contextName as OdisContextName) // tslint:disable-line:no-floating-promises
   }
 }
-// tslint:disable-next-line: no-unused-expression
+
 yargs
   .scriptName('ODIS-load-test')
   .recommendCommands()
