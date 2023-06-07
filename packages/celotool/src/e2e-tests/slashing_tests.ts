@@ -33,6 +33,15 @@ function headerArray(block: any) {
   if (block.gasLimit) {
     headerHashData.push(block.gasLimit)
   }
+  if (block.nonce) {
+    // All these fields are set after GFork, but difficulty is already returned
+    // in RPC as an Eth-compatibility feature before, so we can't use it to
+    // check if we are after GFork
+    headerHashData.push(new BigNumber(block.difficulty).toNumber())
+    headerHashData.push(block.nonce)
+    headerHashData.push(block.sha3Uncles)
+    headerHashData.push(block.mixHash)
+  }
   return headerHashData
 }
 
