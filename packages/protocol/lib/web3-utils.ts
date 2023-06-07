@@ -265,8 +265,9 @@ export const makeTruffleContractForMigration = (contractName: string, contractPa
     unlinked_binary: artifact.bytecode,
   })
   
+  
   Contract.setProvider(web3.currentProvider)
-  Contract.setNetwork('development')
+  Contract.setNetwork(networks.development)
   
   Contract.interfaceAdapter = createInterfaceAdapter({
     networkType: "ethereum",
@@ -274,7 +275,7 @@ export const makeTruffleContractForMigration = (contractName: string, contractPa
   })
   Contract.configureNetwork({networkType: "ethereum", provider: web3.currentProvider})
 
-  // Contract.defaults({from: networks.development.from, gas: networks.development.gas})
+  Contract.defaults({from: networks.development.from, gas: networks.development.gas})
   ArtifactsSingleton.getInstance(contractPath).addArtifact(contractName, Contract)
   return Contract
 }
