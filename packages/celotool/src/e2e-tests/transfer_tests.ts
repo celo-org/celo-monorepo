@@ -84,55 +84,60 @@ const setIntrinsicGas = async (validatorUri: string, validatorAddress: string, g
 }
 
 // Intrinsic gas for a basic transaction
-const INTRINSIC_TX_GAS_COST = 21000
+const INTRINSIC_TX_GAS_COST = 21_000
 
 // Additional intrinsic gas for a transaction with fee currency specified
-const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50000
+const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50_000
 
-// If the To address has zero as the balance, the cost of writting that address is
-const sstoreSetGasEIP2200 = 20000
-const sstoreResetGasEIP2200 = 5000
-const coldSloadCostEIP2929 = 800 // The Eip2929 set this to 2100, but our Cip48 back to 800
-const coldAccountAccessCostEIP2929 = 900 // The Eip2929 set this to 2600, but our Cip48 back to 900
-const warmStorageReadCostEIP2929 = 100 // Eip2929 and Cip48
+// If the To address has zero as the balance, the cost of writing that address is
+const sstoreSetGasEIP2200 = 20_000
+const sstoreResetGasEIP2200 = 5_000
+const coldSloadCostEIP2929 = 2_100 // diff 1300
+const coldAccountAccessCostEIP2929 = 2_600 // diff 1700
+const warmStorageReadCostEIP2929 = 100
 
 // This number represent the gasUsed in the execution of the StableToken transfer assuming:
 // - Nothing was preloaded in the state accessList, so the first storage calls will cost:
-//    * ColdSloadCostEIP2929 = 800
-//    * ColdAccountAccessCostEIP2929 = 900
+//    * ColdSloadCostEIP2929 = 2100
+//    * ColdAccountAccessCostEIP2929 = 2600
 // - The From and To address
 //     * HAVE funds
 //     * non of those will be zero after the transfer
 //     * non those were modified before (as part of the same tx)
 //     * This means that both SSTORE (From and To) will cost:
-//         SstoreResetGasEIP2200 [5000] - ColdSloadCostEIP2929 [800] => 4200
-// - No intrinsic gas involved BUT 630 gas charged for the amount of bytes sent
-const basicStableTokenTransferGasCost = 31253
+//         SstoreResetGasEIP2200 [5000] - ColdSloadCostEIP2929 [2100] => 2900
+
+const opCodeCostStableTokenTransfer = 9_553
+const basicStableTokenTransferGasCost =
+  opCodeCostStableTokenTransfer +
+  11 * coldSloadCostEIP2929 +
+  5 * coldAccountAccessCostEIP2929 +
+  2 * (sstoreResetGasEIP2200 - coldSloadCostEIP2929)
 
 // As the basicStableTokenTransferGasCost assumes that the transfer TO have funds, we should
-// only add the difference to calculate the gas (sstoreSetGasEIP2200 - 4200) => 15800
+// only add the difference to calculate the gas (sstoreSetGasEIP2200 - 2900) => 17100
 const emptyFundsBeforeForBasicCalc =
-  sstoreSetGasEIP2200 - (sstoreResetGasEIP2200 - coldSloadCostEIP2929) // 15800
+  sstoreSetGasEIP2200 - (sstoreResetGasEIP2200 - coldSloadCostEIP2929) // 17100
 
 // The StableToken transfer, paid with the same StableToken, preloads a lot of state
-// when the fee is subsctracted from the account, which generates that the basicStableTokenTransferGasCost
+// when the fee is subtracted from the account, which generates that the basicStableTokenTransferGasCost
 // cost less. The actual differences:
-// - SLOADS ColdSloadCostEIP2929 -> WarmStorageReadCostEIP2929 (-700 each)
+// - SLOADS ColdSloadCostEIP2929 -> WarmStorageReadCostEIP2929 (-2000 each)
 //   * 6 from the stableToken contract
 //   * 2 from the celoRegistry contract
 //   * 2 from the Freeze contract
 // - Account Check ( EXTCODEHASH | EXTCODESIZE | ext BALANCE)
-//          coldAccountAccessCostEIP2929 -> WarmStorageReadCostEIP2929 (-800 each)
+//          coldAccountAccessCostEIP2929 -> WarmStorageReadCostEIP2929 (-2500 each)
 //   * 3 from the stableToken contract
 //   * 1 from the celoRegistry contract
 //   * 1 from the Freeze contract
 // - The From account as already modified the state for that address
-//   * This will make that instead of SstoreResetGasEIP2200 [5000] - ColdSloadCostEIP2929 [800] => 4200
-//     will cost WarmStorageReadCostEIP2929 [100] (-4100)
+//   * This will make that instead of SstoreResetGasEIP2200 [5000] - ColdSloadCostEIP2929 [2100] => 2900
+//     will cost WarmStorageReadCostEIP2929 [100] (-2800)
 const savingGasStableTokenTransferPaidWithSameStable =
   (coldSloadCostEIP2929 - warmStorageReadCostEIP2929) * 10 +
   (coldAccountAccessCostEIP2929 - warmStorageReadCostEIP2929) * 5 +
-  (sstoreResetGasEIP2200 - coldSloadCostEIP2929 - warmStorageReadCostEIP2929) // 15100
+  (sstoreResetGasEIP2200 - coldSloadCostEIP2929 - warmStorageReadCostEIP2929) // 35300
 
 /** Helper to watch balance changes over accounts */
 interface BalanceWatcher {
@@ -293,7 +298,7 @@ describe('Transfer tests', function (this: any) {
     await epochRewards.methods.setCommunityRewardFraction(0).send({ from: validatorAddress })
 
     // Give the account we will send transfers as sufficient gold and dollars.
-    const startBalance = TransferAmount.times(500)
+    const startBalance = TransferAmount.times(800)
     const resDollars = await transferCeloDollars(validatorAddress, FromAddress, startBalance)
     const resGold = await transferCeloGold(validatorAddress, FromAddress, startBalance)
     await Promise.all([resDollars.waitReceipt(), resGold.waitReceipt()])
