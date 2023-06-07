@@ -23,6 +23,7 @@ import {
   generateGenesis,
   generateGenesisWithMigrations,
   generatePrivateKey,
+  privateKeyToAddress,
   privateKeyToPublicKey,
 } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
@@ -78,6 +79,7 @@ export const LOG_TAG_TRANSACTION_VALIDATION_ERROR = 'validate_transaction_error'
 // for log messages which show time needed to receive the receipt after
 // the transaction has been sent
 export const LOG_TAG_TX_TIME_MEASUREMENT = 'tx_time_measurement'
+export const MAX_LOADTEST_THREAD_COUNT = 100
 
 export const getEnodeAddress = (nodeId: string, ipAddress: string, port: number) => {
   return `enode://${nodeId}@${ipAddress}:${port}`
@@ -552,7 +554,7 @@ export enum TestMode {
 }
 
 export const simulateClient = async (
-  senderAddress: string,
+  senderPK: string,
   recipientAddress: string,
   contractAddress: string,
   contractData: string,
@@ -566,13 +568,11 @@ export const simulateClient = async (
 ) => {
   // Assume the node is accessible via localhost with senderAddress unlocked
   const kit = newKitFromWeb3(new Web3(web3Provider))
-  const password = fetchEnv('PASSWORD')
 
   let lastNonce: number = -1
   let lastTx: string = ''
   let lastGasPriceMinimum: BigNumber = new BigNumber(0)
   let nonce: number = 0
-  let unlockNeeded: boolean = true
   let recipientAddressFinal: string = recipientAddress
   const useRandomRecipient = fetchEnv(envVar.LOAD_TEST_USE_RANDOM_RECIPIENT)
 
@@ -583,7 +583,8 @@ export const simulateClient = async (
     )
     await sleep(sleepTime)
   }
-  kit.defaultAccount = senderAddress
+  kit.addAccount(senderPK)
+  kit.defaultAccount = privateKeyToAddress(senderPK)
 
   // sleep a random amount of time in the range [0, txPeriodMs) before starting so
   // that if multiple simulations are started at the same time, they don't all
@@ -612,7 +613,7 @@ export const simulateClient = async (
   const baseLogMessage: any = {
     loadTestID: index,
     threadID: thread,
-    sender: senderAddress,
+    sender: kit.defaultAccount,
     recipient: recipientAddressFinal,
     feeCurrency: '',
     txHash: '',
@@ -620,10 +621,6 @@ export const simulateClient = async (
 
   while (true) {
     const sendTransactionTime = Date.now()
-    if (unlockNeeded) {
-      await unlock(kit, kit.defaultAccount, password, 9223372036)
-      unlockNeeded = false
-    }
     const txConf = await getTxConf(testMode)
     baseLogMessage.tokenName = txConf.tokenName
 
@@ -666,13 +663,20 @@ export const simulateClient = async (
     }
 
     await txConf
-      .transferFn(kit, senderAddress, recipientAddressFinal, transferAmount, dataStr, txOptions)
+      .transferFn(
+        kit,
+        kit.defaultAccount,
+        recipientAddressFinal,
+        transferAmount,
+        dataStr,
+        txOptions
+      )
       .then(async (txResult: TransactionResult) => {
         lastTx = await txResult.getHash()
         lastNonce = (await kit.web3.eth.getTransaction(lastTx)).nonce
         await onLoadTestTxResult(
           kit,
-          senderAddress,
+          kit.defaultAccount!,
           txResult,
           sendTransactionTime,
           baseLogMessage,
@@ -681,9 +685,12 @@ export const simulateClient = async (
         )
       })
       .catch((error: any) => {
-        if (catchNeedUnlock(error, baseLogMessage)) {
-          unlockNeeded = true
-        }
+        console.error('Load test transaction failed with error:', error)
+        tracerLog({
+          tag: LOG_TAG_TRANSACTION_ERROR,
+          error: error.toString(),
+          ...baseLogMessage,
+        })
       })
     if (sendTransactionTime + txPeriodMs > Date.now()) {
       await sleep(sendTransactionTime + txPeriodMs - Date.now())
@@ -758,27 +765,6 @@ const getNonce = async (
     newPrice: _newPrice,
     nonce: _nonce,
   }
-}
-
-// Catch errors from the transfer Fn, and returns if an account unlock
-// is needed.
-const catchNeedUnlock = (error: any, baseLogMessage: any) => {
-  let unlockNeeded = false
-  if (
-    typeof error === 'string' &&
-    error.includes('Error: authentication needed: password or unlock')
-  ) {
-    console.warn('Load test transaction failed with locked account:', error)
-    unlockNeeded = true
-  } else {
-    console.error('Load test transaction failed with error:', error)
-    tracerLog({
-      tag: LOG_TAG_TRANSACTION_ERROR,
-      error: error.toString(),
-      ...baseLogMessage,
-    })
-  }
-  return unlockNeeded
 }
 
 const getFeeCurrency = async (kit: ContractKit, feeCurrencyGold: boolean, baseLogMessage: any) => {
@@ -860,9 +846,11 @@ export const onLoadTestTxResult = async (
  * @param thread the thread number inside the pod
  */
 export function getIndexForLoadTestThread(pod: number, thread: number) {
-  // max number of threads to avoid overlap is [0, base)
-  const base = 10000
-  return pod * base + thread
+  if (thread > MAX_LOADTEST_THREAD_COUNT) {
+    throw new Error(`thread count must be smaller than ${MAX_LOADTEST_THREAD_COUNT}`)
+  }
+  // max number of threads to avoid overlap is [0, MAX_LOADTEST_THREAD_COUNT)
+  return pod * MAX_LOADTEST_THREAD_COUNT + thread
 }
 
 /**
