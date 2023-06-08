@@ -19,7 +19,7 @@
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
     "lint": "tslint --project .",
-    "loadTest": "ts-node src/scripts/run-load-test.ts"
+    "loadTest": "ts-node src/scripts/run-load-test.ts run"
   },
   "dependencies": {
     "@celo/contractkit": "^4.1.1-dev",
