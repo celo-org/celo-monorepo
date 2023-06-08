@@ -19,11 +19,11 @@ import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
   AccountType,
+  Validator,
   generateGenesis,
   generateGenesisWithMigrations,
   generatePrivateKey,
   privateKeyToPublicKey,
-  Validator,
 } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
@@ -1115,7 +1115,6 @@ export async function startGeth(
     isProxied,
     proxyport,
     ethstats,
-    gatewayFee,
   } = instance
 
   const privateKey = instance.privateKey || ''
@@ -1184,10 +1183,6 @@ export async function startGeth(
     instance.args.push(`--nodekeyhex=${instance.nodekey}`)
   } else if (!validating || !replica) {
     instance.args.push(`--nodekeyhex=${privateKey}`)
-  }
-
-  if (gatewayFee) {
-    instance.args.push(`--light.gatewayfee=${gatewayFee.toString()}`)
   }
 
   if (validating) {

@@ -256,7 +256,6 @@ describe('Transfer tests', function (this: any) {
     validating: false,
     syncmode: 'full',
     lightserv: true,
-    gatewayFee: new BigNumber(10000),
     port: 30305,
     rpcport: 8547,
     // We need to set an etherbase here so that the full node will accept transactions from
@@ -317,8 +316,6 @@ describe('Transfer tests', function (this: any) {
       port: 30307,
       rpcport: 8549,
       lightserv: !light,
-      // TODO(nategraf): Remove this when light clients can query for gateway fee.
-      gatewayFee: light ? new BigNumber(10000) : undefined,
       privateKey: DEF_FROM_PK,
     }
 
@@ -702,7 +699,7 @@ describe('Transfer tests', function (this: any) {
                           gatewayFeeRecipient: recipient(recipientChoice),
                           gatewayFee: feeValue(feeValueChoice),
                         }
-                        if (recipientChoice === 'random' || feeValueChoice === 'insufficient') {
+                        if (recipientChoice !== 'unset' || feeValueChoice !== 'unset') {
                           it('should get rejected by the sending node before being added to the tx pool', async () => {
                             try {
                               const res = await transferCeloGold(
@@ -714,7 +711,7 @@ describe('Transfer tests', function (this: any) {
                               await res.waitReceipt()
                               assert.fail('no error was thrown')
                             } catch (error: any) {
-                              assert.include(error.toString(), `Error: no suitable peers available`)
+                              assert.include(error.toString(), `Error: gateway fee is deprecated`)
                             }
                           })
                         } else {
