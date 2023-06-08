@@ -1,4 +1,5 @@
 /* tslint:disable no-console */
+import BigNumber from 'bignumber.js'
 import { AccountType, generateAddress, generatePrivateKey } from 'src/lib/generate_utils'
 import {
   MAX_LOADTEST_THREAD_COUNT,
@@ -22,6 +23,8 @@ interface SimulateClientArgv extends yargs.Argv {
   contractData: string
   clientCount: number
   reuseClient: boolean
+  maxGasPrice: number
+  totalTxGas: number
   testMode: string
 }
 
@@ -80,6 +83,16 @@ export const builder = () => {
       description: 'Use the same client for all the threads/accounts',
       default: false,
     })
+    .options('max-gas-price', {
+      type: 'number',
+      description: 'Max gasPrice to use for transactions',
+      default: 0,
+    })
+    .options('total-tx-gas', {
+      type: 'number',
+      description: 'Gas Target when using data transfers',
+      default: 500000,
+    })
     .options('test-mode', {
       type: 'string',
       description:
@@ -125,6 +138,8 @@ export const handler = async (argv: SimulateClientArgv) => {
       argv.index,
       argv.testMode as TestMode,
       thread,
+      new BigNumber(argv.maxGasPrice),
+      argv.totalTxGas,
       `http://localhost:${web3ProviderPort}`
     )
   }
