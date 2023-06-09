@@ -528,7 +528,6 @@ contract FeeHandler is
     }
     tokenState.currentDaySellLimit = tokenState.currentDaySellLimit.sub(amountBurned);
     emit DailyLimitUpdated(amountBurned);
-    return;
   }
 
   /**
