@@ -1,6 +1,7 @@
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils';
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils';
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils';
+import { ArtifactsSingleton } from '@celo/protocol/migrations_ts/artifactsSingleton';
 import { config } from '@celo/protocol/migrationsConfig';
 import { privateKeyToAddress } from '@celo/utils/lib/address';
 import { soliditySha3 } from '@celo/utils/lib/solidity';
@@ -8,10 +9,11 @@ import BigNumber from 'bignumber.js';
 import chai from 'chai';
 import chaiSubset from 'chai-subset';
 // tslint:disable-next-line: ordered-imports
-import { SpawnOptions, spawn } from 'child_process';
-import { keccak256 } from 'ethereumjs-util';
+import { spawn, SpawnOptions } from 'child_process';
+import { keccak256 } from 'ethereum-cryptography/keccak';
 import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types';
 import Web3 from 'web3';
+import { ContractPackage, MENTO_PACKAGE } from '../contractPackages';
 
 import BN = require('bn.js')
 
@@ -231,7 +233,7 @@ type ProxiedContractGetter = (
 
 type ContratGetter = (
   contractName: string,
-  contractPackage?: ContractPackage, 
+  contractPackage?: ContractPackage | String, 
   ) => Promise<any>
 
 
