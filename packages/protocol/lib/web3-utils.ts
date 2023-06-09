@@ -7,7 +7,6 @@ import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { BigNumber } from 'bignumber.js'
-import { networks } from '../truffle-config.js'
 
 import { createInterfaceAdapter } from '@truffle/interface-adapter'
 import path from 'path'
@@ -259,6 +258,8 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
 
 
 export const makeTruffleContractForMigration = (contractName: string, contractPath:ContractPackage, web3: Web3) => {
+  const network = ArtifactsSingleton.getNetwork()
+
   const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath.name}/${contractName}.json`)
   const Contract = truffleContract({
     abi: artifact.abi,
@@ -267,7 +268,7 @@ export const makeTruffleContractForMigration = (contractName: string, contractPa
   
   
   Contract.setProvider(web3.currentProvider)
-  Contract.setNetwork(networks.development)
+  Contract.setNetwork(network.name)
   
   Contract.interfaceAdapter = createInterfaceAdapter({
     networkType: "ethereum",
@@ -275,7 +276,7 @@ export const makeTruffleContractForMigration = (contractName: string, contractPa
   })
   Contract.configureNetwork({networkType: "ethereum", provider: web3.currentProvider})
 
-  Contract.defaults({from: networks.development.from, gas: networks.development.gas})
+  Contract.defaults({from: network.from, gas: network.gas})
   ArtifactsSingleton.getInstance(contractPath).addArtifact(contractName, Contract)
   return Contract
 }

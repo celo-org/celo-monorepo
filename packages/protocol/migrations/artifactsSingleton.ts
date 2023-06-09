@@ -1,5 +1,7 @@
 import { ContractPackage } from '../contractPackages'
 
+// This objects replicates a Truffle `artifacts.require` singleton
+// but constructed manually
 export class ArtifactsSingleton {
   public static getInstance(contractPackage: ContractPackage, defaultArtifacts?: any): any {
     if (contractPackage === undefined || contractPackage.path === undefined) {
@@ -17,6 +19,17 @@ export class ArtifactsSingleton {
   private static instances: { [key: string]: ArtifactsSingleton } = {}
 
   public artifacts: { [key: string]: any } = {}
+
+  private static network: any
+
+  public static setNetwork(network: any) {
+    this.network = network
+  }
+
+  public static getNetwork() {
+    return this.network
+  }
+
   private constructor() {}
 
   public addArtifact(key: string, value: any) {
