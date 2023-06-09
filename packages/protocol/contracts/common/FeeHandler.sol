@@ -102,8 +102,8 @@ contract FeeHandler is
     uint256[] calldata newLimits,
     uint256[] calldata newMaxSlippages
   ) external initializer {
-    require(tokens.length == handlers.length, "limits length should match tokens");
-    require(tokens.length == newLimits.length, "maxSlippage length should match tokens");
+    require(tokens.length == handlers.length, "handlers length should match tokens");
+    require(tokens.length == newLimits.length, "limits length should match tokens");
     require(tokens.length == newMaxSlippages.length, "maxSlippage length should match tokens");
 
     _transferOwnership(msg.sender);
@@ -153,7 +153,7 @@ contract FeeHandler is
   }
 
   /**
-    @dev Returns the daily sell limit for the specified token.
+    @dev Returns the daily burn limit for the specified token.
     @param tokenAddress The address of the token for which to retrieve the daily burn limit.
     @return The daily burn limit as a uint256 value.
   */
