@@ -39,7 +39,6 @@ contract FeeHandler is
   using FixidityLib for FixidityLib.Fraction;
   using EnumerableSet for EnumerableSet.AddressSet;
 
-  uint256 constant MAX_TIMESTAMP_BLOCK_EXCHANGE = 20;
   uint256 public constant FIXED1_UINT = 1000000000000000000000000;
 
   // Min units that can be burned
