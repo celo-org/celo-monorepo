@@ -52,7 +52,7 @@ contract FeeHandler is
 
   address public feeBeneficiary;
 
-  // This mapping can not be public because it contains  a FixidityLib.Fraction
+  // This mapping can not be public because it contains a FixidityLib.Fraction
   // and that'd be only supported with experimental features in this
   // compiler version
   mapping(address => TokenState) private tokenStates;
