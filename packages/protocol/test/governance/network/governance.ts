@@ -49,6 +49,8 @@ const parseProposalParams = (proposalParams: any) => {
     timestamp: proposalParams[2].toNumber(),
     transactionCount: proposalParams[3].toNumber(),
     descriptionUrl: proposalParams[4],
+    networkWeight: proposalParams[5],
+    approved: proposalParams[6],
   }
 }
 
@@ -746,6 +748,8 @@ contract('Governance', (accounts: string[]) => {
         assert.equal(proposal.timestamp, timestamp)
         assert.equal(proposal.transactionCount, 0)
         assert.equal(proposal.descriptionUrl, descriptionUrl)
+        assertEqualBN(proposal.networkWeight, 0)
+        assert.equal(proposal.approved, false)
       })
 
       it('should emit the ProposalQueued event', async () => {
@@ -786,6 +790,8 @@ contract('Governance', (accounts: string[]) => {
         assert.equal(proposal.timestamp, timestamp)
         assert.equal(proposal.transactionCount, 1)
         assert.equal(proposal.descriptionUrl, descriptionUrl)
+        assertEqualBN(proposal.networkWeight, 0)
+        assert.equal(proposal.approved, false)
       })
 
       it('should register the proposal transactions', async () => {
@@ -870,6 +876,8 @@ contract('Governance', (accounts: string[]) => {
         assert.equal(proposal.timestamp, timestamp)
         assert.equal(proposal.transactionCount, 2)
         assert.equal(proposal.descriptionUrl, descriptionUrl)
+        assertEqualBN(proposal.networkWeight, 0)
+        assert.equal(proposal.approved, false)
       })
 
       it('should register the proposal transactions', async () => {
@@ -1369,6 +1377,17 @@ contract('Governance', (accounts: string[]) => {
     it('should return true', async () => {
       const success = await governance.approve.call(proposalId, index)
       assert.isTrue(success)
+    })
+
+    it('should return updated proposal details correctly', async () => {
+      await governance.approve(proposalId, index)
+      const proposal = parseProposalParams(await governance.getProposal(proposalId))
+      assert.equal(proposal.proposer, accounts[0])
+      assert.equal(proposal.deposit, minDeposit)
+      assert.equal(proposal.transactionCount, 1)
+      assert.equal(proposal.descriptionUrl, descriptionUrl)
+      assert.equal(proposal.approved, true)
+      assertEqualBN(proposal.networkWeight, yesVotes)
     })
 
     it('should set the proposal to approved', async () => {
@@ -3581,12 +3600,12 @@ contract('Governance', (accounts: string[]) => {
       const nonExistentProposalId = 7
       const originalLastDequeue = await governance.lastDequeue()
       await timeTravel(dequeueFrequency, web3)
-      await assertRevert(governance.dequeueProposalIfReady(nonExistentProposalId))
-
+      await governance.dequeueProposalIfReady(nonExistentProposalId)
       assert.equal((await governance.getQueueLength()).toNumber(), 0)
       assert.equal((await governance.lastDequeue()).toNumber(), originalLastDequeue.toNumber())
     })
     describe('when a proposal exists', () => {
+      const proposalId = 1
       beforeEach(async () => {
         await governance.propose(
           [transactionSuccess1.value],
@@ -3599,18 +3618,35 @@ contract('Governance', (accounts: string[]) => {
         )
       })
 
+      it('should not update `dequeued` when proposal has expired', async () => {
+        await timeTravel(queueExpiry, web3)
+        await governance.dequeueProposalIfReady(proposalId)
+        const dequeued = await governance.getDequeue()
+        assert.equal(dequeued.length, 0)
+      })
+
+      it('should update `dequeued` when proposal has not expired', async () => {
+        await timeTravel(dequeueFrequency, web3)
+        await governance.dequeueProposalIfReady(proposalId)
+        const dequeued = await governance.getDequeue()
+        assert.include(
+          dequeued.map((x) => x.toNumber()),
+          proposalId
+        )
+      })
+
       it('should update lastDequeue', async () => {
         const originalLastDequeue = await governance.lastDequeue()
 
         await timeTravel(dequeueFrequency, web3)
-        await governance.dequeueProposalIfReady(1)
+        await governance.dequeueProposalIfReady(proposalId)
 
         assert.equal((await governance.getQueueLength()).toNumber(), 0)
         assert.isTrue((await governance.lastDequeue()).toNumber() > originalLastDequeue.toNumber())
       })
 
       it('should still be valid if not dequeued or expired', async () => {
-        await governance.dequeueProposalIfReady(1)
+        await governance.dequeueProposalIfReady(proposalId)
         const isQueuedProposalExpired = await governance.isQueuedProposalExpired(1)
         assert.isFalse(isQueuedProposalExpired)
       })

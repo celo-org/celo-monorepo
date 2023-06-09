@@ -220,7 +220,7 @@ contract Governance is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 3, 1, 0);
+    return (1, 4, 0, 0);
   }
 
   /**
@@ -1045,7 +1045,7 @@ contract Governance is
   function getProposal(uint256 proposalId)
     external
     view
-    returns (address, uint256, uint256, uint256, string memory)
+    returns (address, uint256, uint256, uint256, string memory, uint256, bool)
   {
     return proposals[proposalId].unpack();
   }
@@ -1265,6 +1265,12 @@ contract Governance is
     // solhint-disable-next-line not-rely-on-time
     if (now >= lastDequeue.add(dequeueFrequency)) {
       Proposals.Proposal storage proposal = proposals[proposalId];
+
+      if (_isQueuedProposalExpired(proposal)) {
+        emit ProposalExpired(proposalId);
+        return isProposalDequeued;
+      }
+
       // Updating refunds back to proposer
       refundedDeposits[proposal.proposer] = refundedDeposits[proposal.proposer].add(
         proposal.deposit
