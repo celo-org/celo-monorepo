@@ -6,7 +6,7 @@ import {
 import { config } from '@celo/protocol/migrationsConfig'
 import { ReserveSpenderMultiSigInstance } from 'types/mento'
 import { MENTO_PACKAGE } from '../contractPackages'
-import { ArtifactsSingleton } from '../migrations_ts/artifactsSingleton'
+import { ArtifactsSingleton } from '../lib/artifactsSingleton'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [

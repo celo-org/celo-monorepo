@@ -1,7 +1,7 @@
+import { ArtifactsSingleton } from '@celo/protocol/lib/artifactsSingleton';
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils';
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils';
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils';
-import { ArtifactsSingleton } from '@celo/protocol/migrations_ts/artifactsSingleton';
 import { config } from '@celo/protocol/migrationsConfig';
 import { privateKeyToAddress } from '@celo/utils/lib/address';
 import { soliditySha3 } from '@celo/utils/lib/solidity';

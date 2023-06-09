@@ -10,7 +10,7 @@ import { RegistryInstance } from 'types'
 import { ReserveInstance, ReserveSpenderMultiSigInstance } from 'types/mento'
 import Web3 from 'web3'
 import { MENTO_PACKAGE } from '../contractPackages'
-import { ArtifactsSingleton } from './artifactsSingleton'
+import { ArtifactsSingleton } from '../lib/artifactsSingleton'
 
 import Web3Utils = require('web3-utils')
 
