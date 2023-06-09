@@ -6,7 +6,7 @@ import { CoreContracts } from './build'
 const UNSAFE_OPCODES = ['selfdestruct', 'delegatecall']
 
 // ignore deprecated and known contracts
-const IGNORE_CONTRACTS = ['ReleaseGold', 'TransferWhitelist']
+const IGNORE_CONTRACTS = ['ReleaseGold']
 const CHECK_CONTRACTS = CoreContracts.filter((c) => !IGNORE_CONTRACTS.includes(c))
 
 const handleGrepOutput = (err: ExecException, grepOutput: string, stderr: string) => {

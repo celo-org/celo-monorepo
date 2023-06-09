@@ -32,7 +32,6 @@ import { newRegistry } from './generated/Registry'
 import { newReserve } from './generated/Reserve'
 import { newSortedOracles } from './generated/SortedOracles'
 import { newStableToken } from './generated/StableToken'
-import { newTransferWhitelist } from './generated/TransferWhitelist'
 import { newValidators } from './generated/Validators'
 
 const debug = debugFactory('kit:web3-contract-cache')
@@ -69,7 +68,6 @@ export const ContractFactories = {
   [CeloContract.StableToken]: newStableToken,
   [CeloContract.StableTokenEUR]: newStableToken,
   [CeloContract.StableTokenBRL]: newStableToken,
-  [CeloContract.TransferWhitelist]: newTransferWhitelist,
   [CeloContract.Validators]: newValidators,
 }
 
@@ -180,9 +178,6 @@ export class Web3ContractCache {
   }
   getStableToken(stableToken: StableToken = StableToken.cUSD) {
     return this.getContract(StableToContract[stableToken])
-  }
-  getTransferWhitelist() {
-    return this.getContract(CeloContract.TransferWhitelist)
   }
   getValidators() {
     return this.getContract(CeloContract.Validators)
