@@ -480,7 +480,7 @@ contract FeeHandler is
       .fromFixed();
     celo.burn(balanceToBurn);
 
-    tokenState.toDistribute += balanceToProcess - balanceToBurn;
+    tokenState.toDistribute = tokenState.toDistribute.add(balanceToProcess.sub(balanceToBurn));
   }
 
   /**
