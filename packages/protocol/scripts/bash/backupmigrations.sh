@@ -19,7 +19,6 @@ else
   cp migrations.bak/01_libraries.* migrations/
   # cp migrations.bak/02_registry.* migrations/
   # cp migrations.bak/03_freezer.* migrations/
-  # cp migrations.bak/03_transferwhitelist.* migrations/
   # cp migrations.bak/03_whitelist.* migrations/
   # cp migrations.bak/04_goldtoken.* migrations/
   # cp migrations.bak/05_sortedoracles.* migrations/

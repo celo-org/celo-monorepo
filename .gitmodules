@@ -10,3 +10,6 @@
 [submodule "packages/protocol/lib/mento-core"]
 	path = packages/protocol/lib/mento-core
 	url = https://github.com/mento-protocol/mento-core
+[submodule "lib/memview.sol"]
+	path = packages/protocol/lib/memview.sol
+	url = https://github.com/summa-tx/memview.sol

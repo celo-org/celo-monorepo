@@ -27,7 +27,6 @@ import { newProxy } from './generated/Proxy'
 import { newRandom } from './generated/Random'
 import { newRegistry } from './generated/Registry'
 import { newSortedOracles } from './generated/SortedOracles'
-import { newTransferWhitelist } from './generated/TransferWhitelist'
 import { newValidators } from './generated/Validators'
 import { newExchange } from './generated/mento/Exchange'
 import { newExchangeBrl } from './generated/mento/ExchangeBRL'
@@ -70,7 +69,6 @@ export const ContractFactories = {
   [CeloContract.StableToken]: newStableToken,
   [CeloContract.StableTokenEUR]: newStableToken,
   [CeloContract.StableTokenBRL]: newStableToken,
-  [CeloContract.TransferWhitelist]: newTransferWhitelist,
   [CeloContract.Validators]: newValidators,
 }
 
@@ -181,9 +179,6 @@ export class Web3ContractCache {
   }
   getStableToken(stableToken: StableToken = StableToken.cUSD) {
     return this.getContract(StableToContract[stableToken])
-  }
-  getTransferWhitelist() {
-    return this.getContract(CeloContract.TransferWhitelist)
   }
   getValidators() {
     return this.getContract(CeloContract.Validators)

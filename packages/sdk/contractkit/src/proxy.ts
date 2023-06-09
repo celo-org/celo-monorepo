@@ -24,7 +24,6 @@ import { ABI as ProxyABI } from './generated/Proxy'
 import { ABI as RandomABI } from './generated/Random'
 import { ABI as RegistryABI } from './generated/Registry'
 import { ABI as SortedOraclesABI } from './generated/SortedOracles'
-import { ABI as TransferWhitelistABI } from './generated/TransferWhitelist'
 import { ABI as ValidatorsABI } from './generated/Validators'
 import { ABI as ExchangeABI } from './generated/mento/Exchange'
 import { ABI as GrandaMentoABI } from './generated/mento/GrandaMento'
@@ -127,7 +126,6 @@ const initializeAbiMap = {
   StableTokenProxy: findInitializeAbi(StableTokenABI),
   StableTokenEURProxy: findInitializeAbi(StableTokenABI),
   StableTokenBRLProxy: findInitializeAbi(StableTokenABI),
-  TransferWhitelistProxy: findInitializeAbi(TransferWhitelistABI),
   ValidatorsProxy: findInitializeAbi(ValidatorsABI),
 }
 

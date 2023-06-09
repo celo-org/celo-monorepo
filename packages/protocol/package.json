@@ -55,6 +55,7 @@
     "@celo/utils": "4.1.1-dev",
     "@celo/cryptographic-utils": "4.1.1-dev",
     "@openzeppelin/upgrades": "^2.8.0",
+    "@summa-tx/memview.sol": "^1.1.0",
     "bip39": "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2",
     "chai-subset": "^1.6.0",
     "csv-parser": "^2.0.0",

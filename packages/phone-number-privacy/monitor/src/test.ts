@@ -83,7 +83,7 @@ export async function serialLoadTest(
   endpoint:
     | CombinerEndpointPNP.LEGACY_PNP_SIGN
     | CombinerEndpointPNP.PNP_QUOTA
-    | CombinerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.LEGACY_PNP_SIGN,
+    | CombinerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.PNP_SIGN,
   timeoutMs?: number
 ) {
   for (let i = 0; i < n; i++) {
@@ -107,7 +107,7 @@ export async function concurrentLoadTest(
   endpoint:
     | CombinerEndpointPNP.LEGACY_PNP_SIGN
     | CombinerEndpointPNP.PNP_QUOTA
-    | CombinerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.LEGACY_PNP_SIGN,
+    | CombinerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.PNP_SIGN,
   timeoutMs?: number
 ) {
   while (true) {

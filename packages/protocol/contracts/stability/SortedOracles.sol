@@ -62,7 +62,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 1);
+    return (1, 1, 2, 2);
   }
 
   /**
@@ -171,7 +171,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @return The address of the last report.
    */
   function isOldestReportExpired(address token) public view returns (bool, address) {
-    require(token != address(0));
+    require(token != address(0), "token address cannot be null");
     address oldest = timestamps[token].getTail();
     uint256 timestamp = timestamps[token].getValue(oldest);
     // solhint-disable-next-line not-rely-on-time
