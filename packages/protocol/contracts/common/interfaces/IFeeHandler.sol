@@ -12,7 +12,7 @@ interface IFeeHandler {
   function setHandler(address tokenAddress, address handlerAddress) external;
 
   // marks token to be handled in "handleAll())
-  function activateToken(address tokenAddress) external; // TODO ADD THIS FUNCTION
+  function activateToken(address tokenAddress) external;
   function deactivateToken(address tokenAddress) external;
 
   function sell(address tokenAddress) external;
