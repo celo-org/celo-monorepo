@@ -171,7 +171,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
       }
     }
 
-    require(bestRouterQuote != 0, "Cam't exchange with zero quote");
+    require(bestRouterQuote != 0, "Can't exchange with zero quote");
 
     uint256 minAmount = 0;
     if (maxSlippage != 0) {
