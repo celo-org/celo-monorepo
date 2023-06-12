@@ -303,7 +303,7 @@ jobs:
                 echo "If these changes are intended, update the 'releaseData/versionReports' accordingly"
                 exit 1
               fi
-          - name: Protocol Unit tests
+          - name: Protocol Common tests
             command: |
               yarn --cwd packages/protocol test common/
           - name: Protocol Compatibility
@@ -318,7 +318,7 @@ jobs:
           - name: Protocol Governance Voting
             command: |
               yarn --cwd packages/protocol test governance/voting/
-          - name: Protocol Governance Identity
+          - name: Protocol Identity
             command: |
               yarn --cwd packages/protocol test identity/
           - name: Protocol Stability
