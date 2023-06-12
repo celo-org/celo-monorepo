@@ -15,10 +15,9 @@ import "../common/interfaces/IFeeHandler.sol";
 import "../common/interfaces/IFeeHandlerSeller.sol";
 
 // TODO move to IStableToken when it adds method getExchangeRegistryId
-import "../stability/StableToken.sol";
+import "./interfaces/IStableTokenMento.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/interfaces/ICeloToken.sol";
-import "../stability/interfaces/IExchange.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 
 // Using the minimal required signatures in the interfaces so more contracts could be compatible
