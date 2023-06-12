@@ -39,7 +39,7 @@ contract FeeHandler is
   using FixidityLib for FixidityLib.Fraction;
   using EnumerableSet for EnumerableSet.AddressSet;
 
-  uint256 public constant FIXED1_UINT = 1000000000000000000000000;
+  uint256 public constant FIXED1_UINT = 1000000000000000000000000; // TODO move to FIX and add check
 
   // Min units that can be burned
   uint256 public constant MIN_BURN = 200;
@@ -61,7 +61,7 @@ contract FeeHandler is
     bool active;
     FixidityLib.Fraction maxSlippage;
     // Max amounts that can be burned in a day for a token
-    uint256 dailyBurnLimit;
+    uint256 dailySellLimit;
     // Max amounts that can be burned today for a token
     uint256 currentDaySellLimit;
     uint256 toDistribute;
@@ -158,7 +158,7 @@ contract FeeHandler is
   */
 
   function getTokenDailySellLimit(address tokenAddress) external view returns (uint256) {
-    return tokenStates[tokenAddress].dailyBurnLimit;
+    return tokenStates[tokenAddress].dailySellLimit;
   }
 
   /**
@@ -316,9 +316,8 @@ contract FeeHandler is
       return;
     }
 
-    if (dailyBurnLimitHit(tokenAddress, balanceToBurn)) {
+    if (dailySellLimitHit(tokenAddress, balanceToBurn)) {
       // in case the limit is hit, burn the max possible
-      // TODO move to state
       balanceToBurn = tokenState.currentDaySellLimit;
       emit DailyLimitHit(tokenAddress, balanceToBurn);
     }
@@ -403,7 +402,7 @@ contract FeeHandler is
 
   function _setDailySellLimit(address token, uint256 newLimit) private {
     TokenState storage tokenState = tokenStates[token];
-    tokenState.dailyBurnLimit = newLimit;
+    tokenState.dailySellLimit = newLimit;
     emit DailyLimitSet(token, newLimit);
   }
 
@@ -495,10 +494,10 @@ contract FeeHandler is
     * @param amountToBurn The amount of the token to burn.
     * @return Returns true if burning amountToBurn would exceed the daily limit.
     */
-  function dailyBurnLimitHit(address token, uint256 amountToBurn) public returns (bool) {
+  function dailySellLimitHit(address token, uint256 amountToBurn) public returns (bool) {
     TokenState storage tokenState = tokenStates[token];
 
-    if (tokenState.dailyBurnLimit == 0) {
+    if (tokenState.dailySellLimit == 0) {
       // if no limit set, assume uncapped
       return false;
     }
@@ -507,7 +506,7 @@ contract FeeHandler is
     // Pattern borrowed from Reserve.sol
     if (currentDay > lastLimitDay) {
       lastLimitDay = currentDay;
-      tokenState.currentDaySellLimit = tokenState.dailyBurnLimit;
+      tokenState.currentDaySellLimit = tokenState.dailySellLimit;
     }
 
     return amountToBurn >= tokenState.currentDaySellLimit;
@@ -521,7 +520,7 @@ contract FeeHandler is
   function updateLimits(address token, uint256 amountBurned) private {
     TokenState storage tokenState = tokenStates[token];
 
-    if (tokenState.dailyBurnLimit == 0) {
+    if (tokenState.dailySellLimit == 0) {
       // if no limit set, assume uncapped
       return;
     }
