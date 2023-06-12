@@ -85,47 +85,31 @@ contract GasPriceMinimum is
    * @param _adjustmentSpeed How quickly the minimum changes, expressed as a fixidity fraction.
    * @dev Value is expected to be < 1.
    */
-  function setAdjustmentSpeed(uint256 _adjustmentSpeed) public onlyOwner {
-    adjustmentSpeed = FixidityLib.wrap(_adjustmentSpeed);
-    require(adjustmentSpeed.lt(FixidityLib.fixed1()), "adjustment speed must be smaller than 1");
-    emit AdjustmentSpeedSet(_adjustmentSpeed);
-  }
+  function setAdjustmentSpeed(uint256 _adjustmentSpeed) public onlyOwner {}
 
   /**
    * @notice Set the block density targeted by the gas price minimum algorithm.
    * @param _targetDensity The target gas fullness of blocks, expressed as a fixidity fraction.
    * @dev Value is expected to be < 1.
    */
-  function setTargetDensity(uint256 _targetDensity) public onlyOwner {
-    targetDensity = FixidityLib.wrap(_targetDensity);
-    require(targetDensity.lt(FixidityLib.fixed1()), "target density must be smaller than 1");
-    emit TargetDensitySet(_targetDensity);
-  }
+  function setTargetDensity(uint256 _targetDensity) public onlyOwner {}
 
   /**
    * @notice Set the minimum gas price treshold.
    * @param _gasPriceMinimumFloor The lowest value the gas price minimum can be.
    * @dev Value is expected to be > 0.
    */
-  function setGasPriceMinimumFloor(uint256 _gasPriceMinimumFloor) public onlyOwner {
-    require(_gasPriceMinimumFloor > 0, "gas price minimum floor must be greater than zero");
-    gasPriceMinimumFloor = _gasPriceMinimumFloor;
-    emit GasPriceMinimumFloorSet(_gasPriceMinimumFloor);
-  }
+  function setGasPriceMinimumFloor(uint256 _gasPriceMinimumFloor) public onlyOwner {}
 
   /**
    * @notice Set the activation block of the baseFee opCode.
    * @param _baseFeeOpCodeActivationBlock Block number where the baseFee opCode is activated
    * @dev Value is expected to be > 0.
    */
-  function setBaseFeeOpCodeActivationBlock(uint256 _baseFeeOpCodeActivationBlock) public onlyOwner {
-    require(
-      _baseFeeOpCodeActivationBlock > 0,
-      "baseFee opCode activation block must be greater than zero"
-    );
-    baseFeeOpCodeActivationBlock = _baseFeeOpCodeActivationBlock;
-    emit BaseFeeOpCodeActivationBlockSet(_baseFeeOpCodeActivationBlock);
-  }
+  function setBaseFeeOpCodeActivationBlock(uint256 _baseFeeOpCodeActivationBlock)
+    public
+    onlyOwner
+  {}
 
   /**
    * @notice Retrieve the current gas price minimum for a currency.
@@ -133,26 +117,7 @@ contract GasPriceMinimum is
    * @return current gas price minimum in the requested currency
    */
   function getGasPriceMinimum(address tokenAddress) external view returns (uint256) {
-    uint256 _gasPriceMinimum;
-    if (baseFeeOpCodeActivationBlock > 0 && block.number >= baseFeeOpCodeActivationBlock) {
-      _gasPriceMinimum = block.basefee;
-    } else {
-      _gasPriceMinimum = gasPriceMinimum;
-    }
-    if (
-      tokenAddress == address(0) ||
-      tokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)
-    ) {
-      return _gasPriceMinimum;
-    } else {
-      ISortedOracles sortedOracles = ISortedOracles(
-        registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
-      );
-      uint256 rateNumerator;
-      uint256 rateDenominator;
-      (rateNumerator, rateDenominator) = sortedOracles.medianRate(tokenAddress);
-      return ((_gasPriceMinimum * rateNumerator) / rateDenominator);
-    }
+    return 10;
   }
 
   /**
@@ -167,9 +132,7 @@ contract GasPriceMinimum is
     onlyVm
     returns (uint256)
   {
-    gasPriceMinimum = getUpdatedGasPriceMinimum(blockGasTotal, blockGasLimit);
-    emit GasPriceMinimumUpdated(gasPriceMinimum);
-    return gasPriceMinimum;
+    return 10;
   }
 
   /**
@@ -186,30 +149,6 @@ contract GasPriceMinimum is
     view
     returns (uint256)
   {
-    FixidityLib.Fraction memory blockDensity = FixidityLib.newFixedFraction(
-      blockGasTotal,
-      blockGasLimit
-    );
-    bool densityGreaterThanTarget = blockDensity.gt(targetDensity);
-    FixidityLib.Fraction memory densityDelta = densityGreaterThanTarget
-      ? blockDensity.subtract(targetDensity)
-      : targetDensity.subtract(blockDensity);
-    FixidityLib.Fraction memory adjustment = densityGreaterThanTarget
-      ? FixidityLib.fixed1().add(adjustmentSpeed.multiply(densityDelta))
-      : FixidityLib.fixed1().subtract(adjustmentSpeed.multiply(densityDelta));
-
-    uint256 _gasPriceMinimum;
-    if (baseFeeOpCodeActivationBlock > 0 && block.number >= baseFeeOpCodeActivationBlock) {
-      _gasPriceMinimum = block.basefee;
-    } else {
-      _gasPriceMinimum = gasPriceMinimum;
-    }
-
-    uint256 newGasPriceMinimum = adjustment
-      .multiply(FixidityLib.newFixed(_gasPriceMinimum))
-      .add(FixidityLib.fixed1())
-      .fromFixed();
-
-    return newGasPriceMinimum >= gasPriceMinimumFloor ? newGasPriceMinimum : gasPriceMinimumFloor;
+    return 10;
   }
 }

@@ -217,9 +217,8 @@ module.exports = {
   plugins: ['truffle-security', 'truffle-plugin-blockscout-verify'],
   compilers: {
     solc: {
-      version: SOLC_VERSION,
+      version: 'pragma',
       settings: {
-        evmVersion: 'istanbul',
         metadata: { useLiteralContent: true },
       },
     },
@@ -232,9 +231,8 @@ if (process.argv.includes('--gas')) {
   module.exports = {
     compilers: {
       solc: {
-        version: SOLC_VERSION,
+        version: 'pragma',
         settings: {
-          evmVersion: 'istanbul',
           metadata: { useLiteralContent: true },
         },
       },
