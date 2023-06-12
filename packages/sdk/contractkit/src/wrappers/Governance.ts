@@ -840,17 +840,6 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
   revokeVotes = proxySend(this.connection, this.contract.methods.revokeVotes)
 
   /**
-   * Returns `voter`'s vote choice on a given proposal.
-   * @param proposalID Governance proposal UUID
-   * @param voter Address of voter
-   */
-  async getVoteValue(proposalID: BigNumber.Value, voter: Address) {
-    const proposalIndex = await this.getDequeueIndex(proposalID)
-    const res = await this.contract.methods.getVoteRecord(voter, proposalIndex).call()
-    return Object.keys(VoteValue)[valueToInt(res[1])] as VoteValue
-  }
-
-  /**
    * Executes a given proposal's associated transactions.
    * @param proposalID Governance proposal UUID
    */

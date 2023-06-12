@@ -75,6 +75,7 @@ lerna-debug.log
 
 # Typechain types
 **/types/typechain/
+**/types/typechain-*/
 
 # keys
 .env.mnemonic*

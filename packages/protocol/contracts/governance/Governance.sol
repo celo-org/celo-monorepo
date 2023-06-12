@@ -1051,7 +1051,7 @@ contract Governance is
   function getProposal(uint256 proposalId)
     external
     view
-    returns (address, uint256, uint256, uint256, string memory)
+    returns (address, uint256, uint256, uint256, string memory, uint256, bool)
   {
     return proposals[proposalId].unpack();
   }
