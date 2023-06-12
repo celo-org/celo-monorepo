@@ -17,7 +17,6 @@ const DefaultConstitution = {
   },
   BlockchainParameters: {
     default: 0.9,
-    setMinimumClientVersion: 0.9,
     setBlockGasLimit: 0.8,
     setIntrinsicGasForAlternativeFeeCurrency: 0.8,
   },
