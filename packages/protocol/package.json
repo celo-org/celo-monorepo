@@ -80,6 +80,8 @@
     "mathjs": "^5.0.4",
     "node-fetch": "^2.6.9",
     "openzeppelin-solidity": "^2.5.0",
+    "@openzeppelin/contracts": "^2.5.0",
+    "@openzeppelin/contracts8": "npm:@openzeppelin/contracts@^4.4.2",
     "prompts": "^2.0.1",
     "solhint": "^2.3.1",
     "solidity-bytes-utils": "0.0.7",
