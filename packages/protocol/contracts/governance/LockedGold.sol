@@ -79,7 +79,7 @@ contract LockedGold is
 
   // delegator -> delegatee - how much votes did delegator delegated in total and to each delegatee
   mapping(address => DelegatedCelo) delegatorCelo;
-  // Gold that was delegated to this particular address
+  // Celo that was delegated to this particular address
   mapping(address => uint256) public totalDelegatedCelo;
 
   event UnlockingPeriodSet(uint256 period);
@@ -235,7 +235,7 @@ contract LockedGold is
 
     require(
       totalLockedGold - delegatedVotes >= value,
-      "Not enough undelegated celo. Celo has to be removed from delegation first."
+      "Not enough undelegated Celo. Celo has to be removed from delegation first."
     );
 
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
@@ -318,9 +318,8 @@ contract LockedGold is
   function delegateGovernanceVotes(address delegatee, uint256 percentageToDelegate) external {
     require(
       percentageToDelegate > 0 && percentageToDelegate <= 100,
-      "delagated percents can be only between 1%..100%"
+      "delegated percents can be only between 1%..100%"
     );
-
     address delegatorAddress = getAccounts().voteSignerToAccount(msg.sender);
     address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
 
@@ -393,7 +392,7 @@ contract LockedGold is
   function revokeDelegatedGovernanceVotes(address delegatee, uint256 percentageToRevoke) public {
     require(
       percentageToRevoke > 0 && percentageToRevoke <= 100,
-      "percents can be only between 1%..100%"
+      "revoked percents can be only between 1%..100%"
     );
 
     address delegatorAddress = getAccounts().voteSignerToAccount(msg.sender);
@@ -404,6 +403,7 @@ contract LockedGold is
     );
 
     address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
+    updateDelegatedAmount(msg.sender, delegatee);
 
     DelegatedInfo storage currentDelegateeInfo = delegated
       .delegateesWithPercentagesAndAmount[delegateeAccount];
@@ -457,7 +457,7 @@ contract LockedGold is
    * @param delegator The delegator address.
    * @param delegatee The delegatee address.
    */
-  function updateDelegatedAmount(address delegator, address delegatee) external {
+  function updateDelegatedAmount(address delegator, address delegatee) public {
     address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
     address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
 

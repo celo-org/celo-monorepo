@@ -580,3 +580,18 @@ export const unlockAndAuthorizeKey = async (offset: number, authorizeFn: any, ac
     from: account,
   })
 }
+
+export async function assertDelegatorDelegateeAmounts(
+  delegator: string,
+  delegatee: string,
+  percent: number,
+  amount: number,
+  lockedGold: LockedGoldInstance
+) {
+  const [percentage, currentAmount] = await lockedGold.getDelegatorDelegateeInfo(
+    delegator,
+    delegatee
+  )
+  assertEqualBN(percentage, percent)
+  assertEqualBN(currentAmount, amount)
+}
