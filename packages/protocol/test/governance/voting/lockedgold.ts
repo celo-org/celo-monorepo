@@ -327,7 +327,6 @@ contract('LockedGold', (accounts: string[]) => {
 
         it('should correctly unlock when getting less or equal to locked amount', async () => {
           const toUnlock = Math.ceil((value / 100) * percentToDelagate)
-          console.log('toUnlock', toUnlock)
           await lockedGold.unlock(toUnlock)
 
           const [val] = await lockedGold.getPendingWithdrawal(account, 0)
@@ -831,8 +830,8 @@ contract('LockedGold', (accounts: string[]) => {
         const value = 1000
 
         beforeEach(async () => {
-          await lockedGold.lock({ value: value, from: delegator })
-          await lockedGold.lock({ value: value, from: delegator2 })
+          await lockedGold.lock({ value, from: delegator })
+          await lockedGold.lock({ value, from: delegator2 })
         })
 
         describe('When delegatee account is registered', () => {
@@ -918,7 +917,7 @@ contract('LockedGold', (accounts: string[]) => {
               assertLogMatches2(log, {
                 event: 'CeloDelegated',
                 args: {
-                  delegator: delegator,
+                  delegator,
                   delegatee: delegatee1,
                   percent: percentsToDelegate,
                   amount: delegatedAmount,
@@ -971,7 +970,7 @@ contract('LockedGold', (accounts: string[]) => {
             describe('When locked more gold and redelagate', () => {
               let resp2: Truffle.TransactionResponse
               beforeEach(async () => {
-                await lockedGold.lock({ value: value, from: delegator })
+                await lockedGold.lock({ value, from: delegator })
                 resp2 = await lockedGold.delegateGovernanceVotes(delegatee1, percentsToDelegate)
               })
 
@@ -995,7 +994,7 @@ contract('LockedGold', (accounts: string[]) => {
                 assertLogMatches2(log, {
                   event: 'CeloDelegated',
                   args: {
-                    delegator: delegator,
+                    delegator,
                     delegatee: delegatee1,
                     percent: percentsToDelegate,
                     amount: delegatedAmount * 2,
@@ -1072,8 +1071,8 @@ contract('LockedGold', (accounts: string[]) => {
         await accountsInstance.createAccount({ from: delegatee1 })
         await accountsInstance.createAccount({ from: delegatee2 })
 
-        await lockedGold.lock({ value: value, from: delegator })
-        await lockedGold.lock({ value: value, from: delegator2 })
+        await lockedGold.lock({ value, from: delegator })
+        await lockedGold.lock({ value, from: delegator2 })
 
         await lockedGold.delegateGovernanceVotes(delegatee1, percentsToDelegate)
         assertEqualBN(
@@ -1124,7 +1123,7 @@ contract('LockedGold', (accounts: string[]) => {
           assertLogMatches2(log, {
             event: 'CeloDelegatedRevoked',
             args: {
-              delegator: delegator,
+              delegator,
               delegatee: delegatee1,
               percent: percentageToRevoke,
               amount: amountToRevoke,
@@ -1145,7 +1144,7 @@ contract('LockedGold', (accounts: string[]) => {
               await lockedGold.getAccountTotalGovernanceVotingPower(delegatee1),
               delegatedAmount + (delegatedAmount - amountToRevoke)
             )
-            await lockedGold.lock({ value: value, from: delegator })
+            await lockedGold.lock({ value, from: delegator })
           })
 
           describe('When revoking percentage such as that with newly locked amount it would decrease below zero', () => {
@@ -1252,7 +1251,7 @@ contract('LockedGold', (accounts: string[]) => {
         })
       })
 
-      describe.only('When delegated to 2 accounts', () => {
+      describe('When delegated to 2 accounts', () => {
         const percentageToRevoke = 2
         const amountToRevoke = (value / 100) * percentageToRevoke
 
@@ -1342,7 +1341,7 @@ contract('LockedGold', (accounts: string[]) => {
       beforeEach(async () => {
         await accountsInstance.createAccount({ from: delegatee })
         await accountsInstance.createAccount({ from: delegator })
-        await lockedGold.lock({ value: value, from: delegator })
+        await lockedGold.lock({ value, from: delegator })
       })
 
       describe('When only delegated', () => {
@@ -1366,7 +1365,7 @@ contract('LockedGold', (accounts: string[]) => {
 
       describe('When delegatee has locked celo', () => {
         beforeEach(async () => {
-          await lockedGold.lock({ value: value, from: delegatee })
+          await lockedGold.lock({ value, from: delegatee })
         })
 
         it('should return correct value when locked', async () => {
@@ -1420,8 +1419,8 @@ contract('LockedGold', (accounts: string[]) => {
         await accountsInstance.createAccount({ from: delegatee })
         await accountsInstance.createAccount({ from: delegator })
 
-        await lockedGold.lock({ value: value, from: delegatee })
-        await lockedGold.lock({ value: value, from: delegator })
+        await lockedGold.lock({ value, from: delegatee })
+        await lockedGold.lock({ value, from: delegator })
 
         await lockedGold.delegateGovernanceVotes(delegatee, delegatedPercent, { from: delegator })
       })
@@ -1458,7 +1457,7 @@ contract('LockedGold', (accounts: string[]) => {
       const delegatedAmount = (value / 100) * delegatedPercent
 
       beforeEach(async () => {
-        await lockedGold.lock({ value: value, from: delegator })
+        await lockedGold.lock({ value, from: delegator })
         await lockedGold.delegateGovernanceVotes(delegatee, delegatedPercent, { from: delegator })
       })
 
@@ -1474,7 +1473,7 @@ contract('LockedGold', (accounts: string[]) => {
       describe('When locked more celo', () => {
         const updatedDelegatedAmount = ((value * 2) / 100) * delegatedPercent
         beforeEach(async () => {
-          await lockedGold.lock({ value: value, from: delegator })
+          await lockedGold.lock({ value, from: delegator })
         })
 
         it('should return unequal amounts', async () => {
@@ -1500,7 +1499,7 @@ contract('LockedGold', (accounts: string[]) => {
     beforeEach(async () => {
       await accountsInstance.createAccount({ from: delegatee })
       await accountsInstance.createAccount({ from: delegator })
-      await lockedGold.lock({ value: value, from: delegator })
+      await lockedGold.lock({ value, from: delegator })
 
       await lockedGold.delegateGovernanceVotes(delegatee, delegatedPercent, { from: delegator })
     })
@@ -1519,7 +1518,7 @@ contract('LockedGold', (accounts: string[]) => {
 
     describe('When delegator locked more celo', () => {
       beforeEach(async () => {
-        await lockedGold.lock({ value: value, from: delegator })
+        await lockedGold.lock({ value, from: delegator })
         await lockedGold.updateDelegatedAmount(delegator, delegatee)
       })
 
