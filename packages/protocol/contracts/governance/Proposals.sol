@@ -265,18 +265,21 @@ library Proposals {
    * @return timestamp
    * @return transaction Transaction count.
    * @return description Description url.
+   * @return networkWeight Network weight.
    */
   function unpack(Proposal storage proposal)
     internal
     view
-    returns (address, uint256, uint256, uint256, string storage)
+    returns (address, uint256, uint256, uint256, string storage, uint256, bool)
   {
     return (
       proposal.proposer,
       proposal.deposit,
       proposal.timestamp,
       proposal.transactions.length,
-      proposal.descriptionUrl
+      proposal.descriptionUrl,
+      proposal.networkWeight,
+      proposal.approved
     );
   }
 

@@ -36,14 +36,14 @@ defaults: &defaults
 contract-defaults: &contract-defaults
   <<: *defaults
   environment:
-    RELEASE_TAG: core-contracts.v8
+    RELEASE_TAG: core-contracts.v9
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
   docker:
-    - image: celohq/circleci:geth1.9-2
+    - image: us-west1-docker.pkg.dev/devopsre/celo-monorepo/circleci-geth:latest
   environment:
-    CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
+    CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.7.x
 general:
   artifacts:
     - 'protocol/coverage'
@@ -253,7 +253,7 @@ jobs:
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             echo "Comparing against $RELEASE_TAG"
-            # Github has phased out the git protocol so we ensure that we use
+            # Github has phased out the http protocol so we ensure that we use
             # https for all git operations that yarn may perform.
             git config --global url."https://github.com".insteadOf git://github.com
             yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json

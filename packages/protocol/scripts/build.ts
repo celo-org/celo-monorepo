@@ -4,6 +4,7 @@ import { execSync } from 'child_process'
 import { readJSONSync } from 'fs-extra'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
+import { MENTO_PACKAGE } from '../contractPackages'
 
 const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
 const BUILD_DIR = path.join(ROOT_DIR, process.env.BUILD_DIR ?? './build')
@@ -17,9 +18,6 @@ export const ProxyContracts = [
   'ElectionProxy',
   'EpochRewardsProxy',
   'EscrowProxy',
-  'ExchangeBRLProxy',
-  'ExchangeEURProxy',
-  'ExchangeProxy',
   'FederatedAttestationsProxy',
   'FeeHandlerProxy',
   'MentoFeeHandlerSellerProxy',
@@ -28,20 +26,15 @@ export const ProxyContracts = [
   'GoldTokenProxy',
   'GovernanceApproverMultiSigProxy',
   'GovernanceProxy',
-  'GrandaMentoProxy',
   'LockedGoldProxy',
   'MetaTransactionWalletProxy',
   'MetaTransactionWalletDeployerProxy',
   'OdisPaymentsProxy',
   'RegistryProxy',
-  'ReserveProxy',
-  'ReserveSpenderMultiSigProxy',
-  'StableTokenBRLProxy',
-  'StableTokenEURProxy',
-  'StableTokenProxy',
   'SortedOraclesProxy',
   'UniswapFeeHandlerSellerProxy',
 ]
+
 export const CoreContracts = [
   // common
   'Accounts',
@@ -57,7 +50,6 @@ export const CoreContracts = [
   'Registry',
   'Freezer',
   'MetaTransactionWallet',
-  'TransferWhitelist',
 
   // governance
   'Election',
@@ -79,18 +71,7 @@ export const CoreContracts = [
   'OdisPayments',
 
   // stability
-  'Exchange',
-  'ExchangeEUR',
-  'ExchangeBRL',
-  'Reserve',
-  'ReserveSpenderMultiSig',
-  'StableToken',
-  'StableTokenEUR',
-  'StableTokenBRL',
   'SortedOracles',
-
-  // liquidity
-  'GrandaMento',
 ]
 
 const OtherContracts = [
@@ -99,11 +80,9 @@ const OtherContracts = [
   // abstract
   'Initializable',
   'UsingRegistry',
-
-  // only used for testing
-  'MockUniswapV2Router02',
-  'MockUniswapV2Factory',
 ]
+
+const externalContractPackages = [MENTO_PACKAGE]
 
 const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
 
@@ -120,6 +99,14 @@ function hasEmptyBytecode(contract: any) {
 function compile(outdir: string) {
   console.log(`protocol: Compiling solidity to ${outdir}`)
 
+  // the reason to generate a different folder is to avoid path collisions, which could be very dangerous
+  for (const externalContractPackage of externalContractPackages) {
+    console.log(`Building external contracts for ${externalContractPackage.name}`)
+    exec(
+      `yarn run truffle compile --silent --contracts_directory=./lib/${externalContractPackage.path}/contracts --contracts_build_directory=./build/contracts-${externalContractPackage.name}`
+    )
+  }
+
   exec(`yarn run --silent truffle compile --build_directory=${outdir}`)
 
   for (const contractName of ImplContracts) {
@@ -132,6 +119,7 @@ function compile(outdir: string) {
         process.exit(1)
       }
     } catch (e) {
+      console.log(e)
       console.debug(
         `WARNING: ${contractName} artifact could not be fetched. Maybe it doesn't exist?`
       )
@@ -140,9 +128,20 @@ function compile(outdir: string) {
 }
 
 function generateFilesForTruffle(outdir: string) {
+  // tslint:disable-next-line
+  for (let externalContractPackage of externalContractPackages) {
+    const outdirExternal = outdir + '-' + externalContractPackage.name
+    console.log(
+      `protocol: Generating Truffle Types for external dependency ${externalContractPackage.name} to ${outdirExternal}`
+    )
+    const artifactPath = `${BUILD_DIR}/contracts-${externalContractPackage.name}/*.json`
+    exec(
+      `yarn run --silent typechain --target=truffle --outDir "${outdirExternal}" "${artifactPath}" `
+    )
+  }
+
   console.log(`protocol: Generating Truffle Types to ${outdir}`)
   exec(`rm -rf "${outdir}"`)
-
   const globPattern = `${BUILD_DIR}/contracts/*.json`
   exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}" `)
 }
@@ -153,19 +152,36 @@ async function generateFilesForContractKit(outdir: string) {
   const relativePath = path.relative(ROOT_DIR, outdir)
 
   const contractKitContracts = CoreContracts.concat('Proxy').concat(Interfaces)
+
   const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
 
   const cwd = process.cwd()
 
-  const web3Generator = new Web3V1Celo({
-    cwd,
-    rawConfig: {
-      files: globPattern,
-      outDir: relativePath,
-    },
-  })
+  await tsGenerator(
+    { cwd, loggingLvl: 'info' },
+    new Web3V1Celo({
+      cwd,
+      rawConfig: {
+        files: globPattern,
+        outDir: relativePath,
+      },
+    })
+  )
 
-  await tsGenerator({ cwd, loggingLvl: 'info' }, web3Generator)
+  for (const externalContractPackage of externalContractPackages) {
+    await tsGenerator(
+      { cwd, loggingLvl: 'info' },
+      new Web3V1Celo({
+        cwd,
+        rawConfig: {
+          files: `${BUILD_DIR}/contracts-${
+            externalContractPackage.name
+          }/@(${externalContractPackage.contracts.join('|')}).json`,
+          outDir: path.join(relativePath, externalContractPackage.name),
+        },
+      })
+    )
+  }
 
   exec(`yarn prettier --write "${outdir}/**/*.ts"`)
 }

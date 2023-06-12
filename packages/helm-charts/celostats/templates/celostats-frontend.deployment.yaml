@@ -47,11 +47,11 @@ spec:
         - name: http
           containerPort: 80
           protocol: TCP
+      {{- with .Values.resources.frontend }}
         resources:
-          requests:
-            cpu: 250m
-            memory: 250Mi
+          {{- toYaml . | nindent 10 }}
+      {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
-{{ toYaml . | indent 8 }}
+        {{- toYaml . | nindent 8 }}
     {{- end }}

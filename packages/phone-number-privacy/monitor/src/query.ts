@@ -52,25 +52,28 @@ export const queryOdisForSalt = async (
     abortController.abort()
     console.log(`ODIS salt request timed out after ${timeoutMs} ms`) // tslint:disable-line:no-console
   }, timeoutMs)
+  try {
+    const res = await OdisUtils.Identifier.getObfuscatedIdentifier(
+      phoneNumber,
+      OdisUtils.Identifier.IdentifierPrefix.PHONE_NUMBER,
+      accountAddress,
+      authSigner,
+      serviceContext,
+      undefined,
+      undefined,
+      undefined,
+      genSessionID(),
+      undefined,
+      endpoint,
+      abortController
+    )
+    clearTimeout(timeout)
 
-  const res = await OdisUtils.Identifier.getObfuscatedIdentifier(
-    phoneNumber,
-    OdisUtils.Identifier.IdentifierPrefix.PHONE_NUMBER,
-    accountAddress,
-    authSigner,
-    serviceContext,
-    undefined,
-    undefined,
-    undefined,
-    genSessionID(),
-    undefined,
-    endpoint,
-    abortController
-  )
-
-  clearTimeout(timeout)
-
-  return res
+    return res
+  } catch (error) {
+    clearTimeout(timeout)
+    throw error
+  }
 }
 
 export const queryOdisForQuota = async (
@@ -98,18 +101,23 @@ export const queryOdisForQuota = async (
     abortController.abort()
   }, timeoutMs)
 
-  const res = await OdisUtils.Quota.getPnpQuotaStatus(
-    accountAddress,
-    authSigner,
-    serviceContext,
-    undefined,
-    undefined,
-    abortController
-  )
+  try {
+    const res = await OdisUtils.Quota.getPnpQuotaStatus(
+      accountAddress,
+      authSigner,
+      serviceContext,
+      undefined,
+      undefined,
+      abortController
+    )
 
-  clearTimeout(timeout)
+    clearTimeout(timeout)
 
-  return res
+    return res
+  } catch (error) {
+    clearTimeout(timeout)
+    throw error
+  }
 }
 
 export const queryOdisDomain = async (contextName: OdisContextName) => {

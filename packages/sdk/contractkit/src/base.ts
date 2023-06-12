@@ -31,7 +31,6 @@ export enum CeloContract {
   StableToken = 'StableToken',
   StableTokenEUR = 'StableTokenEUR',
   StableTokenBRL = 'StableTokenBRL',
-  TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
 }
 

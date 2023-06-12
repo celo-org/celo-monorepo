@@ -28,6 +28,7 @@ done
 [ -z "$OLD_BRANCH" ] && echo "Need to set the old branch via the -a flag" && exit 1;
 [ -z "$NEW_BRANCH" ] && echo "Need to set the new branch via the -b flag" && exit 1;
 
+# CONTRACT_EXCLUSION_REGEX imported from here
 source scripts/bash/contract-exclusion-regex.sh
 
 REPORT_FLAG=""
