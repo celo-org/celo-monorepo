@@ -301,11 +301,11 @@ contract FeeHandler is
 
     TokenState storage tokenState = tokenStates[tokenAddress];
     require(tokenState.handler != address(0), "Handler has to be set to sell token");
-    FixidityLib.Fraction memory balanceOfTokenToBurn = FixidityLib.newFixed(
+    FixidityLib.Fraction memory balanceToProcess = FixidityLib.newFixed(
       token.balanceOf(address(this)).sub(tokenState.toDistribute)
     );
 
-    uint256 balanceToBurn = (burnFraction.multiply(balanceOfTokenToBurn).fromFixed());
+    uint256 balanceToBurn = (burnFraction.multiply(balanceToProcess).fromFixed());
 
     uint256 contractBalance = token.balanceOf(address(this));
 
