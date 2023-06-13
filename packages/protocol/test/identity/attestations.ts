@@ -337,6 +337,12 @@ contract('Attestations', (accounts: string[]) => {
 
     it('should remove the balance of available rewards for the issuer from attestation signer', async () => {
       const signer = await accountsInstance.getAttestationSigner(issuer)
+      // send gas to issuer
+      await web3.eth.sendTransaction({
+        from: accounts[0],
+        to: signer,
+        value: web3.utils.toWei('1', 'ether'),
+      })
       await attestations.withdraw(mockERC20Token.address, {
         from: signer,
       })

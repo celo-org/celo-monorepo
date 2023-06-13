@@ -94,4 +94,16 @@ contract MockLockedGold is ILockedGold {
   function getTotalPendingWithdrawals(address) external view returns (uint256) {
     return 0;
   }
+
+  function getPendingWithdrawal(address account, uint256 index)
+    external
+    view
+    returns (uint256, uint256)
+  {
+    return (0, 0);
+  }
+
+  function unlockingPeriod() external view returns (uint256) {
+    return 0;
+  }
 }

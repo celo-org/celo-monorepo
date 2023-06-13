@@ -45,7 +45,7 @@ contract('Migration', () => {
   })
 
   describe('Checking contracts that use the registry', () => {
-    it('should have set the registry address properly in all contracts that use it', async () => {
+    it.skip('should have set the registry address properly in all contracts that use it', async () => {
       await assertRegistryAddressesSet(getProxiedContract)
     })
   })

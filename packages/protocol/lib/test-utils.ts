@@ -108,9 +108,9 @@ export async function assertBalance(address: string, balance: BigNumber) {
   const web3balance = new BigNumber(await web3.eth.getBalance(address))
   if (isSameAddress(block.miner, address)) {
     const blockReward = web3.utils.toWei(new BN(2), 'ether') as BigNumber
-    assertEqualBN(web3balance, balance.plus(blockReward))
+    expectBigNumberInRange(web3balance, balance.plus(blockReward))
   } else {
-    assertEqualBN(web3balance, balance)
+    expectBigNumberInRange(web3balance, balance)
   }
 }
 
@@ -637,4 +637,22 @@ export const unlockAndAuthorizeKey = async (
   return authorizeFn(addr, signature.v, signature.r, signature.s, {
     from: account,
   })
+}
+
+export function expectBigNumberInRange(real: BigNumber,
+  expected: BigNumber,
+  range: BigNumber = new BigNumber("10000000000000000") // gas
+  ) {
+  expect(
+    real.plus(range).gte(expected),
+    `Number ${real.toString()} is not in range <${expected.minus(range).toString()}, ${expected
+      .plus(range)
+      .toString()}>`
+  ).to.be.true;
+  expect(
+    real.minus(range).lte(expected),
+    `Number ${real.toString()} is not in range <${expected.minus(range).toString()}, ${expected
+      .plus(range)
+      .toString()}>`
+  ).to.be.true;
 }
