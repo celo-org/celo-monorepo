@@ -335,6 +335,7 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+          submodules: recursive
       - name: Build protocol
         run: |
           yarn --cwd packages/protocol build
