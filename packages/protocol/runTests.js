@@ -24,7 +24,6 @@ async function startGanache() {
       networkId: network.network_id,
       chainId: 1,
       allowUnlimitedContractSize: true,
-      hardfork: 'istanbul',
     },
   })
 
