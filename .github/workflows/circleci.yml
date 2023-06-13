@@ -72,12 +72,6 @@ jobs:
           find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat >> $RUNNER_TEMP/package.checksum
           echo "PACKAGE_JSON_CHECKSUM=$(md5sum $RUNNER_TEMP/package.checksum | cut -f1 -d' ')"
           echo "PACKAGE_JSON_CHECKSUM=$(md5sum $RUNNER_TEMP/package.checksum | cut -f1 -d' ')" >> "$GITHUB_OUTPUT"
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 20
-        if: true
-        with:
-          limit-access-to-actor: true
       - name: Restore node cache
         uses: actions/cache@v3
         id: cache_node
@@ -340,6 +334,12 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 20
+        if: true
+        with:
+          limit-access-to-actor: true
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
