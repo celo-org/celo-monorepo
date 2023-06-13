@@ -65,18 +65,19 @@ jobs:
           # Their output does not matter here, the fact that they finish successfully does.
           git rev-parse --abbrev-ref HEAD
           git fetch --all --tags
+      - name: Calculate node cache keys
+        id: node-checksums
+        run: |
+          find . -maxdepth 5 -type f -name 'package.json' -not -path "*node_modules*" -print0 | sort -z | xargs -0 cat > $RUNNER_TEMP/package.checksum
+          find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat > $RUNNER_TEMP/patches.checksum
+          echo "PACKAGE_JSON_CHECKSUM=${{ hashFiles('$RUNNER_TEMP/*.checksum') }}"
+          echo "PACKAGE_JSON_CHECKSUM=${{ hashFiles('$RUNNER_TEMP/*.checksum') }}" >> "$GITHUB_OUTPUT"
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 20
         if: true
         with:
           limit-access-to-actor: true
-      - name: Calculate node cache keys
-        id: node-checksums
-        run: |
-          find . -maxdepth 5 -type f -name 'package.json' -not -path "*node_modules*" -print0 | sort -z | xargs -0 cat > $RUNNER_TEMP/package.checksum
-          find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat > $RUNNER_TEMP/patches.checksum
-          echo "PACKAGE_JSON_CHECKSUM=${{ hashFiles('$RUNNER_TEMP/*.checksum') }}" >> "$GITHUB_OUTPUT"
       - name: Restore node cache
         uses: actions/cache@v3
         id: cache_node
