@@ -331,11 +331,12 @@ jobs:
           path: .git
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-          submodules: recursive
       - name: Build protocol
         run: |
           yarn --cwd packages/protocol build
