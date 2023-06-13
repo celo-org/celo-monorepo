@@ -6,8 +6,12 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { RegistryInstance, ReserveInstance, ReserveSpenderMultiSigInstance } from 'types'
+import { RegistryInstance } from 'types'
+import { ReserveInstance, ReserveSpenderMultiSigInstance } from 'types/mento'
 import Web3 from 'web3'
+import { MENTO_PACKAGE } from '../contractPackages'
+import { ArtifactsSingleton } from './artifactsSingleton'
+
 import Web3Utils = require('web3-utils')
 
 const truffle = require('@celo/protocol/truffle-config.js')
@@ -69,9 +73,10 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
 
     const reserveSpenderMultiSig: ReserveSpenderMultiSigInstance = await getDeployedProxiedContract<ReserveSpenderMultiSigInstance>(
       CeloContractName.ReserveSpenderMultiSig,
-      artifacts
+      ArtifactsSingleton.getInstance(MENTO_PACKAGE)
     )
     console.info(`Marking ${reserveSpenderMultiSig.address} as a reserve spender`)
     await reserve.addSpender(reserveSpenderMultiSig.address)
-  }
+  },
+  MENTO_PACKAGE
 )

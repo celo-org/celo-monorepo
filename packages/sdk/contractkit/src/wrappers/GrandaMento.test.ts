@@ -133,9 +133,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
 
         const proposal = await grandaMento.getHumanReadableExchangeProposal(activeProposals[0])
         expect(proposal.exchanger).toEqual(accounts[0])
-        expect(proposal.stableToken).toEqual(
-          'Celo Dollar (cUSD) at 0x10A736A7b223f1FE1050264249d1aBb975741E75'
-        )
+        expect(proposal.stableToken).toEqual(`Celo Dollar (cUSD) at ${stableToken.address}`)
         expect(proposal.sellAmount).toEqBigNumber(sellAmount)
         expect(proposal.buyAmount).toEqBigNumber(new BigNumber('99000000'))
         expect(proposal.approvalTimestamp).toEqual(new BigNumber(0))
