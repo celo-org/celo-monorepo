@@ -757,7 +757,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 20
-        if: contains(matrix.command, '/lockedgold.sh')
+        if: contains(matrix.command, '/lockedgold.sh') && false
         with:
           limit-access-to-actor: true
       - name: Certora dependencies
