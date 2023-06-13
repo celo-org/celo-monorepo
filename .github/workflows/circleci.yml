@@ -69,8 +69,9 @@ jobs:
         id: node-checksums
         run: |
           find . -maxdepth 5 -type f -name 'package.json' -not -path "*node_modules*" -print0 | sort -z | xargs -0 cat > $RUNNER_TEMP/package.checksum
-          find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat > $RUNNER_TEMP/patches.checksum
-          echo "PACKAGE_JSON_CHECKSUM=${{ hashFiles('$RUNNER_TEMP/*.checksum') }}" >> "$GITHUB_OUTPUT"
+          find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat >> $RUNNER_TEMP/package.checksum
+          echo "PACKAGE_JSON_CHECKSUM=$(md5sum $RUNNER_TEMP/package.checksum | cut -f1 -d' ')"
+          echo "PACKAGE_JSON_CHECKSUM=$(md5sum $RUNNER_TEMP/package.checksum | cut -f1 -d' ')" >> "$GITHUB_OUTPUT"
       - name: Restore node cache
         uses: actions/cache@v3
         id: cache_node
@@ -337,6 +338,7 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+          rebuild-package: 'true'
       - name: Build protocol
         run: |
           yarn --cwd packages/protocol build
@@ -755,7 +757,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 20
-        if: contains(matrix.command, '/lockedgold.sh')
+        if: contains(matrix.command, '/lockedgold.sh') && false
         with:
           limit-access-to-actor: true
       - name: Certora dependencies
@@ -770,4 +772,3 @@ jobs:
       - name: Build and run command
         run: |
           ${{ matrix.command }}
-      
