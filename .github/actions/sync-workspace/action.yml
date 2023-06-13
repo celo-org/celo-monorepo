@@ -19,7 +19,7 @@ runs:
           packages/**/node_modules
         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}-${{ inputs.package-json-checksum }}
         enableCrossOsArchive: true
-        fail-on-cache-miss: (! ${{ fromJSON(env.REBUILD_PACKAGE) }}) && true
+        fail-on-cache-miss: "!${{ fromJSON(env.REBUILD_PACKAGE) }} && true"
     - name: Restore build artifacts cache
       uses: actions/cache@v3
       id: cache_build_artifacts
@@ -39,7 +39,7 @@ runs:
         restore-keys: |
           code-${{ github.sha }}
         enableCrossOsArchive: true
-        fail-on-cache-miss: (! ${{ fromJSON(env.REBUILD_PACKAGE) }}) && true
+        fail-on-cache-miss: "!${{ fromJSON(env.REBUILD_PACKAGE) }} && true"
     - name: Rebuild package
       shell: bash --login -eo pipefail {0}
       run: |
