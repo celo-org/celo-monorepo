@@ -64,7 +64,7 @@ contract GasPriceMinimum is
    * @param _gasPriceMinimumFloor The lowest value the gas price minimum can be.
    * @param _targetDensity The target gas fullness of blocks, expressed as a fixidity fraction.
    * @param _adjustmentSpeed How quickly the minimum changes, expressed as a fixidity fraction.
-   * @param _baseFeeOpCodeActivationBlock Block number where the baseFee opCode is activated
+   * @param _baseFeeOpCodeActivationBlock Block number where the baseFee opCode is activated.
    */
   function initialize(
     address _registryAddress,
@@ -117,7 +117,7 @@ contract GasPriceMinimum is
 
   /**
    * @notice Set the activation block of the baseFee opCode.
-   * @param _baseFeeOpCodeActivationBlock Block number where the baseFee opCode is activated
+   * @param _baseFeeOpCodeActivationBlock Block number where the baseFee opCode is activated.
    * @dev Value is expected to be > 0.
    */
   function setBaseFeeOpCodeActivationBlock(uint256 _baseFeeOpCodeActivationBlock) public onlyOwner {
@@ -132,7 +132,7 @@ contract GasPriceMinimum is
   /**
    * @notice Retrieve the current gas price minimum for a currency.
    * @param tokenAddress The currency the gas price should be in (defaults to gold).
-   * @return current gas price minimum in the requested currency
+   * @return current gas price minimum in the requested currency.
    */
   function getGasPriceMinimum(address tokenAddress) external view returns (uint256) {
     uint256 _gasPriceMinimum;
