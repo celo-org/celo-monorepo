@@ -35,7 +35,6 @@ export abstract class TransferStableBase extends BaseCommand {
     } catch {
       failWith(`The ${this._stableCurrency} token was not deployed yet`)
     }
-    await this.kit.updateGasPriceInConnectionLayer(stableToken.address)
 
     const tx = res.flags.comment
       ? stableToken.transferWithComment(to, value.toFixed(), res.flags.comment)
