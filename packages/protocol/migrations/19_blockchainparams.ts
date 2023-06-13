@@ -4,11 +4,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { BlockchainParametersInstance } from 'types'
 
 const initializeArgs = async (_: string): Promise<any[]> => {
-  const version = config.blockchainParameters.minimumClientVersion
   return [
-    version.major,
-    version.minor,
-    version.patch,
     config.blockchainParameters.gasForNonGoldCurrencies,
     config.blockchainParameters.deploymentBlockGasLimit,
     config.blockchainParameters.uptimeLookbackWindow,
