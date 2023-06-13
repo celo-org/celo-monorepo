@@ -7,7 +7,7 @@ run-name: celo-monorepo tests
 on:
   push:
     branches:
-      - master
+      - jcortejoso/debug
   pull_request:
     branches:
       - master
@@ -65,6 +65,12 @@ jobs:
           # Their output does not matter here, the fact that they finish successfully does.
           git rev-parse --abbrev-ref HEAD
           git fetch --all --tags
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 20
+        if: true
+        with:
+          limit-access-to-actor: true
       - name: Calculate node cache keys
         id: node-checksums
         run: |
