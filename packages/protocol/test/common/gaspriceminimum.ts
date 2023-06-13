@@ -4,7 +4,7 @@ import {
   assertLogMatches2,
   assertTransactionRevertWithReason,
 } from '@celo/protocol/lib/test-utils'
-import { toFixed, fromFixed } from '@celo/utils/lib/fixidity'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   GasPriceMinimumContract,
