@@ -127,7 +127,8 @@ async function startGanache(
     database: { dbPath: datadir },
     wallet: { mnemonic: MNEMONIC, defaultBalance: 200000000 },
     miner: { blockGasLimit: gasLimit },
-    chain: { networkId: 1101, chainId: 1, allowUnlimitedContractSize: true, hardfork: 'istanbul' },
+    chain: { networkId: 1101, chainId: 1, allowUnlimitedContractSize: true },
+    allowUnlimitedInitCodeSize: true,
   })
 
   server.listen(8545, async (err) => {
