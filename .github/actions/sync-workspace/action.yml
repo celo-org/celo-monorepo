@@ -46,6 +46,9 @@ runs:
         fail-on-cache-miss: "!${{ fromJSON(env.REBUILD_PACKAGE) }} && true"
     - name: Rebuild package
       shell: bash --login -eo pipefail {0}
+      env:
+        REBUILD_PACKAGE: ${{ inputs.rebuild-package }}
+      if: ${{ fromJSON(env.REBUILD_PACKAGE) }}
       run: |
         yarn install
         yarn build --ignore docs --include-dependencies
