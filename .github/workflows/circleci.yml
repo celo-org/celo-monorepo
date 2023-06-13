@@ -334,16 +334,11 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 20
-        if: true
-        with:
-          limit-access-to-actor: true
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+          rebuild-package: 'true'
       - name: Build protocol
         run: |
           yarn --cwd packages/protocol build
