@@ -49,8 +49,8 @@ const argv = yargs
   .demandCommand()
   .strict().argv
 
-const oldArtifactsFolder = path.resolve(argv.old_contracts)
-const newArtifactsFolder = path.resolve(argv.new_contracts)
+const oldArtifactsFolder = path.relative(process.cwd(), argv.old_contracts)
+const newArtifactsFolder = path.relative(process.cwd(), argv.new_contracts)
 
 const out = (msg: string, force?: boolean): void => {
   if (force || !argv.quiet) {
