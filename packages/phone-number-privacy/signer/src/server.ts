@@ -1,6 +1,7 @@
 import { ContractKit } from '@celo/contractkit'
 import {
   ErrorMessage,
+  FULL_NODE_TIMEOUT_IN_MS,
   getContractKit,
   loggerMiddleware,
   rootLogger,
@@ -99,7 +100,7 @@ export function startSigner(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen, // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config to make the code cleaner
         kit,
-        config.blockchain.timeout_ms
+        Number(config.blockchain.timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS)
       )
     )
   )
@@ -113,7 +114,7 @@ export function startSigner(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen,
         kit,
-        config.blockchain.timeout_ms
+        Number(config.blockchain.timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS)
       )
     )
   )
@@ -127,7 +128,7 @@ export function startSigner(
         config.api.legacyPhoneNumberPrivacy.enabled,
         config.api.legacyPhoneNumberPrivacy.shouldFailOpen,
         kit,
-        config.blockchain.timeout_ms
+        Number(config.blockchain.timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS)
       )
     )
   )
@@ -139,7 +140,7 @@ export function startSigner(
         config.api.legacyPhoneNumberPrivacy.enabled,
         config.api.legacyPhoneNumberPrivacy.shouldFailOpen,
         kit,
-        config.blockchain.timeout_ms
+        Number(config.blockchain.timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS)
       )
     )
   )
