@@ -23,11 +23,8 @@ export enum CeloContractName {
   ExchangeEUR = 'ExchangeEUR',
   ExchangeBRL = 'ExchangeBRL',
   FederatedAttestations = 'FederatedAttestations',
-<<<<<<< HEAD
   FeeHandler = 'FeeHandler',
   MentoFeeHandlerSeller = 'MentoFeeHandlerSeller',
-=======
->>>>>>> master
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',

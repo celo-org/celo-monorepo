@@ -10,8 +10,6 @@ import {
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
-  ExchangeContract,
-  ExchangeInstance,
   FeeCurrencyWhitelistContract,
   FeeCurrencyWhitelistInstance,
   FeeHandlerContract,
@@ -34,13 +32,19 @@ import {
   MockUniswapV2Router02Instance,
   RegistryContract,
   RegistryInstance,
+  UniswapFeeHandlerSellerContract,
+  UniswapFeeHandlerSellerInstance,
+} from 'types'
+
+import {
+  ExchangeContract,
+  ExchangeInstance,
   StableTokenContract,
   StableTokenEURContract,
   StableTokenEURInstance,
   StableTokenInstance,
-  UniswapFeeHandlerSellerContract,
-  UniswapFeeHandlerSellerInstance,
-} from 'types'
+} from 'types/mento'
+
 import { SECONDS_IN_A_WEEK, ZERO_ADDRESS } from '../constants'
 
 const goldAmountForRate = new BigNumber('1000000000000000000000000')
@@ -522,7 +526,7 @@ contract('FeeHandler', (accounts: string[]) => {
           '0x0000000000000000000000000000000000000000'
         ) // _factory, _WETH
 
-        await feeCurrencyWhitelist.addNonMentoToken(tokenA.address)
+        await feeCurrencyWhitelist.addToken(tokenA.address)
 
         await uniswapFeeHandlerSeller.initialize(registry.address, [], [])
         await uniswapFeeHandlerSeller.setRouter(tokenA.address, uniswap.address)

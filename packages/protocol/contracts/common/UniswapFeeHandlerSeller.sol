@@ -1,16 +1,16 @@
 pragma solidity ^0.5.13;
 
-import "../common/interfaces/IFeeHandlerSeller.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "../stability/interfaces/IExchange.sol";
-import "../stability/interfaces/ISortedOracles.sol";
-import "./UsingRegistry.sol";
-import "../stability/StableToken.sol";
-import "../common/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "../common/Initializable.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/Math.sol";
+
+import "./UsingRegistry.sol";
+
+import "../common/interfaces/IFeeHandlerSeller.sol";
+import "../stability/interfaces/ISortedOracles.sol";
+import "../common/FixidityLib.sol";
+import "../common/Initializable.sol";
 import "./FeeHandlerSeller.sol";
 
 import "../uniswap/interfaces/IUniswapV2RouterMin.sol";

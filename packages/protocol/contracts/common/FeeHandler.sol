@@ -21,8 +21,6 @@ import "../common/interfaces/ICeloToken.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 
 // Using the minimal required signatures in the interfaces so more contracts could be compatible
-import "../uniswap/interfaces/IUniswapV2RouterMin.sol";
-import "../uniswap/interfaces/IUniswapV2FactoryMin.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 contract FeeHandler is
@@ -464,12 +462,16 @@ contract FeeHandler is
     * @notice Burns all the Celo balance of this contract.
     */
   function _burnCelo() private {
+    // TODO remove duplicated registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)
+
     TokenState storage tokenState = tokenStates[registry.getAddressForOrDie(
       GOLD_TOKEN_REGISTRY_ID
     )];
     ICeloToken celo = ICeloToken(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
 
-    uint256 balanceOfCelo = celo.balanceOf(address(this));
+    uint256 balanceOfCelo = IERC20(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)).balanceOf(
+      address(this)
+    );
     uint256 balanceToProcess = balanceOfCelo.sub(tokenState.toDistribute);
     uint256 balanceToBurn = FixidityLib
       .newFixed(balanceToProcess)

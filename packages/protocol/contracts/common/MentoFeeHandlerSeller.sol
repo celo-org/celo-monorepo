@@ -1,14 +1,16 @@
 pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "../common/interfaces/IFeeHandlerSeller.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "../stability/interfaces/IExchange.sol";
-import "../stability/interfaces/ISortedOracles.sol";
-import "./UsingRegistry.sol";
-import "../stability/StableToken.sol";
-import "../common/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+
+import "../../lib/mento-core/contracts/interfaces/IExchange.sol";
+import "./interfaces/IStableTokenMento.sol";
+
+import "./UsingRegistry.sol";
+import "../common/interfaces/IFeeHandlerSeller.sol";
+import "../stability/interfaces/ISortedOracles.sol";
+import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "./FeeHandlerSeller.sol";
 
@@ -47,7 +49,7 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
       "Buy token can only be gold token"
     );
 
-    StableToken stableToken = StableToken(sellTokenAddress);
+    IStableTokenMento stableToken = IStableTokenMento(sellTokenAddress);
     require(amount <= stableToken.balanceOf(address(this)), "Balance of token to burn not enough");
 
     address exchangeAddress = registry.getAddressForOrDie(stableToken.getExchangeRegistryId());
