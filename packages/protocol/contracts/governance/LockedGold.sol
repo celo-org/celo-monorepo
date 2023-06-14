@@ -4,6 +4,7 @@ import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/Address.sol";
+import "openzeppelin-solidity/contracts/utils/Enumerableset.sol";
 
 import "./interfaces/ILockedGold.sol";
 
@@ -24,6 +25,7 @@ contract LockedGold is
   using SafeMath for uint256;
   using Address for address payable; // prettier-ignore
   using FixidityLib for FixidityLib.Fraction;
+  using EnumerableSet for EnumerableSet.AddressSet;
 
   struct PendingWithdrawal {
     // The value of the pending withdrawal.
@@ -47,7 +49,8 @@ contract LockedGold is
     uint256 currentAmount;
   }
 
-  struct DelegatedCelo {
+  struct Delegated {
+    EnumerableSet.AddressSet delegatees;
     // delegatees with how much percent they are getting -
     // eg 0xDF => 20% and delegator total Celo which was 3000
     // Celo at the time of delegation/latest update
@@ -78,9 +81,12 @@ contract LockedGold is
   uint256 public unlockingPeriod;
 
   // delegator -> delegatee - how much votes did delegator delegated in total and to each delegatee
-  mapping(address => DelegatedCelo) delegatorCelo;
+  mapping(address => Delegated) delegatorInfo;
   // Celo that was delegated to this particular address
   mapping(address => uint256) public totalDelegatedCelo;
+
+  // maximum amount of allowed delegatees
+  uint256 maxDelegateesCount;
 
   event UnlockingPeriodSet(uint256 period);
   event GoldLocked(address indexed account, uint256 value);
@@ -107,6 +113,7 @@ contract LockedGold is
     uint256 percent,
     uint256 amount
   );
+  event MaxDelegateesCountSet(uint256 value);
 
   /**
   * @notice Returns the storage, major, minor, and patch version of the contract.
@@ -123,7 +130,9 @@ contract LockedGold is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public Initializable(test) {}
+  constructor(bool test) public Initializable(test) {
+    maxDelegateesCount = 10;
+  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -147,6 +156,15 @@ contract LockedGold is
   }
 
   /**
+   * @notice Sets max delegatees count.
+   * @param value The max delegatees count.
+   */
+  function setMaxDelegateesCount(uint256 value) public onlyOwner {
+    maxDelegateesCount = value;
+    emit MaxDelegateesCountSet(value);
+  }
+
+  /**
    * @notice Locks gold to be used for voting.
    */
   function lock() external payable nonReentrant {
@@ -155,6 +173,7 @@ contract LockedGold is
       "Must first register address with Account.createAccount"
     );
     _incrementNonvotingAccountBalance(msg.sender, msg.value);
+    updateDelegatedAmount(msg.sender);
     emit GoldLocked(msg.sender, msg.value);
   }
 
@@ -323,7 +342,10 @@ contract LockedGold is
     address delegatorAddress = getAccounts().voteSignerToAccount(msg.sender);
     address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
 
-    DelegatedCelo storage delegated = delegatorCelo[delegatorAddress];
+    Delegated storage delegated = delegatorInfo[delegatorAddress];
+    delegated.delegatees.add(delegateeAccount);
+    require(delegated.delegatees.length() <= maxDelegateesCount, "Too many delegatees");
+
     DelegatedInfo storage currentDelegateeInfo = delegated
       .delegateesWithPercentagesAndAmount[delegateeAccount];
 
@@ -396,7 +418,7 @@ contract LockedGold is
     );
 
     address delegatorAddress = getAccounts().voteSignerToAccount(msg.sender);
-    DelegatedCelo storage delegated = delegatorCelo[delegatorAddress];
+    Delegated storage delegated = delegatorInfo[delegatorAddress];
     require(
       delegated.totalDelegatedCeloInPercents >= percentageToRevoke,
       "Not enough total delegated percents"
@@ -443,12 +465,24 @@ contract LockedGold is
     currentDelegateeInfo.currentAmount = currentDelegateeInfo.currentAmount.sub(amountToRevoke);
     totalDelegatedCelo[delegateeAccount] -= amountToRevoke;
 
+    if (currentDelegateeInfo.currentAmount == 0) {
+      delegated.delegatees.remove(delegateeAccount);
+    }
+
     emit CeloDelegatedRevoked(
       delegatorAddress,
       delegateeAccount,
       percentageToRevoke,
       amountToRevoke
     );
+  }
+
+  function updateDelegatedAmount(address delegator) public {
+    address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
+    EnumerableSet.AddressSet storage delegatees = delegatorInfo[delegatorAccount].delegatees;
+    for (uint256 i = 0; i < delegatees.length(); i = i.add(1)) {
+      updateDelegatedAmount(delegatorAccount, delegatees.get(i));
+    }
   }
 
   /**
@@ -461,7 +495,7 @@ contract LockedGold is
     address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
     address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
 
-    DelegatedCelo storage delegated = delegatorCelo[delegatorAccount];
+    Delegated storage delegated = delegatorInfo[delegatorAccount];
     require(delegated.totalDelegatedCeloInPercents > 0, "delegator is not delegating");
     DelegatedInfo storage currentDelegateeInfo = delegated
       .delegateesWithPercentagesAndAmount[delegateeAccount];
@@ -483,7 +517,7 @@ contract LockedGold is
    * @param account The account address.
    */
   function getAccountTotalDelegatedAmountInPercents(address account) public view returns (uint256) {
-    DelegatedCelo storage delegated = delegatorCelo[account];
+    Delegated storage delegated = delegatorInfo[account];
     return delegated.totalDelegatedCeloInPercents;
   }
 
@@ -528,7 +562,7 @@ contract LockedGold is
     view
     returns (uint256 percentage, uint256 currentAmount)
   {
-    DelegatedInfo storage currentDelegateeInfo = delegatorCelo[delegator]
+    DelegatedInfo storage currentDelegateeInfo = delegatorInfo[delegator]
       .delegateesWithPercentagesAndAmount[delegatee];
 
     percentage = currentDelegateeInfo.percentage;
@@ -551,7 +585,7 @@ contract LockedGold is
     address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
     address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
 
-    DelegatedInfo storage currentDelegateeInfo = delegatorCelo[delegator]
+    DelegatedInfo storage currentDelegateeInfo = delegatorInfo[delegator]
       .delegateesWithPercentagesAndAmount[delegateeAccount];
 
     uint256 amountToDelegate = FixidityLib
@@ -561,6 +595,15 @@ contract LockedGold is
 
     expected = amountToDelegate;
     real = currentDelegateeInfo.currentAmount;
+  }
+
+  /**
+   * Retuns all delegatees of delegator
+   * @param delegator The delegator address.
+   */
+  function getDelegateesOfDelegator(address delegator) public view returns (address[] memory) {
+    address[] memory values = delegatorInfo[delegator].delegatees.enumerate();
+    return values;
   }
 
   /**
@@ -733,6 +776,7 @@ contract LockedGold is
     address payable communityFundPayable = address(uint160(communityFund));
     require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
     communityFundPayable.sendValue(maxSlash.sub(reward));
+    updateDelegatedAmount(account);
     emit AccountSlashed(account, maxSlash, reporter, reward);
   }
 }
