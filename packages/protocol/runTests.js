@@ -48,7 +48,7 @@ async function test() {
     const closeGanache = await startGanache()
     if (isCI) {
       // If we are running on circle ci we need to wait for ganache to be up.
-      await waitForPortOpen('localhost', 8545, 60)
+      await waitForPortOpen('localhost', 8545, 90)
     }
 
     // --reset is a hack to trick truffle into using 20M gas.

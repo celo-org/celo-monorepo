@@ -106,4 +106,8 @@ contract MockLockedGold is ILockedGold {
   function unlockingPeriod() external view returns (uint256) {
     return 0;
   }
+
+  function getAccountNonvotingLockedGold(address account) external view returns (uint256) {
+    return 0;
+  }
 }
