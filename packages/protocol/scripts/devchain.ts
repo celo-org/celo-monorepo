@@ -298,12 +298,14 @@ async function runDevChain(
     if (code !== 0) {
       throw Error('Migrations failed')
     }
+    console.info('Migrations successfully applied')
   }
   if (opts.releaseGoldContracts) {
     const code = await deployReleaseGold(opts.releaseGoldContracts)
     if (code !== 0) {
       throw Error('ReleaseGold deployment failed')
     }
+    console.info('ReleaseGold successfully deployed')
   }
   return stopGanache
 }
