@@ -28,9 +28,9 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
-        FULL_NODE_TIMEOUT_IN_MS,
         true,
-        warnings
+        warnings,
+        FULL_NODE_TIMEOUT_IN_MS
       )
 
       expect(success).toBe(false)
@@ -50,9 +50,9 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
-        FULL_NODE_TIMEOUT_IN_MS,
         true,
-        warnings
+        warnings,
+        FULL_NODE_TIMEOUT_IN_MS
       )
 
       expect(success).toBe(false)
@@ -75,9 +75,9 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
-        FULL_NODE_TIMEOUT_IN_MS,
         true,
-        warnings
+        warnings,
+        FULL_NODE_TIMEOUT_IN_MS
       )
 
       expect(success).toBe(true)
@@ -100,9 +100,9 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
-        FULL_NODE_TIMEOUT_IN_MS,
         false,
-        warnings
+        warnings,
+        FULL_NODE_TIMEOUT_IN_MS
       )
 
       expect(success).toBe(false)
@@ -135,9 +135,9 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
-        FULL_NODE_TIMEOUT_IN_MS,
         true,
-        warnings
+        warnings,
+        FULL_NODE_TIMEOUT_IN_MS
       )
 
       expect(success).toBe(false)
@@ -166,12 +166,7 @@ describe('Authentication test suite', () => {
 
       const warnings: ErrorType[] = []
 
-      const success = await auth.authenticateUser(
-        sampleRequest,
-        mockContractKit,
-        logger,
-        FULL_NODE_TIMEOUT_IN_MS
-      )
+      const success = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
       expect(success).toBe(false)
       expect(warnings).toEqual([])
@@ -212,9 +207,9 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
-        FULL_NODE_TIMEOUT_IN_MS,
         true,
-        warnings
+        warnings,
+        FULL_NODE_TIMEOUT_IN_MS
       )
 
       expect(success).toBe(true)
@@ -264,9 +259,9 @@ describe('Authentication test suite', () => {
           sampleRequest,
           mockContractKit,
           logger,
-          FULL_NODE_TIMEOUT_IN_MS,
           true,
-          warnings
+          warnings,
+          FULL_NODE_TIMEOUT_IN_MS
         )
 
         expect(success).toBe(false)
@@ -311,9 +306,9 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
-        FULL_NODE_TIMEOUT_IN_MS,
         true,
-        warnings
+        warnings,
+        FULL_NODE_TIMEOUT_IN_MS
       )
 
       expect(success).toBe(false)
@@ -359,9 +354,9 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
-        FULL_NODE_TIMEOUT_IN_MS,
         true,
-        warnings
+        warnings,
+        FULL_NODE_TIMEOUT_IN_MS
       )
 
       expect(success).toBe(false)
@@ -404,9 +399,9 @@ describe('Authentication test suite', () => {
         sampleRequest,
         mockContractKit,
         logger,
-        FULL_NODE_TIMEOUT_IN_MS,
         true,
-        warnings
+        warnings,
+        FULL_NODE_TIMEOUT_IN_MS
       )
 
       expect(success).toBe(false)

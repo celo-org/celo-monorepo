@@ -81,9 +81,9 @@ export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
       request,
       this.kit,
       logger,
-      this.timeoutMs,
       this.shouldFailOpen,
-      warnings
+      warnings,
+      this.timeoutMs
     )
   }
 

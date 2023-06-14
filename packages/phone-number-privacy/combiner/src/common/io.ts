@@ -42,11 +42,7 @@ export abstract class IO<R extends OdisRequest> {
     response: Response<OdisResponse<R>>
   ): Promise<Session<R> | null>
 
-  abstract authenticate(
-    request: Request<{}, {}, R>,
-    logger?: Logger,
-    timeoutMs?: number
-  ): Promise<boolean>
+  abstract authenticate(request: Request<{}, {}, R>, logger?: Logger): Promise<boolean>
 
   abstract sendFailure(
     error: ErrorType,

@@ -69,9 +69,9 @@ export class LegacyPnpQuotaIO extends IO<LegacyPnpQuotaRequest> {
       request,
       this.kit,
       logger,
-      this.timeoutMs,
       this.shouldFailOpen,
-      warnings
+      warnings,
+      this.timeoutMs
     )
   }
 

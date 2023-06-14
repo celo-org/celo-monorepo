@@ -70,8 +70,9 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       request,
       this.kit,
       logger,
-      this.config.timeoutMs,
-      this.config.shouldFailOpen
+      this.config.shouldFailOpen,
+      [],
+      this.config.fullNodeTimeoutMs
     )
   }
 

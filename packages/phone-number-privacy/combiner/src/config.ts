@@ -29,13 +29,13 @@ export interface OdisConfig {
   shouldFailOpen: boolean // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config, this isn't relevant to domains endpoints
   odisServices: {
     signers: string
-    timeoutMilliSeconds: number // XXX (soloseng): what is this timeout used for? could it also be used to replace FULL_NODE_TIMEOUT_IN_MS?
+    timeoutMilliSeconds: number
   }
   keys: {
     currentVersion: number
     versions: string // parse as KeyVersionInfo[]
   }
-  timeoutMs: number
+  fullNodeTimeoutMs: number
 }
 
 export interface CombinerConfig {
@@ -101,7 +101,7 @@ if (DEV_MODE) {
           },
         ]),
       },
-      timeoutMs: Number(process.env.TIMEOUT_MS ?? FULL_NODE_TIMEOUT_IN_MS),
+      fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
     },
     domains: {
       serviceName: defaultServiceName,
@@ -134,7 +134,7 @@ if (DEV_MODE) {
           },
         ]),
       },
-      timeoutMs: Number(process.env.TIMEOUT_MS ?? FULL_NODE_TIMEOUT_IN_MS),
+      fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
     },
   }
 } else {
@@ -144,6 +144,7 @@ if (DEV_MODE) {
     blockchain: {
       provider: functionConfig.blockchain.provider,
       apiKey: functionConfig.blockchain.api_key,
+      timeout_ms: Number(functionConfig.blockchain.timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
     },
     phoneNumberPrivacy: {
       serviceName: functionConfig.pnp.service_name ?? defaultServiceName,
@@ -159,7 +160,7 @@ if (DEV_MODE) {
         currentVersion: Number(functionConfig.pnp_keys.current_version),
         versions: functionConfig.pnp_keys.versions,
       },
-      timeoutMs: Number(process.env.TIMEOUT_MS ?? FULL_NODE_TIMEOUT_IN_MS),
+      fullNodeTimeoutMs: Number(functionConfig.blockchain.timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
     },
     domains: {
       serviceName: functionConfig.domains.service_name ?? defaultServiceName,
@@ -175,7 +176,7 @@ if (DEV_MODE) {
         currentVersion: Number(functionConfig.domains_keys.current_version),
         versions: functionConfig.domains_keys.versions,
       },
-      timeoutMs: Number(process.env.TIMEOUT_MS ?? FULL_NODE_TIMEOUT_IN_MS),
+      fullNodeTimeoutMs: Number(functionConfig.blockchain.timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
     },
   }
 }

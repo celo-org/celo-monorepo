@@ -1,4 +1,8 @@
-import { BlockchainConfig, toBool } from '@celo/phone-number-privacy-common'
+import {
+  BlockchainConfig,
+  FULL_NODE_TIMEOUT_IN_MS,
+  toBool,
+} from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 
 require('dotenv').config()
@@ -136,6 +140,7 @@ export const config: SignerConfig = {
   blockchain: {
     provider: env.BLOCKCHAIN_PROVIDER,
     apiKey: env.BLOCKCHAIN_API_KEY,
+    timeout_ms: Number(env.TIMEOUT_MS ?? FULL_NODE_TIMEOUT_IN_MS),
   },
   db: {
     type: env.DB_TYPE ? env.DB_TYPE.toLowerCase() : SupportedDatabase.Postgres,

@@ -77,9 +77,9 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       request,
       this.kit,
       logger,
-      this.timeoutMs,
       this.shouldFailOpen,
-      warnings
+      warnings,
+      this.timeoutMs
     )
   }
 
