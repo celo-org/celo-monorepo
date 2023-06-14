@@ -6,7 +6,6 @@ import path from 'path'
 import targz from 'targz'
 import tmp from 'tmp'
 import yargs from 'yargs'
-import { waitForPortOpen } from '../lib/test-utils'
 
 tmp.setGracefulCleanup()
 
@@ -357,4 +356,20 @@ async function compressChain(chainPath: string, filename: string): Promise<void>
       }
     })
   })
+}
+
+export async function waitForPortOpen(host: string, port: number, seconds: number) {
+  console.info(`Waiting for ${host}:${port} to open for ${seconds}s`)
+  const deadline = Date.now() + seconds * 1000
+  do {
+    if (await isPortOpen(host, port)) {
+      return true
+    }
+  } while (Date.now() < deadline)
+  console.info('Port was not opened in time')
+  return false
+}
+
+async function isPortOpen(host: string, port: number) {
+  return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
 }
