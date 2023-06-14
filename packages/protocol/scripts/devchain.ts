@@ -365,6 +365,7 @@ export async function waitForPortOpen(host: string, port: number, seconds: numbe
   const deadline = Date.now() + seconds * 1000
   do {
     if (await isPortOpen(host, port)) {
+      await delay(5000) // extra 5s just to give ganache extra time to startup
       console.info(`Port ${host}:${port} opened`)
       return true
     }
@@ -375,4 +376,8 @@ export async function waitForPortOpen(host: string, port: number, seconds: numbe
 
 async function isPortOpen(host: string, port: number) {
   return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
+}
+
+function delay(time) {
+  return new Promise((resolve) => setTimeout(resolve, time))
 }
