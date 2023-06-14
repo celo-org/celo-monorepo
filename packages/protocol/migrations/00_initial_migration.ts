@@ -1,5 +1,5 @@
-import { networks } from '../truffle-config.js'
 import { ArtifactsSingleton } from '../lib/artifactsSingleton.js'
+import { networks } from '../truffle-config.js'
 
 module.exports = async (deployer: any, network: any) => {
   const Migrations = artifacts.require('./Migrations.sol')
