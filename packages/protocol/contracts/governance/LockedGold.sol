@@ -4,7 +4,7 @@ import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/Address.sol";
-import "openzeppelin-solidity/contracts/utils/Enumerableset.sol";
+import "openzeppelin-solidity/contracts/utils/EnumerableSet.sol";
 
 import "./interfaces/ILockedGold.sol";
 
@@ -80,7 +80,7 @@ contract LockedGold is
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
-  // delegator -> delegatee - how much votes did delegator delegated in total and to each delegatee
+  // Info about delegator
   mapping(address => Delegated) delegatorInfo;
   // Celo that was delegated to this particular address
   mapping(address => uint256) public totalDelegatedCelo;
