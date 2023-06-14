@@ -220,6 +220,7 @@ export async function waitForPortOpen(host: string, port: number, seconds: numbe
   const deadline = Date.now() + seconds * 1000
   do {
     if (await isPortOpen(host, port)) {
+      console.info(`Waiting for ${host}:${port} to opened`)
       return true
     }
   } while (Date.now() < deadline)
