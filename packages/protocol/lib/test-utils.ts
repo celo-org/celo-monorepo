@@ -233,7 +233,7 @@ type ProxiedContractGetter = (
 
 type ContratGetter = (
   contractName: string,
-  contractPackage?: ContractPackage | String, 
+  contractPackage?: ContractPackage,
   ) => Promise<any>
 
 
@@ -269,7 +269,7 @@ export const assertContractsRegistered = async (getContract: ContratGetter) => {
 export const assertRegistryAddressesSet = async (getContract: ContratGetter) => {
   const registry: RegistryInstance = await getContract('Registry')
   for (const contractName of usesRegistry) {
-    const contract: UsingRegistryInstance = await getContract(contractName, 'proxiedContract')
+    const contract: UsingRegistryInstance = await getContract(contractName, MENTO_PACKAGE)
     assert.strictEqual(
       registry.address.toLowerCase(),
       (await contract.registry()).toLowerCase(),
