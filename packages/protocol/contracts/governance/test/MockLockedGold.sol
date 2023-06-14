@@ -116,4 +116,20 @@ contract MockLockedGold is ILockedGold {
   function getAccountTotalGovernanceVotingPower(address account) external view returns (uint256) {
     return totalGovernancePower[account];
   }
+
+  function getPendingWithdrawal(address account, uint256 index)
+    external
+    view
+    returns (uint256, uint256)
+  {
+    return (0, 0);
+  }
+
+  function unlockingPeriod() external view returns (uint256) {
+    return 0;
+  }
+
+  function getAccountNonvotingLockedGold(address account) external view returns (uint256) {
+    return 0;
+  }
 }

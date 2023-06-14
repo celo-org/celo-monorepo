@@ -1,6 +1,8 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.5.13 <0.9.0;
 
 interface ILockedGold {
+  function lock() external payable;
   function incrementNonvotingAccountBalance(address, uint256) external;
   function decrementNonvotingAccountBalance(address, uint256) external;
   function getAccountTotalLockedGold(address) external view returns (uint256);
@@ -9,8 +11,11 @@ interface ILockedGold {
     external
     view
     returns (uint256[] memory, uint256[] memory);
+  function getPendingWithdrawal(address account, uint256 index)
+    external
+    view
+    returns (uint256, uint256);
   function getTotalPendingWithdrawals(address) external view returns (uint256);
-  function lock() external payable;
   function unlock(uint256) external;
   function relock(uint256, uint256) external;
   function withdraw(uint256) external;
@@ -31,4 +36,6 @@ interface ILockedGold {
     returns (uint256);
 
   function getAccountTotalGovernanceVotingPower(address account) external view returns (uint256);
+  function unlockingPeriod() external view returns (uint256);
+  function getAccountNonvotingLockedGold(address account) external view returns (uint256);
 }
