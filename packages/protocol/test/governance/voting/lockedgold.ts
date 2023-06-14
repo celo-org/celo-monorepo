@@ -321,7 +321,7 @@ contract('LockedGold', (accounts: string[]) => {
         it('should revert when trying to unlock CELO that is delegated', async () => {
           await assertRevertWithReason(
             lockedGold.unlock(value),
-            'Not enough undelegated celo. Celo has to be removed from delegation first.'
+            'Not enough undelegated Celo. Celo has to be removed from delegation first.'
           )
         })
 
@@ -618,6 +618,52 @@ contract('LockedGold', (accounts: string[]) => {
       })
     })
 
+    describe('When account is delegating', () => {
+      const penalty = value
+      const reward = value / 2
+
+      const delegatee = accounts[5]
+
+      beforeEach(async () => {
+        await accountsInstance.createAccount({ from: delegatee })
+        await lockedGold.delegateGovernanceVotes(delegatee, 100)
+      })
+
+      it('should update total voting power of delegatee', async () => {
+        const totalAccountGovernanceVotingPower = await lockedGold.getAccountTotalGovernanceVotingPower(
+          delegatee
+        )
+        assertEqualBN(totalAccountGovernanceVotingPower, value)
+      })
+
+      describe('When slashed', () => {
+        beforeEach(async () => {
+          await lockedGold.slash(
+            account,
+            penalty,
+            reporter,
+            reward,
+            [NULL_ADDRESS],
+            [NULL_ADDRESS],
+            [0],
+            { from: accounts[2] }
+          )
+        })
+
+        it("should reduce account's locked gold balance", async () => {
+          assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), value - penalty)
+          assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), value - penalty)
+        })
+
+        it('should reduce delegatee voting power', async () => {
+          const totalAccountGovernanceVotingPower = await lockedGold.getAccountTotalGovernanceVotingPower(
+            delegatee
+          )
+          assertEqualBN(totalAccountGovernanceVotingPower, value - penalty)
+        })
+      })
+    })
+
     describe('when the slashing contract is removed from `isSlasher`', () => {
       const penalty = value
       const reward = value / 2
@@ -817,12 +863,14 @@ contract('LockedGold', (accounts: string[]) => {
     describe('When delegatee is an account', () => {
       const delegatee1 = accounts[5]
       const delegatee2 = accounts[6]
+      const delegatee3 = accounts[7]
       const delegator = accounts[0]
       const delegator2 = accounts[1]
 
       beforeEach(async () => {
         await accountsInstance.createAccount({ from: delegatee1 })
         await accountsInstance.createAccount({ from: delegatee2 })
+        await accountsInstance.createAccount({ from: delegatee3 })
         await accountsInstance.createAccount({ from: delegator2 })
       })
 
@@ -1034,6 +1082,44 @@ contract('LockedGold', (accounts: string[]) => {
                 delegatedAmount,
                 lockedGold
               )
+            })
+          })
+        })
+      })
+
+      describe('When trying to delegate to more then maxDelegateeCount', () => {
+        const value = 1000
+
+        beforeEach(async () => {
+          await lockedGold.setMaxDelegateesCount(2)
+          await lockedGold.lock({ value, from: delegator })
+        })
+
+        describe('When delegated to allow count yet', () => {
+          beforeEach(async () => {
+            await lockedGold.delegateGovernanceVotes(delegatee1, 1, { from: delegator })
+            await lockedGold.delegateGovernanceVotes(delegatee2, 1, { from: delegator })
+          })
+
+          it('should return delegatees correctly', async () => {
+            const delegatees = await lockedGold.getDelegateesOfDelegator(delegator)
+            assert.sameDeepMembers([delegatee1, delegatee2], delegatees)
+          })
+
+          it('should revert when trying to add extra delegatee', async () => {
+            await assertRevertWithReason(
+              lockedGold.delegateGovernanceVotes(delegatee3, 1, { from: delegator }),
+              'Too many delegatees'
+            )
+          })
+
+          describe('When limit is increased', () => {
+            beforeEach(async () => {
+              await lockedGold.setMaxDelegateesCount(3)
+            })
+
+            it('should allow to increase number of validators', async () => {
+              await lockedGold.delegateGovernanceVotes(delegatee3, 1, { from: delegator })
             })
           })
         })
@@ -1476,13 +1562,20 @@ contract('LockedGold', (accounts: string[]) => {
           await lockedGold.lock({ value, from: delegator })
         })
 
-        it('should return unequal amounts', async () => {
+        it('should return equal amounts', async () => {
           const [expected, actual] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
             delegator,
             delegatee
           )
           assertEqualBN(expected, updatedDelegatedAmount)
-          assertEqualBN(actual, delegatedAmount)
+          assertEqualBN(actual, updatedDelegatedAmount)
+        })
+
+        it('should update total voting power of delegatee', async () => {
+          const totalAccountGovernanceVotingPower = await lockedGold.getAccountTotalGovernanceVotingPower(
+            delegatee
+          )
+          assertEqualBN(totalAccountGovernanceVotingPower, delegatedAmount * 2)
         })
       })
     })
