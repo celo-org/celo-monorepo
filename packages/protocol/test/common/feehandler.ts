@@ -45,6 +45,8 @@ import {
   StableTokenInstance,
 } from 'types/mento'
 
+import { MENTO_PACKAGE } from '@celo/protocol/contractPackages'
+import { makeTruffleContractForMigration } from '@celo/protocol/lib/web3-utils'
 import { SECONDS_IN_A_WEEK, ZERO_ADDRESS } from '../constants'
 
 const goldAmountForRate = new BigNumber('1000000000000000000000000')
@@ -56,13 +58,10 @@ const initialReserveBalance = new BigNumber('10000000000000000000000')
 
 const FeeHandler: FeeHandlerContract = artifacts.require('FeeHandler')
 const Registry: RegistryContract = artifacts.require('Registry')
-const Exchange: ExchangeContract = artifacts.require('Exchange')
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
 const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSortedOracles')
 const MockReserve: MockReserveContract = artifacts.require('MockReserve')
 
-const StableToken: StableTokenContract = artifacts.require('StableToken')
-const StableTokenEUR: StableTokenEURContract = artifacts.require('StableTokenEUR')
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const ERC20: MockERC20Contract = artifacts.require('MockERC20')
 
@@ -77,6 +76,19 @@ const MentoFeeHandlerSeller: MentoFeeHandlerSellerContract = artifacts.require(
 
 const UniswapFeeHandlerSeller: UniswapFeeHandlerSellerContract = artifacts.require(
   'UniswapFeeHandlerSeller'
+)
+
+// Mento contracts
+const Exchange: ExchangeContract = makeTruffleContractForMigration('Exchange', MENTO_PACKAGE, web3)
+const StableToken: StableTokenContract = makeTruffleContractForMigration(
+  'StableToken',
+  MENTO_PACKAGE,
+  web3
+)
+const StableTokenEUR: StableTokenEURContract = makeTruffleContractForMigration(
+  'StableTokenEUR',
+  MENTO_PACKAGE,
+  web3
 )
 
 const EXAMPLE_BENEFICIARY_ADDRESS = '0x2A486910DBC72cACcbb8d0e1439C96b03B2A4699'

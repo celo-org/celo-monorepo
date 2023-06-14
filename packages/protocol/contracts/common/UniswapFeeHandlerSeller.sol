@@ -92,16 +92,18 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     uint256 maxSlippage,
     uint256 amount,
     IUniswapV2RouterMin bestRouter
-  ) private returns (uint256) {
+  ) private view returns (uint256) {
     ISortedOracles sortedOracles = getSortedOracles();
+    uint256 minReports = minimumReports[sellTokenAddress];
+
     require(
-      sortedOracles.numRates(sellTokenAddress) >= minimumReports[sellTokenAddress],
+      sortedOracles.numRates(sellTokenAddress) >= minReports,
       "Number of reports for token not enough"
     );
 
     uint256 minimalSortedOracles = 0;
     // if minimumReports for this token is zero, assume the check is not needed
-    if (minimumReports[sellTokenAddress] > 0) {
+    if (minReports > 0) {
       (uint256 rateNumerator, uint256 rateDenominator) = sortedOracles.medianRate(sellTokenAddress);
 
       minimalSortedOracles = calculateMinAmount(
