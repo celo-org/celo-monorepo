@@ -177,6 +177,7 @@ export async function assertRevert(promise: any, errorMessage: string = '') {
 }
 
 export async function exec(command: string, args: string[]) {
+  console.log(`Running: ${command} ${args}`)
   return new Promise<void>((resolve, reject) => {
     const proc = spawn(command, args, {
       stdio: [process.stdout, process.stderr],
