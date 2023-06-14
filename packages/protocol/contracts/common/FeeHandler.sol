@@ -55,7 +55,6 @@ contract FeeHandler is
 
   struct TokenState {
     address handler;
-    bool active;
     FixidityLib.Fraction maxSlippage;
     // Max amounts that can be burned in a day for a token
     uint256 dailySellLimit;
@@ -115,7 +114,6 @@ contract FeeHandler is
     TokenState storage tokenState = tokenStates[registry.getAddressForOrDie(
       GOLD_TOKEN_REGISTRY_ID
     )];
-    tokenState.active = true;
   }
 
   function() external payable {}
@@ -135,7 +133,7 @@ contract FeeHandler is
     @return A boolean representing the active status of the specified token.
   */
   function getTokenActive(address tokenAddress) external view returns (bool) {
-    return tokenStates[tokenAddress].active;
+    return activeTokens.contains(tokenAddress);
   }
 
   /**
@@ -234,7 +232,6 @@ contract FeeHandler is
     IFeeHandlerSeller(handlerAddress);
 
     TokenState storage tokenState = tokenStates[tokenAddress];
-    tokenState.active = true;
     tokenState.handler = handlerAddress;
 
     activeTokens.add(tokenAddress);
@@ -251,7 +248,6 @@ contract FeeHandler is
   function _activateToken(address tokenAddress) private {
     activeTokens.add(tokenAddress);
     TokenState storage tokenState = tokenStates[tokenAddress];
-    tokenState.active = true;
   }
 
   /**
@@ -265,7 +261,6 @@ contract FeeHandler is
   function _deactivateToken(address tokenAddress) private {
     activeTokens.remove(tokenAddress);
     TokenState storage tokenState = tokenStates[tokenAddress];
-    tokenState.active = false;
   }
 
   /**
