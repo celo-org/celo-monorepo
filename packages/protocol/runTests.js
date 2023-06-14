@@ -45,6 +45,7 @@ async function test() {
   })
 
   try {
+    console.info('Starting Ganache ...')
     const closeGanache = await startGanache()
     if (isCI) {
       // If we are running on circle ci we need to wait for ganache to be up.
