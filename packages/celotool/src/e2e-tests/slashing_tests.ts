@@ -18,31 +18,39 @@ const TMP_PATH = '/tmp/e2e'
 const safeMarginBlocks = 4
 
 function headerArray(block: any) {
-  const headerHashData = [
+  if (!block.nonce) {
+    // Before Gingerbread fork
+    return [
+      block.parentHash,
+      block.miner,
+      block.stateRoot,
+      block.transactionsRoot,
+      block.receiptsRoot,
+      block.logsBloom,
+      block.number,
+      block.gasUsed,
+      block.timestamp,
+      block.extraData,
+    ]
+  }
+  return [
     block.parentHash,
+    block.sha3Uncles,
     block.miner,
     block.stateRoot,
     block.transactionsRoot,
     block.receiptsRoot,
     block.logsBloom,
+    new BigNumber(block.difficulty).toNumber(),
     block.number,
+    block.gasLimit,
     block.gasUsed,
     block.timestamp,
     block.extraData,
+    block.mixHash,
+    block.nonce,
+    block.baseFee,
   ]
-  if (block.gasLimit) {
-    headerHashData.push(block.gasLimit)
-  }
-  if (block.nonce) {
-    // All these fields are set after GFork, but difficulty is already returned
-    // in RPC as an Eth-compatibility feature before, so we can't use it to
-    // check if we are after GFork
-    headerHashData.push(new BigNumber(block.difficulty).toNumber())
-    headerHashData.push(block.nonce)
-    headerHashData.push(block.sha3Uncles)
-    headerHashData.push(block.mixHash)
-  }
-  return headerHashData
 }
 
 function headerFromBlock(block: any) {
