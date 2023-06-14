@@ -216,12 +216,14 @@ async function isPortOpen(host: string, port: number) {
 }
 
 export async function waitForPortOpen(host: string, port: number, seconds: number) {
+  console.info(`Waiting for ${host}:${port} to open for ${seconds}s`);
   const deadline = Date.now() + seconds * 1000
   do {
     if (await isPortOpen(host, port)) {
       return true
     }
   } while (Date.now() < deadline)
+  console.info("Port was not opened in time");
   return false
 }
 
