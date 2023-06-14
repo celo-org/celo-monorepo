@@ -221,12 +221,17 @@ export async function waitForPortOpen(host: string, port: number, seconds: numbe
   const deadline = Date.now() + seconds * 1000
   do {
     if (await isPortOpen(host, port)) {
+      await delay(5000) // extra 5s just to give ganache extra time to startup
       console.info(`Port ${host}:${port} opened`)
       return true
     }
   } while (Date.now() < deadline)
   console.info("Port was not opened in time");
   return false
+}
+
+function delay(time) {
+  return new Promise((resolve) => setTimeout(resolve, time))
 }
 
 type ProxiedContractGetter = (
