@@ -6,6 +6,7 @@ import path from 'path'
 import targz from 'targz'
 import tmp from 'tmp'
 import yargs from 'yargs'
+import { waitForPortOpen } from '../lib/test-utils'
 
 tmp.setGracefulCleanup()
 
@@ -14,6 +15,9 @@ const MNEMONIC = 'concert load couple harbor equip island argue ramp clarify fen
 const gasLimit = 20000000
 
 const ProtocolRoot = path.normalize(path.join(__dirname, '../'))
+
+// As documented https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
+const isCI = process.env.CI === 'true'
 
 // Move to where the caller made the call So to have relative paths
 const CallerCWD = process.env.INIT_CWD ? process.env.INIT_CWD : process.cwd()
@@ -242,7 +246,13 @@ async function runDevChainFromTar(filename: string) {
 
   await decompressChain(filename, chainCopy.name)
 
+  console.info('Starting Ganache ...')
   const stopGanache = await startGanache(chainCopy.name, { verbose: true }, chainCopy)
+  if (isCI) {
+    // If we are running on circle ci we need to wait for ganache to be up.
+    await waitForPortOpen('localhost', 8545, 90)
+  }
+
   return stopGanache
 }
 
@@ -278,7 +288,12 @@ async function runDevChain(
     await resetDir(datadir)
   }
   createDirIfMissing(datadir)
+  console.info('Starting Ganache ...')
   const stopGanache = await startGanache(datadir, { verbose: true })
+  if (isCI) {
+    // If we are running on circle ci we need to wait for ganache to be up.
+    await waitForPortOpen('localhost', 8545, 90)
+  }
   if (opts.reset || opts.runMigrations) {
     const code = await runMigrations({ upto: opts.upto, migrationOverride: opts.migrationOverride })
     if (code !== 0) {
