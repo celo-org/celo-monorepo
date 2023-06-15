@@ -40,12 +40,12 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
 
   function sell(
     address sellTokenAddress,
-    address buyToken,
+    address buyTokenAddress,
     uint256 amount,
     uint256 maxSlippage // as fraction,
   ) external {
     require(
-      buyToken == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
+      buyTokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
       "Buy token can only be gold token"
     );
 
@@ -78,6 +78,6 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     IERC20 goldToken = getGoldToken();
     goldToken.transfer(msg.sender, goldToken.balanceOf(address(this)));
 
-    emit TokenSold(sellTokenAddress, amount);
+    emit TokenSold(sellTokenAddress, buyTokenAddress, amount);
   }
 }

@@ -75,7 +75,6 @@ contract FeeHandler is
   event RouterAddressSet(address token, address router);
   event RouterAddressRemoved(address token, address router);
   event RouterUsed(address router);
-  event ReceivedQuote(address router, uint256 quote);
   event FeeBeneficiarySet(address newBeneficiary);
   event BurnFractionSet(uint256 fraction);
 

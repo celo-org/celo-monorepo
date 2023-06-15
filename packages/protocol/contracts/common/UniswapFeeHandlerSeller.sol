@@ -25,7 +25,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   mapping(address => EnumerableSet.AddressSet) private routerAddresses;
   uint256 constant MAX_TIMESTAMP_BLOCK_EXCHANGE = 20;
 
-  event ReceivedQuote(address router, uint256 quote);
+  event ReceivedQuote(address indexed tokneAddress, address indexed router, uint256 quote);
   event RouterUsed(address router);
   event RouterAddressSet(address token, address router);
   event RouterAddressRemoved(address token, address router);
@@ -84,6 +84,15 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     return routerAddresses[token].values;
   }
 
+  /**
+  * @dev Calculates the minimum amount of tokens that can be received for a given amount of sell tokens, 
+          taking into account the slippage and the rates of the sell token and CELO token on the Uniswap V2 pair.
+  * @param sellTokenAddress The address of the sell token.
+  * @param maxSlippage The maximum slippage allowed.
+  * @param amount The amount of sell tokens to be traded.
+  * @param bestRouter The Uniswap V2 router with the best price.
+  * @return The minimum amount of tokens that can be received.
+  */
   function calculateAllMinAmount(
     address sellTokenAddress,
     uint256 maxSlippage,
@@ -129,12 +138,12 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   // This function explicitly defines few variables because it was getting error "stack too deep"
   function sell(
     address sellTokenAddress,
-    address buyToken,
+    address buyTokenAddress,
     uint256 amount,
     uint256 maxSlippage // as fraction,
   ) external {
     require(
-      buyToken == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
+      buyTokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
       "Buy token can only be gold token"
     );
 
@@ -166,7 +175,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
       // so the first value would be equivalent to balanceToBurn
       uint256 wouldGet = router.getAmountsOut(amount, path)[1];
 
-      emit ReceivedQuote(poolAddress, wouldGet);
+      emit ReceivedQuote(sellTokenAddress, poolAddress, wouldGet);
       if (wouldGet > bestRouterQuote) {
         bestRouterQuote = wouldGet;
         bestRouter = router;
@@ -191,6 +200,6 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
 
     celoToken.transfer(msg.sender, celoToken.balanceOf(address(this)));
     emit RouterUsed(address(bestRouter));
-    emit TokenSold(sellTokenAddress, amount);
+    emit TokenSold(sellTokenAddress, buyTokenAddress, amount);
   }
 }
