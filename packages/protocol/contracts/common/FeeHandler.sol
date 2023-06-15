@@ -218,7 +218,7 @@ contract FeeHandler is
     @dev Sets the burn fraction to the specified value. Token has to have a handler set.
     @param tokenAddress The address of the token to sell
   */
-  function sell(address tokenAddress) external nonReentrant {
+  function sell(address tokenAddress) external {
     return _sell(tokenAddress);
   }
 

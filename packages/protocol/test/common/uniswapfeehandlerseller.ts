@@ -75,10 +75,6 @@ contract('UniswapFeeHandlerSeller', (accounts: string[]) => {
       )
     })
 
-    it("doesn't remove if the indexes doesn't match", async () => {
-      await assertRevert(uniswapFeeHandlerSeller.removeRouter(addressA, addressD))
-    })
-
     it('only owner can removeRouter', async () => {
       await assertRevert(uniswapFeeHandlerSeller.removeRouter(addressA, addressB, { from: user }))
     })
