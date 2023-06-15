@@ -45,7 +45,7 @@ contract('UniswapFeeHandlerSeller', (accounts: string[]) => {
     it('sets pool for exchange', async () => {
       await uniswapFeeHandlerSeller.setRouter(addressA, addressB)
 
-      assert(await uniswapFeeHandlerSeller.routerAddresses(addressA, 0), addressB)
+      assert(await uniswapFeeHandlerSeller.getRoutersForToken(addressA)[0], addressB)
     })
 
     it('only owner can setRouter', async () => {
@@ -59,7 +59,7 @@ contract('UniswapFeeHandlerSeller', (accounts: string[]) => {
     })
 
     it('removes a token', async () => {
-      await uniswapFeeHandlerSeller.removeRouter(addressA, addressB, 0)
+      await uniswapFeeHandlerSeller.removeRouter(addressA, addressB)
       expect((await uniswapFeeHandlerSeller.getRoutersForToken(addressA)).toString()).to.equal(
         [].toString()
       )
@@ -69,20 +69,18 @@ contract('UniswapFeeHandlerSeller', (accounts: string[]) => {
       await uniswapFeeHandlerSeller.setRouter(addressA, addressD)
       await uniswapFeeHandlerSeller.setRouter(addressA, addressC)
       // list for token should be [uniswap, exchange, stabletoken]
-      await uniswapFeeHandlerSeller.removeRouter(addressA, addressD, 1)
+      await uniswapFeeHandlerSeller.removeRouter(addressA, addressD)
       expect((await uniswapFeeHandlerSeller.getRoutersForToken(addressA)).toString()).to.equal(
         [addressB, addressC].toString()
       )
     })
 
     it("doesn't remove if the indexes doesn't match", async () => {
-      await assertRevert(uniswapFeeHandlerSeller.removeRouter(addressA, addressD, 0))
+      await assertRevert(uniswapFeeHandlerSeller.removeRouter(addressA, addressD))
     })
 
     it('only owner can removeRouter', async () => {
-      await assertRevert(
-        uniswapFeeHandlerSeller.removeRouter(addressA, addressB, 0, { from: user })
-      )
+      await assertRevert(uniswapFeeHandlerSeller.removeRouter(addressA, addressB, { from: user }))
     })
   })
 })

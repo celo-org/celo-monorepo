@@ -2,6 +2,7 @@ pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-solidity/contracts/utils/EnumerableSet.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/Math.sol";
 
@@ -19,8 +20,9 @@ import "../uniswap/interfaces/IUniswapV2FactoryMin.sol";
 contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
+  using EnumerableSet for EnumerableSet.AddressSet;
 
-  mapping(address => address[]) public routerAddresses;
+  mapping(address => EnumerableSet.AddressSet) private routerAddresses;
   uint256 constant MAX_TIMESTAMP_BLOCK_EXCHANGE = 20;
 
   event ReceivedQuote(address router, uint256 quote);
@@ -59,7 +61,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
 
   function _setRouter(address token, address router) private {
     require(router != address(0), "Router can't be address zero");
-    routerAddresses[token].push(router);
+    routerAddresses[token].add(router);
     emit RouterAddressSet(token, router);
   }
 
@@ -67,14 +69,9 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     * @notice Allows owner to remove a router for a token.
     * @param token Address of the token.
     * @param router Address of the router to remove.
-    * @param index The index of the router to remove.
     */
-  function removeRouter(address token, address router, uint256 index) external onlyOwner {
-    require(routerAddresses[token][index] == router, "Index does not match");
-
-    uint256 length = routerAddresses[token].length;
-    routerAddresses[token][index] = routerAddresses[token][length - 1];
-    routerAddresses[token].pop();
+  function removeRouter(address token, address router) external onlyOwner {
+    routerAddresses[token].remove(router);
     emit RouterAddressRemoved(token, router);
   }
 
@@ -84,7 +81,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     * @return An array of all the allowed router.
     */
   function getRoutersForToken(address token) external view returns (address[] memory) {
-    return routerAddresses[token];
+    return routerAddresses[token].values;
   }
 
   function calculateAllMinAmount(
@@ -141,7 +138,10 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
       "Buy token can only be gold token"
     );
 
-    require(routerAddresses[sellTokenAddress].length > 0, "routerAddresses should be non empty");
+    require(
+      routerAddresses[sellTokenAddress].values.length > 0,
+      "routerAddresses should be non empty"
+    );
 
     // An improvement to this function would be to allow the user to pass a path as argument
     // and if it generates a better outcome that the ones enabled that gets used
@@ -154,8 +154,8 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
 
     address[] memory path = new address[](2);
 
-    for (uint256 i = 0; i < routerAddresses[sellTokenAddress].length; i++) {
-      address poolAddress = routerAddresses[sellTokenAddress][i];
+    for (uint256 i = 0; i < routerAddresses[sellTokenAddress].values.length; i++) {
+      address poolAddress = routerAddresses[sellTokenAddress].get(i);
       IUniswapV2RouterMin router = IUniswapV2RouterMin(poolAddress);
 
       path[0] = sellTokenAddress;
