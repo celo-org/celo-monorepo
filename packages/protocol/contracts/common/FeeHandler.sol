@@ -299,9 +299,9 @@ contract FeeHandler is
 
     uint256 balanceToBurn = (burnFraction.multiply(balanceToProcess).fromFixed());
 
-    uint256 contractBalance = token.balanceOf(address(this));
-
-    tokenState.toDistribute += (contractBalance.sub(balanceToBurn));
+    tokenState.toDistribute += tokenState.toDistribute.add(
+      balanceToProcess.fromFixed().sub(balanceToBurn)
+    );
 
     // small numbers cause rounding errors and zero case should be skipped
     if (balanceToBurn < MIN_BURN) {
@@ -354,7 +354,7 @@ contract FeeHandler is
     }
 
     token.transfer(feeBeneficiary, balanceToDistribute);
-    tokenState.toDistribute = 0;
+    tokenState.toDistribute = tokenState.toDistribute.sub(balanceToDistribute);
   }
 
   /**
@@ -464,9 +464,8 @@ contract FeeHandler is
     )];
     ICeloToken celo = ICeloToken(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
 
-    uint256 balanceOfCelo = IERC20(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)).balanceOf(
-      address(this)
-    );
+    uint256 balanceOfCelo = address(this).balance;
+
     uint256 balanceToProcess = balanceOfCelo.sub(tokenState.toDistribute);
     uint256 balanceToBurn = FixidityLib
       .newFixed(balanceToProcess)
