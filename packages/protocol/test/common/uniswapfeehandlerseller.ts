@@ -44,8 +44,7 @@ contract('UniswapFeeHandlerSeller', (accounts: string[]) => {
   describe('#setRouter()', () => {
     it('sets pool for exchange', async () => {
       await uniswapFeeHandlerSeller.setRouter(addressA, addressB)
-
-      assert(await uniswapFeeHandlerSeller.getRoutersForToken(addressA)[0], addressB)
+      assert((await uniswapFeeHandlerSeller.getRoutersForToken(addressA))[0], addressB)
     })
 
     it('only owner can setRouter', async () => {
