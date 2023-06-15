@@ -32,6 +32,7 @@ export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
   constructor(
     readonly enabled: boolean,
     readonly shouldFailOpen: boolean,
+    readonly timeoutMs: number,
     readonly kit: ContractKit
   ) {
     super(enabled)
@@ -76,7 +77,14 @@ export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
     warnings: ErrorType[],
     logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger, this.shouldFailOpen, warnings)
+    return authenticateUser(
+      request,
+      this.kit,
+      logger,
+      this.shouldFailOpen,
+      warnings,
+      this.timeoutMs
+    )
   }
 
   sendSuccess(
