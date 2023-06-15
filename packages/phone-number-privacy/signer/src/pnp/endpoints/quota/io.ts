@@ -27,8 +27,8 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   constructor(
     readonly enabled: boolean,
     readonly shouldFailOpen: boolean,
-    readonly kit: ContractKit,
-    readonly timeoutMs: number
+    readonly timeoutMs: number,
+    readonly kit: ContractKit
   ) {
     super(enabled)
   }

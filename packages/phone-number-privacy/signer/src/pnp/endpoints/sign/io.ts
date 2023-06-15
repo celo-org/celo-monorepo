@@ -31,8 +31,8 @@ export class PnpSignIO extends IO<SignMessageRequest> {
   constructor(
     readonly enabled: boolean,
     readonly shouldFailOpen: boolean,
-    readonly kit: ContractKit,
-    readonly timeoutMs: number
+    readonly timeoutMs: number,
+    readonly kit: ContractKit
   ) {
     super(enabled)
   }

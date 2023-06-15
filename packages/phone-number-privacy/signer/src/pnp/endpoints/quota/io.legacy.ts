@@ -28,8 +28,8 @@ export class LegacyPnpQuotaIO extends IO<LegacyPnpQuotaRequest> {
   constructor(
     readonly enabled: boolean,
     readonly shouldFailOpen: boolean,
-    readonly kit: ContractKit,
-    readonly timeoutMs: number
+    readonly timeoutMs: number,
+    readonly kit: ContractKit
   ) {
     super(enabled)
   }
