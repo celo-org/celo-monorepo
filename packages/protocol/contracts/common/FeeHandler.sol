@@ -71,7 +71,7 @@ contract FeeHandler is
   event DailyLimitSet(address tokenAddress, uint256 newLimit);
   event DailyLimitHit(address token, uint256 burning);
   event MaxSlippageSet(address token, uint256 maxSlippage);
-  event DailyLimitUpdated(uint256 amount);
+  event DailySellLimitUpdated(uint256 amount);
   event RouterAddressSet(address token, address router);
   event RouterAddressRemoved(address token, address router);
   event RouterUsed(address router);
@@ -97,9 +97,16 @@ contract FeeHandler is
     uint256[] calldata newLimits,
     uint256[] calldata newMaxSlippages
   ) external initializer {
-    require(tokens.length == handlers.length, "handlers length should match tokens");
-    require(tokens.length == newLimits.length, "limits length should match tokens");
-    require(tokens.length == newMaxSlippages.length, "maxSlippage length should match tokens");
+    require(tokens.length == handlers.length, "handlers length should match tokens length");
+    require(tokens.length == newLimits.length, "limits length should match tokens length");
+    require(
+      tokens.length == newMaxSlippages.length,
+      "maxSlippage length should match tokens length"
+    );
+    require(
+      tokens.length == newMaxSlippages.length,
+      "newMininumReports length should match tokens length"
+    );
 
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
@@ -111,11 +118,9 @@ contract FeeHandler is
       _setDailySellLimit(tokens[i], newLimits[i]);
       _setMaxSplippage(tokens[i], newMaxSlippages[i]);
     }
-    TokenState storage tokenState = tokenStates[registry.getAddressForOrDie(
-      GOLD_TOKEN_REGISTRY_ID
-    )];
   }
 
+  // Without this the contract cant receive Celo as native transfer
   function() external payable {}
 
   /**
@@ -214,7 +219,7 @@ contract FeeHandler is
     @dev Sets the burn fraction to the specified value. Token has to have a handler set.
     @param tokenAddress The address of the token to sell
   */
-  function sell(address tokenAddress) external {
+  function sell(address tokenAddress) external nonReentrant {
     return _sell(tokenAddress);
   }
 
@@ -247,7 +252,6 @@ contract FeeHandler is
 
   function _activateToken(address tokenAddress) private {
     activeTokens.add(tokenAddress);
-    TokenState storage tokenState = tokenStates[tokenAddress];
   }
 
   /**
@@ -260,7 +264,6 @@ contract FeeHandler is
 
   function _deactivateToken(address tokenAddress) private {
     activeTokens.remove(tokenAddress);
-    TokenState storage tokenState = tokenStates[tokenAddress];
   }
 
   /**
@@ -380,6 +383,10 @@ contract FeeHandler is
   function _setMaxSplippage(address token, uint256 newMax) private {
     TokenState storage tokenState = tokenStates[token];
     tokenState.maxSlippage = FixidityLib.wrap(newMax);
+    require(
+      FixidityLib.lte(tokenState.maxSlippage, FixidityLib.fixed1()),
+      "Splippage must be less than or equal to 1"
+    );
     emit MaxSlippageSet(token, newMax);
   }
 
@@ -520,7 +527,7 @@ contract FeeHandler is
       return;
     }
     tokenState.currentDaySellLimit = tokenState.currentDaySellLimit.sub(amountBurned);
-    emit DailyLimitUpdated(amountBurned);
+    emit DailySellLimitUpdated(amountBurned);
   }
 
   /**
