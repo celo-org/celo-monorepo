@@ -1,7 +1,6 @@
 import { ContractKit } from '@celo/contractkit'
 import {
   ErrorMessage,
-  FULL_NODE_TIMEOUT_IN_MS,
   getContractKit,
   loggerMiddleware,
   rootLogger,
@@ -99,8 +98,8 @@ export function startSigner(
       new PnpQuotaIO(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen, // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config to make the code cleaner
-        kit,
-        Number(config.blockchain.timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS)
+        config.fullNodeTimeoutMs,
+        kit
       )
     )
   )
@@ -113,8 +112,8 @@ export function startSigner(
       new PnpSignIO(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen,
-        kit,
-        Number(config.blockchain.timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS)
+        config.fullNodeTimeoutMs,
+        kit
       )
     )
   )
@@ -127,8 +126,8 @@ export function startSigner(
       new LegacyPnpSignIO(
         config.api.legacyPhoneNumberPrivacy.enabled,
         config.api.legacyPhoneNumberPrivacy.shouldFailOpen,
-        kit,
-        Number(config.blockchain.timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS)
+        config.fullNodeTimeoutMs,
+        kit
       )
     )
   )
@@ -139,8 +138,8 @@ export function startSigner(
       new LegacyPnpQuotaIO(
         config.api.legacyPhoneNumberPrivacy.enabled,
         config.api.legacyPhoneNumberPrivacy.shouldFailOpen,
-        kit,
-        Number(config.blockchain.timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS)
+        config.fullNodeTimeoutMs,
+        kit
       )
     )
   )

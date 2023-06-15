@@ -144,7 +144,6 @@ if (DEV_MODE) {
     blockchain: {
       provider: functionConfig.blockchain.provider,
       apiKey: functionConfig.blockchain.api_key,
-      timeout_ms: Number(functionConfig.blockchain.timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
     },
     phoneNumberPrivacy: {
       serviceName: functionConfig.pnp.service_name ?? defaultServiceName,
@@ -160,7 +159,7 @@ if (DEV_MODE) {
         currentVersion: Number(functionConfig.pnp_keys.current_version),
         versions: functionConfig.pnp_keys.versions,
       },
-      fullNodeTimeoutMs: Number(functionConfig.blockchain.timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
+      fullNodeTimeoutMs: Number(functionConfig.pnp.full_node_timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
     },
     domains: {
       serviceName: functionConfig.domains.service_name ?? defaultServiceName,
@@ -176,7 +175,7 @@ if (DEV_MODE) {
         currentVersion: Number(functionConfig.domains_keys.current_version),
         versions: functionConfig.domains_keys.versions,
       },
-      fullNodeTimeoutMs: Number(functionConfig.blockchain.timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
+      fullNodeTimeoutMs: Number(functionConfig.pnp.full_node_timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
     },
   }
 }
