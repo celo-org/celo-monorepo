@@ -215,6 +215,7 @@ jobs:
     # needs: [install-dependencies, lint-checks]
     needs: [install-dependencies]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
@@ -257,6 +258,7 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
@@ -289,6 +291,7 @@ jobs:
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
@@ -364,6 +367,7 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
@@ -392,6 +396,7 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, contractkit-tests]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
@@ -420,6 +425,7 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, contractkit-tests]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
@@ -453,6 +459,7 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/cli') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
@@ -493,6 +500,7 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
@@ -521,6 +529,7 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
@@ -555,6 +564,7 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
@@ -588,6 +598,7 @@ jobs:
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks, contractkit-tests]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/celotool') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
@@ -678,6 +689,7 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/phone-number-privacy') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
@@ -713,6 +725,7 @@ jobs:
     # Disable as certora license is not active
     if: |
       false && (
+        github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
         contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
         contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
         contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
