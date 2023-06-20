@@ -14,7 +14,7 @@ on:
 
 jobs:
   celocli-build-dev:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.1
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
     name: Build us-west1-docker.pkg.dev/devopsre/dev-images/celocli:testing
     if: |
       github.ref != 'refs/heads/master'
