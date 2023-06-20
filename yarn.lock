@@ -17309,10 +17309,10 @@ node-gyp-build@~3.7.0:
   resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-3.7.0.tgz#daa77a4f547b9aed3e2aac779eaf151afd60ec8d"
   integrity sha512-L/Eg02Epx6Si2NXmedx+Okg+4UHqmaf3TNcxd50SF9NQGcJaON3AtU++kax69XV7YWz4tUspqZSAsVofhFKG2w==
 
-node-gyp@5.0.1, node-gyp@8.x, node-gyp@^3.6.2, node-gyp@^4.0.0, node-gyp@^5.0.2, node-gyp@^8.0.0:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/node-gyp/-/node-gyp-5.0.1.tgz#db211e9c5d7f611e79d1dcbdc53bca646b99ae4c"
-  integrity sha512-D68549U6EDVJLrAkSOZCWX/nmlYo0eCX2dYZoTOOZJ7bEIFrSE/MQgsgMFBKjByJ323hNzkifw2OuT3A5bR5mA==
+node-gyp@6.0.0, node-gyp@8.x, node-gyp@^3.6.2, node-gyp@^4.0.0, node-gyp@^5.0.2, node-gyp@^8.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/node-gyp/-/node-gyp-6.0.0.tgz#30ca98d692b6ed18be5b92d065081c74fd230db7"
+  integrity sha512-Qz6Xda2bKzdsooXITarGf2uaCJcYh7ua+jeRMifBFmTz0peo0JW6IjpqELlX+ZiHXphsKzISgaCsZeQch5a+NA==
   dependencies:
     env-paths "^1.0.0"
     glob "^7.0.3"
@@ -17323,7 +17323,7 @@ node-gyp@5.0.1, node-gyp@8.x, node-gyp@^3.6.2, node-gyp@^4.0.0, node-gyp@^5.0.2,
     request "^2.87.0"
     rimraf "2"
     semver "~5.3.0"
-    tar "^4.4.8"
+    tar "^4.4.12"
     which "1"
 
 node-hid@2.1.1:
@@ -22174,7 +22174,7 @@ tar-stream@^2.2.0:
     inherits "^2.0.3"
     readable-stream "^3.1.1"
 
-tar@4.4.15, tar@^4, tar@^4.0.2, tar@^4.3.0, tar@^4.4.0, tar@^4.4.10, tar@^4.4.2, tar@^4.4.3, tar@^4.4.8, tar@^6.1.11:
+tar@4.4.15, tar@^4, tar@^4.0.2, tar@^4.3.0, tar@^4.4.0, tar@^4.4.10, tar@^4.4.12, tar@^4.4.2, tar@^4.4.3, tar@^4.4.8, tar@^6.1.11:
   version "4.4.15"
   resolved "https://registry.yarnpkg.com/tar/-/tar-4.4.15.tgz#3caced4f39ebd46ddda4d6203d48493a919697f8"
   integrity sha512-ItbufpujXkry7bHH9NpQyTXPbJ72iTlXgkBAYsAjDXk3Ds8t/3NfO5P4xZGy7u+sYuQUbimgzswX4uQIEeNVOA==
