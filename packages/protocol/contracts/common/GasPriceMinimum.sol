@@ -28,7 +28,7 @@ contract GasPriceMinimum is
   event GasPriceMinimumUpdated(uint256 gasPriceMinimum);
   event BaseFeeOpCodeActivationBlockSet(uint256 baseFeeOpCodeActivationBlock);
 
-  uint256 public gasPriceMinimum;
+  uint256 public deprecated_gasPriceMinimum;
   uint256 public gasPriceMinimumFloor;
 
   // Block congestion level targeted by the gas price minimum calculation.
@@ -73,7 +73,7 @@ contract GasPriceMinimum is
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
-    gasPriceMinimum = _gasPriceMinimumFloor;
+    deprecated_gasPriceMinimum = _gasPriceMinimumFloor;
     setGasPriceMinimumFloor(_gasPriceMinimumFloor);
     setTargetDensity(_targetDensity);
     setAdjustmentSpeed(_adjustmentSpeed);
@@ -142,23 +142,25 @@ contract GasPriceMinimum is
     emit BaseFeeOpCodeActivationBlockSet(_baseFeeOpCodeActivationBlock);
   }
 
+  function gasPriceMinimum() public view returns (uint256) {
+    if (baseFeeOpCodeActivationBlock > 0 && block.number >= baseFeeOpCodeActivationBlock) {
+      return block.basefee;
+    } else {
+      return deprecated_gasPriceMinimum;
+    }
+  }
+
   /**
    * @notice Retrieve the current gas price minimum for a currency.
    * @param tokenAddress The currency the gas price should be in (defaults to gold).
    * @return current gas price minimum in the requested currency
    */
   function getGasPriceMinimum(address tokenAddress) external view returns (uint256) {
-    uint256 _gasPriceMinimum;
-    if (baseFeeOpCodeActivationBlock > 0 && block.number >= baseFeeOpCodeActivationBlock) {
-      _gasPriceMinimum = block.basefee;
-    } else {
-      _gasPriceMinimum = gasPriceMinimum;
-    }
     if (
       tokenAddress == address(0) ||
       tokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)
     ) {
-      return _gasPriceMinimum;
+      return gasPriceMinimum();
     } else {
       ISortedOracles sortedOracles = ISortedOracles(
         registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
@@ -166,7 +168,7 @@ contract GasPriceMinimum is
       uint256 rateNumerator;
       uint256 rateDenominator;
       (rateNumerator, rateDenominator) = sortedOracles.medianRate(tokenAddress);
-      return ((_gasPriceMinimum * rateNumerator) / rateDenominator);
+      return ((gasPriceMinimum() * rateNumerator) / rateDenominator);
     }
   }
 
@@ -182,9 +184,9 @@ contract GasPriceMinimum is
     onlyVm
     returns (uint256)
   {
-    gasPriceMinimum = getUpdatedGasPriceMinimum(blockGasTotal, blockGasLimit);
-    emit GasPriceMinimumUpdated(gasPriceMinimum);
-    return gasPriceMinimum;
+    deprecated_gasPriceMinimum = getUpdatedGasPriceMinimum(blockGasTotal, blockGasLimit);
+    emit GasPriceMinimumUpdated(deprecated_gasPriceMinimum);
+    return deprecated_gasPriceMinimum;
   }
 
   /**
@@ -213,15 +215,8 @@ contract GasPriceMinimum is
       ? FixidityLib.fixed1().add(adjustmentSpeed.multiply(densityDelta))
       : FixidityLib.fixed1().subtract(adjustmentSpeed.multiply(densityDelta));
 
-    uint256 _gasPriceMinimum;
-    if (baseFeeOpCodeActivationBlock > 0 && block.number >= baseFeeOpCodeActivationBlock) {
-      _gasPriceMinimum = block.basefee;
-    } else {
-      _gasPriceMinimum = gasPriceMinimum;
-    }
-
     uint256 newGasPriceMinimum = adjustment
-      .multiply(FixidityLib.newFixed(_gasPriceMinimum))
+      .multiply(FixidityLib.newFixed(gasPriceMinimum()))
       .add(FixidityLib.fixed1())
       .fromFixed();
 
