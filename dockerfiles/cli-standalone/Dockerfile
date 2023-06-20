@@ -26,3 +26,4 @@ RUN celocli config:set --node https://forno.celo.org
 
 ENTRYPOINT ["celocli"]
 CMD ["--help"]
+
