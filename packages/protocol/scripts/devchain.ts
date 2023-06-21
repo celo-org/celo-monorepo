@@ -1,7 +1,7 @@
-import ganache from '@celo/ganache-cli'
-import chalk from 'chalk'
 import { spawn, SpawnOptions } from 'child_process'
 import fs from 'fs-extra'
+// @ts-ignore
+import ganache from 'ganache'
 import path from 'path'
 import targz from 'targz'
 import tmp from 'tmp'
@@ -134,31 +134,30 @@ async function startGanache(
     allowUnlimitedContractSize: true,
   })
 
-  await new Promise((resolve, reject) => {
-    server.listen(8545, (err, blockchain) => {
+  await new Promise<void>((resolve, reject) => {
+    server.listen(8545, async (err) => {
       if (err) {
         reject(err)
       } else {
         // tslint:disable-next-line: no-console
-        console.log(chalk.red('Ganache STARTED'))
+        console.log('Ganache STARTED')
         // console.log(blockchain)
-        resolve(blockchain)
+        resolve()
       }
     })
   })
 
   return () =>
-    new Promise<void>((resolve, reject) => {
-      server.close((err) => {
+    new Promise<void>(async (resolve, reject) => {
+      try {
+        await server.close()
         if (chainCopy) {
           chainCopy.removeCallback()
         }
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      })
+        resolve()
+      } catch (e) {
+        reject(e)
+      }
     })
 }
 
