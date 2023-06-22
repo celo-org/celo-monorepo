@@ -40,7 +40,8 @@
     "truffle:migrate": "truffle migrate",
     "devchain": "ts-node scripts/devchain.ts",
     "view-tags": "git for-each-ref 'refs/tags/core-contracts.*' --sort=-committerdate --format='%(color:magenta)%(committerdate:short) %(color:blue)%(tree) %(color:green)github.com/celo-org/celo-monorepo/releases/tag/%(color:yellow)%(refname:short)'",
-    "generate-stabletoken-files": "ts-node ./scripts/generate-stabletoken-files.ts"
+    "generate-stabletoken-files": "ts-node ./scripts/generate-stabletoken-files.ts",
+    "truffle-verify": "yarn truffle run verify"
   },
   "dependencies": {
     "@0x/sol-compiler": "^4.8.3",
@@ -115,6 +116,7 @@
     "ts-node": "8.3.0",
     "typechain": "1.0.5",
     "typechain-target-truffle": "1.0.2",
-    "yargs": "^14.0.0"
+    "yargs": "^14.0.0",
+    "truffle-plugin-verify": "^0.6.3"
   }
 }

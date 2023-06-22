@@ -13,6 +13,8 @@ const argv = require('minimist')(process.argv.slice(2), {
   boolean: ['reset'],
 })
 
+const { celoScanApiKey } = require('./.env.json')
+
 const SOLC_VERSION = '0.5.13'
 const ALFAJORES_NETWORKID = 44787
 const BAKLAVA_NETWORKID = 62320
@@ -214,7 +216,10 @@ if (process.argv.includes('--forno')) {
 }
 
 module.exports = {
-  plugins: ['truffle-security', 'truffle-plugin-blockscout-verify'],
+  plugins: ['truffle-plugin-verify'],
+  api_keys: {
+    celoscan: celoScanApiKey,
+  },
   compilers: {
     solc: {
       version: SOLC_VERSION,
@@ -239,7 +244,10 @@ if (process.argv.includes('--gas')) {
         },
       },
     },
-    plugins: ['truffle-security', 'truffle-plugin-blockscout-verify'],
+    plugins: ['truffle-plugin-verify'],
+    api_keys: {
+      celoscan: celoScanApiKey,
+    },
     networks,
     reporter: 'eth-gas-reporter',
     reporterOptions: {

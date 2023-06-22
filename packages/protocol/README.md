@@ -133,4 +133,17 @@ Compared to the normal test command, quicktest will:
 1. Not run the pretest script of building solidity (will still be run as part of truffle test) and compiling typescript. This works because truffle can run typescript "natively".
 2. Only migrate selected migrations as set in `backupmigrations.sh` (you'll likely need at least one compilation step since truffle seems to only run compiled migrations)
 
+## Verify released smart contracts
+1. Update CeloScanApi in env.json file
+2. Run verification command
+
+```bash
+yarn truffle-verify [ContractName]@[Contract address]  --network [network]
+```
+
+example:
+```bash
+yarn truffle-verify Reserve@0x907f37a0e9b003df15500c025f7acb496a726aa0  --network mainnet 
+```
+
 
