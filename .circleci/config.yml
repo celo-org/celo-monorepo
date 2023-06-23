@@ -2,9 +2,12 @@
 # and https://github.com/facebook/react-native/blob/master/.circleci/config.yml
 
 version: 2.1
-
+setup: true
 
 parameters:
+  run-workflow:
+    type: boolean
+    default: false 
   # When you need to force a rebuild of the node modules cache then bump this version
   node-modules-cache-version:
     type: integer
@@ -891,6 +894,9 @@ jobs:
 workflows:
   version: 2
   celo-monorepo-build:
+    # Contitionally triggered
+    when: 
+      or: [<< pipeline.parameters.run-workflow >>]
     jobs:
       - install_dependencies
       - certora-test:
@@ -1013,9 +1019,9 @@ workflows:
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
-          # 7 PM in UTC = noon in PDT.
-          # Best for test to fail during SF afternoon, so that, someone can fix it during the day time.
-          cron: '0 19 * * *'
+          # cron: '0 19 * * *'
+          # Feb 30th to disable
+          cron: '0 19 30 2 *'
           filters:
             branches:
               only:
@@ -1028,9 +1034,8 @@ workflows:
   protocol-testing-with-code-coverage-cron-workflow:
     triggers:
       - schedule:
-          # 1 PM in UTC = 6 AM in PDT.
-          # Best for this slow test (~3 hours) to run during SF early morning.
-          cron: '0 13 * * *'
+          # Feb 30th to disable
+          cron: '0 13 30 2 *'
           filters:
             branches:
               only:
