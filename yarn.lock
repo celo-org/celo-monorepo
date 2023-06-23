@@ -12667,10 +12667,10 @@ ganache-core@^2.6.0:
     ethereumjs-wallet "0.6.4"
     web3 "1.2.4"
 
-"ganache@npm:@celo/ganache@7.0.0-beta.0":
-  version "7.0.0-beta.0"
-  resolved "https://registry.yarnpkg.com/@celo/ganache/-/ganache-7.0.0-beta.0.tgz#d8404048b9748231b77be69339c2a7a9f4399e71"
-  integrity sha512-uc06q25y5vgoiFeIQ9CyLkGWH21PTBAAMZ+xqq3JrBNFfx3nHKp8xO9zPzjblSSah2ffoYPsG25oF/PPchKP9g==
+"ganache@npm:@celo/ganache@7.0.0-beta.2":
+  version "7.0.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@celo/ganache/-/ganache-7.0.0-beta.2.tgz#b838100d28c5c6a3888f937bbc0e16b27321a674"
+  integrity sha512-pNkLZQm1hmFutOHnC5lXJDSLg8tXl2RE6tWMGZMhFyB4hOvQTPPJNdZLVNQPvR1RLPHkkMdynKOdaNUGTXQzFQ==
   dependencies:
     "@trufflesuite/bigint-buffer" "1.1.9"
     emittery "0.10.0"
