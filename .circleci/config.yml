@@ -6,14 +6,14 @@ setup: true
 
 parameters:
   run-workflow-general:
-    type: string
-    default: "false" 
+    type: boolean
+    default: false 
   run-workflow-npm-install:
-    type: string
-    default: "false" 
+    type: boolean
+    default: false 
   run-workflow-protocol-coverage:
-    type: string
-    default: "false" 
+    type: boolean
+    default: false 
   # When you need to force a rebuild of the node modules cache then bump this version
   node-modules-cache-version:
     type: integer
@@ -902,9 +902,7 @@ workflows:
   celo-monorepo-build:
     # Contitionally triggered
     when: 
-      matches:
-        pattern: "^(true|True|yes|Yes|Y|y)$"
-        value: << pipeline.parameters.run-workflow-general >>
+      or: [<< pipeline.parameters.run-workflow-general >>]
     jobs:
       - install_dependencies
       - certora-test:
@@ -1027,9 +1025,7 @@ workflows:
   npm-install-testing-cron-workflow:
     # Contitionally triggered
     when: 
-      matches:
-        pattern: "^(true|True|yes|Yes|Y|y)$"
-        value: << pipeline.parameters.run-workflow-npm-install >>
+      or: [<< pipeline.parameters.run-workflow-npm-install >>]
     jobs:
       - test-typescript-npm-package-install
       - test-utils-npm-package-install
@@ -1037,9 +1033,7 @@ workflows:
       - test-celocli-npm-package-install
   protocol-testing-with-code-coverage-cron-workflow:
     when: 
-      matches:
-        pattern: "^(true|True|yes|Yes|Y|y)$"
-        value: << pipeline.parameters.run-workflow-protocol-coverage >>
+      or: [<< pipeline.parameters.run-workflow-protocol-coverage >>]
     jobs:
       - install_dependencies
       - lint-checks:
