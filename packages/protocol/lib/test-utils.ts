@@ -165,12 +165,19 @@ export async function exec(command: string, args: string[]) {
     const proc = spawn(command, args, {
       stdio: [process.stdout, process.stderr],
     })
+    const dataGlobal = [];
+
     proc.on('error', (error: any) => {
       reject(error)
     })
+
+    proc.stderr.on('data', (data: any) => {
+      dataGlobal.push(data.toString())
+    })
+
     proc.on('exit', (code: any) => {
       if (code !== 0) {
-        reject(code)
+        reject({code, stout: dataGlobal.join(" ")})
       } else {
         resolve()
       }

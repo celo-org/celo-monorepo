@@ -1572,15 +1572,28 @@ contract Governance is
       uint256 sumOfVotes = voteRecord.yesVotes.add(voteRecord.noVotes).add(voteRecord.abstainVotes);
 
       if (sumOfVotes > newVotingPower) {
-        uint256 toRemove = sumOfVotes - newVotingPower;
+        uint256 toRemove = sumOfVotes.sub(newVotingPower);
 
         uint256 abstrainToRemove = getVotesPortion(toRemove, voteRecord.abstainVotes, sumOfVotes);
         uint256 yesToRemove = getVotesPortion(toRemove, voteRecord.yesVotes, sumOfVotes);
         uint256 noToRemove = getVotesPortion(toRemove, voteRecord.noVotes, sumOfVotes);
 
-        voteRecord.abstainVotes = voteRecord.abstainVotes.sub(abstrainToRemove);
-        voteRecord.yesVotes = voteRecord.yesVotes.sub(yesToRemove);
-        voteRecord.noVotes = voteRecord.noVotes.sub(noToRemove);
+        uint256 yesVotes = voteRecord.yesVotes.sub(yesToRemove);
+        uint256 noVotes = voteRecord.noVotes.sub(noToRemove);
+        uint256 abstainVotes = voteRecord.abstainVotes.sub(abstrainToRemove);
+
+        proposal.updateVote(
+          voteRecord.yesVotes,
+          voteRecord.noVotes,
+          voteRecord.abstainVotes,
+          yesVotes,
+          noVotes,
+          abstainVotes
+        );
+
+        voteRecord.abstainVotes = abstainVotes;
+        voteRecord.yesVotes = yesVotes;
+        voteRecord.noVotes = noVotes;
       }
     }
   }

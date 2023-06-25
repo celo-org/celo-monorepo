@@ -4029,6 +4029,9 @@ contract('Governance', (accounts: string[]) => {
 
           await assertVoteRecord(governance, account, index, proposalId, yes, no, abstain)
           await assertVoteRecord(governance, account, index2, proposal2Id, yes2, no2, abstain2)
+
+          await assertVotesTotal(governance, proposalId, yes, no, abstain)
+          await assertVotesTotal(governance, proposal2Id, yes2, no2, abstain2)
         })
 
         it('should adjust votes correctly to 0', async () => {
@@ -4038,6 +4041,9 @@ contract('Governance', (accounts: string[]) => {
 
           await assertVoteRecord(governance, account, index, proposalId, 0, 0, 0)
           await assertVoteRecord(governance, account, index2, proposal2Id, 0, 0, 0)
+
+          await assertVotesTotal(governance, proposalId, 0, 0, 0)
+          await assertVotesTotal(governance, proposal2Id, 0, 0, 0)
         })
 
         it('should adjust votes correctly to 30', async () => {
@@ -4047,6 +4053,9 @@ contract('Governance', (accounts: string[]) => {
 
           await assertVoteRecord(governance, account, index, proposalId, maxAmount, 0, 0)
           await assertVoteRecord(governance, account, index2, proposal2Id, 0, maxAmount, 0)
+
+          await assertVotesTotal(governance, proposalId, maxAmount, 0, 0)
+          await assertVotesTotal(governance, proposal2Id, 0, maxAmount, 0)
         })
       })
 
@@ -4142,4 +4151,17 @@ async function assertVoteRecord(
   assertEqualBN(yesVotesRecord2, assertYes)
   assertEqualBN(noVotesRecord2, assertNo)
   assertEqualBN(abstainVotesRecord2, asssertAbstain)
+}
+
+async function assertVotesTotal(
+  governance: GovernanceTestInstance,
+  proposalId: number,
+  assertYes: number,
+  assertNo: number,
+  assertAbstain: number
+) {
+  const [yesVotes, noVotes, abstainVotes] = await governance.getVoteTotals(proposalId)
+  assertEqualBN(yesVotes, assertYes)
+  assertEqualBN(noVotes, assertNo)
+  assertEqualBN(abstainVotes, assertAbstain)
 }

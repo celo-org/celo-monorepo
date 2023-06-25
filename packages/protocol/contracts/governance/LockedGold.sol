@@ -450,7 +450,7 @@ contract LockedGold is
         currentDelegateeInfo.currentAmount
       );
 
-    uint256 unusedReferendumVotes = delegateeTotalVotingPower - totalReferendumVotes;
+    uint256 unusedReferendumVotes = delegateeTotalVotingPower.sub(totalReferendumVotes);
     if (unusedReferendumVotes < amountToRevoke) {
       getGovernance().removeVotesWhenRevokingDelegatedVotes(
         delegateeAccount,
@@ -585,7 +585,7 @@ contract LockedGold is
     address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
     address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
 
-    DelegatedInfo storage currentDelegateeInfo = delegatorInfo[delegator]
+    DelegatedInfo storage currentDelegateeInfo = delegatorInfo[delegatorAccount]
       .delegateesWithPercentagesAndAmount[delegateeAccount];
 
     uint256 amountToDelegate = FixidityLib
