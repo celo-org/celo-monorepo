@@ -36,6 +36,7 @@ git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 echo "- Build monorepo (contract artifacts, migrations, + all dependencies)"
 cd ../..
 # TODO: use `yarn clean` after release v8 (not available at monorepo-root for <=v8)
+yarn run reset >> $LOG_FILE
 yarn run lerna run clean >> $LOG_FILE
 # build entire monorepo to account for any required dependencies.
 yarn install >> $LOG_FILE
