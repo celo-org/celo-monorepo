@@ -37,6 +37,7 @@ echo "- Build monorepo (contract artifacts, migrations, + all dependencies)"
 cd ../..
 # TODO: use `yarn clean` after release v8 (not available at monorepo-root for <=v8)
 yarn run lerna run clean >> $LOG_FILE
+yarn run reset >> $LOG_FILE
 # build entire monorepo to account for any required dependencies.
 yarn install >> $LOG_FILE
 # in release v8 and earlier, @celo/contractkit automatically uses set RELEASE_TAG
