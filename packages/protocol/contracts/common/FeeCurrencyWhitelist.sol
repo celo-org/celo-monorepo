@@ -20,8 +20,6 @@ contract FeeCurrencyWhitelist is
 {
   // Array of all the tokens enabled
   address[] public whitelist;
-  // Array of all the non-Mento tokens enabled
-  address[] public nonMentoTokenWhitelist;
 
   event FeeCurrencyWhitelisted(address token);
 
@@ -79,12 +77,5 @@ contract FeeCurrencyWhitelist is
    */
   function getWhitelist() external view returns (address[] memory) {
     return whitelist;
-  }
-
-  /**
-   * @return a list of all tokens enabled as gas fee currency.
-   */
-  function getWhitelistNonMento() external view returns (address[] memory) {
-    return nonMentoTokenWhitelist;
   }
 }
