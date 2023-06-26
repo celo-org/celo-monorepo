@@ -2590,17 +2590,15 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe.only('when proposal is approved with signer', () => {
+    describe('when proposal is approved with signer', () => {
       let accountSigner
 
       beforeEach(async () => {
-        console.log('a')
         ;[accountSigner] = await createAndAssertDelegatorDelegateeSigners(
           accountsInstance,
           accounts,
           account
         )
-        console.log('b')
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
