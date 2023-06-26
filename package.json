@@ -2,7 +2,7 @@
   "name": "celo",
   "version": "1.0.0",
   "author": "Celo",
-  "license": "SEE LICENSE IN SUB-PACKAGES",
+  "license": "SEE LICENSE IN SUB-PACKAGES.",
   "private": true,
   "scripts": {
     "install-pkg": "yarn install --link-duplicates",
