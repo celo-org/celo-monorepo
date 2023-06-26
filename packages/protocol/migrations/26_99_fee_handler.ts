@@ -8,7 +8,7 @@ import { toFixed } from '@celo/utils/lib/fixidity'
 import { FeeHandlerInstance, MentoFeeHandlerSellerInstance } from 'types'
 import { StableTokenInstance } from 'types/mento'
 import { MENTO_PACKAGE } from '../contractPackages'
-import { ArtifactsSingleton } from './artifactsSingleton'
+import { ArtifactsSingleton } from '../lib/artifactsSingleton'
 
 const initializeArgs = async () => {
   return [
