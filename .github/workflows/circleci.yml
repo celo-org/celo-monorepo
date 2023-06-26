@@ -8,6 +8,8 @@ on:
   push:
     branches:
       - master
+      # TODO: Remove this before merging
+      - soloseng/ganache-upgrade
   pull_request:
     branches:
       - master
@@ -240,9 +242,9 @@ jobs:
           key: protocol-${{ github.sha }}
           restore-keys: |
             protocol-${{ github.sha }}
-      - name: Switch to node12
-        run: |
-          nvm use 12
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 12.22.11
       - name: Build using node12
         run: |
           yarn install
