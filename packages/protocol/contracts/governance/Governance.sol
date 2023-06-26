@@ -1512,7 +1512,7 @@ contract Governance is
       !isQueuedProposalExpired(upvotedProposalId);
 
     if (isVotingQueue) {
-      uint256 weight = getLockedGold().getAccountTotalGovernanceVotingPower(account);
+      uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
       return weight;
     }
 

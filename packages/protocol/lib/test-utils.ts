@@ -11,7 +11,7 @@ import chai from 'chai'
 import chaiSubset from 'chai-subset'
 import { SpawnOptions, spawn } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
-import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
+import { AccountsInstance, GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
 import Web3 from 'web3'
 import { ContractPackage, MENTO_PACKAGE } from '../contractPackages'
 
@@ -628,9 +628,53 @@ export const unlockAndAuthorizeKey = async (offset: number, authorizeFn: any, ac
   await web3.eth.personal.unlockAccount(addr, 'passphrase', 1000000)
 
   const signature = await getParsedSignatureOfAddress(web3, account, addr)
-  return authorizeFn(addr, signature.v, signature.r, signature.s, {
+  await authorizeFn(addr, signature.v, signature.r, signature.s, {
     from: account,
   })
+
+  return addr
+}
+
+export const authorizeAndGenerateVoteSigner = async (accountsInstance: AccountsInstance, account: string, accounts: string[]) => {
+  const roleHash = keccak256('celo.org/core/vote')
+  const role = '0x' + roleHash.toString('hex')
+  
+  const signer = await unlockAndAuthorizeKey(
+    KeyOffsets.VALIDATING_KEY_OFFSET,
+    accountsInstance.authorizeVoteSigner,
+    account,
+    accounts
+  )
+
+  await accountsInstance.completeSignerAuthorization(account, role, { from: signer })
+
+  return signer;
+}
+
+export async function createAndAssertDelegatorDelegateeSigners(accountsInstance: AccountsInstance, accounts: string[], delegator: string, delegatee?: string) {
+  let delegatorSigner
+  let delegateeSigner;
+
+  if (delegator != null) {
+    delegatorSigner = await authorizeAndGenerateVoteSigner(
+      accountsInstance,
+      delegator,
+      accounts
+    )
+    assert.notEqual(delegator, delegatorSigner)
+    assert.equal(await accountsInstance.voteSignerToAccount(delegatorSigner), delegator)
+  }
+
+  if (delegatee != null) {
+    delegateeSigner = await authorizeAndGenerateVoteSigner(
+      accountsInstance,
+      delegatee,
+      accounts
+    )
+    assert.notEqual(delegatee, delegateeSigner)
+    assert.equal(await accountsInstance.voteSignerToAccount(delegateeSigner), delegatee)
+  }
+  return [delegatorSigner, delegateeSigner]
 }
 
 export async function assertDelegatorDelegateeAmounts(

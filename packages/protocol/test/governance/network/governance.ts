@@ -7,6 +7,7 @@ import {
   assertLogMatches2,
   assertRevert,
   assertRevertWithReason,
+  createAndAssertDelegatorDelegateeSigners,
   matchAny,
   mineToNextEpoch,
   stripHexEncoding,
@@ -1985,6 +1986,90 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
+    describe('When proposal is approved and have signer', () => {
+      let accountSigner
+      beforeEach(async () => {
+        ;[accountSigner] = await createAndAssertDelegatorDelegateeSigners(
+          accountsInstance,
+          accounts,
+          account
+        )
+
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(dequeueFrequency, web3)
+        await governance.approve(proposalId, index)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
+      })
+
+      it('should return true', async () => {
+        const success = await governance.vote.call(proposalId, index, value, {
+          from: accountSigner,
+        })
+        assert.isTrue(success)
+      })
+
+      it('should increment the vote totals', async () => {
+        await governance.vote(proposalId, index, value, { from: accountSigner })
+        const [yes, ,] = await governance.getVoteTotals(proposalId)
+        assert.equal(yes.toNumber(), yesVotes)
+      })
+
+      it("should set the voter's vote record", async () => {
+        await governance.vote(proposalId, index, value, { from: accountSigner })
+        const [
+          recordProposalId,
+          ,
+          ,
+          yesVotesRecord,
+          noVotesRecord,
+          abstainVotesRecord,
+        ] = await governance.getVoteRecord(account, index)
+        assertEqualBN(recordProposalId, proposalId)
+        assertEqualBN(yesVotesRecord, yesVotes)
+        assertEqualBN(noVotesRecord, 0)
+        assertEqualBN(abstainVotesRecord, 0)
+      })
+
+      it('should set the most recent referendum proposal voted on', async () => {
+        await governance.vote(proposalId, index, value, { from: accountSigner })
+        assert.equal(
+          (await governance.getMostRecentReferendumProposal(account)).toNumber(),
+          proposalId
+        )
+      })
+
+      it('should emit the ProposalVotedV2 event', async () => {
+        await governance.dequeueProposalsIfReady()
+        const resp = await governance.vote(proposalId, index, value, { from: accountSigner })
+        assert.equal(resp.logs.length, resp.logs.length)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'ProposalVotedV2',
+          args: {
+            proposalId: new BigNumber(proposalId),
+            account,
+            yesVotes,
+            noVotes: 0,
+            abstainVotes: 0,
+          },
+        })
+      })
+
+      it('should revert when the account weight is 0', async () => {
+        await mockLockedGold.setAccountTotalGovernancePower(account, 0)
+        await assertRevert(governance.vote(proposalId, index, value, { from: accountSigner }))
+      })
+    })
+
     describe('when proposal is not approved', () => {
       beforeEach(async () => {
         await governance.propose(
@@ -2502,6 +2587,138 @@ contract('Governance', (accounts: string[]) => {
             },
           })
         })
+      })
+    })
+
+    describe.only('when proposal is approved with signer', () => {
+      let accountSigner
+
+      beforeEach(async () => {
+        console.log('a')
+        ;[accountSigner] = await createAndAssertDelegatorDelegateeSigners(
+          accountsInstance,
+          accounts,
+          account
+        )
+        console.log('b')
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(dequeueFrequency, web3)
+        await governance.approve(proposalId, index)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
+      })
+
+      it('should return true', async () => {
+        const success = await governance.votePartially.call(proposalId, index, yesVotes, 0, 0, {
+          gas: 7000000,
+          from: accountSigner,
+        })
+        assert.isTrue(success)
+      })
+
+      it('should increment the vote totals', async () => {
+        await governance.votePartially(proposalId, index, yesVotes, 0, 0, { from: accountSigner })
+        const [yes, ,] = await governance.getVoteTotals(proposalId)
+        assert.equal(yes.toNumber(), yesVotes)
+      })
+
+      it('should increment the vote totals when voting partially', async () => {
+        const yes = 10
+        const no = 50
+        const abstain = 30
+        await governance.votePartially(proposalId, index, yes, no, abstain, { from: accountSigner })
+        const [yesTotal, noTotal, abstainTotal] = await governance.getVoteTotals(proposalId)
+        assert.equal(yesTotal.toNumber(), yes)
+        assert.equal(noTotal.toNumber(), no)
+        assert.equal(abstainTotal.toNumber(), abstain)
+      })
+
+      it("should set the voter's vote record", async () => {
+        await governance.votePartially(proposalId, index, yesVotes, 0, 0, { from: accountSigner })
+        const [recordProposalId, , , yesVotesRecord] = await governance.getVoteRecord(
+          account,
+          index
+        )
+        assertEqualBN(recordProposalId, proposalId)
+        assertEqualBN(yesVotesRecord, yesVotes)
+      })
+
+      it('should set the most recent referendum proposal voted on', async () => {
+        await governance.votePartially(proposalId, index, yesVotes, 0, 0, { from: accountSigner })
+        assert.equal(
+          (await governance.getMostRecentReferendumProposal(account)).toNumber(),
+          proposalId
+        )
+      })
+
+      it('should emit the ProposalVotedV2 event', async () => {
+        const resp = await governance.votePartially(proposalId, index, yesVotes, 0, 0, {
+          from: accountSigner,
+        })
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'ProposalVotedV2',
+          args: {
+            proposalId: new BigNumber(proposalId),
+            account,
+            yesVotes,
+            noVotes: 0,
+            abstainVotes: 0,
+          },
+        })
+      })
+
+      it('should revert when the account weight is 0', async () => {
+        await mockLockedGold.setAccountTotalGovernancePower(account, 0)
+        await assertRevert(
+          governance.votePartially(proposalId, index, yesVotes, 0, 0, { from: accountSigner })
+        )
+      })
+
+      it('should revert when the account does not have enough gold', async () => {
+        await assertRevert(
+          governance.votePartially(proposalId, index, yesVotes + 1, 0, 0, { from: accountSigner })
+        )
+      })
+
+      it('should revert when the account does not have enough gold when voting partially', async () => {
+        const noVotes = yesVotes
+        await assertRevert(
+          governance.votePartially(proposalId, index, yesVotes, noVotes, 0, { from: accountSigner })
+        )
+      })
+
+      it('should revert when the index is out of bounds', async () => {
+        await assertRevert(
+          governance.votePartially(proposalId, index + 1, yesVotes, 0, 0, { from: accountSigner })
+        )
+      })
+
+      it('should revert if the proposal id does not match the index', async () => {
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(dequeueFrequency, web3)
+        const otherProposalId = 2
+        await assertRevert(
+          governance.votePartially(otherProposalId, index, yesVotes, 0, 0, { from: accountSigner })
+        )
       })
     })
 
@@ -3947,7 +4164,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
-        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
+        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
         await governance.upvote(proposalId1, 0, 0)
       })
 

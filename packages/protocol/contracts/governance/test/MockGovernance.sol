@@ -29,4 +29,26 @@ contract MockGovernance is IGovernance {
   {
     removeVotesCalledFor[account] = maxAmountAllowed;
   }
+
+  function votePartially(
+    uint256 proposalId,
+    uint256 index,
+    uint256 yesVotes,
+    uint256 noVotes,
+    uint256 abstainVotes
+  ) external returns (bool) {
+    return true;
+  }
+
+  function getProposal(uint256 proposalId)
+    external
+    view
+    returns (address, uint256, uint256, uint256, string memory, uint256, bool)
+  {
+    return (address(0), 0, 0, 0, "", 0, false);
+  }
+
+  function getReferendumStageDuration() external view returns (uint256) {
+    return 0;
+  }
 }
