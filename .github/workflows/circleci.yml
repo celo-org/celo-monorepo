@@ -240,6 +240,13 @@ jobs:
           key: protocol-${{ github.sha }}
           restore-keys: |
             protocol-${{ github.sha }}
+      - name: Switch to node 12
+        run: |
+          nvm use 12
+      - name: Build using node 12
+        run: |
+          yarn install
+          yarn build --ignore docs --include-dependencies
       - name: Opcode tests
         run: |
           yarn --cwd packages/protocol check-opcodes
