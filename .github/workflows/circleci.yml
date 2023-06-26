@@ -246,6 +246,7 @@ jobs:
           node-version: 12.22.11
       - name: Build using node12
         run: |
+          yarn run reset && yarn run clean
           yarn install
           yarn build --ignore docs --include-dependencies
       - name: Opcode tests
