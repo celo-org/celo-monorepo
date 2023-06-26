@@ -1111,7 +1111,6 @@ contract('LockedGold', (accounts: string[]) => {
           beforeEach(async () => {
             await lockedGold.lock({ value, from: delegator })
             await lockedGold.lock({ value, from: delegator2 })
-
             ;[delegatorSigner, delegateeSigner1] = await createAndAssertDelegatorDelegateeSigners(
               accountsInstance,
               accounts,
@@ -1792,7 +1791,6 @@ contract('LockedGold', (accounts: string[]) => {
 
           await lockedGold.lock({ value, from: delegator })
           await lockedGold.lock({ value, from: delegator2 })
-
           ;[delegatorSigner, delegatee1Signer] = await createAndAssertDelegatorDelegateeSigners(
             accountsInstance,
             accounts,
