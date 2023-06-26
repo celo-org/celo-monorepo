@@ -10,6 +10,7 @@ import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
+
 contract GoldToken is
   Initializable,
   CalledByVm,
