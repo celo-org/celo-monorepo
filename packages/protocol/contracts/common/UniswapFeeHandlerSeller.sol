@@ -17,6 +17,9 @@ import "./FeeHandlerSeller.sol";
 import "../uniswap/interfaces/IUniswapV2RouterMin.sol";
 import "../uniswap/interfaces/IUniswapV2FactoryMin.sol";
 
+// An implementation of FeeHandlerSeller supporting interfaces compatible with
+// Uniswap V2 API
+// See https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md
 contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;

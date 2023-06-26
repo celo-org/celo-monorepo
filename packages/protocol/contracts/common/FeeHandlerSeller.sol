@@ -7,10 +7,14 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "./UsingRegistry.sol";
 import "../common/Initializable.sol";
 
+// Abstract class for a FeeHandlerSeller, as defined in CIP-52
+// https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md
 contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
+  // Address of the token
+  // minimal number of reports in SortedOracles contract
   mapping(address => uint256) public minimumReports;
 
   event MinimumReportsSet(address tokenAddress, uint256 minimumReports);

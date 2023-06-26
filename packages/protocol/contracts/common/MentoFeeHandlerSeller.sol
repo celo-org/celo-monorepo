@@ -14,6 +14,9 @@ import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "./FeeHandlerSeller.sol";
 
+// An implementation of FeeHandlerSeller supporting interfaces compatible with
+// Mento
+// See https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md
 contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
