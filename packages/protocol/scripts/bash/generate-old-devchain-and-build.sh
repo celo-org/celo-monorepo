@@ -38,6 +38,7 @@ cd ../..
 # TODO: use `yarn clean` after release v8 (not available at monorepo-root for <=v8)
 # yarn run lerna run clean >> $LOG_FILE
 yarn run reset >> $LOG_FILE
+yarn config set python $(which python) >> $LOG_FILE
 # build entire monorepo to account for any required dependencies.
 yarn install >> $LOG_FILE
 yarn run lerna run clean >> $LOG_FILE
