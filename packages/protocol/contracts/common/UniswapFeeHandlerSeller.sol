@@ -163,12 +163,12 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
 
     address[] memory path = new address[](2);
 
+    path[0] = sellTokenAddress;
+    path[1] = address(celoToken);
+
     for (uint256 i = 0; i < routerAddresses[sellTokenAddress].values.length; i++) {
       address poolAddress = routerAddresses[sellTokenAddress].get(i);
       IUniswapV2RouterMin router = IUniswapV2RouterMin(poolAddress);
-
-      path[0] = sellTokenAddress;
-      path[1] = address(celoToken);
 
       // Using the second return value becuase it's the last argument,
       // the previous values show how many tokens are exchanged in each path
