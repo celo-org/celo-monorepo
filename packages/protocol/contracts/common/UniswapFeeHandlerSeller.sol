@@ -22,8 +22,9 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   using FixidityLib for FixidityLib.Fraction;
   using EnumerableSet for EnumerableSet.AddressSet;
 
-  mapping(address => EnumerableSet.AddressSet) private routerAddresses;
   uint256 constant MAX_TIMESTAMP_BLOCK_EXCHANGE = 20;
+  uint256 constant MAX_NUMBER_ROUTERS_PER_TOKEN = 3;
+  mapping(address => EnumerableSet.AddressSet) private routerAddresses;
 
   event ReceivedQuote(address indexed tokneAddress, address indexed router, uint256 quote);
   event RouterUsed(address router);
@@ -62,6 +63,10 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   function _setRouter(address token, address router) private {
     require(router != address(0), "Router can't be address zero");
     routerAddresses[token].add(router);
+    require(
+      routerAddresses[token].values.length <= MAX_NUMBER_ROUTERS_PER_TOKEN,
+      "Max number of routers reached"
+    );
     emit RouterAddressSet(token, router);
   }
 

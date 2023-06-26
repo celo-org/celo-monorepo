@@ -50,6 +50,19 @@ contract('UniswapFeeHandlerSeller', (accounts: string[]) => {
     it('only owner can setRouter', async () => {
       await assertRevert(uniswapFeeHandlerSeller.setRouter(addressA, addressB, { from: user }))
     })
+
+    it("Can't set address zero", async () => {
+      await assertRevert(
+        uniswapFeeHandlerSeller.setRouter(addressA, '0x0000000000000000000000000000000000000000')
+      )
+    })
+
+    it("Can't add more than 4 routers", async () => {
+      await uniswapFeeHandlerSeller.setRouter(addressA, addressB)
+      await uniswapFeeHandlerSeller.setRouter(addressA, accounts[1])
+      await uniswapFeeHandlerSeller.setRouter(addressA, accounts[2])
+      await assertRevert(uniswapFeeHandlerSeller.setRouter(addressA, accounts[4]))
+    })
   })
 
   describe('#removeRouter()', () => {
