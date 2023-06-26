@@ -3,9 +3,12 @@ import {
   assertEqualBN,
   assertLogMatches2,
   assertTransactionRevertWithReason,
-  assumeOwnership,
+  assumeOwnershipWithTruffle,
 } from '@celo/protocol/lib/test-utils'
-import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import {
+  getDeployedProxiedContract,
+  makeTruffleContractForMigration,
+} from '@celo/protocol/lib/web3-utils'
 import { fixed1 } from '@celo/utils/src/fixidity'
 import {
   FreezerContract,
@@ -13,13 +16,17 @@ import {
   OdisPaymentsContract,
   OdisPaymentsInstance,
   RegistryInstance,
-  StableTokenContract,
-  StableTokenInstance,
 } from 'types'
+import { StableTokenContract, StableTokenInstance } from 'types/mento'
+import { MENTO_PACKAGE } from '../../contractPackages'
 
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const OdisPayments: OdisPaymentsContract = artifacts.require('OdisPayments')
-const StableTokenCUSD: StableTokenContract = artifacts.require('StableToken')
+const StableTokenCUSD: StableTokenContract = makeTruffleContractForMigration(
+  'StableToken',
+  MENTO_PACKAGE,
+  web3
+)
 
 const SECONDS_IN_A_DAY = 60 * 60 * 24
 
@@ -38,7 +45,7 @@ contract('OdisPayments', (accounts: string[]) => {
     registry = await getDeployedProxiedContract('Registry', artifacts)
     if ((await registry.owner()) !== owner) {
       // In CI we need to assume ownership, locally using quicktest we don't
-      await assumeOwnership(['Registry'], owner)
+      await assumeOwnershipWithTruffle(['Registry'], owner)
     }
   })
 

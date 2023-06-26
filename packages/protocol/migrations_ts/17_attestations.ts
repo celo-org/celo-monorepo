@@ -5,11 +5,15 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { AttestationsInstance, StableTokenInstance } from 'types'
+import { AttestationsInstance } from 'types'
+import { StableTokenInstance } from 'types/mento'
+import { MENTO_PACKAGE } from '../contractPackages'
+import { ArtifactsSingleton } from '../lib/artifactsSingleton'
+
 const initializeArgs = async (): Promise<[string, string, string, string, string[], string[]]> => {
   const stableToken: StableTokenInstance = await getDeployedProxiedContract<StableTokenInstance>(
     'StableToken',
-    artifacts
+    ArtifactsSingleton.getInstance(MENTO_PACKAGE)
   )
 
   const attestationFee = await convertToContractDecimals(

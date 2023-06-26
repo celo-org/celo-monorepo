@@ -70,8 +70,9 @@ jobs:
         id: node-checksums
         run: |
           find . -maxdepth 5 -type f -name 'package.json' -not -path "*node_modules*" -print0 | sort -z | xargs -0 cat > $RUNNER_TEMP/package.checksum
-          find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat > $RUNNER_TEMP/patches.checksum
-          echo "PACKAGE_JSON_CHECKSUM=${{ hashFiles('$RUNNER_TEMP/*.checksum') }}" >> "$GITHUB_OUTPUT"
+          find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat >> $RUNNER_TEMP/package.checksum
+          echo "PACKAGE_JSON_CHECKSUM=$(md5sum $RUNNER_TEMP/package.checksum | cut -f1 -d' ')"
+          echo "PACKAGE_JSON_CHECKSUM=$(md5sum $RUNNER_TEMP/package.checksum | cut -f1 -d' ')" >> "$GITHUB_OUTPUT"
       - name: Restore node cache
         uses: actions/cache@v3
         id: cache_node
@@ -240,6 +241,13 @@ jobs:
           key: protocol-${{ github.sha }}
           restore-keys: |
             protocol-${{ github.sha }}
+      - name: Switch to node12
+        run: |
+          nvm use 12
+      - name: Build using node12
+        run: |
+          yarn install
+          yarn build --ignore docs --include-dependencies
       - name: Opcode tests
         run: |
           yarn --cwd packages/protocol check-opcodes
@@ -291,7 +299,7 @@ jobs:
     name: ${{ matrix.name }}
     runs-on: ["self-hosted", "monorepo-node18"]
     timeout-minutes: 60
-    needs: [install-dependencies, lint-checks, pre-protocol-test-release]
+    needs: [install-dependencies, lint-checks]
     if: |
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
@@ -310,7 +318,7 @@ jobs:
                 echo "If these changes are intended, update the 'releaseData/versionReports' accordingly"
                 exit 1
               fi
-          - name: Protocol Unit tests
+          - name: Protocol Common tests
             command: |
               yarn --cwd packages/protocol test common/
           - name: Protocol Compatibility
@@ -325,7 +333,7 @@ jobs:
           - name: Protocol Governance Voting
             command: |
               yarn --cwd packages/protocol test governance/voting/
-          - name: Protocol Governance Identity
+          - name: Protocol Identity
             command: |
               yarn --cwd packages/protocol test identity/
           - name: Protocol Stability
@@ -338,10 +346,13 @@ jobs:
           path: .git
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
+        with:
+          submodules: recursive
       - name: Sync workspace
-        uses: ./.github/actions/protocol-sync-workspace
+        uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+          rebuild-package: 'true'
       - name: Build protocol
         run: |
           yarn --cwd packages/protocol build
@@ -390,7 +401,7 @@ jobs:
     name: Identity Tests
     runs-on: ["self-hosted", "monorepo-node18"]
     timeout-minutes: 30
-    needs: [install-dependencies]
+    needs: [install-dependencies, contractkit-tests]
     if: |
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/identity') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
@@ -418,7 +429,7 @@ jobs:
     name: Transaction URI Tests
     runs-on: ["self-hosted", "monorepo-node18"]
     timeout-minutes: 30
-    needs: [install-dependencies]
+    needs: [install-dependencies, contractkit-tests]
     if: |
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk/transactions-uri') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
@@ -585,7 +596,7 @@ jobs:
     name: e2e ${{ matrix.name }}
     runs-on: ["self-hosted", "monorepo-node18"]
     timeout-minutes: 60
-    needs: [install-dependencies, lint-checks, pre-protocol-test-release]
+    needs: [install-dependencies, lint-checks, contractkit-tests]
     if: |
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/celotool') ||
@@ -653,10 +664,13 @@ jobs:
           path: .git
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
+        with:
+          submodules: recursive
       - name: Sync workspace
-        uses: ./.github/actions/protocol-sync-workspace
+        uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+          rebuild-package: 'true'
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 20
@@ -760,7 +774,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 20
-        if: contains(matrix.command, '/lockedgold.sh')
+        if: contains(matrix.command, '/lockedgold.sh') && false
         with:
           limit-access-to-actor: true
       - name: Certora dependencies
@@ -775,4 +789,3 @@ jobs:
       - name: Build and run command
         run: |
           ${{ matrix.command }}
-      

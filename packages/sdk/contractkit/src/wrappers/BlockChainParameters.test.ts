@@ -52,7 +52,6 @@ testWithGanache('BlockChainParametersWrapper', (web3) => {
       const config = await blockchainParamsWrapper.getConfig()
       expect(config.blockGasLimit).toEqual(new BigNumber('20000000'))
       expect(config.intrinsicGasForAlternativeFeeCurrency).toEqual(new BigNumber('50000'))
-      expect(config.minimumClientVersion).toEqual({ major: 1, minor: 0, patch: 0 })
     })
   })
 

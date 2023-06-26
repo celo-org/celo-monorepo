@@ -13,6 +13,7 @@ import {
   domainRestrictedSignatureRequestEIP712,
   DomainRestrictedSignatureResponse,
   ErrorMessage,
+  FULL_NODE_TIMEOUT_IN_MS,
   genSessionID,
   getContractKit,
   KEY_VERSION_HEADER,
@@ -138,6 +139,7 @@ const signerConfig: SignerConfig = {
   },
   timeout: 5000,
   test_quota_bypass_percentage: 0,
+  fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
 }
 
 describe('domainService', () => {
