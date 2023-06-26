@@ -14,7 +14,7 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
   using FixidityLib for FixidityLib.Fraction;
 
   // Address of the token
-  // minimal number of reports in SortedOracles contract
+  // Minimal number of reports in SortedOracles contract
   mapping(address => uint256) public minimumReports;
 
   event MinimumReportsSet(address tokenAddress, uint256 minimumReports);
