@@ -218,6 +218,7 @@ jobs:
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -261,6 +262,7 @@ jobs:
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -294,6 +296,7 @@ jobs:
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -368,7 +371,10 @@ jobs:
     needs: [install-dependencies]
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -397,7 +403,11 @@ jobs:
     needs: [install-dependencies, contractkit-tests]
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/phone-number-privacy/common') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -426,7 +436,10 @@ jobs:
     needs: [install-dependencies, contractkit-tests]
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -461,7 +474,11 @@ jobs:
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/cli') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/phone-number-privacy/common') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -531,6 +548,7 @@ jobs:
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -566,6 +584,7 @@ jobs:
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -599,9 +618,12 @@ jobs:
     needs: [install-dependencies, lint-checks, contractkit-tests]
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/celotool') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/phone-number-privacy/common') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -691,6 +713,7 @@ jobs:
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/phone-number-privacy') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
