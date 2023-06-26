@@ -240,10 +240,10 @@ jobs:
           key: protocol-${{ github.sha }}
           restore-keys: |
             protocol-${{ github.sha }}
-      - name: Switch to node 12
+      - name: Switch to node12
         run: |
           nvm use 12
-      - name: Build using node 12
+      - name: Build using node12
         run: |
           yarn install
           yarn build --ignore docs --include-dependencies
