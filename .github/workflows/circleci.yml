@@ -359,11 +359,11 @@ jobs:
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
     needs: [install-dependencies]
-    if: |
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/contractkit') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
+    # if: |
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/contractkit') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+    #   false
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -582,13 +582,13 @@ jobs:
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks, contractkit-tests]
-    if: |
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/celotool') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk/contractkit') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
+    if: true
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/celotool') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk/contractkit') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+    #   false
     strategy:
       fail-fast: false
       matrix:
