@@ -1,7 +1,15 @@
- "FROM cimg/node:18.14.2
+FROM cimg/node:18.14.2
 
 RUN sudo apt-get update -y
 RUN sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 rsync -y
+
+# Install python3 and python2
+RUN sudo apt-get update -y && \
+    sudo apt-get install -y python3 python2 && \
+    # Set python3 as default
+    sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1 && \
+    sudo apt-get clean -y && \
+    sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install Kubernetes, as per https://kubernetes.io/docs/tasks/tools/install-kubectl/
 RUN sudo apt-get install -y apt-transport-https && \
