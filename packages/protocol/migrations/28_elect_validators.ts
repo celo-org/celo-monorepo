@@ -400,4 +400,5 @@ module.exports = async (_deployer: any, networkName: string) => {
       to: election.address,
     })
   }
+  console.log('Done with migrations')
 }
