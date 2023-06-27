@@ -686,6 +686,7 @@ describe('governance tests', () => {
       this.timeout(0)
       const lockedGold = await kit._web3Contracts.getLockedGold()
       const governance = await kit._web3Contracts.getGovernance()
+      const feeHandler = await kit._web3Contracts.getFeeHandler()
       const gasPriceMinimum = await kit._web3Contracts.getGasPriceMinimum()
       const [group] = await validators.methods.getRegisteredValidatorGroups().call()
 
@@ -714,6 +715,9 @@ describe('governance tests', () => {
 
       const assertGovernanceBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
         await assertBalanceChanged(governance.options.address, blockNumber, expected, goldToken)
+      }
+      const assertFeeHandlerBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
+        await assertBalanceChanged(feeHandler.options.address, blockNumber, expected, goldToken)
       }
 
       const assertReserveBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
@@ -837,10 +841,8 @@ describe('governance tests', () => {
           // Check TS calc'd rewards against what happened
           await assertVotesChanged(blockNumber, expectedVoterRewards)
           await assertLockedGoldBalanceChanged(blockNumber, expectedVoterRewards)
-          await assertGovernanceBalanceChanged(
-            blockNumber,
-            expectedCommunityReward.plus(await blockBaseGasFee(blockNumber))
-          )
+          await assertGovernanceBalanceChanged(blockNumber, expectedCommunityReward)
+          await assertFeeHandlerBalanceChanged(blockNumber, await blockBaseGasFee(blockNumber))
           await assertReserveBalanceChanged(blockNumber, stableTokenSupplyChange.div(exchangeRate))
           await assertGoldTokenTotalSupplyChanged(blockNumber, expectedGoldTotalSupplyChange)
           await assertCarbonOffsettingBalanceChanged(
@@ -852,7 +854,8 @@ describe('governance tests', () => {
           await assertGoldTokenTotalSupplyUnchanged(blockNumber)
           await assertLockedGoldBalanceUnchanged(blockNumber)
           await assertReserveBalanceUnchanged(blockNumber)
-          await assertGovernanceBalanceChanged(blockNumber, await blockBaseGasFee(blockNumber))
+          await assertFeeHandlerBalanceChanged(blockNumber, await blockBaseGasFee(blockNumber))
+          await assertGovernanceBalanceChanged(blockNumber, new BigNumber('0'))
           await assertCarbonOffsettingBalanceUnchanged(blockNumber)
         }
       }
