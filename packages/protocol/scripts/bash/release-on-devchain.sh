@@ -33,7 +33,8 @@ then
 fi
 
 echo "- Run local network"
-startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
+yarn devchain run-tar packages/protocol/$BUILD_DIR/devchain2.tar.gz >> $LOG_FILE
+# startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar packages/protocol/$BUILD_DIR/devchain2.tar.gz >> $LOG_FILE
 
 GANACHE_PID=
 if command -v lsof; then
@@ -65,6 +66,7 @@ git checkout - -- migrationsConfig.js
 echo "- Deploy release of current branch"
 INITIALIZATION_FILE=`ls -1 releaseData/initializationData/* | tail -n 1 | xargs realpath`
 yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --branch $BRANCH --report report.json --proposal proposal.json --librariesFile libraries.json --initialize_data $INITIALIZATION_FILE
+# yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --branch $BRANCH --report report.json --proposal proposal.json --initialize_data $INITIALIZATION_FILE
 
 # From verify-release.sh
 echo "- Verify release"

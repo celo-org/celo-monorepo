@@ -234,15 +234,29 @@ function deployReleaseGold(releaseGoldContracts: string) {
   return execCmd(`yarn`, cmdArgs, { cwd: ProtocolRoot })
 }
 
+// async function runDevChainFromTar(filename: string) {
+//   const chainCopy: tmp.DirResult = tmp.dirSync({ keep: false, unsafeCleanup: true })
+//   // tslint:disable-next-line: no-console
+//   console.log(`Creating tmp folder: ${chainCopy.name}`)
+
+//   await decompressChain(filename, chainCopy.name)
+
+//   const stopGanache = await startGanache(chainCopy.name, { verbose: true }, chainCopy)
+//   await waitForPortOpen('localhost', 8545, 60)
+//   return stopGanache
+// }
+
 async function runDevChainFromTar(filename: string) {
+  const cmdArgs = ['ganache-devchain', '-d']
   const chainCopy: tmp.DirResult = tmp.dirSync({ keep: false, unsafeCleanup: true })
   // tslint:disable-next-line: no-console
   console.log(`Creating tmp folder: ${chainCopy.name}`)
 
   await decompressChain(filename, chainCopy.name)
 
-  const stopGanache = await startGanache(chainCopy.name, { verbose: true }, chainCopy)
-  return stopGanache
+  cmdArgs.push(chainCopy.name)
+
+  return execCmd(`yarn`, cmdArgs, { cwd: ProtocolRoot })
 }
 
 function decompressChain(tarPath: string, copyChainPath: string): Promise<void> {
