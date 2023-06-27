@@ -1,22 +1,7 @@
-# FROM cimg/node:18.14.2
-FROM cimg/base:current
+ "FROM cimg/node:18.14.2
 
 RUN sudo apt-get update -y
 RUN sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 rsync -y
-
-RUN curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash && \
-    export NVM_DIR="$HOME/.nvm" && \
-    . "$NVM_DIR/nvm.sh" && \
-    nvm install 18.14.2 && \
-    nvm use 18.14.2 && \
-    nvm alias default 18.14.2 && \
-    node --version && \
-    npm --version && \
-    sudo ln -s "$NVM_DIR/versions/node/$(nvm version)/bin/node" "/usr/local/bin/node" && \
-    sudo ln -s "$NVM_DIR/versions/node/$(nvm version)/bin/npm" "/usr/local/bin/npm" && \
-    nvm install 12.22.11 && \
-    sudo apt-get clean -y && \
-    sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install Kubernetes, as per https://kubernetes.io/docs/tasks/tools/install-kubectl/
 RUN sudo apt-get install -y apt-transport-https && \
