@@ -249,17 +249,12 @@ jobs:
           name: Check if the test should run
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
-      - node/install:
-          install-yarn: true
-          node-version: '12.22.11'
-      - run:
-          name: Build using node12
-          command: |
-            yarn install
-            yarn build --ignore docs --include-dependencies
       - run:
           name: Opcode tests
           command: yarn --cwd packages/protocol check-opcodes
+      - node/install:
+          install-yarn: true
+          node-version: '12.22.11'
       - run:
           name: Generate devchain of previous release
           command: |

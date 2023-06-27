@@ -8,8 +8,6 @@ on:
   push:
     branches:
       - master
-      # TODO: Remove this before merging
-      - soloseng/ganache-upgrade
   pull_request:
     branches:
       - master
