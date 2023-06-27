@@ -34,6 +34,7 @@ fi
 
 echo "- Run local network"
 yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
+# TODO (soloseng): fix `startInBgAndWaitForString` PIPE error
 # startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
 
 GANACHE_PID=

@@ -251,6 +251,7 @@ async function runDevChainFromTar(filename: string) {
   return stopGanache
 }
 
+// XXX (soloseng): This is a temp fix, for running devchain from tar in background.
 async function runDevChainFromTarInBackGround(filename: string) {
   const cmdArgs = ['ganache-devchain', '-d']
   const chainCopy: tmp.DirResult = tmp.dirSync({ keep: false, unsafeCleanup: true })
