@@ -8,6 +8,8 @@ on:
   push:
     branches:
       - master
+      # TODO: Remove this before merging
+      - soloseng/temp-devchain-release-fix
   pull_request:
     branches:
       - master
