@@ -50,6 +50,12 @@ yargs
     (args) => exitOnError(runDevChainFromTar(args.filename))
   )
   .command(
+    'run-tar-in-bg <filename>',
+    "Run celo's devchain using given tar filename. Generates a copy and then delete it",
+    (args) => args.positional('filename', { type: 'string', description: 'Chain tar filename' }),
+    (args) => exitOnError(runDevChainFromTarInBackGround(args.filename))
+  )
+  .command(
     'generate <datadir>',
     'Create a new devchain directory from scratch',
     (args) =>
@@ -243,6 +249,19 @@ async function runDevChainFromTar(filename: string) {
 
   const stopGanache = await startGanache(chainCopy.name, { verbose: true }, chainCopy)
   return stopGanache
+}
+
+async function runDevChainFromTarInBackGround(filename: string) {
+  const cmdArgs = ['ganache-devchain', '-d']
+  const chainCopy: tmp.DirResult = tmp.dirSync({ keep: false, unsafeCleanup: true })
+  // tslint:disable-next-line: no-console
+  console.log(`Creating tmp folder: ${chainCopy.name}`)
+
+  await decompressChain(filename, chainCopy.name)
+
+  cmdArgs.push(chainCopy.name)
+
+  return execCmd(`yarn`, cmdArgs, { cwd: ProtocolRoot })
 }
 
 function decompressChain(tarPath: string, copyChainPath: string): Promise<void> {
