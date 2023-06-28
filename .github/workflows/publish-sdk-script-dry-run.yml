@@ -22,6 +22,9 @@ jobs:
   dry-run:
     name: Dry run
     runs-on: ["self-hosted", "monorepo-npm"]
+    permissions: # Must change the job token permissions to use JWT auth
+      contents: read
+      id-token: write
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v3
