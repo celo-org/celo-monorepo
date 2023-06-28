@@ -62,10 +62,12 @@ type Answers = {
   // or not to publish or it will use an existing failedSDKs.json file.
   // const { packages, version, publish } = await getAnswers()
 
-  const version: string = process.env.version as string
-  console.log(version)
-  const publish: string = process.env.publish as string
-  console.log(publish)
+  //const version: string = process.env.version as string
+  //console.log(version)
+  //const publish: string = process.env.publish as string
+  //console.log(publish)
+  const version = ''
+  let publish = 'dry-run'
   const packages = []
 
   if (version && !semver.valid(version) && !VERSIONS.includes(version)) {

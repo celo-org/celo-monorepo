@@ -1,6 +1,7 @@
 name: Run dry-run script
 #on: [push]
 on:
+  push:
   workflow_dispatch:
     inputs:
       publish:
