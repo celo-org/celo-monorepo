@@ -64,10 +64,10 @@ type Answers = {
 
   const version: string = process.env.version as string
   console.log(version)
-  //const publish: string = process.env.publish as string
-  //console.log(publish)
+  const publish: string = process.env.publish as string
+  console.log(publish)
   //const version = ''
-  let publish = 'dry-run'
+  //let publish = 'dry-run'
   const packages = []
 
   if (version && !semver.valid(version) && !VERSIONS.includes(version)) {
@@ -180,10 +180,10 @@ type Answers = {
         console.info(`Publishing ${packageJson.name}@${packageJson.version} tagged as ${tag}...`)
 
         // Here is the actual publishing
-        child_process.execSync(`npm publish --access public --dry-run --tag ${tag}`, {
-          cwd: packageFolderPath,
-          stdio: 'ignore',
-        })
+        child_process.execSync(
+          `npm publish --access public ${publish === 'dry-run' ? '--dry-run' : ''} --tag ${tag}`,
+          { cwd: packageFolderPath, stdio: 'ignore' }
+        )
         successfulPackages.push(packageJson.name)
         // remove license files from sdks folders
         console.info(`Done Publishing`)
