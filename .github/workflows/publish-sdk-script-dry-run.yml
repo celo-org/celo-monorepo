@@ -1,0 +1,41 @@
+name: Run dry-run script
+on: [push]
+
+jobs:
+  dry-run:
+    name: Dry run
+    runs-on: ["self-hosted", "monorepo"]
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v3
+
+      # Setup Node JS with input from node version and set the registry url (defaults to npm registry)
+      - name: 'Setup Node JS'
+        uses: actions/setup-node@v3
+        with:
+          node-version: 12.22.12
+          registry-url: https://registry.npmjs.org
+
+      - run: find ./packages -type f -name 'package.json' -exec sed -i 's/4.1.1-dev/4.1.0/g' '{}' \;
+
+      - run: yarn
+
+      - run: |
+          cd packages/protocol/
+          yarn build
+          cd ../..
+          cd packages/dev-utils/
+          yarn build
+          cd ../..
+          cd packages/sdk/contractkit
+          yarn build
+          cd ../../..
+      - run: |
+          npm run deploy-sdks-dry-run || true
+      - run: |
+          cd packages/sdk/wallets/wallet-rpc
+          yarn
+          yarn build
+          cd ../../../..
+      - run: |
+          npm run deploy-sdks-dry-run
