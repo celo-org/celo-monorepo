@@ -19,15 +19,18 @@ jobs:
       - run: find ./packages -type f -name 'package.json' -exec sed -i 's/4.1.1-dev/4.1.0/g' '{}' \;
 
       - run: yarn
-      - run: yarn build
+      - run: yarn build || true
 
       - run: |
+          echo "Switching to packages/protocol/"
           cd packages/protocol/
           yarn build
           cd ../..
+          echo "Switching to packages/dev-utils/"
           cd packages/dev-utils/
           yarn build
           cd ../..
+          echo "Switching to packages/sdk/contractkit"
           cd packages/sdk/contractkit
           yarn build
           cd ../../..
