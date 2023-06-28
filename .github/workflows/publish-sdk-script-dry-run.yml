@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: 'Environment to deploy to'
+        description: 'publish the sdks?'
         required: true
         type: choice
         options:
@@ -13,8 +13,8 @@ on:
           - N
           - dry-run
       version:
-        description: 'Action to run in the workflow'
-        required: true
+        description: 'Version to update the sdks to. You can pick major, minor, patch, a semantic version, or nothing if you do not want to update the versions.'
+        required: false
         type: string
         default: ''
 
@@ -45,8 +45,10 @@ jobs:
           static-secrets: "{\"/static-secrets/devops-circle/alvaro-test/npm-test-publish\":\"NPM_TOKEN\"}"
 
       - run: |
-          echo "publish=Y" >> "$GITHUB_ENV"
-          echo "version=4.1.4" >> "$GITHUB_ENV"
+          echo "publish=dry-run" >> "$GITHUB_ENV"
+          echo "version=4.1.5" >> "$GITHUB_ENV"
+          # echo "publish=${{ github.event.inputs.publish }}" >> "$GITHUB_ENV"
+          # echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_ENV"
 
       - run: sed -i 's/ && yarn keys:decrypt"/"/g' package.json
 
