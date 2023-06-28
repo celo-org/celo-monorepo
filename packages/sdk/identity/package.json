@@ -44,7 +44,7 @@
     "fetch-mock": "9.10.4",
     "@types/elliptic": "^6.4.12",
     "@celo/flake-tracker": "0.0.1-dev",
-    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#21652da",
+    "ganache": "npm:@celo/ganache@7.0.0-beta.0",
     "old-identity-sdk": "npm:@celo/identity@1.5.2"
   },
   "engines": {
