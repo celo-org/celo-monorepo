@@ -10,7 +10,7 @@ import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
-
+// adding comment os that lint doesn't berak
 contract GoldToken is
   Initializable,
   CalledByVm,
