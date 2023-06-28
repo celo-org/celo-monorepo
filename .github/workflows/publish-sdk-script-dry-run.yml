@@ -1,5 +1,21 @@
 name: Run dry-run script
-on: [push]
+#on: [push]
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - Y
+          - N
+          - dry-run
+      version:
+        description: 'Action to run in the workflow'
+        required: true
+        type: string
+        default: ''
 
 jobs:
   dry-run:
@@ -15,6 +31,10 @@ jobs:
         with:
           node-version: 12.22.12
           registry-url: https://registry.npmjs.org
+
+      - run: |
+          echo "publish=${{ github.event.inputs.publish }}" >> "$GITHUB_OUTPUT"
+          echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
 
       - run: sed -i 's/ && yarn keys:decrypt"/"/g' package.json
 

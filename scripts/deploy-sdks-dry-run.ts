@@ -62,8 +62,10 @@ type Answers = {
   // or not to publish or it will use an existing failedSDKs.json file.
   // const { packages, version, publish } = await getAnswers()
 
-  const version = ''
-  const publish = 'dry-run'
+  const version: string = process.env.version as string
+  console.log(version)
+  const publish: string = process.env.publish as string
+  console.log(publish)
   const packages = []
 
   if (version && !semver.valid(version) && !VERSIONS.includes(version)) {
@@ -75,7 +77,7 @@ type Answers = {
     process.exit(1)
   }
 
-  const shouldPublish = true
+  const shouldPublish = publish === 'Y' || publish === 'dry-run'
 
   if (!shouldPublish && !version) {
     console.error(colors.red('Either a version or --publish must be given'))
@@ -174,7 +176,6 @@ type Answers = {
         console.info(`Done Building`)
 
         console.info(`Publishing ${packageJson.name}@${packageJson.version} tagged as ${tag}...`)
-        console.info(`Done Publishing`)
 
         // Here is the actual publishing
         child_process.execSync(`npm publish --access public --dry-run --tag ${tag}`, {
@@ -183,6 +184,7 @@ type Answers = {
         })
         successfulPackages.push(packageJson.name)
         // remove license files from sdks folders
+        console.info(`Done Publishing`)
         child_process.execSync('rm LICENSE', { cwd: packageFolderPath, stdio: 'inherit' })
       } catch (e) {
         let retry = 'N'
