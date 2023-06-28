@@ -109,8 +109,8 @@ export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
     transaction.gatewayFee,
     transaction.to,
     transaction.value,
-    transaction.data, // -> Metamask
-    stringNumberToHex(transaction.chainId), // EIP155
+    transaction.data,
+    stringNumberToHex(transaction.chainId),
     '0x',
     '0x',
   ])

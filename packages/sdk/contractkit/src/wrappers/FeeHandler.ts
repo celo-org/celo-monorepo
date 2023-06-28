@@ -72,17 +72,6 @@ export class FeeHandlerWrapper extends BaseWrapper<FeeHandler> {
     return innerCall(tokenAddress)
   }
 
-  // TODO
-  // async distributeAll(
-  // ) {
-  //   const innerCall = proxySend(
-  //     this.connection,
-  //     this.contract.methods.distributeAll
-  //   )
-  //   return innerCall()
-  // }
-
-  // burnCelo
 }
 
 export type FeeHandlerType = FeeHandlerWrapper

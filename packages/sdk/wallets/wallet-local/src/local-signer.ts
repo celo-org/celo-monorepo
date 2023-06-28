@@ -1,4 +1,3 @@
-// here
 import { RLPEncodedTx, Signer } from '@celo/connect'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { computeSharedSecret as computeECDHSecret } from '@celo/utils/lib/ecdh'
