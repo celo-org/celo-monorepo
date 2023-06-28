@@ -51,7 +51,7 @@
     "@celo/base": "4.1.1-dev",
     "@celo/bls12377js": "0.1.1",
     "@celo/connect": "4.1.1-dev",
-    "@celo/ganache": "npm:@celo/ganache@7.0.0-beta.0",
+    "@celo/ganache": "npm:@celo/ganache@7.0.0-beta.2",
     "@celo/utils": "4.1.1-dev",
     "@celo/cryptographic-utils": "4.1.1-dev",
     "@openzeppelin/upgrades": "^2.8.0",

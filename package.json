@@ -83,7 +83,7 @@
     "typescript-tslint-plugin": "^0.5.4"
   },
   "resolutions": {
-    "ganache": "npm:@celo/ganache@7.0.0-beta.0",
+    "ganache": "npm:@celo/ganache@7.0.0-beta.2",
     "@grpc/grpc-js": "^1.1.8",
     "@types/prettier": "^2.2.1",
     "**/axios": "0.21.1",
