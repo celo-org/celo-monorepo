@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - master
+      - soloseng/ganache-v7-node12-master
   pull_request:
     branches:
       - master
