@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - master
+      - jcortejoso/debug-cli-tests
   pull_request:
     branches:
       - master
@@ -481,7 +482,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
+      true
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -497,6 +498,11 @@ jobs:
         run: |
           cd packages/cli
           yarn test:reset
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 30
+        with:
+          limit-access-to-actor: true
       - name: Run tests
         run: |
           yarn --cwd=packages/cli test
