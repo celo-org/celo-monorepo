@@ -46,12 +46,14 @@ jobs:
 
       - run: |
           echo "publish=${{ github.event.inputs.publish }}" >> "$GITHUB_OUTPUT"
-          echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          echo "version=4.1.4" >> "$GITHUB_OUTPUT"
 
       - run: sed -i 's/ && yarn keys:decrypt"/"/g' package.json
 
       - run: yarn
       - run: yarn build
+
+      - run: find ./packages/sdk -type f -name 'package.json' -exec sed -i 's/@celo/@fernandezfalvaro/g' '{}' \;
 
       - run: |
           npm run deploy-sdks-dry-run
