@@ -45,7 +45,7 @@ jobs:
           static-secrets: "{\"/static-secrets/devops-circle/alvaro-test/npm-test-publish\":\"NPM_TOKEN\"}"
 
       - run: |
-          echo "publish=${{ github.event.inputs.publish }}" >> "$GITHUB_OUTPUT"
+          #echo "publish=${{ github.event.inputs.publish }}" >> "$GITHUB_OUTPUT"
           echo "version=4.1.4" >> "$GITHUB_OUTPUT"
 
       - run: sed -i 's/ && yarn keys:decrypt"/"/g' package.json
@@ -57,4 +57,5 @@ jobs:
 
       - run: |
           npm run deploy-sdks-dry-run
-
+        env:
+          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
