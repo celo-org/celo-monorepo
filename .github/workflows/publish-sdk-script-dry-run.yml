@@ -21,25 +21,25 @@ jobs:
       - run: yarn
       - run: yarn build || true
 
-      - run: |
-          echo "Switching to packages/protocol/"
-          cd packages/protocol/
-          yarn build
-          cd ../..
-          echo "Switching to packages/dev-utils/"
-          cd packages/dev-utils/
-          yarn build
-          cd ../..
-          echo "Switching to packages/sdk/contractkit"
-          cd packages/sdk/contractkit
-          yarn build
-          cd ../../..
+      #- run: |
+      #    echo "Switching to packages/protocol/"
+      #    cd packages/protocol/
+      #    yarn build
+      #    cd ../..
+      #    echo "Switching to packages/dev-utils/"
+      #    cd packages/dev-utils/
+      #    yarn build
+      #    cd ../..
+      #    echo "Switching to packages/sdk/contractkit"
+      #    cd packages/sdk/contractkit
+      #    yarn build
+      #    cd ../../..
       - run: |
           npm run deploy-sdks-dry-run || true
-      - run: |
-          cd packages/sdk/wallets/wallet-rpc
-          yarn
-          yarn build
-          cd ../../../..
+      #- run: |
+      #    cd packages/sdk/wallets/wallet-rpc
+      #    yarn
+      #    yarn build
+      #    cd ../../../..
       - run: |
           npm run deploy-sdks-dry-run

@@ -30,6 +30,7 @@
     "celocli": "yarn --cwd packages/cli run --silent celocli",
     "update-dependency-graph": "ts-node ./scripts/update_dependency_graph.ts",
     "deploy-sdks": "ts-node ./scripts/deploy-sdks.ts",
+    "deploy-sdks-dry-run": "ts-node ./scripts/deploy-sdks-dry-run.ts",
     "deprecate-sdks": "ts-node ./scripts/unpublish-sdks.ts"
   },
   "husky": {
