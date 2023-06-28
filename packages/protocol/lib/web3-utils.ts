@@ -1,21 +1,21 @@
 /* tslint:disable:no-console */
 // TODO(asa): Refactor and rename to 'deployment-utils.ts'
-import { Address, CeloTxObject } from '@celo/connect'
-import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
-import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { signTransaction } from '@celo/protocol/lib/signing-utils'
-import { privateKeyToAddress } from '@celo/utils/lib/address'
-import { BuildArtifacts } from '@openzeppelin/upgrades'
-import { BigNumber } from 'bignumber.js'
+import { Address, CeloTxObject } from '@celo/connect';
+import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils';
+import { CeloContractName } from '@celo/protocol/lib/registry-utils';
+import { signTransaction } from '@celo/protocol/lib/signing-utils';
+import { privateKeyToAddress } from '@celo/utils/lib/address';
+import { BuildArtifacts } from '@openzeppelin/upgrades';
+import { BigNumber } from 'bignumber.js';
 
-import { createInterfaceAdapter } from '@truffle/interface-adapter'
-import path from 'path'
-import prompts from 'prompts'
-import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types'
-import { StableTokenInstance } from 'types/mento'
-import Web3 from 'web3'
-import { ContractPackage } from '../contractPackages'
-import { ArtifactsSingleton } from '../migrations/artifactsSingleton'
+import { createInterfaceAdapter } from '@truffle/interface-adapter';
+import path from 'path';
+import prompts from 'prompts';
+import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types';
+import { StableTokenInstance } from 'types/mento';
+import Web3 from 'web3';
+import { ContractPackage } from '../contractPackages';
+import { ArtifactsSingleton } from './artifactsSingleton';
 
 const truffleContract = require('@truffle/contract');
 
