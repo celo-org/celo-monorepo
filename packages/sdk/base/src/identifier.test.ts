@@ -17,6 +17,7 @@ const EXPECTED_HASH_FOR_PREFIX: Record<IdentifierPrefix, string> = {
   [IdentifierPrefix.DISCORD]: '0xce7834e8e3c84180fab3a97b099dd131a78f9c91c3ae9753412423dc7ffdbdaa',
   [IdentifierPrefix.TELEGRAM]: '0x65ecb839a118e293672aa7556dcff3f5d82dd142835e9d6f45b9539f252b3c6c',
   [IdentifierPrefix.SIGNAL]: '0x34702bc6c5253a4d9521da1f45cec9eac3969c9cae7380aac422e2b872019182',
+  [IdentifierPrefix.GITHUB]: '0xd0a0e7f10b99db21f6a066398baa0bb50c4e8c1768d98104abc56ed000fe81c3',
 }
 
 describe('Identifier hashing', () => {
