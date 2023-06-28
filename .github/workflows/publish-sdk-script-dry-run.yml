@@ -16,10 +16,10 @@ jobs:
           node-version: 12.22.12
           registry-url: https://registry.npmjs.org
 
-      - run: find ./packages -type f -name 'package.json' -exec sed -i 's/4.1.1-dev/4.1.0/g' '{}' \;
+      #- run: find ./packages -type f -name 'package.json' -exec sed -i 's/4.1.1-dev/4.1.0/g' '{}' \;
 
       - run: yarn
-      - run: yarn build || true
+      - run: yarn build
 
       #- run: |
       #    echo "Switching to packages/protocol/"
@@ -35,7 +35,7 @@ jobs:
       #    yarn build
       #    cd ../../..
       - run: |
-          npm run deploy-sdks-dry-run || true
+          npm run deploy-sdks-dry-run
       #- run: |
       #    cd packages/sdk/wallets/wallet-rpc
       #    yarn
