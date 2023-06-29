@@ -1,5 +1,5 @@
 name: celo-monorepo
-run-name: ${{ github.event.head_commit.message }} tests
+run-name: celo-monorepo tests
 
 # Dockefile for the self-hosted runner: 
 # https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfile-monorepo
