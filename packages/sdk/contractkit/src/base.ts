@@ -13,6 +13,7 @@ export enum CeloContract {
   ExchangeBRL = 'ExchangeBRL',
   FederatedAttestations = 'FederatedAttestations',
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
+  FeeHandler = 'FeeHandler',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
   GoldToken = 'GoldToken',

@@ -38,7 +38,7 @@ import {
   StableTokenInstance,
 } from 'types/mento'
 import { MENTO_PACKAGE } from '../../contractPackages'
-import { ArtifactsSingleton } from '../../migrations/artifactsSingleton'
+import { ArtifactsSingleton } from '../../lib/artifactsSingleton'
 import { SECONDS_IN_A_WEEK } from '../constants'
 
 enum VoteValue {

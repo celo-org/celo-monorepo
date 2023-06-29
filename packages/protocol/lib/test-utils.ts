@@ -2,7 +2,7 @@
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
-import { ArtifactsSingleton } from '@celo/protocol/migrations/artifactsSingleton'
+import { ArtifactsSingleton } from '@celo/protocol/lib/artifactsSingleton'
 import { config } from '@celo/protocol/migrationsConfig'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
@@ -416,6 +416,18 @@ export function assertEqualBNArray(
 ) {
   assert.equal(value.length, expected.length, msg)
   value.forEach((x, i) => assertEqualBN(x, expected[i]))
+}
+
+export function assertGtBN(
+  value: number | BN | BigNumber,
+  expected: number | BN | BigNumber,
+  msg?: string
+) {
+  assert(
+    web3.utils.toBN(value).gt(web3.utils.toBN(expected)),
+    `expected ${value.toString()} to be greater than to ${expected.toString()}. ${msg ||
+      ''}`
+  )
 }
 
 export function assertGteBN(

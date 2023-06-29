@@ -10,7 +10,7 @@ import { toFixed } from '@celo/utils/lib/fixidity'
 import { FreezerInstance } from 'types'
 import { ExchangeBRLInstance, ReserveInstance } from 'types/mento'
 import { MENTO_PACKAGE } from '../contractPackages'
-import { ArtifactsSingleton } from './artifactsSingleton'
+import { ArtifactsSingleton } from '../lib/artifactsSingleton'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [

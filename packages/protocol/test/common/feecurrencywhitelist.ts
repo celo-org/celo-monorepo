@@ -37,4 +37,27 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
       await assertRevert(feeCurrencyWhitelist.addToken(aTokenAddress, { from: nonOwner }))
     })
   })
+
+  describe('Removing', () => {
+    beforeEach(async () => {
+      await feeCurrencyWhitelist.addToken(aTokenAddress)
+      await feeCurrencyWhitelist.addToken(accounts[0])
+      await feeCurrencyWhitelist.addToken(accounts[1])
+    })
+
+    describe('#removeToken()', () => {
+      it('Removes from a big list', async () => {
+        await feeCurrencyWhitelist.removeToken(accounts[0], 1)
+        assert.sameMembers(await feeCurrencyWhitelist.getWhitelist(), [aTokenAddress, accounts[1]])
+      })
+
+      it("Doesn't remove if the index is wrong", async () => {
+        await assertRevert(feeCurrencyWhitelist.removeToken(accounts[0], 0))
+      })
+
+      it('should not allow a non-owner to remove Mento token', async () => {
+        await assertRevert(feeCurrencyWhitelist.removeToken(accounts[0], 0, { from: nonOwner }))
+      })
+    })
+  })
 })
