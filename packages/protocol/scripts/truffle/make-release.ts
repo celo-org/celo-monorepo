@@ -92,6 +92,7 @@ const deployImplementation = async (
   }
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
+  console.log(`is runniong dry: ${dryRun}`)
   const contract = await (dryRun
     ? Contract.at(celoRegistryAddress)
     : Contract.new(testingDeployment))
