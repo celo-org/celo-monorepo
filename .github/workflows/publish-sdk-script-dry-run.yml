@@ -1,5 +1,6 @@
 name: Publish SDK NPM packages
 on:
+  # DELETE `push:` to only allow for manual trigering
   push:
   workflow_dispatch:
     inputs:
@@ -18,9 +19,10 @@ on:
         default: ''
 
 jobs:
-  dry-run:
-    name: Dry run
+  publish-npm-sdk:
+    name: Publish NPM SDK packages
     runs-on: ["self-hosted", "monorepo-npm"]
+    if: contains('["aaronmgdr","dckesler", "alvarof2", "jcortejoso"]', github.actor)
     permissions: # Must change the job token permissions to use JWT auth
       contents: read
       id-token: write
@@ -47,7 +49,7 @@ jobs:
       # CHANGE-ME!
       - name: Set WF inputs as env. vars
         run: |
-          echo "publish=Y" >> "$GITHUB_ENV"
+          echo "publish=dry-run" >> "$GITHUB_ENV"
           echo "version=4.1.5" >> "$GITHUB_ENV"
           # echo "publish=${{ github.event.inputs.publish }}" >> "$GITHUB_ENV"
           # echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_ENV"
@@ -64,7 +66,8 @@ jobs:
       - name: '[POC] Set NPM org as @fernandezfalvaro in ./packages/sdk/* package.json'
         run: find ./packages/sdk -type f -name 'package.json' -exec sed -i 's/@celo/@fernandezfalvaro/g' '{}' \;
 
-      - run: |
-          npm run deploy-sdks-dry-run
+      - name: Run TS script to publish NPM packages
+        run: |
+          npm run publish-sdks-github-actions
         env:
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
