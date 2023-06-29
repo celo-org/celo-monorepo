@@ -93,12 +93,14 @@ const deployImplementation = async (
   if (from) {
     Contract.defaults({ from }) // override truffle with provided from address
   }
-  console.log(`Deploying ${contractName}`)
+  console.log(`Deploying ${contractName} instance${Contract}`)
   // Hack to trick truffle, which checks that the provided address has code
   console.log(`isDryRun: ${dryRun}`)
   let contract
   try {
-    contract = await (dryRun ? Contract.at(celoRegistryAddress) : Contract.new(testingDeployment))
+    contract = dryRun
+      ? await Contract.at(celoRegistryAddress)
+      : await Contract.new(testingDeployment)
   } catch (error) {
     console.log(error)
     throw error
