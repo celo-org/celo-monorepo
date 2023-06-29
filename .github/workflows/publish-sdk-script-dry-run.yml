@@ -21,7 +21,7 @@ on:
 jobs:
   dry-run:
     name: Dry run
-    runs-on: ["self-hosted", "monorepo-npm"]
+    runs-on: ["self-hosted", "monorepo"]
     permissions: # Must change the job token permissions to use JWT auth
       contents: read
       id-token: write
@@ -45,7 +45,7 @@ jobs:
           static-secrets: "{\"/static-secrets/devops-circle/alvaro-test/npm-test-publish\":\"NPM_TOKEN\"}"
 
       - run: |
-          echo "publish=dry-run" >> "$GITHUB_ENV"
+          echo "publish=Y" >> "$GITHUB_ENV"
           echo "version=4.1.5" >> "$GITHUB_ENV"
           # echo "publish=${{ github.event.inputs.publish }}" >> "$GITHUB_ENV"
           # echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_ENV"
