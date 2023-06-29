@@ -88,6 +88,7 @@ const deployImplementation = async (
   from: string,
   requireVersion = true
 ) => {
+  console.log(`default from: ${from}`)
   // const testingDeployment = false
   if (from) {
     Contract.defaults({ from }) // override truffle with provided from address
@@ -96,6 +97,7 @@ const deployImplementation = async (
   // Hack to trick truffle, which checks that the provided address has code
   console.log(`isDryRun: ${dryRun}`)
   const contract = await Contract.at(celoRegistryAddress)
+
   // const contract = await (dryRun
   //   ? Contract.at(celoRegistryAddress)
   //   : Contract.new(testingDeployment))
@@ -167,6 +169,7 @@ const deployCoreContract = async (
     args: [contract.address],
     value: '0',
   }
+  console.log(`implementation deployed: ${contract}`)
 
   if (!shouldDeployProxy(report, contractName)) {
     proposal.push(setImplementationTx)
@@ -243,6 +246,7 @@ module.exports = async (callback: (error?: any) => number) => {
       ],
       boolean: ['dry_run'],
     })
+    console.log(JSON.stringify(argv))
     const fullReport = readJsonSync(argv.report)
     const libraryMapping: LibraryAddresses['addresses'] = readJsonSync(
       argv.librariesFile ?? 'libraries.json'
@@ -288,6 +292,7 @@ module.exports = async (callback: (error?: any) => number) => {
 
       // 3. Deploy new versions of the contract or library, if indicated by the report.
       const shouldDeployContract = Object.keys(report.contracts).includes(contractName)
+      console.log(`should deploy: ${shouldDeployContract}`)
       const shouldDeployLibrary = Object.keys(report.libraries).includes(contractName)
       if (shouldDeployContract) {
         await deployCoreContract(
@@ -301,6 +306,7 @@ module.exports = async (callback: (error?: any) => number) => {
           argv.from
         )
       } else if (shouldDeployLibrary) {
+        console.log('deploying library')
         await deployLibrary(contractName, contractArtifact, addresses, argv.dry_run, argv.from)
       }
 
