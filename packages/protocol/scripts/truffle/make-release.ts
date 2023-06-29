@@ -98,9 +98,9 @@ const deployImplementation = async (
   console.log(`isDryRun: ${dryRun}`)
   let contract
   try {
-    contract = dryRun
-      ? await Contract.at(celoRegistryAddress)
-      : await Contract.new(testingDeployment)
+    contract = await (dryRun
+      ? Contract.at(celoRegistryAddress)
+      : Contract.new(testingDeployment, { type: 0 }))
   } catch (error) {
     console.log(error)
     throw error
