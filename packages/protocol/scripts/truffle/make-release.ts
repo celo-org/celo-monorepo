@@ -91,7 +91,7 @@ const deployImplementation = async (
   console.log(`default from: ${from}`)
   const testingDeployment = false
   if (from) {
-    Contract.defaults({ from }) // override truffle with provided from address
+    Contract.defaults({ from, type: 0 }) // override truffle with provided from address
   }
   console.log(`Deploying ${contractName} instance${Contract}`)
   // Hack to trick truffle, which checks that the provided address has code
