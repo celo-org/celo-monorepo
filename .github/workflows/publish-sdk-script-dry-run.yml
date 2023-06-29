@@ -68,6 +68,15 @@ jobs:
 
       - name: Run TS script to publish NPM packages
         run: |
+          if [ ${{ env.publish }} = "dry-run" ];
+          then
+            echo "DRY-RUN publishing"
+          elif [ ${{ env.publish }} = "Y" ];
+          then
+            echo "REAL publishing"
+          else
+            echo "`publish` env. var not set (???)"
+          fi
           npm run publish-sdks-github-actions
         env:
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
