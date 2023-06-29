@@ -88,15 +88,17 @@ const deployImplementation = async (
   from: string,
   requireVersion = true
 ) => {
-  const testingDeployment = false
+  // const testingDeployment = false
   if (from) {
     Contract.defaults({ from }) // override truffle with provided from address
   }
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
-  const contract = await (dryRun
-    ? Contract.at(celoRegistryAddress)
-    : Contract.new(testingDeployment))
+  console.log(`isDryRun: ${dryRun}`)
+  const contract = await Contract.at(celoRegistryAddress)
+  // const contract = await (dryRun
+  //   ? Contract.at(celoRegistryAddress)
+  //   : Contract.new(testingDeployment))
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
@@ -313,6 +315,7 @@ module.exports = async (callback: (error?: any) => number) => {
     writeJsonSync(argv.proposal, proposal, { spaces: 2 })
     callback()
   } catch (error) {
+    console.log('### error:', error)
     callback(error)
   }
 }
