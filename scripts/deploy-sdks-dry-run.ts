@@ -63,9 +63,7 @@ type Answers = {
   // const { packages, version, publish } = await getAnswers()
 
   const version: string = process.env.version as string
-  console.log(version)
   const publish: string = process.env.publish as string
-  console.log(publish)
   //const version = ''
   //let publish = 'dry-run'
   const packages = []
@@ -189,11 +187,12 @@ type Answers = {
         console.info(`Done Publishing`)
         child_process.execSync('rm LICENSE', { cwd: packageFolderPath, stdio: 'inherit' })
       } catch (e) {
-        let retry = 'N'
-        console.info(`Error`)
-        if (retry === 'Y') {
-          index--
-        }
+        console.info(`Error: package ${packageJson.name} failed!`)
+        process.exit(1)
+        // let retry = 'N'
+        // if (retry === 'Y') {
+        //   index--
+        // }
       }
     }
   }
