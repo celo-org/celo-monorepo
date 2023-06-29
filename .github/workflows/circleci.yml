@@ -239,12 +239,12 @@ jobs:
           key: protocol-${{ github.sha }}
           restore-keys: |
             protocol-${{ github.sha }}
-      - name: Opcode tests
-        run: |
-          yarn --cwd packages/protocol check-opcodes
       - uses: actions/setup-node@v3
         with:
           node-version: 12.22.11
+      - name: Opcode tests
+        run: |
+          yarn --cwd packages/protocol check-opcodes
       - name: Generate devchain of previous release
         run: |
           echo "Comparing against $RELEASE_TAG"
