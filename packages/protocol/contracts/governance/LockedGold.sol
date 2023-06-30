@@ -253,7 +253,7 @@ contract LockedGold is
       .fromFixed();
 
     require(
-      totalLockedGold - delegatedVotes >= value,
+      totalLockedGold.sub(delegatedVotes) >= value,
       "Not enough undelegated Celo. Celo has to be removed from delegation first."
     );
 
@@ -370,11 +370,11 @@ contract LockedGold is
         .newFixed(100)
         .multiply(FixidityLib.newFixedFraction(totalReferendumVotes, totalLockedGold))
         .fromFixed();
-      if (totalReferendumVotes % totalLockedGold != 0) {
+      if (totalReferendumVotes.mod(totalLockedGold) != 0) {
         referendumVotesInPercents++;
       }
       require(
-        referendumVotesInPercents + requestedToDelegate <= 100,
+        referendumVotesInPercents.add(requestedToDelegate) <= 100,
         "Cannot delegate votes that are voting in referendum"
       );
     }
@@ -454,7 +454,7 @@ contract LockedGold is
     if (unusedReferendumVotes < amountToRevoke) {
       getGovernance().removeVotesWhenRevokingDelegatedVotes(
         delegateeAccount,
-        delegateeTotalVotingPower - amountToRevoke
+        delegateeTotalVotingPower.sub(amountToRevoke)
       );
     }
 
@@ -463,7 +463,7 @@ contract LockedGold is
     );
 
     currentDelegateeInfo.currentAmount = currentDelegateeInfo.currentAmount.sub(amountToRevoke);
-    totalDelegatedCelo[delegateeAccount] -= amountToRevoke;
+    totalDelegatedCelo[delegateeAccount] = totalDelegatedCelo[delegateeAccount].sub(amountToRevoke);
 
     if (currentDelegateeInfo.currentAmount == 0) {
       delegated.delegatees.remove(delegateeAccount);
@@ -537,7 +537,9 @@ contract LockedGold is
    * @return The total amount of locked gold + delegated gold for an account.
    */
   function getAccountTotalGovernanceVotingPower(address account) public view returns (uint256) {
-    uint256 availableUndelegatedPercents = 100 - getAccountTotalDelegatedAmountInPercents(account);
+    uint256 availableUndelegatedPercents = uint256(100).sub(
+      getAccountTotalDelegatedAmountInPercents(account)
+    );
     uint256 totalLockedGold = getAccountTotalLockedGold(account);
 
     uint256 availableForVoting = FixidityLib
@@ -545,7 +547,7 @@ contract LockedGold is
       .multiply(FixidityLib.newFixedFraction(availableUndelegatedPercents, 100))
       .fromFixed();
 
-    return availableForVoting + totalDelegatedCelo[account];
+    return availableForVoting.add(totalDelegatedCelo[account]);
   }
 
   /**
