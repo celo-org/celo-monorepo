@@ -17,7 +17,7 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fixed1, multiply, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { keccak256, zeroAddress } from 'ethereumjs-util'
+import { keccak256 } from 'ethereumjs-util'
 import {
   AccountsContract,
   AccountsInstance,
@@ -4182,21 +4182,24 @@ contract('Governance', (accounts: string[]) => {
   describe('#removeVotesWhenRevokingDelegatedVotes()', () => {
     it('should revert when not called by staked celo contract', async () => {
       await assertRevertWithReason(
-        governance.removeVotesWhenRevokingDelegatedVotes(zeroAddress(), 0),
+        governance.removeVotesWhenRevokingDelegatedVotes(NULL_ADDRESS, 0),
         'msg.sender not lockedGold'
       )
     })
 
     it('should should pass when no proposal is dequeued', async () => {
-      await governance.removeVotesWhenRevokingDelegatedVotesTest(zeroAddress(), 0)
+      await governance.removeVotesWhenRevokingDelegatedVotesTest(NULL_ADDRESS, 0)
     })
 
-    describe('When having two proposals voted', () => {
+    describe('When having three proposals voted', () => {
       const proposalId = 1
       const index = 0
 
       const proposal2Id = 2
       const index2 = 1
+
+      const proposal3Id = 3
+      const index3 = 2
       beforeEach(async () => {
         const newDequeueFrequency = 60
         await governance.setDequeueFrequency(newDequeueFrequency)
@@ -4223,10 +4226,24 @@ contract('Governance', (accounts: string[]) => {
           { value: minDeposit }
         )
 
+        await governance.propose(
+          [transactionSuccess2.value],
+          [transactionSuccess2.destination],
+          // @ts-ignore bytes type
+          transactionSuccess2.data,
+          [transactionSuccess2.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+
+        await governance.setConcurrentProposals(3)
         await timeTravel(newDequeueFrequency, web3)
         await governance.approve(proposalId, index)
         await timeTravel(newDequeueFrequency, web3)
         await governance.approve(proposal2Id, index2)
+        await timeTravel(newDequeueFrequency, web3)
+        await governance.approve(proposal3Id, index3)
         await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       })
 
@@ -4279,16 +4296,22 @@ contract('Governance', (accounts: string[]) => {
         const no = 33
         const abstain = 33
 
-        const yes2 = 33
-        const no2 = 34
-        const abstain2 = 33
+        const yes2 = 0
+        const no2 = 35
+        const abstain2 = 65
+
+        const yes3 = 0
+        const no3 = 0
+        const abstain3 = 51
 
         beforeEach(async () => {
           await governance.votePartially(proposalId, index, yes, no, abstain)
           await governance.votePartially(proposal2Id, index2, yes2, no2, abstain2)
+          await governance.votePartially(proposal3Id, index3, yes3, no3, abstain3)
 
           await assertVoteRecord(governance, account, index, proposalId, yes, no, abstain)
           await assertVoteRecord(governance, account, index2, proposal2Id, yes2, no2, abstain2)
+          await assertVoteRecord(governance, account, index3, proposal3Id, yes3, no3, abstain3)
         })
 
         it('should adjust votes correctly to 0', async () => {
@@ -4308,14 +4331,33 @@ contract('Governance', (accounts: string[]) => {
           const noPortion = (toRemove * no) / sumOfVotes
           const abstainPortion = (toRemove * abstain) / sumOfVotes
 
+          const no2Portion = (toRemove * no2) / sumOfVotes
+          const abstain2Portion = (toRemove * abstain2) / sumOfVotes
+
           await governance.removeVotesWhenRevokingDelegatedVotesTest(account, maxAmount)
+
+          const [yes1Total, no1Total, abstain1Total] = await governance.getVoteTotals(proposalId)
+          const [yes2Total, no2Total, abstain2Total] = await governance.getVoteTotals(proposal2Id)
+          const [yes3Total, no3Total, abstain3Total] = await governance.getVoteTotals(proposal3Id)
+
+          assertEqualBN(yes1Total.plus(no1Total).plus(abstain1Total), maxAmount)
+          assertEqualBN(yes2Total.plus(no2Total).plus(abstain2Total), maxAmount)
+          assertEqualBN(yes3Total.plus(no3Total).plus(abstain3Total), maxAmount)
+
+          assertEqualBN(yes1Total, Math.ceil(yesPortion) - 1) // -1 because of rounding
+          assertEqualBN(no1Total, Math.ceil(noPortion))
+          assertEqualBN(abstain1Total, Math.ceil(abstainPortion))
+
+          assertEqualBN(yes2Total, 0)
+          assertEqualBN(no2Total, Math.ceil(no2Portion) - 1) // -1 because of rounding
+          assertEqualBN(abstain2Total, Math.ceil(abstain2Portion))
 
           await assertVoteRecord(
             governance,
             account,
             index,
             proposalId,
-            Math.ceil(yesPortion),
+            Math.ceil(yesPortion - 1), // -1 because of rounding
             Math.ceil(noPortion),
             Math.ceil(abstainPortion)
           )
@@ -4324,9 +4366,9 @@ contract('Governance', (accounts: string[]) => {
             account,
             index2,
             proposal2Id,
-            Math.ceil(noPortion),
-            Math.ceil(yesPortion),
-            Math.ceil(abstainPortion)
+            Math.ceil(0),
+            Math.ceil(no2Portion - 1), // -1 because of rounding
+            Math.ceil(abstain2Portion)
           )
         })
 
@@ -4362,6 +4404,7 @@ async function assertVoteRecord(
     noVotesRecord2,
     abstainVotesRecord2,
   ] = await governance.getVoteRecord(account, index)
+
   assertEqualBN(recordProposalId2, assertId)
   assertEqualBN(yesVotesRecord2, assertYes)
   assertEqualBN(noVotesRecord2, assertNo)

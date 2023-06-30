@@ -1574,13 +1574,35 @@ contract Governance is
       if (sumOfVotes > newVotingPower) {
         uint256 toRemove = sumOfVotes.sub(newVotingPower);
 
-        uint256 abstrainToRemove = getVotesPortion(toRemove, voteRecord.abstainVotes, sumOfVotes);
+        uint256 abstainToRemove = getVotesPortion(toRemove, voteRecord.abstainVotes, sumOfVotes);
         uint256 yesToRemove = getVotesPortion(toRemove, voteRecord.yesVotes, sumOfVotes);
         uint256 noToRemove = getVotesPortion(toRemove, voteRecord.noVotes, sumOfVotes);
 
+        uint256 totalRemoved = abstainToRemove.add(yesToRemove).add(noToRemove);
+
         uint256 yesVotes = voteRecord.yesVotes.sub(yesToRemove);
         uint256 noVotes = voteRecord.noVotes.sub(noToRemove);
-        uint256 abstainVotes = voteRecord.abstainVotes.sub(abstrainToRemove);
+        uint256 abstainVotes = voteRecord.abstainVotes.sub(abstainToRemove);
+
+        if (totalRemoved < toRemove) {
+          // in case of rounding error
+          uint256 roundingToRemove = toRemove.sub(totalRemoved);
+
+          uint256 toRemoveRounding = Math.min(roundingToRemove, yesVotes);
+          yesVotes = yesVotes.sub(toRemoveRounding);
+          roundingToRemove = roundingToRemove.sub(toRemoveRounding);
+
+          if (roundingToRemove > 0) {
+            toRemoveRounding = Math.min(roundingToRemove, noVotes);
+            noVotes = noVotes.sub(toRemoveRounding);
+            roundingToRemove = roundingToRemove.sub(toRemoveRounding);
+          }
+
+          if (roundingToRemove > 0) {
+            toRemoveRounding = Math.min(roundingToRemove, abstainVotes);
+            abstainVotes = abstainVotes.sub(toRemoveRounding);
+          }
+        }
 
         proposal.updateVote(
           voteRecord.yesVotes,
@@ -1596,6 +1618,26 @@ contract Governance is
         voteRecord.noVotes = noVotes;
       }
     }
+  }
+
+  function uintToStr(uint256 _i) internal pure returns (string memory _uintAsString) {
+    uint256 number = _i;
+    if (number == 0) {
+      return "0";
+    }
+    uint256 j = number;
+    uint256 len;
+    while (j != 0) {
+      len++;
+      j /= 10;
+    }
+    bytes memory bstr = new bytes(len);
+    uint256 k = len - 1;
+    while (number != 0) {
+      bstr[k--] = bytes1(uint8(48 + (number % 10)));
+      number /= 10;
+    }
+    return string(bstr);
   }
 
   /**

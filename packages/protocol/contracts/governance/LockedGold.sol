@@ -354,9 +354,10 @@ contract LockedGold is
       "Use revokeDelegatedGovernanceVotes to decrease delegated amount."
     );
 
-    uint256 requestedToDelegate = delegated.totalDelegatedCeloInPercents -
-      currentDelegateeInfo.percentage +
-      percentageToDelegate;
+    uint256 requestedToDelegate = delegated
+      .totalDelegatedCeloInPercents
+      .sub(currentDelegateeInfo.percentage)
+      .add(percentageToDelegate);
 
     require(requestedToDelegate <= 100, "Cannot delegate more than 100%");
 
@@ -371,7 +372,7 @@ contract LockedGold is
         .multiply(FixidityLib.newFixedFraction(totalReferendumVotes, totalLockedGold))
         .fromFixed();
       if (totalReferendumVotes.mod(totalLockedGold) != 0) {
-        referendumVotesInPercents++;
+        referendumVotesInPercents = referendumVotesInPercents.add(1);
       }
       require(
         referendumVotesInPercents.add(requestedToDelegate) <= 100,
