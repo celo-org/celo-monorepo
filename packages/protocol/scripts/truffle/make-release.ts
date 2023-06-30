@@ -91,20 +91,15 @@ const deployImplementation = async (
   console.log(`default from: ${from}`)
   const testingDeployment = false
   if (from) {
-    Contract.defaults({ from, type: 0 }) // override truffle with provided from address
+    Contract.defaults({ from }) // override truffle with provided from address
   }
-  console.log(`Deploying ${contractName} instance${Contract}`)
+  console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
   console.log(`isDryRun: ${dryRun}`)
-  let contract
-  try {
-    contract = await (dryRun
-      ? Contract.at(celoRegistryAddress)
-      : Contract.new(testingDeployment, { type: 0 }))
-  } catch (error) {
-    console.log(error)
-    throw error
-  }
+
+  const contract = await (dryRun
+    ? Contract.at(celoRegistryAddress)
+    : Contract.new(testingDeployment, { gas: 19000000 }))
 
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
@@ -174,7 +169,7 @@ const deployCoreContract = async (
     args: [contract.address],
     value: '0',
   }
-  console.log(`implementation deployed: ${JSON.stringify(contract)}`)
+  console.log(`implementation deployed: ${contractName}`)
 
   if (!shouldDeployProxy(report, contractName)) {
     proposal.push(setImplementationTx)
