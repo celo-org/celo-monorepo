@@ -94,10 +94,10 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           'Election',
           'EpochRewards',
           'Escrow',
-          // TODO add fee handler
           'FederatedAttestations',
           'FeeCurrencyWhitelist',
           'Freezer',
+          'FeeHandler',
           'GasPriceMinimum',
           'GoldToken',
           'Governance',

@@ -425,6 +425,18 @@ export function assertEqualBNArray(
   value.forEach((x, i) => assertEqualBN(x, expected[i]))
 }
 
+export function assertGtBN(
+  value: number | BN | BigNumber,
+  expected: number | BN | BigNumber,
+  msg?: string
+) {
+  assert(
+    web3.utils.toBN(value).gt(web3.utils.toBN(expected)),
+    `expected ${value.toString()} to be greater than to ${expected.toString()}. ${msg ||
+      ''}`
+  )
+}
+
 export function assertGteBN(
   value: number | BN | BigNumber,
   expected: number | BN | BigNumber,
