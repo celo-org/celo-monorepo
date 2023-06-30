@@ -35,10 +35,13 @@ git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 
 echo "- Build monorepo (contract artifacts, migrations, + all dependencies)"
 cd ../..
-# TODO: use `yarn clean` after release v8 (not available at monorepo-root for <=v8)
-yarn run lerna run clean >> $LOG_FILE
+
+# Using `yarn reset` to remove node_modules before re-installing using the node version of 
+# the previous release branch. This is useful when node version between branches are incompatible
+yarn run reset >> $LOG_FILE
 # build entire monorepo to account for any required dependencies.
 yarn install >> $LOG_FILE
+yarn run clean >> $LOG_FILE
 # in release v8 and earlier, @celo/contractkit automatically uses set RELEASE_TAG
 # when building, which fails if this differs from `package/protocol`'s build directory.
 RELEASE_TAG="" yarn build >> $LOG_FILE

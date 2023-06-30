@@ -40,7 +40,7 @@ ARG celo_env
 
 RUN echo "geth_tag is ${geth_tag}" && echo "Env is ${celo_env}"
 # Required for celocli
-RUN apk add --no-cache python2 git make gcc g++ pkgconfig libusb libusb-dev linux-headers eudev-dev
+RUN apk add --no-cache python git make gcc g++ pkgconfig libusb libusb-dev linux-headers eudev-dev
 
 WORKDIR /celo-monorepo/
 RUN npm install @celo/celocli

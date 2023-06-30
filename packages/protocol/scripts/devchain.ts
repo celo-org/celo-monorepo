@@ -53,6 +53,12 @@ yargs
     (args) => exitOnError(runDevChainFromTar(args.filename))
   )
   .command(
+    'run-tar-in-bg <filename>',
+    "Run celo's devchain using given tar filename. Generates a copy and then delete it",
+    (args) => args.positional('filename', { type: 'string', description: 'Chain tar filename' }),
+    (args) => exitOnError(runDevChainFromTarInBackGround(args.filename))
+  )
+  .command(
     'generate <datadir>',
     'Create a new devchain directory from scratch',
     (args) =>
@@ -253,6 +259,27 @@ async function runDevChainFromTar(filename: string) {
   }
 
   return stopGanache
+}
+
+/// This function was created to replace `startInBgAndWaitForString` in `release-on-devchain.sh`
+/// and intended to be run on a hosted instances that shutdown after execution.
+/// Note: If you run this locally, you will need to properly cleanup tmp.DirResult and
+/// manually close the detached ganache instance.
+/// see https://trufflesuite.com/docs/ganache/reference/cli-options/#manage-detached-instances for more details
+async function runDevChainFromTarInBackGround(filename: string) {
+  const cmdArgs = ['ganache-devchain', '-d']
+
+  // keep is set to true, because `release-on-devchain` fails when set to false.
+  const chainCopy: tmp.DirResult = tmp.dirSync({ keep: true, unsafeCleanup: true })
+
+  // tslint:disable-next-line: no-console
+  console.log(`Creating tmp folder: ${chainCopy.name}`)
+
+  await decompressChain(filename, chainCopy.name)
+
+  cmdArgs.push(chainCopy.name)
+
+  return execCmd(`yarn`, cmdArgs, { cwd: ProtocolRoot })
 }
 
 function decompressChain(tarPath: string, copyChainPath: string): Promise<void> {

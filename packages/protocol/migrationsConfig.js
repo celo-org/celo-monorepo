@@ -35,11 +35,6 @@ const DefaultConfig = {
   },
   blockchainParameters: {
     gasForNonGoldCurrencies: 50000,
-    minimumClientVersion: {
-      major: 1,
-      minor: 0,
-      patch: 0,
-    },
     deploymentBlockGasLimit: 20000000,
     blockGasLimit: 13000000,
     uptimeLookbackWindow: 12,
