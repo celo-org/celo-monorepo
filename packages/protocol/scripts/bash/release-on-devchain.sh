@@ -33,7 +33,9 @@ then
 fi
 
 echo "- Run local network"
-startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
+yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
+# TODO (soloseng): fix `startInBgAndWaitForString` PIPE error
+# startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
 
 GANACHE_PID=
 if command -v lsof; then
@@ -42,6 +44,9 @@ if command -v lsof; then
 fi
 
 echo "- Verify bytecode of the network"
+
+rm -r build/contracts*
+
 yarn build >> $LOG_FILE
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts --branch $BRANCH --librariesFile libraries.json
 

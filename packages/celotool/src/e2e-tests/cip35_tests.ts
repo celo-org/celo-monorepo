@@ -2,13 +2,17 @@
 import { CeloTx } from '@celo/connect'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
+import * as ejsRlp from '@ethereumjs/rlp'
+import * as ejsUtil from '@ethereumjs/util'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
-import ejsUtil from 'ethereumjs-util'
+import { keccak256 } from 'ethereum-cryptography/keccak'
+import { toHex } from 'ethereum-cryptography/utils'
 import lodash from 'lodash'
 import Web3 from 'web3'
 import { AccountType, generatePrivateKey } from '../lib/generate_utils'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
+import { ensure0x } from '../lib/utils'
 import { getHooks, initAndSyncGethWithRetry, mnemonic, sleep } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
@@ -245,8 +249,8 @@ class TestEnv {
   }
 
   async generateUnprotectedTransaction(ethCompatible: boolean): Promise<string> {
-    const encode = (ejsUtil as any).rlp.encode // the typescript typings are incomplete
-    const numToHex = (x: number | BigNumber) => ejsUtil.bufferToHex(ejsUtil.toBuffer(x))
+    const encode = ejsRlp.encode
+    const numToHex = (x: number | BigNumber) => ejsUtil.bufferToHex(ejsUtil.toBuffer(Number(x)))
     const nonce = await this.kit.connection.nonce(validatorAddress)
     const celoOnlyFields = ethCompatible ? [] : ['0x', '0x', '0x']
     const arr = [
@@ -258,15 +262,16 @@ class TestEnv {
       '0x05', // value: 5 wei
       '0x', // no data
     ]
-    const signingHash = ejsUtil.rlphash(arr)
+    // Creates SHA-3 hash of the RLP encoded version of the input.
+    const signingHash = ejsUtil.toBuffer(keccak256(ejsRlp.encode(arr)))
     const pk = ejsUtil.addHexPrefix(validatorPrivateKey)
     const sig = ejsUtil.ecsign(signingHash, ejsUtil.toBuffer(pk))
     arr.push(
-      ejsUtil.bufferToHex(stripZeros(sig.v)),
-      ejsUtil.bufferToHex(stripZeros(sig.r)),
-      ejsUtil.bufferToHex(stripZeros(sig.s))
+      ejsUtil.bufferToHex(stripZeros(sig.v) as Buffer),
+      ejsUtil.bufferToHex(stripZeros(sig.r) as Buffer),
+      ejsUtil.bufferToHex(stripZeros(sig.s) as Buffer)
     )
-    return ejsUtil.bufferToHex(encode(arr))
+    return ensure0x(toHex(encode(arr)))
   }
 
   runReplayProtectionTests() {

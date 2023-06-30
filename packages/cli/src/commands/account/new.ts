@@ -7,8 +7,8 @@ import {
   validateMnemonic,
 } from '@celo/cryptographic-utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { toChecksumAddress } from '@ethereumjs/util'
 import { flags } from '@oclif/command'
-import { toChecksumAddress } from 'ethereumjs-util'
 import * as fs from 'fs-extra'
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'

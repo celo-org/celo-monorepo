@@ -84,7 +84,14 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     request: Request<{}, {}, SignMessageRequest>,
     logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger, this.config.shouldFailOpen)
+    return authenticateUser(
+      request,
+      this.kit,
+      logger,
+      this.config.shouldFailOpen,
+      [],
+      this.config.fullNodeTimeoutMs
+    )
   }
 
   sendSuccess(

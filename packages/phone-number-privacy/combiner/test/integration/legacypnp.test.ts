@@ -3,6 +3,7 @@ import {
   AuthenticationMethod,
   CombinerEndpoint,
   ErrorMessage,
+  FULL_NODE_TIMEOUT_IN_MS,
   genSessionID,
   KEY_VERSION_HEADER,
   LegacySignMessageRequest,
@@ -142,6 +143,7 @@ const signerConfig: SignerConfig = {
   },
   timeout: 5000,
   test_quota_bypass_percentage: 0,
+  fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
 }
 
 const testBlockNumber = 1000000

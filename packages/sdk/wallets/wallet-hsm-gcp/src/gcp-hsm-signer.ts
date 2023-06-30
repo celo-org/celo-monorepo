@@ -12,9 +12,9 @@ import {
   sixtyFour,
   thirtyTwo,
 } from '@celo/wallet-hsm'
+import * as ethUtil from '@ethereumjs/util'
 import { KeyManagementServiceClient } from '@google-cloud/kms'
 import { BigNumber } from 'bignumber.js'
-import * as ethUtil from 'ethereumjs-util'
 
 export class GcpHsmSigner implements Signer {
   private client: KeyManagementServiceClient

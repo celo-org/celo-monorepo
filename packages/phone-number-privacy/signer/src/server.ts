@@ -7,7 +7,7 @@ import {
   SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import express, { Request, Response } from 'express'
+import express, { Request, RequestHandler, Response } from 'express'
 import fs from 'fs'
 import https from 'https'
 import { Knex } from 'knex'
@@ -47,7 +47,7 @@ export function startSigner(
 
   logger.info('Creating signer express server')
   const app = express()
-  app.use(express.json({ limit: '0.2mb' }), loggerMiddleware(config.serviceName))
+  app.use(express.json({ limit: '0.2mb' }) as RequestHandler, loggerMiddleware(config.serviceName))
 
   app.get(SignerEndpoint.STATUS, (_req, res) => {
     res.status(200).json({
@@ -98,6 +98,7 @@ export function startSigner(
       new PnpQuotaIO(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen, // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config to make the code cleaner
+        config.fullNodeTimeoutMs,
         kit
       )
     )
@@ -111,6 +112,7 @@ export function startSigner(
       new PnpSignIO(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen,
+        config.fullNodeTimeoutMs,
         kit
       )
     )
@@ -124,6 +126,7 @@ export function startSigner(
       new LegacyPnpSignIO(
         config.api.legacyPhoneNumberPrivacy.enabled,
         config.api.legacyPhoneNumberPrivacy.shouldFailOpen,
+        config.fullNodeTimeoutMs,
         kit
       )
     )
@@ -135,6 +138,7 @@ export function startSigner(
       new LegacyPnpQuotaIO(
         config.api.legacyPhoneNumberPrivacy.enabled,
         config.api.legacyPhoneNumberPrivacy.shouldFailOpen,
+        config.fullNodeTimeoutMs,
         kit
       )
     )

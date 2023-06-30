@@ -3,6 +3,8 @@
 
 version: 2.1
 
+orbs:
+  node: circleci/node@5.1.0
 
 parameters:
   # When you need to force a rebuild of the node modules cache then bump this version
@@ -28,7 +30,7 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
+    - image: us.gcr.io/celo-testnet/circleci-node18:1.0.0
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
@@ -36,12 +38,13 @@ defaults: &defaults
 contract-defaults: &contract-defaults
   <<: *defaults
   environment:
-    RELEASE_TAG: core-contracts.v9
+    # RELEASE_TAG: core-contracts.v9
+    RELEASE_TAG: ganache-v7-core-contracts.v9
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
   docker:
-    - image: us-west1-docker.pkg.dev/devopsre/celo-monorepo/circleci-geth:latest
+    - image: us-west1-docker.pkg.dev/devopsre/clabs-public-images/circleci:node18.14-go1.16
   environment:
     CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.7.x
 general:
@@ -78,6 +81,9 @@ commands:
       - run:
           name: Install dependencies
           command: |
+            # node-gyp needs to know where python is at when installed
+            yarn config set python $(which python3)
+
             if [ ! -e ~/.tmp/yarn_deps_have_changed ]; then
               # Though `yarn install` is instantaneous with up-to-date node_modules which is the case when we've restored cached node_modules,
               # there's currently a bug with the generated node_modules/.yarn-integrity file which is apparently not entirely stable
@@ -91,7 +97,6 @@ commands:
               yarn run postinstall
               exit 0
             fi
-
             # Deals with yarn install flakiness which can come due to yarnpkg.com being
             # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
             yarn install || yarn install || yarn install
@@ -128,7 +133,6 @@ jobs:
     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
     resource_class: large
     steps:
-
       - restore_cache:
           keys:
             - source-v1-{{ .Branch }}-{{ .Revision }}
@@ -154,7 +158,7 @@ jobs:
             # Verify that following commands work, they are later called in the incremental testing script
             # There output does not matter here, the fact that they finish successfully does.
             git rev-parse --abbrev-ref HEAD
-            git fetch --all --tags
+            git fetch --all --tags -f
 
       - attach_workspace:
           at: ~/app
@@ -197,7 +201,8 @@ jobs:
 
   general-test:
     <<: *defaults
-    resource_class: large
+    # XXX (soloseng): Increased size because this test was hitting the ram limit and failing
+    resource_class: xlarge
     steps:
       - attach_workspace:
           at: ~/app
@@ -234,6 +239,7 @@ jobs:
   # crashes on the second re-install.
   # This pre script, generates the build and devchain, and adds it to the workspace to be used for the
   # other script
+
   pre-protocol-test-release:
     <<: *contract-defaults
     resource_class: large
@@ -247,13 +253,16 @@ jobs:
       - run:
           name: Opcode tests
           command: yarn --cwd packages/protocol check-opcodes
+      - node/install:
+          install-yarn: true
+          node-version: '12.22.11'
       - run:
           name: Generate devchain of previous release
           command: |
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             echo "Comparing against $RELEASE_TAG"
-            # Github has phased out the git protocol so we ensure that we use
+            # Github has phased out the http protocol so we ensure that we use
             # https for all git operations that yarn may perform.
             git config --global url."https://github.com".insteadOf git://github.com
             yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
@@ -261,7 +270,6 @@ jobs:
           root: .
           paths:
             - 'packages/protocol/.tmp/released_chain/*'
-
   protocol-test-release:
     <<: *contract-defaults
     resource_class: large
@@ -730,7 +738,7 @@ jobs:
   test-typescript-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
+      - image: us.gcr.io/celo-testnet/circleci-node18:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -743,7 +751,7 @@ jobs:
   test-utils-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
+      - image: us.gcr.io/celo-testnet/circleci-node18:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -756,7 +764,7 @@ jobs:
   test-contractkit-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
+      - image: us.gcr.io/celo-testnet/circleci-node18:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -772,7 +780,7 @@ jobs:
   test-celocli-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
+      - image: us.gcr.io/celo-testnet/circleci-node18:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -992,24 +1000,24 @@ workflows:
       - odis-test:
           requires:
             - lint-checks
-      - flakey-test-summary:
-          requires:
-            - protocol-test-common
-            - protocol-test-compatibility
-            - protocol-test-governance-network
-            - protocol-test-governance-validators
-            - protocol-test-governance-voting
-            - protocol-test-identity
-            - protocol-test-stability
-            - end-to-end-geth-transfer-test
-            - end-to-end-geth-blockchain-parameters-test
-            - end-to-end-geth-slashing-test
-            - end-to-end-geth-governance-test
-            - end-to-end-geth-replica-test
-            - end-to-end-geth-sync-test
-            - end-to-end-geth-validator-order-test
-            - end-to-end-cip35-eth-compatibility-test
-            - odis-test
+      # - flakey-test-summary:
+      #     requires:
+      #       - protocol-test-common
+      #       - protocol-test-compatibility
+      #       - protocol-test-governance-network
+      #       - protocol-test-governance-validators
+      #       - protocol-test-governance-voting
+      #       - protocol-test-identity
+      #       - protocol-test-stability
+      #       - end-to-end-geth-transfer-test
+      #       - end-to-end-geth-blockchain-parameters-test
+      #       - end-to-end-geth-slashing-test
+      #       - end-to-end-geth-governance-test
+      #       - end-to-end-geth-replica-test
+      #       - end-to-end-geth-sync-test
+      #       - end-to-end-geth-validator-order-test
+      #       - end-to-end-cip35-eth-compatibility-test
+      #       - odis-test
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:

@@ -24,7 +24,6 @@
   "dependencies": {
     "@celo/utils": "4.1.1-dev",
     "@celo/wallet-local": "4.1.1-dev",
-    "@types/ethereumjs-util": "^5.2.0",
     "ethereumjs-wallet": "^1.0.1"
   },
   "devDependencies": {

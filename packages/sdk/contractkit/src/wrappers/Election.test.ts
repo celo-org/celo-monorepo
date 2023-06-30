@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { mineToNextEpoch } from '../test-utils/utils'
 
-import { zeroAddress } from 'ethereumjs-util'
+import { zeroAddress } from '@ethereumjs/util'
 import { newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from './Accounts'
 import { ElectionWrapper } from './Election'

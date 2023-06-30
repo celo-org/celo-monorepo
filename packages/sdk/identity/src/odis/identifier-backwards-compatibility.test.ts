@@ -4,6 +4,7 @@ import { OdisUtils as OdisUtilsOld } from 'old-identity-sdk'
 import { OdisUtils } from '../../lib'
 import { WasmBlsBlindingClient } from './bls-blinding-client'
 import { AuthenticationMethod, AuthSigner, getServiceContext, OdisContextName } from './query'
+import fetchMock from '../__mocks__/cross-fetch'
 
 const {
   getBlindedIdentifier,

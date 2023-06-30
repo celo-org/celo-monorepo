@@ -154,7 +154,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   ) => Promise<AttestationStat> = proxyCall(
     this.contract.methods.getAttestationStats,
     undefined,
-    (stat) => ({ completed: valueToInt(stat[0]), total: valueToInt(stat[1]) })
+    (stat) => ({
+      completed: valueToInt(stat[0]),
+      total: valueToInt(stat[1]),
+    })
   )
 
   /**

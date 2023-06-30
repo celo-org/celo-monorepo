@@ -41,7 +41,10 @@ export class MockOdis {
 
   quota(
     req: DomainQuotaStatusRequest<SequentialDelayDomain>
-  ): { status: number; body: DomainQuotaStatusResponse } {
+  ): {
+    status: number
+    body: DomainQuotaStatusResponse
+  } {
     const authorized = verifyDomainQuotaStatusRequestAuthenticity(req)
     if (!authorized) {
       return {
@@ -66,7 +69,10 @@ export class MockOdis {
 
   sign(
     req: DomainRestrictedSignatureRequest<SequentialDelayDomain>
-  ): { status: number; body: DomainRestrictedSignatureResponse } {
+  ): {
+    status: number
+    body: DomainRestrictedSignatureResponse
+  } {
     const authorized = verifyDomainRestrictedSignatureRequestAuthenticity(req)
     if (!authorized) {
       return {

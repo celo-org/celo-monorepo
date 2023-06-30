@@ -6,6 +6,7 @@ import {
   Callback,
   CeloTx,
   EncodedTransaction,
+  Error,
   JsonRpcPayload,
   JsonRpcResponse,
   Provider,
@@ -53,12 +54,12 @@ class MockWallet implements ReadOnlyWallet {
     return Promise.resolve('mock')
   }
   decrypt(_address: string, _ciphertext: Buffer): Promise<Buffer> {
-    return Promise.resolve(new Buffer('mock'))
+    return Promise.resolve(Buffer.from('mock'))
   }
   // tslint:disable-next-line: no-empty
   removeAccount(_address: string): void {}
   computeSharedSecret(_address: string, _publicKey: string): Promise<Buffer> {
-    return Promise.resolve(new Buffer('mock'))
+    return Promise.resolve(Buffer.from('mock'))
   }
 }
 
