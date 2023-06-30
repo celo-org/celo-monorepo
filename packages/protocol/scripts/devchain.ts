@@ -254,7 +254,7 @@ async function runDevChainFromTar(filename: string) {
 // XXX (soloseng): This is a temp fix, for running devchain from tar in background.
 async function runDevChainFromTarInBackGround(filename: string) {
   const cmdArgs = ['ganache-devchain', '-d']
-  const chainCopy: tmp.DirResult = tmp.dirSync({ keep: false, unsafeCleanup: true })
+  const chainCopy: tmp.DirResult = tmp.dirSync({ keep: true, unsafeCleanup: true })
   // tslint:disable-next-line: no-console
   console.log(`Creating tmp folder: ${chainCopy.name}`)
 
