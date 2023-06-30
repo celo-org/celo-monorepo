@@ -24,4 +24,8 @@ yarn run ganache \
   --chain.allowUnlimitedContractSize=true \
   --chain.chainId=1 \
   --chain.hardfork='istanbul' \
-  --database.dbPath=$DATA_DIR
+  --database.dbPath=$DATA_DIR \
+  --chain.vmErrorsOnRPCResponse=true \
+  --logging.debug=true \
+  --logging.verbose=true \
+  --logging.quiet=false
