@@ -17,7 +17,7 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fixed1, multiply, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { keccak256, zeroAddress } from 'ethereumjs-util'
+import { keccak256 } from 'ethereumjs-util'
 import {
   AccountsContract,
   AccountsInstance,
@@ -4182,13 +4182,13 @@ contract('Governance', (accounts: string[]) => {
   describe('#removeVotesWhenRevokingDelegatedVotes()', () => {
     it('should revert when not called by staked celo contract', async () => {
       await assertRevertWithReason(
-        governance.removeVotesWhenRevokingDelegatedVotes(zeroAddress(), 0),
+        governance.removeVotesWhenRevokingDelegatedVotes(NULL_ADDRESS, 0),
         'msg.sender not lockedGold'
       )
     })
 
     it('should should pass when no proposal is dequeued', async () => {
-      await governance.removeVotesWhenRevokingDelegatedVotesTest(zeroAddress(), 0)
+      await governance.removeVotesWhenRevokingDelegatedVotesTest(NULL_ADDRESS, 0)
     })
 
     describe('When having two proposals voted', () => {
