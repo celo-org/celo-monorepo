@@ -226,9 +226,6 @@ module.exports = {
   },
   networks,
   mocha: flakeTrackingConfig,
-  logging: {
-    level: 'debug',
-  },
 }
 
 if (process.argv.includes('--gas')) {
