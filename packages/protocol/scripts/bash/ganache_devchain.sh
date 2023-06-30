@@ -12,8 +12,6 @@ done
 
 [ -z "$DATA_DIR" ] && echo "Need to set the datadir path via the -d flag" && exit 1;
 
-# Runs ganache with the mnemonic used in our tests.
-
 yarn run ganache \
   --detach \
   --wallet.mnemonic='concert load couple harbor equip island argue ramp clarify fence smart topic' \
@@ -24,8 +22,4 @@ yarn run ganache \
   --chain.allowUnlimitedContractSize=true \
   --chain.chainId=1 \
   --chain.hardfork='istanbul' \
-  --database.dbPath=$DATA_DIR \
-  --chain.vmErrorsOnRPCResponse=true \
-  --logging.debug=true \
-  --logging.verbose=true \
-  --logging.quiet=false
+  --database.dbPath=$DATA_DIR

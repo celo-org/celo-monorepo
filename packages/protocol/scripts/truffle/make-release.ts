@@ -88,19 +88,15 @@ const deployImplementation = async (
   from: string,
   requireVersion = true
 ) => {
-  console.log(`default from: ${from}`)
   const testingDeployment = false
   if (from) {
     Contract.defaults({ from }) // override truffle with provided from address
   }
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
-  console.log(`isDryRun: ${dryRun}`)
-
   const contract = await (dryRun
     ? Contract.at(celoRegistryAddress)
     : Contract.new(testingDeployment, { gas: 19000000 }))
-
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
@@ -169,7 +165,6 @@ const deployCoreContract = async (
     args: [contract.address],
     value: '0',
   }
-  console.log(`implementation deployed: ${contractName}`)
 
   if (!shouldDeployProxy(report, contractName)) {
     proposal.push(setImplementationTx)
@@ -246,7 +241,6 @@ module.exports = async (callback: (error?: any) => number) => {
       ],
       boolean: ['dry_run'],
     })
-    console.log(JSON.stringify(argv))
     const fullReport = readJsonSync(argv.report)
     const libraryMapping: LibraryAddresses['addresses'] = readJsonSync(
       argv.librariesFile ?? 'libraries.json'
@@ -292,7 +286,6 @@ module.exports = async (callback: (error?: any) => number) => {
 
       // 3. Deploy new versions of the contract or library, if indicated by the report.
       const shouldDeployContract = Object.keys(report.contracts).includes(contractName)
-      console.log(`should deploy: ${shouldDeployContract}`)
       const shouldDeployLibrary = Object.keys(report.libraries).includes(contractName)
       if (shouldDeployContract) {
         await deployCoreContract(
@@ -306,7 +299,6 @@ module.exports = async (callback: (error?: any) => number) => {
           argv.from
         )
       } else if (shouldDeployLibrary) {
-        console.log('deploying library')
         await deployLibrary(contractName, contractArtifact, addresses, argv.dry_run, argv.from)
       }
 
@@ -321,7 +313,6 @@ module.exports = async (callback: (error?: any) => number) => {
     writeJsonSync(argv.proposal, proposal, { spaces: 2 })
     callback()
   } catch (error) {
-    console.log('### error:', error)
     callback(error)
   }
 }
