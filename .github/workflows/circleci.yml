@@ -9,7 +9,7 @@ on:
     branches:
       - master
       # TODO (soloseng): remove before merge
-      - soloseng/ganache-upgrade 
+      - pahor/0.8_from_seb 
   # TODO(jcortejoso): Replace by pull_request
   pull_request_target:
     branches:
