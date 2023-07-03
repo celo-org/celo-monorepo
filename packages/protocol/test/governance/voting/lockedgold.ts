@@ -201,7 +201,7 @@ contract('LockedGold', (accounts: string[]) => {
   describe('#unlock()', () => {
     const value = 1000
     let availabilityTime: BigNumber
-    let resp: any
+    let resp: Truffle.TransactionResponse
     describe('when there are no balance requirements', () => {
       beforeEach(async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -323,25 +323,222 @@ contract('LockedGold', (accounts: string[]) => {
       describe('when the account is delegating', () => {
         const delegatee = accounts[5]
         const percentToDelagate = 50
+        const toUnlock = Math.ceil((value / 100) * (100 - percentToDelagate)) // 500
+        const originallyDelegatedAmount = (value / 100) * percentToDelagate // 500
 
         beforeEach(async () => {
           await accountsInstance.createAccount({ from: delegatee })
           await lockedGold.delegateGovernanceVotes(delegatee, percentToDelagate)
-        })
-
-        it('should revert when trying to unlock CELO that is delegated', async () => {
-          await assertRevertWithReason(
-            lockedGold.unlock(value),
-            'Not enough undelegated Celo. Celo has to be removed from delegation first.'
-          )
+          await mockGovernance.setTotalVotes(delegatee, originallyDelegatedAmount)
+          await lockedGold.unlock(toUnlock)
         })
 
         it('should correctly unlock when getting less or equal to locked amount', async () => {
-          const toUnlock = Math.ceil((value / 100) * percentToDelagate)
-          await lockedGold.unlock(toUnlock)
-
           const [val] = await lockedGold.getPendingWithdrawal(account, 0)
           assertEqualBN(val, toUnlock)
+        })
+
+        it('should correctly update delegated amount for delegatee', async () => {
+          const [expected, real] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
+            accounts[0],
+            delegatee
+          )
+          assertEqualBN(expected, originallyDelegatedAmount / 2)
+          assertEqualBN(real, toUnlock / 2)
+        })
+
+        it('should decrease total delegated amount for delegatee', async () => {
+          const delegateeTotalAmount = await lockedGold.totalDelegatedCelo(delegatee)
+          assertEqualBN(delegateeTotalAmount, originallyDelegatedAmount / 2)
+        })
+
+        it('should call removeDelegatedVotes because voting for governance', async () => {
+          const removeDelegatedVotes = await mockGovernance.removeVotesCalledFor(delegatee)
+          assertEqualBN(removeDelegatedVotes, originallyDelegatedAmount / 2)
+        })
+      })
+
+      describe('when the account is delegating to 2 delegatees', () => {
+        const delegatee = accounts[5]
+        const delegatee2 = accounts[6]
+        const percentToDelagate = 50
+        const toUnlock = Math.ceil((value / 100) * (100 - percentToDelagate)) + 1 // 501
+        const originallyDelegatedAmount = (value / 100) * percentToDelagate // 500
+
+        beforeEach(async () => {
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          await lockedGold.lock({ value: 1 })
+          await accountsInstance.createAccount({ from: delegatee })
+          await accountsInstance.createAccount({ from: delegatee2 })
+          await lockedGold.delegateGovernanceVotes(delegatee, percentToDelagate)
+          await lockedGold.delegateGovernanceVotes(delegatee2, percentToDelagate)
+          await mockGovernance.setTotalVotes(delegatee, originallyDelegatedAmount)
+          await mockGovernance.setTotalVotes(delegatee2, originallyDelegatedAmount)
+          await lockedGold.unlock(toUnlock)
+        })
+
+        it('should correctly unlock when getting less or equal to locked amount', async () => {
+          const [val] = await lockedGold.getPendingWithdrawal(account, 0)
+          assertEqualBN(val, toUnlock)
+        })
+
+        it('should correctly update delegated amount for delegatee', async () => {
+          const [expected, real] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
+            accounts[0],
+            delegatee
+          )
+          assertEqualBN(expected, originallyDelegatedAmount / 2)
+          assertEqualBN(real, Math.floor(toUnlock / 2))
+
+          const [expected2, real2] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
+            accounts[0],
+            delegatee2
+          )
+          assertEqualBN(expected2, originallyDelegatedAmount / 2)
+          assertEqualBN(real2, Math.floor(toUnlock / 2))
+        })
+
+        it('should decrease total delegated amount for delegatee', async () => {
+          const delegateeTotalAmount = await lockedGold.totalDelegatedCelo(delegatee)
+          assertEqualBN(delegateeTotalAmount, originallyDelegatedAmount / 2)
+
+          const delegateeTotalAmount2 = await lockedGold.totalDelegatedCelo(delegatee2)
+          assertEqualBN(delegateeTotalAmount2, originallyDelegatedAmount / 2)
+        })
+
+        it('should call removeDelegatedVotes because voting for governance', async () => {
+          const removeDelegatedVotes = await mockGovernance.removeVotesCalledFor(delegatee)
+          assertEqualBN(removeDelegatedVotes, originallyDelegatedAmount / 2)
+
+          const removeDelegatedVotes2 = await mockGovernance.removeVotesCalledFor(delegatee2)
+          assertEqualBN(removeDelegatedVotes2, originallyDelegatedAmount / 2)
+        })
+      })
+
+      describe('when the account is delegating to 3 delegatees', () => {
+        const delegatee = accounts[5]
+        const delegatee2 = accounts[6]
+        const delegatee3 = accounts[7]
+        const percentToDelagate = 33
+        const toUnlock = 4
+
+        beforeEach(async () => {
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          await lockedGold.unlock(995) // I have only 5 locked now
+          await accountsInstance.createAccount({ from: delegatee })
+          await accountsInstance.createAccount({ from: delegatee2 })
+          await accountsInstance.createAccount({ from: delegatee3 })
+          await lockedGold.delegateGovernanceVotes(delegatee, percentToDelagate)
+          await lockedGold.delegateGovernanceVotes(delegatee2, percentToDelagate)
+          await lockedGold.delegateGovernanceVotes(delegatee3, percentToDelagate)
+
+          const [expected, real] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
+            accounts[0],
+            delegatee
+          )
+          assertEqualBN(expected, 1)
+          assertEqualBN(real, 1)
+
+          const [expected2, real2] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
+            accounts[0],
+            delegatee2
+          )
+          assertEqualBN(expected2, 1)
+          assertEqualBN(real2, 1)
+
+          const [expected3, real3] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
+            accounts[0],
+            delegatee3
+          )
+          assertEqualBN(expected3, 1)
+          assertEqualBN(real3, 1)
+          await mockGovernance.setTotalVotes(delegatee, 1)
+          await mockGovernance.setTotalVotes(delegatee2, 1)
+          await mockGovernance.setTotalVotes(delegatee3, 1)
+
+          await mockGovernance.removeVotesWhenRevokingDelegatedVotes(delegatee, 9999)
+          await mockGovernance.removeVotesWhenRevokingDelegatedVotes(delegatee2, 9999)
+          await mockGovernance.removeVotesWhenRevokingDelegatedVotes(delegatee3, 9999)
+
+          resp = await lockedGold.unlock(toUnlock)
+        })
+
+        it('should correctly unlock when getting less or equal to locked amount', async () => {
+          const [val] = await lockedGold.getPendingWithdrawal(account, 1)
+          assertEqualBN(val, toUnlock)
+        })
+
+        it('should correctly update delegated amount for delegatee', async () => {
+          const [expected, real] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
+            accounts[0],
+            delegatee
+          )
+          assertEqualBN(expected, 0)
+          assertEqualBN(real, 0)
+
+          const [expected2, real2] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
+            accounts[0],
+            delegatee2
+          )
+          assertEqualBN(expected2, 0)
+          assertEqualBN(real2, 0)
+
+          const [expected3, real3] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
+            accounts[0],
+            delegatee3
+          )
+          assertEqualBN(expected3, 0)
+          assertEqualBN(real3, 0)
+        })
+
+        it('should decrease total delegated amount for delegatee', async () => {
+          const delegateeTotalAmount = await lockedGold.totalDelegatedCelo(delegatee)
+          assertEqualBN(delegateeTotalAmount, 0)
+
+          const delegateeTotalAmount2 = await lockedGold.totalDelegatedCelo(delegatee2)
+          assertEqualBN(delegateeTotalAmount2, 0)
+        })
+
+        it('should call removeDelegatedVotes because voting for governance', async () => {
+          const removeDelegatedVotes = await mockGovernance.removeVotesCalledFor(delegatee)
+          assertEqualBN(removeDelegatedVotes, 0)
+
+          const removeDelegatedVotes2 = await mockGovernance.removeVotesCalledFor(delegatee2)
+          assertEqualBN(removeDelegatedVotes2, 0)
+
+          const removeDelegatedVotes3 = await mockGovernance.removeVotesCalledFor(delegatee3)
+          assertEqualBN(removeDelegatedVotes3, 0)
+        })
+
+        it('should emit the CeloDelegatedRevoked event', async () => {
+          assert.equal(resp.logs.length, 4)
+          assertLogMatches2(resp.logs[0], {
+            event: 'CeloDelegatedRevoked',
+            args: {
+              delegator: accounts[0],
+              delegatee,
+              percent: 0,
+              amount: 1,
+            },
+          })
+          assertLogMatches2(resp.logs[1], {
+            event: 'CeloDelegatedRevoked',
+            args: {
+              delegator: accounts[0],
+              delegatee: delegatee2,
+              percent: 0,
+              amount: 1,
+            },
+          })
+          assertLogMatches2(resp.logs[2], {
+            event: 'CeloDelegatedRevoked',
+            args: {
+              delegator: accounts[0],
+              delegatee: delegatee3,
+              percent: 0,
+              amount: 1,
+            },
+          })
         })
       })
     })
@@ -373,7 +570,7 @@ contract('LockedGold', (accounts: string[]) => {
   describe('#relock()', () => {
     const pendingWithdrawalValue = 1000
     const index = 0
-    let resp: any
+    let resp: Truffle.TransactionResponse
     describe('when a pending withdrawal exists', () => {
       beforeEach(async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -465,6 +662,34 @@ contract('LockedGold', (accounts: string[]) => {
       })
     })
 
+    describe('When delegating', () => {
+      const delegatee = accounts[5]
+
+      beforeEach(async () => {
+        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+        await lockedGold.lock({ value: pendingWithdrawalValue })
+        await accountsInstance.createAccount({ from: delegatee })
+        await lockedGold.delegateGovernanceVotes(delegatee, 100)
+        await lockedGold.unlock(pendingWithdrawalValue / 2)
+        const [expected, real] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
+          accounts[0],
+          delegatee
+        )
+        assertEqualBN(expected, pendingWithdrawalValue / 2)
+        assertEqualBN(real, pendingWithdrawalValue / 2)
+      })
+
+      it('should update delegated amount', async () => {
+        await lockedGold.relock(index, pendingWithdrawalValue / 2)
+        const [expected, real] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
+          accounts[0],
+          delegatee
+        )
+        assertEqualBN(expected, pendingWithdrawalValue)
+        assertEqualBN(real, pendingWithdrawalValue)
+      })
+    })
+
     describe('when a pending withdrawal does not exist', () => {
       it('should revert', async () => {
         await assertRevert(lockedGold.relock(index, pendingWithdrawalValue))
@@ -475,7 +700,7 @@ contract('LockedGold', (accounts: string[]) => {
   describe('#withdraw()', () => {
     const value = 1000
     const index = 0
-    let resp: any
+    let resp: Truffle.TransactionResponse
     describe('when a pending withdrawal exists', () => {
       beforeEach(async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
