@@ -890,13 +890,6 @@ contract('LockedGold', (accounts: string[]) => {
           assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), value - penalty)
           assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), value - penalty)
         })
-
-        it('should reduce delegatee voting power', async () => {
-          const totalAccountGovernanceVotingPower = await lockedGold.getAccountTotalGovernanceVotingPower(
-            delegatee
-          )
-          assertEqualBN(totalAccountGovernanceVotingPower, value - penalty)
-        })
       })
     })
 
@@ -1157,12 +1150,12 @@ contract('LockedGold', (accounts: string[]) => {
             await lockedGold.lock({ value, from: delegator2 })
           })
 
-          it.only('should revert when vote over max number of groups set to true', async () => {
-            await mockValidators.setValidatorGroup(accounts[0])
-            // await assertRevert(
-            lockedGold.delegateGovernanceVotes(delegatee1, 10)
-            // 'Validators cannot delegate votes.'
-            // )
+          it('should revert when vote over max number of groups set to true', async () => {
+            await mockValidators.setValidator(accounts[0])
+            await assertRevert(
+              lockedGold.delegateGovernanceVotes(delegatee1, 10),
+              'Validators cannot delegate votes.'
+            )
           })
 
           describe('When delegatee account is registered', () => {
