@@ -172,7 +172,7 @@ contract LockedGold is
       "Must first register address with Account.createAccount"
     );
     _incrementNonvotingAccountBalance(msg.sender, msg.value);
-    updateDelegatedAmount(msg.sender);
+    _updateDelegatedAmount(msg.sender);
     emit GoldLocked(msg.sender, msg.value);
   }
 
@@ -247,11 +247,7 @@ contract LockedGold is
     uint256 delegatedPercentage = delegatorInfo[msg.sender].totalDelegatedCeloInPercents;
 
     if (delegatedPercentage != 0) {
-      uint256 amountToRevokeFromDelegated = FixidityLib
-        .newFixedFraction(value, 100)
-        .multiply(FixidityLib.newFixed(delegatedPercentage))
-        .fromFixed();
-      revokeFromDelegatedWhenUnlocking(msg.sender, value, amountToRevokeFromDelegated);
+      revokeFromDelegatedWhenUnlocking(msg.sender, value);
     }
 
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
@@ -286,7 +282,7 @@ contract LockedGold is
       pendingWithdrawal.value = pendingWithdrawal.value.sub(value);
     }
     _incrementNonvotingAccountBalance(msg.sender, value);
-    updateDelegatedAmount(msg.sender);
+    _updateDelegatedAmount(msg.sender);
     emit GoldRelocked(msg.sender, value);
   }
 
@@ -340,6 +336,9 @@ contract LockedGold is
     address delegatorAddress = getAccounts().voteSignerToAccount(msg.sender);
     address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
 
+    IValidators validators = getValidators();
+    require(!validators.isValidator(delegatorAddress), "Validators cannot delegate votes.");
+
     Delegated storage delegated = delegatorInfo[delegatorAddress];
     delegated.delegatees.add(delegateeAccount);
     require(delegated.delegatees.length() <= maxDelegateesCount, "Too many delegatees");
@@ -360,7 +359,20 @@ contract LockedGold is
     require(requestedToDelegate <= 100, "Cannot delegate more than 100%");
 
     uint256 totalLockedGold = getAccountTotalLockedGold(delegatorAddress);
-    require(totalLockedGold > 0, "No locked celo");
+    if (totalLockedGold == 0) {
+      currentDelegateeInfo.percentage = percentageToDelegate;
+      delegated.totalDelegatedCeloInPercents = delegated.totalDelegatedCeloInPercents.add(
+        percentageToDelegate
+      );
+
+      emit CeloDelegated(
+        delegatorAddress,
+        delegateeAccount,
+        percentageToDelegate,
+        currentDelegateeInfo.currentAmount
+      );
+      return;
+    }
 
     uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatorAddress);
 
@@ -468,11 +480,7 @@ contract LockedGold is
    * @param delegator The delegator account.
    * @param amountToRevoke The amount to revoke.
    */
-  function revokeFromDelegatedWhenUnlocking(
-    address delegator,
-    uint256 amountToRevoke,
-    uint256 expectedToRevokeFromDelegated
-  ) private {
+  function revokeFromDelegatedWhenUnlocking(address delegator, uint256 amountToRevoke) private {
     address[] memory delegatees = getDelegateesOfDelegator(delegator);
 
     Delegated storage delegated = delegatorInfo[delegator];
@@ -525,6 +533,11 @@ contract LockedGold is
    * @param delegator The delegator address.
    */
   function updateDelegatedAmount(address delegator) public {
+    address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
+    _updateDelegatedAmount(delegatorAccount);
+  }
+
+  function _updateDelegatedAmount(address delegator) private {
     address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
     EnumerableSet.AddressSet storage delegatees = delegatorInfo[delegatorAccount].delegatees;
     for (uint256 i = 0; i < delegatees.length(); i = i.add(1)) {
@@ -857,7 +870,6 @@ contract LockedGold is
     address payable communityFundPayable = address(uint160(communityFund));
     require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
     communityFundPayable.sendValue(maxSlash.sub(reward));
-    updateDelegatedAmount(account);
     emit AccountSlashed(account, maxSlash, reporter, reward);
   }
 }

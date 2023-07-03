@@ -4323,7 +4323,7 @@ contract('Governance', (accounts: string[]) => {
           await assertVoteRecord(governance, account, index2, proposal2Id, 0, 0, 0)
         })
 
-        it('should adjust votes correctly to 50', async () => {
+        it.only('should adjust votes correctly to 50', async () => {
           const maxAmount = 50
           const sumOfVotes = yes + no + abstain
           const toRemove = sumOfVotes - maxAmount

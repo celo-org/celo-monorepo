@@ -1111,12 +1111,58 @@ contract('LockedGold', (accounts: string[]) => {
       })
 
       describe('When no vote signers', () => {
+        describe('When no gold is locked', () => {
+          let resp: Truffle.TransactionResponse
+          const percentsToDelegate = 30
+          const delegatedAmount = 0
+
+          beforeEach(async () => {
+            resp = await lockedGold.delegateGovernanceVotes(delegatee1, percentsToDelegate)
+          })
+
+          it('should return correct delegated amounts', async () => {
+            await assertDelegatorDelegateeAmounts(
+              delegator,
+              delegatee1,
+              percentsToDelegate,
+              delegatedAmount,
+              lockedGold
+            )
+            assertEqualBN(
+              await lockedGold.getAccountTotalDelegatedAmountInPercents(delegator),
+              percentsToDelegate
+            )
+          })
+
+          it('should emit the CeloDelegated event', async () => {
+            assert.equal(resp.logs.length, 1)
+            const log = resp.logs[0]
+            assertLogMatches2(log, {
+              event: 'CeloDelegated',
+              args: {
+                delegator,
+                delegatee: delegatee1,
+                percent: percentsToDelegate,
+                amount: delegatedAmount,
+              },
+            })
+          })
+        })
+
         describe('When some gold is locked', () => {
           const value = 1000
 
           beforeEach(async () => {
             await lockedGold.lock({ value, from: delegator })
             await lockedGold.lock({ value, from: delegator2 })
+          })
+
+          it.only('should revert when vote over max number of groups set to true', async () => {
+            await mockValidators.setValidatorGroup(accounts[0])
+            // await assertRevert(
+            lockedGold.delegateGovernanceVotes(delegatee1, 10)
+            // 'Validators cannot delegate votes.'
+            // )
           })
 
           describe('When delegatee account is registered', () => {

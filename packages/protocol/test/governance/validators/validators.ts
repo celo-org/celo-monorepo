@@ -575,6 +575,18 @@ contract('Validators', (accounts: string[]) => {
         )
       })
 
+      it('should revert when delegating Celo', async () => {
+        await mockLockedGold.setAccountTotalDelegatedAmountInPercents(validator, 10)
+        const signer = accounts[9]
+        const sig = await getParsedSignatureOfAddress(web3, validator, signer)
+        await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
+        const publicKey = await addressToPublicKey(signer, web3.eth.sign)
+        await assertRevert(
+          validators.registerValidator(publicKey, blsPublicKey, blsPoP),
+          'Validators cannot delegate governance power'
+        )
+      })
+
       describe('when the account has authorized a validator signer', () => {
         let validatorRegistrationEpochNumber: number
         let publicKey: string

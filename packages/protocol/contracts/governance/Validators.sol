@@ -362,6 +362,12 @@ contract Validators is
       !getElection().allowedToVoteOverMaxNumberOfGroups(account),
       "Validators cannot vote for more than max number of groups"
     );
+    require(
+      // Validator could avoid getting slashed by delegating Celo to delegatees that would be voting
+      // for lots of proposals. Such transaction could run out of gas.
+      getLockedGold().getAccountTotalDelegatedAmountInPercents(account) == 0,
+      "Validators cannot delegate governance power"
+    );
     require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value, "Deposit too small");
