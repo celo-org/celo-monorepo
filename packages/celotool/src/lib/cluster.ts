@@ -1,7 +1,7 @@
 import sleep from 'sleep-promise'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { getClusterConfigForContext, switchToContextCluster } from './context-utils'
-import { doCheckOrPromptIfStagingOrProduction, EnvTypes, envVar, fetchEnv } from './env-utils'
+import { EnvTypes, doCheckOrPromptIfStagingOrProduction, envVar, fetchEnv } from './env-utils'
 import {
   checkHelmVersion,
   createAndUploadBackupSecretIfNotExists,
@@ -11,10 +11,10 @@ import {
   installCertManagerAndNginx,
   installGCPSSDStorageClass,
   isCelotoolHelmDryRun,
+  networkName,
 } from './helm_deploy'
 import { createServiceAccountIfNotExists } from './service-account-utils'
 import { outputIncludes, switchToProjectFromEnv } from './utils'
-import { networkName } from './vm-testnet-utils'
 
 const SYSTEM_HELM_RELEASES = [
   'nginx-ingress-release',

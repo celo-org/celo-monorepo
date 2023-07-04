@@ -1398,3 +1398,11 @@ async function generateMyCeloGenesis(): Promise<string> {
   await spawnCmd('rm', ['-rf', celoBlockchainDir], { silent: true })
   return genesisContent
 }
+
+function useDefaultNetwork() {
+  return fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) === 'celo-networks-dev'
+}
+
+export function networkName(celoEnv: string) {
+  return useDefaultNetwork() ? 'default' : `${celoEnv}-network`
+}
