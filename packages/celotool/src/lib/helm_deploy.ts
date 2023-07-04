@@ -15,7 +15,7 @@ import {
   spawnCmd,
   spawnCmdWithExitOnFailure,
 } from './cmd-utils'
-import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
+import { envTypes, envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import {
@@ -110,7 +110,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
   }
 
   const envType = fetchEnv(envVar.ENV_TYPE)
-  if (envType !== EnvTypes.DEVELOPMENT) {
+  if (envType !== envTypes.DEVELOPMENT) {
     try {
       await execCmdWithExitOnFailure(
         `gcloud sql instances create ${instanceName}-replica --master-instance-name=${instanceName} --zone ${fetchEnv(

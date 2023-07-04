@@ -226,7 +226,7 @@ export enum DynamicEnvVar {
   PROM_REMOTE_WRITE_URL = '{{ context }}_PROM_REMOTE_WRITE_URL',
 }
 
-export enum EnvTypes {
+export enum envTypes {
   DEVELOPMENT = 'development',
   INTEGRATION = 'integration',
   STAGING = 'staging',
@@ -290,7 +290,7 @@ export function validateAndSwitchToEnv(celoEnv: string) {
 }
 
 export function isProduction() {
-  return fetchEnv(envVar.ENV_TYPE).toLowerCase() === EnvTypes.PRODUCTION
+  return fetchEnv(envVar.ENV_TYPE).toLowerCase() === envTypes.PRODUCTION
 }
 
 export function isValidCeloEnv(celoEnv: string) {

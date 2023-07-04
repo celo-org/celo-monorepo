@@ -1,7 +1,7 @@
 import sleep from 'sleep-promise'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { getClusterConfigForContext, switchToContextCluster } from './context-utils'
-import { EnvTypes, doCheckOrPromptIfStagingOrProduction, envVar, fetchEnv } from './env-utils'
+import { doCheckOrPromptIfStagingOrProduction, envTypes, envVar, fetchEnv } from './env-utils'
 import {
   checkHelmVersion,
   createAndUploadBackupSecretIfNotExists,
@@ -137,7 +137,7 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
 
   await installCertManagerAndNginx(celoEnv)
 
-  if (envType !== EnvTypes.DEVELOPMENT) {
+  if (envType !== envTypes.DEVELOPMENT) {
     console.info('Installing metric tools installation')
     await installAndEnableMetricsDeps(true)
   } else {
@@ -199,7 +199,7 @@ export async function setClusterLabels(celoEnv: string) {
     )
   }
   await labelfn('environment', envType)
-  await labelfn('envtype', envType === EnvTypes.PRODUCTION ? 'production' : 'nonproduction')
+  await labelfn('envtype', envType === envTypes.PRODUCTION ? 'production' : 'nonproduction')
   await labelfn('envinstance', celoEnv)
 }
 
