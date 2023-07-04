@@ -1274,8 +1274,26 @@ export async function startGeth(
     }
   }
 
-  // Geth startup isn't fully done even when the port is open, so give it another second
-  await sleep(1000)
+  // Geth startup isn't fully done even when the port is open, so check until it responds
+  const maxTries = 5
+  let tries = 0
+  while (tries < maxTries) {
+    tries++
+    let block = null
+    try {
+      block = await new Web3('http://localhost:8545').eth.getBlock('latest')
+    } catch (e) {
+      console.log(`Failed to fetch test block: ${e}`)
+    }
+    if (block) {
+      break
+    }
+    console.log('Could not fetch test block. Wait one second, then retry.')
+    await sleep(1000)
+  }
+  if (tries === maxTries) {
+    throw new Error(`Geth did not start within ${tries} seconds`)
+  }
 
   console.log(
     `${instance.name}: running.`,
