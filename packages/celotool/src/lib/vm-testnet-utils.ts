@@ -1,6 +1,8 @@
+//TODO(jcortejoso): Remove this file
+
 import sleep from 'sleep-promise'
 import { execCmd } from './cmd-utils'
-import { confirmAction, envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
+import { confirmAction, envVar, fetchEnv } from './env-utils'
 import {
   AccountType,
   generateGenesisFromEnv,
@@ -11,6 +13,7 @@ import {
   privateKeyToPublicKey,
 } from './generate_utils'
 import {
+  TerraformVars,
   applyTerraformModule,
   destroyTerraformModule,
   getTerraformModuleOutputs,
@@ -18,7 +21,6 @@ import {
   planTerraformModule,
   showTerraformModulePlan,
   taintTerraformModuleResource,
-  TerraformVars,
   untaintTerraformModuleResource,
 } from './terraform'
 import {
@@ -452,10 +454,7 @@ function secretsBasePath(celoEnv: string) {
 }
 
 function useDefaultNetwork() {
-  return (
-    fetchEnvOrFallback(envVar.VM_BASED, 'false') !== 'true' ||
-    fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) === 'celo-networks-dev'
-  )
+  return fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) === 'celo-networks-dev'
 }
 
 export function networkName(celoEnv: string) {

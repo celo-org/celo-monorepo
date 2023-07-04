@@ -143,7 +143,6 @@ export enum envVar {
   VALIDATOR_ZERO_GENESIS_BALANCE = 'VALIDATOR_ZERO_GENESIS_BALANCE',
   VALIDATORS = 'VALIDATORS',
   VALIDATORS_ROLLING_UPDATE_PARTITION = 'VALIDATORS_ROLLING_UPDATE_PARTITION',
-  VM_BASED = 'VM_BASED',
   VOTING_BOT_BALANCE = 'VOTING_BOT_BALANCE',
   VOTING_BOT_CHANGE_BASELINE = 'VOTING_BOT_CHANGE_BASELINE',
   VOTING_BOT_CRON_SCHEDULE = 'VOTING_BOT_CRON_SCHEDULE',
@@ -374,22 +373,4 @@ export function addCeloEnvMiddleware(argv: yargs.Argv) {
       // @ts-ignore Since we pass it right above, we know that celoEnv will be there at runtime
       .middleware([celoEnvMiddleware])
   )
-}
-
-export function isVmBased() {
-  return fetchEnv(envVar.VM_BASED) === 'true'
-}
-
-export function failIfNotVmBased() {
-  if (!isVmBased()) {
-    console.error('The celo env is not intended for a VM-based testnet, aborting')
-    process.exit(1)
-  }
-}
-
-export function failIfVmBased() {
-  if (isVmBased()) {
-    console.error('The celo env is intended for a VM-based testnet, aborting')
-    process.exit(1)
-  }
 }
