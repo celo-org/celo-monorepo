@@ -8,7 +8,10 @@ on:
   push:
     branches:
       - master
-  pull_request:
+      # TODO (soloseng): remove before merge
+      - pahor/0.8_from_Seb 
+  # TODO(jcortejoso): Replace by pull_request
+  pull_request_target:
     branches:
       - master
 
@@ -27,7 +30,8 @@ env:
   TERM: dumb
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
   # Git Tag for contract release to use
-  RELEASE_TAG: core-contracts.v9
+  RELEASE_TAG: ganache-v7-core-contracts.v9
+  # RELEASE_TAG: core-contracts.v9
   # CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
   CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.7.x
 
@@ -69,8 +73,9 @@ jobs:
         id: node-checksums
         run: |
           find . -maxdepth 5 -type f -name 'package.json' -not -path "*node_modules*" -print0 | sort -z | xargs -0 cat > $RUNNER_TEMP/package.checksum
-          find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat > $RUNNER_TEMP/patches.checksum
-          echo "PACKAGE_JSON_CHECKSUM=${{ hashFiles('$RUNNER_TEMP/*.checksum') }}" >> "$GITHUB_OUTPUT"
+          find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat >> $RUNNER_TEMP/package.checksum
+          echo "PACKAGE_JSON_CHECKSUM=$(md5sum $RUNNER_TEMP/package.checksum | cut -f1 -d' ')"
+          echo "PACKAGE_JSON_CHECKSUM=$(md5sum $RUNNER_TEMP/package.checksum | cut -f1 -d' ')" >> "$GITHUB_OUTPUT"
       - name: Restore node cache
         uses: actions/cache@v3
         id: cache_node
@@ -242,6 +247,9 @@ jobs:
       - name: Opcode tests
         run: |
           yarn --cwd packages/protocol check-opcodes
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 12.22.11
       - name: Generate devchain of previous release
         run: |
           echo "Comparing against $RELEASE_TAG"
@@ -303,7 +311,7 @@ jobs:
                 echo "If these changes are intended, update the 'releaseData/versionReports' accordingly"
                 exit 1
               fi
-          - name: Protocol Unit tests
+          - name: Protocol Common tests
             command: |
               yarn --cwd packages/protocol test common/
           - name: Protocol Compatibility
@@ -318,7 +326,7 @@ jobs:
           - name: Protocol Governance Voting
             command: |
               yarn --cwd packages/protocol test governance/voting/
-          - name: Protocol Governance Identity
+          - name: Protocol Identity
             command: |
               yarn --cwd packages/protocol test identity/
           - name: Protocol Stability
@@ -331,10 +339,13 @@ jobs:
           path: .git
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+          rebuild-package: 'true'
       - name: Build protocol
         run: |
           yarn --cwd packages/protocol build
@@ -646,10 +657,13 @@ jobs:
           path: .git
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+          rebuild-package: 'true'
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 20
@@ -753,7 +767,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 20
-        if: contains(matrix.command, '/lockedgold.sh')
+        if: contains(matrix.command, '/lockedgold.sh') && false
         with:
           limit-access-to-actor: true
       - name: Certora dependencies
@@ -768,4 +782,3 @@ jobs:
       - name: Build and run command
         run: |
           ${{ matrix.command }}
-      

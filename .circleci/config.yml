@@ -3,6 +3,9 @@
 
 version: 2.1
 
+orbs:
+  node: circleci/node@5.1.0
+
 parameters:
   # When you need to force a rebuild of the node modules cache then bump this version
   node-modules-cache-version:
@@ -35,7 +38,8 @@ defaults: &defaults
 contract-defaults: &contract-defaults
   <<: *defaults
   environment:
-    RELEASE_TAG: core-contracts.v9
+    # RELEASE_TAG: core-contracts.v9
+    RELEASE_TAG: ganache-v7-core-contracts.v9
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
@@ -249,6 +253,9 @@ jobs:
       - run:
           name: Opcode tests
           command: yarn --cwd packages/protocol check-opcodes
+      - node/install:
+          install-yarn: true
+          node-version: '12.22.11'
       - run:
           name: Generate devchain of previous release
           command: |
