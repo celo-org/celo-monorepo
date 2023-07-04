@@ -17,6 +17,7 @@ const SOLC_VERSION = '0.5.13'
 const ALFAJORES_NETWORKID = 44787
 const BAKLAVA_NETWORKID = 62320
 const BAKLAVASTAGING_NETWORKID = 31420
+const CANNOLI_NETWORKID = 17323
 
 // ipcProvider returns a function to create an IPC provider when called.
 // Use by adding `provider: ipcProvider(...)` to any of the configs below.
@@ -36,6 +37,7 @@ const RC0_FROM = '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C'
 const BAKLAVA_FROM = '0x0Cc59Ed03B3e763c02d54D695FFE353055f1502D'
 const BAKLAVASTAGING_FROM = '0x4588ABb84e1BBEFc2BcF4b2296F785fB7AD9F285'
 const STAGING_FROM = '0x4e3d385ecdee402da395a3b18575b05cc5e8ff21'
+const CANNOLI_FROM = '0x8C174E896A85E487aa895865657b78Ea64879dC7' // validator zero
 
 const gasLimit = 13000000
 const hostAddress = process.env.CELO_NODE_ADDRESS || '127.0.0.1'
@@ -161,6 +163,12 @@ const networks = {
     ...defaultConfig,
     network_id: ALFAJORES_NETWORKID,
     from: ALFAJORES_FROM,
+  },
+
+  cannoli: {
+    ...defaultConfig,
+    network_id: CANNOLI_NETWORKID,
+    from: CANNOLI_FROM,
   },
 
   pilot: {

@@ -19,6 +19,8 @@ export const ProxyContracts = [
   'EpochRewardsProxy',
   'EscrowProxy',
   'FederatedAttestationsProxy',
+  'FeeHandlerProxy',
+  'MentoFeeHandlerSellerProxy',
   'FeeCurrencyWhitelistProxy',
   'GasPriceMinimumProxy',
   'GoldTokenProxy',
@@ -30,12 +32,16 @@ export const ProxyContracts = [
   'OdisPaymentsProxy',
   'RegistryProxy',
   'SortedOraclesProxy',
+  'UniswapFeeHandlerSellerProxy',
 ]
 
 export const CoreContracts = [
   // common
   'Accounts',
   'GasPriceMinimum',
+  'FeeHandler',
+  'MentoFeeHandlerSeller',
+  'UniswapFeeHandlerSellerProxy',
   'FeeCurrencyWhitelist',
   'GoldToken',
   'MetaTransactionWallet',

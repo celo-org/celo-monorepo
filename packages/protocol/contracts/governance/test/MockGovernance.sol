@@ -23,16 +23,6 @@ contract MockGovernance is IGovernance {
     return totalVotes[account];
   }
 
-  function votePartially(
-    uint256 proposalId,
-    uint256 index,
-    uint256 yesVotes,
-    uint256 noVotes,
-    uint256 abstainVotes
-  ) external returns (bool) {
-    return false;
-  }
-
   function getProposal(uint256 proposalId)
     external
     view
@@ -45,7 +35,13 @@ contract MockGovernance is IGovernance {
     return 0;
   }
 
-  function getAccountNonvotingLockedGold(address account) external view returns (uint256) {
-    return 0;
+  function votePartially(
+    uint256 proposalId,
+    uint256 index,
+    uint256 yesVotes,
+    uint256 noVotes,
+    uint256 abstainVotes
+  ) external returns (bool) {
+    return false;
   }
 }
