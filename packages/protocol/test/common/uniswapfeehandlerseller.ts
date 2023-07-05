@@ -12,9 +12,8 @@ import {
   UniswapFeeHandlerSellerInstance,
 } from 'types'
 
-const UniswapFeeHandlerSeller: UniswapFeeHandlerSellerContract = artifacts.require(
-  'UniswapFeeHandlerSeller'
-)
+const UniswapFeeHandlerSeller: UniswapFeeHandlerSellerContract =
+  artifacts.require('UniswapFeeHandlerSeller')
 
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
 const Registry: RegistryContract = artifacts.require('Registry')
