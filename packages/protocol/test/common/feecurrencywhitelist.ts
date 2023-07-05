@@ -1,4 +1,4 @@
-import { assertTransactionRevertWithReason } from '@celo/protocol/lib/test-utils'
+import { assertRevert, assertTransactionRevertWithReason } from '@celo/protocol/lib/test-utils'
 import { FeeCurrencyWhitelistContract, FeeCurrencyWhitelistInstance } from 'types'
 
 const FeeCurrencyWhitelist: FeeCurrencyWhitelistContract = artifacts.require('FeeCurrencyWhitelist')

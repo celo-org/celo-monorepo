@@ -37,7 +37,8 @@ contract('GasPriceMinimum', (accounts: string[]) => {
       registry.address,
       gasPriceMinimumFloor,
       targetDensity,
-      adjustmentSpeed
+      adjustmentSpeed,
+      0
     )
   })
 
@@ -73,7 +74,8 @@ contract('GasPriceMinimum', (accounts: string[]) => {
           registry.address,
           gasPriceMinimumFloor,
           targetDensity,
-          adjustmentSpeed
+          adjustmentSpeed,
+          0
         ),
         'contract already initialized'
       )

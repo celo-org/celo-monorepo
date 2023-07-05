@@ -4,7 +4,7 @@ import {
   assertEqualBN,
   assertGtBN,
   assertRevert,
-  assertRevertWithReason,
+  assertTransactionRevertWithReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils' //
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
@@ -70,13 +70,11 @@ const UniswapV2Factory: MockUniswapV2FactoryContract = artifacts.require('MockUn
 
 const FeeCurrencyWhitelist: FeeCurrencyWhitelistContract = artifacts.require('FeeCurrencyWhitelist')
 
-const MentoFeeHandlerSeller: MentoFeeHandlerSellerContract = artifacts.require(
-  'MentoFeeHandlerSeller'
-)
+const MentoFeeHandlerSeller: MentoFeeHandlerSellerContract =
+  artifacts.require('MentoFeeHandlerSeller')
 
-const UniswapFeeHandlerSeller: UniswapFeeHandlerSellerContract = artifacts.require(
-  'UniswapFeeHandlerSeller'
-)
+const UniswapFeeHandlerSeller: UniswapFeeHandlerSellerContract =
+  artifacts.require('UniswapFeeHandlerSeller')
 
 // Mento contracts
 const Exchange: ExchangeContract = makeTruffleContractForMigration('Exchange', MENTO_PACKAGE, web3)
@@ -254,7 +252,7 @@ contract('FeeHandler', (accounts: string[]) => {
     })
 
     it('Only owner can set handler', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         feeHandler.setHandler(stableToken.address, mentoSeller.address, { from: user }),
         'Ownable: caller is not the owner'
       )
@@ -577,7 +575,7 @@ contract('FeeHandler', (accounts: string[]) => {
         })
 
         it("Doesn't exchange when not enough reports", async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             feeHandler.sell(tokenA.address),
             'Number of reports for token not enough'
           )
@@ -598,7 +596,7 @@ contract('FeeHandler', (accounts: string[]) => {
             tokenA.address,
             new BigNumber('300').times(goldAmountForRate)
           )
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             feeHandler.sell(tokenA.address),
             'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'
           )
@@ -638,7 +636,7 @@ contract('FeeHandler', (accounts: string[]) => {
 
       it("Doesn't exchange when slippage is too high", async () => {
         await feeHandler.setMaxSplippage(tokenA.address, maxSlippage)
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           feeHandler.sell(tokenA.address),
           'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT'
         )
