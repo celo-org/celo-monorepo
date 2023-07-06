@@ -4,20 +4,9 @@ pragma solidity >=0.8.0 <0.8.20;
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
-import "./interfaces/IAccounts.sol";
-import "./interfaces/IFeeCurrencyWhitelist.sol";
-import "./interfaces/IFreezer.sol";
 import "./interfaces/IRegistry.sol";
 
-import "../governance/interfaces/IElection.sol";
-import "../governance/interfaces/IGovernance.sol";
-import "../governance/interfaces/ILockedGold.sol";
-import "../governance/interfaces/IValidators.sol";
-
-import "../identity/interfaces/IRandom.sol";
-import "../identity/interfaces/IAttestations.sol";
-
-contract UsingRegistry is Ownable {
+contract UsingRegistry8 is Ownable {
   event RegistrySet(address indexed registryAddress);
 
   // solhint-disable state-visibility
@@ -68,43 +57,7 @@ contract UsingRegistry is Ownable {
     emit RegistrySet(registryAddress);
   }
 
-  function getAccounts() internal view returns (IAccounts) {
-    return IAccounts(registry.getAddressForOrDie(ACCOUNTS_REGISTRY_ID));
-  }
-
-  function getAttestations() internal view returns (IAttestations) {
-    return IAttestations(registry.getAddressForOrDie(ATTESTATIONS_REGISTRY_ID));
-  }
-
-  function getElection() internal view returns (IElection) {
-    return IElection(registry.getAddressForOrDie(ELECTION_REGISTRY_ID));
-  }
-
-  function getFeeCurrencyWhitelistRegistry() internal view returns (IFeeCurrencyWhitelist) {
-    return IFeeCurrencyWhitelist(registry.getAddressForOrDie(FEE_CURRENCY_WHITELIST_REGISTRY_ID));
-  }
-
-  function getFreezer() internal view returns (IFreezer) {
-    return IFreezer(registry.getAddressForOrDie(FREEZER_REGISTRY_ID));
-  }
-
   function getGoldToken() internal view returns (IERC20) {
     return IERC20(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
-  }
-
-  function getGovernance() internal view returns (IGovernance) {
-    return IGovernance(registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
-  }
-
-  function getLockedGold() internal view returns (ILockedGold) {
-    return ILockedGold(registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
-  }
-
-  function getRandom() internal view returns (IRandom) {
-    return IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
-  }
-
-  function getValidators() internal view returns (IValidators) {
-    return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
   }
 }

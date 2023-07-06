@@ -6,7 +6,7 @@ import "@openzeppelin/contracts8/access/Ownable.sol";
 import "./CalledByVm.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloVersionedContract.sol";
-import "./FixidityLib.sol";
+import "./FixidityLib0.8.sol";
 import "./UsingRegistry8.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 
@@ -17,7 +17,7 @@ contract GasPriceMinimum is
   ICeloVersionedContract,
   Ownable,
   Initializable,
-  UsingRegistry,
+  UsingRegistry8,
   CalledByVm
 {
   using FixidityLib for FixidityLib.Fraction;
