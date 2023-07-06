@@ -558,7 +558,7 @@ export const generateGenesisWithMigrations = async ({
   fs.writeFileSync(configFile, JSON.stringify(mcConfig, undefined, 2))
 
   // Generate the genesis file, and return its contents
-  const contractsBuildPath = path.resolve(monorepoRoot, 'packages/protocol/build/contracts/')
+  const contractsBuildPath = path.resolve(monorepoRoot, 'packages/protocol/build/')
   await spawnCmdWithExitOnFailure(
     myceloBinaryPath,
     ['genesis-from-config', tmpDir, '--buildpath', contractsBuildPath],
