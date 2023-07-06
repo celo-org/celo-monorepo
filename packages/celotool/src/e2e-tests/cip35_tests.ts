@@ -130,7 +130,7 @@ function generateTestCases(cipIsActivated: boolean) {
 }
 
 function getGethRunConfig(withDonut: boolean, withEspresso: boolean): GethRunConfig {
-  console.log('getGethRunConfig', withDonut)
+  console.log('getGethRunConfig', 'donut', withDonut, 'espresso', withEspresso)
   return {
     migrate: true,
     runPath: TMP_PATH,

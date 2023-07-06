@@ -45,6 +45,7 @@ describe('replica swap tests', () => {
       churritoBlock: 0,
       donutBlock: 0,
       espressoBlock: 0,
+      gingerbreadBlock: 1,
     },
     instances: [
       {
