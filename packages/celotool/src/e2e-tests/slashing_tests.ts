@@ -49,7 +49,7 @@ function headerArray(block: any) {
     block.extraData,
     block.mixHash,
     block.nonce,
-    block.baseFee,
+    block.baseFeePerGas,
   ]
 }
 
@@ -123,6 +123,7 @@ describe('slashing tests', function (this: any) {
       churritoBlock: 0,
       donutBlock: 0,
       espressoBlock: 0,
+      gingerbreadBlock: 1,
     },
     instances: [
       {
@@ -251,9 +252,6 @@ describe('slashing tests', function (this: any) {
       const blockNumber = await kit.connection.getBlockNumber()
       await waitForBlock(web3, blockNumber + slashableDowntime.toNumber() + 2 * safeMarginBlocks)
 
-      // Store this block for testing double signing
-      doubleSigningBlock = await kit.connection.getBlock(blockNumber + 2 * safeMarginBlocks)
-
       const signer = await slasher.methods.validatorSignerAddressFromSet(4, blockNumber).call()
       const validator = (await kit.connection.getAccounts())[0]
       await kit.connection.web3.eth.personal.unlockAccount(validator, '', 1000000)
@@ -343,10 +341,28 @@ describe('slashing tests', function (this: any) {
     })
   })
 
+  const createAndCollectDifferentInstanceBlock = async () => {
+    await waitForBlock(web3, 1)
+    const blockNumber = await kit.connection.getBlockNumber()
+    await waitForBlock(web3, blockNumber + 2 * safeMarginBlocks)
+
+    // Store this block for testing double signing
+    doubleSigningBlock = await kit.connection.getBlock(blockNumber + 2 * safeMarginBlocks)
+
+    await hooks.after()
+
+    await hooks.before()
+
+    this.timeout(0) // Disable test timeout
+    await restart()
+  }
+
   describe('test slashing for double signing', () => {
     before(async function (this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
+
+      await createAndCollectDifferentInstanceBlock()
     })
 
     it('slash for double signing', async function (this: any) {
@@ -397,6 +413,8 @@ describe('slashing tests', function (this: any) {
     before(async function (this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
+
+      await createAndCollectDifferentInstanceBlock()
     })
 
     it('slash for double signing with contractkit', async function (this: any) {
