@@ -510,10 +510,10 @@ contract('LockedGold', (accounts: string[]) => {
           assertEqualBN(removeDelegatedVotes3, 0)
         })
 
-        it('should emit the CeloDelegatedRevoked event', async () => {
+        it('should emit the DelegatedCeloRevoked event', async () => {
           assert.equal(resp.logs.length, 4)
           assertLogMatches2(resp.logs[0], {
-            event: 'CeloDelegatedRevoked',
+            event: 'DelegatedCeloRevoked',
             args: {
               delegator: accounts[0],
               delegatee,
@@ -522,7 +522,7 @@ contract('LockedGold', (accounts: string[]) => {
             },
           })
           assertLogMatches2(resp.logs[1], {
-            event: 'CeloDelegatedRevoked',
+            event: 'DelegatedCeloRevoked',
             args: {
               delegator: accounts[0],
               delegatee: delegatee2,
@@ -531,7 +531,7 @@ contract('LockedGold', (accounts: string[]) => {
             },
           })
           assertLogMatches2(resp.logs[2], {
-            event: 'CeloDelegatedRevoked',
+            event: 'DelegatedCeloRevoked',
             args: {
               delegator: accounts[0],
               delegatee: delegatee3,
@@ -1820,11 +1820,11 @@ contract('LockedGold', (accounts: string[]) => {
             )
           })
 
-          it('should emit the CeloDelegatedRevoked event', async () => {
+          it('should emit the DelegatedCeloRevoked event', async () => {
             assert.equal(resp.logs.length, 1)
             const log = resp.logs[0]
             assertLogMatches2(log, {
-              event: 'CeloDelegatedRevoked',
+              event: 'DelegatedCeloRevoked',
               args: {
                 delegator,
                 delegatee: delegatee1,
@@ -2120,11 +2120,11 @@ contract('LockedGold', (accounts: string[]) => {
             assertEqualBN(await lockedGold.totalDelegatedCelo(delegatee1Signer), 0)
           })
 
-          it('should emit the CeloDelegatedRevoked event', async () => {
+          it('should emit the DelegatedCeloRevoked event', async () => {
             assert.equal(resp.logs.length, 1)
             const log = resp.logs[0]
             assertLogMatches2(log, {
-              event: 'CeloDelegatedRevoked',
+              event: 'DelegatedCeloRevoked',
               args: {
                 delegator,
                 delegatee: delegatee1,

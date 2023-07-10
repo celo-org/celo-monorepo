@@ -337,6 +337,10 @@ contract LockedGold is
 
     IValidators validators = getValidators();
     require(!validators.isValidator(delegatorAccount), "Validators cannot delegate votes.");
+    require(
+      !validators.isValidatorGroup(delegatorAccount),
+      "Validator groups cannot delegate votes."
+    );
 
     Delegated storage delegated = delegatorInfo[delegatorAccount];
     delegated.delegatees.add(delegateeAccount);

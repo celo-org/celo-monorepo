@@ -571,7 +571,7 @@ contract('Validators', (accounts: string[]) => {
         const publicKey = await addressToPublicKey(signer, web3.eth.sign)
         await assertRevert(
           validators.registerValidator(publicKey, blsPublicKey, blsPoP),
-          'Validators cannot vote for more than max number of groups'
+          'Cannot vote for more than max number of groups'
         )
       })
 
@@ -583,7 +583,7 @@ contract('Validators', (accounts: string[]) => {
         const publicKey = await addressToPublicKey(signer, web3.eth.sign)
         await assertRevert(
           validators.registerValidator(publicKey, blsPublicKey, blsPoP),
-          'Validators cannot delegate governance power'
+          'Cannot delegate governance power'
         )
       })
 
@@ -1305,7 +1305,25 @@ contract('Validators', (accounts: string[]) => {
         const publicKey = await addressToPublicKey(signer, web3.eth.sign)
         await assertRevert(
           validators.registerValidator(publicKey, blsPublicKey, blsPoP),
-          'Validators cannot vote for more than max number of groups'
+          'Cannot vote for more than max number of groups'
+        )
+      })
+
+      it('should revert when vote over max number of groups set to true', async () => {
+        await mockElection.setAllowedToVoteOverMaxNumberOfGroups(group, true)
+        await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)
+        await assertRevert(
+          validators.registerValidatorGroup(commission),
+          'Cannot vote for more than max number of groups'
+        )
+      })
+
+      it('should revert when vote over max number of groups set to true', async () => {
+        await mockLockedGold.setAccountTotalDelegatedAmountInPercents(group, 10)
+        await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)
+        await assertRevert(
+          validators.registerValidatorGroup(commission),
+          'Cannot delegate governance pow'
         )
       })
 
