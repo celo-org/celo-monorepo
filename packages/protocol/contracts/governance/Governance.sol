@@ -1620,26 +1620,6 @@ contract Governance is
     }
   }
 
-  function uintToStr(uint256 _i) internal pure returns (string memory _uintAsString) {
-    uint256 number = _i;
-    if (number == 0) {
-      return "0";
-    }
-    uint256 j = number;
-    uint256 len;
-    while (j != 0) {
-      len++;
-      j /= 10;
-    }
-    bytes memory bstr = new bytes(len);
-    uint256 k = len - 1;
-    while (number != 0) {
-      bstr[k--] = bytes1(uint8(48 + (number % 10)));
-      number /= 10;
-    }
-    return string(bstr);
-  }
-
   /**
    * Returns amount of votes that should be removed from delegatee's proposal voting.
    * @param totalToRemove Total votes to be removed.

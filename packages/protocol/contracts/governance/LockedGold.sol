@@ -51,8 +51,7 @@ contract LockedGold is
 
   struct Delegated {
     EnumerableSet.AddressSet delegatees;
-    // delegatees with how much percent they are getting -
-    // eg 0xDF => 20% and delegator total Celo which was 3000
+    // delegatees with how much percent delegatees are getting
     // Celo at the time of delegation/latest update
     mapping(address => DelegatedInfo) delegateesWithPercentagesAndAmount;
     uint256 totalDelegatedCeloInPercents;
@@ -107,7 +106,7 @@ contract LockedGold is
     uint256 percent,
     uint256 amount
   );
-  event CeloDelegatedRevoked(
+  event DelegatedCeloRevoked(
     address indexed delegator,
     address indexed delegatee,
     uint256 percent,
@@ -333,13 +332,13 @@ contract LockedGold is
       percentageToDelegate > 0 && percentageToDelegate <= 100,
       "delegated percents can be only between 1%..100%"
     );
-    address delegatorAddress = getAccounts().voteSignerToAccount(msg.sender);
+    address delegatorAccount = getAccounts().voteSignerToAccount(msg.sender);
     address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
 
     IValidators validators = getValidators();
-    require(!validators.isValidator(delegatorAddress), "Validators cannot delegate votes.");
+    require(!validators.isValidator(delegatorAccount), "Validators cannot delegate votes.");
 
-    Delegated storage delegated = delegatorInfo[delegatorAddress];
+    Delegated storage delegated = delegatorInfo[delegatorAccount];
     delegated.delegatees.add(delegateeAccount);
     require(delegated.delegatees.length() <= maxDelegateesCount, "Too many delegatees");
 
@@ -358,7 +357,7 @@ contract LockedGold is
 
     require(requestedToDelegate <= 100, "Cannot delegate more than 100%");
 
-    uint256 totalLockedGold = getAccountTotalLockedGold(delegatorAddress);
+    uint256 totalLockedGold = getAccountTotalLockedGold(delegatorAccount);
     if (totalLockedGold == 0) {
       currentDelegateeInfo.percentage = percentageToDelegate;
       delegated.totalDelegatedCeloInPercents = delegated.totalDelegatedCeloInPercents.add(
@@ -366,7 +365,7 @@ contract LockedGold is
       );
 
       emit CeloDelegated(
-        delegatorAddress,
+        delegatorAccount,
         delegateeAccount,
         percentageToDelegate,
         currentDelegateeInfo.currentAmount
@@ -374,7 +373,7 @@ contract LockedGold is
       return;
     }
 
-    uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatorAddress);
+    uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatorAccount);
 
     if (totalReferendumVotes > 0) {
       uint256 referendumVotesInPercents = FixidityLib
@@ -410,7 +409,7 @@ contract LockedGold is
     );
 
     emit CeloDelegated(
-      delegatorAddress,
+      delegatorAccount,
       delegateeAccount,
       percentageToDelegate,
       currentDelegateeInfo.currentAmount
@@ -467,7 +466,7 @@ contract LockedGold is
       delegated.delegatees.remove(delegateeAccount);
     }
 
-    emit CeloDelegatedRevoked(
+    emit DelegatedCeloRevoked(
       delegatorAccount,
       delegateeAccount,
       percentageToRevoke,
@@ -505,7 +504,7 @@ contract LockedGold is
       if (currentDelegateeInfo.currentAmount == 0) {
         delegated.delegatees.remove(delegatees[i]);
       }
-      emit CeloDelegatedRevoked(delegator, delegatees[i], 0, delegateeAmountToRevoke);
+      emit DelegatedCeloRevoked(delegator, delegatees[i], 0, delegateeAmountToRevoke);
     }
   }
 
