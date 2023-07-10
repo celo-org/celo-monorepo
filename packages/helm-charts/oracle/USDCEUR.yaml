@@ -28,7 +28,6 @@ oracle:
         {exchange: 'KRAKEN', symbol: 'EURUSD', toInvert: true}
       ],
       [
-        {exchange: 'BINANCEUS', symbol: 'USDCUSD', toInvert: false},
         {exchange: 'KRAKEN', symbol: 'EURUSD', toInvert: true}
       ],
     ]"
