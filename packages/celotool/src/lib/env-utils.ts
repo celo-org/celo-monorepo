@@ -143,7 +143,6 @@ export enum envVar {
   VALIDATOR_ZERO_GENESIS_BALANCE = 'VALIDATOR_ZERO_GENESIS_BALANCE',
   VALIDATORS = 'VALIDATORS',
   VALIDATORS_ROLLING_UPDATE_PARTITION = 'VALIDATORS_ROLLING_UPDATE_PARTITION',
-  VM_BASED = 'VM_BASED',
   VOTING_BOT_BALANCE = 'VOTING_BOT_BALANCE',
   VOTING_BOT_CHANGE_BASELINE = 'VOTING_BOT_CHANGE_BASELINE',
   VOTING_BOT_CRON_SCHEDULE = 'VOTING_BOT_CRON_SCHEDULE',
@@ -227,7 +226,7 @@ export enum DynamicEnvVar {
   PROM_REMOTE_WRITE_URL = '{{ context }}_PROM_REMOTE_WRITE_URL',
 }
 
-export enum EnvTypes {
+export enum envTypes {
   DEVELOPMENT = 'development',
   INTEGRATION = 'integration',
   STAGING = 'staging',
@@ -291,7 +290,7 @@ export function validateAndSwitchToEnv(celoEnv: string) {
 }
 
 export function isProduction() {
-  return fetchEnv(envVar.ENV_TYPE).toLowerCase() === EnvTypes.PRODUCTION
+  return fetchEnv(envVar.ENV_TYPE).toLowerCase() === envTypes.PRODUCTION
 }
 
 export function isValidCeloEnv(celoEnv: string) {
@@ -374,22 +373,4 @@ export function addCeloEnvMiddleware(argv: yargs.Argv) {
       // @ts-ignore Since we pass it right above, we know that celoEnv will be there at runtime
       .middleware([celoEnvMiddleware])
   )
-}
-
-export function isVmBased() {
-  return fetchEnv(envVar.VM_BASED) === 'true'
-}
-
-export function failIfNotVmBased() {
-  if (!isVmBased()) {
-    console.error('The celo env is not intended for a VM-based testnet, aborting')
-    process.exit(1)
-  }
-}
-
-export function failIfVmBased() {
-  if (isVmBased()) {
-    console.error('The celo env is intended for a VM-based testnet, aborting')
-    process.exit(1)
-  }
 }
