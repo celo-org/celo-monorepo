@@ -33,7 +33,7 @@ const getContract = async (
 
 contract('Migration', () => {
   describe('Checking proxies', () => {
-    it.skip('should have the proxy set up for all proxied contracts', async () => {
+    it('should have the proxy set up for all proxied contracts', async () => {
       await assertProxiesSet(getContract)
     })
   })
