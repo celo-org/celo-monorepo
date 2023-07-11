@@ -137,6 +137,7 @@ function getGethRunConfig(withDonut: boolean, withEspresso: boolean): GethRunCon
       churritoBlock: 0,
       donutBlock: withDonut ? 0 : null,
       espressoBlock: withEspresso ? 0 : null,
+      gingerbreadBlock: null,
     },
     instances: [
       {
