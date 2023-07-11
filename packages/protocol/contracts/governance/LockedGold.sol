@@ -509,6 +509,12 @@ contract LockedGold is
     }
   }
 
+  /**
+   * Decreases delegatee voting power when removing or unlocking delegated votes.
+   * @param delegatee The delegatee.
+   * @param amountToRevoke Amount to revoke.
+   * @param delegateeInfo Delegatee info.
+   */
   function _decreaseDelegateeVotingPower(
     address delegatee,
     uint256 amountToRevoke,
@@ -592,7 +598,6 @@ contract LockedGold is
 
   /**
    * Returns how many percents of CELO is account delegating.
-   * 1 Wei == 1%
    * @param account The account address.
    */
   function getAccountTotalDelegatedFraction(address account) public view returns (uint256) {
