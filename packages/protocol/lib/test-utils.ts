@@ -16,6 +16,7 @@ import Web3 from 'web3'
 import { ContractPackage, MENTO_PACKAGE } from '../contractPackages'
 
 import BN = require('bn.js')
+import { fromFixed } from '@celo/utils/src/fixidity'
 
 const isNumber = (x: any) =>
   typeof x === 'number' || (BN as any).isBN(x) || BigNumber.isBigNumber(x)
@@ -696,10 +697,13 @@ export async function assertDelegatorDelegateeAmounts(
   amount: number,
   lockedGold: LockedGoldInstance
 ) {
-  const [percentage, currentAmount] = await lockedGold.getDelegatorDelegateeInfo(
+  const [fraction, currentAmount] = await lockedGold.getDelegatorDelegateeInfo(
     delegator,
     delegatee
   )
-  assertEqualBN(percentage, percent)
+  console.log("currentAmount", currentAmount);
+  console.log("percentage", fromFixed(fraction));
+  console.log("percent", percent);
+  assertEqualBN(fromFixed(fraction), percent)
   assertEqualBN(currentAmount, amount)
 }

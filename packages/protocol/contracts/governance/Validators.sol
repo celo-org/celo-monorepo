@@ -764,7 +764,7 @@ contract Validators is
     require(
       // Validator could avoid getting slashed by delegating Celo to delegatees that would be voting
       // for lots of proposals. Such transaction could run out of gas.
-      getLockedGold().getAccountTotalDelegatedAmountInPercents(account) == 0,
+      getLockedGold().getAccountTotalDelegatedFraction(account) == 0,
       "Cannot delegate governance power"
     );
   }

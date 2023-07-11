@@ -105,11 +105,7 @@ contract MockLockedGold is ILockedGold {
     return 0;
   }
 
-  function getAccountTotalDelegatedAmountInPercents(address account)
-    external
-    view
-    returns (uint256)
-  {
+  function getAccountTotalDelegatedFraction(address account) external view returns (uint256) {
     return accountTotalDelegatedAmountInPercents[account];
   }
 

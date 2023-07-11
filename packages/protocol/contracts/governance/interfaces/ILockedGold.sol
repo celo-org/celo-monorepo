@@ -30,10 +30,7 @@ interface ILockedGold {
   ) external;
   function isSlasher(address) external view returns (bool);
 
-  function getAccountTotalDelegatedAmountInPercents(address account)
-    external
-    view
-    returns (uint256);
+  function getAccountTotalDelegatedFraction(address account) external view returns (uint256);
 
   function getAccountTotalGovernanceVotingPower(address account) external view returns (uint256);
   function unlockingPeriod() external view returns (uint256);
