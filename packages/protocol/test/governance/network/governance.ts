@@ -996,7 +996,7 @@ contract('Governance', (accounts: string[]) => {
   describe('#upvote()', () => {
     const proposalId = new BigNumber(1)
     beforeEach(async () => {
-      await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
+      await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
@@ -1084,7 +1084,7 @@ contract('Governance', (accounts: string[]) => {
         )
         const otherAccount1 = accounts[1]
         await accountsInstance.createAccount({ from: otherAccount1 })
-        await mockLockedGold.setAccountTotalGovernancePower(otherAccount1, yesVotes)
+        await mockLockedGold.setAccountTotalLockedGold(otherAccount1, yesVotes)
         await governance.upvote(otherProposalId, proposalId, 0, { from: otherAccount1 })
         await timeTravel(queueExpiry, web3)
       })
@@ -1215,7 +1215,7 @@ contract('Governance', (accounts: string[]) => {
   describe('#revokeUpvote()', () => {
     const proposalId = new BigNumber(1)
     beforeEach(async () => {
-      await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
+      await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],

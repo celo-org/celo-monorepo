@@ -701,9 +701,6 @@ export async function assertDelegatorDelegateeAmounts(
     delegator,
     delegatee
   )
-  console.log("currentAmount", currentAmount);
-  console.log("percentage", fromFixed(fraction));
-  console.log("percent", percent);
-  assertEqualBN(fromFixed(fraction), percent)
+  assertEqualBN(fromFixed(fraction).multipliedBy(100), percent)
   assertEqualBN(currentAmount, amount)
 }

@@ -385,8 +385,9 @@ contract LockedGold is
     uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatorAccount);
 
     if (totalReferendumVotes > 0) {
-      FixidityLib.Fraction memory referendumVotesInPercents = FixidityLib.newFixed(100).multiply(
-        FixidityLib.newFixedFraction(totalReferendumVotes, totalLockedGold)
+      FixidityLib.Fraction memory referendumVotesInPercents = FixidityLib.newFixedFraction(
+        totalReferendumVotes,
+        totalLockedGold
       );
       require(
         FixidityLib.lte(referendumVotesInPercents.add(requestedToDelegate), FixidityLib.fixed1()),
@@ -419,26 +420,6 @@ contract LockedGold is
       FixidityLib.unwrap(percentageToDelegate),
       currentDelegateeInfo.currentAmount
     );
-  }
-
-  function uintToStr(uint256 _i) internal pure returns (string memory _uintAsString) {
-    uint256 number = _i;
-    if (number == 0) {
-      return "0";
-    }
-    uint256 j = number;
-    uint256 len;
-    while (j != 0) {
-      len++;
-      j /= 10;
-    }
-    bytes memory bstr = new bytes(len);
-    uint256 k = len - 1;
-    while (number != 0) {
-      bstr[k--] = bytes1(uint8(48 + (number % 10)));
-      number /= 10;
-    }
-    return string(bstr);
   }
 
   /**
@@ -489,7 +470,7 @@ contract LockedGold is
       percentageToRevoke
     );
 
-    if (currentDelegateeInfo.currentAmount == 0) {
+    if (FixidityLib.unwrap(currentDelegateeInfo.percentage) == 0) {
       delegated.delegatees.remove(delegateeAccount);
     }
 
@@ -524,9 +505,6 @@ contract LockedGold is
         .fromFixed();
       delegateeAmountToRevoke = delegateeAmountToRevoke.sub(expected.sub(real));
       _decreaseDelegateeVotingPower(delegatees[i], delegateeAmountToRevoke, currentDelegateeInfo);
-      if (currentDelegateeInfo.currentAmount == 0) {
-        delegated.delegatees.remove(delegatees[i]);
-      }
       emit DelegatedCeloRevoked(delegator, delegatees[i], 0, delegateeAmountToRevoke);
     }
   }
