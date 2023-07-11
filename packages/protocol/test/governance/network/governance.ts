@@ -3642,7 +3642,7 @@ contract('Governance', (accounts: string[]) => {
     describe('when the account has upvoted a proposal', () => {
       const proposalId = 1
       beforeEach(async () => {
-        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
+        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
