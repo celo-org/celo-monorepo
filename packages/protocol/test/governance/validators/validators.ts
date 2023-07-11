@@ -1323,7 +1323,7 @@ contract('Validators', (accounts: string[]) => {
         await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)
         await assertRevert(
           validators.registerValidatorGroup(commission),
-          'Cannot delegate governance pow'
+          'Cannot delegate governance power'
         )
       })
 

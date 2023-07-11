@@ -1150,11 +1150,19 @@ contract('LockedGold', (accounts: string[]) => {
             await lockedGold.lock({ value, from: delegator2 })
           })
 
-          it('should revert when vote over max number of groups set to true', async () => {
+          it('should revert when delegating as validator', async () => {
             await mockValidators.setValidator(accounts[0])
             await assertRevert(
               lockedGold.delegateGovernanceVotes(delegatee1, 10),
               'Validators cannot delegate votes.'
+            )
+          })
+
+          it('should revert when delegating as validator group', async () => {
+            await mockValidators.setValidatorGroup(accounts[0])
+            await assertRevert(
+              lockedGold.delegateGovernanceVotes(delegatee1, 10),
+              'Validator groups cannot delegate votes.'
             )
           })
 
