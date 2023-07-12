@@ -3,7 +3,7 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
-import "./CalledByVm.sol";
+import "./CalledByVm8.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloVersionedContract.sol";
 import "./FixidityLib0.8.sol";
@@ -18,7 +18,7 @@ contract GasPriceMinimum is
   Ownable,
   Initializable,
   UsingRegistry8,
-  CalledByVm
+  CalledByVm8
 {
   using FixidityLib for FixidityLib.Fraction;
 
