@@ -847,7 +847,7 @@ export async function faucetLoadTestThreads(
   mnemonic: string,
   web3Provider: string = 'http://localhost:8545'
 ) {
-  const minimumWeiBalance = new BigNumber(5).pow(18)
+  const minimumEthBalance = 5
   const kit = newKitFromWeb3(new Web3(web3Provider))
   const privateKey = generatePrivateKey(mnemonic, AccountType.FAUCET, index)
   kit.addAccount(privateKey)
@@ -861,30 +861,26 @@ export async function faucetLoadTestThreads(
     kit.contracts.getGoldToken(),
     kit.contracts.getStableToken(),
   ])
-  const gasPriceMinimum = await getGasPrice(kit)
+  const [goldAmount, stableTokenAmount] = await Promise.all([
+    convertToContractDecimals(minimumEthBalance, goldToken),
+    convertToContractDecimals(minimumEthBalance, stableToken),
+  ])
   for (let thread = 0; thread < threads; thread++) {
     const senderIndex = getIndexForLoadTestThread(index, thread)
     const threadPkey = generatePrivateKey(mnemonic, AccountType.LOAD_TESTING_ACCOUNT, senderIndex)
     const threadAddress = privateKeyToAddress(threadPkey)
-    if ((await goldToken.balanceOf(threadAddress)).lt(minimumWeiBalance)) {
-      await transferCeloGold(
-        kit,
-        kit.defaultAccount!,
-        threadAddress,
-        minimumWeiBalance.times(2),
-        undefined,
-        { gas: gasPriceMinimum.toNumber() }
-      )
+    console.info(`Funding account ${threadAddress}`)
+    if ((await goldToken.balanceOf(threadAddress)).lt(goldAmount)) {
+      console.log('Sending gold to ${threadAddress}')
+      await goldToken.transfer(threadAddress, goldAmount.toFixed()).send()
+    } else {
+      console.log(`Account ${threadAddress} already has enough gold`)
     }
-    if ((await stableToken.balanceOf(threadAddress)).lt(minimumWeiBalance)) {
-      await transferCeloDollars(
-        kit,
-        kit.defaultAccount!,
-        threadAddress,
-        minimumWeiBalance.times(2),
-        undefined,
-        { gas: gasPriceMinimum.toNumber() }
-      )
+    if ((await stableToken.balanceOf(threadAddress)).lt(stableTokenAmount)) {
+      console.log('Sending cusd to ${threadAddress}')
+      await stableToken.transfer(threadAddress, stableTokenAmount.toFixed()).send()
+    } else {
+      console.log(`Account ${threadAddress} already has enough cusd`)
     }
   }
 }
