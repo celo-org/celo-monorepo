@@ -849,7 +849,7 @@ export async function faucetLoadTestThreads(
 ) {
   const minimumEthBalance = 5
   const kit = newKitFromWeb3(new Web3(web3Provider))
-  const privateKey = generatePrivateKey(mnemonic, AccountType.FAUCET, index)
+  const privateKey = generatePrivateKey(mnemonic, AccountType.LOAD_TESTING_ACCOUNT, index)
   kit.addAccount(privateKey)
   kit.defaultAccount = privateKeyToAddress(privateKey)
   const sleepTime = 5000
