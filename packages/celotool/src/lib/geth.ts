@@ -852,6 +852,54 @@ export const onLoadTestTxResult = async (
   })
 }
 
+export async function faucetLoadTestThreads(
+  index: number,
+  threads: number,
+  mnemonic: string,
+  web3Provider: string = 'http://localhost:8545'
+) {
+  const minimumWeiBalance = new BigNumber(5).pow(18)
+  const kit = newKitFromWeb3(new Web3(web3Provider))
+  const privateKey = generatePrivateKey(mnemonic, AccountType.FAUCET, index)
+  kit.addAccount(privateKey)
+  kit.defaultAccount = privateKeyToAddress(privateKey)
+  const sleepTime = 5000
+  while (await kit.connection.isSyncing()) {
+    console.info(`Sleeping ${sleepTime}ms while waiting for web3Provider to be synced.`)
+    await sleep(sleepTime)
+  }
+  const [goldToken, stableToken] = await Promise.all([
+    kit.contracts.getGoldToken(),
+    kit.contracts.getStableToken(),
+  ])
+  const gasPriceMinimum = await getGasPrice(kit)
+  for (let thread = 0; thread < threads; thread++) {
+    const senderIndex = getIndexForLoadTestThread(index, thread)
+    const threadPkey = generatePrivateKey(mnemonic, AccountType.LOAD_TESTING_ACCOUNT, senderIndex)
+    const threadAddress = privateKeyToAddress(threadPkey)
+    if ((await goldToken.balanceOf(threadAddress)).lt(minimumWeiBalance)) {
+      await transferCeloGold(
+        kit,
+        kit.defaultAccount!,
+        threadAddress,
+        minimumWeiBalance.times(2),
+        undefined,
+        { gas: gasPriceMinimum.toNumber() }
+      )
+    }
+    if ((await stableToken.balanceOf(threadAddress)).lt(minimumWeiBalance)) {
+      await transferCeloDollars(
+        kit,
+        kit.defaultAccount!,
+        threadAddress,
+        minimumWeiBalance.times(2),
+        undefined,
+        { gas: gasPriceMinimum.toNumber() }
+      )
+    }
+  }
+}
+
 /**
  * This method generates key derivation index for loadtest clients and threads
  *

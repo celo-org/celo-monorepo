@@ -4,6 +4,7 @@ import { AccountType, generateAddress, generatePrivateKey } from 'src/lib/genera
 import {
   MAX_LOADTEST_THREAD_COUNT,
   TestMode,
+  faucetLoadTestThreads,
   getIndexForLoadTestThread,
   simulateClient,
 } from 'src/lib/geth'
@@ -103,6 +104,7 @@ export const builder = () => {
 }
 
 export const handler = async (argv: SimulateClientArgv) => {
+  await faucetLoadTestThreads(argv.index, argv.clientCount, argv.mnemonic)
   for (let thread = 0; thread < argv.clientCount; thread++) {
     const senderIndex = getIndexForLoadTestThread(argv.index, thread)
     const recipientIndex = getIndexForLoadTestThread(argv.recipientIndex, thread)
