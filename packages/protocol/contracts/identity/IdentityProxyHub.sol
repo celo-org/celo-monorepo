@@ -1,14 +1,26 @@
 pragma solidity ^0.5.13;
 
 import "../common/Create2.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/UsingRegistry.sol";
 import "./IdentityProxy.sol";
 
-contract IdentityProxyHub is UsingRegistry {
+contract IdentityProxyHub is UsingRegistry, ICeloVersionedContract {
   bytes32 public constant identityProxyCodeHash = keccak256(
     // solhint-disable-next-line indent
     abi.encodePacked(type(IdentityProxy).creationCode)
   );
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 0, 0, 1);
+  }
 
   /**
    * @notice Returns the IdentityProxy address corresponding to the identifier.
@@ -99,7 +111,7 @@ contract IdentityProxyHub is UsingRegistry {
     payable
     returns (bytes memory)
   {
-    require(passesIdentityHeuristic(msg.sender, identifier));
+    require(passesIdentityHeuristic(msg.sender, identifier), "does not pass identity heuristic");
     return getOrDeployIdentityProxy(identifier).makeCall.value(msg.value)(destination, data);
   }
 

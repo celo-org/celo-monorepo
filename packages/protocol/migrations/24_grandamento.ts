@@ -7,7 +7,9 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { GrandaMentoInstance, ReserveInstance } from 'types'
+import { GrandaMentoInstance, ReserveInstance } from 'types/mento'
+import { MENTO_PACKAGE } from '../contractPackages'
+import { ArtifactsSingleton } from './artifactsSingleton'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [
@@ -28,7 +30,7 @@ module.exports = deploymentForCoreContract<GrandaMentoInstance>(
     // Add as a spender of the Reserve
     const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
       'Reserve',
-      artifacts
+      ArtifactsSingleton.getInstance(MENTO_PACKAGE)
     )
     await reserve.addExchangeSpender(grandaMento.address)
 
@@ -36,5 +38,6 @@ module.exports = deploymentForCoreContract<GrandaMentoInstance>(
       const { min, max } = config.grandaMento.stableTokenExchangeLimits[stableToken]
       await grandaMento.setStableTokenExchangeLimits(stableToken, min, max)
     }
-  }
+  },
+  MENTO_PACKAGE
 )

@@ -69,8 +69,9 @@ jobs:
         id: node-checksums
         run: |
           find . -maxdepth 5 -type f -name 'package.json' -not -path "*node_modules*" -print0 | sort -z | xargs -0 cat > $RUNNER_TEMP/package.checksum
-          find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat > $RUNNER_TEMP/patches.checksum
-          echo "PACKAGE_JSON_CHECKSUM=${{ hashFiles('$RUNNER_TEMP/*.checksum') }}" >> "$GITHUB_OUTPUT"
+          find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat >> $RUNNER_TEMP/package.checksum
+          echo "PACKAGE_JSON_CHECKSUM=$(md5sum $RUNNER_TEMP/package.checksum | cut -f1 -d' ')"
+          echo "PACKAGE_JSON_CHECKSUM=$(md5sum $RUNNER_TEMP/package.checksum | cut -f1 -d' ')" >> "$GITHUB_OUTPUT"
       - name: Restore node cache
         uses: actions/cache@v3
         id: cache_node
@@ -214,7 +215,10 @@ jobs:
     # needs: [install-dependencies, lint-checks]
     needs: [install-dependencies]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -255,7 +259,10 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -284,9 +291,12 @@ jobs:
     name: ${{ matrix.name }}
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 60
-    needs: [install-dependencies, lint-checks, pre-protocol-test-release]
+    needs: [install-dependencies, lint-checks]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -303,7 +313,7 @@ jobs:
                 echo "If these changes are intended, update the 'releaseData/versionReports' accordingly"
                 exit 1
               fi
-          - name: Protocol Unit tests
+          - name: Protocol Common tests
             command: |
               yarn --cwd packages/protocol test common/
           - name: Protocol Compatibility
@@ -318,7 +328,7 @@ jobs:
           - name: Protocol Governance Voting
             command: |
               yarn --cwd packages/protocol test governance/voting/
-          - name: Protocol Governance Identity
+          - name: Protocol Identity
             command: |
               yarn --cwd packages/protocol test identity/
           - name: Protocol Stability
@@ -331,10 +341,13 @@ jobs:
           path: .git
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
+        with:
+          submodules: recursive
       - name: Sync workspace
-        uses: ./.github/actions/protocol-sync-workspace
+        uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
+          rebuild-package: 'true'
       - name: Build protocol
         run: |
           yarn --cwd packages/protocol build
@@ -357,7 +370,11 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/contractkit') ||
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -383,9 +400,14 @@ jobs:
     name: Identity Tests
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
-    needs: [install-dependencies]
+    needs: [install-dependencies, contractkit-tests]
     if: |
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/identity') ||
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/phone-number-privacy/common') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -411,9 +433,13 @@ jobs:
     name: Transaction URI Tests
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 30
-    needs: [install-dependencies]
+    needs: [install-dependencies, contractkit-tests]
     if: |
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk/transactions-uri') ||
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -446,7 +472,13 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/cli') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/phone-number-privacy/common') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -485,6 +517,7 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
@@ -513,7 +546,9 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -547,7 +582,9 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -578,11 +615,15 @@ jobs:
     name: e2e ${{ matrix.name }}
     runs-on: ["self-hosted", "monorepo"]
     timeout-minutes: 60
-    needs: [install-dependencies, lint-checks, pre-protocol-test-release]
+    needs: [install-dependencies, lint-checks, contractkit-tests]
     if: |
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/celotool') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk/contractkit') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/phone-number-privacy/common') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -647,7 +688,7 @@ jobs:
           key: git-${{ github.ref }}
       - uses: actions/checkout@v3
       - name: Sync workspace
-        uses: ./.github/actions/protocol-sync-workspace
+        uses: ./.github/actions/sync-workspace
         with:
           package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Setup tmate session
@@ -670,7 +711,10 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/phone-number-privacy') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -704,7 +748,9 @@ jobs:
     # Disable as certora license is not active
     if: |
       false && (
+        github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
         contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+        contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
         contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
         contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock')
       )
@@ -753,7 +799,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 20
-        if: contains(matrix.command, '/lockedgold.sh')
+        if: contains(matrix.command, '/lockedgold.sh') && false
         with:
           limit-access-to-actor: true
       - name: Certora dependencies
@@ -768,4 +814,3 @@ jobs:
       - name: Build and run command
         run: |
           ${{ matrix.command }}
-      

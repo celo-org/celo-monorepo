@@ -4,13 +4,14 @@ import {
   addressMinedLatestBlock,
   assertEqualBN,
   assertRevert,
-  assumeOwnership,
+  assumeOwnershipWithTruffle,
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import {
   getDeployedProxiedContract,
   getFunctionSelectorsForContract,
+  makeTruffleContractForMigration,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { linkedListChanges, zip } from '@celo/utils/lib/collections'
@@ -18,8 +19,6 @@ import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ElectionInstance,
-  ExchangeContract,
-  ExchangeInstance,
   FeeCurrencyWhitelistInstance,
   FreezerInstance,
   GoldTokenInstance,
@@ -28,12 +27,18 @@ import {
   GovernanceSlasherInstance,
   LockedGoldInstance,
   RegistryInstance,
+} from 'types'
+import {
+  ExchangeContract,
+  ExchangeInstance,
   ReserveInstance,
   ReserveSpenderMultiSigInstance,
   SortedOraclesInstance,
   StableTokenContract,
   StableTokenInstance,
-} from 'types'
+} from 'types/mento'
+import { MENTO_PACKAGE } from '../../contractPackages'
+import { ArtifactsSingleton } from '../../migrations/artifactsSingleton'
 import { SECONDS_IN_A_WEEK } from '../constants'
 
 enum VoteValue {
@@ -296,27 +301,35 @@ contract('Integration: Governance', (accounts: string[]) => {
   describe('Checking governance thresholds', () => {
     for (const contractName of Object.keys(constitution).filter((k) => k !== 'proxy')) {
       it('should have correct thresholds for ' + contractName, async () => {
-        const contract: any = await getDeployedProxiedContract<Truffle.ContractInstance>(
-          contractName,
+        const artifactsInstance = ArtifactsSingleton.getInstance(
+          constitution[contractName].__contractPackage,
           artifacts
         )
 
-        const selectors = getFunctionSelectorsForContract(contract, contractName, artifacts)
+        const contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
+          contractName,
+          artifactsInstance
+        )
+
+        const selectors = getFunctionSelectorsForContract(contract, contractName, artifactsInstance)
+
         selectors.default = ['0x00000000']
 
         const thresholds = { ...constitution.proxy, ...constitution[contractName] }
         await Promise.all(
-          Object.keys(thresholds).map((func) =>
-            Promise.all(
-              selectors[func].map(async (selector) => {
-                assertEqualBN(
-                  await governance.getConstitution(contract.address, selector),
-                  toFixed(thresholds[func]),
-                  'Threshold set incorrectly for function ' + func
-                )
-              })
+          Object.keys(thresholds)
+            .filter((k) => k !== '__contractPackage')
+            .map((func) =>
+              Promise.all(
+                selectors[func].map(async (selector) => {
+                  assertEqualBN(
+                    await governance.getConstitution(contract.address, selector),
+                    toFixed(thresholds[func]),
+                    'Threshold set incorrectly for function ' + func
+                  )
+                })
+              )
             )
-          )
         )
       })
     }
@@ -413,10 +426,22 @@ Array.from([
     const decimals = 18
 
     before(async () => {
-      exchange = await getDeployedProxiedContract(exchangeId, artifacts)
-      stableToken = await getDeployedProxiedContract(stableTokenId, artifacts)
-      multiSig = await getDeployedProxiedContract('ReserveSpenderMultiSig', artifacts)
-      reserve = await getDeployedProxiedContract('Reserve', artifacts)
+      exchange = await getDeployedProxiedContract(
+        exchangeId,
+        ArtifactsSingleton.getInstance(MENTO_PACKAGE)
+      )
+      stableToken = await getDeployedProxiedContract(
+        stableTokenId,
+        ArtifactsSingleton.getInstance(MENTO_PACKAGE)
+      )
+      multiSig = await getDeployedProxiedContract(
+        'ReserveSpenderMultiSig',
+        ArtifactsSingleton.getInstance(MENTO_PACKAGE)
+      )
+      reserve = await getDeployedProxiedContract(
+        'Reserve',
+        ArtifactsSingleton.getInstance(MENTO_PACKAGE)
+      )
       goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
     })
 
@@ -576,8 +601,16 @@ Array.from([
 )
 
 contract('Integration: Adding StableToken', (accounts: string[]) => {
-  const Exchange: ExchangeContract = artifacts.require('Exchange')
-  const StableToken: StableTokenContract = artifacts.require('StableToken')
+  const Exchange: ExchangeContract = makeTruffleContractForMigration(
+    'Exchange',
+    MENTO_PACKAGE,
+    web3
+  )
+  const StableToken: StableTokenContract = makeTruffleContractForMigration(
+    'StableToken',
+    MENTO_PACKAGE,
+    web3
+  )
   let exchangeAbc: ExchangeInstance
   let freezer: FreezerInstance
   let goldToken: GoldTokenInstance
@@ -590,14 +623,9 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
   before(async () => {
     goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
     freezer = await getDeployedProxiedContract('Freezer', artifacts)
-    const contractsToOwn = [
-      'Freezer',
-      'Registry',
-      'Reserve',
-      'SortedOracles',
-      'FeeCurrencyWhitelist',
-    ]
-    await assumeOwnership(contractsToOwn, accounts[0])
+    const contractsToOwn = ['Freezer', 'Registry', 'SortedOracles', 'FeeCurrencyWhitelist']
+    await assumeOwnershipWithTruffle(contractsToOwn, accounts[0])
+    await assumeOwnershipWithTruffle(['Reserve'], accounts[0], 0, MENTO_PACKAGE)
   })
 
   // 1. Mimic the state of the world post-contracts-release
@@ -679,7 +707,10 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
   //   c) Confirm mento is functional
   describe('When the contracts have been unfrozen and the mento has been activated', () => {
     before(async () => {
-      const reserve: ReserveInstance = await getDeployedProxiedContract('Reserve', artifacts)
+      const reserve: ReserveInstance = await getDeployedProxiedContract(
+        'Reserve',
+        ArtifactsSingleton.getInstance(MENTO_PACKAGE)
+      )
       const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract(
         'FeeCurrencyWhitelist',
         artifacts

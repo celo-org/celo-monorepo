@@ -1,7 +1,6 @@
 /* tslint:disable: no-console */
 import { ChildProcess, spawnSync } from 'child_process'
 import { execBackgroundCmd, execCmd } from './cmd-utils'
-import { envVar, fetchEnv, isVmBased } from './env-utils'
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -13,19 +12,7 @@ const PORT_CONTROL_CMD = 'nc -z 127.0.0.1 8545'
 const DEFAULT_COMPONENT = 'validators'
 
 async function getPortForwardCmd(celoEnv: string, component?: string, ports = defaultPortsString) {
-  if (isVmBased()) {
-    return Promise.resolve(getVmPortForwardCmd(celoEnv, component, ports))
-  } else {
-    return getKubernetesPortForwardCmd(celoEnv, component, ports)
-  }
-}
-
-function getVmPortForwardCmd(celoEnv: string, machine = 'validator-0', ports = defaultPortsString) {
-  const zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
-  // this command expects port mappings to be of the form `[localPort]:localhost:[remotePort]`
-  const portMappings = ports.replace(/:/g, ':localhost:').split(' ')
-  const portsWithFlags = portMappings.map((mapping) => `-L ${mapping}`).join(' ')
-  return `gcloud compute ssh --zone ${zone} ${celoEnv}-${machine} -- -N ${portsWithFlags}`
+  return getKubernetesPortForwardCmd(celoEnv, component, ports)
 }
 
 async function getKubernetesPortForwardCmd(
