@@ -13,7 +13,11 @@ const CONTRACT_METADATA_REGEXPS = [
   // 0.5.13
   'a265627a7a72315820.{64}64736f6c6343.{6}0032',
   // 0.8.19
-  'a264697066735822.{64}64736f6c6343.{6}0033'
+
+//   xa264 'i' 'p' 'f' 's' 58 22 <34 bytes IPFS hash>
+// 0x64 's' 'o' 'l' 'c' 0x43 <3 byte version encoding>
+// 0x0033
+  'a264697066735822.{68}64736f6c6343.{6}0033'
 ]
 
 const GENERAL_METADATA_REGEXP = new RegExp(
