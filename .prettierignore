@@ -25,3 +25,6 @@ packages/protocol/contractPackages.js
 # prettier eats Latex underscore escapting and doesn't seem to have an option to disable
 packages/docs/celo-codebase/protocol/proof-of-stake/epoch-rewards.md
 
+
+packages/protocol/contracts/common/Ownable8.sol
+packages/protocol/contracts/common/Context8.sol
