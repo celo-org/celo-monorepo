@@ -1,4 +1,4 @@
-pragma solidity >=0.5.0;
+pragma solidity ^0.5.13;
 
 interface IUniswapV2ERC20 {
   event Approval(address indexed owner, address indexed spender, uint256 value);

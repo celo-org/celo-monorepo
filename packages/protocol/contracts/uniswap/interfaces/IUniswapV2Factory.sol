@@ -1,4 +1,4 @@
-pragma solidity >=0.5.0;
+pragma solidity ^0.5.13;
 
 interface IUniswapV2Factory {
   event PairCreated(address indexed token0, address indexed token1, address pair, uint256);
