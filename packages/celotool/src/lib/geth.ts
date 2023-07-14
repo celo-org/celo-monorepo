@@ -863,7 +863,7 @@ export async function faucetLoadTestThreads(
   console.info(`Addind account ${fundingAddress} to kit`)
   kit.defaultAccount = privateKeyToAddress(privateKey)
   const sleepTime = 5000
-  while (await kit.connection.isSyncing()) {
+  while ((await kit.connection.isSyncing()) || (await kit.connection.getBlockNumber()) < 1) {
     console.info(`Sleeping ${sleepTime}ms while waiting for web3Provider to be synced.`)
     await sleep(sleepTime)
   }
