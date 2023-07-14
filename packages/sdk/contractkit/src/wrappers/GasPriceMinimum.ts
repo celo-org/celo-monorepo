@@ -16,6 +16,7 @@ export class GasPriceMinimumWrapper extends BaseWrapper<GasPriceMinimum> {
    * Query current gas price minimum in CELO.
    * @returns current gas price minimum in CELO
    */
+  // @ts-ignore
   gasPriceMinimum = proxyCall(this.contract.methods.gasPriceMinimum, undefined, valueToBigNumber)
 
   /**
@@ -23,6 +24,7 @@ export class GasPriceMinimumWrapper extends BaseWrapper<GasPriceMinimum> {
    * @returns current gas price minimum in the requested currency
    */
   getGasPriceMinimum = proxyCall(
+    // @ts-ignore
     this.contract.methods.getGasPriceMinimum,
     undefined,
     valueToBigNumber
@@ -33,6 +35,7 @@ export class GasPriceMinimumWrapper extends BaseWrapper<GasPriceMinimum> {
    * @returns the current block density targeted by the gas price minimum algorithm.
    */
   targetDensity = proxyCall(
+    // @ts-ignore
     this.contract.methods.targetDensity,
     undefined,
     fixidityValueToBigNumber
@@ -42,6 +45,7 @@ export class GasPriceMinimumWrapper extends BaseWrapper<GasPriceMinimum> {
    * @returns multiplier that impacts how quickly gas price minimum is adjusted.
    */
   adjustmentSpeed = proxyCall(
+    // @ts-ignore
     this.contract.methods.adjustmentSpeed,
     undefined,
     fixidityValueToBigNumber

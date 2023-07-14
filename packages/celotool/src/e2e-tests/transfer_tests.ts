@@ -385,8 +385,10 @@ describe('Transfer tests', function (this: any) {
   const getGasPriceMinimum = async (feeCurrency: string | undefined) => {
     const gasPriceMinimum = await kit._web3Contracts.getGasPriceMinimum()
     if (feeCurrency) {
+      // @ts-ignore
       return gasPriceMinimum.methods.getGasPriceMinimum(feeCurrency).call()
     } else {
+      // @ts-ignore
       return gasPriceMinimum.methods.gasPriceMinimum().call()
     }
   }
