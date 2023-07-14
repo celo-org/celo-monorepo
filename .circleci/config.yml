@@ -39,6 +39,7 @@ contract-defaults: &contract-defaults
   <<: *defaults
   environment:
     # RELEASE_TAG: core-contracts.v9
+    # TODO(soloseng): switch back to core-contract.v* once the latest contract release is done on node18.
     RELEASE_TAG: ganache-v7-core-contracts.v9
 
 e2e-defaults: &e2e-defaults
@@ -254,6 +255,7 @@ jobs:
           name: Opcode tests
           command: yarn --cwd packages/protocol check-opcodes
       - node/install:
+      # TODO(soloseng): remove this node 12 install once the latest contract release is done on node18.
           install-yarn: true
           node-version: '12.22.11'
       - run:
