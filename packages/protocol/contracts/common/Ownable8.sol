@@ -17,7 +17,7 @@ import "./Context8.sol";
  * `onlyOwner`, which can be applied to your functions to restrict their use to
  * the owner.
  */
-abstract contract Ownable is Context {
+abstract contract Ownable8 is Context8 {
     address private _owner;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
