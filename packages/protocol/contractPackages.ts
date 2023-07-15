@@ -31,3 +31,9 @@ export const MENTO_PACKAGE: ContractPackage = {
     'StableTokenProxy',
   ],
 }
+export const V_0_8_CONTRACTS: ContractPackage = {
+  path: 'core-contracts-v0_8',
+  name: 'v8',
+  contracts: ['GasPriceMinimum'],
+  proxyContracts: [],
+}

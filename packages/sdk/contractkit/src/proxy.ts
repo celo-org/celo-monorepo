@@ -12,7 +12,6 @@ import { ABI as EscrowABI } from './generated/Escrow'
 import { ABI as FederatedAttestationsABI } from './generated/FederatedAttestations'
 import { ABI as FeeCurrencyWhitelistABI } from './generated/FeeCurrencyWhitelist'
 import { ABI as FreezerABI } from './generated/Freezer'
-import { ABI as GasPriceMinimumABI } from './generated/GasPriceMinimum'
 import { ABI as GoldTokenABI } from './generated/GoldToken'
 import { ABI as GovernanceABI } from './generated/Governance'
 import { ABI as LockedGoldABI } from './generated/LockedGold'
@@ -29,6 +28,7 @@ import { ABI as ExchangeABI } from './generated/mento/Exchange'
 import { ABI as GrandaMentoABI } from './generated/mento/GrandaMento'
 import { ABI as ReserveABI } from './generated/mento/Reserve'
 import { ABI as StableTokenABI } from './generated/mento/StableToken'
+import { ABI as GasPriceMinimumABI } from './generated/v8/GasPriceMinimum'
 
 export const GET_IMPLEMENTATION_ABI: ABIDefinition = {
   constant: true,

@@ -4,7 +4,7 @@ import { execSync } from 'child_process'
 import { readJSONSync } from 'fs-extra'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
-import { MENTO_PACKAGE } from '../contractPackages'
+import { MENTO_PACKAGE, V_0_8_CONTRACTS } from '../contractPackages'
 
 const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
 const BUILD_DIR = path.join(ROOT_DIR, process.env.BUILD_DIR ?? './build')
@@ -38,7 +38,7 @@ export const ProxyContracts = [
 export const CoreContracts = [
   // common
   'Accounts',
-  'GasPriceMinimum',
+  // 'GasPriceMinimum',
   'FeeHandler',
   'MentoFeeHandlerSeller',
   'UniswapFeeHandlerSellerProxy',
@@ -83,6 +83,7 @@ const OtherContracts = [
 ]
 
 const externalContractPackages = [MENTO_PACKAGE]
+const CoreContractsV8 = [V_0_8_CONTRACTS]
 
 const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
 
@@ -104,6 +105,14 @@ function compile(outdir: string) {
     console.log(`Building external contracts for ${externalContractPackage.name}`)
     exec(
       `yarn run truffle compile --silent --contracts_directory=./lib/${externalContractPackage.path}/contracts --contracts_build_directory=./build/contracts-${externalContractPackage.name}`
+    )
+  }
+
+  for (const CoreContract8 of CoreContractsV8) {
+    console.log(`Building v8 contracts for ${JSON.stringify(CoreContract8)}`)
+    console.log(`Building external contracts for ${CoreContract8.name}`)
+    exec(
+      `yarn run truffle compile --silent --contracts_directory=./lib/${CoreContract8.path}/contracts --contracts_build_directory=./build/contracts-${CoreContract8.name}`
     )
   }
 
@@ -178,6 +187,20 @@ async function generateFilesForContractKit(outdir: string) {
             externalContractPackage.name
           }/@(${externalContractPackage.contracts.join('|')}).json`,
           outDir: path.join(relativePath, externalContractPackage.name),
+        },
+      })
+    )
+  }
+  for (const CoreContract8 of CoreContractsV8) {
+    await tsGenerator(
+      { cwd, loggingLvl: 'info' },
+      new Web3V1Celo({
+        cwd,
+        rawConfig: {
+          files: `${BUILD_DIR}/contracts-${CoreContract8.name}/@(${CoreContract8.contracts.join(
+            '|'
+          )}).json`,
+          outDir: path.join(relativePath, CoreContract8.name),
         },
       })
     )

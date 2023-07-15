@@ -15,7 +15,6 @@ import { newFederatedAttestations } from './generated/FederatedAttestations'
 import { newFeeCurrencyWhitelist } from './generated/FeeCurrencyWhitelist'
 import { newFeeHandler } from './generated/FeeHandler'
 import { newFreezer } from './generated/Freezer'
-import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
 import { newIerc20 } from './generated/IERC20'
@@ -35,6 +34,7 @@ import { newExchangeEur } from './generated/mento/ExchangeEUR'
 import { newGrandaMento } from './generated/mento/GrandaMento'
 import { newReserve } from './generated/mento/Reserve'
 import { newStableToken } from './generated/mento/StableToken'
+import { newGasPriceMinimum } from './generated/v8/GasPriceMinimum'
 
 const debug = debugFactory('kit:web3-contract-cache')
 
