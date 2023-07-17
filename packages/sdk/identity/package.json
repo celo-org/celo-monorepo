@@ -45,7 +45,7 @@
     "@celo/wallet-local": "4.1.1-dev",
     "@types/elliptic": "^6.4.12",
     "fetch-mock": "9.10.4",
-    "ganache": "npm:@soloseng/ganache@7.8.0-beta.1",
+    "ganache": "npm:@celo/ganache@7.8.0-unofficial.0",
     "old-identity-sdk": "npm:@celo/identity@1.5.2"
   },
   "engines": {
