@@ -34,19 +34,19 @@ ADD https://www.googleapis.com/storage/v1/b/genesis_blocks/o/${celo_env}?alt=med
 ADD https://www.googleapis.com/storage/v1/b/static_nodes/o/${celo_env}?alt=media /celo/static-nodes.json
 
 # Build Celocli
-FROM node:18-alpine as node
+FROM node:12-alpine as node
 
 ARG celo_env
 
 RUN echo "geth_tag is ${geth_tag}" && echo "Env is ${celo_env}"
 # Required for celocli
-RUN apk add --no-cache python3 git make gcc g++ pkgconfig libusb libusb-dev linux-headers eudev-dev
+RUN apk add --no-cache python2 git make gcc g++ pkgconfig libusb libusb-dev linux-headers eudev-dev
 
 WORKDIR /celo-monorepo/
 RUN npm install @celo/celocli
 
 # Build the combined image
-FROM node:18-alpine as final_image
+FROM node:12-alpine as final_image
 
 ARG network_name="alfajores"
 ARG network_id="44787"
