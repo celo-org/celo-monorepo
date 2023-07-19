@@ -1054,11 +1054,5 @@ workflows:
   # Dummy job for not showing CircleCI error: "Error: All Workflows have been filtered from this Pipeline"
   # Check https://github.com/CircleCI-Public/circleci-cli/issues/577 for more context
   no-changes:
-    when:
-      not:
-        or:
-          - << pipeline.parameters.run-workflow-general >>
-          - << pipeline.parameters.run-workflow-npm-install >>
-          - << pipeline.parameters.run-workflow-protocol-coverage >>
     jobs:
       - noop
