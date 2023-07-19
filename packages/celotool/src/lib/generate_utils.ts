@@ -8,7 +8,7 @@ import fs from 'fs'
 import { merge, range, repeat } from 'lodash'
 import { tmpdir } from 'os'
 import path from 'path'
-import * as rlp from 'rlp' // TODO(soloseng): update?
+import * as rlp from 'rlp'
 import { MyceloGenesisConfig } from 'src/lib/interfaces/mycelo-genesis-config'
 import { CurrencyPair } from 'src/lib/k8s-oracle/base'
 import * as ecc from 'tiny-secp256k1'
