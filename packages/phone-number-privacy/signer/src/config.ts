@@ -1,5 +1,6 @@
 import {
   BlockchainConfig,
+  DB_TIMEOUT,
   FULL_NODE_TIMEOUT_IN_MS,
   toBool,
 } from '@celo/phone-number-privacy-common'
@@ -69,6 +70,7 @@ export interface SignerConfig {
     port?: number
     ssl: boolean
     poolMaxSize: number
+    timeout: number
   }
   keystore: {
     type: SupportedKeystore
@@ -151,6 +153,7 @@ export const config: SignerConfig = {
     port: env.DB_PORT ? Number(env.DB_PORT) : undefined,
     ssl: toBool(env.DB_USE_SSL, true),
     poolMaxSize: env.DB_POOL_MAX_SIZE ?? 50,
+    timeout: env.DB_TIMEOUT ?? DB_TIMEOUT,
   },
   keystore: {
     type: env.KEYSTORE_TYPE,

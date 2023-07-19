@@ -1,6 +1,7 @@
-import { DB_TIMEOUT, Domain, domainHash, ErrorMessage } from '@celo/phone-number-privacy-common'
+import { Domain, domainHash, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
+import { config } from '../../../config'
 import { Histograms, meter } from '../../metrics'
 import {
   DOMAIN_REQUESTS_COLUMNS,
@@ -35,7 +36,7 @@ export async function getDomainRequestRecordExists<D extends Domain>(
           [DOMAIN_REQUESTS_COLUMNS.blindedMessage]: blindedMessage,
         })
         .first()
-        .timeout(DB_TIMEOUT)
+        .timeout(config.db.timeout)
       return !!existingRequest
     },
     [],
@@ -58,7 +59,7 @@ export async function storeDomainRequestRecord<D extends Domain>(
       await domainRequests(db)
         .transacting(trx)
         .insert(toDomainRequestRecord(domain, blindedMessage))
-        .timeout(DB_TIMEOUT)
+        .timeout(config.db.timeout)
     },
     [],
     (err: any) => countAndThrowDBError(err, logger, ErrorMessage.DATABASE_INSERT_FAILURE),
