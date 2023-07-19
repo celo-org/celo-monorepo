@@ -2,11 +2,21 @@
 # and https://github.com/facebook/react-native/blob/master/.circleci/config.yml
 
 version: 2.1
+setup: true
 
 orbs:
   node: circleci/node@5.1.0
 
 parameters:
+  run-workflow-general:
+    type: boolean
+    default: false 
+  run-workflow-npm-install:
+    type: boolean
+    default: false 
+  run-workflow-protocol-coverage:
+    type: boolean
+    default: false 
   # When you need to force a rebuild of the node modules cache then bump this version
   node-modules-cache-version:
     type: integer
@@ -897,10 +907,22 @@ jobs:
           name: Add summary of flakey tests to GitHub Checks
           command: |
             node ./packages/flake-tracker/scripts/summary.js
+  
+  # Dummy job for not showing CircleCI error: "Error: All Workflows have been filtered from this Pipeline"
+  # Check https://github.com/CircleCI-Public/circleci-cli/issues/577 for more context
+  noop:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run: echo "noop"
 
 workflows:
   version: 2
   celo-monorepo-build:
+    # Contitionally triggered
+    when: 
+      or: [<< pipeline.parameters.run-workflow-general >>]
     jobs:
       - install_dependencies
       - certora-test:
@@ -1021,30 +1043,17 @@ workflows:
       #       - end-to-end-cip35-eth-compatibility-test
       #       - odis-test
   npm-install-testing-cron-workflow:
-    triggers:
-      - schedule:
-          # 7 PM in UTC = noon in PDT.
-          # Best for test to fail during SF afternoon, so that, someone can fix it during the day time.
-          cron: '0 19 * * *'
-          filters:
-            branches:
-              only:
-                - master
+    # Contitionally triggered
+    when: 
+      or: [<< pipeline.parameters.run-workflow-npm-install >>]
     jobs:
       - test-typescript-npm-package-install
       - test-utils-npm-package-install
       - test-contractkit-npm-package-install
       - test-celocli-npm-package-install
   protocol-testing-with-code-coverage-cron-workflow:
-    triggers:
-      - schedule:
-          # 1 PM in UTC = 6 AM in PDT.
-          # Best for this slow test (~3 hours) to run during SF early morning.
-          cron: '0 13 * * *'
-          filters:
-            branches:
-              only:
-                - master
+    when: 
+      or: [<< pipeline.parameters.run-workflow-protocol-coverage >>]
     jobs:
       - install_dependencies
       - lint-checks:
@@ -1053,3 +1062,8 @@ workflows:
       - protocol-test-with-code-coverage:
           requires:
             - lint-checks
+  # Dummy job for not showing CircleCI error: "Error: All Workflows have been filtered from this Pipeline"
+  # Check https://github.com/CircleCI-Public/circleci-cli/issues/577 for more context
+  no-changes:
+    jobs:
+      - noop
