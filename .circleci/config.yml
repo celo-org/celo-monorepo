@@ -898,7 +898,6 @@ jobs:
             node ./packages/flake-tracker/scripts/summary.js
 
 workflows:
-  version: 2
   celo-monorepo-build:
     # Contitionally triggered
     when: 
