@@ -24,7 +24,7 @@ jobs:
   publish-npm-sdk:
     name: Publish NPM SDK packages
     runs-on: ["self-hosted", "monorepo-npm"]
-    if: (contains('["aaronmgdr", "nicolasbrugneaux", "alvarof2", "jcortejoso"]', github.actor) || contains(github.event.release.name, 'sdk'))
+    if: (contains('["aaronmgdr", "nicolasbrugneaux", "alvarof2", "jcortejoso"]', github.actor) || contains(github.event.release.name, 'SDK'))
     permissions: # Must change the job token permissions to use JWT auth
       contents: read
       id-token: write
