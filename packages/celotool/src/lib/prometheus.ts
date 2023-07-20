@@ -1,6 +1,5 @@
 import fs from 'fs'
 import { createNamespaceIfNotExists } from './cluster'
-import { execCmdWithExitOnFailure } from './cmd-utils'
 import {
   DynamicEnvVar,
   envVar,
@@ -16,13 +15,7 @@ import {
   upgradeGenericHelmChart,
 } from './helm_deploy'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
-import {
-  createServiceAccountIfNotExists,
-  getServiceAccountEmail,
-  getServiceAccountKey,
-  setupGKEWorkloadIdentities,
-} from './service-account-utils'
-import { outputIncludes, switchToGCPProject } from './utils'
+import { outputIncludes } from './utils'
 const yaml = require('js-yaml')
 
 const helmChartPath = '../helm-charts/prometheus'
@@ -78,20 +71,20 @@ export async function upgradePrometheus(context?: string, clusterConfig?: BaseCl
 function getK8sContextVars(
   clusterConfig?: BaseClusterConfig,
   context?: string
-): [string, string, string, boolean] {
+): [string, string, string, string, boolean] {
   const cloudProvider = clusterConfig ? getCloudProviderPrefix(clusterConfig!) : 'gcp'
   const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
   let clusterName = usingGCP ? fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) : clusterConfig!.clusterName
-  let gcloudProject, gcloudRegion, stackdriverDisabled
+  let gcloudProject, gcloudRegion
 
   if (context) {
     gcloudProject = getDynamicEnvVarValue(
-      DynamicEnvVar.PROM_SIDECAR_GCP_PROJECT,
+      DynamicEnvVar.PROM_GCP_PROJECT,
       { context },
       fetchEnv(envVar.TESTNET_PROJECT_NAME)
     )
     gcloudRegion = getDynamicEnvVarValue(
-      DynamicEnvVar.PROM_SIDECAR_GCP_REGION,
+      DynamicEnvVar.PROM_GCP_REGION,
       { context },
       fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
     )

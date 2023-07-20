@@ -35,7 +35,7 @@ import {
 } from './testnet-utils'
 import { stringToBoolean } from './utils'
 
-const generator = require('generate-password')
+import generator from 'generate-password'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
