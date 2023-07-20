@@ -12,14 +12,15 @@ import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { ProxyInstance, RegistryInstance } from 'types'
 import Web3 from 'web3'
+import { ignoredContractsV9 } from './ignored-contracts-v9'
 
-const ignoredContracts = [
+let ignoredContracts = [
   // This contract is not proxied
   'TransferWhitelist',
 
   // These contracts are not in the Registry (before release 1)
   'ReserveSpenderMultiSig',
-  'GovernanceApproverMultiSig',
+  'GovernanceApproverMultiSig'
 ]
 
 interface VerificationContext {
@@ -222,6 +223,7 @@ export const verifyBytecodes = async (
   Proxy: Truffle.Contract<ProxyInstance>,
   _web3: Web3,
   initializationData: InitializationData = {},
+  version?: number,
   network = 'development'
 ) => {
   assertValidProposalTransactions(proposal)
@@ -229,9 +231,14 @@ export const verifyBytecodes = async (
 
   const compiledContracts = artifacts.listArtifacts().map((a) => a.contractName)
 
+  if (version >= 9) {
+    ignoredContracts = [...ignoredContracts, ...ignoredContractsV9]
+  }
+
   const queue = contracts.filter(
     (contract) => !ignoredContracts.includes(contract) && compiledContracts.includes(contract)
   )
+
   const visited: Set<string> = new Set(queue)
 
   // truffle web3 version does not have getProof

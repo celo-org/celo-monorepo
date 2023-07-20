@@ -1,4 +1,10 @@
-import { BlockchainConfig, rootLogger, TestUtils, toBool } from '@celo/phone-number-privacy-common'
+import {
+  BlockchainConfig,
+  FULL_NODE_TIMEOUT_IN_MS,
+  rootLogger,
+  TestUtils,
+  toBool,
+} from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
 export function getCombinerVersion(): string {
   return process.env.npm_package_version ?? require('../package.json').version ?? '0.0.0'
@@ -29,6 +35,7 @@ export interface OdisConfig {
     currentVersion: number
     versions: string // parse as KeyVersionInfo[]
   }
+  fullNodeTimeoutMs: number
 }
 
 export interface CombinerConfig {
@@ -94,6 +101,7 @@ if (DEV_MODE) {
           },
         ]),
       },
+      fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
     },
     domains: {
       serviceName: defaultServiceName,
@@ -126,6 +134,7 @@ if (DEV_MODE) {
           },
         ]),
       },
+      fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
     },
   }
 } else {
@@ -150,6 +159,7 @@ if (DEV_MODE) {
         currentVersion: Number(functionConfig.pnp_keys.current_version),
         versions: functionConfig.pnp_keys.versions,
       },
+      fullNodeTimeoutMs: Number(functionConfig.pnp.full_node_timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
     },
     domains: {
       serviceName: functionConfig.domains.service_name ?? defaultServiceName,
@@ -165,6 +175,7 @@ if (DEV_MODE) {
         currentVersion: Number(functionConfig.domains_keys.current_version),
         versions: functionConfig.domains_keys.versions,
       },
+      fullNodeTimeoutMs: Number(functionConfig.pnp.full_node_timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
     },
   }
 }

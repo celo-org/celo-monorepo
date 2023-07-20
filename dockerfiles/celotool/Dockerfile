@@ -1,16 +1,17 @@
-FROM node:12
+FROM node:12-bullseye-slim
 WORKDIR /celo-monorepo
 
 # Needed for gsutil
 RUN apt-get update && \
-  apt-get install -y lsb-release && \
-  export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
-  echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
-  curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-  apt-get update -y && \
-  apt-get install -y google-cloud-sdk kubectl netcat && \
-  curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash && \
-  rm -rf /var/lib/apt/lists/*
+    apt-get install -y lsb-release && \
+    apt-get install -y curl build-essential git python2 && \
+    export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
+    echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+    apt-get update -y && \
+    apt-get install -y google-cloud-sdk kubectl netcat && \
+    curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash && \
+    rm -rf /var/lib/apt/lists/*
 
 # ensure yarn.lock is evaluated by kaniko cache diff
 COPY lerna.json package.json yarn.lock ./
@@ -35,6 +36,9 @@ COPY packages/typescript/package.json packages/typescript/
 COPY patches/ patches/
 COPY scripts/ scripts/
 COPY packages/sdk/phone-utils/package.json packages/sdk/phone-utils/package.json
+# Makes build fail if it doesn't copy git, will be removed after build
+COPY .git .git 
+COPY .gitmodules .gitmodules 
 
 RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 
@@ -61,6 +65,9 @@ COPY packages/sdk/phone-utils packages/sdk/phone-utils/
 
 RUN yarn build
 
+RUN rm -r .git
+RUN rm .gitmodules
+
 ENV PATH="/celo-monorepo/packages/celotool/bin:${PATH}"
 
 COPY --from=golang:1.16-stretch /usr/local/go/ /usr/local/go/
@@ -68,4 +75,3 @@ COPY --from=golang:1.16-stretch /usr/local/go/ /usr/local/go/
 ENV PATH="/usr/local/go/bin:${PATH}"
 
 CMD ["celotooljs.sh"]
-
