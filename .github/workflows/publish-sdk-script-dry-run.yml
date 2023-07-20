@@ -17,12 +17,14 @@ on:
         required: false
         type: string
         default: ''
+  release:
+    types: [published]
 
 jobs:
   publish-npm-sdk:
     name: Publish NPM SDK packages
     runs-on: ["self-hosted", "monorepo-npm"]
-    if: contains('["aaronmgdr","@nicolasbrugneaux", "alvarof2", "jcortejoso"]', github.actor)
+    if: (contains('["aaronmgdr", "nicolasbrugneaux", "alvarof2", "jcortejoso"]', github.actor) || contains(github.event.release.name, 'sdk'))
     permissions: # Must change the job token permissions to use JWT auth
       contents: read
       id-token: write
@@ -51,8 +53,19 @@ jobs:
         run: |
           echo "publish=dry-run" >> "$GITHUB_ENV"
           echo "version=4.1.5" >> "$GITHUB_ENV"
-          # echo "publish=${{ github.event.inputs.publish }}" >> "$GITHUB_ENV"
-          # echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_ENV"
+          # if [ ${{ github.event.inputs.publish }} ];
+          # then
+          #   echo "publish=${{ github.event.inputs.publish }}" >> "$GITHUB_ENV"
+          # fi
+          # if [ ${{ github.event.inputs.version }} ];
+          # then
+          #   echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_ENV"
+          # fi
+          # if [ ${{ github.event_name }} == "release" ];
+          # then
+          #   tag_version=$(echo ${{ github.event.release.tag_name }} | cut -d'-' -f 2)
+          #   echo "version=$tag_version" >> "$GITHUB_ENV"
+          # fi
 
       - name: Temporarily remove decrypting secrets from ./package.json
         run: sed -i 's/ && yarn keys:decrypt"/"/g' package.json
