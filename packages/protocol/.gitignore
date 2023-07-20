@@ -1,6 +1,9 @@
 /index.js
 /index.js.map
 
+contractPackages.js
+contractPackages.js.map
+
 lib/**/*.js
 lib/**/*.js.map
 
@@ -19,7 +22,6 @@ types/**/*.js.map
 scTopics
 
 build
-twilio-config.js
 .tmp
 .*.tar.gz
 

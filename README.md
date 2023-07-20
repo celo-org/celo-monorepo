@@ -106,16 +106,14 @@ See the [issue backlog](https://github.com/celo-org/celo-monorepo/issues) for a 
 
 The repository has the following packages (sub projects):
 
-- [attestation-service](packages/attestation-service) - service run by validators on the Celo network to send SMS messages, enabling attestations of user phone numbers and their accounts on the Celo network
 - [celotool](packages/celotool) - scripts for deploying and managing testnets
 - [cli](packages/cli) - tool that uses ContractKit to interact with the Celo protocol ([docs](https://docs.celo.org/command-line-interface/introduction))
 - [dev-utils](packages/dev-utils) - a utils package for use as a dev dependency
 - [docs](packages/docs) - technical documentation for the Celo project ([live](https://docs.celo.org/))
-- [helm-charts](packages/helm-charts) - templatized deployments of entire environments to Kubernetes clusters
+- [helm-charts](packages/helm-charts) - (DEPRECATED) templatized deployments of entire environments to Kubernetes clusters. Check [celo-org/charts](https://github.com/celo-org/charts) instead.
 - [protocol](packages/protocol) - identity, stability and other smart contracts for the Celo protocol ([docs](https://docs.celo.org/celo-codebase/protocol))
 - [sdk](packages/sdk) - Typescript packages for interacting with Celo, including Contracts, Wallets, Crypto++
 - [contractkit](packages/sdk/contractkit) - library to help developers and validators interact with the protocol and its smart contracts ([docs](https://docs.celo.org/developer-guide/contractkit))
-- [terraform-modules](packages/terraform-modules) - templatized deployments of entire VM-based testnets for Google Cloud Platform
 - [typescript](packages/typescript) - no README available (improve?)
 
 Code owners for each package can be found in [.github/CODEOWNERS](.github/CODEOWNERS).

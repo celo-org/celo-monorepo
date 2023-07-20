@@ -7,9 +7,17 @@ import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { BigNumber } from 'bignumber.js'
+
+import { createInterfaceAdapter } from '@truffle/interface-adapter'
+import path from 'path'
 import prompts from 'prompts'
-import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
+import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types'
+import { StableTokenInstance } from 'types/mento'
 import Web3 from 'web3'
+import { ContractPackage } from '../contractPackages'
+import { ArtifactsSingleton } from '../migrations/artifactsSingleton'
+
+const truffleContract = require('@truffle/contract');
 
 
 export async function sendTransactionWithPrivateKey<T>(
@@ -143,10 +151,13 @@ export function checkFunctionArgsLength(args: any[], abi: any) {
 
 export async function setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
->(web3: Web3, artifacts: any, contractName: string, ...args: any[]): Promise<ContractInstance> {
-  const Contract: Truffle.Contract<ContractInstance> = artifacts.require(contractName)
-  const ContractProxy: Truffle.Contract<ProxyInstance> = artifacts.require(contractName + 'Proxy')
+>(web3: Web3, artifacts: any, contractName: string, contractPackage?: ContractPackage, ...args: any[]): Promise<ContractInstance> {
+  
+  const Contract = ArtifactsSingleton.getInstance(contractPackage, artifacts).require(contractName)
+  const ContractProxy = ArtifactsSingleton.getInstance(contractPackage, artifacts).require(contractName + 'Proxy')
 
+  await Contract.detectNetwork()
+  await ContractProxy.detectNetwork()
   const implementation: ContractInstance = await Contract.deployed()
   const proxy: ProxyInstance = await ContractProxy.deployed()
   await _setInitialProxyImplementation(web3, implementation, proxy, contractName, { from: null, value: null }, ...args)
@@ -227,9 +238,10 @@ export function deploymentForCoreContract<ContractInstance extends Truffle.Contr
   artifacts: any,
   name: CeloContractName,
   args: (networkName?: string) => Promise<any[]> = async () => [],
-  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
+  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void,
+  artifactPath?: ContractPackage
 ) {
-  return deploymentForContract(web3, artifacts, name, args, true, then);
+  return deploymentForContract(web3, artifacts, name, args, true, then, artifactPath);
 }
 
 export function deploymentForProxiedContract<ContractInstance extends Truffle.ContractInstance>(
@@ -237,10 +249,36 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
   artifacts: any,
   name: CeloContractName,
   args: (networkName?: string) => Promise<any[]> = async () => [],
-  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
+  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void,
+  artifactPath?: ContractPackage
 ) {
-  return deploymentForContract(web3, artifacts, name, args, false, then);
+  return deploymentForContract(web3, artifacts, name, args, false, then, artifactPath);
 
+}
+
+
+export const makeTruffleContractForMigration = (contractName: string, contractPath:ContractPackage, web3: Web3) => {
+  const network = ArtifactsSingleton.getNetwork()
+
+  const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath.name}/${contractName}.json`)
+  const Contract = truffleContract({
+    abi: artifact.abi,
+    unlinked_binary: artifact.bytecode,
+  })
+  
+  
+  Contract.setProvider(web3.currentProvider)
+  Contract.setNetwork(network.name)
+  
+  Contract.interfaceAdapter = createInterfaceAdapter({
+    networkType: "ethereum",
+    provider: web3.currentProvider
+  })
+  Contract.configureNetwork({networkType: "ethereum", provider: web3.currentProvider})
+
+  Contract.defaults({from: network.from, gas: network.gas})
+  ArtifactsSingleton.getInstance(contractPath).addArtifact(contractName, Contract)
+  return Contract
 }
 
 export function deploymentForContract<ContractInstance extends Truffle.ContractInstance>(
@@ -249,29 +287,40 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   name: CeloContractName,
   args: (networkName?: string) => Promise<any[]> = async () => [],
   registerAddress: boolean,
-  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
+  then?: (contract: ContractInstance, web3: Web3, networkName: string, proxy?: ProxyInstance) => void,
+  artifactPath?: ContractPackage
 ) {
-  const Contract = artifacts.require(name)
-  const ContractProxy = artifacts.require(name + 'Proxy')
+
+  console.log("-> Started deployment for", name)
+  let Contract 
+  let ContractProxy
+  if (artifactPath) {
+    Contract = makeTruffleContractForMigration(name, artifactPath, web3)
+    ContractProxy = makeTruffleContractForMigration(name + 'Proxy', artifactPath, web3)
+  } else {
+    Contract = artifacts.require(name)
+    ContractProxy = artifacts.require(name + 'Proxy')
+  }
+ 
   const testingDeployment = false
   return (deployer: any, networkName: string, _accounts: string[]) => {
-    console.log('Deploying', name)
+    console.log("\n-> Deploying", name)
+
     deployer.deploy(ContractProxy)
     deployer.deploy(Contract, testingDeployment)
+
     deployer.then(async () => {
       const proxy: ProxyInstance = await ContractProxy.deployed()
       await proxy._transferOwnership(ContractProxy.defaults().from)
       const proxiedContract: ContractInstance = await setInitialProxyImplementation<
         ContractInstance
-      >(web3, artifacts, name, ...(await args(networkName)))
-
+      >(web3, artifacts, name, artifactPath, ...(await args(networkName)))
       if (registerAddress) {
         const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
         await registry.setAddressFor(name, proxiedContract.address)
       }
-
       if (then) {
-        await then(proxiedContract, web3, networkName)
+        await then(proxiedContract, web3, networkName, ContractProxy)
       }
     })
   }
@@ -314,56 +363,6 @@ export async function transferOwnershipOfProxyAndImplementation<
   )
   await contract.transferOwnership(owner)
   await transferOwnershipOfProxy(contractName, owner, artifacts)
-}
-
-// TODO(asa): Share this code with mobile.
-export async function createInviteCode(
-  goldToken: GoldTokenInstance,
-  stableToken: StableTokenInstance,
-  invitationStableTokenAmount: BigNumber,
-  gasPrice: number,
-  web3: Web3
-) {
-  // TODO(asa): This number was made up
-  const verificationGasAmount = new BigNumber(10000000)
-  if (!gasPrice) {
-    // TODO: this default gas price might not be accurate
-    gasPrice = 0
-  }
-  const temporaryWalletAccount = await web3.eth.accounts.create()
-  const temporaryAddress = temporaryWalletAccount.address
-  // Buffer.from doesn't expect a 0x for hex input
-  const privateKeyHex = temporaryWalletAccount.privateKey.substring(2)
-  const inviteCode = Buffer.from(privateKeyHex, 'hex').toString('base64')
-  await goldToken.transfer(temporaryAddress, verificationGasAmount.times(gasPrice).toString())
-  await stableToken.transfer(temporaryAddress, invitationStableTokenAmount.toString())
-  return [temporaryAddress, inviteCode]
-}
-
-export async function sendEscrowedPayment(
-  contract: StableTokenInstance,
-  escrow: EscrowInstance,
-  phone: string,
-  value: number,
-  paymentID: string
-) {
-  console.log(
-    'Transferring',
-    await convertFromContractDecimals(value, contract),
-    await contract.symbol(),
-    'to',
-    phone,
-    'via Escrow.'
-  )
-  // @ts-ignore
-  const phoneHash: string = Web3.utils.soliditySha3({
-    type: 'string',
-    value: phone,
-  })
-
-  await contract.approve(escrow.address, value.toString())
-  const expirySeconds = 60 * 60 * 24 * 5 // 5 days
-  await escrow.transfer(phoneHash, contract.address, value.toString(), expirySeconds, paymentID, 0)
 }
 
 /*

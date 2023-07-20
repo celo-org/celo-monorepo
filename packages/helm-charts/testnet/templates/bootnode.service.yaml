@@ -3,13 +3,13 @@ kind: Service
 metadata:
   name: {{ template "common.fullname" . }}-bootnode
   labels:
-{{ include "common.standard.labels" .  | indent 4 }}
+    {{- include "common.standard.labels" . | nindent 4 }}
     component: bootnode
 spec:
-  {{ if $.Values.geth.static_ips }}
+  {{- if $.Values.geth.static_ips }}
   type: LoadBalancer
   loadBalancerIP: {{ .Values.geth.bootnodeIpAddress }}
-  {{ end }}
+  {{- end }}
   selector:
     app: {{ template "common.name" . }}
     release: {{ .Release.Name }}

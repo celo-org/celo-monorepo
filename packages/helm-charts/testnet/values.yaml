@@ -36,7 +36,13 @@ geth:
     # limits:
     #   memory: "4Gi"
     #   cpu: "4"
+  validatorResources: {}
+  secondaryResources: {}
+  proxyResources: {}
+  txNodeResources: {}
+  txNodePrivateResources: {}
   ws_port: 8546
+  rpc_gascap: 10000000
   validatorExtraSnippet: |
     echo "Validator"
   secondayExtraSnippet: |
@@ -48,16 +54,22 @@ geth:
   txNodePrivateExtraSnippet: |
     echo "txnode-private"
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --http.timeout.read 600 --http.timeout.write 600 --http.timeout.idle 2400"
+  validatorAffinity: {}
   validatorNodeSelector: {}
   validatorTolerations: []
+  secondaryAffinity: {}
   secondaryNodeSelector: {}
   secondaryTolerations: []
+  proxyAffinity: {}
   proxyNodeSelector: {}
   proxyTolerations: []
+  txNodeAffinity: {}
   txNodeNodeSelector: {}
   txNodeTolerations: []
+  txNodePrivateAffinity: {}
   txNodePrivateNodeSelector: {}
   txNodePrivateTolerations: []
+  storageClass: ssd
   maxpeers: 1150
   light:
     maxpeers: 1000
@@ -107,3 +119,23 @@ domain:
   name: celo-networks-dev
 
 ingressClassName: nginx
+
+extraPodLabels:
+  validator:
+    mode: full
+  secondary:
+    mode: full
+  proxy:
+    mode: full
+  txnode:
+    mode: full
+  txnode_private:
+    stack: blockscout
+    mode: archive
+
+pvcAnnotations:
+  validator: {}
+  secondary: {}
+  proxy: {}
+  txnode: {}
+  txnode_private: {}

@@ -1,6 +1,7 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
+import { testLocally } from '../../test-utils/cliUtils'
 import Register from '../account/register'
 import Lock from '../lockedgold/lock'
 import ValidatorRegister from './register'
@@ -15,12 +16,12 @@ testWithGanache('validator:register', (web3: Web3) => {
     const accounts = await web3.eth.getAccounts()
     account = accounts[0]
     ecdsaPublicKey = await addressToPublicKey(account, web3.eth.sign)
-    await Register.run(['--from', account])
-    await Lock.run(['--from', account, '--value', '10000000000000000000000'])
+    await testLocally(Register, ['--from', account])
+    await testLocally(Lock, ['--from', account, '--value', '10000000000000000000000'])
   })
 
   test('can register validator with 0x prefix', async () => {
-    await ValidatorRegister.run([
+    await testLocally(ValidatorRegister, [
       '--from',
       account,
       '--ecdsaKey',
@@ -34,7 +35,7 @@ testWithGanache('validator:register', (web3: Web3) => {
   })
 
   test('can register validator without 0x prefix', async () => {
-    await ValidatorRegister.run([
+    await testLocally(ValidatorRegister, [
       '--from',
       account,
       '--ecdsaKey',
@@ -48,7 +49,7 @@ testWithGanache('validator:register', (web3: Web3) => {
   })
 
   test('fails if validator already registered', async () => {
-    await ValidatorRegister.run([
+    await testLocally(ValidatorRegister, [
       '--from',
       account,
       '--ecdsaKey',
@@ -60,7 +61,7 @@ testWithGanache('validator:register', (web3: Web3) => {
       '--yes',
     ])
     await expect(
-      ValidatorRegister.run([
+      testLocally(ValidatorRegister, [
         '--from',
         account,
         '--ecdsaKey',

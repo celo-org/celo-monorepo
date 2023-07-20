@@ -31,6 +31,9 @@ contract GoldToken is
 
   mapping(address => mapping(address => uint256)) internal allowed;
 
+  // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
+  address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
+
   event Transfer(address indexed from, address indexed to, uint256 value);
 
   event TransferComment(string comment);
@@ -45,10 +48,13 @@ contract GoldToken is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 1);
+    return (1, 1, 2, 0);
   }
 
   /**
@@ -69,7 +75,7 @@ contract GoldToken is
    */
   // solhint-disable-next-line no-simple-event-func-name
   function transfer(address to, uint256 value) external returns (bool) {
-    return _transfer(to, value);
+    return _transferWithCheck(to, value);
   }
 
   /**
@@ -83,9 +89,20 @@ contract GoldToken is
     external
     returns (bool)
   {
-    bool succeeded = _transfer(to, value);
+    bool succeeded = _transferWithCheck(to, value);
     emit TransferComment(comment);
     return succeeded;
+  }
+
+  /**
+   * @notice This function allows a user to burn a specific amount of tokens.
+     Burning is implemented by sending tokens to the burn address.
+   * @param value: The amount of CELO to burn.
+   * @return True if burn was successful.
+   */
+  function burn(uint256 value) external returns (bool) {
+    // not using transferWithCheck as the burn address can potentially be the zero address
+    return _transfer(BURN_ADDRESS, value);
   }
 
   /**
@@ -142,7 +159,7 @@ contract GoldToken is
     require(value <= balanceOf(from), "transfer value exceeded balance of sender");
     require(
       value <= allowed[from][msg.sender],
-      "transfer value exceeded sender's allowance for recipient"
+      "transfer value exceeded sender's allowance for spender"
     );
 
     bool success;
@@ -197,10 +214,17 @@ contract GoldToken is
   }
 
   /**
-   * @return The total amount of CELO in existence.
+   * @return The total amount of CELO in existence, including what the burn address holds.
    */
   function totalSupply() external view returns (uint256) {
     return totalSupply_;
+  }
+
+  /**
+   * @return The total amount of CELO in existence, not including what the burn address holds.
+   */
+  function circulatingSupply() external view returns (uint256) {
+    return totalSupply_.sub(getBurnedAmount()).sub(balanceOf(address(0)));
   }
 
   /**
@@ -222,6 +246,14 @@ contract GoldToken is
   }
 
   /**
+   * @notice Gets the amount of CELO that has been burned.
+   * @return The total amount of Celo that has been sent to the burn address.
+   */
+  function getBurnedAmount() public view returns (uint256) {
+    return balanceOf(BURN_ADDRESS);
+  }
+
+  /**
    * @notice Gets the balance of the specified address.
    * @param owner The address to query the balance of.
    * @return The balance of the specified address.
@@ -237,7 +269,6 @@ contract GoldToken is
    * @return True if the transaction succeeds.
    */
   function _transfer(address to, uint256 value) internal returns (bool) {
-    require(to != address(0), "transfer attempted to reserved address 0x0");
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
 
     bool success;
@@ -245,5 +276,16 @@ contract GoldToken is
     require(success, "CELO transfer failed");
     emit Transfer(msg.sender, to, value);
     return true;
+  }
+
+  /**
+   * @notice Internal CELO transfer from one address to another.
+   * @param to The address to transfer CELO to. Zero address will revert.
+   * @param value The amount of CELO to transfer.
+   * @return True if the transaction succeeds.
+   */
+  function _transferWithCheck(address to, uint256 value) internal returns (bool) {
+    require(to != address(0), "transfer attempted to reserved address 0x0");
+    return _transfer(to, value);
   }
 }

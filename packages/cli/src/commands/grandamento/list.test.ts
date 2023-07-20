@@ -7,6 +7,7 @@ import { GrandaMentoWrapper } from '@celo/contractkit/lib/wrappers/GrandaMento'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
+import { testLocally } from '../../test-utils/cliUtils'
 import { setGrandaMentoLimits } from '../../test-utils/grandaMento'
 import List from './list'
 
@@ -30,7 +31,7 @@ testWithGanache('grandamento:list cmd', (web3: Web3) => {
   })
 
   it('shows an empty list of proposals', async () => {
-    await List.run([])
+    await testLocally(List, [])
   })
 
   it('shows proposals', async () => {
@@ -45,6 +46,6 @@ testWithGanache('grandamento:list cmd', (web3: Web3) => {
       )
     ).sendAndWaitForReceipt()
 
-    await List.run([])
+    await testLocally(List, [])
   })
 })

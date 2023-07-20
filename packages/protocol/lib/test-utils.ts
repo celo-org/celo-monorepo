@@ -1,20 +1,20 @@
-import { Signature } from '@celo/base/lib/signatureUtils'
+// tslint:disable: ordered-imports
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import { ArtifactsSingleton } from '@celo/protocol/migrations/artifactsSingleton'
 import { config } from '@celo/protocol/migrationsConfig'
-import { AttestationUtils } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
 import chai from 'chai'
 import chaiSubset from 'chai-subset'
-import { spawn, SpawnOptions } from 'child_process'
+import { SpawnOptions, spawn } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
 import Web3 from 'web3'
+import { ContractPackage, MENTO_PACKAGE } from '../contractPackages'
 
-// tslint:disable-next-line: ordered-imports
 import BN = require('bn.js')
 
 const isNumber = (x: any) =>
@@ -209,34 +209,51 @@ export async function waitForPortOpen(host: string, port: number, seconds: numbe
   return false
 }
 
-export const assertProxiesSet = async (getContract: any) => {
-  for (const contractName of proxiedContracts) {
-    const contract = await getContract(contractName, 'contract')
-    const proxy: ProxyInstance = await getContract(contractName, 'proxy')
-    assert.equal(
-      contract.address.toLowerCase(),
-      (await proxy._getImplementation()).toLowerCase(),
-      contractName + 'Proxy not pointing to the ' + contractName + ' implementation'
-    )
+type ProxiedContractGetter = (
+  contractName: string,
+  type: string,
+  contractPackage: ContractPackage, 
+  ) => Promise<any>
+
+type ContratGetter = (
+  contractName: string,
+  contractPackage?: ContractPackage, 
+  ) => Promise<any>
+
+
+export const assertProxiesSet = async (getContract: ProxiedContractGetter) => {
+  for (const contractList of proxiedContracts) {
+    for (const contractName of contractList.contracts) {
+      const contract = await getContract(contractName, 'contract', contractList.__contractPackage)
+      const proxy: ProxyInstance = await getContract(contractName, 'proxy', contractList.__contractPackage)
+      assert.equal(
+        contract.address.toLowerCase(),
+        (await proxy._getImplementation()).toLowerCase(),
+        contractName + 'Proxy not pointing to the ' + contractName + ' implementation'
+      )
+    }
+    
   }
 }
 
-export const assertContractsRegistered = async (getContract: any) => {
-  const registry: RegistryInstance = await getContract('Registry', 'proxiedContract')
-  for (const contractName of hasEntryInRegistry) {
-    const contract: Truffle.ContractInstance = await getContract(contractName, 'proxiedContract')
-    assert.equal(
-      contract.address.toLowerCase(),
-      (await registry.getAddressFor(soliditySha3(contractName))).toLowerCase(),
-      'Registry does not have the correct information for ' + contractName
-    )
+export const assertContractsRegistered = async (getContract: ContratGetter) => {
+  const registry: RegistryInstance = await getContract('Registry')
+  for (const proxyPackage of hasEntryInRegistry) {
+    for (const contractName of proxyPackage.contracts) {
+      const contract: Truffle.ContractInstance = await getContract(contractName, proxyPackage)
+      assert.equal(
+        contract.address.toLowerCase(),
+        (await registry.getAddressFor(soliditySha3(contractName))).toLowerCase(),
+        'Registry does not have the correct information for ' + contractName
+      )
+    }
   }
 }
 
-export const assertRegistryAddressesSet = async (getContract: any) => {
-  const registry: RegistryInstance = await getContract('Registry', 'proxiedContract')
+export const assertRegistryAddressesSet = async (getContract: ContratGetter) => {
+  const registry: RegistryInstance = await getContract('Registry')
   for (const contractName of usesRegistry) {
-    const contract: UsingRegistryInstance = await getContract(contractName, 'proxiedContract')
+    const contract: UsingRegistryInstance = await getContract(contractName, MENTO_PACKAGE)
     assert.equal(
       registry.address.toLowerCase(),
       (await contract.registry()).toLowerCase(),
@@ -245,17 +262,21 @@ export const assertRegistryAddressesSet = async (getContract: any) => {
   }
 }
 
+// This function is currently not in use, it should be converted to assertContractsOwnedByGovernance
 export const assertContractsOwnedByMultiSig = async (getContract: any) => {
   const multiSigAddress = (await getContract('MultiSig', 'proxiedContract')).address
-  for (const contractName of ownedContracts) {
-    const contractOwner: string = await (await getContract(contractName, 'proxiedContract')).owner()
-    assert.equal(contractOwner, multiSigAddress, contractName + ' is not owned by the MultiSig')
+  for (const contractList of ownedContracts) {
+    for (const contractName of contractList.contracts) {
+      const contractOwner: string = await (await getContract(contractName, 'proxiedContract', contractList.__contractPackage)).owner()
+      assert.equal(contractOwner, multiSigAddress, contractName + ' is not owned by the MultiSig')
+    }
   }
 
-  for (const contractName of proxiedContracts) {
-    const proxyOwner = await (await getContract(contractName, 'proxy'))._getOwner()
-    assert.equal(proxyOwner, multiSigAddress, contractName + 'Proxy is not owned by the MultiSig')
-  }
+  for (const contractList of proxiedContracts) {
+    for (const contractName of contractList.contracts) {
+      const proxyOwner = await (await getContract(contractName, 'proxy', contractList.__contractPackage))._getOwner()
+      assert.equal(proxyOwner, multiSigAddress, contractName + 'Proxy is not owned by the MultiSig')
+    }}
 }
 
 export const assertFloatEquality = (
@@ -286,23 +307,64 @@ export function assertLogMatches(
   args: Record<string, any>
 ) {
   assert.equal(log.event, event, `Log event name doesn\'t match`)
+  assertObjectWithBNEqual(log.args, args, (arg) => `Event ${event}, arg: ${arg} do not match`)
+}
 
-  const logArgs = Object.keys(log.args)
+// Compares objects' properties, using assertBNEqual to compare BN fields.
+// Extracted out of previous `assertLogMatches`.
+export function assertObjectWithBNEqual(
+  actual: object,
+  expected: Record<string, any>,
+  fieldErrorMsg: (field?: string) => string,
+) {
+  const objectFields = Object.keys(actual)
     .filter((k) => k !== '__length__' && isNaN(parseInt(k, 10)))
     .sort()
 
-  assert.deepEqual(logArgs, Object.keys(args).sort(), `Argument names do not match for ${event}`)
-
-  for (const k of logArgs) {
-    if (typeof args[k] === 'function') {
-      args[k](log.args[k], `Event ${event}, arg: ${k} do not match`)
-    } else if (isNumber(log.args[k]) || isNumber(args[k])) {
-      assertEqualBN(log.args[k], args[k], `Event ${event}, arg: ${k} do not match`)
-    } else {
-      assert.equal(log.args[k], args[k], `Event ${event}, arg: ${k} do not match`)
+  assert.deepEqual(objectFields, Object.keys(expected).sort(), `Argument names do not match`)
+  for (const k of objectFields) {
+    if (typeof expected[k] === 'function') {
+      expected[k](actual[k], fieldErrorMsg(k))
+    } else if (isNumber(actual[k]) || isNumber(expected[k])) {
+      assertEqualBN(actual[k], expected[k], fieldErrorMsg(k))
+    } else if (Array.isArray(actual[k])) {
+      const actualArray = actual[k] as []
+      const expectedArray = expected[k] as []
+      if (actualArray.length === expectedArray.length 
+        && actualArray.every(actualValue => isNumber(actualValue)) 
+        && expectedArray.every(expectedValue => isNumber(expectedValue))) {
+        // if this is array of BNs, deepEqual will not work
+        // since it is not able to compare number/string/BN
+        // with each other and we have to compare it manually
+        for (let i = 0; i < actualArray.length; i++) {
+          assertEqualBN(actualArray[i], expectedArray[i], fieldErrorMsg(k))
+        }
+      } else  {
+        assert.deepEqual(actual[k], expected[k], fieldErrorMsg(k))
+      }
+    }
+    else {
+      assert.equal(actual[k], expected[k], fieldErrorMsg(k))
     }
   }
 }
+
+export function assertBNArrayEqual(
+  actualArray: any[],
+  expectedArray: any[]
+) {
+  assert(Array.isArray(actualArray), `Actual is not an array`)
+  assert(Array.isArray(expectedArray), `Expected is not an array`)
+  assert(actualArray.length === expectedArray.length, `Different array sizes; actual: ${actualArray.length} expected: ${expectedArray.length}`)
+  assert(actualArray.every(actualValue => isNumber(actualValue)) 
+      && expectedArray.every(expectedValue => isNumber(expectedValue)),
+      `Expected all elements to be numbers`)
+      
+  for (let i = 0; i < actualArray.length; i++) {
+    assertEqualBN(actualArray[i], expectedArray[i])
+  }
+}
+
 
 export function assertEqualBN(
   actual: number | BN | BigNumber,
@@ -373,25 +435,41 @@ export const isSameAddress = (minerAddress, otherAddress) => {
 }
 
 // TODO(amy): Pull this list from the build artifacts instead
-export const proxiedContracts: string[] = [
-  'Attestations',
-  'Escrow',
-  'GoldToken',
-  'Registry',
-  'Reserve',
-  'SortedOracles',
-  'StableToken',
+const proxiedContracts = [{
+  contracts: [
+    'Attestations',
+    'Escrow',
+    'GoldToken',
+    'Registry',
+    'SortedOracles',
+
+  ]
+  },
+  {
+    contracts: [
+      'Reserve',
+      'StableToken',
+    ],
+    __contractPackage: MENTO_PACKAGE
+ }
 ]
 
 // TODO(asa): Pull this list from the build artifacts instead
-export const ownedContracts: string[] = [
-  'Attestations',
-  'Escrow',
-  'Exchange',
-  'Registry',
-  'Reserve',
-  'SortedOracles',
-  'StableToken',
+const ownedContracts = [{
+  contracts: [
+    'Attestations',
+    'Escrow',
+    'Registry',
+    'SortedOracles',
+  ]
+  },{
+  contracts: [
+    'Reserve',
+    'Exchange',
+    'StableToken'
+  ],
+  __contractPackage: MENTO_PACKAGE
+ }
 ]
 
 export function getOffsetForMinerSelection(
@@ -452,50 +530,56 @@ enum VoteValue {
   Yes,
 }
 
-export async function assumeOwnership(contractsToOwn: string[], to: string, proposalId: number = 1, dequeuedIndex: number = 0) {
-	const governance: GovernanceInstance = await getDeployedProxiedContract('Governance', artifacts)
-	const lockedGold: LockedGoldInstance = await getDeployedProxiedContract('LockedGold', artifacts)
-	const multiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract(
-		'GovernanceApproverMultiSig',
-		artifacts
-	)
-	const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)
+export async function assumeOwnershipWithTruffle(contractsToOwn: string[], to: string, dequeuedIndex: number = 0, contractPackage?:ContractPackage) {
+  const governance: GovernanceInstance = await getDeployedProxiedContract('Governance', artifacts)
+  const lockedGold: LockedGoldInstance = await getDeployedProxiedContract('LockedGold', artifacts)
+  const multiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract(
+    'GovernanceApproverMultiSig',
+    artifacts
+  )
+  const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)
   // Enough to pass the governance proposal unilaterally (and then some).
   const tenMillionCELO = '10000000000000000000000000'
-	// @ts-ignore
-	await lockedGold.lock({ value: tenMillionCELO })
+  // @ts-ignore
+  await lockedGold.lock({ value: tenMillionCELO })
   // Any contract's `transferOwnership` function will work here as the function signatures are all the same.
-	// @ts-ignore
+  // @ts-ignore
   const transferOwnershipData = Buffer.from(stripHexEncoding(registry.contract.methods.transferOwnership(to).encodeABI()), 'hex')
-	const proposalTransactions = await Promise.all(
-		contractsToOwn.map(async (contractName: string) => {
-			return {
-				value: 0,
-				destination: (await getDeployedProxiedContract(contractName, artifacts)).address,
-				data: transferOwnershipData,
-			}
-		})
-	)
-	await governance.propose(
-		proposalTransactions.map((tx: any) => tx.value),
-		proposalTransactions.map((tx: any) => tx.destination),
-		// @ts-ignore
-		Buffer.concat(proposalTransactions.map((tx: any) => tx.data)),
-		proposalTransactions.map((tx: any) => tx.data.length),
-		'URL',
-		// @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-		{ value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
-	)
+  const proposalTransactions = await Promise.all(
+    contractsToOwn.map(async (contractName: string) => {
+      
+      const artifactsInstance = ArtifactsSingleton.getInstance(contractPackage, artifacts)
 
-	await governance.upvote(proposalId, 0, 0)
-	await timeTravel(config.governance.dequeueFrequency, web3)
-	// @ts-ignore
-	const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
-	await multiSig.submitTransaction(governance.address, 0, txData)
-	await timeTravel(config.governance.approvalStageDuration, web3)
-	await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
-	await timeTravel(config.governance.referendumStageDuration, web3)
-	await governance.execute(proposalId, dequeuedIndex)
+      const contractAddress = (await getDeployedProxiedContract(contractName, artifactsInstance)).address
+      
+      return {
+        value: 0,
+        destination: contractAddress,
+        data: transferOwnershipData,
+      }
+    })
+  )
+  await governance.propose(
+    proposalTransactions.map((tx: any) => tx.value),
+    proposalTransactions.map((tx: any) => tx.destination),
+    // @ts-ignore
+    Buffer.concat(proposalTransactions.map((tx: any) => tx.data)),
+    proposalTransactions.map((tx: any) => tx.data.length),
+    'URL',
+    // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+    { value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
+  )
+
+  const proposalId = (await governance.proposalCount()).toNumber()
+
+  await timeTravel(config.governance.dequeueFrequency, web3)
+  // @ts-ignore
+  const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
+  await multiSig.submitTransaction(governance.address, 0, txData)
+  await timeTravel(config.governance.approvalStageDuration, web3)
+  await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
+  await timeTravel(config.governance.referendumStageDuration, web3)
+  await governance.execute(proposalId, dequeuedIndex)
 }
 
 /*
@@ -521,16 +605,6 @@ export const accountPrivateKeys: string[] = [
   '0xb2fd4d29c1390b71b8795ae81196bfd60293adf99f9d32a0aff06288fcdac55f',
   '0x23cb7121166b9a2f93ae0b7c05bde02eae50d64449b2cbb42bc84e9d38d6cc89',
 ]
-
-export async function getVerificationCodeSignature(
-  account: string,
-  issuer: string,
-  identifier: string,
-  accounts: string[]
-): Promise<Signature> {
-  const privateKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, issuer, accounts)
-  return AttestationUtils.attestToIdentifier(identifier, account, privateKey)
-}
 
 export const getDerivedKey = (offset: number, address: string, accounts: string[]) => {
   const pKey = accountPrivateKeys[accounts.indexOf(address)]

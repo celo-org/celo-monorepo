@@ -3,6 +3,7 @@ import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/regist
 import { getBuildArtifacts } from '@openzeppelin/upgrades'
 import { readJsonSync, writeJsonSync } from 'fs-extra'
 import { ProxyInstance, RegistryInstance } from 'types'
+import { getReleaseVersion } from '../../lib/compatibility/ignored-contracts-v9'
 
 /*
  * This script verifies that a given set of smart contract bytecodes corresponds
@@ -31,10 +32,11 @@ const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry
 const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
 
 const argv = require('minimist')(process.argv.slice(2), {
-  string: ['build_artifacts', 'proposal', 'initialize_data', 'network', 'librariesFile'],
+  string: ['build_artifacts', 'proposal', 'initialize_data', 'network', 'librariesFile', 'branch'],
 })
 
 const artifactsDirectory = argv.build_artifacts ? argv.build_artifacts : './build/contracts'
+const branch = (argv.branch ? argv.branch : '') as string
 const network = argv.network ?? 'development'
 const proposal = argv.proposal ? readJsonSync(argv.proposal) : []
 const initializationData = argv.initialize_data ? readJsonSync(argv.initialize_data) : {}
@@ -42,6 +44,8 @@ const librariesFile = argv.librariesFile ?? 'libraries.json'
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
+    const version = getReleaseVersion(branch)
+
     const registry = await Registry.at(celoRegistryAddress)
     const buildArtifacts = getBuildArtifacts(artifactsDirectory)
     const libraryAddresses = await verifyBytecodes(
@@ -52,6 +56,7 @@ module.exports = async (callback: (error?: any) => number) => {
       Proxy,
       web3,
       initializationData,
+      version,
       network
     )
 

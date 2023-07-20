@@ -78,10 +78,13 @@ contract LockedGold is
 
   /**
   * @notice Returns the storage, major, minor, and patch version of the contract.
-  * @return The storage, major, minor, and patch version of the contract.
+  * @return Storage version of the contract.
+  * @return Major version of the contract.
+  * @return Minor version of the contract.
+  * @return Patch version of the contract.
   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 0);
+    return (1, 1, 2, 2);
   }
 
   /**
@@ -115,7 +118,10 @@ contract LockedGold is
    * @notice Locks gold to be used for voting.
    */
   function lock() external payable nonReentrant {
-    require(getAccounts().isAccount(msg.sender), "not account");
+    require(
+      getAccounts().isAccount(msg.sender),
+      "Must first register address with Account.createAccount"
+    );
     _incrementNonvotingAccountBalance(msg.sender, msg.value);
     emit GoldLocked(msg.sender, msg.value);
   }
@@ -171,16 +177,25 @@ contract LockedGold is
    * @param value The amount of gold to unlock.
    */
   function unlock(uint256 value) external nonReentrant {
-    require(getAccounts().isAccount(msg.sender), "Unknown account");
+    require(
+      getAccounts().isAccount(msg.sender),
+      "Sender must be registered with Account.createAccount to lock or unlock"
+    );
     Balances storage account = balances[msg.sender];
     // Prevent unlocking gold when voting on governance proposals so that the gold cannot be
     // used to vote more than once.
-    require(!getGovernance().isVoting(msg.sender), "Account locked");
+    uint256 remainingLockedGold = getAccountTotalLockedGold(msg.sender).sub(value);
+
+    uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(msg.sender);
+    require(
+      remainingLockedGold >= totalReferendumVotes,
+      "Not enough unlockable celo. Celo is locked in voting."
+    );
+
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
     require(
-      balanceRequirement == 0 ||
-        balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value),
-      "Trying to unlock too much gold"
+      balanceRequirement == 0 || balanceRequirement <= remainingLockedGold,
+      "Either account doesn't have enough locked Celo or locked Celo is being used for voting."
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
@@ -195,7 +210,10 @@ contract LockedGold is
    * @param value The value to relock from the specified pending withdrawal.
    */
   function relock(uint256 index, uint256 value) external nonReentrant {
-    require(getAccounts().isAccount(msg.sender), "Unknown account");
+    require(
+      getAccounts().isAccount(msg.sender),
+      "Sender must be registered with Account.createAccount to lock or relock"
+    );
     Balances storage account = balances[msg.sender];
     require(index < account.pendingWithdrawals.length, "Bad pending withdrawal index");
     PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
@@ -214,7 +232,10 @@ contract LockedGold is
    * @param index The index of the pending withdrawal to withdraw.
    */
   function withdraw(uint256 index) external nonReentrant {
-    require(getAccounts().isAccount(msg.sender), "Unknown account");
+    require(
+      getAccounts().isAccount(msg.sender),
+      "Sender must be registered with Account.createAccount to withdraw"
+    );
     Balances storage account = balances[msg.sender];
     require(index < account.pendingWithdrawals.length, "Bad pending withdrawal index");
     PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
@@ -265,14 +286,18 @@ contract LockedGold is
   /**
    * @notice Returns the pending withdrawals from unlocked gold for an account.
    * @param account The address of the account.
-   * @return The value and timestamp for each pending withdrawal.
+   * @return The value for each pending withdrawal.
+   * @return The timestamp for each pending withdrawal.
    */
   function getPendingWithdrawals(address account)
     external
     view
     returns (uint256[] memory, uint256[] memory)
   {
-    require(getAccounts().isAccount(account), "Unknown account");
+    require(
+      getAccounts().isAccount(account),
+      "Unknown account: only registered accounts have pending withdrawals"
+    );
     uint256 length = balances[account].pendingWithdrawals.length;
     uint256[] memory values = new uint256[](length);
     uint256[] memory timestamps = new uint256[](length);
@@ -296,7 +321,10 @@ contract LockedGold is
     view
     returns (uint256, uint256)
   {
-    require(getAccounts().isAccount(account), "Unknown account");
+    require(
+      getAccounts().isAccount(account),
+      "Unknown account: only registered accounts have pending withdrawals"
+    );
     require(index < balances[account].pendingWithdrawals.length, "Bad pending withdrawal index");
     PendingWithdrawal memory pendingWithdrawal = (balances[account].pendingWithdrawals[index]);
 

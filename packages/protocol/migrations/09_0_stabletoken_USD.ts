@@ -7,14 +7,11 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import {
-  FeeCurrencyWhitelistInstance,
-  FreezerInstance,
-  ReserveInstance,
-  SortedOraclesInstance,
-  StableTokenInstance,
-} from 'types'
+import { FeeCurrencyWhitelistInstance, FreezerInstance, SortedOraclesInstance } from 'types'
+import { ReserveInstance, StableTokenInstance } from 'types/mento'
 import Web3 from 'web3'
+import { MENTO_PACKAGE } from '../contractPackages'
+import { ArtifactsSingleton } from './artifactsSingleton'
 
 const truffle = require('@celo/protocol/truffle-config.js')
 
@@ -76,7 +73,7 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       )
       const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
         'Reserve',
-        artifacts
+        ArtifactsSingleton.getInstance(MENTO_PACKAGE)
       )
       console.info('Adding StableToken (USD) to Reserve')
       await reserve.addToken(stableToken.address)
@@ -88,5 +85,6 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       artifacts
     )
     await feeCurrencyWhitelist.addToken(stableToken.address)
-  }
+  },
+  MENTO_PACKAGE
 )

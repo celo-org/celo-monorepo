@@ -25,5 +25,3 @@ Note: When you fill in the `host` field you may need to use the database's publi
 Always run migrations in staging first and ensure all e2e tests pass before migrating in alfajores and mainnet.
 
 Run `yarn db:migrate:<network>`
-
-TODO: Figure out how to make migrations run automatically on deployment

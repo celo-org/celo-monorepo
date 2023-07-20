@@ -19,7 +19,6 @@ else
   cp migrations.bak/01_libraries.* migrations/
   # cp migrations.bak/02_registry.* migrations/
   # cp migrations.bak/03_freezer.* migrations/
-  # cp migrations.bak/03_transferwhitelist.* migrations/
   # cp migrations.bak/03_whitelist.* migrations/
   # cp migrations.bak/04_goldtoken.* migrations/
   # cp migrations.bak/05_sortedoracles.* migrations/
@@ -27,9 +26,11 @@ else
   # cp migrations.bak/07_reserve_spender_multisig.* migrations/
   # cp migrations.bak/08_reserve.* migrations/
   # cp migrations.bak/09_0_stabletoken_USD.* migrations/
-  # cp migrations.bak/09_1_stableToken_EUR.* migrations/
+  # cp migrations.bak/09_01_stableToken_EUR.* migrations/
+  # cp migrations.bak/09_02_stableToken_BRL.* migrations/
   # cp migrations.bak/10_0_exchange_USD.* migrations/
-  # cp migrations.bak/10_1_exchange_EUR.* migrations/
+  # cp migrations.bak/10_01_exchange_EUR.* migrations/
+  # cp migrations.bak/10_02_exchange_BRL.* migrations/
   # cp migrations.bak/11_accounts.* migrations/
   # cp migrations.bak/12_lockedgold.* migrations/
   # cp migrations.bak/13_validators.* migrations/
@@ -43,6 +44,10 @@ else
   # cp migrations.bak/21_double_signing_slasher.* migrations/
   # cp migrations.bak/22_downtime_slasher.* migrations/
   # cp migrations.bak/23_governance_approver_multisig.* migrations/
-  # cp migrations.bak/24_governance.* migrations/
-  # cp migrations.bak/25_elect_validators.* migrations/
+  # cp migrations.bak/24_grandamento.* migrations/
+  # cp migrations.bak/25_stableToken_registry.* migrations/
+  # cp migrations.bak/26_federated_attestations.* migrations/
+  # cp migrations.bak/27_odispayments.* migrations/
+  # cp migrations.bak/28_governance.* migrations/
+  # cp migrations.bak/29_elect_validators.* migrations/
 fi

@@ -28,7 +28,6 @@ Network parameters that are configurable by governance.
 * [methodIds](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#methodids)
 * [setBlockGasLimit](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#setblockgaslimit)
 * [setIntrinsicGasForAlternativeFeeCurrency](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#setintrinsicgasforalternativefeecurrency)
-* [setMinimumClientVersion](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#setminimumclientversion)
 * [setUptimeLookbackWindow](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#setuptimelookbackwindow)
 
 ### Accessors
@@ -42,7 +41,6 @@ Network parameters that are configurable by governance.
 * [getEpochSizeNumber](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#getepochsizenumber)
 * [getFirstBlockNumberForEpoch](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#getfirstblocknumberforepoch)
 * [getLastBlockNumberForEpoch](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#getlastblocknumberforepoch)
-* [getMinimumClientVersion](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#getminimumclientversion)
 * [getPastEvents](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#getpastevents)
 * [version](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#version)
 
@@ -259,28 +257,6 @@ Name | Type |
 
 ___
 
-###  setMinimumClientVersion
-
-• **setMinimumClientVersion**: *function* = proxySend(
-    this.connection,
-    this.contract.methods.setMinimumClientVersion
-  )
-
-*Defined in [packages/sdk/contractkit/src/wrappers/BlockchainParameters.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BlockchainParameters.ts#L63)*
-
-Set minimum client version.
-
-#### Type declaration:
-
-▸ (...`args`: InputArgs): *CeloTransactionObject‹Output›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | InputArgs |
-
-___
 
 ###  setUptimeLookbackWindow
 
@@ -387,19 +363,6 @@ Name | Type |
 
 **Returns:** *Promise‹number›*
 
-___
-
-###  getMinimumClientVersion
-
-▸ **getMinimumClientVersion**(): *Promise‹[ClientVersion](../interfaces/_wrappers_blockchainparameters_.clientversion.md)›*
-
-*Defined in [packages/sdk/contractkit/src/wrappers/BlockchainParameters.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BlockchainParameters.ts#L51)*
-
-Get minimum client version.
-
-**Returns:** *Promise‹[ClientVersion](../interfaces/_wrappers_blockchainparameters_.clientversion.md)›*
-
-___
 
 ###  getPastEvents
 

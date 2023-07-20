@@ -19,3 +19,17 @@ celostats:
 
 domain:
   name: celo-testnet
+
+ingressClassName: nginx
+
+resources:
+  server:
+    requests:
+      cpu: 15m
+      memory: 110Mi
+    limits: {}
+  frontend:
+    requests:
+      cpu: 1m
+      memory: 5Mi
+    limits: {}

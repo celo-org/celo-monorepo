@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: {{ .Release.Namespace }}-forno-ingress
   labels:
-{{ include "common.standard.labels" .  | indent 4 }}
+    {{- include "common.standard.labels" . | nindent 4 }}
     component: forno
   annotations:
     kubernetes.io/tls-acme: "true"
@@ -13,9 +13,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "1200"
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  {{- if .Values.ingressClassName }}
-  ingressClassName: {{ .Values.ingressClassName }}
-  {{- end }}
+  ingressClassName: {{ default "nginx" .Values.ingressClassName }}
   tls:
   - hosts:
     - {{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org

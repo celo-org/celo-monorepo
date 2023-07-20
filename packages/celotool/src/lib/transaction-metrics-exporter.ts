@@ -1,10 +1,9 @@
-import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from 'src/lib/env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import {
   installGenericHelmChart,
   removeGenericHelmChart,
   upgradeGenericHelmChart,
 } from 'src/lib/helm_deploy'
-import { getInternalTxNodeLoadBalancerIP } from 'src/lib/vm-testnet-utils'
 
 const chartDir = '../helm-charts/transaction-metrics-exporter/'
 
@@ -14,22 +13,22 @@ function releaseName(celoEnv: string, suffix: string) {
 
 export async function installHelmChart(celoEnv: string) {
   const suffix = fetchEnvOrFallback(envVar.TRANSACTION_METRICS_EXPORTER_SUFFIX, '1')
-  await installGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv, suffix),
+  await installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv, suffix),
     chartDir,
-    await helmParameters(celoEnv)
-  )
+    parameters: await helmParameters(celoEnv),
+  })
 }
 
 export async function upgradeHelmChart(celoEnv: string) {
   const suffix = fetchEnvOrFallback(envVar.TRANSACTION_METRICS_EXPORTER_SUFFIX, '1')
-  await upgradeGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv, suffix),
+  await upgradeGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv, suffix),
     chartDir,
-    await helmParameters(celoEnv)
-  )
+    parameters: await helmParameters(celoEnv),
+  })
 }
 
 export async function removeHelmRelease(celoEnv: string) {
@@ -58,8 +57,5 @@ async function helmParameters(celoEnv: string) {
       ''
     )}`,
   ]
-  if (isVmBased()) {
-    params.push(`--set web3Provider="ws://${await getInternalTxNodeLoadBalancerIP(celoEnv)}:8546"`)
-  }
   return params
 }

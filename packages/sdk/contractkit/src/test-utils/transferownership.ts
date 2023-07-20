@@ -38,6 +38,11 @@ export async function assumeOwnership(web3: Web3, to: string) {
   }
   const proposal: Proposal = [ownershiptx]
 
+  await governance.propose(proposal, 'URL').sendAndWaitForReceipt({
+    from: accounts[0],
+    value: (await governance.getConfig()).minDeposit.toNumber(),
+  })
+
   const proposalReceipt = await governance.propose(proposal, 'URL').sendAndWaitForReceipt({
     from: accounts[0],
     value: (await governance.getConfig()).minDeposit.toNumber(),
@@ -52,7 +57,6 @@ export async function assumeOwnership(web3: Web3, to: string) {
   const tx2 = await governance.approve(proposalId)
   const multisigTx = await multiSig.submitOrConfirmTransaction(governance.address, tx2.txo)
   await multisigTx.sendAndWaitForReceipt({ from: accounts[0] })
-  await timeTravel(expConfigGovernance.approvalStageDuration, web3)
 
   const tx3 = await governance.vote(proposalId, 'Yes')
   await tx3.sendAndWaitForReceipt({ from: accounts[0] })

@@ -1,20 +1,2 @@
-/.devchain/
-/.devchain.tar.gz
-/coverage/
-/node_modules/
-/src/
 
-/tslint.json
-/tsconfig.*
-/jest.config.*
-*.tgz
-
-/src
-
-/lib/**/*.test.*
-/lib/test-utils
-
-/tmp/
-/.tmp/
-
-/scripts
+# use the files array in package.json to include files

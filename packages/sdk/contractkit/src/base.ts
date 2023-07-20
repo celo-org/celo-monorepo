@@ -11,6 +11,7 @@ export enum CeloContract {
   Exchange = 'Exchange',
   ExchangeEUR = 'ExchangeEUR',
   ExchangeBRL = 'ExchangeBRL',
+  FederatedAttestations = 'FederatedAttestations',
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
@@ -21,6 +22,7 @@ export enum CeloContract {
   MetaTransactionWallet = 'MetaTransactionWallet',
   MetaTransactionWalletDeployer = 'MetaTransactionWalletDeployer',
   MultiSig = 'MultiSig',
+  OdisPayments = 'OdisPayments',
   Random = 'Random',
   Registry = 'Registry',
   Reserve = 'Reserve',
@@ -28,9 +30,7 @@ export enum CeloContract {
   StableToken = 'StableToken',
   StableTokenEUR = 'StableTokenEUR',
   StableTokenBRL = 'StableTokenBRL',
-  TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
-  StableTokenRegistry = 'StableTokenRegistry',
 }
 
 export type StableTokenContract =

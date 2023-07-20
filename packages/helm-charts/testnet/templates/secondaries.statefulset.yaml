@@ -17,46 +17,55 @@ kind: StatefulSet
 metadata:
   name: {{ template "common.fullname" . }}-secondaries
   labels:
-{{ include "common.standard.labels" .  | indent 4 }}
+    {{- include "common.standard.labels" . | nindent 4 }}
     component: secondaries
 spec:
+  {{- if .Values.geth.ssd_disks }}
   volumeClaimTemplates:
   - metadata:
       name: data
+      {{- if .Values.pvcAnnotations.secondary }}
+      annotations:
+        {{- toYaml .Values.pvcAnnotations.secondary | nindent 8 }}
+      {{- end }}
     spec:
-      {{ if .Values.geth.ssd_disks }}storageClassName: ssd{{ end }}
+      storageClassName: {{ .Values.geth.storageClass }}
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
           storage: {{ .Values.geth.diskSizeGB }}Gi
+  {{- end }}
   podManagementPolicy: Parallel
   updateStrategy:
-{{ toYaml .Values.updateStrategy.secondaries | indent 4 }}
+    {{- toYaml .Values.updateStrategy.secondaries | nindent 4 }}
   replicas: {{ .Values.geth.secondaries }}
   serviceName: secondaries
   selector:
     matchLabels:
-{{ include "common.standard.labels" .  | indent 6 }}
+      {{- include "common.standard.labels" . | nindent 6 }}
       component: secondaries
   template:
     metadata:
       labels:
-{{ include "common.standard.labels" .  | indent 8 }}
+        {{- include "common.standard.labels" . | nindent 8 }}
         component: secondaries
-{{ if .Values.metrics | default false }}
+        {{- if .Values.extraPodLabels.secondaries }}
+        {{- toYaml .Values.extraPodLabels.secondaries | nindent 8 }}
+        {{- end }}
+      {{- if .Values.metrics | default false }}
       annotations:
-{{ include "common.prometheus-annotations" . | indent 8 }}
-{{- end }}
+        {{- include "common.prometheus-annotations" . | nindent 8 }}
+      {{- end }}
     spec:
       initContainers:
-{{ include "common.conditional-init-genesis-container" .  | indent 6 }}
+      {{- include "common.conditional-init-genesis-container" . | nindent 6 }}
       - name: get-account
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: Always
         command:
         - /bin/bash
-        - "-c"
         args:
+        - "-c"
         - |-
           [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
           RID=${BASH_REMATCH[1]}
@@ -64,17 +73,17 @@ spec:
           echo "Generating private key for rid=$RID"
           celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index "$RID" > /root/.celo/pkey
           echo 'Generating address'
-          celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/address
+          celotooljs.sh generate account-address --private-key $(cat /root/.celo/pkey) > /root/.celo/address
 
           # If this is a proxied validator, it will not have an external IP address
           # and EXTERNAL_IP_ADDRESS will be empty
-          EXTERNAL_IP_ADDRESS=`echo -n "$IP_ADDRESSES" | cut -d '/' -f $((RID + 1))`
+          EXTERNAL_IP_ADDRESS=$(echo -n "$IP_ADDRESSES" | cut -d '/' -f $((RID + 1)))
           echo "$EXTERNAL_IP_ADDRESS" > /root/.celo/externalIpAddress
 
           # Put the proxies per validator array into a comma separated string
           # so we can index it at runtime
           PROXIES_PER_VALIDATOR="{{ join "," .Values.geth.proxiesPerValidator }}"
-          PROXY_COUNT=`echo -n $PROXIES_PER_VALIDATOR | cut -d ',' -f $((RID + 1))`
+          PROXY_COUNT=$(echo -n $PROXIES_PER_VALIDATOR | cut -d ',' -f $((RID + 1)))
           echo -n "$PROXY_COUNT" > /root/.celo/proxyCount
 
           if [[ -z "$EXTERNAL_IP_ADDRESS" ]]; then
@@ -104,7 +113,7 @@ spec:
             ALL_VALIDATOR_PROXY_IPS='{{ join "," .Values.geth.proxyIPAddressesPerValidatorArray }}'
             [[ $ALL_VALIDATOR_PROXY_IPS = '<nil>' ]] && ALL_VALIDATOR_PROXY_IPS=''
 
-            PROXY_IPS=`echo -n $ALL_VALIDATOR_PROXY_IPS | cut -d ',' -f $((RID + 1))`
+            PROXY_IPS=$(echo -n $ALL_VALIDATOR_PROXY_IPS | cut -d ',' -f $((RID + 1)))
 
             # Clear the proxy enode file because it's persisted
             rm -f /root/.celo/proxyEnodeUrlPairs
@@ -116,7 +125,7 @@ spec:
               fi
 
               # gives us PROXY_ENODE_URL_PAIR
-              {{- include "celo.proxyenodeurlpair" . | indent 14 }}
+              {{- include "celo.proxyenodeurlpair" . | nindent 14 }}
               echo -n $PROXY_ENODE_URL_PAIR >> /root/.celo/proxyEnodeUrlPairs
 
               PROXY_INDEX=$(( $PROXY_INDEX + 1 ))
@@ -140,11 +149,11 @@ spec:
         - name: IP_ADDRESSES
           value: {{ join "/" .Values.geth.validatorsIPAddressArray }}
         - name: BOOTNODE_IP_ADDRESS
-          value: "{{ default "none" .Values.geth.bootnodeIpAddress  }}"
+          value: "{{ default "none" .Values.geth.bootnodeIpAddress }}"
         volumeMounts:
         - name: data
           mountPath: /root/.celo
-{{ include "common.import-geth-account-container" .  | indent 6 }}
+      {{- include "common.import-geth-account-container" . | nindent 6 }}
       containers:
       - name: geth
         image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
@@ -181,13 +190,13 @@ spec:
 
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
 
-{{ include  "common.bootnode-flag-script" . | indent 10 }}
+          {{- include  "common.bootnode-flag-script" . | nindent 10 }}
 
-{{ include  "common.geth-add-metrics-pprof-config" . | indent 10 }}
+          {{- include  "common.geth-add-metrics-pprof-config" . | nindent 10 }}
 
-{{ include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,net,web3,debug" "ws_port" "8545" "listen_address" "0.0.0.0") | indent 10 }}
+          {{- include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,net,web3,debug" "ws_port" "8545" "listen_address" "0.0.0.0") | nindent 10 }}
 
-{{ .Values.geth.secondayExtraSnippet | indent 10 }}
+          {{- .Values.geth.secondayExtraSnippet | nindent 10 }}
 
           exec geth \
             $BOOTNODE_FLAG \
@@ -245,21 +254,28 @@ spec:
         - name: metrics
           containerPort: 6060
         {{- end }}
+        {{- $resources := default .Values.geth.resources .Values.geth.secondaryResources -}}
+        {{- with $resources }}
         resources:
-{{ toYaml .Values.geth.resources | indent 10 }}
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         volumeMounts:
         - name: data
           mountPath: /root/.celo
         - name: account
           mountPath: /root/.celo/account
           readOnly: true
-      {{- if .Values.secondayNodeSelector }}
-      nodeSelector:
-{{ toYaml .Values.secondayNodeSelector | indent 8 }}
+      {{- with .Values.geth.secondaryAffinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.secondaryTolerations }}
+      {{- with .Values.secondayNodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.secondaryTolerations }}
       tolerations:
-{{ toYaml .Values.secondaryTolerations | indent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
       - name: data

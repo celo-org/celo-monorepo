@@ -2,7 +2,18 @@
 # and https://github.com/facebook/react-native/blob/master/.circleci/config.yml
 
 version: 2.1
+setup: true
+
 parameters:
+  run-workflow-general:
+    type: boolean
+    default: false 
+  run-workflow-npm-install:
+    type: boolean
+    default: false 
+  run-workflow-protocol-coverage:
+    type: boolean
+    default: false 
   # When you need to force a rebuild of the node modules cache then bump this version
   node-modules-cache-version:
     type: integer
@@ -26,7 +37,7 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+    - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
@@ -34,14 +45,14 @@ defaults: &defaults
 contract-defaults: &contract-defaults
   <<: *defaults
   environment:
-    RELEASE_TAG: core-contracts.v7
+    RELEASE_TAG: core-contracts.v9
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
   docker:
-    - image: celohq/circleci:geth1.9-2
+    - image: us-west1-docker.pkg.dev/devopsre/celo-monorepo/circleci-geth:latest
   environment:
-    CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
+    CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.7.x
 general:
   artifacts:
     - 'protocol/coverage'
@@ -126,6 +137,7 @@ jobs:
     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
     resource_class: large
     steps:
+
       - restore_cache:
           keys:
             - source-v1-{{ .Branch }}-{{ .Revision }}
@@ -161,7 +173,7 @@ jobs:
       - run:
           name: Build packages
           command: |
-            yarn build --ignore docs
+            yarn build --ignore docs --include-dependencies
 
       - run:
           name: Check licenses
@@ -250,7 +262,7 @@ jobs:
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             echo "Comparing against $RELEASE_TAG"
-            # Github has phased out the git protocol so we ensure that we use
+            # Github has phased out the http protocol so we ensure that we use
             # https for all git operations that yarn may perform.
             git config --global url."https://github.com".insteadOf git://github.com
             yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
@@ -727,7 +739,7 @@ jobs:
   test-typescript-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
     steps:
       - run:
           name: Check if the test should run
@@ -740,7 +752,7 @@ jobs:
   test-utils-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
     steps:
       - run:
           name: Check if the test should run
@@ -753,7 +765,7 @@ jobs:
   test-contractkit-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
     steps:
       - run:
           name: Check if the test should run
@@ -769,7 +781,7 @@ jobs:
   test-celocli-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
     steps:
       - run:
           name: Check if the test should run
@@ -782,21 +794,28 @@ jobs:
           name: Minor test of celocli
           command: ./node_modules/.bin/celocli account:new # Small test
 
-  phone-number-privacy-test:
+  odis-test:
     <<: *defaults
+    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/app
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh @celo/phone-number-privacy-signer,@celo/phone-number-privacy-combiner
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/phone-number-privacy-signer,@celo/phone-number-privacy-combiner,@celo/phone-number-privacy-common
+      - run:
+          name: Run Tests for common package
+          command: yarn --cwd=packages/phone-number-privacy/common test:coverage
       - run:
           name: Run Tests for combiner
-          command: yarn --cwd=packages/phone-number-privacy/combiner test
+          no_output_timeout: 30m
+          command: yarn --cwd=packages/phone-number-privacy/combiner test:coverage
       - run:
           name: Run Tests for signer
-          command: yarn --cwd=packages/phone-number-privacy/signer test
+          no_output_timeout: 30m
+          command: yarn --cwd=packages/phone-number-privacy/signer test:coverage
 
   certora-test:
     working_directory: ~/app
@@ -810,6 +829,10 @@ jobs:
           name: Check if the test should run
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+            # Disabling certora until the license is figured out
+            echo "Certora tests are disabled"
+            circleci step halt
+            exit 0
       - run:
           name: Certora dependencies
           command: |
@@ -873,10 +896,22 @@ jobs:
           name: Add summary of flakey tests to GitHub Checks
           command: |
             node ./packages/flake-tracker/scripts/summary.js
+  
+  # Dummy job for not showing CircleCI error: "Error: All Workflows have been filtered from this Pipeline"
+  # Check https://github.com/CircleCI-Public/circleci-cli/issues/577 for more context
+  noop:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run: echo "noop"
 
 workflows:
   version: 2
   celo-monorepo-build:
+    # Contitionally triggered
+    when: 
+      or: [<< pipeline.parameters.run-workflow-general >>]
     jobs:
       - install_dependencies
       - certora-test:
@@ -975,7 +1010,7 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
-      - phone-number-privacy-test:
+      - odis-test:
           requires:
             - lint-checks
       - flakey-test-summary:
@@ -995,32 +1030,19 @@ workflows:
             - end-to-end-geth-sync-test
             - end-to-end-geth-validator-order-test
             - end-to-end-cip35-eth-compatibility-test
-            - phone-number-privacy-test
+            - odis-test
   npm-install-testing-cron-workflow:
-    triggers:
-      - schedule:
-          # 7 PM in UTC = noon in PDT.
-          # Best for test to fail during SF afternoon, so that, someone can fix it during the day time.
-          cron: '0 19 * * *'
-          filters:
-            branches:
-              only:
-                - master
+    # Contitionally triggered
+    when: 
+      or: [<< pipeline.parameters.run-workflow-npm-install >>]
     jobs:
       - test-typescript-npm-package-install
       - test-utils-npm-package-install
       - test-contractkit-npm-package-install
       - test-celocli-npm-package-install
   protocol-testing-with-code-coverage-cron-workflow:
-    triggers:
-      - schedule:
-          # 1 PM in UTC = 6 AM in PDT.
-          # Best for this slow test (~3 hours) to run during SF early morning.
-          cron: '0 13 * * *'
-          filters:
-            branches:
-              only:
-                - master
+    when: 
+      or: [<< pipeline.parameters.run-workflow-protocol-coverage >>]
     jobs:
       - install_dependencies
       - lint-checks:
@@ -1029,3 +1051,8 @@ workflows:
       - protocol-test-with-code-coverage:
           requires:
             - lint-checks
+  # Dummy job for not showing CircleCI error: "Error: All Workflows have been filtered from this Pipeline"
+  # Check https://github.com/CircleCI-Public/circleci-cli/issues/577 for more context
+  no-changes:
+    jobs:
+      - noop

@@ -57,7 +57,7 @@ export class Connection {
   readonly paramsPopulator: TxParamsNormalizer
   rpcCaller!: RpcCaller
 
-  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
+  /** @deprecated no longer needed since gasPrice is available on node rpc */
   private currencyGasPrice: Map<Address, string> = new Map<Address, string>()
 
   constructor(readonly web3: Web3, public wallet?: ReadOnlyWallet, handleRevert = true) {
@@ -264,17 +264,35 @@ export class Connection {
     )
   }
 
-  signTypedData = async (signer: string, typedData: EIP712TypedData): Promise<Signature> => {
+  /*
+   * @param signer - The address of account signing this data
+   * @param typedData - Structured data to be signed
+   * @param version - Optionally provide a version which will be appended to the method. E.G. (4) becomes 'eth_signTypedData_v4'
+   * @remarks Some providers like Metamask treat eth_signTypedData differently from versioned method eth_signTypedData_v4
+   * @see [Metamask info in signing Typed Data](https://docs.metamask.io/guide/signing-data.html)
+   */
+  signTypedData = async (
+    signer: string,
+    typedData: EIP712TypedData,
+    version?: 1 | 3 | 4 | 5
+  ): Promise<Signature> => {
+    // stringify data for v3 & v4 based on https://github.com/MetaMask/metamask-extension/blob/c72199a1a6e4151c40c22f79d0f3b6ed7a2d59a7/app/scripts/lib/typed-message-manager.js#L185
+    const shouldStringify = version === 3 || version === 4
+
     // Uses the Provider and not the RpcCaller, because this method should be intercepted
     // by the CeloProvider if there is a local wallet that could sign it. The RpcCaller
     // would just forward it to the node
     const signature = await new Promise<string>((resolve, reject) => {
+      const method = version ? `eth_signTypedData_v${version}` : 'eth_signTypedData'
       ;(this.web3.currentProvider as Provider).send(
         {
           id: getRandomId(),
           jsonrpc: '2.0',
-          method: 'eth_signTypedData',
-          params: [inputAddressFormatter(signer), typedData],
+          method,
+          params: [
+            inputAddressFormatter(signer),
+            shouldStringify ? JSON.stringify(typedData) : typedData,
+          ],
         },
         (error, resp) => {
           if (error) {
@@ -323,7 +341,7 @@ export class Connection {
     return toTxResult(this.web3.eth.sendSignedTransaction(signedTransactionData))
   }
 
-  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
+  /** @deprecated no longer needed since gasPrice is available on node rpc */
   fillGasPrice(tx: CeloTx): CeloTx {
     if (tx.feeCurrency && tx.gasPrice === '0' && this.currencyGasPrice.has(tx.feeCurrency)) {
       return {
@@ -333,7 +351,7 @@ export class Connection {
     }
     return tx
   }
-  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
+  /** @deprecated no longer needed since gasPrice is available on node rpc */
   async setGasPriceForCurrency(address: Address, gasPrice: string) {
     this.currencyGasPrice.set(address, gasPrice)
   }

@@ -5,7 +5,6 @@ import { AddressType, SignatureType } from '@celo/utils/lib/io'
 import { guessSigner, verifySignature } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import { isLeft } from 'fp-ts/lib/Either'
-import { readFileSync } from 'fs'
 import * as t from 'io-ts'
 import { PathReporter } from 'io-ts/lib/PathReporter'
 import { ContractKit } from '../kit'
@@ -62,6 +61,13 @@ export class IdentityMetadataWrapper {
   }
 
   static fromFile(contractKitOrAccountsWrapper: KitOrAccountsWrapper, path: string) {
+    let readFileSync
+    try {
+      const fs = require('fs')
+      readFileSync = fs.readFileSync
+    } catch {
+      console.error('cant read from file in browser or environment without native fs module')
+    }
     return this.fromRawString(contractKitOrAccountsWrapper, readFileSync(path, 'utf-8'))
   }
 

@@ -461,7 +461,7 @@ contract('Accounts', (accounts: string[]) => {
     it('should not be callable by a non-account', async () => {
       await assertRevertWithReason(
         accountsInstance.setPaymentDelegation(beneficiary, fraction),
-        'Not an account'
+        'Must first register address with Account.createAccount'
       )
     })
 
@@ -515,7 +515,7 @@ contract('Accounts', (accounts: string[]) => {
     it('should not be callable by a non-account', async () => {
       await assertRevertWithReason(
         accountsInstance.setPaymentDelegation(beneficiary, fraction, { from: accounts[2] }),
-        'Not an account'
+        'Must first register address with Account.createAccount'
       )
     })
 

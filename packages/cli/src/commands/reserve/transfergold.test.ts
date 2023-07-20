@@ -4,6 +4,7 @@ import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrappe
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
+import { testLocally } from '../../test-utils/cliUtils'
 import TransferGold from './transfergold'
 
 process.env.NO_SYNCCHECK = 'true'
@@ -21,7 +22,7 @@ testWithGanache('reserve:transfergold cmd', (web3: Web3) => {
   })
   test('transferGold fails if spender not passed in', async () => {
     await expect(
-      TransferGold.run([
+      testLocally(TransferGold, [
         '--from',
         accounts[0],
         '--value',
@@ -33,7 +34,7 @@ testWithGanache('reserve:transfergold cmd', (web3: Web3) => {
   })
   test('can transferGold with multisig option', async () => {
     const initialBalance = await goldToken.balanceOf(accounts[9])
-    await TransferGold.run([
+    await testLocally(TransferGold, [
       '--from',
       accounts[0],
       '--value',
@@ -42,7 +43,7 @@ testWithGanache('reserve:transfergold cmd', (web3: Web3) => {
       accounts[9],
       '--useMultiSig',
     ])
-    await TransferGold.run([
+    await testLocally(TransferGold, [
       '--from',
       accounts[7],
       '--value',

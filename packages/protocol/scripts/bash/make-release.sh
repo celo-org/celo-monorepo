@@ -57,4 +57,5 @@ yarn run truffle exec ./scripts/truffle/make-release.js \
   --librariesFile $LIBRARIES \
   --proposal $PROPOSAL \
   --from $FROM \
+  --branch $BRANCH \
   --initialize_data $INITIALIZE_DATA $DRYRUN $FORNO

@@ -19,6 +19,7 @@ packages/protocol/types/
 packages/protocol/scripts/**/*.js
 packages/protocol/migrations/**/*.js
 packages/protocol/test/**/*.js
+packages/protocol/contractPackages.js
 
 
 # prettier eats Latex underscore escapting and doesn't seem to have an option to disable

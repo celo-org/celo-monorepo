@@ -58,6 +58,19 @@ type Answers = {
 ;(async function () {
   prompt.start()
 
+  const { confirmNoDanglingDevs } = await prompt.get([
+    {
+      name: 'confirmNoDanglingDevs',
+      description: colors.yellow(
+        `Please ensure the @celo/phone-number-privacy-* packages in any sdk/**/package.json are using a published version. Y/N`
+      ),
+    },
+  ])
+
+  if (confirmNoDanglingDevs.toString().toUpperCase() !== 'Y') {
+    process.exit(1)
+  }
+
   // `getAnswers` will either prompt the user for a version and whether
   // or not to publish or it will use an existing failedSDKs.json file.
   const { packages, version, publish } = await getAnswers()
@@ -147,7 +160,7 @@ type Answers = {
     },
   ]
 
-  let successfulPackages = []
+  let successfulPackages: string[] = []
   let otp = ''
   if (shouldPublish) {
     // Here we build and publish all the sdk packages
@@ -161,6 +174,10 @@ type Answers = {
       }
       const packageFolderPath = path.replace('package.json', '')
       try {
+        // copy license file from root to sdk folders so it is included in npm package
+        child_process.execSync(`cp ${__dirname}/../LICENSE ${packageFolderPath}`, {
+          stdio: 'inherit',
+        })
         console.log(`Building ${packageJson.name}`)
         child_process.execSync('yarn build', { cwd: packageFolderPath, stdio: 'ignore' })
 
@@ -181,6 +198,8 @@ type Answers = {
           { cwd: packageFolderPath, stdio: 'ignore' }
         )
         successfulPackages.push(packageJson.name)
+        // remove license files from sdks folders
+        child_process.execSync('rm LICENSE', { cwd: packageFolderPath, stdio: 'inherit' })
       } catch (e) {
         const errorPrompt = [
           {
@@ -239,7 +258,7 @@ type Answers = {
       if (sdkNames.includes(depName)) {
         const versionUpdate =
           json.dependencies[depName].includes('-dev') || isSdk ? `${newDevVersion}-dev` : newVersion
-        json.dependencies[depName] = versionUpdate
+        json.dependencies[depName] = keepCaretOrTilde(json.dependencies[depName], versionUpdate)
         packageChanged = true
       }
     }
@@ -249,7 +268,10 @@ type Answers = {
           json.devDependencies[depName].includes('-dev') || isSdk
             ? `${newDevVersion}-dev`
             : newVersion
-        json.devDependencies[depName] = versionUpdate
+        json.devDependencies[depName] = keepCaretOrTilde(
+          json.devDependencies[depName],
+          versionUpdate
+        )
         packageChanged = true
       }
     }
@@ -311,6 +333,10 @@ function incrementVersion(version: string, command: string) {
 
 function removeDevSuffix(version: string) {
   return version.endsWith('-dev') ? version.slice(0, -4) : version
+}
+
+function keepCaretOrTilde(old: string, next: string): string {
+  return old.startsWith('^') || old.startsWith('~') ? `${old.charAt(0)}${next}` : next
 }
 
 function readPackageJson(filePath: string): PackageJson {

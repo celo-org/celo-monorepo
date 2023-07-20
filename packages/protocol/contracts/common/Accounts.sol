@@ -123,10 +123,13 @@ contract Accounts is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 4, 0);
+    return (1, 1, 4, 1);
   }
 
   /**
@@ -193,7 +196,10 @@ contract Accounts is
    * @return True if account creation succeeded.
    */
   function createAccount() public returns (bool) {
-    require(isNotAccount(msg.sender) && isNotAuthorizedSigner(msg.sender), "Account exists");
+    require(
+      isNotAccount(msg.sender) && isNotAuthorizedSigner(msg.sender),
+      "Account already exists or address is an authorized signer for another account"
+    );
     Account storage account = accounts[msg.sender];
     account.exists = true;
     emit AccountCreated(msg.sender);
@@ -205,7 +211,7 @@ contract Accounts is
    * @param name The name to set.
    */
   function setName(string memory name) public {
-    require(isAccount(msg.sender), "Unknown account");
+    require(isAccount(msg.sender), "Register with createAccount to set account name");
     Account storage account = accounts[msg.sender];
     account.name = name;
     emit AccountNameSet(msg.sender, name);
@@ -287,7 +293,8 @@ contract Accounts is
   /**
    * @notice Returns the full list of offchain storage roots for an account.
    * @param account The account whose storage roots to return.
-   * @return List of storage root URLs.
+   * @return Concatenated storage root URLs.
+   * @return Lengths of storage root URLs.
    */
   function getOffchainStorageRoots(address account)
     external
@@ -326,7 +333,7 @@ contract Accounts is
    * @dev Use `deletePaymentDelegation` to unset the payment delegation.
    */
   function setPaymentDelegation(address beneficiary, uint256 fraction) public {
-    require(isAccount(msg.sender), "Not an account");
+    require(isAccount(msg.sender), "Must first register address with Account.createAccount");
     require(beneficiary != address(0), "Beneficiary cannot be address 0x0");
     FixidityLib.Fraction memory f = FixidityLib.wrap(fraction);
     require(f.lte(FixidityLib.fixed1()), "Fraction must not be greater than 1");
@@ -339,7 +346,7 @@ contract Accounts is
    * fraction to 0.
    */
   function deletePaymentDelegation() public {
-    require(isAccount(msg.sender), "Not an account");
+    require(isAccount(msg.sender), "Must first register address with Account.createAccount");
     paymentDelegations[msg.sender] = PaymentDelegation(address(0x0), FixidityLib.wrap(0));
     emit PaymentDelegationSet(address(0x0), 0);
   }
@@ -347,7 +354,8 @@ contract Accounts is
   /**
    * @notice Gets validator payment delegation settings.
    * @param account Account of the validator.
-   * @return Beneficiary address and fraction of payment delegated.
+   * @return Beneficiary address of payment delegated.
+   * @return Fraction of payment delegated.
    */
   function getPaymentDelegation(address account) external view returns (address, uint256) {
     PaymentDelegation storage delegation = paymentDelegations[account];
@@ -360,7 +368,7 @@ contract Accounts is
    * @param role the role to register a default signer for
    */
   function setIndexedSigner(address signer, bytes32 role) public {
-    require(isAccount(msg.sender), "Not an account");
+    require(isAccount(msg.sender), "Must first register address with Account.createAccount");
     require(isNotAccount(signer), "Cannot authorize account as signer");
     require(
       isNotAuthorizedSignerForAnotherAccount(msg.sender, signer),
@@ -393,7 +401,7 @@ contract Accounts is
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
-   * @dev v, r, s constitute `signer`'s EIP712 signature over `role`, `msg.sender`  
+   * @dev v, r, s constitute `signer`'s EIP712 signature over `role`, `msg.sender`
    *      and `signer`.
    */
   function authorizeSignerWithSignature(address signer, bytes32 role, uint8 v, bytes32 r, bytes32 s)
@@ -540,7 +548,7 @@ contract Accounts is
    * @param role The role to authorize signing for.
    */
   function authorizeSigner(address signer, bytes32 role) public {
-    require(isAccount(msg.sender), "Unknown account");
+    require(isAccount(msg.sender), "Must first register sender with Account.createAccount");
     require(
       isNotAccount(signer) && isNotAuthorizedSignerForAnotherAccount(msg.sender, signer),
       "Cannot re-authorize address signer"
@@ -554,12 +562,15 @@ contract Accounts is
   }
 
   /**
-   * @notice Finish the process of authorizing an address to sign on behalf of the account. 
+   * @notice Finish the process of authorizing an address to sign on behalf of the account.
    * @param account The address of account that authorized signing.
    * @param role The role to finish authorizing for.
    */
   function completeSignerAuthorization(address account, bytes32 role) public {
-    require(isAccount(account), "Unknown account");
+    require(
+      isAccount(account),
+      "Unknown Account: Address that authorized signing must be a registered Account"
+    );
     require(
       isNotAccount(msg.sender) && isNotAuthorizedSignerForAnotherAccount(account, msg.sender),
       "Cannot re-authorize address signer"
@@ -651,7 +662,7 @@ contract Accounts is
   }
 
   /**
-   * @notice Remove one of the Validator, Attestation or 
+   * @notice Remove one of the Validator, Attestation or
    * Vote signers from an account. Should only be called from
    * methods that check the role is a legacy signer.
    * @param role The role that has been authorized.
@@ -674,7 +685,7 @@ contract Accounts is
   }
 
   /**
-   * @notice Removes the currently authorized and indexed signer 
+   * @notice Removes the currently authorized and indexed signer
    * for a specific role
    * @param role The role of the signer.
    */
@@ -686,7 +697,7 @@ contract Accounts is
   }
 
   /**
-   * @notice Removes the currently authorized signer for a specific role and 
+   * @notice Removes the currently authorized signer for a specific role and
    * if the signer is indexed, remove that as well.
    * @param signer The address of the signer.
    * @param role The role that has been authorized.
@@ -737,7 +748,7 @@ contract Accounts is
       return account;
     }
 
-    require(isAccount(signer), "not an account");
+    require(isAccount(signer), "Must first register address with Account.createAccount");
     return signer;
   }
 
@@ -782,7 +793,7 @@ contract Accounts is
     if (authorizingAccount != address(0)) {
       return authorizingAccount;
     } else {
-      require(isAccount(signer), "Not an account");
+      require(isAccount(signer), "Must first register address with Account.createAccount");
       return signer;
     }
   }
@@ -796,7 +807,7 @@ contract Accounts is
   }
 
   /**
-   * @notice Returns the legacy signer for the specified account and 
+   * @notice Returns the legacy signer for the specified account and
    * role. If no signer has been specified it will return the account itself.
    * @param _account The address of the account.
    * @param role The role of the signer.
@@ -818,7 +829,7 @@ contract Accounts is
   }
 
   /**
-   * @notice Returns the default signer for the specified account and 
+   * @notice Returns the default signer for the specified account and
    * role. If no signer has been specified it will return the account itself.
    * @param account The address of the account.
    * @param role The role of the signer.
@@ -829,7 +840,7 @@ contract Accounts is
   }
 
   /**
-   * @notice Returns the indexed signer for the specified account and role. 
+   * @notice Returns the indexed signer for the specified account and role.
    * If no signer has been specified it will return the account itself.
    * @param account The address of the account.
    * @param role The role of the signer.
@@ -946,9 +957,8 @@ contract Accounts is
   /**
    * @notice Getter for the metadata of multiple accounts.
    * @param accountsToQuery The addresses of the accounts to get the metadata for.
-   * @return (stringLengths[] - the length of each string in bytes
-   *          data - all strings concatenated
-   *         )
+   * @return The length of each string in bytes.
+   * @return All strings concatenated.
    */
   function batchGetMetadataURL(address[] calldata accountsToQuery)
     external
@@ -1091,7 +1101,7 @@ contract Accounts is
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
    * @dev Fails if the address is already authorized to another account or is an account itself.
-   * @dev Note that this signature is EIP712 compliant over the authorizing `account` 
+   * @dev Note that this signature is EIP712 compliant over the authorizing `account`
    * (`msg.sender`), `signer` (`authorized`) and `role`.
    */
   function authorizeAddressWithRole(address authorized, bytes32 role, uint8 v, bytes32 r, bytes32 s)
@@ -1109,7 +1119,10 @@ contract Accounts is
    * @dev Fails if the address is already authorized for another account or is an account itself.
    */
   function authorize(address authorized) private {
-    require(isAccount(msg.sender), "Unknown account");
+    require(
+      isAccount(msg.sender),
+      "Unknown account: sender must register with createAccount first"
+    );
     require(
       isNotAccount(authorized) && isNotAuthorizedSignerForAnotherAccount(msg.sender, authorized),
       "Cannot re-authorize address or locked gold account for another account"

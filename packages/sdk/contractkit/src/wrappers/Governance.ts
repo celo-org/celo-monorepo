@@ -42,7 +42,7 @@ type StageDurations<V> = {
 
 type DequeuedStageDurations = Pick<
   StageDurations<BigNumber>,
-  ProposalStage.Approval | ProposalStage.Referendum | ProposalStage.Execution
+  ProposalStage.Referendum | ProposalStage.Execution
 >
 
 export interface ParticipationParameters {
@@ -107,7 +107,7 @@ export interface UpvoteRecord {
 }
 
 export enum VoteValue {
-  None = 'NONE',
+  None = 'None',
   Abstain = 'Abstain',
   No = 'No',
   Yes = 'Yes',
@@ -135,6 +135,9 @@ export interface VoteRecord {
   proposalID: BigNumber
   votes: BigNumber
   value: VoteValue
+  yesVotes: BigNumber
+  noVotes: BigNumber
+  abstainVotes: BigNumber
 }
 
 export interface Voter {
@@ -185,7 +188,6 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
   async stageDurations(): Promise<DequeuedStageDurations> {
     const res = await this.contract.methods.stageDurations().call()
     return {
-      [ProposalStage.Approval]: valueToBigNumber(res[0]),
       [ProposalStage.Referendum]: valueToBigNumber(res[1]),
       [ProposalStage.Execution]: valueToBigNumber(res[2]),
     }
@@ -228,6 +230,14 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
       baselineUpdateFactor: fromFixed(new BigNumber(res[2])),
       baselineQuorumFactor: fromFixed(new BigNumber(res[3])),
     }
+  }
+
+  // function get support doesn't consider constitution parameteres that has an influence
+  // in the total of yes votes required
+  async getSupportWithConstitutionThreshold(proposalID: BigNumber.Value, constitution: BigNumber) {
+    const support = await this.getSupport(proposalID)
+    support.required = support.required.times(constitution)
+    return support
   }
 
   // simulates proposal.getSupportWithQuorumPadding
@@ -285,9 +295,6 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
   async getHumanReadableConfig() {
     const config = await this.getConfig()
     const stageDurations = {
-      [ProposalStage.Approval]: secondsToDurationString(
-        config.stageDurations[ProposalStage.Approval]
-      ),
       [ProposalStage.Referendum]: secondsToDurationString(
         config.stageDurations[ProposalStage.Referendum]
       ),
@@ -413,12 +420,11 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
     }
 
     const durations = await this.stageDurations()
-    const referendum = meta.timestamp.plus(durations.Approval)
+    const referendum = meta.timestamp
     const execution = referendum.plus(durations.Referendum)
     const expiration = execution.plus(durations.Execution)
 
     return {
-      [ProposalStage.Approval]: meta.timestamp,
       [ProposalStage.Referendum]: referendum,
       [ProposalStage.Execution]: execution,
       [ProposalStage.Expiration]: expiration,
@@ -477,13 +483,12 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
 
     if (stage === ProposalStage.Queued) {
       record.upvotes = await this.getUpvotes(proposalID)
-    } else if (stage === ProposalStage.Approval) {
-      record.approved = await this.isApproved(proposalID)
-      record.approvals = await this.getApprovalStatus(proposalID)
     } else if (stage === ProposalStage.Referendum || stage === ProposalStage.Execution) {
       record.approved = true
       record.passed = await this.isProposalPassing(proposalID)
       record.votes = await this.getVotes(proposalID)
+      record.approved = await this.isApproved(proposalID)
+      record.approvals = await this.getApprovalStatus(proposalID)
     }
 
     return record
@@ -551,6 +556,9 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
         proposalID: valueToBigNumber(res[0]),
         value: Object.keys(VoteValue)[valueToInt(res[1])] as VoteValue,
         votes: valueToBigNumber(res[2]),
+        yesVotes: valueToBigNumber(res[3]),
+        noVotes: valueToBigNumber(res[4]),
+        abstainVotes: valueToBigNumber(res[5]),
       }
     } catch (_) {
       // The proposal ID may not be present in the dequeued list, or the voter may not have a vote
@@ -803,18 +811,33 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
     )
   }
 
-  revokeVotes = proxySend(this.connection, this.contract.methods.revokeVotes)
-
   /**
-   * Returns `voter`'s vote choice on a given proposal.
-   * @param proposalID Governance proposal UUID
-   * @param voter Address of voter
+   * Applies `sender`'s vote choice to a given proposal.
+   * @param proposalID Governance proposal UUID.
+   * @param yesVotes The yes votes.
+   * @param noVotes The no votes.
+   * @param abstainVotes The abstain votes.
    */
-  async getVoteValue(proposalID: BigNumber.Value, voter: Address) {
+  async votePartially(
+    proposalID: BigNumber.Value,
+    yesVotes: BigNumber.Value,
+    noVotes: BigNumber.Value,
+    abstainVotes: BigNumber.Value
+  ) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
-    const res = await this.contract.methods.getVoteRecord(voter, proposalIndex).call()
-    return Object.keys(VoteValue)[valueToInt(res[1])] as VoteValue
+    return toTransactionObject(
+      this.connection,
+      this.contract.methods.votePartially(
+        valueToString(proposalID),
+        proposalIndex,
+        valueToString(yesVotes),
+        valueToString(noVotes),
+        valueToString(abstainVotes)
+      )
+    )
   }
+
+  revokeVotes = proxySend(this.connection, this.contract.methods.revokeVotes)
 
   /**
    * Executes a given proposal's associated transactions.

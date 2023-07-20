@@ -1,6 +1,9 @@
-imagePullPolicy: IfNotPresent
 configBase64: config.yaml in base64
 serviceAccountBase64: service account in base 64
+
+imagePullPolicy: IfNotPresent
+imageRepository: us.gcr.io/celo-testnet/eksportisto
+imageTag: "41fd75246c7108716be373d2d36cac13996034fc"
 
 configHash: "0"
 
