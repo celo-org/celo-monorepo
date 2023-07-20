@@ -71,8 +71,7 @@ export async function upgradePrometheus(context?: string, clusterConfig?: BaseCl
 function getK8sContextVars(
   clusterConfig?: BaseClusterConfig,
   context?: string
-): [string, string, string, string, boolean] {
-  const cloudProvider = clusterConfig ? getCloudProviderPrefix(clusterConfig!) : 'gcp'
+): [string, string, string, boolean] {
   const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
   let clusterName = usingGCP ? fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) : clusterConfig!.clusterName
   let gcloudProject, gcloudRegion
@@ -98,7 +97,7 @@ function getK8sContextVars(
     gcloudRegion = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
   }
 
-  return [cloudProvider, clusterName, gcloudProject, gcloudRegion, usingGCP]
+  return [clusterName, gcloudProject, gcloudRegion, usingGCP]
 }
 
 function getRemoteWriteParameters(context?: string): string[] {
