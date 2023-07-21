@@ -1,4 +1,5 @@
 /* tslint:disable no-console */
+
 import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
 import { readJSONSync } from 'fs-extra'
@@ -6,6 +7,7 @@ import path from 'path'
 import { tsGenerator } from 'ts-generator'
 import { MENTO_PACKAGE } from '../contractPackages'
 
+const fs = require('fs')
 const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
 const BUILD_DIR = path.join(ROOT_DIR, process.env.BUILD_DIR ?? './build')
 
@@ -108,10 +110,15 @@ function compile(outdir: string) {
   }
 
   // compile 0.8 contracts
-  console.log(`Building contracts using 0.8`)
-  exec(
-    `yarn run truffle compile --silent --contracts_directory=./contracts-0.8 --contracts_build_directory=./build/contracts-0.8 --config truffle-config0.8.js`
-  )
+  const contracts08 = 'contracts-0.8'
+  if (!fs.existsSync(contracts08)) {
+    fs.mkdirSync(contracts08)
+
+    console.log(`Building contracts using 0.8`)
+    exec(
+      `yarn run truffle compile --silent --contracts_directory=./contracts-0.8 --contracts_build_directory=./build/contracts-0.8 --config truffle-config0.8.js`
+    )
+  }
 
   // compile everything else
   exec(`yarn run --silent truffle compile --build_directory=${outdir}`)
