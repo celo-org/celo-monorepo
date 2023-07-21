@@ -6,12 +6,8 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import {
-  GasPriceMinimumContract,
-  GasPriceMinimumInstance,
-  RegistryContract,
-  RegistryInstance,
-} from 'types'
+import { RegistryContract, RegistryInstance } from 'types'
+import { GasPriceMinimumContract, GasPriceMinimumInstance } from 'types/08'
 
 const Registry: RegistryContract = artifacts.require('Registry')
 const GasPriceMinimum: GasPriceMinimumContract = artifacts.require('GasPriceMinimum')

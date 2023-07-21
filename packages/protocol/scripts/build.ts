@@ -107,10 +107,18 @@ function compile(outdir: string) {
     )
   }
 
+  // compile 0.8 contracts
+  console.log(`Building contracts using 0.8`)
+  exec(
+    `yarn run truffle compile --silent --contracts_directory=./contracts-0.8 --contracts_build_directory=./build/contracts-0.8 --config truffle-config0.8.js`
+  )
+
+  // compile everything else
   exec(`yarn run --silent truffle compile --build_directory=${outdir}`)
 
   for (const contractName of ImplContracts) {
     try {
+      // TODO FIX warning Error: ./build/contracts/GasPriceMinimum.json: ENOENT: no such file or directory, open './build/contracts/GasPriceMinimum.json'
       const fileStr = readJSONSync(`${outdir}/contracts/${contractName}.json`)
       if (hasEmptyBytecode(fileStr)) {
         console.error(
@@ -134,16 +142,24 @@ function generateFilesForTruffle(outdir: string) {
     console.log(
       `protocol: Generating Truffle Types for external dependency ${externalContractPackage.name} to ${outdirExternal}`
     )
+
     const artifactPath = `${BUILD_DIR}/contracts-${externalContractPackage.name}/*.json`
+
     exec(
-      `yarn run --silent typechain --target=truffle --outDir "${outdirExternal}" "${artifactPath}" `
+      `yarn run --silent typechain --target=truffle --outDir "${outdirExternal}" "${artifactPath}"`
     )
   }
 
   console.log(`protocol: Generating Truffle Types to ${outdir}`)
   exec(`rm -rf "${outdir}"`)
   const globPattern = `${BUILD_DIR}/contracts/*.json`
-  exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}" `)
+  exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}"`)
+
+  const outdir08 = `./types/typechain-0.8`
+  // const artifactPath08 = 'contracts-0.8'
+  const artifactPath08 = `${BUILD_DIR}/contracts-0.8/*.json`
+  console.log(`protocol: Generating Truffle Types using Solidity 0.8 to ${outdir08}`)
+  exec(`yarn run --silent typechain --target=truffle --outDir "${outdir08}" "${artifactPath08}"`)
 }
 
 async function generateFilesForContractKit(outdir: string) {

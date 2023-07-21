@@ -1,3 +1,5 @@
+// TODO take this file to it's minimal form without mas much repeated code
+
 /* tslint:disable: object-literal-sort-keys */
 require('ts-node/register')
 const ProviderEngine = require('web3-provider-engine')
@@ -13,9 +15,9 @@ const argv = require('minimist')(process.argv.slice(2), {
   boolean: ['reset'],
 })
 
-console.log('using old truffle version')
+console.log('Using new truffle config')
 
-const SOLC_VERSION = '0.5.13'
+const SOLC_VERSION = '0.8.19'
 const ALFAJORES_NETWORKID = 44787
 const BAKLAVA_NETWORKID = 62320
 const BAKLAVASTAGING_NETWORKID = 31420
@@ -230,7 +232,6 @@ module.exports = {
       version: SOLC_VERSION,
       settings: {
         metadata: { useLiteralContent: true },
-        evmVersion: 'istanbul',
       },
     },
   },
@@ -245,7 +246,6 @@ if (process.argv.includes('--gas')) {
         version: SOLC_VERSION,
         settings: {
           metadata: { useLiteralContent: true },
-          evmVersion: 'istanbul',
         },
       },
     },
