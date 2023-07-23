@@ -368,11 +368,11 @@ contract LockedGold is
 
     uint256 totalLockedGold = getAccountTotalLockedGold(delegatorAccount);
     if (totalLockedGold == 0) {
-      currentDelegateeInfo.percentage = percentageToDelegate;
       delegated.totalDelegatedCeloFraction = delegated
         .totalDelegatedCeloFraction
         .subtract(currentDelegateeInfo.percentage)
         .add(percentageToDelegate);
+      currentDelegateeInfo.percentage = percentageToDelegate;
 
       emit CeloDelegated(
         delegatorAccount,
