@@ -294,7 +294,7 @@ contract Governance is
    * @param _concurrentProposals The number of proposals to dequeue at at a time.
    */
   function setConcurrentProposals(uint256 _concurrentProposals) public onlyOwner {
-    require(_concurrentProposals > 0, "Number of proposals must be larger than zero");
+    require(_concurrentProposals != 0, "Number of proposals must be larger than zero");
     require(_concurrentProposals != concurrentProposals, "Number of proposals unchanged");
     concurrentProposals = _concurrentProposals;
     emit ConcurrentProposalsSet(_concurrentProposals);
@@ -305,7 +305,7 @@ contract Governance is
    * @param _minDeposit The minimum CELO deposit needed to make a proposal.
    */
   function setMinDeposit(uint256 _minDeposit) public onlyOwner {
-    require(_minDeposit > 0, "minDeposit must be larger than 0");
+    require(_minDeposit != 0, "minDeposit must be larger than 0");
     require(_minDeposit != minDeposit, "Minimum deposit unchanged");
     minDeposit = _minDeposit;
     emit MinDepositSet(_minDeposit);
@@ -316,7 +316,7 @@ contract Governance is
    * @param _queueExpiry The number of seconds a proposal can stay in the queue before expiring.
    */
   function setQueueExpiry(uint256 _queueExpiry) public onlyOwner {
-    require(_queueExpiry > 0, "QueueExpiry must be larger than 0");
+    require(_queueExpiry != 0, "QueueExpiry must be larger than 0");
     require(_queueExpiry != queueExpiry, "QueueExpiry unchanged");
     queueExpiry = _queueExpiry;
     emit QueueExpirySet(_queueExpiry);
@@ -329,7 +329,7 @@ contract Governance is
    *   dequeued.
    */
   function setDequeueFrequency(uint256 _dequeueFrequency) public onlyOwner {
-    require(_dequeueFrequency > 0, "dequeueFrequency must be larger than 0");
+    require(_dequeueFrequency != 0, "dequeueFrequency must be larger than 0");
     require(_dequeueFrequency != dequeueFrequency, "dequeueFrequency unchanged");
     dequeueFrequency = _dequeueFrequency;
     emit DequeueFrequencySet(_dequeueFrequency);
@@ -340,7 +340,7 @@ contract Governance is
    * @param referendumStageDuration The number of seconds proposals stay in the referendum stage.
    */
   function setReferendumStageDuration(uint256 referendumStageDuration) public onlyOwner {
-    require(referendumStageDuration > 0, "Duration must be larger than 0");
+    require(referendumStageDuration != 0, "Duration must be larger than 0");
     require(referendumStageDuration != stageDurations.referendum, "Duration unchanged");
     stageDurations.referendum = referendumStageDuration;
     emit ReferendumStageDurationSet(referendumStageDuration);
@@ -351,7 +351,7 @@ contract Governance is
    * @param executionStageDuration The number of seconds proposals stay in the execution stage.
    */
   function setExecutionStageDuration(uint256 executionStageDuration) public onlyOwner {
-    require(executionStageDuration > 0, "Duration must be larger than 0");
+    require(executionStageDuration != 0, "Duration must be larger than 0");
     require(executionStageDuration != stageDurations.execution, "Duration unchanged");
     stageDurations.execution = executionStageDuration;
     emit ExecutionStageDurationSet(executionStageDuration);
@@ -546,7 +546,7 @@ contract Governance is
     Voter storage voter = voters[account];
     removeIfQueuedAndExpired(voter.upvote.proposalId);
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
-    require(weight > 0, "cannot upvote without locking gold");
+    require(weight != 0, "cannot upvote without locking gold");
     require(
       voter.upvote.proposalId == 0 || !queue.contains(voter.upvote.proposalId),
       "cannot upvote more than one queued proposal"
@@ -664,7 +664,7 @@ contract Governance is
 
     address account = getAccounts().voteSignerToAccount(msg.sender);
     uint256 weight = getLockedGold().getAccountTotalGovernanceVotingPower(account);
-    require(weight > 0, "Voter weight zero");
+    require(weight != 0, "Voter weight zero");
 
     _vote(
       proposal,
@@ -812,11 +812,11 @@ contract Governance is
       // Skip proposals where there was no vote cast by the user AND
       // ensure vote record proposal matches identifier of dequeued index proposal.
       if (
-        (voteRecord.yesVotes > 0 ||
-          voteRecord.noVotes > 0 ||
-          voteRecord.abstainVotes > 0 ||
-          voteRecord.deprecated_weight > 0) &&
-        voteRecord.proposalId == dequeued[dequeueIndex]
+        voteRecord.proposalId == dequeued[dequeueIndex] &&
+        (voteRecord.yesVotes != 0 ||
+          voteRecord.noVotes != 0 ||
+          voteRecord.abstainVotes != 0 ||
+          voteRecord.deprecated_weight != 0)
       ) {
         (Proposals.Proposal storage proposal, Proposals.Stage stage) =
           requireDequeuedAndDeleteExpired(voteRecord.proposalId, dequeueIndex); // prettier-ignore
@@ -975,7 +975,7 @@ contract Governance is
    */
   function withdraw() external nonReentrant returns (bool) {
     uint256 value = refundedDeposits[msg.sender];
-    require(value > 0, "Nothing to withdraw");
+    require(value != 0, "Nothing to withdraw");
     require(value <= address(this).balance, "Inconsistent balance");
     refundedDeposits[msg.sender] = 0;
     msg.sender.sendValue(value);
@@ -1242,7 +1242,7 @@ contract Governance is
         );
         // solhint-disable-next-line not-rely-on-time
         proposal.timestamp = now;
-        if (emptyIndices.length > 0) {
+        if (emptyIndices.length != 0) {
           uint256 indexOfLastEmptyIndex = emptyIndices.length.sub(1);
           dequeued[emptyIndices[indexOfLastEmptyIndex]] = proposalId;
           delete emptyIndices[indexOfLastEmptyIndex];
@@ -1284,7 +1284,7 @@ contract Governance is
       queue.remove(proposalId);
       // solhint-disable-next-line not-rely-on-time
       proposal.timestamp = now;
-      if (emptyIndices.length > 0) {
+      if (emptyIndices.length != 0) {
         uint256 indexOfLastEmptyIndex = emptyIndices.length.sub(1);
         dequeued[emptyIndices[indexOfLastEmptyIndex]] = proposalId;
         delete emptyIndices[indexOfLastEmptyIndex];
@@ -1444,7 +1444,7 @@ contract Governance is
     uint256 proposalId,
     uint256 index
   ) private {
-    if (proposal.isApproved() && proposal.networkWeight > 0) {
+    if (proposal.isApproved() && proposal.networkWeight != 0) {
       updateParticipationBaseline(proposal);
     }
     dequeued[index] = 0;
@@ -1592,13 +1592,13 @@ contract Governance is
           yesVotes = yesVotes.sub(toRemoveRounding);
           roundingToRemove = roundingToRemove.sub(toRemoveRounding);
 
-          if (roundingToRemove > 0) {
+          if (roundingToRemove != 0) {
             toRemoveRounding = Math.min(roundingToRemove, noVotes);
             noVotes = noVotes.sub(toRemoveRounding);
             roundingToRemove = roundingToRemove.sub(toRemoveRounding);
           }
 
-          if (roundingToRemove > 0) {
+          if (roundingToRemove != 0) {
             toRemoveRounding = Math.min(roundingToRemove, abstainVotes);
             abstainVotes = abstainVotes.sub(toRemoveRounding);
           }
@@ -1655,7 +1655,7 @@ contract Governance is
     // solhint-disable-next-line not-rely-on-time
     if (
       now >= stageStartTime &&
-      (proposal.transactions.length > 0 ||
+      (proposal.transactions.length != 0 ||
         // proposals with 0 transactions can expire only when not approved or not passing
         !proposal.isApproved() ||
         !_isProposalPassing(proposal))

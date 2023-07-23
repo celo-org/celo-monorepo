@@ -369,9 +369,10 @@ contract LockedGold is
     uint256 totalLockedGold = getAccountTotalLockedGold(delegatorAccount);
     if (totalLockedGold == 0) {
       currentDelegateeInfo.percentage = percentageToDelegate;
-      delegated.totalDelegatedCeloFraction = delegated.totalDelegatedCeloFraction.add(
-        percentageToDelegate
-      );
+      delegated.totalDelegatedCeloFraction = delegated
+        .totalDelegatedCeloFraction
+        .subtract(currentDelegateeInfo.percentage)
+        .add(percentageToDelegate);
 
       emit CeloDelegated(
         delegatorAccount,
@@ -384,7 +385,7 @@ contract LockedGold is
 
     uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(delegatorAccount);
 
-    if (totalReferendumVotes > 0) {
+    if (totalReferendumVotes != 0) {
       FixidityLib.Fraction memory referendumVotesInPercents = FixidityLib.newFixedFraction(
         totalReferendumVotes,
         totalLockedGold
@@ -427,7 +428,7 @@ contract LockedGold is
    * @param delegatee The delegatee acount.
    * @param revokeFraction Fraction of total CELO that will be revoked from delegatee. Fixidity fraction
    */
-  function revokeDelegatedGovernanceVotes(address delegatee, uint256 revokeFraction) public {
+  function revokeDelegatedGovernanceVotes(address delegatee, uint256 revokeFraction) external {
     FixidityLib.Fraction memory percentageToRevoke = FixidityLib.wrap(revokeFraction);
 
     require(
@@ -575,13 +576,13 @@ contract LockedGold is
   function _updateDelegatedAmount(address delegator, address delegatee) internal returns (uint256) {
     Delegated storage delegated = delegatorInfo[delegator];
     require(
-      FixidityLib.unwrap(delegated.totalDelegatedCeloFraction) > 0,
+      FixidityLib.unwrap(delegated.totalDelegatedCeloFraction) != 0,
       "delegator is not delegating"
     );
     DelegatedInfo storage currentDelegateeInfo = delegated
       .delegateesWithPercentagesAndAmount[delegatee];
     require(
-      FixidityLib.unwrap(currentDelegateeInfo.percentage) > 0,
+      FixidityLib.unwrap(currentDelegateeInfo.percentage) != 0,
       "delegator is not delegating for delegatee"
     );
 
@@ -644,7 +645,7 @@ contract LockedGold is
  * @return currentAmount The current actual Celo amount that is assigned to delegatee.
  */
   function getDelegatorDelegateeInfo(address delegator, address delegatee)
-    public
+    external
     view
     returns (uint256 fraction, uint256 currentAmount)
   {
