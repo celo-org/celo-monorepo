@@ -51,6 +51,8 @@ const argv = yargs
 
 const oldArtifactsFolder = path.relative(process.cwd(), argv.old_contracts)
 const newArtifactsFolder = path.relative(process.cwd(), argv.new_contracts)
+const newArtifactsFolder08 = path.relative(process.cwd(), argv.new_contracts + '-0.8')
+const newArtifactsFolders = [newArtifactsFolder, newArtifactsFolder08]
 
 const out = (msg: string, force?: boolean): void => {
   if (force || !argv.quiet) {
@@ -62,13 +64,15 @@ const outFile = argv.output_file ? argv.output_file : tmp.tmpNameSync({})
 const exclude: RegExp = argv.exclude ? new RegExp(argv.exclude) : null
 const oldArtifacts = instantiateArtifacts(oldArtifactsFolder)
 const newArtifacts = instantiateArtifacts(newArtifactsFolder)
+// console.log(newArtifactsFolder)
+const newArtifacts08 = instantiateArtifacts(newArtifactsFolder08)
 
 try {
   const backward = ASTBackwardReport.create(
     oldArtifactsFolder,
-    newArtifactsFolder,
+    newArtifactsFolders,
     oldArtifacts,
-    newArtifacts,
+    [newArtifacts, newArtifacts08],
     exclude,
     new DefaultCategorizer(),
     out
@@ -84,7 +88,7 @@ try {
     const doVersionCheck = async () => {
       const versionChecker = await ASTContractVersionsChecker.create(
         oldArtifacts,
-        newArtifacts,
+        [newArtifacts, newArtifacts08],
         backward.report.versionDeltas()
       )
       const mismatches = versionChecker.excluding(exclude).mismatches()
