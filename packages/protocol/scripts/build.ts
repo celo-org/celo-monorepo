@@ -110,14 +110,17 @@ function compile(outdir: string) {
   }
 
   // compile 0.8 contracts
-  const contracts08 = 'contracts-0.8'
-  if (!fs.existsSync(contracts08)) {
-    fs.mkdirSync(contracts08)
+  const contracts08 = `./contracts-0.8`
+  console.log(contracts08)
+  if (fs.existsSync(contracts08)) {
+    // fs.mkdirSync(contracts08)
 
     console.log(`Building contracts using 0.8`)
     exec(
       `yarn run truffle compile --silent --contracts_directory=./contracts-0.8 --contracts_build_directory=./build/contracts-0.8 --config truffle-config0.8.js`
     )
+  } else {
+    console.log("0.8 folder doesn't exist")
   }
 
   // compile everything else
