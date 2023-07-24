@@ -105,7 +105,7 @@ function compile(outdir: string) {
   for (const externalContractPackage of externalContractPackages) {
     console.log(`Building external contracts for ${externalContractPackage.name}`)
     exec(
-      `yarn run truffle compile --silent --contracts_directory=./lib/${externalContractPackage.path}/contracts --contracts_build_directory=./build/contracts-${externalContractPackage.name}`
+      `yarn run truffle compile --silent --contracts_directory=./lib/${externalContractPackage.path}/contracts --contracts_build_directory=./build/contracts-${externalContractPackage.name}` // todo change to outdir
     )
   }
 
@@ -117,7 +117,7 @@ function compile(outdir: string) {
 
     console.log(`Building contracts using 0.8`)
     exec(
-      `yarn run truffle compile --silent --contracts_directory=./contracts-0.8 --contracts_build_directory=./build/contracts-0.8 --config truffle-config0.8.js`
+      `yarn run truffle compile  --contracts_directory="./contracts-0.8" --contracts_build_directory=${outdir}/contracts-0.8 --config truffle-config0.8.js`
     )
   } else {
     console.log("0.8 folder doesn't exist")
