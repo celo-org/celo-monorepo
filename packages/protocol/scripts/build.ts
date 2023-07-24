@@ -126,6 +126,7 @@ function compile(outdir: string) {
   // compile everything else
   exec(`yarn run --silent truffle compile --build_directory=${outdir}`)
 
+  // check that there were no errors
   for (const contractName of ImplContracts) {
     try {
       // TODO FIX warning Error: ./build/contracts/GasPriceMinimum.json: ENOENT: no such file or directory, open './build/contracts/GasPriceMinimum.json'
