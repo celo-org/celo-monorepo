@@ -2,10 +2,10 @@ pragma solidity ^0.5.13;
 
 import "../../interfaces/IUniswapV2Pair.sol";
 
-import "./SafeMath.sol";
+import "./SafeMathUni.sol";
 
 library UniswapV2Library {
-  using SafeMath for uint256;
+  using SafeMathUni for uint256;
 
   // returns sorted token addresses, used to handle return values from pairs sorted in this order
   function sortTokens(address tokenA, address tokenB)

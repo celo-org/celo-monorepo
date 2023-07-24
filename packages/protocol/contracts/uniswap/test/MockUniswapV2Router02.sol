@@ -5,12 +5,12 @@ import ".//libraries/TransferHelper.sol";
 
 import "../interfaces/IUniswapV2Router02.sol";
 import "./libraries/UniswapV2Library.sol";
-import "./libraries/SafeMath.sol";
+import "./libraries/SafeMathUni.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/IWETH.sol";
 
 contract MockUniswapV2Router02 is IUniswapV2Router02 {
-  using SafeMath for uint256;
+  using SafeMathUni for uint256;
 
   address public factory; // TODO changed by volpe
   address public WETH; // TODO changed by volpe

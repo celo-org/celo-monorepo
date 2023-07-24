@@ -2,7 +2,7 @@ pragma solidity ^0.5.13;
 
 import "../interfaces/IUniswapV2Pair.sol";
 import "./UniswapV2ERC20.sol";
-import "./libraries/Math.sol";
+import "./libraries/MathUni.sol";
 import "./libraries/UQ112x112.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
@@ -102,8 +102,8 @@ contract MockUniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     uint256 _kLast = kLast; // gas savings
     if (feeOn) {
       if (_kLast != 0) {
-        uint256 rootK = Math.sqrt(uint256(_reserve0).mul(_reserve1));
-        uint256 rootKLast = Math.sqrt(_kLast);
+        uint256 rootK = MathUni.sqrt(uint256(_reserve0).mul(_reserve1));
+        uint256 rootKLast = MathUni.sqrt(_kLast);
         if (rootK > rootKLast) {
           uint256 numerator = totalSupply.mul(rootK.sub(rootKLast));
           uint256 denominator = rootK.mul(5).add(rootKLast);
@@ -127,10 +127,10 @@ contract MockUniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     bool feeOn = _mintFee(_reserve0, _reserve1);
     uint256 _totalSupply = totalSupply; // gas savings, must be defined here since totalSupply can update in _mintFee
     if (_totalSupply == 0) {
-      liquidity = Math.sqrt(amount0.mul(amount1)).sub(MINIMUM_LIQUIDITY);
+      liquidity = MathUni.sqrt(amount0.mul(amount1)).sub(MINIMUM_LIQUIDITY);
       _mint(address(0), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
     } else {
-      liquidity = Math.min(
+      liquidity = MathUni.min(
         amount0.mul(_totalSupply) / _reserve0,
         amount1.mul(_totalSupply) / _reserve1
       );
