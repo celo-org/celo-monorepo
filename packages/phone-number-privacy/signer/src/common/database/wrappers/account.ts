@@ -18,7 +18,6 @@ export async function getPerformedQueryCount(
   accountsTable: ACCOUNTS_TABLE,
   account: string,
   logger: Logger,
-  // dbTimeout: number,
   trx?: Knex.Transaction
 ): Promise<number> {
   return meter(
@@ -43,7 +42,6 @@ async function getAccountExists(
   accountsTable: ACCOUNTS_TABLE,
   account: string,
   logger: Logger,
-  // dbTimeout: number,
   trx?: Knex.Transaction
 ): Promise<boolean> {
   return meter(
@@ -71,7 +69,6 @@ export async function incrementQueryCount(
   account: string,
   logger: Logger,
   trx: Knex.Transaction
-  // dbTimeout: number
 ): Promise<void> {
   return meter(
     async () => {
@@ -100,7 +97,6 @@ async function insertRecord(
   data: AccountRecord,
   logger: Logger,
   trx: Knex.Transaction
-  // dbTimeout: number
 ): Promise<void> {
   try {
     await accounts(db, accountsTable).transacting(trx).insert(data).timeout(config.db.timeout)
