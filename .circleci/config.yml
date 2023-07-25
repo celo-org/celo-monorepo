@@ -897,17 +897,6 @@ jobs:
               cd packages/protocol
               ./specs/scripts/reserve.sh
             fi
-
-  flakey-test-summary:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Add summary of flakey tests to GitHub Checks
-          command: |
-            node ./packages/flake-tracker/scripts/summary.js
-  
   # Dummy job for not showing CircleCI error: "Error: All Workflows have been filtered from this Pipeline"
   # Check https://github.com/CircleCI-Public/circleci-cli/issues/577 for more context
   noop:
@@ -1024,24 +1013,6 @@ workflows:
       - odis-test:
           requires:
             - lint-checks
-      # - flakey-test-summary:
-      #     requires:
-      #       - protocol-test-common
-      #       - protocol-test-compatibility
-      #       - protocol-test-governance-network
-      #       - protocol-test-governance-validators
-      #       - protocol-test-governance-voting
-      #       - protocol-test-identity
-      #       - protocol-test-stability
-      #       - end-to-end-geth-transfer-test
-      #       - end-to-end-geth-blockchain-parameters-test
-      #       - end-to-end-geth-slashing-test
-      #       - end-to-end-geth-governance-test
-      #       - end-to-end-geth-replica-test
-      #       - end-to-end-geth-sync-test
-      #       - end-to-end-geth-validator-order-test
-      #       - end-to-end-cip35-eth-compatibility-test
-      #       - odis-test
   npm-install-testing-cron-workflow:
     # Contitionally triggered
     when: 

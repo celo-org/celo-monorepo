@@ -47,7 +47,6 @@
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
-    "@celo/flake-tracker": "0.0.1-dev",
     "@celo/protocol": "*",
     "@types/bunyan": "1.8.8",
     "@types/chai": "^4.1.3",

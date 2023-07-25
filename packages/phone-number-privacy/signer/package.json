@@ -11,7 +11,7 @@
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
     "lint": "tslint --project .",
-    "test": "SKIP_KNOWN_FLAKES=false jest --testPathIgnorePatterns test/end-to-end",
+    "test": "jest --testPathIgnorePatterns test/end-to-end",
     "test:debughandles": "jest --watch --runInBand --detectOpenHandles --testPathIgnorePatterns test/end-to-end",
     "test:debug": "node --inspect ../../../node_modules/.bin/jest --runInBand",
     "test:coverage": "yarn test --coverage",
@@ -64,9 +64,6 @@
     "ts-mockito": "^2.6.1",
     "ts-node": "^8.3.0",
     "typescript": "4.4.3"
-  },
-  "peerDependencies": {
-    "@celo/flake-tracker": "0.0.1-dev"
   },
   "engines": {
     "node": ">=10"

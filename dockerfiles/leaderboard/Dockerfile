@@ -17,7 +17,6 @@ COPY packages/sdk/wallets/wallet-local/package.json packages/sdk/wallets/wallet-
 COPY packages/protocol/package.json packages/protocol/
 COPY packages/sdk/contractkit/package.json packages/sdk/contractkit/
 COPY packages/leaderboard/package.json packages/leaderboard/
-COPY packages/flake-tracker/package.json packages/flake-tracker/package.json
 
 RUN yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
 
@@ -32,7 +31,6 @@ COPY packages/sdk/wallets/wallet-local packages/sdk/wallets/wallet-local
 COPY packages/protocol packages/protocol/
 COPY packages/sdk/contractkit packages/sdk/contractkit/
 COPY packages/leaderboard packages/leaderboard/
-COPY packages/flake-tracker packages/flake-tracker
 
 # build all
 RUN yarn build
