@@ -122,12 +122,22 @@ export interface ASTVersionedReportIndex {
   libraries: CategorizedChangesIndex
 }
 
-export const isLibrary = (contract: string, artifacts: BuildArtifacts) => {
-  const artifact = artifacts.getArtifactByName(contract)
-  const zContract = makeZContract(artifact)
-  const ast = new ContractAST(zContract, artifacts)
-  const kind = ast.getContractNode().contractKind
-  return kind === 'library'
+export const isLibrary = (contract: string, artifactsSet: BuildArtifacts[]) => {
+  for (const artifacts of artifactsSet){
+    // need to get a try here
+
+    const artifact = artifacts.getArtifactByName(contract)
+    if (artifact === undefined){
+      // EAFP
+      // thse artifacts doesn't have the desired property
+      // A priori we don't know in what folder they are
+      continue
+    }
+    const zContract = makeZContract(artifact)
+    const ast = new ContractAST(zContract, artifacts)
+    const kind = ast.getContractNode().contractKind
+    return kind === 'library'
+  }
 }
 
 /**
@@ -158,20 +168,23 @@ export class ASTVersionedReport {
    * {contract name => {@link ASTVersionedReport}}, each built
    * by the {@link CategorizedChanges} for each contract.
    */
-  static createByContract = (changes: CategorizedChanges, artifacts: BuildArtifacts): ASTVersionedReportIndex => {
+  static createByContract = (changes: CategorizedChanges, artifactsSet: BuildArtifacts[]): ASTVersionedReportIndex => {
     const changesByContract = changes.byContract()
     const reportIndex: ASTVersionedReportIndex = {
       contracts: {},
       libraries: {}
     }
+    console.log("made it here a")
     Object.keys(changesByContract).forEach((contract: string) => {
-      if (isLibrary(contract, artifacts)) {
+      console.log("change contract is,", contract)
+      if (isLibrary(contract, artifactsSet)) {
         reportIndex.libraries[contract] = changesByContract[contract]
       } else {
         const report = ASTVersionedReport.create(changesByContract[contract])
         reportIndex.contracts[contract] = report
       }
     })
+    console.log("made it here b")
     return reportIndex
   }
 
@@ -185,9 +198,12 @@ export class ASTVersionedReport {
  */
 export class ASTDetailedVersionedReport {
 
-  static create = (fullReports: ASTReports, artifacts: BuildArtifacts, categorizer: Categorizer): ASTDetailedVersionedReport => {
+  static create = (fullReports: ASTReports, newArtifactsSet: BuildArtifacts[], categorizer: Categorizer): ASTDetailedVersionedReport => {
+    console.log("made it here1")
     const changes = CategorizedChanges.fromReports(fullReports, categorizer)
-    const reportIndex: ASTVersionedReportIndex = ASTVersionedReport.createByContract(changes, artifacts)
+    console.log("made it here2")
+    const reportIndex: ASTVersionedReportIndex = ASTVersionedReport.createByContract(changes, newArtifactsSet)
+    console.log("made it here3")
     return new ASTDetailedVersionedReport(reportIndex.contracts, reportIndex.libraries)
   }
 

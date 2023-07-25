@@ -8,10 +8,12 @@ import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/regist
 import { Address, NULL_ADDRESS, eqAddress } from '@celo/utils/lib/address'
 import { TruffleContract } from '@truffle/contract'
 // tslint:disable-next-line: ordered-imports
+import { makeTruffleContractForMigrationWithoutSingleton } from '@celo/protocol/lib/web3-utils'
 import { readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
 import { RegistryInstance } from 'types'
 import { getReleaseVersion, ignoredContractsV9 } from '../../lib/compatibility/ignored-contracts-v9'
+import { networks } from '../../truffle-config.js'
 
 /*
  * A script that reads a backwards compatibility report, deploys changed contracts, and creates
@@ -38,8 +40,10 @@ class ContractAddresses {
     const addresses = new Map()
     await Promise.all(
       contracts.map(async (contract: string) => {
+        console.log(contract)
         const registeredAddress = await registry.getAddressForString(contract)
         if (!eqAddress(registeredAddress, NULL_ADDRESS)) {
+          console.log('set contract', contract)
           addresses.set(contract, registeredAddress)
         }
       })
@@ -56,6 +60,7 @@ class ContractAddresses {
     if (this.addresses.has(contract)) {
       return this.addresses.get(contract)
     } else {
+      console.trace()
       throw new Error(`Unable to find address for ${contract}`)
     }
   }
@@ -256,7 +261,10 @@ module.exports = async (callback: (error?: any) => number) => {
       ignoredContractsSet = new Set(ignoredContractsV9)
     }
 
+    const contracts08 = readdirSync(join(argv.build_directory, 'contracts-0.8'))
+
     const contracts = readdirSync(join(argv.build_directory, 'contracts'))
+      .concat(contracts08) // adding at the end so libraries that are already deployed don't get redeployed
       .map((x) => basename(x, '.json'))
       .filter(
         (contract) =>
@@ -269,25 +277,48 @@ module.exports = async (callback: (error?: any) => number) => {
     const released: Set<string> = new Set([])
     const proposal: ProposalTx[] = []
 
-    const release = async (contractName: string) => {
+    const release = async (contractNameIn: string) => {
+      let contractName = contractNameIn // not sure this will be needed
+
       // 0. Skip already released dependencies
       if (released.has(contractName)) {
         return
       }
-      // 1. Release all dependencies. Guarantees library addresses are canonical for linking.
-      const contractDependencies = dependencies.get(contractName)
-      for (const dependency of contractDependencies) {
-        await release(dependency)
-      }
-      console.log('Dependencies for contract', contractName)
-      // 2. Link dependencies.
-      const contractArtifact = await artifacts.require(contractName)
-      await Promise.all(contractDependencies.map((d) => contractArtifact.link(d, addresses.get(d))))
 
-      // 3. Deploy new versions of the contract or library, if indicated by the report.
+      console.log('Dependencies for contract', contractName)
+
+      // const contractArtifact = await artifacts.require(contractName) // I think it won't be able to find GasPriceMinimum here
+      let contractArtifact
+
+      try {
+        contractArtifact = await artifacts.require(contractName) // I think it won't be able to find GasPriceMinimum here
+      } catch {
+        // it wasn't found in the standar artifacts folder, check if it's
+        contractArtifact = makeTruffleContractForMigrationWithoutSingleton(
+          contractName,
+          { ...networks[argv.network], name: argv.network },
+          '0.8',
+          web3
+        )
+        // TODO WARNING: make sure there are no libraries with the same name that don't get deployed
+      }
       const shouldDeployContract = Object.keys(report.contracts).includes(contractName)
       const shouldDeployLibrary = Object.keys(report.libraries).includes(contractName)
+
       if (shouldDeployContract) {
+        // Don't try to deploy and link libraries of contracts it doesn't have to deploy
+        // 1. Release all dependencies. Guarantees library addresses are canonical for linking.
+        const contractDependencies = dependencies.get(contractName)
+        for (const dependency of contractDependencies) {
+          console.log('Releasing dependency', dependency)
+          await release(dependency)
+        }
+        // 2. Link dependencies.
+        await Promise.all(
+          contractDependencies.map((d) => contractArtifact.link(d, addresses.get(d)))
+        )
+        // 3. Deploy new versions of the contract or library, if indicated by the report.
+        console.log('Deploying Contract:', contractName)
         await deployCoreContract(
           contractName,
           contractArtifact,
@@ -299,17 +330,22 @@ module.exports = async (callback: (error?: any) => number) => {
           argv.from
         )
       } else if (shouldDeployLibrary) {
+        console.log('Deploying library:', contractName)
         await deployLibrary(contractName, contractArtifact, addresses, argv.dry_run, argv.from)
+      } else {
+        console.log('Not deployed:', contractName, "(it's not included in the report)")
       }
 
       // 4. Mark the contract as released
       released.add(contractName)
     }
+
     for (const contractName of contracts) {
       if (isCoreContract(contractName) && isProxiedContract(contractName)) {
         await release(contractName)
       }
     }
+
     writeJsonSync(argv.proposal, proposal, { spaces: 2 })
     callback()
   } catch (error) {

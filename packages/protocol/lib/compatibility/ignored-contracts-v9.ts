@@ -1,16 +1,21 @@
 export const ignoredContractsV9 = [
   // These are Mento contracts which we are no longer maintaining
   'Exchange',
-  'ExchangeBRL',
   'ExchangeEUR',
+  'ExchangeBRL',
   'GrandaMento',
+  'StableToken',
+  'StableTokenEUR',
+  'StableTokenBRL',
+  'StableTokenRegistry',
   'Reserve',
   'ReserveSpenderMultiSig',
-  'SortedOracles',
-  'StableToken',
-  'StableTokenBRL',
-  'StableTokenEUR',
-  'StableTokenRegistry',
+
+  // note: Sorted Oracles ia a Celo Core Contract
+  // but as it has also been modified and deployed buy the Mento team
+  // it will currently need work to be able to upgrade it again
+  // https://github.com/celo-org/celo-monorepo/issues/10435
+  'SortedOracles' 
 ]
 
 export function getReleaseVersion(branch: string) {
