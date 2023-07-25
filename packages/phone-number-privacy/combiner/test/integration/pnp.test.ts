@@ -68,6 +68,8 @@ const {
   BLINDING_FACTOR,
 } = TestUtils.Values
 
+jest.setTimeout(20000)
+
 // create deep copy of config
 const combinerConfig: typeof config = JSON.parse(JSON.stringify(config))
 combinerConfig.phoneNumberPrivacy.enabled = true
