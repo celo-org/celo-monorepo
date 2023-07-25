@@ -3,7 +3,7 @@ import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { config } from '../../../config'
 import { Histograms, meter } from '../../metrics'
-import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE, AccountRecord, toAccountRecord } from '../models/account'
+import { AccountRecord, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE, toAccountRecord } from '../models/account'
 import { countAndThrowDBError, tableWithLockForTrx } from '../utils'
 
 function accounts(db: Knex, table: ACCOUNTS_TABLE) {
