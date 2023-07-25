@@ -2,11 +2,14 @@ import { newKit } from '@celo/contractkit'
 import {
   AuthenticationMethod,
   CombinerEndpoint,
+  DB_TIMEOUT,
   ErrorMessage,
   FULL_NODE_TIMEOUT_IN_MS,
   genSessionID,
   KEY_VERSION_HEADER,
   LegacySignMessageRequest,
+  RETRY_COUNT,
+  RETRY_DELAY_IN_MS,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
   TestUtils,
@@ -114,6 +117,7 @@ const signerConfig: SignerConfig = {
     port: undefined,
     ssl: true,
     poolMaxSize: 50,
+    timeout: DB_TIMEOUT,
   },
   keystore: {
     type: SupportedKeystore.MOCK_SECRET_MANAGER,
@@ -144,6 +148,8 @@ const signerConfig: SignerConfig = {
   timeout: 5000,
   test_quota_bypass_percentage: 0,
   fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
+  retryCount: RETRY_COUNT,
+  retryDelayMs: RETRY_DELAY_IN_MS,
 }
 
 const testBlockNumber = 1000000

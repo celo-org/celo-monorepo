@@ -1,6 +1,8 @@
 import {
   BlockchainConfig,
   FULL_NODE_TIMEOUT_IN_MS,
+  RETRY_COUNT,
+  RETRY_DELAY_IN_MS,
   rootLogger,
   TestUtils,
   toBool,
@@ -36,6 +38,8 @@ export interface OdisConfig {
     versions: string // parse as KeyVersionInfo[]
   }
   fullNodeTimeoutMs: number
+  retryCount: number
+  retryDelayMs: number
 }
 
 export interface CombinerConfig {
@@ -102,6 +106,8 @@ if (DEV_MODE) {
         ]),
       },
       fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
+      retryCount: RETRY_COUNT,
+      retryDelayMs: RETRY_DELAY_IN_MS,
     },
     domains: {
       serviceName: defaultServiceName,
@@ -135,6 +141,8 @@ if (DEV_MODE) {
         ]),
       },
       fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
+      retryCount: RETRY_COUNT,
+      retryDelayMs: RETRY_DELAY_IN_MS,
     },
   }
 } else {
@@ -160,6 +168,8 @@ if (DEV_MODE) {
         versions: functionConfig.pnp_keys.versions,
       },
       fullNodeTimeoutMs: Number(functionConfig.pnp.full_node_timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
+      retryCount: Number(functionConfig.pnp.retryCount ?? RETRY_COUNT),
+      retryDelayMs: Number(functionConfig.pnp.retryDelayMs ?? RETRY_DELAY_IN_MS),
     },
     domains: {
       serviceName: functionConfig.domains.service_name ?? defaultServiceName,
@@ -176,6 +186,8 @@ if (DEV_MODE) {
         versions: functionConfig.domains_keys.versions,
       },
       fullNodeTimeoutMs: Number(functionConfig.pnp.full_node_timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
+      retryCount: Number(functionConfig.pnp.retryCount ?? RETRY_COUNT),
+      retryDelayMs: Number(functionConfig.pnp.retryDelayMs ?? RETRY_DELAY_IN_MS),
     },
   }
 }

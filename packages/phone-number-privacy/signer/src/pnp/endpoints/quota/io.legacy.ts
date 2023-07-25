@@ -29,6 +29,8 @@ export class LegacyPnpQuotaIO extends IO<LegacyPnpQuotaRequest> {
     readonly enabled: boolean,
     readonly shouldFailOpen: boolean,
     readonly timeoutMs: number,
+    readonly retryCount: number,
+    readonly retryDelayMs: number,
     readonly kit: ContractKit
   ) {
     super(enabled)
@@ -71,7 +73,9 @@ export class LegacyPnpQuotaIO extends IO<LegacyPnpQuotaRequest> {
       logger,
       this.shouldFailOpen,
       warnings,
-      this.timeoutMs
+      this.timeoutMs,
+      this.retryCount,
+      this.retryDelayMs
     )
   }
 

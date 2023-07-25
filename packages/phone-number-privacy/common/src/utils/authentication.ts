@@ -26,7 +26,9 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   logger: Logger,
   shouldFailOpen: boolean = false,
   warnings: ErrorType[] = [],
-  timeoutMs: number = FULL_NODE_TIMEOUT_IN_MS
+  timeoutMs: number = FULL_NODE_TIMEOUT_IN_MS,
+  retryCount: number = RETRY_COUNT,
+  retryDelay: number = RETRY_DELAY_IN_MS
 ): Promise<boolean> {
   logger.debug('Authenticating user')
 
@@ -43,7 +45,14 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   if (authMethod && authMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     let registeredEncryptionKey
     try {
-      registeredEncryptionKey = await getDataEncryptionKey(signer, contractKit, logger, timeoutMs)
+      registeredEncryptionKey = await getDataEncryptionKey(
+        signer,
+        contractKit,
+        logger,
+        timeoutMs,
+        retryCount,
+        retryDelay
+      )
     } catch (err) {
       // getDataEncryptionKey should only throw if there is a full-node connection issue.
       // That is, it does not throw if the DEK is undefined or invalid
@@ -129,7 +138,9 @@ export async function getDataEncryptionKey(
   address: string,
   contractKit: ContractKit,
   logger: Logger,
-  timeoutMs: number
+  timeoutMs: number,
+  retryCount: number,
+  retryDelayMs: number
 ): Promise<string> {
   try {
     const res = await retryAsyncWithBackOffAndTimeout(
@@ -137,9 +148,9 @@ export async function getDataEncryptionKey(
         const accountWrapper: AccountsWrapper = await contractKit.contracts.getAccounts()
         return accountWrapper.getDataEncryptionKey(address)
       },
-      RETRY_COUNT,
+      retryCount,
       [],
-      RETRY_DELAY_IN_MS,
+      retryDelayMs,
       1.5,
       timeoutMs
     )

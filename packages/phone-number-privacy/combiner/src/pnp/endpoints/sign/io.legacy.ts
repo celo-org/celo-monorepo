@@ -91,7 +91,9 @@ export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
       logger,
       this.config.shouldFailOpen,
       [],
-      this.config.fullNodeTimeoutMs
+      this.config.fullNodeTimeoutMs,
+      this.config.retryCount,
+      this.config.retryDelayMs
     )
   }
 
