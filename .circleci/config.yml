@@ -896,6 +896,15 @@ jobs:
           name: Add summary of flakey tests to GitHub Checks
           command: |
             node ./packages/flake-tracker/scripts/summary.js
+  
+  # Dummy job for not showing CircleCI error: "Error: All Workflows have been filtered from this Pipeline"
+  # Check https://github.com/CircleCI-Public/circleci-cli/issues/577 for more context
+  noop:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run: echo "noop"
 
 workflows:
   version: 2
@@ -1042,3 +1051,8 @@ workflows:
       - protocol-test-with-code-coverage:
           requires:
             - lint-checks
+  # Dummy job for not showing CircleCI error: "Error: All Workflows have been filtered from this Pipeline"
+  # Check https://github.com/CircleCI-Public/circleci-cli/issues/577 for more context
+  no-changes:
+    jobs:
+      - noop
