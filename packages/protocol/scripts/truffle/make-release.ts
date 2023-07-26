@@ -1,14 +1,13 @@
 // tslint:disable: max-classes-per-file
 // tslint:disable: no-console
+// tslint:disable: ordered-imports
 import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
-// tslint:disable-next-line: ordered-imports
+import { makeTruffleContractForMigrationWithoutSingleton } from '@celo/protocol/lib/web3-utils'
 import { Address, NULL_ADDRESS, eqAddress } from '@celo/utils/lib/address'
 import { TruffleContract } from '@truffle/contract'
-// tslint:disable-next-line: ordered-imports
-import { makeTruffleContractForMigrationWithoutSingleton } from '@celo/protocol/lib/web3-utils'
 import { readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
 import { RegistryInstance } from 'types'
@@ -281,7 +280,7 @@ module.exports = async (callback: (error?: any) => number) => {
     const proposal: ProposalTx[] = []
 
     const release = async (contractNameIn: string) => {
-      let contractName = contractNameIn // not sure this will be needed
+      const contractName = contractNameIn // not sure this will be needed
 
       // 0. Skip already released dependencies
       if (released.has(contractName)) {
