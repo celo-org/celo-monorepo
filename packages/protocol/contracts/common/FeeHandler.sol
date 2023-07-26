@@ -339,6 +339,7 @@ contract FeeHandler is
     @param tokenAddress The address of the token for which to distribute the available tokens.
   */
   function distribute(address tokenAddress) external {
+    require(activeTokens.contains(tokenAddress), "Token has to be active to distribute");
     return _distribute(tokenAddress);
   }
 
@@ -448,6 +449,7 @@ contract FeeHandler is
   }
 
   function handle(address tokenAddress) external {
+    require(activeTokens.contains(tokenAddress), "Token has to be active to handle");
     return _handle(tokenAddress);
   }
 
