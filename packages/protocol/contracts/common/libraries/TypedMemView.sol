@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
+// Original authors: https://github.com/summa-tx/memview-sol
 pragma solidity >=0.5.10 <0.8.0;
 
 import { SafeMathMem } from "./SafeMathMem.sol";
