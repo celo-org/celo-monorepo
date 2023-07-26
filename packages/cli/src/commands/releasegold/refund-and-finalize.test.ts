@@ -24,6 +24,7 @@ testWithGanache('releasegold:refund-and-finalize cmd', (web3: Web3) => {
   })
 
   test('can refund gold', async () => {
+    const accounts = await web3.eth.getAccounts()
     await testLocally(Revoke, ['--contract', contractAddress, '--yesreally'])
     const releaseGoldWrapper = new ReleaseGoldWrapper(
       kit.connection,
@@ -31,10 +32,14 @@ testWithGanache('releasegold:refund-and-finalize cmd', (web3: Web3) => {
       kit.contracts
     )
     const refundAddress = await releaseGoldWrapper.getRefundAddress()
+    // send extra gold to the ReleaseGold contract
+    const amount = 10000000000000
+    await kit.web3.eth.sendTransaction({ from: accounts[0], to: contractAddress, value: amount })
+
     const balanceBefore = await kit.getTotalBalance(refundAddress)
     await testLocally(RefundAndFinalize, ['--contract', contractAddress])
     const balanceAfter = await kit.getTotalBalance(refundAddress)
-    expect(balanceBefore.CELO!.toNumber()).toBeLessThan(balanceAfter.CELO!.toNumber())
+    expect(balanceBefore.CELO!.toNumber() + amount).toEqual(balanceAfter.CELO!.toNumber())
   })
 
   test('can finalize the contract', async () => {
