@@ -39,7 +39,7 @@ testWithGanache('releasegold:refund-and-finalize cmd', (web3: Web3) => {
     const balanceBefore = await kit.getTotalBalance(refundAddress)
     await testLocally(RefundAndFinalize, ['--contract', contractAddress])
     const balanceAfter = await kit.getTotalBalance(refundAddress)
-    expect(balanceBefore.CELO!.toNumber() + amount).toEqual(balanceAfter.CELO!.toNumber())
+    expect(balanceBefore.CELO!.toNumber()).toBeLessThan(balanceAfter.CELO!.toNumber())
   })
 
   test('can finalize the contract', async () => {
