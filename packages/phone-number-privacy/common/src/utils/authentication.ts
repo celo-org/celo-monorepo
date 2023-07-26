@@ -139,8 +139,8 @@ export async function getDataEncryptionKey(
   contractKit: ContractKit,
   logger: Logger,
   timeoutMs: number,
-  retryCount: number,
-  retryDelayMs: number
+  fullNodeRetryCount: number,
+  fullNodeRetryDelayMs: number
 ): Promise<string> {
   try {
     const res = await retryAsyncWithBackOffAndTimeout(
@@ -148,9 +148,9 @@ export async function getDataEncryptionKey(
         const accountWrapper: AccountsWrapper = await contractKit.contracts.getAccounts()
         return accountWrapper.getDataEncryptionKey(address)
       },
-      retryCount,
+      fullNodeRetryCount,
       [],
-      retryDelayMs,
+      fullNodeRetryDelayMs,
       1.5,
       timeoutMs
     )

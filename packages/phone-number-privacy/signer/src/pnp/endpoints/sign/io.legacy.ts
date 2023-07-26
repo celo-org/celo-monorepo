@@ -33,8 +33,8 @@ export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
     readonly enabled: boolean,
     readonly shouldFailOpen: boolean,
     readonly timeoutMs: number,
-    readonly retryCount: number,
-    readonly retryDelayMs: number,
+    readonly fullNodeRetryCount: number,
+    readonly fullNodeRetryDelayMs: number,
     readonly kit: ContractKit
   ) {
     super(enabled)
@@ -86,8 +86,8 @@ export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
       this.shouldFailOpen,
       warnings,
       this.timeoutMs,
-      this.retryCount,
-      this.retryDelayMs
+      this.fullNodeRetryCount,
+      this.fullNodeRetryDelayMs
     )
   }
 

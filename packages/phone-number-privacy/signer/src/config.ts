@@ -1,6 +1,7 @@
 import {
   BlockchainConfig,
   DB_TIMEOUT,
+  DB_POOL_MAX_SIZE,
   FULL_NODE_TIMEOUT_IN_MS,
   RETRY_COUNT,
   RETRY_DELAY_IN_MS,
@@ -103,8 +104,8 @@ export interface SignerConfig {
   timeout: number
   test_quota_bypass_percentage: number
   fullNodeTimeoutMs: number
-  retryCount: number
-  retryDelayMs: number
+  fullNodeRetryCount: number
+  fullNodeRetryDelayMs: number
 }
 
 const env = process.env as any
@@ -156,8 +157,8 @@ export const config: SignerConfig = {
     host: env.DB_HOST,
     port: env.DB_PORT ? Number(env.DB_PORT) : undefined,
     ssl: toBool(env.DB_USE_SSL, true),
-    poolMaxSize: env.DB_POOL_MAX_SIZE ?? 50,
-    timeout: env.DB_TIMEOUT ?? DB_TIMEOUT,
+    poolMaxSize: Number(env.DB_POOL_MAX_SIZE ?? DB_POOL_MAX_SIZE),
+    timeout: Number(env.DB_TIMEOUT ?? DB_TIMEOUT),
   },
   keystore: {
     type: env.KEYSTORE_TYPE,
@@ -188,6 +189,6 @@ export const config: SignerConfig = {
   timeout: Number(env.ODIS_SIGNER_TIMEOUT ?? 5000),
   test_quota_bypass_percentage: Number(env.TEST_QUOTA_BYPASS_PERCENTAGE ?? 0),
   fullNodeTimeoutMs: Number(env.TIMEOUT_MS ?? FULL_NODE_TIMEOUT_IN_MS),
-  retryCount: Number(env.RETRY_COUNT ?? RETRY_COUNT),
-  retryDelayMs: Number(env.RETRY_DELAY_IN_MS ?? RETRY_DELAY_IN_MS),
+  fullNodeRetryCount: Number(env.RETRY_COUNT ?? RETRY_COUNT),
+  fullNodeRetryDelayMs: Number(env.RETRY_DELAY_IN_MS ?? RETRY_DELAY_IN_MS),
 }

@@ -144,8 +144,8 @@ const signerConfig: SignerConfig = {
   timeout: 5000,
   test_quota_bypass_percentage: 0,
   fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
-  retryCount: RETRY_COUNT,
-  retryDelayMs: RETRY_DELAY_IN_MS,
+  fullNodeRetryCount: RETRY_COUNT,
+  fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
 }
 
 describe('domainService', () => {

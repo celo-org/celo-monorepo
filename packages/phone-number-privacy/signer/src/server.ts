@@ -99,8 +99,8 @@ export function startSigner(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen, // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config to make the code cleaner
         config.fullNodeTimeoutMs,
-        config.retryCount,
-        config.retryDelayMs,
+        config.fullNodeRetryCount,
+        config.fullNodeRetryDelayMs,
         kit
       )
     )
@@ -115,8 +115,8 @@ export function startSigner(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen,
         config.fullNodeTimeoutMs,
-        config.retryCount,
-        config.retryDelayMs,
+        config.fullNodeRetryCount,
+        config.fullNodeRetryDelayMs,
         kit
       )
     )
@@ -131,8 +131,8 @@ export function startSigner(
         config.api.legacyPhoneNumberPrivacy.enabled,
         config.api.legacyPhoneNumberPrivacy.shouldFailOpen,
         config.fullNodeTimeoutMs,
-        config.retryCount,
-        config.retryDelayMs,
+        config.fullNodeRetryCount,
+        config.fullNodeRetryDelayMs,
         kit
       )
     )
@@ -145,8 +145,8 @@ export function startSigner(
         config.api.legacyPhoneNumberPrivacy.enabled,
         config.api.legacyPhoneNumberPrivacy.shouldFailOpen,
         config.fullNodeTimeoutMs,
-        config.retryCount,
-        config.retryDelayMs,
+        config.fullNodeRetryCount,
+        config.fullNodeRetryDelayMs,
         kit
       )
     )

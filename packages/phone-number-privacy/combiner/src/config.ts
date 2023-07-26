@@ -38,8 +38,8 @@ export interface OdisConfig {
     versions: string // parse as KeyVersionInfo[]
   }
   fullNodeTimeoutMs: number
-  retryCount: number
-  retryDelayMs: number
+  fullNodeRetryCount: number
+  fullNodeRetryDelayMs: number
 }
 
 export interface CombinerConfig {
@@ -106,8 +106,8 @@ if (DEV_MODE) {
         ]),
       },
       fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
-      retryCount: RETRY_COUNT,
-      retryDelayMs: RETRY_DELAY_IN_MS,
+      fullNodeRetryCount: RETRY_COUNT,
+      fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
     },
     domains: {
       serviceName: defaultServiceName,
@@ -141,8 +141,8 @@ if (DEV_MODE) {
         ]),
       },
       fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
-      retryCount: RETRY_COUNT,
-      retryDelayMs: RETRY_DELAY_IN_MS,
+      fullNodeRetryCount: RETRY_COUNT,
+      fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
     },
   }
 } else {
@@ -168,8 +168,10 @@ if (DEV_MODE) {
         versions: functionConfig.pnp_keys.versions,
       },
       fullNodeTimeoutMs: Number(functionConfig.pnp.full_node_timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
-      retryCount: Number(functionConfig.pnp.retryCount ?? RETRY_COUNT),
-      retryDelayMs: Number(functionConfig.pnp.retryDelayMs ?? RETRY_DELAY_IN_MS),
+      fullNodeRetryCount: Number(functionConfig.pnp.full_node_retry_count ?? RETRY_COUNT),
+      fullNodeRetryDelayMs: Number(
+        functionConfig.pnp.full_node_retry_delay_ms ?? RETRY_DELAY_IN_MS
+      ),
     },
     domains: {
       serviceName: functionConfig.domains.service_name ?? defaultServiceName,
@@ -186,8 +188,10 @@ if (DEV_MODE) {
         versions: functionConfig.domains_keys.versions,
       },
       fullNodeTimeoutMs: Number(functionConfig.pnp.full_node_timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
-      retryCount: Number(functionConfig.pnp.retryCount ?? RETRY_COUNT),
-      retryDelayMs: Number(functionConfig.pnp.retryDelayMs ?? RETRY_DELAY_IN_MS),
+      fullNodeRetryCount: Number(functionConfig.pnp.full_node_retry_count ?? RETRY_COUNT),
+      fullNodeRetryDelayMs: Number(
+        functionConfig.pnp.full_node_retry_delay_ms ?? RETRY_DELAY_IN_MS
+      ),
     },
   }
 }
