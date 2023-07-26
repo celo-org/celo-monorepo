@@ -448,6 +448,7 @@ export const transferCalldata = async (
   amount: BigNumber,
   dataStr?: string,
   txOptions: {
+    chainId?: number
     gas?: number
     gasPrice?: string
     feeCurrency?: string
@@ -459,6 +460,7 @@ export const transferCalldata = async (
   return kit.sendTransaction({
     from: fromAddress,
     to: toAddress,
+    chainId: numberToHex(txOptions.chainId),
     value: amount.toString(),
     data: dataStr,
     gas: txOptions.gas,
