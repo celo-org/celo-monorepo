@@ -38,10 +38,13 @@ class ContractAddresses {
     libraryAddresses: LibraryAddresses['addresses']
   ) {
     const addresses = new Map()
+    let counter = 1 // TODO remove me
     await Promise.all(
       contracts.map(async (contract: string) => {
-        console.log(contract)
+        console.log('contract(l)', contract)
         const registeredAddress = await registry.getAddressForString(contract)
+        counter++
+
         if (!eqAddress(registeredAddress, NULL_ADDRESS)) {
           console.log('set contract', contract)
           addresses.set(contract, registeredAddress)
@@ -294,6 +297,7 @@ module.exports = async (callback: (error?: any) => number) => {
         contractArtifact = await artifacts.require(contractName) // I think it won't be able to find GasPriceMinimum here
       } catch {
         // it wasn't found in the standar artifacts folder, check if it's
+        console.log('argv.network', argv.network)
         contractArtifact = makeTruffleContractForMigrationWithoutSingleton(
           contractName,
           { ...networks[argv.network], name: argv.network },
