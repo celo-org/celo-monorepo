@@ -17,8 +17,7 @@ import { config } from '../../config'
 import { PnpSession } from '../session'
 
 export abstract class PnpQuotaService
-  implements QuotaService<SignMessageRequest | PnpQuotaRequest>
-{
+  implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
   protected abstract readonly requestsTable: REQUESTS_TABLE
   protected abstract readonly accountsTable: ACCOUNTS_TABLE
 
