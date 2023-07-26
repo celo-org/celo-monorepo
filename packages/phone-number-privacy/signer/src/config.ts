@@ -1,7 +1,7 @@
 import {
   BlockchainConfig,
-  DB_TIMEOUT,
   DB_POOL_MAX_SIZE,
+  DB_TIMEOUT,
   FULL_NODE_TIMEOUT_IN_MS,
   RETRY_COUNT,
   RETRY_DELAY_IN_MS,
