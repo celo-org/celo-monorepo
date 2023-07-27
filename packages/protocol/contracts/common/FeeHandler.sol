@@ -50,6 +50,8 @@ contract FeeHandler is
 
   address public feeBeneficiary;
 
+  uint256 public celoToBeBurned;
+
   // This mapping can not be public because it contains a FixidityLib.Fraction
   // and that'd be only supported with experimental features in this
   // compiler version
@@ -303,7 +305,7 @@ contract FeeHandler is
 
     uint256 balanceToBurn = (burnFraction.multiply(balanceToProcess).fromFixed());
 
-    tokenState.toDistribute += tokenState.toDistribute.add(
+    tokenState.toDistribute = tokenState.toDistribute.add(
       balanceToProcess.fromFixed().sub(balanceToBurn)
     );
 
@@ -321,13 +323,14 @@ contract FeeHandler is
     token.transfer(tokenState.handler, balanceToBurn);
     IFeeHandlerSeller handler = IFeeHandlerSeller(tokenState.handler);
 
-    handler.sell(
+    uint256 celoReceived = handler.sell(
       tokenAddress,
       registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
       balanceToBurn,
       FixidityLib.unwrap(tokenState.maxSlippage)
     );
 
+    celoToBeBurned = celoToBeBurned.add(celoReceived);
     tokenState.pastBurn = tokenState.pastBurn.add(balanceToBurn);
     updateLimits(tokenAddress, balanceToBurn);
 
@@ -476,14 +479,18 @@ contract FeeHandler is
 
     uint256 balanceOfCelo = address(this).balance;
 
-    uint256 balanceToProcess = balanceOfCelo.sub(tokenState.toDistribute);
-    uint256 balanceToBurn = FixidityLib
+    uint256 balanceToProcess = balanceOfCelo.sub(tokenState.toDistribute).sub(celoToBeBurned);
+    uint256 currentBalanceToBurn = FixidityLib
       .newFixed(balanceToProcess)
       .multiply(burnFraction)
       .fromFixed();
-    celo.burn(balanceToBurn);
+    uint256 totalBalanceToBurn = currentBalanceToBurn.add(celoToBeBurned);
+    celo.burn(totalBalanceToBurn);
 
-    tokenState.toDistribute = tokenState.toDistribute.add(balanceToProcess.sub(balanceToBurn));
+    celoToBeBurned = 0;
+    tokenState.toDistribute = tokenState.toDistribute.add(
+      balanceToProcess.sub(currentBalanceToBurn)
+    );
   }
 
   /**
@@ -534,7 +541,7 @@ contract FeeHandler is
   }
 
   /**
-    * @notice Allows owner to transfer tokens of this contract. It's meant for governance to 
+    * @notice Allows owner to transfer tokens of this contract. It's meant for governance to
       trigger use cases not contemplated in this contract.
       @param token The address of the token to transfer.
       @param recipient The address of the recipient to transfer the tokens to.

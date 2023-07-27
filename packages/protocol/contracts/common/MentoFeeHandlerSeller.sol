@@ -46,7 +46,7 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     address buyTokenAddress,
     uint256 amount,
     uint256 maxSlippage // as fraction,
-  ) external {
+  ) external returns (uint256) {
     require(
       buyTokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
       "Buy token can only be gold token"
@@ -79,8 +79,10 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     exchange.sell(amount, minAmount, false);
 
     IERC20 goldToken = getGoldToken();
-    goldToken.transfer(msg.sender, goldToken.balanceOf(address(this)));
+    uint256 celoAmount = goldToken.balanceOf(address(this));
+    goldToken.transfer(msg.sender, celoAmount);
 
     emit TokenSold(sellTokenAddress, buyTokenAddress, amount);
+    return celoAmount;
   }
 }

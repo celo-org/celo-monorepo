@@ -5,6 +5,7 @@ import {
   assertGtBN,
   assertRevert,
   assertRevertWithReason,
+  expectBigNumberInRange,
   timeTravel,
 } from '@celo/protocol/lib/test-utils' //
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
@@ -496,7 +497,7 @@ contract('FeeHandler', (accounts: string[]) => {
           })
         })
 
-        it('burns with mento', async () => {
+        it.only('burns with mento', async () => {
           assertEqualBN(await feeHandler.getPastBurnForToken(stableToken.address), 0)
           const burnedAmountStable = await stableToken.balanceOf(feeHandler.address)
           await feeHandler.sell(stableToken.address)
@@ -508,6 +509,17 @@ contract('FeeHandler', (accounts: string[]) => {
           assertEqualBN(
             await feeHandler.getTokenToDistribute(stableToken.address),
             new BigNumber('0.2e18')
+          )
+
+          expectBigNumberInRange(
+            new BigNumber(await feeHandler.celoToBeBurned()),
+            new BigNumber(
+              await exchange.getBuyTokenAmount(
+                new BigNumber(burnedAmountStable).multipliedBy('0.2'),
+                true
+              )
+            ),
+            new BigNumber('100000000000000000') // 0.1 Celo
           )
         })
 

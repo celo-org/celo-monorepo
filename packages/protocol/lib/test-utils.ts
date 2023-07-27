@@ -637,3 +637,20 @@ export const unlockAndAuthorizeKey = async (offset: number, authorizeFn: any, ac
     from: account,
   })
 }
+
+export function expectBigNumberInRange(real: BigNumber, expected: BigNumber, range: BigNumber) {
+  console.log("real", real.toString());
+  console.log("expected", expected.toString());
+  expect(
+    real.plus(range).gte(expected),
+    `Number ${real.toString()} is not in range <${expected.minus(range).toString()}, ${expected
+      .plus(range)
+      .toString()}>`
+  ).to.be.true;
+  expect(
+    real.minus(range).lte(expected),
+    `Number ${real.toString()} is not in range <${expected.minus(range).toString()}, ${expected
+      .plus(range)
+      .toString()}>`
+  ).to.be.true;
+}
