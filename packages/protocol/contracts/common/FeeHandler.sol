@@ -232,9 +232,6 @@ contract FeeHandler is
   }
 
   function _addToken(address tokenAddress, address handlerAddress) private {
-    // Check that the contract implements the interface
-    IFeeHandlerSeller(handlerAddress);
-
     TokenState storage tokenState = tokenStates[tokenAddress];
     tokenState.handler = handlerAddress;
 
