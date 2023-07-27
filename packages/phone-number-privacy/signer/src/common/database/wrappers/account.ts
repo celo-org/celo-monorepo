@@ -1,6 +1,7 @@
-import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
+import { config } from '../../../config'
 import { Histograms, meter } from '../../metrics'
 import { AccountRecord, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE, toAccountRecord } from '../models/account'
 import { countAndThrowDBError, tableWithLockForTrx } from '../utils'
@@ -26,7 +27,7 @@ export async function getPerformedQueryCount(
         .select(ACCOUNTS_COLUMNS.numLookups)
         .where(ACCOUNTS_COLUMNS.address, account)
         .first()
-        .timeout(DB_TIMEOUT)
+        .timeout(config.db.timeout)
       return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
     },
     [],
@@ -48,7 +49,7 @@ async function getAccountExists(
       const accountRecord = await tableWithLockForTrx(accounts(db, accountsTable), trx)
         .where(ACCOUNTS_COLUMNS.address, account)
         .first()
-        .timeout(DB_TIMEOUT)
+        .timeout(config.db.timeout)
 
       return !!accountRecord
     },
@@ -77,7 +78,7 @@ export async function incrementQueryCount(
           .transacting(trx)
           .where(ACCOUNTS_COLUMNS.address, account)
           .increment(ACCOUNTS_COLUMNS.numLookups, 1)
-          .timeout(DB_TIMEOUT)
+          .timeout(config.db.timeout)
       } else {
         const newAccountRecord = toAccountRecord(account, 1)
         await insertRecord(db, accountsTable, newAccountRecord, logger, trx)
@@ -98,7 +99,7 @@ async function insertRecord(
   trx: Knex.Transaction
 ): Promise<void> {
   try {
-    await accounts(db, accountsTable).transacting(trx).insert(data).timeout(DB_TIMEOUT)
+    await accounts(db, accountsTable).transacting(trx).insert(data).timeout(config.db.timeout)
   } catch (error) {
     countAndThrowDBError(error, logger, ErrorMessage.DATABASE_INSERT_FAILURE)
   }
