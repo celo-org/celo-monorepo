@@ -106,10 +106,6 @@ contract FeeHandler is
       tokens.length == newMaxSlippages.length,
       "maxSlippage length should match tokens length"
     );
-    require(
-      tokens.length == newMaxSlippages.length,
-      "newMininumReports length should match tokens length"
-    );
 
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
