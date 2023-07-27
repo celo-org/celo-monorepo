@@ -295,6 +295,10 @@ contract FeeHandler is
 
     TokenState storage tokenState = tokenStates[tokenAddress];
     require(tokenState.handler != address(0), "Handler has to be set to sell token");
+    require(
+      FixidityLib.unwrap(tokenState.maxSlippage) != 0,
+      "Max slippage has to be set to sell token"
+    );
     FixidityLib.Fraction memory balanceToProcess = FixidityLib.newFixed(
       token.balanceOf(address(this)).sub(tokenState.toDistribute)
     );
@@ -383,6 +387,7 @@ contract FeeHandler is
 
   function _setMaxSplippage(address token, uint256 newMax) private {
     TokenState storage tokenState = tokenStates[token];
+    require(newMax != 0, "Cannot set max slippage to zero");
     tokenState.maxSlippage = FixidityLib.wrap(newMax);
     require(
       FixidityLib.lte(tokenState.maxSlippage, FixidityLib.fixed1()),

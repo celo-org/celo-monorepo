@@ -366,11 +366,13 @@ contract('FeeHandler', (accounts: string[]) => {
 
           await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
           await exchange.sell(goldTokenAmount, 0, true, { from: user })
+          await feeHandler.setMaxSplippage(stableToken.address, toFixed(1 / 50))
           await feeHandler.addToken(stableToken.address, mentoSeller.address)
           await feeHandler.setBurnFraction(toFixed(80 / 100))
           await stableToken.transfer(feeHandler.address, new BigNumber('1e18'), {
             from: user,
           })
+          await feeHandler.setMaxSplippage(stableToken.address, toFixed(1))
 
           await feeHandler.sell(stableToken.address)
         })
@@ -446,6 +448,7 @@ contract('FeeHandler', (accounts: string[]) => {
         await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
         await exchange.sell(goldTokenAmount, 0, true, { from: user })
         await feeHandler.addToken(stableToken.address, mentoSeller.address)
+        await feeHandler.setMaxSplippage(stableToken.address, toFixed(1))
       })
 
       it("doesn't sell when balance is low", async () => {
@@ -497,9 +500,10 @@ contract('FeeHandler', (accounts: string[]) => {
           })
         })
 
-        it.only('burns with mento', async () => {
+        it('burns with mento', async () => {
           assertEqualBN(await feeHandler.getPastBurnForToken(stableToken.address), 0)
           const burnedAmountStable = await stableToken.balanceOf(feeHandler.address)
+          await feeHandler.setMaxSplippage(stableToken.address, toFixed(1))
           await feeHandler.sell(stableToken.address)
           assertEqualBN(
             await feeHandler.getPastBurnForToken(stableToken.address),
@@ -532,6 +536,7 @@ contract('FeeHandler', (accounts: string[]) => {
         })
 
         it("Doesn't burn balance if it hasn't distributed", async () => {
+          await feeHandler.setMaxSplippage(stableToken.address, toFixed(1))
           await feeHandler.sell(stableToken.address)
           const balanceFefore = await stableToken.balanceOf(feeHandler.address)
           await feeHandler.sell(stableToken.address)
@@ -590,6 +595,7 @@ contract('FeeHandler', (accounts: string[]) => {
         )
 
         await feeHandler.addToken(tokenA.address, uniswapFeeHandlerSeller.address)
+        await feeHandler.setMaxSplippage(tokenA.address, toFixed(1))
       })
 
       describe('Oracle check', async () => {
@@ -770,6 +776,8 @@ contract('FeeHandler', (accounts: string[]) => {
 
       await feeHandler.addToken(stableToken.address, mentoSeller.address)
       await feeHandler.addToken(stableToken2.address, mentoSeller.address)
+      await feeHandler.setMaxSplippage(stableToken.address, toFixed(1))
+      await feeHandler.setMaxSplippage(stableToken2.address, toFixed(1))
 
       await feeHandler.setBurnFraction(toFixed(80 / 100))
       await feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS)

@@ -193,9 +193,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     require(bestRouterQuote != 0, "Can't exchange with zero quote");
 
     uint256 minAmount = 0;
-    if (maxSlippage != 0) {
-      minAmount = calculateAllMinAmount(sellTokenAddress, maxSlippage, amount, bestRouter);
-    }
+    minAmount = calculateAllMinAmount(sellTokenAddress, maxSlippage, amount, bestRouter);
 
     IERC20(sellTokenAddress).approve(address(bestRouter), amount);
     bestRouter.swapExactTokensForTokens(

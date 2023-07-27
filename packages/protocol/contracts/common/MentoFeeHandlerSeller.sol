@@ -60,19 +60,16 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     IExchange exchange = IExchange(exchangeAddress);
 
     uint256 minAmount = 0;
-    if (maxSlippage != 0) {
-      // max slippage is set
 
-      ISortedOracles sortedOracles = getSortedOracles();
+    ISortedOracles sortedOracles = getSortedOracles();
 
-      require(
-        sortedOracles.numRates(sellTokenAddress) >= minimumReports[sellTokenAddress],
-        "Number of reports for token not enough"
-      );
+    require(
+      sortedOracles.numRates(sellTokenAddress) >= minimumReports[sellTokenAddress],
+      "Number of reports for token not enough"
+    );
 
-      (uint256 rateNumerator, uint256 rateDenominator) = sortedOracles.medianRate(sellTokenAddress);
-      minAmount = calculateMinAmount(rateNumerator, rateDenominator, amount, maxSlippage);
-    }
+    (uint256 rateNumerator, uint256 rateDenominator) = sortedOracles.medianRate(sellTokenAddress);
+    minAmount = calculateMinAmount(rateNumerator, rateDenominator, amount, maxSlippage);
 
     // TODO an upgrade would be to compare using routers as well
     stableToken.approve(exchangeAddress, amount);
