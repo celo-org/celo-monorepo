@@ -5,7 +5,7 @@ import { execSync } from 'child_process'
 import { readJSONSync } from 'fs-extra'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
-import { MENTO_PACKAGE } from '../contractPackages'
+import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 
 const fs = require('fs')
 const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
@@ -84,7 +84,7 @@ const OtherContracts = [
   'UsingRegistry',
 ]
 
-const externalContractPackages = [MENTO_PACKAGE]
+const contractPackages = [MENTO_PACKAGE, SOLIDITY_08_PACKAGE]
 
 const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
 
@@ -102,10 +102,25 @@ function compile(outdir: string) {
   console.log(`protocol: Compiling solidity to ${outdir}`)
 
   // the reason to generate a different folder is to avoid path collisions, which could be very dangerous
-  for (const externalContractPackage of externalContractPackages) {
-    console.log(`Building external contracts for ${externalContractPackage.name}`)
+  for (const contractPackage of contractPackages) {
+    console.log(`Building external contracts for ${contractPackage.name}`)
+
+    // Waning: Git is currently not fetching submodules when using old versiosn for build
+    fs.existsSync(`${contractPackage.folderPath}/${contractPackage.path}/contracts`)
+
+    let truffleConfig = ''
+    if (contractPackage.solidityVersion == '0.5') {
+      truffleConfig = 'truffle-config.js'
+    } else if (contractPackage.solidityVersion == '0.8') {
+      truffleConfig = 'truffle-config0.8.js'
+    }
+
+    if (!fs.existsSync(contracts08)) {
+      console.log("version doesn't exists")
+      continue
+    }
     exec(
-      `yarn run truffle compile --silent --contracts_directory=./lib/${externalContractPackage.path}/contracts --contracts_build_directory=./build/contracts-${externalContractPackage.name}` // todo change to outdir
+      `yarn run truffle compile --silent --contracts_directory=./${contractPackage.folderPath}/${contractPackage.path}/contracts --contracts_build_directory=./build/contracts-${contractPackage.name} -config ${truffleConfig}` // todo change to outdir
     )
   }
 
@@ -148,13 +163,13 @@ function compile(outdir: string) {
 
 function generateFilesForTruffle(outdir: string) {
   // tslint:disable-next-line
-  for (let externalContractPackage of externalContractPackages) {
-    const outdirExternal = outdir + '-' + externalContractPackage.name
+  for (let contractPackages of contractPackages) {
+    const outdirExternal = outdir + '-' + contractPackages.name
     console.log(
-      `protocol: Generating Truffle Types for external dependency ${externalContractPackage.name} to ${outdirExternal}`
+      `protocol: Generating Truffle Types for external dependency ${contractPackages.name} to ${outdirExternal}`
     )
 
-    const artifactPath = `${BUILD_DIR}/contracts-${externalContractPackage.name}/*.json`
+    const artifactPath = `${BUILD_DIR}/contracts-${contractPackages.name}/*.json`
 
     exec(
       `yarn run --silent typechain --target=truffle --outDir "${outdirExternal}" "${artifactPath}"`
@@ -207,16 +222,16 @@ async function generateFilesForContractKit(outdir: string) {
     })
   )
 
-  for (const externalContractPackage of externalContractPackages) {
+  for (const contractPackages of contractPackages) {
     await tsGenerator(
       { cwd, loggingLvl: 'info' },
       new Web3V1Celo({
         cwd,
         rawConfig: {
           files: `${BUILD_DIR}/contracts-${
-            externalContractPackage.name
-          }/@(${externalContractPackage.contracts.join('|')}).json`,
-          outDir: path.join(relativePath, externalContractPackage.name),
+            contractPackages.name
+          }/@(${contractPackages.contracts.join('|')}).json`,
+          outDir: path.join(relativePath, contractPackages.name),
         },
       })
     )
