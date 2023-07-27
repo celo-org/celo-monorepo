@@ -76,11 +76,10 @@ contract FeeHandler is
   event DailyLimitHit(address token, uint256 burning);
   event MaxSlippageSet(address token, uint256 maxSlippage);
   event DailySellLimitUpdated(uint256 amount);
-  event RouterAddressSet(address token, address router);
-  event RouterAddressRemoved(address token, address router);
-  event RouterUsed(address router);
   event FeeBeneficiarySet(address newBeneficiary);
   event BurnFractionSet(uint256 fraction);
+  event TokenAdded(address tokenAddress, address handlerAddress);
+  event TokenRemoved(address tokenAddress);
 
   /**
    * @notice Sets initialized == true on implementation contracts.
@@ -236,6 +235,7 @@ contract FeeHandler is
     tokenState.handler = handlerAddress;
 
     activeTokens.add(tokenAddress);
+    emit TokenAdded(tokenAddress, handlerAddress)
   }
 
   /**
@@ -285,6 +285,7 @@ contract FeeHandler is
     _deactivateToken(tokenAddress);
     TokenState storage tokenState = tokenStates[tokenAddress];
     tokenState.handler = address(0);
+    emit TokenRemoved(tokenAddress);
   }
 
   function _sell(address tokenAddress) private onlyWhenNotFrozen nonReentrant {
