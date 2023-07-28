@@ -235,7 +235,7 @@ contract FeeHandler is
     tokenState.handler = handlerAddress;
 
     activeTokens.add(tokenAddress);
-    emit TokenAdded(tokenAddress, handlerAddress)
+    emit TokenAdded(tokenAddress, handlerAddress);
   }
 
   /**
