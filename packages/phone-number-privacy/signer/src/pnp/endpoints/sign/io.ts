@@ -31,7 +31,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
   constructor(
     readonly enabled: boolean,
     readonly shouldFailOpen: boolean,
-    readonly timeoutMs: number,
+    readonly fullNodeTimeoutMs: number,
     readonly fullNodeRetryCount: number,
     readonly fullNodeRetryDelayMs: number,
     readonly kit: ContractKit
@@ -81,7 +81,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       logger,
       this.shouldFailOpen,
       warnings,
-      this.timeoutMs,
+      this.fullNodeTimeoutMs,
       this.fullNodeRetryCount,
       this.fullNodeRetryDelayMs
     )
