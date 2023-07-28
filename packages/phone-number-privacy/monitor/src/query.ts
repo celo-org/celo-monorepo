@@ -29,7 +29,7 @@ const newPrivateKey = async () => {
 export const queryOdisForSalt = async (
   blockchainProvider: string,
   contextName: OdisContextName,
-  endpoint: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN,
+  endpoint: CombinerEndpointPNP.PNP_SIGN,
   timeoutMs: number = 10000
 ) => {
   console.log(`contextName: ${contextName}`) // tslint:disable-line:no-console

@@ -2,7 +2,6 @@ import { timeout } from '@celo/base'
 import {
   ErrorMessage,
   getRequestKeyVersion,
-  LegacySignMessageRequest,
   SignMessageRequest,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -17,10 +16,8 @@ import { SignerConfig } from '../../../config'
 import { PnpQuotaService } from '../../services/quota'
 import { PnpSession } from '../../session'
 import { PnpSignIO } from './io'
-import { LegacyPnpSignIO } from './io.legacy'
 
-export abstract class PnpSignAction
-  implements Action<SignMessageRequest | LegacySignMessageRequest> {
+export abstract class PnpSignAction implements Action<SignMessageRequest> {
   protected abstract readonly requestsTable: REQUESTS_TABLE
 
   constructor(
@@ -28,11 +25,11 @@ export abstract class PnpSignAction
     readonly config: SignerConfig,
     readonly quota: PnpQuotaService,
     readonly keyProvider: KeyProvider,
-    readonly io: PnpSignIO | LegacyPnpSignIO
+    readonly io: PnpSignIO
   ) {}
 
   public async perform(
-    session: PnpSession<SignMessageRequest | LegacySignMessageRequest>,
+    session: PnpSession<SignMessageRequest>,
     timeoutError: symbol
   ): Promise<void> {
     // Compute quota lookup, update, and signing within transaction
@@ -144,7 +141,7 @@ export abstract class PnpSignAction
   private async sign(
     blindedMessage: string,
     key: Key,
-    session: Session<SignMessageRequest | LegacySignMessageRequest>
+    session: Session<SignMessageRequest>
   ): Promise<string> {
     let privateKey: string
     try {

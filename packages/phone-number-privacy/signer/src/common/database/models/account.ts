@@ -1,6 +1,5 @@
 export enum ACCOUNTS_TABLE {
   ONCHAIN = 'accountsOnChain',
-  LEGACY = 'accounts',
 }
 
 export enum ACCOUNTS_COLUMNS {

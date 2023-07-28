@@ -42,12 +42,6 @@ export interface SignMessageRequest {
   version?: string
 }
 
-/** previously known as GetBlindedMessageSigRequest */
-export interface LegacySignMessageRequest extends SignMessageRequest {
-  /** Optional on-chain identifier. Unlocks additional quota if the account is verified as an owner of the identifier. */
-  hashedPhoneNumber?: string
-}
-
 export const SignMessageRequestSchema: t.Type<SignMessageRequest> = t.intersection([
   t.type({
     account: t.string,
@@ -60,13 +54,6 @@ export const SignMessageRequestSchema: t.Type<SignMessageRequest> = t.intersecti
   }),
 ])
 
-export const LegacySignMessageRequestSchema: t.Type<LegacySignMessageRequest> = t.intersection([
-  SignMessageRequestSchema,
-  t.partial({
-    hashedPhoneNumber: t.union([t.string, t.undefined]),
-  }),
-])
-
 export interface PnpQuotaRequest {
   account: string
   /** Authentication method to use for verifying the signature in the Authorization header */
@@ -76,13 +63,6 @@ export interface PnpQuotaRequest {
   /** Client-specified version string */
   version?: string
 }
-export interface LegacyPnpQuotaRequest extends PnpQuotaRequest {
-  /** User's ODIS generated on-chain identifier */
-  hashedPhoneNumber?: string
-}
-
-// Backwards compatibility
-export declare type GetQuotaRequest = LegacyPnpQuotaRequest
 
 export const PnpQuotaRequestSchema: t.Type<PnpQuotaRequest> = t.intersection([
   t.type({
@@ -95,18 +75,7 @@ export const PnpQuotaRequestSchema: t.Type<PnpQuotaRequest> = t.intersection([
   }),
 ])
 
-export const LegacyPnpQuotaRequestSchema: t.Type<LegacyPnpQuotaRequest> = t.intersection([
-  PnpQuotaRequestSchema,
-  t.partial({
-    hashedPhoneNumber: t.union([t.string, t.undefined]),
-  }),
-])
-
-export type PhoneNumberPrivacyRequest =
-  | SignMessageRequest
-  | LegacySignMessageRequest
-  | PnpQuotaRequest
-  | LegacyPnpQuotaRequest
+export type PhoneNumberPrivacyRequest = SignMessageRequest | PnpQuotaRequest
 
 export enum DomainRequestTypeTag {
   SIGN = 'DomainRestrictedSignatureRequest',
@@ -526,9 +495,9 @@ export type SignMessageRequestHeader = KeyVersionHeader & PnpAuthHeader
 
 export type PnpQuotaRequestHeader = PnpAuthHeader
 
-export type PhoneNumberPrivacyRequestHeader<R extends PhoneNumberPrivacyRequest> = R extends
-  | SignMessageRequest
-  | LegacySignMessageRequest
+export type PhoneNumberPrivacyRequestHeader<
+  R extends PhoneNumberPrivacyRequest
+> = R extends SignMessageRequest
   ? SignMessageRequestHeader
   : never | R extends PnpQuotaRequest
   ? PnpQuotaRequestHeader

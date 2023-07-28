@@ -12,7 +12,7 @@ const logger = rootLogger('odis-monitor')
 export async function testPNPSignQuery(
   blockchainProvider: string,
   contextName: OdisContextName,
-  endpoint: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN,
+  endpoint: CombinerEndpointPNP.PNP_SIGN,
   timeoutMs?: number
 ) {
   logger.info(`Performing test PNP query for ${endpoint}`)
@@ -81,7 +81,6 @@ export async function serialLoadTest(
   blockchainProvider: string,
   contextName: OdisContextName,
   endpoint:
-    | CombinerEndpointPNP.LEGACY_PNP_SIGN
     | CombinerEndpointPNP.PNP_QUOTA
     | CombinerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.PNP_SIGN,
   timeoutMs?: number
@@ -89,7 +88,6 @@ export async function serialLoadTest(
   for (let i = 0; i < n; i++) {
     try {
       switch (endpoint) {
-        case CombinerEndpointPNP.LEGACY_PNP_SIGN:
         case CombinerEndpointPNP.PNP_SIGN:
           await testPNPSignQuery(blockchainProvider, contextName, endpoint, timeoutMs)
           break
@@ -105,7 +103,6 @@ export async function concurrentLoadTest(
   blockchainProvider: string,
   contextName: OdisContextName,
   endpoint:
-    | CombinerEndpointPNP.LEGACY_PNP_SIGN
     | CombinerEndpointPNP.PNP_QUOTA
     | CombinerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.PNP_SIGN,
   timeoutMs?: number
@@ -120,7 +117,6 @@ export async function concurrentLoadTest(
       while (true) {
         try {
           switch (endpoint) {
-            case CombinerEndpointPNP.LEGACY_PNP_SIGN:
             case CombinerEndpointPNP.PNP_SIGN:
               await testPNPSignQuery(blockchainProvider, contextName, endpoint, timeoutMs)
               break

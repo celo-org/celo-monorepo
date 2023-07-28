@@ -23,7 +23,6 @@ import { PnpQuotaAction } from './pnp/endpoints/quota/action'
 import { PnpQuotaIO } from './pnp/endpoints/quota/io'
 import { PnpSignAction } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
-import { LegacyPnpSignIO } from './pnp/endpoints/sign/io.legacy'
 import { PnpThresholdStateService } from './pnp/services/threshold-state'
 
 require('events').EventEmitter.defaultMaxListeners = 15
@@ -59,23 +58,6 @@ export function startCombiner(config: CombinerConfig, kit: ContractKit) {
   })
 
   const pnpThresholdStateService = new PnpThresholdStateService()
-
-  const legacyPnpSign = new Controller(
-    new PnpSignAction(
-      config.phoneNumberPrivacy,
-      pnpThresholdStateService,
-      new LegacyPnpSignIO(config.phoneNumberPrivacy, kit)
-    )
-  )
-  app.post(CombinerEndpoint.LEGACY_PNP_SIGN, (req, res) =>
-    meterResponse(
-      legacyPnpSign.handle.bind(legacyPnpSign),
-      req,
-      res,
-      CombinerEndpoint.LEGACY_PNP_SIGN,
-      config
-    )
-  )
 
   const pnpQuota = new Controller(
     new PnpQuotaAction(
