@@ -17,8 +17,8 @@ import { PnpQuotaService } from '../../services/quota'
 import { PnpSession } from '../../session'
 import { PnpSignIO } from './io'
 
-export abstract class PnpSignAction implements Action<SignMessageRequest> {
-  protected abstract readonly requestsTable: REQUESTS_TABLE
+export class PnpSignAction implements Action<SignMessageRequest> {
+  protected readonly requestsTable: REQUESTS_TABLE = REQUESTS_TABLE.ONCHAIN
 
   constructor(
     readonly db: Knex,

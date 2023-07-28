@@ -25,9 +25,9 @@ import { DomainSignIO } from './domain/endpoints/sign/io'
 import { DomainQuotaService } from './domain/services/quota'
 import { PnpQuotaAction } from './pnp/endpoints/quota/action'
 import { PnpQuotaIO } from './pnp/endpoints/quota/io'
-import { OnChainPnpSignAction } from './pnp/endpoints/sign/action.onchain'
+import { PnpSignAction } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
-import { OnChainPnpQuotaService } from './pnp/services/quota.onchain'
+import { PnpQuotaService } from './pnp/services/quota'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -83,7 +83,7 @@ export function startSigner(
       }
     })
 
-  const pnpQuotaService = new OnChainPnpQuotaService(db, kit)
+  const pnpQuotaService = new PnpQuotaService(db, kit)
   const domainQuotaService = new DomainQuotaService(db)
 
   const pnpQuota = new Controller(
@@ -101,7 +101,7 @@ export function startSigner(
     )
   )
   const pnpSign = new Controller(
-    new OnChainPnpSignAction(
+    new PnpSignAction(
       db,
       config,
       pnpQuotaService,
