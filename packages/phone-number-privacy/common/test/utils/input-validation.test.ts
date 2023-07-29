@@ -1,8 +1,6 @@
 import * as utils from '../../src/utils/input-validation'
 
 describe('Input Validation test suite', () => {
-  describe('isBodyReasonablySized utility', () => {})
-
   describe('hasValidAccountParam utility', () => {
     it('Should return true for proper address', () => {
       const sampleData = {
@@ -34,6 +32,4 @@ describe('Input Validation test suite', () => {
       expect(result).toBeFalsy()
     })
   })
-
-  describe('hasValidBlindedPhoneNumberParam utility', () => {})
 })
