@@ -39,8 +39,13 @@ oracle:
       {exchange: 'KUCOIN', symbol: 'CELOUSDT', toInvert: false},
       {exchange: 'KRAKEN', symbol: 'USDTEUR', toInvert: false}
     ],
+    [ 
+      {exchange: 'UPBIT', symbol: 'CELOKRW', toInvert: false}, 
+      {exchange: 'UPBIT', symbol: 'BTCKRW', toInvert: true},
+      {exchange: 'KRAKEN', symbol: 'BTCUSD', toInvert: false},
+    ]
     ]"
-  minPriceSourceCount: 2
+  minPriceSourceCount: 4
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:

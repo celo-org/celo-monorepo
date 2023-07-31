@@ -13,22 +13,27 @@ oracle:
   gasPriceMultiplier: 1.5
   priceSources: "[
       [
+        {exchange: 'BINANCE', symbol: 'USDCUSDT', toInvert: false},
+        {exchange: 'BINANCE', symbol: 'EURUSDT', toInvert: true}
+      ],
+      # US compatible
+      [
         {exchange: 'KRAKEN', symbol: 'USDCEUR', toInvert: false}
       ],
       [
         {exchange: 'COINBASE', symbol: 'USDTUSDC', toInvert: true},
         {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false}
-      ],
+      ],        
       [
-        {exchange: 'WHITEBIT', symbol: 'USDCUSDT', toInvert: false},
-        {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false}
+        {exchange: 'Bybit', symbol: 'USDCUSDT', toInvert: false},
+        {exchange: 'Bybit', symbol: 'USDTEUR', toInvert: false}
       ],
       [
         {exchange: 'KRAKEN', symbol: 'USDCUSD', toInvert: false},
         {exchange: 'KRAKEN', symbol: 'EURUSD', toInvert: true}
       ],
     ]"
-  minPriceSourceCount: 2
+  minPriceSourceCount: 3
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:

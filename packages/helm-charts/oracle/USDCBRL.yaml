@@ -13,34 +13,35 @@ oracle:
   gasPriceMultiplier: 1.5
   priceSources: "[
     [
+      {exchange: 'BINANCE', symbol: 'USDCUSDT', toInvert: false},
+      {exchange: 'BINANCE', symbol: 'USDTBRL', toInvert: false }
+    ],
+    [
+      {exchange: 'OKX', symbol: 'USDCUSDT', toInvert: false},
+      {exchange: 'BINANCE', symbol: 'USDTBRL', toInvert: false }
+    ],
+    [
+      {exchange: 'KRAKEN', symbol: 'USDCUSDT', toInvert: false},
+      {exchange: 'BINANCE', symbol: 'USDTBRL', toInvert: false }
+    ],
+    # US compatible
+    [
       { exchange: 'MERCADO', symbol: 'USDCBRL', toInvert: false }
     ],
     [
       {exchange: 'KRAKEN', symbol: 'USDCUSD', toInvert: false},
       {exchange: 'BITSO', symbol: 'USDBRL', toInvert: false }
-    ],
-    [
-      {exchange: 'COINBASE', symbol: 'USDTUSDC', toInvert: true},
-      {exchange: 'BINANCE', symbol: 'USDTBRL', toInvert: false }
-    ],
-    [
-      {exchange: 'WHITEBIT', symbol: 'USDCUSDT', toInvert: false},
-      {exchange: 'BINANCE', symbol: 'USDTBRL', toInvert: false }
-    ],
-    [
-      {exchange: 'KRAKEN', symbol: 'BTCUSDC', toInvert: true},
-      {exchange: 'BINANCE', symbol: 'BTCBRL', toInvert: false }
-    ],
+    ],    
     [
       {exchange: 'COINBASE', symbol: 'USDTUSDC', toInvert: true},
       {exchange: 'BITGET', symbol: 'USDTBRL', toInvert: false }
     ],
     [
-      {exchange: 'WHITEBIT', symbol: 'USDCUSDT', toInvert: false},
+      {exchange: 'BYBIT', symbol: 'USDCUSDT', toInvert: false},
       {exchange: 'BITGET', symbol: 'USDTBRL', toInvert: false }
     ],
    ]"
-  minPriceSourceCount: 2
+  minPriceSourceCount: 4
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
