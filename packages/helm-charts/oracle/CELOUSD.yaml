@@ -12,35 +12,35 @@ oracle:
   circuitBreakerPriceChangeThreshold: 0.25
   gasPriceMultiplier: 1.5
   priceSources: "[ 
-    [ 
-      {exchange: 'BINANCE', symbol: 'CELOBUSD', toInvert: false}, 
-      {exchange: 'COINBASE', symbol: 'BUSDUSD', toInvert: false} 
-    ], 
-    [ 
-      {exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false}, 
-      {exchange: 'KRAKEN', symbol: 'USDTUSD', toInvert: false} 
-    ],
-    # US compatible
-    [ 
-      {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false} 
-    ],
-    [ 
-      {exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false}, 
-      {exchange: 'COINBASE', symbol: 'BTCUSD', toInvert: false} 
-    ], 
-    [ 
-      {exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false}, 
-      {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false} 
-    ], 
-    [ 
-      {exchange: 'KUCOIN', symbol: 'CELOUSDT', toInvert: false}, 
-      {exchange: 'KRAKEN', symbol: 'USDTUSD', toInvert: false} 
-    ],
-    [ 
-      {exchange: 'UPBIT', symbol: 'CELOKRW', toInvert: false}, 
-      {exchange: 'UPBIT', symbol: 'BTCKRW', toInvert: true},
-      {exchange: 'KRAKEN', symbol: 'BTCUSD', toInvert: false},
-    ]
+      [ 
+        {exchange: 'BINANCE', symbol: 'CELOBUSD', toInvert: false}, 
+        {exchange: 'COINBASE', symbol: 'BUSDUSD', toInvert: false} 
+      ], 
+      [ 
+        {exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false}, 
+        {exchange: 'KRAKEN', symbol: 'USDTUSD', toInvert: false} 
+      ],
+      # US compatible
+      [ 
+        {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false} 
+      ],
+      [ 
+        {exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false}, 
+        {exchange: 'COINBASE', symbol: 'BTCUSD', toInvert: false} 
+      ], 
+      [ 
+        {exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false}, 
+        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false} 
+      ], 
+      [ 
+        {exchange: 'KUCOIN', symbol: 'CELOUSDT', toInvert: false}, 
+        {exchange: 'KRAKEN', symbol: 'USDTUSD', toInvert: false} 
+      ],
+      [ 
+        {exchange: 'UPBIT', symbol: 'CELOKRW', toInvert: false}, 
+        {exchange: 'UPBIT', symbol: 'BTCKRW', toInvert: true},
+        {exchange: 'KRAKEN', symbol: 'BTCUSD', toInvert: false},
+      ]
     ]"
   minPriceSourceCount: 3
   reportStrategy: BLOCK_BASED
