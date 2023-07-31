@@ -26,10 +26,6 @@ oracle:
       ],
       # US compatible
       [
-        { exchange: 'BINANCEUS', symbol: 'CELOUSD', toInvert: false },
-        { exchange: 'BITSO', symbol: 'USDBRL', toInvert: false }
-      ],
-      [
         { exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
         { exchange: 'BITSO', symbol: 'USDBRL', toInvert: false }
       ],
@@ -49,7 +45,7 @@ oracle:
       [ 
         {exchange: 'UPBIT', symbol: 'CELOKRW', toInvert: false}, 
         {exchange: 'UPBIT', symbol: 'BTCKRW', toInvert: true},
-        {exchange: 'BIGET', symbol: 'BTCBRL', toInvert: false},
+        {exchange: 'BITGET', symbol: 'BTCBRL', toInvert: false},
       ]
     ]"
   minPriceSourceCount: 4
