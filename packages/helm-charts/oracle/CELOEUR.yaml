@@ -13,6 +13,15 @@ oracle:
   gasPriceMultiplier: 1.5
   priceSources: "[
       [
+        {exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'BINANCE', symbol: 'EURUSDT', toInvert: true}
+      ],
+      [
+        {exchange: 'BINANCE', symbol: 'CELOBTC', toInvert: false},
+        {exchange: 'BINANCE', symbol: 'BTCEUR', toInvert: false}
+      ],
+      # US compatible
+      [
         {exchange: 'COINBASE', symbol: 'CELOEUR', toInvert: false}],
       [
         {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
@@ -23,14 +32,7 @@ oracle:
         {exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false},
         {exchange: 'COINBASE', symbol: 'BTCEUR', toInvert: false}
       ],
-      [
-        {exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false},
-        {exchange: 'BINANCE', symbol: 'EURUSDT', toInvert: true}
-      ],
-      [
-        {exchange: 'BINANCE', symbol: 'CELOBTC', toInvert: false},
-        {exchange: 'BINANCE', symbol: 'BTCEUR', toInvert: false}
-      ],
+      
       [
         {exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false},
         {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false}
