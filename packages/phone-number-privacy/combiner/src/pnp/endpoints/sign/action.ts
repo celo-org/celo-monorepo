@@ -17,6 +17,7 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
     this.responseLogger.logFailOpenResponses(session)
 
     if (session.crypto.hasSufficientSignatures()) {
+      // (14)
       try {
         const combinedSignature = session.crypto.combineBlindedSignatureShares(
           this.parseBlindedMessage(session.request.body),

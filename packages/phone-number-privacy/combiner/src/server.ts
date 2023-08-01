@@ -10,7 +10,7 @@ import {
 import Logger from 'bunyan'
 import express, { Request, RequestHandler, Response } from 'express'
 // tslint:disable-next-line: ordered-imports
-import { PerformanceObserver, performance } from 'perf_hooks'
+import { performance, PerformanceObserver } from 'perf_hooks'
 import { Controller } from './common/controller'
 import { CombinerConfig, getCombinerVersion } from './config'
 import { DomainDisableAction } from './domain/endpoints/disable/action'
@@ -96,8 +96,10 @@ export function startCombiner(config: CombinerConfig, kit: ContractKit) {
       new PnpSignIO(config.phoneNumberPrivacy, kit)
     )
   )
-  app.post(CombinerEndpoint.PNP_SIGN, (req, res) =>
-    meterResponse(pnpSign.handle.bind(pnpSign), req, res, CombinerEndpoint.PNP_SIGN, config)
+  app.post(
+    CombinerEndpoint.PNP_SIGN,
+    (req, res) =>
+      meterResponse(pnpSign.handle.bind(pnpSign), req, res, CombinerEndpoint.PNP_SIGN, config) // (1)
   )
 
   const domainThresholdStateService = new DomainThresholdStateService(config.domains)
@@ -169,6 +171,7 @@ export async function meterResponse(
   logger.info({ req: req.body }, 'Request received')
   const eventLoopLagMeasurementStart = Date.now()
   setTimeout(() => {
+    // (2)
     const eventLoopLag = Date.now() - eventLoopLagMeasurementStart
     logger.info({ eventLoopLag }, 'Measure event loop lag')
   })
@@ -185,7 +188,7 @@ export async function meterResponse(
   obs.observe({ entryTypes: ['measure'], buffered: false })
 
   performance.mark(startMark)
-  await handler(req, res)
+  await handler(req, res) // (3)
     .then(() => {
       logger.info({ res }, 'Response sent')
     })

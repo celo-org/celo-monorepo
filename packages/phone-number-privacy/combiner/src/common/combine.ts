@@ -25,11 +25,13 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
   abstract combine(session: Session<R>): void
 
   async perform(session: Session<R>) {
+    // (5)
     await this.distribute(session)
-    this.combine(session)
+    this.combine(session) // (13)
   }
 
   async distribute(session: Session<R>): Promise<void> {
+    // (6)
     const obs = new PerformanceObserver((list) => {
       // Possible race condition here: if multiple signers take exactly the same
       // amount of time, the PerformanceObserver callback may be called twice with
@@ -56,6 +58,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
     // An unexpected error in handling the result for one signer should not
     // block a threshold of correct responses, but should be logged.
     await Promise.all(
+      // (7)
       this.signers.map(async (signer) => {
         try {
           await this.forwardToSigner(signer, session)
@@ -78,6 +81,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
   }
 
   protected async forwardToSigner(signer: Signer, session: Session<R>): Promise<void> {
+    // (8)
     let signerFetchResult: FetchResponse | undefined
     try {
       signerFetchResult = await this.io.fetchSignerResponseWithFallback(signer, session)
@@ -104,6 +108,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
   }
 
   protected async handleFetchResult(
+    // (9)
     signer: Signer,
     session: Session<R>,
     signerFetchResult?: FetchResponse
@@ -129,6 +134,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
   }
 
   protected async receiveSuccess(
+    // (10)
     signerFetchResult: FetchResponse,
     url: string,
     session: Session<R>

@@ -12,7 +12,7 @@ export class Controller<R extends OdisRequest> {
     try {
       const session = await this.action.io.init(request, response)
       if (session) {
-        await this.action.perform(session)
+        await this.action.perform(session) // (4)
       }
     } catch (err) {
       response.locals.logger.error(

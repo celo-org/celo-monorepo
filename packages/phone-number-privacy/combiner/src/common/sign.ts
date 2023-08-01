@@ -49,7 +49,7 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
       throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
     }
 
-    const res = await super.receiveSuccess(signerResponse, url, session)
+    const res = await super.receiveSuccess(signerResponse, url, session) // (11)
 
     if (res.success) {
       const signatureAdditionStart = Date.now()
@@ -65,6 +65,7 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
       // Send response immediately once we cross threshold
       // BLS threshold signatures can be combined without all partial signatures
       if (session.crypto.hasSufficientSignatures()) {
+        // (12)
         try {
           session.crypto.combineBlindedSignatureShares(
             this.parseBlindedMessage(session.request.body),
