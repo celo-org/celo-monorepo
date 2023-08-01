@@ -40,7 +40,7 @@ export async function getPhoneNumberIdentifier(
   blsBlindingClient?: BlsBlindingClient,
   sessionID?: string,
   keyVersion?: number,
-  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
+  endpoint?: CombinerEndpointPNP.PNP_SIGN
 ): Promise<PhoneNumberHashDetails> {
   debug('Getting phone number pepper')
 
@@ -93,7 +93,7 @@ export async function getBlindedPhoneNumberSignature(
   clientVersion?: string,
   sessionID?: string,
   keyVersion?: number,
-  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
+  endpoint?: CombinerEndpointPNP.PNP_SIGN
 ): Promise<string> {
   return getBlindedIdentifierSignature(
     account,

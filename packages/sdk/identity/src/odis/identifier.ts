@@ -114,7 +114,7 @@ export async function getObfuscatedIdentifier(
   blsBlindingClient?: BlsBlindingClient,
   sessionID?: string,
   keyVersion?: number,
-  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN,
+  endpoint?: CombinerEndpointPNP.PNP_SIGN,
   abortController?: AbortController
 ): Promise<IdentifierHashDetails> {
   debug('Getting identifier pepper')
@@ -213,7 +213,7 @@ export async function getBlindedIdentifierSignature(
   clientVersion?: string,
   sessionID?: string,
   keyVersion?: number,
-  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN,
+  endpoint?: CombinerEndpointPNP.PNP_SIGN,
   abortControlller?: AbortController
 ): Promise<string> {
   const body: SignMessageRequest = {
