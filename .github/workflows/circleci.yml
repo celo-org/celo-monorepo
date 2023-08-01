@@ -134,7 +134,7 @@ jobs:
           # Using comma as separator to be able to easily match full paths (using ,<path>)
           separator: ','
           # Checking if changed in the last 100 commits in PRs
-          fetch_depth: '150'
+          fetch_depth: '250'
       - run: echo ",${{ steps.changed-files.outputs.all_modified_files }}"
   lint-checks:
     name: Lint code
