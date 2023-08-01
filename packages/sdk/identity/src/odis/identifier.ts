@@ -100,7 +100,6 @@ export interface IdentifierHashDetails {
  * @param blsBlindingClient Optional Performs blinding and unblinding, defaults to WasmBlsBlindingClient
  * @param sessionID Optional Used to track user sessions across the client and ODIS
  * @param keyVersion Optional For testing. Specifies which version key ODIS should use
- * @param endpoint Optional Allows client to specify the legacy endpoint if they desire (will be deprecated)
  * @param abortController Optional Allows client to specify a timeout for the ODIS request
  */
 export async function getObfuscatedIdentifier(
@@ -114,7 +113,6 @@ export async function getObfuscatedIdentifier(
   blsBlindingClient?: BlsBlindingClient,
   sessionID?: string,
   keyVersion?: number,
-  endpoint?: CombinerEndpointPNP.PNP_SIGN,
   abortController?: AbortController
 ): Promise<IdentifierHashDetails> {
   debug('Getting identifier pepper')
@@ -147,7 +145,6 @@ export async function getObfuscatedIdentifier(
     clientVersion,
     sessionID,
     keyVersion,
-    endpoint ?? CombinerEndpointPNP.PNP_SIGN,
     abortController
   )
 
@@ -202,7 +199,6 @@ export async function getBlindedIdentifier(
  * @param clientVersion Optional Specifies the client software version
  * @param sessionID Optional Used to track user sessions across the client and ODIS
  * @param keyVersion Optional For testing. Specifies which version key ODIS should use
- * @param endpoint Optional Allows client to specify the legacy endpoint if they desire (will be deprecated)
  * @param abortController Optional Allows client to specify a timeout for the ODIS request
  */
 export async function getBlindedIdentifierSignature(
@@ -213,7 +209,6 @@ export async function getBlindedIdentifierSignature(
   clientVersion?: string,
   sessionID?: string,
   keyVersion?: number,
-  endpoint?: CombinerEndpointPNP.PNP_SIGN,
   abortControlller?: AbortController
 ): Promise<string> {
   const body: SignMessageRequest = {
@@ -227,7 +222,7 @@ export async function getBlindedIdentifierSignature(
   const response = await queryOdis(
     body,
     context,
-    endpoint ?? CombinerEndpointPNP.PNP_SIGN,
+    CombinerEndpointPNP.PNP_SIGN,
     SignMessageResponseSchema,
     {
       [KEY_VERSION_HEADER]: keyVersion?.toString(),
