@@ -7,7 +7,7 @@ import {
   SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import express, { Request, Response } from 'express'
+import express, { Request, RequestHandler, Response } from 'express'
 import fs from 'fs'
 import https from 'https'
 import { Knex } from 'knex'
@@ -43,7 +43,7 @@ export function startSigner(
 
   logger.info('Creating signer express server')
   const app = express()
-  app.use(express.json({ limit: '0.2mb' }), loggerMiddleware(config.serviceName))
+  app.use(express.json({ limit: '0.2mb' }) as RequestHandler, loggerMiddleware(config.serviceName))
 
   app.get(SignerEndpoint.STATUS, (_req, res) => {
     res.status(200).json({

@@ -2,6 +2,7 @@ import {
   assertContainSubset,
   assertEqualBN,
   assertRevert,
+  assertTransactionRevertWithReason,
   mineBlocks,
 } from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
@@ -44,10 +45,11 @@ contract('BlockchainParameters', (accounts: string[]) => {
       })
     })
     it('only owner should be able to set', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         blockchainParameters.setBlockGasLimit(gasLimit, {
           from: accounts[1],
-        })
+        }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -74,10 +76,11 @@ contract('BlockchainParameters', (accounts: string[]) => {
       })
     })
     it('only owner should be able to set', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(gasLimit, {
           from: accounts[1],
-        })
+        }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -125,20 +128,30 @@ contract('BlockchainParameters', (accounts: string[]) => {
     })
 
     it('only owner should be able to set', () =>
-      assertRevert(
+      assertTransactionRevertWithReason(
         blockchainParameters.setUptimeLookbackWindow(newValue, {
           from: accounts[1],
-        })
+        }),
+        'Ownable: caller is not the owner'
       ))
 
     it('should fail when using value lower than safe minimum', () =>
-      assertRevert(blockchainParameters.setUptimeLookbackWindow(2)))
+      assertTransactionRevertWithReason(
+        blockchainParameters.setUptimeLookbackWindow(2),
+        'UptimeLookbackWindow must be within safe range'
+      ))
 
     it('should fail when using value greater than safe maximum', () =>
-      assertRevert(blockchainParameters.setUptimeLookbackWindow(721)))
+      assertTransactionRevertWithReason(
+        blockchainParameters.setUptimeLookbackWindow(721),
+        'UptimeLookbackWindow must be within safe range'
+      ))
 
     it('should fail when using value greater than epochSize - 2', () =>
-      assertRevert(blockchainParameters.setUptimeLookbackWindow(EPOCH - 1)))
+      assertTransactionRevertWithReason(
+        blockchainParameters.setUptimeLookbackWindow(EPOCH - 1),
+        'UptimeLookbackWindow must be smaller or equal to epochSize - 2'
+      ))
   })
 
   describe('#initialize()', () => {

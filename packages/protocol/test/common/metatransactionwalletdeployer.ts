@@ -10,9 +10,8 @@ const MetaTransactionWalletDeployer: MetaTransactionWalletDeployerContract = art
   'MetaTransactionWalletDeployer'
 )
 
-const MetaTransactionWallet: MetaTransactionWalletContract = artifacts.require(
-  'MetaTransactionWallet'
-)
+const MetaTransactionWallet: MetaTransactionWalletContract =
+  artifacts.require('MetaTransactionWallet')
 
 const Proxy: ProxyContract = artifacts.require('Proxy')
 
