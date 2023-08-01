@@ -10,7 +10,7 @@ import { RegistryInstance } from 'types'
 import { ReserveInstance, ReserveSpenderMultiSigInstance } from 'types/mento'
 import Web3 from 'web3'
 import { MENTO_PACKAGE } from '../contractPackages'
-import { ArtifactsSingleton } from './artifactsSingleton'
+import { ArtifactsSingleton } from '../lib/artifactsSingleton'
 
 import Web3Utils = require('web3-utils')
 
@@ -60,6 +60,8 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
         from: network.from,
         to: reserve.address,
         value: web3.utils.toWei(config.reserve.initialBalance.toString(), 'ether').toString(),
+        // @ts-ignore: typing not available https://github.com/web3/web3.js/issues/6123#issuecomment-1568250373
+        type: 0,
       })
 
       if (config.reserve.frozenAssetsStartBalance && config.reserve.frozenAssetsDays) {
@@ -71,10 +73,11 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
       }
     }
 
-    const reserveSpenderMultiSig: ReserveSpenderMultiSigInstance = await getDeployedProxiedContract<ReserveSpenderMultiSigInstance>(
-      CeloContractName.ReserveSpenderMultiSig,
-      ArtifactsSingleton.getInstance(MENTO_PACKAGE)
-    )
+    const reserveSpenderMultiSig: ReserveSpenderMultiSigInstance =
+      await getDeployedProxiedContract<ReserveSpenderMultiSigInstance>(
+        CeloContractName.ReserveSpenderMultiSig,
+        ArtifactsSingleton.getInstance(MENTO_PACKAGE)
+      )
     console.info(`Marking ${reserveSpenderMultiSig.address} as a reserve spender`)
     await reserve.addSpender(reserveSpenderMultiSig.address)
   },

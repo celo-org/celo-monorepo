@@ -2,7 +2,7 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
   assertLogMatches2,
-  assertRevert,
+  assertTransactionRevertWithReason,
   assumeOwnershipWithTruffle,
 } from '@celo/protocol/lib/test-utils'
 import {
@@ -81,7 +81,10 @@ contract('OdisPayments', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(odisPayments.initialize())
+      await assertTransactionRevertWithReason(
+        odisPayments.initialize(),
+        'contract already initialized'
+      )
     })
   })
 
@@ -153,8 +156,9 @@ contract('OdisPayments', (accounts: string[]) => {
     })
 
     it('should revert if transfer fails', async () => {
-      await assertRevert(
-        odisPayments.payInCUSD(sender, valueApprovedForTransfer + 1, { from: sender })
+      await assertTransactionRevertWithReason(
+        odisPayments.payInCUSD(sender, valueApprovedForTransfer + 1, { from: sender }),
+        'SafeERC20: low-level call failed'
       )
       assertEqualBN(await odisPayments.totalPaidCUSD(sender), 0)
     })

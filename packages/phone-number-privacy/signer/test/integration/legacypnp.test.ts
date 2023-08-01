@@ -284,8 +284,7 @@ describe('legacyPNP', () => {
       expectedTotalQuota: 10,
     },
     {
-      it:
-        'should calculate correct quota for account with min balance when no phone number hash is provided',
+      it: 'should calculate correct quota for account with min balance when no phone number hash is provided',
       account: ACCOUNT_ADDRESS1,
       performedQueryCount: 1,
       transactionCount: 0,

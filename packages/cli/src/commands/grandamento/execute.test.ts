@@ -45,7 +45,7 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
 
   const timeTravelDateAndChain = async (seconds: number) => {
     await timeTravel(seconds, web3)
-    jest.useFakeTimers('modern').setSystemTime(dateNowOriginal() + seconds * 1000)
+    jest.useFakeTimers().setSystemTime(dateNowOriginal() + seconds * 1000)
     // Otherwise contractkit complains there is a difference between Date.now()
     // and the timestamp of the last block
     process.env.NO_SYNCCHECK = 'true'

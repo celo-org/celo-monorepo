@@ -5,6 +5,7 @@ import {
   assertContainSubset,
   assertEqualBN,
   assertRevert,
+  assertTransactionRevertWithReason,
   mineBlocks,
 } from '@celo/protocol/lib/test-utils'
 import { normalizeAddressWith0x } from '@celo/utils/lib/address'
@@ -119,14 +120,15 @@ contract('Election', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         election.initialize(
           registry.address,
           electableValidators.min,
           electableValidators.max,
           maxNumGroupsVotedFor,
           electabilityThreshold
-        )
+        ),
+        'contract already initialized'
       )
     })
   })
@@ -141,7 +143,10 @@ contract('Election', (accounts: string[]) => {
 
     it('should revert when the threshold is larger than 100%', async () => {
       const threshold = toFixed(new BigNumber('2'))
-      await assertRevert(election.setElectabilityThreshold(threshold))
+      await assertTransactionRevertWithReason(
+        election.setElectabilityThreshold(threshold),
+        'Electability threshold must be lower than 100%'
+      )
     })
   })
 
@@ -175,29 +180,35 @@ contract('Election', (accounts: string[]) => {
     })
 
     it('should revert when the minElectableValidators is zero', async () => {
-      await assertRevert(election.setElectableValidators(0, newElectableValidators.max))
+      await assertTransactionRevertWithReason(
+        election.setElectableValidators(0, newElectableValidators.max),
+        'Minimum electable validators cannot be zero'
+      )
     })
 
     it('should revert when the min is greater than max', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         election.setElectableValidators(
           newElectableValidators.max.plus(1),
           newElectableValidators.max
-        )
+        ),
+        'Maximum electable validators cannot be smaller than minimum'
       )
     })
 
     it('should revert when the values are unchanged', async () => {
-      await assertRevert(
-        election.setElectableValidators(electableValidators.min, electableValidators.max)
+      await assertTransactionRevertWithReason(
+        election.setElectableValidators(electableValidators.min, electableValidators.max),
+        'Electable validators not changed'
       )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         election.setElectableValidators(newElectableValidators.min, newElectableValidators.max, {
           from: nonOwner,
-        })
+        }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -222,12 +233,16 @@ contract('Election', (accounts: string[]) => {
     })
 
     it('should revert when the maxNumGroupsVotedFor is unchanged', async () => {
-      await assertRevert(election.setMaxNumGroupsVotedFor(maxNumGroupsVotedFor))
+      await assertTransactionRevertWithReason(
+        election.setMaxNumGroupsVotedFor(maxNumGroupsVotedFor),
+        'Max groups voted for not changed'
+      )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevert(
-        election.setMaxNumGroupsVotedFor(newMaxNumGroupsVotedFor, { from: nonOwner })
+      await assertTransactionRevertWithReason(
+        election.setMaxNumGroupsVotedFor(newMaxNumGroupsVotedFor, { from: nonOwner }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -240,7 +255,7 @@ contract('Election', (accounts: string[]) => {
 
     it('should revert when vote over max number of groups set to true', async () => {
       await mockValidators.setValidator(accounts[0])
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         election.setAllowedToVoteOverMaxNumberOfGroups(true),
         'Validators cannot vote for more than max number of groups'
       )
@@ -248,7 +263,7 @@ contract('Election', (accounts: string[]) => {
 
     it('should revert when vote over max number of groups set to true', async () => {
       await mockValidators.setValidatorGroup(accounts[0])
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         election.setAllowedToVoteOverMaxNumberOfGroups(true),
         'Validator groups cannot vote for more than max number of groups'
       )
@@ -322,7 +337,10 @@ contract('Election', (accounts: string[]) => {
 
         describe('when the group has already been marked eligible', () => {
           it('should revert', async () => {
-            await assertRevert(election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS))
+            await assertTransactionRevertWithReason(
+              election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS),
+              'invalid key'
+            )
           })
         })
       })
@@ -330,7 +348,10 @@ contract('Election', (accounts: string[]) => {
 
     describe('not called by the registered validators contract', () => {
       it('should revert', async () => {
-        await assertRevert(election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS))
+        await assertTransactionRevertWithReason(
+          election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS),
+          'only registered contract'
+        )
       })
     })
   })
@@ -370,7 +391,10 @@ contract('Election', (accounts: string[]) => {
 
       describe('when not called by the registered Validators contract', () => {
         it('should revert', async () => {
-          await assertRevert(election.markGroupIneligible(group))
+          await assertTransactionRevertWithReason(
+            election.markGroupIneligible(group),
+            'only registered contract'
+          )
         })
       })
     })
@@ -382,7 +406,10 @@ contract('Election', (accounts: string[]) => {
         })
 
         it('should revert', async () => {
-          await assertRevert(election.markGroupIneligible(group))
+          await assertTransactionRevertWithReason(
+            election.markGroupIneligible(group),
+            'key not in list'
+          )
         })
       })
     })
@@ -522,7 +549,10 @@ contract('Election', (accounts: string[]) => {
             })
 
             it('should revert', async () => {
-              await assertRevert(election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS))
+              await assertTransactionRevertWithReason(
+                election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS),
+                'SafeMath: subtraction overflow'
+              )
             })
           })
         })
@@ -538,8 +568,9 @@ contract('Election', (accounts: string[]) => {
           })
 
           it('should revert', async () => {
-            await assertRevert(
-              election.vote(group, value.minus(maxNumGroupsVotedFor), newGroup, NULL_ADDRESS)
+            await assertTransactionRevertWithReason(
+              election.vote(group, value.minus(maxNumGroupsVotedFor), newGroup, NULL_ADDRESS),
+              'Voted for too many groups'
             )
           })
         })
@@ -587,7 +618,7 @@ contract('Election', (accounts: string[]) => {
             })
 
             it('should revert when turning off of setAllowedToVoteOverMaxNumberOfGroups', async () => {
-              await assertRevert(
+              await assertTransactionRevertWithReason(
                 election.setAllowedToVoteOverMaxNumberOfGroups(false),
                 'Too many groups voted for!'
               )
@@ -729,14 +760,20 @@ contract('Election', (accounts: string[]) => {
         })
 
         it('should revert', async () => {
-          await assertRevert(election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS))
+          await assertTransactionRevertWithReason(
+            election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS),
+            'Group cannot receive votes'
+          )
         })
       })
     })
 
     describe('when the group is not eligible', () => {
       it('should revert', async () => {
-        await assertRevert(election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS))
+        await assertTransactionRevertWithReason(
+          election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS),
+          'Group not eligible'
+        )
       })
     })
   })
@@ -855,14 +892,20 @@ contract('Election', (accounts: string[]) => {
 
       describe('when an epoch boundary has not passed since the pending votes were made', () => {
         it('should revert', async () => {
-          await assertRevert(election.activate(group))
+          await assertTransactionRevertWithReason(
+            election.activate(group),
+            'Pending vote epoch not passed'
+          )
         })
       })
     })
 
     describe('when the voter does not have pending votes', () => {
       it('should revert', async () => {
-        await assertRevert(election.activate(group))
+        await assertTransactionRevertWithReason(
+          election.activate(group),
+          'Vote value cannot be zero'
+        )
       })
     })
   })
@@ -981,14 +1024,20 @@ contract('Election', (accounts: string[]) => {
 
       describe('when an epoch boundary has not passed since the pending votes were made', () => {
         it('should revert', async () => {
-          await assertRevert(election.activateForAccount(group, voter))
+          await assertTransactionRevertWithReason(
+            election.activateForAccount(group, voter),
+            'Pending vote epoch not passed'
+          )
         })
       })
     })
 
     describe('when the voter does not have pending votes', () => {
       it('should revert', async () => {
-        await assertRevert(election.activateForAccount(group, voter))
+        await assertTransactionRevertWithReason(
+          election.activateForAccount(group, voter),
+          'Vote value cannot be zero'
+        )
       })
     })
   })
@@ -1132,8 +1181,9 @@ contract('Election', (accounts: string[]) => {
         describe('when the wrong index is provided', () => {
           const index = 1
           it('should revert', async () => {
-            await assertRevert(
-              election.revokePending(group, value, NULL_ADDRESS, NULL_ADDRESS, index)
+            await assertTransactionRevertWithReason(
+              election.revokePending(group, value, NULL_ADDRESS, NULL_ADDRESS, index),
+              'Bad index'
             )
           })
         })
@@ -1142,8 +1192,9 @@ contract('Election', (accounts: string[]) => {
       describe('when the revoked value is greater than the pending votes', () => {
         const index = 0
         it('should revert', async () => {
-          await assertRevert(
-            election.revokePending(group, value + 1, NULL_ADDRESS, NULL_ADDRESS, index)
+          await assertTransactionRevertWithReason(
+            election.revokePending(group, value + 1, NULL_ADDRESS, NULL_ADDRESS, index),
+            'Vote value larger than pending votes'
           )
         })
       })
@@ -1378,8 +1429,9 @@ contract('Election', (accounts: string[]) => {
         describe('when the wrong index is provided', () => {
           const index = 1
           it('should revert', async () => {
-            await assertRevert(
-              election.revokeActive(group, voteValue0 + reward0, NULL_ADDRESS, NULL_ADDRESS, index)
+            await assertTransactionRevertWithReason(
+              election.revokeActive(group, voteValue0 + reward0, NULL_ADDRESS, NULL_ADDRESS, index),
+              'Bad index'
             )
           })
         })
@@ -1388,14 +1440,15 @@ contract('Election', (accounts: string[]) => {
       describe('when the revoked value is greater than the active votes', () => {
         const index = 0
         it('should revert', async () => {
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             election.revokeActive(
               group,
               voteValue0 + reward0 + 1,
               NULL_ADDRESS,
               NULL_ADDRESS,
               index
-            )
+            ),
+            'Vote value larger than active votes'
           )
         })
       })
@@ -2185,7 +2238,7 @@ contract('Election', (accounts: string[]) => {
       describe('when `forceDecrementVotes` is called with malformed inputs', () => {
         describe('when called to slash more value than groups have', () => {
           it('should revert', async () => {
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               election.forceDecrementVotes(
                 voter,
                 value + value2 + 1,
@@ -2193,7 +2246,8 @@ contract('Election', (accounts: string[]) => {
                 [NULL_ADDRESS, group2],
                 [0, 1],
                 { from: accounts[2] }
-              )
+              ),
+              'only registered contract'
             )
           })
         })
@@ -2202,7 +2256,7 @@ contract('Election', (accounts: string[]) => {
           it('should revert', async () => {
             const slashedValue = value
             // `group` should be listed as a lesser for index 0 (group2's lesser)
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               election.forceDecrementVotes(
                 voter,
                 slashedValue,
@@ -2210,7 +2264,8 @@ contract('Election', (accounts: string[]) => {
                 [NULL_ADDRESS, group2],
                 [0, 1],
                 { from: accounts[2] }
-              )
+              ),
+              'only registered contract'
             )
           })
         })
@@ -2218,7 +2273,7 @@ contract('Election', (accounts: string[]) => {
         describe('when called to slash with incorrect indices', () => {
           it('should revert', async () => {
             const slashedValue = value
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               election.forceDecrementVotes(
                 voter,
                 slashedValue,
@@ -2226,21 +2281,23 @@ contract('Election', (accounts: string[]) => {
                 [NULL_ADDRESS, group2],
                 [0, 0],
                 { from: accounts[2] }
-              )
+              ),
+              'only registered contract'
             )
           })
         })
 
         describe('when called from an address other than the locked gold contract', () => {
           it('should revert', async () => {
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               election.forceDecrementVotes(
                 voter,
                 value,
                 [group, NULL_ADDRESS],
                 [NULL_ADDRESS, group2],
                 [0, 0]
-              )
+              ),
+              'only registered contract'
             )
           })
         })

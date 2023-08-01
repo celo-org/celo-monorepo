@@ -4,13 +4,10 @@ import { OdisUtils as OdisUtilsOld } from 'old-identity-sdk'
 import { OdisUtils } from '../../lib'
 import { WasmBlsBlindingClient } from './bls-blinding-client'
 import { AuthenticationMethod, AuthSigner, getServiceContext, OdisContextName } from './query'
+import fetchMock from '../__mocks__/cross-fetch'
 
-const {
-  getBlindedIdentifier,
-  getIdentifierHash,
-  getObfuscatedIdentifier,
-  IdentifierPrefix,
-} = OdisUtils.Identifier
+const { getBlindedIdentifier, getIdentifierHash, getObfuscatedIdentifier, IdentifierPrefix } =
+  OdisUtils.Identifier
 
 const mockE164Number = '+14155550000'
 const mockAccount = '0x755dB5fF7B82e9a96e0dDDD143293dc2ADeC0050'

@@ -3,7 +3,7 @@ import { constitution } from '@celo/protocol/governanceConstitution'
 import {
   addressMinedLatestBlock,
   assertEqualBN,
-  assertRevert,
+  assertTransactionRevertWithReason,
   assumeOwnershipWithTruffle,
   stripHexEncoding,
   timeTravel,
@@ -38,7 +38,7 @@ import {
   StableTokenInstance,
 } from 'types/mento'
 import { MENTO_PACKAGE } from '../../contractPackages'
-import { ArtifactsSingleton } from '../../migrations/artifactsSingleton'
+import { ArtifactsSingleton } from '../../lib/artifactsSingleton'
 import { SECONDS_IN_A_WEEK } from '../constants'
 
 enum VoteValue {
@@ -665,12 +665,18 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
 
     it(`should be impossible to sell CELO`, async () => {
       await goldToken.approve(exchangeAbc.address, sellAmount)
-      await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, true))
+      await assertTransactionRevertWithReason(
+        exchangeAbc.sell(sellAmount, minBuyAmount, true),
+        'token address cannot be null'
+      )
     })
 
     it(`should be impossible to sell stable token`, async () => {
       await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
-      await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, false))
+      await assertTransactionRevertWithReason(
+        exchangeAbc.sell(sellAmount, minBuyAmount, false),
+        'token address cannot be null'
+      )
     })
   })
 
@@ -692,12 +698,18 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
 
     it(`should be impossible to sell CELO`, async () => {
       await goldToken.approve(exchangeAbc.address, sellAmount)
-      await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, true))
+      await assertTransactionRevertWithReason(
+        exchangeAbc.sell(sellAmount, minBuyAmount, true),
+        "can't call when contract is frozen"
+      )
     })
 
     it(`should be impossible to sell stable token`, async () => {
       await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
-      await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, false))
+      await assertTransactionRevertWithReason(
+        exchangeAbc.sell(sellAmount, minBuyAmount, false),
+        "can't call when contract is frozen"
+      )
     })
   })
 

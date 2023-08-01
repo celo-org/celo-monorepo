@@ -10,7 +10,8 @@ import { PnpQuotaService } from './quota'
 
 export class OnChainPnpQuotaService
   extends PnpQuotaService
-  implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
+  implements QuotaService<SignMessageRequest | PnpQuotaRequest>
+{
   protected readonly requestsTable = REQUESTS_TABLE.ONCHAIN
   protected readonly accountsTable = ACCOUNTS_TABLE.ONCHAIN
   /*

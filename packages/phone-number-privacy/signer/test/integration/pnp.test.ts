@@ -41,13 +41,8 @@ const {
   getPnpRequestAuthorization,
   getPnpSignRequest,
 } = TestUtils.Utils
-const {
-  PRIVATE_KEY1,
-  ACCOUNT_ADDRESS1,
-  mockAccount,
-  DEK_PRIVATE_KEY,
-  DEK_PUBLIC_KEY,
-} = TestUtils.Values
+const { PRIVATE_KEY1, ACCOUNT_ADDRESS1, mockAccount, DEK_PRIVATE_KEY, DEK_PUBLIC_KEY } =
+  TestUtils.Values
 
 jest.setTimeout(20000)
 

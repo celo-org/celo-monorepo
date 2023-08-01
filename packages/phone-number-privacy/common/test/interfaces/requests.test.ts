@@ -7,6 +7,7 @@ import {
   noString,
 } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
+import { bufferToHex } from '@ethereumjs/util'
 import {
   Domain,
   DomainIdentifiers,
@@ -31,18 +32,20 @@ import {
 
 // Compile-time check that DomainRestrictedSignatureRequest can be cast to type EIP712Object.
 export let TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712: EIP712Object
-TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712 = ({} as unknown) as DomainRestrictedSignatureRequest
-TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712 = ({} as unknown) as DomainRestrictedSignatureRequest<Domain>
+TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712 =
+  {} as unknown as DomainRestrictedSignatureRequest
+TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712 =
+  {} as unknown as DomainRestrictedSignatureRequest<Domain>
 
 // Compile-time check that DomainQuotaStatusRequest can be cast to type EIP712Object.
 export let TEST_DOMAIN_QUOTA_STATUS_REQUEST_IS_EIP712: EIP712Object
-TEST_DOMAIN_QUOTA_STATUS_REQUEST_IS_EIP712 = ({} as unknown) as DomainQuotaStatusRequest
-TEST_DOMAIN_QUOTA_STATUS_REQUEST_IS_EIP712 = ({} as unknown) as DomainQuotaStatusRequest<Domain>
+TEST_DOMAIN_QUOTA_STATUS_REQUEST_IS_EIP712 = {} as unknown as DomainQuotaStatusRequest
+TEST_DOMAIN_QUOTA_STATUS_REQUEST_IS_EIP712 = {} as unknown as DomainQuotaStatusRequest<Domain>
 
 // Compile-time check that DomainQuotaStatusRequest can be cast to type EIP712Object.
 export let TEST_DISABLE_DOMAIN_REQUEST_IS_EIP712: EIP712Object
-TEST_DISABLE_DOMAIN_REQUEST_IS_EIP712 = ({} as unknown) as DisableDomainRequest
-TEST_DISABLE_DOMAIN_REQUEST_IS_EIP712 = ({} as unknown) as DisableDomainRequest<Domain>
+TEST_DISABLE_DOMAIN_REQUEST_IS_EIP712 = {} as unknown as DisableDomainRequest
+TEST_DISABLE_DOMAIN_REQUEST_IS_EIP712 = {} as unknown as DisableDomainRequest<Domain>
 
 describe('domainRestrictedSignatureRequestEIP712()', () => {
   it('should generate the correct type data for request with SequentialDelayDomain', () => {
@@ -62,10 +65,10 @@ describe('domainRestrictedSignatureRequestEIP712()', () => {
       blindedMessage: '<blinded message>',
       sessionID: noString,
     }
-    const expectedHash = '9914e6bc3bd0d63727eeae4008654920b9879654f7159b1d5ab33768e61f56df'
+    const expectedHash = '0x9914e6bc3bd0d63727eeae4008654920b9879654f7159b1d5ab33768e61f56df'
     const typedData = domainRestrictedSignatureRequestEIP712(request)
     // console.debug(JSON.stringify(typedData, null, 2))
-    expect(generateTypedDataHash(typedData).toString('hex')).toEqual(expectedHash)
+    expect(bufferToHex(generateTypedDataHash(typedData))).toEqual(expectedHash)
   })
 })
 
@@ -86,10 +89,10 @@ describe('domainQuotaStatusRequestEIP712()', () => {
       },
       sessionID: noString,
     }
-    const expectedHash = '0c1545b83f28d8d0f24886fa0d21ac540af706dd6f9ee6d045bac17780a2656e'
+    const expectedHash = '0x0c1545b83f28d8d0f24886fa0d21ac540af706dd6f9ee6d045bac17780a2656e'
     const typedData = domainQuotaStatusRequestEIP712(request)
     //console.debug(JSON.stringify(typedData, null, 2))
-    expect(generateTypedDataHash(typedData).toString('hex')).toEqual(expectedHash)
+    expect(bufferToHex(generateTypedDataHash(typedData))).toEqual(expectedHash)
   })
 })
 
@@ -110,10 +113,10 @@ describe('disableDomainRequestEIP712()', () => {
       },
       sessionID: noString,
     }
-    const expectedHash = 'd30be7d1b1bb3a9a0b2b2148d9ea3fcae7775dc31ce984d658f90295887a323a'
+    const expectedHash = '0xd30be7d1b1bb3a9a0b2b2148d9ea3fcae7775dc31ce984d658f90295887a323a'
     const typedData = disableDomainRequestEIP712(request)
     console.debug(JSON.stringify(typedData, null, 2))
-    expect(generateTypedDataHash(typedData).toString('hex')).toEqual(expectedHash)
+    expect(bufferToHex(generateTypedDataHash(typedData))).toEqual(expectedHash)
   })
 })
 

@@ -65,9 +65,9 @@ testWithGanache('Account claims', (web3) => {
       const myUrl = 'https://www.test.com/'
       const accounts = await kit.contracts.getAccounts()
       await accounts.createAccount().send({ from: address })
-      await accounts.setMetadataURL(myUrl).send({ from: address })
+      await accounts.setMetadataURL(myUrl).sendAndWaitForReceipt({ from: address, gas: 0 })
       await accounts.createAccount().send({ from: otherAddress })
-      await accounts.setMetadataURL(myUrl).send({ from: otherAddress })
+      await accounts.setMetadataURL(myUrl).sendAndWaitForReceipt({ from: otherAddress, gas: 0 })
 
       IdentityMetadataWrapper.fetchFromURL = () => Promise.resolve(otherMetadata)
 
@@ -82,7 +82,9 @@ testWithGanache('Account claims', (web3) => {
 
     describe('when the metadata URL of the other account has not been set', () => {
       beforeEach(async () => {
-        await (await kit.contracts.getAccounts()).setMetadataURL('').send({ from: otherAddress })
+        await (await kit.contracts.getAccounts())
+          .setMetadataURL('')
+          .sendAndWaitForReceipt({ from: otherAddress, gas: 0 })
       })
 
       it('indicates that the metadata url could not be retrieved', async () => {
