@@ -1,4 +1,5 @@
 export enum REQUESTS_TABLE {
+  LEGACY = 'requests',
   ONCHAIN = 'requestsOnChain',
 }
 

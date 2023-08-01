@@ -1,8 +1,14 @@
 import { rootLogger } from '@celo/phone-number-privacy-common'
+import Logger from 'bunyan'
 import { Knex, knex } from 'knex'
 import { DEV_MODE, SignerConfig, SupportedDatabase, VERBOSE_DB_LOGGING } from '../../config'
+import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from './models/account'
 
-export async function initDatabase(config: SignerConfig, migrationsPath?: string): Promise<Knex> {
+export async function initDatabase(
+  config: SignerConfig,
+  migrationsPath?: string,
+  doTestQuery = true
+): Promise<Knex> {
   const logger = rootLogger(config.serviceName)
   logger.info({ config: config.db }, 'Initializing database connection')
   const { type, host, port, user, password, database, ssl, poolMaxSize } = config.db
@@ -66,6 +72,26 @@ export async function initDatabase(config: SignerConfig, migrationsPath?: string
     loadExtensions: ['.js'],
   })
 
+  if (doTestQuery) {
+    await executeTestQuery(db, logger)
+  }
+
   logger.info('Database initialized successfully')
   return db
+}
+
+async function executeTestQuery(db: Knex, logger: Logger) {
+  logger.info('Counting accounts')
+  const result = await db(ACCOUNTS_TABLE.LEGACY).count(ACCOUNTS_COLUMNS.address).first()
+
+  if (!result) {
+    throw new Error('No result from count, have migrations been run?')
+  }
+
+  const count = Object.values(result)[0]
+  if (count === undefined || count === null || count === '') {
+    throw new Error('No result from count, have migrations been run?')
+  }
+
+  logger.info(`Found ${count} accounts`)
 }
