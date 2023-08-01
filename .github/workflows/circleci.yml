@@ -11,7 +11,7 @@ on:
       # TODO (soloseng): remove before merge
       - soloseng/ganache-upgrade
   # TODO(jcortejoso): Replace by pull_request
-  pull_request_target:
+  pull_request:
     branches:
       - master
 
