@@ -1265,12 +1265,6 @@ contract Governance is
     // solhint-disable-next-line not-rely-on-time
     if (now >= lastDequeue.add(dequeueFrequency)) {
       Proposals.Proposal storage proposal = proposals[proposalId];
-
-      if (_isQueuedProposalExpired(proposal)) {
-        emit ProposalExpired(proposalId);
-        return isProposalDequeued;
-      }
-
       // Updating refunds back to proposer
       refundedDeposits[proposal.proposer] = refundedDeposits[proposal.proposer].add(
         proposal.deposit
