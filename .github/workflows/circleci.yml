@@ -131,7 +131,7 @@ jobs:
           yarn check-licenses
       - name: Detect files changed in PR, and expose as output
         id: changed-files
-        uses: tj-actions/changed-files@v35
+        uses: tj-actions/changed-files@v37
         with:
           # Using comma as separator to be able to easily match full paths (using ,<path>)
           separator: ','
