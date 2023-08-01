@@ -8,8 +8,7 @@ on:
   push:
     branches:
       - master
-  # TODO(jcortejoso): Replace by pull_request
-  pull_request_target:
+  pull_request:
     branches:
       - master
 
@@ -134,7 +133,7 @@ jobs:
           # Using comma as separator to be able to easily match full paths (using ,<path>)
           separator: ','
           # Checking if changed in the last 100 commits in PRs
-          fetch_depth: '250'
+          fetch_depth: '150'
       - run: echo ",${{ steps.changed-files.outputs.all_modified_files }}"
   lint-checks:
     name: Lint code
@@ -463,7 +462,7 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v35
         with:
-          fetch_depth: '250'
+          fetch_depth: '150'
       - name: Generate DevChain
         run: |
           cd packages/sdk/identity
