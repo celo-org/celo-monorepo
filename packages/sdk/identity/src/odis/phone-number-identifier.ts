@@ -39,7 +39,6 @@ export async function getPhoneNumberIdentifier(
   blsBlindingClient?: BlsBlindingClient,
   sessionID?: string,
   keyVersion?: number
-  // endpoint?: CombinerEndpointPNP.PNP_SIGN
 ): Promise<PhoneNumberHashDetails> {
   debug('Getting phone number pepper')
 
