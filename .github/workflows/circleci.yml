@@ -463,7 +463,7 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v35
         with:
-          fetch_depth: '100'
+          fetch_depth: '250'
       - name: Generate DevChain
         run: |
           cd packages/sdk/identity
