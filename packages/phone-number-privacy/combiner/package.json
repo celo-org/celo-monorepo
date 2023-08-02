@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-combiner",
-  "version": "3.0.0-dev",
+  "version": "3.0.0-beta.1",
   "description": "Orchestrates and combines threshold signatures for use in ODIS",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -28,10 +28,10 @@
     "test:e2e:alfajores": "CONTEXT_NAME=alfajores yarn test:e2e"
   },
   "dependencies": {
-    "@celo/contractkit": "^4.1.1-dev",
-    "@celo/phone-number-privacy-common": "^3.0.0-dev",
-    "@celo/identity": "^4.1.1-dev",
-    "@celo/encrypted-backup": "^4.1.1-dev",
+    "@celo/contractkit": "^4.1.1-beta.1",
+    "@celo/phone-number-privacy-common": "^3.0.0-beta.1",
+    "@celo/identity": "^4.1.1-beta.1",
+    "@celo/encrypted-backup": "^4.1.1-beta.1",
     "@celo/identity-prev": "npm:@celo/identity@1.2.0",
     "@celo/poprf": "^0.1.9",
     "@types/bunyan": "^1.8.8",
@@ -46,8 +46,8 @@
     "uuid": "^7.0.3"
   },
   "devDependencies": {
-    "@celo/utils": "^4.1.1-dev",
-    "@celo/phone-utils": "^4.1.1-dev",
+    "@celo/utils": "^4.1.1-beta.1",
+    "@celo/phone-utils": "^4.1.1-beta.1",
     "@types/express": "^4.17.6",
     "@types/supertest": "^2.0.12",
     "@types/uuid": "^7.0.3",
