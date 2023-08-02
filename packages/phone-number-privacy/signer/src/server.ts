@@ -8,9 +8,11 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, RequestHandler, Response } from 'express'
+import { Express } from 'express-serve-static-core'
 import fs from 'fs'
 import https from 'https'
 import { Knex } from 'knex'
+import { IncomingMessage, ServerResponse } from 'node:http'
 import * as PromClient from 'prom-client'
 import { Controller } from './common/controller'
 import { KeyProvider } from './common/key-management/key-provider-base'
@@ -28,7 +30,6 @@ import { PnpQuotaIO } from './pnp/endpoints/quota/io'
 import { PnpSignAction } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
 import { PnpQuotaService } from './pnp/services/quota'
-export { Express } from 'express-serve-static-core'
 
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
@@ -41,7 +42,7 @@ export function startSigner(
   db: Knex,
   keyProvider: KeyProvider,
   kit?: ContractKit
-) {
+): Express | https.Server<typeof IncomingMessage, typeof ServerResponse> {
   const logger = rootLogger(config.serviceName)
 
   kit = kit ?? getContractKit(config.blockchain)
