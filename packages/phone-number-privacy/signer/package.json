@@ -8,6 +8,7 @@
   "scripts": {
     "start": "yarn build && node -r dotenv/config dist/index.js",
     "start:docker": "yarn build && node dist/index.js",
+    "start:docker:tracing": "yarn build && node --require ./dist/tracing.js dist/index.js",
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
     "lint": "tslint --project .",
