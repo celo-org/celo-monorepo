@@ -28,15 +28,19 @@ oracle:
         {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
       ],
       [
+        {exchange: 'OKX', symbol: 'USDCUSDT', toInvert: false},
+        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
+      ],
+      [
         {exchange: 'Bybit', symbol: 'USDTUSDC', toInvert: true},
         {exchange: 'Kraken', symbol: 'USDTUSD', toInvert: false}
       ],
       [
         {exchange: 'WHITEBIT', symbol: 'USDCUSDT', toInvert: false},
-        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
+        {exchange: 'BITSTAMP', symbol: 'USDTUSD', toInvert: false}
       ]
     ]"
-  minPriceSourceCount: 3
+  minPriceSourceCount: 4
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
