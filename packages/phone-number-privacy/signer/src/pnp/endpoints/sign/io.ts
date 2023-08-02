@@ -76,6 +76,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     logger: Logger
   ): Promise<boolean> {
     return authenticateUser(
+      // TODO Optimize Full Node Request
       request,
       this.kit,
       logger,

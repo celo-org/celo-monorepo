@@ -183,6 +183,7 @@ export async function getOnChainOdisPayments(
   endpoint: string
 ): Promise<BigNumber> {
   return meter(
+    // TODO Optimize Full Node Request
     retryAsyncWithBackOffAndTimeout,
     [
       async () => (await kit.contracts.getOdisPayments()).totalPaidCUSD(account),

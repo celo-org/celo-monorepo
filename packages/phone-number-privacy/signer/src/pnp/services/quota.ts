@@ -41,6 +41,7 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
     } else {
       await Promise.all([
         storeRequest(
+          // TODO Optimize DB Requests
           this.db,
           this.requestsTable,
           session.request.body.account,
@@ -49,6 +50,7 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
           trx
         ),
         incrementQueryCount(
+          // TODO Optimize DB Requests
           this.db,
           this.accountsTable,
           session.request.body.account,
@@ -69,9 +71,9 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
     const [performedQueryCountResult, totalQuotaResult, blockNumberResult] = await meter(
       (_session: PnpSession<SignMessageRequest | PnpQuotaRequest>) =>
         Promise.allSettled([
-          getPerformedQueryCount(this.db, this.accountsTable, account, session.logger, trx),
-          this.getTotalQuota(_session),
-          getBlockNumber(this.kit),
+          getPerformedQueryCount(this.db, this.accountsTable, account, session.logger, trx), // TODO Optimize DB Requests
+          this.getTotalQuota(_session), // TODO Optimize Full Node Requests
+          getBlockNumber(this.kit), // TODO (Alec) why are we getting this??
         ]),
       [session],
       (err: any) => {
@@ -131,6 +133,7 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
     session: PnpSession<SignMessageRequest | PnpQuotaRequest>
   ): Promise<number> {
     return meter(
+      // TODO Optimize Full Node Requests
       this.getTotalQuotaWithoutMeter.bind(this),
       [session],
       (err: any) => {
@@ -151,6 +154,7 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
     const { queryPriceInCUSD } = config.quota
     const { account } = session.request.body
     const totalPaidInWei = await getOnChainOdisPayments(
+      // TODO Optimize Full Node Requests
       this.kit,
       session.logger,
       account,

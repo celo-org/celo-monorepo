@@ -46,6 +46,7 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
     let registeredEncryptionKey
     try {
       registeredEncryptionKey = await getDataEncryptionKey(
+        // TODO Optimize Full Node Request
         signer,
         contractKit,
         logger,
@@ -144,6 +145,7 @@ export async function getDataEncryptionKey(
 ): Promise<string> {
   try {
     const res = await retryAsyncWithBackOffAndTimeout(
+      // TODO Optimize Full Node Request
       async () => {
         const accountWrapper: AccountsWrapper = await contractKit.contracts.getAccounts()
         return accountWrapper.getDataEncryptionKey(address)

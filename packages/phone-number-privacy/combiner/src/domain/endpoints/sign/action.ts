@@ -17,6 +17,7 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
     if (session.crypto.hasSufficientSignatures()) {
       try {
         const combinedSignature = session.crypto.combineBlindedSignatureShares(
+          // TODO add metering to cryptographic operations
           this.parseBlindedMessage(session.request.body),
           session.logger
         )

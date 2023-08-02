@@ -28,6 +28,7 @@ export abstract class CryptoClient {
    * Throws an exception if not enough valid signatures or on aggregation failure.
    */
   public combineBlindedSignatureShares(blindedMessage: string, logger: Logger): string {
+    // TODO add metering to cryptographich operations
     if (!this.hasSufficientSignatures()) {
       const { threshold } = this.keyVersionInfo
       logger.error(

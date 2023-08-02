@@ -35,12 +35,14 @@ export class PnpSignAction implements Action<SignMessageRequest> {
     // Compute quota lookup, update, and signing within transaction
     // so that these occur atomically and rollback on error.
     await this.db.transaction(async (trx) => {
+      // TODO Optimize DB Requests
       const pnpSignHandler = async () => {
         const quotaStatus = await this.quota.getQuotaStatus(session, trx)
 
         let isDuplicateRequest = false
         try {
           isDuplicateRequest = await getRequestExists(
+            // TODO Optimize DB Requests
             this.db,
             this.requestsTable,
             session.request.body.account,
@@ -113,6 +115,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         }
 
         try {
+          // TODO add metering to cryptographich operations
           const signature = await this.sign(
             session.request.body.blindedQueryPhoneNumber,
             key,
@@ -151,6 +154,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
       session.logger.error(err)
       throw new Error(WarningMessage.INVALID_KEY_VERSION_REQUEST)
     }
+    // TODO add metering to cryptographich operations
     return computeBlindedSignature(blindedMessage, privateKey, session.logger)
   }
 }

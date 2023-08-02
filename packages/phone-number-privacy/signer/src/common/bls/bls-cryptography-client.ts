@@ -5,7 +5,7 @@ import { Counters } from '../metrics'
 /*
  * Computes the BLS signature for the blinded phone number.
  */
-export function computeBlindedSignature(
+export function computeBlindedSignature( // TODO add metering to cryptographic operations
   base64BlindedMessage: string,
   privateKey: string,
   logger: Logger

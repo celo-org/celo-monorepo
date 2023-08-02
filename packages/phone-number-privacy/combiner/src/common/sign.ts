@@ -66,6 +66,7 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
       if (session.crypto.hasSufficientSignatures()) {
         try {
           session.crypto.combineBlindedSignatureShares(
+            // TODO add metering to cryptographic operations
             this.parseBlindedMessage(session.request.body),
             session.logger
           )

@@ -62,6 +62,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
 
   async authenticate(request: Request<{}, {}, PnpQuotaRequest>, logger: Logger): Promise<boolean> {
     return authenticateUser(
+      // TODO Optimize Full Node Request
       request,
       this.kit,
       logger,
