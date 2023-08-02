@@ -28,6 +28,8 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     readonly enabled: boolean,
     readonly shouldFailOpen: boolean,
     readonly timeoutMs: number,
+    readonly fullNodeRetryCount: number,
+    readonly fullNodeRetryDelayMs: number,
     readonly kit: ContractKit
   ) {
     super(enabled)
@@ -69,7 +71,9 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       logger,
       this.shouldFailOpen,
       warnings,
-      this.timeoutMs
+      this.timeoutMs,
+      this.fullNodeRetryCount,
+      this.fullNodeRetryDelayMs
     )
   }
 
