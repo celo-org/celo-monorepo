@@ -31,7 +31,6 @@ testWithGanache('releasegold:refund-and-finalize cmd', (web3: Web3) => {
       kit.contracts
     )
     const refundAddress = await releaseGoldWrapper.getRefundAddress()
-    // send extra gold to the ReleaseGold contract
     const balanceBefore = await kit.getTotalBalance(refundAddress)
     await testLocally(RefundAndFinalize, ['--contract', contractAddress])
     const balanceAfter = await kit.getTotalBalance(refundAddress)
