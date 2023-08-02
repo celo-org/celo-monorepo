@@ -31,6 +31,8 @@ describe('pnp response logger', () => {
     const mockRequest = {
       body: {},
     } as Request
+
+    // @ts-ignore: missing some properties
     const mockResponse = {
       locals: {
         logger: rootLogger(config.serviceName),

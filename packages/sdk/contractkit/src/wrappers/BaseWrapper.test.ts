@@ -74,26 +74,35 @@ describe('unixSecondsTimestampToDateString()', () => {
   describe('when Brazil/East', () => {
     it('returns local time', () => {
       timezoneMock('Brazil/East')
-      expect(unixSecondsTimestampToDateString(date)).toEqual('Wed, Jul 28, 2021, 1:29 PM GMT-3')
+      let str = unixSecondsTimestampToDateString(date)
+      // due to behavior of node 18 https://github.com/nodejs/node/issues/46123
+      str = str.replace(/[\u00A0\u1680​\u180e\u2000-\u2009\u200a​\u200b​\u202f\u205f​\u3000]/g, ' ')
+      expect(str).toEqual('Wed, Jul 28, 2021, 1:29 PM GMT-3')
     })
   })
 
   describe('when UTC', () => {
     it('returns utc time', () => {
       timezoneMock('UTC')
-      expect(unixSecondsTimestampToDateString(date)).toEqual('Wed, Jul 28, 2021, 4:29 PM UTC')
+      let str = unixSecondsTimestampToDateString(date)
+      str = str.replace(/[\u00A0\u1680​\u180e\u2000-\u2009\u200a​\u200b​\u202f\u205f​\u3000]/g, ' ')
+      expect(str).toEqual('Wed, Jul 28, 2021, 4:29 PM UTC')
     })
   })
   describe('when Australia/Adelaide', () => {
     it('returns local time', () => {
       timezoneMock('Australia/Adelaide')
-      expect(unixSecondsTimestampToDateString(date)).toEqual('Thu, Jul 29, 2021, 1:59 AM GMT+9:30')
+      let str = unixSecondsTimestampToDateString(date)
+      str = str.replace(/[\u00A0\u1680​\u180e\u2000-\u2009\u200a​\u200b​\u202f\u205f​\u3000]/g, ' ')
+      expect(str).toEqual('Thu, Jul 29, 2021, 1:59 AM GMT+9:30')
     })
   })
   describe('when Europe/London', () => {
     it('returns local time', () => {
       timezoneMock('Europe/London')
-      expect(unixSecondsTimestampToDateString(date)).toEqual('Wed, Jul 28, 2021, 5:29 PM GMT+1')
+      let str = unixSecondsTimestampToDateString(date)
+      str = str.replace(/[\u00A0\u1680​\u180e\u2000-\u2009\u200a​\u200b​\u202f\u205f​\u3000]/g, ' ')
+      expect(str).toEqual('Wed, Jul 28, 2021, 5:29 PM GMT+1')
     })
   })
 })

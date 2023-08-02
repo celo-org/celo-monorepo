@@ -30,16 +30,10 @@ import { getCombinerVersion, OdisConfig } from '../../../config'
 export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.LEGACY_PNP_SIGN
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
-  readonly requestSchema: t.Type<
-    LegacySignMessageRequest,
-    LegacySignMessageRequest,
-    unknown
-  > = LegacySignMessageRequestSchema
-  readonly responseSchema: t.Type<
-    SignMessageResponse,
-    SignMessageResponse,
-    unknown
-  > = SignMessageResponseSchema
+  readonly requestSchema: t.Type<LegacySignMessageRequest, LegacySignMessageRequest, unknown> =
+    LegacySignMessageRequestSchema
+  readonly responseSchema: t.Type<SignMessageResponse, SignMessageResponse, unknown> =
+    SignMessageResponseSchema
 
   constructor(readonly config: OdisConfig, readonly kit: ContractKit) {
     super(config)

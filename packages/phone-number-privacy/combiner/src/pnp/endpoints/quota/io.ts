@@ -29,11 +29,8 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.PNP_QUOTA
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
   readonly requestSchema: t.Type<PnpQuotaRequest, PnpQuotaRequest, unknown> = PnpQuotaRequestSchema
-  readonly responseSchema: t.Type<
-    PnpQuotaResponse,
-    PnpQuotaResponse,
-    unknown
-  > = PnpQuotaResponseSchema
+  readonly responseSchema: t.Type<PnpQuotaResponse, PnpQuotaResponse, unknown> =
+    PnpQuotaResponseSchema
 
   constructor(readonly config: OdisConfig, readonly kit: ContractKit) {
     super(config)

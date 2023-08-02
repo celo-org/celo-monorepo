@@ -23,7 +23,8 @@ import { PnpQuotaService } from './quota'
 
 export class LegacyPnpQuotaService
   extends PnpQuotaService
-  implements QuotaService<LegacySignMessageRequest | LegacyPnpQuotaRequest> {
+  implements QuotaService<LegacySignMessageRequest | LegacyPnpQuotaRequest>
+{
   protected readonly requestsTable = REQUESTS_TABLE.LEGACY
   protected readonly accountsTable = ACCOUNTS_TABLE.LEGACY
 
@@ -77,36 +78,33 @@ export class LegacyPnpQuotaService
     session: PnpSession<LegacySignMessageRequest | LegacyPnpQuotaRequest>,
     ...addresses: string[]
   ) {
-    const [
-      cUSDAccountBalanceResult,
-      cEURAccountBalanceResult,
-      celoAccountBalanceResult,
-    ] = await meter(
-      (logger: Logger, ..._addresses: string[]) =>
-        Promise.allSettled([
-          getStableTokenBalance(
-            this.kit,
-            StableToken.cUSD,
-            logger,
-            session.request.url,
-            ..._addresses
-          ),
-          getStableTokenBalance(
-            this.kit,
-            StableToken.cEUR,
-            logger,
-            session.request.url,
-            ..._addresses
-          ),
-          getCeloBalance(this.kit, logger, session.request.url, ..._addresses),
-        ]),
-      [session.logger, ...addresses],
-      (err: any) => {
-        throw err
-      },
-      Histograms.getRemainingQueryCountInstrumentation,
-      ['getBalances', session.request.url]
-    )
+    const [cUSDAccountBalanceResult, cEURAccountBalanceResult, celoAccountBalanceResult] =
+      await meter(
+        (logger: Logger, ..._addresses: string[]) =>
+          Promise.allSettled([
+            getStableTokenBalance(
+              this.kit,
+              StableToken.cUSD,
+              logger,
+              session.request.url,
+              ..._addresses
+            ),
+            getStableTokenBalance(
+              this.kit,
+              StableToken.cEUR,
+              logger,
+              session.request.url,
+              ..._addresses
+            ),
+            getCeloBalance(this.kit, logger, session.request.url, ..._addresses),
+          ]),
+        [session.logger, ...addresses],
+        (err: any) => {
+          throw err
+        },
+        Histograms.getRemainingQueryCountInstrumentation,
+        ['getBalances', session.request.url]
+      )
 
     let hadFullNodeError = false
     let cUSDAccountBalance, cEURAccountBalance, celoAccountBalance

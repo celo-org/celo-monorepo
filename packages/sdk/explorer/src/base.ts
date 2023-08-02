@@ -14,7 +14,7 @@ export interface ContractMapping {
   fnMapping: Map<string, ABIDefinition>
 }
 
-export const getContractDetailsFromContract = async (
+export const getContractDetailsFromContract: any = async (
   kit: ContractKit,
   celoContract: CeloContract,
   address?: string

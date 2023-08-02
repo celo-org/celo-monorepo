@@ -20,7 +20,8 @@ import { PnpSignIO } from './io'
 import { LegacyPnpSignIO } from './io.legacy'
 
 export abstract class PnpSignAction
-  implements Action<SignMessageRequest | LegacySignMessageRequest> {
+  implements Action<SignMessageRequest | LegacySignMessageRequest>
+{
   protected abstract readonly requestsTable: REQUESTS_TABLE
 
   constructor(

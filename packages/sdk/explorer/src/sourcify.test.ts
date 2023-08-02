@@ -7,7 +7,8 @@ import {
   Provider,
 } from '@celo/connect'
 import Web3 from 'web3'
-import { fetchMetadata, Metadata, tryGetProxyImplementation } from './sourcify'
+// tslint:disable-next-line: ordered-imports
+import { Metadata, fetchMetadata, tryGetProxyImplementation } from './sourcify'
 
 // This is taken from protocol/contracts/build/Account.json
 const CONTRACT_METADATA = require('../fixtures/contract.metadata.json')

@@ -44,24 +44,20 @@ export async function getPhoneNumberIdentifier(
 ): Promise<PhoneNumberHashDetails> {
   debug('Getting phone number pepper')
 
-  const {
-    plaintextIdentifier,
-    obfuscatedIdentifier,
-    pepper,
-    unblindedSignature,
-  } = await getObfuscatedIdentifier(
-    e164Number,
-    IdentifierPrefix.PHONE_NUMBER,
-    account,
-    signer,
-    context,
-    blindingFactor,
-    clientVersion,
-    blsBlindingClient,
-    sessionID,
-    keyVersion,
-    endpoint
-  )
+  const { plaintextIdentifier, obfuscatedIdentifier, pepper, unblindedSignature } =
+    await getObfuscatedIdentifier(
+      e164Number,
+      IdentifierPrefix.PHONE_NUMBER,
+      account,
+      signer,
+      context,
+      blindingFactor,
+      clientVersion,
+      blsBlindingClient,
+      sessionID,
+      keyVersion,
+      endpoint
+    )
   return {
     e164Number: plaintextIdentifier,
     phoneHash: obfuscatedIdentifier,
@@ -120,17 +116,13 @@ export async function getPhoneNumberIdentifierFromSignature(
   base64BlindedSignature: string,
   blsBlindingClient: BlsBlindingClient
 ): Promise<PhoneNumberHashDetails> {
-  const {
-    plaintextIdentifier,
-    obfuscatedIdentifier,
-    pepper,
-    unblindedSignature,
-  } = await getObfuscatedIdentifierFromSignature(
-    e164Number,
-    IdentifierPrefix.PHONE_NUMBER,
-    base64BlindedSignature,
-    blsBlindingClient
-  )
+  const { plaintextIdentifier, obfuscatedIdentifier, pepper, unblindedSignature } =
+    await getObfuscatedIdentifierFromSignature(
+      e164Number,
+      IdentifierPrefix.PHONE_NUMBER,
+      base64BlindedSignature,
+      blsBlindingClient
+    )
   return {
     e164Number: plaintextIdentifier,
     phoneHash: obfuscatedIdentifier,
