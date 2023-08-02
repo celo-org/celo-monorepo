@@ -5,6 +5,7 @@ import {
   PnpQuotaStatus,
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
+import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import { ACCOUNTS_TABLE } from '../../common/database/models/account'
 import { REQUESTS_TABLE } from '../../common/database/models/request'
@@ -12,15 +13,13 @@ import { getPerformedQueryCount, incrementQueryCount } from '../../common/databa
 import { storeRequest } from '../../common/database/wrappers/request'
 import { Counters, Histograms, meter } from '../../common/metrics'
 import { OdisQuotaStatusResult, QuotaService } from '../../common/quota'
-import { getBlockNumber } from '../../common/web3/contracts'
+import { getBlockNumber, getOnChainOdisPayments } from '../../common/web3/contracts'
 import { config } from '../../config'
 import { PnpSession } from '../session'
 
-export abstract class PnpQuotaService
-  implements QuotaService<SignMessageRequest | PnpQuotaRequest>
-{
-  protected abstract readonly requestsTable: REQUESTS_TABLE
-  protected abstract readonly accountsTable: ACCOUNTS_TABLE
+export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
+  protected readonly requestsTable: REQUESTS_TABLE = REQUESTS_TABLE.ONCHAIN
+  protected readonly accountsTable: ACCOUNTS_TABLE = ACCOUNTS_TABLE.ONCHAIN
 
   constructor(readonly db: Knex, readonly kit: ContractKit) {}
 
@@ -146,9 +145,24 @@ export abstract class PnpQuotaService
    * Calculates how many queries the caller has unlocked;
    * must be implemented by subclasses.
    */
-  protected abstract getTotalQuotaWithoutMeter(
+  protected async getTotalQuotaWithoutMeter(
     session: PnpSession<SignMessageRequest | PnpQuotaRequest>
-  ): Promise<number>
+  ): Promise<number> {
+    const { queryPriceInCUSD } = config.quota
+    const { account } = session.request.body
+    const totalPaidInWei = await getOnChainOdisPayments(
+      this.kit,
+      session.logger,
+      account,
+      session.request.url
+    )
+    const totalQuota = totalPaidInWei
+      .div(queryPriceInCUSD.times(new BigNumber(1e18)))
+      .integerValue(BigNumber.ROUND_DOWN)
+    // If any account hits an overflow here, we need to redesign how
+    // quota/queries are computed anyways.
+    return totalQuota.toNumber()
+  }
 
   private bypassQuotaForE2ETesting(requestBody: SignMessageRequest): boolean {
     const sessionID = Number(requestBody.sessionID)

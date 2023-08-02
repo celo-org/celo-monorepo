@@ -5,7 +5,6 @@ import {
   ErrorType,
   getSignerEndpoint,
   hasValidAccountParam,
-  identifierIsValidIfExists,
   isBodyReasonablySized,
   PnpQuotaRequest,
   PnpQuotaRequestSchema,
@@ -57,7 +56,6 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     return (
       super.validateClientRequest(request) &&
       hasValidAccountParam(request.body) &&
-      identifierIsValidIfExists(request.body) &&
       isBodyReasonablySized(request.body)
     )
   }
