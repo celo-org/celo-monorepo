@@ -20,7 +20,6 @@ export async function testPNPSignQuery(
     const odisResponse: IdentifierHashDetails = await queryOdisForSalt(
       blockchainProvider,
       contextName,
-      endpoint,
       timeoutMs
     )
     logger.info({ odisResponse }, 'ODIS salt request successful. System is healthy.')

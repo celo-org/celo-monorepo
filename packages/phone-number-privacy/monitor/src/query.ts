@@ -13,7 +13,7 @@ import {
   OdisAPI,
   OdisContextName,
 } from '@celo/identity/lib/odis/query'
-import { CombinerEndpointPNP, fetchEnv } from '@celo/phone-number-privacy-common'
+import { fetchEnv } from '@celo/phone-number-privacy-common'
 import { genSessionID } from '@celo/phone-number-privacy-common/lib/utils/logger'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { defined } from '@celo/utils/lib/sign-typed-data-utils'
@@ -29,7 +29,6 @@ const newPrivateKey = async () => {
 export const queryOdisForSalt = async (
   blockchainProvider: string,
   contextName: OdisContextName,
-  endpoint: CombinerEndpointPNP.PNP_SIGN,
   timeoutMs: number = 10000
 ) => {
   console.log(`contextName: ${contextName}`) // tslint:disable-line:no-console
@@ -64,7 +63,6 @@ export const queryOdisForSalt = async (
       undefined,
       genSessionID(),
       undefined,
-      endpoint,
       abortController
     )
     clearTimeout(timeout)
