@@ -7,11 +7,11 @@ import {
   SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import express, { Request, RequestHandler, Response } from 'express'
-import { Express } from 'express-serve-static-core'
+import express, { Express, Request, RequestHandler, Response } from 'express'
 import fs from 'fs'
 import https from 'https'
 import { Knex } from 'knex'
+import { IncomingMessage, ServerResponse } from 'node:http'
 import * as PromClient from 'prom-client'
 import { Controller } from './common/controller'
 import { KeyProvider } from './common/key-management/key-provider-base'
@@ -41,7 +41,7 @@ export function startSigner(
   db: Knex,
   keyProvider: KeyProvider,
   kit?: ContractKit
-): Express {
+): Express | https.Server<typeof IncomingMessage, typeof ServerResponse> {
   const logger = rootLogger(config.serviceName)
 
   kit = kit ?? getContractKit(config.blockchain)
