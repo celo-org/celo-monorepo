@@ -29,6 +29,10 @@ import { PnpSignAction } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
 import { PnpQuotaService } from './pnp/services/quota'
 
+import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
+const tracer = opentelemetry.trace.getTracer('signer-tracer')
+
 require('events').EventEmitter.defaultMaxListeners = 15
 
 export function startSigner(
@@ -46,9 +50,21 @@ export function startSigner(
   app.use(express.json({ limit: '0.2mb' }) as RequestHandler, loggerMiddleware(config.serviceName))
 
   app.get(SignerEndpoint.STATUS, (_req, res) => {
+    const parentSpan = tracer.startSpan('status')
+    parentSpan.addEvent('Called STATUS')
+    parentSpan.setAttribute(SemanticAttributes.CODE_FUNCTION, 'doWork')
+    parentSpan.setAttribute(SemanticAttributes.HTTP_ROUTE, _req.path)
+    parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, _req.method)
+    parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, _req.ip)
+    parentSpan.addEvent('Returning 200')
     res.status(200).json({
       version: getSignerVersion(),
     })
+    parentSpan.setStatus({
+      code: SpanStatusCode.OK,
+      message: 'OK',
+    })
+    parentSpan.end()
   })
 
   app.get(SignerEndpoint.METRICS, (_req, res) => {
