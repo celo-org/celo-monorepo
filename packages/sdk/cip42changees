@@ -1,0 +1,28 @@
+
+## @celo/connect
+
+* gasPrice is no longer an option on config. setting 0 (or any empty value) for gasPrice in transaction will result in maxFeePerGas and maxPriorityFee per gas being set on the transaction
+
+* likewise gasPrice is no longer settable on the connection itself
+
+* (note that the gasPrice function for fetching price from node is NOT affected)
+
+* replace connection.fillGasPrice  with connection.setFeeMarketGas
+
+* add inputAccessListFormatter
+
+## kit
+
+* removed gasPriceSuggestionMultiplier == gas price from rpc no longer multipled by 5
+
+* remove kit.fillGasPrice
+
+* remove updateGasPriceInConnectionLayer
+
+* remove kit.gasPrice
+
+## @celo/wallet-base
+
+* extractSignature now throws if the length of provided tx is not correct
+
+* ensureLeading0x now types output to be `0x{string}`

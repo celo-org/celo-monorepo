@@ -84,6 +84,38 @@ export function txoStub<T>(): TransactionObjectStub<T> {
         from: '0xAAFFF',
       })
     })
+
+    test('works with maxFeePerGas and maxPriorityFeePerGas', async () => {
+      const txo = txoStub()
+      await kit.connection.sendTransactionObject(txo, {
+        maxFeePerGas: 555,
+        maxPriorityFeePerGas: 555,
+        from: '0xAAFFF',
+      })
+      expect(txo.send).toBeCalledWith({
+        gasPrice: '0',
+        maxFeePerGas: 555,
+        maxPriorityFeePerGas: 555,
+        // from: '0xAAFFF',
+      })
+    })
+
+    test('when maxFeePerGas and maxPriorityFeePerGas and feeCurrency', async () => {
+      const txo = txoStub()
+      await kit.connection.sendTransactionObject(txo, {
+        maxFeePerGas: 555,
+        maxPriorityFeePerGas: 555,
+        feeCurrency: '0xe8537a3d056da446677b9e9d6c5db704eaab4787',
+        from: '0xAAFFF',
+      })
+      expect(txo.send).toBeCalledWith({
+        gasPrice: '0',
+        maxFeePerGas: 555,
+        maxPriorityFeePerGas: 555,
+        feeCurrency: '0xe8537a3d056da446677b9e9d6c5db704eaab4787',
+        from: '0xAAFFF',
+      })
+    })
   })
 })
 

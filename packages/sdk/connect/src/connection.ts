@@ -1,11 +1,11 @@
 import { ensureLeading0x, toChecksumAddress } from '@celo/utils/lib/address'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
-import { parseSignatureWithoutPrefix, Signature } from '@celo/utils/lib/signatureUtils'
+import { Signature, parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import { bufferToHex } from '@ethereumjs/util'
 import debugFactory from 'debug'
 import Web3 from 'web3'
 import { AbiCoder } from './abi-types'
-import { assertIsCeloProvider, CeloProvider } from './celo-provider'
+import { CeloProvider, assertIsCeloProvider } from './celo-provider'
 import {
   Address,
   Block,
@@ -32,9 +32,9 @@ import {
   outputCeloTxReceiptFormatter,
 } from './utils/formatter'
 import { hasProperty } from './utils/provider-utils'
-import { getRandomId, HttpRpcCaller, RpcCaller } from './utils/rpc-caller'
+import { HttpRpcCaller, RpcCaller, getRandomId } from './utils/rpc-caller'
 import { TxParamsNormalizer } from './utils/tx-params-normalizer'
-import { toTxResult, TransactionResult } from './utils/tx-result'
+import { TransactionResult, toTxResult } from './utils/tx-result'
 import { ReadOnlyWallet } from './wallet'
 
 const debugGasEstimation = debugFactory('connection:gas-estimation')
@@ -42,7 +42,6 @@ const debugGasEstimation = debugFactory('connection:gas-estimation')
 type BN = ReturnType<Web3['utils']['toBN']>
 export interface ConnectionOptions {
   gasInflationFactor: number
-  gasPrice: string
   feeCurrency?: Address
   from?: Address
 }
@@ -58,16 +57,11 @@ export class Connection {
   readonly paramsPopulator: TxParamsNormalizer
   rpcCaller!: RpcCaller
 
-  /** @deprecated no longer needed since gasPrice is available on node rpc */
-  private currencyGasPrice: Map<Address, string> = new Map<Address, string>()
-
   constructor(readonly web3: Web3, public wallet?: ReadOnlyWallet, handleRevert = true) {
     web3.eth.handleRevert = handleRevert
 
     this.config = {
       gasInflationFactor: 1.3,
-      // gasPrice:0 means the node will compute gasPrice on its own
-      gasPrice: '0',
     }
 
     const existingProvider: Provider = web3.currentProvider as Provider
@@ -123,14 +117,6 @@ export class Connection {
 
   get defaultGasInflationFactor() {
     return this.config.gasInflationFactor
-  }
-
-  set defaultGasPrice(price: number) {
-    this.config.gasPrice = price.toString(10)
-  }
-
-  get defaultGasPrice() {
-    return parseInt(this.config.gasPrice, 10)
   }
 
   /**
@@ -224,7 +210,7 @@ export class Connection {
    */
   sendTransaction = async (tx: CeloTx): Promise<TransactionResult> => {
     tx = this.fillTxDefaults(tx)
-    tx = this.fillGasPrice(tx)
+    tx = await this.setFeeMarketGas(tx)
 
     let gas = tx.gas
     if (gas == null) {
@@ -244,7 +230,7 @@ export class Connection {
     tx?: Omit<CeloTx, 'data'>
   ): Promise<TransactionResult> => {
     tx = this.fillTxDefaults(tx)
-    tx = this.fillGasPrice(tx)
+    tx = await this.setFeeMarketGas(tx)
 
     let gas = tx.gas
     if (gas == null) {
@@ -341,20 +327,27 @@ export class Connection {
   sendSignedTransaction = async (signedTransactionData: string): Promise<TransactionResult> => {
     return toTxResult(this.web3.eth.sendSignedTransaction(signedTransactionData))
   }
+  // if neither gas price nor feeMarket fields are present set them.
+  async setFeeMarketGas(tx: CeloTx): Promise<CeloTx> {
+    // default to the current values
+    const calls = [Promise.resolve(tx.maxFeePerGas), Promise.resolve(tx.maxPriorityFeePerGas)]
 
-  /** @deprecated no longer needed since gasPrice is available on node rpc */
-  fillGasPrice(tx: CeloTx): CeloTx {
-    if (tx.feeCurrency && tx.gasPrice === '0' && this.currencyGasPrice.has(tx.feeCurrency)) {
-      return {
-        ...tx,
-        gasPrice: this.currencyGasPrice.get(tx.feeCurrency),
+    if ((isEmpty(tx.gasPrice) && isEmpty(tx.maxFeePerGas)) || isEmpty(tx.maxPriorityFeePerGas)) {
+      if (isEmpty(tx.maxFeePerGas)) {
+        calls[0] = this.gasPrice(tx.feeCurrency)
+      }
+      if (isEmpty(tx.maxPriorityFeePerGas)) {
+        calls[1] = this.rpcCaller.call('eth_maxPriorityFeePerGas', []).then((rpcResponse) => {
+          return rpcResponse.result
+        })
       }
     }
-    return tx
-  }
-  /** @deprecated no longer needed since gasPrice is available on node rpc */
-  async setGasPriceForCurrency(address: Address, gasPrice: string) {
-    this.currencyGasPrice.set(address, gasPrice)
+    const [maxFeePerGas, maxPriorityFeePerGas] = await Promise.all(calls)
+    return {
+      ...tx,
+      maxFeePerGas,
+      maxPriorityFeePerGas,
+    }
   }
 
   estimateGas = async (
@@ -508,7 +501,6 @@ export class Connection {
     const defaultTx: CeloTx = {
       from: this.config.from,
       feeCurrency: this.config.feeCurrency,
-      gasPrice: this.config.gasPrice,
     }
 
     return {
@@ -521,4 +513,19 @@ export class Connection {
     assertIsCeloProvider(this.web3.currentProvider)
     this.web3.currentProvider.stop()
   }
+}
+
+function isEmpty(value: string | undefined | number | BN) {
+  return (
+    value === 0 ||
+    value === undefined ||
+    value === null ||
+    value === '0' ||
+    (typeof value === 'string' &&
+      (value.toLowerCase() === '0x' || value.toLowerCase() === '0x0')) ||
+    Web3.utils.toBN(value.toString()).eq(Web3.utils.toBN(0))
+  )
+}
+function isPresent(value: string | undefined) {
+  return !isEmpty(value)
 }

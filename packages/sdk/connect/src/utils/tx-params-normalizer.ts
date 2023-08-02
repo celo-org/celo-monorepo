@@ -10,6 +10,9 @@ function isEmpty(value: string | undefined) {
     value.toLowerCase() === '0x0'
   )
 }
+function isPresent(value: string | undefined) {
+  return !isEmpty(value)
+}
 
 export class TxParamsNormalizer {
   private chainId: number | null = null
@@ -32,8 +35,30 @@ export class TxParamsNormalizer {
       txParams.gas = await this.connection.estimateGas(txParams)
     }
 
-    if (!txParams.gasPrice || isEmpty(txParams.gasPrice.toString())) {
-      txParams.gasPrice = await this.connection.gasPrice(txParams.feeCurrency)
+    // if gasPrice is not set and maxFeePerGas is not set, set maxFeePerGas
+    if (isEmpty(txParams.gasPrice?.toString()) && isEmpty(txParams.maxFeePerGas?.toString())) {
+      const suggestedPrice = await this.connection.gasPrice(txParams.feeCurrency)
+      // add small buffer to suggested price like other libraries do
+      // const priceWithRoom = new BigNumber(suggestedPrice).times(120).dividedBy(100).toString()
+      txParams.maxFeePerGas = suggestedPrice
+    }
+
+    // if maxFeePerGas is set make sure maxPriorityFeePerGas is also set
+    if (
+      isPresent(txParams.maxFeePerGas?.toString()) &&
+      isEmpty(txParams.maxPriorityFeePerGas?.toString())
+    ) {
+      const clientMaxPriorityFeePerGas = await this.connection.rpcCaller.call(
+        'eth_maxPriorityFeePerGas',
+        []
+      )
+      txParams.maxPriorityFeePerGas = clientMaxPriorityFeePerGas.result
+    }
+
+    // remove gasPrice if maxFeePerGas is set
+    if (isPresent(txParams.gasPrice?.toString()) && isPresent(txParams.maxFeePerGas?.toString())) {
+      txParams.gasPrice = undefined
+      delete txParams.gasPrice
     }
 
     return txParams
