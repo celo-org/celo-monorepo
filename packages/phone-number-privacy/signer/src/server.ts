@@ -12,7 +12,6 @@ import { Express } from 'express-serve-static-core'
 import fs from 'fs'
 import https from 'https'
 import { Knex } from 'knex'
-import { IncomingMessage, ServerResponse } from 'node:http'
 import * as PromClient from 'prom-client'
 import { Controller } from './common/controller'
 import { KeyProvider } from './common/key-management/key-provider-base'
@@ -42,7 +41,7 @@ export function startSigner(
   db: Knex,
   keyProvider: KeyProvider,
   kit?: ContractKit
-): Express | https.Server<typeof IncomingMessage, typeof ServerResponse> {
+): Express {
   const logger = rootLogger(config.serviceName)
 
   kit = kit ?? getContractKit(config.blockchain)
