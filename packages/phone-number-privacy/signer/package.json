@@ -5,6 +5,7 @@
   "author": "Celo",
   "license": "Apache-2.0",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "start": "yarn build && node -r dotenv/config dist/index.js",
     "start:docker": "yarn build && node dist/index.js",
