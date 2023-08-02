@@ -1,7 +1,6 @@
 import {
   ErrorMessage,
   ErrorType,
-  LegacySignMessageRequest,
   SignMessageRequest,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -12,7 +11,7 @@ import { PnpSignerResponseLogger } from '../../services/log-responses'
 export class PnpSignAction extends SignAction<SignMessageRequest> {
   readonly responseLogger: PnpSignerResponseLogger = new PnpSignerResponseLogger()
 
-  combine(session: CryptoSession<SignMessageRequest | LegacySignMessageRequest>): void {
+  combine(session: CryptoSession<SignMessageRequest>): void {
     this.responseLogger.logResponseDiscrepancies(session)
     this.responseLogger.logFailOpenResponses(session)
 
@@ -41,7 +40,7 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
     this.handleMissingSignatures(session)
   }
 
-  protected parseBlindedMessage(req: SignMessageRequest | LegacySignMessageRequest): string {
+  protected parseBlindedMessage(req: SignMessageRequest): string {
     return req.blindedQueryPhoneNumber
   }
 

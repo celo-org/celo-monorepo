@@ -25,13 +25,9 @@ import { DomainSignIO } from './domain/endpoints/sign/io'
 import { DomainQuotaService } from './domain/services/quota'
 import { PnpQuotaAction } from './pnp/endpoints/quota/action'
 import { PnpQuotaIO } from './pnp/endpoints/quota/io'
-import { LegacyPnpQuotaIO } from './pnp/endpoints/quota/io.legacy'
-import { LegacyPnpSignAction } from './pnp/endpoints/sign/action.legacy'
-import { OnChainPnpSignAction } from './pnp/endpoints/sign/action.onchain'
+import { PnpSignAction } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
-import { LegacyPnpSignIO } from './pnp/endpoints/sign/io.legacy'
-import { LegacyPnpQuotaService } from './pnp/services/quota.legacy'
-import { OnChainPnpQuotaService } from './pnp/services/quota.onchain'
+import { PnpQuotaService } from './pnp/services/quota'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -87,8 +83,7 @@ export function startSigner(
       }
     })
 
-  const pnpQuotaService = new OnChainPnpQuotaService(db, kit)
-  const legacyPnpQuotaService = new LegacyPnpQuotaService(db, kit)
+  const pnpQuotaService = new PnpQuotaService(db, kit)
   const domainQuotaService = new DomainQuotaService(db)
 
   const pnpQuota = new Controller(
@@ -106,7 +101,7 @@ export function startSigner(
     )
   )
   const pnpSign = new Controller(
-    new OnChainPnpSignAction(
+    new PnpSignAction(
       db,
       config,
       pnpQuotaService,
@@ -121,36 +116,7 @@ export function startSigner(
       )
     )
   )
-  const legacyPnpSign = new Controller(
-    new LegacyPnpSignAction(
-      db,
-      config,
-      legacyPnpQuotaService,
-      keyProvider,
-      new LegacyPnpSignIO(
-        config.api.legacyPhoneNumberPrivacy.enabled,
-        config.api.legacyPhoneNumberPrivacy.shouldFailOpen,
-        config.fullNodeTimeoutMs,
-        config.fullNodeRetryCount,
-        config.fullNodeRetryDelayMs,
-        kit
-      )
-    )
-  )
-  const legacyPnpQuota = new Controller(
-    new PnpQuotaAction(
-      config,
-      legacyPnpQuotaService,
-      new LegacyPnpQuotaIO(
-        config.api.legacyPhoneNumberPrivacy.enabled,
-        config.api.legacyPhoneNumberPrivacy.shouldFailOpen,
-        config.fullNodeTimeoutMs,
-        config.fullNodeRetryCount,
-        config.fullNodeRetryDelayMs,
-        kit
-      )
-    )
-  )
+
   const domainQuota = new Controller(
     new DomainQuotaAction(config, domainQuotaService, new DomainQuotaIO(config.api.domains.enabled))
   )
@@ -172,9 +138,6 @@ export function startSigner(
   addEndpoint(SignerEndpoint.DOMAIN_QUOTA_STATUS, domainQuota.handle.bind(domainQuota))
   addEndpoint(SignerEndpoint.DOMAIN_SIGN, domainSign.handle.bind(domainSign))
   addEndpoint(SignerEndpoint.DISABLE_DOMAIN, domainDisable.handle.bind(domainDisable))
-
-  addEndpoint(SignerEndpoint.LEGACY_PNP_SIGN, legacyPnpSign.handle.bind(legacyPnpSign))
-  addEndpoint(SignerEndpoint.LEGACY_PNP_QUOTA, legacyPnpQuota.handle.bind(legacyPnpQuota))
 
   const sslOptions = getSslOptions(config)
   if (sslOptions) {

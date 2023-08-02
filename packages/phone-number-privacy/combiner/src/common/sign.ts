@@ -2,7 +2,6 @@ import {
   DomainRestrictedSignatureRequest,
   ErrorMessage,
   ErrorType,
-  LegacySignMessageRequest,
   OdisResponse,
   responseHasExpectedKeyVersion,
   SignMessageRequest,
@@ -18,8 +17,8 @@ import { IO } from './io'
 // prettier-ignore
 export type OdisSignatureRequest =
   | SignMessageRequest
-  | LegacySignMessageRequest
   | DomainRestrictedSignatureRequest
+
 export type ThresholdStateService<R extends OdisSignatureRequest> = R extends SignMessageRequest
   ? PnpThresholdStateService<R>
   : never | R extends DomainRestrictedSignatureRequest
