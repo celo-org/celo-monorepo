@@ -17,7 +17,7 @@
     "@celo/network-utils": "4.1.1-beta.1",
     "@celo/utils": "4.1.1-beta.1",
     "@ethereumjs/util": "8.0.5",
-    "@ethereumjs/rlp":"4.0.1",
+    "@ethereumjs/rlp": "4.0.1",
     "@google-cloud/monitoring": "0.7.1",
     "@google-cloud/pubsub": "^0.28.1",
     "@google-cloud/secret-manager": "3.0.0",
