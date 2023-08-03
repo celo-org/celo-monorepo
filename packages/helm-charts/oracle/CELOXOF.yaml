@@ -1,0 +1,35 @@
+oracle:
+  currencyPair: CELOXOF
+  aggregation:
+    mid:
+      maxExchangeVolumeShare: 1
+      maxPercentageDeviation: 0.025
+      maxPercentageBidAskSpread: 0.015
+  metrics:
+    enabled: true
+    prometheusPort: 9090
+  apiRequestTimeoutMs: 5000
+  circuitBreakerPriceChangeThreshold: 0.25
+  gasPriceMultiplier: 1.5
+  priceSources: "
+    [
+      [
+        {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'USDXOF', toInvert: false}
+      ],
+      [
+        {exchange: 'COINBASE', symbol: 'CELOEUR', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
+      ],
+      [
+        {exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false},
+        {exchange: 'COINBASE', symbol: 'BTCUSD', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'USDXOF', toInvert: false}
+      ]
+    ]
+  "
+  minPriceSourceCount: 1
+  reportStrategy: BLOCK_BASED
+  reporter:
+    blockBased:
+      minReportPriceChangeThreshold: 0.005
