@@ -526,6 +526,6 @@ function isEmpty(value: string | undefined | number | BN) {
     Web3.utils.toBN(value.toString()).eq(Web3.utils.toBN(0))
   )
 }
-function isPresent(value: string | undefined) {
+export function isPresent(value: string | undefined | number | BN) {
   return !isEmpty(value)
 }

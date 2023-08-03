@@ -77,6 +77,7 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
       throw new Error('No transaction object given!')
     }
     const rlpEncoded = rlpEncodedTx(txParams)
+    // TODO CIP42 check this probably only needed in legacy txs
     const addToV = chainIdTransformationForSigning(txParams.chainId!)
 
     // Get the signer from the 'from' field

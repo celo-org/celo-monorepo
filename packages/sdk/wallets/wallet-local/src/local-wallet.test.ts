@@ -159,8 +159,29 @@ describe('Local wallet class', () => {
             }
           })
 
-          test('succeeds', async () => {
-            await expect(wallet.signTransaction(celoTransaction)).resolves.not.toBeUndefined()
+          test('succeeds with legacy', async () => {
+            await expect(wallet.signTransaction(celoTransaction)).resolves.toMatchInlineSnapshot()
+          })
+
+          test('succeeds with eip1559', async () => {
+            const transaction1559 = {
+              ...celoTransaction,
+              gasPrice: undefined,
+              feeCurrency: undefined,
+              maxFeePerGas: '99',
+              maxPriorityFeePerGas: '99',
+            }
+            await expect(wallet.signTransaction(transaction1559)).resolves.toMatchInlineSnapshot()
+          })
+          test('succeeds with cip42', async () => {
+            const transaction1559 = {
+              ...celoTransaction,
+              gasPrice: undefined,
+              maxFeePerGas: '99',
+              maxPriorityFeePerGas: '99',
+              feeCurrency: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+            }
+            await expect(wallet.signTransaction(transaction1559)).resolves.toMatchInlineSnapshot()
           })
 
           test('with same signer', async () => {
@@ -196,6 +217,65 @@ describe('Local wallet class', () => {
             expect(normalizeAddressWith0x(recoveredSigner)).toBe(
               normalizeAddressWith0x(knownAddress)
             )
+          })
+        })
+        describe('when using signTransaction with type CIP42', () => {
+          let celoTransactionBase: CeloTx
+          let feeCurrency = '0x10c892a6ec43a53e45d0b916b4b7d383b1b78c0f'
+          let maxFeePerGas = '0x100000000'
+          let maxPriorityFeePerGas = '0x100000000'
+
+          beforeEach(() => {
+            celoTransactionBase = {
+              from: knownAddress,
+              to: otherAddress,
+              chainId: CHAIN_ID,
+              value: Web3.utils.toWei('1', 'ether'),
+              nonce: 0,
+              data: '0xabcdef',
+            }
+          })
+
+          describe('when feeCurrency and maxPriorityFeePerGas and maxFeePerGas are set', () => {
+            it('signs as a CIP42 tx', async () => {
+              const transaction: CeloTx = {
+                ...celoTransactionBase,
+                feeCurrency,
+                maxFeePerGas,
+                maxPriorityFeePerGas,
+              }
+              const signedTx: EncodedTransaction = await wallet.signTransaction(transaction)
+              expect(signedTx.raw).toMatch(/^0x7c/)
+            })
+          })
+          describe('when feeCurrency and maxFeePerGas but not maxPriorityFeePerGas are set', () => {})
+
+          describe('when feeCurrency and maxPriorityFeePerGas but not maxFeePerGas are set', () => {})
+
+          describe('when gas and one of maxPriorityFeePerGas or maxFeePerGas are set', () => {
+            it('throws explaining only one kind of gas fee can be set', async () => {
+              const transaction: CeloTx = {
+                ...celoTransactionBase,
+                maxFeePerGas,
+                maxPriorityFeePerGas,
+                gas: '0x100000000',
+              }
+              expect(async () => await wallet.signTransaction(transaction)).toThrowError(
+                'Only one of gas or maxFeePerGas/maxPriorityFeePerGas can be set'
+              )
+            })
+          })
+
+          describe('when maxPriorityFeePerGas / maxFeePerGas are set but not feeCurrency', () => {
+            it('signs as a EIP1559 tx', async () => {
+              const transaction: CeloTx = {
+                ...celoTransactionBase,
+                maxFeePerGas,
+                maxPriorityFeePerGas,
+              }
+              const signedTx: EncodedTransaction = await wallet.signTransaction(transaction)
+              expect(signedTx.raw).toMatch(/^0x02/)
+            })
           })
         })
 

@@ -1,3 +1,8 @@
+TopLine Changes
+
+* Add support for CIP42 and EIP1559 Transactions
+* Prefer EIP1559 if no feeCurrency and CIP42 if using feeCurrency, Old CeloLegacy transations still supported (set the gasPrice explicitly) but discouraged
+* upgrade Web3 dependency
 
 ## @celo/connect
 
@@ -10,6 +15,16 @@
 * replace connection.fillGasPrice  with connection.setFeeMarketGas
 
 * add inputAccessListFormatter
+
+* remove deprecated setGasPriceForCurrency
+
+* EncodedTransaction Type now supports CIp42 and EIP1559 transactions
+
+* inputCeloTxFormater now returns type FormattedCeloTx although apart from support for cip42 and eip1559 tx the data returned hasnt changed
+
+* numberToHex, ensureLeading0x, inputAddressFormatter now are typed to return `0x{string}` instead of just string
+
+* added parseAccessList and inputAccessListFormatter for converting accessList from json to array of array and back
 
 ## kit
 
@@ -24,5 +39,6 @@
 ## @celo/wallet-base
 
 * extractSignature now throws if the length of provided tx is not correct
+* extractSignature was incorrectly typed to return Buffers for r and s values
 
 * ensureLeading0x now types output to be `0x{string}`
