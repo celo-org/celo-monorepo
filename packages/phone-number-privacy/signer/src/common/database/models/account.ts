@@ -1,6 +1,6 @@
 export enum ACCOUNTS_TABLE {
   ONCHAIN = 'accountsOnChain',
-  LEGACY = 'accounts',
+  LEGACY = 'accounts', // TODO figure out right way to drop this table now that it's no longer in use
 }
 
 export enum ACCOUNTS_COLUMNS {

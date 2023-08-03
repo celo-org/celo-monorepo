@@ -41,7 +41,6 @@
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
-    "@celo/flake-tracker": "0.0.1-dev",
     "@celo/wallet-local": "4.1.1-dev",
     "@types/elliptic": "^6.4.12",
     "fetch-mock": "9.10.4",

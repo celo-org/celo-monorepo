@@ -23,9 +23,9 @@
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
     "test:coverage": "yarn test --coverage",
     "test:integration": "jest --runInBand test/integration",
-    "test:e2e": "FLAKEY=true jest test/end-to-end --verbose",
-    "test:e2e:staging": "FLAKEY=true CONTEXT_NAME=staging yarn test:e2e",
-    "test:e2e:alfajores": "FLAKEY=true CONTEXT_NAME=alfajores yarn test:e2e"
+    "test:e2e": "jest test/end-to-end --verbose",
+    "test:e2e:staging": "CONTEXT_NAME=staging yarn test:e2e",
+    "test:e2e:alfajores": "CONTEXT_NAME=alfajores yarn test:e2e"
   },
   "dependencies": {
     "@celo/contractkit": "^4.1.1-dev",
@@ -55,8 +55,7 @@
     "firebase-tools": "9.20.0"
   },
   "peerDependencies": {
-    "@celo/phone-number-privacy-signer": "^2.0.2",
-    "@celo/flake-tracker": "0.0.1-dev"
+    "@celo/phone-number-privacy-signer": "^2.0.2"
   },
   "engines": {
     "node": ">=14"

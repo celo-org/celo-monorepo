@@ -1,4 +1,3 @@
-import { CombinerEndpointPNP } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import debugFactory from 'debug'
 import { BlsBlindingClient } from './bls-blinding-client'
@@ -39,8 +38,7 @@ export async function getPhoneNumberIdentifier(
   clientVersion?: string,
   blsBlindingClient?: BlsBlindingClient,
   sessionID?: string,
-  keyVersion?: number,
-  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
+  keyVersion?: number
 ): Promise<PhoneNumberHashDetails> {
   debug('Getting phone number pepper')
 
@@ -55,8 +53,7 @@ export async function getPhoneNumberIdentifier(
       clientVersion,
       blsBlindingClient,
       sessionID,
-      keyVersion,
-      endpoint
+      keyVersion
     )
   return {
     e164Number: plaintextIdentifier,
@@ -92,8 +89,7 @@ export async function getBlindedPhoneNumberSignature(
   base64BlindedMessage: string,
   clientVersion?: string,
   sessionID?: string,
-  keyVersion?: number,
-  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
+  keyVersion?: number
 ): Promise<string> {
   return getBlindedIdentifierSignature(
     account,
@@ -102,8 +98,7 @@ export async function getBlindedPhoneNumberSignature(
     base64BlindedMessage,
     clientVersion,
     sessionID,
-    keyVersion,
-    endpoint
+    keyVersion
   )
 }
 

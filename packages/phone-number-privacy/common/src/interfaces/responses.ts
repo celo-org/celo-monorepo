@@ -4,8 +4,6 @@ import {
   DomainQuotaStatusRequest,
   DomainRequest,
   DomainRestrictedSignatureRequest,
-  LegacyPnpQuotaRequest,
-  LegacySignMessageRequest,
   OdisRequest,
   PhoneNumberPrivacyRequest,
   PnpQuotaRequest,
@@ -116,8 +114,8 @@ export const PnpQuotaResponseSchema: t.Type<PnpQuotaResponse> = t.union([
 export type PhoneNumberPrivacyResponse<
   R extends PhoneNumberPrivacyRequest = PhoneNumberPrivacyRequest
 > =
-  | R extends SignMessageRequest | LegacySignMessageRequest ? SignMessageResponse : never
-  | R extends PnpQuotaRequest | LegacyPnpQuotaRequest ? PnpQuotaResponse : never
+  | R extends SignMessageRequest ? SignMessageResponse : never
+  | R extends PnpQuotaRequest ? PnpQuotaResponse : never
 
 // Domains
 

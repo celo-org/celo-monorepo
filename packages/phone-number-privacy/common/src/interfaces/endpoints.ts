@@ -4,8 +4,6 @@ export enum SignerEndpointCommon {
 }
 
 export enum SignerEndpointPNP {
-  LEGACY_PNP_SIGN = '/getBlindedMessagePartialSig',
-  LEGACY_PNP_QUOTA = '/getQuota',
   PNP_QUOTA = '/quotaStatus',
   PNP_SIGN = '/sign',
 }
@@ -15,7 +13,6 @@ export enum CombinerEndpointCommon {
 }
 
 export enum CombinerEndpointPNP {
-  LEGACY_PNP_SIGN = '/getBlindedMessageSig',
   PNP_QUOTA = '/quotaStatus',
   PNP_SIGN = '/sign',
   STATUS = '/status',
@@ -52,8 +49,6 @@ export function getSignerEndpoint(endpoint: CombinerEndpoint): SignerEndpoint {
       return SignerEndpoint.PNP_QUOTA
     case CombinerEndpoint.PNP_SIGN:
       return SignerEndpoint.PNP_SIGN
-    case CombinerEndpoint.LEGACY_PNP_SIGN:
-      return SignerEndpoint.LEGACY_PNP_SIGN
     default:
       throw new Error(`No corresponding signer endpoint exists for combiner endpoint ${endpoint}`)
   }
@@ -71,8 +66,6 @@ export function getCombinerEndpoint(endpoint: SignerEndpoint): CombinerEndpoint 
       return CombinerEndpoint.PNP_QUOTA
     case SignerEndpoint.PNP_SIGN:
       return CombinerEndpoint.PNP_SIGN
-    case SignerEndpoint.LEGACY_PNP_SIGN:
-      return CombinerEndpoint.LEGACY_PNP_SIGN
     default:
       throw new Error(`No corresponding combiner endpoint exists for signer endpoint ${endpoint}`)
   }

@@ -35,7 +35,6 @@
     "web3-utils": "1.10.0"
   },
   "devDependencies": {
-    "@celo/flake-tracker": "0.0.1-dev",
     "@celo/typescript": "0.0.1"
   },
   "resolutions": {

@@ -46,7 +46,6 @@
   "devDependencies": {
     "@celo/phone-utils": "4.1.1-dev",
     "@celo/dev-utils": "0.0.1-dev",
-    "@celo/flake-tracker": "0.0.1-dev",
     "@celo/protocol": "1.0.0",
     "@types/debug": "^4.1.5",
     "fetch-mock": "9.10.4",

@@ -1,6 +1,7 @@
-import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
+import { config } from '../../../config'
 import { Histograms, meter } from '../../metrics'
 import {
   PnpSignRequestRecord,
@@ -33,7 +34,7 @@ export async function getRequestExists(
           [REQUESTS_COLUMNS.blindedQuery]: blindedQuery,
         })
         .first()
-        .timeout(DB_TIMEOUT)
+        .timeout(config.db.timeout)
       return !!existingRequest
     },
     [],
@@ -57,7 +58,7 @@ export async function storeRequest(
       await requests(db, requestsTable)
         .transacting(trx)
         .insert(toPnpSignRequestRecord(account, blindedQuery))
-        .timeout(DB_TIMEOUT)
+        .timeout(config.db.timeout)
     },
     [],
     (err: any) => countAndThrowDBError(err, logger, ErrorMessage.DATABASE_INSERT_FAILURE),

@@ -7,7 +7,6 @@ FROM scratch AS packages
 WORKDIR /celo-phone-number-privacy/
 COPY packages/typescript packages/typescript
 COPY packages/dev-utils packages/dev-utils
-COPY packages/flake-tracker packages/flake-tracker
 COPY packages/phone-number-privacy/signer packages/phone-number-privacy/signer
 COPY packages/phone-number-privacy/common packages/phone-number-privacy/common
 COPY packages/protocol packages/protocol

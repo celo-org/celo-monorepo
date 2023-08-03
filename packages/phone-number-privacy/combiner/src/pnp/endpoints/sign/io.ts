@@ -84,7 +84,9 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       logger,
       this.config.shouldFailOpen,
       [],
-      this.config.fullNodeTimeoutMs
+      this.config.fullNodeTimeoutMs,
+      this.config.fullNodeRetryCount,
+      this.config.fullNodeRetryDelayMs
     )
   }
 

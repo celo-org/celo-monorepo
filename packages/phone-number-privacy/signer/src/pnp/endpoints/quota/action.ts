@@ -1,27 +1,19 @@
 import { timeout } from '@celo/base'
-import {
-  ErrorMessage,
-  LegacyPnpQuotaRequest,
-  PnpQuotaRequest,
-} from '@celo/phone-number-privacy-common'
+import { ErrorMessage, PnpQuotaRequest } from '@celo/phone-number-privacy-common'
 import { Action } from '../../../common/action'
 import { SignerConfig } from '../../../config'
 import { PnpQuotaService } from '../../services/quota'
 import { PnpSession } from '../../session'
 import { PnpQuotaIO } from './io'
-import { LegacyPnpQuotaIO } from './io.legacy'
 
-export class PnpQuotaAction implements Action<PnpQuotaRequest | LegacyPnpQuotaRequest> {
+export class PnpQuotaAction implements Action<PnpQuotaRequest> {
   constructor(
     readonly config: SignerConfig,
     readonly quota: PnpQuotaService,
-    readonly io: PnpQuotaIO | LegacyPnpQuotaIO
+    readonly io: PnpQuotaIO
   ) {}
 
-  public async perform(
-    session: PnpSession<PnpQuotaRequest | LegacyPnpQuotaRequest>,
-    timeoutError: symbol
-  ): Promise<void> {
+  public async perform(session: PnpSession<PnpQuotaRequest>, timeoutError: symbol): Promise<void> {
     const quotaStatus = await timeout(
       () => this.quota.getQuotaStatus(session),
       [],

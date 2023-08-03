@@ -33,7 +33,6 @@
     "io-ts": "2.0.1"
   },
   "devDependencies": {
-    "@celo/flake-tracker": "0.0.1-dev",
     "@celo/typescript": "0.0.1"
   }
 }

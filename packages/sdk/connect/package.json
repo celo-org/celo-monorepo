@@ -31,7 +31,6 @@
     "utf8": "3.0.0"
   },
   "devDependencies": {
-    "@celo/flake-tracker": "0.0.1-dev",
     "web3": "1.10.0",
     "web3-core": "1.10.0",
     "web3-eth": "1.10.0",
