@@ -8,9 +8,11 @@ on:
   push:
     branches:
       - master
+      - release/*
   pull_request:
     branches:
       - master
+      - release/*
 
 concurrency:
   group: circle-ci-${{ github.ref }}
