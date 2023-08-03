@@ -50,13 +50,12 @@ export async function storeRequest(
   account: string,
   blindedQuery: string,
   logger: Logger,
-  trx: Knex.Transaction
+  trx?: Knex.Transaction
 ): Promise<void> {
   return meter(
     async () => {
       logger.debug(`Storing salt request for: ${account}, blindedQuery: ${blindedQuery}`)
-      await requests(db, requestsTable)
-        .transacting(trx)
+      await tableWithLockForTrx(requests(db, requestsTable), trx)
         .insert(toPnpSignRequestRecord(account, blindedQuery))
         .timeout(config.db.timeout)
     },
