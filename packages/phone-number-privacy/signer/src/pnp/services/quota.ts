@@ -26,7 +26,7 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
   public async checkAndUpdateQuotaStatus(
     state: PnpQuotaStatus,
     session: PnpSession<SignMessageRequest>,
-    trx: Knex.Transaction
+    trx?: Knex.Transaction
   ): Promise<OdisQuotaStatusResult<SignMessageRequest>> {
     const remainingQuota = state.totalQuota - state.performedQueryCount
     Histograms.userRemainingQuotaAtRequest.labels(session.request.url).observe(remainingQuota)

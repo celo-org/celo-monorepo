@@ -68,14 +68,13 @@ export async function incrementQueryCount(
   accountsTable: ACCOUNTS_TABLE,
   account: string,
   logger: Logger,
-  trx: Knex.Transaction
+  trx?: Knex.Transaction
 ): Promise<void> {
   return meter(
     async () => {
       logger.debug({ account }, 'Incrementing query count')
       if (await getAccountExists(db, accountsTable, account, logger, trx)) {
-        await accounts(db, accountsTable)
-          .transacting(trx)
+        await tableWithLockForTrx(accounts(db, accountsTable), trx)
           .where(ACCOUNTS_COLUMNS.address, account)
           .increment(ACCOUNTS_COLUMNS.numLookups, 1)
           .timeout(config.db.timeout)
@@ -96,10 +95,12 @@ async function insertRecord(
   accountsTable: ACCOUNTS_TABLE,
   data: AccountRecord,
   logger: Logger,
-  trx: Knex.Transaction
+  trx?: Knex.Transaction
 ): Promise<void> {
   try {
-    await accounts(db, accountsTable).transacting(trx).insert(data).timeout(config.db.timeout)
+    await tableWithLockForTrx(accounts(db, accountsTable), trx)
+      .insert(data)
+      .timeout(config.db.timeout)
   } catch (error) {
     countAndThrowDBError(error, logger, ErrorMessage.DATABASE_INSERT_FAILURE)
   }
