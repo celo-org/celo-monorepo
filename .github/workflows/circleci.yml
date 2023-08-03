@@ -219,6 +219,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+      github.event_name == 'pull_request' && contains(github.base_ref, 'release/') ||
       false
     outputs:
       protocol-test-must-run: ${{ steps.protocol-test-must-run.outputs.PROTOCOL_TEST_MUST_RUN }}
@@ -260,6 +261,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+      github.event_name == 'pull_request' && contains(github.base_ref, 'release/') ||
       false
     steps:
       - uses: actions/cache/restore@v3
@@ -291,6 +293,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+      github.event_name == 'pull_request' && contains(github.base_ref, 'release/') ||
       false
     strategy:
       fail-fast: false
