@@ -13,7 +13,7 @@ function accounts(db: Knex, table: ACCOUNTS_TABLE) {
 /*
  * Returns how many queries the account has already performed.
  */
-export async function getPerformedQueryCount(
+export async function getPerformedQueryCount( //
   db: Knex,
   accountsTable: ACCOUNTS_TABLE,
   account: string,
@@ -37,7 +37,7 @@ export async function getPerformedQueryCount(
   )
 }
 
-async function getAccountExists(
+async function getAccountExists( //
   db: Knex,
   accountsTable: ACCOUNTS_TABLE,
   account: string,
@@ -63,7 +63,7 @@ async function getAccountExists(
 /*
  * Increments query count in database.  If record doesn't exist, create one.
  */
-export async function incrementQueryCount(
+export async function incrementQueryCount( //
   db: Knex,
   accountsTable: ACCOUNTS_TABLE,
   account: string,
@@ -90,7 +90,7 @@ export async function incrementQueryCount(
   )
 }
 
-async function insertRecord(
+async function insertRecord( //
   db: Knex,
   accountsTable: ACCOUNTS_TABLE,
   data: AccountRecord,

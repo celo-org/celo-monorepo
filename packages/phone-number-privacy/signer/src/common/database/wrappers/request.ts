@@ -15,7 +15,7 @@ function requests(db: Knex, table: REQUESTS_TABLE) {
   return db<PnpSignRequestRecord>(table)
 }
 
-export async function getRequestExists(
+export async function getRequestExists( //
   db: Knex,
   requestsTable: REQUESTS_TABLE,
   account: string,
@@ -44,7 +44,7 @@ export async function getRequestExists(
   )
 }
 
-export async function storeRequest(
+export async function storeRequest( //
   db: Knex,
   requestsTable: REQUESTS_TABLE,
   account: string,

@@ -25,7 +25,7 @@ export async function initDatabase(
       host,
       port: port ?? 5432,
       ssl,
-      pool: { max: poolMaxSize },
+      pool: { max: poolMaxSize }, //
     }
   } else if (type === SupportedDatabase.MySql) {
     logger.info('Using MySql')
