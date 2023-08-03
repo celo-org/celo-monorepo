@@ -95,7 +95,7 @@ export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
   transaction.data = Bytes.fromNat(tx.data || '0x').toLowerCase()
   transaction.value = stringNumberToHex(tx.value?.toString())
   transaction.gas = stringNumberToHex(tx.gas)
-
+  transaction.chainId = tx.chainId || 1
   // Celo Specific
   transaction.feeCurrency = Bytes.fromNat(tx.feeCurrency || '0x').toLowerCase()
   transaction.gatewayFeeRecipient = Bytes.fromNat(tx.gatewayFeeRecipient || '0x').toLowerCase()

@@ -14,6 +14,26 @@ export interface CeloParams {
   gatewayFee: string
 }
 
+export type AccessListRaw = Array<[string, string[]]>
+
+export type HexOrMissing = `0x${string}` | undefined
+export interface FormattedCeloTx {
+  chainId: HexOrMissing
+  from: HexOrMissing
+  to: HexOrMissing
+  data: string | undefined
+  value: HexOrMissing
+  feeCurrency?: HexOrMissing
+  gatewayFeeRecipient?: HexOrMissing
+  gatewayFee?: HexOrMissing
+  gas: HexOrMissing
+  gasPrice?: `0x${string}`
+  maxFeePerGas?: `0x${string}`
+  maxPriorityFeePerGas?: `0x${string}`
+  nonce: HexOrMissing | number
+  accessList?: AccessListRaw
+}
+
 export type CeloTx = TransactionConfig & Partial<CeloParams> & { accessList?: AccessList }
 
 export interface CeloTxObject<T> {
@@ -50,18 +70,18 @@ interface FeeMarketAndAccessListTXProperties extends CommonTXProperties {
   accessList?: AccessList
 }
 
-interface EIP1559TXProperties extends FeeMarketAndAccessListTXProperties {
+export interface EIP1559TXProperties extends FeeMarketAndAccessListTXProperties {
   type: 'eip1559'
 }
 
-interface CIP42TXProperties extends FeeMarketAndAccessListTXProperties {
+export interface CIP42TXProperties extends FeeMarketAndAccessListTXProperties {
   feeCurrency: string
   gatewayFeeRecipient?: string
   gatewayFee?: string
   type: 'cip42'
 }
 
-interface LegacyTXProperties extends CommonTXProperties {
+export interface LegacyTXProperties extends CommonTXProperties {
   gasPrice: string
   feeCurrency: string
   gatewayFeeRecipient: string
@@ -118,7 +138,7 @@ export interface HttpProvider {
 }
 
 export interface RLPEncodedTx {
-  transaction: CeloTx
+  transaction: FormattedCeloTx
   rlpEncode: `0x${string}`
   type: TransactionTypes
 }

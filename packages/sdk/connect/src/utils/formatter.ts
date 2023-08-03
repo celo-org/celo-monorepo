@@ -12,30 +12,14 @@ import {
   CeloTxPending,
   CeloTxReceipt,
   Log,
+  FormattedCeloTx,
+  AccessListRaw,
 } from '../types'
-
-type HexOrMissing = `0x${string}` | undefined
-interface FormattedCeloTx {
-  chainId: HexOrMissing
-  from: HexOrMissing
-  to: HexOrMissing
-  data: string | undefined
-  value: HexOrMissing
-  feeCurrency?: HexOrMissing
-  gatewayFeeRecipient?: HexOrMissing
-  gatewayFee?: HexOrMissing
-  gas: HexOrMissing
-  gasPrice?: `0x${string}`
-  maxFeePerGas?: `0x${string}`
-  maxPriorityFeePerGas?: `0x${string}`
-  nonce: HexOrMissing
-  accessList?: ReturnType<typeof inputAccessListFormatter>
-}
 
 /**
  * Formats the input of a transaction and converts all values to HEX
  */
-export function inputCeloTxFormatter(tx: CeloTx) {
+export function inputCeloTxFormatter(tx: CeloTx): FormattedCeloTx {
   const {
     from,
     chainId,
@@ -60,7 +44,6 @@ export function inputCeloTxFormatter(tx: CeloTx) {
   formattedTX.from = inputAddressFormatter(from?.toString())
   formattedTX.to = inputAddressFormatter(to)
 
-  formattedTX.chainId = numberToHex(chainId)
   formattedTX.gas = numberToHex(gas)
 
   formattedTX.value = numberToHex(value?.toString())
@@ -284,7 +267,6 @@ export function outputBigNumberFormatter(hex: string): string {
 function isHash(value: string) {
   return isHex(value) && value.length == 32
 }
-type AccessListRaw = Array<[string, string[]]>
 
 export function parseAccessList(accessList_: AccessListRaw): AccessList {
   const accessList: AccessList = []

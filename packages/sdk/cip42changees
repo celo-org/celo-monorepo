@@ -26,6 +26,8 @@ TopLine Changes
 
 * added parseAccessList and inputAccessListFormatter for converting accessList from json to array of array and back
 
+* RLPEncodedTx now types its transaction field as FormattedTransaction this is more accurate than the CeloTX type it previously had
+
 ## kit
 
 * removed gasPriceSuggestionMultiplier == gas price from rpc no longer multipled by 5
