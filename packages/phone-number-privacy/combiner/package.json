@@ -53,6 +53,9 @@
     "firebase-functions-test": "^3.1.0",
     "firebase-tools": "12.4.7"
   },
+  "peerDependencies": {
+    "@celo/phone-number-privacy-signer": "^2.0.2"
+  },
   "engines": {
     "node": "18"
   }
