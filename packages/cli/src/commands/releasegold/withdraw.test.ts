@@ -28,7 +28,7 @@ testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
   test('can withdraw released gold to beneficiary', async () => {
     await testLocally(SetLiquidityProvision, ['--contract', contractAddress, '--yesreally'])
     // ReleasePeriod of default contract
-    await timeTravel(100000000, web3)
+    await timeTravel(300000000, web3)
     const releaseGoldWrapper = new ReleaseGoldWrapper(
       kit.connection,
       newReleaseGold(web3, contractAddress),
@@ -47,7 +47,7 @@ testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
   test("can't withdraw the whole balance if there is a cUSD balance", async () => {
     await testLocally(SetLiquidityProvision, ['--contract', contractAddress, '--yesreally'])
     // ReleasePeriod of default contract
-    await timeTravel(100000000, web3)
+    await timeTravel(300000000, web3)
     const releaseGoldWrapper = new ReleaseGoldWrapper(
       kit.connection,
       newReleaseGold(web3, contractAddress),
