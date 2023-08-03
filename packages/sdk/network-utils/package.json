@@ -28,8 +28,7 @@
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
-    "fetch-mock": "9.10.4",
-    "@celo/flake-tracker": "0.0.1-dev"
+    "fetch-mock": "9.10.4"
   },
   "engines": {
     "node": ">=8.13.0"

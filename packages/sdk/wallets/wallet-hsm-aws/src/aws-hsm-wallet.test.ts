@@ -8,8 +8,8 @@ import {
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '@celo/wallet-base'
 import { asn1FromPublicKey } from '@celo/wallet-hsm'
+import * as ethUtil from '@ethereumjs/util'
 import { BigNumber } from 'bignumber.js'
-import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
 import { AwsHsmWallet } from './aws-hsm-wallet'
 require('dotenv').config()
@@ -110,7 +110,8 @@ describe('AwsHsmWallet class', () => {
           }),
           getPublicKey: ({ KeyId }: { KeyId: string }) => ({
             promise: async () => {
-              const isGuid = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/
+              const isGuid =
+                /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/
               if (!KeyId.match(isGuid)) {
                 throw new Error(`Invalid keyId ${KeyId}`)
               }

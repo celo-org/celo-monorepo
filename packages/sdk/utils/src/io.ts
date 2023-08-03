@@ -1,5 +1,5 @@
 import { URL_REGEX } from '@celo/base/lib/io'
-import { isValidPublic, toChecksumAddress } from 'ethereumjs-util'
+import { isValidPublic, toChecksumAddress } from '@ethereumjs/util'
 import { either } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { isValidAddress } from './address'

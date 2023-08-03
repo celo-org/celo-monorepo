@@ -5,6 +5,7 @@ import {
   CircuitBreakerKeyStatus,
 } from './circuit-breaker'
 import { MockCircuitBreaker } from './circuit-breaker.mock'
+import fetchMock from '../__mocks__/cross-fetch'
 
 describe('CircuitBreakerClient', () => {
   const client = new CircuitBreakerClient(MockCircuitBreaker.environment)

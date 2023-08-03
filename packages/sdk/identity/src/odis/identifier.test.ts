@@ -9,6 +9,7 @@ import {
   IdentifierPrefix,
 } from './identifier'
 import { AuthenticationMethod, EncryptionKeySigner, ErrorMessages, ServiceContext } from './query'
+import fetchMock from '../__mocks__/cross-fetch'
 
 jest.mock('./bls-blinding-client', () => {
   // tslint:disable-next-line:no-shadowed-variable

@@ -236,14 +236,12 @@ export class ValidatorsWrapper extends BaseWrapperForGoverning<Validators> {
    *   account address. 96 bytes.
    * @return True upon success.
    */
-  updateBlsPublicKey: (
-    blsPublicKey: string,
-    blsPop: string
-  ) => CeloTransactionObject<boolean> = proxySend(
-    this.connection,
-    this.contract.methods.updateBlsPublicKey,
-    tupleParser(stringToSolidityBytes, stringToSolidityBytes)
-  )
+  updateBlsPublicKey: (blsPublicKey: string, blsPop: string) => CeloTransactionObject<boolean> =
+    proxySend(
+      this.connection,
+      this.contract.methods.updateBlsPublicKey,
+      tupleParser(stringToSolidityBytes, stringToSolidityBytes)
+    )
 
   /**
    * Returns whether a particular account has a registered validator.
@@ -294,8 +292,8 @@ export class ValidatorsWrapper extends BaseWrapperForGoverning<Validators> {
     return {
       name,
       address,
-      ecdsaPublicKey: (res.ecdsaPublicKey as unknown) as string,
-      blsPublicKey: (res.blsPublicKey as unknown) as string,
+      ecdsaPublicKey: res.ecdsaPublicKey as unknown as string,
+      blsPublicKey: res.blsPublicKey as unknown as string,
       affiliation: res.affiliation,
       score: fromFixed(new BigNumber(res.score)),
       signer: res.signer,

@@ -55,10 +55,6 @@ export interface SignerConfig {
       enabled: boolean
       shouldFailOpen: boolean
     }
-    legacyPhoneNumberPrivacy: {
-      enabled: boolean
-      shouldFailOpen: boolean
-    }
   }
   attestations: {
     numberAttestationsRequired: number
@@ -136,10 +132,6 @@ export const config: SignerConfig = {
     phoneNumberPrivacy: {
       enabled: toBool(env.PHONE_NUMBER_PRIVACY_API_ENABLED, false),
       shouldFailOpen: toBool(env.FULL_NODE_ERRORS_SHOULD_FAIL_OPEN, false),
-    },
-    legacyPhoneNumberPrivacy: {
-      enabled: toBool(env.LEGACY_PHONE_NUMBER_PRIVACY_API_ENABLED, false),
-      shouldFailOpen: toBool(env.LEGACY_FULL_NODE_ERRORS_SHOULD_FAIL_OPEN, false),
     },
   },
   attestations: {
