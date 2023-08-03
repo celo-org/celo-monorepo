@@ -54,7 +54,7 @@
     "firebase-tools": "12.4.7"
   },
   "peerDependencies": {
-    "@celo/phone-number-privacy-signer": "^2.0.2"
+    "@celo/phone-number-privacy-signer": "^3.0.0-dev"
   },
   "engines": {
     "node": ">=18"
