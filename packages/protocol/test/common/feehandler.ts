@@ -340,12 +340,13 @@ contract('FeeHandler', (accounts: string[]) => {
     it("Can't distribute when not active", async () => {
       await assertRevertWithReason(
         feeHandler.distribute(stableToken.address),
-        'Token has to be active to distribute'
+        'Handler has to be set to sell token'
       )
     })
 
     describe('When token is active', () => {
       beforeEach(async () => {
+        await feeHandler.addToken(stableToken.address, mentoSeller.address)
         await feeHandler.activateToken(stableToken.address)
       })
 
@@ -397,6 +398,7 @@ contract('FeeHandler', (accounts: string[]) => {
       })
 
       await feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS)
+      await feeHandler.addToken(stableToken.address, mentoSeller.address)
       await feeHandler.activateToken(stableToken.address)
       await feeHandler.activateToken(goldToken.address)
     })
@@ -738,10 +740,10 @@ contract('FeeHandler', (accounts: string[]) => {
       await feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS)
     })
 
-    it('should revert when token not active', async () => {
+    it('should revert when token not added', async () => {
       await assertRevertWithReason(
-        feeHandler.handle(goldToken.address),
-        'Token has to be active to handle'
+        feeHandler.handle(stableToken.address),
+        'Handler has to be set to sell token'
       )
     })
 

@@ -231,6 +231,7 @@ contract FeeHandler is
   }
 
   function _addToken(address tokenAddress, address handlerAddress) private {
+    require(handlerAddress != address(0), "Can't set handler to zero");
     TokenState storage tokenState = tokenStates[tokenAddress];
     tokenState.handler = handlerAddress;
 
@@ -247,6 +248,12 @@ contract FeeHandler is
   }
 
   function _activateToken(address tokenAddress) private {
+    TokenState storage tokenState = tokenStates[tokenAddress];
+    require(
+      tokenState.handler != address(0) ||
+        tokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
+      "Handler has to be set to activate token"
+    );
     activeTokens.add(tokenAddress);
   }
 
@@ -340,7 +347,6 @@ contract FeeHandler is
     @param tokenAddress The address of the token for which to distribute the available tokens.
   */
   function distribute(address tokenAddress) external {
-    require(activeTokens.contains(tokenAddress), "Token has to be active to distribute");
     return _distribute(tokenAddress);
   }
 
@@ -350,6 +356,11 @@ contract FeeHandler is
     uint256 tokenBalance = token.balanceOf(address(this));
 
     TokenState storage tokenState = tokenStates[tokenAddress];
+    require(
+      tokenState.handler != address(0) ||
+        tokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
+      "Handler has to be set to sell token"
+    );
 
     // safty check to avoid a revert due balance
     uint256 balanceToDistribute = Math.min(tokenBalance, tokenState.toDistribute);
@@ -451,7 +462,6 @@ contract FeeHandler is
   }
 
   function handle(address tokenAddress) external {
-    require(activeTokens.contains(tokenAddress), "Token has to be active to handle");
     return _handle(tokenAddress);
   }
 
