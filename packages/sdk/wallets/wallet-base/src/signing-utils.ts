@@ -86,7 +86,6 @@ function stringNumberToHex(num?: number | string): `0x${string}` {
   }
   return Bytes.fromNumber(auxNumber)
 }
-//TODO CIP42
 export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
   assertSerializableTX(tx)
   const transaction = inputCeloTxFormatter(tx)
@@ -114,17 +113,17 @@ export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
     // This will be in addition to the type 0x02 transaction as specified in EIP-1559.
     rlpEncode = RLP.encode([
       stringNumberToHex(transaction.chainId),
-      transaction.nonce,
-      transaction.maxPriorityFeePerGas,
-      transaction.maxFeePerGas,
-      transaction.gas,
-      transaction.feeCurrency,
-      transaction.gatewayFeeRecipient,
-      transaction.gatewayFee,
-      transaction.to,
-      transaction.value,
-      transaction.data,
-      transaction.accessList,
+      stringNumberToHex(transaction.nonce),
+      transaction.maxPriorityFeePerGas || '0x',
+      transaction.maxFeePerGas || '0x',
+      transaction.gas || '0x',
+      transaction.feeCurrency || '0x',
+      transaction.gatewayFeeRecipient || '0x',
+      transaction.gatewayFee || '0x',
+      transaction.to || '0x',
+      transaction.value || '0x',
+      transaction.data || '0x',
+      transaction.accessList || '0x',
     ])
     return { transaction, rlpEncode: concatHex(['0x7c', rlpEncode]), type: 'cip42' }
   } else if (isEIP1559(tx)) {
@@ -132,14 +131,14 @@ export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
     // 0x02 || rlp([chain_id, nonce, max_priority_fee_per_gas, max_fee_per_gas, gas_limit, destination, amount, data, access_list, signature_y_parity, signature_r, signature_s]).
     rlpEncode = RLP.encode([
       stringNumberToHex(transaction.chainId),
-      transaction.nonce,
-      transaction.maxPriorityFeePerGas,
-      transaction.maxFeePerGas,
-      transaction.gas,
-      transaction.to,
-      transaction.value,
-      transaction.data,
-      transaction.accessList,
+      stringNumberToHex(transaction.nonce),
+      transaction.maxPriorityFeePerGas || '0x',
+      transaction.maxFeePerGas || '0x',
+      transaction.gas || '0x',
+      transaction.to || '0x',
+      transaction.value || '0x',
+      transaction.data || '0x',
+      transaction.accessList || '0x',
     ])
     return { transaction, rlpEncode: concatHex(['0x02', rlpEncode]), type: 'eip1559' }
   } else {
@@ -187,14 +186,17 @@ function assertSerializableTX(tx: CeloTx) {
 
   // ensure at least gasPrice or maxFeePerGas and maxPriorityFeePerGas are set
   if (
-    isNullOrUndefined(tx.gasPrice) &&
-    (isNullOrUndefined(tx.maxFeePerGas) || isNullOrUndefined(tx.maxPriorityFeePerGas))
+    !isPresent(tx.gasPrice) &&
+    (!isPresent(tx.maxFeePerGas) || !isPresent(tx.maxPriorityFeePerGas))
   ) {
     throw new Error('"gasPrice" or "maxFeePerGas" and "maxPriorityFeePerGas" are missing')
   }
 
   // ensure that gasPrice and maxFeePerGas are not set at the same time
-  if (tx.gasPrice && (tx.maxFeePerGas || tx.maxPriorityFeePerGas)) {
+  if (
+    isPresent(tx.gasPrice) &&
+    (isPresent(tx.maxFeePerGas) || isPresent(tx.maxPriorityFeePerGas))
+  ) {
     throw new Error(
       'when "maxFeePerGas" or "maxPriorityFeePerGas" are set, "gasPrice" must not be set'
     )
@@ -207,25 +209,23 @@ function assertSerializableTX(tx: CeloTx) {
     )
   }
 
-  if (
-    isLessThanZero(tx.nonce) ||
-    isLessThanZero(tx.gas) ||
-    isLessThanZero(tx.chainId) ||
-    isPriceToLow(tx)
-  ) {
-    throw new Error(
-      'Gas, gasPrice or maxFeePerGas/maxPriorityFeePerGas, nonce or chainId is lower than 0'
-    )
+  if (isLessThanZero(tx.nonce) || isLessThanZero(tx.gas) || isLessThanZero(tx.chainId)) {
+    throw new Error('Gas, nonce or chainId is less than than 0')
   }
+  isPriceToLow(tx)
 }
 
-function isPriceToLow(tx: CeloTx) {
-  const prices = [tx.gasPrice, tx.maxFeePerGas, tx.maxPriorityFeePerGas]
+export function isPriceToLow(tx: CeloTx) {
+  const prices = [tx.gasPrice, tx.maxFeePerGas, tx.maxPriorityFeePerGas].filter(
+    (price) => price != undefined
+  )
   let isLow = false
   for (const price of prices) {
-    console.info('price', price)
-    isLow = isLessThanZero(price)
+    if (isLessThanZero(price)) {
+      throw new Error('GasPrice or maxFeePerGas or maxPriorityFeePerGas is less than than 0')
+    }
   }
+
   return isLow
 }
 
