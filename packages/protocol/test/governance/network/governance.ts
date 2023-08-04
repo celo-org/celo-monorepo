@@ -86,6 +86,7 @@ interface Transaction {
   data: Buffer
 }
 
+// TODO(asa): Test dequeueProposalsIfReady
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
 contract('Governance', (accounts: string[]) => {
   let governance: GovernanceTestInstance
@@ -1119,7 +1120,9 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when it has been more than dequeueFrequency since the last dequeue', () => {
       const upvotedProposalId = 2
+      let originalLastDequeue: BigNumber
       beforeEach(async () => {
+        originalLastDequeue = await governance.lastDequeue()
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -1130,21 +1133,23 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
+        await timeTravel(dequeueFrequency, web3)
       })
 
-      it('should only dequeue proposal(s) which is past lastDequeue time', async () => {
-        await governance.upvote(proposalId, upvotedProposalId, 0)
-
-        assert.equal((await governance.getQueueLength()).toNumber(), 2)
-        await timeTravel(dequeueFrequency, web3)
-        await governance.upvote(upvotedProposalId, 0, proposalId)
-        assert.equal((await governance.getQueueLength()).toNumber(), 1)
+      it('should dequeue queued proposal(s)', async () => {
+        const queueLength = await governance.getQueueLength()
+        await governance.upvote(upvotedProposalId, 0, 0)
+        assert.isFalse(await governance.isQueued(proposalId))
+        assert.equal(
+          (await governance.getQueueLength()).toNumber(),
+          queueLength.minus(concurrentProposals).toNumber()
+        )
+        assertEqualBN(await governance.dequeued(0), proposalId)
+        assert.isBelow(originalLastDequeue.toNumber(), (await governance.lastDequeue()).toNumber())
       })
 
-      it('should return false when upvoting a proposal that will be dequeued', async () => {
-        await timeTravel(dequeueFrequency, web3)
-        const isUpvoted = await governance.upvote.call(proposalId, 0, 0)
-        assert.isFalse(isUpvoted)
+      it('should revert when upvoting a proposal that will be dequeued', async () => {
+        await assertRevert(governance.upvote(proposalId, 0, 0))
       })
     })
 
@@ -1153,7 +1158,7 @@ contract('Governance', (accounts: string[]) => {
       // Expire the upvoted proposal without dequeueing it.
       const queueExpiry1 = 60
       beforeEach(async () => {
-        await governance.setQueueExpiry(queueExpiry1)
+        await governance.setQueueExpiry(60)
         await governance.upvote(proposalId, 0, 0)
         await timeTravel(queueExpiry1, web3)
         await governance.propose(
@@ -3811,63 +3816,6 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe('#dequeueProposalIfReady()', () => {
-    it('should not update lastDequeue proposal does not exist in the queue', async () => {
-      const nonExistentProposalId = 7
-      const originalLastDequeue = await governance.lastDequeue()
-      await timeTravel(dequeueFrequency, web3)
-      await governance.dequeueProposalIfReady(nonExistentProposalId)
-      assert.equal((await governance.getQueueLength()).toNumber(), 0)
-      assert.equal((await governance.lastDequeue()).toNumber(), originalLastDequeue.toNumber())
-    })
-    describe('when a proposal exists', () => {
-      const proposalId = 1
-      beforeEach(async () => {
-        await governance.propose(
-          [transactionSuccess1.value],
-          [transactionSuccess1.destination],
-          // @ts-ignore bytes type
-          transactionSuccess1.data,
-          [transactionSuccess1.data.length],
-          descriptionUrl,
-          { value: minDeposit }
-        )
-      })
-
-      it('should not update `dequeued` when proposal has expired', async () => {
-        await timeTravel(queueExpiry, web3)
-        await governance.dequeueProposalIfReady(proposalId)
-        const dequeued = await governance.getDequeue()
-        assert.equal(dequeued.length, 0)
-      })
-
-      it('should update `dequeued` when proposal has not expired', async () => {
-        await timeTravel(dequeueFrequency, web3)
-        await governance.dequeueProposalIfReady(proposalId)
-        const dequeued = await governance.getDequeue()
-        assert.include(
-          dequeued.map((x) => x.toNumber()),
-          proposalId
-        )
-      })
-
-      it('should update lastDequeue', async () => {
-        const originalLastDequeue = await governance.lastDequeue()
-
-        await timeTravel(dequeueFrequency, web3)
-        await governance.dequeueProposalIfReady(proposalId)
-
-        assert.equal((await governance.getQueueLength()).toNumber(), 0)
-        assert.isTrue((await governance.lastDequeue()).toNumber() > originalLastDequeue.toNumber())
-      })
-
-      it('should still be valid if not dequeued or expired', async () => {
-        await governance.dequeueProposalIfReady(proposalId)
-        const isQueuedProposalExpired = await governance.isQueuedProposalExpired(1)
-        assert.isFalse(isQueuedProposalExpired)
-      })
-    })
-  })
   describe('#getProposalStage()', () => {
     const expectStage = async (expected: Stage, _proposalId: number) => {
       const stage = await governance.getProposalStage(_proposalId)
