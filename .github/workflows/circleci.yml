@@ -365,6 +365,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/contractkit') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+      github.event_name == 'pull_request' && contains(github.base_ref, 'release/') ||
       false
     steps:
       - uses: actions/cache/restore@v3
