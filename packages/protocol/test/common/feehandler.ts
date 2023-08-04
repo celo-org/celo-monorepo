@@ -523,8 +523,9 @@ contract('FeeHandler', (accounts: string[]) => {
       // console.log('Uniswap INIT CODE PAIR HASH:', await uniswapFactory.INIT_CODE_PAIR_HASH())
       beforeEach(async () => {
         deadline = (await web3.eth.getBlock('latest')).timestamp + 100
-
         uniswapFactory = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
+        // tslint:disable-next-line
+        console.log('Uniswap INIT CODE PAIR HASH:', await uniswapFactory.INIT_CODE_PAIR_HASH())
 
         uniswap = await UniswapRouter.new(
           uniswapFactory.address,
@@ -539,7 +540,6 @@ contract('FeeHandler', (accounts: string[]) => {
         ) // _factory, _WETH
 
         await feeCurrencyWhitelist.addToken(tokenA.address)
-
         await uniswapFeeHandlerSeller.initialize(registry.address, [], [])
         await uniswapFeeHandlerSeller.setRouter(tokenA.address, uniswap.address)
         await tokenA.mint(feeHandler.address, new BigNumber(10e18))
