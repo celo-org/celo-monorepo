@@ -56,6 +56,7 @@ echo " - Base commit $BASE_COMMIT"
 echo " - Checkout migrationsConfig.js at $BRANCH"
 git checkout $BRANCH -- migrationsConfig.js
 
+OLD_BRANCH=$BUILD_DIR
 source scripts/bash/contract-exclusion-regex.sh
 yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --output_file report.json
 
