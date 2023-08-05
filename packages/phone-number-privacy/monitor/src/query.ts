@@ -53,7 +53,7 @@ export const queryOdisForSalt = async (
     console.log(`ODIS salt request timed out after ${timeoutMs} ms`) // tslint:disable-line:no-console
   }, timeoutMs)
   try {
-    const testSessionId = Math.floor(Math.random() * 100).toString()
+    const testSessionId = Math.floor(Math.random() * 100000).toString()
     const res = await OdisUtils.Identifier.getObfuscatedIdentifier(
       phoneNumber,
       OdisUtils.Identifier.IdentifierPrefix.PHONE_NUMBER,
