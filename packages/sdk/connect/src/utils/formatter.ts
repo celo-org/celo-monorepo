@@ -5,15 +5,15 @@ import BigNumber from 'bignumber.js'
 import { encode } from 'utf8'
 import { AccessList } from 'web3-core'
 import {
+  AccessListRaw,
   Block,
   BlockHeader,
   BlockNumber,
   CeloTx,
   CeloTxPending,
   CeloTxReceipt,
-  Log,
   FormattedCeloTx,
-  AccessListRaw,
+  Log,
 } from '../types'
 
 /**
@@ -268,8 +268,12 @@ function isHash(value: string) {
   return isHex(value) && value.length == 32
 }
 
-export function parseAccessList(accessList_: AccessListRaw): AccessList {
+export function parseAccessList(accessList_: AccessListRaw | '0x'): AccessList {
   const accessList: AccessList = []
+  // if no list was provided to original tx then it will return as "0x"
+  if (accessList_ === '0x') {
+    return accessList
+  }
   for (let i = 0; i < accessList_.length; i++) {
     const [address, storageKeys] = accessList_[i]
 

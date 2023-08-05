@@ -126,25 +126,37 @@ describe('Local wallet class', () => {
         })
 
         test('fails calling signTransaction', async () => {
-          await expect(wallet.signTransaction(celoTransaction)).rejects.toThrowError()
+          await expect(
+            wallet.signTransaction(celoTransaction)
+          ).rejects.toThrowErrorMatchingInlineSnapshot(
+            `"Could not find address 0x588e4b68193001e4d10928660ab4165b813717c0"`
+          )
         })
 
         test('fails calling signPersonalMessage', async () => {
           const hexStr: string = '0xa1'
-          await expect(wallet.signPersonalMessage(unknownAddress, hexStr)).rejects.toThrowError()
+          await expect(
+            wallet.signPersonalMessage(unknownAddress, hexStr)
+          ).rejects.toThrowErrorMatchingInlineSnapshot(
+            `"Could not find address 0x588e4b68193001e4d10928660ab4165b813717c0"`
+          )
         })
 
         test('fails calling signTypedData', async () => {
-          await expect(wallet.signTypedData(unknownAddress, TYPED_DATA)).rejects.toThrowError()
+          await expect(
+            wallet.signTypedData(unknownAddress, TYPED_DATA)
+          ).rejects.toThrowErrorMatchingInlineSnapshot(
+            `"Could not find address 0x588e4b68193001e4d10928660ab4165b813717c0"`
+          )
         })
       })
 
       describe('using a known address', () => {
         describe('when calling signTransaction', () => {
-          let celoTransaction: CeloTx
+          let celoTransactionWithGasPrice: CeloTx
 
           beforeEach(() => {
-            celoTransaction = {
+            celoTransactionWithGasPrice = {
               from: knownAddress,
               to: otherAddress,
               chainId: CHAIN_ID,
@@ -160,32 +172,96 @@ describe('Local wallet class', () => {
           })
 
           test('succeeds with legacy', async () => {
-            await expect(wallet.signTransaction(celoTransaction)).resolves.toMatchInlineSnapshot()
+            await expect(wallet.signTransaction(celoTransactionWithGasPrice)).resolves
+              .toMatchInlineSnapshot(`
+              {
+                "raw": "0xf88480630a80941be31a94361a391bbafb2a4ccd704f57dc04d4bb82567894588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdef83015ad8a09e121a99dc0832a9f4d1d71500b3c8a69a3c064d437c225d6292577ffcc45a71a02c5efa3c4b58953c35968e42d11d3882dacacf45402ee802824268b7cd60daff",
+                "tx": {
+                  "feeCurrency": "0x",
+                  "gas": "0x0a",
+                  "gasPrice": "0x63",
+                  "gatewayFee": "0x5678",
+                  "gatewayFeeRecipient": "0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb",
+                  "hash": "0xd24898ee3f68caa01fe065784453db7360bf783060fcbd18033f9d254ab8b082",
+                  "input": "0xabcdef",
+                  "nonce": "0",
+                  "r": "0x9e121a99dc0832a9f4d1d71500b3c8a69a3c064d437c225d6292577ffcc45a71",
+                  "s": "0x2c5efa3c4b58953c35968e42d11d3882dacacf45402ee802824268b7cd60daff",
+                  "to": "0x588e4b68193001e4d10928660ab4165b813717c0",
+                  "v": "0x015ad8",
+                  "value": "0x0de0b6b3a7640000",
+                },
+                "type": "celo-legacy",
+              }
+            `)
           })
 
           test('succeeds with eip1559', async () => {
             const transaction1559 = {
-              ...celoTransaction,
+              ...celoTransactionWithGasPrice,
               gasPrice: undefined,
               feeCurrency: undefined,
               maxFeePerGas: '99',
               maxPriorityFeePerGas: '99',
             }
-            await expect(wallet.signTransaction(transaction1559)).resolves.toMatchInlineSnapshot()
+            await expect(wallet.signTransaction(transaction1559)).resolves.toMatchInlineSnapshot(`
+              {
+                "raw": "0x02f87082ad5a8063630a94588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdef8083015ad7a00fd2d0c579a971ebc04207d8c5ff5bb3449052f0c9e946a7146e5ae4d4ec6289a0737423de64cc81a62e700b5ca7970212aaed3d28de4dbce8b054483d361f6ff8",
+                "tx": {
+                  "accessList": undefined,
+                  "gas": "0x0a",
+                  "hash": "0xa299b73ecf7d44ab4eb27aef90acd154f0573280e75183b160e9b33bc2f8b649",
+                  "input": "0xabcdef",
+                  "maxFeePerGas": "0x63",
+                  "maxPriorityFeePerGas": "0x63",
+                  "nonce": "0",
+                  "r": "0x0fd2d0c579a971ebc04207d8c5ff5bb3449052f0c9e946a7146e5ae4d4ec6289",
+                  "s": "0x737423de64cc81a62e700b5ca7970212aaed3d28de4dbce8b054483d361f6ff8",
+                  "to": "0x588e4b68193001e4d10928660ab4165b813717c0",
+                  "v": "0x015ad7",
+                  "value": "0x0de0b6b3a7640000",
+                },
+                "type": "eip1559",
+              }
+            `)
           })
           test('succeeds with cip42', async () => {
-            const transaction1559 = {
-              ...celoTransaction,
+            const transaction42 = {
+              ...celoTransactionWithGasPrice,
               gasPrice: undefined,
               maxFeePerGas: '99',
               maxPriorityFeePerGas: '99',
               feeCurrency: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
             }
-            await expect(wallet.signTransaction(transaction1559)).resolves.toMatchInlineSnapshot()
+            await expect(wallet.signTransaction(transaction42)).resolves.toMatchInlineSnapshot(`
+              {
+                "raw": "0x7cf89d82ad5a8063630a94cd2a3d9f938e13cd947ec05abc7fe734df8dd826941be31a94361a391bbafb2a4ccd704f57dc04d4bb82567894588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdef8083015ad8a01078f1b7134f94643e5a8c297690357a463069580287a2cb92f8ba3fb0814826a056621cc5f5b01790374673b8aa8e6969b206d89109ffc4b13cd774ffb5301f03",
+                "tx": {
+                  "accessList": undefined,
+                  "feeCurrency": "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
+                  "gas": "0x0a",
+                  "gatewayFee": "0x5678",
+                  "gatewayFeeRecipient": "0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb",
+                  "hash": "0xe7ca8194491033ca38e16707dd32fe1bafc6565f047195ad7fde56d0555aab11",
+                  "input": "0xabcdef",
+                  "maxFeePerGas": "0x63",
+                  "maxPriorityFeePerGas": "0x63",
+                  "nonce": "0",
+                  "r": "0x1078f1b7134f94643e5a8c297690357a463069580287a2cb92f8ba3fb0814826",
+                  "s": "0x56621cc5f5b01790374673b8aa8e6969b206d89109ffc4b13cd774ffb5301f03",
+                  "to": "0x588e4b68193001e4d10928660ab4165b813717c0",
+                  "v": "0x015ad8",
+                  "value": "0x0de0b6b3a7640000",
+                },
+                "type": "cip42",
+              }
+            `)
           })
 
           test('with same signer', async () => {
-            const signedTx: EncodedTransaction = await wallet.signTransaction(celoTransaction)
+            const signedTx: EncodedTransaction = await wallet.signTransaction(
+              celoTransactionWithGasPrice
+            )
             const [, recoveredSigner] = recoverTransaction(signedTx.raw)
             expect(normalizeAddressWith0x(recoveredSigner)).toBe(
               normalizeAddressWith0x(knownAddress)
@@ -227,6 +303,7 @@ describe('Local wallet class', () => {
 
           beforeEach(() => {
             celoTransactionBase = {
+              gas: '1000000000',
               from: knownAddress,
               to: otherAddress,
               chainId: CHAIN_ID,
@@ -258,10 +335,10 @@ describe('Local wallet class', () => {
                 ...celoTransactionBase,
                 maxFeePerGas,
                 maxPriorityFeePerGas,
-                gas: '0x100000000',
+                gasPrice: '0x100000000',
               }
-              expect(async () => await wallet.signTransaction(transaction)).toThrowError(
-                'Only one of gas or maxFeePerGas/maxPriorityFeePerGas can be set'
+              expect(async () => await wallet.signTransaction(transaction)).rejects.toThrowError(
+                'when "maxFeePerGas" or "maxPriorityFeePerGas" are set, "gasPrice" must not be set'
               )
             })
           })

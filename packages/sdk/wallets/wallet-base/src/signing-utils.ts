@@ -262,8 +262,11 @@ export async function encodeTransaction(
   const v = sanitizedSignature.v
   const r = sanitizedSignature.r
   const s = sanitizedSignature.s
-
-  const decodedTX = RLP.decode(rlpEncoded.rlpEncode)
+  // new types have prefix but legacy does not
+  const decodedTX =
+    rlpEncoded.type === 'celo-legacy'
+      ? RLP.decode(rlpEncoded.rlpEncode)
+      : RLP.decode(`0x${rlpEncoded.rlpEncode.slice(4)}`)
   // for legacy tx we need to slice but for new ones we do not want to do that
   const rawTx = (rlpEncoded.type === 'celo-legacy' ? decodedTX.slice(0, 9) : decodedTX).concat([
     v,
@@ -409,7 +412,7 @@ function recoverTransactionCIP42(serializedTransaction: string): [CeloTx, string
   debug('signing-utils@recoverTransactionCIP42: values are %s', transactionArray)
   if (transactionArray.length !== 15 && transactionArray.length !== 12) {
     throw new Error(
-      `Invalid transaction length for type CIP42: ${transactionArray.length} instead of 15 or 12. rawTx: ${serializedTransaction}`
+      `Invalid transaction length for type CIP42: ${transactionArray.length} instead of 15 or 12. array: ${transactionArray}`
     )
   }
   const [
