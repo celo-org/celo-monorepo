@@ -51,21 +51,22 @@ export function startSigner(
   app.use(express.json({ limit: '0.2mb' }) as RequestHandler, loggerMiddleware(config.serviceName))
 
   app.get(SignerEndpoint.STATUS, (_req, res) => {
-    const parentSpan = tracer.startSpan('status')
-    parentSpan.addEvent('Called STATUS')
-    parentSpan.setAttribute(SemanticAttributes.CODE_FUNCTION, 'doWork')
-    parentSpan.setAttribute(SemanticAttributes.HTTP_ROUTE, _req.path)
-    parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, _req.method)
-    parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, _req.ip)
-    parentSpan.addEvent('Returning 200')
-    res.status(200).json({
-      version: getSignerVersion(),
+    tracer.startActiveSpan('status', (parentSpan) => {
+      parentSpan.addEvent('Called STATUS')
+      parentSpan.setAttribute(SemanticAttributes.CODE_FUNCTION, 'doWork')
+      parentSpan.setAttribute(SemanticAttributes.HTTP_ROUTE, _req.path)
+      parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, _req.method)
+      parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, _req.ip)
+      parentSpan.addEvent('Returning 200')
+      res.status(200).json({
+        version: getSignerVersion(),
+      })
+      parentSpan.setStatus({
+        code: SpanStatusCode.OK,
+        message: 'OK',
+      })
+      parentSpan.end()
     })
-    parentSpan.setStatus({
-      code: SpanStatusCode.OK,
-      message: 'OK',
-    })
-    parentSpan.end()
   })
 
   app.get(SignerEndpoint.METRICS, (_req, res) => {
@@ -79,7 +80,19 @@ export function startSigner(
     app.post(endpoint, async (req, res) => {
       const childLogger: Logger = res.locals.logger
       try {
-        await handler(req, res)
+        tracer.startActiveSpan('main', async (parentSpan) => {
+          parentSpan.addEvent('Called ' + req.path)
+          parentSpan.setAttribute(SemanticAttributes.HTTP_ROUTE, req.path)
+          parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, req.method)
+          parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, req.ip)
+          await handler(req, res)
+          parentSpan.setStatus({
+            code: SpanStatusCode.OK,
+            message: 'OK',
+          })
+          parentSpan.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, res.statusCode)
+          parentSpan.end()
+        })
       } catch (err: any) {
         // Handle any errors that otherwise managed to escape the proper handlers
         childLogger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
