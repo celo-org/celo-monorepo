@@ -86,7 +86,7 @@ export function startSigner(
           parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, req.method)
           parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, req.ip)
           await handler(req, res)
-          if (res.statusCode >= 300) {
+          if (res.statusCode < 400) {
             parentSpan.setStatus({
               code: SpanStatusCode.OK,
               message: res.statusMessage,
