@@ -4,8 +4,6 @@ import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import {
   AuthenticationMethod,
-  LegacyPnpQuotaRequest,
-  LegacySignMessageRequest,
   PhoneNumberPrivacyRequest,
   PnpQuotaRequest,
   SignMessageRequest,
@@ -126,33 +124,6 @@ export function getPnpQuotaRequest(
   return {
     account,
     authenticationMethod,
-    sessionID: genSessionID(),
-  }
-}
-export function getLegacyPnpQuotaRequest(
-  account: string,
-  authenticationMethod?: string,
-  hashedPhoneNumber?: string
-): LegacyPnpQuotaRequest {
-  return {
-    account,
-    authenticationMethod,
-    hashedPhoneNumber,
-    sessionID: genSessionID(),
-  }
-}
-
-export function getLegacyPnpSignRequest(
-  account: string,
-  blindedQueryPhoneNumber: string,
-  authenticationMethod?: string,
-  hashedPhoneNumber?: string
-): LegacySignMessageRequest {
-  return {
-    account,
-    blindedQueryPhoneNumber,
-    authenticationMethod,
-    hashedPhoneNumber,
     sessionID: genSessionID(),
   }
 }

@@ -1,4 +1,4 @@
-const ganache = require('@celo/ganache-cli')
+const ganache = require('ganache')
 const glob = require('glob-fs')({
   gitignore: false,
 })
@@ -14,33 +14,28 @@ const isCI = process.env.CI === 'true'
 
 async function startGanache() {
   const server = ganache.server({
-    default_balance_ether: network.defaultBalance,
-    network_id: network.network_id,
-    mnemonic: network.mnemonic,
-    gasPrice: network.gasPrice,
-    gasLimit: 20000000,
-    allowUnlimitedContractSize: true,
+    logging: { quiet: true },
+    wallet: { mnemonic: network.mnemonic, defaultBalance: network.defaultBalance },
+    miner: {
+      blockGasLimit: 20000000,
+      defaultGasPrice: network.gasPrice,
+    },
+    chain: {
+      networkId: network.network_id,
+      chainId: 1,
+      allowUnlimitedContractSize: true,
+      hardfork: 'istanbul',
+    },
   })
 
-  await new Promise((resolve, reject) => {
-    server.listen(8545, (err, blockchain) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(blockchain)
-      }
-    })
+  server.listen(8545, (err, blockchain) => {
+    if (err) throw err
+    blockchain
   })
 
-  return () =>
-    new Promise((resolve, reject) => {
-      server.close((err) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      })
+  return async () =>
+    await server.close((err) => {
+      if (err) throw err
     })
 }
 

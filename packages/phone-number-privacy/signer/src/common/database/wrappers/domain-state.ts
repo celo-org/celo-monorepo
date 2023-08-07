@@ -1,7 +1,8 @@
-import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import { Domain, domainHash } from '@celo/phone-number-privacy-common/lib/domains'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
+import { config } from '../../../config'
 import { Histograms, meter } from '../../metrics'
 import {
   DOMAIN_STATE_COLUMNS,
@@ -29,7 +30,7 @@ export async function setDomainDisabled<D extends Domain>(
         .transacting(trx)
         .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
         .update(DOMAIN_STATE_COLUMNS.disabled, true)
-        .timeout(DB_TIMEOUT)
+        .timeout(config.db.timeout)
     },
     [],
     (err: any) => countAndThrowDBError(err, logger, ErrorMessage.DATABASE_UPDATE_FAILURE),
@@ -71,7 +72,7 @@ export async function getDomainStateRecord<D extends Domain>(
       const result = await tableWithLockForTrx(domainStates(db), trx)
         .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
         .first()
-        .timeout(DB_TIMEOUT)
+        .timeout(config.db.timeout)
 
       // bools are stored in db as ints (1 or 0), so we must cast them back
       if (result) {
@@ -111,7 +112,7 @@ export async function updateDomainStateRecord<D extends Domain>(
           .transacting(trx)
           .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
           .update(domainState)
-          .timeout(DB_TIMEOUT)
+          .timeout(config.db.timeout)
       }
     },
     [],
@@ -130,7 +131,7 @@ export async function insertDomainStateRecord(
   return meter(
     async () => {
       logger.debug({ domainState }, 'Insert domain state')
-      await domainStates(db).transacting(trx).insert(domainState).timeout(DB_TIMEOUT)
+      await domainStates(db).transacting(trx).insert(domainState).timeout(config.db.timeout)
       return domainState
     },
     [],

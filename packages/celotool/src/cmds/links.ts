@@ -33,7 +33,7 @@ export const builder = (yargs: Argv) => {
     })
     .command('all', 'prints out all links', {}, async (rawArgs: Arguments) => {
       commands.forEach(async (cmd) => {
-        const argv = (rawArgs as any) as LinkArgEnv
+        const argv = rawArgs as any as LinkArgEnv
         const url = cmd.url(argv)
 
         console.info(`$ celotooljs links ${cmd.command}\n`)
@@ -51,7 +51,7 @@ export const builder = (yargs: Argv) => {
 
   return commands.reduce((pYargs: Argv, cmd) => {
     return pYargs.command(cmd.command, cmd.description, {}, async (rawArgs: Arguments) => {
-      const argv = (rawArgs as any) as LinkArgEnv
+      const argv = rawArgs as any as LinkArgEnv
       const url = cmd.url(argv)
       if (argv.explanation) {
         console.info(cmd.explanation)

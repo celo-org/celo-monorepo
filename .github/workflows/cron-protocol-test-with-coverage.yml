@@ -12,7 +12,7 @@ jobs:
   # This seems to take ages and last codecov report is from 2021-02-25 :/
   # https://app.codecov.io/gh/celo-org/celo-monorepo/commits
   protocol-test-with-code-coverage:
-    runs-on: ["self-hosted", "monorepo"]
+    runs-on: ["self-hosted", "monorepo-node18"]
     steps:
       - uses: actions/checkout@v3
       - name: Install yarn dependencies

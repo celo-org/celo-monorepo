@@ -23,9 +23,9 @@ import { ABI as RegistryABI } from '@celo/contractkit/lib/generated/Registry'
 // tslint:disable: ordered-imports
 import {
   getInitializeAbiOfImplementation,
-  setImplementationOnProxy,
   SET_AND_INITIALIZE_IMPLEMENTATION_ABI,
   SET_IMPLEMENTATION_ABI,
+  setImplementationOnProxy,
 } from '@celo/contractkit/lib/proxy'
 // tslint:enable: ordered-imports
 import { valueToString } from '@celo/contractkit/lib/wrappers/BaseWrapper'
@@ -40,7 +40,8 @@ import { isValidAddress } from '@celo/utils/lib/address'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
-import { keccak256 } from 'ethereumjs-util'
+import { keccak256 } from 'ethereum-cryptography/keccak'
+import { utf8ToBytes } from 'ethereum-cryptography/utils'
 import * as inquirer from 'inquirer'
 
 const debug = debugFactory('governance:proposals')
@@ -54,7 +55,7 @@ export const hotfixToEncodedParams = (kit: ContractKit, proposal: Proposal, salt
   )
 
 export const hotfixToHash = (kit: ContractKit, proposal: Proposal, salt: Buffer) =>
-  keccak256(hotfixToEncodedParams(kit, proposal, salt)) as Buffer
+  keccak256(utf8ToBytes(hotfixToEncodedParams(kit, proposal, salt))) as Buffer
 
 /**
  * JSON encoding of a proposal transaction.

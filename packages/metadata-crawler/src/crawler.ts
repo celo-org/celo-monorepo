@@ -148,7 +148,7 @@ async function processDomainClaims() {
   items = items.map((a) => ({
     ...a,
     // Addresses are stored by blockscout as just the bytes prepended with \x
-    address: normalizeAddressWith0x(a.address.substr(2)),
+    address: normalizeAddressWith0x(a.address.substring(2)),
   }))
 
   return concurrentMap(CONCURRENCY, items, (item) => processDomainClaimForValidator(item))
