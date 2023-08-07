@@ -94,22 +94,33 @@ export function startSigner(
           parentSpan.end()
         })
       } catch (err: any) {
-        // Handle any errors that otherwise managed to escape the proper handlers
-        childLogger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
-        childLogger.error(err)
-        Counters.errorsCaughtInEndpointHandler.inc()
-        if (!res.headersSent) {
-          childLogger.info('Responding with error in outer endpoint handler')
-          res.status(500).json({
-            success: false,
-            error: ErrorMessage.UNKNOWN_ERROR,
+        tracer.startActiveSpan('error', (parentSpan) => {
+          parentSpan.setStatus({
+            code: SpanStatusCode.ERROR,
+            message: 'Fail',
           })
-        } else {
-          // Getting to this error likely indicates that the `perform` process
-          // does not terminate after sending a response, and then throws an error.
-          childLogger.error(ErrorMessage.ERROR_AFTER_RESPONSE_SENT)
-          Counters.errorsThrownAfterResponseSent.inc()
-        }
+          parentSpan.setAttribute(SemanticAttributes.HTTP_ROUTE, req.path)
+          parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, req.method)
+          parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, req.ip)
+          parentSpan.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, res.statusCode)
+          // Handle any errors that otherwise managed to escape the proper handlers
+          childLogger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
+          childLogger.error(err)
+          Counters.errorsCaughtInEndpointHandler.inc()
+          if (!res.headersSent) {
+            childLogger.info('Responding with error in outer endpoint handler')
+            res.status(500).json({
+              success: false,
+              error: ErrorMessage.UNKNOWN_ERROR,
+            })
+          } else {
+            // Getting to this error likely indicates that the `perform` process
+            // does not terminate after sending a response, and then throws an error.
+            childLogger.error(ErrorMessage.ERROR_AFTER_RESPONSE_SENT)
+            Counters.errorsThrownAfterResponseSent.inc()
+          }
+          parentSpan.end()
+        })
       }
     })
 
