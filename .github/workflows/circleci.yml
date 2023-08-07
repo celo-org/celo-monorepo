@@ -8,9 +8,11 @@ on:
   push:
     branches:
       - master
+      - 'release/**'
   pull_request:
     branches:
       - master
+      - 'release/**'
 
 concurrency:
   group: circle-ci-${{ github.ref }}
@@ -217,6 +219,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+      github.event_name == 'pull_request' && contains(github.base_ref, 'release/') ||
       false
     outputs:
       protocol-test-must-run: ${{ steps.protocol-test-must-run.outputs.PROTOCOL_TEST_MUST_RUN }}
@@ -258,6 +261,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+      github.event_name == 'pull_request' && contains(github.base_ref, 'release/') ||
       false
     steps:
       - uses: actions/cache/restore@v3
@@ -274,6 +278,12 @@ jobs:
         run: |
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
           (cp -r packages/protocol/.tmp/released_chain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 20
+        if: false
+        with:
+          limit-access-to-actor: true
       - name: Test against current release
         run: |
           echo "Comparing against $RELEASE_TAG"
@@ -289,6 +299,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+      github.event_name == 'pull_request' && contains(github.base_ref, 'release/') ||
       false
     strategy:
       fail-fast: false
@@ -360,6 +371,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/contractkit') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+      github.event_name == 'pull_request' && contains(github.base_ref, 'release/') ||
       false
     steps:
       - uses: actions/cache/restore@v3

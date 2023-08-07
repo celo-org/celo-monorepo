@@ -34,8 +34,8 @@ library UniswapV2Library {
             keccak256(abi.encodePacked(token0, token1)),
             // This variable was hardcoded for Uniswap Eth Mainnet deployment
             // hex"96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f" // init code hash
-            // Hash in the CI "bc307131606b79f0c50770dea78b35921ffca853421cbb031aa5a1ce5d6ea269"
-            hex"bc307131606b79f0c50770dea78b35921ffca853421cbb031aa5a1ce5d6ea269"
+            // Hash in the CI "dd00d753e268a006adece16f4a80a641f28edef4544174a2ba46ad72bcf58010"
+            hex"dd00d753e268a006adece16f4a80a641f28edef4544174a2ba46ad72bcf58010"
             // hex"f0bd447d72bc4c5cd510462381a98e87f097a4d31106d6dd8b5922227696ef7a"
           )
         )

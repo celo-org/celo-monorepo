@@ -8,6 +8,7 @@ import "../interfaces/IGovernance.sol";
 contract MockGovernance is IGovernance {
   mapping(address => bool) public isVoting;
   mapping(address => uint256) public totalVotes;
+  mapping(address => uint256) public removeVotesCalledFor;
 
   function() external payable {} // solhint-disable no-empty-blocks
 
@@ -23,6 +24,22 @@ contract MockGovernance is IGovernance {
     return totalVotes[account];
   }
 
+  function removeVotesWhenRevokingDelegatedVotes(address account, uint256 maxAmountAllowed)
+    external
+  {
+    removeVotesCalledFor[account] = maxAmountAllowed;
+  }
+
+  function votePartially(
+    uint256 proposalId,
+    uint256 index,
+    uint256 yesVotes,
+    uint256 noVotes,
+    uint256 abstainVotes
+  ) external returns (bool) {
+    return true;
+  }
+
   function getProposal(uint256 proposalId)
     external
     view
@@ -33,15 +50,5 @@ contract MockGovernance is IGovernance {
 
   function getReferendumStageDuration() external view returns (uint256) {
     return 0;
-  }
-
-  function votePartially(
-    uint256 proposalId,
-    uint256 index,
-    uint256 yesVotes,
-    uint256 noVotes,
-    uint256 abstainVotes
-  ) external returns (bool) {
-    return false;
   }
 }
