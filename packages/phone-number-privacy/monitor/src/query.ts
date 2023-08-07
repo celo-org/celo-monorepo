@@ -29,7 +29,8 @@ const newPrivateKey = async () => {
 export const queryOdisForSalt = async (
   blockchainProvider: string,
   contextName: OdisContextName,
-  timeoutMs: number = 10000
+  timeoutMs: number = 10000,
+  bypassQuota: boolean = false
 ) => {
   console.log(`contextName: ${contextName}`) // tslint:disable-line:no-console
   console.log(`blockchain provider: ${blockchainProvider}`) // tslint:disable-line:no-console
@@ -52,6 +53,7 @@ export const queryOdisForSalt = async (
     console.log(`ODIS salt request timed out after ${timeoutMs} ms`) // tslint:disable-line:no-console
   }, timeoutMs)
   try {
+    const testSessionId = Math.floor(Math.random() * 100000).toString()
     const res = await OdisUtils.Identifier.getObfuscatedIdentifier(
       phoneNumber,
       OdisUtils.Identifier.IdentifierPrefix.PHONE_NUMBER,
@@ -61,7 +63,7 @@ export const queryOdisForSalt = async (
       undefined,
       undefined,
       undefined,
-      genSessionID(),
+      bypassQuota ? testSessionId : genSessionID(),
       undefined,
       abortController
     )

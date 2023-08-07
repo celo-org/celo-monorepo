@@ -157,12 +157,12 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
   }
 
   private addFailureToSession(signer: Signer, errorCode: number | undefined, session: Session<R>) {
-    session.logger.warn(
-      `Received failure from ${session.failedSigners.size}/${this.signers.length} signers`
-    )
     // Tracking failed request count via signer url prevents
     // double counting the same failed request by mistake
     session.failedSigners.add(signer.url)
+    session.logger.warn(
+      `Received failure from ${session.failedSigners.size}/${this.signers.length} signers`
+    )
     if (errorCode) {
       session.incrementErrorCodeCount(errorCode)
     }
