@@ -55,12 +55,13 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
         return null
       }
       if (!(await this.authenticate(request, warnings, response.locals.logger))) {
-        this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
         span.addEvent('Error calling authenticate')
         span.setStatus({
           code: SpanStatusCode.ERROR,
-          message: response.statusMessage,
+          message: WarningMessage.UNAUTHENTICATED_USER,
         })
+        span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, 401)
+        this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
         span.end()
         return null
       }

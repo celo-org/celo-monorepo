@@ -73,7 +73,7 @@ export abstract class IO<R extends OdisRequest> {
         span.end()
         return false
       }
-      span.addEvent('Correctly calling inputChecks')
+      span.addEvent('Correctly called inputChecks')
       span.setStatus({
         code: SpanStatusCode.OK,
         message: response.statusMessage,
