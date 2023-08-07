@@ -34,9 +34,10 @@ export function countAndThrowDBError<T>(
 }
 
 export function tableWithLockForTrx(baseQuery: Knex.QueryBuilder, trx?: Knex.Transaction) {
+  // rename to `tableWithOptionalLockForSelect`?
   //
   if (trx) {
-    // Lock relevant database rows for the duration of the transaction
+    // Lock relevant database rows for the duration of the transaction when doing a select
     return baseQuery.transacting(trx).forUpdate()
   }
   return baseQuery

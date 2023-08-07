@@ -46,7 +46,7 @@ async function getAccountExists( //
 ): Promise<boolean> {
   return meter(
     async () => {
-      const accountRecord = await tableWithLockForTrx(accounts(db, accountsTable), trx)
+      const accountRecord = await tableWithLockForTrx(accounts(db, accountsTable), trx) // not a select
         .where(ACCOUNTS_COLUMNS.address, account)
         .first()
         .timeout(config.db.timeout)

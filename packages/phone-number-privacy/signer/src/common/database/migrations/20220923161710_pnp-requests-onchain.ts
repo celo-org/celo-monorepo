@@ -10,7 +10,7 @@ export async function up(knex: Knex): Promise<any> {
       t.primary([
         REQUESTS_COLUMNS.address,
         REQUESTS_COLUMNS.timestamp,
-        REQUESTS_COLUMNS.blindedQuery,
+        REQUESTS_COLUMNS.blindedQuery, // double check index
       ])
     })
   }

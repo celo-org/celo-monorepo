@@ -15,7 +15,7 @@ function requests(db: Knex, table: REQUESTS_TABLE) {
   return db<PnpSignRequestRecord>(table)
 }
 
-export async function getRequestExists( //
+export async function getRequestExists( // TODO try insert, if primary key error, then duplicate request
   db: Knex,
   requestsTable: REQUESTS_TABLE,
   account: string,
@@ -31,7 +31,7 @@ export async function getRequestExists( //
       const existingRequest = await tableWithLockForTrx(requests(db, requestsTable), trx)
         .where({
           [REQUESTS_COLUMNS.address]: account,
-          [REQUESTS_COLUMNS.blindedQuery]: blindedQuery,
+          [REQUESTS_COLUMNS.blindedQuery]: blindedQuery, // TODO are we using the primary key correctly??
         })
         .first()
         .timeout(config.db.timeout)
