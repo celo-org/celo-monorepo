@@ -706,8 +706,6 @@ export async function assertDelegatorDelegateeAmounts(
 }
 
 export function expectBigNumberInRange(real: BigNumber, expected: BigNumber, range: BigNumber) {
-  console.log("real", real.toString());
-  console.log("expected", expected.toString());
   expect(
     real.plus(range).gte(expected),
     `Number ${real.toString()} is not in range <${expected.minus(range).toString()}, ${expected
