@@ -117,9 +117,8 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       span.setAttribute(SemanticAttributes.HTTP_METHOD, status)
       span.setStatus({
         code: SpanStatusCode.ERROR,
-        message: 'Fail',
+        message: error,
       })
-
       span.end()
     })
     Counters.responses.labels(this.endpoint, status.toString()).inc()

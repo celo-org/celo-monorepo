@@ -86,11 +86,19 @@ export function startSigner(
           parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, req.method)
           parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, req.ip)
           await handler(req, res)
-          parentSpan.setStatus({
-            code: SpanStatusCode.OK,
-            message: 'OK',
-          })
-          parentSpan.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, res.statusCode)
+          if (res.statusCode >= 300) {
+            parentSpan.setStatus({
+              code: SpanStatusCode.OK,
+              message: res.statusMessage,
+            })
+            parentSpan.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, res.statusCode)
+          } else {
+            parentSpan.setStatus({
+              code: SpanStatusCode.ERROR,
+              message: res.statusMessage,
+            })
+            parentSpan.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, res.statusCode)
+          }
           parentSpan.end()
         })
       } catch (err: any) {
