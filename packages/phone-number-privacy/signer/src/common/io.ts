@@ -11,6 +11,10 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { Session } from './action'
 
+import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
+const tracer = opentelemetry.trace.getTracer('signer-tracer')
+
 export abstract class IO<R extends OdisRequest> {
   abstract readonly endpoint: SignerEndpoint
 
@@ -46,14 +50,36 @@ export abstract class IO<R extends OdisRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<OdisResponse<R>>
   ): request is Request<{}, {}, R> {
-    if (!this.enabled) {
-      this.sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
-      return false
-    }
-    if (!this.validate(request)) {
-      this.sendFailure(WarningMessage.INVALID_INPUT, 400, response)
-      return false
-    }
-    return true
+    return tracer.startActiveSpan('CommonIO - inputChecks', (span) => {
+      if (!this.enabled) {
+        span.addEvent('Error calling enabled')
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: WarningMessage.API_UNAVAILABLE,
+        })
+        span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, 503)
+        this.sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
+        span.end()
+        return false
+      }
+      if (!this.validate(request)) {
+        span.addEvent('Error calling validate')
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: WarningMessage.INVALID_INPUT,
+        })
+        span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, 400)
+        this.sendFailure(WarningMessage.INVALID_INPUT, 400, response)
+        span.end()
+        return false
+      }
+      span.addEvent('Correctly calling inputChecks')
+      span.setStatus({
+        code: SpanStatusCode.OK,
+        message: response.statusMessage,
+      })
+      span.end()
+      return true
+    })
   }
 }

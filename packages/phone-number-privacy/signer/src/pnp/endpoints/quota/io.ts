@@ -46,29 +46,30 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     return tracer.startActiveSpan('pnpQuotaIO - Init', async (span) => {
       const warnings: ErrorType[] = []
       if (!super.inputChecks(request, response)) {
-        span.addEvent('NOT inputChecks ' + response.locals.body)
+        span.addEvent('Error calling inputChecks')
         span.setStatus({
           code: SpanStatusCode.ERROR,
-          message: response.locals.body,
+          message: response.statusMessage,
         })
         span.end()
         return null
       }
       if (!(await this.authenticate(request, warnings, response.locals.logger))) {
         this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
-        span.addEvent('NOT authenticate ' + response.locals.body)
+        span.addEvent('Error calling authenticate')
         span.setStatus({
           code: SpanStatusCode.ERROR,
-          message: response.locals.body,
+          message: response.statusMessage,
         })
         span.end()
         return null
       }
       const session = new PnpSession(request, response)
       session.errors.push(...warnings)
+      span.addEvent('Session created')
       span.setStatus({
         code: SpanStatusCode.OK,
-        message: response.locals.body,
+        message: response.statusMessage,
       })
       span.end()
       return session
@@ -107,7 +108,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     warnings: string[]
   ) {
     tracer.startActiveSpan(`pnpQuotaIO - sendSuccess`, (span) => {
-      span.addEvent('Sending Success: ' + response.locals.body)
+      span.addEvent('Sending Success')
       send(
         response,
         {
@@ -122,7 +123,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       span.setAttribute(SemanticAttributes.HTTP_METHOD, status)
       span.setStatus({
         code: SpanStatusCode.OK,
-        message: response.locals.body,
+        message: response.statusMessage,
       })
       span.end()
     })
@@ -131,7 +132,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
 
   sendFailure(error: ErrorType, status: number, response: Response<PnpQuotaResponseFailure>) {
     tracer.startActiveSpan(`pnpQuotaIO - sendFailure`, (span) => {
-      span.addEvent('Sending Failure: ' + response.locals.body)
+      span.addEvent('Sending Failure')
       send(
         response,
         {
@@ -145,7 +146,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       span.setAttribute(SemanticAttributes.HTTP_METHOD, status)
       span.setStatus({
         code: SpanStatusCode.ERROR,
-        message: response.locals.body,
+        message: error,
       })
       span.end()
     })
