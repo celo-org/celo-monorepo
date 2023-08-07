@@ -21,6 +21,10 @@ import { Counters } from '../../../common/metrics'
 import { getSignerVersion } from '../../../config'
 import { PnpSession } from '../../session'
 
+import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
+const tracer = opentelemetry.trace.getTracer('signer-tracer')
+
 export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   readonly endpoint = SignerEndpoint.PNP_QUOTA
 
@@ -98,16 +102,26 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   }
 
   sendFailure(error: ErrorType, status: number, response: Response<PnpQuotaResponseFailure>) {
-    send(
-      response,
-      {
-        success: false,
-        version: getSignerVersion(),
-        error,
-      },
-      status,
-      response.locals.logger
-    )
+    tracer.startActiveSpan(`pnpQuotaIO - sendFailure`, (span) => {
+      span.addEvent('Sending Failure: ' + error)
+      send(
+        response,
+        {
+          success: false,
+          version: getSignerVersion(),
+          error,
+        },
+        status,
+        response.locals.logger
+      )
+      span.setAttribute(SemanticAttributes.HTTP_METHOD, status)
+      span.setStatus({
+        code: SpanStatusCode.ERROR,
+        message: 'Fail',
+      })
+
+      span.end()
+    })
     Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 }
