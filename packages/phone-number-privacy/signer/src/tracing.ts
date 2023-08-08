@@ -2,7 +2,8 @@ import { JaegerExporter } from '@opentelemetry/exporter-jaeger'
 import { registerInstrumentations } from '@opentelemetry/instrumentation'
 import { Resource } from '@opentelemetry/resources'
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
-import { WebTracerProvider } from '@opentelemetry/sdk-trace-web'
+const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node')
+//import { WebTracerProvider } from '@opentelemetry/sdk-trace-web'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 
 const options = {
@@ -24,7 +25,7 @@ const resource = Resource.default().merge(
   })
 )
 
-const provider = new WebTracerProvider({
+const provider = new NodeTracerProvider({
   resource: resource,
 })
 const exporter = new JaegerExporter(options)
