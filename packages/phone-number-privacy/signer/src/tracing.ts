@@ -19,7 +19,7 @@ registerInstrumentations({
   instrumentations: [
     // Express instrumentation expects HTTP layer to be instrumented
     new HttpInstrumentation({
-      ignoreIncomingRequestHook(req: { url: string }) {
+      ignoreIncomingRequestHook(req: Request) {
         // Ignore spans from static assets.
         const isStaticAsset = !!req.url.match(/[\/status|\/metrics|\/ecp\/.*]/)
         return isStaticAsset
