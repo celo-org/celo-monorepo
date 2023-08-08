@@ -4,7 +4,7 @@ import { Resource } from '@opentelemetry/resources'
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
 const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node')
 //import { WebTracerProvider } from '@opentelemetry/sdk-trace-web'
-import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express'
+//import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express'
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 
@@ -19,7 +19,7 @@ registerInstrumentations({
   instrumentations: [
     // Express instrumentation expects HTTP layer to be instrumented
     new HttpInstrumentation(),
-    new ExpressInstrumentation(),
+    //new ExpressInstrumentation(),
   ],
 })
 
