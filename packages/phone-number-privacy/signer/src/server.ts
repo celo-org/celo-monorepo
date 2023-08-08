@@ -65,40 +65,19 @@ export function startSigner(
     handler: (req: Request, res: Response) => Promise<void>
   ) =>
     app.post(endpoint, async (req, res) => {
-      const childLogger: Logger = res.locals.logger
-      try {
-        //tracer.startActiveSpan('main', async (parentSpan) => {
-        //  parentSpan.addEvent('Called ' + req.path)
-        //  parentSpan.setAttribute(SemanticAttributes.HTTP_ROUTE, req.path)
-        //  parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, req.method)
-        //  parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, req.ip)
-        //  await handler(req, res)
-        //  if (res.statusCode < 400) {
-        //    parentSpan.setStatus({
-        //      code: SpanStatusCode.OK,
-        //      message: res.statusMessage,
-        //    })
-        //    parentSpan.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, res.statusCode)
-        //  } else {
-        //    parentSpan.setStatus({
-        //      code: SpanStatusCode.ERROR,
-        //      message: res.statusMessage,
-        //    })
-        //    parentSpan.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, res.statusCode)
-        //  }
-        //  parentSpan.end()
-        //})
-        await handler(req, res)
-      } catch (err: any) {
-        tracer.startActiveSpan('error', (parentSpan) => {
+      tracer.startActiveSpan('server - addEndpoint -post', async (parentSpan) => {
+        const childLogger: Logger = res.locals.logger
+        try {
+          parentSpan.addEvent('Called ' + req.path)
+          parentSpan.setAttribute(SemanticAttributes.HTTP_ROUTE, req.path)
+          parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, req.method)
+          parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, req.ip)
+          await handler(req, res)
+        } catch (err: any) {
           parentSpan.setStatus({
             code: SpanStatusCode.ERROR,
             message: 'Fail',
           })
-          parentSpan.setAttribute(SemanticAttributes.HTTP_ROUTE, req.path)
-          parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, req.method)
-          parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, req.ip)
-          parentSpan.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, res.statusCode)
           // Handle any errors that otherwise managed to escape the proper handlers
           childLogger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
           childLogger.error(err)
@@ -116,8 +95,8 @@ export function startSigner(
             Counters.errorsThrownAfterResponseSent.inc()
           }
           parentSpan.end()
-        })
-      }
+        }
+      })
     })
 
   const pnpQuotaService = new PnpQuotaService(db, kit)
