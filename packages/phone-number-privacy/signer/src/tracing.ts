@@ -19,7 +19,13 @@ registerInstrumentations({
   instrumentations: [
     // Express instrumentation expects HTTP layer to be instrumented
     new HttpInstrumentation({
-      ignoreIncomingPaths: [/\/status/, /\/metrics/, /\/ecp\/.*/],
+      ignoreIncomingPaths: [
+        /\/status/,
+        /\/metrics/,
+        /\/metadata\/.*/,
+        /\/secrets\/.*/,
+        /\/ecp\/.*/,
+      ],
     }),
     //new ExpressInstrumentation(),
   ],

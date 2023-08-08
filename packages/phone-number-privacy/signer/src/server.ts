@@ -65,7 +65,7 @@ export function startSigner(
     handler: (req: Request, res: Response) => Promise<void>
   ) =>
     app.post(endpoint, async (req, res) => {
-      tracer.startActiveSpan('server - addEndpoint -post', async (parentSpan) => {
+      tracer.startActiveSpan('server - addEndpoint - post', async (parentSpan) => {
         const childLogger: Logger = res.locals.logger
         try {
           parentSpan.addEvent('Called ' + req.path)
