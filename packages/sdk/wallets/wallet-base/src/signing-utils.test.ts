@@ -169,7 +169,7 @@ describe('rlpEncodedTx', () => {
         const result = rlpEncodedTx(CIP42Transaction)
         expect(result).toMatchInlineSnapshot(`
           {
-            "rlpEncode": "0x7cf8400280630a63945409ed021d9299bf6814279a6a1411a7e866a6318080941be31a94361a391bbafb2a4ccd704f57dc04d4bb893635c9adc5dea0000083abcdef80",
+            "rlpEncode": "0x7cf8400280630a63945409ed021d9299bf6814279a6a1411a7e866a6318080941be31a94361a391bbafb2a4ccd704f57dc04d4bb893635c9adc5dea0000083abcdefc0",
             "transaction": {
               "chainId": 2,
               "data": "0xabcdef",
@@ -260,30 +260,84 @@ describe('rlpEncodedTx', () => {
   })
 })
 
+function ckToViem(tx: CeloTx) {
+  return {
+    ...tx,
+    gas: BigInt(tx.gas!),
+    maxFeePerGas: BigInt(tx.maxFeePerGas?.toString()!),
+    maxPriorityFeePerGas: BigInt(tx.maxPriorityFeePerGas?.toString()!),
+    value: BigInt(tx.value?.toString()!),
+    // @ts-expect-error
+    v: BigInt(tx.v?.toString()!),
+    yParity: 1,
+  }
+}
+
 describe('recoverTransaction', () => {
   describe('with EIP1559 transactions', () => {
-    //TODO CIP42
-    // it('matches output of viem parseTransaction', () => {
-    //   const encodedByCK1559TX = ''
-    //   const recovered = recoverTransaction(encodedByCK1559TX)
-    //   expect(recovered[0]).toEqual(parseTransaction(encodedByCK1559TX))
-    // })
-    it.skip('can recover (parse) transactions signed by viem', () => {
-      const encodedByViem1559TX = ''
+    it('matches output of viem parseTransaction', () => {
+      const encodedByCK1559TX =
+        '0x02f87082ad5a8063630a94588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdef8083015ad7a00fd2d0c579a971ebc04207d8c5ff5bb3449052f0c9e946a7146e5ae4d4ec6289a0737423de64cc81a62e700b5ca7970212aaed3d28de4dbce8b054483d361f6ff8'
+      const [transaction, signer] = recoverTransaction(encodedByCK1559TX)
+      const parsed = parseTransaction(encodedByCK1559TX)
+      // expect(transaction.chainId).toEqual(parsed.chainId)
+      // expect(transaction.gas).toEqual(parsed.gas)
+      expect(ckToViem(transaction)).toMatchObject(parsed)
+      expect(signer).toMatchInlineSnapshot()
+    })
+    it('can recover (parse) transactions signed by viem', () => {
+      // stolen from viems's default eip1559 test result viem/src/accounts/utils/signTransaction.test.ts
+      const encodedByViem1559TX =
+        '0x02f850018203118080825208808080c080a04012522854168b27e5dc3d5839bab5e6b39e1a0ffd343901ce1622e3d64b48f1a04e00902ae0502c4728cbf12156290df99c3ed7de85b1dbfe20b5c36931733a33'
       const recovered = recoverTransaction(encodedByViem1559TX)
       expect(recovered).toMatchInlineSnapshot(``)
     })
   })
   it('handles celo-legacy transactions', () => {
-    // from packages/sdk/wallets/wallet-rpc/src/rpc-wallet.test.ts:186
     const celoLegacyTx =
-      '0xf86b8081991094588e4b68193001e4d10928660ab4165b813717c08a0100000000000000000083abcdef25a073bb7eaa60c810af1fad0f68fa15d4714f9990d0202b62797f6134493ec9f6fba046c13e92017228c2c8f0fae74ddd735021817f2f9757cd66debed078daf4070e'
-    expect(recoverTransaction(celoLegacyTx)).toMatchInlineSnapshot()
+      '0xf88480630a80941be31a94361a391bbafb2a4ccd704f57dc04d4bb82567894588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdef83015ad8a09e121a99dc0832a9f4d1d71500b3c8a69a3c064d437c225d6292577ffcc45a71a02c5efa3c4b58953c35968e42d11d3882dacacf45402ee802824268b7cd60daff'
+    expect(recoverTransaction(celoLegacyTx)).toMatchInlineSnapshot(`
+      [
+        {
+          "chainId": "0xad5a",
+          "data": "0xabcdef",
+          "feeCurrency": "0x",
+          "gas": 10,
+          "gasPrice": 99,
+          "gatewayFee": "0x5678",
+          "gatewayFeeRecipient": "0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb",
+          "nonce": 0,
+          "to": "0x588e4b68193001e4d10928660ab4165b813717c0",
+          "type": "celo-legacy",
+          "value": "0x0de0b6b3a7640000",
+        },
+        "0x1Be31A94361a391bBaFB2a4CCd704F57dc04d4bb",
+      ]
+    `)
   })
   it('handles cip42 transactions', () => {
     const cip42TX =
-      '0xf86a80801094588e4b68193001e4d10928660ab4165b813717c08a0100000000000000000083abcdef26a05e9c1e7690d05f3e1433c824fbd948643ff6c618e347ea8c23a6363f3b17cdffa072dc1c22d6147be7b4b7b3cf51eb73b8bedd7940d7b668dcd7ef688a2354a631'
-    expect(recoverTransaction(cip42TX)).toMatchInlineSnapshot()
+      '0x7cf89d82ad5a8063630a94cd2a3d9f938e13cd947ec05abc7fe734df8dd826941be31a94361a391bbafb2a4ccd704f57dc04d4bb82567894588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdef8083015ad8a01078f1b7134f94643e5a8c297690357a463069580287a2cb92f8ba3fb0814826a056621cc5f5b01790374673b8aa8e6969b206d89109ffc4b13cd774ffb5301f03'
+    expect(recoverTransaction(cip42TX)).toMatchInlineSnapshot(`
+      [
+        {
+          "accessList": [],
+          "chainId": 44378,
+          "data": "0xabcdef",
+          "feeCurrency": "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
+          "gas": 10,
+          "gatewayFee": "0x5678",
+          "gatewayFeeRecipient": "0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb",
+          "maxFeePerGas": 99,
+          "maxPriorityFeePerGas": 99,
+          "nonce": 0,
+          "to": "0x588e4b68193001e4d10928660ab4165b813717c0",
+          "type": "cip42",
+          "value": 1000000000000000000,
+        },
+        "0x3fA2a0fd9aCABBDc15ea279C3153a4770F077Fc2",
+      ]
+    `)
   })
 })
 
@@ -339,24 +393,49 @@ describe('isPriceToLow', () => {
   })
 })
 
-describe.skip('extractSignature', () => {
+describe('extractSignature', () => {
   it('extracts from celo legacy txs', () => {
+    // packages/sdk/wallets/wallet-local/src/local-wallet.test.ts:176 (succeeds with legacy)
     const extracted = extractSignature(
-      '0xf86b8081991094588e4b68193001e4d10928660ab4165b813717c08a0100000000000000000083abcdef25a073bb7eaa60c810af1fad0f68fa15d4714f9990d0202b62797f6134493ec9f6fba046c13e92017228c2c8f0fae74ddd735021817f2f9757cd66debed078daf4070e'
+      '0xf88480630a80941be31a94361a391bbafb2a4ccd704f57dc04d4bb82567894588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdef83015ad8a09e121a99dc0832a9f4d1d71500b3c8a69a3c064d437c225d6292577ffcc45a71a02c5efa3c4b58953c35968e42d11d3882dacacf45402ee802824268b7cd60daff'
     )
-    expect(extracted).toMatchInlineSnapshot()
+    expect(extracted).toMatchInlineSnapshot(`
+      {
+        "r": "0x9e121a99dc0832a9f4d1d71500b3c8a69a3c064d437c225d6292577ffcc45a71",
+        "s": "0x2c5efa3c4b58953c35968e42d11d3882dacacf45402ee802824268b7cd60daff",
+        "v": "0x015ad8",
+      }
+    `)
   })
   it('extracts from cip42 txs', () => {
+    // packages/sdk/wallets/wallet-local/src/local-wallet.test.ts:274 (succeeds with cip42)
     const extracted = extractSignature(
-      '0xf86a80801094588e4b68193001e4d10928660ab4165b813717c08a0100000000000000000083abcdef26a05e9c1e7690d05f3e1433c824fbd948643ff6c618e347ea8c23a6363f3b17cdffa072dc1c22d6147be7b4b7b3cf51eb73b8bedd7940d7b668dcd7ef688a2354a631'
+      '0x7cf89d82ad5a8063630a94cd2a3d9f938e13cd947ec05abc7fe734df8dd826941be31a94361a391bbafb2a4ccd704f57dc04d4bb82567894588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdef8083015ad8a01078f1b7134f94643e5a8c297690357a463069580287a2cb92f8ba3fb0814826a056621cc5f5b01790374673b8aa8e6969b206d89109ffc4b13cd774ffb5301f03'
     )
-    expect(extracted).toMatchInlineSnapshot()
+    expect(extracted).toMatchInlineSnapshot(`
+      {
+        "r": "0x1078f1b7134f94643e5a8c297690357a463069580287a2cb92f8ba3fb0814826",
+        "s": "0x56621cc5f5b01790374673b8aa8e6969b206d89109ffc4b13cd774ffb5301f03",
+        "v": "0x015ad8",
+      }
+    `)
   })
-  it.skip('extracts from eip1559 txs', () => {
-    const extracted = extractSignature('')
-    expect(extracted).toMatchInlineSnapshot()
+  it('extracts from eip1559 txs', () => {
+    // packages/sdk/wallets/wallet-local/src/local-wallet.test.ts:209 ( succeeds with eip1559)
+    const extracted = extractSignature(
+      '0x02f87082ad5a8063630a94588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdef8083015ad7a00fd2d0c579a971ebc04207d8c5ff5bb3449052f0c9e946a7146e5ae4d4ec6289a0737423de64cc81a62e700b5ca7970212aaed3d28de4dbce8b054483d361f6ff8'
+    )
+    expect(extracted).toMatchInlineSnapshot(`
+      {
+        "r": "0x0fd2d0c579a971ebc04207d8c5ff5bb3449052f0c9e946a7146e5ae4d4ec6289",
+        "s": "0x737423de64cc81a62e700b5ca7970212aaed3d28de4dbce8b054483d361f6ff8",
+        "v": "0x015ad7",
+      }
+    `)
   })
-  it.skip('fails when length is wrong', () => {
-    expect(() => extractSignature('')).toThrowErrorMatchingInlineSnapshot()
+  it('fails when length is wrong', () => {
+    expect(() => extractSignature('0x')).toThrowErrorMatchingInlineSnapshot(
+      `"@extractSignature: provided transaction has 0 elements but celo-legacy txs with a signature have 12"`
+    )
   })
 })

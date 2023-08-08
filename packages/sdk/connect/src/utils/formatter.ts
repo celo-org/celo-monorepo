@@ -270,6 +270,7 @@ function isHash(value: string) {
 
 export function parseAccessList(accessList_: AccessListRaw | '0x'): AccessList {
   const accessList: AccessList = []
+  // TODO IS that true though? i think that was my mistake
   // if no list was provided to original tx then it will return as "0x"
   if (accessList_ === '0x') {
     return accessList

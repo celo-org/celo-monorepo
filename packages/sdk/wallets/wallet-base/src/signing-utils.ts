@@ -262,11 +262,7 @@ export async function encodeTransaction(
   const v = sanitizedSignature.v
   const r = sanitizedSignature.r
   const s = sanitizedSignature.s
-  // new types have prefix but legacy does not
-  const decodedTX =
-    rlpEncoded.type === 'celo-legacy'
-      ? RLP.decode(rlpEncoded.rlpEncode)
-      : RLP.decode(`0x${rlpEncoded.rlpEncode.slice(4)}`)
+  const decodedTX = prefixAwareRLPDecode(rlpEncoded.rlpEncode, rlpEncoded.type)
   // for legacy tx we need to slice but for new ones we do not want to do that
   const rawTx = (rlpEncoded.type === 'celo-legacy' ? decodedTX.slice(0, 9) : decodedTX).concat([
     v,
@@ -320,6 +316,11 @@ export async function encodeTransaction(
     type: rlpEncoded.type,
   } as EncodedTransaction
 }
+// new types have prefix but legacy does not
+function prefixAwareRLPDecode(rlpEncode: string, type: TransactionTypes) {
+  return type === 'celo-legacy' ? RLP.decode(rlpEncode) : RLP.decode(`0x${rlpEncode.slice(4)}`)
+}
+
 function correctLengthWithSignatureOf(type: TransactionTypes) {
   switch (type) {
     case 'cip42':
@@ -331,8 +332,8 @@ function correctLengthWithSignatureOf(type: TransactionTypes) {
 }
 // Based on the return type of ensureLeading0x this was not a Buffer
 export function extractSignature(rawTx: string) {
-  const rawValues = RLP.decode(rawTx)
   const type = determineTXType(rawTx)
+  const rawValues = prefixAwareRLPDecode(rawTx, type)
   const length = rawValues.length
   if (correctLengthWithSignatureOf(type) !== length) {
     throw new Error(
@@ -365,11 +366,14 @@ function extractSignatureFromDecoded(rawValues: unknown[]) {
 // Recover transaction and sender address from a raw transaction.
 // This is used for testing.
 export function recoverTransaction(rawTx: string): [CeloTx, string] {
+  if (!rawTx.startsWith('0x')) {
+    throw new Error('rawTx must start with 0x')
+  }
   switch (determineTXType(rawTx)) {
     case 'cip42':
       return recoverTransactionCIP42(rawTx)
     case 'eip1559':
-      return recoverTransactionEIP1559(rawTx)
+      return recoverTransactionEIP1559(rawTx as `0x${string}`)
     default:
       const rawValues = RLP.decode(rawTx)
       debug('signing-utils@recoverTransaction: values are %s', rawValues)
@@ -377,6 +381,7 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
       // tslint:disable-next-line:no-bitwise
       const chainId = Bytes.fromNumber((recovery - 35) >> 1)
       const celoTx: CeloTx = {
+        type: 'celo-legacy',
         nonce: rawValues[0].toLowerCase() === '0x' ? 0 : parseInt(rawValues[0], 16),
         gasPrice: rawValues[1].toLowerCase() === '0x' ? 0 : parseInt(rawValues[1], 16),
         gas: rawValues[2].toLowerCase() === '0x' ? 0 : parseInt(rawValues[2], 16),
@@ -435,6 +440,7 @@ function recoverTransactionCIP42(serializedTransaction: string): [CeloTx, string
   ] = transactionArray
 
   const celoTX: CeloTx = {
+    type: 'cip42',
     nonce: nonce.toLowerCase() === '0x' ? 0 : parseInt(nonce, 16),
     maxPriorityFeePerGas:
       maxPriorityFeePerGas.toLowerCase() === '0x' ? 0 : parseInt(maxPriorityFeePerGas, 16),
@@ -444,23 +450,25 @@ function recoverTransactionCIP42(serializedTransaction: string): [CeloTx, string
     gatewayFeeRecipient,
     gatewayFee,
     to,
-    value,
+    value: value.toLowerCase() === '0x' ? 0 : parseInt(value, 16),
     data,
-    chainId,
+    chainId: chainId.toLowerCase() === '0x' ? 0 : parseInt(chainId, 16),
     accessList: parseAccessList(accessList),
   }
   const signer = getSignerFromTx(v, r, s, transactionArray)
   return [celoTX, signer]
 }
 
-function getSignerFromTx(v: any, r: any, s: any, transactionArray: string[]) {
+function getSignerFromTx(v: any, r: any, s: any, serializedTransaction: `0x${string}`) {
   const signature = Account.encodeSignature([v, r, s])
-  const signingDataHex = RLP.encode(transactionArray)
-  const signer = Account.recover(getHashFromEncoded(signingDataHex), signature)
+
+  const hash = getHashFromEncoded(serializedTransaction)
+  console.info('signature', signature, hash, [v, r, s])
+  const signer = Account.recover(hash, signature)
   return signer
 }
 
-function recoverTransactionEIP1559(serializedTransaction: string): [CeloTx, string] {
+function recoverTransactionEIP1559(serializedTransaction: `0x${string}`): [CeloTx, string] {
   const transactionArray = RLP.decode(`0x${serializedTransaction.slice(4)}`)
   debug('signing-utils@recoverTransactionEIP1559: values are %s', transactionArray)
 
@@ -479,19 +487,23 @@ function recoverTransactionEIP1559(serializedTransaction: string): [CeloTx, stri
     s,
   ] = transactionArray
 
-  const celoTx: CeloTx = {
+  const celoTx: CeloTx & { v: any; s: any; r: any } = {
+    type: 'eip1559',
     nonce: nonce.toLowerCase() === '0x' ? 0 : parseInt(nonce, 16),
     gas: gas.toLowerCase() === '0x' ? 0 : parseInt(gas, 16),
     maxPriorityFeePerGas:
       maxPriorityFeePerGas.toLowerCase() === '0x' ? 0 : parseInt(maxPriorityFeePerGas, 16),
     maxFeePerGas: maxFeePerGas.toLowerCase() === '0x' ? 0 : parseInt(maxFeePerGas, 16),
     to: to,
-    value: value,
+    value: value.toLowerCase() === '0x' ? 0 : parseInt(value, 16),
     data: data,
-    chainId,
+    chainId: chainId.toLowerCase() === '0x' ? 0 : parseInt(chainId, 16),
     accessList: parseAccessList(accessList),
+    v,
+    r,
+    s,
   }
-  const signer = getSignerFromTx(v, r, s, transactionArray)
+  const signer = getSignerFromTx(v, r, s, serializedTransaction)
 
   return [celoTx, signer]
 }
@@ -530,6 +542,7 @@ export function verifySignatureWithoutPrefix(
 
 export function decodeSig(sig: any) {
   const [v, r, s] = Account.decodeSignature(sig)
+  console.info('v, r, s', v, r, s)
   return {
     v: parseInt(v, 16),
     r: ethUtil.toBuffer(r) as Buffer,

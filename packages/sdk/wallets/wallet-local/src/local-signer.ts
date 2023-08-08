@@ -28,6 +28,7 @@ export class LocalSigner implements Signer {
   ): Promise<{ v: number; r: Buffer; s: Buffer }> {
     const hash = getHashFromEncoded(encodedTx.rlpEncode)
     const signature = Account.makeSigner(addToV)(hash, this.privateKey)
+    console.info('Signed tx with signature', JSON.stringify(signature))
     return decodeSig(signature)
   }
 
