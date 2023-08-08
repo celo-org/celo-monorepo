@@ -9,6 +9,9 @@ import { Request, Response } from 'express'
 import { Action } from './action'
 import { Counters, Histograms, meter } from './metrics'
 
+import opentelemetry from '@opentelemetry/api'
+const tracer = opentelemetry.trace.getTracer('signer-tracer')
+
 export class Controller<R extends OdisRequest> {
   constructor(readonly action: Action<R>) {}
 
@@ -21,11 +24,16 @@ export class Controller<R extends OdisRequest> {
     const timeoutError = Symbol()
     await meter(
       async () => {
-        const session = await this.action.io.init(request, response)
-        // Init returns a response to the user internally.
-        if (session) {
-          await this.action.perform(session, timeoutError)
-        }
+        tracer.startActiveSpan('pnpSignIO - Init', async (span) => {
+          span.addEvent('Calling init')
+          const session = await this.action.io.init(request, response)
+          // Init returns a response to the user internally.
+          if (session) {
+            span.addEvent('Calling perform')
+            await this.action.perform(session, timeoutError)
+          }
+          span.end()
+        })
       },
       [],
       (err: any) => {
