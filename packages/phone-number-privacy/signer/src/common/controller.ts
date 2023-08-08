@@ -24,7 +24,7 @@ export class Controller<R extends OdisRequest> {
     const timeoutError = Symbol()
     await meter(
       async () => {
-        tracer.startActiveSpan('pnpSignIO - Init', async (span) => {
+        tracer.startActiveSpan('Controller - handle', async (span) => {
           span.addEvent('Calling init')
           const session = await this.action.io.init(request, response)
           // Init returns a response to the user internally.

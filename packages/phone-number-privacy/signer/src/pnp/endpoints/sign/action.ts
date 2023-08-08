@@ -44,6 +44,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         const pnpSignHandler = async () => {
           span.addEvent('Getting quotaStatus')
           const quotaStatus = await this.quota.getQuotaStatus(session, trx)
+          span.addEvent('Got quotaStatus')
 
           let isDuplicateRequest = false
           try {
