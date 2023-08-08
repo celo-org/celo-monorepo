@@ -51,7 +51,7 @@ export function startSigner(
   app.use(express.json({ limit: '0.2mb' }) as RequestHandler, loggerMiddleware(config.serviceName))
 
   app.get(SignerEndpoint.STATUS, (_req, res) => {
-    tracer.startActiveSpan('status', (parentSpan) => {
+    /*tracer.startActiveSpan('status', (parentSpan) => {
       parentSpan.addEvent('Called STATUS')
       parentSpan.setAttribute(SemanticAttributes.CODE_FUNCTION, 'doWork')
       parentSpan.setAttribute(SemanticAttributes.HTTP_ROUTE, _req.path)
@@ -66,6 +66,9 @@ export function startSigner(
         message: 'OK',
       })
       parentSpan.end()
+    })*/
+    res.status(200).json({
+      version: getSignerVersion(),
     })
   })
 
