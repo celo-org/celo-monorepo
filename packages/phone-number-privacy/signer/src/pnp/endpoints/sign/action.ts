@@ -197,6 +197,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         await timeout(pnpSignHandler, [], this.config.timeout, timeoutError)
         span.addEvent('Called pnpSignHandler with timeout')
       })
+      span.addEvent('Called transaction')
       span.end()
     })
   }

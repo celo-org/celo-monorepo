@@ -18,7 +18,13 @@ const options = {
 registerInstrumentations({
   instrumentations: [
     // Express instrumentation expects HTTP layer to be instrumented
-    new HttpInstrumentation(),
+    new HttpInstrumentation({
+      ignoreIncomingRequestHook(req: { url: string }) {
+        // Ignore spans from static assets.
+        const isStaticAsset = !!req.url.match(/[\/status|\/metrics|\/ecp\/.*]/)
+        return isStaticAsset
+      },
+    }),
     //new ExpressInstrumentation(),
   ],
 })
