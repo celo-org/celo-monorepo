@@ -4,6 +4,8 @@ import { Resource } from '@opentelemetry/resources'
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
 const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node')
 //import { WebTracerProvider } from '@opentelemetry/sdk-trace-web'
+import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express'
+import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 
 const options = {
@@ -14,7 +16,11 @@ const options = {
 
 // Optionally register automatic instrumentation libraries
 registerInstrumentations({
-  instrumentations: [],
+  instrumentations: [
+    // Express instrumentation expects HTTP layer to be instrumented
+    new HttpInstrumentation(),
+    new ExpressInstrumentation(),
+  ],
 })
 
 const resource = Resource.default().merge(
