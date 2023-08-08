@@ -45,6 +45,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   ): Promise<PnpSession<PnpQuotaRequest> | null> {
     return tracer.startActiveSpan('pnpQuotaIO - Init', async (span) => {
       const warnings: ErrorType[] = []
+      span.addEvent('Calling inputChecks')
       if (!super.inputChecks(request, response)) {
         span.addEvent('Error calling inputChecks')
         span.setStatus({
@@ -54,6 +55,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
         span.end()
         return null
       }
+      span.addEvent('inputChecks OK, Calling authenticate')
       if (!(await this.authenticate(request, warnings, response.locals.logger))) {
         span.addEvent('Error calling authenticate')
         span.setStatus({
@@ -65,6 +67,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
         span.end()
         return null
       }
+      span.addEvent('Authenticate OK, creating session')
       const session = new PnpSession(request, response)
       session.errors.push(...warnings)
       span.addEvent('Session created')
