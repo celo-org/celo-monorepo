@@ -21,6 +21,6 @@ COPY . ./
 RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 RUN yarn build
 
-RUN rm -r .git
-RUN rm .gitmodules
+RUN rm -rf .git
+RUN rm -rf .gitmodules
 

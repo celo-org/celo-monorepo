@@ -7,7 +7,7 @@
         - 'dockerfiles/all-monorepo/**'
       branches:
         - master
-        - jcortejoso/dockerfile-whole
+        - jcortejoso/dockefile-whole
     pull_request:
       paths:
         - 'dockerfiles/all-monorepo/**'
