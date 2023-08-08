@@ -8,6 +8,8 @@ import {
 import { Encrypt } from '@celo/utils/lib/ecies'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '@celo/wallet-base'
+import { TransactionSerializableEIP1559 } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
 import Web3 from 'web3'
 import { LocalWallet } from './local-wallet'
 
@@ -167,7 +169,7 @@ describe('Local wallet class', () => {
               feeCurrency: '0x',
               gatewayFeeRecipient: FEE_ADDRESS,
               gatewayFee: '0x5678',
-              data: '0xabcdef',
+              data: '0xabcdef' as const,
             }
           })
 
@@ -225,6 +227,40 @@ describe('Local wallet class', () => {
               }
             `)
           })
+
+          test('matches behavior of viem 1559', async () => {
+            const account = privateKeyToAccount(PRIVATE_KEY2)
+            const wallet2 = new LocalWallet()
+            // wallet 1 uses a private key that does not start with 0x which doesnt work for viem
+            wallet2.addAccount(PRIVATE_KEY2)
+
+            const transaction1559 = {
+              ...celoTransactionWithGasPrice,
+              from: ACCOUNT_ADDRESS2,
+              to: otherAddress,
+              gasPrice: undefined,
+              feeCurrency: undefined,
+              maxFeePerGas: '99',
+              maxPriorityFeePerGas: '99',
+              data: celoTransactionWithGasPrice.data as `0x${string}`,
+            }
+            const transaction1559Viem: TransactionSerializableEIP1559 = {
+              ...transaction1559,
+              gas: BigInt(transaction1559.gas as string),
+              to: transaction1559.to as `0x${string}`,
+              value: BigInt(transaction1559.value as string),
+              maxFeePerGas: BigInt(transaction1559.maxFeePerGas as string),
+              maxPriorityFeePerGas: BigInt(transaction1559.maxPriorityFeePerGas as string),
+              accessList: undefined,
+              chainId: celoTransactionWithGasPrice.chainId as number,
+            }
+
+            const signedTransaction = await wallet2.signTransaction(transaction1559)
+            const viemSignedTransaction = await account.signTransaction(transaction1559Viem)
+
+            expect(signedTransaction.raw).toEqual(viemSignedTransaction)
+          })
+
           test('succeeds with cip42', async () => {
             const transaction42 = {
               ...celoTransactionWithGasPrice,

@@ -78,13 +78,13 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
     }
     const rlpEncoded = rlpEncodedTx(txParams)
     // TODO CIP42 check this probably only needed in legacy txs
-    const addToV = chainIdTransformationForSigning(txParams.chainId!)
+    const addToV =
+      rlpEncoded.type === 'celo-legacy' ? chainIdTransformationForSigning(txParams.chainId!) : 0
 
     // Get the signer from the 'from' field
     const fromAddress = txParams.from!.toString()
     const signer = this.getSigner(fromAddress)
     const signature = await signer!.signTransaction(addToV, rlpEncoded)
-
     return encodeTransaction(rlpEncoded, signature)
   }
 

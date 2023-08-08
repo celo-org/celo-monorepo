@@ -179,9 +179,35 @@ describe('Transaction Utils', () => {
         gatewayFee: i & 4 ? gatewayFee : undefined,
         data: i & 8 ? data : undefined,
       }
-      describe(`Testing with ${JSON.stringify(celoTransaction)}`, () => {
+      describe(transactionDescription(celoTransaction), () => {
         verifyLocalSigning(celoTransaction)
       })
+    }
+
+    function transactionDescription(celoTransaction: CeloTx) {
+      const description = []
+      if (celoTransaction.gasPrice != null) {
+        description.push('Testing Legacy with')
+      } else if (celoTransaction.maxFeePerGas != null && celoTransaction.feeCurrency != null) {
+        description.push('Testing CIP42 with')
+      } else if (
+        celoTransaction.maxFeePerGas != null &&
+        celoTransaction.maxPriorityFeePerGas != null
+      ) {
+        description.push('Testing EIP1559 with')
+      }
+      if (celoTransaction.data != null) {
+        description.push(`data: ${celoTransaction.data}`)
+      }
+
+      if (celoTransaction.gatewayFeeRecipient != null) {
+        description.push(`gateway fee recipient: ${celoTransaction.gatewayFeeRecipient}`)
+      }
+      if (celoTransaction.gatewayFee != null) {
+        description.push(`gateway fee: ${celoTransaction.gatewayFee}`)
+      }
+
+      return description.join(' ')
     }
     // tslint:enable:no-bitwise
 

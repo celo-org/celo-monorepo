@@ -1,10 +1,10 @@
-import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
-// import { parseTransaction } from 'viem'
 import { CeloTx } from '@celo/connect'
+import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
+import { parseTransaction, serializeTransaction } from 'viem'
 import Web3 from 'web3'
 import { extractSignature, isPriceToLow, recoverTransaction, rlpEncodedTx } from './signing-utils'
 const PRIVATE_KEY1 = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
+const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1)) as `0x${string}`
 
 describe('rlpEncodedTx', () => {
   describe('legacy', () => {
@@ -138,7 +138,7 @@ describe('rlpEncodedTx', () => {
         const result = rlpEncodedTx(CIP42Transaction)
         expect(result).toMatchInlineSnapshot(`
           {
-            "rlpEncode": "0x7cf8400280630a63945409ed021d9299bf6814279a6a1411a7e866a6318080941be31a94361a391bbafb2a4ccd704f57dc04d4bb893635c9adc5dea0000083abcdef80",
+            "rlpEncode": "0x7cf8400280630a63945409ed021d9299bf6814279a6a1411a7e866a6318080941be31a94361a391bbafb2a4ccd704f57dc04d4bb893635c9adc5dea0000083abcdefc0",
             "transaction": {
               "chainId": 2,
               "data": "0xabcdef",
@@ -189,6 +189,73 @@ describe('rlpEncodedTx', () => {
           }
         `)
       })
+    })
+  })
+  describe('compared to viem', () => {
+    it('matches output of viem serializeTransaction with accessList', () => {
+      const tx = {
+        type: 'eip1559' as const,
+        from: ACCOUNT_ADDRESS1,
+        to: ACCOUNT_ADDRESS1,
+        chainId: 2,
+        value: Web3.utils.toWei('1000', 'ether'),
+        nonce: 0,
+        maxFeePerGas: '1000',
+        maxPriorityFeePerGas: '99',
+        gas: '9900',
+        data: '0xabcdef' as const,
+        accessList: [
+          {
+            address: '0x0000000000000000000000000000000000000000' as const,
+            storageKeys: [
+              '0x0000000000000000000000000000000000000000000000000000000000000001' as const,
+              '0x60fdd29ff912ce880cd3edaf9f932dc61d3dae823ea77e0323f94adb9f6a72fe' as const,
+            ],
+          },
+        ],
+      }
+      const txViem = {
+        ...tx,
+        gas: BigInt(tx.gas),
+        maxFeePerGas: BigInt(tx.maxFeePerGas),
+        maxPriorityFeePerGas: BigInt(tx.maxPriorityFeePerGas),
+        value: BigInt(tx.value),
+      }
+      const viemSerialized = serializeTransaction(txViem)
+      const serialized = rlpEncodedTx(tx)
+
+      const parsedCK = parseTransaction(serialized.rlpEncode)
+      const parsedViem = parseTransaction(viemSerialized)
+      expect(parsedCK).toEqual(parsedViem)
+      expect(serialized.rlpEncode).toEqual(viemSerialized)
+    })
+    it('matches output of viem serializeTransaction without accessList', () => {
+      const tx = {
+        type: 'eip1559' as const,
+        from: ACCOUNT_ADDRESS1,
+        to: ACCOUNT_ADDRESS1,
+        chainId: 2,
+        value: Web3.utils.toWei('1000', 'ether'),
+        nonce: 0,
+        maxFeePerGas: '1000',
+        maxPriorityFeePerGas: '99',
+        gas: '9900',
+        data: '0xabcdef' as const,
+      }
+      const txViem = {
+        ...tx,
+        gas: BigInt(tx.gas),
+        maxFeePerGas: BigInt(tx.maxFeePerGas),
+        maxPriorityFeePerGas: BigInt(tx.maxPriorityFeePerGas),
+        value: BigInt(tx.value),
+      }
+      const viemSerialized = serializeTransaction(txViem)
+      const serialized = rlpEncodedTx(tx)
+
+      const parsedCK = parseTransaction(serialized.rlpEncode)
+      const parsedViem = parseTransaction(viemSerialized)
+      expect(parsedCK).toEqual(parsedViem)
+      expect(serialized.rlpEncode).toEqual(viemSerialized)
     })
   })
 })

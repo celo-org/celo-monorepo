@@ -21,6 +21,9 @@
     "lint": "tslint -c tslint.json --project .",
     "prepublishOnly": "yarn build"
   },
+  "devDependencies": {
+    "viem": "~1.5.3"
+  },
   "dependencies": {
     "@celo/connect": "4.1.1-dev",
     "@celo/base": "4.1.1-dev",

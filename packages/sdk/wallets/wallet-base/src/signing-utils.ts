@@ -2,7 +2,6 @@ import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import {
   CIP42TXProperties,
   CeloTx,
-  EIP1559TXProperties,
   EncodedTransaction,
   LegacyTXProperties,
   RLPEncodedTx,
@@ -13,6 +12,7 @@ import { inputCeloTxFormatter, parseAccessList } from '@celo/connect/lib/utils/f
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import * as ethUtil from '@ethereumjs/util'
+
 import debugFactory from 'debug'
 import Web3 from 'web3' // TODO try to do this without web3 direct
 // @ts-ignore-next-line eth-lib types not found
@@ -123,7 +123,7 @@ export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
       transaction.to || '0x',
       transaction.value || '0x',
       transaction.data || '0x',
-      transaction.accessList || '0x',
+      transaction.accessList || [],
     ])
     return { transaction, rlpEncode: concatHex(['0x7c', rlpEncode]), type: 'cip42' }
   } else if (isEIP1559(tx)) {
@@ -138,7 +138,7 @@ export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
       transaction.to || '0x',
       transaction.value || '0x',
       transaction.data || '0x',
-      transaction.accessList || '0x',
+      transaction.accessList || [],
     ])
     return { transaction, rlpEncode: concatHex(['0x02', rlpEncode]), type: 'eip1559' }
   } else {
@@ -295,8 +295,9 @@ export async function encodeTransaction(
       ...tx,
       maxFeePerGas: rlpEncoded.transaction.maxFeePerGas!.toString(),
       maxPriorityFeePerGas: rlpEncoded.transaction.maxPriorityFeePerGas!.toString(),
+      // @ts-expect-error //TODO CIP42 fix
       accessList: rlpEncoded.transaction.accessList!,
-    } as EIP1559TXProperties
+    }
   }
   if (rlpEncoded.type === 'cip42' || rlpEncoded.type === 'celo-legacy') {
     tx = {
