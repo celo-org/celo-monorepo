@@ -23,3 +23,4 @@ RUN yarn build
 
 RUN rm -r .git
 RUN rm .gitmodules
+
