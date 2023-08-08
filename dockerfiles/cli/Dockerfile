@@ -24,6 +24,7 @@
 
 ARG geth_tag=1.7.4
 ARG geth_project=celo-org
+LABEL org.opencontainers.image.authors="devops@clabs.co"
 
 # Get geth and related files
 FROM us.gcr.io/$geth_project/geth:$geth_tag as geth
