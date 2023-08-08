@@ -94,8 +94,8 @@ export function startSigner(
             childLogger.error(ErrorMessage.ERROR_AFTER_RESPONSE_SENT)
             Counters.errorsThrownAfterResponseSent.inc()
           }
-          parentSpan.end()
         }
+        parentSpan.end()
       })
     })
 
