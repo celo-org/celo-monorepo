@@ -36,7 +36,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
     session: PnpSession<SignMessageRequest>,
     timeoutError: symbol
   ): Promise<void> {
-    return tracer.startActiveSpan('pnpSignIO - Perform', async (span) => {
+    tracer.startActiveSpan('pnpSignIO - Perform', async (span) => {
       span.addEvent('Calling transaction')
       // Compute quota lookup, update, and signing within transaction
       // so that these occur atomically and rollback on error.
@@ -64,7 +64,6 @@ export class PnpSignAction implements Action<SignMessageRequest> {
               code: SpanStatusCode.ERROR,
               message: 'Error checking if request already exists in db',
             })
-            span.end()
           }
 
           if (isDuplicateRequest) {
@@ -89,7 +88,6 @@ export class PnpSignAction implements Action<SignMessageRequest> {
                 session.response,
                 quotaStatus
               )
-              span.end()
               return
             }
             // In the case of a blockchain connection failure, totalQuota will be -1
@@ -108,7 +106,6 @@ export class PnpSignAction implements Action<SignMessageRequest> {
                   ErrorMessage.FAILING_OPEN
                 )
                 Counters.requestsFailingOpen.inc()
-                span.end()
               } else {
                 span.addEvent('Blockchain connection failure FailClosed')
                 span.setStatus({
@@ -127,7 +124,6 @@ export class PnpSignAction implements Action<SignMessageRequest> {
                   session.response,
                   quotaStatus
                 )
-                span.end()
                 return
               }
             }
@@ -174,7 +170,6 @@ export class PnpSignAction implements Action<SignMessageRequest> {
             })
             span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, 200)
             this.io.sendSuccess(200, session.response, key, signature, quotaStatus, session.errors)
-            span.end()
             return
           } catch (err) {
             span.addEvent('Signature computation error')
@@ -194,15 +189,14 @@ export class PnpSignAction implements Action<SignMessageRequest> {
             span.addEvent('Rolling back transactions')
             // Note that errors thrown after rollback will have no effect, hence doing this last
             await trx.rollback()
-            span.end()
             return
           }
         }
         span.addEvent('Calling pnpSignHandler with timeout')
         await timeout(pnpSignHandler, [], this.config.timeout, timeoutError)
         span.addEvent('Called pnpSignHandler with timeout')
-        span.end()
       })
+      span.end()
     })
   }
 
