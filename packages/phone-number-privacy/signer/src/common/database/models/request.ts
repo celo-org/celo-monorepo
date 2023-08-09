@@ -10,6 +10,7 @@ export enum REQUESTS_COLUMNS {
 }
 
 export interface PnpSignRequestRecord {
+  //
   [REQUESTS_COLUMNS.address]: string
   [REQUESTS_COLUMNS.timestamp]: Date
   [REQUESTS_COLUMNS.blindedQuery]: string

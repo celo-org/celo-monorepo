@@ -9,13 +9,13 @@ import {
   REQUESTS_TABLE,
   toPnpSignRequestRecord,
 } from '../models/request'
-import { countAndThrowDBError, tableWithLockForTrx } from '../utils'
+import { countAndThrowDBError, queryWithOptionalTrx } from '../utils'
 
 function requests(db: Knex, table: REQUESTS_TABLE) {
   return db<PnpSignRequestRecord>(table)
 }
 
-export async function getRequestExists(
+export async function getRequestExists( // TODO try insert, if primary key error, then duplicate request
   db: Knex,
   requestsTable: REQUESTS_TABLE,
   account: string,
@@ -28,10 +28,10 @@ export async function getRequestExists(
       logger.debug(
         `Checking if request exists for account: ${account}, blindedQuery: ${blindedQuery}`
       )
-      const existingRequest = await tableWithLockForTrx(requests(db, requestsTable), trx)
+      const existingRequest = await queryWithOptionalTrx(requests(db, requestsTable), trx)
         .where({
           [REQUESTS_COLUMNS.address]: account,
-          [REQUESTS_COLUMNS.blindedQuery]: blindedQuery,
+          [REQUESTS_COLUMNS.blindedQuery]: blindedQuery, // TODO are we using the primary key correctly??
         })
         .first()
         .timeout(config.db.timeout)
@@ -44,7 +44,7 @@ export async function getRequestExists(
   )
 }
 
-export async function storeRequest(
+export async function storeRequest( //
   db: Knex,
   requestsTable: REQUESTS_TABLE,
   account: string,
@@ -55,7 +55,7 @@ export async function storeRequest(
   return meter(
     async () => {
       logger.debug(`Storing salt request for: ${account}, blindedQuery: ${blindedQuery}`)
-      await tableWithLockForTrx(requests(db, requestsTable), trx)
+      await queryWithOptionalTrx(requests(db, requestsTable), trx)
         .insert(toPnpSignRequestRecord(account, blindedQuery))
         .timeout(config.db.timeout)
     },
