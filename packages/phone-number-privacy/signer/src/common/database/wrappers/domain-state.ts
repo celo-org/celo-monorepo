@@ -5,12 +5,12 @@ import { Knex } from 'knex'
 import { config } from '../../../config'
 import { Histograms, meter } from '../../metrics'
 import {
+  DomainStateRecord,
   DOMAIN_STATE_COLUMNS,
   DOMAIN_STATE_TABLE,
-  DomainStateRecord,
   toDomainStateRecord,
 } from '../models/domain-state'
-import { countAndThrowDBError, tableWithLockForTrx } from '../utils'
+import { countAndThrowDBError, queryWithOptionalTrx } from '../utils'
 
 function domainStates(db: Knex) {
   return db<DomainStateRecord>(DOMAIN_STATE_TABLE)
@@ -69,7 +69,7 @@ export async function getDomainStateRecord<D extends Domain>(
     async () => {
       const hash = domainHash(domain).toString('hex')
       logger.debug({ hash, domain }, 'Getting domain state from db')
-      const result = await tableWithLockForTrx(domainStates(db), trx)
+      const result = await queryWithOptionalTrx(domainStates(db), trx)
         .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
         .first()
         .timeout(config.db.timeout)
