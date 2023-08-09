@@ -482,8 +482,6 @@ contract FeeHandler is
     * @notice Burns all the Celo balance of this contract.
     */
   function _burnCelo() private {
-    // TODO remove duplicated registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)
-
     TokenState storage tokenState = tokenStates[registry.getAddressForOrDie(
       GOLD_TOKEN_REGISTRY_ID
     )];
