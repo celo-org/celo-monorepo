@@ -32,6 +32,8 @@ export class PnpSignAction implements Action<SignMessageRequest> {
     session: PnpSession<SignMessageRequest>,
     timeoutError: symbol
   ): Promise<void> {
+    // Compute quota lookup, update, and signing within transaction
+    // so that these occur atomically and rollback on error.
     await this.db.transaction(async (trx) => {
       const pnpSignHandler = async () => {
         const quotaStatus = await this.quota.getQuotaStatus(session, trx)
