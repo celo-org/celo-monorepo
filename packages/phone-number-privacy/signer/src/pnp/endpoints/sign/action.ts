@@ -36,7 +36,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
     session: PnpSession<SignMessageRequest>,
     timeoutError: symbol
   ): Promise<void> {
-    tracer.startActiveSpan('pnpSignIO - Perform', async (span) => {
+    tracer.startActiveSpan('pnpSignIO - perform', async (span) => {
       span.addEvent('Calling transaction')
       // Compute quota lookup, update, and signing within transaction
       // so that these occur atomically and rollback on error.
