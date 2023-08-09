@@ -5,8 +5,9 @@ import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
 const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node')
 //import { WebTracerProvider } from '@opentelemetry/sdk-trace-web'
 //import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express'
-import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
-import { KnexInstrumentation } from '@opentelemetry/instrumentation-knex'
+//import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
+//import { KnexInstrumentation } from '@opentelemetry/instrumentation-knex'
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 
 const options = {
@@ -18,18 +19,19 @@ const options = {
 // Optionally register automatic instrumentation libraries
 registerInstrumentations({
   instrumentations: [
+    getNodeAutoInstrumentations(),
     // Express instrumentation expects HTTP layer to be instrumented
-    new HttpInstrumentation({
-      ignoreIncomingPaths: [
-        /\/status/,
-        /\/metrics/,
-        /\/metadata\/.*/,
-        /\/secrets\/.*/,
-        /\/ecp\/.*/,
-      ],
-    }),
-    //new ExpressInstrumentation(),
-    new KnexInstrumentation(),
+    // new HttpInstrumentation({
+    //   ignoreIncomingPaths: [
+    //     /\/status/,
+    //     /\/metrics/,
+    //     /\/metadata\/.*/,
+    //     /\/secrets\/.*/,
+    //     /\/ecp\/.*/,
+    //   ],
+    // }),
+    // new ExpressInstrumentation(),
+    // new KnexInstrumentation(),
   ],
 })
 
