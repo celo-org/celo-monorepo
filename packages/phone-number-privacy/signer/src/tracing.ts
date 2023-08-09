@@ -6,6 +6,7 @@ const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node')
 //import { WebTracerProvider } from '@opentelemetry/sdk-trace-web'
 //import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express'
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
+import { KnexInstrumentation } from '@opentelemetry/instrumentation-knex'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 
 const options = {
@@ -28,6 +29,7 @@ registerInstrumentations({
       ],
     }),
     //new ExpressInstrumentation(),
+    new KnexInstrumentation(),
   ],
 })
 

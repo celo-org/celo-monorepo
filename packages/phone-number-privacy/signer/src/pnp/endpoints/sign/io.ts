@@ -47,7 +47,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<SignMessageResponse>
   ): Promise<PnpSession<SignMessageRequest> | null> {
-    return tracer.startActiveSpan('pnpSignIO - Init', async (span) => {
+    return tracer.startActiveSpan('pnpSignIO - init', async (span) => {
       const logger = response.locals.logger
       const warnings: ErrorType[] = []
       span.addEvent('Calling inputChecks')
