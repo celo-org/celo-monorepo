@@ -56,9 +56,6 @@ export interface SignerConfig {
       shouldFailOpen: boolean
     }
   }
-  attestations: {
-    numberAttestationsRequired: number
-  }
   blockchain: BlockchainConfig
   db: {
     type: SupportedDatabase
@@ -133,9 +130,6 @@ export const config: SignerConfig = {
       enabled: toBool(env.PHONE_NUMBER_PRIVACY_API_ENABLED, false),
       shouldFailOpen: toBool(env.FULL_NODE_ERRORS_SHOULD_FAIL_OPEN, false),
     },
-  },
-  attestations: {
-    numberAttestationsRequired: Number(env.ATTESTATIONS_NUMBER_ATTESTATIONS_REQUIRED ?? 3),
   },
   blockchain: {
     provider: env.BLOCKCHAIN_PROVIDER,
