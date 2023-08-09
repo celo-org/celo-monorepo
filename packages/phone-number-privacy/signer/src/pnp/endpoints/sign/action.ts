@@ -133,6 +133,8 @@ export class PnpSignAction implements Action<SignMessageRequest> {
             session.response,
             quotaStatus
           )
+          // Note that errors thrown after rollback will have no effect, hence doing this last
+          await trx.rollback()
           return
         }
       }
