@@ -704,3 +704,18 @@ export async function assertDelegatorDelegateeAmounts(
   assertEqualBN(fromFixed(fraction).multipliedBy(100), percent)
   assertEqualBN(currentAmount, amount)
 }
+
+export function expectBigNumberInRange(real: BigNumber, expected: BigNumber, range: BigNumber) {
+  expect(
+    real.plus(range).gte(expected),
+    `Number ${real.toString()} is not in range <${expected.minus(range).toString()}, ${expected
+      .plus(range)
+      .toString()}>`
+  ).to.be.true;
+  expect(
+    real.minus(range).lte(expected),
+    `Number ${real.toString()} is not in range <${expected.minus(range).toString()}, ${expected
+      .plus(range)
+      .toString()}>`
+  ).to.be.true;
+}
