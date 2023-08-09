@@ -1,6 +1,5 @@
 pragma solidity ^0.5.13;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./CalledByVm.sol";
@@ -21,7 +20,6 @@ contract GasPriceMinimum is
   CalledByVm
 {
   using FixidityLib for FixidityLib.Fraction;
-  using SafeMath for uint256;
 
   event TargetDensitySet(uint256 targetDensity);
   event GasPriceMinimumFloorSet(uint256 gasPriceMinimumFloor);
@@ -126,7 +124,7 @@ contract GasPriceMinimum is
       uint256 rateNumerator;
       uint256 rateDenominator;
       (rateNumerator, rateDenominator) = sortedOracles.medianRate(tokenAddress);
-      return (gasPriceMinimum.mul(rateNumerator).div(rateDenominator));
+      return ((gasPriceMinimum * rateNumerator) / rateDenominator);
     }
   }
 
