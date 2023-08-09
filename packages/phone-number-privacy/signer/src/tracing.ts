@@ -19,7 +19,18 @@ const options = {
 // Optionally register automatic instrumentation libraries
 registerInstrumentations({
   instrumentations: [
-    getNodeAutoInstrumentations(),
+    getNodeAutoInstrumentations({
+      // load custom configuration for http instrumentation
+      '@opentelemetry/instrumentation-http': {
+        ignoreIncomingPaths: [
+          /\/status/,
+          /\/metrics/,
+          /\/metadata\/.*/,
+          /\/secrets\/.*/,
+          /\/ecp\/.*/,
+        ],
+      },
+    }),
     // Express instrumentation expects HTTP layer to be instrumented
     // new HttpInstrumentation({
     //   ignoreIncomingPaths: [
