@@ -124,7 +124,7 @@ contract GasPriceMinimum is
       uint256 rateNumerator;
       uint256 rateDenominator;
       (rateNumerator, rateDenominator) = sortedOracles.medianRate(tokenAddress);
-      return ((gasPriceMinimum * rateNumerator) / rateDenominator);
+      return (gasPriceMinimum * rateNumerator) / rateDenominator;
     }
   }
 
