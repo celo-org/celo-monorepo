@@ -1,14 +1,13 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
-import { assertRevert, assertSameAddress } from '@celo/protocol/lib/test-utils'
+import { assertSameAddress, assertTransactionRevertWithReason } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
   AddressSortedLinkedListWithMedianTestContract,
   AddressSortedLinkedListWithMedianTestInstance,
 } from 'types'
 
-const AddressSortedLinkedListWithMedianTest: AddressSortedLinkedListWithMedianTestContract = artifacts.require(
-  'AddressSortedLinkedListWithMedianTest'
-)
+const AddressSortedLinkedListWithMedianTest: AddressSortedLinkedListWithMedianTestContract =
+  artifacts.require('AddressSortedLinkedListWithMedianTest')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
@@ -56,25 +55,28 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
     })
 
     it('should revert if key is 0', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         addressSortedLinkedListWithMedianTest.insert(
           NULL_ADDRESS,
           numerator,
           NULL_ADDRESS,
           NULL_ADDRESS
-        )
+        ),
+        'invalid key'
       )
     })
 
     it('should revert if lesser is equal to key', async () => {
-      await assertRevert(
-        addressSortedLinkedListWithMedianTest.insert(key, numerator, key, NULL_ADDRESS)
+      await assertTransactionRevertWithReason(
+        addressSortedLinkedListWithMedianTest.insert(key, numerator, key, NULL_ADDRESS),
+        'invalid key'
       )
     })
 
     it('should revert if greater is equal to key', async () => {
-      await assertRevert(
-        addressSortedLinkedListWithMedianTest.insert(key, numerator, NULL_ADDRESS, key)
+      await assertTransactionRevertWithReason(
+        addressSortedLinkedListWithMedianTest.insert(key, numerator, NULL_ADDRESS, key),
+        'invalid key'
       )
     })
 
@@ -89,8 +91,9 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
       })
 
       it('should revert when inserting an element already in the list', async () => {
-        await assertRevert(
-          addressSortedLinkedListWithMedianTest.insert(key, numerator, NULL_ADDRESS, NULL_ADDRESS)
+        await assertTransactionRevertWithReason(
+          addressSortedLinkedListWithMedianTest.insert(key, numerator, NULL_ADDRESS, NULL_ADDRESS),
+          'invalid key'
         )
       })
     })
@@ -120,25 +123,28 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
     })
 
     it('should revert if the key is not in the list', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         addressSortedLinkedListWithMedianTest.update(
           accounts[8],
           newNumerator,
           NULL_ADDRESS,
           NULL_ADDRESS
-        )
+        ),
+        'key not in list'
       )
     })
 
     it('should revert if lesser is equal to key', async () => {
-      await assertRevert(
-        addressSortedLinkedListWithMedianTest.update(key, newNumerator, key, NULL_ADDRESS)
+      await assertTransactionRevertWithReason(
+        addressSortedLinkedListWithMedianTest.update(key, newNumerator, key, NULL_ADDRESS),
+        'invalid key'
       )
     })
 
     it('should revert if greater is equal to key', async () => {
-      await assertRevert(
-        addressSortedLinkedListWithMedianTest.update(key, newNumerator, NULL_ADDRESS, key)
+      await assertTransactionRevertWithReason(
+        addressSortedLinkedListWithMedianTest.update(key, newNumerator, NULL_ADDRESS, key),
+        'invalid key'
       )
     })
   })
@@ -176,7 +182,10 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
     })
 
     it('should revert if the key is not in the list', async () => {
-      await assertRevert(addressSortedLinkedListWithMedianTest.remove(accounts[8]))
+      await assertTransactionRevertWithReason(
+        addressSortedLinkedListWithMedianTest.remove(accounts[8]),
+        'key not in list'
+      )
     })
   })
 

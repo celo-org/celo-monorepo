@@ -11,7 +11,7 @@
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
     "lint": "tslint --project .",
-    "test": "SKIP_KNOWN_FLAKES=false jest --testPathIgnorePatterns test/end-to-end",
+    "test": "jest --testPathIgnorePatterns test/end-to-end",
     "test:debughandles": "jest --watch --runInBand --detectOpenHandles --testPathIgnorePatterns test/end-to-end",
     "test:debug": "node --inspect ../../../node_modules/.bin/jest --runInBand",
     "test:coverage": "yarn test --coverage",
@@ -44,8 +44,7 @@
     "@celo/utils": "^4.1.1-dev",
     "@celo/wallet-hsm-azure": "^4.1.1-dev",
     "@google-cloud/secret-manager": "3.0.0",
-    "@types/bunyan": "^1.8.6",
-    "@types/promise.allsettled": "^1.0.3",
+    "@types/bunyan": "^1.8.8",
     "aws-sdk": "^2.705.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "dotenv": "^8.2.0",
@@ -65,9 +64,6 @@
     "ts-mockito": "^2.6.1",
     "ts-node": "^8.3.0",
     "typescript": "4.4.3"
-  },
-  "peerDependencies": {
-    "@celo/flake-tracker": "0.0.1-dev"
   },
   "engines": {
     "node": ">=10"

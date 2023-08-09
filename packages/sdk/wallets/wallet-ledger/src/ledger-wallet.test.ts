@@ -8,10 +8,11 @@ import {
   recoverTransaction,
   verifyEIP712TypedDataSigner,
 } from '@celo/wallet-base'
+import * as ethUtil from '@ethereumjs/util'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
-// @ts-ignore-next-line
+// @ts-ignore-next-line eth-lib types not found
 import { account as Account } from 'eth-lib'
-import * as ethUtil from 'ethereumjs-util'
+import { keccak256 } from 'ethereum-cryptography/keccak'
 import Web3 from 'web3'
 import { AddressValidation, LedgerWallet } from './ledger-wallet'
 
@@ -143,7 +144,7 @@ function mockLedger(wallet: LedgerWallet, mockForceValidation: () => void) {
         domainSeparator: Buffer,
         structHash: Buffer
       ) => {
-        const messageHash = ethUtil.sha3(
+        const messageHash = keccak256(
           Buffer.concat([Buffer.from('1901', 'hex'), domainSeparator, structHash])
         ) as Buffer
 

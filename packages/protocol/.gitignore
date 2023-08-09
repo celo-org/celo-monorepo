@@ -10,6 +10,8 @@ lib/**/*.js.map
 migrations/**/*.js
 migrations/**/*.js.map
 
+migrations_ts/**/*.js
+
 scripts/**/*.js
 scripts/**/*.js.map
 

@@ -1,5 +1,5 @@
 import { ensureLeading0x, normalizeAddressWith0x } from '@celo/base/lib/address'
-import { CeloTx, DefaultRpcCaller, Provider, RpcCaller } from '@celo/connect'
+import { CeloTx, HttpRpcCaller, Provider, RpcCaller } from '@celo/connect'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { UnlockableWallet } from '@celo/wallet-base'
 import { RemoteWallet } from '@celo/wallet-remote'
@@ -19,7 +19,7 @@ export class RpcWallet extends RemoteWallet<RpcSigner> implements UnlockableWall
 
   constructor(protected _provider: Provider) {
     super()
-    this.rpc = new DefaultRpcCaller(_provider)
+    this.rpc = new HttpRpcCaller(_provider)
   }
 
   async loadAccountSigners(): Promise<Map<string, RpcSigner>> {

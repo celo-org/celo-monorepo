@@ -5,7 +5,6 @@ import {
   ErrorType,
   getSignerEndpoint,
   hasValidAccountParam,
-  identifierIsValidIfExists,
   isBodyReasonablySized,
   PnpQuotaRequest,
   PnpQuotaRequestSchema,
@@ -29,11 +28,8 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.PNP_QUOTA
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
   readonly requestSchema: t.Type<PnpQuotaRequest, PnpQuotaRequest, unknown> = PnpQuotaRequestSchema
-  readonly responseSchema: t.Type<
-    PnpQuotaResponse,
-    PnpQuotaResponse,
-    unknown
-  > = PnpQuotaResponseSchema
+  readonly responseSchema: t.Type<PnpQuotaResponse, PnpQuotaResponse, unknown> =
+    PnpQuotaResponseSchema
 
   constructor(readonly config: OdisConfig, readonly kit: ContractKit) {
     super(config)
@@ -60,7 +56,6 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     return (
       super.validateClientRequest(request) &&
       hasValidAccountParam(request.body) &&
-      identifierIsValidIfExists(request.body) &&
       isBodyReasonablySized(request.body)
     )
   }
@@ -72,7 +67,9 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       logger,
       this.config.shouldFailOpen,
       [],
-      this.config.fullNodeTimeoutMs
+      this.config.fullNodeTimeoutMs,
+      this.config.fullNodeRetryCount,
+      this.config.fullNodeRetryDelayMs
     )
   }
 

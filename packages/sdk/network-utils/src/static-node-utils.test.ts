@@ -10,8 +10,8 @@ const mockStaticNodes = [
   'enode://af5677afe5bf99a00bdb86d0f80f948b2e25f8978867b38cba8e860a6426507cbc37e15900f798305ceff6b7ac7f4057195827274d6b5f6a7e547ce512ff26ba@35.230.21.97:30303',
 ]
 
-describe(StaticNodeUtils, () => {
-  describe(StaticNodeUtils.getStaticNodesAsync, () => {
+describe('StaticNodeUtils', () => {
+  describe('StaticNodeUtils.getStaticNodesAsync', () => {
     afterEach(() => {
       fetchMock.reset()
       _testSetTimezoneOverride(undefined)
@@ -30,7 +30,7 @@ describe(StaticNodeUtils, () => {
     })
   })
 
-  describe(StaticNodeUtils.getRegionalStaticNodesAsync, () => {
+  describe('StaticNodeUtils.getRegionalStaticNodesAsync', () => {
     afterEach(() => {
       fetchMock.reset()
       _testSetTimezoneOverride(undefined)
@@ -61,7 +61,7 @@ describe(StaticNodeUtils, () => {
     })
   })
 
-  describe(StaticNodeUtils.getStaticNodeRegion, () => {
+  describe('StaticNodeUtils.getStaticNodeRegion', () => {
     const cases = [
       {
         timezone: 'America/Chicago',

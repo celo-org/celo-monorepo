@@ -40,7 +40,7 @@ export class AWSKeyProvider extends KeyProviderBase {
       privateKey = this.tryParseSecretString(response.SecretString, secretKey)
     } else if (response.SecretBinary) {
       // @ts-ignore AWS sdk typings not quite correct
-      const buff = new Buffer(response.SecretBinary, 'base64')
+      const buff = Buffer.from(response.SecretBinary, 'base64')
       privateKey = buff.toString('ascii')
     } else {
       throw new Error('Response has neither string nor binary')

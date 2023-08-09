@@ -107,7 +107,7 @@ testWithGanache('rpc-wallet', (web3) => {
         await rpcWallet.addAccount('this is not a valid private key', PASSPHRASE)
         throw new Error('Expected exception to be thrown')
       } catch (e: any) {
-        expect(e.message).toBe('private key length is invalid')
+        expect(e.message).toBe('Expected 32 bytes of private key')
       }
     })
 
@@ -142,7 +142,7 @@ testWithGanache('rpc-wallet', (web3) => {
           try {
             await rpcWallet.unlockAccount(ACCOUNT_ADDRESS1, 'wrong_passphrase', DURATION)
           } catch (e: any) {
-            expect(e.message).toContain('Invalid password')
+            expect(e.message).toContain('could not decrypt key with given passphrase')
           }
         })
 
