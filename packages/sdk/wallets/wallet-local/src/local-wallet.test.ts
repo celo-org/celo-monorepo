@@ -208,11 +208,11 @@ describe('Local wallet class', () => {
             }
             await expect(wallet.signTransaction(transaction1559)).resolves.toMatchInlineSnapshot(`
               {
-                "raw": "0x02f87082ad5a8063630a94588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdefc083015ad7a02c61b97c545c0a59732adbc497e944818da323a508930996383751d17e0b932ea015666dce65f074f12335ab78e1912f8b83fda75f05a002943459598712e6b17c",
+                "raw": "0x02f86d82ad5a8063630a94588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdefc080a02c61b97c545c0a59732adbc497e944818da323a508930996383751d17e0b932ea015666dce65f074f12335ab78e1912f8b83fda75f05a002943459598712e6b17c",
                 "tx": {
                   "accessList": undefined,
                   "gas": "0x0a",
-                  "hash": "0x22db63ac433001393e7aa86be3d580937b926371b6d7ab1a92cf74e3ae7d0892",
+                  "hash": "0xc8be0a99b8f133e843f6824d00db12b89d94e0df0cc28899021edc8924b7b2ba",
                   "input": "0xabcdef",
                   "maxFeePerGas": "0x63",
                   "maxPriorityFeePerGas": "0x63",
@@ -220,7 +220,7 @@ describe('Local wallet class', () => {
                   "r": "0x2c61b97c545c0a59732adbc497e944818da323a508930996383751d17e0b932e",
                   "s": "0x15666dce65f074f12335ab78e1912f8b83fda75f05a002943459598712e6b17c",
                   "to": "0x588e4b68193001e4d10928660ab4165b813717c0",
-                  "v": "0x015ad7",
+                  "v": "0x",
                   "value": "0x0de0b6b3a7640000",
                 },
                 "type": "eip1559",
@@ -276,14 +276,14 @@ describe('Local wallet class', () => {
             }
             await expect(wallet.signTransaction(transaction42)).resolves.toMatchInlineSnapshot(`
               {
-                "raw": "0x7cf89d82ad5a8063630a94cd2a3d9f938e13cd947ec05abc7fe734df8dd826941be31a94361a391bbafb2a4ccd704f57dc04d4bb82567894588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdefc083015ad7a0c610507b2ac3cff80dd7017419021196807d605efce0970c18cde48db33c27d1a01799477e0f601f554f0ee6f7ac21490602124801e9f7a99d9605249b90f03112",
+                "raw": "0x7cf89a82ad5a8063630a94cd2a3d9f938e13cd947ec05abc7fe734df8dd826941be31a94361a391bbafb2a4ccd704f57dc04d4bb82567894588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdefc080a0c610507b2ac3cff80dd7017419021196807d605efce0970c18cde48db33c27d1a01799477e0f601f554f0ee6f7ac21490602124801e9f7a99d9605249b90f03112",
                 "tx": {
                   "accessList": undefined,
                   "feeCurrency": "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
                   "gas": "0x0a",
                   "gatewayFee": "0x5678",
                   "gatewayFeeRecipient": "0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb",
-                  "hash": "0xd7f3ea4959543ea7e5602f7230c5beef8c22e45f85f037b10a0981fd2fbcef3f",
+                  "hash": "0x7afcef8db391ff574b7f9c9205399b8ab094fc9fc8afbfb881204cbaaf093365",
                   "input": "0xabcdef",
                   "maxFeePerGas": "0x63",
                   "maxPriorityFeePerGas": "0x63",
@@ -291,7 +291,7 @@ describe('Local wallet class', () => {
                   "r": "0xc610507b2ac3cff80dd7017419021196807d605efce0970c18cde48db33c27d1",
                   "s": "0x1799477e0f601f554f0ee6f7ac21490602124801e9f7a99d9605249b90f03112",
                   "to": "0x588e4b68193001e4d10928660ab4165b813717c0",
-                  "v": "0x015ad7",
+                  "v": "0x",
                   "value": "0x0de0b6b3a7640000",
                 },
                 "type": "cip42",

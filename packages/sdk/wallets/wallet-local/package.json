@@ -17,7 +17,7 @@
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
     "docs": "typedoc",
-    "test": "jest --runInBand",
+    "test": "jest",
     "lint": "tslint -c tslint.json --project .",
     "prepublishOnly": "yarn build"
   },

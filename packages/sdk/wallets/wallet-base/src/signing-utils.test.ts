@@ -1,7 +1,9 @@
 import { CeloTx } from '@celo/connect'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { parseTransaction, serializeTransaction } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
 import Web3 from 'web3'
+// import Accounts from 'web3-eth-accounts'
 import { extractSignature, isPriceToLow, recoverTransaction, rlpEncodedTx } from './signing-utils'
 const PRIVATE_KEY1 = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1)) as `0x${string}`
@@ -268,29 +270,88 @@ function ckToViem(tx: CeloTx) {
     maxPriorityFeePerGas: BigInt(tx.maxPriorityFeePerGas?.toString()!),
     value: BigInt(tx.value?.toString()!),
     // @ts-expect-error
-    v: BigInt(tx.v?.toString()!),
-    yParity: 1,
+    v: BigInt(tx.v?.toString()! === '0x' ? 0 : tx.v?.toString()!),
   }
 }
 
 describe('recoverTransaction', () => {
   describe('with EIP1559 transactions', () => {
+    const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+    const ACCOUNT_ADDRESS1 = privateKeyToAddress(PRIVATE_KEY1)
+
+    test('ok', async () => {
+      const account = privateKeyToAccount(PRIVATE_KEY1)
+      const hash = await account.signTransaction({
+        type: 'eip1559' as const,
+        from: ACCOUNT_ADDRESS1,
+        to: ACCOUNT_ADDRESS1 as `0x${string}`,
+        chainId: 2,
+        value: BigInt(1000),
+        nonce: 0,
+        maxFeePerGas: BigInt('1000'),
+        maxPriorityFeePerGas: BigInt('99'),
+        gas: BigInt('9900'),
+        data: '0xabcdef' as const,
+      })
+
+      const [transaction, signer] = recoverTransaction(hash)
+      expect(signer).toEqual(ACCOUNT_ADDRESS1)
+      expect(transaction).toMatchInlineSnapshot(`
+        {
+          "accessList": [],
+          "chainId": 2,
+          "data": "0xabcdef",
+          "gas": 9900,
+          "maxFeePerGas": 1000,
+          "maxPriorityFeePerGas": 99,
+          "nonce": 0,
+          "r": "0x04ddb2c87a6e0f77aa25da7439c72f978541f74fa1bd20becf2e109301d2f85c",
+          "s": "0x2d91eec5c0abca75d4df8322677bf43306e90172b77914494bbb7641b6dfc7e9",
+          "to": "0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb",
+          "type": "eip1559",
+          "v": 28,
+          "value": 1000,
+          "yParity": 1,
+        }
+      `)
+    })
+
     it('matches output of viem parseTransaction', () => {
       const encodedByCK1559TX =
-        '0x02f87082ad5a8063630a94588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdef8083015ad7a00fd2d0c579a971ebc04207d8c5ff5bb3449052f0c9e946a7146e5ae4d4ec6289a0737423de64cc81a62e700b5ca7970212aaed3d28de4dbce8b054483d361f6ff8'
+        // from packages/sdk/wallets/wallet-local/src/local-wallet.test.ts:211 -- when calling signTransaction succeeds with eip1559
+        '0x02f86d82ad5a8063630a94588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdefc080a02c61b97c545c0a59732adbc497e944818da323a508930996383751d17e0b932ea015666dce65f074f12335ab78e1912f8b83fda75f05a002943459598712e6b17c'
       const [transaction, signer] = recoverTransaction(encodedByCK1559TX)
       const parsed = parseTransaction(encodedByCK1559TX)
-      // expect(transaction.chainId).toEqual(parsed.chainId)
-      // expect(transaction.gas).toEqual(parsed.gas)
+
       expect(ckToViem(transaction)).toMatchObject(parsed)
-      expect(signer).toMatchInlineSnapshot()
+      expect(signer).toMatchInlineSnapshot(`"0x1Be31A94361a391bBaFB2a4CCd704F57dc04d4bb"`)
     })
     it('can recover (parse) transactions signed by viem', () => {
       // stolen from viems's default eip1559 test result viem/src/accounts/utils/signTransaction.test.ts
       const encodedByViem1559TX =
         '0x02f850018203118080825208808080c080a04012522854168b27e5dc3d5839bab5e6b39e1a0ffd343901ce1622e3d64b48f1a04e00902ae0502c4728cbf12156290df99c3ed7de85b1dbfe20b5c36931733a33'
       const recovered = recoverTransaction(encodedByViem1559TX)
-      expect(recovered).toMatchInlineSnapshot(``)
+      expect(recovered).toMatchInlineSnapshot(`
+        [
+          {
+            "accessList": [],
+            "chainId": 1,
+            "data": "0x",
+            "gas": 21000,
+            "maxFeePerGas": 0,
+            "maxPriorityFeePerGas": 0,
+            "nonce": 785,
+            "r": "0x4012522854168b27e5dc3d5839bab5e6b39e1a0ffd343901ce1622e3d64b48f1",
+            "s": "0x4e00902ae0502c4728cbf12156290df99c3ed7de85b1dbfe20b5c36931733a33",
+            "to": "0x",
+            "type": "eip1559",
+            "v": 27,
+            "value": 0,
+            "yParity": 0,
+          },
+          "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        ]
+      `)
     })
   })
   it('handles celo-legacy transactions', () => {
@@ -317,7 +378,7 @@ describe('recoverTransaction', () => {
   })
   it('handles cip42 transactions', () => {
     const cip42TX =
-      '0x7cf89d82ad5a8063630a94cd2a3d9f938e13cd947ec05abc7fe734df8dd826941be31a94361a391bbafb2a4ccd704f57dc04d4bb82567894588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdef8083015ad8a01078f1b7134f94643e5a8c297690357a463069580287a2cb92f8ba3fb0814826a056621cc5f5b01790374673b8aa8e6969b206d89109ffc4b13cd774ffb5301f03'
+      '0x7cf89a82ad5a8063630a94cd2a3d9f938e13cd947ec05abc7fe734df8dd826941be31a94361a391bbafb2a4ccd704f57dc04d4bb82567894588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdefc01ba0c610507b2ac3cff80dd7017419021196807d605efce0970c18cde48db33c27d1a01799477e0f601f554f0ee6f7ac21490602124801e9f7a99d9605249b90f03112'
     expect(recoverTransaction(cip42TX)).toMatchInlineSnapshot(`
       [
         {
@@ -335,7 +396,7 @@ describe('recoverTransaction', () => {
           "type": "cip42",
           "value": 1000000000000000000,
         },
-        "0x3fA2a0fd9aCABBDc15ea279C3153a4770F077Fc2",
+        "0x4fF71EbD891f122A2D6D14051e9480f0FD5633Aa",
       ]
     `)
   })
@@ -410,13 +471,13 @@ describe('extractSignature', () => {
   it('extracts from cip42 txs', () => {
     // packages/sdk/wallets/wallet-local/src/local-wallet.test.ts:274 (succeeds with cip42)
     const extracted = extractSignature(
-      '0x7cf89d82ad5a8063630a94cd2a3d9f938e13cd947ec05abc7fe734df8dd826941be31a94361a391bbafb2a4ccd704f57dc04d4bb82567894588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdef8083015ad8a01078f1b7134f94643e5a8c297690357a463069580287a2cb92f8ba3fb0814826a056621cc5f5b01790374673b8aa8e6969b206d89109ffc4b13cd774ffb5301f03'
+      '0x7cf89a82ad5a8063630a94cd2a3d9f938e13cd947ec05abc7fe734df8dd826941be31a94361a391bbafb2a4ccd704f57dc04d4bb82567894588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdefc01ba0c610507b2ac3cff80dd7017419021196807d605efce0970c18cde48db33c27d1a01799477e0f601f554f0ee6f7ac21490602124801e9f7a99d9605249b90f03112'
     )
     expect(extracted).toMatchInlineSnapshot(`
       {
-        "r": "0x1078f1b7134f94643e5a8c297690357a463069580287a2cb92f8ba3fb0814826",
-        "s": "0x56621cc5f5b01790374673b8aa8e6969b206d89109ffc4b13cd774ffb5301f03",
-        "v": "0x015ad8",
+        "r": "0xc610507b2ac3cff80dd7017419021196807d605efce0970c18cde48db33c27d1",
+        "s": "0x1799477e0f601f554f0ee6f7ac21490602124801e9f7a99d9605249b90f03112",
+        "v": "0x1b",
       }
     `)
   })
@@ -435,7 +496,7 @@ describe('extractSignature', () => {
   })
   it('fails when length is wrong', () => {
     expect(() => extractSignature('0x')).toThrowErrorMatchingInlineSnapshot(
-      `"@extractSignature: provided transaction has 0 elements but celo-legacy txs with a signature have 12"`
+      `"@extractSignature: provided transaction has 0 elements but celo-legacy txs with a signature have 12 []"`
     )
   })
 })

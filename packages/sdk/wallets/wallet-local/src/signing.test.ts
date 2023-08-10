@@ -10,6 +10,7 @@ import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { recoverTransaction } from '@celo/wallet-base'
 import debugFactory from 'debug'
 import Web3 from 'web3'
+import Accounts from 'web3-eth-accounts'
 import { LocalWallet } from './local-wallet'
 
 const debug = debugFactory('kit:txtest:sign')
@@ -39,23 +40,29 @@ describe('Transaction Utils', () => {
           result: '0xc94770007dda54cF92009BFF0dE90c06F603a09f',
         }
         callback(null, response)
+      } else if (payload.method === 'eth_gasPrice') {
+        const response: JsonRpcResponse = {
+          jsonrpc: payload.jsonrpc,
+          id: Number(payload.id),
+          result: '0x09184e72a000',
+        }
+        callback(null, response)
       } else {
         callback(new Error(payload.method))
       }
     },
   }
 
-  beforeEach(async () => {
+  const setupConnection = async () => {
     web3 = new Web3()
     web3.setProvider(mockProvider as any)
     connection = new Connection(web3)
     connection.wallet = new LocalWallet()
-  })
-
+  }
   async function verifyLocalSigning(celoTransaction: CeloTx): Promise<void> {
     let recoveredSigner: string
     let signedCeloTransaction: CeloTx
-    beforeEach(async () => {
+    beforeAll(async () => {
       const signedTransaction = await web3.eth.signTransaction(celoTransaction)
       const recovery = recoverTransaction(signedTransaction.raw)
       signedCeloTransaction = recovery[0]
@@ -146,9 +153,6 @@ describe('Transaction Utils', () => {
     })
   }
 
-  afterEach(async () => {
-    connection.stop()
-  })
   async function verifyLocalSigningInAllPermutations(from: string, to: string): Promise<void> {
     const amountInWei: string = Web3.utils.toWei('1', 'ether')
     const nonce = 0
@@ -174,9 +178,9 @@ describe('Transaction Utils', () => {
         maxPriorityFeePerGas: i % 2 === 1 ? gasPrice : undefined,
         chainId,
         gas,
-        feeCurrency: i & 3 ? feeCurrency : undefined,
-        gatewayFeeRecipient: i & 5 ? gatewayFeeRecipient : undefined,
-        gatewayFee: i & 4 ? gatewayFee : undefined,
+        feeCurrency: i % 3 === 0 ? feeCurrency : undefined,
+        gatewayFeeRecipient: i % 7 === 0 ? gatewayFeeRecipient : undefined,
+        gatewayFee: i % 7 === 0 ? gatewayFee : undefined,
         data: i & 8 ? data : undefined,
       }
       describe(transactionDescription(celoTransaction), () => {
@@ -185,25 +189,35 @@ describe('Transaction Utils', () => {
     }
 
     function transactionDescription(celoTransaction: CeloTx) {
-      const description = []
-      if (celoTransaction.gasPrice != null) {
+      const description: string[] = []
+      if (celoTransaction.gasPrice != undefined) {
         description.push('Testing Legacy with')
-      } else if (celoTransaction.maxFeePerGas != null && celoTransaction.feeCurrency != null) {
-        description.push('Testing CIP42 with')
       } else if (
-        celoTransaction.maxFeePerGas != null &&
-        celoTransaction.maxPriorityFeePerGas != null
+        (celoTransaction.maxFeePerGas != undefined && celoTransaction.feeCurrency != undefined) ||
+        celoTransaction.gatewayFeeRecipient !== undefined
       ) {
+        description.push('Testing CIP42 with')
+      } else {
+        console.warn(
+          'FEE DATA',
+          celoTransaction.maxFeePerGas,
+          celoTransaction.maxPriorityFeePerGas,
+          celoTransaction.gasPrice
+        )
         description.push('Testing EIP1559 with')
       }
-      if (celoTransaction.data != null) {
+      if (celoTransaction.data != undefined) {
         description.push(`data: ${celoTransaction.data}`)
       }
 
-      if (celoTransaction.gatewayFeeRecipient != null) {
+      if (celoTransaction.feeCurrency != undefined) {
+        description.push(`fee currency: ${celoTransaction.feeCurrency}`)
+      }
+
+      if (celoTransaction.gatewayFeeRecipient != undefined) {
         description.push(`gateway fee recipient: ${celoTransaction.gatewayFeeRecipient}`)
       }
-      if (celoTransaction.gatewayFee != null) {
+      if (celoTransaction.gatewayFee != undefined) {
         description.push(`gateway fee: ${celoTransaction.gatewayFee}`)
       }
 
@@ -220,31 +234,37 @@ describe('Transaction Utils', () => {
 
   describe('Signer Testing with single local account and pay gas in CELO', () => {
     describe('Test1 should be able to sign and get the signer back with single local account', () => {
-      beforeEach(async () => {
-        jest.setTimeout(60 * 1000)
+      beforeAll(async () => {
+        await setupConnection()
+        // jest.setTimeout(60 * 1000)
         connection.addAccount(PRIVATE_KEY1)
       })
       verifyLocalSigningInAllPermutations(ACCOUNT_ADDRESS1, ACCOUNT_ADDRESS2)
+      afterAll(() => connection.stop())
     })
   })
 
   describe('Signer Testing with multiple local accounts', () => {
     describe('Test2 should be able to sign with first account and get the signer back with multiple local accounts', () => {
-      beforeEach(async () => {
-        jest.setTimeout(60 * 1000)
+      beforeAll(async () => {
+        await setupConnection()
+        // jest.setTimeout(60 * 1000)
         connection.addAccount(PRIVATE_KEY1)
         connection.addAccount(PRIVATE_KEY2)
       })
       verifyLocalSigningInAllPermutations(ACCOUNT_ADDRESS1, ACCOUNT_ADDRESS2)
+      afterAll(() => connection.stop())
     })
 
     describe('Test3 should be able to sign with second account and get the signer back with multiple local accounts', () => {
-      beforeEach(async () => {
-        jest.setTimeout(60 * 1000)
+      beforeAll(async () => {
+        await setupConnection()
+        // jest.setTimeout(60 * 1000)
         connection.addAccount(PRIVATE_KEY1)
         connection.addAccount(PRIVATE_KEY2)
       })
       verifyLocalSigningInAllPermutations(ACCOUNT_ADDRESS2, ACCOUNT_ADDRESS1)
+      afterAll(() => connection.stop())
     })
   })
 })
