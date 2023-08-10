@@ -14,7 +14,8 @@ export async function testPNPSignQuery(
   contextName: OdisContextName,
   endpoint: CombinerEndpointPNP.PNP_SIGN,
   timeoutMs?: number,
-  bypassQuota?: boolean
+  bypassQuota?: boolean,
+  useDEK?: boolean
 ) {
   logger.info(`Performing test PNP query for ${endpoint}`)
   try {
@@ -22,7 +23,8 @@ export async function testPNPSignQuery(
       blockchainProvider,
       contextName,
       timeoutMs,
-      bypassQuota
+      bypassQuota,
+      useDEK
     )
     logger.info({ odisResponse }, 'ODIS salt request successful. System is healthy.')
   } catch (err) {
@@ -85,13 +87,21 @@ export async function serialLoadTest(
     | CombinerEndpointPNP.PNP_QUOTA
     | CombinerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.PNP_SIGN,
   timeoutMs?: number,
-  bypassQuota?: boolean
+  bypassQuota?: boolean,
+  useDEK?: boolean
 ) {
   for (let i = 0; i < n; i++) {
     try {
       switch (endpoint) {
         case CombinerEndpointPNP.PNP_SIGN:
-          await testPNPSignQuery(blockchainProvider, contextName, endpoint, timeoutMs, bypassQuota)
+          await testPNPSignQuery(
+            blockchainProvider,
+            contextName,
+            endpoint,
+            timeoutMs,
+            bypassQuota,
+            useDEK
+          )
           break
         case CombinerEndpointPNP.PNP_QUOTA:
           await testPNPQuotaQuery(blockchainProvider, contextName, timeoutMs)
@@ -108,7 +118,8 @@ export async function concurrentLoadTest(
     | CombinerEndpointPNP.PNP_QUOTA
     | CombinerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.PNP_SIGN,
   timeoutMs?: number,
-  bypassQuota?: boolean
+  bypassQuota?: boolean,
+  useDEK?: boolean
 ) {
   while (true) {
     const reqs = []
@@ -126,7 +137,8 @@ export async function concurrentLoadTest(
                 contextName,
                 endpoint,
                 timeoutMs,
-                bypassQuota
+                bypassQuota,
+                useDEK
               )
               break
             case CombinerEndpointPNP.PNP_QUOTA:
