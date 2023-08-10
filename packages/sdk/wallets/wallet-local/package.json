@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "web3": "1.10.0",
-    "viem": "~1.5.3"
+    "viem": "~1.5.4"
   },
   "engines": {
     "node": ">=8.14.2"

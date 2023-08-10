@@ -10,7 +10,6 @@ import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { recoverTransaction } from '@celo/wallet-base'
 import debugFactory from 'debug'
 import Web3 from 'web3'
-import Accounts from 'web3-eth-accounts'
 import { LocalWallet } from './local-wallet'
 
 const debug = debugFactory('kit:txtest:sign')

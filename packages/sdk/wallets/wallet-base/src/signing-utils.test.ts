@@ -4,8 +4,15 @@ import { parseTransaction, serializeTransaction } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import Web3 from 'web3'
 // import Accounts from 'web3-eth-accounts'
-import { extractSignature, isPriceToLow, recoverTransaction, rlpEncodedTx } from './signing-utils'
-const PRIVATE_KEY1 = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+import { celo } from 'viem/chains'
+import {
+  extractSignature,
+  getSignerFromTx,
+  isPriceToLow,
+  recoverTransaction,
+  rlpEncodedTx,
+} from './signing-utils'
+const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1)) as `0x${string}`
 
 describe('rlpEncodedTx', () => {
@@ -275,10 +282,8 @@ function ckToViem(tx: CeloTx) {
 }
 
 describe('recoverTransaction', () => {
+  const ACCOUNT_ADDRESS1 = privateKeyToAddress(PRIVATE_KEY1)
   describe('with EIP1559 transactions', () => {
-    const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-    const ACCOUNT_ADDRESS1 = privateKeyToAddress(PRIVATE_KEY1)
-
     test('ok', async () => {
       const account = privateKeyToAccount(PRIVATE_KEY1)
       const hash = await account.signTransaction({
@@ -396,9 +401,34 @@ describe('recoverTransaction', () => {
           "type": "cip42",
           "value": 1000000000000000000,
         },
-        "0x4fF71EbD891f122A2D6D14051e9480f0FD5633Aa",
+        "0x01035Bc38d82B345e6c383c1e1E12E0D4dB9eC0E",
       ]
     `)
+  })
+  test('cip42 serialized by viem', async () => {
+    const account = privateKeyToAccount(PRIVATE_KEY1)
+    const signed = await account.signTransaction(
+      {
+        // @ts-ignore
+        type: 'cip42',
+        accessList: [],
+        chainId: 44378,
+        data: '0xabcdef',
+        feeCurrency: '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
+        gas: BigInt(10),
+        gatewayFee: BigInt('0x5678'),
+        gatewayFeeRecipient: '0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb',
+        maxFeePerGas: BigInt(99),
+        maxPriorityFeePerGas: BigInt(99),
+        nonce: 0,
+        to: '0x588e4b68193001e4d10928660ab4165b813717c0',
+        value: BigInt(1000000000000000000),
+      },
+      { serializer: celo.serializers?.transaction }
+    )
+
+    expect(recoverTransaction(signed)).toMatchInlineSnapshot()
+    expect(recoverTransaction(signed)[1]).toEqual(account.address)
   })
 })
 
@@ -498,5 +528,31 @@ describe('extractSignature', () => {
     expect(() => extractSignature('0x')).toThrowErrorMatchingInlineSnapshot(
       `"@extractSignature: provided transaction has 0 elements but celo-legacy txs with a signature have 12 []"`
     )
+  })
+})
+
+describe.only('getSignerFromTx', () => {
+  const account = privateKeyToAccount(PRIVATE_KEY1)
+  test('adf', async () => {
+    const signed = await account.signTransaction(
+      {
+        // @ts-ignore
+        type: 'cip42',
+        accessList: [],
+        chainId: 44378,
+        data: '0xabcdef',
+        feeCurrency: '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
+        gas: BigInt(10),
+        gatewayFee: BigInt('0x5678'),
+        gatewayFeeRecipient: '0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb',
+        maxFeePerGas: BigInt(99),
+        maxPriorityFeePerGas: BigInt(99),
+        nonce: 0,
+        to: '0x588e4b68193001e4d10928660ab4165b813717c0',
+        value: BigInt(1000000000000000000),
+      },
+      { serializer: celo.serializers?.transaction }
+    )
+    expect(getSignerFromTx(signed)).toEqual(account.address)
   })
 })

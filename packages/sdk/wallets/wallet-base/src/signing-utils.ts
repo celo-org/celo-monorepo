@@ -1,4 +1,4 @@
-import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
+import { ensureLeading0x, hexToBuffer, trimLeading0x } from '@celo/base/lib/address'
 import {
   CIP42TXProperties,
   CeloTx,
@@ -17,6 +17,7 @@ import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typ
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import * as ethUtil from '@ethereumjs/util'
 import debugFactory from 'debug'
+import { keccak256, publicToAddress } from 'ethereumjs-util'
 import Web3 from 'web3' // TODO try to do this without web3 direct
 import Accounts from 'web3-eth-accounts'
 // @ts-ignore-next-line eth-lib types not found
@@ -359,11 +360,10 @@ export function extractSignature(rawTx: string) {
 
 function extractSignatureFromDecoded(rawValues: string[]) {
   // signature is always (for the tx we support so far) the last three elements of the array in order v, r, s,
-  const vRaw = rawValues.at(-3)
+  const v = rawValues.at(-3)
   let r = rawValues.at(-2)
   let s = rawValues.at(-1)
-
-  const v = vRaw === '0x' || hexToNumber(vRaw) === 0 ? 27 : 28
+  // https://github.com/wagmi-dev/viem/blob/993321689b3e2220976504e7e170fe47731297ce/src/utils/transaction/parseTransaction.ts#L281
   // Account.recover cannot handle canonicalized signatures
   // A canonicalized signature may have the first byte removed if its value is 0
   r = ensureLeading0x(trimLeading0x(r as string).padStart(64, '0'))
@@ -417,19 +417,34 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
   }
 }
 
-function getSignerFromTx(rawTx: string): string {
-  // const signingData = transactionArray.slice(0, transactionArray.length - 3)
-  // const signingDataHex = RLP.encode(signingData)
-  // const hash = getHashFromEncoded(signingDataHex)
-  // const signer = ecrecover(Buffer.from(hash), BigInt(v), hexToBuffer(r as string), hexToBuffer(s as string))
-  // const signerHex = bufferToHex(signer)
-  // return publicKeyToAddress(signerHex)
-  const { r, v, s } = extractSignature(rawTx)
-  const signature = Account.encodeSignature([v, r, s])
-  const hash = getHashFromEncoded(rawTx.slice(-3))
-  console.info('signature', signature, hash, [v, r, s])
-  const signer = Account.recover(hash, signature)
-  return signer
+const TRANSACTION_TYPE = '0x7c'
+const TRANSACTION_TYPE_BUFFER = Buffer.from(TRANSACTION_TYPE.padStart(2, '0'), 'hex')
+
+//inspired by @ethereumjs/tx
+function getPublicKeyofSignerFromTx(transactionArray: string[]) {
+  const base = transactionArray.slice(-3)
+  const message = Buffer.concat([TRANSACTION_TYPE_BUFFER, Buffer.from(RLP.encode(base))])
+  const msgHash = keccak256(message)
+
+  const { v, r, s } = extractSignatureFromDecoded(transactionArray)
+
+  try {
+    return ethUtil.ecrecover(
+      msgHash,
+      v === '0x' || v === undefined ? BigInt(27) : BigInt(v!) + BigInt(27), // Recover the 27 which was stripped from ecsign
+      hexToBuffer(r!),
+      hexToBuffer(s!)
+    )
+  } catch (e: any) {
+    throw new Error(e)
+  }
+}
+
+export function getSignerFromTx(serializedTransaction: string): string {
+  const transactionArray: any[] = RLP.decode(`0x${serializedTransaction.slice(4)}`)
+  const signer = getPublicKeyofSignerFromTx(transactionArray)
+  const address = publicToAddress(signer)
+  return `0x` + address.toString('hex')
 }
 
 function determineTXType(serializedTransaction: string): TransactionTypes {
@@ -445,7 +460,7 @@ function determineTXType(serializedTransaction: string): TransactionTypes {
 }
 
 function recoverTransactionCIP42(serializedTransaction: `0x${string}`): [CeloTx, string] {
-  const transactionArray = RLP.decode(`0x${serializedTransaction.slice(4)}`)
+  const transactionArray: any[] = RLP.decode(`0x${serializedTransaction.slice(4)}`)
   debug('signing-utils@recoverTransactionCIP42: values are %s', transactionArray)
   if (transactionArray.length !== 15 && transactionArray.length !== 12) {
     throw new Error(
