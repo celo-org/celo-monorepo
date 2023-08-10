@@ -62,7 +62,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       }
       span.addEvent('inputChecks OK, Calling requestHasValidKeyVersion')
       if (!requestHasValidKeyVersion(request, logger)) {
-        span.addEvent('Error calling inputChecks')
+        span.addEvent('Error request has invalid key version.')
         span.setStatus({
           code: SpanStatusCode.ERROR,
           message: WarningMessage.INVALID_KEY_VERSION_REQUEST,

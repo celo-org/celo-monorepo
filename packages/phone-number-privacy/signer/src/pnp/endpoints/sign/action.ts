@@ -37,7 +37,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
     timeoutError: symbol
   ): Promise<void> {
     tracer.startActiveSpan('pnpSignIO - perform', async (span) => {
-      span.addEvent('Calling transaction')
+      span.addEvent('Calling db transaction')
       // Compute quota lookup, update, and signing within transaction
       // so that these occur atomically and rollback on error.
       await this.db.transaction(async (trx) => {
@@ -190,6 +190,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
             span.addEvent('Rolling back transactions')
             // Note that errors thrown after rollback will have no effect, hence doing this last
             await trx.rollback()
+            span.addEvent('Transaction rolled back')
             return
           }
         }
