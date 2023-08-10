@@ -1,5 +1,6 @@
 import * as crypto from 'crypto'
 import debugFactory from 'debug'
+import fetchMock from '../__mocks__/cross-fetch'
 import {
   BASE64_REGEXP,
   CircuitBreakerEndpoints,
@@ -59,9 +60,10 @@ export class MockCircuitBreaker {
     }
   }
 
-  unwrapKey(
-    req: CircuitBreakerUnwrapKeyRequest
-  ): { status: number; body: CircuitBreakerUnwrapKeyResponse } {
+  unwrapKey(req: CircuitBreakerUnwrapKeyRequest): {
+    status: number
+    body: CircuitBreakerUnwrapKeyResponse
+  } {
     const { ciphertext } = req
     if (!ciphertext) {
       return {

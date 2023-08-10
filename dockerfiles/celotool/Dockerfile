@@ -1,15 +1,17 @@
-FROM node:12-bullseye-slim
+FROM node:18
+LABEL org.opencontainers.image.authors="devops@clabs.co"
+
 WORKDIR /celo-monorepo
 
 # Needed for gsutil
 RUN apt-get update && \
     apt-get install -y lsb-release && \
-    apt-get install -y curl build-essential git python2 && \
+    apt-get install -y curl build-essential git python3 && \
     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
     apt-get update -y && \
-    apt-get install -y google-cloud-sdk kubectl netcat && \
+    apt-get install -y google-cloud-sdk kubectl netcat-openbsd && \
     curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash && \
     rm -rf /var/lib/apt/lists/*
 
@@ -18,7 +20,6 @@ COPY lerna.json package.json yarn.lock ./
 COPY packages/celotool/package.json packages/celotool/
 COPY packages/dev-utils/package.json packages/dev-utils/
 COPY packages/env-tests/package.json packages/env-tests/package.json
-COPY packages/flake-tracker/package.json packages/flake-tracker/package.json
 COPY packages/phone-number-privacy/common/package.json packages/phone-number-privacy/common/package.json
 COPY packages/protocol/package.json packages/protocol/
 COPY packages/sdk/base/package.json packages/sdk/base/
@@ -45,7 +46,6 @@ RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 COPY packages/celotool packages/celotool/
 COPY packages/dev-utils packages/dev-utils/
 COPY packages/env-tests packages/env-tests
-COPY packages/flake-tracker packages/flake-tracker
 COPY packages/helm-charts packages/helm-charts
 COPY packages/phone-number-privacy/common packages/phone-number-privacy/common
 COPY packages/protocol packages/protocol/

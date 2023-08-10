@@ -48,7 +48,7 @@ export function spawnCmd(
   args: string[],
   options?: SpawnOptions & { silent?: boolean }
 ) {
-  return new Promise<number>(async (resolve, reject) => {
+  return new Promise<number | null>(async (resolve, reject) => {
     const { silent, ...spawnOptions } = options || { silent: false }
     if (!silent) {
       console.debug('$ ' + [cmd].concat(args).join(' '))
