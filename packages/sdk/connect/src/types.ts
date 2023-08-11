@@ -18,7 +18,7 @@ export type AccessListRaw = Array<[string, string[]]>
 
 export type HexOrMissing = `0x${string}` | undefined
 export interface FormattedCeloTx {
-  chainId: HexOrMissing
+  chainId: number
   from: HexOrMissing
   to: HexOrMissing
   data: string | undefined
@@ -32,9 +32,11 @@ export interface FormattedCeloTx {
   maxPriorityFeePerGas?: `0x${string}`
   nonce: HexOrMissing | number
   accessList?: AccessListRaw
+  type: TransactionTypes
 }
 
-export type CeloTx = TransactionConfig & Partial<CeloParams> & { accessList?: AccessList }
+export type CeloTx = TransactionConfig &
+  Partial<CeloParams> & { accessList?: AccessList; type?: TransactionTypes }
 
 export interface CeloTxObject<T> {
   arguments: any[]
