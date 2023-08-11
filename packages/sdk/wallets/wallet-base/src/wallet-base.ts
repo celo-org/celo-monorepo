@@ -85,11 +85,7 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
     const fromAddress = txParams.from!.toString()
     const signer = this.getSigner(fromAddress)
     const signature = await signer!.signTransaction(addToV, rlpEncoded)
-    console.info(
-      `Signed tx ${rlpEncoded.type} with signature ${JSON.stringify(signature)}`,
-      'fromAddress',
-      fromAddress
-    )
+
     return encodeTransaction(rlpEncoded, signature)
   }
 

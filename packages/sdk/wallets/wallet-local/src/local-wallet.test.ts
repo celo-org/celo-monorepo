@@ -208,22 +208,25 @@ describe('Local wallet class', () => {
             }
             await expect(wallet.signTransaction(transaction1559)).resolves.toMatchInlineSnapshot(`
               {
-                "raw": "0x02f86d82ad5a8063630a94588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdefc080a02c61b97c545c0a59732adbc497e944818da323a508930996383751d17e0b932ea015666dce65f074f12335ab78e1912f8b83fda75f05a002943459598712e6b17c",
+                "raw": "0x7cf88682ad5a8063630a80941be31a94361a391bbafb2a4ccd704f57dc04d4bb82567894588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdefc001a0cfa1e1b30d1e4617ce80922d853c5e8b54b21f5ed6604438f90280ef2f0b7fd0a06fd8eee02fbdd421136fb45e6851ce72b5d87a2c06b2e136ef1a062df9256f4e",
                 "tx": {
                   "accessList": undefined,
+                  "feeCurrency": "0x",
                   "gas": "0x0a",
-                  "hash": "0xc8be0a99b8f133e843f6824d00db12b89d94e0df0cc28899021edc8924b7b2ba",
+                  "gatewayFee": "0x5678",
+                  "gatewayFeeRecipient": "0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb",
+                  "hash": "0x29327536ba9901fde64b1b86882fd173517b41cd8bc8245e3761847d9b231c6d",
                   "input": "0xabcdef",
                   "maxFeePerGas": "0x63",
                   "maxPriorityFeePerGas": "0x63",
                   "nonce": "0",
-                  "r": "0x2c61b97c545c0a59732adbc497e944818da323a508930996383751d17e0b932e",
-                  "s": "0x15666dce65f074f12335ab78e1912f8b83fda75f05a002943459598712e6b17c",
+                  "r": "0xcfa1e1b30d1e4617ce80922d853c5e8b54b21f5ed6604438f90280ef2f0b7fd0",
+                  "s": "0x6fd8eee02fbdd421136fb45e6851ce72b5d87a2c06b2e136ef1a062df9256f4e",
                   "to": "0x588e4b68193001e4d10928660ab4165b813717c0",
-                  "v": "0x",
+                  "v": "0x01",
                   "value": "0x0de0b6b3a7640000",
                 },
-                "type": "eip1559",
+                "type": "cip42",
               }
             `)
           })
@@ -240,6 +243,8 @@ describe('Local wallet class', () => {
               to: otherAddress,
               gasPrice: undefined,
               feeCurrency: undefined,
+              gatewayFeeRecipient: undefined,
+              gatewayFee: undefined,
               maxFeePerGas: '99',
               maxPriorityFeePerGas: '99',
               data: celoTransactionWithGasPrice.data as `0x${string}`,
