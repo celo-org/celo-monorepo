@@ -1,5 +1,6 @@
 import { StableToken } from '@celo/contractkit'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
+import { stableTokenInfos } from '@celo/contractkit/src/celo-tokens'
 import { flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import BigNumber from 'bignumber.js'
@@ -7,7 +8,6 @@ import { BaseCommand } from './base'
 import { newCheckBuilder } from './utils/checks'
 import { displaySendTx, failWith } from './utils/cli'
 import { Flags } from './utils/command'
-import { stableTokenInfos } from '@celo/contractkit/src/celo-tokens'
 
 export abstract class TransferStableBase extends BaseCommand {
   static flags = {

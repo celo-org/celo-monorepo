@@ -1,12 +1,10 @@
 import { ensureLeading0x, hexToBuffer, trimLeading0x } from '@celo/base/lib/address'
 import {
-  CIP42TXProperties,
   CeloTx,
   EncodedTransaction,
-  LegacyTXProperties,
+  isPresent,
   RLPEncodedTx,
   TransactionTypes,
-  isPresent,
 } from '@celo/connect'
 import {
   hexToNumber,
@@ -17,11 +15,11 @@ import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typ
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import * as ethUtil from '@ethereumjs/util'
 import debugFactory from 'debug'
+// @ts-ignore-next-line eth-lib types not found
+import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
 import { keccak256, publicToAddress } from 'ethereumjs-util'
 import Web3 from 'web3' // TODO try to do this without web3 direct
 import Accounts from 'web3-eth-accounts'
-// @ts-ignore-next-line eth-lib types not found
-import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
 const debug = debugFactory('wallet-base:tx:sign')
 
 // Original code taken from
@@ -229,9 +227,9 @@ function assertSerializableTX(tx: CeloTx) {
 
 export function isPriceToLow(tx: CeloTx) {
   const prices = [tx.gasPrice, tx.maxFeePerGas, tx.maxPriorityFeePerGas].filter(
-    (price) => price != undefined
+    (price) => price !== undefined
   )
-  let isLow = false
+  const isLow = false
   for (const price of prices) {
     if (isLessThanZero(price)) {
       throw new Error('GasPrice or maxFeePerGas or maxPriorityFeePerGas is less than than 0')
@@ -306,30 +304,33 @@ export async function encodeTransaction(
       ...tx,
       maxFeePerGas: rlpEncoded.transaction.maxFeePerGas!.toString(),
       maxPriorityFeePerGas: rlpEncoded.transaction.maxPriorityFeePerGas!.toString(),
-      // @ts-expect-error //TODO CIP42 fix
+      // @ts-expect-error // TODO CIP42 fix
       accessList: rlpEncoded.transaction.accessList!,
     }
   }
   if (rlpEncoded.type === 'cip42' || rlpEncoded.type === 'celo-legacy') {
     tx = {
       ...tx,
+      // @ts-expect-error
       feeCurrency: rlpEncoded.transaction.feeCurrency!.toString(),
       gatewayFeeRecipient: rlpEncoded.transaction.gatewayFeeRecipient!.toString(),
       gatewayFee: rlpEncoded.transaction.gatewayFee!.toString(),
-    } as CIP42TXProperties
+    }
   }
   if (rlpEncoded.type === 'celo-legacy') {
     tx = {
       ...tx,
+      // @ts-expect-error
       gasPrice: rlpEncoded.transaction.gasPrice!.toString(),
-    } as LegacyTXProperties
+    }
   }
 
-  return {
+  const result: EncodedTransaction & { type: TransactionTypes } = {
     tx: tx as EncodedTransaction['tx'],
     raw: rawTransaction,
     type: rlpEncoded.type,
-  } as EncodedTransaction
+  }
+  return result
 }
 // new types have prefix but legacy does not
 function prefixAwareRLPDecode(rlpEncode: string, type: TransactionTypes): string[] {
@@ -423,7 +424,7 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
 const TRANSACTION_TYPE = '0x7c'
 const TRANSACTION_TYPE_BUFFER = Buffer.from(TRANSACTION_TYPE.padStart(2, '0'), 'hex')
 
-//inspired by @ethereumjs/tx
+// inspired by @ethereumjs/tx
 function getPublicKeyofSignerFromTx(transactionArray: string[]) {
   const base = transactionArray.slice(0, 12) // 12 is length of cip42 without vrs fields
   const message = Buffer.concat([TRANSACTION_TYPE_BUFFER, Buffer.from(RLP.encode(base))])
@@ -536,9 +537,9 @@ function recoverTransactionEIP1559(serializedTransaction: `0x${string}`): [CeloT
     maxPriorityFeePerGas:
       maxPriorityFeePerGas.toLowerCase() === '0x' ? 0 : parseInt(maxPriorityFeePerGas, 16),
     maxFeePerGas: maxFeePerGas.toLowerCase() === '0x' ? 0 : parseInt(maxFeePerGas, 16),
-    to: to,
+    to,
     value: value.toLowerCase() === '0x' ? 0 : parseInt(value, 16),
-    data: data,
+    data,
     chainId: chainId.toLowerCase() === '0x' ? 0 : parseInt(chainId, 16),
     accessList: parseAccessList(accessList),
     v,
