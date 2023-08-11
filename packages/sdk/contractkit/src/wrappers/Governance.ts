@@ -211,7 +211,10 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
    * @param proposal Proposal to determine the constitution for running.
    */
   async getConstitution(proposal: Proposal): Promise<BigNumber> {
-    let constitution = new BigNumber(0)
+    // Default value that is harcoded on Governance contract
+    // it's 0.5 in Fixidity
+    // https://github.com/celo-org/celo-monorepo/blob/3fffa158d67ffd6366e81ba7243eadede1974b1b/packages/protocol/contracts/governance/Governance.sol#L39
+    let constitution = fromFixed(new BigNumber('500000000000000000000000'))
     for (const tx of proposal) {
       constitution = BigNumber.max(await this.getTransactionConstitution(tx), constitution)
     }
@@ -236,7 +239,7 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
   // in the total of yes votes required
   async getSupportWithConstitutionThreshold(proposalID: BigNumber.Value, constitution: BigNumber) {
     const support = await this.getSupport(proposalID)
-    support.required = support.required.times(constitution)
+    support.required = support.required.times(constitution).integerValue()
     return support
   }
 

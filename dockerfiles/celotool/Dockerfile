@@ -1,4 +1,6 @@
 FROM node:18
+LABEL org.opencontainers.image.authors="devops@clabs.co"
+
 WORKDIR /celo-monorepo
 
 # Needed for gsutil
