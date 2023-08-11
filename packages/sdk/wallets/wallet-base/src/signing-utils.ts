@@ -422,7 +422,7 @@ const TRANSACTION_TYPE_BUFFER = Buffer.from(TRANSACTION_TYPE.padStart(2, '0'), '
 
 //inspired by @ethereumjs/tx
 function getPublicKeyofSignerFromTx(transactionArray: string[]) {
-  const base = transactionArray.slice(-3)
+  const base = transactionArray.slice(0, 12) // 12 is length of cip42 without vrs fields
   const message = Buffer.concat([TRANSACTION_TYPE_BUFFER, Buffer.from(RLP.encode(base))])
   const msgHash = keccak256(message)
 
