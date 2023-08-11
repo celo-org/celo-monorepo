@@ -275,8 +275,8 @@ export function parseAccessList(accessListRaw: AccessListRaw | '0x'): AccessList
   if (accessListRaw === '0x') {
     return accessList
   }
-  for (let i = 0; i < accessListRaw.length; i++) {
-    const [address, storageKeys] = accessListRaw[i]
+  for (const entry of accessListRaw) {
+    const [address, storageKeys] = entry
 
     throwIfInvalidAddress(address)
 

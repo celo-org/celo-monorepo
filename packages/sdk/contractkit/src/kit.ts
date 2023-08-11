@@ -16,9 +16,9 @@ import { CeloContract, CeloTokenContract } from './base'
 import { CeloTokens, EachCeloToken } from './celo-tokens'
 import { ValidWrappers, WrapperCache } from './contract-cache'
 import {
-  HttpProviderOptions,
   ensureCurrentProvider,
   getWeb3ForKit,
+  HttpProviderOptions,
   setupAPIKey,
 } from './setupForKits'
 import { Web3ContractCache } from './web3-contract-cache'
