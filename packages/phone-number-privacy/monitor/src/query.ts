@@ -18,9 +18,9 @@ import { genSessionID } from '@celo/phone-number-privacy-common/lib/utils/logger
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { defined } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
-import { ACCOUNT_ADDRESS, dekAuthSigner, PRIVATE_KEY } from './resources'
+import { ACCOUNT_ADDRESS, dekAuthSigner, generateRandomPhoneNumber, PRIVATE_KEY } from './resources'
 
-const phoneNumber = fetchEnv('PHONE_NUMBER')
+let phoneNumber = fetchEnv('PHONE_NUMBER')
 
 const newPrivateKey = async () => {
   const mnemonic = await generateMnemonic(MnemonicStrength.s256_24words)
@@ -49,6 +49,7 @@ export const queryOdisForSalt = async (
     contractKit.connection.addAccount(PRIVATE_KEY)
     contractKit.defaultAccount = accountAddress
     authSigner = dekAuthSigner(0)
+    phoneNumber = generateRandomPhoneNumber()
   } else {
     const privateKey = await newPrivateKey()
     accountAddress = normalizeAddressWith0x(privateKeyToAddress(privateKey))

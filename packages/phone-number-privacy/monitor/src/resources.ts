@@ -1,6 +1,5 @@
 import { EncryptionKeySigner } from '@celo/identity/lib/odis/query'
 import { AuthenticationMethod } from '@celo/phone-number-privacy-common'
-import { PhoneNumberUtils } from '@celo/phone-utils'
 import {
   ensureLeading0x,
   normalizeAddressWith0x,
@@ -10,22 +9,6 @@ import 'isomorphic-fetch'
 
 export const PRIVATE_KEY = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 export const ACCOUNT_ADDRESS = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY)) // 0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb
-
-export const PRIVATE_KEY_NO_QUOTA =
-  '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890000000'
-export const ACCOUNT_ADDRESS_NO_QUOTA = privateKeyToAddress(PRIVATE_KEY_NO_QUOTA)
-
-export const PHONE_NUMBER = '+17777777777'
-export const BLINDING_FACTOR = Buffer.from('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=', 'base64')
-// BLINDED_PHONE_NUMBER value is dependent on PHONE_NUMBER AND BLINDING_FACTOR
-// hardcoding to avoid importing blind_threshols_bls library
-export const BLINDED_PHONE_NUMBER =
-  'hZXDhpC5onzBSFa1agZ9vfHzqwJ/QeJg77NGvWiQG/sFWsvHETzZvdWr2GpF3QkB'
-
-export const PHONE_HASH_IDENTIFIER = PhoneNumberUtils.getPhoneHash(PHONE_NUMBER)
-
-export const CONTACT_PHONE_NUMBER = '+14155559999'
-export const CONTACT_PHONE_NUMBERS = [CONTACT_PHONE_NUMBER]
 
 interface DEK {
   privateKey: string
@@ -45,6 +28,7 @@ export const deks: DEK[] = [
     address: '0x34332049B07Fab9a2e843A7C8991469d93cF6Ae6',
   },
 ]
+
 // The following code can be used to generate more test DEKs
 // const generateDEKs = (n: number): Promise<DEK[]> => Promise.all([...Array(n).keys()].map(
 //   async () => await deriveDek(await generateMnemonic())
@@ -57,7 +41,9 @@ export const dekAuthSigner = (index: number): EncryptionKeySigner => {
   }
 }
 
-// export const walletAuthSigner: WalletKeySigner = {
-//   authenticationMethod: AuthenticationMethod.WALLET_KEY,
-//   contractKit,
-// }
+export function generateRandomPhoneNumber() {
+  const min = 1000000000 // Smallest 10-digit number
+  const max = 9999999999 // Largest 10-digit number
+  const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min
+  return '+1' + randomNumber.toString()
+}
