@@ -3,44 +3,82 @@ import { isValidAddress, toChecksumAddress } from '@celo/utils/lib/address'
 import { sha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
 import { encode } from 'utf8'
+import { AccessList } from 'web3-core'
 import {
+  AccessListRaw,
   Block,
   BlockHeader,
   BlockNumber,
   CeloTx,
   CeloTxPending,
   CeloTxReceipt,
+  FormattedCeloTx,
   Log,
 } from '../types'
 
 /**
  * Formats the input of a transaction and converts all values to HEX
  */
-export function inputCeloTxFormatter(tx: CeloTx) {
-  tx.from = inputAddressFormatter(tx.from?.toString())
-  tx.to = inputAddressFormatter(tx.to)
-  tx.feeCurrency = inputAddressFormatter(tx.feeCurrency)
-  tx.gatewayFeeRecipient = inputAddressFormatter(tx.gatewayFeeRecipient)
+export function inputCeloTxFormatter(tx: CeloTx): FormattedCeloTx {
+  const {
+    from,
+    chainId,
+    nonce,
+    to,
+    gas,
+    gasPrice,
+    maxFeePerGas,
+    maxPriorityFeePerGas,
+    feeCurrency,
+    gatewayFee,
+    gatewayFeeRecipient,
+    data,
+    value,
+    accessList,
+    common,
+    chain,
+    hardfork,
+    ...rest
+  } = tx
+  const formattedTX: Partial<FormattedCeloTx> = rest
+  formattedTX.from = inputAddressFormatter(from?.toString())
+  formattedTX.to = inputAddressFormatter(to)
 
-  if (tx.data) {
-    tx.data = ensureLeading0x(tx.data)
+  formattedTX.gas = numberToHex(gas)
+
+  formattedTX.value = numberToHex(value?.toString())
+  formattedTX.nonce = numberToHex(nonce?.toString())
+
+  if (feeCurrency) {
+    formattedTX.feeCurrency = inputAddressFormatter(feeCurrency)
+  }
+  if (gatewayFeeRecipient) {
+    formattedTX.gatewayFeeRecipient = inputAddressFormatter(gatewayFeeRecipient)
+  }
+  if (gatewayFee) {
+    formattedTX.gatewayFee = numberToHex(gatewayFee)
   }
 
-  if (tx.data && !isHex(tx.data)) {
+  if (data && !isHex(data)) {
     throw new Error('The data field must be HEX encoded data.')
+  } else {
+    formattedTX.data = data
   }
 
-  tx.gas = numberToHex(tx.gas)
-  tx.gasPrice = numberToHex(tx.gasPrice?.toString())
-  tx.value = numberToHex(tx.value?.toString())
-  // @ts-ignore - nonce is defined as number, but uses as string (web3)
-  tx.nonce = numberToHex(tx.nonce?.toString())
-  tx.gatewayFee = numberToHex(tx.gatewayFee)
+  if (gasPrice) {
+    formattedTX.gasPrice = numberToHex(gasPrice.toString())
+  }
+  if (maxFeePerGas) {
+    formattedTX.maxFeePerGas = numberToHex(maxFeePerGas.toString())
+  }
+  if (maxPriorityFeePerGas) {
+    formattedTX.maxPriorityFeePerGas = numberToHex(maxPriorityFeePerGas.toString())
+  }
+  if (accessList) {
+    formattedTX.accessList = inputAccessListFormatter(accessList)
+  }
 
-  // @ts-ignore - prune undefines
-  Object.keys(tx).forEach((key) => tx[key] === undefined && delete tx[key])
-
-  return tx
+  return formattedTX as FormattedCeloTx
 }
 
 export function outputCeloTxFormatter(tx: any): CeloTxPending {
@@ -52,9 +90,21 @@ export function outputCeloTxFormatter(tx: any): CeloTxPending {
   }
   tx.nonce = hexToNumber(tx.nonce)
   tx.gas = hexToNumber(tx.gas)
-  tx.gasPrice = outputBigNumberFormatter(tx.gasPrice)
   tx.value = outputBigNumberFormatter(tx.value)
-  tx.gatewayFee = outputBigNumberFormatter(tx.gatewayFee)
+
+  if (tx.gatewayFee) {
+    tx.gatewayFee = outputBigNumberFormatter(tx.gatewayFee)
+  }
+
+  if (tx.gasPrice) {
+    tx.gasPrice = outputBigNumberFormatter(tx.gasPrice)
+  }
+  if (tx.maxFeePerGas) {
+    tx.maxFeePerGas = outputBigNumberFormatter(tx.maxFeePerGas)
+  }
+  if (tx.maxPriorityFeePerGas) {
+    tx.maxPriorityFeePerGas = outputBigNumberFormatter(tx.maxPriorityFeePerGas)
+  }
 
   tx.to =
     tx.to && isValidAddress(tx.to)
@@ -132,6 +182,7 @@ export function inputBlockNumberFormatter(blockNumber: BlockNumber) {
     : numberToHex(blockNumber.toString())!
 }
 
+// TODO prune after gingerbread hardfork
 export function outputBlockHeaderFormatter(blockHeader: any): BlockHeader {
   // transform to number
   blockHeader.gasLimit = hexToNumber(blockHeader.gasLimit)
@@ -213,12 +264,60 @@ export function outputBigNumberFormatter(hex: string): string {
   return new BigNumber(hex).toString(10)
 }
 
-export function inputAddressFormatter(address?: string): string | undefined {
+function isHash(value: string) {
+  return isHex(value) && value.length === 32
+}
+
+export function parseAccessList(accessListRaw: AccessListRaw | '0x'): AccessList {
+  const accessList: AccessList = []
+  // TODO IS that true though? i think that was my mistake
+  // if no list was provided to original tx then it will return as "0x"
+  if (accessListRaw === '0x') {
+    return accessList
+  }
+  for (let i = 0; i < accessListRaw.length; i++) {
+    const [address, storageKeys] = accessListRaw[i]
+
+    throwIfInvalidAddress(address)
+
+    accessList.push({
+      address,
+      // TODO CIP42 figure out how to implement trim like viem or if needed trim(key)
+      storageKeys: storageKeys.map((key) => (isHash(key) ? key : /*trim*/ key)),
+    })
+  }
+  return accessList
+}
+
+function throwIfInvalidAddress(address: string) {
+  if (!isValidAddress(address)) {
+    throw new Error(`Invalid address: ${address}`)
+  }
+}
+
+export function inputAccessListFormatter(accessList?: AccessList): AccessListRaw {
+  if (!accessList || accessList.length === 0) {
+    return []
+  }
+  return accessList.reduce((acc, { address, storageKeys }) => {
+    throwIfInvalidAddress(address)
+
+    storageKeys.forEach((storageKey) => {
+      if (storageKey.length - 2 !== 64) {
+        throw new Error(`Invalid storage key: ${storageKey}`)
+      }
+    })
+    acc.push([address, storageKeys])
+    return acc
+  }, [] as AccessListRaw)
+}
+
+export function inputAddressFormatter(address?: string): `0x${string}` | undefined {
   if (!address || address === '0x') {
     return undefined
   }
   if (isValidAddress(address)) {
-    return ensureLeading0x(address).toLocaleLowerCase()
+    return ensureLeading0x(address).toLocaleLowerCase() as `0x${string}`
   }
   throw new Error(`Provided address ${address} is invalid, the capitalization checksum test failed`)
 }
@@ -256,12 +355,12 @@ function isHexStrict(hex: string): boolean {
   return /^(-)?0x[0-9a-f]*$/i.test(hex)
 }
 
-function numberToHex(value?: BigNumber.Value) {
+function numberToHex(value?: BigNumber.Value): `0x${string}` | undefined {
   if (value) {
     const numberValue = new BigNumber(value)
     const result = ensureLeading0x(new BigNumber(value).toString(16))
     // Seen in web3, copied just in case
-    return numberValue.lt(new BigNumber(0)) ? `-${result}` : result
+    return (numberValue.lt(new BigNumber(0)) ? `-${result}` : result) as `0x${string}`
   }
   return undefined
 }
