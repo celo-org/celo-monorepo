@@ -246,7 +246,10 @@ function isEIP1559(tx: CeloTx): boolean {
 }
 
 function isCIP42(tx: CeloTx): boolean {
-  return isEIP1559(tx) && isPresent(tx.feeCurrency)
+  return (
+    isEIP1559(tx) &&
+    (isPresent(tx.feeCurrency) || isPresent(tx.gatewayFeeRecipient) || isPresent(tx.gatewayFee))
+  )
 }
 
 function concatHex(values: string[]): `0x${string}` {
@@ -347,7 +350,6 @@ export function extractSignature(rawTx: string) {
   const type = determineTXType(rawTx)
   const rawValues = prefixAwareRLPDecode(rawTx, type)
   const length = rawValues.length
-  console.info(type, 'length', length, 'expected', correctLengthWithSignatureOf(type), rawValues)
   if (correctLengthWithSignatureOf(type) !== length) {
     throw new Error(
       `@extractSignature: provided transaction has ${length} elements but ${type} txs with a signature have ${correctLengthWithSignatureOf(
@@ -382,6 +384,7 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
   if (!rawTx.startsWith('0x')) {
     throw new Error('rawTx must start with 0x')
   }
+
   switch (determineTXType(rawTx)) {
     case 'cip42':
       return recoverTransactionCIP42(rawTx as `0x${string}`)
@@ -450,12 +453,12 @@ export function getSignerFromTx(serializedTransaction: string): string {
 function determineTXType(serializedTransaction: string): TransactionTypes {
   // TODO CIP42 is this slice ok?
   const prefix = serializedTransaction.slice(0, 4)
+
   if (prefix === '0x02') {
     return 'eip1559'
   } else if (prefix === '0x7c') {
     return 'cip42'
   }
-  console.warn('Unknown transaction type', prefix)
   return 'celo-legacy'
 }
 
@@ -498,9 +501,9 @@ function recoverTransactionCIP42(serializedTransaction: `0x${string}`): [CeloTx,
     chainId: chainId.toLowerCase() === '0x' ? 0 : parseInt(chainId, 16),
     accessList: parseAccessList(accessList),
   }
-  // const web3Account = new Accounts()
-  // const signer = web3Account.recoverTransaction(serializedTransaction)
-  const signer = getSignerFromTx(serializedTransaction)
+
+  const signer =
+    transactionArray.length === 15 ? getSignerFromTx(serializedTransaction) : 'unsigned'
   return [celoTX, signer]
 }
 
@@ -583,7 +586,7 @@ export function verifySignatureWithoutPrefix(
 
 export function decodeSig(sig: any) {
   const [v, r, s] = Account.decodeSignature(sig)
-  console.info('v, r, s', v, r, s)
+
   return {
     v: parseInt(v, 16),
     r: ethUtil.toBuffer(r) as Buffer,

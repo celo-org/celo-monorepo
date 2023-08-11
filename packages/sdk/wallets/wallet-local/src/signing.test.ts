@@ -59,93 +59,84 @@ describe('Transaction Utils', () => {
     connection.wallet = new LocalWallet()
   }
   async function verifyLocalSigning(celoTransaction: CeloTx): Promise<void> {
-    let recoveredSigner: string
-    let signedCeloTransaction: CeloTx
+    let recoveredSigner: string | undefined
+    let recoveredTransaction: CeloTx | undefined
+    let signedTransaction: { raw: string; tx: any } | undefined
     beforeAll(async () => {
-      const signedTransaction = await web3.eth.signTransaction(celoTransaction)
+      signedTransaction = await web3.eth.signTransaction(celoTransaction)
       const recovery = recoverTransaction(signedTransaction.raw)
-      signedCeloTransaction = recovery[0]
+      recoveredTransaction = recovery[0]
       recoveredSigner = recovery[1]
     })
 
-    test('Signer matches recovered signer', () => {
-      expect(recoveredSigner.toLowerCase()).toEqual(celoTransaction.from!.toString().toLowerCase())
+    afterAll(async () => {
+      console.log('completed')
+      signedTransaction = undefined
+      recoveredTransaction = undefined
+      recoveredSigner = undefined
     })
 
-    test('Checking nonce', () => {
+    test('Signer matches recovered signer', async () => {
+      expect(recoveredSigner?.toLowerCase()).toEqual(celoTransaction.from!.toString().toLowerCase())
+    })
+
+    test('Checking nonce', async () => {
       if (celoTransaction.nonce != null) {
-        expect(signedCeloTransaction.nonce).toEqual(parseInt(celoTransaction.nonce.toString(), 16))
+        expect(recoveredTransaction?.nonce).toEqual(parseInt(celoTransaction.nonce.toString(), 16))
       }
     })
 
-    test('Checking gas', () => {
+    test('Checking gas', async () => {
       if (celoTransaction.gas != null) {
-        expect(signedCeloTransaction.gas).toEqual(parseInt(celoTransaction.gas.toString(), 16))
+        expect(recoveredTransaction?.gas).toEqual(parseInt(celoTransaction.gas.toString(), 16))
       }
     })
-    test('Checking gas price', () => {
+    test('Checking gas price', async () => {
       if (celoTransaction.gasPrice != null) {
-        expect(signedCeloTransaction.gasPrice).toEqual(
+        expect(recoveredTransaction?.gasPrice).toEqual(
           parseInt(celoTransaction.gasPrice.toString(), 16)
         )
       }
     })
-    test('Checking maxFeePerGas', () => {
+    test('Checking maxFeePerGas', async () => {
       if (celoTransaction.maxFeePerGas != null) {
-        expect(signedCeloTransaction.maxFeePerGas).toEqual(
+        expect(recoveredTransaction?.maxFeePerGas).toEqual(
           parseInt(celoTransaction.maxFeePerGas.toString(), 16)
         )
       }
     })
-    test('Checking maxPriorityFeePerGas', () => {
+    test('Checking maxPriorityFeePerGas', async () => {
       if (celoTransaction.maxPriorityFeePerGas != null) {
-        debug(
-          'Checking gas price',
-          signedCeloTransaction.maxPriorityFeePerGas,
-          parseInt(celoTransaction.maxPriorityFeePerGas.toString(), 16)
-        )
-        expect(signedCeloTransaction.maxPriorityFeePerGas).toEqual(
+        expect(recoveredTransaction?.maxPriorityFeePerGas).toEqual(
           parseInt(celoTransaction.maxPriorityFeePerGas.toString(), 16)
         )
       }
     })
-    test('Checking feeCurrency', () => {
+    test('Checking feeCurrency', async () => {
       if (celoTransaction.feeCurrency != null) {
-        debug(
-          'Checking fee currency',
-          signedCeloTransaction.feeCurrency,
-          celoTransaction.feeCurrency
-        )
-        expect(signedCeloTransaction.feeCurrency!.toLowerCase()).toEqual(
+        expect(recoveredTransaction?.feeCurrency!.toLowerCase()).toEqual(
           celoTransaction.feeCurrency.toLowerCase()
         )
       }
     })
-    test('gatewayFeeRecipient', () => {
-      if (celoTransaction.gatewayFeeRecipient != null) {
-        debug(
-          'Checking gateway fee recipient actual ' +
-            `${signedCeloTransaction.gatewayFeeRecipient} expected ${celoTransaction.gatewayFeeRecipient}`
-        )
-        expect(signedCeloTransaction.gatewayFeeRecipient!.toLowerCase()).toEqual(
+    test('gatewayFeeRecipient', async () => {
+      if (
+        celoTransaction.gatewayFeeRecipient !== undefined &&
+        celoTransaction.gatewayFeeRecipient !== null
+      ) {
+        expect(recoveredTransaction?.gatewayFeeRecipient?.toLowerCase()).toEqual(
           celoTransaction.gatewayFeeRecipient.toLowerCase()
         )
       }
     })
-    test('Checking gateway fee value', () => {
-      if (celoTransaction.gatewayFee != null) {
-        debug(
-          'Checking gateway fee value',
-          signedCeloTransaction.gatewayFee,
-          celoTransaction.gatewayFee.toString()
-        )
-        expect(signedCeloTransaction.gatewayFee).toEqual(celoTransaction.gatewayFee.toString())
+    test('Checking gateway fee value', async () => {
+      if (celoTransaction.gatewayFee !== undefined && celoTransaction.gatewayFee !== null) {
+        expect(recoveredTransaction?.gatewayFee).toEqual(celoTransaction.gatewayFee.toString())
       }
     })
-    test('Checking data', () => {
+    test('Checking data', async () => {
       if (celoTransaction.data != null) {
-        debug(`Checking data actual ${signedCeloTransaction.data} expected ${celoTransaction.data}`)
-        expect(signedCeloTransaction.data!.toLowerCase()).toEqual(
+        expect(recoveredTransaction?.data!.toLowerCase()).toEqual(
           celoTransaction.data.toLowerCase()
         )
       }
@@ -156,8 +147,8 @@ describe('Transaction Utils', () => {
     const amountInWei: string = Web3.utils.toWei('1', 'ether')
     const nonce = 0
     const badNonce = 100
-    const gas = 10
-    const gasPrice = 99
+    const gas = 10000
+    const gasPrice = 99000000000
     const feeCurrency = ACCOUNT_ADDRESS1
     const gatewayFeeRecipient = ACCOUNT_ADDRESS2
     const gatewayFee = '0x5678'
@@ -190,20 +181,15 @@ describe('Transaction Utils', () => {
     function transactionDescription(celoTransaction: CeloTx) {
       const description: string[] = []
       if (celoTransaction.gasPrice != undefined) {
-        description.push('Testing Legacy with')
+        description.push(`Testing Legacy with gas price ${celoTransaction.gasPrice}`)
       } else if (
-        (celoTransaction.maxFeePerGas != undefined && celoTransaction.feeCurrency != undefined) ||
-        celoTransaction.gatewayFeeRecipient !== undefined
+        celoTransaction.feeCurrency != undefined ||
+        celoTransaction.gatewayFeeRecipient !== undefined ||
+        celoTransaction.gatewayFee !== undefined
       ) {
         description.push('Testing CIP42 with')
       } else {
-        console.warn(
-          'FEE DATA',
-          celoTransaction.maxFeePerGas,
-          celoTransaction.maxPriorityFeePerGas,
-          celoTransaction.gasPrice
-        )
-        description.push('Testing EIP1559 with')
+        description.push(`Testing EIP1559 with maxFeePerGas ${celoTransaction.maxFeePerGas}`)
       }
       if (celoTransaction.data != undefined) {
         description.push(`data: ${celoTransaction.data}`)
