@@ -40,8 +40,6 @@ class ContractAddresses {
     let counter = 1 // TODO remove me
     await Promise.all(
       contracts.map(async (contract: string) => {
-        await new Promise((r) => setTimeout(r, Math.random() * 2000)) // avoids killing the node
-        console.log('contract(l)', contract, counter)
         const registeredAddress = await registry.getAddressForString(contract)
         counter++
 
@@ -260,6 +258,7 @@ module.exports = async (callback: (error?: any) => number) => {
 
     const version = getReleaseVersion(branch)
 
+    console.log(version)
     if (version >= 9) {
       ignoredContractsSet = new Set(ignoredContractsV9)
     }
@@ -269,6 +268,7 @@ module.exports = async (callback: (error?: any) => number) => {
     const contracts = readdirSync(join(argv.build_directory, 'contracts'))
       .concat(contracts08) // adding at the end so libraries that are already deployed don't get redeployed
       .map((x) => basename(x, '.json'))
+      // if false, out
       .filter(
         (contract) =>
           !ignoredContractsSet.has(contract) &&

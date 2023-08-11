@@ -132,14 +132,16 @@ function compile(outdir: string) {
 
     console.log(`Building contracts using 0.8`)
     exec(
-      `yarn run truffle compile  --contracts_directory="./contracts-0.8" --contracts_build_directory=${outdir}/contracts-0.8 --config truffle-config0.8.js`
+      `yarn run truffle compile --contracts_directory="./contracts-0.8" --contracts_build_directory=${outdir}/contracts-0.8 --config truffle-config0.8.js`
     )
   } else {
     console.log("0.8 folder doesn't exist")
   }
 
   // compile everything else
-  exec(`yarn run --silent truffle compile --build_directory=${outdir}`)
+  exec(
+    `yarn run --silent truffle compile --contracts_directory="./contracts/" --build_directory=${outdir}`
+  )
 
   // check that there were no errors
   for (const contractName of ImplContracts) {

@@ -92,6 +92,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   const contract = queue.pop()
   // mark current DFS node as visited
   visited.add(contract)
+  console.log(`Verifying contract ${contract}`)
 
   // check proxy deployment
   if (isProxyChanged(contract, context.proposal)) {
@@ -128,6 +129,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
     implementationAddress = await proxy._getImplementation()
   }
 
+  console.log("Implementation address at:", implementationAddress)
   let onchainBytecode = await getOnchainBytecode(implementationAddress, context)
   context.libraryAddresses.collect(onchainBytecode, sourceLibraryPositions)
 
@@ -235,9 +237,17 @@ export const verifyBytecodes = async (
     ignoredContracts = [...ignoredContracts, ...ignoredContractsV9]
   }
 
+  console.log("ignoredContracts.includes(contract)", ignoredContracts.includes("SortedOracles"))
+  console.log("contracts", contracts)
   const queue = contracts.filter(
-    (contract) => !ignoredContracts.includes(contract) && compiledContracts.includes(contract)
-  )
+    (contract) => !ignoredContracts.includes(contract)
+    ).filter(
+      (contract) => compiledContracts.includes(contract)
+      )//.filter((contract) => (contract != "SortedOracles")) // TODO figure out why this is not getting filtered in 
+      
+  console.log("ignoredContractsV9",ignoredContractsV9)
+  console.log("queue", queue)
+  console.log("Queue: here")
 
   const visited: Set<string> = new Set(queue)
 
