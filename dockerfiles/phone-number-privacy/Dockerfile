@@ -24,6 +24,7 @@ COPY packages/sdk/wallets/wallet-remote packages/sdk/wallets/wallet-remote
 
 ##### Main stage
 FROM node:18
+LABEL org.opencontainers.image.authors="devops@clabs.co"
 
 WORKDIR /celo-phone-number-privacy/
 
