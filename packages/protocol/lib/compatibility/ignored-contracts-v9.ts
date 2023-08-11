@@ -18,9 +18,12 @@ export const ignoredContractsV9 = [
   // https://github.com/celo-org/celo-monorepo/issues/10435
 ]
 
-export function getReleaseVersion(branch: string) {
+export function getReleaseVersion(tag: string) {
   const regexp = /core-contracts.v(?<version>.*[0-9])/gm
-  const matches = regexp.exec(branch)
+  const matches = regexp.exec(tag)
   const version = parseInt(matches?.groups?.version ?? '0', 10)
+  if ((version) == 0){
+    throw `Tag doesn't have the correct format ${tag}`
+  }
   return version
 }
