@@ -11,7 +11,8 @@ const runLoadTest = (
   isSerial: boolean,
   pnpQuotaEndpoint: boolean,
   timeoutMs: number,
-  bypassQuota: boolean
+  bypassQuota: boolean,
+  useDEK: boolean
 ) => {
   let blockchainProvider: string
   switch (contextName) {
@@ -39,7 +40,8 @@ const runLoadTest = (
       contextName as OdisContextName,
       pnpQuotaEndpoint ? CombinerEndpointPNP.PNP_QUOTA : CombinerEndpointPNP.PNP_SIGN,
       timeoutMs,
-      bypassQuota
+      bypassQuota,
+      useDEK
     )
   } else {
     concurrentLoadTest(
@@ -48,7 +50,8 @@ const runLoadTest = (
       contextName as OdisContextName,
       pnpQuotaEndpoint ? CombinerEndpointPNP.PNP_QUOTA : CombinerEndpointPNP.PNP_SIGN,
       timeoutMs,
-      bypassQuota
+      bypassQuota,
+      useDEK
     )
   }
 }
@@ -87,6 +90,11 @@ yargs
           description: 'Bypass Signer quota check.',
           default: false,
         })
+        .option('useDEK', {
+          type: 'boolean',
+          description: 'Use Data Encryption Key (DEK) to authenticate.',
+          default: false,
+        })
         .option('pnpQuotaEndpoint', {
           type: 'boolean',
           description:
@@ -100,6 +108,7 @@ yargs
         args.isSerial,
         args.pnpQuotaEndpoint,
         args.timeoutMs,
-        args.bypassQuota
+        args.bypassQuota,
+        args.useDEK
       )
   ).argv

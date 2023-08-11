@@ -1,6 +1,7 @@
 import { ContractKit } from '@celo/contractkit'
 import {
   authenticateUser,
+  AuthenticationMethod,
   ErrorType,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
@@ -75,6 +76,12 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     warnings: ErrorType[],
     logger: Logger
   ): Promise<boolean> {
+    const authMethod = request.body.authenticationMethod
+
+    if (authMethod && authMethod === AuthenticationMethod.WALLET_KEY) {
+      Counters.requestsWithWalletAddress.inc()
+    }
+
     return authenticateUser(
       request,
       this.kit,
