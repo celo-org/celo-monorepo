@@ -427,7 +427,26 @@ describe('recoverTransaction', () => {
       { serializer: celo.serializers?.transaction }
     )
 
-    expect(recoverTransaction(signed)).toMatchInlineSnapshot()
+    expect(recoverTransaction(signed)).toMatchInlineSnapshot(`
+      [
+        {
+          "accessList": [],
+          "chainId": 44378,
+          "data": "0xabcdef",
+          "feeCurrency": "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
+          "gas": 10,
+          "gatewayFee": "0x5678",
+          "gatewayFeeRecipient": "0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb",
+          "maxFeePerGas": 99,
+          "maxPriorityFeePerGas": 99,
+          "nonce": 0,
+          "to": "0x588e4b68193001e4d10928660ab4165b813717c0",
+          "type": "cip42",
+          "value": 1000000000000000000,
+        },
+        "0xc2b863ee5586e7aee4cd9f1cad21a41a50882a6b",
+      ]
+    `)
     expect(recoverTransaction(signed)[1]).toEqual(account.address)
   })
 })
@@ -531,9 +550,9 @@ describe('extractSignature', () => {
   })
 })
 
-describe.only('getSignerFromTx', () => {
+describe('getSignerFromTx', () => {
   const account = privateKeyToAccount(PRIVATE_KEY1)
-  test('adf', async () => {
+  test('extracts signer address from cip42 tx signed by viem', async () => {
     const signed = await account.signTransaction(
       {
         // @ts-ignore
