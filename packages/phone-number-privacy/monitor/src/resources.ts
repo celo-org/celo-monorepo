@@ -5,7 +5,6 @@ import {
   normalizeAddressWith0x,
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
-import 'isomorphic-fetch'
 
 export const PRIVATE_KEY = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 export const ACCOUNT_ADDRESS = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY)) // 0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb
