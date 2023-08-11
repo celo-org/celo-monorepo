@@ -2,6 +2,7 @@ export interface ContractPackage {
   path?: string
   folderPath?: string
   name?: string
+  contracstFolder: string
   contracts: string[]
   proxyContracts?: string[]
   solidityVersion: string
@@ -9,7 +10,8 @@ export interface ContractPackage {
 
 export const MENTO_PACKAGE: ContractPackage = {
   path: 'mento-core',
-  folderPath: 'lib/contracts',
+  contracstFolder: 'contracts',
+  folderPath: 'lib',
   name: 'mento',
   contracts: [
     'Exchange',
@@ -38,6 +40,7 @@ export const MENTO_PACKAGE: ContractPackage = {
 
 export const SOLIDITY_08_PACKAGE: ContractPackage = {
   path: 'contracts-0.8',
+  contracstFolder: '',
   folderPath: '',
   name: '0.8',
   contracts: [
@@ -48,5 +51,7 @@ export const SOLIDITY_08_PACKAGE: ContractPackage = {
     // TODO make this automatic?
     'GasPriceMinimumProxy',
   ],
-  solidityVersion: '0.5',
+  solidityVersion: '0.8',
 }
+
+console.log('yeap, I got updated')
