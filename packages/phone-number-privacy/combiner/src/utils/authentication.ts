@@ -50,9 +50,6 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
     let registeredEncryptionKey: string | undefined
 
     // XXX (soloseng): lookup in db first
-    //  await db.transaction(async (trx) => {
-    // XXX: should this use a db trx? I think not, since we are not writing to db,
-    // XXX: so no chance of overwrite conflict.
 
     registeredEncryptionKey = await getDekSignerRecord(signer, logger)
 
