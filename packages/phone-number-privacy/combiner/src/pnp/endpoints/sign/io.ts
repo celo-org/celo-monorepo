@@ -1,6 +1,5 @@
 import { ContractKit } from '@celo/contractkit'
 import {
-  authenticateUser,
   CombinerEndpoint,
   ErrorType,
   getSignerEndpoint,
@@ -26,6 +25,7 @@ import { CryptoSession } from '../../../common/crypto-session'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { getCombinerVersion, OdisConfig } from '../../../config'
+import { authenticateUser } from '../../../utils/authentication'
 
 export class PnpSignIO extends IO<SignMessageRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.PNP_SIGN

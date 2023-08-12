@@ -47,6 +47,13 @@ export interface CombinerConfig {
   blockchain: BlockchainConfig
   phoneNumberPrivacy: OdisConfig
   domains: OdisConfig
+  db: {
+    user: string
+    password: string
+    database: string
+    host: string
+    ssl: boolean
+  }
 }
 
 let config: CombinerConfig
@@ -144,6 +151,13 @@ if (DEV_MODE) {
       fullNodeRetryCount: RETRY_COUNT,
       fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
     },
+    db: {
+      user: 'postgress',
+      password: 'fakePass',
+      database: 'phoneNumber+privacy',
+      host: 'fakeHost',
+      ssl: false,
+    },
   }
 } else {
   const functionConfig = functions.config()
@@ -192,6 +206,13 @@ if (DEV_MODE) {
       fullNodeRetryDelayMs: Number(
         functionConfig.pnp.full_node_retry_delay_ms ?? RETRY_DELAY_IN_MS
       ),
+    },
+    db: {
+      user: functionConfig.db.username,
+      password: functionConfig.db.pass,
+      database: functionConfig.db.name,
+      host: `/cloudsql/${functionConfig.db.host}`,
+      ssl: toBool(functionConfig.db.ssl, true),
     },
   }
 }
