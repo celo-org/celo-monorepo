@@ -38,8 +38,7 @@
     "@types/elliptic": "^6.4.12",
     "@types/express": "^4.17.6",
     "@types/is-base64": "^1.1.0",
-    "@types/node-fetch": "^2.5.7",
-    "web3": "1.10.0"
+    "@types/node-fetch": "^2.5.7"
   },
   "engines": {
     "node": ">=10"
