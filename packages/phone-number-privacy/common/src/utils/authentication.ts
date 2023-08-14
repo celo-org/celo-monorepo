@@ -16,19 +16,36 @@ import {
 } from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
 
+export function newContractKitFetcher(
+  contractKit: ContractKit,
+  logger: Logger,
+  fullNodeTimeoutMs: number = FULL_NODE_TIMEOUT_IN_MS,
+  fullNodeRetryCount: number = RETRY_COUNT,
+  fullNodeRetryDelayMs: number = RETRY_DELAY_IN_MS
+): DataEncryptionKeyFetcher {
+  return (address: string) =>
+    getDataEncryptionKey(
+      address,
+      contractKit,
+      logger,
+      fullNodeTimeoutMs,
+      fullNodeRetryCount,
+      fullNodeRetryDelayMs
+    )
+}
+
+type DataEncryptionKeyFetcher = (address: string) => Promise<string>
+
 /*
  * Confirms that user is who they say they are and throws error on failure to confirm.
  * Authorization header should contain the EC signed body
  */
 export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   request: Request<{}, {}, R>,
-  contractKit: ContractKit,
   logger: Logger,
   shouldFailOpen: boolean = false,
   warnings: ErrorType[] = [],
-  timeoutMs: number = FULL_NODE_TIMEOUT_IN_MS,
-  retryCount: number = RETRY_COUNT,
-  retryDelay: number = RETRY_DELAY_IN_MS
+  fetchDEK: DataEncryptionKeyFetcher
 ): Promise<boolean> {
   logger.debug('Authenticating user')
 
@@ -45,14 +62,7 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   if (authMethod && authMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     let registeredEncryptionKey
     try {
-      registeredEncryptionKey = await getDataEncryptionKey(
-        signer,
-        contractKit,
-        logger,
-        timeoutMs,
-        retryCount,
-        retryDelay
-      )
+      registeredEncryptionKey = await fetchDEK(signer)
     } catch (err) {
       // getDataEncryptionKey should only throw if there is a full-node connection issue.
       // That is, it does not throw if the DEK is undefined or invalid
