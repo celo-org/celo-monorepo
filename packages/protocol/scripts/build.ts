@@ -205,18 +205,6 @@ async function generateFilesForContractKit(outdir: string) {
     })
   )
 
-  // TODO generalize this
-  await tsGenerator(
-    { cwd, loggingLvl: 'info' },
-    new Web3V1Celo({
-      cwd,
-      rawConfig: {
-        files: `${BUILD_DIR}/contracts-0.8/@(${contractKitContracts.join('|')}).json`,
-        outDir: path.join(relativePath, '0.8'),
-      },
-    })
-  )
-
   for (const externalContractPackage of externalContractPackages) {
     await tsGenerator(
       { cwd, loggingLvl: 'info' },
