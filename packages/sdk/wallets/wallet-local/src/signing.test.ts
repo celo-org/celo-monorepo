@@ -70,7 +70,6 @@ describe('Transaction Utils', () => {
     })
 
     afterAll(async () => {
-      console.log('completed')
       signedTransaction = undefined
       recoveredTransaction = undefined
       recoveredSigner = undefined

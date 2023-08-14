@@ -1,10 +1,11 @@
 import { ensureLeading0x, hexToBuffer, trimLeading0x } from '@celo/base/lib/address'
 import {
   CeloTx,
+  CeloTxWithSig,
   EncodedTransaction,
-  isPresent,
   RLPEncodedTx,
   TransactionTypes,
+  isPresent,
 } from '@celo/connect'
 import {
   hexToNumber,
@@ -302,10 +303,10 @@ export async function encodeTransaction(
   if (rlpEncoded.type === 'eip1559' || rlpEncoded.type === 'cip42') {
     tx = {
       ...tx,
+      // @ts-expect-error
       maxFeePerGas: rlpEncoded.transaction.maxFeePerGas!.toString(),
       maxPriorityFeePerGas: rlpEncoded.transaction.maxPriorityFeePerGas!.toString(),
-      // @ts-expect-error // TODO CIP42 fix
-      accessList: rlpEncoded.transaction.accessList!,
+      accessList: parseAccessList(rlpEncoded.transaction.accessList || []),
     }
   }
   if (rlpEncoded.type === 'cip42' || rlpEncoded.type === 'celo-legacy') {
@@ -413,7 +414,6 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
       const { r, v, s } = extractSignatureFromDecoded(rawValues)
       const signature = Account.encodeSignature([v, r, s])
       const extraData = recovery < 35 ? [] : [chainId, '0x', '0x']
-      // TODO CIP42 For if is slice taking off the  v r s values, then that should probably happen for all types
       const signingData = rawValues.slice(0, 9).concat(extraData)
       const signingDataHex = RLP.encode(signingData)
       const signer = Account.recover(getHashFromEncoded(signingDataHex), signature)
@@ -424,7 +424,7 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
 const TRANSACTION_TYPE = '0x7c'
 const TRANSACTION_TYPE_BUFFER = Buffer.from(TRANSACTION_TYPE.padStart(2, '0'), 'hex')
 
-// inspired by @ethereumjs/tx
+// inspired by @ethereumjs/tx -- does not work :(
 function getPublicKeyofSignerFromTx(transactionArray: string[]) {
   const base = transactionArray.slice(0, 12) // 12 is length of cip42 without vrs fields
   const message = Buffer.concat([TRANSACTION_TYPE_BUFFER, Buffer.from(RLP.encode(base))])
@@ -443,8 +443,8 @@ function getPublicKeyofSignerFromTx(transactionArray: string[]) {
     throw new Error(e)
   }
 }
-
-export function getSignerFromTx(serializedTransaction: string): string {
+// This is not working
+export function getSignerFromTxCIP42(serializedTransaction: string): string {
   const transactionArray: any[] = RLP.decode(`0x${serializedTransaction.slice(4)}`)
   const signer = getPublicKeyofSignerFromTx(transactionArray)
   const address = publicToAddress(signer)
@@ -452,7 +452,6 @@ export function getSignerFromTx(serializedTransaction: string): string {
 }
 
 function determineTXType(serializedTransaction: string): TransactionTypes {
-  // TODO CIP42 is this slice ok?
   const prefix = serializedTransaction.slice(0, 4)
 
   if (prefix === '0x02') {
@@ -463,8 +462,18 @@ function determineTXType(serializedTransaction: string): TransactionTypes {
   return 'celo-legacy'
 }
 
-function recoverTransactionCIP42(serializedTransaction: `0x${string}`): [CeloTx, string] {
-  const transactionArray: any[] = RLP.decode(`0x${serializedTransaction.slice(4)}`)
+function vrsForRecovery(vRaw: string, r: string, s: string) {
+  const v = vRaw === '0x' || hexToNumber(vRaw) === 0 ? 27 : 28
+  return {
+    v,
+    r,
+    s,
+    yParity: v === 27 ? 0 : 1,
+  } as const
+}
+
+function recoverTransactionCIP42(serializedTransaction: `0x${string}`): [CeloTxWithSig, string] {
+  const transactionArray: any[] = prefixAwareRLPDecode(serializedTransaction, 'cip42')
   debug('signing-utils@recoverTransactionCIP42: values are %s', transactionArray)
   if (transactionArray.length !== 15 && transactionArray.length !== 12) {
     throw new Error(
@@ -484,9 +493,12 @@ function recoverTransactionCIP42(serializedTransaction: `0x${string}`): [CeloTx,
     value,
     data,
     accessList,
+    vRaw,
+    r,
+    s,
   ] = transactionArray
 
-  const celoTX: CeloTx = {
+  const celoTX: CeloTxWithSig = {
     type: 'cip42',
     nonce: nonce.toLowerCase() === '0x' ? 0 : parseInt(nonce, 16),
     maxPriorityFeePerGas:
@@ -501,15 +513,16 @@ function recoverTransactionCIP42(serializedTransaction: `0x${string}`): [CeloTx,
     data,
     chainId: chainId.toLowerCase() === '0x' ? 0 : parseInt(chainId, 16),
     accessList: parseAccessList(accessList),
+    ...vrsForRecovery(vRaw, r, s),
   }
 
   const signer =
-    transactionArray.length === 15 ? getSignerFromTx(serializedTransaction) : 'unsigned'
+    transactionArray.length === 15 ? getSignerFromTxCIP42(serializedTransaction) : 'unsigned'
   return [celoTX, signer]
 }
 
-function recoverTransactionEIP1559(serializedTransaction: `0x${string}`): [CeloTx, string] {
-  const transactionArray = RLP.decode(`0x${serializedTransaction.slice(4)}`)
+function recoverTransactionEIP1559(serializedTransaction: `0x${string}`): [CeloTxWithSig, string] {
+  const transactionArray: any[] = prefixAwareRLPDecode(serializedTransaction, 'eip1559')
   debug('signing-utils@recoverTransactionEIP1559: values are %s', transactionArray)
 
   const [
@@ -527,10 +540,7 @@ function recoverTransactionEIP1559(serializedTransaction: `0x${string}`): [CeloT
     s,
   ] = transactionArray
 
-  // TODO CIP42 do this for cip42 too also should this also happen when extracting signer?
-  const v = vRaw === '0x' || hexToNumber(vRaw) === 0 ? 27 : 28
-
-  const celoTx: CeloTx & { v: any; s: any; r: any; yParity: 0 | 1 } = {
+  const celoTx: CeloTxWithSig = {
     type: 'eip1559',
     nonce: nonce.toLowerCase() === '0x' ? 0 : parseInt(nonce, 16),
     gas: gas.toLowerCase() === '0x' ? 0 : parseInt(gas, 16),
@@ -542,10 +552,7 @@ function recoverTransactionEIP1559(serializedTransaction: `0x${string}`): [CeloT
     data,
     chainId: chainId.toLowerCase() === '0x' ? 0 : parseInt(chainId, 16),
     accessList: parseAccessList(accessList),
-    v,
-    r,
-    s,
-    yParity: v === 27 ? 0 : 1,
+    ...vrsForRecovery(vRaw, r, s),
   }
   const web3Account = new Accounts()
   const signer = web3Account.recoverTransaction(serializedTransaction)

@@ -268,8 +268,11 @@ function isHash(value: string) {
   return isHex(value) && value.length === 32
 }
 
-export function parseAccessList(accessListRaw: AccessListRaw): AccessList {
+export function parseAccessList(accessListRaw: AccessListRaw | undefined): AccessList {
   const accessList: AccessList = []
+  if (!accessListRaw) {
+    return accessList
+  }
   for (const entry of accessListRaw) {
     const [address, storageKeys] = entry
 

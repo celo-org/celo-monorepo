@@ -96,7 +96,6 @@ export function txoStub<T>(): TransactionObjectStub<T> {
         gasPrice: '0',
         maxFeePerGas: 555,
         maxPriorityFeePerGas: 555,
-        // from: '0xAAFFF',
       })
     })
 
