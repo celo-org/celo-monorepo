@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.0 <0.8.20;
 
+// Note: This is not an exact copy of UsingRegistry or UsingRegistryV2 in the contract's folder
+// because Mento's interfaces still don't support Solidity 0.8
+
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
-import "../contracts/common/interfaces/IRegistry.sol";
+import "../../contracts/common/interfaces/IRegistry.sol";
 
-contract UsingRegistry8 is Ownable {
+contract UsingRegistry is Ownable {
   event RegistrySet(address indexed registryAddress);
 
   // solhint-disable state-visibility
