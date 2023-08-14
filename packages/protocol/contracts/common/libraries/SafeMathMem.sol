@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Original authors: https://github.com/summa-tx/memview-sol
-pragma solidity >=0.5.10;
+pragma solidity >=0.5.10 <0.8.0;
 
 /*
 The MIT License (MIT)
