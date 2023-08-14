@@ -1,8 +1,3 @@
-import { JaegerExporter } from '@opentelemetry/exporter-jaeger'
-import { registerInstrumentations } from '@opentelemetry/instrumentation'
-import { Resource } from '@opentelemetry/resources'
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node'
 /*
   https://www.npmjs.com/package/@opentelemetry/auto-instrumentations-node
   getNodeAutoInstrumentations (above) includes all available auto-tracing
@@ -11,6 +6,11 @@ import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node'
   line above and just add the instrumentations we care like commented lines below.
 */
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
+import { JaegerExporter } from '@opentelemetry/exporter-jaeger'
+import { registerInstrumentations } from '@opentelemetry/instrumentation'
+import { Resource } from '@opentelemetry/resources'
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node'
 /*
   Some instrumentations included in auto-instrumentations-node:
   - https://www.npmjs.com/package/@opentelemetry/sdk-trace-web
@@ -18,16 +18,16 @@ import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentation
   - https://www.npmjs.com/package/@opentelemetry/instrumentation-http
   - https://www.npmjs.com/package/@opentelemetry/instrumentation-knex
 */
-//import { WebTracerProvider } from '@opentelemetry/sdk-trace-web'
-//import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express'
-//import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
-//import { KnexInstrumentation } from '@opentelemetry/instrumentation-knex'
+// import { WebTracerProvider } from '@opentelemetry/sdk-trace-web'
+// import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express'
+// import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
+// import { KnexInstrumentation } from '@opentelemetry/instrumentation-knex'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 
 const options = {
   tags: [],
   endpoint: process.env.TRACER_ENDPOINT,
-  //'http://grafana-agent.grafana-agent:14268/api/traces',
+  // 'http://grafana-agent.grafana-agent:14268/api/traces',
 }
 
 // Optionally register automatic instrumentation libraries
@@ -66,7 +66,7 @@ registerInstrumentations({
 const resource = Resource.default().merge(
   new Resource({
     [SemanticResourceAttributes.SERVICE_NAME]: process.env.TRACING_SERVICE_NAME,
-    //'testing-signer-tracing',
+    // 'testing-signer-tracing',
     [SemanticResourceAttributes.SERVICE_VERSION]: '0.1.0',
   })
 )
