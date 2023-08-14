@@ -65,41 +65,39 @@ export function startSigner(
     handler: (req: Request, res: Response) => Promise<void>
   ) =>
     app.post(endpoint, async (req, res) => {
-      tracer
-        .startActiveSpan('server - addEndpoint - post', async (parentSpan) => {
-          const childLogger: Logger = res.locals.logger
-          try {
-            parentSpan.addEvent('Called ' + req.path)
-            parentSpan.setAttribute(SemanticAttributes.HTTP_ROUTE, req.path)
-            parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, req.method)
-            parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, req.ip)
-            await handler(req, res)
-          } catch (err: any) {
-            parentSpan.setStatus({
-              code: SpanStatusCode.ERROR,
-              message: 'Fail',
+      // tslint:disable-next-line:no-floating-promises
+      tracer.startActiveSpan('server - addEndpoint - post', async (parentSpan) => {
+        const childLogger: Logger = res.locals.logger
+        try {
+          parentSpan.addEvent('Called ' + req.path)
+          parentSpan.setAttribute(SemanticAttributes.HTTP_ROUTE, req.path)
+          parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, req.method)
+          parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, req.ip)
+          await handler(req, res)
+        } catch (err: any) {
+          parentSpan.setStatus({
+            code: SpanStatusCode.ERROR,
+            message: 'Fail',
+          })
+          // Handle any errors that otherwise managed to escape the proper handlers
+          childLogger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
+          childLogger.error(err)
+          Counters.errorsCaughtInEndpointHandler.inc()
+          if (!res.headersSent) {
+            childLogger.info('Responding with error in outer endpoint handler')
+            res.status(500).json({
+              success: false,
+              error: ErrorMessage.UNKNOWN_ERROR,
             })
-            // Handle any errors that otherwise managed to escape the proper handlers
-            childLogger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
-            childLogger.error(err)
-            Counters.errorsCaughtInEndpointHandler.inc()
-            if (!res.headersSent) {
-              childLogger.info('Responding with error in outer endpoint handler')
-              res.status(500).json({
-                success: false,
-                error: ErrorMessage.UNKNOWN_ERROR,
-              })
-            } else {
-              // Getting to this error likely indicates that the `perform` process
-              // does not terminate after sending a response, and then throws an error.
-              childLogger.error(ErrorMessage.ERROR_AFTER_RESPONSE_SENT)
-              Counters.errorsThrownAfterResponseSent.inc()
-            }
+          } else {
+            // Getting to this error likely indicates that the `perform` process
+            // does not terminate after sending a response, and then throws an error.
+            childLogger.error(ErrorMessage.ERROR_AFTER_RESPONSE_SENT)
+            Counters.errorsThrownAfterResponseSent.inc()
           }
-          parentSpan.end()
-        })
-        .then(() => logger.debug('Span then block'))
-        .catch(() => logger.debug('Span catch block'))
+        }
+        parentSpan.end()
+      })
     })
 
   const pnpQuotaService = new PnpQuotaService(db, kit)

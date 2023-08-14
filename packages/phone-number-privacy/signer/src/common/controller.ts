@@ -24,19 +24,17 @@ export class Controller<R extends OdisRequest> {
     const timeoutError = Symbol()
     await meter(
       async () => {
-        tracer
-          .startActiveSpan('Controller - handle', async (span) => {
-            span.addEvent('Calling init')
-            const session = await this.action.io.init(request, response)
-            // Init returns a response to the user internally.
-            if (session) {
-              span.addEvent('Calling perform')
-              await this.action.perform(session, timeoutError)
-            }
-            span.end()
-          })
-          .then(() => response.locals.logger.debug('Span then block'))
-          .catch(() => response.locals.logger.debug('Span catch block'))
+        // tslint:disable-next-line:no-floating-promises
+        tracer.startActiveSpan('Controller - handle', async (span) => {
+          span.addEvent('Calling init')
+          const session = await this.action.io.init(request, response)
+          // Init returns a response to the user internally.
+          if (session) {
+            span.addEvent('Calling perform')
+            await this.action.perform(session, timeoutError)
+          }
+          span.end()
+        })
       },
       [],
       (err: any) => {
