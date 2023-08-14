@@ -246,8 +246,8 @@ export class LockedGoldWrapper extends BaseWrapperForGoverning<LockedGold> {
   async getPendingWithdrawal(account: string, index: number) {
     const response = await this.contract.methods.getPendingWithdrawal(account, index).call()
     return {
-      value: valueToBigNumber(response[1]),
-      time: valueToBigNumber(response[0]),
+      value: valueToBigNumber(response[0]),
+      time: valueToBigNumber(response[1]),
     }
   }
 
