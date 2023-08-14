@@ -124,9 +124,9 @@ function compile(outdir: string) {
     }
 
     let truffleConfig = ''
-    if (contractPackage.solidityVersion == '0.5') {
+    if (contractPackage.solidityVersion === '0.5') {
       truffleConfig = 'truffle-config.js'
-    } else if (contractPackage.solidityVersion == '0.8') {
+    } else if (contractPackage.solidityVersion === '0.8') {
       truffleConfig = 'truffle-config0.8.js'
     }
 

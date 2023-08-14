@@ -53,5 +53,3 @@ export const SOLIDITY_08_PACKAGE: ContractPackage = {
   ],
   solidityVersion: '0.8',
 }
-
-console.log('yeap, I got updated')
