@@ -111,7 +111,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     quotaStatus: PnpQuotaStatus,
     warnings: string[]
   ) {
-    tracer.startActiveSpan(`pnpQuotaIO - sendSuccess`, (span) => {
+    return tracer.startActiveSpan(`pnpQuotaIO - sendSuccess`, (span) => {
       span.addEvent('Sending Success')
       send(
         response,
@@ -129,13 +129,13 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
         code: SpanStatusCode.OK,
         message: response.statusMessage,
       })
+      Counters.responses.labels(this.endpoint, status.toString()).inc()
       span.end()
     })
-    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 
   sendFailure(error: ErrorType, status: number, response: Response<PnpQuotaResponseFailure>) {
-    tracer.startActiveSpan(`pnpQuotaIO - sendFailure`, (span) => {
+    return tracer.startActiveSpan(`pnpQuotaIO - sendFailure`, (span) => {
       span.addEvent('Sending Failure')
       send(
         response,
@@ -152,8 +152,8 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
         code: SpanStatusCode.ERROR,
         message: error,
       })
+      Counters.responses.labels(this.endpoint, status.toString()).inc()
       span.end()
     })
-    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 }

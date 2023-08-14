@@ -66,7 +66,7 @@ export function startSigner(
   ) =>
     app.post(endpoint, async (req, res) => {
       // tslint:disable-next-line:no-floating-promises
-      tracer.startActiveSpan('server - addEndpoint - post', async (parentSpan) => {
+      return tracer.startActiveSpan('server - addEndpoint - post', async (parentSpan) => {
         const childLogger: Logger = res.locals.logger
         try {
           parentSpan.addEvent('Called ' + req.path)

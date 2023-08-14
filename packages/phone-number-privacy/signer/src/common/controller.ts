@@ -25,7 +25,7 @@ export class Controller<R extends OdisRequest> {
     await meter(
       async () => {
         // tslint:disable-next-line:no-floating-promises
-        tracer.startActiveSpan('Controller - handle', async (span) => {
+        return tracer.startActiveSpan('Controller - handle', async (span) => {
           span.addEvent('Calling init')
           const session = await this.action.io.init(request, response)
           // Init returns a response to the user internally.

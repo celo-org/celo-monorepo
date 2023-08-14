@@ -131,7 +131,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     quotaStatus: PnpQuotaStatus,
     warnings: string[]
   ) {
-    tracer.startActiveSpan(`pnpSignIO - sendSuccess`, (span) => {
+    return tracer.startActiveSpan(`pnpSignIO - sendSuccess`, (span) => {
       span.addEvent('Sending Success')
       response.set(KEY_VERSION_HEADER, key.version.toString())
       send(
@@ -151,9 +151,9 @@ export class PnpSignIO extends IO<SignMessageRequest> {
         code: SpanStatusCode.OK,
         message: response.statusMessage,
       })
+      Counters.responses.labels(this.endpoint, status.toString()).inc()
       span.end()
     })
-    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 
   sendFailure(
@@ -162,7 +162,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     response: Response<SignMessageResponseFailure>,
     quotaStatus?: PnpQuotaStatus
   ) {
-    tracer.startActiveSpan(`pnpSignIO - sendFailure`, (span) => {
+    return tracer.startActiveSpan(`pnpSignIO - sendFailure`, (span) => {
       span.addEvent('Sending Failure')
       send(
         response,
@@ -180,8 +180,8 @@ export class PnpSignIO extends IO<SignMessageRequest> {
         code: SpanStatusCode.ERROR,
         message: error,
       })
+      Counters.responses.labels(this.endpoint, status.toString()).inc()
       span.end()
     })
-    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 }
