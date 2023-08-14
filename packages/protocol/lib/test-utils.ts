@@ -240,7 +240,7 @@ type ProxiedContractGetter = (
   contractPackage: ContractPackage, 
   ) => Promise<any>
 
-type ContratGetter = (
+type ContractGetter = (
   contractName: string,
   contractPackage?: ContractPackage,
   ) => Promise<any>
@@ -261,7 +261,7 @@ export const assertProxiesSet = async (getContract: ProxiedContractGetter) => {
   }
 }
 
-export const assertContractsRegistered = async (getContract: ContratGetter) => {
+export const assertContractsRegistered = async (getContract: any) => {
   const registry: RegistryInstance = await getContract('Registry')
   for (const proxyPackage of hasEntryInRegistry) {
     for (const contractName of proxyPackage.contracts) {
@@ -275,7 +275,7 @@ export const assertContractsRegistered = async (getContract: ContratGetter) => {
   }
 }
 
-export const assertRegistryAddressesSet = async (getContract: ContratGetter) => {
+export const assertRegistryAddressesSet = async (getContract: ContractGetter) => {
   const registry: RegistryInstance = await getContract('Registry')
   for (const contractName of usesRegistry) {
     const contract: UsingRegistryInstance = await getContract(contractName, MENTO_PACKAGE)
