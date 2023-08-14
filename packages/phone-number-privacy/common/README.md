@@ -26,7 +26,7 @@ These instructions assume the following scenario for readability:
     - i.e. search and replace `3.1.1-dev` with `3.2.0-beta.1` (note that we’ve removed the `-dev`)
 4. Same idea as above -- ensure the version of the `@celo/phone-number-privacy-common` package is set to the version you are trying to release (i.e. `2.0.3-beta.1`) and that all other packages are importing this version.
 5. From the monorepo root directory, run `yarn reset && yarn && yarn build` (expect this to take at least 10 mins)
-6. Commit your changes with the message `3.2.0-beta.1
+6. Commit your changes with the message `3.2.0-beta.1`
 7. Publish the ODIS common package by navigating to the `phone-number-privacy/common` directory and running `npm publish —-tag beta`
    - You will be prompted to enter your OTP
    - When publishing as `latest`, omit the `--tag beta`
