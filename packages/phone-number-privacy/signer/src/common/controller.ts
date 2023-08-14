@@ -35,8 +35,8 @@ export class Controller<R extends OdisRequest> {
             }
             span.end()
           })
-          .then(() => console.log('Span then block'))
-          .catch(() => console.log('Span catch block'))
+          .then(() => response.locals.logger.debug('Span then block'))
+          .catch(() => response.locals.logger.debug('Span catch block'))
       },
       [],
       (err: any) => {
