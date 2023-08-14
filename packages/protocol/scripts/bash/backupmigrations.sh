@@ -17,7 +17,7 @@ else
   # require libraries to have been migrated, so you might need migration 1 to be
   # uncommented).
   cp migrations.bak/01_libraries.* migrations/
-  # cp migrations.bak/02_registry.* migrations/
+  cp migrations.bak/02_registry.* migrations/
   # cp migrations.bak/03_freezer.* migrations/
   # cp migrations.bak/03_whitelist.* migrations/
   # cp migrations.bak/04_goldtoken.* migrations/
@@ -31,8 +31,8 @@ else
   # cp migrations.bak/10_0_exchange_USD.* migrations/
   # cp migrations.bak/10_01_exchange_EUR.* migrations/
   # cp migrations.bak/10_02_exchange_BRL.* migrations/
-  # cp migrations.bak/11_accounts.* migrations/
-  # cp migrations.bak/12_lockedgold.* migrations/
+  cp migrations.bak/11_accounts.* migrations/
+  cp migrations.bak/12_lockedgold.* migrations/
   # cp migrations.bak/13_validators.* migrations/
   # cp migrations.bak/14_election.* migrations/
   # cp migrations.bak/15_epoch_rewards.* migrations/
