@@ -24,13 +24,14 @@ const runLoadTest = (contextName: string, numWorker: number, isSerial: boolean) 
     yargs.showHelp()
     process.exit(1)
   }
+  // tslint:disable:no-floating-promises
   if (isSerial) {
-    serialLoadTest(numWorker, blockchainProvider!, contextName as OdisContextName) // tslint:disable-line:no-floating-promises
+    serialLoadTest(numWorker, blockchainProvider!, contextName as OdisContextName)
   } else {
-    concurrentLoadTest(numWorker, blockchainProvider!, contextName as OdisContextName) // tslint:disable-line:no-floating-promises
+    concurrentLoadTest(numWorker, blockchainProvider!, contextName as OdisContextName)
   }
 }
-// tslint:disable-next-line: no-unused-expression
+// tslint:disable:no-unused-expression
 yargs
   .scriptName('ODIS-load-test')
   .recommendCommands()
