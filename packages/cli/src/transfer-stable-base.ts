@@ -48,10 +48,12 @@ export abstract class TransferStableBase extends BaseCommand {
         `Account can afford transfer and gas paid in ${this._stableCurrency}`,
         this.kit.connection.defaultFeeCurrency === stableToken.address,
         async () => {
-          const gas = await tx.txo.estimateGas({ feeCurrency: stableToken.address })
-          const gasPrice = await this.kit.connection.gasPrice(stableToken.address)
+          const [gas, gasPrice, balance] = await Promise.all([
+            tx.txo.estimateGas({ feeCurrency: stableToken.address }),
+            this.kit.connection.gasPrice(stableToken.address),
+            stableToken.balanceOf(from),
+          ])
           const gasValue = new BigNumber(gas).times(gasPrice as string)
-          const balance = await stableToken.balanceOf(from)
           return balance.gte(value.plus(gasValue))
         },
         `Cannot afford transfer with ${this._stableCurrency} gasCurrency; try reducing value slightly or using gasCurrency=CELO`

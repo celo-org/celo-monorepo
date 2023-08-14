@@ -268,13 +268,8 @@ function isHash(value: string) {
   return isHex(value) && value.length === 32
 }
 
-export function parseAccessList(accessListRaw: AccessListRaw | '0x'): AccessList {
+export function parseAccessList(accessListRaw: AccessListRaw): AccessList {
   const accessList: AccessList = []
-  // TODO IS that true though? i think that was my mistake
-  // if no list was provided to original tx then it will return as "0x"
-  if (accessListRaw === '0x') {
-    return accessList
-  }
   for (const entry of accessListRaw) {
     const [address, storageKeys] = entry
 

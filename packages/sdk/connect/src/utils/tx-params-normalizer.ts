@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { Connection } from '../connection'
 import { CeloTx } from '../types'
 
@@ -23,26 +24,51 @@ export class TxParamsNormalizer {
   public async populate(celoTxParams: CeloTx): Promise<CeloTx> {
     const txParams = { ...celoTxParams }
 
-    if (txParams.chainId == null) {
-      txParams.chainId = await this.getChainId()
-    }
+    const [chainId, nonce, gas, maxFeePerGas] = await Promise.all(
+      [
+        async () => {
+          if (txParams.chainId == null) {
+            return await this.getChainId()
+          }
+          return txParams.chainId
+        },
+        async () => {
+          if (txParams.nonce == null) {
+            return await this.connection.nonce(txParams.from!.toString())
+          }
+          return txParams.nonce
+        },
+        async () => {
+          if (!txParams.gas || isEmpty(txParams.gas.toString())) {
+            return await this.connection.estimateGas(txParams)
+          }
+          return txParams.gas
+        },
+        async () => {
+          // if gasPrice is not set and maxFeePerGas is not set, set maxFeePerGas
+          if (
+            isEmpty(txParams.gasPrice?.toString()) &&
+            isEmpty(txParams.maxFeePerGas?.toString())
+          ) {
+            const suggestedPrice = await this.connection.gasPrice(txParams.feeCurrency)
+            // add small buffer to suggested price like other libraries do
+            const priceWithRoom = new BigNumber(suggestedPrice)
+              .times(120)
+              .dividedBy(100)
+              .integerValue()
+              .toString(16)
+            return `0x${priceWithRoom}`
+          }
+          return txParams.maxFeePerGas
+        },
+      ].map(async (fn) => fn())
+    )
+    txParams.chainId = chainId as number
+    txParams.nonce = nonce as number
+    txParams.gas = gas as string
+    txParams.maxFeePerGas = maxFeePerGas
 
-    if (txParams.nonce == null) {
-      txParams.nonce = await this.connection.nonce(txParams.from!.toString())
-    }
-
-    if (!txParams.gas || isEmpty(txParams.gas.toString())) {
-      txParams.gas = await this.connection.estimateGas(txParams)
-    }
-
-    // if gasPrice is not set and maxFeePerGas is not set, set maxFeePerGas
-    if (isEmpty(txParams.gasPrice?.toString()) && isEmpty(txParams.maxFeePerGas?.toString())) {
-      const suggestedPrice = await this.connection.gasPrice(txParams.feeCurrency)
-      // add small buffer to suggested price like other libraries do
-      // const priceWithRoom = new BigNumber(suggestedPrice).times(120).dividedBy(100).toString()
-      txParams.maxFeePerGas = suggestedPrice
-    }
-
+    // need to wait until after gas price has been handled
     // if maxFeePerGas is set make sure maxPriorityFeePerGas is also set
     if (
       isPresent(txParams.maxFeePerGas?.toString()) &&
