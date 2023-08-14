@@ -72,7 +72,7 @@ const resource = Resource.default().merge(
 )
 
 const provider = new NodeTracerProvider({
-  resource: resource,
+  resource,
 })
 const exporter = new JaegerExporter(options)
 const processor = new BatchSpanProcessor(exporter)
