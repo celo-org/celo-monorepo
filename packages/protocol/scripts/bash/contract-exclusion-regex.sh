@@ -14,7 +14,7 @@ fi
 
 if [ $VERSION_NUMBER -gt 8 ]
   then
-  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|^Ownable|ˆInitializable|ˆBLS12_377Passthrough|ˆBLS12_381Passthrough]ˆUniswapV2ERC20"
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|^Ownable|Initializable|BLS12_377Passthrough|BLS12_381Passthrough]UniswapV2ERC20"
 fi
 
   # https://github.com/celo-org/celo-monorepo/issues/10435
@@ -22,5 +22,5 @@ fi
   # after this is should be modified to VERSION_NUMBER==10
 if [ $VERSION_NUMBER -gt 9 ]
   then
-  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|^SortedOracles"
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|SortedOracles"
 fi

@@ -163,6 +163,7 @@ function compile(outdir: string) {
 }
 
 function generateFilesForTruffle(outdir: string) {
+  console.log('outdir, generateFilesForTruffle', outdir)
   // tslint:disable-next-line
   for (let externalContractPackage of externalContractPackages) {
     const outdirExternal = outdir + '-' + externalContractPackage.name
@@ -171,7 +172,6 @@ function generateFilesForTruffle(outdir: string) {
     )
 
     const artifactPath = `${BUILD_DIR}/contracts-${externalContractPackage.name}/*.json`
-
     exec(
       `yarn run --silent typechain --target=truffle --outDir "${outdirExternal}" "${artifactPath}"`
     )
@@ -181,12 +181,6 @@ function generateFilesForTruffle(outdir: string) {
   exec(`rm -rf "${outdir}"`)
   const globPattern = `${BUILD_DIR}/contracts/*.json`
   exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}"`)
-
-  const outdir08 = `./types/typechain-0.8`
-  // const artifactPath08 = 'contracts-0.8'
-  const artifactPath08 = `${BUILD_DIR}/contracts-0.8/*.json`
-  console.log(`protocol: Generating Truffle Types using Solidity 0.8 to ${outdir08}`)
-  exec(`yarn run --silent typechain --target=truffle --outDir "${outdir08}" "${artifactPath08}"`)
 }
 
 async function generateFilesForContractKit(outdir: string) {

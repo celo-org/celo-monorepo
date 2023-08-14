@@ -37,11 +37,9 @@ class ContractAddresses {
     libraryAddresses: LibraryAddresses['addresses']
   ) {
     const addresses = new Map()
-    let counter = 1 // TODO remove me
     await Promise.all(
       contracts.map(async (contract: string) => {
         const registeredAddress = await registry.getAddressForString(contract)
-        counter++
 
         if (!eqAddress(registeredAddress, NULL_ADDRESS)) {
           console.log('set contract', contract)
