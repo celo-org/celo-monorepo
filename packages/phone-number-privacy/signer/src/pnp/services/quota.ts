@@ -1,27 +1,41 @@
 import { ContractKit } from '@celo/contractkit'
-import {
-  ErrorMessage,
-  PnpQuotaRequest,
-  PnpQuotaStatus,
-  SignMessageRequest,
-} from '@celo/phone-number-privacy-common'
+import { ErrorMessage, PnpQuotaStatus, SignMessageRequest } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
+import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { ACCOUNTS_TABLE } from '../../common/database/models/account'
 import { REQUESTS_TABLE } from '../../common/database/models/request'
 import { getPerformedQueryCount, incrementQueryCount } from '../../common/database/wrappers/account'
 import { storeRequest } from '../../common/database/wrappers/request'
 import { Counters, Histograms, meter } from '../../common/metrics'
-import { OdisQuotaStatusResult, QuotaService } from '../../common/quota'
+import { OdisQuotaStatusResult } from '../../common/quota'
 import { getBlockNumber, getOnChainOdisPayments } from '../../common/web3/contracts'
 import { config } from '../../config'
 import { PnpSession } from '../session'
+
+type Context = {
+  logger: Logger
+  url: string
+  errors: string[]
+}
+
+interface QuotaService {
+  getQuotaStatus(account: string, ctx: Context): Promise<PnpQuotaStatus>
+}
+
+// class CachingQuotaService implements QuotaService {
+//   protected baseService: QuotaService
+
+//   async getQuotaStatus(account: string, ctx: Context): Promise<PnpQuotaStatus> {
+
+//   }
+// }
 
 /**
  * PnpQuotaService is responsible for serving information about pnp quota
  *
  */
-export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
+export class PnpQuotaService {
   protected readonly requestsTable: REQUESTS_TABLE = REQUESTS_TABLE.ONCHAIN
   protected readonly accountsTable: ACCOUNTS_TABLE = ACCOUNTS_TABLE.ONCHAIN
 
@@ -33,7 +47,9 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
     trx?: Knex.Transaction
   ): Promise<OdisQuotaStatusResult<SignMessageRequest>> {
     const remainingQuota = state.totalQuota - state.performedQueryCount
+
     Histograms.userRemainingQuotaAtRequest.labels(session.request.url).observe(remainingQuota)
+
     let sufficient = remainingQuota > 0
     if (!sufficient) {
       session.logger.warn({ ...state }, 'No remaining quota')
@@ -66,23 +82,23 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
   }
 
   public async getQuotaStatus(
-    session: PnpSession<SignMessageRequest | PnpQuotaRequest>,
+    account: string,
+    ctx: Context,
     trx?: Knex.Transaction
   ): Promise<PnpQuotaStatus> {
-    const { account } = session.request.body
     const [performedQueryCountResult, totalQuotaResult, blockNumberResult] = await meter(
-      (_session: PnpSession<SignMessageRequest | PnpQuotaRequest>) =>
+      () =>
         Promise.allSettled([
-          getPerformedQueryCount(this.db, this.accountsTable, account, session.logger, trx),
-          this.getTotalQuota(_session),
+          getPerformedQueryCount(this.db, this.accountsTable, account, ctx.logger, trx),
+          this.getTotalQuota(account, ctx),
           getBlockNumber(this.kit),
         ]),
-      [session],
+      [],
       (err: any) => {
         throw err
       },
       Histograms.getRemainingQueryCountInstrumentation,
-      ['getQuotaStatus', session.request.url]
+      ['getQuotaStatus', ctx.url]
     )
 
     const quotaStatus: PnpQuotaStatus = {
@@ -94,11 +110,11 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
     if (performedQueryCountResult.status === 'fulfilled') {
       quotaStatus.performedQueryCount = performedQueryCountResult.value
     } else {
-      session.logger.error(
+      ctx.logger.error(
         { err: performedQueryCountResult.reason },
         ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT
       )
-      session.errors.push(
+      ctx.errors.push(
         ErrorMessage.DATABASE_GET_FAILURE,
         ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT
       )
@@ -107,41 +123,33 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
     if (totalQuotaResult.status === 'fulfilled') {
       quotaStatus.totalQuota = totalQuotaResult.value
     } else {
-      session.logger.error(
-        { err: totalQuotaResult.reason },
-        ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA
-      )
+      ctx.logger.error({ err: totalQuotaResult.reason }, ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA)
       hadFullNodeError = true
-      session.errors.push(ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA)
+      ctx.errors.push(ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA)
     }
     if (blockNumberResult.status === 'fulfilled') {
       quotaStatus.blockNumber = blockNumberResult.value
     } else {
-      session.logger.error(
-        { err: blockNumberResult.reason },
-        ErrorMessage.FAILURE_TO_GET_BLOCK_NUMBER
-      )
+      ctx.logger.error({ err: blockNumberResult.reason }, ErrorMessage.FAILURE_TO_GET_BLOCK_NUMBER)
       hadFullNodeError = true
-      session.errors.push(ErrorMessage.FAILURE_TO_GET_BLOCK_NUMBER)
+      ctx.errors.push(ErrorMessage.FAILURE_TO_GET_BLOCK_NUMBER)
     }
     if (hadFullNodeError) {
-      session.errors.push(ErrorMessage.FULL_NODE_ERROR)
+      ctx.errors.push(ErrorMessage.FULL_NODE_ERROR)
     }
 
     return quotaStatus
   }
 
-  protected async getTotalQuota(
-    session: PnpSession<SignMessageRequest | PnpQuotaRequest>
-  ): Promise<number> {
+  private async getTotalQuota(account: string, ctx: Context): Promise<number> {
     return meter(
-      this.getTotalQuotaWithoutMeter.bind(this),
-      [session],
+      () => this.getTotalQuotaWithoutMeter(account, ctx),
+      [],
       (err: any) => {
         throw err
       },
       Histograms.getRemainingQueryCountInstrumentation,
-      ['getTotalQuota', session.request.url]
+      ['getTotalQuota', ctx.url]
     )
   }
 
@@ -149,17 +157,13 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
    * Calculates how many queries the caller has unlocked;
    * must be implemented by subclasses.
    */
-  protected async getTotalQuotaWithoutMeter(
-    session: PnpSession<SignMessageRequest | PnpQuotaRequest>
+  private async getTotalQuotaWithoutMeter(
+    account: string,
+    ctx: Context
+    // session: PnpSession<SignMessageRequest | PnpQuotaRequest>
   ): Promise<number> {
     const { queryPriceInCUSD } = config.quota
-    const { account } = session.request.body
-    const totalPaidInWei = await getOnChainOdisPayments(
-      this.kit,
-      session.logger,
-      account,
-      session.request.url
-    )
+    const totalPaidInWei = await getOnChainOdisPayments(this.kit, ctx.logger, account, ctx.url)
     const totalQuota = totalPaidInWei
       .div(queryPriceInCUSD.times(new BigNumber(1e18)))
       .integerValue(BigNumber.ROUND_DOWN)

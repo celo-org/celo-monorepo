@@ -15,14 +15,14 @@ import {
   getDomainStateRecordOrEmpty,
   updateDomainStateRecord,
 } from '../../common/database/wrappers/domain-state'
-import { OdisQuotaStatusResult, QuotaService } from '../../common/quota'
+import { OdisQuotaStatusResult } from '../../common/quota'
 import { DomainSession } from '../session'
 
 declare type QuotaDependentDomainRequest =
   | DomainQuotaStatusRequest
   | DomainRestrictedSignatureRequest
 
-export class DomainQuotaService implements QuotaService<QuotaDependentDomainRequest> {
+export class DomainQuotaService {
   constructor(readonly db: Knex) {}
 
   async checkAndUpdateQuotaStatus(
