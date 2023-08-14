@@ -1,6 +1,6 @@
-import { ContractKit } from '@celo/contractkit'
 import {
   authenticateUser,
+  DataEncryptionKeyFetcher,
   ErrorType,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
@@ -31,10 +31,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
   constructor(
     readonly enabled: boolean,
     readonly shouldFailOpen: boolean,
-    readonly fullNodeTimeoutMs: number,
-    readonly fullNodeRetryCount: number,
-    readonly fullNodeRetryDelayMs: number,
-    readonly kit: ContractKit
+    readonly dekFetcher: DataEncryptionKeyFetcher
   ) {
     super(enabled)
   }
@@ -75,16 +72,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     warnings: ErrorType[],
     logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(
-      request,
-      this.kit,
-      logger,
-      this.shouldFailOpen,
-      warnings,
-      this.fullNodeTimeoutMs,
-      this.fullNodeRetryCount,
-      this.fullNodeRetryDelayMs
-    )
+    return authenticateUser(request, logger, this.dekFetcher, this.shouldFailOpen, warnings)
   }
 
   sendSuccess(

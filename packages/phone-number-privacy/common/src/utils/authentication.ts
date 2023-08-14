@@ -16,6 +16,8 @@ import {
 } from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
 
+export type DataEncryptionKeyFetcher = (address: string) => Promise<string>
+
 export function newContractKitFetcher(
   contractKit: ContractKit,
   logger: Logger,
@@ -34,8 +36,6 @@ export function newContractKitFetcher(
     )
 }
 
-type DataEncryptionKeyFetcher = (address: string) => Promise<string>
-
 /*
  * Confirms that user is who they say they are and throws error on failure to confirm.
  * Authorization header should contain the EC signed body
@@ -43,9 +43,9 @@ type DataEncryptionKeyFetcher = (address: string) => Promise<string>
 export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   request: Request<{}, {}, R>,
   logger: Logger,
+  fetchDEK: DataEncryptionKeyFetcher,
   shouldFailOpen: boolean = false,
-  warnings: ErrorType[] = [],
-  fetchDEK: DataEncryptionKeyFetcher
+  warnings: ErrorType[] = []
 ): Promise<boolean> {
   logger.debug('Authenticating user')
 

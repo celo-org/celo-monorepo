@@ -17,6 +17,10 @@ import { getBlockNumber, getOnChainOdisPayments } from '../../common/web3/contra
 import { config } from '../../config'
 import { PnpSession } from '../session'
 
+/**
+ * PnpQuotaService is responsible for serving information about pnp quota
+ *
+ */
 export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
   protected readonly requestsTable: REQUESTS_TABLE = REQUESTS_TABLE.ONCHAIN
   protected readonly accountsTable: ACCOUNTS_TABLE = ACCOUNTS_TABLE.ONCHAIN

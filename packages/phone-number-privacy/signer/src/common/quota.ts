@@ -32,3 +32,15 @@ export interface QuotaService<R extends OdisRequest> {
     trx?: Knex.Transaction<OdisQuotaStatus<R>>
   ): Promise<OdisQuotaStatus<R>>
 }
+
+export interface QService {
+  /**
+   * Return the quota for a given account
+   */
+  getQuotaStatus(qAccount: string): Promise<OdisQuotaStatus<any>>
+
+  /**
+   * Will execute action if enough quota for the account. And if the action is sucessful, it will decrement avaiable quota
+   */
+  tryQuotaIncrementingAction(quotaAccount: string, action: () => Promise<boolean>): Promise<void>
+}

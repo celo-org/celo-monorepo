@@ -1,8 +1,10 @@
 import { ContractKit } from '@celo/contractkit'
 import {
+  DataEncryptionKeyFetcher,
   ErrorMessage,
   getContractKit,
   loggerMiddleware,
+  newContractKitFetcher,
   rootLogger,
   SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
@@ -86,6 +88,16 @@ export function startSigner(
   const pnpQuotaService = new PnpQuotaService(db, kit)
   const domainQuotaService = new DomainQuotaService(db)
 
+  const dekFetcher = newCachingDekFetcher(
+    newContractKitFetcher(
+      kit,
+      logger,
+      config.fullNodeTimeoutMs,
+      config.fullNodeRetryCount,
+      config.fullNodeRetryDelayMs
+    )
+  )
+
   const pnpQuota = new Controller(
     new PnpQuotaAction(
       config,
@@ -93,10 +105,7 @@ export function startSigner(
       new PnpQuotaIO(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen, // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config to make the code cleaner
-        config.fullNodeTimeoutMs,
-        config.fullNodeRetryCount,
-        config.fullNodeRetryDelayMs,
-        kit
+        dekFetcher
       )
     )
   )
@@ -109,10 +118,7 @@ export function startSigner(
       new PnpSignIO(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen,
-        config.fullNodeTimeoutMs,
-        config.fullNodeRetryCount,
-        config.fullNodeRetryDelayMs,
-        kit
+        dekFetcher
       )
     )
   )
@@ -165,4 +171,20 @@ function getSslOptions(config: SignerConfig) {
     key: fs.readFileSync(sslKeyPath),
     cert: fs.readFileSync(sslCertPath),
   }
+}
+
+function newCachingDekFetcher(baseFetcher: DataEncryptionKeyFetcher): DataEncryptionKeyFetcher {
+  const cache: Map<string, string> = new Map()
+  // TODO: this doesn't work, caches for eternity
+
+  async function cachedDekFetcher(address: string): Promise<string> {
+    let cached = cache.get(address)
+    if (!cached) {
+      cached = await baseFetcher(address)
+      cache.set(address, cached)
+    }
+    return cached
+  }
+
+  return cachedDekFetcher
 }
