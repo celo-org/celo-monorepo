@@ -47,6 +47,7 @@ RUN npm install @celo/celocli
 
 # Build the combined image
 FROM node:12-alpine as final_image
+LABEL org.opencontainers.image.authors="devops@clabs.co"
 
 ARG network_name="alfajores"
 ARG network_id="44787"
