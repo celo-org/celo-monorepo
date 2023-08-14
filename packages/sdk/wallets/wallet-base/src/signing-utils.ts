@@ -1,4 +1,4 @@
-import { ensureLeading0x, hexToBuffer, trimLeading0x } from '@celo/base/lib/address'
+import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import {
   CeloTx,
   CeloTxWithSig,
@@ -18,7 +18,6 @@ import * as ethUtil from '@ethereumjs/util'
 import debugFactory from 'debug'
 // @ts-ignore-next-line eth-lib types not found
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
-import { keccak256, publicToAddress } from 'ethereumjs-util'
 import Web3 from 'web3' // TODO try to do this without web3 direct
 import Accounts from 'web3-eth-accounts'
 const debug = debugFactory('wallet-base:tx:sign')
@@ -421,35 +420,35 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
   }
 }
 
-const TRANSACTION_TYPE = '0x7c'
-const TRANSACTION_TYPE_BUFFER = Buffer.from(TRANSACTION_TYPE.padStart(2, '0'), 'hex')
+// const TRANSACTION_TYPE = '0x7c'
+// const TRANSACTION_TYPE_BUFFER = Buffer.from(TRANSACTION_TYPE.padStart(2, '0'), 'hex')
 
-// inspired by @ethereumjs/tx -- does not work :(
-function getPublicKeyofSignerFromTx(transactionArray: string[]) {
-  const base = transactionArray.slice(0, 12) // 12 is length of cip42 without vrs fields
-  const message = Buffer.concat([TRANSACTION_TYPE_BUFFER, Buffer.from(RLP.encode(base))])
-  const msgHash = keccak256(message)
+// // inspired by @ethereumjs/tx -- does not work :(
+// function getPublicKeyofSignerFromTx(transactionArray: string[]) {
+//   const base = transactionArray.slice(0, 12) // 12 is length of cip42 without vrs fields
+//   const message = Buffer.concat([TRANSACTION_TYPE_BUFFER, Buffer.from(RLP.encode(base))])
+//   const msgHash = keccak256(message)
 
-  const { v, r, s } = extractSignatureFromDecoded(transactionArray)
+//   const { v, r, s } = extractSignatureFromDecoded(transactionArray)
 
-  try {
-    return ethUtil.ecrecover(
-      msgHash,
-      v === '0x' || v === undefined ? BigInt(27) : BigInt(v!) + BigInt(27), // Recover the 27 which was stripped from ecsign
-      hexToBuffer(r!),
-      hexToBuffer(s!)
-    )
-  } catch (e: any) {
-    throw new Error(e)
-  }
-}
-// This is not working
-export function getSignerFromTxCIP42(serializedTransaction: string): string {
-  const transactionArray: any[] = RLP.decode(`0x${serializedTransaction.slice(4)}`)
-  const signer = getPublicKeyofSignerFromTx(transactionArray)
-  const address = publicToAddress(signer)
-  return `0x` + address.toString('hex')
-}
+//   try {
+//     return ethUtil.ecrecover(
+//       msgHash,
+//       v === '0x' || v === undefined ? BigInt(27) : BigInt(v!) + BigInt(27), // Recover the 27 which was stripped from ecsign
+//       hexToBuffer(r!),
+//       hexToBuffer(s!)
+//     )
+//   } catch (e: any) {
+//     throw new Error(e)
+//   }
+// }
+// // This is not working
+// export function getSignerFromTxCIP42(serializedTransaction: string): string {
+//   const transactionArray: any[] = RLP.decode(`0x${serializedTransaction.slice(4)}`)
+//   const signer = getPublicKeyofSignerFromTx(transactionArray)
+//   const address = publicToAddress(signer)
+//   return `0x` + address.toString('hex')
+// }
 
 function determineTXType(serializedTransaction: string): TransactionTypes {
   const prefix = serializedTransaction.slice(0, 4)
@@ -472,6 +471,9 @@ function vrsForRecovery(vRaw: string, r: string, s: string) {
   } as const
 }
 
+/*
+  @remark does not return the signer address
+*/
 function recoverTransactionCIP42(serializedTransaction: `0x${string}`): [CeloTxWithSig, string] {
   const transactionArray: any[] = prefixAwareRLPDecode(serializedTransaction, 'cip42')
   debug('signing-utils@recoverTransactionCIP42: values are %s', transactionArray)
@@ -517,7 +519,7 @@ function recoverTransactionCIP42(serializedTransaction: `0x${string}`): [CeloTxW
   }
 
   const signer =
-    transactionArray.length === 15 ? getSignerFromTxCIP42(serializedTransaction) : 'unsigned'
+    transactionArray.length === 15 ? '' /*getSignerFromTxCIP42(serializedTransaction)*/ : 'unsigned'
   return [celoTX, signer]
 }
 
