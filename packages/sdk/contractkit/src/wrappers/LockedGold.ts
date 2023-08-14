@@ -314,6 +314,17 @@ export class LockedGoldWrapper extends BaseWrapperForGoverning<LockedGold> {
     }
     return res
   }
+
+  /**
+   * Returns the number of pending withdrawals for the specified account.
+   * @param account The account.
+   * @returns The count of pending withdrawals.
+   */
+  getTotalPendingWithdrawalsCount = proxyCall(
+    this.contract.methods.getTotalPendingWithdrawalsCount,
+    undefined,
+    valueToBigNumber
+  )
 }
 
 export type LockedGoldWrapperType = LockedGoldWrapper
