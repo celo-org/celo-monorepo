@@ -77,7 +77,6 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
       throw new Error('No transaction object given!')
     }
     const rlpEncoded = rlpEncodedTx(txParams)
-    // TODO CIP42 check this probably only needed in legacy txs
     const addToV =
       rlpEncoded.type === 'celo-legacy' ? chainIdTransformationForSigning(txParams.chainId!) : 27
 

@@ -2,12 +2,11 @@ import { CeloTx } from '@celo/connect'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { parseTransaction, serializeTransaction } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
-import Web3 from 'web3'
-// import Accounts from 'web3-eth-accounts'
 import { celo } from 'viem/chains'
+import Web3 from 'web3'
 import {
   extractSignature,
-  getSignerFromTx,
+  getSignerFromTxCIP42,
   isPriceToLow,
   recoverTransaction,
   rlpEncodedTx,
@@ -572,6 +571,6 @@ describe('getSignerFromTx', () => {
       },
       { serializer: celo.serializers?.transaction }
     )
-    expect(getSignerFromTx(signed)).toEqual(account.address)
+    expect(getSignerFromTxCIP42(signed)).toEqual(account.address)
   })
 })

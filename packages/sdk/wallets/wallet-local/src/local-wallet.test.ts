@@ -210,7 +210,7 @@ describe('Local wallet class', () => {
               {
                 "raw": "0x7cf88682ad5a8063630a80941be31a94361a391bbafb2a4ccd704f57dc04d4bb82567894588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdefc001a0cfa1e1b30d1e4617ce80922d853c5e8b54b21f5ed6604438f90280ef2f0b7fd0a06fd8eee02fbdd421136fb45e6851ce72b5d87a2c06b2e136ef1a062df9256f4e",
                 "tx": {
-                  "accessList": undefined,
+                  "accessList": [],
                   "feeCurrency": "0x",
                   "gas": "0x0a",
                   "gatewayFee": "0x5678",
@@ -267,8 +267,10 @@ describe('Local wallet class', () => {
             expect(parseTransaction(signedTransaction.raw)).toEqual(
               parseTransaction(viemSignedTransaction)
             )
-            // FAILS expect(recoverTransaction(signedTransaction.raw)).toEqual(recoverTransaction(viemSignedTransaction))
-            // FAILS expect(signedTransaction.raw).toEqual(viemSignedTransaction)
+            expect(recoverTransaction(signedTransaction.raw)).toEqual(
+              recoverTransaction(viemSignedTransaction)
+            )
+            expect(signedTransaction.raw).toEqual(viemSignedTransaction)
           })
 
           test('succeeds with cip42', async () => {
@@ -283,7 +285,7 @@ describe('Local wallet class', () => {
               {
                 "raw": "0x7cf89a82ad5a8063630a94cd2a3d9f938e13cd947ec05abc7fe734df8dd826941be31a94361a391bbafb2a4ccd704f57dc04d4bb82567894588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdefc080a0c610507b2ac3cff80dd7017419021196807d605efce0970c18cde48db33c27d1a01799477e0f601f554f0ee6f7ac21490602124801e9f7a99d9605249b90f03112",
                 "tx": {
-                  "accessList": undefined,
+                  "accessList": [],
                   "feeCurrency": "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
                   "gas": "0x0a",
                   "gatewayFee": "0x5678",
