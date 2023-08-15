@@ -1,8 +1,8 @@
 parent = require('./truffle-config-parent.js')
 networks = parent.networks
 
-console.log(`Using truffle version for Solidity ${SOLC_VERSION}`)
 const SOLC_VERSION = '0.5.13'
+console.log(`Using truffle version for Solidity ${SOLC_VERSION}`)
 console.log('Using old truffle version')
 
 module.exports = {
