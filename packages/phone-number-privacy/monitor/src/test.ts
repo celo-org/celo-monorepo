@@ -13,14 +13,18 @@ export async function testPNPSignQuery(
   blockchainProvider: string,
   contextName: OdisContextName,
   endpoint: CombinerEndpointPNP.PNP_SIGN,
-  timeoutMs?: number
+  timeoutMs?: number,
+  bypassQuota?: boolean,
+  useDEK?: boolean
 ) {
   logger.info(`Performing test PNP query for ${endpoint}`)
   try {
     const odisResponse: IdentifierHashDetails = await queryOdisForSalt(
       blockchainProvider,
       contextName,
-      timeoutMs
+      timeoutMs,
+      bypassQuota,
+      useDEK
     )
     logger.info({ odisResponse }, 'ODIS salt request successful. System is healthy.')
   } catch (err) {
@@ -82,13 +86,22 @@ export async function serialLoadTest(
   endpoint:
     | CombinerEndpointPNP.PNP_QUOTA
     | CombinerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.PNP_SIGN,
-  timeoutMs?: number
+  timeoutMs?: number,
+  bypassQuota?: boolean,
+  useDEK?: boolean
 ) {
   for (let i = 0; i < n; i++) {
     try {
       switch (endpoint) {
         case CombinerEndpointPNP.PNP_SIGN:
-          await testPNPSignQuery(blockchainProvider, contextName, endpoint, timeoutMs)
+          await testPNPSignQuery(
+            blockchainProvider,
+            contextName,
+            endpoint,
+            timeoutMs,
+            bypassQuota,
+            useDEK
+          )
           break
         case CombinerEndpointPNP.PNP_QUOTA:
           await testPNPQuotaQuery(blockchainProvider, contextName, timeoutMs)
@@ -104,7 +117,9 @@ export async function concurrentLoadTest(
   endpoint:
     | CombinerEndpointPNP.PNP_QUOTA
     | CombinerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.PNP_SIGN,
-  timeoutMs?: number
+  timeoutMs?: number,
+  bypassQuota?: boolean,
+  useDEK?: boolean
 ) {
   while (true) {
     const reqs = []
@@ -117,7 +132,14 @@ export async function concurrentLoadTest(
         try {
           switch (endpoint) {
             case CombinerEndpointPNP.PNP_SIGN:
-              await testPNPSignQuery(blockchainProvider, contextName, endpoint, timeoutMs)
+              await testPNPSignQuery(
+                blockchainProvider,
+                contextName,
+                endpoint,
+                timeoutMs,
+                bypassQuota,
+                useDEK
+              )
               break
             case CombinerEndpointPNP.PNP_QUOTA:
               await testPNPQuotaQuery(blockchainProvider, contextName, timeoutMs)
