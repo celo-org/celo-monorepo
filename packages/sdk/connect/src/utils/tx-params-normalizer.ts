@@ -28,19 +28,19 @@ export class TxParamsNormalizer {
       [
         async () => {
           if (txParams.chainId == null) {
-            return await this.getChainId()
+            return this.getChainId()
           }
           return txParams.chainId
         },
         async () => {
           if (txParams.nonce == null) {
-            return await this.connection.nonce(txParams.from!.toString())
+            return this.connection.nonce(txParams.from!.toString())
           }
           return txParams.nonce
         },
         async () => {
           if (!txParams.gas || isEmpty(txParams.gas.toString())) {
-            return await this.connection.estimateGas(txParams)
+            return this.connection.estimateGas(txParams)
           }
           return txParams.gas
         },

@@ -3,9 +3,9 @@ import {
   CeloTx,
   CeloTxWithSig,
   EncodedTransaction,
+  isPresent,
   RLPEncodedTx,
   TransactionTypes,
-  isPresent,
 } from '@celo/connect'
 import {
   hexToNumber,
