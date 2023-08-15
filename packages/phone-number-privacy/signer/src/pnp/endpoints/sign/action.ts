@@ -11,7 +11,7 @@ import { computeBlindedSignature } from '../../../common/bls/bls-cryptography-cl
 import { REQUESTS_TABLE } from '../../../common/database/models/request'
 import { getRequestExists } from '../../../common/database/wrappers/request'
 import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management/key-provider-base'
-import { Counters } from '../../../common/metrics'
+import { Counters, Histograms, meter } from '../../../common/metrics'
 import { SignerConfig } from '../../../config'
 import { PnpQuotaService } from '../../services/quota'
 import { PnpSession } from '../../session'
@@ -160,10 +160,14 @@ export class PnpSignAction implements Action<SignMessageRequest> {
 
           try {
             span.addEvent('Signing request')
-            const signature = await this.sign(
-              session.request.body.blindedQueryPhoneNumber,
-              key,
-              session
+            const signature = await meter(
+              this.sign.bind(this),
+              [session.request.body.blindedQueryPhoneNumber, key, session],
+              (err: any) => {
+                throw err
+              },
+              Histograms.getBlindedSigInstrumentation,
+              ['sign']
             )
             span.addEvent('Signed request')
             span.setStatus({
