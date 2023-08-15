@@ -135,8 +135,6 @@ export class LibraryAddresses {
     if (!this.addresses[library]) {
       this.addresses[library] = address
     }
-    console.log("this.addresses[library]", this.addresses[library])
-    console.log("address", address)
     return this.addresses[library] === address
   }
 }

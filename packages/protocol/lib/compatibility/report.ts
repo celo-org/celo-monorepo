@@ -174,7 +174,6 @@ export class ASTVersionedReport {
       contracts: {},
       libraries: {}
     }
-    console.log("made it here a")
     Object.keys(changesByContract).forEach((contract: string) => {
       console.log("change contract is,", contract)
       if (isLibrary(contract, artifactsSet)) {
@@ -184,7 +183,6 @@ export class ASTVersionedReport {
         reportIndex.contracts[contract] = report
       }
     })
-    console.log("made it here b")
     return reportIndex
   }
 
@@ -199,11 +197,8 @@ export class ASTVersionedReport {
 export class ASTDetailedVersionedReport {
 
   static create = (fullReports: ASTReports, newArtifactsSet: BuildArtifacts[], categorizer: Categorizer): ASTDetailedVersionedReport => {
-    console.log("made it here1")
     const changes = CategorizedChanges.fromReports(fullReports, categorizer)
-    console.log("made it here2")
     const reportIndex: ASTVersionedReportIndex = ASTVersionedReport.createByContract(changes, newArtifactsSet)
-    console.log("made it here3")
     return new ASTDetailedVersionedReport(reportIndex.contracts, reportIndex.libraries)
   }
 

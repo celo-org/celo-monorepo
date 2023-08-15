@@ -266,7 +266,6 @@ module.exports = async (callback: (error?: any) => number) => {
     const contracts = readdirSync(join(argv.build_directory, 'contracts'))
       .concat(contracts08) // adding at the end so libraries that are already deployed don't get redeployed
       .map((x) => basename(x, '.json'))
-      // if false, out
       .filter(
         (contract) =>
           !ignoredContractsSet.has(contract) &&

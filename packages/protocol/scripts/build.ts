@@ -84,8 +84,7 @@ const OtherContracts = [
   'UsingRegistry',
 ]
 
-const externalContractPackages = [MENTO_PACKAGE, SOLIDITY_08_PACKAGE]
-console.log('externalContractPackages', externalContractPackages)
+const contractPackages = [MENTO_PACKAGE, SOLIDITY_08_PACKAGE]
 
 const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
 
@@ -103,10 +102,8 @@ function compile(outdir: string) {
   console.log(`protocol: Compiling solidity to ${outdir}`)
 
   // the reason to generate a different folder is to avoid path collisions, which could be very dangerous
-  console.log('contractPackages', externalContractPackages)
-  for (const contractPackage of externalContractPackages) {
-    console.log('contractPackage', contractPackage)
-    console.log(`Building external contracts for ${contractPackage.name}`)
+  for (const contractPackage of contractPackages) {
+    console.log(`Building Contracts for package ${contractPackage.name}`)
 
     const contractPath = path.join(
       './',
@@ -114,7 +111,6 @@ function compile(outdir: string) {
       contractPackage.path,
       contractPackage.contracstFolder
     )
-    console.log('contractPath', contractPath)
     if (!fs.existsSync(contractPath)) {
       console.log(`Contract package named ${contractPackage.name} doesn't exist`)
       continue
@@ -153,7 +149,7 @@ function compile(outdir: string) {
 function generateFilesForTruffle(outdir: string) {
   console.log('outdir, generateFilesForTruffle', outdir)
   // tslint:disable-next-line
-  for (let externalContractPackage of externalContractPackages) {
+  for (let externalContractPackage of contractPackages) {
     const outdirExternal = outdir + '-' + externalContractPackage.name
     console.log(
       `protocol: Generating Truffle Types for external dependency ${externalContractPackage.name} to ${outdirExternal}`
@@ -193,7 +189,7 @@ async function generateFilesForContractKit(outdir: string) {
     })
   )
 
-  for (const externalContractPackage of externalContractPackages) {
+  for (const externalContractPackage of contractPackages) {
     await tsGenerator(
       { cwd, loggingLvl: 'info' },
       new Web3V1Celo({

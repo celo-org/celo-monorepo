@@ -237,17 +237,11 @@ export const verifyBytecodes = async (
     ignoredContracts = [...ignoredContracts, ...ignoredContractsV9]
   }
 
-  console.log("ignoredContracts.includes(contract)", ignoredContracts.includes("SortedOracles"))
-  console.log("contracts", contracts)
   const queue = contracts.filter(
     (contract) => !ignoredContracts.includes(contract)
     ).filter(
       (contract) => compiledContracts.includes(contract)
       )
-      
-  console.log("ignoredContractsV9",ignoredContractsV9)
-  console.log("queue", queue)
-  console.log("Queue: here")
 
   const visited: Set<string> = new Set(queue)
 

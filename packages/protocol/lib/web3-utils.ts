@@ -256,11 +256,8 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
 
 }
 
-
-
 // TODO remove duplicated code with makeTruffleContractForMigration
 export const makeTruffleContractForMigrationWithoutSingleton = (contractName: string, network:any, contractPath:string, web3: Web3) => {
-  // const network = ArtifactsSingleton.getNetwork()
 
   const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath}/${contractName}.json`)
   const Contract = truffleContract({
@@ -279,7 +276,6 @@ export const makeTruffleContractForMigrationWithoutSingleton = (contractName: st
   Contract.configureNetwork({networkType: "ethereum", provider: web3.currentProvider})
 
   Contract.defaults({from: network.from, gas: network.gas, type: 0})
-  // ArtifactsSingleton.getInstance(contractPath).addArtifact(contractName, Contract)
   return Contract
 }
 

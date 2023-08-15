@@ -64,7 +64,6 @@ const outFile = argv.output_file ? argv.output_file : tmp.tmpNameSync({})
 const exclude: RegExp = argv.exclude ? new RegExp(argv.exclude) : null
 const oldArtifacts = instantiateArtifacts(oldArtifactsFolder)
 const newArtifacts = instantiateArtifacts(newArtifactsFolder)
-// console.log(newArtifactsFolder)
 const newArtifacts08 = instantiateArtifacts(newArtifactsFolder08)
 
 try {
