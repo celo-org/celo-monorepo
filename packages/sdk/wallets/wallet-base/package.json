@@ -29,6 +29,7 @@
     "@celo/base": "4.1.1-dev",
     "@celo/utils": "4.1.1-dev",
     "@ethereumjs/util": "8.0.5",
+    "ethereum-cryptography": "^2.1.2",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
     "debug": "^4.1.1",

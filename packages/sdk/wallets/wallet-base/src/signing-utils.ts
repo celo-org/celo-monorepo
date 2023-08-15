@@ -1,4 +1,4 @@
-import { ensureLeading0x, hexToBuffer, trimLeading0x } from '@celo/base/lib/address'
+import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import {
   CeloTx,
   CeloTxWithSig,
@@ -16,7 +16,9 @@ import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typ
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import * as ethUtil from '@ethereumjs/util'
 import debugFactory from 'debug'
-import { keccak256, publicToAddress } from 'ethereumjs-util'
+import { keccak256 } from 'ethereum-cryptography/keccak'
+import { utf8ToBytes } from 'ethereum-cryptography/utils.js'
+import { publicToAddress, toBuffer } from '@ethereumjs/util'
 // @ts-ignore-next-line eth-lib types not found
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
 import Web3 from 'web3' // TODO try to do this without web3 direct
@@ -421,23 +423,20 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
   }
 }
 
-const TRANSACTION_TYPE = '0x7c'
-const TRANSACTION_TYPE_BUFFER = Buffer.from(TRANSACTION_TYPE.padStart(2, '0'), 'hex')
-
 // inspired by @ethereumjs/tx -- does not work :(
 function getPublicKeyofSignerFromTx(transactionArray: string[]) {
   const base = transactionArray.slice(0, 12) // 12 is length of cip42 without vrs fields
-  const message = Buffer.concat([TRANSACTION_TYPE_BUFFER, Buffer.from(RLP.encode(base))])
-  const msgHash = keccak256(message)
+  const message = `${TxTypeToPrefix.cip42}${RLP.encode(base)}`
+  const msgHash = keccak256(utf8ToBytes(message))
 
   const { v, r, s } = extractSignatureFromDecoded(transactionArray)
 
   try {
     return ethUtil.ecrecover(
-      msgHash,
+      Buffer.from(msgHash),
       v === '0x' || v === undefined ? BigInt(27) : BigInt(v!) + BigInt(27), // Recover the 27 which was stripped from ecsign
-      hexToBuffer(r!),
-      hexToBuffer(s!)
+      toBuffer(r!),
+      toBuffer(s!)
     )
   } catch (e: any) {
     throw new Error(e)
