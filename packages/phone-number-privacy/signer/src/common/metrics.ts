@@ -128,3 +128,13 @@ export async function meter<T extends any[], U>(
     .catch(onError)
     .finally(_meter)
 }
+
+export function withMeter(
+  histogram: client.Histogram<string>,
+  ...labels: string[]
+): <U>(fn: () => Promise<U>) => Promise<U> {
+  return (fn) => {
+    const _meter = histogram.labels(...labels).startTimer()
+    return fn().finally(_meter)
+  }
+}

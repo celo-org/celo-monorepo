@@ -7,7 +7,7 @@ import { ACCOUNTS_TABLE } from '../../common/database/models/account'
 import { REQUESTS_TABLE } from '../../common/database/models/request'
 import { getPerformedQueryCount, incrementQueryCount } from '../../common/database/wrappers/account'
 import { storeRequest } from '../../common/database/wrappers/request'
-import { Counters, Histograms, meter } from '../../common/metrics'
+import { Counters, Histograms, withMeter } from '../../common/metrics'
 import { OdisQuotaStatusResult } from '../../common/quota'
 import { getBlockNumber, getOnChainOdisPayments } from '../../common/web3/contracts'
 import { config } from '../../config'
@@ -86,19 +86,18 @@ export class PnpQuotaService {
     ctx: Context,
     trx?: Knex.Transaction
   ): Promise<PnpQuotaStatus> {
-    const [performedQueryCountResult, totalQuotaResult, blockNumberResult] = await meter(
-      () =>
-        Promise.allSettled([
-          getPerformedQueryCount(this.db, this.accountsTable, account, ctx.logger, trx),
-          this.getTotalQuota(account, ctx),
-          getBlockNumber(this.kit),
-        ]),
-      [],
-      (err: any) => {
-        throw err
-      },
+    const meter = withMeter(
       Histograms.getRemainingQueryCountInstrumentation,
-      ['getQuotaStatus', ctx.url]
+      'getQuotaStatus',
+      ctx.url
+    )
+
+    const [performedQueryCountResult, totalQuotaResult, blockNumberResult] = await meter(() =>
+      Promise.allSettled([
+        getPerformedQueryCount(this.db, this.accountsTable, account, ctx.logger, trx),
+        this.getTotalQuota(account, ctx),
+        getBlockNumber(this.kit),
+      ])
     )
 
     const quotaStatus: PnpQuotaStatus = {
@@ -119,6 +118,7 @@ export class PnpQuotaService {
         ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT
       )
     }
+
     let hadFullNodeError = false
     if (totalQuotaResult.status === 'fulfilled') {
       quotaStatus.totalQuota = totalQuotaResult.value
@@ -142,15 +142,12 @@ export class PnpQuotaService {
   }
 
   private async getTotalQuota(account: string, ctx: Context): Promise<number> {
-    return meter(
-      () => this.getTotalQuotaWithoutMeter(account, ctx),
-      [],
-      (err: any) => {
-        throw err
-      },
+    const meter = withMeter(
       Histograms.getRemainingQueryCountInstrumentation,
-      ['getTotalQuota', ctx.url]
+      'getTotalQuota',
+      ctx.url
     )
+    return meter(() => this.getTotalQuotaWithoutMeter(account, ctx))
   }
 
   /*
