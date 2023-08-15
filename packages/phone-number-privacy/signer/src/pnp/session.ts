@@ -6,6 +6,12 @@ import {
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 
+export interface Context {
+  logger: Logger
+  url: string
+  errors: string[]
+}
+
 export class PnpSession<R extends PhoneNumberPrivacyRequest> {
   readonly logger: Logger
   readonly errors: ErrorType[] = []

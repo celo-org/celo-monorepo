@@ -13,7 +13,6 @@ import {
   SignMessageRequest,
   SignMessageRequestSchema,
   SignMessageResponse,
-  SignMessageResponseFailure,
   SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -27,6 +26,7 @@ import { PnpSession } from '../../session'
 
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
+import { sendFailure } from '../../../common/handler'
 const tracer = opentelemetry.trace.getTracer('signer-tracer')
 
 export class PnpSignIO extends IO<SignMessageRequest> {
@@ -65,7 +65,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
           message: WarningMessage.INVALID_KEY_VERSION_REQUEST,
         })
         span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, 400)
-        this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
+        sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
         span.end()
         return null
       }
@@ -77,7 +77,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
           message: WarningMessage.UNAUTHENTICATED_USER,
         })
         span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, 401)
-        this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
+        sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
         span.end()
         return null
       }
@@ -138,35 +138,6 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       span.setStatus({
         code: SpanStatusCode.OK,
         message: response.statusMessage,
-      })
-      Counters.responses.labels(this.endpoint, status.toString()).inc()
-      span.end()
-    })
-  }
-
-  sendFailure(
-    error: string,
-    status: number,
-    response: Response<SignMessageResponseFailure>,
-    quotaStatus?: PnpQuotaStatus
-  ) {
-    return tracer.startActiveSpan(`pnpSignIO - sendFailure`, (span) => {
-      span.addEvent('Sending Failure')
-      send(
-        response,
-        {
-          success: false,
-          version: getSignerVersion(),
-          error,
-          ...quotaStatus,
-        },
-        status,
-        response.locals.logger
-      )
-      span.setAttribute(SemanticAttributes.HTTP_METHOD, status)
-      span.setStatus({
-        code: SpanStatusCode.ERROR,
-        message: error,
       })
       Counters.responses.labels(this.endpoint, status.toString()).inc()
       span.end()

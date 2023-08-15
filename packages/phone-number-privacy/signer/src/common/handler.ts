@@ -1,10 +1,12 @@
-import { ErrorMessage } from '@celo/phone-number-privacy-common'
+import { ErrorMessage, ErrorType, send } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { Counters, newMeter } from './metrics'
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
 import * as client from 'prom-client'
+import { timeout } from '@celo/base'
+import { getSignerVersion } from '../config'
 
 const tracer = opentelemetry.trace.getTracer('signer-tracer')
 
@@ -13,6 +15,7 @@ export type PromiseHandler = (request: Request, res: Response) => Promise<void>
 export function catchErrorHandler(handler: PromiseHandler): PromiseHandler {
   return async (req, res) => {
     try {
+      Counters.requests.labels(req.url).inc()
       await handler(req, res)
     } catch (err: any) {
       // Handle any errors that otherwise managed to escape the proper handlers
@@ -23,10 +26,7 @@ export function catchErrorHandler(handler: PromiseHandler): PromiseHandler {
 
       if (!res.headersSent) {
         logger.info('Responding with error in outer endpoint handler')
-        res.status(500).json({
-          success: false,
-          error: ErrorMessage.UNKNOWN_ERROR,
-        })
+        sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, res)
       } else {
         // Getting to this error likely indicates that the `perform` process
         // does not terminate after sending a response, and then throws an error.
@@ -39,24 +39,26 @@ export function catchErrorHandler(handler: PromiseHandler): PromiseHandler {
 
 export function tracingHandler(handler: PromiseHandler): PromiseHandler {
   return async (req, res) => {
-    return tracer.startActiveSpan('server - addEndpoint - post', async (parentSpan) => {
-      try {
-        parentSpan.addEvent('Called ' + req.path)
-        parentSpan.setAttribute(SemanticAttributes.HTTP_ROUTE, req.path)
-        parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, req.method)
-        parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, req.ip)
-
-        await handler(req, res)
-      } catch (err: any) {
-        parentSpan.setStatus({
-          code: SpanStatusCode.ERROR,
-          message: 'Fail',
-        })
-        throw err
-      } finally {
-        parentSpan.end()
-      }
+    const span = tracer.startSpan('server - addEndpoint - post', {
+      attributes: {
+        [SemanticAttributes.HTTP_ROUTE]: req.path,
+        [SemanticAttributes.HTTP_METHOD]: req.method,
+        [SemanticAttributes.HTTP_CLIENT_IP]: req.ip,
+      },
     })
+    span.addEvent('Called ' + req.path)
+
+    try {
+      await handler(req, res)
+    } catch (err: any) {
+      span.setStatus({
+        code: SpanStatusCode.ERROR,
+        message: 'Fail',
+      })
+      throw err
+    } finally {
+      span.end()
+    }
   }
 }
 
@@ -65,4 +67,33 @@ export function meteringHandler(
   handler: PromiseHandler
 ): PromiseHandler {
   return (req, res) => newMeter(histogram, req.url)(() => handler(req, res))
+}
+
+export function timeoutHandler(timeoutMs: number, handler: PromiseHandler): PromiseHandler {
+  // Unique error to be thrown on timeout
+  const timeoutError = Symbol() // TODO (mcortesi) use Error type
+  return async (request, response) => {
+    try {
+      await timeout(handler, [request, response], timeoutMs, timeoutError)
+    } catch (err: any) {
+      if (err === timeoutError) {
+        Counters.timeouts.inc()
+        sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, response)
+      }
+    }
+  }
+}
+
+export function sendFailure(error: ErrorType, status: number, response: Response, body?: Object) {
+  send(
+    response,
+    {
+      success: false,
+      version: getSignerVersion(),
+      error,
+      ...body,
+    },
+    status,
+    response.locals.logger
+  )
 }

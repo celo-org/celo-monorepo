@@ -1,6 +1,4 @@
 import {
-  ErrorType,
-  FailureResponse,
   OdisRequest,
   OdisResponse,
   SignerEndpoint,
@@ -13,6 +11,7 @@ import { Session } from './action'
 
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
+import { sendFailure } from './handler'
 const tracer = opentelemetry.trace.getTracer('signer-tracer')
 
 export abstract class IO<R extends OdisRequest> {
@@ -33,13 +32,6 @@ export abstract class IO<R extends OdisRequest> {
     logger?: Logger
   ): Promise<boolean>
 
-  abstract sendFailure(
-    error: ErrorType,
-    status: number,
-    response: Response<FailureResponse<R>>,
-    ...args: unknown[]
-  ): void
-
   abstract sendSuccess(
     status: number,
     response: Response<SuccessResponse<R>>,
@@ -58,7 +50,7 @@ export abstract class IO<R extends OdisRequest> {
           message: WarningMessage.API_UNAVAILABLE,
         })
         span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, 503)
-        this.sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
+        sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
         span.end()
         return false
       }
@@ -69,7 +61,7 @@ export abstract class IO<R extends OdisRequest> {
           message: WarningMessage.INVALID_INPUT,
         })
         span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, 400)
-        this.sendFailure(WarningMessage.INVALID_INPUT, 400, response)
+        sendFailure(WarningMessage.INVALID_INPUT, 400, response)
         span.end()
         return false
       }

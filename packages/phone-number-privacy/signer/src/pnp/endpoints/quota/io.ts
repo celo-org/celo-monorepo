@@ -7,7 +7,6 @@ import {
   PnpQuotaRequest,
   PnpQuotaRequestSchema,
   PnpQuotaResponse,
-  PnpQuotaResponseFailure,
   PnpQuotaResponseSuccess,
   PnpQuotaStatus,
   send,
@@ -23,6 +22,7 @@ import { PnpSession } from '../../session'
 
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
+import { sendFailure } from '../../../common/handler'
 const tracer = opentelemetry.trace.getTracer('signer-tracer')
 
 export class PnpQuotaIO extends IO<PnpQuotaRequest> {
@@ -60,7 +60,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
           message: WarningMessage.UNAUTHENTICATED_USER,
         })
         span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, 401)
-        this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
+        sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
         span.end()
         return null
       }
@@ -121,27 +121,24 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       span.end()
     })
   }
-
-  sendFailure(error: ErrorType, status: number, response: Response<PnpQuotaResponseFailure>) {
-    return tracer.startActiveSpan(`pnpQuotaIO - sendFailure`, (span) => {
-      span.addEvent('Sending Failure')
-      send(
-        response,
-        {
-          success: false,
-          version: getSignerVersion(),
-          error,
-        },
-        status,
-        response.locals.logger
-      )
-      span.setAttribute(SemanticAttributes.HTTP_METHOD, status)
-      span.setStatus({
-        code: SpanStatusCode.ERROR,
-        message: error,
-      })
-      Counters.responses.labels(this.endpoint, status.toString()).inc()
-      span.end()
-    })
-  }
 }
+
+// function pnpQuotaResult(quotaStatus: PnpQuotaStatus, warnings: string[]) {
+//   return {
+//     ...quotaStatus,
+//     warnings,
+//   }
+// }
+
+// export function sendSuccess(status: number, response: Response, result?: Object) {
+//   send(
+//     response,
+//     {
+//       success: true,
+//       version: getSignerVersion(),
+//       ...result,
+//     },
+//     status,
+//     response.locals.logger
+//   )
+// }

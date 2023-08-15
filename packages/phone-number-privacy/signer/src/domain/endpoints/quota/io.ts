@@ -2,11 +2,9 @@ import {
   DomainQuotaStatusRequest,
   domainQuotaStatusRequestSchema,
   DomainQuotaStatusResponse,
-  DomainQuotaStatusResponseFailure,
   DomainQuotaStatusResponseSuccess,
   DomainSchema,
   DomainState,
-  ErrorType,
   send,
   SignerEndpoint,
   verifyDomainQuotaStatusRequestAuthenticity,
@@ -17,6 +15,7 @@ import { IO } from '../../../common/io'
 import { Counters } from '../../../common/metrics'
 import { getSignerVersion } from '../../../config'
 import { DomainSession } from '../../session'
+import { sendFailure } from '../../../common/handler'
 
 export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
   readonly endpoint = SignerEndpoint.DOMAIN_QUOTA_STATUS
@@ -29,7 +28,7 @@ export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
       return null
     }
     if (!(await this.authenticate(request))) {
-      this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
+      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
     return new DomainSession(request, response)
@@ -56,24 +55,6 @@ export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
         success: true,
         version: getSignerVersion(),
         status: domainState,
-      },
-      status,
-      response.locals.logger
-    )
-    Counters.responses.labels(this.endpoint, status.toString()).inc()
-  }
-
-  sendFailure(
-    error: ErrorType,
-    status: number,
-    response: Response<DomainQuotaStatusResponseFailure>
-  ) {
-    send(
-      response,
-      {
-        success: false,
-        version: getSignerVersion(),
-        error,
       },
       status,
       response.locals.logger

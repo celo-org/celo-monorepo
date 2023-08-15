@@ -16,34 +16,34 @@ import https from 'https'
 import { Knex } from 'knex'
 import { IncomingMessage, ServerResponse } from 'node:http'
 import * as PromClient from 'prom-client'
-
 import { KeyProvider } from './common/key-management/key-provider-base'
-import { Counters, Histograms } from './common/metrics'
+import { Histograms } from './common/metrics'
 import { getSignerVersion, SignerConfig } from './config'
-import { DomainDisableAction } from './domain/endpoints/disable/action'
+import { createDomainDisableHandler } from './domain/endpoints/disable/action'
 import { DomainDisableIO } from './domain/endpoints/disable/io'
-import { DomainQuotaAction } from './domain/endpoints/quota/action'
+import { createDomainQuotaHandler } from './domain/endpoints/quota/action'
 import { DomainQuotaIO } from './domain/endpoints/quota/io'
-import { DomainSignAction } from './domain/endpoints/sign/action'
+import { createDomainSignHandler } from './domain/endpoints/sign/action'
 import { DomainSignIO } from './domain/endpoints/sign/io'
 import { DomainQuotaService } from './domain/services/quota'
-import { PnpQuotaAction } from './pnp/endpoints/quota/action'
+import { createPnpQuotaHandler } from './pnp/endpoints/quota/action'
 import { PnpQuotaIO } from './pnp/endpoints/quota/io'
-import { PnpSignAction } from './pnp/endpoints/sign/action'
+import { createPnpSignHandler } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
 import { PnpQuotaService } from './pnp/services/quota'
-
 import opentelemetry from '@opentelemetry/api'
 
-import { Action } from './common/action'
 const tracer = opentelemetry.trace.getTracer('signer-tracer')
 
 import {
   catchErrorHandler,
   meteringHandler,
   PromiseHandler,
+  sendFailure,
+  timeoutHandler,
   tracingHandler,
 } from './common/handler'
+import { IO } from './common/io'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -84,55 +84,48 @@ export function startSigner(
     )
   )
 
-  const pnpQuota = new PnpQuotaAction(
-    config,
-    pnpQuotaService,
-    new PnpQuotaIO(
-      config.api.phoneNumberPrivacy.enabled,
-      config.api.phoneNumberPrivacy.shouldFailOpen, // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config to make the code cleaner
-      dekFetcher
-    )
+  const pnpQuotaIO = new PnpQuotaIO(
+    config.api.phoneNumberPrivacy.enabled,
+    config.api.phoneNumberPrivacy.shouldFailOpen, // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config to make the code cleaner
+    dekFetcher
   )
+  const pnpQuota = createPnpQuotaHandler(pnpQuotaService, pnpQuotaIO)
 
-  const pnpSign = new PnpSignAction(
-    db,
-    config,
-    pnpQuotaService,
-    keyProvider,
-    new PnpSignIO(
-      config.api.phoneNumberPrivacy.enabled,
-      config.api.phoneNumberPrivacy.shouldFailOpen,
-      dekFetcher
-    )
+  const pnpSignIO = new PnpSignIO(
+    config.api.phoneNumberPrivacy.enabled,
+    config.api.phoneNumberPrivacy.shouldFailOpen,
+    dekFetcher
   )
+  const pnpSign = createPnpSignHandler(db, config, pnpQuotaService, keyProvider, pnpSignIO)
 
-  const domainQuota = new DomainQuotaAction(
-    config,
-    domainQuotaService,
-    new DomainQuotaIO(config.api.domains.enabled)
-  )
+  const domainQuotaIO = new DomainQuotaIO(config.api.domains.enabled)
+  const domainQuota = createDomainQuotaHandler(domainQuotaService, domainQuotaIO)
 
-  const domainSign = new DomainSignAction(
+  const domainSignIO = new DomainSignIO(config.api.domains.enabled)
+  const domainSign = createDomainSignHandler(
     db,
     config,
     domainQuotaService,
     keyProvider,
-    new DomainSignIO(config.api.domains.enabled)
+    domainSignIO
   )
 
-  const domainDisable = new DomainDisableAction(
-    db,
-    config,
-    new DomainDisableIO(config.api.domains.enabled)
-  )
+  const domainDisableIO = new DomainDisableIO(config.api.domains.enabled)
+  const domainDisable = createDomainDisableHandler(db, domainDisableIO)
 
   logger.info('Right before adding meteredSignerEndpoints')
 
-  app.post(SignerEndpoint.PNP_SIGN, createHandler(pnpSign))
-  app.post(SignerEndpoint.PNP_QUOTA, createHandler(pnpQuota))
-  app.post(SignerEndpoint.DOMAIN_QUOTA_STATUS, createHandler(domainQuota))
-  app.post(SignerEndpoint.DOMAIN_SIGN, createHandler(domainSign))
-  app.post(SignerEndpoint.DISABLE_DOMAIN, createHandler(domainDisable))
+  app.post(SignerEndpoint.PNP_SIGN, createHandler(config.timeout, pnpSignIO, pnpSign))
+  app.post(SignerEndpoint.PNP_QUOTA, createHandler(config.timeout, pnpQuotaIO, pnpQuota))
+  app.post(
+    SignerEndpoint.DOMAIN_QUOTA_STATUS,
+    createHandler(config.timeout, domainQuotaIO, domainQuota)
+  )
+  app.post(SignerEndpoint.DOMAIN_SIGN, createHandler(config.timeout, domainSignIO, domainSign))
+  app.post(
+    SignerEndpoint.DISABLE_DOMAIN,
+    createHandler(config.timeout, domainDisableIO, domainDisable)
+  )
 
   const sslOptions = getSslOptions(config)
   if (sslOptions) {
@@ -178,39 +171,40 @@ function newCachingDekFetcher(baseFetcher: DataEncryptionKeyFetcher): DataEncryp
   return cachedDekFetcher
 }
 
-function createHandler(action: Action<any>): RequestHandler {
+function createHandler(timeoutMs: number, io: IO<any>, action: PromiseHandler): RequestHandler {
   return catchErrorHandler(
-    tracingHandler(meteringHandler(Histograms.responseLatency, actionHandler(action)))
+    tracingHandler(
+      meteringHandler(
+        Histograms.responseLatency,
+        timeoutHandler(timeoutMs, actionHandler(io, action))
+      )
+    )
   )
 }
 
 // TODO handle action generic type
-function actionHandler(action: Action<any>): PromiseHandler {
+function actionHandler(io: IO<any>, action: PromiseHandler): PromiseHandler {
+  // TODO handle timeout MS
   return async (request, response) => {
     const logger = response.locals.logger
-    Counters.requests.labels(action.io.endpoint).inc()
-    // Unique error to be thrown on timeout
-    const timeoutError = Symbol()
+
     tracer
       .startActiveSpan('Controller - handle', async (span) => {
         span.addEvent('Calling init')
 
-        const session = await action.io.init(request, response)
+        const session = await io.init(request, response)
         // Init returns a response to the user internally.
         if (session) {
           span.addEvent('Calling perform')
-          await action.perform(session, timeoutError)
+          await action(request, response)
         }
         span.end()
       })
       .catch((err: any) => {
-        logger.error({ err }, `Error in handler for ${action.io.endpoint}`)
+        logger.error({ err }, `Error in handler for ${request.url}`)
 
         let errMsg: ErrorType = ErrorMessage.UNKNOWN_ERROR
-        if (err === timeoutError) {
-          Counters.timeouts.inc()
-          errMsg = ErrorMessage.TIMEOUT_FROM_SIGNER
-        } else if (
+        if (
           err instanceof Error &&
           // Propagate standard error & warning messages thrown during endpoint handling
           (Object.values(ErrorMessage).includes(err.message as ErrorMessage) ||
@@ -219,7 +213,7 @@ function actionHandler(action: Action<any>): PromiseHandler {
           errMsg = err.message as ErrorType
         }
 
-        action.io.sendFailure(errMsg, 500, response)
+        sendFailure(errMsg, 500, response)
       })
   }
 }

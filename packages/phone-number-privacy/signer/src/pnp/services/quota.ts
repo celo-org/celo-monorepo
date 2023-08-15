@@ -1,7 +1,6 @@
 import { ContractKit } from '@celo/contractkit'
 import { ErrorMessage, PnpQuotaStatus, SignMessageRequest } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
-import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { ACCOUNTS_TABLE } from '../../common/database/models/account'
 import { REQUESTS_TABLE } from '../../common/database/models/request'
@@ -11,25 +10,7 @@ import { Counters, Histograms, newMeter } from '../../common/metrics'
 import { OdisQuotaStatusResult } from '../../common/quota'
 import { getBlockNumber, getOnChainOdisPayments } from '../../common/web3/contracts'
 import { config } from '../../config'
-import { PnpSession } from '../session'
-
-interface Context {
-  logger: Logger
-  url: string
-  errors: string[]
-}
-
-// interface QuotaService {
-//   getQuotaStatus(account: string, ctx: Context): Promise<PnpQuotaStatus>
-// }
-
-// class CachingQuotaService implements QuotaService {
-//   protected baseService: QuotaService
-
-//   async getQuotaStatus(account: string, ctx: Context): Promise<PnpQuotaStatus> {
-
-//   }
-// }
+import { Context } from '../session'
 
 /**
  * PnpQuotaService is responsible for serving information about pnp quota
@@ -43,19 +24,20 @@ export class PnpQuotaService {
 
   public async checkAndUpdateQuotaStatus(
     state: PnpQuotaStatus,
-    session: PnpSession<SignMessageRequest>,
+    ctx: Context,
+    body: SignMessageRequest,
     trx?: Knex.Transaction
   ): Promise<OdisQuotaStatusResult<SignMessageRequest>> {
     const remainingQuota = state.totalQuota - state.performedQueryCount
 
-    Histograms.userRemainingQuotaAtRequest.labels(session.request.url).observe(remainingQuota)
+    Histograms.userRemainingQuotaAtRequest.labels(ctx.url).observe(remainingQuota)
 
     let sufficient = remainingQuota > 0
     if (!sufficient) {
-      session.logger.warn({ ...state }, 'No remaining quota')
-      if (this.bypassQuotaForE2ETesting(session.request.body)) {
+      ctx.logger.warn({ ...state }, 'No remaining quota')
+      if (this.bypassQuotaForE2ETesting(body)) {
         Counters.testQuotaBypassedRequests.inc()
-        session.logger.info(session.request.body, 'Request will bypass quota check for e2e testing')
+        ctx.logger.info(body, 'Request will bypass quota check for e2e testing')
         sufficient = true
       }
     } else {
@@ -63,18 +45,12 @@ export class PnpQuotaService {
         storeRequest(
           this.db,
           this.requestsTable,
-          session.request.body.account,
-          session.request.body.blindedQueryPhoneNumber,
-          session.logger,
+          body.account,
+          body.blindedQueryPhoneNumber,
+          ctx.logger,
           trx
         ),
-        incrementQueryCount(
-          this.db,
-          this.accountsTable,
-          session.request.body.account,
-          session.logger,
-          trx
-        ),
+        incrementQueryCount(this.db, this.accountsTable, body.account, ctx.logger, trx),
       ])
       state.performedQueryCount++
     }

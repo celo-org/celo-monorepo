@@ -2,11 +2,9 @@ import {
   DisableDomainRequest,
   disableDomainRequestSchema,
   DisableDomainResponse,
-  DisableDomainResponseFailure,
   DisableDomainResponseSuccess,
   DomainSchema,
   DomainState,
-  ErrorType,
   send,
   SignerEndpoint,
   verifyDisableDomainRequestAuthenticity,
@@ -17,6 +15,7 @@ import { IO } from '../../../common/io'
 import { Counters } from '../../../common/metrics'
 import { getSignerVersion } from '../../../config'
 import { DomainSession } from '../../session'
+import { sendFailure } from '../../../common/handler'
 
 export class DomainDisableIO extends IO<DisableDomainRequest> {
   readonly endpoint = SignerEndpoint.DISABLE_DOMAIN
@@ -30,7 +29,7 @@ export class DomainDisableIO extends IO<DisableDomainRequest> {
       return null
     }
     if (!(await this.authenticate(request))) {
-      this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
+      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
     return new DomainSession(request, response)
@@ -55,20 +54,6 @@ export class DomainDisableIO extends IO<DisableDomainRequest> {
         success: true,
         version: getSignerVersion(),
         status: domainState,
-      },
-      status,
-      response.locals.logger
-    )
-    Counters.responses.labels(this.endpoint, status.toString()).inc()
-  }
-
-  sendFailure(error: ErrorType, status: number, response: Response<DisableDomainResponseFailure>) {
-    send(
-      response,
-      {
-        success: false,
-        version: getSignerVersion(),
-        error,
       },
       status,
       response.locals.logger

@@ -4,6 +4,7 @@ import {
   DomainRestrictedSignatureRequest,
   ErrorMessage,
   isSequentialDelayDomain,
+  SequentialDelayDomain,
 } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import {
@@ -17,6 +18,7 @@ import {
 } from '../../common/database/wrappers/domain-state'
 import { OdisQuotaStatusResult } from '../../common/quota'
 import { DomainSession } from '../session'
+import Logger from 'bunyan'
 
 declare type QuotaDependentDomainRequest =
   | DomainQuotaStatusRequest
@@ -55,9 +57,10 @@ export class DomainQuotaService {
   }
 
   async getQuotaStatus(
-    session: DomainSession<QuotaDependentDomainRequest>,
+    domain: SequentialDelayDomain,
+    logger: Logger,
     trx?: Knex.Transaction<DomainStateRecord>
   ): Promise<DomainStateRecord> {
-    return getDomainStateRecordOrEmpty(this.db, session.request.body.domain, session.logger, trx)
+    return getDomainStateRecordOrEmpty(this.db, domain, logger, trx)
   }
 }
