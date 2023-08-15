@@ -15,10 +15,10 @@ import {
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import * as ethUtil from '@ethereumjs/util'
+import { Address, toBuffer, toChecksumAddress } from '@ethereumjs/util'
 import debugFactory from 'debug'
 import { keccak256 } from 'ethereum-cryptography/keccak'
-import { utf8ToBytes } from 'ethereum-cryptography/utils.js'
-import { publicToAddress, toBuffer } from '@ethereumjs/util'
+import { hexToBytes } from 'ethereum-cryptography/utils.js'
 // @ts-ignore-next-line eth-lib types not found
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
 import Web3 from 'web3' // TODO try to do this without web3 direct
@@ -426,28 +426,26 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
 // inspired by @ethereumjs/tx -- does not work :(
 function getPublicKeyofSignerFromTx(transactionArray: string[]) {
   const base = transactionArray.slice(0, 12) // 12 is length of cip42 without vrs fields
-  const message = `${TxTypeToPrefix.cip42}${RLP.encode(base)}`
-  const msgHash = keccak256(utf8ToBytes(message))
+  const message = concatHex([TxTypeToPrefix.cip42, RLP.encode(base).slice(2)])
+  const msgHash = keccak256(hexToBytes(message))
 
   const { v, r, s } = extractSignatureFromDecoded(transactionArray)
-
   try {
     return ethUtil.ecrecover(
-      Buffer.from(msgHash),
-      v === '0x' || v === undefined ? BigInt(27) : BigInt(v!) + BigInt(27), // Recover the 27 which was stripped from ecsign
-      toBuffer(r!),
-      toBuffer(s!)
+      toBuffer(msgHash),
+      v === '0x' || v === undefined ? BigInt(0) : BigInt(1),
+      toBuffer(r),
+      toBuffer(s)
     )
   } catch (e: any) {
     throw new Error(e)
   }
 }
-// This is not working
+
 export function getSignerFromTxCIP42(serializedTransaction: string): string {
   const transactionArray: any[] = RLP.decode(`0x${serializedTransaction.slice(4)}`)
   const signer = getPublicKeyofSignerFromTx(transactionArray)
-  const address = publicToAddress(signer)
-  return `0x` + address.toString('hex')
+  return toChecksumAddress(Address.fromPublicKey(signer).toString())
 }
 
 function determineTXType(serializedTransaction: string): TransactionTypes {
