@@ -10,8 +10,7 @@ import {
   SignerEndpoint,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import Logger from 'bunyan'
-import express, { Express, Request, RequestHandler, Response } from 'express'
+import express, { Express, RequestHandler } from 'express'
 import fs from 'fs'
 import https from 'https'
 import { Knex } from 'knex'
@@ -19,7 +18,7 @@ import { IncomingMessage, ServerResponse } from 'node:http'
 import * as PromClient from 'prom-client'
 
 import { KeyProvider } from './common/key-management/key-provider-base'
-import { Counters, Histograms, newMeter } from './common/metrics'
+import { Counters, Histograms } from './common/metrics'
 import { getSignerVersion, SignerConfig } from './config'
 import { DomainDisableAction } from './domain/endpoints/disable/action'
 import { DomainDisableIO } from './domain/endpoints/disable/io'
@@ -34,12 +33,17 @@ import { PnpSignAction } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
 import { PnpQuotaService } from './pnp/services/quota'
 
-import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
+import opentelemetry from '@opentelemetry/api'
+
 import { Action } from './common/action'
 const tracer = opentelemetry.trace.getTracer('signer-tracer')
 
-import * as client from 'prom-client'
+import {
+  catchErrorHandler,
+  meteringHandler,
+  PromiseHandler,
+  tracingHandler,
+} from './common/handler'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -174,69 +178,10 @@ function newCachingDekFetcher(baseFetcher: DataEncryptionKeyFetcher): DataEncryp
   return cachedDekFetcher
 }
 
-type PromiseHandler = (request: Request, res: Response) => Promise<void>
-
 function createHandler(action: Action<any>): RequestHandler {
   return catchErrorHandler(
     tracingHandler(meteringHandler(Histograms.responseLatency, actionHandler(action)))
   )
-}
-
-function catchErrorHandler(handler: PromiseHandler): PromiseHandler {
-  return async (req, res) => {
-    try {
-      await handler(req, res)
-    } catch (err: any) {
-      // Handle any errors that otherwise managed to escape the proper handlers
-      const logger: Logger = res.locals.logger
-      logger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
-      logger.error(err)
-      Counters.errorsCaughtInEndpointHandler.inc()
-
-      if (!res.headersSent) {
-        logger.info('Responding with error in outer endpoint handler')
-        res.status(500).json({
-          success: false,
-          error: ErrorMessage.UNKNOWN_ERROR,
-        })
-      } else {
-        // Getting to this error likely indicates that the `perform` process
-        // does not terminate after sending a response, and then throws an error.
-        logger.error(ErrorMessage.ERROR_AFTER_RESPONSE_SENT)
-        Counters.errorsThrownAfterResponseSent.inc()
-      }
-    }
-  }
-}
-
-function tracingHandler(handler: PromiseHandler): PromiseHandler {
-  return async (req, res) => {
-    return tracer.startActiveSpan('server - addEndpoint - post', async (parentSpan) => {
-      try {
-        parentSpan.addEvent('Called ' + req.path)
-        parentSpan.setAttribute(SemanticAttributes.HTTP_ROUTE, req.path)
-        parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, req.method)
-        parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, req.ip)
-
-        await handler(req, res)
-      } catch (err: any) {
-        parentSpan.setStatus({
-          code: SpanStatusCode.ERROR,
-          message: 'Fail',
-        })
-        throw err
-      } finally {
-        parentSpan.end()
-      }
-    })
-  }
-}
-
-function meteringHandler(
-  histogram: client.Histogram<string>,
-  handler: PromiseHandler
-): PromiseHandler {
-  return (req, res) => newMeter(histogram, req.url)(() => handler(req, res))
 }
 
 // TODO handle action generic type
