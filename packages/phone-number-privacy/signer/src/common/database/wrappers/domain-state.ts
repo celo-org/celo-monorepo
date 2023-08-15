@@ -5,9 +5,9 @@ import { Knex } from 'knex'
 import { config } from '../../../config'
 import { Histograms, meter } from '../../metrics'
 import {
-  DomainStateRecord,
   DOMAIN_STATE_COLUMNS,
   DOMAIN_STATE_TABLE,
+  DomainStateRecord,
   toDomainStateRecord,
 } from '../models/domain-state'
 import { countAndThrowDBError, queryWithOptionalTrx } from '../utils'
