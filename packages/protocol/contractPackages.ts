@@ -5,7 +5,8 @@ export interface ContractPackage {
   contracstFolder: string
   contracts: string[]
   proxyContracts?: string[]
-  solidityVersion: string
+  truffleConfig: string
+  solidityVersion?: string
 }
 
 export const MENTO_PACKAGE: ContractPackage = {
@@ -35,7 +36,7 @@ export const MENTO_PACKAGE: ContractPackage = {
     'StableTokenEURProxy',
     'StableTokenProxy',
   ],
-  solidityVersion: '0.5',
+  truffleConfig: 'truffle-config.js',
 }
 
 export const SOLIDITY_08_PACKAGE: ContractPackage = {
@@ -51,5 +52,5 @@ export const SOLIDITY_08_PACKAGE: ContractPackage = {
     // TODO make this automatic?
     'GasPriceMinimumProxy',
   ],
-  solidityVersion: '0.8',
+  truffleConfig: 'truffle-config0.8.js',
 }

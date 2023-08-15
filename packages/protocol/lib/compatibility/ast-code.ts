@@ -253,8 +253,8 @@ export function reportASTIncompatibilities(
   oldArtifacts: BuildArtifacts,
   newArtifactsSets: BuildArtifacts[]): ASTCodeCompatibilityReport {
     
-  let out:ASTCodeCompatibilityReport[] = []
-  for (const newArtifacts of newArtifactsSets){
+  let out: ASTCodeCompatibilityReport[] = []
+  for (const newArtifacts of newArtifactsSets) {
     const reports = newArtifacts.listArtifacts()
     .map((newArtifact) => {
       const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)

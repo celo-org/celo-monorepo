@@ -108,32 +108,20 @@ function compile(outdir: string) {
     console.log('contractPackage', contractPackage)
     console.log(`Building external contracts for ${contractPackage.name}`)
 
-    // Waning: Git is currently not fetching submodules when using old versiosn for build
-    // fs.existsSync(`${contractPackage.folderPath}/${contractPackage.path}/contracts`)
-
     const contractPath = path.join(
       './',
       contractPackage.folderPath,
       contractPackage.path,
       contractPackage.contracstFolder
-    ) // `./${contractPackage.folderPath}/${contractPackage.path}/${contractPackage.contracstFolder}`
+    )
     console.log('contractPath', contractPath)
     if (!fs.existsSync(contractPath)) {
-      console.log("Contract Package doesn't exist") // TODO add package name here
+      console.log(`Contract package named ${contractPackage.name} doesn't exist`)
       continue
     }
 
-    let truffleConfig = ''
-    if (contractPackage.solidityVersion === '0.5') {
-      truffleConfig = 'truffle-config.js'
-    } else if (contractPackage.solidityVersion === '0.8') {
-      truffleConfig = 'truffle-config0.8.js'
-    }
-
-    console.log('truffleConfig', truffleConfig)
-
     exec(
-      `yarn run truffle compile --silent --contracts_directory=${contractPath} --contracts_build_directory=./build/contracts-${contractPackage.name} --config ${truffleConfig}` // todo change to outdir
+      `yarn run truffle compile --silent --contracts_directory=${contractPath} --contracts_build_directory=./build/contracts-${contractPackage.name} --config ${contractPackage.truffleConfig}` // todo change to outdir
     )
   }
 

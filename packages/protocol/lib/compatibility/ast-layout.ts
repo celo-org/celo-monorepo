@@ -209,7 +209,7 @@ export const generateCompatibilityReport  = (oldArtifact: Artifact, oldArtifacts
 
 export const reportLayoutIncompatibilities = (oldArtifacts: BuildArtifacts, newArtifactsSets: BuildArtifacts[]): ASTStorageCompatibilityReport[] => {
   let out: ASTStorageCompatibilityReport[] = []
-  for (const newArtifacts of newArtifactsSets){
+  for (const newArtifacts of newArtifactsSets) {
     const reports = newArtifacts.listArtifacts().map((newArtifact) => {
       const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
       if (oldArtifact !== undefined) {

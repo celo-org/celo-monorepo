@@ -243,7 +243,7 @@ export const verifyBytecodes = async (
     (contract) => !ignoredContracts.includes(contract)
     ).filter(
       (contract) => compiledContracts.includes(contract)
-      )//.filter((contract) => (contract != "SortedOracles")) // TODO figure out why this is not getting filtered in 
+      )
       
   console.log("ignoredContractsV9",ignoredContractsV9)
   console.log("queue", queue)
