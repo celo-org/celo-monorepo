@@ -1,7 +1,6 @@
 import { ContractKit } from '@celo/contractkit'
 import { ErrorMessage, PnpQuotaStatus, SignMessageRequest } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
-import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { ACCOUNTS_TABLE } from '../../common/database/models/account'
 import { REQUESTS_TABLE } from '../../common/database/models/request'
@@ -11,17 +10,75 @@ import { Counters, Histograms, meter } from '../../common/metrics'
 import { OdisQuotaStatusResult } from '../../common/quota'
 import { getBlockNumber, getOnChainOdisPayments } from '../../common/web3/contracts'
 import { config } from '../../config'
+import { Context } from '../../server'
 import { PnpSession } from '../session'
 
-type Context = {
-  logger: Logger
-  url: string
-  errors: string[]
+export type QuotaStatusFetcher = (address: string) => Promise<PnpQuotaStatus>
+
+async function getTotalQuota(kit: ContractKit, account: string, ctx: Context): Promise<number> {
+  const { queryPriceInCUSD } = config.quota
+  const totalPaidInWei = await getOnChainOdisPayments(kit, ctx.logger, account, ctx.url)
+  const totalQuota = totalPaidInWei
+    .div(queryPriceInCUSD.times(new BigNumber(1e18)))
+    .integerValue(BigNumber.ROUND_DOWN)
+  // If any account hits an overflow here, we need to redesign how
+  // quota/queries are computed anyways.
+  return totalQuota.toNumber()
 }
 
-interface QuotaService {
-  getQuotaStatus(account: string, ctx: Context): Promise<PnpQuotaStatus>
+async function getQuotaStatus(
+  kit: ContractKit,
+  account: string,
+  ctx: Context,
+  db: Knex
+): Promise<PnpQuotaStatus> {
+  const [performedQueryCount, totalQuota] = await meter(
+    () =>
+      Promise.all([
+        getPerformedQueryCount(db, ACCOUNTS_TABLE.ONCHAIN, account, ctx.logger),
+        getTotalQuota(kit, account, ctx),
+      ]),
+    [],
+    (err: any) => {
+      throw err
+    },
+    Histograms.getRemainingQueryCountInstrumentation,
+    ['getQuotaStatus', ctx.url]
+  )
+
+  return {
+    totalQuota,
+    performedQueryCount,
+  }
 }
+
+export function newQuotaStatusFetcher(
+  kit: ContractKit,
+  db: Knex,
+  ctx: Context
+): QuotaStatusFetcher {
+  return (address: string) => getQuotaStatus(kit, address, ctx, db)
+}
+
+export function newCachingQuotaStatusFetcher(baseFetcher: QuotaStatusFetcher): QuotaStatusFetcher {
+  const cache: Map<string, PnpQuotaStatus> = new Map()
+  // TODO: this doesn't work, caches for eternity
+
+  async function cachedFetcher(address: string): Promise<PnpQuotaStatus> {
+    let cached = cache.get(address)
+    if (!cached) {
+      cached = await baseFetcher(address)
+      cache.set(address, cached)
+    }
+    return cached
+  }
+
+  return cachedFetcher
+}
+
+// interface QuotaService {
+//   getQuotaStatus(account: string, ctx: Context): Promise<PnpQuotaStatus>
+// }
 
 // class CachingQuotaService implements QuotaService {
 //   protected baseService: QuotaService

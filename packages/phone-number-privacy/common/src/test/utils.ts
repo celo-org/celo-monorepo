@@ -85,7 +85,7 @@ export enum ContractRetrieval {
   getOdisPayments = 'getOdisPayments',
 }
 
-export function createMockWeb3(txCount: number, blockNumber: number) {
+export function createMockWeb3(txCount: number, blockNumber?: number) {
   return {
     eth: {
       getTransactionCount: jest.fn(() => txCount),

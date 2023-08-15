@@ -1,6 +1,5 @@
 import {
   authenticateUser,
-  DataEncryptionKeyFetcher,
   ErrorType,
   hasValidAccountParam,
   isBodyReasonablySized,
@@ -19,6 +18,7 @@ import { Request, Response } from 'express'
 import { IO } from '../../../common/io'
 import { Counters } from '../../../common/metrics'
 import { getSignerVersion } from '../../../config'
+import { AccountFetcher } from '../../../server'
 import { PnpSession } from '../../session'
 
 export class PnpQuotaIO extends IO<PnpQuotaRequest> {
@@ -27,7 +27,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   constructor(
     readonly enabled: boolean,
     readonly shouldFailOpen: boolean,
-    readonly dekFetcher: DataEncryptionKeyFetcher
+    readonly accountFetcher: AccountFetcher
   ) {
     super(enabled)
   }
@@ -62,7 +62,13 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     warnings: ErrorType[],
     logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(request, logger, this.dekFetcher, this.shouldFailOpen, warnings)
+    return authenticateUser(
+      request,
+      logger,
+      (address: string) => this.accountFetcher(address).then((a) => a.dek),
+      this.shouldFailOpen,
+      warnings
+    )
   }
 
   sendSuccess(

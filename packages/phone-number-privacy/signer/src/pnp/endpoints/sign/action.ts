@@ -36,8 +36,9 @@ export class PnpSignAction implements Action<SignMessageRequest> {
     // so that these occur atomically and rollback on error.
     await this.db.transaction(async (trx) => {
       const pnpSignHandler = async () => {
-        const ctx = { url: session.request.url, ...session }
-        const quotaStatus = await this.quota.getQuotaStatus(session.request.body.account, ctx, trx)
+        // const ctx = { url: session.request.url, ...session }
+        const { quotaStatus } = await this.io.accountFetcher(session.request.body.account)
+        // const quotaStatus = await this.quota.getQuotaStatus(session.request.body.account, ctx, trx)
 
         let isDuplicateRequest = false
         try {

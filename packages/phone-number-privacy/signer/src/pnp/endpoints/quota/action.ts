@@ -14,8 +14,8 @@ export class PnpQuotaAction implements Action<PnpQuotaRequest> {
   ) {}
 
   public async perform(session: PnpSession<PnpQuotaRequest>, timeoutError: symbol): Promise<void> {
-    const quotaStatus = await timeout(
-      () => this.quota.getQuotaStatus(session),
+    const { quotaStatus } = await timeout(
+      () => this.io.accountFetcher(session.request.body.account),
       [],
       this.config.timeout,
       timeoutError

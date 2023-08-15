@@ -172,7 +172,7 @@ export async function getDataEncryptionKey(
   }
 }
 
-export async function isVerified(
+export async function isVerified( // TODO remove this
   account: string,
   hashedPhoneNumber: string,
   contractKit: ContractKit,

@@ -1,6 +1,5 @@
 import {
   authenticateUser,
-  DataEncryptionKeyFetcher,
   ErrorType,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
@@ -23,6 +22,7 @@ import { IO } from '../../../common/io'
 import { Key } from '../../../common/key-management/key-provider-base'
 import { Counters } from '../../../common/metrics'
 import { getSignerVersion } from '../../../config'
+import { AccountFetcher } from '../../../server'
 import { PnpSession } from '../../session'
 
 export class PnpSignIO extends IO<SignMessageRequest> {
@@ -31,7 +31,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
   constructor(
     readonly enabled: boolean,
     readonly shouldFailOpen: boolean,
-    readonly dekFetcher: DataEncryptionKeyFetcher
+    readonly accountFetcher: AccountFetcher
   ) {
     super(enabled)
   }
@@ -72,7 +72,13 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     warnings: ErrorType[],
     logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(request, logger, this.dekFetcher, this.shouldFailOpen, warnings)
+    return authenticateUser(
+      request,
+      logger,
+      (address: string) => this.accountFetcher(address).then((a) => a.dek),
+      this.shouldFailOpen,
+      warnings
+    )
   }
 
   sendSuccess(

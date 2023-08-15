@@ -5,6 +5,7 @@ import {
   getContractKit,
   loggerMiddleware,
   newContractKitFetcher,
+  PnpQuotaStatus,
   rootLogger,
   SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
@@ -29,9 +30,28 @@ import { PnpQuotaAction } from './pnp/endpoints/quota/action'
 import { PnpQuotaIO } from './pnp/endpoints/quota/io'
 import { PnpSignAction } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
-import { PnpQuotaService } from './pnp/services/quota'
+import {
+  newCachingQuotaStatusFetcher,
+  newQuotaStatusFetcher,
+  PnpQuotaService,
+  QuotaStatusFetcher,
+} from './pnp/services/quota'
 
 require('events').EventEmitter.defaultMaxListeners = 15
+
+export interface Context {
+  logger: Logger
+  url: string
+  errors: string[]
+}
+
+export interface Account {
+  address: string
+  dek: string
+  quotaStatus: PnpQuotaStatus
+}
+
+export type AccountFetcher = (address: string) => Promise<Account>
 
 export function startSigner(
   config: SignerConfig,
@@ -88,6 +108,51 @@ export function startSigner(
   const pnpQuotaService = new PnpQuotaService(db, kit)
   const domainQuotaService = new DomainQuotaService(db)
 
+  function newCachingDekFetcher(baseFetcher: DataEncryptionKeyFetcher): DataEncryptionKeyFetcher {
+    const cache: Map<string, string> = new Map()
+    // TODO: this doesn't work, caches for eternity
+
+    async function cachedDekFetcher(address: string): Promise<string> {
+      let cached = cache.get(address)
+      if (!cached) {
+        cached = await baseFetcher(address)
+        cache.set(address, cached)
+      }
+      return cached
+    }
+
+    return cachedDekFetcher
+  }
+
+  function newAccountFetcher(
+    _dekFetcher: DataEncryptionKeyFetcher,
+    _quotaStatusFetcher: QuotaStatusFetcher
+  ): AccountFetcher {
+    return async (address: string) => {
+      const [dek, quotaStatus] = await Promise.all([
+        _dekFetcher(address),
+        _quotaStatusFetcher(address),
+      ])
+      return { address, dek, quotaStatus }
+    }
+  }
+
+  function newCachingAccountFetcher(baseFetcher: AccountFetcher): AccountFetcher {
+    const cache: Map<string, Account> = new Map()
+    // TODO: this doesn't work, caches for eternity
+
+    async function cachedFetcher(address: string): Promise<Account> {
+      let cached = cache.get(address)
+      if (!cached) {
+        cached = await baseFetcher(address)
+        cache.set(address, cached)
+      }
+      return cached
+    }
+
+    return cachedFetcher
+  }
+
   const dekFetcher = newCachingDekFetcher(
     newContractKitFetcher(
       kit,
@@ -98,6 +163,12 @@ export function startSigner(
     )
   )
 
+  const quotaStatusFetcher = newCachingQuotaStatusFetcher(
+    newQuotaStatusFetcher(kit, db, { logger, url: 'todo', errors: [] })
+  )
+
+  const accountFetcher = newCachingAccountFetcher(newAccountFetcher(dekFetcher, quotaStatusFetcher))
+
   const pnpQuota = new Controller(
     new PnpQuotaAction(
       config,
@@ -105,7 +176,7 @@ export function startSigner(
       new PnpQuotaIO(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen, // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config to make the code cleaner
-        dekFetcher
+        accountFetcher
       )
     )
   )
@@ -118,7 +189,7 @@ export function startSigner(
       new PnpSignIO(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen,
-        dekFetcher
+        accountFetcher
       )
     )
   )
@@ -171,20 +242,4 @@ function getSslOptions(config: SignerConfig) {
     key: fs.readFileSync(sslKeyPath),
     cert: fs.readFileSync(sslCertPath),
   }
-}
-
-function newCachingDekFetcher(baseFetcher: DataEncryptionKeyFetcher): DataEncryptionKeyFetcher {
-  const cache: Map<string, string> = new Map()
-  // TODO: this doesn't work, caches for eternity
-
-  async function cachedDekFetcher(address: string): Promise<string> {
-    let cached = cache.get(address)
-    if (!cached) {
-      cached = await baseFetcher(address)
-      cache.set(address, cached)
-    }
-    return cached
-  }
-
-  return cachedDekFetcher
 }
