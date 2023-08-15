@@ -152,10 +152,10 @@ if (DEV_MODE) {
       fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
     },
     db: {
-      user: 'postgress',
+      user: 'postgres',
       password: 'fakePass',
       database: 'phoneNumber+privacy',
-      host: 'fakeHost',
+      host: '127.0.0.1',
       ssl: false,
     },
   }

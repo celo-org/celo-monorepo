@@ -9,7 +9,7 @@ async function start() {
     client: 'pg',
     connection: config.db,
   }).migrate.latest({
-    directory: './migrations',
+    directory: './src/database/migrations',
     extension: 'ts',
   })
 }
