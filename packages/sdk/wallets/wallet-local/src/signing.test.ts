@@ -77,11 +77,9 @@ describe('Transaction Utils', () => {
 
     test('Signer matches recovered signer', async () => {
       // dont test cip42
-      if (celoTransaction.gasPrice != null || celoTransaction.feeCurrency === null) {
-        expect(recoveredSigner?.toLowerCase()).toEqual(
-          celoTransaction.from!.toString().toLowerCase()
-        )
-      }
+      // if (celoTransaction.gasPrice != null || celoTransaction.feeCurrency === null) {
+      expect(recoveredSigner?.toLowerCase()).toEqual(celoTransaction.from!.toString().toLowerCase())
+      // }
     })
 
     test('Checking nonce', async () => {
