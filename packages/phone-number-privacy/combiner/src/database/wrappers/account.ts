@@ -37,12 +37,8 @@ export async function updateDekSignerRecord(account: string, newDek: string, log
     .then(async (res) => {
       if (res.length) {
         // if account exist
-        await accountTxBase()
-          .having(ACCOUNTS_COLUMNS.dek, 'is', null)
-          .update({ [ACCOUNTS_COLUMNS.dek]: newDek })
-        await accountTxBase()
-          .having(ACCOUNTS_COLUMNS.onChainDataLastUpdated, 'is', null)
-          .update({ [ACCOUNTS_COLUMNS.onChainDataLastUpdated]: new Date() })
+        await accountTxBase().update({ [ACCOUNTS_COLUMNS.dek]: newDek })
+        await accountTxBase().update({ [ACCOUNTS_COLUMNS.onChainDataLastUpdated]: new Date() })
       } else {
         // account does not exits
         const newAccount = new Account(account, newDek)
