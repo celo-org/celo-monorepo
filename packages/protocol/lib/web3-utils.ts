@@ -154,7 +154,14 @@ export async function setInitialProxyImplementation<
 >(web3: Web3, artifacts: any, contractName: string, contractPackage?: ContractPackage, ...args: any[]): Promise<ContractInstance> {
   
   const Contract = ArtifactsSingleton.getInstance(contractPackage, artifacts).require(contractName)
-  const ContractProxy = ArtifactsSingleton.getInstance(contractPackage, artifacts).require(contractName + 'Proxy')
+  let ContractProxy
+  // TODO remove this iff
+  if (contractPackage?.proxiesPath){
+    ContractProxy = artifacts.require(contractName + 'Proxy')
+  } else {
+    ContractProxy = ArtifactsSingleton.getInstance(contractPackage, artifacts).require(contractName + 'Proxy')
+
+  }
 
   await Contract.detectNetwork()
   await ContractProxy.detectNetwork()
@@ -319,7 +326,16 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   let ContractProxy
   if (artifactPath) {
     Contract = makeTruffleContractForMigration(name, artifactPath, web3)
-    ContractProxy = makeTruffleContractForMigration(name + 'Proxy', artifactPath, web3)
+    
+    // TODO generalize this IF
+    if (artifactPath.proxiesPath){
+      // TODO remove the hardcode
+      console.log("Voy al default", name)
+      ContractProxy = artifacts.require(name + 'Proxy')  
+      console.log(ContractProxy)
+    } else {
+      ContractProxy = makeTruffleContractForMigration(name + 'Proxy', artifactPath, web3)
+    }
   } else {
     Contract = artifacts.require(name)
     ContractProxy = artifacts.require(name + 'Proxy')
