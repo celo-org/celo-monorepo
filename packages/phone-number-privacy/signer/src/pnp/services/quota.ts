@@ -13,15 +13,15 @@ import { getBlockNumber, getOnChainOdisPayments } from '../../common/web3/contra
 import { config } from '../../config'
 import { PnpSession } from '../session'
 
-type Context = {
+interface Context {
   logger: Logger
   url: string
   errors: string[]
 }
 
-interface QuotaService {
-  getQuotaStatus(account: string, ctx: Context): Promise<PnpQuotaStatus>
-}
+// interface QuotaService {
+//   getQuotaStatus(account: string, ctx: Context): Promise<PnpQuotaStatus>
+// }
 
 // class CachingQuotaService implements QuotaService {
 //   protected baseService: QuotaService

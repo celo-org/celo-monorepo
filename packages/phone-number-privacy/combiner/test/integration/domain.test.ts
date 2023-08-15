@@ -93,9 +93,6 @@ const signerConfig: SignerConfig = {
       shouldFailOpen: false,
     },
   },
-  attestations: {
-    numberAttestationsRequired: 3,
-  },
   blockchain: {
     provider: 'https://alfajores-forno.celo-testnet.org',
     apiKey: undefined,
