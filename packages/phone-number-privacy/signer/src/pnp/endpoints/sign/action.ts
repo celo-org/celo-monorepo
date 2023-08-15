@@ -157,7 +157,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
               this.config.keystore.keys.phoneNumberPrivacy.latest,
             name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
           }
-          
+
           try {
             span.addEvent('Signing request')
             const signature = await meter(
