@@ -404,7 +404,7 @@ describe('recoverTransaction', () => {
           "value": 1000000000000000000,
           "yParity": 1,
         },
-        "",
+        "0x90AB065B949165c47Acac34cA9A43171bBeBb1E1",
       ]
     `)
   })
@@ -451,7 +451,7 @@ describe('recoverTransaction', () => {
           "value": 1000000000000000000,
           "yParity": 0,
         },
-        "0xc2b863ee5586e7aee4cd9f1cad21a41a50882a6b",
+        "0x1Be31A94361a391bBaFB2a4CCd704F57dc04d4bb",
       ]
     `)
     // expect(recoverTransaction(signed)[1]).toEqual(account.address)
