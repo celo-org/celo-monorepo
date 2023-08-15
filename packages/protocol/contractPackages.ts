@@ -7,6 +7,7 @@ export interface ContractPackage {
   proxyContracts?: string[]
   truffleConfig: string
   solidityVersion?: string
+  proxiesPath?: string
 }
 
 export const MENTO_PACKAGE: ContractPackage = {
@@ -44,6 +45,7 @@ export const SOLIDITY_08_PACKAGE: ContractPackage = {
   contracstFolder: '',
   folderPath: '',
   name: '0.8',
+  proxiesPath: '/', // Proxies are still with 0.8 contracts
   contracts: [
     // TODO make this automatic?
     'GasPriceMinimum',
