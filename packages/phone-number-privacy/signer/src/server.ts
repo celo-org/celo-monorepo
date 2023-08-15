@@ -62,46 +62,6 @@ export function startSigner(
     res.send(PromClient.register.metrics())
   })
 
-  const addEndpoint = (
-    endpoint: SignerEndpoint,
-    handler: (req: Request, res: Response) => Promise<void>
-  ) =>
-    app.post(endpoint, async (req, res) => {
-      // tslint:disable-next-line:no-floating-promises
-      return tracer.startActiveSpan('server - addEndpoint - post', async (parentSpan) => {
-        const childLogger: Logger = res.locals.logger
-        try {
-          parentSpan.addEvent('Called ' + req.path)
-          parentSpan.setAttribute(SemanticAttributes.HTTP_ROUTE, req.path)
-          parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, req.method)
-          parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, req.ip)
-          await handler(req, res)
-        } catch (err: any) {
-          parentSpan.setStatus({
-            code: SpanStatusCode.ERROR,
-            message: 'Fail',
-          })
-          // Handle any errors that otherwise managed to escape the proper handlers
-          childLogger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
-          childLogger.error(err)
-          Counters.errorsCaughtInEndpointHandler.inc()
-          if (!res.headersSent) {
-            childLogger.info('Responding with error in outer endpoint handler')
-            res.status(500).json({
-              success: false,
-              error: ErrorMessage.UNKNOWN_ERROR,
-            })
-          } else {
-            // Getting to this error likely indicates that the `perform` process
-            // does not terminate after sending a response, and then throws an error.
-            childLogger.error(ErrorMessage.ERROR_AFTER_RESPONSE_SENT)
-            Counters.errorsThrownAfterResponseSent.inc()
-          }
-        }
-        parentSpan.end()
-      })
-    })
-
   const pnpQuotaService = new PnpQuotaService(db, kit)
   const domainQuotaService = new DomainQuotaService(db)
 
@@ -156,11 +116,12 @@ export function startSigner(
     new DomainDisableAction(db, config, new DomainDisableIO(config.api.domains.enabled))
   )
   logger.info('Right before adding meteredSignerEndpoints')
-  addEndpoint(SignerEndpoint.PNP_SIGN, pnpSign.handle.bind(pnpSign))
-  addEndpoint(SignerEndpoint.PNP_QUOTA, pnpQuota.handle.bind(pnpQuota))
-  addEndpoint(SignerEndpoint.DOMAIN_QUOTA_STATUS, domainQuota.handle.bind(domainQuota))
-  addEndpoint(SignerEndpoint.DOMAIN_SIGN, domainSign.handle.bind(domainSign))
-  addEndpoint(SignerEndpoint.DISABLE_DOMAIN, domainDisable.handle.bind(domainDisable))
+
+  app.post(SignerEndpoint.PNP_SIGN, createHandler(pnpSign.handle.bind(pnpSign)))
+  app.post(SignerEndpoint.PNP_QUOTA, createHandler(pnpQuota.handle.bind(pnpQuota)))
+  app.post(SignerEndpoint.DOMAIN_QUOTA_STATUS, createHandler(domainQuota.handle.bind(domainQuota)))
+  app.post(SignerEndpoint.DOMAIN_SIGN, createHandler(domainSign.handle.bind(domainSign)))
+  app.post(SignerEndpoint.DISABLE_DOMAIN, createHandler(domainDisable.handle.bind(domainDisable)))
 
   const sslOptions = getSslOptions(config)
   if (sslOptions) {
@@ -204,4 +165,61 @@ function newCachingDekFetcher(baseFetcher: DataEncryptionKeyFetcher): DataEncryp
   }
 
   return cachedDekFetcher
+}
+
+type PromiseHandler = (request: Request, res: Response) => Promise<void>
+
+function catchErrorHandler(handler: PromiseHandler): PromiseHandler {
+  return async (req, res) => {
+    try {
+      await handler(req, res)
+    } catch (err: any) {
+      // Handle any errors that otherwise managed to escape the proper handlers
+      const logger: Logger = res.locals.logger
+      logger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
+      logger.error(err)
+      Counters.errorsCaughtInEndpointHandler.inc()
+
+      if (!res.headersSent) {
+        logger.info('Responding with error in outer endpoint handler')
+        res.status(500).json({
+          success: false,
+          error: ErrorMessage.UNKNOWN_ERROR,
+        })
+      } else {
+        // Getting to this error likely indicates that the `perform` process
+        // does not terminate after sending a response, and then throws an error.
+        logger.error(ErrorMessage.ERROR_AFTER_RESPONSE_SENT)
+        Counters.errorsThrownAfterResponseSent.inc()
+      }
+    }
+  }
+}
+function tracingHandler(handler: PromiseHandler): PromiseHandler {
+  return async (req, res) => {
+    return tracer.startActiveSpan('server - addEndpoint - post', async (parentSpan) => {
+      try {
+        parentSpan.addEvent('Called ' + req.path)
+        parentSpan.setAttribute(SemanticAttributes.HTTP_ROUTE, req.path)
+        parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, req.method)
+        parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, req.ip)
+
+        await handler(req, res)
+      } catch (err: any) {
+        parentSpan.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: 'Fail',
+        })
+        throw err
+      } finally {
+        parentSpan.end()
+      }
+    })
+  }
+}
+
+function createHandler(
+  handler: (request: Request, res: Response) => Promise<void>
+): RequestHandler {
+  return catchErrorHandler(tracingHandler(handler))
 }
