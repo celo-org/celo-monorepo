@@ -9,10 +9,11 @@ import {
   SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import express, { Request, RequestHandler, Response } from 'express'
+import express, { Express, Request, RequestHandler, Response } from 'express'
 import fs from 'fs'
 import https from 'https'
 import { Knex } from 'knex'
+import { IncomingMessage, ServerResponse } from 'node:http'
 import * as PromClient from 'prom-client'
 import { Controller } from './common/controller'
 import { KeyProvider } from './common/key-management/key-provider-base'
@@ -31,6 +32,10 @@ import { PnpSignAction } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
 import { PnpQuotaService } from './pnp/services/quota'
 
+import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
+const tracer = opentelemetry.trace.getTracer('signer-tracer')
+
 require('events').EventEmitter.defaultMaxListeners = 15
 
 export function startSigner(
@@ -38,7 +43,7 @@ export function startSigner(
   db: Knex,
   keyProvider: KeyProvider,
   kit?: ContractKit
-) {
+): Express | https.Server<typeof IncomingMessage, typeof ServerResponse> {
   const logger = rootLogger(config.serviceName)
 
   kit = kit ?? getContractKit(config.blockchain)
@@ -62,27 +67,39 @@ export function startSigner(
     handler: (req: Request, res: Response) => Promise<void>
   ) =>
     app.post(endpoint, async (req, res) => {
-      const childLogger: Logger = res.locals.logger
-      try {
-        await handler(req, res)
-      } catch (err: any) {
-        // Handle any errors that otherwise managed to escape the proper handlers
-        childLogger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
-        childLogger.error(err)
-        Counters.errorsCaughtInEndpointHandler.inc()
-        if (!res.headersSent) {
-          childLogger.info('Responding with error in outer endpoint handler')
-          res.status(500).json({
-            success: false,
-            error: ErrorMessage.UNKNOWN_ERROR,
+      // tslint:disable-next-line:no-floating-promises
+      return tracer.startActiveSpan('server - addEndpoint - post', async (parentSpan) => {
+        const childLogger: Logger = res.locals.logger
+        try {
+          parentSpan.addEvent('Called ' + req.path)
+          parentSpan.setAttribute(SemanticAttributes.HTTP_ROUTE, req.path)
+          parentSpan.setAttribute(SemanticAttributes.HTTP_METHOD, req.method)
+          parentSpan.setAttribute(SemanticAttributes.HTTP_CLIENT_IP, req.ip)
+          await handler(req, res)
+        } catch (err: any) {
+          parentSpan.setStatus({
+            code: SpanStatusCode.ERROR,
+            message: 'Fail',
           })
-        } else {
-          // Getting to this error likely indicates that the `perform` process
-          // does not terminate after sending a response, and then throws an error.
-          childLogger.error(ErrorMessage.ERROR_AFTER_RESPONSE_SENT)
-          Counters.errorsThrownAfterResponseSent.inc()
+          // Handle any errors that otherwise managed to escape the proper handlers
+          childLogger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
+          childLogger.error(err)
+          Counters.errorsCaughtInEndpointHandler.inc()
+          if (!res.headersSent) {
+            childLogger.info('Responding with error in outer endpoint handler')
+            res.status(500).json({
+              success: false,
+              error: ErrorMessage.UNKNOWN_ERROR,
+            })
+          } else {
+            // Getting to this error likely indicates that the `perform` process
+            // does not terminate after sending a response, and then throws an error.
+            childLogger.error(ErrorMessage.ERROR_AFTER_RESPONSE_SENT)
+            Counters.errorsThrownAfterResponseSent.inc()
+          }
         }
-      }
+        parentSpan.end()
+      })
     })
 
   const pnpQuotaService = new PnpQuotaService(db, kit)

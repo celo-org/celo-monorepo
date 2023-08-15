@@ -4,6 +4,7 @@ import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
+import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import Logger from 'bunyan'
 import crypto from 'crypto'
 import { Request } from 'express'
@@ -15,6 +16,8 @@ import {
   PhoneNumberPrivacyRequest,
 } from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
+
+const tracer = opentelemetry.trace.getTracer('signer-tracer')
 
 export type DataEncryptionKeyFetcher = (address: string) => Promise<string>
 
@@ -47,53 +50,87 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   shouldFailOpen: boolean = false,
   warnings: ErrorType[] = []
 ): Promise<boolean> {
-  logger.debug('Authenticating user')
+  return tracer.startActiveSpan('Authentication - authenticateUser', async (span) => {
+    logger.debug('Authenticating user')
+    span.addEvent('Authenticating user')
 
-  // https://tools.ietf.org/html/rfc7235#section-4.2
-  const messageSignature = request.get('Authorization')
-  const message = JSON.stringify(request.body)
-  const signer = request.body.account
-  const authMethod = request.body.authenticationMethod
+    // https://tools.ietf.org/html/rfc7235#section-4.2
+    const messageSignature = request.get('Authorization')
+    const message = JSON.stringify(request.body)
+    const signer = request.body.account
+    const authMethod = request.body.authenticationMethod
 
-  if (!messageSignature || !signer) {
-    return false
-  }
-
-  if (authMethod && authMethod === AuthenticationMethod.ENCRYPTION_KEY) {
-    let registeredEncryptionKey
-    try {
-      registeredEncryptionKey = await fetchDEK(signer)
-    } catch (err) {
-      // getDataEncryptionKey should only throw if there is a full-node connection issue.
-      // That is, it does not throw if the DEK is undefined or invalid
-      const failureStatus = shouldFailOpen ? ErrorMessage.FAILING_OPEN : ErrorMessage.FAILING_CLOSED
-      logger.error({
-        err,
-        warning: ErrorMessage.FAILURE_TO_GET_DEK,
-        failureStatus,
+    if (!messageSignature || !signer) {
+      span.addEvent('No messageSignature or signer')
+      span.setStatus({
+        code: SpanStatusCode.ERROR,
+        message: 'No messageSignature or signer',
       })
-      warnings.push(ErrorMessage.FAILURE_TO_GET_DEK, failureStatus)
-      return shouldFailOpen
-    }
-    if (!registeredEncryptionKey) {
-      logger.warn({ account: signer }, 'Account does not have registered encryption key')
+      span.end()
       return false
-    } else {
-      logger.info({ dek: registeredEncryptionKey, account: signer }, 'Found DEK for account')
-      if (verifyDEKSignature(message, messageSignature, registeredEncryptionKey, logger)) {
-        return true
+    }
+
+    if (authMethod && authMethod === AuthenticationMethod.ENCRYPTION_KEY) {
+      span.addEvent('Authenticating user with encryption key')
+      let registeredEncryptionKey
+      try {
+        span.addEvent('Getting data emcryption key')
+        registeredEncryptionKey = await fetchDEK(signer)
+      } catch (err) {
+        // getDataEncryptionKey should only throw if there is a full-node connection issue.
+        // That is, it does not throw if the DEK is undefined or invalid
+        const failureStatus = shouldFailOpen
+          ? ErrorMessage.FAILING_OPEN
+          : ErrorMessage.FAILING_CLOSED
+        logger.error({
+          err,
+          warning: ErrorMessage.FAILURE_TO_GET_DEK,
+          failureStatus,
+        })
+        warnings.push(ErrorMessage.FAILURE_TO_GET_DEK, failureStatus)
+        span.addEvent('Error with full-node connection issue')
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: ErrorMessage.FAILURE_TO_GET_DEK + failureStatus,
+        })
+        span.end()
+        return shouldFailOpen
+      }
+      if (!registeredEncryptionKey) {
+        logger.warn({ account: signer }, 'Account does not have registered encryption key')
+        span.addEvent('Account does not have registered encryption key')
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: 'Account does not have registered encryption key',
+        })
+        span.end()
+        return false
+      } else {
+        span.addEvent('Verifying with DEK')
+        logger.info({ dek: registeredEncryptionKey, account: signer }, 'Found DEK for account')
+        if (verifyDEKSignature(message, messageSignature, registeredEncryptionKey, logger)) {
+          span.addEvent('DEK verification OK')
+          span.setStatus({
+            code: SpanStatusCode.OK,
+            message: 'DEK verifycation OK',
+          })
+          span.end()
+          return true
+        }
       }
     }
-  }
 
-  // Fallback to previous signing pattern
-  logger.info(
-    { account: signer, message, messageSignature },
-    'Message was not authenticated with DEK, attempting to authenticate using wallet key'
-  )
-  // TODO This uses signature utils, why doesn't DEK authentication?
-  // (https://github.com/celo-org/celo-monorepo/issues/9803)
-  return verifySignature(message, messageSignature, signer)
+    // Fallback to previous signing pattern
+    logger.info(
+      { account: signer, message, messageSignature },
+      'Message was not authenticated with DEK, attempting to authenticate using wallet key'
+    )
+    // TODO This uses signature utils, why doesn't DEK authentication?
+    // (https://github.com/celo-org/celo-monorepo/issues/9803)
+    span.addEvent('Verifying with wallet key')
+    span.end()
+    return verifySignature(message, messageSignature, signer)
+  })
 }
 
 export function getMessageDigest(message: string) {
