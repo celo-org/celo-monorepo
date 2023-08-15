@@ -1,4 +1,7 @@
+// import opentelemetry from '@opentelemetry/api'
 import * as client from 'prom-client'
+
+// const tracer = opentelemetry.trace.getTracer('signer-tracer')
 const { Counter, Histogram } = client
 
 client.collectDefaultMetrics()
@@ -129,7 +132,7 @@ export async function meter<T extends any[], U>(
     .finally(_meter)
 }
 
-export function withMeter(
+export function newMeter(
   histogram: client.Histogram<string>,
   ...labels: string[]
 ): <U>(fn: () => Promise<U>) => Promise<U> {

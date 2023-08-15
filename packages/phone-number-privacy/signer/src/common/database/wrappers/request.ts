@@ -2,7 +2,7 @@ import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { config } from '../../../config'
-import { Histograms, meter } from '../../metrics'
+import { Histograms, newMeter } from '../../metrics'
 import {
   PnpSignRequestRecord,
   REQUESTS_COLUMNS,
@@ -23,8 +23,9 @@ export async function getRequestExists( // TODO try insert, if primary key error
   logger: Logger,
   trx?: Knex.Transaction
 ): Promise<boolean> {
-  return meter(
-    async () => {
+  const meter = newMeter(Histograms.dbOpsInstrumentation, 'getRequestExists')
+  return meter(async () => {
+    try {
       logger.debug(
         `Checking if request exists for account: ${account}, blindedQuery: ${blindedQuery}`
       )
@@ -36,15 +37,13 @@ export async function getRequestExists( // TODO try insert, if primary key error
         .first()
         .timeout(config.db.timeout)
       return !!existingRequest
-    },
-    [],
-    (err: any) => countAndThrowDBError<boolean>(err, logger, ErrorMessage.DATABASE_GET_FAILURE),
-    Histograms.dbOpsInstrumentation,
-    ['getRequestExists']
-  )
+    } catch (err: any) {
+      return countAndThrowDBError<boolean>(err, logger, ErrorMessage.DATABASE_GET_FAILURE)
+    }
+  })
 }
 
-export async function storeRequest( //
+export async function storeRequest(
   db: Knex,
   requestsTable: REQUESTS_TABLE,
   account: string,
@@ -52,16 +51,15 @@ export async function storeRequest( //
   logger: Logger,
   trx?: Knex.Transaction
 ): Promise<void> {
-  return meter(
-    async () => {
+  const meter = newMeter(Histograms.dbOpsInstrumentation, 'storeRequest')
+  return meter(async () => {
+    try {
       logger.debug(`Storing salt request for: ${account}, blindedQuery: ${blindedQuery}`)
       await queryWithOptionalTrx(requests(db, requestsTable), trx)
         .insert(toPnpSignRequestRecord(account, blindedQuery))
         .timeout(config.db.timeout)
-    },
-    [],
-    (err: any) => countAndThrowDBError(err, logger, ErrorMessage.DATABASE_INSERT_FAILURE),
-    Histograms.dbOpsInstrumentation,
-    ['storeRequest']
-  )
+    } catch (err: any) {
+      return countAndThrowDBError(err, logger, ErrorMessage.DATABASE_INSERT_FAILURE)
+    }
+  })
 }

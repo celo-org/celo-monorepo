@@ -7,7 +7,7 @@ import { ACCOUNTS_TABLE } from '../../common/database/models/account'
 import { REQUESTS_TABLE } from '../../common/database/models/request'
 import { getPerformedQueryCount, incrementQueryCount } from '../../common/database/wrappers/account'
 import { storeRequest } from '../../common/database/wrappers/request'
-import { Counters, Histograms, withMeter } from '../../common/metrics'
+import { Counters, Histograms, newMeter } from '../../common/metrics'
 import { OdisQuotaStatusResult } from '../../common/quota'
 import { getBlockNumber, getOnChainOdisPayments } from '../../common/web3/contracts'
 import { config } from '../../config'
@@ -86,7 +86,7 @@ export class PnpQuotaService {
     ctx: Context,
     trx?: Knex.Transaction
   ): Promise<PnpQuotaStatus> {
-    const meter = withMeter(
+    const meter = newMeter(
       Histograms.getRemainingQueryCountInstrumentation,
       'getQuotaStatus',
       ctx.url
@@ -142,7 +142,7 @@ export class PnpQuotaService {
   }
 
   private async getTotalQuota(account: string, ctx: Context): Promise<number> {
-    const meter = withMeter(
+    const meter = newMeter(
       Histograms.getRemainingQueryCountInstrumentation,
       'getTotalQuota',
       ctx.url
