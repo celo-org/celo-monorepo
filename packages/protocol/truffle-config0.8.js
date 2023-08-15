@@ -3,6 +3,7 @@ networks = parent.networks
 
 const SOLC_VERSION = '0.8.19'
 
+console.log(`Using truffle version for Solidity ${SOLC_VERSION}`)
 module.exports = {
   plugins: ['truffle-security', 'truffle-plugin-blockscout-verify'],
   compilers: {

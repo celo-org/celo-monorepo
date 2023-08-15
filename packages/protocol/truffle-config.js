@@ -1,20 +1,7 @@
-// Agarrar a mano las variables que importan
-
-// export * from './truffle-config-parent.js'
-
-// const fs = require('fs')
-
-// Hack to import all the variables of parent
-
-// let parentFile = fs.readFileSync('./truffle-config-parent.js', 'utf8')
-
-// console.log('parentFile', parentFile)
-// eval(parentFile)
-
 parent = require('./truffle-config-parent.js')
 networks = parent.networks
-// import networks from
 
+console.log(`Using truffle version for Solidity ${SOLC_VERSION}`)
 const SOLC_VERSION = '0.5.13'
 console.log('Using old truffle version')
 
