@@ -7,26 +7,22 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { BigNumber } from 'bignumber.js'
 import Logger from 'bunyan'
-import { Counters, Histograms, Labels, meter, newMeter } from '../metrics'
+import { Counters, Histograms, Labels, newMeter } from '../metrics'
 
 export async function getBlockNumber(kit: ContractKit): Promise<number> {
-  // TODO delete
-  return meter(
-    retryAsyncWithBackOffAndTimeout,
-    [
+  const _meter = newMeter(Histograms.getBlindedSigInstrumentation, 'getBlockNumber')
+  return _meter(() =>
+    retryAsyncWithBackOffAndTimeout(
       () => kit.connection.getBlockNumber(),
       RETRY_COUNT,
       [],
       RETRY_DELAY_IN_MS,
       undefined,
-      FULL_NODE_TIMEOUT_IN_MS,
-    ],
-    (err: any) => {
+      FULL_NODE_TIMEOUT_IN_MS
+    ).catch((err) => {
       Counters.blockchainErrors.labels(Labels.READ).inc()
       throw err
-    },
-    Histograms.getBlindedSigInstrumentation,
-    ['getBlockNumber']
+    })
   )
 }
 
