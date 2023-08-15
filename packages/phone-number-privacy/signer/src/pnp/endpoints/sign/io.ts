@@ -26,6 +26,10 @@ import { Counters } from '../../../common/metrics'
 import { getSignerVersion } from '../../../config'
 import { PnpSession } from '../../session'
 
+import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
+const tracer = opentelemetry.trace.getTracer('signer-tracer')
+
 export class PnpSignIO extends IO<SignMessageRequest> {
   readonly endpoint = SignerEndpoint.PNP_SIGN
 
@@ -44,22 +48,54 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<SignMessageResponse>
   ): Promise<PnpSession<SignMessageRequest> | null> {
-    const logger = response.locals.logger
-    const warnings: ErrorType[] = []
-    if (!super.inputChecks(request, response)) {
-      return null
-    }
-    if (!requestHasValidKeyVersion(request, logger)) {
-      this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
-      return null
-    }
-    if (!(await this.authenticate(request, warnings, logger))) {
-      this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
-      return null
-    }
-    const session = new PnpSession(request, response)
-    session.errors.push(...warnings)
-    return session
+    return tracer.startActiveSpan('pnpSignIO - init', async (span) => {
+      const logger = response.locals.logger
+      const warnings: ErrorType[] = []
+      span.addEvent('Calling inputChecks')
+      if (!super.inputChecks(request, response)) {
+        span.addEvent('Error calling inputChecks')
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: response.statusMessage,
+        })
+        span.end()
+        return null
+      }
+      span.addEvent('inputChecks OK, Calling requestHasValidKeyVersion')
+      if (!requestHasValidKeyVersion(request, logger)) {
+        span.addEvent('Error request has invalid key version.')
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: WarningMessage.INVALID_KEY_VERSION_REQUEST,
+        })
+        span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, 400)
+        this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
+        span.end()
+        return null
+      }
+      span.addEvent('requestHasValidKeyVersion OK, Calling authenticate')
+      if (!(await this.authenticate(request, warnings, logger))) {
+        span.addEvent('Error calling authenticate')
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: WarningMessage.UNAUTHENTICATED_USER,
+        })
+        span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, 401)
+        this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
+        span.end()
+        return null
+      }
+      span.addEvent('Authenticate OK, creating session')
+      const session = new PnpSession(request, response)
+      session.errors.push(...warnings)
+      span.addEvent('Session created')
+      span.setStatus({
+        code: SpanStatusCode.OK,
+        message: response.statusMessage,
+      })
+      span.end()
+      return session
+    })
   }
 
   validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, SignMessageRequest> {
@@ -102,20 +138,29 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     quotaStatus: PnpQuotaStatus,
     warnings: string[]
   ) {
-    response.set(KEY_VERSION_HEADER, key.version.toString())
-    send(
-      response,
-      {
-        success: true,
-        version: getSignerVersion(),
-        signature,
-        ...quotaStatus,
-        warnings,
-      },
-      status,
-      response.locals.logger
-    )
-    Counters.responses.labels(this.endpoint, status.toString()).inc()
+    return tracer.startActiveSpan(`pnpSignIO - sendSuccess`, (span) => {
+      span.addEvent('Sending Success')
+      response.set(KEY_VERSION_HEADER, key.version.toString())
+      send(
+        response,
+        {
+          success: true,
+          version: getSignerVersion(),
+          signature,
+          ...quotaStatus,
+          warnings,
+        },
+        status,
+        response.locals.logger
+      )
+      span.setAttribute(SemanticAttributes.HTTP_METHOD, status)
+      span.setStatus({
+        code: SpanStatusCode.OK,
+        message: response.statusMessage,
+      })
+      Counters.responses.labels(this.endpoint, status.toString()).inc()
+      span.end()
+    })
   }
 
   sendFailure(
@@ -124,17 +169,26 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     response: Response<SignMessageResponseFailure>,
     quotaStatus?: PnpQuotaStatus
   ) {
-    send(
-      response,
-      {
-        success: false,
-        version: getSignerVersion(),
-        error,
-        ...quotaStatus,
-      },
-      status,
-      response.locals.logger
-    )
-    Counters.responses.labels(this.endpoint, status.toString()).inc()
+    return tracer.startActiveSpan(`pnpSignIO - sendFailure`, (span) => {
+      span.addEvent('Sending Failure')
+      send(
+        response,
+        {
+          success: false,
+          version: getSignerVersion(),
+          error,
+          ...quotaStatus,
+        },
+        status,
+        response.locals.logger
+      )
+      span.setAttribute(SemanticAttributes.HTTP_METHOD, status)
+      span.setStatus({
+        code: SpanStatusCode.ERROR,
+        message: error,
+      })
+      Counters.responses.labels(this.endpoint, status.toString()).inc()
+      span.end()
+    })
   }
 }

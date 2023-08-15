@@ -1,7 +1,6 @@
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { serializeSignature, Signature, signMessage } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
-import Web3 from 'web3'
 import {
   AuthenticationMethod,
   PhoneNumberPrivacyRequest,
@@ -50,7 +49,7 @@ export function createMockOdisPayments(totalPaidCUSDFunc: jest.Mock<BigNumber, [
 
 export function createMockContractKit(
   c: { [contractName in ContractRetrieval]?: any },
-  mockWeb3?: any
+  mockWeb3: any
 ) {
   const contracts: any = {}
   for (const t of Object.keys(c)) {
@@ -66,8 +65,7 @@ export function createMockContractKit(
   }
 }
 
-export function createMockConnection(mockWeb3?: any) {
-  mockWeb3 = mockWeb3 ?? new Web3()
+export function createMockConnection(mockWeb3: any) {
   return {
     web3: mockWeb3,
     getTransactionCount: jest.fn(() => mockWeb3.eth.getTransactionCount()),
