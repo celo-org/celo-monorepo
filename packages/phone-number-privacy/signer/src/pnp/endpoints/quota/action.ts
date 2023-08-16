@@ -1,7 +1,6 @@
 import {
   authenticateUser,
   DataEncryptionKeyFetcher,
-  ErrorMessage,
   ErrorType,
   hasValidAccountParam,
   isBodyReasonablySized,
@@ -36,23 +35,15 @@ export function createPnpQuotaHandler(
       url: request.baseUrl,
       errors: warnings,
     })
-    if (quotaStatus.performedQueryCount > -1 && quotaStatus.totalQuota > -1) {
-      return {
-        status: 200,
-        body: {
-          success: true,
-          version: getSignerVersion(),
-          ...quotaStatus,
-          warnings,
-        },
-      }
-    } else {
-      return errorResult(
-        500,
-        quotaStatus.performedQueryCount === -1
-          ? ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT
-          : ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA
-      )
+
+    return {
+      status: 200,
+      body: {
+        success: true,
+        version: getSignerVersion(),
+        ...quotaStatus,
+        warnings,
+      },
     }
   })
 }

@@ -181,7 +181,6 @@ describe('pnp', () => {
             version: expectedVersion,
             performedQueryCount: 0,
             totalQuota: expectedTotalQuota,
-            blockNumber: testBlockNumber,
             warnings: [],
           })
         })
@@ -205,7 +204,6 @@ describe('pnp', () => {
           version: res.body.version,
           performedQueryCount: 0,
           totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
           warnings: [],
         })
       })
@@ -221,7 +219,6 @@ describe('pnp', () => {
           version: res1.body.version,
           performedQueryCount: 0,
           totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
           warnings: [],
         })
         const res2 = await sendRequest(req, authorization, SignerEndpoint.PNP_QUOTA)
@@ -240,7 +237,6 @@ describe('pnp', () => {
           version: res.body.version,
           performedQueryCount: 0,
           totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
           warnings: [],
         })
       })
@@ -257,7 +253,6 @@ describe('pnp', () => {
           version: expectedVersion,
           performedQueryCount: 0,
           totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
           warnings: [],
         })
       })
@@ -284,7 +279,6 @@ describe('pnp', () => {
           version: res.body.version,
           performedQueryCount: expectedQuota + 1,
           totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
           warnings: [],
         })
       })
@@ -393,7 +387,6 @@ describe('pnp', () => {
             version: expectedVersion,
             performedQueryCount: 0,
             totalQuota: expectedQuota,
-            blockNumber: testBlockNumber,
             warnings: [ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_OPEN],
           })
         })
@@ -414,7 +407,7 @@ describe('pnp', () => {
           expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
             success: false,
             version: expectedVersion,
-            error: ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT,
+            error: ErrorMessage.FAILURE_TO_GET_ACCOUNT,
           })
 
           spy.mockRestore()
@@ -432,7 +425,7 @@ describe('pnp', () => {
           expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
             success: false,
             version: expectedVersion,
-            error: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA,
+            error: ErrorMessage.FAILURE_TO_GET_ACCOUNT,
           })
         })
 
@@ -507,7 +500,6 @@ describe('pnp', () => {
               signature: expectedSignature,
               performedQueryCount: 1, // incremented for signature request
               totalQuota: expectedTotalQuota,
-              blockNumber: testBlockNumber,
               warnings: [],
             })
           } else {
@@ -517,7 +509,6 @@ describe('pnp', () => {
               version: expectedVersion,
               performedQueryCount: 0,
               totalQuota: expectedTotalQuota,
-              blockNumber: testBlockNumber,
               error: WarningMessage.EXCEEDED_QUOTA,
             })
           }
@@ -559,7 +550,6 @@ describe('pnp', () => {
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
           warnings: [],
         })
         expect(res.get(KEY_VERSION_HEADER)).toEqual(
@@ -582,7 +572,6 @@ describe('pnp', () => {
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
           warnings: [],
         })
       })
@@ -603,7 +592,6 @@ describe('pnp', () => {
             signature: expectedSignatures[i - 1],
             performedQueryCount: performedQueryCount + 1,
             totalQuota: expectedQuota,
-            blockNumber: testBlockNumber,
             warnings: [],
           })
           expect(res.get(KEY_VERSION_HEADER)).toEqual(i.toString())
@@ -625,7 +613,6 @@ describe('pnp', () => {
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
           warnings: [],
         })
         const res2 = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -651,7 +638,6 @@ describe('pnp', () => {
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
           warnings: [],
         })
       })
@@ -783,7 +769,6 @@ describe('pnp', () => {
           version: expectedVersion,
           performedQueryCount: expectedQuota,
           totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
           error: WarningMessage.EXCEEDED_QUOTA,
         })
       })
@@ -810,7 +795,6 @@ describe('pnp', () => {
           version: expectedVersion,
           performedQueryCount: 0,
           totalQuota: 0,
-          blockNumber: testBlockNumber,
           error: WarningMessage.EXCEEDED_QUOTA,
         })
 
@@ -846,7 +830,6 @@ describe('pnp', () => {
           version: expectedVersion,
           performedQueryCount: expectedQuota + 1,
           totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
           error: WarningMessage.EXCEEDED_QUOTA,
         })
       })
@@ -865,7 +848,6 @@ describe('pnp', () => {
           version: expectedVersion,
           performedQueryCount: performedQueryCount,
           totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
           error: ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
         })
       })
@@ -945,9 +927,8 @@ describe('pnp', () => {
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: expectedVersion,
-            performedQueryCount: -1,
-            totalQuota: expectedQuota,
-            blockNumber: testBlockNumber,
+            performedQueryCount: 1,
+            totalQuota: 1,
             error: ErrorMessage.DATABASE_GET_FAILURE,
           })
 
@@ -1078,8 +1059,8 @@ describe('pnp', () => {
             signature: expectedSignature,
             performedQueryCount: expectedQuota + 1, // bc we depleted the user's quota above
             totalQuota: Number.MAX_SAFE_INTEGER,
-            blockNumber: testBlockNumber,
-            warnings: [ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA, ErrorMessage.FULL_NODE_ERROR],
+            warnings: [ErrorMessage.FAILURE_TO_GET_ACCOUNT],
+            // warnings: [ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA, ErrorMessage.FULL_NODE_ERROR],
           })
 
           // check DB state: performedQueryCount was incremented and request was stored
@@ -1137,7 +1118,6 @@ describe('pnp', () => {
             version: expectedVersion,
             performedQueryCount: performedQueryCount,
             totalQuota: -1,
-            blockNumber: testBlockNumber,
             error: ErrorMessage.FULL_NODE_ERROR,
           })
         })
@@ -1261,7 +1241,6 @@ describe('pnp', () => {
             signature: expectedSignature,
             performedQueryCount: performedQueryCount + 1,
             totalQuota: expectedQuota,
-            blockNumber: testBlockNumber,
             warnings: [ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_OPEN],
           })
         })
@@ -1287,7 +1266,6 @@ describe('pnp', () => {
             version: expectedVersion,
             performedQueryCount: performedQueryCount,
             totalQuota: expectedQuota,
-            blockNumber: testBlockNumber,
             error: ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
           })
 
@@ -1338,7 +1316,6 @@ describe('pnp', () => {
             version: expectedVersion,
             performedQueryCount: performedQueryCount,
             totalQuota: expectedQuota,
-            blockNumber: testBlockNumber,
             error: ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
           })
 

@@ -28,7 +28,7 @@ import { DomainSignIO } from './domain/endpoints/sign/io'
 import { DomainQuotaService } from './domain/services/quota'
 import { createPnpQuotaHandler } from './pnp/endpoints/quota/action'
 import { createPnpSignHandler } from './pnp/endpoints/sign/action'
-import { PnpQuotaService } from './pnp/services/quota'
+import { DefaultPnpQuotaService } from './pnp/services/quota'
 
 import {
   catchErrorHandler,
@@ -66,7 +66,7 @@ export function startSigner(
     res.send(PromClient.register.metrics())
   })
 
-  const pnpQuotaService = new PnpQuotaService(db, kit)
+  const pnpQuotaService = new DefaultPnpQuotaService(db, kit)
   const domainQuotaService = new DomainQuotaService(db)
 
   const dekFetcher = newCachingDekFetcher(

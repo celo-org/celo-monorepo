@@ -8,6 +8,7 @@ import {
   hasValidBlindedPhoneNumberParam,
   isBodyReasonablySized,
   KEY_VERSION_HEADER,
+  PnpQuotaStatus,
   requestHasValidKeyVersion,
   SignMessageRequest,
   SignMessageRequestSchema,
@@ -26,8 +27,8 @@ import { PnpQuotaService } from '../../services/quota'
 import { errorResult, PromiseHandler, Result, resultHandler } from '../../../common/handler'
 
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
 import Logger from 'bunyan'
+import { OdisError } from '../../../common/error'
 const tracer = opentelemetry.trace.getTracer('signer-tracer')
 
 export function createPnpSignHandler(
@@ -36,6 +37,7 @@ export function createPnpSignHandler(
   quota: PnpQuotaService,
   keyProvider: KeyProvider,
   shouldFailOpen: boolean,
+
   dekFetcher: DataEncryptionKeyFetcher
 ): PromiseHandler {
   return resultHandler(
@@ -63,8 +65,21 @@ export function createPnpSignHandler(
             errors: warnings,
           }
 
-          let quotaStatus = await quota.getQuotaStatus(request.body.account, ctx)
-          span.addEvent('Got quotaStatus')
+          let quotaStatus: PnpQuotaStatus
+          try {
+            quotaStatus = await quota.getQuotaStatus(request.body.account, ctx)
+          } catch (err: any) {
+            // TODO review this logic
+            if (shouldFailOpen && err instanceof OdisError) {
+              warnings.push(err.code)
+              quotaStatus = {
+                performedQueryCount: 0,
+                totalQuota: 1,
+              }
+            } else {
+              throw err
+            }
+          }
 
           const duplicateRequest = await isDuplicateRequest(
             db,
@@ -73,67 +88,16 @@ export function createPnpSignHandler(
             logger
           )
 
-          if (duplicateRequest) {
-            span.addEvent('Request already exists in db')
-            Counters.duplicateRequests.inc()
-            logger.info(
-              'Request already exists in db. Will service request without charging quota.'
-            )
-            warnings.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
-          } else {
-            // In the case of a database connection failure, performedQueryCount will be -1
-            if (quotaStatus.performedQueryCount === -1) {
-              span.addEvent('Database connection failure')
-              span.setStatus({
-                code: SpanStatusCode.ERROR,
-                message: ErrorMessage.DATABASE_GET_FAILURE,
-              })
-              return errorResult(500, ErrorMessage.DATABASE_GET_FAILURE, quotaStatus)
-            }
+          if (!duplicateRequest && quotaStatus.totalQuota <= quotaStatus.performedQueryCount) {
+            logger.warn({ ...quotaStatus }, 'No remaining quota')
 
-            // In the case of a blockchain connection failure, totalQuota will be -1
-            if (quotaStatus.totalQuota === -1 && !shouldFailOpen) {
-              span.addEvent('Blockchain connection failure FailClosed')
-              span.setStatus({
-                code: SpanStatusCode.ERROR,
-                message: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA + ErrorMessage.FAILING_CLOSED,
-              })
-              span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, 500)
-              logger.warn(
-                { warning: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA },
-                ErrorMessage.FAILING_CLOSED
-              )
-              Counters.requestsFailingClosed.inc()
+            const remainingQuota = quotaStatus.totalQuota - quotaStatus.performedQueryCount
+            Histograms.userRemainingQuotaAtRequest.labels(ctx.url).observe(remainingQuota)
 
-              return errorResult(500, ErrorMessage.FULL_NODE_ERROR, quotaStatus)
-            }
-
-            if (quotaStatus.totalQuota === -1 && shouldFailOpen) {
-              span.addEvent('Blockchain connection failure FailOpen')
-              span.setStatus({
-                code: SpanStatusCode.ERROR,
-                message: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA + ErrorMessage.FAILING_OPEN,
-              })
-              // We fail open and service requests on full-node errors to not block the user.
-              // Error messages are stored in the session and included along with the signature in the response.
-              quotaStatus.totalQuota = Number.MAX_SAFE_INTEGER
-              logger.warn(
-                { warning: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA },
-                ErrorMessage.FAILING_OPEN
-              )
-              Counters.requestsFailingOpen.inc()
-            }
-
-            if (quotaStatus.totalQuota <= quotaStatus.performedQueryCount) {
-              const remainingQuota = quotaStatus.totalQuota - quotaStatus.performedQueryCount
-              Histograms.userRemainingQuotaAtRequest.labels(ctx.url).observe(remainingQuota)
-              ctx.logger.warn({ ...quotaStatus }, 'No remaining quota')
-              // if (this.bypassQuotaForE2ETesting(body)) {
-              //   Counters.testQuotaBypassedRequests.inc()
-              //   ctx.logger.info(body, 'Request will bypass quota check for e2e testing')
-              //   sufficient = true
-              // }
-
+            if (bypassQuotaForE2ETesting(config.test_quota_bypass_percentage, request.body)) {
+              Counters.testQuotaBypassedRequests.inc()
+              logger.info(request.body, 'Request will bypass quota check for e2e testing')
+            } else {
               span.addEvent('Not sufficient Quota')
               span.setStatus({
                 code: SpanStatusCode.ERROR,
@@ -152,37 +116,38 @@ export function createPnpSignHandler(
 
           let signature: string
           try {
-            span.addEvent('Signing request')
             signature = await sign(
               request.body.blindedQueryPhoneNumber,
               key,
               keyProvider,
               response.locals.logger
             )
-            span.addEvent('Signed request')
             span.setStatus({
               code: SpanStatusCode.OK,
               message: response.statusMessage,
             })
           } catch (err) {
-            span.addEvent('Signature computation error')
             span.setStatus({
               code: SpanStatusCode.ERROR,
               message: ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
             })
 
-            span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, 500)
             response.locals.logger.error({ err }, 'catch error on signing')
 
             return errorResult(500, ErrorMessage.SIGNATURE_COMPUTATION_FAILURE, quotaStatus)
           }
 
           if (!duplicateRequest) {
-            quotaStatus = await quota.updateQuotaStatus(quotaStatus, ctx, request.body, db)
+            quotaStatus = await quota.updateQuotaStatus(quotaStatus, ctx, request.body)
+          } else {
+            Counters.duplicateRequests.inc()
+            logger.info(
+              'Request already exists in db. Will service request without charging quota.'
+            )
+            warnings.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
           }
 
           // Send Success response
-          span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, 200)
           response.set(KEY_VERSION_HEADER, key.version.toString())
           return {
             status: 200,
@@ -245,4 +210,12 @@ function isValidRequest(
     hasValidBlindedPhoneNumberParam(request.body) &&
     isBodyReasonablySized(request.body)
   )
+}
+
+function bypassQuotaForE2ETesting(
+  bypassQuotaPercentage: number,
+  requestBody: SignMessageRequest
+): boolean {
+  const sessionID = Number(requestBody.sessionID)
+  return !Number.isNaN(sessionID) && sessionID % 100 < bypassQuotaPercentage
 }

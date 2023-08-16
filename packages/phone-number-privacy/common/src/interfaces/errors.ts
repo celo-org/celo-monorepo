@@ -24,15 +24,16 @@ export enum ErrorMessage {
   INVALID_SIGNER_RESPONSE = `CELO_ODIS_ERR_21 SIG_ERR Signer response body is invalid`,
   SIGNER_RESPONSE_FAILED_WITH_OK_STATUS = `CELO_ODIS_ERR_22 SIG_ERR Signer response failed with 200 status`,
   THRESHOLD_PNP_QUOTA_STATUS_FAILURE = `CELO_ODIS_ERR_23 SIG_ERR Failed to get PNP quota status from a threshold of signers`,
-  FAILURE_TO_GET_PERFORMED_QUERY_COUNT = `CELO_ODIS_ERR_24 DB_ERR Failed to read performedQueryCount from signer db`,
-  FAILURE_TO_GET_TOTAL_QUOTA = `CELO_ODIS_ERR_25 NODE_ERR Failed to read on-chain state to calculate total quota`,
-  FAILURE_TO_GET_BLOCK_NUMBER = `CELO_ODIS_ERR_26 NODE_ERR Failed to read block number from full node`,
+  // FAILURE_TO_GET_PERFORMED_QUERY_COUNT = `CELO_ODIS_ERR_24 DB_ERR Failed to read performedQueryCount from signer db`,
+  // FAILURE_TO_GET_TOTAL_QUOTA = `CELO_ODIS_ERR_25 NODE_ERR Failed to read on-chain state to calculate total quota`,
+  // FAILURE_TO_GET_BLOCK_NUMBER = `CELO_ODIS_ERR_26 NODE_ERR Failed to read block number from full node`,
   FAILURE_TO_GET_DEK = `CELO_ODIS_ERR_27 NODE_ERR Failed to read user's DEK from full-node`,
   FAILING_OPEN = `CELO_ODIS_ERR_28 NODE_ERR Failing open on full-node error`,
   FAILING_CLOSED = `CELO_ODIS_ERR_29 NODE_ERR Failing closed on full-node error`,
   CAUGHT_ERROR_IN_ENDPOINT_HANDLER = `CELO_ODIS_ERR_30 Caught error in outer endpoint handler`,
   ERROR_AFTER_RESPONSE_SENT = `CELO_ODIS_ERR_31 Error in endpoint thrown after response was already sent`,
   SIGNATURE_AGGREGATION_FAILURE = 'CELO_ODIS_ERR_32 SIG_ERR Failed to blind aggregate signature shares',
+  FAILURE_TO_GET_ACCOUNT = `CELO_ODIS_ERR_26 Failed to read account data`,
 }
 
 export enum WarningMessage {
