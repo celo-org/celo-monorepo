@@ -1,5 +1,5 @@
 import { timeout } from '@celo/base'
-import { ErrorMessage, ErrorType, send } from '@celo/phone-number-privacy-common'
+import { ErrorMessage, ErrorType, send, WarningMessage } from '@celo/phone-number-privacy-common'
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
 import Logger from 'bunyan'
@@ -80,6 +80,16 @@ export function timeoutHandler(timeoutMs: number, handler: PromiseHandler): Prom
         Counters.timeouts.inc()
         sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, response)
       }
+    }
+  }
+}
+
+export function withEnableHandler(enabled: boolean, handler: PromiseHandler): PromiseHandler {
+  return async (req, res) => {
+    if (enabled) {
+      return handler(req, res)
+    } else {
+      sendFailure(WarningMessage.API_UNAVAILABLE, 503, res)
     }
   }
 }

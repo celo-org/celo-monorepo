@@ -18,3 +18,5 @@ TODO
 - types for Request
 
 - Maked send() types so that it matches responde body type
+- sendFailure is missing a Counter
+- if endpoint disabled, can be replaced by failing handler at server.ts

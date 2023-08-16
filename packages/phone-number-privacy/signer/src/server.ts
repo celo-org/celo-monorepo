@@ -27,7 +27,6 @@ import { createDomainSignHandler } from './domain/endpoints/sign/action'
 import { DomainSignIO } from './domain/endpoints/sign/io'
 import { DomainQuotaService } from './domain/services/quota'
 import { createPnpQuotaHandler } from './pnp/endpoints/quota/action'
-import { PnpQuotaIO } from './pnp/endpoints/quota/io'
 import { createPnpSignHandler } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
 import { PnpQuotaService } from './pnp/services/quota'
@@ -80,12 +79,12 @@ export function startSigner(
     )
   )
 
-  const pnpQuotaIO = new PnpQuotaIO(
+  const pnpQuota = createPnpQuotaHandler(
+    pnpQuotaService,
     config.api.phoneNumberPrivacy.enabled,
     config.api.phoneNumberPrivacy.shouldFailOpen, // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config to make the code cleaner
     dekFetcher
   )
-  const pnpQuota = createPnpQuotaHandler(pnpQuotaService, pnpQuotaIO)
 
   const pnpSignIO = new PnpSignIO(
     config.api.phoneNumberPrivacy.enabled,
