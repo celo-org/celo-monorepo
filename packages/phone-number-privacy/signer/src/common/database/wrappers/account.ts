@@ -17,14 +17,13 @@ export async function getPerformedQueryCount(
   db: Knex,
   accountsTable: ACCOUNTS_TABLE,
   account: string,
-  logger: Logger,
-  trx?: Knex.Transaction
+  logger: Logger
 ): Promise<number> {
   const _meter = newMeter(Histograms.dbOpsInstrumentation, 'getPerformedQueryCount')
   return _meter(async () => {
     try {
       logger.debug({ account }, 'Getting performed query count')
-      const queryCounts = await queryWithOptionalTrx(accounts(db, accountsTable), trx)
+      const queryCounts = await accounts(db, accountsTable)
         .select(ACCOUNTS_COLUMNS.numLookups)
         .where(ACCOUNTS_COLUMNS.address, account)
         .first()

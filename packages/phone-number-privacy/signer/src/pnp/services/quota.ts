@@ -57,11 +57,30 @@ export class PnpQuotaService {
     return { sufficient, state }
   }
 
-  public async getQuotaStatus(
-    account: string,
+  public async updateQuotaStatus(
+    state: PnpQuotaStatus,
     ctx: Context,
-    trx?: Knex.Transaction
+    body: SignMessageRequest,
+    db: Knex
   ): Promise<PnpQuotaStatus> {
+    await db.transaction((trx) =>
+      Promise.all([
+        storeRequest(
+          this.db,
+          this.requestsTable,
+          body.account,
+          body.blindedQueryPhoneNumber,
+          ctx.logger,
+          trx
+        ),
+        incrementQueryCount(this.db, this.accountsTable, body.account, ctx.logger, trx),
+      ])
+    )
+    state.performedQueryCount++
+    return state
+  }
+
+  public async getQuotaStatus(account: string, ctx: Context): Promise<PnpQuotaStatus> {
     const meter = newMeter(
       Histograms.getRemainingQueryCountInstrumentation,
       'getQuotaStatus',
@@ -70,7 +89,7 @@ export class PnpQuotaService {
 
     const [performedQueryCountResult, totalQuotaResult, blockNumberResult] = await meter(() =>
       Promise.allSettled([
-        getPerformedQueryCount(this.db, this.accountsTable, account, ctx.logger, trx),
+        getPerformedQueryCount(this.db, this.accountsTable, account, ctx.logger),
         this.getTotalQuota(account, ctx),
         getBlockNumber(this.kit),
       ])

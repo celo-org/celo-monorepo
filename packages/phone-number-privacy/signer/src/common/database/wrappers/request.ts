@@ -15,21 +15,21 @@ function requests(db: Knex, table: REQUESTS_TABLE) {
   return db<PnpSignRequestRecord>(table)
 }
 
+const getRequestExistsMeter = newMeter(Histograms.dbOpsInstrumentation, 'getRequestExists')
+
 export async function getRequestExists( // TODO try insert, if primary key error, then duplicate request
   db: Knex,
   requestsTable: REQUESTS_TABLE,
   account: string,
   blindedQuery: string,
-  logger: Logger,
-  trx?: Knex.Transaction
+  logger: Logger
 ): Promise<boolean> {
-  const meter = newMeter(Histograms.dbOpsInstrumentation, 'getRequestExists')
-  return meter(async () => {
+  return getRequestExistsMeter(async () => {
     try {
       logger.debug(
         `Checking if request exists for account: ${account}, blindedQuery: ${blindedQuery}`
       )
-      const existingRequest = await queryWithOptionalTrx(requests(db, requestsTable), trx)
+      const existingRequest = await requests(db, requestsTable)
         .where({
           [REQUESTS_COLUMNS.address]: account,
           [REQUESTS_COLUMNS.blindedQuery]: blindedQuery, // TODO are we using the primary key correctly??
