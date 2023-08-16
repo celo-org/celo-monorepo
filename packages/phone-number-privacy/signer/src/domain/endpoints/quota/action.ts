@@ -13,7 +13,7 @@ export function createDomainQuotaHandler(
   return async (request, response) => {
     if (await io.init(request, response)) {
       const { domain } = request.body
-      const { logger } = response.locals.logger
+      const logger = response.locals.logger
       logger.info('Processing request to get domain quota status', {
         name: domain.name,
         version: domain.version,
