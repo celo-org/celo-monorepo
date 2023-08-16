@@ -1,4 +1,3 @@
-/*tracing.js*/
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger'
 import { registerInstrumentations } from '@opentelemetry/instrumentation'
 import { Resource } from '@opentelemetry/resources'
@@ -7,8 +6,6 @@ import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
-// const { ExpressInstrumentation } = require('@opentelemetry/instrumentation-express')
-// const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http')
 
 const options = {
   tags: [],
@@ -47,13 +44,3 @@ const processor = new BatchSpanProcessor(exporter)
 provider.addSpanProcessor(processor)
 
 provider.register()
-
-// await exporter.shutdown();
-
-// process.stdin.resume();//so the program will not close instantly
-
-async function exit() {
-  await exporter.forceFlush()
-}
-
-module.exports = { exit }
