@@ -8,6 +8,7 @@ export async function up(knex: Knex): Promise<any> {
       t.dateTime(ACCOUNTS_COLUMNS.createdAt).notNullable()
       t.string(ACCOUNTS_COLUMNS.dek)
       t.dateTime(ACCOUNTS_COLUMNS.onChainDataLastUpdated)
+      t.primary([ACCOUNTS_COLUMNS.address, ACCOUNTS_COLUMNS.dek])
     })
   }
   return null
