@@ -1,6 +1,5 @@
 import { ContractKit } from '@celo/contractkit'
 import {
-  authenticateUser,
   CombinerEndpoint,
   ErrorType,
   getSignerEndpoint,
@@ -23,6 +22,7 @@ import * as t from 'io-ts'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { getCombinerVersion, OdisConfig } from '../../../config'
+import { authenticateUser } from '../../../utils/authentication'
 
 export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.PNP_QUOTA
