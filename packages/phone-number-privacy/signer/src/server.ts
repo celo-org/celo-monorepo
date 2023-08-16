@@ -32,6 +32,7 @@ import { PnpQuotaService } from './pnp/services/quota'
 
 import {
   catchErrorHandler,
+  disabledHandler,
   meteringHandler,
   PromiseHandler,
   sendFailure,
@@ -78,22 +79,24 @@ export function startSigner(
     )
   )
 
-  const pnpQuota = createPnpQuotaHandler(
-    pnpQuotaService,
-    config.api.phoneNumberPrivacy.enabled,
-    config.api.phoneNumberPrivacy.shouldFailOpen, // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config to make the code cleaner
-    dekFetcher
-  )
+  const pnpQuotaHandler = config.api.phoneNumberPrivacy.enabled
+    ? createPnpQuotaHandler(
+        pnpQuotaService,
+        config.api.phoneNumberPrivacy.shouldFailOpen, // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config to make the code cleaner
+        dekFetcher
+      )
+    : disabledHandler
 
-  const pnpSign = createPnpSignHandler(
-    db,
-    config,
-    pnpQuotaService,
-    keyProvider,
-    config.api.phoneNumberPrivacy.enabled,
-    config.api.phoneNumberPrivacy.shouldFailOpen,
-    dekFetcher
-  )
+  const pnpSignHandler = config.api.phoneNumberPrivacy.enabled
+    ? createPnpSignHandler(
+        db,
+        config,
+        pnpQuotaService,
+        keyProvider,
+        config.api.phoneNumberPrivacy.shouldFailOpen,
+        dekFetcher
+      )
+    : disabledHandler
 
   const domainQuotaIO = new DomainQuotaIO(config.api.domains.enabled)
   const domainQuota = createDomainQuotaHandler(domainQuotaService, domainQuotaIO)
@@ -112,8 +115,8 @@ export function startSigner(
 
   logger.info('Right before adding meteredSignerEndpoints')
 
-  app.post(SignerEndpoint.PNP_SIGN, createHandler(config.timeout, pnpSign))
-  app.post(SignerEndpoint.PNP_QUOTA, createHandler(config.timeout, pnpQuota))
+  app.post(SignerEndpoint.PNP_SIGN, createHandler(config.timeout, pnpSignHandler))
+  app.post(SignerEndpoint.PNP_QUOTA, createHandler(config.timeout, pnpQuotaHandler))
   app.post(SignerEndpoint.DOMAIN_QUOTA_STATUS, createHandler(config.timeout, domainQuota))
   app.post(SignerEndpoint.DOMAIN_SIGN, createHandler(config.timeout, domainSign))
   app.post(SignerEndpoint.DISABLE_DOMAIN, createHandler(config.timeout, domainDisable))

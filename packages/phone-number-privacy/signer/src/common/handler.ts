@@ -94,6 +94,10 @@ export function withEnableHandler(enabled: boolean, handler: PromiseHandler): Pr
   }
 }
 
+export async function disabledHandler(_: Request, response: Response): Promise<void> {
+  sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
+}
+
 export function sendFailure(
   error: ErrorType,
   status: number,

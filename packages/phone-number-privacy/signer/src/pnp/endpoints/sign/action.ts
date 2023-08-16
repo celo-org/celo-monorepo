@@ -24,7 +24,7 @@ import { Counters } from '../../../common/metrics'
 import { getSignerVersion, SignerConfig } from '../../../config'
 import { PnpQuotaService } from '../../services/quota'
 
-import { PromiseHandler, sendFailure, withEnableHandler } from '../../../common/handler'
+import { PromiseHandler, sendFailure } from '../../../common/handler'
 
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
@@ -36,11 +36,10 @@ export function createPnpSignHandler(
   config: SignerConfig,
   quota: PnpQuotaService,
   keyProvider: KeyProvider,
-  enabled: boolean,
   shouldFailOpen: boolean,
   dekFetcher: DataEncryptionKeyFetcher
 ): PromiseHandler {
-  return withEnableHandler(enabled, async (request, response) => {
+  return async (request, response) => {
     const logger = response.locals.logger
 
     if (!isValidRequest(request)) {
@@ -226,7 +225,7 @@ export function createPnpSignHandler(
       span.addEvent('Called transaction')
       span.end()
     })
-  })
+  }
 }
 
 async function sign(

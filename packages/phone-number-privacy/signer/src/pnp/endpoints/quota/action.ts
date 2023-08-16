@@ -11,18 +11,17 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request } from 'express'
-import { PromiseHandler, sendFailure, withEnableHandler } from '../../../common/handler'
+import { PromiseHandler, sendFailure } from '../../../common/handler'
 import { Counters } from '../../../common/metrics'
 import { getSignerVersion } from '../../../config'
 import { PnpQuotaService } from '../../services/quota'
 
 export function createPnpQuotaHandler(
   quota: PnpQuotaService,
-  enabled: boolean,
   shouldFailOpen: boolean,
   dekFetcher: DataEncryptionKeyFetcher
 ): PromiseHandler {
-  return withEnableHandler(enabled, async (request, response) => {
+  return async (request, response) => {
     const logger = response.locals.logger
 
     if (!isValidRequest(request)) {
@@ -63,7 +62,7 @@ export function createPnpQuotaHandler(
         response
       )
     }
-  })
+  }
 }
 
 function isValidRequest(
