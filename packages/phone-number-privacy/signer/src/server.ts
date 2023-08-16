@@ -31,9 +31,6 @@ import { PnpQuotaIO } from './pnp/endpoints/quota/io'
 import { createPnpSignHandler } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
 import { PnpQuotaService } from './pnp/services/quota'
-import opentelemetry from '@opentelemetry/api'
-
-const tracer = opentelemetry.trace.getTracer('signer-tracer')
 
 import {
   catchErrorHandler,
@@ -43,7 +40,6 @@ import {
   timeoutHandler,
   tracingHandler,
 } from './common/handler'
-import { IO } from './common/io'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -115,17 +111,11 @@ export function startSigner(
 
   logger.info('Right before adding meteredSignerEndpoints')
 
-  app.post(SignerEndpoint.PNP_SIGN, createHandler(config.timeout, pnpSignIO, pnpSign))
-  app.post(SignerEndpoint.PNP_QUOTA, createHandler(config.timeout, pnpQuotaIO, pnpQuota))
-  app.post(
-    SignerEndpoint.DOMAIN_QUOTA_STATUS,
-    createHandler(config.timeout, domainQuotaIO, domainQuota)
-  )
-  app.post(SignerEndpoint.DOMAIN_SIGN, createHandler(config.timeout, domainSignIO, domainSign))
-  app.post(
-    SignerEndpoint.DISABLE_DOMAIN,
-    createHandler(config.timeout, domainDisableIO, domainDisable)
-  )
+  app.post(SignerEndpoint.PNP_SIGN, createHandler(config.timeout, pnpSign))
+  app.post(SignerEndpoint.PNP_QUOTA, createHandler(config.timeout, pnpQuota))
+  app.post(SignerEndpoint.DOMAIN_QUOTA_STATUS, createHandler(config.timeout, domainQuota))
+  app.post(SignerEndpoint.DOMAIN_SIGN, createHandler(config.timeout, domainSign))
+  app.post(SignerEndpoint.DISABLE_DOMAIN, createHandler(config.timeout, domainDisable))
 
   const sslOptions = getSslOptions(config)
   if (sslOptions) {
@@ -171,49 +161,36 @@ function newCachingDekFetcher(baseFetcher: DataEncryptionKeyFetcher): DataEncryp
   return cachedDekFetcher
 }
 
-function createHandler(timeoutMs: number, io: IO<any>, action: PromiseHandler): RequestHandler {
+function createHandler(timeoutMs: number, action: PromiseHandler): RequestHandler {
   return catchErrorHandler(
     tracingHandler(
       meteringHandler(
         Histograms.responseLatency,
-        timeoutHandler(timeoutMs, actionHandler(io, action))
+        timeoutHandler(timeoutMs, catchErrorHandler2(action))
       )
     )
   )
 }
 
-// TODO handle action generic type
-function actionHandler(io: IO<any>, action: PromiseHandler): PromiseHandler {
-  // TODO handle timeout MS
+function catchErrorHandler2(handler: PromiseHandler): PromiseHandler {
   return async (request, response) => {
-    const logger = response.locals.logger
+    try {
+      await handler(request, response)
+    } catch (err: any) {
+      const logger = response.locals.logger
+      logger.error({ err }, `Error in handler for ${request.url}`)
 
-    tracer
-      .startActiveSpan('Controller - handle', async (span) => {
-        span.addEvent('Calling init')
+      let errMsg: ErrorType = ErrorMessage.UNKNOWN_ERROR
+      if (
+        err instanceof Error &&
+        // Propagate standard error & warning messages thrown during endpoint handling
+        (Object.values(ErrorMessage).includes(err.message as ErrorMessage) ||
+          Object.values(WarningMessage).includes(err.message as WarningMessage))
+      ) {
+        errMsg = err.message as ErrorType
+      }
 
-        const session = await io.init(request, response)
-        // Init returns a response to the user internally.
-        if (session) {
-          span.addEvent('Calling perform')
-          await action(request, response)
-        }
-        span.end()
-      })
-      .catch((err: any) => {
-        logger.error({ err }, `Error in handler for ${request.url}`)
-
-        let errMsg: ErrorType = ErrorMessage.UNKNOWN_ERROR
-        if (
-          err instanceof Error &&
-          // Propagate standard error & warning messages thrown during endpoint handling
-          (Object.values(ErrorMessage).includes(err.message as ErrorMessage) ||
-            Object.values(WarningMessage).includes(err.message as WarningMessage))
-        ) {
-          errMsg = err.message as ErrorType
-        }
-
-        sendFailure(errMsg, 500, response)
-      })
+      sendFailure(errMsg, 500, response)
+    }
   }
 }

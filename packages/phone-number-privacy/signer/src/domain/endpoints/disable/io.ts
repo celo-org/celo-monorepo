@@ -2,20 +2,14 @@ import {
   DisableDomainRequest,
   disableDomainRequestSchema,
   DisableDomainResponse,
-  DisableDomainResponseSuccess,
   DomainSchema,
-  DomainState,
-  send,
   SignerEndpoint,
   verifyDisableDomainRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
-import { IO } from '../../../common/io'
-import { Counters } from '../../../common/metrics'
-import { getSignerVersion } from '../../../config'
-import { DomainSession } from '../../session'
 import { sendFailure } from '../../../common/handler'
+import { IO } from '../../../common/io'
 
 export class DomainDisableIO extends IO<DisableDomainRequest> {
   readonly endpoint = SignerEndpoint.DISABLE_DOMAIN
@@ -23,41 +17,19 @@ export class DomainDisableIO extends IO<DisableDomainRequest> {
   async init(
     request: Request<{}, {}, unknown>,
     response: Response<DisableDomainResponse>
-  ): Promise<DomainSession<DisableDomainRequest> | null> {
+  ): Promise<boolean> {
     // Input checks sends a response to the user internally.
     if (!super.inputChecks(request, response)) {
-      return null
+      return false
     }
-    if (!(await this.authenticate(request))) {
+    if (!verifyDisableDomainRequestAuthenticity(request.body)) {
       sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
-      return null
+      return false
     }
-    return new DomainSession(request, response)
+    return true
   }
 
   validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, DisableDomainRequest> {
     return disableDomainRequestSchema(DomainSchema).is(request.body)
-  }
-
-  authenticate(request: Request<{}, {}, DisableDomainRequest>): Promise<boolean> {
-    return Promise.resolve(verifyDisableDomainRequestAuthenticity(request.body))
-  }
-
-  sendSuccess(
-    status: number,
-    response: Response<DisableDomainResponseSuccess>,
-    domainState: DomainState
-  ) {
-    send(
-      response,
-      {
-        success: true,
-        version: getSignerVersion(),
-        status: domainState,
-      },
-      status,
-      response.locals.logger
-    )
-    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 }

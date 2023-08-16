@@ -17,7 +17,6 @@ import {
   updateDomainStateRecord,
 } from '../../common/database/wrappers/domain-state'
 import { OdisQuotaStatusResult } from '../../common/quota'
-import { DomainSession } from '../session'
 import Logger from 'bunyan'
 
 declare type QuotaDependentDomainRequest =
@@ -29,11 +28,11 @@ export class DomainQuotaService {
 
   async checkAndUpdateQuotaStatus(
     state: DomainStateRecord,
-    session: DomainSession<QuotaDependentDomainRequest>,
+    domain: SequentialDelayDomain,
     trx: Knex.Transaction<DomainStateRecord>,
+    logger: Logger,
     attemptTime?: number
   ): Promise<OdisQuotaStatusResult<QuotaDependentDomainRequest>> {
-    const { domain } = session.request.body
     // Timestamp precision is lowered to seconds to reduce the chance of effective timing attacks.
     attemptTime = attemptTime ?? Math.floor(Date.now() / 1000)
     if (isSequentialDelayDomain(domain)) {
@@ -46,7 +45,7 @@ export class DomainQuotaService {
         const newState = toDomainStateRecord(domain, result.state)
         // Persist the updated domain quota to the database.
         // This will trigger an insert if its the first update to the domain instance.
-        await updateDomainStateRecord(this.db, domain, newState, trx, session.logger)
+        await updateDomainStateRecord(this.db, domain, newState, trx, logger)
         return { sufficient: true, state: newState }
       }
       // If the result was rejected, the domainStateRecord does not change

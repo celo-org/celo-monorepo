@@ -1,6 +1,8 @@
 import {
   ErrorMessage,
   getRequestKeyVersion,
+  KEY_VERSION_HEADER,
+  send,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
@@ -9,7 +11,7 @@ import { REQUESTS_TABLE } from '../../../common/database/models/request'
 import { getRequestExists } from '../../../common/database/wrappers/request'
 import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management/key-provider-base'
 import { Counters } from '../../../common/metrics'
-import { SignerConfig } from '../../../config'
+import { getSignerVersion, SignerConfig } from '../../../config'
 import { PnpQuotaService } from '../../services/quota'
 import { PnpSignIO } from './io'
 
@@ -28,7 +30,14 @@ export function createPnpSignHandler(
   io: PnpSignIO
 ): PromiseHandler {
   return async (request, response) => {
-    const errors: string[] = []
+    const [ok, _warnings] = await io.init(request, response)
+
+    if (!ok) {
+      return
+    }
+
+    // TODO fix type isse with the compiler
+    const warnings = _warnings as string[]
 
     return tracer.startActiveSpan('pnpSignIO - perform', async (span) => {
       span.addEvent('Calling db transaction')
@@ -36,7 +45,11 @@ export function createPnpSignHandler(
       // so that these occur atomically and rollback on error.
       await db.transaction(async (trx) => {
         span.addEvent('Getting quotaStatus')
-        const ctx = { url: request.url, logger: response.locals.logger, errors }
+        const ctx = {
+          url: request.url,
+          logger: response.locals.logger,
+          errors: warnings,
+        }
         const quotaStatus = await quota.getQuotaStatus(request.body.account, ctx, trx)
         span.addEvent('Got quotaStatus')
 
@@ -67,7 +80,7 @@ export function createPnpSignHandler(
           response.locals.logger.info(
             'Request already exists in db. Will service request without charging quota.'
           )
-          errors.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
+          warnings.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
         } else {
           // In the case of a database connection failure, performedQueryCount will be -1
           if (quotaStatus.performedQueryCount === -1) {
@@ -156,7 +169,22 @@ export function createPnpSignHandler(
             message: response.statusMessage,
           })
           span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, 200)
-          io.sendSuccess(200, response, key, signature, quotaStatus, errors)
+
+          response.set(KEY_VERSION_HEADER, key.version.toString())
+          send(
+            response,
+            {
+              success: true,
+              version: getSignerVersion(),
+              signature,
+              ...quotaStatus,
+              warnings,
+            },
+            200,
+            response.locals.logger
+          )
+          Counters.responses.labels(request.url, '200').inc()
+
           return
         } catch (err) {
           span.addEvent('Signature computation error')

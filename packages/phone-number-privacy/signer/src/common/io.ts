@@ -2,12 +2,9 @@ import {
   OdisRequest,
   OdisResponse,
   SignerEndpoint,
-  SuccessResponse,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import { Session } from './action'
 
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
@@ -19,24 +16,7 @@ export abstract class IO<R extends OdisRequest> {
 
   constructor(readonly enabled: boolean) {}
 
-  abstract init(
-    request: Request<{}, {}, unknown>,
-    response: Response<OdisResponse<R>>
-  ): Promise<Session<R> | null>
-
   abstract validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, R>
-
-  abstract authenticate(
-    request: Request<{}, {}, R>,
-    warnings?: string[],
-    logger?: Logger
-  ): Promise<boolean>
-
-  abstract sendSuccess(
-    status: number,
-    response: Response<SuccessResponse<R>>,
-    ...args: unknown[]
-  ): void
 
   protected inputChecks(
     request: Request<{}, {}, unknown>,

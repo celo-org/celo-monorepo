@@ -1,12 +1,12 @@
+import { timeout } from '@celo/base'
 import { ErrorMessage, ErrorType, send } from '@celo/phone-number-privacy-common'
-import Logger from 'bunyan'
-import { Request, Response } from 'express'
-import { Counters, newMeter } from './metrics'
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
+import Logger from 'bunyan'
+import { Request, Response } from 'express'
 import * as client from 'prom-client'
-import { timeout } from '@celo/base'
 import { getSignerVersion } from '../config'
+import { Counters, newMeter } from './metrics'
 
 const tracer = opentelemetry.trace.getTracer('signer-tracer')
 
@@ -84,7 +84,12 @@ export function timeoutHandler(timeoutMs: number, handler: PromiseHandler): Prom
   }
 }
 
-export function sendFailure(error: ErrorType, status: number, response: Response, body?: Object) {
+export function sendFailure(
+  error: ErrorType,
+  status: number,
+  response: Response,
+  body?: Record<any, any>
+) {
   send(
     response,
     {

@@ -10,7 +10,7 @@ import { Counters, Histograms, newMeter } from '../../common/metrics'
 import { OdisQuotaStatusResult } from '../../common/quota'
 import { getBlockNumber, getOnChainOdisPayments } from '../../common/web3/contracts'
 import { config } from '../../config'
-import { Context } from '../session'
+import { Context } from '../context'
 
 /**
  * PnpQuotaService is responsible for serving information about pnp quota

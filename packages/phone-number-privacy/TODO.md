@@ -16,3 +16,5 @@ TODO
 - handle sendFailure (add function to response.locals)
 - check if we're setting status twice for the same request (make sure we haven't responded already)
 - types for Request
+
+- Maked send() types so that it matches responde body type

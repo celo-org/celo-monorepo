@@ -4,21 +4,24 @@ import {
   DomainRestrictedSignatureRequest,
   ErrorType,
   getRequestKeyVersion,
+  KEY_VERSION_HEADER,
+  send,
   ThresholdPoprfServer,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { EIP712Optional } from '@celo/utils/lib/sign-typed-data-utils'
+import Logger from 'bunyan'
 import { Knex } from 'knex'
 import {
   DomainStateRecord,
   toSequentialDelayDomainState,
 } from '../../../common/database/models/domain-state'
+import { PromiseHandler, sendFailure } from '../../../common/handler'
 import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management/key-provider-base'
-import { SignerConfig } from '../../../config'
+import { Counters } from '../../../common/metrics'
+import { getSignerVersion, SignerConfig } from '../../../config'
 import { DomainQuotaService } from '../../services/quota'
 import { DomainSignIO } from './io'
-import Logger from 'bunyan'
-import { PromiseHandler } from '../../../common/handler'
 
 type TrxResult =
   | {
@@ -43,6 +46,10 @@ export function createDomainSignHandler(
   io: DomainSignIO
 ): PromiseHandler {
   return async (request, response) => {
+    if (!(await io.init(request, response))) {
+      return
+    }
+
     const domain = request.body.domain
     const logger = response.locals.logger
     logger.info(
@@ -70,8 +77,9 @@ export function createDomainSignHandler(
 
       const quotaStatus = await quota.checkAndUpdateQuotaStatus(
         domainStateRecord,
-        request.body,
-        trx
+        request.body.domain,
+        trx,
+        logger
       )
 
       if (!quotaStatus.sufficient) {
@@ -109,20 +117,23 @@ export function createDomainSignHandler(
     })
 
     if (res.success) {
-      io.sendSuccess(
-        res.status,
+      response.set(KEY_VERSION_HEADER, res.key.version.toString())
+      send(
         response,
-        res.key,
-        res.signature,
-        toSequentialDelayDomainState(res.domainStateRecord)
+        {
+          success: true,
+          version: getSignerVersion(),
+          signature: res.signature,
+          status: toSequentialDelayDomainState(res.domainStateRecord),
+        },
+        res.status,
+        response.locals.logger
       )
+      Counters.responses.labels(request.url, res.status.toString()).inc()
     } else {
-      io.sendFailure(
-        res.error,
-        res.status,
-        response,
-        toSequentialDelayDomainState(res.domainStateRecord)
-      )
+      sendFailure(res.error, res.status, response, {
+        status: toSequentialDelayDomainState(res.domainStateRecord),
+      })
     }
   }
 }
