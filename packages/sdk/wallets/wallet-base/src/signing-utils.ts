@@ -3,9 +3,9 @@ import {
   CeloTx,
   CeloTxWithSig,
   EncodedTransaction,
+  isPresent,
   RLPEncodedTx,
   TransactionTypes,
-  isPresent,
 } from '@celo/connect'
 import {
   hexToNumber,
@@ -14,13 +14,21 @@ import {
 } from '@celo/connect/lib/utils/formatter'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
-import * as ethUtil from '@ethereumjs/util'
-import { Address, toBuffer, toChecksumAddress } from '@ethereumjs/util'
+import {
+  Address,
+  bufferToHex,
+  ecrecover,
+  fromRpcSig,
+  hashPersonalMessage,
+  pubToAddress,
+  toBuffer,
+  toChecksumAddress,
+} from '@ethereumjs/util'
 import debugFactory from 'debug'
-import { keccak256 } from 'ethereum-cryptography/keccak'
-import { hexToBytes } from 'ethereum-cryptography/utils.js'
 // @ts-ignore-next-line eth-lib types not found
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
+import { keccak256 } from 'ethereum-cryptography/keccak'
+import { hexToBytes } from 'ethereum-cryptography/utils.js'
 import Web3 from 'web3' // TODO try to do this without web3 direct
 import Accounts from 'web3-eth-accounts'
 const debug = debugFactory('wallet-base:tx:sign')
@@ -431,7 +439,7 @@ function getPublicKeyofSignerFromTx(transactionArray: string[]) {
 
   const { v, r, s } = extractSignatureFromDecoded(transactionArray)
   try {
-    return ethUtil.ecrecover(
+    return ecrecover(
       toBuffer(msgHash),
       v === '0x' || v === undefined ? BigInt(0) : BigInt(1),
       toBuffer(r),
@@ -561,12 +569,12 @@ function recoverTransactionEIP1559(serializedTransaction: `0x${string}`): [CeloT
 }
 
 export function recoverMessageSigner(signingDataHex: string, signedData: string): string {
-  const dataBuff = ethUtil.toBuffer(signingDataHex)
-  const msgHashBuff = ethUtil.hashPersonalMessage(dataBuff)
-  const signature = ethUtil.fromRpcSig(signedData)
+  const dataBuff = toBuffer(signingDataHex)
+  const msgHashBuff = hashPersonalMessage(dataBuff)
+  const signature = fromRpcSig(signedData)
 
-  const publicKey = ethUtil.ecrecover(msgHashBuff, signature.v, signature.r, signature.s)
-  const address = ethUtil.pubToAddress(publicKey, true)
+  const publicKey = ecrecover(msgHashBuff, signature.v, signature.r, signature.s)
+  const address = pubToAddress(publicKey, true)
   return ensureLeading0x(address.toString('hex'))
 }
 
@@ -575,7 +583,7 @@ export function verifyEIP712TypedDataSigner(
   signedData: string,
   expectedAddress: string
 ): boolean {
-  const dataHex = ethUtil.bufferToHex(generateTypedDataHash(typedData))
+  const dataHex = bufferToHex(generateTypedDataHash(typedData))
   return verifySignatureWithoutPrefix(dataHex, signedData, expectedAddress)
 }
 
@@ -597,7 +605,7 @@ export function decodeSig(sig: any) {
 
   return {
     v: parseInt(v, 16),
-    r: ethUtil.toBuffer(r) as Buffer,
-    s: ethUtil.toBuffer(s) as Buffer,
+    r: toBuffer(r) as Buffer,
+    s: toBuffer(s) as Buffer,
   }
 }
