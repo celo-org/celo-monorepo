@@ -4,7 +4,9 @@ import {
   ErrorType,
   OdisResponse,
   PnpQuotaResponseFailure,
+  PnpQuotaStatus,
   send,
+  SignMessageResponseFailure,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
@@ -53,8 +55,6 @@ export function tracingHandler(handler: PromiseHandler): PromiseHandler {
         [SemanticAttributes.HTTP_CLIENT_IP]: req.ip,
       },
     })
-    span.addEvent('Called ' + req.path)
-
     try {
       await handler(req, res)
     } catch (err: any) {
@@ -139,18 +139,25 @@ export function resultHandler<A extends OdisResponse>(
 ): PromiseHandler {
   return async (req, res) => {
     const result = await resHandler(req, res)
+    res.locals.logger.info('ABOUT to send response')
     send(res, result.body, result.status, res.locals.logger)
+    res.locals.logger('DONE send response')
     Counters.responses.labels(req.url, result.status.toString()).inc()
   }
 }
 
-export function errorResult(status: number, error: string): Result<PnpQuotaResponseFailure> {
+export function errorResult(
+  status: number,
+  error: string,
+  quota?: PnpQuotaStatus
+): Result<PnpQuotaResponseFailure | SignMessageResponseFailure> {
   return {
     status,
     body: {
       success: false,
       version: getSignerVersion(),
       error,
+      ...quota,
     },
   }
 }

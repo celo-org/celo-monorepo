@@ -56,6 +56,7 @@ export function createDomainSignHandler(
       sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return
     }
+
     if (!verifyDomainRestrictedSignatureRequestAuthenticity(request.body)) {
       sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return
