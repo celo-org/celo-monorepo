@@ -1,10 +1,20 @@
 import {
+  authenticateUser,
+  DataEncryptionKeyFetcher,
   ErrorMessage,
+  ErrorType,
   getRequestKeyVersion,
+  hasValidAccountParam,
+  hasValidBlindedPhoneNumberParam,
+  isBodyReasonablySized,
   KEY_VERSION_HEADER,
+  requestHasValidKeyVersion,
   send,
+  SignMessageRequest,
+  SignMessageRequestSchema,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import { Request } from 'express'
 import { Knex } from 'knex'
 import { computeBlindedSignature } from '../../../common/bls/bls-cryptography-client'
 import { REQUESTS_TABLE } from '../../../common/database/models/request'
@@ -13,9 +23,8 @@ import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management
 import { Counters } from '../../../common/metrics'
 import { getSignerVersion, SignerConfig } from '../../../config'
 import { PnpQuotaService } from '../../services/quota'
-import { PnpSignIO } from './io'
 
-import { PromiseHandler, sendFailure } from '../../../common/handler'
+import { PromiseHandler, sendFailure, withEnableHandler } from '../../../common/handler'
 
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
@@ -27,17 +36,28 @@ export function createPnpSignHandler(
   config: SignerConfig,
   quota: PnpQuotaService,
   keyProvider: KeyProvider,
-  io: PnpSignIO
+  enabled: boolean,
+  shouldFailOpen: boolean,
+  dekFetcher: DataEncryptionKeyFetcher
 ): PromiseHandler {
-  return async (request, response) => {
-    const [ok, _warnings] = await io.init(request, response)
+  return withEnableHandler(enabled, async (request, response) => {
+    const logger = response.locals.logger
 
-    if (!ok) {
+    if (!isValidRequest(request)) {
+      sendFailure(WarningMessage.INVALID_INPUT, 400, response)
       return
     }
 
-    // TODO fix type isse with the compiler
-    const warnings = _warnings as string[]
+    if (!requestHasValidKeyVersion(request, logger)) {
+      sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
+      return
+    }
+
+    const warnings: ErrorType[] = []
+    if (!(await authenticateUser(request, logger, dekFetcher, shouldFailOpen, warnings))) {
+      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
+      return
+    }
 
     return tracer.startActiveSpan('pnpSignIO - perform', async (span) => {
       span.addEvent('Calling db transaction')
@@ -95,7 +115,7 @@ export function createPnpSignHandler(
           }
           // In the case of a blockchain connection failure, totalQuota will be -1
           if (quotaStatus.totalQuota === -1) {
-            if (io.shouldFailOpen) {
+            if (shouldFailOpen) {
               span.addEvent('Blockchain connection failure FailOpen')
               span.setStatus({
                 code: SpanStatusCode.ERROR,
@@ -206,7 +226,7 @@ export function createPnpSignHandler(
       span.addEvent('Called transaction')
       span.end()
     })
-  }
+  })
 }
 
 async function sign(
@@ -224,4 +244,15 @@ async function sign(
     throw new Error(WarningMessage.INVALID_KEY_VERSION_REQUEST)
   }
   return computeBlindedSignature(blindedMessage, privateKey, logger)
+}
+
+function isValidRequest(
+  request: Request<{}, {}, unknown>
+): request is Request<{}, {}, SignMessageRequest> {
+  return (
+    SignMessageRequestSchema.is(request.body) &&
+    hasValidAccountParam(request.body) &&
+    hasValidBlindedPhoneNumberParam(request.body) &&
+    isBodyReasonablySized(request.body)
+  )
 }

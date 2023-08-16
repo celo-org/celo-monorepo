@@ -28,7 +28,6 @@ import { DomainSignIO } from './domain/endpoints/sign/io'
 import { DomainQuotaService } from './domain/services/quota'
 import { createPnpQuotaHandler } from './pnp/endpoints/quota/action'
 import { createPnpSignHandler } from './pnp/endpoints/sign/action'
-import { PnpSignIO } from './pnp/endpoints/sign/io'
 import { PnpQuotaService } from './pnp/services/quota'
 
 import {
@@ -86,12 +85,15 @@ export function startSigner(
     dekFetcher
   )
 
-  const pnpSignIO = new PnpSignIO(
+  const pnpSign = createPnpSignHandler(
+    db,
+    config,
+    pnpQuotaService,
+    keyProvider,
     config.api.phoneNumberPrivacy.enabled,
     config.api.phoneNumberPrivacy.shouldFailOpen,
     dekFetcher
   )
-  const pnpSign = createPnpSignHandler(db, config, pnpQuotaService, keyProvider, pnpSignIO)
 
   const domainQuotaIO = new DomainQuotaIO(config.api.domains.enabled)
   const domainQuota = createDomainQuotaHandler(domainQuotaService, domainQuotaIO)
