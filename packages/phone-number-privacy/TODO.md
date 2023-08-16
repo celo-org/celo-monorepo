@@ -13,10 +13,14 @@ return doAction(request, response, auth)
 
 TODO
 
-- handle sendFailure (add function to response.locals)
-- check if we're setting status twice for the same request (make sure we haven't responded already)
-- types for Request
+- (Alec) refactor domain endpoints to get rid of IO
+  - if endpoint disabled, can be replaced by failing handler at server.ts
+- (Alec) remove catchErrorHandler2 (move it catchErrorHandler)
+- (Alec) add back quotaBypassForE2e
+- (Alec) remove block number
+- (alec) Remove sendFailure is missing a Counter
+
+- (Alec) check prometheus Counter
 
 - Maked send() types so that it matches responde body type
-- sendFailure is missing a Counter
-- if endpoint disabled, can be replaced by failing handler at server.ts
+- types for Request
