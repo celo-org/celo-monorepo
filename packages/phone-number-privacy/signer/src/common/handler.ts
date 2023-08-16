@@ -1,5 +1,12 @@
 import { timeout } from '@celo/base'
-import { ErrorMessage, ErrorType, send, WarningMessage } from '@celo/phone-number-privacy-common'
+import {
+  ErrorMessage,
+  ErrorType,
+  OdisResponse,
+  PnpQuotaResponseFailure,
+  send,
+  WarningMessage,
+} from '@celo/phone-number-privacy-common'
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
 import Logger from 'bunyan'
@@ -115,4 +122,35 @@ export function sendFailure(
     status,
     response.locals.logger
   )
+}
+
+export interface Result<A extends OdisResponse> {
+  status: number
+  body: A
+}
+
+export type ResultHandler<A extends OdisResponse> = (
+  request: Request,
+  res: Response<A>
+) => Promise<Result<A>>
+
+export function resultHandler<A extends OdisResponse>(
+  resHandler: ResultHandler<A>
+): PromiseHandler {
+  return async (req, res) => {
+    const result = await resHandler(req, res)
+    send(res, result.body, result.status, res.locals.logger)
+    Counters.responses.labels(req.url, result.status.toString()).inc()
+  }
+}
+
+export function errorResult(status: number, error: string): Result<PnpQuotaResponseFailure> {
+  return {
+    status,
+    body: {
+      success: false,
+      version: getSignerVersion(),
+      error,
+    },
+  }
 }
