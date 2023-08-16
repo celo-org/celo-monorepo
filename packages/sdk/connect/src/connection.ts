@@ -328,7 +328,7 @@ export class Connection {
     return toTxResult(this.web3.eth.sendSignedTransaction(signedTransactionData))
   }
   // if neither gas price nor feeMarket fields are present set them.
-  async setFeeMarketGas(tx: CeloTx): Promise<CeloTx> {
+  setFeeMarketGas = async (tx: CeloTx): Promise<CeloTx> => {
     // default to the current values
     const calls = [Promise.resolve(tx.maxFeePerGas), Promise.resolve(tx.maxPriorityFeePerGas)]
 
