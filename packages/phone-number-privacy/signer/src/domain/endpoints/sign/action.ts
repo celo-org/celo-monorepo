@@ -5,8 +5,10 @@ import {
   ErrorType,
   getRequestKeyVersion,
   KEY_VERSION_HEADER,
+  requestHasValidKeyVersion,
   send,
   ThresholdPoprfServer,
+  verifyDomainRestrictedSignatureRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { EIP712Optional } from '@celo/utils/lib/sign-typed-data-utils'
@@ -46,7 +48,16 @@ export function createDomainSignHandler(
   io: DomainSignIO
 ): PromiseHandler {
   return async (request, response) => {
-    if (!(await io.init(request, response))) {
+    if (!io.init(request, response)) {
+      return
+    }
+
+    if (!requestHasValidKeyVersion(request, response.locals.logger)) {
+      sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
+      return
+    }
+    if (!verifyDomainRestrictedSignatureRequestAuthenticity(request.body)) {
+      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return
     }
 
