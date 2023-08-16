@@ -139,9 +139,7 @@ export function resultHandler<A extends OdisResponse>(
 ): PromiseHandler {
   return async (req, res) => {
     const result = await resHandler(req, res)
-    res.locals.logger.info('ABOUT to send response')
     send(res, result.body, result.status, res.locals.logger)
-    res.locals.logger('DONE send response')
     Counters.responses.labels(req.url, result.status.toString()).inc()
   }
 }
