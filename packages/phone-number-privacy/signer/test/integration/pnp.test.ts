@@ -18,8 +18,6 @@ import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
 import { initDatabase } from '../../src/common/database/database'
-import { ACCOUNTS_TABLE } from '../../src/common/database/models/account'
-import { REQUESTS_TABLE } from '../../src/common/database/models/request'
 import { countAndThrowDBError } from '../../src/common/database/utils'
 import {
   getPerformedQueryCount,
@@ -262,7 +260,7 @@ describe('pnp', () => {
           for (let i = 0; i <= expectedQuota; i++) {
             await incrementQueryCount(
               db,
-              ACCOUNTS_TABLE.ONCHAIN,
+
               ACCOUNT_ADDRESS1,
               rootLogger(config.serviceName),
               trx
@@ -354,43 +352,6 @@ describe('pnp', () => {
       })
 
       describe('functionality in case of errors', () => {
-        it('Should respond with 200 on failure to fetch DEK when shouldFailOpen is true', async () => {
-          mockGetDataEncryptionKey.mockImplementation(() => {
-            throw new Error()
-          })
-
-          const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, AuthenticationMethod.ENCRYPTION_KEY)
-
-          const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
-          configWithFailOpenEnabled.api.phoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startSigner(
-            configWithFailOpenEnabled,
-            db,
-            keyProvider,
-            newKit('dummyKit')
-          )
-
-          // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
-          const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
-          const authorization = getPnpRequestAuthorization(req, differentPk)
-          const res = await sendRequest(
-            req,
-            authorization,
-            SignerEndpoint.PNP_QUOTA,
-            '1',
-            appWithFailOpenEnabled
-          )
-
-          expect(res.status).toBe(200)
-          expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
-            success: true,
-            version: expectedVersion,
-            performedQueryCount: 0,
-            totalQuota: expectedQuota,
-            warnings: [ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_OPEN],
-          })
-        })
-
         it('Should respond with 500 on DB performedQueryCount query failure', async () => {
           const spy = jest
             .spyOn(
@@ -526,7 +487,7 @@ describe('pnp', () => {
           for (let i = 0; i < performedQueryCount; i++) {
             await incrementQueryCount(
               db,
-              ACCOUNTS_TABLE.ONCHAIN,
+
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName),
               trx
@@ -749,7 +710,7 @@ describe('pnp', () => {
           for (let i = 0; i < remainingQuota; i++) {
             await incrementQueryCount(
               db,
-              ACCOUNTS_TABLE.ONCHAIN,
+
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName),
               trx
@@ -807,7 +768,7 @@ describe('pnp', () => {
           for (let i = 0; i <= expectedRemainingQuota; i++) {
             await incrementQueryCount(
               db,
-              ACCOUNTS_TABLE.ONCHAIN,
+
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName),
               trx
@@ -891,7 +852,7 @@ describe('pnp', () => {
             for (let i = 0; i < remainingQuota; i++) {
               await incrementQueryCount(
                 db,
-                ACCOUNTS_TABLE.ONCHAIN,
+
                 ACCOUNT_ADDRESS1,
                 rootLogger(_config.serviceName),
                 trx
@@ -902,7 +863,7 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE.ONCHAIN,
+
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
@@ -985,7 +946,7 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE.ONCHAIN,
+
               ACCOUNT_ADDRESS1,
               rootLogger(config.serviceName)
             )
@@ -993,7 +954,7 @@ describe('pnp', () => {
           expect(
             await getRequestExists(
               db,
-              REQUESTS_TABLE.ONCHAIN,
+
               req.account,
               req.blindedQueryPhoneNumber,
               rootLogger(config.serviceName)
@@ -1001,89 +962,7 @@ describe('pnp', () => {
           ).toBe(false)
         })
 
-        it('Should return 200 w/ warning on blockchain totalQuota query failure when shouldFailOpen is true', async () => {
-          const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
-          configWithFailOpenEnabled.api.phoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startSigner(
-            configWithFailOpenEnabled,
-            db,
-            keyProvider,
-            newKit('dummyKit')
-          )
-
-          // deplete user's quota
-          const remainingQuota = expectedQuota - performedQueryCount
-          await db.transaction(async (trx) => {
-            for (let i = 0; i < remainingQuota; i++) {
-              await incrementQueryCount(
-                db,
-                ACCOUNTS_TABLE.ONCHAIN,
-                ACCOUNT_ADDRESS1,
-                rootLogger(_config.serviceName),
-                trx
-              )
-            }
-          })
-          // sanity check
-          expect(
-            await getPerformedQueryCount(
-              db,
-              ACCOUNTS_TABLE.ONCHAIN,
-              ACCOUNT_ADDRESS1,
-              rootLogger(_config.serviceName)
-            )
-          ).toBe(expectedQuota)
-
-          mockOdisPaymentsTotalPaidCUSD.mockImplementation(() => {
-            throw new Error('dummy error')
-          })
-
-          const req = getPnpSignRequest(
-            ACCOUNT_ADDRESS1,
-            BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY
-          )
-          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-          const res = await sendRequest(
-            req,
-            authorization,
-            SignerEndpoint.PNP_SIGN,
-            '1',
-            appWithFailOpenEnabled
-          )
-
-          expect(res.status).toBe(200)
-          expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
-            success: true,
-            version: expectedVersion,
-            signature: expectedSignature,
-            performedQueryCount: expectedQuota + 1, // bc we depleted the user's quota above
-            totalQuota: Number.MAX_SAFE_INTEGER,
-            warnings: [ErrorMessage.FAILURE_TO_GET_ACCOUNT],
-            // warnings: [ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA, ErrorMessage.FULL_NODE_ERROR],
-          })
-
-          // check DB state: performedQueryCount was incremented and request was stored
-          expect(
-            await getPerformedQueryCount(
-              db,
-              ACCOUNTS_TABLE.ONCHAIN,
-              ACCOUNT_ADDRESS1,
-              rootLogger(config.serviceName)
-            )
-          ).toBe(expectedQuota + 1)
-          expect(
-            await getRequestExists(
-              db,
-              REQUESTS_TABLE.ONCHAIN,
-              req.account,
-              req.blindedQueryPhoneNumber,
-              rootLogger(config.serviceName)
-            )
-          ).toBe(true)
-        })
-
-        it('Should return 500 on blockchain totalQuota query failure when shouldFailOpen is false', async () => {
+        it('Should return 500 on blockchain totalQuota query failure', async () => {
           mockOdisPaymentsTotalPaidCUSD.mockImplementation(() => {
             throw new Error('dummy error')
           })
@@ -1095,7 +974,6 @@ describe('pnp', () => {
           )
 
           const configWithFailOpenDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
-          configWithFailOpenDisabled.api.phoneNumberPrivacy.shouldFailOpen = false
           const appWithFailOpenDisabled = startSigner(
             configWithFailOpenDisabled,
             db,
@@ -1151,13 +1029,13 @@ describe('pnp', () => {
           })
 
           // check DB state: performedQueryCount was not incremented and request was not stored
-          expect(
-            await getPerformedQueryCount(db, ACCOUNTS_TABLE.ONCHAIN, ACCOUNT_ADDRESS1, logger)
-          ).toBe(performedQueryCount)
+          expect(await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, logger)).toBe(
+            performedQueryCount
+          )
           expect(
             await getRequestExists(
               db,
-              REQUESTS_TABLE.ONCHAIN,
+
               req.account,
               req.blindedQueryPhoneNumber,
               logger
@@ -1168,7 +1046,10 @@ describe('pnp', () => {
         it('Should return 500 on failure to store request', async () => {
           const logger = rootLogger(_config.serviceName)
           const spy = jest
-            .spyOn(jest.requireActual('../../src/common/database/wrappers/request'), 'storeRequest')
+            .spyOn(
+              jest.requireActual('../../src/common/database/wrappers/request'),
+              'insertRequest'
+            )
             .mockImplementationOnce(() => {
               countAndThrowDBError(new Error(), logger, ErrorMessage.DATABASE_INSERT_FAILURE)
             })
@@ -1190,59 +1071,18 @@ describe('pnp', () => {
           })
 
           // check DB state: performedQueryCount was not incremented and request was not stored
-          expect(
-            await getPerformedQueryCount(db, ACCOUNTS_TABLE.ONCHAIN, ACCOUNT_ADDRESS1, logger)
-          ).toBe(performedQueryCount)
+          expect(await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, logger)).toBe(
+            performedQueryCount
+          )
           expect(
             await getRequestExists(
               db,
-              REQUESTS_TABLE.ONCHAIN,
+
               req.account,
               req.blindedQueryPhoneNumber,
               logger
             )
           ).toBe(false)
-        })
-
-        it('Should return 200 on failure to fetch DEK when shouldFailOpen is true', async () => {
-          mockGetDataEncryptionKey.mockImplementation(() => {
-            throw new Error()
-          })
-
-          const req = getPnpSignRequest(
-            ACCOUNT_ADDRESS1,
-            BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.ENCRYPTION_KEY
-          )
-
-          const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
-          configWithFailOpenEnabled.api.phoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startSigner(
-            configWithFailOpenEnabled,
-            db,
-            keyProvider,
-            newKit('dummyKit')
-          )
-
-          // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
-          const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
-          const authorization = getPnpRequestAuthorization(req, differentPk)
-          const res = await sendRequest(
-            req,
-            authorization,
-            SignerEndpoint.PNP_SIGN,
-            '1',
-            appWithFailOpenEnabled
-          )
-          expect(res.status).toBe(200)
-          expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
-            success: true,
-            version: expectedVersion,
-            signature: expectedSignature,
-            performedQueryCount: performedQueryCount + 1,
-            totalQuota: expectedQuota,
-            warnings: [ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_OPEN],
-          })
         })
 
         it('Should return 500 on bls signing error', async () => {
@@ -1275,7 +1115,7 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE.ONCHAIN,
+
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
@@ -1283,7 +1123,7 @@ describe('pnp', () => {
           expect(
             await getRequestExists(
               db,
-              REQUESTS_TABLE.ONCHAIN,
+
               req.account,
               req.blindedQueryPhoneNumber,
               rootLogger(_config.serviceName)
@@ -1325,7 +1165,7 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE.ONCHAIN,
+
               ACCOUNT_ADDRESS1,
               rootLogger(config.serviceName)
             )
@@ -1333,7 +1173,7 @@ describe('pnp', () => {
           expect(
             await getRequestExists(
               db,
-              REQUESTS_TABLE.ONCHAIN,
+
               req.account,
               req.blindedQueryPhoneNumber,
               rootLogger(config.serviceName)

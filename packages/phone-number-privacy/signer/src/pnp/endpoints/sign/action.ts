@@ -8,7 +8,6 @@ import {
   hasValidBlindedPhoneNumberParam,
   isBodyReasonablySized,
   KEY_VERSION_HEADER,
-  PnpQuotaStatus,
   requestHasValidKeyVersion,
   SignMessageRequest,
   SignMessageRequestSchema,
@@ -17,7 +16,6 @@ import {
 import { Request } from 'express'
 import { Knex } from 'knex'
 import { computeBlindedSignature } from '../../../common/bls/bls-cryptography-client'
-import { REQUESTS_TABLE } from '../../../common/database/models/request'
 import { getRequestExists } from '../../../common/database/wrappers/request'
 import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management/key-provider-base'
 import { Counters, Histograms } from '../../../common/metrics'
@@ -28,7 +26,6 @@ import { errorResult, PromiseHandler, Result, resultHandler } from '../../../com
 
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import Logger from 'bunyan'
-import { OdisError } from '../../../common/error'
 const tracer = opentelemetry.trace.getTracer('signer-tracer')
 
 export function createPnpSignHandler(
@@ -36,8 +33,6 @@ export function createPnpSignHandler(
   config: SignerConfig,
   quota: PnpQuotaService,
   keyProvider: KeyProvider,
-  shouldFailOpen: boolean,
-
   dekFetcher: DataEncryptionKeyFetcher
 ): PromiseHandler {
   return resultHandler(
@@ -55,7 +50,7 @@ export function createPnpSignHandler(
           }
 
           const warnings: ErrorType[] = []
-          if (!(await authenticateUser(request, logger, dekFetcher, shouldFailOpen, warnings))) {
+          if (!(await authenticateUser(request, logger, dekFetcher, warnings))) {
             return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
           }
 
@@ -65,21 +60,7 @@ export function createPnpSignHandler(
             errors: warnings,
           }
 
-          let quotaStatus: PnpQuotaStatus
-          try {
-            quotaStatus = await quota.getQuotaStatus(request.body.account, ctx)
-          } catch (err: any) {
-            // TODO review this logic
-            if (shouldFailOpen && err instanceof OdisError) {
-              warnings.push(err.code)
-              quotaStatus = {
-                performedQueryCount: 0,
-                totalQuota: 1,
-              }
-            } else {
-              throw err
-            }
-          }
+          let quotaStatus = await quota.getQuotaStatus(request.body.account, ctx)
 
           const duplicateRequest = await isDuplicateRequest(
             db,
@@ -172,13 +153,7 @@ function isDuplicateRequest(
   blindedQueryPhoneNumber: string,
   logger: any
 ): Promise<boolean> {
-  return getRequestExists(
-    db,
-    REQUESTS_TABLE.ONCHAIN,
-    account,
-    blindedQueryPhoneNumber,
-    logger
-  ).catch((err) => {
+  return getRequestExists(db, account, blindedQueryPhoneNumber, logger).catch((err) => {
     logger.error(err, 'Failed to check if request already exists in db')
     return false
   })

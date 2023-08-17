@@ -13,7 +13,7 @@ export function wrapError<T>(
   code: ErrorType,
   status: number = 500
 ): Promise<T> {
-  return valueOrError.catch((err) => {
-    throw new OdisError(code, err, status)
+  return valueOrError.catch((parentErr) => {
+    throw new OdisError(code, parentErr, status)
   })
 }

@@ -15,7 +15,6 @@ import { PnpQuotaService } from '../../services/quota'
 
 export function createPnpQuotaHandler(
   quota: PnpQuotaService,
-  shouldFailOpen: boolean,
   dekFetcher: DataEncryptionKeyFetcher
 ): PromiseHandler {
   return resultHandler(async (request, response) => {
@@ -26,7 +25,7 @@ export function createPnpQuotaHandler(
     }
 
     const warnings: ErrorType[] = []
-    if (!(await authenticateUser(request, logger, dekFetcher, shouldFailOpen, warnings))) {
+    if (!(await authenticateUser(request, logger, dekFetcher, warnings))) {
       return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
     }
 

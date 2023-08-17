@@ -1,7 +1,4 @@
-export enum ACCOUNTS_TABLE {
-  ONCHAIN = 'accountsOnChain',
-  LEGACY = 'accounts', // TODO figure out right way to drop this table now that it's no longer in use
-}
+export const ACCOUNTS_TABLE = 'accountsOnChain'
 
 export enum ACCOUNTS_COLUMNS {
   address = 'address',

@@ -80,22 +80,11 @@ export function startSigner(
   )
 
   const pnpQuotaHandler = config.api.phoneNumberPrivacy.enabled
-    ? createPnpQuotaHandler(
-        pnpQuotaService,
-        config.api.phoneNumberPrivacy.shouldFailOpen, // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config to make the code cleaner
-        dekFetcher
-      )
+    ? createPnpQuotaHandler(pnpQuotaService, dekFetcher)
     : disabledHandler
 
   const pnpSignHandler = config.api.phoneNumberPrivacy.enabled
-    ? createPnpSignHandler(
-        db,
-        config,
-        pnpQuotaService,
-        keyProvider,
-        config.api.phoneNumberPrivacy.shouldFailOpen,
-        dekFetcher
-      )
+    ? createPnpSignHandler(db, config, pnpQuotaService, keyProvider, dekFetcher)
     : disabledHandler
 
   const domainQuotaIO = new DomainQuotaIO(config.api.domains.enabled)
@@ -174,27 +163,27 @@ function createHandler(timeoutMs: number, action: PromiseHandler): RequestHandle
       )
     )
   )
-}
 
-function catchErrorHandler2(handler: PromiseHandler): PromiseHandler {
-  return async (request, response) => {
-    try {
-      await handler(request, response)
-    } catch (err: any) {
-      const logger = response.locals.logger
-      logger.error({ err }, `Error in handler for ${request.url}`)
+  function catchErrorHandler2(handler: PromiseHandler): PromiseHandler {
+    return async (request, response) => {
+      try {
+        await handler(request, response)
+      } catch (err: any) {
+        const logger = response.locals.logger
+        logger.error({ err }, `Error in handler for ${request.url}`)
 
-      let errMsg: ErrorType = ErrorMessage.UNKNOWN_ERROR
-      if (
-        err instanceof Error &&
-        // Propagate standard error & warning messages thrown during endpoint handling
-        (Object.values(ErrorMessage).includes(err.message as ErrorMessage) ||
-          Object.values(WarningMessage).includes(err.message as WarningMessage))
-      ) {
-        errMsg = err.message as ErrorType
+        let errMsg: ErrorType = ErrorMessage.UNKNOWN_ERROR
+        if (
+          err instanceof Error &&
+          // Propagate standard error & warning messages thrown during endpoint handling
+          (Object.values(ErrorMessage).includes(err.message as ErrorMessage) ||
+            Object.values(WarningMessage).includes(err.message as WarningMessage))
+        ) {
+          errMsg = err.message as ErrorType
+        }
+
+        sendFailure(errMsg, 500, response)
       }
-
-      sendFailure(errMsg, 500, response)
     }
   }
 }

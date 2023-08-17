@@ -47,7 +47,6 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   request: Request<{}, {}, R>,
   logger: Logger,
   fetchDEK: DataEncryptionKeyFetcher,
-  shouldFailOpen: boolean = false,
   warnings: ErrorType[] = []
 ): Promise<boolean> {
   return tracer.startActiveSpan('Authentication - authenticateUser', async (span) => {
@@ -79,9 +78,7 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
       } catch (err) {
         // getDataEncryptionKey should only throw if there is a full-node connection issue.
         // That is, it does not throw if the DEK is undefined or invalid
-        const failureStatus = shouldFailOpen
-          ? ErrorMessage.FAILING_OPEN
-          : ErrorMessage.FAILING_CLOSED
+        const failureStatus = ErrorMessage.FAILING_CLOSED
         logger.error({
           err,
           warning: ErrorMessage.FAILURE_TO_GET_DEK,
@@ -94,7 +91,7 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
           message: ErrorMessage.FAILURE_TO_GET_DEK + failureStatus,
         })
         span.end()
-        return shouldFailOpen
+        return false
       }
       if (!registeredEncryptionKey) {
         logger.warn({ account: signer }, 'Account does not have registered encryption key')

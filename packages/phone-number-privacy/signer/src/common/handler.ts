@@ -15,6 +15,7 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import * as client from 'prom-client'
 import { getSignerVersion } from '../config'
+import { OdisError } from './error'
 import { Counters, newMeter } from './metrics'
 
 const tracer = opentelemetry.trace.getTracer('signer-tracer')
@@ -34,8 +35,11 @@ export function catchErrorHandler(handler: PromiseHandler): PromiseHandler {
       Counters.errorsCaughtInEndpointHandler.inc()
 
       if (!res.headersSent) {
-        logger.info('Responding with error in outer endpoint handler')
-        sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, res)
+        if (err instanceof OdisError) {
+          sendFailure(err.code, err.status, res)
+        } else {
+          sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, res)
+        }
       } else {
         // Getting to this error likely indicates that the `perform` process
         // does not terminate after sending a response, and then throws an error.

@@ -24,7 +24,7 @@ describe('Authentication test suite', () => {
       const dekFetcher = newContractKitFetcher({} as ContractKit, logger)
       const warnings: ErrorType[] = []
 
-      const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, true, warnings)
+      const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, warnings)
 
       expect(success).toBe(false)
       expect(warnings).toEqual([])
@@ -39,13 +39,13 @@ describe('Authentication test suite', () => {
 
       const warnings: ErrorType[] = []
 
-      const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, true, warnings)
+      const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, warnings)
 
       expect(success).toBe(false)
       expect(warnings).toEqual([])
     })
 
-    it('Should succeed authentication with error in getDataEncryptionKey when shouldFailOpen is true', async () => {
+    it('Should fail authentication with error in getDataEncryptionKey', async () => {
       const sampleRequest: Request = {
         get: (name: string) => (name === 'Authorization' ? 'Test' : ''),
         body: {
@@ -57,31 +57,7 @@ describe('Authentication test suite', () => {
 
       const warnings: ErrorType[] = []
 
-      const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, true, warnings)
-
-      expect(success).toBe(true)
-      expect(warnings).toEqual([ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_OPEN])
-    })
-
-    it('Should fail authentication with error in getDataEncryptionKey when shouldFailOpen is false', async () => {
-      const sampleRequest: Request = {
-        get: (name: string) => (name === 'Authorization' ? 'Test' : ''),
-        body: {
-          account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
-          authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
-        },
-      } as Request
-      const dekFetcher = newContractKitFetcher({} as ContractKit, logger)
-
-      const warnings: ErrorType[] = []
-
-      const success = await auth.authenticateUser(
-        sampleRequest,
-        logger,
-        dekFetcher,
-        false,
-        warnings
-      )
+      const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, warnings)
 
       expect(success).toBe(false)
       expect(warnings).toEqual([ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_CLOSED])
@@ -110,7 +86,7 @@ describe('Authentication test suite', () => {
 
       const warnings: ErrorType[] = []
 
-      const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, true, warnings)
+      const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, warnings)
 
       expect(success).toBe(false)
       expect(warnings).toEqual([])
@@ -177,7 +153,7 @@ describe('Authentication test suite', () => {
       const warnings: ErrorType[] = []
       const dekFetcher = newContractKitFetcher(mockContractKit, logger)
 
-      const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, true, warnings)
+      const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, warnings)
 
       expect(success).toBe(true)
       expect(warnings).toEqual([])
@@ -224,13 +200,7 @@ describe('Authentication test suite', () => {
 
         const dekFetcher = newContractKitFetcher(mockContractKit, logger)
 
-        const success = await auth.authenticateUser(
-          sampleRequest,
-          logger,
-          dekFetcher,
-          true,
-          warnings
-        )
+        const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, warnings)
 
         expect(success).toBe(false)
         expect(warnings).toEqual([])
@@ -272,7 +242,7 @@ describe('Authentication test suite', () => {
 
       const dekFetcher = newContractKitFetcher(mockContractKit, logger)
 
-      const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, true, warnings)
+      const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, warnings)
 
       expect(success).toBe(false)
       expect(warnings).toEqual([])
@@ -315,7 +285,7 @@ describe('Authentication test suite', () => {
 
       const dekFetcher = newContractKitFetcher(mockContractKit, logger)
 
-      const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, true, warnings)
+      const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, warnings)
 
       expect(success).toBe(false)
       expect(warnings).toEqual([])
@@ -354,7 +324,7 @@ describe('Authentication test suite', () => {
 
       const warnings: ErrorType[] = []
 
-      const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, true, warnings)
+      const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, warnings)
 
       expect(success).toBe(false)
       expect(warnings).toEqual([])

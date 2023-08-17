@@ -53,7 +53,6 @@ export interface SignerConfig {
     }
     phoneNumberPrivacy: {
       enabled: boolean
-      shouldFailOpen: boolean
     }
   }
   blockchain: BlockchainConfig
@@ -128,7 +127,6 @@ export const config: SignerConfig = {
     },
     phoneNumberPrivacy: {
       enabled: toBool(env.PHONE_NUMBER_PRIVACY_API_ENABLED, false),
-      shouldFailOpen: toBool(env.FULL_NODE_ERRORS_SHOULD_FAIL_OPEN, false),
     },
   },
   blockchain: {

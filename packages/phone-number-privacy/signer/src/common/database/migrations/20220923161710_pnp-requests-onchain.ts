@@ -2,8 +2,8 @@ import { Knex } from 'knex'
 import { REQUESTS_COLUMNS, REQUESTS_TABLE } from '../models/request'
 
 export async function up(knex: Knex): Promise<any> {
-  if (!(await knex.schema.hasTable(REQUESTS_TABLE.ONCHAIN))) {
-    return knex.schema.createTable(REQUESTS_TABLE.ONCHAIN, (t) => {
+  if (!(await knex.schema.hasTable(REQUESTS_TABLE))) {
+    return knex.schema.createTable(REQUESTS_TABLE, (t) => {
       t.string(REQUESTS_COLUMNS.address).notNullable()
       t.dateTime(REQUESTS_COLUMNS.timestamp).notNullable()
       t.string(REQUESTS_COLUMNS.blindedQuery).notNullable()
@@ -18,5 +18,5 @@ export async function up(knex: Knex): Promise<any> {
 }
 
 export async function down(knex: Knex): Promise<any> {
-  return knex.schema.dropTable(REQUESTS_TABLE.ONCHAIN)
+  return knex.schema.dropTable(REQUESTS_TABLE)
 }
