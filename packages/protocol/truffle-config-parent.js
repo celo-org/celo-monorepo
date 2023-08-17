@@ -47,6 +47,12 @@ const defaultConfig = {
 
 const freeGasConfig = { ...defaultConfig, ...{ gasPrice: 0 } }
 
+// ipcProvider returns a function to create an IPC provider when called.
+// Use by adding `provider: ipcProvider(...)` to any of the configs below.
+function ipcProvider(path) {
+  return () => new Web3.providers.IpcProvider(path, net)
+}
+
 // Here to avoid recreating it each time
 let coverageProvider = null
 
@@ -214,3 +220,5 @@ if (process.argv.includes('--forno')) {
     return new Web3.providers.HttpProvider(fornoUrls[argv.network])
   }
 }
+
+module.exports = { networks: networks }

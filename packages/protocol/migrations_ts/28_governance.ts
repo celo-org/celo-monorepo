@@ -5,7 +5,7 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
   getDeployedProxiedContract,
-  getFunctionSelectorsForContract,
+  getFunctionSelectorsForContractProxy,
   transferOwnershipOfProxyAndImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
@@ -56,16 +56,27 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       for (const contractName of constitutionContractNames) {
         console.log(`\tSetting constitution thresholds for ${contractName}`)
 
+        console.log(
+          'constitution[contractName].__contractPackage',
+          constitution[contractName].__contractPackage
+        )
         const artifactsObject = ArtifactsSingleton.getInstance(
           constitution[contractName].__contractPackage,
           artifacts
         )
 
-        const contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
-          contractName,
-          artifactsObject
+        // TODO generalize this
+        let contract
+        try {
+          await getDeployedProxiedContract<Truffle.ContractInstance>(contractName, artifactsObject)
+        } catch {
+          await getDeployedProxiedContract<Truffle.ContractInstance>(contractName, artifacts)
+        }
+
+        const selectors = getFunctionSelectorsForContractProxy(
+          contract,
+          artifactsObject.getProxy(contractName)
         )
-        const selectors = getFunctionSelectorsForContract(contract, contractName, artifactsObject)
 
         selectors.default = ['0x00000000']
         const thresholds = { ...constitution.proxy, ...constitution[contractName] }

@@ -213,10 +213,21 @@ export async function _setInitialProxyImplementation<
 
 export async function getDeployedProxiedContract<ContractInstance extends Truffle.ContractInstance>(
   contractName: string,
-  artifacts: any
+  customArtifacts: any
 ): Promise<ContractInstance> {
-  const Proxy: ProxyContract = artifacts.require(contractName + 'Proxy')
-  const Contract: Truffle.Contract<ContractInstance> = artifacts.require(contractName)
+  const Contract: Truffle.Contract<ContractInstance> = customArtifacts.require(contractName)
+  
+  // const Proxy: ProxyContract = customArtifacts.require(contractName + 'Proxy')
+  
+  let Proxy:ProxyContract
+  // TODO this needs to be more general
+  Proxy = customArtifacts.require(contractName + 'Proxy')
+  console.log("Proxy", Proxy)
+  if (!Proxy) {
+    console.log("try clasic require")
+    Proxy = artifacts.require(contractName + 'Proxy')
+  }
+
   const proxy: ProxyInstance = await Proxy.deployed()
   // @ts-ignore
   Contract.numberFormat = 'BigNumber'
@@ -403,6 +414,30 @@ export async function transferOwnershipOfProxyAndImplementation<
   await contract.transferOwnership(owner)
   await transferOwnershipOfProxy(contractName, owner, artifacts)
 }
+
+
+/*
+* Builds and returns mapping of function names to selectors.
+* Each function name maps to an array of selectors to account for overloading.
+*/
+export function getFunctionSelectorsForContractProxy(contract: any, proxy: any) {
+  const selectors: { [index: string]: string[] } = {}
+  proxy.abi
+    .concat(contract.abi)
+    .filter((abiEntry: any) => abiEntry.type === 'function')
+    .forEach((func: any) => {
+      if (typeof selectors[func.name] === 'undefined') {
+        selectors[func.name] = []
+      }
+      if (typeof func.signature === 'undefined') {
+        selectors[func.name].push(web3.eth.abi.encodeFunctionSignature(func))
+      } else {
+        selectors[func.name].push(func.signature)
+      }
+    })
+  return selectors
+}
+
 
 /*
 * Builds and returns mapping of function names to selectors.

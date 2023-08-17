@@ -92,7 +92,6 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   const contract = queue.pop()
   // mark current DFS node as visited
   visited.add(contract)
-  console.log(`Verifying contract ${contract}`)
 
   // check proxy deployment
   if (isProxyChanged(contract, context.proposal)) {
@@ -129,7 +128,6 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
     implementationAddress = await proxy._getImplementation()
   }
 
-  console.log("Implementation address at:", implementationAddress)
   let onchainBytecode = await getOnchainBytecode(implementationAddress, context)
   context.libraryAddresses.collect(onchainBytecode, sourceLibraryPositions)
 

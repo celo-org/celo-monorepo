@@ -62,13 +62,6 @@ const DefaultConstitution = {
     freeze: 0.6,
     unfreeze: 0.6,
   },
-  GasPriceMinimum: {
-    default: 0.7,
-    setRegistry: 0.9,
-    setAdjustmentSpeed: 0.7,
-    setTargetDensity: 0.7,
-    setGasPriceMinimumFloor: 0.7,
-  },
   GoldToken: {
     default: 0.9,
     transfer: 0.6,
@@ -219,6 +212,14 @@ const constitutionExternal = {
     setSpread: 0.8,
     setReserveFraction: 0.8,
     __contractPackage: MENTO_PACKAGE,
+  },
+  GasPriceMinimum: {
+    default: 0.7,
+    setRegistry: 0.9,
+    setAdjustmentSpeed: 0.7,
+    setTargetDensity: 0.7,
+    setGasPriceMinimumFloor: 0.7,
+    __contractPackage: contractPackages.SOLIDITY_08_PACKAGE,
   },
 }
 

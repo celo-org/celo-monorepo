@@ -21,6 +21,7 @@ export class ArtifactsSingleton {
       ArtifactsSingleton.instances[namespace] = new ArtifactsSingleton()
     }
 
+    // console.log("artifacts for that instance are", ArtifactsSingleton.instances[namespace])
     return ArtifactsSingleton.instances[namespace]
   }
 
@@ -38,5 +39,18 @@ export class ArtifactsSingleton {
 
   public require(key: string) {
     return this.artifacts[key]
+  }
+
+  //
+  public getProxy(key: string, defaultArtifacts?:any) {
+    const proxyArtifactName = key + "Proxy"
+
+      const  toReturn = this.require(proxyArtifactName)
+
+      if (!toReturn && defaultArtifacts){
+        return defaultArtifacts.require(proxyArtifactName)
+      }
+
+    return toReturn
   }
 }

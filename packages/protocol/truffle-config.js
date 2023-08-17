@@ -1,9 +1,10 @@
-parent = require('./truffle-config-parent.js')
-networks = parent.networks
-
 const SOLC_VERSION = '0.5.13'
+
+const parent = require('./truffle-config-parent.js')
+const flakeTrackingConfig = require('@celo/flake-tracker/src/mocha/config.js')
+const networks = { ...parent.networks }
+
 console.log(`Using truffle version for Solidity ${SOLC_VERSION}`)
-console.log('Using old truffle version')
 
 module.exports = {
   plugins: ['truffle-security', 'truffle-plugin-blockscout-verify'],
@@ -17,7 +18,7 @@ module.exports = {
     },
   },
   networks,
-  mocha: parent.flakeTrackingConfig,
+  mocha: flakeTrackingConfig,
 }
 
 if (process.argv.includes('--gas')) {

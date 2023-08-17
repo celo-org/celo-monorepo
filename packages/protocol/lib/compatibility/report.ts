@@ -175,7 +175,6 @@ export class ASTVersionedReport {
       libraries: {}
     }
     Object.keys(changesByContract).forEach((contract: string) => {
-      console.log("change contract is,", contract)
       if (isLibrary(contract, artifactsSet)) {
         reportIndex.libraries[contract] = changesByContract[contract]
       } else {
