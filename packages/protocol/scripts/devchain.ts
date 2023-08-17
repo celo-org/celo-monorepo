@@ -146,12 +146,12 @@ async function startGanache(
 
   return async () => {
     try {
-      await server.close()
+      // await server.close()
       if (chainCopy) {
         chainCopy.removeCallback()
       }
       // tslint:disable-next-line: no-console
-      console.log(chalk.red('Ganache server CLOSED'))
+      // console.log(chalk.red('Ganache server CLOSED'))
     } catch (e) {
       throw e
     }
