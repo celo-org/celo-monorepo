@@ -22,7 +22,7 @@
     "lint": "tslint --project .",
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
     "test:coverage": "yarn test --coverage",
-    "test:integration": "jest --runInBand test/integration/pnp",
+    "test:integration": "jest --runInBand test/integration",
     "test:e2e": "jest test/end-to-end --verbose",
     "test:e2e:staging": "CONTEXT_NAME=staging yarn test:e2e",
     "test:e2e:alfajores": "CONTEXT_NAME=alfajores yarn test:e2e",
@@ -56,8 +56,7 @@
     "@types/supertest": "^2.0.12",
     "@types/uuid": "^7.0.3",
     "firebase-functions-test": "^3.1.0",
-    "firebase-tools": "12.4.7",
-    "sqlite3": "^5.0.8"
+    "firebase-tools": "12.4.7"
   },
   "peerDependencies": {
     "@celo/phone-number-privacy-signer": "^3.0.0-dev"
