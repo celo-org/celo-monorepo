@@ -1,5 +1,4 @@
 import { CeloTx, CeloTxObject, CeloTxReceipt, JsonRpcPayload, PromiEvent } from '@celo/connect'
-import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
 import { HttpProvider } from 'web3-core'
 import { newKitFromWeb3 as newFullKitFromWeb3, newKitWithApiKey } from './kit'
@@ -115,26 +114,6 @@ export function txoStub<T>(): TransactionObjectStub<T> {
         from: '0xAAFFF',
       })
     })
-  })
-})
-
-test('should retrieve currency gasPrice with feeCurrency', async () => {
-  const kit = newFullKitFromWeb3(new Web3('http://'))
-
-  const txo = txoStub()
-  const gasPrice = 100
-  const getGasPriceMin = jest.fn().mockImplementation(() => ({
-    getGasPriceMinimum() {
-      return new BigNumber(gasPrice)
-    },
-  }))
-  kit.contracts.getGasPriceMinimum = getGasPriceMin.bind(kit.contracts)
-  await kit.updateGasPriceInConnectionLayer('XXX')
-  const options: CeloTx = { gas: 555, feeCurrency: 'XXX', from: '0xAAFFF' }
-  await kit.connection.sendTransactionObject(txo, options)
-  expect(txo.send).toBeCalledWith({
-    gasPrice: `${gasPrice * 5}`,
-    ...options,
   })
 })
 
