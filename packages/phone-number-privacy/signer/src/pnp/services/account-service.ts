@@ -7,10 +7,11 @@ import {
   RETRY_DELAY_IN_MS,
 } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
-import { wrapError } from '../../common/error'
+import Logger from 'bunyan'
+import { LRUCache } from 'lru-cache'
+import { OdisError, wrapError } from '../../common/error'
 import { getOnChainOdisPayments } from '../../common/web3/contracts'
 import { config } from '../../config'
-import { Context } from '../context'
 
 export interface PnpAccount {
   dek: string // onChain
@@ -19,23 +20,52 @@ export interface PnpAccount {
 }
 
 export interface AccountService {
-  getDekForAccount(address: string, ctx: Context): Promise<string>
-  getAccount(address: string, ctx: Context): Promise<PnpAccount>
+  getAccount(address: string): Promise<PnpAccount>
 }
 
-// interface ContratKitAccountService extends AccountService {}
-
-// // this one use another AccountService to fill the cache (contractKit one)
-// interface CachingAccountService extends AccountService {}
-
+interface CachedValue {
+  dek: string
+  pnpTotalQuota: number
+}
 export interface ContractKitAccountServiceOptions {
   fullNodeTimeoutMs: number
   fullNodeRetryCount: number
   fullNodeRetryDelayMs: number
 }
 
+export class CachingAccountService implements AccountService {
+  private cache: LRUCache<string, CachedValue, any>
+  constructor(baseService: AccountService) {
+    this.cache = new LRUCache({
+      max: 500,
+      ttl: 5 * 1000, // 5 seconds
+      allowStale: true,
+      fetchMethod: async (address: string) => {
+        const account = await baseService.getAccount(address)
+        return { dek: account.dek, pnpTotalQuota: account.pnpTotalQuota }
+      },
+    })
+  }
+
+  async getAccount(address: string): Promise<PnpAccount> {
+    const value = await this.cache.fetch(address)
+
+    if (value === undefined) {
+      // TODO decide which error ot use here
+      throw new OdisError(ErrorMessage.FAILURE_TO_GET_DEK)
+    }
+    return {
+      address,
+      dek: value.dek,
+      pnpTotalQuota: value.pnpTotalQuota,
+    }
+  }
+}
+
+// tslint:disable-next-line:max-classes-per-file
 export class ContractKitAccountService implements AccountService {
   constructor(
+    private readonly logger: Logger,
     private readonly kit: ContractKit,
     private readonly opts: ContractKitAccountServiceOptions = {
       fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
@@ -44,19 +74,12 @@ export class ContractKitAccountService implements AccountService {
     }
   ) {}
 
-  getDekForAccount(address: string, ctx: Context): Promise<string> {
-    return this.getAccount(address, ctx).then((acc) => acc.dek)
-  }
-
-  async getAccount(address: string, ctx: Context): Promise<PnpAccount> {
-    const logger = ctx.logger
-    const url = ctx.url
-
+  async getAccount(address: string): Promise<PnpAccount> {
     const dek = await wrapError(
       getDataEncryptionKey(
         address,
         this.kit,
-        logger,
+        this.logger,
         this.opts.fullNodeTimeoutMs,
         this.opts.fullNodeRetryCount,
         this.opts.fullNodeRetryDelayMs
@@ -66,7 +89,7 @@ export class ContractKitAccountService implements AccountService {
 
     const { queryPriceInCUSD } = config.quota
     const totalPaidInWei = await wrapError(
-      getOnChainOdisPayments(this.kit, logger, address, url),
+      getOnChainOdisPayments(this.kit, this.logger, address, 'FAKE_URL'),
       ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA
     )
     const totalQuotaBN = totalPaidInWei

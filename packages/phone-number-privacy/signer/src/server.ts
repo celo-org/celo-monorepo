@@ -34,7 +34,7 @@ import {
   timeoutHandler,
   tracingHandler,
 } from './common/handler'
-import { ContractKitAccountService } from './pnp/services/account-service'
+import { CachingAccountService, ContractKitAccountService } from './pnp/services/account-service'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -62,11 +62,14 @@ export function startSigner(
     res.send(PromClient.register.metrics())
   })
 
-  const accountService = new ContractKitAccountService(kit, {
-    fullNodeTimeoutMs: config.fullNodeTimeoutMs,
-    fullNodeRetryCount: config.fullNodeRetryCount,
-    fullNodeRetryDelayMs: config.fullNodeRetryDelayMs,
-  })
+  const accountService = new CachingAccountService(
+    new ContractKitAccountService(logger, kit, {
+      fullNodeTimeoutMs: config.fullNodeTimeoutMs,
+      fullNodeRetryCount: config.fullNodeRetryCount,
+      fullNodeRetryDelayMs: config.fullNodeRetryDelayMs,
+    })
+  )
+
   const pnpRequestService = new DefaultPnpQuotaService(db)
   const domainQuotaService = new DomainQuotaService(db)
 

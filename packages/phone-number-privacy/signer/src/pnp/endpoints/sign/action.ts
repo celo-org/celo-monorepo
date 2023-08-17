@@ -56,7 +56,7 @@ export function createPnpSignHandler(
             errors: warnings,
           }
 
-          const account = await accountService.getAccount(request.body.account, ctx)
+          const account = await accountService.getAccount(request.body.account)
 
           if (!(await authenticateUser(request, logger, async (_) => account.dek, warnings))) {
             return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
