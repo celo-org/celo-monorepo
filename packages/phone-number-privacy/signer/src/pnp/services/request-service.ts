@@ -1,6 +1,8 @@
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { getPerformedQueryCount, incrementQueryCount } from '../../common/database/wrappers/account'
 import { insertRequest } from '../../common/database/wrappers/request'
+import { wrapError } from '../../common/error'
 import { Histograms, newMeter } from '../../common/metrics'
 import { Context } from '../context'
 
@@ -33,6 +35,11 @@ export class DefaultPnpQuotaService {
       'getQuotaStatus',
       ctx.url
     )
-    return meter(async () => getPerformedQueryCount(this.db, account, ctx.logger))
+    return meter(() =>
+      wrapError(
+        getPerformedQueryCount(this.db, account, ctx.logger),
+        ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT
+      )
+    )
   }
 }

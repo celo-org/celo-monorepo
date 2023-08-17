@@ -368,7 +368,7 @@ describe('pnp', () => {
           expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
             success: false,
             version: expectedVersion,
-            error: ErrorMessage.FAILURE_TO_GET_ACCOUNT,
+            error: ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT,
           })
 
           spy.mockRestore()
@@ -386,7 +386,7 @@ describe('pnp', () => {
           expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
             success: false,
             version: expectedVersion,
-            error: ErrorMessage.FAILURE_TO_GET_ACCOUNT,
+            error: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA,
           })
         })
 
@@ -888,9 +888,7 @@ describe('pnp', () => {
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: expectedVersion,
-            performedQueryCount: 1,
-            totalQuota: 1,
-            error: ErrorMessage.DATABASE_GET_FAILURE,
+            error: ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT,
           })
 
           spy.mockRestore()
@@ -994,9 +992,7 @@ describe('pnp', () => {
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: expectedVersion,
-            performedQueryCount: performedQueryCount,
-            totalQuota: -1,
-            error: ErrorMessage.FULL_NODE_ERROR,
+            error: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA,
           })
         })
 

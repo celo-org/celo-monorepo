@@ -1,11 +1,13 @@
 import { ContractKit } from '@celo/contractkit'
 import {
+  ErrorMessage,
   FULL_NODE_TIMEOUT_IN_MS,
   getDataEncryptionKey,
   RETRY_COUNT,
   RETRY_DELAY_IN_MS,
 } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
+import { wrapError } from '../../common/error'
 import { getOnChainOdisPayments } from '../../common/web3/contracts'
 import { config } from '../../config'
 import { Context } from '../context'
@@ -50,17 +52,23 @@ export class ContractKitAccountService implements AccountService {
     const logger = ctx.logger
     const url = ctx.url
 
-    const dek = await getDataEncryptionKey(
-      address,
-      this.kit,
-      logger,
-      this.opts.fullNodeTimeoutMs,
-      this.opts.fullNodeRetryCount,
-      this.opts.fullNodeRetryDelayMs
+    const dek = await wrapError(
+      getDataEncryptionKey(
+        address,
+        this.kit,
+        logger,
+        this.opts.fullNodeTimeoutMs,
+        this.opts.fullNodeRetryCount,
+        this.opts.fullNodeRetryDelayMs
+      ),
+      ErrorMessage.FAILURE_TO_GET_DEK
     )
 
     const { queryPriceInCUSD } = config.quota
-    const totalPaidInWei = await getOnChainOdisPayments(this.kit, logger, address, url)
+    const totalPaidInWei = await wrapError(
+      getOnChainOdisPayments(this.kit, logger, address, url),
+      ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA
+    )
     const totalQuotaBN = totalPaidInWei
       .div(queryPriceInCUSD.times(new BigNumber(1e18)))
       .integerValue(BigNumber.ROUND_DOWN)
