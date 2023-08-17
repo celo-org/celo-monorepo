@@ -4,6 +4,7 @@ import { getPerformedQueryCount, incrementQueryCount } from '../../common/databa
 import { insertRequest } from '../../common/database/wrappers/request'
 import { wrapError } from '../../common/error'
 import { Histograms, newMeter } from '../../common/metrics'
+import { traceAsyncFunction } from '../../common/tracing-utils'
 import { Context } from '../context'
 
 export interface PnpRequestService {
@@ -23,9 +24,11 @@ export class DefaultPnpQuotaService {
     blindedQueryPhoneNumber: string,
     ctx: Context
   ): Promise<void> {
-    return this.db.transaction(async (trx) => {
-      await insertRequest(this.db, account, blindedQueryPhoneNumber, ctx.logger, trx)
-      await incrementQueryCount(this.db, account, ctx.logger, trx)
+    return traceAsyncFunction('pnpQuotaService - recordRequest', () => {
+      return this.db.transaction(async (trx) => {
+        await insertRequest(this.db, account, blindedQueryPhoneNumber, ctx.logger, trx)
+        await incrementQueryCount(this.db, account, ctx.logger, trx)
+      })
     })
   }
 
@@ -35,10 +38,13 @@ export class DefaultPnpQuotaService {
       'getQuotaStatus',
       ctx.url
     )
-    return meter(() =>
-      wrapError(
-        getPerformedQueryCount(this.db, account, ctx.logger),
-        ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT
+
+    return traceAsyncFunction('pnpQuotaService - getUsedQuotaForAccount', () =>
+      meter(() =>
+        wrapError(
+          getPerformedQueryCount(this.db, account, ctx.logger),
+          ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT
+        )
       )
     )
   }

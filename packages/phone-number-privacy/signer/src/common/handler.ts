@@ -52,24 +52,29 @@ export function catchErrorHandler(handler: PromiseHandler): PromiseHandler {
 
 export function tracingHandler(handler: PromiseHandler): PromiseHandler {
   return async (req, res) => {
-    const span = tracer.startSpan('server - addEndpoint - post', {
-      attributes: {
-        [SemanticAttributes.HTTP_ROUTE]: req.path,
-        [SemanticAttributes.HTTP_METHOD]: req.method,
-        [SemanticAttributes.HTTP_CLIENT_IP]: req.ip,
+    return tracer.startActiveSpan(
+      req.url,
+      {
+        attributes: {
+          [SemanticAttributes.HTTP_ROUTE]: req.path,
+          [SemanticAttributes.HTTP_METHOD]: req.method,
+          [SemanticAttributes.HTTP_CLIENT_IP]: req.ip,
+        },
       },
-    })
-    try {
-      await handler(req, res)
-    } catch (err: any) {
-      span.setStatus({
-        code: SpanStatusCode.ERROR,
-        message: 'Fail',
-      })
-      throw err
-    } finally {
-      span.end()
-    }
+      async (span) => {
+        try {
+          await handler(req, res)
+        } catch (err: any) {
+          span.setStatus({
+            code: SpanStatusCode.ERROR,
+            message: err instanceof Error ? err.message : 'Fail',
+          })
+          throw err
+        } finally {
+          span.end()
+        }
+      }
+    )
   }
 }
 

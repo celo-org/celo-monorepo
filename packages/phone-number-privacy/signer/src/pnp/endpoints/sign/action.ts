@@ -22,11 +22,9 @@ import { getSignerVersion, SignerConfig } from '../../../config'
 
 import { errorResult, PromiseHandler, Result, resultHandler } from '../../../common/handler'
 
-import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import Logger from 'bunyan'
 import { AccountService } from '../../services/account-service'
 import { PnpRequestService } from '../../services/request-service'
-const tracer = opentelemetry.trace.getTracer('signer-tracer')
 
 export function createPnpSignHandler(
   db: Knex,
@@ -35,130 +33,103 @@ export function createPnpSignHandler(
   accountService: AccountService,
   keyProvider: KeyProvider
 ): PromiseHandler {
-  return resultHandler(
-    async (request, response): Promise<Result<any>> =>
-      tracer.startActiveSpan('pnpSignIO - perform', async (span) => {
-        try {
-          const logger = response.locals.logger
+  return resultHandler(async (request, response): Promise<Result<any>> => {
+    const logger = response.locals.logger
 
-          if (!isValidRequest(request)) {
-            return errorResult(400, WarningMessage.INVALID_INPUT)
-          }
+    if (!isValidRequest(request)) {
+      return errorResult(400, WarningMessage.INVALID_INPUT)
+    }
 
-          if (!requestHasValidKeyVersion(request, logger)) {
-            return errorResult(400, WarningMessage.INVALID_KEY_VERSION_REQUEST)
-          }
+    if (!requestHasValidKeyVersion(request, logger)) {
+      return errorResult(400, WarningMessage.INVALID_KEY_VERSION_REQUEST)
+    }
 
-          const warnings: ErrorType[] = []
-          const ctx = {
-            url: request.url,
-            logger,
-            errors: warnings,
-          }
+    const warnings: ErrorType[] = []
+    const ctx = {
+      url: request.url,
+      logger,
+      errors: warnings,
+    }
 
-          const account = await accountService.getAccount(request.body.account)
+    const account = await accountService.getAccount(request.body.account)
 
-          if (!(await authenticateUser(request, logger, async (_) => account.dek, warnings))) {
-            return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
-          }
+    if (!(await authenticateUser(request, logger, async (_) => account.dek, warnings))) {
+      return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
+    }
 
-          let usedQuota = await requestService.getUsedQuotaForAccount(request.body.account, ctx)
+    let usedQuota = await requestService.getUsedQuotaForAccount(request.body.account, ctx)
 
-          const duplicateRequest = await isDuplicateRequest(
-            db,
-            request.body.account,
-            request.body.blindedQueryPhoneNumber,
-            logger
-          )
+    const duplicateRequest = await isDuplicateRequest(
+      db,
+      request.body.account,
+      request.body.blindedQueryPhoneNumber,
+      logger
+    )
 
-          if (!duplicateRequest && account.pnpTotalQuota <= usedQuota) {
-            logger.warn({ usedQuota, totalQuota: account.pnpTotalQuota }, 'No remaining quota')
+    if (!duplicateRequest && account.pnpTotalQuota <= usedQuota) {
+      logger.warn({ usedQuota, totalQuota: account.pnpTotalQuota }, 'No remaining quota')
 
-            const remainingQuota = account.pnpTotalQuota - usedQuota
-            Histograms.userRemainingQuotaAtRequest.labels(ctx.url).observe(remainingQuota)
+      const remainingQuota = account.pnpTotalQuota - usedQuota
+      Histograms.userRemainingQuotaAtRequest.labels(ctx.url).observe(remainingQuota)
 
-            if (bypassQuotaForE2ETesting(config.test_quota_bypass_percentage, request.body)) {
-              Counters.testQuotaBypassedRequests.inc()
-              logger.info(request.body, 'Request will bypass quota check for e2e testing')
-            } else {
-              span.addEvent('Not sufficient Quota')
-              span.setStatus({
-                code: SpanStatusCode.ERROR,
-                message: WarningMessage.EXCEEDED_QUOTA,
-              })
-              return errorResult(403, WarningMessage.EXCEEDED_QUOTA, {
-                performedQueryCount: usedQuota,
-                totalQuota: account.pnpTotalQuota,
-              })
-            }
-          }
+      if (bypassQuotaForE2ETesting(config.test_quota_bypass_percentage, request.body)) {
+        Counters.testQuotaBypassedRequests.inc()
+        logger.info(request.body, 'Request will bypass quota check for e2e testing')
+      } else {
+        return errorResult(403, WarningMessage.EXCEEDED_QUOTA, {
+          performedQueryCount: usedQuota,
+          totalQuota: account.pnpTotalQuota,
+        })
+      }
+    }
 
-          const key: Key = {
-            version:
-              getRequestKeyVersion(request, response.locals.logger) ??
-              config.keystore.keys.phoneNumberPrivacy.latest,
-            name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
-          }
+    const key: Key = {
+      version:
+        getRequestKeyVersion(request, response.locals.logger) ??
+        config.keystore.keys.phoneNumberPrivacy.latest,
+      name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
+    }
 
-          let signature: string
-          try {
-            signature = await sign(
-              request.body.blindedQueryPhoneNumber,
-              key,
-              keyProvider,
-              response.locals.logger
-            )
-            span.setStatus({
-              code: SpanStatusCode.OK,
-              message: response.statusMessage,
-            })
-          } catch (err) {
-            span.setStatus({
-              code: SpanStatusCode.ERROR,
-              message: ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
-            })
+    let signature: string
+    try {
+      signature = await sign(
+        request.body.blindedQueryPhoneNumber,
+        key,
+        keyProvider,
+        response.locals.logger
+      )
+    } catch (err) {
+      response.locals.logger.error({ err }, 'catch error on signing')
 
-            response.locals.logger.error({ err }, 'catch error on signing')
-
-            return errorResult(500, ErrorMessage.SIGNATURE_COMPUTATION_FAILURE, {
-              performedQueryCount: usedQuota,
-              totalQuota: account.pnpTotalQuota,
-            })
-          }
-
-          if (!duplicateRequest) {
-            await requestService.recordRequest(
-              account.address,
-              request.body.blindedQueryPhoneNumber,
-              ctx
-            )
-            usedQuota++
-          } else {
-            Counters.duplicateRequests.inc()
-            logger.info(
-              'Request already exists in db. Will service request without charging quota.'
-            )
-            warnings.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
-          }
-
-          // Send Success response
-          response.set(KEY_VERSION_HEADER, key.version.toString())
-          return {
-            status: 200,
-            body: {
-              success: true as true,
-              version: getSignerVersion(),
-              signature,
-              performedQueryCount: usedQuota,
-              totalQuota: account.pnpTotalQuota,
-              warnings,
-            },
-          }
-        } finally {
-          span.end()
-        }
+      return errorResult(500, ErrorMessage.SIGNATURE_COMPUTATION_FAILURE, {
+        performedQueryCount: usedQuota,
+        totalQuota: account.pnpTotalQuota,
       })
-  )
+    }
+
+    if (!duplicateRequest) {
+      await requestService.recordRequest(account.address, request.body.blindedQueryPhoneNumber, ctx)
+      usedQuota++
+    } else {
+      Counters.duplicateRequests.inc()
+      logger.info('Request already exists in db. Will service request without charging quota.')
+      warnings.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
+    }
+
+    // Send Success response
+    response.set(KEY_VERSION_HEADER, key.version.toString())
+    return {
+      status: 200,
+      body: {
+        success: true as true,
+        version: getSignerVersion(),
+        signature,
+        performedQueryCount: usedQuota,
+        totalQuota: account.pnpTotalQuota,
+        warnings,
+      },
+    }
+  })
 }
 
 function isDuplicateRequest(

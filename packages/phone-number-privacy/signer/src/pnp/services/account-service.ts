@@ -10,6 +10,7 @@ import BigNumber from 'bignumber.js'
 import Logger from 'bunyan'
 import { LRUCache } from 'lru-cache'
 import { OdisError, wrapError } from '../../common/error'
+import { traceAsyncFunction } from '../../common/tracing-utils'
 import { getOnChainOdisPayments } from '../../common/web3/contracts'
 import { config } from '../../config'
 
@@ -47,18 +48,20 @@ export class CachingAccountService implements AccountService {
     })
   }
 
-  async getAccount(address: string): Promise<PnpAccount> {
-    const value = await this.cache.fetch(address)
+  getAccount(address: string): Promise<PnpAccount> {
+    return traceAsyncFunction('CachingAccountService - getAccount', async () => {
+      const value = await this.cache.fetch(address)
 
-    if (value === undefined) {
-      // TODO decide which error ot use here
-      throw new OdisError(ErrorMessage.FAILURE_TO_GET_DEK)
-    }
-    return {
-      address,
-      dek: value.dek,
-      pnpTotalQuota: value.pnpTotalQuota,
-    }
+      if (value === undefined) {
+        // TODO decide which error ot use here
+        throw new OdisError(ErrorMessage.FAILURE_TO_GET_DEK)
+      }
+      return {
+        address,
+        dek: value.dek,
+        pnpTotalQuota: value.pnpTotalQuota,
+      }
+    })
   }
 }
 
@@ -75,35 +78,37 @@ export class ContractKitAccountService implements AccountService {
   ) {}
 
   async getAccount(address: string): Promise<PnpAccount> {
-    const dek = await wrapError(
-      getDataEncryptionKey(
+    return traceAsyncFunction('ContractKitAccountService - getAccount', async () => {
+      const dek = await wrapError(
+        getDataEncryptionKey(
+          address,
+          this.kit,
+          this.logger,
+          this.opts.fullNodeTimeoutMs,
+          this.opts.fullNodeRetryCount,
+          this.opts.fullNodeRetryDelayMs
+        ),
+        ErrorMessage.FAILURE_TO_GET_DEK
+      )
+
+      const { queryPriceInCUSD } = config.quota
+      const totalPaidInWei = await wrapError(
+        getOnChainOdisPayments(this.kit, this.logger, address, 'FAKE_URL'),
+        ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA
+      )
+      const totalQuotaBN = totalPaidInWei
+        .div(queryPriceInCUSD.times(new BigNumber(1e18)))
+        .integerValue(BigNumber.ROUND_DOWN)
+
+      // If any account hits an overflow here, we need to redesign how
+      // quota/queries are computed anyways.
+      const pnpTotalQuota = totalQuotaBN.toNumber()
+
+      return {
         address,
-        this.kit,
-        this.logger,
-        this.opts.fullNodeTimeoutMs,
-        this.opts.fullNodeRetryCount,
-        this.opts.fullNodeRetryDelayMs
-      ),
-      ErrorMessage.FAILURE_TO_GET_DEK
-    )
-
-    const { queryPriceInCUSD } = config.quota
-    const totalPaidInWei = await wrapError(
-      getOnChainOdisPayments(this.kit, this.logger, address, 'FAKE_URL'),
-      ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA
-    )
-    const totalQuotaBN = totalPaidInWei
-      .div(queryPriceInCUSD.times(new BigNumber(1e18)))
-      .integerValue(BigNumber.ROUND_DOWN)
-
-    // If any account hits an overflow here, we need to redesign how
-    // quota/queries are computed anyways.
-    const pnpTotalQuota = totalQuotaBN.toNumber()
-
-    return {
-      address,
-      dek,
-      pnpTotalQuota,
-    }
+        dek,
+        pnpTotalQuota,
+      }
+    })
   }
 }
