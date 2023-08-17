@@ -1,6 +1,5 @@
 import {
   authenticateUser,
-  DataEncryptionKeyFetcher,
   ErrorMessage,
   ErrorType,
   getRequestKeyVersion,
@@ -20,20 +19,20 @@ import { getRequestExists } from '../../../common/database/wrappers/request'
 import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management/key-provider-base'
 import { Counters, Histograms } from '../../../common/metrics'
 import { getSignerVersion, SignerConfig } from '../../../config'
-import { PnpQuotaService } from '../../services/quota'
 
 import { errorResult, PromiseHandler, Result, resultHandler } from '../../../common/handler'
 
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import Logger from 'bunyan'
+import { AccountService, PnpRequestService } from '../../services/quota'
 const tracer = opentelemetry.trace.getTracer('signer-tracer')
 
 export function createPnpSignHandler(
   db: Knex,
   config: SignerConfig,
-  quota: PnpQuotaService,
-  keyProvider: KeyProvider,
-  dekFetcher: DataEncryptionKeyFetcher
+  requestService: PnpRequestService,
+  accountService: AccountService,
+  keyProvider: KeyProvider
 ): PromiseHandler {
   return resultHandler(
     async (request, response): Promise<Result<any>> =>
@@ -50,17 +49,19 @@ export function createPnpSignHandler(
           }
 
           const warnings: ErrorType[] = []
-          if (!(await authenticateUser(request, logger, dekFetcher, warnings))) {
-            return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
-          }
-
           const ctx = {
             url: request.url,
             logger,
             errors: warnings,
           }
 
-          let quotaStatus = await quota.getQuotaStatus(request.body.account, ctx)
+          const account = await accountService.getAccount(request.body.account, ctx)
+
+          if (!(await authenticateUser(request, logger, async (_) => account.dek, warnings))) {
+            return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
+          }
+
+          let usedQuota = await requestService.getUsedQuotaForAccount(request.body.account, ctx)
 
           const duplicateRequest = await isDuplicateRequest(
             db,
@@ -69,10 +70,10 @@ export function createPnpSignHandler(
             logger
           )
 
-          if (!duplicateRequest && quotaStatus.totalQuota <= quotaStatus.performedQueryCount) {
-            logger.warn({ ...quotaStatus }, 'No remaining quota')
+          if (!duplicateRequest && account.pnpTotalQuota <= usedQuota) {
+            logger.warn({ usedQuota, totalQuota: account.pnpTotalQuota }, 'No remaining quota')
 
-            const remainingQuota = quotaStatus.totalQuota - quotaStatus.performedQueryCount
+            const remainingQuota = account.pnpTotalQuota - usedQuota
             Histograms.userRemainingQuotaAtRequest.labels(ctx.url).observe(remainingQuota)
 
             if (bypassQuotaForE2ETesting(config.test_quota_bypass_percentage, request.body)) {
@@ -84,7 +85,10 @@ export function createPnpSignHandler(
                 code: SpanStatusCode.ERROR,
                 message: WarningMessage.EXCEEDED_QUOTA,
               })
-              return errorResult(403, WarningMessage.EXCEEDED_QUOTA, quotaStatus)
+              return errorResult(403, WarningMessage.EXCEEDED_QUOTA, {
+                performedQueryCount: usedQuota,
+                totalQuota: account.pnpTotalQuota,
+              })
             }
           }
 
@@ -115,11 +119,19 @@ export function createPnpSignHandler(
 
             response.locals.logger.error({ err }, 'catch error on signing')
 
-            return errorResult(500, ErrorMessage.SIGNATURE_COMPUTATION_FAILURE, quotaStatus)
+            return errorResult(500, ErrorMessage.SIGNATURE_COMPUTATION_FAILURE, {
+              performedQueryCount: usedQuota,
+              totalQuota: account.pnpTotalQuota,
+            })
           }
 
           if (!duplicateRequest) {
-            quotaStatus = await quota.updateQuotaStatus(quotaStatus, ctx, request.body)
+            await requestService.recordRequest(
+              account.address,
+              request.body.blindedQueryPhoneNumber,
+              ctx
+            )
+            usedQuota++
           } else {
             Counters.duplicateRequests.inc()
             logger.info(
@@ -136,7 +148,8 @@ export function createPnpSignHandler(
               success: true as true,
               version: getSignerVersion(),
               signature,
-              ...quotaStatus,
+              performedQueryCount: usedQuota,
+              totalQuota: account.pnpTotalQuota,
               warnings,
             },
           }

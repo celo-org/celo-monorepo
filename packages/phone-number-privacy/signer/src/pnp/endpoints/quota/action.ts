@@ -1,6 +1,5 @@
 import {
   authenticateUser,
-  DataEncryptionKeyFetcher,
   ErrorType,
   hasValidAccountParam,
   isBodyReasonablySized,
@@ -11,11 +10,11 @@ import {
 import { Request } from 'express'
 import { errorResult, PromiseHandler, resultHandler } from '../../../common/handler'
 import { getSignerVersion } from '../../../config'
-import { PnpQuotaService } from '../../services/quota'
+import { AccountService, PnpRequestService } from '../../services/quota'
 
 export function createPnpQuotaHandler(
-  quota: PnpQuotaService,
-  dekFetcher: DataEncryptionKeyFetcher
+  requestService: PnpRequestService,
+  accountService: AccountService
 ): PromiseHandler {
   return resultHandler(async (request, response) => {
     const logger = response.locals.logger
@@ -25,22 +24,27 @@ export function createPnpQuotaHandler(
     }
 
     const warnings: ErrorType[] = []
-    if (!(await authenticateUser(request, logger, dekFetcher, warnings))) {
+    const ctx = {
+      url: request.url,
+      logger,
+      errors: warnings,
+    }
+
+    const account = await accountService.getAccount(request.body.account, ctx)
+
+    if (!(await authenticateUser(request, logger, async (_) => account.dek, warnings))) {
       return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
     }
 
-    const quotaStatus = await quota.getQuotaStatus(request.body.account, {
-      logger: response.locals.logger,
-      url: request.baseUrl,
-      errors: warnings,
-    })
+    const usedQuota = await requestService.getUsedQuotaForAccount(request.body.account, ctx)
 
     return {
       status: 200,
       body: {
         success: true,
         version: getSignerVersion(),
-        ...quotaStatus,
+        performedQueryCount: usedQuota,
+        totalQuota: account.pnpTotalQuota,
         warnings,
       },
     }

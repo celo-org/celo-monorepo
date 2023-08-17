@@ -61,18 +61,20 @@ export async function incrementQueryCount(
     ErrorMessage.DATABASE_INSERT_FAILURE,
     logger,
     async () => {
-      let sql
       if (await getAccountExists(db, account, logger, trx)) {
-        sql = db<AccountRecord>(ACCOUNTS_TABLE)
+        const sql = db<AccountRecord>(ACCOUNTS_TABLE)
           .where(ACCOUNTS_COLUMNS.address, account)
           .increment(ACCOUNTS_COLUMNS.numLookups, 1)
           .timeout(config.db.timeout)
+        await (trx != null ? sql.transacting(trx) : sql)
       } else {
-        sql = db<AccountRecord>(ACCOUNTS_TABLE)
+        const sql = db<AccountRecord>(ACCOUNTS_TABLE)
           .insert(toAccountRecord(account, 1))
           .timeout(config.db.timeout)
+
+        await (trx != null ? sql.transacting(trx) : sql)
       }
-      await (trx != null ? sql.transacting(trx) : sql)
+      return
     }
   )
 }

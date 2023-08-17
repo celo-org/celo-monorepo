@@ -1,11 +1,9 @@
 import { ContractKit } from '@celo/contractkit'
 import {
-  DataEncryptionKeyFetcher,
   ErrorMessage,
   ErrorType,
   getContractKit,
   loggerMiddleware,
-  newContractKitFetcher,
   rootLogger,
   SignerEndpoint,
   WarningMessage,
@@ -25,7 +23,7 @@ import { createDomainSignHandler } from './domain/endpoints/sign/action'
 import { DomainQuotaService } from './domain/services/quota'
 import { createPnpQuotaHandler } from './pnp/endpoints/quota/action'
 import { createPnpSignHandler } from './pnp/endpoints/sign/action'
-import { DefaultPnpQuotaService } from './pnp/services/quota'
+import { ContractKitAccountService, DefaultPnpQuotaService } from './pnp/services/quota'
 
 import {
   catchErrorHandler,
@@ -63,25 +61,20 @@ export function startSigner(
     res.send(PromClient.register.metrics())
   })
 
-  const pnpQuotaService = new DefaultPnpQuotaService(db, kit)
+  const accountService = new ContractKitAccountService(kit, {
+    fullNodeTimeoutMs: config.fullNodeTimeoutMs,
+    fullNodeRetryCount: config.fullNodeRetryCount,
+    fullNodeRetryDelayMs: config.fullNodeRetryDelayMs,
+  })
+  const pnpRequestService = new DefaultPnpQuotaService(db)
   const domainQuotaService = new DomainQuotaService(db)
 
-  const dekFetcher = newCachingDekFetcher(
-    newContractKitFetcher(
-      kit,
-      logger,
-      config.fullNodeTimeoutMs,
-      config.fullNodeRetryCount,
-      config.fullNodeRetryDelayMs
-    )
-  )
-
   const pnpQuotaHandler = config.api.phoneNumberPrivacy.enabled
-    ? createPnpQuotaHandler(pnpQuotaService, dekFetcher)
+    ? createPnpQuotaHandler(pnpRequestService, accountService)
     : disabledHandler
 
   const pnpSignHandler = config.api.phoneNumberPrivacy.enabled
-    ? createPnpSignHandler(db, config, pnpQuotaService, keyProvider, dekFetcher)
+    ? createPnpSignHandler(db, config, pnpRequestService, accountService, keyProvider)
     : disabledHandler
 
   const domainQuota = config.api.domains.enabled
@@ -130,22 +123,6 @@ function getSslOptions(config: SignerConfig) {
     key: fs.readFileSync(sslKeyPath),
     cert: fs.readFileSync(sslCertPath),
   }
-}
-
-function newCachingDekFetcher(baseFetcher: DataEncryptionKeyFetcher): DataEncryptionKeyFetcher {
-  const cache: Map<string, string> = new Map()
-  // TODO: this doesn't work, caches for eternity
-
-  async function cachedDekFetcher(address: string): Promise<string> {
-    let cached = cache.get(address)
-    if (!cached) {
-      cached = await baseFetcher(address)
-      cache.set(address, cached)
-    }
-    return cached
-  }
-
-  return cachedDekFetcher
 }
 
 function createHandler(timeoutMs: number, action: PromiseHandler): RequestHandler {
