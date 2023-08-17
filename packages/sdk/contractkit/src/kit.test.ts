@@ -78,7 +78,7 @@ export function txoStub<T>(): TransactionObjectStub<T> {
       const txo = txoStub()
       await kit.connection.sendTransactionObject(txo, { gas: 555, from: '0xAAFFF' })
       expect(txo.send).toBeCalledWith({
-        gasPrice: '0',
+        feeCurrency: undefined,
         gas: 555,
         from: '0xAAFFF',
       })
@@ -87,27 +87,31 @@ export function txoStub<T>(): TransactionObjectStub<T> {
     test('works with maxFeePerGas and maxPriorityFeePerGas', async () => {
       const txo = txoStub()
       await kit.connection.sendTransactionObject(txo, {
+        gas: 1000,
         maxFeePerGas: 555,
         maxPriorityFeePerGas: 555,
         from: '0xAAFFF',
       })
       expect(txo.send).toBeCalledWith({
-        gasPrice: '0',
+        feeCurrency: undefined,
         maxFeePerGas: 555,
         maxPriorityFeePerGas: 555,
+        gas: 1000,
+        from: '0xAAFFF',
       })
     })
 
     test('when maxFeePerGas and maxPriorityFeePerGas and feeCurrency', async () => {
       const txo = txoStub()
       await kit.connection.sendTransactionObject(txo, {
+        gas: 1000,
         maxFeePerGas: 555,
         maxPriorityFeePerGas: 555,
         feeCurrency: '0xe8537a3d056da446677b9e9d6c5db704eaab4787',
         from: '0xAAFFF',
       })
       expect(txo.send).toBeCalledWith({
-        gasPrice: '0',
+        gas: 1000,
         maxFeePerGas: 555,
         maxPriorityFeePerGas: 555,
         feeCurrency: '0xe8537a3d056da446677b9e9d6c5db704eaab4787',
