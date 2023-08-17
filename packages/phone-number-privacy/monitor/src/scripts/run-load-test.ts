@@ -34,6 +34,7 @@ const runLoadTest = (
     process.exit(1)
   }
   if (isSerial) {
+    // tslint:disable-next-line: no-floating-promises
     serialLoadTest(
       numWorker,
       blockchainProvider!,
@@ -44,6 +45,7 @@ const runLoadTest = (
       useDEK
     )
   } else {
+    // tslint:disable-next-line: no-floating-promises
     concurrentLoadTest(
       numWorker,
       blockchainProvider!,
@@ -56,6 +58,7 @@ const runLoadTest = (
   }
 }
 
+// tslint:disable-next-line: no-unused-expression
 yargs
   .scriptName('ODIS-load-test')
   .recommendCommands()
