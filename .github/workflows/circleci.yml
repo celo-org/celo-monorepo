@@ -251,6 +251,8 @@ jobs:
         with:
           node-version: 12.22.11
       - name: Generate devchain of previous release
+          timeout_minutes: 30
+          max_attempts: 3
         run: |
           echo "Comparing against $RELEASE_TAG"
           # Github has phased out the git protocol so we ensure that we use
