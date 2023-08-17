@@ -18,7 +18,7 @@ registerInstrumentations({
     getNodeAutoInstrumentations({
       '@opentelemetry/instrumentation-http': {
         startIncomingSpanHook: (req) => {
-          delete req.headers.traceparent
+          // delete req.headers.traceparent
           delete req.headers[`x-cloud-trace-context`]
           delete req.headers[`grpc-trace-bin`]
 
