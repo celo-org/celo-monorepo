@@ -1,7 +1,7 @@
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { getDatabase, getTransaction } from '../database'
-import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE, Account } from '../models/account'
+import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
 
 function accounts() {
   return getDatabase()<Account>(ACCOUNTS_TABLE)

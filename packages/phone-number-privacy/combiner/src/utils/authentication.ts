@@ -6,11 +6,11 @@ import {
   AuthenticationMethod,
   ErrorMessage,
   ErrorType,
+  fetchEnv,
   FULL_NODE_TIMEOUT_IN_MS,
   PhoneNumberPrivacyRequest,
   RETRY_COUNT,
   RETRY_DELAY_IN_MS,
-  fetchEnv,
   rootLogger,
 } from '@celo/phone-number-privacy-common'
 import { trimLeading0x } from '@celo/utils/lib/address'
