@@ -13,14 +13,15 @@ return doAction(request, response, auth)
 
 TODO
 
-- (Alec) refactor domain endpoints to get rid of IO
-  - if endpoint disabled, can be replaced by failing handler at server.ts
-- (Alec) remove catchErrorHandler2 (move it catchErrorHandler)
-- (Alec) add back quotaBypassForE2e
-- (Alec) remove block number
-- (alec) Remove sendFailure is missing a Counter
-
+- (alec) fix domains tests
+- (alec) extract resultHandler() out of each handler, into the createHandler on server.ts
+- (alec) Refactor domain sign handler to use db transactions properly
 - (Alec) check prometheus Counter
 
-- Maked send() types so that it matches responde body type
-- types for Request
+- Type Handler so Response has the correct Response Type and the correct Locals Type (logger should not be an ANY)
+- Type Handlers so that Request is the proper type, or better use the "isValid Request" function
+
+- (mariano) refactor authorization function with the new account model
+- (Mariano) remove catchErrorHandler2 (move it catchErrorHandler)
+- (mariano) Implement chaching Account Service
+- (mariano) Check Tracing Calls
