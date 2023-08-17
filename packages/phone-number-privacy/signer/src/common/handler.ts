@@ -2,11 +2,11 @@ import { timeout } from '@celo/base'
 import {
   ErrorMessage,
   ErrorType,
+  FailureResponse,
   OdisResponse,
-  PnpQuotaResponseFailure,
   PnpQuotaStatus,
   send,
-  SignMessageResponseFailure,
+  SequentialDelayDomainState,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
@@ -148,18 +148,18 @@ export function resultHandler<A extends OdisResponse>(
   }
 }
 
-export function errorResult(
+export function errorResult( // TODO add support for domains
   status: number,
   error: string,
-  quota?: PnpQuotaStatus
-): Result<PnpQuotaResponseFailure | SignMessageResponseFailure> {
+  quotaStatus?: PnpQuotaStatus | SequentialDelayDomainState
+): Result<FailureResponse> {
   return {
     status,
     body: {
       success: false,
       version: getSignerVersion(),
       error,
-      ...quota,
+      ...quotaStatus,
     },
   }
 }

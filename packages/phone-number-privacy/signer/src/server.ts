@@ -20,11 +20,8 @@ import { KeyProvider } from './common/key-management/key-provider-base'
 import { Histograms } from './common/metrics'
 import { getSignerVersion, SignerConfig } from './config'
 import { createDomainDisableHandler } from './domain/endpoints/disable/action'
-import { DomainDisableIO } from './domain/endpoints/disable/io'
 import { createDomainQuotaHandler } from './domain/endpoints/quota/action'
-import { DomainQuotaIO } from './domain/endpoints/quota/io'
 import { createDomainSignHandler } from './domain/endpoints/sign/action'
-import { DomainSignIO } from './domain/endpoints/sign/io'
 import { DomainQuotaService } from './domain/services/quota'
 import { createPnpQuotaHandler } from './pnp/endpoints/quota/action'
 import { createPnpSignHandler } from './pnp/endpoints/sign/action'
@@ -87,20 +84,17 @@ export function startSigner(
     ? createPnpSignHandler(db, config, pnpQuotaService, keyProvider, dekFetcher)
     : disabledHandler
 
-  const domainQuotaIO = new DomainQuotaIO(config.api.domains.enabled)
-  const domainQuota = createDomainQuotaHandler(domainQuotaService, domainQuotaIO)
+  const domainQuota = config.api.domains.enabled
+    ? createDomainQuotaHandler(domainQuotaService)
+    : disabledHandler
 
-  const domainSignIO = new DomainSignIO(config.api.domains.enabled)
-  const domainSign = createDomainSignHandler(
-    db,
-    config,
-    domainQuotaService,
-    keyProvider,
-    domainSignIO
-  )
+  const domainSign = config.api.domains.enabled
+    ? createDomainSignHandler(db, config, domainQuotaService, keyProvider)
+    : disabledHandler
 
-  const domainDisableIO = new DomainDisableIO(config.api.domains.enabled)
-  const domainDisable = createDomainDisableHandler(db, domainDisableIO)
+  const domainDisable = config.api.domains.enabled
+    ? createDomainDisableHandler(db)
+    : disabledHandler
 
   logger.info('Right before adding meteredSignerEndpoints')
 

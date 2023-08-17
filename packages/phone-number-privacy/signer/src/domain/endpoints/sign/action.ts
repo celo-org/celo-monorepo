@@ -2,28 +2,29 @@ import {
   Domain,
   domainHash,
   DomainRestrictedSignatureRequest,
+  domainRestrictedSignatureRequestSchema,
+  DomainSchema,
   ErrorType,
   getRequestKeyVersion,
   KEY_VERSION_HEADER,
   requestHasValidKeyVersion,
-  send,
   ThresholdPoprfServer,
   verifyDomainRestrictedSignatureRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { EIP712Optional } from '@celo/utils/lib/sign-typed-data-utils'
 import Logger from 'bunyan'
+import { Request } from 'express'
 import { Knex } from 'knex'
 import {
   DomainStateRecord,
   toSequentialDelayDomainState,
 } from '../../../common/database/models/domain-state'
-import { PromiseHandler, sendFailure } from '../../../common/handler'
+import { errorResult, PromiseHandler, resultHandler } from '../../../common/handler'
 import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management/key-provider-base'
-import { Counters } from '../../../common/metrics'
+import { OdisQuotaStatusResult } from '../../../common/quota'
 import { getSignerVersion, SignerConfig } from '../../../config'
 import { DomainQuotaService } from '../../services/quota'
-import { DomainSignIO } from './io'
 
 type TrxResult =
   | {
@@ -44,26 +45,23 @@ export function createDomainSignHandler(
   db: Knex,
   config: SignerConfig,
   quota: DomainQuotaService,
-  keyProvider: KeyProvider,
-  io: DomainSignIO
+  keyProvider: KeyProvider
 ): PromiseHandler {
-  return async (request, response) => {
-    if (!io.init(request, response)) {
-      return
-    }
+  return resultHandler(async (request, response) => {
+    const { logger } = response.locals
 
-    if (!requestHasValidKeyVersion(request, response.locals.logger)) {
-      sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
-      return
+    if (!isValidRequest(request)) {
+      return errorResult(400, WarningMessage.INVALID_INPUT)
     }
-
+    if (!requestHasValidKeyVersion(request, logger)) {
+      return errorResult(400, WarningMessage.INVALID_KEY_VERSION_REQUEST)
+    }
     if (!verifyDomainRestrictedSignatureRequestAuthenticity(request.body)) {
-      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
-      return
+      return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
     }
 
-    const domain = request.body.domain
-    const logger = response.locals.logger
+    const { domain } = request.body
+
     logger.info(
       {
         name: domain.name,
@@ -74,12 +72,13 @@ export function createDomainSignHandler(
     )
     const res: TrxResult = await db.transaction(async (trx) => {
       // Get the current domain state record, or use an empty record if one does not exist.
-      const domainStateRecord = await quota.getQuotaStatus(domain, logger, trx)
+      const domainStateRecord: DomainStateRecord = await quota.getQuotaStatus(domain, logger, trx)
 
       // Note that this action occurs in the same transaction as the remainder of the siging
       // action. As a result, this is included here rather than in the authentication function.
       if (!nonceCheck(domainStateRecord, request.body, logger)) {
         return {
+          // TODO revisit this
           success: false,
           status: 401,
           domainStateRecord,
@@ -87,12 +86,14 @@ export function createDomainSignHandler(
         }
       }
 
-      const quotaStatus = await quota.checkAndUpdateQuotaStatus(
-        domainStateRecord,
-        request.body.domain,
-        trx,
-        logger
-      )
+      const quotaStatus: OdisQuotaStatusResult<DomainRestrictedSignatureRequest> =
+        await quota.checkAndUpdateQuotaStatus(
+          // TODO types
+          domainStateRecord,
+          request.body.domain,
+          trx,
+          logger
+        )
 
       if (!quotaStatus.sufficient) {
         logger.warn(
@@ -117,7 +118,13 @@ export function createDomainSignHandler(
       }
 
       // Compute evaluation inside transaction so it will rollback on error.
-      const evaluation = await sign(domain, request.body.blindedMessage, key, logger, keyProvider)
+      const evaluation: Buffer = await sign(
+        domain,
+        request.body.blindedMessage,
+        key,
+        logger,
+        keyProvider
+      )
 
       return {
         success: true,
@@ -130,24 +137,25 @@ export function createDomainSignHandler(
 
     if (res.success) {
       response.set(KEY_VERSION_HEADER, res.key.version.toString())
-      send(
-        response,
-        {
+      return {
+        status: 200,
+        body: {
           success: true,
           version: getSignerVersion(),
           signature: res.signature,
           status: toSequentialDelayDomainState(res.domainStateRecord),
         },
-        res.status,
-        response.locals.logger
-      )
-      Counters.responses.labels(request.url, res.status.toString()).inc()
+      }
     } else {
-      sendFailure(res.error, res.status, response, {
-        status: toSequentialDelayDomainState(res.domainStateRecord),
-      })
+      return errorResult(res.status, res.error, toSequentialDelayDomainState(res.domainStateRecord))
     }
-  }
+  })
+}
+
+function isValidRequest(
+  request: Request<{}, {}, unknown>
+): request is Request<{}, {}, DomainRestrictedSignatureRequest> {
+  return domainRestrictedSignatureRequestSchema(DomainSchema).is(request.body)
 }
 
 function nonceCheck(

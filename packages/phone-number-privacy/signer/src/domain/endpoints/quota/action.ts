@@ -1,32 +1,30 @@
 import {
   domainHash,
-  send,
+  DomainQuotaStatusRequest,
+  domainQuotaStatusRequestSchema,
+  DomainSchema,
   verifyDomainQuotaStatusRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import { Request } from 'express'
 import { toSequentialDelayDomainState } from '../../../common/database/models/domain-state'
-import { PromiseHandler, sendFailure } from '../../../common/handler'
-import { Counters } from '../../../common/metrics'
+import { errorResult, PromiseHandler, resultHandler } from '../../../common/handler'
 import { getSignerVersion } from '../../../config'
 import { DomainQuotaService } from '../../services/quota'
-import { DomainQuotaIO } from './io'
 
-export function createDomainQuotaHandler(
-  quota: DomainQuotaService,
-  io: DomainQuotaIO
-): PromiseHandler {
-  return async (request, response) => {
-    if (!io.init(request, response)) {
-      return
+export function createDomainQuotaHandler(quota: DomainQuotaService): PromiseHandler {
+  return resultHandler(async (request, response) => {
+    const { logger } = response.locals
+
+    if (!isValidRequest(request)) {
+      return errorResult(400, WarningMessage.INVALID_INPUT)
     }
-
     if (!verifyDomainQuotaStatusRequestAuthenticity(request.body)) {
-      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
-      return
+      return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
     }
 
     const { domain } = request.body
-    const logger = response.locals.logger
+
     logger.info('Processing request to get domain quota status', {
       name: domain.name,
       version: domain.version,
@@ -34,16 +32,19 @@ export function createDomainQuotaHandler(
     })
     const domainStateRecord = await quota.getQuotaStatus(domain, logger)
 
-    send(
-      response,
-      {
+    return {
+      status: 200,
+      body: {
         success: true,
         version: getSignerVersion(),
         status: toSequentialDelayDomainState(domainStateRecord),
       },
-      200,
-      response.locals.logger
-    )
-    Counters.responses.labels(request.url, '200').inc()
-  }
+    }
+  })
+}
+
+function isValidRequest(
+  request: Request<{}, {}, unknown>
+): request is Request<{}, {}, DomainQuotaStatusRequest> {
+  return domainQuotaStatusRequestSchema(DomainSchema).is(request.body)
 }

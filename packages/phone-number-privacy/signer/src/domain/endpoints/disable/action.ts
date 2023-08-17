@@ -1,9 +1,12 @@
 import {
+  DisableDomainRequest,
+  disableDomainRequestSchema,
   domainHash,
-  send,
+  DomainSchema,
   verifyDisableDomainRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import { Request } from 'express'
 import { Knex } from 'knex'
 import { toSequentialDelayDomainState } from '../../../common/database/models/domain-state'
 import {
@@ -12,24 +15,22 @@ import {
   insertDomainStateRecord,
   setDomainDisabled,
 } from '../../../common/database/wrappers/domain-state'
-import { PromiseHandler, sendFailure } from '../../../common/handler'
-import { Counters } from '../../../common/metrics'
+import { errorResult, PromiseHandler, resultHandler } from '../../../common/handler'
 import { getSignerVersion } from '../../../config'
-import { DomainDisableIO } from './io'
 
-export function createDomainDisableHandler(db: Knex, io: DomainDisableIO): PromiseHandler {
-  return async (request, response) => {
-    if (!io.init(request, response)) {
-      return
-    }
-
-    if (!verifyDisableDomainRequestAuthenticity(request.body)) {
-      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
-      return
-    }
-
+export function createDomainDisableHandler(db: Knex): PromiseHandler {
+  return resultHandler(async (request, response) => {
     const { logger } = response.locals
+
+    if (!isValidRequest(request)) {
+      return errorResult(400, WarningMessage.INVALID_INPUT)
+    }
+    if (!verifyDisableDomainRequestAuthenticity(request.body)) {
+      return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
+    }
+
     const { domain } = request.body
+
     logger.info(
       {
         name: domain.name,
@@ -48,6 +49,7 @@ export function createDomainDisableHandler(db: Knex, io: DomainDisableIO): Promi
         domainStateRecord.disabled = true
       }
       return {
+        // TODO revisit this
         success: true,
         status: 200,
         domainStateRecord,
@@ -56,16 +58,19 @@ export function createDomainDisableHandler(db: Knex, io: DomainDisableIO): Promi
       // return timeout(disableDomainHandler, [], this.config.timeout, timeoutError)
     })
 
-    send(
-      response,
-      {
+    return {
+      status: res.status,
+      body: {
         success: true,
         version: getSignerVersion(),
         status: toSequentialDelayDomainState(res.domainStateRecord),
       },
-      res.status,
-      response.locals.logger
-    )
-    Counters.responses.labels(request.url, res.status.toString()).inc()
-  }
+    }
+  })
+}
+
+function isValidRequest(
+  request: Request<{}, {}, unknown>
+): request is Request<{}, {}, DisableDomainRequest> {
+  return disableDomainRequestSchema(DomainSchema).is(request.body)
 }
