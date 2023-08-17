@@ -233,7 +233,7 @@ if (DEV_MODE) {
       port: undefined,
       ssl: toBool(functionConfig.db.ssl, true),
       poolMaxSize: Number(functionConfig.db.pool_max_size),
-      timeout: functionConfig.db.timeout,
+      timeout: Number(functionConfig.db.timeout),
     },
   }
 }

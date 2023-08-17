@@ -25,7 +25,6 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
   abstract combine(session: Session<R>): void
 
   async perform(session: Session<R>) {
-    // TODO (soloseng): check if request already exist in db
     await this.distribute(session)
     this.combine(session)
   }

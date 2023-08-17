@@ -148,8 +148,8 @@ export function verifyDEKSignature(
     }
     return false
   } catch (err) {
-    logger.error('Failed to verify signature with DEK')
-    logger.error({ err, dek: registeredEncryptionKey })
+    logger?.error('Failed to verify signature with DEK')
+    logger?.error({ err, dek: registeredEncryptionKey })
     return false
   }
 }
