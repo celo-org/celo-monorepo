@@ -25,6 +25,9 @@ registerInstrumentations({
           return {}
         },
       },
+      '@opentelemetry/instrumentation-fs': {
+        enabled: false,
+      },
     }),
   ],
 })
