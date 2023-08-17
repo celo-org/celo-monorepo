@@ -10,7 +10,8 @@ import {
 import { Request } from 'express'
 import { errorResult, PromiseHandler, resultHandler } from '../../../common/handler'
 import { getSignerVersion } from '../../../config'
-import { AccountService, PnpRequestService } from '../../services/quota'
+import { AccountService } from '../../services/account-service'
+import { PnpRequestService } from '../../services/request-service'
 
 export function createPnpQuotaHandler(
   requestService: PnpRequestService,

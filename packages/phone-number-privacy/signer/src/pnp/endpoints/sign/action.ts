@@ -24,7 +24,8 @@ import { errorResult, PromiseHandler, Result, resultHandler } from '../../../com
 
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import Logger from 'bunyan'
-import { AccountService, PnpRequestService } from '../../services/quota'
+import { AccountService } from '../../services/account-service'
+import { PnpRequestService } from '../../services/request-service'
 const tracer = opentelemetry.trace.getTracer('signer-tracer')
 
 export function createPnpSignHandler(

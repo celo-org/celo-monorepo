@@ -23,7 +23,7 @@ import { createDomainSignHandler } from './domain/endpoints/sign/action'
 import { DomainQuotaService } from './domain/services/quota'
 import { createPnpQuotaHandler } from './pnp/endpoints/quota/action'
 import { createPnpSignHandler } from './pnp/endpoints/sign/action'
-import { ContractKitAccountService, DefaultPnpQuotaService } from './pnp/services/quota'
+import { DefaultPnpQuotaService } from './pnp/services/request-service'
 
 import {
   catchErrorHandler,
@@ -34,6 +34,7 @@ import {
   timeoutHandler,
   tracingHandler,
 } from './common/handler'
+import { ContractKitAccountService } from './pnp/services/account-service'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
