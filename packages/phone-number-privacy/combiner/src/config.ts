@@ -1,5 +1,6 @@
 import {
   BlockchainConfig,
+  DB_TIMEOUT,
   FULL_NODE_TIMEOUT_IN_MS,
   RETRY_COUNT,
   RETRY_DELAY_IN_MS,
@@ -13,6 +14,7 @@ export function getCombinerVersion(): string {
 }
 export const DEV_MODE =
   process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
+export const VERBOSE_DB_LOGGING = toBool(process.env.VERBOSE_DB_LOGGING, false)
 
 export const FORNO_ALFAJORES = 'https://alfajores-forno.celo-testnet.org'
 
@@ -24,6 +26,13 @@ export const E2E_TEST_ACCOUNTS: string[] = ['0x1be31a94361a391bbafb2a4ccd704f57d
 export const MAX_BLOCK_DISCREPANCY_THRESHOLD = 3
 export const MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD = 5
 export const MAX_QUERY_COUNT_DISCREPANCY_THRESHOLD = 5
+
+export enum SupportedDatabase {
+  Postgres = 'postgres', // PostgresSQL
+  MySql = 'mysql', // MySQL
+  MsSql = 'mssql', // Microsoft SQL Server
+  Sqlite = 'sqlite3', // SQLite (for testing)
+}
 
 export interface OdisConfig {
   serviceName: string
@@ -48,11 +57,15 @@ export interface CombinerConfig {
   phoneNumberPrivacy: OdisConfig
   domains: OdisConfig
   db: {
+    type: SupportedDatabase
     user: string
     password: string
     database: string
     host: string
+    port?: number
     ssl: boolean
+    poolMaxSize: number
+    timeout: number
   }
 }
 
@@ -152,11 +165,15 @@ if (DEV_MODE) {
       fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
     },
     db: {
+      type: SupportedDatabase.Sqlite,
       user: 'postgres',
-      password: 'fakePass',
+      password: '',
       database: 'phoneNumber+privacy',
-      host: '127.0.0.1',
-      ssl: false,
+      host: 'http://localhost',
+      port: undefined,
+      ssl: true,
+      poolMaxSize: 50,
+      timeout: DB_TIMEOUT,
     },
   }
 } else {
@@ -208,11 +225,15 @@ if (DEV_MODE) {
       ),
     },
     db: {
+      type: functionConfig.db.type,
       user: functionConfig.db.username,
       password: functionConfig.db.pass,
       database: functionConfig.db.name,
       host: `/cloudsql/${functionConfig.db.host}`,
+      port: undefined,
       ssl: toBool(functionConfig.db.ssl, true),
+      poolMaxSize: Number(functionConfig.db.pool_max_size),
+      timeout: functionConfig.db.timeout,
     },
   }
 }

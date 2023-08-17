@@ -19,6 +19,7 @@ import {
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
+import { Knex } from 'knex'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { getCombinerVersion, OdisConfig } from '../../../config'
@@ -31,7 +32,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   readonly responseSchema: t.Type<PnpQuotaResponse, PnpQuotaResponse, unknown> =
     PnpQuotaResponseSchema
 
-  constructor(readonly config: OdisConfig, readonly kit: ContractKit) {
+  constructor(readonly db: Knex, readonly config: OdisConfig, readonly kit: ContractKit) {
     super(config)
   }
 
@@ -62,6 +63,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
 
   async authenticate(request: Request<{}, {}, PnpQuotaRequest>, logger: Logger): Promise<boolean> {
     return authenticateUser(
+      this.db,
       request,
       this.kit,
       logger,

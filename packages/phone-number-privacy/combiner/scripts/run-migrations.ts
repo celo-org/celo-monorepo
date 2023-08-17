@@ -1,17 +1,11 @@
 // tslint:disable: no-console
 // TODO de-dupe with signer script
-import knex from 'knex'
+import { initDatabase } from '../src/database/database'
 import config from '../src/config'
 
 async function start() {
   console.info('Running migrations')
-  await knex({
-    client: 'pg',
-    connection: config.db,
-  }).migrate.latest({
-    directory: './src/database/migrations',
-    extension: 'ts',
-  })
+  await initDatabase(config, undefined, false)
 }
 
 start()

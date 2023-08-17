@@ -20,6 +20,7 @@ import {
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
+import { Knex } from 'knex'
 import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-crypto-client'
 import { CryptoSession } from '../../../common/crypto-session'
 import { IO } from '../../../common/io'
@@ -35,7 +36,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
   readonly responseSchema: t.Type<SignMessageResponse, SignMessageResponse, unknown> =
     SignMessageResponseSchema
 
-  constructor(readonly config: OdisConfig, readonly kit: ContractKit) {
+  constructor(readonly db: Knex, readonly config: OdisConfig, readonly kit: ContractKit) {
     super(config)
   }
 
@@ -79,6 +80,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     logger: Logger
   ): Promise<boolean> {
     return authenticateUser(
+      this.db,
       request,
       this.kit,
       logger,

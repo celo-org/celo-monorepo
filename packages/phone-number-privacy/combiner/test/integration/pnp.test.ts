@@ -40,6 +40,7 @@ import request from 'supertest'
 import config, { getCombinerVersion } from '../../src/config'
 import { startCombiner } from '../../src/server'
 import { getBlindedPhoneNumber } from '../utils'
+import { initDatabase as initCombinerDatabase } from '../../src/database/database'
 
 const {
   ContractRetrieval,
@@ -189,6 +190,7 @@ describe('pnpService', () => {
   let signer2: Server | HttpsServer
   let signer3: Server | HttpsServer
   let app: any
+  let db: Knex
 
   // Used by PNP_SIGN tests for various configurations of signers
   let userSeed: Uint8Array
@@ -295,7 +297,8 @@ describe('pnpService', () => {
           [`${DefaultKeyName.PHONE_NUMBER_PRIVACY}-3`, PNP_THRESHOLD_DEV_PK_SHARE_3_V3],
         ])
       )
-      app = startCombiner(combinerConfig, mockKit)
+      db = await initCombinerDatabase(combinerConfig)
+      app = startCombiner(db, combinerConfig, mockKit)
     })
 
     beforeEach(async () => {
@@ -318,9 +321,15 @@ describe('pnpService', () => {
       await signerDB1?.destroy()
       await signerDB2?.destroy()
       await signerDB3?.destroy()
+
       signer1?.close()
       signer2?.close()
       signer3?.close()
+      signer3?.close()
+    })
+
+    afterAll(async () => {
+      await db?.destroy()
     })
 
     describe('when signers are operating correctly', () => {
@@ -589,7 +598,7 @@ describe('pnpService', () => {
             JSON.stringify(combinerConfig)
           )
           configWithApiDisabled.phoneNumberPrivacy.enabled = false
-          const appWithApiDisabled = startCombiner(configWithApiDisabled, mockKit)
+          const appWithApiDisabled = startCombiner(db, configWithApiDisabled, mockKit)
           const req = {
             account: ACCOUNT_ADDRESS1,
           }
@@ -625,7 +634,11 @@ describe('pnpService', () => {
               JSON.stringify(combinerConfig)
             )
             combinerConfigWithFailOpenEnabled.phoneNumberPrivacy.shouldFailOpen = true
-            const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled, mockKit)
+            const appWithFailOpenEnabled = startCombiner(
+              db,
+              combinerConfigWithFailOpenEnabled,
+              mockKit
+            )
             const res = await getCombinerQuotaResponse(req, authorization, appWithFailOpenEnabled)
 
             expect(res.status).toBe(200)
@@ -914,7 +927,7 @@ describe('pnpService', () => {
             JSON.stringify(combinerConfig)
           )
           configWithApiDisabled.phoneNumberPrivacy.enabled = false
-          const appWithApiDisabled = startCombiner(configWithApiDisabled, mockKit)
+          const appWithApiDisabled = startCombiner(db, configWithApiDisabled, mockKit)
 
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendPnpSignRequest(req, authorization, appWithApiDisabled)
@@ -942,7 +955,11 @@ describe('pnpService', () => {
               JSON.stringify(combinerConfig)
             )
             combinerConfigWithFailOpenEnabled.phoneNumberPrivacy.shouldFailOpen = true
-            const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled, mockKit)
+            const appWithFailOpenEnabled = startCombiner(
+              db,
+              combinerConfigWithFailOpenEnabled,
+              mockKit
+            )
             const res = await sendPnpSignRequest(req, authorization, appWithFailOpenEnabled)
 
             expect(res.status).toBe(200)
@@ -975,6 +992,7 @@ describe('pnpService', () => {
             )
             combinerConfigWithFailOpenDisabled.phoneNumberPrivacy.shouldFailOpen = false
             const appWithFailOpenDisabled = startCombiner(
+              db,
               combinerConfigWithFailOpenDisabled,
               mockKit
             )
@@ -1301,7 +1319,8 @@ describe('pnpService', () => {
           ],
         ])
       )
-      app = startCombiner(combinerConfigLargerN, mockKit)
+      db = await initCombinerDatabase(combinerConfig)
+      app = startCombiner(db, combinerConfigLargerN, mockKit)
     })
 
     let req: SignMessageRequest

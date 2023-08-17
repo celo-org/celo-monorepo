@@ -8,7 +8,8 @@ import {
   rootLogger,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import express, { Request, RequestHandler, Response } from 'express'
+import express, { Express, Request, RequestHandler, Response } from 'express'
+import { Knex } from 'knex'
 // tslint:disable-next-line: ordered-imports
 import { PerformanceObserver, performance } from 'perf_hooks'
 import { Controller } from './common/controller'
@@ -28,7 +29,7 @@ import { PnpThresholdStateService } from './pnp/services/threshold-state'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-export function startCombiner(config: CombinerConfig, kit: ContractKit) {
+export function startCombiner(db: Knex, config: CombinerConfig, kit: ContractKit): Express {
   const logger = rootLogger(config.serviceName)
 
   logger.info('Creating combiner express server')
@@ -64,7 +65,7 @@ export function startCombiner(config: CombinerConfig, kit: ContractKit) {
     new PnpQuotaAction(
       config.phoneNumberPrivacy,
       pnpThresholdStateService,
-      new PnpQuotaIO(config.phoneNumberPrivacy, kit)
+      new PnpQuotaIO(db, config.phoneNumberPrivacy, kit)
     )
   )
   app.post(CombinerEndpoint.PNP_QUOTA, (req, res) =>
@@ -75,7 +76,7 @@ export function startCombiner(config: CombinerConfig, kit: ContractKit) {
     new PnpSignAction(
       config.phoneNumberPrivacy,
       pnpThresholdStateService,
-      new PnpSignIO(config.phoneNumberPrivacy, kit)
+      new PnpSignIO(db, config.phoneNumberPrivacy, kit)
     )
   )
   app.post(CombinerEndpoint.PNP_SIGN, (req, res) =>

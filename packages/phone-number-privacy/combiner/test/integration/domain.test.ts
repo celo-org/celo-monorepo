@@ -47,6 +47,7 @@ import request from 'supertest'
 import { MockKeyProvider } from '../../../signer/dist/common/key-management/mock-key-provider'
 import config from '../../src/config'
 import { startCombiner } from '../../src/server'
+import { initDatabase as initCombinerDatabase } from '../../src/database/database'
 
 const {
   DOMAINS_THRESHOLD_DEV_PK_SHARE_1_V1,
@@ -236,6 +237,7 @@ describe('domainService', () => {
   let signer2: Server | HttpsServer
   let signer3: Server | HttpsServer
   let app: any
+  let db: Knex
 
   const signerMigrationsPath = '../signer/dist/common/database/migrations'
 
@@ -269,8 +271,8 @@ describe('domainService', () => {
           [`${DefaultKeyName.DOMAINS}-3`, DOMAINS_THRESHOLD_DEV_PK_SHARE_3_V3],
         ])
       )
-
-      app = startCombiner(combinerConfig, getContractKit(combinerConfig.blockchain))
+      db = await initCombinerDatabase(combinerConfig)
+      app = startCombiner(db, combinerConfig, getContractKit(combinerConfig.blockchain))
     })
 
     beforeEach(async () => {
@@ -286,6 +288,10 @@ describe('domainService', () => {
       signer1?.close()
       signer2?.close()
       signer3?.close()
+    })
+
+    afterAll(async () => {
+      await db?.destroy()
     })
 
     describe('when signers are operating correctly', () => {
@@ -417,6 +423,7 @@ describe('domainService', () => {
           )
           configWithApiDisabled.domains.enabled = false
           const appWithApiDisabled = startCombiner(
+            db,
             configWithApiDisabled,
             getContractKit(configWithApiDisabled.blockchain)
           )
@@ -566,6 +573,7 @@ describe('domainService', () => {
           )
           configWithApiDisabled.domains.enabled = false
           const appWithApiDisabled = startCombiner(
+            db,
             configWithApiDisabled,
             getContractKit(configWithApiDisabled.blockchain)
           )
@@ -896,6 +904,7 @@ describe('domainService', () => {
           )
           configWithApiDisabled.domains.enabled = false
           const appWithApiDisabled = startCombiner(
+            db,
             configWithApiDisabled,
             getContractKit(configWithApiDisabled.blockchain)
           )
@@ -1218,7 +1227,11 @@ describe('domainService', () => {
           ],
         ])
       )
-      app = startCombiner(combinerConfigLargerN, getContractKit(combinerConfigLargerN.blockchain))
+      app = startCombiner(
+        db,
+        combinerConfigLargerN,
+        getContractKit(combinerConfigLargerN.blockchain)
+      )
     })
 
     beforeEach(async () => {
@@ -1241,6 +1254,8 @@ describe('domainService', () => {
       await signerDB3?.destroy()
       await signerDB4?.destroy()
       await signerDB5?.destroy()
+      await db?.destroy()
+
       signer1?.close()
       signer2?.close()
       signer3?.close()

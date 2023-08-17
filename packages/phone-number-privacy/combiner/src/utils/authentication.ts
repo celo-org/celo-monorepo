@@ -18,6 +18,7 @@ import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import Logger from 'bunyan'
 import crypto from 'crypto'
 import { Request } from 'express'
+import { Knex } from 'knex'
 import { getDekSignerRecord, updateDekSignerRecord } from '../database/wrappers/account'
 
 /*
@@ -25,6 +26,7 @@ import { getDekSignerRecord, updateDekSignerRecord } from '../database/wrappers/
  * Authorization header should contain the EC signed body
  */
 export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
+  db: Knex,
   request: Request<{}, {}, R>,
   contractKit: ContractKit,
   logger: Logger,
@@ -49,9 +51,7 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   if (authMethod && authMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     let registeredEncryptionKey: string | undefined
 
-    // XXX (soloseng): lookup in db first
-
-    registeredEncryptionKey = await getDekSignerRecord(signer, logger)
+    registeredEncryptionKey = await getDekSignerRecord(db, signer, logger)
 
     if (registeredEncryptionKey) {
       logger.info({ dek: registeredEncryptionKey, account: signer }, 'Found DEK for account in db')
@@ -60,8 +60,6 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
       }
       logger.warn({ account: signer }, 'Failed to verify account DEK signature found in db.')
     }
-
-    // XXX: if does not exist or failed to verify, fetch onchain.
 
     try {
       registeredEncryptionKey = await getDataEncryptionKey(
@@ -90,10 +88,9 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
     } else {
       logger.info({ dek: registeredEncryptionKey, account: signer }, 'Found DEK for account')
       if (verifyDEKSignature(message, messageSignature, registeredEncryptionKey, logger)) {
-        // XXX: once found, update db with DEK.
-
-        await updateDekSignerRecord(signer, registeredEncryptionKey!, logger)
-
+        await db.transaction(async (trx) => {
+          await updateDekSignerRecord(db, signer, registeredEncryptionKey!, logger, trx)
+        })
         return true
       }
     }

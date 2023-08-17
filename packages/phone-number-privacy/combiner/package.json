@@ -23,6 +23,7 @@
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
     "test:coverage": "yarn test --coverage",
     "test:integration": "jest --runInBand test/integration",
+    "test:integration:debugdb": "VERBOSE_DB_LOGGING=true jest --runInBand test/integration",
     "test:e2e": "jest test/end-to-end --verbose",
     "test:e2e:staging": "CONTEXT_NAME=staging yarn test:e2e",
     "test:e2e:alfajores": "CONTEXT_NAME=alfajores yarn test:e2e",
