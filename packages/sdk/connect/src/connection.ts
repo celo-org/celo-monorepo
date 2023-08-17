@@ -210,7 +210,7 @@ export class Connection {
    */
   sendTransaction = async (tx: CeloTx): Promise<TransactionResult> => {
     tx = this.fillTxDefaults(tx)
-    tx = await this.setFeeMarketGas(tx)
+    // tx = await this.setFeeMarketGas(tx)
 
     let gas = tx.gas
     if (gas == null) {
@@ -230,7 +230,7 @@ export class Connection {
     tx?: Omit<CeloTx, 'data'>
   ): Promise<TransactionResult> => {
     tx = this.fillTxDefaults(tx)
-    tx = await this.setFeeMarketGas(tx)
+    // tx = await this.setFeeMarketGas(tx)
 
     let gas = tx.gas
     if (gas == null) {
