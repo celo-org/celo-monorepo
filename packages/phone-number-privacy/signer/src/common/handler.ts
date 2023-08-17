@@ -156,7 +156,7 @@ export function resultHandler<A extends OdisResponse>(
 export function errorResult( // TODO add support for domains
   status: number,
   error: string,
-  quotaStatus?: PnpQuotaStatus | SequentialDelayDomainState
+  quotaStatus?: PnpQuotaStatus | { status: SequentialDelayDomainState }
 ): Result<FailureResponse> {
   return {
     status,

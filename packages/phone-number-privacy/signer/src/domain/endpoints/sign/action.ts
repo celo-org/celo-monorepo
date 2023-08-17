@@ -147,7 +147,9 @@ export function createDomainSignHandler(
         },
       }
     } else {
-      return errorResult(res.status, res.error, toSequentialDelayDomainState(res.domainStateRecord))
+      return errorResult(res.status, res.error, {
+        status: toSequentialDelayDomainState(res.domainStateRecord),
+      })
     }
   })
 }
