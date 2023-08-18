@@ -5,7 +5,6 @@ import {
   isBodyReasonablySized,
   PnpQuotaRequest,
   PnpQuotaRequestSchema,
-  PnpQuotaResponse,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request } from 'express'
@@ -17,7 +16,7 @@ import { PnpRequestService } from '../../services/request-service'
 export function pnpQuota(
   requestService: PnpRequestService,
   accountService: AccountService
-): ResultHandler<PnpQuotaResponse> {
+): ResultHandler<PnpQuotaRequest> {
   return async (request, response) => {
     const logger = response.locals.logger
 

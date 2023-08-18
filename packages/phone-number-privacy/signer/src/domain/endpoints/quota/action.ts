@@ -2,7 +2,6 @@ import {
   domainHash,
   DomainQuotaStatusRequest,
   domainQuotaStatusRequestSchema,
-  DomainQuotaStatusResponse,
   DomainSchema,
   verifyDomainQuotaStatusRequestAuthenticity,
   WarningMessage,
@@ -13,7 +12,7 @@ import { errorResult, ResultHandler } from '../../../common/handler'
 import { getSignerVersion } from '../../../config'
 import { DomainQuotaService } from '../../services/quota'
 
-export function domainQuota(quota: DomainQuotaService): ResultHandler<DomainQuotaStatusResponse> {
+export function domainQuota(quota: DomainQuotaService): ResultHandler<DomainQuotaStatusRequest> {
   return async (request, response) => {
     const { logger } = response.locals
 

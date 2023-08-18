@@ -4,7 +4,7 @@ import {
   ErrorType,
   getContractKit,
   loggerMiddleware,
-  OdisResponse,
+  OdisRequest,
   rootLogger,
   SignerEndpoint,
   WarningMessage,
@@ -29,6 +29,7 @@ import { DefaultPnpQuotaService } from './pnp/services/request-service'
 import {
   catchErrorHandler,
   disabledHandler,
+  Locals,
   meteringHandler,
   PromiseHandler,
   ResultHandler,
@@ -136,11 +137,11 @@ function getSslOptions(config: SignerConfig) {
   }
 }
 
-function createHandler<A extends OdisResponse>(
+function createHandler<R extends OdisRequest>(
   timeoutMs: number,
   enabled: boolean,
-  action: ResultHandler<A>
-): RequestHandler {
+  action: ResultHandler<R>
+): RequestHandler<{}, {}, R, {}, Locals> {
   return catchErrorHandler(
     tracingHandler(
       meteringHandler(
@@ -153,7 +154,7 @@ function createHandler<A extends OdisResponse>(
     )
   )
 
-  function catchErrorHandler2(handler: PromiseHandler): PromiseHandler {
+  function catchErrorHandler2(handler: PromiseHandler<R>): PromiseHandler<R> {
     return async (request, response) => {
       try {
         await handler(request, response)

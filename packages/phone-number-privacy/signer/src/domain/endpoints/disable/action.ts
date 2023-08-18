@@ -1,7 +1,6 @@
 import {
   DisableDomainRequest,
   disableDomainRequestSchema,
-  DisableDomainResponse,
   domainHash,
   DomainSchema,
   verifyDisableDomainRequestAuthenticity,
@@ -19,7 +18,7 @@ import {
 import { errorResult, ResultHandler } from '../../../common/handler'
 import { getSignerVersion } from '../../../config'
 
-export function domainDisable(db: Knex): ResultHandler<DisableDomainResponse> {
+export function domainDisable(db: Knex): ResultHandler<DisableDomainRequest> {
   return async (request, response) => {
     const { logger } = response.locals
 

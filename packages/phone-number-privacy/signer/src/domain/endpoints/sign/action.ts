@@ -3,7 +3,6 @@ import {
   domainHash,
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestSchema,
-  DomainRestrictedSignatureResponse,
   DomainSchema,
   ErrorType,
   getRequestKeyVersion,
@@ -47,7 +46,7 @@ export function domainSign(
   config: SignerConfig,
   quota: DomainQuotaService,
   keyProvider: KeyProvider
-): ResultHandler<DomainRestrictedSignatureResponse> {
+): ResultHandler<DomainRestrictedSignatureRequest> {
   return async (request, response) => {
     const { logger } = response.locals
 

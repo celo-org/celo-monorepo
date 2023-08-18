@@ -9,23 +9,6 @@ import { BigNumber } from 'bignumber.js'
 import Logger from 'bunyan'
 import { Counters, Histograms, Labels, newMeter } from '../metrics'
 
-export async function getBlockNumber(kit: ContractKit): Promise<number> {
-  const _meter = newMeter(Histograms.getBlindedSigInstrumentation, 'getBlockNumber')
-  return _meter(() =>
-    retryAsyncWithBackOffAndTimeout(
-      () => kit.connection.getBlockNumber(),
-      RETRY_COUNT,
-      [],
-      RETRY_DELAY_IN_MS,
-      undefined,
-      FULL_NODE_TIMEOUT_IN_MS
-    ).catch((err) => {
-      Counters.blockchainErrors.labels(Labels.READ).inc()
-      throw err
-    })
-  )
-}
-
 export async function getOnChainOdisPayments(
   kit: ContractKit,
   logger: Logger,

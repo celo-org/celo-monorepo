@@ -2,7 +2,7 @@ import { timeout } from '@celo/base'
 import {
   ErrorMessage,
   ErrorType,
-  FailureResponse,
+  OdisRequest,
   OdisResponse,
   PnpQuotaStatus,
   send,
@@ -20,16 +20,25 @@ import { Counters, newMeter } from './metrics'
 
 const tracer = opentelemetry.trace.getTracer('signer-tracer')
 
-export type PromiseHandler = (request: Request, res: Response) => Promise<void>
+export interface Locals {
+  logger: Logger
+}
 
-export function catchErrorHandler(handler: PromiseHandler): PromiseHandler {
+export type PromiseHandler<R extends OdisRequest> = (
+  request: Request<{}, {}, R>,
+  res: Response<OdisResponse<R>, Locals>
+) => Promise<void>
+
+export function catchErrorHandler<R extends OdisRequest>(
+  handler: PromiseHandler<R>
+): PromiseHandler<R> {
   return async (req, res) => {
     try {
       Counters.requests.labels(req.url).inc()
       await handler(req, res)
     } catch (err: any) {
       // Handle any errors that otherwise managed to escape the proper handlers
-      const logger: Logger = res.locals.logger
+      const logger = res.locals.logger
       logger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
       logger.error(err)
       Counters.errorsCaughtInEndpointHandler.inc()
@@ -50,7 +59,9 @@ export function catchErrorHandler(handler: PromiseHandler): PromiseHandler {
   }
 }
 
-export function tracingHandler(handler: PromiseHandler): PromiseHandler {
+export function tracingHandler<R extends OdisRequest>(
+  handler: PromiseHandler<R>
+): PromiseHandler<R> {
   return async (req, res) => {
     return tracer.startActiveSpan(
       req.url,
@@ -78,14 +89,17 @@ export function tracingHandler(handler: PromiseHandler): PromiseHandler {
   }
 }
 
-export function meteringHandler(
+export function meteringHandler<R extends OdisRequest>(
   histogram: client.Histogram<string>,
-  handler: PromiseHandler
-): PromiseHandler {
+  handler: PromiseHandler<R>
+): PromiseHandler<R> {
   return (req, res) => newMeter(histogram, req.url)(() => handler(req, res))
 }
 
-export function timeoutHandler(timeoutMs: number, handler: PromiseHandler): PromiseHandler {
+export function timeoutHandler<R extends OdisRequest>(
+  timeoutMs: number,
+  handler: PromiseHandler<R>
+): PromiseHandler<R> {
   // Unique error to be thrown on timeout
   const timeoutError = Symbol() // TODO (mcortesi) use Error type
   return async (request, response) => {
@@ -100,7 +114,10 @@ export function timeoutHandler(timeoutMs: number, handler: PromiseHandler): Prom
   }
 }
 
-export function withEnableHandler(enabled: boolean, handler: PromiseHandler): PromiseHandler {
+export function withEnableHandler<R extends OdisRequest>(
+  enabled: boolean,
+  handler: PromiseHandler<R>
+): PromiseHandler<R> {
   return async (req, res) => {
     if (enabled) {
       return handler(req, res)
@@ -110,7 +127,10 @@ export function withEnableHandler(enabled: boolean, handler: PromiseHandler): Pr
   }
 }
 
-export async function disabledHandler(_: Request, response: Response): Promise<void> {
+export async function disabledHandler<R extends OdisRequest>(
+  _: Request<{}, {}, R>,
+  response: Response<OdisResponse<R>, Locals>
+): Promise<void> {
   sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
 }
 
@@ -118,7 +138,7 @@ export function sendFailure(
   error: ErrorType,
   status: number,
   response: Response,
-  body?: Record<any, any>
+  body?: Record<any, any> // TODO remove any
 ) {
   send(
     response,
@@ -133,19 +153,19 @@ export function sendFailure(
   )
 }
 
-export interface Result<A extends OdisResponse> {
+export interface Result<R extends OdisRequest> {
   status: number
-  body: A
+  body: OdisResponse<R>
 }
 
-export type ResultHandler<A extends OdisResponse> = (
-  request: Request,
-  res: Response<A>
-) => Promise<Result<A>>
+export type ResultHandler<R extends OdisRequest> = (
+  request: Request<{}, {}, R>,
+  res: Response<OdisResponse<R>, Locals>
+) => Promise<Result<R>>
 
-export function resultHandler<A extends OdisResponse>(
-  resHandler: ResultHandler<A>
-): PromiseHandler {
+export function resultHandler<R extends OdisRequest>(
+  resHandler: ResultHandler<R>
+): PromiseHandler<R> {
   return async (req, res) => {
     const result = await resHandler(req, res)
     send(res, result.body, result.status, res.locals.logger)
@@ -153,11 +173,12 @@ export function resultHandler<A extends OdisResponse>(
   }
 }
 
-export function errorResult( // TODO add support for domains
+export function errorResult(
   status: number,
   error: string,
   quotaStatus?: PnpQuotaStatus | { status: SequentialDelayDomainState }
-): Result<FailureResponse> {
+): Result<any> {
+  // TODO remove any
   return {
     status,
     body: {

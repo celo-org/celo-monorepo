@@ -10,7 +10,6 @@ import {
   requestHasValidKeyVersion,
   SignMessageRequest,
   SignMessageRequestSchema,
-  SignMessageResponse,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request } from 'express'
@@ -21,7 +20,7 @@ import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management
 import { Counters, Histograms } from '../../../common/metrics'
 import { getSignerVersion, SignerConfig } from '../../../config'
 
-import { errorResult, Result, ResultHandler } from '../../../common/handler'
+import { errorResult, ResultHandler } from '../../../common/handler'
 
 import Logger from 'bunyan'
 import { AccountService } from '../../services/account-service'
@@ -33,8 +32,8 @@ export function pnpSign(
   requestService: PnpRequestService,
   accountService: AccountService,
   keyProvider: KeyProvider
-): ResultHandler<SignMessageResponse> {
-  return async (request, response): Promise<Result<any>> => {
+): ResultHandler<SignMessageRequest> {
+  return async (request, response) => {
     const logger = response.locals.logger
 
     if (!isValidRequest(request)) {
