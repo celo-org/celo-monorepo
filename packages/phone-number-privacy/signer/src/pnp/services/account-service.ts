@@ -10,6 +10,7 @@ import BigNumber from 'bignumber.js'
 import Logger from 'bunyan'
 import { LRUCache } from 'lru-cache'
 import { OdisError, wrapError } from '../../common/error'
+import { Counters } from '../../common/metrics'
 import { traceAsyncFunction } from '../../common/tracing-utils'
 import { getOnChainOdisPayments } from '../../common/web3/contracts'
 import { config } from '../../config'
@@ -87,7 +88,12 @@ export class ContractKitAccountService implements AccountService {
           this.opts.fullNodeTimeoutMs,
           this.opts.fullNodeRetryCount,
           this.opts.fullNodeRetryDelayMs
-        ),
+        ).catch((err) => {
+          // TODO could clean this up...quick fix since we weren't incrementing blockchain error counter
+          this.logger.error({ err, address }, 'failed to get on-chain odis balance for account')
+          Counters.blockchainErrors.inc()
+          throw err
+        }),
         ErrorMessage.FAILURE_TO_GET_DEK
       )
 

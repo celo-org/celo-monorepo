@@ -7,7 +7,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { BigNumber } from 'bignumber.js'
 import Logger from 'bunyan'
-import { Counters, Histograms, Labels, newMeter } from '../metrics'
+import { Counters, Histograms, newMeter } from '../metrics'
 
 export async function getOnChainOdisPayments(
   kit: ContractKit,
@@ -30,7 +30,7 @@ export async function getOnChainOdisPayments(
       FULL_NODE_TIMEOUT_IN_MS
     ).catch((err: any) => {
       logger.error({ err, account }, 'failed to get on-chain odis balance for account')
-      Counters.blockchainErrors.labels(Labels.READ).inc()
+      Counters.blockchainErrors.inc()
       throw err
     })
   )

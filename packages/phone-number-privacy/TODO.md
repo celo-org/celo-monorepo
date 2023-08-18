@@ -2,14 +2,17 @@
 
 ## Before Load Test
 
-- (Alec) check prometheus Counter
 - Search for TODO comments and see if there's anything to fix for Load Tests
+  - notes:
+    - we might get errors on deployment bc we deleted migrations files
+    - we still need to fix the requests table primary key
 - Deploy & Make Release
 - Run LoadTest
 
 ## After Load Test
 
 - (alec) fix domains tests
+- (Alec) check prometheus Counter
 - Fix types in errorResult and sendFailure so we don't have to use ANY
 - Refactor domain sign handler to use db transactions properly
 - refactor authorization function with the new account model

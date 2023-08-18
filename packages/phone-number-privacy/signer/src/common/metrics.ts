@@ -32,7 +32,6 @@ export const Counters = {
   blockchainErrors: new Counter({
     name: 'blockchain_errors',
     help: 'Counter for the number of errors from interacting with the blockchain',
-    labelNames: ['type'],
   }),
   signatureComputationErrors: new Counter({
     name: 'signature_computation_errors',
@@ -46,14 +45,6 @@ export const Counters = {
     name: 'requests_with_wallet_address',
     help: 'Counter for the number of requests in which the account uses a different wallet address',
   }),
-  requestsWithVerifiedAccount: new Counter({
-    name: 'requests_with_verified_account',
-    help: 'Counter for the number of requests in which the account is verified',
-  }),
-  requestsWithUnverifiedAccountWithMinBalance: new Counter({
-    name: 'requests_with_unverified_account_with_min_balance',
-    help: 'Counter for the number of requests in which the account is not verified but meets min balance',
-  }),
   testQuotaBypassedRequests: new Counter({
     name: 'test_quota_bypassed_requests',
     help: 'Counter for the number of requests not requiring quota (testing only)',
@@ -61,10 +52,6 @@ export const Counters = {
   timeouts: new Counter({
     name: 'timeouts',
     help: 'Counter for the number of signer timeouts as measured by the signer',
-  }),
-  requestsFailingClosed: new Counter({
-    name: 'requests_failing_closed',
-    help: 'Counter for the number of requests failing quota or authentication checks due to full-node errors',
   }),
   errorsCaughtInEndpointHandler: new Counter({
     name: 'errors_caught_in_endpoint_handler',
@@ -85,12 +72,6 @@ export const Histograms = {
     name: 'signature_endpoint_latency',
     help: 'Histogram tracking latency of signature endpoint',
     labelNames: ['endpoint'],
-    buckets,
-  }),
-  getBlindedSigInstrumentation: new Histogram({
-    name: 'get_blinded_sig_instrumentation',
-    help: 'Histogram tracking latency of blinded sig function by code segment',
-    labelNames: ['codeSegment'],
     buckets,
   }),
   getRemainingQueryCountInstrumentation: new Histogram({

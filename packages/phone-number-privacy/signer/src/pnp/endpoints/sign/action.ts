@@ -67,11 +67,12 @@ export function pnpSign(
       logger
     )
 
+    Histograms.userRemainingQuotaAtRequest
+      .labels(ctx.url)
+      .observe(account.pnpTotalQuota - usedQuota)
+
     if (!duplicateRequest && account.pnpTotalQuota <= usedQuota) {
       logger.warn({ usedQuota, totalQuota: account.pnpTotalQuota }, 'No remaining quota')
-
-      const remainingQuota = account.pnpTotalQuota - usedQuota
-      Histograms.userRemainingQuotaAtRequest.labels(ctx.url).observe(remainingQuota)
 
       if (bypassQuotaForE2ETesting(config.test_quota_bypass_percentage, request.body)) {
         Counters.testQuotaBypassedRequests.inc()
