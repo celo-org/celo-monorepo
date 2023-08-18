@@ -6,6 +6,7 @@ import {
   getSignerEndpoint,
   hasValidAccountParam,
   isBodyReasonablySized,
+  newContractKitFetcher,
   PnpQuotaRequest,
   PnpQuotaRequestSchema,
   PnpQuotaResponse,
@@ -63,13 +64,14 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   async authenticate(request: Request<{}, {}, PnpQuotaRequest>, logger: Logger): Promise<boolean> {
     return authenticateUser(
       request,
-      this.kit,
       logger,
-      this.config.shouldFailOpen,
-      [],
-      this.config.fullNodeTimeoutMs,
-      this.config.fullNodeRetryCount,
-      this.config.fullNodeRetryDelayMs
+      newContractKitFetcher(
+        this.kit,
+        logger,
+        this.config.fullNodeTimeoutMs,
+        this.config.fullNodeRetryCount,
+        this.config.fullNodeRetryDelayMs
+      )
     )
   }
 

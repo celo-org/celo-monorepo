@@ -28,10 +28,10 @@ export class PnpSignerResponseLogger {
     }> = []
     session.responses.forEach((response) => {
       if (response.res.success) {
-        const { version, performedQueryCount, totalQuota, blockNumber, warnings } = response.res
+        const { version, performedQueryCount, totalQuota, warnings } = response.res
         parsedResponses.push({
           signerUrl: response.url,
-          values: { version, performedQueryCount, totalQuota, blockNumber, warnings },
+          values: { version, performedQueryCount, totalQuota, warnings },
         })
       }
     })

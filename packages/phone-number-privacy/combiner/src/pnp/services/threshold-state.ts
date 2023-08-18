@@ -43,7 +43,6 @@ export class PnpThresholdStateService<R extends PnpQuotaRequest | SignMessageReq
     return {
       performedQueryCount: thresholdSigner.performedQueryCount,
       totalQuota: thresholdSigner.totalQuota,
-      blockNumber: thresholdSigner.blockNumber,
     }
   }
 }

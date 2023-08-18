@@ -7,6 +7,7 @@ import {
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
   isBodyReasonablySized,
+  newContractKitFetcher,
   PnpQuotaStatus,
   send,
   SignerEndpoint,
@@ -80,13 +81,14 @@ export class PnpSignIO extends IO<SignMessageRequest> {
   ): Promise<boolean> {
     return authenticateUser(
       request,
-      this.kit,
       logger,
-      this.config.shouldFailOpen,
-      [],
-      this.config.fullNodeTimeoutMs,
-      this.config.fullNodeRetryCount,
-      this.config.fullNodeRetryDelayMs
+      newContractKitFetcher(
+        this.kit,
+        logger,
+        this.config.fullNodeTimeoutMs,
+        this.config.fullNodeRetryCount,
+        this.config.fullNodeRetryDelayMs
+      )
     )
   }
 
