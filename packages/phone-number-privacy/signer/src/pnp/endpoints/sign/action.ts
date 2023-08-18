@@ -23,6 +23,7 @@ import { getSignerVersion, SignerConfig } from '../../../config'
 import { errorResult, ResultHandler } from '../../../common/handler'
 
 import Logger from 'bunyan'
+import { traceAsyncFunction } from '../../../common/tracing-utils'
 import { AccountService } from '../../services/account-service'
 import { PnpRequestService } from '../../services/request-service'
 
@@ -151,14 +152,16 @@ async function sign(
   logger: Logger
 ): Promise<string> {
   let privateKey: string
-  try {
-    privateKey = await keyProvider.getPrivateKeyOrFetchFromStore(key)
-  } catch (err) {
-    logger.info({ key }, 'Requested key version not supported')
-    logger.error(err)
-    throw new Error(WarningMessage.INVALID_KEY_VERSION_REQUEST)
-  }
-  return computeBlindedSignature(blindedMessage, privateKey, logger)
+  return traceAsyncFunction('pnpSign', async () => {
+    try {
+      privateKey = await keyProvider.getPrivateKeyOrFetchFromStore(key)
+    } catch (err) {
+      logger.info({ key }, 'Requested key version not supported')
+      logger.error(err)
+      throw new Error(WarningMessage.INVALID_KEY_VERSION_REQUEST)
+    }
+    return computeBlindedSignature(blindedMessage, privateKey, logger)
+  })
 }
 
 function isValidRequest(

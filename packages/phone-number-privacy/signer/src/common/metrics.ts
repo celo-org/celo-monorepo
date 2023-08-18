@@ -117,21 +117,6 @@ export const Histograms = {
   }),
 }
 
-declare type InFunction<T extends any[], U> = (...params: T) => Promise<U>
-
-export async function meter<T extends any[], U>(
-  inFunction: InFunction<T, U>,
-  params: T,
-  onError: (err: any) => U,
-  prometheus: client.Histogram<string>,
-  labels: string[]
-): Promise<U> {
-  const _meter = prometheus.labels(...labels).startTimer()
-  return inFunction(...params)
-    .catch(onError)
-    .finally(_meter)
-}
-
 export function newMeter(
   histogram: client.Histogram<string>,
   ...labels: string[]

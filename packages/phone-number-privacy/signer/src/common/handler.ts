@@ -75,6 +75,9 @@ export function tracingHandler<R extends OdisRequest>(
       async (span) => {
         try {
           await handler(req, res)
+          span.setStatus({
+            code: SpanStatusCode.OK,
+          })
         } catch (err: any) {
           span.setStatus({
             code: SpanStatusCode.ERROR,
