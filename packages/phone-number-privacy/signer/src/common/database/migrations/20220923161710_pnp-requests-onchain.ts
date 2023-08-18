@@ -9,8 +9,10 @@ export async function up(knex: Knex): Promise<any> {
       t.string(REQUESTS_COLUMNS.blindedQuery).notNullable()
       t.primary([
         REQUESTS_COLUMNS.address,
+        // Note: timestamp isn't used on lookups and therefore hurts performance. Fixed in follow up migration.
+        // (https://oracle-base.com/articles/9i/index-skip-scanning)
         REQUESTS_COLUMNS.timestamp,
-        REQUESTS_COLUMNS.blindedQuery, // double check index
+        REQUESTS_COLUMNS.blindedQuery,
       ])
     })
   }

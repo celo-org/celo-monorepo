@@ -5,7 +5,6 @@ export async function up(knex: Knex): Promise<any> {
   // This check was necessary to switch from using .ts migrations to .js migrations.
   if (!(await knex.schema.hasTable('requests'))) {
     return knex.schema.createTable('requests', (t) => {
-      // TODO add migration dropping these tables
       t.string(REQUESTS_COLUMNS.address).notNullable()
       t.dateTime(REQUESTS_COLUMNS.timestamp).notNullable()
       t.string(REQUESTS_COLUMNS.blindedQuery).notNullable()
