@@ -13,7 +13,6 @@ return doAction(request, response, auth)
 
 TODO
 
-- (alec) extract resultHandler() out of each handler, into the createHandler on server.ts
 - (alec) Refactor domain sign handler to use db transactions properly
 - (Alec) check prometheus Counter
 

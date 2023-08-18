@@ -10,6 +10,7 @@ import {
   requestHasValidKeyVersion,
   SignMessageRequest,
   SignMessageRequestSchema,
+  SignMessageResponse,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request } from 'express'
@@ -20,20 +21,20 @@ import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management
 import { Counters, Histograms } from '../../../common/metrics'
 import { getSignerVersion, SignerConfig } from '../../../config'
 
-import { errorResult, PromiseHandler, Result, resultHandler } from '../../../common/handler'
+import { errorResult, Result, ResultHandler } from '../../../common/handler'
 
 import Logger from 'bunyan'
 import { AccountService } from '../../services/account-service'
 import { PnpRequestService } from '../../services/request-service'
 
-export function createPnpSignHandler(
+export function pnpSign(
   db: Knex,
   config: SignerConfig,
   requestService: PnpRequestService,
   accountService: AccountService,
   keyProvider: KeyProvider
-): PromiseHandler {
-  return resultHandler(async (request, response): Promise<Result<any>> => {
+): ResultHandler<SignMessageResponse> {
+  return async (request, response): Promise<Result<any>> => {
     const logger = response.locals.logger
 
     if (!isValidRequest(request)) {
@@ -129,7 +130,7 @@ export function createPnpSignHandler(
         warnings,
       },
     }
-  })
+  }
 }
 
 function isDuplicateRequest(

@@ -5,19 +5,20 @@ import {
   isBodyReasonablySized,
   PnpQuotaRequest,
   PnpQuotaRequestSchema,
+  PnpQuotaResponse,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request } from 'express'
-import { errorResult, PromiseHandler, resultHandler } from '../../../common/handler'
+import { errorResult, ResultHandler } from '../../../common/handler'
 import { getSignerVersion } from '../../../config'
 import { AccountService } from '../../services/account-service'
 import { PnpRequestService } from '../../services/request-service'
 
-export function createPnpQuotaHandler(
+export function pnpQuota(
   requestService: PnpRequestService,
   accountService: AccountService
-): PromiseHandler {
-  return resultHandler(async (request, response) => {
+): ResultHandler<PnpQuotaResponse> {
+  return async (request, response) => {
     const logger = response.locals.logger
 
     if (!isValidRequest(request)) {
@@ -49,7 +50,7 @@ export function createPnpQuotaHandler(
         warnings,
       },
     }
-  })
+  }
 }
 
 function isValidRequest(

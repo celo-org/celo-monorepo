@@ -3,6 +3,7 @@ import {
   domainHash,
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestSchema,
+  DomainRestrictedSignatureResponse,
   DomainSchema,
   ErrorType,
   getRequestKeyVersion,
@@ -20,7 +21,7 @@ import {
   DomainStateRecord,
   toSequentialDelayDomainState,
 } from '../../../common/database/models/domain-state'
-import { errorResult, PromiseHandler, resultHandler } from '../../../common/handler'
+import { errorResult, ResultHandler } from '../../../common/handler'
 import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management/key-provider-base'
 import { OdisQuotaStatusResult } from '../../../common/quota'
 import { getSignerVersion, SignerConfig } from '../../../config'
@@ -41,13 +42,13 @@ type TrxResult =
       signature: string
     }
 
-export function createDomainSignHandler(
+export function domainSign(
   db: Knex,
   config: SignerConfig,
   quota: DomainQuotaService,
   keyProvider: KeyProvider
-): PromiseHandler {
-  return resultHandler(async (request, response) => {
+): ResultHandler<DomainRestrictedSignatureResponse> {
+  return async (request, response) => {
     const { logger } = response.locals
 
     if (!isValidRequest(request)) {
@@ -151,7 +152,7 @@ export function createDomainSignHandler(
         status: toSequentialDelayDomainState(res.domainStateRecord),
       })
     }
-  })
+  }
 }
 
 function isValidRequest(

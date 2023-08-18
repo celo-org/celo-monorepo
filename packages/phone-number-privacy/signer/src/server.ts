@@ -4,6 +4,7 @@ import {
   ErrorType,
   getContractKit,
   loggerMiddleware,
+  OdisResponse,
   rootLogger,
   SignerEndpoint,
   WarningMessage,
@@ -17,12 +18,12 @@ import * as PromClient from 'prom-client'
 import { KeyProvider } from './common/key-management/key-provider-base'
 import { Histograms } from './common/metrics'
 import { getSignerVersion, SignerConfig } from './config'
-import { createDomainDisableHandler } from './domain/endpoints/disable/action'
-import { createDomainQuotaHandler } from './domain/endpoints/quota/action'
-import { createDomainSignHandler } from './domain/endpoints/sign/action'
+import { domainDisable } from './domain/endpoints/disable/action'
+import { domainQuota } from './domain/endpoints/quota/action'
+import { domainSign } from './domain/endpoints/sign/action'
 import { DomainQuotaService } from './domain/services/quota'
-import { createPnpQuotaHandler } from './pnp/endpoints/quota/action'
-import { createPnpSignHandler } from './pnp/endpoints/sign/action'
+import { pnpQuota } from './pnp/endpoints/quota/action'
+import { pnpSign } from './pnp/endpoints/sign/action'
 import { DefaultPnpQuotaService } from './pnp/services/request-service'
 
 import {
@@ -30,6 +31,8 @@ import {
   disabledHandler,
   meteringHandler,
   PromiseHandler,
+  ResultHandler,
+  resultHandler,
   sendFailure,
   timeoutHandler,
   tracingHandler,
@@ -73,33 +76,37 @@ export function startSigner(
   const pnpRequestService = new DefaultPnpQuotaService(db)
   const domainQuotaService = new DomainQuotaService(db)
 
-  const pnpQuotaHandler = config.api.phoneNumberPrivacy.enabled
-    ? createPnpQuotaHandler(pnpRequestService, accountService)
-    : disabledHandler
-
-  const pnpSignHandler = config.api.phoneNumberPrivacy.enabled
-    ? createPnpSignHandler(db, config, pnpRequestService, accountService, keyProvider)
-    : disabledHandler
-
-  const domainQuota = config.api.domains.enabled
-    ? createDomainQuotaHandler(domainQuotaService)
-    : disabledHandler
-
-  const domainSign = config.api.domains.enabled
-    ? createDomainSignHandler(db, config, domainQuotaService, keyProvider)
-    : disabledHandler
-
-  const domainDisable = config.api.domains.enabled
-    ? createDomainDisableHandler(db)
-    : disabledHandler
-
   logger.info('Right before adding meteredSignerEndpoints')
 
-  app.post(SignerEndpoint.PNP_SIGN, createHandler(config.timeout, pnpSignHandler))
-  app.post(SignerEndpoint.PNP_QUOTA, createHandler(config.timeout, pnpQuotaHandler))
-  app.post(SignerEndpoint.DOMAIN_QUOTA_STATUS, createHandler(config.timeout, domainQuota))
-  app.post(SignerEndpoint.DOMAIN_SIGN, createHandler(config.timeout, domainSign))
-  app.post(SignerEndpoint.DISABLE_DOMAIN, createHandler(config.timeout, domainDisable))
+  const {
+    timeout,
+    api: { domains, phoneNumberPrivacy },
+  } = config
+
+  app.post(
+    SignerEndpoint.PNP_SIGN,
+    createHandler(
+      timeout,
+      phoneNumberPrivacy.enabled,
+      pnpSign(db, config, pnpRequestService, accountService, keyProvider)
+    )
+  )
+  app.post(
+    SignerEndpoint.PNP_QUOTA,
+    createHandler(timeout, phoneNumberPrivacy.enabled, pnpQuota(pnpRequestService, accountService))
+  )
+  app.post(
+    SignerEndpoint.DOMAIN_QUOTA_STATUS,
+    createHandler(timeout, domains.enabled, domainQuota(domainQuotaService))
+  )
+  app.post(
+    SignerEndpoint.DOMAIN_SIGN,
+    createHandler(timeout, domains.enabled, domainSign(db, config, domainQuotaService, keyProvider))
+  )
+  app.post(
+    SignerEndpoint.DISABLE_DOMAIN,
+    createHandler(timeout, domains.enabled, domainDisable(db))
+  )
 
   const sslOptions = getSslOptions(config)
   if (sslOptions) {
@@ -129,12 +136,19 @@ function getSslOptions(config: SignerConfig) {
   }
 }
 
-function createHandler(timeoutMs: number, action: PromiseHandler): RequestHandler {
+function createHandler<A extends OdisResponse>(
+  timeoutMs: number,
+  enabled: boolean,
+  action: ResultHandler<A>
+): RequestHandler {
   return catchErrorHandler(
     tracingHandler(
       meteringHandler(
         Histograms.responseLatency,
-        timeoutHandler(timeoutMs, catchErrorHandler2(action))
+        timeoutHandler(
+          timeoutMs,
+          catchErrorHandler2(enabled ? resultHandler(action) : disabledHandler)
+        )
       )
     )
   )

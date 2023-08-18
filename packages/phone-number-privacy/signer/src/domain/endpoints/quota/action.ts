@@ -2,18 +2,19 @@ import {
   domainHash,
   DomainQuotaStatusRequest,
   domainQuotaStatusRequestSchema,
+  DomainQuotaStatusResponse,
   DomainSchema,
   verifyDomainQuotaStatusRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request } from 'express'
 import { toSequentialDelayDomainState } from '../../../common/database/models/domain-state'
-import { errorResult, PromiseHandler, resultHandler } from '../../../common/handler'
+import { errorResult, ResultHandler } from '../../../common/handler'
 import { getSignerVersion } from '../../../config'
 import { DomainQuotaService } from '../../services/quota'
 
-export function createDomainQuotaHandler(quota: DomainQuotaService): PromiseHandler {
-  return resultHandler(async (request, response) => {
+export function domainQuota(quota: DomainQuotaService): ResultHandler<DomainQuotaStatusResponse> {
+  return async (request, response) => {
     const { logger } = response.locals
 
     if (!isValidRequest(request)) {
@@ -40,7 +41,7 @@ export function createDomainQuotaHandler(quota: DomainQuotaService): PromiseHand
         status: toSequentialDelayDomainState(domainStateRecord),
       },
     }
-  })
+  }
 }
 
 function isValidRequest(

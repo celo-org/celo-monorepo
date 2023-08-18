@@ -1,6 +1,7 @@
 import {
   DisableDomainRequest,
   disableDomainRequestSchema,
+  DisableDomainResponse,
   domainHash,
   DomainSchema,
   verifyDisableDomainRequestAuthenticity,
@@ -15,11 +16,11 @@ import {
   insertDomainStateRecord,
   setDomainDisabled,
 } from '../../../common/database/wrappers/domain-state'
-import { errorResult, PromiseHandler, resultHandler } from '../../../common/handler'
+import { errorResult, ResultHandler } from '../../../common/handler'
 import { getSignerVersion } from '../../../config'
 
-export function createDomainDisableHandler(db: Knex): PromiseHandler {
-  return resultHandler(async (request, response) => {
+export function domainDisable(db: Knex): ResultHandler<DisableDomainResponse> {
+  return async (request, response) => {
     const { logger } = response.locals
 
     if (!isValidRequest(request)) {
@@ -66,7 +67,7 @@ export function createDomainDisableHandler(db: Knex): PromiseHandler {
         status: toSequentialDelayDomainState(res.domainStateRecord),
       },
     }
-  })
+  }
 }
 
 function isValidRequest(
