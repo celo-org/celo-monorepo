@@ -819,4 +819,28 @@ contract('LockedGold', (accounts: string[]) => {
       assertEqualBN(await lockedGold.getAccountTotalLockedGold(reporter), reward)
     })
   })
+
+  describe('#getTotalPendingWithdrawalsCount()', () => {
+    it('should return 0 if account has no pending withdrawals', async () => {
+      const count = await lockedGold.getTotalPendingWithdrawalsCount(account)
+      assert.equal(count.toNumber(), 0)
+    })
+
+    it('should return the count of pending withdrawals', async () => {
+      const value = 10000
+      // @ts-ignore
+      await lockedGold.lock({ value })
+      await lockedGold.unlock(value / 2)
+      await lockedGold.unlock(value / 2)
+
+      const count = await lockedGold.getTotalPendingWithdrawalsCount(account)
+      assert.equal(count.toNumber(), 2)
+    })
+
+    it('should return 0 for a non-existent account', async () => {
+      const nonExistentAccount = '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef'
+      const count = await lockedGold.getTotalPendingWithdrawalsCount(nonExistentAccount)
+      assert.equal(count.toNumber(), 0)
+    })
+  })
 })

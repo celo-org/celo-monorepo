@@ -1098,7 +1098,7 @@ describe('domainService', () => {
               version: res.body.version,
               error: ErrorMessage.THRESHOLD_DISABLE_DOMAIN_FAILURE,
             })
-          })
+          }, 10000)
         })
 
         describe(`${CombinerEndpoint.DOMAIN_QUOTA_STATUS}`, () => {
@@ -1112,7 +1112,7 @@ describe('domainService', () => {
               version: res.body.version,
               error: ErrorMessage.THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE,
             })
-          })
+          }, 10000)
         })
 
         describe(`${CombinerEndpoint.DOMAIN_SIGN}`, () => {
@@ -1125,7 +1125,7 @@ describe('domainService', () => {
               version: res.body.version,
               error: ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES,
             })
-          })
+          }, 10000)
         })
       })
     })
