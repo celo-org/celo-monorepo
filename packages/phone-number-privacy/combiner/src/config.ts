@@ -166,7 +166,7 @@ if (DEV_MODE) {
     },
     db: {
       type: SupportedDatabase.Sqlite,
-      user: 'postgres',
+      user: '',
       password: '',
       database: 'phoneNumber+privacy',
       host: 'http://localhost',
