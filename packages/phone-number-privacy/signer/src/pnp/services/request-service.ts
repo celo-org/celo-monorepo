@@ -1,11 +1,11 @@
 import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
+import { Context } from '../../common/context'
 import { getPerformedQueryCount, incrementQueryCount } from '../../common/database/wrappers/account'
 import { insertRequest } from '../../common/database/wrappers/request'
 import { wrapError } from '../../common/error'
 import { Histograms, newMeter } from '../../common/metrics'
 import { traceAsyncFunction } from '../../common/tracing-utils'
-import { Context } from '../context'
 
 export interface PnpRequestService {
   getUsedQuotaForAccount(address: string, ctx: Context): Promise<number>

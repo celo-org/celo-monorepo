@@ -14,6 +14,8 @@ export function traceAsyncFunction<A>(traceName: string, fn: () => Promise<A>): 
         message: err instanceof Error ? err.message : undefined,
       })
       throw err
+    } finally {
+      span.end()
     }
   })
 }
