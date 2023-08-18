@@ -287,7 +287,12 @@ export const makeTruffleContractForMigrationWithoutSingleton = (contractName: st
   })
   Contract.configureNetwork({networkType: "ethereum", provider: web3.currentProvider})
 
-  Contract.defaults({from: network.from, gas: network.gas, type: 0})
+  Contract.defaults({from: network.from, gas: network.gas, 
+    // gasPrice: network.gas-1, 
+    // type: 0, 
+    // maxFeePerGas:6616036
+  }
+    )
   return Contract
 }
 
@@ -311,7 +316,12 @@ export const makeTruffleContractForMigration = (contractName: string, contractPa
   })
   Contract.configureNetwork({networkType: "ethereum", provider: web3.currentProvider})
 
-  Contract.defaults({from: network.from, gas: network.gas, type: 0})
+  Contract.defaults({from: network.from, gas: network.gas, 
+    // type: 0,  
+    // gasPrice: network.gas-1
+    // maxFeePerGas:6616036
+  }
+    )
   ArtifactsSingleton.getInstance(contractPath).addArtifact(contractName, Contract)
   return Contract
 }
@@ -337,7 +347,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
       // TODO remove the hardcode
       console.log("Voy al default", name)
       ContractProxy = artifacts.require(name + 'Proxy')  
-      console.log(ContractProxy)
+      // console.log(ContractProxy)
     } else {
       ContractProxy = makeTruffleContractForMigration(name + 'Proxy', artifactPath, web3)
     }
@@ -351,9 +361,14 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
     console.log("\n-> Deploying", name)
 
     deployer.deploy(ContractProxy)
+    console.log(1)
     deployer.deploy(Contract, testingDeployment)
-
+    // if (name != "GasPriceMinimum"){
+      
+    // }
+    console.log(2)
     deployer.then(async () => {
+      console.log(3)
       const proxy: ProxyInstance = await ContractProxy.deployed()
       await proxy._transferOwnership(ContractProxy.defaults().from)
       const proxiedContract: ContractInstance = await setInitialProxyImplementation<

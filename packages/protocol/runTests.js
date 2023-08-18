@@ -53,7 +53,7 @@ async function test() {
     }
 
     // --reset is a hack to trick truffle into using 20M gas.
-    let testArgs = ['run', 'truffle', 'test', '--reset']
+    let testArgs = ['run', 'truffle', 'test', '--reset'] // Adding config doesn't seem to do much --config truffle-confisg0.8.js
     if (argv['verbose-rpc']) {
       testArgs.push('--verbose-rpc')
     }

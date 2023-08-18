@@ -43,6 +43,7 @@ const defaultConfig = {
   from: OG_FROM,
   gas: gasLimit,
   gasPrice: 100000000000,
+  // maxFeePerGas: 975000000,
 }
 
 const freeGasConfig = { ...defaultConfig, ...{ gasPrice: 0 } }

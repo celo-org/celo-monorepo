@@ -21,6 +21,6 @@ module.exports = deploymentForCoreContract<GasPriceMinimumInstance>(
   artifacts,
   CeloContractName.GasPriceMinimum,
   initializeArgs,
-  null,
+  undefined,
   SOLIDITY_08_PACKAGE
 )
