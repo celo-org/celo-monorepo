@@ -40,7 +40,7 @@ testWithGanache('releasegold:transfer-dollars cmd', (web3: Web3) => {
       contractAddress,
       '--value',
       cUSDToTransfer,
-      '--feeCurrency',
+      '--gasCurrency',
       'CELO',
     ])
     // RG cUSD balance should match the amount sent
@@ -54,7 +54,7 @@ testWithGanache('releasegold:transfer-dollars cmd', (web3: Web3) => {
       accounts[0],
       '--value',
       cUSDToTransfer,
-      '--feeCurrency',
+      '--gasCurrency',
       'CELO',
     ])
     const balanceAfter = await kit.getTotalBalance(accounts[0])
