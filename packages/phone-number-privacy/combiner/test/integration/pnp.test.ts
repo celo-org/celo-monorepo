@@ -100,7 +100,6 @@ const signerConfig: SignerConfig = {
     },
     phoneNumberPrivacy: {
       enabled: true,
-      shouldFailOpen: true,
     },
   },
   blockchain: {
@@ -602,40 +601,6 @@ describe('pnpService', () => {
             error: WarningMessage.API_UNAVAILABLE,
           })
         })
-
-        describe('functionality in case of errors', () => {
-          it('Should respond with 200 on failure to fetch DEK when shouldFailOpen is true', async () => {
-            mockGetDataEncryptionKey.mockReset().mockImplementation(() => {
-              throw new Error()
-            })
-
-            const req = {
-              account: ACCOUNT_ADDRESS1,
-              authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
-            }
-
-            // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
-            const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
-            const authorization = getPnpRequestAuthorization(req, differentPk)
-
-            const combinerConfigWithFailOpenEnabled: typeof combinerConfig = JSON.parse(
-              JSON.stringify(combinerConfig)
-            )
-            combinerConfigWithFailOpenEnabled.phoneNumberPrivacy.shouldFailOpen = true
-            const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled, mockKit)
-            const res = await getCombinerQuotaResponse(req, authorization, appWithFailOpenEnabled)
-
-            expect(res.status).toBe(200)
-            expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
-              success: true,
-              version: expectedVersion,
-              performedQueryCount: 0,
-              totalQuota,
-              blockNumber: testBlockNumber,
-              warnings: [],
-            })
-          })
-        })
       })
 
       describe(`${CombinerEndpoint.PNP_SIGN}`, () => {
@@ -925,41 +890,7 @@ describe('pnpService', () => {
         })
 
         describe('functionality in case of errors', () => {
-          it('Should return 200 on failure to fetch DEK when shouldFailOpen is true', async () => {
-            mockGetDataEncryptionKey.mockImplementation(() => {
-              throw new Error()
-            })
-
-            req.authenticationMethod = AuthenticationMethod.ENCRYPTION_KEY
-            // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
-            const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
-            const authorization = getPnpRequestAuthorization(req, differentPk)
-
-            const combinerConfigWithFailOpenEnabled: typeof combinerConfig = JSON.parse(
-              JSON.stringify(combinerConfig)
-            )
-            combinerConfigWithFailOpenEnabled.phoneNumberPrivacy.shouldFailOpen = true
-            const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled, mockKit)
-            const res = await sendPnpSignRequest(req, authorization, appWithFailOpenEnabled)
-
-            expect(res.status).toBe(200)
-            expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
-              success: true,
-              version: expectedVersion,
-              signature: expectedSignature,
-              performedQueryCount: 1,
-              totalQuota: expectedTotalQuota,
-              blockNumber: testBlockNumber,
-              warnings: [],
-            })
-            const unblindedSig = threshold_bls.unblind(
-              Buffer.from(res.body.signature, 'base64'),
-              blindedMsgResult.blindingFactor
-            )
-            expect(Buffer.from(unblindedSig).toString('base64')).toEqual(expectedUnblindedSig)
-          })
-
-          it('Should return 401 on failure to fetch DEK when shouldFailOpen is false', async () => {
+          it('Should return 401 on failure to fetch DEK', async () => {
             mockGetDataEncryptionKey.mockImplementation(() => {
               throw new Error()
             })
@@ -970,7 +901,6 @@ describe('pnpService', () => {
             const combinerConfigWithFailOpenDisabled: typeof combinerConfig = JSON.parse(
               JSON.stringify(combinerConfig)
             )
-            combinerConfigWithFailOpenDisabled.phoneNumberPrivacy.shouldFailOpen = false
             const appWithFailOpenDisabled = startCombiner(
               combinerConfigWithFailOpenDisabled,
               mockKit

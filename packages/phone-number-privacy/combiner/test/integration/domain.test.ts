@@ -90,7 +90,6 @@ const signerConfig: SignerConfig = {
     },
     phoneNumberPrivacy: {
       enabled: false,
-      shouldFailOpen: false,
     },
   },
   blockchain: {
