@@ -28,7 +28,7 @@ export default class TransferDollars extends ReleaseGoldBaseCommand {
     this.kit.defaultAccount = isRevoked
       ? await this.releaseGoldWrapper.getReleaseOwner()
       : await this.releaseGoldWrapper.getBeneficiary()
-
+    console.info('flags', flags)
     await displaySendTx('transfer', this.releaseGoldWrapper.transfer(flags.to, flags.value))
   }
 }

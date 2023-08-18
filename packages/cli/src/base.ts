@@ -203,6 +203,7 @@ export abstract class BaseCommand extends Command {
       await this.kit.setFeeCurrency(stableTokenInfos[stable].contract)
     }
     if (Object.keys(StableToken).includes(gasCurrencyConfig)) {
+      console.info('set fee currency', gasCurrencyConfig)
       await setStableTokenGas(StableToken[gasCurrencyConfig as keyof typeof StableToken])
     } else if (gasCurrencyConfig === gasOptions.auto && this.kit.defaultAccount) {
       const balances = await this.kit.getTotalBalance(this.kit.defaultAccount)
