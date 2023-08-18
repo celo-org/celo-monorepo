@@ -1,13 +1,10 @@
 import { ContractKit } from '@celo/contractkit'
 import {
-  ErrorMessage,
-  ErrorType,
   getContractKit,
   loggerMiddleware,
   OdisRequest,
   rootLogger,
   SignerEndpoint,
-  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import express, { Express, RequestHandler } from 'express'
 import fs from 'fs'
@@ -31,10 +28,8 @@ import {
   disabledHandler,
   Locals,
   meteringHandler,
-  PromiseHandler,
   ResultHandler,
   resultHandler,
-  sendFailure,
   timeoutHandler,
   tracingHandler,
 } from './common/handler'
@@ -146,34 +141,8 @@ function createHandler<R extends OdisRequest>(
     tracingHandler(
       meteringHandler(
         Histograms.responseLatency,
-        timeoutHandler(
-          timeoutMs,
-          catchErrorHandler2(enabled ? resultHandler(action) : disabledHandler)
-        )
+        timeoutHandler(timeoutMs, enabled ? resultHandler(action) : disabledHandler)
       )
     )
   )
-
-  function catchErrorHandler2(handler: PromiseHandler<R>): PromiseHandler<R> {
-    return async (request, response) => {
-      try {
-        await handler(request, response)
-      } catch (err: any) {
-        const logger = response.locals.logger
-        logger.error({ err }, `Error in handler for ${request.url}`)
-
-        let errMsg: ErrorType = ErrorMessage.UNKNOWN_ERROR
-        if (
-          err instanceof Error &&
-          // Propagate standard error & warning messages thrown during endpoint handling
-          (Object.values(ErrorMessage).includes(err.message as ErrorMessage) ||
-            Object.values(WarningMessage).includes(err.message as WarningMessage))
-        ) {
-          errMsg = err.message as ErrorType
-        }
-
-        sendFailure(errMsg, 500, response)
-      }
-    }
-  }
 }

@@ -112,6 +112,8 @@ export function timeoutHandler<R extends OdisRequest>(
       if (err === timeoutError) {
         Counters.timeouts.inc()
         sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, response)
+      } else {
+        throw err
       }
     }
   }
