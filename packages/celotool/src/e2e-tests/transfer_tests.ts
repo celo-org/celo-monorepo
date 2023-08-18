@@ -691,6 +691,7 @@ describe('Transfer tests', function (this: any) {
                         const txOptions = {
                           gatewayFeeRecipient: recipient(recipientChoice),
                           gatewayFee: feeValue(feeValueChoice),
+                          gas: 200000, // avoids the error from the gas estimation, instead the txPool
                         }
                         if (recipientChoice !== 'unset' || feeValueChoice !== 'unset') {
                           it('should get rejected by the sending node before being added to the tx pool', async () => {
