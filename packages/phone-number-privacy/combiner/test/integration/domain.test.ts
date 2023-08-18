@@ -271,11 +271,12 @@ describe('domainService', () => {
           [`${DefaultKeyName.DOMAINS}-3`, DOMAINS_THRESHOLD_DEV_PK_SHARE_3_V3],
         ])
       )
-      db = await initCombinerDatabase(combinerConfig)
-      app = startCombiner(db, combinerConfig, getContractKit(combinerConfig.blockchain))
     })
 
     beforeEach(async () => {
+      db = await initCombinerDatabase(combinerConfig)
+      app = startCombiner(db, combinerConfig, getContractKit(combinerConfig.blockchain))
+
       signerDB1 = await initSignerDatabase(signerConfig, signerMigrationsPath)
       signerDB2 = await initSignerDatabase(signerConfig, signerMigrationsPath)
       signerDB3 = await initSignerDatabase(signerConfig, signerMigrationsPath)
@@ -285,13 +286,11 @@ describe('domainService', () => {
       await signerDB1?.destroy()
       await signerDB2?.destroy()
       await signerDB3?.destroy()
+      await db?.destroy()
+
       signer1?.close()
       signer2?.close()
       signer3?.close()
-    })
-
-    afterAll(async () => {
-      await db?.destroy()
     })
 
     describe('when signers are operating correctly', () => {
@@ -1227,14 +1226,16 @@ describe('domainService', () => {
           ],
         ])
       )
+    })
+
+    beforeEach(async () => {
+      db = await initCombinerDatabase(combinerConfig)
       app = startCombiner(
         db,
         combinerConfigLargerN,
         getContractKit(combinerConfigLargerN.blockchain)
       )
-    })
 
-    beforeEach(async () => {
       signerDB1 = await initSignerDatabase(signerConfig, signerMigrationsPath)
       signerDB2 = await initSignerDatabase(signerConfig, signerMigrationsPath)
       signerDB3 = await initSignerDatabase(signerConfig, signerMigrationsPath)

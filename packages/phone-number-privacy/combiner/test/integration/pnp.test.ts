@@ -297,11 +297,11 @@ describe('pnpService', () => {
           [`${DefaultKeyName.PHONE_NUMBER_PRIVACY}-3`, PNP_THRESHOLD_DEV_PK_SHARE_3_V3],
         ])
       )
-      db = await initCombinerDatabase(combinerConfig)
-      app = startCombiner(db, combinerConfig, mockKit)
     })
 
     beforeEach(async () => {
+      db = await initCombinerDatabase(combinerConfig)
+      app = startCombiner(db, combinerConfig, mockKit)
       signerDB1 = await initSignerDatabase(signerConfig, signerMigrationsPath)
       signerDB2 = await initSignerDatabase(signerConfig, signerMigrationsPath)
       signerDB3 = await initSignerDatabase(signerConfig, signerMigrationsPath)
@@ -321,6 +321,7 @@ describe('pnpService', () => {
       await signerDB1?.destroy()
       await signerDB2?.destroy()
       await signerDB3?.destroy()
+      await db?.destroy()
 
       signer1?.close()
       signer2?.close()
@@ -328,9 +329,9 @@ describe('pnpService', () => {
       signer3?.close()
     })
 
-    afterAll(async () => {
-      await db?.destroy()
-    })
+    // afterAll(async () => {
+    //   await db?.destroy()
+    // })
 
     describe('when signers are operating correctly', () => {
       beforeEach(async () => {
@@ -1319,13 +1320,14 @@ describe('pnpService', () => {
           ],
         ])
       )
-      db = await initCombinerDatabase(combinerConfig)
-      app = startCombiner(db, combinerConfigLargerN, mockKit)
     })
 
     let req: SignMessageRequest
 
     beforeEach(async () => {
+      db = await initCombinerDatabase(combinerConfig)
+      app = startCombiner(db, combinerConfigLargerN, mockKit)
+
       signerDB1 = await initSignerDatabase(signerConfig, signerMigrationsPath)
       signerDB2 = await initSignerDatabase(signerConfig, signerMigrationsPath)
       signerDB3 = await initSignerDatabase(signerConfig, signerMigrationsPath)
@@ -1353,6 +1355,7 @@ describe('pnpService', () => {
       await signerDB3?.destroy()
       await signerDB4?.destroy()
       await signerDB5?.destroy()
+      await db?.destroy()
       signer1?.close()
       signer2?.close()
       signer3?.close()
