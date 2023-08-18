@@ -2,6 +2,29 @@ import { ContractPackage } from '../contractPackages'
 
 // This objects replicates a Truffle `artifacts.require` singleton
 // but constructed manually
+
+
+// This class is meant to be
+export class DefaultArtifact{
+  public artifacts: any
+
+  public constructor(artifacts) {
+    this.artifacts = artifacts
+  }
+
+  // TODO abstract this function
+  public require(key: string) {
+    return this.artifacts.require(key)
+  }
+
+  public getProxy(key: string) {
+    const proxyArtifactName = key + "Proxy"
+    console.log("getProxy", proxyArtifactName)
+    return this.require(proxyArtifactName)
+  }
+  
+}
+
 export class ArtifactsSingleton {
   public static setNetwork(network: any) {
     this.network = network
@@ -12,8 +35,11 @@ export class ArtifactsSingleton {
   }
 
   public static getInstance(contractPackage: ContractPackage, defaultArtifacts?: any): any {
+    console.log("getInstance", contractPackage)
     if (contractPackage === undefined || contractPackage.path === undefined) {
-      return defaultArtifacts
+      // default artifacts but overcharged with a getProxy method
+      const artifacts = new DefaultArtifact(defaultArtifacts)
+      return artifacts
     }
 
     const namespace = contractPackage.path
@@ -23,6 +49,16 @@ export class ArtifactsSingleton {
 
     // console.log("artifacts for that instance are", ArtifactsSingleton.instances[namespace])
     return ArtifactsSingleton.instances[namespace]
+  }
+
+  public static wrap(artifacts:any){
+    if (artifacts instanceof ArtifactsSingleton || artifacts instanceof DefaultArtifact){
+      console.log("Using our wrap")
+      return artifacts
+    }
+
+    console.log("Using default")
+    return new DefaultArtifact(artifacts)
   }
 
   private static instances: { [key: string]: ArtifactsSingleton } = {}
@@ -37,6 +73,7 @@ export class ArtifactsSingleton {
     this.artifacts[key] = value
   }
 
+
   public require(key: string) {
     return this.artifacts[key]
   }
@@ -45,12 +82,14 @@ export class ArtifactsSingleton {
   public getProxy(key: string, defaultArtifacts?:any) {
     const proxyArtifactName = key + "Proxy"
 
-      const  toReturn = this.require(proxyArtifactName)
+      const toReturn = this.require(proxyArtifactName)
 
-      if (!toReturn && defaultArtifacts){
+      if (toReturn === undefined){
+        console.log("using default getProxy")
         return defaultArtifacts.require(proxyArtifactName)
       }
 
+    console.log("using ours getProxy")
     return toReturn
   }
 }

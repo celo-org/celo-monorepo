@@ -215,19 +215,13 @@ export async function getDeployedProxiedContract<ContractInstance extends Truffl
   contractName: string,
   customArtifacts: any
 ): Promise<ContractInstance> {
+
   const Contract: Truffle.Contract<ContractInstance> = customArtifacts.require(contractName)
   
-  // const Proxy: ProxyContract = customArtifacts.require(contractName + 'Proxy')
-  
   let Proxy:ProxyContract
-  // TODO this needs to be more general
-  Proxy = customArtifacts.require(contractName + 'Proxy')
-  console.log("Proxy", Proxy)
-  if (!Proxy) {
-    console.log("try clasic require")
-    Proxy = artifacts.require(contractName + 'Proxy')
-  }
-
+  // this wrap avoids a lot of rewrite
+  const overloadedArtifact = ArtifactsSingleton.wrap(customArtifacts)
+  Proxy = overloadedArtifact.getProxy(contractName, artifacts)
   const proxy: ProxyInstance = await Proxy.deployed()
   // @ts-ignore
   Contract.numberFormat = 'BigNumber'
@@ -396,9 +390,9 @@ export async function submitMultiSigTransaction(
 export async function transferOwnershipOfProxy(
   contractName: string,
   owner: string,
-  artifacts: any
+  customArtifacts: any
 ) {
-  const Proxy = artifacts.require(contractName + 'Proxy')
+  const Proxy = ArtifactsSingleton.wrap(customArtifacts).getProxy(contractName, artifacts)
   const proxy: ProxyInstance = await Proxy.deployed()
   await proxy._transferOwnership(owner)
 }
@@ -420,7 +414,7 @@ export async function transferOwnershipOfProxyAndImplementation<
 * Builds and returns mapping of function names to selectors.
 * Each function name maps to an array of selectors to account for overloading.
 */
-export function getFunctionSelectorsForContractProxy(contract: any, proxy: any) {
+export function getFunctionSelectorsForContractProxy(contract: any, proxy: any, web3:any) {
   const selectors: { [index: string]: string[] } = {}
   proxy.abi
     .concat(contract.abi)

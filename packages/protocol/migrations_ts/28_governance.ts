@@ -11,7 +11,7 @@ import {
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance } from 'types'
-import { MENTO_PACKAGE } from '../contractPackages'
+import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 import { ArtifactsSingleton } from '../lib/artifactsSingleton'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
@@ -66,16 +66,21 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
         )
 
         // TODO generalize this
-        let contract
-        try {
-          await getDeployedProxiedContract<Truffle.ContractInstance>(contractName, artifactsObject)
-        } catch {
-          await getDeployedProxiedContract<Truffle.ContractInstance>(contractName, artifacts)
-        }
+        const contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
+          contractName,
+          artifactsObject
+        )
+        // let contract
+        // try {
+        //   contract = await getDeployedProxiedContract<Truffle.ContractInstance>(contractName, artifactsObject)
+        // } catch {
+        //   contract = await getDeployedProxiedContract<Truffle.ContractInstance>(contractName, artifacts)
+        // }
 
         const selectors = getFunctionSelectorsForContractProxy(
           contract,
-          artifactsObject.getProxy(contractName)
+          artifactsObject.getProxy(contractName, artifacts),
+          web3
         )
 
         selectors.default = ['0x00000000']
@@ -110,7 +115,6 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           'FeeCurrencyWhitelist',
           'Freezer',
           'FeeHandler',
-          'GasPriceMinimum',
           'GoldToken',
           'Governance',
           'GovernanceSlasher',
@@ -134,6 +138,10 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           'StableTokenBRL',
         ],
         __contractPackage: MENTO_PACKAGE, // TODO refactor this
+      },
+      {
+        contracts: ['GasPriceMinimum'],
+        __contractPackage: SOLIDITY_08_PACKAGE, // TODO refactor this
       },
     ]
 
