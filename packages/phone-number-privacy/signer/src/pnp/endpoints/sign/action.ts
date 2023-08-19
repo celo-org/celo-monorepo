@@ -15,7 +15,7 @@ import {
 import { Request } from 'express'
 import { Knex } from 'knex'
 import { computeBlindedSignature } from '../../../common/bls/bls-cryptography-client'
-// import { getRequestExists } from '../../../common/database/wrappers/request'
+import { getRequestExists } from '../../../common/database/wrappers/request'
 import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management/key-provider-base'
 import { Counters, Histograms } from '../../../common/metrics'
 import { getSignerVersion, SignerConfig } from '../../../config'
@@ -26,7 +26,6 @@ import Logger from 'bunyan'
 import { traceAsyncFunction } from '../../../common/tracing-utils'
 import { AccountService } from '../../services/account-service'
 import { PnpRequestService } from '../../services/request-service'
-import { getRequestExists } from '../../../common/database/wrappers/request'
 
 export function pnpSign(
   db: Knex,

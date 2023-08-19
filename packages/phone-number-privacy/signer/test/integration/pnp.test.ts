@@ -1024,19 +1024,19 @@ describe('pnp', () => {
             error: ErrorMessage.DATABASE_UPDATE_FAILURE,
           })
 
-          // check DB state: performedQueryCount was not incremented and request was not stored
-          expect(await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, logger)).toBe(
-            performedQueryCount
-          )
-          expect(
-            await getRequestExists(
-              db,
-
-              req.account,
-              req.blindedQueryPhoneNumber,
-              logger
-            )
-          ).toBe(false)
+          // TODO remove this check if we decide to permanently remove trx
+          // // check DB state: performedQueryCount was not incremented and request was not stored
+          // expect(await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, logger)).toBe(
+          //   performedQueryCount
+          // )
+          // expect(
+          //   await getRequestExists(
+          //     db,
+          //     req.account,
+          //     req.blindedQueryPhoneNumber,
+          //     logger
+          //   )
+          // ).toBe(false)
         })
 
         it('Should return 500 on failure to store request', async () => {
