@@ -4391,13 +4391,12 @@
     "@opentelemetry/semantic-conventions" "^1.0.0"
 
 "@opentelemetry/instrumentation-generic-pool@^0.32.0":
-  version "0.32.1"
-  resolved "https://registry.yarnpkg.com/@opentelemetry/instrumentation-generic-pool/-/instrumentation-generic-pool-0.32.1.tgz#ae5f58a07eac37e1ac2a797ad9b38d94764b3be8"
-  integrity sha512-uTsiAq9A486eKi4hSqDi5vF5TZK0KGdLn5CBqhVvc3oPTz2We69etGKqyv2sV51LwX749iRNHbVFDm2Km+wMSQ==
+  version "0.32.2"
+  resolved "https://registry.yarnpkg.com/@opentelemetry/instrumentation-generic-pool/-/instrumentation-generic-pool-0.32.2.tgz#dbe1283ccc832ef651f7082b0d1ed8357d2dbce9"
+  integrity sha512-HMAkKOfSZMKy4YfDLwSByR2q74pk3TMpSxgwWYLeezNpscnNAc4mtZtbWdUL62v8IaCXIc/qizwQYkcKqvGnZQ==
   dependencies:
     "@opentelemetry/instrumentation" "^0.41.2"
     "@opentelemetry/semantic-conventions" "^1.0.0"
-    "@types/generic-pool" "^3.1.9"
 
 "@opentelemetry/instrumentation-graphql@^0.35.0":
   version "0.35.1"
@@ -6075,13 +6074,6 @@
   integrity sha512-SvSrYXfWSc7R4eqnOzbQF4TZmfpNSM9FrSWLU3EUnWBuyZqNBOrv1B1JA3byUDPUl9z4Ab3jeZG2eDdySlgNMg==
   dependencies:
     "@types/node" "*"
-
-"@types/generic-pool@^3.1.9":
-  version "3.8.1"
-  resolved "https://registry.yarnpkg.com/@types/generic-pool/-/generic-pool-3.8.1.tgz#b9b25b2ba4733057fa5df1818352d3205c48e87b"
-  integrity sha512-eaMAbZS0EfKvaP5PUZ/Cdf5uJBO2t6T3RdvQTKuMqUwGhNpCnPAsKWEMyV+mCeCQG3UiHrtgdzni8X6DmhxRaQ==
-  dependencies:
-    generic-pool "*"
 
 "@types/glob@*":
   version "8.1.0"
@@ -13508,11 +13500,6 @@ generate-password@^1.5.1:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/generate-password/-/generate-password-1.7.0.tgz#00ba4eb1e71f89a72307b0d6604ee0d4e7f5770c"
   integrity sha512-WPCtlfy0jexf7W5IbwxGUgpIDvsZIohbI2DAq2Q6TSlKKis+G4GT9sxvPxrZUGL8kP6WUXMWNqYnxY6DDKAdFA==
-
-generic-pool@*:
-  version "3.9.0"
-  resolved "https://registry.yarnpkg.com/generic-pool/-/generic-pool-3.9.0.tgz#36f4a678e963f4fdb8707eab050823abc4e8f5e4"
-  integrity sha512-hymDOu5B53XvN4QT9dBmZxPX4CWhBPPLguTZ9MMFeFa/Kg0xWVfylOVNlJji/E7yTZWFd/q9GO5TxDLq156D7g==
 
 gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
