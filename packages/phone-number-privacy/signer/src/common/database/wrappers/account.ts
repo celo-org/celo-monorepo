@@ -20,10 +20,10 @@ export async function getPerformedQueryCount(
     logger,
     async () => {
       const queryCounts = await db<AccountRecord>(ACCOUNTS_TABLE)
-        .select(ACCOUNTS_COLUMNS.numLookups)
         .where(ACCOUNTS_COLUMNS.address, account)
+        .select(ACCOUNTS_COLUMNS.numLookups)
         .first()
-        .timeout(config.db.timeout)
+        .timeout(config.db.timeout, { cancel: true })
       return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
     }
   )
@@ -39,7 +39,7 @@ async function getAccountExists(
     const sql = db<AccountRecord>(ACCOUNTS_TABLE)
       .where(ACCOUNTS_COLUMNS.address, account)
       .first()
-      .timeout(config.db.timeout)
+      .timeout(config.db.timeout, { cancel: true })
 
     const accountRecord = await (trx != null ? sql.transacting(trx) : sql)
     return !!accountRecord

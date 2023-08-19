@@ -24,7 +24,7 @@ export async function getRequestExists( // TODO try insert, if primary key error
         [REQUESTS_COLUMNS.blindedQuery]: blindedQuery, // TODO are we using the primary key correctly??
       })
       .first()
-      .timeout(config.db.timeout)
+      .timeout(config.db.timeout, { cancel: true })
     return !!existingRequest
   })
 }

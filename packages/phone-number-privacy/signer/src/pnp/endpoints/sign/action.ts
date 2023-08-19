@@ -15,7 +15,7 @@ import {
 import { Request } from 'express'
 import { Knex } from 'knex'
 import { computeBlindedSignature } from '../../../common/bls/bls-cryptography-client'
-import { getRequestExists } from '../../../common/database/wrappers/request'
+// import { getRequestExists } from '../../../common/database/wrappers/request'
 import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management/key-provider-base'
 import { Counters, Histograms } from '../../../common/metrics'
 import { getSignerVersion, SignerConfig } from '../../../config'
@@ -135,15 +135,16 @@ export function pnpSign(
 }
 
 function isDuplicateRequest(
-  db: Knex<any, any[]>,
-  account: string,
-  blindedQueryPhoneNumber: string,
-  logger: any
+  _db: Knex<any, any[]>,
+  _account: string,
+  _blindedQueryPhoneNumber: string,
+  _logger: any
 ): Promise<boolean> {
-  return getRequestExists(db, account, blindedQueryPhoneNumber, logger).catch((err) => {
-    logger.error(err, 'Failed to check if request already exists in db')
-    return false
-  })
+  return Promise.resolve(false)
+  // return getRequestExists(db, account, blindedQueryPhoneNumber, logger).catch((err) => {
+  //   logger.error(err, 'Failed to check if request already exists in db')
+  //   return false
+  // })
 }
 
 async function sign(
