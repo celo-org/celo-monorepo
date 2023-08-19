@@ -33,7 +33,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     PnpQuotaResponseSchema
 
   constructor(readonly db: Knex, readonly config: OdisConfig, readonly kit: ContractKit) {
-    super(config)
+    super(config, db)
   }
 
   async init(

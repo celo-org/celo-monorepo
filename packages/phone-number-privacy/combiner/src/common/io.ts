@@ -16,6 +16,7 @@ import {
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
+import { Knex } from 'knex'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { performance } from 'perf_hooks'
 import { OdisConfig } from '../config'
@@ -35,7 +36,7 @@ export abstract class IO<R extends OdisRequest> {
   abstract readonly requestSchema: t.Type<R, R, unknown>
   abstract readonly responseSchema: t.Type<OdisResponse<R>, OdisResponse<R>, unknown>
 
-  constructor(readonly config: OdisConfig) {}
+  constructor(readonly config: OdisConfig, readonly db?: Knex) {}
 
   abstract init(
     request: Request<{}, {}, unknown>,

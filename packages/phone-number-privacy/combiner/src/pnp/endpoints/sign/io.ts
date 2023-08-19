@@ -37,7 +37,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     SignMessageResponseSchema
 
   constructor(readonly db: Knex, readonly config: OdisConfig, readonly kit: ContractKit) {
-    super(config)
+    super(config, db)
   }
 
   async init(
