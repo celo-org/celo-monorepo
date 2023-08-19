@@ -24,11 +24,11 @@ export class DefaultPnpQuotaService {
     blindedQueryPhoneNumber: string,
     ctx: Context
   ): Promise<void> {
-    return traceAsyncFunction('pnpQuotaService - recordRequest', () => {
-      return this.db.transaction(async (trx) => {
-        await insertRequest(this.db, account, blindedQueryPhoneNumber, ctx.logger, trx)
-        await incrementQueryCount(this.db, account, ctx.logger, trx)
-      })
+    return traceAsyncFunction('pnpQuotaService - recordRequest', async () => {
+      await Promise.all([
+        insertRequest(this.db, account, blindedQueryPhoneNumber, ctx.logger),
+        incrementQueryCount(this.db, account, ctx.logger),
+      ])
     })
   }
 

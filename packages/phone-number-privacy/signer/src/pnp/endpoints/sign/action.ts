@@ -26,6 +26,7 @@ import Logger from 'bunyan'
 import { traceAsyncFunction } from '../../../common/tracing-utils'
 import { AccountService } from '../../services/account-service'
 import { PnpRequestService } from '../../services/request-service'
+import { getRequestExists } from '../../../common/database/wrappers/request'
 
 export function pnpSign(
   db: Knex,
@@ -135,16 +136,15 @@ export function pnpSign(
 }
 
 function isDuplicateRequest(
-  _db: Knex<any, any[]>,
-  _account: string,
-  _blindedQueryPhoneNumber: string,
-  _logger: any
+  db: Knex<any, any[]>,
+  account: string,
+  blindedQueryPhoneNumber: string,
+  logger: any
 ): Promise<boolean> {
-  return Promise.resolve(false)
-  // return getRequestExists(db, account, blindedQueryPhoneNumber, logger).catch((err) => {
-  //   logger.error(err, 'Failed to check if request already exists in db')
-  //   return false
-  // })
+  return getRequestExists(db, account, blindedQueryPhoneNumber, logger).catch((err) => {
+    logger.error(err, 'Failed to check if request already exists in db')
+    return false
+  })
 }
 
 async function sign(

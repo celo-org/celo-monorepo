@@ -71,10 +71,8 @@ export async function incrementQueryCount(
         const sql = db<AccountRecord>(ACCOUNTS_TABLE)
           .insert(toAccountRecord(account, 1))
           .timeout(config.db.timeout)
-
         await (trx != null ? sql.transacting(trx) : sql)
       }
-      return
     }
   )
 }

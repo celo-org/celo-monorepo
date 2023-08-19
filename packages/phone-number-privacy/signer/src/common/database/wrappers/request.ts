@@ -25,7 +25,7 @@ export async function getRequestExists( // TODO try insert, if primary key error
       })
       .first()
       .timeout(config.db.timeout, { cancel: true })
-    return !!existingRequest
+    return !!existingRequest // TODO use EXISTS query??
   })
 }
 
@@ -34,13 +34,13 @@ export async function insertRequest(
   account: string,
   blindedQuery: string,
   logger: Logger,
-  trx: Knex.Transaction
-): Promise<number[]> {
+  trx?: Knex.Transaction
+): Promise<void> {
   logger.debug(`Storing salt request for: ${account}, blindedQuery: ${blindedQuery}`)
-  return doMeteredSql('insertRequest', ErrorMessage.DATABASE_INSERT_FAILURE, logger, () =>
-    db<PnpSignRequestRecord>(REQUESTS_TABLE)
+  return doMeteredSql('insertRequest', ErrorMessage.DATABASE_INSERT_FAILURE, logger, async () => {
+    const sql = db<PnpSignRequestRecord>(REQUESTS_TABLE)
       .insert(toPnpSignRequestRecord(account, blindedQuery))
       .timeout(config.db.timeout)
-      .transacting(trx)
-  )
+    await (trx != null ? sql.transacting(trx) : sql)
+  })
 }
