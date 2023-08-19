@@ -36,7 +36,11 @@ export abstract class TransferStableBase extends BaseCommand {
     } catch {
       failWith(`The ${this._stableCurrency} token was not deployed yet`)
     }
-    await this.kit.setFeeCurrency(stableTokenInfos[this._stableCurrency].contract)
+    // If gasCurrency is not set, use the transfering token
+    console.warn('gasFeeFlag', res.flags.gasCurrency)
+    if (!res.flags.gasCurrency) {
+      await this.kit.setFeeCurrency(stableTokenInfos[this._stableCurrency].contract)
+    }
 
     const tx = res.flags.comment
       ? stableToken.transferWithComment(to, value.toFixed(), res.flags.comment)
