@@ -62,11 +62,12 @@ export function startSigner(
   })
 
   const accountService = new CachingAccountService(
-    new ContractKitAccountService(logger, kit, {
-      fullNodeTimeoutMs: config.fullNodeTimeoutMs,
-      fullNodeRetryCount: config.fullNodeRetryCount,
-      fullNodeRetryDelayMs: config.fullNodeRetryDelayMs,
-    })
+    // new ContractKitAccountService(logger, kit, {
+    //   fullNodeTimeoutMs: config.fullNodeTimeoutMs,
+    //   fullNodeRetryCount: config.fullNodeRetryCount,
+    //   fullNodeRetryDelayMs: config.fullNodeRetryDelayMs,
+    // })
+    new ContractKitAccountService()
   )
 
   const pnpRequestService = new DefaultPnpQuotaService(db)
