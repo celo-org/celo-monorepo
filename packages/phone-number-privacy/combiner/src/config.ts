@@ -1,5 +1,6 @@
 import {
   BlockchainConfig,
+  DB_POOL_MAX_SIZE,
   DB_TIMEOUT,
   FULL_NODE_TIMEOUT_IN_MS,
   RETRY_COUNT,
@@ -172,7 +173,7 @@ if (DEV_MODE) {
       host: 'http://localhost',
       port: undefined,
       ssl: true,
-      poolMaxSize: 50,
+      poolMaxSize: DB_POOL_MAX_SIZE,
       timeout: DB_TIMEOUT,
     },
   }
@@ -225,15 +226,19 @@ if (DEV_MODE) {
       ),
     },
     db: {
-      type: functionConfig.db.type,
+      type: functionConfig.db.type
+        ? functionConfig.db.type.toLowerCase()
+        : SupportedDatabase.Postgres,
       user: functionConfig.db.username,
       password: functionConfig.db.pass,
       database: functionConfig.db.name,
       host: `/cloudsql/${functionConfig.db.host}`,
-      port: undefined,
+      port: functionConfig.db.port ? Number(functionConfig.db.port) : undefined,
       ssl: toBool(functionConfig.db.ssl, true),
-      poolMaxSize: Number(functionConfig.db.pool_max_size),
-      timeout: Number(functionConfig.db.timeout),
+      poolMaxSize: functionConfig.db.pool_max_size
+        ? Number(functionConfig.db.pool_max_size)
+        : DB_POOL_MAX_SIZE,
+      timeout: functionConfig.db.timeout ? Number(functionConfig.db.timeout) : DB_TIMEOUT,
     },
   }
 }
