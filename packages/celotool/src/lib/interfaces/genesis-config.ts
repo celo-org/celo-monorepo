@@ -16,4 +16,5 @@ export interface GenesisConfig {
   donutBlock?: number | null
   espressoBlock?: number | null
   gingerbreadBlock?: number | null
+  gingerbreadP2Block?: number | null
 }

@@ -124,6 +124,7 @@ describe('slashing tests', function (this: any) {
       donutBlock: 0,
       espressoBlock: 0,
       gingerbreadBlock: 1,
+      gingerbreadP2Block: 1,
     },
     instances: [
       {

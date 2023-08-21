@@ -142,6 +142,7 @@ function getGethRunConfig(withDonut: boolean, withEspresso: boolean): GethRunCon
       donutBlock: withDonut ? 0 : null,
       espressoBlock: withEspresso ? 0 : null,
       gingerbreadBlock: null,
+      gingerbreadP2Block: null,
     },
     instances: [
       {
