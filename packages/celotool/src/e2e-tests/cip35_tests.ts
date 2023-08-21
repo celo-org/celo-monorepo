@@ -22,6 +22,7 @@ const lightUrl = 'http://localhost:8546'
 const notYetActivatedError = 'support for eth-compatible transactions is not enabled'
 const notCompatibleError = 'ethCompatible is true, but non-eth-compatible fields are present'
 const noReplayProtectionError = 'only replay-protected (EIP-155) transactions allowed over RPC'
+const gatewayFeeDeprecatedError = 'gateway fee is deprecated'
 
 const validatorPrivateKey = generatePrivateKey(mnemonic, AccountType.VALIDATOR, 0)
 const validatorAddress = privateKeyToAddress(validatorPrivateKey)
@@ -75,7 +76,7 @@ interface TestCase {
 
 // generateTestCases is used to generate all the cases we want to test for a setup which
 // is either pre-Donut or post-Donut (cipIsActivated true means post-Donut)
-function generateTestCases(cipIsActivated: boolean) {
+function generateTestCases(cipIsActivated: boolean, gingerbreadActivated: boolean) {
   const cases: TestCase[] = []
   if (devFilter.cipIsActivated !== undefined && devFilter.cipIsActivated !== cipIsActivated) {
     // The devFilter is incompatible with the cipIsActivated value, so there are no cases to run
@@ -94,13 +95,17 @@ function generateTestCases(cipIsActivated: boolean) {
               for (const sendRawTransaction of getValues(devFilter.sendRawTransaction)) {
                 let errorString: string | null = null
                 let errorReason: string | null = null
-                const hasCeloFields = useFeeCurrency || useGatewayFee || useGatewayFeeRecipient
+                const hasGatewayFields = useGatewayFee || useGatewayFeeRecipient
+                const hasCeloFields = useFeeCurrency || hasGatewayFields
                 if (ethCompatible && hasCeloFields) {
                   errorString = notCompatibleError
                   errorReason = 'transaction has celo-only fields'
                 } else if (ethCompatible && !cipIsActivated) {
                   errorString = notYetActivatedError
                   errorReason = 'Donut is not activated'
+                } else if (hasGatewayFields && gingerbreadActivated) {
+                  errorString = gatewayFeeDeprecatedError
+                  errorReason = 'Gateway fee is deprecated since Gingerbread'
                 }
                 if (sendRawTransaction && ethCompatible && hasCeloFields) {
                   // Such scenarios don't make sense, since eth-compatible transactions in RLP can't have
@@ -129,8 +134,20 @@ function generateTestCases(cipIsActivated: boolean) {
   return cases
 }
 
-function getGethRunConfig(withDonut: boolean, withEspresso: boolean): GethRunConfig {
-  console.log('getGethRunConfig', 'donut', withDonut, 'espresso', withEspresso)
+function getGethRunConfig(
+  withDonut: boolean,
+  withEspresso: boolean,
+  withTheOthers: boolean
+): GethRunConfig {
+  console.log(
+    'getGethRunConfig',
+    'donut',
+    withDonut,
+    'espresso',
+    withEspresso,
+    'others (ginger p1/p2)',
+    withTheOthers
+  )
   return {
     migrate: true,
     runPath: TMP_PATH,
@@ -141,8 +158,8 @@ function getGethRunConfig(withDonut: boolean, withEspresso: boolean): GethRunCon
       churritoBlock: 0,
       donutBlock: withDonut ? 0 : null,
       espressoBlock: withEspresso ? 0 : null,
-      gingerbreadBlock: null,
-      gingerbreadP2Block: null,
+      gingerbreadBlock: withTheOthers ? 1 : null,
+      gingerbreadP2Block: withTheOthers ? 1 : null,
     },
     instances: [
       {
@@ -178,6 +195,7 @@ class TestEnv {
   gethConfig: GethRunConfig
   cipIsActivated: boolean
   replayProtectionIsNotMandatory: boolean
+  withNewerForks: boolean
   hooks: ReturnType<typeof getHooks>
   stableTokenAddr: string = ''
   gasPrice: string = ''
@@ -196,12 +214,21 @@ class TestEnv {
   web3: Web3
   web3Light: Web3
 
-  constructor(cipIsActivated: boolean, replayProtectionIsNotMandatory: boolean) {
-    this.gethConfig = getGethRunConfig(cipIsActivated, replayProtectionIsNotMandatory)
+  constructor(
+    cipIsActivated: boolean,
+    replayProtectionIsNotMandatory: boolean,
+    withNewerForks: boolean
+  ) {
+    this.gethConfig = getGethRunConfig(
+      cipIsActivated,
+      replayProtectionIsNotMandatory,
+      withNewerForks
+    )
     this.hooks = getHooks(this.gethConfig)
     this.cipIsActivated = cipIsActivated
     this.replayProtectionIsNotMandatory = replayProtectionIsNotMandatory
-    this.testCases = generateTestCases(cipIsActivated)
+    this.withNewerForks = withNewerForks
+    this.testCases = generateTestCases(cipIsActivated, withNewerForks)
     this.kit = newKitFromWeb3(new Web3(validatorUrl))
     this.kitLight = newKitFromWeb3(new Web3(lightUrl))
     this.kitWithLocalWallet = newKitFromWeb3(new Web3(validatorUrl))
@@ -432,7 +459,7 @@ describe('CIP-35 >', function (this: any) {
     if (devFilter.cipIsActivated === true) {
       return
     }
-    const testEnv = new TestEnv(false, false) // not donut, not espresso
+    const testEnv = new TestEnv(false, false, false) // not donut, not espresso, not others
     before(async function (this) {
       this.timeout(0)
       await testEnv.before()
@@ -454,55 +481,81 @@ describe('CIP-35 >', function (this: any) {
     })
   })
 
-  describe('after activation', async () => {
-    if (devFilter.cipIsActivated === false) {
-      return
-    }
-    const testEnv = new TestEnv(true, false) // donut, not espresso
-    before(async function (this) {
-      this.timeout(0)
-      await testEnv.before()
-    })
+  // describe('after activation', async () => {
+  //   if (devFilter.cipIsActivated === false) {
+  //     return
+  //   }
+  //   const testEnv = new TestEnv(true, false, false) // donut, not espresso, not others
+  //   before(async function (this) {
+  //     this.timeout(0)
+  //     await testEnv.before()
+  //   })
 
-    if (replayProtectionTests !== 'only') {
-      for (const testCase of testEnv.testCases) {
-        testEnv.runTestCase(testCase)
-      }
-    }
+  //   if (replayProtectionTests !== 'only') {
+  //     for (const testCase of testEnv.testCases) {
+  //       testEnv.runTestCase(testCase)
+  //     }
+  //   }
 
-    if (replayProtectionTests !== 'skip') {
-      testEnv.runReplayProtectionTests()
-    }
+  //   if (replayProtectionTests !== 'skip') {
+  //     testEnv.runReplayProtectionTests()
+  //   }
 
-    after(async function (this: any) {
-      this.timeout(0)
-      await testEnv.hooks.after()
-    })
-  })
+  //   after(async function (this: any) {
+  //     this.timeout(0)
+  //     await testEnv.hooks.after()
+  //   })
+  // })
 
-  describe('after cip50 (optional replay protection)', async () => {
-    if (devFilter.cipIsActivated === false) {
-      return
-    }
-    const testEnv = new TestEnv(true, true) // donut and espresso
-    before(async function (this) {
-      this.timeout(0)
-      await testEnv.before()
-    })
+  // describe('after cip50 (optional replay protection)', async () => {
+  //   if (devFilter.cipIsActivated === false) {
+  //     return
+  //   }
+  //   const testEnv = new TestEnv(true, true, false) // donut and espresso, not others
+  //   before(async function (this) {
+  //     this.timeout(0)
+  //     await testEnv.before()
+  //   })
 
-    if (replayProtectionTests !== 'only') {
-      for (const testCase of testEnv.testCases) {
-        testEnv.runTestCase(testCase)
-      }
-    }
+  //   if (replayProtectionTests !== 'only') {
+  //     for (const testCase of testEnv.testCases) {
+  //       testEnv.runTestCase(testCase)
+  //     }
+  //   }
 
-    if (replayProtectionTests !== 'skip') {
-      testEnv.runReplayProtectionTests()
-    }
+  //   if (replayProtectionTests !== 'skip') {
+  //     testEnv.runReplayProtectionTests()
+  //   }
 
-    after(async function (this: any) {
-      this.timeout(0)
-      await testEnv.hooks.after()
-    })
-  })
+  //   after(async function (this: any) {
+  //     this.timeout(0)
+  //     await testEnv.hooks.after()
+  //   })
+  // })
+
+  // describe('after last active HF', async () => {
+  //   if (devFilter.cipIsActivated === false) {
+  //     return
+  //   }
+  //   const testEnv = new TestEnv(true, true, true) // donut, espresso and others
+  //   before(async function (this) {
+  //     this.timeout(0)
+  //     await testEnv.before()
+  //   })
+
+  //   if (replayProtectionTests !== 'only') {
+  //     for (const testCase of testEnv.testCases) {
+  //       testEnv.runTestCase(testCase)
+  //     }
+  //   }
+
+  //   if (replayProtectionTests !== 'skip') {
+  //     testEnv.runReplayProtectionTests()
+  //   }
+
+  //   after(async function (this: any) {
+  //     this.timeout(0)
+  //     await testEnv.hooks.after()
+  //   })
+  // })
 })
