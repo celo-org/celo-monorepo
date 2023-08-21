@@ -6,7 +6,6 @@ A service that generates unique partial signatures for blinded messages. Using a
 
 ODIS v2 provides support for three APIs, which need to be explicitly enabled ([see below](#enabling-apis-odis-v2) for configuration info):
 
-- **Legacy PNP API**: retrieve signatures for blinded messages, rate-limited using ODIS v1's scheme, based on an account's transaction history and verification status.
 - **PNP API**: retrieve signatures for blinded messages, rate-limited based on quota purchased on-chain in `OdisPayments.sol`.
 - **Domains API**: retrieve signatures over domains with custom rate-limiting schemes, as defined in more detail in [CIP-40](https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0040.md).
 
@@ -25,7 +24,6 @@ You can use the following environment variables to configure the ODIS Signer ser
 
 Each API must be explicitly enabled by setting the following env vars to true (all are false by default):
 
-- `LEGACY_PHONE_NUMBER_PRIVACY_API_ENABLED`
 - `PHONE_NUMBER_PRIVACY_API_ENABLED`
 - `DOMAINS_API_ENABLED`
 
