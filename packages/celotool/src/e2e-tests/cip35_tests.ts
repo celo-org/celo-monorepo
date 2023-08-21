@@ -481,81 +481,81 @@ describe('CIP-35 >', function (this: any) {
     })
   })
 
-  // describe('after activation', async () => {
-  //   if (devFilter.cipIsActivated === false) {
-  //     return
-  //   }
-  //   const testEnv = new TestEnv(true, false, false) // donut, not espresso, not others
-  //   before(async function (this) {
-  //     this.timeout(0)
-  //     await testEnv.before()
-  //   })
+  describe('after activation', async () => {
+    if (devFilter.cipIsActivated === false) {
+      return
+    }
+    const testEnv = new TestEnv(true, false, false) // donut, not espresso, not others
+    before(async function (this) {
+      this.timeout(0)
+      await testEnv.before()
+    })
 
-  //   if (replayProtectionTests !== 'only') {
-  //     for (const testCase of testEnv.testCases) {
-  //       testEnv.runTestCase(testCase)
-  //     }
-  //   }
+    if (replayProtectionTests !== 'only') {
+      for (const testCase of testEnv.testCases) {
+        testEnv.runTestCase(testCase)
+      }
+    }
 
-  //   if (replayProtectionTests !== 'skip') {
-  //     testEnv.runReplayProtectionTests()
-  //   }
+    if (replayProtectionTests !== 'skip') {
+      testEnv.runReplayProtectionTests()
+    }
 
-  //   after(async function (this: any) {
-  //     this.timeout(0)
-  //     await testEnv.hooks.after()
-  //   })
-  // })
+    after(async function (this: any) {
+      this.timeout(0)
+      await testEnv.hooks.after()
+    })
+  })
 
-  // describe('after cip50 (optional replay protection)', async () => {
-  //   if (devFilter.cipIsActivated === false) {
-  //     return
-  //   }
-  //   const testEnv = new TestEnv(true, true, false) // donut and espresso, not others
-  //   before(async function (this) {
-  //     this.timeout(0)
-  //     await testEnv.before()
-  //   })
+  describe('after cip50 (optional replay protection)', async () => {
+    if (devFilter.cipIsActivated === false) {
+      return
+    }
+    const testEnv = new TestEnv(true, true, false) // donut and espresso, not others
+    before(async function (this) {
+      this.timeout(0)
+      await testEnv.before()
+    })
 
-  //   if (replayProtectionTests !== 'only') {
-  //     for (const testCase of testEnv.testCases) {
-  //       testEnv.runTestCase(testCase)
-  //     }
-  //   }
+    if (replayProtectionTests !== 'only') {
+      for (const testCase of testEnv.testCases) {
+        testEnv.runTestCase(testCase)
+      }
+    }
 
-  //   if (replayProtectionTests !== 'skip') {
-  //     testEnv.runReplayProtectionTests()
-  //   }
+    if (replayProtectionTests !== 'skip') {
+      testEnv.runReplayProtectionTests()
+    }
 
-  //   after(async function (this: any) {
-  //     this.timeout(0)
-  //     await testEnv.hooks.after()
-  //   })
-  // })
+    after(async function (this: any) {
+      this.timeout(0)
+      await testEnv.hooks.after()
+    })
+  })
 
-  // describe('after last active HF', async () => {
-  //   if (devFilter.cipIsActivated === false) {
-  //     return
-  //   }
-  //   const testEnv = new TestEnv(true, true, true) // donut, espresso and others
-  //   before(async function (this) {
-  //     this.timeout(0)
-  //     await testEnv.before()
-  //   })
+  describe('after last active HF', async () => {
+    if (devFilter.cipIsActivated === false) {
+      return
+    }
+    const testEnv = new TestEnv(true, true, true) // donut, espresso and others
+    before(async function (this) {
+      this.timeout(0)
+      await testEnv.before()
+    })
 
-  //   if (replayProtectionTests !== 'only') {
-  //     for (const testCase of testEnv.testCases) {
-  //       testEnv.runTestCase(testCase)
-  //     }
-  //   }
+    if (replayProtectionTests !== 'only') {
+      for (const testCase of testEnv.testCases) {
+        testEnv.runTestCase(testCase)
+      }
+    }
 
-  //   if (replayProtectionTests !== 'skip') {
-  //     testEnv.runReplayProtectionTests()
-  //   }
+    if (replayProtectionTests !== 'skip') {
+      testEnv.runReplayProtectionTests()
+    }
 
-  //   after(async function (this: any) {
-  //     this.timeout(0)
-  //     await testEnv.hooks.after()
-  //   })
-  // })
+    after(async function (this: any) {
+      this.timeout(0)
+      await testEnv.hooks.after()
+    })
+  })
 })

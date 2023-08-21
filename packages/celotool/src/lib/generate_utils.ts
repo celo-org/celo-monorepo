@@ -321,6 +321,8 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const churritoBlock = hardForkActivationBlock(envVar.CHURRITO_BLOCK)
   const donutBlock = hardForkActivationBlock(envVar.DONUT_BLOCK)
   const espressoBlock = hardForkActivationBlock(envVar.ESPRESSO_BLOCK)
+  const gingerbreadBlock = hardForkActivationBlock(envVar.GINGERBREAD_BLOCK)
+  const gingerbreadP2Block = hardForkActivationBlock(envVar.GINGERBREAD_P2_BLOCK)
 
   // network start timestamp
   const timestamp = parseInt(fetchEnvOrFallback(envVar.TIMESTAMP, '0'), 10)
@@ -339,6 +341,8 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     churritoBlock,
     donutBlock,
     espressoBlock,
+    gingerbreadBlock,
+    gingerbreadP2Block,
   })
 }
 
@@ -497,22 +501,29 @@ export const generateGenesisWithMigrations = async ({
   const envFile = path.join(tmpDir, 'env.json')
   const configFile = path.join(tmpDir, 'genesis-config.json')
   const myceloBinaryPath = path.join(gethRepoPath!, '/build/bin/mycelo')
-  await spawnCmdWithExitOnFailure(
-    myceloBinaryPath,
-    [
-      'genesis-config',
-      '--template',
-      'monorepo',
-      '--mnemonic',
-      mnemonic,
-      '--validators',
-      numValidators.toString(),
-    ],
-    {
-      silent: !verbose,
-      cwd: tmpDir,
-    }
-  )
+  const genesisConfigParams = [
+    'genesis-config',
+    '--template',
+    'monorepo',
+    '--mnemonic',
+    mnemonic,
+    '--validators',
+    numValidators.toString(),
+  ]
+  // As the gasPriceMinimum requires the block number of the gingerbread HF, we need to
+  // create the genesis config with the actual activation block (instead of override it later)
+  if (!genesisConfig.gingerbreadBlock) {
+    genesisConfigParams.push('--forks.gingerbread')
+    genesisConfigParams.push('-1')
+  } else {
+    genesisConfigParams.push('--forks.gingerbread')
+    genesisConfigParams.push(genesisConfig.gingerbreadBlock.toString())
+  }
+
+  await spawnCmdWithExitOnFailure(myceloBinaryPath, genesisConfigParams, {
+    silent: !verbose,
+    cwd: tmpDir,
+  })
   const mcEnv = JSON.parse(fs.readFileSync(envFile).toString())
   const mcConfig = JSON.parse(fs.readFileSync(configFile).toString())
 

@@ -13,6 +13,25 @@ import { getHooks, initAndSyncGethWithRetry, killInstance, sleep } from './utils
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
+interface nodePorts {
+  port: number
+  rpcport: number
+}
+
+const validatorPort: nodePorts = {
+  port: 30303,
+  rpcport: 8545,
+}
+
+const fullNodePort: nodePorts = {
+  port: 30305,
+  rpcport: 8547,
+}
+
+const syncNodePort: nodePorts = {
+  port: 30307,
+  rpcport: 8549,
+}
 
 /**
  * Helper Class to change StableToken Inflation in tests
@@ -234,8 +253,8 @@ describe('Transfer tests', function (this: any) {
         // Separate address for tx fees, so that we can easy identify balance changes due to them
         txFeeRecipient: txFeeRecipientAddress,
         syncmode: 'full',
-        port: 30303,
-        rpcport: 8545,
+        port: validatorPort.port,
+        rpcport: validatorPort.rpcport,
       },
     ],
   }
@@ -258,8 +277,8 @@ describe('Transfer tests', function (this: any) {
     validating: false,
     syncmode: 'full',
     lightserv: true,
-    port: 30305,
-    rpcport: 8547,
+    port: fullNodePort.port,
+    rpcport: fullNodePort.rpcport,
     // We need to set an etherbase here so that the full node will accept transactions from
     // light clients.
     minerValidator: gatewayFeeRecipientAddress,
@@ -269,7 +288,7 @@ describe('Transfer tests', function (this: any) {
   const restartWithCleanNodes = async () => {
     await hooks.restart()
 
-    kit = newKitFromWeb3(new Web3('http://localhost:8545'))
+    kit = newKitFromWeb3(new Web3(`http://localhost:${validatorPort.rpcport}`))
     kit.connection.defaultGasInflationFactor = 1
 
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
@@ -307,8 +326,8 @@ describe('Transfer tests', function (this: any) {
       name: syncmode,
       validating: false,
       syncmode,
-      port: 30307,
-      rpcport: 8549,
+      port: syncNodePort.port,
+      rpcport: syncNodePort.rpcport,
       lightserv: !light,
       privateKey: DEF_FROM_PK,
     }
@@ -324,10 +343,14 @@ describe('Transfer tests', function (this: any) {
     )
 
     // Reset contracts to send RPCs through transferring node.
-    kit.connection.setProvider(new Web3.providers.HttpProvider('http://localhost:8549'))
+    kit.connection.setProvider(
+      new Web3.providers.HttpProvider(`http://localhost:${syncNodePort.rpcport}`)
+    )
 
     // Give the node time to sync the latest block.
-    const upstream = await new Web3('http://localhost:8545').eth.getBlock('latest')
+    const upstream = await new Web3(`http://localhost:${validatorPort.rpcport}`).eth.getBlock(
+      'latest'
+    )
     while ((await kit.connection.getBlock('latest')).number < upstream.number) {
       await sleep(0.5)
     }
@@ -798,7 +821,7 @@ describe('Transfer tests', function (this: any) {
           try {
             await startSyncNode(syncMode)
             await setIntrinsicGas(
-              'http://localhost:8545',
+              `http://localhost:${validatorPort.rpcport}`,
               validatorAddress,
               changedIntrinsicGasForAlternativeFeeCurrency
             )
@@ -854,7 +877,7 @@ describe('Transfer tests', function (this: any) {
         before(`start geth on sync: ${syncMode}`, async () => {
           await restartWithCleanNodes()
           inflationManager = new InflationManager(
-            'http://localhost:8545',
+            `http://localhost:${validatorPort.rpcport}`,
             validatorAddress,
             StableToken.cUSD
           )
