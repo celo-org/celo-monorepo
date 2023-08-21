@@ -4,6 +4,7 @@ import {
   DomainRestrictedSignatureRequest,
   ErrorMessage,
   isSequentialDelayDomain,
+  SequentialDelayDomain,
 } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import {
@@ -15,23 +16,23 @@ import {
   getDomainStateRecordOrEmpty,
   updateDomainStateRecord,
 } from '../../common/database/wrappers/domain-state'
-import { OdisQuotaStatusResult, QuotaService } from '../../common/quota'
-import { DomainSession } from '../session'
+import { OdisQuotaStatusResult } from '../../common/quota'
+import Logger from 'bunyan'
 
 declare type QuotaDependentDomainRequest =
   | DomainQuotaStatusRequest
   | DomainRestrictedSignatureRequest
 
-export class DomainQuotaService implements QuotaService<QuotaDependentDomainRequest> {
+export class DomainQuotaService {
   constructor(readonly db: Knex) {}
 
   async checkAndUpdateQuotaStatus(
     state: DomainStateRecord,
-    session: DomainSession<QuotaDependentDomainRequest>,
+    domain: SequentialDelayDomain,
     trx: Knex.Transaction<DomainStateRecord>,
+    logger: Logger,
     attemptTime?: number
   ): Promise<OdisQuotaStatusResult<QuotaDependentDomainRequest>> {
-    const { domain } = session.request.body
     // Timestamp precision is lowered to seconds to reduce the chance of effective timing attacks.
     attemptTime = attemptTime ?? Math.floor(Date.now() / 1000)
     if (isSequentialDelayDomain(domain)) {
@@ -44,7 +45,7 @@ export class DomainQuotaService implements QuotaService<QuotaDependentDomainRequ
         const newState = toDomainStateRecord(domain, result.state)
         // Persist the updated domain quota to the database.
         // This will trigger an insert if its the first update to the domain instance.
-        await updateDomainStateRecord(this.db, domain, newState, trx, session.logger)
+        await updateDomainStateRecord(this.db, domain, newState, trx, logger)
         return { sufficient: true, state: newState }
       }
       // If the result was rejected, the domainStateRecord does not change
@@ -55,9 +56,10 @@ export class DomainQuotaService implements QuotaService<QuotaDependentDomainRequ
   }
 
   async getQuotaStatus(
-    session: DomainSession<QuotaDependentDomainRequest>,
+    domain: SequentialDelayDomain,
+    logger: Logger,
     trx?: Knex.Transaction<DomainStateRecord>
   ): Promise<DomainStateRecord> {
-    return getDomainStateRecordOrEmpty(this.db, session.request.body.domain, session.logger, trx)
+    return getDomainStateRecordOrEmpty(this.db, domain, logger, trx)
   }
 }

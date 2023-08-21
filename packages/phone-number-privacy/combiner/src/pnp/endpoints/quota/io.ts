@@ -59,20 +59,19 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     )
   }
 
-  async authenticate(
-    _request: Request<{}, {}, PnpQuotaRequest>,
-    _logger: Logger
-  ): Promise<boolean> {
+  async authenticate(request: Request<{}, {}, PnpQuotaRequest>, logger: Logger): Promise<boolean> {
+    logger.debug({ url: request.url }) // just for ts not to make a fuzz
     return Promise.resolve(true)
     // return authenticateUser(
     //   request,
-    //   this.kit,
     //   logger,
-    //   this.config.shouldFailOpen,
-    //   [],
-    //   this.config.fullNodeTimeoutMs,
-    //   this.config.fullNodeRetryCount,
-    //   this.config.fullNodeRetryDelayMs
+    //   newContractKitFetcher(
+    //     this.kit,
+    //     logger,
+    //     this.config.fullNodeTimeoutMs,
+    //     this.config.fullNodeRetryCount,
+    //     this.config.fullNodeRetryDelayMs
+    //   )
     // )
   }
 

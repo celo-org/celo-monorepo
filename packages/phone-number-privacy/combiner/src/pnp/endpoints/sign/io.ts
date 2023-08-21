@@ -80,13 +80,14 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     return Promise.resolve(true)
     // return authenticateUser(
     //   request,
-    //   this.kit,
     //   logger,
-    //   this.config.shouldFailOpen,
-    //   [],
-    //   this.config.fullNodeTimeoutMs,
-    //   this.config.fullNodeRetryCount,
-    //   this.config.fullNodeRetryDelayMs
+    //   newContractKitFetcher(
+    //     this.kit,
+    //     logger,
+    //     this.config.fullNodeTimeoutMs,
+    //     this.config.fullNodeRetryCount,
+    //     this.config.fullNodeRetryDelayMs
+    //   )
     // )
   }
 

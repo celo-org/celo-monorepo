@@ -31,9 +31,6 @@ export const queryOdisForSalt = async (
   contextName: OdisContextName,
   timeoutMs: number = 10000
 ) => {
-  console.log(`contextName: ${contextName}`) // tslint:disable-line:no-console
-  console.log(`blockchain provider: ${blockchainProvider}`) // tslint:disable-line:no-console
-
   const serviceContext = getServiceContext(contextName, OdisAPI.PNP)
 
   const contractKit = newKit(blockchainProvider, new LocalWallet())

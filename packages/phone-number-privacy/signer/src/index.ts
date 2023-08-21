@@ -2,10 +2,15 @@ import { getContractKit, rootLogger } from '@celo/phone-number-privacy-common'
 import { initDatabase } from './common/database/database'
 import { initKeyProvider } from './common/key-management/key-provider'
 import { KeyProvider } from './common/key-management/key-provider-base'
-import { config, DEV_MODE } from './config'
+import { config, DEV_MODE, SupportedDatabase, SupportedKeystore } from './config'
 import { startSigner } from './server'
 
 require('dotenv').config()
+
+if (DEV_MODE) {
+  config.db.type = SupportedDatabase.Sqlite
+  config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
+}
 
 async function start() {
   const logger = rootLogger(config.serviceName)
@@ -23,13 +28,11 @@ async function start() {
     .setTimeout(backupTimeout)
 }
 
-if (!DEV_MODE) {
-  start().catch((err) => {
-    const logger = rootLogger(config.serviceName)
-    logger.error({ err }, 'Fatal error occured. Exiting')
-    process.exit(1)
-  })
-}
+start().catch((err) => {
+  const logger = rootLogger(config.serviceName)
+  logger.error({ err }, 'Fatal error occured. Exiting')
+  process.exit(1)
+})
 
 export { initDatabase } from './common/database/database'
 export { initKeyProvider } from './common/key-management/key-provider'

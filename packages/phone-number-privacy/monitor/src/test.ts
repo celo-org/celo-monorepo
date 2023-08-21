@@ -1,10 +1,11 @@
-import { concurrentMap, sleep } from '@celo/base'
+import { sleep } from '@celo/base'
 import { Result } from '@celo/base/lib/result'
 import { BackupError } from '@celo/encrypted-backup'
 import { IdentifierHashDetails } from '@celo/identity/lib/odis/identifier'
 import { ErrorMessages, OdisContextName } from '@celo/identity/lib/odis/query'
 import { PnpClientQuotaStatus } from '@celo/identity/lib/odis/quota'
 import { CombinerEndpointPNP, rootLogger } from '@celo/phone-number-privacy-common'
+import { performance } from 'perf_hooks'
 import { queryOdisDomain, queryOdisForQuota, queryOdisForSalt } from './query'
 
 const logger = rootLogger('odis-monitor')
@@ -12,20 +13,18 @@ const logger = rootLogger('odis-monitor')
 export async function testPNPSignQuery(
   blockchainProvider: string,
   contextName: OdisContextName,
-  endpoint: CombinerEndpointPNP.PNP_SIGN,
   timeoutMs?: number
 ) {
-  logger.info(`Performing test PNP query for ${endpoint}`)
   try {
     const odisResponse: IdentifierHashDetails = await queryOdisForSalt(
       blockchainProvider,
       contextName,
       timeoutMs
     )
-    logger.info({ odisResponse }, 'ODIS salt request successful. System is healthy.')
+    logger.debug({ odisResponse }, 'ODIS salt request successful. System is healthy.')
   } catch (err) {
     if ((err as Error).message === ErrorMessages.ODIS_QUOTA_ERROR) {
-      logger.info(
+      logger.warn(
         { error: err },
         'ODIS salt request out of quota. This is expected. System is healthy.'
       )
@@ -75,55 +74,71 @@ export async function testDomainSignQuery(contextName: OdisContextName) {
   }
 }
 
-export async function serialLoadTest(
-  n: number,
+export async function concurrentRPSLoadTest(
+  rps: number,
   blockchainProvider: string,
   contextName: OdisContextName,
   endpoint:
     | CombinerEndpointPNP.PNP_QUOTA
     | CombinerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.PNP_SIGN,
-  timeoutMs?: number
+  duration: number = 0
 ) {
-  for (let i = 0; i < n; i++) {
-    try {
-      switch (endpoint) {
-        case CombinerEndpointPNP.PNP_SIGN:
-          await testPNPSignQuery(blockchainProvider, contextName, endpoint, timeoutMs)
-          break
-        case CombinerEndpointPNP.PNP_QUOTA:
-          await testPNPQuotaQuery(blockchainProvider, contextName, timeoutMs)
-      }
-    } catch {} // tslint:disable-line:no-empty
+  const endPointFn =
+    endpoint === CombinerEndpointPNP.PNP_SIGN ? testPNPSignQuery : testPNPQuotaQuery
+
+  const taskFn = async (i: number) => {
+    const start = performance.now()
+    await endPointFn(blockchainProvider, contextName)
+    const requestDuration = performance.now() - start
+    if (requestDuration > 600) {
+      logger.warn({ duration: Math.round(requestDuration), index: i }, 'SLOW Request')
+    } else {
+      logger.info({ duration: Math.round(requestDuration), index: i }, 'request finished')
+    }
   }
+
+  return doRPSTest(taskFn, rps, duration)
 }
 
-export async function concurrentLoadTest(
-  workers: number,
-  blockchainProvider: string,
-  contextName: OdisContextName,
-  endpoint:
-    | CombinerEndpointPNP.PNP_QUOTA
-    | CombinerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.PNP_SIGN,
-  timeoutMs?: number
-) {
-  while (true) {
-    const reqs = []
-    for (let i = 0; i < workers; i++) {
-      reqs.push(i)
-    }
-    await concurrentMap(workers, reqs, async (i) => {
-      await sleep(i * 10)
-      while (true) {
-        try {
-          switch (endpoint) {
-            case CombinerEndpointPNP.PNP_SIGN:
-              await testPNPSignQuery(blockchainProvider, contextName, endpoint, timeoutMs)
-              break
-            case CombinerEndpointPNP.PNP_QUOTA:
-              await testPNPQuotaQuery(blockchainProvider, contextName, timeoutMs)
-          }
-        } catch {} // tslint:disable-line:no-empty
+async function doRPSTest(
+  testFn: (reqNumber: number) => Promise<void>,
+  rps: number,
+  duration: number = 0
+): Promise<void> {
+  const inFlightRequests: Array<Promise<void>> = []
+  let shouldRun = true
+
+  async function requestSender() {
+    let reqCounter = 1
+    while (shouldRun) {
+      for (let i = 0; i < rps; i++) {
+        inFlightRequests.push(testFn(reqCounter++))
       }
-    })
+      await sleep(1000)
+    }
+  }
+
+  async function requestEnder() {
+    while (shouldRun || inFlightRequests.length > 0) {
+      if (inFlightRequests.length > 0) {
+        const req = inFlightRequests.shift()
+        await req?.catch((err) => {
+          console.error('some request failed', err)
+        })
+      } else {
+        await sleep(1000)
+      }
+    }
+  }
+
+  async function durationChecker() {
+    await sleep(duration)
+    shouldRun = false
+  }
+
+  if (duration === 0) {
+    await Promise.all([requestSender(), requestEnder()])
+  } else {
+    await Promise.all([durationChecker(), requestSender(), requestEnder()])
   }
 }

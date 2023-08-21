@@ -4,6 +4,7 @@ import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
+
 import Logger from 'bunyan'
 import crypto from 'crypto'
 import { Request } from 'express'
@@ -16,19 +17,35 @@ import {
 } from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
 
+export type DataEncryptionKeyFetcher = (address: string) => Promise<string>
+
+export function newContractKitFetcher(
+  contractKit: ContractKit,
+  logger: Logger,
+  fullNodeTimeoutMs: number = FULL_NODE_TIMEOUT_IN_MS,
+  fullNodeRetryCount: number = RETRY_COUNT,
+  fullNodeRetryDelayMs: number = RETRY_DELAY_IN_MS
+): DataEncryptionKeyFetcher {
+  return (address: string) =>
+    getDataEncryptionKey(
+      address,
+      contractKit,
+      logger,
+      fullNodeTimeoutMs,
+      fullNodeRetryCount,
+      fullNodeRetryDelayMs
+    )
+}
+
 /*
  * Confirms that user is who they say they are and throws error on failure to confirm.
  * Authorization header should contain the EC signed body
  */
 export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   request: Request<{}, {}, R>,
-  contractKit: ContractKit,
   logger: Logger,
-  shouldFailOpen: boolean = false,
-  warnings: ErrorType[] = [],
-  timeoutMs: number = FULL_NODE_TIMEOUT_IN_MS,
-  retryCount: number = RETRY_COUNT,
-  retryDelay: number = RETRY_DELAY_IN_MS
+  fetchDEK: DataEncryptionKeyFetcher,
+  warnings: ErrorType[] = []
 ): Promise<boolean> {
   logger.debug('Authenticating user')
 
@@ -45,25 +62,18 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   if (authMethod && authMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     let registeredEncryptionKey
     try {
-      registeredEncryptionKey = await getDataEncryptionKey(
-        signer,
-        contractKit,
-        logger,
-        timeoutMs,
-        retryCount,
-        retryDelay
-      )
+      registeredEncryptionKey = await fetchDEK(signer)
     } catch (err) {
       // getDataEncryptionKey should only throw if there is a full-node connection issue.
       // That is, it does not throw if the DEK is undefined or invalid
-      const failureStatus = shouldFailOpen ? ErrorMessage.FAILING_OPEN : ErrorMessage.FAILING_CLOSED
+      const failureStatus = ErrorMessage.FAILING_CLOSED
       logger.error({
         err,
         warning: ErrorMessage.FAILURE_TO_GET_DEK,
         failureStatus,
       })
       warnings.push(ErrorMessage.FAILURE_TO_GET_DEK, failureStatus)
-      return shouldFailOpen
+      return false
     }
     if (!registeredEncryptionKey) {
       logger.warn({ account: signer }, 'Account does not have registered encryption key')

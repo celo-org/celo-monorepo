@@ -1,4 +1,3 @@
-import { CombinerEndpointPNP } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
 import { testDomainSignQuery, testPNPSignQuery } from './test'
 
@@ -11,9 +10,7 @@ if (!contextName || !blockchainProvider) {
 export const odisMonitorScheduleFunctionPNP = functions
   .region('us-central1')
   .pubsub.schedule('every 5 minutes')
-  .onRun(async () =>
-    testPNPSignQuery(blockchainProvider, contextName, CombinerEndpointPNP.PNP_SIGN)
-  )
+  .onRun(async () => testPNPSignQuery(blockchainProvider, contextName))
 
 export const odisMonitorScheduleFunctionDomains = functions
   .region('us-central1')

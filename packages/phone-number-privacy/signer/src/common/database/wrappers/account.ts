@@ -1,107 +1,81 @@
-import { ErrorMessage } from '@celo/phone-number-privacy-common'
+// import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
-import { config } from '../../../config'
-import { Histograms, meter } from '../../metrics'
-import { AccountRecord, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE, toAccountRecord } from '../models/account'
-import { countAndThrowDBError, queryWithOptionalTrx } from '../utils'
-
-function accounts(db: Knex, table: ACCOUNTS_TABLE) {
-  return db<AccountRecord>(table)
-}
+// import { config } from '../../../config'
+// import { AccountRecord, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE, toAccountRecord } from '../models/account'
+// import { doMeteredSql } from '../utils'
 
 /*
  * Returns how many queries the account has already performed.
  */
 export async function getPerformedQueryCount(
-  db: Knex,
-  accountsTable: ACCOUNTS_TABLE,
-  account: string,
-  logger: Logger,
-  trx?: Knex.Transaction
+  _db: Knex,
+  _account: string,
+  _logger: Logger
 ): Promise<number> {
-  return meter(
-    async () => {
-      logger.debug({ account }, 'Getting performed query count')
-      const queryCounts = await queryWithOptionalTrx(accounts(db, accountsTable), trx)
-        .select(ACCOUNTS_COLUMNS.numLookups)
-        .where(ACCOUNTS_COLUMNS.address, account)
-        .first()
-        .timeout(config.db.timeout)
-      return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
-    },
-    [],
-    (err: any) => countAndThrowDBError<number>(err, logger, ErrorMessage.DATABASE_GET_FAILURE),
-    Histograms.dbOpsInstrumentation,
-    ['getPerformedQueryCount']
-  )
+  return Promise.resolve(0)
+  // logger.debug({ account }, 'Getting performed query count')
+  // return doMeteredSql(
+  //   'getPerformedQueryCount',
+  //   ErrorMessage.DATABASE_GET_FAILURE,
+  //   logger,
+  //   async () => {
+  //     const queryCounts = await db<AccountRecord>(ACCOUNTS_TABLE)
+  //       .where(ACCOUNTS_COLUMNS.address, account)
+  //       .select(ACCOUNTS_COLUMNS.numLookups)
+  //       .first()
+  //       .timeout(config.db.timeout)
+  //     return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
+  //   }
+  // )
 }
 
-async function getAccountExists(
-  db: Knex,
-  accountsTable: ACCOUNTS_TABLE,
-  account: string,
-  logger: Logger,
-  trx?: Knex.Transaction
-): Promise<boolean> {
-  return meter(
-    async () => {
-      const accountRecord = await queryWithOptionalTrx(accounts(db, accountsTable), trx)
-        .where(ACCOUNTS_COLUMNS.address, account)
-        .first()
-        .timeout(config.db.timeout)
+// async function getAccountExists(
+//   db: Knex,
+//   account: string,
+//   logger: Logger,
+//   trx?: Knex.Transaction
+// ): Promise<boolean> {
+//   return Promise.resolve(true)
+//   return doMeteredSql('getAccountExists', ErrorMessage.DATABASE_GET_FAILURE, logger, async () => {
+//     const sql = db<AccountRecord>(ACCOUNTS_TABLE)
+//       .where(ACCOUNTS_COLUMNS.address, account)
+//       .first()
+//       .timeout(config.db.timeout)
 
-      return !!accountRecord
-    },
-    [],
-    (err: any) => countAndThrowDBError<boolean>(err, logger, ErrorMessage.DATABASE_GET_FAILURE),
-    Histograms.dbOpsInstrumentation,
-    ['getAccountExists']
-  )
-}
+//     const accountRecord = await (trx != null ? sql.transacting(trx) : sql)
+//     return !!accountRecord
+//   })
+// }
 
 /*
  * Increments query count in database.  If record doesn't exist, create one.
  */
-export async function incrementQueryCount( //
-  db: Knex,
-  accountsTable: ACCOUNTS_TABLE,
-  account: string,
-  logger: Logger,
-  trx?: Knex.Transaction
+export async function incrementQueryCount(
+  _db: Knex,
+  _account: string,
+  _logger: Logger,
+  _trx?: Knex.Transaction
 ): Promise<void> {
-  return meter(
-    async () => {
-      logger.debug({ account }, 'Incrementing query count')
-      if (await getAccountExists(db, accountsTable, account, logger, trx)) {
-        await queryWithOptionalTrx(accounts(db, accountsTable), trx)
-          .where(ACCOUNTS_COLUMNS.address, account)
-          .increment(ACCOUNTS_COLUMNS.numLookups, 1)
-          .timeout(config.db.timeout)
-      } else {
-        const newAccountRecord = toAccountRecord(account, 1)
-        await insertRecord(db, accountsTable, newAccountRecord, logger, trx)
-      }
-    },
-    [],
-    (err: any) => countAndThrowDBError(err, logger, ErrorMessage.DATABASE_UPDATE_FAILURE),
-    Histograms.dbOpsInstrumentation,
-    ['incrementQueryCount']
-  )
-}
-
-async function insertRecord(
-  db: Knex,
-  accountsTable: ACCOUNTS_TABLE,
-  data: AccountRecord,
-  logger: Logger,
-  trx?: Knex.Transaction
-): Promise<void> {
-  try {
-    await queryWithOptionalTrx(accounts(db, accountsTable), trx)
-      .insert(data)
-      .timeout(config.db.timeout)
-  } catch (error) {
-    countAndThrowDBError(error, logger, ErrorMessage.DATABASE_INSERT_FAILURE)
-  }
+  return
+  // logger.debug({ account }, 'Incrementing query count')
+  // return doMeteredSql(
+  //   'incrementQueryCount',
+  //   ErrorMessage.DATABASE_INSERT_FAILURE,
+  //   logger,
+  //   async () => {
+  //     if (await getAccountExists(db, account, logger, trx)) {
+  //       const sql = db<AccountRecord>(ACCOUNTS_TABLE)
+  //         .where(ACCOUNTS_COLUMNS.address, account)
+  //         .increment(ACCOUNTS_COLUMNS.numLookups, 1)
+  //         .timeout(config.db.timeout)
+  //       await (trx != null ? sql.transacting(trx) : sql)
+  //     } else {
+  //       const sql = db<AccountRecord>(ACCOUNTS_TABLE)
+  //         .insert(toAccountRecord(account, 1))
+  //         .timeout(config.db.timeout)
+  //       await (trx != null ? sql.transacting(trx) : sql)
+  //     }
+  //   }
+  // )
 }

@@ -1,13 +1,15 @@
 {
   "name": "@celo/phone-number-privacy-signer",
-  "version": "3.0.0-beta.3",
+  "version": "3.0.0-beta.12",
   "description": "Signing participator of ODIS",
   "author": "Celo",
   "license": "Apache-2.0",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "start": "yarn build && node -r dotenv/config dist/index.js",
     "start:docker": "yarn build && node dist/index.js",
+    "start:docker:tracing": "yarn build && node --require ./dist/tracing.js dist/index.js",
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
     "lint": "tslint --project .",
@@ -44,6 +46,13 @@
     "@celo/utils": "^4.1.1-beta.1",
     "@celo/wallet-hsm-azure": "^4.1.1-beta.1",
     "@google-cloud/secret-manager": "3.0.0",
+    "@opentelemetry/api": "^1.4.1",
+    "@opentelemetry/auto-instrumentations-node": "^0.38.0",
+    "@opentelemetry/propagator-ot-trace": "^0.27.0",
+    "@opentelemetry/sdk-metrics": "^1.15.1",
+    "@opentelemetry/sdk-node": "^0.41.1",
+    "@opentelemetry/semantic-conventions": "^1.15.1",
+    "@opentelemetry/sdk-trace-web": "^1.15.1",
     "@types/bunyan": "^1.8.8",
     "aws-sdk": "^2.705.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
@@ -54,7 +63,8 @@
     "mysql2": "^2.1.0",
     "pg": "^8.2.1",
     "prom-client": "12.0.0",
-    "promise.allsettled": "^1.0.2"
+    "promise.allsettled": "^1.0.2",
+    "lru-cache": "^10.0.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.6",

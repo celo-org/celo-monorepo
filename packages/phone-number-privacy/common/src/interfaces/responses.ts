@@ -16,7 +16,6 @@ export interface PnpQuotaStatus {
   performedQueryCount: number
   // all time total quota
   totalQuota: number
-  blockNumber?: number
 }
 
 const PnpQuotaStatusSchema: t.Type<PnpQuotaStatus> = t.intersection([
@@ -47,7 +46,6 @@ export interface SignMessageResponseFailure {
   // Changing this is more involved; TODO(future) https://github.com/celo-org/celo-monorepo/issues/9826
   performedQueryCount?: number
   totalQuota?: number
-  blockNumber?: number
 }
 
 export type SignMessageResponse = SignMessageResponseSuccess | SignMessageResponseFailure
