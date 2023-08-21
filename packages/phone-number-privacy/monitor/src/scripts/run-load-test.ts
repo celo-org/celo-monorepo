@@ -1,4 +1,5 @@
 import { OdisContextName } from '@celo/identity/lib/odis/query'
+import { CombinerEndpointPNP } from '@celo/phone-number-privacy-common'
 import yargs from 'yargs'
 import { concurrentRPSLoadTest } from '../test'
 
@@ -21,6 +22,16 @@ yargs
         .positional('rps', {
           type: 'number',
           description: 'Number of requests per second to generate',
+        })
+        .option('bypassQuota', {
+          type: 'boolean',
+          description: 'Bypass Signer quota check.',
+          default: false,
+        })
+        .option('useDEK', {
+          type: 'boolean',
+          description: 'Use Data Encryption Key (DEK) to authenticate.',
+          default: false,
         }),
     (args) => {
       if (args.rps == null || args.contextName == null) {
@@ -28,7 +39,6 @@ yargs
         yargs.showHelp()
         process.exit(1)
       }
-
       const rps = args.rps!
       const contextName = args.contextName! as OdisContextName
 
@@ -52,6 +62,14 @@ yargs
         yargs.showHelp()
         process.exit(1)
       }
-      concurrentRPSLoadTest(args.rps, blockchainProvider!, contextName) // tslint:disable-line:no-floating-promises
+      concurrentRPSLoadTest(
+        args.rps,
+        blockchainProvider!,
+        contextName,
+        CombinerEndpointPNP.PNP_SIGN,
+        0,
+        args.bypassQuota,
+        args.useDEK
+      ) // tslint:disable-line:no-floating-promises
     }
   ).argv

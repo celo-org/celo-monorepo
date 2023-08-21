@@ -13,13 +13,17 @@ const logger = rootLogger('odis-monitor')
 export async function testPNPSignQuery(
   blockchainProvider: string,
   contextName: OdisContextName,
-  timeoutMs?: number
+  timeoutMs?: number,
+  bypassQuota?: boolean,
+  useDEK?: boolean
 ) {
   try {
     const odisResponse: IdentifierHashDetails = await queryOdisForSalt(
       blockchainProvider,
       contextName,
-      timeoutMs
+      timeoutMs,
+      bypassQuota,
+      useDEK
     )
     logger.debug({ odisResponse }, 'ODIS salt request successful. System is healthy.')
   } catch (err) {
@@ -81,14 +85,15 @@ export async function concurrentRPSLoadTest(
   endpoint:
     | CombinerEndpointPNP.PNP_QUOTA
     | CombinerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.PNP_SIGN,
-  duration: number = 0
+  duration: number = 0,
+  bypassQuota?: boolean,
+  useDEK?: boolean
 ) {
-  const endPointFn =
-    endpoint === CombinerEndpointPNP.PNP_SIGN ? testPNPSignQuery : testPNPQuotaQuery
-
   const taskFn = async (i: number) => {
     const start = performance.now()
-    await endPointFn(blockchainProvider, contextName)
+    await (endpoint === CombinerEndpointPNP.PNP_SIGN
+      ? testPNPSignQuery(blockchainProvider, contextName, undefined, bypassQuota, useDEK)
+      : testPNPQuotaQuery(blockchainProvider, contextName))
     const requestDuration = performance.now() - start
     if (requestDuration > 600) {
       logger.warn({ duration: Math.round(requestDuration), index: i }, 'SLOW Request')
