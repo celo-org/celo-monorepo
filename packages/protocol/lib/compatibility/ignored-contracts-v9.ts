@@ -12,7 +12,7 @@ export const ignoredContractsV9 = [
   'ReserveSpenderMultiSig',
 
   'SortedOracles' 
-  // Note: Sorted Oracles ia a Celo Core Contract
+ // Note: Sorted Oracles is a Celo Core Contract
   // but as it has also been modified and deployed but the Mento team.
   // We currently need work to be able to upgrade it again:
   // https://github.com/celo-org/celo-monorepo/issues/10435
