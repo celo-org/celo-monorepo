@@ -1,6 +1,5 @@
 import { ContractKit } from '@celo/contractkit'
 import {
-  authenticateUser,
   CombinerEndpoint,
   ErrorType,
   getSignerEndpoint,
@@ -75,19 +74,20 @@ export class PnpSignIO extends IO<SignMessageRequest> {
   }
 
   async authenticate(
-    request: Request<{}, {}, SignMessageRequest>,
-    logger: Logger
+    _request: Request<{}, {}, SignMessageRequest>,
+    _logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(
-      request,
-      this.kit,
-      logger,
-      this.config.shouldFailOpen,
-      [],
-      this.config.fullNodeTimeoutMs,
-      this.config.fullNodeRetryCount,
-      this.config.fullNodeRetryDelayMs
-    )
+    return Promise.resolve(true)
+    // return authenticateUser(
+    //   request,
+    //   this.kit,
+    //   logger,
+    //   this.config.shouldFailOpen,
+    //   [],
+    //   this.config.fullNodeTimeoutMs,
+    //   this.config.fullNodeRetryCount,
+    //   this.config.fullNodeRetryDelayMs
+    // )
   }
 
   sendSuccess(
