@@ -224,8 +224,9 @@ describe('Transfer tests', function (this: any) {
 
   let feeHandlerAddress: string // set later on using the contract itself
   const validatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
-  const DEF_FROM_PK = 'f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d'
+  const validatorPK = 'add67e37fdf5c26743d295b1af6d9b50f2785a6b60bc83a8f05bd1dd4b385c6c'
   const FromAddress = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
+  const DEF_FROM_PK = 'f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d'
 
   // Arbitrary addresses.
   const txFeeRecipientAddress = '0x5555555555555555555555555555555555555555'
@@ -290,11 +291,13 @@ describe('Transfer tests', function (this: any) {
 
     kit = newKitFromWeb3(new Web3(`http://localhost:${validatorPort.rpcport}`))
     kit.connection.defaultGasInflationFactor = 1
+    // Sets the validator private key to sign txs locally with the kit
+    kit.addAccount(validatorPK)
 
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
-    await sleep(2)
-    // Assuming empty password
-    await kit.connection.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
+    // await sleep(2)
+    // // Assuming empty password
+    // await kit.connection.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
 
     await initAndSyncGethWithRetry(
       gethConfig,
@@ -355,8 +358,10 @@ describe('Transfer tests', function (this: any) {
       await sleep(0.5)
     }
 
-    // Unlock Node account
-    await kit.connection.web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
+    // Sets the from private key to sign txs locally with the kit
+    kit.addAccount(DEF_FROM_PK)
+    // // Unlock Node account
+    // await kit.connection.web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
   }
 
   const transferCeloGold = async (
@@ -587,6 +592,14 @@ describe('Transfer tests', function (this: any) {
   }) {
     let txRes: TestTxResults
     let balances: BalanceWatcher
+
+    if (!txOptions) {
+      txOptions = {}
+    }
+    // Fixed a gas to avoid estimation errors
+    if (!txOptions.gas) {
+      txOptions.gas = 200000
+    }
 
     before(async () => {
       const feeCurrency = await kit.celoTokens.getFeeCurrencyAddress(feeToken)
