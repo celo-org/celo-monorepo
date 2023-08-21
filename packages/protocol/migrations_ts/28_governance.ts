@@ -65,17 +65,10 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           artifacts
         )
 
-        // TODO generalize this
         const contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
           contractName,
           artifactsObject
         )
-        // let contract
-        // try {
-        //   contract = await getDeployedProxiedContract<Truffle.ContractInstance>(contractName, artifactsObject)
-        // } catch {
-        //   contract = await getDeployedProxiedContract<Truffle.ContractInstance>(contractName, artifacts)
-        // }
 
         const selectors = getFunctionSelectorsForContractProxy(
           contract,

@@ -155,7 +155,10 @@ export async function setInitialProxyImplementation<
   
   const Contract = ArtifactsSingleton.getInstance(contractPackage, artifacts).require(contractName)
   let ContractProxy
-  // TODO remove this iff
+  
+  // TODO here probably better to change to 
+  // ArtifactsSingleton.wrap(artifacts.require(contractName + 'Proxy'))
+  // and the if can be removed
   if (contractPackage?.proxiesPath){
     ContractProxy = artifacts.require(contractName + 'Proxy')
   } else {
@@ -342,7 +345,9 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   if (artifactPath) {
     Contract = makeTruffleContractForMigration(name, artifactPath, web3)
     
-    // TODO generalize this IF
+    // TODO probably better replace this if with
+    // ArtifactsSingleton.wrap(artifacts.require(contractName + 'Proxy'))
+    // or create a new flag in contractPackages to check if the proxy is in a different package
     if (artifactPath.proxiesPath){
       // TODO remove the hardcode
       console.log("Voy al default", name)

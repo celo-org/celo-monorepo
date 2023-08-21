@@ -4,7 +4,9 @@ import { ContractPackage } from '../contractPackages'
 // but constructed manually
 
 
-// This class is meant to be
+// This class is meant to be used to wrap truffle artifacts
+// and extend its interface
+// TODO: create abstract class with require and getProxy
 export class DefaultArtifact{
   public artifacts: any
 
@@ -80,6 +82,7 @@ export class ArtifactsSingleton {
 
   //
   public getProxy(key: string, defaultArtifacts?:any) {
+    // TODO proxyArtifactName logic is duplicated in two classes
     const proxyArtifactName = key + "Proxy"
 
       const toReturn = this.require(proxyArtifactName)
