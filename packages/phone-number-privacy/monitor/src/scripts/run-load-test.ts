@@ -1,35 +1,7 @@
 import { OdisContextName } from '@celo/identity/lib/odis/query'
 import yargs from 'yargs'
-import { concurrentLoadTest, serialLoadTest } from '../test'
+import { concurrentRPSLoadTest } from '../test'
 
-/* tslint:disable:no-console */
-
-const runLoadTest = (contextName: string, numWorker: number, isSerial: boolean) => {
-  let blockchainProvider: string
-  switch (contextName) {
-    case 'alfajoresstaging':
-    case 'alfajores':
-      blockchainProvider = 'https://alfajores-forno.celo-testnet.org'
-      break
-    case 'mainnet':
-      blockchainProvider = 'https://forno.celo.org'
-      break
-    default:
-      console.error('Invalid contextName')
-      yargs.showHelp()
-      process.exit(1)
-  }
-  if (numWorker < 1) {
-    console.error('Invalid numWorkers')
-    yargs.showHelp()
-    process.exit(1)
-  }
-  if (isSerial) {
-    serialLoadTest(numWorker, blockchainProvider!, contextName as OdisContextName) // tslint:disable-line:no-floating-promises
-  } else {
-    concurrentLoadTest(numWorker, blockchainProvider!, contextName as OdisContextName) // tslint:disable-line:no-floating-promises
-  }
-}
 // tslint:disable-next-line: no-unused-expression
 yargs
   .scriptName('ODIS-load-test')
@@ -38,7 +10,7 @@ yargs
   .strict(true)
   .showHelpOnFail(true)
   .command(
-    'run <contextName> <numWorkers>',
+    'run <contextName> <rps>',
     'Load test ODIS.',
     (args) =>
       args
@@ -46,14 +18,40 @@ yargs
           type: 'string',
           description: 'Desired network.',
         })
-        .positional('numWorkers', {
+        .positional('rps', {
           type: 'number',
-          description: 'Number of machines that will be sending request to ODIS.',
-        })
-        .option('isSerial', {
-          type: 'boolean',
-          description: 'run test workers in series.',
-          default: false,
+          description: 'Number of requests per second to generate',
         }),
-    (args) => runLoadTest(args.contextName!, args.numWorkers!, args.isSerial)
+    (args) => {
+      if (args.rps == null || args.contextName == null) {
+        console.error('missing positional arguments')
+        yargs.showHelp()
+        process.exit(1)
+      }
+
+      const rps = args.rps!
+      const contextName = args.contextName! as OdisContextName
+
+      let blockchainProvider: string
+      switch (contextName) {
+        case 'alfajoresstaging':
+        case 'alfajores':
+          blockchainProvider = 'https://alfajores-forno.celo-testnet.org'
+          break
+        case 'mainnet':
+          blockchainProvider = 'https://forno.celo.org'
+          break
+        default:
+          console.error('Invalid contextName')
+          yargs.showHelp()
+          process.exit(1)
+      }
+
+      if (rps < 1) {
+        console.error('Invalid rps')
+        yargs.showHelp()
+        process.exit(1)
+      }
+      concurrentRPSLoadTest(args.rps, blockchainProvider!, contextName) // tslint:disable-line:no-floating-promises
+    }
   ).argv
