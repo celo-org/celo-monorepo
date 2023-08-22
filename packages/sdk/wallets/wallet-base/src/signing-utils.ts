@@ -3,9 +3,9 @@ import {
   CeloTx,
   CeloTxWithSig,
   EncodedTransaction,
+  isPresent,
   RLPEncodedTx,
   TransactionTypes,
-  isPresent,
 } from '@celo/connect'
 import {
   hexToNumber,
@@ -89,23 +89,21 @@ function signatureFormatter(
   }
 }
 
-function stringNumberOrBNToHex(
+export function stringNumberOrBNToHex(
   num?: number | string | ReturnType<Web3['utils']['toBN']>
 ): `0x${string}` {
   if (typeof num === 'string' || typeof num === 'number' || num === undefined) {
     return stringNumberToHex(num)
-  } else if (Web3.utils.isBigNumber(num)) {
-    return num.toString('hex') as `0x${string}`
+  } else {
+    return makeEven(`0x` + num.toString('hex')) as `0x${string}`
   }
-  return '0x'
 }
-
 function stringNumberToHex(num?: number | string): `0x${string}` {
   const auxNumber = Number(num)
   if (num === '0x' || num === undefined || auxNumber === 0) {
     return '0x'
   }
-  return Web3.utils.toHex(num) as `0x${string}`
+  return makeEven(Web3.utils.numberToHex(num)) as `0x${string}`
 }
 export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
   assertSerializableTX(tx)
