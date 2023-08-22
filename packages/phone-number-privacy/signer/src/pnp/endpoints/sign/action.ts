@@ -13,9 +13,7 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request } from 'express'
-import { Knex } from 'knex'
 import { computeBlindedSignature } from '../../../common/bls/bls-cryptography-client'
-import { getRequestExists } from '../../../common/database/wrappers/request'
 import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management/key-provider-base'
 import { Counters, Histograms } from '../../../common/metrics'
 import { getSignerVersion, SignerConfig } from '../../../config'
@@ -28,7 +26,6 @@ import { AccountService } from '../../services/account-service'
 import { PnpRequestService } from '../../services/request-service'
 
 export function pnpSign(
-  db: Knex,
   config: SignerConfig,
   requestService: PnpRequestService,
   accountService: AccountService,
@@ -60,11 +57,10 @@ export function pnpSign(
 
     let usedQuota = await requestService.getUsedQuotaForAccount(request.body.account, ctx)
 
-    const duplicateRequest = await isDuplicateRequest(
-      db,
+    const duplicateRequest = await requestService.isDuplicateRequest(
       request.body.account,
       request.body.blindedQueryPhoneNumber,
-      logger
+      ctx
     )
 
     Histograms.userRemainingQuotaAtRequest
@@ -132,18 +128,6 @@ export function pnpSign(
       },
     }
   }
-}
-
-function isDuplicateRequest(
-  db: Knex<any, any[]>,
-  account: string,
-  blindedQueryPhoneNumber: string,
-  logger: any
-): Promise<boolean> {
-  return getRequestExists(db, account, blindedQueryPhoneNumber, logger).catch((err) => {
-    logger.error(err, 'Failed to check if request already exists in db')
-    return false
-  })
 }
 
 async function sign(
