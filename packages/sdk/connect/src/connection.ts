@@ -1,11 +1,11 @@
 import { ensureLeading0x, toChecksumAddress } from '@celo/utils/lib/address'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
-import { Signature, parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
+import { parseSignatureWithoutPrefix, Signature } from '@celo/utils/lib/signatureUtils'
 import { bufferToHex } from '@ethereumjs/util'
 import debugFactory from 'debug'
 import Web3 from 'web3'
 import { AbiCoder } from './abi-types'
-import { CeloProvider, assertIsCeloProvider } from './celo-provider'
+import { assertIsCeloProvider, CeloProvider } from './celo-provider'
 import {
   Address,
   Block,
@@ -32,9 +32,9 @@ import {
   outputCeloTxReceiptFormatter,
 } from './utils/formatter'
 import { hasProperty } from './utils/provider-utils'
-import { HttpRpcCaller, RpcCaller, getRandomId } from './utils/rpc-caller'
+import { getRandomId, HttpRpcCaller, RpcCaller } from './utils/rpc-caller'
 import { TxParamsNormalizer } from './utils/tx-params-normalizer'
-import { TransactionResult, toTxResult } from './utils/tx-result'
+import { toTxResult, TransactionResult } from './utils/tx-result'
 import { ReadOnlyWallet } from './wallet'
 
 const debugGasEstimation = debugFactory('connection:gas-estimation')
