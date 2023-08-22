@@ -24,6 +24,12 @@ export class TxParamsNormalizer {
   public async populate(celoTxParams: CeloTx): Promise<CeloTx> {
     const txParams = { ...celoTxParams }
 
+    if (isPresent(txParams.gatewayFeeRecipient) || isPresent(txParams.gatewayFee)) {
+      console.warn(
+        'Gateway fee has been deprecated and will be removed see: https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0057.md'
+      )
+    }
+
     const [chainId, nonce, gas, maxFeePerGas] = await Promise.all(
       [
         async () => {
