@@ -17,17 +17,19 @@ import { PromiseHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, sendFailure } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { getCombinerVersion, OdisConfig } from '../../../config'
-import { PnpSignerResponseLogger } from '../../services/log-responses'
-import { PnpThresholdStateService } from '../../services/threshold-state'
+import {
+  logFailOpenResponses,
+  logPnpSignerResponseDiscrepancies,
+} from '../../services/log-responses'
+import { findCombinerQuotaState } from '../../services/threshold-state'
 
 export function createPnpQuotaHandler(
   signers: Signer[],
   config: OdisConfig,
-  thresholdStateService: PnpThresholdStateService<PnpQuotaRequest>,
   dekFetcher: DataEncryptionKeyFetcher
 ): PromiseHandler<PnpQuotaRequest> {
   const signerEndpoint = CombinerEndpoint.PNP_QUOTA
-  const responseLogger: PnpSignerResponseLogger = new PnpSignerResponseLogger()
+
   return async (request, response) => {
     const logger = response.locals.logger
     if (!validateRequest(request)) {
@@ -47,20 +49,20 @@ export function createPnpQuotaHandler(
       signers,
       signerEndpoint,
       request,
-      session.keyVersionInfo,
+      keyVersionInfo,
       null,
       config.odisServices.timeoutMilliSeconds,
       PnpQuotaResponseSchema
     )
 
-    responseLogger.logResponseDiscrepancies(session)
-    responseLogger.logFailOpenResponses(session)
+    session.warnings.push(...logPnpSignerResponseDiscrepancies(logger, session.responses))
+    logFailOpenResponses(logger, session.responses)
 
     const { threshold } = session.keyVersionInfo
 
     if (session.responses.length >= threshold) {
       try {
-        const quotaStatus = thresholdStateService.findCombinerQuotaState(session)
+        const quotaStatus = findCombinerQuotaState(session)
         send(
           response,
           {
@@ -75,7 +77,7 @@ export function createPnpQuotaHandler(
 
         return
       } catch (err) {
-        session.logger.error(err, 'Error combining signer quota status responses')
+        logger.error(err, 'Error combining signer quota status responses')
       }
     }
     sendFailure(

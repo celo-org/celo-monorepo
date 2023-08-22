@@ -22,18 +22,19 @@ import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-crypto
 import { CryptoSession } from '../../../common/crypto-session'
 import { PromiseHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, requestHasSupportedKeyVersion, sendFailure } from '../../../common/io'
-import { ThresholdStateService } from '../../../common/sign'
 import { getCombinerVersion, OdisConfig } from '../../../config'
-import { PnpSignerResponseLogger } from '../../services/log-responses'
+import {
+  logFailOpenResponses,
+  logPnpSignerResponseDiscrepancies,
+} from '../../services/log-responses'
+import { findCombinerQuotaState } from '../../services/threshold-state'
 
 export function createPnpSignHandler(
   signers: Signer[],
   config: OdisConfig,
-  thresholdStateService: ThresholdStateService<SignMessageRequest>,
   dekFetcher: DataEncryptionKeyFetcher
 ): PromiseHandler<SignMessageRequest> {
   const signerEndpoint = CombinerEndpoint.PNP_SIGN
-  const responseLogger: PnpSignerResponseLogger = new PnpSignerResponseLogger()
   return async (request, response) => {
     const logger = response.locals.logger
     if (!validateRequest(request)) {
@@ -101,8 +102,8 @@ export function createPnpSignHandler(
       processRequest
     )
 
-    responseLogger.logResponseDiscrepancies(session)
-    responseLogger.logFailOpenResponses(session)
+    session.warnings.push(...logPnpSignerResponseDiscrepancies(logger, session.responses))
+    logFailOpenResponses(logger, session.responses)
 
     if (session.crypto.hasSufficientSignatures()) {
       try {
@@ -111,7 +112,7 @@ export function createPnpSignHandler(
           logger
         )
 
-        const quotaStatus = thresholdStateService.findCombinerQuotaState(session)
+        const quotaStatus = findCombinerQuotaState(session)
         return send(
           response,
           {

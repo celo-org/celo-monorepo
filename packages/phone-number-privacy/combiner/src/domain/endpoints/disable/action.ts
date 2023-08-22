@@ -15,16 +15,14 @@ import { PromiseHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, sendFailure } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { getCombinerVersion, OdisConfig } from '../../../config'
-import { DomainSignerResponseLogger } from '../../services/log-responses'
-import { DomainThresholdStateService } from '../../services/threshold-state'
+import { logDomainResponsesDiscrepancies } from '../../services/log-responses'
+import { findThresholdDomainState } from '../../services/threshold-state'
 
 export function createDisableDomainHandler(
   signers: Signer[],
-  config: OdisConfig,
-  thresholdStateService: DomainThresholdStateService<DisableDomainRequest>
+  config: OdisConfig
 ): PromiseHandler<DisableDomainRequest> {
   const requestSchema = disableDomainRequestSchema(DomainSchema)
-  const responseLogger: DomainSignerResponseLogger = new DomainSignerResponseLogger()
   const signerEndpoint = CombinerEndpoint.DISABLE_DOMAIN
   return async (request, response) => {
     if (!requestSchema.is(request.body)) {
@@ -51,9 +49,9 @@ export function createDisableDomainHandler(
       disableDomainResponseSchema(SequentialDelayDomainStateSchema)
     )
 
-    responseLogger.logResponseDiscrepancies(session)
+    logDomainResponsesDiscrepancies(response.locals.logger, session.responses)
     try {
-      const disableDomainStatus = thresholdStateService.findThresholdDomainState(session)
+      const disableDomainStatus = findThresholdDomainState(session, signers.length)
       if (disableDomainStatus.disabled) {
         send(
           response,

@@ -19,16 +19,14 @@ import { CryptoSession } from '../../../common/crypto-session'
 import { PromiseHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, requestHasSupportedKeyVersion, sendFailure } from '../../../common/io'
 import { getCombinerVersion, OdisConfig } from '../../../config'
-import { DomainSignerResponseLogger } from '../../services/log-responses'
-import { DomainThresholdStateService } from '../../services/threshold-state'
+import { logDomainResponsesDiscrepancies } from '../../services/log-responses'
+import { findThresholdDomainState } from '../../services/threshold-state'
 
 export function createDomainSignHandler(
   signers: Signer[],
-  config: OdisConfig,
-  thresholdStateService: DomainThresholdStateService<DomainRestrictedSignatureRequest>
+  config: OdisConfig
 ): PromiseHandler<DomainRestrictedSignatureRequest> {
   const requestSchema = domainRestrictedSignatureRequestSchema(DomainSchema)
-  const responseLogger: DomainSignerResponseLogger = new DomainSignerResponseLogger()
   const signerEndpoint = CombinerEndpoint.DOMAIN_SIGN
   return async (request, response) => {
     if (!requestSchema.is(request.body)) {
@@ -102,7 +100,7 @@ export function createDomainSignHandler(
       processRequest
     )
 
-    responseLogger.logResponseDiscrepancies(session)
+    logDomainResponsesDiscrepancies(response.locals.logger, session.responses)
 
     if (session.crypto.hasSufficientSignatures()) {
       try {
@@ -117,7 +115,7 @@ export function createDomainSignHandler(
             success: true,
             version: getCombinerVersion(),
             signature: combinedSignature,
-            status: thresholdStateService.findThresholdDomainState(session),
+            status: findThresholdDomainState(session, signers.length),
           },
           200,
           response.locals.logger

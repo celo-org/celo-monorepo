@@ -15,16 +15,14 @@ import { PromiseHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, sendFailure } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { getCombinerVersion, OdisConfig } from '../../../config'
-import { DomainSignerResponseLogger } from '../../services/log-responses'
-import { DomainThresholdStateService } from '../../services/threshold-state'
+import { logDomainResponsesDiscrepancies } from '../../services/log-responses'
+import { findThresholdDomainState } from '../../services/threshold-state'
 
 export function createDomainQuotaHandler(
   signers: Signer[],
-  config: OdisConfig,
-  thresholdStateService: DomainThresholdStateService<DomainQuotaStatusRequest>
+  config: OdisConfig
 ): PromiseHandler<DomainQuotaStatusRequest> {
   const requestSchema = domainQuotaStatusRequestSchema(DomainSchema)
-  const responseLogger: DomainSignerResponseLogger = new DomainSignerResponseLogger()
   const signerEndpoint = CombinerEndpoint.DOMAIN_QUOTA_STATUS
   return async (request, response) => {
     if (!requestSchema.is(request.body)) {
@@ -51,17 +49,16 @@ export function createDomainQuotaHandler(
       domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema)
     )
 
-    responseLogger.logResponseDiscrepancies(session)
+    logDomainResponsesDiscrepancies(response.locals.logger, session.responses)
     const { threshold } = session.keyVersionInfo
     if (session.responses.length >= threshold) {
       try {
-        const domainQuotaStatus = thresholdStateService.findThresholdDomainState(session)
         send(
           response,
           {
             success: true,
             version: getCombinerVersion(),
-            status: domainQuotaStatus,
+            status: findThresholdDomainState(session, signers.length),
           },
           200,
           response.locals.logger

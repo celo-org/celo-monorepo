@@ -22,11 +22,8 @@ import { createDomainQuotaHandler } from './domain/endpoints/quota/action'
 
 import { createDomainSignHandler } from './domain/endpoints/sign/action'
 
-import { DomainThresholdStateService } from './domain/services/threshold-state'
 import { createPnpQuotaHandler } from './pnp/endpoints/quota/action'
 import { createPnpSignHandler } from './pnp/endpoints/sign/action'
-
-import { PnpThresholdStateService } from './pnp/services/threshold-state'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -69,43 +66,14 @@ export function startCombiner(config: CombinerConfig, kit: ContractKit) {
     config.phoneNumberPrivacy.fullNodeRetryDelayMs
   )
 
-  const pnpThresholdStateService = new PnpThresholdStateService()
-
   const pnpSigners: Signer[] = JSON.parse(config.phoneNumberPrivacy.odisServices.signers)
-  const pnpQuota = createPnpQuotaHandler(
-    pnpSigners,
-    config.phoneNumberPrivacy,
-    pnpThresholdStateService,
-    dekFetcher
-  )
-
-  const pnpSign = createPnpSignHandler(
-    pnpSigners,
-    config.phoneNumberPrivacy,
-    pnpThresholdStateService,
-    dekFetcher
-  )
+  const pnpQuota = createPnpQuotaHandler(pnpSigners, config.phoneNumberPrivacy, dekFetcher)
+  const pnpSign = createPnpSignHandler(pnpSigners, config.phoneNumberPrivacy, dekFetcher)
 
   const domainSigners: Signer[] = JSON.parse(config.domains.odisServices.signers)
-  const domainThresholdStateService = new DomainThresholdStateService(config.domains)
-
-  const domainQuota = createDomainQuotaHandler(
-    domainSigners,
-    config.domains,
-    domainThresholdStateService
-  )
-
-  const domainSign = createDomainSignHandler(
-    domainSigners,
-    config.domains,
-    domainThresholdStateService
-  )
-
-  const domainDisable = createDisableDomainHandler(
-    domainSigners,
-    config.domains,
-    domainThresholdStateService
-  )
+  const domainQuota = createDomainQuotaHandler(domainSigners, config.domains)
+  const domainSign = createDomainSignHandler(domainSigners, config.domains)
+  const domainDisable = createDisableDomainHandler(domainSigners, config.domains)
 
   app.post(CombinerEndpoint.PNP_QUOTA, createHandler(config.phoneNumberPrivacy.enabled, pnpQuota))
   app.post(CombinerEndpoint.PNP_SIGN, createHandler(config.phoneNumberPrivacy.enabled, pnpSign))
