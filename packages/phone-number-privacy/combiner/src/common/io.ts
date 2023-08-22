@@ -84,12 +84,11 @@ export function getKeyVersionInfo(
 export async function fetchSignerResponseWithFallback<R extends OdisRequest>(
   signer: Signer,
   signerEndpoint: string,
-  session: Session<R>,
+  keyVersion: number,
+  request: Request<R>,
   logger: Logger,
   abortSignal: AbortSignal
 ): Promise<FetchResponse> {
-  const { request } = session
-
   async function fetchSignerResponse(url: string): Promise<FetchResponse> {
     // prettier-ignore
     return fetch(url, {
@@ -101,7 +100,7 @@ export async function fetchSignerResponseWithFallback<R extends OdisRequest>(
         ...(request.headers.authorization ? { Authorization: request.headers.authorization } : {}),
         // Forward requested keyVersion if provided by client, otherwise use default keyVersion.
         // This will be ignored for non-signing requests.
-        [KEY_VERSION_HEADER]: session.keyVersionInfo.keyVersion.toString()
+        [KEY_VERSION_HEADER]: keyVersion.toString()
       },
       body: JSON.stringify(request.body),
       signal: abortSignal,

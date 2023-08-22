@@ -8,26 +8,24 @@ import {
   rootLogger,
 } from '@celo/phone-number-privacy-common'
 import express, { RequestHandler } from 'express'
+import { Signer } from './common/combine'
 // tslint:disable-next-line: ordered-imports
 import {
-  actionHandler,
   catchErrorHandler,
   disabledHandler,
   meteringHandler,
   PromiseHandler,
 } from './common/handlers'
 import { CombinerConfig, getCombinerVersion } from './config'
-import { DomainDisableAction } from './domain/endpoints/disable/action'
-import { DomainDisableIO } from './domain/endpoints/disable/io'
-import { DomainQuotaAction } from './domain/endpoints/quota/action'
-import { DomainQuotaIO } from './domain/endpoints/quota/io'
-import { DomainSignAction } from './domain/endpoints/sign/action'
-import { DomainSignIO } from './domain/endpoints/sign/io'
+import { createDisableDomainHandler } from './domain/endpoints/disable/action'
+import { createDomainQuotaHandler } from './domain/endpoints/quota/action'
+
+import { createDomainSignHandler } from './domain/endpoints/sign/action'
+
 import { DomainThresholdStateService } from './domain/services/threshold-state'
-import { PnpQuotaAction } from './pnp/endpoints/quota/action'
-import { PnpQuotaIO } from './pnp/endpoints/quota/io'
-import { PnpSignAction } from './pnp/endpoints/sign/action'
-import { PnpSignIO } from './pnp/endpoints/sign/io'
+import { createPnpQuotaHandler } from './pnp/endpoints/quota/action'
+import { createPnpSignHandler } from './pnp/endpoints/sign/action'
+
 import { PnpThresholdStateService } from './pnp/services/threshold-state'
 
 require('events').EventEmitter.defaultMaxListeners = 15
@@ -73,46 +71,40 @@ export function startCombiner(config: CombinerConfig, kit: ContractKit) {
 
   const pnpThresholdStateService = new PnpThresholdStateService()
 
-  const pnpQuota = actionHandler(
-    new PnpQuotaAction(
-      config.phoneNumberPrivacy,
-      pnpThresholdStateService,
-      new PnpQuotaIO(config.phoneNumberPrivacy, kit, dekFetcher)
-    )
+  const pnpSigners: Signer[] = JSON.parse(config.phoneNumberPrivacy.odisServices.signers)
+  const pnpQuota = createPnpQuotaHandler(
+    pnpSigners,
+    config.phoneNumberPrivacy,
+    pnpThresholdStateService,
+    dekFetcher
   )
 
-  const pnpSign = actionHandler(
-    new PnpSignAction(
-      config.phoneNumberPrivacy,
-      pnpThresholdStateService,
-      new PnpSignIO(config.phoneNumberPrivacy, kit, dekFetcher)
-    )
+  const pnpSign = createPnpSignHandler(
+    pnpSigners,
+    config.phoneNumberPrivacy,
+    pnpThresholdStateService,
+    dekFetcher
   )
 
+  const domainSigners: Signer[] = JSON.parse(config.domains.odisServices.signers)
   const domainThresholdStateService = new DomainThresholdStateService(config.domains)
 
-  const domainQuota = actionHandler(
-    new DomainQuotaAction(
-      config.domains,
-      domainThresholdStateService,
-      new DomainQuotaIO(config.domains)
-    )
+  const domainQuota = createDomainQuotaHandler(
+    domainSigners,
+    config.domains,
+    domainThresholdStateService
   )
 
-  const domainSign = actionHandler(
-    new DomainSignAction(
-      config.domains,
-      domainThresholdStateService,
-      new DomainSignIO(config.domains)
-    )
+  const domainSign = createDomainSignHandler(
+    domainSigners,
+    config.domains,
+    domainThresholdStateService
   )
 
-  const domainDisable = actionHandler(
-    new DomainDisableAction(
-      config.domains,
-      domainThresholdStateService,
-      new DomainDisableIO(config.domains)
-    )
+  const domainDisable = createDisableDomainHandler(
+    domainSigners,
+    config.domains,
+    domainThresholdStateService
   )
 
   app.post(CombinerEndpoint.PNP_QUOTA, createHandler(config.phoneNumberPrivacy.enabled, pnpQuota))

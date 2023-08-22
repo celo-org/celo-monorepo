@@ -5,28 +5,18 @@ import {
   OdisResponse,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { Request, Response } from 'express'
+import { Response } from 'express'
 import { SignerResponse } from './io'
 
 export class Session<R extends OdisRequest> {
-  // public timedOut: boolean = false
   readonly logger: Logger
-  // readonly abort: AbortController = new AbortController()
-  readonly failedSigners: Set<string> = new Set<string>()
+
   readonly errorCodes: Map<number, number> = new Map<number, number>()
   readonly responses: Array<SignerResponse<R>> = new Array<SignerResponse<R>>()
   readonly warnings: string[] = []
 
-  public constructor(
-    readonly request: Request<{}, {}, R>,
-    readonly response: Response<OdisResponse<R>>,
-    readonly keyVersionInfo: KeyVersionInfo
-  ) {
+  public constructor(response: Response<OdisResponse<R>>, readonly keyVersionInfo: KeyVersionInfo) {
     this.logger = response.locals.logger
-  }
-
-  incrementErrorCodeCount(errorCode: number) {
-    this.errorCodes.set(errorCode, (this.errorCodes.get(errorCode) ?? 0) + 1)
   }
 
   getMajorityErrorCode(): number | null {

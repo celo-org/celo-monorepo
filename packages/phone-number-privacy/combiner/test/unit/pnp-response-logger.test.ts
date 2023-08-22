@@ -38,11 +38,7 @@ describe('pnp response logger', () => {
         logger: rootLogger(config.serviceName),
       },
     } as Response
-    const session = new Session<PnpQuotaRequest | SignMessageRequest>(
-      mockRequest,
-      mockResponse,
-      keyVersionInfo
-    )
+    const session = new Session<PnpQuotaRequest | SignMessageRequest>(mockResponse, keyVersionInfo)
     responses.forEach((res) => {
       session.responses.push({ url, res, status: 200 })
     })

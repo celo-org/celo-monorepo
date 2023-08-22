@@ -1,53 +1,66 @@
 import {
+  authenticateUser,
+  CombinerEndpoint,
+  DataEncryptionKeyFetcher,
   ErrorMessage,
-  OdisResponse,
+  hasValidAccountParam,
+  isBodyReasonablySized,
   PnpQuotaRequest,
+  PnpQuotaRequestSchema,
   PnpQuotaResponseSchema,
   send,
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { Request, Response } from 'express'
-import { Action } from '../../../common/action'
+import { Request } from 'express'
 import { Signer, thresholdCallToSigners } from '../../../common/combine'
-import { Locals } from '../../../common/handlers'
-import { IO, sendFailure } from '../../../common/io'
+import { PromiseHandler } from '../../../common/handlers'
+import { getKeyVersionInfo, sendFailure } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { getCombinerVersion, OdisConfig } from '../../../config'
 import { PnpSignerResponseLogger } from '../../services/log-responses'
 import { PnpThresholdStateService } from '../../services/threshold-state'
 
-export class PnpQuotaAction implements Action<PnpQuotaRequest> {
-  readonly responseLogger: PnpSignerResponseLogger = new PnpSignerResponseLogger()
-  protected readonly signers: Signer[] = JSON.parse(this.config.odisServices.signers)
+export function createPnpQuotaHandler(
+  signers: Signer[],
+  config: OdisConfig,
+  thresholdStateService: PnpThresholdStateService<PnpQuotaRequest>,
+  dekFetcher: DataEncryptionKeyFetcher
+): PromiseHandler<PnpQuotaRequest> {
+  const signerEndpoint = CombinerEndpoint.PNP_QUOTA
+  const responseLogger: PnpSignerResponseLogger = new PnpSignerResponseLogger()
+  return async (request, response) => {
+    const logger = response.locals.logger
+    if (!validateRequest(request)) {
+      sendFailure(WarningMessage.INVALID_INPUT, 400, response)
+      return
+    }
 
-  constructor(
-    readonly config: OdisConfig,
-    readonly thresholdStateService: PnpThresholdStateService<PnpQuotaRequest>,
-    readonly io: IO<PnpQuotaRequest>
-  ) {}
+    if (!(await authenticateUser(request, logger, dekFetcher))) {
+      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
+      return
+    }
+    const keyVersionInfo = getKeyVersionInfo(request, config, logger)
+    const session = new Session(response, keyVersionInfo)
 
-  async perform(
-    _request: Request<{}, {}, PnpQuotaRequest>,
-    response: Response<OdisResponse<PnpQuotaRequest>, Locals>,
-    session: Session<PnpQuotaRequest>
-  ) {
     await thresholdCallToSigners(
-      response.locals.logger,
-      this.signers,
-      this.io.signerEndpoint,
-      session,
+      logger,
+      signers,
+      signerEndpoint,
+      request,
+      session.keyVersionInfo,
       null,
-      this.config.odisServices.timeoutMilliSeconds,
+      config.odisServices.timeoutMilliSeconds,
       PnpQuotaResponseSchema
     )
 
-    this.responseLogger.logResponseDiscrepancies(session)
-    this.responseLogger.logFailOpenResponses(session)
+    responseLogger.logResponseDiscrepancies(session)
+    responseLogger.logFailOpenResponses(session)
 
     const { threshold } = session.keyVersionInfo
 
     if (session.responses.length >= threshold) {
       try {
-        const quotaStatus = this.thresholdStateService.findCombinerQuotaState(session)
+        const quotaStatus = thresholdStateService.findCombinerQuotaState(session)
         send(
           response,
           {
@@ -57,7 +70,7 @@ export class PnpQuotaAction implements Action<PnpQuotaRequest> {
             warnings: session.warnings,
           },
           200,
-          response.locals.logger
+          logger
         )
 
         return
@@ -68,7 +81,17 @@ export class PnpQuotaAction implements Action<PnpQuotaRequest> {
     sendFailure(
       ErrorMessage.THRESHOLD_PNP_QUOTA_STATUS_FAILURE,
       session.getMajorityErrorCode() ?? 500,
-      session.response
+      response
     )
   }
+}
+
+function validateRequest(
+  request: Request<{}, {}, unknown>
+): request is Request<{}, {}, PnpQuotaRequest> {
+  return (
+    PnpQuotaRequestSchema.is(request.body) &&
+    hasValidAccountParam(request.body) &&
+    isBodyReasonablySized(request.body)
+  )
 }

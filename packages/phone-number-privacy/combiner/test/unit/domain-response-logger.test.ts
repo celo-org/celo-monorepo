@@ -35,7 +35,7 @@ describe('domain response logger', () => {
         logger: rootLogger(config.serviceName),
       },
     } as Response
-    const session = new Session<DomainRequest>(mockRequest, mockResponse, keyVersionInfo)
+    const session = new Session<DomainRequest>(mockResponse, keyVersionInfo)
     responses.forEach((res) => {
       session.responses.push({ url, res, status: 200 })
     })

@@ -1,15 +1,16 @@
 import {
   ErrorMessage,
+  KeyVersionInfo,
   OdisRequest,
   OdisResponse,
   responseHasExpectedKeyVersion,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
+import { Request } from 'express'
 import * as t from 'io-ts'
 import { PerformanceObserver } from 'perf_hooks'
 import { fetchSignerResponseWithFallback } from './io'
-import { Session } from './session'
 
 export interface Signer {
   url: string
@@ -20,7 +21,8 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
   logger: Logger,
   signers: Signer[],
   endpoint: string,
-  session: Session<R>,
+  request: Request<R>,
+  keyVersionInfo: KeyVersionInfo,
   keyVersion: number | null,
   requestTimeoutMS: number,
   responseSchema: t.Type<OdisResponse<R>, OdisResponse<R>, unknown>,
@@ -47,7 +49,7 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
   const failedSigners: string[] = []
   const errorCodes: Map<number, number> = new Map<number, number>()
 
-  const requiredThreshold = session.keyVersionInfo.threshold
+  const requiredThreshold = keyVersionInfo.threshold
 
   // Forward request to signers
   // An unexpected error in handling the result for one signer should not
@@ -58,7 +60,8 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
         const signerFetchResult = await fetchSignerResponseWithFallback(
           signer,
           endpoint,
-          session,
+          keyVersionInfo.keyVersion,
+          request,
           logger,
           abortSignal
         )
@@ -88,7 +91,7 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
         }
 
         const data: any = await signerFetchResult.json()
-        session.logger.info(
+        logger.info(
           { signer, res: data, status: signerFetchResult.status },
           `received 'OK' response from signer`
         )

@@ -7,7 +7,6 @@ import {
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { performance, PerformanceObserver } from 'perf_hooks'
-import { Action } from './action'
 import { sendFailure } from './io'
 
 export interface Locals {
@@ -76,23 +75,6 @@ export function meteringHandler<R extends OdisRequest>(
       performance.measure(entryName, startMark, endMark)
       performance.clearMarks()
       obs.disconnect()
-    }
-  }
-}
-
-export function actionHandler<R extends OdisRequest>(action: Action<R>): PromiseHandler<R> {
-  return async (request, response) => {
-    try {
-      const session = await action.io.init(request, response)
-      if (session) {
-        await action.perform(request, response, session)
-      }
-    } catch (err) {
-      response.locals.logger.error(
-        { error: err },
-        `Unknown error in handler for ${action.io.endpoint}`
-      )
-      sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, response)
     }
   }
 }

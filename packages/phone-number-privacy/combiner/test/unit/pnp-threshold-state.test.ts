@@ -35,17 +35,12 @@ describe('pnp threshold state', () => {
         logger: rootLogger,
       },
     } as Response
-    const session = new Session<PnpQuotaRequest | SignMessageRequest>(
-      mockRequest,
-      mockResponse,
-      keyVersionInfo
-    )
+    const session = new Session<PnpQuotaRequest | SignMessageRequest>(mockResponse, keyVersionInfo)
     quotaData.forEach((q) => {
       const res: PnpQuotaResponseSuccess | SignMessageResponseSuccess = {
         success: true,
         version: expectedVersion,
         ...q,
-        blockNumber: testBlockNumber,
       }
       session.responses.push({ url: 'random url', res, status: 200 })
     })

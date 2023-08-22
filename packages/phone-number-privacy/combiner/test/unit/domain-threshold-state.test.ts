@@ -33,7 +33,7 @@ describe('domain threshold state', () => {
         logger: new Logger({ name: 'logger' }),
       },
     } as Response
-    const session = new Session(mockRequest, mockResponse, keyVersionInfo)
+    const session = new Session(mockResponse, keyVersionInfo)
     domainStates.forEach((status) => {
       const res: DomainRestrictedSignatureResponseSuccess | DomainQuotaStatusResponseSuccess = {
         success: true,
