@@ -10,6 +10,7 @@ import {
   isPriceToLow,
   recoverTransaction,
   rlpEncodedTx,
+  stringNumberOrBNToHex,
 } from './signing-utils'
 const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1)) as `0x${string}`
@@ -580,5 +581,23 @@ describe('getSignerFromTx', () => {
       { serializer: celo.serializers?.transaction }
     )
     expect(getSignerFromTxCIP42(signed)).toEqual(account.address)
+  })
+})
+
+describe('stringNumberOrBNToHex', () => {
+  test('string as base 10 number', () => {
+    expect(stringNumberOrBNToHex('1230000000000020')).toEqual('0x045eadb112e014')
+    expect(stringNumberOrBNToHex('123')).toEqual('0x7b')
+  })
+  test('string as base 16 number', () => {
+    expect(stringNumberOrBNToHex('0x7b')).toEqual('0x7b')
+  })
+  test('number', () => {
+    expect(stringNumberOrBNToHex(1230000000000020)).toEqual('0x045eadb112e014')
+    expect(stringNumberOrBNToHex(123)).toEqual('0x7b')
+  })
+  test('BN', () => {
+    const biggie = Web3.utils.toBN('123')
+    expect(stringNumberOrBNToHex(biggie)).toEqual('0x7b')
   })
 })
