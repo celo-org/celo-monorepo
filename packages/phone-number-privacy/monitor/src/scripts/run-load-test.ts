@@ -1,7 +1,9 @@
 import { OdisContextName } from '@celo/identity/lib/odis/query'
-import { CombinerEndpointPNP } from '@celo/phone-number-privacy-common'
+import { CombinerEndpointPNP, rootLogger } from '@celo/phone-number-privacy-common'
 import yargs from 'yargs'
 import { concurrentRPSLoadTest } from '../test'
+
+const logger = rootLogger('odis-monitor')
 
 // tslint:disable-next-line: no-unused-expression
 yargs
@@ -23,6 +25,11 @@ yargs
           type: 'number',
           description: 'Number of requests per second to generate',
         })
+        .option('duration', {
+          type: 'number',
+          description: 'Duration of the loadtest in Ms.',
+          default: 0,
+        })
         .option('bypassQuota', {
           type: 'boolean',
           description: 'Bypass Signer quota check.',
@@ -32,10 +39,15 @@ yargs
           type: 'boolean',
           description: 'Use Data Encryption Key (DEK) to authenticate.',
           default: false,
+        })
+        .option('movingAvgRequests', {
+          type: 'number',
+          description: 'number of requests to use when calculating latency moving average',
+          default: 50,
         }),
     (args) => {
       if (args.rps == null || args.contextName == null) {
-        console.error('missing positional arguments')
+        logger.error('missing positional arguments')
         yargs.showHelp()
         process.exit(1)
       }
@@ -52,13 +64,13 @@ yargs
           blockchainProvider = 'https://forno.celo.org'
           break
         default:
-          console.error('Invalid contextName')
+          logger.error('Invalid contextName')
           yargs.showHelp()
           process.exit(1)
       }
 
       if (rps < 1) {
-        console.error('Invalid rps')
+        logger.error('Invalid rps')
         yargs.showHelp()
         process.exit(1)
       }
@@ -67,9 +79,10 @@ yargs
         blockchainProvider!,
         contextName,
         CombinerEndpointPNP.PNP_SIGN,
-        0,
+        args.duration,
         args.bypassQuota,
-        args.useDEK
+        args.useDEK,
+        args.movingAvgRequests
       ) // tslint:disable-line:no-floating-promises
     }
   ).argv
