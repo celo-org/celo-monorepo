@@ -46,9 +46,9 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
     if (tx.nonce < 0 || tx.gas < 0 || tx.gasPrice < 0 || tx.chainId < 0) {
       throw new Error('Gas, gasPrice, nonce or chainId is lower than 0')
     }
-
     try {
       tx = inputCeloTxFormatter(tx)
+      console.info('protocol signing-util', tx)
 
       const transaction = tx
       transaction.to = tx.to || '0x'
