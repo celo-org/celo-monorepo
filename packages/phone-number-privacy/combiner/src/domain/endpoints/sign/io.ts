@@ -3,12 +3,7 @@ import {
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestSchema,
   DomainRestrictedSignatureResponse,
-  domainRestrictedSignatureResponseSchema,
-  DomainRestrictedSignatureResponseSuccess,
   DomainSchema,
-  DomainState,
-  send,
-  SequentialDelayDomainStateSchema,
   verifyDomainRestrictedSignatureRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -22,7 +17,7 @@ import {
   requestHasSupportedKeyVersion,
   sendFailure,
 } from '../../../common/io'
-import { getCombinerVersion, OdisConfig } from '../../../config'
+import { OdisConfig } from '../../../config'
 
 export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
   readonly requestSchema: t.Type<
@@ -30,11 +25,6 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
     DomainRestrictedSignatureRequest,
     unknown
   > = domainRestrictedSignatureRequestSchema(DomainSchema)
-  readonly responseSchema: t.Type<
-    DomainRestrictedSignatureResponse,
-    DomainRestrictedSignatureResponse,
-    unknown
-  > = domainRestrictedSignatureResponseSchema(SequentialDelayDomainStateSchema)
 
   constructor(config: OdisConfig) {
     super(config, CombinerEndpoint.DOMAIN_SIGN)
@@ -66,25 +56,6 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
       response,
       keyVersionInfo,
       new DomainCryptoClient(keyVersionInfo)
-    )
-  }
-
-  sendSuccess(
-    status: number,
-    response: Response<DomainRestrictedSignatureResponseSuccess>,
-    signature: string,
-    domainState: DomainState
-  ) {
-    send(
-      response,
-      {
-        success: true,
-        version: getCombinerVersion(),
-        signature,
-        status: domainState,
-      },
-      status,
-      response.locals.logger
     )
   }
 }

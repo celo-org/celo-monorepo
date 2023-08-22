@@ -4,15 +4,14 @@ import {
   OdisRequest,
   OdisResponse,
 } from '@celo/phone-number-privacy-common'
-import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { SignerResponse } from './io'
 
 export class Session<R extends OdisRequest> {
-  public timedOut: boolean = false
+  // public timedOut: boolean = false
   readonly logger: Logger
-  readonly abort: AbortController = new AbortController()
+  // readonly abort: AbortController = new AbortController()
   readonly failedSigners: Set<string> = new Set<string>()
   readonly errorCodes: Map<number, number> = new Map<number, number>()
   readonly responses: Array<SignerResponse<R>> = new Array<SignerResponse<R>>()
@@ -52,4 +51,3 @@ export class Session<R extends OdisRequest> {
     return maxErrorCode > 0 ? maxErrorCode : null
   }
 }
-;``

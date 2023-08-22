@@ -6,13 +6,9 @@ import {
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
   isBodyReasonablySized,
-  PnpQuotaStatus,
-  send,
   SignMessageRequest,
   SignMessageRequestSchema,
   SignMessageResponse,
-  SignMessageResponseSchema,
-  SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
@@ -26,13 +22,11 @@ import {
   sendFailure,
 } from '../../../common/io'
 import { Session } from '../../../common/session'
-import { getCombinerVersion, OdisConfig } from '../../../config'
+import { OdisConfig } from '../../../config'
 
 export class PnpSignIO extends IO<SignMessageRequest> {
   readonly requestSchema: t.Type<SignMessageRequest, SignMessageRequest, unknown> =
     SignMessageRequestSchema
-  readonly responseSchema: t.Type<SignMessageResponse, SignMessageResponse, unknown> =
-    SignMessageResponseSchema
 
   constructor(
     config: OdisConfig,
@@ -75,27 +69,6 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       hasValidAccountParam(request.body) &&
       hasValidBlindedPhoneNumberParam(request.body) &&
       isBodyReasonablySized(request.body)
-    )
-  }
-
-  sendSuccess(
-    status: number,
-    response: Response<SignMessageResponseSuccess>,
-    signature: string,
-    quotaStatus: PnpQuotaStatus,
-    warnings: string[]
-  ) {
-    send(
-      response,
-      {
-        success: true,
-        version: getCombinerVersion(),
-        signature,
-        ...quotaStatus,
-        warnings,
-      },
-      status,
-      response.locals.logger
     )
   }
 }

@@ -1,28 +1,60 @@
-import { DisableDomainRequest, ErrorMessage } from '@celo/phone-number-privacy-common'
-import { CombineAction } from '../../../common/combine'
+import {
+  DisableDomainRequest,
+  disableDomainResponseSchema,
+  ErrorMessage,
+  OdisResponse,
+  send,
+  SequentialDelayDomainStateSchema,
+} from '@celo/phone-number-privacy-common'
+import { Request, Response } from 'express'
+import { Action } from '../../../common/action'
+import { Signer, thresholdCallToSigners } from '../../../common/combine'
+import { Locals } from '../../../common/handlers'
 import { IO, sendFailure } from '../../../common/io'
 import { Session } from '../../../common/session'
-import { OdisConfig } from '../../../config'
+import { getCombinerVersion, OdisConfig } from '../../../config'
 import { DomainSignerResponseLogger } from '../../services/log-responses'
 import { DomainThresholdStateService } from '../../services/threshold-state'
 
-export class DomainDisableAction extends CombineAction<DisableDomainRequest> {
+export class DomainDisableAction implements Action<DisableDomainRequest> {
   readonly responseLogger: DomainSignerResponseLogger = new DomainSignerResponseLogger()
-
+  protected readonly signers: Signer[] = JSON.parse(this.config.odisServices.signers)
   constructor(
     readonly config: OdisConfig,
     readonly thresholdStateService: DomainThresholdStateService<DisableDomainRequest>,
     readonly io: IO<DisableDomainRequest>
-  ) {
-    super(config, io)
-  }
+  ) {}
 
-  combine(session: Session<DisableDomainRequest>): void {
+  async perform(
+    _request: Request<{}, {}, DisableDomainRequest>,
+    response: Response<OdisResponse<DisableDomainRequest>, Locals>,
+    session: Session<DisableDomainRequest>
+  ) {
+    await thresholdCallToSigners(
+      response.locals.logger,
+      this.signers,
+      this.io.signerEndpoint,
+      session,
+      null,
+      this.config.odisServices.timeoutMilliSeconds,
+      disableDomainResponseSchema(SequentialDelayDomainStateSchema)
+    )
+
     this.responseLogger.logResponseDiscrepancies(session)
     try {
       const disableDomainStatus = this.thresholdStateService.findThresholdDomainState(session)
       if (disableDomainStatus.disabled) {
-        this.io.sendSuccess(200, session.response, disableDomainStatus)
+        send(
+          response,
+          {
+            success: true,
+            version: getCombinerVersion(),
+            status: disableDomainStatus,
+          },
+          200,
+          response.locals.logger
+        )
+
         return
       }
     } catch (err) {

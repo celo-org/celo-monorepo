@@ -9,16 +9,13 @@ import {
   PnpQuotaRequestSchema,
   PnpQuotaResponse,
   PnpQuotaResponseSchema,
-  PnpQuotaResponseSuccess,
-  PnpQuotaStatus,
-  send,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
 import { getKeyVersionInfo, IO, sendFailure } from '../../../common/io'
 import { Session } from '../../../common/session'
-import { getCombinerVersion, OdisConfig } from '../../../config'
+import { OdisConfig } from '../../../config'
 
 export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   readonly requestSchema: t.Type<PnpQuotaRequest, PnpQuotaRequest, unknown> = PnpQuotaRequestSchema
@@ -57,25 +54,6 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       super.validateClientRequest(request) &&
       hasValidAccountParam(request.body) &&
       isBodyReasonablySized(request.body)
-    )
-  }
-
-  sendSuccess(
-    status: number,
-    response: Response<PnpQuotaResponseSuccess>,
-    quotaStatus: PnpQuotaStatus,
-    warnings: string[]
-  ) {
-    send(
-      response,
-      {
-        success: true,
-        version: getCombinerVersion(),
-        ...quotaStatus,
-        warnings,
-      },
-      status,
-      response.locals.logger
     )
   }
 }

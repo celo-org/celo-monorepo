@@ -1,6 +1,5 @@
 import {
   CombinerEndpoint,
-  ErrorMessage,
   ErrorType,
   getRequestKeyVersion,
   getSignerEndpoint,
@@ -11,7 +10,6 @@ import {
   requestHasValidKeyVersion,
   send,
   SignerEndpoint,
-  SuccessResponse,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
@@ -32,7 +30,6 @@ export type SignerResponse<R extends OdisRequest> = {
 export abstract class IO<R extends OdisRequest> {
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
   abstract readonly requestSchema: t.Type<R, R, unknown>
-  abstract readonly responseSchema: t.Type<OdisResponse<R>, OdisResponse<R>, unknown>
 
   constructor(readonly config: OdisConfig, readonly endpoint: CombinerEndpoint) {}
 
@@ -41,26 +38,8 @@ export abstract class IO<R extends OdisRequest> {
     response: Response<OdisResponse<R>>
   ): Promise<Session<R> | null>
 
-  abstract sendSuccess(
-    status: number,
-    response: Response<SuccessResponse<R>>,
-    ...args: unknown[]
-  ): void
-
   validateClientRequest(request: Request<{}, {}, unknown>): request is Request<{}, {}, R> {
     return this.requestSchema.is(request.body)
-  }
-
-  validateSignerResponse(data: string, url: string, logger: Logger): OdisResponse<R> {
-    const res: unknown = JSON.parse(data)
-    if (!this.responseSchema.is(res)) {
-      logger.error(
-        { data, signer: url },
-        `Signer request to ${url + this.signerEndpoint} returned malformed response`
-      )
-      throw new Error(ErrorMessage.INVALID_SIGNER_RESPONSE)
-    }
-    return res
   }
 }
 
@@ -105,9 +84,11 @@ export function getKeyVersionInfo(
 export async function fetchSignerResponseWithFallback<R extends OdisRequest>(
   signer: Signer,
   signerEndpoint: string,
-  session: Session<R>
+  session: Session<R>,
+  logger: Logger,
+  abortSignal: AbortSignal
 ): Promise<FetchResponse> {
-  const { request, abort } = session
+  const { request } = session
 
   async function fetchSignerResponse(url: string): Promise<FetchResponse> {
     // prettier-ignore
@@ -123,16 +104,15 @@ export async function fetchSignerResponseWithFallback<R extends OdisRequest>(
         [KEY_VERSION_HEADER]: session.keyVersionInfo.keyVersion.toString()
       },
       body: JSON.stringify(request.body),
-      // @ts-ignore: missing property `reason`
-      signal: abort.signal,
+      signal: abortSignal,
     })
   }
 
   return measureTime(signer.url + signerEndpoint, () =>
     fetchSignerResponse(signer.url + signerEndpoint).catch((err) => {
-      session.logger.error({ url: signer.url, error: err }, `Signer failed with primary url`)
+      logger.error({ url: signer.url, error: err }, `Signer failed with primary url`)
       if (signer.fallbackUrl) {
-        session.logger.warn({ url: signer.fallbackUrl }, `Using fallback url to call signer`)
+        logger.warn({ url: signer.fallbackUrl }, `Using fallback url to call signer`)
         return fetchSignerResponse(signer.fallbackUrl + signerEndpoint)
       } else {
         throw err
