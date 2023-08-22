@@ -3,6 +3,7 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { performance, PerformanceObserver } from 'perf_hooks'
 import { Action } from './action'
+import { sendFailure } from './io'
 
 export interface Locals {
   logger: Logger
@@ -86,7 +87,7 @@ export function actionHandler<R extends OdisRequest>(action: Action<R>): Promise
         { error: err },
         `Unknown error in handler for ${action.io.endpoint}`
       )
-      action.io.sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, response)
+      sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, response)
     }
   }
 }

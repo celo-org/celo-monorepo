@@ -1,7 +1,6 @@
 import { ContractKit } from '@celo/contractkit'
 import {
   CombinerEndpoint,
-  ErrorType,
   getSignerEndpoint,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
@@ -12,7 +11,6 @@ import {
   SignMessageRequest,
   SignMessageRequestSchema,
   SignMessageResponse,
-  SignMessageResponseFailure,
   SignMessageResponseSchema,
   SignMessageResponseSuccess,
   WarningMessage,
@@ -22,7 +20,12 @@ import { Request, Response } from 'express'
 import * as t from 'io-ts'
 import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-crypto-client'
 import { CryptoSession } from '../../../common/crypto-session'
-import { IO } from '../../../common/io'
+import {
+  getKeyVersionInfo,
+  IO,
+  requestHasSupportedKeyVersion,
+  sendFailure,
+} from '../../../common/io'
 import { Session } from '../../../common/session'
 import { getCombinerVersion, OdisConfig } from '../../../config'
 
@@ -45,15 +48,15 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     if (!super.inputChecks(request, response)) {
       return null
     }
-    if (!this.requestHasSupportedKeyVersion(request, response.locals.logger)) {
-      this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
+    if (!requestHasSupportedKeyVersion(request, this.config, response.locals.logger)) {
+      sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return null
     }
     if (!(await this.authenticate(request, response.locals.logger))) {
-      this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
+      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    const keyVersionInfo = this.getKeyVersionInfo(request, response.locals.logger)
+    const keyVersionInfo = getKeyVersionInfo(request, this.config, response.locals.logger)
     return new CryptoSession(
       request,
       response,
@@ -106,19 +109,6 @@ export class PnpSignIO extends IO<SignMessageRequest> {
         signature,
         ...quotaStatus,
         warnings,
-      },
-      status,
-      response.locals.logger
-    )
-  }
-
-  sendFailure(error: ErrorType, status: number, response: Response<SignMessageResponseFailure>) {
-    send(
-      response,
-      {
-        success: false,
-        version: getCombinerVersion(),
-        error,
       },
       status,
       response.locals.logger

@@ -12,7 +12,7 @@ import { DomainThresholdStateService } from '../domain/services/threshold-state'
 import { PnpThresholdStateService } from '../pnp/services/threshold-state'
 import { CombineAction } from './combine'
 import { CryptoSession } from './crypto-session'
-import { IO } from './io'
+import { IO, sendFailure } from './io'
 
 // prettier-ignore
 export type OdisSignatureRequest =
@@ -85,7 +85,7 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
   protected handleMissingSignatures(session: CryptoSession<R>) {
     const errorCode = session.getMajorityErrorCode() ?? 500
     const error = this.errorCodeToError(errorCode)
-    this.io.sendFailure(error, errorCode, session.response)
+    sendFailure(error, errorCode, session.response)
   }
 
   protected abstract errorCodeToError(errorCode: number): ErrorType

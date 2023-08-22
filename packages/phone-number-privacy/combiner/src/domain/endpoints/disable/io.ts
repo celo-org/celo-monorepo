@@ -18,7 +18,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
-import { IO } from '../../../common/io'
+import { getKeyVersionInfo, IO, sendFailure } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { getCombinerVersion } from '../../../config'
 
@@ -38,10 +38,14 @@ export class DomainDisableIO extends IO<DisableDomainRequest> {
       return null
     }
     if (!(await this.authenticate(request))) {
-      this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
+      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new Session(request, response, this.getKeyVersionInfo(request, response.locals.logger))
+    return new Session(
+      request,
+      response,
+      getKeyVersionInfo(request, this.config, response.locals.logger)
+    )
   }
 
   authenticate(request: Request<{}, {}, DisableDomainRequest>): Promise<boolean> {
@@ -66,15 +70,6 @@ export class DomainDisableIO extends IO<DisableDomainRequest> {
   }
 
   sendFailure(error: ErrorType, status: number, response: Response<DisableDomainResponseFailure>) {
-    send(
-      response,
-      {
-        success: false,
-        version: getCombinerVersion(),
-        error,
-      },
-      status,
-      response.locals.logger
-    )
+    sendFailure(error, status, response)
   }
 }

@@ -3,12 +3,10 @@ import {
   DomainQuotaStatusRequest,
   domainQuotaStatusRequestSchema,
   DomainQuotaStatusResponse,
-  DomainQuotaStatusResponseFailure,
   domainQuotaStatusResponseSchema,
   DomainQuotaStatusResponseSuccess,
   DomainSchema,
   DomainState,
-  ErrorType,
   getSignerEndpoint,
   OdisResponse,
   send,
@@ -19,7 +17,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
-import { IO } from '../../../common/io'
+import { getKeyVersionInfo, IO, sendFailure } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { getCombinerVersion } from '../../../config'
 
@@ -39,10 +37,10 @@ export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
       return null
     }
     if (!(await this.authenticate(request))) {
-      this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
+      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    const keyVersionInfo = this.getKeyVersionInfo(request, response.locals.logger)
+    const keyVersionInfo = getKeyVersionInfo(request, this.config, response.locals.logger)
     return new Session(request, response, keyVersionInfo)
   }
 
@@ -61,23 +59,6 @@ export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
         success: true,
         version: getCombinerVersion(),
         status: domainState,
-      },
-      status,
-      response.locals.logger
-    )
-  }
-
-  sendFailure(
-    error: ErrorType,
-    status: number,
-    response: Response<DomainQuotaStatusResponseFailure>
-  ) {
-    send(
-      response,
-      {
-        success: false,
-        version: getCombinerVersion(),
-        error,
       },
       status,
       response.locals.logger

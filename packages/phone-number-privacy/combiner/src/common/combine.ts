@@ -9,7 +9,7 @@ import { Response as FetchResponse } from 'node-fetch'
 import { PerformanceObserver } from 'perf_hooks'
 import { OdisConfig } from '../config'
 import { Action } from './action'
-import { IO } from './io'
+import { fetchSignerResponseWithFallback, IO } from './io'
 import { Session } from './session'
 
 export interface Signer {
@@ -18,7 +18,8 @@ export interface Signer {
 }
 
 export abstract class CombineAction<R extends OdisRequest> implements Action<R> {
-  readonly signers: Signer[]
+  private readonly signers: Signer[]
+
   public constructor(readonly config: OdisConfig, readonly io: IO<R>) {
     this.signers = JSON.parse(config.odisServices.signers)
   }
@@ -82,10 +83,14 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
     obs.disconnect()
   }
 
-  protected async forwardToSigner(signer: Signer, session: Session<R>): Promise<void> {
+  private async forwardToSigner(signer: Signer, session: Session<R>): Promise<void> {
     let signerFetchResult: FetchResponse | undefined
     try {
-      signerFetchResult = await this.io.fetchSignerResponseWithFallback(signer, session)
+      signerFetchResult = await fetchSignerResponseWithFallback(
+        signer,
+        this.io.signerEndpoint,
+        session
+      )
       session.logger.info({
         message: 'Received signerFetchResult',
         signer: signer.url,
@@ -108,7 +113,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
     return this.handleFetchResult(signer, session, signerFetchResult)
   }
 
-  protected async handleFetchResult(
+  private async handleFetchResult(
     signer: Signer,
     session: Session<R>,
     signerFetchResult?: FetchResponse
@@ -178,3 +183,29 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
     }
   }
 }
+
+// async function callSigner(logger: Logger, signer: Signer) {
+//   let signerFetchResult: FetchResponse | undefined
+//   try {
+//     signerFetchResult = await this.io.fetchSignerResponseWithFallback(signer, session)
+//     logger.info({
+//       message: 'Received signerFetchResult',
+//       signer: signer.url,
+//       status: signerFetchResult.status,
+//     })
+//   } catch (err) {
+//     logger.debug({ err, signer: signer.url, message: 'signer request failure' })
+//     if (err instanceof Error && err.name === 'AbortError' && session.abort.signal.aborted) {
+//       if (session.timedOut) {
+//         logger.error({ signer }, ErrorMessage.TIMEOUT_FROM_SIGNER)
+//       } else {
+//         logger.info({ signer }, WarningMessage.CANCELLED_REQUEST_TO_SIGNER)
+//       }
+//     } else {
+//       // Logging the err & message simultaneously fails to log the message in some cases
+//       logger.error({ signer }, ErrorMessage.SIGNER_REQUEST_ERROR)
+//       logger.error({ signer, err })
+//     }
+//   }
+//   return this.handleFetchResult(signer, session, signerFetchResult)
+// }

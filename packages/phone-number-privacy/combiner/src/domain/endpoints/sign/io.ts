@@ -3,12 +3,10 @@ import {
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestSchema,
   DomainRestrictedSignatureResponse,
-  DomainRestrictedSignatureResponseFailure,
   domainRestrictedSignatureResponseSchema,
   DomainRestrictedSignatureResponseSuccess,
   DomainSchema,
   DomainState,
-  ErrorType,
   getSignerEndpoint,
   send,
   SequentialDelayDomainStateSchema,
@@ -19,7 +17,12 @@ import { Request, Response } from 'express'
 import * as t from 'io-ts'
 import { DomainCryptoClient } from '../../../common/crypto-clients/domain-crypto-client'
 import { CryptoSession } from '../../../common/crypto-session'
-import { IO } from '../../../common/io'
+import {
+  getKeyVersionInfo,
+  IO,
+  requestHasSupportedKeyVersion,
+  sendFailure,
+} from '../../../common/io'
 import { getCombinerVersion } from '../../../config'
 
 export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
@@ -43,15 +46,15 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
     if (!super.inputChecks(request, response)) {
       return null
     }
-    if (!this.requestHasSupportedKeyVersion(request, response.locals.logger)) {
-      this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
+    if (!requestHasSupportedKeyVersion(request, this.config, response.locals.logger)) {
+      sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return null
     }
     if (!(await this.authenticate(request))) {
-      this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
+      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    const keyVersionInfo = this.getKeyVersionInfo(request, response.locals.logger)
+    const keyVersionInfo = getKeyVersionInfo(request, this.config, response.locals.logger)
     return new CryptoSession(
       request,
       response,
@@ -80,23 +83,6 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
         version: getCombinerVersion(),
         signature,
         status: domainState,
-      },
-      status,
-      response.locals.logger
-    )
-  }
-
-  sendFailure(
-    error: ErrorType,
-    status: number,
-    response: Response<DomainRestrictedSignatureResponseFailure>
-  ) {
-    send(
-      response,
-      {
-        success: false,
-        version: getCombinerVersion(),
-        error,
       },
       status,
       response.locals.logger

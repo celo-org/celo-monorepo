@@ -1,14 +1,12 @@
 import { ContractKit } from '@celo/contractkit'
 import {
   CombinerEndpoint,
-  ErrorType,
   getSignerEndpoint,
   hasValidAccountParam,
   isBodyReasonablySized,
   PnpQuotaRequest,
   PnpQuotaRequestSchema,
   PnpQuotaResponse,
-  PnpQuotaResponseFailure,
   PnpQuotaResponseSchema,
   PnpQuotaResponseSuccess,
   PnpQuotaStatus,
@@ -19,7 +17,7 @@ import {
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
-import { IO } from '../../../common/io'
+import { getKeyVersionInfo, IO, sendFailure } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { getCombinerVersion, OdisConfig } from '../../../config'
 
@@ -42,10 +40,10 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       return null
     }
     if (!(await this.authenticate(request, response.locals.logger))) {
-      this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
+      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    const keyVersionInfo = this.getKeyVersionInfo(request, response.locals.logger)
+    const keyVersionInfo = getKeyVersionInfo(request, this.config, response.locals.logger)
     return new Session(request, response, keyVersionInfo)
   }
 
@@ -88,19 +86,6 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
         version: getCombinerVersion(),
         ...quotaStatus,
         warnings,
-      },
-      status,
-      response.locals.logger
-    )
-  }
-
-  sendFailure(error: ErrorType, status: number, response: Response<PnpQuotaResponseFailure>) {
-    send(
-      response,
-      {
-        success: false,
-        version: getCombinerVersion(),
-        error,
       },
       status,
       response.locals.logger

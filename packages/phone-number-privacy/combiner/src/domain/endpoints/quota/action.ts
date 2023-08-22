@@ -1,6 +1,6 @@
 import { DomainQuotaStatusRequest, ErrorMessage } from '@celo/phone-number-privacy-common'
 import { CombineAction } from '../../../common/combine'
-import { IO } from '../../../common/io'
+import { IO, sendFailure } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { OdisConfig } from '../../../config'
 import { DomainSignerResponseLogger } from '../../services/log-responses'
@@ -29,11 +29,10 @@ export class DomainQuotaAction extends CombineAction<DomainQuotaStatusRequest> {
         session.logger.error(err, 'Error combining signer quota status responses')
       }
     }
-    this.io.sendFailure(
+    sendFailure(
       ErrorMessage.THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE,
       session.getMajorityErrorCode() ?? 500,
-      session.response,
-      session.logger
+      session.response
     )
   }
 }

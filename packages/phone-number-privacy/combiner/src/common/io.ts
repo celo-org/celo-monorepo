@@ -2,13 +2,13 @@ import {
   CombinerEndpoint,
   ErrorMessage,
   ErrorType,
-  FailureResponse,
   getRequestKeyVersion,
-  KEY_VERSION_HEADER,
   KeyVersionInfo,
+  KEY_VERSION_HEADER,
   OdisRequest,
   OdisResponse,
   requestHasValidKeyVersion,
+  send,
   SignerEndpoint,
   SuccessResponse,
   WarningMessage,
@@ -18,7 +18,7 @@ import { Request, Response } from 'express'
 import * as t from 'io-ts'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { performance } from 'perf_hooks'
-import { OdisConfig } from '../config'
+import { getCombinerVersion, OdisConfig } from '../config'
 import { Signer } from './combine'
 import { Session } from './session'
 
@@ -44,13 +44,6 @@ export abstract class IO<R extends OdisRequest> {
 
   abstract authenticate(request: Request<{}, {}, R>, logger?: Logger): Promise<boolean>
 
-  abstract sendFailure(
-    error: ErrorType,
-    status: number,
-    response: Response<FailureResponse<R>>,
-    ...args: unknown[]
-  ): void
-
   abstract sendSuccess(
     status: number,
     response: Response<SuccessResponse<R>>,
@@ -59,36 +52,6 @@ export abstract class IO<R extends OdisRequest> {
 
   validateClientRequest(request: Request<{}, {}, unknown>): request is Request<{}, {}, R> {
     return this.requestSchema.is(request.body)
-  }
-
-  getKeyVersionInfo(request: Request<{}, {}, OdisRequest>, logger: Logger): KeyVersionInfo {
-    // If an invalid key version is present, we don't want this function to throw but
-    // to instead replace the key version with the default
-    // If a valid but unsupported key version is present, we want this function to throw
-    let requestKeyVersion: number | undefined
-    if (requestHasValidKeyVersion(request, logger)) {
-      requestKeyVersion = getRequestKeyVersion(request, logger)
-    }
-    const keyVersion = requestKeyVersion ?? this.config.keys.currentVersion
-    const supportedVersions: KeyVersionInfo[] = JSON.parse(this.config.keys.versions) // TODO add io-ts checks for this and signer array
-    const filteredSupportedVersions: KeyVersionInfo[] = supportedVersions.filter(
-      (v) => v.keyVersion === keyVersion
-    )
-    if (!filteredSupportedVersions.length) {
-      throw new Error(`key version ${keyVersion} not supported`)
-    }
-    return filteredSupportedVersions[0]
-  }
-
-  requestHasSupportedKeyVersion(request: Request<{}, {}, OdisRequest>, logger: Logger): boolean {
-    try {
-      this.getKeyVersionInfo(request, logger)
-      return true
-    } catch (err) {
-      logger.debug('Error caught in requestHasSupportedKeyVersion')
-      logger.debug(err)
-      return false
-    }
   }
 
   validateSignerResponse(data: string, url: string, logger: Logger): OdisResponse<R> {
@@ -103,36 +66,68 @@ export abstract class IO<R extends OdisRequest> {
     return res
   }
 
-  async fetchSignerResponseWithFallback(
-    signer: Signer,
-    session: Session<R>
-  ): Promise<FetchResponse> {
-    const start = `Start ${signer.url + this.signerEndpoint}`
-    const end = `End ${signer.url + this.signerEndpoint}`
-    performance.mark(start)
-
-    return this.fetchSignerResponse(signer.url, session)
-      .catch((err) => {
-        session.logger.error({ url: signer.url, error: err }, `Signer failed with primary url`)
-        if (signer.fallbackUrl) {
-          session.logger.warn({ url: signer.fallbackUrl }, `Using fallback url to call signer`)
-          return this.fetchSignerResponse(signer.fallbackUrl, session)
-        }
-        throw err
-      })
-      .finally(() => {
-        performance.mark(end)
-        performance.measure(signer.url, start, end)
-      })
+  protected inputChecks(
+    request: Request<{}, {}, unknown>,
+    response: Response<OdisResponse<R>>
+  ): request is Request<{}, {}, R> {
+    if (!this.config.enabled) {
+      sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
+      return false
+    }
+    if (!this.validateClientRequest(request)) {
+      sendFailure(WarningMessage.INVALID_INPUT, 400, response)
+      return false
+    }
+    return true
   }
+}
 
-  protected async fetchSignerResponse(
-    signerUrl: string,
-    session: Session<R>
-  ): Promise<FetchResponse> {
-    const { request, logger, abort } = session
-    const url = signerUrl + this.signerEndpoint
-    logger.debug({ url }, `Sending signer request`)
+export function requestHasSupportedKeyVersion(
+  request: Request<{}, {}, OdisRequest>,
+  config: OdisConfig,
+  logger: Logger
+): boolean {
+  try {
+    getKeyVersionInfo(request, config, logger)
+    return true
+  } catch (err) {
+    logger.debug('Error caught in requestHasSupportedKeyVersion')
+    logger.debug(err)
+    return false
+  }
+}
+
+export function getKeyVersionInfo(
+  request: Request<{}, {}, OdisRequest>,
+  config: OdisConfig,
+  logger: Logger
+): KeyVersionInfo {
+  // If an invalid key version is present, we don't want this function to throw but
+  // to instead replace the key version with the default
+  // If a valid but unsupported key version is present, we want this function to throw
+  let requestKeyVersion: number | undefined
+  if (requestHasValidKeyVersion(request, logger)) {
+    requestKeyVersion = getRequestKeyVersion(request, logger)
+  }
+  const keyVersion = requestKeyVersion ?? config.keys.currentVersion
+  const supportedVersions: KeyVersionInfo[] = JSON.parse(config.keys.versions) // TODO add io-ts checks for this and signer array
+  const filteredSupportedVersions: KeyVersionInfo[] = supportedVersions.filter(
+    (v) => v.keyVersion === keyVersion
+  )
+  if (!filteredSupportedVersions.length) {
+    throw new Error(`key version ${keyVersion} not supported`)
+  }
+  return filteredSupportedVersions[0]
+}
+
+export async function fetchSignerResponseWithFallback<R extends OdisRequest>(
+  signer: Signer,
+  signerEndpoint: string,
+  session: Session<R>
+): Promise<FetchResponse> {
+  const { request, abort } = session
+
+  async function fetchSignerResponse(url: string): Promise<FetchResponse> {
     // prettier-ignore
     return fetch(url, {
       method: 'POST',
@@ -151,18 +146,40 @@ export abstract class IO<R extends OdisRequest> {
     })
   }
 
-  protected inputChecks(
-    request: Request<{}, {}, unknown>,
-    response: Response<OdisResponse<R>>
-  ): request is Request<{}, {}, R> {
-    if (!this.config.enabled) {
-      this.sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
-      return false
-    }
-    if (!this.validateClientRequest(request)) {
-      this.sendFailure(WarningMessage.INVALID_INPUT, 400, response)
-      return false
-    }
-    return true
+  return measureTime(signer.url + signerEndpoint, () =>
+    fetchSignerResponse(signer.url + signerEndpoint).catch((err) => {
+      session.logger.error({ url: signer.url, error: err }, `Signer failed with primary url`)
+      if (signer.fallbackUrl) {
+        session.logger.warn({ url: signer.fallbackUrl }, `Using fallback url to call signer`)
+        return fetchSignerResponse(signer.fallbackUrl + signerEndpoint)
+      } else {
+        throw err
+      }
+    })
+  )
+}
+async function measureTime<T>(name: string, fn: () => Promise<T>): Promise<T> {
+  const start = `Start ${name}`
+  const end = `End ${name}`
+  performance.mark(start)
+  try {
+    const res = await fn()
+    return res
+  } finally {
+    performance.mark(end)
+    performance.measure(name, start, end)
   }
+}
+
+export function sendFailure(error: ErrorType, status: number, response: Response<any>) {
+  send(
+    response,
+    {
+      success: false,
+      version: getCombinerVersion(),
+      error,
+    },
+    status,
+    response.locals.logger
+  )
 }
