@@ -39,7 +39,7 @@ export async function sendTransactionWithPrivateKey<T>(
       from: address,
     })
   }
-
+  console.info('signing tx with', address  )
   const signedTx: any = await signTransaction(
     web3,
     {
@@ -152,7 +152,7 @@ export function checkFunctionArgsLength(args: any[], abi: any) {
 export async function setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
 >(web3: Web3, artifacts: any, contractName: string, contractPackage?: ContractPackage, ...args: any[]): Promise<ContractInstance> {
-  
+
   const Contract = ArtifactsSingleton.getInstance(contractPackage, artifacts).require(contractName)
   const ContractProxy = ArtifactsSingleton.getInstance(contractPackage, artifacts).require(contractName + 'Proxy')
 
@@ -265,11 +265,11 @@ export const makeTruffleContractForMigration = (contractName: string, contractPa
     abi: artifact.abi,
     unlinked_binary: artifact.bytecode,
   })
-  
-  
+
+
   Contract.setProvider(web3.currentProvider)
   Contract.setNetwork(network.name)
-  
+
   Contract.interfaceAdapter = createInterfaceAdapter({
     networkType: "ethereum",
     provider: web3.currentProvider
@@ -292,7 +292,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
 ) {
 
   console.log("-> Started deployment for", name)
-  let Contract 
+  let Contract
   let ContractProxy
   if (artifactPath) {
     Contract = makeTruffleContractForMigration(name, artifactPath, web3)
@@ -301,7 +301,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
     Contract = artifacts.require(name)
     ContractProxy = artifacts.require(name + 'Proxy')
   }
- 
+
   const testingDeployment = false
   return (deployer: any, networkName: string, _accounts: string[]) => {
     console.log("\n-> Deploying", name)
@@ -392,12 +392,12 @@ export function getFunctionSelectorsForContract(contract: any, contractName: str
 export function checkImports(baseContractName: string, derivativeContractArtifact: any, artifacts: any) {
   const isImport = (astNode: any) => astNode.nodeType === 'ImportDirective'
   const imports: any[] = derivativeContractArtifact.ast.nodes.filter((astNode: any) => isImport(astNode))
-  while (imports.length) { // BFS 
+  while (imports.length) { // BFS
     const importedContractName = (imports.pop().file as string).split('/').pop().split('.')[0]
     if (importedContractName ===  baseContractName) {
       return true
     }
-    const importedContractArtifact = artifacts instanceof BuildArtifacts ? 
+    const importedContractArtifact = artifacts instanceof BuildArtifacts ?
       artifacts.getArtifactByName(importedContractName) :
       artifacts.require(importedContractName)
     imports.unshift(...importedContractArtifact.ast.nodes.filter((astNode: any) => isImport(astNode)))
