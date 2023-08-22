@@ -58,7 +58,6 @@ export async function getPnpQuotaStatus(
       totalQuota: response.totalQuota,
       remainingQuota: response.totalQuota - response.performedQueryCount,
       warnings: response.warnings,
-      blockNumber: response.blockNumber,
     }
   }
 
