@@ -1,16 +1,17 @@
 import { getContractKit } from '@celo/phone-number-privacy-common'
-import * as functions from 'firebase-functions'
+import * as functions from 'firebase-functions/v2/https'
+import { setGlobalOptions } from 'firebase-functions/v2'
+import { defineInt } from 'firebase-functions/params'
 import config from './config'
 import { startCombiner } from './server'
 
 require('dotenv').config()
 
-export const combiner = functions
-  .region('us-central1')
-  .runWith({
-    // Keep instances warm for mainnet functions
-    // Defined check required for running tests vs. deployment
-    minInstances: functions.config().service ? Number(functions.config().service.min_instances) : 0,
-  })
-  .https.onRequest(startCombiner(config, getContractKit(config.blockchain)))
+setGlobalOptions({ region: 'us-central1' })
+
+const minInstances = defineInt('MIN_INSTANCES', { default: 0 })
+export const combinerGen2 = functions.onRequest(
+  { minInstances: minInstances },
+  startCombiner(config, getContractKit(config.blockchain))
+)
 export * from './config'
