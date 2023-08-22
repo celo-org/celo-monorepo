@@ -52,3 +52,4 @@ export class Session<R extends OdisRequest> {
     return maxErrorCode > 0 ? maxErrorCode : null
   }
 }
+;``

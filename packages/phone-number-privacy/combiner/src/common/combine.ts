@@ -4,6 +4,7 @@ import {
   OdisResponse,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import { Locals, Request, Response } from 'express'
 import { Response as FetchResponse } from 'node-fetch'
 import { PerformanceObserver } from 'perf_hooks'
 import { OdisConfig } from '../config'
@@ -24,7 +25,11 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
 
   abstract combine(session: Session<R>): void
 
-  async perform(session: Session<R>) {
+  async perform(
+    _request: Request<{}, {}, R>,
+    _response: Response<OdisResponse<R>, Locals>,
+    session: Session<R>
+  ) {
     await this.distribute(session)
     this.combine(session)
   }
