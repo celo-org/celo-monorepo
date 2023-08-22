@@ -12,7 +12,6 @@ import {
   send,
   SignerEndpoint,
   SuccessResponse,
-  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
@@ -42,8 +41,6 @@ export abstract class IO<R extends OdisRequest> {
     response: Response<OdisResponse<R>>
   ): Promise<Session<R> | null>
 
-  abstract authenticate(request: Request<{}, {}, R>, logger?: Logger): Promise<boolean>
-
   abstract sendSuccess(
     status: number,
     response: Response<SuccessResponse<R>>,
@@ -64,21 +61,6 @@ export abstract class IO<R extends OdisRequest> {
       throw new Error(ErrorMessage.INVALID_SIGNER_RESPONSE)
     }
     return res
-  }
-
-  protected inputChecks(
-    request: Request<{}, {}, unknown>,
-    response: Response<OdisResponse<R>>
-  ): request is Request<{}, {}, R> {
-    if (!this.config.enabled) {
-      sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
-      return false
-    }
-    if (!this.validateClientRequest(request)) {
-      sendFailure(WarningMessage.INVALID_INPUT, 400, response)
-      return false
-    }
-    return true
   }
 }
 

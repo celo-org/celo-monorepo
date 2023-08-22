@@ -44,14 +44,19 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<DomainRestrictedSignatureResponse>
   ): Promise<CryptoSession<DomainRestrictedSignatureRequest> | null> {
-    if (!super.inputChecks(request, response)) {
+    if (!this.validateClientRequest(request)) {
+      sendFailure(WarningMessage.INVALID_INPUT, 400, response)
       return null
     }
     if (!requestHasSupportedKeyVersion(request, this.config, response.locals.logger)) {
       sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return null
     }
-    if (!(await this.authenticate(request))) {
+
+    // Note that signing requests may include a nonce for replay protection that will be checked by
+    // the signer, but is not checked here. As a result, requests that pass the authentication check
+    // here may still fail when sent to the signer.
+    if (!verifyDomainRestrictedSignatureRequestAuthenticity(request.body)) {
       sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
@@ -62,13 +67,6 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
       keyVersionInfo,
       new DomainCryptoClient(keyVersionInfo)
     )
-  }
-
-  authenticate(request: Request<{}, {}, DomainRestrictedSignatureRequest>): Promise<boolean> {
-    // Note that signing requests may include a nonce for replay protection that will be checked by
-    // the signer, but is not checked here. As a result, requests that pass the authentication check
-    // here may still fail when sent to the signer.
-    return Promise.resolve(verifyDomainRestrictedSignatureRequestAuthenticity(request.body))
   }
 
   sendSuccess(

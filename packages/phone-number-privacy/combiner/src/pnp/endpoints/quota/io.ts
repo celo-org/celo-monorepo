@@ -1,6 +1,8 @@
 import { ContractKit } from '@celo/contractkit'
 import {
+  authenticateUser,
   CombinerEndpoint,
+  DataEncryptionKeyFetcher,
   hasValidAccountParam,
   isBodyReasonablySized,
   PnpQuotaRequest,
@@ -12,7 +14,6 @@ import {
   send,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
 import { getKeyVersionInfo, IO, sendFailure } from '../../../common/io'
@@ -24,7 +25,11 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   readonly responseSchema: t.Type<PnpQuotaResponse, PnpQuotaResponse, unknown> =
     PnpQuotaResponseSchema
 
-  constructor(config: OdisConfig, readonly kit: ContractKit) {
+  constructor(
+    config: OdisConfig,
+    readonly kit: ContractKit,
+    readonly dekFetcher: DataEncryptionKeyFetcher
+  ) {
     super(config, CombinerEndpoint.PNP_QUOTA)
   }
 
@@ -32,10 +37,12 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<PnpQuotaResponse>
   ): Promise<Session<PnpQuotaRequest> | null> {
-    if (!super.inputChecks(request, response)) {
+    if (!this.validateClientRequest(request)) {
+      sendFailure(WarningMessage.INVALID_INPUT, 400, response)
       return null
     }
-    if (!(await this.authenticate(request, response.locals.logger))) {
+
+    if (!(await authenticateUser(request, response.locals.logger, this.dekFetcher))) {
       sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
@@ -51,22 +58,6 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       hasValidAccountParam(request.body) &&
       isBodyReasonablySized(request.body)
     )
-  }
-
-  async authenticate(request: Request<{}, {}, PnpQuotaRequest>, logger: Logger): Promise<boolean> {
-    logger.debug({ url: request.url }) // just for ts not to make a fuzz
-    return Promise.resolve(true)
-    // return authenticateUser(
-    //   request,
-    //   logger,
-    //   newContractKitFetcher(
-    //     this.kit,
-    //     logger,
-    //     this.config.fullNodeTimeoutMs,
-    //     this.config.fullNodeRetryCount,
-    //     this.config.fullNodeRetryDelayMs
-    //   )
-    // )
   }
 
   sendSuccess(

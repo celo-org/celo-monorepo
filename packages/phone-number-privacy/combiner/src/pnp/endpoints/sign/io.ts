@@ -1,6 +1,8 @@
 import { ContractKit } from '@celo/contractkit'
 import {
+  authenticateUser,
   CombinerEndpoint,
+  DataEncryptionKeyFetcher,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
   isBodyReasonablySized,
@@ -13,7 +15,6 @@ import {
   SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
 import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-crypto-client'
@@ -33,7 +34,11 @@ export class PnpSignIO extends IO<SignMessageRequest> {
   readonly responseSchema: t.Type<SignMessageResponse, SignMessageResponse, unknown> =
     SignMessageResponseSchema
 
-  constructor(config: OdisConfig, readonly kit: ContractKit) {
+  constructor(
+    config: OdisConfig,
+    readonly kit: ContractKit,
+    readonly dekFetcher: DataEncryptionKeyFetcher
+  ) {
     super(config, CombinerEndpoint.PNP_SIGN)
   }
 
@@ -41,14 +46,15 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<SignMessageResponse>
   ): Promise<Session<SignMessageRequest> | null> {
-    if (!super.inputChecks(request, response)) {
+    if (!this.validateClientRequest(request)) {
+      sendFailure(WarningMessage.INVALID_INPUT, 400, response)
       return null
     }
     if (!requestHasSupportedKeyVersion(request, this.config, response.locals.logger)) {
       sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return null
     }
-    if (!(await this.authenticate(request, response.locals.logger))) {
+    if (!(await authenticateUser(request, response.locals.logger, this.dekFetcher))) {
       sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
@@ -70,24 +76,6 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       hasValidBlindedPhoneNumberParam(request.body) &&
       isBodyReasonablySized(request.body)
     )
-  }
-
-  async authenticate(
-    _request: Request<{}, {}, SignMessageRequest>,
-    _logger: Logger
-  ): Promise<boolean> {
-    return Promise.resolve(true)
-    // return authenticateUser(
-    //   request,
-    //   logger,
-    //   newContractKitFetcher(
-    //     this.kit,
-    //     logger,
-    //     this.config.fullNodeTimeoutMs,
-    //     this.config.fullNodeRetryCount,
-    //     this.config.fullNodeRetryDelayMs
-    //   )
-    // )
   }
 
   sendSuccess(

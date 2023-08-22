@@ -34,10 +34,12 @@ export class DomainDisableIO extends IO<DisableDomainRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<DisableDomainResponse>
   ): Promise<Session<DisableDomainRequest> | null> {
-    if (!super.inputChecks(request, response)) {
+    if (!this.validateClientRequest(request)) {
+      sendFailure(WarningMessage.INVALID_INPUT, 400, response)
       return null
     }
-    if (!(await this.authenticate(request))) {
+
+    if (!verifyDisableDomainRequestAuthenticity(request.body)) {
       sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
@@ -46,10 +48,6 @@ export class DomainDisableIO extends IO<DisableDomainRequest> {
       response,
       getKeyVersionInfo(request, this.config, response.locals.logger)
     )
-  }
-
-  authenticate(request: Request<{}, {}, DisableDomainRequest>): Promise<boolean> {
-    return Promise.resolve(verifyDisableDomainRequestAuthenticity(request.body))
   }
 
   sendSuccess(

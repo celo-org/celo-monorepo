@@ -1,4 +1,9 @@
-import { ErrorMessage, OdisRequest, OdisResponse } from '@celo/phone-number-privacy-common'
+import {
+  ErrorMessage,
+  OdisRequest,
+  OdisResponse,
+  WarningMessage,
+} from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { performance, PerformanceObserver } from 'perf_hooks'
@@ -90,4 +95,11 @@ export function actionHandler<R extends OdisRequest>(action: Action<R>): Promise
       sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, response)
     }
   }
+}
+
+export async function disabledHandler<R extends OdisRequest>(
+  _: Request<{}, {}, R>,
+  response: Response<OdisResponse<R>, Locals>
+): Promise<void> {
+  sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
 }

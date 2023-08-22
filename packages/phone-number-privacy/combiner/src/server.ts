@@ -3,6 +3,7 @@ import {
   CombinerEndpoint,
   KEY_VERSION_HEADER,
   loggerMiddleware,
+  newContractKitFetcher,
   OdisRequest,
   rootLogger,
 } from '@celo/phone-number-privacy-common'
@@ -11,6 +12,7 @@ import express, { RequestHandler } from 'express'
 import {
   actionHandler,
   catchErrorHandler,
+  disabledHandler,
   meteringHandler,
   PromiseHandler,
 } from './common/handlers'
@@ -61,13 +63,21 @@ export function startCombiner(config: CombinerConfig, kit: ContractKit) {
     })
   })
 
+  const dekFetcher = newContractKitFetcher(
+    kit,
+    logger,
+    config.phoneNumberPrivacy.fullNodeTimeoutMs,
+    config.phoneNumberPrivacy.fullNodeRetryCount,
+    config.phoneNumberPrivacy.fullNodeRetryDelayMs
+  )
+
   const pnpThresholdStateService = new PnpThresholdStateService()
 
   const pnpQuota = actionHandler(
     new PnpQuotaAction(
       config.phoneNumberPrivacy,
       pnpThresholdStateService,
-      new PnpQuotaIO(config.phoneNumberPrivacy, kit)
+      new PnpQuotaIO(config.phoneNumberPrivacy, kit, dekFetcher)
     )
   )
 
@@ -75,7 +85,7 @@ export function startCombiner(config: CombinerConfig, kit: ContractKit) {
     new PnpSignAction(
       config.phoneNumberPrivacy,
       pnpThresholdStateService,
-      new PnpSignIO(config.phoneNumberPrivacy, kit)
+      new PnpSignIO(config.phoneNumberPrivacy, kit, dekFetcher)
     )
   )
 
@@ -105,17 +115,18 @@ export function startCombiner(config: CombinerConfig, kit: ContractKit) {
     )
   )
 
-  app.post(CombinerEndpoint.PNP_QUOTA, createHandler(pnpQuota))
-  app.post(CombinerEndpoint.PNP_SIGN, createHandler(pnpSign))
-  app.post(CombinerEndpoint.DOMAIN_QUOTA_STATUS, createHandler(domainQuota))
-  app.post(CombinerEndpoint.DOMAIN_SIGN, createHandler(domainSign))
-  app.post(CombinerEndpoint.DISABLE_DOMAIN, createHandler(domainDisable))
+  app.post(CombinerEndpoint.PNP_QUOTA, createHandler(config.phoneNumberPrivacy.enabled, pnpQuota))
+  app.post(CombinerEndpoint.PNP_SIGN, createHandler(config.phoneNumberPrivacy.enabled, pnpSign))
+  app.post(CombinerEndpoint.DOMAIN_QUOTA_STATUS, createHandler(config.domains.enabled, domainQuota))
+  app.post(CombinerEndpoint.DOMAIN_SIGN, createHandler(config.domains.enabled, domainSign))
+  app.post(CombinerEndpoint.DISABLE_DOMAIN, createHandler(config.domains.enabled, domainDisable))
 
   return app
 }
 
 export function createHandler<R extends OdisRequest>(
+  enabled: boolean,
   handler: PromiseHandler<R>
 ): PromiseHandler<R> {
-  return meteringHandler(catchErrorHandler(handler))
+  return meteringHandler(catchErrorHandler(enabled ? handler : disabledHandler<R>))
 }
