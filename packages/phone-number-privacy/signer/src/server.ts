@@ -12,17 +12,6 @@ import https from 'https'
 import { Knex } from 'knex'
 import { IncomingMessage, ServerResponse } from 'node:http'
 import * as PromClient from 'prom-client'
-import { KeyProvider } from './common/key-management/key-provider-base'
-import { Histograms } from './common/metrics'
-import { getSignerVersion, SignerConfig } from './config'
-import { domainDisable } from './domain/endpoints/disable/action'
-import { domainQuota } from './domain/endpoints/quota/action'
-import { domainSign } from './domain/endpoints/sign/action'
-import { DomainQuotaService } from './domain/services/quota'
-import { pnpQuota } from './pnp/endpoints/quota/action'
-import { pnpSign } from './pnp/endpoints/sign/action'
-import { DefaultPnpQuotaService } from './pnp/services/request-service'
-
 import {
   catchErrorHandler,
   disabledHandler,
@@ -33,7 +22,21 @@ import {
   timeoutHandler,
   tracingHandler,
 } from './common/handler'
-import { CachingAccountService, ContractKitAccountService } from './pnp/services/account-service'
+import { KeyProvider } from './common/key-management/key-provider-base'
+import { Histograms } from './common/metrics'
+import { getSignerVersion, SignerConfig } from './config'
+import { domainDisable } from './domain/endpoints/disable/action'
+import { domainQuota } from './domain/endpoints/quota/action'
+import { domainSign } from './domain/endpoints/sign/action'
+import { DomainQuotaService } from './domain/services/quota'
+import { pnpQuota } from './pnp/endpoints/quota/action'
+import { pnpSign } from './pnp/endpoints/sign/action'
+import {
+  CachingAccountService,
+  ContractKitAccountService,
+  MockAccountService,
+} from './pnp/services/account-service'
+import { DefaultPnpRequestService, MockPnpRequestService } from './pnp/services/request-service'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -61,16 +64,19 @@ export function startSigner(
     res.send(PromClient.register.metrics())
   })
 
-  const accountService = new CachingAccountService(
-    // new ContractKitAccountService(logger, kit, {
-    //   fullNodeTimeoutMs: config.fullNodeTimeoutMs,
-    //   fullNodeRetryCount: config.fullNodeRetryCount,
-    //   fullNodeRetryDelayMs: config.fullNodeRetryDelayMs,
-    // })
-    new ContractKitAccountService()
-  )
+  const baseAccountService = config.shouldMockAccountService
+    ? new MockAccountService(config.mockDek, config.mockTotalQuota)
+    : new ContractKitAccountService(logger, kit, {
+        fullNodeTimeoutMs: config.fullNodeTimeoutMs,
+        fullNodeRetryCount: config.fullNodeRetryCount,
+        fullNodeRetryDelayMs: config.fullNodeRetryDelayMs,
+      })
 
-  const pnpRequestService = new DefaultPnpQuotaService(db)
+  const accountService = new CachingAccountService(baseAccountService)
+
+  const pnpRequestService = config.shouldMockRequestService
+    ? new MockPnpRequestService()
+    : new DefaultPnpRequestService(db)
   const domainQuotaService = new DomainQuotaService(db)
 
   logger.info('Right before adding meteredSignerEndpoints')
@@ -85,7 +91,7 @@ export function startSigner(
     createHandler(
       timeout,
       phoneNumberPrivacy.enabled,
-      pnpSign(db, config, pnpRequestService, accountService, keyProvider)
+      pnpSign(config, pnpRequestService, accountService, keyProvider)
     )
   )
   app.post(

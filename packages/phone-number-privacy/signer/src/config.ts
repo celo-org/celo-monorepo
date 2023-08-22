@@ -98,6 +98,10 @@ export interface SignerConfig {
   fullNodeTimeoutMs: number
   fullNodeRetryCount: number
   fullNodeRetryDelayMs: number
+  shouldMockAccountService: boolean
+  mockDek: string
+  mockTotalQuota: number
+  shouldMockRequestService: boolean
 }
 
 const env = process.env as any
@@ -175,4 +179,8 @@ export const config: SignerConfig = {
   fullNodeTimeoutMs: Number(env.TIMEOUT_MS ?? FULL_NODE_TIMEOUT_IN_MS),
   fullNodeRetryCount: Number(env.RETRY_COUNT ?? RETRY_COUNT),
   fullNodeRetryDelayMs: Number(env.RETRY_DELAY_IN_MS ?? RETRY_DELAY_IN_MS),
+  shouldMockAccountService: toBool(env.SHOULD_MOCK_ACCOUNT_SERVICE, false),
+  mockDek: env.MOCK_DEK,
+  mockTotalQuota: Number(env.MOCK_TOTAL_QUOTA ?? 10),
+  shouldMockRequestService: toBool(env.SHOULD_MOCK_REQUEST_SERVICE, false),
 }
