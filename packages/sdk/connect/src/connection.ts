@@ -85,6 +85,7 @@ export class Connection {
       return true
     } catch (error) {
       console.error(`could not attach provider`, error)
+      return false
     }
   }
 
@@ -210,7 +211,6 @@ export class Connection {
    */
   sendTransaction = async (tx: CeloTx): Promise<TransactionResult> => {
     tx = this.fillTxDefaults(tx)
-    // tx = await this.setFeeMarketGas(tx)
 
     let gas = tx.gas
     if (gas == null) {
@@ -230,7 +230,6 @@ export class Connection {
     tx?: Omit<CeloTx, 'data'>
   ): Promise<TransactionResult> => {
     tx = this.fillTxDefaults(tx)
-    // tx = await this.setFeeMarketGas(tx)
 
     let gas = tx.gas
     if (gas == null) {
@@ -423,7 +422,6 @@ export class Connection {
   gasPrice = async (feeCurrency?: Address): Promise<string> => {
     // Required otherwise is not backward compatible
     const parameter = feeCurrency ? [feeCurrency] : []
-    console.info('looking up gas price with', parameter)
     // Reference: https://eth.wiki/json-rpc/API#eth_gasprice
     const response = await this.rpcCaller.call('eth_gasPrice', parameter)
     const gasPriceInHex = response.result.toString()
