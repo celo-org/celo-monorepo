@@ -54,6 +54,7 @@ export async function sendTransactionWithPrivateKey<T>(
   )
 
   const rawTransaction = signedTx.rawTransaction.toString('hex')
+  console.info('sending tx', rawTransaction)
   return web3.eth.sendSignedTransaction(rawTransaction)
 }
 
