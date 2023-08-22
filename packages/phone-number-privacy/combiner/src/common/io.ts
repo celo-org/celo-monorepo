@@ -3,6 +3,7 @@ import {
   ErrorMessage,
   ErrorType,
   getRequestKeyVersion,
+  getSignerEndpoint,
   KeyVersionInfo,
   KEY_VERSION_HEADER,
   OdisRequest,
@@ -30,12 +31,11 @@ export type SignerResponse<R extends OdisRequest> = {
 }
 
 export abstract class IO<R extends OdisRequest> {
-  abstract readonly endpoint: CombinerEndpoint
-  abstract readonly signerEndpoint: SignerEndpoint
+  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
   abstract readonly requestSchema: t.Type<R, R, unknown>
   abstract readonly responseSchema: t.Type<OdisResponse<R>, OdisResponse<R>, unknown>
 
-  constructor(readonly config: OdisConfig) {}
+  constructor(readonly config: OdisConfig, readonly endpoint: CombinerEndpoint) {}
 
   abstract init(
     request: Request<{}, {}, unknown>,

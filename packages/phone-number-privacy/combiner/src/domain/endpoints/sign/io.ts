@@ -7,7 +7,6 @@ import {
   DomainRestrictedSignatureResponseSuccess,
   DomainSchema,
   DomainState,
-  getSignerEndpoint,
   send,
   SequentialDelayDomainStateSchema,
   verifyDomainRestrictedSignatureRequestAuthenticity,
@@ -23,11 +22,9 @@ import {
   requestHasSupportedKeyVersion,
   sendFailure,
 } from '../../../common/io'
-import { getCombinerVersion } from '../../../config'
+import { getCombinerVersion, OdisConfig } from '../../../config'
 
 export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
-  readonly endpoint = CombinerEndpoint.DOMAIN_SIGN
-  readonly signerEndpoint = getSignerEndpoint(this.endpoint)
   readonly requestSchema: t.Type<
     DomainRestrictedSignatureRequest,
     DomainRestrictedSignatureRequest,
@@ -38,6 +35,10 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
     DomainRestrictedSignatureResponse,
     unknown
   > = domainRestrictedSignatureResponseSchema(SequentialDelayDomainStateSchema)
+
+  constructor(config: OdisConfig) {
+    super(config, CombinerEndpoint.DOMAIN_SIGN)
+  }
 
   async init(
     request: Request<{}, {}, unknown>,

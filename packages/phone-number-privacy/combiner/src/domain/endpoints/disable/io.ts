@@ -9,10 +9,8 @@ import {
   DomainSchema,
   DomainState,
   ErrorType,
-  getSignerEndpoint,
   send,
   SequentialDelayDomainStateSchema,
-  SignerEndpoint,
   verifyDisableDomainRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -20,15 +18,17 @@ import { Request, Response } from 'express'
 import * as t from 'io-ts'
 import { getKeyVersionInfo, IO, sendFailure } from '../../../common/io'
 import { Session } from '../../../common/session'
-import { getCombinerVersion } from '../../../config'
+import { getCombinerVersion, OdisConfig } from '../../../config'
 
 export class DomainDisableIO extends IO<DisableDomainRequest> {
-  readonly endpoint: CombinerEndpoint = CombinerEndpoint.DISABLE_DOMAIN
-  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
   readonly requestSchema: t.Type<DisableDomainRequest, DisableDomainRequest, unknown> =
     disableDomainRequestSchema(DomainSchema)
   readonly responseSchema: t.Type<DisableDomainResponse, DisableDomainResponse, unknown> =
     disableDomainResponseSchema(SequentialDelayDomainStateSchema)
+
+  constructor(config: OdisConfig) {
+    super(config, CombinerEndpoint.DISABLE_DOMAIN)
+  }
 
   async init(
     request: Request<{}, {}, unknown>,

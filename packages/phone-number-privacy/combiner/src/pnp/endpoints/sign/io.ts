@@ -1,13 +1,11 @@
 import { ContractKit } from '@celo/contractkit'
 import {
   CombinerEndpoint,
-  getSignerEndpoint,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
   isBodyReasonablySized,
   PnpQuotaStatus,
   send,
-  SignerEndpoint,
   SignMessageRequest,
   SignMessageRequestSchema,
   SignMessageResponse,
@@ -30,15 +28,13 @@ import { Session } from '../../../common/session'
 import { getCombinerVersion, OdisConfig } from '../../../config'
 
 export class PnpSignIO extends IO<SignMessageRequest> {
-  readonly endpoint: CombinerEndpoint = CombinerEndpoint.PNP_SIGN
-  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
   readonly requestSchema: t.Type<SignMessageRequest, SignMessageRequest, unknown> =
     SignMessageRequestSchema
   readonly responseSchema: t.Type<SignMessageResponse, SignMessageResponse, unknown> =
     SignMessageResponseSchema
 
-  constructor(readonly config: OdisConfig, readonly kit: ContractKit) {
-    super(config)
+  constructor(config: OdisConfig, readonly kit: ContractKit) {
+    super(config, CombinerEndpoint.PNP_SIGN)
   }
 
   async init(

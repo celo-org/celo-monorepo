@@ -1,7 +1,6 @@
 import { ContractKit } from '@celo/contractkit'
 import {
   CombinerEndpoint,
-  getSignerEndpoint,
   hasValidAccountParam,
   isBodyReasonablySized,
   PnpQuotaRequest,
@@ -11,7 +10,6 @@ import {
   PnpQuotaResponseSuccess,
   PnpQuotaStatus,
   send,
-  SignerEndpoint,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
@@ -22,14 +20,12 @@ import { Session } from '../../../common/session'
 import { getCombinerVersion, OdisConfig } from '../../../config'
 
 export class PnpQuotaIO extends IO<PnpQuotaRequest> {
-  readonly endpoint: CombinerEndpoint = CombinerEndpoint.PNP_QUOTA
-  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
   readonly requestSchema: t.Type<PnpQuotaRequest, PnpQuotaRequest, unknown> = PnpQuotaRequestSchema
   readonly responseSchema: t.Type<PnpQuotaResponse, PnpQuotaResponse, unknown> =
     PnpQuotaResponseSchema
 
-  constructor(readonly config: OdisConfig, readonly kit: ContractKit) {
-    super(config)
+  constructor(config: OdisConfig, readonly kit: ContractKit) {
+    super(config, CombinerEndpoint.PNP_QUOTA)
   }
 
   async init(
