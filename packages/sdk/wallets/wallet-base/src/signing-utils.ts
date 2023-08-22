@@ -3,9 +3,9 @@ import {
   CeloTx,
   CeloTxWithSig,
   EncodedTransaction,
-  isPresent,
   RLPEncodedTx,
   TransactionTypes,
+  isPresent,
 } from '@celo/connect'
 import {
   hexToNumber,
@@ -105,7 +105,7 @@ function stringNumberToHex(num?: number | string): `0x${string}` {
   if (num === '0x' || num === undefined || auxNumber === 0) {
     return '0x'
   }
-  return Bytes.fromNumber(auxNumber)
+  return Web3.utils.toHex(num) as `0x${string}`
 }
 export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
   assertSerializableTX(tx)
@@ -113,16 +113,16 @@ export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
   transaction.to = Bytes.fromNat(tx.to || '0x').toLowerCase()
   transaction.nonce = Number(((tx.nonce as any) !== '0x' ? tx.nonce : 0) || 0)
   transaction.data = Bytes.fromNat(tx.data || '0x').toLowerCase()
-  transaction.value = stringNumberToHex(tx.value?.toString())
-  transaction.gas = stringNumberToHex(tx.gas)
+  transaction.value = stringNumberOrBNToHex(tx.value)
+  transaction.gas = stringNumberOrBNToHex(tx.gas)
   transaction.chainId = tx.chainId || 1
   // Celo Specific
   transaction.feeCurrency = Bytes.fromNat(tx.feeCurrency || '0x').toLowerCase()
   transaction.gatewayFeeRecipient = Bytes.fromNat(tx.gatewayFeeRecipient || '0x').toLowerCase()
-  transaction.gatewayFee = stringNumberToHex(tx.gatewayFee)
+  transaction.gatewayFee = stringNumberOrBNToHex(tx.gatewayFee)
 
   // Legacy
-  transaction.gasPrice = stringNumberToHex(tx.gasPrice?.toString())
+  transaction.gasPrice = stringNumberOrBNToHex(tx.gasPrice)
   // EIP1559 / CIP42
   transaction.maxFeePerGas = stringNumberOrBNToHex(tx.maxFeePerGas)
   transaction.maxPriorityFeePerGas = stringNumberOrBNToHex(tx.maxPriorityFeePerGas)
