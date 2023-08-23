@@ -86,27 +86,56 @@ export async function concurrentRPSLoadTest(
     | CombinerEndpointPNP.PNP_QUOTA
     | CombinerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.PNP_SIGN,
   duration: number = 0,
-  bypassQuota?: boolean,
-  useDEK?: boolean
+  bypassQuota: boolean = false,
+  useDEK: boolean = false,
+  movingAverageRequests: number = 50
 ) {
-  const taskFn = async (i: number) => {
-    const start = performance.now()
-    await (endpoint === CombinerEndpointPNP.PNP_SIGN
-      ? testPNPSignQuery(blockchainProvider, contextName, undefined, bypassQuota, useDEK)
-      : testPNPQuotaQuery(blockchainProvider, contextName))
-    const requestDuration = performance.now() - start
-    if (requestDuration > 600) {
-      logger.warn({ duration: Math.round(requestDuration), index: i }, 'SLOW Request')
-    } else {
-      logger.info({ duration: Math.round(requestDuration), index: i }, 'request finished')
+  const latencyQueue: number[] = []
+  let movingAvgLatencySum = 0
+  let latencySum = 0
+  let index = 1
+
+  function measureLatency(fn: () => Promise<void>): () => Promise<void> {
+    return async () => {
+      const start = performance.now()
+
+      await fn()
+
+      const reqLatency = performance.now() - start
+      latencySum += reqLatency
+      movingAvgLatencySum += reqLatency
+
+      const queuelength = latencyQueue.push(reqLatency)
+      if (queuelength > movingAverageRequests) {
+        movingAvgLatencySum -= latencyQueue.shift()!
+      }
+
+      const stats = {
+        averageLatency: Math.round(latencySum / index),
+        movingAverageLatency: Math.round(movingAvgLatencySum / latencyQueue.length),
+        index,
+      }
+
+      if (reqLatency > 600) {
+        logger.warn(stats, 'SLOW Request')
+      } else {
+        logger.info(stats, 'request finished')
+      }
+      index++
     }
   }
 
-  return doRPSTest(taskFn, rps, duration)
+  const testFn = async () => {
+    await (endpoint === CombinerEndpointPNP.PNP_SIGN
+      ? testPNPSignQuery(blockchainProvider, contextName, undefined, bypassQuota, useDEK)
+      : testPNPQuotaQuery(blockchainProvider, contextName))
+  }
+
+  return doRPSTest(measureLatency(testFn), rps, duration)
 }
 
 async function doRPSTest(
-  testFn: (reqNumber: number) => Promise<void>,
+  testFn: () => Promise<void>,
   rps: number,
   duration: number = 0
 ): Promise<void> {
@@ -114,10 +143,9 @@ async function doRPSTest(
   let shouldRun = true
 
   async function requestSender() {
-    let reqCounter = 1
     while (shouldRun) {
       for (let i = 0; i < rps; i++) {
-        inFlightRequests.push(testFn(reqCounter++))
+        inFlightRequests.push(testFn())
       }
       await sleep(1000)
     }
@@ -127,8 +155,8 @@ async function doRPSTest(
     while (shouldRun || inFlightRequests.length > 0) {
       if (inFlightRequests.length > 0) {
         const req = inFlightRequests.shift()
-        await req?.catch((err) => {
-          console.error('some request failed', err)
+        await req?.catch((_err) => {
+          logger.error('load test request failed')
         })
       } else {
         await sleep(1000)
