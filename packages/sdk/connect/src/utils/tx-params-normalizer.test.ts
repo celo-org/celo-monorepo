@@ -101,13 +101,13 @@ describe('TxParamsNormalizer class', () => {
       expect(newCeloTx.maxFeePerGas).toBe(undefined)
       expect(newCeloTx.maxPriorityFeePerGas).toBe(undefined)
     })
-    test('will not pop maxFeePerGas it is set', async () => {
+    test('will not pop maxFeePerGas if it is set', async () => {
       const celoTx: CeloTx = { ...completeCeloTx }
       celoTx.maxFeePerGas = 100
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.maxFeePerGas).toBe(100)
     })
-    test('will not pop maxPriorityFeePerGas it is set', async () => {
+    test('will not pop maxPriorityFeePerGas if it is set', async () => {
       const celoTx: CeloTx = { ...completeCeloTx }
       celoTx.maxPriorityFeePerGas = 2000
       const newCeloTx = await populator.populate(celoTx)
