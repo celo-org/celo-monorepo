@@ -83,10 +83,16 @@ const DefaultConfig = {
     minimumReports: 1,
     frozen: false,
   },
+  feeHandler: {
+    //TODO update these values
+    beneficiaryAddress: '0x0000000000000000000000000000000000000000',
+    burnFraction: 1,
+  },
   gasPriceMinimum: {
     minimumFloor: 100000000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
+    baseFeeOpCodeActivationBlock: 0, // TODO: decide block number
   },
   goldToken: {
     frozen: false,
