@@ -10,7 +10,6 @@ on:
   pull_request:
     paths:
       - 'dockerfiles/all-monorepo/**'
-      - '.github/workflows/container-all-monorepo.yml'
   workflow_dispatch:
 
 jobs:
