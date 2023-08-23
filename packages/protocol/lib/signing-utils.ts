@@ -1,11 +1,10 @@
 // Originally taken from https://github.com/ethereum/web3.js/blob/1.x/packages/web3-eth-accounts/src/index.js
 
-import { inputCeloTxFormatter } from '@celo/connect/lib/utils/formatter'
 import { parseSignature } from '@celo/utils/lib/signatureUtils'
-import { account as Account, bytes, hash, nat, RLP } from 'eth-lib'
+import { LocalWallet } from '@celo/wallet-local'
+import { account as Account } from 'eth-lib'
 import _ from 'underscore'
 import Web3 from 'web3'
-import { numberToHex } from 'web3-utils'
 
 function isNot(value: any) {
   return _.isUndefined(value) || _.isNull(value)
@@ -38,7 +37,7 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
     throw new Error('No transaction object given!')
   }
 
-  const signed = (tx: any) => {
+  const signed = async (tx: any) => {
     if (!tx.gas && !tx.gasLimit) {
       throw new Error('"gas" is missing')
     }
@@ -47,57 +46,14 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
       throw new Error('Gas, gasPrice, nonce or chainId is lower than 0')
     }
     try {
-      tx = inputCeloTxFormatter(tx)
-      console.info('protocol signing-util', tx)
+      const wallet = new LocalWallet()
 
-      const transaction = tx
-      transaction.to = tx.to || '0x'
-      transaction.data = tx.data || '0x'
-      transaction.value = tx.value || '0x'
-      transaction.chainId = numberToHex(tx.chainId)
-      transaction.feeCurrency = tx.feeCurrency || '0x'
-      transaction.gatewayFeeRecipient = tx.gatewayFeeRecipient || '0x'
-      transaction.gatewayFee = tx.gatewayFee || '0x'
+      wallet.addAccount(privateKey)
 
-      const rlpEncoded = RLP.encode([
-        bytes.fromNat(transaction.nonce),
-        bytes.fromNat(transaction.gasPrice),
-        bytes.fromNat(transaction.gas),
-        transaction.feeCurrency.toLowerCase(),
-        transaction.gatewayFeeRecipient.toLowerCase(),
-        bytes.fromNat(transaction.gatewayFee),
-        transaction.to.toLowerCase(),
-        bytes.fromNat(transaction.value),
-        transaction.data,
-        bytes.fromNat(transaction.chainId || '0x1'),
-        '0x',
-        '0x',
-      ])
+      result = await wallet.signTransaction(tx)
 
-      const messageHash = hash.keccak256(rlpEncoded)
-
-      const signature = Account.makeSigner(nat.toNumber(transaction.chainId || '0x1') * 2 + 35)(
-        hash.keccak256(rlpEncoded),
-        privateKey
-      )
-
-      const rawTx = RLP.decode(rlpEncoded).slice(0, 9).concat(Account.decodeSignature(signature))
-
-      rawTx[9] = makeEven(trimLeadingZero(rawTx[9]))
-      rawTx[10] = makeEven(trimLeadingZero(rawTx[10]))
-      rawTx[11] = makeEven(trimLeadingZero(rawTx[11]))
-
-      const rawTransaction = RLP.encode(rawTx)
-
-      const values = RLP.decode(rawTransaction)
-      result = {
-        messageHash,
-        v: trimLeadingZero(values[9]),
-        r: trimLeadingZero(values[10]),
-        s: trimLeadingZero(values[11]),
-        rawTransaction,
-      }
     } catch (e) {
+      console.info('Error signing transaction', e)
       throw e
     }
 

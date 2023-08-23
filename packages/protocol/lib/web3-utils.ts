@@ -39,7 +39,7 @@ export async function sendTransactionWithPrivateKey<T>(
       from: address,
     })
   }
-  console.info('signing tx with', address  )
+  console.info('signing tx with', address)
   const signedTx: any = await signTransaction(
     web3,
     {
