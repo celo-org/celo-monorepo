@@ -31,12 +31,12 @@ import { SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
 import BigNumber from 'bignumber.js'
 import threshold_bls from 'blind-threshold-bls'
 import { Server as HttpsServer } from 'https'
+import { Server } from 'http'
 import { Knex } from 'knex'
-import { Server } from 'net'
 import request from 'supertest'
 import config, { getCombinerVersion } from '../../src/config'
 import { startCombiner } from '../../src/server'
-import { getBlindedPhoneNumber } from '../utils'
+import { getBlindedPhoneNumber, serverClose } from '../utils'
 
 const {
   ContractRetrieval,
@@ -175,12 +175,6 @@ jest.mock('@celo/contractkit', () => ({
   ...jest.requireActual('@celo/contractkit'),
   newKit: jest.fn().mockImplementation(() => mockContractKit),
 }))
-
-async function serverClose(server?: Server | HttpsServer) {
-  if (server) {
-    await new Promise((resolve) => server.close(resolve))
-  }
-}
 
 describe('pnpService', () => {
   let keyProvider1: KeyProvider

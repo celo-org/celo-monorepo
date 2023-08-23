@@ -39,11 +39,12 @@ import { LocalWallet } from '@celo/wallet-local'
 import BigNumber from 'bignumber.js'
 import { Server as HttpsServer } from 'https'
 import { Knex } from 'knex'
-import { Server } from 'net'
+import { Server } from 'http'
 import request from 'supertest'
 import { MockKeyProvider } from '../../../signer/dist/common/key-management/mock-key-provider'
 import config from '../../src/config'
 import { startCombiner } from '../../src/server'
+import { serverClose } from '../utils'
 
 const {
   DOMAINS_THRESHOLD_DEV_PK_SHARE_1_V1,
@@ -281,9 +282,9 @@ describe('domainService', () => {
       await signerDB1?.destroy()
       await signerDB2?.destroy()
       await signerDB3?.destroy()
-      signer1?.close()
-      signer2?.close()
-      signer3?.close()
+      await serverClose(signer1)
+      await serverClose(signer2)
+      await serverClose(signer3)
     })
 
     describe('when signers are operating correctly', () => {
@@ -1239,11 +1240,11 @@ describe('domainService', () => {
       await signerDB3?.destroy()
       await signerDB4?.destroy()
       await signerDB5?.destroy()
-      signer1?.close()
-      signer2?.close()
-      signer3?.close()
-      signer4?.close()
-      signer5?.close()
+      await serverClose(signer1)
+      await serverClose(signer2)
+      await serverClose(signer3)
+      await serverClose(signer4)
+      await serverClose(signer5)
     })
 
     it('Should respond with 200 on valid request', async () => {
