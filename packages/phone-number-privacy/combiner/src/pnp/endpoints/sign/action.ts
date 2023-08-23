@@ -91,9 +91,9 @@ export function createPnpSignHandler(
       signerEndpoint,
       request,
       keyVersionInfo,
-      keyVersionInfo.keyVersion,
       config.odisServices.timeoutMilliSeconds,
       SignMessageResponseSchema,
+      true,
       processRequest
     )
 

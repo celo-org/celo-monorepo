@@ -23,9 +23,9 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
   endpoint: string,
   request: Request<{}, {}, R>,
   keyVersionInfo: KeyVersionInfo,
-  keyVersion: number | null,
   requestTimeoutMS: number,
   responseSchema: t.Type<OdisResponse<R>, OdisResponse<R>, unknown>,
+  shouldCheckKeyVersion: boolean = false,
   processResult: (res: OdisResponse<R>) => Promise<boolean> = (_) => Promise.resolve(false)
 ): Promise<{ signerResponses: Array<SignerResponse<R>>; maxErrorCode?: number }> {
   const obs = new PerformanceObserver((list) => {
@@ -83,8 +83,8 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
 
         // if given key version, check that
         if (
-          keyVersion != null &&
-          !responseHasExpectedKeyVersion(signerFetchResult, keyVersion, logger)
+          shouldCheckKeyVersion &&
+          !responseHasExpectedKeyVersion(signerFetchResult, keyVersionInfo.keyVersion, logger)
         ) {
           throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
         }

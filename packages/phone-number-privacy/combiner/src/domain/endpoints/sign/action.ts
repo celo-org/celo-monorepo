@@ -90,9 +90,9 @@ export function createDomainSignHandler(
       signerEndpoint,
       request,
       keyVersionInfo,
-      keyVersionInfo.keyVersion,
       config.odisServices.timeoutMilliSeconds,
       domainRestrictedSignatureResponseSchema(SequentialDelayDomainStateSchema),
+      true,
       processRequest
     )
 

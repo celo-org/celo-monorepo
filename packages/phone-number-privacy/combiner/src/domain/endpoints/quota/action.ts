@@ -43,7 +43,6 @@ export function createDomainQuotaHandler(
       signerEndpoint,
       request,
       keyVersionInfo,
-      null,
       config.odisServices.timeoutMilliSeconds,
       domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema)
     )

@@ -43,7 +43,6 @@ export function createDisableDomainHandler(
       signerEndpoint,
       request,
       keyVersionInfo,
-      null,
       config.odisServices.timeoutMilliSeconds,
       disableDomainResponseSchema(SequentialDelayDomainStateSchema)
     )

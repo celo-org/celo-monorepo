@@ -49,7 +49,6 @@ export function createPnpQuotaHandler(
       signerEndpoint,
       request,
       keyVersionInfo,
-      null,
       config.odisServices.timeoutMilliSeconds,
       PnpQuotaResponseSchema
     )
