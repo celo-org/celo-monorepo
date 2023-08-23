@@ -35,7 +35,7 @@ testWithGanache('GoldToken Wrapper', (web3) => {
     const before = await goldToken.allowance(accounts[0], accounts[1])
     expect(before).toEqBigNumber(0)
 
-    await goldToken.approve(accounts[1], ONE_GOLD).send()
+    await goldToken.approve(accounts[1], ONE_GOLD).sendAndWaitForReceipt()
     const after = await goldToken.allowance(accounts[0], accounts[1])
     expect(after).toEqBigNumber(ONE_GOLD)
   })
@@ -43,8 +43,7 @@ testWithGanache('GoldToken Wrapper', (web3) => {
   test('SBAT tranfer from', async () => {
     const before = await goldToken.balanceOf(accounts[3])
     // account1 approves account0
-    await goldToken.approve(accounts[0], ONE_GOLD).send({ from: accounts[1] })
-
+    await goldToken.approve(accounts[0], ONE_GOLD).sendAndWaitForReceipt({ from: accounts[1] })
     const tx = await goldToken.transferFrom(accounts[1], accounts[3], ONE_GOLD).send()
     await tx.waitReceipt()
     const after = await goldToken.balanceOf(accounts[3])

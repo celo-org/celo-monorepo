@@ -12,9 +12,9 @@ import {
   sixtyFour,
   thirtyTwo,
 } from '@celo/wallet-hsm'
+import * as ethUtil from '@ethereumjs/util'
 import { KMS } from 'aws-sdk'
 import { BigNumber } from 'bignumber.js'
-import * as ethUtil from 'ethereumjs-util'
 
 const SigningAlgorithm = 'ECDSA_SHA_256'
 

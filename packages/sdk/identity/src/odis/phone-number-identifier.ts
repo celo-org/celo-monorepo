@@ -1,4 +1,3 @@
-import { CombinerEndpointPNP } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import debugFactory from 'debug'
 import { BlsBlindingClient } from './bls-blinding-client'
@@ -39,29 +38,23 @@ export async function getPhoneNumberIdentifier(
   clientVersion?: string,
   blsBlindingClient?: BlsBlindingClient,
   sessionID?: string,
-  keyVersion?: number,
-  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
+  keyVersion?: number
 ): Promise<PhoneNumberHashDetails> {
   debug('Getting phone number pepper')
 
-  const {
-    plaintextIdentifier,
-    obfuscatedIdentifier,
-    pepper,
-    unblindedSignature,
-  } = await getObfuscatedIdentifier(
-    e164Number,
-    IdentifierPrefix.PHONE_NUMBER,
-    account,
-    signer,
-    context,
-    blindingFactor,
-    clientVersion,
-    blsBlindingClient,
-    sessionID,
-    keyVersion,
-    endpoint
-  )
+  const { plaintextIdentifier, obfuscatedIdentifier, pepper, unblindedSignature } =
+    await getObfuscatedIdentifier(
+      e164Number,
+      IdentifierPrefix.PHONE_NUMBER,
+      account,
+      signer,
+      context,
+      blindingFactor,
+      clientVersion,
+      blsBlindingClient,
+      sessionID,
+      keyVersion
+    )
   return {
     e164Number: plaintextIdentifier,
     phoneHash: obfuscatedIdentifier,
@@ -96,8 +89,7 @@ export async function getBlindedPhoneNumberSignature(
   base64BlindedMessage: string,
   clientVersion?: string,
   sessionID?: string,
-  keyVersion?: number,
-  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
+  keyVersion?: number
 ): Promise<string> {
   return getBlindedIdentifierSignature(
     account,
@@ -106,8 +98,7 @@ export async function getBlindedPhoneNumberSignature(
     base64BlindedMessage,
     clientVersion,
     sessionID,
-    keyVersion,
-    endpoint
+    keyVersion
   )
 }
 
@@ -120,17 +111,13 @@ export async function getPhoneNumberIdentifierFromSignature(
   base64BlindedSignature: string,
   blsBlindingClient: BlsBlindingClient
 ): Promise<PhoneNumberHashDetails> {
-  const {
-    plaintextIdentifier,
-    obfuscatedIdentifier,
-    pepper,
-    unblindedSignature,
-  } = await getObfuscatedIdentifierFromSignature(
-    e164Number,
-    IdentifierPrefix.PHONE_NUMBER,
-    base64BlindedSignature,
-    blsBlindingClient
-  )
+  const { plaintextIdentifier, obfuscatedIdentifier, pepper, unblindedSignature } =
+    await getObfuscatedIdentifierFromSignature(
+      e164Number,
+      IdentifierPrefix.PHONE_NUMBER,
+      base64BlindedSignature,
+      blsBlindingClient
+    )
   return {
     e164Number: plaintextIdentifier,
     phoneHash: obfuscatedIdentifier,

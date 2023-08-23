@@ -21,13 +21,19 @@ import { Counters } from '../../../common/metrics'
 import { getSignerVersion } from '../../../config'
 import { PnpSession } from '../../session'
 
+import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
+const tracer = opentelemetry.trace.getTracer('signer-tracer')
+
 export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   readonly endpoint = SignerEndpoint.PNP_QUOTA
 
   constructor(
     readonly enabled: boolean,
     readonly shouldFailOpen: boolean,
-    readonly timeoutMs: number,
+    readonly fullNodeTimeoutMs: number,
+    readonly fullNodeRetryCount: number,
+    readonly fullNodeRetryDelayMs: number,
     readonly kit: ContractKit
   ) {
     super(enabled)
@@ -37,17 +43,41 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<PnpQuotaResponse>
   ): Promise<PnpSession<PnpQuotaRequest> | null> {
-    const warnings: ErrorType[] = []
-    if (!super.inputChecks(request, response)) {
-      return null
-    }
-    if (!(await this.authenticate(request, warnings, response.locals.logger))) {
-      this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
-      return null
-    }
-    const session = new PnpSession(request, response)
-    session.errors.push(...warnings)
-    return session
+    return tracer.startActiveSpan('pnpQuotaIO - Init', async (span) => {
+      const warnings: ErrorType[] = []
+      span.addEvent('Calling inputChecks')
+      if (!super.inputChecks(request, response)) {
+        span.addEvent('Error calling inputChecks')
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: response.statusMessage,
+        })
+        span.end()
+        return null
+      }
+      span.addEvent('inputChecks OK, Calling authenticate')
+      if (!(await this.authenticate(request, warnings, response.locals.logger))) {
+        span.addEvent('Error calling authenticate')
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: WarningMessage.UNAUTHENTICATED_USER,
+        })
+        span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, 401)
+        this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
+        span.end()
+        return null
+      }
+      span.addEvent('Authenticate OK, creating session')
+      const session = new PnpSession(request, response)
+      session.errors.push(...warnings)
+      span.addEvent('Session created')
+      span.setStatus({
+        code: SpanStatusCode.OK,
+        message: response.statusMessage,
+      })
+      span.end()
+      return session
+    })
   }
 
   validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, PnpQuotaRequest> {
@@ -69,7 +99,9 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       logger,
       this.shouldFailOpen,
       warnings,
-      this.timeoutMs
+      this.fullNodeTimeoutMs,
+      this.fullNodeRetryCount,
+      this.fullNodeRetryDelayMs
     )
   }
 
@@ -79,31 +111,49 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     quotaStatus: PnpQuotaStatus,
     warnings: string[]
   ) {
-    send(
-      response,
-      {
-        success: true,
-        version: getSignerVersion(),
-        ...quotaStatus,
-        warnings,
-      },
-      status,
-      response.locals.logger
-    )
-    Counters.responses.labels(this.endpoint, status.toString()).inc()
+    return tracer.startActiveSpan(`pnpQuotaIO - sendSuccess`, (span) => {
+      span.addEvent('Sending Success')
+      send(
+        response,
+        {
+          success: true,
+          version: getSignerVersion(),
+          ...quotaStatus,
+          warnings,
+        },
+        status,
+        response.locals.logger
+      )
+      span.setAttribute(SemanticAttributes.HTTP_METHOD, status)
+      span.setStatus({
+        code: SpanStatusCode.OK,
+        message: response.statusMessage,
+      })
+      Counters.responses.labels(this.endpoint, status.toString()).inc()
+      span.end()
+    })
   }
 
   sendFailure(error: ErrorType, status: number, response: Response<PnpQuotaResponseFailure>) {
-    send(
-      response,
-      {
-        success: false,
-        version: getSignerVersion(),
-        error,
-      },
-      status,
-      response.locals.logger
-    )
-    Counters.responses.labels(this.endpoint, status.toString()).inc()
+    return tracer.startActiveSpan(`pnpQuotaIO - sendFailure`, (span) => {
+      span.addEvent('Sending Failure')
+      send(
+        response,
+        {
+          success: false,
+          version: getSignerVersion(),
+          error,
+        },
+        status,
+        response.locals.logger
+      )
+      span.setAttribute(SemanticAttributes.HTTP_METHOD, status)
+      span.setStatus({
+        code: SpanStatusCode.ERROR,
+        message: error,
+      })
+      Counters.responses.labels(this.endpoint, status.toString()).inc()
+      span.end()
+    })
   }
 }

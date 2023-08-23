@@ -13,13 +13,14 @@ import {
   OdisAPI,
   OdisContextName,
 } from '@celo/identity/lib/odis/query'
-import { CombinerEndpointPNP, fetchEnv } from '@celo/phone-number-privacy-common'
+import { fetchEnv } from '@celo/phone-number-privacy-common'
 import { genSessionID } from '@celo/phone-number-privacy-common/lib/utils/logger'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { defined } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
+import { ACCOUNT_ADDRESS, dekAuthSigner, generateRandomPhoneNumber, PRIVATE_KEY } from './resources'
 
-const phoneNumber = fetchEnv('PHONE_NUMBER')
+let phoneNumber = fetchEnv('PHONE_NUMBER')
 
 const newPrivateKey = async () => {
   const mnemonic = await generateMnemonic(MnemonicStrength.s256_24words)
@@ -29,22 +30,35 @@ const newPrivateKey = async () => {
 export const queryOdisForSalt = async (
   blockchainProvider: string,
   contextName: OdisContextName,
-  endpoint: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN,
-  timeoutMs: number = 10000
+  timeoutMs: number = 10000,
+  bypassQuota: boolean = false,
+  useDEK: boolean = false
 ) => {
+  let authSigner: AuthSigner
+  let accountAddress: string
   console.log(`contextName: ${contextName}`) // tslint:disable-line:no-console
   console.log(`blockchain provider: ${blockchainProvider}`) // tslint:disable-line:no-console
+  console.log(`using DEK: ${useDEK}`) // tslint:disable-line:no-console
 
   const serviceContext = getServiceContext(contextName, OdisAPI.PNP)
 
   const contractKit = newKit(blockchainProvider, new LocalWallet())
-  const privateKey = await newPrivateKey()
-  const accountAddress = normalizeAddressWith0x(privateKeyToAddress(privateKey))
-  contractKit.connection.addAccount(privateKey)
-  contractKit.defaultAccount = accountAddress
-  const authSigner: AuthSigner = {
-    authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
-    contractKit,
+
+  if (useDEK) {
+    accountAddress = ACCOUNT_ADDRESS
+    contractKit.connection.addAccount(PRIVATE_KEY)
+    contractKit.defaultAccount = accountAddress
+    authSigner = dekAuthSigner(0)
+    phoneNumber = generateRandomPhoneNumber()
+  } else {
+    const privateKey = await newPrivateKey()
+    accountAddress = normalizeAddressWith0x(privateKeyToAddress(privateKey))
+    contractKit.connection.addAccount(privateKey)
+    contractKit.defaultAccount = accountAddress
+    authSigner = {
+      authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
+      contractKit,
+    }
   }
 
   const abortController = new AbortController()
@@ -53,6 +67,7 @@ export const queryOdisForSalt = async (
     console.log(`ODIS salt request timed out after ${timeoutMs} ms`) // tslint:disable-line:no-console
   }, timeoutMs)
   try {
+    const testSessionId = Math.floor(Math.random() * 100000).toString()
     const res = await OdisUtils.Identifier.getObfuscatedIdentifier(
       phoneNumber,
       OdisUtils.Identifier.IdentifierPrefix.PHONE_NUMBER,
@@ -62,9 +77,8 @@ export const queryOdisForSalt = async (
       undefined,
       undefined,
       undefined,
-      genSessionID(),
+      bypassQuota ? testSessionId : genSessionID(),
       undefined,
-      endpoint,
       abortController
     )
     clearTimeout(timeout)

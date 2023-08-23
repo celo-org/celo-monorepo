@@ -42,7 +42,7 @@ export const handler = async (argv: ListArgv) => {
   const resp = await fetch(
     `${blockscoutURL}/api?module=account&action=txlist&address=${argv.address}&sort=desc`
   )
-  const jsonResp = await resp.json()
+  const jsonResp = (await resp.json()) as any
 
   if (jsonResp.result === undefined) {
     return

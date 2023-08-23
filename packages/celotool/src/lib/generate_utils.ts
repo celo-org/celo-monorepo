@@ -2,7 +2,7 @@
 import * as bls12377js from '@celo/bls12377js'
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/cryptographic-utils/lib/bls'
 import BigNumber from 'bignumber.js'
-import * as bip32 from 'bip32'
+import { BIP32Factory, BIP32Interface } from 'bip32'
 import * as bip39 from 'bip39'
 import fs from 'fs'
 import { merge, range, repeat } from 'lodash'
@@ -11,6 +11,7 @@ import path from 'path'
 import * as rlp from 'rlp'
 import { MyceloGenesisConfig } from 'src/lib/interfaces/mycelo-genesis-config'
 import { CurrencyPair } from 'src/lib/k8s-oracle/base'
+import * as ecc from 'tiny-secp256k1'
 import Web3 from 'web3'
 import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
@@ -25,6 +26,8 @@ import {
 import { getIndexForLoadTestThread } from './geth'
 import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
+
+const bip32 = BIP32Factory(ecc)
 
 export enum AccountType {
   VALIDATOR = 0,
@@ -117,7 +120,7 @@ export const generateOraclePrivateKey = (
 export const generatePrivateKeyWithDerivations = (mnemonic: string, derivations: number[]) => {
   const seed = bip39.mnemonicToSeedSync(mnemonic)
   const node = bip32.fromSeed(seed)
-  const newNode = derivations.reduce((n: bip32.BIP32Interface, derivation: number) => {
+  const newNode = derivations.reduce((n: BIP32Interface, derivation: number) => {
     return n.derive(derivation)
   }, node)
   return newNode.privateKey!.toString('hex')
@@ -357,24 +360,24 @@ export const generateIstanbulExtraData = (validators: Validator[]) => {
         validators.map((validator) => Buffer.from(validator.address, 'hex')),
         validators.map((validator) => Buffer.from(validator.blsPublicKey, 'hex')),
         // Removed validators
-        new Buffer(0),
+        Buffer.alloc(0),
         // Seal
         Buffer.from(repeat('0', ecdsaSignatureVanity * 2), 'hex'),
         [
           // AggregatedSeal.Bitmap
-          new Buffer(0),
+          Buffer.alloc(0),
           // AggregatedSeal.Signature
           Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
           // AggregatedSeal.Round
-          new Buffer(0),
+          Buffer.alloc(0),
         ],
         [
           // ParentAggregatedSeal.Bitmap
-          new Buffer(0),
+          Buffer.alloc(0),
           // ParentAggregatedSeal.Signature
           Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
           // ParentAggregatedSeal.Round
-          new Buffer(0),
+          Buffer.alloc(0),
         ],
       ])
       .toString('hex')

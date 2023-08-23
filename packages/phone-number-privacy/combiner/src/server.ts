@@ -8,8 +8,9 @@ import {
   rootLogger,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import express, { Request, Response } from 'express'
-import { performance, PerformanceObserver } from 'perf_hooks'
+import express, { Request, RequestHandler, Response } from 'express'
+// tslint:disable-next-line: ordered-imports
+import { PerformanceObserver, performance } from 'perf_hooks'
 import { Controller } from './common/controller'
 import { CombinerConfig, getCombinerVersion } from './config'
 import { DomainDisableAction } from './domain/endpoints/disable/action'
@@ -23,7 +24,6 @@ import { PnpQuotaAction } from './pnp/endpoints/quota/action'
 import { PnpQuotaIO } from './pnp/endpoints/quota/io'
 import { PnpSignAction } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
-import { LegacyPnpSignIO } from './pnp/endpoints/sign/io.legacy'
 import { PnpThresholdStateService } from './pnp/services/threshold-state'
 
 require('events').EventEmitter.defaultMaxListeners = 15
@@ -35,7 +35,7 @@ export function startCombiner(config: CombinerConfig, kit: ContractKit) {
   const app = express()
   // TODO get logger to show accurate serviceName
   // (https://github.com/celo-org/celo-monorepo/issues/9809)
-  app.use(express.json({ limit: '0.2mb' }), loggerMiddleware(config.serviceName))
+  app.use(express.json({ limit: '0.2mb' }) as RequestHandler, loggerMiddleware(config.serviceName))
 
   // Enable cross origin resource sharing from any domain so ODIS can be interacted with from web apps
   //
@@ -59,23 +59,6 @@ export function startCombiner(config: CombinerConfig, kit: ContractKit) {
   })
 
   const pnpThresholdStateService = new PnpThresholdStateService()
-
-  const legacyPnpSign = new Controller(
-    new PnpSignAction(
-      config.phoneNumberPrivacy,
-      pnpThresholdStateService,
-      new LegacyPnpSignIO(config.phoneNumberPrivacy, kit)
-    )
-  )
-  app.post(CombinerEndpoint.LEGACY_PNP_SIGN, (req, res) =>
-    meterResponse(
-      legacyPnpSign.handle.bind(legacyPnpSign),
-      req,
-      res,
-      CombinerEndpoint.LEGACY_PNP_SIGN,
-      config
-    )
-  )
 
   const pnpQuota = new Controller(
     new PnpQuotaAction(

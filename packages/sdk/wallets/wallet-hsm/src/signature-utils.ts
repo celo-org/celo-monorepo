@@ -1,6 +1,6 @@
 import { Address, ensureLeading0x } from '@celo/base/lib/address'
+import * as ethUtil from '@ethereumjs/util'
 import { BigNumber } from 'bignumber.js'
-import * as ethUtil from 'ethereumjs-util'
 import { ecdsaRecover } from 'secp256k1'
 
 // 0x04 prefix indicates that the key is not compressed

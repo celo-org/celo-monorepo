@@ -8,7 +8,8 @@ import { WalletBase } from '@celo/wallet-base'
  */
 export abstract class RemoteWallet<TSigner extends Signer>
   extends WalletBase<TSigner>
-  implements ReadOnlyWallet {
+  implements ReadOnlyWallet
+{
   private setupFinished = false
   private setupLocked = false
   private INIT_TIMEOUT_IN_MS = 10 * 1000

@@ -413,7 +413,7 @@ describe('Transfer tests', function (this: any) {
   const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
 
   function truncateTopic(hex: string) {
-    return '0x' + hex.substr(26)
+    return '0x' + hex.substring(26)
   }
 
   function parseEvents(receipt: CeloTxReceipt | undefined) {

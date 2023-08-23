@@ -25,16 +25,10 @@ import { getCombinerVersion } from '../../../config'
 export class DomainDisableIO extends IO<DisableDomainRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.DISABLE_DOMAIN
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
-  readonly requestSchema: t.Type<
-    DisableDomainRequest,
-    DisableDomainRequest,
-    unknown
-  > = disableDomainRequestSchema(DomainSchema)
-  readonly responseSchema: t.Type<
-    DisableDomainResponse,
-    DisableDomainResponse,
-    unknown
-  > = disableDomainResponseSchema(SequentialDelayDomainStateSchema)
+  readonly requestSchema: t.Type<DisableDomainRequest, DisableDomainRequest, unknown> =
+    disableDomainRequestSchema(DomainSchema)
+  readonly responseSchema: t.Type<DisableDomainResponse, DisableDomainResponse, unknown> =
+    disableDomainResponseSchema(SequentialDelayDomainStateSchema)
 
   async init(
     request: Request<{}, {}, unknown>,
