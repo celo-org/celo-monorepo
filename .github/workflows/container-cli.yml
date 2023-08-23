@@ -25,6 +25,7 @@ jobs:
       tag: testing
       context: .
       file: dockerfiles/cli-standalone/Dockerfile
+      trivy: true
 
   celocli-build:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
@@ -38,3 +39,4 @@ jobs:
       tag: latest
       context: .
       file: dockerfiles/cli-standalone/Dockerfile
+      trivy: true
