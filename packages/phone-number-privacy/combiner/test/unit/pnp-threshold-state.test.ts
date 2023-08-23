@@ -9,9 +9,8 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { getSignerVersion } from '@celo/phone-number-privacy-signer/src/config'
 import { Request, Response } from 'express'
-import { Session } from '../../src/common/session'
 import config from '../../src/config'
-import { PnpThresholdStateService } from '../../src/pnp/services/threshold-state'
+import { findCombinerQuotaState } from '../../src/pnp/services/threshold-state'
 
 describe('pnp threshold state', () => {
   // TODO add tests with failed signer responses, depending on
@@ -24,33 +23,9 @@ describe('pnp threshold state', () => {
     pubKey: 'mock pubKey',
   }
 
-  const getSession = (quotaData: { totalQuota: number; performedQueryCount: number }[]) => {
-    const mockRequest = {
-      body: {},
-    } as Request
-
-    // @ts-ignore: missing some properties
-    const mockResponse = {
-      locals: {
-        logger: rootLogger,
-      },
-    } as Response
-    const session = new Session<PnpQuotaRequest | SignMessageRequest>(mockResponse, keyVersionInfo)
-    quotaData.forEach((q) => {
-      const res: PnpQuotaResponseSuccess | SignMessageResponseSuccess = {
-        success: true,
-        version: expectedVersion,
-        ...q,
-      }
-      session.responses.push({ url: 'random url', res, status: 200 })
-    })
-    return session
-  }
-
   const pnpConfig = config.phoneNumberPrivacy
   pnpConfig.keys.currentVersion = keyVersionInfo.keyVersion
   pnpConfig.keys.versions = JSON.stringify([keyVersionInfo])
-  const pnpThresholdStateService = new PnpThresholdStateService()
 
   const expectedVersion = getSignerVersion()
   const testBlockNumber = 1000000
@@ -106,8 +81,21 @@ describe('pnp threshold state', () => {
   ]
   varyingQueryCount.forEach(({ signerRes, expectedQueryCount }) => {
     it(`should return ${expectedQueryCount} performedQueryCount given signer responses of ${signerRes}`, () => {
-      const session = getSession(signerRes)
-      const thresholdResult = pnpThresholdStateService.findCombinerQuotaState(session)
+      
+      signerRes.map((o) => (
+        url: 'random url',
+        status: 200,
+        res: {
+          success: true,
+          version: expectedVersion,
+          ...q,
+        }
+      })
+      session.responses.push({ url: 'random url', res, status: 200 })
+
+      
+      const warnings: string[] = []
+      const thresholdResult = findCombinerQuotaState(keyVersionInfo, null, warnings)
       expect(thresholdResult).toStrictEqual({
         performedQueryCount: expectedQueryCount,
         totalQuota,
