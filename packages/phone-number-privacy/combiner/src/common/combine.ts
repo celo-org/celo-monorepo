@@ -148,11 +148,13 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
   // measure e2e combiner latency.
   obs.disconnect()
 
-  if (errorCodes.size > 1) {
-    logger.error(
-      { errorCodes: JSON.stringify([...errorCodes]) },
-      ErrorMessage.INCONSISTENT_SIGNER_RESPONSES
-    )
+  if (errorCodes.size > 0) {
+    if (errorCodes.size > 1) {
+      logger.error(
+        { errorCodes: JSON.stringify([...errorCodes]) },
+        ErrorMessage.INCONSISTENT_SIGNER_RESPONSES
+      )
+    }
 
     return { signerResponses: responses, maxErrorCode: getMajorityErrorCode(errorCodes) }
   } else {
