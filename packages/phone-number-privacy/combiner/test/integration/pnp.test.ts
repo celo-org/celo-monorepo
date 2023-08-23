@@ -378,7 +378,7 @@ describe('pnpService', () => {
               version: expectedVersion,
               performedQueryCount: expectedQueryCount,
               totalQuota,
-              blockNumber: testBlockNumber,
+
               warnings: expectedWarnings,
             })
           })
@@ -396,7 +396,7 @@ describe('pnpService', () => {
             version: expectedVersion,
             performedQueryCount: 0,
             totalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
         })
@@ -413,7 +413,7 @@ describe('pnpService', () => {
             version: expectedVersion,
             performedQueryCount: 0,
             totalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
           const res2 = await getCombinerQuotaResponse(req, authorization)
@@ -435,7 +435,7 @@ describe('pnpService', () => {
             version: expectedVersion,
             performedQueryCount: 0,
             totalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
         })
@@ -454,7 +454,7 @@ describe('pnpService', () => {
             version: expectedVersion,
             performedQueryCount: 0,
             totalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
         })
@@ -474,7 +474,7 @@ describe('pnpService', () => {
             version: expectedVersion,
             performedQueryCount: 0,
             totalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [
               WarningMessage.SIGNER_RESPONSE_DISCREPANCIES,
               WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS +
@@ -622,7 +622,7 @@ describe('pnpService', () => {
             signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
           const unblindedSig = threshold_bls.unblind(
@@ -645,7 +645,7 @@ describe('pnpService', () => {
               signature: expectedSignatures[i - 1],
               performedQueryCount: 1,
               totalQuota: expectedTotalQuota,
-              blockNumber: testBlockNumber,
+
               warnings: [],
             })
 
@@ -669,7 +669,7 @@ describe('pnpService', () => {
             signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           }
 
@@ -691,7 +691,7 @@ describe('pnpService', () => {
             signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           }
 
@@ -726,7 +726,7 @@ describe('pnpService', () => {
             signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
         })
@@ -743,7 +743,7 @@ describe('pnpService', () => {
             signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
         })
@@ -760,7 +760,7 @@ describe('pnpService', () => {
             signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
         })
@@ -776,7 +776,7 @@ describe('pnpService', () => {
             signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
 
@@ -950,7 +950,7 @@ describe('pnpService', () => {
               signature: expectedSignature,
               performedQueryCount: 1,
               totalQuota: expectedTotalQuota,
-              blockNumber: testBlockNumber,
+
               warnings: [],
             })
             const unblindedSig = threshold_bls.unblind(
@@ -1067,7 +1067,7 @@ describe('pnpService', () => {
               version: expectedVersion,
               performedQueryCount: 0,
               totalQuota: expectedTotalQuota,
-              blockNumber: testBlockNumber,
+
               warnings: [],
             })
           })
@@ -1085,7 +1085,7 @@ describe('pnpService', () => {
               signature: expectedSignature,
               performedQueryCount: 1,
               totalQuota: expectedTotalQuota,
-              blockNumber: testBlockNumber,
+
               warnings: [],
             })
           })
@@ -1281,7 +1281,7 @@ describe('pnpService', () => {
         signature: res.body.signature,
         performedQueryCount: 1,
         totalQuota: expectedTotalQuota,
-        blockNumber: testBlockNumber,
+
         warnings: [],
       })
       threshold_bls.unblind(

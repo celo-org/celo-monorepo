@@ -1,52 +1,25 @@
 import {
   DisableDomainRequest,
   DomainQuotaStatusRequest,
-  DomainRequest,
   DomainRestrictedSignatureRequest,
-  KeyVersionInfo,
   OdisResponse,
   rootLogger,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { getSignerVersion } from '@celo/phone-number-privacy-signer/src/config'
-import { Request, Response } from 'express'
-import { Session } from '../../src/common/session'
+
 import config from '../../src/config'
-import { DomainSignerResponseLogger } from '../../src/domain/services/log-responses'
+import { logDomainResponsesDiscrepancies } from '../../src/domain/services/log-responses'
 
 describe('domain response logger', () => {
   const url = 'test signer url'
 
-  const keyVersionInfo: KeyVersionInfo = {
-    keyVersion: 1,
-    threshold: 3,
-    polynomial: 'mock polynomial',
-    pubKey: 'mock pubKey',
-  }
-
-  const getSession = (responses: OdisResponse<DomainRequest>[]) => {
-    const mockRequest = {
-      body: {},
-    } as Request
-
-    // @ts-ignore: missing some properties
-    const mockResponse = {
-      locals: {
-        logger: rootLogger(config.serviceName),
-      },
-    } as Response
-    const session = new Session<DomainRequest>(mockResponse, keyVersionInfo)
-    responses.forEach((res) => {
-      session.responses.push({ url, res, status: 200 })
-    })
-    return session
-  }
+  const logger = rootLogger(config.serviceName)
 
   const version = getSignerVersion()
   const counter = 1
   const disabled = false
   const timer = 10000
-  const domainResponseLogger = new DomainSignerResponseLogger()
 
   const testCases: {
     it: string
@@ -317,26 +290,28 @@ describe('domain response logger', () => {
   ]
   testCases.forEach((testCase) => {
     it(testCase.it, () => {
-      const session = getSession(testCase.responses)
       const logSpys = {
         info: {
-          spy: jest.spyOn(session.logger, 'info'),
+          spy: jest.spyOn(logger, 'info'),
           callCount: 0,
         },
         debug: {
-          spy: jest.spyOn(session.logger, 'debug'),
+          spy: jest.spyOn(logger, 'debug'),
           callCount: 0,
         },
         warn: {
-          spy: jest.spyOn(session.logger, 'warn'),
+          spy: jest.spyOn(logger, 'warn'),
           callCount: 0,
         },
         error: {
-          spy: jest.spyOn(session.logger, 'error'),
+          spy: jest.spyOn(logger, 'error'),
           callCount: 0,
         },
       }
-      domainResponseLogger.logResponseDiscrepancies(session)
+      logDomainResponsesDiscrepancies(
+        logger,
+        testCase.responses.map((res) => ({ url, res }))
+      )
       testCase.expectedLogs.forEach((log) => {
         expect(logSpys[log.level].spy).toHaveBeenNthCalledWith(
           ++logSpys[log.level].callCount,
