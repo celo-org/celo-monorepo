@@ -9,7 +9,7 @@ import {
   OdisResponse,
   send,
   SequentialDelayDomainStateSchema,
-  verifyDisableDomainRequestAuthenticity,
+  verifyDomainRestrictedSignatureRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import assert from 'node:assert'
@@ -42,7 +42,7 @@ export function createDomainSignHandler(
     // Note that signing requests may include a nonce for replay protection that will be checked by
     // the signer, but is not checked here. As a result, requests that pass the authentication check
     // here may still fail when sent to the signer.
-    if (!verifyDisableDomainRequestAuthenticity(request.body)) {
+    if (!verifyDomainRestrictedSignatureRequestAuthenticity(request.body)) {
       sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return
     }

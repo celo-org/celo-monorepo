@@ -21,7 +21,7 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
   logger: Logger,
   signers: Signer[],
   endpoint: string,
-  request: Request<R>,
+  request: Request<{}, {}, R>,
   keyVersionInfo: KeyVersionInfo,
   keyVersion: number | null,
   requestTimeoutMS: number,

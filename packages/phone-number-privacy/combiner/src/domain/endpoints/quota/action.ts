@@ -7,7 +7,7 @@ import {
   ErrorMessage,
   send,
   SequentialDelayDomainStateSchema,
-  verifyDisableDomainRequestAuthenticity,
+  verifyDomainQuotaStatusRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Signer, thresholdCallToSigners } from '../../../common/combine'
@@ -30,7 +30,7 @@ export function createDomainQuotaHandler(
       return
     }
 
-    if (!verifyDisableDomainRequestAuthenticity(request.body)) {
+    if (!verifyDomainQuotaStatusRequestAuthenticity(request.body)) {
       sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return
     }

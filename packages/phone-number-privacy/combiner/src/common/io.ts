@@ -63,7 +63,7 @@ export async function fetchSignerResponseWithFallback<R extends OdisRequest>(
   signer: Signer,
   signerEndpoint: string,
   keyVersion: number,
-  request: Request<R>,
+  request: Request<{}, {}, R>,
   logger: Logger,
   abortSignal: AbortSignal
 ): Promise<FetchResponse> {
