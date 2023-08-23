@@ -5,6 +5,7 @@ import {
   disableDomainResponseSchema,
   DomainSchema,
   ErrorMessage,
+  getSignerEndpoint,
   send,
   SequentialDelayDomainStateSchema,
   verifyDisableDomainRequestAuthenticity,
@@ -13,19 +14,16 @@ import {
 import { Signer, thresholdCallToSigners } from '../../../common/combine'
 import { PromiseHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, sendFailure } from '../../../common/io'
-
 import { getCombinerVersion, OdisConfig } from '../../../config'
-import { logDomainResponsesDiscrepancies } from '../../services/log-responses'
+import { logDomainResponseDiscrepancies } from '../../services/log-responses'
 import { findThresholdDomainState } from '../../services/threshold-state'
 
 export function createDisableDomainHandler(
   signers: Signer[],
   config: OdisConfig
 ): PromiseHandler<DisableDomainRequest> {
-  const requestSchema = disableDomainRequestSchema(DomainSchema)
-  const signerEndpoint = CombinerEndpoint.DISABLE_DOMAIN
   return async (request, response) => {
-    if (!requestSchema.is(request.body)) {
+    if (!disableDomainRequestSchema(DomainSchema).is(request.body)) {
       sendFailure(WarningMessage.INVALID_INPUT, 400, response)
       return
     }
@@ -35,19 +33,23 @@ export function createDisableDomainHandler(
       return
     }
 
+    // TODO remove?
     const keyVersionInfo = getKeyVersionInfo(request, config, response.locals.logger)
 
-    const { signerResponses, maxErrorCode } = await thresholdCallToSigners(
+    const { signerResponses, maxErrorCode } = await thresholdCallToSigners<DisableDomainRequest>(
       response.locals.logger,
-      signers,
-      signerEndpoint,
-      request,
-      keyVersionInfo,
-      config.odisServices.timeoutMilliSeconds,
-      disableDomainResponseSchema(SequentialDelayDomainStateSchema)
+      {
+        signers,
+        endpoint: getSignerEndpoint(CombinerEndpoint.DISABLE_DOMAIN),
+        request,
+        keyVersionInfo,
+        requestTimeoutMS: config.odisServices.timeoutMilliSeconds,
+        responseSchema: disableDomainResponseSchema(SequentialDelayDomainStateSchema),
+        shouldCheckKeyVersion: false,
+      }
     )
 
-    logDomainResponsesDiscrepancies(response.locals.logger, signerResponses)
+    logDomainResponseDiscrepancies(response.locals.logger, signerResponses)
     try {
       const disableDomainStatus = findThresholdDomainState(
         keyVersionInfo,

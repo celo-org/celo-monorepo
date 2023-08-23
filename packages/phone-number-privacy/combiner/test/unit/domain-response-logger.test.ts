@@ -9,7 +9,7 @@ import {
 import { getSignerVersion } from '@celo/phone-number-privacy-signer/src/config'
 
 import config from '../../src/config'
-import { logDomainResponsesDiscrepancies } from '../../src/domain/services/log-responses'
+import { logDomainResponseDiscrepancies } from '../../src/domain/services/log-responses'
 
 describe('domain response logger', () => {
   const url = 'test signer url'
@@ -308,7 +308,7 @@ describe('domain response logger', () => {
           callCount: 0,
         },
       }
-      logDomainResponsesDiscrepancies(
+      logDomainResponseDiscrepancies(
         logger,
         testCase.responses.map((res) => ({ url, res }))
       )

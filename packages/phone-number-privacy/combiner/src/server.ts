@@ -9,7 +9,6 @@ import {
 } from '@celo/phone-number-privacy-common'
 import express, { RequestHandler } from 'express'
 import { Signer } from './common/combine'
-// tslint:disable-next-line: ordered-imports
 import {
   catchErrorHandler,
   disabledHandler,
@@ -19,9 +18,7 @@ import {
 import { CombinerConfig, getCombinerVersion } from './config'
 import { createDisableDomainHandler } from './domain/endpoints/disable/action'
 import { createDomainQuotaHandler } from './domain/endpoints/quota/action'
-
 import { createDomainSignHandler } from './domain/endpoints/sign/action'
-
 import { createPnpQuotaHandler } from './pnp/endpoints/quota/action'
 import { createPnpSignHandler } from './pnp/endpoints/sign/action'
 

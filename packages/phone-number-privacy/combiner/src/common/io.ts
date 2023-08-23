@@ -1,12 +1,13 @@
 import {
   ErrorType,
   getRequestKeyVersion,
-  KeyVersionInfo,
   KEY_VERSION_HEADER,
+  KeyVersionInfo,
   OdisRequest,
   OdisResponse,
   requestHasValidKeyVersion,
   send,
+  SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
@@ -66,7 +67,7 @@ export function getKeyVersionInfo(
 
 export async function fetchSignerResponseWithFallback<R extends OdisRequest>(
   signer: Signer,
-  signerEndpoint: string,
+  signerEndpoint: SignerEndpoint,
   keyVersion: number,
   request: Request<{}, {}, R>,
   logger: Logger,

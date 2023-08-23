@@ -1,14 +1,10 @@
-import {
-  DomainRequest,
-  DomainRestrictedSignatureRequest,
-  WarningMessage,
-} from '@celo/phone-number-privacy-common'
+import { DomainRequest, WarningMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { SignerResponse } from '../../common/io'
 
-export function logDomainResponsesDiscrepancies(
+export function logDomainResponseDiscrepancies<R extends DomainRequest>(
   logger: Logger,
-  responses: Array<SignerResponse<DomainRequest | DomainRestrictedSignatureRequest>>
+  responses: Array<SignerResponse<R>>
 ) {
   const parsedResponses: Array<{
     signerUrl: string

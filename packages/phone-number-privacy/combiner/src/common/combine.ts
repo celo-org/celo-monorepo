@@ -4,6 +4,7 @@ import {
   OdisRequest,
   OdisResponse,
   responseHasExpectedKeyVersion,
+  SignerEndpoint,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
@@ -17,15 +18,19 @@ export interface Signer {
   fallbackUrl?: string
 }
 
+export interface ThresholdCallToSignersOptions<R extends OdisRequest> {
+  signers: Signer[]
+  endpoint: SignerEndpoint
+  requestTimeoutMS: number
+  shouldCheckKeyVersion: boolean
+  keyVersionInfo: KeyVersionInfo
+  request: Request<{}, {}, R>
+  responseSchema: t.Type<OdisResponse<R>, OdisResponse<R>, unknown>
+}
+
 export async function thresholdCallToSigners<R extends OdisRequest>(
   logger: Logger,
-  signers: Signer[],
-  endpoint: string,
-  request: Request<{}, {}, R>,
-  keyVersionInfo: KeyVersionInfo,
-  requestTimeoutMS: number,
-  responseSchema: t.Type<OdisResponse<R>, OdisResponse<R>, unknown>,
-  shouldCheckKeyVersion: boolean = false,
+  options: ThresholdCallToSignersOptions<R>,
   processResult: (res: OdisResponse<R>) => Promise<boolean> = (_) => Promise.resolve(false)
 ): Promise<{ signerResponses: Array<SignerResponse<R>>; maxErrorCode?: number }> {
   const obs = new PerformanceObserver((list) => {
@@ -41,6 +46,16 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
     })
   })
   obs.observe({ entryTypes: ['measure'], buffered: false })
+
+  const {
+    signers,
+    endpoint,
+    requestTimeoutMS,
+    shouldCheckKeyVersion,
+    keyVersionInfo,
+    request,
+    responseSchema,
+  } = options
 
   const manualAbort = new AbortController()
   const timeoutSignal = AbortSignal.timeout(requestTimeoutMS)
@@ -81,7 +96,6 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
           return
         }
 
-        // if given key version, check that
         if (
           shouldCheckKeyVersion &&
           !responseHasExpectedKeyVersion(signerFetchResult, keyVersionInfo.keyVersion, logger)
@@ -120,16 +134,11 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
           logger.error({ signer }, ErrorMessage.SIGNER_REQUEST_ERROR)
           logger.error({ signer, err })
 
-          // Tracking failed request count via signer url prevents
-          // double counting the same failed request by mistake
           errorCount++
           if (signers.length - errorCount < requiredThreshold) {
             logger.warn('Not possible to reach a threshold of signer responses. Failing fast')
             manualAbort.abort()
           }
-
-          // TODO (mcortesi) doesn't seem we need to fail at first error
-          // throw err
         }
       }
     })

@@ -12,10 +12,7 @@ import config, {
   MAX_QUERY_COUNT_DISCREPANCY_THRESHOLD,
   MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD,
 } from '../../src/config'
-import {
-  logFailOpenResponses,
-  logPnpSignerResponseDiscrepancies,
-} from '../../src/pnp/services/log-responses'
+import { logPnpSignerResponseDiscrepancies } from '../../src/pnp/services/log-responses'
 
 describe('pnp response logger', () => {
   const url = 'test signer url'
@@ -413,104 +410,6 @@ describe('pnp response logger', () => {
         },
       ],
     },
-    {
-      it: 'should log correctly when signers respond with fail-open warnings',
-      responses: [
-        {
-          success: true,
-          performedQueryCount,
-          totalQuota,
-          version,
-
-          warnings: [ErrorMessage.FAILING_OPEN],
-        },
-        {
-          success: true,
-          performedQueryCount,
-          totalQuota,
-          version,
-
-          warnings: [ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA],
-        },
-        {
-          success: true,
-          performedQueryCount,
-          totalQuota,
-          version,
-
-          warnings: [ErrorMessage.FAILURE_TO_GET_DEK],
-        },
-      ],
-      expectedLogs: [
-        {
-          params: [
-            {
-              parsedResponses: [
-                {
-                  signerUrl: url,
-                  values: {
-                    performedQueryCount,
-                    totalQuota,
-                    version,
-                    warnings: [ErrorMessage.FAILING_OPEN],
-                  },
-                },
-                {
-                  signerUrl: url,
-                  values: {
-                    performedQueryCount,
-                    totalQuota,
-                    version,
-                    warnings: [ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA],
-                  },
-                },
-                {
-                  signerUrl: url,
-                  values: {
-                    performedQueryCount,
-                    totalQuota,
-                    version,
-                    warnings: [ErrorMessage.FAILURE_TO_GET_DEK],
-                  },
-                },
-              ],
-            },
-            WarningMessage.SIGNER_RESPONSE_DISCREPANCIES,
-          ],
-          level: 'warn',
-        },
-        {
-          params: [
-            {
-              signerWarning: ErrorMessage.FAILING_OPEN,
-              service: url,
-            },
-            WarningMessage.SIGNER_FAILED_OPEN,
-          ],
-          level: 'error',
-        },
-        {
-          params: [
-            {
-              signerWarning: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA,
-              service: url,
-            },
-            WarningMessage.SIGNER_FAILED_OPEN,
-          ],
-          level: 'error',
-        },
-        {
-          params: [
-            {
-              signerWarning: ErrorMessage.FAILURE_TO_GET_DEK,
-              service: url,
-            },
-            WarningMessage.SIGNER_FAILED_OPEN,
-          ],
-          level: 'error',
-        },
-      ],
-    },
   ]
   testCases.forEach((testCase) => {
     it(testCase.it, () => {
@@ -536,7 +435,6 @@ describe('pnp response logger', () => {
         },
       }
       logPnpSignerResponseDiscrepancies(logger, responses)
-      logFailOpenResponses(logger, responses)
       testCase.expectedLogs.forEach((log) => {
         expect(logSpys[log.level].spy).toHaveBeenNthCalledWith(
           ++logSpys[log.level].callCount,

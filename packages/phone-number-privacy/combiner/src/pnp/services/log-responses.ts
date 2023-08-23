@@ -1,14 +1,11 @@
 import {
-  ErrorMessage,
   PnpQuotaRequest,
   SignMessageRequest,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { SignerResponse } from '../../common/io'
-
 import {
-  MAX_BLOCK_DISCREPANCY_THRESHOLD,
   MAX_QUERY_COUNT_DISCREPANCY_THRESHOLD,
   MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD,
 } from '../../config'
@@ -28,16 +25,15 @@ export function logPnpSignerResponseDiscrepancies(
       version: string
       performedQueryCount: number
       totalQuota: number
-      blockNumber?: number
       warnings?: string[]
     }
   }> = []
   responses.forEach((response) => {
     if (response.res.success) {
-      const { version, performedQueryCount, totalQuota, warnings } = response.res
+      const { version, performedQueryCount, totalQuota, warnings: _warnings } = response.res
       parsedResponses.push({
         signerUrl: response.url,
-        values: { version, performedQueryCount, totalQuota, warnings },
+        values: { version, performedQueryCount, totalQuota, warnings: _warnings },
       })
     }
   })
@@ -54,25 +50,6 @@ export function logPnpSignerResponseDiscrepancies(
       warnings.push(WarningMessage.SIGNER_RESPONSE_DISCREPANCIES)
       break
     }
-  }
-
-  // blockNumber
-  parsedResponses.forEach((res) => {
-    if (res.values.blockNumber === undefined) {
-      logger.warn({ signerUrl: res.signerUrl }, 'Signer responded with undefined blockNumber')
-    }
-  })
-  const sortedByBlockNumber = parsedResponses
-    .filter((res) => !!res.values.blockNumber)
-    .sort((a, b) => a.values.blockNumber! - b.values.blockNumber!)
-  if (
-    sortedByBlockNumber.length &&
-    sortedByBlockNumber[sortedByBlockNumber.length - 1].values.blockNumber! -
-      sortedByBlockNumber[0].values.blockNumber! >=
-      MAX_BLOCK_DISCREPANCY_THRESHOLD
-  ) {
-    logger.error({ sortedByBlockNumber }, WarningMessage.INCONSISTENT_SIGNER_BLOCK_NUMBERS)
-    warnings.push(WarningMessage.INCONSISTENT_SIGNER_BLOCK_NUMBERS)
   }
 
   // totalQuota
@@ -102,30 +79,4 @@ export function logPnpSignerResponseDiscrepancies(
   }
 
   return warnings
-}
-
-export function logFailOpenResponses(
-  logger: Logger,
-  responses: Array<SignerResponse<PnpQuotaRequest | SignMessageRequest>>
-): void {
-  responses.forEach((response) => {
-    if (response.res.success) {
-      const { warnings } = response.res
-      if (warnings) {
-        warnings.forEach((warning) => {
-          switch (warning) {
-            case ErrorMessage.FAILING_OPEN:
-            case ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA:
-            case ErrorMessage.FAILURE_TO_GET_DEK:
-              logger.error(
-                { signerWarning: warning, service: response.url },
-                WarningMessage.SIGNER_FAILED_OPEN
-              )
-            default:
-              break
-          }
-        })
-      }
-    }
-  })
 }

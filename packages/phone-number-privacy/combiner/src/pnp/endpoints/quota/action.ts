@@ -3,6 +3,7 @@ import {
   CombinerEndpoint,
   DataEncryptionKeyFetcher,
   ErrorMessage,
+  getSignerEndpoint,
   hasValidAccountParam,
   isBodyReasonablySized,
   PnpQuotaRequest,
@@ -15,12 +16,8 @@ import { Request } from 'express'
 import { Signer, thresholdCallToSigners } from '../../../common/combine'
 import { PromiseHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, sendFailure } from '../../../common/io'
-
 import { getCombinerVersion, OdisConfig } from '../../../config'
-import {
-  logFailOpenResponses,
-  logPnpSignerResponseDiscrepancies,
-} from '../../services/log-responses'
+import { logPnpSignerResponseDiscrepancies } from '../../services/log-responses'
 import { findCombinerQuotaState } from '../../services/threshold-state'
 
 export function createPnpQuotaHandler(
@@ -28,10 +25,9 @@ export function createPnpQuotaHandler(
   config: OdisConfig,
   dekFetcher: DataEncryptionKeyFetcher
 ): PromiseHandler<PnpQuotaRequest> {
-  const signerEndpoint = CombinerEndpoint.PNP_QUOTA
-
   return async (request, response) => {
     const logger = response.locals.logger
+
     if (!validateRequest(request)) {
       sendFailure(WarningMessage.INVALID_INPUT, 400, response)
       return
@@ -41,19 +37,23 @@ export function createPnpQuotaHandler(
       sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return
     }
+
+    // TODO remove?
     const keyVersionInfo = getKeyVersionInfo(request, config, logger)
 
-    const { signerResponses, maxErrorCode } = await thresholdCallToSigners(
-      logger,
+    const { signerResponses, maxErrorCode } = await thresholdCallToSigners(logger, {
       signers,
-      signerEndpoint,
+      endpoint: getSignerEndpoint(CombinerEndpoint.PNP_QUOTA),
       request,
       keyVersionInfo,
-      config.odisServices.timeoutMilliSeconds,
-      PnpQuotaResponseSchema
-    )
+      requestTimeoutMS: config.odisServices.timeoutMilliSeconds,
+      responseSchema: PnpQuotaResponseSchema,
+      shouldCheckKeyVersion: false,
+    })
     const warnings = logPnpSignerResponseDiscrepancies(logger, signerResponses)
-    logFailOpenResponses(logger, signerResponses)
+
+    // TODO remove?
+    // logFailOpenResponses(logger, signerResponses)
 
     const { threshold } = keyVersionInfo
 

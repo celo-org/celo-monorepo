@@ -5,6 +5,7 @@ import {
   domainQuotaStatusResponseSchema,
   DomainSchema,
   ErrorMessage,
+  getSignerEndpoint,
   send,
   SequentialDelayDomainStateSchema,
   verifyDomainQuotaStatusRequestAuthenticity,
@@ -13,19 +14,16 @@ import {
 import { Signer, thresholdCallToSigners } from '../../../common/combine'
 import { PromiseHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, sendFailure } from '../../../common/io'
-
 import { getCombinerVersion, OdisConfig } from '../../../config'
-import { logDomainResponsesDiscrepancies } from '../../services/log-responses'
+import { logDomainResponseDiscrepancies } from '../../services/log-responses'
 import { findThresholdDomainState } from '../../services/threshold-state'
 
 export function createDomainQuotaHandler(
   signers: Signer[],
   config: OdisConfig
 ): PromiseHandler<DomainQuotaStatusRequest> {
-  const requestSchema = domainQuotaStatusRequestSchema(DomainSchema)
-  const signerEndpoint = CombinerEndpoint.DOMAIN_QUOTA_STATUS
   return async (request, response) => {
-    if (!requestSchema.is(request.body)) {
+    if (!domainQuotaStatusRequestSchema(DomainSchema).is(request.body)) {
       sendFailure(WarningMessage.INVALID_INPUT, 400, response)
       return
     }
@@ -35,19 +33,20 @@ export function createDomainQuotaHandler(
       return
     }
 
+    // TODO remove?
     const keyVersionInfo = getKeyVersionInfo(request, config, response.locals.logger)
 
-    const { signerResponses, maxErrorCode } = await thresholdCallToSigners(
-      response.locals.logger,
+    const { signerResponses, maxErrorCode } = await thresholdCallToSigners(response.locals.logger, {
       signers,
-      signerEndpoint,
+      endpoint: getSignerEndpoint(CombinerEndpoint.DOMAIN_QUOTA_STATUS),
       request,
       keyVersionInfo,
-      config.odisServices.timeoutMilliSeconds,
-      domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema)
-    )
+      requestTimeoutMS: config.odisServices.timeoutMilliSeconds,
+      responseSchema: domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema),
+      shouldCheckKeyVersion: false,
+    })
 
-    logDomainResponsesDiscrepancies(response.locals.logger, signerResponses)
+    logDomainResponseDiscrepancies(response.locals.logger, signerResponses)
     if (signerResponses.length >= keyVersionInfo.threshold) {
       try {
         send(
@@ -65,6 +64,6 @@ export function createDomainQuotaHandler(
         response.locals.logger.error(err, 'Error combining signer quota status responses')
       }
     }
-    sendFailure(ErrorMessage.THRESHOLD_DISABLE_DOMAIN_FAILURE, maxErrorCode ?? 500, response)
+    sendFailure(ErrorMessage.THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE, maxErrorCode ?? 500, response)
   }
 }

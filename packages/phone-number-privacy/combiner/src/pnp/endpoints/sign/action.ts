@@ -4,6 +4,7 @@ import {
   DataEncryptionKeyFetcher,
   ErrorMessage,
   ErrorType,
+  getSignerEndpoint,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
   isBodyReasonablySized,
@@ -14,19 +15,14 @@ import {
   SignMessageResponseSchema,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-
 import { Request } from 'express'
 import assert from 'node:assert'
 import { Signer, thresholdCallToSigners } from '../../../common/combine'
 import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-crypto-client'
 import { PromiseHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, requestHasSupportedKeyVersion, sendFailure } from '../../../common/io'
-
 import { getCombinerVersion, OdisConfig } from '../../../config'
-import {
-  logFailOpenResponses,
-  logPnpSignerResponseDiscrepancies,
-} from '../../services/log-responses'
+import { logPnpSignerResponseDiscrepancies } from '../../services/log-responses'
 import { findCombinerQuotaState } from '../../services/threshold-state'
 
 export function createPnpSignHandler(
@@ -34,7 +30,6 @@ export function createPnpSignHandler(
   config: OdisConfig,
   dekFetcher: DataEncryptionKeyFetcher
 ): PromiseHandler<SignMessageRequest> {
-  const signerEndpoint = CombinerEndpoint.PNP_SIGN
   return async (request, response) => {
     const logger = response.locals.logger
     if (!validateRequest(request)) {
@@ -54,7 +49,7 @@ export function createPnpSignHandler(
     const keyVersionInfo = getKeyVersionInfo(request, config, logger)
     const crypto = new BLSCryptographyClient(keyVersionInfo)
 
-    const processRequest = async (result: OdisResponse<SignMessageRequest>): Promise<boolean> => {
+    const processResult = async (result: OdisResponse<SignMessageRequest>): Promise<boolean> => {
       assert(result.success)
       crypto.addSignature({ url: 'TODO: remove', signature: result.signature })
       // const signatureAdditionStart = Date.now()
@@ -77,7 +72,7 @@ export function createPnpSignHandler(
           return true
         } catch (err) {
           // One or more signatures failed verification and were discarded.
-          logger.info('Error caught in receiveSuccess')
+          logger.info('Error caught in processRequest')
           logger.info(err)
           // Continue to collect signatures.
         }
@@ -87,18 +82,19 @@ export function createPnpSignHandler(
 
     const { signerResponses, maxErrorCode } = await thresholdCallToSigners(
       logger,
-      signers,
-      signerEndpoint,
-      request,
-      keyVersionInfo,
-      config.odisServices.timeoutMilliSeconds,
-      SignMessageResponseSchema,
-      true,
-      processRequest
+      {
+        signers,
+        endpoint: getSignerEndpoint(CombinerEndpoint.PNP_SIGN),
+        request,
+        keyVersionInfo,
+        requestTimeoutMS: config.odisServices.timeoutMilliSeconds,
+        responseSchema: SignMessageResponseSchema,
+        shouldCheckKeyVersion: true,
+      },
+      processResult
     )
 
     const warnings = logPnpSignerResponseDiscrepancies(logger, signerResponses)
-    logFailOpenResponses(logger, signerResponses)
 
     if (crypto.hasSufficientSignatures()) {
       try {

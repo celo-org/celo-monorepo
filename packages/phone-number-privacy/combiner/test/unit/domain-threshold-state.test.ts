@@ -4,7 +4,6 @@ import {
   KeyVersionInfo,
 } from '@celo/phone-number-privacy-common'
 import { getSignerVersion } from '@celo/phone-number-privacy-signer/src/config'
-
 import { findThresholdDomainState } from '../../src/domain/services/threshold-state'
 
 describe('domain threshold state', () => {
@@ -17,11 +16,6 @@ describe('domain threshold state', () => {
     polynomial: 'mock polynomial',
     pubKey: 'mock pubKey',
   }
-
-  // const keyVersionInfo: KeyVersionInfo = {
-  //   currentVersion: keyVersionInfo.keyVersion,
-  //   versions: JSON.stringify([keyVersionInfo]),
-  // }
 
   const totalSigners = 4
 

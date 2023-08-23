@@ -6,6 +6,7 @@ import {
   DomainSchema,
   ErrorMessage,
   ErrorType,
+  getSignerEndpoint,
   OdisResponse,
   send,
   SequentialDelayDomainStateSchema,
@@ -15,26 +16,24 @@ import {
 import assert from 'node:assert'
 import { Signer, thresholdCallToSigners } from '../../../common/combine'
 import { DomainCryptoClient } from '../../../common/crypto-clients/domain-crypto-client'
-
 import { PromiseHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, requestHasSupportedKeyVersion, sendFailure } from '../../../common/io'
-
 import { getCombinerVersion, OdisConfig } from '../../../config'
-import { logDomainResponsesDiscrepancies } from '../../services/log-responses'
+import { logDomainResponseDiscrepancies } from '../../services/log-responses'
 import { findThresholdDomainState } from '../../services/threshold-state'
 
 export function createDomainSignHandler(
   signers: Signer[],
   config: OdisConfig
 ): PromiseHandler<DomainRestrictedSignatureRequest> {
-  const requestSchema = domainRestrictedSignatureRequestSchema(DomainSchema)
-  const signerEndpoint = CombinerEndpoint.DOMAIN_SIGN
   return async (request, response) => {
-    if (!requestSchema.is(request.body)) {
+    const { logger } = response.locals
+
+    if (!domainRestrictedSignatureRequestSchema(DomainSchema).is(request.body)) {
       sendFailure(WarningMessage.INVALID_INPUT, 400, response)
       return
     }
-    if (!requestHasSupportedKeyVersion(request, config, response.locals.logger)) {
+    if (!requestHasSupportedKeyVersion(request, config, logger)) {
       sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return
     }
@@ -47,11 +46,10 @@ export function createDomainSignHandler(
       return
     }
 
-    const keyVersionInfo = getKeyVersionInfo(request, config, response.locals.logger)
+    const keyVersionInfo = getKeyVersionInfo(request, config, logger)
     const crypto = new DomainCryptoClient(keyVersionInfo)
 
-    const logger = response.locals.logger
-    const processRequest = async (
+    const processResult = async (
       res: OdisResponse<DomainRestrictedSignatureRequest>
     ): Promise<boolean> => {
       assert(res.success)
@@ -86,17 +84,19 @@ export function createDomainSignHandler(
 
     const { signerResponses, maxErrorCode } = await thresholdCallToSigners(
       response.locals.logger,
-      signers,
-      signerEndpoint,
-      request,
-      keyVersionInfo,
-      config.odisServices.timeoutMilliSeconds,
-      domainRestrictedSignatureResponseSchema(SequentialDelayDomainStateSchema),
-      true,
-      processRequest
+      {
+        signers,
+        endpoint: getSignerEndpoint(CombinerEndpoint.DOMAIN_SIGN),
+        request,
+        keyVersionInfo,
+        requestTimeoutMS: config.odisServices.timeoutMilliSeconds,
+        responseSchema: domainRestrictedSignatureResponseSchema(SequentialDelayDomainStateSchema),
+        shouldCheckKeyVersion: true,
+      },
+      processResult
     )
 
-    logDomainResponsesDiscrepancies(response.locals.logger, signerResponses)
+    logDomainResponseDiscrepancies(response.locals.logger, signerResponses)
 
     if (crypto.hasSufficientSignatures()) {
       try {
