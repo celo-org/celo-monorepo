@@ -8,12 +8,10 @@ on:
   push:
     branches:
       - master
-      # TODO (soloseng): remove before merge
-      - martinvol/isolate-0.8-artifacts
-  # TODO(jcortejoso): Replace by pull_request
-  pull_request_target:
+  pull_request:
     branches:
       - master
+      - martinvol/CR10Release
 
 concurrency:
   group: circle-ci-${{ github.ref }}
