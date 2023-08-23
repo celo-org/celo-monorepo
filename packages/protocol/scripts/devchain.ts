@@ -255,7 +255,7 @@ async function runDevChainFromTar(filename: string) {
   const stopGanache = await startGanache(chainCopy.name, { verbose: true }, chainCopy)
   if (isCI) {
     // If we are running on circle ci we need to wait for ganache to be up.
-    await waitForPortOpen('localhost', 8545, 90)
+    await waitForPortOpen('localhost', 8545, 120)
   }
 
   return stopGanache
@@ -318,7 +318,7 @@ async function runDevChain(
   const stopGanache = await startGanache(datadir, { verbose: true })
   if (isCI) {
     // If we are running on circle ci we need to wait for ganache to be up.
-    await waitForPortOpen('localhost', 8545, 90)
+    await waitForPortOpen('localhost', 8545, 120)
   }
   if (opts.reset || opts.runMigrations) {
     const code = await runMigrations({ upto: opts.upto, migrationOverride: opts.migrationOverride })
