@@ -38,7 +38,7 @@ contract Governance is
 
   uint256 private constant FIXED_HALF = 500000000000000000000000;
 
-  enum VoteValue { None, Abstain, No, Yes }
+  enum VoteValue { None, Abstain, No, Yes, Maybe }
 
   struct UpvoteRecord {
     uint256 proposalId;
@@ -225,7 +225,7 @@ contract Governance is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 4, 0, 0);
+    return (1, 4, 0, 1);
   }
 
   /**
