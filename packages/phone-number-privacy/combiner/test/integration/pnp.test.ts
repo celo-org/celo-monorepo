@@ -176,6 +176,12 @@ jest.mock('@celo/contractkit', () => ({
   newKit: jest.fn().mockImplementation(() => mockContractKit),
 }))
 
+async function serverClose(server?: Server | HttpsServer) {
+  if (server) {
+    await new Promise((resolve) => server.close(resolve))
+  }
+}
+
 describe('pnpService', () => {
   let keyProvider1: KeyProvider
   let keyProvider2: KeyProvider
@@ -316,9 +322,9 @@ describe('pnpService', () => {
       await signerDB1?.destroy()
       await signerDB2?.destroy()
       await signerDB3?.destroy()
-      signer1?.close()
-      signer2?.close()
-      signer3?.close()
+      await serverClose(signer1)
+      await serverClose(signer2)
+      await serverClose(signer3)
     })
 
     describe('when signers are operating correctly', () => {
@@ -565,8 +571,8 @@ describe('pnpService', () => {
         it('Should respond with 500 when insufficient signer responses', async () => {
           await signerDB1?.destroy()
           await signerDB2?.destroy()
-          signer1?.close()
-          signer2?.close()
+          await serverClose(signer1)
+          await serverClose(signer2)
 
           const req = {
             account: ACCOUNT_ADDRESS1,
@@ -1263,11 +1269,11 @@ describe('pnpService', () => {
       await signerDB3?.destroy()
       await signerDB4?.destroy()
       await signerDB5?.destroy()
-      signer1?.close()
-      signer2?.close()
-      signer3?.close()
-      signer4?.close()
-      signer5?.close()
+      await serverClose(signer1)
+      await serverClose(signer2)
+      await serverClose(signer3)
+      await serverClose(signer4)
+      await serverClose(signer5)
     })
 
     it('Should respond with 200 on valid request', async () => {
