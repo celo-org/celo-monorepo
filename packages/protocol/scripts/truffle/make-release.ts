@@ -30,6 +30,14 @@ import { networks } from '../../truffle-config.js'
 
 let ignoredContractsSet = new Set()
 
+function delay(time) {
+  return new Promise((resolve) => setTimeout(resolve, time))
+}
+
+function getRandomNumber(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
 class ContractAddresses {
   static async create(
     contracts: string[],
@@ -39,11 +47,17 @@ class ContractAddresses {
     const addresses = new Map()
     await Promise.all(
       contracts.map(async (contract: string) => {
-        const registeredAddress = await registry.getAddressForString(contract)
+        // without this delay it sometimes fails with ProviderError
+        await delay(getRandomNumber(1, 1000))
+        try {
+          const registeredAddress = await registry.getAddressForString(contract)
 
-        if (!eqAddress(registeredAddress, NULL_ADDRESS)) {
-          console.log('set contract', contract)
-          addresses.set(contract, registeredAddress)
+          if (!eqAddress(registeredAddress, NULL_ADDRESS)) {
+            addresses.set(contract, registeredAddress)
+          }
+        } catch (error) {
+          console.log('contract', contract, error)
+          throw error
         }
       })
     )

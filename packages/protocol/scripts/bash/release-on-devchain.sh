@@ -63,7 +63,7 @@ git checkout - -- migrationsConfig.js
 
 # From make-release.sh
 echo "- Deploy release of current branch"
-INITIALIZATION_FILE=`ls -1 releaseData/initializationData/* | tail -n 1 | xargs realpath`
+INITIALIZATION_FILE=`ls releaseData/initializationData/release*.json | sort -V | tail -n 1 | xargs realpath`
 yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --branch $BRANCH --report report.json --proposal proposal.json --librariesFile libraries.json --initialize_data $INITIALIZATION_FILE
 
 # From verify-release.sh
