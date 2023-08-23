@@ -15,7 +15,7 @@ import { Request } from 'express'
 import { Signer, thresholdCallToSigners } from '../../../common/combine'
 import { PromiseHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, sendFailure } from '../../../common/io'
-import { Session } from '../../../common/session'
+
 import { getCombinerVersion, OdisConfig } from '../../../config'
 import {
   logFailOpenResponses,
@@ -42,9 +42,8 @@ export function createPnpQuotaHandler(
       return
     }
     const keyVersionInfo = getKeyVersionInfo(request, config, logger)
-    const session = new Session(response, keyVersionInfo)
 
-    await thresholdCallToSigners(
+    const { signerResponses, maxErrorCode } = await thresholdCallToSigners(
       logger,
       signers,
       signerEndpoint,
@@ -54,22 +53,21 @@ export function createPnpQuotaHandler(
       config.odisServices.timeoutMilliSeconds,
       PnpQuotaResponseSchema
     )
+    const warnings = logPnpSignerResponseDiscrepancies(logger, signerResponses)
+    logFailOpenResponses(logger, signerResponses)
 
-    session.warnings.push(...logPnpSignerResponseDiscrepancies(logger, session.responses))
-    logFailOpenResponses(logger, session.responses)
+    const { threshold } = keyVersionInfo
 
-    const { threshold } = session.keyVersionInfo
-
-    if (session.responses.length >= threshold) {
+    if (signerResponses.length >= threshold) {
       try {
-        const quotaStatus = findCombinerQuotaState(session)
+        const quotaStatus = findCombinerQuotaState(keyVersionInfo, signerResponses, warnings)
         send(
           response,
           {
             success: true,
             version: getCombinerVersion(),
             ...quotaStatus,
-            warnings: session.warnings,
+            warnings,
           },
           200,
           logger
@@ -80,11 +78,7 @@ export function createPnpQuotaHandler(
         logger.error(err, 'Error combining signer quota status responses')
       }
     }
-    sendFailure(
-      ErrorMessage.THRESHOLD_PNP_QUOTA_STATUS_FAILURE,
-      session.getMajorityErrorCode() ?? 500,
-      response
-    )
+    sendFailure(ErrorMessage.THRESHOLD_PNP_QUOTA_STATUS_FAILURE, maxErrorCode ?? 500, response)
   }
 }
 

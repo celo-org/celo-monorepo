@@ -1,17 +1,19 @@
 import {
-  PnpQuotaRequest,
+  KeyVersionInfo,
+  OdisRequest,
   PnpQuotaStatus,
-  SignMessageRequest,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { Session } from '../../common/session'
+import { SignerResponse } from '../../common/io'
 import { MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD } from '../../config'
 
-export function findCombinerQuotaState<R extends PnpQuotaRequest | SignMessageRequest>(
-  session: Session<R>
+export function findCombinerQuotaState<R extends OdisRequest>(
+  keyVersionInfo: KeyVersionInfo,
+  rawSignerResponses: Array<SignerResponse<R>>,
+  warnings: string[]
 ): PnpQuotaStatus {
-  const { threshold } = session.keyVersionInfo
-  const signerResponses = session.responses
+  const { threshold } = keyVersionInfo
+  const signerResponses = rawSignerResponses
     .map((signerResponse) => signerResponse.res)
     .filter((res) => res.success) as PnpQuotaStatus[]
   const sortedResponses = signerResponses.sort(
@@ -28,7 +30,7 @@ export function findCombinerQuotaState<R extends PnpQuotaRequest | SignMessageRe
     // TODO(2.0.0): add alerting for this
     throw new Error(WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS)
   } else if (totalQuotaStDev > 0) {
-    session.warnings.push(
+    warnings.push(
       WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS +
         ', using threshold signer as best guess'
     )

@@ -13,7 +13,7 @@ import {
 import { Signer, thresholdCallToSigners } from '../../../common/combine'
 import { PromiseHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, sendFailure } from '../../../common/io'
-import { Session } from '../../../common/session'
+
 import { getCombinerVersion, OdisConfig } from '../../../config'
 import { logDomainResponsesDiscrepancies } from '../../services/log-responses'
 import { findThresholdDomainState } from '../../services/threshold-state'
@@ -36,29 +36,27 @@ export function createDomainQuotaHandler(
     }
 
     const keyVersionInfo = getKeyVersionInfo(request, config, response.locals.logger)
-    const session = new Session(response, keyVersionInfo)
 
-    await thresholdCallToSigners(
+    const { signerResponses, maxErrorCode } = await thresholdCallToSigners(
       response.locals.logger,
       signers,
       signerEndpoint,
       request,
-      session.keyVersionInfo,
+      keyVersionInfo,
       null,
       config.odisServices.timeoutMilliSeconds,
       domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema)
     )
 
-    logDomainResponsesDiscrepancies(response.locals.logger, session.responses)
-    const { threshold } = session.keyVersionInfo
-    if (session.responses.length >= threshold) {
+    logDomainResponsesDiscrepancies(response.locals.logger, signerResponses)
+    if (signerResponses.length >= keyVersionInfo.threshold) {
       try {
         send(
           response,
           {
             success: true,
             version: getCombinerVersion(),
-            status: findThresholdDomainState(session, signers.length),
+            status: findThresholdDomainState(keyVersionInfo, signerResponses, signers.length),
           },
           200,
           response.locals.logger
@@ -68,10 +66,6 @@ export function createDomainQuotaHandler(
         response.locals.logger.error(err, 'Error combining signer quota status responses')
       }
     }
-    sendFailure(
-      ErrorMessage.THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE,
-      session.getMajorityErrorCode() ?? 500,
-      response
-    )
+    sendFailure(ErrorMessage.THRESHOLD_DISABLE_DOMAIN_FAILURE, maxErrorCode ?? 500, response)
   }
 }

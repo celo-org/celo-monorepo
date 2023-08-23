@@ -1,46 +1,24 @@
 import {
-  CombinerEndpoint,
   ErrorType,
   getRequestKeyVersion,
-  getSignerEndpoint,
   KeyVersionInfo,
   KEY_VERSION_HEADER,
   OdisRequest,
   OdisResponse,
   requestHasValidKeyVersion,
   send,
-  SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import * as t from 'io-ts'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { performance } from 'perf_hooks'
 import { getCombinerVersion, OdisConfig } from '../config'
 import { Signer } from './combine'
-import { Session } from './session'
 
 // tslint:disable-next-line: interface-over-type-literal
 export type SignerResponse<R extends OdisRequest> = {
   url: string
   res: OdisResponse<R>
-  status: number
-}
-
-export abstract class IO<R extends OdisRequest> {
-  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
-  abstract readonly requestSchema: t.Type<R, R, unknown>
-
-  constructor(readonly config: OdisConfig, readonly endpoint: CombinerEndpoint) {}
-
-  abstract init(
-    request: Request<{}, {}, unknown>,
-    response: Response<OdisResponse<R>>
-  ): Promise<Session<R> | null>
-
-  validateClientRequest(request: Request<{}, {}, unknown>): request is Request<{}, {}, R> {
-    return this.requestSchema.is(request.body)
-  }
 }
 
 export function requestHasSupportedKeyVersion(

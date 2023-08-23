@@ -10,7 +10,7 @@ import Logger from 'bunyan'
 import { Request } from 'express'
 import * as t from 'io-ts'
 import { PerformanceObserver } from 'perf_hooks'
-import { fetchSignerResponseWithFallback } from './io'
+import { fetchSignerResponseWithFallback, SignerResponse } from './io'
 
 export interface Signer {
   url: string
@@ -27,7 +27,7 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
   requestTimeoutMS: number,
   responseSchema: t.Type<OdisResponse<R>, OdisResponse<R>, unknown>,
   processResult: (res: OdisResponse<R>) => Promise<boolean> = (_) => Promise.resolve(false)
-) {
+): Promise<{ signerResponses: Array<SignerResponse<R>>; maxErrorCode?: number }> {
   const obs = new PerformanceObserver((list) => {
     // Possible race condition here: if multiple signers take exactly the same
     // amount of time, the PerformanceObserver callback may be called twice with
@@ -46,11 +46,12 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
   const timeoutSignal = AbortSignal.timeout(requestTimeoutMS)
   const abortSignal = (AbortSignal as any).any([manualAbort.signal, timeoutSignal]) as AbortSignal
 
-  const failedSigners: string[] = []
+  let errorCount = 0
   const errorCodes: Map<number, number> = new Map<number, number>()
 
   const requiredThreshold = keyVersionInfo.threshold
 
+  const responses: Array<SignerResponse<R>> = []
   // Forward request to signers
   // An unexpected error in handling the result for one signer should not
   // block a threshold of correct responses, but should be logged.
@@ -67,15 +68,13 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
         )
 
         if (!signerFetchResult.ok) {
-          // Tracking failed request count via signer url prevents
-          // double counting the same failed request by mistake
-          failedSigners.push(signer.url)
+          errorCount++
           errorCodes.set(
             signerFetchResult.status,
             (errorCodes.get(signerFetchResult.status) ?? 0) + 1
           )
 
-          if (signers.length - failedSigners.length < requiredThreshold) {
+          if (signers.length - errorCount < requiredThreshold) {
             logger.warn('Not possible to reach a threshold of signer responses. Failing fast')
             manualAbort.abort()
           }
@@ -105,6 +104,8 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
           throw new Error(ErrorMessage.SIGNER_RESPONSE_FAILED_WITH_OK_STATUS)
         }
 
+        responses.push({ res: odisResponse, url: signer.url })
+
         if (await processResult(odisResponse)) {
           // we already have enough responses
           manualAbort.abort()
@@ -121,8 +122,8 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
 
           // Tracking failed request count via signer url prevents
           // double counting the same failed request by mistake
-          failedSigners.push(signer.url)
-          if (signers.length - failedSigners.length < requiredThreshold) {
+          errorCount++
+          if (signers.length - errorCount < requiredThreshold) {
             logger.warn('Not possible to reach a threshold of signer responses. Failing fast')
             manualAbort.abort()
           }
@@ -137,6 +138,17 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
   // DO NOT call performance.clearMarks() as this also deletes marks used to
   // measure e2e combiner latency.
   obs.disconnect()
+
+  if (errorCodes.size > 1) {
+    logger.error(
+      { errorCodes: JSON.stringify([...errorCodes]) },
+      ErrorMessage.INCONSISTENT_SIGNER_RESPONSES
+    )
+
+    return { signerResponses: responses, maxErrorCode: getMajorityErrorCode(errorCodes) }
+  } else {
+    return { signerResponses: responses }
+  }
 }
 
 function parseSchema<T>(schema: t.Type<T, T, unknown>, data: unknown, logger: Logger): T {
@@ -153,4 +165,18 @@ function isTimeoutError(err: unknown) {
 
 function isAbortError(err: unknown) {
   return err instanceof Error && err.name === 'AbortError'
+}
+
+function getMajorityErrorCode(errorCodes: Map<number, number>): number {
+  let maxErrorCode = -1
+  let maxCount = -1
+  errorCodes.forEach((count, errorCode) => {
+    // This gives priority to the lower status codes in the event of a tie
+    // because 400s are more helpful than 500s for user feedback
+    if (count > maxCount || (count === maxCount && errorCode < maxErrorCode)) {
+      maxCount = count
+      maxErrorCode = errorCode
+    }
+  })
+  return maxErrorCode
 }

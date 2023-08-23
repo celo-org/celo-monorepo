@@ -1,16 +1,16 @@
-import { DomainRequest, DomainState } from '@celo/phone-number-privacy-common'
-import { Session } from '../../common/session'
+import { DomainRequest, DomainState, KeyVersionInfo } from '@celo/phone-number-privacy-common'
+import { SignerResponse } from '../../common/io'
 
 export function findThresholdDomainState<R extends DomainRequest>(
-  session: Session<R>,
+  keyVersionInfo: KeyVersionInfo,
+  rawSignerResponses: Array<SignerResponse<R>>,
   totalSigners: number
 ): DomainState {
+  const { threshold } = keyVersionInfo
   // Get the domain status from the responses, filtering out responses that don't have the status.
-  const domainStates = session.responses
+  const domainStates = rawSignerResponses
     .map((signerResponse) => ('status' in signerResponse.res ? signerResponse.res.status : null))
     .filter((state: DomainState | null | undefined): state is DomainState => !!state)
-
-  const { threshold } = session.keyVersionInfo
 
   // Note: when the threshold > # total signers - threshold, it's possible that we
   // throw an error here when the domain is disabled. While the domain is technically disabled,

@@ -13,7 +13,7 @@ import {
 import { Signer, thresholdCallToSigners } from '../../../common/combine'
 import { PromiseHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, sendFailure } from '../../../common/io'
-import { Session } from '../../../common/session'
+
 import { getCombinerVersion, OdisConfig } from '../../../config'
 import { logDomainResponsesDiscrepancies } from '../../services/log-responses'
 import { findThresholdDomainState } from '../../services/threshold-state'
@@ -36,9 +36,8 @@ export function createDisableDomainHandler(
     }
 
     const keyVersionInfo = getKeyVersionInfo(request, config, response.locals.logger)
-    const session = new Session(response, keyVersionInfo)
 
-    await thresholdCallToSigners(
+    const { signerResponses, maxErrorCode } = await thresholdCallToSigners(
       response.locals.logger,
       signers,
       signerEndpoint,
@@ -49,9 +48,13 @@ export function createDisableDomainHandler(
       disableDomainResponseSchema(SequentialDelayDomainStateSchema)
     )
 
-    logDomainResponsesDiscrepancies(response.locals.logger, session.responses)
+    logDomainResponsesDiscrepancies(response.locals.logger, signerResponses)
     try {
-      const disableDomainStatus = findThresholdDomainState(session, signers.length)
+      const disableDomainStatus = findThresholdDomainState(
+        keyVersionInfo,
+        signerResponses,
+        signers.length
+      )
       if (disableDomainStatus.disabled) {
         send(
           response,
@@ -73,10 +76,6 @@ export function createDisableDomainHandler(
       )
     }
 
-    sendFailure(
-      ErrorMessage.THRESHOLD_DISABLE_DOMAIN_FAILURE,
-      session.getMajorityErrorCode() ?? 500,
-      response
-    )
+    sendFailure(ErrorMessage.THRESHOLD_DISABLE_DOMAIN_FAILURE, maxErrorCode ?? 500, response)
   }
 }

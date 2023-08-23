@@ -15,9 +15,10 @@ import {
 import assert from 'node:assert'
 import { Signer, thresholdCallToSigners } from '../../../common/combine'
 import { DomainCryptoClient } from '../../../common/crypto-clients/domain-crypto-client'
-import { CryptoSession } from '../../../common/crypto-session'
+
 import { PromiseHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, requestHasSupportedKeyVersion, sendFailure } from '../../../common/io'
+
 import { getCombinerVersion, OdisConfig } from '../../../config'
 import { logDomainResponsesDiscrepancies } from '../../services/log-responses'
 import { findThresholdDomainState } from '../../services/threshold-state'
@@ -47,25 +48,20 @@ export function createDomainSignHandler(
     }
 
     const keyVersionInfo = getKeyVersionInfo(request, config, response.locals.logger)
-    const session = new CryptoSession(
-      request,
-      response,
-      keyVersionInfo,
-      new DomainCryptoClient(keyVersionInfo)
-    )
+    const crypto = new DomainCryptoClient(keyVersionInfo)
 
     const logger = response.locals.logger
     const processRequest = async (
       res: OdisResponse<DomainRestrictedSignatureRequest>
     ): Promise<boolean> => {
       assert(res.success)
-      session.crypto.addSignature({ url: 'TODO: remove', signature: res.signature })
+      crypto.addSignature({ url: 'TODO: remove', signature: res.signature })
       // const signatureAdditionStart = Date.now()
 
       // logger.info(
       //   {
       //     signer: url,
-      //     hasSufficientSignatures: session.crypto.x(),
+      //     hasSufficientSignatures: crypto.x(),
       //     additionLatency: Date.now() - signatureAdditionStart,
       //   },
       //   'Added signature'
@@ -73,9 +69,9 @@ export function createDomainSignHandler(
 
       // Send response immediately once we cross threshold
       // BLS threshold signatures can be combined without all partial signatures
-      if (session.crypto.hasSufficientSignatures()) {
+      if (crypto.hasSufficientSignatures()) {
         try {
-          session.crypto.combineBlindedSignatureShares(request.body.blindedMessage, logger)
+          crypto.combineBlindedSignatureShares(request.body.blindedMessage, logger)
           // Close outstanding requests
           return true
         } catch (err) {
@@ -88,23 +84,23 @@ export function createDomainSignHandler(
       return false
     }
 
-    await thresholdCallToSigners(
+    const { signerResponses, maxErrorCode } = await thresholdCallToSigners(
       response.locals.logger,
       signers,
       signerEndpoint,
       request,
-      session.keyVersionInfo,
-      session.keyVersionInfo.keyVersion,
+      keyVersionInfo,
+      keyVersionInfo.keyVersion,
       config.odisServices.timeoutMilliSeconds,
       domainRestrictedSignatureResponseSchema(SequentialDelayDomainStateSchema),
       processRequest
     )
 
-    logDomainResponsesDiscrepancies(response.locals.logger, session.responses)
+    logDomainResponsesDiscrepancies(response.locals.logger, signerResponses)
 
-    if (session.crypto.hasSufficientSignatures()) {
+    if (crypto.hasSufficientSignatures()) {
       try {
-        const combinedSignature = session.crypto.combineBlindedSignatureShares(
+        const combinedSignature = crypto.combineBlindedSignatureShares(
           request.body.blindedMessage,
           logger
         )
@@ -115,7 +111,7 @@ export function createDomainSignHandler(
             success: true,
             version: getCombinerVersion(),
             signature: combinedSignature,
-            status: findThresholdDomainState(session, signers.length),
+            status: findThresholdDomainState(keyVersionInfo, signerResponses, signers.length),
           },
           200,
           response.locals.logger
@@ -128,9 +124,9 @@ export function createDomainSignHandler(
       }
     }
 
-    const errorCode = session.getMajorityErrorCode() ?? 500
+    const errorCode = maxErrorCode ?? 500
     const error = errorCodeToError(errorCode)
-    sendFailure(error, errorCode, session.response)
+    sendFailure(error, errorCode, response)
   }
 }
 

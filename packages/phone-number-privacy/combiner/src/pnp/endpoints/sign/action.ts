@@ -19,9 +19,9 @@ import { Request } from 'express'
 import assert from 'node:assert'
 import { Signer, thresholdCallToSigners } from '../../../common/combine'
 import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-crypto-client'
-import { CryptoSession } from '../../../common/crypto-session'
 import { PromiseHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, requestHasSupportedKeyVersion, sendFailure } from '../../../common/io'
+
 import { getCombinerVersion, OdisConfig } from '../../../config'
 import {
   logFailOpenResponses,
@@ -52,22 +52,17 @@ export function createPnpSignHandler(
       return
     }
     const keyVersionInfo = getKeyVersionInfo(request, config, logger)
-    const session = new CryptoSession(
-      request,
-      response,
-      keyVersionInfo,
-      new BLSCryptographyClient(keyVersionInfo)
-    )
+    const crypto = new BLSCryptographyClient(keyVersionInfo)
 
     const processRequest = async (result: OdisResponse<SignMessageRequest>): Promise<boolean> => {
       assert(result.success)
-      session.crypto.addSignature({ url: 'TODO: remove', signature: result.signature })
+      crypto.addSignature({ url: 'TODO: remove', signature: result.signature })
       // const signatureAdditionStart = Date.now()
 
       // logger.info(
       //   {
       //     signer: url,
-      //     hasSufficientSignatures: session.crypto.x(),
+      //     hasSufficientSignatures: crypto.x(),
       //     additionLatency: Date.now() - signatureAdditionStart,
       //   },
       //   'Added signature'
@@ -75,9 +70,9 @@ export function createPnpSignHandler(
 
       // Send response immediately once we cross threshold
       // BLS threshold signatures can be combined without all partial signatures
-      if (session.crypto.hasSufficientSignatures()) {
+      if (crypto.hasSufficientSignatures()) {
         try {
-          session.crypto.combineBlindedSignatureShares(request.body.blindedQueryPhoneNumber, logger)
+          crypto.combineBlindedSignatureShares(request.body.blindedQueryPhoneNumber, logger)
           // Close outstanding requests
           return true
         } catch (err) {
@@ -90,37 +85,36 @@ export function createPnpSignHandler(
       return false
     }
 
-    await thresholdCallToSigners(
+    const { signerResponses, maxErrorCode } = await thresholdCallToSigners(
       logger,
       signers,
       signerEndpoint,
       request,
-      session.keyVersionInfo,
-      session.keyVersionInfo.keyVersion,
+      keyVersionInfo,
+      keyVersionInfo.keyVersion,
       config.odisServices.timeoutMilliSeconds,
       SignMessageResponseSchema,
       processRequest
     )
 
-    session.warnings.push(...logPnpSignerResponseDiscrepancies(logger, session.responses))
-    logFailOpenResponses(logger, session.responses)
+    const warnings = logPnpSignerResponseDiscrepancies(logger, signerResponses)
+    logFailOpenResponses(logger, signerResponses)
 
-    if (session.crypto.hasSufficientSignatures()) {
+    if (crypto.hasSufficientSignatures()) {
       try {
-        const combinedSignature = session.crypto.combineBlindedSignatureShares(
-          session.request.body.blindedQueryPhoneNumber,
+        const combinedSignature = crypto.combineBlindedSignatureShares(
+          request.body.blindedQueryPhoneNumber,
           logger
         )
 
-        const quotaStatus = findCombinerQuotaState(session)
         return send(
           response,
           {
             success: true,
             version: getCombinerVersion(),
             signature: combinedSignature,
-            ...quotaStatus,
-            warnings: session.warnings,
+            ...findCombinerQuotaState(keyVersionInfo, signerResponses, warnings),
+            warnings,
           },
           200,
           logger
@@ -132,9 +126,9 @@ export function createPnpSignHandler(
       }
     }
 
-    const errorCode = session.getMajorityErrorCode() ?? 500
+    const errorCode = maxErrorCode ?? 500
     const error = errorCodeToError(errorCode)
-    sendFailure(error, errorCode, session.response)
+    sendFailure(error, errorCode, response)
   }
 }
 
