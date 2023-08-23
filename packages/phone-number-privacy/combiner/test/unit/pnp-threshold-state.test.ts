@@ -1,14 +1,6 @@
-import {
-  KeyVersionInfo,
-  PnpQuotaRequest,
-  PnpQuotaResponseSuccess,
-  rootLogger,
-  SignMessageRequest,
-  SignMessageResponseSuccess,
-  WarningMessage,
-} from '@celo/phone-number-privacy-common'
+import { KeyVersionInfo, WarningMessage } from '@celo/phone-number-privacy-common'
 import { getSignerVersion } from '@celo/phone-number-privacy-signer/src/config'
-import { Request, Response } from 'express'
+
 import config from '../../src/config'
 import { findCombinerQuotaState } from '../../src/pnp/services/threshold-state'
 
@@ -28,7 +20,6 @@ describe('pnp threshold state', () => {
   pnpConfig.keys.versions = JSON.stringify([keyVersionInfo])
 
   const expectedVersion = getSignerVersion()
-  const testBlockNumber = 1000000
   const totalQuota = 10
   const performedQueryCount = 5
 
@@ -81,25 +72,23 @@ describe('pnp threshold state', () => {
   ]
   varyingQueryCount.forEach(({ signerRes, expectedQueryCount }) => {
     it(`should return ${expectedQueryCount} performedQueryCount given signer responses of ${signerRes}`, () => {
-      
-      signerRes.map((o) => (
-        url: 'random url',
-        status: 200,
-        res: {
-          success: true,
-          version: expectedVersion,
-          ...q,
+      const responses = signerRes.map((o) => {
+        return {
+          url: 'random url',
+          status: 200,
+          res: {
+            success: true as true,
+            version: expectedVersion,
+            ...o,
+          },
         }
       })
-      session.responses.push({ url: 'random url', res, status: 200 })
 
-      
       const warnings: string[] = []
-      const thresholdResult = findCombinerQuotaState(keyVersionInfo, null, warnings)
+      const thresholdResult = findCombinerQuotaState(keyVersionInfo, responses, warnings)
       expect(thresholdResult).toStrictEqual({
         performedQueryCount: expectedQueryCount,
         totalQuota,
-        blockNumber: testBlockNumber,
       })
     })
   })
@@ -138,15 +127,26 @@ describe('pnp threshold state', () => {
   ]
   varyingTotalQuota.forEach(({ signerRes, expectedTotalQuota, warning }) => {
     it(`should return ${expectedTotalQuota} totalQuota given signer responses of ${signerRes}`, () => {
-      const session = getSession(signerRes)
-      const thresholdResult = pnpThresholdStateService.findCombinerQuotaState(session)
+      const responses = signerRes.map((o) => {
+        return {
+          url: 'random url',
+          status: 200,
+          res: {
+            success: true as true,
+            version: expectedVersion,
+            ...o,
+          },
+        }
+      })
+
+      const warnings: string[] = []
+      const thresholdResult = findCombinerQuotaState(keyVersionInfo, responses, warnings)
       expect(thresholdResult).toStrictEqual({
         performedQueryCount,
         totalQuota: expectedTotalQuota,
-        blockNumber: testBlockNumber,
       })
       if (warning) {
-        expect(session.warnings).toContain(
+        expect(warnings).toContain(
           WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS +
             ', using threshold signer as best guess'
         )
@@ -180,15 +180,26 @@ describe('pnp threshold state', () => {
   ]
   varyingQuotaAndQuery.forEach(({ signerRes, expectedQueryCount, expectedTotalQuota, warning }) => {
     it(`should return ${expectedTotalQuota} totalQuota and ${expectedQueryCount} performedQueryCount given signer responses of ${signerRes}`, () => {
-      const session = getSession(signerRes)
-      const thresholdResult = pnpThresholdStateService.findCombinerQuotaState(session)
+      const responses = signerRes.map((o) => {
+        return {
+          url: 'random url',
+          status: 200,
+          res: {
+            success: true as true,
+            version: expectedVersion,
+            ...o,
+          },
+        }
+      })
+
+      const warnings: string[] = []
+      const thresholdResult = findCombinerQuotaState(keyVersionInfo, responses, warnings)
       expect(thresholdResult).toStrictEqual({
         performedQueryCount: expectedQueryCount,
         totalQuota: expectedTotalQuota,
-        blockNumber: testBlockNumber,
       })
       if (warning) {
-        expect(session.warnings).toContain(
+        expect(warnings).toContain(
           WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS +
             ', using threshold signer as best guess'
         )
@@ -197,13 +208,26 @@ describe('pnp threshold state', () => {
   })
 
   it('should throw an error if the total quota varies too much between signers', () => {
-    const session = getSession([
+    const signerRes = [
       { performedQueryCount, totalQuota: 1 },
       { performedQueryCount, totalQuota: 9 },
       { performedQueryCount, totalQuota: 15 },
       { performedQueryCount, totalQuota: 14 },
-    ])
-    expect(() => pnpThresholdStateService.findCombinerQuotaState(session)).toThrow(
+    ]
+    const responses = signerRes.map((o) => {
+      return {
+        url: 'random url',
+        status: 200,
+        res: {
+          success: true as true,
+          version: expectedVersion,
+          ...o,
+        },
+      }
+    })
+
+    const warnings: string[] = []
+    expect(() => findCombinerQuotaState(keyVersionInfo, responses, warnings)).toThrow(
       WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS
     )
   })

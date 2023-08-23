@@ -26,12 +26,9 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import {
-  initDatabase as initSignerDatabase,
-  startSigner,
-  SupportedDatabase,
-  SupportedKeystore,
-} from '@celo/phone-number-privacy-signer'
+import { initDatabase as initSignerDatabase } from '@celo/phone-number-privacy-signer/dist/common/database/database'
+import { startSigner } from '@celo/phone-number-privacy-signer/dist/server'
+import { SupportedDatabase, SupportedKeystore } from '@celo/phone-number-privacy-signer/dist/config'
 import {
   DefaultKeyName,
   KeyProvider,
@@ -138,6 +135,11 @@ const signerConfig: SignerConfig = {
   fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
   fullNodeRetryCount: RETRY_COUNT,
   fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
+  // TODO (alec) make SignerConfig better
+  shouldMockAccountService: false,
+  mockDek: '',
+  mockTotalQuota: 0,
+  shouldMockRequestService: false,
 }
 
 describe('domainService', () => {
