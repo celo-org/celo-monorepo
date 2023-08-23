@@ -1,0 +1,21 @@
+name: Publish SDK NPM packages
+on:
+  # DELETE `push:` to only allow for manual trigering
+  push:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'publish the sdks?'
+        required: true
+        type: choice
+        options:
+          - Y
+          - N
+          - dry-run
+      version:
+        description: 'Version to update the sdks to. You can pick major, minor, patch, a semantic version, or nothing if you do not want to update the versions.'
+        required: false
+        type: string
+        default: ''
+
+
