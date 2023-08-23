@@ -3,25 +3,10 @@
 import { parseSignature } from '@celo/utils/lib/signatureUtils'
 import { LocalWallet } from '@celo/wallet-local'
 import { account as Account } from 'eth-lib'
-import _ from 'underscore'
 import Web3 from 'web3'
 
 function isNot(value: any) {
-  return _.isUndefined(value) || _.isNull(value)
-}
-
-function trimLeadingZero(hex: string) {
-  while (hex && hex.startsWith('0x0')) {
-    hex = '0x' + hex.slice(3)
-  }
-  return hex
-}
-
-function makeEven(hex: string) {
-  if (hex.length % 2 === 1) {
-    hex = hex.replace('0x', '0x0')
-  }
-  return hex
+  return value === null || value === undefined
 }
 
 export const getParsedSignatureOfAddress = async (web3: Web3, address: string, signer: string) => {
@@ -66,7 +51,7 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
   }
 
   // Otherwise, get the missing info from the Ethereum Node
-  const chainId = isNot(txn.chainId) ? await web3.eth.net.getId() : txn.chainId
+  const chainId = isNot(txn.chainId) ? await web3.eth.getChainId() : txn.chainId
   const gasPrice = isNot(txn.gasPrice) ? await web3.eth.getGasPrice() : txn.gasPrice
   const nonce = isNot(txn.nonce)
     ? await web3.eth.getTransactionCount(Account.fromPrivate(privateKey).address)
@@ -78,5 +63,5 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
         JSON.stringify({ chainId, gasPrice, nonce })
     )
   }
-  return signed(_.extend(txn, { chainId, gasPrice, nonce }))
+  return signed({...txn, chainId, gasPrice, nonce })
 }
