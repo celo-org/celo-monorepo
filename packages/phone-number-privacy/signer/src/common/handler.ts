@@ -1,4 +1,3 @@
-import { timeout } from '@celo/base'
 import {
   ErrorMessage,
   ErrorType,
@@ -103,19 +102,20 @@ export function timeoutHandler<R extends OdisRequest>(
   timeoutMs: number,
   handler: PromiseHandler<R>
 ): PromiseHandler<R> {
-  // Unique error to be thrown on timeout
-  const timeoutError = Symbol() // TODO (mcortesi) use Error type
   return async (request, response) => {
-    try {
-      await timeout(handler, [request, response], timeoutMs, timeoutError)
-    } catch (err: any) {
-      if (err === timeoutError) {
-        Counters.timeouts.inc()
-        sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, response)
-      } else {
-        throw err
-      }
-    }
+    const timeoutSignal = (AbortSignal as any).timeout(timeoutMs)
+    timeoutSignal.addEventListener(
+      'abort',
+      () => {
+        if (!response.headersSent) {
+          Counters.timeouts.inc()
+          sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, response)
+        }
+      },
+      { once: true }
+    )
+
+    await handler(request, response)
   }
 }
 

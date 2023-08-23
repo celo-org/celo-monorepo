@@ -67,7 +67,7 @@ export async function getDomainStateRecord<D extends Domain>(
         .first()
         .timeout(config.db.timeout)
 
-      const result = await (trx != null ? sql.transacting(trx) : trx)
+      const result = await (trx != null ? sql.transacting(trx) : sql)
       // bools are stored in db as ints (1 or 0), so we must cast them back
       if (result) {
         result.disabled = !!result.disabled
