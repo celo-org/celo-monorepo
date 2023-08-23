@@ -10,10 +10,15 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
+import * as http from 'http'
+import * as https from 'https'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { performance } from 'perf_hooks'
 import { getCombinerVersion, OdisConfig } from '../config'
 import { Signer } from './combine'
+
+const httpAgent = new http.Agent({ keepAlive: true })
+const httpsAgent = new https.Agent({ keepAlive: true })
 
 // tslint:disable-next-line: interface-over-type-literal
 export type SignerResponse<R extends OdisRequest> = {
@@ -82,6 +87,7 @@ export async function fetchSignerResponseWithFallback<R extends OdisRequest>(
       },
       body: JSON.stringify(request.body),
       signal: abortSignal,
+      agent: url.startsWith("https://") ? httpsAgent : httpAgent
     })
   }
 
