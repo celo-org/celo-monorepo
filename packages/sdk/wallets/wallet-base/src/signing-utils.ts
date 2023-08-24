@@ -3,9 +3,9 @@ import {
   CeloTx,
   CeloTxWithSig,
   EncodedTransaction,
-  isPresent,
   RLPEncodedTx,
   TransactionTypes,
+  isPresent,
 } from '@celo/connect'
 import {
   hexToNumber,
@@ -41,6 +41,8 @@ const debug = debugFactory('wallet-base:tx:sign')
 export const publicKeyPrefix: number = 0x04
 export const sixtyFour: number = 64
 export const thirtyTwo: number = 32
+
+const yPARITY_EIP_2098 = 27
 
 function isNullOrUndefined(value: any): boolean {
   return value === null || value === undefined
@@ -80,7 +82,7 @@ function signatureFormatter(
 } {
   let v = signature.v
   if (type !== 'celo-legacy') {
-    v = signature.v === 27 ? 0 : 1
+    v = signature.v === yPARITY_EIP_2098 ? 0 : 1
   }
   return {
     v: stringNumberToHex(v),
@@ -311,7 +313,7 @@ export async function encodeTransaction(
   if (rlpEncoded.type === 'eip1559' || rlpEncoded.type === 'cip42') {
     tx = {
       ...tx,
-      // @ts-expect-error
+      // @ts-expect-error -- just a matter of how  this tx is built
       maxFeePerGas: rlpEncoded.transaction.maxFeePerGas!.toString(),
       maxPriorityFeePerGas: rlpEncoded.transaction.maxPriorityFeePerGas!.toString(),
       accessList: parseAccessList(rlpEncoded.transaction.accessList || []),
@@ -320,7 +322,7 @@ export async function encodeTransaction(
   if (rlpEncoded.type === 'cip42' || rlpEncoded.type === 'celo-legacy') {
     tx = {
       ...tx,
-      // @ts-expect-error
+      // @ts-expect-error -- just a matter of how  this tx is built
       feeCurrency: rlpEncoded.transaction.feeCurrency!.toString(),
       gatewayFeeRecipient: rlpEncoded.transaction.gatewayFeeRecipient!.toString(),
       gatewayFee: rlpEncoded.transaction.gatewayFee!.toString(),
@@ -329,7 +331,7 @@ export async function encodeTransaction(
   if (rlpEncoded.type === 'celo-legacy') {
     tx = {
       ...tx,
-      // @ts-expect-error
+      // @ts-expect-error -- just a matter of how  this tx is built
       gasPrice: rlpEncoded.transaction.gasPrice!.toString(),
     }
   }
@@ -429,7 +431,7 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
   }
 }
 
-// inspired by @ethereumjs/tx -- does not work :(
+// inspired by @ethereumjs/tx
 function getPublicKeyofSignerFromTx(transactionArray: string[]) {
   const base = transactionArray.slice(0, 12) // 12 is length of cip42 without vrs fields
   const message = concatHex([TxTypeToPrefix.cip42, RLP.encode(base).slice(2)])
@@ -466,18 +468,15 @@ function determineTXType(serializedTransaction: string): TransactionTypes {
 }
 
 function vrsForRecovery(vRaw: string, r: string, s: string) {
-  const v = vRaw === '0x' || hexToNumber(vRaw) === 0 ? 27 : 28
+  const v = vRaw === '0x' || hexToNumber(vRaw) === 0 ? yPARITY_EIP_2098 : yPARITY_EIP_2098 + 1
   return {
     v,
     r,
     s,
-    yParity: v === 27 ? 0 : 1,
+    yParity: v === yPARITY_EIP_2098 ? 0 : 1,
   } as const
 }
 
-/*
-  @remark does not return the signer address
-*/
 function recoverTransactionCIP42(serializedTransaction: `0x${string}`): [CeloTxWithSig, string] {
   const transactionArray: any[] = prefixAwareRLPDecode(serializedTransaction, 'cip42')
   debug('signing-utils@recoverTransactionCIP42: values are %s', transactionArray)

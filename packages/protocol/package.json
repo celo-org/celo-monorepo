@@ -54,6 +54,7 @@
     "@celo/connect": "4.1.1-dev",
     "@celo/cryptographic-utils": "4.1.1-dev",
     "@celo/utils": "4.1.1-dev",
+    "@celo/wallet-local": "4.1.1-dev",
     "@ethereumjs/util": "8.0.5",
     "@ethereumjs/vm": "npm:@celo/ethereumjs-vm@6.4.1-unofficial.0",
     "@ganache/console.log": "0.3.0",

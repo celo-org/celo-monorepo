@@ -331,19 +331,18 @@ export class Connection {
     // default to the current values
     const calls = [Promise.resolve(tx.maxFeePerGas), Promise.resolve(tx.maxPriorityFeePerGas)]
 
-    if ((isEmpty(tx.gasPrice) && isEmpty(tx.maxFeePerGas)) || isEmpty(tx.maxPriorityFeePerGas)) {
-      if (isEmpty(tx.maxFeePerGas)) {
-        calls[0] = this.gasPrice(tx.feeCurrency)
-      }
-      if (isEmpty(tx.maxPriorityFeePerGas)) {
-        calls[1] = this.rpcCaller.call('eth_maxPriorityFeePerGas', []).then((rpcResponse) => {
-          return rpcResponse.result
-        })
-      }
+    if (isEmpty(tx.maxFeePerGas)) {
+      calls[0] = this.gasPrice(tx.feeCurrency)
+    }
+    if (isEmpty(tx.maxPriorityFeePerGas)) {
+      calls[1] = this.rpcCaller.call('eth_maxPriorityFeePerGas', []).then((rpcResponse) => {
+        return rpcResponse.result
+      })
     }
     const [maxFeePerGas, maxPriorityFeePerGas] = await Promise.all(calls)
     return {
       ...tx,
+      gasPrice: undefined,
       maxFeePerGas,
       maxPriorityFeePerGas,
     }

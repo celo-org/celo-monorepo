@@ -263,7 +263,6 @@ describe('Local wallet class', () => {
             const signedTransaction = await wallet2.signTransaction(transaction1559)
             const viemSignedTransaction = await account.signTransaction(transaction1559Viem)
 
-            // TODO CIP42 wth parsing equals but recover doenst and the rawtx strings also dont match
             expect(parseTransaction(signedTransaction.raw)).toEqual(
               parseTransaction(viemSignedTransaction)
             )
@@ -373,9 +372,37 @@ describe('Local wallet class', () => {
               expect(signedTx.raw).toMatch(/^0x7c/)
             })
           })
-          describe('when feeCurrency and maxFeePerGas but not maxPriorityFeePerGas are set', () => {})
+          describe('when feeCurrency and maxFeePerGas but not maxPriorityFeePerGas are set', () => {
+            it('throws error', async () => {
+              const transaction: CeloTx = {
+                ...celoTransactionBase,
+                feeCurrency,
+                maxFeePerGas,
+                maxPriorityFeePerGas: undefined,
+              }
+              expect(() =>
+                wallet.signTransaction(transaction)
+              ).rejects.toThrowErrorMatchingInlineSnapshot(
+                `""gasPrice" or "maxFeePerGas" and "maxPriorityFeePerGas" are missing"`
+              )
+            })
+          })
 
-          describe('when feeCurrency and maxPriorityFeePerGas but not maxFeePerGas are set', () => {})
+          describe('when feeCurrency and maxPriorityFeePerGas but not maxFeePerGas are set', () => {
+            it('throws error', async () => {
+              const transaction: CeloTx = {
+                ...celoTransactionBase,
+                feeCurrency,
+                maxFeePerGas: undefined,
+                maxPriorityFeePerGas,
+              }
+              expect(() =>
+                wallet.signTransaction(transaction)
+              ).rejects.toThrowErrorMatchingInlineSnapshot(
+                `""gasPrice" or "maxFeePerGas" and "maxPriorityFeePerGas" are missing"`
+              )
+            })
+          })
 
           describe('when gas and one of maxPriorityFeePerGas or maxFeePerGas are set', () => {
             it('throws explaining only one kind of gas fee can be set', async () => {

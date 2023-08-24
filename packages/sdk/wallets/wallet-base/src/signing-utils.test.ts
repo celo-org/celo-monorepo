@@ -269,14 +269,13 @@ describe('rlpEncodedTx', () => {
   })
 })
 
-function ckToViem(tx: CeloTx) {
+function ckToViem(tx: CeloTx & { v?: number }) {
   return {
     ...tx,
     gas: BigInt(tx.gas!),
     maxFeePerGas: BigInt(tx.maxFeePerGas?.toString()!),
     maxPriorityFeePerGas: BigInt(tx.maxPriorityFeePerGas?.toString()!),
     value: BigInt(tx.value?.toString()!),
-    // @ts-expect-error
     v: BigInt(tx.v?.toString()! === '0x' ? 0 : tx.v?.toString()!),
   }
 }
@@ -413,7 +412,7 @@ describe('recoverTransaction', () => {
     const account = privateKeyToAccount(PRIVATE_KEY1)
     const signed = await account.signTransaction(
       {
-        // @ts-ignore
+        // @ts-ignore -- types on viem dont quite work for setting the tx type but the actual js execution works fine
         type: 'cip42',
         accessList: [],
         chainId: 44378,
@@ -455,7 +454,7 @@ describe('recoverTransaction', () => {
         "0x1Be31A94361a391bBaFB2a4CCd704F57dc04d4bb",
       ]
     `)
-    // expect(recoverTransaction(signed)[1]).toEqual(account.address)
+    expect(recoverTransaction(signed)[1]).toEqual(account.address)
   })
 })
 

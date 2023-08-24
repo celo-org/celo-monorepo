@@ -56,7 +56,6 @@ export class TxParamsNormalizer {
             isEmpty(txParams.gasPrice?.toString()) &&
             isEmpty(txParams.maxFeePerGas?.toString())
           ) {
-            console.info('looking up gas price')
             const suggestedPrice = await this.connection.gasPrice(txParams.feeCurrency)
             // add small buffer to suggested price like other libraries do
             const priceWithRoom = new BigNumber(suggestedPrice)

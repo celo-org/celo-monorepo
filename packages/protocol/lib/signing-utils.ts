@@ -1,8 +1,8 @@
 // Originally taken from https://github.com/ethereum/web3.js/blob/1.x/packages/web3-eth-accounts/src/index.js
 
 import { parseSignature } from '@celo/utils/lib/signatureUtils'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { LocalWallet } from '@celo/wallet-local'
-import { account as Account } from 'eth-lib'
 import Web3 from 'web3'
 
 function isNot(value: any) {
@@ -51,7 +51,7 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
   const chainId = isNot(txn.chainId) ? await web3.eth.getChainId() : txn.chainId
   const gasPrice = isNot(txn.gasPrice) ? await web3.eth.getGasPrice() : txn.gasPrice
   const nonce = isNot(txn.nonce)
-    ? await web3.eth.getTransactionCount(Account.fromPrivate(privateKey).address)
+    ? await web3.eth.getTransactionCount(privateKeyToAddress(privateKey))
     : txn.nonce
 
   if (isNot(chainId) || isNot(gasPrice) || isNot(nonce)) {
