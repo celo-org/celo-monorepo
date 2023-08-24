@@ -6,7 +6,29 @@ import {
   rootLogger,
   TestUtils,
 } from '@celo/phone-number-privacy-common'
-import { defineInt, defineString, defineBoolean } from 'firebase-functions/params'
+import {
+  blockchainApiKey,
+  blockchainProvider,
+  domainEnabled,
+  domainFullNodeDelaysMs,
+  domainFullNodeRetryCount,
+  domainFullNodeTimeoutMs,
+  domainKeysCurrentVersion,
+  domainKeysVersions,
+  domainOdisServicesSigners,
+  domainOdisServicesTimeoutMilliseconds,
+  domainServiceName,
+  pnpEnabled,
+  pnpFullNodeDelaysMs,
+  pnpFullNodeRetryCount,
+  pnpFullNodeTimeoutMs,
+  pnpKeysCurrentVersion,
+  pnpKeysVersions,
+  pnpOdisServicesSigners,
+  pnpOdisServicesTimeoutMilliseconds,
+  pnpServiceName,
+  serviceNameConfig,
+} from './utils/firebase-configs'
 
 export function getCombinerVersion(): string {
   return process.env.npm_package_version ?? require('../package.json').version ?? '0.0.0'
@@ -51,51 +73,6 @@ export interface CombinerConfig {
 let config: CombinerConfig
 
 const defaultServiceName = 'odis-combiner'
-
-// XXX: Root
-const serviceNameConfig = defineString('SERVICE_NAME', { default: defaultServiceName })
-
-// XXX: Blockchain
-const blockchainProvider = defineString('BLOCKCHAIN_PROVIDER')
-const blockchainApi = defineString('BLOCKCHAIN_API')
-
-// XXX: PNP
-const pnpServiceName = defineString('PNP_SERVICE_NAME', { default: defaultServiceName })
-const pnpEnabled = defineBoolean('PNP_ENABLED', {
-  default: false,
-  description: '',
-})
-const pnpOdisServicesSigners = defineString('PNP_ODIS_SERVICES_SIGNERS')
-const pnpOdisServicesTimeoutMilliseconds = defineInt('PNP_ODIS_SERVICES_TIMEOUT_MILLISECONDS', {
-  default: 5 * 1000,
-})
-const pnpKeysCurrentVersion = defineInt('PNP_KEYS_CURRENT_VERSION')
-const pnpKeysVersions = defineString('PNP_KEYS_VERSIONS')
-const pnpFullNodeTimeoutMs = defineInt('PNP_FULL_NODE_TIMEOUT_MS', {
-  default: FULL_NODE_TIMEOUT_IN_MS,
-})
-const pnpFullNodeRetryCount = defineInt('PNP_FULL_NODE_RETRY_COUNT', { default: RETRY_COUNT })
-const pnpFullNodeDelaysMs = defineInt('PNP_FULL_NODE_DELAY_MS', { default: RETRY_DELAY_IN_MS })
-
-// XXX: Domains
-const domainServiceName = defineString('DOMAIN_SERVICE_NAME', { default: defaultServiceName })
-const domainEnabled = defineBoolean('DOMAIN_ENABLED', { default: false })
-const domainOdisServicesSigners = defineString('DOMAIN_ODIS_SERVICES_SIGNERS')
-const domainOdisServicesTimeoutMilliseconds = defineInt(
-  'DOMAIN_ODIS_SERVICES_TIMEOUT_MILLISECONDS',
-  {
-    default: 5 * 1000,
-  }
-)
-const domainKeysCurrentVersion = defineInt('DOMAIN_KEYS_CURRENT_VERSION')
-const domainKeysVersions = defineString('DOMAIN_KEYS_VERSIONS')
-const domainFullNodeTimeoutMs = defineInt('DOMAIN_FULL_NODE_TIMEOUT_MS', {
-  default: FULL_NODE_TIMEOUT_IN_MS,
-})
-const domainFullNodeRetryCount = defineInt('DOMAIN_FULL_NODE_RETRY_COUNT', { default: RETRY_COUNT })
-const domainFullNodeDelaysMs = defineInt('DOMAIN_FULL_NODE_DELAY_MS', {
-  default: RETRY_DELAY_IN_MS,
-})
 
 if (DEV_MODE) {
   rootLogger(defaultServiceName).debug('Running in dev mode')
@@ -192,7 +169,7 @@ if (DEV_MODE) {
     serviceName: serviceNameConfig.value(),
     blockchain: {
       provider: blockchainProvider.value(),
-      apiKey: blockchainApi.value(),
+      apiKey: blockchainApiKey.value(),
     },
     phoneNumberPrivacy: {
       serviceName: pnpServiceName.value(),
