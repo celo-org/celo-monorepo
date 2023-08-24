@@ -3,9 +3,9 @@ import {
   CeloTx,
   CeloTxWithSig,
   EncodedTransaction,
+  isPresent,
   RLPEncodedTx,
   TransactionTypes,
-  isPresent,
 } from '@celo/connect'
 import {
   hexToNumber,
@@ -42,7 +42,7 @@ export const publicKeyPrefix: number = 0x04
 export const sixtyFour: number = 64
 export const thirtyTwo: number = 32
 
-const yPARITY_EIP_2098 = 27
+const Y_PARITY_EIP_2098 = 27
 
 function isNullOrUndefined(value: any): boolean {
   return value === null || value === undefined
@@ -82,7 +82,7 @@ function signatureFormatter(
 } {
   let v = signature.v
   if (type !== 'celo-legacy') {
-    v = signature.v === yPARITY_EIP_2098 ? 0 : 1
+    v = signature.v === Y_PARITY_EIP_2098 ? 0 : 1
   }
   return {
     v: stringNumberToHex(v),
@@ -468,12 +468,12 @@ function determineTXType(serializedTransaction: string): TransactionTypes {
 }
 
 function vrsForRecovery(vRaw: string, r: string, s: string) {
-  const v = vRaw === '0x' || hexToNumber(vRaw) === 0 ? yPARITY_EIP_2098 : yPARITY_EIP_2098 + 1
+  const v = vRaw === '0x' || hexToNumber(vRaw) === 0 ? Y_PARITY_EIP_2098 : Y_PARITY_EIP_2098 + 1
   return {
     v,
     r,
     s,
-    yParity: v === yPARITY_EIP_2098 ? 0 : 1,
+    yParity: v === Y_PARITY_EIP_2098 ? 0 : 1,
   } as const
 }
 
