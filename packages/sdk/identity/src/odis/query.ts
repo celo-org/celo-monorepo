@@ -52,7 +52,7 @@ export interface ServiceContext {
 }
 
 export const ODIS_STAGING_CONTEXT: ServiceContext = {
-  odisUrl: 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net/combiner',
+  odisUrl: 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net/combinerGen2',
   odisPubKey:
     '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA',
 }
