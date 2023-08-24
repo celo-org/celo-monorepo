@@ -150,7 +150,7 @@ const networks = {
   testing: {
     ...defaultConfig,
     from: INTEGRATION_TESTING_FROM,
-    network_id: 9099000,
+    network_id: 1101,
   },
   argentinastaging: freeGasConfig,
   argentinaproduction: freeGasConfig,
