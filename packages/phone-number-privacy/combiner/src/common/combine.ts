@@ -59,7 +59,7 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
 
   const manualAbort = new AbortController()
   const timeoutSignal = AbortSignal.timeout(requestTimeoutMS)
-  const abortSignal = (AbortSignal as any).any([manualAbort.signal, timeoutSignal]) as AbortSignal
+  const abortSignal = abortSignalAny([manualAbort.signal, timeoutSignal])
 
   let errorCount = 0
   const errorCodes: Map<number, number> = new Map<number, number>()
@@ -190,4 +190,28 @@ function getMajorityErrorCode(errorCodes: Map<number, number>): number {
     }
   })
   return maxErrorCode
+}
+
+/*
+ * TODO remove this in favor of actual implementation once we can upgrade to node v18.17.0.
+ * The Combiner cannot currently be deployed with node versions beyond v18.
+ * Actual implementation:
+ * https://github.com/nodejs/node/blob/5ff1ead6b2d6da7ba044b11e2824c7cbf5a94cb8/lib/internal/abort_controller.js#L198C24-L198C24
+ */
+function abortSignalAny(signals: AbortSignal[]): AbortSignal {
+  const ac = new AbortController()
+  for (const signal of signals) {
+    if (signal.aborted) {
+      ac.abort(signal)
+      return ac.signal
+    }
+    signal.addEventListener(
+      'abort',
+      (e) => {
+        ac.abort(e)
+      },
+      { once: true }
+    )
+  }
+  return ac.signal
 }
