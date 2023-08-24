@@ -16,7 +16,6 @@ export const getParsedSignatureOfAddress = async (web3: Web3, address: string, s
 }
 
 export async function signTransaction(web3: Web3, txn: any, privateKey: string) {
-  let result: any
 
   if (!txn) {
     throw new Error('No transaction object given!')
@@ -35,14 +34,12 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
 
       wallet.addAccount(privateKey)
 
-      result = await wallet.signTransaction(tx)
+      return wallet.signTransaction(tx)
 
     } catch (e) {
       console.info('Error signing transaction', e)
       throw e
     }
-
-    return result
   }
 
   // Resolve immediately if nonce, chainId and price are provided
