@@ -104,7 +104,6 @@
     "@types/mocha": "^7.0.2",
     "@types/targz": "^1.0.0",
     "@types/tmp": "^0.1.0",
-    "@types/underscore": "^1.8.8",
     "@types/yargs": "^13.0.2",
     "cross-env": "^5.1.6",
     "eth-gas-reporter": "^0.2.16",
