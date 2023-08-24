@@ -22,10 +22,10 @@ export class DefaultPnpRequestService implements PnpRequestService {
     ctx: Context
   ): Promise<void> {
     return traceAsyncFunction('DefaultPnpRequestService - recordRequest', async () => {
-      await Promise.all([
-        insertRequest(this.db, account, blindedQueryPhoneNumber, ctx.logger),
-        incrementQueryCount(this.db, account, ctx.logger),
-      ])
+      return this.db.transaction(async (trx) => {
+        await insertRequest(this.db, account, blindedQueryPhoneNumber, ctx.logger, trx)
+        await incrementQueryCount(this.db, account, ctx.logger, trx)
+      })
     })
   }
 

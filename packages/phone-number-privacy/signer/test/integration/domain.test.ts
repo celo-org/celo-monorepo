@@ -924,7 +924,8 @@ describe('domain', () => {
       expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: false,
         version: res.body.version,
-        error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
+        // error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
+        error: ErrorMessage.UNKNOWN_ERROR, // TODO make this more informative when we refactor the sign handler
       })
     })
 

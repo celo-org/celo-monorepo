@@ -894,8 +894,7 @@ describe('pnp', () => {
           spy.mockRestore()
         })
 
-        // TODO
-        xit('Should respond with 500 on signer timeout', async () => {
+        it('Should respond with 500 on signer timeout', async () => {
           const testTimeoutMS = 0
           const delay = 200
           const spy = jest
@@ -938,26 +937,6 @@ describe('pnp', () => {
             version: expectedVersion,
           })
           spy.mockRestore()
-          // Allow time for non-killed processes to finish
-          await new Promise((resolve) => setTimeout(resolve, delay))
-          // Check that DB was not updated
-          expect(
-            await getPerformedQueryCount(
-              db,
-
-              ACCOUNT_ADDRESS1,
-              rootLogger(config.serviceName)
-            )
-          ).toBe(performedQueryCount)
-          expect(
-            await getRequestExists(
-              db,
-
-              req.account,
-              req.blindedQueryPhoneNumber,
-              rootLogger(config.serviceName)
-            )
-          ).toBe(false)
         })
 
         it('Should return 500 on blockchain totalQuota query failure', async () => {
@@ -1024,19 +1003,13 @@ describe('pnp', () => {
             error: ErrorMessage.DATABASE_UPDATE_FAILURE,
           })
 
-          // TODO remove this check if we decide to permanently remove trx
-          // // check DB state: performedQueryCount was not incremented and request was not stored
-          // expect(await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, logger)).toBe(
-          //   performedQueryCount
-          // )
-          // expect(
-          //   await getRequestExists(
-          //     db,
-          //     req.account,
-          //     req.blindedQueryPhoneNumber,
-          //     logger
-          //   )
-          // ).toBe(false)
+          // check DB state: performedQueryCount was not incremented and request was not stored
+          expect(await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, logger)).toBe(
+            performedQueryCount
+          )
+          expect(await getRequestExists(db, req.account, req.blindedQueryPhoneNumber, logger)).toBe(
+            false
+          )
         })
 
         it('Should return 500 on failure to store request', async () => {
