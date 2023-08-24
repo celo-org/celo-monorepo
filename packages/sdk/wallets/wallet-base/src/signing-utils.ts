@@ -95,7 +95,7 @@ export function stringNumberOrBNToHex(
   if (typeof num === 'string' || typeof num === 'number' || num === undefined) {
     return stringNumberToHex(num)
   } else {
-    return makeEven(`0x` + num.toString('hex')) as `0x${string}`
+    return makeEven(`0x` + num.toString(16)) as `0x${string}`
   }
 }
 function stringNumberToHex(num?: number | string): `0x${string}` {
