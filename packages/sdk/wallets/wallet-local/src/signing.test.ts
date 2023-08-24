@@ -76,10 +76,7 @@ describe('Transaction Utils', () => {
     })
 
     test('Signer matches recovered signer', async () => {
-      // dont test cip42
-      // if (celoTransaction.gasPrice != null || celoTransaction.feeCurrency === null) {
       expect(recoveredSigner?.toLowerCase()).toEqual(celoTransaction.from!.toString().toLowerCase())
-      // }
     })
 
     test('Checking nonce', async () => {
@@ -210,10 +207,9 @@ describe('Transaction Utils', () => {
 
       return description.join(' ')
     }
-    // tslint:enable:no-bitwise
 
     // A special case.
-    // An incorrect nonce  will only work, if no implict calls to estimate gas are required.
+    // An incorrect nonce  will only work, if no implicit calls to estimate gas are required.
     describe('Testing with bad nonce', () => {
       verifyLocalSigning({ from, to, nonce: badNonce, gas, gasPrice, chainId })
     })
@@ -223,7 +219,6 @@ describe('Transaction Utils', () => {
     describe('Test1 should be able to sign and get the signer back with single local account', () => {
       beforeAll(async () => {
         await setupConnection()
-        // jest.setTimeout(60 * 1000)
         connection.addAccount(PRIVATE_KEY1)
       })
       verifyLocalSigningInAllPermutations(ACCOUNT_ADDRESS1, ACCOUNT_ADDRESS2)
@@ -235,7 +230,6 @@ describe('Transaction Utils', () => {
     describe('Test2 should be able to sign with first account and get the signer back with multiple local accounts', () => {
       beforeAll(async () => {
         await setupConnection()
-        // jest.setTimeout(60 * 1000)
         connection.addAccount(PRIVATE_KEY1)
         connection.addAccount(PRIVATE_KEY2)
       })
@@ -246,7 +240,6 @@ describe('Transaction Utils', () => {
     describe('Test3 should be able to sign with second account and get the signer back with multiple local accounts', () => {
       beforeAll(async () => {
         await setupConnection()
-        // jest.setTimeout(60 * 1000)
         connection.addAccount(PRIVATE_KEY1)
         connection.addAccount(PRIVATE_KEY2)
       })

@@ -39,7 +39,6 @@ export async function sendTransactionWithPrivateKey<T>(
       from: address,
     })
   }
-  console.info('signing tx with', address)
   const signedTx = await signTransaction(
     web3,
     {
@@ -54,7 +53,6 @@ export async function sendTransactionWithPrivateKey<T>(
   )
 
   const rawTransaction = signedTx.raw
-  console.info('sending tx',signedTx.tx, rawTransaction)
   return web3.eth.sendSignedTransaction(rawTransaction)
 }
 
