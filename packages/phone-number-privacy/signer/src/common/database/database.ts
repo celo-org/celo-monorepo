@@ -4,6 +4,7 @@ import { DEV_MODE, SignerConfig, SupportedDatabase, VERBOSE_DB_LOGGING } from '.
 
 export async function initDatabase(config: SignerConfig, migrationsPath?: string): Promise<Knex> {
   const logger = rootLogger(config.serviceName)
+
   logger.info({ config: config.db }, 'Initializing database connection')
   const { type, host, port, user, password, database, ssl, poolMaxSize } = config.db
 

@@ -3,9 +3,9 @@ import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { config } from '../../../config'
 import {
-  DomainRequestRecord,
   DOMAIN_REQUESTS_COLUMNS,
   DOMAIN_REQUESTS_TABLE,
+  DomainRequestRecord,
   toDomainRequestRecord,
 } from '../models/domain-request'
 import { countAndThrowDBError, doMeteredSql } from '../utils'

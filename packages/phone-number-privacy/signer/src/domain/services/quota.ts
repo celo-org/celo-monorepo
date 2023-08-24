@@ -6,6 +6,7 @@ import {
   isSequentialDelayDomain,
   SequentialDelayDomain,
 } from '@celo/phone-number-privacy-common'
+import Logger from 'bunyan'
 import { Knex } from 'knex'
 import {
   DomainStateRecord,
@@ -17,7 +18,6 @@ import {
   updateDomainStateRecord,
 } from '../../common/database/wrappers/domain-state'
 import { OdisQuotaStatusResult } from '../../common/quota'
-import Logger from 'bunyan'
 
 declare type QuotaDependentDomainRequest =
   | DomainQuotaStatusRequest
