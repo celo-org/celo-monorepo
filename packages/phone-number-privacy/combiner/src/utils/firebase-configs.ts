@@ -9,6 +9,7 @@ const defaultServiceName = 'odis-combiner'
 
 // function settings
 export const minInstancesConfig = defineInt('MIN_INSTANCES', { default: 0 })
+export const requestConcurency = defineInt('REQUEST_CONCURRENCY', { default: 80 })
 // Root
 export const serviceNameConfig = defineString('SERVICE_NAME', { default: defaultServiceName })
 
