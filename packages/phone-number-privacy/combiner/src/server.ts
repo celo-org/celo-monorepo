@@ -7,7 +7,7 @@ import {
   OdisRequest,
   rootLogger,
 } from '@celo/phone-number-privacy-common'
-import express, { RequestHandler } from 'express'
+import express, { Express, RequestHandler } from 'express'
 import { Signer } from './common/combine'
 import {
   catchErrorHandler,
@@ -21,6 +21,7 @@ import { createDomainQuotaHandler } from './domain/endpoints/quota/action'
 import { createDomainSignHandler } from './domain/endpoints/sign/action'
 import { createPnpQuotaHandler } from './pnp/endpoints/quota/action'
 import { createPnpSignHandler } from './pnp/endpoints/sign/action'
+import { Knex } from 'knex'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -64,8 +65,8 @@ export function startCombiner(db: Knex, config: CombinerConfig, kit: ContractKit
   )
 
   const pnpSigners: Signer[] = JSON.parse(config.phoneNumberPrivacy.odisServices.signers)
-  const pnpQuota = createPnpQuotaHandler(pnpSigners, config.phoneNumberPrivacy, dekFetcher)
-  const pnpSign = createPnpSignHandler(pnpSigners, config.phoneNumberPrivacy, dekFetcher)
+  const pnpQuota = createPnpQuotaHandler(db, pnpSigners, config.phoneNumberPrivacy, dekFetcher)
+  const pnpSign = createPnpSignHandler(db, pnpSigners, config.phoneNumberPrivacy, dekFetcher)
 
   const domainSigners: Signer[] = JSON.parse(config.domains.odisServices.signers)
   const domainQuota = createDomainQuotaHandler(domainSigners, config.domains)

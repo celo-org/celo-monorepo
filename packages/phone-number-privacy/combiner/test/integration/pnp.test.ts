@@ -203,7 +203,7 @@ describe('pnpService', () => {
 
   const message = Buffer.from('test message', 'utf8')
 
-  // In current setup, the same mocked kit is used for the combiner and signers
+  // In current setup, the same mocked kit is used for the app and signers
   const mockKit = newKit('dummyKit')
 
   const sendPnpSignRequest = async (
@@ -320,16 +320,13 @@ describe('pnpService', () => {
       await signerDB1?.destroy()
       await signerDB2?.destroy()
       await signerDB3?.destroy()
-      await db?.destroy()
 
       await serverClose(signer1)
       await serverClose(signer2)
       await serverClose(signer3)
-    })
 
-    // afterAll(async () => {
-    //   await db?.destroy()
-    // })
+      await db?.destroy()
+    })
 
     describe('when signers are operating correctly', () => {
       beforeEach(async () => {
@@ -931,7 +928,7 @@ describe('pnpService', () => {
       })
     })
 
-    // For testing combiner code paths when signers do not behave as expected
+    // For testing app code paths when signers do not behave as expected
     describe('when signers are not operating correctly', () => {
       beforeEach(() => {
         mockOdisPaymentsTotalPaidCUSD.mockReturnValue(onChainPaymentsDefault)
@@ -1276,13 +1273,14 @@ describe('pnpService', () => {
       await signerDB3?.destroy()
       await signerDB4?.destroy()
       await signerDB5?.destroy()
-      await db?.destroy()
 
       await serverClose(signer1)
       await serverClose(signer2)
       await serverClose(signer3)
       await serverClose(signer4)
       await serverClose(signer5)
+
+      await db?.destroy()
     })
 
     it('Should respond with 200 on valid request', async () => {

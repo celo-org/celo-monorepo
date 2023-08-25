@@ -1,5 +1,4 @@
 import {
-  authenticateUser,
   CombinerEndpoint,
   DataEncryptionKeyFetcher,
   ErrorMessage,
@@ -24,8 +23,11 @@ import { getKeyVersionInfo, requestHasSupportedKeyVersion, sendFailure } from '.
 import { getCombinerVersion, OdisConfig } from '../../../config'
 import { logPnpSignerResponseDiscrepancies } from '../../services/log-responses'
 import { findCombinerQuotaState } from '../../services/threshold-state'
+import { Knex } from 'knex'
+import { authenticateUser } from '../../../utils/authentication'
 
 export function createPnpSignHandler(
+  db: Knex,
   signers: Signer[],
   config: OdisConfig,
   dekFetcher: DataEncryptionKeyFetcher
@@ -42,7 +44,7 @@ export function createPnpSignHandler(
       return
     }
 
-    if (!(await authenticateUser(request, logger, dekFetcher))) {
+    if (!(await authenticateUser(db, request, logger, dekFetcher))) {
       sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return
     }

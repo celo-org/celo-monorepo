@@ -4,6 +4,7 @@ import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import {
   AuthenticationMethod,
+  DataEncryptionKeyFetcher,
   ErrorMessage,
   ErrorType,
   fetchEnv,
@@ -28,13 +29,9 @@ import { getDekSignerRecord, updateDekSignerRecord } from '../database/wrappers/
 export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   db: Knex,
   request: Request<{}, {}, R>,
-  contractKit: ContractKit,
   logger: Logger,
-  shouldFailOpen: boolean = false,
-  warnings: ErrorType[] = [],
-  timeoutMs: number = FULL_NODE_TIMEOUT_IN_MS,
-  retryCount: number = RETRY_COUNT,
-  retryDelay: number = RETRY_DELAY_IN_MS
+  fetchDEK: DataEncryptionKeyFetcher,
+  warnings: ErrorType[] = []
 ): Promise<boolean> {
   logger.debug('Authenticating user')
 
@@ -50,38 +47,47 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
 
   if (authMethod && authMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     let registeredEncryptionKey: string | undefined
+    try {
+      // first look for DEK in db
+      registeredEncryptionKey = await getDekSignerRecord(db, signer, logger)
 
-    registeredEncryptionKey = await getDekSignerRecord(db, signer, logger)
-
-    if (registeredEncryptionKey) {
-      logger.info({ dek: registeredEncryptionKey, account: signer }, 'Found DEK for account in db')
-      if (verifyDEKSignature(message, messageSignature, registeredEncryptionKey, logger)) {
-        return true
+      // verify DEK if found
+      if (registeredEncryptionKey) {
+        logger.info(
+          { dek: registeredEncryptionKey, account: signer },
+          'Found DEK for account in db'
+        )
+        if (verifyDEKSignature(message, messageSignature, registeredEncryptionKey, logger)) {
+          return true
+        }
+        logger.warn({ account: signer }, 'Failed to verify account DEK signature found in db.')
       }
-      logger.warn({ account: signer }, 'Failed to verify account DEK signature found in db.')
+    } catch (error) {
+      const failureStatus = ErrorMessage.FAILING_CLOSED
+      logger.error({
+        error,
+        warning: ErrorMessage.FAILURE_TO_GET_DEK,
+        failureStatus,
+      })
+      warnings.push(ErrorMessage.FAILURE_TO_GET_DEK, failureStatus)
+      return false
     }
 
     try {
-      registeredEncryptionKey = await getDataEncryptionKey(
-        signer,
-        contractKit,
-        logger,
-        timeoutMs,
-        retryCount,
-        retryDelay
-      )
+      registeredEncryptionKey = await fetchDEK(signer)
     } catch (err) {
       // getDataEncryptionKey should only throw if there is a full-node connection issue.
       // That is, it does not throw if the DEK is undefined or invalid
-      const failureStatus = shouldFailOpen ? ErrorMessage.FAILING_OPEN : ErrorMessage.FAILING_CLOSED
+      const failureStatus = ErrorMessage.FAILING_CLOSED
       logger.error({
         err,
         warning: ErrorMessage.FAILURE_TO_GET_DEK,
         failureStatus,
       })
       warnings.push(ErrorMessage.FAILURE_TO_GET_DEK, failureStatus)
-      return shouldFailOpen
+      return false
     }
+
     if (!registeredEncryptionKey) {
       logger.warn({ account: signer }, 'Account does not have registered encryption key')
       return false

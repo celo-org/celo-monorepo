@@ -270,13 +270,11 @@ describe('domainService', () => {
           [`${DefaultKeyName.DOMAINS}-3`, DOMAINS_THRESHOLD_DEV_PK_SHARE_3_V3],
         ])
       )
-
-      app = startCombiner(combinerConfig, getContractKitWithAgent(combinerConfig.blockchain))
     })
 
     beforeEach(async () => {
       db = await initCombinerDatabase(combinerConfig)
-      app = startCombiner(db, combinerConfig, getContractKit(combinerConfig.blockchain))
+      app = startCombiner(db, combinerConfig, getContractKitWithAgent(combinerConfig.blockchain))
 
       signerDB1 = await initSignerDatabase(signerConfig, signerMigrationsPath)
       signerDB2 = await initSignerDatabase(signerConfig, signerMigrationsPath)
@@ -287,11 +285,12 @@ describe('domainService', () => {
       await signerDB1?.destroy()
       await signerDB2?.destroy()
       await signerDB3?.destroy()
-      await db?.destroy()
 
       await serverClose(signer1)
       await serverClose(signer2)
       await serverClose(signer3)
+
+      await db?.destroy()
     })
 
     describe('when signers are operating correctly', () => {
@@ -1227,10 +1226,6 @@ describe('domainService', () => {
           ],
         ])
       )
-      app = startCombiner(
-        combinerConfigLargerN,
-        getContractKitWithAgent(combinerConfigLargerN.blockchain)
-      )
     })
 
     beforeEach(async () => {
@@ -1238,7 +1233,7 @@ describe('domainService', () => {
       app = startCombiner(
         db,
         combinerConfigLargerN,
-        getContractKit(combinerConfigLargerN.blockchain)
+        getContractKitWithAgent(combinerConfigLargerN.blockchain)
       )
 
       signerDB1 = await initSignerDatabase(signerConfig, signerMigrationsPath)
@@ -1260,13 +1255,14 @@ describe('domainService', () => {
       await signerDB3?.destroy()
       await signerDB4?.destroy()
       await signerDB5?.destroy()
-      await db?.destroy()
 
       await serverClose(signer1)
       await serverClose(signer2)
       await serverClose(signer3)
       await serverClose(signer4)
       await serverClose(signer5)
+
+      await db?.destroy()
     })
 
     it('Should respond with 200 on valid request', async () => {
