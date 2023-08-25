@@ -16,7 +16,7 @@ import {
   ErrorMessage,
   FULL_NODE_TIMEOUT_IN_MS,
   genSessionID,
-  getContractKit,
+  getContractKitWithAgent,
   KEY_VERSION_HEADER,
   PoprfClient,
   RETRY_COUNT,
@@ -26,12 +26,9 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import {
-  initDatabase as initSignerDatabase,
-  startSigner,
-  SupportedDatabase,
-  SupportedKeystore,
-} from '@celo/phone-number-privacy-signer'
+import { initDatabase as initSignerDatabase } from '@celo/phone-number-privacy-signer/dist/common/database/database'
+import { startSigner } from '@celo/phone-number-privacy-signer/dist/server'
+import { SupportedDatabase, SupportedKeystore } from '@celo/phone-number-privacy-signer/dist/config'
 import {
   DefaultKeyName,
   KeyProvider,
@@ -42,12 +39,13 @@ import { LocalWallet } from '@celo/wallet-local'
 import BigNumber from 'bignumber.js'
 import { Server as HttpsServer } from 'https'
 import { Knex } from 'knex'
-import { Server } from 'net'
+import { Server } from 'http'
 import request from 'supertest'
 import { MockKeyProvider } from '../../../signer/dist/common/key-management/mock-key-provider'
 import config from '../../src/config'
 import { startCombiner } from '../../src/server'
 import { initDatabase as initCombinerDatabase } from '../../src/database/database'
+import { serverClose } from '../utils'
 
 const {
   DOMAINS_THRESHOLD_DEV_PK_SHARE_1_V1,
@@ -91,11 +89,7 @@ const signerConfig: SignerConfig = {
     },
     phoneNumberPrivacy: {
       enabled: false,
-      shouldFailOpen: false,
     },
-  },
-  attestations: {
-    numberAttestationsRequired: 3,
   },
   blockchain: {
     provider: 'https://alfajores-forno.celo-testnet.org',
@@ -143,6 +137,11 @@ const signerConfig: SignerConfig = {
   fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
   fullNodeRetryCount: RETRY_COUNT,
   fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
+  // TODO (alec) make SignerConfig better
+  shouldMockAccountService: false,
+  mockDek: '',
+  mockTotalQuota: 0,
+  shouldMockRequestService: false,
 }
 
 describe('domainService', () => {
@@ -271,6 +270,8 @@ describe('domainService', () => {
           [`${DefaultKeyName.DOMAINS}-3`, DOMAINS_THRESHOLD_DEV_PK_SHARE_3_V3],
         ])
       )
+
+      app = startCombiner(combinerConfig, getContractKitWithAgent(combinerConfig.blockchain))
     })
 
     beforeEach(async () => {
@@ -288,9 +289,9 @@ describe('domainService', () => {
       await signerDB3?.destroy()
       await db?.destroy()
 
-      signer1?.close()
-      signer2?.close()
-      signer3?.close()
+      await serverClose(signer1)
+      await serverClose(signer2)
+      await serverClose(signer3)
     })
 
     describe('when signers are operating correctly', () => {
@@ -424,7 +425,7 @@ describe('domainService', () => {
           const appWithApiDisabled = startCombiner(
             db,
             configWithApiDisabled,
-            getContractKit(configWithApiDisabled.blockchain)
+            getContractKitWithAgent(configWithApiDisabled.blockchain)
           )
           const req = await disableRequest()
 
@@ -574,7 +575,7 @@ describe('domainService', () => {
           const appWithApiDisabled = startCombiner(
             db,
             configWithApiDisabled,
-            getContractKit(configWithApiDisabled.blockchain)
+            getContractKitWithAgent(configWithApiDisabled.blockchain)
           )
 
           const req = await quotaRequest()
@@ -905,7 +906,7 @@ describe('domainService', () => {
           const appWithApiDisabled = startCombiner(
             db,
             configWithApiDisabled,
-            getContractKit(configWithApiDisabled.blockchain)
+            getContractKitWithAgent(configWithApiDisabled.blockchain)
           )
 
           const [req, _] = await signatureRequest()
@@ -1226,6 +1227,10 @@ describe('domainService', () => {
           ],
         ])
       )
+      app = startCombiner(
+        combinerConfigLargerN,
+        getContractKitWithAgent(combinerConfigLargerN.blockchain)
+      )
     })
 
     beforeEach(async () => {
@@ -1257,11 +1262,11 @@ describe('domainService', () => {
       await signerDB5?.destroy()
       await db?.destroy()
 
-      signer1?.close()
-      signer2?.close()
-      signer3?.close()
-      signer4?.close()
-      signer5?.close()
+      await serverClose(signer1)
+      await serverClose(signer2)
+      await serverClose(signer3)
+      await serverClose(signer4)
+      await serverClose(signer5)
     })
 
     it('Should respond with 200 on valid request', async () => {

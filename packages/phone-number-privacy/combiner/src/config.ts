@@ -38,7 +38,6 @@ export enum SupportedDatabase {
 export interface OdisConfig {
   serviceName: string
   enabled: boolean
-  shouldFailOpen: boolean // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config, this isn't relevant to domains endpoints
   odisServices: {
     signers: string
     timeoutMilliSeconds: number
@@ -98,7 +97,6 @@ if (DEV_MODE) {
     phoneNumberPrivacy: {
       serviceName: defaultServiceName,
       enabled: true,
-      shouldFailOpen: false,
       odisServices: {
         signers: devSignersString,
         timeoutMilliSeconds: 5 * 1000,
@@ -133,7 +131,6 @@ if (DEV_MODE) {
     domains: {
       serviceName: defaultServiceName,
       enabled: true,
-      shouldFailOpen: false,
       odisServices: {
         signers: devSignersString,
         timeoutMilliSeconds: 5 * 1000,
@@ -188,7 +185,6 @@ if (DEV_MODE) {
     phoneNumberPrivacy: {
       serviceName: functionConfig.pnp.service_name ?? defaultServiceName,
       enabled: toBool(functionConfig.pnp.enabled, false),
-      shouldFailOpen: toBool(functionConfig.pnp.should_fail_open, false),
       odisServices: {
         signers: functionConfig.pnp.odisservices,
         timeoutMilliSeconds: functionConfig.pnp.timeout_ms
@@ -208,7 +204,6 @@ if (DEV_MODE) {
     domains: {
       serviceName: functionConfig.domains.service_name ?? defaultServiceName,
       enabled: toBool(functionConfig.domains.enabled, false),
-      shouldFailOpen: toBool(functionConfig.domains.auth_should_fail_open, false),
       odisServices: {
         signers: functionConfig.domains.odisservices,
         timeoutMilliSeconds: functionConfig.domains.timeout_ms

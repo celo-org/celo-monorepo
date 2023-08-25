@@ -1,7 +1,4 @@
-export enum REQUESTS_TABLE {
-  LEGACY = 'requests',
-  ONCHAIN = 'requestsOnChain',
-}
+export const REQUESTS_TABLE = 'requestsOnChain'
 
 export enum REQUESTS_COLUMNS {
   address = 'caller_address',
@@ -10,6 +7,7 @@ export enum REQUESTS_COLUMNS {
 }
 
 export interface PnpSignRequestRecord {
+  //
   [REQUESTS_COLUMNS.address]: string
   [REQUESTS_COLUMNS.timestamp]: Date
   [REQUESTS_COLUMNS.blindedQuery]: string

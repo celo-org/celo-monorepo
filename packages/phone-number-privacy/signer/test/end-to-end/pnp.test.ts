@@ -78,7 +78,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         version: expectedVersion,
         performedQueryCount: 0,
         totalQuota: 0,
-        blockNumber: resBody.blockNumber,
+
         warnings: [],
       })
     })
@@ -94,7 +94,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         version: expectedVersion,
         performedQueryCount: resBody.performedQueryCount,
         totalQuota: resBody.totalQuota,
-        blockNumber: resBody.blockNumber,
+
         warnings: [],
       })
       expect(resBody.totalQuota).toBeGreaterThan(0)
@@ -116,7 +116,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         version: expectedVersion,
         performedQueryCount: resBody.performedQueryCount,
         totalQuota: resBody.totalQuota + 1,
-        blockNumber: res2Body.blockNumber,
+
         warnings: [],
       })
     })
@@ -207,7 +207,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
           signature: resBody.signature,
           performedQueryCount: startingPerformedQueryCount + 1,
           totalQuota: resBody.totalQuota,
-          blockNumber: resBody.blockNumber,
+
           warnings: [],
         })
         expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(contextSpecificParams.pnpKeyVersion)
@@ -242,7 +242,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
           signature: resBody.signature,
           performedQueryCount: startingPerformedQueryCount + 1,
           totalQuota: resBody.totalQuota,
-          blockNumber: resBody.blockNumber,
+
           warnings: [],
         })
         expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(keyVersion)
@@ -273,7 +273,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
           signature: resBody.signature,
           performedQueryCount: startingPerformedQueryCount + 1,
           totalQuota: resBody.totalQuota,
-          blockNumber: resBody.blockNumber,
+
           warnings: [],
         })
         expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(contextSpecificParams.pnpKeyVersion)
@@ -293,7 +293,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
           signature: resBody.signature,
           performedQueryCount: resBody.performedQueryCount, // Not incremented
           totalQuota: resBody.totalQuota,
-          blockNumber: res2Body.blockNumber,
+
           warnings: [WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG],
         })
       })
@@ -443,7 +443,6 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
           error: WarningMessage.EXCEEDED_QUOTA,
           totalQuota: quotaResBody.totalQuota,
           performedQueryCount: quotaResBody.performedQueryCount,
-          blockNumber: resBody.blockNumber,
         })
       })
     })

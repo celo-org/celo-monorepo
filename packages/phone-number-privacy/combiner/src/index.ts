@@ -1,4 +1,4 @@
-import { getContractKit } from '@celo/phone-number-privacy-common'
+import { getContractKitWithAgent } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
 import { Knex } from 'knex'
 import config from './config'
@@ -17,7 +17,7 @@ export const combiner = functions
   .https.onRequest(async (req, res) => {
     try {
       const db: Knex = await initDatabase(config)
-      const app = startCombiner(db, config, getContractKit(config.blockchain))
+      const app = startCombiner(db, config, getContractKitWithAgent(config.blockchain))
 
       app(req, res)
     } catch (e) {

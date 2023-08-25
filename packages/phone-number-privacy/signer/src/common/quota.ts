@@ -6,8 +6,6 @@ import {
   PnpQuotaStatus,
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
-import { Knex } from 'knex'
-import { Session } from './action'
 import { DomainStateRecord } from './database/models/domain-state'
 
 // prettier-ignore
@@ -20,15 +18,14 @@ export interface OdisQuotaStatusResult<R extends OdisRequest> {
   state: OdisQuotaStatus<R>
 }
 
-export interface QuotaService<R extends OdisRequest> {
-  checkAndUpdateQuotaStatus(
-    state: OdisQuotaStatus<R>,
-    session: Session<R>,
-    trx: Knex.Transaction<OdisQuotaStatus<R>>
-  ): Promise<OdisQuotaStatusResult<R>>
+export interface QService {
+  /**
+   * Return the quota for a given account
+   */
+  getQuotaStatus(qAccount: string): Promise<OdisQuotaStatus<any>>
 
-  getQuotaStatus(
-    session: Session<R>,
-    trx?: Knex.Transaction<OdisQuotaStatus<R>>
-  ): Promise<OdisQuotaStatus<R>>
+  /**
+   * Will execute action if enough quota for the account. And if the action is sucessful, it will decrement avaiable quota
+   */
+  tryQuotaIncrementingAction(quotaAccount: string, action: () => Promise<boolean>): Promise<void>
 }
