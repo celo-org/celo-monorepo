@@ -225,6 +225,7 @@ export async function getDeployedProxiedContract<ContractInstance extends Truffl
   // this wrap avoids a lot of rewrite
   console.log("customArtifacts testttu", customArtifacts);
   console.log("artifacts testttp", artifacts);
+  console.log("getting artifacts for", contractName);
   const overloadedArtifact = ArtifactsSingleton.wrap(customArtifacts)
   Proxy = overloadedArtifact.getProxy(contractName, artifacts)
   const proxy: ProxyInstance = await Proxy.deployed()
