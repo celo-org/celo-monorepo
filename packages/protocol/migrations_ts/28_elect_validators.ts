@@ -105,11 +105,7 @@ async function registerValidatorGroup(
   // Add a premium to cover tx fees
   const v = lockedGoldValue.times(1.01).integerValue()
 
-  console.info(
-    `    - send funds ${v} to group address ${account.address} from ${privateKeyToAddress(
-      privateKey
-    )}}`
-  )
+  console.info(`    - send funds ${v} to group address ${account.address}}`)
   await sendTransaction(web3, null, privateKey, {
     to: account.address,
     value: v,

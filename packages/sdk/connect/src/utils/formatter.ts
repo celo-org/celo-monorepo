@@ -61,8 +61,8 @@ export function inputCeloTxFormatter(tx: CeloTx): FormattedCeloTx {
 
   if (data && !isHex(data)) {
     throw new Error('The data field must be HEX encoded data.')
-  } else {
-    formattedTX.data = data
+  } else if (data) {
+    formattedTX.data = ensureLeading0x(data)
   }
 
   if (gasPrice) {
@@ -280,8 +280,14 @@ export function parseAccessList(accessListRaw: AccessListRaw | undefined): Acces
 
     accessList.push({
       address,
-      // TODO CIP42 figure out how to implement trim like viem or if needed trim(key)
-      storageKeys: storageKeys.map((key) => (isHash(key) ? key : /*trim*/ key)),
+      storageKeys: storageKeys.map((key) => {
+        if (isHash(key)) {
+          return key
+        } else {
+          // same behavior as web3
+          throw new Error(`Invalid storage key: ${key}`)
+        }
+      }),
     })
   }
   return accessList
