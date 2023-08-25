@@ -189,7 +189,7 @@ function isTimeoutError(err: unknown) {
   return err instanceof Error && err.name === 'TimeoutError'
 }
 
-function isAbortError(err: unknown) {
+export function isAbortError(err: unknown) {
   return err instanceof Error && err.name === 'AbortError'
 }
 
