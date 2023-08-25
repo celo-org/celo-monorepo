@@ -1,4 +1,4 @@
-import { getContractKit, rootLogger } from '@celo/phone-number-privacy-common'
+import { getContractKitWithAgent, rootLogger } from '@celo/phone-number-privacy-common'
 import { initDatabase } from './common/database/database'
 import { initKeyProvider } from './common/key-management/key-provider'
 import { KeyProvider } from './common/key-management/key-provider-base'
@@ -17,7 +17,7 @@ async function start() {
   logger.info(`Starting. Dev mode: ${DEV_MODE}`)
   const db = await initDatabase(config)
   const keyProvider: KeyProvider = await initKeyProvider(config)
-  const server = startSigner(config, db, keyProvider, getContractKit(config.blockchain))
+  const server = startSigner(config, db, keyProvider, getContractKitWithAgent(config.blockchain))
   logger.info('Starting server')
   const port = config.server.port ?? 0
   const backupTimeout = config.timeout * 1.2

@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@celo/contractkit": "^4.1.1-beta.1",
-    "@celo/phone-number-privacy-common": "^3.0.0-beta.2",
+    "@celo/phone-number-privacy-common": "^3.0.0-beta.3-dev",
     "@celo/identity": "^4.1.1-beta.1",
     "@celo/encrypted-backup": "^4.1.1-beta.1",
     "@celo/poprf": "^0.1.9",
