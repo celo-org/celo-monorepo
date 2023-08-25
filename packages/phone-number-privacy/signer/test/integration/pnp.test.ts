@@ -97,7 +97,7 @@ describe('pnp', () => {
   beforeEach(async () => {
     // Create a new in-memory database for each test.
     db = await initDatabase(_config)
-    app = startSigner(_config, db, keyProvider, newKit('dummyKit'))
+    app = startSigner(_config, db, keyProvider, newKit('dummyKit')).server
     mockOdisPaymentsTotalPaidCUSD.mockReset()
     mockGetDataEncryptionKey.mockReset().mockReturnValue(DEK_PUBLIC_KEY)
     mockGetWalletAddress.mockReset().mockReturnValue(mockAccount)
@@ -326,7 +326,7 @@ describe('pnp', () => {
           db,
           keyProvider,
           newKit('dummyKit')
-        )
+        ).server
 
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
@@ -404,7 +404,7 @@ describe('pnp', () => {
             db,
             keyProvider,
             newKit('dummyKit')
-          )
+          ).server
           const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(
@@ -810,7 +810,7 @@ describe('pnp', () => {
           db,
           keyProvider,
           newKit('dummyKit')
-        )
+        ).server
 
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
@@ -898,7 +898,7 @@ describe('pnp', () => {
             db,
             keyProvider,
             newKit('dummyKit')
-          )
+          ).server
 
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
@@ -940,7 +940,7 @@ describe('pnp', () => {
             db,
             keyProvider,
             newKit('dummyKit')
-          )
+          ).server
 
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(

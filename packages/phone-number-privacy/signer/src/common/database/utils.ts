@@ -7,6 +7,7 @@ export type DatabaseErrorMessage =
   | ErrorMessage.DATABASE_GET_FAILURE
   | ErrorMessage.DATABASE_INSERT_FAILURE
   | ErrorMessage.DATABASE_UPDATE_FAILURE
+  | ErrorMessage.DATABASE_REMOVE_FAILURE
 
 export function countAndThrowDBError(
   err: any,
@@ -23,6 +24,9 @@ export function countAndThrowDBError(
       break
     case ErrorMessage.DATABASE_INSERT_FAILURE:
       label = Labels.INSERT
+      break
+    case ErrorMessage.DATABASE_REMOVE_FAILURE:
+      label = Labels.BATCH_DELETE
       break
     default:
       throw new Error('Unknown database label provided')

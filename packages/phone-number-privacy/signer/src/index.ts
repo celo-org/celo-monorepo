@@ -4,6 +4,7 @@ import { initKeyProvider } from './common/key-management/key-provider'
 import { KeyProvider } from './common/key-management/key-provider-base'
 import { config, DEV_MODE, SupportedDatabase, SupportedKeystore } from './config'
 import { startSigner } from './server'
+import { CronJob } from 'cron'
 
 require('dotenv').config()
 
@@ -11,13 +12,20 @@ if (DEV_MODE) {
   config.db.type = SupportedDatabase.Sqlite
   config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
 }
+var databasePrunner: CronJob
 
 async function start() {
   const logger = rootLogger(config.serviceName)
   logger.info(`Starting. Dev mode: ${DEV_MODE}`)
   const db = await initDatabase(config)
   const keyProvider: KeyProvider = await initKeyProvider(config)
-  const server = startSigner(config, db, keyProvider, getContractKitWithAgent(config.blockchain))
+  const { server, databasePrunnerJob } = startSigner(
+    config,
+    db,
+    keyProvider,
+    getContractKitWithAgent(config.blockchain)
+  )
+  databasePrunner = databasePrunnerJob
   logger.info('Starting server')
   const port = config.server.port ?? 0
   const backupTimeout = config.timeout * 1.2
@@ -31,6 +39,7 @@ async function start() {
 start().catch((err) => {
   const logger = rootLogger(config.serviceName)
   logger.error({ err }, 'Fatal error occured. Exiting')
+  databasePrunner?.stop()
   process.exit(1)
 })
 

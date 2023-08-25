@@ -7,6 +7,7 @@ import {
   SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
 import express, { Express, RequestHandler } from 'express'
+import { CronJob } from 'cron'
 import fs from 'fs'
 import https from 'https'
 import { Knex } from 'knex'
@@ -45,7 +46,10 @@ export function startSigner(
   db: Knex,
   keyProvider: KeyProvider,
   kit?: ContractKit
-): Express | https.Server<typeof IncomingMessage, typeof ServerResponse> {
+): {
+  server: Express | https.Server<typeof IncomingMessage, typeof ServerResponse>
+  databasePrunnerJob: CronJob
+} {
   const logger = rootLogger(config.serviceName)
 
   kit = kit ?? getContractKitWithAgent(config.blockchain)
@@ -111,11 +115,13 @@ export function startSigner(
     createHandler(timeout, domains.enabled, domainDisable(db))
   )
 
+  const databasePrunner = launchRequestPrunnerJob(config, pnpRequestService)
+
   const sslOptions = getSslOptions(config)
   if (sslOptions) {
-    return https.createServer(sslOptions, app)
+    return { server: https.createServer(sslOptions, app), databasePrunnerJob: databasePrunner }
   } else {
-    return app
+    return { server: app, databasePrunnerJob: databasePrunner }
   }
 }
 
@@ -152,4 +158,27 @@ function createHandler<R extends OdisRequest>(
       )
     )
   )
+}
+
+function launchRequestPrunnerJob(
+  config: SignerConfig,
+  pnpRequestService: MockPnpRequestService | DefaultPnpRequestService
+) {
+  const ctx = {
+    url: '',
+    logger: rootLogger(config.serviceName),
+    errors: [],
+  }
+  const databasePrunner = new CronJob({
+    cronTime: config.requestPrunningJobCronPattern,
+    onTick: async () => {
+      ctx.logger.info('Prunning database requests')
+      await pnpRequestService.removeOldRequest(config.requestPrunningDays, ctx)
+    },
+    timeZone: 'UTC',
+    runOnInit: config.requestPrunningAtServerStart,
+  })
+  databasePrunner.start()
+
+  return databasePrunner
 }
