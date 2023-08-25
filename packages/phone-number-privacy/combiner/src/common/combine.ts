@@ -90,6 +90,14 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
         })
 
         if (!signerFetchResult.ok) {
+          // used for log based metrics
+          logger.info({
+            message: 'Received signerFetchResult on unsuccessful signer response',
+            res: await signerFetchResult.json(),
+            status: signerFetchResult.status,
+            signer: signer.url,
+          })
+
           errorCount++
           errorCodes.set(
             signerFetchResult.status,
