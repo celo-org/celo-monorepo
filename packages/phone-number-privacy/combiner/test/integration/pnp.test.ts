@@ -326,9 +326,9 @@ describe('pnpService', () => {
 
     describe('when signers are operating correctly', () => {
       beforeEach(async () => {
-        signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).server.listen(3001)
-        signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).server.listen(3002)
-        signer3 = startSigner(signerConfig, signerDB3, keyProvider3, mockKit).server.listen(3003)
+        signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
+        signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).listen(3002)
+        signer3 = startSigner(signerConfig, signerDB3, keyProvider3, mockKit).listen(3003)
       })
 
       describe(`${CombinerEndpoint.PNP_QUOTA}`, () => {
@@ -937,11 +937,9 @@ describe('pnpService', () => {
           const badKeyProvider1 = new MockKeyProvider(
             new Map([[`${DefaultKeyName.PHONE_NUMBER_PRIVACY}-1`, badBlsShare1]])
           )
-          signer1 = startSigner(signerConfig, signerDB1, badKeyProvider1, mockKit).server.listen(
-            3001
-          )
-          signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).server.listen(3002)
-          signer3 = startSigner(signerConfig, signerDB3, keyProvider3, mockKit).server.listen(3003)
+          signer1 = startSigner(signerConfig, signerDB1, badKeyProvider1, mockKit).listen(3001)
+          signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).listen(3002)
+          signer3 = startSigner(signerConfig, signerDB3, keyProvider3, mockKit).listen(3003)
         })
 
         describe(`${CombinerEndpoint.PNP_SIGN}`, () => {
@@ -984,13 +982,9 @@ describe('pnpService', () => {
             new Map([[`${DefaultKeyName.PHONE_NUMBER_PRIVACY}-1`, badBlsShare2]])
           )
 
-          signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).server.listen(3001)
-          signer2 = startSigner(signerConfig, signerDB2, badKeyProvider1, mockKit).server.listen(
-            3002
-          )
-          signer3 = startSigner(signerConfig, signerDB3, badKeyProvider2, mockKit).server.listen(
-            3003
-          )
+          signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
+          signer2 = startSigner(signerConfig, signerDB2, badKeyProvider1, mockKit).listen(3002)
+          signer3 = startSigner(signerConfig, signerDB3, badKeyProvider2, mockKit).listen(3003)
         })
 
         describe(`${CombinerEndpoint.PNP_SIGN}`, () => {
@@ -1013,19 +1007,13 @@ describe('pnpService', () => {
         beforeEach(async () => {
           const configWithApiDisabled: SignerConfig = JSON.parse(JSON.stringify(signerConfig))
           configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
-          signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).server.listen(3001)
-          signer2 = startSigner(
-            configWithApiDisabled,
-            signerDB2,
-            keyProvider2,
-            mockKit
-          ).server.listen(3002)
-          signer3 = startSigner(
-            configWithApiDisabled,
-            signerDB3,
-            keyProvider3,
-            mockKit
-          ).server.listen(3003)
+          signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
+          signer2 = startSigner(configWithApiDisabled, signerDB2, keyProvider2, mockKit).listen(
+            3002
+          )
+          signer3 = startSigner(configWithApiDisabled, signerDB3, keyProvider3, mockKit).listen(
+            3003
+          )
         })
 
         describe(`${CombinerEndpoint.PNP_QUOTA}`, () => {
@@ -1064,14 +1052,11 @@ describe('pnpService', () => {
         beforeEach(async () => {
           const configWithApiDisabled: SignerConfig = JSON.parse(JSON.stringify(signerConfig))
           configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
-          signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).server.listen(3001)
-          signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).server.listen(3002)
-          signer3 = startSigner(
-            configWithApiDisabled,
-            signerDB3,
-            keyProvider3,
-            mockKit
-          ).server.listen(3003)
+          signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
+          signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).listen(3002)
+          signer3 = startSigner(configWithApiDisabled, signerDB3, keyProvider3, mockKit).listen(
+            3003
+          )
         })
 
         describe(`${CombinerEndpoint.PNP_QUOTA}`, () => {
@@ -1119,24 +1104,15 @@ describe('pnpService', () => {
           const configWithShortTimeout: SignerConfig = JSON.parse(JSON.stringify(signerConfig))
           configWithShortTimeout.timeout = testTimeoutMS
           // Test this with all signers timing out to decrease possibility of race conditions
-          signer1 = startSigner(
-            configWithShortTimeout,
-            signerDB1,
-            keyProvider1,
-            mockKit
-          ).server.listen(3001)
-          signer2 = startSigner(
-            configWithShortTimeout,
-            signerDB2,
-            keyProvider2,
-            mockKit
-          ).server.listen(3002)
-          signer3 = startSigner(
-            configWithShortTimeout,
-            signerDB3,
-            keyProvider3,
-            mockKit
-          ).server.listen(3003)
+          signer1 = startSigner(configWithShortTimeout, signerDB1, keyProvider1, mockKit).listen(
+            3001
+          )
+          signer2 = startSigner(configWithShortTimeout, signerDB2, keyProvider2, mockKit).listen(
+            3002
+          )
+          signer3 = startSigner(configWithShortTimeout, signerDB3, keyProvider3, mockKit).listen(
+            3003
+          )
         })
 
         describe(`${CombinerEndpoint.PNP_QUOTA}`, () => {
@@ -1269,11 +1245,11 @@ describe('pnpService', () => {
       signerDB4 = await initSignerDatabase(signerConfig, signerMigrationsPath)
       signerDB5 = await initSignerDatabase(signerConfig, signerMigrationsPath)
 
-      signer1 = startSigner(signerConfig, signerDB1, keyProvider1).server.listen(3001)
-      signer2 = startSigner(signerConfig, signerDB2, keyProvider2).server.listen(3002)
-      signer3 = startSigner(signerConfig, signerDB3, keyProvider3).server.listen(3003)
-      signer4 = startSigner(signerConfig, signerDB4, keyProvider4).server.listen(3004)
-      signer5 = startSigner(signerConfig, signerDB5, keyProvider5).server.listen(3005)
+      signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3001)
+      signer2 = startSigner(signerConfig, signerDB2, keyProvider2).listen(3002)
+      signer3 = startSigner(signerConfig, signerDB3, keyProvider3).listen(3003)
+      signer4 = startSigner(signerConfig, signerDB4, keyProvider4).listen(3004)
+      signer5 = startSigner(signerConfig, signerDB5, keyProvider5).listen(3005)
 
       userSeed = new Uint8Array(32)
       for (let i = 0; i < userSeed.length - 1; i++) {

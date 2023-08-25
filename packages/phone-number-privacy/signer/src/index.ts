@@ -5,6 +5,8 @@ import { KeyProvider } from './common/key-management/key-provider-base'
 import { config, DEV_MODE, SupportedDatabase, SupportedKeystore } from './config'
 import { startSigner } from './server'
 import { CronJob } from 'cron'
+import { Knex } from 'knex'
+import { DefaultPnpRequestService, MockPnpRequestService } from './pnp/services/request-service'
 
 require('dotenv').config()
 
@@ -19,17 +21,11 @@ async function start() {
   logger.info(`Starting. Dev mode: ${DEV_MODE}`)
   const db = await initDatabase(config)
   const keyProvider: KeyProvider = await initKeyProvider(config)
-  const { server, databasePrunnerJob } = startSigner(
-    config,
-    db,
-    keyProvider,
-    getContractKitWithAgent(config.blockchain)
-  )
-  databasePrunner = databasePrunnerJob
-  if (databasePrunner) {
-    logger.info('Starting database Prunner job')
-    databasePrunner.start()
-  }
+  const server = startSigner(config, db, keyProvider, getContractKitWithAgent(config.blockchain))
+
+  logger.info('Starting database Prunner job')
+  launchRequestPrunnerJob(db)
+
   logger.info('Starting server')
   const port = config.server.port ?? 0
   const backupTimeout = config.timeout * 1.2
@@ -38,6 +34,27 @@ async function start() {
       logger.info(`Server is listening on port ${port}`)
     })
     .setTimeout(backupTimeout)
+}
+
+function launchRequestPrunnerJob(db: Knex) {
+  const ctx = {
+    url: '',
+    logger: rootLogger(config.serviceName),
+    errors: [],
+  }
+  const pnpRequestService = config.shouldMockRequestService
+    ? new MockPnpRequestService()
+    : new DefaultPnpRequestService(db)
+  databasePrunner = new CronJob({
+    cronTime: config.requestPrunningJobCronPattern,
+    onTick: async () => {
+      ctx.logger.info('Prunning database requests')
+      await pnpRequestService.removeOldRequest(config.requestPrunningDays, ctx)
+    },
+    timeZone: 'UTC',
+    runOnInit: config.requestPrunningAtServerStart,
+  })
+  databasePrunner.start()
 }
 
 start().catch((err) => {
