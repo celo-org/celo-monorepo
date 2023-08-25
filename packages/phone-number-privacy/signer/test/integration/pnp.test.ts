@@ -547,7 +547,7 @@ describe('pnp', () => {
         })
       }
 
-      it.only('Should respond with 200 and warning on repeated valid requests', async () => {
+      it('Should respond with 200 and warning on repeated valid requests', async () => {
         const logger = rootLogger(_config.serviceName)
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
