@@ -138,7 +138,7 @@ describe('domain', () => {
   beforeEach(async () => {
     // Create a new in-memory database for each test.
     db = await initDatabase(_config)
-    app = startSigner(_config, db, keyProvider)
+    app = startSigner(_config, db, keyProvider).server
   })
 
   afterEach(async () => {
@@ -293,7 +293,7 @@ describe('domain', () => {
     it('Should respond with 503 on disabled api', async () => {
       const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
       configWithApiDisabled.api.domains.enabled = false
-      const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+      const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider).server
 
       const req = await disableRequest()
 
@@ -342,7 +342,7 @@ describe('domain', () => {
 
         const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
         configWithShortTimeout.timeout = testTimeoutMS
-        const appWithShortTimeout = startSigner(configWithShortTimeout, db, keyProvider)
+        const appWithShortTimeout = startSigner(configWithShortTimeout, db, keyProvider).server
 
         const req = await disableRequest()
         const spy = jest
@@ -502,7 +502,7 @@ describe('domain', () => {
     it('Should respond with 503 on disabled api', async () => {
       const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
       configWithApiDisabled.api.domains.enabled = false
-      const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+      const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider).server
 
       const req = await quotaRequest()
 
@@ -557,7 +557,7 @@ describe('domain', () => {
 
       const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
       configWithShortTimeout.timeout = testTimeoutMS
-      const appWithShortTimeout = startSigner(configWithShortTimeout, db, keyProvider)
+      const appWithShortTimeout = startSigner(configWithShortTimeout, db, keyProvider).server
 
       const req = await quotaRequest()
       const spy = jest
@@ -932,7 +932,7 @@ describe('domain', () => {
     it('Should respond with 503 on disabled api', async () => {
       const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
       configWithApiDisabled.api.domains.enabled = false
-      const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+      const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider).server
 
       const [req, _] = await signatureRequest()
 
@@ -1025,7 +1025,7 @@ describe('domain', () => {
 
         const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
         configWithShortTimeout.timeout = testTimeoutMS
-        const appWithShortTimeout = startSigner(configWithShortTimeout, db, keyProvider)
+        const appWithShortTimeout = startSigner(configWithShortTimeout, db, keyProvider).server
 
         const res = await request(appWithShortTimeout).post(SignerEndpoint.DOMAIN_SIGN).send(req)
         expect(res.status).toBe(500)

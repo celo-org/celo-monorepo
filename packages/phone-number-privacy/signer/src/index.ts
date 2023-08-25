@@ -26,6 +26,10 @@ async function start() {
     getContractKitWithAgent(config.blockchain)
   )
   databasePrunner = databasePrunnerJob
+  if (databasePrunner) {
+    logger.info('Starting database Prunner job')
+    databasePrunner.start()
+  }
   logger.info('Starting server')
   const port = config.server.port ?? 0
   const backupTimeout = config.timeout * 1.2

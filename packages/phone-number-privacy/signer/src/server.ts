@@ -178,7 +178,6 @@ function launchRequestPrunnerJob(
     timeZone: 'UTC',
     runOnInit: config.requestPrunningAtServerStart,
   })
-  databasePrunner.start()
 
   return databasePrunner
 }
