@@ -1,6 +1,6 @@
 import { ContractKit } from '@celo/contractkit'
 import {
-  getContractKit,
+  getContractKitWithAgent,
   loggerMiddleware,
   OdisRequest,
   rootLogger,
@@ -48,7 +48,7 @@ export function startSigner(
 ): Express | https.Server<typeof IncomingMessage, typeof ServerResponse> {
   const logger = rootLogger(config.serviceName)
 
-  kit = kit ?? getContractKit(config.blockchain)
+  kit = kit ?? getContractKitWithAgent(config.blockchain)
 
   logger.info('Creating signer express server')
   const app = express()

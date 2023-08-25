@@ -82,6 +82,13 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
           abortSignal
         )
 
+        // used for log based metrics
+        logger.info({
+          message: 'Received signerFetchResult',
+          signer: signer.url,
+          status: signerFetchResult.status,
+        })
+
         if (!signerFetchResult.ok) {
           errorCount++
           errorCodes.set(

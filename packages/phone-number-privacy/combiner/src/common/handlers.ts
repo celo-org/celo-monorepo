@@ -49,6 +49,9 @@ export function meteringHandler<R extends OdisRequest>(
   return async (req, res) => {
     const logger: Logger = res.locals.logger
 
+    // used for log based metrics
+    logger.info({ req: req.body }, 'Request received')
+
     const eventLoopLagMeasurementStart = Date.now()
     setTimeout(() => {
       const eventLoopLag = Date.now() - eventLoopLagMeasurementStart
@@ -70,6 +73,10 @@ export function meteringHandler<R extends OdisRequest>(
 
     try {
       await handler(req, res)
+      if (res.headersSent) {
+        // used for log based metrics
+        logger.info({ res }, 'Response sent')
+      }
     } finally {
       performance.mark(endMark)
       performance.measure(entryName, startMark, endMark)

@@ -126,9 +126,13 @@ export async function concurrentRPSLoadTest(
   }
 
   const testFn = async () => {
-    await (endpoint === CombinerEndpointPNP.PNP_SIGN
-      ? testPNPSignQuery(blockchainProvider, contextName, undefined, bypassQuota, useDEK)
-      : testPNPQuotaQuery(blockchainProvider, contextName))
+    try {
+      await (endpoint === CombinerEndpointPNP.PNP_SIGN
+        ? testPNPSignQuery(blockchainProvider, contextName, undefined, bypassQuota, useDEK)
+        : testPNPQuotaQuery(blockchainProvider, contextName))
+    } catch (_) {
+      logger.error('load test request failed')
+    }
   }
 
   return doRPSTest(measureLatency(testFn), rps, duration)
