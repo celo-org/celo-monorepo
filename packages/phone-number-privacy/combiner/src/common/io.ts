@@ -92,7 +92,7 @@ export async function fetchSignerResponseWithFallback<R extends OdisRequest>(
     })
   }
 
-  return measureTime(signer.url + signerEndpoint, () =>
+  return measureTime(signer.url + signerEndpoint + `/${request.body.sessionID}`, () =>
     fetchSignerResponse(signer.url + signerEndpoint).catch((err) => {
       logger.error({ url: signer.url, error: err }, `Signer failed with primary url`)
       if (signer.fallbackUrl) {
@@ -114,6 +114,10 @@ async function measureTime<T>(name: string, fn: () => Promise<T>): Promise<T> {
   } finally {
     performance.mark(end)
     performance.measure(name, start, end)
+
+    performance.clearMeasures(name)
+    performance.clearMarks(start)
+    performance.clearMarks(end)
   }
 }
 

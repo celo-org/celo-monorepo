@@ -40,15 +40,23 @@ export abstract class CryptoClient {
         `${ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES} ${this.allSignaturesLength}/${threshold}`
       )
     }
+    const randomID =
+      Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
 
-    const start = `Start combineBlindedSignatureShares`
-    const end = `End combineBlindedSignatureShares`
+    const name = `combineBlindedSignatureShares/${randomID}`
+    const start = `Start ${name}`
+    const end = `End ${name}`
+
     performance.mark(start)
 
     const combinedSignature = this._combineBlindedSignatureShares(blindedMessage, logger)
 
     performance.mark(end)
-    performance.measure('combineBlindedSignatureShares', start, end)
+    performance.measure(name, start, end)
+
+    performance.clearMeasures(name)
+    performance.clearMarks(start)
+    performance.clearMarks(end)
 
     return combinedSignature
   }

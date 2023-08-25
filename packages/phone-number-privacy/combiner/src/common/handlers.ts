@@ -57,9 +57,9 @@ export function meteringHandler<R extends OdisRequest>(
       const eventLoopLag = Date.now() - eventLoopLagMeasurementStart
       logger.info({ eventLoopLag }, 'Measure event loop lag')
     })
-    const startMark = `Begin ${req.url}`
-    const endMark = `End ${req.url}`
-    const entryName = `${req.url} latency`
+    const startMark = `Begin ${req.url}/${req.body.sessionID}`
+    const endMark = `End ${req.url}/${req.body.sessionID}`
+    const entryName = `${req.url}/${req.body.sessionID} latency`
 
     const obs = new PerformanceObserver((list) => {
       const entry = list.getEntriesByName(entryName)[0]
@@ -80,7 +80,10 @@ export function meteringHandler<R extends OdisRequest>(
     } finally {
       performance.mark(endMark)
       performance.measure(entryName, startMark, endMark)
-      performance.clearMarks()
+
+      performance.clearMeasures(entryName)
+      performance.clearMarks(startMark)
+      performance.clearMarks(endMark)
       obs.disconnect()
     }
   }
