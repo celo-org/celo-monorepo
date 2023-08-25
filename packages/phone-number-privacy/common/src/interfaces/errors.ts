@@ -32,6 +32,7 @@ export enum ErrorMessage {
   CAUGHT_ERROR_IN_ENDPOINT_HANDLER = `CELO_ODIS_ERR_30 Caught error in outer endpoint handler`,
   ERROR_AFTER_RESPONSE_SENT = `CELO_ODIS_ERR_31 Error in endpoint thrown after response was already sent`,
   SIGNATURE_AGGREGATION_FAILURE = 'CELO_ODIS_ERR_32 SIG_ERR Failed to blind aggregate signature shares',
+  DATABASE_REMOVE_FAILURE = 'CELO_ODIS_ERR_33 DB_ERR Failed to remove database entries',
 }
 
 export enum WarningMessage {
