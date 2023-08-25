@@ -57,7 +57,7 @@ export function pnpSign(
 
     let usedQuota = await requestService.getUsedQuotaForAccount(request.body.account, ctx)
 
-    const duplicateRequest = await requestService.isDuplicateRequest(
+    const duplicateRequest = await requestService.getDuplicateRequest(
       request.body.account,
       request.body.blindedQueryPhoneNumber,
       ctx
@@ -89,24 +89,33 @@ export function pnpSign(
     }
 
     let signature: string
-    try {
-      signature = await sign(
-        request.body.blindedQueryPhoneNumber,
-        key,
-        keyProvider,
-        response.locals.logger
-      )
-    } catch (err) {
-      response.locals.logger.error({ err }, 'catch error on signing')
+    if (duplicateRequest && duplicateRequest.signature.length) {
+      signature = duplicateRequest.signature
+    } else {
+      try {
+        signature = await sign(
+          request.body.blindedQueryPhoneNumber,
+          key,
+          keyProvider,
+          response.locals.logger
+        )
+      } catch (err) {
+        response.locals.logger.error({ err }, 'catch error on signing')
 
-      return errorResult(500, ErrorMessage.SIGNATURE_COMPUTATION_FAILURE, {
-        performedQueryCount: usedQuota,
-        totalQuota: account.pnpTotalQuota,
-      })
+        return errorResult(500, ErrorMessage.SIGNATURE_COMPUTATION_FAILURE, {
+          performedQueryCount: usedQuota,
+          totalQuota: account.pnpTotalQuota,
+        })
+      }
     }
 
     if (!duplicateRequest) {
-      await requestService.recordRequest(account.address, request.body.blindedQueryPhoneNumber, ctx)
+      await requestService.recordRequest(
+        account.address,
+        request.body.blindedQueryPhoneNumber,
+        signature,
+        ctx
+      )
       usedQuota++
     } else {
       Counters.duplicateRequests.inc()
