@@ -1,4 +1,4 @@
-import { ContractKit, newKit, newKitWithApiKey, HttpProviderOptions } from '@celo/contractkit'
+import { ContractKit, HttpProviderOptions, newKit, newKitWithApiKey } from '@celo/contractkit'
 import http from 'http'
 import https from 'https'
 
