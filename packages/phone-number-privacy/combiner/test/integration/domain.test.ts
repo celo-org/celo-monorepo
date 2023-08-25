@@ -16,7 +16,7 @@ import {
   ErrorMessage,
   FULL_NODE_TIMEOUT_IN_MS,
   genSessionID,
-  getContractKit,
+  getContractKitWithAgent,
   KEY_VERSION_HEADER,
   PoprfClient,
   RETRY_COUNT,
@@ -39,7 +39,7 @@ import { LocalWallet } from '@celo/wallet-local'
 import BigNumber from 'bignumber.js'
 import { Server as HttpsServer } from 'https'
 import { Knex } from 'knex'
-import { Server } from 'http'
+import { Server, Agent } from 'http'
 import request from 'supertest'
 import { MockKeyProvider } from '../../../signer/dist/common/key-management/mock-key-provider'
 import config from '../../src/config'
@@ -269,7 +269,7 @@ describe('domainService', () => {
         ])
       )
 
-      app = startCombiner(combinerConfig, getContractKit(combinerConfig.blockchain))
+      app = startCombiner(combinerConfig, getContractKitWithAgent(combinerConfig.blockchain))
     })
 
     beforeEach(async () => {
@@ -417,7 +417,7 @@ describe('domainService', () => {
           configWithApiDisabled.domains.enabled = false
           const appWithApiDisabled = startCombiner(
             configWithApiDisabled,
-            getContractKit(configWithApiDisabled.blockchain)
+            getContractKitWithAgent(configWithApiDisabled.blockchain)
           )
           const req = await disableRequest()
 
@@ -566,7 +566,7 @@ describe('domainService', () => {
           configWithApiDisabled.domains.enabled = false
           const appWithApiDisabled = startCombiner(
             configWithApiDisabled,
-            getContractKit(configWithApiDisabled.blockchain)
+            getContractKitWithAgent(configWithApiDisabled.blockchain)
           )
 
           const req = await quotaRequest()
@@ -896,7 +896,7 @@ describe('domainService', () => {
           configWithApiDisabled.domains.enabled = false
           const appWithApiDisabled = startCombiner(
             configWithApiDisabled,
-            getContractKit(configWithApiDisabled.blockchain)
+            getContractKitWithAgent(configWithApiDisabled.blockchain)
           )
 
           const [req, _] = await signatureRequest()
@@ -1217,7 +1217,10 @@ describe('domainService', () => {
           ],
         ])
       )
-      app = startCombiner(combinerConfigLargerN, getContractKit(combinerConfigLargerN.blockchain))
+      app = startCombiner(
+        combinerConfigLargerN,
+        getContractKitWithAgent(combinerConfigLargerN.blockchain)
+      )
     })
 
     beforeEach(async () => {

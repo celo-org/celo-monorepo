@@ -1,4 +1,4 @@
-import { getContractKit } from '@celo/phone-number-privacy-common'
+import { getContractKitWithAgent } from '@celo/phone-number-privacy-common'
 import { setGlobalOptions } from 'firebase-functions/v2'
 import * as functions from 'firebase-functions/v2/https'
 import config from './config'
@@ -11,6 +11,6 @@ setGlobalOptions({ region: 'us-central1' })
 
 export const combinerGen2 = functions.onRequest(
   { minInstances: minInstancesConfig, secrets: [blockchainApiKey], concurrency: requestConcurency },
-  startCombiner(config, getContractKit(config.blockchain))
+  startCombiner(config, getContractKitWithAgent(config.blockchain))
 )
 export * from './config'
