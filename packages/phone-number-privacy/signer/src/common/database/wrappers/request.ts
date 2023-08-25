@@ -50,12 +50,12 @@ export async function insertRequest(
 
 export async function deleteRequestsOlderThan(
   db: Knex,
-  date: Date,
+  since: Date,
   logger: Logger,
   trx?: Knex.Transaction
 ): Promise<Number> {
-  logger.debug(`Removing request older than: ${date}`)
-  if (date > new Date()) {
+  logger.debug(`Removing request older than: ${since}`)
+  if (since > new Date(Date.now())) {
     logger.debug('Date is in the future')
     return 0
   }
@@ -65,7 +65,7 @@ export async function deleteRequestsOlderThan(
     logger,
     async () => {
       const sql = db<PnpSignRequestRecord>(REQUESTS_TABLE)
-        .where(REQUESTS_COLUMNS.timestamp, '<=', date)
+        .where(REQUESTS_COLUMNS.timestamp, '<=', since)
         .del()
       return await (trx != null ? sql.transacting(trx) : sql)
     }
