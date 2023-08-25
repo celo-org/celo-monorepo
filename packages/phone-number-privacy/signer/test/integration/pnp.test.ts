@@ -23,7 +23,7 @@ import {
   getPerformedQueryCount,
   incrementQueryCount,
 } from '../../src/common/database/wrappers/account'
-import { getRequestExists } from '../../src/common/database/wrappers/request'
+import { getRequestIfExists } from '../../src/common/database/wrappers/request'
 import { initKeyProvider } from '../../src/common/key-management/key-provider'
 import { KeyProvider } from '../../src/common/key-management/key-provider-base'
 import { config, getSignerVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
@@ -258,13 +258,7 @@ describe('pnp', () => {
       it('Should respond with 200 if performedQueryCount is greater than totalQuota', async () => {
         await db.transaction(async (trx) => {
           for (let i = 0; i <= expectedQuota; i++) {
-            await incrementQueryCount(
-              db,
-
-              ACCOUNT_ADDRESS1,
-              rootLogger(config.serviceName),
-              trx
-            )
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
           }
         })
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
@@ -485,13 +479,7 @@ describe('pnp', () => {
         mockOdisPaymentsTotalPaidCUSD.mockReturnValue(onChainBalance)
         await db.transaction(async (trx) => {
           for (let i = 0; i < performedQueryCount; i++) {
-            await incrementQueryCount(
-              db,
-
-              ACCOUNT_ADDRESS1,
-              rootLogger(_config.serviceName),
-              trx
-            )
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
           }
         })
       })
@@ -559,7 +547,8 @@ describe('pnp', () => {
         })
       }
 
-      it('Should respond with 200 and warning on repeated valid requests', async () => {
+      it.only('Should respond with 200 and warning on repeated valid requests', async () => {
+        const logger = rootLogger(_config.serviceName)
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
@@ -576,6 +565,20 @@ describe('pnp', () => {
           totalQuota: expectedQuota,
           warnings: [],
         })
+
+        const requestDbRecord = await getRequestIfExists(
+          db,
+          req.account,
+          req.blindedQueryPhoneNumber,
+          logger
+        )
+        expect(requestDbRecord).toEqual({
+          blinded_query: req.blindedQueryPhoneNumber,
+          caller_address: req.account,
+          signature: expectedSignature,
+          timestamp: requestDbRecord!.timestamp,
+        })
+
         const res2 = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
         expect(res2.status).toBe(200)
         res1.body.warnings.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
@@ -708,13 +711,7 @@ describe('pnp', () => {
         const remainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i < remainingQuota; i++) {
-            await incrementQueryCount(
-              db,
-
-              ACCOUNT_ADDRESS1,
-              rootLogger(_config.serviceName),
-              trx
-            )
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
           }
         })
         const req = getPnpSignRequest(
@@ -766,17 +763,9 @@ describe('pnp', () => {
         const expectedRemainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i <= expectedRemainingQuota; i++) {
-            await incrementQueryCount(
-              db,
-
-              ACCOUNT_ADDRESS1,
-              rootLogger(_config.serviceName),
-              trx
-            )
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
           }
         })
-
-        // It is possible to reach this state due to our fail-open logic
 
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
@@ -861,12 +850,7 @@ describe('pnp', () => {
           })
           // sanity check
           expect(
-            await getPerformedQueryCount(
-              db,
-
-              ACCOUNT_ADDRESS1,
-              rootLogger(_config.serviceName)
-            )
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(expectedQuota)
 
           const spy = jest
@@ -1007,9 +991,9 @@ describe('pnp', () => {
           expect(await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, logger)).toBe(
             performedQueryCount
           )
-          expect(await getRequestExists(db, req.account, req.blindedQueryPhoneNumber, logger)).toBe(
-            false
-          )
+          expect(
+            await getRequestIfExists(db, req.account, req.blindedQueryPhoneNumber, logger)
+          ).toBe(undefined)
         })
 
         it('Should return 500 on failure to store request', async () => {
@@ -1044,14 +1028,8 @@ describe('pnp', () => {
             performedQueryCount
           )
           expect(
-            await getRequestExists(
-              db,
-
-              req.account,
-              req.blindedQueryPhoneNumber,
-              logger
-            )
-          ).toBe(false)
+            await getRequestIfExists(db, req.account, req.blindedQueryPhoneNumber, logger)
+          ).toBe(undefined)
         })
 
         it('Should return 500 on bls signing error', async () => {
@@ -1090,14 +1068,13 @@ describe('pnp', () => {
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(
+            await getRequestIfExists(
               db,
-
               req.account,
               req.blindedQueryPhoneNumber,
               rootLogger(_config.serviceName)
             )
-          ).toBe(false)
+          ).toBe(undefined)
         })
 
         it('Should return 500 on generic error in sign', async () => {
@@ -1132,22 +1109,17 @@ describe('pnp', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(
-              db,
-
-              ACCOUNT_ADDRESS1,
-              rootLogger(config.serviceName)
-            )
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(
+            await getRequestIfExists(
               db,
 
               req.account,
               req.blindedQueryPhoneNumber,
               rootLogger(config.serviceName)
             )
-          ).toBe(false)
+          ).toBe(undefined)
         })
       })
     })

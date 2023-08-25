@@ -9,7 +9,7 @@ export async function up(knex: Knex): Promise<any> {
       t.string(REQUESTS_COLUMNS.blindedQuery).notNullable()
       t.primary([
         REQUESTS_COLUMNS.address,
-        // Note: the order of these should be switched
+        // Note: the order of these should be switched. Done in follow up migration.
         REQUESTS_COLUMNS.timestamp,
         REQUESTS_COLUMNS.blindedQuery,
       ])

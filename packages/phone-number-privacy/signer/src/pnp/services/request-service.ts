@@ -1,16 +1,26 @@
 import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { Context } from '../../common/context'
+import { PnpSignRequestRecord } from '../../common/database/models/request'
 import { getPerformedQueryCount, incrementQueryCount } from '../../common/database/wrappers/account'
-import { getRequestExists, insertRequest } from '../../common/database/wrappers/request'
+import { getRequestIfExists, insertRequest } from '../../common/database/wrappers/request'
 import { wrapError } from '../../common/error'
 import { Histograms, newMeter } from '../../common/metrics'
 import { traceAsyncFunction } from '../../common/tracing-utils'
 
 export interface PnpRequestService {
-  recordRequest(address: string, blindedQuery: string, ctx: Context): Promise<void>
+  recordRequest(
+    address: string,
+    blindedQuery: string,
+    signature: string,
+    ctx: Context
+  ): Promise<void>
   getUsedQuotaForAccount(address: string, ctx: Context): Promise<number>
-  isDuplicateRequest(address: string, blindedQuery: string, ctx: Context): Promise<boolean>
+  getDuplicateRequest(
+    address: string,
+    blindedQuery: string,
+    ctx: Context
+  ): Promise<PnpSignRequestRecord | undefined>
 }
 
 export class DefaultPnpRequestService implements PnpRequestService {
@@ -19,11 +29,12 @@ export class DefaultPnpRequestService implements PnpRequestService {
   public async recordRequest(
     account: string,
     blindedQueryPhoneNumber: string,
+    signature: string,
     ctx: Context
   ): Promise<void> {
     return traceAsyncFunction('DefaultPnpRequestService - recordRequest', async () => {
       return this.db.transaction(async (trx) => {
-        await insertRequest(this.db, account, blindedQueryPhoneNumber, ctx.logger, trx)
+        await insertRequest(this.db, account, blindedQueryPhoneNumber, signature, ctx.logger, trx)
         await incrementQueryCount(this.db, account, ctx.logger, trx)
       })
     })
@@ -45,16 +56,17 @@ export class DefaultPnpRequestService implements PnpRequestService {
     )
   }
 
-  public async isDuplicateRequest(
+  public async getDuplicateRequest(
     account: string,
     blindedQueryPhoneNumber: string,
     ctx: Context
-  ): Promise<boolean> {
+  ): Promise<PnpSignRequestRecord | undefined> {
     try {
-      return getRequestExists(this.db, account, blindedQueryPhoneNumber, ctx.logger)
+      const res = await getRequestIfExists(this.db, account, blindedQueryPhoneNumber, ctx.logger)
+      return res
     } catch (err) {
       ctx.logger.error(err, 'Failed to check if request already exists in db')
-      return false
+      return undefined
     }
   }
 }
@@ -64,9 +76,13 @@ export class MockPnpRequestService implements PnpRequestService {
   public async recordRequest(
     account: string,
     blindedQueryPhoneNumber: string,
+    signature: string,
     ctx: Context
   ): Promise<void> {
-    ctx.logger.info({ account, blindedQueryPhoneNumber }, 'MockPnpRequestService - recordRequest')
+    ctx.logger.info(
+      { account, blindedQueryPhoneNumber, signature },
+      'MockPnpRequestService - recordRequest'
+    )
     return
   }
 
@@ -75,15 +91,15 @@ export class MockPnpRequestService implements PnpRequestService {
     return 0
   }
 
-  public async isDuplicateRequest(
+  public async getDuplicateRequest(
     account: string,
     blindedQueryPhoneNumber: string,
     ctx: Context
-  ): Promise<boolean> {
+  ): Promise<PnpSignRequestRecord | undefined> {
     ctx.logger.info(
       { account, blindedQueryPhoneNumber },
       'MockPnpRequestService - isDuplicateRequest'
     )
-    return false
+    return undefined
   }
 }
