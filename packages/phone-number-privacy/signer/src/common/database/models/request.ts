@@ -11,7 +11,7 @@ export interface PnpSignRequestRecord {
   [REQUESTS_COLUMNS.address]: string
   [REQUESTS_COLUMNS.timestamp]: Date
   [REQUESTS_COLUMNS.blindedQuery]: string
-  [REQUESTS_COLUMNS.signature]: string
+  [REQUESTS_COLUMNS.signature]: string | undefined
 }
 
 export function toPnpSignRequestRecord(

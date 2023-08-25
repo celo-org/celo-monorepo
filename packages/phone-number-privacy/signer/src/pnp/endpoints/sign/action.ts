@@ -89,7 +89,7 @@ export function pnpSign(
     }
 
     let signature: string
-    if (duplicateRequest && duplicateRequest.signature.length) {
+    if (duplicateRequest && duplicateRequest.signature?.length) {
       signature = duplicateRequest.signature
     } else {
       try {
