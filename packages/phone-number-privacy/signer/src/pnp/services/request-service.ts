@@ -3,7 +3,11 @@ import { Knex } from 'knex'
 import { Context } from '../../common/context'
 import { PnpSignRequestRecord } from '../../common/database/models/request'
 import { getPerformedQueryCount, incrementQueryCount } from '../../common/database/wrappers/account'
-import { getRequestIfExists, insertRequest } from '../../common/database/wrappers/request'
+import {
+  deleteRequestsOlderThan,
+  getRequestIfExists,
+  insertRequest,
+} from '../../common/database/wrappers/request'
 import { wrapError } from '../../common/error'
 import { Histograms, newMeter } from '../../common/metrics'
 import { traceAsyncFunction } from '../../common/tracing-utils'
@@ -21,6 +25,7 @@ export interface PnpRequestService {
     blindedQuery: string,
     ctx: Context
   ): Promise<PnpSignRequestRecord | undefined>
+  removeOldRequest(daysToKeep: number, ctx: Context): Promise<Number>
 }
 
 export class DefaultPnpRequestService implements PnpRequestService {
@@ -69,6 +74,16 @@ export class DefaultPnpRequestService implements PnpRequestService {
       return undefined
     }
   }
+
+  public async removeOldRequest(daysToKeep: number, ctx: Context): Promise<Number> {
+    if (daysToKeep < 0) {
+      ctx.logger.error('RemoveOldRequest - DaysToKeep should be bigger than or equal to zero')
+    }
+    const since: Date = new Date(Date.now() - daysToKeep * 24 * 60 * 60 * 1000)
+    return traceAsyncFunction('DefaultPnpRequestService - removeOldRequest', () =>
+      deleteRequestsOlderThan(this.db, since, ctx.logger)
+    )
+  }
 }
 
 // tslint:disable-next-line:max-classes-per-file
@@ -101,5 +116,10 @@ export class MockPnpRequestService implements PnpRequestService {
       'MockPnpRequestService - isDuplicateRequest'
     )
     return undefined
+  }
+
+  public async removeOldRequest(daysToKeep: number, ctx: Context): Promise<Number> {
+    ctx.logger.info({ daysToKeep }, 'MockPnpRequestService - removeOldRequest')
+    return 0
   }
 }

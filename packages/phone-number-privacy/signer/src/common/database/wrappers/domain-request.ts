@@ -64,3 +64,27 @@ export async function storeDomainRequestRecord<D extends Domain>(
     }
   )
 }
+
+export async function deleteDomainRequestsOlderThan(
+  db: Knex,
+  date: Date,
+  logger: Logger,
+  trx?: Knex.Transaction
+): Promise<Number> {
+  logger.debug(`Removing request older than: ${date}`)
+  if (date > new Date()) {
+    logger.debug('Date is in the future')
+    return 0
+  }
+  return doMeteredSql(
+    'deleteDomainRequestsOlderThan',
+    ErrorMessage.DATABASE_REMOVE_FAILURE,
+    logger,
+    async () => {
+      const sql = db<DomainRequestRecord>(DOMAIN_REQUESTS_TABLE)
+        .where(DOMAIN_REQUESTS_COLUMNS.timestamp, '<=', date)
+        .del()
+      return await (trx != null ? sql.transacting(trx) : sql)
+    }
+  )
+}

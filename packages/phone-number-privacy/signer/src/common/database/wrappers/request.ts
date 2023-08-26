@@ -47,3 +47,26 @@ export async function insertRequest(
     await (trx != null ? sql.transacting(trx) : sql)
   })
 }
+
+export async function deleteRequestsOlderThan(
+  db: Knex,
+  since: Date,
+  logger: Logger
+): Promise<Number> {
+  logger.debug(`Removing request older than: ${since}`)
+  if (since > new Date(Date.now())) {
+    logger.debug('Date is in the future')
+    return 0
+  }
+  return doMeteredSql(
+    'deleteRequestsOlderThan',
+    ErrorMessage.DATABASE_REMOVE_FAILURE,
+    logger,
+    async () => {
+      const sql = db<PnpSignRequestRecord>(REQUESTS_TABLE)
+        .where(REQUESTS_COLUMNS.timestamp, '<=', since)
+        .del()
+      return sql
+    }
+  )
+}

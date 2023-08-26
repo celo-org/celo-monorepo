@@ -141,6 +141,9 @@ const signerConfig: SignerConfig = {
   mockDek: '',
   mockTotalQuota: 0,
   shouldMockRequestService: false,
+  requestPrunningDays: 0,
+  requestPrunningAtServerStart: false,
+  requestPrunningJobCronPattern: '0 0 * * * *',
 }
 
 describe('domainService', () => {
