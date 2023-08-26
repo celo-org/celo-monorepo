@@ -81,9 +81,7 @@ export class DefaultPnpRequestService implements PnpRequestService {
     }
     const since: Date = new Date(Date.now() - daysToKeep * 24 * 60 * 60 * 1000)
     return traceAsyncFunction('DefaultPnpRequestService - removeOldRequest', () =>
-      this.db.transaction(
-        async (trx) => await deleteRequestsOlderThan(this.db, since, ctx.logger, trx)
-      )
+      deleteRequestsOlderThan(this.db, since, ctx.logger)
     )
   }
 }
