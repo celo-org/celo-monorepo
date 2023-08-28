@@ -43,7 +43,10 @@ export async function insertRequest(
   return doMeteredSql('insertRequest', ErrorMessage.DATABASE_INSERT_FAILURE, logger, async () => {
     const sql = db<PnpSignRequestRecord>(REQUESTS_TABLE)
       .insert(toPnpSignRequestRecord(account, blindedQuery, signature))
+      .onConflict([REQUESTS_COLUMNS.address, REQUESTS_COLUMNS.blindedQuery])
+      .ignore()
       .timeout(config.db.timeout)
+
     await (trx != null ? sql.transacting(trx) : sql)
   })
 }
