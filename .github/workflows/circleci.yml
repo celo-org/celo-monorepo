@@ -349,8 +349,7 @@ jobs:
           yarn --cwd packages/protocol build
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 20
-        if: contains(matrix.command, 'common/') && false
+        timeout-minutes: 120
         with:
           limit-access-to-actor: true
       - name: Execute matrix command for test
