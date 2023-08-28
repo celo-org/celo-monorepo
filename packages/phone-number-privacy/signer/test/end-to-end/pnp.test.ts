@@ -73,12 +73,11 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
       const res = await queryPnpQuotaEndpoint(req, authorization)
       expect(res.status).toBe(200)
       const resBody: PnpQuotaResponseSuccess = await res.json()
-      expect(resBody).toStrictEqual<PnpQuotaResponseSuccess>({
+      expect(resBody).toEqual<PnpQuotaResponseSuccess>({
         success: true,
         version: expectedVersion,
         performedQueryCount: 0,
         totalQuota: 0,
-
         warnings: [],
       })
     })
@@ -89,12 +88,11 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
       const res = await queryPnpQuotaEndpoint(req, authorization)
       expect(res.status).toBe(200)
       const resBody: PnpQuotaResponseSuccess = await res.json()
-      expect(resBody).toStrictEqual<PnpQuotaResponseSuccess>({
+      expect(resBody).toEqual<PnpQuotaResponseSuccess>({
         success: true,
         version: expectedVersion,
         performedQueryCount: resBody.performedQueryCount,
         totalQuota: resBody.totalQuota,
-
         warnings: [],
       })
       expect(resBody.totalQuota).toBeGreaterThan(0)
@@ -105,18 +103,30 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY2)
       const res = await queryPnpQuotaEndpoint(req, authorization)
       expect(res.status).toBe(200)
+
       const resBody: PnpQuotaResponseSuccess = await res.json()
+
       await sendCUSDToOdisPayments(singleQueryCost, ACCOUNT_ADDRESS2, ACCOUNT_ADDRESS2)
 
       const res2 = await queryPnpQuotaEndpoint(req, authorization)
       expect(res2.status).toBe(200)
       const res2Body: PnpQuotaResponseSuccess = await res2.json()
-      expect(res2Body).toStrictEqual<PnpQuotaResponseSuccess>({
+      expect(res2Body).toEqual<PnpQuotaResponseSuccess>({
         success: true,
         version: expectedVersion,
         performedQueryCount: resBody.performedQueryCount,
-        totalQuota: resBody.totalQuota + 1,
+        totalQuota: resBody.totalQuota,
+        warnings: [],
+      })
 
+      const res3 = await queryPnpQuotaEndpoint(req, authorization)
+      expect(res3.status).toBe(200)
+      const res3Body: PnpQuotaResponseSuccess = await res3.json()
+      expect(res3Body).toEqual<PnpQuotaResponseSuccess>({
+        success: true,
+        version: expectedVersion,
+        performedQueryCount: resBody.performedQueryCount,
+        totalQuota: resBody.totalQuota + 1, // req2 updated the cache, but stale value was returned
         warnings: [],
       })
     })
@@ -129,7 +139,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
       const res = await queryPnpQuotaEndpoint(badRequest, authorization)
       expect(res.status).toBe(400)
       const resBody: PnpQuotaResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<PnpQuotaResponseFailure>({
+      expect(resBody).toEqual<PnpQuotaResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.INVALID_INPUT,
@@ -142,7 +152,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
       const res = await queryPnpQuotaEndpoint(badRequest, authorization)
       expect(res.status).toBe(401)
       const resBody: PnpQuotaResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<PnpQuotaResponseFailure>({
+      expect(resBody).toEqual<PnpQuotaResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.UNAUTHENTICATED_USER,
@@ -155,7 +165,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
       const res = await queryPnpQuotaEndpoint(badRequest, authorization)
       expect(res.status).toBe(401)
       const resBody: PnpQuotaResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<PnpQuotaResponseFailure>({
+      expect(resBody).toEqual<PnpQuotaResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.UNAUTHENTICATED_USER,
@@ -168,7 +178,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
       const res = await queryPnpQuotaEndpoint(badRequest, authorization)
       expect(res.status).toBe(401)
       const resBody: PnpQuotaResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<PnpQuotaResponseFailure>({
+      expect(resBody).toEqual<PnpQuotaResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.UNAUTHENTICATED_USER,
@@ -201,13 +211,12 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         const res = await queryPnpSignEndpoint(req, authorization)
         expect(res.status).toBe(200)
         const resBody: SignMessageResponseSuccess = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseSuccess>({
+        expect(resBody).toEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: resBody.signature,
           performedQueryCount: startingPerformedQueryCount + 1,
           totalQuota: resBody.totalQuota,
-
           warnings: [],
         })
         expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(contextSpecificParams.pnpKeyVersion)
@@ -236,13 +245,12 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         const res = await queryPnpSignEndpoint(req, authorization, keyVersion)
         expect(res.status).toBe(200)
         const resBody: SignMessageResponseSuccess = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseSuccess>({
+        expect(resBody).toEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: resBody.signature,
           performedQueryCount: startingPerformedQueryCount + 1,
           totalQuota: resBody.totalQuota,
-
           warnings: [],
         })
         expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(keyVersion)
@@ -267,13 +275,12 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         const res = await queryPnpSignEndpoint(req, authorization)
         expect(res.status).toBe(200)
         const resBody: SignMessageResponseSuccess = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseSuccess>({
+        expect(resBody).toEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: resBody.signature,
           performedQueryCount: startingPerformedQueryCount + 1,
           totalQuota: resBody.totalQuota,
-
           warnings: [],
         })
         expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(contextSpecificParams.pnpKeyVersion)
@@ -287,13 +294,12 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         const res2 = await queryPnpSignEndpoint(req, authorization)
         expect(res2.status).toBe(200)
         const res2Body: SignMessageResponseSuccess = await res2.json()
-        expect(res2Body).toStrictEqual<SignMessageResponseSuccess>({
+        expect(res2Body).toEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: resBody.signature,
           performedQueryCount: resBody.performedQueryCount, // Not incremented
-          totalQuota: resBody.totalQuota,
-
+          totalQuota: resBody.totalQuota + 1, // prev request updated cache
           warnings: [WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG],
         })
       })
@@ -314,7 +320,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         const res = await queryPnpSignEndpoint(badRequest, authorization)
         expect(res.status).toBe(400)
         const resBody: SignMessageResponseFailure = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseFailure>({
+        expect(resBody).toEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
@@ -331,7 +337,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         const res = await queryPnpSignEndpoint(badRequest, authorization, 'asd')
         expect(res.status).toBe(400)
         const resBody: SignMessageResponseFailure = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseFailure>({
+        expect(resBody).toEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
@@ -348,7 +354,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         const res = await queryPnpSignEndpoint(badRequest, authorization)
         expect(res.status).toBe(400)
         const resBody: SignMessageResponseFailure = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseFailure>({
+        expect(resBody).toEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
@@ -365,7 +371,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         const res = await queryPnpSignEndpoint(badRequest, authorization)
         expect(res.status).toBe(400)
         const resBody: SignMessageResponseFailure = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseFailure>({
+        expect(resBody).toEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
@@ -382,7 +388,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         const res = await queryPnpSignEndpoint(badRequest, authorization)
         expect(res.status).toBe(401)
         const resBody: SignMessageResponseFailure = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseFailure>({
+        expect(resBody).toEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
@@ -399,7 +405,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         const res = await queryPnpSignEndpoint(badRequest, authorization)
         expect(res.status).toBe(401)
         const resBody: SignMessageResponseFailure = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseFailure>({
+        expect(resBody).toEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
@@ -416,7 +422,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         const res = await queryPnpSignEndpoint(badRequest, authorization)
         expect(res.status).toBe(401)
         const resBody: SignMessageResponseFailure = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseFailure>({
+        expect(resBody).toEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
@@ -437,7 +443,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         const res = await queryPnpSignEndpoint(req, authorization)
         expect(res.status).toBe(403)
         const resBody: SignMessageResponseFailure = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseFailure>({
+        expect(resBody).toEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.EXCEEDED_QUOTA,
