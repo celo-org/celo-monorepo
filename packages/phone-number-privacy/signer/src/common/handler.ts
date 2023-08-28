@@ -44,9 +44,9 @@ export function catchErrorHandler<R extends OdisRequest>(
 
       if (!res.headersSent) {
         if (err instanceof OdisError) {
-          sendFailure(err.code, err.status, res)
+          sendFailure(err.code, err.status, res, req.url)
         } else {
-          sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, res)
+          sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, res, req.url)
         }
       } else {
         // Getting to this error likely indicates that the `perform` process
@@ -102,20 +102,20 @@ export function timeoutHandler<R extends OdisRequest>(
   timeoutMs: number,
   handler: PromiseHandler<R>
 ): PromiseHandler<R> {
-  return async (request, response) => {
+  return async (req, res) => {
     const timeoutSignal = (AbortSignal as any).timeout(timeoutMs)
     timeoutSignal.addEventListener(
       'abort',
       () => {
-        if (!response.headersSent) {
+        if (!res.headersSent) {
           Counters.timeouts.inc()
-          sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, response)
+          sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, res, req.url)
         }
       },
       { once: true }
     )
 
-    await handler(request, response)
+    await handler(req, res)
   }
 }
 
@@ -127,22 +127,23 @@ export function withEnableHandler<R extends OdisRequest>(
     if (enabled) {
       return handler(req, res)
     } else {
-      sendFailure(WarningMessage.API_UNAVAILABLE, 503, res)
+      sendFailure(WarningMessage.API_UNAVAILABLE, 503, res, req.url)
     }
   }
 }
 
 export async function disabledHandler<R extends OdisRequest>(
-  _: Request<{}, {}, R>,
+  req: Request<{}, {}, R>,
   response: Response<OdisResponse<R>, Locals>
 ): Promise<void> {
-  sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
+  sendFailure(WarningMessage.API_UNAVAILABLE, 503, response, req.url)
 }
 
 export function sendFailure(
   error: ErrorType,
   status: number,
   response: Response,
+  endpoint: string,
   body?: Record<any, any> // TODO remove any
 ) {
   send(
@@ -156,6 +157,7 @@ export function sendFailure(
     status,
     response.locals.logger
   )
+  Counters.responses.labels(endpoint, status.toString()).inc()
 }
 
 export interface Result<R extends OdisRequest> {
