@@ -52,7 +52,7 @@ export async function deleteRequestsOlderThan(
   db: Knex,
   since: Date,
   logger: Logger
-): Promise<Number> {
+): Promise<number> {
   logger.debug(`Removing request older than: ${since}`)
   if (since > new Date(Date.now())) {
     logger.debug('Date is in the future')

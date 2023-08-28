@@ -1,12 +1,12 @@
 import { getContractKitWithAgent, rootLogger } from '@celo/phone-number-privacy-common'
+import { CronJob } from 'cron'
+import { Knex } from 'knex'
 import { initDatabase } from './common/database/database'
 import { initKeyProvider } from './common/key-management/key-provider'
 import { KeyProvider } from './common/key-management/key-provider-base'
 import { config, DEV_MODE, SupportedDatabase, SupportedKeystore } from './config'
-import { startSigner } from './server'
-import { CronJob } from 'cron'
-import { Knex } from 'knex'
 import { DefaultPnpRequestService, MockPnpRequestService } from './pnp/services/request-service'
+import { startSigner } from './server'
 
 require('dotenv').config()
 
@@ -14,7 +14,7 @@ if (DEV_MODE) {
   config.db.type = SupportedDatabase.Sqlite
   config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
 }
-var databasePrunner: CronJob
+let databasePrunner: CronJob
 
 async function start() {
   const logger = rootLogger(config.serviceName)

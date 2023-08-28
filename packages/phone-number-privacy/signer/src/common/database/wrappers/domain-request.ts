@@ -70,7 +70,7 @@ export async function deleteDomainRequestsOlderThan(
   date: Date,
   logger: Logger,
   trx?: Knex.Transaction
-): Promise<Number> {
+): Promise<number> {
   logger.debug(`Removing request older than: ${date}`)
   if (date > new Date()) {
     logger.debug('Date is in the future')
@@ -84,7 +84,7 @@ export async function deleteDomainRequestsOlderThan(
       const sql = db<DomainRequestRecord>(DOMAIN_REQUESTS_TABLE)
         .where(DOMAIN_REQUESTS_COLUMNS.timestamp, '<=', date)
         .del()
-      return await (trx != null ? sql.transacting(trx) : sql)
+      return trx != null ? sql.transacting(trx) : sql
     }
   )
 }

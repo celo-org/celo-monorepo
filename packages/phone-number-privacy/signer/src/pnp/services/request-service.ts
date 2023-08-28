@@ -25,7 +25,7 @@ export interface PnpRequestService {
     blindedQuery: string,
     ctx: Context
   ): Promise<PnpSignRequestRecord | undefined>
-  removeOldRequest(daysToKeep: number, ctx: Context): Promise<Number>
+  removeOldRequest(daysToKeep: number, ctx: Context): Promise<number>
 }
 
 export class DefaultPnpRequestService implements PnpRequestService {
@@ -75,7 +75,7 @@ export class DefaultPnpRequestService implements PnpRequestService {
     }
   }
 
-  public async removeOldRequest(daysToKeep: number, ctx: Context): Promise<Number> {
+  public async removeOldRequest(daysToKeep: number, ctx: Context): Promise<number> {
     if (daysToKeep < 0) {
       ctx.logger.error('RemoveOldRequest - DaysToKeep should be bigger than or equal to zero')
     }
@@ -118,7 +118,7 @@ export class MockPnpRequestService implements PnpRequestService {
     return undefined
   }
 
-  public async removeOldRequest(daysToKeep: number, ctx: Context): Promise<Number> {
+  public async removeOldRequest(daysToKeep: number, ctx: Context): Promise<number> {
     ctx.logger.info({ daysToKeep }, 'MockPnpRequestService - removeOldRequest')
     return 0
   }
