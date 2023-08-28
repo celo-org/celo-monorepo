@@ -78,6 +78,7 @@ export class DefaultPnpRequestService implements PnpRequestService {
   public async removeOldRequest(daysToKeep: number, ctx: Context): Promise<number> {
     if (daysToKeep < 0) {
       ctx.logger.error('RemoveOldRequest - DaysToKeep should be bigger than or equal to zero')
+      return 0
     }
     const since: Date = new Date(Date.now() - daysToKeep * 24 * 60 * 60 * 1000)
     return traceAsyncFunction('DefaultPnpRequestService - removeOldRequest', () =>
