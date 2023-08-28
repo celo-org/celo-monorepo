@@ -350,8 +350,6 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 120
-        with:
-          limit-access-to-actor: true
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
         with:
