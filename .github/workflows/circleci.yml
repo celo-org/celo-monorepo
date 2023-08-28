@@ -349,7 +349,7 @@ jobs:
           yarn --cwd packages/protocol build
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
-        if: true
+        if: false
         timeout-minutes: 120
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
@@ -663,7 +663,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 120
-        if: contains(matrix.command, 'ci_test_transfers.sh')
+        if: contains(matrix.command, 'ci_test_transfers.sh') && false
         with:
           limit-access-to-actor: true
       - name: Execute matrix command for test
