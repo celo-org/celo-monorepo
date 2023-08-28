@@ -44,7 +44,7 @@ oracle:
       [ 
         {exchange: 'UPBIT', symbol: 'CELOKRW', toInvert: false}, 
         {exchange: 'UPBIT', symbol: 'BTCKRW', toInvert: true},
-        {exchange: 'KRAKEN', symbol: 'BTCUSD', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'BTCEUR', toInvert: false},
       ]
     ]"
   minPriceSourceCount: 4
