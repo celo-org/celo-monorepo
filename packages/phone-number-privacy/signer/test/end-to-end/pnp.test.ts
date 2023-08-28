@@ -389,6 +389,7 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         expect(res.status).toBe(401)
         const resBody: SignMessageResponseFailure = await res.json()
         expect(resBody).toEqual<SignMessageResponseFailure>({
+          // TODO test if toStrictEqual works after fixing sendFailure<any>
           success: false,
           version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
