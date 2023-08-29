@@ -223,11 +223,10 @@ export async function getDeployedProxiedContract<ContractInstance extends Truffl
   
   let Proxy:ProxyContract
   // this wrap avoids a lot of rewrite
-  console.log("customArtifacts testttu", customArtifacts);
-  console.log("artifacts testttp", artifacts);
-  console.log("getting artifacts for", contractName);
   const overloadedArtifact = ArtifactsSingleton.wrap(customArtifacts)
-  Proxy = overloadedArtifact.getProxy(contractName, artifacts)
+  // if global artifacts are not defined we need to handle it
+  const defaultArtifacts = typeof artifacts !== 'undefined' ? artifacts : undefined;
+  Proxy = overloadedArtifact.getProxy(contractName, defaultArtifacts)
   const proxy: ProxyInstance = await Proxy.deployed()
   // @ts-ignore
   Contract.numberFormat = 'BigNumber'

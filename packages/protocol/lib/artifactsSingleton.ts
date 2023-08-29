@@ -89,7 +89,7 @@ export class ArtifactsSingleton {
 
       if (toReturn === undefined){
         console.log("using default getProxy")
-        return defaultArtifacts.require(proxyArtifactName)
+        return defaultArtifacts?.require(proxyArtifactName)
       }
 
     console.log("using ours getProxy")
