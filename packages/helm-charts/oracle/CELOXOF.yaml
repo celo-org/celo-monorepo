@@ -19,6 +19,7 @@ oracle:
       {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
       {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: true},
       {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false},
+      {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
     ],
     [
       {exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false},
