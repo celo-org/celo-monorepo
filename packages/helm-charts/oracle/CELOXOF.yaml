@@ -32,7 +32,8 @@ oracle:
     ],
     [
       {exchange: 'BINANCE', symbol: 'CELOBTC', toInvert: false},
-      {exchange: 'BINANCE', symbol: 'BTCEUR', toInvert: false}
+      {exchange: 'BINANCE', symbol: 'BTCEUR', toInvert: false},
+      {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
     ],
     [
       {exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false},
