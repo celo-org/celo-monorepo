@@ -102,6 +102,9 @@ export interface SignerConfig {
   mockDek: string
   mockTotalQuota: number
   shouldMockRequestService: boolean
+  requestPrunningDays: number
+  requestPrunningAtServerStart: boolean
+  requestPrunningJobCronPattern: string
 }
 
 const env = process.env as any
@@ -183,4 +186,7 @@ export const config: SignerConfig = {
   mockDek: env.MOCK_DEK,
   mockTotalQuota: Number(env.MOCK_TOTAL_QUOTA ?? 10),
   shouldMockRequestService: toBool(env.SHOULD_MOCK_REQUEST_SERVICE, false),
+  requestPrunningDays: Number(env.REQUEST_PRUNNING_DAYS ?? 7),
+  requestPrunningAtServerStart: toBool(env.REQUEST_PRUNNING_AT_SERVER_START, false),
+  requestPrunningJobCronPattern: env.REQUEST_PRUNNING_JOB_CRON_PATTERN ?? '0 0 3 * * *',
 }

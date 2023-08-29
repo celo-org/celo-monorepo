@@ -20,7 +20,7 @@ export async function initDatabase(config: SignerConfig, migrationsPath?: string
       host,
       port: port ?? 5432,
       ssl,
-      pool: { max: poolMaxSize }, //
+      pool: { max: poolMaxSize },
     }
   } else if (type === SupportedDatabase.MySql) {
     logger.info('Using MySql')

@@ -10,22 +10,22 @@ import {
 } from '../models/request'
 import { doMeteredSql } from '../utils'
 
-export async function getRequestExists( // TODO try insert, if primary key error, then duplicate request
+export async function getRequestIfExists(
   db: Knex,
   account: string,
   blindedQuery: string,
   logger: Logger
-): Promise<boolean> {
+): Promise<PnpSignRequestRecord | undefined> {
   logger.debug(`Checking if request exists for account: ${account}, blindedQuery: ${blindedQuery}`)
-  return doMeteredSql('getRequestExists', ErrorMessage.DATABASE_GET_FAILURE, logger, async () => {
+  return doMeteredSql('getRequestIfExists', ErrorMessage.DATABASE_GET_FAILURE, logger, async () => {
     const existingRequest = await db<PnpSignRequestRecord>(REQUESTS_TABLE)
       .where({
         [REQUESTS_COLUMNS.address]: account,
-        [REQUESTS_COLUMNS.blindedQuery]: blindedQuery, // TODO are we using the primary key correctly??
+        [REQUESTS_COLUMNS.blindedQuery]: blindedQuery,
       })
       .first()
       .timeout(config.db.timeout)
-    return !!existingRequest // TODO use EXISTS query??
+    return existingRequest
   })
 }
 
@@ -33,14 +33,40 @@ export async function insertRequest(
   db: Knex,
   account: string,
   blindedQuery: string,
+  signature: string,
   logger: Logger,
   trx?: Knex.Transaction
 ): Promise<void> {
-  logger.debug(`Storing salt request for: ${account}, blindedQuery: ${blindedQuery}`)
+  logger.debug(
+    `Storing salt request for: ${account}, blindedQuery: ${blindedQuery}, signature: ${signature}`
+  )
   return doMeteredSql('insertRequest', ErrorMessage.DATABASE_INSERT_FAILURE, logger, async () => {
     const sql = db<PnpSignRequestRecord>(REQUESTS_TABLE)
-      .insert(toPnpSignRequestRecord(account, blindedQuery))
+      .insert(toPnpSignRequestRecord(account, blindedQuery, signature))
       .timeout(config.db.timeout)
     await (trx != null ? sql.transacting(trx) : sql)
   })
+}
+
+export async function deleteRequestsOlderThan(
+  db: Knex,
+  since: Date,
+  logger: Logger
+): Promise<number> {
+  logger.debug(`Removing request older than: ${since}`)
+  if (since > new Date(Date.now())) {
+    logger.debug('Date is in the future')
+    return 0
+  }
+  return doMeteredSql(
+    'deleteRequestsOlderThan',
+    ErrorMessage.DATABASE_REMOVE_FAILURE,
+    logger,
+    async () => {
+      const sql = db<PnpSignRequestRecord>(REQUESTS_TABLE)
+        .where(REQUESTS_COLUMNS.timestamp, '<=', since)
+        .del()
+      return sql
+    }
+  )
 }
