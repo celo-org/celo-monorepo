@@ -1,6 +1,3 @@
-#######################################################
-# Note: this configuration is for testnet usage only! #
-#######################################################
 oracle:
   currencyPair: EUROCEUR
   aggregation:
@@ -14,21 +11,20 @@ oracle:
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
   gasPriceMultiplier: 1.5
-  priceSources: "
-    [
+  priceSources: "[
       [
         {exchange: 'COINBASE', symbol: 'EUROCEUR', toInvert: false}
       ],
       [
-        {exchange: 'BITSTAMP', symbol: 'EUROCEUR', toInvert: false}
-      ],
+        {exchange: 'COINBASE', symbol: 'EUROCUSD', toInvert: false},
+        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: true},
+        {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false}
+      ],      
       [
-        {exchange: 'BITMART', symbol: 'EUROCUSDC', toInvert: false},
-        {exchange: 'COINBASE', symbol: 'USDCEUR', toInvert: false}
-      ]
-    ]
-  "
-  minPriceSourceCount: 1
+        {exchange: 'BITSTAMP', symbol: 'EUROCEUR', toInvert: false},
+      ]    
+    ]"
+  minPriceSourceCount: 3
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:

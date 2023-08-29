@@ -313,6 +313,7 @@ export function addCurrencyPairMiddleware(argv: yargs.Argv) {
       'CELOXOF',
       'XOFEUR',
       'EUROCEUR',
+      'EURXOF',
     ],
     description: 'Oracle deployment to target based on currency pair',
     demandOption: true,
