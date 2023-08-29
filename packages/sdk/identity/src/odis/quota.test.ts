@@ -40,7 +40,6 @@ describe(getPnpQuotaStatus, () => {
       remainingQuota: totalQuota - performedQueryCount,
       version,
       warnings: undefined,
-      blockNumber: undefined,
     })
   })
 
