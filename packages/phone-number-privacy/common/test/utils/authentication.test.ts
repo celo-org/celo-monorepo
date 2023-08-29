@@ -60,7 +60,7 @@ describe('Authentication test suite', () => {
       const success = await auth.authenticateUser(sampleRequest, logger, dekFetcher, warnings)
 
       expect(success).toBe(false)
-      expect(warnings).toEqual([ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_CLOSED])
+      expect(warnings).toEqual([ErrorMessage.FAILURE_TO_GET_DEK])
     })
 
     it('Should fail authentication when key is not registered', async () => {

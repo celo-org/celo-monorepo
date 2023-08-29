@@ -18,15 +18,10 @@ export interface PnpQuotaStatus {
   totalQuota: number
 }
 
-const PnpQuotaStatusSchema: t.Type<PnpQuotaStatus> = t.intersection([
-  t.type({
-    performedQueryCount: t.number,
-    totalQuota: t.number,
-  }),
-  t.partial({
-    blockNumber: t.union([t.number, t.undefined]),
-  }),
-])
+const PnpQuotaStatusSchema: t.Type<PnpQuotaStatus> = t.type({
+  performedQueryCount: t.number,
+  totalQuota: t.number,
+})
 
 export interface SignMessageResponseSuccess extends PnpQuotaStatus {
   success: true
@@ -71,7 +66,6 @@ export const SignMessageResponseSchema: t.Type<SignMessageResponse> = t.union([
     t.partial({
       performedQueryCount: t.union([t.number, t.undefined]),
       totalQuota: t.union([t.number, t.undefined]),
-      blockNumber: t.union([t.number, t.undefined]),
     }),
   ]),
 ])
