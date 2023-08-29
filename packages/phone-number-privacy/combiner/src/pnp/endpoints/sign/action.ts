@@ -26,6 +26,8 @@ import { findCombinerQuotaState } from '../../services/threshold-state'
 import { Knex } from 'knex'
 import { authenticateUser } from '../../../utils/authentication'
 
+import { storeRequest } from '../../../database/wrappers/request'
+
 export function createPnpSignHandler(
   db: Knex,
   signers: Signer[],
@@ -103,6 +105,14 @@ export function createPnpSignHandler(
         const combinedSignature = crypto.combineBlindedSignatureShares(
           request.body.blindedQueryPhoneNumber,
           logger
+        )
+        // TODO (soloseng): store validated request
+        const signMessageRequest: SignMessageRequest = request.body
+        await storeRequest(
+          db,
+          signMessageRequest.account,
+          signMessageRequest.blindedQueryPhoneNumber,
+          combinedSignature
         )
 
         return send(
