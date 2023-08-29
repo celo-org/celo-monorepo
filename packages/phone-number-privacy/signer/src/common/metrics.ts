@@ -11,6 +11,7 @@ export enum Labels {
   READ = 'read',
   UPDATE = 'update',
   INSERT = 'insert',
+  BATCH_DELETE = 'batch-delete',
 }
 
 export const Counters = {

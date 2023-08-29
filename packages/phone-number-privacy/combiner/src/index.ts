@@ -1,20 +1,22 @@
 import { getContractKitWithAgent } from '@celo/phone-number-privacy-common'
-import * as functions from 'firebase-functions'
+import * as functions from 'firebase-functions/v2/https'
 import { Knex } from 'knex'
 import config from './config'
 import { initDatabase } from './database/database'
 import { startCombiner } from './server'
+import { blockchainApiKey, minInstancesConfig, requestConcurency } from './utils/firebase-configs'
 
 require('dotenv').config()
 
-export const combiner = functions
-  .region('us-central1')
-  .runWith({
-    // Keep instances warm for mainnet functions
-    // Defined check required for running tests vs. deployment
-    minInstances: functions.config().service ? Number(functions.config().service.min_instances) : 0,
-  })
-  .https.onRequest(async (req, res) => {
+export const combinerGen2 = functions.onRequest(
+  {
+    minInstances: minInstancesConfig,
+    secrets: [blockchainApiKey],
+    concurrency: requestConcurency,
+    memory: '512MiB',
+    region: 'us-central1',
+  },
+  async (req, res) => {
     try {
       const db: Knex = await initDatabase(config)
       const app = startCombiner(db, config, getContractKitWithAgent(config.blockchain))
@@ -23,5 +25,7 @@ export const combiner = functions
     } catch (e) {
       res.status(500).send('Internal Server Error')
     }
-  })
+  }
+  // startCombiner(config, getContractKit(config.blockchain))
+)
 export * from './config'

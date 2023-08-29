@@ -16,7 +16,7 @@ import * as https from 'https'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { performance } from 'perf_hooks'
 import { getCombinerVersion, OdisConfig } from '../config'
-import { Signer } from './combine'
+import { isAbortError, Signer } from './combine'
 
 const httpAgent = new http.Agent({ keepAlive: true })
 const httpsAgent = new https.Agent({ keepAlive: true })
@@ -92,11 +92,12 @@ export async function fetchSignerResponseWithFallback<R extends OdisRequest>(
     })
   }
 
-  return measureTime(signer.url + signerEndpoint, () =>
+  return measureTime(signer.url + signerEndpoint + `/${request.body.sessionID}`, () =>
     fetchSignerResponse(signer.url + signerEndpoint).catch((err) => {
       logger.error({ url: signer.url, error: err }, `Signer failed with primary url`)
-      if (signer.fallbackUrl) {
-        logger.warn({ url: signer.fallbackUrl }, `Using fallback url to call signer`)
+      if (signer.fallbackUrl && !isAbortError(err)) {
+        // TODO should we also be checking isTimeoutError here?
+        logger.warn({ signer }, `Using fallback url to call signer`)
         return fetchSignerResponse(signer.fallbackUrl + signerEndpoint)
       } else {
         throw err
@@ -114,6 +115,10 @@ async function measureTime<T>(name: string, fn: () => Promise<T>): Promise<T> {
   } finally {
     performance.mark(end)
     performance.measure(name, start, end)
+
+    performance.clearMeasures(name)
+    performance.clearMarks(start)
+    performance.clearMarks(end)
   }
 }
 

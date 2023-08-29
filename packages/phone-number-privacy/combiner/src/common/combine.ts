@@ -90,6 +90,14 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
         })
 
         if (!signerFetchResult.ok) {
+          // used for log based metrics
+          logger.info({
+            message: 'Received signerFetchResult on unsuccessful signer response',
+            res: await signerFetchResult.json(),
+            status: signerFetchResult.status,
+            signer: signer.url,
+          })
+
           errorCount++
           errorCodes.set(
             signerFetchResult.status,
@@ -181,7 +189,7 @@ function isTimeoutError(err: unknown) {
   return err instanceof Error && err.name === 'TimeoutError'
 }
 
-function isAbortError(err: unknown) {
+export function isAbortError(err: unknown) {
   return err instanceof Error && err.name === 'AbortError'
 }
 

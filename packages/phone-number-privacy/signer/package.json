@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-signer",
-  "version": "3.0.0-beta.14",
+  "version": "3.0.0-beta.15",
   "description": "Signing participator of ODIS",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -61,6 +61,7 @@
     "knex": "^2.1.0",
     "mssql": "^6.3.1",
     "mysql2": "^2.1.0",
+    "cron": "^2.4.1",
     "pg": "^8.2.1",
     "prom-client": "12.0.0",
     "promise.allsettled": "^1.0.2",

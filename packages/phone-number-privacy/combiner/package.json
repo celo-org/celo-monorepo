@@ -1,13 +1,13 @@
 {
   "name": "@celo/phone-number-privacy-combiner",
-  "version": "3.0.0-beta.5",
+  "version": "3.0.0-beta.6",
   "description": "Orchestrates and combines threshold signatures for use in ODIS",
   "author": "Celo",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
     "dev": "yarn build && firebase serve --only functions",
-    "deploy": "yarn build && firebase deploy --only functions:combiner",
+    "deploy": "yarn build && firebase deploy --only functions:combinerGen2",
     "deploy:staging": "yarn deploy --project celo-phone-number-privacy-stg",
     "deploy:alfajores": "yarn deploy --project celo-phone-number-privacy",
     "deploy:mainnet": "yarn deploy --project celo-pgpnp-mainnet",

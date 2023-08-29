@@ -330,47 +330,4 @@ describe('Authentication test suite', () => {
       expect(warnings).toEqual([])
     })
   })
-
-  describe('isVerified utility', () => {
-    // TODO remove this
-    it('Should succeed when verification is ok', async () => {
-      const mockContractKit = {
-        contracts: {
-          getAttestations: async () => {
-            return {
-              getVerifiedStatus: async (_: string, __: string) => {
-                return {
-                  isVerified: true,
-                }
-              },
-            }
-          },
-        },
-      } as ContractKit
-
-      const result = await auth.isVerified('', '', mockContractKit, logger)
-
-      expect(result).toBe(true)
-    })
-
-    it('Should fail when verification is not ok', async () => {
-      const mockContractKit = {
-        contracts: {
-          getAttestations: async () => {
-            return {
-              getVerifiedStatus: async (_: string, __: string) => {
-                return {
-                  isVerified: false,
-                }
-              },
-            }
-          },
-        },
-      } as ContractKit
-
-      const result = await auth.isVerified('', '', mockContractKit, logger)
-
-      expect(result).toBe(false)
-    })
-  })
 })

@@ -7,9 +7,31 @@ import {
   RETRY_DELAY_IN_MS,
   rootLogger,
   TestUtils,
-  toBool,
 } from '@celo/phone-number-privacy-common'
-import * as functions from 'firebase-functions'
+import {
+  blockchainApiKey,
+  blockchainProvider,
+  domainEnabled,
+  domainFullNodeDelaysMs,
+  domainFullNodeRetryCount,
+  domainFullNodeTimeoutMs,
+  domainKeysCurrentVersion,
+  domainKeysVersions,
+  domainOdisServicesSigners,
+  domainOdisServicesTimeoutMilliseconds,
+  domainServiceName,
+  pnpEnabled,
+  pnpFullNodeDelaysMs,
+  pnpFullNodeRetryCount,
+  pnpFullNodeTimeoutMs,
+  pnpKeysCurrentVersion,
+  pnpKeysVersions,
+  pnpOdisServicesSigners,
+  pnpOdisServicesTimeoutMilliseconds,
+  pnpServiceName,
+  serviceNameConfig,
+} from './utils/firebase-configs'
+
 export function getCombinerVersion(): string {
   return process.env.npm_package_version ?? require('../package.json').version ?? '0.0.0'
 }
@@ -175,50 +197,41 @@ if (DEV_MODE) {
     },
   }
 } else {
-  const functionConfig = functions.config()
   config = {
-    serviceName: functionConfig.service.name ?? defaultServiceName,
+    serviceName: serviceNameConfig.value(),
     blockchain: {
-      provider: functionConfig.blockchain.provider,
-      apiKey: functionConfig.blockchain.api_key,
+      provider: blockchainProvider.value(),
+      apiKey: blockchainApiKey.value(),
     },
     phoneNumberPrivacy: {
-      serviceName: functionConfig.pnp.service_name ?? defaultServiceName,
-      enabled: toBool(functionConfig.pnp.enabled, false),
+      serviceName: pnpServiceName.value(),
+      enabled: pnpEnabled.value(),
       odisServices: {
-        signers: functionConfig.pnp.odisservices,
-        timeoutMilliSeconds: functionConfig.pnp.timeout_ms
-          ? Number(functionConfig.pnp.timeout_ms)
-          : 5 * 1000,
+        signers: pnpOdisServicesSigners.value(),
+        timeoutMilliSeconds: pnpOdisServicesTimeoutMilliseconds.value(),
       },
       keys: {
-        currentVersion: Number(functionConfig.pnp_keys.current_version),
-        versions: functionConfig.pnp_keys.versions,
+        currentVersion: pnpKeysCurrentVersion.value(),
+        versions: pnpKeysVersions.value(),
       },
-      fullNodeTimeoutMs: Number(functionConfig.pnp.full_node_timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
-      fullNodeRetryCount: Number(functionConfig.pnp.full_node_retry_count ?? RETRY_COUNT),
-      fullNodeRetryDelayMs: Number(
-        functionConfig.pnp.full_node_retry_delay_ms ?? RETRY_DELAY_IN_MS
-      ),
+      fullNodeTimeoutMs: pnpFullNodeTimeoutMs.value(),
+      fullNodeRetryCount: pnpFullNodeRetryCount.value(),
+      fullNodeRetryDelayMs: pnpFullNodeDelaysMs.value(),
     },
     domains: {
-      serviceName: functionConfig.domains.service_name ?? defaultServiceName,
-      enabled: toBool(functionConfig.domains.enabled, false),
+      serviceName: domainServiceName.value(),
+      enabled: domainEnabled.value(),
       odisServices: {
-        signers: functionConfig.domains.odisservices,
-        timeoutMilliSeconds: functionConfig.domains.timeout_ms
-          ? Number(functionConfig.domains.timeout_ms)
-          : 5 * 1000,
+        signers: domainOdisServicesSigners.value(),
+        timeoutMilliSeconds: domainOdisServicesTimeoutMilliseconds.value(),
       },
       keys: {
-        currentVersion: Number(functionConfig.domains_keys.current_version),
-        versions: functionConfig.domains_keys.versions,
+        currentVersion: domainKeysCurrentVersion.value(),
+        versions: domainKeysVersions.value(),
       },
-      fullNodeTimeoutMs: Number(functionConfig.pnp.full_node_timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
-      fullNodeRetryCount: Number(functionConfig.pnp.full_node_retry_count ?? RETRY_COUNT),
-      fullNodeRetryDelayMs: Number(
-        functionConfig.pnp.full_node_retry_delay_ms ?? RETRY_DELAY_IN_MS
-      ),
+      fullNodeTimeoutMs: domainFullNodeTimeoutMs.value(),
+      fullNodeRetryCount: domainFullNodeRetryCount.value(),
+      fullNodeRetryDelayMs: domainFullNodeDelaysMs.value(),
     },
     db: {
       type: functionConfig.db.type
