@@ -17,9 +17,9 @@ export async function setDomainDisabled<D extends Domain>(
   trx: Knex.Transaction<DomainStateRecord>,
   logger: Logger
 ): Promise<void> {
+  const hash = domainHash(domain).toString('hex')
+  logger.debug({ hash, domain }, 'Disabling domain')
   return doMeteredSql('disableDomain', ErrorMessage.DATABASE_UPDATE_FAILURE, logger, async () => {
-    const hash = domainHash(domain).toString('hex')
-    logger.debug({ hash, domain }, 'Disabling domain')
     await db<DomainStateRecord>(DOMAIN_STATE_TABLE)
       .transacting(trx)
       .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
@@ -54,14 +54,13 @@ export async function getDomainStateRecord<D extends Domain>(
   logger: Logger,
   trx?: Knex.Transaction<DomainStateRecord>
 ): Promise<DomainStateRecord | null> {
+  const hash = domainHash(domain).toString('hex')
+  logger.debug({ hash, domain }, 'Getting domain state from db')
   return doMeteredSql(
     'getDomainStateRecord',
     ErrorMessage.DATABASE_GET_FAILURE,
     logger,
     async () => {
-      const hash = domainHash(domain).toString('hex')
-      logger.debug({ hash, domain }, 'Getting domain state from db')
-
       const sql = db<DomainStateRecord>(DOMAIN_STATE_TABLE)
         .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
         .first()
@@ -85,13 +84,13 @@ export async function updateDomainStateRecord<D extends Domain>(
   trx: Knex.Transaction<DomainStateRecord>,
   logger: Logger
 ): Promise<void> {
+  const hash = domainHash(domain).toString('hex')
+  logger.debug({ hash, domain, domainState }, 'Update domain state')
   return doMeteredSql(
     'updateDomainStateRecord',
     ErrorMessage.DATABASE_UPDATE_FAILURE,
     logger,
     async () => {
-      const hash = domainHash(domain).toString('hex')
-      logger.debug({ hash, domain, domainState }, 'Update domain state')
       // Check whether the domain is already in the database.
       // The current signature flow results in redundant queries of the domain state.
       // Consider optimizing in the future: https://github.com/celo-org/celo-monorepo/issues/9855
@@ -117,12 +116,12 @@ export async function insertDomainStateRecord(
   trx: Knex.Transaction<DomainStateRecord>,
   logger: Logger
 ): Promise<DomainStateRecord> {
+  logger.debug({ domainState }, 'Insert domain state')
   return doMeteredSql(
     'insertDomainState',
     ErrorMessage.DATABASE_INSERT_FAILURE,
     logger,
     async () => {
-      logger.debug({ domainState }, 'Insert domain state')
       await db<DomainStateRecord>(DOMAIN_STATE_TABLE)
         .transacting(trx)
         .insert(domainState)
