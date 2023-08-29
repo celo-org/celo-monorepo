@@ -1,9 +1,12 @@
 import {
+  DB_POOL_MAX_SIZE,
+  DB_TIMEOUT,
   FULL_NODE_TIMEOUT_IN_MS,
   RETRY_COUNT,
   RETRY_DELAY_IN_MS,
 } from '@celo/phone-number-privacy-common'
 import { defineBoolean, defineInt, defineSecret, defineString } from 'firebase-functions/params'
+import { SupportedDatabase } from '../config'
 
 const defaultServiceName = 'odis-combiner'
 
@@ -65,3 +68,14 @@ export const domainFullNodeRetryCount = defineInt('DOMAIN_FULL_NODE_RETRY_COUNT'
 export const domainFullNodeDelaysMs = defineInt('DOMAIN_FULL_NODE_DELAY_MS', {
   default: RETRY_DELAY_IN_MS,
 })
+
+// DB
+export const dbType = defineString('DB_TYPE', { default: SupportedDatabase.Postgres.toString() })
+export const dbUsername = defineString('DB_USERNAME')
+export const dbPassword = defineSecret('DB_PASSWORD')
+export const dbName = defineString('DB_NAME')
+export const dbHost = defineString('DB_HOST')
+export const dbPort = defineInt('DB_PORT', { default: undefined })
+export const dbSsl = defineBoolean('DB_SSL', { default: true })
+export const dbPoolMaxSize = defineInt('DB_POOL_MAX_SIZE', { default: DB_POOL_MAX_SIZE })
+export const dbTimeout = defineInt('DB_TIMEOUT', { default: DB_TIMEOUT })

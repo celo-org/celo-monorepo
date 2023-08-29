@@ -7,10 +7,20 @@ import {
   RETRY_DELAY_IN_MS,
   rootLogger,
   TestUtils,
+  toBool,
 } from '@celo/phone-number-privacy-common'
 import {
   blockchainApiKey,
   blockchainProvider,
+  dbHost,
+  dbName,
+  dbPassword,
+  dbPoolMaxSize,
+  dbPort,
+  dbSsl,
+  dbTimeout,
+  dbType,
+  dbUsername,
   domainEnabled,
   domainFullNodeDelaysMs,
   domainFullNodeRetryCount,
@@ -79,7 +89,7 @@ export interface CombinerConfig {
   phoneNumberPrivacy: OdisConfig
   domains: OdisConfig
   db: {
-    type: SupportedDatabase
+    type: SupportedDatabase | string
     user: string
     password: string
     database: string
@@ -234,19 +244,15 @@ if (DEV_MODE) {
       fullNodeRetryDelayMs: domainFullNodeDelaysMs.value(),
     },
     db: {
-      type: functionConfig.db.type
-        ? functionConfig.db.type.toLowerCase()
-        : SupportedDatabase.Postgres,
-      user: functionConfig.db.username,
-      password: functionConfig.db.pass,
-      database: functionConfig.db.name,
-      host: `/cloudsql/${functionConfig.db.host}`,
-      port: functionConfig.db.port ? Number(functionConfig.db.port) : undefined,
-      ssl: toBool(functionConfig.db.ssl, true),
-      poolMaxSize: functionConfig.db.pool_max_size
-        ? Number(functionConfig.db.pool_max_size)
-        : DB_POOL_MAX_SIZE,
-      timeout: functionConfig.db.timeout ? Number(functionConfig.db.timeout) : DB_TIMEOUT,
+      type: dbType.value(),
+      user: dbUsername.value(),
+      password: dbPassword.value(),
+      database: dbName.value(),
+      host: `/cloudsql/${dbHost.value()}`,
+      port: dbPort.value(),
+      ssl: dbSsl.value(),
+      poolMaxSize: dbPoolMaxSize.value(),
+      timeout: dbTimeout.value(),
     },
   }
 }
