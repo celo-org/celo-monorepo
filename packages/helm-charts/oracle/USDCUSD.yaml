@@ -16,7 +16,6 @@ oracle:
         {exchange: 'BINANCE', symbol: 'USDCUSDT', toInvert: false},
         {exchange: 'KRAKEN', symbol: 'USDTUSD', toInvert: false }
       ],
-      # US Compatible
       [
         {exchange: 'KRAKEN', symbol: 'USDCUSD', toInvert: false}
       ],
@@ -29,18 +28,23 @@ oracle:
       ],
       [
         {exchange: 'OKX', symbol: 'USDCUSDT', toInvert: false},
-        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
+        {exchange: 'BITSTAMP', symbol: 'USDTUSD', toInvert: false}
       ],
       [
-        {exchange: 'Bybit', symbol: 'USDTUSDC', toInvert: true},
+        {exchange: 'Bitget', symbol: 'USDTUSDC', toInvert: true},
         {exchange: 'Kraken', symbol: 'USDTUSD', toInvert: false}
       ],
       [
-        {exchange: 'WHITEBIT', symbol: 'USDCUSDT', toInvert: false},
+        {exchange: 'KUCOIN', symbol: 'USDCUSDT', toInvert: false},
         {exchange: 'BITSTAMP', symbol: 'USDTUSD', toInvert: false}
       ]
     ]"
-  minPriceSourceCount: 4
+    # Additional sources missing adapters 
+    # [
+    #     {exchange: 'Bybit', symbol: 'USDTUSDC', toInvert: true},
+    #     {exchange: 'Kraken', symbol: 'USDTUSD', toInvert: false}
+    #   ],
+  minPriceSourceCount: 5
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:

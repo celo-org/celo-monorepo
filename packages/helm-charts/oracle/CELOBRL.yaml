@@ -13,10 +13,6 @@ oracle:
   gasPriceMultiplier: 1.5
   priceSources: "[
       [
-        { exchange: 'BINANCE', symbol: 'CELOBUSD', toInvert: false },
-        { exchange: 'BINANCE', symbol: 'BUSDBRL', toInvert: false }
-      ],
-      [
         { exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false },
         { exchange: 'BINANCE', symbol: 'USDTBRL', toInvert: false }
       ],
@@ -24,14 +20,9 @@ oracle:
         { exchange: 'BINANCE', symbol: 'CELOBTC', toInvert: false },
         { exchange: 'MERCADO', symbol: 'BTCBRL', toInvert: false }
       ],
-      # US compatible
       [
         { exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
         { exchange: 'BITSO', symbol: 'USDBRL', toInvert: false }
-      ],
-      [
-        { exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false },
-        { exchange: 'NOVADAX', symbol: 'BTCBRL', toInvert: false }
       ],
       [
         { exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false },
@@ -42,12 +33,17 @@ oracle:
         {exchange: 'KUCOIN', symbol: 'CELOUSDT', toInvert: false}, 
         { exchange: 'BITSO', symbol: 'USDTBRL', toInvert: false } 
       ],
-      [ 
-        {exchange: 'UPBIT', symbol: 'CELOKRW', toInvert: false}, 
-        {exchange: 'UPBIT', symbol: 'BTCKRW', toInvert: true},
-        {exchange: 'BITGET', symbol: 'BTCBRL', toInvert: false},
+      [
+        {exchange: 'BITGET', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'BITGET', symbol: 'USDTBRL', toInvert: false}
       ]
-    ]"
+     ]"
+      # Additional sources missing adapters  
+      # [ 
+      #   {exchange: 'UPBIT', symbol: 'CELOKRW', toInvert: false}, 
+      #   {exchange: 'UPBIT', symbol: 'BTCKRW', toInvert: true},
+      #   {exchange: 'BITGET', symbol: 'BTCBRL', toInvert: false},
+      # ]
   minPriceSourceCount: 4
   reportStrategy: BLOCK_BASED
   reporter:

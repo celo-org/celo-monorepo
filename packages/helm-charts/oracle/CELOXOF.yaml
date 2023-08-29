@@ -12,47 +12,40 @@ oracle:
   circuitBreakerPriceChangeThreshold: 0.25
   gasPriceMultiplier: 1.5
   priceSources: "[
-    [
-      {exchange: 'COINBASE', symbol: 'CELOEUR', toInvert: false}],
-      {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
-    [
-      {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
-      {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: true},
-      {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false},
-      {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
-    ],
-    [
-      {exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false},
-      {exchange: 'COINBASE', symbol: 'BTCEUR', toInvert: false},
-      {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
-    ],
-    [
-      {exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false},
-      {exchange: 'BINANCE', symbol: 'EURUSDT', toInvert: true},
-      {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
-    ],
-    [
-      {exchange: 'BINANCE', symbol: 'CELOBTC', toInvert: false},
-      {exchange: 'BINANCE', symbol: 'BTCEUR', toInvert: false},
-      {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
-    ],
-    [
-      {exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false},
-      {exchange: 'BITSTAMP', symbol: 'USDTEUR', toInvert: false},
-      {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
-    ],
-    [
-      {exchange: 'KUCOIN', symbol: 'CELOUSDT', toInvert: false},
-      {exchange: 'KRAKEN', symbol: 'USDTEUR', toInvert: false},
-      {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
-    ],
-    [
-      {exchange: 'BITGET', symbol: 'CELOUSDT', toInvert: false},
-      {exchange: 'BITGET', symbol: 'USDTEUR', toInvert: false},
-      {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
-    ]
+      [
+        {exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'BINANCE', symbol: 'EURUSDT', toInvert: true},
+        {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
+      ],
+      [
+        {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
+        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: true},
+        {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
+      ],
+      [
+        {exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'BITSTAMP', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
+      ],
+      [
+        {exchange: 'KUCOIN', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
+      ],
+      [
+        {exchange: 'BITGET', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'BITGET', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
+      ]
     ]"
-  minPriceSourceCount: 5
+      # Additional sources missing adapters [ 
+      #   {exchange: 'UPBIT', symbol: 'CELOKRW', toInvert: false}, 
+      #   {exchange: 'UPBIT', symbol: 'BTCKRW', toInvert: true},
+      #   {exchange: 'KRAKEN', symbol: 'BTCEUR', toInvert: false},
+      #   {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
+      # ]
+  minPriceSourceCount: 3
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:

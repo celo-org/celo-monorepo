@@ -24,7 +24,6 @@ oracle:
         {exchange: 'KRAKEN', symbol: 'USDCUSDT', toInvert: false},
         {exchange: 'BINANCE', symbol: 'USDTBRL', toInvert: false }
       ],
-      # US compatible
       [
         { exchange: 'MERCADO', symbol: 'USDCBRL', toInvert: false }
       ],
@@ -37,11 +36,16 @@ oracle:
         {exchange: 'BITGET', symbol: 'USDTBRL', toInvert: false }
       ],
       [
-        {exchange: 'BYBIT', symbol: 'USDCUSDT', toInvert: false},
+        {exchange: 'KUCOIN', symbol: 'USDCUSDT', toInvert: false},
         {exchange: 'BITGET', symbol: 'USDTBRL', toInvert: false }
       ]
    ]"
-  minPriceSourceCount: 4
+    # Additional sources missing adapters 
+    # [
+    #     {exchange: 'BYBIT', symbol: 'USDTUSDC', toInvert: true},
+    #     {exchange: 'FOXBIT', symbol: 'USDTUSD', toInvert: false}
+    #   ],
+  minPriceSourceCount: 5
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
