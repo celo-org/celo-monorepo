@@ -26,6 +26,5 @@ export const combinerGen2 = functions.onRequest(
       res.status(500).send('Internal Server Error')
     }
   }
-  // startCombiner(config, getContractKit(config.blockchain))
 )
 export * from './config'
