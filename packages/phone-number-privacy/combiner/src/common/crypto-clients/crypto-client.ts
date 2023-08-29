@@ -15,7 +15,6 @@ export abstract class CryptoClient {
   /**
    * Returns true if the number of valid signatures is enough to perform a combination
    */
-  // TODO (mcortesi) remove
   public hasSufficientSignatures(): boolean {
     return this.allSignaturesLength >= this.keyVersionInfo.threshold
   }
