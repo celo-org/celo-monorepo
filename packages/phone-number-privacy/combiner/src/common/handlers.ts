@@ -57,6 +57,7 @@ export function meteringHandler<R extends OdisRequest>(
       const eventLoopLag = Date.now() - eventLoopLagMeasurementStart
       logger.info({ eventLoopLag }, 'Measure event loop lag')
     })
+    // TODO:(soloseng): session ID may not always exist
     const startMark = `Begin ${req.url}/${req.body.sessionID}`
     const endMark = `End ${req.url}/${req.body.sessionID}`
     const entryName = `${req.url}/${req.body.sessionID} latency`
