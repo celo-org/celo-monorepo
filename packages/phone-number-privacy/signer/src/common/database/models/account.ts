@@ -7,7 +7,6 @@ export enum ACCOUNTS_COLUMNS {
 }
 
 export interface AccountRecord {
-  //
   [ACCOUNTS_COLUMNS.address]: string
   [ACCOUNTS_COLUMNS.createdAt]: Date
   [ACCOUNTS_COLUMNS.numLookups]: number
