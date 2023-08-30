@@ -289,7 +289,7 @@ jobs:
     # Keeping name short because GitHub UI does not handle long names well 
     name: ${{ matrix.name }}
     runs-on: ["self-hosted", "monorepo-node18"]
-    timeout-minutes: 60
+    timeout-minutes: 120
     needs: [install-dependencies, lint-checks]
     if: |
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
