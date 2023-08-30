@@ -51,17 +51,7 @@ export function createPnpSignHandler(
 
     const processResult = async (result: OdisResponse<SignMessageRequest>): Promise<boolean> => {
       assert(result.success)
-      crypto.addSignature({ url: 'TODO: remove', signature: result.signature })
-      // const signatureAdditionStart = Date.now()
-
-      // logger.info(
-      //   {
-      //     signer: url,
-      //     hasSufficientSignatures: crypto.x(),
-      //     additionLatency: Date.now() - signatureAdditionStart,
-      //   },
-      //   'Added signature'
-      // )
+      crypto.addSignature({ url: request.url, signature: result.signature })
 
       // Send response immediately once we cross threshold
       // BLS threshold signatures can be combined without all partial signatures
