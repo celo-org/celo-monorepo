@@ -40,7 +40,7 @@ export function catchErrorHandler<R extends OdisRequest>(
       const logger = res.locals.logger
       logger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
       logger.error(err)
-      Counters.errorsCaughtInEndpointHandler.inc()
+      Counters.errorsCaughtInEndpointHandler.inc() // TODO investigate why this gets triggered on full node errors
 
       if (!res.headersSent) {
         if (err instanceof OdisError) {
@@ -49,7 +49,7 @@ export function catchErrorHandler<R extends OdisRequest>(
           sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, res, req.url)
         }
       } else {
-        // Getting to this error likely indicates that the `perform` process
+        // Getting to this error likely indicates that an inner handler
         // does not terminate after sending a response, and then throws an error.
         logger.error(ErrorMessage.ERROR_AFTER_RESPONSE_SENT)
         Counters.errorsThrownAfterResponseSent.inc()
