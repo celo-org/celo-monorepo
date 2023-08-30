@@ -49,7 +49,7 @@ function launchRequestPrunnerJob(db: Knex) {
     cronTime: config.requestPrunningJobCronPattern,
     onTick: async () => {
       ctx.logger.info('Prunning database requests')
-      await pnpRequestService.removeOldRequest(config.requestPrunningDays, ctx)
+      await pnpRequestService.removeOldRequests(config.requestPrunningDays, ctx)
     },
     timeZone: 'UTC',
     runOnInit: config.requestPrunningAtServerStart,

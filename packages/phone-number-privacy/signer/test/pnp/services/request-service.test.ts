@@ -49,7 +49,7 @@ describe('request service', () => {
 
     expect((elements! as any)['CNT']).toBe('2')
 
-    await service.removeOldRequest(2, ctx)
+    await service.removeOldRequests(2, ctx)
 
     const elementsAfter = await db<PnpSignRequestRecord>(REQUESTS_TABLE)
       .count(`${REQUESTS_COLUMNS.address} as CNT`)
