@@ -1,5 +1,6 @@
 import {
   authenticateUser,
+  AuthenticationMethod,
   ErrorMessage,
   ErrorType,
   getRequestKeyVersion,
@@ -50,6 +51,10 @@ export function pnpSign(
     }
 
     const account = await accountService.getAccount(request.body.account)
+
+    if (request.body.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
+      Counters.requestsWithWalletAddress.inc()
+    }
 
     if (!(await authenticateUser(request, logger, async (_) => account.dek, warnings))) {
       return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)

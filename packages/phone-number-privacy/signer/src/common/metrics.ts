@@ -1,7 +1,5 @@
-// import opentelemetry from '@opentelemetry/api'
 import * as client from 'prom-client'
 
-// const tracer = opentelemetry.trace.getTracer('signer-tracer')
 const { Counter, Histogram } = client
 
 client.collectDefaultMetrics()
@@ -44,7 +42,7 @@ export const Counters = {
   }),
   requestsWithWalletAddress: new Counter({
     name: 'requests_with_wallet_address',
-    help: 'Counter for the number of requests in which the account uses a different wallet address',
+    help: 'Counter for the number of requests in which WALLET_KEY authentication is used',
   }),
   testQuotaBypassedRequests: new Counter({
     name: 'test_quota_bypassed_requests',
@@ -75,10 +73,10 @@ export const Histograms = {
     labelNames: ['endpoint'],
     buckets,
   }),
-  getRemainingQueryCountInstrumentation: new Histogram({
-    name: 'get_remaining_query_count_instrumentation',
-    help: 'Histogram tracking latency of getRemainingQueryCount function by code segment',
-    labelNames: ['codeSegment', 'endpoint'],
+  fullNodeLatency: new Histogram({
+    name: 'full_node_latency',
+    help: 'Histogram tracking latency of full node requests',
+    labelNames: ['codeSegment'],
     buckets,
   }),
   dbOpsInstrumentation: new Histogram({

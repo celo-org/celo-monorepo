@@ -119,45 +119,11 @@ export function timeoutHandler<R extends OdisRequest>(
   }
 }
 
-export function withEnableHandler<R extends OdisRequest>(
-  enabled: boolean,
-  handler: PromiseHandler<R>
-): PromiseHandler<R> {
-  return async (req, res) => {
-    if (enabled) {
-      return handler(req, res)
-    } else {
-      sendFailure(WarningMessage.API_UNAVAILABLE, 503, res, req.url)
-    }
-  }
-}
-
 export async function disabledHandler<R extends OdisRequest>(
   req: Request<{}, {}, R>,
   response: Response<OdisResponse<R>, Locals>
 ): Promise<void> {
   sendFailure(WarningMessage.API_UNAVAILABLE, 503, response, req.url)
-}
-
-export function sendFailure(
-  error: ErrorType,
-  status: number,
-  response: Response,
-  endpoint: string,
-  body?: Record<any, any> // TODO remove any
-) {
-  send(
-    response,
-    {
-      success: false,
-      version: getSignerVersion(),
-      error,
-      ...body,
-    },
-    status,
-    response.locals.logger
-  )
-  Counters.responses.labels(endpoint, status.toString()).inc()
 }
 
 export interface Result<R extends OdisRequest> {
@@ -195,4 +161,25 @@ export function errorResult(
       ...quotaStatus,
     },
   }
+}
+
+function sendFailure(
+  error: ErrorType,
+  status: number,
+  response: Response,
+  endpoint: string,
+  body?: Record<any, any> // TODO remove any
+) {
+  send(
+    response,
+    {
+      success: false,
+      version: getSignerVersion(),
+      error,
+      ...body,
+    },
+    status,
+    response.locals.logger
+  )
+  Counters.responses.labels(endpoint, status.toString()).inc()
 }

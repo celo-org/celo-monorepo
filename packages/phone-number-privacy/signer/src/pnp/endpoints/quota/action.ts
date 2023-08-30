@@ -1,5 +1,6 @@
 import {
   authenticateUser,
+  AuthenticationMethod,
   ErrorType,
   hasValidAccountParam,
   isBodyReasonablySized,
@@ -9,6 +10,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Request } from 'express'
 import { errorResult, ResultHandler } from '../../../common/handler'
+import { Counters } from '../../../common/metrics'
 import { getSignerVersion } from '../../../config'
 import { AccountService } from '../../services/account-service'
 import { PnpRequestService } from '../../services/request-service'
@@ -32,6 +34,10 @@ export function pnpQuota(
     }
 
     const account = await accountService.getAccount(request.body.account)
+
+    if (request.body.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
+      Counters.requestsWithWalletAddress.inc()
+    }
 
     if (!(await authenticateUser(request, logger, async (_) => account.dek, warnings))) {
       return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
