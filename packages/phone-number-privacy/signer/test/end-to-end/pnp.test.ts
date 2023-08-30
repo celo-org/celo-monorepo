@@ -1,3 +1,4 @@
+import { sleep } from '@celo/base'
 import { newKit, StableToken } from '@celo/contractkit'
 import {
   AuthenticationMethod,
@@ -118,6 +119,8 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
         totalQuota: resBody.totalQuota,
         warnings: [],
       })
+
+      await sleep(5 * 1000) // sleep for cache ttl
 
       const res3 = await queryPnpQuotaEndpoint(req, authorization)
       expect(res3.status).toBe(200)
@@ -291,6 +294,9 @@ describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
             Buffer.from(resBody.signature, 'base64')
           )
         )
+
+        await sleep(5 * 1000) // sleep for cache ttl
+
         const res2 = await queryPnpSignEndpoint(req, authorization)
         expect(res2.status).toBe(200)
         const res2Body: SignMessageResponseSuccess = await res2.json()
