@@ -1,5 +1,4 @@
 import {
-  ErrorMessage,
   KeyVersionInfo,
   OdisResponse,
   PnpQuotaRequest,
@@ -8,14 +7,11 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { getSignerVersion } from '@celo/phone-number-privacy-signer/src/config'
-import { Request, Response } from 'express'
-import { Session } from '../../src/common/session'
 import config, {
-  MAX_BLOCK_DISCREPANCY_THRESHOLD,
   MAX_QUERY_COUNT_DISCREPANCY_THRESHOLD,
   MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD,
 } from '../../src/config'
-import { PnpSignerResponseLogger } from '../../src/pnp/services/log-responses'
+import { logPnpSignerResponseDiscrepancies } from '../../src/pnp/services/log-responses'
 
 describe('pnp response logger', () => {
   const url = 'test signer url'
@@ -27,33 +23,12 @@ describe('pnp response logger', () => {
     pubKey: 'mock pubKey',
   }
 
-  const getSession = (responses: OdisResponse<PnpQuotaRequest | SignMessageRequest>[]) => {
-    const mockRequest = {
-      body: {},
-    } as Request
-    const mockResponse = {
-      locals: {
-        logger: rootLogger(config.serviceName),
-      },
-    } as Response
-    const session = new Session<PnpQuotaRequest | SignMessageRequest>(
-      mockRequest,
-      mockResponse,
-      keyVersionInfo
-    )
-    responses.forEach((res) => {
-      session.responses.push({ url, res, status: 200 })
-    })
-    return session
-  }
-
   const pnpConfig = config.phoneNumberPrivacy
   pnpConfig.keys.currentVersion = keyVersionInfo.keyVersion
   pnpConfig.keys.versions = JSON.stringify([keyVersionInfo])
-  const pnpResponseLogger = new PnpSignerResponseLogger()
 
   const version = getSignerVersion()
-  const blockNumber = 1000000
+
   const totalQuota = 10
   const performedQueryCount = 5
   const warnings = ['warning']
@@ -79,9 +54,9 @@ describe('pnp response logger', () => {
     {
       it: 'should log correctly when all the responses are the same',
       responses: [
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
+        { success: true, performedQueryCount, totalQuota, version, warnings },
+        { success: true, performedQueryCount, totalQuota, version, warnings },
+        { success: true, performedQueryCount, totalQuota, version, warnings },
       ],
       expectedLogs: [],
     },
@@ -93,11 +68,11 @@ describe('pnp response logger', () => {
           performedQueryCount,
           totalQuota,
           version: 'differentVersion',
-          blockNumber,
+
           warnings,
         },
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
+        { success: true, performedQueryCount, totalQuota, version, warnings },
+        { success: true, performedQueryCount, totalQuota, version, warnings },
       ],
       expectedLogs: [
         {
@@ -107,7 +82,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota,
                     version: 'differentVersion',
@@ -117,7 +91,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota,
                     version,
@@ -127,7 +100,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota,
                     version,
@@ -145,9 +117,9 @@ describe('pnp response logger', () => {
     {
       it: 'should log correctly when there is a discrepency in performedQueryCount field',
       responses: [
-        { success: true, performedQueryCount: 1, totalQuota, version, blockNumber, warnings },
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
+        { success: true, performedQueryCount: 1, totalQuota, version, warnings },
+        { success: true, performedQueryCount, totalQuota, version, warnings },
+        { success: true, performedQueryCount, totalQuota, version, warnings },
       ],
       expectedLogs: [
         {
@@ -157,7 +129,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount: 1,
                     totalQuota,
                     version,
@@ -167,7 +138,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota,
                     version,
@@ -177,7 +147,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota,
                     version,
@@ -200,11 +169,11 @@ describe('pnp response logger', () => {
           performedQueryCount: performedQueryCount + MAX_QUERY_COUNT_DISCREPANCY_THRESHOLD,
           totalQuota,
           version,
-          blockNumber,
+
           warnings,
         },
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
+        { success: true, performedQueryCount, totalQuota, version, warnings },
+        { success: true, performedQueryCount, totalQuota, version, warnings },
       ],
       expectedLogs: [
         {
@@ -214,7 +183,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota,
                     version,
@@ -224,7 +192,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota,
                     version,
@@ -234,7 +201,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount:
                       performedQueryCount + MAX_QUERY_COUNT_DISCREPANCY_THRESHOLD,
                     totalQuota,
@@ -255,7 +221,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota,
                     version,
@@ -265,7 +230,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota,
                     version,
@@ -275,7 +239,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount:
                       performedQueryCount + MAX_QUERY_COUNT_DISCREPANCY_THRESHOLD,
                     totalQuota,
@@ -294,9 +257,9 @@ describe('pnp response logger', () => {
     {
       it: 'should log correctly when there is a discrepency in totalQuota field',
       responses: [
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
-        { success: true, performedQueryCount, totalQuota: 1, version, blockNumber, warnings },
+        { success: true, performedQueryCount, totalQuota, version, warnings },
+        { success: true, performedQueryCount, totalQuota, version, warnings },
+        { success: true, performedQueryCount, totalQuota: 1, version, warnings },
       ],
       expectedLogs: [
         {
@@ -306,7 +269,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota: 1,
                     version,
@@ -316,7 +278,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota,
                     version,
@@ -326,7 +287,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota,
                     version,
@@ -344,14 +304,14 @@ describe('pnp response logger', () => {
     {
       it: 'should log correctly when there is a large discrepency in totalQuota field',
       responses: [
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
+        { success: true, performedQueryCount, totalQuota, version, warnings },
+        { success: true, performedQueryCount, totalQuota, version, warnings },
         {
           success: true,
           performedQueryCount,
           totalQuota: totalQuota + MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD,
           version,
-          blockNumber,
+
           warnings,
         },
       ],
@@ -363,7 +323,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota,
                     version,
@@ -373,7 +332,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota,
                     version,
@@ -383,7 +341,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota: totalQuota + MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD,
                     version,
@@ -399,134 +356,16 @@ describe('pnp response logger', () => {
       ],
     },
     {
-      it: 'should log correctly when one signer returns an undefined blockNumber',
-      responses: [
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
-        {
-          success: true,
-          performedQueryCount,
-          totalQuota,
-          version,
-          blockNumber: undefined,
-          warnings,
-        },
-      ],
-      expectedLogs: [
-        {
-          params: [
-            {
-              parsedResponses: [
-                {
-                  signerUrl: url,
-                  values: {
-                    blockNumber,
-                    performedQueryCount,
-                    totalQuota,
-                    version,
-                    warnings,
-                  },
-                },
-                {
-                  signerUrl: url,
-                  values: {
-                    blockNumber,
-                    performedQueryCount,
-                    totalQuota,
-                    version,
-                    warnings,
-                  },
-                },
-                {
-                  signerUrl: url,
-                  values: {
-                    blockNumber: undefined,
-                    performedQueryCount,
-                    totalQuota,
-                    version,
-                    warnings,
-                  },
-                },
-              ],
-            },
-            WarningMessage.SIGNER_RESPONSE_DISCREPANCIES,
-          ],
-          level: 'warn',
-        },
-        {
-          params: [{ signerUrl: url }, 'Signer responded with undefined blockNumber'],
-          level: 'warn',
-        },
-      ],
-    },
-    {
-      it: 'should log correctly when there is a large discrepency in blockNumber field',
-      responses: [
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
-        {
-          success: true,
-          performedQueryCount,
-          totalQuota,
-          version,
-          blockNumber: blockNumber + MAX_BLOCK_DISCREPANCY_THRESHOLD,
-          warnings,
-        },
-      ],
-      expectedLogs: [
-        {
-          params: [
-            {
-              sortedByBlockNumber: [
-                {
-                  signerUrl: url,
-                  values: {
-                    blockNumber,
-                    performedQueryCount,
-                    totalQuota,
-                    version,
-                    warnings,
-                  },
-                },
-                {
-                  signerUrl: url,
-                  values: {
-                    blockNumber,
-                    performedQueryCount,
-                    totalQuota,
-                    version,
-                    warnings,
-                  },
-                },
-                {
-                  signerUrl: url,
-                  values: {
-                    blockNumber: blockNumber + MAX_BLOCK_DISCREPANCY_THRESHOLD,
-                    performedQueryCount,
-                    totalQuota,
-                    version,
-                    warnings,
-                  },
-                },
-              ],
-            },
-            WarningMessage.INCONSISTENT_SIGNER_BLOCK_NUMBERS,
-          ],
-          level: 'error',
-        },
-      ],
-    },
-    {
       it: 'should log correctly when there is a discrepency in warnings field',
       responses: [
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
-        { success: true, performedQueryCount, totalQuota, version, blockNumber, warnings },
+        { success: true, performedQueryCount, totalQuota, version, warnings },
+        { success: true, performedQueryCount, totalQuota, version, warnings },
         {
           success: true,
           performedQueryCount,
           totalQuota,
           version,
-          blockNumber,
+
           warnings: ['differentWarning'],
         },
       ],
@@ -538,7 +377,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota,
                     version,
@@ -548,7 +386,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota,
                     version,
@@ -558,7 +395,6 @@ describe('pnp response logger', () => {
                 {
                   signerUrl: url,
                   values: {
-                    blockNumber,
                     performedQueryCount,
                     totalQuota,
                     version,
@@ -573,131 +409,31 @@ describe('pnp response logger', () => {
         },
       ],
     },
-    {
-      it: 'should log correctly when signers respond with fail-open warnings',
-      responses: [
-        {
-          success: true,
-          performedQueryCount,
-          totalQuota,
-          version,
-          blockNumber,
-          warnings: [ErrorMessage.FAILING_OPEN],
-        },
-        {
-          success: true,
-          performedQueryCount,
-          totalQuota,
-          version,
-          blockNumber,
-          warnings: [ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA],
-        },
-        {
-          success: true,
-          performedQueryCount,
-          totalQuota,
-          version,
-          blockNumber,
-          warnings: [ErrorMessage.FAILURE_TO_GET_DEK],
-        },
-      ],
-      expectedLogs: [
-        {
-          params: [
-            {
-              parsedResponses: [
-                {
-                  signerUrl: url,
-                  values: {
-                    blockNumber,
-                    performedQueryCount,
-                    totalQuota,
-                    version,
-                    warnings: [ErrorMessage.FAILING_OPEN],
-                  },
-                },
-                {
-                  signerUrl: url,
-                  values: {
-                    blockNumber,
-                    performedQueryCount,
-                    totalQuota,
-                    version,
-                    warnings: [ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA],
-                  },
-                },
-                {
-                  signerUrl: url,
-                  values: {
-                    blockNumber,
-                    performedQueryCount,
-                    totalQuota,
-                    version,
-                    warnings: [ErrorMessage.FAILURE_TO_GET_DEK],
-                  },
-                },
-              ],
-            },
-            WarningMessage.SIGNER_RESPONSE_DISCREPANCIES,
-          ],
-          level: 'warn',
-        },
-        {
-          params: [
-            {
-              signerWarning: ErrorMessage.FAILING_OPEN,
-              service: url,
-            },
-            WarningMessage.SIGNER_FAILED_OPEN,
-          ],
-          level: 'error',
-        },
-        {
-          params: [
-            {
-              signerWarning: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA,
-              service: url,
-            },
-            WarningMessage.SIGNER_FAILED_OPEN,
-          ],
-          level: 'error',
-        },
-        {
-          params: [
-            {
-              signerWarning: ErrorMessage.FAILURE_TO_GET_DEK,
-              service: url,
-            },
-            WarningMessage.SIGNER_FAILED_OPEN,
-          ],
-          level: 'error',
-        },
-      ],
-    },
   ]
   testCases.forEach((testCase) => {
     it(testCase.it, () => {
-      const session = getSession(testCase.responses)
+      const logger = rootLogger(config.serviceName)
+
+      const responses = testCase.responses.map((res) => ({ res, url }))
       const logSpys = {
         info: {
-          spy: jest.spyOn(session.logger, 'info'),
+          spy: jest.spyOn(logger, 'info'),
           callCount: 0,
         },
         debug: {
-          spy: jest.spyOn(session.logger, 'debug'),
+          spy: jest.spyOn(logger, 'debug'),
           callCount: 0,
         },
         warn: {
-          spy: jest.spyOn(session.logger, 'warn'),
+          spy: jest.spyOn(logger, 'warn'),
           callCount: 0,
         },
         error: {
-          spy: jest.spyOn(session.logger, 'error'),
+          spy: jest.spyOn(logger, 'error'),
           callCount: 0,
         },
       }
-      pnpResponseLogger.logResponseDiscrepancies(session)
-      pnpResponseLogger.logFailOpenResponses(session)
+      logPnpSignerResponseDiscrepancies(logger, responses)
       testCase.expectedLogs.forEach((log) => {
         expect(logSpys[log.level].spy).toHaveBeenNthCalledWith(
           ++logSpys[log.level].callCount,

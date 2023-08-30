@@ -1,4 +1,4 @@
-import { getContractKit } from '@celo/phone-number-privacy-common'
+import { getContractKitWithAgent } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
 import config from './config'
 import { startCombiner } from './server'
@@ -10,7 +10,7 @@ export const combiner = functions
   .runWith({
     // Keep instances warm for mainnet functions
     // Defined check required for running tests vs. deployment
-    minInstances: functions.config().service ? functions.config().service.min_instances : undefined,
+    minInstances: functions.config().service ? Number(functions.config().service.min_instances) : 0,
   })
-  .https.onRequest(startCombiner(config, getContractKit(config.blockchain)))
+  .https.onRequest(startCombiner(config, getContractKitWithAgent(config.blockchain)))
 export * from './config'

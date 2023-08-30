@@ -1,5 +1,9 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
-import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
+import {
+  assertEqualBN,
+  assertLogMatches2,
+  assertTransactionRevertWithReason,
+} from '@celo/protocol/lib/test-utils'
 import { parseMultiSigTransaction } from '@celo/protocol/lib/web3-utils'
 import _ from 'lodash'
 import { MultiSigContract, MultiSigInstance } from 'types'
@@ -35,8 +39,9 @@ contract('MultiSig', (accounts: any) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(
-        multiSig.initialize(owners, requiredSignatures, internalRequiredSignatures)
+      await assertTransactionRevertWithReason(
+        multiSig.initialize(owners, requiredSignatures, internalRequiredSignatures),
+        'contract already initialized'
       )
     })
   })
@@ -96,13 +101,17 @@ contract('MultiSig', (accounts: any) => {
 
     it('should not allow an owner to submit a transaction to a null address', async () => {
       // @ts-ignore: TODO(mcortesi): fix typings
-      await assertRevert(multiSig.submitTransaction(NULL_ADDRESS, 0, txData))
+      await assertTransactionRevertWithReason(
+        multiSig.submitTransaction(NULL_ADDRESS, 0, txData),
+        'address was null'
+      )
     })
 
     it('should not allow a non-owner to submit a transaction', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         // @ts-ignore: TODO(mcortesi): fix typings
-        multiSig.submitTransaction(multiSig.address, 0, txData, { from: accounts[2] })
+        multiSig.submitTransaction(multiSig.address, 0, txData, { from: accounts[2] }),
+        'owner does not exist'
       )
     })
   })
@@ -135,11 +144,17 @@ contract('MultiSig', (accounts: any) => {
     })
 
     it('should not allow an owner to confirm a transaction twice', async () => {
-      await assertRevert(multiSig.confirmTransaction(txId, { from: accounts[0] }))
+      await assertTransactionRevertWithReason(
+        multiSig.confirmTransaction(txId, { from: accounts[0] }),
+        'transaction was already confirmed for owner'
+      )
     })
 
     it('should not allow a non-owner to confirm a transaction', async () => {
-      await assertRevert(multiSig.confirmTransaction(txId, { from: accounts[2] }))
+      await assertTransactionRevertWithReason(
+        multiSig.confirmTransaction(txId, { from: accounts[2] }),
+        'owner does not exist'
+      )
     })
   })
 
@@ -167,11 +182,17 @@ contract('MultiSig', (accounts: any) => {
     })
 
     it('should not allow a non-owner to revoke a confirmation', async () => {
-      await assertRevert(multiSig.revokeConfirmation(txId, { from: accounts[2] }))
+      await assertTransactionRevertWithReason(
+        multiSig.revokeConfirmation(txId, { from: accounts[2] }),
+        'owner does not exist'
+      )
     })
 
     it('should not allow an owner to revoke before confirming', async () => {
-      await assertRevert(multiSig.revokeConfirmation(txId, { from: accounts[1] }))
+      await assertTransactionRevertWithReason(
+        multiSig.revokeConfirmation(txId, { from: accounts[1] }),
+        'transaction was not confirmed for owner'
+      )
     })
   })
 
@@ -197,7 +218,10 @@ contract('MultiSig', (accounts: any) => {
 
     it('should not allow an external account to add an owner', async () => {
       // @ts-ignore
-      await assertRevert(multiSig.addOwner(accounts[2], { from: accounts[3] }))
+      await assertTransactionRevertWithReason(
+        multiSig.addOwner(accounts[2], { from: accounts[3] }),
+        'msg.sender was not multisig wallet'
+      )
     })
 
     it('should not allow adding the null address', async () => {
@@ -211,7 +235,10 @@ contract('MultiSig', (accounts: any) => {
         event: 'Confirmation',
       })
       const txId = txEvent.args.transactionId
-      await assertRevert(multiSig.confirmTransaction(txId, { from: accounts[1] }))
+      await assertTransactionRevertWithReason(
+        multiSig.confirmTransaction(txId, { from: accounts[1] }),
+        'Transaction execution failed.'
+      )
     })
   })
 
@@ -242,7 +269,10 @@ contract('MultiSig', (accounts: any) => {
 
     it('should not allow an external account to remove an owner', async () => {
       // @ts-ignore
-      await assertRevert(multiSig.removeOwner(accounts[1], { from: accounts[3] }))
+      await assertTransactionRevertWithReason(
+        multiSig.removeOwner(accounts[1], { from: accounts[3] }),
+        'msg.sender was not multisig wallet'
+      )
     })
   })
 
@@ -268,7 +298,10 @@ contract('MultiSig', (accounts: any) => {
 
     it('should not allow an external account to replace an owner', async () => {
       // @ts-ignore
-      await assertRevert(multiSig.replaceOwner(accounts[1], accounts[2], { from: accounts[3] }))
+      await assertTransactionRevertWithReason(
+        multiSig.replaceOwner(accounts[1], accounts[2], { from: accounts[3] }),
+        'msg.sender was not multisig wallet'
+      )
     })
 
     it('should not allow an owner to be replaced by the null address', async () => {
@@ -282,7 +315,10 @@ contract('MultiSig', (accounts: any) => {
         event: 'Confirmation',
       })
       const txId = txEvent.args.transactionId
-      await assertRevert(multiSig.confirmTransaction(txId, { from: accounts[1] }))
+      await assertTransactionRevertWithReason(
+        multiSig.confirmTransaction(txId, { from: accounts[1] }),
+        'Transaction execution failed.'
+      )
     })
   })
 
@@ -307,7 +343,10 @@ contract('MultiSig', (accounts: any) => {
 
     it('should not allow an external account to change the requirement', async () => {
       // @ts-ignore
-      await assertRevert(multiSig.changeRequirement(3, { from: accounts[3] }))
+      await assertTransactionRevertWithReason(
+        multiSig.changeRequirement(3, { from: accounts[3] }),
+        'msg.sender was not multisig wallet'
+      )
     })
   })
 
@@ -332,7 +371,10 @@ contract('MultiSig', (accounts: any) => {
 
     it('should not allow an external account to change the internal requirement', async () => {
       // @ts-ignore
-      await assertRevert(multiSig.changeInternalRequirement(3, { from: accounts[3] }))
+      await assertTransactionRevertWithReason(
+        multiSig.changeInternalRequirement(3, { from: accounts[3] }),
+        'msg.sender was not multisig wallet'
+      )
     })
   })
 

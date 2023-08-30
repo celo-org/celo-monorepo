@@ -20,7 +20,30 @@ EXAMPLE
   $ celocli plugins
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.9.5/src/commands/plugins/index.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.11/src/commands/plugins/index.ts)_
+
+## `celocli plugins:inspect PLUGIN...`
+
+displays installation properties of a plugin
+
+```
+displays installation properties of a plugin
+
+USAGE
+  $ celocli plugins:inspect PLUGIN...
+
+ARGUMENTS
+  PLUGIN  [default: .] plugin to inspect
+
+OPTIONS
+  -h, --help     show CLI help
+  -v, --verbose
+
+EXAMPLE
+  $ celocli plugins:inspect myplugin
+```
+
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.11/src/commands/plugins/inspect.ts)_
 
 ## `celocli plugins:install PLUGIN...`
 
@@ -68,7 +91,7 @@ EXAMPLES
   $ celocli plugins:install someuser/someplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.9.5/src/commands/plugins/install.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.11/src/commands/plugins/install.ts)_
 
 ## `celocli plugins:link PLUGIN`
 
@@ -103,7 +126,7 @@ EXAMPLE
   $ celocli plugins:link myplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.9.5/src/commands/plugins/link.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.11/src/commands/plugins/link.ts)_
 
 ## `celocli plugins:uninstall PLUGIN...`
 
@@ -127,7 +150,7 @@ ALIASES
   $ celocli plugins:remove
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.9.5/src/commands/plugins/uninstall.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.11/src/commands/plugins/uninstall.ts)_
 
 ## `celocli plugins:update`
 
@@ -144,4 +167,4 @@ OPTIONS
   -v, --verbose
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.9.5/src/commands/plugins/update.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.11/src/commands/plugins/update.ts)_

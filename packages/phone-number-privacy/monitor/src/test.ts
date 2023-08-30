@@ -1,10 +1,11 @@
-import { concurrentMap, sleep } from '@celo/base'
+import { sleep } from '@celo/base'
 import { Result } from '@celo/base/lib/result'
 import { BackupError } from '@celo/encrypted-backup'
 import { IdentifierHashDetails } from '@celo/identity/lib/odis/identifier'
 import { ErrorMessages, OdisContextName } from '@celo/identity/lib/odis/query'
 import { PnpClientQuotaStatus } from '@celo/identity/lib/odis/quota'
 import { CombinerEndpointPNP, rootLogger } from '@celo/phone-number-privacy-common'
+import { performance } from 'perf_hooks'
 import { queryOdisDomain, queryOdisForQuota, queryOdisForSalt } from './query'
 
 const logger = rootLogger('odis-monitor')
@@ -12,21 +13,22 @@ const logger = rootLogger('odis-monitor')
 export async function testPNPSignQuery(
   blockchainProvider: string,
   contextName: OdisContextName,
-  endpoint: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN,
-  timeoutMs?: number
+  timeoutMs?: number,
+  bypassQuota?: boolean,
+  useDEK?: boolean
 ) {
-  logger.info(`Performing test PNP query for ${endpoint}`)
   try {
     const odisResponse: IdentifierHashDetails = await queryOdisForSalt(
       blockchainProvider,
       contextName,
-      endpoint,
-      timeoutMs
+      timeoutMs,
+      bypassQuota,
+      useDEK
     )
-    logger.info({ odisResponse }, 'ODIS salt request successful. System is healthy.')
+    logger.debug({ odisResponse }, 'ODIS salt request successful. System is healthy.')
   } catch (err) {
     if ((err as Error).message === ErrorMessages.ODIS_QUOTA_ERROR) {
-      logger.info(
+      logger.warn(
         { error: err },
         'ODIS salt request out of quota. This is expected. System is healthy.'
       )
@@ -76,59 +78,104 @@ export async function testDomainSignQuery(contextName: OdisContextName) {
   }
 }
 
-export async function serialLoadTest(
-  n: number,
+export async function concurrentRPSLoadTest(
+  rps: number,
   blockchainProvider: string,
   contextName: OdisContextName,
   endpoint:
-    | CombinerEndpointPNP.LEGACY_PNP_SIGN
     | CombinerEndpointPNP.PNP_QUOTA
     | CombinerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.PNP_SIGN,
-  timeoutMs?: number
+  duration: number = 0,
+  bypassQuota: boolean = false,
+  useDEK: boolean = false,
+  movingAverageRequests: number = 50
 ) {
-  for (let i = 0; i < n; i++) {
-    try {
-      switch (endpoint) {
-        case CombinerEndpointPNP.LEGACY_PNP_SIGN:
-        case CombinerEndpointPNP.PNP_SIGN:
-          await testPNPSignQuery(blockchainProvider, contextName, endpoint, timeoutMs)
-          break
-        case CombinerEndpointPNP.PNP_QUOTA:
-          await testPNPQuotaQuery(blockchainProvider, contextName, timeoutMs)
+  const latencyQueue: number[] = []
+  let movingAvgLatencySum = 0
+  let latencySum = 0
+  let index = 1
+
+  function measureLatency(fn: () => Promise<void>): () => Promise<void> {
+    return async () => {
+      const start = performance.now()
+
+      await fn()
+
+      const reqLatency = performance.now() - start
+      latencySum += reqLatency
+      movingAvgLatencySum += reqLatency
+
+      const queuelength = latencyQueue.push(reqLatency)
+      if (queuelength > movingAverageRequests) {
+        movingAvgLatencySum -= latencyQueue.shift()!
       }
-    } catch {} // tslint:disable-line:no-empty
+
+      const stats = {
+        averageLatency: Math.round(latencySum / index),
+        movingAverageLatency: Math.round(movingAvgLatencySum / latencyQueue.length),
+        index,
+      }
+
+      if (reqLatency > 600) {
+        logger.warn(stats, 'SLOW Request')
+      } else {
+        logger.info(stats, 'request finished')
+      }
+      index++
+    }
   }
+
+  const testFn = async () => {
+    try {
+      await (endpoint === CombinerEndpointPNP.PNP_SIGN
+        ? testPNPSignQuery(blockchainProvider, contextName, undefined, bypassQuota, useDEK)
+        : testPNPQuotaQuery(blockchainProvider, contextName))
+    } catch (_) {
+      logger.error('load test request failed')
+    }
+  }
+
+  return doRPSTest(measureLatency(testFn), rps, duration)
 }
 
-export async function concurrentLoadTest(
-  workers: number,
-  blockchainProvider: string,
-  contextName: OdisContextName,
-  endpoint:
-    | CombinerEndpointPNP.LEGACY_PNP_SIGN
-    | CombinerEndpointPNP.PNP_QUOTA
-    | CombinerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.PNP_SIGN,
-  timeoutMs?: number
-) {
-  while (true) {
-    const reqs = []
-    for (let i = 0; i < workers; i++) {
-      reqs.push(i)
-    }
-    await concurrentMap(workers, reqs, async (i) => {
-      await sleep(i * 10)
-      while (true) {
-        try {
-          switch (endpoint) {
-            case CombinerEndpointPNP.LEGACY_PNP_SIGN:
-            case CombinerEndpointPNP.PNP_SIGN:
-              await testPNPSignQuery(blockchainProvider, contextName, endpoint, timeoutMs)
-              break
-            case CombinerEndpointPNP.PNP_QUOTA:
-              await testPNPQuotaQuery(blockchainProvider, contextName, timeoutMs)
-          }
-        } catch {} // tslint:disable-line:no-empty
+async function doRPSTest(
+  testFn: () => Promise<void>,
+  rps: number,
+  duration: number = 0
+): Promise<void> {
+  const inFlightRequests: Array<Promise<void>> = []
+  let shouldRun = true
+
+  async function requestSender() {
+    while (shouldRun) {
+      for (let i = 0; i < rps; i++) {
+        inFlightRequests.push(testFn())
       }
-    })
+      await sleep(1000)
+    }
+  }
+
+  async function requestEnder() {
+    while (shouldRun || inFlightRequests.length > 0) {
+      if (inFlightRequests.length > 0) {
+        const req = inFlightRequests.shift()
+        await req?.catch((_err) => {
+          logger.error('load test request failed')
+        })
+      } else {
+        await sleep(1000)
+      }
+    }
+  }
+
+  async function durationChecker() {
+    await sleep(duration)
+    shouldRun = false
+  }
+
+  if (duration === 0) {
+    await Promise.all([requestSender(), requestEnder()])
+  } else {
+    await Promise.all([durationChecker(), requestSender(), requestEnder()])
   }
 }

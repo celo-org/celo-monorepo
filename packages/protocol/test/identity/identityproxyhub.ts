@@ -1,4 +1,4 @@
-import { assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertTransactionRevertWithReason } from '@celo/protocol/lib/test-utils'
 import {
   IdentityProxyContract,
   IdentityProxyHubContract,
@@ -153,7 +153,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
         const txData = identityProxyTest.contract.methods.payMe().encodeABI()
         // @ts-ignore
         await identityProxyHub.makeCall(identifier, identityProxyTest.address, txData, {
-          value: 100,
+          value: '100',
         })
         const proxyBalance = await web3.eth.getBalance(address)
         const balanceAfter = await web3.eth.getBalance(identityProxyTest.address)
@@ -169,7 +169,10 @@ contract('IdentityProxyHub', (accounts: string[]) => {
 
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
-      await assertRevert(identityProxyHub.makeCall(identifier, identityProxyTest.address, txData))
+      await assertTransactionRevertWithReason(
+        identityProxyHub.makeCall(identifier, identityProxyTest.address, txData),
+        'does not pass identity heuristic'
+      )
     })
 
     it('fails to call if sender does not have more than 50% attestation completions', async () => {
@@ -186,7 +189,10 @@ contract('IdentityProxyHub', (accounts: string[]) => {
 
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
-      await assertRevert(identityProxyHub.makeCall(identifier, identityProxyTest.address, txData))
+      await assertTransactionRevertWithReason(
+        identityProxyHub.makeCall(identifier, identityProxyTest.address, txData),
+        'does not pass identity heuristic'
+      )
     })
 
     it('fails to call if another address has more attestations completed', async () => {
@@ -201,7 +207,10 @@ contract('IdentityProxyHub', (accounts: string[]) => {
 
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
-      await assertRevert(identityProxyHub.makeCall(identifier, identityProxyTest.address, txData))
+      await assertTransactionRevertWithReason(
+        identityProxyHub.makeCall(identifier, identityProxyTest.address, txData),
+        'does not pass identity heuristic'
+      )
     })
   })
 })

@@ -1,4 +1,13 @@
 import { NativeSigner, serializeSignature, Signature, Signer } from '@celo/base/lib/signatureUtils'
+import {
+  bufferToHex,
+  ecrecover,
+  ecsign,
+  fromRpcSig,
+  privateToPublic,
+  pubToAddress,
+  toBuffer,
+} from '@ethereumjs/util'
 import { isHexStrict, soliditySha3 } from 'web3-utils'
 import { ensureLeading0x, eqAddress, privateKeyToAddress, trimLeading0x } from './address'
 import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
@@ -12,7 +21,6 @@ export {
   Signature,
   Signer,
 } from '@celo/base/lib/signatureUtils'
-const ethjsutil = require('ethereumjs-util')
 
 // If messages is a hex, the length of it should be the number of bytes
 function messageLength(message: string) {
@@ -41,16 +49,11 @@ export async function addressToPublicKey(
   // Note: Eth.sign typing displays incorrect parameter order
   const sig = await signFn(data, signer)
 
-  const rawsig = ethjsutil.fromRpcSig(sig)
+  const rawsig = fromRpcSig(sig)
   const prefixedMsg = hashMessageWithPrefix(data)
-  const pubKey = ethjsutil.ecrecover(
-    Buffer.from(prefixedMsg.slice(2), 'hex'),
-    rawsig.v,
-    rawsig.r,
-    rawsig.s
-  )
+  const pubKey = ecrecover(Buffer.from(prefixedMsg.slice(2), 'hex'), rawsig.v, rawsig.r, rawsig.s)
 
-  const computedAddr = ethjsutil.pubToAddress(pubKey).toString('hex')
+  const computedAddr = pubToAddress(pubKey).toString('hex')
   if (!eqAddress(computedAddr, signer)) {
     throw new Error('computed address !== signer')
   }
@@ -68,9 +71,9 @@ export function LocalSigner(privateKey: string): Signer {
 }
 
 export function signedMessageToPublicKey(message: string, v: number, r: string, s: string) {
-  const pubKeyBuf = ethjsutil.ecrecover(
+  const pubKeyBuf = ecrecover(
     Buffer.from(message.slice(2), 'hex'),
-    v,
+    BigInt(v),
     Buffer.from(r.slice(2), 'hex'),
     Buffer.from(s.slice(2), 'hex')
   )
@@ -86,21 +89,16 @@ export function signMessage(message: string, privateKey: string, address: string
 }
 
 export function signMessageWithoutPrefix(messageHash: string, privateKey: string, address: string) {
-  const publicKey = ethjsutil.privateToPublic(ethjsutil.toBuffer(privateKey))
-  const derivedAddress: string = ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
+  const publicKey = privateToPublic(toBuffer(privateKey))
+  const derivedAddress: string = bufferToHex(pubToAddress(publicKey))
   if (derivedAddress.toLowerCase() !== address.toLowerCase()) {
     throw new Error('Provided private key does not match address of intended signer')
   }
-  const { r, s, v } = ethjsutil.ecsign(
-    ethjsutil.toBuffer(messageHash),
-    ethjsutil.toBuffer(privateKey)
-  )
-  if (
-    !isValidSignature(address, messageHash, v, ethjsutil.bufferToHex(r), ethjsutil.bufferToHex(s))
-  ) {
+  const { r, s, v } = ecsign(toBuffer(messageHash), toBuffer(privateKey))
+  if (!isValidSignature(address, messageHash, Number(v), bufferToHex(r), bufferToHex(s))) {
     throw new Error('Unable to validate signature')
   }
-  return { v, r: ethjsutil.bufferToHex(r), s: ethjsutil.bufferToHex(s) }
+  return { v: Number(v), r: bufferToHex(r), s: bufferToHex(s) }
 }
 
 export function verifySignature(message: string, signature: string, signer: string) {
@@ -141,14 +139,9 @@ function recoverEIP712TypedDataSigner(
 ): string {
   const dataBuff = generateTypedDataHash(typedData)
   const { r, s, v } = parseFunction(trimLeading0x(signature))
-  const publicKey = ethjsutil.ecrecover(
-    ethjsutil.toBuffer(dataBuff),
-    v,
-    ethjsutil.toBuffer(r),
-    ethjsutil.toBuffer(s)
-  )
+  const publicKey = ecrecover(toBuffer(dataBuff), BigInt(v), toBuffer(r), toBuffer(s))
   // TODO test error handling on this
-  return ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
+  return bufferToHex(pubToAddress(publicKey))
 }
 
 /**
@@ -203,13 +196,8 @@ export function verifyEIP712TypedDataSigner(
 export function guessSigner(message: string, signature: string): string {
   const messageHash = hashMessageWithPrefix(message)
   const { r, s, v } = parseSignatureAsRsv(signature.slice(2))
-  const publicKey = ethjsutil.ecrecover(
-    ethjsutil.toBuffer(messageHash),
-    v,
-    ethjsutil.toBuffer(r),
-    ethjsutil.toBuffer(s)
-  )
-  return ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
+  const publicKey = ecrecover(toBuffer(messageHash), BigInt(v), toBuffer(r), toBuffer(s))
+  return bufferToHex(pubToAddress(publicKey))
 }
 
 function parseSignatureAsVrs(signature: string) {
@@ -234,13 +222,10 @@ function parseSignatureAsRsv(signature: string) {
 
 function isValidSignature(signer: string, message: string, v: number, r: string, s: string) {
   try {
-    const publicKey = ethjsutil.ecrecover(
-      ethjsutil.toBuffer(message),
-      v,
-      ethjsutil.toBuffer(r),
-      ethjsutil.toBuffer(s)
-    )
-    const retrievedAddress: string = ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
+    const publicKey = ecrecover(toBuffer(message), BigInt(v), toBuffer(r), toBuffer(s))
+
+    const retrievedAddress: string = bufferToHex(pubToAddress(publicKey))
+
     return eqAddress(retrievedAddress, signer)
   } catch (err) {
     return false

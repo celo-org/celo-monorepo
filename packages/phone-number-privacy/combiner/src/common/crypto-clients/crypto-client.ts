@@ -1,5 +1,6 @@
 import { ErrorMessage, KeyVersionInfo } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
+import { performance } from 'perf_hooks'
 
 export interface ServicePartialSignature {
   url: string
@@ -38,7 +39,17 @@ export abstract class CryptoClient {
         `${ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES} ${this.allSignaturesLength}/${threshold}`
       )
     }
-    return this._combineBlindedSignatureShares(blindedMessage, logger)
+
+    const start = `Start combineBlindedSignatureShares`
+    const end = `End combineBlindedSignatureShares`
+    performance.mark(start)
+
+    const combinedSignature = this._combineBlindedSignatureShares(blindedMessage, logger)
+
+    performance.mark(end)
+    performance.measure('combineBlindedSignatureShares', start, end)
+
+    return combinedSignature
   }
 
   /*

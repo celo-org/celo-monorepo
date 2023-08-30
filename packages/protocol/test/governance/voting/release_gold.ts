@@ -5,11 +5,14 @@ import {
   assertEqualBN,
   assertGteBN,
   assertLogMatches,
-  assertRevert,
   assertSameAddress,
+  // tslint:disable-next-line: ordered-imports
+  assertTransactionRevertWithReason,
+  assertTransactionRevertWithoutReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { addressToPublicKey, Signature } from '@celo/utils/lib/signatureUtils'
+// tslint:disable-next-line: ordered-imports
+import { Signature, addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import _ from 'lodash'
 import {
@@ -326,7 +329,7 @@ contract('ReleaseGold', (accounts: string[]) => {
 
     it('should emit safeTransfer logs on erc20 revert', async () => {
       const startBalanceFrom = await mockStableToken.balanceOf(releaseGoldInstance.address)
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         releaseGoldInstance.genericTransfer(
           mockStableToken.address,
           receiver,
@@ -340,10 +343,11 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
 
     it('should revert when attempting transfer of goldtoken from the release gold instance', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         releaseGoldInstance.genericTransfer(goldTokenInstance.address, receiver, transferAmount, {
           from: beneficiary,
-        })
+        }),
+        'Transfer must not target celo balance'
       )
     })
   })
@@ -437,26 +441,38 @@ contract('ReleaseGold', (accounts: string[]) => {
       it('should revert when releaseGold beneficiary is the null address', async () => {
         const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
         releaseGoldSchedule.beneficiary = NULL_ADDRESS
-        await assertRevert(createNewReleaseGoldInstance(releaseGoldSchedule, web3))
+        await assertTransactionRevertWithReason(
+          createNewReleaseGoldInstance(releaseGoldSchedule, web3),
+          'The release schedule beneficiary cannot be the zero addresss'
+        )
       })
 
       it('should revert when releaseGold periods are zero', async () => {
         const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
         releaseGoldSchedule.numReleasePeriods = 0
-        await assertRevert(createNewReleaseGoldInstance(releaseGoldSchedule, web3))
+        await assertTransactionRevertWithReason(
+          createNewReleaseGoldInstance(releaseGoldSchedule, web3),
+          'There must be at least one releasing period'
+        )
       })
 
       it('should revert when released amount per period is zero', async () => {
         const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
         releaseGoldSchedule.amountReleasedPerPeriod = new BigNumber('0')
-        await assertRevert(createNewReleaseGoldInstance(releaseGoldSchedule, web3))
+        await assertTransactionRevertWithReason(
+          createNewReleaseGoldInstance(releaseGoldSchedule, web3),
+          'The released amount per period must be greater than zero'
+        )
       })
 
       it('should overflow for very large combinations of release periods and amount per time', async () => {
         const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
         releaseGoldSchedule.numReleasePeriods = Number.MAX_SAFE_INTEGER
         releaseGoldSchedule.amountReleasedPerPeriod = new BigNumber(2).pow(300)
-        await assertRevert(createNewReleaseGoldInstance(releaseGoldSchedule, web3))
+        await assertTransactionRevertWithReason(
+          createNewReleaseGoldInstance(releaseGoldSchedule, web3),
+          'value out-of-bounds'
+        )
       })
     })
   })
@@ -473,7 +489,10 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
 
     it('should revert when setting a new beneficiary from the release owner', async () => {
-      await assertRevert(releaseGoldInstance.setBeneficiary(newBeneficiary, { from: releaseOwner }))
+      await assertTransactionRevertWithReason(
+        releaseGoldInstance.setBeneficiary(newBeneficiary, { from: releaseOwner }),
+        'Ownable: caller is not the owner'
+      )
     })
 
     it('should emit the BeneficiarySet event', async () => {
@@ -503,7 +522,10 @@ contract('ReleaseGold', (accounts: string[]) => {
       it('reverts if a non-beneficiary attempts account creation', async () => {
         const isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
-        await assertRevert(releaseGoldInstance.createAccount({ from: accounts[2] }))
+        await assertTransactionRevertWithReason(
+          releaseGoldInstance.createAccount({ from: accounts[2] }),
+          'Sender must be the beneficiary and state must not be revoked'
+        )
       })
     })
 
@@ -515,7 +537,10 @@ contract('ReleaseGold', (accounts: string[]) => {
       it('reverts if anyone attempts account creation', async () => {
         const isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
-        await assertRevert(releaseGoldInstance.createAccount({ from: beneficiary }))
+        await assertTransactionRevertWithReason(
+          releaseGoldInstance.createAccount({ from: beneficiary }),
+          'Sender must be the beneficiary and state must not be revoked'
+        )
       })
     })
   })
@@ -556,7 +581,7 @@ contract('ReleaseGold', (accounts: string[]) => {
       it('reverts if a non-beneficiary attempts to set the account', async () => {
         const isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           releaseGoldInstance.setAccount(
             accountName,
             dataEncryptionKey,
@@ -567,7 +592,8 @@ contract('ReleaseGold', (accounts: string[]) => {
             {
               from: accounts[2],
             }
-          )
+          ),
+          'Sender must be the beneficiary and state must not be revoked'
         )
       })
 
@@ -603,7 +629,7 @@ contract('ReleaseGold', (accounts: string[]) => {
       it('should revert to set the name, dataEncryptionKey and walletAddress of the account by a non-beneficiary', async () => {
         const isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           releaseGoldInstance.setAccount(
             accountName,
             dataEncryptionKey,
@@ -614,7 +640,8 @@ contract('ReleaseGold', (accounts: string[]) => {
             {
               from: releaseOwner,
             }
-          )
+          ),
+          'Sender must be the beneficiary and state must not be revoked'
         )
       })
     })
@@ -627,7 +654,7 @@ contract('ReleaseGold', (accounts: string[]) => {
       it('reverts if anyone attempts to set the account', async () => {
         const isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           releaseGoldInstance.setAccount(
             accountName,
             dataEncryptionKey,
@@ -638,14 +665,15 @@ contract('ReleaseGold', (accounts: string[]) => {
             {
               from: releaseOwner,
             }
-          )
+          ),
+          'Sender must be the beneficiary and state must not be revoked'
         )
       })
 
       it('should revert to set the name, dataEncryptionKey and walletAddress of the account', async () => {
         const isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           releaseGoldInstance.setAccount(
             accountName,
             dataEncryptionKey,
@@ -656,7 +684,8 @@ contract('ReleaseGold', (accounts: string[]) => {
             {
               from: releaseOwner,
             }
-          )
+          ),
+          'Sender must be the beneficiary and state must not be revoked'
         )
       })
     })
@@ -671,7 +700,10 @@ contract('ReleaseGold', (accounts: string[]) => {
 
     describe('when the account has not been created', () => {
       it('should revert', async () => {
-        await assertRevert(releaseGoldInstance.setAccountName(accountName, { from: beneficiary }))
+        await assertTransactionRevertWithReason(
+          releaseGoldInstance.setAccountName(accountName, { from: beneficiary }),
+          'Register with createAccount to set account name'
+        )
       })
     })
 
@@ -688,7 +720,10 @@ contract('ReleaseGold', (accounts: string[]) => {
         })
 
         it('should revert if non-beneficiary attempts to set the name', async () => {
-          await assertRevert(releaseGoldInstance.setAccountName(accountName, { from: accounts[2] }))
+          await assertTransactionRevertWithReason(
+            releaseGoldInstance.setAccountName(accountName, { from: accounts[2] }),
+            'Sender must be the beneficiary and state must not be revoked'
+          )
         })
       })
 
@@ -698,8 +733,9 @@ contract('ReleaseGold', (accounts: string[]) => {
         })
 
         it('should revert if anyone attempts to set the name', async () => {
-          await assertRevert(
-            releaseGoldInstance.setAccountName(accountName, { from: releaseOwner })
+          await assertTransactionRevertWithReason(
+            releaseGoldInstance.setAccountName(accountName, { from: releaseOwner }),
+            'Sender must be the beneficiary and state must not be revoked'
           )
         })
       })
@@ -718,14 +754,15 @@ contract('ReleaseGold', (accounts: string[]) => {
 
     describe('when the releaseGold account has not been created', () => {
       it('should revert', async () => {
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           releaseGoldInstance.setAccountWalletAddress(
             walletAddress,
             proofOfWalletOwnership.v,
             proofOfWalletOwnership.r,
             proofOfWalletOwnership.s,
             { from: beneficiary }
-          )
+          ),
+          'Unknown account'
         )
       })
     })
@@ -749,14 +786,15 @@ contract('ReleaseGold', (accounts: string[]) => {
         })
 
         it('should revert if non-beneficiary attempts to set the walletAddress', async () => {
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             releaseGoldInstance.setAccountWalletAddress(
               walletAddress,
               proofOfWalletOwnership.v,
               proofOfWalletOwnership.r,
               proofOfWalletOwnership.s,
               { from: accounts[2] }
-            )
+            ),
+            'Sender must be the beneficiary and state must not be revoked'
           )
         })
 
@@ -775,14 +813,15 @@ contract('ReleaseGold', (accounts: string[]) => {
         })
 
         it('should revert if anyone attempts to set the walletAddress', async () => {
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             releaseGoldInstance.setAccountWalletAddress(
               walletAddress,
               proofOfWalletOwnership.v,
               proofOfWalletOwnership.r,
               proofOfWalletOwnership.s,
               { from: releaseOwner }
-            )
+            ),
+            'Sender must be the beneficiary and state must not be revoked'
           )
         })
       })
@@ -798,8 +837,9 @@ contract('ReleaseGold', (accounts: string[]) => {
 
     describe('when the account has not been created', () => {
       it('should revert', async () => {
-        await assertRevert(
-          releaseGoldInstance.setAccountMetadataURL(metadataURL, { from: beneficiary })
+        await assertTransactionRevertWithReason(
+          releaseGoldInstance.setAccountMetadataURL(metadataURL, { from: beneficiary }),
+          'Unknown account'
         )
       })
     })
@@ -817,8 +857,9 @@ contract('ReleaseGold', (accounts: string[]) => {
         })
 
         it('should revert if non-beneficiary attempts to set the metadataURL', async () => {
-          await assertRevert(
-            releaseGoldInstance.setAccountMetadataURL(metadataURL, { from: accounts[2] })
+          await assertTransactionRevertWithReason(
+            releaseGoldInstance.setAccountMetadataURL(metadataURL, { from: accounts[2] }),
+            'Sender must be the beneficiary and state must not be revoked'
           )
         })
       })
@@ -829,8 +870,9 @@ contract('ReleaseGold', (accounts: string[]) => {
         })
 
         it('should revert if anyone attempts to set the metadataURL', async () => {
-          await assertRevert(
-            releaseGoldInstance.setAccountMetadataURL(metadataURL, { from: releaseOwner })
+          await assertTransactionRevertWithReason(
+            releaseGoldInstance.setAccountMetadataURL(metadataURL, { from: releaseOwner }),
+            'Sender must be the beneficiary and state must not be revoked'
           )
         })
       })
@@ -861,8 +903,9 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
 
     it('should revert if non-beneficiary attempts to set dataEncryptionKey', async () => {
-      await assertRevert(
-        releaseGoldInstance.setAccountDataEncryptionKey(dataEncryptionKey, { from: accounts[2] })
+      await assertTransactionRevertWithReason(
+        releaseGoldInstance.setAccountDataEncryptionKey(dataEncryptionKey, { from: accounts[2] }),
+        'Sender must be the beneficiary and state must not be revoked'
       )
     })
 
@@ -879,8 +922,9 @@ contract('ReleaseGold', (accounts: string[]) => {
 
     it('should revert when the key is invalid', async () => {
       const invalidKey: any = '0x32132931293'
-      await assertRevert(
-        releaseGoldInstance.setAccountDataEncryptionKey(invalidKey, { from: beneficiary })
+      await assertTransactionRevertWithReason(
+        releaseGoldInstance.setAccountDataEncryptionKey(invalidKey, { from: beneficiary }),
+        'data encryption key length <= 32'
       )
     })
 
@@ -925,7 +969,10 @@ contract('ReleaseGold', (accounts: string[]) => {
       })
 
       it('cannot be lowered again', async () => {
-        await assertRevert(releaseGoldInstance.setMaxDistribution(500, { from: releaseOwner }))
+        await assertTransactionRevertWithReason(
+          releaseGoldInstance.setMaxDistribution(500, { from: releaseOwner }),
+          'Cannot set max distribution lower if already set to 1000'
+        )
       })
     })
   })
@@ -999,8 +1046,9 @@ contract('ReleaseGold', (accounts: string[]) => {
 
         it(`should revert if the ${authorizationTestDescriptions[key].me} is an account`, async () => {
           await accountsInstance.createAccount({ from: authorized })
-          await assertRevert(
-            authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
+          await assertTransactionRevertWithReason(
+            authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary }),
+            'Cannot re-authorize address or locked gold account for another account'
           )
         })
 
@@ -1012,10 +1060,11 @@ contract('ReleaseGold', (accounts: string[]) => {
             otherAccount
           )
           await accountsInstance.createAccount({ from: otherAccount })
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             authorizationTest.fn(otherAccount, otherSig.v, otherSig.r, otherSig.s, {
               from: beneficiary,
-            })
+            }),
+            'Cannot re-authorize address or locked gold account for another account'
           )
         })
 
@@ -1026,10 +1075,11 @@ contract('ReleaseGold', (accounts: string[]) => {
             releaseGoldInstance.address,
             nonVoter
           )
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             authorizationTest.fn(authorized, incorrectSig.v, incorrectSig.r, incorrectSig.s, {
               from: beneficiary,
-            })
+            }),
+            'Invalid signature'
           )
         })
 
@@ -1172,13 +1222,19 @@ contract('ReleaseGold', (accounts: string[]) => {
 
     it('should revert when non-releaseOwner attempts to revoke the releaseGold', async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      await assertRevert(releaseGoldInstance.revoke({ from: accounts[5] }))
+      await assertTransactionRevertWithReason(
+        releaseGoldInstance.revoke({ from: accounts[5] }),
+        'Sender must be the registered releaseOwner address'
+      )
     })
 
     it('should revert if releaseGold is already revoked', async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
       await releaseGoldInstance.revoke({ from: releaseOwner })
-      await assertRevert(releaseGoldInstance.revoke({ from: releaseOwner }))
+      await assertTransactionRevertWithReason(
+        releaseGoldInstance.revoke({ from: releaseOwner }),
+        'Release schedule instance must not already be revoked'
+      )
     })
 
     it('should revert if releaseGold is non-revocable', async () => {
@@ -1186,7 +1242,10 @@ contract('ReleaseGold', (accounts: string[]) => {
       releaseGoldSchedule.revocable = false
       releaseGoldSchedule.refundAddress = '0x0000000000000000000000000000000000000000'
       await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
-      await assertRevert(releaseGoldInstance.revoke({ from: releaseOwner }))
+      await assertTransactionRevertWithReason(
+        releaseGoldInstance.revoke({ from: releaseOwner }),
+        'Release schedule instance must be revocable'
+      )
     })
   })
 
@@ -1198,7 +1257,10 @@ contract('ReleaseGold', (accounts: string[]) => {
 
       describe('when called before expiration time has passed', () => {
         it('should revert', async () => {
-          await assertRevert(releaseGoldInstance.expire({ from: releaseOwner }))
+          await assertTransactionRevertWithReason(
+            releaseGoldInstance.expire({ from: releaseOwner }),
+            '`EXPIRATION_TIME` must have passed after the end of releasing'
+          )
         })
       })
 
@@ -1213,7 +1275,10 @@ contract('ReleaseGold', (accounts: string[]) => {
         })
 
         it('should revert before `EXPIRATION_TIME` after release schedule end', async () => {
-          await assertRevert(releaseGoldInstance.expire({ from: releaseOwner }))
+          await assertTransactionRevertWithReason(
+            releaseGoldInstance.expire({ from: releaseOwner }),
+            '`EXPIRATION_TIME` must have passed after the end of releasing'
+          )
         })
 
         describe('when `EXPIRATION_TIME` has passed after release schedule completion', () => {
@@ -1224,7 +1289,10 @@ contract('ReleaseGold', (accounts: string[]) => {
           })
           describe('when not called by releaseOwner', () => {
             it('should revert', async () => {
-              await assertRevert(releaseGoldInstance.expire())
+              await assertTransactionRevertWithReason(
+                releaseGoldInstance.expire(),
+                'Sender must be the registered releaseOwner address'
+              )
             })
           })
 
@@ -1307,7 +1375,10 @@ contract('ReleaseGold', (accounts: string[]) => {
 
       describe('when `expire` is called', () => {
         it('should revert', async () => {
-          await assertRevert(releaseGoldInstance.expire({ from: releaseOwner }))
+          await assertTransactionRevertWithReason(
+            releaseGoldInstance.expire({ from: releaseOwner }),
+            'Contract must be expirable'
+          )
         })
       })
     })
@@ -1328,11 +1399,17 @@ contract('ReleaseGold', (accounts: string[]) => {
 
     it('should revert when revoked but called by a non-releaseOwner', async () => {
       await releaseGoldInstance.revoke({ from: releaseOwner })
-      await assertRevert(releaseGoldInstance.refundAndFinalize({ from: accounts[5] }))
+      await assertTransactionRevertWithReason(
+        releaseGoldInstance.refundAndFinalize({ from: accounts[5] }),
+        'Sender must be the releaseOwner and state must be revoked'
+      )
     })
 
     it('should revert when non-revoked but called by a releaseOwner', async () => {
-      await assertRevert(releaseGoldInstance.refundAndFinalize({ from: releaseOwner }))
+      await assertTransactionRevertWithReason(
+        releaseGoldInstance.refundAndFinalize({ from: releaseOwner }),
+        'Sender must be the releaseOwner and state must be revoked'
+      )
     })
 
     describe('when revoked()', () => {
@@ -1411,16 +1488,17 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
 
     it('should revert if releaseGold instance is not an account', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         releaseGoldInstance.lockGold(lockAmount, {
           from: beneficiary,
-        })
+        }),
+        'Must first register address with Account.createAccount'
       )
     })
 
     it('should revert if beneficiary tries to lock up more than there is remaining in the contract', async () => {
       await releaseGoldInstance.createAccount({ from: beneficiary })
-      await assertRevert(
+      await assertTransactionRevertWithoutReason(
         releaseGoldInstance.lockGold(lockAmount.multipliedBy(1.1), {
           from: beneficiary,
         })
@@ -1429,7 +1507,10 @@ contract('ReleaseGold', (accounts: string[]) => {
 
     it('should revert if non-beneficiary tries to lock up any unlocked amount', async () => {
       await releaseGoldInstance.createAccount({ from: beneficiary })
-      await assertRevert(releaseGoldInstance.lockGold(lockAmount, { from: accounts[6] }))
+      await assertTransactionRevertWithReason(
+        releaseGoldInstance.lockGold(lockAmount, { from: accounts[6] }),
+        'Sender must be the beneficiary and state must not be revoked'
+      )
     })
   })
 
@@ -1481,7 +1562,10 @@ contract('ReleaseGold', (accounts: string[]) => {
         from: beneficiary,
       })
       // unlock the latter
-      await assertRevert(releaseGoldInstance.unlockGold(lockAmount, { from: accounts[5] }))
+      await assertTransactionRevertWithReason(
+        releaseGoldInstance.unlockGold(lockAmount, { from: accounts[5] }),
+        'Must be called by releaseOwner when revoked or beneficiary before revocation'
+      )
     })
 
     it('should revert if beneficiary in voting tries to unlock the locked amount', async () => {
@@ -1492,7 +1576,10 @@ contract('ReleaseGold', (accounts: string[]) => {
         from: beneficiary,
       })
       // unlock the latter
-      await assertRevert(releaseGoldInstance.unlockGold(lockAmount, { from: accounts[5] }))
+      await assertTransactionRevertWithReason(
+        releaseGoldInstance.unlockGold(lockAmount, { from: accounts[5] }),
+        'Must be called by releaseOwner when revoked or beneficiary before revocation'
+      )
     })
 
     it('should revert if beneficiary with balance requirements tries to unlock the locked amount', async () => {
@@ -1509,7 +1596,10 @@ contract('ReleaseGold', (accounts: string[]) => {
         balanceRequirement
       )
       // unlock the latter
-      await assertRevert(releaseGoldInstance.unlockGold(lockAmount, { from: beneficiary }))
+      await assertTransactionRevertWithReason(
+        releaseGoldInstance.unlockGold(lockAmount, { from: beneficiary }),
+        "Either account doesn't have enough locked Celo or locked Celo is being used for voting."
+      )
     })
   })
 
@@ -1544,20 +1634,29 @@ contract('ReleaseGold', (accounts: string[]) => {
 
       describe('when it is before the availablity time', () => {
         it('should revert', async () => {
-          await assertRevert(releaseGoldInstance.withdrawLockedGold(index, { from: beneficiary }))
+          await assertTransactionRevertWithReason(
+            releaseGoldInstance.withdrawLockedGold(index, { from: beneficiary }),
+            'Pending withdrawal not available'
+          )
         })
       })
 
       describe('when non-beneficiary attempts to withdraw the gold', () => {
         it('should revert', async () => {
-          await assertRevert(releaseGoldInstance.withdrawLockedGold(index, { from: accounts[4] }))
+          await assertTransactionRevertWithReason(
+            releaseGoldInstance.withdrawLockedGold(index, { from: accounts[4] }),
+            'Must be called by releaseOwner when revoked or beneficiary before revocation'
+          )
         })
       })
     })
 
     describe('when a pending withdrawal does not exist', () => {
       it('should revert', async () => {
-        await assertRevert(releaseGoldInstance.withdrawLockedGold(index, { from: beneficiary }))
+        await assertTransactionRevertWithReason(
+          releaseGoldInstance.withdrawLockedGold(index, { from: beneficiary }),
+          'Pending withdrawal not available'
+        )
       })
     })
   })
@@ -1653,14 +1752,20 @@ contract('ReleaseGold', (accounts: string[]) => {
       describe('when relocking value greater than the value of the pending withdrawal', () => {
         const value = pendingWithdrawalValue + 1
         it('should revert', async () => {
-          await assertRevert(releaseGoldInstance.relockGold(index, value, { from: beneficiary }))
+          await assertTransactionRevertWithReason(
+            releaseGoldInstance.relockGold(index, value, { from: beneficiary }),
+            'Requested value larger than pending value'
+          )
         })
       })
     })
 
     describe('when a pending withdrawal does not exist', () => {
       it('should revert', async () => {
-        await assertRevert(releaseGoldInstance.relockGold(index, pendingWithdrawalValue))
+        await assertTransactionRevertWithReason(
+          releaseGoldInstance.relockGold(index, pendingWithdrawalValue),
+          'Sender must be the beneficiary and state must not be revoked'
+        )
       })
     })
   })
@@ -1682,8 +1787,9 @@ contract('ReleaseGold', (accounts: string[]) => {
       await releaseGoldInstance.setMaxDistribution(1000, { from: releaseOwner })
       const timeToTravel = 0.5 * HOUR
       await timeTravel(timeToTravel, web3)
-      await assertRevert(
-        releaseGoldInstance.withdraw(initialreleaseGoldAmount.div(20), { from: beneficiary })
+      await assertTransactionRevertWithReason(
+        releaseGoldInstance.withdraw(initialreleaseGoldAmount.div(20), { from: beneficiary }),
+        'Requested amount is greater than available released funds'
       )
     })
 
@@ -1691,7 +1797,10 @@ contract('ReleaseGold', (accounts: string[]) => {
       await releaseGoldInstance.setMaxDistribution(1000, { from: releaseOwner })
       const timeToTravel = 3 * MONTH + 1 * DAY
       await timeTravel(timeToTravel, web3)
-      await assertRevert(releaseGoldInstance.withdraw(new BigNumber(0), { from: beneficiary }))
+      await assertTransactionRevertWithReason(
+        releaseGoldInstance.withdraw(new BigNumber(0), { from: beneficiary }),
+        'Requested withdrawal amount must be greater than zero'
+      )
     })
 
     describe('when not revoked', () => {
@@ -1706,8 +1815,9 @@ contract('ReleaseGold', (accounts: string[]) => {
           const expectedWithdrawalAmount = await releaseGoldInstance.getCurrentReleasedTotalAmount()
           const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
           assertEqualBN(expectedWithdrawalAmount, 0)
-          await assertRevert(
-            releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
+          await assertTransactionRevertWithReason(
+            releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary }),
+            'Requested withdrawal amount must be greater than zero'
           )
           assertEqualBN(
             new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
@@ -1822,8 +1932,9 @@ contract('ReleaseGold', (accounts: string[]) => {
 
             it('should not allow withdrawal of more than 50% gold', async () => {
               const unexpectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_GOLDTOKEN).div(2).plus(1)
-              await assertRevert(
-                releaseGoldInstance.withdraw(unexpectedWithdrawalAmount, { from: beneficiary })
+              await assertTransactionRevertWithReason(
+                releaseGoldInstance.withdraw(unexpectedWithdrawalAmount, { from: beneficiary }),
+                'Requested amount is greater than available released funds'
               )
             })
           })
@@ -1848,8 +1959,9 @@ contract('ReleaseGold', (accounts: string[]) => {
           const expectedWithdrawalAmount = TOTAL_AMOUNT.div(2)
           await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
           const unexpectedWithdrawalAmount = 1
-          await assertRevert(
-            releaseGoldInstance.withdraw(unexpectedWithdrawalAmount, { from: beneficiary })
+          await assertTransactionRevertWithReason(
+            releaseGoldInstance.withdraw(unexpectedWithdrawalAmount, { from: beneficiary }),
+            'Requested amount exceeds current alloted maximum distribution'
           )
         })
       })
@@ -1881,13 +1993,14 @@ contract('ReleaseGold', (accounts: string[]) => {
           await timeTravel(timeToTravel, web3)
           await releaseGoldInstance.revoke({ from: releaseOwner })
           const [, , expectedWithdrawalAmount] = await releaseGoldInstance.revocationInfo()
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             releaseGoldInstance.withdraw(
               new BigNumber(expectedWithdrawalAmount).multipliedBy(1.1),
               {
                 from: beneficiary,
               }
-            )
+            ),
+            'Requested amount is greater than available released funds'
           )
         })
 
@@ -1940,8 +2053,9 @@ contract('ReleaseGold', (accounts: string[]) => {
         })
 
         it('should revert on withdrawal of more than 50%', async () => {
-          await assertRevert(
-            releaseGoldInstance.withdraw(initialreleaseGoldAmount, { from: beneficiary })
+          await assertTransactionRevertWithReason(
+            releaseGoldInstance.withdraw(initialreleaseGoldAmount, { from: beneficiary }),
+            'Requested amount exceeds current alloted maximum distribution'
           )
         })
       })
@@ -1975,13 +2089,15 @@ contract('ReleaseGold', (accounts: string[]) => {
       })
 
       it('should revert on withdraw of any amount', async () => {
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           releaseGoldInstance.withdraw(initialreleaseGoldAmount.multipliedBy(0.5), {
             from: beneficiary,
-          })
+          }),
+          'Requested withdrawal before liquidity provision is met'
         )
-        await assertRevert(
-          releaseGoldInstance.withdraw(initialreleaseGoldAmount, { from: beneficiary })
+        await assertTransactionRevertWithReason(
+          releaseGoldInstance.withdraw(initialreleaseGoldAmount, { from: beneficiary }),
+          'Requested withdrawal before liquidity provision is met'
         )
       })
     })

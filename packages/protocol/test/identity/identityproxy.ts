@@ -1,4 +1,4 @@
-import { assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertTransactionRevertWithReason } from '@celo/protocol/lib/test-utils'
 import {
   IdentityProxyContract,
   IdentityProxyInstance,
@@ -9,7 +9,7 @@ import {
 const IdentityProxy: IdentityProxyContract = artifacts.require('IdentityProxy')
 const IdentityProxyTest: IdentityProxyTestContract = artifacts.require('IdentityProxyTest')
 
-contract('IdentityProxyHub', (accounts: string[]) => {
+contract('IdentityProxy', (accounts: string[]) => {
   let identityProxy: IdentityProxyInstance
   let identityProxyTest: IdentityProxyTestInstance
 
@@ -38,8 +38,9 @@ contract('IdentityProxyHub', (accounts: string[]) => {
     it('cannot be called by anyone other than the original deployer', async () => {
       // @ts-ignore
       const txData = identityProxyTest.contract.methods.callMe().encodeABI()
-      await assertRevert(
-        identityProxy.makeCall(identityProxyTest.address, txData, { from: accounts[1] })
+      await assertTransactionRevertWithReason(
+        identityProxy.makeCall(identityProxyTest.address, txData, { from: accounts[1] }),
+        'Only callable by original deployer'
       )
     })
   })

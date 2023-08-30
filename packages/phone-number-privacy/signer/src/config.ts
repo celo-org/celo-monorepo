@@ -1,6 +1,10 @@
 import {
   BlockchainConfig,
+  DB_POOL_MAX_SIZE,
+  DB_TIMEOUT,
   FULL_NODE_TIMEOUT_IN_MS,
+  RETRY_COUNT,
+  RETRY_DELAY_IN_MS,
   toBool,
 } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
@@ -49,15 +53,7 @@ export interface SignerConfig {
     }
     phoneNumberPrivacy: {
       enabled: boolean
-      shouldFailOpen: boolean
     }
-    legacyPhoneNumberPrivacy: {
-      enabled: boolean
-      shouldFailOpen: boolean
-    }
-  }
-  attestations: {
-    numberAttestationsRequired: number
   }
   blockchain: BlockchainConfig
   db: {
@@ -69,6 +65,7 @@ export interface SignerConfig {
     port?: number
     ssl: boolean
     poolMaxSize: number
+    timeout: number
   }
   keystore: {
     type: SupportedKeystore
@@ -99,6 +96,15 @@ export interface SignerConfig {
   timeout: number
   test_quota_bypass_percentage: number
   fullNodeTimeoutMs: number
+  fullNodeRetryCount: number
+  fullNodeRetryDelayMs: number
+  shouldMockAccountService: boolean
+  mockDek: string
+  mockTotalQuota: number
+  shouldMockRequestService: boolean
+  requestPrunningDays: number
+  requestPrunningAtServerStart: boolean
+  requestPrunningJobCronPattern: string
 }
 
 const env = process.env as any
@@ -128,15 +134,7 @@ export const config: SignerConfig = {
     },
     phoneNumberPrivacy: {
       enabled: toBool(env.PHONE_NUMBER_PRIVACY_API_ENABLED, false),
-      shouldFailOpen: toBool(env.FULL_NODE_ERRORS_SHOULD_FAIL_OPEN, false),
     },
-    legacyPhoneNumberPrivacy: {
-      enabled: toBool(env.LEGACY_PHONE_NUMBER_PRIVACY_API_ENABLED, false),
-      shouldFailOpen: toBool(env.LEGACY_FULL_NODE_ERRORS_SHOULD_FAIL_OPEN, false),
-    },
-  },
-  attestations: {
-    numberAttestationsRequired: Number(env.ATTESTATIONS_NUMBER_ATTESTATIONS_REQUIRED ?? 3),
   },
   blockchain: {
     provider: env.BLOCKCHAIN_PROVIDER,
@@ -150,7 +148,8 @@ export const config: SignerConfig = {
     host: env.DB_HOST,
     port: env.DB_PORT ? Number(env.DB_PORT) : undefined,
     ssl: toBool(env.DB_USE_SSL, true),
-    poolMaxSize: env.DB_POOL_MAX_SIZE ?? 50,
+    poolMaxSize: Number(env.DB_POOL_MAX_SIZE ?? DB_POOL_MAX_SIZE),
+    timeout: Number(env.DB_TIMEOUT ?? DB_TIMEOUT),
   },
   keystore: {
     type: env.KEYSTORE_TYPE,
@@ -181,4 +180,13 @@ export const config: SignerConfig = {
   timeout: Number(env.ODIS_SIGNER_TIMEOUT ?? 5000),
   test_quota_bypass_percentage: Number(env.TEST_QUOTA_BYPASS_PERCENTAGE ?? 0),
   fullNodeTimeoutMs: Number(env.TIMEOUT_MS ?? FULL_NODE_TIMEOUT_IN_MS),
+  fullNodeRetryCount: Number(env.RETRY_COUNT ?? RETRY_COUNT),
+  fullNodeRetryDelayMs: Number(env.RETRY_DELAY_IN_MS ?? RETRY_DELAY_IN_MS),
+  shouldMockAccountService: toBool(env.SHOULD_MOCK_ACCOUNT_SERVICE, false),
+  mockDek: env.MOCK_DEK,
+  mockTotalQuota: Number(env.MOCK_TOTAL_QUOTA ?? 10),
+  shouldMockRequestService: toBool(env.SHOULD_MOCK_REQUEST_SERVICE, false),
+  requestPrunningDays: Number(env.REQUEST_PRUNNING_DAYS ?? 7),
+  requestPrunningAtServerStart: toBool(env.REQUEST_PRUNNING_AT_SERVER_START, false),
+  requestPrunningJobCronPattern: env.REQUEST_PRUNNING_JOB_CRON_PATTERN ?? '0 0 3 * * *',
 }

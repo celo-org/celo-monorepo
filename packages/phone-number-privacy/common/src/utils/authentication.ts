@@ -1,9 +1,9 @@
 import { hexToBuffer, retryAsyncWithBackOffAndTimeout } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
-import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
+
 import Logger from 'bunyan'
 import crypto from 'crypto'
 import { Request } from 'express'
@@ -16,17 +16,35 @@ import {
 } from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
 
+export type DataEncryptionKeyFetcher = (address: string) => Promise<string>
+
+export function newContractKitFetcher(
+  contractKit: ContractKit,
+  logger: Logger,
+  fullNodeTimeoutMs: number = FULL_NODE_TIMEOUT_IN_MS,
+  fullNodeRetryCount: number = RETRY_COUNT,
+  fullNodeRetryDelayMs: number = RETRY_DELAY_IN_MS
+): DataEncryptionKeyFetcher {
+  return (address: string) =>
+    getDataEncryptionKey(
+      address,
+      contractKit,
+      logger,
+      fullNodeTimeoutMs,
+      fullNodeRetryCount,
+      fullNodeRetryDelayMs
+    )
+}
+
 /*
  * Confirms that user is who they say they are and throws error on failure to confirm.
  * Authorization header should contain the EC signed body
  */
 export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   request: Request<{}, {}, R>,
-  contractKit: ContractKit,
   logger: Logger,
-  shouldFailOpen: boolean = false,
-  warnings: ErrorType[] = [],
-  timeoutMs: number = FULL_NODE_TIMEOUT_IN_MS
+  fetchDEK: DataEncryptionKeyFetcher,
+  warnings: ErrorType[] = []
 ): Promise<boolean> {
   logger.debug('Authenticating user')
 
@@ -43,18 +61,16 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   if (authMethod && authMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     let registeredEncryptionKey
     try {
-      registeredEncryptionKey = await getDataEncryptionKey(signer, contractKit, logger, timeoutMs)
+      registeredEncryptionKey = await fetchDEK(signer)
     } catch (err) {
       // getDataEncryptionKey should only throw if there is a full-node connection issue.
       // That is, it does not throw if the DEK is undefined or invalid
-      const failureStatus = shouldFailOpen ? ErrorMessage.FAILING_OPEN : ErrorMessage.FAILING_CLOSED
       logger.error({
         err,
         warning: ErrorMessage.FAILURE_TO_GET_DEK,
-        failureStatus,
       })
-      warnings.push(ErrorMessage.FAILURE_TO_GET_DEK, failureStatus)
-      return shouldFailOpen
+      warnings.push(ErrorMessage.FAILURE_TO_GET_DEK)
+      return false
     }
     if (!registeredEncryptionKey) {
       logger.warn({ account: signer }, 'Account does not have registered encryption key')
@@ -129,7 +145,9 @@ export async function getDataEncryptionKey(
   address: string,
   contractKit: ContractKit,
   logger: Logger,
-  timeoutMs: number
+  fullNodeTimeoutMs: number,
+  fullNodeRetryCount: number,
+  fullNodeRetryDelayMs: number
 ): Promise<string> {
   try {
     const res = await retryAsyncWithBackOffAndTimeout(
@@ -137,57 +155,16 @@ export async function getDataEncryptionKey(
         const accountWrapper: AccountsWrapper = await contractKit.contracts.getAccounts()
         return accountWrapper.getDataEncryptionKey(address)
       },
-      RETRY_COUNT,
+      fullNodeRetryCount,
       [],
-      RETRY_DELAY_IN_MS,
+      fullNodeRetryDelayMs,
       1.5,
-      timeoutMs
+      fullNodeTimeoutMs
     )
     return res
   } catch (error) {
     logger.error('Failed to retrieve DEK: ' + error)
     logger.error(ErrorMessage.FULL_NODE_ERROR)
     throw error
-  }
-}
-
-export async function isVerified(
-  account: string,
-  hashedPhoneNumber: string,
-  contractKit: ContractKit,
-  logger: Logger
-): Promise<boolean> {
-  try {
-    const res = await retryAsyncWithBackOffAndTimeout(
-      async () => {
-        const attestationsWrapper: AttestationsWrapper = await contractKit.contracts.getAttestations()
-        const {
-          isVerified: _isVerified,
-          completed,
-          numAttestationsRemaining,
-          total,
-        } = await attestationsWrapper.getVerifiedStatus(hashedPhoneNumber, account)
-
-        logger.debug({
-          account,
-          isVerified: _isVerified,
-          completedAttestations: completed,
-          remainingAttestations: numAttestationsRemaining,
-          totalAttestationsRequested: total,
-        })
-        return _isVerified
-      },
-      RETRY_COUNT,
-      [],
-      RETRY_DELAY_IN_MS,
-      1.5,
-      FULL_NODE_TIMEOUT_IN_MS
-    )
-    return res
-  } catch (error) {
-    logger.error('Failed to get verification status: ' + error)
-    logger.error(ErrorMessage.FULL_NODE_ERROR)
-    logger.warn('Assuming user is verified')
-    return true
   }
 }

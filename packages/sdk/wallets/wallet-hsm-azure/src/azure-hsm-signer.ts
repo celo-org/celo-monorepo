@@ -2,7 +2,7 @@ import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import { RLPEncodedTx, Signer } from '@celo/connect'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { getHashFromEncoded } from '@celo/wallet-base'
-import * as ethUtil from 'ethereumjs-util'
+import * as ethUtil from '@ethereumjs/util'
 import { AzureKeyVaultClient } from './azure-key-vault-client'
 
 /**

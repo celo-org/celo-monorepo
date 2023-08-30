@@ -1,4 +1,4 @@
-import { assertRevert, assertRevertWithReason } from '@celo/protocol/lib/test-utils'
+import { assertTransactionRevertWithReason } from '@celo/protocol/lib/test-utils'
 import { LinkedListTestContract, LinkedListTestInstance } from 'types'
 
 const LinkedListTest: LinkedListTestContract = artifacts.require('LinkedListTest')
@@ -20,11 +20,17 @@ contract('LinkedListTest', () => {
 
     describe('when inserting to empty list', () => {
       it('should revert if previous is equal to key', async () => {
-        await assertRevert(linkedListTest.insert(addedKey, addedKey, NULL_KEY))
+        await assertTransactionRevertWithReason(
+          linkedListTest.insert(addedKey, addedKey, NULL_KEY),
+          'Key cannot be the same as previousKey or nextKey'
+        )
       })
 
       it('should revert if next is equal to key', async () => {
-        await assertRevert(linkedListTest.insert(addedKey, NULL_KEY, addedKey))
+        await assertTransactionRevertWithReason(
+          linkedListTest.insert(addedKey, NULL_KEY, addedKey),
+          'Key cannot be the same as previousKey or nextKey'
+        )
       })
     })
 
@@ -34,11 +40,17 @@ contract('LinkedListTest', () => {
       })
 
       it('should revert if next is equal to key', async () => {
-        await assertRevert(linkedListTest.insert(addedKey, firstKey, addedKey))
+        await assertTransactionRevertWithReason(
+          linkedListTest.insert(addedKey, firstKey, addedKey),
+          'Key cannot be the same as previousKey or nextKey'
+        )
       })
 
       it('should revert if previous is equal to key', async () => {
-        await assertRevert(linkedListTest.insert(addedKey, addedKey, firstKey))
+        await assertTransactionRevertWithReason(
+          linkedListTest.insert(addedKey, addedKey, firstKey),
+          'Key cannot be the same as previousKey or nextKey'
+        )
       })
     })
 
@@ -51,31 +63,52 @@ contract('LinkedListTest', () => {
       })
 
       it('should revert if next is equal to key (beginning)', async () => {
-        await assertRevert(linkedListTest.insert(addedKey, firstKey, addedKey))
+        await assertTransactionRevertWithReason(
+          linkedListTest.insert(addedKey, firstKey, addedKey),
+          'Key cannot be the same as previousKey or nextKey'
+        )
       })
 
       it('should revert if previous is equal to key (beginning)', async () => {
-        await assertRevert(linkedListTest.insert(addedKey, addedKey, firstKey))
+        await assertTransactionRevertWithReason(
+          linkedListTest.insert(addedKey, addedKey, firstKey),
+          'Key cannot be the same as previousKey or nextKey'
+        )
       })
 
       it('should revert if next is equal to key (end)', async () => {
-        await assertRevert(linkedListTest.insert(addedKey, lastKey, addedKey))
+        await assertTransactionRevertWithReason(
+          linkedListTest.insert(addedKey, lastKey, addedKey),
+          'Key cannot be the same as previousKey or nextKey'
+        )
       })
 
       it('should revert if previous is equal to key (end)', async () => {
-        await assertRevert(linkedListTest.insert(addedKey, addedKey, lastKey))
+        await assertTransactionRevertWithReason(
+          linkedListTest.insert(addedKey, addedKey, lastKey),
+          'Key cannot be the same as previousKey or nextKey'
+        )
       })
 
       it('should revert if next is equal to key (middle)', async () => {
-        await assertRevert(linkedListTest.insert(addedKey, middleKey, addedKey))
+        await assertTransactionRevertWithReason(
+          linkedListTest.insert(addedKey, middleKey, addedKey),
+          'Key cannot be the same as previousKey or nextKey'
+        )
       })
 
       it('should revert if previous is equal to key (middle)', async () => {
-        await assertRevert(linkedListTest.insert(addedKey, addedKey, middleKey))
+        await assertTransactionRevertWithReason(
+          linkedListTest.insert(addedKey, addedKey, middleKey),
+          'Key cannot be the same as previousKey or nextKey'
+        )
       })
 
       it('should revert if next and previous equal to key', async () => {
-        await assertRevert(linkedListTest.insert(addedKey, addedKey, addedKey))
+        await assertTransactionRevertWithReason(
+          linkedListTest.insert(addedKey, addedKey, addedKey),
+          'Key cannot be the same as previousKey or nextKey'
+        )
       })
     })
   })
@@ -89,7 +122,7 @@ contract('LinkedListTest', () => {
 
     describe('removing from an empty list', () => {
       it('should revert', async () => {
-        await assertRevertWithReason(linkedListTest.remove(firstKey), 'key not in list')
+        await assertTransactionRevertWithReason(linkedListTest.remove(firstKey), 'key not in list')
       })
     })
 
@@ -121,7 +154,7 @@ contract('LinkedListTest', () => {
 
       it('should revert when attempting to remove a removed element', async () => {
         await linkedListTest.remove(firstKey)
-        await assertRevertWithReason(linkedListTest.remove(firstKey), 'key not in list')
+        await assertTransactionRevertWithReason(linkedListTest.remove(firstKey), 'key not in list')
       })
     })
   })

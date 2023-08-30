@@ -1,7 +1,7 @@
 import { BLS } from '@celo/bls12377js'
 // this is an implementation of a subset of BLS12-377
 import { isValidAddress } from '@celo/utils/lib/address'
-import { keccak256 } from 'ethereumjs-util'
+import { keccak256 } from 'ethereum-cryptography/keccak'
 const BigInteger = require('bigi')
 const reverse = require('buffer-reverse')
 
@@ -15,7 +15,7 @@ export const blsPrivateKeyToProcessedPrivateKey = (privateKeyHex: string) => {
   for (let i = 0; i < 256; i++) {
     const originalPrivateKeyBytes = Buffer.from(privateKeyHex, 'hex')
 
-    const iBuffer = new Buffer(1)
+    const iBuffer = Buffer.alloc(1)
     iBuffer[0] = i
     const keyBytes = Buffer.concat([
       Buffer.from('ecdsatobls', 'utf8'),

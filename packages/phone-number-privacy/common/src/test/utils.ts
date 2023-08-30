@@ -1,11 +1,8 @@
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { serializeSignature, Signature, signMessage } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
-import Web3 from 'web3'
 import {
   AuthenticationMethod,
-  LegacyPnpQuotaRequest,
-  LegacySignMessageRequest,
   PhoneNumberPrivacyRequest,
   PnpQuotaRequest,
   SignMessageRequest,
@@ -64,12 +61,11 @@ export function createMockContractKit(
     registry: {
       addressFor: async () => 1000,
     },
-    connection: createMockConnection(mockWeb3),
+    connection: mockWeb3 ?? createMockConnection(mockWeb3),
   }
 }
 
-export function createMockConnection(mockWeb3?: any) {
-  mockWeb3 = mockWeb3 ?? new Web3()
+export function createMockConnection(mockWeb3: any) {
   return {
     web3: mockWeb3,
     getTransactionCount: jest.fn(() => mockWeb3.eth.getTransactionCount()),
@@ -80,7 +76,6 @@ export function createMockConnection(mockWeb3?: any) {
 }
 
 export enum ContractRetrieval {
-  getAttestations = 'getAttestations',
   getStableToken = 'getStableToken',
   getGoldToken = 'getGoldToken',
   getAccounts = 'getAccounts',
@@ -126,33 +121,6 @@ export function getPnpQuotaRequest(
   return {
     account,
     authenticationMethod,
-    sessionID: genSessionID(),
-  }
-}
-export function getLegacyPnpQuotaRequest(
-  account: string,
-  authenticationMethod?: string,
-  hashedPhoneNumber?: string
-): LegacyPnpQuotaRequest {
-  return {
-    account,
-    authenticationMethod,
-    hashedPhoneNumber,
-    sessionID: genSessionID(),
-  }
-}
-
-export function getLegacyPnpSignRequest(
-  account: string,
-  blindedQueryPhoneNumber: string,
-  authenticationMethod?: string,
-  hashedPhoneNumber?: string
-): LegacySignMessageRequest {
-  return {
-    account,
-    blindedQueryPhoneNumber,
-    authenticationMethod,
-    hashedPhoneNumber,
     sessionID: genSessionID(),
   }
 }

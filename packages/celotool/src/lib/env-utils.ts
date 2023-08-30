@@ -111,10 +111,10 @@ export enum envVar {
   ODIS_SIGNER_BLOCKCHAIN_PROVIDER = 'ODIS_SIGNER_BLOCKCHAIN_PROVIDER',
   ODIS_SIGNER_DOMAINS_API_ENABLED = 'ODIS_SIGNER_DOMAINS_API_ENABLED',
   ODIS_SIGNER_PNP_API_ENABLED = 'ODIS_SIGNER_PNP_API_ENABLED',
-  ODIS_SIGNER_LEGACY_PNP_API_ENABLED = 'ODIS_SIGNER_LEGACY_PNP_API_ENABLED',
   ORACLE_DOCKER_IMAGE_REPOSITORY = 'ORACLE_DOCKER_IMAGE_REPOSITORY',
   ORACLE_DOCKER_IMAGE_TAG = 'ORACLE_DOCKER_IMAGE_TAG',
   ORACLE_UNUSED_ORACLE_ADDRESSES = 'ORACLE_UNUSED_ORACLE_ADDRESSES',
+  ORACLE_FX_ADAPTERS_API_KEYS = 'ORACLE_FX_ADAPTERS_API_KEYS',
   PRIVATE_NODE_DISK_SIZE_GB = 'PRIVATE_NODE_DISK_SIZE_GB',
   PRIVATE_TX_NODES = 'PRIVATE_TX_NODES',
   PROMETHEUS_DISABLE_STACKDRIVER_SIDECAR = 'PROMETHEUS_DISABLE_STACKDRIVER_SIDECAR',
@@ -143,7 +143,6 @@ export enum envVar {
   VALIDATOR_ZERO_GENESIS_BALANCE = 'VALIDATOR_ZERO_GENESIS_BALANCE',
   VALIDATORS = 'VALIDATORS',
   VALIDATORS_ROLLING_UPDATE_PARTITION = 'VALIDATORS_ROLLING_UPDATE_PARTITION',
-  VM_BASED = 'VM_BASED',
   VOTING_BOT_BALANCE = 'VOTING_BOT_BALANCE',
   VOTING_BOT_CHANGE_BASELINE = 'VOTING_BOT_CHANGE_BASELINE',
   VOTING_BOT_CRON_SCHEDULE = 'VOTING_BOT_CRON_SCHEDULE',
@@ -208,7 +207,6 @@ export enum DynamicEnvVar {
   ODIS_SIGNER_AZURE_KEYVAULT_DOMAINS_KEY_LATEST_VERSION = '{{ context }}_ODIS_SIGNER_AZURE_KEYVAULT_DOMAINS_KEY_LATEST_VERSION',
   ODIS_SIGNER_DOMAINS_API_ENABLED = '{{ context }}_ODIS_SIGNER_DOMAINS_API_ENABLED',
   ODIS_SIGNER_PHONE_NUMBER_PRIVACY_API_ENABLED = '{{ context }}_ODIS_SIGNER_PNP_API_ENABLED',
-  ODIS_SIGNER_LEGACY_PHONE_NUMBER_PRIVACY_API_ENABLED = '{{ context }}_ODIS_SIGNER_LEGACY_PNP_API_ENABLED',
   ODIS_SIGNER_DB_HOST = '{{ context }}_ODIS_SIGNER_DB_HOST',
   ODIS_SIGNER_DB_PORT = '{{ context }}_ODIS_SIGNER_DB_PORT',
   ODIS_SIGNER_DB_USERNAME = '{{ context }}_ODIS_SIGNER_DB_USERNAME',
@@ -227,7 +225,7 @@ export enum DynamicEnvVar {
   PROM_REMOTE_WRITE_URL = '{{ context }}_PROM_REMOTE_WRITE_URL',
 }
 
-export enum EnvTypes {
+export enum envTypes {
   DEVELOPMENT = 'development',
   INTEGRATION = 'integration',
   STAGING = 'staging',
@@ -291,7 +289,7 @@ export function validateAndSwitchToEnv(celoEnv: string) {
 }
 
 export function isProduction() {
-  return fetchEnv(envVar.ENV_TYPE).toLowerCase() === EnvTypes.PRODUCTION
+  return fetchEnv(envVar.ENV_TYPE).toLowerCase() === envTypes.PRODUCTION
 }
 
 export function isValidCeloEnv(celoEnv: string) {
@@ -374,22 +372,4 @@ export function addCeloEnvMiddleware(argv: yargs.Argv) {
       // @ts-ignore Since we pass it right above, we know that celoEnv will be there at runtime
       .middleware([celoEnvMiddleware])
   )
-}
-
-export function isVmBased() {
-  return fetchEnv(envVar.VM_BASED) === 'true'
-}
-
-export function failIfNotVmBased() {
-  if (!isVmBased()) {
-    console.error('The celo env is not intended for a VM-based testnet, aborting')
-    process.exit(1)
-  }
-}
-
-export function failIfVmBased() {
-  if (isVmBased()) {
-    console.error('The celo env is intended for a VM-based testnet, aborting')
-    process.exit(1)
-  }
 }

@@ -26,7 +26,7 @@ testWithGanache('account metadata cmds', (web3: Web3) => {
   describe('Modifying the metadata file', () => {
     const emptyFilePath = `${tmpdir()}/metadata.json`
     const generateEmptyMetadataFile = () => {
-      writeFileSync(emptyFilePath, IdentityMetadataWrapper.fromEmpty(account))
+      writeFileSync(emptyFilePath, IdentityMetadataWrapper.fromEmpty(account).toString())
     }
 
     const readFile = async () => {

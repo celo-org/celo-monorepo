@@ -2,6 +2,7 @@ import { newKit } from '@celo/contractkit'
 import {
   AuthenticationMethod,
   CombinerEndpoint,
+  DB_TIMEOUT,
   ErrorMessage,
   FULL_NODE_TIMEOUT_IN_MS,
   genSessionID,
@@ -9,6 +10,8 @@ import {
   PnpQuotaRequest,
   PnpQuotaResponseFailure,
   PnpQuotaResponseSuccess,
+  RETRY_COUNT,
+  RETRY_DELAY_IN_MS,
   SignerEndpoint,
   SignMessageRequest,
   SignMessageResponseFailure,
@@ -16,34 +19,33 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import {
-  initDatabase as initSignerDatabase,
-  startSigner,
-  SupportedDatabase,
-  SupportedKeystore,
-} from '@celo/phone-number-privacy-signer'
+import { initDatabase as initSignerDatabase } from '@celo/phone-number-privacy-signer/dist/common/database/database'
 import {
   DefaultKeyName,
   KeyProvider,
 } from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
 import { MockKeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/mock-key-provider'
-import { SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
+import {
+  SignerConfig,
+  SupportedDatabase,
+  SupportedKeystore,
+} from '@celo/phone-number-privacy-signer/dist/config'
+import { startSigner } from '@celo/phone-number-privacy-signer/dist/server'
 import BigNumber from 'bignumber.js'
 import threshold_bls from 'blind-threshold-bls'
+import { Server } from 'http'
 import { Server as HttpsServer } from 'https'
 import { Knex } from 'knex'
-import { Server } from 'net'
 import request from 'supertest'
 import config, { getCombinerVersion } from '../../src/config'
 import { startCombiner } from '../../src/server'
-import { getBlindedPhoneNumber } from '../utils'
+import { getBlindedPhoneNumber, serverClose } from '../utils'
 
 const {
   ContractRetrieval,
   createMockContractKit,
   createMockAccounts,
   createMockOdisPayments,
-  createMockWeb3,
   getPnpRequestAuthorization,
 } = TestUtils.Utils
 const {
@@ -64,6 +66,8 @@ const {
   ACCOUNT_ADDRESS2,
   BLINDING_FACTOR,
 } = TestUtils.Values
+
+jest.setTimeout(20000)
 
 // create deep copy of config
 const combinerConfig: typeof config = JSON.parse(JSON.stringify(config))
@@ -95,15 +99,7 @@ const signerConfig: SignerConfig = {
     },
     phoneNumberPrivacy: {
       enabled: true,
-      shouldFailOpen: true,
     },
-    legacyPhoneNumberPrivacy: {
-      enabled: false,
-      shouldFailOpen: true,
-    },
-  },
-  attestations: {
-    numberAttestationsRequired: 3,
   },
   blockchain: {
     provider: 'https://alfajores-forno.celo-testnet.org',
@@ -118,6 +114,7 @@ const signerConfig: SignerConfig = {
     port: undefined,
     ssl: true,
     poolMaxSize: 50,
+    timeout: DB_TIMEOUT,
   },
   keystore: {
     type: SupportedKeystore.MOCK_SECRET_MANAGER,
@@ -148,24 +145,29 @@ const signerConfig: SignerConfig = {
   timeout: 5000,
   test_quota_bypass_percentage: 0,
   fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
+  fullNodeRetryCount: RETRY_COUNT,
+  fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
+  // TODO (alec) make SignerConfig better
+  shouldMockAccountService: false,
+  mockDek: '',
+  mockTotalQuota: 0,
+  shouldMockRequestService: false,
+  requestPrunningDays: 0,
+  requestPrunningAtServerStart: false,
+  requestPrunningJobCronPattern: '0 0 0 * * *',
 }
-
-const testBlockNumber = 1000000
 
 const mockOdisPaymentsTotalPaidCUSD = jest.fn<BigNumber, []>()
 const mockGetWalletAddress = jest.fn<string, []>()
 const mockGetDataEncryptionKey = jest.fn<string, []>()
 
-const mockContractKit = createMockContractKit(
-  {
-    [ContractRetrieval.getAccounts]: createMockAccounts(
-      mockGetWalletAddress,
-      mockGetDataEncryptionKey
-    ),
-    [ContractRetrieval.getOdisPayments]: createMockOdisPayments(mockOdisPaymentsTotalPaidCUSD),
-  },
-  createMockWeb3(5, testBlockNumber)
-)
+const mockContractKit = createMockContractKit({
+  [ContractRetrieval.getAccounts]: createMockAccounts(
+    mockGetWalletAddress,
+    mockGetDataEncryptionKey
+  ),
+  [ContractRetrieval.getOdisPayments]: createMockOdisPayments(mockOdisPaymentsTotalPaidCUSD),
+})
 
 // Mock newKit as opposed to the CK constructor
 // Returns an object of type ContractKit that can be passed into the signers + combiner
@@ -314,9 +316,9 @@ describe('pnpService', () => {
       await signerDB1?.destroy()
       await signerDB2?.destroy()
       await signerDB3?.destroy()
-      signer1?.close()
-      signer2?.close()
-      signer3?.close()
+      await serverClose(signer1)
+      await serverClose(signer2)
+      await serverClose(signer3)
     })
 
     describe('when signers are operating correctly', () => {
@@ -378,7 +380,7 @@ describe('pnpService', () => {
               version: expectedVersion,
               performedQueryCount: expectedQueryCount,
               totalQuota,
-              blockNumber: testBlockNumber,
+
               warnings: expectedWarnings,
             })
           })
@@ -396,7 +398,7 @@ describe('pnpService', () => {
             version: expectedVersion,
             performedQueryCount: 0,
             totalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
         })
@@ -413,7 +415,7 @@ describe('pnpService', () => {
             version: expectedVersion,
             performedQueryCount: 0,
             totalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
           const res2 = await getCombinerQuotaResponse(req, authorization)
@@ -435,7 +437,7 @@ describe('pnpService', () => {
             version: expectedVersion,
             performedQueryCount: 0,
             totalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
         })
@@ -454,7 +456,7 @@ describe('pnpService', () => {
             version: expectedVersion,
             performedQueryCount: 0,
             totalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
         })
@@ -474,7 +476,7 @@ describe('pnpService', () => {
             version: expectedVersion,
             performedQueryCount: 0,
             totalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [
               WarningMessage.SIGNER_RESPONSE_DISCREPANCIES,
               WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS +
@@ -563,8 +565,8 @@ describe('pnpService', () => {
         it('Should respond with 500 when insufficient signer responses', async () => {
           await signerDB1?.destroy()
           await signerDB2?.destroy()
-          signer1?.close()
-          signer2?.close()
+          await serverClose(signer1)
+          await serverClose(signer2)
 
           const req = {
             account: ACCOUNT_ADDRESS1,
@@ -601,40 +603,6 @@ describe('pnpService', () => {
             error: WarningMessage.API_UNAVAILABLE,
           })
         })
-
-        describe('functionality in case of errors', () => {
-          it('Should respond with 200 on failure to fetch DEK when shouldFailOpen is true', async () => {
-            mockGetDataEncryptionKey.mockReset().mockImplementation(() => {
-              throw new Error()
-            })
-
-            const req = {
-              account: ACCOUNT_ADDRESS1,
-              authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
-            }
-
-            // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
-            const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
-            const authorization = getPnpRequestAuthorization(req, differentPk)
-
-            const combinerConfigWithFailOpenEnabled: typeof combinerConfig = JSON.parse(
-              JSON.stringify(combinerConfig)
-            )
-            combinerConfigWithFailOpenEnabled.phoneNumberPrivacy.shouldFailOpen = true
-            const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled, mockKit)
-            const res = await getCombinerQuotaResponse(req, authorization, appWithFailOpenEnabled)
-
-            expect(res.status).toBe(200)
-            expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
-              success: true,
-              version: expectedVersion,
-              performedQueryCount: 0,
-              totalQuota,
-              blockNumber: testBlockNumber,
-              warnings: [],
-            })
-          })
-        })
       })
 
       describe(`${CombinerEndpoint.PNP_SIGN}`, () => {
@@ -656,7 +624,7 @@ describe('pnpService', () => {
             signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
           const unblindedSig = threshold_bls.unblind(
@@ -679,7 +647,7 @@ describe('pnpService', () => {
               signature: expectedSignatures[i - 1],
               performedQueryCount: 1,
               totalQuota: expectedTotalQuota,
-              blockNumber: testBlockNumber,
+
               warnings: [],
             })
 
@@ -703,7 +671,7 @@ describe('pnpService', () => {
             signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           }
 
@@ -725,7 +693,7 @@ describe('pnpService', () => {
             signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           }
 
@@ -760,7 +728,7 @@ describe('pnpService', () => {
             signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
         })
@@ -777,7 +745,7 @@ describe('pnpService', () => {
             signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
         })
@@ -794,7 +762,7 @@ describe('pnpService', () => {
             signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
         })
@@ -810,7 +778,7 @@ describe('pnpService', () => {
             signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
-            blockNumber: testBlockNumber,
+
             warnings: [],
           })
 
@@ -924,41 +892,7 @@ describe('pnpService', () => {
         })
 
         describe('functionality in case of errors', () => {
-          it('Should return 200 on failure to fetch DEK when shouldFailOpen is true', async () => {
-            mockGetDataEncryptionKey.mockImplementation(() => {
-              throw new Error()
-            })
-
-            req.authenticationMethod = AuthenticationMethod.ENCRYPTION_KEY
-            // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
-            const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
-            const authorization = getPnpRequestAuthorization(req, differentPk)
-
-            const combinerConfigWithFailOpenEnabled: typeof combinerConfig = JSON.parse(
-              JSON.stringify(combinerConfig)
-            )
-            combinerConfigWithFailOpenEnabled.phoneNumberPrivacy.shouldFailOpen = true
-            const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled, mockKit)
-            const res = await sendPnpSignRequest(req, authorization, appWithFailOpenEnabled)
-
-            expect(res.status).toBe(200)
-            expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
-              success: true,
-              version: expectedVersion,
-              signature: expectedSignature,
-              performedQueryCount: 1,
-              totalQuota: expectedTotalQuota,
-              blockNumber: testBlockNumber,
-              warnings: [],
-            })
-            const unblindedSig = threshold_bls.unblind(
-              Buffer.from(res.body.signature, 'base64'),
-              blindedMsgResult.blindingFactor
-            )
-            expect(Buffer.from(unblindedSig).toString('base64')).toEqual(expectedUnblindedSig)
-          })
-
-          it('Should return 401 on failure to fetch DEK when shouldFailOpen is false', async () => {
+          it('Should return 401 on failure to fetch DEK', async () => {
             mockGetDataEncryptionKey.mockImplementation(() => {
               throw new Error()
             })
@@ -969,7 +903,6 @@ describe('pnpService', () => {
             const combinerConfigWithFailOpenDisabled: typeof combinerConfig = JSON.parse(
               JSON.stringify(combinerConfig)
             )
-            combinerConfigWithFailOpenDisabled.phoneNumberPrivacy.shouldFailOpen = false
             const appWithFailOpenDisabled = startCombiner(
               combinerConfigWithFailOpenDisabled,
               mockKit
@@ -1019,7 +952,7 @@ describe('pnpService', () => {
               signature: expectedSignature,
               performedQueryCount: 1,
               totalQuota: expectedTotalQuota,
-              blockNumber: testBlockNumber,
+
               warnings: [],
             })
             const unblindedSig = threshold_bls.unblind(
@@ -1136,7 +1069,7 @@ describe('pnpService', () => {
               version: expectedVersion,
               performedQueryCount: 0,
               totalQuota: expectedTotalQuota,
-              blockNumber: testBlockNumber,
+
               warnings: [],
             })
           })
@@ -1154,7 +1087,7 @@ describe('pnpService', () => {
               signature: expectedSignature,
               performedQueryCount: 1,
               totalQuota: expectedTotalQuota,
-              blockNumber: testBlockNumber,
+
               warnings: [],
             })
           })
@@ -1330,11 +1263,11 @@ describe('pnpService', () => {
       await signerDB3?.destroy()
       await signerDB4?.destroy()
       await signerDB5?.destroy()
-      signer1?.close()
-      signer2?.close()
-      signer3?.close()
-      signer4?.close()
-      signer5?.close()
+      await serverClose(signer1)
+      await serverClose(signer2)
+      await serverClose(signer3)
+      await serverClose(signer4)
+      await serverClose(signer5)
     })
 
     it('Should respond with 200 on valid request', async () => {
@@ -1350,7 +1283,7 @@ describe('pnpService', () => {
         signature: res.body.signature,
         performedQueryCount: 1,
         totalQuota: expectedTotalQuota,
-        blockNumber: testBlockNumber,
+
         warnings: [],
       })
       threshold_bls.unblind(

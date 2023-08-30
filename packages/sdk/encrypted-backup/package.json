@@ -27,7 +27,7 @@
   "dependencies": {
     "@celo/base": "4.1.1-dev",
     "@celo/identity": "4.1.1-dev",
-    "@celo/phone-number-privacy-common": "^2.0.2",
+    "@celo/phone-number-privacy-common": "^3.0.0-beta.1",
     "@celo/poprf": "^0.1.9",
     "@celo/utils": "4.1.1-dev",
     "@types/debug": "^4.1.5",
@@ -37,7 +37,6 @@
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
-    "@celo/flake-tracker": "0.0.1-dev",
     "fetch-mock": "9.10.4"
   },
   "engines": {
