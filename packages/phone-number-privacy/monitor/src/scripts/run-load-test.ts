@@ -1,62 +1,9 @@
 import { OdisContextName } from '@celo/identity/lib/odis/query'
-import { CombinerEndpointPNP } from '@celo/phone-number-privacy-common'
+import { CombinerEndpointPNP, rootLogger } from '@celo/phone-number-privacy-common'
 import yargs from 'yargs'
-import { concurrentLoadTest, serialLoadTest } from '../test'
+import { concurrentRPSLoadTest } from '../test'
 
-/* tslint:disable:no-console */
-
-const runLoadTest = (
-  contextName: string,
-  numWorker: number,
-  isSerial: boolean,
-  pnpQuotaEndpoint: boolean,
-  timeoutMs: number,
-  bypassQuota: boolean,
-  useDEK: boolean
-) => {
-  let blockchainProvider: string
-  switch (contextName) {
-    case 'alfajoresstaging':
-    case 'alfajores':
-      blockchainProvider = 'https://alfajores-forno.celo-testnet.org'
-      break
-    case 'mainnet':
-      blockchainProvider = 'https://forno.celo.org'
-      break
-    default:
-      console.error('Invalid contextName')
-      yargs.showHelp()
-      process.exit(1)
-  }
-  if (numWorker < 1) {
-    console.error('Invalid numWorkers')
-    yargs.showHelp()
-    process.exit(1)
-  }
-  if (isSerial) {
-    // tslint:disable-next-line: no-floating-promises
-    serialLoadTest(
-      numWorker,
-      blockchainProvider!,
-      contextName as OdisContextName,
-      pnpQuotaEndpoint ? CombinerEndpointPNP.PNP_QUOTA : CombinerEndpointPNP.PNP_SIGN,
-      timeoutMs,
-      bypassQuota,
-      useDEK
-    )
-  } else {
-    // tslint:disable-next-line: no-floating-promises
-    concurrentLoadTest(
-      numWorker,
-      blockchainProvider!,
-      contextName as OdisContextName,
-      pnpQuotaEndpoint ? CombinerEndpointPNP.PNP_QUOTA : CombinerEndpointPNP.PNP_SIGN,
-      timeoutMs,
-      bypassQuota,
-      useDEK
-    )
-  }
-}
+const logger = rootLogger('odis-monitor')
 
 // tslint:disable-next-line: no-unused-expression
 yargs
@@ -66,7 +13,7 @@ yargs
   .strict(true)
   .showHelpOnFail(true)
   .command(
-    'run <contextName> <numWorkers>',
+    'run <contextName> <rps>',
     'Load test ODIS.',
     (args) =>
       args
@@ -74,19 +21,14 @@ yargs
           type: 'string',
           description: 'Desired network.',
         })
-        .positional('numWorkers', {
+        .positional('rps', {
           type: 'number',
-          description: 'Number of machines that will be sending request to ODIS.',
+          description: 'Number of requests per second to generate',
         })
-        .option('isSerial', {
-          type: 'boolean',
-          description: 'Run test workers in series.',
-          default: false,
-        })
-        .option('timeoutMs', {
+        .option('duration', {
           type: 'number',
-          description: 'Timout in ms.',
-          default: 10000,
+          description: 'Duration of the loadtest in Ms.',
+          default: 0,
         })
         .option('bypassQuota', {
           type: 'boolean',
@@ -98,20 +40,49 @@ yargs
           description: 'Use Data Encryption Key (DEK) to authenticate.',
           default: false,
         })
-        .option('pnpQuotaEndpoint', {
-          type: 'boolean',
-          description:
-            'Use this flag to load test PNP_QUOTA endpoint instead of PNP_SIGN endpoint.',
-          default: false,
+        .option('movingAvgRequests', {
+          type: 'number',
+          description: 'number of requests to use when calculating latency moving average',
+          default: 50,
         }),
-    (args) =>
-      runLoadTest(
-        args.contextName!,
-        args.numWorkers!,
-        args.isSerial,
-        args.pnpQuotaEndpoint,
-        args.timeoutMs,
+    (args) => {
+      if (args.rps == null || args.contextName == null) {
+        logger.error('missing positional arguments')
+        yargs.showHelp()
+        process.exit(1)
+      }
+      const rps = args.rps!
+      const contextName = args.contextName! as OdisContextName
+
+      let blockchainProvider: string
+      switch (contextName) {
+        case 'alfajoresstaging':
+        case 'alfajores':
+          blockchainProvider = 'https://alfajores-forno.celo-testnet.org'
+          break
+        case 'mainnet':
+          blockchainProvider = 'https://forno.celo.org'
+          break
+        default:
+          logger.error('Invalid contextName')
+          yargs.showHelp()
+          process.exit(1)
+      }
+
+      if (rps < 1) {
+        logger.error('Invalid rps')
+        yargs.showHelp()
+        process.exit(1)
+      }
+      concurrentRPSLoadTest(
+        args.rps,
+        blockchainProvider!,
+        contextName,
+        CombinerEndpointPNP.PNP_SIGN,
+        args.duration,
         args.bypassQuota,
-        args.useDEK
-      )
+        args.useDEK,
+        args.movingAvgRequests
+      ) // tslint:disable-line:no-floating-promises
+    }
   ).argv

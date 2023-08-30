@@ -6,7 +6,7 @@ import { config } from '../src/config'
 async function start() {
   console.info('Running migrations')
   console.warn('It is no longer necessary to run db migrations seperately prior to startup')
-  await initDatabase(config, undefined, false)
+  await initDatabase(config, undefined)
 }
 
 start()

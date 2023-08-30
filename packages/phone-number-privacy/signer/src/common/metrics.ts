@@ -1,4 +1,5 @@
 import * as client from 'prom-client'
+
 const { Counter, Histogram } = client
 
 client.collectDefaultMetrics()
@@ -8,6 +9,7 @@ export enum Labels {
   READ = 'read',
   UPDATE = 'update',
   INSERT = 'insert',
+  BATCH_DELETE = 'batch-delete',
 }
 
 export const Counters = {
@@ -29,7 +31,6 @@ export const Counters = {
   blockchainErrors: new Counter({
     name: 'blockchain_errors',
     help: 'Counter for the number of errors from interacting with the blockchain',
-    labelNames: ['type'],
   }),
   signatureComputationErrors: new Counter({
     name: 'signature_computation_errors',
@@ -41,15 +42,7 @@ export const Counters = {
   }),
   requestsWithWalletAddress: new Counter({
     name: 'requests_with_wallet_address',
-    help: 'Counter for the number of requests in which the account uses a different wallet address',
-  }),
-  requestsWithVerifiedAccount: new Counter({
-    name: 'requests_with_verified_account',
-    help: 'Counter for the number of requests in which the account is verified',
-  }),
-  requestsWithUnverifiedAccountWithMinBalance: new Counter({
-    name: 'requests_with_unverified_account_with_min_balance',
-    help: 'Counter for the number of requests in which the account is not verified but meets min balance',
+    help: 'Counter for the number of requests in which WALLET_KEY authentication is used',
   }),
   testQuotaBypassedRequests: new Counter({
     name: 'test_quota_bypassed_requests',
@@ -58,14 +51,6 @@ export const Counters = {
   timeouts: new Counter({
     name: 'timeouts',
     help: 'Counter for the number of signer timeouts as measured by the signer',
-  }),
-  requestsFailingOpen: new Counter({
-    name: 'requests_failing_open',
-    help: 'Counter for the number of requests bypassing quota or authentication checks due to full-node errors',
-  }),
-  requestsFailingClosed: new Counter({
-    name: 'requests_failing_closed',
-    help: 'Counter for the number of requests failing quota or authentication checks due to full-node errors',
   }),
   errorsCaughtInEndpointHandler: new Counter({
     name: 'errors_caught_in_endpoint_handler',
@@ -88,16 +73,10 @@ export const Histograms = {
     labelNames: ['endpoint'],
     buckets,
   }),
-  getBlindedSigInstrumentation: new Histogram({
-    name: 'get_blinded_sig_instrumentation',
-    help: 'Histogram tracking latency of blinded sig function by code segment',
+  fullNodeLatency: new Histogram({
+    name: 'full_node_latency',
+    help: 'Histogram tracking latency of full node requests',
     labelNames: ['codeSegment'],
-    buckets,
-  }),
-  getRemainingQueryCountInstrumentation: new Histogram({
-    name: 'get_remaining_query_count_instrumentation',
-    help: 'Histogram tracking latency of getRemainingQueryCount function by code segment',
-    labelNames: ['codeSegment', 'endpoint'],
     buckets,
   }),
   dbOpsInstrumentation: new Histogram({
@@ -114,17 +93,12 @@ export const Histograms = {
   }),
 }
 
-declare type InFunction<T extends any[], U> = (...params: T) => Promise<U>
-
-export async function meter<T extends any[], U>(
-  inFunction: InFunction<T, U>,
-  params: T,
-  onError: (err: any) => U,
-  prometheus: client.Histogram<string>,
-  labels: string[]
-): Promise<U> {
-  const _meter = prometheus.labels(...labels).startTimer()
-  return inFunction(...params)
-    .catch(onError)
-    .finally(_meter)
+export function newMeter(
+  histogram: client.Histogram<string>,
+  ...labels: string[]
+): <U>(fn: () => Promise<U>) => Promise<U> {
+  return (fn) => {
+    const _meter = histogram.labels(...labels).startTimer()
+    return fn().finally(_meter)
+  }
 }
