@@ -29,6 +29,7 @@ import {
   ContractKitAccountService,
   MockAccountService,
 } from './pnp/services/account-services'
+import { NoQuotaCache } from './utils/no-quota-cache'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -70,6 +71,7 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
     : new ContractKitAccountService(logger, kit)
 
   const accountService = new CachingAccountService(baseAccountService)
+  const noQuotaCache = new NoQuotaCache()
 
   const pnpSigners: Signer[] = JSON.parse(config.phoneNumberPrivacy.odisServices.signers)
   const domainSigners: Signer[] = JSON.parse(config.domains.odisServices.signers)
@@ -80,14 +82,14 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
     CombinerEndpoint.PNP_QUOTA,
     createHandler(
       phoneNumberPrivacy.enabled,
-      pnpQuota(pnpSigners, config.phoneNumberPrivacy, accountService)
+      pnpQuota(pnpSigners, config.phoneNumberPrivacy, accountService, noQuotaCache)
     )
   )
   app.post(
     CombinerEndpoint.PNP_SIGN,
     createHandler(
       phoneNumberPrivacy.enabled,
-      pnpSign(pnpSigners, config.phoneNumberPrivacy, accountService)
+      pnpSign(pnpSigners, config.phoneNumberPrivacy, accountService, noQuotaCache)
     )
   )
   app.post(
