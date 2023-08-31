@@ -459,9 +459,13 @@ export function getFunctionSelectorsForContractProxy(contract: any, proxy: any, 
 * Builds and returns mapping of function names to selectors.
 * Each function name maps to an array of selectors to account for overloading.
 */
-export function getFunctionSelectorsForContract(contract: any, contractName: string, artifacts: Truffle.Artifacts) {
+export function getFunctionSelectorsForContract(contract: any, contractName: string, customArtifacts: Truffle.Artifacts) {
   const selectors: { [index: string]: string[] } = {}
-  const proxy: any = artifacts.require(contractName + 'Proxy')
+  let proxy: any = customArtifacts.require(contractName + 'Proxy')
+  if (proxy == null) {
+    const defaultArtifacts = typeof artifacts !== 'undefined' ? artifacts : undefined;
+    proxy = defaultArtifacts != null ? defaultArtifacts.require(contractName + 'Proxy') : proxy;
+  }
   proxy.abi
     .concat(contract.abi)
     .filter((abiEntry: any) => abiEntry.type === 'function')

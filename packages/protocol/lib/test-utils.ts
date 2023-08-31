@@ -257,7 +257,6 @@ export const assertProxiesSet = async (getContract: ProxiedContractGetter) => {
         contractName + 'Proxy not pointing to the ' + contractName + ' implementation'
       )
     }
-    
   }
 }
 

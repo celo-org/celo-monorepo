@@ -3,7 +3,7 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
   assertGtBN,
-  assertRevert,
+  assertTransactionRevertWithoutReason,
   assertTransactionRevertWithReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils' //
@@ -237,11 +237,17 @@ contract('FeeHandler', (accounts: string[]) => {
     })
 
     it('only allows owner to change the burn fraction', async () => {
-      await assertRevert(feeHandler.setBurnFraction(toFixed(80 / 100), { from: user }))
+      await assertTransactionRevertWithReason(
+        feeHandler.setBurnFraction(toFixed(80 / 100), { from: user }),
+        'Ownable: caller is not the owner.'
+      )
     })
 
     it("doesn't allow numbers bigger than one", async () => {
-      await assertRevert(feeHandler.setBurnFraction(toFixed(80 / 100), { from: user }))
+      await assertTransactionRevertWithReason(
+        feeHandler.setBurnFraction(toFixed(80 / 100), { from: user }),
+        'Ownable: caller is not the owner.'
+      )
     })
   })
 
@@ -273,8 +279,9 @@ contract('FeeHandler', (accounts: string[]) => {
     })
 
     it('Only owner can add token', async () => {
-      await assertRevert(
-        feeHandler.addToken(stableToken.address, mentoSeller.address, { from: user })
+      await assertTransactionRevertWithReason(
+        feeHandler.addToken(stableToken.address, mentoSeller.address, { from: user }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -292,7 +299,10 @@ contract('FeeHandler', (accounts: string[]) => {
     })
 
     it('Only owner can remove token', async () => {
-      await assertRevert(feeHandler.removeToken(stableToken.address, { from: user }))
+      await assertTransactionRevertWithReason(
+        feeHandler.removeToken(stableToken.address, { from: user }),
+        'Ownable: caller is not the owner.'
+      )
     })
   })
 
@@ -314,7 +324,10 @@ contract('FeeHandler', (accounts: string[]) => {
     })
 
     it('Only owner can deactivate token', async () => {
-      await assertRevert(feeHandler.deactivateToken(stableToken.address, { from: user }))
+      await assertTransactionRevertWithReason(
+        feeHandler.deactivateToken(stableToken.address, { from: user }),
+        'Ownable: caller is not the owner.'
+      )
     })
   })
 
@@ -325,7 +338,10 @@ contract('FeeHandler', (accounts: string[]) => {
     })
 
     it('only allows owner to change the burn fraction', async () => {
-      await assertRevert(feeHandler.setBurnFraction(EXAMPLE_BENEFICIARY_ADDRESS, { from: user }))
+      await assertTransactionRevertWithReason(
+        feeHandler.setBurnFraction(EXAMPLE_BENEFICIARY_ADDRESS, { from: user }),
+        'Ownable: caller is not the owner.'
+      )
     })
   })
 
@@ -336,7 +352,10 @@ contract('FeeHandler', (accounts: string[]) => {
 
     it("Can't distribute when frozen", async () => {
       await freezer.freeze(feeHandler.address)
-      await assertRevert(feeHandler.distribute(stableToken.address))
+      await assertTransactionRevertWithReason(
+        feeHandler.distribute(stableToken.address),
+        "can't call when contract is frozen."
+      )
     })
 
     it("doesn't distribute when balance is zero", async () => {
@@ -418,7 +437,10 @@ contract('FeeHandler', (accounts: string[]) => {
 
     it("Can't sell when frozen", async () => {
       await freezer.freeze(feeHandler.address)
-      await assertRevert(feeHandler.sell(stableToken.address))
+      await assertTransactionRevertWithoutReason(
+        feeHandler.sell(stableToken.address),
+        "can't call when contract is frozen."
+      )
     })
 
     describe('Mento tokens', async () => {
@@ -498,7 +520,10 @@ contract('FeeHandler', (accounts: string[]) => {
           await mentoSeller.setMinimumReports(tokenA.address, 2)
           const balanceBefore = await stableToken.balanceOf(feeHandler.address) // TODO this balance is wrong
           await feeHandler.setMaxSplippage(tokenA.address, maxSlippage)
-          await assertRevert(feeHandler.sell(tokenA.address))
+          await assertTransactionRevertWithReason(
+            feeHandler.sell(tokenA.address),
+            'Handler has to be set to sell token.'
+          )
           assertEqualBN(await stableToken.balanceOf(feeHandler.address), balanceBefore)
         })
 
@@ -779,8 +804,9 @@ contract('FeeHandler', (accounts: string[]) => {
     })
 
     it('Only owner can take tokens out', async () => {
-      await assertRevert(
-        feeHandler.transfer(tokenA.address, user, new BigNumber(1e18), { from: user })
+      await assertTransactionRevertWithReason(
+        feeHandler.transfer(tokenA.address, user, new BigNumber(1e18), { from: user }),
+        'Ownable: caller is not the owner.'
       )
     })
 
@@ -792,16 +818,18 @@ contract('FeeHandler', (accounts: string[]) => {
 
   describe('#setDailySellLimit()', () => {
     it('should only be called by owner', async () => {
-      await assertRevert(
-        feeHandler.setDailySellLimit(stableToken.address, goldAmountForRate, { from: user })
+      await assertTransactionRevertWithReason(
+        feeHandler.setDailySellLimit(stableToken.address, goldAmountForRate, { from: user }),
+        'Ownable: caller is not the owner.'
       )
     })
   })
 
   describe('#setMaxSplipagge()', () => {
     it('should only be called by owner', async () => {
-      await assertRevert(
-        feeHandler.setMaxSplippage(stableToken.address, maxSlippage, { from: user })
+      await assertTransactionRevertWithReason(
+        feeHandler.setMaxSplippage(stableToken.address, maxSlippage, { from: user }),
+        'Ownable: caller is not the owner.'
       )
     })
   })

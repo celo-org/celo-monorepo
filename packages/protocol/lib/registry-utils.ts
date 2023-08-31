@@ -6,7 +6,7 @@
  * an environment.
  */
 
-import { MENTO_PACKAGE } from "../contractPackages"
+import { ContractPackage, MENTO_PACKAGE } from "../contractPackages"
 
 export const celoRegistryAddress = '0x000000000000000000000000000000000000ce10'
 
@@ -52,7 +52,7 @@ export const usesRegistry = [
   CeloContractName.StableToken,
 ]
 
-export const hasEntryInRegistry= [
+export const hasEntryInRegistry: ContractPackage[]= [
   {
     contracts:[
       CeloContractName.Accounts,
@@ -65,13 +65,18 @@ export const hasEntryInRegistry= [
       CeloContractName.FederatedAttestations,
       CeloContractName.FeeCurrencyWhitelist,
       CeloContractName.Freezer,
-      CeloContractName.GasPriceMinimum,
       CeloContractName.GoldToken,
       CeloContractName.GovernanceSlasher,
       CeloContractName.OdisPayments,
       CeloContractName.Random,
       CeloContractName.SortedOracles,
     ]
+  },
+  {
+    contracts:[
+      CeloContractName.GasPriceMinimum,
+    ],
+    path: "contracts-0.8"
   },
   {
     ...MENTO_PACKAGE,
