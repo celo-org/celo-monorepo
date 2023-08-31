@@ -8408,11 +8408,6 @@ blakejs@^1.1.0:
   resolved "https://registry.yarnpkg.com/blakejs/-/blakejs-1.2.1.tgz#5057e4206eadb4a97f7c0b6e197a505042fc3814"
   integrity sha512-QXUSXI3QVc/gJME0dBpXrag1kbzOqCjCX8/b54ntNyW6sjtoqxqRk3LTmXzaJoh71zMsDCjM+47jS7XiwN/+fQ==
 
-"blind-threshold-bls@git+https://github.com/celo-org/blind-threshold-bls-wasm.git#e1e2f8a":
-  version "0.1.0"
-  uid e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208
-  resolved "git+https://github.com/celo-org/blind-threshold-bls-wasm.git#e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208"
-
 "blind-threshold-bls@https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a":
   version "0.1.0"
   resolved "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208"
