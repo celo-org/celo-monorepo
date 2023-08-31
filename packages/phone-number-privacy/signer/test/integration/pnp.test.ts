@@ -34,7 +34,6 @@ const {
   createMockContractKit,
   createMockAccounts,
   createMockOdisPayments,
-  createMockWeb3,
   getPnpQuotaRequest,
   getPnpRequestAuthorization,
   getPnpSignRequest,
@@ -44,23 +43,19 @@ const { PRIVATE_KEY1, ACCOUNT_ADDRESS1, mockAccount, DEK_PRIVATE_KEY, DEK_PUBLIC
 
 jest.setTimeout(20000)
 
-const testBlockNumber = 1000000
 const zeroBalance = new BigNumber(0)
 
 const mockOdisPaymentsTotalPaidCUSD = jest.fn<BigNumber, []>()
 const mockGetWalletAddress = jest.fn<string, []>()
 const mockGetDataEncryptionKey = jest.fn<string, []>()
 
-const mockContractKit = createMockContractKit(
-  {
-    [ContractRetrieval.getAccounts]: createMockAccounts(
-      mockGetWalletAddress,
-      mockGetDataEncryptionKey
-    ),
-    [ContractRetrieval.getOdisPayments]: createMockOdisPayments(mockOdisPaymentsTotalPaidCUSD),
-  },
-  createMockWeb3(5, testBlockNumber)
-)
+const mockContractKit = createMockContractKit({
+  [ContractRetrieval.getAccounts]: createMockAccounts(
+    mockGetWalletAddress,
+    mockGetDataEncryptionKey
+  ),
+  [ContractRetrieval.getOdisPayments]: createMockOdisPayments(mockOdisPaymentsTotalPaidCUSD),
+})
 jest.mock('@celo/contractkit', () => ({
   ...jest.requireActual('@celo/contractkit'),
   newKit: jest.fn().mockImplementation(() => mockContractKit),

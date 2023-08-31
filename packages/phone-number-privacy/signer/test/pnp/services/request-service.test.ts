@@ -1,16 +1,16 @@
+import { rootLogger } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { initDatabase } from '../../../src/common/database/database'
-import { config, SupportedDatabase, SupportedKeystore } from '../../../src/config'
-import {
-  DefaultPnpRequestService,
-  PnpRequestService,
-} from '../../../src/pnp/services/request-service'
-import { rootLogger } from '@celo/phone-number-privacy-common'
 import {
   PnpSignRequestRecord,
   REQUESTS_COLUMNS,
   REQUESTS_TABLE,
 } from '../../../src/common/database/models/request'
+import { config, SupportedDatabase, SupportedKeystore } from '../../../src/config'
+import {
+  DefaultPnpRequestService,
+  PnpRequestService,
+} from '../../../src/pnp/services/request-service'
 
 jest.setTimeout(20000)
 describe('request service', () => {
@@ -49,7 +49,7 @@ describe('request service', () => {
 
     expect((elements! as any)['CNT']).toBe('2')
 
-    await service.removeOldRequest(2, ctx)
+    await service.removeOldRequests(2, ctx)
 
     const elementsAfter = await db<PnpSignRequestRecord>(REQUESTS_TABLE)
       .count(`${REQUESTS_COLUMNS.address} as CNT`)

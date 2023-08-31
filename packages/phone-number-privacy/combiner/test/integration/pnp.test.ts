@@ -20,18 +20,21 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { initDatabase as initSignerDatabase } from '@celo/phone-number-privacy-signer/dist/common/database/database'
-import { startSigner } from '@celo/phone-number-privacy-signer/dist/server'
-import { SupportedDatabase, SupportedKeystore } from '@celo/phone-number-privacy-signer/dist/config'
 import {
   DefaultKeyName,
   KeyProvider,
 } from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
 import { MockKeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/mock-key-provider'
-import { SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
+import {
+  SignerConfig,
+  SupportedDatabase,
+  SupportedKeystore,
+} from '@celo/phone-number-privacy-signer/dist/config'
+import { startSigner } from '@celo/phone-number-privacy-signer/dist/server'
 import BigNumber from 'bignumber.js'
 import threshold_bls from 'blind-threshold-bls'
-import { Server as HttpsServer } from 'https'
 import { Server } from 'http'
+import { Server as HttpsServer } from 'https'
 import { Knex } from 'knex'
 import request from 'supertest'
 import config, { getCombinerVersion } from '../../src/config'
@@ -43,7 +46,6 @@ const {
   createMockContractKit,
   createMockAccounts,
   createMockOdisPayments,
-  createMockWeb3,
   getPnpRequestAuthorization,
 } = TestUtils.Utils
 const {
@@ -155,22 +157,17 @@ const signerConfig: SignerConfig = {
   requestPrunningJobCronPattern: '0 0 0 * * *',
 }
 
-const testBlockNumber = 1000000
-
 const mockOdisPaymentsTotalPaidCUSD = jest.fn<BigNumber, []>()
 const mockGetWalletAddress = jest.fn<string, []>()
 const mockGetDataEncryptionKey = jest.fn<string, []>()
 
-const mockContractKit = createMockContractKit(
-  {
-    [ContractRetrieval.getAccounts]: createMockAccounts(
-      mockGetWalletAddress,
-      mockGetDataEncryptionKey
-    ),
-    [ContractRetrieval.getOdisPayments]: createMockOdisPayments(mockOdisPaymentsTotalPaidCUSD),
-  },
-  createMockWeb3(5, testBlockNumber)
-)
+const mockContractKit = createMockContractKit({
+  [ContractRetrieval.getAccounts]: createMockAccounts(
+    mockGetWalletAddress,
+    mockGetDataEncryptionKey
+  ),
+  [ContractRetrieval.getOdisPayments]: createMockOdisPayments(mockOdisPaymentsTotalPaidCUSD),
+})
 
 // Mock newKit as opposed to the CK constructor
 // Returns an object of type ContractKit that can be passed into the signers + combiner

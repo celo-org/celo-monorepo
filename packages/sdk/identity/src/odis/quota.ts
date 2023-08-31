@@ -11,7 +11,7 @@ export interface PnpClientQuotaStatus {
   performedQueryCount: number
   totalQuota: number
   remainingQuota: number
-  blockNumber?: number
+  blockNumber?: number // TODO fully remove blockNumber from identity sdk
   warnings?: string[]
 }
 

@@ -38,7 +38,7 @@ export function createPnpQuotaHandler(
       return
     }
 
-    // TODO remove?
+    // TODO remove this, we shouldn't need keyVersionInfo for non-signing endpoints
     const keyVersionInfo = getKeyVersionInfo(request, config, logger)
 
     const { signerResponses, maxErrorCode } = await thresholdCallToSigners(logger, {
@@ -51,9 +51,6 @@ export function createPnpQuotaHandler(
       shouldCheckKeyVersion: false,
     })
     const warnings = logPnpSignerResponseDiscrepancies(logger, signerResponses)
-
-    // TODO remove?
-    // logFailOpenResponses(logger, signerResponses)
 
     const { threshold } = keyVersionInfo
 

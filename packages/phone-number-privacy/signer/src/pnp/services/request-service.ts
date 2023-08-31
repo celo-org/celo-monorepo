@@ -9,7 +9,6 @@ import {
   insertRequest,
 } from '../../common/database/wrappers/request'
 import { wrapError } from '../../common/error'
-import { Histograms, newMeter } from '../../common/metrics'
 import { traceAsyncFunction } from '../../common/tracing-utils'
 
 export interface PnpRequestService {
@@ -25,7 +24,7 @@ export interface PnpRequestService {
     blindedQuery: string,
     ctx: Context
   ): Promise<PnpSignRequestRecord | undefined>
-  removeOldRequest(daysToKeep: number, ctx: Context): Promise<number>
+  removeOldRequests(daysToKeep: number, ctx: Context): Promise<number>
 }
 
 export class DefaultPnpRequestService implements PnpRequestService {
@@ -37,26 +36,19 @@ export class DefaultPnpRequestService implements PnpRequestService {
     signature: string,
     ctx: Context
   ): Promise<void> {
-    return traceAsyncFunction('DefaultPnpRequestService - recordRequest', async () => {
-      return this.db.transaction(async (trx) => {
+    return traceAsyncFunction('DefaultPnpRequestService - recordRequest', () =>
+      this.db.transaction(async (trx) => {
         await insertRequest(this.db, account, blindedQueryPhoneNumber, signature, ctx.logger, trx)
         await incrementQueryCount(this.db, account, ctx.logger, trx)
       })
-    })
+    )
   }
 
   public async getUsedQuotaForAccount(account: string, ctx: Context): Promise<number> {
-    const meter = newMeter(
-      Histograms.getRemainingQueryCountInstrumentation,
-      'getQuotaStatus',
-      ctx.url
-    )
     return traceAsyncFunction('DefaultPnpRequestService - getUsedQuotaForAccount', () =>
-      meter(() =>
-        wrapError(
-          getPerformedQueryCount(this.db, account, ctx.logger),
-          ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT
-        )
+      wrapError(
+        getPerformedQueryCount(this.db, account, ctx.logger),
+        ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT
       )
     )
   }
@@ -75,13 +67,16 @@ export class DefaultPnpRequestService implements PnpRequestService {
     }
   }
 
-  public async removeOldRequest(daysToKeep: number, ctx: Context): Promise<number> {
+  public async removeOldRequests(daysToKeep: number, ctx: Context): Promise<number> {
     if (daysToKeep < 0) {
-      ctx.logger.error('RemoveOldRequest - DaysToKeep should be bigger than or equal to zero')
+      ctx.logger.error(
+        { daysToKeep },
+        'RemoveOldRequests - DaysToKeep should be bigger than or equal to zero'
+      )
       return 0
     }
     const since: Date = new Date(Date.now() - daysToKeep * 24 * 60 * 60 * 1000)
-    return traceAsyncFunction('DefaultPnpRequestService - removeOldRequest', () =>
+    return traceAsyncFunction('DefaultPnpRequestService - removeOldRequests', () =>
       deleteRequestsOlderThan(this.db, since, ctx.logger)
     )
   }
@@ -119,8 +114,8 @@ export class MockPnpRequestService implements PnpRequestService {
     return undefined
   }
 
-  public async removeOldRequest(daysToKeep: number, ctx: Context): Promise<number> {
-    ctx.logger.info({ daysToKeep }, 'MockPnpRequestService - removeOldRequest')
+  public async removeOldRequests(daysToKeep: number, ctx: Context): Promise<number> {
+    ctx.logger.info({ daysToKeep }, 'MockPnpRequestService - removeOldRequests')
     return 0
   }
 }

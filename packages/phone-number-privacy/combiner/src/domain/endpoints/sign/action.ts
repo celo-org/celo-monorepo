@@ -53,17 +53,8 @@ export function createDomainSignHandler(
       res: OdisResponse<DomainRestrictedSignatureRequest>
     ): Promise<boolean> => {
       assert(res.success)
-      crypto.addSignature({ url: 'TODO: remove', signature: res.signature })
-      // const signatureAdditionStart = Date.now()
-
-      // logger.info(
-      //   {
-      //     signer: url,
-      //     hasSufficientSignatures: crypto.x(),
-      //     additionLatency: Date.now() - signatureAdditionStart,
-      //   },
-      //   'Added signature'
-      // )
+      // TODO remove the need to pass url here
+      crypto.addSignature({ url: request.url, signature: res.signature })
 
       // Send response immediately once we cross threshold
       // BLS threshold signatures can be combined without all partial signatures

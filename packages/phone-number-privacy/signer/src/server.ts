@@ -66,11 +66,7 @@ export function startSigner(
 
   const baseAccountService = config.shouldMockAccountService
     ? new MockAccountService(config.mockDek, config.mockTotalQuota)
-    : new ContractKitAccountService(logger, kit, {
-        fullNodeTimeoutMs: config.fullNodeTimeoutMs,
-        fullNodeRetryCount: config.fullNodeRetryCount,
-        fullNodeRetryDelayMs: config.fullNodeRetryDelayMs,
-      })
+    : new ContractKitAccountService(logger, kit)
 
   const accountService = new CachingAccountService(baseAccountService)
 

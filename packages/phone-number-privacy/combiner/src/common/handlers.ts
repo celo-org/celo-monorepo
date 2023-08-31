@@ -6,7 +6,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import { performance, PerformanceObserver } from 'perf_hooks'
+import { PerformanceObserver, performance } from 'perf_hooks'
 import { sendFailure } from './io'
 
 export interface Locals {

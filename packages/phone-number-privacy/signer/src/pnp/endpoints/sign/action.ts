@@ -1,5 +1,6 @@
 import {
   authenticateUser,
+  AuthenticationMethod,
   ErrorMessage,
   ErrorType,
   getRequestKeyVersion,
@@ -12,16 +13,14 @@ import {
   SignMessageRequestSchema,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import Logger from 'bunyan'
 import { Request } from 'express'
 import { computeBlindedSignature } from '../../../common/bls/bls-cryptography-client'
+import { errorResult, ResultHandler } from '../../../common/handler'
 import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management/key-provider-base'
 import { Counters, Histograms } from '../../../common/metrics'
-import { getSignerVersion, SignerConfig } from '../../../config'
-
-import { errorResult, ResultHandler } from '../../../common/handler'
-
-import Logger from 'bunyan'
 import { traceAsyncFunction } from '../../../common/tracing-utils'
+import { getSignerVersion, SignerConfig } from '../../../config'
 import { AccountService } from '../../services/account-service'
 import { PnpRequestService } from '../../services/request-service'
 
@@ -50,6 +49,10 @@ export function pnpSign(
     }
 
     const account = await accountService.getAccount(request.body.account)
+
+    if (request.body.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
+      Counters.requestsWithWalletAddress.inc()
+    }
 
     if (!(await authenticateUser(request, logger, async (_) => account.dek, warnings))) {
       return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
@@ -83,8 +86,7 @@ export function pnpSign(
 
     const key: Key = {
       version:
-        getRequestKeyVersion(request, response.locals.logger) ??
-        config.keystore.keys.phoneNumberPrivacy.latest,
+        getRequestKeyVersion(request, logger) ?? config.keystore.keys.phoneNumberPrivacy.latest,
       name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
     }
 
@@ -93,14 +95,9 @@ export function pnpSign(
       signature = duplicateRequest.signature
     } else {
       try {
-        signature = await sign(
-          request.body.blindedQueryPhoneNumber,
-          key,
-          keyProvider,
-          response.locals.logger
-        )
+        signature = await sign(request.body.blindedQueryPhoneNumber, key, keyProvider, logger)
       } catch (err) {
-        response.locals.logger.error({ err }, 'catch error on signing')
+        logger.error({ err }, 'catch error on signing')
 
         return errorResult(500, ErrorMessage.SIGNATURE_COMPUTATION_FAILURE, {
           performedQueryCount: usedQuota,
@@ -173,6 +170,6 @@ function bypassQuotaForE2ETesting(
   bypassQuotaPercentage: number,
   requestBody: SignMessageRequest
 ): boolean {
-  const sessionID = Number(requestBody.sessionID)
+  const sessionID = Number(requestBody.sessionID) // TODO revisit whether to remove sessionID
   return !Number.isNaN(sessionID) && sessionID % 100 < bypassQuotaPercentage
 }
