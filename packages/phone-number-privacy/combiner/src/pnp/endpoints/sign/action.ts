@@ -1,7 +1,6 @@
 import {
   authenticateUser,
   CombinerEndpoint,
-  DataEncryptionKeyFetcher,
   ErrorMessage,
   ErrorType,
   getSignerEndpoint,
@@ -21,13 +20,14 @@ import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-crypto
 import { errorResult, ResultHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, requestHasSupportedKeyVersion } from '../../../common/io'
 import { getCombinerVersion, OdisConfig } from '../../../config'
+import { AccountService } from '../../services/account-services'
 import { logPnpSignerResponseDiscrepancies } from '../../services/log-responses'
 import { findCombinerQuotaState } from '../../services/threshold-state'
 
 export function pnpSign(
   signers: Signer[],
   config: OdisConfig,
-  dekFetcher: DataEncryptionKeyFetcher
+  accountService: AccountService
 ): ResultHandler<SignMessageRequest> {
   return async (request, response) => {
     const logger = response.locals.logger
@@ -39,7 +39,9 @@ export function pnpSign(
       return errorResult(400, WarningMessage.INVALID_KEY_VERSION_REQUEST)
     }
 
-    if (!(await authenticateUser(request, logger, dekFetcher))) {
+    const warnings: ErrorType[] = []
+
+    if (!(await authenticateUser(request, logger, accountService.getAccount, warnings))) {
       return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
     }
     const keyVersionInfo = getKeyVersionInfo(request, config, logger)
@@ -80,7 +82,7 @@ export function pnpSign(
       processResult
     )
 
-    const warnings = logPnpSignerResponseDiscrepancies(logger, signerResponses)
+    warnings.push(...logPnpSignerResponseDiscrepancies(logger, signerResponses))
 
     if (crypto.hasSufficientSignatures()) {
       try {

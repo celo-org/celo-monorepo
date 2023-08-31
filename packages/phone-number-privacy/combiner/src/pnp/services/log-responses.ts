@@ -1,4 +1,5 @@
 import {
+  ErrorType,
   PnpQuotaRequest,
   SignMessageRequest,
   WarningMessage,
@@ -13,8 +14,8 @@ import {
 export function logPnpSignerResponseDiscrepancies(
   logger: Logger,
   responses: Array<SignerResponse<PnpQuotaRequest | SignMessageRequest>>
-): string[] {
-  const warnings: string[] = []
+): ErrorType[] {
+  const warnings: ErrorType[] = []
 
   // TODO responses should all already be successes due to CombineAction receiveSuccess
   // https://github.com/celo-org/celo-monorepo/issues/9826

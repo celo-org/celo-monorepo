@@ -41,6 +41,8 @@ export const pnpFullNodeRetryCount = defineInt('PNP_FULL_NODE_RETRY_COUNT', {
 export const pnpFullNodeDelaysMs = defineInt('PNP_FULL_NODE_DELAY_MS', {
   default: RETRY_DELAY_IN_MS,
 })
+export const pnpShouldMockAccountService = defineBoolean('PNP_SHOULD_MOCK_ACCOUNT_SERVICE')
+export const pnpMockDek = defineString('PNP_MOCK_DECK')
 
 // Domains
 export const domainServiceName = defineString('DOMAIN_SERVICE_NAME', {

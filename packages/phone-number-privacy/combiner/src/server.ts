@@ -4,7 +4,6 @@ import {
   getContractKitWithAgent,
   KEY_VERSION_HEADER,
   loggerMiddleware,
-  newContractKitFetcher,
   OdisRequest,
   rootLogger,
 } from '@celo/phone-number-privacy-common'
@@ -25,6 +24,11 @@ import { domainQuota } from './domain/endpoints/quota/action'
 import { domainSign } from './domain/endpoints/sign/action'
 import { pnpQuota } from './pnp/endpoints/quota/action'
 import { pnpSign } from './pnp/endpoints/sign/action'
+import {
+  CachingAccountService,
+  ContractKitAccountService,
+  MockAccountService,
+} from './pnp/services/account-services'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -61,13 +65,15 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
     })
   })
 
-  const dekFetcher = newContractKitFetcher(
-    kit,
-    logger,
-    config.phoneNumberPrivacy.fullNodeTimeoutMs,
-    config.phoneNumberPrivacy.fullNodeRetryCount,
-    config.phoneNumberPrivacy.fullNodeRetryDelayMs
-  )
+  const baseAccountService = config.phoneNumberPrivacy.shouldMockAccountService
+    ? new MockAccountService(config.phoneNumberPrivacy.mockDek!)
+    : new ContractKitAccountService(logger, kit, {
+        fullNodeTimeoutMs: config.phoneNumberPrivacy.fullNodeTimeoutMs,
+        fullNodeRetryCount: config.phoneNumberPrivacy.fullNodeRetryCount,
+        fullNodeRetryDelayMs: config.phoneNumberPrivacy.fullNodeRetryDelayMs,
+      })
+
+  const accountService = new CachingAccountService(baseAccountService)
 
   const pnpSigners: Signer[] = JSON.parse(config.phoneNumberPrivacy.odisServices.signers)
   const domainSigners: Signer[] = JSON.parse(config.domains.odisServices.signers)
@@ -78,14 +84,14 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
     CombinerEndpoint.PNP_QUOTA,
     createHandler(
       phoneNumberPrivacy.enabled,
-      pnpQuota(pnpSigners, config.phoneNumberPrivacy, dekFetcher)
+      pnpQuota(pnpSigners, config.phoneNumberPrivacy, accountService)
     )
   )
   app.post(
     CombinerEndpoint.PNP_SIGN,
     createHandler(
       phoneNumberPrivacy.enabled,
-      pnpSign(pnpSigners, config.phoneNumberPrivacy, dekFetcher)
+      pnpSign(pnpSigners, config.phoneNumberPrivacy, accountService)
     )
   )
   app.post(
