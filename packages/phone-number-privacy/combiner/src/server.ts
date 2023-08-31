@@ -90,6 +90,7 @@ export function createHandler<R extends OdisRequest>(
 }
 
 export function startProxy(req: any, res: any, config: CombinerConfig) {
+  const logger = rootLogger(config.serviceName)
   const proxy = httpProxy.createProxyServer({})
   let destinationUrl
   const originalPath = req.path
@@ -119,10 +120,10 @@ export function startProxy(req: any, res: any, config: CombinerConfig) {
       break
   }
   proxy.on('error', (_) => {
-    res
-      .status(500)
-      .send(
-        'Error in Proxying request to Combiner. Please make sure you are running the latest SDK version?'
-      )
+    logger.error('Error in Proxying request to Combiner.')
+    res.status(500).json({
+      success: false,
+      error: 'Error handling you request. Please make sure you are running the latest SDK version.',
+    })
   })
 }
