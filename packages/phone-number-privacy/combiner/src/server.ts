@@ -7,7 +7,8 @@ import {
   OdisRequest,
   rootLogger,
 } from '@celo/phone-number-privacy-common'
-import express, { RequestHandler } from 'express'
+import express, { Express, Request, RequestHandler, Response } from 'express'
+import http from 'http'
 import { Signer } from './common/combine'
 import {
   catchErrorHandler,
@@ -24,7 +25,7 @@ import { createPnpSignHandler } from './pnp/endpoints/sign/action'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-export function startCombiner(config: CombinerConfig, kit: ContractKit) {
+export function startCombiner(config: CombinerConfig, kit: ContractKit): Express {
   const logger = rootLogger(config.serviceName)
 
   logger.info('Creating combiner express server')
@@ -54,6 +55,38 @@ export function startCombiner(config: CombinerConfig, kit: ContractKit) {
       version: getCombinerVersion(),
     })
   })
+
+  if (config.forwardToGen2) {
+    // Define a new route handler for forwarding requests
+    app.all('*', (req: Request, res: Response) => {
+      let destinationUrl
+      const originalPath = req.path
+      const strippedPath = originalPath.replace(/\/combiner/, '')
+
+      switch (config.deploymentEnv) {
+        case 'mainnet':
+          // XXX (soloseng):URL may need to be updated after gen2 function is created on mainnet
+          destinationUrl =
+            'https://us-central1-celo-pgpnp-mainnet.cloudfunctions.net/combinerGen2' + strippedPath
+          handleForward(req, res, destinationUrl)
+          break
+        case 'alfajores':
+          // XXX (soloseng):URL may need to be updated after gen2 function is created on alfajores
+          destinationUrl =
+            'https://us-central1-celo-phone-number-privacy.cloudfunctions.net/combinerGen2' +
+            strippedPath
+          handleForward(req, res, destinationUrl)
+          break
+        case 'staging':
+          destinationUrl =
+            'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net/combinerGen2' +
+            strippedPath
+          handleForward(req, res, destinationUrl)
+          break
+      }
+    })
+    return app
+  }
 
   const dekFetcher = newContractKitFetcher(
     kit,
@@ -86,4 +119,41 @@ export function createHandler<R extends OdisRequest>(
   handler: PromiseHandler<R>
 ): PromiseHandler<R> {
   return meteringHandler(catchErrorHandler(enabled ? handler : disabledHandler<R>))
+}
+
+function handleForward(req: Request, res: Response, destinationUrl: string) {
+  const { method, headers, body } = req
+  const { hostname, port, pathname } = new URL(destinationUrl)
+
+  // Configure the options for the outbound request
+  const options: http.RequestOptions = {
+    hostname,
+    port,
+    path: pathname,
+    method,
+    headers,
+  }
+
+  // Create an HTTP request to forward the request
+  const forwardReq = http.request(options, (forwardRes) => {
+    const chunks: Buffer[] = []
+
+    forwardRes.on('data', (chunk) => {
+      chunks.push(chunk)
+    })
+
+    forwardRes.on('end', () => {
+      const responseData = Buffer.concat(chunks).toString()
+      res.status(forwardRes.statusCode || 500).send(responseData)
+    })
+  })
+
+  // Handle errors in the outbound request
+  forwardReq.on('error', (error) => {
+    res.status(500).send('Error forwarding request: ' + error.message)
+  })
+
+  // Write the request body and end the request
+  forwardReq.write(JSON.stringify(body))
+  forwardReq.end()
 }
