@@ -3,10 +3,10 @@ import { LRUCache } from 'lru-cache'
 // Stores if an address does not have more quota with its totalQuota number
 export class NoQuotaCache {
   private cache: LRUCache<string, number, any>
-  constructor() {
+  constructor(seconds: number = 5) {
     this.cache = new LRUCache({
       max: 500,
-      ttl: 5 * 1000, // 5 seconds
+      ttl: seconds * 1000,
       allowStale: false,
     })
   }
