@@ -1,6 +1,7 @@
 import { ContractKit } from '@celo/contractkit'
 import {
   CombinerEndpoint,
+  getContractKitWithAgent,
   KEY_VERSION_HEADER,
   loggerMiddleware,
   newContractKitFetcher,
@@ -12,20 +13,26 @@ import { Signer } from './common/combine'
 import {
   catchErrorHandler,
   disabledHandler,
+  Locals,
   meteringHandler,
-  PromiseHandler,
+  resultHandler,
+  ResultHandler,
+  timeoutHandler,
+  tracingHandler,
 } from './common/handlers'
 import { CombinerConfig, getCombinerVersion } from './config'
-import { createDisableDomainHandler } from './domain/endpoints/disable/action'
-import { createDomainQuotaHandler } from './domain/endpoints/quota/action'
-import { createDomainSignHandler } from './domain/endpoints/sign/action'
-import { createPnpQuotaHandler } from './pnp/endpoints/quota/action'
-import { createPnpSignHandler } from './pnp/endpoints/sign/action'
+import { disableDomain } from './domain/endpoints/disable/action'
+import { domainQuota } from './domain/endpoints/quota/action'
+import { domainSign } from './domain/endpoints/sign/action'
+import { pnpQuota } from './pnp/endpoints/quota/action'
+import { pnpSign } from './pnp/endpoints/sign/action'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-export function startCombiner(config: CombinerConfig, kit: ContractKit) {
+export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
   const logger = rootLogger(config.serviceName)
+
+  kit = kit ?? getContractKitWithAgent(config.blockchain)
 
   logger.info('Creating combiner express server')
   const app = express()
@@ -64,26 +71,62 @@ export function startCombiner(config: CombinerConfig, kit: ContractKit) {
   )
 
   const pnpSigners: Signer[] = JSON.parse(config.phoneNumberPrivacy.odisServices.signers)
-  const pnpQuota = createPnpQuotaHandler(pnpSigners, config.phoneNumberPrivacy, dekFetcher)
-  const pnpSign = createPnpSignHandler(pnpSigners, config.phoneNumberPrivacy, dekFetcher)
-
   const domainSigners: Signer[] = JSON.parse(config.domains.odisServices.signers)
-  const domainQuota = createDomainQuotaHandler(domainSigners, config.domains)
-  const domainSign = createDomainSignHandler(domainSigners, config.domains)
-  const domainDisable = createDisableDomainHandler(domainSigners, config.domains)
 
-  app.post(CombinerEndpoint.PNP_QUOTA, createHandler(config.phoneNumberPrivacy.enabled, pnpQuota))
-  app.post(CombinerEndpoint.PNP_SIGN, createHandler(config.phoneNumberPrivacy.enabled, pnpSign))
-  app.post(CombinerEndpoint.DOMAIN_QUOTA_STATUS, createHandler(config.domains.enabled, domainQuota))
-  app.post(CombinerEndpoint.DOMAIN_SIGN, createHandler(config.domains.enabled, domainSign))
-  app.post(CombinerEndpoint.DISABLE_DOMAIN, createHandler(config.domains.enabled, domainDisable))
+  const { domains, phoneNumberPrivacy } = config
+
+  app.post(
+    CombinerEndpoint.PNP_QUOTA,
+    createHandler(
+      phoneNumberPrivacy.odisServices.timeoutMilliSeconds,
+      phoneNumberPrivacy.enabled,
+      pnpQuota(pnpSigners, config.phoneNumberPrivacy, dekFetcher)
+    )
+  )
+  app.post(
+    CombinerEndpoint.PNP_SIGN,
+    createHandler(
+      phoneNumberPrivacy.odisServices.timeoutMilliSeconds,
+      phoneNumberPrivacy.enabled,
+      pnpSign(pnpSigners, config.phoneNumberPrivacy, dekFetcher)
+    )
+  )
+  app.post(
+    CombinerEndpoint.DOMAIN_QUOTA_STATUS,
+    createHandler(
+      domains.odisServices.timeoutMilliSeconds,
+      domains.enabled,
+      domainQuota(domainSigners, config.domains)
+    )
+  )
+  app.post(
+    CombinerEndpoint.DOMAIN_SIGN,
+    createHandler(
+      domains.odisServices.timeoutMilliSeconds,
+      config.domains.enabled,
+      domainSign(domainSigners, config.domains)
+    )
+  )
+  app.post(
+    CombinerEndpoint.DISABLE_DOMAIN,
+    createHandler(
+      domains.odisServices.timeoutMilliSeconds,
+      config.domains.enabled,
+      disableDomain(domainSigners, config.domains)
+    )
+  )
 
   return app
 }
 
-export function createHandler<R extends OdisRequest>(
+function createHandler<R extends OdisRequest>(
+  timeoutMs: number,
   enabled: boolean,
-  handler: PromiseHandler<R>
-): PromiseHandler<R> {
-  return meteringHandler(catchErrorHandler(enabled ? handler : disabledHandler<R>))
+  action: ResultHandler<R>
+): RequestHandler<{}, {}, R, {}, Locals> {
+  return catchErrorHandler(
+    tracingHandler(
+      meteringHandler(timeoutHandler(timeoutMs, enabled ? resultHandler(action) : disabledHandler))
+    )
+  )
 }
