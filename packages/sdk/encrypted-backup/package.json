@@ -27,7 +27,7 @@
   "dependencies": {
     "@celo/base": "4.1.1",
     "@celo/identity": "4.1.1",
-    "@celo/phone-number-privacy-common": "^3.0.0-beta.1",
+    "@celo/phone-number-privacy-common": "^3.0.0",
     "@celo/poprf": "^0.1.9",
     "@celo/utils": "4.1.1",
     "@types/debug": "^4.1.5",
