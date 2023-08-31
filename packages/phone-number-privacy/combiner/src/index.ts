@@ -1,4 +1,3 @@
-import { getContractKitWithAgent } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions/v2/https'
 import config from './config'
 import { startCombiner } from './server'
@@ -14,6 +13,6 @@ export const combinerGen2 = functions.onRequest(
     memory: '512MiB',
     region: 'us-central1',
   },
-  startCombiner(config, getContractKitWithAgent(config.blockchain))
+  startCombiner(config)
 )
 export * from './config'

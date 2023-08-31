@@ -1,13 +1,22 @@
 import {
   ErrorMessage,
+  ErrorType,
   OdisRequest,
   OdisResponse,
+  PnpQuotaStatus,
+  SequentialDelayDomainState,
   WarningMessage,
+  send,
 } from '@celo/phone-number-privacy-common'
+import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { PerformanceObserver, performance } from 'perf_hooks'
-import { sendFailure } from './io'
+import { getCombinerVersion } from '../config'
+import { OdisError } from './error'
+
+const tracer = opentelemetry.trace.getTracer('combiner-tracer')
 
 export interface Locals {
   logger: Logger
@@ -18,28 +27,59 @@ export type PromiseHandler<R extends OdisRequest> = (
   res: Response<OdisResponse<R>, Locals>
 ) => Promise<void>
 
-type ParentHandler = (req: Request<{}, {}, any>, res: Response<any, Locals>) => Promise<void>
-
 export function catchErrorHandler<R extends OdisRequest>(
   handler: PromiseHandler<R>
-): ParentHandler {
+): PromiseHandler<R> {
   return async (req, res) => {
-    const logger: Logger = res.locals.logger
     try {
       await handler(req, res)
     } catch (err) {
+      const logger: Logger = res.locals.logger
       logger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
       logger.error(err)
       if (!res.headersSent) {
-        logger.info('Responding with error in outer endpoint handler')
-        res.status(500).json({
-          success: false,
-          error: ErrorMessage.UNKNOWN_ERROR,
-        })
+        if (err instanceof OdisError) {
+          sendFailure(err.code, err.status, res, req.url)
+        } else {
+          sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, res, req.url)
+        }
       } else {
         logger.error(ErrorMessage.ERROR_AFTER_RESPONSE_SENT)
       }
     }
+  }
+}
+
+export function tracingHandler<R extends OdisRequest>(
+  handler: PromiseHandler<R>
+): PromiseHandler<R> {
+  return async (req, res) => {
+    return tracer.startActiveSpan(
+      req.url,
+      {
+        attributes: {
+          [SemanticAttributes.HTTP_ROUTE]: req.path,
+          [SemanticAttributes.HTTP_METHOD]: req.method,
+          [SemanticAttributes.HTTP_CLIENT_IP]: req.ip,
+        },
+      },
+      async (span) => {
+        try {
+          await handler(req, res)
+          span.setStatus({
+            code: SpanStatusCode.OK,
+          })
+        } catch (err: any) {
+          span.setStatus({
+            code: SpanStatusCode.ERROR,
+            message: err instanceof Error ? err.message : 'Fail',
+          })
+          throw err
+        } finally {
+          span.end()
+        }
+      }
+    )
   }
 }
 
@@ -90,9 +130,98 @@ export function meteringHandler<R extends OdisRequest>(
   }
 }
 
+export function timeoutHandler<R extends OdisRequest>(
+  timeoutMs: number,
+  handler: PromiseHandler<R>
+): PromiseHandler<R> {
+  return async (req, res) => {
+    const timeoutSignal = (AbortSignal as any).timeout(timeoutMs)
+    timeoutSignal.addEventListener(
+      'abort',
+      () => {
+        if (!res.headersSent) {
+          sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, res, req.url)
+        }
+      },
+      { once: true }
+    )
+
+    await handler(req, res)
+  }
+}
+
+export function withEnableHandler<R extends OdisRequest>(
+  enabled: boolean,
+  handler: PromiseHandler<R>
+): PromiseHandler<R> {
+  return async (req, res) => {
+    if (enabled) {
+      return handler(req, res)
+    } else {
+      sendFailure(WarningMessage.API_UNAVAILABLE, 503, res, req.url)
+    }
+  }
+}
+
 export async function disabledHandler<R extends OdisRequest>(
-  _: Request<{}, {}, R>,
+  req: Request<{}, {}, R>,
   response: Response<OdisResponse<R>, Locals>
 ): Promise<void> {
-  sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
+  sendFailure(WarningMessage.API_UNAVAILABLE, 503, response, req.url)
+}
+
+export function sendFailure(
+  error: ErrorType,
+  status: number,
+  response: Response,
+  _endpoint: string,
+  body?: Record<any, any> // TODO remove any
+) {
+  send(
+    response,
+    {
+      success: false,
+      version: getCombinerVersion(),
+      error,
+      ...body,
+    },
+    status,
+    response.locals.logger
+  )
+}
+
+export interface Result<R extends OdisRequest> {
+  status: number
+  body: OdisResponse<R>
+}
+
+export type ResultHandler<R extends OdisRequest> = (
+  request: Request<{}, {}, R>,
+  res: Response<OdisResponse<R>, Locals>
+) => Promise<Result<R>>
+
+export function resultHandler<R extends OdisRequest>(
+  resHandler: ResultHandler<R>
+): PromiseHandler<R> {
+  return async (req, res) => {
+    const result = await resHandler(req, res)
+    send(res, result.body, result.status, res.locals.logger)
+  }
+}
+
+export function errorResult(
+  status: number,
+  error: string,
+  quotaStatus?: PnpQuotaStatus | { status: SequentialDelayDomainState }
+): Result<any> {
+  // TODO remove any
+  return {
+    status,
+    body: {
+      success: false,
+      version: getCombinerVersion(),
+      error,
+      ...quotaStatus,
+    },
+  }
 }
