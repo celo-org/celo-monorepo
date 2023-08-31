@@ -7,8 +7,8 @@ import {
   OdisRequest,
   rootLogger,
 } from '@celo/phone-number-privacy-common'
-import express, { Express, Request, RequestHandler, Response } from 'express'
-import http from 'http'
+import express, { Express, RequestHandler } from 'express'
+import httpProxy from 'http-proxy'
 import { Signer } from './common/combine'
 import {
   catchErrorHandler,
@@ -56,38 +56,6 @@ export function startCombiner(config: CombinerConfig, kit: ContractKit): Express
     })
   })
 
-  if (config.forwardToGen2) {
-    // Define a new route handler for forwarding requests
-    app.all('*', (req: Request, res: Response) => {
-      let destinationUrl
-      const originalPath = req.path
-      const strippedPath = originalPath.replace(/\/combiner/, '')
-
-      switch (config.deploymentEnv) {
-        case 'mainnet':
-          // XXX (soloseng):URL may need to be updated after gen2 function is created on mainnet
-          destinationUrl =
-            'https://us-central1-celo-pgpnp-mainnet.cloudfunctions.net/combinerGen2' + strippedPath
-          handleForward(req, res, destinationUrl)
-          break
-        case 'alfajores':
-          // XXX (soloseng):URL may need to be updated after gen2 function is created on alfajores
-          destinationUrl =
-            'https://us-central1-celo-phone-number-privacy.cloudfunctions.net/combinerGen2' +
-            strippedPath
-          handleForward(req, res, destinationUrl)
-          break
-        case 'staging':
-          destinationUrl =
-            'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net/combinerGen2' +
-            strippedPath
-          handleForward(req, res, destinationUrl)
-          break
-      }
-    })
-    return app
-  }
-
   const dekFetcher = newContractKitFetcher(
     kit,
     logger,
@@ -121,39 +89,40 @@ export function createHandler<R extends OdisRequest>(
   return meteringHandler(catchErrorHandler(enabled ? handler : disabledHandler<R>))
 }
 
-function handleForward(req: Request, res: Response, destinationUrl: string) {
-  const { method, headers, body } = req
-  const { hostname, port, pathname } = new URL(destinationUrl)
+export function startProxy(req: any, res: any, config: CombinerConfig) {
+  const proxy = httpProxy.createProxyServer({})
+  let destinationUrl
+  const originalPath = req.path
+  const strippedPath = originalPath.replace(/\/combiner/, '')
 
-  // Configure the options for the outbound request
-  const options: http.RequestOptions = {
-    hostname,
-    port,
-    path: pathname,
-    method,
-    headers,
+  switch (config.deploymentEnv) {
+    case 'mainnet':
+      // XXX (soloseng):URL may need to be updated after gen2 function is created on mainnet
+      destinationUrl =
+        'https://us-central1-celo-pgpnp-mainnet.cloudfunctions.net/combinerGen2' +
+        proxy.web(req, res, { target: destinationUrl })
+      break
+    case 'alfajores':
+      // XXX (soloseng):URL may need to be updated after gen2 function is created on alfajores
+      destinationUrl =
+        'https://us-central1-celo-phone-number-privacy.cloudfunctions.net/combinerGen2' +
+        strippedPath
+
+      proxy.web(req, res, { target: destinationUrl })
+      break
+    case 'staging':
+      destinationUrl =
+        'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net/combinerGen2' +
+        strippedPath
+
+      proxy.web(req, res, { target: destinationUrl })
+      break
   }
-
-  // Create an HTTP request to forward the request
-  const forwardReq = http.request(options, (forwardRes) => {
-    const chunks: Buffer[] = []
-
-    forwardRes.on('data', (chunk) => {
-      chunks.push(chunk)
-    })
-
-    forwardRes.on('end', () => {
-      const responseData = Buffer.concat(chunks).toString()
-      res.status(forwardRes.statusCode || 500).send(responseData)
-    })
+  proxy.on('error', (_) => {
+    res
+      .status(500)
+      .send(
+        'Error in Proxying request to Combiner. Please make sure you are running the latest SDK version?'
+      )
   })
-
-  // Handle errors in the outbound request
-  forwardReq.on('error', (error) => {
-    res.status(500).send('Error forwarding request: ' + error.message)
-  })
-
-  // Write the request body and end the request
-  forwardReq.write(JSON.stringify(body))
-  forwardReq.end()
 }
