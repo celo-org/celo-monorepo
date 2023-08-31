@@ -90,9 +90,13 @@ export function createHandler<R extends OdisRequest>(
 }
 
 export function startProxy(req: any, res: any, config: CombinerConfig) {
-  const logger = rootLogger(config.serviceName)
-  const proxy = httpProxy.createProxyServer({})
   let destinationUrl
+
+  const logger = rootLogger(config.serviceName)
+  const proxy = httpProxy.createProxyServer({
+    proxyTimeout: config.phoneNumberPrivacy.odisServices.timeoutMilliSeconds,
+  })
+
   const originalPath = req.path
   const strippedPath = originalPath.replace(/\/combiner/, '')
 
