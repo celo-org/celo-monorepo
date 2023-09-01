@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-signer",
-  "version": "3.0.0-beta.17-dev",
+  "version": "3.0.1-dev",
   "description": "Signing participator of ODIS",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -27,10 +27,8 @@
     "test:e2e:alfajores:1": "CONTEXT_NAME=alfajores ODIS_SIGNER_SERVICE_URL=https://odis-alfajores-signer-1-b.azurefd.net yarn test:e2e",
     "test:e2e:alfajores:2": "CONTEXT_NAME=alfajores ODIS_SIGNER_SERVICE_URL=https://odis-alfajores-signer2.azurefd.net yarn test:e2e",
     "test:e2e:alfajores:3": "CONTEXT_NAME=alfajores ODIS_SIGNER_SERVICE_URL=https://odis-alfajores-signer3.azurefd.net yarn test:e2e",
-    "test:e2e:mainnet:westus2": "CONTEXT_NAME=mainnet ODIS_SIGNER_SERVICE_URL=https://mainnet-pgpnp-westus2.azurefd.net yarn test:e2e",
     "test:e2e:mainnet:brazilsouth": "CONTEXT_NAME=mainnet ODIS_SIGNER_SERVICE_URL=https://mainnet-pgpnp-brazilsouth.azurefd.net yarn test:e2e",
     "test:e2e:mainnet:eastasia": "CONTEXT_NAME=mainnet ODIS_SIGNER_SERVICE_URL=https://mainnet-pgpnp-eastasia.azurefd.net yarn test:e2e",
-    "test:e2e:mainnet:westeurope": "CONTEXT_NAME=mainnet ODIS_SIGNER_SERVICE_URL=https://mainnet-pgpnp-westeurope.azurefd.net yarn test:e2e",
     "test:signer:mainnet": "MAINNET_ODIS_BLOCKCHAIN_PROVIDER=https://alfajores-forno.celo-testnet.org CONTEXT_NAME=mainnet yarn jest test/end-to-end -t='\\[Signer configuration test\\]'",
     "db:migrate": "ts-node scripts/run-migrations.ts",
     "db:migrate:make": "knex --migrations-directory ./src/common/database/migrations migrate:make -x ts",
@@ -68,6 +66,7 @@
     "lru-cache": "^10.0.1"
   },
   "devDependencies": {
+    "@types/node": "18.15.13",
     "@types/express": "^4.17.6",
     "@types/supertest": "^2.0.12",
     "sqlite3": "^5.0.8",
