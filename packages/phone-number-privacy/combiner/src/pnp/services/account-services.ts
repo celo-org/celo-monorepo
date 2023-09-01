@@ -1,15 +1,10 @@
 import { ContractKit } from '@celo/contractkit'
-import {
-  ErrorMessage,
-  FULL_NODE_TIMEOUT_IN_MS,
-  getDataEncryptionKey,
-  RETRY_COUNT,
-  RETRY_DELAY_IN_MS,
-} from '@celo/phone-number-privacy-common'
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { LRUCache } from 'lru-cache'
 import { OdisError, wrapError } from '../../common/error'
 import { traceAsyncFunction } from '../../common/tracing-utils'
+import { getDEK } from '../../common/web3/contracts'
 
 export interface AccountService {
   getAccount(address: string): Promise<string>
@@ -40,7 +35,7 @@ export class CachingAccountService implements AccountService {
 
       if (dek === undefined) {
         // TODO decide which error ot use here
-        throw new OdisError(ErrorMessage.FAILURE_TO_GET_DEK)
+        throw new OdisError(ErrorMessage.FULL_NODE_ERROR)
       }
       return dek
     })
@@ -49,33 +44,11 @@ export class CachingAccountService implements AccountService {
 
 // tslint:disable-next-line:max-classes-per-file
 export class ContractKitAccountService implements AccountService {
-  constructor(
-    private readonly logger: Logger,
-    private readonly kit: ContractKit,
-    private readonly opts: ContractKitAccountServiceOptions = {
-      fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
-      fullNodeRetryCount: RETRY_COUNT,
-      fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
-    }
-  ) {}
+  constructor(private readonly logger: Logger, private readonly kit: ContractKit) {}
 
   async getAccount(address: string): Promise<string> {
     return traceAsyncFunction('ContractKitAccountService - getAccount', async () => {
-      return wrapError(
-        getDataEncryptionKey(
-          address,
-          this.kit,
-          this.logger,
-          this.opts.fullNodeTimeoutMs,
-          this.opts.fullNodeRetryCount,
-          this.opts.fullNodeRetryDelayMs
-        ).catch((err) => {
-          // TODO could clean this up...quick fix since we weren't incrementing blockchain error counter
-          this.logger.error({ err, address }, 'failed to get on-chain dek for account')
-          throw err
-        }),
-        ErrorMessage.FAILURE_TO_GET_DEK
-      )
+      return wrapError(getDEK(this.kit, this.logger, address), ErrorMessage.FAILURE_TO_GET_DEK)
     })
   }
 }

@@ -130,26 +130,6 @@ export function meteringHandler<R extends OdisRequest>(
   }
 }
 
-export function timeoutHandler<R extends OdisRequest>(
-  timeoutMs: number,
-  handler: PromiseHandler<R>
-): PromiseHandler<R> {
-  return async (req, res) => {
-    const timeoutSignal = (AbortSignal as any).timeout(timeoutMs)
-    timeoutSignal.addEventListener(
-      'abort',
-      () => {
-        if (!res.headersSent) {
-          sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, res, req.url)
-        }
-      },
-      { once: true }
-    )
-
-    await handler(req, res)
-  }
-}
-
 export async function disabledHandler<R extends OdisRequest>(
   req: Request<{}, {}, R>,
   response: Response<OdisResponse<R>, Locals>

@@ -67,11 +67,7 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
 
   const baseAccountService = config.phoneNumberPrivacy.shouldMockAccountService
     ? new MockAccountService(config.phoneNumberPrivacy.mockDek!)
-    : new ContractKitAccountService(logger, kit, {
-        fullNodeTimeoutMs: config.phoneNumberPrivacy.fullNodeTimeoutMs,
-        fullNodeRetryCount: config.phoneNumberPrivacy.fullNodeRetryCount,
-        fullNodeRetryDelayMs: config.phoneNumberPrivacy.fullNodeRetryDelayMs,
-      })
+    : new ContractKitAccountService(logger, kit)
 
   const accountService = new CachingAccountService(baseAccountService)
 
