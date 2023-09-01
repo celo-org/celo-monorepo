@@ -150,19 +150,6 @@ export function timeoutHandler<R extends OdisRequest>(
   }
 }
 
-export function withEnableHandler<R extends OdisRequest>(
-  enabled: boolean,
-  handler: PromiseHandler<R>
-): PromiseHandler<R> {
-  return async (req, res) => {
-    if (enabled) {
-      return handler(req, res)
-    } else {
-      sendFailure(WarningMessage.API_UNAVAILABLE, 503, res, req.url)
-    }
-  }
-}
-
 export async function disabledHandler<R extends OdisRequest>(
   req: Request<{}, {}, R>,
   response: Response<OdisResponse<R>, Locals>
