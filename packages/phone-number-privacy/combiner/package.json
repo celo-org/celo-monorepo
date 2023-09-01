@@ -48,6 +48,7 @@
     "firebase-admin": "^11.10.1",
     "firebase-functions": "^4.4.1",
     "knex": "^2.1.0",
+    "lru-cache": "^10.0.1",
     "node-fetch": "^2.6.9",
     "pg": "^8.2.1",
     "uuid": "^7.0.3"

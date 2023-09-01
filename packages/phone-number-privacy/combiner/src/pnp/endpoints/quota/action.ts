@@ -1,8 +1,8 @@
 import {
   authenticateUser,
   CombinerEndpoint,
-  DataEncryptionKeyFetcher,
   ErrorMessage,
+  ErrorType,
   getSignerEndpoint,
   hasValidAccountParam,
   isBodyReasonablySized,
@@ -16,13 +16,14 @@ import { Signer, thresholdCallToSigners } from '../../../common/combine'
 import { errorResult, ResultHandler } from '../../../common/handlers'
 import { getKeyVersionInfo } from '../../../common/io'
 import { getCombinerVersion, OdisConfig } from '../../../config'
+import { AccountService } from '../../services/account-services'
 import { logPnpSignerResponseDiscrepancies } from '../../services/log-responses'
 import { findCombinerQuotaState } from '../../services/threshold-state'
 
 export function pnpQuota(
   signers: Signer[],
   config: OdisConfig,
-  dekFetcher: DataEncryptionKeyFetcher
+  accountService: AccountService
 ): ResultHandler<PnpQuotaRequest> {
   return async (request, response) => {
     const logger = response.locals.logger
@@ -31,7 +32,9 @@ export function pnpQuota(
       return errorResult(400, WarningMessage.INVALID_INPUT)
     }
 
-    if (!(await authenticateUser(request, logger, dekFetcher))) {
+    const warnings: ErrorType[] = []
+
+    if (!(await authenticateUser(request, logger, accountService.getAccount, warnings))) {
       return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
     }
 
@@ -47,7 +50,7 @@ export function pnpQuota(
       responseSchema: PnpQuotaResponseSchema,
       shouldCheckKeyVersion: false,
     })
-    const warnings = logPnpSignerResponseDiscrepancies(logger, signerResponses)
+    warnings.push(...logPnpSignerResponseDiscrepancies(logger, signerResponses))
 
     const { threshold } = keyVersionInfo
 

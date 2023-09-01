@@ -24,9 +24,11 @@ import {
   pnpFullNodeTimeoutMs,
   pnpKeysCurrentVersion,
   pnpKeysVersions,
+  pnpMockDek,
   pnpOdisServicesSigners,
   pnpOdisServicesTimeoutMilliseconds,
   pnpServiceName,
+  pnpShouldMockAccountService,
   serviceNameConfig,
 } from './utils/firebase-configs'
 
@@ -61,6 +63,8 @@ export interface OdisConfig {
   fullNodeTimeoutMs: number
   fullNodeRetryCount: number
   fullNodeRetryDelayMs: number
+  shouldMockAccountService?: boolean
+  mockDek?: string
 }
 
 export interface CombinerConfig {
@@ -185,6 +189,8 @@ if (DEV_MODE) {
       fullNodeTimeoutMs: pnpFullNodeTimeoutMs.value(),
       fullNodeRetryCount: pnpFullNodeRetryCount.value(),
       fullNodeRetryDelayMs: pnpFullNodeDelaysMs.value(),
+      shouldMockAccountService: pnpShouldMockAccountService.value(),
+      mockDek: pnpMockDek.value(),
     },
     domains: {
       serviceName: domainServiceName.value(),
