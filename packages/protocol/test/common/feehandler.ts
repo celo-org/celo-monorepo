@@ -543,7 +543,7 @@ contract('FeeHandler', (accounts: string[]) => {
       // 1. Skip these tests locally, as they will run in the CI anyway or
       // 2. Change the hash, you can get the hash for the parciular test deployment with the following:
       // // tslint:disable-next-line
-      // console.log('Uniswap INIT CODE PAIR HASH:', await uniswapFactory.INIT_CODE_PAIR_HASH())
+      console.log('Uniswap INIT CODE PAIR HASH:', await uniswapFactory.INIT_CODE_PAIR_HASH())
       beforeEach(async () => {
         deadline = (await web3.eth.getBlock('latest')).timestamp + 100
 
