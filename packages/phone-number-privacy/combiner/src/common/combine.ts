@@ -3,15 +3,15 @@ import {
   KeyVersionInfo,
   OdisRequest,
   OdisResponse,
-  responseHasExpectedKeyVersion,
   SignerEndpoint,
   WarningMessage,
+  responseHasExpectedKeyVersion,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request } from 'express'
 import * as t from 'io-ts'
 import { PerformanceObserver } from 'perf_hooks'
-import { fetchSignerResponseWithFallback, SignerResponse } from './io'
+import { SignerResponse, fetchSignerResponseWithFallback } from './io'
 
 export interface Signer {
   url: string
@@ -90,10 +90,11 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
         })
 
         if (!signerFetchResult.ok) {
+          const data = await signerFetchResult.json()
           // used for log based metrics
           logger.info({
             message: 'Received signerFetchResult on unsuccessful signer response',
-            res: await signerFetchResult.json(),
+            res: data,
             status: signerFetchResult.status,
             signer: signer.url,
           })
@@ -108,6 +109,7 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
             logger.warn('Not possible to reach a threshold of signer responses. Failing fast')
             manualAbort.abort()
           }
+          responses.push({ res: data, url: signer.url })
           return
         }
 

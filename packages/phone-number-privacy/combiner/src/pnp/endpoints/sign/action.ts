@@ -20,6 +20,7 @@ import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-crypto
 import { errorResult, ResultHandler } from '../../../common/handlers'
 import { getKeyVersionInfo, requestHasSupportedKeyVersion } from '../../../common/io'
 import { getCombinerVersion, OdisConfig } from '../../../config'
+import { NoQuotaCache } from '../../../utils/no-quota-cache'
 import { AccountService } from '../../services/account-services'
 import { logPnpSignerResponseDiscrepancies } from '../../services/log-responses'
 import { findCombinerQuotaState } from '../../services/threshold-state'
@@ -27,7 +28,8 @@ import { findCombinerQuotaState } from '../../services/threshold-state'
 export function pnpSign(
   signers: Signer[],
   config: OdisConfig,
-  accountService: AccountService
+  accountService: AccountService,
+  noQuotaCache: NoQuotaCache
 ): ResultHandler<SignMessageRequest> {
   return async (request, response) => {
     const logger = response.locals.logger
@@ -44,6 +46,16 @@ export function pnpSign(
     if (!(await authenticateUser(request, logger, accountService.getAccount, warnings))) {
       return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
     }
+
+    const account = request.body.account
+    if (noQuotaCache.maximumQuouaReached(account)) {
+      const quota = noQuotaCache.getTotalQuota(account)
+      // can exist a race condition between the hasQuota and getTotalQuota but that's highly improbable
+      if (quota !== undefined) {
+        return errorResult(403, WarningMessage.EXCEEDED_QUOTA)
+      }
+    }
+
     const keyVersionInfo = getKeyVersionInfo(request, config, logger)
     const crypto = new BLSCryptographyClient(keyVersionInfo)
 
@@ -109,6 +121,15 @@ export function pnpSign(
     }
 
     const errorCode = maxErrorCode ?? 500
+    // If the error is 403 it means that we don't have quota for the signer
+    if (errorCode === 403) {
+      const exceededResponse = signerResponses.find(
+        (e) => !e.res.success && e.res.error === WarningMessage.EXCEEDED_QUOTA
+      )
+      if (exceededResponse && exceededResponse.res.totalQuota !== undefined) {
+        noQuotaCache.setNoMoreQuota(account, exceededResponse.res.totalQuota)
+      }
+    }
     const error = errorCodeToError(errorCode)
     return errorResult(errorCode, error)
   }
