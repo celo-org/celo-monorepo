@@ -44,7 +44,7 @@ oracle:
       #   {exchange: 'UPBIT', symbol: 'BTCKRW', toInvert: true},
       #   {exchange: 'BITGET', symbol: 'BTCBRL', toInvert: false},
       # ]
-  minPriceSourceCount: 4
+  minPriceSourceCount: 3
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
