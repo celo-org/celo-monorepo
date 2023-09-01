@@ -127,7 +127,8 @@ export function startProxy(req: any, res: any, config: CombinerConfig) {
     logger.error('Error in Proxying request to Combiner.')
     res.status(500).json({
       success: false,
-      error: 'Error handling you request. Please make sure you are running the latest SDK version.',
+      error:
+        'Error handling your request. Please make sure you are running the latest SDK version.',
     })
   })
 }
