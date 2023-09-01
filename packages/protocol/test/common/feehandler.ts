@@ -542,7 +542,7 @@ contract('FeeHandler', (accounts: string[]) => {
       // in the file UniswapV2Library.sol. The hash writen now there is meant to run in the CI. If you're seeing this problem you can
       // 1. Skip these tests locally, as they will run in the CI anyway or
       // 2. Change the hash, you can get the hash for the parciular test deployment with the following:
-      // // tslint:disable-next-line
+      // tslint:disable-next-line
       console.log('Uniswap INIT CODE PAIR HASH:', await uniswapFactory.INIT_CODE_PAIR_HASH())
       beforeEach(async () => {
         deadline = (await web3.eth.getBlock('latest')).timestamp + 100
