@@ -1,18 +1,19 @@
 import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { Knex } from 'knex'
-import { Counters, Labels } from '../metrics'
+import { OdisError } from '../error'
+import { Counters, Histograms, Labels, newMeter } from '../metrics'
 
 export type DatabaseErrorMessage =
   | ErrorMessage.DATABASE_GET_FAILURE
   | ErrorMessage.DATABASE_INSERT_FAILURE
   | ErrorMessage.DATABASE_UPDATE_FAILURE
+  | ErrorMessage.DATABASE_REMOVE_FAILURE
 
-export function countAndThrowDBError<T>(
+export function countAndThrowDBError(
   err: any,
   logger: Logger,
   errorMsg: DatabaseErrorMessage
-): T {
+): never {
   let label: Labels
   switch (errorMsg) {
     case ErrorMessage.DATABASE_UPDATE_FAILURE:
@@ -24,19 +25,28 @@ export function countAndThrowDBError<T>(
     case ErrorMessage.DATABASE_INSERT_FAILURE:
       label = Labels.INSERT
       break
+    case ErrorMessage.DATABASE_REMOVE_FAILURE:
+      label = Labels.BATCH_DELETE
+      break
     default:
       throw new Error('Unknown database label provided')
   }
 
   Counters.databaseErrors.labels(label).inc()
   logger.error({ err }, errorMsg)
-  throw new Error(errorMsg)
+  throw new OdisError(errorMsg)
 }
 
-export function tableWithLockForTrx(baseQuery: Knex.QueryBuilder, trx?: Knex.Transaction) {
-  if (trx) {
-    // Lock relevant database rows for the duration of the transaction
-    return baseQuery.transacting(trx).forUpdate()
-  }
-  return baseQuery
+export function doMeteredSql<A>(
+  sqlLabel: string,
+  errorMsg: DatabaseErrorMessage,
+  logger: Logger,
+  fn: () => Promise<A>
+): Promise<A> {
+  const meter = newMeter(Histograms.dbOpsInstrumentation, sqlLabel)
+
+  return meter(async () => {
+    const res = await fn()
+    return res
+  }).catch((err) => countAndThrowDBError(err, logger, errorMsg))
 }
