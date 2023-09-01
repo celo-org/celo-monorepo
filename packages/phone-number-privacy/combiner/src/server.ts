@@ -17,7 +17,6 @@ import {
   meteringHandler,
   resultHandler,
   ResultHandler,
-  timeoutHandler,
   tracingHandler,
 } from './common/handlers'
 import { CombinerConfig, getCombinerVersion } from './config'
@@ -78,7 +77,6 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
   app.post(
     CombinerEndpoint.PNP_QUOTA,
     createHandler(
-      phoneNumberPrivacy.odisServices.timeoutMilliSeconds,
       phoneNumberPrivacy.enabled,
       pnpQuota(pnpSigners, config.phoneNumberPrivacy, dekFetcher)
     )
@@ -86,47 +84,31 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
   app.post(
     CombinerEndpoint.PNP_SIGN,
     createHandler(
-      phoneNumberPrivacy.odisServices.timeoutMilliSeconds,
       phoneNumberPrivacy.enabled,
       pnpSign(pnpSigners, config.phoneNumberPrivacy, dekFetcher)
     )
   )
   app.post(
     CombinerEndpoint.DOMAIN_QUOTA_STATUS,
-    createHandler(
-      domains.odisServices.timeoutMilliSeconds,
-      domains.enabled,
-      domainQuota(domainSigners, config.domains)
-    )
+    createHandler(domains.enabled, domainQuota(domainSigners, config.domains))
   )
   app.post(
     CombinerEndpoint.DOMAIN_SIGN,
-    createHandler(
-      domains.odisServices.timeoutMilliSeconds,
-      config.domains.enabled,
-      domainSign(domainSigners, config.domains)
-    )
+    createHandler(domains.enabled, domainSign(domainSigners, domains))
   )
   app.post(
     CombinerEndpoint.DISABLE_DOMAIN,
-    createHandler(
-      domains.odisServices.timeoutMilliSeconds,
-      config.domains.enabled,
-      disableDomain(domainSigners, config.domains)
-    )
+    createHandler(domains.enabled, disableDomain(domainSigners, domains))
   )
 
   return app
 }
 
 function createHandler<R extends OdisRequest>(
-  timeoutMs: number,
   enabled: boolean,
   action: ResultHandler<R>
 ): RequestHandler<{}, {}, R, {}, Locals> {
   return catchErrorHandler(
-    tracingHandler(
-      meteringHandler(timeoutHandler(timeoutMs, enabled ? resultHandler(action) : disabledHandler))
-    )
+    tracingHandler(meteringHandler(enabled ? resultHandler(action) : disabledHandler))
   )
 }
