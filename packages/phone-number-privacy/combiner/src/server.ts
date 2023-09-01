@@ -100,7 +100,7 @@ export function startProxy(req: any, res: any, config: CombinerConfig) {
   const originalPath = req.path
   const strippedPath = originalPath.replace(/\/combiner/, '')
 
-  switch (config.deploymentEnv) {
+  switch (config.proxy.deploymentEnv) {
     case 'mainnet':
       // XXX (soloseng):URL may need to be updated after gen2 function is created on mainnet
       destinationUrl =

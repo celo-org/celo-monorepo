@@ -14,7 +14,7 @@ export const combiner = functions
     minInstances: functions.config().service ? Number(functions.config().service.min_instances) : 0,
   })
   .https.onRequest((req, res) => {
-    if (config.forwardToGen2) {
+    if (config.proxy.forwardToGen2) {
       startProxy(req, res, config)
     } else {
       const app = startCombiner(config, getContractKitWithAgent(config.blockchain))

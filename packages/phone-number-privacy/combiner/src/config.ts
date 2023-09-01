@@ -40,14 +40,16 @@ export interface OdisConfig {
   fullNodeRetryCount: number
   fullNodeRetryDelayMs: number
 }
-
+export interface ProxyConfig {
+  deploymentEnv: string
+  forwardToGen2: boolean
+}
 export interface CombinerConfig {
   serviceName: string
   blockchain: BlockchainConfig
   phoneNumberPrivacy: OdisConfig
   domains: OdisConfig
-  deploymentEnv: string
-  forwardToGen2: boolean
+  proxy: ProxyConfig
 }
 
 let config: CombinerConfig
@@ -143,8 +145,10 @@ if (DEV_MODE) {
       fullNodeRetryCount: RETRY_COUNT,
       fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
     },
-    forwardToGen2: false,
-    deploymentEnv: 'local',
+    proxy: {
+      forwardToGen2: false,
+      deploymentEnv: 'local',
+    },
   }
 } else {
   const functionConfig = functions.config()
@@ -194,8 +198,10 @@ if (DEV_MODE) {
         functionConfig.domains.full_node_retry_delay_ms ?? RETRY_DELAY_IN_MS
       ),
     },
-    forwardToGen2: toBool(functionConfig.forward_to_gen2, false),
-    deploymentEnv: functionConfig.deployment_env,
+    proxy: {
+      forwardToGen2: toBool(functionConfig.proxy.forward_to_gen2, false),
+      deploymentEnv: functionConfig.proxy.deployment_env,
+    },
   }
 }
 export default config
