@@ -49,7 +49,7 @@ export function createMockOdisPayments(totalPaidCUSDFunc: jest.Mock<BigNumber, [
 
 export function createMockContractKit(
   c: { [contractName in ContractRetrieval]?: any },
-  mockWeb3: any
+  mockWeb3?: any
 ) {
   const contracts: any = {}
   for (const t of Object.keys(c)) {
@@ -61,7 +61,7 @@ export function createMockContractKit(
     registry: {
       addressFor: async () => 1000,
     },
-    connection: createMockConnection(mockWeb3),
+    connection: mockWeb3 ?? createMockConnection(mockWeb3),
   }
 }
 
@@ -76,7 +76,6 @@ export function createMockConnection(mockWeb3: any) {
 }
 
 export enum ContractRetrieval {
-  getAttestations = 'getAttestations',
   getStableToken = 'getStableToken',
   getGoldToken = 'getGoldToken',
   getAccounts = 'getAccounts',

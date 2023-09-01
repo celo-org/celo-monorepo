@@ -1,7 +1,7 @@
 import { AuthenticationMethod, CombinerEndpoint } from '@celo/phone-number-privacy-common'
+import fetchMock from '../__mocks__/cross-fetch'
 import { EncryptionKeySigner, ServiceContext } from './query'
 import { getPnpQuotaStatus, PnpClientQuotaStatus } from './quota'
-import fetchMock from '../__mocks__/cross-fetch'
 
 const mockAccount = '0x0000000000000000000000000000000000007E57'
 const serviceContext: ServiceContext = {
@@ -40,7 +40,6 @@ describe(getPnpQuotaStatus, () => {
       remainingQuota: totalQuota - performedQueryCount,
       version,
       warnings: undefined,
-      blockNumber: undefined,
     })
   })
 

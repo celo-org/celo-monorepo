@@ -1,7 +1,13 @@
-import { timeout } from '@celo/base'
-import { DisableDomainRequest, domainHash } from '@celo/phone-number-privacy-common'
+import {
+  DisableDomainRequest,
+  disableDomainRequestSchema,
+  domainHash,
+  DomainSchema,
+  verifyDisableDomainRequestAuthenticity,
+  WarningMessage,
+} from '@celo/phone-number-privacy-common'
+import { Request } from 'express'
 import { Knex } from 'knex'
-import { Action } from '../../../common/action'
 import { toSequentialDelayDomainState } from '../../../common/database/models/domain-state'
 import {
   createEmptyDomainStateRecord,
@@ -9,19 +15,23 @@ import {
   insertDomainStateRecord,
   setDomainDisabled,
 } from '../../../common/database/wrappers/domain-state'
-import { SignerConfig } from '../../../config'
-import { DomainSession } from '../../session'
-import { DomainDisableIO } from './io'
+import { errorResult, ResultHandler } from '../../../common/handler'
+import { getSignerVersion } from '../../../config'
 
-export class DomainDisableAction implements Action<DisableDomainRequest> {
-  constructor(readonly db: Knex, readonly config: SignerConfig, readonly io: DomainDisableIO) {}
+export function domainDisable(db: Knex): ResultHandler<DisableDomainRequest> {
+  return async (request, response) => {
+    const { logger } = response.locals
 
-  public async perform(
-    session: DomainSession<DisableDomainRequest>,
-    timeoutError: symbol
-  ): Promise<void> {
-    const domain = session.request.body.domain
-    session.logger.info(
+    if (!isValidRequest(request)) {
+      return errorResult(400, WarningMessage.INVALID_INPUT)
+    }
+    if (!verifyDisableDomainRequestAuthenticity(request.body)) {
+      return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
+    }
+
+    const { domain } = request.body
+
+    logger.info(
       {
         name: domain.name,
         version: domain.version,
@@ -29,35 +39,38 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
       },
       'Processing request to disable domain'
     )
-    // Inside a database transaction, update or create the domain to mark it disabled.
-    const res = await this.db.transaction(async (trx) => {
-      const disableDomainHandler = async () => {
-        const domainStateRecord =
-          (await getDomainStateRecord(this.db, domain, session.logger, trx)) ??
-          (await insertDomainStateRecord(
-            this.db,
-            createEmptyDomainStateRecord(domain, true),
-            trx,
-            session.logger
-          ))
-        if (!domainStateRecord.disabled) {
-          await setDomainDisabled(this.db, domain, trx, session.logger)
-          domainStateRecord.disabled = true
-        }
-        return {
-          success: true,
-          status: 200,
-          domainStateRecord,
-        }
+
+    const res = await db.transaction(async (trx) => {
+      const domainStateRecord =
+        (await getDomainStateRecord(db, domain, logger, trx)) ??
+        (await insertDomainStateRecord(db, createEmptyDomainStateRecord(domain, true), trx, logger))
+      if (!domainStateRecord.disabled) {
+        await setDomainDisabled(db, domain, trx, logger)
+        domainStateRecord.disabled = true
       }
-      // Ensure timeouts roll back DB trx
-      return timeout(disableDomainHandler, [], this.config.timeout, timeoutError)
+      return {
+        // TODO revisit this
+        success: true,
+        status: 200,
+        domainStateRecord,
+      }
+      // Note: we previously timed out inside the trx to ensure timeouts roll back DB trx
+      // return timeout(disableDomainHandler, [], this.config.timeout, timeoutError)
     })
 
-    this.io.sendSuccess(
-      res.status,
-      session.response,
-      toSequentialDelayDomainState(res.domainStateRecord)
-    )
+    return {
+      status: res.status,
+      body: {
+        success: true,
+        version: getSignerVersion(),
+        status: toSequentialDelayDomainState(res.domainStateRecord),
+      },
+    }
   }
+}
+
+function isValidRequest(
+  request: Request<{}, {}, unknown>
+): request is Request<{}, {}, DisableDomainRequest> {
+  return disableDomainRequestSchema(DomainSchema).is(request.body)
 }

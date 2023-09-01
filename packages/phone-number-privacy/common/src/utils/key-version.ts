@@ -35,7 +35,7 @@ export function getRequestKeyVersion(
     return undefined
   }
   if (!isValidKeyVersion(keyVersion)) {
-    logger.error({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
+    logger.error({ keyVersionHeader, keyVersion }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
     throw new Error(WarningMessage.INVALID_KEY_VERSION_REQUEST)
   }
 
@@ -76,7 +76,7 @@ export function getResponseKeyVersion(response: FetchResponse, logger: Logger): 
     return undefined
   }
   if (!isValidKeyVersion(keyVersion)) {
-    logger.error({ keyVersionHeader }, ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
+    logger.error({ keyVersionHeader, keyVersion }, ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
     throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
   }
 
@@ -93,7 +93,7 @@ function parseKeyVersionFromHeader(
 
   const keyVersionHeaderString = keyVersionHeader.toString().trim()
 
-  if (!keyVersionHeaderString.length) {
+  if (!keyVersionHeaderString.length || keyVersionHeaderString === 'undefined') {
     return undefined
   }
 
