@@ -15,15 +15,18 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
   address public factory; // TODO changed by volpe
   address public WETH; // TODO changed by volpe
 
+  bytes32 public INIT_CODE_PAIR_HASH;
+
   event Pair(address pair);
   modifier ensure(uint256 deadline) {
     require(deadline >= block.timestamp, "UniswapV2Router: EXPIRED");
     _;
   }
 
-  constructor(address _factory, address _WETH) public {
+  constructor(address _factory, address _WETH, bytes32 initCodePairHash) public {
     factory = _factory;
     WETH = _WETH;
+    INIT_CODE_PAIR_HASH = initCodePairHash;
   }
 
   // receive() external payable {
@@ -43,10 +46,15 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     if (IUniswapV2Factory(factory).getPair(tokenA, tokenB) == address(0)) {
       IUniswapV2Factory(factory).createPair(tokenA, tokenB);
     }
-    // emit Pair(UniswapV2Library.pairFor(factory, tokenA, tokenB));
+    // emit Pair(UniswapV2Library.pairFor(factory, tokenA, tokenB)), INIT_CODE_PAIR_HASH;
     // require(false, "revert here");
     (amountA, amountA);
-    (uint256 reserveA, uint256 reserveB) = UniswapV2Library.getReserves(factory, tokenA, tokenB);
+    (uint256 reserveA, uint256 reserveB) = UniswapV2Library.getReserves(
+      factory,
+      tokenA,
+      tokenB,
+      INIT_CODE_PAIR_HASH
+    );
     if (reserveA == 0 && reserveB == 0) {
       (amountA, amountB) = (amountADesired, amountBDesired);
     } else {
@@ -81,7 +89,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
       amountBMin
     );
     // require(false, "revert here");
-    address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB);
+    address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB, INIT_CODE_PAIR_HASH);
     TransferHelper.safeTransferFrom(tokenA, msg.sender, pair, amountA);
     TransferHelper.safeTransferFrom(tokenB, msg.sender, pair, amountB);
     liquidity = IUniswapV2Pair(pair).mint(to);
@@ -107,7 +115,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
       amountTokenMin,
       amountETHMin
     );
-    address pair = UniswapV2Library.pairFor(factory, token, WETH);
+    address pair = UniswapV2Library.pairFor(factory, token, WETH, INIT_CODE_PAIR_HASH);
     TransferHelper.safeTransferFrom(token, msg.sender, pair, amountToken);
     // IWETH(WETH).deposit{value: amountETH}(); // TODO changed by volpe
     assert(IWETH(WETH).transfer(pair, amountETH));
@@ -126,7 +134,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     address to,
     uint256 deadline
   ) public ensure(deadline) returns (uint256 amountA, uint256 amountB) {
-    address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB);
+    address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB, INIT_CODE_PAIR_HASH);
     IUniswapV2Pair(pair).transferFrom(msg.sender, pair, liquidity); // send liquidity to pair
     (uint256 amount0, uint256 amount1) = IUniswapV2Pair(pair).burn(to);
     (address token0, ) = UniswapV2Library.sortTokens(tokenA, tokenB);
@@ -168,7 +176,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     bytes32 r,
     bytes32 s
   ) external returns (uint256 amountA, uint256 amountB) {
-    address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB);
+    address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB, INIT_CODE_PAIR_HASH);
     uint256 value = approveMax ? uint256(-1) : liquidity;
     IUniswapV2Pair(pair).permit(msg.sender, address(this), value, deadline, v, r, s);
     (amountA, amountB) = removeLiquidity(
@@ -193,7 +201,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     bytes32 r,
     bytes32 s
   ) external returns (uint256 amountToken, uint256 amountETH) {
-    address pair = UniswapV2Library.pairFor(factory, token, WETH);
+    address pair = UniswapV2Library.pairFor(factory, token, WETH, INIT_CODE_PAIR_HASH);
     uint256 value = approveMax ? uint256(-1) : liquidity;
     IUniswapV2Pair(pair).permit(msg.sender, address(this), value, deadline, v, r, s);
     (amountToken, amountETH) = removeLiquidityETH(
@@ -240,7 +248,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     bytes32 r,
     bytes32 s
   ) external returns (uint256 amountETH) {
-    address pair = UniswapV2Library.pairFor(factory, token, WETH);
+    address pair = UniswapV2Library.pairFor(factory, token, WETH, INIT_CODE_PAIR_HASH);
     uint256 value = approveMax ? uint256(-1) : liquidity;
     IUniswapV2Pair(pair).permit(msg.sender, address(this), value, deadline, v, r, s);
     amountETH = removeLiquidityETHSupportingFeeOnTransferTokens(
@@ -264,9 +272,9 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
         ? (uint256(0), amountOut)
         : (amountOut, uint256(0));
       address to = i < path.length - 2
-        ? UniswapV2Library.pairFor(factory, output, path[i + 2])
+        ? UniswapV2Library.pairFor(factory, output, path[i + 2], INIT_CODE_PAIR_HASH)
         : _to;
-      IUniswapV2Pair(UniswapV2Library.pairFor(factory, input, output)).swap(
+      IUniswapV2Pair(UniswapV2Library.pairFor(factory, input, output, INIT_CODE_PAIR_HASH)).swap(
         amount0Out,
         amount1Out,
         to,
@@ -281,7 +289,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     address to,
     uint256 deadline
   ) external ensure(deadline) returns (uint256[] memory amounts) {
-    amounts = UniswapV2Library.getAmountsOut(factory, amountIn, path);
+    amounts = UniswapV2Library.getAmountsOut(factory, amountIn, path, INIT_CODE_PAIR_HASH);
     require(
       amounts[amounts.length - 1] >= amountOutMin,
       "UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT"
@@ -289,7 +297,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     TransferHelper.safeTransferFrom(
       path[0],
       msg.sender,
-      UniswapV2Library.pairFor(factory, path[0], path[1]),
+      UniswapV2Library.pairFor(factory, path[0], path[1], INIT_CODE_PAIR_HASH),
       amounts[0]
     );
     _swap(amounts, path, to);
@@ -301,12 +309,12 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     address to,
     uint256 deadline
   ) external ensure(deadline) returns (uint256[] memory amounts) {
-    amounts = UniswapV2Library.getAmountsIn(factory, amountOut, path);
+    amounts = UniswapV2Library.getAmountsIn(factory, amountOut, path, INIT_CODE_PAIR_HASH);
     require(amounts[0] <= amountInMax, "UniswapV2Router: EXCESSIVE_INPUT_AMOUNT");
     TransferHelper.safeTransferFrom(
       path[0],
       msg.sender,
-      UniswapV2Library.pairFor(factory, path[0], path[1]),
+      UniswapV2Library.pairFor(factory, path[0], path[1], INIT_CODE_PAIR_HASH),
       amounts[0]
     );
     _swap(amounts, path, to);
@@ -318,13 +326,18 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     uint256 deadline
   ) external payable ensure(deadline) returns (uint256[] memory amounts) {
     require(path[0] == WETH, "UniswapV2Router: INVALID_PATH");
-    amounts = UniswapV2Library.getAmountsOut(factory, msg.value, path);
+    amounts = UniswapV2Library.getAmountsOut(factory, msg.value, path, INIT_CODE_PAIR_HASH);
     require(
       amounts[amounts.length - 1] >= amountOutMin,
       "UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT"
     );
     // IWETH(WETH).deposit{value: amounts[0]}(); // TODO changed by volpe
-    assert(IWETH(WETH).transfer(UniswapV2Library.pairFor(factory, path[0], path[1]), amounts[0]));
+    assert(
+      IWETH(WETH).transfer(
+        UniswapV2Library.pairFor(factory, path[0], path[1], INIT_CODE_PAIR_HASH),
+        amounts[0]
+      )
+    );
     _swap(amounts, path, to);
   }
   function swapTokensForExactETH(
@@ -335,12 +348,12 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     uint256 deadline
   ) external ensure(deadline) returns (uint256[] memory amounts) {
     require(path[path.length - 1] == WETH, "UniswapV2Router: INVALID_PATH");
-    amounts = UniswapV2Library.getAmountsIn(factory, amountOut, path);
+    amounts = UniswapV2Library.getAmountsIn(factory, amountOut, path, INIT_CODE_PAIR_HASH);
     require(amounts[0] <= amountInMax, "UniswapV2Router: EXCESSIVE_INPUT_AMOUNT");
     TransferHelper.safeTransferFrom(
       path[0],
       msg.sender,
-      UniswapV2Library.pairFor(factory, path[0], path[1]),
+      UniswapV2Library.pairFor(factory, path[0], path[1], INIT_CODE_PAIR_HASH),
       amounts[0]
     );
     _swap(amounts, path, address(this));
@@ -355,7 +368,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     uint256 deadline
   ) external ensure(deadline) returns (uint256[] memory amounts) {
     require(path[path.length - 1] == WETH, "UniswapV2Router: INVALID_PATH");
-    amounts = UniswapV2Library.getAmountsOut(factory, amountIn, path);
+    amounts = UniswapV2Library.getAmountsOut(factory, amountIn, path, INIT_CODE_PAIR_HASH);
     require(
       amounts[amounts.length - 1] >= amountOutMin,
       "UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT"
@@ -363,7 +376,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     TransferHelper.safeTransferFrom(
       path[0],
       msg.sender,
-      UniswapV2Library.pairFor(factory, path[0], path[1]),
+      UniswapV2Library.pairFor(factory, path[0], path[1], INIT_CODE_PAIR_HASH),
       amounts[0]
     );
     _swap(amounts, path, address(this));
@@ -377,10 +390,15 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     uint256 deadline
   ) external payable ensure(deadline) returns (uint256[] memory amounts) {
     require(path[0] == WETH, "UniswapV2Router: INVALID_PATH");
-    amounts = UniswapV2Library.getAmountsIn(factory, amountOut, path);
+    amounts = UniswapV2Library.getAmountsIn(factory, amountOut, path, INIT_CODE_PAIR_HASH);
     require(amounts[0] <= msg.value, "UniswapV2Router: EXCESSIVE_INPUT_AMOUNT");
     // IWETH(WETH).deposit{value: amounts[0]}(); // TODO changed by volpe
-    assert(IWETH(WETH).transfer(UniswapV2Library.pairFor(factory, path[0], path[1]), amounts[0]));
+    assert(
+      IWETH(WETH).transfer(
+        UniswapV2Library.pairFor(factory, path[0], path[1], INIT_CODE_PAIR_HASH),
+        amounts[0]
+      )
+    );
     _swap(amounts, path, to);
     // refund dust eth, if any
     if (msg.value > amounts[0]) TransferHelper.safeTransferETH(msg.sender, msg.value - amounts[0]);
@@ -392,7 +410,9 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     for (uint256 i; i < path.length - 1; i++) {
       (address input, address output) = (path[i], path[i + 1]);
       (address token0, ) = UniswapV2Library.sortTokens(input, output);
-      IUniswapV2Pair pair = IUniswapV2Pair(UniswapV2Library.pairFor(factory, input, output));
+      IUniswapV2Pair pair = IUniswapV2Pair(
+        UniswapV2Library.pairFor(factory, input, output, INIT_CODE_PAIR_HASH)
+      );
       uint256 amountInput;
       uint256 amountOutput;
       {
@@ -408,7 +428,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
         ? (uint256(0), amountOutput)
         : (amountOutput, uint256(0));
       address to = i < path.length - 2
-        ? UniswapV2Library.pairFor(factory, output, path[i + 2])
+        ? UniswapV2Library.pairFor(factory, output, path[i + 2], INIT_CODE_PAIR_HASH)
         : _to;
       pair.swap(amount0Out, amount1Out, to, new bytes(0));
     }
@@ -423,7 +443,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     TransferHelper.safeTransferFrom(
       path[0],
       msg.sender,
-      UniswapV2Library.pairFor(factory, path[0], path[1]),
+      UniswapV2Library.pairFor(factory, path[0], path[1], INIT_CODE_PAIR_HASH),
       amountIn
     );
     uint256 balanceBefore = IERC20(path[path.length - 1]).balanceOf(to);
@@ -442,7 +462,12 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     require(path[0] == WETH, "UniswapV2Router: INVALID_PATH");
     uint256 amountIn = msg.value;
     // IWETH(WETH).deposit{value: amountIn}(); // TODO changed by volpe
-    assert(IWETH(WETH).transfer(UniswapV2Library.pairFor(factory, path[0], path[1]), amountIn));
+    assert(
+      IWETH(WETH).transfer(
+        UniswapV2Library.pairFor(factory, path[0], path[1], INIT_CODE_PAIR_HASH),
+        amountIn
+      )
+    );
     uint256 balanceBefore = IERC20(path[path.length - 1]).balanceOf(to);
     _swapSupportingFeeOnTransferTokens(path, to);
     require(
@@ -461,7 +486,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     TransferHelper.safeTransferFrom(
       path[0],
       msg.sender,
-      UniswapV2Library.pairFor(factory, path[0], path[1]),
+      UniswapV2Library.pairFor(factory, path[0], path[1], INIT_CODE_PAIR_HASH),
       amountIn
     );
     _swapSupportingFeeOnTransferTokens(path, address(this));
@@ -501,7 +526,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     view
     returns (uint256[] memory amounts)
   {
-    return UniswapV2Library.getAmountsOut(factory, amountIn, path);
+    return UniswapV2Library.getAmountsOut(factory, amountIn, path, INIT_CODE_PAIR_HASH);
   }
 
   function getAmountsIn(uint256 amountOut, address[] memory path)
@@ -509,6 +534,6 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     view
     returns (uint256[] memory amounts)
   {
-    return UniswapV2Library.getAmountsIn(factory, amountOut, path);
+    return UniswapV2Library.getAmountsIn(factory, amountOut, path, INIT_CODE_PAIR_HASH);
   }
 }

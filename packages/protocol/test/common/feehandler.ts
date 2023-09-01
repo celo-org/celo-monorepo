@@ -537,30 +537,26 @@ contract('FeeHandler', (accounts: string[]) => {
       })
     })
 
-    describe('Other tokens (non-Mento) (if this fails with "revert" please read comments of this tests)', async () => {
-      // Uniswap can get the address of a pair by using an init code pair hash. Unfortunately, this hash is harcoded
-      // in the file UniswapV2Library.sol. The hash writen now there is meant to run in the CI. If you're seeing this problem you can
-      // 1. Skip these tests locally, as they will run in the CI anyway or
-      // 2. Change the hash, you can get the hash for the parciular test deployment with the following:
-
+    describe('Other tokens (non-Mento)', async () => {
       beforeEach(async () => {
         deadline = (await web3.eth.getBlock('latest')).timestamp + 100
 
         uniswapFactory = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
 
-        // tslint:disable-next-line
-        console.log('Uniswap INIT CODE PAIR HASH:', await uniswapFactory.INIT_CODE_PAIR_HASH())
+        const initCodePairHash = await uniswapFactory.INIT_CODE_PAIR_HASH()
 
         uniswap = await UniswapRouter.new(
           uniswapFactory.address,
-          '0x0000000000000000000000000000000000000000'
+          '0x0000000000000000000000000000000000000000',
+          initCodePairHash
         ) // _factory, _WETH
 
         uniswapFactory2 = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
 
         uniswap2 = await UniswapRouter.new(
           uniswapFactory2.address,
-          '0x0000000000000000000000000000000000000000'
+          '0x0000000000000000000000000000000000000000',
+          initCodePairHash
         ) // _factory, _WETH
 
         await feeCurrencyWhitelist.addToken(tokenA.address)
