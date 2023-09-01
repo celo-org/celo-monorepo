@@ -313,12 +313,12 @@ describe('pnpService', () => {
     })
 
     afterEach(async () => {
-      await signerDB1?.destroy()
-      await signerDB2?.destroy()
-      await signerDB3?.destroy()
       await serverClose(signer1)
       await serverClose(signer2)
       await serverClose(signer3)
+      await signerDB1?.destroy()
+      await signerDB2?.destroy()
+      await signerDB3?.destroy()
     })
 
     describe('when signers are operating correctly', () => {
@@ -563,10 +563,10 @@ describe('pnpService', () => {
 
         // This previously returned 502 instead of 500
         it('Should respond with 500 when insufficient signer responses', async () => {
-          await signerDB1?.destroy()
-          await signerDB2?.destroy()
           await serverClose(signer1)
           await serverClose(signer2)
+          await signerDB1?.destroy()
+          await signerDB2?.destroy()
 
           const req = {
             account: ACCOUNT_ADDRESS1,
@@ -1258,16 +1258,16 @@ describe('pnpService', () => {
     })
 
     afterEach(async () => {
-      await signerDB1?.destroy()
-      await signerDB2?.destroy()
-      await signerDB3?.destroy()
-      await signerDB4?.destroy()
-      await signerDB5?.destroy()
       await serverClose(signer1)
       await serverClose(signer2)
       await serverClose(signer3)
       await serverClose(signer4)
       await serverClose(signer5)
+      await signerDB1?.destroy()
+      await signerDB2?.destroy()
+      await signerDB3?.destroy()
+      await signerDB4?.destroy()
+      await signerDB5?.destroy()
     })
 
     it('Should respond with 200 on valid request', async () => {
