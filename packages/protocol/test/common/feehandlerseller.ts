@@ -46,7 +46,7 @@ contract('FeeHandlerSeller', (accounts: string[]) => {
     mentoFeeHandlerSeller = await MentoFeeHandlerSeller.new(true)
     contractsToTest = [mentoFeeHandlerSeller, uniswapFeeHandlerSeller]
     for (const contract of contractsToTest) {
-      contract.initialize(registry.address, [], [])
+      await contract.initialize(registry.address, [], [])
     }
   })
 
