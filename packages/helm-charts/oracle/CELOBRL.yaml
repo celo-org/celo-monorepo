@@ -17,7 +17,7 @@ oracle:
         { exchange: 'BINANCE', symbol: 'USDTBRL', toInvert: false }
       ],
       [
-        { exchange: 'BINANCE', symbol: 'CELOBTC', toInvert: false },
+        { exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false },
         { exchange: 'MERCADO', symbol: 'BTCBRL', toInvert: false }
       ],
       [
@@ -44,7 +44,7 @@ oracle:
       #   {exchange: 'UPBIT', symbol: 'BTCKRW', toInvert: true},
       #   {exchange: 'BITGET', symbol: 'BTCBRL', toInvert: false},
       # ]
-  minPriceSourceCount: 3
+  minPriceSourceCount: 4
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
