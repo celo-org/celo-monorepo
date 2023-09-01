@@ -11,10 +11,10 @@ export class NoQuotaCache {
     })
   }
 
-  maximumQuouaReached = (address: string): boolean => {
-    const dek = this.cache.get(address)
+  maximumQuotaReached = (address: string): boolean => {
+    const quota = this.cache.get(address)
 
-    return dek !== undefined
+    return quota !== undefined
   }
 
   getTotalQuota = (address: string): number | undefined => {
