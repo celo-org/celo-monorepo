@@ -95,7 +95,7 @@ export function meteringHandler<R extends OdisRequest>(
   histogram: client.Histogram<string>,
   handler: PromiseHandler<R>
 ): PromiseHandler<R> {
-  return (req, res) => newMeter(histogram, req.url)(() => handler(req, res))
+  return (req, res) => newMeter(histogram, req.url)(async () => await handler(req, res))
 }
 
 export function timeoutHandler<R extends OdisRequest>(
@@ -103,19 +103,19 @@ export function timeoutHandler<R extends OdisRequest>(
   handler: PromiseHandler<R>
 ): PromiseHandler<R> {
   return async (req, res) => {
-    const timeoutSignal = (AbortSignal as any).timeout(timeoutMs)
-    timeoutSignal.addEventListener(
-      'abort',
-      () => {
-        if (!res.headersSent) {
-          Counters.timeouts.inc()
-          sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, res, req.url)
-        }
-      },
-      { once: true }
-    )
+    const timeoutId = setTimeout(() => {
+      if (!res.headersSent) {
+        Counters.timeouts.inc()
+        sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, res, req.url)
+      }
+    }, timeoutMs)
 
-    await handler(req, res)
+    try {
+      await handler(req, res)
+    } finally {
+      // Clears the timeout if it answers first
+      clearTimeout(timeoutId)
+    }
   }
 }
 
