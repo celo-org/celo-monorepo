@@ -53,7 +53,7 @@ export async function sendTransactionWithPrivateKey<T>(
     privateKey
   )
 
-  const rawTransaction = signedTx.raw
+  const rawTransaction = signedTx.rawTransaction.toString('hex')
   return web3.eth.sendSignedTransaction(rawTransaction)
 }
 
@@ -352,7 +352,9 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
     // or create a new flag in contractPackages to check if the proxy is in a different package
     if (artifactPath.proxiesPath){
       // TODO remove the hardcode
+      console.log("Voy al default", name)
       ContractProxy = artifacts.require(name + 'Proxy')  
+      // console.log(ContractProxy)
     } else {
       ContractProxy = makeTruffleContractForMigration(name + 'Proxy', artifactPath, web3)
     }
@@ -366,11 +368,14 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
     console.log("\n-> Deploying", name)
 
     deployer.deploy(ContractProxy)
+    console.log(1)
     deployer.deploy(Contract, testingDeployment)
     // if (name != "GasPriceMinimum"){
       
     // }
+    console.log(2)
     deployer.then(async () => {
+      console.log(3)
       const proxy: ProxyInstance = await ContractProxy.deployed()
       await proxy._transferOwnership(ContractProxy.defaults().from)
       const proxiedContract: ContractInstance = await setInitialProxyImplementation<
