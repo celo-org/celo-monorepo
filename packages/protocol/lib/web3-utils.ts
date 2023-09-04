@@ -374,10 +374,11 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
     // if (name != "GasPriceMinimum"){
       
     // }
-    console.log(2)
+    console.log(2) 
     deployer.then(async () => {
       console.log(3)
       const proxy: ProxyInstance = await ContractProxy.deployed()
+      console.log("4");
       await proxy._transferOwnership(ContractProxy.defaults().from)
       const proxiedContract: ContractInstance = await setInitialProxyImplementation<
         ContractInstance
