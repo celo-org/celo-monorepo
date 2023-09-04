@@ -366,7 +366,6 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   const testingDeployment = false
   return (deployer: any, networkName: string, _accounts: string[]) => {
     console.log("\n-> Deploying", name)
-    console.log("deployer", JSON.stringify(deployer))
 
     deployer.deploy(ContractProxy)
     console.log(1)
