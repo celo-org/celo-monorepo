@@ -663,7 +663,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 120
-        if: contains(matrix.command, 'ci_test_transfers.sh') && false
+        if: contains(matrix.command, 'ci_test_cip35.sh')
         with:
           limit-access-to-actor: true
       - name: Execute matrix command for test
