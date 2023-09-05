@@ -123,8 +123,16 @@ export function connectionClosedHandler<R extends OdisRequest>(
   handler: PromiseHandler<R>
 ): PromiseHandler<R> {
   return async (req, res) => {
+    const controller = new AbortController()
+    const signal = controller.signal
+
+    signal.addEventListener('abort', () => {
+      res.locals.logger.info('request aborted')
+    })
+
     req.on('close', () => {
       res.locals.logger.info('request closed')
+
       if (req.socket?.closed) {
         res.locals.logger.info('req socket closed')
       }
