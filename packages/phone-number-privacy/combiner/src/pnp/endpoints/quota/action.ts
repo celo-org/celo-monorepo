@@ -41,7 +41,7 @@ export function pnpQuota(
     }
 
     const account = request.body.account
-    if (noQuotaCache.maximumQuouaReached(account)) {
+    if (noQuotaCache.maximumQuotaReached(account)) {
       const quota = noQuotaCache.getTotalQuota(account)
       // can exist a race condition between the hasQuota and getTotalQuota but that's highly improbable
       if (quota !== undefined) {
