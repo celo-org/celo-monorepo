@@ -9,6 +9,7 @@ import {
 import {
   blockchainApiKey,
   blockchainProvider,
+  defaultMockDEK,
   domainEnabled,
   domainFullNodeDelaysMs,
   domainFullNodeRetryCount,
@@ -132,6 +133,7 @@ if (DEV_MODE) {
       fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
       fullNodeRetryCount: RETRY_COUNT,
       fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
+      mockDek: defaultMockDEK,
     },
     domains: {
       serviceName: defaultServiceName,

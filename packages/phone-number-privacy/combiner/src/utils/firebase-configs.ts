@@ -1,3 +1,4 @@
+import { ensureLeading0x } from '@celo/base'
 import {
   FULL_NODE_TIMEOUT_IN_MS,
   RETRY_COUNT,
@@ -6,6 +7,9 @@ import {
 import { defineBoolean, defineInt, defineSecret, defineString } from 'firebase-functions/params'
 
 const defaultServiceName = 'odis-combiner'
+export const defaultMockDEK = ensureLeading0x(
+  'bf8a2b73baf8402f8fe906ad3f42b560bf14b39f7df7797ece9e293d6f162188'
+)
 
 // function settings
 export const minInstancesConfig = defineInt('MIN_INSTANCES', { default: 0 })
@@ -41,8 +45,10 @@ export const pnpFullNodeRetryCount = defineInt('PNP_FULL_NODE_RETRY_COUNT', {
 export const pnpFullNodeDelaysMs = defineInt('PNP_FULL_NODE_DELAY_MS', {
   default: RETRY_DELAY_IN_MS,
 })
-export const pnpShouldMockAccountService = defineBoolean('PNP_SHOULD_MOCK_ACCOUNT_SERVICE')
-export const pnpMockDek = defineString('PNP_MOCK_DECK')
+export const pnpShouldMockAccountService = defineBoolean('PNP_SHOULD_MOCK_ACCOUNT_SERVICE', {
+  default: false,
+})
+export const pnpMockDek = defineString('PNP_MOCK_DECK', { default: defaultMockDEK })
 
 // Domains
 export const domainServiceName = defineString('DOMAIN_SERVICE_NAME', {
