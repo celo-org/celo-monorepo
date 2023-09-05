@@ -24,7 +24,7 @@ export class CachingAccountService implements AccountService {
       ttl: 5 * 1000, // 5 seconds
       allowStale: true,
       fetchMethod: async (address: string) => {
-        return await baseService.getAccount(address)
+        return baseService.getAccount(address)
       },
     })
   }

@@ -4,15 +4,15 @@ import {
   OdisRequest,
   OdisResponse,
   PnpQuotaStatus,
+  send,
   SequentialDelayDomainState,
   WarningMessage,
-  send,
 } from '@celo/phone-number-privacy-common'
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import { PerformanceObserver, performance } from 'perf_hooks'
+import { performance, PerformanceObserver } from 'perf_hooks'
 import { getCombinerVersion } from '../config'
 import { OdisError } from './error'
 
