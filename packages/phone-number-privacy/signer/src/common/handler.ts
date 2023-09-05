@@ -119,6 +119,20 @@ export function timeoutHandler<R extends OdisRequest>(
   }
 }
 
+export function connectionClosedHandler<R extends OdisRequest>(
+  handler: PromiseHandler<R>
+): PromiseHandler<R> {
+  return async (req, res) => {
+    req.on('close', () => {
+      if (res.socket?.closed) {
+        res.end()
+      }
+    })
+
+    await handler(req, res)
+  }
+}
+
 export async function disabledHandler<R extends OdisRequest>(
   req: Request<{}, {}, R>,
   response: Response<OdisResponse<R>, Locals>
@@ -141,8 +155,11 @@ export function resultHandler<R extends OdisRequest>(
 ): PromiseHandler<R> {
   return async (req, res) => {
     const result = await resHandler(req, res)
-    send(res, result.body, result.status, res.locals.logger)
-    Counters.responses.labels(req.url, result.status.toString()).inc()
+    // Check if the response was ended
+    if (!res.writableEnded) {
+      send(res, result.body, result.status, res.locals.logger)
+      Counters.responses.labels(req.url, result.status.toString()).inc()
+    }
   }
 }
 
@@ -170,16 +187,19 @@ function sendFailure(
   endpoint: string,
   body?: Record<any, any> // TODO remove any
 ) {
-  send(
-    response,
-    {
-      success: false,
-      version: getSignerVersion(),
-      error,
-      ...body,
-    },
-    status,
-    response.locals.logger
-  )
-  Counters.responses.labels(endpoint, status.toString()).inc()
+  // Check if the response was ended
+  if (!response.writableEnded) {
+    send(
+      response,
+      {
+        success: false,
+        version: getSignerVersion(),
+        error,
+        ...body,
+      },
+      status,
+      response.locals.logger
+    )
+    Counters.responses.labels(endpoint, status.toString()).inc()
+  }
 }
