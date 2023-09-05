@@ -124,7 +124,7 @@ export function connectionClosedHandler<R extends OdisRequest>(
 ): PromiseHandler<R> {
   return async (req, res) => {
     req.on('close', () => {
-      if (res.socket?.closed) {
+      if (res.socket?.destroyed) {
         res.locals.logger.info('connection closed')
         Counters.connectionClosed.inc()
         res.end()
