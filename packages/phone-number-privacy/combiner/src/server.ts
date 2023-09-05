@@ -1,6 +1,7 @@
 import { ContractKit } from '@celo/contractkit'
 import {
   CombinerEndpoint,
+  ErrorMessage,
   KEY_VERSION_HEADER,
   loggerMiddleware,
   newContractKitFetcher,
@@ -93,42 +94,44 @@ export function startProxy(req: any, res: any, config: CombinerConfig) {
   let destinationUrl
 
   const logger = rootLogger(config.serviceName)
+  logger.info('Starting proxy.')
   const proxy = httpProxy.createProxyServer({
     proxyTimeout: config.phoneNumberPrivacy.odisServices.timeoutMilliSeconds,
   })
-
-  const originalPath = req.path
-  const strippedPath = originalPath.replace(/\/combiner/, '')
+  logger.info('created proxy server.')
 
   switch (config.proxy.deploymentEnv) {
     case 'mainnet':
       // XXX (soloseng):URL may need to be updated after gen2 function is created on mainnet
-      destinationUrl =
-        'https://us-central1-celo-pgpnp-mainnet.cloudfunctions.net/combinerGen2' +
-        proxy.web(req, res, { target: destinationUrl })
+      destinationUrl = 'https://us-central1-celo-pgpnp-mainnet.cloudfunctions.net/combinerGen2'
+      proxy.web(req, res, { target: destinationUrl })
       break
     case 'alfajores':
       // XXX (soloseng):URL may need to be updated after gen2 function is created on alfajores
       destinationUrl =
-        'https://us-central1-celo-phone-number-privacy.cloudfunctions.net/combinerGen2' +
-        strippedPath
+        'https://us-central1-celo-phone-number-privacy.cloudfunctions.net/combinerGen2'
 
       proxy.web(req, res, { target: destinationUrl })
       break
     case 'staging':
       destinationUrl =
-        'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net/combinerGen2' +
-        strippedPath
+        'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net/combinerGen2'
+
+      logger.info(
+        { request: req, destinationURL: destinationUrl },
+        'Proxying request to staging Combiner gen 2.'
+      )
 
       proxy.web(req, res, { target: destinationUrl })
       break
+    default:
+      throw ErrorMessage.UNKNOWN_ERROR
   }
-  proxy.on('error', (_) => {
+  proxy.on('error', (err) => {
     logger.error('Error in Proxying request to Combiner.')
     res.status(500).json({
       success: false,
-      error:
-        'Error handling your request. Please make sure you are running the latest SDK version.',
+      error: err,
     })
   })
 }
