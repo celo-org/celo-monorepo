@@ -25,6 +25,7 @@ jobs:
       tag: ${{ github.sha }}
       context: .
       file: dockerfiles/all-monorepo/Dockerfile
+      trivy: true
 
   celomonorepo-build:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
@@ -38,3 +39,4 @@ jobs:
       tag: ${{ github.sha }}
       context: .
       file: dockerfiles/all-monorepo/Dockerfile
+      trivy: true

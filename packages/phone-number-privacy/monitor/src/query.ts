@@ -36,9 +36,6 @@ export const queryOdisForSalt = async (
 ) => {
   let authSigner: AuthSigner
   let accountAddress: string
-  console.log(`contextName: ${contextName}`) // tslint:disable-line:no-console
-  console.log(`blockchain provider: ${blockchainProvider}`) // tslint:disable-line:no-console
-  console.log(`using DEK: ${useDEK}`) // tslint:disable-line:no-console
 
   const serviceContext = getServiceContext(contextName, OdisAPI.PNP)
 
