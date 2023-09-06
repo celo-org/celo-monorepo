@@ -19,11 +19,11 @@ import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
   AccountType,
-  Validator,
   generateGenesis,
   generateGenesisWithMigrations,
   generatePrivateKey,
   privateKeyToPublicKey,
+  Validator,
 } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'

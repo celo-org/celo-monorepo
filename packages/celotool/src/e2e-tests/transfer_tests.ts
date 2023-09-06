@@ -13,22 +13,22 @@ import { getHooks, initAndSyncGethWithRetry, killInstance, sleep } from './utils
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
-interface nodePorts {
+interface NodePorts {
   port: number
   rpcport: number
 }
 
-const validatorPort: nodePorts = {
+const validatorPort: NodePorts = {
   port: 30303,
   rpcport: 8545,
 }
 
-const fullNodePort: nodePorts = {
+const fullNodePort: NodePorts = {
   port: 30305,
   rpcport: 8547,
 }
 
-const syncNodePort: nodePorts = {
+const syncNodePort: NodePorts = {
   port: 30307,
   rpcport: 8549,
 }
