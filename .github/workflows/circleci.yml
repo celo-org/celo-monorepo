@@ -12,6 +12,7 @@ on:
     branches:
       - master
       - martinvol/CR10Release
+      - pahor/0.8branchout
 
 concurrency:
   group: circle-ci-${{ github.ref }}
