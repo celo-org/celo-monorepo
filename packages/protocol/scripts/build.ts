@@ -117,7 +117,7 @@ function compile(outdir: string) {
     }
 
     exec(
-      `yarn run truffle compile --silent --contracts_directory=${contractPath} --contracts_build_directory=./build/contracts-${contractPackage.name} --config ${contractPackage.truffleConfig}` // todo change to outdir
+      `yarn run truffle compile --silent --contracts_directory=${contractPath} --contracts_build_directory=${outdir}/contracts-${contractPackage.name} --config ${contractPackage.truffleConfig}` // todo change to outdir
     )
   }
 
