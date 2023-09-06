@@ -80,6 +80,7 @@
     "j6": "^1.0.2",
     "lodash": "^4.17.21",
     "mathjs": "^5.0.4",
+    "minimist": "~1.2.7", 
     "node-fetch": "^2.6.9",
     "openzeppelin-solidity": "^2.5.0",
     "prompts": "^2.0.1",
