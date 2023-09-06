@@ -13,6 +13,25 @@ import { getHooks, initAndSyncGethWithRetry, killInstance, sleep } from './utils
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
+interface nodePorts {
+  port: number
+  rpcport: number
+}
+
+const validatorPort: nodePorts = {
+  port: 30303,
+  rpcport: 8545,
+}
+
+const fullNodePort: nodePorts = {
+  port: 30305,
+  rpcport: 8547,
+}
+
+const syncNodePort: nodePorts = {
+  port: 30307,
+  rpcport: 8549,
+}
 
 /**
  * Helper Class to change StableToken Inflation in tests
@@ -84,55 +103,60 @@ const setIntrinsicGas = async (validatorUri: string, validatorAddress: string, g
 }
 
 // Intrinsic gas for a basic transaction
-const INTRINSIC_TX_GAS_COST = 21000
+const INTRINSIC_TX_GAS_COST = 21_000
 
 // Additional intrinsic gas for a transaction with fee currency specified
-const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50000
+const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50_000
 
-// If the To address has zero as the balance, the cost of writting that address is
-const sstoreSetGasEIP2200 = 20000
-const sstoreResetGasEIP2200 = 5000
-const coldSloadCostEIP2929 = 800 // The Eip2929 set this to 2100, but our Cip48 back to 800
-const coldAccountAccessCostEIP2929 = 900 // The Eip2929 set this to 2600, but our Cip48 back to 900
-const warmStorageReadCostEIP2929 = 100 // Eip2929 and Cip48
+// If the To address has zero as the balance, the cost of writing that address is
+const sstoreSetGasEIP2200 = 20_000
+const sstoreResetGasEIP2200 = 5_000
+const coldSloadCostEIP2929 = 2_100 // diff 1300
+const coldAccountAccessCostEIP2929 = 2_600 // diff 1700
+const warmStorageReadCostEIP2929 = 100
 
 // This number represent the gasUsed in the execution of the StableToken transfer assuming:
 // - Nothing was preloaded in the state accessList, so the first storage calls will cost:
-//    * ColdSloadCostEIP2929 = 800
-//    * ColdAccountAccessCostEIP2929 = 900
+//    * ColdSloadCostEIP2929 = 2100
+//    * ColdAccountAccessCostEIP2929 = 2600
 // - The From and To address
 //     * HAVE funds
 //     * non of those will be zero after the transfer
 //     * non those were modified before (as part of the same tx)
 //     * This means that both SSTORE (From and To) will cost:
-//         SstoreResetGasEIP2200 [5000] - ColdSloadCostEIP2929 [800] => 4200
-// - No intrinsic gas involved BUT 630 gas charged for the amount of bytes sent
-const basicStableTokenTransferGasCost = 31253
+//         SstoreResetGasEIP2200 [5000] - ColdSloadCostEIP2929 [2100] => 2900
+
+const opCodeCostStableTokenTransfer = 9_553
+const basicStableTokenTransferGasCost =
+  opCodeCostStableTokenTransfer +
+  11 * coldSloadCostEIP2929 +
+  5 * coldAccountAccessCostEIP2929 +
+  2 * (sstoreResetGasEIP2200 - coldSloadCostEIP2929)
 
 // As the basicStableTokenTransferGasCost assumes that the transfer TO have funds, we should
-// only add the difference to calculate the gas (sstoreSetGasEIP2200 - 4200) => 15800
+// only add the difference to calculate the gas (sstoreSetGasEIP2200 - 2900) => 17100
 const emptyFundsBeforeForBasicCalc =
-  sstoreSetGasEIP2200 - (sstoreResetGasEIP2200 - coldSloadCostEIP2929) // 15800
+  sstoreSetGasEIP2200 - (sstoreResetGasEIP2200 - coldSloadCostEIP2929) // 17100
 
 // The StableToken transfer, paid with the same StableToken, preloads a lot of state
-// when the fee is subsctracted from the account, which generates that the basicStableTokenTransferGasCost
+// when the fee is subtracted from the account, which generates that the basicStableTokenTransferGasCost
 // cost less. The actual differences:
-// - SLOADS ColdSloadCostEIP2929 -> WarmStorageReadCostEIP2929 (-700 each)
+// - SLOADS ColdSloadCostEIP2929 -> WarmStorageReadCostEIP2929 (-2000 each)
 //   * 6 from the stableToken contract
 //   * 2 from the celoRegistry contract
 //   * 2 from the Freeze contract
 // - Account Check ( EXTCODEHASH | EXTCODESIZE | ext BALANCE)
-//          coldAccountAccessCostEIP2929 -> WarmStorageReadCostEIP2929 (-800 each)
+//          coldAccountAccessCostEIP2929 -> WarmStorageReadCostEIP2929 (-2500 each)
 //   * 3 from the stableToken contract
 //   * 1 from the celoRegistry contract
 //   * 1 from the Freeze contract
 // - The From account as already modified the state for that address
-//   * This will make that instead of SstoreResetGasEIP2200 [5000] - ColdSloadCostEIP2929 [800] => 4200
-//     will cost WarmStorageReadCostEIP2929 [100] (-4100)
+//   * This will make that instead of SstoreResetGasEIP2200 [5000] - ColdSloadCostEIP2929 [2100] => 2900
+//     will cost WarmStorageReadCostEIP2929 [100] (-2800)
 const savingGasStableTokenTransferPaidWithSameStable =
   (coldSloadCostEIP2929 - warmStorageReadCostEIP2929) * 10 +
   (coldAccountAccessCostEIP2929 - warmStorageReadCostEIP2929) * 5 +
-  (sstoreResetGasEIP2200 - coldSloadCostEIP2929 - warmStorageReadCostEIP2929) // 15100
+  (sstoreResetGasEIP2200 - coldSloadCostEIP2929 - warmStorageReadCostEIP2929) // 35300
 
 /** Helper to watch balance changes over accounts */
 interface BalanceWatcher {
@@ -198,10 +222,11 @@ describe('Transfer tests', function (this: any) {
 
   let currentGethInstance: GethInstanceConfig
 
-  let governanceAddress: string // set later on using the contract itself
+  let feeHandlerAddress: string // set later on using the contract itself
   const validatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
-  const DEF_FROM_PK = 'f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d'
+  const validatorPK = 'add67e37fdf5c26743d295b1af6d9b50f2785a6b60bc83a8f05bd1dd4b385c6c'
   const FromAddress = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
+  const DEF_FROM_PK = 'f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d'
 
   // Arbitrary addresses.
   const txFeeRecipientAddress = '0x5555555555555555555555555555555555555555'
@@ -218,6 +243,8 @@ describe('Transfer tests', function (this: any) {
       churritoBlock: 0,
       donutBlock: 0,
       espressoBlock: 0,
+      gingerbreadBlock: 1,
+      gingerbreadP2Block: 1,
     },
     instances: [
       {
@@ -227,8 +254,8 @@ describe('Transfer tests', function (this: any) {
         // Separate address for tx fees, so that we can easy identify balance changes due to them
         txFeeRecipient: txFeeRecipientAddress,
         syncmode: 'full',
-        port: 30303,
-        rpcport: 8545,
+        port: validatorPort.port,
+        rpcport: validatorPort.rpcport,
       },
     ],
   }
@@ -251,9 +278,8 @@ describe('Transfer tests', function (this: any) {
     validating: false,
     syncmode: 'full',
     lightserv: true,
-    gatewayFee: new BigNumber(10000),
-    port: 30305,
-    rpcport: 8547,
+    port: fullNodePort.port,
+    rpcport: fullNodePort.rpcport,
     // We need to set an etherbase here so that the full node will accept transactions from
     // light clients.
     minerValidator: gatewayFeeRecipientAddress,
@@ -263,13 +289,15 @@ describe('Transfer tests', function (this: any) {
   const restartWithCleanNodes = async () => {
     await hooks.restart()
 
-    kit = newKitFromWeb3(new Web3('http://localhost:8545'))
+    kit = newKitFromWeb3(new Web3(`http://localhost:${validatorPort.rpcport}`))
     kit.connection.defaultGasInflationFactor = 1
+    // Sets the validator private key to sign txs locally with the kit
+    kit.addAccount(validatorPK)
 
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
-    await sleep(2)
-    // Assuming empty password
-    await kit.connection.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
+    // await sleep(2)
+    // // Assuming empty password
+    // await kit.connection.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
 
     await initAndSyncGethWithRetry(
       gethConfig,
@@ -280,20 +308,12 @@ describe('Transfer tests', function (this: any) {
       3
     )
 
-    governanceAddress = (await kit._web3Contracts.getGovernance()).options.address
-    // The tests below check the balance of the governance contract (i.e. the community fund)
+    feeHandlerAddress = (await kit._web3Contracts.getFeeHandler()).options.address
+    // The tests below check the balance of the FeeHandler contract (See UltraGreen CIP-52)
     // before and after transactions to verify the correct amount has been received from the fees.
-    // This causes flakiness due to the fund also receiving epoch rewards (if the epoch change is
-    // between the blocks the balance checker uses as its before and after the test will fail due
-    // to the unexpected change from the epoch rewards).
-    // To avoid this, we set the community fund's fraction of epoch rewards to zero.
-    // Another option would have been to make the epoch size large enough so no epoch changes happen
-    // during the test.
-    const epochRewards = await kit._web3Contracts.getEpochRewards()
-    await epochRewards.methods.setCommunityRewardFraction(0).send({ from: validatorAddress })
 
     // Give the account we will send transfers as sufficient gold and dollars.
-    const startBalance = TransferAmount.times(500)
+    const startBalance = TransferAmount.times(800)
     const resDollars = await transferCeloDollars(validatorAddress, FromAddress, startBalance)
     const resGold = await transferCeloGold(validatorAddress, FromAddress, startBalance)
     await Promise.all([resDollars.waitReceipt(), resGold.waitReceipt()])
@@ -309,11 +329,9 @@ describe('Transfer tests', function (this: any) {
       name: syncmode,
       validating: false,
       syncmode,
-      port: 30307,
-      rpcport: 8549,
+      port: syncNodePort.port,
+      rpcport: syncNodePort.rpcport,
       lightserv: !light,
-      // TODO(nategraf): Remove this when light clients can query for gateway fee.
-      gatewayFee: light ? new BigNumber(10000) : undefined,
       privateKey: DEF_FROM_PK,
     }
 
@@ -328,16 +346,22 @@ describe('Transfer tests', function (this: any) {
     )
 
     // Reset contracts to send RPCs through transferring node.
-    kit.connection.setProvider(new Web3.providers.HttpProvider('http://localhost:8549'))
+    kit.connection.setProvider(
+      new Web3.providers.HttpProvider(`http://localhost:${syncNodePort.rpcport}`)
+    )
 
     // Give the node time to sync the latest block.
-    const upstream = await new Web3('http://localhost:8545').eth.getBlock('latest')
+    const upstream = await new Web3(`http://localhost:${validatorPort.rpcport}`).eth.getBlock(
+      'latest'
+    )
     while ((await kit.connection.getBlock('latest')).number < upstream.number) {
       await sleep(0.5)
     }
 
-    // Unlock Node account
-    await kit.connection.web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
+    // Sets the from private key to sign txs locally with the kit
+    kit.addAccount(DEF_FROM_PK)
+    // // Unlock Node account
+    // await kit.connection.web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
   }
 
   const transferCeloGold = async (
@@ -569,6 +593,14 @@ describe('Transfer tests', function (this: any) {
     let txRes: TestTxResults
     let balances: BalanceWatcher
 
+    if (!txOptions) {
+      txOptions = {}
+    }
+    // Fixed a gas to avoid estimation errors
+    if (!txOptions.gas) {
+      txOptions.gas = 200000
+    }
+
     before(async () => {
       const feeCurrency = await kit.celoTokens.getFeeCurrencyAddress(feeToken)
 
@@ -577,7 +609,7 @@ describe('Transfer tests', function (this: any) {
         toAddress,
         txFeeRecipientAddress,
         gatewayFeeRecipientAddress,
-        governanceAddress,
+        feeHandlerAddress,
       ]
       balances = await newBalanceWatcher(kit, accounts)
 
@@ -605,7 +637,7 @@ describe('Transfer tests', function (this: any) {
         if (kit.celoTokens.isStableToken(feeToken)) {
           assert(
             txRes.events.find(
-              (a) => eqAddress(a.to, governanceAddress) && eqAddress(a.from, fromAddress)
+              (a) => eqAddress(a.to, feeHandlerAddress) && eqAddress(a.from, fromAddress)
             )
           )
         }
@@ -649,8 +681,8 @@ describe('Transfer tests', function (this: any) {
     it(`should increment the gateway fee recipient's ${feeToken} balance by the gateway fee`, () =>
       assertEqualBN(balances.delta(gatewayFeeRecipientAddress, feeToken), txRes.fees.gateway))
 
-    it(`should increment the infrastructure fund's ${feeToken} balance by the base portion of the gas fee`, () =>
-      assertEqualBN(balances.delta(governanceAddress, feeToken), txRes.fees.base))
+    it(`should increment the FeeHandler's ${feeToken} balance by the base portion of the gas fee`, () =>
+      assertEqualBN(balances.delta(feeHandlerAddress, feeToken), txRes.fees.base))
 
     it(`should increment the tx fee recipient's ${feeToken} balance by the rest of the gas fee`, () => {
       assertEqualBN(balances.delta(txFeeRecipientAddress, feeToken), txRes.fees.tip)
@@ -696,8 +728,9 @@ describe('Transfer tests', function (this: any) {
                         const txOptions = {
                           gatewayFeeRecipient: recipient(recipientChoice),
                           gatewayFee: feeValue(feeValueChoice),
+                          gas: 200000, // avoids the error from the gas estimation, instead the txPool
                         }
-                        if (recipientChoice === 'random' || feeValueChoice === 'insufficient') {
+                        if (recipientChoice !== 'unset' || feeValueChoice !== 'unset') {
                           it('should get rejected by the sending node before being added to the tx pool', async () => {
                             try {
                               const res = await transferCeloGold(
@@ -709,7 +742,7 @@ describe('Transfer tests', function (this: any) {
                               await res.waitReceipt()
                               assert.fail('no error was thrown')
                             } catch (error: any) {
-                              assert.include(error.toString(), `Error: no suitable peers available`)
+                              assert.include(error.toString(), `Error: gateway fee is deprecated`)
                             }
                           })
                         } else {
@@ -801,7 +834,7 @@ describe('Transfer tests', function (this: any) {
           try {
             await startSyncNode(syncMode)
             await setIntrinsicGas(
-              'http://localhost:8545',
+              `http://localhost:${validatorPort.rpcport}`,
               validatorAddress,
               changedIntrinsicGasForAlternativeFeeCurrency
             )
@@ -857,7 +890,7 @@ describe('Transfer tests', function (this: any) {
         before(`start geth on sync: ${syncMode}`, async () => {
           await restartWithCleanNodes()
           inflationManager = new InflationManager(
-            'http://localhost:8545',
+            `http://localhost:${validatorPort.rpcport}`,
             validatorAddress,
             StableToken.cUSD
           )
@@ -875,7 +908,7 @@ describe('Transfer tests', function (this: any) {
                 FromAddress,
                 ToAddress,
                 gatewayFeeRecipientAddress,
-                governanceAddress,
+                feeHandlerAddress,
               ])
 
               await inflationManager.setInflationRateForNextTransfer(new BigNumber(2))
@@ -924,11 +957,11 @@ describe('Transfer tests', function (this: any) {
               )
             })
 
-            it("should halve the infrastructure fund's Celo Dollar balance then increment it by the base portion of the gas fees", () => {
+            it("should halve the FeeHandler's Celo Dollar balance then increment it by the base portion of the gas fees", () => {
               assertEqualBN(
                 balances
-                  .current(governanceAddress, StableToken.cUSD)
-                  .minus(balances.initial(governanceAddress, StableToken.cUSD).idiv(2)),
+                  .current(feeHandlerAddress, StableToken.cUSD)
+                  .minus(balances.initial(feeHandlerAddress, StableToken.cUSD).idiv(2)),
                 expectedFees.base
               )
             })

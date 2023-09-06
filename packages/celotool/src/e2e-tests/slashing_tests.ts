@@ -18,17 +18,38 @@ const TMP_PATH = '/tmp/e2e'
 const safeMarginBlocks = 4
 
 function headerArray(block: any) {
+  if (!block.nonce) {
+    // Before Gingerbread fork
+    return [
+      block.parentHash,
+      block.miner,
+      block.stateRoot,
+      block.transactionsRoot,
+      block.receiptsRoot,
+      block.logsBloom,
+      block.number,
+      block.gasUsed,
+      block.timestamp,
+      block.extraData,
+    ]
+  }
   return [
     block.parentHash,
+    block.sha3Uncles,
     block.miner,
     block.stateRoot,
     block.transactionsRoot,
     block.receiptsRoot,
     block.logsBloom,
+    new BigNumber(block.difficulty).toNumber(),
     block.number,
+    block.gasLimit,
     block.gasUsed,
     block.timestamp,
     block.extraData,
+    block.mixHash,
+    block.nonce,
+    block.baseFeePerGas,
   ]
 }
 
@@ -102,6 +123,8 @@ describe('slashing tests', function (this: any) {
       churritoBlock: 0,
       donutBlock: 0,
       espressoBlock: 0,
+      gingerbreadBlock: 1,
+      gingerbreadP2Block: 1,
     },
     instances: [
       {
@@ -230,9 +253,6 @@ describe('slashing tests', function (this: any) {
       const blockNumber = await kit.connection.getBlockNumber()
       await waitForBlock(web3, blockNumber + slashableDowntime.toNumber() + 2 * safeMarginBlocks)
 
-      // Store this block for testing double signing
-      doubleSigningBlock = await kit.connection.getBlock(blockNumber + 2 * safeMarginBlocks)
-
       const signer = await slasher.methods.validatorSignerAddressFromSet(4, blockNumber).call()
       const validator = (await kit.connection.getAccounts())[0]
       await kit.connection.web3.eth.personal.unlockAccount(validator, '', 1000000)
@@ -322,10 +342,28 @@ describe('slashing tests', function (this: any) {
     })
   })
 
+  const createAndCollectDifferentInstanceBlock = async () => {
+    await waitForBlock(web3, 1)
+    const blockNumber = await kit.connection.getBlockNumber()
+    await waitForBlock(web3, blockNumber + 2 * safeMarginBlocks)
+
+    // Store this block for testing double signing
+    doubleSigningBlock = await kit.connection.getBlock(blockNumber + 2 * safeMarginBlocks)
+
+    await hooks.after()
+
+    await hooks.before()
+
+    this.timeout(0) // Disable test timeout
+    await restart()
+  }
+
   describe('test slashing for double signing', () => {
     before(async function (this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
+
+      await createAndCollectDifferentInstanceBlock()
     })
 
     it('slash for double signing', async function (this: any) {
@@ -376,6 +414,8 @@ describe('slashing tests', function (this: any) {
     before(async function (this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
+
+      await createAndCollectDifferentInstanceBlock()
     })
 
     it('slash for double signing with contractkit', async function (this: any) {
