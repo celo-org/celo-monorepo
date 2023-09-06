@@ -321,6 +321,8 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const churritoBlock = hardForkActivationBlock(envVar.CHURRITO_BLOCK)
   const donutBlock = hardForkActivationBlock(envVar.DONUT_BLOCK)
   const espressoBlock = hardForkActivationBlock(envVar.ESPRESSO_BLOCK)
+  const gingerbreadBlock = hardForkActivationBlock(envVar.GINGERBREAD_BLOCK)
+  const gingerbreadP2Block = hardForkActivationBlock(envVar.GINGERBREAD_P2_BLOCK)
 
   // network start timestamp
   const timestamp = parseInt(fetchEnvOrFallback(envVar.TIMESTAMP, '0'), 10)
@@ -339,6 +341,8 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     churritoBlock,
     donutBlock,
     espressoBlock,
+    gingerbreadBlock,
+    gingerbreadP2Block,
   })
 }
 
@@ -398,6 +402,8 @@ export const generateGenesis = ({
   churritoBlock,
   donutBlock,
   espressoBlock,
+  gingerbreadBlock,
+  gingerbreadP2Block,
 }: GenesisConfig): string => {
   const genesis: any = { ...TEMPLATE }
 
@@ -413,6 +419,12 @@ export const generateGenesis = ({
   }
   if (typeof espressoBlock === 'number') {
     genesis.config.espressoBlock = espressoBlock
+  }
+  if (typeof gingerbreadBlock === 'number') {
+    genesis.config.gingerbreadBlock = gingerbreadBlock
+  }
+  if (typeof gingerbreadP2Block === 'number') {
+    genesis.config.gingerbreadP2Block = gingerbreadP2Block
   }
 
   genesis.config.chainId = chainId
@@ -489,22 +501,29 @@ export const generateGenesisWithMigrations = async ({
   const envFile = path.join(tmpDir, 'env.json')
   const configFile = path.join(tmpDir, 'genesis-config.json')
   const myceloBinaryPath = path.join(gethRepoPath!, '/build/bin/mycelo')
-  await spawnCmdWithExitOnFailure(
-    myceloBinaryPath,
-    [
-      'genesis-config',
-      '--template',
-      'monorepo',
-      '--mnemonic',
-      mnemonic,
-      '--validators',
-      numValidators.toString(),
-    ],
-    {
-      silent: !verbose,
-      cwd: tmpDir,
-    }
-  )
+  const genesisConfigParams = [
+    'genesis-config',
+    '--template',
+    'monorepo',
+    '--mnemonic',
+    mnemonic,
+    '--validators',
+    numValidators.toString(),
+  ]
+  // As the gasPriceMinimum requires the block number of the gingerbread HF, we need to
+  // create the genesis config with the actual activation block (instead of override it later)
+  if (!genesisConfig.gingerbreadBlock) {
+    genesisConfigParams.push('--forks.gingerbread')
+    genesisConfigParams.push('-1')
+  } else {
+    genesisConfigParams.push('--forks.gingerbread')
+    genesisConfigParams.push(genesisConfig.gingerbreadBlock.toString())
+  }
+
+  await spawnCmdWithExitOnFailure(myceloBinaryPath, genesisConfigParams, {
+    silent: !verbose,
+    cwd: tmpDir,
+  })
   const mcEnv = JSON.parse(fs.readFileSync(envFile).toString())
   const mcConfig = JSON.parse(fs.readFileSync(configFile).toString())
 
@@ -542,6 +561,12 @@ export const generateGenesisWithMigrations = async ({
   if (genesisConfig.espressoBlock !== undefined) {
     mcConfig.hardforks.espressoBlock = genesisConfig.espressoBlock
   }
+  if (genesisConfig.gingerbreadBlock !== undefined) {
+    mcConfig.hardforks.gingerbreadBlock = genesisConfig.gingerbreadBlock
+  }
+  if (genesisConfig.gingerbreadP2Block !== undefined) {
+    mcConfig.hardforks.gingerbreadP2Block = genesisConfig.gingerbreadP2Block
+  }
   if (genesisConfig.timestamp !== undefined) {
     mcConfig.genesisTimestamp = genesisConfig.timestamp
   }
@@ -551,7 +576,7 @@ export const generateGenesisWithMigrations = async ({
   fs.writeFileSync(configFile, JSON.stringify(mcConfig, undefined, 2))
 
   // Generate the genesis file, and return its contents
-  const contractsBuildPath = path.resolve(monorepoRoot, 'packages/protocol/build/contracts/')
+  const contractsBuildPath = path.resolve(monorepoRoot, 'packages/protocol/build/')
   await spawnCmdWithExitOnFailure(
     myceloBinaryPath,
     ['genesis-from-config', tmpDir, '--buildpath', contractsBuildPath],

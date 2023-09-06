@@ -21,6 +21,8 @@ describe('sync tests', function (this: any) {
       churritoBlock: 0,
       donutBlock: 0,
       espressoBlock: 0,
+      gingerbreadBlock: 1,
+      gingerbreadP2Block: 1,
     },
     instances: [
       {
