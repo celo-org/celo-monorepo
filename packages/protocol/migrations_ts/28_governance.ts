@@ -78,22 +78,18 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
 
         selectors.default = ['0x00000000']
         const thresholds = { ...constitution.proxy, ...constitution[contractName] }
-        await Promise.all(
-          Object.keys(thresholds)
-            .filter((method) => method !== '__contractPackage')
-            .map(
-              async (func) =>
-                await Promise.all(
-                  selectors[func].map((selector) =>
-                    governance.setConstitution(
-                      contract.address,
-                      selector,
-                      toFixed(thresholds[func])
-                    )
-                  )
-                )
-            )
+
+        const tresholdKeys = Object.keys(thresholds).filter(
+          (method) => method !== '__contractPackage'
         )
+
+        for (const func of tresholdKeys) {
+          await Promise.all(
+            selectors[func].map((selector) =>
+              governance.setConstitution(contract.address, selector, toFixed(thresholds[func]))
+            )
+          )
+        }
       }
     }
 
