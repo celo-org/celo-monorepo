@@ -36,6 +36,8 @@ const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
 
 const expectedVersion = getCombinerVersion()
 
+// TODO fix combiner e2e tests
+
 describe(`Running against service deployed at ${combinerUrl} w/ blockchain provider ${fullNodeUrl}`, () => {
   it('Service is deployed at correct version', async () => {
     const response = await fetch(combinerUrl + CombinerEndpoint.STATUS, {
@@ -58,7 +60,6 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         performedQueryCount: res.performedQueryCount,
         totalQuota: res.totalQuota,
         remainingQuota: res.totalQuota - res.performedQueryCount,
-        blockNumber: res.blockNumber,
         warnings: [],
       })
     })
@@ -74,7 +75,6 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         performedQueryCount: res.performedQueryCount,
         totalQuota: res.totalQuota,
         remainingQuota: res.totalQuota - res.performedQueryCount,
-        blockNumber: res.blockNumber,
         warnings: [],
       })
     })
@@ -90,7 +90,6 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         performedQueryCount: res1.performedQueryCount,
         totalQuota: res1.totalQuota,
         remainingQuota: res1.totalQuota - res1.performedQueryCount,
-        blockNumber: res1.blockNumber,
         warnings: [],
       }
       expect(res1).toStrictEqual<PnpClientQuotaStatus>(expectedRes)
@@ -99,7 +98,6 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         dekAuthSigner(0),
         SERVICE_CONTEXT
       )
-      expectedRes.blockNumber = res2.blockNumber
       expect(res2).toStrictEqual<PnpClientQuotaStatus>(expectedRes)
     })
 
@@ -198,7 +196,6 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
           performedQueryCount: startingPerformedQueryCount + 1,
           totalQuota: startingTotalQuota,
           remainingQuota: startingTotalQuota - (startingPerformedQueryCount + 1),
-          blockNumber: quotaRes.blockNumber,
           warnings: [],
         })
       })
@@ -222,7 +219,6 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
           performedQueryCount: startingPerformedQueryCount + 1,
           totalQuota: startingTotalQuota,
           remainingQuota: startingTotalQuota - (startingPerformedQueryCount + 1),
-          blockNumber: quotaRes.blockNumber,
           warnings: [],
         })
       })
