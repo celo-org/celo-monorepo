@@ -2,12 +2,12 @@
 
 import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
-import { readJSONSync } from 'fs-extra'
+import { existsSync, readJSONSync } from 'fs-extra'
+import minimist, { ParsedArgs } from 'minimist'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
 import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 
-const fs = require('fs')
 const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
 const BUILD_DIR = path.join(ROOT_DIR, process.env.BUILD_DIR ?? './build')
 
@@ -43,7 +43,7 @@ export const CoreContracts = [
   'GasPriceMinimum',
   'FeeHandler',
   'MentoFeeHandlerSeller',
-  'UniswapFeeHandlerSellerProxy',
+  'UniswapFeeHandlerSeller',
   'FeeCurrencyWhitelist',
   'GoldToken',
   'MetaTransactionWallet',
@@ -111,7 +111,7 @@ function compile(outdir: string) {
       contractPackage.path,
       contractPackage.contracstFolder
     )
-    if (!fs.existsSync(contractPath)) {
+    if (!existsSync(contractPath)) {
       console.log(`Contract package named ${contractPackage.name} doesn't exist`)
       continue
     }
@@ -207,13 +207,14 @@ async function generateFilesForContractKit(outdir: string) {
   exec(`yarn prettier --write "${outdir}/**/*.ts"`)
 }
 
-const _buildTargets = {
+const _buildTargets: ParsedArgs = {
+  _: [],
   solidity: undefined,
   truffleTypes: undefined,
   web3Types: undefined,
 }
 
-async function main(buildTargets: typeof _buildTargets) {
+async function main(buildTargets: ParsedArgs) {
   if (buildTargets.solidity) {
     compile(buildTargets.solidity)
   }
@@ -225,7 +226,6 @@ async function main(buildTargets: typeof _buildTargets) {
   }
 }
 
-const minimist = require('minimist')
 const argv = minimist(process.argv.slice(2), {
   string: Object.keys(_buildTargets),
 })

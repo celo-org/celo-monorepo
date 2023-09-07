@@ -36,6 +36,9 @@ import { newGrandaMento } from './generated/mento/GrandaMento'
 import { newReserve } from './generated/mento/Reserve'
 import { newStableToken } from './generated/mento/StableToken'
 
+import { newMentoFeeHandlerSeller } from './generated/MentoFeeHandlerSeller'
+import { newUniswapFeeHandlerSeller } from './generated/UniswapFeeHandlerSeller'
+
 const debug = debugFactory('kit:web3-contract-cache')
 
 export const ContractFactories = {
@@ -55,6 +58,8 @@ export const ContractFactories = {
   [CeloContract.FeeCurrencyWhitelist]: newFeeCurrencyWhitelist,
   [CeloContract.Freezer]: newFreezer,
   [CeloContract.FeeHandler]: newFeeHandler,
+  [CeloContract.MentoFeeHandlerSeller]: newMentoFeeHandlerSeller,
+  [CeloContract.UniswapFeeHandlerSeller]: newUniswapFeeHandlerSeller,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
@@ -199,6 +204,8 @@ export class Web3ContractCache {
         address = await this.registry.addressFor(contract)
       }
       debug('Initiating contract %s', contract)
+      debug('is it included?', ProxyContracts.includes(contract))
+      debug('is it included?', ProxyContracts.toString())
       const createFn = ProxyContracts.includes(contract) ? newProxy : ContractFactories[contract]
       this.cacheMap[contract] = createFn(
         this.registry.connection.web3,
