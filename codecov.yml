@@ -1,7 +1,9 @@
 coverage:
   status:
     project:
-      default: off
+      default:
+        target: auto
+        threshold: null
       mobile:
         paths:
           - packages/mobile/
