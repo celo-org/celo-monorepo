@@ -171,7 +171,7 @@ if (DEV_MODE) {
       fullNodeRetryDelayMs: Number(
         functionConfig.pnp.full_node_retry_delay_ms ?? RETRY_DELAY_IN_MS
       ),
-      shouldAuthenticate: toBool(functionConfig.pnp.shouldAuthenticate, true),
+      shouldAuthenticate: toBool(functionConfig.pnp.should_authenticate, true),
     },
     domains: {
       serviceName: functionConfig.domains.service_name ?? defaultServiceName,
