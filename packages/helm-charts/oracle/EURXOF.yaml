@@ -1,5 +1,5 @@
 oracle:
-  currencyPair: EUROCEUR
+  currencyPair: EURXOF
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
@@ -13,7 +13,7 @@ oracle:
   gasPriceMultiplier: 1.5
   priceSources: "[
       [
-        {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: false}
+        {exchange: 'ALPHAVANTAGE', symbol: 'EURXOF', toInvert: false}
       ]
     ]"
   minPriceSourceCount: 1
