@@ -81,12 +81,17 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
         await Promise.all(
           Object.keys(thresholds)
             .filter((method) => method !== '__contractPackage')
-            .map((func) =>
-              Promise.all(
-                selectors[func].map((selector) =>
-                  governance.setConstitution(contract.address, selector, toFixed(thresholds[func]))
+            .map(
+              async (func) =>
+                await Promise.all(
+                  selectors[func].map((selector) =>
+                    governance.setConstitution(
+                      contract.address,
+                      selector,
+                      toFixed(thresholds[func])
+                    )
+                  )
                 )
-              )
             )
         )
       }
