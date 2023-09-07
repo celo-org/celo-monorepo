@@ -43,7 +43,7 @@ export const CoreContracts = [
   'GasPriceMinimum',
   'FeeHandler',
   'MentoFeeHandlerSeller',
-  'UniswapFeeHandlerSellerProxy',
+  'UniswapFeeHandlerSeller',
   'FeeCurrencyWhitelist',
   'GoldToken',
   'MetaTransactionWallet',
