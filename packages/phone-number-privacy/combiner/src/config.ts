@@ -39,6 +39,7 @@ export interface OdisConfig {
   fullNodeTimeoutMs: number
   fullNodeRetryCount: number
   fullNodeRetryDelayMs: number
+  shouldAuthenticate: boolean
 }
 
 export interface CombinerConfig {
@@ -106,6 +107,7 @@ if (DEV_MODE) {
       fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
       fullNodeRetryCount: RETRY_COUNT,
       fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
+      shouldAuthenticate: true,
     },
     domains: {
       serviceName: defaultServiceName,
@@ -140,6 +142,7 @@ if (DEV_MODE) {
       fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
       fullNodeRetryCount: RETRY_COUNT,
       fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
+      shouldAuthenticate: true,
     },
   }
 } else {
@@ -168,6 +171,7 @@ if (DEV_MODE) {
       fullNodeRetryDelayMs: Number(
         functionConfig.pnp.full_node_retry_delay_ms ?? RETRY_DELAY_IN_MS
       ),
+      shouldAuthenticate: toBool(functionConfig.pnp.shouldAuthenticate, true),
     },
     domains: {
       serviceName: functionConfig.domains.service_name ?? defaultServiceName,
@@ -182,11 +186,12 @@ if (DEV_MODE) {
         currentVersion: Number(functionConfig.domains_keys.current_version),
         versions: functionConfig.domains_keys.versions,
       },
-      fullNodeTimeoutMs: Number(functionConfig.pnp.full_node_timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
+      fullNodeTimeoutMs: Number(functionConfig.pnp.full_node_timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS), // TODO refactor config - domains endpoints don't use full node
       fullNodeRetryCount: Number(functionConfig.pnp.full_node_retry_count ?? RETRY_COUNT),
       fullNodeRetryDelayMs: Number(
         functionConfig.pnp.full_node_retry_delay_ms ?? RETRY_DELAY_IN_MS
       ),
+      shouldAuthenticate: true,
     },
   }
 }
