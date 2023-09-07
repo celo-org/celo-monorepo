@@ -76,21 +76,15 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
 
   app.post(
     CombinerEndpoint.PNP_QUOTA,
-    createHandler(
-      phoneNumberPrivacy.enabled,
-      pnpQuota(pnpSigners, config.phoneNumberPrivacy, dekFetcher)
-    )
+    createHandler(phoneNumberPrivacy.enabled, pnpQuota(pnpSigners, phoneNumberPrivacy, dekFetcher))
   )
   app.post(
     CombinerEndpoint.PNP_SIGN,
-    createHandler(
-      phoneNumberPrivacy.enabled,
-      pnpSign(pnpSigners, config.phoneNumberPrivacy, dekFetcher)
-    )
+    createHandler(phoneNumberPrivacy.enabled, pnpSign(pnpSigners, phoneNumberPrivacy, dekFetcher))
   )
   app.post(
     CombinerEndpoint.DOMAIN_QUOTA_STATUS,
-    createHandler(domains.enabled, domainQuota(domainSigners, config.domains))
+    createHandler(domains.enabled, domainQuota(domainSigners, domains))
   )
   app.post(
     CombinerEndpoint.DOMAIN_SIGN,
