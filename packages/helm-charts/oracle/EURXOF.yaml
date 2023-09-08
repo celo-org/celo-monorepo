@@ -19,7 +19,7 @@ oracle:
         {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false}
       ]
   ]"
-  minPriceSourceCount: 1
+  minPriceSourceCount: 2
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
