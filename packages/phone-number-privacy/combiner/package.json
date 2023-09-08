@@ -26,7 +26,7 @@
     "test:e2e": "jest --runInBand test/end-to-end --verbose",
     "test:e2e:staging": "CONTEXT_NAME=staging yarn test:e2e",
     "test:e2e:alfajores": "CONTEXT_NAME=alfajores yarn test:e2e",
-    "test:e2e:mainnet": "CONTEXT_NAME=alfajores yarn test:e2e"
+    "test:e2e:mainnet": "CONTEXT_NAME=mainnet yarn test:e2e"
   },
   "dependencies": {
     "@celo/contractkit": "^4.1.2-dev",
