@@ -44,6 +44,10 @@ yargs
           type: 'number',
           description: 'number of requests to use when calculating latency moving average',
           default: 50,
+        })
+        .option('privateKey', {
+          type: 'string',
+          description: 'optional private key to send requests from',
         }),
     (args) => {
       if (args.rps == null || args.contextName == null) {
@@ -82,7 +86,8 @@ yargs
         args.duration,
         args.bypassQuota,
         args.useDEK,
-        args.movingAvgRequests
+        args.movingAvgRequests,
+        args.privateKey
       ) // tslint:disable-line:no-floating-promises
     }
   ).argv
