@@ -73,7 +73,7 @@ export abstract class BaseOracleDeployer {
       ? getFornoWebSocketUrl(this.celoEnv)
       : getLightNodeWebSocketRpcInternalUrl(this.celoEnv)
     return [
-      `--set oracle.api_keys=${fetchEnv(envVar.ORACLE_FX_ADAPTERS_API_KEYS)}`,
+      `--set-literal oracle.api_keys=${fetchEnv(envVar.ORACLE_FX_ADAPTERS_API_KEYS)}`,
       `--set environment.name=${this.celoEnv}`,
       `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
       `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
