@@ -37,12 +37,12 @@
     "ssl:keygen": "./scripts/create-ssl-cert.sh"
   },
   "dependencies": {
-    "@celo/base": "^4.1.1",
-    "@celo/contractkit": "^4.1.1",
-    "@celo/phone-number-privacy-common": "^3.0.0",
+    "@celo/base": "^4.1.2-dev",
+    "@celo/contractkit": "^4.1.2-dev",
+    "@celo/phone-number-privacy-common": "^3.0.1-dev",
     "@celo/poprf": "^0.1.9",
-    "@celo/utils": "^4.1.1",
-    "@celo/wallet-hsm-azure": "^4.1.1",
+    "@celo/utils": "^4.1.2-dev",
+    "@celo/wallet-hsm-azure": "^4.1.2-dev",
     "@google-cloud/secret-manager": "3.0.0",
     "@opentelemetry/api": "^1.4.1",
     "@opentelemetry/auto-instrumentations-node": "^0.38.0",
