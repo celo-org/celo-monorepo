@@ -25,6 +25,7 @@ import {
   PHONE_NUMBER,
   walletAuthSigner,
 } from './resources'
+import { sleep } from '@celo/base'
 
 const { IdentifierPrefix } = OdisUtils.Identifier
 
@@ -168,6 +169,9 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       await odisPayments
         .payInCUSD(ACCOUNT_ADDRESS, amountInWei)
         .sendAndWaitForReceipt({ from: ACCOUNT_ADDRESS })
+      // wait for cache to expire and then query to refresh
+      await sleep(5 * 1000)
+      await OdisUtils.Quota.getPnpQuotaStatus(ACCOUNT_ADDRESS, dekAuthSigner(0), SERVICE_CONTEXT)
     })
 
     describe('new requests', () => {
