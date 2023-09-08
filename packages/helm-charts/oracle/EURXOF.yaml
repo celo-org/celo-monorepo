@@ -1,27 +1,25 @@
-#######################################################
-# Note: this configuration is for testnet usage only! #
-#######################################################
 oracle:
   currencyPair: EURXOF
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
-      maxPercentageDeviation: 0.05
-      maxPercentageBidAskSpread: 0.025
+      maxPercentageDeviation: 0.01
+      maxPercentageBidAskSpread: 0.005
   metrics:
     enabled: true
     prometheusPort: 9090
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
   gasPriceMultiplier: 1.5
-  priceSources: "
-    [
+  priceSources: "[
       [
         {exchange: 'ALPHAVANTAGE', symbol: 'EURXOF', toInvert: false}
+      ],
+      [
+        {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false}
       ]
-    ]
-  "
-  minPriceSourceCount: 1
+  ]"
+  minPriceSourceCount: 2
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:

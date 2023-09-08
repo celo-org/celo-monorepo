@@ -11,24 +11,71 @@ oracle:
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
   gasPriceMultiplier: 1.5
-  priceSources: "
-    [
+  priceSources: "[
+      [
+        {exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'BINANCE', symbol: 'EURUSDT', toInvert: true},
+        {exchange: 'ALPHAVANTAGE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'BINANCE', symbol: 'EURUSDT', toInvert: true},
+        {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+
       [
         {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
-        {exchange: 'ALPHAVANTAGE', symbol: 'USDXOF', toInvert: false}
+        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: true},
+        {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
       ],
       [
-        {exchange: 'COINBASE', symbol: 'CELOEUR', toInvert: false},
-        {exchange: 'ALPHAVANTAGE', symbol: 'XOFEUR', toInvert: true}
+        {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
+        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: true},
+        {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+
+      [
+        {exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'BITSTAMP', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
       ],
       [
-        {exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false},
-        {exchange: 'COINBASE', symbol: 'BTCUSD', toInvert: false},
-        {exchange: 'ALPHAVANTAGE', symbol: 'USDXOF', toInvert: false}
+        {exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'BITSTAMP', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+
+      [
+        {exchange: 'KUCOIN', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'KUCOIN', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+
+      [
+        {exchange: 'BITGET', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'BITGET', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'BITGET', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'BITGET', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
       ]
-    ]
-  "
-  minPriceSourceCount: 1
+    ]"
+      # Additional sources missing adapters [
+      #   {exchange: 'UPBIT', symbol: 'CELOKRW', toInvert: false},
+      #   {exchange: 'UPBIT', symbol: 'BTCKRW', toInvert: true},
+      #   {exchange: 'KRAKEN', symbol: 'BTCEUR', toInvert: false},
+      #   {exchange: 'ALPHAVANTAGE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      # ]
+  minPriceSourceCount: 6
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
