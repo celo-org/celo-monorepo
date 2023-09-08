@@ -16,7 +16,8 @@ export async function testPNPSignQuery(
   timeoutMs?: number,
   bypassQuota?: boolean,
   useDEK?: boolean,
-  privateKey?: string
+  privateKey?: string,
+  privateKeyPercentage: number = 100
 ) {
   try {
     const odisResponse: IdentifierHashDetails = await queryOdisForSalt(
@@ -25,7 +26,8 @@ export async function testPNPSignQuery(
       timeoutMs,
       bypassQuota,
       useDEK,
-      privateKey
+      privateKey,
+      privateKeyPercentage
     )
     logger.debug({ odisResponse }, 'ODIS salt request successful. System is healthy.')
   } catch (err) {
@@ -46,7 +48,8 @@ export async function testPNPQuotaQuery(
   blockchainProvider: string,
   contextName: OdisContextName,
   timeoutMs?: number,
-  privateKey?: string
+  privateKey?: string,
+  privateKeyPercentage: number = 100
 ) {
   logger.info(`Performing test PNP query for ${CombinerEndpointPNP.PNP_QUOTA}`)
   try {
@@ -54,7 +57,8 @@ export async function testPNPQuotaQuery(
       blockchainProvider,
       contextName,
       timeoutMs,
-      privateKey
+      privateKey,
+      privateKeyPercentage
     )
     logger.info({ odisResponse }, 'ODIS quota request successful. System is healthy.')
   } catch (err) {
@@ -93,7 +97,8 @@ export async function concurrentRPSLoadTest(
   bypassQuota: boolean = false,
   useDEK: boolean = false,
   movingAverageRequests: number = 50,
-  privateKey?: string
+  privateKey?: string,
+  privateKeyPercentage: number = 100
 ) {
   const latencyQueue: number[] = []
   let movingAvgLatencySum = 0
@@ -139,9 +144,16 @@ export async function concurrentRPSLoadTest(
             undefined,
             bypassQuota,
             useDEK,
-            privateKey
+            privateKey,
+            privateKeyPercentage
           )
-        : testPNPQuotaQuery(blockchainProvider, contextName, undefined, privateKey))
+        : testPNPQuotaQuery(
+            blockchainProvider,
+            contextName,
+            undefined,
+            privateKey,
+            privateKeyPercentage
+          ))
     } catch (_) {
       logger.error('load test request failed')
     }
