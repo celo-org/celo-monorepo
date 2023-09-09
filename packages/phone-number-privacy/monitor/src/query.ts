@@ -18,7 +18,7 @@ import { genSessionID } from '@celo/phone-number-privacy-common/lib/utils/logger
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { defined } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
-import { ACCOUNT_ADDRESS, dekAuthSigner, generateRandomPhoneNumber, PRIVATE_KEY } from './resources'
+import { dekAuthSigner, generateRandomPhoneNumber, PRIVATE_KEY } from './resources'
 
 let phoneNumber = fetchEnv('PHONE_NUMBER')
 
@@ -44,12 +44,11 @@ export const queryOdisForSalt = async (
   const contractKit = newKit(blockchainProvider, new LocalWallet())
 
   if (useDEK) {
-    accountAddress = ACCOUNT_ADDRESS
     if (!privateKey || Math.random() > privateKeyPercentage * 0.01) {
       privateKey = PRIVATE_KEY
-      console.log('### Using default PK')
     }
-    contractKit.connection.addAccount(privateKey ?? PRIVATE_KEY)
+    contractKit.connection.addAccount(privateKey)
+    accountAddress = normalizeAddressWith0x(privateKeyToAddress(privateKey))
     contractKit.defaultAccount = accountAddress
     authSigner = dekAuthSigner(0)
     phoneNumber = generateRandomPhoneNumber()
