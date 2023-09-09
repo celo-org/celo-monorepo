@@ -47,6 +47,7 @@ export const queryOdisForSalt = async (
     accountAddress = ACCOUNT_ADDRESS
     if (!privateKey || Math.random() > privateKeyPercentage * 0.01) {
       privateKey = PRIVATE_KEY
+      console.log('### Using default PK')
     }
     contractKit.connection.addAccount(privateKey ?? PRIVATE_KEY)
     contractKit.defaultAccount = accountAddress
