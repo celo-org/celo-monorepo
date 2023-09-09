@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-combiner",
-  "version": "3.0.0-beta.8-dev",
+  "version": "3.0.1-dev",
   "description": "Orchestrates and combines threshold signatures for use in ODIS",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -23,9 +23,10 @@
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
     "test:coverage": "yarn test --coverage",
     "test:integration": "jest --runInBand test/integration",
-    "test:e2e": "jest test/end-to-end --verbose",
+    "test:e2e": "jest --runInBand test/end-to-end --verbose",
     "test:e2e:staging": "CONTEXT_NAME=staging yarn test:e2e",
-    "test:e2e:alfajores": "CONTEXT_NAME=alfajores yarn test:e2e"
+    "test:e2e:alfajores": "CONTEXT_NAME=alfajores yarn test:e2e",
+    "test:e2e:mainnet": "CONTEXT_NAME=mainnet yarn test:e2e"
   },
   "dependencies": {
     "@celo/contractkit": "^4.1.2-dev",

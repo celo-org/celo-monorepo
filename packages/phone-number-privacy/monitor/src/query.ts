@@ -32,7 +32,8 @@ export const queryOdisForSalt = async (
   contextName: OdisContextName,
   timeoutMs: number = 10000,
   bypassQuota: boolean = false,
-  useDEK: boolean = false
+  useDEK: boolean = false,
+  privateKey?: string
 ) => {
   let authSigner: AuthSigner
   let accountAddress: string
@@ -43,12 +44,12 @@ export const queryOdisForSalt = async (
 
   if (useDEK) {
     accountAddress = ACCOUNT_ADDRESS
-    contractKit.connection.addAccount(PRIVATE_KEY)
+    contractKit.connection.addAccount(privateKey ?? PRIVATE_KEY)
     contractKit.defaultAccount = accountAddress
     authSigner = dekAuthSigner(0)
     phoneNumber = generateRandomPhoneNumber()
   } else {
-    const privateKey = await newPrivateKey()
+    privateKey ??= await newPrivateKey()
     accountAddress = normalizeAddressWith0x(privateKeyToAddress(privateKey))
     contractKit.connection.addAccount(privateKey)
     contractKit.defaultAccount = accountAddress
@@ -90,7 +91,8 @@ export const queryOdisForSalt = async (
 export const queryOdisForQuota = async (
   blockchainProvider: string,
   contextName: OdisContextName,
-  timeoutMs: number = 10000
+  timeoutMs: number = 10000,
+  privateKey?: string
 ) => {
   console.log(`contextName: ${contextName}`) // tslint:disable-line:no-console
   console.log(`blockchain provider: ${blockchainProvider}`) // tslint:disable-line:no-console
@@ -98,7 +100,7 @@ export const queryOdisForQuota = async (
   const serviceContext = getServiceContext(contextName, OdisAPI.PNP)
 
   const contractKit = newKit(blockchainProvider, new LocalWallet())
-  const privateKey = await newPrivateKey()
+  privateKey ??= await newPrivateKey()
   const accountAddress = normalizeAddressWith0x(privateKeyToAddress(privateKey))
   contractKit.connection.addAccount(privateKey)
   contractKit.defaultAccount = accountAddress
