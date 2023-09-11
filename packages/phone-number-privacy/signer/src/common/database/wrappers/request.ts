@@ -2,67 +2,71 @@ import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { config } from '../../../config'
-import { Histograms, meter } from '../../metrics'
 import {
   PnpSignRequestRecord,
   REQUESTS_COLUMNS,
   REQUESTS_TABLE,
   toPnpSignRequestRecord,
 } from '../models/request'
-import { countAndThrowDBError, tableWithLockForTrx } from '../utils'
+import { doMeteredSql } from '../utils'
 
-function requests(db: Knex, table: REQUESTS_TABLE) {
-  return db<PnpSignRequestRecord>(table)
-}
-
-export async function getRequestExists(
+export async function getRequestIfExists(
   db: Knex,
-  requestsTable: REQUESTS_TABLE,
   account: string,
   blindedQuery: string,
+  logger: Logger
+): Promise<PnpSignRequestRecord | undefined> {
+  logger.debug(`Checking if request exists for account: ${account}, blindedQuery: ${blindedQuery}`)
+  return doMeteredSql('getRequestIfExists', ErrorMessage.DATABASE_GET_FAILURE, logger, async () => {
+    const existingRequest = await db<PnpSignRequestRecord>(REQUESTS_TABLE)
+      .where({
+        [REQUESTS_COLUMNS.address]: account,
+        [REQUESTS_COLUMNS.blindedQuery]: blindedQuery,
+      })
+      .first()
+      .timeout(config.db.timeout)
+    return existingRequest
+  })
+}
+
+export async function insertRequest(
+  db: Knex,
+  account: string,
+  blindedQuery: string,
+  signature: string,
   logger: Logger,
   trx?: Knex.Transaction
-): Promise<boolean> {
-  return meter(
-    async () => {
-      logger.debug(
-        `Checking if request exists for account: ${account}, blindedQuery: ${blindedQuery}`
-      )
-      const existingRequest = await tableWithLockForTrx(requests(db, requestsTable), trx)
-        .where({
-          [REQUESTS_COLUMNS.address]: account,
-          [REQUESTS_COLUMNS.blindedQuery]: blindedQuery,
-        })
-        .first()
-        .timeout(config.db.timeout)
-      return !!existingRequest
-    },
-    [],
-    (err: any) => countAndThrowDBError<boolean>(err, logger, ErrorMessage.DATABASE_GET_FAILURE),
-    Histograms.dbOpsInstrumentation,
-    ['getRequestExists']
+): Promise<void> {
+  logger.debug(
+    `Storing salt request for: ${account}, blindedQuery: ${blindedQuery}, signature: ${signature}`
   )
+  return doMeteredSql('insertRequest', ErrorMessage.DATABASE_INSERT_FAILURE, logger, async () => {
+    const sql = db<PnpSignRequestRecord>(REQUESTS_TABLE)
+      .insert(toPnpSignRequestRecord(account, blindedQuery, signature))
+      .timeout(config.db.timeout)
+    await (trx != null ? sql.transacting(trx) : sql)
+  })
 }
 
-export async function storeRequest(
+export async function deleteRequestsOlderThan(
   db: Knex,
-  requestsTable: REQUESTS_TABLE,
-  account: string,
-  blindedQuery: string,
-  logger: Logger,
-  trx: Knex.Transaction
-): Promise<void> {
-  return meter(
+  since: Date,
+  logger: Logger
+): Promise<number> {
+  logger.debug(`Removing request older than: ${since}`)
+  if (since > new Date(Date.now())) {
+    logger.debug('Date is in the future')
+    return 0
+  }
+  return doMeteredSql(
+    'deleteRequestsOlderThan',
+    ErrorMessage.DATABASE_REMOVE_FAILURE,
+    logger,
     async () => {
-      logger.debug(`Storing salt request for: ${account}, blindedQuery: ${blindedQuery}`)
-      await requests(db, requestsTable)
-        .transacting(trx)
-        .insert(toPnpSignRequestRecord(account, blindedQuery))
-        .timeout(config.db.timeout)
-    },
-    [],
-    (err: any) => countAndThrowDBError(err, logger, ErrorMessage.DATABASE_INSERT_FAILURE),
-    Histograms.dbOpsInstrumentation,
-    ['storeRequest']
+      const sql = db<PnpSignRequestRecord>(REQUESTS_TABLE)
+        .where(REQUESTS_COLUMNS.timestamp, '<=', since)
+        .del()
+      return sql
+    }
   )
 }

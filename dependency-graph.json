@@ -79,7 +79,6 @@
       "@celo/encrypted-backup",
       "@celo/identity",
       "@celo/phone-number-privacy-common",
-      "@celo/phone-number-privacy-signer",
       "@celo/phone-utils",
       "@celo/utils"
     ]
