@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@celo/contractkit": "^5.0.1-dev",
-    "@celo/phone-number-privacy-common": "^3.0.1",
+    "@celo/phone-number-privacy-common": "^3.0.2-dev",
     "@celo/identity": "^5.0.1-dev",
     "@celo/encrypted-backup": "^5.0.1-dev",
     "@celo/poprf": "^0.1.9",
