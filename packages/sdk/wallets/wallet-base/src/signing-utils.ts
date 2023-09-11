@@ -3,6 +3,7 @@ import {
   CeloTx,
   CeloTxWithSig,
   EncodedTransaction,
+  Hex,
   isPresent,
   RLPEncodedTx,
   TransactionTypes,
@@ -93,19 +94,19 @@ function signatureFormatter(
 
 export function stringNumberOrBNToHex(
   num?: number | string | ReturnType<Web3['utils']['toBN']>
-): `0x${string}` {
+): Hex {
   if (typeof num === 'string' || typeof num === 'number' || num === undefined) {
     return stringNumberToHex(num)
   } else {
-    return makeEven(`0x` + num.toString(16)) as `0x${string}`
+    return makeEven(`0x` + num.toString(16)) as Hex
   }
 }
-function stringNumberToHex(num?: number | string): `0x${string}` {
+function stringNumberToHex(num?: number | string): Hex {
   const auxNumber = Number(num)
   if (num === '0x' || num === undefined || auxNumber === 0) {
     return '0x'
   }
-  return makeEven(Web3.utils.numberToHex(num)) as `0x${string}`
+  return makeEven(Web3.utils.numberToHex(num)) as Hex
 }
 export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
   assertSerializableTX(tx)
@@ -127,7 +128,7 @@ export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
   transaction.maxFeePerGas = stringNumberOrBNToHex(tx.maxFeePerGas)
   transaction.maxPriorityFeePerGas = stringNumberOrBNToHex(tx.maxPriorityFeePerGas)
 
-  let rlpEncode: `0x${string}`
+  let rlpEncode: Hex
   if (isCIP42(tx)) {
     // There shall be a typed transaction with the code 0x7c that has the following format:
     // 0x7c || rlp([chain_id, nonce, max_priority_fee_per_gas, max_fee_per_gas, gas_limit, feecurrency, gatewayFeeRecipient, gatewayfee, destination, amount, data, access_list, signature_y_parity, signature_r, signature_s]).
@@ -192,12 +193,12 @@ enum TxTypeToPrefix {
 function concatTypePrefixHex(
   rawTransaction: string,
   txType: EncodedTransaction['tx']['type']
-): `0x${string}` {
+): Hex {
   const prefix = TxTypeToPrefix[txType]
   if (prefix) {
     return concatHex([prefix, rawTransaction])
   }
-  return rawTransaction as `0x${string}`
+  return rawTransaction as Hex
 }
 
 function assertSerializableTX(tx: CeloTx) {
@@ -261,7 +262,7 @@ function isCIP42(tx: CeloTx): boolean {
   )
 }
 
-function concatHex(values: string[]): `0x${string}` {
+function concatHex(values: string[]): Hex {
   return `0x${values.reduce((acc, x) => acc + x.replace('0x', ''), '')}`
 }
 
@@ -399,9 +400,9 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
 
   switch (determineTXType(rawTx)) {
     case 'cip42':
-      return recoverTransactionCIP42(rawTx as `0x${string}`)
+      return recoverTransactionCIP42(rawTx as Hex)
     case 'eip1559':
-      return recoverTransactionEIP1559(rawTx as `0x${string}`)
+      return recoverTransactionEIP1559(rawTx as Hex)
     default:
       const rawValues = RLP.decode(rawTx)
       debug('signing-utils@recoverTransaction: values are %s', rawValues)
@@ -477,7 +478,7 @@ function vrsForRecovery(vRaw: string, r: string, s: string) {
   } as const
 }
 
-function recoverTransactionCIP42(serializedTransaction: `0x${string}`): [CeloTxWithSig, string] {
+function recoverTransactionCIP42(serializedTransaction: Hex): [CeloTxWithSig, string] {
   const transactionArray: any[] = prefixAwareRLPDecode(serializedTransaction, 'cip42')
   debug('signing-utils@recoverTransactionCIP42: values are %s', transactionArray)
   if (transactionArray.length !== 15 && transactionArray.length !== 12) {
@@ -526,7 +527,7 @@ function recoverTransactionCIP42(serializedTransaction: `0x${string}`): [CeloTxW
   return [celoTX, signer]
 }
 
-function recoverTransactionEIP1559(serializedTransaction: `0x${string}`): [CeloTxWithSig, string] {
+function recoverTransactionEIP1559(serializedTransaction: Hex): [CeloTxWithSig, string] {
   const transactionArray: any[] = prefixAwareRLPDecode(serializedTransaction, 'eip1559')
   debug('signing-utils@recoverTransactionEIP1559: values are %s', transactionArray)
 

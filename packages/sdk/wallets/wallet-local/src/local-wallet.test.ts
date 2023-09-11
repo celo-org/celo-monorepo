@@ -1,4 +1,4 @@
-import { CeloTx, EncodedTransaction } from '@celo/connect'
+import { CeloTx, EncodedTransaction, Hex } from '@celo/connect'
 import {
   normalizeAddressWith0x,
   privateKeyToAddress,
@@ -12,6 +12,7 @@ import { TransactionSerializableEIP1559, parseTransaction } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import Web3 from 'web3'
 import { LocalWallet } from './local-wallet'
+import { StrongAddress } from '@celo/base/lib/address'
 
 const CHAIN_ID = 44378
 
@@ -247,13 +248,13 @@ describe('Local wallet class', () => {
               gatewayFee: undefined,
               maxFeePerGas: '99',
               maxPriorityFeePerGas: '99',
-              data: celoTransactionWithGasPrice.data as `0x${string}`,
+              data: celoTransactionWithGasPrice.data as Hex,
             }
             const transaction1559Viem: TransactionSerializableEIP1559 = {
               ...transaction1559,
               type: 'eip1559',
               gas: BigInt(transaction1559.gas as string),
-              to: transaction1559.to as `0x${string}`,
+              to: transaction1559.to as StrongAddress,
               value: BigInt(transaction1559.value as string),
               maxFeePerGas: BigInt(transaction1559.maxFeePerGas as string),
               maxPriorityFeePerGas: BigInt(transaction1559.maxPriorityFeePerGas as string),

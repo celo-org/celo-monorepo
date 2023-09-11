@@ -1,4 +1,4 @@
-import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
+import { ensureLeading0x, StrongAddress, trimLeading0x } from '@celo/base/lib/address'
 import { isValidAddress, toChecksumAddress } from '@celo/utils/lib/address'
 import { sha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
@@ -13,6 +13,7 @@ import {
   CeloTxPending,
   CeloTxReceipt,
   FormattedCeloTx,
+  Hex,
   Log,
 } from '../types'
 
@@ -316,12 +317,12 @@ export function inputAccessListFormatter(accessList?: AccessList): AccessListRaw
   }, [] as AccessListRaw)
 }
 
-export function inputAddressFormatter(address?: string): `0x${string}` | undefined {
+export function inputAddressFormatter(address?: string): StrongAddress | undefined {
   if (!address || address === '0x') {
     return undefined
   }
   if (isValidAddress(address)) {
-    return ensureLeading0x(address).toLocaleLowerCase() as `0x${string}`
+    return ensureLeading0x(address).toLocaleLowerCase() as StrongAddress
   }
   throw new Error(`Provided address ${address} is invalid, the capitalization checksum test failed`)
 }
@@ -359,12 +360,12 @@ function isHexStrict(hex: string): boolean {
   return /^(-)?0x[0-9a-f]*$/i.test(hex)
 }
 
-function numberToHex(value?: BigNumber.Value): `0x${string}` | undefined {
+function numberToHex(value?: BigNumber.Value): Hex | undefined {
   if (value) {
     const numberValue = new BigNumber(value)
     const result = ensureLeading0x(new BigNumber(value).toString(16))
     // Seen in web3, copied just in case
-    return (numberValue.lt(new BigNumber(0)) ? `-${result}` : result) as `0x${string}`
+    return (numberValue.lt(new BigNumber(0)) ? `-${result}` : result) as Hex
   }
   return undefined
 }

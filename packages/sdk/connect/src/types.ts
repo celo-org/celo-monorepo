@@ -8,15 +8,22 @@ import {
 import { Contract } from 'web3-eth-contract'
 export type Address = string
 
+export type Hex = `0x${string}`
 export interface CeloParams {
   feeCurrency: string
+  /*
+  @deprecated
+  */
   gatewayFeeRecipient: string
+  /*
+  @deprecated
+  */
   gatewayFee: string
 }
 
 export type AccessListRaw = Array<[string, string[]]>
 
-export type HexOrMissing = `0x${string}` | undefined
+export type HexOrMissing = Hex | undefined
 export interface FormattedCeloTx {
   chainId: number
   from: HexOrMissing
@@ -24,12 +31,18 @@ export interface FormattedCeloTx {
   data: string | undefined
   value: HexOrMissing
   feeCurrency?: HexOrMissing
+  /*
+  @deprecated
+  */
   gatewayFeeRecipient?: HexOrMissing
+  /*
+  @deprecated
+  */
   gatewayFee?: HexOrMissing
   gas: HexOrMissing
-  gasPrice?: `0x${string}`
-  maxFeePerGas?: `0x${string}`
-  maxPriorityFeePerGas?: `0x${string}`
+  gasPrice?: Hex
+  maxFeePerGas?: Hex
+  maxPriorityFeePerGas?: Hex
   nonce: HexOrMissing | number
   accessList?: AccessListRaw
   type: TransactionTypes
@@ -84,6 +97,9 @@ export interface CIP42TXProperties extends FeeMarketAndAccessListTXProperties {
   type: 'cip42'
 }
 
+/*
+  @deprecated
+  */
 export interface LegacyTXProperties extends CommonTXProperties {
   gasPrice: string
   feeCurrency: string
@@ -93,7 +109,7 @@ export interface LegacyTXProperties extends CommonTXProperties {
 }
 
 export interface EncodedTransaction {
-  raw: `0x${string}`
+  raw: Hex
   tx: LegacyTXProperties | CIP42TXProperties | EIP1559TXProperties
 }
 
@@ -142,6 +158,6 @@ export interface HttpProvider {
 
 export interface RLPEncodedTx {
   transaction: FormattedCeloTx
-  rlpEncode: `0x${string}`
+  rlpEncode: Hex
   type: TransactionTypes
 }
