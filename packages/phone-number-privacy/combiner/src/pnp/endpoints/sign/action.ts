@@ -39,9 +39,12 @@ export function pnpSign(
       return errorResult(400, WarningMessage.INVALID_KEY_VERSION_REQUEST)
     }
 
-    if (!(await authenticateUser(request, logger, dekFetcher))) {
-      return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
+    if (config.shouldAuthenticate) {
+      if (!(await authenticateUser(request, logger, dekFetcher))) {
+        return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
+      }
     }
+
     const keyVersionInfo = getKeyVersionInfo(request, config, logger)
     const crypto = new BLSCryptographyClient(keyVersionInfo)
 

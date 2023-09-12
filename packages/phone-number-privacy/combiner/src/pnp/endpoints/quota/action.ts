@@ -31,8 +31,10 @@ export function pnpQuota(
       return errorResult(400, WarningMessage.INVALID_INPUT)
     }
 
-    if (!(await authenticateUser(request, logger, dekFetcher))) {
-      return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
+    if (config.shouldAuthenticate) {
+      if (!(await authenticateUser(request, logger, dekFetcher))) {
+        return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
+      }
     }
 
     // TODO remove this, we shouldn't need keyVersionInfo for non-signing endpoints

@@ -9,6 +9,7 @@ import {
   SignMessageRequest,
   SignMessageResponseSchema,
 } from '@celo/phone-number-privacy-common'
+import { normalizeAddressWith0x } from '@celo/utils/lib/address'
 import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
@@ -19,10 +20,12 @@ import {
   ACCOUNT_ADDRESS_NO_QUOTA,
   BLINDED_PHONE_NUMBER,
   dekAuthSigner,
+  deks,
   getTestContextName,
   PHONE_NUMBER,
   walletAuthSigner,
 } from './resources'
+import { sleep } from '@celo/base'
 
 const { IdentifierPrefix } = OdisUtils.Identifier
 
@@ -36,9 +39,17 @@ const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
 
 const expectedVersion = getCombinerVersion()
 
-// TODO fix combiner e2e tests
-
 describe(`Running against service deployed at ${combinerUrl} w/ blockchain provider ${fullNodeUrl}`, () => {
+  beforeAll(async () => {
+    const accounts = await walletAuthSigner.contractKit.contracts.getAccounts()
+    const dekPublicKey = normalizeAddressWith0x(deks[0].publicKey)
+    if ((await accounts.getDataEncryptionKey(ACCOUNT_ADDRESS)) !== dekPublicKey) {
+      await accounts
+        .setAccountDataEncryptionKey(dekPublicKey)
+        .sendAndWaitForReceipt({ from: ACCOUNT_ADDRESS })
+    }
+  })
+
   it('Service is deployed at correct version', async () => {
     const response = await fetch(combinerUrl + CombinerEndpoint.STATUS, {
       method: 'GET',
@@ -140,27 +151,30 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
   })
 
   describe(`${CombinerEndpoint.PNP_SIGN}`, () => {
-    describe('new requests', () => {
-      beforeAll(async () => {
-        // Replenish quota for ACCOUNT_ADDRESS
-        // If this fails, may be necessary to faucet ACCOUNT_ADDRESS more funds
-        const numQueriesToReplenish = 2
-        const amountInWei = signerConfig.quota.queryPriceInCUSD
-          .times(1e18)
-          .times(numQueriesToReplenish)
-          .toString()
-        const stableToken = await walletAuthSigner.contractKit.contracts.getStableToken(
-          StableToken.cUSD
-        )
-        const odisPayments = await walletAuthSigner.contractKit.contracts.getOdisPayments()
-        await stableToken
-          .approve(odisPayments.address, amountInWei)
-          .sendAndWaitForReceipt({ from: ACCOUNT_ADDRESS })
-        await odisPayments
-          .payInCUSD(ACCOUNT_ADDRESS, amountInWei)
-          .sendAndWaitForReceipt({ from: ACCOUNT_ADDRESS })
-      })
+    beforeAll(async () => {
+      // Replenish quota for ACCOUNT_ADDRESS
+      // If this fails, may be necessary to faucet ACCOUNT_ADDRESS more funds
+      const numQueriesToReplenish = 100
+      const amountInWei = signerConfig.quota.queryPriceInCUSD
+        .times(1e18)
+        .times(numQueriesToReplenish)
+        .toString()
+      const stableToken = await walletAuthSigner.contractKit.contracts.getStableToken(
+        StableToken.cUSD
+      )
+      const odisPayments = await walletAuthSigner.contractKit.contracts.getOdisPayments()
+      await stableToken
+        .approve(odisPayments.address, amountInWei)
+        .sendAndWaitForReceipt({ from: ACCOUNT_ADDRESS })
+      await odisPayments
+        .payInCUSD(ACCOUNT_ADDRESS, amountInWei)
+        .sendAndWaitForReceipt({ from: ACCOUNT_ADDRESS })
+      // wait for cache to expire and then query to refresh
+      await sleep(5 * 1000)
+      await OdisUtils.Quota.getPnpQuotaStatus(ACCOUNT_ADDRESS, dekAuthSigner(0), SERVICE_CONTEXT)
+    })
 
+    describe('new requests', () => {
       // Requests made for PHONE_NUMBER from ACCOUNT_ADDRESS & same blinding factor
       // are replayed from previous test runs (for every run after the very first)
       let startingPerformedQueryCount: number
