@@ -1,16 +1,57 @@
-import { PromiEvent, Transaction, TransactionConfig, TransactionReceipt } from 'web3-core'
+import {
+  AccessList,
+  PromiEvent,
+  Transaction,
+  TransactionConfig,
+  TransactionReceipt,
+} from 'web3-core'
 import { Contract } from 'web3-eth-contract'
-
 export type Address = string
 
+export type Hex = `0x${string}`
 export interface CeloParams {
   feeCurrency: string
+  /*
+  @deprecated
+  */
   gatewayFeeRecipient: string
+  /*
+  @deprecated
+  */
   gatewayFee: string
 }
 
-export type CeloTx = TransactionConfig & Partial<CeloParams>
+export type AccessListRaw = Array<[string, string[]]>
 
+export type HexOrMissing = Hex | undefined
+export interface FormattedCeloTx {
+  chainId: number
+  from: HexOrMissing
+  to: HexOrMissing
+  data: string | undefined
+  value: HexOrMissing
+  feeCurrency?: HexOrMissing
+  /*
+  @deprecated
+  */
+  gatewayFeeRecipient?: HexOrMissing
+  /*
+  @deprecated
+  */
+  gatewayFee?: HexOrMissing
+  gas: HexOrMissing
+  gasPrice?: Hex
+  maxFeePerGas?: Hex
+  maxPriorityFeePerGas?: Hex
+  nonce: HexOrMissing | number
+  accessList?: AccessListRaw
+  type: TransactionTypes
+}
+
+export type CeloTx = TransactionConfig &
+  Partial<CeloParams> & { accessList?: AccessList; type?: TransactionTypes }
+
+export type CeloTxWithSig = CeloTx & { v: number; s: string; r: string; yParity: 0 | 1 }
 export interface CeloTxObject<T> {
   arguments: any[]
   call(tx?: CeloTx): Promise<T>
@@ -24,23 +65,52 @@ export { BlockNumber, EventLog, Log, PromiEvent, Sign } from 'web3-core'
 export { Block, BlockHeader, Syncing } from 'web3-eth'
 export { Contract, ContractSendMethod, PastEventOptions } from 'web3-eth-contract'
 
+export type TransactionTypes = 'eip1559' | 'celo-legacy' | 'cip42'
+
+interface CommonTXProperties {
+  nonce: string
+  gas: string
+  to: string
+  value: string
+  input: string
+  r: string
+  s: string
+  v: string
+  hash: string
+  type: TransactionTypes
+}
+
+interface FeeMarketAndAccessListTXProperties extends CommonTXProperties {
+  maxFeePerGas: string
+  maxPriorityFeePerGas: string
+  accessList?: AccessList
+}
+
+export interface EIP1559TXProperties extends FeeMarketAndAccessListTXProperties {
+  type: 'eip1559'
+}
+
+export interface CIP42TXProperties extends FeeMarketAndAccessListTXProperties {
+  feeCurrency: string
+  gatewayFeeRecipient?: string
+  gatewayFee?: string
+  type: 'cip42'
+}
+
+/*
+  @deprecated
+  */
+export interface LegacyTXProperties extends CommonTXProperties {
+  gasPrice: string
+  feeCurrency: string
+  gatewayFeeRecipient: string
+  gatewayFee: string
+  type: 'celo-legacy'
+}
+
 export interface EncodedTransaction {
-  raw: string
-  tx: {
-    nonce: string
-    gasPrice: string
-    gas: string
-    feeCurrency: string
-    gatewayFeeRecipient: string
-    gatewayFee: string
-    to: string
-    value: string
-    input: string
-    r: string
-    s: string
-    v: string
-    hash: string
-  }
+  raw: Hex
+  tx: LegacyTXProperties | CIP42TXProperties | EIP1559TXProperties
 }
 
 export type CeloTxPending = Transaction & Partial<CeloParams>
@@ -87,6 +157,7 @@ export interface HttpProvider {
 }
 
 export interface RLPEncodedTx {
-  transaction: CeloTx
-  rlpEncode: string
+  transaction: FormattedCeloTx
+  rlpEncode: Hex
+  type: TransactionTypes
 }

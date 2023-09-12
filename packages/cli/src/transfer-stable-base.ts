@@ -1,5 +1,6 @@
 import { StableToken } from '@celo/contractkit'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
+import { stableTokenInfos } from '@celo/contractkit/src/celo-tokens'
 import { flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import BigNumber from 'bignumber.js'
@@ -35,7 +36,10 @@ export abstract class TransferStableBase extends BaseCommand {
     } catch {
       failWith(`The ${this._stableCurrency} token was not deployed yet`)
     }
-    await this.kit.updateGasPriceInConnectionLayer(stableToken.address)
+    // If gasCurrency is not set, use the transferring token
+    if (!res.flags.gasCurrency) {
+      await this.kit.setFeeCurrency(stableTokenInfos[this._stableCurrency].contract)
+    }
 
     const tx = res.flags.comment
       ? stableToken.transferWithComment(to, value.toFixed(), res.flags.comment)
@@ -47,14 +51,12 @@ export abstract class TransferStableBase extends BaseCommand {
         `Account can afford transfer and gas paid in ${this._stableCurrency}`,
         this.kit.connection.defaultFeeCurrency === stableToken.address,
         async () => {
-          const gas = await tx.txo.estimateGas({ feeCurrency: stableToken.address })
-          // TODO: replace with gasPrice rpc once supported by min client version
-          const { gasPrice } = await this.kit.connection.fillGasPrice({
-            gasPrice: '0',
-            feeCurrency: stableToken.address,
-          })
+          const [gas, gasPrice, balance] = await Promise.all([
+            tx.txo.estimateGas({ feeCurrency: stableToken.address }),
+            this.kit.connection.gasPrice(stableToken.address),
+            stableToken.balanceOf(from),
+          ])
           const gasValue = new BigNumber(gas).times(gasPrice as string)
-          const balance = await stableToken.balanceOf(from)
           return balance.gte(value.plus(gasValue))
         },
         `Cannot afford transfer with ${this._stableCurrency} gasCurrency; try reducing value slightly or using gasCurrency=CELO`
