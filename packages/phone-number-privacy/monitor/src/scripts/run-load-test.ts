@@ -48,6 +48,11 @@ yargs
         .option('privateKey', {
           type: 'string',
           description: 'optional private key to send requests from',
+        })
+        .option('privateKeyPercentage', {
+          type: 'number',
+          description: 'percentage of time to use privateKey, if specified',
+          default: 100,
         }),
     (args) => {
       if (args.rps == null || args.contextName == null) {
@@ -87,7 +92,8 @@ yargs
         args.bypassQuota,
         args.useDEK,
         args.movingAvgRequests,
-        args.privateKey
+        args.privateKey,
+        args.privateKeyPercentage
       ) // tslint:disable-line:no-floating-promises
     }
   ).argv
