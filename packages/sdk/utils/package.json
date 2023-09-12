@@ -1,6 +1,6 @@
 {
   "name": "@celo/utils",
-  "version": "5.0.2-beta.1-dev",
+  "version": "5.0.3-dev",
   "description": "Celo common utils",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -22,7 +22,7 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/base": "5.0.2-beta.1-dev",
+    "@celo/base": "5.0.3-dev",
     "@ethereumjs/util": "8.0.5",
     "@types/bn.js": "^5.1.0",
     "@types/elliptic": "^6.4.9",
