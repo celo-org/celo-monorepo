@@ -1,6 +1,6 @@
 {
   "name": "@celo/wallet-local",
-  "version": "5.0.2-dev",
+  "version": "5.0.2-beta.1-dev",
   "description": "Local wallet implementation",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -22,9 +22,9 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@celo/utils": "5.0.2-dev",
-    "@celo/connect": "5.0.2-dev",
-    "@celo/wallet-base": "5.0.2-dev",
+    "@celo/utils": "5.0.2-beta.1-dev",
+    "@celo/connect": "5.0.2-beta.1-dev",
+    "@celo/wallet-base": "5.0.2-beta.1-dev",
     "eth-lib": "^0.2.8",
     "@ethereumjs/util": "8.0.5"
   },
