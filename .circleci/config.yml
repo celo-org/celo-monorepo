@@ -2,7 +2,21 @@
 # and https://github.com/facebook/react-native/blob/master/.circleci/config.yml
 
 version: 2.1
+setup: true
+
+orbs:
+  node: circleci/node@5.1.0
+
 parameters:
+  run-workflow-general:
+    type: boolean
+    default: false 
+  run-workflow-npm-install:
+    type: boolean
+    default: false 
+  run-workflow-protocol-coverage:
+    type: boolean
+    default: false 
   # When you need to force a rebuild of the node modules cache then bump this version
   node-modules-cache-version:
     type: integer
@@ -26,7 +40,7 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
+    - image: us.gcr.io/celo-testnet/circleci-node18:1.0.0
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
@@ -34,14 +48,16 @@ defaults: &defaults
 contract-defaults: &contract-defaults
   <<: *defaults
   environment:
-    RELEASE_TAG: core-contracts.v8
+    # RELEASE_TAG: core-contracts.v9
+    # TODO(soloseng): switch back to core-contract.v* once the latest contract release is done on node18.
+    RELEASE_TAG: ganache-v7-core-contracts.v9
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
   docker:
-    - image: celohq/circleci:geth1.9-2
+    - image: us-west1-docker.pkg.dev/devopsre/clabs-public-images/circleci:node18.14-go1.16
   environment:
-    CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
+    CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.7.x
 general:
   artifacts:
     - 'protocol/coverage'
@@ -76,6 +92,9 @@ commands:
       - run:
           name: Install dependencies
           command: |
+            # node-gyp needs to know where python is at when installed
+            yarn config set python $(which python3)
+
             if [ ! -e ~/.tmp/yarn_deps_have_changed ]; then
               # Though `yarn install` is instantaneous with up-to-date node_modules which is the case when we've restored cached node_modules,
               # there's currently a bug with the generated node_modules/.yarn-integrity file which is apparently not entirely stable
@@ -89,7 +108,6 @@ commands:
               yarn run postinstall
               exit 0
             fi
-
             # Deals with yarn install flakiness which can come due to yarnpkg.com being
             # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
             yarn install || yarn install || yarn install
@@ -151,7 +169,7 @@ jobs:
             # Verify that following commands work, they are later called in the incremental testing script
             # There output does not matter here, the fact that they finish successfully does.
             git rev-parse --abbrev-ref HEAD
-            git fetch --all --tags
+            git fetch --all --tags -f
 
       - attach_workspace:
           at: ~/app
@@ -194,7 +212,8 @@ jobs:
 
   general-test:
     <<: *defaults
-    resource_class: large
+    # XXX (soloseng): Increased size because this test was hitting the ram limit and failing
+    resource_class: xlarge
     steps:
       - attach_workspace:
           at: ~/app
@@ -231,6 +250,7 @@ jobs:
   # crashes on the second re-install.
   # This pre script, generates the build and devchain, and adds it to the workspace to be used for the
   # other script
+
   pre-protocol-test-release:
     <<: *contract-defaults
     resource_class: large
@@ -244,13 +264,17 @@ jobs:
       - run:
           name: Opcode tests
           command: yarn --cwd packages/protocol check-opcodes
+      - node/install:
+      # TODO(soloseng): remove this node 12 install once the latest contract release is done on node18.
+          install-yarn: true
+          node-version: '12.22.11'
       - run:
           name: Generate devchain of previous release
           command: |
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             echo "Comparing against $RELEASE_TAG"
-            # Github has phased out the git protocol so we ensure that we use
+            # Github has phased out the http protocol so we ensure that we use
             # https for all git operations that yarn may perform.
             git config --global url."https://github.com".insteadOf git://github.com
             yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
@@ -258,7 +282,6 @@ jobs:
           root: .
           paths:
             - 'packages/protocol/.tmp/released_chain/*'
-
   protocol-test-release:
     <<: *contract-defaults
     resource_class: large
@@ -727,7 +750,7 @@ jobs:
   test-typescript-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
+      - image: us.gcr.io/celo-testnet/circleci-node18:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -740,7 +763,7 @@ jobs:
   test-utils-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
+      - image: us.gcr.io/celo-testnet/circleci-node18:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -753,7 +776,7 @@ jobs:
   test-contractkit-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
+      - image: us.gcr.io/celo-testnet/circleci-node18:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -769,7 +792,7 @@ jobs:
   test-celocli-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
+      - image: us.gcr.io/celo-testnet/circleci-node18:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -784,6 +807,8 @@ jobs:
 
   odis-test:
     <<: *defaults
+    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/app
@@ -872,20 +897,21 @@ jobs:
               cd packages/protocol
               ./specs/scripts/reserve.sh
             fi
-
-  flakey-test-summary:
-    <<: *defaults
+  # Dummy job for not showing CircleCI error: "Error: All Workflows have been filtered from this Pipeline"
+  # Check https://github.com/CircleCI-Public/circleci-cli/issues/577 for more context
+  noop:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
     steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Add summary of flakey tests to GitHub Checks
-          command: |
-            node ./packages/flake-tracker/scripts/summary.js
+      - run: echo "noop"
 
 workflows:
   version: 2
   celo-monorepo-build:
+    # Contitionally triggered
+    when: 
+      or: [<< pipeline.parameters.run-workflow-general >>]
     jobs:
       - install_dependencies
       - certora-test:
@@ -987,49 +1013,18 @@ workflows:
       - odis-test:
           requires:
             - lint-checks
-      - flakey-test-summary:
-          requires:
-            - protocol-test-common
-            - protocol-test-compatibility
-            - protocol-test-governance-network
-            - protocol-test-governance-validators
-            - protocol-test-governance-voting
-            - protocol-test-identity
-            - protocol-test-stability
-            - end-to-end-geth-transfer-test
-            - end-to-end-geth-blockchain-parameters-test
-            - end-to-end-geth-slashing-test
-            - end-to-end-geth-governance-test
-            - end-to-end-geth-replica-test
-            - end-to-end-geth-sync-test
-            - end-to-end-geth-validator-order-test
-            - end-to-end-cip35-eth-compatibility-test
-            - odis-test
   npm-install-testing-cron-workflow:
-    triggers:
-      - schedule:
-          # 7 PM in UTC = noon in PDT.
-          # Best for test to fail during SF afternoon, so that, someone can fix it during the day time.
-          cron: '0 19 * * *'
-          filters:
-            branches:
-              only:
-                - master
+    # Contitionally triggered
+    when: 
+      or: [<< pipeline.parameters.run-workflow-npm-install >>]
     jobs:
       - test-typescript-npm-package-install
       - test-utils-npm-package-install
       - test-contractkit-npm-package-install
       - test-celocli-npm-package-install
   protocol-testing-with-code-coverage-cron-workflow:
-    triggers:
-      - schedule:
-          # 1 PM in UTC = 6 AM in PDT.
-          # Best for this slow test (~3 hours) to run during SF early morning.
-          cron: '0 13 * * *'
-          filters:
-            branches:
-              only:
-                - master
+    when: 
+      or: [<< pipeline.parameters.run-workflow-protocol-coverage >>]
     jobs:
       - install_dependencies
       - lint-checks:
@@ -1038,3 +1033,8 @@ workflows:
       - protocol-test-with-code-coverage:
           requires:
             - lint-checks
+  # Dummy job for not showing CircleCI error: "Error: All Workflows have been filtered from this Pipeline"
+  # Check https://github.com/CircleCI-Public/circleci-cli/issues/577 for more context
+  no-changes:
+    jobs:
+      - noop

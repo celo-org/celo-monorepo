@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { mineToNextEpoch } from '../test-utils/utils'
 
-import { zeroAddress } from 'ethereumjs-util'
+import { zeroAddress } from '@ethereumjs/util'
 import { newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from './Accounts'
 import { ElectionWrapper } from './Election'
@@ -18,6 +18,8 @@ const blsPublicKey =
   '0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00'
 const blsPoP =
   '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900'
+
+jest.setTimeout(20000)
 
 testWithGanache('Election Wrapper', (web3) => {
   const ZERO_GOLD = new BigNumber(web3.utils.toWei('0', 'ether'))
@@ -62,7 +64,9 @@ testWithGanache('Election Wrapper', (web3) => {
 
   const setupGroup = async (groupAccount: string) => {
     await registerAccountWithLockedGold(groupAccount, new BigNumber(minLockedGoldValue).toFixed())
-    await (await validators.registerValidatorGroup(GROUP_COMMISSION)).sendAndWaitForReceipt({
+    await (
+      await validators.registerValidatorGroup(GROUP_COMMISSION)
+    ).sendAndWaitForReceipt({
       from: groupAccount,
     })
   }
@@ -85,7 +89,9 @@ testWithGanache('Election Wrapper', (web3) => {
     await setupGroup(groupAccount)
     await setupValidator(validatorAccount)
     await validators.affiliate(groupAccount).sendAndWaitForReceipt({ from: validatorAccount })
-    await (await validators.addMember(groupAccount, validatorAccount)).sendAndWaitForReceipt({
+    await (
+      await validators.addMember(groupAccount, validatorAccount)
+    ).sendAndWaitForReceipt({
       from: groupAccount,
     })
   }
@@ -120,21 +126,45 @@ testWithGanache('Election Wrapper', (web3) => {
       await registerAccountWithLockedGold(userAccount)
     })
 
+    describe('#getValidatorGroupVotes', () => {
+      // Confirm base assumptions once to avoid duplicating test code later
+      test('shows non-empty group as eligible', async () => {
+        const groupVotesBefore = await election.getValidatorGroupVotes(groupAccount)
+        expect(groupVotesBefore.eligible).toBe(true)
+      })
+
+      test('shows empty group as ineligible', async () => {
+        await validators.deaffiliate().sendAndWaitForReceipt({ from: validatorAccount })
+        const groupVotesAfter = await election.getValidatorGroupVotes(groupAccount)
+        expect(groupVotesAfter.eligible).toBe(false)
+      })
+    })
+
     describe('#vote', () => {
-      test('SBAT vote', async () => {
-        await (await election.vote(groupAccount, ONE_HUNDRED_GOLD)).sendAndWaitForReceipt({
+      beforeEach(async () => {
+        await (
+          await election.vote(groupAccount, ONE_HUNDRED_GOLD)
+        ).sendAndWaitForReceipt({
           from: userAccount,
         })
-
+      })
+      test('SBAT vote', async () => {
         const totalGroupVotes = await election.getTotalVotesForGroup(groupAccount)
+        expect(totalGroupVotes).toEqual(ONE_HUNDRED_GOLD)
+      })
 
+      test('total votes remain unchanged when group becomes ineligible', async () => {
+        await validators.deaffiliate().sendAndWaitForReceipt({ from: validatorAccount })
+        const totalGroupVotes = await election.getTotalVotesForGroup(groupAccount)
         expect(totalGroupVotes).toEqual(ONE_HUNDRED_GOLD)
       })
     })
 
     describe('#activate', () => {
-      test('SBAT activate vote', async () => {
-        await (await election.vote(groupAccount, ONE_HUNDRED_GOLD)).sendAndWaitForReceipt({
+      beforeEach(async () => {
+        await (
+          await election.vote(groupAccount, ONE_HUNDRED_GOLD)
+        ).sendAndWaitForReceipt({
           from: userAccount,
         })
         await mineToNextEpoch(web3)
@@ -146,15 +176,26 @@ testWithGanache('Election Wrapper', (web3) => {
           promises.push(promise)
         }
         await Promise.all(promises)
+      })
 
+      test('SBAT activate vote', async () => {
+        const activeVotes = await election.getActiveVotesForGroup(groupAccount)
+        expect(activeVotes).toEqual(ONE_HUNDRED_GOLD)
+      })
+
+      test('active votes remain unchanged when group becomes ineligible', async () => {
+        await validators.deaffiliate().sendAndWaitForReceipt({ from: validatorAccount })
         const activeVotes = await election.getActiveVotesForGroup(groupAccount)
         expect(activeVotes).toEqual(ONE_HUNDRED_GOLD)
       })
     })
 
     describe('#revokeActive', () => {
-      test('SBAT revoke active', async () => {
+      beforeEach(async () => {
         await activateAndVote(groupAccount, userAccount, ONE_HUNDRED_GOLD)
+      })
+
+      test('SBAT revoke active', async () => {
         await (
           await election.revokeActive(userAccount, groupAccount, ONE_HUNDRED_GOLD)
         ).sendAndWaitForReceipt({
@@ -164,13 +205,39 @@ testWithGanache('Election Wrapper', (web3) => {
         const remainingVotes = await election.getTotalVotesForGroup(groupAccount)
         expect(remainingVotes).toEqual(ZERO_GOLD)
       })
+
+      test('SBAT revoke active when group is ineligible', async () => {
+        await validators.deaffiliate().sendAndWaitForReceipt({ from: validatorAccount })
+        await (
+          await election.revokeActive(userAccount, groupAccount, ONE_HUNDRED_GOLD)
+        ).sendAndWaitForReceipt({ from: userAccount })
+
+        const remainingVotes = await election.getTotalVotesForGroup(groupAccount)
+        expect(remainingVotes).toEqual(ZERO_GOLD)
+      })
     })
 
     describe('#revokePending', () => {
-      test('SBAT revoke pending', async () => {
-        await (await election.vote(groupAccount, ONE_HUNDRED_GOLD)).sendAndWaitForReceipt({
+      beforeEach(async () => {
+        await (
+          await election.vote(groupAccount, ONE_HUNDRED_GOLD)
+        ).sendAndWaitForReceipt({
           from: userAccount,
         })
+      })
+
+      test('SBAT revoke pending', async () => {
+        await (
+          await election.revokePending(userAccount, groupAccount, ONE_HUNDRED_GOLD)
+        ).sendAndWaitForReceipt({
+          from: userAccount,
+        })
+        const remainingVotes = await election.getTotalVotesForGroup(groupAccount)
+        expect(remainingVotes).toEqual(ZERO_GOLD)
+      })
+
+      test('SBAT revoke pending when group is ineligible', async () => {
+        await validators.deaffiliate().sendAndWaitForReceipt({ from: validatorAccount })
         await (
           await election.revokePending(userAccount, groupAccount, ONE_HUNDRED_GOLD)
         ).sendAndWaitForReceipt({
@@ -182,11 +249,30 @@ testWithGanache('Election Wrapper', (web3) => {
     })
 
     describe('#revoke', () => {
-      test('SBAT revoke active and pending votes', async () => {
+      beforeEach(async () => {
         await activateAndVote(groupAccount, userAccount, TWO_HUNDRED_GOLD)
-        await (await election.vote(groupAccount, ONE_HUNDRED_GOLD)).sendAndWaitForReceipt({
+        await (
+          await election.vote(groupAccount, ONE_HUNDRED_GOLD)
+        ).sendAndWaitForReceipt({
           from: userAccount,
         })
+      })
+
+      test('SBAT revoke active and pending votes', async () => {
+        const revokeTransactionsList = await election.revoke(
+          userAccount,
+          groupAccount,
+          THREE_HUNDRED_GOLD
+        )
+        for (let tx of revokeTransactionsList) {
+          await tx.sendAndWaitForReceipt({ from: userAccount })
+        }
+        const remainingVotes = await election.getTotalVotesForGroup(groupAccount)
+        expect(remainingVotes).toEqual(ZERO_GOLD)
+      })
+
+      test('SBAT revoke active and pending votes when group is ineligible', async () => {
+        await validators.deaffiliate().sendAndWaitForReceipt({ from: validatorAccount })
         const revokeTransactionsList = await election.revoke(
           userAccount,
           groupAccount,
@@ -235,7 +321,9 @@ testWithGanache('Election Wrapper', (web3) => {
     })
 
     test('Validator groups should be in the correct order', async () => {
-      await (await election.vote(groupAccountA, ONE_HUNDRED_GOLD)).sendAndWaitForReceipt({
+      await (
+        await election.vote(groupAccountA, ONE_HUNDRED_GOLD)
+      ).sendAndWaitForReceipt({
         from: userAccount,
       })
       const revokeTransactionsList = await election.revoke(

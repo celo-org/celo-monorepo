@@ -1,21 +1,19 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
+import { Signature } from '@celo/base/lib/signatureUtils'
 import getPhoneHash from '@celo/phone-utils/lib/getPhoneHash'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
   assertLogMatches2,
   assertRevert,
-  assertSameAddress,
+  assertTransactionRevertWithReason,
   getDerivedKey,
-  getVerificationCodeSignature,
   KeyOffsets,
-  mineBlocks,
   unlockAndAuthorizeKey,
 } from '@celo/protocol/lib/test-utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
-import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
+import { SignatureUtils } from '@celo/utils/src/signatureUtils'
 import BigNumber from 'bignumber.js'
-import { range, uniq } from 'lodash'
 import {
   AccountsContract,
   AccountsInstance,
@@ -34,7 +32,7 @@ import {
   RegistryInstance,
 } from 'types'
 import Web3 from 'web3'
-import { beforeEachWithRetries } from '../customHooks'
+import { soliditySha3 } from 'web3-utils'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 /* We use a contract that behaves like the actual Attestations contract, but
@@ -84,7 +82,7 @@ contract('Attestations', (accounts: string[]) => {
     return accounts[nonIssuerIndex]
   }
 
-  beforeEachWithRetries('Attestations setup', 3, 3000, async () => {
+  beforeEach('Attestations setup', async () => {
     accountsInstance = await Accounts.new(true)
     mockERC20Token = await MockERC20Token.new()
     otherMockERC20Token = await MockERC20Token.new()
@@ -97,27 +95,24 @@ contract('Attestations', (accounts: string[]) => {
     registry = await Registry.new(true)
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
-
     const tokenBalance = web3.utils.toWei('10', 'ether').toString()
-    await Promise.all(
-      accounts.map(async (account) => {
-        await mockERC20Token.mint(account, tokenBalance)
-        await otherMockERC20Token.mint(account, tokenBalance)
-        await accountsInstance.createAccount({ from: account })
-        await unlockAndAuthorizeKey(
-          KeyOffsets.VALIDATING_KEY_OFFSET,
-          accountsInstance.authorizeValidatorSigner,
-          account,
-          accounts
-        )
-        await unlockAndAuthorizeKey(
-          KeyOffsets.ATTESTING_KEY_OFFSET,
-          accountsInstance.authorizeAttestationSigner,
-          account,
-          accounts
-        )
-      })
-    )
+    for (const account of accounts) {
+      await mockERC20Token.mint(account, tokenBalance)
+      await otherMockERC20Token.mint(account, tokenBalance)
+      await accountsInstance.createAccount({ from: account })
+      await unlockAndAuthorizeKey(
+        KeyOffsets.VALIDATING_KEY_OFFSET,
+        accountsInstance.authorizeValidatorSigner,
+        account,
+        accounts
+      )
+      await unlockAndAuthorizeKey(
+        KeyOffsets.ATTESTING_KEY_OFFSET,
+        accountsInstance.authorizeAttestationSigner,
+        account,
+        accounts
+      )
+    }
 
     mockElection = await MockElection.new()
     await mockElection.setElectedValidators(
@@ -157,7 +152,7 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         attestations.initialize(
           registry.address,
           attestationExpiryBlocks,
@@ -165,7 +160,8 @@ contract('Attestations', (accounts: string[]) => {
           maxAttestations,
           [mockERC20Token.address],
           [attestationFee]
-        )
+        ),
+        'contract already initialized'
       )
     })
   })
@@ -190,10 +186,11 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert when set by a non-owner', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         attestations.setAttestationExpiryBlocks(newMaxNumBlocksPerAttestation, {
           from: accounts[1],
-        })
+        }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -208,14 +205,18 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert when the fee is being set to 0', async () => {
-      await assertRevert(attestations.setAttestationRequestFee(mockERC20Token.address, 0))
+      await assertTransactionRevertWithReason(
+        attestations.setAttestationRequestFee(mockERC20Token.address, 0),
+        'You have to specify a fee greater than 0'
+      )
     })
 
     it('should not be settable by a non-owner', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         attestations.setAttestationRequestFee(mockERC20Token.address, newAttestationFee, {
           from: accounts[1],
-        })
+        }),
+        'Ownable: caller is not the owner'
       )
     })
 
@@ -256,10 +257,11 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert when set by a non-owner', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         attestations.setSelectIssuersWaitBlocks(newSelectIssuersWaitBlocks, {
           from: accounts[1],
-        })
+        }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -283,424 +285,41 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert when set by a non-owner', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         attestations.setMaxAttestations(newMaxAttestations, {
           from: accounts[1],
-        })
+        }),
+        'Ownable: caller is not the owner'
       )
     })
   })
 
-  describe('#request()', () => {
-    it('should indicate an unselected attestation request', async () => {
-      await attestations.request(phoneHash, attestationsRequested, mockERC20Token.address)
-      const requestBlock = await web3.eth.getBlock('latest')
-
-      const [
-        blockNumber,
-        actualAttestationsRequested,
-        actualAttestationRequestFeeToken,
-      ] = await attestations.getUnselectedRequest(phoneHash, caller)
-
-      assertEqualBN(blockNumber, requestBlock.number)
-      assertEqualBN(attestationsRequested, actualAttestationsRequested)
-      assertSameAddress(actualAttestationRequestFeeToken, mockERC20Token.address)
-    })
-
-    it('should increment the number of attestations requested', async () => {
-      await attestations.request(phoneHash, attestationsRequested, mockERC20Token.address)
-
-      const [completed, total] = await attestations.getAttestationStats(phoneHash, caller)
-      assertEqualBN(completed, 0)
-      assertEqualBN(total, attestationsRequested)
-    })
-
-    it('should revert if 0 attestations are requested', async () => {
-      await assertRevert(attestations.request(phoneHash, 0, mockERC20Token.address))
-    })
-
-    it('should emit the AttestationsRequested event', async () => {
-      const response = await attestations.request(
-        phoneHash,
-        attestationsRequested,
-        mockERC20Token.address
-      )
-
-      assert.lengthOf(response.logs, 1)
-      const event = response.logs[0]
-      assertLogMatches2(event, {
-        event: 'AttestationsRequested',
-        args: {
-          identifier: phoneHash,
-          account: caller,
-          attestationsRequested: new BigNumber(attestationsRequested),
-          attestationRequestFeeToken: mockERC20Token.address,
-        },
-      })
-    })
-
-    describe('when attestations have already been requested', () => {
-      beforeEach(async () => {
-        await attestations.request(phoneHash, attestationsRequested, mockERC20Token.address)
-      })
-
-      describe('when the issuers have not yet been selected', () => {
-        it('should revert requesting more attestations', async () => {
-          await assertRevert(attestations.request(phoneHash, 1, mockERC20Token.address))
-        })
-
-        describe('when the original request has expired', () => {
-          it('should allow to request more attestations', async () => {
-            await mineBlocks(attestationExpiryBlocks, web3)
-            await attestations.request(phoneHash, 1, mockERC20Token.address)
-          })
-        })
-
-        describe('when the original request cannot be selected for due to randomness not being available', () => {
-          it('should allow to request more attestations', async () => {
-            const randomnessBlockRetentionWindow = await random.randomnessBlockRetentionWindow()
-            await mineBlocks(randomnessBlockRetentionWindow.toNumber(), web3)
-            await attestations.request(phoneHash, 1, mockERC20Token.address)
-          })
-        })
-      })
-
-      describe('when the issuers have been selected', () => {
-        beforeEach(async () => {
-          const requestBlockNumber = await web3.eth.getBlockNumber()
-          await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
-          await attestations.selectIssuers(phoneHash)
-        })
-
-        it('should allow to request more attestations', async () => {
-          await attestations.request(phoneHash, 1, mockERC20Token.address)
-          const [completed, total] = await attestations.getAttestationStats(phoneHash, caller)
-          assert.equal(completed.toNumber(), 0)
-          assert.equal(total.toNumber(), attestationsRequested + 1)
-        })
-      })
-    })
-  })
-
-  describe('#selectIssuers()', () => {
-    let expectedRequestBlockNumber: number
-
-    describe('when half the validator set does not authorize an attestation key', () => {
-      const accountsThatOptedIn = accounts.slice(0, 5)
-
-      beforeEach(async () => {
-        await Promise.all(
-          accounts
-            .slice(5, 10)
-            .map(async (account) => accountsInstance.removeAttestationSigner({ from: account }))
-        )
-      })
-
-      it('does not select among those when requesting 5', async () => {
-        await attestations.request(phoneHash, 5, mockERC20Token.address)
-        const requestBlockNumber = await web3.eth.getBlockNumber()
-        await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
-        await attestations.selectIssuers(phoneHash)
-
-        const attestationIssuers = await attestations.getAttestationIssuers(phoneHash, caller)
-        assert.includeMembers(accountsThatOptedIn, attestationIssuers)
-      })
-    })
-
-    describe('when attestations were requested', () => {
-      beforeEach(async () => {
-        await attestations.request(phoneHash, attestationsRequested, mockERC20Token.address)
-        expectedRequestBlockNumber = await web3.eth.getBlockNumber()
-      })
-
-      // These tests/functionality implicitly relies on randomness to only be available
-      // historically. The attestation contract itself will not test that the current block
-      //  number is sufficiently in the future after the request block
-      describe('when the randomness of the right block has been set', () => {
-        beforeEach(async () => {
-          const requestBlockNumber = await web3.eth.getBlockNumber()
-          await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
-        })
-
-        it('should add the correct number attestation issuers', async () => {
-          assert.isEmpty(await attestations.getAttestationIssuers(phoneHash, caller))
-          await attestations.selectIssuers(phoneHash)
-
-          const attestationIssuers = await attestations.getAttestationIssuers(phoneHash, caller)
-          assert.lengthOf(attestationIssuers, attestationsRequested)
-          assert.lengthOf(uniq(attestationIssuers), attestationsRequested)
-        })
-
-        it('should set the block of request in the attestation', async () => {
-          await attestations.selectIssuers(phoneHash)
-          const attestationIssuers = await attestations.getAttestationIssuers(phoneHash, caller)
-
-          await Promise.all(
-            attestationIssuers.map(async (issuer) => {
-              const [status, requestBlock] = await attestations.getAttestationState(
-                phoneHash,
-                caller,
-                issuer
-              )
-
-              assert.equal(status.toNumber(), 1)
-              assert.equal(requestBlock.toNumber(), expectedRequestBlockNumber)
-            })
-          )
-        })
-
-        it('should return the attestations in getCompletableAttestations', async () => {
-          await Promise.all(
-            accounts.map((account) =>
-              accountsInstance.setMetadataURL(`https://test.com/${account}`, { from: account })
-            )
-          )
-          await attestations.selectIssuers(phoneHash)
-          const [
-            attestationBlockNumbers,
-            attestationIssuers,
-            stringLengths,
-            stringData,
-          ] = await attestations.getCompletableAttestations(phoneHash, caller)
-
-          const urls = parseSolidityStringArray(
-            stringLengths.map((x) => x.toNumber()),
-            (stringData as unknown) as string
-          )
-
-          assert.lengthOf(attestationBlockNumbers, attestationsRequested)
-          await Promise.all(
-            range(0, attestationsRequested).map(async (i) => {
-              const [status, requestBlock] = await attestations.getAttestationState(
-                phoneHash,
-                caller,
-                attestationIssuers[i]!
-              )
-              assert.equal(status.toNumber(), 1)
-              assertEqualBN(requestBlock, attestationBlockNumbers[i])
-              assert.equal(`https://test.com/${attestationIssuers[i]}`, urls[i])
-            })
-          )
-        })
-
-        it('should delete the unselected request', async () => {
-          await attestations.selectIssuers(phoneHash)
-          const [
-            blockNumber,
-            actualAttestationsRequested,
-          ] = await attestations.getUnselectedRequest(phoneHash, caller)
-          assertEqualBN(blockNumber, 0)
-          assertEqualBN(actualAttestationsRequested, 0)
-        })
-
-        it('should emit the AttestationIssuerSelected event', async () => {
-          const response = await attestations.selectIssuers(phoneHash)
-          const issuers = await attestations.getAttestationIssuers(phoneHash, caller)
-          assert.lengthOf(response.logs, 3)
-
-          issuers.forEach((issuer, index) => {
-            assertLogMatches2(response.logs[index], {
-              event: 'AttestationIssuerSelected',
-              args: {
-                identifier: phoneHash,
-                account: caller,
-                issuer,
-                attestationRequestFeeToken: mockERC20Token.address,
-              },
-            })
-          })
-        })
-
-        describe('when more attestations were requested', () => {
-          beforeEach(async () => {
-            await attestations.selectIssuers(phoneHash)
-            await attestations.request(phoneHash, 8, mockERC20Token.address)
-            expectedRequestBlockNumber = await web3.eth.getBlockNumber()
-            const requestBlockNumber = await web3.eth.getBlockNumber()
-            await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
-          })
-
-          it('should revert if too many issuers attempted', async () => {
-            await assertRevert(attestations.selectIssuers(phoneHash))
-          })
-        })
-
-        describe('after attestationExpiryBlocks', () => {
-          beforeEach(async () => {
-            await attestations.selectIssuers(phoneHash)
-            await mineBlocks(attestationExpiryBlocks, web3)
-          })
-
-          it('should no longer list the attestations in getCompletableAttestations', async () => {
-            const [attestationBlockNumbers] = await attestations.getCompletableAttestations(
-              phoneHash,
-              caller
-            )
-
-            assert.lengthOf(attestationBlockNumbers, 0)
-          })
-        })
-
-        describe('when the validation key has been rotated for all validators', () => {
-          // Rotate all validation keys
-          beforeEach(async () => {
-            await Promise.all(
-              accounts.map((account) =>
-                unlockAndAuthorizeKey(
-                  KeyOffsets.NEW_VALIDATING_KEY_OFFSET,
-                  accountsInstance.authorizeValidatorSigner,
-                  account,
-                  accounts
-                )
-              )
-            )
-          })
-
-          it('can still select issuers', async () => {
-            assert.isEmpty(await attestations.getAttestationIssuers(phoneHash, caller))
-            await attestations.selectIssuers(phoneHash)
-
-            const attestationIssuers = await attestations.getAttestationIssuers(phoneHash, caller)
-            assert.lengthOf(attestationIssuers, attestationsRequested)
-          })
-        })
-      })
-
-      it('should revert when selecting too soon', async () => {
-        const requestBlockNumber = await web3.eth.getBlockNumber()
-        await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks - 1, '0x1')
-        await assertRevert(attestations.selectIssuers(phoneHash))
-      })
-    })
-
-    describe('without requesting attestations before', () => {
-      it('should revert when selecting issuers', async () => {
-        await assertRevert(attestations.selectIssuers(phoneHash))
-      })
-    })
-  })
-
-  describe('#complete()', () => {
-    let issuer: string
-    let v: number
-    let r: string
-    let s: string
-
-    beforeEach(async () => {
-      await requestAttestations()
-      issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-      ;({ v, r, s } = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts))
-    })
-
-    it('should add the account to the list upon completion', async () => {
-      let attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
-      assert.isEmpty(attestedAccounts)
-
-      await attestations.complete(phoneHash, v, r, s)
-      attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
-      assert.lengthOf(attestedAccounts, 1)
-      assert.equal(attestedAccounts[0], caller)
-    })
-
-    it('should not add the account twice to the list', async () => {
-      await attestations.complete(phoneHash, v, r, s)
-      const secondIssuer = (await attestations.getAttestationIssuers(phoneHash, caller))[1]
-      ;({ v, r, s } = await getVerificationCodeSignature(caller, secondIssuer, phoneHash, accounts))
-
-      await attestations.complete(phoneHash, v, r, s)
-      const attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
-      assert.lengthOf(attestedAccounts, 1)
-      assert.equal(attestedAccounts[0], caller)
-    })
-
-    it('should increment the number of completed verification requests', async () => {
-      const [numCompleted] = await attestations.getAttestationStats(phoneHash, caller)
-      assert.equal(numCompleted.toNumber(), 0)
-
-      await attestations.complete(phoneHash, v, r, s)
-      const [numCompleted2, numTotal] = await attestations.getAttestationStats(phoneHash, caller)
-      assert.equal(numCompleted2.toNumber(), 1)
-      assert.equal(numTotal.toNumber(), attestationsRequested)
-    })
-
-    it('should set the time of the successful completion', async () => {
-      await mineBlocks(1, web3)
-      await attestations.complete(phoneHash, v, r, s)
-
-      const expectedBlock = await web3.eth.getBlock('latest')
-
-      const [
-        status,
-        completionBlock,
-        actualAttestationRequestFeeToken,
-      ] = await attestations.getAttestationState(phoneHash, caller, issuer)
-
-      assert.equal(status.toNumber(), 2)
-      assert.equal(completionBlock.toNumber(), expectedBlock.number)
-      assertSameAddress(actualAttestationRequestFeeToken, NULL_ADDRESS)
-    })
-
-    it('should increment pendingWithdrawals for the rewards recipient', async () => {
-      await attestations.complete(phoneHash, v, r, s)
-      const pendingWithdrawals = await attestations.pendingWithdrawals(
-        mockERC20Token.address,
-        issuer
-      )
-      assert.equal(pendingWithdrawals.toString(), attestationFee.toString())
-    })
-
-    it('should no longer list the attestation in getCompletableAttestationStats', async () => {
-      await attestations.complete(phoneHash, v, r, s)
-      const [attestationIssuers] = await attestations.getCompletableAttestations(phoneHash, caller)
-      assert.equal(attestationIssuers.indexOf(new BigNumber(issuer)), -1)
-    })
-
-    it('should emit the AttestationCompleted event', async () => {
-      const response = await attestations.complete(phoneHash, v, r, s)
-      assert.lengthOf(response.logs, 1)
-      const event = response.logs[0]
-      assertLogMatches2(event, {
-        event: 'AttestationCompleted',
-        args: {
-          identifier: phoneHash,
-          account: caller,
-          issuer,
-        },
-      })
-    })
-
-    it('should revert when an invalid attestation code is provided', async () => {
-      ;({ v, r, s } = await getVerificationCodeSignature(accounts[1], issuer, phoneHash, accounts))
-      await assertRevert(attestations.complete(phoneHash, v, r, s))
-    })
-
-    it('should revert with a non-requested issuer', async () => {
-      ;({ v, r, s } = await getVerificationCodeSignature(
-        caller,
-        await getNonIssuer(),
-        phoneHash,
-        accounts
-      ))
-      await assertRevert(attestations.complete(phoneHash, v, r, s))
-    })
-
-    it('should revert an already completed request', async () => {
-      await attestations.complete(phoneHash, v, r, s)
-      await assertRevert(attestations.complete(phoneHash, v, r, s))
-    })
-
-    it('does not let you verify beyond the window', async () => {
-      await mineBlocks(attestationExpiryBlocks, web3)
-      await assertRevert(attestations.complete(phoneHash, v, r, s))
-    })
-  })
+  function getVerificationCodeSignature(
+    _account: string,
+    _issuer: string,
+    _identifier: string,
+    _accounts: string[]
+  ): Signature {
+    const privateKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, _issuer, _accounts)
+    const derivedIssuerAddress = privateKeyToAddress(privateKey)
+    const attestationMessageFromIdentifier = soliditySha3(
+      { type: 'bytes32', value: _identifier },
+      { type: 'address', value: _account }
+    )!
+    const { v, r, s } = SignatureUtils.signMessage(
+      attestationMessageFromIdentifier,
+      privateKey,
+      derivedIssuerAddress
+    )
+    return { v, r, s }
+  }
 
   describe('#withdraw()', () => {
     let issuer: string
     beforeEach(async () => {
       await requestAttestations()
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-      const { v, r, s } = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
+      const { v, r, s } = getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
       await attestations.complete(phoneHash, v, r, s)
       await mockERC20Token.mint(attestations.address, attestationFee)
     })
@@ -736,7 +355,10 @@ contract('Attestations', (accounts: string[]) => {
         accounts
       )
       const signer = await accountsInstance.getVoteSigner(issuer)
-      await assertRevert(attestations.withdraw(mockERC20Token.address, { from: signer }))
+      await assertTransactionRevertWithReason(
+        attestations.withdraw(mockERC20Token.address, { from: signer }),
+        'not active authorized signer for role'
+      )
     })
 
     it('should emit the Withdrawal event', async () => {
@@ -756,8 +378,9 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should not allow someone with no pending withdrawals to withdraw', async () => {
-      await assertRevert(
-        attestations.withdraw(mockERC20Token.address, { from: await getNonIssuer() })
+      await assertTransactionRevertWithReason(
+        attestations.withdraw(mockERC20Token.address, { from: await getNonIssuer() }),
+        'value was negative/zero'
       )
     })
   })
@@ -771,7 +394,7 @@ contract('Attestations', (accounts: string[]) => {
   const requestAndCompleteAttestations = async () => {
     await requestAttestations()
     const issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-    const { v, r, s } = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
+    const { v, r, s } = getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
     await attestations.complete(phoneHash, v, r, s)
   }
 
@@ -877,12 +500,7 @@ contract('Attestations', (accounts: string[]) => {
             await attestations.selectIssuers(phoneHash, { from: other })
 
             const issuer = (await attestations.getAttestationIssuers(phoneHash, other))[0]
-            const { v, r, s } = await getVerificationCodeSignature(
-              other,
-              issuer,
-              phoneHash,
-              accounts
-            )
+            const { v, r, s } = getVerificationCodeSignature(other, issuer, phoneHash, accounts)
             await attestations.complete(phoneHash, v, r, s, { from: other })
             await accountsInstance.setWalletAddress(other, '0x0', '0x0', '0x0', { from: other })
           })
@@ -1002,130 +620,6 @@ contract('Attestations', (accounts: string[]) => {
 
       it('does not revert when called with the correct number', async () => {
         await attestations.requireNAttestationsRequested(phoneHash, caller, attestationsRequested)
-      })
-    })
-  })
-
-  describe('#approveTransfer()', () => {
-    const replacementAddress: string = accounts[1]
-    describe('when the attestation exists', () => {
-      beforeEach(async () => {
-        await requestAndCompleteAttestations()
-      })
-
-      it('should allow a user to change their mapped address when approved in the order from-->to', async () => {
-        const originalAttestationStats = await attestations.getAttestationStats(phoneHash, caller)
-        const originalUnselectedRequest = await attestations.getUnselectedRequest(phoneHash, caller)
-        await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
-          from: caller,
-        })
-        const attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
-        await assert.deepEqual(attestedAccounts, [caller])
-        await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
-          from: replacementAddress,
-        })
-        const attestedAccountsAfterApproval = await attestations.lookupAccountsForIdentifier(
-          phoneHash
-        )
-        assert.deepEqual(attestedAccountsAfterApproval, [replacementAddress])
-        const newAttestationStats = await attestations.getAttestationStats(
-          phoneHash,
-          replacementAddress
-        )
-        const newUnselectedRequest = await attestations.getUnselectedRequest(
-          phoneHash,
-          replacementAddress
-        )
-        assert.deepEqual(originalAttestationStats, newAttestationStats)
-        assert.deepEqual(originalUnselectedRequest, newUnselectedRequest)
-      })
-
-      it('should allow a user to change their mapped address when approved in the order to-->from', async () => {
-        const originalAttestationStats = await attestations.getAttestationStats(phoneHash, caller)
-        const originalUnselectedRequest = await attestations.getUnselectedRequest(phoneHash, caller)
-        await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
-          from: replacementAddress,
-        })
-        const attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
-        await assert.deepEqual(attestedAccounts, [caller])
-        await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
-          from: caller,
-        })
-        const attestedAccountsAfterApproval = await attestations.lookupAccountsForIdentifier(
-          phoneHash
-        )
-        assert.deepEqual(attestedAccountsAfterApproval, [replacementAddress])
-        const newAttestationStats = await attestations.getAttestationStats(
-          phoneHash,
-          replacementAddress
-        )
-        const newUnselectedRequest = await attestations.getUnselectedRequest(
-          phoneHash,
-          replacementAddress
-        )
-        assert.deepEqual(originalAttestationStats, newAttestationStats)
-        assert.deepEqual(originalUnselectedRequest, newUnselectedRequest)
-      })
-
-      it('should allow a user to revoke their approval', async () => {
-        await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
-          from: caller,
-        })
-        await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, false, {
-          from: caller,
-        })
-        await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
-          from: replacementAddress,
-        })
-        const [completed, requested] = await attestations.getAttestationStats(
-          phoneHash,
-          replacementAddress
-        )
-        assertEqualBN(completed, 0)
-        assertEqualBN(requested, 0)
-      })
-
-      it('should revert if the caller is not one of the two parties', async () => {
-        const otherAddress: string = accounts[2]
-        await assertRevert(
-          attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
-            from: otherAddress,
-          })
-        )
-      })
-
-      it('should revert when the `to` address has attestations existing', async () => {
-        await attestations.request(phoneHash, attestationsRequested, mockERC20Token.address, {
-          from: replacementAddress,
-        })
-        const requestBlockNumber = await web3.eth.getBlockNumber()
-        await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
-        await attestations.selectIssuers(phoneHash, { from: replacementAddress })
-
-        const issuer = (
-          await attestations.getAttestationIssuers(phoneHash, replacementAddress, {
-            from: replacementAddress,
-          })
-        )[0]
-        const { v, r, s } = await getVerificationCodeSignature(
-          replacementAddress,
-          issuer,
-          phoneHash,
-          accounts
-        )
-        await attestations.complete(phoneHash, v, r, s, { from: replacementAddress })
-        await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
-          from: replacementAddress,
-        })
-        await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
-          from: replacementAddress,
-        })
-        await assertRevert(
-          attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
-            from: caller,
-          }),
-          'Address tranferring to has already requested attestations'
-        )
       })
     })
   })

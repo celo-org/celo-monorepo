@@ -28,27 +28,23 @@ import { DomainRequest } from '@celo/phone-number-privacy-common/src'
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
 import 'isomorphic-fetch'
-import { config, getSignerVersion } from '../../src/config'
+import { getTestParamsForContext } from './utils'
 const { ACCOUNT_ADDRESS1, PRIVATE_KEY1 } = TestUtils.Values
 
 require('dotenv').config()
 
 jest.setTimeout(60000)
 
-const signerUrl = process.env.ODIS_SIGNER_SERVICE_URL
-const expectedVersion = getSignerVersion()
+const expectedVersion = process.env.DEPLOYED_SIGNER_SERVICE_VERSION!
 
 const ODIS_SIGNER_URL = process.env.ODIS_SIGNER_SERVICE_URL
 
-const ODIS_DOMAINS_PUBLIC_POLYNOMIAL = process.env[
-  process.env.ODIS_DOMAINS_POLYNOMIAL_VAR_FOR_TESTS as string
-] as string
-const ODIS_DOMAINS_PUBLIC_PUBKEY = process.env[
-  process.env.ODIS_DOMAINS_PUBKEY_VAR_FOR_TESTS as string
-] as string
-const ODIS_KEY_VERSION = (process.env.ODIS_DOMAINS_TEST_KEY_VERSION || 1) as string
+const contextSpecificParams = getTestParamsForContext()
+console.log(`Blockchain provider: ${contextSpecificParams.blockchainProviderURL}`)
+console.log(`Domains public polynomial: ${contextSpecificParams.domainsPolynomial}`)
+console.log(`Domains pubKey: ${contextSpecificParams.domainsPubKey}`)
 
-describe(`Running against service deployed at ${signerUrl}`, () => {
+describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
   const wallet = new LocalWallet()
   wallet.addAccount(PRIVATE_KEY1)
 
@@ -57,7 +53,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
   const signSalt = 'himalayanPink-sign'
 
   it('Service is deployed at correct version', async () => {
-    const response = await fetch(signerUrl + SignerEndpoint.STATUS, {
+    const response = await fetch(ODIS_SIGNER_URL + SignerEndpoint.STATUS, {
       method: 'GET',
     })
     expect(response.status).toBe(200)
@@ -72,7 +68,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(req, SignerEndpoint.DISABLE_DOMAIN)
       expect(res.status).toBe(200)
       const resBody: DisableDomainResponseSuccess = await res.json()
-      expect(resBody).toStrictEqual<DisableDomainResponseSuccess>({
+      expect(resBody).toEqual<DisableDomainResponseSuccess>({
         success: true,
         version: resBody.version,
         status: {
@@ -89,7 +85,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(req, SignerEndpoint.DISABLE_DOMAIN)
       expect(res.status).toBe(200)
       const resBody: DisableDomainResponseSuccess = await res.json()
-      expect(resBody).toStrictEqual<DisableDomainResponseSuccess>({
+      expect(resBody).toEqual<DisableDomainResponseSuccess>({
         success: true,
         version: resBody.version,
         status: {
@@ -108,7 +104,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DISABLE_DOMAIN)
       expect(res.status).toBe(400)
       const resBody: DisableDomainResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<DisableDomainResponseFailure>({
+      expect(resBody).toEqual<DisableDomainResponseFailure>({
         success: false,
         version: resBody.version,
         error: WarningMessage.INVALID_INPUT,
@@ -122,7 +118,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DISABLE_DOMAIN)
       expect(res.status).toBe(400)
       const resBody: DisableDomainResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<DisableDomainResponseFailure>({
+      expect(resBody).toEqual<DisableDomainResponseFailure>({
         success: false,
         version: resBody.version,
         error: WarningMessage.INVALID_INPUT,
@@ -136,7 +132,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DISABLE_DOMAIN)
       expect(res.status).toBe(400)
       const resBody: DisableDomainResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<DisableDomainResponseFailure>({
+      expect(resBody).toEqual<DisableDomainResponseFailure>({
         success: false,
         version: resBody.version,
         error: WarningMessage.INVALID_INPUT,
@@ -149,7 +145,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DISABLE_DOMAIN)
       expect(res.status).toBe(401)
       const resBody: DisableDomainResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<DisableDomainResponseFailure>({
+      expect(resBody).toEqual<DisableDomainResponseFailure>({
         success: false,
         version: resBody.version,
         error: WarningMessage.UNAUTHENTICATED_USER,
@@ -164,7 +160,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(req, SignerEndpoint.DOMAIN_QUOTA_STATUS)
       expect(res.status).toBe(200)
       const resBody: DomainQuotaStatusResponseSuccess = await res.json()
-      expect(resBody).toStrictEqual<DomainQuotaStatusResponseSuccess>({
+      expect(resBody).toEqual<DomainQuotaStatusResponseSuccess>({
         success: true,
         version: expectedVersion,
         status: { disabled: false, counter: 0, timer: 0, now: resBody.status.now },
@@ -176,7 +172,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(req, SignerEndpoint.DOMAIN_QUOTA_STATUS)
       expect(res.status).toBe(200)
       const resBody: DomainQuotaStatusResponseSuccess = await res.json()
-      expect(resBody).toStrictEqual<DomainQuotaStatusResponseSuccess>({
+      expect(resBody).toEqual<DomainQuotaStatusResponseSuccess>({
         success: true,
         version: expectedVersion,
         status: { disabled: true, counter: 0, timer: 0, now: resBody.status.now },
@@ -190,7 +186,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DOMAIN_QUOTA_STATUS)
       expect(res.status).toBe(400)
       const resBody: DomainQuotaStatusResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<DomainQuotaStatusResponseFailure>({
+      expect(resBody).toEqual<DomainQuotaStatusResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.INVALID_INPUT,
@@ -204,7 +200,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DOMAIN_QUOTA_STATUS)
       expect(res.status).toBe(400)
       const resBody: DomainQuotaStatusResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<DomainQuotaStatusResponseFailure>({
+      expect(resBody).toEqual<DomainQuotaStatusResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.INVALID_INPUT,
@@ -218,7 +214,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DOMAIN_QUOTA_STATUS)
       expect(res.status).toBe(400)
       const resBody: DomainQuotaStatusResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<DomainQuotaStatusResponseFailure>({
+      expect(resBody).toEqual<DomainQuotaStatusResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.INVALID_INPUT,
@@ -231,7 +227,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DOMAIN_QUOTA_STATUS)
       expect(res.status).toBe(401)
       const resBody: DomainQuotaStatusResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<DomainQuotaStatusResponseFailure>({
+      expect(resBody).toEqual<DomainQuotaStatusResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.UNAUTHENTICATED_USER,
@@ -246,11 +242,11 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
     beforeAll(async () => {
       ;[req, poprf] = await signatureRequest(wallet, ACCOUNT_ADDRESS1, signSaltNew)
     })
-    it('Should respond with 200 on valid request for new domain', async () => {
+    it('[Signer configuration test] Should respond with 200 on valid request for new domain', async () => {
       const res = await queryDomainEndpoint(req, SignerEndpoint.DOMAIN_SIGN)
       expect(res.status).toBe(200)
       const resBody: DomainRestrictedSignatureResponseSuccess = await res.json()
-      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseSuccess>({
+      expect(resBody).toEqual<DomainRestrictedSignatureResponseSuccess>({
         success: true,
         version: expectedVersion,
         signature: resBody.signature,
@@ -261,9 +257,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
           now: resBody.status.now,
         },
       })
-      expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(
-        config.keystore.keys.domains.latest.toString()
-      )
+      expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(contextSpecificParams.domainsKeyVersion)
       poprf.unblindPartialResponse(
         // throws if verification fails
         Buffer.from(resBody.signature, 'base64')
@@ -275,7 +269,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(req, SignerEndpoint.DOMAIN_SIGN)
       expect(res.status).toBe(401)
       const resBody: DomainRestrictedSignatureResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseFailure>({
+      expect(resBody).toEqual<DomainRestrictedSignatureResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.INVALID_NONCE,
@@ -309,7 +303,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       })
       expect(res.status).toBe(200)
       const resBody: DomainRestrictedSignatureResponseSuccess = await res.json()
-      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseSuccess>({
+      expect(resBody).toEqual<DomainRestrictedSignatureResponseSuccess>({
         success: true,
         version: expectedVersion,
         signature: resBody.signature,
@@ -334,7 +328,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(newReq, SignerEndpoint.DOMAIN_SIGN)
       expect(res.status).toBe(200)
       const resBody: DomainRestrictedSignatureResponseSuccess = await res.json()
-      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseSuccess>({
+      expect(resBody).toEqual<DomainRestrictedSignatureResponseSuccess>({
         success: true,
         version: expectedVersion,
         signature: resBody.signature,
@@ -354,10 +348,14 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         ACCOUNT_ADDRESS1,
         `${signSalt}-${Date.now() + 1}`
       )
-      const res = await queryDomainEndpoint(newReq, SignerEndpoint.DOMAIN_SIGN, ODIS_KEY_VERSION)
+      const res = await queryDomainEndpoint(
+        newReq,
+        SignerEndpoint.DOMAIN_SIGN,
+        contextSpecificParams.domainsKeyVersion
+      )
       expect(res.status).toBe(200)
       const resBody: DomainRestrictedSignatureResponseSuccess = await res.json()
-      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseSuccess>({
+      expect(resBody).toEqual<DomainRestrictedSignatureResponseSuccess>({
         success: true,
         version: expectedVersion,
         signature: resBody.signature,
@@ -368,7 +366,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
           now: resBody.status.now,
         },
       })
-      expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(ODIS_KEY_VERSION)
+      expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(contextSpecificParams.domainsKeyVersion)
       _poprf.unblindPartialResponse(Buffer.from(resBody.signature, 'base64'))
     })
 
@@ -383,7 +381,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DOMAIN_SIGN)
       expect(res.status).toBe(400)
       const resBody: DomainRestrictedSignatureResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseFailure>({
+      expect(resBody).toEqual<DomainRestrictedSignatureResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.INVALID_INPUT,
@@ -401,7 +399,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DOMAIN_SIGN)
       expect(res.status).toBe(400)
       const resBody: DomainRestrictedSignatureResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseFailure>({
+      expect(resBody).toEqual<DomainRestrictedSignatureResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.INVALID_INPUT,
@@ -419,7 +417,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DOMAIN_SIGN)
       expect(res.status).toBe(400)
       const resBody: DomainRestrictedSignatureResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseFailure>({
+      expect(resBody).toEqual<DomainRestrictedSignatureResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.INVALID_INPUT,
@@ -435,7 +433,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DOMAIN_SIGN, 'a')
       expect(res.status).toBe(400)
       const resBody: DomainRestrictedSignatureResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseFailure>({
+      expect(resBody).toEqual<DomainRestrictedSignatureResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
@@ -452,7 +450,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DOMAIN_SIGN)
       expect(res.status).toBe(401)
       const resBody: DomainRestrictedSignatureResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseFailure>({
+      expect(resBody).toEqual<DomainRestrictedSignatureResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.UNAUTHENTICATED_USER,
@@ -468,7 +466,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(signReq, SignerEndpoint.DOMAIN_SIGN)
       expect(res.status).toBe(429)
       const resBody = await res.json()
-      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseFailure>({
+      expect(resBody).toEqual<DomainRestrictedSignatureResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.EXCEEDED_QUOTA,
@@ -494,7 +492,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(signReq, SignerEndpoint.DOMAIN_SIGN)
       expect(res.status).toBe(429)
       const resBody = await res.json()
-      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseFailure>({
+      expect(resBody).toEqual<DomainRestrictedSignatureResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.EXCEEDED_QUOTA,
@@ -599,8 +597,8 @@ const signatureRequest = async (
 ): Promise<[DomainRestrictedSignatureRequest<SequentialDelayDomain>, ThresholdPoprfClient]> => {
   const domain = _domain ?? authenticatedDomain(address, salt)
   const thresholdPoprfClient = new ThresholdPoprfClient(
-    Buffer.from(ODIS_DOMAINS_PUBLIC_PUBKEY, 'base64'),
-    Buffer.from(ODIS_DOMAINS_PUBLIC_POLYNOMIAL, 'hex'),
+    Buffer.from(contextSpecificParams.domainsPubKey, 'base64'),
+    Buffer.from(contextSpecificParams.domainsPolynomial, 'hex'),
     domainHash(domain),
     Buffer.from('test message', 'utf8')
   )

@@ -6,6 +6,8 @@
  * an environment.
  */
 
+import { MENTO_PACKAGE } from "../contractPackages"
+
 export const celoRegistryAddress = '0x000000000000000000000000000000000000ce10'
 
 export enum CeloContractName {
@@ -38,9 +40,7 @@ export enum CeloContractName {
   StableToken = 'StableToken',
   StableTokenEUR = 'StableTokenEUR',
   StableTokenBRL = 'StableTokenBRL',
-  TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
-  StableTokenRegistry = 'StableTokenRegistry',
 }
 
 export const usesRegistry = [
@@ -48,25 +48,35 @@ export const usesRegistry = [
   CeloContractName.StableToken,
 ]
 
-export const hasEntryInRegistry: string[] = [
-  CeloContractName.Accounts,
-  CeloContractName.Attestations,
-  CeloContractName.BlockchainParameters,
-  CeloContractName.DoubleSigningSlasher,
-  CeloContractName.DowntimeSlasher,
-  CeloContractName.Election,
-  CeloContractName.Escrow,
-  CeloContractName.Exchange,
-  CeloContractName.FederatedAttestations,
-  CeloContractName.FeeCurrencyWhitelist,
-  CeloContractName.Freezer,
-  CeloContractName.GasPriceMinimum,
-  CeloContractName.GoldToken,
-  CeloContractName.GovernanceSlasher,
-  CeloContractName.GrandaMento,
-  CeloContractName.OdisPayments,
-  CeloContractName.Random,
-  CeloContractName.Reserve,
-  CeloContractName.SortedOracles,
-  CeloContractName.StableToken,
+export const hasEntryInRegistry= [
+  {
+    contracts:[
+      CeloContractName.Accounts,
+      CeloContractName.Attestations,
+      CeloContractName.BlockchainParameters,
+      CeloContractName.DoubleSigningSlasher,
+      CeloContractName.DowntimeSlasher,
+      CeloContractName.Election,
+      CeloContractName.Escrow,
+      CeloContractName.FederatedAttestations,
+      CeloContractName.FeeCurrencyWhitelist,
+      CeloContractName.Freezer,
+      CeloContractName.GasPriceMinimum,
+      CeloContractName.GoldToken,
+      CeloContractName.GovernanceSlasher,
+      CeloContractName.OdisPayments,
+      CeloContractName.Random,
+      CeloContractName.SortedOracles,
+    ]
+  },
+  {
+    ...MENTO_PACKAGE,
+    // not all Mentro contracts are supposed to be in the Registry
+    contracts:[
+      CeloContractName.Exchange,
+      CeloContractName.GrandaMento,
+      CeloContractName.Reserve,
+      CeloContractName.StableToken,
+    ],
+  }
 ]

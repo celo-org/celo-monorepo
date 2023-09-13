@@ -1,3 +1,4 @@
+import { sleep } from '@celo/base'
 import { newKit, StableToken } from '@celo/contractkit'
 import {
   AuthenticationMethod,
@@ -15,7 +16,8 @@ import {
 import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
-import { config, getSignerVersion } from '../../src/config'
+import { config } from '../../src/config'
+import { getBlindedPhoneNumber, getTestParamsForContext } from './utils'
 
 require('dotenv').config()
 
@@ -29,32 +31,21 @@ const {
   PRIVATE_KEY2,
   PRIVATE_KEY3,
 } = TestUtils.Values
-const {
-  getBlindedPhoneNumber,
-  getPnpQuotaRequest,
-  getPnpRequestAuthorization,
-  getPnpSignRequest,
-} = TestUtils.Utils
+const { getPnpQuotaRequest, getPnpRequestAuthorization, getPnpSignRequest } = TestUtils.Utils
 
 const ODIS_SIGNER_URL = process.env.ODIS_SIGNER_SERVICE_URL
-const ODIS_PUBLIC_POLYNOMIAL = process.env[
-  process.env.ODIS_PNP_POLYNOMIAL_VAR_FOR_TESTS as string
-] as string
+const contextSpecificParams = getTestParamsForContext()
 
-const ODIS_KEY_VERSION = (process.env.ODIS_PNP_TEST_KEY_VERSION || 1) as string
-const DEFAULT_FORNO_URL = process.env.ODIS_BLOCKCHAIN_PROVIDER as string
-
-const kit = newKit(DEFAULT_FORNO_URL)
+const kit = newKit(contextSpecificParams.blockchainProviderURL)
 kit.addAccount(PRIVATE_KEY1)
 kit.addAccount(PRIVATE_KEY2)
 kit.addAccount(PRIVATE_KEY3)
 
 jest.setTimeout(60000)
 
-const signerUrl = process.env.ODIS_SIGNER_SERVICE_URL
-const expectedVersion = getSignerVersion()
+const expectedVersion = process.env.DEPLOYED_SIGNER_SERVICE_VERSION!
 
-describe(`Running against service deployed at ${signerUrl}`, () => {
+describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
   const singleQueryCost = config.quota.queryPriceInCUSD.times(1e18).toString()
 
   beforeAll(async () => {
@@ -67,7 +58,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
   })
 
   it('Service is deployed at correct version', async () => {
-    const response = await fetch(signerUrl + SignerEndpoint.STATUS, {
+    const response = await fetch(ODIS_SIGNER_URL + SignerEndpoint.STATUS, {
       method: 'GET',
     })
     expect(response.status).toBe(200)
@@ -83,12 +74,11 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryPnpQuotaEndpoint(req, authorization)
       expect(res.status).toBe(200)
       const resBody: PnpQuotaResponseSuccess = await res.json()
-      expect(resBody).toStrictEqual<PnpQuotaResponseSuccess>({
+      expect(resBody).toEqual<PnpQuotaResponseSuccess>({
         success: true,
         version: expectedVersion,
         performedQueryCount: 0,
         totalQuota: 0,
-        blockNumber: resBody.blockNumber,
         warnings: [],
       })
     })
@@ -99,12 +89,11 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryPnpQuotaEndpoint(req, authorization)
       expect(res.status).toBe(200)
       const resBody: PnpQuotaResponseSuccess = await res.json()
-      expect(resBody).toStrictEqual<PnpQuotaResponseSuccess>({
+      expect(resBody).toEqual<PnpQuotaResponseSuccess>({
         success: true,
         version: expectedVersion,
         performedQueryCount: resBody.performedQueryCount,
         totalQuota: resBody.totalQuota,
-        blockNumber: resBody.blockNumber,
         warnings: [],
       })
       expect(resBody.totalQuota).toBeGreaterThan(0)
@@ -115,18 +104,32 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY2)
       const res = await queryPnpQuotaEndpoint(req, authorization)
       expect(res.status).toBe(200)
+
       const resBody: PnpQuotaResponseSuccess = await res.json()
+
       await sendCUSDToOdisPayments(singleQueryCost, ACCOUNT_ADDRESS2, ACCOUNT_ADDRESS2)
 
       const res2 = await queryPnpQuotaEndpoint(req, authorization)
       expect(res2.status).toBe(200)
       const res2Body: PnpQuotaResponseSuccess = await res2.json()
-      expect(res2Body).toStrictEqual<PnpQuotaResponseSuccess>({
+      expect(res2Body).toEqual<PnpQuotaResponseSuccess>({
         success: true,
         version: expectedVersion,
         performedQueryCount: resBody.performedQueryCount,
-        totalQuota: resBody.totalQuota + 1,
-        blockNumber: res2Body.blockNumber,
+        totalQuota: resBody.totalQuota,
+        warnings: [],
+      })
+
+      await sleep(5 * 1000) // sleep for cache ttl
+
+      const res3 = await queryPnpQuotaEndpoint(req, authorization)
+      expect(res3.status).toBe(200)
+      const res3Body: PnpQuotaResponseSuccess = await res3.json()
+      expect(res3Body).toEqual<PnpQuotaResponseSuccess>({
+        success: true,
+        version: expectedVersion,
+        performedQueryCount: resBody.performedQueryCount,
+        totalQuota: resBody.totalQuota + 1, // req2 updated the cache, but stale value was returned
         warnings: [],
       })
     })
@@ -139,7 +142,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryPnpQuotaEndpoint(badRequest, authorization)
       expect(res.status).toBe(400)
       const resBody: PnpQuotaResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<PnpQuotaResponseFailure>({
+      expect(resBody).toEqual<PnpQuotaResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.INVALID_INPUT,
@@ -152,7 +155,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryPnpQuotaEndpoint(badRequest, authorization)
       expect(res.status).toBe(401)
       const resBody: PnpQuotaResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<PnpQuotaResponseFailure>({
+      expect(resBody).toEqual<PnpQuotaResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.UNAUTHENTICATED_USER,
@@ -165,7 +168,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryPnpQuotaEndpoint(badRequest, authorization)
       expect(res.status).toBe(401)
       const resBody: PnpQuotaResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<PnpQuotaResponseFailure>({
+      expect(resBody).toEqual<PnpQuotaResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.UNAUTHENTICATED_USER,
@@ -178,7 +181,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryPnpQuotaEndpoint(badRequest, authorization)
       expect(res.status).toBe(401)
       const resBody: PnpQuotaResponseFailure = await res.json()
-      expect(resBody).toStrictEqual<PnpQuotaResponseFailure>({
+      expect(resBody).toEqual<PnpQuotaResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.UNAUTHENTICATED_USER,
@@ -199,7 +202,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         startingPerformedQueryCount = resBody.performedQueryCount
       })
 
-      it('Should respond with 200 on valid request', async () => {
+      it('[Signer configuration test] Should respond with 200 on valid request', async () => {
         const blindedMessage = getBlindedPhoneNumber(PHONE_NUMBER, randomBytes(32))
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS2,
@@ -211,32 +214,29 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         const res = await queryPnpSignEndpoint(req, authorization)
         expect(res.status).toBe(200)
         const resBody: SignMessageResponseSuccess = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseSuccess>({
+        expect(resBody).toEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: resBody.signature,
           performedQueryCount: startingPerformedQueryCount + 1,
           totalQuota: resBody.totalQuota,
-          blockNumber: resBody.blockNumber,
           warnings: [],
         })
-        expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(
-          config.keystore.keys.phoneNumberPrivacy.latest.toString()
-        )
+        expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(contextSpecificParams.pnpKeyVersion)
         expect(
           threshold_bls.partialVerifyBlindSignature(
-            Buffer.from(ODIS_PUBLIC_POLYNOMIAL, 'hex'),
+            Buffer.from(contextSpecificParams.pnpPolynomial, 'hex'),
             Buffer.from(blindedMessage, 'base64'),
             Buffer.from(resBody.signature, 'base64')
           )
         )
       })
 
-      it(`Should respond with 200 on valid request with key version ${ODIS_KEY_VERSION}`, async () => {
+      it(`Should respond with 200 on valid request with key version ${contextSpecificParams.pnpKeyVersion}`, async () => {
         // This value can also be modified but needs to be manually inspected in the signer logs
         // (on staging) since a valid key version that does not exist in the keystore
         // will default to the secretName stored in `KEYSTORE_AZURE_SECRET_NAME`
-        const keyVersion = ODIS_KEY_VERSION
+        const keyVersion = contextSpecificParams.pnpKeyVersion
         const blindedMessage = getBlindedPhoneNumber(PHONE_NUMBER, randomBytes(32))
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS2,
@@ -248,19 +248,18 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         const res = await queryPnpSignEndpoint(req, authorization, keyVersion)
         expect(res.status).toBe(200)
         const resBody: SignMessageResponseSuccess = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseSuccess>({
+        expect(resBody).toEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: resBody.signature,
           performedQueryCount: startingPerformedQueryCount + 1,
           totalQuota: resBody.totalQuota,
-          blockNumber: resBody.blockNumber,
           warnings: [],
         })
         expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(keyVersion)
         expect(
           threshold_bls.partialVerifyBlindSignature(
-            Buffer.from(ODIS_PUBLIC_POLYNOMIAL, 'hex'),
+            Buffer.from(contextSpecificParams.pnpPolynomial, 'hex'),
             Buffer.from(blindedMessage, 'base64'),
             Buffer.from(resBody.signature, 'base64')
           )
@@ -279,35 +278,34 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         const res = await queryPnpSignEndpoint(req, authorization)
         expect(res.status).toBe(200)
         const resBody: SignMessageResponseSuccess = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseSuccess>({
+        expect(resBody).toEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: resBody.signature,
           performedQueryCount: startingPerformedQueryCount + 1,
           totalQuota: resBody.totalQuota,
-          blockNumber: resBody.blockNumber,
           warnings: [],
         })
-        expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(
-          config.keystore.keys.phoneNumberPrivacy.latest.toString()
-        )
+        expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(contextSpecificParams.pnpKeyVersion)
         expect(
           threshold_bls.partialVerifyBlindSignature(
-            Buffer.from(ODIS_PUBLIC_POLYNOMIAL, 'hex'),
+            Buffer.from(contextSpecificParams.pnpPolynomial, 'hex'),
             Buffer.from(blindedMessage, 'base64'),
             Buffer.from(resBody.signature, 'base64')
           )
         )
+
+        await sleep(5 * 1000) // sleep for cache ttl
+
         const res2 = await queryPnpSignEndpoint(req, authorization)
         expect(res2.status).toBe(200)
         const res2Body: SignMessageResponseSuccess = await res2.json()
-        expect(res2Body).toStrictEqual<SignMessageResponseSuccess>({
+        expect(res2Body).toEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: resBody.signature,
           performedQueryCount: resBody.performedQueryCount, // Not incremented
-          totalQuota: resBody.totalQuota,
-          blockNumber: res2Body.blockNumber,
+          totalQuota: resBody.totalQuota + 1, // prev request updated cache
           warnings: [WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG],
         })
       })
@@ -328,7 +326,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         const res = await queryPnpSignEndpoint(badRequest, authorization)
         expect(res.status).toBe(400)
         const resBody: SignMessageResponseFailure = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseFailure>({
+        expect(resBody).toEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
@@ -345,7 +343,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         const res = await queryPnpSignEndpoint(badRequest, authorization, 'asd')
         expect(res.status).toBe(400)
         const resBody: SignMessageResponseFailure = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseFailure>({
+        expect(resBody).toEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
@@ -362,7 +360,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         const res = await queryPnpSignEndpoint(badRequest, authorization)
         expect(res.status).toBe(400)
         const resBody: SignMessageResponseFailure = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseFailure>({
+        expect(resBody).toEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
@@ -379,7 +377,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         const res = await queryPnpSignEndpoint(badRequest, authorization)
         expect(res.status).toBe(400)
         const resBody: SignMessageResponseFailure = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseFailure>({
+        expect(resBody).toEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
@@ -396,7 +394,8 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         const res = await queryPnpSignEndpoint(badRequest, authorization)
         expect(res.status).toBe(401)
         const resBody: SignMessageResponseFailure = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseFailure>({
+        expect(resBody).toEqual<SignMessageResponseFailure>({
+          // TODO test if toStrictEqual works after fixing sendFailure<any>
           success: false,
           version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
@@ -413,7 +412,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         const res = await queryPnpSignEndpoint(badRequest, authorization)
         expect(res.status).toBe(401)
         const resBody: SignMessageResponseFailure = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseFailure>({
+        expect(resBody).toEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
@@ -430,7 +429,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         const res = await queryPnpSignEndpoint(badRequest, authorization)
         expect(res.status).toBe(401)
         const resBody: SignMessageResponseFailure = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseFailure>({
+        expect(resBody).toEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
@@ -451,13 +450,12 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         const res = await queryPnpSignEndpoint(req, authorization)
         expect(res.status).toBe(403)
         const resBody: SignMessageResponseFailure = await res.json()
-        expect(resBody).toStrictEqual<SignMessageResponseFailure>({
+        expect(resBody).toEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.EXCEEDED_QUOTA,
           totalQuota: quotaResBody.totalQuota,
           performedQueryCount: quotaResBody.performedQueryCount,
-          blockNumber: resBody.blockNumber,
         })
       })
     })

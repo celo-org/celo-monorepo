@@ -33,16 +33,20 @@ echo "- Checkout source code at $BRANCH"
 git fetch origin +"$BRANCH" 2>>$LOG_FILE >> $LOG_FILE
 git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 
-echo "- Build contract artifacts"
-rm -rf build/contracts
-rm -rf ../sdk/cryptographic-utils/lib
-cd ../sdk/cryptographic-utils
-yarn build
-cd ../../protocol
-yarn install >> $LOG_FILE
-yarn build >> $LOG_FILE
+echo "- Build monorepo (contract artifacts, migrations, + all dependencies)"
+cd ../..
 
-# TODO: Move to yarn build:sol after the next contract release.
+# Using `yarn reset` to remove node_modules before re-installing using the node version of 
+# the previous release branch. This is useful when node version between branches are incompatible
+yarn run reset >> $LOG_FILE
+# build entire monorepo to account for any required dependencies.
+yarn install >> $LOG_FILE
+yarn run clean >> $LOG_FILE
+# in release v8 and earlier, @celo/contractkit automatically uses set RELEASE_TAG
+# when building, which fails if this differs from `package/protocol`'s build directory.
+RELEASE_TAG="" yarn build >> $LOG_FILE
+cd packages/protocol
+
 echo "- Create local network"
 if [ -z "$GRANTS_FILE" ]; then
   yarn devchain generate-tar "$PWD/devchain.tar.gz" >> $LOG_FILE

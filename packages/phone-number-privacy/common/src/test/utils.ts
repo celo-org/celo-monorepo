@@ -1,20 +1,21 @@
-import { AttestationsStatus } from '@celo/base'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { serializeSignature, Signature, signMessage } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
-import * as threshold from 'blind-threshold-bls'
-import btoa from 'btoa'
-import Web3 from 'web3'
 import {
   AuthenticationMethod,
-  LegacyPnpQuotaRequest,
-  LegacySignMessageRequest,
   PhoneNumberPrivacyRequest,
   PnpQuotaRequest,
   SignMessageRequest,
 } from '../interfaces'
 import { signWithRawKey } from '../utils/authentication'
 import { genSessionID } from '../utils/logger'
+
+export interface AttestationsStatus {
+  isVerified: boolean
+  numAttestationsRemaining: number
+  total: number
+  completed: number
+}
 
 export function createMockAttestation(getVerifiedStatus: jest.Mock<AttestationsStatus, []>) {
   return {
@@ -60,12 +61,11 @@ export function createMockContractKit(
     registry: {
       addressFor: async () => 1000,
     },
-    connection: createMockConnection(mockWeb3),
+    connection: mockWeb3 ?? createMockConnection(mockWeb3),
   }
 }
 
-export function createMockConnection(mockWeb3?: any) {
-  mockWeb3 = mockWeb3 ?? new Web3()
+export function createMockConnection(mockWeb3: any) {
   return {
     web3: mockWeb3,
     getTransactionCount: jest.fn(() => mockWeb3.eth.getTransactionCount()),
@@ -76,7 +76,6 @@ export function createMockConnection(mockWeb3?: any) {
 }
 
 export enum ContractRetrieval {
-  getAttestations = 'getAttestations',
   getStableToken = 'getStableToken',
   getGoldToken = 'getGoldToken',
   getAccounts = 'getAccounts',
@@ -90,19 +89,6 @@ export function createMockWeb3(txCount: number, blockNumber: number) {
       getBlockNumber: jest.fn(() => blockNumber),
     },
   }
-}
-
-export function getBlindedPhoneNumber(phoneNumber: string, blindingFactor: Buffer): string {
-  const blindedPhoneNumber = threshold.blind(Buffer.from(phoneNumber), blindingFactor).message
-  return uint8ArrayToBase64(blindedPhoneNumber)
-}
-
-function uint8ArrayToBase64(bytes: Uint8Array) {
-  let binary = ''
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i])
-  }
-  return btoa(binary)
 }
 
 export async function replenishQuota(account: string, contractKit: any) {
@@ -135,33 +121,6 @@ export function getPnpQuotaRequest(
   return {
     account,
     authenticationMethod,
-    sessionID: genSessionID(),
-  }
-}
-export function getLegacyPnpQuotaRequest(
-  account: string,
-  authenticationMethod?: string,
-  hashedPhoneNumber?: string
-): LegacyPnpQuotaRequest {
-  return {
-    account,
-    authenticationMethod,
-    hashedPhoneNumber,
-    sessionID: genSessionID(),
-  }
-}
-
-export function getLegacyPnpSignRequest(
-  account: string,
-  blindedQueryPhoneNumber: string,
-  authenticationMethod?: string,
-  hashedPhoneNumber?: string
-): LegacySignMessageRequest {
-  return {
-    account,
-    blindedQueryPhoneNumber,
-    authenticationMethod,
-    hashedPhoneNumber,
     sessionID: genSessionID(),
   }
 }

@@ -102,8 +102,8 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
             })
             // Some flakiness has been observed after proposing, so we sleep
             await sleep(5000)
-            const proposalId = creationReceipt.events!.ExchangeProposalCreated.returnValues
-              .proposalId
+            const proposalId =
+              creationReceipt.events!.ExchangeProposalCreated.returnValues.proposalId
 
             logger.debug(
               {

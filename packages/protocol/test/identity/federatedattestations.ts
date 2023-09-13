@@ -10,9 +10,9 @@ import {
   assertGteBN,
   assertLogMatches2,
   assertRevert,
-  assertRevertWithReason,
   assertThrowsAsync,
-  assumeOwnership,
+  assertTransactionRevertWithReason,
+  assumeOwnershipWithTruffle,
 } from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
@@ -26,9 +26,8 @@ import {
 import { encodePacked, keccak256 } from 'web3-utils'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
-const FederatedAttestations: FederatedAttestationsContract = artifacts.require(
-  'FederatedAttestations'
-)
+const FederatedAttestations: FederatedAttestationsContract =
+  artifacts.require('FederatedAttestations')
 
 contract('FederatedAttestations', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
@@ -169,7 +168,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     registry = await getDeployedProxiedContract('Registry', artifacts)
     if ((await registry.owner()) !== owner) {
       // In CI we need to assume ownership, locally using quicktest we don't
-      await assumeOwnership(['Registry'], owner)
+      await assumeOwnershipWithTruffle(['Registry'], owner)
     }
   })
 
@@ -231,20 +230,18 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(federatedAttestations.initialize())
+      await assertTransactionRevertWithReason(
+        federatedAttestations.initialize(),
+        'contract already initialized'
+      )
     })
   })
 
   describe('#lookupAttestations', () => {
     describe('when identifier has not been registered', () => {
       it('should return empty list', async () => {
-        const [
-          countsPerIssuer,
-          addresses,
-          signers,
-          issuedOns,
-          publishedOns,
-        ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1])
+        const [countsPerIssuer, addresses, signers, issuedOns, publishedOns] =
+          await federatedAttestations.lookupAttestations(identifier1, [issuer1])
         checkAgainstExpectedAttestations(
           [0],
           [],
@@ -313,13 +310,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should return empty count and list if no issuers specified', async () => {
-        const [
-          countsPerIssuer,
-          addresses,
-          signers,
-          issuedOns,
-          publishedOns,
-        ] = await federatedAttestations.lookupAttestations(identifier1, [])
+        const [countsPerIssuer, addresses, signers, issuedOns, publishedOns] =
+          await federatedAttestations.lookupAttestations(identifier1, [])
         checkAgainstExpectedAttestations(
           [],
           [],
@@ -333,13 +325,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should return all attestations from one issuer', async () => {
-        const [
-          countsPerIssuer,
-          addresses,
-          signers,
-          issuedOns,
-          publishedOns,
-        ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1])
+        const [countsPerIssuer, addresses, signers, issuedOns, publishedOns] =
+          await federatedAttestations.lookupAttestations(identifier1, [issuer1])
         checkAgainstExpectedAttestations(
           [issuer1Attestations.length],
           issuer1Attestations,
@@ -353,13 +340,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should return empty list if no attestations exist for an issuer', async () => {
-        const [
-          countsPerIssuer,
-          addresses,
-          signers,
-          issuedOns,
-          publishedOns,
-        ] = await federatedAttestations.lookupAttestations(identifier1, [issuer3])
+        const [countsPerIssuer, addresses, signers, issuedOns, publishedOns] =
+          await federatedAttestations.lookupAttestations(identifier1, [issuer3])
         checkAgainstExpectedAttestations(
           [0],
           [],
@@ -375,13 +357,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
       it('should return attestations from multiple issuers in correct order', async () => {
         const expectedAttestations = issuer2Attestations.concat(issuer1Attestations)
         const expectedCountsPerIssuer = [0, issuer2Attestations.length, issuer1Attestations.length]
-        const [
-          countsPerIssuer,
-          addresses,
-          signers,
-          issuedOns,
-          publishedOns,
-        ] = await federatedAttestations.lookupAttestations(identifier1, [issuer3, issuer2, issuer1])
+        const [countsPerIssuer, addresses, signers, issuedOns, publishedOns] =
+          await federatedAttestations.lookupAttestations(identifier1, [issuer3, issuer2, issuer1])
         checkAgainstExpectedAttestations(
           expectedCountsPerIssuer,
           expectedAttestations,
@@ -402,13 +379,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
         })
       })
       it('should return empty list', async () => {
-        const [
-          countsPerIssuer,
-          addresses,
-          signers,
-          issuedOns,
-          publishedOns,
-        ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1])
+        const [countsPerIssuer, addresses, signers, issuedOns, publishedOns] =
+          await federatedAttestations.lookupAttestations(identifier1, [issuer1])
         checkAgainstExpectedAttestations(
           [0],
           [],
@@ -444,10 +416,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
     describe('when address has not been registered', () => {
       it('should return empty list', async () => {
-        const [
-          actualCountsPerIssuer,
-          actualIdentifiers,
-        ] = await federatedAttestations.lookupIdentifiers(account1, [issuer1])
+        const [actualCountsPerIssuer, actualIdentifiers] =
+          await federatedAttestations.lookupIdentifiers(account1, [issuer1])
         checkAgainstExpectedIdCases([0], [], actualCountsPerIssuer, actualIdentifiers)
       })
     })
@@ -499,18 +469,14 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should return empty count if no issuers specified', async () => {
-        const [
-          actualCountsPerIssuer,
-          actualIdentifiers,
-        ] = await federatedAttestations.lookupIdentifiers(account1, [])
+        const [actualCountsPerIssuer, actualIdentifiers] =
+          await federatedAttestations.lookupIdentifiers(account1, [])
         checkAgainstExpectedIdCases([], [], actualCountsPerIssuer, actualIdentifiers)
       })
 
       it('should return all identifiers from one issuer', async () => {
-        const [
-          actualCountsPerIssuer,
-          actualIdentifiers,
-        ] = await federatedAttestations.lookupIdentifiers(account1, [issuer1])
+        const [actualCountsPerIssuer, actualIdentifiers] =
+          await federatedAttestations.lookupIdentifiers(account1, [issuer1])
         checkAgainstExpectedIdCases(
           [issuer1IdCases.length],
           issuer1IdCases,
@@ -520,20 +486,16 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should return empty list if no identifiers exist for an (issuer,address)', async () => {
-        const [
-          actualCountsPerIssuer,
-          actualIdentifiers,
-        ] = await federatedAttestations.lookupIdentifiers(account1, [issuer3])
+        const [actualCountsPerIssuer, actualIdentifiers] =
+          await federatedAttestations.lookupIdentifiers(account1, [issuer3])
         checkAgainstExpectedIdCases([0], [], actualCountsPerIssuer, actualIdentifiers)
       })
 
       it('should return identifiers from multiple issuers in correct order', async () => {
         const expectedIdCases = issuer2IdCases.concat(issuer1IdCases)
         const expectedCountsPerIssuer = [0, issuer2IdCases.length, issuer1IdCases.length]
-        const [
-          actualCountsPerIssuer,
-          actualIdentifiers,
-        ] = await federatedAttestations.lookupIdentifiers(account1, [issuer3, issuer2, issuer1])
+        const [actualCountsPerIssuer, actualIdentifiers] =
+          await federatedAttestations.lookupIdentifiers(account1, [issuer3, issuer2, issuer1])
         checkAgainstExpectedIdCases(
           expectedCountsPerIssuer,
           expectedIdCases,
@@ -550,10 +512,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
         })
       })
       it('should return empty list', async () => {
-        const [
-          actualCountsPerIssuer,
-          actualIdentifiers,
-        ] = await federatedAttestations.lookupIdentifiers(account1, [issuer1])
+        const [actualCountsPerIssuer, actualIdentifiers] =
+          await federatedAttestations.lookupIdentifiers(account1, [issuer1])
         checkAgainstExpectedIdCases([0], [], actualCountsPerIssuer, actualIdentifiers)
       })
     })
@@ -711,7 +671,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         chainId,
         federatedAttestations.address
       )
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         federatedAttestations.registerAttestation(
           identifier1,
           issuer1,
@@ -721,13 +681,14 @@ contract('FederatedAttestations', (accounts: string[]) => {
           sig2.v,
           sig2.r,
           sig2.s
-        )
+        ),
+        'Signature is invalid'
       )
     })
 
     it('should revert if signer has been deregistered', async () => {
       await accountsInstance.removeSigner(signer1, signerRole, { from: issuer1 })
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         federatedAttestations.registerAttestation(
           identifier1,
           issuer1,
@@ -737,7 +698,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
           sig.v,
           sig.r,
           sig.s
-        )
+        ),
+        'not active authorized signer for role'
       )
     })
 
@@ -746,7 +708,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       await federatedAttestations.revokeAttestation(identifier1, issuer1, account1, {
         from: issuer1,
       })
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         federatedAttestations.registerAttestation(
           identifier1,
           issuer1,
@@ -807,7 +769,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           1,
           federatedAttestations.address
         )
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           federatedAttestations.registerAttestation(
             identifier1,
             issuer1,
@@ -818,7 +780,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
             sig2.r,
             sig2.s,
             { from: issuer1 }
-          )
+          ),
+          'Signature is invalid'
         )
       })
 
@@ -908,7 +871,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           { from: issuer1 }
         )
       }
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         federatedAttestations.registerAttestationAsIssuer(identifier1, account1, nowUnixTime, {
           from: issuer1,
         }),
@@ -930,7 +893,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           { from: issuer1 }
         )
       }
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         federatedAttestations.registerAttestationAsIssuer(identifier1, account1, nowUnixTime, {
           from: issuer1,
         }),
@@ -973,10 +936,11 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
     it('should revert when signer has been deregistered', async () => {
       await accountsInstance.removeSigner(signer1, signerRole, { from: issuer1 })
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         federatedAttestations.revokeAttestation(identifier1, issuer1, account1, {
           from: signer1,
-        })
+        }),
+        'not active authorized signer for role'
       )
     })
 
@@ -1023,7 +987,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
 
     it("should revert when revoking an attestation that doesn't exist", async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         federatedAttestations.revokeAttestation(identifier1, issuer1, accounts[5], {
           from: issuer1,
         }),
@@ -1069,10 +1033,11 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
 
     it('should revert if an invalid user attempts to revoke the attestation', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         federatedAttestations.revokeAttestation(identifier1, issuer1, account1, {
           from: accounts[5],
-        })
+        }),
+        'Must first register address with Account.createAccount'
       )
     })
 
@@ -1080,7 +1045,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       await federatedAttestations.revokeAttestation(identifier1, issuer1, account1, {
         from: issuer1,
       })
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         federatedAttestations.registerAttestation(
           identifier1,
           issuer1,
@@ -1091,7 +1056,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
           sig.r,
           sig.s,
           { from: issuer1 }
-        )
+        ),
+        'Attestation has been revoked'
       )
     })
   })
@@ -1112,13 +1078,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
         [account1, account2],
         { from: issuer1 }
       )
-      const [
-        countsPerIssuer1,
-        addresses1,
-        signers1,
-        issuedOns1,
-        publishedOns1,
-      ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1])
+      const [countsPerIssuer1, addresses1, signers1, issuedOns1, publishedOns1] =
+        await federatedAttestations.lookupAttestations(identifier1, [issuer1])
       checkAgainstExpectedAttestations(
         [1],
         [{ account: account2, issuedOn: nowUnixTime, signer: signer2 }],
@@ -1129,13 +1090,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
         issuedOns1,
         publishedOns1
       )
-      const [
-        countsPerIssuer2,
-        addresses2,
-        signers2,
-        issuedOns2,
-        publishedOns2,
-      ] = await federatedAttestations.lookupAttestations(identifier2, [issuer1])
+      const [countsPerIssuer2, addresses2, signers2, issuedOns2, publishedOns2] =
+        await federatedAttestations.lookupAttestations(identifier2, [issuer1])
       checkAgainstExpectedAttestations(
         [0],
         [],
@@ -1155,13 +1111,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
         [account2, account1],
         { from: issuer1 }
       )
-      const [
-        countsPerIssuer1,
-        addresses1,
-        signers1,
-        issuedOns1,
-        publishedOns1,
-      ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1])
+      const [countsPerIssuer1, addresses1, signers1, issuedOns1, publishedOns1] =
+        await federatedAttestations.lookupAttestations(identifier1, [issuer1])
       checkAgainstExpectedAttestations(
         [1],
         [{ account: account2, issuedOn: nowUnixTime, signer: signer2 }],
@@ -1172,13 +1123,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
         issuedOns1,
         publishedOns1
       )
-      const [
-        countsPerIssuer2,
-        addresses2,
-        signers2,
-        issuedOns2,
-        publishedOns2,
-      ] = await federatedAttestations.lookupAttestations(identifier2, [issuer1])
+      const [countsPerIssuer2, addresses2, signers2, issuedOns2, publishedOns2] =
+        await federatedAttestations.lookupAttestations(identifier2, [issuer1])
       checkAgainstExpectedAttestations(
         [0],
         [],
@@ -1198,13 +1144,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
         [account2, account1],
         { from: signer1 }
       )
-      const [
-        countsPerIssuer1,
-        addresses1,
-        signers1,
-        issuedOns1,
-        publishedOns1,
-      ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1])
+      const [countsPerIssuer1, addresses1, signers1, issuedOns1, publishedOns1] =
+        await federatedAttestations.lookupAttestations(identifier1, [issuer1])
       checkAgainstExpectedAttestations(
         [1],
         [{ account: account2, issuedOn: nowUnixTime, signer: signer2 }],
@@ -1215,13 +1156,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
         issuedOns1,
         publishedOns1
       )
-      const [
-        countsPerIssuer2,
-        addresses2,
-        signers2,
-        issuedOns2,
-        publishedOns2,
-      ] = await federatedAttestations.lookupAttestations(identifier2, [issuer1])
+      const [countsPerIssuer2, addresses2, signers2, issuedOns2, publishedOns2] =
+        await federatedAttestations.lookupAttestations(identifier2, [issuer1])
       checkAgainstExpectedAttestations(
         [0],
         [],
@@ -1249,27 +1185,29 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
     it('should revert if deregistered signer of issuer batch revokes attestations', async () => {
       await accountsInstance.removeSigner(signer1, signerRole, { from: issuer1 })
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         federatedAttestations.batchRevokeAttestations(
           issuer1,
           [identifier2, identifier1],
           [account2, account1],
           { from: signer1 }
-        )
+        ),
+        'not active authorized signer for role'
       )
     })
     it('should revert if identifiers.length != accounts.length', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         federatedAttestations.batchRevokeAttestations(
           issuer1,
           [identifier2],
           [account2, account1],
           { from: signer1 }
-        )
+        ),
+        'Unequal number of identifiers and accounts'
       )
     })
     it('should revert if one of the (identifier, account) pairs is invalid', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         federatedAttestations.batchRevokeAttestations(
           issuer1,
           // (identifier2, account1) does not exist

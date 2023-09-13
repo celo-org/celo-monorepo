@@ -1,3 +1,4 @@
+// tslint:disable: ordered-imports
 import debugFactory from 'debug'
 import { AddressRegistry } from './address-registry'
 import { CeloContract, ProxyContracts } from './base'
@@ -10,16 +11,12 @@ import { newDowntimeSlasher } from './generated/DowntimeSlasher'
 import { newElection } from './generated/Election'
 import { newEpochRewards } from './generated/EpochRewards'
 import { newEscrow } from './generated/Escrow'
-import { newExchange } from './generated/Exchange'
-import { newExchangeBrl } from './generated/ExchangeBRL'
-import { newExchangeEur } from './generated/ExchangeEUR'
 import { newFederatedAttestations } from './generated/FederatedAttestations'
 import { newFeeCurrencyWhitelist } from './generated/FeeCurrencyWhitelist'
 import { newFreezer } from './generated/Freezer'
 import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
-import { newGrandaMento } from './generated/GrandaMento'
 import { newIerc20 } from './generated/IERC20'
 import { newLockedGold } from './generated/LockedGold'
 import { newMetaTransactionWallet } from './generated/MetaTransactionWallet'
@@ -29,12 +26,14 @@ import { newOdisPayments } from './generated/OdisPayments'
 import { newProxy } from './generated/Proxy'
 import { newRandom } from './generated/Random'
 import { newRegistry } from './generated/Registry'
-import { newReserve } from './generated/Reserve'
 import { newSortedOracles } from './generated/SortedOracles'
-import { newStableToken } from './generated/StableToken'
-import { newStableTokenRegistry } from './generated/StableTokenRegistry'
-import { newTransferWhitelist } from './generated/TransferWhitelist'
 import { newValidators } from './generated/Validators'
+import { newExchange } from './generated/mento/Exchange'
+import { newExchangeBrl } from './generated/mento/ExchangeBRL'
+import { newExchangeEur } from './generated/mento/ExchangeEUR'
+import { newGrandaMento } from './generated/mento/GrandaMento'
+import { newReserve } from './generated/mento/Reserve'
+import { newStableToken } from './generated/mento/StableToken'
 
 const debug = debugFactory('kit:web3-contract-cache')
 
@@ -70,8 +69,6 @@ export const ContractFactories = {
   [CeloContract.StableToken]: newStableToken,
   [CeloContract.StableTokenEUR]: newStableToken,
   [CeloContract.StableTokenBRL]: newStableToken,
-  [CeloContract.StableTokenRegistry]: newStableTokenRegistry,
-  [CeloContract.TransferWhitelist]: newTransferWhitelist,
   [CeloContract.Validators]: newValidators,
 }
 
@@ -183,14 +180,8 @@ export class Web3ContractCache {
   getStableToken(stableToken: StableToken = StableToken.cUSD) {
     return this.getContract(StableToContract[stableToken])
   }
-  getTransferWhitelist() {
-    return this.getContract(CeloContract.TransferWhitelist)
-  }
   getValidators() {
     return this.getContract(CeloContract.Validators)
-  }
-  getStableTokenRegistry() {
-    return this.getContract(CeloContract.StableTokenRegistry)
   }
 
   /**

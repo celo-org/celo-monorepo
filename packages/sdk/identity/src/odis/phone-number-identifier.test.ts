@@ -3,12 +3,12 @@ import { WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   getBlindedPhoneNumber,
   getBlindedPhoneNumberSignature,
-  getPepperFromThresholdSignature,
   getPhoneNumberIdentifier,
   getPhoneNumberIdentifierFromSignature,
   isBalanceSufficientForSigRetrieval,
 } from './phone-number-identifier'
 import { AuthenticationMethod, EncryptionKeySigner, ErrorMessages, ServiceContext } from './query'
+import fetchMock from '../__mocks__/cross-fetch'
 
 jest.mock('./bls-blinding-client', () => {
   // tslint:disable-next-line:no-shadowed-variable
@@ -125,13 +125,5 @@ describe(getPhoneNumberIdentifier, () => {
     await expect(
       getPhoneNumberIdentifier(mockE164Number, mockAccount, authSigner, serviceContext)
     ).rejects.toThrow(ErrorMessages.ODIS_AUTH_ERROR)
-  })
-})
-
-describe(getPepperFromThresholdSignature, () => {
-  it('Hashes sigs correctly', () => {
-    const base64Sig = 'vJeFZJ3MY5KlpI9+kIIozKkZSR4cMymLPh2GHZUatWIiiLILyOcTiw2uqK/LBReA'
-    const signature = Buffer.from(base64Sig, 'base64')
-    expect(getPepperFromThresholdSignature(signature)).toBe('piWqRHHYWtfg9')
   })
 })

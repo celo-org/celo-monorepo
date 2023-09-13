@@ -1,9 +1,9 @@
 import { hexToBuffer, retryAsyncWithBackOffAndTimeout } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
-import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
+
 import Logger from 'bunyan'
 import crypto from 'crypto'
 import { Request } from 'express'
@@ -13,9 +13,28 @@ import {
   ErrorMessage,
   ErrorType,
   PhoneNumberPrivacyRequest,
-  WarningMessage,
 } from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
+
+export type DataEncryptionKeyFetcher = (address: string) => Promise<string>
+
+export function newContractKitFetcher(
+  contractKit: ContractKit,
+  logger: Logger,
+  fullNodeTimeoutMs: number = FULL_NODE_TIMEOUT_IN_MS,
+  fullNodeRetryCount: number = RETRY_COUNT,
+  fullNodeRetryDelayMs: number = RETRY_DELAY_IN_MS
+): DataEncryptionKeyFetcher {
+  return (address: string) =>
+    getDataEncryptionKey(
+      address,
+      contractKit,
+      logger,
+      fullNodeTimeoutMs,
+      fullNodeRetryCount,
+      fullNodeRetryDelayMs
+    )
+}
 
 /*
  * Confirms that user is who they say they are and throws error on failure to confirm.
@@ -23,9 +42,8 @@ import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './const
  */
 export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   request: Request<{}, {}, R>,
-  contractKit: ContractKit,
   logger: Logger,
-  shouldFailOpen: boolean = false,
+  fetchDEK: DataEncryptionKeyFetcher,
   warnings: ErrorType[] = []
 ): Promise<boolean> {
   logger.debug('Authenticating user')
@@ -43,30 +61,23 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   if (authMethod && authMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     let registeredEncryptionKey
     try {
-      registeredEncryptionKey = await getDataEncryptionKey(signer, contractKit, logger)
+      registeredEncryptionKey = await fetchDEK(signer)
     } catch (err) {
       // getDataEncryptionKey should only throw if there is a full-node connection issue.
       // That is, it does not throw if the DEK is undefined or invalid
-      logger.error(
-        { err, warning: ErrorMessage.FAILURE_TO_GET_DEK },
-        shouldFailOpen ? ErrorMessage.FAILING_OPEN : ErrorMessage.FAILING_CLOSED
-      )
-      warnings.push(
-        ErrorMessage.FAILURE_TO_GET_DEK,
-        shouldFailOpen ? ErrorMessage.FAILING_OPEN : ErrorMessage.FAILING_CLOSED
-      )
-      return shouldFailOpen
+      logger.error({
+        err,
+        warning: ErrorMessage.FAILURE_TO_GET_DEK,
+      })
+      warnings.push(ErrorMessage.FAILURE_TO_GET_DEK)
+      return false
     }
     if (!registeredEncryptionKey) {
       logger.warn({ account: signer }, 'Account does not have registered encryption key')
       return false
     } else {
       logger.info({ dek: registeredEncryptionKey, account: signer }, 'Found DEK for account')
-      if (
-        verifyDEKSignature(message, messageSignature, registeredEncryptionKey, logger, {
-          insecureAllowIncorrectlyGeneratedSignature: true,
-        })
-      ) {
+      if (verifyDEKSignature(message, messageSignature, registeredEncryptionKey, logger)) {
         return true
       }
     }
@@ -106,10 +117,7 @@ export function verifyDEKSignature(
   message: string,
   messageSignature: string,
   registeredEncryptionKey: string,
-  logger?: Logger,
-  { insecureAllowIncorrectlyGeneratedSignature } = {
-    insecureAllowIncorrectlyGeneratedSignature: false,
-  }
+  logger?: Logger
 ) {
   logger = logger ?? rootLogger(fetchEnv('SERVICE_NAME'))
   try {
@@ -125,16 +133,6 @@ export function verifyDEKSignature(
     if (key.verify(getMessageDigest(message), parsedSig)) {
       return true
     }
-    // TODO(2.0.0, deployment): Remove this once clients upgrade to @celo/identity v1.5.3
-    // Due to an error in the original implementation of the sign and verify functions
-    // used here, older clients may generate signatures over the truncated message,
-    // instead of its hash. These signatures represent a risk to the signer as they do
-    // not protect against modifications of the message past the first 64 characters of the message.
-    // (https://github.com/celo-org/celo-monorepo/issues/9802)
-    if (insecureAllowIncorrectlyGeneratedSignature && key.verify(message, parsedSig)) {
-      logger.warn(WarningMessage.INVALID_AUTH_SIGNATURE)
-      return true
-    }
     return false
   } catch (err) {
     logger.error('Failed to verify signature with DEK')
@@ -146,7 +144,10 @@ export function verifyDEKSignature(
 export async function getDataEncryptionKey(
   address: string,
   contractKit: ContractKit,
-  logger: Logger
+  logger: Logger,
+  fullNodeTimeoutMs: number,
+  fullNodeRetryCount: number,
+  fullNodeRetryDelayMs: number
 ): Promise<string> {
   try {
     const res = await retryAsyncWithBackOffAndTimeout(
@@ -154,57 +155,16 @@ export async function getDataEncryptionKey(
         const accountWrapper: AccountsWrapper = await contractKit.contracts.getAccounts()
         return accountWrapper.getDataEncryptionKey(address)
       },
-      RETRY_COUNT,
+      fullNodeRetryCount,
       [],
-      RETRY_DELAY_IN_MS,
+      fullNodeRetryDelayMs,
       1.5,
-      FULL_NODE_TIMEOUT_IN_MS
+      fullNodeTimeoutMs
     )
     return res
   } catch (error) {
     logger.error('Failed to retrieve DEK: ' + error)
     logger.error(ErrorMessage.FULL_NODE_ERROR)
     throw error
-  }
-}
-
-export async function isVerified(
-  account: string,
-  hashedPhoneNumber: string,
-  contractKit: ContractKit,
-  logger: Logger
-): Promise<boolean> {
-  try {
-    const res = await retryAsyncWithBackOffAndTimeout(
-      async () => {
-        const attestationsWrapper: AttestationsWrapper = await contractKit.contracts.getAttestations()
-        const {
-          isVerified: _isVerified,
-          completed,
-          numAttestationsRemaining,
-          total,
-        } = await attestationsWrapper.getVerifiedStatus(hashedPhoneNumber, account)
-
-        logger.debug({
-          account,
-          isVerified: _isVerified,
-          completedAttestations: completed,
-          remainingAttestations: numAttestationsRemaining,
-          totalAttestationsRequested: total,
-        })
-        return _isVerified
-      },
-      RETRY_COUNT,
-      [],
-      RETRY_DELAY_IN_MS,
-      1.5,
-      FULL_NODE_TIMEOUT_IN_MS
-    )
-    return res
-  } catch (error) {
-    logger.error('Failed to get verification status: ' + error)
-    logger.error(ErrorMessage.FULL_NODE_ERROR)
-    logger.warn('Assuming user is verified')
-    return true
   }
 }

@@ -7,9 +7,9 @@ import {
   verifyKeybaseClaim,
 } from '@celo/contractkit/lib/identity/claims/keybase'
 import { sleep } from '@celo/utils/lib/async'
+import { toChecksumAddress } from '@ethereumjs/util'
 import { flags } from '@oclif/command'
 import { cli } from 'cli-ux'
-import { toChecksumAddress } from 'ethereumjs-util'
 import { writeFileSync } from 'fs'
 import { tmpdir } from 'os'
 import { binaryPrompt } from '../../utils/cli'

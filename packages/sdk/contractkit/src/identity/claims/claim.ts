@@ -1,12 +1,6 @@
 import { hashMessage } from '@celo/utils/lib/signatureUtils'
 import * as t from 'io-ts'
-import { ContractKit } from '../../kit'
 import { AccountClaim, AccountClaimType } from './account'
-import {
-  AttestationServiceURLClaim,
-  AttestationServiceURLClaimType,
-  validateAttestationServiceUrl,
-} from './attestation-service-url'
 import { ClaimTypes, now, SignatureType, TimestampType } from './types'
 
 export const KeybaseClaimType = t.type({
@@ -37,7 +31,6 @@ const StorageClaimType = t.type({
 })
 
 export const ClaimType = t.union([
-  AttestationServiceURLClaimType,
   AccountClaimType,
   DomainClaimType,
   KeybaseClaimType,
@@ -54,13 +47,7 @@ export const DOMAIN_TXT_HEADER = 'celo-site-verification'
 export type DomainClaim = t.TypeOf<typeof DomainClaimType>
 export type NameClaim = t.TypeOf<typeof NameClaimType>
 export type StorageClaim = t.TypeOf<typeof StorageClaimType>
-export type Claim =
-  | AttestationServiceURLClaim
-  | DomainClaim
-  | KeybaseClaim
-  | NameClaim
-  | AccountClaim
-  | StorageClaim
+export type Claim = DomainClaim | KeybaseClaim | NameClaim | AccountClaim | StorageClaim
 
 export type ClaimPayload<K extends ClaimTypes> = K extends typeof ClaimTypes.DOMAIN
   ? DomainClaim
@@ -68,32 +55,15 @@ export type ClaimPayload<K extends ClaimTypes> = K extends typeof ClaimTypes.DOM
   ? NameClaim
   : K extends typeof ClaimTypes.KEYBASE
   ? KeybaseClaim
-  : K extends typeof ClaimTypes.ATTESTATION_SERVICE_URL
-  ? AttestationServiceURLClaim
   : K extends typeof ClaimTypes.ACCOUNT
   ? AccountClaim
   : StorageClaim
 
 /** @internal */
-export const isOfType = <K extends ClaimTypes>(type: K) => (data: Claim): data is ClaimPayload<K> =>
-  data.type === type
-
-/**
- * Validates a claim made by an account, i.e. whether the claim is usable
- * @param kit The ContractKit object
- * @param claim The claim to validate
- * @param address The address that is making the claim
- * @returns If valid, returns undefined. If invalid or unable to validate, returns a string with the error
- */
-export async function validateClaim(kit: ContractKit, claim: Claim, address: string) {
-  switch (claim.type) {
-    case ClaimTypes.ATTESTATION_SERVICE_URL:
-      return validateAttestationServiceUrl(kit, claim, address)
-    default:
-      break
-  }
-  return
-}
+export const isOfType =
+  <K extends ClaimTypes>(type: K) =>
+  (data: Claim): data is ClaimPayload<K> =>
+    data.type === type
 
 export function hashOfClaim(claim: Claim) {
   return hashMessage(serializeClaim(claim))

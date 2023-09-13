@@ -1,6 +1,6 @@
 import { CeloTransactionObject } from '@celo/connect'
+import { toBuffer } from '@ethereumjs/util'
 import { flags } from '@oclif/command'
-import { toBuffer } from 'ethereumjs-util'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx, failWith } from '../../utils/cli'

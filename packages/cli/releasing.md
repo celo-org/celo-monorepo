@@ -1,19 +1,23 @@
 # how to release new versions
 
-1. change all @celo/** dependencies which are pointing to the unpublished -dev version to published versions
+- change all @celo/** dependencies which are pointing to the unpublished -dev version to published versions
 
-2. update cli version in cli/package.json to next version with a pre-release (eg -beta.x) suffix
+- check that @celo/phone-number-privacy-common in @celo/identity  and @celo/encrypted-backup packages points to a published version. (actually check on npm because just removing -dev might not be enough)
 
-3. run `yarn prepack`
+- update cli version in cli/package.json to next version with a pre-release (eg -beta.x) suffix
 
-4. *IMPORTANT* double check version in package.json is correct!
+- run `yarn generate:shrinkwrap` (if you got some nonsense about @celo/phone-number-privacy-signer not being found try removing from peer deps of combiner running yarn again and retrying)
 
-5. commit the the package.json and shrinkwrap
+- commit the the package.json and shrinkwrap
 
-6. run `npm publish --otp XXXXXX --tag TAG` *you MUST run with --tag and provide alpha | beta for pre release*
+- run `yarn prepack`
 
-7. add back -dev suffics to @celo/** deps it was removed from in cli package (otherwise ci build will fail)
+- *IMPORTANT* double check version in package.json is correct!
 
-8. run yarn
+- run `npm publish --otp XXXXXX --tag TAG` *you MUST run with --tag and provide alpha | beta for pre release*
 
-9. commit
+- add back -dev suffics to @celo/** deps it was removed from in cli package (otherwise ci build will fail)
+
+- run yarn
+
+- commit

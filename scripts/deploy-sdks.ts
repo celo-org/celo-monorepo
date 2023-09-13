@@ -33,10 +33,10 @@
  */
 
 import * as child_process from 'child_process'
-import * as colors from 'colors'
+import colors from 'colors'
 import * as fs from 'fs'
 import * as path from 'path'
-import * as prompt from 'prompt'
+import prompt from 'prompt'
 import * as semver from 'semver'
 
 const VERSIONS = ['major', 'minor', 'patch']
@@ -57,6 +57,19 @@ type Answers = {
 // This is an async IIFE so that we can use `aync/await`
 ;(async function () {
   prompt.start()
+
+  const { confirmNoDanglingDevs } = await prompt.get([
+    {
+      name: 'confirmNoDanglingDevs',
+      description: colors.yellow(
+        `Please ensure the @celo/phone-number-privacy-* packages in any sdk/**/package.json are using a published version. Y/N`
+      ),
+    },
+  ])
+
+  if (confirmNoDanglingDevs.toString().toUpperCase() !== 'Y') {
+    process.exit(1)
+  }
 
   // `getAnswers` will either prompt the user for a version and whether
   // or not to publish or it will use an existing failedSDKs.json file.
@@ -108,7 +121,7 @@ type Answers = {
   // `package.json` dependencies.
   const sdkNames = sdkJsons.map(({ name }) => name)
 
-  let newVersion: string
+  let newVersion: string = ''
   // Here we update the sdk `package.json` objects with updated
   // versions and dependencies.
   sdkJsons.forEach((json, index) => {
@@ -187,12 +200,16 @@ type Answers = {
         successfulPackages.push(packageJson.name)
         // remove license files from sdks folders
         child_process.execSync('rm LICENSE', { cwd: packageFolderPath, stdio: 'inherit' })
-      } catch (e) {
+      } catch (e: unknown) {
         const errorPrompt = [
           {
             name: 'retry',
             description: colors.red(
-              `${packageJson.name} failed to publish. (Did you run 'yarn deploy-sdks'? must be run as 'npm run deploy-sdks') Error message: ${e.message} Retry? Y/N`
+              `${
+                packageJson.name
+              } failed to publish. (Did you run 'yarn deploy-sdks'? must be run as 'npm run deploy-sdks') Error message: ${
+                (e as Error).message
+              } Retry? Y/N`
             ),
           },
         ]
@@ -245,7 +262,7 @@ type Answers = {
       if (sdkNames.includes(depName)) {
         const versionUpdate =
           json.dependencies[depName].includes('-dev') || isSdk ? `${newDevVersion}-dev` : newVersion
-        json.dependencies[depName] = versionUpdate
+        json.dependencies[depName] = keepCaretOrTilde(json.dependencies[depName], versionUpdate)
         packageChanged = true
       }
     }
@@ -255,7 +272,10 @@ type Answers = {
           json.devDependencies[depName].includes('-dev') || isSdk
             ? `${newDevVersion}-dev`
             : newVersion
-        json.devDependencies[depName] = versionUpdate
+        json.devDependencies[depName] = keepCaretOrTilde(
+          json.devDependencies[depName],
+          versionUpdate
+        )
         packageChanged = true
       }
     }
@@ -317,6 +337,10 @@ function incrementVersion(version: string, command: string) {
 
 function removeDevSuffix(version: string) {
   return version.endsWith('-dev') ? version.slice(0, -4) : version
+}
+
+function keepCaretOrTilde(old: string, next: string): string {
+  return old.startsWith('^') || old.startsWith('~') ? `${old.charAt(0)}${next}` : next
 }
 
 function readPackageJson(filePath: string): PackageJson {

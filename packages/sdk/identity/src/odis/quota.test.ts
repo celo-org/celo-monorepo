@@ -1,4 +1,5 @@
 import { AuthenticationMethod, CombinerEndpoint } from '@celo/phone-number-privacy-common'
+import fetchMock from '../__mocks__/cross-fetch'
 import { EncryptionKeySigner, ServiceContext } from './query'
 import { getPnpQuotaStatus, PnpClientQuotaStatus } from './quota'
 
@@ -39,7 +40,6 @@ describe(getPnpQuotaStatus, () => {
       remainingQuota: totalQuota - performedQueryCount,
       version,
       warnings: undefined,
-      blockNumber: undefined,
     })
   })
 

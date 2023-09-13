@@ -4,8 +4,6 @@ import {
   DomainQuotaStatusRequest,
   DomainRequest,
   DomainRestrictedSignatureRequest,
-  LegacyPnpQuotaRequest,
-  LegacySignMessageRequest,
   OdisRequest,
   PhoneNumberPrivacyRequest,
   PnpQuotaRequest,
@@ -18,18 +16,12 @@ export interface PnpQuotaStatus {
   performedQueryCount: number
   // all time total quota
   totalQuota: number
-  blockNumber?: number
 }
 
-const PnpQuotaStatusSchema: t.Type<PnpQuotaStatus> = t.intersection([
-  t.type({
-    performedQueryCount: t.number,
-    totalQuota: t.number,
-  }),
-  t.partial({
-    blockNumber: t.union([t.number, t.undefined]),
-  }),
-])
+const PnpQuotaStatusSchema: t.Type<PnpQuotaStatus> = t.type({
+  performedQueryCount: t.number,
+  totalQuota: t.number,
+})
 
 export interface SignMessageResponseSuccess extends PnpQuotaStatus {
   success: true
@@ -49,7 +41,6 @@ export interface SignMessageResponseFailure {
   // Changing this is more involved; TODO(future) https://github.com/celo-org/celo-monorepo/issues/9826
   performedQueryCount?: number
   totalQuota?: number
-  blockNumber?: number
 }
 
 export type SignMessageResponse = SignMessageResponseSuccess | SignMessageResponseFailure
@@ -75,7 +66,6 @@ export const SignMessageResponseSchema: t.Type<SignMessageResponse> = t.union([
     t.partial({
       performedQueryCount: t.union([t.number, t.undefined]),
       totalQuota: t.union([t.number, t.undefined]),
-      blockNumber: t.union([t.number, t.undefined]),
     }),
   ]),
 ])
@@ -116,8 +106,8 @@ export const PnpQuotaResponseSchema: t.Type<PnpQuotaResponse> = t.union([
 export type PhoneNumberPrivacyResponse<
   R extends PhoneNumberPrivacyRequest = PhoneNumberPrivacyRequest
 > =
-  | R extends SignMessageRequest | LegacySignMessageRequest ? SignMessageResponse : never
-  | R extends PnpQuotaRequest | LegacyPnpQuotaRequest ? PnpQuotaResponse : never
+  | R extends SignMessageRequest ? SignMessageResponse : never
+  | R extends PnpQuotaRequest ? PnpQuotaResponse : never
 
 // Domains
 

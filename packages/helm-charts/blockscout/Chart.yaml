@@ -1,9 +1,0 @@
-apiVersion: v1
-name: blockscout
-version: 0.0.2
-description: Chart which is used to deploy a blockscout setup for a celo testnet
-keywords:
-- ethereum
-- blockchain
-- blockscout
-appVersion: v2.0.4-beta

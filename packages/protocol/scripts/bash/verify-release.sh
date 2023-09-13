@@ -40,4 +40,4 @@ done
 source scripts/bash/release-lib.sh
 build_tag $BRANCH $LOG_FILE
 
-yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts --proposal $PROPOSAL $FORNO $INITIALIZE_DATA
+yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts --branch $BRANCH --proposal $PROPOSAL $FORNO $INITIALIZE_DATA

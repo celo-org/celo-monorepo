@@ -99,7 +99,7 @@ contract Governance is
   mapping(address => uint256) public refundedDeposits;
   mapping(address => ContractConstitution) private constitution;
   mapping(uint256 => Proposals.Proposal) private proposals;
-  mapping(address => Voter) private voters;
+  mapping(address => Voter) internal voters;
   mapping(bytes32 => HotfixRecord) public hotfixes;
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
@@ -220,7 +220,7 @@ contract Governance is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 3, 0, 0);
+    return (1, 4, 0, 0);
   }
 
   /**
@@ -505,7 +505,7 @@ contract Governance is
   {
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(_isDequeuedProposal(proposal, proposalId, index), "Proposal not dequeued");
-    Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
+    Proposals.Stage stage = getProposalDequeuedStage(proposal);
     if (_isDequeuedProposalExpired(proposal, stage)) {
       deleteDequeuedProposal(proposal, proposalId, index);
       return (proposal, Proposals.Stage.Expiration);
@@ -527,8 +527,12 @@ contract Governance is
     nonReentrant
     returns (bool)
   {
-    dequeueProposalsIfReady();
-    // If acting on an expired proposal, expire the proposal and take no action.
+    require(queue.contains(proposalId), "cannot upvote a proposal not in the queue");
+
+    if (dequeueProposalIfReady(proposalId)) {
+      return false;
+    }
+
     if (removeIfQueuedAndExpired(proposalId)) {
       return false;
     }
@@ -536,11 +540,8 @@ contract Governance is
     address account = getAccounts().voteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
     removeIfQueuedAndExpired(voter.upvote.proposalId);
-
-    // We can upvote a proposal in the queue if we're not already upvoting a proposal in the queue.
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
     require(weight > 0, "cannot upvote without locking gold");
-    require(queue.contains(proposalId), "cannot upvote a proposal not in the queue");
     require(
       voter.upvote.proposalId == 0 || !queue.contains(voter.upvote.proposalId),
       "cannot upvote more than one queued proposal"
@@ -549,6 +550,9 @@ contract Governance is
     queue.update(proposalId, upvotes, lesser, greater);
     voter.upvote = UpvoteRecord(proposalId, weight);
     emit ProposalUpvoted(proposalId, account, weight);
+
+    // dequeue other proposals if ready.
+    dequeueProposalsIfReady();
     return true;
   }
 
@@ -566,7 +570,7 @@ contract Governance is
       return
         _isQueuedProposalExpired(proposal) ? Proposals.Stage.Expiration : Proposals.Stage.Queued;
     } else {
-      Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
+      Proposals.Stage stage = getProposalDequeuedStage(proposal);
       return _isDequeuedProposalExpired(proposal, stage) ? Proposals.Stage.Expiration : stage;
     }
   }
@@ -601,7 +605,7 @@ contract Governance is
   }
 
   /**
-   * @notice Approves a proposal in the approval stage.
+   * @notice Approves a proposal in the approval stage or in the referendum stage.
    * @param proposalId The ID of the proposal to approve.
    * @param index The index of the proposal ID in `dequeued`.
    * @return Whether or not the approval was made successfully.
@@ -756,7 +760,6 @@ contract Governance is
         noVotes,
         abstainVotes
       );
-
     } else {
       proposal.updateVote(
         previousVoteRecord.yesVotes,
@@ -985,8 +988,7 @@ contract Governance is
       isQueued(upvotedProposal) &&
       !isQueuedProposalExpired(upvotedProposal);
     Proposals.Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
-    bool isVotingReferendum = (proposal.getDequeuedStage(stageDurations) ==
-      Proposals.Stage.Referendum);
+    bool isVotingReferendum = (getProposalDequeuedStage(proposal) == Proposals.Stage.Referendum);
     return isVotingQueue || isVotingReferendum;
   }
 
@@ -1043,7 +1045,7 @@ contract Governance is
   function getProposal(uint256 proposalId)
     external
     view
-    returns (address, uint256, uint256, uint256, string memory)
+    returns (address, uint256, uint256, uint256, string memory, uint256, bool)
   {
     return proposals[proposalId].unpack();
   }
@@ -1254,6 +1256,49 @@ contract Governance is
   }
 
   /**
+   * @notice Removes the proposal from the queue if `lastDequeue` time has passed.
+   * @param proposalId The ID of the proposal.
+   * @dev If any of the top proposals have expired, they are deleted.
+   */
+  function dequeueProposalIfReady(uint256 proposalId) public returns (bool isProposalDequeued) {
+    isProposalDequeued = false;
+    // solhint-disable-next-line not-rely-on-time
+    if (now >= lastDequeue.add(dequeueFrequency)) {
+      Proposals.Proposal storage proposal = proposals[proposalId];
+
+      if (_isQueuedProposalExpired(proposal)) {
+        emit ProposalExpired(proposalId);
+        return isProposalDequeued;
+      }
+
+      // Updating refunds back to proposer
+      refundedDeposits[proposal.proposer] = refundedDeposits[proposal.proposer].add(
+        proposal.deposit
+      );
+      queue.remove(proposalId);
+      // solhint-disable-next-line not-rely-on-time
+      proposal.timestamp = now;
+      if (emptyIndices.length > 0) {
+        uint256 indexOfLastEmptyIndex = emptyIndices.length.sub(1);
+        dequeued[emptyIndices[indexOfLastEmptyIndex]] = proposalId;
+        delete emptyIndices[indexOfLastEmptyIndex];
+        emptyIndices.length = indexOfLastEmptyIndex;
+      } else {
+        dequeued.push(proposalId);
+      }
+
+      // solhint-disable-next-line not-rely-on-time
+      emit ProposalDequeued(proposalId, now);
+      isProposalDequeued = true;
+
+      // solhint-disable-next-line not-rely-on-time
+      lastDequeue = now;
+    }
+
+    return isProposalDequeued;
+  }
+
+  /**
    * @notice Returns whether or not a proposal is in the queue.
    * @dev NOTE: proposal may be expired
    * @param proposalId The ID of the proposal.
@@ -1283,6 +1328,13 @@ contract Governance is
     FixidityLib.Fraction memory support = proposal.getSupportWithQuorumPadding(
       participationParameters.baseline.multiply(participationParameters.baselineQuorumFactor)
     );
+
+    if (proposal.transactions.length == 0) {
+      // default treshold
+      FixidityLib.Fraction memory threshold = _getConstitution(address(0), "");
+      return support.gt(threshold);
+    }
+
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = ExtractFunctionSignature.extractFunctionSignature(
         proposal.transactions[i].data
@@ -1331,7 +1383,7 @@ contract Governance is
    */
   function isDequeuedProposalExpired(uint256 proposalId) external view returns (bool) {
     Proposals.Proposal storage proposal = proposals[proposalId];
-    return _isDequeuedProposalExpired(proposal, proposal.getDequeuedStage(stageDurations));
+    return _isDequeuedProposalExpired(proposal, getProposalDequeuedStage(proposal));
   }
 
   /**
@@ -1461,19 +1513,52 @@ contract Governance is
     uint256 maxUsed = 0;
     for (uint256 index = 0; index < dequeued.length; index = index.add(1)) {
       Proposals.Proposal storage proposal = proposals[dequeued[index]];
-      bool isVotingReferendum = (proposal.getDequeuedStage(stageDurations) ==
-        Proposals.Stage.Referendum);
+      bool isVotingReferendum = (getProposalDequeuedStage(proposal) == Proposals.Stage.Referendum);
 
       if (!isVotingReferendum) {
         continue;
       }
 
       VoteRecord storage voteRecord = voter.referendumVotes[index];
+      uint256 votesCast = voteRecord.yesVotes.add(voteRecord.noVotes).add(voteRecord.abstainVotes);
       maxUsed = Math.max(
         maxUsed,
-        voteRecord.yesVotes.add(voteRecord.noVotes).add(voteRecord.abstainVotes)
+        // backward compatibility for transition period - this should be updated later on
+        votesCast == 0 ? voteRecord.deprecated_weight : votesCast
       );
     }
     return maxUsed;
+  }
+
+  /**
+   * @notice Returns the stage of a dequeued proposal.
+   * @param proposal The proposal struct.
+   * @return The stage of the dequeued proposal.
+   * @dev Must be called on a dequeued proposal.
+   */
+  function getProposalDequeuedStage(Proposals.Proposal storage proposal)
+    internal
+    view
+    returns (Proposals.Stage)
+  {
+    uint256 stageStartTime = proposal.timestamp.add(stageDurations.referendum).add(
+      stageDurations.execution
+    );
+    // solhint-disable-next-line not-rely-on-time
+    if (
+      now >= stageStartTime &&
+      (proposal.transactions.length > 0 ||
+        // proposals with 0 transactions can expire only when not approved or not passing
+        !proposal.isApproved() ||
+        !_isProposalPassing(proposal))
+    ) {
+      return Proposals.Stage.Expiration;
+    }
+    stageStartTime = stageStartTime.sub(stageDurations.execution);
+    // solhint-disable-next-line not-rely-on-time
+    if (now >= stageStartTime) {
+      return Proposals.Stage.Execution;
+    }
+    return Proposals.Stage.Referendum;
   }
 }

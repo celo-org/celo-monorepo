@@ -13,9 +13,9 @@ if [ "${1}" == "checkout" ]; then
     # Test master by default.
     BRANCH_TO_TEST=${2:-"master"}
     echo "Checking out geth at branch ${BRANCH_TO_TEST}..."
-    ./node_modules/.bin/mocha -r ts-node/register src/e2e-tests/sync_tests.ts --branch ${BRANCH_TO_TEST}
+    ./node_modules/.bin/mocha --node-option loader=ts-node/esm src/e2e-tests/sync_tests.ts --branch ${BRANCH_TO_TEST}
 elif [ "${1}" == "local" ]; then
     export GETH_DIR="${2}"
     echo "Testing using local geth dir ${GETH_DIR}..."
-    ./node_modules/.bin/mocha -r ts-node/register src/e2e-tests/sync_tests.ts --localgeth ${GETH_DIR}
+    ./node_modules/.bin/mocha --node-option loader=ts-node/esm src/e2e-tests/sync_tests.ts --localgeth ${GETH_DIR}
 fi

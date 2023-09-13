@@ -2,14 +2,9 @@ import {
   DomainQuotaStatusResponseSuccess,
   DomainRestrictedSignatureResponseSuccess,
   KeyVersionInfo,
-  SequentialDelayDomainState,
 } from '@celo/phone-number-privacy-common'
 import { getSignerVersion } from '@celo/phone-number-privacy-signer/src/config'
-import Logger from 'bunyan'
-import { Request, Response } from 'express'
-import { Session } from '../../src/common/session'
-import config from '../../src/config'
-import { DomainThresholdStateService } from '../../src/domain/services/threshold-state'
+import { findThresholdDomainState } from '../../src/domain/services/threshold-state'
 
 describe('domain threshold state', () => {
   // TODO add tests with failed signer responses, depending on
@@ -22,38 +17,7 @@ describe('domain threshold state', () => {
     pubKey: 'mock pubKey',
   }
 
-  const getSession = (domainStates: SequentialDelayDomainState[]) => {
-    const mockRequest = {
-      body: {},
-    } as Request
-    const mockResponse = {
-      locals: {
-        logger: new Logger({ name: 'logger' }),
-      },
-    } as Response
-    const session = new Session(mockRequest, mockResponse, keyVersionInfo)
-    domainStates.forEach((status) => {
-      const res: DomainRestrictedSignatureResponseSuccess | DomainQuotaStatusResponseSuccess = {
-        success: true,
-        version: expectedVersion,
-        status,
-      }
-      session.responses.push({ url: 'random url', res, status: 200 })
-    })
-    return session
-  }
-
-  const domainConfig = config.domains
-  domainConfig.keys.currentVersion = keyVersionInfo.keyVersion
-  domainConfig.keys.versions = JSON.stringify([keyVersionInfo])
-  domainConfig.odisServices.signers = JSON.stringify([
-    { url: 'http://localhost:3001', fallbackUrl: 'http://localhost:3001/fallback' },
-    { url: 'http://localhost:3002', fallbackUrl: 'http://localhost:3002/fallback' },
-    { url: 'http://localhost:3003', fallbackUrl: 'http://localhost:3003/fallback' },
-    { url: 'http://localhost:4004', fallbackUrl: 'http://localhost:4004/fallback' },
-  ])
-
-  const domainThresholdStateService = new DomainThresholdStateService(domainConfig)
+  const totalSigners = 4
 
   const expectedVersion = getSignerVersion()
   const now = Date.now()
@@ -135,8 +99,15 @@ describe('domain threshold state', () => {
 
   varyingDomainStates.forEach(({ statuses, expectedCounter, expectedTimer }) => {
     it(`should return counter:${expectedCounter} and timer:${expectedTimer} given the domain states: ${statuses}`, () => {
-      const session = getSession(statuses)
-      const thresholdResult = domainThresholdStateService.findThresholdDomainState(session)
+      const responses = statuses.map((status) => {
+        const res: DomainRestrictedSignatureResponseSuccess | DomainQuotaStatusResponseSuccess = {
+          success: true,
+          version: expectedVersion,
+          status,
+        }
+        return { url: 'random url', res, status: 200 }
+      })
+      const thresholdResult = findThresholdDomainState(keyVersionInfo, responses, totalSigners)
 
       expect(thresholdResult).toStrictEqual({
         timer: expectedTimer,
@@ -154,8 +125,16 @@ describe('domain threshold state', () => {
       { timer, counter: 2, disabled: false, now },
       { timer, counter: 2, disabled: false, now },
     ]
-    const session = getSession(statuses)
-    const thresholdResult = domainThresholdStateService.findThresholdDomainState(session)
+
+    const responses = statuses.map((status) => {
+      const res: DomainRestrictedSignatureResponseSuccess | DomainQuotaStatusResponseSuccess = {
+        success: true,
+        version: expectedVersion,
+        status,
+      }
+      return { url: 'random url', res, status: 200 }
+    })
+    const thresholdResult = findThresholdDomainState(keyVersionInfo, responses, totalSigners)
 
     expect(thresholdResult).toStrictEqual({ timer: 0, counter: 0, disabled: true, now: 0 })
   })
@@ -166,9 +145,16 @@ describe('domain threshold state', () => {
       { timer, counter: 2, disabled: false, now },
       { timer, counter: 2, disabled: false, now },
     ]
-    const session = getSession(statuses)
+    const responses = statuses.map((status) => {
+      const res: DomainRestrictedSignatureResponseSuccess | DomainQuotaStatusResponseSuccess = {
+        success: true,
+        version: expectedVersion,
+        status,
+      }
+      return { url: 'random url', res, status: 200 }
+    })
 
-    expect(() => domainThresholdStateService.findThresholdDomainState(session)).toThrow(
+    expect(() => findThresholdDomainState(keyVersionInfo, responses, totalSigners)).toThrow(
       'Insufficient number of signer responses. Domain may be disabled'
     )
   })

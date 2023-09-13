@@ -2,17 +2,20 @@ const HEX_REGEX = /^0x[0-9A-F]*$/i
 
 export type Address = string
 
+export type StrongAddress = `0x${string}`
+
 export const eqAddress = (a: Address, b: Address) => normalizeAddress(a) === normalizeAddress(b)
 
 export const normalizeAddress = (a: Address) => trimLeading0x(a).toLowerCase()
 
-export const isNullAddress = (a: Address) => normalizeAddress(a) === NULL_ADDRESS
+export const isNullAddress = (a: Address) => normalizeAddress(a) === normalizeAddress(NULL_ADDRESS)
 
 export const normalizeAddressWith0x = (a: Address) => ensureLeading0x(a).toLowerCase()
 
 export const trimLeading0x = (input: string) => (input.startsWith('0x') ? input.slice(2) : input)
 
-export const ensureLeading0x = (input: string) => (input.startsWith('0x') ? input : `0x${input}`)
+export const ensureLeading0x = (input: string): StrongAddress =>
+  input.startsWith('0x') ? (input as StrongAddress) : (`0x${input}` as const)
 
 // Turns '0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10'
 // into ['ce10','ce10','ce10','ce10','ce10','ce10','ce10','ce10','ce10','ce10']

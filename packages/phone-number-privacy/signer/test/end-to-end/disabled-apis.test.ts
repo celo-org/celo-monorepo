@@ -21,7 +21,6 @@ import {
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
 import 'isomorphic-fetch'
-import { getSignerVersion } from '../../src/config'
 
 require('dotenv').config()
 
@@ -32,7 +31,7 @@ const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
 
 jest.setTimeout(30000)
 
-const expectedVersion = getSignerVersion()
+const expectedVersion = process.env.DEPLOYED_SIGNER_SERVICE_VERSION!
 
 // These tests should be run when the individual APIs are disabled.
 // When run against enabled APIs, they should fail.
@@ -191,57 +190,6 @@ describe('Running against a deployed service with disabled APIs', () => {
       const body = JSON.stringify(req)
       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const response = await fetch(ODIS_SIGNER + SignerEndpoint.PNP_SIGN, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: authorization,
-        },
-        body,
-      })
-      expect(response.status).toBe(503)
-      const responseBody: PnpQuotaResponse = await response.json()
-      expect(responseBody).toStrictEqual({
-        success: false,
-        version: expectedVersion,
-        error: WarningMessage.API_UNAVAILABLE,
-      })
-    })
-  })
-
-  describe('when LEGACY_PNP API is disabled', () => {
-    it(`${SignerEndpoint.LEGACY_PNP_QUOTA} should respond with 503`, async () => {
-      const req: PnpQuotaRequest = {
-        account: ACCOUNT_ADDRESS1,
-      }
-      const body = JSON.stringify(req)
-      const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-      const response = await fetch(ODIS_SIGNER + SignerEndpoint.LEGACY_PNP_QUOTA, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: authorization,
-        },
-        body,
-      })
-      expect(response.status).toBe(503)
-      const responseBody: PnpQuotaResponse = await response.json()
-      expect(responseBody).toStrictEqual({
-        success: false,
-        version: expectedVersion,
-        error: WarningMessage.API_UNAVAILABLE,
-      })
-    })
-
-    it(`${SignerEndpoint.LEGACY_PNP_SIGN} should respond with 503`, async () => {
-      const req: SignMessageRequest = {
-        account: ACCOUNT_ADDRESS1,
-        blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
-      }
-      const body = JSON.stringify(req)
-      const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-      const response = await fetch(ODIS_SIGNER + SignerEndpoint.LEGACY_PNP_SIGN, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

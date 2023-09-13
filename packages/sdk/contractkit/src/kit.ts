@@ -27,8 +27,6 @@ import { BlockchainParametersConfig } from './wrappers/BlockchainParameters'
 import { DowntimeSlasherConfig } from './wrappers/DowntimeSlasher'
 import { ElectionConfig } from './wrappers/Election'
 import { ExchangeConfig } from './wrappers/Exchange'
-// TODO ASv2
-// import { FederatedAttestationsConfig } from './wrappers/FederatedAttestations'
 import { GasPriceMinimumConfig } from './wrappers/GasPriceMinimum'
 import { GovernanceConfig } from './wrappers/Governance'
 import { GrandaMentoConfig } from './wrappers/GrandaMento'
@@ -74,8 +72,6 @@ export interface NetworkConfig {
   stableTokens: EachCeloToken<StableTokenConfig>
   election: ElectionConfig
   attestations: AttestationsConfig
-  // TODO ASv2
-  // federatedattestations: FederatedAttestationsConfig
   governance: GovernanceConfig
   lockedGold: LockedGoldConfig
   sortedOracles: SortedOraclesConfig
@@ -113,9 +109,6 @@ export class ContractKit {
   /** helper for interacting with CELO & stable tokens */
   readonly celoTokens: CeloTokens
 
-  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
-  gasPriceSuggestionMultiplier = 5
-
   constructor(readonly connection: Connection) {
     this.registry = new AddressRegistry(connection)
     this._web3Contracts = new Web3ContractCache(this.registry)
@@ -150,8 +143,6 @@ export class ContractKit {
     const configContracts: ValidWrappers[] = [
       CeloContract.Election,
       CeloContract.Attestations,
-      // TODO ASv2
-      // CeloContract.FederatedAttestations,
       CeloContract.Governance,
       CeloContract.LockedGold,
       CeloContract.SortedOracles,
@@ -206,18 +197,7 @@ export class ContractKit {
       tokenContract === CeloContract.GoldToken
         ? undefined
         : await this.registry.addressFor(tokenContract)
-    if (address) {
-      await this.updateGasPriceInConnectionLayer(address)
-    }
     this.connection.defaultFeeCurrency = address
-  }
-
-  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
-  async updateGasPriceInConnectionLayer(currency: Address) {
-    const gasPriceMinimum = await this.contracts.getGasPriceMinimum()
-    const rawGasPrice = await gasPriceMinimum.getGasPriceMinimum(currency)
-    const gasPrice = rawGasPrice.multipliedBy(this.gasPriceSuggestionMultiplier).toFixed()
-    await this.connection.setGasPriceForCurrency(currency, gasPrice)
   }
 
   async getEpochSize(): Promise<number> {
@@ -264,14 +244,6 @@ export class ContractKit {
     return this.connection.defaultGasInflationFactor
   }
 
-  set gasPrice(price: number) {
-    this.connection.defaultGasPrice = price
-  }
-
-  get gasPrice() {
-    return this.connection.defaultGasPrice
-  }
-
   set defaultFeeCurrency(address: Address | undefined) {
     this.connection.defaultFeeCurrency = address
   }
@@ -286,13 +258,6 @@ export class ContractKit {
 
   isSyncing(): Promise<boolean> {
     return this.connection.isSyncing()
-  }
-  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
-  async fillGasPrice(tx: CeloTx): Promise<CeloTx> {
-    if (tx.feeCurrency && tx.gasPrice === '0') {
-      await this.updateGasPriceInConnectionLayer(tx.feeCurrency)
-    }
-    return this.connection.fillGasPrice(tx)
   }
 
   async sendTransaction(tx: CeloTx): Promise<TransactionResult> {

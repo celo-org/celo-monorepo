@@ -1,6 +1,8 @@
 import { NULL_ADDRESS, trimLeading0x } from '@celo/base/lib/address'
+import { toBuffer } from '@ethereumjs/util'
 import { BigNumber } from 'bignumber.js'
-import { keccak } from 'ethereumjs-util'
+import { keccak256 } from 'ethereum-cryptography/keccak'
+import { hexToBytes, utf8ToBytes } from 'ethereum-cryptography/utils'
 import * as t from 'io-ts'
 import coder from 'web3-eth-abi'
 
@@ -40,27 +42,35 @@ export interface EIP712TypedData {
 
 /** Array of all EIP-712 atomic type names. */
 export const EIP712_ATOMIC_TYPES = [
-  'bytes1',
-  'bytes32',
-  'uint8',
-  'uint64',
-  'uint256',
-  // This list should technically include all types from uint8 to uint256, and int8 to int256
-  'int8',
-  'int256',
   'bool',
   'address',
+  // bytes types from 1 to 32 bytes
+  // and uint/int types from 8 to 256 bits
+  ...(() => {
+    const result = []
+    // Putting "bigger" types first, assuming they are more likely to be used.
+    // So `EIP712_ATOMIC_TYPES.includes(...)` calls are faster. (likely useless micro-optimization :D)
+    for (let i = 32; i >= 1; i--) {
+      result.push('bytes' + i)
+      result.push('uint' + i * 8)
+      result.push('int' + i * 8)
+    }
+    return result
+  })(),
 ]
 
 export const EIP712_DYNAMIC_TYPES = ['bytes', 'string']
 
-export const EIP712_BUILTIN_TYPES = EIP712_ATOMIC_TYPES.concat(EIP712_DYNAMIC_TYPES)
+export const EIP712_BUILTIN_TYPES = EIP712_DYNAMIC_TYPES.concat(EIP712_ATOMIC_TYPES)
 
 // Regular expression used to identify and parse EIP-712 array type strings.
 const EIP712_ARRAY_REGEXP = /^(?<memberType>[\w<>\[\]_\-]+)(\[(?<fixedLength>\d+)?\])$/
 
-// Regular experssion used to identity EIP-712 integer types (e.g. int256, uint256, uint8).
+// Regular expression used to identify EIP-712 integer types (e.g. int256, uint256, uint8).
 const EIP712_INT_REGEXP = /^u?int\d*$/
+
+// Regular expression used to identify EIP-712 bytes types (e.g. bytes, bytes1, up to bytes32).
+const EIP712_BYTES_REGEXP = /^bytes\d*$/
 
 /**
  * Utility type representing an optional value in a EIP-712 compatible manner, as long as the
@@ -126,7 +136,7 @@ export const noString: EIP712Optional<string> = {
  * @return  A Buffer containing the hash of the typed data.
  */
 export function generateTypedDataHash(typedData: EIP712TypedData): Buffer {
-  return keccak(
+  return keccak256(
     Buffer.concat([
       Buffer.from('1901', 'hex'),
       structHash('EIP712Domain', typedData.domain, typedData.types),
@@ -183,7 +193,7 @@ export function encodeType(primaryType: string, types: EIP712Types): string {
 }
 
 export function typeHash(primaryType: string, types: EIP712Types): Buffer {
-  return keccak(encodeType(primaryType, types)) as Buffer
+  return keccak256(utf8ToBytes(encodeType(primaryType, types))) as Buffer
 }
 
 /** Encodes a single EIP-712 value to a 32-byte buffer */
@@ -200,12 +210,12 @@ function encodeValue(valueType: string, value: EIP712ObjectValue, types: EIP712T
     // Converting to Buffer before passing to `keccak` prevents an issue where the string is
     // interpretted as a hex-encoded string when is starts with 0x.
     // https://github.com/ethereumjs/ethereumjs-util/blob/7e3be1d97b4e11fbc4924836b8c444e644f643ac/index.js#L155-L183
-    return keccak(Buffer.from(value as string, 'utf8')) as Buffer
+    return keccak256(Buffer.from(value as string, 'utf8')) as Buffer
   }
   if (valueType === 'bytes') {
     // Allow the user to use either utf8 (plain string) or hex encoding for their bytes.
     // Note: keccak throws if the value cannot be converted into a Buffer,
-    return keccak(value as string) as Buffer
+    return toBuffer(keccak256(hexToBytes(trimLeading0x(value as string))))
   }
 
   // Encode structs as its hashStruct (e.g. keccak(typeHash || encodeData(struct)) ).
@@ -219,7 +229,7 @@ function encodeValue(valueType: string, value: EIP712ObjectValue, types: EIP712T
     // Note: If a fixed length is provided in the type, it is not checked.
     const match = EIP712_ARRAY_REGEXP.exec(valueType)
     const memberType: string = match?.groups?.memberType!
-    return keccak(
+    return keccak256(
       Buffer.concat(
         (value as EIP712ObjectValue[]).map((member) => encodeValue(memberType, member, types))
       )
@@ -248,7 +258,7 @@ export function encodeData(primaryType: string, data: EIP712Object, types: EIP71
 }
 
 export function structHash(primaryType: string, data: EIP712Object, types: EIP712Types): Buffer {
-  return keccak(
+  return keccak256(
     Buffer.concat([typeHash(primaryType, types), encodeData(primaryType, data, types)])
   ) as Buffer
 }
@@ -265,20 +275,22 @@ export function structHash(primaryType: string, data: EIP712Object, types: EIP71
  */
 export function zeroValue(primaryType: string, types: EIP712Types = {}): EIP712ObjectValue {
   // If the type is a built-in, return a pre-defined zero value.
-  if (['bytes', 'bytes1', 'bytes32'].includes(primaryType)) {
-    return Buffer.alloc(0)
-  }
-  if (['uint8', 'uint256', 'int8', 'int256'].includes(primaryType)) {
-    return 0
-  }
-  if (primaryType === 'bool') {
-    return false
-  }
-  if (primaryType === 'address') {
-    return NULL_ADDRESS
-  }
-  if (primaryType === 'string') {
-    return ''
+  if (EIP712_BUILTIN_TYPES.includes(primaryType)) {
+    if (EIP712_BYTES_REGEXP.test(primaryType)) {
+      return Buffer.alloc(0)
+    }
+    if (EIP712_INT_REGEXP.test(primaryType)) {
+      return 0
+    }
+    if (primaryType === 'bool') {
+      return false
+    }
+    if (primaryType === 'address') {
+      return NULL_ADDRESS
+    }
+    if (primaryType === 'string') {
+      return ''
+    }
   }
 
   // If the type is an array, return an empty array or an array of the given fixed length.

@@ -1,3 +1,4 @@
+// tslint:disable: ordered-imports
 import { ABIDefinition, AbiItem } from '@celo/connect'
 import Web3 from 'web3'
 import { ABI as AccountsABI } from './generated/Accounts'
@@ -8,14 +9,12 @@ import { ABI as DowntimeSlasherABI } from './generated/DowntimeSlasher'
 import { ABI as ElectionABI } from './generated/Election'
 import { ABI as EpochRewardsABI } from './generated/EpochRewards'
 import { ABI as EscrowABI } from './generated/Escrow'
-import { ABI as ExchangeABI } from './generated/Exchange'
 import { ABI as FederatedAttestationsABI } from './generated/FederatedAttestations'
 import { ABI as FeeCurrencyWhitelistABI } from './generated/FeeCurrencyWhitelist'
 import { ABI as FreezerABI } from './generated/Freezer'
 import { ABI as GasPriceMinimumABI } from './generated/GasPriceMinimum'
 import { ABI as GoldTokenABI } from './generated/GoldToken'
 import { ABI as GovernanceABI } from './generated/Governance'
-import { ABI as GrandaMentoABI } from './generated/GrandaMento'
 import { ABI as LockedGoldABI } from './generated/LockedGold'
 import { ABI as MetaTransactionWalletABI } from './generated/MetaTransactionWallet'
 import { ABI as MetaTransactionWalletDeployerABI } from './generated/MetaTransactionWalletDeployer'
@@ -24,11 +23,12 @@ import { ABI as OdisPaymentsABI } from './generated/OdisPayments'
 import { ABI as ProxyABI } from './generated/Proxy'
 import { ABI as RandomABI } from './generated/Random'
 import { ABI as RegistryABI } from './generated/Registry'
-import { ABI as ReserveABI } from './generated/Reserve'
 import { ABI as SortedOraclesABI } from './generated/SortedOracles'
-import { ABI as StableTokenABI } from './generated/StableToken'
-import { ABI as TransferWhitelistABI } from './generated/TransferWhitelist'
 import { ABI as ValidatorsABI } from './generated/Validators'
+import { ABI as ExchangeABI } from './generated/mento/Exchange'
+import { ABI as GrandaMentoABI } from './generated/mento/GrandaMento'
+import { ABI as ReserveABI } from './generated/mento/Reserve'
+import { ABI as StableTokenABI } from './generated/mento/StableToken'
 
 export const GET_IMPLEMENTATION_ABI: ABIDefinition = {
   constant: true,
@@ -126,7 +126,6 @@ const initializeAbiMap = {
   StableTokenProxy: findInitializeAbi(StableTokenABI),
   StableTokenEURProxy: findInitializeAbi(StableTokenABI),
   StableTokenBRLProxy: findInitializeAbi(StableTokenABI),
-  TransferWhitelistProxy: findInitializeAbi(TransferWhitelistABI),
   ValidatorsProxy: findInitializeAbi(ValidatorsABI),
 }
 

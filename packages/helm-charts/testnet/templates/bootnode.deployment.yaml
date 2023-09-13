@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ template "common.fullname" . }}-bootnode
   labels:
-{{ include "common.standard.labels" .  | indent 4 }}
+    {{- include "common.standard.labels" .  | nindent 4 }}
     component: bootnode
 spec:
   strategy:
@@ -11,12 +11,12 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-{{ include "common.standard.labels" .  | indent 6 }}
+      {{- include "common.standard.labels" .  | nindent 6 }}
       component: bootnode
   template:
     metadata:
       labels:
-{{ include "common.standard.labels" .  | indent 8 }}
+        {{- include "common.standard.labels" .  | nindent 8 }}
         component: bootnode
     spec:
       containers:
@@ -97,5 +97,5 @@ spec:
       {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
-{{ toYaml . | indent 8 }}
+      {{- toYaml . | nindent 8 }}
     {{- end }}
