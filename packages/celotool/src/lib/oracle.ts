@@ -4,18 +4,12 @@ import yargs from 'yargs'
 import { getCloudProviderFromContext, getDynamicEnvVarValues } from './context-utils'
 import { getOraclePrivateKeysFor, privateKeyToAddress } from './generate_utils'
 import { AksClusterConfig } from './k8s-cluster/aks'
-import { AwsClusterConfig } from './k8s-cluster/aws'
 import { BaseClusterManager, CloudProvider } from './k8s-cluster/base'
 import {
   AksHsmOracleDeployer,
   AksHsmOracleDeploymentConfig,
   AksHsmOracleIdentity,
 } from './k8s-oracle/aks-hsm'
-import {
-  AwsHsmOracleDeployer,
-  AwsHsmOracleDeploymentConfig,
-  AwsHsmOracleIdentity,
-} from './k8s-oracle/aws-hsm'
 import { BaseOracleDeployer, CurrencyPair } from './k8s-oracle/base'
 import {
   PrivateKeyOracleDeployer,
@@ -36,7 +30,6 @@ const hsmOracleDeployerGetterByCloudProvider: {
     clusterManager: BaseClusterManager
   ) => BaseOracleDeployer
 } = {
-  [CloudProvider.AWS]: getAwsHsmOracleDeployer,
   [CloudProvider.AZURE]: getAksHsmOracleDeployer,
 }
 
@@ -168,116 +161,6 @@ const aksHsmOracleIdentityConfigDynamicEnvVars: {
   [k in keyof AksHsmOracleIdentityConfig]: DynamicEnvVar
 } = {
   addressKeyVaults: DynamicEnvVar.ORACLE_ADDRESS_AZURE_KEY_VAULTS,
-}
-
-/**
- * ----------- AwsHsmOracleDeployer helpers -----------
- */
-
-/**
- * Gets an AwsHsmOracleDeployer by looking at env var values
- */
-function getAwsHsmOracleDeployer(
-  celoEnv: string,
-  context: string,
-  currencyPair: CurrencyPair,
-  useForno: boolean,
-  clusterManager: BaseClusterManager
-) {
-  const { addressKeyAliases } = getDynamicEnvVarValues(
-    awsHsmOracleIdentityConfigDynamicEnvVars,
-    { context, currencyPair },
-    {
-      addressKeyAliases: '',
-    }
-  )
-
-  const identities = getAwsHsmOracleIdentities(addressKeyAliases, currencyPair)
-  const deploymentConfig: AwsHsmOracleDeploymentConfig = {
-    context,
-    clusterConfig: clusterManager.clusterConfig as AwsClusterConfig,
-    currencyPair,
-    identities,
-    useForno,
-  }
-  return new AwsHsmOracleDeployer(deploymentConfig, celoEnv)
-}
-
-/**
- * Given a string addressKeyAliases containing comma separated info of the form:
- * <address>:<keyAlias>:<region (optional)>
- * eg: 0x0000000000000000000000000000000000000000:keyAlias0,0x0000000000000000000000000000000000000001:keyAlias1:region1
- * returns an array of AwsHsmOracleIdentity in the same order
- */
-export function getAwsHsmOracleIdentities(
-  addressKeyAliases: string,
-  currencyPair: CurrencyPair
-): AwsHsmOracleIdentity[] {
-  const identityStrings = addressKeyAliases.split(',')
-  const identities = []
-  for (const identityStr of identityStrings) {
-    const [address, keyAlias, region] = identityStr.split(':')
-    // region can be undefined
-    if (!address || !keyAlias) {
-      throw Error(`Address or key alias is invalid. Address: ${address} Key Alias: ${keyAlias}`)
-    }
-    identities.push({
-      address,
-      currencyPair,
-      keyAlias,
-      region,
-    })
-  }
-  return identities
-}
-
-/**
- * Config values pulled from env vars used for generating an AwsHsmOracleIdentity
- */
-interface AwsHsmOracleIdentityConfig {
-  addressKeyAliases: string
-}
-
-/**
- * Env vars corresponding to each value for the AwsHsmOracleIdentityConfig for a particular context
- */
-const awsHsmOracleIdentityConfigDynamicEnvVars: {
-  [k in keyof AwsHsmOracleIdentityConfig]: DynamicEnvVar
-} = {
-  addressKeyAliases: DynamicEnvVar.ORACLE_ADDRESS_AWS_KEY_ALIASES,
-}
-
-/**
- * ----------- PrivateKeyOracleDeployer helpers -----------
- */
-
-/**
- * Gets an AwsHsmOracleDeployer by looking at env var values and generating private keys
- * from the mnemonic
- */
-function getPrivateKeyOracleDeployer(
-  celoEnv: string,
-  context: string,
-  currencyPair: CurrencyPair,
-  useForno: boolean,
-  count: number
-): PrivateKeyOracleDeployer {
-  const identities: PrivateKeyOracleIdentity[] = getOraclePrivateKeysFor(
-    currencyPair,
-    fetchEnv(envVar.MNEMONIC),
-    count
-  ).map((pkey) => ({
-    address: privateKeyToAddress(pkey),
-    currencyPair,
-    privateKey: ensureLeading0x(pkey),
-  }))
-  const deploymentConfig: PrivateKeyOracleDeploymentConfig = {
-    context,
-    currencyPair,
-    identities,
-    useForno,
-  }
-  return new PrivateKeyOracleDeployer(deploymentConfig, celoEnv)
 }
 
 /**
