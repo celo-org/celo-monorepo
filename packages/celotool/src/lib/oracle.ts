@@ -164,6 +164,39 @@ const aksHsmOracleIdentityConfigDynamicEnvVars: {
 }
 
 /**
+ * ----------- PrivateKeyOracleDeployer helpers -----------
+ */
+
+/**
+ * Gets an PrivateKeyOracleDeployer by looking at env var values and generating private keys
+ * from the mnemonic
+ */
+function getPrivateKeyOracleDeployer(
+  celoEnv: string,
+  context: string,
+  currencyPair: CurrencyPair,
+  useForno: boolean,
+  count: number
+): PrivateKeyOracleDeployer {
+  const identities: PrivateKeyOracleIdentity[] = getOraclePrivateKeysFor(
+    currencyPair,
+    fetchEnv(envVar.MNEMONIC),
+    count
+  ).map((pkey) => ({
+    address: privateKeyToAddress(pkey),
+    currencyPair,
+    privateKey: ensureLeading0x(pkey),
+  }))
+  const deploymentConfig: PrivateKeyOracleDeploymentConfig = {
+    context,
+    currencyPair,
+    identities,
+    useForno,
+  }
+  return new PrivateKeyOracleDeployer(deploymentConfig, celoEnv)
+}
+
+/**
  * Config values pulled from env vars used for generating a PrivateKeyOracleIdentity
  * from a mnemonic
  */
