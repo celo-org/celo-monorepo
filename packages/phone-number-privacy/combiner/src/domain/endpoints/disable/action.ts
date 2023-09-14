@@ -6,31 +6,28 @@ import {
   DomainSchema,
   ErrorMessage,
   getSignerEndpoint,
-  send,
   SequentialDelayDomainStateSchema,
   verifyDisableDomainRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Signer, thresholdCallToSigners } from '../../../common/combine'
-import { PromiseHandler } from '../../../common/handlers'
-import { getKeyVersionInfo, sendFailure } from '../../../common/io'
+import { errorResult, ResultHandler } from '../../../common/handlers'
+import { getKeyVersionInfo } from '../../../common/io'
 import { getCombinerVersion, OdisConfig } from '../../../config'
 import { logDomainResponseDiscrepancies } from '../../services/log-responses'
 import { findThresholdDomainState } from '../../services/threshold-state'
 
-export function createDisableDomainHandler(
+export function disableDomain(
   signers: Signer[],
   config: OdisConfig
-): PromiseHandler<DisableDomainRequest> {
+): ResultHandler<DisableDomainRequest> {
   return async (request, response) => {
     if (!disableDomainRequestSchema(DomainSchema).is(request.body)) {
-      sendFailure(WarningMessage.INVALID_INPUT, 400, response)
-      return
+      return errorResult(400, WarningMessage.INVALID_INPUT)
     }
 
     if (!verifyDisableDomainRequestAuthenticity(request.body)) {
-      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
-      return
+      return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
     }
 
     // TODO remove?
@@ -57,18 +54,14 @@ export function createDisableDomainHandler(
         signers.length
       )
       if (disableDomainStatus.disabled) {
-        send(
-          response,
-          {
+        return {
+          status: 200,
+          body: {
             success: true,
             version: getCombinerVersion(),
             status: disableDomainStatus,
           },
-          200,
-          response.locals.logger
-        )
-
-        return
+        }
       }
     } catch (err) {
       response.locals.logger.error(
@@ -77,6 +70,6 @@ export function createDisableDomainHandler(
       )
     }
 
-    sendFailure(ErrorMessage.THRESHOLD_DISABLE_DOMAIN_FAILURE, maxErrorCode ?? 500, response)
+    return errorResult(maxErrorCode ?? 500, ErrorMessage.THRESHOLD_DISABLE_DOMAIN_FAILURE)
   }
 }

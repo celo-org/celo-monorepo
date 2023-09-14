@@ -8,7 +8,6 @@ import {
   ErrorType,
   getSignerEndpoint,
   OdisResponse,
-  send,
   SequentialDelayDomainStateSchema,
   verifyDomainRestrictedSignatureRequestAuthenticity,
   WarningMessage,
@@ -16,34 +15,31 @@ import {
 import assert from 'node:assert'
 import { Signer, thresholdCallToSigners } from '../../../common/combine'
 import { DomainCryptoClient } from '../../../common/crypto-clients/domain-crypto-client'
-import { PromiseHandler } from '../../../common/handlers'
-import { getKeyVersionInfo, requestHasSupportedKeyVersion, sendFailure } from '../../../common/io'
+import { errorResult, ResultHandler } from '../../../common/handlers'
+import { getKeyVersionInfo, requestHasSupportedKeyVersion } from '../../../common/io'
 import { getCombinerVersion, OdisConfig } from '../../../config'
 import { logDomainResponseDiscrepancies } from '../../services/log-responses'
 import { findThresholdDomainState } from '../../services/threshold-state'
 
-export function createDomainSignHandler(
+export function domainSign(
   signers: Signer[],
   config: OdisConfig
-): PromiseHandler<DomainRestrictedSignatureRequest> {
+): ResultHandler<DomainRestrictedSignatureRequest> {
   return async (request, response) => {
     const { logger } = response.locals
 
     if (!domainRestrictedSignatureRequestSchema(DomainSchema).is(request.body)) {
-      sendFailure(WarningMessage.INVALID_INPUT, 400, response)
-      return
+      return errorResult(400, WarningMessage.INVALID_INPUT)
     }
     if (!requestHasSupportedKeyVersion(request, config, logger)) {
-      sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
-      return
+      return errorResult(400, WarningMessage.INVALID_KEY_VERSION_REQUEST)
     }
 
     // Note that signing requests may include a nonce for replay protection that will be checked by
     // the signer, but is not checked here. As a result, requests that pass the authentication check
     // here may still fail when sent to the signer.
     if (!verifyDomainRestrictedSignatureRequestAuthenticity(request.body)) {
-      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
-      return
+      return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
     }
 
     const keyVersionInfo = getKeyVersionInfo(request, config, logger)
@@ -96,17 +92,15 @@ export function createDomainSignHandler(
           logger
         )
 
-        return send(
-          response,
-          {
+        return {
+          status: 200,
+          body: {
             success: true,
             version: getCombinerVersion(),
             signature: combinedSignature,
             status: findThresholdDomainState(keyVersionInfo, signerResponses, signers.length),
           },
-          200,
-          response.locals.logger
-        )
+        }
       } catch (err) {
         // May fail upon combining signatures if too many sigs are invalid
         logger.error('Combining signatures failed in combine')
@@ -117,7 +111,7 @@ export function createDomainSignHandler(
 
     const errorCode = maxErrorCode ?? 500
     const error = errorCodeToError(errorCode)
-    sendFailure(error, errorCode, response)
+    return errorResult(errorCode, error)
   }
 }
 

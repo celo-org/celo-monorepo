@@ -9,7 +9,6 @@ import {
   hasValidBlindedPhoneNumberParam,
   isBodyReasonablySized,
   OdisResponse,
-  send,
   SignMessageRequest,
   SignMessageRequestSchema,
   SignMessageResponseSchema,
@@ -19,33 +18,33 @@ import { Request } from 'express'
 import assert from 'node:assert'
 import { Signer, thresholdCallToSigners } from '../../../common/combine'
 import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-crypto-client'
-import { PromiseHandler } from '../../../common/handlers'
-import { getKeyVersionInfo, requestHasSupportedKeyVersion, sendFailure } from '../../../common/io'
+import { errorResult, ResultHandler } from '../../../common/handlers'
+import { getKeyVersionInfo, requestHasSupportedKeyVersion } from '../../../common/io'
 import { getCombinerVersion, OdisConfig } from '../../../config'
 import { logPnpSignerResponseDiscrepancies } from '../../services/log-responses'
 import { findCombinerQuotaState } from '../../services/threshold-state'
 
-export function createPnpSignHandler(
+export function pnpSign(
   signers: Signer[],
   config: OdisConfig,
   dekFetcher: DataEncryptionKeyFetcher
-): PromiseHandler<SignMessageRequest> {
+): ResultHandler<SignMessageRequest> {
   return async (request, response) => {
     const logger = response.locals.logger
-    if (!validateRequest(request)) {
-      sendFailure(WarningMessage.INVALID_INPUT, 400, response)
-      return
+    if (!isValidRequest(request)) {
+      return errorResult(400, WarningMessage.INVALID_INPUT)
     }
 
     if (!requestHasSupportedKeyVersion(request, config, response.locals.logger)) {
-      sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
-      return
+      return errorResult(400, WarningMessage.INVALID_KEY_VERSION_REQUEST)
     }
 
-    if (!(await authenticateUser(request, logger, dekFetcher))) {
-      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
-      return
+    if (config.shouldAuthenticate) {
+      if (!(await authenticateUser(request, logger, dekFetcher))) {
+        return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
+      }
     }
+
     const keyVersionInfo = getKeyVersionInfo(request, config, logger)
     const crypto = new BLSCryptographyClient(keyVersionInfo)
 
@@ -93,18 +92,16 @@ export function createPnpSignHandler(
           logger
         )
 
-        return send(
-          response,
-          {
+        return {
+          status: 200,
+          body: {
             success: true,
             version: getCombinerVersion(),
             signature: combinedSignature,
             ...findCombinerQuotaState(keyVersionInfo, signerResponses, warnings),
             warnings,
           },
-          200,
-          logger
-        )
+        }
       } catch (error) {
         // May fail upon combining signatures if too many sigs are invalid
         // Fallback to handleMissingSignatures
@@ -114,11 +111,11 @@ export function createPnpSignHandler(
 
     const errorCode = maxErrorCode ?? 500
     const error = errorCodeToError(errorCode)
-    sendFailure(error, errorCode, response)
+    return errorResult(errorCode, error)
   }
 }
 
-function validateRequest(
+function isValidRequest(
   request: Request<{}, {}, unknown>
 ): request is Request<{}, {}, SignMessageRequest> {
   return (
