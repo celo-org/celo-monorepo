@@ -1,6 +1,5 @@
 import { getContractKitWithAgent } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
-
 import config from './config'
 import { startCombiner, startProxy } from './server'
 

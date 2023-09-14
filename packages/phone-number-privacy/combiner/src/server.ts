@@ -128,7 +128,7 @@ export function startProxy(req: any, res: any, config: CombinerConfig) {
       throw ErrorMessage.UNKNOWN_ERROR
   }
   proxy.on('error', (err) => {
-    logger.error('Error in Proxying request to Combiner.')
+    logger.error({ err }, 'Error in Proxying request to Combiner.')
     res.status(500).json({
       success: false,
       error: err,
