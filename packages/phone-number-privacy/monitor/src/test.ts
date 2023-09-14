@@ -15,7 +15,9 @@ export async function testPNPSignQuery(
   contextName: OdisContextName,
   timeoutMs?: number,
   bypassQuota?: boolean,
-  useDEK?: boolean
+  useDEK?: boolean,
+  privateKey?: string,
+  privateKeyPercentage: number = 100
 ) {
   try {
     const odisResponse: IdentifierHashDetails = await queryOdisForSalt(
@@ -23,7 +25,9 @@ export async function testPNPSignQuery(
       contextName,
       timeoutMs,
       bypassQuota,
-      useDEK
+      useDEK,
+      privateKey,
+      privateKeyPercentage
     )
     logger.debug({ odisResponse }, 'ODIS salt request successful. System is healthy.')
   } catch (err) {
@@ -43,14 +47,18 @@ export async function testPNPSignQuery(
 export async function testPNPQuotaQuery(
   blockchainProvider: string,
   contextName: OdisContextName,
-  timeoutMs?: number
+  timeoutMs?: number,
+  privateKey?: string,
+  privateKeyPercentage: number = 100
 ) {
   logger.info(`Performing test PNP query for ${CombinerEndpointPNP.PNP_QUOTA}`)
   try {
     const odisResponse: PnpClientQuotaStatus = await queryOdisForQuota(
       blockchainProvider,
       contextName,
-      timeoutMs
+      timeoutMs,
+      privateKey,
+      privateKeyPercentage
     )
     logger.info({ odisResponse }, 'ODIS quota request successful. System is healthy.')
   } catch (err) {
@@ -88,7 +96,9 @@ export async function concurrentRPSLoadTest(
   duration: number = 0,
   bypassQuota: boolean = false,
   useDEK: boolean = false,
-  movingAverageRequests: number = 50
+  movingAverageRequests: number = 50,
+  privateKey?: string,
+  privateKeyPercentage: number = 100
 ) {
   const latencyQueue: number[] = []
   let movingAvgLatencySum = 0
@@ -128,8 +138,22 @@ export async function concurrentRPSLoadTest(
   const testFn = async () => {
     try {
       await (endpoint === CombinerEndpointPNP.PNP_SIGN
-        ? testPNPSignQuery(blockchainProvider, contextName, undefined, bypassQuota, useDEK)
-        : testPNPQuotaQuery(blockchainProvider, contextName))
+        ? testPNPSignQuery(
+            blockchainProvider,
+            contextName,
+            undefined,
+            bypassQuota,
+            useDEK,
+            privateKey,
+            privateKeyPercentage
+          )
+        : testPNPQuotaQuery(
+            blockchainProvider,
+            contextName,
+            undefined,
+            privateKey,
+            privateKeyPercentage
+          ))
     } catch (_) {
       logger.error('load test request failed')
     }
