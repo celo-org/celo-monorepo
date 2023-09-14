@@ -19,6 +19,7 @@ import {
   domainOdisServicesSigners,
   domainOdisServicesTimeoutMilliseconds,
   domainServiceName,
+  domainShouldAuthenticate,
   pnpEnabled,
   pnpFullNodeDelaysMs,
   pnpFullNodeRetryCount,
@@ -29,6 +30,7 @@ import {
   pnpOdisServicesSigners,
   pnpOdisServicesTimeoutMilliseconds,
   pnpServiceName,
+  pnpShouldAuthenticate,
   pnpShouldMockAccountService,
   serviceNameConfig,
 } from './utils/firebase-configs'
@@ -64,6 +66,7 @@ export interface OdisConfig {
   fullNodeTimeoutMs: number
   fullNodeRetryCount: number
   fullNodeRetryDelayMs: number
+  shouldAuthenticate: boolean
   shouldMockAccountService?: boolean
   mockDek?: string
 }
@@ -133,6 +136,7 @@ if (DEV_MODE) {
       fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
       fullNodeRetryCount: RETRY_COUNT,
       fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
+      shouldAuthenticate: true,
       mockDek: defaultMockDEK,
     },
     domains: {
@@ -168,6 +172,7 @@ if (DEV_MODE) {
       fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
       fullNodeRetryCount: RETRY_COUNT,
       fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
+      shouldAuthenticate: true,
     },
   }
 } else {
@@ -191,6 +196,7 @@ if (DEV_MODE) {
       fullNodeTimeoutMs: pnpFullNodeTimeoutMs.value(),
       fullNodeRetryCount: pnpFullNodeRetryCount.value(),
       fullNodeRetryDelayMs: pnpFullNodeDelaysMs.value(),
+      shouldAuthenticate: pnpShouldAuthenticate.value(),
       shouldMockAccountService: pnpShouldMockAccountService.value(),
       mockDek: pnpMockDek.value(),
     },
@@ -208,6 +214,7 @@ if (DEV_MODE) {
       fullNodeTimeoutMs: domainFullNodeTimeoutMs.value(),
       fullNodeRetryCount: domainFullNodeRetryCount.value(),
       fullNodeRetryDelayMs: domainFullNodeDelaysMs.value(),
+      shouldAuthenticate: domainShouldAuthenticate.value(),
     },
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-utils",
-  "version": "4.1.1-beta.1",
+  "version": "4.1.2-dev",
   "description": "Celo phone utils",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -22,8 +22,8 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/base": "4.1.1-beta.1",
-    "@celo/utils": "4.1.1-beta.1",
+    "@celo/base": "4.1.2-dev",
+    "@celo/utils": "4.1.2-dev",
     "@types/country-data": "^0.0.0",
     "@types/google-libphonenumber": "^7.4.23",
     "@types/node": "^10.12.18",

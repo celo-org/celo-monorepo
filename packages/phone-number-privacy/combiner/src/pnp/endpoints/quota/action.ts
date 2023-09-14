@@ -35,9 +35,10 @@ export function pnpQuota(
     }
 
     const warnings: ErrorType[] = []
-
-    if (!(await authenticateUser(request, logger, accountService.getAccount, warnings))) {
-      return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
+    if (config.shouldAuthenticate) {
+      if (!(await authenticateUser(request, logger, accountService.getAccount, warnings))) {
+        return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
+      }
     }
 
     const account = request.body.account

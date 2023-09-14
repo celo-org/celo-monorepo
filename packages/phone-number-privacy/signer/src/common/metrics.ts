@@ -61,6 +61,10 @@ export const Counters = {
     name: 'errors_thrown_after_response_sent',
     help: 'Counter for the number of errors thrown after a response was already sent',
   }),
+  connectionClosed: new Counter({
+    name: 'connection_closed',
+    help: 'Counter for the number of closed connections caught in Signer',
+  }),
 }
 const buckets = [
   0.001, 0.01, 0.1, 0.2, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.3, 2.6, 2.9, 3.5,

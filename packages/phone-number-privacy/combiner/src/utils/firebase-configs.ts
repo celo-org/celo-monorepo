@@ -45,6 +45,9 @@ export const pnpFullNodeRetryCount = defineInt('PNP_FULL_NODE_RETRY_COUNT', {
 export const pnpFullNodeDelaysMs = defineInt('PNP_FULL_NODE_DELAY_MS', {
   default: RETRY_DELAY_IN_MS,
 })
+export const pnpShouldAuthenticate = defineBoolean('PNP_SHOULD_AUTHENTICATE', {
+  default: true,
+})
 export const pnpShouldMockAccountService = defineBoolean('PNP_SHOULD_MOCK_ACCOUNT_SERVICE', {
   default: false,
 })
@@ -72,4 +75,7 @@ export const domainFullNodeRetryCount = defineInt('DOMAIN_FULL_NODE_RETRY_COUNT'
 })
 export const domainFullNodeDelaysMs = defineInt('DOMAIN_FULL_NODE_DELAY_MS', {
   default: RETRY_DELAY_IN_MS,
+})
+export const domainShouldAuthenticate = defineBoolean('DOMAIN_SHOULD_AUTHENTICATE', {
+  default: true,
 })

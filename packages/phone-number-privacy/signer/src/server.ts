@@ -14,6 +14,7 @@ import { IncomingMessage, ServerResponse } from 'node:http'
 import * as PromClient from 'prom-client'
 import {
   catchErrorHandler,
+  connectionClosedHandler,
   disabledHandler,
   Locals,
   meteringHandler,
@@ -144,7 +145,10 @@ function createHandler<R extends OdisRequest>(
     tracingHandler(
       meteringHandler(
         Histograms.responseLatency,
-        timeoutHandler(timeoutMs, enabled ? resultHandler(action) : disabledHandler)
+        timeoutHandler(
+          timeoutMs,
+          enabled ? connectionClosedHandler(resultHandler(action)) : disabledHandler
+        )
       )
     )
   )
