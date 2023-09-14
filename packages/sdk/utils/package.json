@@ -26,7 +26,7 @@
     "@ethereumjs/util": "8.0.5",
     "@types/bn.js": "^5.1.0",
     "@types/elliptic": "^6.4.9",
-    "@types/node": "^10.12.18",
+    "@types/node": "^18.7.16",
     "bignumber.js": "^9.0.0",
     "elliptic": "^6.5.4",
     "ethereum-cryptography": "1.2.0",
