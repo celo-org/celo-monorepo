@@ -34,8 +34,7 @@ library TransferHelper {
   }
 
   function safeTransferETH(address to, uint256 value) internal {
-    // TODO changed by volpe
-    // (bool success, ) = to.call{value: value}(new bytes(0));
-    // require(success, 'TransferHelper::safeTransferETH: ETH transfer failed');
+    // (bool success, ) = to.call{value: value}(new bytes(0)); // CHANGED
+    // require(success, 'TransferHelper::safeTransferETH: ETH transfer failed'); // CHANGED
   }
 }

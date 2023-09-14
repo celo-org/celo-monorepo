@@ -1,5 +1,9 @@
 pragma solidity ^0.5.13;
 
+// Lines with line with a comment `CHANGED` was changed from original
+// implementation to make it compatible with Solidity 0.5.
+// As this is a mock, security is not a concern.
+
 import "../interfaces/IUniswapV2Factory.sol";
 import ".//libraries/TransferHelper.sol";
 
@@ -12,8 +16,8 @@ import "../interfaces/IWETH.sol";
 contract MockUniswapV2Router02 is IUniswapV2Router02 {
   using SafeMathUni for uint256;
 
-  address public factory; // TODO changed by volpe
-  address public WETH; // TODO changed by volpe
+  address public factory; // CHANGED
+  address public WETH; // CHANGED
 
   bytes32 public INIT_CODE_PAIR_HASH;
 
@@ -117,7 +121,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     );
     address pair = UniswapV2Library.pairFor(factory, token, WETH, INIT_CODE_PAIR_HASH);
     TransferHelper.safeTransferFrom(token, msg.sender, pair, amountToken);
-    // IWETH(WETH).deposit{value: amountETH}(); // TODO changed by volpe
+    // IWETH(WETH).deposit{value: amountETH}(); // CHANGED
     assert(IWETH(WETH).transfer(pair, amountETH));
     liquidity = IUniswapV2Pair(pair).mint(to);
     // refund dust eth, if any
@@ -331,7 +335,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
       amounts[amounts.length - 1] >= amountOutMin,
       "UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT"
     );
-    // IWETH(WETH).deposit{value: amounts[0]}(); // TODO changed by volpe
+    // IWETH(WETH).deposit{value: amounts[0]}(); // CHANGED
     assert(
       IWETH(WETH).transfer(
         UniswapV2Library.pairFor(factory, path[0], path[1], INIT_CODE_PAIR_HASH),
@@ -392,7 +396,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     require(path[0] == WETH, "UniswapV2Router: INVALID_PATH");
     amounts = UniswapV2Library.getAmountsIn(factory, amountOut, path, INIT_CODE_PAIR_HASH);
     require(amounts[0] <= msg.value, "UniswapV2Router: EXCESSIVE_INPUT_AMOUNT");
-    // IWETH(WETH).deposit{value: amounts[0]}(); // TODO changed by volpe
+    // IWETH(WETH).deposit{value: amounts[0]}(); // CHANGED
     assert(
       IWETH(WETH).transfer(
         UniswapV2Library.pairFor(factory, path[0], path[1], INIT_CODE_PAIR_HASH),
@@ -461,7 +465,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
   ) external payable ensure(deadline) {
     require(path[0] == WETH, "UniswapV2Router: INVALID_PATH");
     uint256 amountIn = msg.value;
-    // IWETH(WETH).deposit{value: amountIn}(); // TODO changed by volpe
+    // IWETH(WETH).deposit{value: amountIn}(); // CHANGED
     assert(
       IWETH(WETH).transfer(
         UniswapV2Library.pairFor(factory, path[0], path[1], INIT_CODE_PAIR_HASH),
