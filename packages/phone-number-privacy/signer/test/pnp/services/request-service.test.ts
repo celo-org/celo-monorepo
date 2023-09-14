@@ -1,16 +1,16 @@
-import { rootLogger } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { initDatabase } from '../../../src/common/database/database'
-import {
-  PnpSignRequestRecord,
-  REQUESTS_COLUMNS,
-  REQUESTS_TABLE,
-} from '../../../src/common/database/models/request'
 import { config, SupportedDatabase, SupportedKeystore } from '../../../src/config'
 import {
   DefaultPnpRequestService,
   PnpRequestService,
 } from '../../../src/pnp/services/request-service'
+import { rootLogger } from '@celo/phone-number-privacy-common'
+import {
+  PnpSignRequestRecord,
+  REQUESTS_COLUMNS,
+  REQUESTS_TABLE,
+} from '../../../src/common/database/models/request'
 
 jest.setTimeout(20000)
 describe('request service', () => {

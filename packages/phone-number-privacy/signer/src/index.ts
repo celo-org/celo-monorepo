@@ -4,7 +4,7 @@ import { Knex } from 'knex'
 import { initDatabase } from './common/database/database'
 import { initKeyProvider } from './common/key-management/key-provider'
 import { KeyProvider } from './common/key-management/key-provider-base'
-import { DEV_MODE, SupportedDatabase, SupportedKeystore, config } from './config'
+import { config, DEV_MODE, SupportedDatabase, SupportedKeystore } from './config'
 import { DefaultPnpRequestService, MockPnpRequestService } from './pnp/services/request-service'
 import { startSigner } from './server'
 
@@ -66,5 +66,5 @@ start().catch((err) => {
 
 export { initDatabase } from './common/database/database'
 export { initKeyProvider } from './common/key-management/key-provider'
-export { SupportedDatabase, SupportedKeystore, config } from './config'
+export { config, SupportedDatabase, SupportedKeystore } from './config'
 export * from './server'

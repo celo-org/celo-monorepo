@@ -1,4 +1,3 @@
-// import opentelemetry from '@opentelemetry/api'
 import * as client from 'prom-client'
 
 const { Counter, Histogram } = client
