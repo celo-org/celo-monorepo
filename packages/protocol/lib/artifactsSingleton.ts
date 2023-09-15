@@ -1,33 +1,41 @@
-import { ContractPackage } from '../contractPackages'
+import { ContractPackage } from '../contractPackages';
 
-// This objects replicates a Truffle `artifacts.require` singleton
-// but constructed manually
 
+
+
+// Defines a minimal interface an artifact should implement
+export interface ArtifactSet {
+  require(key: string): any;
+  getProxy(key: string): any;
+}
+
+function getProxyName(contractName:string){
+  return contractName + "Proxy";
+}
 
 // This class is meant to be used to wrap truffle artifacts
-// and extend its interface
-// TODO: create abstract class with require and getProxy
-export class DefaultArtifact{
+// and extend its interface.
+// ArtifactsSingleton.wrap returns an instance of DefaultArtifact
+export class DefaultArtifact implements ArtifactSet{
   public artifacts: any
-
+  
   public constructor(artifacts) {
     this.artifacts = artifacts
   }
-
-  // TODO abstract this function
+  
   public require(key: string) {
     return this.artifacts.require(key)
   }
-
+  
   public getProxy(key: string) {
-    const proxyArtifactName = key + "Proxy"
-    console.log("getProxy", proxyArtifactName)
-    return this.require(proxyArtifactName)
+    return this.require(getProxyName(key))
   }
   
 }
 
-export class ArtifactsSingleton {
+// This objects replicates a Truffle `artifacts.require` singleton
+// but constructed manually
+export class ArtifactsSingleton implements ArtifactSet{
   public static setNetwork(network: any) {
     this.network = network
   }
@@ -49,17 +57,14 @@ export class ArtifactsSingleton {
       ArtifactsSingleton.instances[namespace] = new ArtifactsSingleton()
     }
 
-    // console.log("artifacts for that instance are", ArtifactsSingleton.instances[namespace])
     return ArtifactsSingleton.instances[namespace]
   }
 
   public static wrap(artifacts:any){
     if (artifacts instanceof ArtifactsSingleton || artifacts instanceof DefaultArtifact){
-      console.log("Using our wrap")
       return artifacts
     }
 
-    console.log("Using default")
     return new DefaultArtifact(artifacts)
   }
 
@@ -75,24 +80,21 @@ export class ArtifactsSingleton {
     this.artifacts[key] = value
   }
 
-
   public require(key: string) {
     return this.artifacts[key]
   }
 
-  //
   public getProxy(key: string, defaultArtifacts?:any) {
-    // TODO proxyArtifactName logic is duplicated in two classes
-    const proxyArtifactName = key + "Proxy"
+    const proxyArtifactName = getProxyName(key)
 
-      const toReturn = this.require(proxyArtifactName)
+    const toReturn = this.require(proxyArtifactName)
 
-      if (toReturn === undefined){
-        console.log("using default getProxy")
-        return defaultArtifacts?.require(proxyArtifactName)
-      }
+    if (toReturn === undefined){
+      // in case the package of this artifact has proxiesPath set
+      // this needs to be changed to support it, now only "/" path is supported
+      return defaultArtifacts?.require(proxyArtifactName)
+    }
 
-    console.log("using ours getProxy")
     return toReturn
   }
 }

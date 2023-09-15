@@ -153,18 +153,12 @@ export async function setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
 >(web3: Web3, artifacts: any, contractName: string, contractPackage?: ContractPackage, ...args: any[]): Promise<ContractInstance> {
   
-  const Contract = ArtifactsSingleton.getInstance(contractPackage, artifacts).require(contractName)
-  let ContractProxy
+  const wrappedArtifacts = ArtifactsSingleton.getInstance(contractPackage, artifacts)
+  const Contract = wrappedArtifacts.require(contractName)
   
-  // TODO here probably better to change to 
-  // ArtifactsSingleton.wrap(artifacts.require(contractName + 'Proxy'))
-  // and the if can be removed
-  if (contractPackage?.proxiesPath){
-    ContractProxy = artifacts.require(contractName + 'Proxy')
-  } else {
-    ContractProxy = ArtifactsSingleton.getInstance(contractPackage, artifacts).require(contractName + 'Proxy')
-
-  }
+  // getProxy function supports the case the proxy is in a different package
+  // which is the case for GasPriceMimimum
+  const ContractProxy = wrappedArtifacts.getProxy(contractName, artifacts)
 
   await Contract.detectNetwork()
   await ContractProxy.detectNetwork()
@@ -273,7 +267,7 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
 
 }
 
-// TODO remove duplicated code with makeTruffleContractForMigration
+// TODO change name
 export const makeTruffleContractForMigrationWithoutSingleton = (contractName: string, network:any, contractPath:string, web3: Web3) => {
 
   const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath}/${contractName}.json`)
@@ -292,41 +286,14 @@ export const makeTruffleContractForMigrationWithoutSingleton = (contractName: st
   })
   Contract.configureNetwork({networkType: "ethereum", provider: web3.currentProvider})
 
-  Contract.defaults({from: network.from, gas: network.gas, 
-    // gasPrice: network.gas-1, 
-    // type: 0, 
-    // maxFeePerGas:6616036
-  }
-    )
+  Contract.defaults({from: network.from, gas: network.gas})
   return Contract
 }
 
 
 export const makeTruffleContractForMigration = (contractName: string, contractPath:ContractPackage, web3: Web3) => {
   const network = ArtifactsSingleton.getNetwork()
-
-  const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath.name}/${contractName}.json`)
-  const Contract = truffleContract({
-    abi: artifact.abi,
-    unlinked_binary: artifact.bytecode,
-  })
-  
-  
-  Contract.setProvider(web3.currentProvider)
-  Contract.setNetwork(network.name)
-  
-  Contract.interfaceAdapter = createInterfaceAdapter({
-    networkType: "ethereum",
-    provider: web3.currentProvider
-  })
-  Contract.configureNetwork({networkType: "ethereum", provider: web3.currentProvider})
-
-  Contract.defaults({from: network.from, gas: network.gas, 
-    // type: 0,  
-    // gasPrice: network.gas-1
-    // maxFeePerGas:6616036
-  }
-    )
+  const Contract = makeTruffleContractForMigrationWithoutSingleton(contractName, network, contractPath.name, web3)
   ArtifactsSingleton.getInstance(contractPath).addArtifact(contractName, Contract)
   return Contract
 }
@@ -347,14 +314,13 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   if (artifactPath) {
     Contract = makeTruffleContractForMigration(name, artifactPath, web3)
     
-    // TODO probably better replace this if with
-    // ArtifactsSingleton.wrap(artifacts.require(contractName + 'Proxy'))
-    // or create a new flag in contractPackages to check if the proxy is in a different package
+    // This supports the case the proxy is in a different package
     if (artifactPath.proxiesPath){
-      // TODO remove the hardcode
-      console.log("Voy al default", name)
-      ContractProxy = artifacts.require(name + 'Proxy')  
-      // console.log(ContractProxy)
+      if (artifactPath.proxiesPath == "/"){
+        ContractProxy = artifacts.require(name + 'Proxy')  
+      } else {
+        throw "Loading proxies for custom path not supported"
+      }
     } else {
       ContractProxy = makeTruffleContractForMigration(name + 'Proxy', artifactPath, web3)
     }

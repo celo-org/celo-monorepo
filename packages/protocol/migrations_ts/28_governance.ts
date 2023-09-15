@@ -93,6 +93,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       }
     }
 
+    // This list probably needs a refactor
     const proxyAndImplementationOwnedByGovernance = [
       {
         contracts: [
@@ -131,11 +132,11 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           'StableTokenEUR',
           'StableTokenBRL',
         ],
-        __contractPackage: MENTO_PACKAGE, // TODO refactor this
+        __contractPackage: MENTO_PACKAGE,
       },
       {
         contracts: ['GasPriceMinimum'],
-        __contractPackage: SOLIDITY_08_PACKAGE, // TODO refactor this
+        __contractPackage: SOLIDITY_08_PACKAGE,
       },
     ]
 

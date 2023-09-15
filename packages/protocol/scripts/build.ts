@@ -24,7 +24,7 @@ export const ProxyContracts = [
   'FeeHandlerProxy',
   'MentoFeeHandlerSellerProxy',
   'FeeCurrencyWhitelistProxy',
-  'GasPriceMinimumProxy',
+  // 'GasPriceMinimumProxy',
   'GoldTokenProxy',
   'GovernanceApproverMultiSigProxy',
   'GovernanceProxy',
