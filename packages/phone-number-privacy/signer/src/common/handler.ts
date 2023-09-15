@@ -95,7 +95,7 @@ export function meteringHandler<R extends OdisRequest>(
   histogram: client.Histogram<string>,
   handler: PromiseHandler<R>
 ): PromiseHandler<R> {
-  return (req, res) => newMeter(histogram, req.url)(async () => await handler(req, res))
+  return (req, res) => newMeter(histogram, req.url)(async () => handler(req, res))
 }
 
 export function timeoutHandler<R extends OdisRequest>(
