@@ -2893,8 +2893,7 @@ contract('Governance', (accounts: string[]) => {
         await mockLockedGold.setAccountTotalGovernancePower(account, 0)
         await assertTransactionRevertWithReason(
           governance.votePartially(proposalId, index, yesVotes, 0, 0)
-        ),
-          "Voter doesn't have enough locked Celo [(]formerly known as Celo Gold[)]"
+        )
       })
 
       it('should revert when the index is out of bounds', async () => {
