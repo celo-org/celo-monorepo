@@ -34,6 +34,6 @@
     "@celo/contractkit": "4.1.1-dev"
   },
   "engines": {
-    "node": ">=8.13.0"
+    "node": ">=8.14.2"
   }
 }

@@ -1,5 +1,5 @@
+import { bufferToHex, toChecksumAddress } from '@ethereumjs/util'
 import BigNumber from 'bignumber.js'
-import { toChecksumAddress } from 'ethereumjs-util'
 import * as rlp from 'rlp'
 import { Address } from './address'
 
@@ -44,7 +44,7 @@ export function parseBlockExtraData(data: string): IstanbulExtra {
   const buffer = Buffer.from(data.replace(/^0x/, ''), 'hex')
   const decode: any = rlp.decode('0x' + buffer.slice(ISTANBUL_EXTRA_VANITY_BYTES).toString('hex'))
   return {
-    addedValidators: decode[0].map((addr: Buffer) => toChecksumAddress(addr.toString('hex'))),
+    addedValidators: decode[0].map((addr: Buffer) => toChecksumAddress(bufferToHex(addr))),
     addedValidatorsPublicKeys: decode[1].map((key: Buffer) => '0x' + key.toString('hex')),
     removedValidators: bigNumberFromBuffer(decode[2]),
     seal: '0x' + decode[3].toString('hex'),

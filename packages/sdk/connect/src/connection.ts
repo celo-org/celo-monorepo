@@ -1,6 +1,7 @@
 import { ensureLeading0x, toChecksumAddress } from '@celo/utils/lib/address'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix, Signature } from '@celo/utils/lib/signatureUtils'
+import { bufferToHex } from '@ethereumjs/util'
 import debugFactory from 'debug'
 import Web3 from 'web3'
 import { AbiCoder } from './abi-types'
@@ -31,7 +32,7 @@ import {
   outputCeloTxReceiptFormatter,
 } from './utils/formatter'
 import { hasProperty } from './utils/provider-utils'
-import { DefaultRpcCaller, getRandomId, RpcCaller } from './utils/rpc-caller'
+import { getRandomId, HttpRpcCaller, RpcCaller } from './utils/rpc-caller'
 import { TxParamsNormalizer } from './utils/tx-params-normalizer'
 import { toTxResult, TransactionResult } from './utils/tx-result'
 import { ReadOnlyWallet } from './wallet'
@@ -57,7 +58,7 @@ export class Connection {
   readonly paramsPopulator: TxParamsNormalizer
   rpcCaller!: RpcCaller
 
-  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
+  /** @deprecated no longer needed since gasPrice is available on node rpc */
   private currencyGasPrice: Map<Address, string> = new Map<Address, string>()
 
   constructor(readonly web3: Web3, public wallet?: ReadOnlyWallet, handleRevert = true) {
@@ -83,7 +84,7 @@ export class Connection {
     }
     try {
       if (!(provider instanceof CeloProvider)) {
-        this.rpcCaller = new DefaultRpcCaller(provider)
+        this.rpcCaller = new HttpRpcCaller(provider)
         provider = new CeloProvider(provider, this)
       }
       this.web3.setProvider(provider as any)
@@ -306,7 +307,7 @@ export class Connection {
       )
     })
 
-    const messageHash = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
+    const messageHash = bufferToHex(generateTypedDataHash(typedData))
     return parseSignatureWithoutPrefix(messageHash, signature, signer)
   }
 
@@ -341,7 +342,7 @@ export class Connection {
     return toTxResult(this.web3.eth.sendSignedTransaction(signedTransactionData))
   }
 
-  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
+  /** @deprecated no longer needed since gasPrice is available on node rpc */
   fillGasPrice(tx: CeloTx): CeloTx {
     if (tx.feeCurrency && tx.gasPrice === '0' && this.currencyGasPrice.has(tx.feeCurrency)) {
       return {
@@ -351,7 +352,7 @@ export class Connection {
     }
     return tx
   }
-  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
+  /** @deprecated no longer needed since gasPrice is available on node rpc */
   async setGasPriceForCurrency(address: Address, gasPrice: string) {
     this.currencyGasPrice.set(address, gasPrice)
   }
@@ -384,7 +385,7 @@ export class Connection {
   }
 
   getAbiCoder(): AbiCoder {
-    return (this.web3.eth.abi as unknown) as AbiCoder
+    return this.web3.eth.abi as unknown as AbiCoder
   }
 
   estimateGasWithInflationFactor = async (

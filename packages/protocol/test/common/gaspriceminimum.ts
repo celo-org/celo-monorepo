@@ -1,16 +1,19 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
-import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
+import {
+  assertEqualBN,
+  assertLogMatches2,
+  assertTransactionRevertWithReason,
+} from '@celo/protocol/lib/test-utils'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import {
-  GasPriceMinimumContract,
-  GasPriceMinimumInstance,
-  RegistryContract,
-  RegistryInstance,
-} from 'types'
+import { RegistryContract, RegistryInstance } from 'types'
+import { GasPriceMinimumContract, GasPriceMinimumInstance } from 'types/08'
+import { SOLIDITY_08_PACKAGE } from '../../contractPackages'
+import { ArtifactsSingleton } from '../../lib/artifactsSingleton'
 
 const Registry: RegistryContract = artifacts.require('Registry')
-const GasPriceMinimum: GasPriceMinimumContract = artifacts.require('GasPriceMinimum')
+const GasPriceMinimum: GasPriceMinimumContract =
+  ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE).require('GasPriceMinimum')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
@@ -33,7 +36,8 @@ contract('GasPriceMinimum', (accounts: string[]) => {
       registry.address,
       gasPriceMinimumFloor,
       targetDensity,
-      adjustmentSpeed
+      adjustmentSpeed,
+      0
     )
   })
 
@@ -64,13 +68,15 @@ contract('GasPriceMinimum', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         gasPriceMinimum.initialize(
           registry.address,
           gasPriceMinimumFloor,
           targetDensity,
-          adjustmentSpeed
-        )
+          adjustmentSpeed,
+          0
+        ),
+        'contract already initialized'
       )
     })
   })
@@ -97,11 +103,17 @@ contract('GasPriceMinimum', (accounts: string[]) => {
     })
 
     it('should revert when the provided fraction is greater than one', async () => {
-      await assertRevert(gasPriceMinimum.setAdjustmentSpeed(toFixed(3 / 2)))
+      await assertTransactionRevertWithReason(
+        gasPriceMinimum.setAdjustmentSpeed(toFixed(3 / 2)),
+        'adjustment speed must be smaller than 1'
+      )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevert(gasPriceMinimum.setAdjustmentSpeed(newAdjustmentSpeed, { from: nonOwner }))
+      await assertTransactionRevertWithReason(
+        gasPriceMinimum.setAdjustmentSpeed(newAdjustmentSpeed, { from: nonOwner }),
+        'Ownable: caller is not the owner'
+      )
     })
   })
 
@@ -127,14 +139,18 @@ contract('GasPriceMinimum', (accounts: string[]) => {
     })
 
     it('should revert when the provided fraction is greater than one', async () => {
-      await assertRevert(gasPriceMinimum.setTargetDensity(toFixed(3 / 2)))
+      await assertTransactionRevertWithReason(
+        gasPriceMinimum.setTargetDensity(toFixed(3 / 2)),
+        'target density must be smaller than 1'
+      )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         gasPriceMinimum.setTargetDensity(newTargetDensity, {
           from: nonOwner,
-        })
+        }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -161,14 +177,18 @@ contract('GasPriceMinimum', (accounts: string[]) => {
     })
 
     it('should revert when the provided floor is zero', async () => {
-      await assertRevert(gasPriceMinimum.setGasPriceMinimumFloor(0))
+      await assertTransactionRevertWithReason(
+        gasPriceMinimum.setGasPriceMinimumFloor(0),
+        'gas price minimum floor must be greater than zero'
+      )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         gasPriceMinimum.setGasPriceMinimumFloor(newGasPriceMinFloor, {
           from: nonOwner,
-        })
+        }),
+        'Ownable: caller is not the owner'
       )
     })
   })

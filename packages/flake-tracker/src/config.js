@@ -37,9 +37,12 @@ const flakeTrackerID = 71131 // This is the FlakeTracker GitHub App ID.
 //    - If true, new flakey tests will be reported as 'failures' on GitHub Checks. Note this does not affect the CI workflow.
 
 // shouldTrackFlakes => tests are retried `numRetries` times and flakey results are logged w/ test output
-const shouldTrackFlakes =
-  (isCI && repo !== 'celo-blockchain' && process.env.FLAKEY !== 'false') ||
-  process.env.FLAKEY === 'true'
+
+// XXX (soloseng and jcortejoso): disabling to skip flaker test on CI
+const shouldTrackFlakes = false
+// const shouldTrackFlakes =
+//   (isCI && repo !== 'celo-blockchain' && process.env.FLAKEY !== 'false') ||
+//   process.env.FLAKEY === 'true'
 
 // shouldLogRetryErrorsOnFailure => log raw test error immediately after every retry.
 const shouldLogRetryErrorsOnFailure = shouldTrackFlakes && process.env.LOG_ALL_RETRY_ERRORS

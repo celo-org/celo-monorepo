@@ -195,9 +195,7 @@ export class CircuitBreakerClient {
       ciphertext = crypto.publicEncrypt(
         {
           key: this.environment.publicKey,
-          // @ts-ignore support for OAEP hash option, was added in Node 12.9.0.
           oaepHash: 'sha256',
-          encoding: 'pem',
         },
         plaintext
       )

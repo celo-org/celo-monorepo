@@ -146,6 +146,7 @@ export abstract class IO<R extends OdisRequest> {
         [KEY_VERSION_HEADER]: session.keyVersionInfo.keyVersion.toString()
       },
       body: JSON.stringify(request.body),
+      // @ts-ignore: missing property `reason`
       signal: abort.signal,
     })
   }

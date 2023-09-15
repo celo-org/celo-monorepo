@@ -1,10 +1,11 @@
-import { Err, Ok, parseJsonAsResult, Result, trimLeading0x } from '@celo/base'
+import { ensureLeading0x, Err, Ok, parseJsonAsResult, Result, trimLeading0x } from '@celo/base'
 import { Address, publicKeyToAddress } from '@celo/utils/lib/address'
 import { ensureCompressed, ensureUncompressed, trimUncompressedPrefix } from '@celo/utils/lib/ecdh'
 import { AES128Decrypt, AES128Encrypt, Encrypt, IV_LENGTH } from '@celo/utils/lib/ecies'
 import { EIP712Object, EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { createHmac, randomBytes } from 'crypto'
-import { keccak256 } from 'ethereumjs-util'
+import { keccak256 } from 'ethereum-cryptography/keccak'
+import { toHex } from 'ethereum-cryptography/utils'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { join, sep } from 'path'
@@ -316,7 +317,7 @@ export const buildEIP712TypedData = async <DataType>(
       ],
     }
     message = {
-      hash: keccak256(data).toString('hex'),
+      hash: ensureLeading0x(toHex(keccak256(data))),
     }
   } else {
     const Claim = buildEIP712Schema(type!)
@@ -328,7 +329,7 @@ export const buildEIP712TypedData = async <DataType>(
       ],
     }
     message = {
-      payload: (data as unknown) as EIP712Object,
+      payload: data as unknown as EIP712Object,
     }
   }
 

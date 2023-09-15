@@ -2,6 +2,7 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertLogMatches2,
   assertRevert,
+  assertTransactionRevertWithReason,
   getEpochNumberOfBlock,
   getFirstBlockNumberForEpoch,
   jsonRpc,
@@ -108,9 +109,9 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     await validators.affiliate(groups[0], { from: validatorList[1] })
     await validators.affiliate(groups[1], { from: validatorList[2] })
     await slasher.initialize(registry.address, slashingPenalty, slashingReward, slashableDowntime)
-    await Promise.all(
-      accounts.map((account) => mockLockedGold.setAccountTotalLockedGold(account, 50000))
-    )
+    for (const account of accounts) {
+      await mockLockedGold.setAccountTotalLockedGold(account, 50000)
+    }
   })
 
   describe('#initialize()', () => {
@@ -131,13 +132,19 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     })
 
     it('can only be called once', async () => {
-      await assertRevert(slasher.initialize(registry.address, 10000, 100, 2))
+      await assertTransactionRevertWithReason(
+        slasher.initialize(registry.address, 10000, 100, 2),
+        'contract already initialized'
+      )
     })
   })
 
   describe('#setSlashingIncentives()', () => {
     it('can only be set by the owner', async () => {
-      await assertRevert(slasher.setSlashingIncentives(123, 67, { from: nonOwner }))
+      await assertTransactionRevertWithReason(
+        slasher.setSlashingIncentives(123, 67, { from: nonOwner }),
+        'Ownable: caller is not the owner'
+      )
     })
 
     it('should have set slashing incentives', async () => {
@@ -148,7 +155,10 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     })
 
     it('reward cannot be larger than penalty', async () => {
-      await assertRevert(slasher.setSlashingIncentives(123, 678))
+      await assertTransactionRevertWithReason(
+        slasher.setSlashingIncentives(123, 678),
+        'Penalty has to be larger than reward'
+      )
     })
 
     it('should emit the SlashingIncentivesSet corresponding event', async () => {
@@ -166,7 +176,10 @@ contract('DowntimeSlasher', (accounts: string[]) => {
 
   describe('#setSlashableDowntime()', () => {
     it('can only be set by the owner', async () => {
-      await assertRevert(slasher.setSlashableDowntime(23, { from: nonOwner }))
+      await assertTransactionRevertWithReason(
+        slasher.setSlashableDowntime(23, { from: nonOwner }),
+        ' Ownable: caller is not the owner'
+      )
     })
 
     it('should have set slashable downtime', async () => {
@@ -270,7 +283,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       const resp = await slasher.setBitmapForInterval(blockNumber, blockNumber + 1)
       assert.equal(resp.logs.length, 1)
 
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         slasher.setBitmapForInterval(blockNumber, blockNumber + 1),
         'bitmap already set'
       )
@@ -378,7 +391,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         // First block with every validator signatures
         await presetParentSealForBlocks(startBlock, 1, [bitmapVI01])
         const slotArrays = await calculateEverySlot(startBlock)
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           slasher.slash(
             slotArrays.startBlocks,
             slotArrays.endBlocks,
@@ -406,7 +419,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         // Last block with every validator signatures
         await presetParentSealForBlocks(startBlock + slashableDowntime - 1, 1, [bitmapVI01])
         const slotArrays = await calculateEverySlot(startBlock)
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           slasher.slash(
             slotArrays.startBlocks,
             slotArrays.endBlocks,
@@ -434,7 +447,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         // Middle block with every validator signatures
         await presetParentSealForBlocks(startBlock + intervalSize, 1, [bitmapVI01])
         const slotArrays = await calculateEverySlot(startBlock)
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           slasher.slash(
             slotArrays.startBlocks,
             slotArrays.endBlocks,
@@ -462,7 +475,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         // First block with every validator signatures
         await presetParentSealForBlocks(startBlock, 1, [bitmapVI99])
         const slotArrays = await calculateEverySlot(startBlock)
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           slasher.slash(
             slotArrays.startBlocks,
             slotArrays.endBlocks,
@@ -559,7 +572,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
               ])
             }
             await generateProofs(startBlocks, endBlocks)
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               slasher.slash(
                 startBlocks,
                 endBlocks,
@@ -572,7 +585,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
                 [],
                 []
               ),
-              'at least one endBlock is not in the boundaries of the next interval'
+              'each interval must start at most one block after the end of the previous interval'
             )
           })
         })
@@ -590,7 +603,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
             ])
           }
           await generateProofs(startBlocks, endBlocks)
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             slasher.slash(
               startBlocks,
               endBlocks,
@@ -603,7 +616,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
               [],
               []
             ),
-            'the intervals are not covering the slashableDowntime window'
+            'startBlocks and endBlocks must have the same length'
           )
         })
       })
@@ -702,7 +715,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
           // Last block with every validator signatures
           await presetParentSealForBlocks(startBlock + slashableDowntime - 1, 1, [bitmapVI01])
           const slotArrays = await calculateEverySlot(startBlock)
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             slasher.slash(
               slotArrays.startBlocks,
               slotArrays.endBlocks,
@@ -731,7 +744,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
           // Last block with every validator signatures
           await presetParentSealForBlocks(startBlock + slashableDowntime - 1, 1, [bitmapVI01])
           const slotArrays = await calculateEverySlot(startBlock)
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             slasher.slash(
               slotArrays.startBlocks,
               slotArrays.endBlocks,
@@ -802,7 +815,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
             1,
             validatorIndexInEpoch,
           ])
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             slasher.slash(
               slotArrays.startBlocks,
               slotArrays.endBlocks,
@@ -850,7 +863,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
           const slotArrays = await ensureValidatorIsSlashable(newStartBlock, [
             validatorIndexInEpoch,
           ])
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             slasher.slash(
               slotArrays.startBlocks,
               slotArrays.endBlocks,
@@ -863,7 +876,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
               [],
               []
             ),
-            'validator has a newer slash'
+            'cannot slash validator for downtime for which they may already have been slashed'
           )
         })
       })

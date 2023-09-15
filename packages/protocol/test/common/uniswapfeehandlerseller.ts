@@ -2,7 +2,7 @@
 
 // TODO remove magic numbers
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertTransactionRevertWithReason } from '@celo/protocol/lib/test-utils'
 import {
   GoldTokenContract,
   GoldTokenInstance,
@@ -12,9 +12,8 @@ import {
   UniswapFeeHandlerSellerInstance,
 } from 'types'
 
-const UniswapFeeHandlerSeller: UniswapFeeHandlerSellerContract = artifacts.require(
-  'UniswapFeeHandlerSeller'
-)
+const UniswapFeeHandlerSeller: UniswapFeeHandlerSellerContract =
+  artifacts.require('UniswapFeeHandlerSeller')
 
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -48,12 +47,16 @@ contract('UniswapFeeHandlerSeller', (accounts: string[]) => {
     })
 
     it('only owner can setRouter', async () => {
-      await assertRevert(uniswapFeeHandlerSeller.setRouter(addressA, addressB, { from: user }))
+      await assertTransactionRevertWithReason(
+        uniswapFeeHandlerSeller.setRouter(addressA, addressB, { from: user }),
+        'Ownable: caller is not the owner'
+      )
     })
 
     it("Can't set address zero", async () => {
-      await assertRevert(
-        uniswapFeeHandlerSeller.setRouter(addressA, '0x0000000000000000000000000000000000000000')
+      await assertTransactionRevertWithReason(
+        uniswapFeeHandlerSeller.setRouter(addressA, '0x0000000000000000000000000000000000000000'),
+        "Router can't be address zero."
       )
     })
 
@@ -61,7 +64,10 @@ contract('UniswapFeeHandlerSeller', (accounts: string[]) => {
       await uniswapFeeHandlerSeller.setRouter(addressA, addressB)
       await uniswapFeeHandlerSeller.setRouter(addressA, accounts[1])
       await uniswapFeeHandlerSeller.setRouter(addressA, accounts[2])
-      await assertRevert(uniswapFeeHandlerSeller.setRouter(addressA, accounts[4]))
+      await assertTransactionRevertWithReason(
+        uniswapFeeHandlerSeller.setRouter(addressA, accounts[4]),
+        'Max number of routers reached.'
+      )
     })
   })
 
@@ -88,7 +94,10 @@ contract('UniswapFeeHandlerSeller', (accounts: string[]) => {
     })
 
     it('only owner can removeRouter', async () => {
-      await assertRevert(uniswapFeeHandlerSeller.removeRouter(addressA, addressB, { from: user }))
+      await assertTransactionRevertWithReason(
+        uniswapFeeHandlerSeller.removeRouter(addressA, addressB, { from: user }),
+        'Ownable: caller is not the owner.'
+      )
     })
   })
 })

@@ -2,6 +2,10 @@ pragma solidity ^0.5.13;
 
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+// Lines with line with a comment `CHANGED` was changed from original
+// implementation to make it compatible with Solidity 0.5.
+// As this is a mock, security is not a concern.
+
 // helper methods for interacting with ERC20 tokens and sending ETH that do not consistently return true/false
 library TransferHelper {
   function safeApprove(address token, address to, uint256 value) internal {
@@ -34,8 +38,7 @@ library TransferHelper {
   }
 
   function safeTransferETH(address to, uint256 value) internal {
-    // TODO changed by volpe
-    // (bool success, ) = to.call{value: value}(new bytes(0));
-    // require(success, 'TransferHelper::safeTransferETH: ETH transfer failed');
+    // (bool success, ) = to.call{value: value}(new bytes(0)); // CHANGED
+    // require(success, 'TransferHelper::safeTransferETH: ETH transfer failed'); // CHANGED
   }
 }

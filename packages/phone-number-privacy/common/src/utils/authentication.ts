@@ -25,7 +25,8 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   contractKit: ContractKit,
   logger: Logger,
   shouldFailOpen: boolean = false,
-  warnings: ErrorType[] = []
+  warnings: ErrorType[] = [],
+  timeoutMs: number = FULL_NODE_TIMEOUT_IN_MS
 ): Promise<boolean> {
   logger.debug('Authenticating user')
 
@@ -42,7 +43,7 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   if (authMethod && authMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     let registeredEncryptionKey
     try {
-      registeredEncryptionKey = await getDataEncryptionKey(signer, contractKit, logger)
+      registeredEncryptionKey = await getDataEncryptionKey(signer, contractKit, logger, timeoutMs)
     } catch (err) {
       // getDataEncryptionKey should only throw if there is a full-node connection issue.
       // That is, it does not throw if the DEK is undefined or invalid
@@ -127,7 +128,8 @@ export function verifyDEKSignature(
 export async function getDataEncryptionKey(
   address: string,
   contractKit: ContractKit,
-  logger: Logger
+  logger: Logger,
+  timeoutMs: number
 ): Promise<string> {
   try {
     const res = await retryAsyncWithBackOffAndTimeout(
@@ -139,7 +141,7 @@ export async function getDataEncryptionKey(
       [],
       RETRY_DELAY_IN_MS,
       1.5,
-      FULL_NODE_TIMEOUT_IN_MS
+      timeoutMs
     )
     return res
   } catch (error) {
@@ -158,7 +160,8 @@ export async function isVerified(
   try {
     const res = await retryAsyncWithBackOffAndTimeout(
       async () => {
-        const attestationsWrapper: AttestationsWrapper = await contractKit.contracts.getAttestations()
+        const attestationsWrapper: AttestationsWrapper =
+          await contractKit.contracts.getAttestations()
         const {
           isVerified: _isVerified,
           completed,

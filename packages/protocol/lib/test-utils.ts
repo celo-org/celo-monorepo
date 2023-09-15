@@ -1,35 +1,40 @@
+
+import { ArtifactsSingleton } from '@celo/protocol/lib/artifactsSingleton';
+import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils';
+import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils';
+import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils';
+import { config } from '@celo/protocol/migrationsConfig';
+import { privateKeyToAddress } from '@celo/utils/lib/address';
+import { soliditySha3 } from '@celo/utils/lib/solidity';
+import BigNumber from 'bignumber.js';
+import chai from 'chai';
+import chaiSubset from 'chai-subset';
+// tslint:disable-next-line: ordered-imports
+import { spawn, SpawnOptions } from 'child_process';
+import { keccak256 } from 'ethereum-cryptography/keccak';
+import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types';
+import Web3 from 'web3';
+import { ContractPackage, MENTO_PACKAGE } from '../contractPackages';
+
 // tslint:disable: ordered-imports
-import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
-import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
-import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
-import { ArtifactsSingleton } from '@celo/protocol/lib/artifactsSingleton'
-import { config } from '@celo/protocol/migrationsConfig'
-import { privateKeyToAddress } from '@celo/utils/lib/address'
-import { soliditySha3 } from '@celo/utils/lib/solidity'
-import BigNumber from 'bignumber.js'
-import chai from 'chai'
-import chaiSubset from 'chai-subset'
-import { SpawnOptions, spawn } from 'child_process'
-import { keccak256 } from 'ethereumjs-util'
-import { AccountsInstance, GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
-import Web3 from 'web3'
-import { ContractPackage, MENTO_PACKAGE } from '../contractPackages'
+import { fromFixed } from '@celo/utils/src/fixidity';
+import { bufferToHex, toBuffer } from '@ethereumjs/util';
+import { utf8ToBytes } from 'ethereum-cryptography/utils';
+import { AccountsInstance } from 'types';
+
 
 import BN = require('bn.js')
-import { fromFixed } from '@celo/utils/src/fixidity'
 
 const isNumber = (x: any) =>
   typeof x === 'number' || (BN as any).isBN(x) || BigNumber.isBigNumber(x)
 
 chai.use(chaiSubset)
 
-const assert = chai.assert
-
 // hard coded in ganache
 export const EPOCH = 100
 
 export function stripHexEncoding(hexString: string) {
-  return hexString.substr(0, 2) === '0x' ? hexString.substr(2) : hexString
+  return hexString.substring(0, 2) === '0x' ? hexString.substring(2) : hexString
 }
 
 export function assertContainSubset(superset: any, subset: any) {
@@ -111,9 +116,9 @@ export async function assertBalance(address: string, balance: BigNumber) {
   const web3balance = new BigNumber(await web3.eth.getBalance(address))
   if (isSameAddress(block.miner, address)) {
     const blockReward = web3.utils.toWei(new BN(2), 'ether') as BigNumber
-    assertEqualBN(web3balance, balance.plus(blockReward))
+    expectBigNumberInRange(web3balance, balance.plus(blockReward))
   } else {
-    assertEqualBN(web3balance, balance)
+    expectBigNumberInRange(web3balance, balance)
   }
 }
 
@@ -125,24 +130,38 @@ export const assertThrowsAsync = async (promise: any, errorMessage: string = '')
     failed = true
   }
 
-  assert.isTrue(failed, errorMessage)
+  assert.strictEqual(true, failed, errorMessage)
 }
 
-export async function assertRevertWithReason(promise: any, expectedRevertReason: string = '') {
+export async function assertTransactionRevertWithReason(promise: any, expectedRevertReason: string = '') {
+  try {
+   await promise
+    assert.fail('Expected transaction to revert')
+  } catch (error) {
+    // Only ever tested with ganache.
+    // When it's a transaction (eg a non-view send call), error.message has a shape like:
+    // 'StatusError: Transaction: ${transactionHash} exited with an error (status 0). Reason given: ${revertMessage}.'
+    // Therefore we try to search for `${expectedRevertReason}`.
+    const revertFound: boolean =
+    error.message.search(expectedRevertReason) >= 0
+    const msg: string =
+    expectedRevertReason === '' ? `Expected "StatusError", got ${error} instead` : `Expected ${expectedRevertReason}, got ${error} instead`
+    assert(revertFound, msg)
+  }
+}
+
+export async function assertTransactionRevertWithoutReason(promise: any, errorMessage: string = '') {
+  // When a transaction reverts without a reason, error.message has a shape like:
+  // 'Transaction: ${transactionHash} exited with an error (status 0).'
   try {
     await promise
     assert.fail('Expected transaction to revert')
   } catch (error) {
-    // Only ever tested with ganache.
-    // When it's a view call, error.message has a shape like:
-    // `Returned error: VM Exception while processing transaction: revert ${revertMessage}`
-    // When it's a transaction (eg a non-view send call), error.message has a shape like:
-    // `Returned error: VM Exception while processing transaction: revert ${revertMessage} -- Reason given: ${revertMessage}.`
-    // Therefore we try to parse the first instance of `${revertMessage}`.
-    const foundRevertReason = error.message
-      .split(" -- Reason given: ")[0]
-      .split('Returned error: VM Exception while processing transaction: revert ')[1]
-    assert.equal(foundRevertReason, expectedRevertReason, 'Incorrect revert message')
+    const revertFound: boolean =
+      error.message.search('exited with an error [(]status 0[)]') >= 0
+    const msg: string =
+      errorMessage === '' ? `Expected "StatusError", got ${error} instead` : errorMessage
+    assert(revertFound, msg)
   }
 }
 
@@ -150,18 +169,23 @@ export async function assertRevertWithReason(promise: any, expectedRevertReason:
 // Note that errorMessage is not the expected revert message, but the
 // message that is provided if there is no revert.
 export async function assertRevert(promise: any, errorMessage: string = '') {
+  // Only ever tested with ganache.
+  // When it's a view call, error.message has a shape like:
+  // `Error: VM Exception while processing transaction: revert ${expectedRevertReason}`
   try {
     await promise
     assert.fail('Expected transaction to revert')
   } catch (error) {
-    const revertFound =
+    const revertFound: boolean =
       error.message.search('VM Exception while processing transaction: revert') >= 0
-    const msg = errorMessage === '' ? `Expected "revert", got ${error} instead` : errorMessage
+    const msg: string =
+      errorMessage === '' ? `Expected "revert", got ${error} instead` : errorMessage
     assert(revertFound, msg)
   }
 }
 
 export async function exec(command: string, args: string[]) {
+  console.log(`Running: ${command} ${args}`)
   return new Promise<void>((resolve, reject) => {
     const proc = spawn(command, args, {
       stdio: [process.stdout, process.stderr],
@@ -208,13 +232,21 @@ async function isPortOpen(host: string, port: number) {
 }
 
 export async function waitForPortOpen(host: string, port: number, seconds: number) {
+  console.info(`Waiting for ${host}:${port} to open for ${seconds}s`);
   const deadline = Date.now() + seconds * 1000
   do {
     if (await isPortOpen(host, port)) {
+      await delay(60000) // extra 60s just to give ganache extra time to startup
+      console.info(`Port ${host}:${port} opened`)
       return true
     }
   } while (Date.now() < deadline)
+  console.info("Port was not opened in time");
   return false
+}
+
+function delay(time) {
+  return new Promise((resolve) => setTimeout(resolve, time))
 }
 
 type ProxiedContractGetter = (
@@ -223,9 +255,9 @@ type ProxiedContractGetter = (
   contractPackage: ContractPackage, 
   ) => Promise<any>
 
-type ContratGetter = (
+type ContractGetter = (
   contractName: string,
-  contractPackage?: ContractPackage, 
+  contractPackage?: ContractPackage,
   ) => Promise<any>
 
 
@@ -234,22 +266,21 @@ export const assertProxiesSet = async (getContract: ProxiedContractGetter) => {
     for (const contractName of contractList.contracts) {
       const contract = await getContract(contractName, 'contract', contractList.__contractPackage)
       const proxy: ProxyInstance = await getContract(contractName, 'proxy', contractList.__contractPackage)
-      assert.equal(
+      assert.strictEqual(
         contract.address.toLowerCase(),
         (await proxy._getImplementation()).toLowerCase(),
         contractName + 'Proxy not pointing to the ' + contractName + ' implementation'
       )
     }
-    
   }
 }
 
-export const assertContractsRegistered = async (getContract: ContratGetter) => {
+export const assertContractsRegistered = async (getContract: any) => {
   const registry: RegistryInstance = await getContract('Registry')
   for (const proxyPackage of hasEntryInRegistry) {
     for (const contractName of proxyPackage.contracts) {
       const contract: Truffle.ContractInstance = await getContract(contractName, proxyPackage)
-      assert.equal(
+      assert.strictEqual(
         contract.address.toLowerCase(),
         (await registry.getAddressFor(soliditySha3(contractName))).toLowerCase(),
         'Registry does not have the correct information for ' + contractName
@@ -258,11 +289,11 @@ export const assertContractsRegistered = async (getContract: ContratGetter) => {
   }
 }
 
-export const assertRegistryAddressesSet = async (getContract: ContratGetter) => {
+export const assertRegistryAddressesSet = async (getContract: ContractGetter) => {
   const registry: RegistryInstance = await getContract('Registry')
   for (const contractName of usesRegistry) {
     const contract: UsingRegistryInstance = await getContract(contractName, MENTO_PACKAGE)
-    assert.equal(
+    assert.strictEqual(
       registry.address.toLowerCase(),
       (await contract.registry()).toLowerCase(),
       'Registry address is not set properly in ' + contractName
@@ -276,14 +307,14 @@ export const assertContractsOwnedByMultiSig = async (getContract: any) => {
   for (const contractList of ownedContracts) {
     for (const contractName of contractList.contracts) {
       const contractOwner: string = await (await getContract(contractName, 'proxiedContract', contractList.__contractPackage)).owner()
-      assert.equal(contractOwner, multiSigAddress, contractName + ' is not owned by the MultiSig')
+      assert.strictEqual(contractOwner, multiSigAddress, contractName + ' is not owned by the MultiSig')
     }
   }
 
   for (const contractList of proxiedContracts) {
     for (const contractName of contractList.contracts) {
       const proxyOwner = await (await getContract(contractName, 'proxy', contractList.__contractPackage))._getOwner()
-      assert.equal(proxyOwner, multiSigAddress, contractName + 'Proxy is not owned by the MultiSig')
+      assert.strictEqual(proxyOwner, multiSigAddress, contractName + 'Proxy is not owned by the MultiSig')
     }}
 }
 
@@ -293,13 +324,7 @@ export const assertFloatEquality = (
   errorMessage: string,
   epsilon = new BigNumber(0.00000001)
 ) => {
-  assert(
-    a
-      .minus(b)
-      .abs()
-      .comparedTo(epsilon) === -1,
-    errorMessage
-  )
+  assert(a.minus(b).abs().comparedTo(epsilon) === -1, errorMessage)
 }
 
 export function assertLogMatches2(
@@ -314,7 +339,7 @@ export function assertLogMatches(
   event: string,
   args: Record<string, any>
 ) {
-  assert.equal(log.event, event, `Log event name doesn\'t match`)
+  assert.strictEqual(log.event, event, `Log event name doesn\'t match`)
   assertObjectWithBNEqual(log.args, args, (arg) => `Event ${event}, arg: ${arg} do not match`)
 }
 
@@ -323,13 +348,13 @@ export function assertLogMatches(
 export function assertObjectWithBNEqual(
   actual: object,
   expected: Record<string, any>,
-  fieldErrorMsg: (field?: string) => string,
+  fieldErrorMsg: (field?: string) => string
 ) {
   const objectFields = Object.keys(actual)
     .filter((k) => k !== '__length__' && isNaN(parseInt(k, 10)))
     .sort()
 
-  assert.deepEqual(objectFields, Object.keys(expected).sort(), `Argument names do not match`)
+  assert.deepStrictEqual(objectFields, Object.keys(expected).sort(), `Argument names do not match`)
   for (const k of objectFields) {
     if (typeof expected[k] === 'function') {
       expected[k](actual[k], fieldErrorMsg(k))
@@ -348,11 +373,11 @@ export function assertObjectWithBNEqual(
           assertEqualBN(actualArray[i], expectedArray[i], fieldErrorMsg(k))
         }
       } else  {
-        assert.deepEqual(actual[k], expected[k], fieldErrorMsg(k))
+        assert.deepStrictEqual(actual[k], expected[k], fieldErrorMsg(k))
       }
     }
     else {
-      assert.equal(actual[k], expected[k], fieldErrorMsg(k))
+      assert.strictEqual(actual[k], expected[k], fieldErrorMsg(k))
     }
   }
 }
@@ -391,10 +416,7 @@ export function assertAlmostEqualBN(
   margin: number | BN | BigNumber,
   msg?: string
 ) {
-  const diff = web3.utils
-    .toBN(actual)
-    .sub(web3.utils.toBN(expected))
-    .abs()
+  const diff = web3.utils.toBN(actual).sub(web3.utils.toBN(expected)).abs()
   assert(
     web3.utils.toBN(margin).gte(diff),
     `expected ${expected.toString(10)} to be within ${margin.toString(10)} of ${actual.toString(
@@ -422,7 +444,7 @@ export function assertEqualBNArray(
   expected: number[] | BN[] | BigNumber[],
   msg?: string
 ) {
-  assert.equal(value.length, expected.length, msg)
+  assert.strictEqual(value.length, expected.length, msg)
   value.forEach((x, i) => assertEqualBN(x, expected[i]))
 }
 
@@ -445,8 +467,9 @@ export function assertGteBN(
 ) {
   assert(
     web3.utils.toBN(value).gte(web3.utils.toBN(expected)),
-    `expected ${value.toString()} to be greater than or equal to ${expected.toString()}. ${msg ||
-      ''}`
+    `expected ${value.toString()} to be greater than or equal to ${expected.toString()}. ${
+      msg || ''
+    }`
   )
 }
 
@@ -516,7 +539,7 @@ export function getOffsetForMinerSelection(
 }
 
 export const assertSameAddress = (value: string, expected: string, msg?: string) => {
-  assert.equal(expected.toLowerCase(), value.toLowerCase(), msg)
+  assert.strictEqual(expected.toLowerCase(), value.toLowerCase(), msg)
 }
 
 export function createMatcher<A>(assertFn: (value: A, expected: A, msg?: string) => void) {
@@ -633,7 +656,12 @@ export const getDerivedKey = (offset: number, address: string, accounts: string[
   return '0x' + aKey.toString('hex')
 }
 
-export const unlockAndAuthorizeKey = async (offset: number, authorizeFn: any, account: string, accounts: string[]) => {
+export const unlockAndAuthorizeKey = async (
+  offset: number,
+  authorizeFn: any,
+  account: string,
+  accounts: string[]
+) => {
   const key = getDerivedKey(offset, account, accounts)
   const addr = privateKeyToAddress(key)
   // @ts-ignore
@@ -649,8 +677,8 @@ export const unlockAndAuthorizeKey = async (offset: number, authorizeFn: any, ac
 }
 
 export const authorizeAndGenerateVoteSigner = async (accountsInstance: AccountsInstance, account: string, accounts: string[]) => {
-  const roleHash = keccak256('celo.org/core/vote')
-  const role = '0x' + roleHash.toString('hex')
+  const roleHash = keccak256(utf8ToBytes('celo.org/core/vote'))
+  const role = bufferToHex(toBuffer(roleHash))
   
   const signer = await unlockAndAuthorizeKey(
     KeyOffsets.VALIDATING_KEY_OFFSET,
@@ -658,6 +686,12 @@ export const authorizeAndGenerateVoteSigner = async (accountsInstance: AccountsI
     account,
     accounts
   )
+  // fund singer
+  await web3.eth.sendTransaction({
+      from: accounts[9],
+      to: signer,
+      value:  web3.utils.toWei('1', 'ether'),
+    })
 
   await accountsInstance.completeSignerAuthorization(account, role, { from: signer })
 
@@ -673,7 +707,7 @@ export async function createAndAssertDelegatorDelegateeSigners(accountsInstance:
       accountsInstance,
       delegator,
       accounts
-    )
+      )
     assert.notEqual(delegator, delegatorSigner)
     assert.equal(await accountsInstance.voteSignerToAccount(delegatorSigner), delegator)
   }
@@ -683,7 +717,7 @@ export async function createAndAssertDelegatorDelegateeSigners(accountsInstance:
       accountsInstance,
       delegatee,
       accounts
-    )
+      )
     assert.notEqual(delegatee, delegateeSigner)
     assert.equal(await accountsInstance.voteSignerToAccount(delegateeSigner), delegatee)
   }
@@ -705,7 +739,10 @@ export async function assertDelegatorDelegateeAmounts(
   assertEqualBN(currentAmount, amount)
 }
 
-export function expectBigNumberInRange(real: BigNumber, expected: BigNumber, range: BigNumber) {
+export function expectBigNumberInRange(real: BigNumber,
+  expected: BigNumber,
+  range: BigNumber = new BigNumber("10000000000000000") // gas
+  ) {
   expect(
     real.plus(range).gte(expected),
     `Number ${real.toString()} is not in range <${expected.minus(range).toString()}, ${expected

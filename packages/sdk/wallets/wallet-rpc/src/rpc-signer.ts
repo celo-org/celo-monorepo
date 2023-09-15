@@ -8,7 +8,7 @@ import BN from 'bn.js'
 const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
 const currentTimeInSeconds = () => Math.floor(Date.now() / 1000)
 
-const toRpcHex = (val: string | number | BigNumber | BN | undefined) => {
+const toRpcHex = (val: string | number | BN | undefined) => {
   if (typeof val === 'number' || val instanceof BigNumber) {
     return ensureLeading0x(val.toString(16))
   } else if (typeof val === 'string') {
@@ -73,7 +73,7 @@ export class RpcSigner implements Signer {
 
   init = (privateKey: string, passphrase: string) =>
     this.callAndCheckResponse(RpcSignerEndpoint.ImportAccount, [
-      trimLeading0x(privateKey),
+      ensureLeading0x(privateKey),
       passphrase,
     ])
 

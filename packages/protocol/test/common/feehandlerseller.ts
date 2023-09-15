@@ -2,7 +2,7 @@
 
 // TODO remove magic numbers
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertEqualBN, assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertEqualBN, assertTransactionRevertWithReason } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
   GoldTokenContract,
@@ -15,13 +15,11 @@ import {
   UniswapFeeHandlerSellerInstance,
 } from 'types'
 
-const MentoFeeHandlerSeller: MentoFeeHandlerSellerContract = artifacts.require(
-  'MentoFeeHandlerSeller'
-)
+const MentoFeeHandlerSeller: MentoFeeHandlerSellerContract =
+  artifacts.require('MentoFeeHandlerSeller')
 
-const UniswapFeeHandlerSeller: UniswapFeeHandlerSellerContract = artifacts.require(
-  'UniswapFeeHandlerSeller'
-)
+const UniswapFeeHandlerSeller: UniswapFeeHandlerSellerContract =
+  artifacts.require('UniswapFeeHandlerSeller')
 
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -48,7 +46,7 @@ contract('FeeHandlerSeller', (accounts: string[]) => {
     mentoFeeHandlerSeller = await MentoFeeHandlerSeller.new(true)
     contractsToTest = [mentoFeeHandlerSeller, uniswapFeeHandlerSeller]
     for (const contract of contractsToTest) {
-      contract.initialize(registry.address, [], [])
+      await contract.initialize(registry.address, [], [])
     }
   })
 
@@ -69,7 +67,10 @@ contract('FeeHandlerSeller', (accounts: string[]) => {
       const receiver = web3.eth.accounts.create().address
       for (const contract of contractsToTest) {
         await goldToken.transfer(contract.address, oneCelo)
-        await assertRevert(contract.transfer(goldToken.address, oneCelo, receiver, { from: user }))
+        await assertTransactionRevertWithReason(
+          contract.transfer(goldToken.address, oneCelo, receiver, { from: user }),
+          'Ownable: caller is not the owner'
+        )
       }
     })
   })
@@ -84,7 +85,10 @@ contract('FeeHandlerSeller', (accounts: string[]) => {
 
     it('only owner can setMinimumReports', async () => {
       for (const contract of contractsToTest) {
-        await assertRevert(contract.setMinimumReports(goldToken.address, 1, { from: user }))
+        await assertTransactionRevertWithReason(
+          contract.setMinimumReports(goldToken.address, 1, { from: user }),
+          'Ownable: caller is not the owner.'
+        )
       }
     })
   })

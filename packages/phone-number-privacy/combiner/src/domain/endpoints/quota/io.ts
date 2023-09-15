@@ -26,16 +26,10 @@ import { getCombinerVersion } from '../../../config'
 export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.DOMAIN_QUOTA_STATUS
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
-  readonly requestSchema: t.Type<
-    DomainQuotaStatusRequest,
-    DomainQuotaStatusRequest,
-    unknown
-  > = domainQuotaStatusRequestSchema(DomainSchema)
-  readonly responseSchema: t.Type<
-    DomainQuotaStatusResponse,
-    DomainQuotaStatusResponse,
-    unknown
-  > = domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema)
+  readonly requestSchema: t.Type<DomainQuotaStatusRequest, DomainQuotaStatusRequest, unknown> =
+    domainQuotaStatusRequestSchema(DomainSchema)
+  readonly responseSchema: t.Type<DomainQuotaStatusResponse, DomainQuotaStatusResponse, unknown> =
+    domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema)
 
   async init(
     request: Request<{}, {}, unknown>,

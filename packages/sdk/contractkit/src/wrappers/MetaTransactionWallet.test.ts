@@ -1,8 +1,9 @@
-import { Address, ensureLeading0x } from '@celo/base/lib/address'
+import { Address } from '@celo/base/lib/address'
 import { Signature } from '@celo/base/lib/signatureUtils'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import MTWContract from '@celo/protocol/build/contracts/MetaTransactionWallet.json'
 import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
+import { bufferToHex } from '@ethereumjs/util'
 import BigNumber from 'bignumber.js'
 import { newKitFromWeb3 } from '../kit'
 import { GoldTokenWrapper } from './GoldTokenWrapper'
@@ -127,7 +128,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
         0,
         chainId
       )
-      const offChainDigest = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
+      const offChainDigest = bufferToHex(generateTypedDataHash(typedData))
 
       expect(onChainDigest).toEqual(offChainDigest)
     })

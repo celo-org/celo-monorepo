@@ -6,7 +6,7 @@ import {
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
-  assertRevertWithReason,
+  assertTransactionRevertWithReason,
   createAndAssertDelegatorDelegateeSigners,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -109,7 +109,10 @@ contract('LockedGold', (accounts: string[]) => {
     })
 
     it('should revert if already initialized', async () => {
-      await assertRevert(lockedGold.initialize(registry.address, unlockingPeriod))
+      await assertTransactionRevertWithReason(
+        lockedGold.initialize(registry.address, unlockingPeriod),
+        'contract already initialized'
+      )
     })
   })
 
@@ -122,7 +125,10 @@ contract('LockedGold', (accounts: string[]) => {
     })
 
     it('should revert when not called by the owner', async () => {
-      await assertRevert(lockedGold.setRegistry(anAddress, { from: nonOwner }))
+      await assertTransactionRevertWithReason(
+        lockedGold.setRegistry(anAddress, { from: nonOwner }),
+        'Ownable: caller is not the owner'
+      )
     })
   })
 
@@ -146,11 +152,17 @@ contract('LockedGold', (accounts: string[]) => {
     })
 
     it('should revert when the unlockingPeriod is unchanged', async () => {
-      await assertRevert(lockedGold.setUnlockingPeriod(unlockingPeriod))
+      await assertTransactionRevertWithReason(
+        lockedGold.setUnlockingPeriod(unlockingPeriod),
+        'Unlocking period not changed'
+      )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevert(lockedGold.setUnlockingPeriod(newUnlockingPeriod, { from: nonOwner }))
+      await assertTransactionRevertWithReason(
+        lockedGold.setUnlockingPeriod(newUnlockingPeriod, { from: nonOwner }),
+        'Ownable: caller is not the owner'
+      )
     })
   })
 
@@ -193,8 +205,11 @@ contract('LockedGold', (accounts: string[]) => {
     })
 
     it('should revert when the account does not exist', async () => {
-      // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-      await assertRevert(lockedGold.lock({ value, from: accounts[1] }))
+      await assertTransactionRevertWithReason(
+        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+        lockedGold.lock({ value, from: accounts[1] }),
+        'Must first register address with Account.createAccount'
+      )
     })
   })
 
@@ -266,7 +281,10 @@ contract('LockedGold', (accounts: string[]) => {
         })
 
         it('should revert when requesting gold that is voted with', async () => {
-          await assertRevert(lockedGold.unlock(value))
+          await assertTransactionRevertWithReason(
+            lockedGold.unlock(value),
+            'Not enough unlockable celo. Celo is locked in voting.'
+          )
         })
 
         describe('when the account is requesting only non voting gold', () => {
@@ -584,7 +602,10 @@ contract('LockedGold', (accounts: string[]) => {
       describe('when unlocking would yield a locked gold balance less than the required value', () => {
         describe('when the the current time is earlier than the requirement time', () => {
           it('should revert', async () => {
-            await assertRevert(lockedGold.unlock(value))
+            await assertTransactionRevertWithReason(
+              lockedGold.unlock(value),
+              "Either account doesn't have enough locked Celo or locked Celo is being used for voting."
+            )
           })
         })
       })
@@ -687,7 +708,10 @@ contract('LockedGold', (accounts: string[]) => {
       describe('when relocking value greater than the value of the pending withdrawal', () => {
         const value = pendingWithdrawalValue + 1
         it('should revert', async () => {
-          await assertRevert(lockedGold.relock(index, value))
+          await assertTransactionRevertWithReason(
+            lockedGold.relock(index, value),
+            'Requested value larger than pending value'
+          )
         })
       })
     })
@@ -722,7 +746,10 @@ contract('LockedGold', (accounts: string[]) => {
 
     describe('when a pending withdrawal does not exist', () => {
       it('should revert', async () => {
-        await assertRevert(lockedGold.relock(index, pendingWithdrawalValue))
+        await assertTransactionRevertWithReason(
+          lockedGold.relock(index, pendingWithdrawalValue),
+          'Bad pending withdrawal index'
+        )
       })
     })
   })
@@ -762,14 +789,20 @@ contract('LockedGold', (accounts: string[]) => {
 
       describe('when it is before the availablity time', () => {
         it('should revert', async () => {
-          await assertRevert(lockedGold.withdraw(index))
+          await assertTransactionRevertWithReason(
+            lockedGold.withdraw(index),
+            'Pending withdrawal not available'
+          )
         })
       })
     })
 
     describe('when a pending withdrawal does not exist', () => {
       it('should revert', async () => {
-        await assertRevert(lockedGold.withdraw(index))
+        await assertTransactionRevertWithReason(
+          lockedGold.withdraw(index),
+          'Bad pending withdrawal index'
+        )
       })
     })
   })
@@ -787,13 +820,17 @@ contract('LockedGold', (accounts: string[]) => {
       assert.equal(bytes, (await lockedGold.getSlashingWhitelist())[0])
     })
     it('can only be called by owner', async () => {
-      await assertRevert(
-        lockedGold.addSlasher(CeloContractName.DowntimeSlasher, { from: accounts[1] })
+      await assertTransactionRevertWithReason(
+        lockedGold.addSlasher(CeloContractName.DowntimeSlasher, { from: accounts[1] }),
+        'Ownable: caller is not the owner'
       )
     })
     it('cannot add a slasher twice', async () => {
       await lockedGold.addSlasher(CeloContractName.DowntimeSlasher)
-      await assertRevert(lockedGold.addSlasher(CeloContractName.DowntimeSlasher))
+      await assertTransactionRevertWithReason(
+        lockedGold.addSlasher(CeloContractName.DowntimeSlasher),
+        'Cannot add slasher ID twice.'
+      )
     })
   })
 
@@ -808,19 +845,29 @@ contract('LockedGold', (accounts: string[]) => {
       assert.equal(0, (await lockedGold.getSlashingWhitelist()).length)
     })
     it('can only be called by owner', async () => {
-      await assertRevert(
-        lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 0, { from: accounts[1] })
+      await assertTransactionRevertWithReason(
+        lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 0, { from: accounts[1] }),
+        'Ownable: caller is not the owner'
       )
     })
     it('reverts when index too large', async () => {
-      await assertRevert(lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 100))
+      await assertTransactionRevertWithReason(
+        lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 100),
+        'Provided index exceeds whitelist bounds.'
+      )
     })
     it('reverts when key does not exists', async () => {
-      await assertRevert(lockedGold.removeSlasher(CeloContractName.GovernanceSlasher, 100))
+      await assertTransactionRevertWithReason(
+        lockedGold.removeSlasher(CeloContractName.GovernanceSlasher, 100),
+        'Cannot remove slasher ID not yet added.'
+      )
     })
     it('reverts when index and key have mismatch', async () => {
       await lockedGold.addSlasher(CeloContractName.GovernanceSlasher)
-      await assertRevert(lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 1))
+      await assertTransactionRevertWithReason(
+        lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 1),
+        "Index doesn't match identifier"
+      )
     })
   })
 
@@ -896,9 +943,8 @@ contract('LockedGold', (accounts: string[]) => {
       })
 
       it('should update total voting power of delegatee', async () => {
-        const totalAccountGovernanceVotingPower = await lockedGold.getAccountTotalGovernanceVotingPower(
-          delegatee
-        )
+        const totalAccountGovernanceVotingPower =
+          await lockedGold.getAccountTotalGovernanceVotingPower(delegatee)
         assertEqualBN(totalAccountGovernanceVotingPower, value)
       })
 
@@ -931,7 +977,7 @@ contract('LockedGold', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           lockedGold.slash(
             account,
             penalty,
@@ -941,7 +987,8 @@ contract('LockedGold', (accounts: string[]) => {
             [NULL_ADDRESS],
             [0],
             { from: accounts[2] }
-          )
+          ),
+          'Caller is not a whitelisted slasher.'
         )
       })
     })
@@ -1065,7 +1112,7 @@ contract('LockedGold', (accounts: string[]) => {
       const penalty = value
       const reward = value / 2
 
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         lockedGold.slash(
           account,
           penalty,
@@ -1106,14 +1153,14 @@ contract('LockedGold', (accounts: string[]) => {
 
   describe('#delegateGovernanceVotes', () => {
     it('should revert when delegatee is not account', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         lockedGold.delegateGovernanceVotes(zeroAddress(), toFixed(10 / 100)),
         'Must first register address with Account.createAccount'
       )
     })
 
     it('should revert when delegator is not an account', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         lockedGold.delegateGovernanceVotes(zeroAddress(), toFixed(10 / 100), { from: accounts[1] }),
         'Must first register address with Account.createAccount'
       )
@@ -1181,13 +1228,13 @@ contract('LockedGold', (accounts: string[]) => {
           const value = 1000
 
           beforeEach(async () => {
-            await lockedGold.lock({ value, from: delegator })
-            await lockedGold.lock({ value, from: delegator2 })
+            await lockedGold.lock({ value: value.toString(), from: delegator })
+            await lockedGold.lock({ value: value.toString(), from: delegator2 })
           })
 
           it('should revert when delegating as validator', async () => {
             await mockValidators.setValidator(accounts[0])
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               lockedGold.delegateGovernanceVotes(delegatee1, toFixed(10 / 100)),
               'Validators cannot delegate votes.'
             )
@@ -1195,7 +1242,7 @@ contract('LockedGold', (accounts: string[]) => {
 
           it('should revert when delegating as validator group', async () => {
             await mockValidators.setValidatorGroup(accounts[0])
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               lockedGold.delegateGovernanceVotes(delegatee1, 10),
               'Validator groups cannot delegate votes.'
             )
@@ -1213,7 +1260,7 @@ contract('LockedGold', (accounts: string[]) => {
             })
 
             it('should revert when incorrect percent amount is inserted', async () => {
-              await assertRevertWithReason(
+              await assertTransactionRevertWithReason(
                 lockedGold.delegateGovernanceVotes(zeroAddress(), toFixed(101 / 100)),
                 'Delegate fraction must be less than or equal to 1'
               )
@@ -1225,7 +1272,7 @@ contract('LockedGold', (accounts: string[]) => {
               })
 
               it('should revert when delagating votes that are currently voting for proposal', async () => {
-                await assertRevertWithReason(
+                await assertTransactionRevertWithReason(
                   lockedGold.delegateGovernanceVotes(delegatee1, toFixed(100 / 100)),
                   'Cannot delegate votes that are voting in referendum'
                 )
@@ -1233,7 +1280,7 @@ contract('LockedGold', (accounts: string[]) => {
 
               it('should revert when voting for proposal with votes that are currently used in referendum (2 delegatees)', async () => {
                 await lockedGold.delegateGovernanceVotes(delegatee1, toFixed(99 / 100))
-                await assertRevertWithReason(
+                await assertTransactionRevertWithReason(
                   lockedGold.delegateGovernanceVotes(delegatee2, toFixed(1 / 100)),
                   'Cannot delegate votes that are voting in referendum'
                 )
@@ -1253,7 +1300,7 @@ contract('LockedGold', (accounts: string[]) => {
                 )
               })
               it('should revert when delegating more than 100% in two steps (different delegatees)', async () => {
-                await assertRevertWithReason(
+                await assertTransactionRevertWithReason(
                   lockedGold.delegateGovernanceVotes(delegatee2, toFixed(100 / 100)),
                   'Cannot delegate more than 100%'
                 )
@@ -1347,7 +1394,7 @@ contract('LockedGold', (accounts: string[]) => {
               describe('When locked more gold and redelagate', () => {
                 let resp2: Truffle.TransactionResponse
                 beforeEach(async () => {
-                  await lockedGold.lock({ value, from: delegator })
+                  await lockedGold.lock({ value: value.toString(), from: delegator })
                   resp2 = await lockedGold.delegateGovernanceVotes(
                     delegatee1,
                     toFixed(percentsToDelegate / 100)
@@ -1437,8 +1484,8 @@ contract('LockedGold', (accounts: string[]) => {
           let delegateeSigner2
 
           beforeEach(async () => {
-            await lockedGold.lock({ value, from: delegator })
-            await lockedGold.lock({ value, from: delegator2 })
+            await lockedGold.lock({ value: value.toString(), from: delegator })
+            await lockedGold.lock({ value: value.toString(), from: delegator2 })
             ;[delegatorSigner, delegateeSigner1] = await createAndAssertDelegatorDelegateeSigners(
               accountsInstance,
               accounts,
@@ -1465,7 +1512,7 @@ contract('LockedGold', (accounts: string[]) => {
             })
 
             it('should revert when incorrect percent amount is inserted', async () => {
-              await assertRevertWithReason(
+              await assertTransactionRevertWithReason(
                 lockedGold.delegateGovernanceVotes(zeroAddress(), toFixed(101 / 100)),
                 'Delegate fraction must be less than or equal to 1'
               )
@@ -1477,7 +1524,7 @@ contract('LockedGold', (accounts: string[]) => {
               })
 
               it('should revert when delegating votes that are currently voting for proposal', async () => {
-                await assertRevertWithReason(
+                await assertTransactionRevertWithReason(
                   lockedGold.delegateGovernanceVotes(delegateeSigner1, toFixed(100 / 100), {
                     from: delegatorSigner,
                   }),
@@ -1489,7 +1536,7 @@ contract('LockedGold', (accounts: string[]) => {
                 await lockedGold.delegateGovernanceVotes(delegateeSigner1, toFixed(99 / 100), {
                   from: delegator,
                 })
-                await assertRevertWithReason(
+                await assertTransactionRevertWithReason(
                   lockedGold.delegateGovernanceVotes(delegateeSigner2, toFixed(1 / 100), {
                     from: delegator,
                   }),
@@ -1514,7 +1561,7 @@ contract('LockedGold', (accounts: string[]) => {
                 )
               })
               it('should revert when delegating more than 100% in two steps (different delegatees)', async () => {
-                await assertRevertWithReason(
+                await assertTransactionRevertWithReason(
                   lockedGold.delegateGovernanceVotes(delegateeSigner2, toFixed(100 / 100), {
                     from: delegatorSigner,
                   }),
@@ -1646,7 +1693,7 @@ contract('LockedGold', (accounts: string[]) => {
               describe('When locked more gold and redelagate', () => {
                 let resp2: Truffle.TransactionResponse
                 beforeEach(async () => {
-                  await lockedGold.lock({ value, from: delegator })
+                  await lockedGold.lock({ value: value.toString(), from: delegator })
                   resp2 = await lockedGold.delegateGovernanceVotes(
                     delegateeSigner1,
                     toFixed(percentsToDelegate / 100),
@@ -1733,7 +1780,7 @@ contract('LockedGold', (accounts: string[]) => {
 
         beforeEach(async () => {
           await lockedGold.setMaxDelegateesCount(2)
-          await lockedGold.lock({ value, from: delegator })
+          await lockedGold.lock({ value: value.toString(), from: delegator })
         })
 
         describe('When delegated to allow count yet', () => {
@@ -1752,7 +1799,7 @@ contract('LockedGold', (accounts: string[]) => {
           })
 
           it('should revert when trying to add extra delegatee', async () => {
-            await assertRevertWithReason(
+            await assertTransactionRevertWithReason(
               lockedGold.delegateGovernanceVotes(delegatee3, toFixed(1 / 100), { from: delegator }),
               'Too many delegatees'
             )
@@ -1774,14 +1821,14 @@ contract('LockedGold', (accounts: string[]) => {
 
       describe('When trying to delegate to more then maxDelegateeCount with vote signers', () => {
         const value = 1000
-        let delegatorSigner
-        let delegateeSigner1
-        let delegateeSigner2
-        let delegateeSigner3
+        let delegatorSigner: string
+        let delegateeSigner1: string
+        let delegateeSigner2: string
+        let delegateeSigner3: string
 
         beforeEach(async () => {
           await lockedGold.setMaxDelegateesCount(2)
-          await lockedGold.lock({ value, from: delegator })
+          await lockedGold.lock({ value: value.toString(), from: delegator })
           ;[delegatorSigner, delegateeSigner1] = await createAndAssertDelegatorDelegateeSigners(
             accountsInstance,
             accounts,
@@ -1812,7 +1859,7 @@ contract('LockedGold', (accounts: string[]) => {
           })
 
           it('should revert when trying to add extra delegatee', async () => {
-            await assertRevertWithReason(
+            await assertTransactionRevertWithReason(
               lockedGold.delegateGovernanceVotes(delegateeSigner3, toFixed(1 / 100), {
                 from: delegatorSigner,
               }),
@@ -1838,14 +1885,14 @@ contract('LockedGold', (accounts: string[]) => {
 
   describe('#revokeDelegatedGovernanceVotes()', () => {
     it('should revert when incorrect percent amount is inserted', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         lockedGold.revokeDelegatedGovernanceVotes(zeroAddress(), toFixed(101 / 100)),
         'Revoke fraction must be less than or equal to 1'
       )
     })
 
     it('should revert when nothing delegated', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         lockedGold.revokeDelegatedGovernanceVotes(zeroAddress(), toFixed(10 / 100)),
         'Not enough total delegated percents'
       )
@@ -1867,8 +1914,8 @@ contract('LockedGold', (accounts: string[]) => {
           await accountsInstance.createAccount({ from: delegatee1 })
           await accountsInstance.createAccount({ from: delegatee2 })
 
-          await lockedGold.lock({ value, from: delegator })
-          await lockedGold.lock({ value, from: delegator2 })
+          await lockedGold.lock({ value: value.toString(), from: delegator })
+          await lockedGold.lock({ value: value.toString(), from: delegator2 })
 
           await lockedGold.delegateGovernanceVotes(delegatee1, toFixed(percentsToDelegate / 100))
           assertEqualBN(
@@ -1879,7 +1926,7 @@ contract('LockedGold', (accounts: string[]) => {
         })
 
         it('should revert when trying to revert more percent than delegated', async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             lockedGold.revokeDelegatedGovernanceVotes(zeroAddress(), toFixed(100 / 100)),
             'Not enough total delegated percents'
           )
@@ -1947,7 +1994,7 @@ contract('LockedGold', (accounts: string[]) => {
                 await lockedGold.getAccountTotalGovernanceVotingPower(delegatee1),
                 delegatedAmount + (delegatedAmount - amountToRevoke)
               )
-              await lockedGold.lock({ value, from: delegator })
+              await lockedGold.lock({ value: value.toString(), from: delegator })
             })
 
             describe('When revoking percentage such as that with newly locked amount it would decrease below zero', () => {
@@ -2166,8 +2213,8 @@ contract('LockedGold', (accounts: string[]) => {
           await accountsInstance.createAccount({ from: delegatee1 })
           await accountsInstance.createAccount({ from: delegatee2 })
 
-          await lockedGold.lock({ value, from: delegator })
-          await lockedGold.lock({ value, from: delegator2 })
+          await lockedGold.lock({ value: value.toString(), from: delegator })
+          await lockedGold.lock({ value: value.toString(), from: delegator2 })
           ;[delegatorSigner, delegatee1Signer] = await createAndAssertDelegatorDelegateeSigners(
             accountsInstance,
             accounts,
@@ -2197,7 +2244,7 @@ contract('LockedGold', (accounts: string[]) => {
         })
 
         it('should revert when trying to revert more percent than delegated', async () => {
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             lockedGold.revokeDelegatedGovernanceVotes(zeroAddress(), toFixed(100 / 100)),
             'Not enough total delegated percents'
           )
@@ -2268,7 +2315,7 @@ contract('LockedGold', (accounts: string[]) => {
                 await lockedGold.getAccountTotalGovernanceVotingPower(delegatee1),
                 delegatedAmount + (delegatedAmount - amountToRevoke)
               )
-              await lockedGold.lock({ value, from: delegator })
+              await lockedGold.lock({ value: value.toString(), from: delegator })
             })
 
             describe('When revoking percentage such as that with newly locked amount it would decrease below zero', () => {
@@ -2501,7 +2548,7 @@ contract('LockedGold', (accounts: string[]) => {
       beforeEach(async () => {
         await accountsInstance.createAccount({ from: delegatee })
         await accountsInstance.createAccount({ from: delegator })
-        await lockedGold.lock({ value, from: delegator })
+        await lockedGold.lock({ value: value.toString(), from: delegator })
       })
 
       describe('When only delegated', () => {
@@ -2527,7 +2574,7 @@ contract('LockedGold', (accounts: string[]) => {
 
       describe('When delegatee has locked celo', () => {
         beforeEach(async () => {
-          await lockedGold.lock({ value, from: delegatee })
+          await lockedGold.lock({ value: value.toString(), from: delegatee })
         })
 
         it('should return correct value when locked', async () => {
@@ -2581,8 +2628,8 @@ contract('LockedGold', (accounts: string[]) => {
         await accountsInstance.createAccount({ from: delegatee })
         await accountsInstance.createAccount({ from: delegator })
 
-        await lockedGold.lock({ value, from: delegatee })
-        await lockedGold.lock({ value, from: delegator })
+        await lockedGold.lock({ value: value.toString(), from: delegatee })
+        await lockedGold.lock({ value: value.toString(), from: delegator })
 
         await lockedGold.delegateGovernanceVotes(delegatee, toFixed(delegatedPercent / 100), {
           from: delegator,
@@ -2621,7 +2668,7 @@ contract('LockedGold', (accounts: string[]) => {
       const delegatedAmount = (value / 100) * delegatedPercent
 
       beforeEach(async () => {
-        await lockedGold.lock({ value, from: delegator })
+        await lockedGold.lock({ value: value.toString(), from: delegator })
         await lockedGold.delegateGovernanceVotes(delegatee, toFixed(delegatedPercent / 100), {
           from: delegator,
         })
@@ -2639,7 +2686,7 @@ contract('LockedGold', (accounts: string[]) => {
       describe('When locked more celo', () => {
         const updatedDelegatedAmount = ((value * 2) / 100) * delegatedPercent
         beforeEach(async () => {
-          await lockedGold.lock({ value, from: delegator })
+          await lockedGold.lock({ value: value.toString(), from: delegator })
         })
 
         it('should return equal amounts', async () => {
@@ -2652,9 +2699,8 @@ contract('LockedGold', (accounts: string[]) => {
         })
 
         it('should update total voting power of delegatee', async () => {
-          const totalAccountGovernanceVotingPower = await lockedGold.getAccountTotalGovernanceVotingPower(
-            delegatee
-          )
+          const totalAccountGovernanceVotingPower =
+            await lockedGold.getAccountTotalGovernanceVotingPower(delegatee)
           assertEqualBN(totalAccountGovernanceVotingPower, delegatedAmount * 2)
         })
       })
@@ -2679,7 +2725,7 @@ contract('LockedGold', (accounts: string[]) => {
         const delegatedAmount = (value / 100) * delegatedPercent
 
         beforeEach(async () => {
-          await lockedGold.lock({ value, from: delegator })
+          await lockedGold.lock({ value: value.toString(), from: delegator })
           await lockedGold.delegateGovernanceVotes(
             delegateeSigner,
             toFixed(delegatedPercent / 100),
@@ -2690,13 +2736,11 @@ contract('LockedGold', (accounts: string[]) => {
         })
 
         it('should return equal amounts', async () => {
-          const [
-            expectedSigner,
-            actualSigner,
-          ] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
-            delegatorSigner,
-            delegateeSigner
-          )
+          const [expectedSigner, actualSigner] =
+            await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
+              delegatorSigner,
+              delegateeSigner
+            )
 
           const [expected, actual] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
             delegator,
@@ -2712,17 +2756,15 @@ contract('LockedGold', (accounts: string[]) => {
         describe('When locked more celo', () => {
           const updatedDelegatedAmount = ((value * 2) / 100) * delegatedPercent
           beforeEach(async () => {
-            await lockedGold.lock({ value, from: delegator })
+            await lockedGold.lock({ value: value.toString(), from: delegator })
           })
 
           it('should return equal amounts', async () => {
-            const [
-              expectedSigner,
-              actualSigner,
-            ] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
-              delegatorSigner,
-              delegateeSigner
-            )
+            const [expectedSigner, actualSigner] =
+              await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
+                delegatorSigner,
+                delegateeSigner
+              )
 
             const [expected, actual] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
               delegator,
@@ -2736,13 +2778,11 @@ contract('LockedGold', (accounts: string[]) => {
           })
 
           it('should update total voting power of delegatee', async () => {
-            const totalAccountGovernanceVotingPower = await lockedGold.getAccountTotalGovernanceVotingPower(
-              delegatee
-            )
+            const totalAccountGovernanceVotingPower =
+              await lockedGold.getAccountTotalGovernanceVotingPower(delegatee)
 
-            const totalAccountGovernanceVotingPowerSigner = await lockedGold.getAccountTotalGovernanceVotingPower(
-              delegateeSigner
-            )
+            const totalAccountGovernanceVotingPowerSigner =
+              await lockedGold.getAccountTotalGovernanceVotingPower(delegateeSigner)
 
             assertEqualBN(totalAccountGovernanceVotingPowerSigner, 0)
             assertEqualBN(totalAccountGovernanceVotingPower, delegatedAmount * 2)
@@ -2763,7 +2803,7 @@ contract('LockedGold', (accounts: string[]) => {
     beforeEach(async () => {
       await accountsInstance.createAccount({ from: delegatee })
       await accountsInstance.createAccount({ from: delegator })
-      await lockedGold.lock({ value, from: delegator })
+      await lockedGold.lock({ value: value.toString(), from: delegator })
     })
 
     describe('When no vote signer', () => {
@@ -2787,7 +2827,7 @@ contract('LockedGold', (accounts: string[]) => {
 
       describe('When delegator locked more celo', () => {
         beforeEach(async () => {
-          await lockedGold.lock({ value, from: delegator })
+          await lockedGold.lock({ value: value.toString(), from: delegator })
           await lockedGold.updateDelegatedAmount(delegator, delegatee)
         })
 
@@ -2838,7 +2878,7 @@ contract('LockedGold', (accounts: string[]) => {
 
       describe('When delegator locked more celo', () => {
         beforeEach(async () => {
-          await lockedGold.lock({ value, from: delegator })
+          await lockedGold.lock({ value: value.toString(), from: delegator })
           await lockedGold.updateDelegatedAmount(delegatorSigner, delegateeSigner)
         })
 

@@ -2,7 +2,7 @@ import { build_directory, config } from '@celo/protocol/migrationsConfig'
 import { RegistryInstance } from 'types'
 import { setInitialProxyImplementation } from '../lib/web3-utils'
 
-const Artifactor = require('truffle-artifactor')
+const Artifactor = require('@truffle/artifactor')
 
 const name = 'Registry'
 const Contract = artifacts.require(name)

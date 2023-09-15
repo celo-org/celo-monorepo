@@ -8,7 +8,7 @@ import {
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { FeeCurrencyWhitelistInstance, FreezerInstance, SortedOraclesInstance } from 'types'
-import { ReserveInstance, StableTokenInstance } from 'types/mento'
+import { ReserveInstance, StableTokenEURInstance } from 'types/mento'
 import Web3 from 'web3'
 import { MENTO_PACKAGE } from '../contractPackages'
 import { ArtifactsSingleton } from '../lib/artifactsSingleton'
@@ -16,55 +16,53 @@ import { ArtifactsSingleton } from '../lib/artifactsSingleton'
 const truffle = require('@celo/protocol/truffle-config.js')
 
 const initializeArgs = async (): Promise<any[]> => {
-  const rate = toFixed(config.stableToken.inflationRate)
+  const rate = toFixed(config.stableTokenEUR.inflationRate)
   return [
-    config.stableToken.tokenName,
-    config.stableToken.tokenSymbol,
-    config.stableToken.decimals,
+    config.stableTokenEUR.tokenName,
+    config.stableTokenEUR.tokenSymbol,
+    config.stableTokenEUR.decimals,
     config.registry.predeployedProxyAddress,
     rate.toString(),
-    config.stableToken.inflationPeriod,
-    config.stableToken.initialBalances.addresses,
-    config.stableToken.initialBalances.values,
-    'Exchange', // USD
+    config.stableTokenEUR.inflationPeriod,
+    config.stableTokenEUR.initialBalances.addresses,
+    config.stableTokenEUR.initialBalances.values,
+    'ExchangeEUR',
   ]
 }
 
-module.exports = deploymentForCoreContract<StableTokenInstance>(
+// TODO make this general (do it!)
+module.exports = deploymentForCoreContract<StableTokenEURInstance>(
   web3,
   artifacts,
-  CeloContractName.StableToken,
+  CeloContractName.StableTokenEUR,
   initializeArgs,
-  async (stableToken: StableTokenInstance, _web3: Web3, networkName: string) => {
-    if (config.stableToken.frozen) {
+  async (stableToken: StableTokenEURInstance, _web3: Web3, networkName: string) => {
+    if (config.stableTokenEUR.frozen) {
       const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
         'Freezer',
         artifacts
       )
       await freezer.freeze(stableToken.address)
     }
+    const sortedOracles: SortedOraclesInstance =
+      await getDeployedProxiedContract<SortedOraclesInstance>('SortedOracles', artifacts)
 
-    const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<SortedOraclesInstance>(
-      'SortedOracles',
-      artifacts
-    )
-
-    for (const oracle of config.stableToken.oracles) {
-      console.info(`Adding ${oracle} as an Oracle for StableToken (USD)`)
+    for (const oracle of config.stableTokenEUR.oracles) {
+      console.info(`Adding ${oracle} as an Oracle for StableToken (EUR)`)
       await sortedOracles.addOracle(stableToken.address, ensureLeading0x(oracle))
     }
 
-    const goldPrice = config.stableToken.goldPrice
+    const goldPrice = config.stableTokenEUR.goldPrice
     if (goldPrice) {
       const fromAddress = truffle.networks[networkName].from
-      const isOracle = config.stableToken.oracles.some((o) => eqAddress(o, fromAddress))
+      const isOracle = config.stableTokenEUR.oracles.some((o) => eqAddress(o, fromAddress))
       if (!isOracle) {
         console.warn(
           `Gold price specified in migration but ${fromAddress} not explicitly authorized as oracle, authorizing...`
         )
         await sortedOracles.addOracle(stableToken.address, ensureLeading0x(fromAddress))
       }
-      console.info('Reporting price of StableToken (USD) to oracle')
+      console.info('Reporting price of StableToken (EUR) to oracle')
       await sortedOracles.report(
         stableToken.address,
         toFixed(goldPrice),
@@ -75,15 +73,16 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
         'Reserve',
         ArtifactsSingleton.getInstance(MENTO_PACKAGE)
       )
-      console.info('Adding StableToken (USD) to Reserve')
+      console.info('Adding StableToken (EUR) to Reserve')
       await reserve.addToken(stableToken.address)
     }
 
-    console.info('Whitelisting StableToken (USD) as a fee currency')
-    const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract<FeeCurrencyWhitelistInstance>(
-      'FeeCurrencyWhitelist',
-      artifacts
-    )
+    console.info('Whitelisting StableToken (EUR) as a fee currency')
+    const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance =
+      await getDeployedProxiedContract<FeeCurrencyWhitelistInstance>(
+        'FeeCurrencyWhitelist',
+        artifacts
+      )
     await feeCurrencyWhitelist.addToken(stableToken.address)
   },
   MENTO_PACKAGE

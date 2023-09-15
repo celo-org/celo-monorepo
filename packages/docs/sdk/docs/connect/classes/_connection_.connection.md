@@ -318,7 +318,7 @@ ___
 
 *Defined in [connection.ts:327](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L327)*
 
-**`deprecated`** no longer needed since gasPrice is available on minimumClientVersion node rpc
+**`deprecated`** no longer needed since gasPrice is available on node rpc
 
 **Parameters:**
 
@@ -656,7 +656,7 @@ ___
 
 *Defined in [connection.ts:337](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/connection.ts#L337)*
 
-**`deprecated`** no longer needed since gasPrice is available on minimumClientVersion node rpc
+**`deprecated`** no longer needed since gasPrice is available on node rpc
 
 **Parameters:**
 

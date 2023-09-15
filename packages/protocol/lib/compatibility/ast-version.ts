@@ -1,21 +1,25 @@
 // tslint:disable: max-classes-per-file
-import { Artifact } from '@celo/protocol/lib/compatibility/internal'
-import { ContractVersion, ContractVersionChecker, ContractVersionCheckerIndex, ContractVersionDelta, ContractVersionDeltaIndex, ContractVersionIndex, DEFAULT_VERSION_STRING } from '@celo/protocol/lib/compatibility/version'
-import { BuildArtifacts } from '@openzeppelin/upgrades'
-import { isLibrary } from './report'
-const VM = require('ethereumjs-vm').default
+import { Artifact } from '@celo/protocol/lib/compatibility/internal';
+import { ContractVersion, ContractVersionChecker, ContractVersionCheckerIndex, ContractVersionDelta, ContractVersionDeltaIndex, ContractVersionIndex, DEFAULT_VERSION_STRING } from '@celo/protocol/lib/compatibility/version';
+import { Address as EJSAddress } from "@ethereumjs/util";
+import { VM } from "@ethereumjs/vm";
+import { BuildArtifacts } from '@openzeppelin/upgrades';
+import { isLibrary } from './report';
 const abi = require('ethereumjs-abi')
 
 /**
  * A mapping {contract name => {@link ContractVersion}}.
  */
 export class ASTContractVersions {
-  static fromArtifacts = async (artifacts: BuildArtifacts): Promise<ASTContractVersions>=> {
+  static fromArtifacts = async (artifactsSet: BuildArtifacts[]): Promise<ASTContractVersions>=> {
     const contracts = {}
 
-    await Promise.all(artifacts.listArtifacts().filter(c => !isLibrary(c.contractName, artifacts)).map(async (artifact) => {
-      contracts[artifact.contractName] = await getContractVersion(artifact)
-    }))
+    for (const artifacts of artifactsSet){
+      await Promise.all(artifacts.listArtifacts().filter(c => !isLibrary(c.contractName, [artifacts])).map(async (artifact) => {
+        contracts[artifact.contractName] = await getContractVersion(artifact)
+      }))
+    }
+
     return new ASTContractVersions(contracts)
   }
 
@@ -29,17 +33,17 @@ export class ASTContractVersions {
  * If the contract version cannot be retrieved, returns version 1.1.0.0 by default.
  */
 export async function getContractVersion(artifact: Artifact): Promise<ContractVersion> {
-  const vm = new VM()
+  const vm = await VM.create();
   const bytecode = artifact.deployedBytecode
   const data = '0x' + abi.methodID('getVersionNumber', []).toString('hex')
   const nullAddress = '0000000000000000000000000000000000000000'
   // Artificially link all libraries to the null address.
   const linkedBytecode = bytecode.split(/[_]+[A-Za-z0-9]+[_]+/).join(nullAddress)
-  const result = await vm.runCall({
-    to: Buffer.from(nullAddress, 'hex'),
-    caller: Buffer.from(nullAddress, 'hex'),
+  const result = await vm.evm.runCall({
+    to:new EJSAddress(Buffer.from(nullAddress, 'hex')) ,
+    caller: new EJSAddress(Buffer.from(nullAddress, 'hex')),
     code: Buffer.from(linkedBytecode.slice(2), 'hex'),
-    static: true,
+    isStatic: true,
     data: Buffer.from(data.slice(2), 'hex')
   })
   if (result.execResult.exceptionError === undefined) {
@@ -53,9 +57,9 @@ export async function getContractVersion(artifact: Artifact): Promise<ContractVe
 }
 
 export class ASTContractVersionsChecker {
-  static create = async (oldArtifacts: BuildArtifacts, newArtifacts: BuildArtifacts, expectedVersionDeltas: ContractVersionDeltaIndex): Promise<ASTContractVersionsChecker> => {
-    const oldVersions = await ASTContractVersions.fromArtifacts(oldArtifacts)
-    const newVersions = await ASTContractVersions.fromArtifacts(newArtifacts)
+  static create = async (oldArtifacts: BuildArtifacts, newArtifactsSet: BuildArtifacts[], expectedVersionDeltas: ContractVersionDeltaIndex): Promise<ASTContractVersionsChecker> => {
+    const oldVersions = await ASTContractVersions.fromArtifacts([oldArtifacts])
+    const newVersions = await ASTContractVersions.fromArtifacts(newArtifactsSet)
     const contracts = {}
     Object.keys(newVersions.contracts).map((contract:string) => {
       const versionDelta = expectedVersionDeltas[contract] === undefined ? ContractVersionDelta.fromChanges(false, false, false, false) : expectedVersionDeltas[contract]
@@ -64,6 +68,7 @@ export class ASTContractVersionsChecker {
     })
     return new ASTContractVersionsChecker(contracts)
   }
+  
   constructor(public readonly contracts: ContractVersionCheckerIndex) {}
 
   /**

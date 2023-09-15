@@ -30,16 +30,10 @@ import { getCombinerVersion, OdisConfig } from '../../../config'
 export class PnpSignIO extends IO<SignMessageRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.PNP_SIGN
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
-  readonly requestSchema: t.Type<
-    SignMessageRequest,
-    SignMessageRequest,
-    unknown
-  > = SignMessageRequestSchema
-  readonly responseSchema: t.Type<
-    SignMessageResponse,
-    SignMessageResponse,
-    unknown
-  > = SignMessageResponseSchema
+  readonly requestSchema: t.Type<SignMessageRequest, SignMessageRequest, unknown> =
+    SignMessageRequestSchema
+  readonly responseSchema: t.Type<SignMessageResponse, SignMessageResponse, unknown> =
+    SignMessageResponseSchema
 
   constructor(readonly config: OdisConfig, readonly kit: ContractKit) {
     super(config)
@@ -84,7 +78,14 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     request: Request<{}, {}, SignMessageRequest>,
     logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger, this.config.shouldFailOpen)
+    return authenticateUser(
+      request,
+      this.kit,
+      logger,
+      this.config.shouldFailOpen,
+      [],
+      this.config.fullNodeTimeoutMs
+    )
   }
 
   sendSuccess(

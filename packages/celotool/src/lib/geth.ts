@@ -262,7 +262,7 @@ const checkBlockscoutResponse = (
 
 const fetchBlockscoutTxInfo = async (url: string, txHash: string) => {
   const response = await fetch(`${url}/api?module=transaction&action=gettxinfo&txhash=${txHash}`)
-  return response.json()
+  return response.json() as any
 }
 
 const validateBlockscout = async (

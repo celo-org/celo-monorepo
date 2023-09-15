@@ -29,11 +29,8 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.PNP_QUOTA
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
   readonly requestSchema: t.Type<PnpQuotaRequest, PnpQuotaRequest, unknown> = PnpQuotaRequestSchema
-  readonly responseSchema: t.Type<
-    PnpQuotaResponse,
-    PnpQuotaResponse,
-    unknown
-  > = PnpQuotaResponseSchema
+  readonly responseSchema: t.Type<PnpQuotaResponse, PnpQuotaResponse, unknown> =
+    PnpQuotaResponseSchema
 
   constructor(readonly config: OdisConfig, readonly kit: ContractKit) {
     super(config)
@@ -66,7 +63,14 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   }
 
   async authenticate(request: Request<{}, {}, PnpQuotaRequest>, logger: Logger): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger, this.config.shouldFailOpen)
+    return authenticateUser(
+      request,
+      this.kit,
+      logger,
+      this.config.shouldFailOpen,
+      [],
+      this.config.fullNodeTimeoutMs
+    )
   }
 
   sendSuccess(

@@ -512,15 +512,14 @@ export type DomainRestrictedSignatureRequestHeader = KeyVersionHeader
 export type DisableDomainRequestHeader = undefined
 export type DomainQuotaStatusRequestHeader = undefined
 
-export type DomainRequestHeader<
-  R extends DomainRequest
-> = R extends DomainRestrictedSignatureRequest
-  ? DomainRestrictedSignatureRequestHeader
-  : never | R extends DisableDomainRequest
-  ? DisableDomainRequestHeader
-  : never | R extends DomainQuotaStatusRequest
-  ? DomainQuotaStatusRequestHeader
-  : never
+export type DomainRequestHeader<R extends DomainRequest> =
+  R extends DomainRestrictedSignatureRequest
+    ? DomainRestrictedSignatureRequestHeader
+    : never | R extends DisableDomainRequest
+    ? DisableDomainRequestHeader
+    : never | R extends DomainQuotaStatusRequest
+    ? DomainQuotaStatusRequestHeader
+    : never
 
 export type SignMessageRequestHeader = KeyVersionHeader & PnpAuthHeader
 

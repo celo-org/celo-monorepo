@@ -21,6 +21,7 @@ import { AuthorizedSignerAccessor } from './offchain/accessors/authorized-signer
 import { SchemaErrors, SchemaErrorTypes } from './offchain/accessors/errors'
 import { PrivateNameAccessor, PublicNameAccessor } from './offchain/accessors/name'
 import { MockStorageWriter } from './offchain/storage-writers'
+import fetchMock from './__mocks__/cross-fetch'
 
 const testname = 'test'
 const testPayload = { name: testname }

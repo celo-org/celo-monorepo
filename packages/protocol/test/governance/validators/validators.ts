@@ -8,6 +8,7 @@ import {
   assertEqualDpBN,
   assertRevert,
   assertSameAddress,
+  assertTransactionRevertWithReason,
   currentEpochNumber,
   mineBlocks,
   mineToNextEpoch,
@@ -217,7 +218,7 @@ contract('Validators', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         validators.initialize(
           registry.address,
           groupLockedGoldRequirements.value,
@@ -231,7 +232,8 @@ contract('Validators', (accounts: string[]) => {
           maxGroupSize,
           commissionUpdateDelay,
           downtimeGracePeriod
-        )
+        ),
+        'contract already initialized'
       )
     })
   })
@@ -264,10 +266,11 @@ contract('Validators', (accounts: string[]) => {
 
         describe('when called by a non-owner', () => {
           it('should revert', async () => {
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               validators.setMembershipHistoryLength(newLength, {
                 from: nonOwner,
-              })
+              }),
+              'Ownable: caller is not the owner'
             )
           })
         })
@@ -275,7 +278,10 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the length is the same', () => {
         it('should revert', async () => {
-          await assertRevert(validators.setMembershipHistoryLength(membershipHistoryLength))
+          await assertTransactionRevertWithReason(
+            validators.setMembershipHistoryLength(membershipHistoryLength),
+            'Membership history length not changed'
+          )
         })
       })
     })
@@ -309,10 +315,11 @@ contract('Validators', (accounts: string[]) => {
 
         describe('when called by a non-owner', () => {
           it('should revert', async () => {
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               validators.setMaxGroupSize(newSize, {
                 from: nonOwner,
-              })
+              }),
+              'Ownable: caller is not the owner'
             )
           })
         })
@@ -320,7 +327,10 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the size is the same', () => {
         it('should revert', async () => {
-          await assertRevert(validators.setMaxGroupSize(maxGroupSize))
+          await assertTransactionRevertWithReason(
+            validators.setMaxGroupSize(maxGroupSize),
+            'Max group size not changed'
+          )
         })
       })
     })
@@ -363,12 +373,13 @@ contract('Validators', (accounts: string[]) => {
 
         describe('when called by a non-owner', () => {
           it('should revert', async () => {
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               validators.setGroupLockedGoldRequirements(
                 newRequirements.value,
                 newRequirements.duration,
                 { from: nonOwner }
-              )
+              ),
+              'Ownable: caller is not the owner'
             )
           })
         })
@@ -376,11 +387,12 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the requirements are the same', () => {
         it('should revert', async () => {
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             validators.setGroupLockedGoldRequirements(
               groupLockedGoldRequirements.value,
               groupLockedGoldRequirements.duration
-            )
+            ),
+            'Group requirements not changed'
           )
         })
       })
@@ -424,12 +436,13 @@ contract('Validators', (accounts: string[]) => {
 
         describe('when called by a non-owner', () => {
           it('should revert', async () => {
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               validators.setValidatorLockedGoldRequirements(
                 newRequirements.value,
                 newRequirements.duration,
                 { from: nonOwner }
-              )
+              ),
+              'Ownable: caller is not the owner'
             )
           })
         })
@@ -437,11 +450,12 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the requirements are the same', () => {
         it('should revert', async () => {
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             validators.setValidatorLockedGoldRequirements(
               validatorLockedGoldRequirements.value,
               validatorLockedGoldRequirements.duration
-            )
+            ),
+            'Validator requirements not changed'
           )
         })
       })
@@ -485,14 +499,15 @@ contract('Validators', (accounts: string[]) => {
 
         describe('when called by a non-owner', () => {
           it('should revert', async () => {
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               validators.setValidatorScoreParameters(
                 newParameters.exponent,
                 newParameters.adjustmentSpeed,
                 {
                   from: nonOwner,
                 }
-              )
+              ),
+              'Ownable: caller is not the owner'
             )
           })
         })
@@ -500,11 +515,12 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the lockups are the same', () => {
         it('should revert', async () => {
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             validators.setValidatorScoreParameters(
               validatorScoreParameters.exponent,
               validatorScoreParameters.adjustmentSpeed
-            )
+            ),
+            'Adjustment speed and exponent not changed'
           )
         })
       })
@@ -540,14 +556,20 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the size is the same', () => {
         it('should revert', async () => {
-          await assertRevert(validators.setMaxGroupSize(maxGroupSize))
+          await assertTransactionRevertWithReason(
+            validators.setMaxGroupSize(maxGroupSize),
+            'Max group size not changed'
+          )
         })
       })
     })
 
     describe('when called by a non-owner', () => {
       it('should revert', async () => {
-        await assertRevert(validators.setMaxGroupSize(maxGroupSize, { from: nonOwner }))
+        await assertTransactionRevertWithReason(
+          validators.setMaxGroupSize(maxGroupSize, { from: nonOwner }),
+          'Ownable: caller is not the owner'
+        )
       })
     })
   })
@@ -569,7 +591,7 @@ contract('Validators', (accounts: string[]) => {
         const sig = await getParsedSignatureOfAddress(web3, validator, signer)
         await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
         const publicKey = await addressToPublicKey(signer, web3.eth.sign)
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           validators.registerValidator(publicKey, blsPublicKey, blsPoP),
           'Cannot vote for more than max number of groups'
         )
@@ -581,7 +603,7 @@ contract('Validators', (accounts: string[]) => {
         const sig = await getParsedSignatureOfAddress(web3, validator, signer)
         await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
         const publicKey = await addressToPublicKey(signer, web3.eth.sign)
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           validators.registerValidator(publicKey, blsPublicKey, blsPoP),
           'Cannot delegate governance power'
         )
@@ -678,7 +700,10 @@ contract('Validators', (accounts: string[]) => {
       it('should revert', async () => {
         publicKey = await addressToPublicKey(validator, web3.eth.sign)
         await validators.registerValidator(publicKey, blsPublicKey, blsPoP)
-        await assertRevert(validators.registerValidator(publicKey, blsPublicKey, blsPoP))
+        await assertTransactionRevertWithReason(
+          validators.registerValidator(publicKey, blsPublicKey, blsPoP),
+          'Already registered'
+        )
       })
     })
 
@@ -690,7 +715,10 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         const publicKey = await addressToPublicKey(validator, web3.eth.sign)
-        await assertRevert(validators.registerValidator(publicKey, blsPublicKey, blsPoP))
+        await assertTransactionRevertWithReason(
+          validators.registerValidator(publicKey, blsPublicKey, blsPoP),
+          'Already registered'
+        )
       })
     })
 
@@ -704,7 +732,10 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         const publicKey = await addressToPublicKey(validator, web3.eth.sign)
-        await assertRevert(validators.registerValidator(publicKey, blsPublicKey, blsPoP))
+        await assertTransactionRevertWithReason(
+          validators.registerValidator(publicKey, blsPublicKey, blsPoP),
+          'Deposit too small'
+        )
       })
     })
   })
@@ -798,25 +829,37 @@ contract('Validators', (accounts: string[]) => {
             })
 
             it('should revert', async () => {
-              await assertRevert(validators.deregisterValidator(index))
+              await assertTransactionRevertWithReason(
+                validators.deregisterValidator(index),
+                'Not yet requirement end time'
+              )
             })
           })
         })
 
         describe('when the validator is still a member of a validator group', () => {
           it('should revert', async () => {
-            await assertRevert(validators.deregisterValidator(index))
+            await assertTransactionRevertWithReason(
+              validators.deregisterValidator(index),
+              'Has been group member recently'
+            )
           })
         })
       })
     })
 
     it('should revert when the account is not a registered validator', async () => {
-      await assertRevert(validators.deregisterValidator(index, { from: accounts[2] }))
+      await assertTransactionRevertWithReason(
+        validators.deregisterValidator(index, { from: accounts[2] }),
+        'Not a validator'
+      )
     })
 
     it('should revert when the wrong index is provided', async () => {
-      await assertRevert(validators.deregisterValidator(index + 1))
+      await assertTransactionRevertWithReason(
+        validators.deregisterValidator(index + 1),
+        'Not a validator'
+      )
     })
   })
 
@@ -970,7 +1013,10 @@ contract('Validators', (accounts: string[]) => {
             })
 
             it('should revert', async () => {
-              await assertRevert(validators.affiliate(group))
+              await assertTransactionRevertWithReason(
+                validators.affiliate(group),
+                "Group doesn't meet requirements"
+              )
             })
           })
         })
@@ -984,21 +1030,27 @@ contract('Validators', (accounts: string[]) => {
           })
 
           it('should revert', async () => {
-            await assertRevert(validators.affiliate(group))
+            await assertTransactionRevertWithReason(
+              validators.affiliate(group),
+              "Validator doesn't meet requirements"
+            )
           })
         })
       })
 
       describe('when affiliating with a non-registered validator group', () => {
         it('should revert', async () => {
-          await assertRevert(validators.affiliate(group))
+          await assertTransactionRevertWithReason(
+            validators.affiliate(group),
+            'Not a validator group'
+          )
         })
       })
     })
 
     describe('when the account does not have a registered validator', () => {
       it('should revert', async () => {
-        await assertRevert(validators.affiliate(group))
+        await assertTransactionRevertWithReason(validators.affiliate(group), 'Not a validator')
       })
     })
   })
@@ -1085,12 +1137,15 @@ contract('Validators', (accounts: string[]) => {
     })
 
     it('should revert when the account is not a registered validator', async () => {
-      await assertRevert(validators.deaffiliate({ from: accounts[2] }))
+      await assertTransactionRevertWithReason(
+        validators.deaffiliate({ from: accounts[2] }),
+        'Not a validator'
+      )
     })
 
     it('should revert when the validator is not affiliated with a validator group', async () => {
       await validators.deaffiliate()
-      await assertRevert(validators.deaffiliate())
+      await assertTransactionRevertWithReason(validators.deaffiliate(), 'not affiliated')
     })
   })
 
@@ -1138,7 +1193,10 @@ contract('Validators', (accounts: string[]) => {
           const signer = accounts[9]
           it('should revert', async () => {
             const newPublicKey = await addressToPublicKey(accounts[8], web3.eth.sign)
-            await assertRevert(validators.updateEcdsaPublicKey(validator, signer, newPublicKey))
+            await assertTransactionRevertWithReason(
+              validators.updateEcdsaPublicKey(validator, signer, newPublicKey),
+              'ECDSA key does not match signer'
+            )
           })
         })
       })
@@ -1148,7 +1206,10 @@ contract('Validators', (accounts: string[]) => {
           const signer = accounts[9]
           it('should revert', async () => {
             const newPublicKey = await addressToPublicKey(signer, web3.eth.sign)
-            await assertRevert(validators.updateEcdsaPublicKey(validator, signer, newPublicKey))
+            await assertTransactionRevertWithReason(
+              validators.updateEcdsaPublicKey(validator, signer, newPublicKey),
+              'only registered contract'
+            )
           })
         })
       })
@@ -1213,14 +1274,15 @@ contract('Validators', (accounts: string[]) => {
           const signer = accounts[9]
           it('should revert', async () => {
             const newPublicKey = await addressToPublicKey(accounts[8], web3.eth.sign)
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               validators.updatePublicKeys(
                 validator,
                 signer,
                 newPublicKey,
                 newBlsPublicKey,
                 newBlsPoP
-              )
+              ),
+              'ECDSA key does not match signer'
             )
           })
         })
@@ -1231,14 +1293,15 @@ contract('Validators', (accounts: string[]) => {
           const signer = accounts[9]
           it('should revert', async () => {
             const newPublicKey = await addressToPublicKey(signer, web3.eth.sign)
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               validators.updatePublicKeys(
                 validator,
                 signer,
                 newPublicKey,
                 newBlsPublicKey,
                 newBlsPoP
-              )
+              ),
+              'only registered contract'
             )
           })
         })
@@ -1281,13 +1344,19 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the public key is not 96 bytes', () => {
         it('should revert', async () => {
-          await assertRevert(validators.updateBlsPublicKey(newBlsPublicKey + '01', newBlsPoP))
+          await assertTransactionRevertWithReason(
+            validators.updateBlsPublicKey(newBlsPublicKey + '01', newBlsPoP),
+            'Wrong BLS public key length'
+          )
         })
       })
 
       describe('when the proof of possession is not 48 bytes', () => {
         it('should revert', async () => {
-          await assertRevert(validators.updateBlsPublicKey(newBlsPublicKey, newBlsPoP + '01'))
+          await assertTransactionRevertWithReason(
+            validators.updateBlsPublicKey(newBlsPublicKey, newBlsPoP + '01'),
+            'Wrong BLS PoP length'
+          )
         })
       })
     })
@@ -1303,7 +1372,7 @@ contract('Validators', (accounts: string[]) => {
         const sig = await getParsedSignatureOfAddress(web3, group, signer)
         await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
         const publicKey = await addressToPublicKey(signer, web3.eth.sign)
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           validators.registerValidator(publicKey, blsPublicKey, blsPoP),
           'Cannot vote for more than max number of groups'
         )
@@ -1312,7 +1381,7 @@ contract('Validators', (accounts: string[]) => {
       it('should revert when vote over max number of groups set to true', async () => {
         await mockElection.setAllowedToVoteOverMaxNumberOfGroups(group, true)
         await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           validators.registerValidatorGroup(commission),
           'Cannot vote for more than max number of groups'
         )
@@ -1321,7 +1390,7 @@ contract('Validators', (accounts: string[]) => {
       it('should revert when vote over max number of groups set to true', async () => {
         await mockLockedGold.setAccountTotalDelegatedAmountInPercents(group, 10)
         await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           validators.registerValidatorGroup(commission),
           'Cannot delegate governance power'
         )
@@ -1373,7 +1442,10 @@ contract('Validators', (accounts: string[]) => {
         })
 
         it('should revert', async () => {
-          await assertRevert(validators.registerValidatorGroup(commission))
+          await assertTransactionRevertWithReason(
+            validators.registerValidatorGroup(commission),
+            'Not enough locked gold'
+          )
         })
       })
     })
@@ -1384,7 +1456,10 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        await assertRevert(validators.registerValidatorGroup(commission))
+        await assertTransactionRevertWithReason(
+          validators.registerValidatorGroup(commission),
+          'Already registered as validator'
+        )
       })
     })
 
@@ -1395,7 +1470,10 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        await assertRevert(validators.registerValidatorGroup(commission))
+        await assertTransactionRevertWithReason(
+          validators.registerValidatorGroup(commission),
+          'Already registered as group'
+        )
       })
     })
 
@@ -1405,7 +1483,10 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        await assertRevert(validators.registerValidatorGroup(commission))
+        await assertTransactionRevertWithReason(
+          validators.registerValidatorGroup(commission),
+          'Already registered as group'
+        )
       })
     })
   })
@@ -1498,26 +1579,38 @@ contract('Validators', (accounts: string[]) => {
             })
 
             it('should revert', async () => {
-              await assertRevert(validators.deregisterValidatorGroup(index))
+              await assertTransactionRevertWithReason(
+                validators.deregisterValidatorGroup(index),
+                "Hasn't been empty for long enough"
+              )
             })
           })
         })
 
         describe('when the group still has members', () => {
           it('should revert', async () => {
-            await assertRevert(validators.deregisterValidatorGroup(index))
+            await assertTransactionRevertWithReason(
+              validators.deregisterValidatorGroup(index),
+              'Validator group not empty'
+            )
           })
         })
       })
 
       it('should revert when the wrong index is provided', async () => {
-        await assertRevert(validators.deregisterValidatorGroup(index + 1))
+        await assertTransactionRevertWithReason(
+          validators.deregisterValidatorGroup(index + 1),
+          'deleteElement: index out of range'
+        )
       })
     })
 
     describe('when the account does not have a registered validator group', () => {
       it('should revert', async () => {
-        await assertRevert(validators.deregisterValidatorGroup(index))
+        await assertTransactionRevertWithReason(
+          validators.deregisterValidatorGroup(index),
+          'Not a validator group'
+        )
       })
     })
   })
@@ -1599,7 +1692,10 @@ contract('Validators', (accounts: string[]) => {
               })
 
               it('should revert', async () => {
-                await assertRevert(validators.addMember(accounts[2]))
+                await assertTransactionRevertWithReason(
+                  validators.addMember(accounts[2]),
+                  'group would exceed maximum size'
+                )
               })
             })
 
@@ -1643,7 +1739,10 @@ contract('Validators', (accounts: string[]) => {
             })
 
             it('should revert', async () => {
-              await assertRevert(validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS))
+              await assertTransactionRevertWithReason(
+                validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS),
+                'Validator requirements not met'
+              )
             })
           })
         })
@@ -1658,7 +1757,10 @@ contract('Validators', (accounts: string[]) => {
             })
 
             it('should revert', async () => {
-              await assertRevert(validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS))
+              await assertTransactionRevertWithReason(
+                validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS),
+                'Group requirements not met'
+              )
             })
           })
 
@@ -1675,7 +1777,10 @@ contract('Validators', (accounts: string[]) => {
             })
 
             it('should revert', async () => {
-              await assertRevert(validators.addMember(validator2))
+              await assertTransactionRevertWithReason(
+                validators.addMember(validator2),
+                'Group requirements not met'
+              )
             })
           })
         })
@@ -1687,20 +1792,29 @@ contract('Validators', (accounts: string[]) => {
         })
 
         it('should revert', async () => {
-          await assertRevert(validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS))
+          await assertTransactionRevertWithReason(
+            validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS),
+            'Not affiliated to group'
+          )
         })
       })
     })
 
     describe('when the account does not have a registered validator group', () => {
       it('should revert', async () => {
-        await assertRevert(validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS))
+        await assertTransactionRevertWithReason(
+          validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS),
+          'Not validator and group'
+        )
       })
     })
 
     describe('when the validator is already a member of the group', () => {
       it('should revert', async () => {
-        await assertRevert(validators.addMember(validator))
+        await assertTransactionRevertWithReason(
+          validators.addMember(validator),
+          'Validator group empty'
+        )
       })
     })
   })
@@ -1769,11 +1883,17 @@ contract('Validators', (accounts: string[]) => {
     })
 
     it('should revert when the account is not a registered validator group', async () => {
-      await assertRevert(validators.removeMember(validator, { from: accounts[2] }))
+      await assertTransactionRevertWithReason(
+        validators.removeMember(validator, { from: accounts[2] }),
+        'is not group and validator'
+      )
     })
 
     it('should revert when the member is not a registered validator', async () => {
-      await assertRevert(validators.removeMember(accounts[2]))
+      await assertTransactionRevertWithReason(
+        validators.removeMember(accounts[2]),
+        'is not group and validator'
+      )
     })
 
     describe('when the validator is not a member of the validator group', () => {
@@ -1782,7 +1902,10 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        await assertRevert(validators.removeMember(validator))
+        await assertTransactionRevertWithReason(
+          validators.removeMember(validator),
+          'Not affiliated to group'
+        )
       })
     })
   })
@@ -1815,13 +1938,17 @@ contract('Validators', (accounts: string[]) => {
     })
 
     it('should revert when the account is not a registered validator group', async () => {
-      await assertRevert(
-        validators.reorderMember(validator2, validator1, NULL_ADDRESS, { from: accounts[2] })
+      await assertTransactionRevertWithReason(
+        validators.reorderMember(validator2, validator1, NULL_ADDRESS, { from: accounts[2] }),
+        'Not a group'
       )
     })
 
     it('should revert when the member is not a registered validator', async () => {
-      await assertRevert(validators.reorderMember(accounts[3], validator1, NULL_ADDRESS))
+      await assertTransactionRevertWithReason(
+        validators.reorderMember(accounts[3], validator1, NULL_ADDRESS),
+        'Not a validator'
+      )
     })
 
     describe('when the validator is not a member of the validator group', () => {
@@ -1830,7 +1957,10 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        await assertRevert(validators.reorderMember(validator2, validator1, NULL_ADDRESS))
+        await assertTransactionRevertWithReason(
+          validators.reorderMember(validator2, validator1, NULL_ADDRESS),
+          'Not a member of the group'
+        )
       })
     })
   })
@@ -1875,13 +2005,19 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the commission is the same', () => {
         it('should revert', async () => {
-          await assertRevert(validators.setNextCommissionUpdate(commission))
+          await assertTransactionRevertWithReason(
+            validators.setNextCommissionUpdate(commission),
+            'Not a validator group'
+          )
         })
       })
 
       describe('when the commission is greater than one', () => {
         it('should revert', async () => {
-          await assertRevert(validators.setNextCommissionUpdate(fixed1.plus(1)))
+          await assertTransactionRevertWithReason(
+            validators.setNextCommissionUpdate(fixed1.plus(1)),
+            'Not a validator group'
+          )
         })
       })
     })
@@ -1924,13 +2060,19 @@ contract('Validators', (accounts: string[]) => {
     describe('when activationBlock has NOT passed', () => {
       it('should revert', async () => {
         await validators.setNextCommissionUpdate(newCommission)
-        await assertRevert(validators.updateCommission())
+        await assertTransactionRevertWithReason(
+          validators.updateCommission(),
+          "Can't apply commission update yet"
+        )
       })
     })
 
     describe('when NO Commission has been queued', () => {
       it('should revert', async () => {
-        await assertRevert(validators.updateCommission())
+        await assertTransactionRevertWithReason(
+          validators.updateCommission(),
+          'No commission update queued'
+        )
       })
     })
 
@@ -1939,7 +2081,10 @@ contract('Validators', (accounts: string[]) => {
         await validators.setNextCommissionUpdate(newCommission)
         await mineBlocks(commissionUpdateDelay.toNumber(), web3)
         await validators.updateCommission()
-        await assertRevert(validators.updateCommission())
+        await assertTransactionRevertWithReason(
+          validators.updateCommission(),
+          'No commission update queued'
+        )
       })
     })
   })
@@ -2077,7 +2222,10 @@ contract('Validators', (accounts: string[]) => {
     describe('when uptime > 1.0', () => {
       const uptime = 1.01
       it('should revert', async () => {
-        await assertRevert(validators.updateValidatorScoreFromSigner(validator, toFixed(uptime)))
+        await assertTransactionRevertWithReason(
+          validators.updateValidatorScoreFromSigner(validator, toFixed(uptime)),
+          'Uptime cannot be larger than one'
+        )
       })
     })
   })
@@ -2466,7 +2614,10 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the sender is not an approved address', () => {
       it('should revert', async () => {
-        await assertRevert(validators.forceDeaffiliateIfValidator(validator))
+        await assertTransactionRevertWithReason(
+          validators.forceDeaffiliateIfValidator(validator),
+          'Only registered slasher can call'
+        )
       })
     })
   })
@@ -2611,7 +2762,10 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert when called by non-slasher', async () => {
-        await assertRevert(validators.halveSlashingMultiplier(group, { from: accounts[0] }))
+        await assertTransactionRevertWithReason(
+          validators.halveSlashingMultiplier(group, { from: accounts[0] }),
+          'Only registered slasher can call'
+        )
       })
     })
   })
@@ -2642,7 +2796,10 @@ contract('Validators', (accounts: string[]) => {
     describe('when the slashing multiplier is reset before reset period', async () => {
       it('should revert', async () => {
         await timeTravel(slashingMultiplierResetPeriod - 10, web3)
-        await assertRevert(validators.resetSlashingMultiplier({ from: group }))
+        await assertTransactionRevertWithReason(
+          validators.resetSlashingMultiplier({ from: group }),
+          '`resetSlashingMultiplier` called before resetPeriod expired'
+        )
       })
     })
 

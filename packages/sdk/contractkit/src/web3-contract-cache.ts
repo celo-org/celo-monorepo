@@ -3,6 +3,7 @@ import debugFactory from 'debug'
 import { AddressRegistry } from './address-registry'
 import { CeloContract, ProxyContracts } from './base'
 import { StableToken } from './celo-tokens'
+import { newGasPriceMinimum } from './generated/0.8/GasPriceMinimum'
 import { newAccounts } from './generated/Accounts'
 import { newAttestations } from './generated/Attestations'
 import { newBlockchainParameters } from './generated/BlockchainParameters'
@@ -15,7 +16,6 @@ import { newFederatedAttestations } from './generated/FederatedAttestations'
 import { newFeeCurrencyWhitelist } from './generated/FeeCurrencyWhitelist'
 import { newFeeHandler } from './generated/FeeHandler'
 import { newFreezer } from './generated/Freezer'
-import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
 import { newIerc20 } from './generated/IERC20'
@@ -36,6 +36,9 @@ import { newGrandaMento } from './generated/mento/GrandaMento'
 import { newReserve } from './generated/mento/Reserve'
 import { newStableToken } from './generated/mento/StableToken'
 
+import { newMentoFeeHandlerSeller } from './generated/MentoFeeHandlerSeller'
+import { newUniswapFeeHandlerSeller } from './generated/UniswapFeeHandlerSeller'
+
 const debug = debugFactory('kit:web3-contract-cache')
 
 export const ContractFactories = {
@@ -55,6 +58,8 @@ export const ContractFactories = {
   [CeloContract.FeeCurrencyWhitelist]: newFeeCurrencyWhitelist,
   [CeloContract.Freezer]: newFreezer,
   [CeloContract.FeeHandler]: newFeeHandler,
+  [CeloContract.MentoFeeHandlerSeller]: newMentoFeeHandlerSeller,
+  [CeloContract.UniswapFeeHandlerSeller]: newUniswapFeeHandlerSeller,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
@@ -199,6 +204,8 @@ export class Web3ContractCache {
         address = await this.registry.addressFor(contract)
       }
       debug('Initiating contract %s', contract)
+      debug('is it included?', ProxyContracts.includes(contract))
+      debug('is it included?', ProxyContracts.toString())
       const createFn = ProxyContracts.includes(contract) ? newProxy : ContractFactories[contract]
       this.cacheMap[contract] = createFn(
         this.registry.connection.web3,

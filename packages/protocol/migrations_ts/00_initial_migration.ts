@@ -1,4 +1,4 @@
-import { ArtifactsSingleton } from '../lib/artifactsSingleton.js'
+import { ArtifactsSingleton } from '../lib/artifactsSingleton'
 import { networks } from '../truffle-config.js'
 
 module.exports = async (deployer: any, network: any) => {

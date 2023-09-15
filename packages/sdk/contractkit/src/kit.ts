@@ -109,7 +109,7 @@ export class ContractKit {
   /** helper for interacting with CELO & stable tokens */
   readonly celoTokens: CeloTokens
 
-  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
+  /** @deprecated no longer needed since gasPrice is available on node rpc */
   gasPriceSuggestionMultiplier = 5
 
   constructor(readonly connection: Connection) {
@@ -206,7 +206,7 @@ export class ContractKit {
     this.connection.defaultFeeCurrency = address
   }
 
-  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
+  /** @deprecated no longer needed since gasPrice is available on node rpc */
   async updateGasPriceInConnectionLayer(currency: Address) {
     const gasPriceMinimum = await this.contracts.getGasPriceMinimum()
     const rawGasPrice = await gasPriceMinimum.getGasPriceMinimum(currency)
@@ -281,7 +281,7 @@ export class ContractKit {
   isSyncing(): Promise<boolean> {
     return this.connection.isSyncing()
   }
-  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
+  /** @deprecated no longer needed since gasPrice is available on node rpc */
   async fillGasPrice(tx: CeloTx): Promise<CeloTx> {
     if (tx.feeCurrency && tx.gasPrice === '0') {
       await this.updateGasPriceInConnectionLayer(tx.feeCurrency)
