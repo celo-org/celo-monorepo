@@ -250,6 +250,8 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
  * @param newArtifacts
  */
 export function reportASTIncompatibilities(
+  // oldArtifacts also needs to be a set
+  // https://github.com/celo-org/celo-monorepo/issues/10567
   oldArtifacts: BuildArtifacts,
   newArtifactsSets: BuildArtifacts[]): ASTCodeCompatibilityReport {
     
