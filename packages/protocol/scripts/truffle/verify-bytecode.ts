@@ -47,7 +47,7 @@ module.exports = async (callback: (error?: any) => number) => {
     const version = getReleaseVersion(branch)
 
     const registry = await Registry.at(celoRegistryAddress)
-    const buildArtifacts = getBuildArtifacts(artifactsDirectory) // TODO this should also include 0.8 contracts
+    const buildArtifacts = getBuildArtifacts(artifactsDirectory)
     const libraryAddresses = await verifyBytecodes(
       Object.keys(CeloContractName),
       buildArtifacts,

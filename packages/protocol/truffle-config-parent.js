@@ -97,7 +97,6 @@ const networks = {
     from: DEVELOPMENT_FROM,
     provider: function () {
       if (coverageProvider == null) {
-        console.log('building provider!')
         coverageProvider = new ProviderEngine()
 
         const projectRoot = ''

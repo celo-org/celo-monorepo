@@ -8,6 +8,7 @@ import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/regist
 import { makeTruffleContractForMigrationWithoutSingleton } from '@celo/protocol/lib/web3-utils'
 import { Address, NULL_ADDRESS, eqAddress } from '@celo/utils/lib/address'
 import { TruffleContract } from '@truffle/contract'
+import { SOLIDITY_08_PACKAGE } from 'contractPackages'
 import { readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
 import { RegistryInstance } from 'types'
@@ -270,7 +271,6 @@ module.exports = async (callback: (error?: any) => number) => {
 
     const version = getReleaseVersion(branch)
 
-    console.log(version)
     if (version >= 9) {
       ignoredContractsSet = new Set(ignoredContractsV9)
     }
@@ -301,18 +301,18 @@ module.exports = async (callback: (error?: any) => number) => {
 
       console.log('Dependencies for contract', contractName)
 
-      // const contractArtifact = await artifacts.require(contractName) // I think it won't be able to find GasPriceMinimum here
       let contractArtifact
 
       try {
-        contractArtifact = await artifacts.require(contractName) // I think it won't be able to find GasPriceMinimum here
+        contractArtifact = await artifacts.require(contractName)
       } catch {
-        // it wasn't found in the standar artifacts folder, check if it's
-        console.log('argv.network', argv.network)
+        // it wasn't found in the standard artifacts folder, check if it's
+        // TODO this needs generalization to support more packages
+        // https://github.com/celo-org/celo-monorepo/issues/10563
         contractArtifact = makeTruffleContractForMigrationWithoutSingleton(
           contractName,
           { ...networks[argv.network], name: argv.network },
-          '0.8',
+          SOLIDITY_08_PACKAGE.name,
           web3
         )
         // TODO WARNING: make sure there are no libraries with the same name that don't get deployed

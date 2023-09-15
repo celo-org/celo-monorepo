@@ -147,7 +147,6 @@ function compile(outdir: string) {
 }
 
 function generateFilesForTruffle(outdir: string) {
-  console.log('outdir, generateFilesForTruffle', outdir)
   // tslint:disable-next-line
   for (let externalContractPackage of contractPackages) {
     const outdirExternal = outdir + '-' + externalContractPackage.name

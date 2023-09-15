@@ -236,7 +236,7 @@ export async function waitForPortOpen(host: string, port: number, seconds: numbe
   const deadline = Date.now() + seconds * 1000
   do {
     if (await isPortOpen(host, port)) {
-      await delay(10000) // extra 10s just to give ganache extra time to startup
+      await delay(60000) // extra 60s just to give ganache extra time to startup
       console.info(`Port ${host}:${port} opened`)
       return true
     }

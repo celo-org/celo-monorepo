@@ -45,7 +45,6 @@ export class ArtifactsSingleton implements ArtifactSet{
   }
 
   public static getInstance(contractPackage: ContractPackage, defaultArtifacts?: any): any {
-    console.log("getInstance", contractPackage)
     if (contractPackage === undefined || contractPackage.path === undefined) {
       // default artifacts but overcharged with a getProxy method
       const artifacts = new DefaultArtifact(defaultArtifacts)

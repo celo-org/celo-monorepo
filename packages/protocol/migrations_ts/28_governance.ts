@@ -56,10 +56,6 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       for (const contractName of constitutionContractNames) {
         console.log(`\tSetting constitution thresholds for ${contractName}`)
 
-        console.log(
-          'constitution[contractName].__contractPackage',
-          constitution[contractName].__contractPackage
-        )
         const artifactsObject = ArtifactsSingleton.getInstance(
           constitution[contractName].__contractPackage,
           artifacts
