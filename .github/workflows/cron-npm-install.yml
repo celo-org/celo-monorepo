@@ -29,7 +29,7 @@ jobs:
         if: matrix.package == '@celo/celocli'
         run: |
           apt update
-          apt install -y libusb-1.0-0-dev libudev-dev
+          apt install -y libusb-1.0-0-dev
       - name: Installing npm package
         run: yarn add ${{ matrix.package }}
       - name: Test celocli command
