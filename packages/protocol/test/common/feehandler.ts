@@ -5,7 +5,6 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
   assertGtBN,
-  assertRevert,
   assertTransactionRevertWithReason,
   assertTransactionRevertWithoutReason,
   expectBigNumberInRange,
@@ -369,7 +368,10 @@ contract('FeeHandler', (accounts: string[]) => {
 
       it("Can't distribute when frozen", async () => {
         await freezer.freeze(feeHandler.address)
-        await assertRevert(feeHandler.distribute(stableToken.address))
+        await assertTransactionRevertWithReason(
+          feeHandler.distribute(stableToken.address),
+          "can't call when contract is frozen"
+        )
       })
 
       it("doesn't distribute when balance is zero", async () => {
