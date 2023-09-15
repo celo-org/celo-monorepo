@@ -51,6 +51,8 @@ yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development
 echo "- Check versions of current branch"
 # From check-versions.sh
 
+BASE_COMMIT=$(git rev-parse HEAD)
+echo " - Base commit $BASE_COMMIT"
 echo " - Checkout migrationsConfig.js at $BRANCH"
 git checkout $BRANCH -- migrationsConfig.js
 
@@ -58,7 +60,7 @@ OLD_BRANCH=$BUILD_DIR
 source scripts/bash/contract-exclusion-regex.sh
 yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --output_file report.json
 
-
+echo "Undo checkout for migrationsConfig.js from $(git rev-parse HEAD) to $BASE_COMMIT"
 git checkout - -- migrationsConfig.js
 
 # From make-release.sh

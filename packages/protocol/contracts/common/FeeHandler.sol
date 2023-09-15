@@ -50,6 +50,8 @@ contract FeeHandler is
 
   address public feeBeneficiary;
 
+  uint256 public celoToBeBurned;
+
   // This mapping can not be public because it contains a FixidityLib.Fraction
   // and that'd be only supported with experimental features in this
   // compiler version
@@ -74,11 +76,10 @@ contract FeeHandler is
   event DailyLimitHit(address token, uint256 burning);
   event MaxSlippageSet(address token, uint256 maxSlippage);
   event DailySellLimitUpdated(uint256 amount);
-  event RouterAddressSet(address token, address router);
-  event RouterAddressRemoved(address token, address router);
-  event RouterUsed(address router);
   event FeeBeneficiarySet(address newBeneficiary);
   event BurnFractionSet(uint256 fraction);
+  event TokenAdded(address tokenAddress, address handlerAddress);
+  event TokenRemoved(address tokenAddress);
 
   /**
    * @notice Sets initialized == true on implementation contracts.
@@ -103,10 +104,6 @@ contract FeeHandler is
     require(
       tokens.length == newMaxSlippages.length,
       "maxSlippage length should match tokens length"
-    );
-    require(
-      tokens.length == newMaxSlippages.length,
-      "newMininumReports length should match tokens length"
     );
 
     _transferOwnership(msg.sender);
@@ -234,13 +231,12 @@ contract FeeHandler is
   }
 
   function _addToken(address tokenAddress, address handlerAddress) private {
-    // Check that the contract implements the interface
-    IFeeHandlerSeller(handlerAddress);
-
+    require(handlerAddress != address(0), "Can't set handler to zero");
     TokenState storage tokenState = tokenStates[tokenAddress];
     tokenState.handler = handlerAddress;
 
     activeTokens.add(tokenAddress);
+    emit TokenAdded(tokenAddress, handlerAddress);
   }
 
   /**
@@ -252,6 +248,12 @@ contract FeeHandler is
   }
 
   function _activateToken(address tokenAddress) private {
+    TokenState storage tokenState = tokenStates[tokenAddress];
+    require(
+      tokenState.handler != address(0) ||
+        tokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
+      "Handler has to be set to activate token"
+    );
     activeTokens.add(tokenAddress);
   }
 
@@ -290,6 +292,7 @@ contract FeeHandler is
     _deactivateToken(tokenAddress);
     TokenState storage tokenState = tokenStates[tokenAddress];
     tokenState.handler = address(0);
+    emit TokenRemoved(tokenAddress);
   }
 
   function _sell(address tokenAddress) private onlyWhenNotFrozen nonReentrant {
@@ -297,13 +300,17 @@ contract FeeHandler is
 
     TokenState storage tokenState = tokenStates[tokenAddress];
     require(tokenState.handler != address(0), "Handler has to be set to sell token");
+    require(
+      FixidityLib.unwrap(tokenState.maxSlippage) != 0,
+      "Max slippage has to be set to sell token"
+    );
     FixidityLib.Fraction memory balanceToProcess = FixidityLib.newFixed(
       token.balanceOf(address(this)).sub(tokenState.toDistribute)
     );
 
     uint256 balanceToBurn = (burnFraction.multiply(balanceToProcess).fromFixed());
 
-    tokenState.toDistribute += tokenState.toDistribute.add(
+    tokenState.toDistribute = tokenState.toDistribute.add(
       balanceToProcess.fromFixed().sub(balanceToBurn)
     );
 
@@ -321,13 +328,14 @@ contract FeeHandler is
     token.transfer(tokenState.handler, balanceToBurn);
     IFeeHandlerSeller handler = IFeeHandlerSeller(tokenState.handler);
 
-    handler.sell(
+    uint256 celoReceived = handler.sell(
       tokenAddress,
       registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
       balanceToBurn,
       FixidityLib.unwrap(tokenState.maxSlippage)
     );
 
+    celoToBeBurned = celoToBeBurned.add(celoReceived);
     tokenState.pastBurn = tokenState.pastBurn.add(balanceToBurn);
     updateLimits(tokenAddress, balanceToBurn);
 
@@ -348,6 +356,11 @@ contract FeeHandler is
     uint256 tokenBalance = token.balanceOf(address(this));
 
     TokenState storage tokenState = tokenStates[tokenAddress];
+    require(
+      tokenState.handler != address(0) ||
+        tokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
+      "Handler has to be set to sell token"
+    );
 
     // safty check to avoid a revert due balance
     uint256 balanceToDistribute = Math.min(tokenBalance, tokenState.toDistribute);
@@ -383,6 +396,7 @@ contract FeeHandler is
 
   function _setMaxSplippage(address token, uint256 newMax) private {
     TokenState storage tokenState = tokenStates[token];
+    require(newMax != 0, "Cannot set max slippage to zero");
     tokenState.maxSlippage = FixidityLib.wrap(newMax);
     require(
       FixidityLib.lte(tokenState.maxSlippage, FixidityLib.fixed1()),
@@ -447,6 +461,9 @@ contract FeeHandler is
     _burnCelo();
   }
 
+  /**
+    @dev Distributes the the token for to the feeBeneficiary.
+  */
   function handle(address tokenAddress) external {
     return _handle(tokenAddress);
   }
@@ -465,8 +482,6 @@ contract FeeHandler is
     * @notice Burns all the Celo balance of this contract.
     */
   function _burnCelo() private {
-    // TODO remove duplicated registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)
-
     TokenState storage tokenState = tokenStates[registry.getAddressForOrDie(
       GOLD_TOKEN_REGISTRY_ID
     )];
@@ -474,14 +489,18 @@ contract FeeHandler is
 
     uint256 balanceOfCelo = address(this).balance;
 
-    uint256 balanceToProcess = balanceOfCelo.sub(tokenState.toDistribute);
-    uint256 balanceToBurn = FixidityLib
+    uint256 balanceToProcess = balanceOfCelo.sub(tokenState.toDistribute).sub(celoToBeBurned);
+    uint256 currentBalanceToBurn = FixidityLib
       .newFixed(balanceToProcess)
       .multiply(burnFraction)
       .fromFixed();
-    celo.burn(balanceToBurn);
+    uint256 totalBalanceToBurn = currentBalanceToBurn.add(celoToBeBurned);
+    celo.burn(totalBalanceToBurn);
 
-    tokenState.toDistribute = tokenState.toDistribute.add(balanceToProcess.sub(balanceToBurn));
+    celoToBeBurned = 0;
+    tokenState.toDistribute = tokenState.toDistribute.add(
+      balanceToProcess.sub(currentBalanceToBurn)
+    );
   }
 
   /**
@@ -532,7 +551,7 @@ contract FeeHandler is
   }
 
   /**
-    * @notice Allows owner to transfer tokens of this contract. It's meant for governance to 
+    * @notice Allows owner to transfer tokens of this contract. It's meant for governance to
       trigger use cases not contemplated in this contract.
       @param token The address of the token to transfer.
       @param recipient The address of the recipient to transfer the tokens to.

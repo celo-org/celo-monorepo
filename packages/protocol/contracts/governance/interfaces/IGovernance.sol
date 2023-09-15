@@ -2,6 +2,8 @@
 pragma solidity >=0.5.13 <0.9.0;
 
 interface IGovernance {
+  function removeVotesWhenRevokingDelegatedVotes(address account, uint256 maxAmountAllowed)
+    external;
   function votePartially(
     uint256 proposalId,
     uint256 index,
