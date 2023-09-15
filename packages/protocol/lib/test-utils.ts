@@ -1,3 +1,4 @@
+
 import { ArtifactsSingleton } from '@celo/protocol/lib/artifactsSingleton';
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils';
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils';
@@ -14,6 +15,13 @@ import { keccak256 } from 'ethereum-cryptography/keccak';
 import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types';
 import Web3 from 'web3';
 import { ContractPackage, MENTO_PACKAGE } from '../contractPackages';
+
+// tslint:disable: ordered-imports
+import { fromFixed } from '@celo/utils/src/fixidity';
+import { bufferToHex, toBuffer } from '@ethereumjs/util';
+import { utf8ToBytes } from 'ethereum-cryptography/utils';
+import { AccountsInstance } from 'types';
+
 
 import BN = require('bn.js')
 
@@ -182,12 +190,19 @@ export async function exec(command: string, args: string[]) {
     const proc = spawn(command, args, {
       stdio: [process.stdout, process.stderr],
     })
+    const dataGlobal = [];
+
     proc.on('error', (error: any) => {
       reject(error)
     })
+
+    proc.stderr.on('data', (data: any) => {
+      dataGlobal.push(data.toString())
+    })
+
     proc.on('exit', (code: any) => {
       if (code !== 0) {
-        reject(code)
+        reject({code, stout: dataGlobal.join(" ")})
       } else {
         resolve()
       }
@@ -655,9 +670,68 @@ export const unlockAndAuthorizeKey = async (
   await web3.eth.personal.unlockAccount(addr, 'passphrase', 1000000)
 
   const signature = await getParsedSignatureOfAddress(web3, account, addr)
-  return authorizeFn(addr, signature.v, signature.r, signature.s, {
+  await authorizeFn(addr, signature.v, signature.r, signature.s, {
     from: account,
   })
+
+  return addr
+}
+
+export const authorizeAndGenerateVoteSigner = async (accountsInstance: AccountsInstance, account: string, accounts: string[]) => {
+  const roleHash = keccak256(utf8ToBytes('celo.org/core/vote'))
+  const role = '0x' + bufferToHex(toBuffer(roleHash))
+  
+  const signer = await unlockAndAuthorizeKey(
+    KeyOffsets.VALIDATING_KEY_OFFSET,
+    accountsInstance.authorizeVoteSigner,
+    account,
+    accounts
+  )
+
+  await accountsInstance.completeSignerAuthorization(account, role, { from: signer })
+
+  return signer;
+}
+
+export async function createAndAssertDelegatorDelegateeSigners(accountsInstance: AccountsInstance, accounts: string[], delegator: string, delegatee?: string) {
+  let delegatorSigner
+  let delegateeSigner;
+
+  if (delegator != null) {
+    delegatorSigner = await authorizeAndGenerateVoteSigner(
+      accountsInstance,
+      delegator,
+      accounts
+    )
+    assert.notEqual(delegator, delegatorSigner)
+    assert.equal(await accountsInstance.voteSignerToAccount(delegatorSigner), delegator)
+  }
+
+  if (delegatee != null) {
+    delegateeSigner = await authorizeAndGenerateVoteSigner(
+      accountsInstance,
+      delegatee,
+      accounts
+    )
+    assert.notEqual(delegatee, delegateeSigner)
+    assert.equal(await accountsInstance.voteSignerToAccount(delegateeSigner), delegatee)
+  }
+  return [delegatorSigner, delegateeSigner]
+}
+
+export async function assertDelegatorDelegateeAmounts(
+  delegator: string,
+  delegatee: string,
+  percent: number,
+  amount: number,
+  lockedGold: LockedGoldInstance
+) {
+  const [fraction, currentAmount] = await lockedGold.getDelegatorDelegateeInfo(
+    delegator,
+    delegatee
+  )
+  assertEqualBN(fromFixed(fraction).multipliedBy(100), percent)
+  assertEqualBN(currentAmount, amount)
 }
 
 export function expectBigNumberInRange(real: BigNumber,

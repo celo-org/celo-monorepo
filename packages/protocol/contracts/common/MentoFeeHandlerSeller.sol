@@ -46,7 +46,7 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     address buyTokenAddress,
     uint256 amount,
     uint256 maxSlippage // as fraction,
-  ) external {
+  ) external returns (uint256) {
     require(
       buyTokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
       "Buy token can only be gold token"
@@ -60,27 +60,26 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     IExchange exchange = IExchange(exchangeAddress);
 
     uint256 minAmount = 0;
-    if (maxSlippage != 0) {
-      // max slippage is set
 
-      ISortedOracles sortedOracles = getSortedOracles();
+    ISortedOracles sortedOracles = getSortedOracles();
 
-      require(
-        sortedOracles.numRates(sellTokenAddress) >= minimumReports[sellTokenAddress],
-        "Number of reports for token not enough"
-      );
+    require(
+      sortedOracles.numRates(sellTokenAddress) >= minimumReports[sellTokenAddress],
+      "Number of reports for token not enough"
+    );
 
-      (uint256 rateNumerator, uint256 rateDenominator) = sortedOracles.medianRate(sellTokenAddress);
-      minAmount = calculateMinAmount(rateNumerator, rateDenominator, amount, maxSlippage);
-    }
+    (uint256 rateNumerator, uint256 rateDenominator) = sortedOracles.medianRate(sellTokenAddress);
+    minAmount = calculateMinAmount(rateNumerator, rateDenominator, amount, maxSlippage);
 
     // TODO an upgrade would be to compare using routers as well
     stableToken.approve(exchangeAddress, amount);
     exchange.sell(amount, minAmount, false);
 
     IERC20 goldToken = getGoldToken();
-    goldToken.transfer(msg.sender, goldToken.balanceOf(address(this)));
+    uint256 celoAmount = goldToken.balanceOf(address(this));
+    goldToken.transfer(msg.sender, celoAmount);
 
     emit TokenSold(sellTokenAddress, buyTokenAddress, amount);
+    return celoAmount;
   }
 }

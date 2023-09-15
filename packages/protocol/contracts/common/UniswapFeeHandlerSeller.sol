@@ -149,7 +149,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     address buyTokenAddress,
     uint256 amount,
     uint256 maxSlippage // as fraction,
-  ) external {
+  ) external returns (uint256) {
     require(
       buyTokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
       "Buy token can only be gold token"
@@ -193,9 +193,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     require(bestRouterQuote != 0, "Can't exchange with zero quote");
 
     uint256 minAmount = 0;
-    if (maxSlippage != 0) {
-      minAmount = calculateAllMinAmount(sellTokenAddress, maxSlippage, amount, bestRouter);
-    }
+    minAmount = calculateAllMinAmount(sellTokenAddress, maxSlippage, amount, bestRouter);
 
     IERC20(sellTokenAddress).approve(address(bestRouter), amount);
     bestRouter.swapExactTokensForTokens(
@@ -206,8 +204,10 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
       block.timestamp + MAX_TIMESTAMP_BLOCK_EXCHANGE
     );
 
-    celoToken.transfer(msg.sender, celoToken.balanceOf(address(this)));
+    uint256 celoAmount = celoToken.balanceOf(address(this));
+    celoToken.transfer(msg.sender, celoAmount);
     emit RouterUsed(address(bestRouter));
     emit TokenSold(sellTokenAddress, buyTokenAddress, amount);
+    return celoAmount;
   }
 }

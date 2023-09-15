@@ -5,6 +5,7 @@ import {
   assertGtBN,
   assertRevert,
   assertTransactionRevertWithReason,
+  expectBigNumberInRange,
   timeTravel,
 } from '@celo/protocol/lib/test-utils' //
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
@@ -334,39 +335,55 @@ contract('FeeHandler', (accounts: string[]) => {
       await feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS)
     })
 
-    it("Can't distribute when frozen", async () => {
-      await freezer.freeze(feeHandler.address)
-      await assertRevert(feeHandler.distribute(stableToken.address))
+    it("Can't distribute when not active", async () => {
+      await assertTransactionRevertWithReason(
+        feeHandler.distribute(stableToken.address),
+        'Handler has to be set to sell token'
+      )
     })
 
-    it("doesn't distribute when balance is zero", async () => {
-      assertEqualBN(await stableToken.balanceOf(feeHandler.address), 0)
-      const res = await feeHandler.distribute(stableToken.address)
-      assert(res.logs.length === 0, 'No transfer should be done (nor event emitted)')
-    })
-
-    describe('#distribute() with balance', () => {
+    describe('When token is active', () => {
       beforeEach(async () => {
-        const goldTokenAmount = new BigNumber(1e18)
-
-        await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
-        await exchange.sell(goldTokenAmount, 0, true, { from: user })
         await feeHandler.addToken(stableToken.address, mentoSeller.address)
-        await feeHandler.setBurnFraction(toFixed(80 / 100))
-        await stableToken.transfer(feeHandler.address, new BigNumber('1e18'), {
-          from: user,
-        })
-
-        await feeHandler.sell(stableToken.address)
+        await feeHandler.activateToken(stableToken.address)
       })
 
-      it('distributes after a burn', async () => {
-        await feeHandler.distribute(stableToken.address)
+      it("Can't distribute when frozen", async () => {
+        await freezer.freeze(feeHandler.address)
+        await assertRevert(feeHandler.distribute(stableToken.address))
+      })
+
+      it("doesn't distribute when balance is zero", async () => {
         assertEqualBN(await stableToken.balanceOf(feeHandler.address), 0)
-        assertEqualBN(
-          await stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS),
-          new BigNumber('0.2e18')
-        )
+        const res = await feeHandler.distribute(stableToken.address)
+        assert(res.logs.length === 0, 'No transfer should be done (nor event emitted)')
+      })
+
+      describe('#distribute() with balance', () => {
+        beforeEach(async () => {
+          const goldTokenAmount = new BigNumber(1e18)
+
+          await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
+          await exchange.sell(goldTokenAmount, 0, true, { from: user })
+          await feeHandler.setMaxSplippage(stableToken.address, toFixed(1 / 50))
+          await feeHandler.addToken(stableToken.address, mentoSeller.address)
+          await feeHandler.setBurnFraction(toFixed(80 / 100))
+          await stableToken.transfer(feeHandler.address, new BigNumber('1e18'), {
+            from: user,
+          })
+          await feeHandler.setMaxSplippage(stableToken.address, toFixed(1))
+
+          await feeHandler.sell(stableToken.address)
+        })
+
+        it('distributes after a burn', async () => {
+          await feeHandler.distribute(stableToken.address)
+          assertEqualBN(await stableToken.balanceOf(feeHandler.address), 0)
+          assertEqualBN(
+            await stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS),
+            new BigNumber('0.2e18')
+          )
+        })
       })
     })
   })
@@ -379,6 +396,9 @@ contract('FeeHandler', (accounts: string[]) => {
       })
 
       await feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS)
+      await feeHandler.addToken(stableToken.address, mentoSeller.address)
+      await feeHandler.activateToken(stableToken.address)
+      await feeHandler.activateToken(goldToken.address)
     })
 
     it('distribute correctly', async () => {
@@ -402,7 +422,7 @@ contract('FeeHandler', (accounts: string[]) => {
       assertEqualBN(await goldToken.getBurnedAmount(), new BigNumber('0.8e18').plus(previousBurn))
     })
 
-    it('distributes correcly after a burn', async () => {
+    it('distributes correctly after a burn', async () => {
       await feeHandler.burnCelo()
       await feeHandler.distribute(stableToken.address)
       assertEqualBN(await goldToken.balanceOf(feeHandler.address), new BigNumber('0.2e18'))
@@ -428,6 +448,7 @@ contract('FeeHandler', (accounts: string[]) => {
         await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
         await exchange.sell(goldTokenAmount, 0, true, { from: user })
         await feeHandler.addToken(stableToken.address, mentoSeller.address)
+        await feeHandler.setMaxSplippage(stableToken.address, toFixed(1))
       })
 
       it("doesn't sell when balance is low", async () => {
@@ -482,6 +503,7 @@ contract('FeeHandler', (accounts: string[]) => {
         it('burns with mento', async () => {
           assertEqualBN(await feeHandler.getPastBurnForToken(stableToken.address), 0)
           const burnedAmountStable = await stableToken.balanceOf(feeHandler.address)
+          await feeHandler.setMaxSplippage(stableToken.address, toFixed(1))
           await feeHandler.sell(stableToken.address)
           assertEqualBN(
             await feeHandler.getPastBurnForToken(stableToken.address),
@@ -491,6 +513,17 @@ contract('FeeHandler', (accounts: string[]) => {
           assertEqualBN(
             await feeHandler.getTokenToDistribute(stableToken.address),
             new BigNumber('0.2e18')
+          )
+
+          expectBigNumberInRange(
+            new BigNumber(await feeHandler.celoToBeBurned()),
+            new BigNumber(
+              await exchange.getBuyTokenAmount(
+                new BigNumber(burnedAmountStable).multipliedBy('0.2'),
+                true
+              )
+            ),
+            new BigNumber('100000000000000000') // 0.1 Celo
           )
         })
 
@@ -503,6 +536,7 @@ contract('FeeHandler', (accounts: string[]) => {
         })
 
         it("Doesn't burn balance if it hasn't distributed", async () => {
+          await feeHandler.setMaxSplippage(stableToken.address, toFixed(1))
           await feeHandler.sell(stableToken.address)
           const balanceFefore = await stableToken.balanceOf(feeHandler.address)
           await feeHandler.sell(stableToken.address)
@@ -521,8 +555,9 @@ contract('FeeHandler', (accounts: string[]) => {
       // console.log('Uniswap INIT CODE PAIR HASH:', await uniswapFactory.INIT_CODE_PAIR_HASH())
       beforeEach(async () => {
         deadline = (await web3.eth.getBlock('latest')).timestamp + 100
-
         uniswapFactory = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
+        // tslint:disable-next-line
+        console.log('Uniswap INIT CODE PAIR HASH:', await uniswapFactory.INIT_CODE_PAIR_HASH())
 
         uniswap = await UniswapRouter.new(
           uniswapFactory.address,
@@ -537,7 +572,6 @@ contract('FeeHandler', (accounts: string[]) => {
         ) // _factory, _WETH
 
         await feeCurrencyWhitelist.addToken(tokenA.address)
-
         await uniswapFeeHandlerSeller.initialize(registry.address, [], [])
         await uniswapFeeHandlerSeller.setRouter(tokenA.address, uniswap.address)
         await tokenA.mint(feeHandler.address, new BigNumber(10e18))
@@ -561,6 +595,7 @@ contract('FeeHandler', (accounts: string[]) => {
         )
 
         await feeHandler.addToken(tokenA.address, uniswapFeeHandlerSeller.address)
+        await feeHandler.setMaxSplippage(tokenA.address, toFixed(1))
       })
 
       describe('Oracle check', async () => {
@@ -703,16 +738,29 @@ contract('FeeHandler', (accounts: string[]) => {
       await feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS)
     })
 
-    it('handles Celo', async () => {
-      const pastBurn = await goldToken.getBurnedAmount()
-      const previusBeneficiaryBalance = await goldToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS)
-      // basically it just does a burn
-      await feeHandler.handle(goldToken.address)
-      assertEqualBN(await goldToken.getBurnedAmount(), new BigNumber('0.8e18').plus(pastBurn))
-      assertEqualBN(
-        await goldToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS),
-        new BigNumber('0.2e18').plus(previusBeneficiaryBalance)
+    it('should revert when token not added', async () => {
+      await assertTransactionRevertWithReason(
+        feeHandler.handle(stableToken.address),
+        'Handler has to be set to sell token'
       )
+    })
+
+    describe('When token active', () => {
+      beforeEach(async () => {
+        await feeHandler.activateToken(goldToken.address)
+      })
+
+      it('handles Celo', async () => {
+        const pastBurn = await goldToken.getBurnedAmount()
+        const previusBeneficiaryBalance = await goldToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS)
+        // basically it just does a burn
+        await feeHandler.handle(goldToken.address)
+        assertEqualBN(await goldToken.getBurnedAmount(), new BigNumber('0.8e18').plus(pastBurn))
+        assertEqualBN(
+          await goldToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS),
+          new BigNumber('0.2e18').plus(previusBeneficiaryBalance)
+        )
+      })
     })
   })
 
@@ -728,6 +776,8 @@ contract('FeeHandler', (accounts: string[]) => {
 
       await feeHandler.addToken(stableToken.address, mentoSeller.address)
       await feeHandler.addToken(stableToken2.address, mentoSeller.address)
+      await feeHandler.setMaxSplippage(stableToken.address, toFixed(1))
+      await feeHandler.setMaxSplippage(stableToken2.address, toFixed(1))
 
       await feeHandler.setBurnFraction(toFixed(80 / 100))
       await feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS)
