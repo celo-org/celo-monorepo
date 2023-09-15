@@ -1381,7 +1381,7 @@ contract('Validators', (accounts: string[]) => {
       it('should revert when vote over max number of groups set to true', async () => {
         await mockElection.setAllowedToVoteOverMaxNumberOfGroups(group, true)
         await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           validators.registerValidatorGroup(commission),
           'Cannot vote for more than max number of groups'
         )
