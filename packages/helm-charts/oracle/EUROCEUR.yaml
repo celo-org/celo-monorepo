@@ -25,7 +25,7 @@ oracle:
       ]    
       
     ]"
-  minPriceSourceCount: 3
+  minPriceSourceCount: 2
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
