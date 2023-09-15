@@ -574,7 +574,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe('#registerValidator', () => {
+  describe.only('#registerValidator', () => {
     const validator = accounts[0]
     let resp: any
     describe('when the account is not a registered validator', () => {
@@ -603,7 +603,7 @@ contract('Validators', (accounts: string[]) => {
         const sig = await getParsedSignatureOfAddress(web3, validator, signer)
         await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
         const publicKey = await addressToPublicKey(signer, web3.eth.sign)
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           validators.registerValidator(publicKey, blsPublicKey, blsPoP),
           'Cannot delegate governance power'
         )
@@ -1390,7 +1390,7 @@ contract('Validators', (accounts: string[]) => {
       it('should revert when vote over max number of groups set to true', async () => {
         await mockLockedGold.setAccountTotalDelegatedAmountInPercents(group, 10)
         await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           validators.registerValidatorGroup(commission),
           'Cannot delegate governance power'
         )

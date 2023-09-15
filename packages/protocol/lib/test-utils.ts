@@ -678,7 +678,7 @@ export const unlockAndAuthorizeKey = async (
 
 export const authorizeAndGenerateVoteSigner = async (accountsInstance: AccountsInstance, account: string, accounts: string[]) => {
   const roleHash = keccak256(utf8ToBytes('celo.org/core/vote'))
-  const role = '0x' + bufferToHex(toBuffer(roleHash))
+  const role = bufferToHex(toBuffer(roleHash))
   
   const signer = await unlockAndAuthorizeKey(
     KeyOffsets.VALIDATING_KEY_OFFSET,
@@ -686,6 +686,12 @@ export const authorizeAndGenerateVoteSigner = async (accountsInstance: AccountsI
     account,
     accounts
   )
+  // fund singer
+  await web3.eth.sendTransaction({
+      from: accounts[9],
+      to: signer,
+      value:  web3.utils.toWei('1', 'ether'),
+    })
 
   await accountsInstance.completeSignerAuthorization(account, role, { from: signer })
 
@@ -701,7 +707,7 @@ export async function createAndAssertDelegatorDelegateeSigners(accountsInstance:
       accountsInstance,
       delegator,
       accounts
-    )
+      )
     assert.notEqual(delegator, delegatorSigner)
     assert.equal(await accountsInstance.voteSignerToAccount(delegatorSigner), delegator)
   }
@@ -711,7 +717,7 @@ export async function createAndAssertDelegatorDelegateeSigners(accountsInstance:
       accountsInstance,
       delegatee,
       accounts
-    )
+      )
     assert.notEqual(delegatee, delegateeSigner)
     assert.equal(await accountsInstance.voteSignerToAccount(delegateeSigner), delegatee)
   }

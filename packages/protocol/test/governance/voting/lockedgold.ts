@@ -1234,7 +1234,7 @@ contract('LockedGold', (accounts: string[]) => {
 
           it('should revert when delegating as validator', async () => {
             await mockValidators.setValidator(accounts[0])
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               lockedGold.delegateGovernanceVotes(delegatee1, toFixed(10 / 100)),
               'Validators cannot delegate votes.'
             )
@@ -1242,7 +1242,7 @@ contract('LockedGold', (accounts: string[]) => {
 
           it('should revert when delegating as validator group', async () => {
             await mockValidators.setValidatorGroup(accounts[0])
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               lockedGold.delegateGovernanceVotes(delegatee1, 10),
               'Validator groups cannot delegate votes.'
             )
@@ -1821,10 +1821,10 @@ contract('LockedGold', (accounts: string[]) => {
 
       describe('When trying to delegate to more then maxDelegateeCount with vote signers', () => {
         const value = 1000
-        let delegatorSigner
-        let delegateeSigner1
-        let delegateeSigner2
-        let delegateeSigner3
+        let delegatorSigner: string
+        let delegateeSigner1: string
+        let delegateeSigner2: string
+        let delegateeSigner3: string
 
         beforeEach(async () => {
           await lockedGold.setMaxDelegateesCount(2)
