@@ -34,7 +34,7 @@ ADD https://www.googleapis.com/storage/v1/b/genesis_blocks/o/${celo_env}?alt=med
 ADD https://www.googleapis.com/storage/v1/b/static_nodes/o/${celo_env}?alt=media /celo/static-nodes.json
 
 # Build Celocli
-FROM node:18-alpine as node
+FROM node:12-alpine as node
 
 ARG celo_env
 
