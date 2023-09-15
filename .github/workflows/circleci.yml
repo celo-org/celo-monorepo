@@ -8,10 +8,6 @@ on:
   push:
     branches:
       - master
-      # TODO (soloseng): remove before merge
-  # TODO(jcortejoso): Replace by pull_request
-  pull_request_target:
-      - 'release/**'
   pull_request:
     branches:
       - master
