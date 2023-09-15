@@ -236,7 +236,7 @@ export async function waitForPortOpen(host: string, port: number, seconds: numbe
   const deadline = Date.now() + seconds * 1000
   do {
     if (await isPortOpen(host, port)) {
-      await delay(10000) // extra 10s just to give ganache extra time to startup
+      await delay(60000) // extra 60s just to give ganache extra time to startup
       console.info(`Port ${host}:${port} opened`)
       return true
     }
@@ -255,7 +255,7 @@ type ProxiedContractGetter = (
   contractPackage: ContractPackage, 
   ) => Promise<any>
 
-type ContratGetter = (
+type ContractGetter = (
   contractName: string,
   contractPackage?: ContractPackage,
   ) => Promise<any>
@@ -272,11 +272,10 @@ export const assertProxiesSet = async (getContract: ProxiedContractGetter) => {
         contractName + 'Proxy not pointing to the ' + contractName + ' implementation'
       )
     }
-    
   }
 }
 
-export const assertContractsRegistered = async (getContract: ContratGetter) => {
+export const assertContractsRegistered = async (getContract: any) => {
   const registry: RegistryInstance = await getContract('Registry')
   for (const proxyPackage of hasEntryInRegistry) {
     for (const contractName of proxyPackage.contracts) {
@@ -290,7 +289,7 @@ export const assertContractsRegistered = async (getContract: ContratGetter) => {
   }
 }
 
-export const assertRegistryAddressesSet = async (getContract: ContratGetter) => {
+export const assertRegistryAddressesSet = async (getContract: ContractGetter) => {
   const registry: RegistryInstance = await getContract('Registry')
   for (const contractName of usesRegistry) {
     const contract: UsingRegistryInstance = await getContract(contractName, MENTO_PACKAGE)
@@ -679,7 +678,7 @@ export const unlockAndAuthorizeKey = async (
 
 export const authorizeAndGenerateVoteSigner = async (accountsInstance: AccountsInstance, account: string, accounts: string[]) => {
   const roleHash = keccak256(utf8ToBytes('celo.org/core/vote'))
-  const role = '0x' + bufferToHex(toBuffer(roleHash))
+  const role = bufferToHex(toBuffer(roleHash))
   
   const signer = await unlockAndAuthorizeKey(
     KeyOffsets.VALIDATING_KEY_OFFSET,
@@ -687,6 +686,12 @@ export const authorizeAndGenerateVoteSigner = async (accountsInstance: AccountsI
     account,
     accounts
   )
+  // fund singer
+  await web3.eth.sendTransaction({
+      from: accounts[9],
+      to: signer,
+      value:  web3.utils.toWei('1', 'ether'),
+    })
 
   await accountsInstance.completeSignerAuthorization(account, role, { from: signer })
 
@@ -702,7 +707,7 @@ export async function createAndAssertDelegatorDelegateeSigners(accountsInstance:
       accountsInstance,
       delegator,
       accounts
-    )
+      )
     assert.notEqual(delegator, delegatorSigner)
     assert.equal(await accountsInstance.voteSignerToAccount(delegatorSigner), delegator)
   }
@@ -712,7 +717,7 @@ export async function createAndAssertDelegatorDelegateeSigners(accountsInstance:
       accountsInstance,
       delegatee,
       accounts
-    )
+      )
     assert.notEqual(delegatee, delegateeSigner)
     assert.equal(await accountsInstance.voteSignerToAccount(delegateeSigner), delegatee)
   }

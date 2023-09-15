@@ -20,6 +20,8 @@ export enum CeloContract {
   Governance = 'Governance',
   GrandaMento = 'GrandaMento',
   LockedGold = 'LockedGold',
+  MentoFeeHandlerSeller = 'MentoFeeHandlerSeller',
+  UniswapFeeHandlerSeller = 'UniswapFeeHandlerSeller',
   MetaTransactionWallet = 'MetaTransactionWallet',
   MetaTransactionWalletDeployer = 'MetaTransactionWalletDeployer',
   MultiSig = 'MultiSig',

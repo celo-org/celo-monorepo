@@ -5,7 +5,7 @@ pragma solidity ^0.5.13;
 // which is largely based on
 // https://github.com/ralexstokes/deposit-verifier/blob/master/deposit_verifier.sol
 
-import { TypedMemView } from "@summa-tx/memview.sol/contracts/TypedMemView.sol";
+import { TypedMemView } from "./TypedMemView.sol";
 
 library B12 {
   using TypedMemView for bytes;

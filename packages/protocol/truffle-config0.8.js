@@ -1,4 +1,4 @@
-const SOLC_VERSION = '0.5.13'
+const SOLC_VERSION = '0.8.19'
 
 const parent = require('./truffle-config-parent.js')
 const flakeTrackingConfig = require('@celo/flake-tracker/src/mocha/config.js')
@@ -13,7 +13,6 @@ module.exports = {
       version: SOLC_VERSION,
       settings: {
         metadata: { useLiteralContent: true },
-        evmVersion: 'istanbul',
       },
     },
   },
@@ -28,7 +27,6 @@ if (process.argv.includes('--gas')) {
         version: SOLC_VERSION,
         settings: {
           metadata: { useLiteralContent: true },
-          evmVersion: 'istanbul',
         },
       },
     },

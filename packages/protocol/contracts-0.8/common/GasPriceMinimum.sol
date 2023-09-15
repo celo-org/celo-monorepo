@@ -3,12 +3,12 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
-import "./CalledByVm.sol";
-import "./Initializable.sol";
-import "./interfaces/ICeloVersionedContract.sol";
-import "./FixidityLib0.8.sol";
-import "./UsingRegistry8.sol";
-import "../stability/interfaces/ISortedOracles.sol";
+import "../../contracts/common/CalledByVm.sol";
+import "../../contracts/common/Initializable.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/FixidityLib.sol";
+import "./UsingRegistry.sol";
+import "../../contracts/stability/interfaces/ISortedOracles.sol";
 
 /**
  * @title Stores and provides gas price minimum for various currencies.
@@ -17,7 +17,7 @@ contract GasPriceMinimum is
   ICeloVersionedContract,
   Ownable,
   Initializable,
-  UsingRegistry8,
+  UsingRegistry,
   CalledByVm
 {
   using FixidityLib for FixidityLib.Fraction;
@@ -53,7 +53,7 @@ contract GasPriceMinimum is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 2, 0, 0);
   }
 
   /**

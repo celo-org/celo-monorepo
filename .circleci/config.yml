@@ -202,7 +202,7 @@ jobs:
   general-test:
     <<: *defaults
     # XXX (soloseng): Increased size because this test was hitting the ram limit and failing
-    resource_class: xlarge
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/app

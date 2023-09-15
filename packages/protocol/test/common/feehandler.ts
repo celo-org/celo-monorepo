@@ -1,13 +1,15 @@
 // TODO remove magic numbers
+// tslint:disable: ordered-imports
+// TODO either pretiffy is not fixing this or the linter is broken
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
   assertGtBN,
-  assertRevert,
   assertTransactionRevertWithReason,
+  assertTransactionRevertWithoutReason,
   expectBigNumberInRange,
   timeTravel,
-} from '@celo/protocol/lib/test-utils' //
+} from '@celo/protocol/lib/test-utils'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
@@ -238,11 +240,17 @@ contract('FeeHandler', (accounts: string[]) => {
     })
 
     it('only allows owner to change the burn fraction', async () => {
-      await assertRevert(feeHandler.setBurnFraction(toFixed(80 / 100), { from: user }))
+      await assertTransactionRevertWithReason(
+        feeHandler.setBurnFraction(toFixed(80 / 100), { from: user }),
+        'Ownable: caller is not the owner.'
+      )
     })
 
     it("doesn't allow numbers bigger than one", async () => {
-      await assertRevert(feeHandler.setBurnFraction(toFixed(80 / 100), { from: user }))
+      await assertTransactionRevertWithReason(
+        feeHandler.setBurnFraction(toFixed(80 / 100), { from: user }),
+        'Ownable: caller is not the owner.'
+      )
     })
   })
 
@@ -274,8 +282,9 @@ contract('FeeHandler', (accounts: string[]) => {
     })
 
     it('Only owner can add token', async () => {
-      await assertRevert(
-        feeHandler.addToken(stableToken.address, mentoSeller.address, { from: user })
+      await assertTransactionRevertWithReason(
+        feeHandler.addToken(stableToken.address, mentoSeller.address, { from: user }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -293,7 +302,10 @@ contract('FeeHandler', (accounts: string[]) => {
     })
 
     it('Only owner can remove token', async () => {
-      await assertRevert(feeHandler.removeToken(stableToken.address, { from: user }))
+      await assertTransactionRevertWithReason(
+        feeHandler.removeToken(stableToken.address, { from: user }),
+        'Ownable: caller is not the owner.'
+      )
     })
   })
 
@@ -315,7 +327,10 @@ contract('FeeHandler', (accounts: string[]) => {
     })
 
     it('Only owner can deactivate token', async () => {
-      await assertRevert(feeHandler.deactivateToken(stableToken.address, { from: user }))
+      await assertTransactionRevertWithReason(
+        feeHandler.deactivateToken(stableToken.address, { from: user }),
+        'Ownable: caller is not the owner.'
+      )
     })
   })
 
@@ -326,7 +341,10 @@ contract('FeeHandler', (accounts: string[]) => {
     })
 
     it('only allows owner to change the burn fraction', async () => {
-      await assertRevert(feeHandler.setBurnFraction(EXAMPLE_BENEFICIARY_ADDRESS, { from: user }))
+      await assertTransactionRevertWithReason(
+        feeHandler.setBurnFraction(EXAMPLE_BENEFICIARY_ADDRESS, { from: user }),
+        'Ownable: caller is not the owner.'
+      )
     })
   })
 
@@ -350,7 +368,10 @@ contract('FeeHandler', (accounts: string[]) => {
 
       it("Can't distribute when frozen", async () => {
         await freezer.freeze(feeHandler.address)
-        await assertRevert(feeHandler.distribute(stableToken.address))
+        await assertTransactionRevertWithReason(
+          feeHandler.distribute(stableToken.address),
+          "can't call when contract is frozen"
+        )
       })
 
       it("doesn't distribute when balance is zero", async () => {
@@ -438,7 +459,10 @@ contract('FeeHandler', (accounts: string[]) => {
 
     it("Can't sell when frozen", async () => {
       await freezer.freeze(feeHandler.address)
-      await assertRevert(feeHandler.sell(stableToken.address))
+      await assertTransactionRevertWithoutReason(
+        feeHandler.sell(stableToken.address),
+        "can't call when contract is frozen."
+      )
     })
 
     describe('Mento tokens', async () => {
@@ -531,7 +555,10 @@ contract('FeeHandler', (accounts: string[]) => {
           await mentoSeller.setMinimumReports(tokenA.address, 2)
           const balanceBefore = await stableToken.balanceOf(feeHandler.address) // TODO this balance is wrong
           await feeHandler.setMaxSplippage(tokenA.address, maxSlippage)
-          await assertRevert(feeHandler.sell(tokenA.address))
+          await assertTransactionRevertWithReason(
+            feeHandler.sell(tokenA.address),
+            'Handler has to be set to sell token.'
+          )
           assertEqualBN(await stableToken.balanceOf(feeHandler.address), balanceBefore)
         })
 
@@ -546,29 +573,27 @@ contract('FeeHandler', (accounts: string[]) => {
       })
     })
 
-    describe('Other tokens (non-Mento) (if this fails with "revert" please read comments of this tests)', async () => {
-      // Uniswap can get the address of a pair by using an init code pair hash. Unfortunately, this hash is harcoded
-      // in the file UniswapV2Library.sol. The hash writen now there is meant to run in the CI. If you're seeing this problem you can
-      // 1. Skip these tests locally, as they will run in the CI anyway or
-      // 2. Change the hash, you can get the hash for the parciular test deployment with the following:
-      // // tslint:disable-next-line
-      // console.log('Uniswap INIT CODE PAIR HASH:', await uniswapFactory.INIT_CODE_PAIR_HASH())
+    describe('Other tokens (non-Mento)', async () => {
       beforeEach(async () => {
         deadline = (await web3.eth.getBlock('latest')).timestamp + 100
         uniswapFactory = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
         // tslint:disable-next-line
         console.log('Uniswap INIT CODE PAIR HASH:', await uniswapFactory.INIT_CODE_PAIR_HASH())
 
+        const initCodePairHash = await uniswapFactory.INIT_CODE_PAIR_HASH()
+
         uniswap = await UniswapRouter.new(
           uniswapFactory.address,
-          '0x0000000000000000000000000000000000000000'
+          '0x0000000000000000000000000000000000000000',
+          initCodePairHash
         ) // _factory, _WETH
 
         uniswapFactory2 = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
 
         uniswap2 = await UniswapRouter.new(
           uniswapFactory2.address,
-          '0x0000000000000000000000000000000000000000'
+          '0x0000000000000000000000000000000000000000',
+          initCodePairHash
         ) // _factory, _WETH
 
         await feeCurrencyWhitelist.addToken(tokenA.address)
@@ -829,8 +854,9 @@ contract('FeeHandler', (accounts: string[]) => {
     })
 
     it('Only owner can take tokens out', async () => {
-      await assertRevert(
-        feeHandler.transfer(tokenA.address, user, new BigNumber(1e18), { from: user })
+      await assertTransactionRevertWithReason(
+        feeHandler.transfer(tokenA.address, user, new BigNumber(1e18), { from: user }),
+        'Ownable: caller is not the owner.'
       )
     })
 
@@ -842,16 +868,18 @@ contract('FeeHandler', (accounts: string[]) => {
 
   describe('#setDailySellLimit()', () => {
     it('should only be called by owner', async () => {
-      await assertRevert(
-        feeHandler.setDailySellLimit(stableToken.address, goldAmountForRate, { from: user })
+      await assertTransactionRevertWithReason(
+        feeHandler.setDailySellLimit(stableToken.address, goldAmountForRate, { from: user }),
+        'Ownable: caller is not the owner.'
       )
     })
   })
 
   describe('#setMaxSplipagge()', () => {
     it('should only be called by owner', async () => {
-      await assertRevert(
-        feeHandler.setMaxSplippage(stableToken.address, maxSlippage, { from: user })
+      await assertTransactionRevertWithReason(
+        feeHandler.setMaxSplippage(stableToken.address, maxSlippage, { from: user }),
+        'Ownable: caller is not the owner.'
       )
     })
   })

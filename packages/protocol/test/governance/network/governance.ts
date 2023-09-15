@@ -1223,7 +1223,10 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should revert when upvoting a proposal that will be dequeued', async () => {
-        await assertRevert(governance.upvote(proposalId, 0, 0))
+        await assertTransactionRevertWithReason(
+          governance.upvote(proposalId, 0, 0),
+          'cannot upvote a proposal not in the queue'
+        )
       })
     })
 
@@ -1869,7 +1872,10 @@ contract('Governance', (accounts: string[]) => {
 
       it('should revert when the account weight is 0', async () => {
         await mockLockedGold.setAccountTotalGovernancePower(account, 0)
-        await assertRevert(governance.vote(proposalId, index, value))
+        await assertTransactionRevertWithReason(
+          governance.vote(proposalId, index, value),
+          'Voter weight zero'
+        )
       })
 
       it('should revert when the index is out of bounds', async () => {
@@ -2154,7 +2160,10 @@ contract('Governance', (accounts: string[]) => {
 
       it('should revert when the account weight is 0', async () => {
         await mockLockedGold.setAccountTotalGovernancePower(account, 0)
-        await assertRevert(governance.vote(proposalId, index, value, { from: accountSigner }))
+        await assertTransactionRevertWithReason(
+          governance.vote(proposalId, index, value, { from: accountSigner }),
+          'Voter weight zero'
+        )
       })
     })
 
@@ -2400,7 +2409,10 @@ contract('Governance', (accounts: string[]) => {
 
       it('should revert when the account weight is 0', async () => {
         await mockLockedGold.setAccountTotalGovernancePower(account, 0)
-        await assertRevert(governance.votePartially(proposalId, index, yesVotes, 0, 0))
+        await assertTransactionRevertWithReason(
+          governance.votePartially(proposalId, index, yesVotes, 0, 0),
+          "Voter doesn't have enough locked Celo [(]formerly known as Celo Gold[)]"
+        )
       })
 
       it('should revert when the account does not have enough gold', async () => {
@@ -2765,27 +2777,33 @@ contract('Governance', (accounts: string[]) => {
 
       it('should revert when the account weight is 0', async () => {
         await mockLockedGold.setAccountTotalGovernancePower(account, 0)
-        await assertRevert(
-          governance.votePartially(proposalId, index, yesVotes, 0, 0, { from: accountSigner })
+        await assertTransactionRevertWithReason(
+          governance.votePartially(proposalId, index, yesVotes, 0, 0, { from: accountSigner }),
+          "Voter doesn't have enough locked Celo [(]formerly known as Celo Gold[)]"
         )
       })
 
       it('should revert when the account does not have enough gold', async () => {
-        await assertRevert(
-          governance.votePartially(proposalId, index, yesVotes + 1, 0, 0, { from: accountSigner })
+        await assertTransactionRevertWithReason(
+          governance.votePartially(proposalId, index, yesVotes + 1, 0, 0, { from: accountSigner }),
+          "Voter doesn't have enough locked Celo [(]formerly known as Celo Gold[)]"
         )
       })
 
       it('should revert when the account does not have enough gold when voting partially', async () => {
         const noVotes = yesVotes
-        await assertRevert(
-          governance.votePartially(proposalId, index, yesVotes, noVotes, 0, { from: accountSigner })
+        await assertTransactionRevertWithReason(
+          governance.votePartially(proposalId, index, yesVotes, noVotes, 0, {
+            from: accountSigner,
+          }),
+          "Voter doesn't have enough locked Celo [(]formerly known as Celo Gold[)]"
         )
       })
 
       it('should revert when the index is out of bounds', async () => {
-        await assertRevert(
-          governance.votePartially(proposalId, index + 1, yesVotes, 0, 0, { from: accountSigner })
+        await assertTransactionRevertWithReason(
+          governance.votePartially(proposalId, index + 1, yesVotes, 0, 0, { from: accountSigner }),
+          'Provided index greater than dequeue length.'
         )
       })
 
@@ -2802,8 +2820,9 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         const otherProposalId = 2
-        await assertRevert(
-          governance.votePartially(otherProposalId, index, yesVotes, 0, 0, { from: accountSigner })
+        await assertTransactionRevertWithReason(
+          governance.votePartially(otherProposalId, index, yesVotes, 0, 0, { from: accountSigner }),
+          'Reason given: Proposal not dequeued.'
         )
       })
     })
@@ -2872,7 +2891,9 @@ contract('Governance', (accounts: string[]) => {
 
       it('should revert when the account weight is 0', async () => {
         await mockLockedGold.setAccountTotalGovernancePower(account, 0)
-        await assertRevert(governance.votePartially(proposalId, index, yesVotes, 0, 0))
+        await assertTransactionRevertWithReason(
+          governance.votePartially(proposalId, index, yesVotes, 0, 0)
+        )
       })
 
       it('should revert when the index is out of bounds', async () => {

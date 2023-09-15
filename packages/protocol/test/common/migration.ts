@@ -33,6 +33,7 @@ const getContract = async (
 
 contract('Migration', () => {
   describe('Checking proxies', () => {
+    // https://github.com/celo-org/celo-monorepo/issues/10566
     it.skip('should have the proxy set up for all proxied contracts', async () => {
       await assertProxiesSet(getContract)
     })

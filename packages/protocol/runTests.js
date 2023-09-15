@@ -49,11 +49,11 @@ async function test() {
     const closeGanache = await startGanache()
     if (isCI) {
       // If we are running on circle ci we need to wait for ganache to be up.
-      await waitForPortOpen('localhost', 8545, 90)
+      await waitForPortOpen('localhost', 8545, 120)
     }
 
     // --reset is a hack to trick truffle into using 20M gas.
-    let testArgs = ['run', 'truffle', 'test', '--reset']
+    let testArgs = ['run', 'truffle', 'test', '--reset'] // Adding config doesn't seem to do much --config truffle-confisg0.8.js
     if (argv['verbose-rpc']) {
       testArgs.push('--verbose-rpc')
     }

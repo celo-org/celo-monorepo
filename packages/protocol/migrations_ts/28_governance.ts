@@ -5,13 +5,13 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
   getDeployedProxiedContract,
-  getFunctionSelectorsForContract,
+  getFunctionSelectorsForContractProxy,
   transferOwnershipOfProxyAndImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance } from 'types'
-import { MENTO_PACKAGE } from '../contractPackages'
+import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 import { ArtifactsSingleton } from '../lib/artifactsSingleton'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
@@ -65,24 +65,31 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           contractName,
           artifactsObject
         )
-        const selectors = getFunctionSelectorsForContract(contract, contractName, artifactsObject)
+
+        const selectors = getFunctionSelectorsForContractProxy(
+          contract,
+          artifactsObject.getProxy(contractName, artifacts),
+          web3
+        )
 
         selectors.default = ['0x00000000']
         const thresholds = { ...constitution.proxy, ...constitution[contractName] }
-        await Promise.all(
-          Object.keys(thresholds)
-            .filter((method) => method !== '__contractPackage')
-            .map((func) =>
-              Promise.all(
-                selectors[func].map((selector) =>
-                  governance.setConstitution(contract.address, selector, toFixed(thresholds[func]))
-                )
-              )
-            )
+
+        const tresholdKeys = Object.keys(thresholds).filter(
+          (method) => method !== '__contractPackage'
         )
+
+        for (const func of tresholdKeys) {
+          await Promise.all(
+            selectors[func].map((selector) =>
+              governance.setConstitution(contract.address, selector, toFixed(thresholds[func]))
+            )
+          )
+        }
       }
     }
 
+    // This list probably needs a refactor
     const proxyAndImplementationOwnedByGovernance = [
       {
         contracts: [
@@ -99,7 +106,6 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           'FeeCurrencyWhitelist',
           'Freezer',
           'FeeHandler',
-          'GasPriceMinimum',
           'GoldToken',
           'Governance',
           'GovernanceSlasher',
@@ -122,7 +128,11 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           'StableTokenEUR',
           'StableTokenBRL',
         ],
-        __contractPackage: MENTO_PACKAGE, // TODO refactor this
+        __contractPackage: MENTO_PACKAGE,
+      },
+      {
+        contracts: ['GasPriceMinimum'],
+        __contractPackage: SOLIDITY_08_PACKAGE,
       },
     ]
 
