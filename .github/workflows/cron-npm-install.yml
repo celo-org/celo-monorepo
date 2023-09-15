@@ -15,7 +15,7 @@ jobs:
     name: ${{ matrix.package }} NPM package install
     runs-on: ubuntu-latest
     container:
-      image: node:18-bullseye
+      image: node:16-bullseye
     strategy:
       fail-fast: false
       matrix:
