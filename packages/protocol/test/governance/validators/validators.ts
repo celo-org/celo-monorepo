@@ -574,7 +574,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe.only('#registerValidator', () => {
+  describe('#registerValidator', () => {
     const validator = accounts[0]
     let resp: any
     describe('when the account is not a registered validator', () => {
