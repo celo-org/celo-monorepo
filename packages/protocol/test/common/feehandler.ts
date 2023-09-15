@@ -1,4 +1,6 @@
 // TODO remove magic numbers
+// tslint:disable: ordered-imports
+// TODO either pretiffy is not fixing this or the linter is broken
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
@@ -8,7 +10,7 @@ import {
   assertTransactionRevertWithoutReason,
   expectBigNumberInRange,
   timeTravel,
-} from '@celo/protocol/lib/test-utils' //
+} from '@celo/protocol/lib/test-utils'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
