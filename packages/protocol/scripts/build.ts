@@ -129,7 +129,7 @@ function compile(outdir: string) {
   // check that there were no errors
   for (const contractName of ImplContracts) {
     try {
-      // TODO FIX warning Error: ./build/contracts/GasPriceMinimum.json: ENOENT: no such file or directory, open './build/contracts/GasPriceMinimum.json'
+      // This is issuing a warning: https://github.com/celo-org/celo-monorepo/issues/10564
       const fileStr = readJSONSync(`${outdir}/contracts/${contractName}.json`)
       if (hasEmptyBytecode(fileStr)) {
         console.error(

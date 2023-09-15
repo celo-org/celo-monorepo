@@ -124,13 +124,11 @@ export interface ASTVersionedReportIndex {
 
 export const isLibrary = (contract: string, artifactsSet: BuildArtifacts[]) => {
   for (const artifacts of artifactsSet){
-    // need to get a try here
 
     const artifact = artifacts.getArtifactByName(contract)
     if (artifact === undefined){
-      // EAFP
-      // thse artifacts doesn't have the desired property
-      // A priori we don't know in what folder they are
+      // EAFP 
+      // the library may be in another package
       continue
     }
     const zContract = makeZContract(artifact)
