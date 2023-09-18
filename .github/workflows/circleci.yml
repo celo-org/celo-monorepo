@@ -105,12 +105,6 @@ jobs:
           key: code-${{ github.sha }}
           restore-keys: |
             code-${{ github.sha }}
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 20
-        if: true
-        with:
-          limit-access-to-actor: true
       - name: Install yarn dependencies
         run: yarn install
         if: steps.cache_node.outputs.cache-hit != 'true'
