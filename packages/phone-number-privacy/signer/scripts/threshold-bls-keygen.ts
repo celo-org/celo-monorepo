@@ -1,5 +1,5 @@
 // tslint:disable: no-console
-import threshold_bls from 'blind-threshold-bls'
+import threshold_bls from '@celo/blind-threshold-bls'
 import crypto from 'crypto'
 
 const t = 2

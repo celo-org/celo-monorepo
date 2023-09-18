@@ -1,4 +1,4 @@
-import threshold_bls from 'blind-threshold-bls'
+import threshold_bls from '@celo/blind-threshold-bls'
 import { Server } from 'http'
 import { Server as HttpsServer } from 'https'
 

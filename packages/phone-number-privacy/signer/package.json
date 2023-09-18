@@ -53,7 +53,7 @@
     "@opentelemetry/sdk-trace-web": "^1.15.1",
     "@types/bunyan": "^1.8.8",
     "aws-sdk": "^2.705.0",
-    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
+    "@celo/blind-threshold-bls": "1.0.0-beta",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "knex": "^2.1.0",

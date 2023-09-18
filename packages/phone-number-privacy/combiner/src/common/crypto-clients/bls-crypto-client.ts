@@ -1,5 +1,5 @@
+import threshold_bls from '@celo/blind-threshold-bls'
 import { ErrorMessage } from '@celo/phone-number-privacy-common'
-import threshold_bls from 'blind-threshold-bls'
 import Logger from 'bunyan'
 import { CryptoClient, ServicePartialSignature } from './crypto-client'
 
