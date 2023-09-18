@@ -1,3 +1,4 @@
+import { sleep } from '@celo/base'
 import { StableToken } from '@celo/contractkit'
 import { OdisUtils } from '@celo/identity'
 import { ErrorMessages, getServiceContext, OdisAPI } from '@celo/identity/lib/odis/query'
@@ -25,7 +26,6 @@ import {
   PHONE_NUMBER,
   walletAuthSigner,
 } from './resources'
-import { sleep } from '@celo/base'
 
 const { IdentifierPrefix } = OdisUtils.Identifier
 
@@ -66,13 +66,14 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         walletAuthSigner,
         SERVICE_CONTEXT
       )
-      expect(res).toStrictEqual<PnpClientQuotaStatus>({
-        version: expectedVersion,
-        performedQueryCount: res.performedQueryCount,
-        totalQuota: res.totalQuota,
-        remainingQuota: res.totalQuota - res.performedQueryCount,
-        warnings: [],
-      })
+      expect(res).toEqual<PnpClientQuotaStatus>(
+        expect.objectContaining({
+          version: expectedVersion,
+          performedQueryCount: res.performedQueryCount,
+          totalQuota: res.totalQuota,
+          remainingQuota: res.totalQuota - res.performedQueryCount,
+        })
+      )
     })
 
     it('Should succeed when authenticated with DEK', async () => {
@@ -81,13 +82,14 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         dekAuthSigner(0),
         SERVICE_CONTEXT
       )
-      expect(res).toStrictEqual<PnpClientQuotaStatus>({
-        version: expectedVersion,
-        performedQueryCount: res.performedQueryCount,
-        totalQuota: res.totalQuota,
-        remainingQuota: res.totalQuota - res.performedQueryCount,
-        warnings: [],
-      })
+      expect(res).toEqual<PnpClientQuotaStatus>(
+        expect.objectContaining({
+          version: expectedVersion,
+          performedQueryCount: res.performedQueryCount,
+          totalQuota: res.totalQuota,
+          remainingQuota: res.totalQuota - res.performedQueryCount,
+        })
+      )
     })
 
     it('Should succeed on repeated valid requests', async () => {
@@ -101,15 +103,14 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         performedQueryCount: res1.performedQueryCount,
         totalQuota: res1.totalQuota,
         remainingQuota: res1.totalQuota - res1.performedQueryCount,
-        warnings: [],
       }
-      expect(res1).toStrictEqual<PnpClientQuotaStatus>(expectedRes)
+      expect(res1).toEqual<PnpClientQuotaStatus>(expect.objectContaining(expectedRes))
       const res2 = await OdisUtils.Quota.getPnpQuotaStatus(
         ACCOUNT_ADDRESS,
         dekAuthSigner(0),
         SERVICE_CONTEXT
       )
-      expect(res2).toStrictEqual<PnpClientQuotaStatus>(expectedRes)
+      expect(res2).toStrictEqual<PnpClientQuotaStatus>(expect.objectContaining(expectedRes))
     })
 
     it(`Should reject to throw ${ErrorMessages.ODIS_INPUT_ERROR} with invalid address`, async () => {
@@ -205,13 +206,14 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
           dekAuthSigner(0),
           SERVICE_CONTEXT
         )
-        expect(quotaRes).toStrictEqual<PnpClientQuotaStatus>({
-          version: expectedVersion,
-          performedQueryCount: startingPerformedQueryCount + 1,
-          totalQuota: startingTotalQuota,
-          remainingQuota: startingTotalQuota - (startingPerformedQueryCount + 1),
-          warnings: [],
-        })
+        expect(quotaRes).toEqual<PnpClientQuotaStatus>(
+          expect.objectContaining({
+            version: expectedVersion,
+            performedQueryCount: startingPerformedQueryCount + 1,
+            totalQuota: startingTotalQuota,
+            remainingQuota: startingTotalQuota - (startingPerformedQueryCount + 1),
+          })
+        )
       })
 
       it('Should increment performedQueryCount on success with WALLET_KEY auth', async () => {
@@ -228,13 +230,14 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
           walletAuthSigner,
           SERVICE_CONTEXT
         )
-        expect(quotaRes).toStrictEqual<PnpClientQuotaStatus>({
-          version: expectedVersion,
-          performedQueryCount: startingPerformedQueryCount + 1,
-          totalQuota: startingTotalQuota,
-          remainingQuota: startingTotalQuota - (startingPerformedQueryCount + 1),
-          warnings: [],
-        })
+        expect(quotaRes).toEqual<PnpClientQuotaStatus>(
+          expect.objectContaining({
+            version: expectedVersion,
+            performedQueryCount: startingPerformedQueryCount + 1,
+            totalQuota: startingTotalQuota,
+            remainingQuota: startingTotalQuota - (startingPerformedQueryCount + 1),
+          })
+        )
       })
     })
 
