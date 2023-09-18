@@ -42,19 +42,21 @@ export function pnpQuota(
     }
 
     const account = request.body.account
-    if (noQuotaCache.maximumQuotaReached(account)) {
-      const quota = noQuotaCache.getTotalQuota(account)
-      // can exist a race condition between the hasQuota and getTotalQuota but that's highly improbable
-      if (quota !== undefined) {
-        return {
-          status: 200,
-          body: {
-            success: true,
-            version: getCombinerVersion(),
-            performedQueryCount: quota,
-            totalQuota: quota,
-            warnings,
-          },
+    if (config.shouldCheckQuota) {
+      if (noQuotaCache.maximumQuotaReached(account)) {
+        const quota = noQuotaCache.getTotalQuota(account)
+        // can exist a race condition between the hasQuota and getTotalQuota but that's highly improbable
+        if (quota !== undefined) {
+          return {
+            status: 200,
+            body: {
+              success: true,
+              version: getCombinerVersion(),
+              performedQueryCount: quota,
+              totalQuota: quota,
+              warnings,
+            },
+          }
         }
       }
     }

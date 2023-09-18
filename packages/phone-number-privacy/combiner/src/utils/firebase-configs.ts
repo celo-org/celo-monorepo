@@ -48,6 +48,9 @@ export const pnpFullNodeDelaysMs = defineInt('PNP_FULL_NODE_DELAY_MS', {
 export const pnpShouldAuthenticate = defineBoolean('PNP_SHOULD_AUTHENTICATE', {
   default: true,
 })
+export const pnpShouldCheckQuota = defineBoolean('PNP_SHOULD_CHECK_QUOTA', {
+  default: false,
+})
 export const pnpShouldMockAccountService = defineBoolean('PNP_SHOULD_MOCK_ACCOUNT_SERVICE', {
   default: false,
 })
@@ -78,4 +81,7 @@ export const domainFullNodeDelaysMs = defineInt('DOMAIN_FULL_NODE_DELAY_MS', {
 })
 export const domainShouldAuthenticate = defineBoolean('DOMAIN_SHOULD_AUTHENTICATE', {
   default: true,
+})
+export const domainShouldCheckQuota = defineBoolean('DOMAIN_SHOULD_CHECK_QUOTA', {
+  default: false,
 })

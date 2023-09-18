@@ -49,11 +49,13 @@ export function pnpSign(
     }
 
     const account = request.body.account
-    if (noQuotaCache.maximumQuotaReached(account)) {
-      const quota = noQuotaCache.getTotalQuota(account)
-      // can exist a race condition between the hasQuota and getTotalQuota but that's highly improbable
-      if (quota !== undefined) {
-        return errorResult(403, WarningMessage.EXCEEDED_QUOTA)
+    if (config.shouldCheckQuota) {
+      if (noQuotaCache.maximumQuotaReached(account)) {
+        const quota = noQuotaCache.getTotalQuota(account)
+        // can exist a race condition between the hasQuota and getTotalQuota but that's highly improbable
+        if (quota !== undefined) {
+          return errorResult(403, WarningMessage.EXCEEDED_QUOTA)
+        }
       }
     }
 
