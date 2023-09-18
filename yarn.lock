@@ -8526,7 +8526,7 @@ bip39@^2.2.0, bip39@^2.5.0, bip39@^2.6.0:
 
 "bip39@https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2":
   version "3.0.3"
-  resolved "git+ssh://git@github.com/bitcoinjs/bip39.git#d8ea080a18b40f301d4e2219a2991cd2417e83c2"
+  resolved "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2"
   integrity sha512-I2ADywus8maO/BPS8eEULUXS20kQYJQ+/W0MxSEkEUGP+nj58ZYUL0i7BWSRdKwjQxLU8fEchj5p2JqhCVBltg==
   dependencies:
     "@types/node" "11.11.6"
