@@ -1,6 +1,6 @@
 import { StableToken } from '@celo/contractkit'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
-import { stableTokenInfos } from '@celo/contractkit/src/celo-tokens'
+import { stableTokenInfos } from '@celo/contractkit/lib/celo-tokens'
 import { flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import BigNumber from 'bignumber.js'
