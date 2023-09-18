@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "3.0.0-beta.3",
+  "version": "3.0.0-beta.4",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -32,7 +32,6 @@
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/bls12377js": "0.1.1",
     "@celo/contractkit": "^5.0.2",
     "@celo/explorer": "^5.0.2",
     "@celo/governance": "^5.0.2",
@@ -54,9 +53,7 @@
     "@oclif/plugin-warn-if-update-available": "^1.7.0",
     "@ethereumjs/util": "8.0.5",
     "@types/command-exists": "^1.2.0",
-    "bip32": "3.1.0",
     "bignumber.js": "9.0.0",
-    "bip39": "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2",
     "chalk": "^2.4.2",
     "cli-table": "^0.3.1",
     "cli-ux": "^5.4.9",
@@ -97,8 +94,7 @@
     "!lib/test-utils",
     "!lib/**/*.test.**",
     "!lib/**/*.d.ts",
-    "/oclif.manifest.json",
-    "/npm-shrinkwrap.json"
+    "/oclif.manifest.json"
   ],
   "oclif": {
     "bin": "celocli",
