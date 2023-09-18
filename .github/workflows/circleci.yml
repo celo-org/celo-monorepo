@@ -106,7 +106,7 @@ jobs:
           restore-keys: |
             code-${{ github.sha }}
       - name: Install yarn dependencies
-        run: yarn install
+        run: git config --global url."https://".insteadOf ssh:// && yarn install
         if: steps.cache_node.outputs.cache-hit != 'true'
       - name: Run yarn postinstall if cache hitted
         run: yarn run postinstall
