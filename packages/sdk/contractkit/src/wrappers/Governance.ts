@@ -572,7 +572,7 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
       const res = await this.contract.methods.getVoteRecord(voter, proposalIndex).call()
       const returnedProposalId = valueToBigNumber(res[0])
       // Vote record is for a different historical proposal with same index
-      if (returnedProposalId.toString() != proposalID.toString()) {
+      if (returnedProposalId.toString() !== proposalID.toString()) {
         return null
       }
 
