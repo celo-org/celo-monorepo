@@ -15,6 +15,7 @@ import fetch, { Response as FetchResponse } from 'node-fetch'
 import { performance } from 'perf_hooks'
 import { OdisConfig } from '../config'
 import { isAbortError, Signer } from './combine'
+import { AbortSignal } from 'node-fetch/externals'
 
 const httpAgent = new http.Agent({ keepAlive: true })
 const httpsAgent = new https.Agent({ keepAlive: true })
