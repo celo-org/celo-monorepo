@@ -552,8 +552,14 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
     try {
       const proposalIndex = await this.getDequeueIndex(proposalID)
       const res = await this.contract.methods.getVoteRecord(voter, proposalIndex).call()
+      const returnedProposalId = valueToBigNumber(res[0])
+      // Vote record is for a different historical proposal with same index
+      if (returnedProposalId.toString() != proposalID.toString()) {
+        return null
+      }
+
       return {
-        proposalID: valueToBigNumber(res[0]),
+        proposalID: returnedProposalId,
         value: Object.keys(VoteValue)[valueToInt(res[1])] as VoteValue,
         votes: valueToBigNumber(res[2]),
         yesVotes: valueToBigNumber(res[3]),

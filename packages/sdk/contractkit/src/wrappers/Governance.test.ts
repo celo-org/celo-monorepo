@@ -199,6 +199,30 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       expect(voteRecord?.abstainVotes).toEqBigNumber(0)
     })
 
+    it('#getVoteRecord for same index proposal', async () => {
+      const voter = accounts[2]
+      await proposeFn(accounts[0])
+      await timeTravel(expConfig.dequeueFrequency, web3)
+      await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
+      await approveFn()
+      await voteFn(voter)
+      // expire & delete proposal
+      await timeTravel(expConfig.referendumStageDuration + expConfig.executionStageDuration, web3)
+      await approveFn()
+      // propose new proposal with same index
+      await proposeFn(accounts[0])
+      await timeTravel(expConfig.dequeueFrequency, web3)
+      await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
+
+      const yesVotes = (await governance.getVotes(proposalID))[VoteValue.Yes]
+      expect(yesVotes).toEqBigNumber(0)
+
+      const voteRecord = await governance.getVoteRecord(voter, proposalID)
+      expect(voteRecord?.yesVotes ?? 0).toEqBigNumber(0)
+      expect(voteRecord?.noVotes ?? 0).toEqBigNumber(0)
+      expect(voteRecord?.abstainVotes ?? 0).toEqBigNumber(0)
+    })
+
     it('#votePartially', async () => {
       await proposeFn(accounts[0])
       await timeTravel(expConfig.dequeueFrequency, web3)
