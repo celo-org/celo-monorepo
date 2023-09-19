@@ -1472,7 +1472,8 @@ contract Governance is
 
     uint256 maxUsed = 0;
     for (uint256 index = 0; index < dequeued.length; index = index.add(1)) {
-      Proposals.Proposal storage proposal = proposals[dequeued[index]];
+      uint256 proposalId = dequeued[index];
+      Proposals.Proposal storage proposal = proposals[proposalId];
       bool isVotingReferendum = (getProposalDequeuedStage(proposal) == Proposals.Stage.Referendum);
 
       if (!isVotingReferendum) {
@@ -1480,6 +1481,11 @@ contract Governance is
       }
 
       VoteRecord storage voteRecord = voter.referendumVotes[index];
+      // skip if vote record is not for this proposal
+      if (voteRecord.proposalId != proposalId) {
+        continue;
+      }
+
       uint256 votesCast = voteRecord.yesVotes.add(voteRecord.noVotes).add(voteRecord.abstainVotes);
       maxUsed = Math.max(
         maxUsed,
@@ -1515,7 +1521,8 @@ contract Governance is
     Voter storage voter = voters[account];
 
     for (uint256 index = 0; index < dequeued.length; index = index.add(1)) {
-      Proposals.Proposal storage proposal = proposals[dequeued[index]];
+      uint256 proposalId = dequeued[index];
+      Proposals.Proposal storage proposal = proposals[proposalId];
       bool isVotingReferendum = (getProposalDequeuedStage(proposal) == Proposals.Stage.Referendum);
 
       if (!isVotingReferendum) {
@@ -1523,6 +1530,12 @@ contract Governance is
       }
 
       VoteRecord storage voteRecord = voter.referendumVotes[index];
+
+      // skip if vote record is not for this proposal
+      if (voteRecord.proposalId != proposalId) {
+        continue;
+      }
+
       uint256 sumOfVotes = voteRecord.yesVotes.add(voteRecord.noVotes).add(voteRecord.abstainVotes);
 
       if (sumOfVotes > newVotingPower) {
