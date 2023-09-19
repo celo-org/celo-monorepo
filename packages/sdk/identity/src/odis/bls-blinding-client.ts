@@ -34,7 +34,7 @@ export class WasmBlsBlindingClient implements BlsBlindingClient {
     } else if (this.isBrowserEnvironment()) {
       throw new Error('Cannot use WasmBlsBlindingClient in a browser environment')
     } else {
-      this.thresholdBls = require('@celo/blind-threshold-bls')
+      this.thresholdBls = require('blind-threshold-bls')
     }
   }
 

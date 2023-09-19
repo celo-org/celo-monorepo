@@ -1,4 +1,4 @@
-import threshold_bls from '@celo/blind-threshold-bls'
+import threshold_bls from 'blind-threshold-bls'
 
 require('dotenv').config()
 

@@ -1,5 +1,4 @@
 import { sleep } from '@celo/base'
-import threshold_bls from '@celo/blind-threshold-bls'
 import { StableToken } from '@celo/contractkit'
 import { OdisUtils } from '@celo/identity'
 import { ErrorMessages, getServiceContext, OdisAPI } from '@celo/identity/lib/odis/query'
@@ -12,6 +11,7 @@ import {
   SignMessageResponseSchema,
 } from '@celo/phone-number-privacy-common'
 import { normalizeAddressWith0x } from '@celo/utils/lib/address'
+import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import { config as signerConfig } from '../../../signer/src/config'

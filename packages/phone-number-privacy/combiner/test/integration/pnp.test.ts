@@ -1,4 +1,3 @@
-import threshold_bls from '@celo/blind-threshold-bls'
 import { newKit } from '@celo/contractkit'
 import {
   AuthenticationMethod,
@@ -33,6 +32,7 @@ import {
 } from '@celo/phone-number-privacy-signer/dist/config'
 import { startSigner } from '@celo/phone-number-privacy-signer/dist/server'
 import BigNumber from 'bignumber.js'
+import threshold_bls from 'blind-threshold-bls'
 import { Server } from 'http'
 import { Server as HttpsServer } from 'https'
 import { Knex } from 'knex'

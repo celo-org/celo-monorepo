@@ -1,5 +1,4 @@
 import { sleep } from '@celo/base'
-import threshold_bls from '@celo/blind-threshold-bls'
 import { newKit, StableToken } from '@celo/contractkit'
 import {
   AuthenticationMethod,
@@ -14,6 +13,7 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import { config } from '../../src/config'
