@@ -5,7 +5,7 @@
   "license": "SEE LICENSE IN SUB-PACKAGES",
   "private": true,
   "scripts": {
-    "preinstall": "git config --global url.\"https: //\".insteadOf ssh://",
+    "preinstall": "git config --global url.\"https://\".insteadOf ssh://",
     "install-pkg": "yarn install --link-duplicates",
     "lint": "yarn lerna run lint && yarn run --silent lint:do-not-merge",
     "lint:do-not-merge": "! git grep -E 'DO[ _]*NOT[ _]*MERGE'",
