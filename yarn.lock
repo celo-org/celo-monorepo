@@ -966,11 +966,6 @@
   resolved "https://registry.npmjs.org/@celo/base/-/base-1.5.2.tgz"
   integrity sha512-KGf6Dl9E6D01vAfkgkjL2sG+zqAjspAogILIpWstljWdG5ifyA75jihrnDEHaMCoQS0KxHvTdP1XYS/GS6BEyQ==
 
-"@celo/blind-threshold-bls@1.0.0-beta", "blind-threshold-bls@https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a", "blind-threshold-bls@npm:@celo/blind-threshold-bls@1.0.0-beta":
-  version "1.0.0-beta"
-  resolved "https://registry.yarnpkg.com/@celo/blind-threshold-bls/-/blind-threshold-bls-1.0.0-beta.tgz#6c46e55c3720d99929d6d34dd3770b1623a09900"
-  integrity sha512-sk9XLvbv0M0TJKJPHPc8FkIRTfP/PiPHeyKXPBTMZBW8URL4pRix9IfcT98zT5sA7hvMDJwgw3p3tM/L6Z1iGw==
-
 "@celo/bls12377js@0.1.1":
   version "0.1.1"
   resolved "https://registry.npmjs.org/@celo/bls12377js/-/bls12377js-0.1.1.tgz"
@@ -8569,6 +8564,11 @@ blakejs@^1.1.0:
   version "1.2.1"
   resolved "https://registry.npmjs.org/blakejs/-/blakejs-1.2.1.tgz"
   integrity sha512-QXUSXI3QVc/gJME0dBpXrag1kbzOqCjCX8/b54ntNyW6sjtoqxqRk3LTmXzaJoh71zMsDCjM+47jS7XiwN/+fQ==
+
+"blind-threshold-bls@https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a", "blind-threshold-bls@npm:@celo/blind-threshold-bls@1.0.0-beta":
+  version "1.0.0-beta"
+  resolved "https://registry.yarnpkg.com/@celo/blind-threshold-bls/-/blind-threshold-bls-1.0.0-beta.tgz#6c46e55c3720d99929d6d34dd3770b1623a09900"
+  integrity sha512-sk9XLvbv0M0TJKJPHPc8FkIRTfP/PiPHeyKXPBTMZBW8URL4pRix9IfcT98zT5sA7hvMDJwgw3p3tM/L6Z1iGw==
 
 "bls12377js@https://github.com/celo-org/bls12377js#cb38a4cfb643c778619d79b20ca3e5283a2122a6":
   version "0.1.0"
