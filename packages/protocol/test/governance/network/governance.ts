@@ -2231,7 +2231,10 @@ contract('Governance', (accounts: string[]) => {
 
       it('should revert when the account weight is 0', async () => {
         await mockLockedGold.setAccountTotalGovernancePower(account, 0)
-        await assertRevert(governance.vote(proposalId, index, value))
+        await assertTransactionRevertWithReason(
+          governance.vote(proposalId, index, value),
+          'Voter weight zero'
+        )
       })
 
       it('should revert when the index is out of bounds', async () => {
@@ -4184,6 +4187,8 @@ contract('Governance', (accounts: string[]) => {
     })
 
     describe('proposal dequeued', () => {
+      const originalDequeuedIndex = 0
+      const proposalId = 1
       beforeEach(async () => {
         await governance.propose(
           [transactionSuccess1.value],
@@ -4198,11 +4203,12 @@ contract('Governance', (accounts: string[]) => {
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(1, 0)
         await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
+        assertEqualBN(await governance.dequeued(originalDequeuedIndex), proposalId)
       })
 
       describe('When account voted on proposal in V8', () => {
         beforeEach(async () => {
-          await governance.setDeprecatedWeight(accounts[0], 0, 100)
+          await governance.setDeprecatedWeight(accounts[0], 0, 100, 1)
         })
 
         it('Should return correct number of votes', async () => {
@@ -4232,6 +4238,38 @@ contract('Governance', (accounts: string[]) => {
           const totalVotesByAccount = await governance.getAmountOfGoldUsedForVoting(accounts[0])
 
           assertEqualBN(totalVotesByAccount, 0)
+        })
+
+        describe('When index of proposal gets reused', () => {
+          const newProposalId = 2
+          const newDequeuedIndex = 0
+          beforeEach(async () => {
+            // expire the proposal
+            await timeTravel(executionStageDuration + referendumStageDuration + 1, web3)
+            // delete expired proposal
+            await governance.approve(proposalId, originalDequeuedIndex)
+
+            await governance.propose(
+              [transactionSuccess1.value],
+              [transactionSuccess1.destination],
+              // @ts-ignore bytes type
+              transactionSuccess1.data,
+              [transactionSuccess1.data.length],
+              descriptionUrl,
+              // @ts-ignore:
+              { value: minDeposit }
+            )
+            await timeTravel(dequeueFrequency + 1, web3)
+            await governance.dequeueProposalsIfReady()
+            await governance.approve(newProposalId, newDequeuedIndex)
+            assertEqualBN(await governance.dequeued(newDequeuedIndex), newProposalId)
+          })
+
+          it('Should return 0 votes since user never voted for new proposal', async () => {
+            const totalVotesByAccount = await governance.getAmountOfGoldUsedForVoting(accounts[0])
+
+            assertEqualBN(totalVotesByAccount, 0)
+          })
         })
       })
     })
