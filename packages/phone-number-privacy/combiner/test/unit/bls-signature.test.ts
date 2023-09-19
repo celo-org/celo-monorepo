@@ -1,5 +1,5 @@
+import threshold_bls from '@celo/blind-threshold-bls'
 import { KeyVersionInfo, rootLogger } from '@celo/phone-number-privacy-common'
-import threshold_bls, { KeyVersionInfo } from '@celo/blind-threshold-bls'
 import { BLSCryptographyClient } from '../../src/common/crypto-clients/bls-crypto-client'
 import { ServicePartialSignature } from '../../src/common/crypto-clients/crypto-client'
 import config from '../../src/config'
