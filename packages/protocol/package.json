@@ -64,7 +64,7 @@
     "@truffle/contract": "4.6.10",
     "@truffle/resolver": "9.0.27",
     "bignumber.js": "9.1.0",
-    "bip39": "^2.6.0",
+    "bip39": "^3.0.4",
     "chai": "^4.3.6",
     "chai-subset": "^1.6.0",
     "csv-parser": "^2.0.0",

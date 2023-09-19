@@ -32,7 +32,7 @@
     "@types/randombytes": "^2.0.0",
     "bigi": "^1.4.2",
     "bip32": "^3.1.0",
-    "bip39": "^2.6.0",
+    "bip39": "^3.0.4",
     "buffer-reverse": "^1.0.1",
     "elliptic": "^6.5.4",
     "ethereum-cryptography": "1.2.0",

@@ -24,7 +24,7 @@
     "@google-cloud/storage": "^2.4.3",
     "bignumber.js": "^9.0.0",
     "bip32": "3.1.0",
-    "bip39": "^2.6.0",
+    "bip39": "^3.0.4",
     "bunyan": "1.8.12",
     "bunyan-gke-stackdriver": "0.1.2",
     "compare-versions": "^3.5.1",
