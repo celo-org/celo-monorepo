@@ -15,7 +15,6 @@ import fetch, { Response as FetchResponse } from 'node-fetch'
 import { performance } from 'perf_hooks'
 import { OdisConfig } from '../config'
 import { isAbortError, Signer } from './combine'
-import { AbortSignal } from 'node-fetch/externals'
 
 const httpAgent = new http.Agent({ keepAlive: true })
 const httpsAgent = new https.Agent({ keepAlive: true })
@@ -86,6 +85,7 @@ export async function fetchSignerResponseWithFallback<R extends OdisRequest>(
         [KEY_VERSION_HEADER]: keyVersion.toString()
       },
       body: JSON.stringify(request.body),
+      // @ts-expect-error -- wants a param for abortifThrown but thats not available on the incoming yet. @alec will fix it ;) 
       signal: abortSignal,
       agent: url.startsWith("https://") ? httpsAgent : httpAgent
     })
