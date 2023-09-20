@@ -31,7 +31,7 @@
     "@celo/phone-number-privacy-common": "^3.0.4-dev",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
-    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
+    "blind-threshold-bls": "npm:@celo/blind-threshold-bls@1.0.0-beta",
     "cross-fetch": "3.0.6",
     "debug": "^4.1.1",
     "elliptic": "^6.5.4",
