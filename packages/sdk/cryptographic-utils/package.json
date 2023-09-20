@@ -36,6 +36,7 @@
     "buffer-reverse": "^1.0.1",
     "elliptic": "^6.5.4",
     "ethereum-cryptography": "1.2.0",
+    "randombytes": "^2.0.1",
     "tiny-secp256k1": "2.2.1"
   },
   "devDependencies": {

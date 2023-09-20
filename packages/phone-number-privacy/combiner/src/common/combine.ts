@@ -79,6 +79,7 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
           keyVersionInfo.keyVersion,
           request,
           logger,
+          // @ts-ignore
           abortSignal
         )
 
