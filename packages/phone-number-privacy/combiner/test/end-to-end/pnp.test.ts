@@ -1,3 +1,4 @@
+import { sleep } from '@celo/base'
 import { StableToken } from '@celo/contractkit'
 import { OdisUtils } from '@celo/identity'
 import { ErrorMessages, getServiceContext, OdisAPI } from '@celo/identity/lib/odis/query'
@@ -25,7 +26,6 @@ import {
   PHONE_NUMBER,
   walletAuthSigner,
 } from './resources'
-import { sleep } from '@celo/base'
 
 const { IdentifierPrefix } = OdisUtils.Identifier
 
