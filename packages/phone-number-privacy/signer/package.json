@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@celo/base": "^5.0.3-dev",
+    "blind-threshold-bls": "npm:@celo/blind-threshold-bls@1.0.0-beta",
     "@celo/contractkit": "^5.0.3-dev",
     "@celo/phone-number-privacy-common": "^3.0.4-dev",
     "@celo/poprf": "^0.1.9",
@@ -53,7 +54,6 @@
     "@opentelemetry/sdk-trace-web": "^1.15.1",
     "@types/bunyan": "^1.8.8",
     "aws-sdk": "^2.705.0",
-    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "knex": "^2.1.0",

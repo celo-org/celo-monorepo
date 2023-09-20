@@ -41,7 +41,8 @@
     "fp-ts": "2.1.1",
     "io-ts": "2.0.1",
     "semver": "^7.3.5",
-    "web3": "1.10.0"
+    "web3": "1.10.0",
+    "web3-core-helpers": "1.10.0"
   },
   "devDependencies": {
     "@celo/phone-utils": "5.0.3-dev",

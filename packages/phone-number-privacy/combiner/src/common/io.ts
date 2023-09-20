@@ -85,6 +85,7 @@ export async function fetchSignerResponseWithFallback<R extends OdisRequest>(
         [KEY_VERSION_HEADER]: keyVersion.toString()
       },
       body: JSON.stringify(request.body),
+      // @ts-expect-error -- wants a param for abortifThrown but thats not available on the incoming yet. @alec will fix it ;) 
       signal: abortSignal,
       agent: url.startsWith("https://") ? httpsAgent : httpAgent
     })
