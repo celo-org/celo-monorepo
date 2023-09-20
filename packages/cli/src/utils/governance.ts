@@ -1,6 +1,6 @@
 import { toTxResult } from '@celo/connect'
 import { ContractKit } from '@celo/contractkit'
-import { ProposalTransaction } from '@celo/contractkit/src/wrappers/Governance'
+import { ProposalTransaction } from '@celo/contractkit/lib/wrappers/Governance'
 import { ProposalBuilder, proposalToJSON, ProposalTransactionJSON } from '@celo/governance'
 import chalk from 'chalk'
 import { readJsonSync } from 'fs-extra'
