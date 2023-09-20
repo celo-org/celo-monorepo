@@ -71,12 +71,12 @@ export class LedgerWallet extends RemoteWallet<LedgerSigner> implements ReadOnly
     // CeloLedger does not support maxFeePerGas and maxPriorityFeePerGas yet
     txParams.gasPrice = txParams.gasPrice ?? txParams.maxFeePerGas
     if (txParams.maxFeePerGas || txParams.maxPriorityFeePerGas) {
-      console.warn(
-        'maxFeePerGas and maxPriorityFeePerGas are not supported on Ledger yet. Using gasPrice instead.'
+      console.info(
+        'maxFeePerGas and maxPriorityFeePerGas are not supported on Ledger yet. Automatically using gasPrice instead.'
       )
+      delete txParams.maxFeePerGas
+      delete txParams.maxPriorityFeePerGas
     }
-    delete txParams.maxFeePerGas
-    delete txParams.maxPriorityFeePerGas
     return super.signTransaction(txParams)
   }
 
