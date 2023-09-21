@@ -391,7 +391,7 @@ describe('recoverTransaction', () => {
           "value": 1000000000000000000,
           "yParity": 0,
         },
-        "0xb2a81DC4204cF3E96488dFa71a633ae5B336b3fE",
+        "0x1Be31A94361a391bBaFB2a4CCd704F57dc04d4bb",
       ]
     `)
   })
