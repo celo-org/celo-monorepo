@@ -40,7 +40,7 @@
     "@celo/base": "^5.0.4",
     "blind-threshold-bls": "npm:@celo/blind-threshold-bls@1.0.0-beta",
     "@celo/contractkit": "^5.0.4",
-    "@celo/phone-number-privacy-common": "^3.0.4",
+    "@celo/phone-number-privacy-common": "^3.0.3",
     "@celo/poprf": "^0.1.9",
     "@celo/utils": "^5.0.4",
     "@celo/wallet-hsm-azure": "^5.0.4",
