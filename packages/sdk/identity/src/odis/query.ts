@@ -58,13 +58,13 @@ export const ODIS_STAGING_CONTEXT: ServiceContext = {
 }
 
 export const ODIS_ALFAJORES_CONTEXT_PNP: ServiceContext = {
-  odisUrl: 'https://us-central1-celo-phone-number-privacy.cloudfunctions.net/combiner',
+  odisUrl: 'https://us-central1-celo-phone-number-privacy.cloudfunctions.net/combinerGen2',
   odisPubKey:
     'kPoRxWdEdZ/Nd3uQnp3FJFs54zuiS+ksqvOm9x8vY6KHPG8jrfqysvIRU0wtqYsBKA7SoAsICMBv8C/Fb2ZpDOqhSqvr/sZbZoHmQfvbqrzbtDIPvUIrHgRS0ydJCMsA',
 }
 
 export const ODIS_ALFAJORES_CONTEXT_DOMAINS: ServiceContext = {
-  odisUrl: 'https://us-central1-celo-phone-number-privacy.cloudfunctions.net/combiner',
+  odisUrl: 'https://us-central1-celo-phone-number-privacy.cloudfunctions.net/combinerGen2',
   odisPubKey:
     '+ZrxyPvLChWUX/DyPw6TuGwQH0glDJEbSrSxUARyP5PuqYyP/U4WZTV1e0bAUioBZ6QCJMiLpDwTaFvy8VnmM5RBbLQUMrMg5p4+CBCqj6HhsMfcyUj8V0LyuNdStlCB',
 }
