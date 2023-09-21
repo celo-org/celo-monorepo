@@ -387,13 +387,13 @@ function prefixAwareRLPDecode(rlpEncode: string, type: TransactionTypes): string
   return type === 'celo-legacy' ? RLP.decode(rlpEncode) : RLP.decode(`0x${rlpEncode.slice(4)}`)
 }
 
-function correctLengthOf(type: TransactionTypes, hasSignature: boolean = true) {
+function correctLengthOf(type: TransactionTypes, includeSig: boolean = true) {
   switch (type) {
     case 'cip64': {
-      return hasSignature ? 13 : 10
+      return includeSig ? 13 : 10
     }
     case 'cip42':
-      return hasSignature ? 15 : 12
+      return includeSig ? 15 : 12
     case 'celo-legacy':
     case 'eip1559':
       return 12
@@ -478,8 +478,10 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
 // inspired by @ethereumjs/tx
 function getPublicKeyofSignerFromTx(transactionArray: string[], type: TransactionTypes) {
   // this needs to be 10 for cip64, 12 for cip42 and eip1559
-  const base = transactionArray.slice(0, correctLengthOf(type))
+  console.info('type', type)
+  const base = transactionArray.slice(0, correctLengthOf(type, false))
   const message = concatHex([TxTypeToPrefix[type], RLP.encode(base).slice(2)])
+  console.log('message', message)
   const msgHash = keccak256(hexToBytes(message))
 
   const { v, r, s } = extractSignatureFromDecoded(transactionArray)
