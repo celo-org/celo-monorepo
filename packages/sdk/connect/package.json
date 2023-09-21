@@ -22,20 +22,21 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
+    "@ethereumjs/util": "8.0.5",
     "@types/debug": "^4.1.5",
     "@types/utf8": "^2.1.6",
     "@celo/base": "5.0.4",
     "@celo/utils": "5.0.4",
     "bignumber.js": "^9.0.0",
     "debug": "^4.1.1",
-    "utf8": "3.0.0"
+    "utf8": "3.0.0",
+    "web3-core": "1.10.0",
+    "web3-eth": "1.10.0",
+    "web3-eth-contract": "1.10.0"
   },
   "devDependencies": {
     "web3": "1.10.0",
-    "web3-core": "1.10.0",
-    "web3-eth": "1.10.0",
-    "web3-eth-abi": "1.10.0",
-    "web3-eth-contract": "1.10.0"
+    "web3-eth-abi": "1.10.0"
   },
   "peerDependencies": {
     "web3": "1.10.0"
