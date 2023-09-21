@@ -182,11 +182,12 @@ describe('Transaction Utils', () => {
       if (celoTransaction.gasPrice != undefined) {
         description.push(`Testing Legacy with gas price ${celoTransaction.gasPrice}`)
       } else if (
-        celoTransaction.feeCurrency != undefined ||
         celoTransaction.gatewayFeeRecipient !== undefined ||
         celoTransaction.gatewayFee !== undefined
       ) {
         description.push('Testing CIP42 with')
+      } else if (celoTransaction.feeCurrency != undefined) {
+        description.push('Testing CIP64 with')
       } else {
         description.push(`Testing EIP1559 with maxFeePerGas ${celoTransaction.maxFeePerGas}`)
       }
