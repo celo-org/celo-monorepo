@@ -15,7 +15,6 @@ import {
 } from '@celo/connect/lib/utils/formatter'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
-import { RLP } from '@ethereumjs/rlp'
 import {
   Address,
   bufferToHex,
@@ -28,7 +27,7 @@ import {
 } from '@ethereumjs/util'
 import debugFactory from 'debug'
 // @ts-ignore-next-line eth-lib types not found
-import { account as Account, bytes as Bytes, hash as Hash } from 'eth-lib'
+import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
 import { keccak256 } from 'ethereum-cryptography/keccak'
 import { hexToBytes } from 'ethereum-cryptography/utils.js'
 import Web3 from 'web3' // TODO try to do this without web3 direct
@@ -129,11 +128,12 @@ export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
   transaction.maxFeePerGas = stringNumberOrBNToHex(tx.maxFeePerGas)
   transaction.maxPriorityFeePerGas = stringNumberOrBNToHex(tx.maxPriorityFeePerGas)
 
+  let rlpEncode: Hex
   if (isCIP42(tx)) {
     // There shall be a typed transaction with the code 0x7c that has the following format:
     // 0x7c || rlp([chain_id, nonce, max_priority_fee_per_gas, max_fee_per_gas, gas_limit, feecurrency, gatewayFeeRecipient, gatewayfee, destination, amount, data, access_list, signature_y_parity, signature_r, signature_s]).
     // This will be in addition to the type 0x02 transaction as specified in EIP-1559.
-    const rlpEncode = RLP.encode([
+    rlpEncode = RLP.encode([
       stringNumberToHex(transaction.chainId),
       stringNumberToHex(transaction.nonce),
       transaction.maxPriorityFeePerGas || '0x',
@@ -147,11 +147,11 @@ export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
       transaction.data || '0x',
       transaction.accessList || [],
     ])
-    return { transaction, rlpEncode: concatHex(['0x7c', rlpEncode.toString()]), type: 'cip42' }
+    return { transaction, rlpEncode: concatHex(['0x7c', rlpEncode]), type: 'cip42' }
   } else if (isEIP1559(tx)) {
     // https://eips.ethereum.org/EIPS/eip-1559
     // 0x02 || rlp([chain_id, nonce, max_priority_fee_per_gas, max_fee_per_gas, gas_limit, destination, amount, data, access_list, signature_y_parity, signature_r, signature_s]).
-    const rlpEncode = RLP.encode([
+    rlpEncode = RLP.encode([
       stringNumberToHex(transaction.chainId),
       stringNumberToHex(transaction.nonce),
       transaction.maxPriorityFeePerGas || '0x',
@@ -162,11 +162,11 @@ export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
       transaction.data || '0x',
       transaction.accessList || [],
     ])
-    return { transaction, rlpEncode: concatHex(['0x02', rlpEncode.toString()]), type: 'eip1559' }
+    return { transaction, rlpEncode: concatHex(['0x02', rlpEncode]), type: 'eip1559' }
   } else {
     // This order should match the order in Geth.
     // https://github.com/celo-org/celo-blockchain/blob/027dba2e4584936cc5a8e8993e4e27d28d5247b8/core/types/transaction.go#L65
-    const rlpEncode = RLP.encode([
+    rlpEncode = RLP.encode([
       stringNumberToHex(transaction.nonce),
       transaction.gasPrice,
       transaction.gas,
@@ -180,8 +180,7 @@ export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
       '0x',
       '0x',
     ])
-
-    return { transaction, rlpEncode: rlpEncode.toString() as Hex, type: 'celo-legacy' }
+    return { transaction, rlpEncode, type: 'celo-legacy' }
   }
 }
 

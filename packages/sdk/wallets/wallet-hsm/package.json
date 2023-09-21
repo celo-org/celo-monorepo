@@ -33,6 +33,9 @@
     "elliptic": "^6.5.4",
     "secp256k1": "^4.0.0"
   },
+  "devDependencies": {
+    "dotenv": "^8.2.0"
+  },
   "engines": {
     "node": ">=8.14.2"
   }
