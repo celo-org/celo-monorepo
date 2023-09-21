@@ -35,7 +35,7 @@
     "@celo/dev-utils": "0.0.1",
     "@celo/contractkit": "5.0.4",
     "bn.js": "^5.1.0",
-    "web3": "1.10.1"
+    "web3": "1.10.0"
   },
   "engines": {
     "node": ">=8.14.2"
