@@ -8,7 +8,6 @@ import {
   getDynamicEnvVarValue,
 } from './env-utils'
 import { AksClusterConfig } from './k8s-cluster/aks'
-import { AwsClusterConfig } from './k8s-cluster/aws'
 import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './k8s-cluster/base'
 import { GCPClusterConfig } from './k8s-cluster/gcp'
 import { getClusterManager } from './k8s-cluster/utils'
@@ -27,17 +26,6 @@ const contextAksClusterConfigDynamicEnvVars: {
 }
 
 /**
- * Env vars corresponding to each value for the AwsClusterConfig for a particular context
- */
-const contextAwsClusterConfigDynamicEnvVars: {
-  [k in keyof Omit<AwsClusterConfig, 'cloudProvider'>]: DynamicEnvVar
-} = {
-  clusterName: DynamicEnvVar.KUBERNETES_CLUSTER_NAME,
-  clusterRegion: DynamicEnvVar.AWS_CLUSTER_REGION,
-  resourceGroupTag: DynamicEnvVar.AWS_RESOURCE_GROUP_TAG,
-}
-
-/**
  * Env vars corresponding to each value for the GCPClusterConfig for a particular context
  */
 const contextGCPClusterConfigDynamicEnvVars: {
@@ -51,7 +39,6 @@ const contextGCPClusterConfigDynamicEnvVars: {
 const clusterConfigGetterByCloudProvider: {
   [key in CloudProvider]: (context: string) => BaseClusterConfig
 } = {
-  [CloudProvider.AWS]: getAwsClusterConfig,
   [CloudProvider.AZURE]: getAksClusterConfig,
   [CloudProvider.GCP]: getGCPClusterConfig,
 }
@@ -85,24 +72,7 @@ export function getAksClusterConfig(context: string): AksClusterConfig {
 /**
  * Fetches the env vars for a particular context
  * @param context the context to use
- * @return an AwsClusterConfig for the context
- */
-export function getAwsClusterConfig(context: string): AwsClusterConfig {
-  const awsDynamicEnvVars = getContextDynamicEnvVarValues(
-    contextAwsClusterConfigDynamicEnvVars,
-    context
-  )
-  const clusterConfig: AwsClusterConfig = {
-    cloudProvider: CloudProvider.AZURE,
-    ...awsDynamicEnvVars,
-  }
-  return clusterConfig
-}
-
-/**
- * Fetches the env vars for a particular context
- * @param context the context to use
- * @return an AwsClusterConfig for the context
+ * @return an GCPClusterConfig for the context
  */
 export function getGCPClusterConfig(context: string): GCPClusterConfig {
   const gcpDynamicEnvVars = getContextDynamicEnvVarValues(
@@ -166,7 +136,7 @@ export function getContextDynamicEnvVarValues<T>(
 }
 
 /**
- * Reads the context and switches to the appropriate Azure or AWS Cluster
+ * Reads the context and switches to the appropriate Azure Cluster
  */
 export async function switchToContextCluster(
   celoEnv: string,
