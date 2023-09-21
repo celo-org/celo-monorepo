@@ -369,6 +369,32 @@ describe('recoverTransaction', () => {
       ]
     `)
   })
+  it('handles cip64 transactions', () => {
+    const cip64TX =
+      '0x7bf88282ad5a8063630a94588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdefc094cd2a3d9f938e13cd947ec05abc7fe734df8dd82680a091b5504a59e529e7efa42dbb97fbc3311a91d035c873a94ab0789441fc989f84a02e8254d6b3101b63417e5d496833bc84f4832d4a8bf8a2b83e291d8f38c0f62d'
+    expect(recoverTransaction(cip64TX)).toMatchInlineSnapshot(`
+      [
+        {
+          "accessList": [],
+          "chainId": 44378,
+          "data": "0xabcdef",
+          "feeCurrency": "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
+          "gas": 10,
+          "maxFeePerGas": 99,
+          "maxPriorityFeePerGas": 99,
+          "nonce": 0,
+          "r": "0x91b5504a59e529e7efa42dbb97fbc3311a91d035c873a94ab0789441fc989f84",
+          "s": "0x2e8254d6b3101b63417e5d496833bc84f4832d4a8bf8a2b83e291d8f38c0f62d",
+          "to": "0x588e4b68193001e4d10928660ab4165b813717c0",
+          "type": "cip64",
+          "v": 27,
+          "value": 1000000000000000000,
+          "yParity": 0,
+        },
+        "0xb2a81DC4204cF3E96488dFa71a633ae5B336b3fE",
+      ]
+    `)
+  })
   it('handles cip42 transactions', () => {
     const cip42TX =
       '0x7cf89a82ad5a8063630a94cd2a3d9f938e13cd947ec05abc7fe734df8dd826941be31a94361a391bbafb2a4ccd704f57dc04d4bb82567894588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdefc01ba0c610507b2ac3cff80dd7017419021196807d605efce0970c18cde48db33c27d1a01799477e0f601f554f0ee6f7ac21490602124801e9f7a99d9605249b90f03112'

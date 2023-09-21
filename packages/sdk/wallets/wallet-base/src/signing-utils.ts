@@ -387,10 +387,13 @@ function prefixAwareRLPDecode(rlpEncode: string, type: TransactionTypes): string
   return type === 'celo-legacy' ? RLP.decode(rlpEncode) : RLP.decode(`0x${rlpEncode.slice(4)}`)
 }
 
-function correctLengthWithSignatureOf(type: TransactionTypes) {
+function correctLengthOf(type: TransactionTypes, hasSignature: boolean = true) {
   switch (type) {
+    case 'cip64': {
+      return hasSignature ? 13 : 10
+    }
     case 'cip42':
-      return 15
+      return hasSignature ? 15 : 12
     case 'celo-legacy':
     case 'eip1559':
       return 12
@@ -401,9 +404,9 @@ export function extractSignature(rawTx: string) {
   const type = determineTXType(rawTx)
   const rawValues = prefixAwareRLPDecode(rawTx, type)
   const length = rawValues.length
-  if (correctLengthWithSignatureOf(type) !== length) {
+  if (correctLengthOf(type) !== length) {
     throw new Error(
-      `@extractSignature: provided transaction has ${length} elements but ${type} txs with a signature have ${correctLengthWithSignatureOf(
+      `@extractSignature: provided transaction has ${length} elements but ${type} txs with a signature have ${correctLengthOf(
         type
       )} ${JSON.stringify(rawValues)}`
     )
@@ -473,9 +476,9 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
 }
 
 // inspired by @ethereumjs/tx
-function getPublicKeyofSignerFromTx(transactionArray: string[]) {
-  // TODO this needs to be 10 for cip64
-  const base = transactionArray.slice(0, 12) // 12 is length of cip42 without vrs fields
+function getPublicKeyofSignerFromTx(transactionArray: string[], type: TransactionTypes) {
+  // this needs to be 10 for cip64, 12 for cip42 and eip1559
+  const base = transactionArray.slice(0, correctLengthOf(type, false))
   const message = concatHex([TxTypeToPrefix.cip42, RLP.encode(base).slice(2)])
   const msgHash = keccak256(hexToBytes(message))
 
@@ -494,7 +497,10 @@ function getPublicKeyofSignerFromTx(transactionArray: string[]) {
 
 export function getSignerFromTxEIP2718TX(serializedTransaction: string): string {
   const transactionArray: any[] = RLP.decode(`0x${serializedTransaction.slice(4)}`)
-  const signer = getPublicKeyofSignerFromTx(transactionArray)
+  const signer = getPublicKeyofSignerFromTx(
+    transactionArray,
+    determineTXType(serializedTransaction)
+  )
   return toChecksumAddress(Address.fromPublicKey(signer).toString())
 }
 
