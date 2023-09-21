@@ -478,10 +478,8 @@ export function recoverTransaction(rawTx: string): [CeloTx, string] {
 // inspired by @ethereumjs/tx
 function getPublicKeyofSignerFromTx(transactionArray: string[], type: TransactionTypes) {
   // this needs to be 10 for cip64, 12 for cip42 and eip1559
-  console.info('type', type)
   const base = transactionArray.slice(0, correctLengthOf(type, false))
   const message = concatHex([TxTypeToPrefix[type], RLP.encode(base).slice(2)])
-  console.log('message', message)
   const msgHash = keccak256(hexToBytes(message))
 
   const { v, r, s } = extractSignatureFromDecoded(transactionArray)
