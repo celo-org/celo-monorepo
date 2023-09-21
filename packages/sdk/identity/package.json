@@ -1,6 +1,6 @@
 {
   "name": "@celo/identity",
-  "version": "5.0.3-dev",
+  "version": "5.0.4",
   "description": "Utilities for interacting with Celo's identity protocol",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -25,10 +25,10 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@celo/base": "5.0.3-dev",
-    "@celo/utils": "5.0.3-dev",
-    "@celo/contractkit": "5.0.3-dev",
-    "@celo/phone-number-privacy-common": "^3.0.4-dev",
+    "@celo/base": "5.0.4",
+    "@celo/utils": "5.0.4",
+    "@celo/contractkit": "5.0.4",
+    "@celo/phone-number-privacy-common": "^3.0.3",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
     "blind-threshold-bls": "npm:@celo/blind-threshold-bls@1.0.0-beta",
@@ -40,8 +40,8 @@
     "io-ts": "2.0.1"
   },
   "devDependencies": {
-    "@celo/dev-utils": "0.0.1-dev",
-    "@celo/wallet-local": "5.0.3-dev",
+    "@celo/dev-utils": "0.0.1",
+    "@celo/wallet-local": "5.0.4",
     "@types/elliptic": "^6.4.12",
     "fetch-mock": "9.10.4",
     "ganache": "npm:@celo/ganache@7.8.0-unofficial.0",
