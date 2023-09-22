@@ -39,12 +39,6 @@ export interface SignerConfig {
     sslCertPath?: string
   }
   quota: {
-    unverifiedQueryMax: number
-    additionalVerifiedQueryMax: number
-    queryPerTransaction: number
-    minDollarBalance: BigNumber
-    minEuroBalance: BigNumber
-    minCeloBalance: BigNumber
     queryPriceInCUSD: BigNumber
   }
   api: {
@@ -116,15 +110,6 @@ export const config: SignerConfig = {
     sslCertPath: env.SERVER_SSL_CERT_PATH,
   },
   quota: {
-    unverifiedQueryMax: Number(env.UNVERIFIED_QUERY_MAX ?? 10),
-    additionalVerifiedQueryMax: Number(env.ADDITIONAL_VERIFIED_QUERY_MAX ?? 30),
-    queryPerTransaction: Number(env.QUERY_PER_TRANSACTION ?? 2),
-    // Min balance is .01 cUSD
-    minDollarBalance: new BigNumber(env.MIN_DOLLAR_BALANCE ?? 1e16),
-    // Min balance is .01 cEUR
-    minEuroBalance: new BigNumber(env.MIN_DOLLAR_BALANCE ?? 1e16),
-    // Min balance is .005 CELO
-    minCeloBalance: new BigNumber(env.MIN_DOLLAR_BALANCE ?? 5e15),
     // Equivalent to 0.001 cUSD/query
     queryPriceInCUSD: new BigNumber(env.QUERY_PRICE_PER_CUSD ?? 0.001),
   },

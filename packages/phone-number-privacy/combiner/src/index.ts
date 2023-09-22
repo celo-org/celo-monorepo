@@ -1,18 +1,28 @@
-import * as functions from 'firebase-functions/v2/https'
-import config from './config'
+import { rootLogger } from '@celo/phone-number-privacy-common'
+import { config, DEV_MODE } from './config'
 import { startCombiner } from './server'
-import { blockchainApiKey, minInstancesConfig, requestConcurency } from './utils/firebase-configs'
 
 require('dotenv').config()
 
-export const combinerGen2 = functions.onRequest(
-  {
-    minInstances: minInstancesConfig,
-    secrets: [blockchainApiKey],
-    concurrency: requestConcurency,
-    memory: '512MiB',
-    region: 'us-central1',
-  },
-  startCombiner(config)
-)
+async function start() {
+  const logger = rootLogger(config.serviceName)
+  logger.info(`Starting. Dev mode: ${DEV_MODE}`)
+
+  logger.info('Starting server')
+  const server = startCombiner(config)
+  // const server = startCombiner(config, getContractKitWithAgent(config.blockchain))
+
+  const port = config.server.port ?? 0
+  server.listen(port, () => {
+    logger.info(`Server is listening on port ${port}`)
+  })
+}
+
+start().catch((err) => {
+  const logger = rootLogger(config.serviceName)
+  logger.error({ err }, 'Fatal error occured. Exiting')
+  process.exit(1)
+})
+
 export * from './config'
+export * from './server'
