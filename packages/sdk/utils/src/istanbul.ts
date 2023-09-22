@@ -1,6 +1,6 @@
-import * as rlp from 'rlp'
 import { bufferToHex, toChecksumAddress } from '@ethereumjs/util'
 import BigNumber from 'bignumber.js'
+import * as rlp from 'rlp'
 import { Address } from './address'
 
 // This file contains utilities that help with istanbul-specific block information.
