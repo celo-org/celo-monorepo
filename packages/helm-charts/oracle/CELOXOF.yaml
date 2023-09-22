@@ -1,5 +1,6 @@
 oracle:
   currencyPair: CELOXOF
+  overrideOracleCount: 12 # At 5s block time, every client reports once per minute
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
