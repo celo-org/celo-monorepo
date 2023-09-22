@@ -5,6 +5,7 @@
     "exclude": ["types/contracts/*", "lib/**"]
   },
   "rules": {
+    "no-implicit-dependencies": false,
     "no-global-arrow-functions": false,
     "no-floating-promises": true,
     "no-string-literal": false,
