@@ -22,6 +22,8 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
+    "@types/bn.js": "^5.1.0",
+    "@celo/base": "5.0.4",
     "@celo/connect": "5.0.4",
     "@celo/utils": "5.0.4",
     "@celo/wallet-base": "5.0.4",
@@ -31,7 +33,9 @@
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1",
-    "@celo/contractkit": "5.0.4"
+    "@celo/contractkit": "5.0.4",
+    "bn.js": "^5.1.0",
+    "web3": "1.10.0"
   },
   "engines": {
     "node": ">=8.14.2"

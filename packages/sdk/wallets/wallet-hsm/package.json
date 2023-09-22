@@ -29,8 +29,12 @@
     "eth-lib": "^0.2.8",
     "@ethereumjs/util": "8.0.5",
     "asn1js": "^2.0.26",
+    "bignumber.js": "^9.0.0",
     "elliptic": "^6.5.4",
     "secp256k1": "^4.0.0"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0"
   },
   "engines": {
     "node": ">=8.14.2"

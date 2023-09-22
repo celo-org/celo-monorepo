@@ -25,8 +25,10 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
+    "@celo/connect": "5.0.4",
     "@celo/base": "5.0.4",
     "@celo/identity": "5.0.4",
+    "@celo/wallet-local": "5.0.4",
     "@celo/phone-number-privacy-common": "^3.0.3",
     "@celo/poprf": "^0.1.9",
     "@celo/utils": "5.0.4",
