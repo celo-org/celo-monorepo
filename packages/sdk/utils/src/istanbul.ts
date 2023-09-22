@@ -1,4 +1,4 @@
-import { RLP as rlp } from '@ethereumjs/rlp'
+import * as rlp from 'rlp'
 import { bufferToHex, toChecksumAddress } from '@ethereumjs/util'
 import BigNumber from 'bignumber.js'
 import { Address } from './address'

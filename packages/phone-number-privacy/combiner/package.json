@@ -45,6 +45,7 @@
     "@opentelemetry/sdk-node": "^0.41.2",
     "@opentelemetry/sdk-trace-web": "^1.15.2",
     "@opentelemetry/sdk-trace-node": "1.15.2",
+    "@opentelemetry/sdk-trace-base": "^1.17.0",
     "@opentelemetry/semantic-conventions": "^1.15.2",
     "blind-threshold-bls": "npm:@celo/blind-threshold-bls@1.0.0-beta",
     "dotenv": "^8.2.0",

@@ -24,7 +24,7 @@
   "dependencies": {
     "@celo/base": "5.0.4",
     "@ethereumjs/util": "8.0.5",
-    "@ethereumjs/rlp": "^5.0.0",
+    "rlp": "^2.2.4",
     "@types/bn.js": "^5.1.0",
     "@types/elliptic": "^6.4.9",
     "@types/node": "^18.7.16",
