@@ -313,12 +313,12 @@ describe('pnpService', () => {
     })
 
     afterEach(async () => {
-      await signerDB1?.destroy()
-      await signerDB2?.destroy()
-      await signerDB3?.destroy()
       await serverClose(signer1)
       await serverClose(signer2)
       await serverClose(signer3)
+      await signerDB1?.destroy()
+      await signerDB2?.destroy()
+      await signerDB3?.destroy()
     })
 
     describe('when signers are operating correctly', () => {
@@ -563,10 +563,10 @@ describe('pnpService', () => {
 
         // This previously returned 502 instead of 500
         it('Should respond with 500 when insufficient signer responses', async () => {
-          await signerDB1?.destroy()
-          await signerDB2?.destroy()
           await serverClose(signer1)
           await serverClose(signer2)
+          await signerDB1?.destroy()
+          await signerDB2?.destroy()
 
           const req = {
             account: ACCOUNT_ADDRESS1,
@@ -1242,11 +1242,11 @@ describe('pnpService', () => {
       signerDB4 = await initSignerDatabase(signerConfig, signerMigrationsPath)
       signerDB5 = await initSignerDatabase(signerConfig, signerMigrationsPath)
 
-      signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3001)
-      signer2 = startSigner(signerConfig, signerDB2, keyProvider2).listen(3002)
-      signer3 = startSigner(signerConfig, signerDB3, keyProvider3).listen(3003)
-      signer4 = startSigner(signerConfig, signerDB4, keyProvider4).listen(3004)
-      signer5 = startSigner(signerConfig, signerDB5, keyProvider5).listen(3005)
+      signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
+      signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).listen(3002)
+      signer3 = startSigner(signerConfig, signerDB3, keyProvider3, mockKit).listen(3003)
+      signer4 = startSigner(signerConfig, signerDB4, keyProvider4, mockKit).listen(3004)
+      signer5 = startSigner(signerConfig, signerDB5, keyProvider5, mockKit).listen(3005)
 
       userSeed = new Uint8Array(32)
       for (let i = 0; i < userSeed.length - 1; i++) {
@@ -1258,16 +1258,16 @@ describe('pnpService', () => {
     })
 
     afterEach(async () => {
-      await signerDB1?.destroy()
-      await signerDB2?.destroy()
-      await signerDB3?.destroy()
-      await signerDB4?.destroy()
-      await signerDB5?.destroy()
       await serverClose(signer1)
       await serverClose(signer2)
       await serverClose(signer3)
       await serverClose(signer4)
       await serverClose(signer5)
+      await signerDB1?.destroy()
+      await signerDB2?.destroy()
+      await signerDB3?.destroy()
+      await signerDB4?.destroy()
+      await signerDB5?.destroy()
     })
 
     it('Should respond with 200 on valid request', async () => {
@@ -1283,7 +1283,6 @@ describe('pnpService', () => {
         signature: res.body.signature,
         performedQueryCount: 1,
         totalQuota: expectedTotalQuota,
-
         warnings: [],
       })
       threshold_bls.unblind(

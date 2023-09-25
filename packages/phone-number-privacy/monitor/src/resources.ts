@@ -6,8 +6,8 @@ import {
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
 
-export const PRIVATE_KEY = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-export const ACCOUNT_ADDRESS = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY)) // 0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb
+export const PRIVATE_KEY = '2c63bf6d60b16c8afa13e1069dbe92fef337c23855fff8b27732b3e9c6e7efd4'
+export const ACCOUNT_ADDRESS = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY)) // 0x6037800e91eaa703e38bad40c01410bbdf0fea7e
 
 interface DEK {
   privateKey: string

@@ -6,31 +6,28 @@ import {
   DomainSchema,
   ErrorMessage,
   getSignerEndpoint,
-  send,
   SequentialDelayDomainStateSchema,
   verifyDomainQuotaStatusRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Signer, thresholdCallToSigners } from '../../../common/combine'
-import { PromiseHandler } from '../../../common/handlers'
-import { getKeyVersionInfo, sendFailure } from '../../../common/io'
+import { errorResult, ResultHandler } from '../../../common/handlers'
+import { getKeyVersionInfo } from '../../../common/io'
 import { getCombinerVersion, OdisConfig } from '../../../config'
 import { logDomainResponseDiscrepancies } from '../../services/log-responses'
 import { findThresholdDomainState } from '../../services/threshold-state'
 
-export function createDomainQuotaHandler(
+export function domainQuota(
   signers: Signer[],
   config: OdisConfig
-): PromiseHandler<DomainQuotaStatusRequest> {
+): ResultHandler<DomainQuotaStatusRequest> {
   return async (request, response) => {
     if (!domainQuotaStatusRequestSchema(DomainSchema).is(request.body)) {
-      sendFailure(WarningMessage.INVALID_INPUT, 400, response)
-      return
+      return errorResult(400, WarningMessage.INVALID_INPUT)
     }
 
     if (!verifyDomainQuotaStatusRequestAuthenticity(request.body)) {
-      sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
-      return
+      return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
     }
 
     // TODO remove?
@@ -49,21 +46,18 @@ export function createDomainQuotaHandler(
     logDomainResponseDiscrepancies(response.locals.logger, signerResponses)
     if (signerResponses.length >= keyVersionInfo.threshold) {
       try {
-        send(
-          response,
-          {
+        return {
+          status: 200,
+          body: {
             success: true,
             version: getCombinerVersion(),
             status: findThresholdDomainState(keyVersionInfo, signerResponses, signers.length),
           },
-          200,
-          response.locals.logger
-        )
-        return
+        }
       } catch (err) {
         response.locals.logger.error(err, 'Error combining signer quota status responses')
       }
     }
-    sendFailure(ErrorMessage.THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE, maxErrorCode ?? 500, response)
+    return errorResult(maxErrorCode ?? 500, ErrorMessage.THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE)
   }
 }

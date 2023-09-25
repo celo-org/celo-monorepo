@@ -113,7 +113,9 @@ export function pnpSign(
         signature,
         ctx
       )
-      usedQuota++
+      if (!bypassQuotaForE2ETesting(config.test_quota_bypass_percentage, request.body)) {
+        usedQuota++
+      }
     } else {
       Counters.duplicateRequests.inc()
       logger.info('Request already exists in db. Will service request without charging quota.')

@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-utils",
-  "version": "4.1.1-dev",
+  "version": "5.0.4",
   "description": "Celo phone utils",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -22,15 +22,16 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/base": "4.1.1-dev",
-    "@celo/utils": "4.1.1-dev",
+    "@celo/base": "5.0.4",
+    "@celo/utils": "5.0.4",
     "@types/country-data": "^0.0.0",
     "@types/google-libphonenumber": "^7.4.23",
-    "@types/node": "^10.12.18",
+    "@types/node": "^18.7.16",
     "country-data": "^0.0.31",
     "fp-ts": "2.1.1",
     "google-libphonenumber": "^3.2.27",
-    "io-ts": "2.0.1"
+    "io-ts": "2.0.1",
+    "web3-utils": "^1.10.0"
   },
   "devDependencies": {
     "@celo/typescript": "0.0.1"

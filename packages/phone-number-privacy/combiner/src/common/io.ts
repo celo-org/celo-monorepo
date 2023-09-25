@@ -1,21 +1,19 @@
 import {
-  ErrorType,
   getRequestKeyVersion,
   KEY_VERSION_HEADER,
   KeyVersionInfo,
   OdisRequest,
   OdisResponse,
   requestHasValidKeyVersion,
-  send,
   SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { Request, Response } from 'express'
+import { Request } from 'express'
 import * as http from 'http'
 import * as https from 'https'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { performance } from 'perf_hooks'
-import { getCombinerVersion, OdisConfig } from '../config'
+import { OdisConfig } from '../config'
 import { isAbortError, Signer } from './combine'
 
 const httpAgent = new http.Agent({ keepAlive: true })
@@ -87,6 +85,7 @@ export async function fetchSignerResponseWithFallback<R extends OdisRequest>(
         [KEY_VERSION_HEADER]: keyVersion.toString()
       },
       body: JSON.stringify(request.body),
+      // @ts-expect-error -- wants a param for abortifThrown but thats not available on the incoming yet. @alec will fix it ;) 
       signal: abortSignal,
       agent: url.startsWith("https://") ? httpsAgent : httpAgent
     })
@@ -115,17 +114,4 @@ async function measureTime<T>(name: string, fn: () => Promise<T>): Promise<T> {
     performance.mark(end)
     performance.measure(name, start, end)
   }
-}
-
-export function sendFailure(error: ErrorType, status: number, response: Response<any>) {
-  send(
-    response,
-    {
-      success: false,
-      version: getCombinerVersion(),
-      error,
-    },
-    status,
-    response.locals.logger
-  )
 }

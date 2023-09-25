@@ -1,5 +1,5 @@
 import Web3 from 'web3'
-import { HttpProviderOptions as Web3HttpProviderOptions } from 'web3-providers-http'
+import { HttpProviderOptions as Web3HttpProviderOptions } from 'web3-core-helpers'
 export type HttpProviderOptions = Web3HttpProviderOptions
 
 export const API_KEY_HEADER_KEY = 'apiKey'

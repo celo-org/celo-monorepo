@@ -95,7 +95,7 @@ export function meteringHandler<R extends OdisRequest>(
   histogram: client.Histogram<string>,
   handler: PromiseHandler<R>
 ): PromiseHandler<R> {
-  return (req, res) => newMeter(histogram, req.url)(() => handler(req, res))
+  return (req, res) => newMeter(histogram, req.url)(async () => handler(req, res))
 }
 
 export function timeoutHandler<R extends OdisRequest>(
@@ -103,17 +103,33 @@ export function timeoutHandler<R extends OdisRequest>(
   handler: PromiseHandler<R>
 ): PromiseHandler<R> {
   return async (req, res) => {
-    const timeoutSignal = (AbortSignal as any).timeout(timeoutMs)
-    timeoutSignal.addEventListener(
-      'abort',
-      () => {
-        if (!res.headersSent) {
-          Counters.timeouts.inc()
-          sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, res, req.url)
-        }
-      },
-      { once: true }
-    )
+    const timeoutId = setTimeout(() => {
+      if (!res.headersSent) {
+        Counters.timeouts.inc()
+        sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, res, req.url)
+      }
+    }, timeoutMs)
+
+    try {
+      await handler(req, res)
+    } finally {
+      // Clears the timeout if it answers first
+      clearTimeout(timeoutId)
+    }
+  }
+}
+
+export function connectionClosedHandler<R extends OdisRequest>(
+  handler: PromiseHandler<R>
+): PromiseHandler<R> {
+  return async (req, res) => {
+    req.on('close', () => {
+      if (res.socket?.destroyed) {
+        res.locals.logger.info('connection closed')
+        Counters.connectionClosed.inc()
+        res.end()
+      }
+    })
 
     await handler(req, res)
   }
@@ -141,8 +157,11 @@ export function resultHandler<R extends OdisRequest>(
 ): PromiseHandler<R> {
   return async (req, res) => {
     const result = await resHandler(req, res)
-    send(res, result.body, result.status, res.locals.logger)
-    Counters.responses.labels(req.url, result.status.toString()).inc()
+    // Check if the response was ended
+    if (!res.writableEnded) {
+      send(res, result.body, result.status, res.locals.logger)
+      Counters.responses.labels(req.url, result.status.toString()).inc()
+    }
   }
 }
 
@@ -170,16 +189,19 @@ function sendFailure(
   endpoint: string,
   body?: Record<any, any> // TODO remove any
 ) {
-  send(
-    response,
-    {
-      success: false,
-      version: getSignerVersion(),
-      error,
-      ...body,
-    },
-    status,
-    response.locals.logger
-  )
-  Counters.responses.labels(endpoint, status.toString()).inc()
+  // Check if the response was ended
+  if (!response.writableEnded) {
+    send(
+      response,
+      {
+        success: false,
+        version: getSignerVersion(),
+        error,
+        ...body,
+      },
+      status,
+      response.locals.logger
+    )
+    Counters.responses.labels(endpoint, status.toString()).inc()
+  }
 }

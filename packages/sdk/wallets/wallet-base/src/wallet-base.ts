@@ -77,7 +77,8 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
       throw new Error('No transaction object given!')
     }
     const rlpEncoded = rlpEncodedTx(txParams)
-    const addToV = chainIdTransformationForSigning(txParams.chainId!)
+    const addToV =
+      rlpEncoded.type === 'celo-legacy' ? chainIdTransformationForSigning(txParams.chainId!) : 27
 
     // Get the signer from the 'from' field
     const fromAddress = txParams.from!.toString()
