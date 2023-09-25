@@ -71,7 +71,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         performedQueryCount: res.performedQueryCount,
         totalQuota: res.totalQuota,
         remainingQuota: res.totalQuota - res.performedQueryCount,
-        warnings: [],
+        warnings: res.warnings ?? [],
       })
     })
 
@@ -86,7 +86,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         performedQueryCount: res.performedQueryCount,
         totalQuota: res.totalQuota,
         remainingQuota: res.totalQuota - res.performedQueryCount,
-        warnings: [],
+        warnings: res.warnings ?? [],
       })
     })
 
@@ -101,7 +101,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         performedQueryCount: res1.performedQueryCount,
         totalQuota: res1.totalQuota,
         remainingQuota: res1.totalQuota - res1.performedQueryCount,
-        warnings: [],
+        warnings: res1.warnings ?? [],
       }
       expect(res1).toStrictEqual<PnpClientQuotaStatus>(expectedRes)
       const res2 = await OdisUtils.Quota.getPnpQuotaStatus(
@@ -210,7 +210,10 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
           performedQueryCount: startingPerformedQueryCount + 1,
           totalQuota: startingTotalQuota,
           remainingQuota: startingTotalQuota - (startingPerformedQueryCount + 1),
-          warnings: [],
+          warnings: [
+            'CELO_ODIS_WARN_17 SIGNER Discrepancies detected in signer responses',
+            'CELO_ODIS_WARN_18 SIGNER Discrepancy found in signers performed query count measurements',
+          ],
         })
       })
 
@@ -233,7 +236,10 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
           performedQueryCount: startingPerformedQueryCount + 1,
           totalQuota: startingTotalQuota,
           remainingQuota: startingTotalQuota - (startingPerformedQueryCount + 1),
-          warnings: [],
+          warnings: [
+            'CELO_ODIS_WARN_17 SIGNER Discrepancies detected in signer responses',
+            'CELO_ODIS_WARN_18 SIGNER Discrepancy found in signers performed query count measurements',
+          ],
         })
       })
     })
