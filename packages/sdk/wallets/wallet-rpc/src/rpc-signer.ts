@@ -3,7 +3,7 @@ import { CeloTx, EncodedTransaction, RpcCaller, Signer } from '@celo/connect'
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { decodeSig } from '@celo/wallet-base'
 import BigNumber from 'bignumber.js'
-import BN from 'bn.js'
+import type BN from 'bn.js'
 
 const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
 const currentTimeInSeconds = () => Math.floor(Date.now() / 1000)
@@ -82,14 +82,21 @@ export class RpcSigner implements Signer {
       throw new Error(`RpcSigner cannot sign tx with 'from' ${tx.from}`)
     }
     // see geth SendTxArgs type
-    // https://github.com/celo-org/celo-blockchain/blob/bf2ba25426f9956384220b8b2ce302337e7fa8a4/internal/ethapi/api.go#L1363
+    // https://github.com/celo-org/celo-blockchain/blob/fc20d6921478cda68fc88797078f20053bae8866/internal/ethapi/api.go#L1241C6-L1241C20
     const rpcTx = {
       ...tx,
       nonce: toRpcHex(tx.nonce),
       value: toRpcHex(tx.value),
       gas: toRpcHex(tx.gas),
-      gasPrice: toRpcHex(tx.gasPrice),
       gatewayFee: toRpcHex(tx.gatewayFee),
+      ...(tx.gasPrice
+        ? {
+            gasPrice: toRpcHex(tx.gasPrice),
+          }
+        : {
+            maxPriorityFeePerGas: toRpcHex(tx.maxPriorityFeePerGas),
+            maxFeePerGas: toRpcHex(tx.maxFeePerGas),
+          }),
     }
     return this.callAndCheckResponse(RpcSignerEndpoint.SignTransaction, [rpcTx])
   }

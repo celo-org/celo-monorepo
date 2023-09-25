@@ -1,5 +1,4 @@
 import { CeloTx, CeloTxObject, CeloTxReceipt, JsonRpcPayload, PromiEvent } from '@celo/connect'
-import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
 import { HttpProvider } from 'web3-core'
 import { newKitFromWeb3 as newFullKitFromWeb3, newKitWithApiKey } from './kit'
@@ -79,31 +78,46 @@ export function txoStub<T>(): TransactionObjectStub<T> {
       const txo = txoStub()
       await kit.connection.sendTransactionObject(txo, { gas: 555, from: '0xAAFFF' })
       expect(txo.send).toBeCalledWith({
-        gasPrice: '0',
+        feeCurrency: undefined,
         gas: 555,
         from: '0xAAFFF',
       })
     })
-  })
-})
 
-test('should retrieve currency gasPrice with feeCurrency', async () => {
-  const kit = newFullKitFromWeb3(new Web3('http://'))
+    test('works with maxFeePerGas and maxPriorityFeePerGas', async () => {
+      const txo = txoStub()
+      await kit.connection.sendTransactionObject(txo, {
+        gas: 1000,
+        maxFeePerGas: 555,
+        maxPriorityFeePerGas: 555,
+        from: '0xAAFFF',
+      })
+      expect(txo.send).toBeCalledWith({
+        feeCurrency: undefined,
+        maxFeePerGas: 555,
+        maxPriorityFeePerGas: 555,
+        gas: 1000,
+        from: '0xAAFFF',
+      })
+    })
 
-  const txo = txoStub()
-  const gasPrice = 100
-  const getGasPriceMin = jest.fn().mockImplementation(() => ({
-    getGasPriceMinimum() {
-      return new BigNumber(gasPrice)
-    },
-  }))
-  kit.contracts.getGasPriceMinimum = getGasPriceMin.bind(kit.contracts)
-  await kit.updateGasPriceInConnectionLayer('XXX')
-  const options: CeloTx = { gas: 555, feeCurrency: 'XXX', from: '0xAAFFF' }
-  await kit.connection.sendTransactionObject(txo, options)
-  expect(txo.send).toBeCalledWith({
-    gasPrice: `${gasPrice * 5}`,
-    ...options,
+    test('when maxFeePerGas and maxPriorityFeePerGas and feeCurrency', async () => {
+      const txo = txoStub()
+      await kit.connection.sendTransactionObject(txo, {
+        gas: 1000,
+        maxFeePerGas: 555,
+        maxPriorityFeePerGas: 555,
+        feeCurrency: '0xe8537a3d056da446677b9e9d6c5db704eaab4787',
+        from: '0xAAFFF',
+      })
+      expect(txo.send).toBeCalledWith({
+        gas: 1000,
+        maxFeePerGas: 555,
+        maxPriorityFeePerGas: 555,
+        feeCurrency: '0xe8537a3d056da446677b9e9d6c5db704eaab4787',
+        from: '0xAAFFF',
+      })
+    })
   })
 })
 

@@ -1,6 +1,6 @@
 {
   "name": "@celo/wallet-hsm-aws",
-  "version": "4.1.1-dev",
+  "version": "5.0.4",
   "description": "AWS HSM wallet implementation",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -22,10 +22,10 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@celo/utils": "4.1.1-dev",
-    "@celo/wallet-base": "4.1.1-dev",
-    "@celo/wallet-remote": "4.1.1-dev",
-    "@celo/wallet-hsm": "4.1.1-dev",
+    "@celo/utils": "5.0.4",
+    "@celo/wallet-base": "5.0.4",
+    "@celo/wallet-remote": "5.0.4",
+    "@celo/wallet-hsm": "5.0.4",
     "@types/debug": "^4.1.5",
     "@types/secp256k1": "^4.0.0",
     "aws-sdk": "^2.705.0",
@@ -36,8 +36,9 @@
     "secp256k1": "^4.0.0"
   },
   "devDependencies": {
-    "@celo/connect": "4.1.1-dev",
+    "@celo/connect": "5.0.4",
     "elliptic": "^6.5.4",
+    "dotenv": "^8.2.0",
     "web3": "1.10.0"
   },
   "engines": {

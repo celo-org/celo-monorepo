@@ -19,6 +19,8 @@
   "@celo/celocli": {
     "location": "packages/cli",
     "dependencies": [
+      "@celo/base",
+      "@celo/connect",
       "@celo/contractkit",
       "@celo/cryptographic-utils",
       "@celo/dev-utils",
@@ -64,7 +66,8 @@
       "@celo/cryptographic-utils",
       "@celo/phone-utils",
       "@celo/typescript",
-      "@celo/utils"
+      "@celo/utils",
+      "@celo/wallet-local"
     ]
   },
   "@celo/typescript": {
@@ -78,7 +81,6 @@
       "@celo/encrypted-backup",
       "@celo/identity",
       "@celo/phone-number-privacy-common",
-      "@celo/phone-number-privacy-signer",
       "@celo/phone-utils",
       "@celo/utils"
     ]
@@ -96,6 +98,7 @@
   "@celo/phone-number-privacy-monitor": {
     "location": "packages/phone-number-privacy/monitor",
     "dependencies": [
+      "@celo/base",
       "@celo/contractkit",
       "@celo/cryptographic-utils",
       "@celo/encrypted-backup",
@@ -152,10 +155,12 @@
     "location": "packages/sdk/encrypted-backup",
     "dependencies": [
       "@celo/base",
+      "@celo/connect",
       "@celo/dev-utils",
       "@celo/identity",
       "@celo/phone-number-privacy-common",
-      "@celo/utils"
+      "@celo/utils",
+      "@celo/wallet-local"
     ]
   },
   "@celo/explorer": {
@@ -246,6 +251,7 @@
   "@celo/wallet-hsm-azure": {
     "location": "packages/sdk/wallets/wallet-hsm-azure",
     "dependencies": [
+      "@celo/base",
       "@celo/connect",
       "@celo/utils",
       "@celo/wallet-base",
@@ -272,6 +278,7 @@
   "@celo/wallet-ledger": {
     "location": "packages/sdk/wallets/wallet-ledger",
     "dependencies": [
+      "@celo/base",
       "@celo/connect",
       "@celo/utils",
       "@celo/wallet-base",
@@ -297,6 +304,7 @@
   "@celo/wallet-rpc": {
     "location": "packages/sdk/wallets/wallet-rpc",
     "dependencies": [
+      "@celo/base",
       "@celo/connect",
       "@celo/contractkit",
       "@celo/dev-utils",

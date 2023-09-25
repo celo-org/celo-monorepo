@@ -28,7 +28,6 @@ export const MAX_QUERY_COUNT_DISCREPANCY_THRESHOLD = 5
 export interface OdisConfig {
   serviceName: string
   enabled: boolean
-  shouldFailOpen: boolean // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config, this isn't relevant to domains endpoints
   odisServices: {
     signers: string
     timeoutMilliSeconds: number
@@ -40,6 +39,7 @@ export interface OdisConfig {
   fullNodeTimeoutMs: number
   fullNodeRetryCount: number
   fullNodeRetryDelayMs: number
+  shouldAuthenticate: boolean
 }
 
 export interface CombinerConfig {
@@ -77,7 +77,6 @@ if (DEV_MODE) {
     phoneNumberPrivacy: {
       serviceName: defaultServiceName,
       enabled: true,
-      shouldFailOpen: false,
       odisServices: {
         signers: devSignersString,
         timeoutMilliSeconds: 5 * 1000,
@@ -108,11 +107,11 @@ if (DEV_MODE) {
       fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
       fullNodeRetryCount: RETRY_COUNT,
       fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
+      shouldAuthenticate: true,
     },
     domains: {
       serviceName: defaultServiceName,
       enabled: true,
-      shouldFailOpen: false,
       odisServices: {
         signers: devSignersString,
         timeoutMilliSeconds: 5 * 1000,
@@ -143,6 +142,7 @@ if (DEV_MODE) {
       fullNodeTimeoutMs: FULL_NODE_TIMEOUT_IN_MS,
       fullNodeRetryCount: RETRY_COUNT,
       fullNodeRetryDelayMs: RETRY_DELAY_IN_MS,
+      shouldAuthenticate: true,
     },
   }
 } else {
@@ -156,7 +156,6 @@ if (DEV_MODE) {
     phoneNumberPrivacy: {
       serviceName: functionConfig.pnp.service_name ?? defaultServiceName,
       enabled: toBool(functionConfig.pnp.enabled, false),
-      shouldFailOpen: toBool(functionConfig.pnp.should_fail_open, false),
       odisServices: {
         signers: functionConfig.pnp.odisservices,
         timeoutMilliSeconds: functionConfig.pnp.timeout_ms
@@ -172,11 +171,11 @@ if (DEV_MODE) {
       fullNodeRetryDelayMs: Number(
         functionConfig.pnp.full_node_retry_delay_ms ?? RETRY_DELAY_IN_MS
       ),
+      shouldAuthenticate: toBool(functionConfig.pnp.should_authenticate, true),
     },
     domains: {
       serviceName: functionConfig.domains.service_name ?? defaultServiceName,
       enabled: toBool(functionConfig.domains.enabled, false),
-      shouldFailOpen: toBool(functionConfig.domains.auth_should_fail_open, false),
       odisServices: {
         signers: functionConfig.domains.odisservices,
         timeoutMilliSeconds: functionConfig.domains.timeout_ms
@@ -187,11 +186,12 @@ if (DEV_MODE) {
         currentVersion: Number(functionConfig.domains_keys.current_version),
         versions: functionConfig.domains_keys.versions,
       },
-      fullNodeTimeoutMs: Number(functionConfig.pnp.full_node_timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS),
+      fullNodeTimeoutMs: Number(functionConfig.pnp.full_node_timeout_ms ?? FULL_NODE_TIMEOUT_IN_MS), // TODO refactor config - domains endpoints don't use full node
       fullNodeRetryCount: Number(functionConfig.pnp.full_node_retry_count ?? RETRY_COUNT),
       fullNodeRetryDelayMs: Number(
         functionConfig.pnp.full_node_retry_delay_ms ?? RETRY_DELAY_IN_MS
       ),
+      shouldAuthenticate: true,
     },
   }
 }

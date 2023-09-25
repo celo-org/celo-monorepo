@@ -29,8 +29,9 @@ class MockWallet implements ReadOnlyWallet {
   }
   signTransaction(_txParams: CeloTx): Promise<EncodedTransaction> {
     return Promise.resolve({
-      raw: 'mock',
+      raw: '0xmock',
       tx: {
+        type: 'celo-legacy',
         nonce: 'nonce',
         gasPrice: 'gasPrice',
         gas: 'gas',
@@ -193,7 +194,7 @@ describe('CeloProvider', () => {
 
     describe('but tries to use it with a different account', () => {
       interceptedByCeloProvider.forEach((method: string) => {
-        test(`fowards the call to '${method}' to the original provider`, (done) => {
+        test(`forwards the call to '${method}' to the original provider`, (done) => {
           const payload: JsonRpcPayload = {
             id: 0,
             jsonrpc: '2.0',
