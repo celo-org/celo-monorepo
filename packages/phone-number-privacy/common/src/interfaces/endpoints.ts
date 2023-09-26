@@ -9,6 +9,7 @@ export enum SignerEndpointPNP {
 }
 
 export enum CombinerEndpointCommon {
+  METRICS = '/metrics',
   STATUS = '/status',
 }
 
