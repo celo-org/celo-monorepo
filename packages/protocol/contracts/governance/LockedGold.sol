@@ -84,7 +84,7 @@ contract LockedGold is
   * @return Patch version of the contract.
   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 2);
+    return (1, 1, 3, 0);
   }
 
   /**
@@ -329,6 +329,15 @@ contract LockedGold is
     PendingWithdrawal memory pendingWithdrawal = (balances[account].pendingWithdrawals[index]);
 
     return (pendingWithdrawal.value, pendingWithdrawal.timestamp);
+  }
+
+  /**
+    * @notice Returns the number of pending withdrawals for the specified account.
+    * @param account The address of the account.
+    * @return The count of pending withdrawals.
+    */
+  function getTotalPendingWithdrawalsCount(address account) external view returns (uint256) {
+    return balances[account].pendingWithdrawals.length;
   }
 
   /**

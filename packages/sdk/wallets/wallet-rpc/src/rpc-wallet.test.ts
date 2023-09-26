@@ -178,8 +178,26 @@ testWithGanache('rpc-wallet', (web3) => {
               }
             })
 
-            test('succeeds', async () => {
-              await expect(rpcWallet.signTransaction(celoTransaction)).resolves.not.toBeUndefined()
+            test('succeeds with old school pricing', async () => {
+              await expect(
+                rpcWallet.signTransaction(celoTransaction)
+              ).resolves.toMatchInlineSnapshot(
+                `"0xf86b8081991094588e4b68193001e4d10928660ab4165b813717c08a0100000000000000000083abcdef25a073bb7eaa60c810af1fad0f68fa15d4714f9990d0202b62797f6134493ec9f6fba046c13e92017228c2c8f0fae74ddd735021817f2f9757cd66debed078daf4070e"`
+              )
+            })
+
+            test('succeeds with with FeeMarketFields', async () => {
+              const feeMarketTransaction = {
+                ...celoTransaction,
+                gasPrice: undefined,
+                maxFeePerGas: '1500000000',
+                maxPriorityFeePerGas: '1500000000',
+              }
+              await expect(
+                rpcWallet.signTransaction(feeMarketTransaction)
+              ).resolves.toMatchInlineSnapshot(
+                `"0xf86a80801094588e4b68193001e4d10928660ab4165b813717c08a0100000000000000000083abcdef26a05e9c1e7690d05f3e1433c824fbd948643ff6c618e347ea8c23a6363f3b17cdffa072dc1c22d6147be7b4b7b3cf51eb73b8bedd7940d7b668dcd7ef688a2354a631"`
+              )
             })
 
             // TODO(yorke): enable once fixed: https://github.com/celo-org/celo-monorepo/issues/4077

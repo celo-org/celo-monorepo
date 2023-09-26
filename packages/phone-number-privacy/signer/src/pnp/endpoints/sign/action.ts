@@ -1,156 +1,177 @@
-import { timeout } from '@celo/base'
 import {
+  authenticateUser,
+  AuthenticationMethod,
   ErrorMessage,
+  ErrorType,
   getRequestKeyVersion,
+  hasValidAccountParam,
+  hasValidBlindedPhoneNumberParam,
+  isBodyReasonablySized,
+  KEY_VERSION_HEADER,
+  requestHasValidKeyVersion,
   SignMessageRequest,
+  SignMessageRequestSchema,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { Knex } from 'knex'
-import { Action, Session } from '../../../common/action'
+import Logger from 'bunyan'
+import { Request } from 'express'
 import { computeBlindedSignature } from '../../../common/bls/bls-cryptography-client'
-import { REQUESTS_TABLE } from '../../../common/database/models/request'
-import { getRequestExists } from '../../../common/database/wrappers/request'
+import { errorResult, ResultHandler } from '../../../common/handler'
 import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management/key-provider-base'
-import { Counters } from '../../../common/metrics'
-import { SignerConfig } from '../../../config'
-import { PnpQuotaService } from '../../services/quota'
-import { PnpSession } from '../../session'
-import { PnpSignIO } from './io'
+import { Counters, Histograms } from '../../../common/metrics'
+import { traceAsyncFunction } from '../../../common/tracing-utils'
+import { getSignerVersion, SignerConfig } from '../../../config'
+import { AccountService } from '../../services/account-service'
+import { PnpRequestService } from '../../services/request-service'
 
-export class PnpSignAction implements Action<SignMessageRequest> {
-  protected readonly requestsTable: REQUESTS_TABLE = REQUESTS_TABLE.ONCHAIN
+export function pnpSign(
+  config: SignerConfig,
+  requestService: PnpRequestService,
+  accountService: AccountService,
+  keyProvider: KeyProvider
+): ResultHandler<SignMessageRequest> {
+  return async (request, response) => {
+    const logger = response.locals.logger
 
-  constructor(
-    readonly db: Knex,
-    readonly config: SignerConfig,
-    readonly quota: PnpQuotaService,
-    readonly keyProvider: KeyProvider,
-    readonly io: PnpSignIO
-  ) {}
+    if (!isValidRequest(request)) {
+      return errorResult(400, WarningMessage.INVALID_INPUT)
+    }
 
-  public async perform(
-    session: PnpSession<SignMessageRequest>,
-    timeoutError: symbol
-  ): Promise<void> {
-    // Compute quota lookup, update, and signing within transaction
-    // so that these occur atomically and rollback on error.
-    await this.db.transaction(async (trx) => {
-      const pnpSignHandler = async () => {
-        const quotaStatus = await this.quota.getQuotaStatus(session, trx)
+    if (!requestHasValidKeyVersion(request, logger)) {
+      return errorResult(400, WarningMessage.INVALID_KEY_VERSION_REQUEST)
+    }
 
-        let isDuplicateRequest = false
-        try {
-          isDuplicateRequest = await getRequestExists(
-            this.db,
-            this.requestsTable,
-            session.request.body.account,
-            session.request.body.blindedQueryPhoneNumber,
-            session.logger,
-            trx
-          )
-        } catch (err) {
-          session.logger.error(err, 'Failed to check if request already exists in db')
-        }
+    const warnings: ErrorType[] = []
+    const ctx = {
+      url: request.url,
+      logger,
+      errors: warnings,
+    }
 
-        if (isDuplicateRequest) {
-          Counters.duplicateRequests.inc()
-          session.logger.info(
-            'Request already exists in db. Will service request without charging quota.'
-          )
-          session.errors.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
-        } else {
-          // In the case of a database connection failure, performedQueryCount will be -1
-          if (quotaStatus.performedQueryCount === -1) {
-            this.io.sendFailure(
-              ErrorMessage.DATABASE_GET_FAILURE,
-              500,
-              session.response,
-              quotaStatus
-            )
-            return
-          }
-          // In the case of a blockchain connection failure, totalQuota will be -1
-          if (quotaStatus.totalQuota === -1) {
-            if (this.io.shouldFailOpen) {
-              // We fail open and service requests on full-node errors to not block the user.
-              // Error messages are stored in the session and included along with the signature in the response.
-              quotaStatus.totalQuota = Number.MAX_SAFE_INTEGER
-              session.logger.warn(
-                { warning: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA },
-                ErrorMessage.FAILING_OPEN
-              )
-              Counters.requestsFailingOpen.inc()
-            } else {
-              session.logger.warn(
-                { warning: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA },
-                ErrorMessage.FAILING_CLOSED
-              )
-              Counters.requestsFailingClosed.inc()
-              this.io.sendFailure(ErrorMessage.FULL_NODE_ERROR, 500, session.response, quotaStatus)
-              return
-            }
-          }
+    const account = await accountService.getAccount(request.body.account)
 
-          // TODO(after 2.0.0) add more specific error messages on DB and key version
-          // https://github.com/celo-org/celo-monorepo/issues/9882
-          // quotaStatus is updated in place; throws on failure to update
-          const { sufficient } = await this.quota.checkAndUpdateQuotaStatus(
-            quotaStatus,
-            session,
-            trx
-          )
-          if (!sufficient) {
-            this.io.sendFailure(WarningMessage.EXCEEDED_QUOTA, 403, session.response, quotaStatus)
-            return
-          }
-        }
+    if (request.body.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
+      Counters.requestsWithWalletAddress.inc()
+    }
 
-        const key: Key = {
-          version:
-            getRequestKeyVersion(session.request, session.logger) ??
-            this.config.keystore.keys.phoneNumberPrivacy.latest,
-          name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
-        }
+    if (!(await authenticateUser(request, logger, async (_) => account.dek, warnings))) {
+      return errorResult(401, WarningMessage.UNAUTHENTICATED_USER)
+    }
 
-        try {
-          const signature = await this.sign(
-            session.request.body.blindedQueryPhoneNumber,
-            key,
-            session
-          )
-          this.io.sendSuccess(200, session.response, key, signature, quotaStatus, session.errors)
-          return
-        } catch (err) {
-          session.logger.error({ err })
-          quotaStatus.performedQueryCount--
-          this.io.sendFailure(
-            ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
-            500,
-            session.response,
-            quotaStatus
-          )
-          // Note that errors thrown after rollback will have no effect, hence doing this last
-          await trx.rollback()
-          return
-        }
+    let usedQuota = await requestService.getUsedQuotaForAccount(request.body.account, ctx)
+
+    const duplicateRequest = await requestService.getDuplicateRequest(
+      request.body.account,
+      request.body.blindedQueryPhoneNumber,
+      ctx
+    )
+
+    Histograms.userRemainingQuotaAtRequest
+      .labels(ctx.url)
+      .observe(account.pnpTotalQuota - usedQuota)
+
+    if (!duplicateRequest && account.pnpTotalQuota <= usedQuota) {
+      logger.warn({ usedQuota, totalQuota: account.pnpTotalQuota }, 'No remaining quota')
+
+      if (bypassQuotaForE2ETesting(config.test_quota_bypass_percentage, request.body)) {
+        Counters.testQuotaBypassedRequests.inc()
+        logger.info(request.body, 'Request will bypass quota check for e2e testing')
+      } else {
+        return errorResult(403, WarningMessage.EXCEEDED_QUOTA, {
+          performedQueryCount: usedQuota,
+          totalQuota: account.pnpTotalQuota,
+        })
       }
-      await timeout(pnpSignHandler, [], this.config.timeout, timeoutError)
-    })
-  }
+    }
 
-  private async sign(
-    blindedMessage: string,
-    key: Key,
-    session: Session<SignMessageRequest>
-  ): Promise<string> {
-    let privateKey: string
+    const key: Key = {
+      version:
+        getRequestKeyVersion(request, logger) ?? config.keystore.keys.phoneNumberPrivacy.latest,
+      name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
+    }
+
+    let signature: string
+    if (duplicateRequest && duplicateRequest.signature?.length) {
+      signature = duplicateRequest.signature
+    } else {
+      try {
+        signature = await sign(request.body.blindedQueryPhoneNumber, key, keyProvider, logger)
+      } catch (err) {
+        logger.error({ err }, 'catch error on signing')
+
+        return errorResult(500, ErrorMessage.SIGNATURE_COMPUTATION_FAILURE, {
+          performedQueryCount: usedQuota,
+          totalQuota: account.pnpTotalQuota,
+        })
+      }
+    }
+
+    if (!duplicateRequest) {
+      await requestService.recordRequest(
+        account.address,
+        request.body.blindedQueryPhoneNumber,
+        signature,
+        ctx
+      )
+      if (!bypassQuotaForE2ETesting(config.test_quota_bypass_percentage, request.body)) {
+        usedQuota++
+      }
+    } else {
+      Counters.duplicateRequests.inc()
+      logger.info('Request already exists in db. Will service request without charging quota.')
+      warnings.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
+    }
+
+    // Send Success response
+    response.set(KEY_VERSION_HEADER, key.version.toString())
+    return {
+      status: 200,
+      body: {
+        success: true as true,
+        version: getSignerVersion(),
+        signature,
+        performedQueryCount: usedQuota,
+        totalQuota: account.pnpTotalQuota,
+        warnings,
+      },
+    }
+  }
+}
+
+async function sign(
+  blindedMessage: string,
+  key: Key,
+  keyProvider: KeyProvider,
+  logger: Logger
+): Promise<string> {
+  let privateKey: string
+  return traceAsyncFunction('pnpSign', async () => {
     try {
-      privateKey = await this.keyProvider.getPrivateKeyOrFetchFromStore(key)
+      privateKey = await keyProvider.getPrivateKeyOrFetchFromStore(key)
     } catch (err) {
-      session.logger.info({ key }, 'Requested key version not supported')
-      session.logger.error(err)
+      logger.info({ key }, 'Requested key version not supported')
+      logger.error(err)
       throw new Error(WarningMessage.INVALID_KEY_VERSION_REQUEST)
     }
-    return computeBlindedSignature(blindedMessage, privateKey, session.logger)
-  }
+    return computeBlindedSignature(blindedMessage, privateKey, logger)
+  })
+}
+
+function isValidRequest(
+  request: Request<{}, {}, unknown>
+): request is Request<{}, {}, SignMessageRequest> {
+  return (
+    SignMessageRequestSchema.is(request.body) &&
+    hasValidAccountParam(request.body) &&
+    hasValidBlindedPhoneNumberParam(request.body) &&
+    isBodyReasonablySized(request.body)
+  )
+}
+
+function bypassQuotaForE2ETesting(
+  bypassQuotaPercentage: number,
+  requestBody: SignMessageRequest
+): boolean {
+  const sessionID = Number(requestBody.sessionID) // TODO revisit whether to remove sessionID
+  return !Number.isNaN(sessionID) && sessionID % 100 < bypassQuotaPercentage
 }

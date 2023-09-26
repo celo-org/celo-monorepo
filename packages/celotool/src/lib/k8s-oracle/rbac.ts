@@ -15,7 +15,7 @@ const rbacHelmChartPath = '../helm-charts/oracle-rbac'
 /**
  * RbacOracleDeployer cloud-agnostically manages deployments for oracles
  * whose pods must change their metadata in order to accomodate limitations
- * in pod identity solutions (like Azure's aad-pod-identity and AWS's kube2iam).
+ * in pod identity solutions (like Azure's aad-pod-identity).
  * This will create a k8s service account for each oracle pod that can modify
  * pod metadata, and will ensure each SA's credentials make their way to the helm chart.
  */

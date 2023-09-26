@@ -1,35 +1,10 @@
 import { OdisContextName } from '@celo/identity/lib/odis/query'
+import { CombinerEndpointPNP, rootLogger } from '@celo/phone-number-privacy-common'
 import yargs from 'yargs'
-import { concurrentLoadTest, serialLoadTest } from '../test'
+import { concurrentRPSLoadTest } from '../test'
 
-/* tslint:disable:no-console */
+const logger = rootLogger('odis-monitor')
 
-const runLoadTest = (contextName: string, numWorker: number, isSerial: boolean) => {
-  let blockchainProvider: string
-  switch (contextName) {
-    case 'alfajoresstaging':
-    case 'alfajores':
-      blockchainProvider = 'https://alfajores-forno.celo-testnet.org'
-      break
-    case 'mainnet':
-      blockchainProvider = 'https://forno.celo.org'
-      break
-    default:
-      console.error('Invalid contextName')
-      yargs.showHelp()
-      process.exit(1)
-  }
-  if (numWorker < 1) {
-    console.error('Invalid numWorkers')
-    yargs.showHelp()
-    process.exit(1)
-  }
-  if (isSerial) {
-    serialLoadTest(numWorker, blockchainProvider!, contextName as OdisContextName) // tslint:disable-line:no-floating-promises
-  } else {
-    concurrentLoadTest(numWorker, blockchainProvider!, contextName as OdisContextName) // tslint:disable-line:no-floating-promises
-  }
-}
 // tslint:disable-next-line: no-unused-expression
 yargs
   .scriptName('ODIS-load-test')
@@ -38,7 +13,7 @@ yargs
   .strict(true)
   .showHelpOnFail(true)
   .command(
-    'run <contextName> <numWorkers>',
+    'run <contextName> <rps>',
     'Load test ODIS.',
     (args) =>
       args
@@ -46,14 +21,79 @@ yargs
           type: 'string',
           description: 'Desired network.',
         })
-        .positional('numWorkers', {
+        .positional('rps', {
           type: 'number',
-          description: 'Number of machines that will be sending request to ODIS.',
+          description: 'Number of requests per second to generate',
         })
-        .option('isSerial', {
+        .option('duration', {
+          type: 'number',
+          description: 'Duration of the loadtest in Ms.',
+          default: 0,
+        })
+        .option('bypassQuota', {
           type: 'boolean',
-          description: 'run test workers in series.',
+          description: 'Bypass Signer quota check.',
           default: false,
+        })
+        .option('useDEK', {
+          type: 'boolean',
+          description: 'Use Data Encryption Key (DEK) to authenticate.',
+          default: false,
+        })
+        .option('movingAvgRequests', {
+          type: 'number',
+          description: 'number of requests to use when calculating latency moving average',
+          default: 50,
+        })
+        .option('privateKey', {
+          type: 'string',
+          description: 'optional private key to send requests from',
+        })
+        .option('privateKeyPercentage', {
+          type: 'number',
+          description: 'percentage of time to use privateKey, if specified',
+          default: 100,
         }),
-    (args) => runLoadTest(args.contextName!, args.numWorkers!, args.isSerial)
+    (args) => {
+      if (args.rps == null || args.contextName == null) {
+        logger.error('missing positional arguments')
+        yargs.showHelp()
+        process.exit(1)
+      }
+      const rps = args.rps!
+      const contextName = args.contextName! as OdisContextName
+
+      let blockchainProvider: string
+      switch (contextName) {
+        case 'alfajoresstaging':
+        case 'alfajores':
+          blockchainProvider = 'https://alfajores-forno.celo-testnet.org'
+          break
+        case 'mainnet':
+          blockchainProvider = 'https://forno.celo.org'
+          break
+        default:
+          logger.error('Invalid contextName')
+          yargs.showHelp()
+          process.exit(1)
+      }
+
+      if (rps < 1) {
+        logger.error('Invalid rps')
+        yargs.showHelp()
+        process.exit(1)
+      }
+      concurrentRPSLoadTest(
+        args.rps,
+        blockchainProvider!,
+        contextName,
+        CombinerEndpointPNP.PNP_SIGN,
+        args.duration,
+        args.bypassQuota,
+        args.useDEK,
+        args.movingAvgRequests,
+        args.privateKey,
+        args.privateKeyPercentage
+      ) // tslint:disable-line:no-floating-promises
+    }
   ).argv
