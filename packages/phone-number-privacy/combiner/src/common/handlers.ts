@@ -15,6 +15,7 @@ import { Request, Response } from 'express'
 import { performance, PerformanceObserver } from 'perf_hooks'
 import { getCombinerVersion } from '../config'
 import { OdisError } from './error'
+import { Counters } from './metrics'
 
 const tracer = opentelemetry.trace.getTracer('combiner-tracer')
 
@@ -113,6 +114,7 @@ export function meteringHandler<R extends OdisRequest>(
     performance.mark(startMark)
 
     try {
+      Counters.requests.labels(req.url).inc()
       await handler(req, res)
       if (res.headersSent) {
         // used for log based metrics
