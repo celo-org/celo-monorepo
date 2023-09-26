@@ -44,6 +44,7 @@ const provider = new NodeTracerProvider({
 })
 const exporter = new JaegerExporter(options)
 const processor = new BatchSpanProcessor(exporter)
+// @ts-ignore TODO @alec fix this
 provider.addSpanProcessor(processor)
 
 provider.register()
