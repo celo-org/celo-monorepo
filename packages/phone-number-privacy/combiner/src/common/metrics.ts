@@ -29,10 +29,7 @@ export const Counters = {
   }),
 }
 
-const buckets = [
-  0.001, 0.01, 0.1, 0.2, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.3, 2.6, 2.9, 3.5,
-  4, 5, 10,
-]
+const buckets = [0.001, 0.01, 0.1, 0.5, 1, 2, 5, 10]
 
 export const Histograms = {
   responseLatency: new Histogram({
