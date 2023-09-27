@@ -13,9 +13,10 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { performance, PerformanceObserver } from 'perf_hooks'
+import * as client from 'prom-client'
 import { getCombinerVersion } from '../config'
 import { OdisError } from './error'
-import { Counters } from './metrics'
+import { Counters, newMeter } from './metrics'
 
 const tracer = opentelemetry.trace.getTracer('combiner-tracer')
 
@@ -85,51 +86,56 @@ export function tracingHandler<R extends OdisRequest>(
 }
 
 export function meteringHandler<R extends OdisRequest>(
+  histogram: client.Histogram<string>,
   handler: PromiseHandler<R>
 ): PromiseHandler<R> {
-  return async (req, res) => {
-    const logger: Logger = res.locals.logger
+  return async (req, res) =>
+    newMeter(
+      histogram,
+      req.url
+    )(async () => {
+      const logger: Logger = res.locals.logger
 
-    // used for log based metrics
-    logger.info({ req: req.body }, 'Request received')
+      // used for log based metrics
+      logger.info({ req: req.body }, 'Request received')
 
-    const eventLoopLagMeasurementStart = Date.now()
-    setTimeout(() => {
-      const eventLoopLag = Date.now() - eventLoopLagMeasurementStart
-      logger.info({ eventLoopLag }, 'Measure event loop lag')
-    })
-    // TODO:(soloseng): session ID may not always exist
-    const startMark = `Begin ${req.url}/${req.body.sessionID}`
-    const endMark = `End ${req.url}/${req.body.sessionID}`
-    const entryName = `${req.url}/${req.body.sessionID} latency`
+      const eventLoopLagMeasurementStart = Date.now()
+      setTimeout(() => {
+        const eventLoopLag = Date.now() - eventLoopLagMeasurementStart
+        logger.info({ eventLoopLag }, 'Measure event loop lag')
+      })
+      // TODO:(soloseng): session ID may not always exist
+      const startMark = `Begin ${req.url}/${req.body.sessionID}`
+      const endMark = `End ${req.url}/${req.body.sessionID}`
+      const entryName = `${req.url}/${req.body.sessionID} latency`
 
-    const obs = new PerformanceObserver((list) => {
-      const entry = list.getEntriesByName(entryName)[0]
-      if (entry) {
-        logger.info({ latency: entry }, 'e2e response latency measured')
+      const obs = new PerformanceObserver((list) => {
+        const entry = list.getEntriesByName(entryName)[0]
+        if (entry) {
+          logger.info({ latency: entry }, 'e2e response latency measured')
+        }
+      })
+      obs.observe({ entryTypes: ['measure'], buffered: false })
+
+      performance.mark(startMark)
+
+      try {
+        Counters.requests.labels(req.url).inc()
+        await handler(req, res)
+        if (res.headersSent) {
+          // used for log based metrics
+          logger.info({ res }, 'Response sent')
+        }
+      } finally {
+        performance.mark(endMark)
+        performance.measure(entryName, startMark, endMark)
+
+        performance.clearMeasures(entryName)
+        performance.clearMarks(startMark)
+        performance.clearMarks(endMark)
+        obs.disconnect()
       }
     })
-    obs.observe({ entryTypes: ['measure'], buffered: false })
-
-    performance.mark(startMark)
-
-    try {
-      Counters.requests.labels(req.url).inc()
-      await handler(req, res)
-      if (res.headersSent) {
-        // used for log based metrics
-        logger.info({ res }, 'Response sent')
-      }
-    } finally {
-      performance.mark(endMark)
-      performance.measure(entryName, startMark, endMark)
-
-      performance.clearMeasures(entryName)
-      performance.clearMarks(startMark)
-      performance.clearMarks(endMark)
-      obs.disconnect()
-    }
-  }
 }
 
 export function timeoutHandler<R extends OdisRequest>(
@@ -195,6 +201,7 @@ export function resultHandler<R extends OdisRequest>(
   return async (req, res) => {
     const result = await resHandler(req, res)
     send(res, result.body, result.status, res.locals.logger)
+    Counters.responses.labels(req.url, result.status.toString()).inc()
   }
 }
 

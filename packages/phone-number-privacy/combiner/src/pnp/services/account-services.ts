@@ -3,6 +3,7 @@ import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { LRUCache } from 'lru-cache'
 import { OdisError, wrapError } from '../../common/error'
+import { Counters } from '../../common/metrics'
 import { traceAsyncFunction } from '../../common/tracing-utils'
 import { getDEK } from '../../common/web3/contracts'
 
@@ -35,6 +36,7 @@ export class CachingAccountService implements AccountService {
 
       if (dek === undefined) {
         // TODO decide which error ot use here
+        Counters.blockchainErrors.inc()
         throw new OdisError(ErrorMessage.FULL_NODE_ERROR)
       }
       return dek

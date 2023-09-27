@@ -19,6 +19,7 @@ import {
   ResultHandler,
   tracingHandler,
 } from './common/handlers'
+import { Histograms } from './common/metrics'
 import { CombinerConfig, getCombinerVersion } from './config'
 import { disableDomain } from './domain/endpoints/disable/action'
 import { domainQuota } from './domain/endpoints/quota/action'
@@ -117,6 +118,8 @@ function createHandler<R extends OdisRequest>(
   action: ResultHandler<R>
 ): RequestHandler<{}, {}, R, {}, Locals> {
   return catchErrorHandler(
-    tracingHandler(meteringHandler(enabled ? resultHandler(action) : disabledHandler))
+    tracingHandler(
+      meteringHandler(Histograms.responseLatency, enabled ? resultHandler(action) : disabledHandler)
+    )
   )
 }
