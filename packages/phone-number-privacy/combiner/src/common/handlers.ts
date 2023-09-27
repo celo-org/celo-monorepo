@@ -125,6 +125,7 @@ export function meteringHandler<R extends OdisRequest>(
         if (res.headersSent) {
           // used for log based metrics
           logger.info({ res }, 'Response sent')
+          Counters.responses.labels(req.url, res.statusCode.toString()).inc()
         }
       } finally {
         performance.mark(endMark)
@@ -201,7 +202,6 @@ export function resultHandler<R extends OdisRequest>(
   return async (req, res) => {
     const result = await resHandler(req, res)
     send(res, result.body, result.status, res.locals.logger)
-    Counters.responses.labels(req.url, result.status.toString()).inc()
   }
 }
 
