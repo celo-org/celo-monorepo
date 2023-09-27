@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - master
+      - jcortejoso/test-job-in-container
     paths-ignore:
       - '**/*.md'
   pull_request:
