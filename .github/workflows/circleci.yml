@@ -48,7 +48,7 @@ jobs:
     # runs-on: ubuntu-latest
     runs-on: ['self-hosted', 'monorepo-node18']
     container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+      image: jcortejoso/builder:node18
     timeout-minutes: 30
     steps:
       - name: Restore .git cache
