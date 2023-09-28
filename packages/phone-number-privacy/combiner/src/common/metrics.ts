@@ -43,13 +43,13 @@ const buckets = [0.001, 0.01, 0.1, 0.5, 1, 2, 5, 10]
 
 export const Histograms = {
   responseLatency: new Histogram({
-    name: 'signature_endpoint_latency',
-    help: 'Histogram tracking latency of signature endpoint',
+    name: 'combiner_endpoint_latency',
+    help: 'Histogram tracking latency of combiner endpoints',
     labelNames: ['endpoint'],
     buckets,
   }),
   fullNodeLatency: new Histogram({
-    name: 'full_node_latency',
+    name: 'combiner_full_node_latency',
     help: 'Histogram tracking latency of full node requests',
     labelNames: ['codeSegment'],
     buckets,
