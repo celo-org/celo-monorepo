@@ -33,7 +33,7 @@ export const Counters = {
     labelNames: ['signer'],
   }),
   errorsCaughtInEndpointHandler: new Counter({
-    name: 'errors_caught_in_endpoint_handler',
+    name: 'combiner_endpoint_handler_errors_total',
     help: 'Counter for the number of errors caught in the outermost endpoint handler',
     labelNames: ['endpoint'],
   }),
