@@ -65,7 +65,7 @@ export { BlockNumber, EventLog, Log, PromiEvent, Sign } from 'web3-core'
 export { Block, BlockHeader, Syncing } from 'web3-eth'
 export { Contract, ContractSendMethod, PastEventOptions } from 'web3-eth-contract'
 
-export type TransactionTypes = 'eip1559' | 'celo-legacy' | 'cip42'
+export type TransactionTypes = 'eip1559' | 'celo-legacy' | 'cip42' | 'cip64'
 
 interface CommonTXProperties {
   nonce: string
@@ -90,6 +90,11 @@ export interface EIP1559TXProperties extends FeeMarketAndAccessListTXProperties 
   type: 'eip1559'
 }
 
+export interface CIP64TXProperties extends FeeMarketAndAccessListTXProperties {
+  feeCurrency: string
+  type: 'cip64'
+}
+
 export interface CIP42TXProperties extends FeeMarketAndAccessListTXProperties {
   feeCurrency: string
   gatewayFeeRecipient?: string
@@ -110,7 +115,7 @@ export interface LegacyTXProperties extends CommonTXProperties {
 
 export interface EncodedTransaction {
   raw: Hex
-  tx: LegacyTXProperties | CIP42TXProperties | EIP1559TXProperties
+  tx: LegacyTXProperties | CIP42TXProperties | EIP1559TXProperties | CIP64TXProperties
 }
 
 export type CeloTxPending = Transaction & Partial<CeloParams>

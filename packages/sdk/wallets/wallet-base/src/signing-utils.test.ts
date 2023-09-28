@@ -6,7 +6,7 @@ import { celo } from 'viem/chains'
 import Web3 from 'web3'
 import {
   extractSignature,
-  getSignerFromTxCIP42,
+  getSignerFromTxEIP2718TX,
   isPriceToLow,
   recoverTransaction,
   rlpEncodedTx,
@@ -139,31 +139,28 @@ describe('rlpEncodedTx', () => {
     })
 
     describe('when maxFeePerGas and maxPriorityFeePerGas and feeCurrency are provided', () => {
-      it('orders fields in RLP as specified by CIP42', () => {
-        const CIP42Transaction = {
+      it('orders fields in RLP as specified by CIP64', () => {
+        const CIP64Transaction = {
           ...eip1559Transaction,
           feeCurrency: '0x5409ED021D9299bf6814279A6A1411A7e866A631',
         }
-        const result = rlpEncodedTx(CIP42Transaction)
+        const result = rlpEncodedTx(CIP64Transaction)
         expect(result).toMatchInlineSnapshot(`
           {
-            "rlpEncode": "0x7cf8400280630a63945409ed021d9299bf6814279a6a1411a7e866a6318080941be31a94361a391bbafb2a4ccd704f57dc04d4bb893635c9adc5dea0000083abcdefc0",
+            "rlpEncode": "0x7bf83e0280630a63941be31a94361a391bbafb2a4ccd704f57dc04d4bb893635c9adc5dea0000083abcdefc0945409ed021d9299bf6814279a6a1411a7e866a631",
             "transaction": {
               "chainId": 2,
               "data": "0xabcdef",
               "feeCurrency": "0x5409ed021d9299bf6814279a6a1411a7e866a631",
               "from": "0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb",
               "gas": "0x63",
-              "gasPrice": "0x",
-              "gatewayFee": "0x",
-              "gatewayFeeRecipient": "0x",
               "maxFeePerGas": "0x0a",
               "maxPriorityFeePerGas": "0x63",
               "nonce": 0,
               "to": "0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb",
               "value": "0x3635c9adc5dea00000",
             },
-            "type": "cip42",
+            "type": "cip64",
           }
         `)
       })
@@ -171,30 +168,22 @@ describe('rlpEncodedTx', () => {
 
     describe('when maxFeePerGas and maxPriorityFeePerGas are provided', () => {
       it('orders fields in RLP as specified by EIP1559', () => {
-        const CIP42Transaction = {
-          ...eip1559Transaction,
-          feeCurrency: '0x5409ED021D9299bf6814279A6A1411A7e866A631',
-        }
-        const result = rlpEncodedTx(CIP42Transaction)
+        const result = rlpEncodedTx(eip1559Transaction)
         expect(result).toMatchInlineSnapshot(`
           {
-            "rlpEncode": "0x7cf8400280630a63945409ed021d9299bf6814279a6a1411a7e866a6318080941be31a94361a391bbafb2a4ccd704f57dc04d4bb893635c9adc5dea0000083abcdefc0",
+            "rlpEncode": "0x02e90280630a63941be31a94361a391bbafb2a4ccd704f57dc04d4bb893635c9adc5dea0000083abcdefc0",
             "transaction": {
               "chainId": 2,
               "data": "0xabcdef",
-              "feeCurrency": "0x5409ed021d9299bf6814279a6a1411a7e866a631",
               "from": "0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb",
               "gas": "0x63",
-              "gasPrice": "0x",
-              "gatewayFee": "0x",
-              "gatewayFeeRecipient": "0x",
               "maxFeePerGas": "0x0a",
               "maxPriorityFeePerGas": "0x63",
               "nonce": 0,
               "to": "0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb",
               "value": "0x3635c9adc5dea00000",
             },
-            "type": "cip42",
+            "type": "eip1559",
           }
         `)
       })
@@ -375,6 +364,32 @@ describe('recoverTransaction', () => {
           "to": "0x588e4b68193001e4d10928660ab4165b813717c0",
           "type": "celo-legacy",
           "value": "0x0de0b6b3a7640000",
+        },
+        "0x1Be31A94361a391bBaFB2a4CCd704F57dc04d4bb",
+      ]
+    `)
+  })
+  it('handles cip64 transactions', () => {
+    const cip64TX =
+      '0x7bf88282ad5a8063630a94588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdefc094cd2a3d9f938e13cd947ec05abc7fe734df8dd82680a091b5504a59e529e7efa42dbb97fbc3311a91d035c873a94ab0789441fc989f84a02e8254d6b3101b63417e5d496833bc84f4832d4a8bf8a2b83e291d8f38c0f62d'
+    expect(recoverTransaction(cip64TX)).toMatchInlineSnapshot(`
+      [
+        {
+          "accessList": [],
+          "chainId": 44378,
+          "data": "0xabcdef",
+          "feeCurrency": "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
+          "gas": 10,
+          "maxFeePerGas": 99,
+          "maxPriorityFeePerGas": 99,
+          "nonce": 0,
+          "r": "0x91b5504a59e529e7efa42dbb97fbc3311a91d035c873a94ab0789441fc989f84",
+          "s": "0x2e8254d6b3101b63417e5d496833bc84f4832d4a8bf8a2b83e291d8f38c0f62d",
+          "to": "0x588e4b68193001e4d10928660ab4165b813717c0",
+          "type": "cip64",
+          "v": 27,
+          "value": 1000000000000000000,
+          "yParity": 0,
         },
         "0x1Be31A94361a391bBaFB2a4CCd704F57dc04d4bb",
       ]
@@ -579,7 +594,7 @@ describe('getSignerFromTx', () => {
       },
       { serializer: celo.serializers?.transaction }
     )
-    expect(getSignerFromTxCIP42(signed)).toEqual(account.address)
+    expect(getSignerFromTxEIP2718TX(signed)).toEqual(account.address)
   })
 })
 

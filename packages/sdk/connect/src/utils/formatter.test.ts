@@ -67,6 +67,29 @@ describe('inputCeloTxFormatter', () => {
       `)
     })
   })
+  describe('valid cip64 tx', () => {
+    const cip64 = {
+      ...base,
+      maxFeePerGas: '0x3e8',
+      maxPriorityFeePerGas: '0x3e8',
+      feeCurrency: '0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe',
+    }
+    it('formats', () => {
+      expect(inputCeloTxFormatter(cip64)).toMatchInlineSnapshot(`
+        {
+          "data": "0x",
+          "feeCurrency": "0x11f4d0a3c12e86b4b5f39b213f7e19d048276dae",
+          "from": "0x11f4d0a3c12e86b4b5f39b213f7e19d048276dae",
+          "gas": "0xf4240",
+          "maxFeePerGas": "0x3e8",
+          "maxPriorityFeePerGas": "0x3e8",
+          "nonce": "0x1",
+          "to": "0x11f4d0a3c12e86b4b5f39b213f7e19d048276dae",
+          "value": "0x241",
+        }
+      `)
+    })
+  })
   describe('valid cip42 tx', () => {
     const cip42 = {
       ...base,

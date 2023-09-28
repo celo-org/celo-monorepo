@@ -1,3 +1,4 @@
+import { StrongAddress } from '@celo/base/lib/address'
 import { CeloTx, EncodedTransaction, Hex } from '@celo/connect'
 import {
   normalizeAddressWith0x,
@@ -12,7 +13,6 @@ import { TransactionSerializableEIP1559, parseTransaction } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import Web3 from 'web3'
 import { LocalWallet } from './local-wallet'
-import { StrongAddress } from '@celo/base/lib/address'
 
 const CHAIN_ID = 44378
 
@@ -272,6 +272,35 @@ describe('Local wallet class', () => {
             )
             expect(signedTransaction.raw).toEqual(viemSignedTransaction)
           })
+          test('succeeds with cip64', async () => {
+            const recoverTransactionCIP64 = {
+              ...celoTransactionWithGasPrice,
+              gasPrice: undefined,
+              gatewayFee: undefined,
+              gatewayFeeRecipient: undefined,
+              maxFeePerGas: '99',
+              maxPriorityFeePerGas: '99',
+              feeCurrency: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+            }
+            await expect(wallet.signTransaction(recoverTransactionCIP64)).resolves
+              .toMatchInlineSnapshot(`
+              {
+                "raw": "0x7bf88282ad5a8063630a94588e4b68193001e4d10928660ab4165b813717c0880de0b6b3a764000083abcdefc094cd2a3d9f938e13cd947ec05abc7fe734df8dd82680a091b5504a59e529e7efa42dbb97fbc3311a91d035c873a94ab0789441fc989f84a02e8254d6b3101b63417e5d496833bc84f4832d4a8bf8a2b83e291d8f38c0f62d",
+                "tx": {
+                  "gas": "0x0a",
+                  "hash": "0x645afc1d19fe805c0c0956e70d5415487bf073741d7b297ccb7e7040c6ce5df6",
+                  "input": "0xabcdef",
+                  "nonce": "0",
+                  "r": "0x91b5504a59e529e7efa42dbb97fbc3311a91d035c873a94ab0789441fc989f84",
+                  "s": "0x2e8254d6b3101b63417e5d496833bc84f4832d4a8bf8a2b83e291d8f38c0f62d",
+                  "to": "0x588e4b68193001e4d10928660ab4165b813717c0",
+                  "v": "0x",
+                  "value": "0x0de0b6b3a7640000",
+                },
+                "type": "cip64",
+              }
+            `)
+          })
 
           test('succeeds with cip42', async () => {
             const transaction42 = {
@@ -279,6 +308,7 @@ describe('Local wallet class', () => {
               gasPrice: undefined,
               maxFeePerGas: '99',
               maxPriorityFeePerGas: '99',
+              gatewayFee: '0x5678',
               feeCurrency: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
             }
             await expect(wallet.signTransaction(transaction42)).resolves.toMatchInlineSnapshot(`
@@ -343,7 +373,7 @@ describe('Local wallet class', () => {
             )
           })
         })
-        describe('when using signTransaction with type CIP42', () => {
+        describe('when using signTransaction with type CIP42/64', () => {
           let celoTransactionBase: CeloTx
           let feeCurrency = '0x10c892a6ec43a53e45d0b916b4b7d383b1b78c0f'
           let maxFeePerGas = '0x100000000'
@@ -360,11 +390,26 @@ describe('Local wallet class', () => {
               data: '0xabcdef',
             }
           })
-
-          describe('when feeCurrency and maxPriorityFeePerGas and maxFeePerGas are set', () => {
+          describe('when feeCurrency and maxPriorityFeePerGas and maxFeePerGas are set but no gatewayfees', () => {
+            it('signs as a CIP64 tx', async () => {
+              const transaction: CeloTx = {
+                ...celoTransactionBase,
+                gatewayFee: undefined,
+                gatewayFeeRecipient: undefined,
+                feeCurrency,
+                maxFeePerGas,
+                maxPriorityFeePerGas,
+              }
+              const signedTx: EncodedTransaction = await wallet.signTransaction(transaction)
+              expect(signedTx.raw).toMatch(/^0x7b/)
+            })
+          })
+          describe('when feeCurrency and gatewayFee and maxPriorityFeePerGas and maxFeePerGas are set', () => {
             it('signs as a CIP42 tx', async () => {
               const transaction: CeloTx = {
                 ...celoTransactionBase,
+                gatewayFee: '0x1331',
+                gatewayFeeRecipient: FEE_ADDRESS,
                 feeCurrency,
                 maxFeePerGas,
                 maxPriorityFeePerGas,
