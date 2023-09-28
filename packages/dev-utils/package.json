@@ -1,6 +1,6 @@
 {
   "name": "@celo/dev-utils",
-  "version": "0.0.1-dev",
+  "version": "0.0.1",
   "description": "util package for celo packages that should only be a devDependency",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -16,6 +16,7 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
+    "ganache": "npm:@celo/ganache@7.8.0-unofficial.0",
     "bignumber.js": "^9.0.0",
     "web3": "1.10.0",
     "web3-core-helpers": "1.10.0",

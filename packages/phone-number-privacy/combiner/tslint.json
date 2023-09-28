@@ -1,7 +1,13 @@
 {
   "extends": ["@celo/typescript/tslint.json"],
   "rules": {
+    "no-implicit-dependencies": [
+      true,
+      [
+        "node:assert"
+      ]
+    ],
     "no-global-arrow-functions": false,
-    "no-console": true 
+    "no-console": true
   }
 }

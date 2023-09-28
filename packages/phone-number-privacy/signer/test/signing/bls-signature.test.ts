@@ -1,5 +1,5 @@
-import { rootLogger, TestUtils } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
+import { rootLogger, TestUtils } from '@celo/phone-number-privacy-common'
 import { computeBlindedSignature } from '../../src/common/bls/bls-cryptography-client'
 import { config } from '../../src/config'
 

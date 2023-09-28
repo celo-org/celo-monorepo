@@ -8,9 +8,13 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - '**/*.md'
   pull_request:
     branches:
       - master
+    paths-ignore:
+      - '**/*.md'
 
 concurrency:
   group: circle-ci-${{ github.ref }}
@@ -106,7 +110,7 @@ jobs:
           restore-keys: |
             code-${{ github.sha }}
       - name: Install yarn dependencies
-        run: yarn install
+        run: git config --global url."https://".insteadOf ssh:// && yarn install
         if: steps.cache_node.outputs.cache-hit != 'true'
       - name: Run yarn postinstall if cache hitted
         run: yarn run postinstall

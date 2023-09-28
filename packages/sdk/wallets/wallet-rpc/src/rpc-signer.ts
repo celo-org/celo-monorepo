@@ -3,7 +3,7 @@ import { CeloTx, EncodedTransaction, RpcCaller, Signer } from '@celo/connect'
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { decodeSig } from '@celo/wallet-base'
 import BigNumber from 'bignumber.js'
-import BN from 'bn.js'
+import type BN from 'bn.js'
 
 const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
 const currentTimeInSeconds = () => Math.floor(Date.now() / 1000)
