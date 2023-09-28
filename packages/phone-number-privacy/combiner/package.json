@@ -29,6 +29,7 @@
     "test:e2e:mainnet": "CONTEXT_NAME=mainnet yarn test:e2e"
   },
   "dependencies": {
+    "@celo/base": "^5.0.4",
     "@celo/contractkit": "^5.0.4",
     "@celo/phone-number-privacy-common": "^3.0.3",
     "@celo/identity": "^5.0.4",
