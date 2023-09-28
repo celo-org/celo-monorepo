@@ -14,18 +14,28 @@ export enum Labels {
 
 export const Counters = {
   requests: new Counter({
-    name: 'requests',
+    name: 'combiner_requests_total',
     help: 'Counter for the number of requests received',
     labelNames: ['endpoint'],
   }),
   responses: new Counter({
-    name: 'responses',
+    name: 'combiner_responses_total',
     help: 'Counter for the number of responses sent',
     labelNames: ['endpoint', 'statusCode'],
   }),
   blockchainErrors: new Counter({
-    name: 'blockchain_errors',
+    name: 'combiner_blockchain_errors_total',
     help: 'Counter for the number of errors from interacting with the blockchain',
+  }),
+  blsComputeErrors: new Counter({
+    name: 'combiner_bls_compute_errors_total',
+    help: 'Counter for the number of errors from interacting with the blockchain',
+    labelNames: ['signer'],
+  }),
+  errorsCaughtInEndpointHandler: new Counter({
+    name: 'errors_caught_in_endpoint_handler',
+    help: 'Counter for the number of errors caught in the outermost endpoint handler',
+    labelNames: ['endpoint'],
   }),
 }
 

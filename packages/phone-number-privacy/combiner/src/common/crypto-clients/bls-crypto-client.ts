@@ -1,6 +1,7 @@
 import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
 import Logger from 'bunyan'
+import { Counters } from '../../common/metrics'
 import { CryptoClient, ServicePartialSignature } from './crypto-client'
 
 function flattenSigsArray(sigs: Uint8Array[]) {
@@ -75,6 +76,7 @@ export class BLSCryptographyClient extends CryptoClient {
       // We move it to the verified set so that we don't need to re-verify in the future
       this.verifiedSignatures.push(unverifiedSignature)
     } else {
+      Counters.responses.labels(unverifiedSignature.url).inc()
       logger.error({ url: unverifiedSignature.url }, ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)
     }
   }
