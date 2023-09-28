@@ -12,6 +12,7 @@ import { Request } from 'express'
 import * as t from 'io-ts'
 import { PerformanceObserver } from 'perf_hooks'
 import { fetchSignerResponseWithFallback, SignerResponse } from './io'
+import { Counters } from './metrics'
 
 export interface Signer {
   url: string
@@ -138,7 +139,7 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
           `received 'OK' response from signer`
         )
 
-        const odisResponse: OdisResponse<R> = parseSchema(responseSchema, data, logger)
+        const odisResponse: OdisResponse<R> = parseSchema(responseSchema, data, logger, endpoint)
         if (!odisResponse.success) {
           logger.error(
             { err: odisResponse.error, signer: signer.url },
@@ -179,6 +180,7 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
 
   if (errorCodes.size > 0) {
     if (errorCodes.size > 1) {
+      Counters.combinerErrors.labels(endpoint).inc()
       logger.error(
         { errorCodes: JSON.stringify([...errorCodes]) },
         ErrorMessage.INCONSISTENT_SIGNER_RESPONSES
@@ -191,8 +193,14 @@ export async function thresholdCallToSigners<R extends OdisRequest>(
   }
 }
 
-function parseSchema<T>(schema: t.Type<T, T, unknown>, data: unknown, logger: Logger): T {
+function parseSchema<T>(
+  schema: t.Type<T, T, unknown>,
+  data: unknown,
+  logger: Logger,
+  endpoint: string
+): T {
   if (!schema.is(data)) {
+    Counters.combinerErrors.labels(endpoint).inc()
     logger.error({ data }, `Malformed schema`)
     throw new Error(ErrorMessage.INVALID_SIGNER_RESPONSE)
   }

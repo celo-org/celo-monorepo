@@ -76,7 +76,8 @@ export class BLSCryptographyClient extends CryptoClient {
       // We move it to the verified set so that we don't need to re-verify in the future
       this.verifiedSignatures.push(unverifiedSignature)
     } else {
-      Counters.responses.labels(unverifiedSignature.url).inc()
+      Counters.blsComputeErrors.labels(unverifiedSignature.url).inc()
+      Counters.combinerErrors.labels(unverifiedSignature.url).inc()
       logger.error({ url: unverifiedSignature.url }, ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)
     }
   }
