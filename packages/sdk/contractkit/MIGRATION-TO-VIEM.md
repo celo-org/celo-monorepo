@@ -1,4 +1,4 @@
-# Draft: Migration document from Contractkit
+# Migration document from Contractkit
 
 Hello devs 🌱 this is a migration path away from contractkit. This aims to give examples to help you move to [viem](https://viem.sh/).
 
