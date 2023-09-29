@@ -108,7 +108,7 @@
     "@types/mathjs": "^4.4.1",
     "@types/mocha": "^7.0.2",
     "@types/targz": "^1.0.0",
-    "@types/lodash": "^4.17.20",
+    "@types/lodash": "^4.14.199",
     "@types/tmp": "^0.1.0",
     "@types/yargs": "^13.0.2",
     "cross-env": "^5.1.6",
