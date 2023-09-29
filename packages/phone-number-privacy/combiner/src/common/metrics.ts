@@ -37,11 +37,6 @@ export const Counters = {
     help: 'Counter for the number of errors caught in the outermost endpoint handler',
     labelNames: ['endpoint'],
   }),
-  combinerErrors: new Counter({
-    name: 'combiner_errors_total',
-    help: 'Counter for the all error types logged in the combiner, excluding errors in signer response data and ERR_09 or ERR_10.',
-    labelNames: ['endpoint'],
-  }),
 }
 
 const buckets = [0.001, 0.01, 0.1, 0.5, 1, 2, 5, 10]
