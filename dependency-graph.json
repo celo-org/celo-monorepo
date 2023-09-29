@@ -10,7 +10,6 @@
       "@celo/env-tests",
       "@celo/explorer",
       "@celo/governance",
-      "@celo/identity",
       "@celo/network-utils",
       "@celo/protocol",
       "@celo/utils"
@@ -26,7 +25,6 @@
       "@celo/dev-utils",
       "@celo/explorer",
       "@celo/governance",
-      "@celo/identity",
       "@celo/phone-utils",
       "@celo/utils",
       "@celo/wallet-hsm-azure",
@@ -45,7 +43,6 @@
       "@celo/connect",
       "@celo/contractkit",
       "@celo/cryptographic-utils",
-      "@celo/identity",
       "@celo/phone-utils",
       "@celo/utils"
     ]
@@ -73,50 +70,6 @@
   "@celo/typescript": {
     "location": "packages/typescript",
     "dependencies": []
-  },
-  "@celo/phone-number-privacy-combiner": {
-    "location": "packages/phone-number-privacy/combiner",
-    "dependencies": [
-      "@celo/contractkit",
-      "@celo/encrypted-backup",
-      "@celo/identity",
-      "@celo/phone-number-privacy-common",
-      "@celo/phone-utils",
-      "@celo/utils"
-    ]
-  },
-  "@celo/phone-number-privacy-common": {
-    "location": "packages/phone-number-privacy/common",
-    "dependencies": [
-      "@celo/base",
-      "@celo/contractkit",
-      "@celo/phone-utils",
-      "@celo/utils",
-      "@celo/wallet-local"
-    ]
-  },
-  "@celo/phone-number-privacy-monitor": {
-    "location": "packages/phone-number-privacy/monitor",
-    "dependencies": [
-      "@celo/base",
-      "@celo/contractkit",
-      "@celo/cryptographic-utils",
-      "@celo/encrypted-backup",
-      "@celo/identity",
-      "@celo/phone-number-privacy-common",
-      "@celo/utils",
-      "@celo/wallet-local"
-    ]
-  },
-  "@celo/phone-number-privacy-signer": {
-    "location": "packages/phone-number-privacy/signer",
-    "dependencies": [
-      "@celo/base",
-      "@celo/contractkit",
-      "@celo/phone-number-privacy-common",
-      "@celo/utils",
-      "@celo/wallet-hsm-azure"
-    ]
   },
   "@celo/base": {
     "location": "packages/sdk/base",
@@ -151,18 +104,6 @@
       "@celo/utils"
     ]
   },
-  "@celo/encrypted-backup": {
-    "location": "packages/sdk/encrypted-backup",
-    "dependencies": [
-      "@celo/base",
-      "@celo/connect",
-      "@celo/dev-utils",
-      "@celo/identity",
-      "@celo/phone-number-privacy-common",
-      "@celo/utils",
-      "@celo/wallet-local"
-    ]
-  },
   "@celo/explorer": {
     "location": "packages/sdk/explorer",
     "dependencies": [
@@ -180,17 +121,6 @@
       "@celo/contractkit",
       "@celo/explorer",
       "@celo/utils"
-    ]
-  },
-  "@celo/identity": {
-    "location": "packages/sdk/identity",
-    "dependencies": [
-      "@celo/base",
-      "@celo/contractkit",
-      "@celo/dev-utils",
-      "@celo/phone-number-privacy-common",
-      "@celo/utils",
-      "@celo/wallet-local"
     ]
   },
   "@celo/keystores": {
