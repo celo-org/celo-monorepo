@@ -133,4 +133,36 @@ Compared to the normal test command, quicktest will:
 1. Not run the pretest script of building solidity (will still be run as part of truffle test) and compiling typescript. This works because truffle can run typescript "natively".
 2. Only migrate selected migrations as set in `backupmigrations.sh` (you'll likely need at least one compilation step since truffle seems to only run compiled migrations)
 
+## Verify released smart contracts
+1. Update CeloScanApi in env.json file
+2. Run verification command
 
+```bash
+yarn truffle-verify [ContractName]@[Contract address]  --network [network] --forno [network rpc url]
+```
+
+example:
+```bash
+yarn truffle-verify MentoFeeHandlerSeller@0x4efa274b7e33476c961065000d58ee09f7921a74 --network mainnet --forno https://forno.celo.org
+```
+
+### Possible problems
+ 1. Some of old smart contracts have slightly different bytecode when verified (it is usually just few bytes difference). Some of the smart contracts were originally deployed with version 0.5.8 instead of 0.5.13 even though there is no history trace about this in our monorepo.
+ 2. Bytecode differs because of missing library addresses on CeloScan. Json file that will be manually uploaded to CeloScan needs to have libraries root element updated. Library addresses is possible to get either manually or with command which will generate libraries.json.
+  ```bash
+   yarn verify-deployed -n $NETWORK -b $PREVIOUS_RELEASE -f
+   ```
+    
+  ```javascript
+  {
+    "libraries": {
+            "/contracts/governance/Governance.sol": {
+                "Proposals": "0x38afc0dc55415ae27b81c24b5a5fbfe433ebfba8",
+                "IntegerSortedLinkedList": "0x411b40a81a07fcd3542ce5b3d7e215178c4ca2ef",
+                "AddressLinkedList": "0xd26d896d258e258eba71ff0873a878ec36538f8d",
+                "Signatures": "0x69baecd458e7c08b13a18e11887dbb078fb3cbb4",
+                "AddressSortedLinkedList": "0x4819ad0a0eb1304b1d7bc3afd7818017b52a87ab"
+            }
+        }
+  }
+```
