@@ -1,8 +1,0 @@
-{
-  "extends": ["@celo/typescript/tslint.json"],
-  "rules": {
-    "no-implicit-dependencies": [true, ["node:http"]],
-    "no-global-arrow-functions": false,
-    "no-console": true
-  }
-}
