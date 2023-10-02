@@ -403,76 +403,6 @@ jobs:
       - name: Run tests
         run: |
           yarn --cwd=packages/sdk/contractkit test
-  identity-tests:
-    name: Identity Tests
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 30
-    needs: [install-dependencies, contractkit-tests]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/phone-number-privacy/common') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Generate DevChain
-        run: |
-          cd packages/sdk/identity
-          yarn test:reset
-      - name: Run tests
-        run: |
-          yarn --cwd=packages/sdk/identity test
-  transactions-uri-tests:
-    name: Transaction URI Tests
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 30
-    needs: [install-dependencies, contractkit-tests]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v37
-        with:
-          fetch_depth: '150'
-      - name: Generate DevChain
-        run: |
-          cd packages/sdk/identity
-          yarn test:reset
-      - name: Run tests
-        run: |
-          yarn --cwd=packages/sdk/identity test
   cli-tests:
     name: CeloCli Tests
     runs-on: ['self-hosted', 'monorepo-node18']
@@ -481,7 +411,6 @@ jobs:
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/cli') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/phone-number-privacy/common') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
@@ -626,7 +555,6 @@ jobs:
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/celotool') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/phone-number-privacy/common') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
@@ -714,40 +642,6 @@ jobs:
           max_attempts: 3
           command: |
             ${{ matrix.command }}
-
-  odis-test:
-    name: ODIS test
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 30
-    needs: [install-dependencies, lint-checks]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/phone-number-privacy') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Run Tests for common package
-        run: |
-          yarn --cwd=packages/phone-number-privacy/common test:coverage
-      - name: Run Tests for combiner
-        run: |
-          yarn --cwd=packages/phone-number-privacy/combiner test:coverage
-      - name: Run Tests for signer
-        run: |
-          yarn --cwd=packages/phone-number-privacy/signer test:coverage
 
   # NOTE: This has not been fully tested as we don't have a license for certora
   certora-test:
