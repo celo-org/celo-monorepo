@@ -39,6 +39,7 @@ interface AccountSummary {
     nonvoting: BigNumber
     requirement: BigNumber
   }
+  totalGovernaneVotingPower: BigNumber
   pendingWithdrawals: PendingWithdrawal[]
 }
 
@@ -79,6 +80,30 @@ export class LockedGoldWrapper extends BaseWrapperForGoverning<LockedGold> {
    * The gold to be locked, must be specified as the `tx.value`
    */
   lock = proxySend(this.connection, this.contract.methods.lock)
+
+  /**
+   * Delegates locked gold.
+   */
+  delegate = proxySend(this.connection, this.contract.methods.delegateGovernanceVotes)
+
+  /**
+   * Updates the amount of delegated locked gold. There might be discrepancy between the amount of locked gold
+   * and the amount of delegated locked gold because of received rewards.
+   */
+  updateDelegatedAmount = proxySend(this.connection, this.contract.methods.updateDelegatedAmount)
+
+  /**
+   * Revokes delegated locked gold.
+   */
+  revokeDelegated = proxySend(this.connection, this.contract.methods.revokeDelegatedGovernanceVotes)
+
+  getMaxDelegateesCount = async () => {
+    const maxDelegateesCountHex = await this.connection.web3.eth.getStorageAt(
+      this.contract['_address'],
+      10
+    )
+    return new BigNumber(maxDelegateesCountHex, 16)
+  }
 
   /**
    * Unlocks gold that becomes withdrawable after the unlocking period.
@@ -204,19 +229,34 @@ export class LockedGoldWrapper extends BaseWrapperForGoverning<LockedGold> {
   }
 
   async getAccountSummary(account: string): Promise<AccountSummary> {
-    const nonvoting = await this.getAccountNonvotingLockedGold(account)
-    const total = await this.getAccountTotalLockedGold(account)
     const validators = await this.contracts.getValidators()
-    const requirement = await validators.getAccountLockedGoldRequirement(account)
-    const pendingWithdrawals = await this.getPendingWithdrawals(account)
+    const nonvotingPromise = this.getAccountNonvotingLockedGold(account)
+    const totalPromise = this.getAccountTotalLockedGold(account)
+    const requirementPromise = validators.getAccountLockedGoldRequirement(account)
+    const pendingWithdrawalsPromise = this.getPendingWithdrawals(account)
+    const accountTotalGovernanceVotingPowerPromise =
+      this.getAccountTotalGovernanceVotingPower(account)
     return {
       lockedGold: {
-        total,
-        nonvoting,
-        requirement,
+        total: await totalPromise,
+        nonvoting: await nonvotingPromise,
+        requirement: await requirementPromise,
       },
-      pendingWithdrawals,
+      totalGovernaneVotingPower: await accountTotalGovernanceVotingPowerPromise,
+      pendingWithdrawals: await pendingWithdrawalsPromise,
     }
+  }
+
+  /**
+   * Returns the total amount of governance voting power for an account.
+   * @param account The address of the account.
+   * @return The total amount of governance voting power for an account.
+   */
+  async getAccountTotalGovernanceVotingPower(account: string) {
+    const totalGovernanceVotingPower = await this.contract.methods
+      .getAccountTotalGovernanceVotingPower(account)
+      .call()
+    return new BigNumber(totalGovernanceVotingPower)
   }
 
   /**
