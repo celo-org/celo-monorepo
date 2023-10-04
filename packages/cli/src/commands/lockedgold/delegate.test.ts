@@ -3,8 +3,8 @@ import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
 import { testLocally } from '../../test-utils/cliUtils'
 import Register from '../account/register'
-import Lock from './lock'
 import Delegate from './delegate'
+import Lock from './lock'
 
 process.env.NO_SYNCCHECK = 'true'
 

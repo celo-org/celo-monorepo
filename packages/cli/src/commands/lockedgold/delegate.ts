@@ -1,4 +1,5 @@
 import { Address } from '@celo/connect'
+import { toFixed } from '@celo/utils/src/fixidity'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
@@ -6,7 +7,6 @@ import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 import { LockedGoldArgs } from '../../utils/lockedgold'
-import { toFixed } from '@celo/utils/src/fixidity'
 
 export default class Delegate extends BaseCommand {
   static description = 'Delegate locked gold.'

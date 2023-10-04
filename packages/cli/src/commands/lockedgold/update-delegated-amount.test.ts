@@ -2,9 +2,9 @@ import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
 import { testLocally } from '../../test-utils/cliUtils'
 import Register from '../account/register'
-import UpdateDelegatedAmount from './update-delegated-amount'
 import Delegate from './delegate'
 import Lock from './lock'
+import UpdateDelegatedAmount from './update-delegated-amount'
 
 process.env.NO_SYNCCHECK = 'true'
 
