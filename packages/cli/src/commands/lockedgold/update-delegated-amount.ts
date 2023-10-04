@@ -28,7 +28,7 @@ export default class UpdateDelegatedAmount extends BaseCommand {
 
     this.kit.defaultAccount = address
 
-    await newCheckBuilder(this).isAccount(address).isAccount(to).isAccount(to).runChecks()
+    await newCheckBuilder(this).isAccount(address).isAccount(to).runChecks()
 
     const lockedGold = await this.kit.contracts.getLockedGold()
 
