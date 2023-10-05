@@ -31,8 +31,8 @@ oracle:
         {exchange: 'BITSTAMP', symbol: 'USDTUSD', toInvert: false}
       ],
       [
-        {exchange: 'Bitget', symbol: 'USDTUSDC', toInvert: true},
-        {exchange: 'Kraken', symbol: 'USDTUSD', toInvert: false}
+        {exchange: 'BITGET', symbol: 'USDTUSDC', toInvert: true},
+        {exchange: 'KRAKEN', symbol: 'USDTUSD', toInvert: false}
       ],
       [
         {exchange: 'KUCOIN', symbol: 'USDCUSDT', toInvert: false},
