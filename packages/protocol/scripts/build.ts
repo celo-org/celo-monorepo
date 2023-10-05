@@ -196,9 +196,10 @@ const _buildTargets = {
   truffleTypes: undefined,
   web3Types: undefined,
   ethersTypes: undefined,
-}
+} as const
+type BuildTargets = Record<keyof typeof _buildTargets, string>
 
-async function main(buildTargets: typeof _buildTargets) {
+async function main(buildTargets: BuildTargets) {
   if (buildTargets.solidity) {
     compile(buildTargets.solidity)
   }
@@ -215,7 +216,7 @@ async function main(buildTargets: typeof _buildTargets) {
 
 const argv = minimist(process.argv.slice(2), {
   string: Object.keys(_buildTargets),
-})
+}) as unknown as BuildTargets
 
 main(argv).catch((err) => {
   console.error(err)
