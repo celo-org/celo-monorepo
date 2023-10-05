@@ -43,4 +43,32 @@ testWithGanache('LockedGold Wrapper', (web3) => {
     await Promise.all(txos.map((txo) => txo.sendAndWaitForReceipt()))
     //
   })
+
+  test('should return the count of pending withdrawals', async () => {
+    await lockedGold.lock().sendAndWaitForReceipt({ value: value * 2 })
+    await lockedGold.unlock(value).sendAndWaitForReceipt()
+    await lockedGold.unlock(value).sendAndWaitForReceipt()
+
+    const count = await lockedGold.getTotalPendingWithdrawalsCount(account)
+    expect(count).toEqBigNumber(2)
+  })
+
+  test('should return zero when there are no pending withdrawals', async () => {
+    const count = await lockedGold.getTotalPendingWithdrawalsCount(account)
+    expect(count).toEqBigNumber(0)
+  })
+
+  test('should return the pending withdrawal at a given index', async () => {
+    await lockedGold.lock().sendAndWaitForReceipt({ value: value * 2 })
+    await lockedGold.unlock(value).sendAndWaitForReceipt()
+    const pendingWithdrawal = await lockedGold.getPendingWithdrawal(account, 0)
+
+    expect(pendingWithdrawal.value).toEqBigNumber(value)
+  })
+
+  test('should throw an error for an invalid index', async () => {
+    await expect(lockedGold.getPendingWithdrawal(account, 999)).rejects.toThrow(
+      'Bad pending withdrawal index'
+    )
+  })
 })

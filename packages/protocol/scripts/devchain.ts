@@ -1,7 +1,7 @@
-import ganache from '@celo/ganache-cli'
 import chalk from 'chalk'
 import { spawn, SpawnOptions } from 'child_process'
 import fs from 'fs-extra'
+import ganache from 'ganache'
 import path from 'path'
 import targz from 'targz'
 import tmp from 'tmp'
@@ -48,6 +48,12 @@ yargs
     "Run celo's devchain using given tar filename. Generates a copy and then delete it",
     (args) => args.positional('filename', { type: 'string', description: 'Chain tar filename' }),
     (args) => exitOnError(runDevChainFromTar(args.filename))
+  )
+  .command(
+    'run-tar-in-bg <filename>',
+    "Run celo's devchain using given tar filename. Generates a copy and then delete it",
+    (args) => args.positional('filename', { type: 'string', description: 'Chain tar filename' }),
+    (args) => exitOnError(runDevChainFromTarInBackGround(args.filename))
   )
   .command(
     'generate <datadir>',
@@ -123,43 +129,33 @@ async function startGanache(
       }
 
   const server = ganache.server({
-    default_balance_ether: 200000000,
-    logger: {
-      log: logFn,
-    },
-    network_id: 1101,
-    db_path: datadir,
-    mnemonic: MNEMONIC,
-    gasLimit,
-    allowUnlimitedContractSize: true,
+    logging: { logger: { log: logFn } },
+    database: { dbPath: datadir },
+    wallet: { mnemonic: MNEMONIC, defaultBalance: 200000000 },
+    miner: { blockGasLimit: gasLimit },
+    chain: { networkId: 1101, chainId: 1, allowUnlimitedContractSize: true, hardfork: 'istanbul' },
   })
 
-  await new Promise((resolve, reject) => {
-    server.listen(8545, (err, blockchain) => {
-      if (err) {
-        reject(err)
-      } else {
-        // tslint:disable-next-line: no-console
-        console.log(chalk.red('Ganache STARTED'))
-        // console.log(blockchain)
-        resolve(blockchain)
+  server.listen(8545, async (err) => {
+    if (err) {
+      throw err
+    }
+    // tslint:disable-next-line: no-console
+    console.log(chalk.red('Ganache STARTED'))
+  })
+
+  return async () => {
+    try {
+      await server.close()
+      if (chainCopy) {
+        chainCopy.removeCallback()
       }
-    })
-  })
-
-  return () =>
-    new Promise<void>((resolve, reject) => {
-      server.close((err) => {
-        if (chainCopy) {
-          chainCopy.removeCallback()
-        }
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      })
-    })
+      // tslint:disable-next-line: no-console
+      console.log(chalk.red('Ganache server CLOSED'))
+    } catch (e) {
+      throw e
+    }
+  }
 }
 
 export function execCmd(
@@ -253,6 +249,27 @@ async function runDevChainFromTar(filename: string) {
 
   const stopGanache = await startGanache(chainCopy.name, { verbose: true }, chainCopy)
   return stopGanache
+}
+
+/// This function was created to replace `startInBgAndWaitForString` in `release-on-devchain.sh`
+/// and intended to be run on a hosted instances that shutdown after execution.
+/// Note: If you run this locally, you will need to properly cleanup tmp.DirResult and
+/// manually close the detached ganache instance.
+/// see https://trufflesuite.com/docs/ganache/reference/cli-options/#manage-detached-instances for more details
+async function runDevChainFromTarInBackGround(filename: string) {
+  const cmdArgs = ['ganache-devchain', '-d']
+
+  // keep is set to true, because `release-on-devchain` fails when set to false.
+  const chainCopy: tmp.DirResult = tmp.dirSync({ keep: true, unsafeCleanup: true })
+
+  // tslint:disable-next-line: no-console
+  console.log(`Creating tmp folder: ${chainCopy.name}`)
+
+  await decompressChain(filename, chainCopy.name)
+
+  cmdArgs.push(chainCopy.name)
+
+  return execCmd(`yarn`, cmdArgs, { cwd: ProtocolRoot })
 }
 
 function decompressChain(tarPath: string, copyChainPath: string): Promise<void> {

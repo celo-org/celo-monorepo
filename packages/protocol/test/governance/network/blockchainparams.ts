@@ -2,6 +2,7 @@ import {
   assertContainSubset,
   assertEqualBN,
   assertRevert,
+  assertTransactionRevertWithReason,
   mineBlocks,
 } from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
@@ -20,54 +21,11 @@ const EPOCH = 100
 
 contract('BlockchainParameters', (accounts: string[]) => {
   let blockchainParameters: BlockchainParametersInstance
-  const version = {
-    major: 1,
-    minor: 8,
-    patch: 2,
-  }
   const gasLimit = 7000000
   const gasForNonGoldCurrencies = 50000
 
   beforeEach(async () => {
     blockchainParameters = await BlockchainParameters.new()
-  })
-
-  describe('#setMinimumClientVersion()', () => {
-    it('should set the variable', async () => {
-      await blockchainParameters.setMinimumClientVersion(
-        version.major,
-        version.minor,
-        version.patch
-      )
-      const versionQueried = await blockchainParameters.getMinimumClientVersion()
-      assert.equal(version.major, versionQueried[0].toNumber())
-      assert.equal(version.minor, versionQueried[1].toNumber())
-      assert.equal(version.patch, versionQueried[2].toNumber())
-    })
-    it('should emit the MinimumClientVersionSet event', async () => {
-      const resp = await blockchainParameters.setMinimumClientVersion(
-        version.major,
-        version.minor,
-        version.patch
-      )
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertContainSubset(log, {
-        event: 'MinimumClientVersionSet',
-        args: {
-          major: new BigNumber(version.major),
-          minor: new BigNumber(version.minor),
-          patch: new BigNumber(version.patch),
-        },
-      })
-    })
-    it('only owner should be able to set', async () => {
-      await assertRevert(
-        blockchainParameters.setMinimumClientVersion(version.major, version.minor, version.patch, {
-          from: accounts[1],
-        })
-      )
-    })
   })
 
   describe('#setBlockGasLimit()', () => {
@@ -87,10 +45,11 @@ contract('BlockchainParameters', (accounts: string[]) => {
       })
     })
     it('only owner should be able to set', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         blockchainParameters.setBlockGasLimit(gasLimit, {
           from: accounts[1],
-        })
+        }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -117,10 +76,11 @@ contract('BlockchainParameters', (accounts: string[]) => {
       })
     })
     it('only owner should be able to set', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(gasLimit, {
           from: accounts[1],
-        })
+        }),
+        'Ownable: caller is not the owner'
       )
     })
   })
@@ -168,38 +128,37 @@ contract('BlockchainParameters', (accounts: string[]) => {
     })
 
     it('only owner should be able to set', () =>
-      assertRevert(
+      assertTransactionRevertWithReason(
         blockchainParameters.setUptimeLookbackWindow(newValue, {
           from: accounts[1],
-        })
+        }),
+        'Ownable: caller is not the owner'
       ))
 
     it('should fail when using value lower than safe minimum', () =>
-      assertRevert(blockchainParameters.setUptimeLookbackWindow(2)))
+      assertTransactionRevertWithReason(
+        blockchainParameters.setUptimeLookbackWindow(2),
+        'UptimeLookbackWindow must be within safe range'
+      ))
 
     it('should fail when using value greater than safe maximum', () =>
-      assertRevert(blockchainParameters.setUptimeLookbackWindow(721)))
+      assertTransactionRevertWithReason(
+        blockchainParameters.setUptimeLookbackWindow(721),
+        'UptimeLookbackWindow must be within safe range'
+      ))
 
     it('should fail when using value greater than epochSize - 2', () =>
-      assertRevert(blockchainParameters.setUptimeLookbackWindow(EPOCH - 1)))
+      assertTransactionRevertWithReason(
+        blockchainParameters.setUptimeLookbackWindow(EPOCH - 1),
+        'UptimeLookbackWindow must be smaller or equal to epochSize - 2'
+      ))
   })
 
   describe('#initialize()', () => {
     const lookbackWindow = 20
 
     it('should set the variables', async () => {
-      await blockchainParameters.initialize(
-        version.major,
-        version.minor,
-        version.patch,
-        gasForNonGoldCurrencies,
-        gasLimit,
-        lookbackWindow
-      )
-      const versionQueried = await blockchainParameters.getMinimumClientVersion()
-      assert.equal(version.major, versionQueried[0].toNumber())
-      assert.equal(version.minor, versionQueried[1].toNumber())
-      assert.equal(version.patch, versionQueried[2].toNumber())
+      await blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow)
       assert.equal((await blockchainParameters.blockGasLimit()).toNumber(), gasLimit)
 
       // need to wait an epoch for uptimeLookbackWindow
@@ -211,29 +170,18 @@ contract('BlockchainParameters', (accounts: string[]) => {
     })
     it('should emit correct events', async () => {
       const resp = await blockchainParameters.initialize(
-        version.major,
-        version.minor,
-        version.patch,
         gasForNonGoldCurrencies,
         gasLimit,
         lookbackWindow
       )
-      assert.equal(resp.logs.length, 5)
-      assertContainSubset(resp.logs[1], {
-        event: 'MinimumClientVersionSet',
-        args: {
-          major: new BigNumber(version.major),
-          minor: new BigNumber(version.minor),
-          patch: new BigNumber(version.patch),
-        },
-      })
-      assertContainSubset(resp.logs[3], {
+      assert.equal(resp.logs.length, 4)
+      assertContainSubset(resp.logs[2], {
         event: 'IntrinsicGasForAlternativeFeeCurrencySet',
         args: {
           gas: new BigNumber(gasForNonGoldCurrencies),
         },
       })
-      assertContainSubset(resp.logs[2], {
+      assertContainSubset(resp.logs[1], {
         event: 'BlockGasLimitSet',
         args: {
           limit: new BigNumber(gasLimit),
@@ -246,7 +194,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
           newOwner: accounts[0],
         },
       })
-      assertContainSubset(resp.logs[4], {
+      assertContainSubset(resp.logs[3], {
         event: 'UptimeLookbackWindowSet',
         args: {
           window: new BigNumber(lookbackWindow),

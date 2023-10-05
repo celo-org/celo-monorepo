@@ -4,10 +4,11 @@ import {
   assertContainSubset,
   assertEqualBN,
   assertEqualDpBN,
-  assertRevert,
+  assertTransactionRevertWithReason,
   jsonRpc,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { makeTruffleContractForMigration } from '@celo/protocol/lib/web3-utils'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
@@ -25,9 +26,9 @@ import {
   MockStableTokenInstance,
   RegistryContract,
   RegistryInstance,
-  ReserveContract,
-  ReserveInstance,
 } from 'types'
+import { ReserveContract, ReserveInstance } from 'types/mento'
+import { MENTO_PACKAGE } from '../../../contractPackages'
 
 const EpochRewards: EpochRewardsTestContract = artifacts.require('EpochRewardsTest')
 const Freezer: FreezerContract = artifacts.require('Freezer')
@@ -36,7 +37,7 @@ const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSortedOracles')
 const Registry: RegistryContract = artifacts.require('Registry')
-const Reserve: ReserveContract = artifacts.require('Reserve')
+const Reserve: ReserveContract = makeTruffleContractForMigration('Reserve', MENTO_PACKAGE, web3)
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
@@ -153,7 +154,7 @@ contract('EpochRewards', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(
+      await assertTransactionRevertWithReason(
         epochRewards.initialize(
           registry.address,
           targetVotingYieldParams.initial,
@@ -167,7 +168,8 @@ contract('EpochRewards', (accounts: string[]) => {
           communityRewardFraction,
           carbonOffsettingPartner,
           carbonOffsettingFraction
-        )
+        ),
+        'contract already initialized'
       )
     })
   })
@@ -196,10 +198,11 @@ contract('EpochRewards', (accounts: string[]) => {
 
         describe('when called by a non-owner', () => {
           it('should revert', async () => {
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               epochRewards.setTargetVotingGoldFraction(newFraction, {
                 from: nonOwner,
-              })
+              }),
+              'Ownable: caller is not the owner'
             )
           })
         })
@@ -207,7 +210,10 @@ contract('EpochRewards', (accounts: string[]) => {
 
       describe('when the fraction is the same', () => {
         it('should revert', async () => {
-          await assertRevert(epochRewards.setTargetVotingGoldFraction(targetVotingGoldFraction))
+          await assertTransactionRevertWithReason(
+            epochRewards.setTargetVotingGoldFraction(targetVotingGoldFraction),
+            'Target voting gold fraction unchanged'
+          )
         })
       })
     })
@@ -237,10 +243,11 @@ contract('EpochRewards', (accounts: string[]) => {
 
         describe('when called by a non-owner', () => {
           it('should revert', async () => {
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               epochRewards.setCommunityRewardFraction(newFraction, {
                 from: nonOwner,
-              })
+              }),
+              'Ownable: caller is not the owner'
             )
           })
         })
@@ -248,7 +255,10 @@ contract('EpochRewards', (accounts: string[]) => {
 
       describe('when the fraction is the same', () => {
         it('should revert', async () => {
-          await assertRevert(epochRewards.setCommunityRewardFraction(communityRewardFraction))
+          await assertTransactionRevertWithReason(
+            epochRewards.setCommunityRewardFraction(communityRewardFraction),
+            'Value must be different from existing community reward fraction and less than 1'
+          )
         })
       })
     })
@@ -278,8 +288,9 @@ contract('EpochRewards', (accounts: string[]) => {
 
         describe('when the payment is the same', () => {
           it('should revert', async () => {
-            await assertRevert(
-              epochRewards.setTargetValidatorEpochPayment(targetValidatorEpochPayment)
+            await assertTransactionRevertWithReason(
+              epochRewards.setTargetValidatorEpochPayment(targetValidatorEpochPayment),
+              'Target validator epoch payment unchanged'
             )
           })
         })
@@ -287,10 +298,11 @@ contract('EpochRewards', (accounts: string[]) => {
 
       describe('when called by a non-owner', () => {
         it('should revert', async () => {
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             epochRewards.setTargetValidatorEpochPayment(newPayment, {
               from: nonOwner,
-            })
+            }),
+            'Ownable: caller is not the owner'
           )
         })
       })
@@ -338,7 +350,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
         describe('when called by a non-owner', () => {
           it('should revert', async () => {
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               epochRewards.setRewardsMultiplierParameters(
                 newParams.max,
                 newParams.underspend,
@@ -346,7 +358,8 @@ contract('EpochRewards', (accounts: string[]) => {
                 {
                   from: nonOwner,
                 }
-              )
+              ),
+              'Ownable: caller is not the owner'
             )
           })
         })
@@ -354,12 +367,13 @@ contract('EpochRewards', (accounts: string[]) => {
 
       describe('when the parameters are the same', () => {
         it('should revert', async () => {
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             epochRewards.setRewardsMultiplierParameters(
               rewardsMultiplier.max,
               rewardsMultiplier.adjustments.underspend,
               rewardsMultiplier.adjustments.overspend
-            )
+            ),
+            'Bad rewards multiplier parameters'
           )
         })
       })
@@ -398,10 +412,11 @@ contract('EpochRewards', (accounts: string[]) => {
 
         describe('when called by a non-owner', () => {
           it('should revert', async () => {
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               epochRewards.setTargetVotingYieldParameters(newMax, newFactor, {
                 from: nonOwner,
-              })
+              }),
+              'Ownable: caller is not the owner'
             )
           })
         })
@@ -409,11 +424,12 @@ contract('EpochRewards', (accounts: string[]) => {
 
       describe('when the parameters are the same', () => {
         it('should revert', async () => {
-          await assertRevert(
+          await assertTransactionRevertWithReason(
             epochRewards.setTargetVotingYieldParameters(
               targetVotingYieldParams.max,
               targetVotingYieldParams.adjustmentFactor
-            )
+            ),
+            'Bad target voting yield parameters'
           )
         })
       })
@@ -449,10 +465,11 @@ contract('EpochRewards', (accounts: string[]) => {
 
     describe('when called by a non-owner', () => {
       it('should revert', async () => {
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           epochRewards.setTargetVotingYield(newTarget, {
             from: nonOwner,
-          })
+          }),
+          'Ownable: caller is not the owner'
         )
       })
     })
@@ -1164,7 +1181,10 @@ contract('EpochRewards', (accounts: string[]) => {
     })
 
     it('should make updateTargetVotingYield revert', async () => {
-      await assertRevert(epochRewards.updateTargetVotingYield())
+      await assertTransactionRevertWithReason(
+        epochRewards.updateTargetVotingYield(),
+        "can't call when contract is frozen"
+      )
     })
   })
 })

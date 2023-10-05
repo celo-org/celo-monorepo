@@ -142,14 +142,8 @@ function getRemoteWriteParameters(context?: string): string[] {
 }
 
 async function helmParameters(context?: string, clusterConfig?: BaseClusterConfig) {
-  const [
-    cloudProvider,
-    clusterName,
-    gcloudProject,
-    gcloudRegion,
-    stackdriverDisabled,
-    usingGCP,
-  ] = getK8sContextVars(clusterConfig, context)
+  const [cloudProvider, clusterName, gcloudProject, gcloudRegion, stackdriverDisabled, usingGCP] =
+    getK8sContextVars(clusterConfig, context)
 
   const params = [
     `--set namespace=${kubeNamespace}`,
@@ -296,7 +290,6 @@ async function createPrometheusGcloudServiceAccount(
 
 function getCloudProviderPrefix(clusterConfig: BaseClusterConfig) {
   const prefixByCloudProvider: { [key in CloudProvider]: string } = {
-    [CloudProvider.AWS]: 'aws',
     [CloudProvider.AZURE]: 'aks',
     [CloudProvider.GCP]: 'gcp',
   }

@@ -1,6 +1,6 @@
 import { CELO_DERIVATION_PATH_BASE } from '@celo/base/lib/account'
 import { zeroRange } from '@celo/base/lib/collections'
-import { Address, ReadOnlyWallet } from '@celo/connect'
+import { Address, CeloTx, EncodedTransaction, ReadOnlyWallet } from '@celo/connect'
 import { RemoteWallet } from '@celo/wallet-remote'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'
@@ -65,6 +65,19 @@ export class LedgerWallet extends RemoteWallet<LedgerSigner> implements ReadOnly
     if (invalidDPs) {
       throw new Error('ledger-wallet: Invalid address index')
     }
+  }
+
+  signTransaction(txParams: CeloTx): Promise<EncodedTransaction> {
+    // CeloLedger does not support maxFeePerGas and maxPriorityFeePerGas yet
+    txParams.gasPrice = txParams.gasPrice ?? txParams.maxFeePerGas
+    if (txParams.maxFeePerGas || txParams.maxPriorityFeePerGas) {
+      console.info(
+        'maxFeePerGas and maxPriorityFeePerGas are not supported on Ledger yet. Automatically using gasPrice instead.'
+      )
+      delete txParams.maxFeePerGas
+      delete txParams.maxPriorityFeePerGas
+    }
+    return super.signTransaction(txParams)
   }
 
   protected async loadAccountSigners(): Promise<Map<Address, LedgerSigner>> {

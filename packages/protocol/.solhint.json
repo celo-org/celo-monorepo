@@ -3,7 +3,7 @@
   "rules": {
     "compiler-fixed": false,
     "function-max-lines": 70,
-    "indent": ["error", 2],
-    "max-line-length": ["error", 100]
+    "indent": "off",
+    "max-line-length": "off"
   }
 }

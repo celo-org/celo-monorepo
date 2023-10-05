@@ -1,6 +1,6 @@
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { StableToken } from '../generated/StableToken'
+import { StableToken } from '../generated/mento/StableToken'
 import {
   proxyCall,
   proxySend,

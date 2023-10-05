@@ -16,7 +16,7 @@ import Web3 from 'web3'
 import { Admin } from 'web3-eth-admin'
 import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { convertToContractDecimals } from './contract-utils'
-import { envVar, fetchEnv, isVmBased } from './env-utils'
+import { envVar, fetchEnv } from './env-utils'
 import {
   AccountType,
   generateGenesis,
@@ -29,7 +29,6 @@ import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
 import { GethRunConfig } from './interfaces/geth-run-config'
 import { ensure0x } from './utils'
-import { getTestnetOutputs } from './vm-testnet-utils'
 
 export async function unlockAccount(
   web3: Web3,
@@ -91,29 +90,19 @@ export const getBootnodeEnode = async (namespace: string) => {
 }
 
 export const retrieveBootnodeIPAddress = async (namespace: string) => {
-  if (isVmBased()) {
-    const outputs = await getTestnetOutputs(namespace)
-    return outputs.bootnode_ip_address.value
+  // Baklava bootnode address comes from VM and has an different name (not possible to update name after creation)
+  const resourceName =
+    namespace === 'baklava' ? `${namespace}-bootnode-address` : `${namespace}-bootnode`
+  if (fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true') {
+    return retrieveIPAddress(resourceName)
   } else {
-    // Baklava bootnode address comes from VM and has an different name (not possible to update name after creation)
-    const resourceName =
-      namespace === 'baklava' ? `${namespace}-bootnode-address` : `${namespace}-bootnode`
-    if (fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true') {
-      return retrieveIPAddress(resourceName)
-    } else {
-      return retrieveClusterIPAddress('service', resourceName, namespace)
-    }
+    return retrieveClusterIPAddress('service', resourceName, namespace)
   }
 }
 
 const retrieveTxNodeAddresses = async (namespace: string, txNodesNum: number) => {
-  if (isVmBased()) {
-    const outputs = await getTestnetOutputs(namespace)
-    return outputs.tx_node_ip_addresses.value
-  } else {
-    const txNodesRange = range(0, txNodesNum)
-    return Promise.all(txNodesRange.map((i) => retrieveIPAddress(`${namespace}-tx-nodes-${i}`)))
-  }
+  const txNodesRange = range(0, txNodesNum)
+  return Promise.all(txNodesRange.map((i) => retrieveIPAddress(`${namespace}-tx-nodes-${i}`)))
 }
 
 const getEnodesWithIpAddresses = async (namespace: string, getExternalIP: boolean) => {
@@ -262,7 +251,7 @@ const checkBlockscoutResponse = (
 
 const fetchBlockscoutTxInfo = async (url: string, txHash: string) => {
   const response = await fetch(`${url}/api?module=transaction&action=gettxinfo&txhash=${txHash}`)
-  return response.json()
+  return response.json() as any
 }
 
 const validateBlockscout = async (
@@ -1274,8 +1263,26 @@ export async function startGeth(
     }
   }
 
-  // Geth startup isn't fully done even when the port is open, so give it another second
-  await sleep(1000)
+  // Geth startup isn't fully done even when the port is open, so check until it responds
+  const maxTries = 5
+  let tries = 0
+  while (tries < maxTries) {
+    tries++
+    let block = null
+    try {
+      block = await new Web3('http://localhost:8545').eth.getBlock('latest')
+    } catch (e) {
+      console.log(`Failed to fetch test block: ${e}`)
+    }
+    if (block) {
+      break
+    }
+    console.log('Could not fetch test block. Wait one second, then retry.')
+    await sleep(1000)
+  }
+  if (tries === maxTries) {
+    throw new Error(`Geth did not start within ${tries} seconds`)
+  }
 
   console.log(
     `${instance.name}: running.`,

@@ -10,9 +10,8 @@ const UNVERSIONED_CONTRACTS = [
   CeloContract.Registry,
   CeloContract.FeeCurrencyWhitelist,
   CeloContract.Freezer,
-  CeloContract.TransferWhitelist,
 ]
-const UNPROXIED_CONTRACTS = [CeloContract.TransferWhitelist]
+const UNPROXIED_CONTRACTS: CeloContract[] = []
 
 export default class Contracts extends BaseCommand {
   static description = 'Lists Celo core contracts and their addesses.'
@@ -57,7 +56,7 @@ export default class Contracts extends BaseCommand {
       }
     )
 
-    const tokenBalanceColumns: table.Columns<typeof contractInfo[number]> = {}
+    const tokenBalanceColumns: table.Columns<(typeof contractInfo)[number]> = {}
     await this.kit.celoTokens.forEachCeloToken(
       (token) =>
         (tokenBalanceColumns[token.symbol] = {

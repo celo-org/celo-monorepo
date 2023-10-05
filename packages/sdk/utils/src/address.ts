@@ -6,7 +6,7 @@ import {
   pubToAddress,
   toBuffer,
   toChecksumAddress,
-} from 'ethereumjs-util'
+} from '@ethereumjs/util'
 // Exports moved to @celo/base, forwarding them
 // here for backwards compatibility
 export {
@@ -25,7 +25,7 @@ export {
   NULL_ADDRESS,
   trimLeading0x,
 } from '@celo/base/lib/address'
-export { isValidChecksumAddress, toChecksumAddress } from 'ethereumjs-util'
+export { isValidChecksumAddress, toChecksumAddress } from '@ethereumjs/util'
 
 export const privateKeyToAddress = (privateKey: string) =>
   toChecksumAddress(ensureLeading0x(privateToAddress(hexToBuffer(privateKey)).toString('hex')))

@@ -5,9 +5,8 @@ import {
   assertEqualBN,
   assertLogMatches2,
   assertObjectWithBNEqual,
-  assertRevert,
-  assertRevertWithReason,
-  assumeOwnership,
+  assertTransactionRevertWithReason,
+  assumeOwnershipWithTruffle,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
@@ -28,9 +27,8 @@ import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 const Escrow: EscrowContract = artifacts.require('Escrow')
 const MockERC20Token: MockERC20TokenContract = artifacts.require('MockERC20Token')
 const MockAttestations: MockAttestationsContract = artifacts.require('MockAttestations')
-const FederatedAttestations: FederatedAttestationsContract = artifacts.require(
-  'FederatedAttestations'
-)
+const FederatedAttestations: FederatedAttestationsContract =
+  artifacts.require('FederatedAttestations')
 
 const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
 const NULL_ESCROWED_PAYMENT: EscrowedPayment = {
@@ -98,7 +96,7 @@ contract('Escrow', (accounts: string[]) => {
     registry = await getDeployedProxiedContract('Registry', artifacts)
     if ((await registry.owner()) !== owner) {
       // In CI we need to assume ownership, locally using quicktest we don't
-      await assumeOwnership(['Registry'], owner)
+      await assumeOwnershipWithTruffle(['Registry'], owner)
     }
   })
 
@@ -122,7 +120,7 @@ contract('Escrow', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(escrow.initialize())
+      await assertTransactionRevertWithReason(escrow.initialize(), 'contract already initialized')
     })
   })
 
@@ -134,7 +132,10 @@ contract('Escrow', (accounts: string[]) => {
     })
 
     it('reverts if non-owner attempts to add trustedIssuer', async () => {
-      await assertRevert(escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: trustedIssuer1 }))
+      await assertTransactionRevertWithReason(
+        escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: trustedIssuer1 }),
+        'Ownable: caller is not the owner'
+      )
     })
 
     it('should emit the DefaultTrustedIssuerAdded event', async () => {
@@ -148,7 +149,7 @@ contract('Escrow', (accounts: string[]) => {
     })
 
     it('should not allow an empty address to be set as a trustedIssuer', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         escrow.addDefaultTrustedIssuer(NULL_ADDRESS, { from: owner }),
         "trustedIssuer can't be null"
       )
@@ -156,7 +157,7 @@ contract('Escrow', (accounts: string[]) => {
 
     it('should not allow a trustedIssuer to be added twice', async () => {
       await escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner })
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner }),
         'trustedIssuer already in defaultTrustedIssuers'
       )
@@ -180,7 +181,7 @@ contract('Escrow', (accounts: string[]) => {
       })
 
       it('should not allow more trusted issuers to be added', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner }),
           "defaultTrustedIssuers.length can't exceed allowed number of trustedIssuers"
         )
@@ -190,10 +191,8 @@ contract('Escrow', (accounts: string[]) => {
         await escrow.removeDefaultTrustedIssuer(expectedTrustedIssuers[0], 0, { from: owner })
         await escrow.addDefaultTrustedIssuer(trustedIssuer1)
         expectedTrustedIssuers.push(trustedIssuer1)
-        assert.deepEqual(
-          (await escrow.getDefaultTrustedIssuers()).sort(),
-          expectedTrustedIssuers.slice(1).sort()
-        )
+        const sortedDefaultTrustedIssuers = [...(await escrow.getDefaultTrustedIssuers())].sort()
+        assert.deepEqual(sortedDefaultTrustedIssuers, expectedTrustedIssuers.slice(1).sort())
       })
     })
   })
@@ -210,8 +209,9 @@ contract('Escrow', (accounts: string[]) => {
     })
 
     it('reverts if non-owner attempts to remove trustedIssuer', async () => {
-      await assertRevert(
-        escrow.removeDefaultTrustedIssuer(trustedIssuer1, 0, { from: trustedIssuer1 })
+      await assertTransactionRevertWithReason(
+        escrow.removeDefaultTrustedIssuer(trustedIssuer1, 0, { from: trustedIssuer1 }),
+        'Ownable: caller is not the owner'
       )
     })
 
@@ -226,16 +226,16 @@ contract('Escrow', (accounts: string[]) => {
     })
 
     it('should revert if index is invalid', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         escrow.removeDefaultTrustedIssuer(trustedIssuer1, 1, { from: owner }),
         'index is invalid'
       )
     })
 
     it('should revert if trusted issuer does not match index', async () => {
-      await assertRevertWithReason(
+      await assertTransactionRevertWithReason(
         escrow.removeDefaultTrustedIssuer(trustedIssuer2, 0, { from: owner }),
-        'trustedIssuer does not match address found at defaultTrustedIssuers[index]'
+        'trustedIssuer does not match address found at defaultTrustedIssuers'
       )
     })
 
@@ -514,7 +514,7 @@ contract('Escrow', (accounts: string[]) => {
             from: sender,
           }
         )
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           escrow.transferWithTrustedIssuers(
             aPhoneHash,
             mockERC20Token.address,
@@ -535,7 +535,7 @@ contract('Escrow', (accounts: string[]) => {
         const repeatedTrustedIssuers = Array.from<string>({
           length: (await escrow.MAX_TRUSTED_ISSUERS_PER_PAYMENT()).toNumber() + 1,
         }).fill(trustedIssuer1)
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           escrow.transferWithTrustedIssuers(
             aPhoneHash,
             mockERC20Token.address,
@@ -551,7 +551,7 @@ contract('Escrow', (accounts: string[]) => {
       })
 
       it('should not allow a transfer if token is 0', async () => {
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           escrow.transferWithTrustedIssuers(
             aPhoneHash,
             NULL_ADDRESS,
@@ -563,12 +563,13 @@ contract('Escrow', (accounts: string[]) => {
             {
               from: sender,
             }
-          )
+          ),
+          'Invalid transfer inputs.'
         )
       })
 
       it('should not allow a transfer if value is 0', async () => {
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           escrow.transferWithTrustedIssuers(
             aPhoneHash,
             mockERC20Token.address,
@@ -580,12 +581,13 @@ contract('Escrow', (accounts: string[]) => {
             {
               from: sender,
             }
-          )
+          ),
+          'Invalid transfer inputs.'
         )
       })
 
       it('should not allow a transfer if expirySeconds is 0', async () => {
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           escrow.transferWithTrustedIssuers(
             aPhoneHash,
             mockERC20Token.address,
@@ -597,12 +599,13 @@ contract('Escrow', (accounts: string[]) => {
             {
               from: sender,
             }
-          )
+          ),
+          'Invalid transfer inputs.'
         )
       })
 
       it('should not allow a transfer if identifier is empty but minAttestations is > 0', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           escrow.transferWithTrustedIssuers(
             NULL_BYTES32,
             mockERC20Token.address,
@@ -620,7 +623,7 @@ contract('Escrow', (accounts: string[]) => {
       })
 
       it('should not allow a transfer if identifier is empty but trustedIssuers are provided', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           escrow.transferWithTrustedIssuers(
             NULL_BYTES32,
             mockERC20Token.address,
@@ -638,7 +641,7 @@ contract('Escrow', (accounts: string[]) => {
       })
 
       it('should not allow setting trustedIssuers without minAttestations', async () => {
-        await assertRevertWithReason(
+        await assertTransactionRevertWithReason(
           escrow.transferWithTrustedIssuers(
             aPhoneHash,
             mockERC20Token.address,
@@ -656,7 +659,7 @@ contract('Escrow', (accounts: string[]) => {
       })
 
       it('should revert if transfer value exceeds balance', async () => {
-        await assertRevert(
+        await assertTransactionRevertWithReason(
           escrow.transferWithTrustedIssuers(
             aPhoneHash,
             mockERC20Token.address,
@@ -668,7 +671,8 @@ contract('Escrow', (accounts: string[]) => {
             {
               from: sender,
             }
-          )
+          ),
+          'SafeERC20: low-level call failed'
         )
       })
 
@@ -851,11 +855,11 @@ contract('Escrow', (accounts: string[]) => {
             receiver,
             uniquePaymentIDWithdraw
           )
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             escrow.withdraw(uniquePaymentIDWithdraw, parsedSig.v, parsedSig.r, parsedSig.s, {
               from: receiver,
             }),
-            'Invalid withdraw value.'
+            'Invalid withdraw value'
           )
         })
       })
@@ -975,7 +979,7 @@ contract('Escrow', (accounts: string[]) => {
             receiver,
             uniquePaymentIDWithdraw
           )
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             escrow.withdraw(uniquePaymentIDWithdraw, parsedSig.v, parsedSig.r, parsedSig.s, {
               from: sender,
             }),
@@ -1004,9 +1008,9 @@ contract('Escrow', (accounts: string[]) => {
         })
         it('should not allow a user to withdraw a payment if they have fewer than minAttestations', async () => {
           await completeAttestations(receiver, aPhoneHash, minAttestations - 1)
-          await assertRevertWithReason(
+          await assertTransactionRevertWithReason(
             withdrawAndCheckState(sender, receiver, aPhoneHash, uniquePaymentIDWithdraw, [], []),
-            'This account does not have the required attestations to withdraw this payment.'
+            'This account does not have the required attestations to withdraw this payment'
           )
         })
         it("should withdraw properly when sender's second payment has an identifier", async () => {
@@ -1060,7 +1064,7 @@ contract('Escrow', (accounts: string[]) => {
           describe('when <minAttestations have been completed', () => {
             it('should not allow withdrawal if no attestations exist in FederatedAttestations', async () => {
               await completeAttestations(receiver, aPhoneHash, minAttestations - 1)
-              await assertRevertWithReason(
+              await assertTransactionRevertWithReason(
                 withdrawAndCheckState(
                   sender,
                   receiver,
@@ -1069,7 +1073,7 @@ contract('Escrow', (accounts: string[]) => {
                   [],
                   []
                 ),
-                'This account does not have the required attestations to withdraw this payment.'
+                'This account does not have the required attestations to withdraw this payment'
               )
             })
             it('should allow users to withdraw if attestation is found in FederatedAttestations', async () => {
@@ -1114,9 +1118,9 @@ contract('Escrow', (accounts: string[]) => {
             )
           })
           it('should not allow a user to withdraw a payment if no attestations exist for trustedIssuers', async () => {
-            await assertRevertWithReason(
+            await assertTransactionRevertWithReason(
               withdrawAndCheckState(sender, receiver, aPhoneHash, uniquePaymentIDWithdraw, [], []),
-              'This account does not have the required attestations to withdraw this payment.'
+              'This account does not have the required attestations to withdraw this payment'
             )
           })
         })
@@ -1236,31 +1240,35 @@ contract('Escrow', (accounts: string[]) => {
             await escrow.withdraw(uniquePaymentIDRevoke, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
               from: receiver,
             })
-            await assertRevert(escrow.revoke(uniquePaymentIDRevoke, { from: sender }))
+            await assertTransactionRevertWithReason(
+              escrow.revoke(uniquePaymentIDRevoke, { from: sender }),
+              'Only sender of payment can attempt to revoke payment.'
+            )
           })
 
           it('should not allow receiver to redeem payment after sender revokes it', async () => {
             await timeTravel(oneDayInSecs, web3)
             await escrow.revoke(uniquePaymentIDRevoke, { from: sender })
-            await assertRevert(
+            await assertTransactionRevertWithReason(
               escrow.withdraw(uniquePaymentIDRevoke, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
                 from: receiver,
-              })
+              }),
+              'Invalid withdraw value.'
             )
           })
 
           it('should not allow sender to revoke payment before payment has expired', async () => {
-            await assertRevertWithReason(
+            await assertTransactionRevertWithReason(
               escrow.revoke(uniquePaymentIDRevoke, { from: sender }),
-              'Transaction not redeemable for sender yet.'
+              'Transaction not redeemable for sender yet'
             )
           })
 
           it('should not allow receiver to use revoke function', async () => {
             await timeTravel(oneDayInSecs, web3)
-            await assertRevertWithReason(
+            await assertTransactionRevertWithReason(
               escrow.revoke(uniquePaymentIDRevoke, { from: receiver }),
-              'Only sender of payment can attempt to revoke payment.'
+              'Only sender of payment can attempt to revoke payment'
             )
           })
         })

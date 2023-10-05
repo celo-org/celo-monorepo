@@ -4,15 +4,15 @@ name: Protocol tests with coverage
 # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
 on:
   schedule:
-  # daily at 13:00 UTC
-  - cron: 0 13 * * *
+  # Every Saturday at 13:00 UTC
+  - cron: 0 13 * * 6
   workflow_dispatch:
 
 jobs:
   # This seems to take ages and last codecov report is from 2021-02-25 :/
   # https://app.codecov.io/gh/celo-org/celo-monorepo/commits
   protocol-test-with-code-coverage:
-    runs-on: ["self-hosted", "monorepo"]
+    runs-on: ["self-hosted", "monorepo-node18"]
     steps:
       - uses: actions/checkout@v3
       - name: Install yarn dependencies

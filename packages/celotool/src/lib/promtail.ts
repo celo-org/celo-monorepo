@@ -91,11 +91,6 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
         `--set extraArgs[0]='-client.external-labels=cluster_name=${clusterConfig?.clusterName}'`
       )
       break
-
-    case CloudProvider.AWS:
-    default:
-      console.error(`Unrecognised or unsupported cloud provider: ${cloudProvider}`)
-      process.exit(1)
   }
 
   const user = fetchEnv(envVar.LOKI_USERNAME)
