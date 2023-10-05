@@ -34,4 +34,4 @@ import { AccountsContract } from '@celo/abis/types/truffle'
 
 ## License
 
-The contents of this package are licensed under the terms of the GNU Lesser Public License V3
+All packages are licensed under the terms of the Apache 2.0 License unless otherwise specified in the LICENSE file at package's root.
