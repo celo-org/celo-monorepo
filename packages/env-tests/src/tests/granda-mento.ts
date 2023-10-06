@@ -6,17 +6,9 @@ import { describe, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
 import Logger from 'bunyan'
 import { EnvTestContext } from '../context'
-import {
-  fundAccountWithCELO,
-  fundAccountWithStableToken,
-  getKey,
-  getValidatorKey,
-  ONE,
-  TestAccounts,
-} from '../scaffold'
+import { ONE, TestAccounts, fundAccountWithStableToken, getKey, getValidatorKey } from '../scaffold'
 
 export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: StableToken[]) {
-  const celoAmountToFund = ONE.times(61000)
   const stableTokenAmountToFund = ONE.times(61000)
 
   const celoAmountToSell = ONE.times(60000)
@@ -24,7 +16,7 @@ export function runGrandaMentoTest(context: EnvTestContext, stableTokensToTest: 
 
   describe('Granda Mento Test', () => {
     beforeAll(async () => {
-      await fundAccountWithCELO(context, TestAccounts.GrandaMentoExchanger, celoAmountToFund)
+      throw new Error('ENV RESERVE ARE CURRENTLY DISABLED')
     })
 
     const baseLogger = context.logger.child({ test: 'grandaMento' })
