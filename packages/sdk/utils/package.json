@@ -1,6 +1,6 @@
 {
   "name": "@celo/utils",
-  "version": "4.1.1-dev",
+  "version": "5.0.4",
   "description": "Celo common utils",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -22,20 +22,22 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/base": "4.1.1-dev",
+    "@celo/base": "5.0.4",
     "@ethereumjs/util": "8.0.5",
+    "rlp": "^2.2.4",
     "@types/bn.js": "^5.1.0",
     "@types/elliptic": "^6.4.9",
-    "@types/node": "^10.12.18",
+    "@types/node": "^18.7.16",
     "bignumber.js": "^9.0.0",
     "elliptic": "^6.5.4",
     "ethereum-cryptography": "1.2.0",
+    "bn.js": "4.11.9",
     "io-ts": "2.0.1",
+    "fp-ts": "2.1.1",
     "web3-eth-abi": "1.10.0",
     "web3-utils": "1.10.0"
   },
   "devDependencies": {
-    "@celo/flake-tracker": "0.0.1-dev",
     "@celo/typescript": "0.0.1"
   },
   "resolutions": {

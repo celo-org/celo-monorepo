@@ -1,7 +1,6 @@
 const SOLC_VERSION = '0.5.13'
 
 const parent = require('./truffle-config-parent.js')
-const flakeTrackingConfig = require('@celo/flake-tracker/src/mocha/config.js')
 const networks = { ...parent.networks }
 
 console.log(`Using truffle version for Solidity ${SOLC_VERSION}`)
@@ -18,7 +17,6 @@ module.exports = {
     },
   },
   networks,
-  mocha: flakeTrackingConfig,
 }
 
 if (process.argv.includes('--gas')) {

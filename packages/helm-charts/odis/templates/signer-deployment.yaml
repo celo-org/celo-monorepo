@@ -52,7 +52,6 @@ spec:
 {{ include "common.env-var" (dict "name" "DOMAINS_LATEST_KEY_VERSION" "dict" .Values.keystore "value_name" "domainsKeyLatestVersion") | indent 12 }}
 {{ include "common.env-var" (dict "name" "DOMAINS_API_ENABLED" "dict" .Values.api "value_name" "domainsAPIEnabled") | indent 12 }}
 {{ include "common.env-var" (dict "name" "PHONE_NUMBER_PRIVACY_API_ENABLED" "dict" .Values.api "value_name" "pnpAPIEnabled") | indent 12 }}
-{{ include "common.env-var" (dict "name" "LEGACY_PHONE_NUMBER_PRIVACY_API_ENABLED" "dict" .Values.api "value_name" "legacyPnpAPIEnabled") | indent 12 }}
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:

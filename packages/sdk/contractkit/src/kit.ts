@@ -109,9 +109,12 @@ export class ContractKit {
   /** helper for interacting with CELO & stable tokens */
   readonly celoTokens: CeloTokens
 
+<<<<<<< HEAD
   /** @deprecated no longer needed since gasPrice is available on node rpc */
   gasPriceSuggestionMultiplier = 5
 
+=======
+>>>>>>> master
   constructor(readonly connection: Connection) {
     this.registry = new AddressRegistry(connection)
     this._web3Contracts = new Web3ContractCache(this.registry)
@@ -200,12 +203,10 @@ export class ContractKit {
       tokenContract === CeloContract.GoldToken
         ? undefined
         : await this.registry.addressFor(tokenContract)
-    if (address) {
-      await this.updateGasPriceInConnectionLayer(address)
-    }
     this.connection.defaultFeeCurrency = address
   }
 
+<<<<<<< HEAD
   /** @deprecated no longer needed since gasPrice is available on node rpc */
   async updateGasPriceInConnectionLayer(currency: Address) {
     const gasPriceMinimum = await this.contracts.getGasPriceMinimum()
@@ -214,6 +215,8 @@ export class ContractKit {
     await this.connection.setGasPriceForCurrency(currency, gasPrice)
   }
 
+=======
+>>>>>>> master
   async getEpochSize(): Promise<number> {
     const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
     return blockchainParamsWrapper.getEpochSizeNumber()
@@ -258,14 +261,6 @@ export class ContractKit {
     return this.connection.defaultGasInflationFactor
   }
 
-  set gasPrice(price: number) {
-    this.connection.defaultGasPrice = price
-  }
-
-  get gasPrice() {
-    return this.connection.defaultGasPrice
-  }
-
   set defaultFeeCurrency(address: Address | undefined) {
     this.connection.defaultFeeCurrency = address
   }
@@ -281,6 +276,7 @@ export class ContractKit {
   isSyncing(): Promise<boolean> {
     return this.connection.isSyncing()
   }
+<<<<<<< HEAD
   /** @deprecated no longer needed since gasPrice is available on node rpc */
   async fillGasPrice(tx: CeloTx): Promise<CeloTx> {
     if (tx.feeCurrency && tx.gasPrice === '0') {
@@ -288,6 +284,8 @@ export class ContractKit {
     }
     return this.connection.fillGasPrice(tx)
   }
+=======
+>>>>>>> master
 
   async sendTransaction(tx: CeloTx): Promise<TransactionResult> {
     return this.connection.sendTransaction(tx)

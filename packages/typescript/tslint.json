@@ -11,7 +11,10 @@
     "no-reference": true,
     "no-duplicate-super": true,
     "member-access": false,
-    "no-implicit-dependencies": false,
+    "no-implicit-dependencies": [
+      true,
+      "dev"
+    ],
     "interface-name": false,
     "no-submodule-imports": false,
     "object-literal-sort-keys": false,

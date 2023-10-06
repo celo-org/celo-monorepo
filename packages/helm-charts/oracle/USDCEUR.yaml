@@ -27,10 +27,6 @@ oracle:
         {exchange: 'KRAKEN', symbol: 'USDCUSD', toInvert: false},
         {exchange: 'KRAKEN', symbol: 'EURUSD', toInvert: true}
       ],
-      [
-        {exchange: 'BINANCEUS', symbol: 'USDCUSD', toInvert: false},
-        {exchange: 'KRAKEN', symbol: 'EURUSD', toInvert: true}
-      ],
     ]"
   minPriceSourceCount: 2
   reportStrategy: BLOCK_BASED

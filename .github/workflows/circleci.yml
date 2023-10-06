@@ -1,20 +1,20 @@
 name: celo-monorepo
 run-name: celo-monorepo tests
 
-# Dockefile for the self-hosted runner: 
+# Dockefile for the self-hosted runner:
 # https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfile-monorepo
 
 on:
   push:
     branches:
       - master
+    paths-ignore:
+      - '**/*.md'
   pull_request:
     branches:
       - master
-      - martinvol/CR10Release
-      - 'release/**'
-      - pahor/0.8_from_Seb 
-      - 'martinvol/isolate-0.8-artifacts'
+    paths-ignore:
+      - '**/*.md'
 
 concurrency:
   group: circle-ci-${{ github.ref }}
@@ -43,7 +43,7 @@ jobs:
       package-json-checksum: ${{ steps.node-checksums.outputs.PACKAGE_JSON_CHECKSUM }}
       # Propagate more outputs if you need https://github.com/tj-actions/changed-files#outputs
       # Adding a initial comma so ',<path>' matches also for the first file
-      all_modified_files: ",${{ steps.changed-files.outputs.all_modified_files }}"
+      all_modified_files: ',${{ steps.changed-files.outputs.all_modified_files }}'
     # runs-on: ubuntu-latest
     runs-on: ["self-hosted", "monorepo-node18"]
     timeout-minutes: 30
@@ -110,9 +110,9 @@ jobs:
           restore-keys: |
             code-${{ github.sha }}
       - name: Install yarn dependencies
-        run: yarn install
+        run: git config --global url."https://".insteadOf ssh:// && yarn install
         if: steps.cache_node.outputs.cache-hit != 'true'
-      - name: Run yarn postinstall if cache hitted 
+      - name: Run yarn postinstall if cache hitted
         run: yarn run postinstall
         if: steps.cache_node.outputs.cache-hit == 'true'
       - name: Fail if generated dependency graph doesn't match committed
@@ -132,12 +132,12 @@ jobs:
           yarn check-licenses
       - name: Detect files changed in PR, and expose as output
         id: changed-files
-        uses: tj-actions/changed-files@v35
+        uses: tj-actions/changed-files@v37
         with:
           # Using comma as separator to be able to easily match full paths (using ,<path>)
-          separator: ","
+          separator: ','
           # Checking if changed in the last 100 commits in PRs
-          fetch_depth: "150"
+          fetch_depth: '150'
       - run: echo ",${{ steps.changed-files.outputs.all_modified_files }}"
   lint-checks:
     name: Lint code
@@ -184,7 +184,6 @@ jobs:
             --ignore @celo/celotool \
             --ignore @celo/celocli \
             --ignore @celo/env-tests \
-            --ignore @celo/identity \
             --ignore @celo/transactions-uri \
             --ignore '@celo/wallet-*' \
             run test
@@ -220,7 +219,10 @@ jobs:
     # needs: [install-dependencies, lint-checks]
     needs: [install-dependencies]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       github.event_name == 'pull_request' && contains(github.base_ref, 'release/') ||
@@ -270,7 +272,10 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       github.event_name == 'pull_request' && contains(github.base_ref, 'release/') ||
@@ -302,13 +307,16 @@ jobs:
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
           yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
   protocol-test-matrix:
-    # Keeping name short because GitHub UI does not handle long names well 
+    # Keeping name short because GitHub UI does not handle long names well
     name: ${{ matrix.name }}
     runs-on: ["self-hosted", "monorepo-node18"]
     timeout-minutes: 120
     needs: [install-dependencies, lint-checks]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       github.event_name == 'pull_request' && contains(github.base_ref, 'release/') ||
@@ -381,7 +389,11 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/contractkit') ||
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       github.event_name == 'pull_request' && contains(github.base_ref, 'release/') ||
@@ -404,74 +416,18 @@ jobs:
       - name: Run tests
         run: |
           yarn --cwd=packages/sdk/contractkit test
-  identity-tests:
-    name: Identity Tests
-    runs-on: ["self-hosted", "monorepo-node18"]
-    timeout-minutes: 30
-    needs: [install-dependencies, contractkit-tests]
-    if: |
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/identity') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Generate DevChain
-        run: |
-          cd packages/sdk/identity
-          yarn test:reset
-      - name: Run tests
-        run: |
-          yarn --cwd=packages/sdk/identity test
-  transactions-uri-tests:
-    name: Transaction URI Tests
-    runs-on: ["self-hosted", "monorepo-node18"]
-    timeout-minutes: 30
-    needs: [install-dependencies, contractkit-tests]
-    if: |
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk/transactions-uri') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v35
-        with:
-          fetch_depth: "100"
-      - name: Generate DevChain
-        run: |
-          cd packages/sdk/identity
-          yarn test:reset
-      - name: Run tests
-        run: |
-          yarn --cwd=packages/sdk/identity test
   cli-tests:
     name: CeloCli Tests
-    runs-on: ["self-hosted", "monorepo-node18"]
+    runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/cli') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -510,6 +466,7 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
@@ -538,7 +495,9 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -572,7 +531,9 @@ jobs:
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -605,9 +566,12 @@ jobs:
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks, contractkit-tests]
     if: |
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/celotool') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk/contractkit') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -694,47 +658,18 @@ jobs:
           command: |
             ${{ matrix.command }}
 
-  odis-test:
-    name: ODIS test
-    runs-on: ["self-hosted", "monorepo-node18"]
-    timeout-minutes: 30
-    needs: [install-dependencies, lint-checks]
-    if: |
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/phone-number-privacy') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
-      - name: Run Tests for common package
-        run: |
-          yarn --cwd=packages/phone-number-privacy/common test:coverage
-      - name: Run Tests for combiner
-        run: |
-          yarn --cwd=packages/phone-number-privacy/combiner test:coverage
-      - name: Run Tests for signer
-        run: |
-          yarn --cwd=packages/phone-number-privacy/signer test:coverage
-
   # NOTE: This has not been fully tested as we don't have a license for certora
   certora-test:
     name: Certora test ${{ matrix.name }}
-    runs-on: ["self-hosted", "monorepo-node18"]
+    runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks]
     # Disable as certora license is not active
     if: |
       false && (
+        github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
         contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+        contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
         contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
         contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock')
       )

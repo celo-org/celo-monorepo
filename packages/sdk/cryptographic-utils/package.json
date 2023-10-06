@@ -1,6 +1,6 @@
 {
   "name": "@celo/cryptographic-utils",
-  "version": "4.1.1-dev",
+  "version": "5.0.4",
   "description": "Some Celo utils for comment/data encryption, bls, and mnemonics",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -22,9 +22,9 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/utils": "4.1.1-dev",
+    "@celo/utils": "5.0.4",
     "@celo/bls12377js": "0.1.1",
-    "@celo/base": "4.1.1-dev",
+    "@celo/base": "5.0.4",
     "@ethereumjs/util": "8.0.5",
     "@types/bn.js": "^5.1.0",
     "@types/elliptic": "^6.4.9",
@@ -36,10 +36,10 @@
     "buffer-reverse": "^1.0.1",
     "elliptic": "^6.5.4",
     "ethereum-cryptography": "1.2.0",
+    "randombytes": "^2.0.1",
     "tiny-secp256k1": "2.2.1"
   },
   "devDependencies": {
-    "@celo/flake-tracker": "0.0.1-dev",
     "@celo/typescript": "0.0.1"
   }
 }

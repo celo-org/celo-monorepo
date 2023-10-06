@@ -1,4 +1,3 @@
-
 import { ArtifactsSingleton } from '@celo/protocol/lib/artifactsSingleton';
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils';
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils';

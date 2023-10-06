@@ -1,21 +1,21 @@
 /* tslint:disable:no-console */
 // TODO(asa): Refactor and rename to 'deployment-utils.ts'
-import { Address, CeloTxObject } from '@celo/connect';
-import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils';
-import { CeloContractName } from '@celo/protocol/lib/registry-utils';
-import { signTransaction } from '@celo/protocol/lib/signing-utils';
-import { privateKeyToAddress } from '@celo/utils/lib/address';
-import { BuildArtifacts } from '@openzeppelin/upgrades';
-import { BigNumber } from 'bignumber.js';
+import { Address, CeloTxObject } from '@celo/connect'
+import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { signTransaction } from '@celo/protocol/lib/signing-utils'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { BuildArtifacts } from '@openzeppelin/upgrades'
+import { createInterfaceAdapter } from '@truffle/interface-adapter'
+import { BigNumber } from 'bignumber.js'
+import path from 'path'
+import prompts from 'prompts'
+import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types'
+import { StableTokenInstance } from 'types/mento'
+import Web3 from 'web3'
+import { ContractPackage } from '../contractPackages'
+import { ArtifactsSingleton } from './artifactsSingleton'
 
-import { createInterfaceAdapter } from '@truffle/interface-adapter';
-import path from 'path';
-import prompts from 'prompts';
-import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types';
-import { StableTokenInstance } from 'types/mento';
-import Web3 from 'web3';
-import { ContractPackage } from '../contractPackages';
-import { ArtifactsSingleton } from './artifactsSingleton';
 
 const truffleContract = require('@truffle/contract');
 
@@ -39,8 +39,7 @@ export async function sendTransactionWithPrivateKey<T>(
       from: address,
     })
   }
-
-  const signedTx: any = await signTransaction(
+  const signedTx = await signTransaction(
     web3,
     {
       ...txArgs,
@@ -53,7 +52,7 @@ export async function sendTransactionWithPrivateKey<T>(
     privateKey
   )
 
-  const rawTransaction = signedTx.rawTransaction.toString('hex')
+  const rawTransaction = signedTx.raw
   return web3.eth.sendSignedTransaction(rawTransaction)
 }
 
@@ -275,11 +274,11 @@ export const makeTruffleContractForMigrationWithoutSingleton = (contractName: st
     abi: artifact.abi,
     unlinked_binary: artifact.bytecode,
   })
-  
-  
+
+
   Contract.setProvider(web3.currentProvider)
   Contract.setNetwork(network.name)
-  
+
   Contract.interfaceAdapter = createInterfaceAdapter({
     networkType: "ethereum",
     provider: web3.currentProvider
@@ -309,7 +308,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
 ) {
 
   console.log("-> Started deployment for", name)
-  let Contract 
+  let Contract
   let ContractProxy
   if (artifactPath) {
     Contract = makeTruffleContractForMigration(name, artifactPath, web3)
@@ -328,7 +327,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
     Contract = artifacts.require(name)
     ContractProxy = artifacts.require(name + 'Proxy')
   }
- 
+
   const testingDeployment = false
   return (deployer: any, networkName: string, _accounts: string[]) => {
     console.log("\n-> Deploying", name)
@@ -447,12 +446,12 @@ export function getFunctionSelectorsForContract(contract: any, contractName: str
 export function checkImports(baseContractName: string, derivativeContractArtifact: any, artifacts: any) {
   const isImport = (astNode: any) => astNode.nodeType === 'ImportDirective'
   const imports: any[] = derivativeContractArtifact.ast.nodes.filter((astNode: any) => isImport(astNode))
-  while (imports.length) { // BFS 
+  while (imports.length) { // BFS
     const importedContractName = (imports.pop().file as string).split('/').pop().split('.')[0]
     if (importedContractName ===  baseContractName) {
       return true
     }
-    const importedContractArtifact = artifacts instanceof BuildArtifacts ? 
+    const importedContractArtifact = artifacts instanceof BuildArtifacts ?
       artifacts.getArtifactByName(importedContractName) :
       artifacts.require(importedContractName)
     imports.unshift(...importedContractArtifact.ast.nodes.filter((astNode: any) => isImport(astNode)))

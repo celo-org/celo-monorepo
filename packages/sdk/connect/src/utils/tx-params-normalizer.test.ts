@@ -17,6 +17,8 @@ describe('TxParamsNormalizer class', () => {
     value: 1,
     gas: 1,
     gasPrice: 1,
+    maxFeePerGas: undefined,
+    maxPriorityFeePerGas: undefined,
     feeCurrency: undefined,
     gatewayFeeRecipient: '1',
     gatewayFee: '1',
@@ -92,56 +94,50 @@ describe('TxParamsNormalizer class', () => {
       expect(mockGasEstimation.mock.calls.length).toBe(1)
     })
 
-    /* Disabled till the coinbase issue is fixed
-
-    test('will populate the gatewayFeeRecipient', async () => {
+    test('will not pop maxFeePerGas and maxPriorityFeePerGas when gasPrice is set', async () => {
       const celoTx: CeloTx = { ...completeCeloTx }
-      celoTx.gatewayFeeRecipient = undefined
+      celoTx.gasPrice = 1
       const newCeloTx = await populator.populate(celoTx)
-      expect(newCeloTx.gatewayFeeRecipient).toBe('27')
-      expect(mockRpcCall.mock.calls.length).toBe(1)
-      expect(mockRpcCall.mock.calls[0][0]).toBe('eth_coinbase')
+      expect(newCeloTx.maxFeePerGas).toBe(undefined)
+      expect(newCeloTx.maxPriorityFeePerGas).toBe(undefined)
+    })
+    test('will not pop maxFeePerGas if it is set', async () => {
+      const celoTx: CeloTx = { ...completeCeloTx }
+      celoTx.maxFeePerGas = 100
+      const newCeloTx = await populator.populate(celoTx)
+      expect(newCeloTx.maxFeePerGas).toBe(100)
+    })
+    test('will not pop maxPriorityFeePerGas if it is set', async () => {
+      const celoTx: CeloTx = { ...completeCeloTx }
+      celoTx.maxPriorityFeePerGas = 2000
+      const newCeloTx = await populator.populate(celoTx)
+      expect(newCeloTx.maxPriorityFeePerGas).toBe(2000)
     })
 
-    test('will retrieve only once the gatewayFeeRecipient', async () => {
-      const celoTx: CeloTx = { ...completeCeloTx }
-      celoTx.gatewayFeeRecipient = undefined
-      const newCeloTx = await populator.populate(celoTx)
-      expect(newCeloTx.gatewayFeeRecipient).toBe('27')
-
-      const newCeloTx2 = await populator.populate(celoTx)
-      expect(newCeloTx2.gatewayFeeRecipient).toBe('27')
-
-      expect(mockRpcCall.mock.calls.length).toBe(1)
-      expect(mockRpcCall.mock.calls[0][0]).toBe('eth_coinbase')
-    })
-    */
-
-    test('will populate the gas price without fee currency', async () => {
+    test('will populate the maxFeePerGas and maxPriorityFeePerGas without fee currency', async () => {
       const celoTx: CeloTx = { ...completeCeloTx }
       celoTx.gasPrice = undefined
-      const newCeloTx = await populator.populate(celoTx)
-      expect(newCeloTx.gasPrice).toBe('0x27')
-      expect(mockRpcCall.mock.calls.length).toBe(1)
-      expect(mockRpcCall.mock.calls[0][0]).toBe('eth_gasPrice')
-    })
-
-    test('will populate the gas price with fee currency', async () => {
-      const celoTx: CeloTx = { ...completeCeloTx }
-      celoTx.gasPrice = undefined
-      celoTx.feeCurrency = 'celoMagic'
-      const newCeloTx = await populator.populate(celoTx)
-      expect(newCeloTx.gasPrice).toBe('0x27')
-      expect(mockRpcCall.mock.calls[0]).toEqual(['eth_gasPrice', ['celoMagic']])
-    })
-
-    test('will not populate the gas price when fee currency is undefined', async () => {
-      const celoTx: CeloTx = { ...completeCeloTx }
-      celoTx.gasPrice = undefined
+      celoTx.maxFeePerGas = undefined
+      celoTx.maxPriorityFeePerGas = undefined
       celoTx.feeCurrency = undefined
       const newCeloTx = await populator.populate(celoTx)
-      expect(newCeloTx.gasPrice).toBe('0x27')
+      expect(newCeloTx.maxFeePerGas).toBe('0x2f')
+      expect(newCeloTx.maxPriorityFeePerGas).toBe('0x27')
       expect(mockRpcCall.mock.calls[0]).toEqual(['eth_gasPrice', []])
+      expect(mockRpcCall.mock.calls[1]).toEqual(['eth_maxPriorityFeePerGas', []])
+    })
+
+    test('will populate the maxFeePerGas and maxPriorityFeePerGas with fee currency', async () => {
+      const celoTx: CeloTx = { ...completeCeloTx }
+      celoTx.gasPrice = undefined
+      celoTx.maxFeePerGas = undefined
+      celoTx.maxPriorityFeePerGas = undefined
+      celoTx.feeCurrency = 'celoMagic'
+      const newCeloTx = await populator.populate(celoTx)
+      expect(newCeloTx.maxFeePerGas).toBe('0x2f')
+      expect(newCeloTx.maxPriorityFeePerGas).toBe('0x27')
+      expect(mockRpcCall.mock.calls[0]).toEqual(['eth_gasPrice', ['celoMagic']])
+      expect(mockRpcCall.mock.calls[1]).toEqual(['eth_maxPriorityFeePerGas', []])
     })
   })
 })
