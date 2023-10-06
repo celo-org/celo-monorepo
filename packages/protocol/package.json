@@ -21,7 +21,6 @@
     "pull-submodules": "git submodule update --init --recursive",
     "build:sol": "git submodule update --init --recursive && mkdir -p migrations && ts-node ./scripts/build.ts --solidity ${BUILD_DIR:-./build}",
     "build": "yarn pull-submodules && yarn build:sol && yarn build:ts",
-    "postbuild:sol": "cp ./contracts/package.abis.json ./build/contracts/package.json && cp ./contracts/README.abis.md ./build/contracts/README.md",
     "prebuild": "rm -rf ./build",
     "postbuild": "ts-node ./scripts/prepare-contracts-and-abis-publishing.ts $npm_package_version",
     "sourcify-publish": "ts-node ./scripts/sourcify-publish.ts",
