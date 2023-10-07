@@ -50,3 +50,6 @@ The name of the pkey secret
 {{- define "pkey-secret-name" -}}
 pkey-secret-{{- .Values.oracle.currencyPair | lower -}}
 {{- end -}}
+{{- define "api-keys-secret-name" -}}
+api-keys-{{- .Values.oracle.currencyPair | lower -}}
+{{- end -}}
