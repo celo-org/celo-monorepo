@@ -9,7 +9,6 @@
     "@celo/utils": "5.0.4",
     "@celo/base": "5.0.4",
     "@celo/connect": "5.0.4",
-    "@celo/identity": "5.0.4",
     "@celo/phone-utils": "5.0.4",
     "@celo/cryptographic-utils": "5.0.4",
     "bignumber.js": "^9.0.0",

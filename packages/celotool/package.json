@@ -13,7 +13,6 @@
     "@celo/env-tests": "1.0.0",
     "@celo/explorer": "5.0.4",
     "@celo/governance": "5.0.4",
-    "@celo/identity": "5.0.4",
     "@celo/network-utils": "5.0.4",
     "@celo/utils": "5.0.4",
     "@ethereumjs/util": "8.0.5",
