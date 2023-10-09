@@ -7,7 +7,6 @@
       "@celo/contractkit",
       "@celo/cryptographic-utils",
       "@celo/dev-utils",
-      "@celo/env-tests",
       "@celo/explorer",
       "@celo/governance",
       "@celo/network-utils",
@@ -35,17 +34,6 @@
   "@celo/dev-utils": {
     "location": "packages/dev-utils",
     "dependencies": []
-  },
-  "@celo/env-tests": {
-    "location": "packages/env-tests",
-    "dependencies": [
-      "@celo/base",
-      "@celo/connect",
-      "@celo/contractkit",
-      "@celo/cryptographic-utils",
-      "@celo/phone-utils",
-      "@celo/utils"
-    ]
   },
   "@celo/metadata-crawler": {
     "location": "packages/metadata-crawler",

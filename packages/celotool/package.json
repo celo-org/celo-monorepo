@@ -10,7 +10,6 @@
     "@celo/connect": "5.0.4",
     "@celo/cryptographic-utils": "5.0.4",
     "@celo/contractkit": "5.0.4",
-    "@celo/env-tests": "1.0.0",
     "@celo/explorer": "5.0.4",
     "@celo/governance": "5.0.4",
     "@celo/network-utils": "5.0.4",
