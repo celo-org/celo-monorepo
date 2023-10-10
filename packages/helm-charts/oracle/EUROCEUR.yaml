@@ -24,7 +24,7 @@ oracle:
         {exchange: 'BITSTAMP', symbol: 'EUROCEUR', toInvert: false},
       ]    
     ]"
-  minPriceSourceCount: 2
+  minPriceSourceCount: 3
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:

@@ -102,7 +102,7 @@ oracle:
       #   {exchange: 'KRAKEN', symbol: 'BTCEUR', toInvert: false},
       #   {exchange: 'ALPHAVANTAGE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
       # ]
-  minPriceSourceCount: 6
+  minPriceSourceCount: 9
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
