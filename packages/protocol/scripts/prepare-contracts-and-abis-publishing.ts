@@ -2,7 +2,6 @@ import * as child_process from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 import rimraf from 'rimraf'
-import { version } from '../package.json'
 
 const SRC_DIR = path.join(__dirname, '../contracts')
 const BUILD_DIR = path.join(__dirname, '../build/contracts')
@@ -42,14 +41,6 @@ child_process.execSync(`yarn wagmi generate`, { stdio: 'inherit' })
 
 fs.copyFileSync(path.join(SRC_DIR, 'package.abis.json'), path.join(BUILD_DIR, 'package.json'))
 fs.copyFileSync(path.join(SRC_DIR, 'README.abis.md'), path.join(BUILD_DIR, 'README.md'))
-
-if (process.env.RELEASE_TYPE === 'release') {
-  process.env.RELEASE_ABIS_VERSION = version
-} else {
-  const latestRelease = child_process.execSync(`npm view @celo/contracts version`)
-  console.log(latestRelease.toString())
-  process.env.RELEASE_ABIS_VERSION = latestRelease.toString()
-}
 
 function lsRecursive(dir: string): string[] {
   const filesAndDirectories = fs.readdirSync(dir, { withFileTypes: true })
