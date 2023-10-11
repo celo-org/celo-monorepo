@@ -12,8 +12,10 @@ if (!match) {
 }
 
 const [, gitTag] = match
-const [major, minor, patch] = gitTag.split('.')
-const semver = new SemVer([major, minor, patch].map((x) => x || 0).join('.'))
+const [major, minor, patchAndMore] = gitTag.split('.')
+const semver = new SemVer([major, minor, patchAndMore].map((x) => x || 0).join('.'))
 
-process.stdout.write(semver.version)
+console.log(semver)
+console.log(`RELEASE_VERSION=${semver.version}`)
+console.log(`RELEASE_TYPE=${semver.prerelease.length ? 'prerelease' : 'release'}`)
 process.exit(0)
