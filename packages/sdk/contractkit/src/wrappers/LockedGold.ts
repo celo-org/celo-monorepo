@@ -33,6 +33,12 @@ export interface VotingDetails {
   weight: BigNumber
 }
 
+export interface DelegateInfo {
+  totalPercentDelegated: string
+  delegatees: string[]
+  totalVotesDelegatedToThisAccount: BigNumber
+}
+
 interface AccountSummary {
   lockedGold: {
     total: BigNumber
@@ -103,6 +109,26 @@ export class LockedGoldWrapper extends BaseWrapperForGoverning<LockedGold> {
       10
     )
     return new BigNumber(maxDelegateesCountHex, 16)
+  }
+
+  getDelegateInfo = async (account: string): Promise<DelegateInfo> => {
+    const totalDelegatedFractionPromise = this.contract.methods
+      .getAccountTotalDelegatedFraction(account)
+      .call()
+    const totalDelegatedCeloPromise = this.contract.methods.totalDelegatedCelo(account).call()
+    const delegateesPromise = this.contract.methods.getDelegateesOfDelegator(account).call()
+
+    const fixidity = new BigNumber('1000000000000000000000000')
+
+    return {
+      totalPercentDelegated:
+        new BigNumber(await totalDelegatedFractionPromise)
+          .multipliedBy(100)
+          .div(fixidity)
+          .toFixed() + '%',
+      delegatees: await delegateesPromise,
+      totalVotesDelegatedToThisAccount: new BigNumber(await totalDelegatedCeloPromise),
+    }
   }
 
   /**
