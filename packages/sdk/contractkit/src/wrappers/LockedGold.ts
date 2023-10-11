@@ -105,6 +105,7 @@ export class LockedGoldWrapper extends BaseWrapperForGoverning<LockedGold> {
 
   getMaxDelegateesCount = async () => {
     const maxDelegateesCountHex = await this.connection.web3.eth.getStorageAt(
+      // tslint:disable-next-line:no-string-literal
       this.contract['_address'],
       10
     )
