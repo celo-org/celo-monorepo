@@ -102,7 +102,7 @@
   },
   "devDependencies": {
     "@celo/phone-utils": "5.0.4",
-    "@celo/typechain-target-web3-v1-celo": "0.2.0",
+    "@celo/typechain-target-web3-v1-celo": "^1.0.0",
     "@celo/typescript": "0.0.1",
     "@types/bn.js": "^5.1.0",
     "@types/chai": "^4.1.3",
@@ -122,9 +122,9 @@
     "truffle-typings": "^1.0.6",
     "ts-node": "8.3.0",
     "ts-generator": "^0.0.8",
-    "typechain": "8.1.1",
-    "typechain-target-truffle": "1.0.2",
-    "typechain-target-ethers-v5": "5.0.1",
+    "typechain": "^4.0.3",
+    "typechain-target-truffle": "^1.0.2",
+    "typechain-target-ethers-v5": "^5.0.1",
     "yargs": "^14.0.0"
   }
 }

@@ -4,7 +4,6 @@ import * as path from 'path'
 import rimraf from 'rimraf'
 import { version } from '../package.json'
 
-const ROOT_DIR = path.join(__dirname, '../')
 const SRC_DIR = path.join(__dirname, '../contracts')
 const BUILD_DIR = path.join(__dirname, '../build/contracts')
 const TYPES_DIR = path.join(BUILD_DIR, 'types')
@@ -39,12 +38,7 @@ allFiles.forEach((filePath) => {
   }
 })
 
-const tsconfig = JSON.parse(fs.readFileSync(path.join(ROOT_DIR, 'tsconfig.json'), 'utf8'))
-const tsconfigForWagmi = { ...tsconfig }
-tsconfig.target = 'ES6'
-fs.writeFileSync(path.join(ROOT_DIR, 'tsconfig.json'), JSON.stringify(tsconfigForWagmi))
 child_process.execSync(`yarn wagmi generate`, { stdio: 'inherit' })
-child_process.execSync(`git checkout ${path.join(ROOT_DIR, 'tsconfig.json')}`, { stdio: 'inherit' })
 
 fs.copyFileSync(path.join(SRC_DIR, 'package.abis.json'), path.join(BUILD_DIR, 'package.json'))
 fs.copyFileSync(path.join(SRC_DIR, 'README.abis.md'), path.join(BUILD_DIR, 'README.md'))

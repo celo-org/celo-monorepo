@@ -13,10 +13,10 @@
     "removeComments": false,
     "skipLibCheck": true,
     "sourceMap": true,
-    "target": "es5",
+    "target": "ES2020",
     "downlevelIteration": true,
     "resolveJsonModule": true
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "wagmi.config.ts"],
   "references": [{ "path": "../sdk/utils" }]
 }

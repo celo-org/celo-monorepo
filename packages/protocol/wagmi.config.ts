@@ -7,7 +7,7 @@ import { readFileSync } from 'fs'
 const BUILD_DIR = path.join(__dirname, 'build', 'contracts')
 console.log(BUILD_DIR)
 
-const contracts = []
+const contracts: { name: string; abi: any }[] = []
 for (const contractName of new Set(ImplContracts)) {
   try {
     const fileStr = readFileSync(path.join(BUILD_DIR, `${contractName}.json`))
