@@ -14,20 +14,23 @@ on:
       - chore/contract-publishing
 jobs:
   publish:
-    runs-on: ['self-hosted', 'org', 'npm-publish']
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     permissions:
       contents: write
       id-token: write
       repository-projects: read
     steps:
       - uses: actions/checkout@v4
-      # - name: Akeyless Get Secrets
-      #   id: get_auth_token
-      #   uses: docker://us-west1-docker.pkg.dev/devopsre/akeyless-public/akeyless-action:latest
-      #   with:
-      #     api-url: https://api.gateway.akeyless.celo-networks-dev.org
-      #     access-id: p-kf9vjzruht6l
-      #     static-secrets: '{"/static-secrets/apps-tooling-circle/npm-publish-token":"NPM_TOKEN"}'
+      - name: Akeyless Get Secrets
+        id: get_auth_token
+        uses: docker://us-west1-docker.pkg.dev/devopsre/akeyless-public/akeyless-action:latest
+        with:
+          api-url: https://api.gateway.akeyless.celo-networks-dev.org
+          access-id: p-kf9vjzruht6l
+          static-secrets: '{"/static-secrets/apps-tooling-circle/npm-publish-token":"NPM_TOKEN"}'
       # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v3
         with:
@@ -60,7 +63,7 @@ jobs:
 
       - if: ${{ env.RELEASE_VERSION != '' }}
         name: Publish @celo/contracts
-        run: yarn publish contracts --tag latest --version $RELEASE_VERSION --no-git-tag-version --dry-run
+        run: yarn publish contracts --tag latest --version $RELEASE_VERSION --no-git-tag-version
         working-directory: packages/protocol
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
@@ -69,7 +72,7 @@ jobs:
 
       - if: ${{ env.RELEASE_VERSION != '' }}
         name: Publish @celo/abis
-        run: yarn publish build/contracts --tag latest --version $RELEASE_VERSION --no-git-tag-version --dry-run
+        run: yarn publish build/contracts --tag latest --version $RELEASE_VERSION --no-git-tag-version
         working-directory: packages/protocol
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
