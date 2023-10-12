@@ -39,6 +39,17 @@ allFiles.forEach((filePath) => {
 
 child_process.execSync(`yarn wagmi generate`, { stdio: 'inherit' })
 
+const packageJsons = [path.join(SRC_DIR, 'package.abis.json'), path.join(SRC_DIR, 'package.json')]
+
+packageJsons.forEach((packageJsonPath) => {
+  const file = fs.readFileSync(packageJsonPath).toString()
+
+  fs.writeFileSync(
+    packageJsonPath,
+    file.replace('0.0.0-template.version', process.env.RELEASE_VERSION)
+  )
+})
+
 fs.copyFileSync(path.join(SRC_DIR, 'package.abis.json'), path.join(BUILD_DIR, 'package.json'))
 fs.copyFileSync(path.join(SRC_DIR, 'README.abis.md'), path.join(BUILD_DIR, 'README.md'))
 
@@ -52,10 +63,3 @@ function lsRecursive(dir: string): string[] {
     return fileNames.concat([filePath])
   }, [])
 }
-
-/*
-❯ du -h build/contracts/
-  0B	build/contracts//types
- 62M	build/contracts/
-
- */
