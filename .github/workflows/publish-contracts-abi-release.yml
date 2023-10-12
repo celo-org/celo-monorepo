@@ -34,23 +34,26 @@ jobs:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
           scope: '@celo'
+
       - name: 'Setup yarn'
         shell: bash
         run: |
           npm install --global yarn
           source ~/.bashrc
-      - run: cd packages/protocol
+
       - name: 'Install packages'
         run: yarn
 
       - name: Check if a release should be published
         run: yarn --silent is_contract_release $GITHUB_TAG >> "$GITHUB_ENV"
+        working-directory: packages/protocol
         env:
           GITHUB_TAG: ${{ github.ref_name }}
 
       - if: ${{ env.RELEASE_VERSION != '' }}
         name: Compile solidity contracts and typescript files
         run: yarn build && yarn prepare_contracts_and_abis_publishing
+        working-directory: packages/protocol
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
@@ -58,6 +61,7 @@ jobs:
       - if: ${{ env.RELEASE_VERSION != '' }}
         name: Publish @celo/contracts
         run: yarn publish contracts --tag latest --version $RELEASE_VERSION --no-git-tag-version --dry-run
+        working-directory: packages/protocol
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
@@ -66,6 +70,7 @@ jobs:
       - if: ${{ env.RELEASE_VERSION != '' }}
         name: Publish @celo/abis
         run: yarn publish build/contracts --tag latest --version $RELEASE_VERSION --no-git-tag-version --dry-run
+        working-directory: packages/protocol
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}

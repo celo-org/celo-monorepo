@@ -1,14 +1,16 @@
 import { SemVer } from 'semver'
 const arg = process.argv[2]
 if (!arg) {
-  console.error('Missing git tag')
-  process.exit(1)
+  console.error('Missing git tag, skipping next steps.')
+  process.exit(0)
 }
 
 const match = arg.match(/core-contracts.v(.+)/)
 if (!match) {
-  console.error(`Git tag didn't match the following RegExp("/core-contracts.v(.+)/"), got ${arg}`)
-  process.exit(1)
+  console.error(
+    `Git tag didn't match the following RegExp("/core-contracts.v(.+)/"), got ${arg}, skipping next steps.`
+  )
+  process.exit(0)
 }
 
 const [, gitTag] = match
