@@ -1,4 +1,4 @@
-name: Publish Package to npmjs
+name: Publish ABIs and Solidity files to NPM
 on:
   release:
     types: [released]
@@ -43,13 +43,15 @@ jobs:
       - name: 'Install packages'
         run: yarn
 
-      - name: 'Check if a release should be published'
+      - run: cd packages/protocol
+
+      - name: Check if a release should be published
         run: npm run is_contract_release $GITHUB_TAG >> "$GITHUB_ENV"
         env:
           GITHUB_TAG: ${{ github.ref_name }}
 
       - if: ${{ env.RELEASE_VERSION != '' }}
-        name: 'Compile solidity contracts and typescript files'
+        name: Compile solidity contracts and typescript files
         run: yarn build && npm run prepare_contracts_and_abis_publishing
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
