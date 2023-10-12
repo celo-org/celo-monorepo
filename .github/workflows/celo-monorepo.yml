@@ -48,7 +48,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:13efc59f03aa761fc79aadd085f95bb465cc5a6c
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     steps:
       - name: Restore .git cache
@@ -147,7 +147,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:13efc59f03aa761fc79aadd085f95bb465cc5a6c
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: install-dependencies
     steps:
@@ -170,7 +170,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:13efc59f03aa761fc79aadd085f95bb465cc5a6c
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     needs: install-dependencies
     steps:
       - uses: actions/cache/restore@v3
@@ -206,7 +206,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:13efc59f03aa761fc79aadd085f95bb465cc5a6c
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: install-dependencies
     steps:
@@ -228,7 +228,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:13efc59f03aa761fc79aadd085f95bb465cc5a6c
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
       # Required root to install node12
       options: --user root
     timeout-minutes: 30
@@ -285,7 +285,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:13efc59f03aa761fc79aadd085f95bb465cc5a6c
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
@@ -322,7 +322,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:13efc59f03aa761fc79aadd085f95bb465cc5a6c
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks]
     if: |
@@ -402,7 +402,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:13efc59f03aa761fc79aadd085f95bb465cc5a6c
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
@@ -437,7 +437,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:13efc59f03aa761fc79aadd085f95bb465cc5a6c
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
@@ -484,7 +484,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:13efc59f03aa761fc79aadd085f95bb465cc5a6c
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
@@ -516,7 +516,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:13efc59f03aa761fc79aadd085f95bb465cc5a6c
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
@@ -555,7 +555,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:13efc59f03aa761fc79aadd085f95bb465cc5a6c
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
@@ -593,7 +593,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:13efc59f03aa761fc79aadd085f95bb465cc5a6c
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks, contractkit-tests]
     if: |
@@ -693,7 +693,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:13efc59f03aa761fc79aadd085f95bb465cc5a6c
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks]
     # Disable as certora license is not active
