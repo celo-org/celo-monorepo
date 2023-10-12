@@ -369,11 +369,14 @@ export class BlockExplorer {
       this.getContractMappingFromSourcifyAsProxy,
     ]
   ): Promise<ContractMapping | undefined> {
-    for (const strategy of strategies) {
-      const contractMapping = await strategy(address)
-      if (contractMapping && contractMapping.fnMapping.get(selector)) {
-        return contractMapping
-      }
-    }
+    const mappings = await Promise.all(
+      strategies.map(async (strategy) => {
+        const contractMapping = await strategy(address)
+        if (contractMapping && contractMapping.fnMapping.get(selector)) {
+          return contractMapping
+        }
+      })
+    )
+    return mappings.find((mapping) => mapping !== undefined)
   }
 }

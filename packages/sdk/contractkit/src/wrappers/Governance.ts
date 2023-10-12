@@ -245,11 +245,13 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
 
   // simulates proposal.getSupportWithQuorumPadding
   async getSupport(proposalID: BigNumber.Value) {
-    const participation = await this.getParticipationParameters()
+    const [participation, votes, lockedGold] = await Promise.all([
+      this.getParticipationParameters(),
+      this.getVotes(proposalID),
+      this.contracts.getLockedGold(),
+    ])
     const quorum = participation.baseline.times(participation.baselineQuorumFactor)
-    const votes = await this.getVotes(proposalID)
     const total = votes.Yes.plus(votes.No).plus(votes.Abstain)
-    const lockedGold = await this.contracts.getLockedGold()
     // NOTE: this networkWeight is not as governance calculates it,
     // but we don't have access to proposal.networkWeight
     const networkWeight = await lockedGold.getTotalLockedGold()
@@ -455,11 +457,20 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
   }
 
   async getApprovalStatus(proposalID: BigNumber.Value): Promise<ApprovalStatus> {
-    const multisig = await this.getApproverMultisig()
-    const approveTx = await this.approve(proposalID)
-    const multisigTxs = await multisig.getTransactionDataByContent(this.address, approveTx.txo)
+    console.time(`getApprovalStatus(${proposalID})`)
+    const [multisig, approveTx] = await Promise.all([
+      this.getApproverMultisig(),
+      this.approve(proposalID),
+    ])
+
+    const [multisigTxs, approvers] = await Promise.all([
+      multisig.getTransactionDataByContent(this.address, approveTx.txo),
+      multisig.getOwners() as Promise<Address[]>,
+    ])
+
     const confirmations = multisigTxs ? multisigTxs.confirmations : []
-    const approvers = await multisig.getOwners()
+
+    console.timeEnd(`getApprovalStatus(${proposalID})`)
     return {
       completion: `${confirmations.length} / ${approvers.length}`,
       confirmations,
@@ -472,9 +483,16 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
    * @param proposalID Governance proposal UUID
    */
   async getProposalRecord(proposalID: BigNumber.Value): Promise<ProposalRecord> {
-    const metadata = await this.getProposalMetadata(proposalID)
-    const proposal = await this.getProposal(proposalID)
-    const stage = await this.getProposalStage(proposalID)
+    console.time(`getProposalRecord(${proposalID})`)
+
+    console.time(`getProposalMetaStage(${proposalID})`)
+
+    const [proposal, metadata, stage] = await Promise.all([
+      this.getProposal(proposalID),
+      this.getProposalMetadata(proposalID),
+      this.getProposalStage(proposalID),
+    ])
+    console.timeEnd(`getProposalMetaStage(${proposalID})`)
 
     const record: ProposalRecord = {
       proposal,
@@ -487,13 +505,20 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
     if (stage === ProposalStage.Queued) {
       record.upvotes = await this.getUpvotes(proposalID)
     } else if (stage === ProposalStage.Referendum || stage === ProposalStage.Execution) {
-      record.approved = true
-      record.passed = await this.isProposalPassing(proposalID)
-      record.votes = await this.getVotes(proposalID)
-      record.approved = await this.isApproved(proposalID)
-      record.approvals = await this.getApprovalStatus(proposalID)
+      console.time(`getProposalState(${proposalID})`)
+      const [passed, votes, approved, approvals] = await Promise.all([
+        this.isProposalPassing(proposalID) as Promise<boolean>,
+        this.getVotes(proposalID),
+        this.isApproved(proposalID),
+        this.getApprovalStatus(proposalID),
+      ])
+      console.timeEnd(`getProposalState(${proposalID})`)
+      record.passed = passed as boolean
+      record.votes = votes
+      record.approved = approved
+      record.approvals = approvals
     }
-
+    console.timeEnd(`getProposalRecord(${proposalID})`)
     return record
   }
 
