@@ -1,5 +1,6 @@
 import { SemVer } from 'semver'
-const arg = process.argv[2]
+const arg = process.env.INPUT_VERSION || process.env.GITHUB_TAG
+
 if (!arg) {
   console.error('Missing git tag, skipping next steps.')
   process.exit(0)

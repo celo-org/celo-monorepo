@@ -5,13 +5,10 @@ on:
 
   workflow_dispatch:
     input:
-      tag:
-        descript: 'NPM version'
+      npm_version:
+        description: 'NPM version'
         required: true
         type: string
-  push:
-    branches:
-      - chore/contract-publishing
 jobs:
   publish:
     runs-on: ['self-hosted', 'org', '8-cpu']
@@ -48,10 +45,11 @@ jobs:
         run: yarn
 
       - name: Check if a release should be published
-        run: yarn --silent is_contract_release $GITHUB_TAG >> "$GITHUB_ENV"
+        run: yarn --silent is_contract_release >> "$GITHUB_ENV"
         working-directory: packages/protocol
         env:
           GITHUB_TAG: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ inputs.npm_version }}
 
       - if: ${{ env.RELEASE_VERSION != '' }}
         name: Compile solidity contracts and typescript files
