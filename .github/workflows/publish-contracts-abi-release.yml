@@ -21,14 +21,14 @@ jobs:
       repository-projects: read
     steps:
       - uses: actions/checkout@v4
-      - name: Akeyless Get Secrets
-        id: get_auth_token
-        uses: docker://us-west1-docker.pkg.dev/devopsre/akeyless-public/akeyless-action:latest
-        with:
-          api-url: https://api.gateway.akeyless.celo-networks-dev.org
-          # this access-id needs to change whenever devops gives em
-          access-id: p-kf9vjzruht6l
-          static-secrets: '{"/static-secrets/apps-tooling-circle/npm-publish-token":"NPM_TOKEN"}'
+      # - name: Akeyless Get Secrets
+      #   id: get_auth_token
+      #   uses: docker://us-west1-docker.pkg.dev/devopsre/akeyless-public/akeyless-action:latest
+      #   with:
+      #     api-url: https://api.gateway.akeyless.celo-networks-dev.org
+      #     # this access-id needs to change whenever devops gives em
+      #     access-id: p-kf9vjzruht6l
+      #     static-secrets: '{"/static-secrets/apps-tooling-circle/npm-publish-token":"NPM_TOKEN"}'
       # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v3
         with:
