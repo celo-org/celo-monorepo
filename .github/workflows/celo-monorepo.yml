@@ -1,5 +1,5 @@
-name: celo-monorepo
-run-name: celo-monorepo tests
+name: celo-monorepo CI/CD
+run-name: celo-monorepo CI/CD for ${{ github.head_ref || github.ref_name }}
 
 # Dockefile for the self-hosted runner:
 # https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfile-monorepo
@@ -17,7 +17,7 @@ on:
       - '**/*.md'
 
 concurrency:
-  group: circle-ci-${{ github.ref }}
+  group: celo-monorepo-${{ github.ref }}
   cancel-in-progress: true
 
 defaults:
@@ -26,7 +26,7 @@ defaults:
 
 env:
   # Increment these to force cache rebuilding
-  NODE_MODULE_CACHE_VERSION: 3
+  NODE_MODULE_CACHE_VERSION: 4
   NODE_OPTIONS: '--max-old-space-size=4096'
   TERM: dumb
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
@@ -45,7 +45,10 @@ jobs:
       # Adding a initial comma so ',<path>' matches also for the first file
       all_modified_files: ',${{ steps.changed-files.outputs.all_modified_files }}'
     # runs-on: ubuntu-latest
-    runs-on: ["self-hosted", "monorepo-node18"]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     steps:
       - name: Restore .git cache
@@ -121,7 +124,7 @@ jobs:
         run: |
           # This fails if there is any change
           if ! git diff-index HEAD --; then
-            echo "Git changes detected while building. If this is unexpected, bump NODE_MODULE_CACHE_VERSION in .github/workflows/circleci.yml"
+            echo "Git changes detected while building. If this is unexpected, bump NODE_MODULE_CACHE_VERSION in .github/workflows/celo-monorepo.yml"
             exit 1
           fi
       - name: Build packages
@@ -141,7 +144,10 @@ jobs:
       - run: echo ",${{ steps.changed-files.outputs.all_modified_files }}"
   lint-checks:
     name: Lint code
-    runs-on: ["self-hosted", "monorepo-node18"]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: install-dependencies
     steps:
@@ -161,7 +167,10 @@ jobs:
       - run: yarn run lint
   general_test:
     name: General jest test
-    runs-on: ["self-hosted", "monorepo-node18"]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     needs: install-dependencies
     steps:
       - uses: actions/cache/restore@v3
@@ -194,7 +203,10 @@ jobs:
           path: test-results/jest
   wallet-test:
     name: Wallet test
-    runs-on: ["self-hosted", "monorepo-node18"]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: install-dependencies
     steps:
@@ -213,7 +225,12 @@ jobs:
           yarn run lerna --scope '@celo/wallet-*' run test
   pre-protocol-test-release:
     name: Protocol Tests Prepare
-    runs-on: ["self-hosted", "monorepo-node18"]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+      # Required root to install node12
+      options: --user root
     timeout-minutes: 30
     # Comment lint-checks dependency to speed up (as this is a dependency for many other jobs)
     # needs: [install-dependencies, lint-checks]
@@ -225,7 +242,6 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      github.event_name == 'pull_request' && contains(github.base_ref, 'release/') ||
       false
     outputs:
       protocol-test-must-run: ${{ steps.protocol-test-must-run.outputs.PROTOCOL_TEST_MUST_RUN }}
@@ -254,21 +270,22 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 12.22.11
+      # Workaround for https://stackoverflow.com/questions/72978485/git-submodule-update-failed-with-fatal-detected-dubious-ownership-in-repositor
+      - name: Configure git safe directories
+        run: git config --global --add safe.directory '*'
       - name: Generate devchain of previous release
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 60
-          max_attempts: 3
-          command: |
-            echo "Comparing against $RELEASE_TAG"
-            # Github has phased out the git protocol so we ensure that we use
-            # https for all git operations that yarn may perform.
-            git config --global url."https://github.com".insteadOf git://github.com
-            yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
-
+        run: |
+          echo "Comparing against $RELEASE_TAG"
+          # Github has phased out the git protocol so we ensure that we use
+          # https for all git operations that yarn may perform.
+          git config --global url."https://github.com".insteadOf git://github.com
+          yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
   protocol-test-release:
     name: Protocol Test Release
-    runs-on: ["self-hosted", "monorepo-node18"]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
@@ -278,7 +295,6 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      github.event_name == 'pull_request' && contains(github.base_ref, 'release/') ||
       false
     steps:
       - uses: actions/cache/restore@v3
@@ -295,12 +311,6 @@ jobs:
         run: |
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
           (cp -r packages/protocol/.tmp/released_chain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 20
-        if: false
-        with:
-          limit-access-to-actor: true
       - name: Test against current release
         run: |
           echo "Comparing against $RELEASE_TAG"
@@ -309,8 +319,11 @@ jobs:
   protocol-test-matrix:
     # Keeping name short because GitHub UI does not handle long names well
     name: ${{ matrix.name }}
-    runs-on: ["self-hosted", "monorepo-node18"]
-    timeout-minutes: 120
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    timeout-minutes: 60
     needs: [install-dependencies, lint-checks]
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
@@ -319,7 +332,6 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      github.event_name == 'pull_request' && contains(github.base_ref, 'release/') ||
       false
     strategy:
       fail-fast: false
@@ -374,18 +386,23 @@ jobs:
           yarn --cwd packages/protocol build
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
-        if: false
-        timeout-minutes: 120
+        timeout-minutes: 20
+        if: contains(matrix.command, 'common/') && false
+        with:
+          limit-access-to-actor: true
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
         with:
-          timeout_minutes: 60
+          timeout_minutes: 40
           max_attempts: 3
           command: |
             ${{ matrix.command }}
   contractkit-tests:
     name: ContractKit Tests
-    runs-on: ["self-hosted", "monorepo-node18"]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
@@ -396,7 +413,6 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      github.event_name == 'pull_request' && contains(github.base_ref, 'release/') ||
       false
     steps:
       - uses: actions/cache/restore@v3
@@ -418,7 +434,10 @@ jobs:
           yarn --cwd=packages/sdk/contractkit test
   cli-tests:
     name: CeloCli Tests
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
@@ -462,7 +481,10 @@ jobs:
           yarn --cwd=packages/cli run celocli account:new
   typescript-tests:
     name: Typescript package Tests
-    runs-on: ["self-hosted", "monorepo-node18"]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
@@ -491,7 +513,10 @@ jobs:
           npm install $RUNNER_WORKSPACE/celo-monorepo/packages/typescript/*.tgz
   base-test:
     name: SDK Base package Tests
-    runs-on: ["self-hosted", "monorepo-node18"]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
@@ -527,7 +552,10 @@ jobs:
           npm install $RUNNER_WORKSPACE/celo-monorepo/packages/sdk/base/*.tgz
   utils-test:
     name: SDK Utils package Tests
-    runs-on: ["self-hosted", "monorepo-node18"]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
@@ -562,7 +590,10 @@ jobs:
   end-to-end-geth-matrix:
     # Keeping name short because GitHub UI does not handle long names well
     name: e2e ${{ matrix.name }}
-    runs-on: ["self-hosted", "monorepo-node18"]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks, contractkit-tests]
     if: |
@@ -624,12 +655,10 @@ jobs:
               ./ci_test_validator_order.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
           - name: CIP35 eth compatibility test
             command: |
-              echo "Test skipped, see issue https://github.com/celo-org/celo-monorepo/issues/10556"
-
-              # set -e
-              # export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              # cd packages/celotool
-              # ./ci_test_cip35.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
+              set -e
+              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
+              cd packages/celotool
+              ./ci_test_cip35.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -646,14 +675,14 @@ jobs:
           rebuild-package: 'true'
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 120
-        if: contains(matrix.command, 'ci_test_cip35.sh')
+        timeout-minutes: 20
+        if: contains(matrix.command, 'ci_test_transfers.sh') && false
         with:
           limit-access-to-actor: true
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
         with:
-          timeout_minutes: 60
+          timeout_minutes: 30
           max_attempts: 3
           command: |
             ${{ matrix.command }}
@@ -661,7 +690,10 @@ jobs:
   # NOTE: This has not been fully tested as we don't have a license for certora
   certora-test:
     name: Certora test ${{ matrix.name }}
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks]
     # Disable as certora license is not active
