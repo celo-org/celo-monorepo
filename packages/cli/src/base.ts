@@ -201,9 +201,6 @@ export abstract class BaseCommand extends Command {
 
     const setStableTokenGas = async (stable: StableToken) => {
       await this.kit.setFeeCurrency(stableTokenInfos[stable].contract)
-      await this.kit.updateGasPriceInConnectionLayer(
-        await this.kit.registry.addressFor(stableTokenInfos[stable].contract)
-      )
     }
     if (Object.keys(StableToken).includes(gasCurrencyConfig)) {
       await setStableTokenGas(StableToken[gasCurrencyConfig as keyof typeof StableToken])

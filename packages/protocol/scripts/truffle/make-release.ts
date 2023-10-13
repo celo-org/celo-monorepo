@@ -4,11 +4,14 @@ import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
-import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
-import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
+// tslint:disable-next-line: ordered-imports
+import { Address, NULL_ADDRESS, eqAddress } from '@celo/utils/lib/address'
+import { TruffleContract } from '@truffle/contract'
+// tslint:disable-next-line: ordered-imports
+import { readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
-import { TruffleContract } from 'truffle-contract'
 import { RegistryInstance } from 'types'
+import { getReleaseVersion, ignoredContractsV9 } from '../../lib/compatibility/ignored-contracts-v9'
 
 /*
  * A script that reads a backwards compatibility report, deploys changed contracts, and creates
@@ -23,6 +26,8 @@ import { RegistryInstance } from 'types'
  *   --network alfajores --build_directory build/alfajores/ --report report.json \
  *   --initialize_data initialize_data.json --proposal proposal.json
  */
+
+let ignoredContractsSet = new Set()
 
 class ContractAddresses {
   static async create(
@@ -225,7 +230,15 @@ export interface ProposalTx {
 module.exports = async (callback: (error?: any) => number) => {
   try {
     const argv = require('minimist')(process.argv.slice(2), {
-      string: ['report', 'from', 'proposal', 'librariesFile', 'initialize_data', 'build_directory'],
+      string: [
+        'report',
+        'from',
+        'proposal',
+        'librariesFile',
+        'initialize_data',
+        'build_directory',
+        'branch',
+      ],
       boolean: ['dry_run'],
     })
     const fullReport = readJsonSync(argv.report)
@@ -233,11 +246,24 @@ module.exports = async (callback: (error?: any) => number) => {
       argv.librariesFile ?? 'libraries.json'
     )
     const report: ASTDetailedVersionedReport = fullReport.report
+    const branch = (argv.branch ? argv.branch : '') as string
     const initializationData = readJsonSync(argv.initialize_data)
     const dependencies = getCeloContractDependencies()
-    const contracts = readdirSync(join(argv.build_directory, 'contracts')).map((x) =>
-      basename(x, '.json')
-    )
+
+    const version = getReleaseVersion(branch)
+
+    if (version >= 9) {
+      ignoredContractsSet = new Set(ignoredContractsV9)
+    }
+
+    const contracts = readdirSync(join(argv.build_directory, 'contracts'))
+      .map((x) => basename(x, '.json'))
+      .filter(
+        (contract) =>
+          !ignoredContractsSet.has(contract) &&
+          !ignoredContractsSet.has(contract.replace('Proxy', ''))
+      )
+
     const registry = await artifacts.require('Registry').at(celoRegistryAddress)
     const addresses = await ContractAddresses.create(contracts, registry, libraryMapping)
     const released: Set<string> = new Set([])
@@ -253,6 +279,7 @@ module.exports = async (callback: (error?: any) => number) => {
       for (const dependency of contractDependencies) {
         await release(dependency)
       }
+      console.log('Dependencies for contract', contractName)
       // 2. Link dependencies.
       const contractArtifact = await artifacts.require(contractName)
       await Promise.all(contractDependencies.map((d) => contractArtifact.link(d, addresses.get(d))))

@@ -1,8 +1,8 @@
 import { ProposalBuilder, proposalToJSON } from '@celo/governance'
 import { concurrentMap } from '@celo/utils/lib/async'
+import { toBuffer } from '@ethereumjs/util'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'
-import { toBuffer } from 'ethereumjs-util'
 import { writeFileSync } from 'fs'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
@@ -88,6 +88,7 @@ export default class Show extends BaseCommand {
 
       const record = await governance.getProposalRecord(id)
       const proposal = record.proposal
+
       if (!raw) {
         const builder = new ProposalBuilder(this.kit)
         if (res.flags.afterExecutingID) {
@@ -114,7 +115,10 @@ export default class Show extends BaseCommand {
       if (record.stage === 'Referendum' || record.stage === 'Execution') {
         // Identify the transaction with the highest constitutional requirement.
         const constitutionThreshold = await governance.getConstitution(proposal)
-        const support = await governance.getSupport(id)
+        const support = await governance.getSupportWithConstitutionThreshold(
+          id,
+          constitutionThreshold
+        )
         requirements = {
           constitutionThreshold,
           ...support,
@@ -125,8 +129,16 @@ export default class Show extends BaseCommand {
       printValueMapRecursive({
         ...record,
         schedule,
-        requirements,
       })
+
+      if (Object.keys(requirements).length !== 0) {
+        console.log(
+          'Note: required is the minimal amount of yes + abstain votes needed to pass the proposal'
+        )
+        printValueMapRecursive({
+          requirements,
+        })
+      }
     } else if (hotfix) {
       const hotfixBuf = toBuffer(hotfix) as Buffer
       const record = await governance.getHotfixRecord(hotfixBuf)

@@ -112,7 +112,7 @@ ___
 
 *Defined in [packages/sdk/contractkit/src/kit.ts:113](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L113)*
 
-**`deprecated`** no longer needed since gasPrice is available on minimumClientVersion node rpc
+**`deprecated`** no longer needed since gasPrice is available on node rpc
 
 ___
 
@@ -246,7 +246,7 @@ ___
 
 *Defined in [packages/sdk/contractkit/src/kit.ts:285](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L285)*
 
-**`deprecated`** no longer needed since gasPrice is available on minimumClientVersion node rpc
+**`deprecated`** no longer needed since gasPrice is available on node rpc
 
 **Parameters:**
 
@@ -472,7 +472,7 @@ ___
 
 *Defined in [packages/sdk/contractkit/src/kit.ts:210](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L210)*
 
-**`deprecated`** no longer needed since gasPrice is available on minimumClientVersion node rpc
+**`deprecated`** no longer needed since gasPrice is available on node rpc
 
 **Parameters:**
 

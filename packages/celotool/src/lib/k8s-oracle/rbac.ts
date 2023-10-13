@@ -3,7 +3,6 @@ import {
   removeGenericHelmChart,
   upgradeGenericHelmChart,
 } from 'src/lib/helm_deploy'
-import { execCmdWithExitOnFailure } from '../cmd-utils'
 import { BaseOracleDeployer } from './base'
 
 // Oracle RBAC------
@@ -16,7 +15,7 @@ const rbacHelmChartPath = '../helm-charts/oracle-rbac'
 /**
  * RbacOracleDeployer cloud-agnostically manages deployments for oracles
  * whose pods must change their metadata in order to accomodate limitations
- * in pod identity solutions (like Azure's aad-pod-identity and AWS's kube2iam).
+ * in pod identity solutions (like Azure's aad-pod-identity).
  * This will create a k8s service account for each oracle pod that can modify
  * pod metadata, and will ensure each SA's credentials make their way to the helm chart.
  */
@@ -63,17 +62,9 @@ export abstract class RbacOracleDeployer extends BaseOracleDeployer {
   }
 
   async rbacServiceAccountSecretNames() {
-    const names = [...Array(this.replicas).keys()].map((i) => `${this.rbacReleaseName()}-${i}`)
-    let jsonSecretPath = '"{.items[*].secrets[0][\'name\']}"'
-    if (names.length === 1) {
-      jsonSecretPath = '"{.secrets[0][\'name\']}"'
-    }
-    const [tokenName] = await execCmdWithExitOnFailure(
-      `kubectl get serviceaccount --namespace=${this.celoEnv} ${names.join(
-        ' '
-      )} -o=jsonpath=${jsonSecretPath}`
-    )
-    return tokenName.trim().split(' ')
+    return [...Array(this.replicas).keys()].map((i) => {
+      return `${this.rbacReleaseName()}-secret-${i}`
+    })
   }
 
   rbacReleaseName() {

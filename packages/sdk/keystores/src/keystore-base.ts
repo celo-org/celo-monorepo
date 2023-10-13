@@ -132,9 +132,9 @@ export abstract class KeystoreBase {
   async changeKeystorePassphrase(address: string, oldPassphrase: string, newPassphrase: string) {
     const keystoreName = await this.getKeystoreName(address)
     const rawKeystore = this.getRawKeystore(keystoreName)
-    const newKeystore = await (await Wallet.fromV3(rawKeystore, oldPassphrase)).toV3String(
-      newPassphrase
-    )
+    const newKeystore = await (
+      await Wallet.fromV3(rawKeystore, oldPassphrase)
+    ).toV3String(newPassphrase)
     this.persistKeystore(keystoreName, newKeystore)
   }
 

@@ -1,7 +1,7 @@
 import { isHexString, normalizeAddressWith0x } from '@celo/base/lib/address'
 import { Address, CeloTx, EncodedTransaction, ReadOnlyWallet, Signer } from '@celo/connect'
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
-import * as ethUtil from 'ethereumjs-util'
+import * as ethUtil from '@ethereumjs/util'
 import { chainIdTransformationForSigning, encodeTransaction, rlpEncodedTx } from './signing-utils'
 
 type addInMemoryAccount = (privateKey: string) => void
@@ -77,7 +77,8 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
       throw new Error('No transaction object given!')
     }
     const rlpEncoded = rlpEncodedTx(txParams)
-    const addToV = chainIdTransformationForSigning(txParams.chainId!)
+    const addToV =
+      rlpEncoded.type === 'celo-legacy' ? chainIdTransformationForSigning(txParams.chainId!) : 27
 
     // Get the signer from the 'from' field
     const fromAddress = txParams.from!.toString()
@@ -101,7 +102,7 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
     const signer = this.getSigner(address)
     const sig = await signer.signPersonalMessage(data)
 
-    return ethUtil.toRpcSig(sig.v, sig.r, sig.s)
+    return ethUtil.toRpcSig(BigInt(sig.v), sig.r, sig.s)
   }
 
   /**
@@ -118,7 +119,7 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
     const signer = this.getSigner(address)
     const sig = await signer.signTypedData(typedData)
 
-    return ethUtil.toRpcSig(sig.v, sig.r, sig.s)
+    return ethUtil.toRpcSig(BigInt(sig.v), sig.r, sig.s)
   }
 
   protected getSigner(address: string): TSigner {
