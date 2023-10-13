@@ -22,8 +22,8 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/base": "5.0.4",
-    "@celo/utils": "5.0.4",
+    "@celo/base": "^5.0.4",
+    "@celo/utils": "^5.0.4",
     "@types/country-data": "^0.0.0",
     "@types/google-libphonenumber": "^7.4.23",
     "@types/node": "^18.7.16",
