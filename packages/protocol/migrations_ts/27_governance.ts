@@ -14,7 +14,6 @@ import { GovernanceApproverMultiSigInstance, GovernanceInstance } from 'types'
 import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 
 import { ArtifactsSingleton } from '../lib/artifactsSingleton'
->>>>>>>> master:packages/protocol/migrations_ts/27_governance.ts
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
   const governanceApproverMultiSig: GovernanceApproverMultiSigInstance =
