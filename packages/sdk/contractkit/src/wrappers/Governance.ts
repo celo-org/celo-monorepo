@@ -457,7 +457,6 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
   }
 
   async getApprovalStatus(proposalID: BigNumber.Value): Promise<ApprovalStatus> {
-    console.time(`getApprovalStatus(${proposalID})`)
     const [multisig, approveTx] = await Promise.all([
       this.getApproverMultisig(),
       this.approve(proposalID),
@@ -470,7 +469,6 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
 
     const confirmations = multisigTxs ? multisigTxs.confirmations : []
 
-    console.timeEnd(`getApprovalStatus(${proposalID})`)
     return {
       completion: `${confirmations.length} / ${approvers.length}`,
       confirmations,
@@ -483,16 +481,11 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
    * @param proposalID Governance proposal UUID
    */
   async getProposalRecord(proposalID: BigNumber.Value): Promise<ProposalRecord> {
-    console.time(`getProposalRecord(${proposalID})`)
-
-    console.time(`getProposalMetaStage(${proposalID})`)
-
     const [proposal, metadata, stage] = await Promise.all([
       this.getProposal(proposalID),
       this.getProposalMetadata(proposalID),
       this.getProposalStage(proposalID),
     ])
-    console.timeEnd(`getProposalMetaStage(${proposalID})`)
 
     const record: ProposalRecord = {
       proposal,
@@ -505,20 +498,17 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
     if (stage === ProposalStage.Queued) {
       record.upvotes = await this.getUpvotes(proposalID)
     } else if (stage === ProposalStage.Referendum || stage === ProposalStage.Execution) {
-      console.time(`getProposalState(${proposalID})`)
       const [passed, votes, approved, approvals] = await Promise.all([
         this.isProposalPassing(proposalID) as Promise<boolean>,
         this.getVotes(proposalID),
         this.isApproved(proposalID),
         this.getApprovalStatus(proposalID),
       ])
-      console.timeEnd(`getProposalState(${proposalID})`)
       record.passed = passed as boolean
       record.votes = votes
       record.approved = approved
       record.approvals = approvals
     }
-    console.timeEnd(`getProposalRecord(${proposalID})`)
     return record
   }
 

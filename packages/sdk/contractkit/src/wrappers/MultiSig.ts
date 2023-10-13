@@ -81,7 +81,6 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
     txo: CeloTxObject<any>,
     value: BigNumber.Value = 0
   ) {
-    console.time('getTransactionDataByContent')
     const data = stringToSolidityBytes(txo.encodeABI())
     const transactionCount = await this.getTransactionCount(true, true)
     const transactionIndexes = await Promise.all(
@@ -100,7 +99,6 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
       return
     }
     const transactionWithConfirmations = await this.getTransaction(txID)
-    console.timeEnd('getTransactionDataByContent')
     return transactionWithConfirmations
   }
   async getTransaction(i: number): Promise<TransactionData>
