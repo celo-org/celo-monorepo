@@ -315,8 +315,16 @@ export class BlockExplorer {
   getContractMappingFromSourcify = async (
     address: string
   ): Promise<ContractMapping | undefined> => {
+    const cached = this.addressMapping.get(address)
+    if (cached) {
+      return cached
+    }
     const metadata = await fetchMetadata(this.kit.connection, address)
-    return metadata?.toContractMapping()
+    const mapping = metadata?.toContractMapping()
+    if (mapping) {
+      this.addressMapping.set(address, mapping)
+    }
+    return mapping
   }
 
   /**
