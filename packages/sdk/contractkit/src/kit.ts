@@ -1,3 +1,4 @@
+// tslint:disable: ordered-imports
 import {
   Address,
   CeloTx,

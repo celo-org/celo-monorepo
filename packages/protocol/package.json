@@ -116,6 +116,7 @@
     "@types/yargs": "^13.0.2",
     "cross-env": "^5.1.6",
     "eth-gas-reporter": "^0.2.16",
+    "ethereumjs-util": "^6.2.0",
     "merkle-patricia-tree": "4.0.0",
     "targz": "^1.0.1",
     "tmp": "^0.1.0",

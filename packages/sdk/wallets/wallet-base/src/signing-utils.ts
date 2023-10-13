@@ -1,3 +1,4 @@
+// tslint:disable: ordered-imports
 import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import {
   CeloTx,
@@ -15,24 +16,25 @@ import {
 } from '@celo/connect/lib/utils/formatter'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
-import {
+// @ts-ignore-next-line
+import * as ethUtil from '@ethereumjs/util'
+import debugFactory from 'debug'
+// @ts-ignore-next-line eth-lib types not found
+import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
+import { keccak256 } from 'ethereum-cryptography/keccak'
+import { hexToBytes } from 'ethereum-cryptography/utils.js'
+import Web3 from 'web3' // TODO try to do this without web3 direct
+import Accounts from 'web3-eth-accounts'
+
+const {
   Address,
   ecrecover,
   fromRpcSig,
   hashPersonalMessage,
   pubToAddress,
   toBuffer,
-  toChecksumAddress
-} from '@ethereumjs/util'
-import debugFactory from 'debug'
-// @ts-ignore-next-line eth-lib types not found
-import * as ethUtil from '@ethereumjs/util'
-// @ts-ignore-next-line eth-lib types not found
-import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
-import { keccak256 } from 'ethereum-cryptography/keccak'
-import { hexToBytes } from 'ethereum-cryptography/utils.js'
-import Web3 from 'web3'; // TODO try to do this without web3 direct
-import Accounts from 'web3-eth-accounts'
+  toChecksumAddress,
+} = ethUtil
 const debug = debugFactory('wallet-base:tx:sign')
 
 // Original code taken from

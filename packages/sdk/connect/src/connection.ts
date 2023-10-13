@@ -1,3 +1,4 @@
+// tslint:disable: ordered-imports
 import { ensureLeading0x, toChecksumAddress } from '@celo/utils/lib/address'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { Signature, parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
@@ -341,7 +342,7 @@ export class Connection {
     }
     return tx
   }
-  
+
   /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
   async setGasPriceForCurrency(address: Address, gasPrice: string) {
     this.currencyGasPrice.set(address, gasPrice)
