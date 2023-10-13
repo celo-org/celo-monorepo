@@ -1,5 +1,6 @@
 oracle:
-  currencyPair: EUROCEUR
+  currencyPair: EURXOF
+  overrideOracleCount: 12 # At 5s block time, every client reports once per minute
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
@@ -13,17 +14,12 @@ oracle:
   gasPriceMultiplier: 1.5
   priceSources: "[
       [
-        {exchange: 'COINBASE', symbol: 'EUROCEUR', toInvert: false}
+        {exchange: 'ALPHAVANTAGE', symbol: 'EURXOF', toInvert: false}
       ],
       [
-        {exchange: 'COINBASE', symbol: 'EUROCUSD', toInvert: false},
-        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: true},
-        {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false}
-      ],      
-      [
-        {exchange: 'BITSTAMP', symbol: 'EUROCEUR', toInvert: false},
-      ]    
-    ]"
+        {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false}
+      ]
+  ]"
   minPriceSourceCount: 2
   reportStrategy: BLOCK_BASED
   reporter:
