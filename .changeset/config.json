@@ -8,7 +8,7 @@
     ]
   ],
   "linked": [],
-  "access": "restricted",
+  "access": "public",
   "baseBranch": "master",
   "updateInternalDependencies": "patch",
   "ignore": []
