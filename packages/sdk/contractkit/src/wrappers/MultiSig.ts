@@ -83,23 +83,26 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
   ) {
     const data = stringToSolidityBytes(txo.encodeABI())
     const transactionCount = await this.getTransactionCount(true, true)
-    const transactionIndexes = await Promise.all(
+    const transactionsOrEmpties = await Promise.all(
       Array(transactionCount)
         .fill(0)
         .map(async (_, index) => {
           const tx = await this.getTransaction(index, false)
           if (tx.data === data && tx.destination === destination && tx.value.isEqualTo(value)) {
-            return index
+            return { index, ...tx }
           }
           return null
         })
     )
-    const txID = transactionIndexes.find((index) => index !== null)
-    if (!txID) {
+    const wantedTransaction = transactionsOrEmpties.find((tx) => tx !== null)
+    if (!wantedTransaction) {
       return
     }
-    const transactionWithConfirmations = await this.getTransaction(txID)
-    return transactionWithConfirmations
+    const confirmations = await this.getConfirmations(wantedTransaction.index)
+    return {
+      ...wantedTransaction,
+      confirmations,
+    }
   }
   async getTransaction(i: number): Promise<TransactionData>
   async getTransaction(
@@ -119,10 +122,25 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
       }
     }
 
+    const confirmations = await this.getConfirmations(i)
+    return {
+      confirmations,
+      destination,
+      data,
+      executed,
+      value: new BigNumber(value),
+    }
+  }
+
+  /*
+   * Returns array of signer addresses which have confirmed a transaction
+   * when given the index of that transaction.
+   */
+  async getConfirmations(txId: number) {
     const owners = await this.getOwners()
     const confirmationsOrEmpties = await Promise.all(
       owners.map(async (owner) => {
-        const confirmation = await this.contract.methods.confirmations(i, owner).call()
+        const confirmation = await this.contract.methods.confirmations(txId, owner).call()
         if (confirmation) {
           return owner
         } else {
@@ -131,13 +149,7 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
       })
     )
     const confirmations = confirmationsOrEmpties.filter((c) => c !== null) as string[]
-    return {
-      confirmations,
-      destination,
-      data,
-      executed,
-      value: new BigNumber(value),
-    }
+    return confirmations
   }
 
   async getTransactions(): Promise<TransactionData[]> {
