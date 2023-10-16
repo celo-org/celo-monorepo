@@ -22,9 +22,9 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/utils": "5.0.4",
+    "@celo/utils": "^5.0.4",
     "@celo/bls12377js": "0.1.1",
-    "@celo/base": "5.0.4",
+    "@celo/base": "^5.0.4",
     "@ethereumjs/util": "8.0.5",
     "@types/bn.js": "^5.1.0",
     "@types/elliptic": "^6.4.9",
