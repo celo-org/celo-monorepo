@@ -29,10 +29,10 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/base": "5.0.4",
-    "@celo/connect": "5.0.4",
-    "@celo/utils": "5.0.4",
-    "@celo/wallet-local": "5.0.4",
+    "@celo/base": "^5.0.4",
+    "@celo/connect": "^5.0.4",
+    "@celo/utils": "^5.0.4",
+    "@celo/wallet-local": "^5.0.4",
     "@types/bn.js": "^5.1.0",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
