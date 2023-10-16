@@ -23,15 +23,6 @@ steps:
   ]
   waitFor: ['-']
 
-- id: "docker:phone-number-privacy-signer"
-  name: gcr.io/kaniko-project/executor:v0.16.0
-  args: [
-    "--dockerfile=dockerfiles/phone-number-privacy/Dockerfile",
-    "--cache=true",
-    "--destination=us.gcr.io/$PROJECT_ID/celo-monorepo:phone-number-privacy-$COMMIT_SHA"
-  ]
-  waitFor: ['-']
-
 options:
  machineType: 'N1_HIGHCPU_8'
 
