@@ -1,5 +1,6 @@
 {
   "name": "@celo/env-tests",
+  "private": true,
   "version": "1.0.1-beta.0",
   "description": "Environment tests",
   "main": "index.js",
