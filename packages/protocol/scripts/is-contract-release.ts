@@ -18,6 +18,8 @@ const [, gitTag] = match
 const [major, minor, patchAndMore] = gitTag.split('.')
 const semver = new SemVer([major, minor, patchAndMore].map((x) => x || 0).join('.'))
 
+// tslint:disable-next-line
 console.log(`RELEASE_VERSION=${semver.version}`)
+// tslint:disable-next-line
 console.log(`RELEASE_TYPE=${semver.prerelease.length ? 'prerelease' : 'release'}`)
 process.exit(0)

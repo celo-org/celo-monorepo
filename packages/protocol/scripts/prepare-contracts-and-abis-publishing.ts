@@ -30,7 +30,6 @@ child_process.execSync(
 allFiles.forEach((filePath) => {
   const name = path.basename(filePath)
   if (filePath.includes('/test/') || name.startsWith('Mock')) {
-    console.log('deleting', name)
     rimraf.sync(path.join(BUILD_DIR, name.replace('sol', 'json')))
     rimraf.sync(path.join(TYPES_DIR, 'ethers', name.replace('sol', '.d.ts')))
     rimraf.sync(path.join(TYPES_DIR, 'web3', name.replace('sol', '.ts')))

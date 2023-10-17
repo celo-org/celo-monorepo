@@ -2,10 +2,10 @@
 import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
 import { readFileSync } from 'fs'
+import minimist from 'minimist'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
 import { MENTO_PACKAGE } from '../contractPackages'
-import minimist from 'minimist'
 
 const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
 const BUILD_DIR = path.join(ROOT_DIR, process.env.BUILD_DIR ?? './build')
