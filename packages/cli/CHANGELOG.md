@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.2-beta.1
+
+### Patch Changes
+
+- cb7b4c538: Fixes type warnings
+
 ## 3.0.2-beta.0
 
 ### Patch Changes
