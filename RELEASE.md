@@ -10,9 +10,17 @@ This will bring up an interactive console which asks which packages are affect a
 
 ## Auto Releasing
 
-(coming soon)
+The Release.yaml workflow will create a PR called "Version Packages", each time a PR is merged to master with changeset files this PR will be rebased and updated to show what the versions would be of published then. Merging this PR in will lead to packages being built and published to npm and github release notes being published.
 
-## Manual Releasing
+### Automatic Pre Releasing
+
+The action is also configured to run if the branch being merged into starts with 'prerelease/'.
+
+In this case you would
+
+
+
+## Manual Releasing (discouraged)
 
 when time to release new versions of npm package run `changeset version` this will look thru the changeset files that have been generated since last release to bump the versions for package automatically to major if any changesets specify major change minor if only minor and patch if a the package had no changesets of its own but depends on one which will be updated.
 
@@ -20,7 +28,7 @@ finally `changeset publish` will go thru and publish to npm the packages that ne
 
 after go ahead and run `git push --follow-tags` to push git tags up to github.
 
-### For Pre Releasing
+### For Manual Pre Releasing
 
 changesets has 2 strategies for pre release versions.
 
