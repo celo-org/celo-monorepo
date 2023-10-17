@@ -54,6 +54,7 @@ export interface ConnectionOptions {
  */
 export class Connection {
   private config: ConnectionOptions
+  private _chainID: number | undefined
   readonly paramsPopulator: TxParamsNormalizer
   rpcCaller!: RpcCaller
 
@@ -76,6 +77,7 @@ export class Connection {
     if (!provider) {
       throw new Error('Must have a valid Provider')
     }
+    this._chainID = undefined
     try {
       if (!(provider instanceof CeloProvider)) {
         this.rpcCaller = new HttpRpcCaller(provider)
@@ -395,10 +397,16 @@ export class Connection {
     }
   }
 
+  // An instance of Connection will only change chain id if provider is changed.
   chainId = async (): Promise<number> => {
+    if (this._chainID) {
+      return this._chainID
+    }
     // Reference: https://eth.wiki/json-rpc/API#net_version
     const response = await this.rpcCaller.call('net_version', [])
-    return parseInt(response.result.toString(), 10)
+    const chainID = parseInt(response.result.toString(), 10)
+    this._chainID = chainID
+    return chainID
   }
 
   getTransactionCount = async (address: Address): Promise<number> => {

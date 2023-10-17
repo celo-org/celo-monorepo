@@ -315,8 +315,16 @@ export class BlockExplorer {
   getContractMappingFromSourcify = async (
     address: string
   ): Promise<ContractMapping | undefined> => {
+    const cached = this.addressMapping.get(address)
+    if (cached) {
+      return cached
+    }
     const metadata = await fetchMetadata(this.kit.connection, address)
-    return metadata?.toContractMapping()
+    const mapping = metadata?.toContractMapping()
+    if (mapping) {
+      this.addressMapping.set(address, mapping)
+    }
+    return mapping
   }
 
   /**
@@ -369,11 +377,14 @@ export class BlockExplorer {
       this.getContractMappingFromSourcifyAsProxy,
     ]
   ): Promise<ContractMapping | undefined> {
-    for (const strategy of strategies) {
-      const contractMapping = await strategy(address)
-      if (contractMapping && contractMapping.fnMapping.get(selector)) {
-        return contractMapping
-      }
-    }
+    const mappings = await Promise.all(
+      strategies.map(async (strategy) => {
+        const contractMapping = await strategy(address)
+        if (contractMapping && contractMapping.fnMapping.get(selector)) {
+          return contractMapping
+        }
+      })
+    )
+    return mappings.find((mapping) => mapping !== undefined)
   }
 }
