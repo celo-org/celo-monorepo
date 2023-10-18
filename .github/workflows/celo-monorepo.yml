@@ -8,13 +8,10 @@ on:
   push:
     branches:
       - master
-    paths-ignore:
-      - '**/*.md'
+      - martinvol/CR10_master
   pull_request:
     branches:
       - master
-    paths-ignore:
-      - '**/*.md'
 
 concurrency:
   group: celo-monorepo-${{ github.ref }}
@@ -24,7 +21,7 @@ defaults:
   run:
     shell: bash --login -eo pipefail {0}
 
-env:
+env: 
   # Increment these to force cache rebuilding
   NODE_MODULE_CACHE_VERSION: 4
   NODE_OPTIONS: '--max-old-space-size=4096'
