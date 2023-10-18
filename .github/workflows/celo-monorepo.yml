@@ -264,8 +264,8 @@ jobs:
         run: |
           yarn --cwd packages/protocol check-opcodes
       - uses: actions/setup-node@v3
-        with:
-          node-version: 12.22.11
+        # with:
+        #   node-version: 12.22.11
       # Workaround for https://stackoverflow.com/questions/72978485/git-submodule-update-failed-with-fatal-detected-dubious-ownership-in-repositor
       - name: Configure git safe directories
         run: git config --global --add safe.directory '*'
