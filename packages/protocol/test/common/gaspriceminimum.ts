@@ -12,8 +12,9 @@ import { SOLIDITY_08_PACKAGE } from '../../contractPackages'
 import { ArtifactsSingleton } from '../../lib/artifactsSingleton'
 
 const Registry: RegistryContract = artifacts.require('Registry')
-const GasPriceMinimum: GasPriceMinimumContract =
-  ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE).require('GasPriceMinimum')
+const GasPriceMinimum: GasPriceMinimumContract = ArtifactsSingleton.getInstance(
+  SOLIDITY_08_PACKAGE
+).require('GasPriceMinimum')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN

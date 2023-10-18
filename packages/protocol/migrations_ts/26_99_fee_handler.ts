@@ -29,17 +29,15 @@ module.exports = deploymentForCoreContract<FeeHandlerInstance>(
   initializeArgs,
   async (feeHandler: FeeHandlerInstance) => {
     for (const token of ['StableToken', 'StableTokenEUR', 'StableTokenBRL']) {
-      const stableToken: StableTokenInstance =
-        await getDeployedProxiedContract<StableTokenInstance>(
-          token,
-          ArtifactsSingleton.getInstance(MENTO_PACKAGE)
-        )
+      const stableToken: StableTokenInstance = await getDeployedProxiedContract<StableTokenInstance>(
+        token,
+        ArtifactsSingleton.getInstance(MENTO_PACKAGE)
+      )
 
-      const mentoFeeHandlerSeller: MentoFeeHandlerSellerInstance =
-        await getDeployedProxiedContract<MentoFeeHandlerSellerInstance>(
-          CeloContractName.MentoFeeHandlerSeller,
-          artifacts
-        )
+      const mentoFeeHandlerSeller: MentoFeeHandlerSellerInstance = await getDeployedProxiedContract<MentoFeeHandlerSellerInstance>(
+        CeloContractName.MentoFeeHandlerSeller,
+        artifacts
+      )
 
       await feeHandler.addToken(stableToken.address, mentoFeeHandlerSeller.address)
     }

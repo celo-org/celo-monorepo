@@ -48,9 +48,7 @@ testWithGanache('Validators Wrapper', (web3) => {
       groupAccount,
       new BigNumber(minLockedGoldValue).times(members).toFixed()
     )
-    await (
-      await validators.registerValidatorGroup(new BigNumber(0.1))
-    ).sendAndWaitForReceipt({
+    await (await validators.registerValidatorGroup(new BigNumber(0.1))).sendAndWaitForReceipt({
       from: groupAccount,
     })
   }
@@ -84,9 +82,7 @@ testWithGanache('Validators Wrapper', (web3) => {
     await setupGroup(groupAccount)
     await setupValidator(validatorAccount)
     await validators.affiliate(groupAccount).sendAndWaitForReceipt({ from: validatorAccount })
-    await (
-      await validators.addMember(groupAccount, validatorAccount)
-    ).sendAndWaitForReceipt({
+    await (await validators.addMember(groupAccount, validatorAccount)).sendAndWaitForReceipt({
       from: groupAccount,
     })
 
@@ -142,9 +138,7 @@ testWithGanache('Validators Wrapper', (web3) => {
       for (const validator of [validator1, validator2]) {
         await setupValidator(validator)
         await validators.affiliate(groupAccount).sendAndWaitForReceipt({ from: validator })
-        await (
-          await validators.addMember(groupAccount, validator)
-        ).sendAndWaitForReceipt({
+        await (await validators.addMember(groupAccount, validator)).sendAndWaitForReceipt({
           from: groupAccount,
         })
       }

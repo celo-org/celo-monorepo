@@ -26,8 +26,9 @@ import {
 import { encodePacked, keccak256 } from 'web3-utils'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
-const FederatedAttestations: FederatedAttestationsContract =
-  artifacts.require('FederatedAttestations')
+const FederatedAttestations: FederatedAttestationsContract = artifacts.require(
+  'FederatedAttestations'
+)
 
 contract('FederatedAttestations', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
@@ -240,8 +241,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
   describe('#lookupAttestations', () => {
     describe('when identifier has not been registered', () => {
       it('should return empty list', async () => {
-        const [countsPerIssuer, addresses, signers, issuedOns, publishedOns] =
-          await federatedAttestations.lookupAttestations(identifier1, [issuer1])
+        const [
+          countsPerIssuer,
+          addresses,
+          signers,
+          issuedOns,
+          publishedOns,
+        ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1])
         checkAgainstExpectedAttestations(
           [0],
           [],
@@ -310,8 +316,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should return empty count and list if no issuers specified', async () => {
-        const [countsPerIssuer, addresses, signers, issuedOns, publishedOns] =
-          await federatedAttestations.lookupAttestations(identifier1, [])
+        const [
+          countsPerIssuer,
+          addresses,
+          signers,
+          issuedOns,
+          publishedOns,
+        ] = await federatedAttestations.lookupAttestations(identifier1, [])
         checkAgainstExpectedAttestations(
           [],
           [],
@@ -325,8 +336,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should return all attestations from one issuer', async () => {
-        const [countsPerIssuer, addresses, signers, issuedOns, publishedOns] =
-          await federatedAttestations.lookupAttestations(identifier1, [issuer1])
+        const [
+          countsPerIssuer,
+          addresses,
+          signers,
+          issuedOns,
+          publishedOns,
+        ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1])
         checkAgainstExpectedAttestations(
           [issuer1Attestations.length],
           issuer1Attestations,
@@ -340,8 +356,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should return empty list if no attestations exist for an issuer', async () => {
-        const [countsPerIssuer, addresses, signers, issuedOns, publishedOns] =
-          await federatedAttestations.lookupAttestations(identifier1, [issuer3])
+        const [
+          countsPerIssuer,
+          addresses,
+          signers,
+          issuedOns,
+          publishedOns,
+        ] = await federatedAttestations.lookupAttestations(identifier1, [issuer3])
         checkAgainstExpectedAttestations(
           [0],
           [],
@@ -357,8 +378,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
       it('should return attestations from multiple issuers in correct order', async () => {
         const expectedAttestations = issuer2Attestations.concat(issuer1Attestations)
         const expectedCountsPerIssuer = [0, issuer2Attestations.length, issuer1Attestations.length]
-        const [countsPerIssuer, addresses, signers, issuedOns, publishedOns] =
-          await federatedAttestations.lookupAttestations(identifier1, [issuer3, issuer2, issuer1])
+        const [
+          countsPerIssuer,
+          addresses,
+          signers,
+          issuedOns,
+          publishedOns,
+        ] = await federatedAttestations.lookupAttestations(identifier1, [issuer3, issuer2, issuer1])
         checkAgainstExpectedAttestations(
           expectedCountsPerIssuer,
           expectedAttestations,
@@ -379,8 +405,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
         })
       })
       it('should return empty list', async () => {
-        const [countsPerIssuer, addresses, signers, issuedOns, publishedOns] =
-          await federatedAttestations.lookupAttestations(identifier1, [issuer1])
+        const [
+          countsPerIssuer,
+          addresses,
+          signers,
+          issuedOns,
+          publishedOns,
+        ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1])
         checkAgainstExpectedAttestations(
           [0],
           [],
@@ -416,8 +447,10 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
     describe('when address has not been registered', () => {
       it('should return empty list', async () => {
-        const [actualCountsPerIssuer, actualIdentifiers] =
-          await federatedAttestations.lookupIdentifiers(account1, [issuer1])
+        const [
+          actualCountsPerIssuer,
+          actualIdentifiers,
+        ] = await federatedAttestations.lookupIdentifiers(account1, [issuer1])
         checkAgainstExpectedIdCases([0], [], actualCountsPerIssuer, actualIdentifiers)
       })
     })
@@ -469,14 +502,18 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should return empty count if no issuers specified', async () => {
-        const [actualCountsPerIssuer, actualIdentifiers] =
-          await federatedAttestations.lookupIdentifiers(account1, [])
+        const [
+          actualCountsPerIssuer,
+          actualIdentifiers,
+        ] = await federatedAttestations.lookupIdentifiers(account1, [])
         checkAgainstExpectedIdCases([], [], actualCountsPerIssuer, actualIdentifiers)
       })
 
       it('should return all identifiers from one issuer', async () => {
-        const [actualCountsPerIssuer, actualIdentifiers] =
-          await federatedAttestations.lookupIdentifiers(account1, [issuer1])
+        const [
+          actualCountsPerIssuer,
+          actualIdentifiers,
+        ] = await federatedAttestations.lookupIdentifiers(account1, [issuer1])
         checkAgainstExpectedIdCases(
           [issuer1IdCases.length],
           issuer1IdCases,
@@ -486,16 +523,20 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should return empty list if no identifiers exist for an (issuer,address)', async () => {
-        const [actualCountsPerIssuer, actualIdentifiers] =
-          await federatedAttestations.lookupIdentifiers(account1, [issuer3])
+        const [
+          actualCountsPerIssuer,
+          actualIdentifiers,
+        ] = await federatedAttestations.lookupIdentifiers(account1, [issuer3])
         checkAgainstExpectedIdCases([0], [], actualCountsPerIssuer, actualIdentifiers)
       })
 
       it('should return identifiers from multiple issuers in correct order', async () => {
         const expectedIdCases = issuer2IdCases.concat(issuer1IdCases)
         const expectedCountsPerIssuer = [0, issuer2IdCases.length, issuer1IdCases.length]
-        const [actualCountsPerIssuer, actualIdentifiers] =
-          await federatedAttestations.lookupIdentifiers(account1, [issuer3, issuer2, issuer1])
+        const [
+          actualCountsPerIssuer,
+          actualIdentifiers,
+        ] = await federatedAttestations.lookupIdentifiers(account1, [issuer3, issuer2, issuer1])
         checkAgainstExpectedIdCases(
           expectedCountsPerIssuer,
           expectedIdCases,
@@ -512,8 +553,10 @@ contract('FederatedAttestations', (accounts: string[]) => {
         })
       })
       it('should return empty list', async () => {
-        const [actualCountsPerIssuer, actualIdentifiers] =
-          await federatedAttestations.lookupIdentifiers(account1, [issuer1])
+        const [
+          actualCountsPerIssuer,
+          actualIdentifiers,
+        ] = await federatedAttestations.lookupIdentifiers(account1, [issuer1])
         checkAgainstExpectedIdCases([0], [], actualCountsPerIssuer, actualIdentifiers)
       })
     })
@@ -1078,8 +1121,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
         [account1, account2],
         { from: issuer1 }
       )
-      const [countsPerIssuer1, addresses1, signers1, issuedOns1, publishedOns1] =
-        await federatedAttestations.lookupAttestations(identifier1, [issuer1])
+      const [
+        countsPerIssuer1,
+        addresses1,
+        signers1,
+        issuedOns1,
+        publishedOns1,
+      ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1])
       checkAgainstExpectedAttestations(
         [1],
         [{ account: account2, issuedOn: nowUnixTime, signer: signer2 }],
@@ -1090,8 +1138,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
         issuedOns1,
         publishedOns1
       )
-      const [countsPerIssuer2, addresses2, signers2, issuedOns2, publishedOns2] =
-        await federatedAttestations.lookupAttestations(identifier2, [issuer1])
+      const [
+        countsPerIssuer2,
+        addresses2,
+        signers2,
+        issuedOns2,
+        publishedOns2,
+      ] = await federatedAttestations.lookupAttestations(identifier2, [issuer1])
       checkAgainstExpectedAttestations(
         [0],
         [],
@@ -1111,8 +1164,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
         [account2, account1],
         { from: issuer1 }
       )
-      const [countsPerIssuer1, addresses1, signers1, issuedOns1, publishedOns1] =
-        await federatedAttestations.lookupAttestations(identifier1, [issuer1])
+      const [
+        countsPerIssuer1,
+        addresses1,
+        signers1,
+        issuedOns1,
+        publishedOns1,
+      ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1])
       checkAgainstExpectedAttestations(
         [1],
         [{ account: account2, issuedOn: nowUnixTime, signer: signer2 }],
@@ -1123,8 +1181,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
         issuedOns1,
         publishedOns1
       )
-      const [countsPerIssuer2, addresses2, signers2, issuedOns2, publishedOns2] =
-        await federatedAttestations.lookupAttestations(identifier2, [issuer1])
+      const [
+        countsPerIssuer2,
+        addresses2,
+        signers2,
+        issuedOns2,
+        publishedOns2,
+      ] = await federatedAttestations.lookupAttestations(identifier2, [issuer1])
       checkAgainstExpectedAttestations(
         [0],
         [],
@@ -1144,8 +1207,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
         [account2, account1],
         { from: signer1 }
       )
-      const [countsPerIssuer1, addresses1, signers1, issuedOns1, publishedOns1] =
-        await federatedAttestations.lookupAttestations(identifier1, [issuer1])
+      const [
+        countsPerIssuer1,
+        addresses1,
+        signers1,
+        issuedOns1,
+        publishedOns1,
+      ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1])
       checkAgainstExpectedAttestations(
         [1],
         [{ account: account2, issuedOn: nowUnixTime, signer: signer2 }],
@@ -1156,8 +1224,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
         issuedOns1,
         publishedOns1
       )
-      const [countsPerIssuer2, addresses2, signers2, issuedOns2, publishedOns2] =
-        await federatedAttestations.lookupAttestations(identifier2, [issuer1])
+      const [
+        countsPerIssuer2,
+        addresses2,
+        signers2,
+        issuedOns2,
+        publishedOns2,
+      ] = await federatedAttestations.lookupAttestations(identifier2, [issuer1])
       checkAgainstExpectedAttestations(
         [0],
         [],

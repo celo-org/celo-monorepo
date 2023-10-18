@@ -73,11 +73,13 @@ const UniswapV2Factory: MockUniswapV2FactoryContract = artifacts.require('MockUn
 
 const FeeCurrencyWhitelist: FeeCurrencyWhitelistContract = artifacts.require('FeeCurrencyWhitelist')
 
-const MentoFeeHandlerSeller: MentoFeeHandlerSellerContract =
-  artifacts.require('MentoFeeHandlerSeller')
+const MentoFeeHandlerSeller: MentoFeeHandlerSellerContract = artifacts.require(
+  'MentoFeeHandlerSeller'
+)
 
-const UniswapFeeHandlerSeller: UniswapFeeHandlerSellerContract =
-  artifacts.require('UniswapFeeHandlerSeller')
+const UniswapFeeHandlerSeller: UniswapFeeHandlerSellerContract = artifacts.require(
+  'UniswapFeeHandlerSeller'
+)
 
 // Mento contracts
 const Exchange: ExchangeContract = makeTruffleContractForMigration('Exchange', MENTO_PACKAGE, web3)

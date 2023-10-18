@@ -43,9 +43,10 @@ testWithGanache('Metadata', (web3) => {
     ) => {
       const pop = await accounts.generateProofOfKeyPossession(address, signer)
       if (action === 'vote') {
-        await (
-          await accounts.authorizeVoteSigner(signer, pop)
-        ).sendAndWaitForReceipt({ from: address, gas: 13000000 })
+        await (await accounts.authorizeVoteSigner(signer, pop)).sendAndWaitForReceipt({
+          from: address,
+          gas: 13000000,
+        })
       } else if (action === 'validator') {
         await (
           await accounts.authorizeValidatorSigner(signer, pop, validator)
@@ -54,9 +55,10 @@ testWithGanache('Metadata', (web3) => {
           gas: 13000000,
         })
       } else if (action === 'attestation') {
-        await (
-          await accounts.authorizeAttestationSigner(signer, pop)
-        ).sendAndWaitForReceipt({ from: address, gas: 13000000 })
+        await (await accounts.authorizeAttestationSigner(signer, pop)).sendAndWaitForReceipt({
+          from: address,
+          gas: 13000000,
+        })
       }
       await metadata.addClaim(createNameClaim(name), NativeSigner(kit.connection.sign, signer))
       const serializedMetadata = metadata.toString()

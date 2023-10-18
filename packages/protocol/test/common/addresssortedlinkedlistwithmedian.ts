@@ -6,8 +6,9 @@ import {
   AddressSortedLinkedListWithMedianTestInstance,
 } from 'types'
 
-const AddressSortedLinkedListWithMedianTest: AddressSortedLinkedListWithMedianTestContract =
-  artifacts.require('AddressSortedLinkedListWithMedianTest')
+const AddressSortedLinkedListWithMedianTest: AddressSortedLinkedListWithMedianTestContract = artifacts.require(
+  'AddressSortedLinkedListWithMedianTest'
+)
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
