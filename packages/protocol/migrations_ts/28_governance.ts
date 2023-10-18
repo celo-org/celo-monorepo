@@ -16,10 +16,11 @@ import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 import { ArtifactsSingleton } from '../lib/artifactsSingleton'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
-  const governanceApproverMultiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract<GovernanceApproverMultiSigInstance>(
-    CeloContractName.GovernanceApproverMultiSig,
-    artifacts
-  )
+  const governanceApproverMultiSig: GovernanceApproverMultiSigInstance =
+    await getDeployedProxiedContract<GovernanceApproverMultiSigInstance>(
+      CeloContractName.GovernanceApproverMultiSig,
+      artifacts
+    )
   const networkFrom: string = require('@celo/protocol/truffle-config.js').networks[networkName].from
   const approver: string = config.governanceApproverMultiSig.useMultiSig
     ? governanceApproverMultiSig.address

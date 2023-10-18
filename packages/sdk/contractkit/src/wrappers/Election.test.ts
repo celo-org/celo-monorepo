@@ -64,7 +64,9 @@ testWithGanache('Election Wrapper', (web3) => {
 
   const setupGroup = async (groupAccount: string) => {
     await registerAccountWithLockedGold(groupAccount, new BigNumber(minLockedGoldValue).toFixed())
-    await (await validators.registerValidatorGroup(GROUP_COMMISSION)).sendAndWaitForReceipt({
+    await (
+      await validators.registerValidatorGroup(GROUP_COMMISSION)
+    ).sendAndWaitForReceipt({
       from: groupAccount,
     })
   }
@@ -87,7 +89,9 @@ testWithGanache('Election Wrapper', (web3) => {
     await setupGroup(groupAccount)
     await setupValidator(validatorAccount)
     await validators.affiliate(groupAccount).sendAndWaitForReceipt({ from: validatorAccount })
-    await (await validators.addMember(groupAccount, validatorAccount)).sendAndWaitForReceipt({
+    await (
+      await validators.addMember(groupAccount, validatorAccount)
+    ).sendAndWaitForReceipt({
       from: groupAccount,
     })
   }
@@ -138,7 +142,9 @@ testWithGanache('Election Wrapper', (web3) => {
 
     describe('#vote', () => {
       beforeEach(async () => {
-        await (await election.vote(groupAccount, ONE_HUNDRED_GOLD)).sendAndWaitForReceipt({
+        await (
+          await election.vote(groupAccount, ONE_HUNDRED_GOLD)
+        ).sendAndWaitForReceipt({
           from: userAccount,
         })
       })
@@ -156,7 +162,9 @@ testWithGanache('Election Wrapper', (web3) => {
 
     describe('#activate', () => {
       beforeEach(async () => {
-        await (await election.vote(groupAccount, ONE_HUNDRED_GOLD)).sendAndWaitForReceipt({
+        await (
+          await election.vote(groupAccount, ONE_HUNDRED_GOLD)
+        ).sendAndWaitForReceipt({
           from: userAccount,
         })
         await mineToNextEpoch(web3)
@@ -211,7 +219,9 @@ testWithGanache('Election Wrapper', (web3) => {
 
     describe('#revokePending', () => {
       beforeEach(async () => {
-        await (await election.vote(groupAccount, ONE_HUNDRED_GOLD)).sendAndWaitForReceipt({
+        await (
+          await election.vote(groupAccount, ONE_HUNDRED_GOLD)
+        ).sendAndWaitForReceipt({
           from: userAccount,
         })
       })
@@ -241,7 +251,9 @@ testWithGanache('Election Wrapper', (web3) => {
     describe('#revoke', () => {
       beforeEach(async () => {
         await activateAndVote(groupAccount, userAccount, TWO_HUNDRED_GOLD)
-        await (await election.vote(groupAccount, ONE_HUNDRED_GOLD)).sendAndWaitForReceipt({
+        await (
+          await election.vote(groupAccount, ONE_HUNDRED_GOLD)
+        ).sendAndWaitForReceipt({
           from: userAccount,
         })
       })
@@ -309,7 +321,9 @@ testWithGanache('Election Wrapper', (web3) => {
     })
 
     test('Validator groups should be in the correct order', async () => {
-      await (await election.vote(groupAccountA, ONE_HUNDRED_GOLD)).sendAndWaitForReceipt({
+      await (
+        await election.vote(groupAccountA, ONE_HUNDRED_GOLD)
+      ).sendAndWaitForReceipt({
         from: userAccount,
       })
       const revokeTransactionsList = await election.revoke(

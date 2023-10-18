@@ -943,9 +943,8 @@ contract('LockedGold', (accounts: string[]) => {
       })
 
       it('should update total voting power of delegatee', async () => {
-        const totalAccountGovernanceVotingPower = await lockedGold.getAccountTotalGovernanceVotingPower(
-          delegatee
-        )
+        const totalAccountGovernanceVotingPower =
+          await lockedGold.getAccountTotalGovernanceVotingPower(delegatee)
         assertEqualBN(totalAccountGovernanceVotingPower, value)
       })
 
@@ -2700,9 +2699,8 @@ contract('LockedGold', (accounts: string[]) => {
         })
 
         it('should update total voting power of delegatee', async () => {
-          const totalAccountGovernanceVotingPower = await lockedGold.getAccountTotalGovernanceVotingPower(
-            delegatee
-          )
+          const totalAccountGovernanceVotingPower =
+            await lockedGold.getAccountTotalGovernanceVotingPower(delegatee)
           assertEqualBN(totalAccountGovernanceVotingPower, delegatedAmount * 2)
         })
       })
@@ -2738,13 +2736,11 @@ contract('LockedGold', (accounts: string[]) => {
         })
 
         it('should return equal amounts', async () => {
-          const [
-            expectedSigner,
-            actualSigner,
-          ] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
-            delegatorSigner,
-            delegateeSigner
-          )
+          const [expectedSigner, actualSigner] =
+            await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
+              delegatorSigner,
+              delegateeSigner
+            )
 
           const [expected, actual] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
             delegator,
@@ -2764,13 +2760,11 @@ contract('LockedGold', (accounts: string[]) => {
           })
 
           it('should return equal amounts', async () => {
-            const [
-              expectedSigner,
-              actualSigner,
-            ] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
-              delegatorSigner,
-              delegateeSigner
-            )
+            const [expectedSigner, actualSigner] =
+              await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
+                delegatorSigner,
+                delegateeSigner
+              )
 
             const [expected, actual] = await lockedGold.getDelegatorDelegateeExpectedAndRealAmount(
               delegator,
@@ -2784,13 +2778,11 @@ contract('LockedGold', (accounts: string[]) => {
           })
 
           it('should update total voting power of delegatee', async () => {
-            const totalAccountGovernanceVotingPower = await lockedGold.getAccountTotalGovernanceVotingPower(
-              delegatee
-            )
+            const totalAccountGovernanceVotingPower =
+              await lockedGold.getAccountTotalGovernanceVotingPower(delegatee)
 
-            const totalAccountGovernanceVotingPowerSigner = await lockedGold.getAccountTotalGovernanceVotingPower(
-              delegateeSigner
-            )
+            const totalAccountGovernanceVotingPowerSigner =
+              await lockedGold.getAccountTotalGovernanceVotingPower(delegateeSigner)
 
             assertEqualBN(totalAccountGovernanceVotingPowerSigner, 0)
             assertEqualBN(totalAccountGovernanceVotingPower, delegatedAmount * 2)

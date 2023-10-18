@@ -1838,14 +1838,8 @@ contract('Governance', (accounts: string[]) => {
 
       it("should set the voter's vote record", async () => {
         await governance.vote(proposalId, index, value)
-        const [
-          recordProposalId,
-          ,
-          ,
-          yesVotesRecord,
-          noVotesRecord,
-          abstainVotesRecord,
-        ] = await governance.getVoteRecord(account, index)
+        const [recordProposalId, , , yesVotesRecord, noVotesRecord, abstainVotesRecord] =
+          await governance.getVoteRecord(account, index)
         assertEqualBN(recordProposalId, proposalId)
         assertEqualBN(yesVotesRecord, yesVotes)
         assertEqualBN(noVotesRecord, 0)
@@ -1995,14 +1989,8 @@ contract('Governance', (accounts: string[]) => {
 
           it("should set the voter's vote record", async () => {
             await governance.vote(proposalId, index, newValue)
-            const [
-              recordProposalId,
-              ,
-              ,
-              yesVotesRecord,
-              noVotesRecord,
-              abstainVotesRecord,
-            ] = await governance.getVoteRecord(account, index)
+            const [recordProposalId, , , yesVotesRecord, noVotesRecord, abstainVotesRecord] =
+              await governance.getVoteRecord(account, index)
             assert.equal(recordProposalId.toNumber(), proposalId)
 
             const votesNormalized = [0, abstainVotesRecord, noVotesRecord, yesVotesRecord]
@@ -2137,14 +2125,8 @@ contract('Governance', (accounts: string[]) => {
 
       it("should set the voter's vote record", async () => {
         await governance.vote(proposalId, index, value, { from: accountSigner })
-        const [
-          recordProposalId,
-          ,
-          ,
-          yesVotesRecord,
-          noVotesRecord,
-          abstainVotesRecord,
-        ] = await governance.getVoteRecord(account, index)
+        const [recordProposalId, , , yesVotesRecord, noVotesRecord, abstainVotesRecord] =
+          await governance.getVoteRecord(account, index)
         assertEqualBN(recordProposalId, proposalId)
         assertEqualBN(yesVotesRecord, yesVotes)
         assertEqualBN(noVotesRecord, 0)
@@ -2214,14 +2196,8 @@ contract('Governance', (accounts: string[]) => {
 
       it("should set the voter's vote record", async () => {
         await governance.vote(proposalId, index, value)
-        const [
-          recordProposalId,
-          ,
-          ,
-          yesVotesRecord,
-          noVotesRecord,
-          abstainVotesRecord,
-        ] = await governance.getVoteRecord(account, index)
+        const [recordProposalId, , , yesVotesRecord, noVotesRecord, abstainVotesRecord] =
+          await governance.getVoteRecord(account, index)
         assertEqualBN(recordProposalId, proposalId)
         assertEqualBN(yesVotesRecord, yesVotes)
         assertEqualBN(noVotesRecord, 0)
@@ -2565,14 +2541,8 @@ contract('Governance', (accounts: string[]) => {
 
           it("should set the voter's vote record", async () => {
             await governance.votePartially(proposalId, index, newYes, newNo, newAbstain)
-            const [
-              recordProposalId,
-              ,
-              ,
-              yesVotesRecord,
-              noVotesRecord,
-              abstainVotesRecord,
-            ] = await governance.getVoteRecord(account, index)
+            const [recordProposalId, , , yesVotesRecord, noVotesRecord, abstainVotesRecord] =
+              await governance.getVoteRecord(account, index)
             assert.equal(recordProposalId.toNumber(), proposalId)
 
             assertEqualBN(yesVotesRecord, newYes)
@@ -2627,14 +2597,8 @@ contract('Governance', (accounts: string[]) => {
 
           it("should set the voter's vote record", async () => {
             await governance.votePartially(proposalId, index, newYes, newNo, newAbstain)
-            const [
-              recordProposalId,
-              ,
-              ,
-              yesVotesRecord,
-              noVotesRecord,
-              abstainVotesRecord,
-            ] = await governance.getVoteRecord(account, index)
+            const [recordProposalId, , , yesVotesRecord, noVotesRecord, abstainVotesRecord] =
+              await governance.getVoteRecord(account, index)
             assert.equal(recordProposalId.toNumber(), proposalId)
             assertEqualBN(yesVotesRecord, newYes)
             assertEqualBN(noVotesRecord, newNo)
@@ -2895,14 +2859,8 @@ contract('Governance', (accounts: string[]) => {
 
       it("should set the voter's vote record", async () => {
         await governance.votePartially(proposalId, index, yesVotes, 0, 0)
-        const [
-          recordProposalId,
-          ,
-          ,
-          yesVotesRecord,
-          noVotesRecord,
-          abstainVotesRecord,
-        ] = await governance.getVoteRecord(account, index)
+        const [recordProposalId, , , yesVotesRecord, noVotesRecord, abstainVotesRecord] =
+          await governance.getVoteRecord(account, index)
         assertEqualBN(recordProposalId, proposalId)
         assertEqualBN(yesVotesRecord, yesVotes)
         assertEqualBN(noVotesRecord, 0)
@@ -3625,7 +3583,7 @@ contract('Governance', (accounts: string[]) => {
       }
     })
 
-    const whitelistFrom = (t: keyof typeof validators[0]) =>
+    const whitelistFrom = (t: keyof (typeof validators)[0]) =>
       concurrentMap(5, validators, (v) => governance.whitelistHotfix(newHotfixHash, { from: v[t] }))
 
     const checkTally = async () => {
@@ -4530,14 +4488,8 @@ async function assertVoteRecord(
   assertNo: number,
   asssertAbstain: number
 ) {
-  const [
-    recordProposalId2,
-    ,
-    ,
-    yesVotesRecord2,
-    noVotesRecord2,
-    abstainVotesRecord2,
-  ] = await governance.getVoteRecord(account, index)
+  const [recordProposalId2, , , yesVotesRecord2, noVotesRecord2, abstainVotesRecord2] =
+    await governance.getVoteRecord(account, index)
 
   assertEqualBN(recordProposalId2, assertId)
   assertEqualBN(yesVotesRecord2, assertYes)

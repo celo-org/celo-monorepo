@@ -77,10 +77,11 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
       }
     }
 
-    const reserveSpenderMultiSig: ReserveSpenderMultiSigInstance = await getDeployedProxiedContract<ReserveSpenderMultiSigInstance>(
-      CeloContractName.ReserveSpenderMultiSig,
-      ArtifactsSingleton.getInstance(MENTO_PACKAGE)
-    )
+    const reserveSpenderMultiSig: ReserveSpenderMultiSigInstance =
+      await getDeployedProxiedContract<ReserveSpenderMultiSigInstance>(
+        CeloContractName.ReserveSpenderMultiSig,
+        ArtifactsSingleton.getInstance(MENTO_PACKAGE)
+      )
     console.info(`Marking ${reserveSpenderMultiSig.address} as a reserve spender`)
     await reserve.addSpender(reserveSpenderMultiSig.address)
   },

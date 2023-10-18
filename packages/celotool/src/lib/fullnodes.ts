@@ -64,10 +64,10 @@ export function getFullNodeDeployerForContext(
     if (cloudProvider !== CloudProvider.GCP) {
       throw Error('Cannot create NEG for cloud providers other than GCP')
     }
-    deploymentConfig = ({
+    deploymentConfig = {
       ...deploymentConfig,
       createNEG: true,
-    } as unknown) as GCPFullNodeDeploymentConfig // make typescript happy
+    } as unknown as GCPFullNodeDeploymentConfig // make typescript happy
   }
   return getFullNodeDeployer(cloudProvider, celoEnv, deploymentConfig)
 }
@@ -163,9 +163,8 @@ function getFullNodeDeploymentConfig(context: string): BaseFullNodeDeploymentCon
  * For a given context, returns the appropriate AksFullNodeDeploymentConfig
  */
 function getAksFullNodeDeploymentConfig(context: string): AksFullNodeDeploymentConfig {
-  const fullNodeDeploymentConfig: BaseFullNodeDeploymentConfig = getFullNodeDeploymentConfig(
-    context
-  )
+  const fullNodeDeploymentConfig: BaseFullNodeDeploymentConfig =
+    getFullNodeDeploymentConfig(context)
   return {
     ...fullNodeDeploymentConfig,
     clusterConfig: getAksClusterConfig(context),
@@ -176,9 +175,8 @@ function getAksFullNodeDeploymentConfig(context: string): AksFullNodeDeploymentC
  * For a given context, returns the appropriate getGCPFullNodeDeploymentConfig
  */
 function getGCPFullNodeDeploymentConfig(context: string): GCPFullNodeDeploymentConfig {
-  const fullNodeDeploymentConfig: BaseFullNodeDeploymentConfig = getFullNodeDeploymentConfig(
-    context
-  )
+  const fullNodeDeploymentConfig: BaseFullNodeDeploymentConfig =
+    getFullNodeDeploymentConfig(context)
   return {
     ...fullNodeDeploymentConfig,
     clusterConfig: getGCPClusterConfig(context),

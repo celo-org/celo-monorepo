@@ -19,8 +19,7 @@ describe('Istanbul utilities', () => {
         '0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00',
       ],
       removedValidators: new BigNumber(1),
-      seal:
-        '0x88022a71c12a801a4318e27eeb5c82aa923160632c63b0eae4457ed120356ddb549fb7c4e4865728478aa61c19b9abe10ec7db34c8662b003b139188e99edcd400',
+      seal: '0x88022a71c12a801a4318e27eeb5c82aa923160632c63b0eae4457ed120356ddb549fb7c4e4865728478aa61c19b9abe10ec7db34c8662b003b139188e99edcd400',
       aggregatedSeal: {
         bitmap: new BigNumber(13),
         signature:
