@@ -1,5 +1,31 @@
 # Changelog
 
+## 3.0.2
+
+### Patch Changes
+
+- d48c68afc: Speeds up governance:show command by parallelize async calls, and reducing data fetched
+- cb7b4c538: Fixes type warnings
+- Updated dependencies [d48c68afc]
+- Updated dependencies [d48c68afc]
+- Updated dependencies [53bbd4958]
+- Updated dependencies [d48c68afc]
+- Updated dependencies [53bbd4958]
+- Updated dependencies [d48c68afc]
+- Updated dependencies [d48c68afc]
+- Updated dependencies [d48c68afc]
+  - @celo/contractkit@5.1.0
+  - @celo/connect@5.1.0
+  - @celo/wallet-hsm-azure@5.1.0
+  - @celo/wallet-ledger@5.1.0
+  - @celo/wallet-local@5.1.0
+  - @celo/cryptographic-utils@5.0.5
+  - @celo/phone-utils@5.0.5
+  - @celo/governance@5.0.5
+  - @celo/explorer@5.0.5
+  - @celo/utils@5.0.5
+  - @celo/base@5.0.5
+
 ## 3.0.2-beta.1
 
 ### Patch Changes
