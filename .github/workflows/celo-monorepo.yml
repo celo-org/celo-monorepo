@@ -333,7 +333,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Protocol Reslease Snapshots
+          - name: Protocol Release Snapshots
             command: |
               yarn --cwd packages/protocol test:release-snapshots
               if [[ $(git status packages/protocol/releaseData/versionReports --porcelain) ]]; then
