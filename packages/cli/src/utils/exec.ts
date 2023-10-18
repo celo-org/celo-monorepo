@@ -6,7 +6,7 @@ export function execCmd(
   args: string[],
   options?: SpawnOptions & { silent?: boolean }
 ) {
-  return new Promise<number>((resolve, reject) => {
+  return new Promise<number | null>((resolve, reject) => {
     const { silent, ...spawnOptions } = options || { silent: false }
     if (!silent) {
       console.debug('$ ' + [cmd].concat(args).join(' '))

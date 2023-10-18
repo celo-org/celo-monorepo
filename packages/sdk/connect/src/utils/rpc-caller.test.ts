@@ -1,5 +1,5 @@
-import { Callback, JsonRpcPayload, JsonRpcResponse, Provider } from '../types'
-import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from './rpc-caller'
+import { Callback, Error, JsonRpcPayload, JsonRpcResponse, Provider } from '../types'
+import { HttpRpcCaller, RpcCaller, rpcCallHandler } from './rpc-caller'
 
 const mockProvider: Provider = {
   send: (payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): any => {
@@ -29,7 +29,7 @@ describe('RPC Caller class', () => {
   let rpcCaller: RpcCaller
 
   beforeEach(async () => {
-    rpcCaller = new DefaultRpcCaller(mockProvider)
+    rpcCaller = new HttpRpcCaller(mockProvider)
   })
 
   describe('when calling the provider', () => {

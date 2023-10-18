@@ -1,6 +1,6 @@
-// @ts-ignore
-import * as ganache from '@celo/ganache-cli'
 import * as fs from 'fs-extra'
+// @ts-ignore
+import * as ganache from 'ganache'
 import * as path from 'path'
 import * as targz from 'targz'
 
@@ -67,37 +67,26 @@ async function launchServer(opts: { verbose?: boolean; from_targz?: boolean }, c
       }
 
   const server = ganache.server({
-    default_balance_ether: 1000000,
-    logger: {
-      log: logFn,
-    },
-    network_id: 1101,
-    db_path: chain,
-    mnemonic: MNEMONIC,
-    gasLimit: 20000000,
-    allowUnlimitedContractSize: true,
+    wallet: { mnemonic: MNEMONIC, defaultBalance: 1000000 },
+    logging: { logger: { log: logFn } },
+    database: { dbPath: chain },
+    miner: { blockGasLimit: 20000000, defaultGasPrice: 0 },
+    chain: { networkId: 1101, chainId: 1, allowUnlimitedContractSize: true, hardfork: 'istanbul' },
   })
 
-  await new Promise((resolve, reject) => {
-    server.listen(8545, (err: any, blockchain: any) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(blockchain)
-      }
-    })
+  server.listen(8545, async (err: any) => {
+    if (err) {
+      throw err
+    }
   })
 
-  return () =>
-    new Promise<void>((resolve, reject) => {
-      server.close((err: any) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      })
-    })
+  return async () => {
+    try {
+      await server.close()
+    } catch (e) {
+      throw e
+    }
+  }
 }
 
 function decompressChain(tarPath: string, copyChainPath: string): Promise<void> {

@@ -23,9 +23,9 @@ import { ABI as RegistryABI } from '@celo/contractkit/lib/generated/Registry'
 // tslint:disable: ordered-imports
 import {
   getInitializeAbiOfImplementation,
-  setImplementationOnProxy,
   SET_AND_INITIALIZE_IMPLEMENTATION_ABI,
   SET_IMPLEMENTATION_ABI,
+  setImplementationOnProxy,
 } from '@celo/contractkit/lib/proxy'
 // tslint:enable: ordered-imports
 import { valueToString } from '@celo/contractkit/lib/wrappers/BaseWrapper'
@@ -40,7 +40,8 @@ import { isValidAddress } from '@celo/utils/lib/address'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
-import { keccak256 } from 'ethereumjs-util'
+import { keccak256 } from 'ethereum-cryptography/keccak'
+import { utf8ToBytes } from 'ethereum-cryptography/utils'
 import * as inquirer from 'inquirer'
 
 const debug = debugFactory('governance:proposals')
@@ -54,7 +55,7 @@ export const hotfixToEncodedParams = (kit: ContractKit, proposal: Proposal, salt
   )
 
 export const hotfixToHash = (kit: ContractKit, proposal: Proposal, salt: Buffer) =>
-  keccak256(hotfixToEncodedParams(kit, proposal, salt)) as Buffer
+  keccak256(utf8ToBytes(hotfixToEncodedParams(kit, proposal, salt))) as Buffer
 
 /**
  * JSON encoding of a proposal transaction.
@@ -135,91 +136,91 @@ export const proposalToJSON = async (
     debug(`updating registry to reflect ${name} => ${address}`)
     await blockExplorer.updateContractDetailsMapping(stripProxy(name), address)
   }
-
   if (registryAdditions) {
     // Update the registry mapping with registry additions prior to processing the proposal.
-    for (const nameStr of Object.keys(registryAdditions)) {
-      const name = nameStr as CeloContract
-      if (CeloContract[name]) {
-        await updateRegistryMapping(name, registryAdditions[name])
-      } else {
-        debug(`Name ${nameStr} in registry additions not a CeloContract`)
-      }
-    }
+    await Promise.all(
+      Object.keys(registryAdditions).map(async (nameStr) => {
+        const name = nameStr as CeloContract
+        if (CeloContract[name]) {
+          await updateRegistryMapping(name, registryAdditions[name])
+        } else {
+          debug(`Name ${nameStr} in registry additions not a CeloContract`)
+        }
+      })
+    )
   }
-
   const abiCoder = kit.connection.getAbiCoder()
-  const proposalJson: ProposalTransactionJSON[] = []
 
-  for (const tx of proposal) {
-    debug(`decoding tx ${JSON.stringify(tx)}`)
-    const parsedTx = await blockExplorer.tryParseTx(tx as CeloTxPending)
-    if (parsedTx == null) {
-      throw new Error(`Unable to parse ${JSON.stringify(tx)} with block explorer`)
-    }
+  const proposalJson: ProposalTransactionJSON[] = await Promise.all(
+    proposal.map(async (tx) => {
+      debug(`decoding tx ${JSON.stringify(tx)}`)
+      const parsedTx = await blockExplorer.tryParseTx(tx as CeloTxPending)
+      if (parsedTx == null) {
+        throw new Error(`Unable to parse ${JSON.stringify(tx)} with block explorer`)
+      }
+      if (isRegistryRepointRaw(abiCoder, tx) && parsedTx.callDetails.isCoreContract) {
+        const args = registryRepointRawArgs(abiCoder, tx)
+        await updateRegistryMapping(args.name, args.address)
+      }
 
-    if (isRegistryRepointRaw(abiCoder, tx) && parsedTx.callDetails.isCoreContract) {
-      const args = registryRepointRawArgs(abiCoder, tx)
-      await updateRegistryMapping(args.name, args.address)
-    }
+      const jsonTx: ProposalTransactionJSON = {
+        contract: parsedTx.callDetails.contract as CeloContract,
+        address: parsedTx.callDetails.contractAddress,
+        function: parsedTx.callDetails.function,
+        args: parsedTx.callDetails.argList,
+        params: parsedTx.callDetails.paramMap,
+        value: parsedTx.tx.value,
+      }
 
-    const jsonTx: ProposalTransactionJSON = {
-      contract: parsedTx.callDetails.contract as CeloContract,
-      address: parsedTx.callDetails.contractAddress,
-      function: parsedTx.callDetails.function,
-      args: parsedTx.callDetails.argList,
-      params: parsedTx.callDetails.paramMap,
-      value: parsedTx.tx.value,
-    }
-
-    if (isProxySetFunction(jsonTx)) {
-      jsonTx.contract = suffixProxy(jsonTx.contract)
-      await blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
-    } else if (isProxySetAndInitFunction(jsonTx)) {
-      await blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
-      let initAbi
-      if (parsedTx.callDetails.isCoreContract) {
+      if (isProxySetFunction(jsonTx)) {
         jsonTx.contract = suffixProxy(jsonTx.contract)
-        initAbi = getInitializeAbiOfImplementation(jsonTx.contract as any)
-      } else {
-        const implAddress = jsonTx.args[0]
-        const metadata = await fetchMetadata(kit.connection, implAddress)
-        if (metadata && metadata.abi) {
-          initAbi = metadata?.abiForMethod('initialize')[0]
+        await blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
+      } else if (isProxySetAndInitFunction(jsonTx)) {
+        await blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
+        let initAbi
+        if (parsedTx.callDetails.isCoreContract) {
+          jsonTx.contract = suffixProxy(jsonTx.contract)
+          initAbi = getInitializeAbiOfImplementation(jsonTx.contract as any)
+        } else {
+          const implAddress = jsonTx.args[0]
+          const metadata = await fetchMetadata(kit.connection, implAddress)
+          if (metadata && metadata.abi) {
+            initAbi = metadata?.abiForMethod('initialize')[0]
+          }
+        }
+
+        if (initAbi !== undefined) {
+          // Transform delegate call initialize args into a readable params map
+          // 8 bytes for function sig
+          const initSig = trimLeading0x(jsonTx.args[1]).slice(0, 8)
+          const initArgs = trimLeading0x(jsonTx.args[1]).slice(8)
+
+          const { params: initParams } = parseDecodedParams(
+            kit.connection.getAbiCoder().decodeParameters(initAbi.inputs!, initArgs)
+          )
+          jsonTx.params![`initialize@${initSig}`] = initParams
+        }
+      } else if (isGovernanceConstitutionSetter(jsonTx)) {
+        const [address, functionId, threshold] = jsonTx.args
+        const contractMapping = await blockExplorer.getContractMappingWithSelector(
+          address,
+          functionId
+        )
+        if (contractMapping === undefined) {
+          throw new Error(
+            `Governance.setConstitution targets unknown address ${address} and function id ${functionId}`
+          )
+        }
+        jsonTx.params![`setConstitution[${address}][${functionId}]`] = {
+          contract: contractMapping.details.name,
+          method: contractMapping.fnMapping.get(functionId)?.name,
+          threshold: fromFixed(new BigNumber(threshold)),
         }
       }
+      return jsonTx
+    })
+  )
 
-      if (initAbi !== undefined) {
-        // Transform delegate call initialize args into a readable params map
-        // 8 bytes for function sig
-        const initSig = trimLeading0x(jsonTx.args[1]).slice(0, 8)
-        const initArgs = trimLeading0x(jsonTx.args[1]).slice(8)
-
-        const { params: initParams } = parseDecodedParams(
-          kit.connection.getAbiCoder().decodeParameters(initAbi.inputs!, initArgs)
-        )
-        jsonTx.params![`initialize@${initSig}`] = initParams
-      }
-    } else if (isGovernanceConstitutionSetter(jsonTx)) {
-      const [address, functionId, threshold] = jsonTx.args
-      const contractMapping = await blockExplorer.getContractMappingWithSelector(
-        address,
-        functionId
-      )
-      if (contractMapping === undefined) {
-        throw new Error(
-          `Governance.setConstitution targets unknown address ${address} and function id ${functionId}`
-        )
-      }
-      jsonTx.params![`setConstitution[${address}][${functionId}]`] = {
-        contract: contractMapping.details.name,
-        method: contractMapping.fnMapping.get(functionId)?.name,
-        threshold: fromFixed(new BigNumber(threshold)),
-      }
-    }
-
-    proposalJson.push(jsonTx)
-  }
   return proposalJson
 }
 

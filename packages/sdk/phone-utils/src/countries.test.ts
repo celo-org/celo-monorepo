@@ -27,28 +27,28 @@ describe('countries', () => {
       const country = countries.getCountry('taiwan')
 
       expect(country).toMatchInlineSnapshot(`
-        Object {
+        {
           "alpha2": "TW",
           "alpha3": "TWN",
           "countryCallingCode": "+886",
-          "countryCallingCodes": Array [
+          "countryCallingCodes": [
             "+886",
           ],
-          "countryPhonePlaceholder": Object {
+          "countryPhonePlaceholder": {
             "national": "00 0000 0000",
           },
-          "currencies": Array [
+          "currencies": [
             "TWD",
           ],
           "displayName": "Taiwan",
           "displayNameNoDiacritics": "taiwan",
           "emoji": "🇹🇼",
           "ioc": "TPE",
-          "languages": Array [
+          "languages": [
             "zho",
           ],
           "name": "Taiwan",
-          "names": Object {
+          "names": {
             "en-us": "Taiwan",
             "es-419": "Taiwán",
           },
@@ -63,29 +63,29 @@ describe('countries', () => {
       const results = countries.getFilteredCountries('taiwan')
 
       expect(results).toMatchInlineSnapshot(`
-        Array [
-          Object {
+        [
+          {
             "alpha2": "TW",
             "alpha3": "TWN",
             "countryCallingCode": "+886",
-            "countryCallingCodes": Array [
+            "countryCallingCodes": [
               "+886",
             ],
-            "countryPhonePlaceholder": Object {
+            "countryPhonePlaceholder": {
               "national": "00 0000 0000",
             },
-            "currencies": Array [
+            "currencies": [
               "TWD",
             ],
             "displayName": "Taiwan",
             "displayNameNoDiacritics": "taiwan",
             "emoji": "🇹🇼",
             "ioc": "TPE",
-            "languages": Array [
+            "languages": [
               "zho",
             ],
             "name": "Taiwan",
-            "names": Object {
+            "names": {
               "en-us": "Taiwan",
               "es-419": "Taiwán",
             },
@@ -99,29 +99,29 @@ describe('countries', () => {
       const results = countries.getFilteredCountries('49')
 
       expect(results).toMatchInlineSnapshot(`
-        Array [
-          Object {
+        [
+          {
             "alpha2": "DE",
             "alpha3": "DEU",
             "countryCallingCode": "+49",
-            "countryCallingCodes": Array [
+            "countryCallingCodes": [
               "+49",
             ],
-            "countryPhonePlaceholder": Object {
+            "countryPhonePlaceholder": {
               "national": "000 000000",
             },
-            "currencies": Array [
+            "currencies": [
               "EUR",
             ],
             "displayName": "Germany",
             "displayNameNoDiacritics": "germany",
             "emoji": "🇩🇪",
             "ioc": "GER",
-            "languages": Array [
+            "languages": [
               "deu",
             ],
             "name": "Germany",
-            "names": Object {
+            "names": {
               "en-us": "Germany",
               "es-419": "Alemania",
             },
@@ -135,25 +135,25 @@ describe('countries', () => {
       const results = countries.getFilteredCountries('gb')
 
       expect(results).toMatchInlineSnapshot(`
-        Array [
-          Object {
+        [
+          {
             "alpha2": "GB",
             "alpha3": "GBR",
             "countryCallingCode": "+44",
-            "countryCallingCodes": Array [
+            "countryCallingCodes": [
               "+44",
             ],
-            "countryPhonePlaceholder": Object {
+            "countryPhonePlaceholder": {
               "national": "0000 000 0000",
             },
-            "currencies": Array [
+            "currencies": [
               "GBP",
             ],
             "displayName": "United Kingdom",
             "displayNameNoDiacritics": "united kingdom",
             "emoji": "🇬🇧",
             "ioc": "GBR",
-            "languages": Array [
+            "languages": [
               "eng",
               "cor",
               "gle",
@@ -161,7 +161,7 @@ describe('countries', () => {
               "cym",
             ],
             "name": "United Kingdom",
-            "names": Object {
+            "names": {
               "en-us": "United Kingdom",
               "es-419": "Reino Unido",
             },

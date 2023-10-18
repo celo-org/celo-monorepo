@@ -1,6 +1,6 @@
 {
   "name": "@celo/wallet-ledger",
-  "version": "4.1.1-dev",
+  "version": "5.1.0",
   "description": "Ledger wallet implementation",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -22,18 +22,24 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@celo/utils": "4.1.1-dev",
-    "@celo/wallet-base": "4.1.1-dev",
-    "@celo/wallet-remote": "4.1.1-dev",
-    "@celo/connect": "4.1.1-dev",
-    "@types/ethereumjs-util": "^5.2.0",
-    "eth-lib": "^0.2.8",
-    "ethereumjs-util": "^5.2.0",
-    "debug": "^4.1.1",
+    "@celo/base": "^5.0.5",
+    "@celo/utils": "^5.0.5",
+    "@celo/wallet-base": "^5.1.0",
+    "@celo/wallet-remote": "^5.1.0",
+    "@celo/connect": "^5.1.0",
+    "@ethereumjs/util": "8.0.5",
     "@ledgerhq/hw-app-eth": "~5.11.0",
-    "@ledgerhq/hw-transport": "~5.11.0"
+    "@ledgerhq/errors": "^5.50.0",
+    "@ledgerhq/hw-transport": "~5.11.0",
+    "debug": "^4.1.1",
+    "eth-lib": "^0.2.8",
+    "ethereum-cryptography": "1.2.0"
+  },
+  "devDependencies": {
+    "@ledgerhq/hw-transport-node-hid": "^6.27.4",
+    "web3": "1.10.0"
   },
   "engines": {
-    "node": ">=8.13.0"
+    "node": ">=8.14.2"
   }
 }

@@ -1,7 +1,7 @@
 # Celo-Blockchain End-to-End Tests
 
 This package contains a number of end-to-end tests that depend both on the
-monorepo protocol package and the Golang celo-blockchain implmenetation.
+monorepo protocol package and the Golang celo-blockchain implementation.
 
 ## Setup
 
