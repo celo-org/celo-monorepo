@@ -9,6 +9,6 @@ const initializeArgs = async () => {
 module.exports = deploymentForCoreContract<UniswapFeeHandlerSellerInstance>(
   web3,
   artifacts,
-  CeloContractName.MentoFeeHandlerSeller,
+  CeloContractName.UniswapFeeHandlerSeller,
   initializeArgs
 )
