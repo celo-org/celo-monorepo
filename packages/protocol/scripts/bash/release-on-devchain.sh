@@ -43,7 +43,7 @@ fi
 
 echo "- Verify bytecode of the network"
 
-rm -r build/contracts*
+rm -rf build/contracts*
 
 yarn build >> $LOG_FILE
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts --branch $BRANCH --librariesFile libraries.json
