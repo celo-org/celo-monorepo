@@ -30,8 +30,9 @@ done
 [ -z "$BUILD_DIR" ] && BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'));
 
 echo "- Checkout source code at $BRANCH"
-git fetch origin +"$BRANCH" 2>>$LOG_FILE >> $LOG_FILE
-git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
+# Fetching also tags so we can checkout if $BRACH references a tag
+git fetch origin +"$BRANCH" --tags >> $LOG_FILE 2>&1
+git checkout $BRANCH >> $LOG_FILE 2>&1
 
 echo "- Build monorepo (contract artifacts, migrations, + all dependencies)"
 cd ../..
