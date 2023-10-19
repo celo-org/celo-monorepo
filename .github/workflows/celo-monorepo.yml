@@ -272,7 +272,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 60
-        if: true
+        if: false
         with:
           limit-access-to-actor: true
       - name: Generate devchain of previous release
