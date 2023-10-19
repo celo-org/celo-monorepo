@@ -908,7 +908,7 @@
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@celo/base@5.0.4", "@celo/base@^5.0.2", "@celo/base@^5.0.4":
+"@celo/base@5.0.4":
   version "5.0.4"
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-5.0.4.tgz#72df2e56aac6cbe33e089e69523826065f53e0a7"
   integrity sha512-mzyJXGodTd8HjGgeEfDfq3Tr39/tAKSKiCsJGxI7F2ovPC93NniNq7fyo31Vc7W12SJRgMvejD9+7ReoJrXnKQ==
@@ -934,7 +934,7 @@
     debug "^4.1.1"
     utf8 "3.0.0"
 
-"@celo/contractkit@5.0.4", "@celo/contractkit@^5.0.2":
+"@celo/contractkit@5.0.4":
   version "5.0.4"
   resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-5.0.4.tgz#00fd583d373761e3b5c46f2006f4bb0372b04f84"
   integrity sha512-/IxnngKMBUoA2G0IaZ/Xoq4dKJe140oov1C0qPwHwxVlO80cgwbPZvV/E7GlKNWBi0n6ZTmYkGt5Zs1OiCdyVQ==
@@ -973,6 +973,11 @@
     fp-ts "2.1.1"
     io-ts "2.0.1"
 
+"@celo/odis-identifiers@0.0.0-alpha-b064fdc03":
+  version "0.0.0-alpha-b064fdc03"
+  resolved "https://registry.yarnpkg.com/@celo/odis-identifiers/-/odis-identifiers-0.0.0-alpha-b064fdc03.tgz#fd4cbecf693e3de081b5b9accd04c896910d0649"
+  integrity sha512-s13vpz2LTWZr3xkNFWTtfaoc9NZjgNMv7ofWGMWUrKfOBmm6BHrNw9KFrNc3Vy6F/jBXLdBVl/zlKBWkJO600Q==
+
 "@celo/phone-number-privacy-common@^3.0.3":
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-3.0.3.tgz#6e79909a222b75d7e40d8e658572ece16f2c90e9"
@@ -999,21 +1004,6 @@
     io-ts "2.0.1"
     is-base64 "^1.1.0"
 
-"@celo/phone-utils@^5.0.2":
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/@celo/phone-utils/-/phone-utils-5.0.4.tgz#46d911f4379f08dc992240290c07abc7a26f9364"
-  integrity sha512-5bpLSbfYdpgAcDH45tHxkmQPSYnwBsd0tWy6WVxMdbI2Kw4DdiwrzM+V6fSm11ji9La+4kbFdczXnPCRr/wSkQ==
-  dependencies:
-    "@celo/base" "5.0.4"
-    "@celo/utils" "5.0.4"
-    "@types/country-data" "^0.0.0"
-    "@types/google-libphonenumber" "^7.4.23"
-    "@types/node" "^18.7.16"
-    country-data "^0.0.31"
-    fp-ts "2.1.1"
-    google-libphonenumber "^3.2.27"
-    io-ts "2.0.1"
-
 "@celo/typechain-target-web3-v1-celo@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@celo/typechain-target-web3-v1-celo/-/typechain-target-web3-v1-celo-0.2.0.tgz#2560b470e348d2628debe899885724ce5b218bc3"
@@ -1022,7 +1012,7 @@
     lodash "~4.17.19"
     typechain "2.0.0"
 
-"@celo/utils@5.0.4", "@celo/utils@^5.0.2", "@celo/utils@^5.0.4":
+"@celo/utils@5.0.4":
   version "5.0.4"
   resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-5.0.4.tgz#e2a4789254e464e86c9e37a793708c8b589ce2d8"
   integrity sha512-cvIIB/XrLvs8gQAsU5hoM2RKVdY8iYWjYQDA0xZiqF3NQSBDNslCDiYLZuPBjZqvfF4sHsQp2wMsLvWbVOumVg==
