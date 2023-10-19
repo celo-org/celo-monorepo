@@ -15,7 +15,7 @@ jobs:
     name: ${{ matrix.package }} NPM package install
     runs-on: ubuntu-latest
     container:
-      image: node:16-bullseye
+      image: node:18-bullseye
     strategy:
       fail-fast: false
       matrix:
@@ -31,7 +31,7 @@ jobs:
           apt update
           apt install -y libusb-1.0-0-dev libudev-dev
       - name: Installing npm package
-        run: yarn add ${{ matrix.package }}
+        run: yarn add ${{ matrix.package }}@beta
       - name: Test celocli command
         if: matrix.package == '@celo/celocli'
         run: |
