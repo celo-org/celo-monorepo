@@ -20,10 +20,9 @@ jobs:
       fail-fast: false
       matrix:
         package:
-        - '@celo/typescript'
-        - '@celo/utils'
-        - '@celo/contractkit'
-        - '@celo/celocli'
+        - '@celo/utils@beta'
+        - '@celo/contractkit@beta'
+        - '@celo/celocli@beta'
     steps:
       - name: Install @celo/celocli dependencies
         if: matrix.package == '@celo/celocli'
@@ -31,7 +30,7 @@ jobs:
           apt update
           apt install -y libusb-1.0-0-dev libudev-dev
       - name: Installing npm package
-        run: yarn add ${{ matrix.package }}@beta
+        run: yarn add ${{ matrix.package }}
       - name: Test celocli command
         if: matrix.package == '@celo/celocli'
         run: |
