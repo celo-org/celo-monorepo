@@ -48,10 +48,16 @@ echo " - Checkout migrationsConfig.js at $NEW_BRANCH"
 CURRENT_HASH=`git log -n 1 --oneline | cut -c 1-9`
 git checkout $NEW_BRANCH -- migrationsConfig.js
 
+echo 1
+
 yarn ts-node scripts/check-backward.ts sem_check \
   --old_contracts $OLD_BRANCH_BUILD_DIR/contracts \
   --new_contracts $NEW_BRANCH_BUILD_DIR/contracts \
   --exclude $CONTRACT_EXCLUSION_REGEX \
   $REPORT_FLAG
 
+echo 2
+
 git checkout $CURRENT_HASH -- migrationsConfig.js
+
+echo 3
