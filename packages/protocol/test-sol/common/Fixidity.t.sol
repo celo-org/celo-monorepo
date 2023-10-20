@@ -5,7 +5,7 @@ import "celo-foundry/Test.sol";
 import "forge-std/console.sol";
 
 // Contract to test
-import "../../contracts/common/test/FixidityTest.sol";
+import "../../contracts/common/test/FixidityWrapper.sol";
 
 contract FixidityTest is Test {
   FixidityWrapper fixidity;
