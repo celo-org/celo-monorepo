@@ -1,0 +1,29 @@
+pragma solidity ^0.5.13;
+
+import "celo-foundry/Test.sol";
+import "forge-std/console.sol";
+
+// Contract to test
+import "../../../contracts/governance/network/BlockchainParameters.sol";
+
+contract BlockchainParameters is Test {
+    BlockchainParameters blockchainParameters;
+    uint256 gasLimit = 7000000;
+
+
+  function setUp() public {
+    blockchainParameters = new BlockchainParameters(true);
+
+  }
+
+  function test_setBlockGasLimit_set_variable() {
+    blockchainParameters.setBlockGasLimit(gasLimit);
+    assertEq(blockchainParameters.blockGasLimit(), gasLimit); 
+  }
+
+  // function test_setBlockGasLimit_set_variable1() {
+  //   blockchainParameters.setBlockGasLimit(gasLimit);
+  //   assertEq(blockchainParameters.blockGasLimit(), gasLimit); 
+  // }
+
+}
