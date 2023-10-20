@@ -50,7 +50,3 @@ jobs:
         with:
           # This expects you to have a script called release which does a build for your packages and calls changeset publish
           publish: yarn release
-      - name: Remove Yarn
-        # https://github.com/actions/setup-node/issues/182
-        if: always()
-        run: npm uninstall -g yarn
