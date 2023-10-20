@@ -25,7 +25,7 @@ jobs:
         - '@celo/celocli@beta'
     steps:
       - name: Install @celo/celocli dependencies
-        if: matrix.package == '@celo/celocli'
+        if: matrix.package == '@celo/celocli@beta'
         run: |
           apt update
           apt install -y libusb-1.0-0-dev libudev-dev
