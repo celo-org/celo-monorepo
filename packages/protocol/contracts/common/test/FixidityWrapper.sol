@@ -2,7 +2,8 @@ pragma solidity ^0.5.13;
 
 import "../FixidityLib.sol";
 
-contract FixidityTest {
+// TODO rename file
+contract FixidityWrapper {
   using FixidityLib for FixidityLib.Fraction;
 
   function newFixed(uint256 a) external pure returns (uint256) {
