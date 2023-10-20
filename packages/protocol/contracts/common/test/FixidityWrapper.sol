@@ -2,7 +2,8 @@ pragma solidity ^0.5.13;
 
 import "../FixidityLib.sol";
 
-// TODO rename file
+// Fixidity needs a wrapper as
+
 contract FixidityWrapper {
   using FixidityLib for FixidityLib.Fraction;
 
