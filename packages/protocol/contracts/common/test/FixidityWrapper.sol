@@ -2,7 +2,7 @@ pragma solidity ^0.5.13;
 
 import "../FixidityLib.sol";
 
-// Fixidity needs a wrapper as
+// Fixidity needs a wrapper as it is a library
 
 contract FixidityWrapper {
   using FixidityLib for FixidityLib.Fraction;
