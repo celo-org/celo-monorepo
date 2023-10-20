@@ -1,3 +1,4 @@
+import { IdentifierPrefix, getIdentifierHash } from "@celo/odis-identifiers"
 import { ArtifactsSingleton } from "@celo/protocol/lib/artifactsSingleton"
 import {
   hasEntryInRegistry,
@@ -11,9 +12,7 @@ import { soliditySha3 } from "@celo/utils/lib/solidity"
 import BigNumber from "bignumber.js"
 import chai from "chai"
 import chaiSubset from "chai-subset"
-// tslint:disable-next-line: ordered-imports
-import { getIdentifierHash, IdentifierPrefix } from "@celo/odis-identifiers"
-import { spawn, SpawnOptions } from "child_process"
+import { SpawnOptions, spawn } from "child_process"
 import { keccak256 } from "ethereum-cryptography/keccak"
 import {
   GovernanceApproverMultiSigInstance,
