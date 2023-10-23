@@ -8,7 +8,6 @@ on:
   push:
     branches:
       - master
-      - martinvol/CR10_master
   pull_request:
     branches:
       - master
@@ -211,8 +210,10 @@ jobs:
   pre-protocol-test-release:
     name: Protocol Tests Prepare
     runs-on: ['self-hosted', 'monorepo-node18']
-      # Required root to install node12
-      options: --user root
+    # container: 
+    #   image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    #   # Required root to install node12
+    #   options: --user root
     timeout-minutes: 30
     # Comment lint-checks dependency to speed up (as this is a dependency for many other jobs)
     # needs: [install-dependencies, lint-checks]
