@@ -41,10 +41,7 @@ jobs:
       # Adding a initial comma so ',<path>' matches also for the first file
       all_modified_files: ',${{ steps.changed-files.outputs.all_modified_files }}'
     # runs-on: ubuntu-latest
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     steps:
       - name: Restore .git cache
@@ -140,10 +137,7 @@ jobs:
       - run: echo ",${{ steps.changed-files.outputs.all_modified_files }}"
   lint-checks:
     name: Lint code
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: install-dependencies
     steps:
@@ -163,10 +157,7 @@ jobs:
       - run: yarn run lint
   general_test:
     name: General jest test
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    runs-on: ['self-hosted', 'monorepo-node18']
     needs: install-dependencies
     steps:
       - uses: actions/cache/restore@v3
@@ -199,10 +190,7 @@ jobs:
           path: test-results/jest
   wallet-test:
     name: Wallet test
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: install-dependencies
     steps:
@@ -221,10 +209,7 @@ jobs:
           yarn run lerna --scope '@celo/wallet-*' run test
   pre-protocol-test-release:
     name: Protocol Tests Prepare
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    runs-on: ['self-hosted', 'monorepo-node18']
       # Required root to install node12
       options: --user root
     timeout-minutes: 30
@@ -284,10 +269,7 @@ jobs:
           yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
   protocol-test-release:
     name: Protocol Test Release
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
@@ -327,10 +309,7 @@ jobs:
   protocol-test-matrix:
     # Keeping name short because GitHub UI does not handle long names well
     name: ${{ matrix.name }}
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks]
     if: |
@@ -407,10 +386,7 @@ jobs:
             ${{ matrix.command }}
   contractkit-tests:
     name: ContractKit Tests
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
@@ -442,10 +418,7 @@ jobs:
           yarn --cwd=packages/sdk/contractkit test
   cli-tests:
     name: CeloCli Tests
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
@@ -489,10 +462,7 @@ jobs:
           yarn --cwd=packages/cli run celocli account:new
   typescript-tests:
     name: Typescript package Tests
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
@@ -521,10 +491,7 @@ jobs:
           npm install $RUNNER_WORKSPACE/celo-monorepo/packages/typescript/*.tgz
   base-test:
     name: SDK Base package Tests
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
@@ -560,10 +527,7 @@ jobs:
           npm install $RUNNER_WORKSPACE/celo-monorepo/packages/sdk/base/*.tgz
   utils-test:
     name: SDK Utils package Tests
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
@@ -598,10 +562,7 @@ jobs:
   end-to-end-geth-matrix:
     # Keeping name short because GitHub UI does not handle long names well
     name: e2e ${{ matrix.name }}
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks, contractkit-tests]
     if: |
@@ -698,10 +659,7 @@ jobs:
   # NOTE: This has not been fully tested as we don't have a license for certora
   certora-test:
     name: Certora test ${{ matrix.name }}
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks]
     # Disable as certora license is not active
