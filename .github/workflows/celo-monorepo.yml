@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - master
+      - martinvol/CR10_master
   pull_request:
     branches:
       - master
