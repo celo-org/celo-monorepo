@@ -12,7 +12,7 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { zeroAddress } from 'ethereumjs-util'
+import { ZERO_ADDRESS } from 'test/constants'
 import {
   AccountsContract,
   AccountsInstance,
@@ -1154,14 +1154,14 @@ contract('LockedGold', (accounts: string[]) => {
   describe('#delegateGovernanceVotes', () => {
     it('should revert when delegatee is not account', async () => {
       await assertTransactionRevertWithReason(
-        lockedGold.delegateGovernanceVotes(zeroAddress(), toFixed(10 / 100)),
+        lockedGold.delegateGovernanceVotes(ZERO_ADDRESS, toFixed(10 / 100)),
         'Must first register address with Account.createAccount'
       )
     })
 
     it('should revert when delegator is not an account', async () => {
       await assertTransactionRevertWithReason(
-        lockedGold.delegateGovernanceVotes(zeroAddress(), toFixed(10 / 100), { from: accounts[1] }),
+        lockedGold.delegateGovernanceVotes(ZERO_ADDRESS, toFixed(10 / 100), { from: accounts[1] }),
         'Must first register address with Account.createAccount'
       )
     })
@@ -1261,7 +1261,7 @@ contract('LockedGold', (accounts: string[]) => {
 
             it('should revert when incorrect percent amount is inserted', async () => {
               await assertTransactionRevertWithReason(
-                lockedGold.delegateGovernanceVotes(zeroAddress(), toFixed(101 / 100)),
+                lockedGold.delegateGovernanceVotes(ZERO_ADDRESS, toFixed(101 / 100)),
                 'Delegate fraction must be less than or equal to 1'
               )
             })
@@ -1513,7 +1513,7 @@ contract('LockedGold', (accounts: string[]) => {
 
             it('should revert when incorrect percent amount is inserted', async () => {
               await assertTransactionRevertWithReason(
-                lockedGold.delegateGovernanceVotes(zeroAddress(), toFixed(101 / 100)),
+                lockedGold.delegateGovernanceVotes(ZERO_ADDRESS, toFixed(101 / 100)),
                 'Delegate fraction must be less than or equal to 1'
               )
             })
@@ -1886,14 +1886,14 @@ contract('LockedGold', (accounts: string[]) => {
   describe('#revokeDelegatedGovernanceVotes()', () => {
     it('should revert when incorrect percent amount is inserted', async () => {
       await assertTransactionRevertWithReason(
-        lockedGold.revokeDelegatedGovernanceVotes(zeroAddress(), toFixed(101 / 100)),
+        lockedGold.revokeDelegatedGovernanceVotes(ZERO_ADDRESS, toFixed(101 / 100)),
         'Revoke fraction must be less than or equal to 1'
       )
     })
 
     it('should revert when nothing delegated', async () => {
       await assertTransactionRevertWithReason(
-        lockedGold.revokeDelegatedGovernanceVotes(zeroAddress(), toFixed(10 / 100)),
+        lockedGold.revokeDelegatedGovernanceVotes(ZERO_ADDRESS, toFixed(10 / 100)),
         'Not enough total delegated percents'
       )
     })
@@ -1927,7 +1927,7 @@ contract('LockedGold', (accounts: string[]) => {
 
         it('should revert when trying to revert more percent than delegated', async () => {
           await assertTransactionRevertWithReason(
-            lockedGold.revokeDelegatedGovernanceVotes(zeroAddress(), toFixed(100 / 100)),
+            lockedGold.revokeDelegatedGovernanceVotes(ZERO_ADDRESS, toFixed(100 / 100)),
             'Not enough total delegated percents'
           )
         })
@@ -2245,7 +2245,7 @@ contract('LockedGold', (accounts: string[]) => {
 
         it('should revert when trying to revert more percent than delegated', async () => {
           await assertTransactionRevertWithReason(
-            lockedGold.revokeDelegatedGovernanceVotes(zeroAddress(), toFixed(100 / 100)),
+            lockedGold.revokeDelegatedGovernanceVotes(ZERO_ADDRESS, toFixed(100 / 100)),
             'Not enough total delegated percents'
           )
         })
