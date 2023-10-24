@@ -299,7 +299,7 @@ jobs:
           (cp -r packages/protocol/.tmp/released_chain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 20
+        timeout-minutes: 120
         if: true
         with:
           limit-access-to-actor: true
