@@ -23,6 +23,11 @@ oracle:
         {exchange: 'BINANCE', symbol: 'EURUSDT', toInvert: true},
         {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
       ],
+      [
+        {exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'BINANCE', symbol: 'EURUSDT', toInvert: true},
+        {exchange: 'XIGNITE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
 
       [
         {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
@@ -36,6 +41,12 @@ oracle:
         {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false},
         {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
       ],
+      [
+        {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
+        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: true},
+        {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'XIGNITE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
 
       [
         {exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false},
@@ -46,6 +57,11 @@ oracle:
         {exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false},
         {exchange: 'BITSTAMP', symbol: 'USDTEUR', toInvert: false},
         {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'BITSTAMP', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'XIGNITE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
       ],
 
       [
@@ -58,6 +74,11 @@ oracle:
         {exchange: 'KRAKEN', symbol: 'USDTEUR', toInvert: false},
         {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
       ],
+      [
+        {exchange: 'KUCOIN', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'XIGNITE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
 
       [
         {exchange: 'BITGET', symbol: 'CELOUSDT', toInvert: false},
@@ -68,6 +89,11 @@ oracle:
         {exchange: 'BITGET', symbol: 'CELOUSDT', toInvert: false},
         {exchange: 'BITGET', symbol: 'USDTEUR', toInvert: false},
         {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'BITGET', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'BITGET', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'XIGNITE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
       ]
     ]"
       # Additional sources missing adapters [
@@ -76,7 +102,7 @@ oracle:
       #   {exchange: 'KRAKEN', symbol: 'BTCEUR', toInvert: false},
       #   {exchange: 'ALPHAVANTAGE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
       # ]
-  minPriceSourceCount: 6
+  minPriceSourceCount: 9
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
