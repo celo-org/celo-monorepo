@@ -49,7 +49,7 @@ export const handler = async (argv: Argv) => {
           true
         )
         return false
-      } catch ([error, stdout, stderr]) {
+      } catch ([error, stdout, stderr]: any) {
         if (typeof stdout === 'string') {
           const healthyInstances = JSON.parse(stdout).length
           return healthyInstances === 0

@@ -68,7 +68,7 @@ export default class Approve extends BaseCommand {
         .proposalExists(id)
         .proposalInStage(
           id,
-          governanceVersion.storage === '1' && governanceVersion.major < 3
+          governanceVersion.storage === '1' && Number(governanceVersion.major) < 3
             ? 'Approval'
             : 'Referendum'
         )

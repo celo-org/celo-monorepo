@@ -472,7 +472,7 @@ export class InteractiveProposalBuilder {
 
       // prompt for function
       const functionPromptName = contractName + ' Function'
-      const functionAnswer = await inquirer.prompt({
+      const functionAnswer: { [functionPromptName: string]: string } = await inquirer.prompt({
         name: functionPromptName,
         type: 'list',
         choices: txMethodNames,
@@ -483,6 +483,7 @@ export class InteractiveProposalBuilder {
 
       // prompt individually for each argument
       const args = []
+
       for (const functionInput of txDefinition.inputs!) {
         const inputAnswer = await inquirer.prompt({
           name: functionInput.name,
