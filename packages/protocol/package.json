@@ -57,7 +57,7 @@
     "@celo/utils": "^5.0.5",
     "@celo/wallet-local": "^5.1.0",
     "@ethereumjs/util": "8.0.5",
-    "@ethereumjs/vm": "npm:@soloseng/ethereumjs-vm@6.4.1",
+    "@ethereumjs/vm": "npm:@celo/ethereumjs-vm@6.4.1-unofficial.0",
     "@ganache/console.log": "0.3.0",
     "@openzeppelin/contracts8": "npm:@openzeppelin/contracts@^4.4.2",
     "@openzeppelin/upgrades": "^2.8.0",
