@@ -124,5 +124,8 @@
     "typechain": "1.0.5",
     "typechain-target-truffle": "1.0.2",
     "yargs": "^14.0.0"
+  },
+  "resolutions": {
+    "@ethereumjs/vm": "npm:@soloseng/ethereumjs-vm@6.4.1"
   }
 }
