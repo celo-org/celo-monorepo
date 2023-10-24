@@ -61,3 +61,5 @@ mv build/contracts-* $BUILD_DIR
 mv "$PWD/devchain.tar.gz" $BUILD_DIR/.
 
 git checkout -
+
+yarn install >> $LOG_FILE
