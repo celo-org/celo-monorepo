@@ -6,10 +6,10 @@ import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/rep
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { makeTruffleContractForMigrationWithoutSingleton } from '@celo/protocol/lib/web3-utils'
 import { Address, NULL_ADDRESS, eqAddress } from '@celo/utils/lib/address'
 import { TruffleContract } from '@truffle/contract'
-import { SOLIDITY_08_PACKAGE } from 'contractPackages'
 
 // tslint:disable-next-line: ordered-imports
 
@@ -312,7 +312,7 @@ module.exports = async (callback: (error?: any) => number) => {
       try {
         contractArtifact = await artifacts.require(contractName)
       } catch {
-        // it wasn't found in the standard artifacts folder, check if it's
+        // it wasn't found in the standard artifacts folder, check if it's 0.8 contract
         // TODO this needs generalization to support more packages
         // https://github.com/celo-org/celo-monorepo/issues/10563
         contractArtifact = makeTruffleContractForMigrationWithoutSingleton(
