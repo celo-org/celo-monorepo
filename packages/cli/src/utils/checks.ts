@@ -503,6 +503,8 @@ class CheckBuilder {
 
     if (!allPassed) {
       return this.cmd.error("Some checks didn't pass!")
+    } else {
+      console.log(`All checks passed`)
     }
   }
 
