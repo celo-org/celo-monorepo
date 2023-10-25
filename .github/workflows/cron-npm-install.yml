@@ -15,21 +15,21 @@ jobs:
     name: ${{ matrix.package }} NPM package install
     runs-on: ubuntu-latest
     container:
-      image: node:16-bullseye
+      image: node:18-bullseye
     strategy:
       fail-fast: false
       matrix:
         package:
-        - '@celo/typescript'
-        - '@celo/utils'
-        - '@celo/contractkit'
-        - '@celo/celocli'
+        - '@celo/utils@beta'
+        - '@celo/contractkit@beta'
+        - '@celo/celocli@beta'
     steps:
       - name: Install @celo/celocli dependencies
-        if: matrix.package == '@celo/celocli'
+        if: matrix.package == '@celo/celocli@beta'
         run: |
           apt update
           apt install -y libusb-1.0-0-dev libudev-dev
+          yarn global add node-gyp
       - name: Installing npm package
         run: yarn add ${{ matrix.package }}
       - name: Test celocli command
