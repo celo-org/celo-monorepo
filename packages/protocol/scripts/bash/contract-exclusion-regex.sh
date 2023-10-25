@@ -31,10 +31,10 @@ if [ $VERSION_NUMBER -gt 9 ]
   CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|SortedOracles"
 fi
 
-
-if [ $VERSION_NUMBER -gt 10 ]
+# TODO remove this after merge by fixing the report creation scipt to include GasPriceMinimum
+if [ $VERSION_NUMBER -gt 9 ]
   then
-  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|GasPriceMinimum" # TODO remove this after merge
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|GasPriceMinimum"
 fi
 
 echo "CONTRACT_EXCLUSION_REGEX"
