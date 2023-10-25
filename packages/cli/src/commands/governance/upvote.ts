@@ -1,3 +1,4 @@
+import { GovernanceWrapper } from '@celo/contractkit/src/wrappers/Governance'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
@@ -29,6 +30,43 @@ export default class Upvote extends BaseCommand {
       .runChecks()
 
     const account = await (await this.kit.contracts.getAccounts()).voteSignerToAccount(signer)
-    await displaySendTx('upvoteTx', await governance.upvote(id, account), {}, 'ProposalUpvoted')
+
+    const consideredProposals = await this.dequeueAllPossibleProposals(governance as any)
+
+    if (!consideredProposals.some((k) => k.id === id)) {
+      await displaySendTx('upvoteTx', await governance.upvote(id, account), {}, 'ProposalUpvoted')
+    }
+  }
+
+  /**
+   * Dequeues all possible proposals, returns the ones that were considered to be dequeued.
+   */
+  async dequeueAllPossibleProposals(governance: GovernanceWrapper) {
+    const concurrentProposals = (await governance.concurrentProposals()).toNumber()
+    const queue = await governance.getQueue()
+    const originalLastDequeue = await governance.lastDequeue()
+
+    let consideredProposals
+
+    for (let index = 0; index < queue.length / concurrentProposals + 1; index++) {
+      consideredProposals = (
+        await Promise.all(
+          queue
+            .slice(0, concurrentProposals)
+            .map((p) => p.proposalID)
+            .map(async (id) => {
+              const expired = await governance.isQueuedProposalExpired(id)
+              return { id: id.toString(), expired }
+            })
+        )
+      ).filter((k) => k.expired === false)
+
+      await displaySendTx('dequeue', governance.dequeueProposalsIfReady(), {})
+      if (originalLastDequeue !== (await governance.lastDequeue())) {
+        break
+      }
+    }
+
+    return consideredProposals ?? []
   }
 }
