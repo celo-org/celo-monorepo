@@ -41,11 +41,17 @@ if command -v lsof; then
     echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
 fi
 
+rm -rf build/contracts*
+cd ../..
+yarn run reset
+yarn install >> $LOG_FILE
+yarn build >> $LOG_FILE
+cd packages/protocol
+
 echo "- Verify bytecode of the network"
 
-rm -rf build/contracts*
 
-yarn build >> $LOG_FILE
+# yarn build >> $LOG_FILE
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts --branch $BRANCH --librariesFile libraries.json
 
 echo "- Check versions of current branch"
