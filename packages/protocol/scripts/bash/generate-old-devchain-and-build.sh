@@ -62,6 +62,8 @@ mv "$PWD/devchain.tar.gz" $BUILD_DIR/.
 
 git checkout -
 
+cd ../..
 yarn run reset
+cd packages/protocol
 
 yarn install >> $LOG_FILE
