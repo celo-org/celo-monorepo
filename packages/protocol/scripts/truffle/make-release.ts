@@ -121,10 +121,10 @@ const deployImplementation = async (
   // Hack to trick truffle, which checks that the provided address has code
   let contract
   try {
-    await (dryRun ? Contract.at(celoRegistryAddress) : Contract.new(testingDeployment))
+    contract = await (dryRun ? Contract.at(celoRegistryAddress) : Contract.new(testingDeployment))
   } catch (error) {
     console.log('Truffle error is: ')
-    console.log('erro')
+    console.log(error)
   }
 
   // Sanity check that any contracts that are being changed set a version number.
