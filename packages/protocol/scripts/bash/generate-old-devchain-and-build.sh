@@ -44,7 +44,7 @@ cd ../..
 
 # build entire monorepo to account for any required dependencies.
 yarn install >> $LOG_FILE
-yarn run clean >> $LOG_FILE
+# yarn run clean >> $LOG_FILE
 # in release v8 and earlier, @celo/contractkit automatically uses set RELEASE_TAG
 # when building, which fails if this differs from `package/protocol`'s build directory.
 RELEASE_TAG="" yarn build >> $LOG_FILE
@@ -57,7 +57,7 @@ else
   yarn devchain generate-tar "$PWD/devchain.tar.gz" --release_gold_contracts $GRANTS_FILE >> $LOG_FILE
 fi
 rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
-mv build/contracts-* $BUILD_DIR
+mv build/contracts* $BUILD_DIR
 mv "$PWD/devchain.tar.gz" $BUILD_DIR/.
 
 git checkout -
