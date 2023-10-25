@@ -64,6 +64,6 @@ git checkout -
 
 cd ../..
 yarn run reset
-cd packages/protocol
-
 yarn install >> $LOG_FILE
+yarb build
+cd packages/protocol
