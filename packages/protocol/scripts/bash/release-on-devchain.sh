@@ -43,6 +43,8 @@ cd packages/protocol
 echo "- Run local network"
 yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE &
 
+sleep 60
+
 GANACHE_PID=
 if command -v lsof; then
     GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
