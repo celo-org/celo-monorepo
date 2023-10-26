@@ -35,18 +35,20 @@ fi
 echo "- Run local network"
 yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
 
-GANACHE_PID=
-if command -v lsof; then
-    GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
-    echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
-fi
-
 rm -rf build/contracts*
 cd ../..
 yarn run reset
 yarn install >> $LOG_FILE
 yarn build >> $LOG_FILE
 cd packages/protocol
+
+GANACHE_PID=
+# TODO install lsof in the CI
+if command -v lsof; then
+    GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
+    echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
+fi
+
 
 echo "- Verify bytecode of the network"
 
