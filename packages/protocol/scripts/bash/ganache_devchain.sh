@@ -14,6 +14,7 @@ done
 
 # --detach \
 yarn run ganache \
+  -v  \
   --wallet.mnemonic='concert load couple harbor equip island argue ramp clarify fence smart topic' \
   --miner.defaultGasPrice=0 \
   --miner.blockGasLimit=20000000 \
@@ -22,4 +23,5 @@ yarn run ganache \
   --chain.allowUnlimitedContractSize=true \
   --chain.chainId=1 \
   --chain.hardfork='istanbul' \
-  --database.dbPath=$DATA_DIR
+  --database.dbPath=$DATA_DIR \
+  --logging.debug
