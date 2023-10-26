@@ -13,7 +13,7 @@ done
 [ -z "$DATA_DIR" ] && echo "Need to set the datadir path via the -d flag" && exit 1;
 
 yarn run ganache \
-  --detach \
+  # --detach \
   --wallet.mnemonic='concert load couple harbor equip island argue ramp clarify fence smart topic' \
   --miner.defaultGasPrice=0 \
   --miner.blockGasLimit=20000000 \
