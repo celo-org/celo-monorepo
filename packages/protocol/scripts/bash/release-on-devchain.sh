@@ -41,7 +41,7 @@ yarn build >> $LOG_FILE
 cd packages/protocol
 
 echo "- Run local network"
-yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
+yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE &
 
 GANACHE_PID=
 if command -v lsof; then
@@ -71,12 +71,12 @@ git checkout - -- migrationsConfig.js
 
 # restart Ganache
 
-kill $GANACHE_PID
-yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
-if command -v lsof; then
-    GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
-    echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
-fi
+# kill $GANACHE_PID
+# yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
+# if command -v lsof; then
+#     GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
+#     echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
+# fi
 
 # From make-release.sh
 echo "- Deploy release of current branch"
