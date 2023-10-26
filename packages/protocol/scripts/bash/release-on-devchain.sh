@@ -49,9 +49,7 @@ if command -v lsof; then
     echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
 fi
 
-
 echo "- Verify bytecode of the network"
-
 
 # yarn build >> $LOG_FILE
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts --branch $BRANCH --librariesFile libraries.json
@@ -70,6 +68,15 @@ yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/cont
 
 echo "Undo checkout for migrationsConfig.js from $(git rev-parse HEAD) to $BASE_COMMIT"
 git checkout - -- migrationsConfig.js
+
+# restart Ganache
+
+kill $GANACHE_PID
+yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
+if command -v lsof; then
+    GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
+    echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
+fi
 
 # From make-release.sh
 echo "- Deploy release of current branch"
