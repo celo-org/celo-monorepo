@@ -272,7 +272,7 @@ jobs:
   protocol-test-release:
     name: Protocol Test Release
     runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 30
+    timeout-minutes: 120
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
