@@ -41,7 +41,7 @@ export class ArtifactsSingleton implements ArtifactSet{
   }
 
   public static getNetwork() {
-    console.log("getNetwork", getNetwork)
+    console.log("getNetwork", this.network)
     return this.network
   }
 
