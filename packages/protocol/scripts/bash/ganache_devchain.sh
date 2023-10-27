@@ -12,9 +12,8 @@ done
 
 [ -z "$DATA_DIR" ] && echo "Need to set the datadir path via the -d flag" && exit 1;
 
-# --detach \
 yarn run ganache \
-  -v  \
+  --detach \
   --wallet.mnemonic='concert load couple harbor equip island argue ramp clarify fence smart topic' \
   --miner.defaultGasPrice=0 \
   --miner.blockGasLimit=20000000 \
@@ -24,4 +23,3 @@ yarn run ganache \
   --chain.chainId=1 \
   --chain.hardfork='istanbul' \
   --database.dbPath=$DATA_DIR \
-  --logging.debug

@@ -41,7 +41,7 @@ yarn build >> $LOG_FILE
 cd packages/protocol
 
 echo "- Run local network"
-yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE &
+yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
 
 sleep 60
 

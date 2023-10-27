@@ -272,7 +272,7 @@ jobs:
   protocol-test-release:
     name: Protocol Test Release
     runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 120
+    timeout-minutes: 500
     needs: [install-dependencies, lint-checks, pre-protocol-test-release]
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
@@ -303,13 +303,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install vim lsof --yes
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
-          yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout || echo "failed"
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 120
-        if: true
-        with:
-          limit-access-to-actor: true
+          yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
+      #   timeout-minutes: 500
+      #   if: true
+      #   with:
+      #     limit-access-to-actor: true
   protocol-test-matrix:
     # Keeping name short because GitHub UI does not handle long names well
     name: ${{ matrix.name }}

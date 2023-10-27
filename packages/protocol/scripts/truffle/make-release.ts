@@ -120,6 +120,7 @@ const deployImplementation = async (
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
 
+  // without this delay it sometimes fails with ProviderError
   await delay(getRandomNumber(1, 1000))
 
   const contract = await (dryRun
