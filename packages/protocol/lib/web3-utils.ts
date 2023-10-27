@@ -8,6 +8,7 @@ import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { createInterfaceAdapter } from '@truffle/interface-adapter'
 import { BigNumber } from 'bignumber.js'
+import { execSync } from 'child_process'
 import path from 'path'
 import prompts from 'prompts'
 import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types'
@@ -266,7 +267,7 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
 
 }
 
-// TODO change name
+
 export const makeTruffleContractForMigrationWithoutSingleton = (contractName: string, network:any, contractPath:string, web3: Web3) => {
 
   const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath}/${contractName}.json`)
@@ -286,6 +287,9 @@ export const makeTruffleContractForMigrationWithoutSingleton = (contractName: st
   Contract.configureNetwork({networkType: "ethereum", provider: web3.currentProvider})
 
   Contract.defaults({from: network.from, gas: network.gas})
+
+  execSync("sleep 0.1")
+
   return Contract
 }
 
