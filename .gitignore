@@ -96,12 +96,14 @@ packages/docs/_book/
 # old packages
 packages/reserve-site/*
 packages/blockchain-api/*
-packages/komencikit/*
 packages/mobile/*
 packages/faucet/*
 packages/moonpay-auth/*
 packages/notification-service/*
 packages/react-components/*
+packages/phone-number-privacy/*
+packages/sdk/identity/*
+packages/sdk/encrypted-backup/*
 
 # temp json file for deploy-sdks script
 scripts/failedSDKs.json

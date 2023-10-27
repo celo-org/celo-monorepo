@@ -15,7 +15,7 @@ import {
   spawnCmd,
   spawnCmdWithExitOnFailure,
 } from './cmd-utils'
-import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
+import { envTypes, envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import {
@@ -110,7 +110,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
   }
 
   const envType = fetchEnv(envVar.ENV_TYPE)
-  if (envType !== EnvTypes.DEVELOPMENT) {
+  if (envType !== envTypes.DEVELOPMENT) {
     try {
       await execCmdWithExitOnFailure(
         `gcloud sql instances create ${instanceName}-replica --master-instance-name=${instanceName} --zone ${fetchEnv(
@@ -1397,4 +1397,12 @@ async function generateMyCeloGenesis(): Promise<string> {
   // Clean up the tmp dir as it's no longer needed
   await spawnCmd('rm', ['-rf', celoBlockchainDir], { silent: true })
   return genesisContent
+}
+
+function useDefaultNetwork() {
+  return fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) === 'celo-networks-dev'
+}
+
+export function networkName(celoEnv: string) {
+  return useDefaultNetwork() ? 'default' : `${celoEnv}-network`
 }

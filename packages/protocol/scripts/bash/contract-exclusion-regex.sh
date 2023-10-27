@@ -1,9 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
 # Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, inlined libraries,
 # MultiSig contracts, and the ReleaseGold contract.
 CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles"
 
+echo "old branch is $OLD_BRANCH"
+
 # Before CR7, UsingRegistry and UsingRegistryV2 had been deployed, they need to keep getting deployed to keep the release reports without changes.
 VERSION_NUMBER=$(echo "$OLD_BRANCH" | tr -dc '0-9')
+echo "version number is  $VERSION_NUMBER"
 
 if [ $VERSION_NUMBER -gt 6 ]
   then
@@ -24,3 +30,12 @@ if [ $VERSION_NUMBER -gt 9 ]
   then
   CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|SortedOracles"
 fi
+
+# TODO remove this after merge by fixing the report creation scipt to include GasPriceMinimum
+if [ $VERSION_NUMBER -gt 9 ]
+  then
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|GasPriceMinimum"
+fi
+
+echo "CONTRACT_EXCLUSION_REGEX"
+echo "$CONTRACT_EXCLUSION_REGEX"

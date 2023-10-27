@@ -2,7 +2,6 @@
   "lerna": "2.10.1",
   "packages": [
     "packages/*",
-    "packages/phone-number-privacy/*",
     "packages/sdk/*",
     "packages/sdk/wallets/*"
   ],

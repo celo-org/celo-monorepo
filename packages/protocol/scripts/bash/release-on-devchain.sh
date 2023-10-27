@@ -32,8 +32,18 @@ then
     BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
 fi
 
+
+rm -rf build/contracts*
+cd ../..
+yarn run reset
+yarn install >> $LOG_FILE
+yarn build >> $LOG_FILE
+cd packages/protocol
+
 echo "- Run local network"
 yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
+
+sleep 60
 
 GANACHE_PID=
 if command -v lsof; then
@@ -43,9 +53,7 @@ fi
 
 echo "- Verify bytecode of the network"
 
-rm -r build/contracts*
-
-yarn build >> $LOG_FILE
+# yarn build >> $LOG_FILE
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts --branch $BRANCH --librariesFile libraries.json
 
 echo "- Check versions of current branch"
@@ -56,12 +64,21 @@ echo " - Base commit $BASE_COMMIT"
 echo " - Checkout migrationsConfig.js at $BRANCH"
 git checkout $BRANCH -- migrationsConfig.js
 
-OLD_BRANCH=$BUILD_DIR
+OLD_BRANCH=$BRANCH
 source scripts/bash/contract-exclusion-regex.sh
 yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --output_file report.json
 
 echo "Undo checkout for migrationsConfig.js from $(git rev-parse HEAD) to $BASE_COMMIT"
 git checkout - -- migrationsConfig.js
+
+# restart Ganache
+
+# kill $GANACHE_PID
+# yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
+# if command -v lsof; then
+#     GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
+#     echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
+# fi
 
 # From make-release.sh
 echo "- Deploy release of current branch"

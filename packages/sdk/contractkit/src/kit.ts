@@ -1,3 +1,4 @@
+// tslint:disable: ordered-imports
 import {
   Address,
   CeloTx,
@@ -16,9 +17,9 @@ import { CeloContract, CeloTokenContract } from './base'
 import { CeloTokens, EachCeloToken } from './celo-tokens'
 import { ValidWrappers, WrapperCache } from './contract-cache'
 import {
+  HttpProviderOptions,
   ensureCurrentProvider,
   getWeb3ForKit,
-  HttpProviderOptions,
   setupAPIKey,
 } from './setupForKits'
 import { Web3ContractCache } from './web3-contract-cache'
@@ -200,18 +201,7 @@ export class ContractKit {
       tokenContract === CeloContract.GoldToken
         ? undefined
         : await this.registry.addressFor(tokenContract)
-    if (address) {
-      await this.updateGasPriceInConnectionLayer(address)
-    }
     this.connection.defaultFeeCurrency = address
-  }
-
-  /** @deprecated no longer needed since gasPrice is available on node rpc */
-  async updateGasPriceInConnectionLayer(currency: Address) {
-    const gasPriceMinimum = await this.contracts.getGasPriceMinimum()
-    const rawGasPrice = await gasPriceMinimum.getGasPriceMinimum(currency)
-    const gasPrice = rawGasPrice.multipliedBy(this.gasPriceSuggestionMultiplier).toFixed()
-    await this.connection.setGasPriceForCurrency(currency, gasPrice)
   }
 
   async getEpochSize(): Promise<number> {
@@ -258,14 +248,6 @@ export class ContractKit {
     return this.connection.defaultGasInflationFactor
   }
 
-  set gasPrice(price: number) {
-    this.connection.defaultGasPrice = price
-  }
-
-  get gasPrice() {
-    return this.connection.defaultGasPrice
-  }
-
   set defaultFeeCurrency(address: Address | undefined) {
     this.connection.defaultFeeCurrency = address
   }
@@ -280,13 +262,6 @@ export class ContractKit {
 
   isSyncing(): Promise<boolean> {
     return this.connection.isSyncing()
-  }
-  /** @deprecated no longer needed since gasPrice is available on node rpc */
-  async fillGasPrice(tx: CeloTx): Promise<CeloTx> {
-    if (tx.feeCurrency && tx.gasPrice === '0') {
-      await this.updateGasPriceInConnectionLayer(tx.feeCurrency)
-    }
-    return this.connection.fillGasPrice(tx)
   }
 
   async sendTransaction(tx: CeloTx): Promise<TransactionResult> {
