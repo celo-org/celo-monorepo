@@ -5,6 +5,8 @@ module.exports = async (deployer: any, network: any) => {
   const Migrations = artifacts.require('./Migrations.sol')
   deployer.deploy(Migrations)
 
+  console.log('network config is', network)
+
   const currentNetwork = { ...networks[network], name: network }
 
   // tslint:disable-next-line
