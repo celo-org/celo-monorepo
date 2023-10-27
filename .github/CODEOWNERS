@@ -11,16 +11,14 @@
 /packages/cli/ @celo-org/devtooling
 /packages/dev-utils/ @celo-org/devtooling
 /packages/docs/ @celo-org/devtooling @celo-org/devrel
-/packages/env-tests/ @celo-org/devtooling
+/packages/env-tests/ @celo-org/primitives
 /packages/faucet/ @celo-org/devtooling
 /packages/helm-charts/ @celo-org/devopsre
 /packages/helm-charts/blockscout/ @celo-org/data-services @celo-org/devopsre
 /packages/helm-charts/oracle/ @celo-org/mento  @celo-org/devopsre
 /packages/metadata-crawler/ @celo-org/data-services
-/packages/phone-number-privacy/ @celo-org/identity
 /packages/protocol/ @celo-org/primitives @celo-org/identity
 /packages/sdk/ @celo-org/devtooling
-/packages/sdk/identity/  @celo-org/identity @celo-org/devtooling
 /packages/sdk/contractkit/ @celo-org/devtooling
 /packages/terraform-modules-public/ @celo-org/devopsre
 /packages/terraform-modules/ @celo-org/devopsre
