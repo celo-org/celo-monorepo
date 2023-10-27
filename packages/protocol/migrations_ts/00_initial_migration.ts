@@ -1,3 +1,4 @@
+/* tslint:disable no-console */
 import { ArtifactsSingleton } from '../lib/artifactsSingleton'
 import { networks } from '../truffle-config.js'
 
