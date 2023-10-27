@@ -3,6 +3,7 @@ import { networks } from '../truffle-config.js'
 
 module.exports = async (deployer: any, network: any) => {
   const Migrations = artifacts.require('./Migrations.sol')
+  console.log('defaults', Migrations.defaults())
   deployer.deploy(Migrations)
 
   console.log('network config is', network)
