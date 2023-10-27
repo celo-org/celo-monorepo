@@ -119,6 +119,7 @@ const deployImplementation = async (
   }
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
+  Contract.setProvider(web3.currentProvider)
   const contract = await (dryRun
     ? Contract.at(celoRegistryAddress)
     : Contract.new(testingDeployment))
