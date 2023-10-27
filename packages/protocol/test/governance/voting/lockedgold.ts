@@ -10,9 +10,9 @@ import {
   createAndAssertDelegatorDelegateeSigners,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { ZERO_ADDRESS } from '@celo/protocol/test/constants'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { ZERO_ADDRESS } from 'test/constants'
 import {
   AccountsContract,
   AccountsInstance,
