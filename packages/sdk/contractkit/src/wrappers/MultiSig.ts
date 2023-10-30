@@ -19,6 +19,12 @@ export interface TransactionData {
   executed: boolean
   confirmations: string[]
 }
+export interface TransactionDataWithOutConfirmations {
+  destination: string
+  value: BigNumber
+  data: string
+  executed: boolean
+}
 
 /**
  * Contract for handling multisig actions
@@ -30,11 +36,7 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
    * Otherwise, submits the `txObject` to the multisig and add confirmation.
    * @param index The index of the pending withdrawal to withdraw.
    */
-  async submitOrConfirmTransaction(
-    destination: string,
-    txObject: CeloTxObject<any>,
-    value: string = '0'
-  ) {
+  async submitOrConfirmTransaction(destination: string, txObject: CeloTxObject<any>, value = '0') {
     const data = stringToSolidityBytes(txObject.encodeABI())
     const transactionCount = await this.contract.methods.getTransactionCount(true, true).call()
     let transactionId
@@ -81,33 +83,73 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
   ) {
     const data = stringToSolidityBytes(txo.encodeABI())
     const transactionCount = await this.getTransactionCount(true, true)
-    // reverse order for recency
-    for (let transactionId = transactionCount - 1; transactionId >= 0; transactionId--) {
-      const tx = await this.getTransaction(transactionId)
-      if (tx.data === data && tx.destination === destination && tx.value.isEqualTo(value)) {
-        return tx
-      }
+    const transactionsOrEmpties = await Promise.all(
+      Array(transactionCount)
+        .fill(0)
+        .map(async (_, index) => {
+          const tx = await this.getTransaction(index, false)
+          if (tx.data === data && tx.destination === destination && tx.value.isEqualTo(value)) {
+            return { index, ...tx }
+          }
+          return null
+        })
+    )
+    const wantedTransaction = transactionsOrEmpties.find((tx) => tx !== null)
+    if (!wantedTransaction) {
+      return
     }
-    return undefined
+    const confirmations = await this.getConfirmations(wantedTransaction.index)
+    return {
+      ...wantedTransaction,
+      confirmations,
+    }
   }
-
-  async getTransaction(i: number): Promise<TransactionData> {
+  async getTransaction(i: number): Promise<TransactionData>
+  async getTransaction(
+    i: number,
+    includeConfirmations: false
+  ): Promise<TransactionDataWithOutConfirmations>
+  async getTransaction(i: number, includeConfirmations = true) {
     const { destination, value, data, executed } = await this.contract.methods
       .transactions(i)
       .call()
-    const confirmations = []
-    for (const e of await this.getOwners()) {
-      if (await this.contract.methods.confirmations(i, e).call()) {
-        confirmations.push(e)
+    if (!includeConfirmations) {
+      return {
+        destination,
+        data,
+        executed,
+        value: new BigNumber(value),
       }
     }
+
+    const confirmations = await this.getConfirmations(i)
     return {
+      confirmations,
       destination,
       data,
       executed,
-      confirmations,
       value: new BigNumber(value),
     }
+  }
+
+  /*
+   * Returns array of signer addresses which have confirmed a transaction
+   * when given the index of that transaction.
+   */
+  async getConfirmations(txId: number) {
+    const owners = await this.getOwners()
+    const confirmationsOrEmpties = await Promise.all(
+      owners.map(async (owner) => {
+        const confirmation = await this.contract.methods.confirmations(txId, owner).call()
+        if (confirmation) {
+          return owner
+        } else {
+          return null
+        }
+      })
+    )
+    const confirmations = confirmationsOrEmpties.filter((c) => c !== null) as string[]
+    return confirmations
   }
 
   async getTransactions(): Promise<TransactionData[]> {

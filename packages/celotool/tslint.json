@@ -4,6 +4,12 @@
     "exclude": ["**/__mocks__/**", "**/lcov-report/**"]
   },
   "rules": {
+    "no-implicit-dependencies": [
+      false,
+      [
+        "src"
+      ]
+    ],
     "no-relative-imports": false,
     "max-classes-per-file": [true, 2],
     "no-global-arrow-functions": false,

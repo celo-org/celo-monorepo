@@ -2231,7 +2231,10 @@ contract('Governance', (accounts: string[]) => {
 
       it('should revert when the account weight is 0', async () => {
         await mockLockedGold.setAccountTotalGovernancePower(account, 0)
-        await assertRevert(governance.vote(proposalId, index, value))
+        await assertTransactionRevertWithReason(
+          governance.vote(proposalId, index, value),
+          'Voter weight zero'
+        )
       })
 
       it('should revert when the index is out of bounds', async () => {

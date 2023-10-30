@@ -5,10 +5,12 @@ import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
+
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { makeTruffleContractForMigrationWithoutSingleton } from '@celo/protocol/lib/web3-utils'
 import { Address, NULL_ADDRESS, eqAddress } from '@celo/utils/lib/address'
 import { TruffleContract } from '@truffle/contract'
-import { SOLIDITY_08_PACKAGE } from 'contractPackages'
+
 import { readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
 import { RegistryInstance } from 'types'
@@ -74,7 +76,6 @@ class ContractAddresses {
     if (this.addresses.has(contract)) {
       return this.addresses.get(contract)
     } else {
-      console.trace()
       throw new Error(`Unable to find address for ${contract}`)
     }
   }
@@ -113,9 +114,14 @@ const deployImplementation = async (
   }
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
+
+  // without this delay it sometimes fails with ProviderError
+  await delay(getRandomNumber(1, 1000))
+
   const contract = await (dryRun
     ? Contract.at(celoRegistryAddress)
     : Contract.new(testingDeployment))
+
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
@@ -306,7 +312,7 @@ module.exports = async (callback: (error?: any) => number) => {
       try {
         contractArtifact = await artifacts.require(contractName)
       } catch {
-        // it wasn't found in the standard artifacts folder, check if it's
+        // it wasn't found in the standard artifacts folder, check if it's 0.8 contract
         // TODO this needs generalization to support more packages
         // https://github.com/celo-org/celo-monorepo/issues/10563
         contractArtifact = makeTruffleContractForMigrationWithoutSingleton(

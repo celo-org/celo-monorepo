@@ -1,17 +1,18 @@
 {
   "name": "@celo/env-tests",
-  "version": "1.0.0",
+  "private": true,
+  "version": "1.0.1",
   "description": "Environment tests",
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@celo/contractkit": "4.1.1-dev",
-    "@celo/utils": "4.1.1-dev",
-    "@celo/base": "4.1.1-dev",
-    "@celo/connect": "4.1.1-dev",
-    "@celo/identity": "4.1.1-dev",
-    "@celo/phone-utils": "4.1.1-dev",
-    "@celo/cryptographic-utils": "4.1.1-dev",
+    "@celo/contractkit": "^5.1.0",
+    "@celo/utils": "^5.0.5",
+    "@celo/base": "^5.0.5",
+    "@celo/connect": "^5.1.0",
+    "@celo/phone-utils": "^5.0.5",
+    "@celo/cryptographic-utils": "^5.0.5",
+    "bignumber.js": "^9.0.0",
     "bunyan": "1.8.12",
     "bunyan-gke-stackdriver": "0.1.2",
     "bunyan-debug-stream": "2.0.0",
@@ -31,6 +32,7 @@
     "staging-test": "CELO_ENV=staging CELO_PROVIDER=https://staging-forno.celo-networks-dev.org jest --runInBand"
   },
   "devDependencies": {
+    "@jest/globals": "^29.5.0",
     "typescript": "4.4.3"
   }
 }

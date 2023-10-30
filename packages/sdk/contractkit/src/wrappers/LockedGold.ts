@@ -237,6 +237,21 @@ export class LockedGoldWrapper extends BaseWrapperForGoverning<LockedGold> {
   }
 
   /**
+   * Returns the pending withdrawal at a given index for a given account.
+   * @param account The address of the account.
+   * @param index The index of the pending withdrawal.
+   * @return The value of the pending withdrawal.
+   * @return The timestamp of the pending withdrawal.
+   */
+  async getPendingWithdrawal(account: string, index: number) {
+    const response = await this.contract.methods.getPendingWithdrawal(account, index).call()
+    return {
+      value: valueToBigNumber(response[0]),
+      time: valueToBigNumber(response[1]),
+    }
+  }
+
+  /**
    * Retrieves AccountSlashed for epochNumber.
    * @param epochNumber The epoch to retrieve AccountSlashed at.
    */
@@ -314,6 +329,17 @@ export class LockedGoldWrapper extends BaseWrapperForGoverning<LockedGold> {
     }
     return res
   }
+
+  /**
+   * Returns the number of pending withdrawals for the specified account.
+   * @param account The account.
+   * @returns The count of pending withdrawals.
+   */
+  getTotalPendingWithdrawalsCount = proxyCall(
+    this.contract.methods.getTotalPendingWithdrawalsCount,
+    undefined,
+    valueToBigNumber
+  )
 }
 
 export type LockedGoldWrapperType = LockedGoldWrapper

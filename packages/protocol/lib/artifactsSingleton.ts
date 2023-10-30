@@ -1,8 +1,5 @@
 import { ContractPackage } from '../contractPackages';
 
-
-
-
 // Defines a minimal interface an artifact should implement
 export interface ArtifactSet {
   require(key: string): any;
