@@ -11,7 +11,7 @@ import "../contracts/governance/test/MockValidators.sol";
 import "../contracts/common/Registry.sol";
 import "../contracts/common/Accounts.sol";
 
-contract AttestationsTest is Test {
+contract AttestationsFoundryTest is Test {
   enum KeyOffsets {
     VALIDATING_KEY_OFFSET,
     ATTESTING_KEY_OFFSET,
@@ -37,13 +37,51 @@ contract AttestationsTest is Test {
   uint256 callerPK3;
   address nonIssuer = actor("nonIssuer");
   string phoneNumber = "+18005551212";
-  bytes32 phoneHash = keccak256(phonenumber);
+  bytes32 phoneHash;
 
   uint256 attestationsRequested = 3;
   uint256 attestationExpiryBlocks = (60 * 60) / 5;
   uint256 selectIssuersWaitBlocks = 4;
   uint256 maxAttestations = 20;
   uint256 attestationFee = 0.5 ether;
+
+  event AttestationsRequested(
+    bytes32 indexed identifier,
+    address indexed account,
+    uint256 attestationsRequested,
+    address attestationRequestFeeToken
+  );
+
+  event AttestationIssuerSelected(
+    bytes32 indexed identifier,
+    address indexed account,
+    address indexed issuer,
+    address attestationRequestFeeToken
+  );
+
+  event AttestationCompleted(
+    bytes32 indexed identifier,
+    address indexed account,
+    address indexed issuer
+  );
+
+  event Withdrawal(address indexed account, address indexed token, uint256 amount);
+  event AttestationExpiryBlocksSet(uint256 value);
+  event AttestationRequestFeeSet(address indexed token, uint256 value);
+  event SelectIssuersWaitBlocksSet(uint256 value);
+  event MaxAttestationsSet(uint256 value);
+  event AttestationsTransferred(
+    bytes32 indexed identifier,
+    address indexed fromAccount,
+    address indexed toAccount
+  );
+  event TransferApproval(
+    address indexed approver,
+    bytes32 indexed indentifier,
+    address from,
+    address to,
+    bool approved
+  );
 
   // function getDerivedKey(uint8 offset, uint256 privateKey) public pure returns (bytes32) {
   //     bytes32 aKey;
@@ -59,10 +97,14 @@ contract AttestationsTest is Test {
   //     }
   //     return result;
   //   }
-  function getDerivedKey(uint8 offset, uint256 privateKey) public pure returns (uint256) {
+  function getDerivedKey(AttestationsFoundryTest.KeyOffsets offset, uint256 privateKey)
+    public
+    pure
+    returns (uint256)
+  {
     bytes32 aKey = bytes32(privateKey);
     bytes1 firstByte = aKey[0];
-    bytes1 newByte = bytes1(uint8(firstByte) + offset);
+    bytes1 newByte = bytes1(uint8(firstByte) + uint8(offset));
 
     bytes32 shiftedKey = aKey >> 8; // Shift right to remove the first byte
     bytes32 result = (shiftedKey << 8) | bytes32(newByte); // Add the new byte
@@ -70,11 +112,11 @@ contract AttestationsTest is Test {
     return uint256(result);
   }
 
-  function getAddressFromPrivateKey(uint256 privateKey) returns (address) {
+  function getAddressFromPrivateKey(uint256 privateKey) public returns (address) {
     return vm.addr(privateKey);
   }
 
-  function activateAddress(address account, uint256 tokenBalance) {
+  function activateAddress(address account, uint256 tokenBalance) public {
     mockERC20Token.mint(account, tokenBalance);
     otherMockERC20Token.mint(account, tokenBalance);
     vm.prank(account);
@@ -90,7 +132,7 @@ contract AttestationsTest is Test {
     return vm.sign(privateKey, prefixedHash);
   }
 
-  function prepareAccount(address account, uint256 accountPK) {
+  function prepareAccount(address account, uint256 accountPK) public {
     mockERC20Token.mint(account, 10 ether);
     otherMockERC20Token.mint(account, 10 ether);
     vm.prank(account);
@@ -125,6 +167,8 @@ contract AttestationsTest is Test {
   }
 
   function setUp() public {
+    phoneHash = keccak256(abi.encodePacked(phoneNumber));
+
     attestationsTest = new AttestationsTest();
     mockERC20Token = new MockERC20Token();
     otherMockERC20Token = new MockERC20Token();
@@ -147,16 +191,16 @@ contract AttestationsTest is Test {
     prepareAccount(caller2, callerPK2);
     prepareAccount(caller3, callerPK3);
 
-    address[] memory electedValidators = new address[]();
-    electedValidators.push(
-      getAddressFromPrivateKey(getDerivedKey(KeyOffsets.VALIDATING_KEY_OFFSET, callerPK))
+    address[] memory electedValidators = new address[](1);
+    electedValidators[0] = getAddressFromPrivateKey(
+      getDerivedKey(KeyOffsets.VALIDATING_KEY_OFFSET, callerPK)
     );
     mockElection.setElectedValidators(electedValidators);
 
     registry.setAddressFor("Election", address(mockElection));
     registry.setAddressFor("LockedGold", address(mockLockedGold));
     registry.setAddressFor("Random", address(random));
-    registry.setAddressFor("Accounts", address(account));
+    registry.setAddressFor("Accounts", address(accounts));
 
     address[] memory mockTokens = new address[](2);
     mockTokens[0] = address(mockERC20Token);
@@ -179,17 +223,138 @@ contract AttestationsTest is Test {
   }
 
   function setAccountWalletAddress() public {
-    accountsInstance.setWalletAddress(caller, bytes32(0), bytes32(0), bytes32(0));
+    accounts.setWalletAddress(caller, 0, bytes32(0), bytes32(0));
   }
 }
 
-contract AttestationsInitialize is IdentityProxyTestFoundry {
+contract AttestationsInitialize is AttestationsFoundryTest {
   function setUp() public {
     super.setUp();
   }
 
   function test_ShouldHaveSetAttestationExpiryBlocks() public {
-    assertEq(attestations.attestationExpiryBlocks(), attestationExpiryBlocks);
+    assertEq(attestationsTest.attestationExpiryBlocks(), attestationExpiryBlocks);
   }
 
+  function test_ShouldHaveSetTheFee() public {
+    assertEq(attestationsTest.attestationRequestFees(address(mockERC20Token)), attestationFee);
+    assertEq(attestationsTest.attestationRequestFees(address(otherMockERC20Token)), attestationFee);
+  }
+
+  function test_ShouldNotBeCallableAgain() public {
+    vm.expectRevert("contract already initialized");
+    attestationsTest.initialize(
+      address(registry),
+      attestationExpiryBlocks,
+      selectIssuersWaitBlocks,
+      maxAttestations,
+      new address[](0),
+      new uint256[](0)
+    );
+  }
+}
+
+contract AttestationsSetAttestationsExpirySeconds is AttestationsFoundryTest {
+  uint256 newMaxNumBlocksPerAttestation = attestationExpiryBlocks + 1;
+
+  function setUp() public {
+    super.setUp();
+  }
+
+  function test_SetAttestationsExpiryBlocks() public {
+    attestationsTest.setAttestationExpiryBlocks(newMaxNumBlocksPerAttestation);
+    assertEq(attestationsTest.attestationExpiryBlocks(), newMaxNumBlocksPerAttestation);
+  }
+
+  function test_ShouldEmitAttestationExpiryBlocksSetEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit AttestationExpiryBlocksSet(newMaxNumBlocksPerAttestation);
+    attestationsTest.setAttestationExpiryBlocks(newMaxNumBlocksPerAttestation);
+  }
+
+  function test_ShouldRevertWhenSetByNonOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(nonIssuer);
+    attestationsTest.setAttestationExpiryBlocks(newMaxNumBlocksPerAttestation);
+  }
+}
+
+contract AttestationsSetAttestationsRequestFee is AttestationsFoundryTest {
+  uint256 newAttestationFee = attestationExpiryBlocks + 1;
+
+  function setUp() public {
+    super.setUp();
+  }
+
+  function test_SetAttestationsRequestFee() public {
+    attestationsTest.setAttestationRequestFee(address(mockERC20Token), newAttestationFee);
+    assertEq(attestationsTest.getAttestationRequestFee(address(mockERC20Token)), newAttestationFee);
+  }
+
+  function test_ShouldRevertWhenSetTo0() public {
+    vm.expectRevert("You have to specify a fee greater than 0");
+    attestationsTest.setAttestationRequestFee(address(mockERC20Token), 0);
+  }
+
+  function test_ShouldEmitAttestationRequestFeeSetEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit AttestationRequestFeeSet(address(mockERC20Token), newAttestationFee);
+    attestationsTest.setAttestationRequestFee(address(mockERC20Token), newAttestationFee);
+  }
+
+  function test_ShouldRevertWhenSetByNonOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(nonIssuer);
+    attestationsTest.setAttestationRequestFee(address(mockERC20Token), newAttestationFee);
+  }
+}
+
+contract AttestationsSetSelectedIssuersWaitBlock is AttestationsFoundryTest {
+  uint256 newSelectIssuersWaitBlocks = selectIssuersWaitBlocks + 1;
+
+  function setUp() public {
+    super.setUp();
+  }
+
+  function test_SelectedIssuersWaitBlock() public {
+    attestationsTest.setSelectIssuersWaitBlocks(newSelectIssuersWaitBlocks);
+    assertEq(attestationsTest.selectIssuersWaitBlocks(), newSelectIssuersWaitBlocks);
+  }
+
+  function test_ShouldEmitAttestationRequestFeeSetEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit SelectIssuersWaitBlocksSet(newSelectIssuersWaitBlocks);
+    attestationsTest.setSelectIssuersWaitBlocks(newSelectIssuersWaitBlocks);
+  }
+
+  function test_ShouldRevertWhenSetByNonOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(nonIssuer);
+    attestationsTest.setSelectIssuersWaitBlocks(newSelectIssuersWaitBlocks);
+  }
+}
+
+contract AttestationsSetMaxAttestations is AttestationsFoundryTest {
+  uint256 newMaxAttestations = maxAttestations + 1;
+
+  function setUp() public {
+    super.setUp();
+  }
+
+  function test_SelectedIssuersWaitBlock() public {
+    attestationsTest.setMaxAttestations(newMaxAttestations);
+    assertEq(attestationsTest.maxAttestations(), newMaxAttestations);
+  }
+
+  function test_ShouldEmitAttestationRequestFeeSetEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit MaxAttestationsSet(newMaxAttestations);
+    attestationsTest.setMaxAttestations(newMaxAttestations);
+  }
+
+  function test_ShouldRevertWhenSetByNonOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(nonIssuer);
+    attestationsTest.setMaxAttestations(newMaxAttestations);
+  }
 }
