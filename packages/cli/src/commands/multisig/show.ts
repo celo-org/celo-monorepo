@@ -35,7 +35,7 @@ export default class ShowMultiSig extends BaseCommand {
     const multisig = await this.kit.contracts.getMultiSig(args.address)
     const txs = await multisig.totalTransactionCount()
     const explorer = await newBlockExplorer(this.kit)
-    explorer.updateContractDetailsMapping(CeloContract.MultiSig, args.address)
+    await explorer.updateContractDetailsMapping(CeloContract.MultiSig, args.address)
     const process = async (txdata: TransactionData) => {
       if (raw) return txdata
       return { ...txdata, data: await explorer.tryParseTxInput(txdata.destination, txdata.data) }
