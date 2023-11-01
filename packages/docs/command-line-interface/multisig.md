@@ -1,7 +1,30 @@
 # `celocli multisig`
 
-Shows information about multi-sig contract
+Approves an existing transaction on a multi-sig contract
 
+
+## `celocli multisig:approve`
+
+Approves an existing transaction on a multi-sig contract
+
+```
+Approves an existing transaction on a multi-sig contract
+
+USAGE
+  $ celocli multisig:approve
+
+OPTIONS
+  --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Account Address
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+  --globalHelp                                       View all available global flags
+  --tx=tx                                            (required) Transaction to approve
+
+EXAMPLE
+  approve --from 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --for
+  0x5409ed021d9299bf6814279a6a1411a7e866a631 --tx 3
+```
+
+_See code: [src/commands/multisig/approve.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/multisig/approve.ts)_
 
 ## `celocli multisig:show ADDRESS`
 
