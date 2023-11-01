@@ -11,4 +11,3 @@ yarn run ganache \
   --wallet.defaultBalance=200000000 \
   --chain.allowUnlimitedContractSize=true \
   --chain.chainId=1 \
-  --chain.hardfork='istanbul'

@@ -236,8 +236,10 @@ export const verifyBytecodes = async (
   }
 
   const queue = contracts.filter(
-    (contract) => !ignoredContracts.includes(contract) && compiledContracts.includes(contract)
-  )
+    (contract) => !ignoredContracts.includes(contract)
+    ).filter(
+      (contract) => compiledContracts.includes(contract)
+      )
 
   const visited: Set<string> = new Set(queue)
 

@@ -4,4 +4,3 @@ certoraRun specs/harnesses/GoldTokenHarness.sol specs/harnesses/LockedGoldHarnes
   --optimistic_loop \
   --short_output \
   --msg "LockedGold" \
-  --solc_args "['--evm-version', 'istanbul']"

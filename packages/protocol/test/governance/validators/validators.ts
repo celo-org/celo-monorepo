@@ -593,7 +593,19 @@ contract('Validators', (accounts: string[]) => {
         const publicKey = await addressToPublicKey(signer, web3.eth.sign)
         await assertTransactionRevertWithReason(
           validators.registerValidator(publicKey, blsPublicKey, blsPoP),
-          'Validators cannot vote for more than max number of groups'
+          'Cannot vote for more than max number of groups'
+        )
+      })
+
+      it('should revert when delegating Celo', async () => {
+        await mockLockedGold.setAccountTotalDelegatedAmountInPercents(validator, 10)
+        const signer = accounts[9]
+        const sig = await getParsedSignatureOfAddress(web3, validator, signer)
+        await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
+        const publicKey = await addressToPublicKey(signer, web3.eth.sign)
+        await assertTransactionRevertWithReason(
+          validators.registerValidator(publicKey, blsPublicKey, blsPoP),
+          'Cannot delegate governance power'
         )
       })
 
@@ -1362,7 +1374,25 @@ contract('Validators', (accounts: string[]) => {
         const publicKey = await addressToPublicKey(signer, web3.eth.sign)
         await assertTransactionRevertWithReason(
           validators.registerValidator(publicKey, blsPublicKey, blsPoP),
-          'Validators cannot vote for more than max number of groups'
+          'Cannot vote for more than max number of groups'
+        )
+      })
+
+      it('should revert when vote over max number of groups set to true', async () => {
+        await mockElection.setAllowedToVoteOverMaxNumberOfGroups(group, true)
+        await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)
+        await assertTransactionRevertWithReason(
+          validators.registerValidatorGroup(commission),
+          'Cannot vote for more than max number of groups'
+        )
+      })
+
+      it('should revert when vote over max number of groups set to true', async () => {
+        await mockLockedGold.setAccountTotalDelegatedAmountInPercents(group, 10)
+        await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)
+        await assertTransactionRevertWithReason(
+          validators.registerValidatorGroup(commission),
+          'Cannot delegate governance power'
         )
       })
 

@@ -36,7 +36,10 @@
   },
   "devDependencies": {
     "web3": "1.10.0",
-    "web3-eth-abi": "1.10.0"
+    "web3-core": "1.10.0",
+    "web3-eth": "1.10.0",
+    "web3-eth-abi": "1.10.0",
+    "web3-eth-contract": "1.10.0"
   },
   "peerDependencies": {
     "web3": "1.10.0"
