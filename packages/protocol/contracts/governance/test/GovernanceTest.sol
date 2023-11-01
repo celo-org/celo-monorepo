@@ -23,6 +23,13 @@ contract GovernanceTest is Governance(true) {
     validatorSet.push(validator);
   }
 
+  // exposes removeVotesWhenRevokingDelegatedVotes for tests
+  function removeVotesWhenRevokingDelegatedVotesTest(address account, uint256 maxAmountAllowed)
+    public
+  {
+    _removeVotesWhenRevokingDelegatedVotes(account, maxAmountAllowed);
+  }
+
   function setDeprecatedWeight(address voterAddress, uint256 proposalIndex, uint256 weight)
     external
   {

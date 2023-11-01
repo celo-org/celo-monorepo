@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
 # Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, inlined libraries,
 # MultiSig contracts, and the ReleaseGold contract.
 CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles"
@@ -8,4 +11,26 @@ VERSION_NUMBER=$(echo "$OLD_BRANCH" | tr -dc '0-9')
 if [ $VERSION_NUMBER -gt 6 ]
   then
   CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|^UsingRegistry"
+fi
+
+
+
+if [ $VERSION_NUMBER -gt 8 ]
+  then
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|^Ownable|Initializable|BLS12_377Passthrough|BLS12_381Passthrough]UniswapV2ERC20"
+fi
+
+  # https://github.com/celo-org/celo-monorepo/issues/10435
+  # SortedOracles is currently not deployable
+  # after fixing that this should be modified to VERSION_NUMBER==10
+if [ $VERSION_NUMBER -gt 9 ]
+  then
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|SortedOracles"
+fi
+
+# TODO remove this after merge by fixing the report creation scipt to include GasPriceMinimum (0.8 contracts)
+# https://github.com/celo-org/celo-monorepo/issues/10567
+if [ $VERSION_NUMBER -gt 9 ]
+  then
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|GasPriceMinimum"
 fi
