@@ -1,6 +1,9 @@
 {
   "oldArtifactsFolder": "build/core-contracts.v4/contracts",
-  "newArtifactsFolder": "build/core-contracts.v5/contracts",
+  "newArtifactsFolder": [
+    "build/core-contracts.v5/contracts",
+    "build/core-contracts.v5/contracts-0.8"
+  ],
   "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles/",
   "report": {
     "contracts": {

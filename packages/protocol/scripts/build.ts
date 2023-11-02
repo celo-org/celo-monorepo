@@ -1,11 +1,12 @@
 /* tslint:disable no-console */
+
 import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
-import { readFileSync } from 'fs'
-import minimist from 'minimist'
+import { existsSync, readJSONSync } from 'fs-extra'
+import minimist, { ParsedArgs } from 'minimist'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
-import { MENTO_PACKAGE } from '../contractPackages'
+import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 
 const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
 const BUILD_DIR = path.join(ROOT_DIR, process.env.BUILD_DIR ?? './build')
@@ -20,8 +21,9 @@ export const ProxyContracts = [
   'EpochRewardsProxy',
   'EscrowProxy',
   'FederatedAttestationsProxy',
+  'FeeHandlerProxy',
+  'MentoFeeHandlerSellerProxy',
   'FeeCurrencyWhitelistProxy',
-  'GasPriceMinimumProxy',
   'GoldTokenProxy',
   'GovernanceApproverMultiSigProxy',
   'GovernanceProxy',
@@ -31,12 +33,16 @@ export const ProxyContracts = [
   'OdisPaymentsProxy',
   'RegistryProxy',
   'SortedOraclesProxy',
+  'UniswapFeeHandlerSellerProxy',
 ]
 
 export const CoreContracts = [
   // common
   'Accounts',
   'GasPriceMinimum',
+  'FeeHandler',
+  'MentoFeeHandlerSeller',
+  'UniswapFeeHandlerSeller',
   'FeeCurrencyWhitelist',
   'GoldToken',
   'MetaTransactionWallet',
@@ -77,7 +83,7 @@ const OtherContracts = [
   'UsingRegistry',
 ]
 
-const externalContractPackages = [MENTO_PACKAGE]
+const contractPackages = [MENTO_PACKAGE, SOLIDITY_08_PACKAGE]
 
 const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
 
@@ -95,19 +101,36 @@ function compile(outdir: string) {
   console.log(`protocol: Compiling solidity to ${outdir}`)
 
   // the reason to generate a different folder is to avoid path collisions, which could be very dangerous
-  for (const externalContractPackage of externalContractPackages) {
-    console.log(`Building external contracts for ${externalContractPackage.name}`)
+  for (const contractPackage of contractPackages) {
+    console.log(`Building Contracts for package ${contractPackage.name}`)
+
+    const contractPath = path.join(
+      './',
+      contractPackage.folderPath,
+      contractPackage.path,
+      contractPackage.contracstFolder
+    )
+    if (!existsSync(contractPath)) {
+      console.log(`Contract package named ${contractPackage.name} doesn't exist`)
+      continue
+    }
+
     exec(
-      `yarn run truffle compile --silent --contracts_directory=./lib/${externalContractPackage.path}/contracts --contracts_build_directory=./build/contracts-${externalContractPackage.name}`
+      `yarn run truffle compile --silent --contracts_directory=${contractPath} --contracts_build_directory=${outdir}/contracts-${contractPackage.name} --config ${contractPackage.truffleConfig}` // todo change to outdir
     )
   }
 
-  exec(`yarn run --silent truffle compile --build_directory=${outdir}`)
+  // compile everything else
+  exec(
+    `yarn run --silent truffle compile --contracts_directory="./contracts/" --build_directory=${outdir}`
+  )
 
+  // check that there were no errors
   for (const contractName of ImplContracts) {
     try {
-      const fileStr = readFileSync(`${outdir}/contracts/${contractName}.json`)
-      if (hasEmptyBytecode(JSON.parse(fileStr.toString()))) {
+      // This is issuing a warning: https://github.com/celo-org/celo-monorepo/issues/10564
+      const fileStr = readJSONSync(`${outdir}/contracts/${contractName}.json`)
+      if (hasEmptyBytecode(fileStr)) {
         console.error(
           `${contractName} has empty bytecode. Maybe you forgot to fully implement an interface?`
         )
@@ -124,21 +147,22 @@ function compile(outdir: string) {
 
 function generateFilesForTruffle(outdir: string) {
   // tslint:disable-next-line
-  for (let externalContractPackage of externalContractPackages) {
+  for (let externalContractPackage of contractPackages) {
     const outdirExternal = outdir + '-' + externalContractPackage.name
     console.log(
       `protocol: Generating Truffle Types for external dependency ${externalContractPackage.name} to ${outdirExternal}`
     )
+
     const artifactPath = `${BUILD_DIR}/contracts-${externalContractPackage.name}/*.json`
     exec(
-      `yarn run --silent typechain --target=truffle --outDir "${outdirExternal}" "${artifactPath}" `
+      `yarn run --silent typechain --target=truffle --outDir "${outdirExternal}" "${artifactPath}"`
     )
   }
 
   console.log(`protocol: Generating Truffle Types to ${outdir}`)
   exec(`rm -rf "${outdir}"`)
   const globPattern = `${BUILD_DIR}/contracts/*.json`
-  exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}" `)
+  exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}"`)
 }
 
 function generateFilesForEthers(outdir: string) {
@@ -173,7 +197,7 @@ async function generateFilesForContractKit(outdir: string) {
     })
   )
 
-  for (const externalContractPackage of externalContractPackages) {
+  for (const externalContractPackage of contractPackages) {
     await tsGenerator(
       { cwd, loggingLvl: 'info' },
       new Web3V1Celo({
@@ -191,7 +215,8 @@ async function generateFilesForContractKit(outdir: string) {
   exec(`yarn prettier --write "${outdir}/**/*.ts"`)
 }
 
-const _buildTargets = {
+const _buildTargets: ParsedArgs = {
+  _: undefined,
   solidity: undefined,
   truffleTypes: undefined,
   web3Types: undefined,
