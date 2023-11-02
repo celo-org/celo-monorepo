@@ -59,7 +59,7 @@ function getDateFromFirstCommit(fromSHA, toSHA) {
 /// MAIN
 ////////////////////////////////////////////////////////////////
 
-const [remoteName, remoteUrl] = process.env.HUSKY_GIT_PARAMS.split(' ')
+const remoteName = execSync('git remote').toString()
 
 const changes = process.env.HUSKY_GIT_STDIN.split('\n')
   .filter((line) => line !== '')
