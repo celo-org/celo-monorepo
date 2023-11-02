@@ -23,7 +23,7 @@
     "clean:all": "yarn clean && rm -rf src/generated",
     "prepublishOnly": "yarn build",
     "docs": "typedoc",
-    "test:reset": "yarn --cwd ../../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../../dev-utils/src/migration-override.json --upto 27",
+    "test:reset": "yarn --cwd ../../protocol devchain:reset --migration_override ../../dev-utils/src/migration-override.json",
     "test:livechain": "yarn --cwd ../../protocol devchain run-tar .tmp/devchain.tar.gz",
     "test": "jest --runInBand --forceExit",
     "lint": "tslint -c tslint.json --project ."
@@ -45,7 +45,7 @@
     "web3-core-helpers": "1.10.0"
   },
   "devDependencies": {
-    "@celo/odis-identifiers": "0.0.0-alpha-b064fdc03",
+    "@celo/odis-identifiers": "^1.0.0",
     "@celo/dev-utils": "0.0.1",
     "@celo/protocol": "1.0.1",
     "@types/debug": "^4.1.5",
@@ -53,7 +53,7 @@
     "ganache": "npm:@celo/ganache@7.8.0-unofficial.0",
     "jest": "^29.0.2",
     "bn.js": "^5.1.0",
-    "ts-node": "8.3.0",
+    "ts-node": "^10.9.1",
     "typedoc": "^0.19.2",
     "typedoc-plugin-markdown": "^2.2.16",
     "xhr2-cookies": "1.1.0"

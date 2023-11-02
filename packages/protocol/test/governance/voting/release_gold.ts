@@ -9,6 +9,7 @@ import {
   // tslint:disable-next-line: ordered-imports
   assertTransactionRevertWithReason,
   assertTransactionRevertWithoutReason,
+  expectBigNumberInRange,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 // tslint:disable-next-line: ordered-imports
@@ -1833,8 +1834,8 @@ contract('ReleaseGold', (accounts: string[]) => {
           await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
           const totalWithdrawn = await releaseGoldInstance.totalWithdrawn()
           const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
-          assertEqualBN(new BigNumber(totalWithdrawn), expectedWithdrawalAmount)
-          assertEqualBN(
+          expectBigNumberInRange(new BigNumber(totalWithdrawn), expectedWithdrawalAmount)
+          expectBigNumberInRange(
             new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
             expectedWithdrawalAmount
           )
@@ -1849,7 +1850,7 @@ contract('ReleaseGold', (accounts: string[]) => {
           const totalWithdrawn = await releaseGoldInstance.totalWithdrawn()
           const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
           assertEqualBN(new BigNumber(totalWithdrawn), expectedWithdrawalAmount)
-          assertEqualBN(
+          expectBigNumberInRange(
             new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
             expectedWithdrawalAmount
           )
@@ -1864,7 +1865,7 @@ contract('ReleaseGold', (accounts: string[]) => {
           const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
           const totalWithdrawn = await releaseGoldInstance.totalWithdrawn()
           assertEqualBN(new BigNumber(totalWithdrawn), expectedWithdrawalAmount)
-          assertEqualBN(
+          expectBigNumberInRange(
             new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
             expectedWithdrawalAmount
           )
@@ -1878,7 +1879,7 @@ contract('ReleaseGold', (accounts: string[]) => {
           await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
           const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
 
-          assertEqualBN(
+          expectBigNumberInRange(
             new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
             expectedWithdrawalAmount
           )
@@ -1981,8 +1982,8 @@ contract('ReleaseGold', (accounts: string[]) => {
           await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
           const totalWithdrawn = await releaseGoldInstance.totalWithdrawn()
           const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
-          assertEqualBN(new BigNumber(totalWithdrawn), expectedWithdrawalAmount)
-          assertEqualBN(
+          expectBigNumberInRange(new BigNumber(totalWithdrawn), expectedWithdrawalAmount)
+          expectBigNumberInRange(
             new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
             expectedWithdrawalAmount
           )
@@ -2013,7 +2014,7 @@ contract('ReleaseGold', (accounts: string[]) => {
           await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
           const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
 
-          assertEqualBN(
+          expectBigNumberInRange(
             new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
             expectedWithdrawalAmount
           )
@@ -2046,7 +2047,7 @@ contract('ReleaseGold', (accounts: string[]) => {
           await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
           const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
 
-          assertEqualBN(
+          expectBigNumberInRange(
             new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
             expectedWithdrawalAmount
           )
@@ -2070,7 +2071,7 @@ contract('ReleaseGold', (accounts: string[]) => {
           await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
           const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
 
-          assertEqualBN(
+          expectBigNumberInRange(
             new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
             expectedWithdrawalAmount
           )

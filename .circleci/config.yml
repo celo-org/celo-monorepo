@@ -48,9 +48,7 @@ defaults: &defaults
 contract-defaults: &contract-defaults
   <<: *defaults
   environment:
-    # RELEASE_TAG: core-contracts.v9
-    # TODO(soloseng): switch back to core-contract.v* once the latest contract release is done on node18.
-    RELEASE_TAG: ganache-v7-core-contracts.v9
+    RELEASE_TAG: core-contracts.v10
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
@@ -212,7 +210,6 @@ jobs:
 
   general-test:
     <<: *defaults
-    # XXX (soloseng): Increased size because this test was hitting the ram limit and failing
     resource_class: xlarge
     steps:
       - attach_workspace:
