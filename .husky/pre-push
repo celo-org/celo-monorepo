@@ -1,9 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# recreate this as it was removed in husky 
-HUSKY_GIT_STDIN=$local_ref $local_oid $remote_ref $remote_oid
-
-node ./scripts/hooks/pre-push.js
+# recreate this as it was removed in husky
+HUSKY_GIT_STDIN="$local_ref $local_oid $remote_ref $remote_oid" node ./scripts/hooks/pre-push.js
 
 bash scripts/hooks/prereleasecheck.sh
