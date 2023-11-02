@@ -10,7 +10,6 @@ import "../contracts/governance/test/MockLockedGold.sol";
 import "../contracts/governance/test/MockValidators.sol";
 import "../contracts/common/Registry.sol";
 import "../contracts/common/Accounts.sol";
-import "forge-std/console.sol";
 
 contract AttestationsFoundryTest is Test {
   enum KeyOffsets {
@@ -162,13 +161,10 @@ contract AttestationsFoundryTest is Test {
     return issuers[0];
   }
 
-  function requestAndCompleteAttestations(address account, uint256 accountPK) public {
-    requestAttestations(account);
+  function completeAttestations(address account) public {
     vm.startPrank(account);
-    console.log("we are talking about account", account);
     address returnedIssuer = getIssuer(account, phoneHash);
 
-    console.log("issuer returned", returnedIssuer);
     uint256 returnedIssuerPK = privateKeys[returnedIssuer];
     require(returnedIssuerPK != 0, "issuer not found");
 
@@ -180,6 +176,11 @@ contract AttestationsFoundryTest is Test {
 
     attestationsTest.complete(phoneHash, v, r, s);
     vm.stopPrank();
+  }
+
+  function requestAndCompleteAttestations(address account) public {
+    requestAttestations(account);
+    completeAttestations(account);
   }
 
   function getParsedSignatureOfAddress(address _address, uint256 privateKey)
@@ -200,13 +201,6 @@ contract AttestationsFoundryTest is Test {
     vm.stopPrank();
     address validatingAddress = unlockDerivedValidator(account, accountPK);
     address attestationAddress = unlockDerivedAttestator(account, accountPK);
-
-    console.log("for account", account);
-    console.log("validatingAddress", validatingAddress);
-    console.log("attestationAddress", attestationAddress);
-    console.log("confirmedValidator", accounts.validatorSignerToAccount(validatingAddress));
-    console.log("confirmedAttestattor", accounts.attestationSignerToAccount(attestationAddress));
-
   }
 
   function unlockDerivedAttestator(address account, uint256 accountPK) public returns (address) {
@@ -293,21 +287,11 @@ contract AttestationsFoundryTest is Test {
     accounts.initialize(address(registry));
     registry.setAddressFor("Validators", address(mockValidators));
 
-    uint256 _callerPK = 0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d;
-
-    caller = getAddressFromPrivateKey(_callerPK);
-    callerPK = _callerPK;
-
-    // (caller, callerPK) = actorWithPK("caller");
+    (caller, callerPK) = actorWithPK("caller");
     (caller2, callerPK2) = actorWithPK("caller2");
     (caller3, callerPK3) = actorWithPK("caller3");
     (caller4, callerPK4) = actorWithPK("caller4");
     (caller5, callerPK5) = actorWithPK("caller5");
-    console.log("caller", caller);
-    console.log("caller2", caller2);
-    console.log("caller3", caller3);
-    console.log("caller4", caller4);
-    console.log("caller5", caller5);
 
     privateKeys[caller] = callerPK;
     privateKeys[caller2] = callerPK2;
@@ -366,8 +350,9 @@ contract AttestationsFoundryTest is Test {
     attestationsTest.__setValidators(electedValidators);
   }
 
-  function setAccountWalletAddress() public {
-    accounts.setWalletAddress(caller, 0, bytes32(0), bytes32(0));
+  function setAccountWalletAddress(address account) public {
+    vm.prank(account);
+    accounts.setWalletAddress(account, 0, bytes32(0), bytes32(0));
   }
 }
 
@@ -508,7 +493,7 @@ contract AttestationsWithdraw is AttestationsFoundryTest {
 
   function setUp() public {
     super.setUp();
-    requestAndCompleteAttestations(caller, callerPK);
+    requestAndCompleteAttestations(caller);
     issuer = getIssuer(caller, phoneHash);
     mockERC20Token.mint(address(attestationsTest), attestationFee);
   }
@@ -552,11 +537,14 @@ contract AttestationsWithdraw is AttestationsFoundryTest {
 }
 
 contract AttestationsLookupAccountsForIdentifier is AttestationsFoundryTest {
-  address issuer;
-
   function setUp() public {
     super.setUp();
     requestAttestations(caller);
+  }
+
+  function setAccountWalletAddress(address account) public {
+    vm.prank(account);
+    accounts.setWalletAddress(account, 0, bytes32(0), bytes32(0));
   }
 
   function test_WhenAccountHasAClaim_ItDoesNotReturnTheUsersAccount() public {
@@ -564,9 +552,211 @@ contract AttestationsLookupAccountsForIdentifier is AttestationsFoundryTest {
     assertEq(attestationsTest.lookupAccountsForIdentifier(phoneHash).length, 0);
   }
 
-  // function test_WhenAccountHasAnAttestation_ItDoesNotReturnTheUsersAccount() public {
-  //   vm.prank(caller);
-  //   assertEq(attestationsTest.lookupAccountsForIdentifier(phoneHash).length, 0);
-  // }
+  function test_WhenAccountHasAnAttestation_WhenUserHasNoWalletAddressMapped_ShouldAllowUserToLookupTheAttestedAccountOfPhoneNumber()
+    public
+  {
+    completeAttestations(caller);
+
+    address[] memory expectedAttestedAccounts = new address[](1);
+    expectedAttestedAccounts[0] = caller;
+
+    vm.prank(caller);
+    address[] memory attestedAccounts = attestationsTest.lookupAccountsForIdentifier(phoneHash);
+
+    assertEq(attestedAccounts, expectedAttestedAccounts);
+  }
+
+  function test_WhenAccountHasAnAttestation_WhenUserHasWalletAddressMapped_ShouldAllowUserToLookupTheAttestedAccountOfPhoneNumber()
+    public
+  {
+    completeAttestations(caller);
+    setAccountWalletAddress(caller);
+
+    address[] memory expectedAttestedAccounts = new address[](1);
+    expectedAttestedAccounts[0] = caller;
+
+    vm.prank(caller);
+    address[] memory attestedAccounts = attestationsTest.lookupAccountsForIdentifier(phoneHash);
+
+    assertEq(attestedAccounts, expectedAttestedAccounts);
+  }
+
+  function test_WhenAccountIsNotAttested_ShouldReturnEmptyArrayForPhoneNumber() public {
+    address[] memory attestedAccounts = attestationsTest.lookupAccountsForIdentifier(phoneHash);
+    assertEq(attestedAccounts.length, 0);
+  }
+}
+
+contract AttestationsBatchGetAttestationStats is AttestationsFoundryTest {
+  function setUp() public {
+    super.setUp();
+  }
+
+  function test_WhenAnAccountHasAClaimAndIsMappedWithAddressWallet_DoesNotReturnUserAccount()
+    public
+  {
+    requestAttestations(caller);
+    setAccountWalletAddress(caller);
+
+    bytes32[] memory identifiers = new bytes32[](1);
+    identifiers[0] = phoneHash;
+
+    vm.prank(caller);
+    (uint256[] memory matches, address[] memory addresses, uint64[] memory completed, uint64[] memory total) = attestationsTest
+      .batchGetAttestationStats(identifiers);
+
+    assertEq(matches[0], 0);
+    assertEq(addresses.length, 0);
+    assertEq(completed.length, 0);
+    assertEq(total.length, 0);
+  }
+
+  function test_WhenAnAccountHasAnAttestation_WHenTheAccountHasAWalletAddressMapped_ShouldAllowUserToLookupTheAttestedAccountOfPhoneNumber()
+    public
+  {
+    requestAndCompleteAttestations(caller);
+    setAccountWalletAddress(caller);
+
+    bytes32[] memory identifiers = new bytes32[](1);
+    identifiers[0] = phoneHash;
+
+    vm.prank(caller);
+    (uint256[] memory matches, address[] memory addresses, uint64[] memory completed, uint64[] memory total) = attestationsTest
+      .batchGetAttestationStats(identifiers);
+
+    assertEq(matches.length, 1);
+    assertEq(addresses.length, 1);
+    assertEq(completed.length, 1);
+    assertEq(total.length, 1);
+
+    assertEq(matches[0], 1);
+    assertEq(addresses[0], caller);
+    assertEq(uint256(completed[0]), 1);
+    assertEq(uint256(total[0]), 3);
+  }
+
+  function test_WhenAnAccountHasAnAttestation_WHenTheAccountHasAWalletAddressMapped_AndAnotherAccountAlsoHasAnAttestationToTheSamePhoneNumber_ShouldReturnMultipleAttestedAcounts_ShouldReturnMultipleAttestedAccounts()
+    public
+  {
+    requestAndCompleteAttestations(caller);
+    setAccountWalletAddress(caller);
+
+    requestAndCompleteAttestations(caller2);
+    setAccountWalletAddress(caller2);
+
+    bytes32[] memory identifiers = new bytes32[](1);
+    identifiers[0] = phoneHash;
+
+    (uint256[] memory matches, address[] memory addresses, uint64[] memory completed, uint64[] memory total) = attestationsTest
+      .batchGetAttestationStats(identifiers);
+
+    assertEq(matches.length, 1);
+    assertEq(addresses.length, 2);
+    assertEq(completed.length, 2);
+    assertEq(total.length, 2);
+
+    assertEq(matches[0], 2);
+    assertEq(addresses[0], caller);
+    assertEq(addresses[1], caller2);
+    assertEq(uint256(completed[0]), 1);
+    assertEq(uint256(completed[1]), 1);
+    assertEq(uint256(total[0]), 3);
+    assertEq(uint256(total[1]), 3);
+  }
+
+  function test_WhenAccountHasNoWalletAddressMapped_ReturnsTheUsersAccountWithAZeroAddress()
+    public
+  {
+    requestAndCompleteAttestations(caller);
+
+    bytes32[] memory identifiers = new bytes32[](1);
+    identifiers[0] = phoneHash;
+
+    vm.prank(caller);
+    (uint256[] memory matches, address[] memory addresses, uint64[] memory completed, uint64[] memory total) = attestationsTest
+      .batchGetAttestationStats(identifiers);
+
+    assertEq(matches.length, 1);
+    assertEq(addresses.length, 1);
+    assertEq(completed.length, 1);
+    assertEq(total.length, 1);
+
+    assertEq(matches[0], 1);
+    assertEq(addresses[0], address(0));
+    assertEq(uint256(completed[0]), 1);
+    assertEq(uint256(total[0]), 3);
+  }
+
+  function test_WhenAnAccountIsNotClaimed() public {
+    bytes32[] memory identifiers = new bytes32[](1);
+    identifiers[0] = phoneHash;
+
+    vm.prank(caller);
+    (uint256[] memory matches, address[] memory addresses, uint64[] memory completed, uint64[] memory total) = attestationsTest
+      .batchGetAttestationStats(identifiers);
+
+    assertEq(matches.length, 1);
+    assertEq(addresses.length, 0);
+    assertEq(completed.length, 0);
+    assertEq(total.length, 0);
+
+    assertEq(matches[0], 0);
+  }
+}
+
+contract AttestationsRevoke is AttestationsFoundryTest {
+  function setUp() public {
+    super.setUp();
+    requestAndCompleteAttestations(caller);
+  }
+
+  function test_ShouldAllowAUserToRevokeTheirAccountForAPhoneNumber() public {
+    vm.startPrank(caller);
+    attestationsTest.revoke(phoneHash, 0);
+    assertEq(attestationsTest.lookupAccountsForIdentifier(phoneHash).length, 0);
+
+    bytes32[] memory identifiers = new bytes32[](1);
+    identifiers[0] = phoneHash;
+
+    (uint256[] memory matches, address[] memory addresses, uint64[] memory completed, uint64[] memory total) = attestationsTest
+      .batchGetAttestationStats(identifiers);
+
+    assertEq(matches.length, 1);
+    assertEq(addresses.length, 0);
+    assertEq(completed.length, 0);
+    assertEq(total.length, 0);
+
+    vm.stopPrank();
+  }
+}
+
+contract AttestationsRequireNAttestationRequests is AttestationsFoundryTest {
+  function setUp() public {
+    super.setUp();
+  }
+
+  function test_WithNoneRequested_DoesNotRevertWhenCalledWith0() public {
+    vm.prank(caller);
+    attestationsTest.requireNAttestationsRequested(phoneHash, caller, 0);
+  }
+
+  function test_WithNoneRequested_DoesRevertWhenCalledWithSomethingElse() public {
+    vm.expectRevert("requested attestations does not match expected");
+    vm.prank(caller);
+    attestationsTest.requireNAttestationsRequested(phoneHash, caller, 2);
+  }
+
+  function test_WithSomeRequested_DoesRevertWhenCalledWith0() public {
+    requestAttestations(caller);
+    vm.expectRevert("requested attestations does not match expected");
+    vm.prank(caller);
+    attestationsTest.requireNAttestationsRequested(phoneHash, caller, 0);
+  }
+
+  function test_WithSomeRequested_DoesRevertWhenCalledWithCorrectNumber() public {
+    requestAttestations(caller);
+    vm.prank(caller);
+    attestationsTest.requireNAttestationsRequested(phoneHash, caller, 3);
+  }
 
 }
