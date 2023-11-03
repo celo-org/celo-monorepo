@@ -59,17 +59,15 @@ function getDateFromFirstCommit(fromSHA, toSHA) {
 /// MAIN
 ////////////////////////////////////////////////////////////////
 
-const [remoteName, remoteUrl] = process.env.HUSKY_GIT_PARAMS.split(' ')
-
+// must trim otherwise the name will be 'origin\n'
+const remoteName = execSync('git remote').toString().trim()
 const changes = process.env.HUSKY_GIT_STDIN.split('\n')
   .filter((line) => line !== '')
   .map((line) => {
     const [localRef, localSHA, remoteRef, remoteSHA] = line.split(' ')
     return { localRef, localSHA, remoteRef, remoteSHA }
   })
-
 for (const change of changes) {
-  // console.log('Checking commits to push to ', change.remoteRef)
   const [from, to] = getCommitRange(change, remoteName)
 
   const changedFiles = getChangedFiled(from, to)
