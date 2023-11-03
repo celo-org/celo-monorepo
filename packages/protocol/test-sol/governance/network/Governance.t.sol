@@ -120,6 +120,9 @@ contract BaseTest is Test {
     )
       .unwrap();
 
+    // change block.tiemstamp so we're not on timestamp = 0
+    vm.warp(100 * 60);
+
     setUpContracts();
     setUpVoterAccount();
     setUpProposalStubs();
