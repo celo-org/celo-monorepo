@@ -11,6 +11,7 @@ export default class ApproveMultiSig extends BaseCommand {
     ...BaseCommand.flags,
     from: Flags.address({
       required: true,
+      description: 'Account approving the multi-sig transaction',
     }),
     for: Flags.address({
       required: true,
