@@ -14,9 +14,14 @@ USAGE
   $ celocli multisig:approve
 
 OPTIONS
-  --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Account Address
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+  --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Address of the multi-sig
+                                                     contract
+
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account approving the
+                                                     multi-sig transaction
+
   --globalHelp                                       View all available global flags
+
   --tx=tx                                            (required) Transaction to approve
 
 EXAMPLE
