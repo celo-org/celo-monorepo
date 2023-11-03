@@ -15,6 +15,7 @@ export default class ApproveMultiSig extends BaseCommand {
     }),
     for: Flags.address({
       required: true,
+      description: 'Address of the multi-sig contract',
     }),
     tx: flags.integer({
       required: true,
