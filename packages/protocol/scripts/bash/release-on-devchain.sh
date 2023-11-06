@@ -41,7 +41,12 @@ yarn build >> $LOG_FILE
 cd packages/protocol
 
 echo "- Run local network"
-yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
+TAR_FILE="packages/protocol/$BUILD_DIR/devchain.tar.gz"
+if [ ! -f "$TAR_FILE" ]; then
+  echo "Generating $TAR_FILE"
+  yarn devchain generate-tar $TAR_FILE
+fi
+yarn devchain run-tar-in-bg $TAR_FILE >> $LOG_FILE
 
 GANACHE_PID=
 if command -v lsof; then
