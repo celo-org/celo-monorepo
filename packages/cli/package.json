@@ -39,7 +39,7 @@
     "@celo/contractkit": "^5.1.0",
     "@celo/explorer": "^5.0.5",
     "@celo/governance": "^5.0.5",
-    "@celo/identity": "^5.0.4",
+    "@celo/identity": "^5.1.0",
     "@celo/phone-utils": "^5.0.5",
     "@celo/utils": "^5.0.5",
     "@celo/cryptographic-utils": "^5.0.5",
