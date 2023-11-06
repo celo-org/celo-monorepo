@@ -2,4 +2,4 @@
 '@celo/contractkit': minor
 ---
 
-Delegated functions added
+Governance delegation functions added
