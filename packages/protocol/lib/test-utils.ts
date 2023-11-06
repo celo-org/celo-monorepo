@@ -20,6 +20,7 @@ import { fromFixed } from '@celo/utils/src/fixidity';
 import { bufferToHex, toBuffer } from '@ethereumjs/util';
 import { utf8ToBytes } from 'ethereum-cryptography/utils';
 import { AccountsInstance } from 'types';
+import { IdentifierPrefix, getIdentifierHash } from "@celo/odis-identifiers"
 
 
 import BN = require('bn.js')
@@ -34,6 +35,10 @@ export const EPOCH = 100
 
 export function stripHexEncoding(hexString: string) {
   return hexString.substring(0, 2) === '0x' ? hexString.substring(2) : hexString
+}
+
+export function getOdisHash(phoneNumber: string, pepper?: string, prefix = IdentifierPrefix.PHONE_NUMBER) {
+  return getIdentifierHash(Web3.utils.sha3, phoneNumber, prefix, pepper);
 }
 
 export function assertContainSubset(superset: any, subset: any) {
