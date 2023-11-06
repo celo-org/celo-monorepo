@@ -1,10 +1,10 @@
 import { GovernanceWrapper } from '@celo/contractkit/src/wrappers/Governance'
 import { flags } from '@oclif/command'
+import chalk from 'chalk'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import chalk from 'chalk'
 
 export default class Upvote extends BaseCommand {
   static description = 'Upvote a queued governance proposal'
