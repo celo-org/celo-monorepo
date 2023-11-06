@@ -1,5 +1,5 @@
 ---
-'@celo/celocli': major
+'@celo/celocli': minor
 ---
 
 Delegation of Governance votes
