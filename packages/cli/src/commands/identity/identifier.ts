@@ -42,7 +42,6 @@ export default class IdentifierQuery extends BaseCommand {
 
     const authSigner: AuthSigner = {
       authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
-      // @ts-expect-error
       contractKit: this.kit,
     }
 
