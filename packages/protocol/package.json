@@ -101,7 +101,7 @@
     "web3-utils": "1.10.0"
   },
   "devDependencies": {
-    "@celo/phone-utils": "^5.0.5",
+    "@celo/odis-identifiers": "^1.0.0",
     "@celo/typechain-target-web3-v1-celo": "0.2.0",
     "@celo/typescript": "0.0.1",
     "@types/bn.js": "^5.1.0",
