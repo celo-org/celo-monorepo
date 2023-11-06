@@ -4,6 +4,7 @@ import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import chalk from 'chalk'
 
 export default class Upvote extends BaseCommand {
   static description = 'Upvote a queued governance proposal'
@@ -35,6 +36,8 @@ export default class Upvote extends BaseCommand {
 
     if (!consideredProposals.some((k) => k.id === id)) {
       await displaySendTx('upvoteTx', await governance.upvote(id, account), {}, 'ProposalUpvoted')
+    } else {
+      console.info(chalk.green('Proposal was dequeued, no need to upvote it.'))
     }
   }
 
