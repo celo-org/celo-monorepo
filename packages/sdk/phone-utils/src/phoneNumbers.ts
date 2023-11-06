@@ -5,7 +5,6 @@ import {
   PhoneNumberType,
   PhoneNumberUtil,
 } from 'google-libphonenumber'
-import getPhoneHash from './getPhoneHash'
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 const MIN_PHONE_LENGTH = 4
@@ -211,8 +210,8 @@ function prependToFormMobilePhoneNumber(
 
 export function getExampleNumber(
   regionCode: string,
-  useOnlyZeroes: boolean = true,
-  isInternational: boolean = false
+  useOnlyZeroes = true,
+  isInternational = false
 ) {
   const examplePhone = phoneUtil.getExampleNumber(
     getRegionCodeFromCountryCode(regionCode) as string
@@ -238,7 +237,6 @@ export function getExampleNumber(
 }
 
 export const PhoneNumberUtils = {
-  getPhoneHash,
   getCountryCode,
   getRegionCode,
   getDisplayPhoneNumber,
