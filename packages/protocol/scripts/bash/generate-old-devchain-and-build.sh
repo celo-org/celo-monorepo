@@ -49,14 +49,16 @@ RELEASE_TAG="" yarn build >> $LOG_FILE
 cd packages/protocol
 
 echo "- Create local network"
-if [ -z "$GRANTS_FILE" ]; then
-  yarn devchain generate-tar "$PWD/devchain.tar.gz" >> $LOG_FILE
-else
-  yarn devchain generate-tar "$PWD/devchain.tar.gz" --release_gold_contracts $GRANTS_FILE >> $LOG_FILE
-fi
-rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
-mv build/contracts* $BUILD_DIR
-mv "$PWD/devchain.tar.gz" $BUILD_DIR/.
+# if [ -z "$GRANTS_FILE" ]; then
+#   yarn devchain generate-tar "$PWD/devchain.tar.gz" >> $LOG_FILE
+# else
+#   yarn devchain generate-tar "$PWD/devchain.tar.gz" --release_gold_contracts $GRANTS_FILE >> $LOG_FILE
+# fi
+# rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
+# mv build/contracts* $BUILD_DIR
+# mv "$PWD/devchain.tar.gz" $BUILD_DIR/.
+
+echo "IN ORIGINAL FILE"
 
 # Forcefully remove all submodules and reinitialize them after checkout
 git submodule deinit -f --all
