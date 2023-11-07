@@ -60,7 +60,12 @@ mv "$PWD/devchain.tar.gz" $BUILD_DIR/.
 
 # Forcefully remove all submodules and reinitialize them after checkout
 git submodule deinit -f --all
-git config --file .gitmodules --get-regexp path | awk '{ print $2 }' | xargs -I {} rm -rf {}
+while IFS= read -r line; do
+    # Extract the submodule path which is the second part of the line
+    submodule_path=$(echo "$line" | cut -d ' ' -f 2)
+    # Remove the submodule directory
+    rm -rf "$submodule_path"
+done < <(git config --file .gitmodules --get-regexp path)
 rm -rf .git/modules/*
 git checkout -f --recurse-submodules -
 git submodule update --init --recursive
