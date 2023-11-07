@@ -53,6 +53,7 @@ if [ -z "$GRANTS_FILE" ]; then
 else
   yarn devchain generate-tar "$PWD/devchain.tar.gz" --release_gold_contracts $GRANTS_FILE >> $LOG_FILE
 fi
+
 rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts* $BUILD_DIR
 mv "$PWD/devchain.tar.gz" $BUILD_DIR/.

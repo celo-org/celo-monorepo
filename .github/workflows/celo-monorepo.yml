@@ -28,7 +28,6 @@ env:
   TERM: dumb
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
   # Git Tag for contract release to use
-  #RELEASE_TAG: ganache-v7-core-contracts.v9
   RELEASE_TAG: core-contracts.v10
   # CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
   CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.7.x
@@ -215,7 +214,7 @@ jobs:
     #   image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
     #   # Required root to install node12
     #   options: --user root
-    timeout-minutes: 30
+    timeout-minutes: 300
     # Comment lint-checks dependency to speed up (as this is a dependency for many other jobs)
     # needs: [install-dependencies, lint-checks]
     needs: [install-dependencies]
@@ -255,19 +254,19 @@ jobs:
       # Workaround for https://stackoverflow.com/questions/72978485/git-submodule-update-failed-with-fatal-detected-dubious-ownership-in-repositor
       - name: Configure git safe directories
         run: git config --global --add safe.directory '*'
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 60
-        if: false
-        with:
-          limit-access-to-actor: true
       - name: Generate devchain of previous release
         run: |
           echo "Comparing against $RELEASE_TAG"
           # Github has phased out the git protocol so we ensure that we use
           # https for all git operations that yarn may perform.
           git config --global url."https://github.com".insteadOf git://github.com
-          yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
+          yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json ||
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 600
+        if: true
+        with:
+          limit-access-to-actor: true
   protocol-test-release:
     name: Protocol Test Release
     runs-on: ['self-hosted', 'monorepo-node18']
