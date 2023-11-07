@@ -1,9 +1,5 @@
 const getPhoneHash = (phoneNumber: string, salt?: string): string => {
-  if (salt) {
-    return `0x${phoneNumber + salt}`
-  }
-  // backwards compatibility for old phoneUtils getPhoneHash
-  return 'no goood'
+  return `0x${phoneNumber + salt}`
 }
 
 export default getPhoneHash
