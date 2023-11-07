@@ -2,11 +2,13 @@
 
 import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
-import { existsSync, readJSONSync } from 'fs-extra'
+import fsExtraPkg from 'fs-extra'
 import minimist, { ParsedArgs } from 'minimist'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
 import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
+
+const { existsSync, readJSONSync } = fsExtraPkg
 
 const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
 const BUILD_DIR = path.join(ROOT_DIR, process.env.BUILD_DIR ?? './build')
@@ -83,7 +85,7 @@ const OtherContracts = [
   'UsingRegistry',
 ]
 
-const contractPackages = [MENTO_PACKAGE, SOLIDITY_08_PACKAGE]
+const contractPackages = [MENTO_PACKAGE, SOLIDITY_08_PACKAGE].filter(Boolean)
 
 const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
 
@@ -216,7 +218,7 @@ async function generateFilesForContractKit(outdir: string) {
 }
 
 const _buildTargets: ParsedArgs = {
-  _: undefined,
+  _: [] as string[],
   solidity: undefined,
   truffleTypes: undefined,
   web3Types: undefined,

@@ -1,8 +1,8 @@
 export interface ContractPackage {
-  path?: string
-  folderPath?: string
-  name?: string
-  contracstFolder?: string
+  path: string
+  folderPath: string
+  name: string
+  contracstFolder: string
   contracts: string[]
   proxyContracts?: string[]
   truffleConfig?: string
