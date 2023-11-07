@@ -43,6 +43,13 @@ export default class Upvote extends BaseCommand {
 
   /**
    * Dequeues all possible proposals, returns the ones that were considered to be dequeued.
+   * This cycle is there only for safety purposes (in 99.9% of times it will not be run more than once).
+   * The reason behind this cycle is as follows:
+   * 1. Someone will DDoS our proposals (eg 100+)
+   * 2. All these proposals will expire
+   * 3. DequeueProposalsIfReady will always try to dequeue first n proposals but if all of them will be expired it will just remove them from queue.
+   * 4. Since none of the proposals were actually dequeued, next call will allow to dequeue again
+   * 5. Upvote function will try to dequeue again and possibly it will hit the proposal and bug that we have
    */
   async dequeueAllPossibleProposals(governance: GovernanceWrapper) {
     const concurrentProposals = (await governance.concurrentProposals()).toNumber()
