@@ -5,7 +5,8 @@
   "license": "LGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "hhttps://github.com/celo-org/celo-monorepo/tree/master/packages/protocol/contracts"
+    "url": "https://github.com/celo-org/celo-monorepo.git",
+    "directory": "packages/protocol/contracts"
   },
   "scripts": {},
   "dependencies": {},
