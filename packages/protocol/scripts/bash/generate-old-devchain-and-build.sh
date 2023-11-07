@@ -33,6 +33,7 @@ done
 echo "- Checkout source code at $BRANCH"
 # Fetching also tags so we can checkout if $BRACH references a tag
 git fetch origin +"$BRANCH" --tags --force >> $LOG_FILE 2>&1
+rm -rf packages/protocol/lib/memview.sol # has to be mentined explicitly as it is not a submodule in previous releases
 git checkout -f --recurse-submodules $BRANCH >> $LOG_FILE 2>&1
 
 echo "- Build monorepo (contract artifacts, migrations, + all dependencies)"
