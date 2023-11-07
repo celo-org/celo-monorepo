@@ -961,11 +961,6 @@
     fp-ts "2.1.1"
     io-ts "2.0.1"
 
-"@celo/odis-identifiers@0.0.0-alpha-b064fdc03":
-  version "0.0.0-alpha-b064fdc03"
-  resolved "https://registry.yarnpkg.com/@celo/odis-identifiers/-/odis-identifiers-0.0.0-alpha-b064fdc03.tgz#fd4cbecf693e3de081b5b9accd04c896910d0649"
-  integrity sha512-s13vpz2LTWZr3xkNFWTtfaoc9NZjgNMv7ofWGMWUrKfOBmm6BHrNw9KFrNc3Vy6F/jBXLdBVl/zlKBWkJO600Q==
-
 "@celo/odis-identifiers@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@celo/odis-identifiers/-/odis-identifiers-1.0.0.tgz#9bafbb77d989f1f1064f293a54d64af3298f0e91"
