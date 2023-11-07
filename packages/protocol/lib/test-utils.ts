@@ -23,6 +23,14 @@ import { AccountsInstance } from 'types';
 
 
 import BN = require('bn.js')
+import { getIdentifierHash, IdentifierPrefix } from "@celo/odis-identifiers"
+export function getOdisHash(
+	phoneNumber: string,
+	pepper?: string,
+	prefix = IdentifierPrefix.PHONE_NUMBER,
+) {
+	return getIdentifierHash(Web3.utils.sha3, phoneNumber, prefix, pepper);
+}
 
 const isNumber = (x: any) =>
   typeof x === 'number' || (BN as any).isBN(x) || BigNumber.isBigNumber(x)
