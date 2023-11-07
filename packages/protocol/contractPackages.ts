@@ -1,9 +1,9 @@
 export interface ContractPackage {
-  path: string
-  folderPath: string
+  path?: string
+  folderPath?: string
   name: string
-  contracstFolder: string
   contracts: string[]
+  contracstFolder?: string
   proxyContracts?: string[]
   truffleConfig?: string
   solidityVersion?: string
