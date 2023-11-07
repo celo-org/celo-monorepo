@@ -64,7 +64,7 @@ export const builder = () => {
     })
     .options('test-mode', {
       type: 'string',
-      description: 'Load test mode: mixed transaction types, big calldatas, or simple transfers',
+      description: 'Load test mode: mixed transaction types, big calldatas, simple transfers paid in CELO or transfers paid in cUSD',
       choices: [TestMode.Mixed, TestMode.Data, TestMode.Transfer, TestMode.StableTransfer],
       default: TestMode.Mixed,
     })
