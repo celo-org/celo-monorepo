@@ -4,7 +4,7 @@ on:
     types: [released]
 
   workflow_dispatch:
-    input:
+    inputs:
       npm_version:
         description: 'NPM version'
         required: true
