@@ -49,16 +49,14 @@ RELEASE_TAG="" yarn build >> $LOG_FILE
 cd packages/protocol
 
 echo "- Create local network"
-# if [ -z "$GRANTS_FILE" ]; then
-#   yarn devchain generate-tar "$PWD/devchain.tar.gz" >> $LOG_FILE
-# else
-#   yarn devchain generate-tar "$PWD/devchain.tar.gz" --release_gold_contracts $GRANTS_FILE >> $LOG_FILE
-# fi
-# rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
-# mv build/contracts* $BUILD_DIR
-# mv "$PWD/devchain.tar.gz" $BUILD_DIR/.
-
-echo "IN ORIGINAL FILE"
+if [ -z "$GRANTS_FILE" ]; then
+  yarn devchain generate-tar "$PWD/devchain.tar.gz" >> $LOG_FILE
+else
+  yarn devchain generate-tar "$PWD/devchain.tar.gz" --release_gold_contracts $GRANTS_FILE >> $LOG_FILE
+fi
+rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
+mv build/contracts* $BUILD_DIR
+mv "$PWD/devchain.tar.gz" $BUILD_DIR/.
 
 # Forcefully remove all submodules and reinitialize them after checkout
 git submodule deinit -f --all
@@ -69,7 +67,7 @@ while IFS= read -r line; do
     echo "removing $submodule_path"
     rm -rf "$submodule_path"
 done < <(git config --file .gitmodules --get-regexp path)
-rm -rf packages/protocol/lib/memview.sol
+rm -rf packages/protocol/lib/memview.sol # has to be mentined explicitly as it is not a submodule in previous releases
 rm -rf .git/modules/*
 git checkout -f --recurse-submodules -
 git submodule update --init --recursive
