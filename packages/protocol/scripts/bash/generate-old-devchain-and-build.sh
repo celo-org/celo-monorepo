@@ -58,4 +58,9 @@ rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts* $BUILD_DIR
 mv "$PWD/devchain.tar.gz" $BUILD_DIR/.
 
+# Forcefully remove all submodules and reinitialize them after checkout
+git submodule deinit -f --all
+git config --file .gitmodules --get-regexp path | awk '{ print $2 }' | xargs -I {} rm -rf {}
+rm -rf .git/modules/*
 git checkout -f --recurse-submodules -
+git submodule update --init --recursive
