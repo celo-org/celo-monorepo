@@ -536,7 +536,7 @@ export const unlock = async (
 export enum TestMode {
   Mixed = 'mixed',
   Data = 'data',
-  Transfer = 'celo_transfer',
+  Transfer = 'transfer',
   StableTransfer = 'stable_transfer',
 }
 
