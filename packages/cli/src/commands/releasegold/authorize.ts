@@ -46,7 +46,10 @@ export default class Authorize extends ReleaseGoldBaseCommand {
   ]
 
   async run() {
+    console.log('RUNNING AWAY FROM HERE')
     const { flags } = this.parse(Authorize)
+    console.log('RUN; flags: ', flags)
+
     const role = flags.role
 
     // Check that the account is registered on-chain.
