@@ -7,5 +7,6 @@ export async function testLocally(
   config?: LoadOptions
 ) {
   const extendedArgv = [...argv, '--node', 'local']
+  console.warn('cliUtils.ts: testLocally: extendedArgv: ', extendedArgv)
   return command.run(extendedArgv, config)
 }

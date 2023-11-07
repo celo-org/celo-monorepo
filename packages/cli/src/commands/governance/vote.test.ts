@@ -13,9 +13,12 @@ import Vote from './vote'
 
 process.env.NO_SYNCCHECK = 'true'
 
+console.log('vote.test.ts: file start')
+
 const expConfig = NetworkConfig.governance
 
 testWithGanache('governance:vote cmd', (web3: Web3) => {
+  console.log('vote.test.ts: testWithGanache start')
   const minDeposit = web3.utils.toWei(expConfig.minDeposit.toString(), 'ether')
   const kit = newKitFromWeb3(web3)
   const proposalID = new BigNumber(1)
@@ -24,6 +27,7 @@ testWithGanache('governance:vote cmd', (web3: Web3) => {
   let governance: GovernanceWrapper
 
   beforeEach(async () => {
+    console.log('vote.test.ts: beforeEach start')
     accounts = await web3.eth.getAccounts()
     kit.defaultAccount = accounts[0]
     governance = await kit.contracts.getGovernance()
@@ -44,6 +48,7 @@ testWithGanache('governance:vote cmd', (web3: Web3) => {
   })
 
   test('can vote yes', async () => {
+    console.log('vote.test.ts: can vote yes start')
     await testLocally(Vote, [
       '--from',
       accounts[0],

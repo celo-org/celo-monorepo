@@ -9,12 +9,14 @@ import CreateAccount from './create-account'
 import LockedGold from './locked-gold'
 
 process.env.NO_SYNCCHECK = 'true'
+console.warn('authorize.test.ts: file start')
 
 testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
   let contractAddress: string
   let kit: any
 
   beforeEach(async () => {
+    console.warn('authorize.test.ts: beforeEach start')
     contractAddress = await getContractFromEvent(
       'ReleaseGoldInstanceCreated(address,address)',
       web3
@@ -34,6 +36,8 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
     })
 
     test('can authorize account vote signer ', async () => {
+      console.warn('authorize.test.ts: can authorize account vote signer')
+
       await testLocally(Authorize, [
         '--contract',
         contractAddress,
@@ -47,6 +51,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
     })
 
     test('can authorize account validator signer', async () => {
+      console.warn('authorize.test.ts: can authorize account validator signer')
       await testLocally(Authorize, [
         '--contract',
         contractAddress,
