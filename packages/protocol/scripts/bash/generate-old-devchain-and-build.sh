@@ -33,7 +33,7 @@ done
 echo "- Checkout source code at $BRANCH"
 # Fetching also tags so we can checkout if $BRACH references a tag
 git fetch origin +"$BRANCH" --tags --force >> $LOG_FILE 2>&1
-git checkout $BRANCH >> $LOG_FILE 2>&1
+git checkout -f --recurse-submodules $BRANCH >> $LOG_FILE 2>&1
 
 echo "- Build monorepo (contract artifacts, migrations, + all dependencies)"
 cd ../..
@@ -58,4 +58,4 @@ rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts* $BUILD_DIR
 mv "$PWD/devchain.tar.gz" $BUILD_DIR/.
 
-git checkout -
+git checkout -f --recurse-submodules -
