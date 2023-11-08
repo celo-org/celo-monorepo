@@ -15,6 +15,7 @@ FORNO=""
 BUILD_DIR=""
 LOG_FILE="/dev/null"
 GRANTS_FILE=""
+TARGET_DIR=""
 
 while getopts ':b:rl:d:g:' flag; do
   case "${flag}" in
@@ -31,7 +32,14 @@ done
 # Remember the original working directory
 ORIG_PWD=$(pwd)
 
-[ -z "$BUILD_DIR_ORIG" ] && BUILD_DIR_ORIG=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'));
+REMOTE_URL=$(git remote get-url origin)
+
+TARGET_DIR_RELATIVE=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'));
+rm -rf $TARGET_DIR_RELATIVE && mkdir -p $TARGET_DIR_RELATIVE
+TARGET_DIR=$(cd "$TARGET_DIR_RELATIVE" && pwd || echo "Error: Failed to find directory")
+
+echo TARGET_DIR: $TARGET_DIR
+echo BUILD_DIR: $BUILD_DIR
 
 # Create temporary directory
 TMP_DIR=$(mktemp -d)
@@ -39,17 +47,15 @@ echo "Using temporary directory $TMP_DIR"
 
 [ -z "$BUILD_DIR" ] && BUILD_DIR=$(echo "$TMP_DIR/build/$(echo $BRANCH | sed -e 's/\//_/g')");
 
-echo "- Checkout source code at $BRANCH"
+echo "- Checkout source code at $BRANCH" and remote url $REMOTE_URL
 # Clone the repository into the temporary directory
-git clone . "$TMP_DIR/repo" --branch "$BRANCH" --single-branch
+git clone $REMOTE_URL "$TMP_DIR/repo" --branch "$BRANCH" --single-branch
 cd "$TMP_DIR/repo"
 
 # Redirection of logs
 exec 2>>$LOG_FILE >> $LOG_FILE
 
 echo "- Build monorepo (contract artifacts, migrations, + all dependencies)"
-# Assuming we need to go up two directories to get to the root of the monorepo
-cd ../../..
 
 # Here, replace the 'yarn' commands as necessary to work within the temp directory structure
 yarn run reset
@@ -65,11 +71,9 @@ else
   yarn devchain generate-tar "$BUILD_DIR/devchain.tar.gz" --release_gold_contracts "$GRANTS_FILE"
 fi
 
-cd "$ORIG_PWD"
 
-rm -rf $BUILD_DIR_ORIG && mkdir -p $BUILD_DIR_ORIG
-mv build/contracts $BUILD_DIR_ORIG
-mv "$PWD/devchain.tar.gz" $BUILD_DIR_ORIG/.
+mv build/contracts $TARGET_DIR
+mv "$PWD/devchain.tar.gz" $TARGET_DIR/.
 
 # Clean up if necessary
-# rm -rf "$TMP_DIR"
+rm -rf "$TMP_DIR"
