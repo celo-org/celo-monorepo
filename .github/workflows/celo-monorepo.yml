@@ -188,6 +188,12 @@ jobs:
         with:
           name: devchain-${{ env.RELEASE_TAG }}
           path: packages/protocol/.tmp/devchain
+      - name: Download protocol devchain artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: protocol-devchain.yml          
+          name: build-${{ env.RELEASE_TAG }}
+          path: packages/protocol/.tmp/build
       - name: Copy DevChain and Build generated from released tag
         run: |
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
