@@ -68,7 +68,7 @@ else
   yarn devchain generate-tar "$PWD/devchain.tar.gz" --release_gold_contracts "$GRANTS_FILE"
 fi
 
-echo "moving contracts from build/contracts to $BUILD_DIR_ABOSLUTE"" 
+echo "moving contracts from build/contracts to $BUILD_DIR_ABOSLUTE"
 mv build/contracts $BUILD_DIR_ABOSLUTE
 echo "moving $PWD/devchain.tar.gz to $BUILD_DIR_ABOSLUTE"
 mv "$PWD/devchain.tar.gz" $BUILD_DIR_ABOSLUTE/.
