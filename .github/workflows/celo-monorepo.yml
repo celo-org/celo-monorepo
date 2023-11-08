@@ -187,6 +187,8 @@ jobs:
       false
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
       - name: Download protocol devchain artifact
