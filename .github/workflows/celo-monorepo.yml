@@ -94,18 +94,13 @@ jobs:
       - name: Run yarn postinstall if cache hitted
         run: yarn run postinstall
         if: steps.cache_node.outputs.cache-hit == 'true'
-      - name: Verify Changed files
-        uses: tj-actions/verify-changed-files@v16
-        id: verify-changed-files
-        with:
-          fail-if-changed: "true"
-          fail-message: "File changes during build. Please run locally and commit changes."
-          match-gitignore-files: "true"
-      - name: Run step only when any of the above files change.
-        if: steps.verify-changed-files.outputs.files_changed == 'true'
+      - name: Fail if any file changed on git
         run: |
-          echo "Changed files: ${{ steps.verify-changed-files.outputs.changed_files }}"
-        # Outputs: "Changed files: new.txt test_directory/new.txt"
+          # This fails if there is any change
+          if ! git diff-index HEAD --; then
+            echo "Git changes detected while building. If this is unexpected, bump NODE_MODULE_CACHE_VERSION in .github/workflows/celo-monorepo.yml"
+            exit 1
+          fi
       - name: Build packages
         run: yarn build --ignore docs --include-dependencies
       - name: Check licenses
