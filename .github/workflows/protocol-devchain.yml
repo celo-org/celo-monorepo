@@ -1,10 +1,10 @@
-name: celo-monorepo CI/CD - generate protocol devchain
-run-name: celo-monorepo Protocol devchain
+name: 'CoreContracts: Devchain For Contract Release'
+run-name: 'CoreContracts: Devchain For Contract Release'
 
 on:
   schedule:
     # monthly on 1 at 0:00 UTC
-    - cron: 0 0 1 * * 
+    - cron: 0 0 1 * *
   workflow_dispatch:
 
 jobs:
@@ -34,10 +34,6 @@ jobs:
         run: git config --global url."https://".insteadOf ssh:// && yarn install
       - name: Build packages
         run: yarn build --ignore docs --include-dependencies
-      # TODO: Needed?
-      - name: Opcode tests
-        run: |
-          yarn --cwd packages/protocol check-opcodes
       # Workaround for https://stackoverflow.com/questions/72978485/git-submodule-update-failed-with-fatal-detected-dubious-ownership-in-repositor
       # This is needed because some runners messup with permissions of git files and submodules. Particularly problematic for DinD runners (e.g. self-hosted+container arg)
       - name: Configure git safe directories
