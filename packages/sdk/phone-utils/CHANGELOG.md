@@ -1,17 +1,5 @@
 # @celo/phone-utils
 
-## 6.0.0-hornet.0
-
-### Major Changes
-
-- 8648936c6: Remove getPhoneHash, to lookup an odis hash for an identifier use getIdentifierHash from @celo/identity
-
-### Patch Changes
-
-- Updated dependencies [8648936c6]
-  - @celo/base@6.0.0-hornet.0
-  - @celo/utils@5.0.6-hornet.0
-
 ## 5.0.5
 
 ### Patch Changes

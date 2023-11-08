@@ -1,24 +1,5 @@
 # @celo/celotool
 
-## 2.0.0-hornet.0
-
-### Major Changes
-
-- 8648936c6: Remove lookup command, use `celocli identity:identifier --phoneNumber`
-
-### Patch Changes
-
-- Updated dependencies
-- Updated dependencies [8648936c6]
-  - @celo/contractkit@5.2.0-hornet.0
-  - @celo/base@6.0.0-hornet.0
-  - @celo/env-tests@1.0.2-hornet.0
-  - @celo/explorer@5.0.6-hornet.0
-  - @celo/governance@5.0.6-hornet.0
-  - @celo/connect@5.1.1-hornet.0
-  - @celo/cryptographic-utils@5.0.6-hornet.0
-  - @celo/utils@5.0.6-hornet.0
-
 ## 1.0.1
 
 ### Patch Changes

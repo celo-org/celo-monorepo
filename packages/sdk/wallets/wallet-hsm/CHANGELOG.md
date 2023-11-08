@@ -1,12 +1,5 @@
 # @celo/wallet-hsm
 
-## 5.1.1-hornet.0
-
-### Patch Changes
-
-- Updated dependencies [8648936c6]
-  - @celo/base@6.0.0-hornet.0
-
 ## 5.1.0
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@celo/protocol",
-  "version": "1.0.2-hornet.0",
+  "version": "1.0.1",
   "private": true,
   "main": "index.ts",
   "author": "Celo",
@@ -50,12 +50,12 @@
     "@0x/sol-profiler": "^4.1.37",
     "@0x/sol-trace": "^3.0.47",
     "@0x/subproviders": "^7.0.1",
-    "@celo/base": "^6.0.0-hornet.0",
+    "@celo/base": "^5.0.5",
     "@celo/bls12377js": "0.1.1",
-    "@celo/connect": "^5.1.1-hornet.0",
-    "@celo/cryptographic-utils": "^5.0.6-hornet.0",
-    "@celo/utils": "^5.0.6-hornet.0",
-    "@celo/wallet-local": "^5.1.1-hornet.0",
+    "@celo/connect": "^5.1.0",
+    "@celo/cryptographic-utils": "^5.0.5",
+    "@celo/utils": "^5.0.5",
+    "@celo/wallet-local": "^5.1.0",
     "@ethereumjs/util": "8.0.5",
     "@ethereumjs/vm": "npm:@soloseng/ethereumjs-vm@6.4.1",
     "@ganache/console.log": "0.3.0",
@@ -101,7 +101,6 @@
     "web3-utils": "1.10.0"
   },
   "devDependencies": {
-    "@celo/celo-devchain": "6.0.0",
     "@celo/odis-identifiers": "^1.0.0",
     "@celo/typechain-target-web3-v1-celo": "0.2.0",
     "@celo/typescript": "0.0.1",

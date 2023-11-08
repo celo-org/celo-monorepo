@@ -1,17 +1,5 @@
 # @celo/governance
 
-## 5.0.6-hornet.0
-
-### Patch Changes
-
-- Updated dependencies
-- Updated dependencies [8648936c6]
-  - @celo/contractkit@5.2.0-hornet.0
-  - @celo/base@6.0.0-hornet.0
-  - @celo/explorer@5.0.6-hornet.0
-  - @celo/connect@5.1.1-hornet.0
-  - @celo/utils@5.0.6-hornet.0
-
 ## 5.0.5
 
 ### Patch Changes

@@ -1,12 +1,5 @@
 # @celo/utils
 
-## 5.0.6-hornet.0
-
-### Patch Changes
-
-- Updated dependencies [8648936c6]
-  - @celo/base@6.0.0-hornet.0
-
 ## 5.0.5
 
 ### Patch Changes
