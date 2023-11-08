@@ -94,14 +94,6 @@ jobs:
       - name: Run yarn postinstall if cache hitted
         run: yarn run postinstall
         if: steps.cache_node.outputs.cache-hit == 'true'
-      - name: Fail if any file changed on git
-        if: false
-        run: |
-          # This fails if there is any change
-          if ! git diff-index HEAD --; then
-            echo "Git changes detected while building. If this is unexpected, bump NODE_MODULE_CACHE_VERSION in .github/workflows/celo-monorepo.yml"
-            exit 1
-          fi
       - name: Verify Changed files
         uses: tj-actions/verify-changed-files@v16
         with:
