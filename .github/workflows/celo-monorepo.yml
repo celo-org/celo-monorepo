@@ -187,7 +187,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           workflow: protocol-devchain.yml          
-          name: build-${{ env.RELEASE_TAG }}
+          name: devchain-${{ env.RELEASE_TAG }}
           path: packages/protocol/.tmp/build
       - name: Copy DevChain and Build generated from released tag
         run: |
