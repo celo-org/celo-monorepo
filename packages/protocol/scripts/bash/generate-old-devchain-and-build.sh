@@ -70,3 +70,8 @@ yarn --cwd packages/protocol pull-submodules
 
 git checkout -
 
+# reset submodules again after checkout
+rm -rf  rm -rf packages/protocol/lib/
+git checkout packages/protocol/lib/
+# can't do as it may not be in the previous branch `yarn --cwd packages/protocol delete-submodules``
+yarn --cwd packages/protocol pull-submodules
