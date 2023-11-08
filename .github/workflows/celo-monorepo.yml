@@ -165,6 +165,41 @@ jobs:
       - name: Run Wallet tests
         run: |
           yarn run lerna --scope '@celo/wallet-*' run test
+
+  old-release-devchain:
+    name: Generate Old Release Devchain
+    runs-on: ['self-hosted', 'monorepo-node18']
+    timeout-minutes: 30
+    needs: [install-dependencies]
+    if: |
+      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+      false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          submodules: recursive
+      - name: Install yarn dependencies
+        run: git config --global url."https://".insteadOf ssh:// && yarn install
+      - name: Build packages
+        run: yarn build --ignore docs --include-dependencies
+      - name: Generate devchain
+        run: |
+          cd packages/protocol
+          mkdir release
+          mv build/contracts* release
+          yarn devchain generate-tar release/devchain.tar.gz --release_gold_contracts scripts/truffle/releaseGoldExampleConfigs.json
+      - name: save artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-${{ env.RELEASE_TAG }}
+          path: packages/protocol/release
+
   pre-protocol-test-release:
     name: Protocol Tests Prepare
     runs-on: ['self-hosted', 'monorepo-node18']
