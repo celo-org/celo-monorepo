@@ -18,15 +18,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        tag:
-          - core-contracts.v9
-          - core-contracts.v10
+        include:
+          - tag: core-contracts.v9
+            node-version: 12
+          - tag: core-contracts.v10
+            node-version: 18
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ matrix.tag }}
           fetch-depth: 0
           submodules: recursive
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
       - name: Install yarn dependencies
         run: git config --global url."https://".insteadOf ssh:// && yarn install
       - name: Build packages
@@ -35,8 +41,8 @@ jobs:
       - name: Opcode tests
         run: |
           yarn --cwd packages/protocol check-opcodes
-      - uses: actions/setup-node@v3
       # Workaround for https://stackoverflow.com/questions/72978485/git-submodule-update-failed-with-fatal-detected-dubious-ownership-in-repositor
+      # This is needed because some runners messup with permissions of git files and submodules. Particularly problematic for DinD runners (e.g. self-hosted+container arg)
       - name: Configure git safe directories
         run: git config --global --add safe.directory '*'
       - name: Generate devchain of previous release
@@ -46,7 +52,10 @@ jobs:
           yarn --cwd packages/protocol devchain generate-tar devchain/devchain.tar.gz --release_gold_contracts $GRANTS_FILE
           mv packages/protocol/build/contracts* devchain/
       - name: Upload devchain as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: devchain-${{ matrix.tag }}
           path: devchain
+          # Max retention time is 90 days for public repos
+          # https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
+          retention-days: 90
