@@ -95,12 +95,18 @@ jobs:
         run: yarn run postinstall
         if: steps.cache_node.outputs.cache-hit == 'true'
       - name: Fail if any file changed on git
+        if: false
         run: |
           # This fails if there is any change
           if ! git diff-index HEAD --; then
             echo "Git changes detected while building. If this is unexpected, bump NODE_MODULE_CACHE_VERSION in .github/workflows/celo-monorepo.yml"
             exit 1
           fi
+      - name: Verify Changed files
+        uses: tj-actions/verify-changed-files@v16
+        with:
+          fail-if-changed: "true"
+          fail-message: "Files changed during build. Please build locally and commit the changes."
       - name: Build packages
         run: yarn build --ignore docs --include-dependencies
       - name: Check licenses
@@ -188,11 +194,11 @@ jobs:
         with:
           workflow: protocol-devchain.yml          
           name: devchain-${{ env.RELEASE_TAG }}
-          path: packages/protocol/.tmp/build
+          path: packages/protocol/.tmp/devchain
       - name: Copy DevChain and Build generated from released tag
         run: |
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
-          (cp -r packages/protocol/.tmp/released_chain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
+          (cp -r packages/protocol/.tmp/devchain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
       - name: Test against current release
         run: |
           echo "Comparing against $RELEASE_TAG"
