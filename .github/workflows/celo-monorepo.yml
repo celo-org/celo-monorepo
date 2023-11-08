@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - master
+      - jcortejoso/debug-ci
   pull_request:
     branches:
       - master
@@ -53,9 +54,10 @@ jobs:
           key: git-${{ github.ref }}
           restore-keys: |
             git-
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
       - name: Verify setup for incremental testing
         run: |
           set -euo pipefail
@@ -149,7 +151,7 @@ jobs:
         with:
           path: .git
           key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -166,7 +168,7 @@ jobs:
         with:
           path: .git
           key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -200,7 +202,7 @@ jobs:
         with:
           path: .git
           key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -235,7 +237,7 @@ jobs:
         with:
           path: .git
           key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -287,7 +289,7 @@ jobs:
         with:
           path: .git
           key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/protocol-sync-workspace
         with:
@@ -363,7 +365,7 @@ jobs:
         with:
           path: .git
           key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Sync workspace
@@ -407,7 +409,7 @@ jobs:
         with:
           path: .git
           key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -440,7 +442,7 @@ jobs:
         with:
           path: .git
           key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -480,7 +482,7 @@ jobs:
         with:
           path: .git
           key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -510,7 +512,7 @@ jobs:
         with:
           path: .git
           key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -546,7 +548,7 @@ jobs:
         with:
           path: .git
           key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -639,7 +641,7 @@ jobs:
         with:
           path: .git
           key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Sync workspace
@@ -709,7 +711,7 @@ jobs:
         with:
           path: .git
           key: git-${{ github.ref }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
