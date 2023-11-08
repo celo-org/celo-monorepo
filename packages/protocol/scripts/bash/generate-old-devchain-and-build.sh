@@ -63,7 +63,9 @@ cd ../..
 # Fix a git bug https://github.com/hathach/tinyusb/issues/242
 # wihout this calls to git will fail
 rm -rf .git/modules/
-yarn --cwd packages/protocol delete-submodules
+rm -rf  rm -rf packages/protocol/lib/
+git checkout packages/protocol/lib/
+# can't do as it may not be in the previous branch `yarn --cwd packages/protocol delete-submodules``
 yarn --cwd packages/protocol pull-submodules
 
 git checkout -
