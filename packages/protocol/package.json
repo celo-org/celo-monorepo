@@ -19,6 +19,7 @@
     "build:ts": "rm -f migrations/*.js* && ts-node --preferTsExts ./scripts/build.ts --truffleTypes ./types/typechain && tsc -b && mv migrations_ts/*.js* migrations",
     "gas": "yarn run test --gas",
     "pull-submodules": "git submodule update --init --recursive",
+    "delete-submodules": "rm -rf $(git submodule | awk '{ print $2 }')",
     "build:sol": "yarn pull-submodules && mkdir -p migrations && ts-node --preferTsExts ./scripts/build.ts --solidity ${BUILD_DIR:-./build}",
     "build": "yarn build:sol && yarn build:ts",
     "prebuild": "rm -rf ./build",
