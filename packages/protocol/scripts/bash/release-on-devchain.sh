@@ -34,11 +34,6 @@ fi
 
 
 rm -rf build/contracts*
-cd ../..
-yarn run reset
-yarn install >> $LOG_FILE
-yarn build >> $LOG_FILE
-cd packages/protocol
 
 echo "- Run local network"
 TAR_FILE="packages/protocol/$BUILD_DIR/devchain.tar.gz"
@@ -46,6 +41,7 @@ if [ ! -f "$TAR_FILE" ]; then
   echo "Generating $TAR_FILE"
   yarn devchain generate-tar $TAR_FILE
 fi
+
 yarn devchain run-tar-in-bg $TAR_FILE >> $LOG_FILE
 
 GANACHE_PID=
@@ -64,14 +60,14 @@ echo "- Check versions of current branch"
 BASE_COMMIT=$(git rev-parse HEAD)
 echo " - Base commit $BASE_COMMIT"
 echo " - Checkout migrationsConfig.js at $BRANCH"
-git checkout $BRANCH -- migrationsConfig.js
+# git checkout $BRANCH -- migrationsConfig.js
 
 OLD_BRANCH=$BRANCH
 source scripts/bash/contract-exclusion-regex.sh
 yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --output_file report.json
 
 echo "Undo checkout for migrationsConfig.js from $(git rev-parse HEAD) to $BASE_COMMIT"
-git checkout - -- migrationsConfig.js
+# git checkout - -- migrationsConfig.js
 
 # From make-release.sh
 echo "- Deploy release of current branch"
