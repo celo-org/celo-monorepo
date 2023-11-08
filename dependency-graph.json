@@ -61,6 +61,7 @@
       "@celo/base",
       "@celo/connect",
       "@celo/cryptographic-utils",
+      "@celo/phone-utils",
       "@celo/typescript",
       "@celo/utils",
       "@celo/wallet-local"
@@ -89,6 +90,7 @@
       "@celo/base",
       "@celo/connect",
       "@celo/dev-utils",
+      "@celo/phone-utils",
       "@celo/protocol",
       "@celo/utils",
       "@celo/wallet-local"

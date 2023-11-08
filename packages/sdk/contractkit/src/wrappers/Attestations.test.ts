@@ -1,16 +1,11 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { getIdentifierHash, IdentifierPrefix } from '@celo/odis-identifiers'
+import { PhoneNumberUtils } from '@celo/phone-utils'
 import { newKitFromWeb3 } from '../kit'
 import { AttestationsWrapper } from './Attestations'
 
 testWithGanache('Attestations Wrapper', (web3) => {
   const PHONE_NUMBER = '+15555555555'
-  const IDENTIFIER = getIdentifierHash(
-    web3.utils.sha3,
-    PHONE_NUMBER,
-    IdentifierPrefix.PHONE_NUMBER,
-    'pepper'
-  )
+  const IDENTIFIER = PhoneNumberUtils.getPhoneHash(PHONE_NUMBER)
 
   const kit = newKitFromWeb3(web3)
   let accounts: string[] = []
