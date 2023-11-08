@@ -6,9 +6,6 @@ on:
     # monthly on 1 at 0:00 UTC
     - cron: 0 0 1 * * 
   workflow_dispatch:
-  push:
-    branches:
-      - jcortejoso/debug-ci
 
 jobs:
   generate-protocol-devchain:

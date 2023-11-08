@@ -166,51 +166,11 @@ jobs:
         run: |
           yarn run lerna --scope '@celo/wallet-*' run test
 
-  old-release-devchain:
-    name: Generate Old Release Devchain
+  protocol-test-release:
+    name: Protocol Test Release
     runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 30
-    needs: [install-dependencies]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.RELEASE_TAG }}
-          submodules: recursive
-      - name: Install yarn dependencies
-        run: git config --global url."https://".insteadOf ssh:// && yarn install
-      - name: Build packages
-        run: yarn build --ignore docs --include-dependencies
-      - name: Generate devchain
-        run: |
-          cd packages/protocol
-          mkdir release
-          mv build/contracts* release
-          yarn devchain generate-tar release/devchain.tar.gz --release_gold_contracts scripts/truffle/releaseGoldExampleConfigs.json
-      - name: save artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-${{ env.RELEASE_TAG }}
-          path: packages/protocol/release
-
-  pre-protocol-test-release:
-    name: Protocol Tests Prepare
-    runs-on: ['self-hosted', 'monorepo-node18']
-    # container:
-    #   image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
-    #   # Required root to install node12
-    #   options: --user root
-    timeout-minutes: 30
-    # Comment lint-checks dependency to speed up (as this is a dependency for many other jobs)
-    # needs: [install-dependencies, lint-checks]
-    needs: [install-dependencies]
+    timeout-minutes: 500
+    needs: [install-dependencies, lint-checks]
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
@@ -223,46 +183,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
-      - name: Cache protocol devchain
-        uses: actions/cache@v3
-        id: cache_protocol
+      - name: Download protocol devchain artifact
+        uses: actions/download-artifact@v4
         with:
-          path: packages/protocol/.tmp/released_chain
-          key: protocol-${{ github.sha }}
-          restore-keys: |
-            protocol-${{ github.sha }}
-      - name: Opcode tests
-        run: |
-          yarn --cwd packages/protocol check-opcodes
-      - uses: actions/setup-node@v3
-      # Workaround for https://stackoverflow.com/questions/72978485/git-submodule-update-failed-with-fatal-detected-dubious-ownership-in-repositor
-      - name: Configure git safe directories
-        run: git config --global --add safe.directory '*'
-      - name: Generate devchain of previous release
-        run: |
-          echo "Comparing against $RELEASE_TAG"
-          # Github has phased out the git protocol so we ensure that we use
-          # https for all git operations that yarn may perform.
-          git config --global url."https://github.com".insteadOf git://github.com
-          yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
-
-  protocol-test-release:
-    name: Protocol Test Release
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 500
-    needs: [install-dependencies, lint-checks, pre-protocol-test-release]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    steps:
-      - uses: actions/checkout@v4
-      - name: Sync workspace
-        uses: ./.github/actions/protocol-sync-workspace
+          name: devchain-$RELEASE_TAG
+          path: packages/protocol/.tmp/devchain
       - name: Copy DevChain and Build generated from released tag
         run: |
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
@@ -274,6 +199,7 @@ jobs:
           sudo apt-get install vim lsof --yes
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
           yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
+
   protocol-test-matrix:
     # Keeping name short because GitHub UI does not handle long names well
     name: ${{ matrix.name }}
@@ -328,11 +254,6 @@ jobs:
           submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
-        with:
-          rebuild-package: 'true'
-      - name: Build protocol
-        run: |
-          yarn --cwd packages/protocol build
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
         with:
@@ -340,6 +261,7 @@ jobs:
           max_attempts: 3
           command: |
             ${{ matrix.command }}
+
   contractkit-tests:
     name: ContractKit Tests
     runs-on: ['self-hosted', 'monorepo-node18']
@@ -365,6 +287,7 @@ jobs:
       - name: Run tests
         run: |
           yarn --cwd=packages/sdk/contractkit test
+
   cli-tests:
     name: CeloCli Tests
     runs-on: ['self-hosted', 'monorepo-node18']
@@ -402,6 +325,7 @@ jobs:
       - name: Verify that a new account can be created
         run: |
           yarn --cwd=packages/cli run celocli account:new
+
   typescript-tests:
     name: Typescript package Tests
     runs-on: ['self-hosted', 'monorepo-node18']
