@@ -1,5 +1,5 @@
-name: celo-monorepo CI/CD
-run-name: celo-monorepo CI/CD for ${{ github.head_ref || github.ref_name }}
+name: Build & Integration Tests
+run-name: 'Build & Integration Tests: ${{ github.head_ref || github.ref_name }}'
 
 # Dockefile for the self-hosted runner:
 # https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfile-monorepo
@@ -97,8 +97,8 @@ jobs:
       - name: Verify Changed files
         uses: tj-actions/verify-changed-files@v16
         with:
-          fail-if-changed: "true"
-          fail-message: "Files changed during build. Please build locally and commit the changes."
+          fail-if-changed: 'true'
+          fail-message: 'Files changed during build. Please build locally and commit the changes.'
       - name: Build packages
         run: yarn build --ignore docs --include-dependencies
       - name: Check licenses
@@ -187,7 +187,7 @@ jobs:
       - name: Download protocol devchain artifact
         uses: dawidd6/action-download-artifact@v2
         with:
-          workflow: protocol-devchain.yml          
+          workflow: protocol-devchain.yml
           name: devchain-${{ env.RELEASE_TAG }}
           path: packages/protocol/.tmp/devchain
       - name: Copy DevChain and Build generated from released tag
