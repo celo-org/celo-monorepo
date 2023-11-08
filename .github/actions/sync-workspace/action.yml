@@ -1,9 +1,6 @@
 name: "Sync workspace"
 description: "Sync GitHub Action workspace using GitHub cache"
 inputs:
-  package-json-checksum:
-    description: "Checksum of package.json"
-    required: true
   rebuild-package:
     description: "Rebuild package. It also disable fail-on-cache-miss"
     required: false
