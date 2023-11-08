@@ -537,6 +537,7 @@ export enum TestMode {
   Mixed = 'mixed',
   Data = 'data',
   Transfer = 'transfer',
+  StableTransfer = 'stable_transfer',
 }
 
 export const simulateClient = async (
@@ -633,7 +634,7 @@ export const simulateClient = async (
         ...baseLogMessage,
       })
     }
-    const intrinsicGas = 21000
+    const intrinsicGas = txConf.feeCurrencyGold ? 21000 : 71000
     const totalTxGas = 500000 // aim for half million gas txs
     const calldataGas = totalTxGas - intrinsicGas
     const calldataSize = calldataGas / 4 // 119750 < tx pool size limit (128k)
@@ -690,6 +691,13 @@ const getTxConf = async (testMode: TestMode) => {
       feeCurrencyGold: true,
       tokenName: 'cGLD',
       transferFn: transferCeloGold,
+    }
+  }
+  if (testMode === TestMode.StableTransfer) {
+    return {
+      feeCurrencyGold: false,
+      tokenName: 'cUSD',
+      transferFn: transferCeloDollars,
     }
   }
 
