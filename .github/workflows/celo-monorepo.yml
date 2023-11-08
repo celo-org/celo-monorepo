@@ -52,14 +52,6 @@ jobs:
     runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     steps:
-      - name: Restore .git cache
-        uses: actions/cache@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
-          restore-keys: |
-            git-
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -130,13 +122,6 @@ jobs:
     timeout-minutes: 30
     needs: install-dependencies
     steps:
-      # Restore .git cache as we need to checkout the local composite action to run it:
-      # https://github.com/orgs/community/discussions/11771
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
@@ -147,11 +132,6 @@ jobs:
     runs-on: ['self-hosted', 'monorepo-node18']
     needs: install-dependencies
     steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
@@ -179,11 +159,6 @@ jobs:
     timeout-minutes: 30
     needs: install-dependencies
     steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
@@ -210,11 +185,6 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
@@ -254,11 +224,6 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/protocol-sync-workspace
@@ -322,11 +287,6 @@ jobs:
             command: |
               yarn --cwd packages/protocol test stability/
     steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -359,11 +319,6 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
@@ -390,11 +345,6 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
@@ -428,11 +378,6 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
@@ -456,11 +401,6 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
@@ -484,11 +424,6 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
     steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
@@ -575,11 +510,6 @@ jobs:
 
               ./ci_test_validator_order.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
     steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -638,11 +568,6 @@ jobs:
               cd packages/protocol
               ./specs/scripts/reserve.sh
     steps:
-      - uses: actions/cache/restore@v3
-        id: cache_git
-        with:
-          path: .git
-          key: git-${{ github.ref }}
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
