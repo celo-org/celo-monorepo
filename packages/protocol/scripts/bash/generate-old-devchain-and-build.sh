@@ -41,6 +41,7 @@ echo "Using temporary directory $TMP_DIR"
 echo "Using build directory $BUILD_DIR"
 rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 BUILD_DIR_ABOSLUTE=$(cd "$BUILD_DIR" && pwd || echo "Error: Failed to find directory")
+echo "ABSOLUTE BUILD DIR: $BUILD_DIR_ABOSLUTE"
 
 
 echo "- Checkout source code at $BRANCH" and remote url $REMOTE_URL
