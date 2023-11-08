@@ -1,5 +1,11 @@
 # @celo/base
 
+## 6.0.0-hornet.0
+
+### Major Changes
+
+- 8648936c6: Remove getIdentifierHash, IdentifierPrefix, getIdentifierPrefix. These have been moved to @celo/odis-identifiers
+
 ## 5.0.5
 
 ### Patch Changes

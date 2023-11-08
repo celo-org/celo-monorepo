@@ -1,5 +1,14 @@
 # @celo/metadata-crawler
 
+## 0.0.3-hornet.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @celo/contractkit@5.2.0-hornet.0
+  - @celo/connect@5.1.1-hornet.0
+  - @celo/utils@5.0.6-hornet.0
+
 ## 0.0.2
 
 ### Patch Changes

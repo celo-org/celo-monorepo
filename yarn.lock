@@ -896,6 +896,11 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@celo/base@^5.0.4", "@celo/base@^5.0.5":
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/@celo/base/-/base-5.0.5.tgz#b4102faba080ce536411b7987259d9ca152b6e6d"
+  integrity sha512-S6kXYibYH3iQ5rNbzqziWXnafr21b4UOxeLLMmx/ubYLHLX5lkCdZnSXBhQAiH5k2jhGSUg4H+VQNj5RqWL/JA==
+
 "@celo/bls12377js@0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@celo/bls12377js/-/bls12377js-0.1.1.tgz#ba3574f41697cdba96c10ae96bb1aac057285798"
@@ -903,6 +908,55 @@
   dependencies:
     "@stablelib/blake2xs" "0.10.4"
     big-integer "^1.6.44"
+
+"@celo/celo-devchain@6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@celo/celo-devchain/-/celo-devchain-6.0.0.tgz#fe0491b626ed6940f6ba46c0287a05927e6d7a2e"
+  integrity sha512-PHJd8FUiEkGe4dTx1c/lPThsZfHuHYgxAjvzhV6nWIeVMNBlu29irm/JjEjnJxqwnCBbNPtLfaDWtqsDng2exw==
+  dependencies:
+    "@celo/contractkit" "^5.0.4"
+    commander "^10.0.0"
+    ganache "npm:@celo/ganache@7.8.0-unofficial.0"
+    node-fetch "^3.3.0"
+    targz "^1.0.1"
+    tmp "^0.2.1"
+
+"@celo/connect@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@celo/connect/-/connect-5.1.0.tgz#a557f4c46c26251408fbc529e7b7b08c2934bad7"
+  integrity sha512-dQikaSYth2UXk0Z7DO1xViLGZ3a9r6Xe50uLwOuoFXGhv1ERBMgC1/c82UVi7atOk9h7sUfE1VAlWehxShEdEw==
+  dependencies:
+    "@celo/base" "^5.0.5"
+    "@celo/utils" "^5.0.5"
+    "@ethereumjs/util" "8.0.5"
+    "@types/debug" "^4.1.5"
+    "@types/utf8" "^2.1.6"
+    bignumber.js "^9.0.0"
+    debug "^4.1.1"
+    utf8 "3.0.0"
+    web3-core "1.10.0"
+    web3-eth "1.10.0"
+    web3-eth-contract "1.10.0"
+
+"@celo/contractkit@^5.0.4":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-5.1.0.tgz#258d03f03b51b5d2fb74114a8f5a0dc0d93e43e3"
+  integrity sha512-sUeUq46u0jQ2J/sl9E5IKMRD7t05XZCuX4HYCqsLqAth+6P5DsqNTG4qNK9amHMqnE1HAbGJ9o+cyBkY8vEwfg==
+  dependencies:
+    "@celo/base" "^5.0.5"
+    "@celo/connect" "^5.1.0"
+    "@celo/utils" "^5.0.5"
+    "@celo/wallet-local" "^5.1.0"
+    "@types/bn.js" "^5.1.0"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^9.0.0"
+    cross-fetch "3.0.6"
+    debug "^4.1.1"
+    fp-ts "2.1.1"
+    io-ts "2.0.1"
+    semver "^7.3.5"
+    web3 "1.10.0"
+    web3-core-helpers "1.10.0"
 
 "@celo/identity@^5.1.0":
   version "5.1.0"
@@ -958,6 +1012,22 @@
     is-base64 "^1.1.0"
     node-fetch "^2.6.9"
 
+"@celo/phone-utils@^5.0.4":
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/@celo/phone-utils/-/phone-utils-5.0.5.tgz#c3fb8ca33064f7642fc3950c5a9781603495e90f"
+  integrity sha512-If5c90GEOU0z9nKI82FPlzbfS1PgRdbNKlOuBuVvbL6oZHZW+4YBEU7IQQ60RxadVBr87Fzj4mHmvd7CFTznlQ==
+  dependencies:
+    "@celo/base" "^5.0.5"
+    "@celo/utils" "^5.0.5"
+    "@types/country-data" "^0.0.0"
+    "@types/google-libphonenumber" "^7.4.23"
+    "@types/node" "^18.7.16"
+    country-data "^0.0.31"
+    fp-ts "2.1.1"
+    google-libphonenumber "^3.2.27"
+    io-ts "2.0.1"
+    web3-utils "^1.10.0"
+
 "@celo/typechain-target-web3-v1-celo@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@celo/typechain-target-web3-v1-celo/-/typechain-target-web3-v1-celo-0.2.0.tgz#2560b470e348d2628debe899885724ce5b218bc3"
@@ -965,6 +1035,55 @@
   dependencies:
     lodash "~4.17.19"
     typechain "2.0.0"
+
+"@celo/utils@^5.0.4", "@celo/utils@^5.0.5":
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-5.0.5.tgz#40a99274ed88a7faff1ad1eb755d69f2c6b22428"
+  integrity sha512-rE+VMFipUUccQncAxaPsm+5NSONRx0DOTMN0mEDTRe9eml9/VhDn63IGImksLoebcVlYg4/XdcJpGgqIQQYdig==
+  dependencies:
+    "@celo/base" "^5.0.5"
+    "@ethereumjs/util" "8.0.5"
+    "@types/bn.js" "^5.1.0"
+    "@types/elliptic" "^6.4.9"
+    "@types/node" "^18.7.16"
+    bignumber.js "^9.0.0"
+    bn.js "4.11.9"
+    elliptic "^6.5.4"
+    ethereum-cryptography "1.2.0"
+    fp-ts "2.1.1"
+    io-ts "2.0.1"
+    rlp "^2.2.4"
+    web3-eth-abi "1.10.0"
+    web3-utils "1.10.0"
+
+"@celo/wallet-base@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@celo/wallet-base/-/wallet-base-5.1.0.tgz#6a3f24e0ecf44a05e30a04796cdb8368f0362dfa"
+  integrity sha512-7kSXwv++QXkuSVjsDF6FTZhhqDXIBvpMOpBxUAKgUHhxDkJfC3DmlddlSdc/DJCWlfuVM/JHhdystfSpY46z5A==
+  dependencies:
+    "@celo/base" "^5.0.5"
+    "@celo/connect" "^5.1.0"
+    "@celo/utils" "^5.0.5"
+    "@ethereumjs/rlp" "^5.0.0"
+    "@ethereumjs/util" "8.0.5"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^9.0.0"
+    debug "^4.1.1"
+    eth-lib "^0.2.8"
+    ethereum-cryptography "^2.1.2"
+    web3 "1.10.0"
+    web3-eth-accounts "1.10.0"
+
+"@celo/wallet-local@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@celo/wallet-local/-/wallet-local-5.1.0.tgz#fba607075086261db84bcb56bfc175e597835c4a"
+  integrity sha512-exJugDRdZuMX3P73sC5DJi4bL3vv4m8itWovtyB3YR92ise1moaH48rXlEvBM2NeJN4AP+SIiqGUJcxcf2fjkw==
+  dependencies:
+    "@celo/connect" "^5.1.0"
+    "@celo/utils" "^5.0.5"
+    "@celo/wallet-base" "^5.1.0"
+    "@ethereumjs/util" "8.0.5"
+    eth-lib "^0.2.8"
 
 "@chainsafe/as-sha256@^0.3.1":
   version "0.3.1"
@@ -9107,6 +9226,11 @@ commander@3.0.2, commander@^3.0.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-3.0.2.tgz#6837c3fb677ad9933d1cfba42dd14d5117d6b39e"
   integrity sha512-Gar0ASD4BDyKC4hl4DwHqDrmvjoxWKZigVnAbn5H1owvm4CxCPdb0HQDehwNYMJpla5+M2tPmPARzhtYuwpHow==
 
+commander@^10.0.0:
+  version "10.0.1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-10.0.1.tgz#881ee46b4f77d1c1dccc5823433aa39b022cbe06"
+  integrity sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==
+
 commander@^2.12.1, commander@^2.20.3, commander@^2.8.1:
   version "2.20.3"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
@@ -9664,6 +9788,11 @@ dashdash@^1.12.0:
   integrity sha512-jRFi8UDGo6j+odZiEpjazZaWqEal3w/basFjQHQEwVtZJGDpxbH1MeYluwCS8Xq5wmLJooDlMgvVarmWfGM44g==
   dependencies:
     assert-plus "^1.0.0"
+
+data-uri-to-buffer@^4.0.0:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/data-uri-to-buffer/-/data-uri-to-buffer-4.0.1.tgz#d8feb2b2881e6a4f58c2e08acfd0e2834e26222e"
+  integrity sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==
 
 dataloader@2.1.0:
   version "2.1.0"
@@ -11762,6 +11891,14 @@ fd-slicer@~1.1.0:
   dependencies:
     pend "~1.2.0"
 
+fetch-blob@^3.1.2, fetch-blob@^3.1.4:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/fetch-blob/-/fetch-blob-3.2.0.tgz#f09b8d4bbd45adc6f0c20b7e787e793e309dcce9"
+  integrity sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==
+  dependencies:
+    node-domexception "^1.0.0"
+    web-streams-polyfill "^3.0.3"
+
 fetch-cookie@0.11.0:
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/fetch-cookie/-/fetch-cookie-0.11.0.tgz#e046d2abadd0ded5804ce7e2cae06d4331c15407"
@@ -12099,6 +12236,13 @@ form-data@~2.3.2:
     asynckit "^0.4.0"
     combined-stream "^1.0.6"
     mime-types "^2.1.12"
+
+formdata-polyfill@^4.0.10:
+  version "4.0.10"
+  resolved "https://registry.yarnpkg.com/formdata-polyfill/-/formdata-polyfill-4.0.10.tgz#24807c31c9d402e002ab3d8c720144ceb8848423"
+  integrity sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g==
+  dependencies:
+    fetch-blob "^3.1.2"
 
 forwarded@0.2.0:
   version "0.2.0"
@@ -17246,6 +17390,11 @@ node-addon-api@^4.2.0, node-addon-api@^4.3.0:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-4.3.0.tgz#52a1a0b475193e0928e98e0426a0d1254782b77f"
   integrity sha512-73sE9+3UaLYYFmDsFZnqCInzPyh3MqIwZO9cw58yIqAZhONrrabrYyYe3TuIqtIiOuTXVhsGau8hcrhhwSsDIQ==
 
+node-domexception@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/node-domexception/-/node-domexception-1.0.0.tgz#6888db46a1f71c0b76b3f7555016b63fe64766e5"
+  integrity sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==
+
 node-environment-flags@1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/node-environment-flags/-/node-environment-flags-1.0.6.tgz#a30ac13621f6f7d674260a54dede048c3982c088"
@@ -17280,6 +17429,15 @@ node-fetch@^2.2.0, node-fetch@^2.3.0, node-fetch@^2.6.0, node-fetch@^2.6.1, node
   integrity sha512-DJm/CJkZkRjKKj4Zi4BsKVZh3ValV5IR5s7LVZnW+6YMh0W1BfNA8XSs6DLMGYlId5F3KnA70uu2qepcR08Qqg==
   dependencies:
     whatwg-url "^5.0.0"
+
+node-fetch@^3.3.0:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-3.3.2.tgz#d1e889bacdf733b4ff3b2b243eb7a12866a0b78b"
+  integrity sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==
+  dependencies:
+    data-uri-to-buffer "^4.0.0"
+    fetch-blob "^3.1.4"
+    formdata-polyfill "^4.0.10"
 
 node-forge@^0.10.0:
   version "0.10.0"
@@ -21768,7 +21926,7 @@ tmp@^0.1.0:
   dependencies:
     rimraf "^2.6.3"
 
-tmp@~0.2.1:
+tmp@^0.2.1, tmp@~0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.2.1.tgz#8457fc3037dcf4719c251367a1af6500ee1ccf14"
   integrity sha512-76SUhtfqR2Ijn+xllcI5P1oyannHNHByD80W1q447gU3mp9G9PSpGdWmjUOHRDPiHYacIk66W7ubDTuPF3BEtQ==
@@ -22888,6 +23046,11 @@ weak-map@^1.0.5:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/weak-map/-/weak-map-1.0.8.tgz#394c18a9e8262e790544ed8b55c6a4ddad1cb1a3"
   integrity sha512-lNR9aAefbGPpHO7AEnY0hCFjz1eTkWCXYvkTRrTHs9qv8zJp+SkVYpzfLIFXQQiG3tVvbNFQgVg2bQS8YGgxyw==
+
+web-streams-polyfill@^3.0.3:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-3.2.1.tgz#71c2718c52b45fd49dbeee88634b3a60ceab42a6"
+  integrity sha512-e0MO3wdXWKrLbL0DgGnUV7WHVuw9OUvL4hjgnPkIeEvESk74gAITi5G606JtZPp39cd8HA9VQzCIvA49LpPN5Q==
 
 web3-bzz@1.10.0:
   version "1.10.0"

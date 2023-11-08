@@ -1,5 +1,28 @@
 # Changelog
 
+## 3.1.0-hornet.0
+
+### Minor Changes
+
+- 1e8d07ba6: add FeeHandler contract info to `celocli network:contracts` command
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies [8648936c6]
+- Updated dependencies [8648936c6]
+  - @celo/contractkit@5.2.0-hornet.0
+  - @celo/phone-utils@6.0.0-hornet.0
+  - @celo/base@6.0.0-hornet.0
+  - @celo/explorer@5.0.6-hornet.0
+  - @celo/governance@5.0.6-hornet.0
+  - @celo/connect@5.1.1-hornet.0
+  - @celo/cryptographic-utils@5.0.6-hornet.0
+  - @celo/utils@5.0.6-hornet.0
+  - @celo/wallet-hsm-azure@5.1.1-hornet.0
+  - @celo/wallet-ledger@5.1.1-hornet.0
+  - @celo/wallet-local@5.1.1-hornet.0
+
 ## 3.0.2
 
 ### Patch Changes
