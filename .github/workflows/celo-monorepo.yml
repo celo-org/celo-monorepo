@@ -188,6 +188,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
