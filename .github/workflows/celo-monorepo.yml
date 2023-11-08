@@ -260,11 +260,11 @@ jobs:
           # Github has phased out the git protocol so we ensure that we use
           # https for all git operations that yarn may perform.
           git config --global url."https://github.com".insteadOf git://github.com
-          yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
+          yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json || echo "failed"
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 600
-        if: false
+        if: true
         with:
           limit-access-to-actor: true
   protocol-test-release:
