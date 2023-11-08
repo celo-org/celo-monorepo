@@ -48,7 +48,7 @@ jobs:
       - name: Generate devchain of previous release
         run: |
           mkdir devchain
-          GRANTS_FILE=packages/protocol/scripts/truffle/releaseGoldExampleConfigs.json
+          GRANTS_FILE=scripts/truffle/releaseGoldExampleConfigs.json
           yarn --cwd packages/protocol devchain generate-tar devchain/devchain.tar.gz --release_gold_contracts $GRANTS_FILE
           mv packages/protocol/build/contracts* devchain/
       - name: Upload devchain as artifact
