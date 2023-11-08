@@ -61,7 +61,9 @@ mv "$PWD/devchain.tar.gz" $BUILD_DIR/.
 cd ../..
 
 # Fix a git bug https://github.com/hathach/tinyusb/issues/242
+# wihout this calls to git will fail
 rm -rf .git/modules/
+yarn --cwd packages/protocol delete-submodules
 yarn --cwd packages/protocol pull-submodules
 
 git checkout -
