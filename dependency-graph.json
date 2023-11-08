@@ -90,6 +90,7 @@
       "@celo/base",
       "@celo/connect",
       "@celo/dev-utils",
+      "@celo/phone-utils",
       "@celo/protocol",
       "@celo/utils",
       "@celo/wallet-local"

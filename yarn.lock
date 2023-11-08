@@ -966,11 +966,6 @@
     fp-ts "2.1.1"
     io-ts "2.0.1"
 
-"@celo/odis-identifiers@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@celo/odis-identifiers/-/odis-identifiers-1.0.0.tgz#9bafbb77d989f1f1064f293a54d64af3298f0e91"
-  integrity sha512-ZcBMGrr+DRX7FqNO0dWZpOVnYi5xWUxGaDtSeWnFQH9JwQ37ZmXQLEyraDXHx3gTgVEl+xSgCfJUnc1+w88PSQ==
-
 "@celo/phone-number-privacy-common@^3.0.3":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-3.1.0.tgz#df603ce1ff3ccc4297385d28884d1f730ec06743"
