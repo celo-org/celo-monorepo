@@ -45,7 +45,7 @@ echo BUILD_DIR: $BUILD_DIR
 TMP_DIR=$(mktemp -d)
 echo "Using temporary directory $TMP_DIR"
 
-[ -z "$BUILD_DIR" ] && BUILD_DIR=$(echo "$TMP_DIR/build/$(echo $BRANCH | sed -e 's/\//_/g')");
+[ -z "$BUILD_DIR" ] && BUILD_DIR=$(echo "build/$(echo $BRANCH | sed -e 's/\//_/g')");
 
 echo "- Checkout source code at $BRANCH" and remote url $REMOTE_URL
 # Clone the repository into the temporary directory
@@ -71,8 +71,9 @@ else
   yarn devchain generate-tar "$BUILD_DIR/devchain.tar.gz" --release_gold_contracts "$GRANTS_FILE"
 fi
 
-
+echo "moving contracts from build/contracts to $TARGET_DIR"" 
 mv build/contracts $TARGET_DIR
+echo "moving $PWD/devchain.tar.gz to $TARGET_DIR"
 mv "$PWD/devchain.tar.gz" $TARGET_DIR/.
 
 # Clean up if necessary
