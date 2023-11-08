@@ -202,8 +202,6 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
-    outputs:
-      protocol-test-must-run: ${{ steps.protocol-test-must-run.outputs.PROTOCOL_TEST_MUST_RUN }}
     steps:
       - uses: actions/cache/restore@v3
         id: cache_git
@@ -604,6 +602,7 @@ jobs:
           submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
+        with:
           rebuild-package: 'true'
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
