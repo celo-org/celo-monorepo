@@ -15,7 +15,6 @@ FORNO=""
 BUILD_DIR=""
 LOG_FILE="/dev/null"
 GRANTS_FILE=""
-TARGET_DIR=""
 
 while getopts ':b:rl:d:g:' flag; do
   case "${flag}" in
@@ -29,23 +28,20 @@ done
 
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 
-# Remember the original working directory
-ORIG_PWD=$(pwd)
 
 REMOTE_URL=$(git remote get-url origin)
 
-TARGET_DIR_RELATIVE=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'));
-rm -rf $TARGET_DIR_RELATIVE && mkdir -p $TARGET_DIR_RELATIVE
-TARGET_DIR=$(cd "$TARGET_DIR_RELATIVE" && pwd || echo "Error: Failed to find directory")
-
-echo TARGET_DIR: $TARGET_DIR
-echo BUILD_DIR: $BUILD_DIR
 
 # Create temporary directory
 TMP_DIR=$(mktemp -d)
 echo "Using temporary directory $TMP_DIR"
 
 [ -z "$BUILD_DIR" ] && BUILD_DIR=$(echo "build/$(echo $BRANCH | sed -e 's/\//_/g')");
+
+echo "Using build directory $BUILD_DIR"
+rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
+BUILD_DIR_ABOSLUTE=$(cd "$BUILD_DIR" && pwd || echo "Error: Failed to find directory")
+
 
 echo "- Checkout source code at $BRANCH" and remote url $REMOTE_URL
 # Clone the repository into the temporary directory
@@ -66,15 +62,15 @@ cd packages/protocol
 
 echo "- Create local network"
 if [ -z "$GRANTS_FILE" ]; then
-  yarn devchain generate-tar "$BUILD_DIR/devchain.tar.gz"
+  yarn devchain generate-tar "$PWD/devchain.tar.gz"
 else
-  yarn devchain generate-tar "$BUILD_DIR/devchain.tar.gz" --release_gold_contracts "$GRANTS_FILE"
+  yarn devchain generate-tar "$PWD/devchain.tar.gz" --release_gold_contracts "$GRANTS_FILE"
 fi
 
-echo "moving contracts from build/contracts to $TARGET_DIR"" 
-mv build/contracts $TARGET_DIR
-echo "moving $PWD/devchain.tar.gz to $TARGET_DIR"
-mv "$PWD/devchain.tar.gz" $TARGET_DIR/.
+echo "moving contracts from build/contracts to $BUILD_DIR_ABOSLUTE"" 
+mv build/contracts $BUILD_DIR_ABOSLUTE
+echo "moving $PWD/devchain.tar.gz to $BUILD_DIR_ABOSLUTE"
+mv "$PWD/devchain.tar.gz" $BUILD_DIR_ABOSLUTE/.
 
-# Clean up if necessary
+echo "removing tmp directory $TMP_DIR"
 rm -rf "$TMP_DIR"
