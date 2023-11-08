@@ -186,7 +186,7 @@ jobs:
       - name: Download protocol devchain artifact
         uses: actions/download-artifact@v3
         with:
-          name: devchain-$RELEASE_TAG
+          name: devchain-${{ env.RELEASE_TAG }}
           path: packages/protocol/.tmp/devchain
       - name: Copy DevChain and Build generated from released tag
         run: |
