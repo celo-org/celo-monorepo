@@ -1,16 +1,10 @@
 name: "Sync workspace for protocol tests"
 description: "Sync workspace for protocol tests"
-inputs:
-  package-json-checksum:
-    description: "Checksum of package.json"
-    required: true
 runs:
   using: "composite"
   steps:
     - name: Sync workspace
       uses: ./.github/actions/sync-workspace
-      with:
-        package-json-checksum: ${{ inputs.package-json-checksum }}
     - uses: actions/cache/restore@v3
       id: cache_protocol
       with:

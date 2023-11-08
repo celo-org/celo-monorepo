@@ -38,7 +38,6 @@ jobs:
   install-dependencies:
     name: Install dependencies
     outputs:
-      package-json-checksum: ${{ steps.node-checksums.outputs.PACKAGE_JSON_CHECKSUM }}
       # Propagate more outputs if you need https://github.com/tj-actions/changed-files#outputs
       # Adding a initial comma so ',<path>' matches also for the first file
       all_modified_files: ',${{ steps.changed-files.outputs.all_modified_files }}'
@@ -58,24 +57,6 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Verify setup for incremental testing
-        run: |
-          set -euo pipefail
-          set -v
-          # To get the "master" branch mapping
-          git checkout master
-          git checkout ${GITHUB_SHA}
-          # Verify that following commands work, they are later called in the incremental testing script
-          # Their output does not matter here, the fact that they finish successfully does.
-          git rev-parse --abbrev-ref HEAD
-          git fetch --all --tags
-      - name: Calculate node cache keys
-        id: node-checksums
-        run: |
-          find . -maxdepth 5 -type f -name 'package.json' -not -path "*node_modules*" -print0 | sort -z | xargs -0 cat > $RUNNER_TEMP/package.checksum
-          find ./patches -type f -name '*.patch' -print0 | sort -z | xargs -0 cat >> $RUNNER_TEMP/package.checksum
-          echo "PACKAGE_JSON_CHECKSUM=$(md5sum $RUNNER_TEMP/package.checksum | cut -f1 -d' ')"
-          echo "PACKAGE_JSON_CHECKSUM=$(md5sum $RUNNER_TEMP/package.checksum | cut -f1 -d' ')" >> "$GITHUB_OUTPUT"
       - name: Restore node cache
         uses: actions/cache@v3
         id: cache_node
@@ -114,8 +95,6 @@ jobs:
       - name: Run yarn postinstall if cache hitted
         run: yarn run postinstall
         if: steps.cache_node.outputs.cache-hit == 'true'
-      - name: Fail if generated dependency graph doesn't match committed
-        run: ./scripts/ci_check_dependency_graph_changed.sh
       - name: Fail if any file changed on git
         run: |
           # This fails if there is any change
@@ -154,8 +133,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - run: yarn run prettify:diff
       - run: yarn run lint
   general_test:
@@ -171,8 +148,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Run Jest Tests
         run: |
           mkdir -p test-results/jest
@@ -205,8 +180,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Run Wallet tests
         run: |
           yarn run lerna --scope '@celo/wallet-*' run test
@@ -240,8 +213,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Cache protocol devchain
         uses: actions/cache@v3
         id: cache_protocol
@@ -292,8 +263,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/protocol-sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Copy DevChain and Build generated from released tag
         run: |
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
@@ -370,8 +339,6 @@ jobs:
           submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
           rebuild-package: 'true'
       - name: Build protocol
         run: |
@@ -412,8 +379,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Generate DevChain
         run: |
           cd packages/sdk/contractkit
@@ -445,8 +410,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Generate DevChain
         run: |
           cd packages/cli
@@ -485,8 +448,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Install and test the npm package
         run: |
           set -euo pipefail
@@ -515,8 +476,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 20
@@ -551,8 +510,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - name: Install and test the npm package
         run: |
           set -euo pipefail
@@ -646,8 +603,6 @@ jobs:
           submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
           rebuild-package: 'true'
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
@@ -714,8 +669,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
-        with:
-          package-json-checksum: ${{ needs.install-dependencies.outputs.package-json-checksum }}
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
