@@ -33,6 +33,14 @@ env:
   # CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
   CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.7.x
 
+# EXAMPLE on debug ssh step
+#  - name: Setup tmate session
+#  uses: mxschmitt/action-tmate@v3
+#  timeout-minutes: 20
+#  if: contains(matrix.command, 'common/') && false
+#  with:
+#    limit-access-to-actor: true
+
 jobs:
   install-dependencies:
     name: Install dependencies
@@ -225,12 +233,6 @@ jobs:
       # Workaround for https://stackoverflow.com/questions/72978485/git-submodule-update-failed-with-fatal-detected-dubious-ownership-in-repositor
       - name: Configure git safe directories
         run: git config --global --add safe.directory '*'
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 60
-        if: false
-        with:
-          limit-access-to-actor: true
       - name: Generate devchain of previous release
         run: |
           echo "Comparing against $RELEASE_TAG"
@@ -271,12 +273,6 @@ jobs:
           sudo apt-get install vim lsof --yes
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
           yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 500
-        if: false
-        with:
-          limit-access-to-actor: true
   protocol-test-matrix:
     # Keeping name short because GitHub UI does not handle long names well
     name: ${{ matrix.name }}
@@ -341,12 +337,6 @@ jobs:
       - name: Build protocol
         run: |
           yarn --cwd packages/protocol build
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 20
-        if: contains(matrix.command, 'common/') && false
-        with:
-          limit-access-to-actor: true
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
         with:
@@ -474,12 +464,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 20
-        if: false
-        with:
-          limit-access-to-actor: true
       - name: Install and test the npm package
         run: |
           set -euo pipefail
@@ -603,12 +587,6 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           rebuild-package: 'true'
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 20
-        if: contains(matrix.command, 'ci_test_transfers.sh') && false
-        with:
-          limit-access-to-actor: true
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
         with:
@@ -672,12 +650,6 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '11'
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 20
-        if: contains(matrix.command, '/lockedgold.sh') && false
-        with:
-          limit-access-to-actor: true
       - name: Certora dependencies
         run: |
           echo "export PATH=$PATH:~/.local/bin" >> ~/.bashrc
