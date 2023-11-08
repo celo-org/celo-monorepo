@@ -396,10 +396,10 @@ export function assertBNArrayEqual(
   assert(Array.isArray(actualArray), `Actual is not an array`)
   assert(Array.isArray(expectedArray), `Expected is not an array`)
   assert(actualArray.length === expectedArray.length, `Different array sizes; actual: ${actualArray.length} expected: ${expectedArray.length}`)
-  assert(actualArray.every(actualValue => isNumber(actualValue)) 
+  assert(actualArray.every(actualValue => isNumber(actualValue))
       && expectedArray.every(expectedValue => isNumber(expectedValue)),
       `Expected all elements to be numbers`)
-      
+
   for (let i = 0; i < actualArray.length; i++) {
     assertEqualBN(actualArray[i], expectedArray[i])
   }
@@ -597,11 +597,11 @@ export async function assumeOwnershipWithTruffle(contractsToOwn: string[], to: s
   const transferOwnershipData = Buffer.from(stripHexEncoding(registry.contract.methods.transferOwnership(to).encodeABI()), 'hex')
   const proposalTransactions = await Promise.all(
     contractsToOwn.map(async (contractName: string) => {
-      
+
       const artifactsInstance = ArtifactsSingleton.getInstance(contractPackage, artifacts)
 
       const contractAddress = (await getDeployedProxiedContract(contractName, artifactsInstance)).address
-      
+
       return {
         value: 0,
         destination: contractAddress,
