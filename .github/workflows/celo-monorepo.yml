@@ -184,7 +184,7 @@ jobs:
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
       - name: Download protocol devchain artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: devchain-$RELEASE_TAG
           path: packages/protocol/.tmp/devchain
@@ -348,6 +348,7 @@ jobs:
           yarn pack
           cd $RUNNER_TEMP
           npm install $RUNNER_WORKSPACE/celo-monorepo/packages/typescript/*.tgz
+
   base-test:
     name: SDK Base package Tests
     runs-on: ['self-hosted', 'monorepo-node18']
@@ -371,6 +372,7 @@ jobs:
           yarn pack
           cd $RUNNER_TEMP
           npm install $RUNNER_WORKSPACE/celo-monorepo/packages/sdk/base/*.tgz
+
   utils-test:
     name: SDK Utils package Tests
     runs-on: ['self-hosted', 'monorepo-node18']
