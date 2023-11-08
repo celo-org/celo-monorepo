@@ -30,7 +30,7 @@ done
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 [ -z "$BUILD_DIR" ] && BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'));
 
-echo "- Checkout source code at $BRANCH"
+echo "- Checkout2 source code at $BRANCH"
 # Fetching also tags so we can checkout if $BRACH references a tag
 git fetch origin +"$BRANCH" --tags --force >> $LOG_FILE 2>&1
 rm -vrf packages/protocol/lib/memview.sol/* # has to be mentined explicitly as it is not a submodule in previous releases
