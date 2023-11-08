@@ -1,0 +1,52 @@
+name: celo-monorepo CI/CD - generate protocol devchain
+run-name: celo-monorepo Protocol devchain
+
+on:
+  schedule:
+    # monthly on 1 at 0:00 UTC
+    - cron: 0 0 1 * * 
+  workflow_dispatch:
+  push:
+    branches:
+      - jcortejoso/debug-ci
+
+jobs:
+  generate-protocol-devchain:
+    name: Generate protocol devchain used in celo-monorepo.yml workflow
+    runs-on: ['self-hosted', 'monorepo-node18']
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        tag:
+          - core-contracts.v9
+          - core-contracts.v10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.tag }}
+          fetch-depth: 0
+          submodules: recursive
+      - name: Install yarn dependencies
+        run: git config --global url."https://".insteadOf ssh:// && yarn install
+      - name: Build packages
+        run: yarn build --ignore docs --include-dependencies
+      # TODO: Needed?
+      - name: Opcode tests
+        run: |
+          yarn --cwd packages/protocol check-opcodes
+      - uses: actions/setup-node@v3
+      # Workaround for https://stackoverflow.com/questions/72978485/git-submodule-update-failed-with-fatal-detected-dubious-ownership-in-repositor
+      - name: Configure git safe directories
+        run: git config --global --add safe.directory '*'
+      - name: Generate devchain of previous release
+        run: |
+          mkdir devchain
+          GRANTS_FILE=packages/protocol/scripts/truffle/releaseGoldExampleConfigs.json
+          yarn --cwd packages/protocol devchain generate-tar devchain/devchain.tar.gz --release_gold_contracts $GRANTS_FILE
+          mv packages/protocol/build/contracts* devchain/
+      - name: Upload devchain as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: devchain-${{ matrix.tag }}
+          path: devchain
