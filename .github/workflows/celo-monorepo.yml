@@ -208,7 +208,7 @@ jobs:
         run: |
           echo "Comparing against $RELEASE_TAG"
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
-          yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
+          yarn --cwd packages/protocol ci:test-make-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR
 
   protocol-test-matrix:
     # Keeping name short because GitHub UI does not handle long names well
