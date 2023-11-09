@@ -94,6 +94,15 @@ jobs:
       - name: Run yarn postinstall if cache hitted
         run: yarn run postinstall
         if: steps.cache_node.outputs.cache-hit == 'true'
+      - name: Detect files changed in PR, and expose as output
+        id: changed-files
+        uses: tj-actions/changed-files@v37
+        with:
+          # Using comma as separator to be able to easily match full paths (using ,<path>)
+          separator: ','
+          # Checking if changed in the last 100 commits in PRs
+          fetch_depth: '150'
+      - run: echo ",${{ steps.changed-files.outputs.all_modified_files }}"
       - name: Verify Changed files
         uses: tj-actions/verify-changed-files@v16
         with:
@@ -105,15 +114,7 @@ jobs:
         if: steps.cache_node.outputs.cache-hit != 'true'
         run: |
           yarn check-licenses
-      - name: Detect files changed in PR, and expose as output
-        id: changed-files
-        uses: tj-actions/changed-files@v37
-        with:
-          # Using comma as separator to be able to easily match full paths (using ,<path>)
-          separator: ','
-          # Checking if changed in the last 100 commits in PRs
-          fetch_depth: '150'
-      - run: echo ",${{ steps.changed-files.outputs.all_modified_files }}"
+
   lint-checks:
     name: Lint code
     runs-on: ['self-hosted', 'monorepo-node18']
