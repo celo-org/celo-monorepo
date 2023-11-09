@@ -7,10 +7,7 @@ import {
   getRegionCode,
   getRegionCodeFromCountryCode,
   parsePhoneNumber,
-  PhoneNumberUtils,
 } from './phoneNumbers'
-
-const getPhoneHash = PhoneNumberUtils.getPhoneHash
 
 const COUNTRY_CODES = {
   US: '+1',

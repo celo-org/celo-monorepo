@@ -44,7 +44,6 @@ export async function displaySendTx<A>(
         })
     }
   } catch (e: any) {
-    console.error('Not great', e.message)
     cli.action.stop(`failed: ${e.message}`)
     throw e
   }

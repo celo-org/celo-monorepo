@@ -40,7 +40,6 @@ const negate = (x: Promise<boolean>) => x.then((y) => !y)
 type Resolve<A> = A extends Promise<infer T> ? T : A
 
 export function newCheckBuilder(cmd: BaseCommand, signer?: Address) {
-  console.log('CHECKBUILDER')
   return new CheckBuilder(cmd, signer)
 }
 
@@ -503,7 +502,6 @@ class CheckBuilder {
     }
 
     if (!allPassed) {
-      console.log('CHECKBUILDER ERROR')
       return this.cmd.error("Some checks didn't pass!")
     } else {
       console.log(`All checks passed`)

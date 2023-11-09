@@ -108,6 +108,12 @@
     "commands": "./lib/commands",
     "helpClass": "./lib/help",
     "plugins": [
+      "@oclif/plugin-help",
+      "@oclif/plugin-autocomplete",
+      "@oclif/plugin-not-found",
+      "@oclif/plugin-commands",
+      "@oclif/plugin-warn-if-update-available",
+      "@oclif/plugin-plugins"
     ],
     "topics": {
       "account": {

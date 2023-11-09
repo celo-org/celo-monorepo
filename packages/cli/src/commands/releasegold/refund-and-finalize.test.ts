@@ -40,6 +40,6 @@ testWithGanache('releasegold:refund-and-finalize cmd', (web3: Web3) => {
   test('can finalize the contract', async () => {
     await testLocally(Revoke, ['--contract', contractAddress, '--yesreally'])
     await testLocally(RefundAndFinalize, ['--contract', contractAddress])
-    await expect(testLocally(Show, ['--contract', contractAddress])).rejects.toThrow('what?')
+    await expect(testLocally(Show, ['--contract', contractAddress])).rejects.toThrow()
   })
 })

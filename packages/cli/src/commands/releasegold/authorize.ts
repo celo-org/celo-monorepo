@@ -46,9 +46,8 @@ export default class Authorize extends ReleaseGoldBaseCommand {
   ]
 
   async run() {
-    console.log('RUNNING AWAY FROM HERE')
+    // tslint:disable-next-line
     const { flags } = this.parse(Authorize)
-    console.log('RUN; flags: ', flags)
 
     const role = flags.role
 
@@ -94,7 +93,6 @@ export default class Authorize extends ReleaseGoldBaseCommand {
       tx = await this.releaseGoldWrapper.authorizeAttestationSigner(flags.signer, sig)
     } else {
       this.error('Invalid role provided')
-      return
     }
     await displaySendTx('authorize' + role + 'Tx', tx)
   }
