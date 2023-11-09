@@ -12,7 +12,7 @@ import { NULL_ADDRESS } from '@celo/utils/lib/address'
 import { assert } from 'chai'
 import { RegistryInstance } from 'types'
 
-import truffleContract = require('@truffle/contract')
+import truffleContract from '@truffle/contract'
 
 const Registry = artifacts.require('Registry')
 const Proxy = artifacts.require('Proxy')
