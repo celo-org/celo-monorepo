@@ -17,14 +17,14 @@ async function startGanache() {
     logging: { quiet: true },
     wallet: { mnemonic: network.mnemonic, defaultBalance: network.defaultBalance },
     miner: {
-      blockGasLimit: 20000000,
+      blockGasLimit: 30000000,
       defaultGasPrice: network.gasPrice,
     },
     chain: {
       networkId: network.network_id,
       chainId: 1,
       allowUnlimitedContractSize: true,
-      hardfork: 'istanbul',
+      allowUnlimitedInitCodeSize: true,
     },
   })
 
@@ -45,14 +45,15 @@ async function test() {
   })
 
   try {
+    console.info('Starting Ganache ...')
     const closeGanache = await startGanache()
     if (isCI) {
       // If we are running on circle ci we need to wait for ganache to be up.
-      await waitForPortOpen('localhost', 8545, 60)
+      await waitForPortOpen('localhost', 8545, 120)
     }
 
     // --reset is a hack to trick truffle into using 20M gas.
-    let testArgs = ['run', 'truffle', 'test', '--reset']
+    let testArgs = ['run', 'truffle', 'test', '--reset'] // Adding config doesn't seem to do much --config truffle-confisg0.8.js
     if (argv['verbose-rpc']) {
       testArgs.push('--verbose-rpc')
     }

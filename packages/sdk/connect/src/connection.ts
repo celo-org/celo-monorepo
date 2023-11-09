@@ -1,11 +1,12 @@
+// tslint:disable: ordered-imports
 import { ensureLeading0x, toChecksumAddress } from '@celo/utils/lib/address'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
-import { parseSignatureWithoutPrefix, Signature } from '@celo/utils/lib/signatureUtils'
+import { Signature, parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import { bufferToHex } from '@ethereumjs/util'
 import debugFactory from 'debug'
 import Web3 from 'web3'
 import { AbiCoder } from './abi-types'
-import { assertIsCeloProvider, CeloProvider } from './celo-provider'
+import { CeloProvider, assertIsCeloProvider } from './celo-provider'
 import {
   Address,
   Block,
@@ -32,9 +33,9 @@ import {
   outputCeloTxReceiptFormatter,
 } from './utils/formatter'
 import { hasProperty } from './utils/provider-utils'
-import { getRandomId, HttpRpcCaller, RpcCaller } from './utils/rpc-caller'
+import { HttpRpcCaller, RpcCaller, getRandomId } from './utils/rpc-caller'
 import { TxParamsNormalizer } from './utils/tx-params-normalizer'
-import { toTxResult, TransactionResult } from './utils/tx-result'
+import { TransactionResult, toTxResult } from './utils/tx-result'
 import { ReadOnlyWallet } from './wallet'
 
 const debugGasEstimation = debugFactory('connection:gas-estimation')
@@ -54,8 +55,12 @@ export interface ConnectionOptions {
  */
 export class Connection {
   private config: ConnectionOptions
+  private _chainID: number | undefined
   readonly paramsPopulator: TxParamsNormalizer
   rpcCaller!: RpcCaller
+
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
+  private currencyGasPrice: Map<Address, string> = new Map<Address, string>()
 
   constructor(readonly web3: Web3, public wallet?: ReadOnlyWallet, handleRevert = true) {
     web3.eth.handleRevert = handleRevert
@@ -76,6 +81,7 @@ export class Connection {
     if (!provider) {
       throw new Error('Must have a valid Provider')
     }
+    this._chainID = undefined
     try {
       if (!(provider instanceof CeloProvider)) {
         this.rpcCaller = new HttpRpcCaller(provider)
@@ -327,25 +333,21 @@ export class Connection {
     return toTxResult(this.web3.eth.sendSignedTransaction(signedTransactionData))
   }
   // if neither gas price nor feeMarket fields are present set them.
-  setFeeMarketGas = async (tx: CeloTx): Promise<CeloTx> => {
-    // default to the current values
-    const calls = [Promise.resolve(tx.maxFeePerGas), Promise.resolve(tx.maxPriorityFeePerGas)]
 
-    if (isEmpty(tx.maxFeePerGas)) {
-      calls[0] = this.gasPrice(tx.feeCurrency)
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
+  fillGasPrice(tx: CeloTx): CeloTx {
+    if (tx.feeCurrency && tx.gasPrice === '0' && this.currencyGasPrice.has(tx.feeCurrency)) {
+      return {
+        ...tx,
+        gasPrice: this.currencyGasPrice.get(tx.feeCurrency),
+      }
     }
-    if (isEmpty(tx.maxPriorityFeePerGas)) {
-      calls[1] = this.rpcCaller.call('eth_maxPriorityFeePerGas', []).then((rpcResponse) => {
-        return rpcResponse.result
-      })
-    }
-    const [maxFeePerGas, maxPriorityFeePerGas] = await Promise.all(calls)
-    return {
-      ...tx,
-      gasPrice: undefined,
-      maxFeePerGas,
-      maxPriorityFeePerGas,
-    }
+    return tx
+  }
+
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
+  async setGasPriceForCurrency(address: Address, gasPrice: string) {
+    this.currencyGasPrice.set(address, gasPrice)
   }
 
   estimateGas = async (
@@ -395,10 +397,16 @@ export class Connection {
     }
   }
 
+  // An instance of Connection will only change chain id if provider is changed.
   chainId = async (): Promise<number> => {
+    if (this._chainID) {
+      return this._chainID
+    }
     // Reference: https://eth.wiki/json-rpc/API#net_version
     const response = await this.rpcCaller.call('net_version', [])
-    return parseInt(response.result.toString(), 10)
+    const chainID = parseInt(response.result.toString(), 10)
+    this._chainID = chainID
+    return chainID
   }
 
   getTransactionCount = async (address: Address): Promise<number> => {

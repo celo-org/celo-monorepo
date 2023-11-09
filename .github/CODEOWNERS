@@ -14,16 +14,16 @@
 /dockerfiles/ @celo-org/devopsre
 
 /packages/celotool/ @celo-org/devopsre
-/packages/cli/ @celo-org/applications
-/packages/dev-utils/ @celo-org/applications
-/packages/docs/ @celo-org/applications @celo-org/devrel
-/packages/env-tests/ @celo-org/applications
+/packages/cli/ @celo-org/devtooling
+/packages/dev-utils/ @celo-org/devtooling
+/packages/docs/ @celo-org/devtooling @celo-org/primitives @celo-org/devrel
+/packages/env-tests/ @celo-org/primitives
+/packages/faucet/ @celo-org/devtooling
 /packages/helm-charts/ @celo-org/devopsre
-/packages/helm-charts/blockscout/ @celo-org/data-services @celo-org/devopsre
+/packages/helm-charts/mock-oracle/ @celo-org/mento  @celo-org/devopsre
+/packages/helm-charts/oracle-rbac/ @celo-org/mento  @celo-org/devopsre
 /packages/helm-charts/oracle/ @celo-org/mento  @celo-org/devopsre
-/packages/metadata-crawler/ @celo-org/data-services @celo-org/devopsre
+/packages/metadata-crawler/ @celo-org/devopsre
 /packages/protocol/ @celo-org/primitives
-/packages/sdk/ @celo-org/applications
-/packages/typescript/ @celo-org/applications
-
-/patches/ @celo-org/applications
+/packages/sdk/ @celo-org/devtooling
+/packages/typescript/ @celo-org/devtooling
