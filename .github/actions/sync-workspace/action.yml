@@ -23,8 +23,6 @@ runs:
         enableCrossOsArchive: true
         fail-on-cache-miss: "!${{ fromJSON(env.REBUILD_PACKAGE) }}"
 
-    - name: Format 
-
     - name: Restore build artifacts cache
       uses: actions/cache/restore@v3
       id: cache_build_artifacts
