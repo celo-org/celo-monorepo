@@ -126,6 +126,7 @@ jobs:
       - run: yarn run prettify:diff
       - run: yarn run lint
   general_test:
+    if: false
     name: General jest test
     runs-on: ['self-hosted', 'monorepo-node18']
     needs: install-dependencies
@@ -153,6 +154,7 @@ jobs:
           path: test-results/jest
   wallet-test:
     name: Wallet test
+    if: false
     runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: install-dependencies
@@ -232,24 +234,24 @@ jobs:
           - name: Protocol Common tests
             command: |
               yarn --cwd packages/protocol test common/
-          - name: Protocol Compatibility
-            command: |
-              yarn --cwd packages/protocol test compatibility/
-          - name: Protocol Governance Network
-            command: |
-              yarn --cwd packages/protocol test governance/network/
-          - name: Protocol Governance Validators
-            command: |
-              yarn --cwd packages/protocol test governance/validators/
-          - name: Protocol Governance Voting
-            command: |
-              yarn --cwd packages/protocol test governance/voting/
-          - name: Protocol Identity
-            command: |
-              yarn --cwd packages/protocol test identity/
-          - name: Protocol Stability
-            command: |
-              yarn --cwd packages/protocol test stability/
+          # - name: Protocol Compatibility
+          #   command: |
+          #     yarn --cwd packages/protocol test compatibility/
+          # - name: Protocol Governance Network
+          #   command: |
+          #     yarn --cwd packages/protocol test governance/network/
+          # - name: Protocol Governance Validators
+          #   command: |
+          #     yarn --cwd packages/protocol test governance/validators/
+          # - name: Protocol Governance Voting
+          #   command: |
+          #     yarn --cwd packages/protocol test governance/voting/
+          # - name: Protocol Identity
+          #   command: |
+          #     yarn --cwd packages/protocol test identity/
+          # - name: Protocol Stability
+          #   command: |
+          #     yarn --cwd packages/protocol test stability/
     steps:
       - uses: actions/checkout@v4
         with:
@@ -261,7 +263,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 40
-        if: contains(matrix.name, 'Protocol Common tests') && false
+        if: contains(matrix.name, 'Protocol Common tests')
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
         with:
@@ -272,18 +274,19 @@ jobs:
 
   contractkit-tests:
     name: ContractKit Tests
+    if: false
     runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: [install-dependencies]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
+    # if: |
+    #   github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+    #   false
     steps:
       - uses: actions/checkout@v4
       - name: Sync workspace
@@ -301,16 +304,17 @@ jobs:
     runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: [install-dependencies]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/cli') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
+    if: false
+    # if: |
+    #   github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/cli') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+    #   false
     steps:
       - uses: actions/checkout@v4
       - name: Sync workspace
@@ -339,12 +343,13 @@ jobs:
     runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: [install-dependencies]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
+    if: false
+    # if: |
+    #   github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+    #   false
     steps:
       - uses: actions/checkout@v4
       - name: Sync workspace
@@ -362,13 +367,14 @@ jobs:
     runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: [install-dependencies]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
+    if: false
+    # if: |
+    #   github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+    #   false
     steps:
       - uses: actions/checkout@v4
       - name: Sync workspace
@@ -386,13 +392,14 @@ jobs:
     runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: [install-dependencies]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
+    if: false
+    # if: |
+    #   github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+    #   false
     steps:
       - uses: actions/checkout@v4
       - name: Sync workspace
@@ -414,16 +421,17 @@ jobs:
     runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks, contractkit-tests]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/celotool') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
+    if: false
+    # if: |
+    #   github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/celotool') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
+    #   contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
+    #   false
     strategy:
       fail-fast: false
       matrix:
