@@ -1,10 +1,10 @@
 import { Address } from '@celo/base/lib/address'
 import { Signature } from '@celo/base/lib/signatureUtils'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import MTWContract from '@celo/protocol/build/contracts/MetaTransactionWallet.json'
 import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { bufferToHex } from '@ethereumjs/util'
 import BigNumber from 'bignumber.js'
+import { ABI as MTWContract } from '../generated/MetaTransactionWallet'
 import { newKitFromWeb3 } from '../kit'
 import { GoldTokenWrapper } from './GoldTokenWrapper'
 import {

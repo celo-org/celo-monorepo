@@ -1,9 +1,12 @@
 import { Address, normalizeAddress } from '@celo/base'
 import { CeloTxReceipt, EventLog } from '@celo/connect'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import MTWContract from '@celo/protocol/build/contracts/MetaTransactionWallet.json'
-import MTWDeployerContract from '@celo/protocol/build/contracts/MetaTransactionWalletDeployer.json'
-import { MetaTransactionWallet, newMetaTransactionWallet } from '../generated/MetaTransactionWallet'
+import {
+  ABI as MTWContract,
+  MetaTransactionWallet,
+  newMetaTransactionWallet,
+} from '../generated/MetaTransactionWallet'
+import { ABI as MTWDeployerContract } from '../generated/MetaTransactionWalletDeployer'
 import { newProxy } from '../generated/Proxy'
 import { newKitFromWeb3 } from '../kit'
 import { MetaTransactionWalletDeployerWrapper } from './MetaTransactionWalletDeployer'
