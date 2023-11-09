@@ -6,9 +6,7 @@ import { CeloContract } from '../base'
 import { StableToken } from '../celo-tokens'
 import { newKitFromWeb3 } from '../kit'
 import { OracleRate, ReportTarget, SortedOraclesWrapper } from './SortedOracles'
-
-const truffleContract = require('@truffle/contract')
-
+import truffleContract from '@truffle/contract'
 // set timeout to 10 seconds
 jest.setTimeout(10 * 1000)
 

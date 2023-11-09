@@ -6,6 +6,7 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
+import truffleContract from '@truffle/contract'
 import { createInterfaceAdapter } from '@truffle/interface-adapter'
 import { BigNumber } from 'bignumber.js'
 import path from 'path'
@@ -15,9 +16,6 @@ import { StableTokenInstance } from 'types/mento'
 import Web3 from 'web3'
 import { ContractPackage } from '../contractPackages'
 import { ArtifactsSingleton } from './artifactsSingleton'
-
-
-const truffleContract = require('@truffle/contract');
 
 
 export async function sendTransactionWithPrivateKey<T>(
@@ -151,10 +149,10 @@ export function checkFunctionArgsLength(args: any[], abi: any) {
 export async function setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
 >(web3: Web3, artifacts: any, contractName: string, contractPackage?: ContractPackage, ...args: any[]): Promise<ContractInstance> {
-  
+
   const wrappedArtifacts = ArtifactsSingleton.getInstance(contractPackage, artifacts)
   const Contract = wrappedArtifacts.require(contractName)
-  
+
   // getProxy function supports the case the proxy is in a different package
   // which is the case for GasPriceMimimum
   const ContractProxy = wrappedArtifacts.getProxy(contractName, artifacts)
@@ -213,7 +211,7 @@ export async function getDeployedProxiedContract<ContractInstance extends Truffl
 ): Promise<ContractInstance> {
 
   const Contract: Truffle.Contract<ContractInstance> = customArtifacts.require(contractName)
-  
+
   let Proxy:ProxyContract
   // this wrap avoids a lot of rewrite
   const overloadedArtifact = ArtifactsSingleton.wrap(customArtifacts)
@@ -313,11 +311,11 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   let ContractProxy
   if (artifactPath) {
     Contract = makeTruffleContractForMigration(name, artifactPath, web3)
-    
+
     // This supports the case the proxy is in a different package
     if (artifactPath.proxiesPath){
       if (artifactPath.proxiesPath == "/"){
-        ContractProxy = artifacts.require(name + 'Proxy')  
+        ContractProxy = artifacts.require(name + 'Proxy')
       } else {
         throw "Loading proxies for custom path not supported"
       }

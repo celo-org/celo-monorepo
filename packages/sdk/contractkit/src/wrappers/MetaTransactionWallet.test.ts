@@ -3,6 +3,7 @@ import { Signature } from '@celo/base/lib/signatureUtils'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { bufferToHex } from '@ethereumjs/util'
+import contract from '@truffle/contract'
 import BigNumber from 'bignumber.js'
 import { ABI as MTWContract } from '../generated/MetaTransactionWallet'
 import { newKitFromWeb3 } from '../kit'
@@ -13,8 +14,6 @@ import {
   RawTransaction,
   toRawTransaction,
 } from './MetaTransactionWallet'
-
-const contract = require('@truffle/contract')
 const MetaTransactionWallet = contract(MTWContract)
 
 testWithGanache('MetaTransactionWallet Wrapper', (web3) => {

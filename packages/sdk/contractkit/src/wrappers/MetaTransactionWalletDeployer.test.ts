@@ -11,7 +11,7 @@ import { newProxy } from '../generated/Proxy'
 import { newKitFromWeb3 } from '../kit'
 import { MetaTransactionWalletDeployerWrapper } from './MetaTransactionWalletDeployer'
 
-const contract = require('@truffle/contract')
+import contract from '@truffle/contract'
 const MetaTransactionWalletDeployer = contract(MTWDeployerContract)
 const MetaTransactionWallet = contract(MTWContract)
 
