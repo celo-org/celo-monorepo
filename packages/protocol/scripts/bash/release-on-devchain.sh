@@ -12,12 +12,10 @@ source ./scripts/bash/utils.sh
 BRANCH=""
 BUILD_DIR=""
 RE_BUILD_REPO=""
-LOG_FILE="/dev/null"
 
 while getopts 'b:l:d:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
-    l) LOG_FILE="${OPTARG}" ;;
     d) BUILD_DIR="${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
@@ -33,16 +31,8 @@ then
 fi
 
 
-rm -rf build/contracts*
-
 echo "- Run local network"
-TAR_FILE="packages/protocol/$BUILD_DIR/devchain.tar.gz"
-if [ ! -f "$TAR_FILE" ]; then
-  echo "Generating $TAR_FILE"
-  yarn devchain generate-tar $TAR_FILE
-fi
-
-yarn devchain run-tar-in-bg $TAR_FILE >> $LOG_FILE
+yarn devchain run-tar-in-bg packages/protocol/$BUILD_DIR/devchain.tar.gz
 
 GANACHE_PID=
 if command -v lsof; then
@@ -60,14 +50,14 @@ echo "- Check versions of current branch"
 BASE_COMMIT=$(git rev-parse HEAD)
 echo " - Base commit $BASE_COMMIT"
 echo " - Checkout migrationsConfig.js at $BRANCH"
-# git checkout $BRANCH -- migrationsConfig.js
+git checkout $BRANCH -- migrationsConfig.js
 
-OLD_BRANCH=$BRANCH
 source scripts/bash/contract-exclusion-regex.sh
 yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --output_file report.json
 
-echo "Undo checkout for migrationsConfig.js from $(git rev-parse HEAD) to $BASE_COMMIT"
-# git checkout - -- migrationsConfig.js
+echo "- Clean git modified file"
+git restore migrationsConfig.js
+
 
 # From make-release.sh
 echo "- Deploy release of current branch"
