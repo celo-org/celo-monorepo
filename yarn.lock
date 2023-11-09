@@ -904,15 +904,15 @@
     "@stablelib/blake2xs" "0.10.4"
     big-integer "^1.6.44"
 
-"@celo/identity@5.1.1-beta.0":
-  version "5.1.1-beta.0"
-  resolved "https://registry.yarnpkg.com/@celo/identity/-/identity-5.1.1-beta.0.tgz#624885f41f913ac39b108ea1d8f65ad83bc7df9d"
-  integrity sha512-FbQnQZyXJ8JHpvsL7xNzy64TYEWDbYF/NfwmWEiR/QWJNbb9YFa9wm8nyUa4ULS+3eK7nLCdF/pLcNfYt6DR/g==
+"@celo/identity@^5.1.1":
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@celo/identity/-/identity-5.1.1.tgz#e56cea67d820c7deae147e50b353f3c76b3e6d4d"
+  integrity sha512-udds/CV2NfG9JxvWqzU/1d/eHNyPEfLj4suLysermRL2liyf2k38DYUNiEcvhzJ/WCJnc/lwUL6EABoWaNPDRQ==
   dependencies:
     "@celo/base" "^5.0.5"
     "@celo/contractkit" "^5.1.0"
     "@celo/odis-identifiers" "^1.0.0"
-    "@celo/phone-number-privacy-common" "^3.1.1-beta.0"
+    "@celo/phone-number-privacy-common" "^3.1.1"
     "@celo/utils" "^5.0.5"
     "@types/debug" "^4.1.10"
     bignumber.js "^9.1.2"
@@ -929,10 +929,10 @@
   resolved "https://registry.yarnpkg.com/@celo/odis-identifiers/-/odis-identifiers-1.0.0.tgz#9bafbb77d989f1f1064f293a54d64af3298f0e91"
   integrity sha512-ZcBMGrr+DRX7FqNO0dWZpOVnYi5xWUxGaDtSeWnFQH9JwQ37ZmXQLEyraDXHx3gTgVEl+xSgCfJUnc1+w88PSQ==
 
-"@celo/phone-number-privacy-common@^3.1.1-beta.0":
-  version "3.1.1-beta.0"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-3.1.1-beta.0.tgz#ef4d4cb7848d4052ad3c9125078c89bf4cea253f"
-  integrity sha512-exvAKLbF3lS9MePfWttob9qJhW+hn/fdGPOe8PWiZwFp2x6VzzmS7jJRKVPFGrMDu3Exnu0HuyKyJiQDwCnaNQ==
+"@celo/phone-number-privacy-common@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-3.1.1.tgz#c068c223886271858c1bca95540144be417ac919"
+  integrity sha512-xitDmlcUZcXdjEfCft73Rry+ZlY9OZYrc2mY7OagjqWeEVTaR5TdclpfvTt6OgF0TgcCCi5pGMy1wptnOx2/VA==
   dependencies:
     "@celo/base" "^5.0.5"
     "@celo/contractkit" "^5.1.0"
