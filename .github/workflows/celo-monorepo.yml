@@ -258,9 +258,6 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           rebuild-package: 'true'
-      - name: Build protocol
-        run: |
-          yarn --cwd packages/protocol build
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
         with:
@@ -484,8 +481,6 @@ jobs:
           submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
-        with:
-          rebuild-package: 'true'
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
         with:
