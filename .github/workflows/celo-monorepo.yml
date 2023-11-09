@@ -258,6 +258,10 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           rebuild-package: 'true'
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 40
+        if: contains(matrix.name, 'Protocol Common tests') && false
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
         with:
