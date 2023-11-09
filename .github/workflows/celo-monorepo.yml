@@ -474,14 +474,13 @@ jobs:
               set -e
               export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
               cd packages/celotool
-              echo "Test is skipped because migrations somehow fail"
-              # ./ci_test_cip35.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
+              # echo "Test is skipped because migrations somehow fail"
+              ./ci_test_cip35.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
           - name: Validator order test
             command: |
               set -e
               export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
               cd packages/celotool
-
               ./ci_test_validator_order.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
     steps:
       - uses: actions/checkout@v4
@@ -509,6 +508,7 @@ jobs:
         github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
         contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
         contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
+        contains(needs.install-dependencies.outputs.all_modified_files, '.github/workflows/celo-monorepo.yml') ||
         contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
         contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock')
       )
