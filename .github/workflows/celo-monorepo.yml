@@ -31,7 +31,7 @@ env:
   #RELEASE_TAG: ganache-v7-core-contracts.v9
   RELEASE_TAG: core-contracts.v10
   # CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
-  CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.7.x
+  CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.8.x
 
 # EXAMPLE on debug ssh step
 #  - name: Setup tmate session
@@ -174,6 +174,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, '.github/workflows/celo-monorepo.yml') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -213,6 +214,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, '.github/workflows/celo-monorepo.yml') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -277,6 +279,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, '.github/workflows/celo-monorepo.yml') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -304,6 +307,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, '.github/workflows/celo-monorepo.yml') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -338,6 +342,7 @@ jobs:
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, '.github/workflows/celo-monorepo.yml') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -362,6 +367,7 @@ jobs:
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, '.github/workflows/celo-monorepo.yml') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -386,6 +392,7 @@ jobs:
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, '.github/workflows/celo-monorepo.yml') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -417,6 +424,7 @@ jobs:
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
+      contains(needs.install-dependencies.outputs.all_modified_files, '.github/workflows/celo-monorepo.yml') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
