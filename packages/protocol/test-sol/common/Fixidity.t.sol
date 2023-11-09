@@ -8,15 +8,15 @@ import "forge-std/console.sol";
 import "../../contracts/common/test/FixidityWrapper.sol";
 
 contract FixidityTest is Test {
-  FixidityWrapper fixidity;
   uint256 private constant FIXED1_UINT = 1000000000000000000000000;
   uint256 private constant MAX_NEW_FIXED = 115792089237316195423570985008687907853269984665640564;
   uint256 private constant MAX_NEW_FIXED_ADD = 57896044618658097711785492504343953926634992332820282019728792003956564819967;
   uint256 private constant MAX_UINT256 = 115792089237316195423570985008687907853269984665640564039457584007913129639935;
   uint256 private constant MAX_FIXED_MUL = 340282366920938463463374607431768211455999999999999;
   uint256 private constant MAX_FIXED_DIV = 115792089237316195423570985008687907853269984665640564;
-
   uint256 private constant MUL_PRECISION = 1000000000000;
+
+  FixidityWrapper fixidity;
 
   function setUp() public {
     fixidity = new FixidityWrapper();
@@ -64,7 +64,6 @@ contract FixidityTest is Test {
     uint256 b = fixidity.newFixed(3);
 
     assertEq(fixidity.add(a, b), fixidity.newFixed(5));
-
   }
 
   function test_fraction_add_fraction() public {
@@ -153,7 +152,6 @@ contract FixidityTest is Test {
     uint256 result = fixidity.multiply(a, b);
 
     assertEq(result, FIXED1_UINT);
-
   }
 
   function test_multiply_fails_larger_than_maxFixedMul() public {
@@ -162,7 +160,6 @@ contract FixidityTest is Test {
     vm.expectRevert("add overflow detected");
 
     fixidity.multiply(a, a);
-
   }
 
   function test_reciprocal_fixed1() public {
@@ -229,6 +226,5 @@ contract FixidityTest is Test {
     assertFalse(fixidity.gte(a, b));
     assertTrue(fixidity.lt(a, b));
     assertTrue(fixidity.lte(a, b));
-
   }
 }

@@ -9,22 +9,21 @@ import "../../contracts/common/Registry.sol";
 
 contract RegistryTest is Test {
   event RegistryUpdated(string identifier, bytes32 indexed identifierHash, address indexed addr);
-  Registry registry;
 
-  address public owner;
-  address public constant anAddress = address(0x06012c8cf97BEaD5deAe237070F9587f8E7A266d);
-  string anIdentifier = "cryptokitties";
-
-  // hash of anIdentifier
+  address constant SOME_ADDRESS = address(0x06012c8cf97BEaD5deAe237070F9587f8E7A266d);
+  string constant SOME_ID = "cryptokitties";
+  // hash of SOME_ID
   // hash is harcoded to avoid test and implementation chaing in at the same time
-  bytes32 testHash = 0x05445421d7b4d4c2e571c5a4ccf9317ec68601449f752c75ddbcc61a16061004;
+  bytes32 constant ID_HASH = 0x05445421d7b4d4c2e571c5a4ccf9317ec68601449f752c75ddbcc61a16061004;
+
+  Registry registry;
+  address owner;
 
   function setUp() public {
     owner = address(this);
     vm.prank(owner);
     registry = new Registry(true);
     registry.initialize();
-
   }
 
   function test_initialize_has_right_owner() public {
@@ -38,59 +37,58 @@ contract RegistryTest is Test {
 
   function test_setAddressFor_set_address() public {
     vm.prank(owner);
-    registry.setAddressFor(anIdentifier, anAddress);
-    assertEq(registry.registry(testHash), anAddress);
+    registry.setAddressFor(SOME_ID, SOME_ADDRESS);
+    assertEq(registry.registry(ID_HASH), SOME_ADDRESS);
   }
 
   function test_setAddressFor_reverts_other_user() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(msg.sender);
-    registry.setAddressFor(anIdentifier, anAddress);
+    registry.setAddressFor(SOME_ID, SOME_ADDRESS);
   }
 
   function test_setAddressFor_emits() public {
     vm.expectEmit(true, true, false, true);
-    emit RegistryUpdated(anIdentifier, testHash, anAddress);
+    emit RegistryUpdated(SOME_ID, ID_HASH, SOME_ADDRESS);
 
-    registry.setAddressFor(anIdentifier, anAddress);
+    registry.setAddressFor(SOME_ID, SOME_ADDRESS);
   }
 
   function test_getAddressForOrDie_gets_address() public {
-    registry.setAddressFor(anIdentifier, anAddress);
-    assertEq(registry.getAddressForOrDie(testHash), anAddress);
+    registry.setAddressFor(SOME_ID, SOME_ADDRESS);
+    assertEq(registry.getAddressForOrDie(ID_HASH), SOME_ADDRESS);
   }
 
   function test_getAddressForOrDie_reverts_address_not_set() public {
     vm.expectRevert("identifier has no registry entry");
-    registry.getAddressForOrDie(testHash);
+    registry.getAddressForOrDie(ID_HASH);
   }
 
   function test_getAddressFor_gets_address() public {
-    registry.setAddressFor(anIdentifier, anAddress);
-    assertEq(registry.getAddressFor(testHash), anAddress);
+    registry.setAddressFor(SOME_ID, SOME_ADDRESS);
+    assertEq(registry.getAddressFor(ID_HASH), SOME_ADDRESS);
   }
 
   function test_getAddressFor_doesnt_revert() public {
-    assertEq(registry.getAddressFor(testHash), address(0));
+    assertEq(registry.getAddressFor(ID_HASH), address(0));
   }
 
   function test_getAddressForStringOrDie_gets_address() public {
-    registry.setAddressFor(anIdentifier, anAddress);
-    assertEq(registry.getAddressForStringOrDie(anIdentifier), anAddress);
+    registry.setAddressFor(SOME_ID, SOME_ADDRESS);
+    assertEq(registry.getAddressForStringOrDie(SOME_ID), SOME_ADDRESS);
   }
 
   function test_getAddressForStringOrDie_reverts() public {
     vm.expectRevert("identifier has no registry entry");
-    registry.getAddressForStringOrDie(anIdentifier);
+    registry.getAddressForStringOrDie(SOME_ID);
   }
 
   function test_getAddressForString_gets_addres() public {
-    registry.setAddressFor(anIdentifier, anAddress);
-    assertEq(registry.getAddressForString(anIdentifier), anAddress);
+    registry.setAddressFor(SOME_ID, SOME_ADDRESS);
+    assertEq(registry.getAddressForString(SOME_ID), SOME_ADDRESS);
   }
 
   function test_getAddressForString_shoudlnt_revert() public view {
-    registry.getAddressForString(anIdentifier);
+    registry.getAddressForString(SOME_ID);
   }
-
 }
