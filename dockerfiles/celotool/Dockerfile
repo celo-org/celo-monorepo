@@ -15,6 +15,8 @@ RUN apt-get update && \
     curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash && \
     rm -rf /var/lib/apt/lists/*
 
+RUN alias python=python3
+
 # ensure yarn.lock is evaluated by kaniko cache diff
 COPY lerna.json package.json yarn.lock ./
 COPY packages/celotool/package.json packages/celotool/

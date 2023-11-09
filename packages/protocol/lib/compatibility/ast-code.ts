@@ -250,13 +250,22 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
  * @param newArtifacts
  */
 export function reportASTIncompatibilities(
+  // oldArtifacts also needs to be a set
+  // https://github.com/celo-org/celo-monorepo/issues/10567
   oldArtifacts: BuildArtifacts,
-  newArtifacts: BuildArtifacts): ASTCodeCompatibilityReport {
-  const reports = newArtifacts.listArtifacts()
-  .map((newArtifact) => {
-    const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
-    const oldZContract = oldArtifact ? makeZContract(oldArtifact) : null
-    return generateASTCompatibilityReport(oldZContract, oldArtifacts, makeZContract(newArtifact), newArtifacts)
-  })
-  return mergeReports(reports)
+  newArtifactsSets: BuildArtifacts[]): ASTCodeCompatibilityReport {
+    
+  let out: ASTCodeCompatibilityReport[] = []
+  for (const newArtifacts of newArtifactsSets) {
+    const reports = newArtifacts.listArtifacts()
+    .map((newArtifact) => {
+      const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
+      const oldZContract = oldArtifact ? makeZContract(oldArtifact) : null
+      return generateASTCompatibilityReport(oldZContract, oldArtifacts, makeZContract(newArtifact), newArtifacts)
+    })
+    out = [...out, ...reports] 
+    
+  }
+
+  return mergeReports(out)
 }

@@ -21,6 +21,10 @@ oracle:
         {exchange: 'COINBASE', symbol: 'EUROCEUR', toInvert: false},
         {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
       ],
+      [
+        {exchange: 'COINBASE', symbol: 'EUROCEUR', toInvert: false},
+        {exchange: 'XIGNITE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
 
       [
         {exchange: 'COINBASE', symbol: 'EUROCUSD', toInvert: false},
@@ -34,6 +38,12 @@ oracle:
         {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false},
         {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
       ],
+      [
+        {exchange: 'COINBASE', symbol: 'EUROCUSD', toInvert: false},
+        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: true},
+        {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'XIGNITE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
 
       [
         {exchange: 'BITSTAMP', symbol: 'EUROCEUR', toInvert: false},
@@ -42,9 +52,13 @@ oracle:
       [
         {exchange: 'BITSTAMP', symbol: 'EUROCEUR', toInvert: false},
         {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'BITSTAMP', symbol: 'EUROCEUR', toInvert: false},
+        {exchange: 'XIGNITE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
       ]
   ]"
-  minPriceSourceCount: 4
+  minPriceSourceCount: 6
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:

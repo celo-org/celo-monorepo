@@ -17,5 +17,5 @@ if [ "${1}" == "checkout" ]; then
 elif [ "${1}" == "local" ]; then
     export GETH_DIR="${2}"
     echo "Testing using local geth dir ${GETH_DIR}..."
-    ./node_modules/.bin/mocha --node-option loader=ts-node/esm  src/e2e-tests/cip35_tests.ts --localgeth ${GETH_DIR}
+    ./node_modules/.bin/mocha --node-option loader=ts-node/esm src/e2e-tests/cip35_tests.ts --localgeth ${GETH_DIR}
 fi

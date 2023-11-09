@@ -6,9 +6,8 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
-import { BigNumber } from 'bignumber.js'
-
 import { createInterfaceAdapter } from '@truffle/interface-adapter'
+import { BigNumber } from 'bignumber.js'
 import path from 'path'
 import prompts from 'prompts'
 import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types'
@@ -16,6 +15,7 @@ import { StableTokenInstance } from 'types/mento'
 import Web3 from 'web3'
 import { ContractPackage } from '../contractPackages'
 import { ArtifactsSingleton } from './artifactsSingleton'
+
 
 const truffleContract = require('@truffle/contract');
 
@@ -151,9 +151,13 @@ export function checkFunctionArgsLength(args: any[], abi: any) {
 export async function setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
 >(web3: Web3, artifacts: any, contractName: string, contractPackage?: ContractPackage, ...args: any[]): Promise<ContractInstance> {
-
-  const Contract = ArtifactsSingleton.getInstance(contractPackage, artifacts).require(contractName)
-  const ContractProxy = ArtifactsSingleton.getInstance(contractPackage, artifacts).require(contractName + 'Proxy')
+  
+  const wrappedArtifacts = ArtifactsSingleton.getInstance(contractPackage, artifacts)
+  const Contract = wrappedArtifacts.require(contractName)
+  
+  // getProxy function supports the case the proxy is in a different package
+  // which is the case for GasPriceMimimum
+  const ContractProxy = wrappedArtifacts.getProxy(contractName, artifacts)
 
   await Contract.detectNetwork()
   await ContractProxy.detectNetwork()
@@ -205,10 +209,17 @@ export async function _setInitialProxyImplementation<
 
 export async function getDeployedProxiedContract<ContractInstance extends Truffle.ContractInstance>(
   contractName: string,
-  artifacts: any
+  customArtifacts: any
 ): Promise<ContractInstance> {
-  const Proxy: ProxyContract = artifacts.require(contractName + 'Proxy')
-  const Contract: Truffle.Contract<ContractInstance> = artifacts.require(contractName)
+
+  const Contract: Truffle.Contract<ContractInstance> = customArtifacts.require(contractName)
+  
+  let Proxy:ProxyContract
+  // this wrap avoids a lot of rewrite
+  const overloadedArtifact = ArtifactsSingleton.wrap(customArtifacts)
+  // if global artifacts are not defined we need to handle it
+  const defaultArtifacts = typeof artifacts !== 'undefined' ? artifacts : undefined;
+  Proxy = overloadedArtifact.getProxy(contractName, defaultArtifacts)
   const proxy: ProxyInstance = await Proxy.deployed()
   // @ts-ignore
   Contract.numberFormat = 'BigNumber'
@@ -256,10 +267,9 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
 }
 
 
-export const makeTruffleContractForMigration = (contractName: string, contractPath:ContractPackage, web3: Web3) => {
-  const network = ArtifactsSingleton.getNetwork()
+export const makeTruffleContractForMigrationWithoutSingleton = (contractName: string, network:any, contractPath:string, web3: Web3) => {
 
-  const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath.name}/${contractName}.json`)
+  const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath}/${contractName}.json`)
   const Contract = truffleContract({
     abi: artifact.abi,
     unlinked_binary: artifact.bytecode,
@@ -267,7 +277,7 @@ export const makeTruffleContractForMigration = (contractName: string, contractPa
 
 
   Contract.setProvider(web3.currentProvider)
-  Contract.setNetwork(network.name)
+  Contract.setNetwork(network.network_id)
 
   Contract.interfaceAdapter = createInterfaceAdapter({
     networkType: "ethereum",
@@ -275,7 +285,15 @@ export const makeTruffleContractForMigration = (contractName: string, contractPa
   })
   Contract.configureNetwork({networkType: "ethereum", provider: web3.currentProvider})
 
-  Contract.defaults({from: network.from, gas: network.gas, type: 0})
+  Contract.defaults({from: network.from, gas: network.gas})
+
+  return Contract
+}
+
+
+export const makeTruffleContractForMigration = (contractName: string, contractPath:ContractPackage, web3: Web3) => {
+  const network = ArtifactsSingleton.getNetwork()
+  const Contract = makeTruffleContractForMigrationWithoutSingleton(contractName, network, contractPath.name, web3)
   ArtifactsSingleton.getInstance(contractPath).addArtifact(contractName, Contract)
   return Contract
 }
@@ -295,7 +313,17 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   let ContractProxy
   if (artifactPath) {
     Contract = makeTruffleContractForMigration(name, artifactPath, web3)
-    ContractProxy = makeTruffleContractForMigration(name + 'Proxy', artifactPath, web3)
+    
+    // This supports the case the proxy is in a different package
+    if (artifactPath.proxiesPath){
+      if (artifactPath.proxiesPath == "/"){
+        ContractProxy = artifacts.require(name + 'Proxy')  
+      } else {
+        throw "Loading proxies for custom path not supported"
+      }
+    } else {
+      ContractProxy = makeTruffleContractForMigration(name + 'Proxy', artifactPath, web3)
+    }
   } else {
     Contract = artifacts.require(name)
     ContractProxy = artifacts.require(name + 'Proxy')
@@ -345,9 +373,9 @@ export async function submitMultiSigTransaction(
 export async function transferOwnershipOfProxy(
   contractName: string,
   owner: string,
-  artifacts: any
+  customArtifacts: any
 ) {
-  const Proxy = artifacts.require(contractName + 'Proxy')
+  const Proxy = ArtifactsSingleton.wrap(customArtifacts).getProxy(contractName, artifacts)
   const proxy: ProxyInstance = await Proxy.deployed()
   await proxy._transferOwnership(owner)
 }
@@ -364,13 +392,41 @@ export async function transferOwnershipOfProxyAndImplementation<
   await transferOwnershipOfProxy(contractName, owner, artifacts)
 }
 
+
 /*
 * Builds and returns mapping of function names to selectors.
 * Each function name maps to an array of selectors to account for overloading.
 */
-export function getFunctionSelectorsForContract(contract: any, contractName: string, artifacts: Truffle.Artifacts) {
+export function getFunctionSelectorsForContractProxy(contract: any, proxy: any, web3:any) {
   const selectors: { [index: string]: string[] } = {}
-  const proxy: any = artifacts.require(contractName + 'Proxy')
+  proxy.abi
+    .concat(contract.abi)
+    .filter((abiEntry: any) => abiEntry.type === 'function')
+    .forEach((func: any) => {
+      if (typeof selectors[func.name] === 'undefined') {
+        selectors[func.name] = []
+      }
+      if (typeof func.signature === 'undefined') {
+        selectors[func.name].push(web3.eth.abi.encodeFunctionSignature(func))
+      } else {
+        selectors[func.name].push(func.signature)
+      }
+    })
+  return selectors
+}
+
+
+/*
+* Builds and returns mapping of function names to selectors.
+* Each function name maps to an array of selectors to account for overloading.
+*/
+export function getFunctionSelectorsForContract(contract: any, contractName: string, customArtifacts: Truffle.Artifacts) {
+  const selectors: { [index: string]: string[] } = {}
+  let proxy: any = customArtifacts.require(contractName + 'Proxy')
+  if (proxy == null) {
+    const defaultArtifacts = typeof artifacts !== 'undefined' ? artifacts : undefined;
+    proxy = defaultArtifacts != null ? defaultArtifacts.require(contractName + 'Proxy') : proxy;
+  }
   proxy.abi
     .concat(contract.abi)
     .filter((abiEntry: any) => abiEntry.type === 'function')

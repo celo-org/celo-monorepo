@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+yarn pretty-quick --staged --pattern '**/*.+(ts|tsx|js|jsx|sol|java)'
+
+bash scripts/hooks/prereleasecheck.sh

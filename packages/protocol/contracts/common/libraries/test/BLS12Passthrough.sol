@@ -1,7 +1,7 @@
 pragma solidity ^0.5.13;
 
 import { B12_377Lib, B12_381Lib, B12 } from "../B12.sol";
-import { TypedMemView } from "@summa-tx/memview.sol/contracts/TypedMemView.sol";
+import { TypedMemView } from "../TypedMemView.sol";
 
 contract Common {
   using B12 for B12.G1Point;
