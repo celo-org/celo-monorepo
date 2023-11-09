@@ -207,8 +207,6 @@ jobs:
       - name: Test against current release
         run: |
           echo "Comparing against $RELEASE_TAG"
-          sudo apt-get update
-          sudo apt-get install vim lsof --yes
           BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
           yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
 
@@ -293,6 +291,8 @@ jobs:
       false
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -322,6 +322,8 @@ jobs:
       false
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
