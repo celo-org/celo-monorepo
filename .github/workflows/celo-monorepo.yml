@@ -92,8 +92,8 @@ jobs:
         run: |
           ARTIFACTS="$(git ls-files --others --ignored --exclude-standard | grep -v node_modules)"
           echo $ARTIFACTS
-          echo "MULTI_LINES_TEXT_ENV_VAR<<EOF" >> $GITHUB_ENV
-          echo "artifacts-to-cache=$ARTIFACTS" >> $GITHUB_ENV
+          echo "artifacts-to-cache<<EOF" >> $GITHUB_ENV
+          echo "$ARTIFACTS" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
       # We use cache to share the build artifacts between jobs (gh artifacts are too slow...)
       # For more context check https://github.com/actions/upload-artifact/issues/199
