@@ -1,6 +1,6 @@
 import { NativeSigner, Signature, Signer } from '@celo/base/lib/signatureUtils'
 import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
-import { getParsedSignatureOfAddress } from '@celo/contractkit/lib/utils/getParsedSignatureOfAddress'
+import { getParsedSignatureOfAddress } from '../utils/getParsedSignatureOfAddress'
 import {
   LocalSigner,
   hashMessageWithPrefix,

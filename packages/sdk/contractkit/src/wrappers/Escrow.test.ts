@@ -1,6 +1,6 @@
-import { getParsedSignatureOfAddress } from '@celo/contractkit/lib/utils/getParsedSignatureOfAddress'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { newKitFromWeb3 } from '../kit'
+import { getParsedSignatureOfAddress } from '../utils/getParsedSignatureOfAddress'
 import { EscrowWrapper } from './Escrow'
 import { FederatedAttestationsWrapper } from './FederatedAttestations'
 import { StableTokenWrapper } from './StableTokenWrapper'
