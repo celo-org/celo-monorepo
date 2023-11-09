@@ -14,7 +14,10 @@ import {
   RawTransaction,
   toRawTransaction,
 } from './MetaTransactionWallet'
-const MetaTransactionWallet = contract(MTWContract)
+const MetaTransactionWallet = contract({
+  contractName: 'MetaTransactionWallet',
+  abi: MTWContract,
+})
 
 testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
   MetaTransactionWallet.setProvider(web3.currentProvider)
