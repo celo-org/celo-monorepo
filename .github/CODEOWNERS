@@ -7,8 +7,8 @@
 
 # directory and file-level owners. Feel free to add to this!
 
-.github/actions @celo-org/devopsre
-.github/workflows @celo-org/devopsre
+.github/actions/ @celo-org/devopsre
+.github/workflows/ @celo-org/devopsre
 
 /dockerfiles/ @celo-org/devopsre
 
