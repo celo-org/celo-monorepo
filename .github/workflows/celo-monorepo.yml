@@ -97,6 +97,9 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
       # We use cache to share the build artifacts between jobs (gh artifacts are too slow...)
       # For more context check https://github.com/actions/upload-artifact/issues/199
+      - name: debug
+        run: |
+          echo ${{ steps.get_artifacts_to_cache.outputs.ARTIFACTS }}
       - name: Restore build artifacts cache
         uses: actions/cache@v3
         id: cache_build_artifacts
