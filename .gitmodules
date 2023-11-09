@@ -10,6 +10,6 @@
 [submodule "packages/protocol/lib/memview.sol"]
 	path = packages/protocol/lib/memview.sol
 	url = https://github.com/summa-tx/memview.sol
-[submodule "lib/celo-foundry"]
+[submodule "packages/protocol/lib/celo-foundry"]
 	path = packages/protocol/lib/celo-foundry
 	url = https://github.com/celo-org/celo-foundry
