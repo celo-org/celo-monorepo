@@ -91,6 +91,7 @@ jobs:
         id: get_artifacts_to_cache
         run: |
           ARTIFACTS="$(git ls-files --others --ignored --exclude-standard | grep -v node_modules | tr '\n' ',')"
+          echo "artifacts-to-cache=$ARTIFACTS"
           echo "artifacts-to-cache=$ARTIFACTS" >> $GITHUB_ENV
       # We use cache to share the build artifacts between jobs (gh artifacts are too slow...)
       # For more context check https://github.com/actions/upload-artifact/issues/199
