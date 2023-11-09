@@ -12,8 +12,14 @@ import { newKitFromWeb3 } from '../kit'
 import { MetaTransactionWalletDeployerWrapper } from './MetaTransactionWalletDeployer'
 
 import contract from '@truffle/contract'
-const MetaTransactionWalletDeployer = contract(MTWDeployerContract)
-const MetaTransactionWallet = contract(MTWContract)
+const MetaTransactionWalletDeployer = contract({
+  abi: MTWDeployerContract,
+  name: 'MetaTransactionWalletDeployer',
+})
+const MetaTransactionWallet = contract({
+  abi: MTWContract,
+  name: 'MetaTransactionWallet',
+})
 
 testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
   MetaTransactionWalletDeployer.setProvider(web3.currentProvider)

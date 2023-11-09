@@ -1,12 +1,12 @@
 import { Address } from '@celo/connect'
 import { describeEach } from '@celo/dev-utils/lib/describeEach'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
-import { ABI as SortedOraclesABI } from '../generated/SortedOracles'
+import truffleContract from '@truffle/contract'
 import { CeloContract } from '../base'
 import { StableToken } from '../celo-tokens'
+import { ABI as SortedOraclesABI } from '../generated/SortedOracles'
 import { newKitFromWeb3 } from '../kit'
 import { OracleRate, ReportTarget, SortedOraclesWrapper } from './SortedOracles'
-import truffleContract from '@truffle/contract'
 // set timeout to 10 seconds
 jest.setTimeout(10 * 1000)
 
@@ -17,7 +17,10 @@ TEST NOTES:
 
 testWithGanache('SortedOracles Wrapper', (web3) => {
   const kit = newKitFromWeb3(web3)
-  const SortedOracles = truffleContract(SortedOraclesABI)
+  const SortedOracles = truffleContract({
+    abi: SortedOraclesABI,
+    contractName: 'SortedOracles',
+  })
   SortedOracles.setProvider(web3.currentProvider)
 
   async function reportAsOracles(
