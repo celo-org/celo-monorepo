@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - master
+      - jcortejoso/cache-dynamic-files
   pull_request:
     branches:
       - master
@@ -121,7 +122,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Sync workspace
-        uses: ./.github/actions/
+        uses: ./.github/actions/sync-workspace
         with:
           artifacts-to-cache: ${{ needs.install-dependencies.outputs.artifacts-to-cache }}
       - run: yarn run prettify:diff
@@ -134,6 +135,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
+        with:
+          artifacts-to-cache: ${{ needs.install-dependencies.outputs.artifacts-to-cache }}
       - name: Run Jest Tests
         run: |
           mkdir -p test-results/jest
@@ -161,6 +164,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
+        with:
+          artifacts-to-cache: ${{ needs.install-dependencies.outputs.artifacts-to-cache }}
       - name: Run Wallet tests
         run: |
           yarn run lerna --scope '@celo/wallet-*' run test
@@ -185,6 +190,8 @@ jobs:
           submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
+        with:
+          artifacts-to-cache: ${{ needs.install-dependencies.outputs.artifacts-to-cache }}
       - name: Download protocol devchain artifact
         uses: dawidd6/action-download-artifact@v2
         with:
@@ -259,6 +266,7 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           rebuild-package: 'true'
+          artifacts-to-cache: ${{ needs.install-dependencies.outputs.artifacts-to-cache }}
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
         with:
@@ -285,6 +293,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
+        with:
+          artifacts-to-cache: ${{ needs.install-dependencies.outputs.artifacts-to-cache }}
       - name: Generate DevChain
         run: |
           cd packages/sdk/contractkit
@@ -312,6 +322,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
+        with:
+          artifacts-to-cache: ${{ needs.install-dependencies.outputs.artifacts-to-cache }}
       - name: Generate DevChain
         run: |
           cd packages/cli
@@ -346,6 +358,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
+        with:
+          artifacts-to-cache: ${{ needs.install-dependencies.outputs.artifacts-to-cache }}
       - name: Install and test the npm package
         run: |
           set -euo pipefail
@@ -370,6 +384,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
+        with:
+          artifacts-to-cache: ${{ needs.install-dependencies.outputs.artifacts-to-cache }}
       - name: Install and test the npm package
         run: |
           set -euo pipefail
@@ -394,6 +410,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
+        with:
+          artifacts-to-cache: ${{ needs.install-dependencies.outputs.artifacts-to-cache }}
       - name: Install and test the npm package
         run: |
           set -euo pipefail
@@ -482,6 +500,8 @@ jobs:
           submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
+        with:
+          artifacts-to-cache: ${{ needs.install-dependencies.outputs.artifacts-to-cache }}
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
         with:
@@ -536,6 +556,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
+        with:
+          artifacts-to-cache: ${{ needs.install-dependencies.outputs.artifacts-to-cache }}
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
