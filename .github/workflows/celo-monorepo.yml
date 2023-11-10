@@ -60,7 +60,7 @@ jobs:
           submodules: recursive
       - name: Show Cache Key
         shell: bash
-        run: echo "using cache key -- node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}"
+        run: echo "using cache key -- node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('yarn.lock') }}"
       - name: Restore node cache
         uses: actions/cache@v3
         id: cache_node
@@ -70,12 +70,13 @@ jobs:
           path: |
             node_modules
             packages/**/node_modules
-          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}
+          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 30
+        if: false
         with:
           limit-access-to-actor: true
       - name: Install yarn dependencies
@@ -84,17 +85,17 @@ jobs:
       - name: Run yarn postinstall if cache hitted
         run: yarn run postinstall
         if: steps.cache_node.outputs.cache-hit == 'true'
-      - name: Verify Changed files
-        uses: tj-actions/verify-changed-files@v16
-        with:
-          fail-if-changed: 'true'
-          fail-message: 'Files changed during build. Please build locally and commit the changes.'
       - name: Build packages
         run: yarn build --ignore docs --include-dependencies
       - name: Check licenses
         if: steps.cache_node.outputs.cache-hit != 'true'
         run: |
           yarn check-licenses
+      - name: Verify Changed files
+        uses: tj-actions/verify-changed-files@v16
+        with:
+          fail-if-changed: 'true'
+          fail-message: 'Files changed during build. Please build locally and commit the changes.'
       - name: Get the artifacts to cache
         id: get_artifacts_to_cache
         run: |
@@ -125,6 +126,9 @@ jobs:
           # Checking if changed in the last 100 commits in PRs
           fetch_depth: '150'
       - run: echo ",${{ steps.changed-files.outputs.all_modified_files }}"
+      - run: |
+          git diff
+
   lint-checks:
     name: Lint code
     runs-on: ['self-hosted', 'monorepo-node18']
