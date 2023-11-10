@@ -56,7 +56,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
           submodules: recursive
       - name: Show Cache Key
         shell: bash
@@ -91,6 +90,8 @@ jobs:
         if: steps.cache_node.outputs.cache-hit != 'true'
         run: |
           yarn check-licenses
+      - run: |
+          git diff
       - name: Verify Changed files
         uses: tj-actions/verify-changed-files@v16
         with:
