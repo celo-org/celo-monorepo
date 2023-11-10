@@ -49,6 +49,7 @@ jobs:
       # Adding a initial comma so ',<path>' matches also for the first file
       all_modified_files: ',${{ steps.changed-files.outputs.all_modified_files }}'
       artifacts_to_cache: ${{ steps.get_artifacts_to_cache.outputs.artifacts_to_cache }}
+      cache-hit: ${{ steps.cache_node.outputs.cache-hit }}
     # runs-on: ubuntu-latest
     runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
@@ -127,7 +128,7 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-          rebuild-package: 'true'
+          rebuild-package: ${{ needs.install-dependencies.outputs.cache-hit != 'true' }}
       - run: yarn run prettify:diff
       - run: yarn run lint
   general_test:
@@ -140,7 +141,8 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-          rebuild-package: 'true'
+          rebuild-package: ${{ needs.install-dependencies.outputs.cache-hit != 'true' }}
+
       - name: Run Jest Tests
         run: |
           mkdir -p test-results/jest
@@ -170,7 +172,7 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-          rebuild-package: 'true'
+          rebuild-package: ${{ needs.install-dependencies.outputs.cache-hit != 'true' }}
       - name: Run Wallet tests
         run: |
           yarn run lerna --scope '@celo/wallet-*' run test
@@ -268,7 +270,7 @@ jobs:
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
-          rebuild-package: 'true'
+          rebuild-package: ${{ needs.install-dependencies.outputs.cache-hit != 'true' }}
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
@@ -300,7 +302,7 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-          rebuild-package: 'true'
+          rebuild-package: ${{ needs.install-dependencies.outputs.cache-hit != 'true' }}
       - name: Generate DevChain
         run: |
           cd packages/sdk/contractkit
@@ -332,7 +334,7 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-          rebuild-package: 'true'
+          rebuild-package: ${{ needs.install-dependencies.outputs.cache-hit != 'true' }}
       - name: Generate DevChain
         run: |
           cd packages/cli
