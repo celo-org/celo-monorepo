@@ -12,8 +12,8 @@ on:
   pull_request:
     branches:
       - master
-      - 'releases/**'
-      - 'prereleases/**'
+      - 'release/**'
+      - 'prerelease/**'
 
 concurrency:
   group: celo-monorepo-${{ github.ref }}
