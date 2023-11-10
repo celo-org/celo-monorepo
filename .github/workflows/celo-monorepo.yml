@@ -90,7 +90,7 @@ jobs:
         id: get_artifacts_to_cache
         run: |
           artifacts_to_cache="$(git ls-files --others --ignored --exclude-standard | grep -v node_modules)"
-          
+
           echo "artifacts_to_cache<<EOF" >> $GITHUB_OUTPUT
           echo "$artifacts_to_cache" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -127,6 +127,7 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
+          rebuild-package: 'true'
       - run: yarn run prettify:diff
       - run: yarn run lint
   general_test:
@@ -139,6 +140,7 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
+          rebuild-package: 'true'
       - name: Run Jest Tests
         run: |
           mkdir -p test-results/jest
@@ -168,6 +170,7 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
+          rebuild-package: 'true'
       - name: Run Wallet tests
         run: |
           yarn run lerna --scope '@celo/wallet-*' run test
@@ -297,6 +300,7 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
+          rebuild-package: 'true'
       - name: Generate DevChain
         run: |
           cd packages/sdk/contractkit
@@ -328,6 +332,7 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
+          rebuild-package: 'true'
       - name: Generate DevChain
         run: |
           cd packages/cli
