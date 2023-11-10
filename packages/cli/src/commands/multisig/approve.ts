@@ -36,10 +36,14 @@ export default class ApproveMultiSig extends BaseCommand {
 
     const checkBuilder = newCheckBuilder(this)
       .isMultiSigOwner(account, multisig)
-      .addCheck(`${res.flags.tx} is existing transaction`, async () => {
-        const max = await multisig.getTransactionCount(true, true)
-        return res.flags.tx < max
-      })
+      .addCheck(
+        `Checking that ${res.flags.tx} is an existing transaction.`,
+        async () => {
+          const max = await multisig.getTransactionCount(true, true)
+          return res.flags.tx < max
+        },
+        `(Failed: No transaction with index ${res.flags.tx} found)`
+      )
 
     await checkBuilder.runChecks()
 
