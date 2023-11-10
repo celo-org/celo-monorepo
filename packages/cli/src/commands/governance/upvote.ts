@@ -52,17 +52,17 @@ export default class Upvote extends BaseCommand {
    * 5. Upvote function will try to dequeue again and possibly it will hit the proposal and bug that we have
    */
   async dequeueAllPossibleProposals(governance: GovernanceWrapper) {
-    const currentProposalCount = (await governance.concurrentProposals()).toNumber()
+    const concurrentProposals = (await governance.concurrentProposals()).toNumber()
     const queue = await governance.getQueue()
     const originalLastDequeue = await governance.lastDequeue()
 
     let consideredProposals
 
-    for (let index = 0; index < queue.length / currentProposalCount + 1; index++) {
+    for (let index = 0; index < queue.length / concurrentProposals + 1; index++) {
       consideredProposals = (
         await Promise.all(
           queue
-            .slice(0, currentProposalCount)
+            .slice(0, concurrentProposals)
             .map((p) => p.proposalID)
             .map(async (id) => {
               const expired = await governance.isQueuedProposalExpired(id)

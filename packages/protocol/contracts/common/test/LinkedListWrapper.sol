@@ -2,7 +2,7 @@ pragma solidity ^0.5.13;
 
 import "../linkedlists/LinkedList.sol";
 
-contract LinkedListTest {
+contract LinkedListWrapper {
   using LinkedList for LinkedList.List;
 
   LinkedList.List private list;

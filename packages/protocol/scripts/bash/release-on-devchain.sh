@@ -66,7 +66,7 @@ source scripts/bash/contract-exclusion-regex.sh
 yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --output_file report.json
 
 echo "Undo checkout for migrationsConfig.js from $(git rev-parse HEAD) to $BASE_COMMIT"
-git checkout - -- migrationsConfig.js
+git checkout $BASE_COMMIT -- migrationsConfig.js
 
 # From make-release.sh
 echo "- Deploy release of current branch"
