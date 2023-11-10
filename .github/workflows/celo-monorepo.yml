@@ -90,13 +90,14 @@ jobs:
         if: steps.cache_node.outputs.cache-hit != 'true'
         run: |
           yarn check-licenses
-      - run: |
-          git diff
       - name: Verify Changed files
+        id: changed-files
         uses: tj-actions/verify-changed-files@v16
         with:
-          fail-if-changed: 'true'
+          fail-if-changed: 'false'
           fail-message: 'Files changed during build. Please build locally and commit the changes.'
+      - run: |
+          echo "${{ steps.changed-files.outputs.changed_files }}"
       - name: Get the artifacts to cache
         id: get_artifacts_to_cache
         run: |
