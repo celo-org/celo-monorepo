@@ -49,7 +49,6 @@ jobs:
       # Adding a initial comma so ',<path>' matches also for the first file
       all_modified_files: ',${{ steps.changed-files.outputs.all_modified_files }}'
       artifacts_to_cache: ${{ steps.get_artifacts_to_cache.outputs.artifacts_to_cache }}
-      cache-hit: ${{ steps.cache_node.outputs.cache-hit }}
     # runs-on: ubuntu-latest
     runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
@@ -69,12 +68,6 @@ jobs:
           key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 30
-        if: false
-        with:
-          limit-access-to-actor: true
       - name: Install yarn dependencies
         run: git config --global url."https://".insteadOf ssh:// && yarn install
         if: steps.cache_node.outputs.cache-hit != 'true'
@@ -87,6 +80,10 @@ jobs:
         if: steps.cache_node.outputs.cache-hit != 'true'
         run: |
           yarn check-licenses
+      - name: Get submodules to ignore in changed files check
+        id: get_submodules_to_ignore
+        run: |
+          submodules=$(git config --file .gitmodules --name-only --get-regexp path | sed 's/^')
       - name: Verify Changed files
         id: verify-changed-files
         uses: tj-actions/verify-changed-files@v16
@@ -125,8 +122,6 @@ jobs:
           # Checking if changed in the last 100 commits in PRs
           fetch_depth: '150'
       - run: echo ",${{ steps.changed-files.outputs.all_modified_files }}"
-      - run: |
-          git diff
 
   lint-checks:
     name: Lint code
@@ -283,6 +278,7 @@ jobs:
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
+          rebuild-package: 'true'
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
