@@ -56,7 +56,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     await reportAsOracles(sortedOracles, target, freshOracles)
   }
 
-  // XXX: this function causes test to hang after completion.
+  // TODO (soloseng): this function causes test to hang after completion.
   // used --forceExit flag to exit test.
   /**
    * When testing with a custom token pair we can't use the
