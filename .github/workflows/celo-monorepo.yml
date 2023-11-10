@@ -58,6 +58,9 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Show Cache Key
+        shell: bash
+        run: echo "using cache key -- node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}"
       - name: Restore node cache
         uses: actions/cache@v3
         id: cache_node
