@@ -68,6 +68,7 @@ const DefaultConstitution = {
     setAdjustmentSpeed: 0.7,
     setTargetDensity: 0.7,
     setGasPriceMinimumFloor: 0.7,
+    __contractPackage: contractPackages.SOLIDITY_08_PACKAGE,
   },
   GoldToken: {
     default: 0.9,

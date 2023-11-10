@@ -7,7 +7,7 @@ contract MockSortedOracles {
   uint256 public constant DENOMINATOR = 1000000000000000000000000;
   mapping(address => uint256) public numerators;
   mapping(address => uint256) public medianTimestamp;
-  mapping(address => uint256) public numRates;
+  mapping(address => uint256) public _numRates;
   mapping(address => bool) public expired;
 
   function setMedianRate(address token, uint256 numerator) external returns (bool) {
@@ -25,7 +25,11 @@ contract MockSortedOracles {
   }
 
   function setNumRates(address token, uint256 rate) external {
-    numRates[token] = rate;
+    _numRates[token] = rate; // This change may breack something, TODO
+  }
+
+  function numRates(address token) external view returns (uint256) {
+    return _numRates[token];
   }
 
   function medianRate(address token) external view returns (uint256, uint256) {
