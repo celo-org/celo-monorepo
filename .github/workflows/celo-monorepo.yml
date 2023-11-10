@@ -57,9 +57,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Show Cache Key
-        shell: bash
-        run: echo "using cache key -- node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('yarn.lock') }}"
       - name: Restore node cache
         uses: actions/cache@v3
         id: cache_node
@@ -69,7 +66,7 @@ jobs:
           path: |
             node_modules
             packages/**/node_modules
-          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('yarn.lock') }}
+          key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-
       - name: Setup tmate session
@@ -138,6 +135,8 @@ jobs:
     needs: install-dependencies
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -150,11 +149,12 @@ jobs:
     needs: install-dependencies
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-
       - name: Run Jest Tests
         run: |
           mkdir -p test-results/jest
@@ -180,6 +180,8 @@ jobs:
     needs: install-dependencies
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -375,6 +377,8 @@ jobs:
       false
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -401,6 +405,8 @@ jobs:
       false
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -427,6 +433,8 @@ jobs:
       false
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -573,6 +581,8 @@ jobs:
               ./specs/scripts/reserve.sh
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
