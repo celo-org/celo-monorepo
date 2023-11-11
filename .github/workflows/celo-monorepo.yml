@@ -80,20 +80,36 @@ jobs:
         if: steps.cache_node.outputs.cache-hit != 'true'
         run: |
           yarn check-licenses
+      # Get a list of submodules to ignore in the changed files check
+      - name: Get submodules to ignore in changed files check
+        id: get_submodules_to_ignore
+        run: |
+          # Get all the submodules paths
+          submodules=$(git config --file .gitmodules --name-only --get-regexp path)
+          # Remove the "submodule." prefix and ".path" suffix
+          submodules=$(echo $submodules | sed 's/^submodule.//g')
+          submodules=$(echo $submodules | sed 's/.path$//g')
+          # Add a ! in front of each path to ignore it latter in the changed files check
+          submodules=$(echo $submodules | sed 's/^/!/g')
+          echo "submodules<<EOF" >> $GITHUB_OUTPUT
+          echo "$submodules" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       # Get workdir local changes and fail if there are any change
       - name: Verify Changed files
         id: verify-changed-files
         uses: tj-actions/verify-changed-files@v16
         with:
-          fail-if-changed: 'false'
+          fail-if-changed: 'true'
           fail-message: 'Files changed during build. Please build locally and commit the changes.'
+          files: |
+            **/*
+            ${{ steps.get_submodules_to_ignore.outputs.submodules }}
       - run: |
           echo "${{ steps.verify-changed-files.outputs.changed_files }}"
       - name: Get the artifacts to cache
         id: get_artifacts_to_cache
         run: |
           artifacts_to_cache="$(git ls-files --others --ignored --exclude-standard | grep -v node_modules)"
-
           echo "artifacts_to_cache<<EOF" >> $GITHUB_OUTPUT
           echo "$artifacts_to_cache" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
