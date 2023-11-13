@@ -1,4 +1,4 @@
-import { flags } from '@oclif/command'
+import { flags as oclifFlags } from '@oclif/command'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -10,7 +10,7 @@ export default class Authorize extends ReleaseGoldBaseCommand {
 
   static flags = {
     ...ReleaseGoldBaseCommand.flags,
-    role: flags.string({ required: true, options: ['vote', 'validator', 'attestation'] }),
+    role: oclifFlags.string({ required: true, options: ['vote', 'validator', 'attestation'] }),
     signer: Flags.address({
       required: true,
       description: 'The signer key that is to be used for voting through the ReleaseGold instance',
@@ -29,7 +29,7 @@ export default class Authorize extends ReleaseGoldBaseCommand {
         'The BLS public key proof-of-possession, which consists of a signature on the account address. 48 bytes.',
       dependsOn: ['blsKey'],
     }),
-    force: flags.boolean({
+    force: oclifFlags.boolean({
       description:
         'Allow rotation of validator ECDSA key without rotating the BLS key. Only intended for validators with a special reason to do so.',
       default: false,
@@ -48,6 +48,7 @@ export default class Authorize extends ReleaseGoldBaseCommand {
   async run() {
     // tslint:disable-next-line
     const { flags } = this.parse(Authorize)
+
     const role = flags.role
 
     // Check that the account is registered on-chain.

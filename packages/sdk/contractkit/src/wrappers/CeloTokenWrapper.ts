@@ -3,14 +3,14 @@
 // referencing '@celo/utils/node_modules/bignumber.js'
 import 'bignumber.js'
 import { ICeloToken } from '../generated/ICeloToken'
-import { Ierc20 } from '../generated/IERC20'
+import { IERC20 } from '../generated/IERC20'
 import { proxyCall, proxySend, valueToInt } from './BaseWrapper'
 import { Erc20Wrapper } from './Erc20Wrapper'
 
 /**
  * Contract for Celo native currency that adheres to the ICeloToken and IERC20 interfaces.
  */
-export class CeloTokenWrapper<T extends Ierc20 & ICeloToken> extends Erc20Wrapper<T> {
+export class CeloTokenWrapper<T extends IERC20 & ICeloToken> extends Erc20Wrapper<T> {
   /**
    * Returns the name of the token.
    * @returns Name of the token.

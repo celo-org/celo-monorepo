@@ -2,13 +2,13 @@
 // after the move to node 10. This allows types to be inferred without
 // referencing '@celo/utils/node_modules/bignumber.js'
 import BigNumber from 'bignumber.js'
-import { Ierc20 } from '../generated/IERC20'
+import { IERC20 } from '../generated/IERC20'
 import { BaseWrapper, proxyCall, proxySend, valueToBigNumber } from './BaseWrapper'
 
 /**
  * ERC-20 contract only containing the non-optional functions
  */
-export class Erc20Wrapper<T extends Ierc20> extends BaseWrapper<T> {
+export class Erc20Wrapper<T extends IERC20> extends BaseWrapper<T> {
   /**
    * Querying allowance.
    * @param from Account who has given the allowance.
@@ -60,4 +60,4 @@ export class Erc20Wrapper<T extends Ierc20> extends BaseWrapper<T> {
   )
 }
 
-export type Erc20WrapperType<T extends Ierc20> = Erc20Wrapper<T>
+export type Erc20WrapperType<T extends IERC20> = Erc20Wrapper<T>

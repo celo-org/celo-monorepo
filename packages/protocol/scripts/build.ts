@@ -2,11 +2,13 @@
 
 import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
-import { existsSync, readJSONSync } from 'fs-extra'
+import fsExtraPkg from 'fs-extra'
 import minimist, { ParsedArgs } from 'minimist'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
 import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
+
+const { existsSync, readJSONSync } = fsExtraPkg
 
 const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
 const BUILD_DIR = path.join(ROOT_DIR, process.env.BUILD_DIR ?? './build')
@@ -83,7 +85,7 @@ const OtherContracts = [
   'UsingRegistry',
 ]
 
-const contractPackages = [MENTO_PACKAGE, SOLIDITY_08_PACKAGE]
+const contractPackages = [MENTO_PACKAGE, SOLIDITY_08_PACKAGE].filter(Boolean)
 
 const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
 
@@ -165,6 +167,16 @@ function generateFilesForTruffle(outdir: string) {
   exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}"`)
 }
 
+function generateFilesForEthers(outdir: string) {
+  console.log(`protocol: Generating Ethers Types to ${outdir}`)
+  exec(`rm -rf "${outdir}"`)
+
+  const contractKitContracts = CoreContracts.concat('Proxy').concat(Interfaces)
+  const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
+
+  exec(`yarn run --silent typechain --target=ethers-v5 --outDir "${outdir}" "${globPattern}"`)
+}
+
 async function generateFilesForContractKit(outdir: string) {
   console.log(`protocol: Generating Web3 Types to ${outdir}`)
   exec(`rm -rf ${outdir}`)
@@ -206,18 +218,23 @@ async function generateFilesForContractKit(outdir: string) {
 }
 
 const _buildTargets: ParsedArgs = {
-  _: [],
+  _: [] as string[],
   solidity: undefined,
   truffleTypes: undefined,
   web3Types: undefined,
-}
+  ethersTypes: undefined,
+} as const
+type BuildTargets = Record<keyof typeof _buildTargets, string>
 
-async function main(buildTargets: ParsedArgs) {
+async function main(buildTargets: BuildTargets) {
   if (buildTargets.solidity) {
     compile(buildTargets.solidity)
   }
   if (buildTargets.truffleTypes) {
     generateFilesForTruffle(buildTargets.truffleTypes)
+  }
+  if (buildTargets.ethersTypes) {
+    generateFilesForEthers(buildTargets.ethersTypes)
   }
   if (buildTargets.web3Types) {
     await generateFilesForContractKit(buildTargets.web3Types)
@@ -226,7 +243,7 @@ async function main(buildTargets: ParsedArgs) {
 
 const argv = minimist(process.argv.slice(2), {
   string: Object.keys(_buildTargets),
-})
+}) as unknown as BuildTargets
 
 main(argv).catch((err) => {
   console.error(err)

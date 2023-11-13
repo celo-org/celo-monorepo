@@ -6,7 +6,7 @@
  * an environment.
  */
 
-import { ContractPackage, MENTO_PACKAGE } from "../contractPackages"
+import { ContractPackage, MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from "../contractPackages"
 
 export const celoRegistryAddress = '0x000000000000000000000000000000000000ce10'
 
@@ -54,6 +54,7 @@ export const usesRegistry = [
 
 export const hasEntryInRegistry: ContractPackage[]= [
   {
+    name: "default",
     contracts:[
       CeloContractName.Accounts,
       CeloContractName.Attestations,
@@ -72,12 +73,8 @@ export const hasEntryInRegistry: ContractPackage[]= [
       CeloContractName.SortedOracles,
     ]
   },
-  {
-    contracts:[
-      CeloContractName.GasPriceMinimum,
-    ],
-    path: "contracts-0.8"
-  },
+  SOLIDITY_08_PACKAGE
+  ,
   {
     ...MENTO_PACKAGE,
     // not all Mentro contracts are supposed to be in the Registry
