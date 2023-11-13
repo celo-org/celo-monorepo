@@ -46,9 +46,6 @@ export abstract class OffchainDataCommand extends BaseCommand {
     }: ParserOutput<any, any> = this.parse()
 
     const from = privateKeyToAddress(privateKey)
-    // identity depends on a version of kit that doesnt support cip64 tx
-    // so the types dont match but it is fine to ignore here as the kit is not sending a tx
-    // its reading from AccountsWrapper
     this.offchainDataWrapper = new BasicDataWrapper(from, this.kit)
 
     this.offchainDataWrapper.storageWriter =
