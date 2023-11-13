@@ -99,7 +99,7 @@ function hasEmptyBytecode(contract: any) {
   return contract.bytecode === '0x'
 }
 
-function compile(outdir: string) {
+function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
   console.log(`protocol: Compiling solidity to ${outdir}`)
 
   // the reason to generate a different folder is to avoid path collisions, which could be very dangerous
@@ -117,18 +117,19 @@ function compile(outdir: string) {
       continue
     }
 
-    exec(
+    execSync(
       `yarn run truffle compile --silent --contracts_directory=${contractPath} --contracts_build_directory=${outdir}/contracts-${contractPackage.name} --config ${contractPackage.truffleConfig}` // todo change to outdir
     )
   }
 
   // compile everything else
-  exec(
+  execSync(
     `yarn run --silent truffle compile --contracts_directory="./contracts/" --build_directory=${outdir}`
   )
 
+  const contracts = coreContractsOnly ? CoreContracts : ImplContracts
   // check that there were no errors
-  for (const contractName of ImplContracts) {
+  for (const contractName of contracts) {
     try {
       // This is issuing a warning: https://github.com/celo-org/celo-monorepo/issues/10564
       const fileStr = readJSONSync(`${outdir}/contracts/${contractName}.json`)
@@ -147,7 +148,7 @@ function compile(outdir: string) {
   }
 }
 
-function generateFilesForTruffle(outdir: string) {
+function generateFilesForTruffle({ coreContractsOnly, truffleTypes: outdir }: BuildTargets) {
   // tslint:disable-next-line
   for (let externalContractPackage of contractPackages) {
     const outdirExternal = outdir + '-' + externalContractPackage.name
@@ -163,26 +164,35 @@ function generateFilesForTruffle(outdir: string) {
 
   console.log(`protocol: Generating Truffle Types to ${outdir}`)
   exec(`rm -rf "${outdir}"`)
-  const globPattern = `${BUILD_DIR}/contracts/*.json`
+
+  const contractKitContracts = coreContractsOnly
+    ? CoreContracts
+    : CoreContracts.concat('Proxy').concat(Interfaces)
+  const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
+
   exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}"`)
 }
 
-function generateFilesForEthers(outdir: string) {
+function generateFilesForEthers({ coreContractsOnly, ethersTypes: outdir }: BuildTargets) {
   console.log(`protocol: Generating Ethers Types to ${outdir}`)
   exec(`rm -rf "${outdir}"`)
 
-  const contractKitContracts = CoreContracts.concat('Proxy').concat(Interfaces)
+  const contractKitContracts = coreContractsOnly
+    ? CoreContracts
+    : CoreContracts.concat('Proxy').concat(Interfaces)
   const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
 
   exec(`yarn run --silent typechain --target=ethers-v5 --outDir "${outdir}" "${globPattern}"`)
 }
 
-async function generateFilesForContractKit(outdir: string) {
+async function generateFilesForContractKit({ coreContractsOnly, web3Types: outdir }: BuildTargets) {
   console.log(`protocol: Generating Web3 Types to ${outdir}`)
   exec(`rm -rf ${outdir}`)
   const relativePath = path.relative(ROOT_DIR, outdir)
 
-  const contractKitContracts = CoreContracts.concat('Proxy').concat(Interfaces)
+  const contractKitContracts = coreContractsOnly
+    ? CoreContracts
+    : CoreContracts.concat('Proxy').concat(Interfaces)
 
   const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
 
@@ -224,25 +234,28 @@ const _buildTargets: ParsedArgs = {
   web3Types: undefined,
   ethersTypes: undefined,
 } as const
-type BuildTargets = Record<keyof typeof _buildTargets, string>
+type BuildTargets = Record<keyof typeof _buildTargets, string> & {
+  coreContractsOnly: boolean
+}
 
 async function main(buildTargets: BuildTargets) {
   if (buildTargets.solidity) {
-    compile(buildTargets.solidity)
+    compile(buildTargets)
   }
   if (buildTargets.truffleTypes) {
-    generateFilesForTruffle(buildTargets.truffleTypes)
+    generateFilesForTruffle(buildTargets)
   }
   if (buildTargets.ethersTypes) {
-    generateFilesForEthers(buildTargets.ethersTypes)
+    generateFilesForEthers(buildTargets)
   }
   if (buildTargets.web3Types) {
-    await generateFilesForContractKit(buildTargets.web3Types)
+    await generateFilesForContractKit(buildTargets)
   }
 }
 
 const argv = minimist(process.argv.slice(2), {
   string: Object.keys(_buildTargets),
+  boolean: ['coreContractsOnly'],
 }) as unknown as BuildTargets
 
 main(argv).catch((err) => {

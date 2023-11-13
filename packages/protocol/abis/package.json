@@ -9,6 +9,10 @@
     "directory": "packages/protocol/contracts"
   },
   "scripts": {},
-  "dependencies": {},
-  "types": "./types/ethers/index.d.ts"
+  "dependencies": {},  
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "files": [
+    "lib/"
+  ]
 }
