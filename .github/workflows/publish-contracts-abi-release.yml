@@ -11,10 +11,7 @@ on:
         type: string
 jobs:
   publish:
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    runs-on: ['self-hosted', 'monorepo-node18']
     permissions:
       contents: write
       id-token: write
