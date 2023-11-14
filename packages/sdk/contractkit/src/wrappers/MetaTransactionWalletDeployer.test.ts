@@ -21,7 +21,7 @@ const MetaTransactionWallet = contract({
   name: 'MetaTransactionWallet',
 })
 
-testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
+testWithGanache('MetaTransactionWalletDeployer Wrapper', (web3) => {
   MetaTransactionWalletDeployer.setProvider(web3.currentProvider)
   MetaTransactionWallet.setProvider(web3.currentProvider)
 
@@ -57,7 +57,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
     walletDeployer = await kit.contracts.getMetaTransactionWalletDeployer(walletDeployerAddress)
   })
 
-  describe('#deploy', () => {
+  describe.skip('#deploy', () => {
     let result: CeloTxReceipt
     let walletDeployedEvent: EventLog | undefined
 

@@ -30,7 +30,7 @@ export async function assumeOwnership<C extends CeloContract>(
     contractName,
     addressOfContract
   )
-  if (typeof contractToChangeOwnershipOf.methods['transferOwnership'] !== 'function') {
+  if (typeof contractToChangeOwnershipOf.methods.transferOwnership !== 'function') {
     throw new Error('Contract does not have a transferOwnership function')
   }
 
