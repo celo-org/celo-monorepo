@@ -4,7 +4,6 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "baseUrl": ".",
-    "jsx": "preserve",
     "strict": true,
     "moduleResolution": "node",
     "noUnusedLocals": true,
