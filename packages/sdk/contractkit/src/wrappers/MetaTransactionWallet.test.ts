@@ -1,15 +1,12 @@
 import { Address } from '@celo/base/lib/address'
 import { Signature } from '@celo/base/lib/signatureUtils'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
-import { bufferToHex } from '@ethereumjs/util'
 import contract from '@truffle/contract'
 import BigNumber from 'bignumber.js'
 import { ABI as MTWContract } from '../generated/MetaTransactionWallet'
 import { newKitFromWeb3 } from '../kit'
 import { GoldTokenWrapper } from './GoldTokenWrapper'
 import {
-  buildMetaTxTypedData,
   MetaTransactionWalletWrapper,
   RawTransaction,
   toRawTransaction,
@@ -61,27 +58,8 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
   })
 
   describe('#executeTransaction', () => {
-    describe('as a rando', () => {
-      it('reverts', async () => {
-        expect.assertions(1)
-        await expect(
-          wallet
-            .executeTransaction(gold.transfer(emptyAccounts[0], 10000).txo)
-            .sendAndWaitForReceipt({ from: rando })
-        ).rejects.toThrow(/Invalid transaction sender/)
-      })
-    })
-
-    describe('as the signer', () => {
-      it('can call contracts', async () => {
-        const value = new BigNumber(1e18)
-        const result = await wallet
-          .executeTransaction(gold.transfer(emptyAccounts[0], value.toFixed()).txo)
-          .sendAndWaitForReceipt()
-        expect(result.status).toBe(true)
-        expect(await gold.balanceOf(emptyAccounts[0])).toEqual(value)
-      })
-    })
+    // removed test for as not signer it reverts duplicated at https://github.com/celo-org/celo-monorepo/blob/b8c37cddaeaa81e473dde97fb55a455f9a121ba0/packages/protocol/test/common/metatransactionwallet.ts#L268
+    // remove duplicate 'as the signer it can call contracts' test https://github.com/celo-org/celo-monorepo/blob/b8c37cddaeaa81e473dde97fb55a455f9a121ba0/packages/protocol/test/common/metatransactionwallet.ts#L290C14-L290C14
   })
 
   describe('#executeTransactions', () => {
@@ -120,22 +98,9 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
     })
   })
 
-  describe('#getMetaTransactionDigest', () => {
-    it('should match the digest created off-chain', async () => {
-      const metaTransfer = gold.transfer(emptyAccounts[0], 1000).txo
-      const onChainDigest = await wallet.getMetaTransactionDigest(metaTransfer, 0)
-      const typedData = buildMetaTxTypedData(
-        wallet.address,
-        toRawTransaction(metaTransfer),
-        0,
-        chainId
-      )
-      const offChainDigest = bufferToHex(generateTypedDataHash(typedData))
+  // remove getMetaTransactionDigest should match the digest created off-chain duplicated at https://github.com/celo-org/celo-monorepo/blob/b8c37cddaeaa81e473dde97fb55a455f9a121ba0/packages/protocol/test/common/metatransactionwallet.ts#L501
 
-      expect(onChainDigest).toEqual(offChainDigest)
-    })
-  })
-
+  // No test found for this in packages/sdk/contractkit/src/wrappers/MetaTransactionWallet.ts
   describe('#getMetaTransactionSigner', () => {
     it('should match what is signed off-chain', async () => {
       const metaTransfer = gold.transfer(emptyAccounts[0], 1000000).txo
@@ -145,6 +110,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
     })
   })
 
+  // doesn't actually make any contract calls
   describe('#signMetaTransaction', () => {
     describe('with an unlocked account', () => {
       it('returns a signature', async () => {
@@ -157,23 +123,10 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
   })
 
   describe('#executeMetaTransaction', () => {
+    // remove executeMetaTransaction duplicated at https://github.com/celo-org/celo-monorepo/blob/b8c37cddaeaa81e473dde97fb55a455f9a121ba0/packages/protocol/test/common/metatransactionwallet.ts#L562
     describe('as a rando', () => {
-      it('can execute transactions', async () => {
-        const walletBalanceBefore = await gold.balanceOf(wallet.address)
-        const value = new BigNumber(1e18)
-
-        const metaTransfer = gold.transfer(emptyAccounts[0], value.toFixed()).txo
-        const signature = await wallet.signMetaTransaction(metaTransfer)
-
-        const result = await wallet
-          .executeMetaTransaction(metaTransfer, signature)
-          .sendAndWaitForReceipt({ from: rando })
-        expect(result.status).toBe(true)
-
-        expect(await gold.balanceOf(emptyAccounts[0])).toEqual(value)
-        expect(await gold.balanceOf(wallet.address)).toEqual(walletBalanceBefore.minus(value))
-      })
-
+      // can batch transactions as a call to self handled by https://github.com/celo-org/celo-monorepo/blob/b8c37cddaeaa81e473dde97fb55a455f9a121ba0/packages/protocol/test/common/metatransactionwallet.ts#L465
+      // could be good to do a unit test for this which merely tests the wrapper calls with right data
       it('can batch transactions as a call to self', async () => {
         const walletBalanceBefore = await gold.balanceOf(wallet.address)
         const value = new BigNumber(1e18)
@@ -188,13 +141,6 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
           .executeMetaTransaction(metaBatch, signature)
           .sendAndWaitForReceipt({ from: rando })
         expect(result.status).toBe(true)
-
-        expect(await gold.balanceOf(wallet.address)).toEqual(
-          walletBalanceBefore.minus(value.times(3))
-        )
-        for (let i = 0; i < 3; i++) {
-          expect(await gold.balanceOf(emptyAccounts[i])).toEqual(value)
-        }
       })
     })
 
