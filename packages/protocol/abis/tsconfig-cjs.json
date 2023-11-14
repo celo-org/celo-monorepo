@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "module": "CommonJS",
-    "outDir": "../build/abis/lib/cjs"
+    "outDir": "./lib/cjs"
   },
   "references": [{ "path": "../../sdk/utils" }]
 }

@@ -6,90 +6,11 @@ import fsExtraPkg from 'fs-extra'
 import minimist, { ParsedArgs } from 'minimist'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
-import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
+import { CoreContracts, ImplContracts, Interfaces, ROOT_DIR, contractPackages } from './consts'
 
 const { existsSync, readJSONSync } = fsExtraPkg
 
-const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
 const BUILD_DIR = path.join(ROOT_DIR, process.env.BUILD_DIR ?? './build')
-
-export const ProxyContracts = [
-  'AccountsProxy',
-  'AttestationsProxy',
-  'BlockchainParametersProxy',
-  'DoubleSigningSlasherProxy',
-  'DowntimeSlasherProxy',
-  'ElectionProxy',
-  'EpochRewardsProxy',
-  'EscrowProxy',
-  'FederatedAttestationsProxy',
-  'FeeHandlerProxy',
-  'MentoFeeHandlerSellerProxy',
-  'FeeCurrencyWhitelistProxy',
-  'GoldTokenProxy',
-  'GovernanceApproverMultiSigProxy',
-  'GovernanceProxy',
-  'LockedGoldProxy',
-  'MetaTransactionWalletProxy',
-  'MetaTransactionWalletDeployerProxy',
-  'OdisPaymentsProxy',
-  'RegistryProxy',
-  'SortedOraclesProxy',
-  'UniswapFeeHandlerSellerProxy',
-]
-
-export const CoreContracts = [
-  // common
-  'Accounts',
-  'GasPriceMinimum',
-  'FeeHandler',
-  'MentoFeeHandlerSeller',
-  'UniswapFeeHandlerSeller',
-  'FeeCurrencyWhitelist',
-  'GoldToken',
-  'MetaTransactionWallet',
-  'MetaTransactionWalletDeployer',
-  'MultiSig',
-  'Registry',
-  'Freezer',
-  'MetaTransactionWallet',
-
-  // governance
-  'Election',
-  'EpochRewards',
-  'Governance',
-  'GovernanceApproverMultiSig',
-  'BlockchainParameters',
-  'DoubleSigningSlasher',
-  'DowntimeSlasher',
-  'LockedGold',
-  'Validators',
-  'ReleaseGold',
-
-  // identity
-  'Attestations',
-  'Escrow',
-  'FederatedAttestations',
-  'Random',
-  'OdisPayments',
-
-  // stability
-  'SortedOracles',
-]
-
-const OtherContracts = [
-  'Proxy',
-  'Migrations',
-  // abstract
-  'Initializable',
-  'UsingRegistry',
-]
-
-const contractPackages = [MENTO_PACKAGE, SOLIDITY_08_PACKAGE].filter(Boolean)
-
-const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
-
-export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
 
 function exec(cmd: string) {
   return execSync(cmd, { cwd: ROOT_DIR, stdio: 'inherit' })

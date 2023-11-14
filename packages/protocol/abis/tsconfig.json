@@ -16,9 +16,9 @@
     "resolveJsonModule": true,
     "declaration": true,
     "module": "ES2020",
-    "outDir": "../build/abis/lib/esm"
+    "outDir": "./lib/esm"
   },
-  "include": ["../build/abis/src"],
-  "exclude": ["../build/abis/src/ethers"],
+  "include": ["./src-generated"],
+  "exclude": ["./src-generated/ethers"],
   "references": [{ "path": "../../sdk/utils" }]
 }
