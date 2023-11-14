@@ -1,8 +1,8 @@
 import { NetworkConfig, timeTravel } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
+import { CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
 import { Proposal, ProposalTransaction } from '../wrappers/Governance'
-import { CeloContract } from '../base'
 
 // Implements a transfer ownership function using only contractkit primitives
 

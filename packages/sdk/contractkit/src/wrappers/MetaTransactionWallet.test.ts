@@ -3,10 +3,10 @@ import { Signature } from '@celo/base/lib/signatureUtils'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { bufferToHex } from '@ethereumjs/util'
-import contract from '@truffle/contract'
 import BigNumber from 'bignumber.js'
-import { ABI as MTWContract } from '../generated/MetaTransactionWallet'
+import { CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
+import { assumeOwnership } from '../test-utils/transferownership'
 import { GoldTokenWrapper } from './GoldTokenWrapper'
 import {
   buildMetaTxTypedData,
@@ -14,20 +14,8 @@ import {
   RawTransaction,
   toRawTransaction,
 } from './MetaTransactionWallet'
-const MetaTransactionWallet = contract({
-  contractName: 'MetaTransactionWallet',
-  abi: MTWContract,
-})
 
 testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
-  MetaTransactionWallet.setProvider(web3.currentProvider)
-
-  const deployWallet = async (deployer: Address, signer: Address): Promise<Address> => {
-    const instance = await MetaTransactionWallet.new(true, { from: deployer })
-    await instance.initialize(signer, { from: deployer })
-    return instance.address
-  }
-
   // Ganache returns 1 in chainId assembly code
   const chainId = 1
   const kit = newKitFromWeb3(web3)
@@ -49,7 +37,8 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
   })
 
   beforeEach(async () => {
-    const walletAddress = await deployWallet(walletDeployer, walletSigner)
+    const walletAddress = await kit.registry.addressFor(CeloContract.MetaTransactionWallet)
+    assumeOwnership(web3, walletSigner, CeloContract.MetaTransactionWallet)
     wallet = await kit.contracts.getMetaTransactionWallet(walletAddress)
     // Ganache returns 1 in chainId assembly code
     // @ts-ignore
