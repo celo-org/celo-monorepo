@@ -1,5 +1,5 @@
 import { Address } from '@celo/base/lib/address'
-import { newKitFromWeb3 } from '@celo/contractkit'
+import { CeloContract, newKitFromWeb3 } from '@celo/contractkit'
 import { StableToken } from '@celo/contractkit/lib/celo-tokens'
 import { assumeOwnership } from '@celo/contractkit/lib/test-utils/transferownership'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
@@ -26,7 +26,7 @@ testWithGanache('grandamento:show cmd', (web3: Web3) => {
   })
 
   beforeEach(async () => {
-    await assumeOwnership(web3, accounts[0])
+    await assumeOwnership(web3, accounts[0], CeloContract.GrandaMento)
     await setGrandaMentoLimits(grandaMento)
   })
 
