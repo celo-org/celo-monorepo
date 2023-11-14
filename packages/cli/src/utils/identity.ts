@@ -1,7 +1,7 @@
 import { ContractKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { Claim } from '@celo/contractkit/lib/identity/claims/claim'
-import { VERIFIABLE_CLAIM_TYPES, now } from '@celo/contractkit/lib/identity/claims/types'
+import { now, VERIFIABLE_CLAIM_TYPES } from '@celo/contractkit/lib/identity/claims/types'
 import { verifyClaim } from '@celo/contractkit/lib/identity/claims/verify'
 import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
