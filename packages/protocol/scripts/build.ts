@@ -117,13 +117,13 @@ function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
       continue
     }
 
-    execSync(
+    exec(
       `yarn run truffle compile --silent --contracts_directory=${contractPath} --contracts_build_directory=${outdir}/contracts-${contractPackage.name} --config ${contractPackage.truffleConfig}` // todo change to outdir
     )
   }
 
   // compile everything else
-  execSync(
+  exec(
     `yarn run --silent truffle compile --contracts_directory="./contracts/" --build_directory=${outdir}`
   )
 
@@ -165,10 +165,9 @@ function generateFilesForTruffle({ coreContractsOnly, truffleTypes: outdir }: Bu
   console.log(`protocol: Generating Truffle Types to ${outdir}`)
   exec(`rm -rf "${outdir}"`)
 
-  const contractKitContracts = coreContractsOnly
-    ? CoreContracts
-    : CoreContracts.concat('Proxy').concat(Interfaces)
-  const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
+  const globPattern = coreContractsOnly
+    ? `${BUILD_DIR}/contracts/@(${CoreContracts.join('|')}).json`
+    : `${BUILD_DIR}/contracts/*.json`
 
   exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}"`)
 }

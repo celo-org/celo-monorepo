@@ -9,7 +9,6 @@ const SRC_DIR = path.join(__dirname, '../contracts')
 const PACKAGE_SRC_DIR = path.join(__dirname, '../abis')
 const PACKAGE_DIR = path.join(__dirname, '../build/abis')
 const BUILD_DIR = path.join(PACKAGE_DIR, 'src')
-const BUILD_08_DIR = path.join(__dirname, '../build/contracts-0.8')
 const BUILD_EXECUTABLE = path.join(__dirname, 'build.ts')
 const TSCONFIG_PATH = path.join(ROOT_DIR, 'tsconfig.json')
 
