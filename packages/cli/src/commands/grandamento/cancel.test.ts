@@ -1,5 +1,5 @@
 import { Address } from '@celo/base/lib/address'
-import { newKitFromWeb3 } from '@celo/contractkit'
+import { CeloContract, newKitFromWeb3 } from '@celo/contractkit'
 import { assumeOwnership } from '@celo/contractkit/lib/test-utils/transferownership'
 import { GrandaMentoWrapper } from '@celo/contractkit/lib/wrappers/GrandaMento'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
@@ -29,7 +29,7 @@ testWithGanache('grandamento:cancel cmd', (web3: Web3) => {
   })
 
   beforeEach(async () => {
-    await assumeOwnership(web3, accounts[0])
+    await assumeOwnership(web3, accounts[0], CeloContract.GrandaMento)
     await increaseLimits()
     // create mock proposal
     await testLocally(Propose, [

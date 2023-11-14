@@ -1,19 +1,22 @@
 import { NetworkConfig, timeTravel } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
 import { newKitFromWeb3 } from '../kit'
-import { AccountsWrapper } from '../wrappers/Accounts'
 import { Proposal, ProposalTransaction } from '../wrappers/Governance'
+import { CeloContract } from '../base'
 
 // Implements a transfer ownership function using only contractkit primitives
 
 const expConfigGovernance = NetworkConfig.governance
 
-export async function assumeOwnership(web3: Web3, to: string) {
+export async function assumeOwnership<C extends CeloContract>(
+  web3: Web3,
+  newOwnerAddress: string,
+  contractName: C
+) {
   const kit = newKitFromWeb3(web3)
   const ONE_CGLD = web3.utils.toWei('1', 'ether')
   const accounts = await web3.eth.getAccounts()
-  let accountWrapper: AccountsWrapper
-  accountWrapper = await kit.contracts.getAccounts()
+  const accountWrapper = await kit.contracts.getAccounts()
   const lockedGold = await kit.contracts.getLockedGold()
 
   try {
@@ -22,8 +25,11 @@ export async function assumeOwnership(web3: Web3, to: string) {
   } catch (error) {
     console.log('Account already created')
   }
-
-  const grandaMento = await kit._web3Contracts.getGrandaMento()
+  const addressOfContract = await kit.registry.addressFor(contractName)
+  const contractToChangeOwnershipOf = await kit._web3Contracts.getContract<C>(
+    contractName,
+    addressOfContract
+  )
   const governance = await kit.contracts.getGovernance()
   const multiSig = await kit.contracts.getMultiSig(await governance.getApprover())
 
@@ -33,8 +39,8 @@ export async function assumeOwnership(web3: Web3, to: string) {
 
   const ownershiptx: ProposalTransaction = {
     value: '0',
-    to: (grandaMento as any)._address,
-    input: grandaMento.methods.transferOwnership(to).encodeABI(),
+    to: addressOfContract,
+    input: contractToChangeOwnershipOf.methods.transferOwnership(newOwnerAddress).encodeABI(),
   }
   const proposal: Proposal = [ownershiptx]
 

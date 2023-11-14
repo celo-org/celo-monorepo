@@ -1,5 +1,5 @@
 import { Address } from '@celo/base/lib/address'
-import { newKitFromWeb3 } from '@celo/contractkit'
+import { CeloContract, newKitFromWeb3 } from '@celo/contractkit'
 import { assumeOwnership } from '@celo/contractkit/lib/test-utils/transferownership'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
@@ -16,7 +16,7 @@ testWithGanache('grandamento:get-buy-amount cmd', (web3: Web3) => {
   })
 
   beforeEach(async () => {
-    await assumeOwnership(web3, accounts[0])
+    await assumeOwnership(web3, accounts[0], CeloContract.GrandaMento)
   })
 
   it('gets the buy amount', async () => {
