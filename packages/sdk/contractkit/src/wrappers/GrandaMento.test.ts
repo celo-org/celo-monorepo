@@ -10,6 +10,7 @@ import { assumeOwnership } from '../test-utils/transferownership'
 import { GoldTokenWrapper } from './GoldTokenWrapper'
 import { ExchangeProposalState, GrandaMentoWrapper } from './GrandaMento'
 import { StableTokenWrapper } from './StableTokenWrapper'
+import { CeloContract } from '../base'
 
 const expConfig = NetworkConfig.grandaMento
 
@@ -31,7 +32,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
     stableToken = await kit.contracts.getStableToken(StableToken.cUSD)
     celoToken = await kit.contracts.getGoldToken()
     // Reset limits
-    await assumeOwnership(web3, accounts[0])
+    await assumeOwnership(web3, accounts[0], CeloContract.GrandaMento)
     const zero = new BigNumber(0)
     await setLimits('StableToken', zero, zero)
     await setLimits('StableTokenEUR', zero, zero)

@@ -20,7 +20,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
   const chainId = 1
   const kit = newKitFromWeb3(web3)
   let accounts: Address[]
-  let walletDeployer: Address
+  // let walletDeployer: Address
   let walletSigner: Address
   let wallet: MetaTransactionWalletWrapper
   let gold: GoldTokenWrapper
@@ -29,7 +29,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
 
   beforeAll(async () => {
     accounts = await web3.eth.getAccounts()
-    walletDeployer = accounts[0]
+    // walletDeployer = accounts[0]
     walletSigner = accounts[1]
     kit.defaultAccount = walletSigner
     rando = accounts[2]
