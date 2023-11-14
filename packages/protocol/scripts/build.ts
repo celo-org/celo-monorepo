@@ -6,7 +6,7 @@ import fsExtraPkg from 'fs-extra'
 import minimist, { ParsedArgs } from 'minimist'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
-import { CoreContracts, ImplContracts, Interfaces, ROOT_DIR, contractPackages } from './consts'
+import { contractPackages, CoreContracts, ImplContracts, Interfaces, ROOT_DIR } from './consts'
 
 const { existsSync, readJSONSync } = fsExtraPkg
 
