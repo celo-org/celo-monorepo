@@ -46,7 +46,6 @@ export abstract class OffchainDataCommand extends BaseCommand {
     }: ParserOutput<any, any> = this.parse()
 
     const from = privateKeyToAddress(privateKey)
-
     this.offchainDataWrapper = new BasicDataWrapper(from, this.kit)
 
     this.offchainDataWrapper.storageWriter =

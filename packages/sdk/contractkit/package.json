@@ -45,7 +45,7 @@
     "web3-core-helpers": "1.10.0"
   },
   "devDependencies": {
-    "@celo/phone-utils": "^5.0.5",
+    "@celo/odis-identifiers": "^1.0.0",
     "@celo/dev-utils": "0.0.1",
     "@celo/protocol": "1.0.1",
     "@types/debug": "^4.1.5",
