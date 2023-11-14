@@ -26,10 +26,14 @@ export async function assumeOwnership<C extends CeloContract>(
     console.log('Account already created')
   }
   const addressOfContract = await kit.registry.addressFor(contractName)
-  const contractToChangeOwnershipOf = await kit._web3Contracts.getContract<C>(
+  const contractToChangeOwnershipOf: any = await kit._web3Contracts.getContract<C>(
     contractName,
     addressOfContract
   )
+  if (typeof contractToChangeOwnershipOf.methods['transferOwnership'] !== 'function') {
+    throw new Error('Contract does not have a transferOwnership function')
+  }
+
   const governance = await kit.contracts.getGovernance()
   const multiSig = await kit.contracts.getMultiSig(await governance.getApprover())
 
