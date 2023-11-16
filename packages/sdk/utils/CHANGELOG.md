@@ -1,5 +1,12 @@
 # @celo/utils
 
+## 5.0.6
+
+### Patch Changes
+
+- Updated dependencies [97d5ccf43]
+  - @celo/base@6.0.0
+
 ## 5.0.6-beta.0
 
 ### Patch Changes
