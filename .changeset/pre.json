@@ -30,5 +30,17 @@
     "@celo/wallet-rpc": "5.1.0",
     "@celo/typescript": "0.0.1"
   },
-  "changesets": []
+  "changesets": [
+    "beige-planes-sort",
+    "breezy-ants-refuse",
+    "cyan-lies-jam",
+    "four-cooks-rhyme",
+    "hot-lamps-grin",
+    "itchy-tips-repair",
+    "lemon-rice-cry",
+    "nine-ladybugs-beam",
+    "radical-monkey-play",
+    "sixty-squids-warn",
+    "small-hats-pull"
+  ]
 }
