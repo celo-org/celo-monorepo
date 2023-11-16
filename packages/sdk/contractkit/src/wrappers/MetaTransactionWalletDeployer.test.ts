@@ -1,40 +1,14 @@
 import { Address, normalizeAddress } from '@celo/base'
 import { CeloTxReceipt, EventLog } from '@celo/connect'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import {
-  ABI as MTWContract,
-  MetaTransactionWallet,
-  newMetaTransactionWallet,
-} from '../generated/MetaTransactionWallet'
-import { ABI as MTWDeployerContract } from '../generated/MetaTransactionWalletDeployer'
+import { CeloContract } from '../base'
+import { MetaTransactionWallet, newMetaTransactionWallet } from '../generated/MetaTransactionWallet'
 import { newProxy } from '../generated/Proxy'
 import { newKitFromWeb3 } from '../kit'
+import { assumeOwnership } from '../test-utils/transferownership'
 import { MetaTransactionWalletDeployerWrapper } from './MetaTransactionWalletDeployer'
 
-import contract from '@truffle/contract'
-const MetaTransactionWalletDeployer = contract({
-  abi: MTWDeployerContract,
-  name: 'MetaTransactionWalletDeployer',
-})
-const MetaTransactionWallet = contract({
-  abi: MTWContract,
-  name: 'MetaTransactionWallet',
-})
-
 testWithGanache('MetaTransactionWalletDeployer Wrapper', (web3) => {
-  MetaTransactionWalletDeployer.setProvider(web3.currentProvider)
-  MetaTransactionWallet.setProvider(web3.currentProvider)
-
-  const deployImplementation = async (from: Address) => {
-    const impl = await MetaTransactionWallet.new(true, { from })
-    return impl.address
-  }
-
-  const deployWalletDeployer = async (from: Address): Promise<Address> => {
-    const instance = await MetaTransactionWalletDeployer.new({ from })
-    return instance.address
-  }
-
   const kit = newKitFromWeb3(web3)
   let accounts: Address[]
   let walletDeployerOwner: Address
@@ -48,16 +22,23 @@ testWithGanache('MetaTransactionWalletDeployer Wrapper', (web3) => {
     walletDeployerOwner = accounts[0]
     rando = accounts[1]
     kit.defaultAccount = walletDeployerOwner
+
+    await Promise.all([
+      assumeOwnership(web3, walletDeployerOwner, CeloContract.MetaTransactionWalletDeployer),
+      assumeOwnership(web3, walletDeployerOwner, CeloContract.MetaTransactionWallet),
+    ])
     beneficiary = web3.utils.randomHex(20)
-    implementation = newMetaTransactionWallet(web3, await deployImplementation(accounts[0]))
+    // implementation = newMetaTransactionWallet(web3, await deployImplementation(accounts[0]))
   })
 
   beforeEach(async () => {
-    const walletDeployerAddress = await deployWalletDeployer(walletDeployerOwner)
+    const walletDeployerAddress = await kit.registry.addressFor(
+      CeloContract.MetaTransactionWalletDeployer
+    )
     walletDeployer = await kit.contracts.getMetaTransactionWalletDeployer(walletDeployerAddress)
   })
 
-  describe.skip('#deploy', () => {
+  describe('#deploy', () => {
     let result: CeloTxReceipt
     let walletDeployedEvent: EventLog | undefined
 
