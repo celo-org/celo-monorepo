@@ -1,5 +1,12 @@
 # @celo/wallet-hsm
 
+## 5.1.1-beta.0
+
+### Patch Changes
+
+- Updated dependencies [97d5ccf43]
+  - @celo/base@6.0.0-beta.0
+
 ## 5.1.0
 
 ### Patch Changes

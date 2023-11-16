@@ -1,6 +1,6 @@
 {
   "name": "@celo/wallet-ledger",
-  "version": "5.1.0",
+  "version": "5.1.1-beta.0",
   "description": "Ledger wallet implementation",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -22,11 +22,11 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@celo/base": "^5.0.5",
-    "@celo/utils": "^5.0.5",
-    "@celo/wallet-base": "^5.1.0",
-    "@celo/wallet-remote": "^5.1.0",
-    "@celo/connect": "^5.1.0",
+    "@celo/base": "^6.0.0-beta.0",
+    "@celo/utils": "^5.0.6-beta.0",
+    "@celo/wallet-base": "^5.1.1-beta.0",
+    "@celo/wallet-remote": "^5.1.1-beta.0",
+    "@celo/connect": "^5.1.1-beta.0",
     "@ethereumjs/util": "8.0.5",
     "@ledgerhq/hw-app-eth": "~5.11.0",
     "@ledgerhq/errors": "^5.50.0",

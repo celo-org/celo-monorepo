@@ -42,6 +42,7 @@ export default class IdentifierQuery extends BaseCommand {
 
     const authSigner: AuthSigner = {
       authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
+      // @ts-ignore fails when identity brings in different version of ck than is specified in dependencies
       contractKit: this.kit,
     }
 
