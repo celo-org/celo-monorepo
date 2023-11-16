@@ -20,7 +20,6 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
   const chainId = 1
   const kit = newKitFromWeb3(web3)
   let accounts: Address[]
-  // let walletDeployer: Address
   let walletSigner: Address
   let wallet: MetaTransactionWalletWrapper
   let gold: GoldTokenWrapper
@@ -29,16 +28,16 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
 
   beforeAll(async () => {
     accounts = await web3.eth.getAccounts()
-    // walletDeployer = accounts[0]
     walletSigner = accounts[1]
     kit.defaultAccount = walletSigner
     rando = accounts[2]
+    // change ownership of the wallet to the signer from the Governance Contract
+    await assumeOwnership(web3, walletSigner, CeloContract.MetaTransactionWallet)
     gold = await kit.contracts.getGoldToken()
   })
 
   beforeEach(async () => {
     const walletAddress = await kit.registry.addressFor(CeloContract.MetaTransactionWallet)
-    assumeOwnership(web3, walletSigner, CeloContract.MetaTransactionWallet)
     wallet = await kit.contracts.getMetaTransactionWallet(walletAddress)
     // Ganache returns 1 in chainId assembly code
     // @ts-ignore
