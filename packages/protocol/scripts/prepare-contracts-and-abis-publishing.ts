@@ -13,6 +13,7 @@ import {
 } from './consts'
 
 function log(...args: any[]) {
+  // tslint:disable-next-line
   console.log('[prepare-contracts-and-abis]', ...args)
 }
 
