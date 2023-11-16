@@ -1,5 +1,16 @@
 # @celo/wallet-rpc
 
+## 5.1.1-beta.0
+
+### Patch Changes
+
+- Updated dependencies [97d5ccf43]
+  - @celo/base@6.0.0-beta.0
+  - @celo/connect@5.1.1-beta.0
+  - @celo/utils@5.0.6-beta.0
+  - @celo/wallet-base@5.1.1-beta.0
+  - @celo/wallet-remote@5.1.1-beta.0
+
 ## 5.1.0
 
 ### Patch Changes
