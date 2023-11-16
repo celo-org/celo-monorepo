@@ -69,7 +69,6 @@
     "events": "^3.0.0",
     "fs-extra": "^8.1.0",
     "humanize-duration": "^3.29.0",
-    "moment": "^2.29.0",
     "path": "^0.12.7",
     "prompts": "^2.0.1",
     "randombytes": "^2.0.1",
