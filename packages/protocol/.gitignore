@@ -41,3 +41,6 @@ out/
 
 wagmi.config.js
 wagmi.config.js.map
+
+abis/src-generated/
+abis/lib/
