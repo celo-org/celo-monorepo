@@ -1,12 +1,12 @@
 import { Address } from '@celo/connect'
 import { describeEach } from '@celo/dev-utils/lib/describeEach'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
-import SortedOraclesArtifact from '@celo/protocol/build/contracts/SortedOracles.json'
-import truffleContract from '@truffle/contract'
+import SortedOraclesArtifact from '../../artifacts/SortedOracles.json'
 import { CeloContract } from '../base'
 import { StableToken } from '../celo-tokens'
 import { newKitFromWeb3 } from '../kit'
 import { OracleRate, ReportTarget, SortedOraclesWrapper } from './SortedOracles'
+import truffleContract from '@truffle/contract'
 // set timeout to 10 seconds
 jest.setTimeout(10 * 1000)
 
