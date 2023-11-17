@@ -1,6 +1,6 @@
 {
   "name": "@celo/wallet-base",
-  "version": "5.1.0",
+  "version": "5.1.1-beta.0",
   "description": "Wallet base implementation",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -25,9 +25,9 @@
     "viem": "~1.5.4"
   },
   "dependencies": {
-    "@celo/connect": "^5.1.0",
-    "@celo/base": "^5.0.5",
-    "@celo/utils": "^5.0.5",
+    "@celo/connect": "^5.1.1-beta.0",
+    "@celo/base": "^6.0.0-beta.0",
+    "@celo/utils": "^5.0.6-beta.0",
     "@ethereumjs/util": "8.0.5",
     "@ethereumjs/rlp": "^5.0.0",
     "ethereum-cryptography": "^2.1.2",

@@ -1,7 +1,6 @@
 import { exec, ExecException } from 'child_process'
 import path from 'path'
-
-import { CoreContracts } from './build'
+import { CoreContracts } from './consts'
 
 const UNSAFE_OPCODES = ['selfdestruct', 'delegatecall']
 

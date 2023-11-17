@@ -29,6 +29,7 @@
     "keys:encrypt": "bash scripts/key_placer.sh encrypt",
     "check:packages": "node ./scripts/check-packages.js",
     "release": "yarn build && yarn cs publish",
+    "version-and-reinstall": "yarn changeset version && yarn install",
     "celotool": "yarn --cwd packages/celotool run --silent cli",
     "celocli": "yarn --cwd packages/cli run --silent celocli",
     "update-dependency-graph": "ts-node ./scripts/update_dependency_graph.ts",
