@@ -446,7 +446,7 @@ Array.from([
     })
 
     describe('Selling', () => {
-      const sellAmount = new BigNumber('1000000000000000000')
+      const sellAmount = new BigNumber('1000000000000000000000')
       const minBuyAmount = 1
 
       describe('When selling gold', () => {
@@ -508,8 +508,8 @@ Array.from([
     })
 
     describe('Buying', () => {
-      const buyAmount = new BigNumber(100)
-      const maxSellAmount = new BigNumber('1000000000000000000')
+      const buyAmount = new BigNumber(10000000000000000000)
+      const maxSellAmount = new BigNumber('10000000000000000000000')
 
       describe('When buying stable token', () => {
         before(async () => {

@@ -412,6 +412,7 @@ export async function generateKeys(
   return generateKeysFromSeed(seed, changeIndex, addressIndex, derivationPath)
 }
 
+// XXX: (@soloseng) no test for this function?
 export function generateDeterministicInviteCode(
   recipientPhoneHash: string,
   recipientPepper: string,
