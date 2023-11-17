@@ -5,7 +5,7 @@ import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { bufferToHex } from '@ethereumjs/util'
 import contract from '@truffle/contract'
 import BigNumber from 'bignumber.js'
-import { ABI as MTWContract } from '../generated/MetaTransactionWallet'
+import MTWContract from '../../artifacts/MetaTransactionWallet.json'
 import { newKitFromWeb3 } from '../kit'
 import { GoldTokenWrapper } from './GoldTokenWrapper'
 import {

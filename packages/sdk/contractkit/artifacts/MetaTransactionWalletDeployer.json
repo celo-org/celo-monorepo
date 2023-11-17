@@ -1,0 +1,2060 @@
+{
+  "contractName": "MetaTransactionWalletDeployer",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "wallet",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "implementation",
+          "type": "address"
+        }
+      ],
+      "name": "WalletDeployed",
+      "type": "event"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getVersionNumber",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "implementation",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "initCallData",
+          "type": "bytes"
+        }
+      ],
+      "name": "deploy",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.5.13+commit.5b0b510c\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"wallet\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"WalletDeployed\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"initCallData\",\"type\":\"bytes\"}],\"name\":\"deploy\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getVersionNumber\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{\"deploy(address,address,bytes)\":{\"params\":{\"implementation\":\"The address of the implementation which the proxy will point to\",\"initCallData\":\"calldata pointing to a method on implementation used to initialize\",\"owner\":\"The external account which will act as signer and owner of the proxy\"}},\"getVersionNumber()\":{\"return\":\"Storage version of the contract.Major version of the contract.Minor version of the contract.Patch version of the contract.\"}}},\"userdoc\":{\"methods\":{\"deploy(address,address,bytes)\":{\"notice\":\"Used to deploy a MetaTransactionWalletProxy, set the implementation, initialize, transfer ownership and emit an event.\"},\"getVersionNumber()\":{\"notice\":\"Returns the storage, major, minor, and patch version of the contract.     \"}}}},\"settings\":{\"compilationTarget\":{\"project:/contracts/common/MetaTransactionWalletDeployer.sol\":\"MetaTransactionWalletDeployer\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"useLiteralContent\":true},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"openzeppelin-solidity/contracts/utils/Address.sol\":{\"content\":\"pragma solidity ^0.5.5;\\n\\n/**\\n * @dev Collection of functions related to the address type\\n */\\nlibrary Address {\\n    /**\\n     * @dev Returns true if `account` is a contract.\\n     *\\n     * [IMPORTANT]\\n     * ====\\n     * It is unsafe to assume that an address for which this function returns\\n     * false is an externally-owned account (EOA) and not a contract.\\n     *\\n     * Among others, `isContract` will return false for the following \\n     * types of addresses:\\n     *\\n     *  - an externally-owned account\\n     *  - a contract in construction\\n     *  - an address where a contract will be created\\n     *  - an address where a contract lived, but was destroyed\\n     * ====\\n     */\\n    function isContract(address account) internal view returns (bool) {\\n        // According to EIP-1052, 0x0 is the value returned for not-yet created accounts\\n        // and 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470 is returned\\n        // for accounts without code, i.e. `keccak256('')`\\n        bytes32 codehash;\\n        bytes32 accountHash = 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470;\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly { codehash := extcodehash(account) }\\n        return (codehash != accountHash && codehash != 0x0);\\n    }\\n\\n    /**\\n     * @dev Converts an `address` into `address payable`. Note that this is\\n     * simply a type cast: the actual underlying value is not changed.\\n     *\\n     * _Available since v2.4.0._\\n     */\\n    function toPayable(address account) internal pure returns (address payable) {\\n        return address(uint160(account));\\n    }\\n\\n    /**\\n     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to\\n     * `recipient`, forwarding all available gas and reverting on errors.\\n     *\\n     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost\\n     * of certain opcodes, possibly making contracts go over the 2300 gas limit\\n     * imposed by `transfer`, making them unable to receive funds via\\n     * `transfer`. {sendValue} removes this limitation.\\n     *\\n     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].\\n     *\\n     * IMPORTANT: because control is transferred to `recipient`, care must be\\n     * taken to not create reentrancy vulnerabilities. Consider using\\n     * {ReentrancyGuard} or the\\n     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].\\n     *\\n     * _Available since v2.4.0._\\n     */\\n    function sendValue(address payable recipient, uint256 amount) internal {\\n        require(address(this).balance >= amount, \\\"Address: insufficient balance\\\");\\n\\n        // solhint-disable-next-line avoid-call-value\\n        (bool success, ) = recipient.call.value(amount)(\\\"\\\");\\n        require(success, \\\"Address: unable to send value, recipient may have reverted\\\");\\n    }\\n}\\n\",\"keccak256\":\"0x1a8e5072509c5ea7365eb1d48030b9be865140c8fb779968da0a459a0e174a11\"},\"project:/contracts/common/MetaTransactionWalletDeployer.sol\":{\"content\":\"pragma solidity ^0.5.13;\\n\\nimport \\\"./interfaces/ICeloVersionedContract.sol\\\";\\nimport \\\"./interfaces/IMetaTransactionWalletDeployer.sol\\\";\\nimport \\\"./proxies/MetaTransactionWalletProxy.sol\\\";\\n\\ncontract MetaTransactionWalletDeployer is IMetaTransactionWalletDeployer, ICeloVersionedContract {\\n  event WalletDeployed(address indexed owner, address indexed wallet, address implementation);\\n\\n  /**\\n     * @notice Returns the storage, major, minor, and patch version of the contract.     \\n     * @return Storage version of the contract.\\n     * @return Major version of the contract.\\n     * @return Minor version of the contract.\\n     * @return Patch version of the contract.\\n     */\\n  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {\\n    return (1, 1, 0, 3);\\n  }\\n\\n  /**\\n     * @notice Used to deploy a MetaTransactionWalletProxy, set the implementation,\\n     * initialize, transfer ownership and emit an event.\\n     * @param owner The external account which will act as signer and owner of the proxy\\n     * @param implementation The address of the implementation which the proxy will point to\\n     * @param initCallData calldata pointing to a method on implementation used to initialize\\n     */\\n  function deploy(address owner, address implementation, bytes calldata initCallData) external {\\n    MetaTransactionWalletProxy proxy = new MetaTransactionWalletProxy();\\n    proxy._setAndInitializeImplementation(implementation, initCallData);\\n    proxy._transferOwnership(owner);\\n\\n    emit WalletDeployed(owner, address(proxy), implementation);\\n  }\\n}\\n\",\"keccak256\":\"0xc19a498789d5d830812aa16e645c54414c3b2e3ca0a44bcebd8d0cb660c80296\"},\"project:/contracts/common/Proxy.sol\":{\"content\":\"pragma solidity ^0.5.13;\\n/* solhint-disable no-inline-assembly, no-complex-fallback, avoid-low-level-calls */\\n\\nimport \\\"openzeppelin-solidity/contracts/utils/Address.sol\\\";\\n\\n/**\\n * @title A Proxy utilizing the Unstructured Storage pattern.\\n */\\ncontract Proxy {\\n  // Used to store the address of the owner.\\n  bytes32 private constant OWNER_POSITION = bytes32(uint256(keccak256(\\\"eip1967.proxy.admin\\\")) - 1);\\n  // Used to store the address of the implementation contract.\\n  bytes32 private constant IMPLEMENTATION_POSITION = bytes32(\\n    uint256(keccak256(\\\"eip1967.proxy.implementation\\\")) - 1\\n  );\\n\\n  event OwnerSet(address indexed owner);\\n  event ImplementationSet(address indexed implementation);\\n\\n  constructor() public {\\n    _setOwner(msg.sender);\\n  }\\n\\n  /**\\n   * @notice Throws if called by any account other than the owner.\\n   */\\n  modifier onlyOwner() {\\n    require(msg.sender == _getOwner(), \\\"sender was not owner\\\");\\n    _;\\n  }\\n\\n  /**\\n   * @notice Delegates calls to the implementation contract.\\n   */\\n  function() external payable {\\n    bytes32 implementationPosition = IMPLEMENTATION_POSITION;\\n\\n    address implementationAddress;\\n\\n    // Load the address of the implementation contract from an explicit storage slot.\\n    assembly {\\n      implementationAddress := sload(implementationPosition)\\n    }\\n\\n    // Avoid checking if address is a contract or executing delegated call when\\n    // implementation address is 0x0\\n    require(implementationAddress != address(0), \\\"No Implementation set\\\");\\n    require(Address.isContract(implementationAddress), \\\"Invalid contract address\\\");\\n\\n    assembly {\\n      // Extract the position of the transaction data (i.e. function ID and arguments).\\n      let newCallDataPosition := mload(0x40)\\n      mstore(0x40, add(newCallDataPosition, calldatasize))\\n      calldatacopy(newCallDataPosition, 0, calldatasize)\\n\\n      // Call the smart contract at `implementationAddress` in the context of the proxy contract,\\n      // with the same msg.sender and value.\\n      let delegatecallSuccess := delegatecall(\\n        gas,\\n        implementationAddress,\\n        newCallDataPosition,\\n        calldatasize,\\n        0,\\n        0\\n      )\\n\\n      // Copy the return value of the call so it can be returned.\\n      let returnDataSize := returndatasize\\n      let returnDataPosition := mload(0x40)\\n      mstore(0x40, add(returnDataPosition, returnDataSize))\\n      returndatacopy(returnDataPosition, 0, returnDataSize)\\n\\n      // Revert or return depending on whether or not the call was successful.\\n      switch delegatecallSuccess\\n        case 0 {\\n          revert(returnDataPosition, returnDataSize)\\n        }\\n        default {\\n          return(returnDataPosition, returnDataSize)\\n        }\\n    }\\n  }\\n\\n  /**\\n   * @notice Transfers ownership of Proxy to a new owner.\\n   * @param newOwner Address of the new owner account.\\n   */\\n  function _transferOwnership(address newOwner) external onlyOwner {\\n    _setOwner(newOwner);\\n  }\\n\\n  /**\\n   * @notice Sets the address of the implementation contract and calls into it.\\n   * @param implementation Address of the new target contract.\\n   * @param callbackData The abi-encoded function call to perform in the implementation\\n   * contract.\\n   * @dev Throws if the initialization callback fails.\\n   * @dev If the target contract does not need initialization, use\\n   * setImplementation instead.\\n   */\\n  function _setAndInitializeImplementation(address implementation, bytes calldata callbackData)\\n    external\\n    payable\\n    onlyOwner\\n  {\\n    _setImplementation(implementation);\\n    bool success;\\n    bytes memory returnValue;\\n    (success, returnValue) = implementation.delegatecall(callbackData);\\n    require(success, \\\"initialization callback failed\\\");\\n  }\\n\\n  /**\\n   * @notice Returns the implementation address.\\n   */\\n  function _getImplementation() external view returns (address implementation) {\\n    bytes32 implementationPosition = IMPLEMENTATION_POSITION;\\n    // Load the address of the implementation contract from an explicit storage slot.\\n    assembly {\\n      implementation := sload(implementationPosition)\\n    }\\n  }\\n\\n  /**\\n   * @notice Sets the address of the implementation contract.\\n   * @param implementation Address of the new target contract.\\n   * @dev If the target contract needs to be initialized, call\\n   * setAndInitializeImplementation instead.\\n   */\\n  function _setImplementation(address implementation) public onlyOwner {\\n    bytes32 implementationPosition = IMPLEMENTATION_POSITION;\\n\\n    require(Address.isContract(implementation), \\\"Invalid contract address\\\");\\n\\n    // Store the address of the implementation contract in an explicit storage slot.\\n    assembly {\\n      sstore(implementationPosition, implementation)\\n    }\\n\\n    emit ImplementationSet(implementation);\\n  }\\n\\n  /**\\n   * @notice Returns the Proxy owner's address.\\n   */\\n  function _getOwner() public view returns (address owner) {\\n    bytes32 position = OWNER_POSITION;\\n    // Load the address of the contract owner from an explicit storage slot.\\n    assembly {\\n      owner := sload(position)\\n    }\\n  }\\n\\n  function _setOwner(address newOwner) internal {\\n    require(newOwner != address(0), \\\"owner cannot be 0\\\");\\n    bytes32 position = OWNER_POSITION;\\n    // Store the address of the contract owner in an explicit storage slot.\\n    assembly {\\n      sstore(position, newOwner)\\n    }\\n    emit OwnerSet(newOwner);\\n  }\\n}\\n\",\"keccak256\":\"0x650f2a079da45a71970749c9039dece5986835225035b29eca4df1c1dab0d6ac\"},\"project:/contracts/common/interfaces/ICeloVersionedContract.sol\":{\"content\":\"// SPDX-License-Identifier: LGPL-3.0-only\\npragma solidity >=0.5.13 <0.9.0;\\n\\ninterface ICeloVersionedContract {\\n  /**\\n   * @notice Returns the storage, major, minor, and patch version of the contract.\\n    * @return Storage version of the contract.\\n    * @return Major version of the contract.\\n    * @return Minor version of the contract.\\n    * @return Patch version of the contract.\\n   */\\n  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256);\\n}\\n\",\"keccak256\":\"0x27f0b14472db998eb8e4b529bbfd6a5879cbd842f8db8aa6c06ed7d2e0b17ac1\"},\"project:/contracts/common/interfaces/IMetaTransactionWalletDeployer.sol\":{\"content\":\"// SPDX-License-Identifier: LGPL-3.0-only\\npragma solidity >=0.5.13 <0.9.0;\\n\\ninterface IMetaTransactionWalletDeployer {\\n  function deploy(address, address, bytes calldata) external;\\n}\\n\",\"keccak256\":\"0xf36e8a8b1a2a4e8414e623cbdfff8c747ddfa264151aa4f592ce9a1b48deed9d\"},\"project:/contracts/common/proxies/MetaTransactionWalletProxy.sol\":{\"content\":\"pragma solidity ^0.5.3;\\n\\nimport \\\"../Proxy.sol\\\";\\n\\n/* solhint-disable-next-line no-empty-blocks */\\ncontract MetaTransactionWalletProxy is Proxy {}\\n\",\"keccak256\":\"0xa1766fbbb99f3f1a94d39043ad4ee0e71f2047ed3240a2b00ce7e1cbf2169e50\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50610f30806100206000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c80632db5b86f1461003b57806354255be0146100f4575b600080fd5b6100f26004803603606081101561005157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190803573ffffffffffffffffffffffffffffffffffffffff169060200190929190803590602001906401000000008111156100ae57600080fd5b8201836020820111156100c057600080fd5b803590602001918460018302840111640100000000831117156100e257600080fd5b9091929391929390505050610127565b005b6100fc61034e565b6040518085815260200184815260200183815260200182815260200194505050505060405180910390f35b600060405161013590610375565b604051809103906000f080158015610151573d6000803e3d6000fd5b5090508073ffffffffffffffffffffffffffffffffffffffff166303386ba38585856040518463ffffffff1660e01b8152600401808473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001806020018281038252848482818152602001925080828437600081840152601f19601f820116905080830192505050945050505050600060405180830381600087803b15801561020757600080fd5b505af115801561021b573d6000803e3d6000fd5b505050508073ffffffffffffffffffffffffffffffffffffffff1663d29d44ee866040518263ffffffff1660e01b8152600401808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001915050600060405180830381600087803b15801561029e57600080fd5b505af11580156102b2573d6000803e3d6000fd5b505050508073ffffffffffffffffffffffffffffffffffffffff168573ffffffffffffffffffffffffffffffffffffffff167f59f1a52a03cbb11153119ab5682a8097ec48554e9ce2141612d3615081c4f28886604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a35050505050565b60008060008060018060006003839350829250819150809050935093509350935090919293565b610b79806103838339019056fe60806040526100133361001860201b60201c565b610148565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614156100bb576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260118152602001807f6f776e65722063616e6e6f74206265203000000000000000000000000000000081525060200191505060405180910390fd5b6000600160405180807f656970313936372e70726f78792e61646d696e000000000000000000000000008152506013019050604051809103902060001c0360001b90508181558173ffffffffffffffffffffffffffffffffffffffff167f50146d0e3c60aa1d17a70635b05494f864e86144a2201275021014fbf08bafe260405160405180910390a25050565b610a22806101576000396000f3fe60806040526004361061004a5760003560e01c806303386ba3146101e757806342404e0714610280578063bb913f41146102d7578063d29d44ee14610328578063f7e6af8014610379575b6000600160405180807f656970313936372e70726f78792e696d706c656d656e746174696f6e00000000815250601c019050604051809103902060001c0360001b9050600081549050600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff161415610136576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260158152602001807f4e6f20496d706c656d656e746174696f6e20736574000000000000000000000081525060200191505060405180910390fd5b61013f816103d0565b6101b1576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260188152602001807f496e76616c696420636f6e74726163742061646472657373000000000000000081525060200191505060405180910390fd5b60405136810160405236600082376000803683855af43d604051818101604052816000823e82600081146101e3578282f35b8282fd5b61027e600480360360408110156101fd57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291908035906020019064010000000081111561023a57600080fd5b82018360208201111561024c57600080fd5b8035906020019184600183028401116401000000008311171561026e57600080fd5b909192939192939050505061041b565b005b34801561028c57600080fd5b506102956105c1565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b3480156102e357600080fd5b50610326600480360360208110156102fa57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff16906020019092919050505061060d565b005b34801561033457600080fd5b506103776004803603602081101561034b57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506107bd565b005b34801561038557600080fd5b5061038e610871565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b60008060007fc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a47060001b9050833f915080821415801561041257506000801b8214155b92505050919050565b610423610871565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16146104c3576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260148152602001807f73656e64657220776173206e6f74206f776e657200000000000000000000000081525060200191505060405180910390fd5b6104cc8361060d565b600060608473ffffffffffffffffffffffffffffffffffffffff168484604051808383808284378083019250505092505050600060405180830381855af49150503d8060008114610539576040519150601f19603f3d011682016040523d82523d6000602084013e61053e565b606091505b508092508193505050816105ba576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252601e8152602001807f696e697469616c697a6174696f6e2063616c6c6261636b206661696c6564000081525060200191505060405180910390fd5b5050505050565b600080600160405180807f656970313936372e70726f78792e696d706c656d656e746174696f6e00000000815250601c019050604051809103902060001c0360001b9050805491505090565b610615610871565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16146106b5576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260148152602001807f73656e64657220776173206e6f74206f776e657200000000000000000000000081525060200191505060405180910390fd5b6000600160405180807f656970313936372e70726f78792e696d706c656d656e746174696f6e00000000815250601c019050604051809103902060001c0360001b9050610701826103d0565b610773576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260188152602001807f496e76616c696420636f6e74726163742061646472657373000000000000000081525060200191505060405180910390fd5b8181558173ffffffffffffffffffffffffffffffffffffffff167fab64f92ab780ecbf4f3866f57cee465ff36c89450dcce20237ca7a8d81fb7d1360405160405180910390a25050565b6107c5610871565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614610865576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260148152602001807f73656e64657220776173206e6f74206f776e657200000000000000000000000081525060200191505060405180910390fd5b61086e816108bd565b50565b600080600160405180807f656970313936372e70726f78792e61646d696e000000000000000000000000008152506013019050604051809103902060001c0360001b9050805491505090565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff161415610960576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260118152602001807f6f776e65722063616e6e6f74206265203000000000000000000000000000000081525060200191505060405180910390fd5b6000600160405180807f656970313936372e70726f78792e61646d696e000000000000000000000000008152506013019050604051809103902060001c0360001b90508181558173ffffffffffffffffffffffffffffffffffffffff167f50146d0e3c60aa1d17a70635b05494f864e86144a2201275021014fbf08bafe260405160405180910390a2505056fea265627a7a7231582045533c82f72269f659b782d65f9df44acb028dbd1cac773ca302071204faa33364736f6c634300050d0032a265627a7a723158205c32c21bd401ccdda130a41c2f39866d0d923078ec9c08d3b6c493e609edcc4364736f6c634300050d0032",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100365760003560e01c80632db5b86f1461003b57806354255be0146100f4575b600080fd5b6100f26004803603606081101561005157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190803573ffffffffffffffffffffffffffffffffffffffff169060200190929190803590602001906401000000008111156100ae57600080fd5b8201836020820111156100c057600080fd5b803590602001918460018302840111640100000000831117156100e257600080fd5b9091929391929390505050610127565b005b6100fc61034e565b6040518085815260200184815260200183815260200182815260200194505050505060405180910390f35b600060405161013590610375565b604051809103906000f080158015610151573d6000803e3d6000fd5b5090508073ffffffffffffffffffffffffffffffffffffffff166303386ba38585856040518463ffffffff1660e01b8152600401808473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001806020018281038252848482818152602001925080828437600081840152601f19601f820116905080830192505050945050505050600060405180830381600087803b15801561020757600080fd5b505af115801561021b573d6000803e3d6000fd5b505050508073ffffffffffffffffffffffffffffffffffffffff1663d29d44ee866040518263ffffffff1660e01b8152600401808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001915050600060405180830381600087803b15801561029e57600080fd5b505af11580156102b2573d6000803e3d6000fd5b505050508073ffffffffffffffffffffffffffffffffffffffff168573ffffffffffffffffffffffffffffffffffffffff167f59f1a52a03cbb11153119ab5682a8097ec48554e9ce2141612d3615081c4f28886604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a35050505050565b60008060008060018060006003839350829250819150809050935093509350935090919293565b610b79806103838339019056fe60806040526100133361001860201b60201c565b610148565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614156100bb576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260118152602001807f6f776e65722063616e6e6f74206265203000000000000000000000000000000081525060200191505060405180910390fd5b6000600160405180807f656970313936372e70726f78792e61646d696e000000000000000000000000008152506013019050604051809103902060001c0360001b90508181558173ffffffffffffffffffffffffffffffffffffffff167f50146d0e3c60aa1d17a70635b05494f864e86144a2201275021014fbf08bafe260405160405180910390a25050565b610a22806101576000396000f3fe60806040526004361061004a5760003560e01c806303386ba3146101e757806342404e0714610280578063bb913f41146102d7578063d29d44ee14610328578063f7e6af8014610379575b6000600160405180807f656970313936372e70726f78792e696d706c656d656e746174696f6e00000000815250601c019050604051809103902060001c0360001b9050600081549050600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff161415610136576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260158152602001807f4e6f20496d706c656d656e746174696f6e20736574000000000000000000000081525060200191505060405180910390fd5b61013f816103d0565b6101b1576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260188152602001807f496e76616c696420636f6e74726163742061646472657373000000000000000081525060200191505060405180910390fd5b60405136810160405236600082376000803683855af43d604051818101604052816000823e82600081146101e3578282f35b8282fd5b61027e600480360360408110156101fd57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291908035906020019064010000000081111561023a57600080fd5b82018360208201111561024c57600080fd5b8035906020019184600183028401116401000000008311171561026e57600080fd5b909192939192939050505061041b565b005b34801561028c57600080fd5b506102956105c1565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b3480156102e357600080fd5b50610326600480360360208110156102fa57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff16906020019092919050505061060d565b005b34801561033457600080fd5b506103776004803603602081101561034b57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506107bd565b005b34801561038557600080fd5b5061038e610871565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b60008060007fc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a47060001b9050833f915080821415801561041257506000801b8214155b92505050919050565b610423610871565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16146104c3576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260148152602001807f73656e64657220776173206e6f74206f776e657200000000000000000000000081525060200191505060405180910390fd5b6104cc8361060d565b600060608473ffffffffffffffffffffffffffffffffffffffff168484604051808383808284378083019250505092505050600060405180830381855af49150503d8060008114610539576040519150601f19603f3d011682016040523d82523d6000602084013e61053e565b606091505b508092508193505050816105ba576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252601e8152602001807f696e697469616c697a6174696f6e2063616c6c6261636b206661696c6564000081525060200191505060405180910390fd5b5050505050565b600080600160405180807f656970313936372e70726f78792e696d706c656d656e746174696f6e00000000815250601c019050604051809103902060001c0360001b9050805491505090565b610615610871565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16146106b5576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260148152602001807f73656e64657220776173206e6f74206f776e657200000000000000000000000081525060200191505060405180910390fd5b6000600160405180807f656970313936372e70726f78792e696d706c656d656e746174696f6e00000000815250601c019050604051809103902060001c0360001b9050610701826103d0565b610773576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260188152602001807f496e76616c696420636f6e74726163742061646472657373000000000000000081525060200191505060405180910390fd5b8181558173ffffffffffffffffffffffffffffffffffffffff167fab64f92ab780ecbf4f3866f57cee465ff36c89450dcce20237ca7a8d81fb7d1360405160405180910390a25050565b6107c5610871565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614610865576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260148152602001807f73656e64657220776173206e6f74206f776e657200000000000000000000000081525060200191505060405180910390fd5b61086e816108bd565b50565b600080600160405180807f656970313936372e70726f78792e61646d696e000000000000000000000000008152506013019050604051809103902060001c0360001b9050805491505090565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff161415610960576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260118152602001807f6f776e65722063616e6e6f74206265203000000000000000000000000000000081525060200191505060405180910390fd5b6000600160405180807f656970313936372e70726f78792e61646d696e000000000000000000000000008152506013019050604051809103902060001c0360001b90508181558173ffffffffffffffffffffffffffffffffffffffff167f50146d0e3c60aa1d17a70635b05494f864e86144a2201275021014fbf08bafe260405160405180910390a2505056fea265627a7a7231582045533c82f72269f659b782d65f9df44acb028dbd1cac773ca302071204faa33364736f6c634300050d0032a265627a7a723158205c32c21bd401ccdda130a41c2f39866d0d923078ec9c08d3b6c493e609edcc4364736f6c634300050d0032",
+  "sourceMap": "186:1387:28:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;186:1387:28;;;;;;;",
+  "deployedSourceMap": "186:1387:28:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;186:1387:28;;;;;;;;;;;;;;;;;;;;;;;;1225:346;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;1225:346:28;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;21:11:-1;8;5:28;2:2;;;46:1;43;36:12;2:2;1225:346:28;;35:9:-1;28:4;12:14;8:25;5:40;2:2;;;58:1;55;48:12;2:2;1225:346:28;;;;;;100:9:-1;95:1;81:12;77:20;67:8;63:35;60:50;39:11;25:12;22:29;11:107;8:2;;;131:1;128;121:12;8:2;1225:346:28;;;;;;;;;;;;:::i;:::-;;673:117;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1225:346;1324:32;1359;;;;;:::i;:::-;;;;;;;;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;1359:32:28;1324:67;;1397:5;:37;;;1435:14;1451:12;;1397:67;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;30:3:-1;22:6;14;1:33;99:1;93:3;85:6;81:16;74:27;137:4;133:9;126:4;121:3;117:14;113:30;106:37;;169:3;161:6;157:16;147:26;;1397:67:28;;;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;1397:67:28;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;1397:67:28;;;;1470:5;:24;;;1495:5;1470:31;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;1470:31:28;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;1470:31:28;;;;1543:5;1513:53;;1528:5;1513:53;;;1551:14;1513:53;;;;;;;;;;;;;;;;;;;;;;1225:346;;;;;:::o;673:117::-;724:7;733;742;751;774:1;777;780;783;766:19;;;;;;;;;;;;;;;;;;;;673:117;;;;:::o;186:1387::-;;;;;;;;:::o",
+  "source": "pragma solidity ^0.5.13;\n\nimport \"./interfaces/ICeloVersionedContract.sol\";\nimport \"./interfaces/IMetaTransactionWalletDeployer.sol\";\nimport \"./proxies/MetaTransactionWalletProxy.sol\";\n\ncontract MetaTransactionWalletDeployer is IMetaTransactionWalletDeployer, ICeloVersionedContract {\n  event WalletDeployed(address indexed owner, address indexed wallet, address implementation);\n\n  /**\n     * @notice Returns the storage, major, minor, and patch version of the contract.     \n     * @return Storage version of the contract.\n     * @return Major version of the contract.\n     * @return Minor version of the contract.\n     * @return Patch version of the contract.\n     */\n  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {\n    return (1, 1, 0, 3);\n  }\n\n  /**\n     * @notice Used to deploy a MetaTransactionWalletProxy, set the implementation,\n     * initialize, transfer ownership and emit an event.\n     * @param owner The external account which will act as signer and owner of the proxy\n     * @param implementation The address of the implementation which the proxy will point to\n     * @param initCallData calldata pointing to a method on implementation used to initialize\n     */\n  function deploy(address owner, address implementation, bytes calldata initCallData) external {\n    MetaTransactionWalletProxy proxy = new MetaTransactionWalletProxy();\n    proxy._setAndInitializeImplementation(implementation, initCallData);\n    proxy._transferOwnership(owner);\n\n    emit WalletDeployed(owner, address(proxy), implementation);\n  }\n}\n",
+  "sourcePath": "/Users/aaronmgdr/celo-monorepo/packages/protocol/contracts/common/MetaTransactionWalletDeployer.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/common/MetaTransactionWalletDeployer.sol",
+    "exportedSymbols": {
+      "MetaTransactionWalletDeployer": [
+        8520
+      ]
+    },
+    "id": 8521,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 8449,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".13"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:28"
+      },
+      {
+        "absolutePath": "project:/contracts/common/interfaces/ICeloVersionedContract.sol",
+        "file": "./interfaces/ICeloVersionedContract.sol",
+        "id": 8450,
+        "nodeType": "ImportDirective",
+        "scope": 8521,
+        "sourceUnit": 12684,
+        "src": "26:49:28",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "project:/contracts/common/interfaces/IMetaTransactionWalletDeployer.sol",
+        "file": "./interfaces/IMetaTransactionWalletDeployer.sol",
+        "id": 8451,
+        "nodeType": "ImportDirective",
+        "scope": 8521,
+        "sourceUnit": 12911,
+        "src": "76:57:28",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "project:/contracts/common/proxies/MetaTransactionWalletProxy.sol",
+        "file": "./proxies/MetaTransactionWalletProxy.sol",
+        "id": 8452,
+        "nodeType": "ImportDirective",
+        "scope": 8521,
+        "sourceUnit": 23851,
+        "src": "134:50:28",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 8453,
+              "name": "IMetaTransactionWalletDeployer",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 12910,
+              "src": "228:30:28",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_IMetaTransactionWalletDeployer_$12910",
+                "typeString": "contract IMetaTransactionWalletDeployer"
+              }
+            },
+            "id": 8454,
+            "nodeType": "InheritanceSpecifier",
+            "src": "228:30:28"
+          },
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 8455,
+              "name": "ICeloVersionedContract",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 12683,
+              "src": "260:22:28",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_ICeloVersionedContract_$12683",
+                "typeString": "contract ICeloVersionedContract"
+              }
+            },
+            "id": 8456,
+            "nodeType": "InheritanceSpecifier",
+            "src": "260:22:28"
+          }
+        ],
+        "contractDependencies": [
+          12683,
+          12910,
+          23850
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 8520,
+        "linearizedBaseContracts": [
+          8520,
+          12683,
+          12910
+        ],
+        "name": "MetaTransactionWalletDeployer",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": null,
+            "id": 8464,
+            "name": "WalletDeployed",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 8463,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8458,
+                  "indexed": true,
+                  "name": "owner",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8464,
+                  "src": "308:21:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8457,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "308:7:28",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8460,
+                  "indexed": true,
+                  "name": "wallet",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8464,
+                  "src": "331:22:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8459,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "331:7:28",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8462,
+                  "indexed": false,
+                  "name": "implementation",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8464,
+                  "src": "355:22:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8461,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "355:7:28",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "307:71:28"
+            },
+            "src": "287:92:28"
+          },
+          {
+            "body": {
+              "id": 8481,
+              "nodeType": "Block",
+              "src": "760:30:28",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "components": [
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "31",
+                        "id": 8475,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "number",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "774:1:28",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_rational_1_by_1",
+                          "typeString": "int_const 1"
+                        },
+                        "value": "1"
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "31",
+                        "id": 8476,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "number",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "777:1:28",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_rational_1_by_1",
+                          "typeString": "int_const 1"
+                        },
+                        "value": "1"
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "30",
+                        "id": 8477,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "number",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "780:1:28",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_rational_0_by_1",
+                          "typeString": "int_const 0"
+                        },
+                        "value": "0"
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "33",
+                        "id": 8478,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "number",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "783:1:28",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_rational_3_by_1",
+                          "typeString": "int_const 3"
+                        },
+                        "value": "3"
+                      }
+                    ],
+                    "id": 8479,
+                    "isConstant": false,
+                    "isInlineArray": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "lValueRequested": false,
+                    "nodeType": "TupleExpression",
+                    "src": "773:12:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$_t_rational_1_by_1_$_t_rational_1_by_1_$_t_rational_0_by_1_$_t_rational_3_by_1_$",
+                      "typeString": "tuple(int_const 1,int_const 1,int_const 0,int_const 3)"
+                    }
+                  },
+                  "functionReturnParameters": 8474,
+                  "id": 8480,
+                  "nodeType": "Return",
+                  "src": "766:19:28"
+                }
+              ]
+            },
+            "documentation": "@notice Returns the storage, major, minor, and patch version of the contract.     \n@return Storage version of the contract.\n@return Major version of the contract.\n@return Minor version of the contract.\n@return Patch version of the contract.",
+            "id": 8482,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getVersionNumber",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 8465,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "698:2:28"
+            },
+            "returnParameters": {
+              "id": 8474,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8467,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8482,
+                  "src": "724:7:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8466,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "724:7:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8469,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8482,
+                  "src": "733:7:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8468,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "733:7:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8471,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8482,
+                  "src": "742:7:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8470,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "742:7:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8473,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8482,
+                  "src": "751:7:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8472,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "751:7:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "723:36:28"
+            },
+            "scope": 8520,
+            "src": "673:117:28",
+            "stateMutability": "pure",
+            "superFunction": 12682,
+            "visibility": "external"
+          },
+          {
+            "body": {
+              "id": 8518,
+              "nodeType": "Block",
+              "src": "1318:253:28",
+              "statements": [
+                {
+                  "assignments": [
+                    8492
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 8492,
+                      "name": "proxy",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 8518,
+                      "src": "1324:32:28",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_MetaTransactionWalletProxy_$23850",
+                        "typeString": "contract MetaTransactionWalletProxy"
+                      },
+                      "typeName": {
+                        "contractScope": null,
+                        "id": 8491,
+                        "name": "MetaTransactionWalletProxy",
+                        "nodeType": "UserDefinedTypeName",
+                        "referencedDeclaration": 23850,
+                        "src": "1324:26:28",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_MetaTransactionWalletProxy_$23850",
+                          "typeString": "contract MetaTransactionWalletProxy"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 8496,
+                  "initialValue": {
+                    "argumentTypes": null,
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 8494,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "NewExpression",
+                      "src": "1359:30:28",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_creation_nonpayable$__$returns$_t_contract$_MetaTransactionWalletProxy_$23850_$",
+                        "typeString": "function () returns (contract MetaTransactionWalletProxy)"
+                      },
+                      "typeName": {
+                        "contractScope": null,
+                        "id": 8493,
+                        "name": "MetaTransactionWalletProxy",
+                        "nodeType": "UserDefinedTypeName",
+                        "referencedDeclaration": 23850,
+                        "src": "1363:26:28",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_MetaTransactionWalletProxy_$23850",
+                          "typeString": "contract MetaTransactionWalletProxy"
+                        }
+                      }
+                    },
+                    "id": 8495,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1359:32:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_MetaTransactionWalletProxy_$23850",
+                      "typeString": "contract MetaTransactionWalletProxy"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1324:67:28"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 8500,
+                        "name": "implementation",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 8486,
+                        "src": "1435:14:28",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 8501,
+                        "name": "initCallData",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 8488,
+                        "src": "1451:12:28",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes_calldata_ptr",
+                          "typeString": "bytes calldata"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_bytes_calldata_ptr",
+                          "typeString": "bytes calldata"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 8497,
+                        "name": "proxy",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 8492,
+                        "src": "1397:5:28",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_MetaTransactionWalletProxy_$23850",
+                          "typeString": "contract MetaTransactionWalletProxy"
+                        }
+                      },
+                      "id": 8499,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "_setAndInitializeImplementation",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 9812,
+                      "src": "1397:37:28",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_payable$_t_address_$_t_bytes_memory_ptr_$returns$__$",
+                        "typeString": "function (address,bytes memory) payable external"
+                      }
+                    },
+                    "id": 8502,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1397:67:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 8503,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1397:67:28"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 8507,
+                        "name": "owner",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 8484,
+                        "src": "1495:5:28",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 8504,
+                        "name": "proxy",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 8492,
+                        "src": "1470:5:28",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_MetaTransactionWalletProxy_$23850",
+                          "typeString": "contract MetaTransactionWalletProxy"
+                        }
+                      },
+                      "id": 8506,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "_transferOwnership",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 9778,
+                      "src": "1470:24:28",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$returns$__$",
+                        "typeString": "function (address) external"
+                      }
+                    },
+                    "id": 8508,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1470:31:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 8509,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1470:31:28"
+                },
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 8511,
+                        "name": "owner",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 8484,
+                        "src": "1528:5:28",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 8513,
+                            "name": "proxy",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 8492,
+                            "src": "1543:5:28",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_contract$_MetaTransactionWalletProxy_$23850",
+                              "typeString": "contract MetaTransactionWalletProxy"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_contract$_MetaTransactionWalletProxy_$23850",
+                              "typeString": "contract MetaTransactionWalletProxy"
+                            }
+                          ],
+                          "id": 8512,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "nodeType": "ElementaryTypeNameExpression",
+                          "src": "1535:7:28",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_address_$",
+                            "typeString": "type(address)"
+                          },
+                          "typeName": "address"
+                        },
+                        "id": 8514,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1535:14:28",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 8515,
+                        "name": "implementation",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 8486,
+                        "src": "1551:14:28",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        },
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 8510,
+                      "name": "WalletDeployed",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 8464,
+                      "src": "1513:14:28",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$_t_address_$returns$__$",
+                        "typeString": "function (address,address,address)"
+                      }
+                    },
+                    "id": 8516,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1513:53:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 8517,
+                  "nodeType": "EmitStatement",
+                  "src": "1508:58:28"
+                }
+              ]
+            },
+            "documentation": "@notice Used to deploy a MetaTransactionWalletProxy, set the implementation,\ninitialize, transfer ownership and emit an event.\n@param owner The external account which will act as signer and owner of the proxy\n@param implementation The address of the implementation which the proxy will point to\n@param initCallData calldata pointing to a method on implementation used to initialize",
+            "id": 8519,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "deploy",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 8489,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8484,
+                  "name": "owner",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8519,
+                  "src": "1241:13:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8483,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1241:7:28",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8486,
+                  "name": "implementation",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8519,
+                  "src": "1256:22:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8485,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1256:7:28",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8488,
+                  "name": "initCallData",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8519,
+                  "src": "1280:27:28",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 8487,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1280:5:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1240:68:28"
+            },
+            "returnParameters": {
+              "id": 8490,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1318:0:28"
+            },
+            "scope": 8520,
+            "src": "1225:346:28",
+            "stateMutability": "nonpayable",
+            "superFunction": 12909,
+            "visibility": "external"
+          }
+        ],
+        "scope": 8521,
+        "src": "186:1387:28"
+      }
+    ],
+    "src": "0:1574:28"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "project:/contracts/common/MetaTransactionWalletDeployer.sol",
+      "exportedSymbols": {
+        "MetaTransactionWalletDeployer": [
+          8520
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.5",
+            ".13"
+          ]
+        },
+        "id": 8449,
+        "name": "PragmaDirective",
+        "src": "0:24:28"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 12684,
+          "absolutePath": "project:/contracts/common/interfaces/ICeloVersionedContract.sol",
+          "file": "./interfaces/ICeloVersionedContract.sol",
+          "scope": 8521,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 8450,
+        "name": "ImportDirective",
+        "src": "26:49:28"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 12911,
+          "absolutePath": "project:/contracts/common/interfaces/IMetaTransactionWalletDeployer.sol",
+          "file": "./interfaces/IMetaTransactionWalletDeployer.sol",
+          "scope": 8521,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 8451,
+        "name": "ImportDirective",
+        "src": "76:57:28"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 23851,
+          "absolutePath": "project:/contracts/common/proxies/MetaTransactionWalletProxy.sol",
+          "file": "./proxies/MetaTransactionWalletProxy.sol",
+          "scope": 8521,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 8452,
+        "name": "ImportDirective",
+        "src": "134:50:28"
+      },
+      {
+        "attributes": {
+          "contractDependencies": [
+            12683,
+            12910,
+            23850
+          ],
+          "contractKind": "contract",
+          "documentation": null,
+          "fullyImplemented": true,
+          "linearizedBaseContracts": [
+            8520,
+            12683,
+            12910
+          ],
+          "name": "MetaTransactionWalletDeployer",
+          "scope": 8521
+        },
+        "children": [
+          {
+            "attributes": {
+              "arguments": null
+            },
+            "children": [
+              {
+                "attributes": {
+                  "contractScope": null,
+                  "name": "IMetaTransactionWalletDeployer",
+                  "referencedDeclaration": 12910,
+                  "type": "contract IMetaTransactionWalletDeployer"
+                },
+                "id": 8453,
+                "name": "UserDefinedTypeName",
+                "src": "228:30:28"
+              }
+            ],
+            "id": 8454,
+            "name": "InheritanceSpecifier",
+            "src": "228:30:28"
+          },
+          {
+            "attributes": {
+              "arguments": null
+            },
+            "children": [
+              {
+                "attributes": {
+                  "contractScope": null,
+                  "name": "ICeloVersionedContract",
+                  "referencedDeclaration": 12683,
+                  "type": "contract ICeloVersionedContract"
+                },
+                "id": 8455,
+                "name": "UserDefinedTypeName",
+                "src": "260:22:28"
+              }
+            ],
+            "id": 8456,
+            "name": "InheritanceSpecifier",
+            "src": "260:22:28"
+          },
+          {
+            "attributes": {
+              "anonymous": false,
+              "documentation": null,
+              "name": "WalletDeployed"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": true,
+                      "name": "owner",
+                      "scope": 8464,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 8457,
+                        "name": "ElementaryTypeName",
+                        "src": "308:7:28"
+                      }
+                    ],
+                    "id": 8458,
+                    "name": "VariableDeclaration",
+                    "src": "308:21:28"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": true,
+                      "name": "wallet",
+                      "scope": 8464,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 8459,
+                        "name": "ElementaryTypeName",
+                        "src": "331:7:28"
+                      }
+                    ],
+                    "id": 8460,
+                    "name": "VariableDeclaration",
+                    "src": "331:22:28"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": false,
+                      "name": "implementation",
+                      "scope": 8464,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 8461,
+                        "name": "ElementaryTypeName",
+                        "src": "355:7:28"
+                      }
+                    ],
+                    "id": 8462,
+                    "name": "VariableDeclaration",
+                    "src": "355:22:28"
+                  }
+                ],
+                "id": 8463,
+                "name": "ParameterList",
+                "src": "307:71:28"
+              }
+            ],
+            "id": 8464,
+            "name": "EventDefinition",
+            "src": "287:92:28"
+          },
+          {
+            "attributes": {
+              "documentation": "@notice Returns the storage, major, minor, and patch version of the contract.     \n@return Storage version of the contract.\n@return Major version of the contract.\n@return Minor version of the contract.\n@return Patch version of the contract.",
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "getVersionNumber",
+              "scope": 8520,
+              "stateMutability": "pure",
+              "superFunction": 12682,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 8465,
+                "name": "ParameterList",
+                "src": "698:2:28"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 8482,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 8466,
+                        "name": "ElementaryTypeName",
+                        "src": "724:7:28"
+                      }
+                    ],
+                    "id": 8467,
+                    "name": "VariableDeclaration",
+                    "src": "724:7:28"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 8482,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 8468,
+                        "name": "ElementaryTypeName",
+                        "src": "733:7:28"
+                      }
+                    ],
+                    "id": 8469,
+                    "name": "VariableDeclaration",
+                    "src": "733:7:28"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 8482,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 8470,
+                        "name": "ElementaryTypeName",
+                        "src": "742:7:28"
+                      }
+                    ],
+                    "id": 8471,
+                    "name": "VariableDeclaration",
+                    "src": "742:7:28"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 8482,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 8472,
+                        "name": "ElementaryTypeName",
+                        "src": "751:7:28"
+                      }
+                    ],
+                    "id": 8473,
+                    "name": "VariableDeclaration",
+                    "src": "751:7:28"
+                  }
+                ],
+                "id": 8474,
+                "name": "ParameterList",
+                "src": "723:36:28"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 8474
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isInlineArray": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "type": "tuple(int_const 1,int_const 1,int_const 0,int_const 3)"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "hexvalue": "31",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "subdenomination": null,
+                              "token": "number",
+                              "type": "int_const 1",
+                              "value": "1"
+                            },
+                            "id": 8475,
+                            "name": "Literal",
+                            "src": "774:1:28"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "hexvalue": "31",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "subdenomination": null,
+                              "token": "number",
+                              "type": "int_const 1",
+                              "value": "1"
+                            },
+                            "id": 8476,
+                            "name": "Literal",
+                            "src": "777:1:28"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "hexvalue": "30",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "subdenomination": null,
+                              "token": "number",
+                              "type": "int_const 0",
+                              "value": "0"
+                            },
+                            "id": 8477,
+                            "name": "Literal",
+                            "src": "780:1:28"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "hexvalue": "33",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "subdenomination": null,
+                              "token": "number",
+                              "type": "int_const 3",
+                              "value": "3"
+                            },
+                            "id": 8478,
+                            "name": "Literal",
+                            "src": "783:1:28"
+                          }
+                        ],
+                        "id": 8479,
+                        "name": "TupleExpression",
+                        "src": "773:12:28"
+                      }
+                    ],
+                    "id": 8480,
+                    "name": "Return",
+                    "src": "766:19:28"
+                  }
+                ],
+                "id": 8481,
+                "name": "Block",
+                "src": "760:30:28"
+              }
+            ],
+            "id": 8482,
+            "name": "FunctionDefinition",
+            "src": "673:117:28"
+          },
+          {
+            "attributes": {
+              "documentation": "@notice Used to deploy a MetaTransactionWalletProxy, set the implementation,\ninitialize, transfer ownership and emit an event.\n@param owner The external account which will act as signer and owner of the proxy\n@param implementation The address of the implementation which the proxy will point to\n@param initCallData calldata pointing to a method on implementation used to initialize",
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "deploy",
+              "scope": 8520,
+              "stateMutability": "nonpayable",
+              "superFunction": 12909,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "owner",
+                      "scope": 8519,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 8483,
+                        "name": "ElementaryTypeName",
+                        "src": "1241:7:28"
+                      }
+                    ],
+                    "id": 8484,
+                    "name": "VariableDeclaration",
+                    "src": "1241:13:28"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "implementation",
+                      "scope": 8519,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 8485,
+                        "name": "ElementaryTypeName",
+                        "src": "1256:7:28"
+                      }
+                    ],
+                    "id": 8486,
+                    "name": "VariableDeclaration",
+                    "src": "1256:22:28"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "initCallData",
+                      "scope": 8519,
+                      "stateVariable": false,
+                      "storageLocation": "calldata",
+                      "type": "bytes",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bytes",
+                          "type": "bytes"
+                        },
+                        "id": 8487,
+                        "name": "ElementaryTypeName",
+                        "src": "1280:5:28"
+                      }
+                    ],
+                    "id": 8488,
+                    "name": "VariableDeclaration",
+                    "src": "1280:27:28"
+                  }
+                ],
+                "id": 8489,
+                "name": "ParameterList",
+                "src": "1240:68:28"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 8490,
+                "name": "ParameterList",
+                "src": "1318:0:28"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "assignments": [
+                        8492
+                      ]
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "constant": false,
+                          "name": "proxy",
+                          "scope": 8518,
+                          "stateVariable": false,
+                          "storageLocation": "default",
+                          "type": "contract MetaTransactionWalletProxy",
+                          "value": null,
+                          "visibility": "internal"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "contractScope": null,
+                              "name": "MetaTransactionWalletProxy",
+                              "referencedDeclaration": 23850,
+                              "type": "contract MetaTransactionWalletProxy"
+                            },
+                            "id": 8491,
+                            "name": "UserDefinedTypeName",
+                            "src": "1324:26:28"
+                          }
+                        ],
+                        "id": 8492,
+                        "name": "VariableDeclaration",
+                        "src": "1324:32:28"
+                      },
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "arguments": [
+                            null
+                          ],
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "contract MetaTransactionWalletProxy",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                null
+                              ],
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "type": "function () returns (contract MetaTransactionWalletProxy)"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "contractScope": null,
+                                  "name": "MetaTransactionWalletProxy",
+                                  "referencedDeclaration": 23850,
+                                  "type": "contract MetaTransactionWalletProxy"
+                                },
+                                "id": 8493,
+                                "name": "UserDefinedTypeName",
+                                "src": "1363:26:28"
+                              }
+                            ],
+                            "id": 8494,
+                            "name": "NewExpression",
+                            "src": "1359:30:28"
+                          }
+                        ],
+                        "id": 8495,
+                        "name": "FunctionCall",
+                        "src": "1359:32:28"
+                      }
+                    ],
+                    "id": 8496,
+                    "name": "VariableDeclarationStatement",
+                    "src": "1324:67:28"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_address",
+                                  "typeString": "address"
+                                },
+                                {
+                                  "typeIdentifier": "t_bytes_calldata_ptr",
+                                  "typeString": "bytes calldata"
+                                }
+                              ],
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "_setAndInitializeImplementation",
+                              "referencedDeclaration": 9812,
+                              "type": "function (address,bytes memory) payable external"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 8492,
+                                  "type": "contract MetaTransactionWalletProxy",
+                                  "value": "proxy"
+                                },
+                                "id": 8497,
+                                "name": "Identifier",
+                                "src": "1397:5:28"
+                              }
+                            ],
+                            "id": 8499,
+                            "name": "MemberAccess",
+                            "src": "1397:37:28"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 8486,
+                              "type": "address",
+                              "value": "implementation"
+                            },
+                            "id": 8500,
+                            "name": "Identifier",
+                            "src": "1435:14:28"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 8488,
+                              "type": "bytes calldata",
+                              "value": "initCallData"
+                            },
+                            "id": 8501,
+                            "name": "Identifier",
+                            "src": "1451:12:28"
+                          }
+                        ],
+                        "id": 8502,
+                        "name": "FunctionCall",
+                        "src": "1397:67:28"
+                      }
+                    ],
+                    "id": 8503,
+                    "name": "ExpressionStatement",
+                    "src": "1397:67:28"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_address",
+                                  "typeString": "address"
+                                }
+                              ],
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "_transferOwnership",
+                              "referencedDeclaration": 9778,
+                              "type": "function (address) external"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 8492,
+                                  "type": "contract MetaTransactionWalletProxy",
+                                  "value": "proxy"
+                                },
+                                "id": 8504,
+                                "name": "Identifier",
+                                "src": "1470:5:28"
+                              }
+                            ],
+                            "id": 8506,
+                            "name": "MemberAccess",
+                            "src": "1470:24:28"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 8484,
+                              "type": "address",
+                              "value": "owner"
+                            },
+                            "id": 8507,
+                            "name": "Identifier",
+                            "src": "1495:5:28"
+                          }
+                        ],
+                        "id": 8508,
+                        "name": "FunctionCall",
+                        "src": "1470:31:28"
+                      }
+                    ],
+                    "id": 8509,
+                    "name": "ExpressionStatement",
+                    "src": "1470:31:28"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_address",
+                                  "typeString": "address"
+                                },
+                                {
+                                  "typeIdentifier": "t_address_payable",
+                                  "typeString": "address payable"
+                                },
+                                {
+                                  "typeIdentifier": "t_address",
+                                  "typeString": "address"
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 8464,
+                              "type": "function (address,address,address)",
+                              "value": "WalletDeployed"
+                            },
+                            "id": 8510,
+                            "name": "Identifier",
+                            "src": "1513:14:28"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 8484,
+                              "type": "address",
+                              "value": "owner"
+                            },
+                            "id": 8511,
+                            "name": "Identifier",
+                            "src": "1528:5:28"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "type": "address payable",
+                              "type_conversion": true
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    {
+                                      "typeIdentifier": "t_contract$_MetaTransactionWalletProxy_$23850",
+                                      "typeString": "contract MetaTransactionWalletProxy"
+                                    }
+                                  ],
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "type": "type(address)",
+                                  "value": "address"
+                                },
+                                "id": 8512,
+                                "name": "ElementaryTypeNameExpression",
+                                "src": "1535:7:28"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 8492,
+                                  "type": "contract MetaTransactionWalletProxy",
+                                  "value": "proxy"
+                                },
+                                "id": 8513,
+                                "name": "Identifier",
+                                "src": "1543:5:28"
+                              }
+                            ],
+                            "id": 8514,
+                            "name": "FunctionCall",
+                            "src": "1535:14:28"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 8486,
+                              "type": "address",
+                              "value": "implementation"
+                            },
+                            "id": 8515,
+                            "name": "Identifier",
+                            "src": "1551:14:28"
+                          }
+                        ],
+                        "id": 8516,
+                        "name": "FunctionCall",
+                        "src": "1513:53:28"
+                      }
+                    ],
+                    "id": 8517,
+                    "name": "EmitStatement",
+                    "src": "1508:58:28"
+                  }
+                ],
+                "id": 8518,
+                "name": "Block",
+                "src": "1318:253:28"
+              }
+            ],
+            "id": 8519,
+            "name": "FunctionDefinition",
+            "src": "1225:346:28"
+          }
+        ],
+        "id": 8520,
+        "name": "ContractDefinition",
+        "src": "186:1387:28"
+      }
+    ],
+    "id": 8521,
+    "name": "SourceUnit",
+    "src": "0:1574:28"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.13+commit.5b0b510c.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.13",
+  "updatedAt": "2023-11-17T13:39:53.710Z",
+  "devdoc": {
+    "methods": {
+      "deploy(address,address,bytes)": {
+        "params": {
+          "implementation": "The address of the implementation which the proxy will point to",
+          "initCallData": "calldata pointing to a method on implementation used to initialize",
+          "owner": "The external account which will act as signer and owner of the proxy"
+        }
+      },
+      "getVersionNumber()": {
+        "return": "Storage version of the contract.Major version of the contract.Minor version of the contract.Patch version of the contract."
+      }
+    }
+  },
+  "userdoc": {
+    "methods": {
+      "deploy(address,address,bytes)": {
+        "notice": "Used to deploy a MetaTransactionWalletProxy, set the implementation, initialize, transfer ownership and emit an event."
+      },
+      "getVersionNumber()": {
+        "notice": "Returns the storage, major, minor, and patch version of the contract.     "
+      }
+    }
+  }
+}

@@ -3,6 +3,7 @@
 /coverage/
 /node_modules/
 /src/
+/artifacts
 /tmp/
 /.tmp/
 
