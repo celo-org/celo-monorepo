@@ -47,7 +47,6 @@
   "devDependencies": {
     "@celo/odis-identifiers": "^1.0.0",
     "@celo/dev-utils": "0.0.1",
-    "@celo/protocol": "1.0.2-beta.0",
     "@truffle/contract": "^4.6.10",
     "@types/debug": "^4.1.5",
     "fetch-mock": "9.10.4",
