@@ -705,7 +705,7 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
   private getIndex(id: BigNumber.Value, array: BigNumber[]) {
     const index = array.findIndex((bn) => bn.isEqualTo(id))
     if (index === -1) {
-      throw new Error(`ID ${id} not found in array ${array}`)
+      throw new Error(`ID ${id} not found in array ${JSON.stringify(array)}`)
     }
     return index
   }
@@ -849,6 +849,7 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
     abstainVotes: BigNumber.Value
   ) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
+    console.log('proposal INDEX', proposalIndex)
     return toTransactionObject(
       this.connection,
       this.contract.methods.votePartially(

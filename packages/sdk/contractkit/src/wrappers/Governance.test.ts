@@ -76,6 +76,7 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       [CeloContract.Escrow, '0x0000000000000000000000000000000000000002'],
     ]
     const proposalID = new BigNumber(1)
+    const proposalID2 = new BigNumber(2)
 
     let proposal: Proposal
     beforeAll(() => (proposal = registryRepointProposal(repoints)))
@@ -102,8 +103,8 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     }
 
     // protocol/truffle-config defines approver address as accounts[0]
-    const approveFn = async () => {
-      const tx = await governance.approve(proposalID)
+    const approveFn = async (propId?: BigNumber) => {
+      const tx = await governance.approve(propId ?? proposalID)
       const multisigTx = await governanceApproverMultiSig.submitOrConfirmTransaction(
         governance.address,
         tx.txo
@@ -199,6 +200,13 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       expect(voteRecord?.abstainVotes).toEqBigNumber(0)
     })
 
+    async function expectVotes(propId: BigNumber, yes: number, no: number, abstain: number) {
+      const votes = await governance.getVotes(propId)
+      expect(votes[VoteValue.Yes]).toEqBigNumber(yes)
+      expect(votes[VoteValue.No]).toEqBigNumber(no)
+      expect(votes[VoteValue.Abstain]).toEqBigNumber(abstain)
+    }
+
     it('#getVoteRecord for same index proposal', async () => {
       const voter = accounts[2]
       await proposeFn(accounts[0])
@@ -209,18 +217,22 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       // expire & delete proposal
       await timeTravel(expConfig.referendumStageDuration + expConfig.executionStageDuration, web3)
       await approveFn()
-      // propose new proposal with same index
+      // propose new proposal with same index (proposal id is different)
       await proposeFn(accounts[0])
-      await timeTravel(expConfig.dequeueFrequency, web3)
+      await timeTravel(expConfig.dequeueFrequency + 1, web3)
+
       await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
+      await approveFn(proposalID2)
 
-      const yesVotes = (await governance.getVotes(proposalID))[VoteValue.Yes]
-      expect(yesVotes).toEqBigNumber(0)
+      const yes = 10
+      const no = 20
+      const abstain = 0
 
-      const voteRecord = await governance.getVoteRecord(voter, proposalID)
-      expect(voteRecord?.yesVotes ?? 0).toEqBigNumber(0)
-      expect(voteRecord?.noVotes ?? 0).toEqBigNumber(0)
-      expect(voteRecord?.abstainVotes ?? 0).toEqBigNumber(0)
+      const tx = await governance.votePartially(proposalID2, yes, no, abstain)
+      await tx.sendAndWaitForReceipt({ from: voter })
+
+      await expectVotes(proposalID, 0, 0, 0)
+      await expectVotes(proposalID2, yes, no, abstain)
     })
 
     it('#votePartially', async () => {
