@@ -4,7 +4,6 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "baseUrl": ".",
-    "jsx": "preserve",
     "lib": ["dom", "es2015", "es2016"],
     "module": "commonjs",
     "moduleResolution": "node",
@@ -13,9 +12,10 @@
     "removeComments": false,
     "skipLibCheck": true,
     "sourceMap": true,
-    "target": "es5",
-    "downlevelIteration": true
+    "target": "ES5",
+    "downlevelIteration": true,
+    "resolveJsonModule": true
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "wagmi.config.ts"],
   "references": [{ "path": "../sdk/utils" }]
 }
