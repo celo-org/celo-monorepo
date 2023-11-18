@@ -7179,6 +7179,22 @@ abi-to-sol@^0.6.6:
     prettier "^2.7.1"
     prettier-plugin-solidity "^1.0.0-dev.23"
 
+abi-to-sol@^0.7.0:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/abi-to-sol/-/abi-to-sol-0.7.1.tgz#76d55c35ab2932fda26c224e4194987517324a19"
+  integrity sha512-GcpyiHA+sTbmSEAbBWsXS5iO3WBGuqhsiBo3WH9VHthNFF/k438mXFJtS/SUxtm8HmbCMv/BnxokUX6w4y2eFg==
+  dependencies:
+    "@truffle/abi-utils" "^1.0.0"
+    "@truffle/contract-schema" "^3.3.1"
+    ajv "^6.12.5"
+    better-ajv-errors "^0.8.2"
+    neodoc "^2.0.2"
+    semver "^7.3.5"
+    source-map-support "^0.5.19"
+  optionalDependencies:
+    prettier "^2.7.1"
+    prettier-plugin-solidity "^1.0.0-dev.23"
+
 abitype@0.8.7:
   version "0.8.7"
   resolved "https://registry.yarnpkg.com/abitype/-/abitype-0.8.7.tgz#e4b3f051febd08111f486c0cc6a98fa72d033622"
@@ -7193,11 +7209,6 @@ abitype@0.9.8:
   version "0.9.8"
   resolved "https://registry.yarnpkg.com/abitype/-/abitype-0.9.8.tgz#1f120b6b717459deafd213dfbf3a3dd1bf10ae8c"
   integrity sha512-puLifILdm+8sjyss4S+fsUN09obiT1g2YW6CtcQF+QDzxR0euzgEB29MZujC6zMk2a6SVmtttq1fc6+YFA7WYQ==
-
-abitype@0.9.3:
-  version "0.9.3"
-  resolved "https://registry.yarnpkg.com/abitype/-/abitype-0.9.3.tgz#294d25288ee683d72baf4e1fed757034e3c8c277"
-  integrity sha512-dz4qCQLurx97FQhnb/EIYTk/ldQ+oafEDUqC0VVIeQS1Q48/YWt/9YNfMmp9SLFqN41ktxny3c8aYxHjmFIB/w==
 
 abort-controller@3.0.0, abort-controller@^3.0.0:
   version "3.0.0"
@@ -9379,6 +9390,14 @@ cli-cursor@^4.0.0:
   integrity sha512-VGtlMu3x/4DOtIUwEkRezxUZ2lBacNJCHash0N0WeZDBS+7Ux1dm3XWAgWYxLJFMMdOeXMHXorshEFhbMSGelg==
   dependencies:
     restore-cursor "^4.0.0"
+
+cli-logger@^0.5.40:
+  version "0.5.40"
+  resolved "https://registry.yarnpkg.com/cli-logger/-/cli-logger-0.5.40.tgz#097f0e11b072c7c698a26c47f588a29c20b48b0b"
+  integrity sha512-piXVCa0TLm/+A7xdVEhw7t4OSrsmJaZIekWcoGrVMY1bHtLJTXgiNzgHlKT0EVHQ14sCKWorQJazU7UWgZhXOQ==
+  dependencies:
+    circular "^1.0.5"
+    cli-util "~1.1.27"
 
 cli-progress@^3.4.0:
   version "3.12.0"
