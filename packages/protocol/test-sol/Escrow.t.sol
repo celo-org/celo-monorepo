@@ -201,7 +201,7 @@ contract EscrowInitialize is EscrowTest {
   }
 
   function test_initializeAgain() public {
-    vm.expectRevert();
+    vm.expectRevert("contract already initialized");
     escrowContract.initialize();
   }
 }
