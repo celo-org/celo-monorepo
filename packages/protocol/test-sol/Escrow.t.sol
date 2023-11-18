@@ -777,7 +777,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     assertEq(trustedIssuersPerPayment, trustedIssuers);
   }
 
-  function test_transfer_WhenDefaultTrustedIssuersAreSet_ShouldSetThemToEmptyListWhenMinAttestationsEq0()
+  function test_transfer_WhenDefaultTrustedIssuersAreSet_ShouldSetTrustedIssuersPerPaymentIdToEmptyListWhenMinAttestationsEq0()
     public
   {
     // when defaut trustedIssuers are set; should set trustedIssuersPerPaymentId to empty list when minAttestations==0
