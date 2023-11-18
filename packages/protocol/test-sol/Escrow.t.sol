@@ -220,7 +220,7 @@ contract EscrowAddDefaultTrustedIssuer is EscrowTest {
     assertEq(escrowContract.getDefaultTrustedIssuers(), expected2);
   }
 
-  function test_revertsWhenNonOwnerTriesToAdd() public {
+  function test_revertsWhenNonOwnerTriesToAddTrustedIssuer() public {
     vm.expectRevert();
     vm.prank(sender);
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
