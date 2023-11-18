@@ -228,8 +228,16 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       const no = 20
       const abstain = 0
 
+      expect(
+        await governance['contract'].methods.getAmountOfGoldUsedForVoting(voter).call()
+      ).toEqBigNumber(0)
+
       const tx = await governance.votePartially(proposalID2, yes, no, abstain)
       await tx.sendAndWaitForReceipt({ from: voter })
+
+      expect(
+        await governance['contract'].methods.getAmountOfGoldUsedForVoting(voter).call()
+      ).toEqBigNumber(yes + no + abstain)
 
       await expectVotes(proposalID, 0, 0, 0)
       await expectVotes(proposalID2, yes, no, abstain)
