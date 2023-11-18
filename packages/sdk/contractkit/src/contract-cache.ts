@@ -3,7 +3,7 @@ import { AddressRegistry } from './address-registry'
 import { CeloContract } from './base'
 import { ContractCacheType } from './basic-contract-cache-type'
 import { StableToken, stableTokenInfos } from './celo-tokens'
-import { Ierc20 } from './generated/IERC20'
+import { IERC20 } from './generated/IERC20'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AccountsWrapper } from './wrappers/Accounts'
 import { AttestationsWrapper } from './wrappers/Attestations'
@@ -90,7 +90,7 @@ interface WrapperCacheMap {
   [CeloContract.DowntimeSlasher]?: DowntimeSlasherWrapper
   [CeloContract.Election]?: ElectionWrapper
   [CeloContract.EpochRewards]?: EpochRewardsWrapper
-  [CeloContract.ERC20]?: Erc20Wrapper<Ierc20>
+  [CeloContract.ERC20]?: Erc20Wrapper<IERC20>
   [CeloContract.Escrow]?: EscrowWrapper
   [CeloContract.Exchange]?: ExchangeWrapper
   [CeloContract.ExchangeEUR]?: ExchangeWrapper

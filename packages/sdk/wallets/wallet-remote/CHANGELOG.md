@@ -1,5 +1,13 @@
 # @celo/wallet-remote
 
+## 5.1.1-beta.0
+
+### Patch Changes
+
+- @celo/connect@5.1.1-beta.0
+- @celo/utils@5.0.6-beta.0
+- @celo/wallet-base@5.1.1-beta.0
+
 ## 5.1.0
 
 ### Patch Changes

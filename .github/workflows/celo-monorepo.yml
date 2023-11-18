@@ -8,10 +8,12 @@ on:
   push:
     branches:
       - master
+      - changeset-release/master
   pull_request:
     branches:
       - master
-      - prerelease/*
+      - 'release/**'
+      - 'prerelease/**'
 
 concurrency:
   group: celo-monorepo-${{ github.ref }}
@@ -55,7 +57,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
           submodules: recursive
       - name: Restore node cache
         uses: actions/cache@v3
@@ -75,22 +76,42 @@ jobs:
       - name: Run yarn postinstall if cache hitted
         run: yarn run postinstall
         if: steps.cache_node.outputs.cache-hit == 'true'
-      - name: Verify Changed files
-        uses: tj-actions/verify-changed-files@v16
-        with:
-          fail-if-changed: 'true'
-          fail-message: 'Files changed during build. Please build locally and commit the changes.'
       - name: Build packages
         run: yarn build --ignore docs --include-dependencies
       - name: Check licenses
         if: steps.cache_node.outputs.cache-hit != 'true'
         run: |
           yarn check-licenses
+      # Get a list of submodules to ignore in the changed files check
+      - name: Get submodules to ignore in changed files check
+        id: get_submodules_to_ignore
+        run: |
+          # Get all the submodules paths
+          submodules=$(git config --file .gitmodules --name-only --get-regexp path)
+          # Remove the "submodule." prefix and ".path" suffix
+          submodules=$(echo $submodules | sed 's/^submodule.//g')
+          submodules=$(echo $submodules | sed 's/.path$//g')
+          # Add a ! in front of each path to ignore it latter in the changed files check
+          submodules=$(echo $submodules | sed 's/^/!/g')
+          echo "submodules<<EOF" >> $GITHUB_OUTPUT
+          echo "$submodules" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      # Get workdir local changes and fail if there are any change
+      - name: Verify Changed files
+        id: verify-changed-files
+        uses: tj-actions/verify-changed-files@v16
+        with:
+          fail-if-changed: 'true'
+          fail-message: 'Files changed during build. Please build locally and commit the changes.'
+          files: |
+            **/*
+            ${{ steps.get_submodules_to_ignore.outputs.submodules }}
+      - run: |
+          echo "${{ steps.verify-changed-files.outputs.changed_files }}"
       - name: Get the artifacts to cache
         id: get_artifacts_to_cache
         run: |
           artifacts_to_cache="$(git ls-files --others --ignored --exclude-standard | grep -v node_modules)"
-          
           echo "artifacts_to_cache<<EOF" >> $GITHUB_OUTPUT
           echo "$artifacts_to_cache" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -107,7 +128,7 @@ jobs:
           key: code-${{ github.sha }}
           restore-keys: |
             code-${{ github.sha }}
-      - name: Detect files changed in PR, and expose as output
+      - name: Detect files changed in PR (or commit), and expose as output
         id: changed-files
         uses: tj-actions/changed-files@v37
         with:
@@ -116,6 +137,7 @@ jobs:
           # Checking if changed in the last 100 commits in PRs
           fetch_depth: '150'
       - run: echo ",${{ steps.changed-files.outputs.all_modified_files }}"
+
   lint-checks:
     name: Lint code
     runs-on: ['self-hosted', 'monorepo-node18']
@@ -123,6 +145,8 @@ jobs:
     needs: install-dependencies
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -135,6 +159,8 @@ jobs:
     needs: install-dependencies
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -164,6 +190,8 @@ jobs:
     needs: install-dependencies
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -360,6 +388,8 @@ jobs:
       false
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -386,6 +416,8 @@ jobs:
       false
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -412,6 +444,8 @@ jobs:
       false
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
@@ -558,6 +592,8 @@ jobs:
               ./specs/scripts/reserve.sh
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
