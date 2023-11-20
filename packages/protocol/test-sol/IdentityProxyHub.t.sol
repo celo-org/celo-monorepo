@@ -80,8 +80,8 @@ contract IdentityProxyTestGetIdenityProxy is IdentityProxyHubTest {
       address(identityProxyHub),
       bytecode
     );
-    IdentityProxy identiyProxyReturned = identityProxyHub.getOrDeployIdentityProxy(identifier);
-    assertEq(expectedAddress, address(identiyProxyReturned));
+    IdentityProxy identityProxyReturned = identityProxyHub.getOrDeployIdentityProxy(identifier);
+    assertEq(expectedAddress, address(identityProxyReturned));
   }
 
   function test_ReturnsTheAddressOfAnIdentityProxy() public {
@@ -101,7 +101,7 @@ contract IdentityProxyTestMakeCall_Failures is IdentityProxyHubTest {
     identityProxyAddress = address(identityProxyHub.getOrDeployIdentityProxy(identifier));
   }
 
-  function test_FailsToCallIfSenderDoesNotHaveAtLeast3AttestationCompletitions() public {
+  function test_FailsToCallIfSenderDoesNotHaveAtLeast3AttestationCompletions() public {
     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
 
@@ -110,7 +110,7 @@ contract IdentityProxyTestMakeCall_Failures is IdentityProxyHubTest {
     identityProxyHub.makeCall(identifier, address(identityProxyTest), txData);
   }
 
-  function test_FailsToCallIfSenderDoesNotHaveMoreThan50PercentAttestationCompletitions() public {
+  function test_FailsToCallIfSenderDoesNotHaveMoreThan50PercentAttestationCompletions() public {
     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));

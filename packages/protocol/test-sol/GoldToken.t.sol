@@ -131,7 +131,7 @@ contract GoldTokenTransferFrom is GoldTokenTest {
     goldToken.transferFrom(sender, address(0), ONE_GOLDTOKEN);
   }
 
-  function testTransfer_ShouldNotAllowTransferingMoreThanSenderHas() public {
+  function testTransfer_ShouldNotAllowTransferMoreThanSenderHas() public {
     uint256 value = sender.balance + ONE_GOLDTOKEN * 4;
 
     vm.prank(receiver);
@@ -174,13 +174,13 @@ contract BurnGoldToken is GoldTokenTest {
 }
 
 contract MockGoldTokenTest is Test {
-  MockGoldToken mockgoldToken;
+  MockGoldToken mockGoldToken;
   uint256 ONE_GOLDTOKEN = 1000000000000000000;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
 
   function setUp() public {
-    mockgoldToken = new MockGoldToken();
-    mockgoldToken.setTotalSupply(ONE_GOLDTOKEN * 1000);
+    mockGoldToken = new MockGoldToken();
+    mockGoldToken.setTotalSupply(ONE_GOLDTOKEN * 1000);
   }
 }
 
@@ -189,13 +189,13 @@ contract MockGoldTokenCirculatingSupply is MockGoldTokenTest {
     super.setUp();
   }
 
-  function test_ShouldMatchCirculationSuply_WhenNoBurn() public {
-    assertEq(mockgoldToken.circulatingSupply(), mockgoldToken.totalSupply());
+  function test_ShouldMatchCirculationSupply_WhenNoBurn() public {
+    assertEq(mockGoldToken.circulatingSupply(), mockGoldToken.totalSupply());
   }
 
   function test_ShouldDecreaseCirculatingSupply_WhenThereWasBurn() public {
-    mockgoldToken.setBalanceOf(burnAddress, ONE_GOLDTOKEN);
-    assertEq(mockgoldToken.circulatingSupply(), ONE_GOLDTOKEN * 999);
-    assertEq(mockgoldToken.circulatingSupply(), mockgoldToken.totalSupply() - ONE_GOLDTOKEN);
+    mockGoldToken.setBalanceOf(burnAddress, ONE_GOLDTOKEN);
+    assertEq(mockGoldToken.circulatingSupply(), ONE_GOLDTOKEN * 999);
+    assertEq(mockGoldToken.circulatingSupply(), mockGoldToken.totalSupply() - ONE_GOLDTOKEN);
   }
 }

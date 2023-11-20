@@ -1025,7 +1025,7 @@ contract FederatedAttestations_ValidateAttestation is FederatedAttestationsFound
     );
   }
 
-  function test_ShouldFailtIfTheSignerIsAuthorizedAsADifferentRoleByTheIssuer() public {
+  function test_ShouldFailIfTheSignerIsAuthorizedAsADifferentRoleByTheIssuer() public {
     vm.prank(issuer1);
     accounts.authorizeSigner(signer1, RandomRole);
     vm.prank(signer1);
@@ -1293,7 +1293,7 @@ contract FederatedAttestations_RegisterAttestation is FederatedAttestationsFound
 
   }
 
-  function test_ShouldSucceeedIfAnyUserAttemtsToRegisterTheAttestationWithAValidSignature() public {
+  function test_ShouldSucceedIfAnyUserAttemptsToRegisterTheAttestationWithAValidSignature() public {
     vm.prank(issuer2);
     federatedAttestations.registerAttestation(
       phoneHash,
@@ -1353,7 +1353,7 @@ contract FederatedAttestations_RegisterAttestation is FederatedAttestationsFound
     );
   }
 
-  function test_ShouldSucceeedIfIssuerIsNotRegisteredInAccounts() public {
+  function test_ShouldSucceedIfIssuerIsNotRegisteredInAccounts() public {
     assertEq(accounts.isAccount(address(issuer3)), false);
 
     vm.prank(issuer3);
@@ -1506,7 +1506,7 @@ contract FederatedAttestations_RevokeAttestation is FederatedAttestationsFoundry
     assertAttestationNotInStorage(phoneHash, issuer3, account1, 0, 0);
   }
 
-  function test_ShouldRevertWhenRevokingAnAttestationThatDoesntExist() public {
+  function test_ShouldRevertWhenRevokingAnAttestationThatDoesNotExist() public {
     vm.expectRevert("Attestation to be revoked does not exist");
     vm.prank(issuer1);
     federatedAttestations.revokeAttestation(phoneHash, issuer1, issuer1);
@@ -1843,7 +1843,7 @@ contract FederatedAttestations_BatchRevokeAttestations is FederatedAttestationsF
     federatedAttestations.batchRevokeAttestations(issuer1, attestationsToRevoke, accountsToRevoke);
   }
 
-  function test_ShouldRevertIfIdentifiersLenghtIsNotEqualAccountsLenght() public {
+  function test_ShouldRevertIfIdentifiersLengthIsNotEqualAccountsLength() public {
     bytes32[] memory attestationsToRevoke = new bytes32[](2);
     attestationsToRevoke[0] = phoneHash2;
     attestationsToRevoke[1] = phoneHash;
@@ -1856,7 +1856,7 @@ contract FederatedAttestations_BatchRevokeAttestations is FederatedAttestationsF
     federatedAttestations.batchRevokeAttestations(issuer1, attestationsToRevoke, accountsToRevoke);
   }
 
-  function test_ShouldRevertIfOneOfTheIdentifierAccountPairsIsInvalida() public {
+  function test_ShouldRevertIfOneOfTheIdentifierAccountPairsIsInvalid() public {
     bytes32[] memory attestationsToRevoke = new bytes32[](2);
     attestationsToRevoke[0] = phoneHash2;
     attestationsToRevoke[1] = phoneHash2;
