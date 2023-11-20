@@ -139,7 +139,7 @@ contract EscrowTest is Test {
     assertEq(trustedIssuersPerPayment, new address[](0), "trustedIssuersPerPayment not zeroed out");
   }
 
-  function getEscrowedPayment(address paymentId) public returns (EscrowedPayment memory) {
+  function getEscrowedPayment(address paymentId) public view returns (EscrowedPayment memory) {
     (bytes32 recipientIdentifier, address _sender, address token, uint256 value, uint256 sentIndex, uint256 receivedIndex, uint256 timestamp, uint256 expirySeconds, uint256 minAttestations) = escrowContract
       .escrowedPayments(paymentId);
     return
@@ -158,6 +158,7 @@ contract EscrowTest is Test {
 
   function getParsedSignatureOfAddress(address _address, uint256 privateKey)
     public
+    pure
     returns (uint8, bytes32, bytes32)
   {
     bytes32 addressHash = keccak256(abi.encodePacked(_address));
@@ -193,11 +194,11 @@ contract EscrowInitialize is EscrowTest {
     super.setUp();
   }
 
-  function test_should_have_set_the_owner() public {
+  function test_Should_have_set_the_owner() public {
     assertEq(escrowContract.owner(), address(this));
   }
 
-  function test_initializeAgain() public {
+  function test_InitializeAgain() public {
     vm.expectRevert("contract already initialized");
     escrowContract.initialize();
   }
@@ -208,7 +209,7 @@ contract EscrowAddDefaultTrustedIssuer is EscrowTest {
     super.setUp();
   }
 
-  function test_allowOwnerToAddTrustedIssuer() public {
+  function test_AllowOwnerToAddTrustedIssuer() public {
     address[] memory expected1 = new address[](0);
     assertEq(escrowContract.getDefaultTrustedIssuers(), expected1);
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
@@ -217,24 +218,24 @@ contract EscrowAddDefaultTrustedIssuer is EscrowTest {
     assertEq(escrowContract.getDefaultTrustedIssuers(), expected2);
   }
 
-  function test_revertsWhenNonOwnerTriesToAdd() public {
+  function test_RevertsWhenNonOwnerTriesToAdd() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(sender);
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
   }
 
-  function test_eventEmitted() public {
+  function test_EventEmitted() public {
     vm.expectEmit(true, false, false, false);
     emit DefaultTrustedIssuerAdded(trustedIssuer1);
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
   }
 
-  function test_revertsWhenEmptyAddress() public {
+  function test_RevertsWhenEmptyAddress() public {
     vm.expectRevert("trustedIssuer can't be null");
     escrowContract.addDefaultTrustedIssuer(address(0));
   }
 
-  function test_shouldNotAllowATrustedIssuerToBeAddedTwice() public {
+  function test_ShouldNotAllowATrustedIssuerToBeAddedTwice() public {
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
     vm.expectRevert("trustedIssuer already in defaultTrustedIssuers");
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
@@ -254,16 +255,16 @@ contract WhenMaxTrustedIssuersHaveBeenAdded is EscrowTest {
     }
   }
 
-  function test_setExpectedDefaultTrustedIssuers() public {
+  function test_SetExpectedDefaultTrustedIssuers() public {
     assertEq(escrowContract.getDefaultTrustedIssuers(), expectedTrustedIssuers);
   }
 
-  function test_doesntAllowToAddMoreIssuers() public {
+  function test_DoesntAllowToAddMoreIssuers() public {
     vm.expectRevert("defaultTrustedIssuers.length can't exceed allowed number of trustedIssuers");
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
   }
 
-  function test_shouldAllowRemovingAndAddingIssuer() public {
+  function test_ShouldAllowRemovingAndAddingIssuer() public {
     escrowContract.removeDefaultTrustedIssuer(
       expectedTrustedIssuers[expectedTrustedIssuers.length - 1],
       expectedTrustedIssuers.length - 1
@@ -284,13 +285,13 @@ contract EscrowRemoveDefaultTrustedIssuer is EscrowTest {
     assertEq(escrowContract.getDefaultTrustedIssuers(), expected2);
   }
 
-  function test_allowOwnerToRemoveTrustedIssuer() public {
+  function test_AllowOwnerToRemoveTrustedIssuer() public {
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 0);
     address[] memory expected1 = new address[](0);
     assertEq(escrowContract.getDefaultTrustedIssuers(), expected1);
   }
 
-  function test_revertsWhenNonOwnerTriesToRemoveTrustedIssuer() public {
+  function test_RevertsWhenNonOwnerTriesToRemoveTrustedIssuer() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(sender);
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 0);
@@ -302,18 +303,18 @@ contract EscrowRemoveDefaultTrustedIssuer is EscrowTest {
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 0);
   }
 
-  function test_revertsWhenIndexIsIncorrect() public {
+  function test_RevertsWhenIndexIsIncorrect() public {
     vm.expectRevert("index is invalid");
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 1);
   }
 
-  function test_revertsWhenIssuerIsNotOnIndex() public {
+  function test_RevertsWhenIssuerIsNotOnIndex() public {
     escrowContract.addDefaultTrustedIssuer(trustedIssuer2);
     vm.expectRevert("trustedIssuer does not match address found at defaultTrustedIssuers[index]");
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 1);
   }
 
-  function test_allowOwnerToRemoveTrustedIssuersWhenTwoArePresent() public {
+  function test_AllowOwnerToRemoveTrustedIssuersWhenTwoArePresent() public {
     escrowContract.addDefaultTrustedIssuer(trustedIssuer2);
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer2, 1);
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 0);
@@ -388,7 +389,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     assertEq(trustedIssuers, trustedIssuersPerPayment);
   }
 
-  function test_shouldAllowUsersToTransferTokensToAnyUser() public {
+  function test_ShouldAllowUsersToTransferTokensToAnyUser() public {
     address[] memory expected = new address[](1);
     expected[0] = withdrawKeyAddress;
 
@@ -405,7 +406,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     );
   }
 
-  function test_shouldAllowTransferWhenMinAttestationsGt0AndIdentifierIsProvided() public {
+  function test_ShouldAllowTransferWhenMinAttestationsGt0AndIdentifierIsProvided() public {
     // should allow transfer when minAttestations > 0 and identifier is provided
     address[] memory expected = new address[](1);
     expected[0] = withdrawKeyAddress;
@@ -423,7 +424,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     );
   }
 
-  function test_shouldAllowTransferWhenTrustedIssuersAreProvided() public {
+  function test_ShouldAllowTransferWhenTrustedIssuersAreProvided() public {
     // should allow transfer when trustedIssuers are provided
     address[] memory expected = new address[](1);
     expected[0] = withdrawKeyAddress;
@@ -445,7 +446,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     );
   }
 
-  function test_shouldAllowTransferWhenMaxTrustedIssuersAreProvided() public {
+  function test_ShouldAllowTransferWhenMaxTrustedIssuersAreProvided() public {
     // should allow transfer when max trustedIssuers are provided
     address[] memory expected = new address[](1);
     expected[0] = withdrawKeyAddress;
@@ -471,7 +472,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     );
   }
 
-  function test_shouldAllowTransferWhenNoIdentifierIsProvided() public {
+  function test_ShouldAllowTransferWhenNoIdentifierIsProvided() public {
     // should allow transfer when no identifier is provided
     address[] memory expected = new address[](1);
     expected[0] = withdrawKeyAddress;
@@ -489,7 +490,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     );
   }
 
-  function test_shouldAllowTransferFromSameSenderWithDifferentPaymentIds() public {
+  function test_ShouldAllowTransferFromSameSenderWithDifferentPaymentIds() public {
     // should allow transfers from same sender with different paymentIds
     address[] memory expected = new address[](2);
     expected[0] = anotherWithdrawKeyAddress;
@@ -518,7 +519,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     );
   }
 
-  function test_shouldEmitTheTransferEvent() public {
+  function test_ShouldEmitTheTransferEvent() public {
     vm.expectEmit(true, true, true, true);
     emit Transfer(sender, aPhoneHash, address(mockERC20Token), aValue, withdrawKeyAddress, 2);
 
@@ -534,7 +535,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     );
   }
 
-  function test_shouldEmitTheTrustedIssuerEvent() public {
+  function test_ShouldEmitTheTrustedIssuerEvent() public {
     // should emit the TrustedIssuersSet event
 
     address[] memory trustedIssuers = new address[](1);
@@ -717,7 +718,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     );
   }
 
-  function test_shouldRevertIfTransferValueExceedsBalance() public {
+  function test_ShouldRevertIfTransferValueExceedsBalance() public {
     // should revert if transfer value exceeds balance
 
     address[] memory trustedIssuers = new address[](1);
@@ -737,7 +738,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     );
   }
 
-  function test_transfer_WhenNoDefaultTrustedIssuersAreSet_ShouldSetThemToEmptyList() public {
+  function test_Transfer_WhenNoDefaultTrustedIssuersAreSet_ShouldSetThemToEmptyList() public {
     // when no defaut trustedIssuers are set; should set trustedIssuersPerPaymentId to empty list
     vm.prank(sender);
     escrowContract.transfer(
@@ -756,7 +757,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     assertEq(trustedIssuersPerPayment, expected);
   }
 
-  function test_transfer_WhenDefaultTrustedIssuersAreSet_ShouldSetTrustedIssuersPerPaymentIdToDefaultWhenMinAttestationsGt0()
+  function test_Transfer_WhenDefaultTrustedIssuersAreSet_ShouldSetTrustedIssuersPerPaymentIdToDefaultWhenMinAttestationsGt0()
     public
   {
     // when defaut trustedIssuers are set; should set trustedIssuersPerPaymentId to default when minAttestations>0
@@ -784,7 +785,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     assertEq(trustedIssuersPerPayment, trustedIssuers);
   }
 
-  function test_transfer_WhenDefaultTrustedIssuersAreSet_ShouldSetTrustedIssuersPerPaymentIdToEmptyListWhenMinAttestationsEq0()
+  function test_Transfer_WhenDefaultTrustedIssuersAreSet_ShouldSetTrustedIssuersPerPaymentIdToEmptyListWhenMinAttestationsEq0()
     public
   {
     // when defaut trustedIssuers are set; should set trustedIssuersPerPaymentId to empty list when minAttestations==0
@@ -885,7 +886,7 @@ contract EscrowWithdrawalTest is EscrowTest {
     );
   }
 
-  function test_shouldFailIfPaymentIdDoesNotExist() public {
+  function test_ShouldFailIfPaymentIdDoesNotExist() public {
     // should fail when no payment has been escrowed
     (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(
       receiver,
@@ -1003,7 +1004,7 @@ contract EscrowWithdrawalTest is EscrowTest {
     );
   }
 
-  function test_shouldWithdawProperlyWhenSenderSecondPaymentHasAnIdentifierWithAttestations()
+  function test_ShouldWithdawProperlyWhenSenderSecondPaymentHasAnIdentifierWithAttestations()
     public
   {
     // should withdraw properly when sender's second payment has an identifier with attestations
@@ -1119,7 +1120,7 @@ contract EscrowWithdrawalTest is EscrowTest {
     escrowContract.withdraw(uniquePaymentIDWithdraw, v, r, s);
   }
 
-  function test_shouldWithdawProperlyWhenSenderSecondPaymentHasAnIdentifier() public {
+  function test_ShouldWithdawProperlyWhenSenderSecondPaymentHasAnIdentifier() public {
     // should withdraw properly when sender's second payment has an identifier
     uint256 minAttestations = 3;
 
@@ -1413,7 +1414,7 @@ contract EscrowRevokeTestIdentifierEmptyMinAttestations0TrustedIssuersEmpty is E
     );
   }
 
-  function test_shouldEmitTheTrustedIssuersUnsetEvent() public {
+  function test_ShouldEmitTheTrustedIssuersUnsetEvent() public {
     // should emit the TrustedIssuersUnset event
     vm.warp(oneDayInSecs + 1);
 
@@ -1424,7 +1425,7 @@ contract EscrowRevokeTestIdentifierEmptyMinAttestations0TrustedIssuersEmpty is E
     escrowContract.revoke(uniquePaymentIDRevoke);
   }
 
-  function test_shouldEmitRevokationEvent() public {
+  function test_ShouldEmitRevokationEvent() public {
     // should emit the Revocation event
     vm.warp(oneDayInSecs + 1);
 
@@ -1566,7 +1567,7 @@ contract EscrowRevokeTestIdentifierNotEmptyMinAttestations0TrustedIssuersEmpty i
     );
   }
 
-  function test_shouldEmitTheTrustedIssuersUnsetEvent() public {
+  function test_ShouldEmitTheTrustedIssuersUnsetEvent() public {
     // should emit the TrustedIssuersUnset event
     vm.warp(oneDayInSecs + 1);
 
@@ -1577,7 +1578,7 @@ contract EscrowRevokeTestIdentifierNotEmptyMinAttestations0TrustedIssuersEmpty i
     escrowContract.revoke(uniquePaymentIDRevoke);
   }
 
-  function test_shouldEmitRevokationEvent() public {
+  function test_ShouldEmitRevokationEvent() public {
     // should emit the Revocation event
     vm.warp(oneDayInSecs + 1);
 
@@ -1721,7 +1722,7 @@ contract EscrowRevokeTestIdentifierNotEmptyMinAttestations1TrustedIssuersNonEmpt
     );
   }
 
-  function test_shouldEmitTheTrustedIssuersUnsetEvent() public {
+  function test_ShouldEmitTheTrustedIssuersUnsetEvent() public {
     // should emit the TrustedIssuersUnset event
     vm.warp(oneDayInSecs + 1);
 
@@ -1732,7 +1733,7 @@ contract EscrowRevokeTestIdentifierNotEmptyMinAttestations1TrustedIssuersNonEmpt
     escrowContract.revoke(uniquePaymentIDRevoke);
   }
 
-  function test_shouldEmitRevokationEvent() public {
+  function test_ShouldEmitRevokationEvent() public {
     // should emit the Revocation event
     vm.warp(oneDayInSecs + 1);
 
