@@ -11,7 +11,6 @@ import "../contracts/identity/test/MockERC20Token.sol";
 import "../contracts/common/FixidityLib.sol";
 import "../contracts/common/Registry.sol";
 import "../contracts/common/Signatures.sol";
-import "forge-std/console.sol";
 
 contract EscrowTest is Test {
   using FixidityLib for FixidityLib.Fraction;
@@ -69,8 +68,6 @@ contract EscrowTest is Test {
 
   uint256 gasPriceMinimumFloor = 100;
   uint256 gasPriceMinimum = gasPriceMinimumFloor;
-  uint256 initailTargetDensity = FixidityLib.newFixedFraction(1, 2).unwrap();
-  uint256 initialAdjustmentSpeed = FixidityLib.newFixedFraction(1, 2).unwrap();
 
   uint256 ONE_GOLDTOKEN = 1000000000000000000;
   address receiver;
@@ -196,7 +193,7 @@ contract EscrowInitialize is EscrowTest {
     super.setUp();
   }
 
-  function test_owner() public {
+  function test_should_have_set_the_owner() public {
     assertEq(escrowContract.owner(), address(this));
   }
 
@@ -221,13 +218,13 @@ contract EscrowAddDefaultTrustedIssuer is EscrowTest {
   }
 
   function test_revertsWhenNonOwnerTriesToAdd() public {
-    vm.expectRevert();
+    vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(sender);
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
   }
 
   function test_eventEmitted() public {
-    vm.expectEmit(true, true, true, true);
+    vm.expectEmit(true, false, false, false);
     emit DefaultTrustedIssuerAdded(trustedIssuer1);
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
   }
@@ -235,6 +232,12 @@ contract EscrowAddDefaultTrustedIssuer is EscrowTest {
   function test_revertsWhenEmptyAddress() public {
     vm.expectRevert("trustedIssuer can't be null");
     escrowContract.addDefaultTrustedIssuer(address(0));
+  }
+
+  function test_shouldNotAllowATrustedIssuerToBeAddedTwice() public {
+    escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
+    vm.expectRevert("trustedIssuer already in defaultTrustedIssuers");
+    escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
   }
 }
 
@@ -287,9 +290,15 @@ contract EscrowRemoveDefaultTrustedIssuer is EscrowTest {
     assertEq(escrowContract.getDefaultTrustedIssuers(), expected1);
   }
 
-  function test_revertsWhenNonOwnerTriesToAdd() public {
+  function test_revertsWhenNonOwnerTriesToRemoveTrustedIssuer() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(sender);
+    escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 0);
+  }
+
+  function test_ShouldEmitTheDefaultTrustedIssuerEvent() public {
+    vm.expectEmit(true, false, false, false);
+    emit DefaultTrustedIssuerRemoved(trustedIssuer1);
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 0);
   }
 
@@ -380,7 +389,6 @@ contract EscrowTestsWithTokens is EscrowTest {
   }
 
   function test_shouldAllowUsersToTransferTokensToAnyUser() public {
-    // should allow users to transfer tokens to any user
     address[] memory expected = new address[](1);
     expected[0] = withdrawKeyAddress;
 
@@ -511,7 +519,6 @@ contract EscrowTestsWithTokens is EscrowTest {
   }
 
   function test_shouldEmitTheTransferEvent() public {
-    // should emit the Transfer event
     vm.expectEmit(true, true, true, true);
     emit Transfer(sender, aPhoneHash, address(mockERC20Token), aValue, withdrawKeyAddress, 2);
 

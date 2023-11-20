@@ -1,6 +1,6 @@
 [submodule "packages/protocol/lib/celo-foundry"]
 	path = packages/protocol/lib/celo-foundry
-	url = https://github.com/pahor167/celo-foundry
+	url = https://github.com/celo-org/celo-foundry
 [submodule "packages/protocol/lib/solidity-bytes-utils"]
 	path = packages/protocol/lib/solidity-bytes-utils
 	url = https://github.com/GNSPS/solidity-bytes-utils
