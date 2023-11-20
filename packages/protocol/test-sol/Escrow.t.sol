@@ -1033,7 +1033,7 @@ contract EscrowWithdrawalTest is EscrowTest {
     );
   }
 
-  function test_ShouldNotAllowWithdrawingWithoutAValidSignatureSusingTHeWithdrawalKey() public {
+  function test_ShouldNotAllowWithdrawingWithoutAValidSignatureUsingTheWithdrawalKey() public {
     // should not allow withdrawing without a valid signature using the withdraw key
 
     address[] memory expected = new address[](1);
