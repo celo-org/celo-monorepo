@@ -195,7 +195,7 @@ contract EscrowInitialize is EscrowTest {
     assertEq(escrowContract.owner(), address(this));
   }
 
-  function test_InitializeAgain() public {
+  function testRevertsIf_InitializedAgain() public {
     vm.expectRevert("contract already initialized");
     escrowContract.initialize();
   }
