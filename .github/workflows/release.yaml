@@ -29,7 +29,7 @@ jobs:
         with:
           api-url: https://api.gateway.akeyless.celo-networks-dev.org
           access-id: p-kf9vjzruht6l
-          static-secrets: '{"/static-secrets/apps-tooling-circle/npm-publish-token":"NPM_TOKEN"}'
+          static-secrets: '{"/static-secrets/NPM/npm-publish-token":"NPM_TOKEN"}'
       - name: Setup Node.js 18.x
         uses: actions/setup-node@v3
         with:
@@ -51,3 +51,4 @@ jobs:
         with:
           # This expects you to have a script called release which does a build for your packages and calls changeset publish
           publish: yarn release
+          version: yarn version-and-reinstall

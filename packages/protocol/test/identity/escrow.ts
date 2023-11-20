@@ -1,5 +1,5 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
-import getPhoneHash from '@celo/phone-utils/lib/getPhoneHash'
+
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
@@ -7,6 +7,7 @@ import {
   assertObjectWithBNEqual,
   assertTransactionRevertWithReason,
   assumeOwnershipWithTruffle,
+  getOdisHash as getPhoneHash,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'

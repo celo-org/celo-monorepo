@@ -1,5 +1,12 @@
 # @celo/keystores
 
+## 5.0.6-beta.0
+
+### Patch Changes
+
+- @celo/utils@5.0.6-beta.0
+- @celo/wallet-local@5.1.1-beta.0
+
 ## 5.0.5
 
 ### Patch Changes
