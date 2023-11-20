@@ -287,7 +287,7 @@ contract EscrowRemoveDefaultTrustedIssuer is EscrowTest {
     assertEq(escrowContract.getDefaultTrustedIssuers(), expected1);
   }
 
-  function test_revertsWhenNonOwnerTriesToAdd() public {
+  function test_revertsWhenNonOwnerTriesToRemoveTrustedIssuer() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(sender);
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 0);
