@@ -7,7 +7,9 @@ import * as path from 'path'
 // If there is not, then your editor probably deleted it automatically.
 
 export default async function globalSetup() {
-  await baseSetup(path.resolve(path.join(__dirname, '../../')), '.tmp/devchain.tar.gz', {
+  const chainDataPath = path.join(path.dirname(require.resolve('@celo/celo-devchain')), '../chains')
+  // v10 refers to core contract release 10
+  await baseSetup(path.resolve(chainDataPath), 'v10.tar.gz', {
     from_targz: true,
   })
 }
