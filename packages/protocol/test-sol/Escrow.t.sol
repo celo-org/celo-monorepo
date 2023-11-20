@@ -198,7 +198,7 @@ contract EscrowInitialize is EscrowTest {
   }
 
   function test_initializeAgain() public {
-    vm.expectRevert();
+    vm.expectRevert("contract already initialized");
     escrowContract.initialize();
   }
 }
@@ -263,7 +263,7 @@ contract WhenMaxTrustedIssuersHaveBeenAdded is EscrowTest {
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
   }
 
-  function test_shouldAllowRemoveAndAddIssuer() public {
+  function test_shouldAllowRemovingAndAddingIssuer() public {
     escrowContract.removeDefaultTrustedIssuer(
       expectedTrustedIssuers[expectedTrustedIssuers.length - 1],
       expectedTrustedIssuers.length - 1
@@ -756,7 +756,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     assertEq(trustedIssuersPerPayment, expected);
   }
 
-  function test_transfer_WhenDefaultTrustedIssuersAreSet_ShouldSetThemToDefaultWhenMinAttestationsGt0()
+  function test_transfer_WhenDefaultTrustedIssuersAreSet_ShouldSetTrustedIssuersPerPaymentIdToDefaultWhenMinAttestationsGt0()
     public
   {
     // when defaut trustedIssuers are set; should set trustedIssuersPerPaymentId to default when minAttestations>0
@@ -784,7 +784,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     assertEq(trustedIssuersPerPayment, trustedIssuers);
   }
 
-  function test_transfer_WhenDefaultTrustedIssuersAreSet_ShouldSetThemToEmptyListWhenMinAttestationsEq0()
+  function test_transfer_WhenDefaultTrustedIssuersAreSet_ShouldSetTrustedIssuersPerPaymentIdToEmptyListWhenMinAttestationsEq0()
     public
   {
     // when defaut trustedIssuers are set; should set trustedIssuersPerPaymentId to empty list when minAttestations==0
@@ -896,7 +896,7 @@ contract EscrowWithdrawalTest is EscrowTest {
     escrowContract.withdraw(uniquePaymentIDWithdraw, v, r, s);
   }
 
-  function test_ShouldAllowWithdrawalWithPossesionOfPLAndNoAttestations() public {
+  function test_ShouldAllowWithdrawalWithPossesionOfPKAndNoAttestations() public {
     // should allow withdrawal with possession of PK and no attestations
     mintAndTransfer(
       sender,
@@ -1040,7 +1040,7 @@ contract EscrowWithdrawalTest is EscrowTest {
     );
   }
 
-  function test_ShouldNotAllowWithdrawingWithoutAValidSignatureSusingTHeWithdrawalKey() public {
+  function test_ShouldNotAllowWithdrawingWithoutAValidSignatureUsingTheWithdrawalKey() public {
     // should not allow withdrawing without a valid signature using the withdraw key
 
     address[] memory expected = new address[](1);
@@ -1091,7 +1091,7 @@ contract EscrowWithdrawalTest is EscrowTest {
     );
   }
 
-  function test_WhenFirstPaymentWithIdentifierAndMinAttestations_ShouldNotAllowToWithdrawWhenLessAttestations()
+  function test_WhenFirstPaymentWithIdentifierAndMinAttestations_ShouldNotAllowToWithdrawWhenLessThanMinAttestations()
     public
   {
     // should not allow a user to withdraw a payment if they have fewer than minAttestations
@@ -1461,7 +1461,7 @@ contract EscrowRevokeTestIdentifierEmptyMinAttestations0TrustedIssuersEmpty is E
     escrowContract.revoke(uniquePaymentIDRevoke);
   }
 
-  function test_ShouldNotAllowReceiveToUseRevokeFunction() public {
+  function test_ShouldNotAllowReceiverToUseRevokeFunction() public {
     // should not allow receiver to use revoke function
     vm.expectRevert("Only sender of payment can attempt to revoke payment.");
     vm.prank(receiver);
