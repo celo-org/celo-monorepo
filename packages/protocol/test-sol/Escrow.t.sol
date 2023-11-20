@@ -1454,7 +1454,7 @@ contract EscrowRevokeTestIdentifierEmptyMinAttestations0TrustedIssuersEmpty is E
     escrowContract.revoke(uniquePaymentIDRevoke);
   }
 
-  function test_ShouldNotAllowReceiveToUseRevokeFunction() public {
+  function test_ShouldNotAllowReceiverToUseRevokeFunction() public {
     // should not allow receiver to use revoke function
     vm.expectRevert("Only sender of payment can attempt to revoke payment.");
     vm.prank(receiver);
