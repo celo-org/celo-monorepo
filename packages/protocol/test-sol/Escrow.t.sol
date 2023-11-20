@@ -889,7 +889,7 @@ contract EscrowWithdrawalTest is EscrowTest {
     escrowContract.withdraw(uniquePaymentIDWithdraw, v, r, s);
   }
 
-  function test_ShouldAllowWithdrawalWithPossesionOfPLAndNoAttestations() public {
+  function test_ShouldAllowWithdrawalWithPossesionOfPKAndNoAttestations() public {
     // should allow withdrawal with possession of PK and no attestations
     mintAndTransfer(
       sender,
