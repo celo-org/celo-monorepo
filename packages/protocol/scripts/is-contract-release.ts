@@ -1,15 +1,10 @@
 import { SemVer } from 'semver'
 const arg = process.env.INPUT_VERSION || process.env.GITHUB_TAG
 
-if (!arg) {
-  console.error('Missing git tag, skipping next steps.')
-  process.exit(0)
-}
-
-const match = arg.match(/core-contracts.v(.+)/)
+const match = arg?.match(/core-contracts.v(.+)/)
 if (!match) {
   console.error(
-    `Git tag didn't match the following RegExp("/core-contracts.v(.+)/"), got ${arg}, skipping next steps.`
+    `Git tag didn't match the following RegExp("/core-contracts.v(.+)/"), got ${arg}, next steps will be dry-run.`
   )
   process.exit(0)
 }

@@ -1,8 +1,11 @@
 name: Publish ABIs and Solidity files to NPM
 on:
+  push:
+    branches: [main]
+  pull_request:
+
   release:
     types: [released]
-
   workflow_dispatch:
     inputs:
       npm_version:
@@ -11,10 +14,7 @@ on:
         type: string
 jobs:
   publish:
-    runs-on: ['self-hosted', 'org', '8-cpu']
-    container:
-      # Update image at https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfiles/Dockerfile-monorepo
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/celo-monorepo:node18
+    runs-on: ['self-hosted', 'monorepo-node18']
     permissions:
       contents: write
       id-token: write
@@ -27,7 +27,7 @@ jobs:
         with:
           api-url: https://api.gateway.akeyless.celo-networks-dev.org
           access-id: p-kf9vjzruht6l
-          static-secrets: '{"/static-secrets/apps-tooling-circle/npm-publish-token":"NPM_TOKEN"}'
+          static-secrets: '{"/static-secrets/NPM/npm-publish-token":"NPM_TOKEN"}'
       # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v3
         with:
@@ -44,6 +44,9 @@ jobs:
       - name: 'Install packages'
         run: yarn
 
+      - name: 'Build all packages'
+        run: yarn build
+
       - name: Check if a release should be published
         run: yarn --silent is_contract_release >> "$GITHUB_ENV"
         working-directory: packages/protocol
@@ -51,9 +54,8 @@ jobs:
           GITHUB_TAG: ${{ github.ref_name }}
           INPUT_VERSION: ${{ inputs.npm_version }}
 
-      - if: ${{ env.RELEASE_VERSION != '' }}
-        name: Compile solidity contracts and typescript files
-        run: yarn build && yarn prepare_contracts_and_abis_publishing
+      - name: Compile solidity contracts and typescript files
+        run: yarn prepare_contracts_and_abis_publishing
         working-directory: packages/protocol
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}

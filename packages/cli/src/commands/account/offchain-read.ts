@@ -25,6 +25,7 @@ export default class OffchainRead extends BaseCommand {
       args: { address },
       flags: { from, privateDEK },
     } = this.parse(OffchainRead)
+    // @ts-ignore
     const provider = new BasicDataWrapper(from!, this.kit)
 
     if (privateDEK) {

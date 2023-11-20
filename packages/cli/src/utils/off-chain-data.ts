@@ -46,6 +46,7 @@ export abstract class OffchainDataCommand extends BaseCommand {
     }: ParserOutput<any, any> = this.parse()
 
     const from = privateKeyToAddress(privateKey)
+    // @ts-ignore -- TODO: if identity depends on diff version of ck which has a slightly differnt type this complains
     this.offchainDataWrapper = new BasicDataWrapper(from, this.kit)
 
     this.offchainDataWrapper.storageWriter =
