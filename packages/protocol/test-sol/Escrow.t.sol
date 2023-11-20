@@ -226,7 +226,7 @@ contract EscrowAddDefaultTrustedIssuer is EscrowTest {
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
   }
 
-  function test_eventEmitted() public {
+  function test_emitEventDefaultTrustedIssuerAdded() public {
     vm.expectEmit(true, true, true, true);
     emit DefaultTrustedIssuerAdded(trustedIssuer1);
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
