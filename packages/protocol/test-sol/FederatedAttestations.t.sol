@@ -138,11 +138,11 @@ contract FederatedAttestationsFoundryTest is Test {
     address account,
     uint256 issuedOn,
     uint256 privateKeySigner, // This is used to simulate signing in the test environment
-    uint256 chainId,
+    uint256 _chainId,
     address verifyingContract
-  ) public view returns (uint8 v, bytes32 r, bytes32 s) {
+  ) public pure returns (uint8 v, bytes32 r, bytes32 s) {
     bytes32 dataHash = generateTypedDataHash(
-      Domain("FederatedAttestations", "1.0", chainId, verifyingContract),
+      Domain("FederatedAttestations", "1.0", _chainId, verifyingContract),
       OwnershipAttestations(
         identifier,
         issuer,
@@ -1372,7 +1372,7 @@ contract FederatedAttestations_RegisterAttestation is FederatedAttestationsFound
 
   function test_ShouldRevertIfMAX_ATTESTATIONS_PER_IDENTIFIERHaveAlreadyBeenRegistered() public {
     for (uint256 i = 0; i < federatedAttestations.MAX_ATTESTATIONS_PER_IDENTIFIER(); i++) {
-      (address actor, uint256 pk) = actorWithPK(string(abi.encodePacked(i)));
+      address actor = actor(string(abi.encodePacked(i)));
 
       vm.prank(issuer1);
       federatedAttestations.registerAttestationAsIssuer(phoneHash, actor, uint64(block.timestamp));
