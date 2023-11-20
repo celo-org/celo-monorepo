@@ -260,7 +260,7 @@ contract WhenMaxTrustedIssuersHaveBeenAdded is EscrowTest {
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
   }
 
-  function test_shouldAllowRemoveAndAddIssuer() public {
+  function test_shouldAllowRemovingAndAddingIssuer() public {
     escrowContract.removeDefaultTrustedIssuer(
       expectedTrustedIssuers[expectedTrustedIssuers.length - 1],
       expectedTrustedIssuers.length - 1
