@@ -1,4 +1,3 @@
-import getPhoneHash from '@celo/phone-utils/lib/getPhoneHash'
 import {
   getDomainDigest,
   getSignatureForAttestation,
@@ -13,6 +12,7 @@ import {
   assertThrowsAsync,
   assertTransactionRevertWithReason,
   assumeOwnershipWithTruffle,
+  getOdisHash as getPhoneHash,
 } from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'

@@ -1,5 +1,11 @@
 # @celo/base
 
+## 6.0.0-beta.0
+
+### Major Changes
+
+- 97d5ccf43: Remove getIdentifierHash, IdentifierPrefix, getIdentifierPrefix. These have been moved to @celo/odis-identifiers
+
 ## 5.0.5
 
 ### Patch Changes

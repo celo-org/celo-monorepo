@@ -7,10 +7,7 @@ import {
   getRegionCode,
   getRegionCodeFromCountryCode,
   parsePhoneNumber,
-  PhoneNumberUtils,
 } from './phoneNumbers'
-
-const getPhoneHash = PhoneNumberUtils.getPhoneHash
 
 const COUNTRY_CODES = {
   US: '+1',
@@ -52,27 +49,6 @@ const TEST_PHONE_NUMBERS = {
 }
 
 describe('Phone number formatting and utilities', () => {
-  describe('Phone hashing', () => {
-    it('Hashes an valid number without a salt', () => {
-      expect(getPhoneHash(TEST_PHONE_NUMBERS.VALID_E164)).toBe(
-        '0x483128504c69591aed5751690805ba9aad6c390644421dc189f6dbb6e085aadf'
-      )
-    })
-    it('Hashes an valid number with a salt', () => {
-      expect(getPhoneHash(TEST_PHONE_NUMBERS.VALID_E164, 'abcdefg')).toBe(
-        '0xf08257f6b126597dbd090fecf4f5106cfb59c98ef997644cef16f9349464810c'
-      )
-    })
-    it('Throws for an invalid number', () => {
-      try {
-        getPhoneHash(TEST_PHONE_NUMBERS.VALID_US_1)
-        fail('expected an error')
-      } catch (error) {
-        // Error expected
-      }
-    })
-  })
-
   describe('E164 formatting', () => {
     it('Invalid empty', () => {
       expect(getE164Number(TEST_PHONE_NUMBERS.INVALID_EMPTY, COUNTRY_CODES.US)).toBe(null)

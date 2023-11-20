@@ -1,6 +1,5 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { Signature } from '@celo/base/lib/signatureUtils'
-import getPhoneHash from '@celo/phone-utils/lib/getPhoneHash'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
@@ -8,6 +7,7 @@ import {
   assertRevert,
   assertTransactionRevertWithReason,
   getDerivedKey,
+  getOdisHash as getPhoneHash,
   KeyOffsets,
   unlockAndAuthorizeKey,
 } from '@celo/protocol/lib/test-utils'
