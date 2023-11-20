@@ -1,5 +1,11 @@
 # @celo/connect
 
+## 5.1.1-beta.1
+
+### Patch Changes
+
+- 679ef0c60: Add back setFeeMarket function and re remove fillGasPrice which were accidentally reverted in beta 0
+
 ## 5.1.1-beta.0
 
 ### Patch Changes

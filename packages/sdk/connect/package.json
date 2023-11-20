@@ -1,6 +1,6 @@
 {
   "name": "@celo/connect",
-  "version": "5.1.1-beta.0",
+  "version": "5.1.1-beta.1",
   "description": "Light Toolkit for connecting with the Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
