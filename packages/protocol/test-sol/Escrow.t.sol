@@ -1084,7 +1084,7 @@ contract EscrowWithdrawalTest is EscrowTest {
     );
   }
 
-  function test_WhenFirstPaymentWithIdentifierAndMinAttestations_ShouldNotAllowToWithdrawWhenLessAttestations()
+  function test_WhenFirstPaymentWithIdentifierAndMinAttestations_ShouldNotAllowToWithdrawWhenLessThanMinAttestations()
     public
   {
     // should not allow a user to withdraw a payment if they have fewer than minAttestations
