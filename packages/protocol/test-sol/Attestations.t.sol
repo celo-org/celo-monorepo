@@ -84,7 +84,7 @@ contract AttestationsFoundryTest is Test {
   );
   event TransferApproval(
     address indexed approver,
-    bytes32 indexed indentifier,
+    bytes32 indexed identifier,
     address from,
     address to,
     bool approved
@@ -199,8 +199,8 @@ contract AttestationsFoundryTest is Test {
     vm.startPrank(account);
     accounts.createAccount();
     vm.stopPrank();
-    address validatingAddress = unlockDerivedValidator(account, accountPK);
-    address attestationAddress = unlockDerivedAttestator(account, accountPK);
+    unlockDerivedValidator(account, accountPK);
+    unlockDerivedAttestator(account, accountPK);
   }
 
   function unlockDerivedAttestator(address account, uint256 accountPK) public returns (address) {
@@ -498,15 +498,13 @@ contract AttestationsWithdraw is AttestationsFoundryTest {
     mockERC20Token.mint(address(attestationsTest), attestationFee);
   }
 
-  function test_ShouldRemoveTHeBlaanceOfAVailabelRewardsForTheIssuerFromIssuer() public {
+  function test_ShouldRemoveTheBalanceOfAvailableRewardsForTheIssuerFromIssuer() public {
     vm.prank(issuer);
     attestationsTest.withdraw(address(mockERC20Token));
     assertEq(attestationsTest.pendingWithdrawals(address(mockERC20Token), issuer), 0);
   }
 
-  function test_ShouldRemoveTheBalanceOfAvailiableREwardsForTheIssuerFromAttestationSigner()
-    public
-  {
+  function test_ShouldRemoveTheBalanceOfAvailableRewardsForTheIssuerFromAttestationSigner() public {
     address signer = accounts.getAttestationSigner(issuer);
     vm.prank(signer);
     attestationsTest.withdraw(address(mockERC20Token));
@@ -635,7 +633,7 @@ contract AttestationsBatchGetAttestationStats is AttestationsFoundryTest {
     assertEq(uint256(total[0]), 3);
   }
 
-  function test_WhenAnAccountHasAnAttestation_WHenTheAccountHasAWalletAddressMapped_AndAnotherAccountAlsoHasAnAttestationToTheSamePhoneNumber_ShouldReturnMultipleAttestedAcounts_ShouldReturnMultipleAttestedAccounts()
+  function test_WhenAnAccountHasAnAttestation_WHenTheAccountHasAWalletAddressMapped_AndAnotherAccountAlsoHasAnAttestationToTheSamePhoneNumber_ShouldReturnMultipleAttestedAccounts_ShouldReturnMultipleAttestedAccounts()
     public
   {
     requestAndCompleteAttestations(caller);
