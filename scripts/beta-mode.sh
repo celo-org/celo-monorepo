@@ -2,7 +2,7 @@
 
 # Beta Workflow steps
 # 0. Enter any random branch name
-echo "Enter a branch name"
+echo "Enter a new arbitrary branch name"
 read branch_name
 # 1. create a prerelease/random branch
 git branch prerelease/$branch_name
