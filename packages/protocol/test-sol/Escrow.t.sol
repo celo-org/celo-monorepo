@@ -66,9 +66,6 @@ contract EscrowTest is Test {
     address paymentId
   );
 
-  uint256 gasPriceMinimumFloor = 100;
-  uint256 gasPriceMinimum = gasPriceMinimumFloor;
-
   uint256 ONE_GOLDTOKEN = 1000000000000000000;
   address receiver;
   uint256 receiverPK;
