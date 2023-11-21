@@ -14,11 +14,12 @@ on:
         type: string
 jobs:
   publish:
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ['self-hosted', 'org', 'npm-publish']
     permissions:
       contents: write
       id-token: write
-      repository-projects: read
+      pull-requests: write
+      repository-projects: write   
     steps:
       - uses: actions/checkout@v4
       - name: Akeyless Get Secrets
@@ -28,12 +29,13 @@ jobs:
           api-url: https://api.gateway.akeyless.celo-networks-dev.org
           access-id: p-kf9vjzruht6l
           static-secrets: '{"/static-secrets/NPM/npm-publish-token":"NPM_TOKEN"}'
+
       # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
-          scope: '@celo'
+          #scope: '@celo'
 
       - name: 'Setup yarn'
         shell: bash
@@ -42,6 +44,7 @@ jobs:
           source ~/.bashrc
 
       - name: 'Install packages'
+        shell: bash
         run: yarn
 
       - name: 'Build all packages'
