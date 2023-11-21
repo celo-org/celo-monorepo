@@ -43,7 +43,7 @@
     "web3-core-helpers": "1.10.0"
   },
   "devDependencies": {
-    "@celo/celo-devchain": "^6.0.0",
+    "@celo/celo-devchain": "^6.0.2-beta.0",
     "@celo/odis-identifiers": "^1.0.0",
     "@celo/dev-utils": "0.0.1",
     "@celo/protocol": "1.0.2-beta.0",
