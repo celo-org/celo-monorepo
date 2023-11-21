@@ -163,9 +163,15 @@ export class Web3ContractCache {
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
   }
+  /*
+    @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
+  */
   getMetaTransactionWallet(address: string) {
     return this.getContract(CeloContract.MetaTransactionWallet, address)
   }
+  /*
+    @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
+  */
   getMetaTransactionWalletDeployer(address: string) {
     return this.getContract(CeloContract.MetaTransactionWalletDeployer, address)
   }
