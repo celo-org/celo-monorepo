@@ -1,6 +1,6 @@
-import { getParsedSignatureOfAddress } from '@celo/contractkit/lib/utils/getParsedSignatureOfAddress'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { newKitFromWeb3 } from '../kit'
+import { getParsedSignatureOfAddress } from '../utils/getParsedSignatureOfAddress'
 import { EscrowWrapper } from './Escrow'
 import { FederatedAttestationsWrapper } from './FederatedAttestations'
 import { StableTokenWrapper } from './StableTokenWrapper'
@@ -10,7 +10,7 @@ testWithGanache('Escrow Wrapper', (web3) => {
   const TEN_CUSD = kit.web3.utils.toWei('10', 'ether')
   const TIMESTAMP = 1665080820
 
-  function getParsedSignatureOfAddressForTest(address, signer) {
+  function getParsedSignatureOfAddressForTest(address: string, signer: string) {
     return getParsedSignatureOfAddress(
       web3.utils.soliditySha3,
       kit.connection.sign,

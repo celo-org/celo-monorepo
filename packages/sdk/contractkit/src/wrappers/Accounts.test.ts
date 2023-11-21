@@ -1,4 +1,4 @@
-import { getParsedSignatureOfAddress } from '@celo/contractkit/lib/utils/getParsedSignatureOfAddress'
+import { getParsedSignatureOfAddress } from '../utils/getParsedSignatureOfAddress'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'

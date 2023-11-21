@@ -1,9 +1,8 @@
 import { NativeSigner, Signature, Signer } from '@celo/base/lib/signatureUtils'
 import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
-import { getParsedSignatureOfAddress } from '@celo/contractkit/lib/utils/getParsedSignatureOfAddress'
 import {
-  LocalSigner,
   hashMessageWithPrefix,
+  LocalSigner,
   parseSignature,
   signedMessageToPublicKey,
 } from '@celo/utils/lib/signatureUtils'
@@ -11,6 +10,7 @@ import { soliditySha3 } from '@celo/utils/lib/solidity'
 import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
 import type BN from 'bn.js' // just the types
 import { Accounts } from '../generated/Accounts'
+import { getParsedSignatureOfAddress } from '../utils/getParsedSignatureOfAddress'
 import { newContractVersion } from '../versions'
 import {
   proxyCall,
