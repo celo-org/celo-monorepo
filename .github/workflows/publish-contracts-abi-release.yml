@@ -61,20 +61,20 @@ jobs:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
 
-      - if: ${{ env.RELEASE_VERSION != '' }}
-        name: Publish @celo/contracts
-        run: yarn publish contracts --tag latest --version $RELEASE_VERSION --no-git-tag-version
-        working-directory: packages/protocol
+      - name: Publish @celo/contracts
+        run: npm publish --tag latest $DRY_RUN
+        working-directory: packages/protocol/contracts
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
           NPM_TOKEN: ${{ env.NPM_TOKEN }}
+          DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
 
-      - if: ${{ env.RELEASE_VERSION != '' }}
-        name: Publish @celo/abis
-        run: yarn publish build/contracts --tag latest --version $RELEASE_VERSION --no-git-tag-version
-        working-directory: packages/protocol
+      - name: Publish @celo/abis
+        run: npm publish --tag latest $DRY_RUN
+        working-directory: packages/protocol/abis
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
           NPM_TOKEN: ${{ env.NPM_TOKEN }}
+          DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}

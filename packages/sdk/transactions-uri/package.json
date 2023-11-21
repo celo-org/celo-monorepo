@@ -1,6 +1,6 @@
 {
   "name": "@celo/transactions-uri",
-  "version": "5.0.6-beta.0",
+  "version": "5.0.6",
   "description": "Celo's transactions uri generation",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -24,8 +24,8 @@
   "dependencies": {
     "@types/debug": "^4.1.5",
     "@types/qrcode": "^1.3.4",
-    "@celo/base": "^6.0.0-beta.0",
-    "@celo/connect": "^5.1.1-beta.0",
+    "@celo/base": "^6.0.0",
+    "@celo/connect": "^5.1.1",
     "bn.js": "4.11.9",
     "qrcode": "1.4.4",
     "web3-eth-abi": "1.10.0"
@@ -33,7 +33,7 @@
   "devDependencies": {
     "@celo/celo-devchain": "^6.0.2-beta.2",
     "@celo/dev-utils": "0.0.1",
-    "@celo/contractkit": "^5.2.0-beta.0",
+    "@celo/contractkit": "^5.2.0",
     "dotenv": "^8.2.0"
   },
   "engines": {

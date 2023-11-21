@@ -1,5 +1,15 @@
 # @celo/wallet-base
 
+## 5.1.1
+
+### Patch Changes
+
+- Updated dependencies [679ef0c60]
+- Updated dependencies [97d5ccf43]
+  - @celo/connect@5.1.1
+  - @celo/base@6.0.0
+  - @celo/utils@5.0.6
+
 ## 5.1.1-beta.0
 
 ### Patch Changes
