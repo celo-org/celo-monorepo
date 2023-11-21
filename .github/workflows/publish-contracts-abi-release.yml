@@ -67,7 +67,7 @@ jobs:
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-          NPM_TOKEN: ${{ env.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
           DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
 
       - name: Publish @celo/abis
@@ -76,5 +76,5 @@ jobs:
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-          NPM_TOKEN: ${{ env.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
           DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
