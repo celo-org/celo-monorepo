@@ -926,6 +926,18 @@
     targz "^1.0.1"
     tmp "^0.2.1"
 
+"@celo/celo-devchain@^6.0.2-beta.2":
+  version "6.0.2-beta.2"
+  resolved "https://registry.yarnpkg.com/@celo/celo-devchain/-/celo-devchain-6.0.2-beta.2.tgz#5fdbf474692fddda8ec0380814b73fe4a26ab6b4"
+  integrity sha512-593lnEyadgRdZ4qiSGSOaCt7XPGPuXq/CkmGNAogrzr83MBXIeGV6YhzYEMALkGmx8CAkmcg2qCd50lGF33VnA==
+  dependencies:
+    "@celo/contractkit" "^5.0.4"
+    commander "^10.0.0"
+    ganache "npm:@celo/ganache@7.8.0-unofficial.0"
+    node-fetch "^3.3.0"
+    targz "^1.0.1"
+    tmp "^0.2.1"
+
 "@celo/connect@^5.1.0":
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/@celo/connect/-/connect-5.1.0.tgz#a557f4c46c26251408fbc529e7b7b08c2934bad7"

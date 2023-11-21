@@ -1,7 +1,7 @@
 import { Address } from '@celo/base/lib/address'
 import { Signature } from '@celo/base/lib/signatureUtils'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import MTWContract from '@celo/protocol/build/contracts/MetaTransactionWallet.json'
+import MTWContract from '@celo/celo-devchain/contracts/contracts-0.5/MetaTransactionWallet.json'
 import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { bufferToHex } from '@ethereumjs/util'
 import BigNumber from 'bignumber.js'
