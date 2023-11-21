@@ -34,7 +34,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-          #registry-url: 'https://registry.npmjs.org'
+          registry-url: 'https://registry.npmjs.org'
           #scope: '@celo'
 
       - name: 'Setup yarn'
