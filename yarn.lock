@@ -914,18 +914,6 @@
     "@stablelib/blake2xs" "0.10.4"
     big-integer "^1.6.44"
 
-"@celo/celo-devchain@^6.0.2-beta.0":
-  version "6.0.2-beta.0"
-  resolved "https://registry.yarnpkg.com/@celo/celo-devchain/-/celo-devchain-6.0.2-beta.0.tgz#8970655fc47aa04d1919be33f3b554570785d8d3"
-  integrity sha512-hhcfYpoc6lKa4tAb0dQDrzKlJnGiGj2WHIz9jGTrC2lwo7OdNEEWGk5JFl02iPc5kOHDExx3+zCSdKF34/LT0g==
-  dependencies:
-    "@celo/contractkit" "^5.0.4"
-    commander "^10.0.0"
-    ganache "npm:@celo/ganache@7.8.0-unofficial.0"
-    node-fetch "^3.3.0"
-    targz "^1.0.1"
-    tmp "^0.2.1"
-
 "@celo/celo-devchain@^6.0.2-beta.2":
   version "6.0.2-beta.2"
   resolved "https://registry.yarnpkg.com/@celo/celo-devchain/-/celo-devchain-6.0.2-beta.2.tgz#5fdbf474692fddda8ec0380814b73fe4a26ab6b4"
