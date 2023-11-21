@@ -1,5 +1,5 @@
+import { getParsedSignatureOfAddress } from '@celo/contractkit/lib/utils/getParsedSignatureOfAddress'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import { newKitFromWeb3 } from '../kit'
 import { EscrowWrapper } from './Escrow'
 import { FederatedAttestationsWrapper } from './FederatedAttestations'
@@ -9,6 +9,15 @@ testWithGanache('Escrow Wrapper', (web3) => {
   const kit = newKitFromWeb3(web3)
   const TEN_CUSD = kit.web3.utils.toWei('10', 'ether')
   const TIMESTAMP = 1665080820
+
+  function getParsedSignatureOfAddressForTest(address, signer) {
+    return getParsedSignatureOfAddress(
+      web3.utils.soliditySha3,
+      kit.connection.sign,
+      address,
+      signer
+    )
+  }
 
   let accounts: string[] = []
   let escrow: EscrowWrapper
@@ -59,7 +68,7 @@ testWithGanache('Escrow Wrapper', (web3) => {
     const receiver: string = accounts[2]
     const withdrawKeyAddress: string = accounts[3]
     const oneDayInSecs: number = 86400
-    const parsedSig = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
+    const parsedSig = await getParsedSignatureOfAddressForTest(receiver, withdrawKeyAddress)
 
     await federatedAttestations
       .registerAttestationAsIssuer(identifier, receiver, TIMESTAMP)
@@ -99,7 +108,7 @@ testWithGanache('Escrow Wrapper', (web3) => {
     const receiver: string = accounts[2]
     const withdrawKeyAddress: string = accounts[3]
     const oneDayInSecs: number = 86400
-    const parsedSig = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
+    const parsedSig = await getParsedSignatureOfAddressForTest(receiver, withdrawKeyAddress)
 
     await stableTokenContract
       .approve(escrow.address, TEN_CUSD)
@@ -128,7 +137,7 @@ testWithGanache('Escrow Wrapper', (web3) => {
     const receiver: string = accounts[2]
     const withdrawKeyAddress: string = accounts[3]
     const oneDayInSecs: number = 86400
-    const parsedSig = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
+    const parsedSig = await getParsedSignatureOfAddressForTest(receiver, withdrawKeyAddress)
 
     await federatedAttestations
       .registerAttestationAsIssuer(identifier, receiver, TIMESTAMP)

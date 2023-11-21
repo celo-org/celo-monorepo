@@ -1,8 +1,9 @@
 import { NativeSigner, Signature, Signer } from '@celo/base/lib/signatureUtils'
 import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
+import { getParsedSignatureOfAddress } from '@celo/contractkit/lib/utils/getParsedSignatureOfAddress'
 import {
-  hashMessageWithPrefix,
   LocalSigner,
+  hashMessageWithPrefix,
   parseSignature,
   signedMessageToPublicKey,
 } from '@celo/utils/lib/signatureUtils'
@@ -496,9 +497,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   private async getParsedSignatureOfAddress(address: Address, signer: string, signerFn: Signer) {
-    const hash = soliditySha3({ type: 'address', value: address })
-    const signature = await signerFn.sign(hash!)
-    return parseSignature(hash!, signature, signer)
+    return getParsedSignatureOfAddress(soliditySha3, signerFn.sign, address, signer)
   }
 
   private keccak256(value: string | BN): string {
