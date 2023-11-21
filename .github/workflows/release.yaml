@@ -11,7 +11,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   release:
-    name: Prepare Release
+    name: Prepare or Publish
     runs-on: ['self-hosted', 'org', 'npm-publish']
     permissions:
       contents: write
