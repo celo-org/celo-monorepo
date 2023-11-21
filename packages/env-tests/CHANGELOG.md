@@ -1,5 +1,23 @@
 # @celo/env-tests
 
+## 1.0.2
+
+### Patch Changes
+
+- 22ea7f691: Remove moment.js dependency
+- Updated dependencies
+- Updated dependencies [679ef0c60]
+- Updated dependencies [97d5ccf43]
+- Updated dependencies [32face3d8]
+- Updated dependencies [97d5ccf43]
+- Updated dependencies [87647b46b]
+  - @celo/contractkit@5.2.0
+  - @celo/connect@5.1.1
+  - @celo/phone-utils@6.0.0
+  - @celo/base@6.0.0
+  - @celo/cryptographic-utils@5.0.6
+  - @celo/utils@5.0.6
+
 ## 1.0.2-beta.0
 
 ### Patch Changes
