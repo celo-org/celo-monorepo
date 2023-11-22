@@ -1,7 +1,7 @@
 import { Address } from '@celo/connect'
 import { describeEach } from '@celo/dev-utils/lib/describeEach'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
-import SortedOraclesABI from '@celo/celo-devchain/contracts/contracts-0.5/SortedOracles.json'
+import SortedOraclesArtifacts from '@celo/celo-devchain/contracts/contracts-0.5/SortedOracles.json'
 import { CeloContract } from '../base'
 import { StableToken } from '../celo-tokens'
 import { newKitFromWeb3 } from '../kit'
@@ -19,7 +19,7 @@ TEST NOTES:
 
 testWithGanache('SortedOracles Wrapper', (web3) => {
   const kit = newKitFromWeb3(web3)
-  const SortedOracles = truffleContract(SortedOraclesABI)
+  const SortedOracles = truffleContract(SortedOraclesArtifacts)
   SortedOracles.setProvider(web3.currentProvider)
 
   async function reportAsOracles(

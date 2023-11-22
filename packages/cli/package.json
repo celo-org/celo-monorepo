@@ -30,12 +30,12 @@
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/base": "^6.0.0-beta.0",
+    "@celo/base": "^6.0.0",
     "@celo/celo-devchain": "^6.0.2",
-    "@celo/connect": "^5.1.1-beta.0",
-    "@celo/contractkit": "^5.2.0-beta.0",
-    "@celo/explorer": "^5.0.6-beta.0",
-    "@celo/governance": "^5.0.6-beta.0",
+    "@celo/connect": "^5.1.1",
+    "@celo/contractkit": "^5.2.0",
+    "@celo/explorer": "^5.0.6",
+    "@celo/governance": "^5.0.6",
     "@celo/identity": "^5.1.1",
     "@celo/phone-utils": "^6.0.0",
     "@celo/utils": "^5.0.6",
