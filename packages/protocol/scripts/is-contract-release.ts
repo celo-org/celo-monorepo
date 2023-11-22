@@ -10,11 +10,13 @@ if (!match) {
 }
 
 const [, gitTag] = match
-const [major, minor, patchAndMore] = gitTag.split('.')
-const semver = new SemVer([major, minor, patchAndMore].map((x) => x || 0).join('.'))
+const [major, minor, ...patchAndMore] = gitTag.split('.')
+const semver = new SemVer(
+  [major, minor || 0, ...(patchAndMore.length ? patchAndMore : [0])].map((x) => x || 0).join('.')
+)
 
 // tslint:disable-next-line
 console.log(`RELEASE_VERSION=${semver.version}`)
 // tslint:disable-next-line
-console.log(`RELEASE_TYPE=${semver.prerelease.length ? 'prerelease' : 'release'}`)
+console.log(`RELEASE_TYPE=${semver.prerelease.length ? semver.prerelease[0] : 'latest'}`)
 process.exit(0)
