@@ -541,7 +541,7 @@ export enum TestMode {
   Data = 'data',
   Transfer = 'transfer',
   StableTransfer = 'stable_transfer',
-  ContractCall = 'contract-call',
+  ContractCall = 'contract_call',
 }
 
 export const simulateClient = async (
