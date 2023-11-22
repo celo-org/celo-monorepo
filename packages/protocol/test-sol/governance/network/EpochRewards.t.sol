@@ -367,3 +367,20 @@ contract EpochRewardsFoundryTest_setTargetVotingYield is EpochRewardsFoundryTest
   }
 }
 
+// const getExpectedTargetTotalSupply = (timeDelta: BigNumber): BigNumber => {
+//   const genesisSupply = new BigNumber(web3.utils.toWei('600000000'))
+//   const linearRewards = new BigNumber(web3.utils.toWei('200000000'))
+//   return genesisSupply
+//     .plus(timeDelta.times(linearRewards).div(YEAR.times(15)))
+//     .integerValue(BigNumber.ROUND_FLOOR)
+// }
+
+contract EpochRewardsFoundryTest_getTargetGoldTotalSupply is EpochRewardsFoundryTest {
+  function test_whenLessThan15YearsSinceGenesis_shouldReturn1B() public {
+    uint256 timeDelta = 365 * 24 * 60 * 60 * 10;
+    vm.warp(block.timestamp + timeDelta);
+
+    assertEq(epochRewards.getTargetGoldTotalSupply(), getExpectedTargetTotalSupply(timeDelta));
+  }
+
+}
