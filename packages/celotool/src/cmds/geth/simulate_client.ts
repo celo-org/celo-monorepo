@@ -2,10 +2,10 @@
 import BigNumber from 'bignumber.js'
 import { AccountType, generateAddress, generatePrivateKey } from 'src/lib/generate_utils'
 import {
-  MAX_LOADTEST_THREAD_COUNT,
-  TestMode,
   getIndexForLoadTestThread,
+  MAX_LOADTEST_THREAD_COUNT,
   simulateClient,
+  TestMode,
 } from 'src/lib/geth'
 import * as yargs from 'yargs'
 export const command = 'simulate-client'
