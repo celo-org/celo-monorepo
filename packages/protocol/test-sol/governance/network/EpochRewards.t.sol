@@ -2,8 +2,14 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
-import "../../../contracts/governance/EpochRewards.sol";
+// import "../../../contracts/governance/EpochRewards.sol";
 import "../../../contracts/common/Registry.sol";
+
+import "../../../contracts/governance/test/MockElection.sol";
+import "../../../contracts/governance/test/EpochRewardsTest.sol"; // TODO move this to test-sol? // TODO import only EpochRewardsTest
+
+import "../../../contracts/stability/test/MockSortedOracles.sol";
+import "../../../contracts/stability/test/MockStableToken.sol";
 
 import "forge-std/console.sol";
 
@@ -19,6 +25,8 @@ contract EpochRewardsFoundryTest is Test {
   event TargetVotingYieldParametersSet(uint256 max, uint256 adjustmentFactor);
   event TargetVotingYieldSet(uint256 target);
 
+  uint256 constant YEAR = 365 * 24 * 60 * 60;
+
   uint256 constant targetVotingYieldParamsInitial = 160000000000000000000; //0.00016
   uint256 constant targetVotingYieldParamsMax = 500000000000000000000; // 0.0005
   uint256 constant targetVotingYieldParamsAdjustmentFactor = 1127990000000000000; // 0.00000112799
@@ -32,25 +40,62 @@ contract EpochRewardsFoundryTest is Test {
   uint256 constant communityRewardFraction = (1 * 1e24) / uint256(4);
   uint256 constant carbonOffsettingFraction = (1 * 1e24) / uint256(200);
 
-  EpochRewards epochRewards;
+  uint256 constant exchangeRate = 7;
+  uint256 constant sortedOraclesDenominator = 1e24;
+
+  EpochRewardsTest epochRewards;
+  MockElection mockElection;
+  MockSortedOracles mockSortedOracles;
+  MockStableToken mockStableToken;
 
   // mocked contracts
   Registry registry;
 
   address caller = address(this);
+
+  function getExpectedTargetTotalSupply(uint256 timeDelta) internal pure returns (uint256) {
+    // const getExpectedTargetTotalSupply = (timeDelta: BigNumber): BigNumber => {
+    //   const genesisSupply = new BigNumber(web3.utils.toWei('600000000'))
+    //   const linearRewards = new BigNumber(web3.utils.toWei('200000000'))
+    //   return genesisSupply
+    //     .plus(timeDelta.times(linearRewards).div(YEAR.times(15)))
+    //     .integerValue(BigNumber.ROUND_FLOOR)
+    // }
+
+    uint256 genesisSupply = 600000000 ether;
+    uint256 linearRewards = 200000000 ether;
+
+    return uint256(genesisSupply + (timeDelta * linearRewards) / (YEAR * 15));
+
+  }
   // uint256 callerPK;
 
   function setUp() public {
-    epochRewards = new EpochRewards(true);
+    epochRewards = new EpochRewardsTest();
+
+    mockElection = new MockElection();
+    mockSortedOracles = new MockSortedOracles();
+    mockStableToken = new MockStableToken();
 
     registry = new Registry(true);
+
+    // TODO not all tests require all this setup, so an optimization
+    // would be to generate multiple ones inheriting
+    registry.setAddressFor("Election", address(mockElection));
+    registry.setAddressFor("SortedOracles", address(mockSortedOracles));
+    registry.setAddressFor("StableToken", address(mockStableToken));
+
+    mockSortedOracles.setMedianRate(
+      address(mockStableToken),
+      sortedOraclesDenominator * exchangeRate
+    );
 
     // callerPK = 0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d;
     // caller = getAddressFromPrivateKey(callerPK);
 
     console.log(targetVotingGoldFraction);
 
-    vm.prank(caller);
+    vm.prank(caller); // TODO remove this
     epochRewards.initialize(
       address(registry),
       targetVotingYieldParamsInitial,
@@ -367,20 +412,44 @@ contract EpochRewardsFoundryTest_setTargetVotingYield is EpochRewardsFoundryTest
   }
 }
 
-// const getExpectedTargetTotalSupply = (timeDelta: BigNumber): BigNumber => {
-//   const genesisSupply = new BigNumber(web3.utils.toWei('600000000'))
-//   const linearRewards = new BigNumber(web3.utils.toWei('200000000'))
-//   return genesisSupply
-//     .plus(timeDelta.times(linearRewards).div(YEAR.times(15)))
-//     .integerValue(BigNumber.ROUND_FLOOR)
-// }
-
 contract EpochRewardsFoundryTest_getTargetGoldTotalSupply is EpochRewardsFoundryTest {
   function test_whenLessThan15YearsSinceGenesis_shouldReturn1B() public {
-    uint256 timeDelta = 365 * 24 * 60 * 60 * 10;
+    uint256 timeDelta = YEAR * 10;
     vm.warp(block.timestamp + timeDelta);
-
     assertEq(epochRewards.getTargetGoldTotalSupply(), getExpectedTargetTotalSupply(timeDelta));
+  }
+
+}
+
+contract EpochRewardsFoundryTest_getTargetVoterRewards is EpochRewardsFoundryTest {
+  function test_whenThereAreActiveVotes_shouldReturnAPercentageOfActiveVotes() public {
+    uint256 activeVotes = 1000000;
+
+    mockElection.setActiveVotes(activeVotes);
+    // fromFixed(targetVotingYieldParams.initial).times(activeVotes)
+    uint256 expected = uint256((activeVotes * targetVotingYieldParamsInitial) / 1e24);
+
+    assertEq(epochRewards.getTargetVoterRewards(), expected);
+  }
+
+}
+
+contract EpochRewardsFoundryTest_getTargetTotalEpochPaymentsInGold is EpochRewardsFoundryTest {
+  function test_whenExchangeRateIsSet_getTargetTotalEpochPaymentsInGold() public {
+    // TODO change seems off
+
+    uint256 numberValidators = 100;
+    epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
+    uint256 expected = uint256((targetValidatorEpochPayment * numberValidators) / exchangeRate);
+
+    assertEq(epochRewards.getTargetTotalEpochPaymentsInGold(), expected);
+
+    // mockElection.setActiveVotes(activeVotes);
+    // fromFixed(targetVotingYieldParams.initial).times(activeVotes)
+    // uint256 expected = uint256(activeVotes * targetVotingYieldParamsInitial / 1e24);
+
+    // assertEq(epochRewards.getTargetVoterRewards(), expected);
+
   }
 
 }
