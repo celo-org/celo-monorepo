@@ -3,7 +3,6 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
-import "forge-std/console.sol";
 import "../contracts/identity/Escrow.sol";
 import "../contracts/identity/FederatedAttestations.sol";
 import "../contracts/identity/test/MockAttestations.sol";
@@ -908,16 +907,16 @@ contract BackwardCompatibility is AccountsTest {
     }
   }
 
-  function getSignature(address account, bytes32 role, uint256 signerPK, bool genericWrite)
+  function getSignature(address _account, bytes32 role, uint256 _signerPK, bool genericWrite)
     public
     view
     returns (uint8, bytes32, bytes32)
   {
     if (genericWrite) {
-      return getSignatureForAuthorization(account, role, signerPK, 31337, address(accounts));
+      return getSignatureForAuthorization(_account, role, _signerPK, 31337, address(accounts));
     }
 
-    return getParsedSignatureOfAddress(account, signerPK);
+    return getParsedSignatureOfAddress(_account, _signerPK);
   }
 
   function getRole(Role role) public pure returns (bytes32 _role) {
@@ -968,6 +967,24 @@ contract BackwardCompatibility is AccountsTest {
         accounts.authorizeVoteSigner(_signer, _v, _r, _s);
       } else if (role == Role.Validator) {
         accounts.authorizeValidatorSigner(_signer, _v, _r, _s);
+      }
+    }
+    vm.stopPrank();
+  }
+
+  function removeSigner(bool genericWrite, Role role, address _account) public {
+    vm.startPrank(_account);
+    bytes32 _role = getRole(role);
+    if (genericWrite) {
+      address defaultSigner = accounts.getIndexedSigner(_account, _role);
+      accounts.removeSigner(defaultSigner, _role);
+    } else {
+      if (role == Role.Attestation) {
+        accounts.removeAttestationSigner();
+      } else if (role == Role.Vote) {
+        accounts.removeVoteSigner();
+      } else if (role == Role.Validator) {
+        accounts.removeValidatorSigner();
       }
     }
     vm.stopPrank();
@@ -1206,5 +1223,314 @@ contract BackwardCompatibility is AccountsTest {
     bytes32 _role = getRole(Role.Attestation);
     (uint8 _v, bytes32 _r, bytes32 _s) = getSignature(account, _role, signerPK, true);
     authorizeSignerFactory(signer, _role, _v, _r, _s, true);
+  }
+
+  function helperShouldRevertIfSignatureIsIncorrect(Role role, bool genericWrite) public {
+    (, uint256 otherSignerPK) = actorWithPK("otherSigner");
+    bytes32 _role = getRole(role);
+    (uint8 v, bytes32 r, bytes32 s) = getSignature(account, _role, otherSignerPK, genericWrite);
+    vm.expectRevert("Invalid signature");
+    authorizeSignerFactory(signer, _role, v, r, s, true);
+  }
+
+  function test_ShouldRevertIfSignatureIsIncorrect_Attestations_GenericWriteTrue() public {
+    helperShouldRevertIfSignatureIsIncorrect(Role.Attestation, true);
+  }
+
+  function test_ShouldRevertIfSignatureIsIncorrect_Attestations_GenericWriteFalse() public {
+    helperShouldRevertIfSignatureIsIncorrect(Role.Attestation, false);
+  }
+
+  function test_ShouldRevertIfSignatureIsIncorrect_Vote_GenericWriteTrue() public {
+    helperShouldRevertIfSignatureIsIncorrect(Role.Vote, true);
+  }
+
+  function test_ShouldRevertIfSignatureIsIncorrect_Vote_GenericWriteFalse() public {
+    helperShouldRevertIfSignatureIsIncorrect(Role.Vote, false);
+  }
+
+  function test_ShouldRevertIfSignatureIsIncorrect_Validator_GenericWriteTrue() public {
+    helperShouldRevertIfSignatureIsIncorrect(Role.Validator, true);
+  }
+
+  function test_ShouldRevertIfSignatureIsIncorrect_Validator_GenericWriteFalse() public {
+    helperShouldRevertIfSignatureIsIncorrect(Role.Validator, false);
+  }
+
+  function helperShouldSetTheNewAuthorized(Role role, bool genericWrite, bool genericRead) public {
+    authorize(role, genericWrite, account, signer, signerPK);
+    (address newAuthorized, uint256 newAuthorizedPK) = actorWithPK("otherSigner");
+    authorize(role, genericWrite, account, newAuthorized, newAuthorizedPK);
+
+    assertEq(accounts.authorizedBy(newAuthorized), account);
+    assertEq(getAuthorizedFromAccount(role, genericRead, account), newAuthorized);
+    assertEq(authorizedSignerToAccount(role, genericRead, newAuthorized), account);
+    assertEq(accounts.authorizedBy(signer), account);
+  }
+
+  function test_ShouldSetTheNewAuthorized_WhenPreviousAuthorizationHasBeenMade_Attestations_GenericWriteTrue_GenericReadTrue()
+    public
+  {
+    helperShouldSetTheNewAuthorized(Role.Attestation, true, true);
+  }
+
+  function test_ShouldSetTheNewAuthorized_WhenPreviousAuthorizationHasBeenMade_Attestations_GenericWriteTrue_GenericReadFalse()
+    public
+  {
+    helperShouldSetTheNewAuthorized(Role.Attestation, true, false);
+  }
+
+  function test_ShouldSetTheNewAuthorized_WhenPreviousAuthorizationHasBeenMade_Attestations_GenericWriteFalse_GenericReadTrue()
+    public
+  {
+    helperShouldSetTheNewAuthorized(Role.Attestation, false, true);
+  }
+
+  function test_ShouldSetTheNewAuthorized_WhenPreviousAuthorizationHasBeenMade_Attestations_GenericWriteFalse_GenericReadFalse()
+    public
+  {
+    helperShouldSetTheNewAuthorized(Role.Attestation, false, false);
+  }
+
+  function test_ShouldSetTheNewAuthorized_WhenPreviousAuthorizationHasBeenMade_Vote_GenericWriteTrue_GenericReadTrue()
+    public
+  {
+    helperShouldSetTheNewAuthorized(Role.Vote, true, true);
+  }
+
+  function test_ShouldSetTheNewAuthorized_WhenPreviousAuthorizationHasBeenMade_Vote_GenericWriteTrue_GenericReadFalse()
+    public
+  {
+    helperShouldSetTheNewAuthorized(Role.Vote, true, false);
+  }
+
+  function test_ShouldSetTheNewAuthorized_WhenPreviousAuthorizationHasBeenMade_Vote_GenericWriteFalse_GenericReadTrue()
+    public
+  {
+    helperShouldSetTheNewAuthorized(Role.Vote, false, true);
+  }
+
+  function test_ShouldSetTheNewAuthorized_WhenPreviousAuthorizationHasBeenMade_Vote_GenericWriteFalse_GenericReadFalse()
+    public
+  {
+    helperShouldSetTheNewAuthorized(Role.Vote, false, false);
+  }
+
+  function test_ShouldSetTheNewAuthorized_WhenPreviousAuthorizationHasBeenMade_Validator_GenericWriteTrue_GenericReadTrue()
+    public
+  {
+    helperShouldSetTheNewAuthorized(Role.Validator, true, true);
+  }
+
+  function test_ShouldSetTheNewAuthorized_WhenPreviousAuthorizationHasBeenMade_Validator_GenericWriteTrue_GenericReadFalse()
+    public
+  {
+    helperShouldSetTheNewAuthorized(Role.Validator, true, false);
+  }
+
+  function test_ShouldSetTheNewAuthorized_WhenPreviousAuthorizationHasBeenMade_Validator_GenericWriteFalse_GenericReadTrue()
+    public
+  {
+    helperShouldSetTheNewAuthorized(Role.Validator, false, true);
+  }
+
+  function test_ShouldSetTheNewAuthorized_WhenPreviousAuthorizationHasBeenMade_Validator_GenericWriteFalse_GenericReadFalse()
+    public
+  {
+    helperShouldSetTheNewAuthorized(Role.Validator, false, false);
+  }
+
+  function helperShouldReturnCorrectValues_WhenAccountHasNotAuthorized(Role role, bool genericRead)
+    public
+  {
+    assertEq(authorizedSignerToAccount(role, genericRead, account), account);
+
+    vm.expectRevert("Must first register address with Account.createAccount");
+    authorizedSignerToAccount(role, genericRead, otherAccount);
+
+    assertEq(getAuthorizedFromAccount(role, genericRead, account), account);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasNotAuthorized_Attestation_GenericReadTrue()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasNotAuthorized(Role.Attestation, true);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasNotAuthorized_Attestation_GenericReadFalse()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasNotAuthorized(Role.Attestation, false);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasNotAuthorized_Vote_GenericReadTrue()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasNotAuthorized(Role.Vote, true);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasNotAuthorized_Vote_GenericReadFalse()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasNotAuthorized(Role.Vote, false);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasNotAuthorized_Validator_GenericReadTrue()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasNotAuthorized(Role.Validator, true);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasNotAuthorized_Validator_GenericReadFalse()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasNotAuthorized(Role.Validator, false);
+  }
+
+  function helperShouldReturnCorrectValues_WhenAccountHasAuthorized(
+    Role role,
+    bool genericRead,
+    bool genericWrite
+  ) public {
+    assertEq(authorizedSignerToAccount(role, genericRead, account), account);
+
+    authorize(role, genericWrite, account, signer, signerPK);
+    assertEq(authorizedSignerToAccount(role, genericRead, signer), account);
+    assertEq(getAuthorizedFromAccount(role, genericRead, account), signer);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasAuthorized_Attestation_GenericReadTrue_GenericWriteTrue()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Attestation, true, true);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasAuthorized_Attestation_GenericReadFalse_GenericWriteTrue()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Attestation, false, true);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasAuthorized_Attestation_GenericReadTrue_GenericWriteFalse()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Attestation, true, false);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasAuthorized_Attestation_GenericReadFalse_GenericWriteFalse()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Attestation, false, false);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasAuthorized_Vote_GenericReadTrue_GenericWriteTrue()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Vote, true, true);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasAuthorized_Vote_GenericReadFalse_GenericWriteTrue()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Vote, false, true);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasAuthorized_Vote_GenericReadTrue_GenericWriteFalse()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Vote, true, false);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasAuthorized_Vote_GenericReadFalse_GenericWriteFalse()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Vote, false, false);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasAuthorized_Validator_GenericReadTrue_GenericWriteTrue()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Validator, true, true);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasAuthorized_Validator_GenericReadFalse_GenericWriteTrue()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Validator, false, true);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasAuthorized_Validator_GenericReadTrue_GenericWriteFalse()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Validator, true, false);
+  }
+
+  function test_ShouldReturnCorrectValues_WhenAccountHasAuthorized_Validator_GenericReadFalse_GenericWriteFalse()
+    public
+  {
+    helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Validator, false, false);
+  }
+
+  function helper_ShouldRemoveSigner(Role role, bool genericRead, bool genericWrite) public {
+    authorize(role, genericWrite, account, signer, signerPK);
+    assertEq(hasAuthorizedSigner(role, account, genericRead), true, "No authorized signer");
+    assertEq(
+      getAuthorizedFromAccount(role, genericRead, account),
+      signer,
+      "authorized from account"
+    );
+
+    removeSigner(genericWrite, role, account);
+
+    assertEq(hasAuthorizedSigner(role, account, genericRead), false, "Authorized signer");
+    assertEq(getAuthorizedFromAccount(role, genericRead, account), account);
+  }
+
+  function test_ShouldRemoveSigner_Attestations_GenericReadTrue_GenericWriteTrue() public {
+    helper_ShouldRemoveSigner(Role.Attestation, true, true);
+  }
+
+  function test_ShouldRemoveSigner_Attestations_GenericReadFalse_GenericWriteTrue() public {
+    helper_ShouldRemoveSigner(Role.Attestation, false, true);
+  }
+
+  function test_ShouldRemoveSigner_Attestations_GenericReadTrue_GenericWriteFalse() public {
+    helper_ShouldRemoveSigner(Role.Attestation, true, false);
+  }
+
+  function test_ShouldRemoveSigner_Attestations_GenericReadFalse_GenericWriteFalse() public {
+    helper_ShouldRemoveSigner(Role.Attestation, false, true);
+  }
+
+  function test_ShouldRemoveSigner_Vote_GenericReadTrue_GenericWriteTrue() public {
+    helper_ShouldRemoveSigner(Role.Vote, true, true);
+  }
+
+  function test_ShouldRemoveSigner_Vote_GenericReadFalse_GenericWriteTrue() public {
+    helper_ShouldRemoveSigner(Role.Vote, false, true);
+  }
+
+  function test_ShouldRemoveSigner_Vote_GenericReadTrue_GenericWriteFalse() public {
+    helper_ShouldRemoveSigner(Role.Vote, true, false);
+  }
+
+  function test_ShouldRemoveSigner_Vote_GenericReadFalse_GenericWriteFalse() public {
+    helper_ShouldRemoveSigner(Role.Vote, false, true);
+  }
+
+  function test_ShouldRemoveSigner_Validator_GenericReadTrue_GenericWriteTrue() public {
+    helper_ShouldRemoveSigner(Role.Validator, true, true);
+  }
+
+  function test_ShouldRemoveSigner_Validator_GenericReadFalse_GenericWriteTrue() public {
+    helper_ShouldRemoveSigner(Role.Validator, false, true);
+  }
+
+  function test_ShouldRemoveSigner_Validator_GenericReadTrue_GenericWriteFalse() public {
+    helper_ShouldRemoveSigner(Role.Validator, true, false);
+  }
+
+  function test_ShouldRemoveSigner_Validator_GenericReadFalse_GenericWriteFalse() public {
+    helper_ShouldRemoveSigner(Role.Validator, false, true);
   }
 }
