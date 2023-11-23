@@ -10,6 +10,7 @@ import "../../../contracts/governance/test/EpochRewardsTest.sol"; // TODO move t
 
 import "../../../contracts/stability/test/MockSortedOracles.sol";
 import "../../../contracts/stability/test/MockStableToken.sol";
+import "../../../contracts/common/test/MockGoldToken.sol";
 
 import "forge-std/console.sol";
 
@@ -43,10 +44,13 @@ contract EpochRewardsFoundryTest is Test {
   uint256 constant exchangeRate = 7;
   uint256 constant sortedOraclesDenominator = 1e24;
 
+  uint256 constant SUPPLY_CAP = 1e9 ether;
+
   EpochRewardsTest epochRewards;
   MockElection mockElection;
   MockSortedOracles mockSortedOracles;
   MockStableToken mockStableToken;
+  MockGoldToken mockGoldToken;
 
   // mocked contracts
   Registry registry;
@@ -76,6 +80,7 @@ contract EpochRewardsFoundryTest is Test {
     mockElection = new MockElection();
     mockSortedOracles = new MockSortedOracles();
     mockStableToken = new MockStableToken();
+    mockGoldToken = new MockGoldToken();
 
     registry = new Registry(true);
 
@@ -84,6 +89,7 @@ contract EpochRewardsFoundryTest is Test {
     registry.setAddressFor("Election", address(mockElection));
     registry.setAddressFor("SortedOracles", address(mockSortedOracles));
     registry.setAddressFor("StableToken", address(mockStableToken));
+    registry.setAddressFor("GoldToken", address(mockGoldToken));
 
     mockSortedOracles.setMedianRate(
       address(mockStableToken),
@@ -436,19 +442,67 @@ contract EpochRewardsFoundryTest_getTargetVoterRewards is EpochRewardsFoundryTes
 
 contract EpochRewardsFoundryTest_getTargetTotalEpochPaymentsInGold is EpochRewardsFoundryTest {
   function test_whenExchangeRateIsSet_getTargetTotalEpochPaymentsInGold() public {
-    // TODO change seems off
-
     uint256 numberValidators = 100;
     epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
     uint256 expected = uint256((targetValidatorEpochPayment * numberValidators) / exchangeRate);
 
     assertEq(epochRewards.getTargetTotalEpochPaymentsInGold(), expected);
+  }
 
-    // mockElection.setActiveVotes(activeVotes);
-    // fromFixed(targetVotingYieldParams.initial).times(activeVotes)
-    // uint256 expected = uint256(activeVotes * targetVotingYieldParamsInitial / 1e24);
+}
 
-    // assertEq(epochRewards.getTargetVoterRewards(), expected);
+contract EpochRewardsFoundryTest_getRewardsMultiplier is EpochRewardsFoundryTest {
+  uint256 constant timeDelta = YEAR * 10;
+  uint256 expectedTargetTotalSupply;
+  uint256 expectedTargetRemainingSupply;
+  uint256 targetEpochReward;
+
+  function setUp() public {
+    super.setUp();
+    expectedTargetTotalSupply = getExpectedTargetTotalSupply(timeDelta);
+    expectedTargetRemainingSupply = SUPPLY_CAP - expectedTargetTotalSupply; // TODO check if this is repeated (initialized as zero)
+    targetEpochReward =
+      epochRewards.getTargetVoterRewards() +
+      epochRewards.getTargetTotalEpochPaymentsInGold();
+  }
+
+  function test_whenTheTargetSupplyIsEqualToTheActualSupplyAfterRewards_shouldReturnOne() public {
+    mockGoldToken.setTotalSupply(expectedTargetTotalSupply - targetEpochReward);
+    vm.warp(block.timestamp + timeDelta); // TODO mabe this goes to setUp
+    assertEq(epochRewards.getRewardsMultiplier(), 1e24);
+  }
+
+  function test_whenTheActualRemainingSupplyIs10pMoreThanTheTargetRemainingSupplyAfterRewards_shouldReturnOnePlus10pTimesTheUnderspendAdjustment()
+    public
+  {
+    uint256 actualRemainingSupply = uint256((expectedTargetRemainingSupply * 11) / 10);
+    uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - targetEpochReward;
+    mockGoldToken.setTotalSupply(totalSupply);
+    vm.warp(block.timestamp + timeDelta);
+
+    uint256 actual = epochRewards.getRewardsMultiplier(); // fromFixed(
+
+    uint256 expected = uint256((1e24 + (rewardsMultiplierAdjustmentsUnderspend / 10)));
+    //  new BigNumber(1).plus(
+    //       fromFixed(rewardsMultiplier.adjustments.underspend).times(0.1)
+    //     )
+    assertApproxEqRel(actual, expected, 1e6);
+  }
+
+  function test_whenTheActualRemainingSupplyIs10PLessThanTheTargetRemainingSupplyAfterRewards_shouldReturnOneMinus10pTimesTheUnderspendAdjustment()
+    public
+  {
+    uint256 actualRemainingSupply = uint256((expectedTargetRemainingSupply * 9) / 10);
+    uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - targetEpochReward;
+    mockGoldToken.setTotalSupply(totalSupply);
+
+    vm.warp(block.timestamp + timeDelta);
+
+    uint256 actual = epochRewards.getRewardsMultiplier(); // fromFixed(
+
+    uint256 expected = uint256((1e24 - (rewardsMultiplierAdjustmentsOverspend / 10)));
+
+    assertApproxEqRel(actual, expected, 1e6);
 
   }
 
