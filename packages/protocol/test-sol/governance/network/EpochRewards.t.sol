@@ -629,7 +629,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
   function test_whenThePercentageOfVotingGoldIs100P_ShouldDecreaseTheTargetVotingYieldBy100minusTargetVotingGoldPercentageTimesAdjustmentFactor()
     public
   {
-    uint256 totalVotes = floatingSupply * 1;
+    uint256 totalVotes = floatingSupply * 1; // explicit one
     mockVotes(totalVotes);
 
     uint256 expected = targetVotingYieldParamsInitial +
@@ -637,6 +637,149 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
     uint256 result;
     (result, , ) = epochRewards.getTargetVotingYieldParameters();
     assertApproxEqRel(result, expected, 1e1);
+  }
+
+  function test_WhenTargetVotingYieldIsIncreasedByAdjustmentFactor_maximumTargetVotingYieldShouldBeEnforced()
+    public
+  {
+    uint256 totalVotes = floatingSupply / 10;
+    mockVotes(totalVotes);
+
+    for (uint256 i = 0; i < 600; i++) {
+      // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
+      // time travel alone is not enough, updateTargetVotingYield needs to be called
+      vm.prank(address(0));
+      epochRewards.updateTargetVotingYield();
+    }
+
+    uint256 result;
+    (result, , ) = epochRewards.getTargetVotingYieldParameters();
+
+    assertApproxEqRel(result, targetVotingYieldParamsMax, 1e1);
+  }
+
+  function test_whenTargetVotingYieldIsDecreasedByAdjustmentFactor_minimumTargetVotingYieldOf0ShouldBeEnforced()
+    public
+  {
+    uint256 totalVotes = (floatingSupply * 98) / 100;
+    mockElection.setTotalVotes(totalVotes);
+    // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
+    for (uint256 i = 0; i < 800; i++) {
+      vm.prank(address(0));
+      epochRewards.updateTargetVotingYield();
+    }
+
+    uint256 result;
+    (result, , ) = epochRewards.getTargetVotingYieldParameters();
+    assertEq(result, 0);
+  }
+
+  function test_whenVotingFractionRemainsBelowTarget5EpochsInARow_targetVotingYieldShouldBeIncreased5TimesAsExpected()
+    public
+  {
+    uint256 totalVotes = (floatingSupply * 3) / 10;
+    mockElection.setTotalVotes(totalVotes);
+    // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
+    for (uint256 i = 0; i < 5; i++) {
+      vm.prank(address(0));
+      epochRewards.updateTargetVotingYield();
+    }
+
+    uint256 expected = targetVotingYieldParamsInitial +
+      (targetVotingYieldParamsAdjustmentFactor *
+        ((targetVotingGoldFraction / 1e24 - 3e24 / 10) / 1e24) *
+        5);
+
+    uint256 result;
+    (result, , ) = epochRewards.getTargetVotingYieldParameters();
+    assertApproxEqRel(result, expected, 1e7);
+  }
+
+  function test_whenVotingFractionRemainsAboveTarget5EpochsInARow_targetVotingYieldShouldBeDecreased5TimesAsExpected()
+    public
+  {
+    uint256 totalVotes = (floatingSupply * 8) / 10;
+    mockElection.setTotalVotes(totalVotes);
+    // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
+    for (uint256 i = 0; i < 5; i++) {
+      vm.prank(address(0));
+      epochRewards.updateTargetVotingYield();
+    }
+
+    uint256 expected = targetVotingYieldParamsInitial +
+      (targetVotingYieldParamsAdjustmentFactor *
+        ((targetVotingGoldFraction / 1e24 - 8e24 / 10) / 1e24) *
+        5);
+
+    uint256 result;
+    (result, , ) = epochRewards.getTargetVotingYieldParameters();
+    assertApproxEqRel(result, expected, 1e6);
+  }
+
+  function test_whenVotingfractionFluctuatesAroundTheTarget_targetVotingYieldShouldBeAdjustedAsExpected()
+    public
+  {
+    uint256[] memory votingNumeratorArray = new uint256[](3);
+    uint256[] memory votingDenominatorArray = new uint256[](3);
+
+    votingNumeratorArray[0] = 8;
+    votingNumeratorArray[1] = 3;
+    votingNumeratorArray[2] = 2;
+
+    votingDenominatorArray[0] = 10;
+    votingDenominatorArray[1] = 10;
+    votingDenominatorArray[2] = 3;
+
+    uint256 expected = targetVotingYieldParamsInitial;
+    for (uint256 i = 0; i < votingNumeratorArray.length; i++) {
+      uint256 totalVotes = (floatingSupply * votingNumeratorArray[i]) / votingDenominatorArray[i];
+      mockVotes(totalVotes);
+      expected =
+        expected +
+        (targetVotingYieldParamsAdjustmentFactor *
+          ((targetVotingGoldFraction /
+            1e24 -
+            ((votingNumeratorArray[i] * (1e24)) / votingDenominatorArray[i])) /
+            1e24));
+    }
+
+    uint256 result;
+    (result, , ) = epochRewards.getTargetVotingYieldParameters();
+    assertApproxEqRel(result, expected, 1e6);
+  }
+
+  function test_whenTargetVotingYieldIsIncreasedOver365EpochsByAdjustmentFactor_targetVotingYieldShouldChangeAsExpected()
+    public
+  {
+    uint256 totalVotes = (floatingSupply * (targetVotingGoldFraction - (1e24 / 10))) / 1e24;
+    mockElection.setTotalVotes(totalVotes);
+    for (uint256 i = 0; i < 356; i++) {
+      vm.prank(address(0));
+      epochRewards.updateTargetVotingYield();
+    }
+
+    uint256 expected = targetVotingYieldParamsInitial +
+      ((targetVotingYieldParamsAdjustmentFactor * 365) / 10);
+    uint256 result;
+    (result, , ) = epochRewards.getTargetVotingYieldParameters();
+    assertApproxEqRel(result, expected, 1e16); // TODO I suspect it has a 1% error due rounding errors, but need to double check
+  }
+
+  function test_whenTargetVotingYieldIsDecreasedOver365EpochsByAdjustmentFactor_targetVotingYieldShouldChangeAsExpected()
+    public
+  {
+    uint256 totalVotes = (floatingSupply * (targetVotingGoldFraction + (1e24 / 10))) / 1e24;
+    mockElection.setTotalVotes(totalVotes);
+    for (uint256 i = 0; i < 356; i++) {
+      vm.prank(address(0));
+      epochRewards.updateTargetVotingYield();
+    }
+
+    uint256 expected = targetVotingYieldParamsInitial -
+      ((targetVotingYieldParamsAdjustmentFactor * 365) / 10);
+    uint256 result;
+    (result, , ) = epochRewards.getTargetVotingYieldParameters();
+    assertApproxEqRel(result, expected, 1e16); // TODO I suspect it has a 1% error due rounding errors, but need to double check
   }
 
 }
