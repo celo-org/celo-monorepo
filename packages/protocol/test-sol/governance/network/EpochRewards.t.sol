@@ -540,14 +540,17 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
     vm.deal(address(reserve), reserveBalance);
   }
 
+  function mockVotes(uint256 votes) internal {
+    mockElection.setTotalVotes(votes); // TODO make function mockElection with these three lines
+    vm.prank(address(0));
+    epochRewards.updateTargetVotingYield();
+  }
+
   function test_whenThePercentageOfVotingGoldIsEqualToTheTarget_shouldNotChangeTheTargetVotingYield()
     public
   {
     uint256 totalVotes = uint256((targetVotingGoldFraction * floatingSupply) / 1e24);
-
-    mockElection.setTotalVotes(totalVotes); // TODO make function mockElection with these three lines
-    vm.prank(address(0));
-    epochRewards.updateTargetVotingYield();
+    mockVotes(totalVotes);
 
     uint256 result;
     (result, , ) = epochRewards.getTargetVotingYieldParameters();
@@ -559,12 +562,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
   {
     // uint256 totalVotes = uint256(((targetVotingGoldFraction* floatingSupply )/10)/1e24);
     uint256 totalVotes = ((floatingSupply * targetVotingGoldFraction) - 1e23) / 1e24;
-
-    console.log("totalVotes");
-    console.log(totalVotes);
-    mockElection.setTotalVotes(totalVotes);
-    vm.prank(address(0));
-    epochRewards.updateTargetVotingYield();
+    mockVotes(totalVotes);
 
     uint256 expected = targetVotingYieldParamsInitial +
       uint256((targetVotingYieldParamsAdjustmentFactor / 10));
@@ -577,9 +575,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
     public
   {
     uint256 totalVotes = ((floatingSupply * targetVotingGoldFraction) + 1e23) / 1e24;
-    mockElection.setTotalVotes(totalVotes);
-    vm.prank(address(0));
-    epochRewards.updateTargetVotingYield();
+    mockVotes(totalVotes);
 
     uint256 expected = targetVotingYieldParamsInitial -
       uint256((targetVotingYieldParamsAdjustmentFactor / 10));
@@ -591,9 +587,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
   function test_whenThePercentageOfVotingCeloIs0p_shouldIncreaseTheTargetVotingYieldByTheTargetVotingGoldPercentageTimesAdjustmentFactor()
     public
   {
-    mockElection.setTotalVotes(0);
-    vm.prank(address(0));
-    epochRewards.updateTargetVotingYield();
+    mockVotes(0);
 
     uint256 expected = targetVotingYieldParamsInitial +
       uint256((targetVotingYieldParamsAdjustmentFactor * targetVotingGoldFraction) / 1e24);
@@ -606,9 +600,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
     public
   {
     uint256 totalVotes = (floatingSupply * 3) / 10;
-    mockElection.setTotalVotes(totalVotes);
-    vm.prank(address(0));
-    epochRewards.updateTargetVotingYield();
+    mockVotes(totalVotes);
 
     uint256 expected = targetVotingYieldParamsInitial +
       uint256(
@@ -623,9 +615,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
     public
   {
     uint256 totalVotes = (floatingSupply * 9) / 10;
-    mockElection.setTotalVotes(totalVotes);
-    vm.prank(address(0));
-    epochRewards.updateTargetVotingYield();
+    mockVotes(totalVotes);
 
     uint256 expected = targetVotingYieldParamsInitial +
       uint256(
@@ -640,9 +630,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
     public
   {
     uint256 totalVotes = floatingSupply * 1;
-    mockElection.setTotalVotes(totalVotes);
-    vm.prank(address(0));
-    epochRewards.updateTargetVotingYield();
+    mockVotes(totalVotes);
 
     uint256 expected = targetVotingYieldParamsInitial +
       uint256((targetVotingYieldParamsAdjustmentFactor * (targetVotingGoldFraction - 1e24)));
