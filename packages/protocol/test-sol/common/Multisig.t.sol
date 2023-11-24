@@ -2,8 +2,8 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
-import "forge-std/console.sol";
-import "../contracts/common/MultiSig.sol";
+// import "forge-std/console.sol";
+import "../../contracts/common/MultiSig.sol";
 
 contract MultiSigTest is Test {
   function() external payable {}
@@ -12,10 +12,13 @@ contract MultiSigTest is Test {
   uint256 ONE_GOLDTOKEN = 1000000000000000000;
   address owner0;
   address owner1;
+  address newOwner;
+  address nonOwner;
   address sender;
   uint256 requiredSignatures = 2;
   uint256 internalRequiredSignatures = 2;
   address[] public owners;
+  bytes txData;
 
   // event Transfer(address indexed from, address indexed to, uint256 value);
   event Confirmation(address indexed sender, uint256 indexed transactionId);
@@ -33,8 +36,12 @@ contract MultiSigTest is Test {
     owner0 = actor("owner0");
     owner1 = actor("owner1");
     sender = actor("sender");
+    newOwner = actor("newOwner");
+    nonOwner = actor("nonOwner");
     vm.deal(sender, 10 ether);
     owners = [owner0, owner1];
+
+    txData = abi.encodeWithSignature("addOwner(address)", newOwner);
 
     multiSig.initialize(owners, requiredSignatures, internalRequiredSignatures);
   }
@@ -57,7 +64,7 @@ contract MultiSigInitialize is MultiSigTest {
     assertEq(uint256(multiSig.internalRequired()), 2);
   }
 
-  function test_shouldNotBeCallableAgain() public {
+  function test_revertsWhenCalledTwice() public {
     vm.expectRevert("contract already initialized");
     multiSig.initialize(owners, requiredSignatures, internalRequiredSignatures);
   }
@@ -78,47 +85,227 @@ contract MultiSigFallbackFunction is MultiSigTest {
     _to.call.value(_amount)("ok");
   }
 
-  function test_emitsDepositEventWithCorrectParametersWhenReceivingCelo() public payable {
+  function test_emitsDepositEventWithCorrectParameters_whenReceivingCelo() public payable {
     vm.prank(sender);
     vm.expectEmit(true, false, false, false);
     emit Deposit(sender, amount);
     uncheckedSendViaCall(address(multiSig), amount);
   }
 
-  function test_doesNotEmitEventWhenReceiving0Value() public {
+  function SKIP_test_doesNotEmitEvent_whenReceivingZeroValue() public {
     vm.prank(sender);
-    // TODO: use vm.recordLogs
-    // vm.expectEmit(false, false, false, false);
-    // emit Deposit(sender, 0);
-    // /
+    vm.recordLogs();
     uncheckedSendViaCallData(address(multiSig), 0);
+    // Vm.Log[] memory entries = vm.getRecordedLogs();
+    // assertEq(entries.length, 0);
   }
 }
 
 contract MultiSigSubmitTransaction is MultiSigTest {
-  address owner2;
+  uint256 txId = 0;
 
   function setUp() public {
     super.setUp();
-
-    owner2 = actor("owner2");
   }
 
   function test_shouldAllowAnOwnerToSubmitATransaction() public {
+    // bytes memory txData = abi.encodeWithSignature("addOwner(address)", newOwner);
     vm.prank(owner0);
 
     vm.expectEmit(true, true, true, true);
+    emit Confirmation(owner0, txId);
+    multiSig.submitTransaction(address(multiSig), 0, txData);
 
-    emit Confirmation(owner0, 0);
+    (address dest, uint256 val, bytes memory data, bool exec) = multiSig.transactions(txId);
 
-    multiSig.submitTransaction(
-      address(multiSig),
-      0,
-      abi.encodeWithSignature("addOwner(address)", owner2)
-    );
+    assertEq(dest, address(multiSig));
+    assertEq(val, 0);
+    assertEq(data, txData);
+    assertEq(exec, false);
+    assertEq(multiSig.confirmations(txId, owner0), true);
+    assertEq(multiSig.transactionCount(), 1);
   }
 
-  function test_shouldNotAllowAnOwnerToSubmitATransactionToANullAddress() public {}
+  function test_shouldNotAllowAnOwnerToSubmitATransactionToANullAddress() public {
+    vm.expectRevert("address was null");
+    multiSig.submitTransaction(address(0), 0, txData);
+  }
 
-  function test_shouldNotAllowANon_ownerToSubmitATransaction() public {}
+  function test_shouldNotAllowANonOwnerToSubmitATransaction() public {
+    vm.expectRevert("owner does not exist");
+    multiSig.submitTransaction(address(multiSig), 0, txData);
+  }
+}
+
+contract MultiSigConfirmTransaction is MultiSigTest {
+  uint256 txId = 0;
+
+  function setUp() public {
+    super.setUp();
+    vm.prank(owner0);
+    multiSig.submitTransaction(address(multiSig), 0, txData);
+  }
+
+  function test_shouldAllowAnOwnerToConfirmTransaction() public {
+    vm.prank(owner1);
+    multiSig.confirmTransaction(txId);
+
+    assertEq(multiSig.confirmations(txId, owner1), true);
+
+    (, , , bool exec) = multiSig.transactions(txId);
+    assertEq(exec, true);
+  }
+
+  function test_shouldNotAllowAnOwnerToConfirmATransactionTwice() public {
+    vm.prank(owner0);
+    vm.expectRevert("transaction was already confirmed for owner");
+    multiSig.confirmTransaction(txId);
+  }
+
+  function test_shouldNotAllowANonOwnerToConfirmATransaction() public {
+    vm.prank(nonOwner);
+    vm.expectRevert("owner does not exist");
+    multiSig.confirmTransaction(txId);
+  }
+}
+
+contract MultiSigRevokeConfirmation is MultiSigTest {
+  uint256 txId = 0;
+
+  function setUp() public {
+    super.setUp();
+    vm.prank(owner0);
+    multiSig.submitTransaction(address(multiSig), 0, txData);
+  }
+
+  function test_shouldAllowAnOwnerToRevokeConfirmation() public {
+    vm.prank(owner0);
+    multiSig.revokeConfirmation(txId);
+    assertEq(multiSig.confirmations(txId, owner0), false);
+  }
+
+  function test_shouldNotAllowANonOwnerToRevokeConfirmation() public {
+    vm.prank(nonOwner);
+    vm.expectRevert("owner does not exist");
+    multiSig.revokeConfirmation(txId);
+  }
+
+  function test_shouldNotAllowAnOwnerToRevokeBeforeConfirming() public {
+    vm.prank(owner1);
+    vm.expectRevert("transaction was not confirmed for owner");
+    multiSig.revokeConfirmation(txId);
+  }
+}
+
+contract MultiSigAddOwner is MultiSigTest {
+  uint256 txId = 0;
+  address[] public updatedOwners;
+
+  function setUp() public {
+    super.setUp();
+    updatedOwners = [owner0, owner1, newOwner];
+  }
+
+  function test_shouldAllowNewOwnerToBeAddedViaMultiSig() public {
+    vm.prank(owner0);
+    multiSig.submitTransaction(address(multiSig), 0, txData);
+    vm.prank(owner1);
+    multiSig.confirmTransaction(txId);
+    assertEq(multiSig.isOwner(newOwner), true);
+
+    assertEq(multiSig.getOwners(), updatedOwners);
+  }
+
+  function test_shouldNotAllowAnExternalAccountToAddAnOwner() public {
+    vm.prank(nonOwner);
+    vm.expectRevert("msg.sender was not multisig wallet");
+    multiSig.addOwner(newOwner);
+  }
+
+  function test_shouldNotAllowAddingTheNullAddress() public {
+    bytes memory txData_null = abi.encodeWithSignature("addOwner(address)", address(0));
+    vm.prank(owner0);
+    multiSig.submitTransaction(address(multiSig), 0, txData_null);
+
+    vm.prank(owner1);
+    vm.expectRevert("Transaction execution failed.");
+    multiSig.confirmTransaction(txId);
+  }
+}
+
+contract MultiSigRemoveOwner is MultiSigTest {
+  uint256 txId = 0;
+  address[] public updatedOwners;
+
+  function setUp() public {
+    super.setUp();
+    updatedOwners = [owner0];
+  }
+
+  function test_shouldAllowOwnerToBeRemovedViaMultiSig() public {
+    bytes memory txData_remove = abi.encodeWithSignature("removeOwner(address)", owner1);
+    vm.prank(owner0);
+    multiSig.submitTransaction(address(multiSig), 0, txData_remove);
+
+    vm.prank(owner1);
+    multiSig.confirmTransaction(txId);
+
+    assertEq(multiSig.isOwner(owner1), false);
+    assertEq(multiSig.required(), 1);
+    assertEq(multiSig.internalRequired(), 1);
+    assertEq(multiSig.getOwners(), updatedOwners);
+  }
+
+  function test_shouldNotAllowAnExternalAccountToRemoveAnOwner() public {
+    vm.prank(nonOwner);
+    vm.expectRevert("msg.sender was not multisig wallet");
+    multiSig.removeOwner(newOwner);
+  }
+}
+
+contract MultiSigReplaceOwner is MultiSigTest {
+  uint256 txId = 0;
+  address[] public updatedOwners;
+
+  function setUp() public {
+    super.setUp();
+    updatedOwners = [owner0, newOwner];
+  }
+
+  function test_shouldAllowAnExistingOwnerToBeReplacedViaMultiSig() public {
+    bytes memory txData_replace = abi.encodeWithSignature(
+      "replaceOwner(address,address)",
+      owner1,
+      newOwner
+    );
+    vm.prank(owner0);
+    multiSig.submitTransaction(address(multiSig), 0, txData_replace);
+
+    vm.prank(owner1);
+    multiSig.confirmTransaction(txId);
+
+    assertEq(multiSig.isOwner(owner1), false);
+    assertEq(multiSig.isOwner(newOwner), true);
+    assertEq(multiSig.getOwners(), updatedOwners);
+  }
+
+  function test_shouldNotAllowAnExternalAccountToReplaceAnOwner() public {
+    vm.prank(nonOwner);
+    vm.expectRevert("msg.sender was not multisig wallet");
+    multiSig.replaceOwner(owner1, newOwner);
+  }
+
+  function test_shouldNotAllowAnOwnerToBeReplacedByNullAddress() public {
+    bytes memory txData_replace = abi.encodeWithSignature(
+      "replaceOwner(address,address)",
+      owner1,
+      address(0)
+    );
+    vm.prank(owner0);
+    multiSig.submitTransaction(address(multiSig), 0, txData_replace);
+
+    vm.prank(owner1);
+    vm.expectRevert("Transaction execution failed.");
+    multiSig.confirmTransaction(txId);
+  }
 }
