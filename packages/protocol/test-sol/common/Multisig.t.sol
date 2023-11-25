@@ -2,7 +2,7 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
-// import "forge-std/console.sol";
+import "forge-std/console.sol";
 import "../../contracts/common/MultiSig.sol";
 
 contract MultiSigTest is Test {
@@ -307,5 +307,86 @@ contract MultiSigReplaceOwner is MultiSigTest {
     vm.prank(owner1);
     vm.expectRevert("Transaction execution failed.");
     multiSig.confirmTransaction(txId);
+  }
+}
+
+contract MultiSigChangeRequirements is MultiSigTest {
+  uint256 txId = 0;
+
+  function setUp() public {
+    super.setUp();
+  }
+
+  function test_shouldAllowTheRequirementToBeChangedViaMultiSig() public {
+    bytes memory txData_change_req = abi.encodeWithSignature("changeRequirement(uint256)", 1);
+
+    vm.prank(owner0);
+    multiSig.submitTransaction(address(multiSig), 0, txData_change_req);
+
+    vm.prank(owner1);
+    multiSig.confirmTransaction(txId);
+    assertEq(multiSig.required(), 1);
+  }
+
+  function test_shouldNotAllowAnExternalAccountToChangeTheRequirement() public {
+    vm.prank(nonOwner);
+    vm.expectRevert("msg.sender was not multisig wallet");
+    multiSig.changeRequirement(3);
+  }
+}
+
+contract MultiSigChangeInternalRequirements is MultiSigTest {
+  uint256 txId = 0;
+
+  function setUp() public {
+    super.setUp();
+  }
+
+  function test_shouldAllowTheInternalRequirementToBeChangedViaMultiSig() public {
+    bytes memory txData_change_req = abi.encodeWithSignature(
+      "changeInternalRequirement(uint256)",
+      1
+    );
+
+    vm.prank(owner0);
+    multiSig.submitTransaction(address(multiSig), 0, txData_change_req);
+
+    vm.prank(owner1);
+    multiSig.confirmTransaction(txId);
+    assertEq(multiSig.internalRequired(), 1);
+  }
+
+  function test_shouldNotAllowAnExternalAccountToChangeTheInternalRequirement() public {
+    vm.prank(nonOwner);
+    vm.expectRevert("msg.sender was not multisig wallet");
+    multiSig.changeInternalRequirement(3);
+  }
+}
+
+contract MultiSigGetConfirmationCount is MultiSigTest {
+  uint256 txId = 0;
+
+  function setUp() public {
+    super.setUp();
+    vm.prank(owner0);
+    multiSig.submitTransaction(address(multiSig), 0, txData);
+  }
+
+  function test_shouldReturnTheConfirmationCount() public {
+    assertEq(multiSig.getConfirmationCount(txId), 1);
+  }
+}
+
+contract MultiSigGetTransactionCount is MultiSigTest {
+  uint256 txId = 0;
+
+  function setUp() public {
+    super.setUp();
+    vm.prank(owner0);
+    multiSig.submitTransaction(address(multiSig), 0, txData);
+  }
+
+  function test_shouldReturnTheTransactionCount() public {
+    assertEq(multiSig.getTransactionCount(true, true), 1);
   }
 }
