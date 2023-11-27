@@ -21,6 +21,13 @@ import "../contracts/governance/test/MockElection.sol";
 import "../contracts/governance/test/MockGovernance.sol";
 import "../contracts/governance/test/MockValidators.sol";
 
+interface ISECP256K1 {
+  function recover(uint256 digest, uint8 v, uint256 r, uint256 s)
+    external
+    pure
+    returns (uint256, uint256);
+}
+
 contract ReleaseGoldTest is Test {
   using FixidityLib for FixidityLib.Fraction;
 
@@ -688,30 +695,104 @@ contract AuthorizeWithPublicKeys is ReleaseGoldTest {
   address authorized;
   uint256 authorizedPK;
 
-  function addressToPublicKey(uint8 _v, bytes32 _r, bytes32 _s) public pure returns (address) {
-    bytes32 messageHash = keccak256("dummy_msg_data");
-    bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(messageHash);
+  ISECP256K1 sECP256K1;
 
-    address recoveredAddress = ecrecover(prefixedHash, _v, _r, _s);
-    require(recoveredAddress != address(0), "ECDSA: invalid signature");
+  bytes ecdsaPublicKey;
 
-    return recoveredAddress;
+  function addressToPublicKey(bytes32 message, uint8 _v, bytes32 _r, bytes32 _s)
+    public
+    view
+    returns (bytes memory)
+  {
+    string memory header = "\x19Ethereum Signed Message:\n32";
+    bytes32 _message = keccak256(abi.encodePacked(header, message));
+    (uint256 x, uint256 y) = sECP256K1.recover(
+      uint256(_message),
+      _v - 27,
+      uint256(_r),
+      uint256(_s)
+    );
+    return abi.encodePacked(x, y);
+  }
+
+  function _randomBytes32() internal returns (bytes32) {
+    return keccak256(abi.encodePacked(block.timestamp, block.difficulty, msg.sender));
+  }
+
+  function _truncateBytes(bytes memory data, uint256 size) internal pure returns (bytes memory) {
+    require(size <= data.length, "Size too large");
+    bytes memory result = new bytes(size);
+    for (uint256 i = 0; i < size; i++) {
+      result[i] = data[i];
+    }
+    return result;
   }
 
   function setUp() public {
     super.setUp();
+
+    address SECP256K1Address = actor("SECP256K1Address");
+
+    deployCodeTo("SECP256K1.sol", SECP256K1Address);
+    sECP256K1 = ISECP256K1(SECP256K1Address);
+
     config.revocable = false;
     config.canValidate = true;
     config.refundAddress = address(0);
     newReleaseGold(true, false);
 
     vm.prank(beneficiary);
-    accounts.createAccount();
+    releaseGold.createAccount();
 
     (authorized, authorizedPK) = actorWithPK("authorized");
-
     (v, r, s) = getParsedSignatureOfAddress(address(releaseGold), authorizedPK);
+    ecdsaPublicKey = addressToPublicKey(keccak256(abi.encodePacked("dummy_msg_data")), v, r, s);
+  }
+
+  function test_ShouldSetTheAuthorizedKeys_WhenUsingECDSAPublickKey() public {
     vm.prank(beneficiary);
-    // releaseGold.authorizeValidatorSignerWithPublicKey(authorized, v, r, s, )
+    releaseGold.authorizeValidatorSignerWithPublicKey(
+      address(uint160(authorized)),
+      v,
+      r,
+      s,
+      ecdsaPublicKey
+    );
+
+    assertEq(accounts.authorizedBy(authorized), address(releaseGold));
+    assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
+    assertEq(accounts.validatorSignerToAccount(authorized), address(releaseGold));
+  }
+
+  function test_ShouldSetTheAuthorizedKeys_WhenUsingBLSKeys() public {
+    bytes32 newBlsPublicKeyPart1 = _randomBytes32();
+    bytes32 newBlsPublicKeyPart2 = _randomBytes32();
+    bytes32 newBlsPublicKeyPart3 = _randomBytes32();
+    bytes memory newBlsPublicKey = abi.encodePacked(
+      newBlsPublicKeyPart1,
+      newBlsPublicKeyPart2,
+      newBlsPublicKeyPart3
+    );
+    newBlsPublicKey = _truncateBytes(newBlsPublicKey, 96);
+
+    bytes32 newBlsPoPPart1 = _randomBytes32();
+    bytes32 newBlsPoPPart2 = _randomBytes32();
+    bytes memory newBlsPoP = abi.encodePacked(newBlsPoPPart1, newBlsPoPPart2);
+    newBlsPoP = _truncateBytes(newBlsPoP, 48);
+
+    vm.prank(beneficiary);
+    releaseGold.authorizeValidatorSignerWithKeys(
+      address(uint160(authorized)),
+      v,
+      r,
+      s,
+      ecdsaPublicKey,
+      newBlsPublicKey,
+      newBlsPoP
+    );
+
+    assertEq(accounts.authorizedBy(authorized), address(releaseGold));
+    assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
+    assertEq(accounts.validatorSignerToAccount(authorized), address(releaseGold));
   }
 }

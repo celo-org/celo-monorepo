@@ -163,20 +163,22 @@ contract('ReleaseGold', (accounts: string[]) => {
       )
     }
     await releaseGoldInstance.initialize(
-      releaseGoldSchedule.releaseStartTime,
-      releaseGoldSchedule.releaseCliffTime,
-      releaseGoldSchedule.numReleasePeriods,
-      releaseGoldSchedule.releasePeriod,
-      releaseGoldSchedule.amountReleasedPerPeriod,
-      releaseGoldSchedule.revocable,
-      releaseGoldSchedule.beneficiary,
-      releaseGoldSchedule.releaseOwner,
-      releaseGoldSchedule.refundAddress,
-      releaseGoldSchedule.subjectToLiquidityProvision,
-      releaseGoldSchedule.initialDistributionRatio,
-      releaseGoldSchedule.canValidate,
-      releaseGoldSchedule.canVote,
-      registry.address,
+      {
+        releaseStartTime: releaseGoldSchedule.releaseStartTime,
+        releaseCliffTime: releaseGoldSchedule.releaseCliffTime,
+        numReleasePeriods: releaseGoldSchedule.numReleasePeriods,
+        releasePeriod: releaseGoldSchedule.releasePeriod,
+        amountReleasedPerPeriod: releaseGoldSchedule.amountReleasedPerPeriod,
+        revocable: releaseGoldSchedule.revocable,
+        beneficiary: releaseGoldSchedule.beneficiary,
+        releaseOwner: releaseGoldSchedule.releaseOwner,
+        refundAddress: releaseGoldSchedule.refundAddress,
+        subjectToLiquidityProvision: releaseGoldSchedule.subjectToLiquidityProvision,
+        initialDistributionRatio: releaseGoldSchedule.initialDistributionRatio,
+        canValidate: releaseGoldSchedule.canValidate,
+        canVote: releaseGoldSchedule.canVote,
+        registryAddress: registry.address,
+      },
       { from: owner }
     )
     if (override.startReleasing) {
@@ -978,160 +980,6 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
   })
 
-  describe('authorization tests:', () => {
-    Object.keys(authorizationTestDescriptions).forEach((key) => {
-      let authorizationTest: any
-      const authorized = accounts[4] // the account that is to be authorized for whatever role
-      let sig: any
-
-      describe(`#authorize${_.upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
-        beforeEach(async () => {
-          const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
-          releaseGoldSchedule.revocable = false
-          releaseGoldSchedule.refundAddress = '0x0000000000000000000000000000000000000000'
-          releaseGoldSchedule.canValidate = true
-          await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
-          await releaseGoldInstance.createAccount({ from: beneficiary })
-
-          authorizationTests.voting = {
-            fn: releaseGoldInstance.authorizeVoteSigner,
-            eventName: 'VoteSignerAuthorized',
-            getAuthorizedFromAccount: accountsInstance.getVoteSigner,
-            authorizedSignerToAccount: accountsInstance.voteSignerToAccount,
-          }
-          authorizationTests.validating = {
-            fn: releaseGoldInstance.authorizeValidatorSigner,
-            eventName: 'ValidatorSignerAuthorized',
-            getAuthorizedFromAccount: accountsInstance.getValidatorSigner,
-            authorizedSignerToAccount: accountsInstance.validatorSignerToAccount,
-          }
-          authorizationTests.attestation = {
-            fn: releaseGoldInstance.authorizeAttestationSigner,
-            eventName: 'AttestationSignerAuthorized',
-            getAuthorizedFromAccount: accountsInstance.getAttestationSigner,
-            authorizedSignerToAccount: accountsInstance.attestationSignerToAccount,
-          }
-          authorizationTest = authorizationTests[key]
-          sig = await getParsedSignatureOfAddress(web3, releaseGoldInstance.address, authorized)
-        })
-
-        it(`should set the authorized ${authorizationTestDescriptions[key].me}`, async () => {
-          await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
-          assert.equal(await accountsInstance.authorizedBy(authorized), releaseGoldInstance.address)
-          assert.equal(
-            await authorizationTest.getAuthorizedFromAccount(releaseGoldInstance.address),
-            authorized
-          )
-          assert.equal(
-            await authorizationTest.authorizedSignerToAccount(authorized),
-            releaseGoldInstance.address
-          )
-        })
-
-        // The attestations signer does not send txs.
-        if (authorizationTestDescriptions[key].subject !== 'attestationSigner') {
-          it(`should transfer 1 CELO to the ${authorizationTestDescriptions[key].me}`, async () => {
-            const balance1 = await web3.eth.getBalance(authorized)
-            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
-            const balance2 = await web3.eth.getBalance(authorized)
-            assertEqualBN(new BigNumber(balance2).minus(balance1), web3.utils.toWei('1'))
-          })
-        } else {
-          it(`should not transfer 1 CELO to the ${authorizationTestDescriptions[key].me}`, async () => {
-            const balance1 = await web3.eth.getBalance(authorized)
-            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
-            const balance2 = await web3.eth.getBalance(authorized)
-            assertEqualBN(new BigNumber(balance2).minus(balance1), 0)
-          })
-        }
-
-        it(`should revert if the ${authorizationTestDescriptions[key].me} is an account`, async () => {
-          await accountsInstance.createAccount({ from: authorized })
-          await assertTransactionRevertWithReason(
-            authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary }),
-            'Cannot re-authorize address or locked gold account for another account'
-          )
-        })
-
-        it(`should revert if the ${authorizationTestDescriptions[key].me} is already authorized`, async () => {
-          const otherAccount = accounts[5]
-          const otherSig = await getParsedSignatureOfAddress(
-            web3,
-            releaseGoldInstance.address,
-            otherAccount
-          )
-          await accountsInstance.createAccount({ from: otherAccount })
-          await assertTransactionRevertWithReason(
-            authorizationTest.fn(otherAccount, otherSig.v, otherSig.r, otherSig.s, {
-              from: beneficiary,
-            }),
-            'Cannot re-authorize address or locked gold account for another account'
-          )
-        })
-
-        it('should revert if the signature is incorrect', async () => {
-          const nonVoter = accounts[5]
-          const incorrectSig = await getParsedSignatureOfAddress(
-            web3,
-            releaseGoldInstance.address,
-            nonVoter
-          )
-          await assertTransactionRevertWithReason(
-            authorizationTest.fn(authorized, incorrectSig.v, incorrectSig.r, incorrectSig.s, {
-              from: beneficiary,
-            }),
-            'Invalid signature'
-          )
-        })
-
-        describe('when a previous authorization has been made', () => {
-          const newAuthorized = accounts[6]
-          let balance1: string
-          let newSig: any
-          beforeEach(async () => {
-            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
-            newSig = await getParsedSignatureOfAddress(
-              web3,
-              releaseGoldInstance.address,
-              newAuthorized
-            )
-            balance1 = await web3.eth.getBalance(newAuthorized)
-            await authorizationTest.fn(newAuthorized, newSig.v, newSig.r, newSig.s, {
-              from: beneficiary,
-            })
-          })
-
-          it(`should set the new authorized ${authorizationTestDescriptions[key].me}`, async () => {
-            assert.equal(
-              await accountsInstance.authorizedBy(newAuthorized),
-              releaseGoldInstance.address
-            )
-            assert.equal(
-              await authorizationTest.getAuthorizedFromAccount(releaseGoldInstance.address),
-              newAuthorized
-            )
-            assert.equal(
-              await authorizationTest.authorizedSignerToAccount(newAuthorized),
-              releaseGoldInstance.address
-            )
-          })
-
-          it(`should not transfer 1 CELO to the ${authorizationTestDescriptions[key].me}`, async () => {
-            const balance2 = await web3.eth.getBalance(newAuthorized)
-            assertEqualBN(new BigNumber(balance2).minus(balance1), 0)
-          })
-
-          it('should preserve the previous authorization', async () => {
-            assert.equal(
-              await accountsInstance.authorizedBy(authorized),
-              releaseGoldInstance.address
-            )
-          })
-        })
-      })
-    })
-  })
-
   describe('#authorizeWithPublicKeys', () => {
     const authorized = accounts[4] // the account that is to be authorized for whatever role
 
@@ -1155,7 +1003,7 @@ contract('ReleaseGold', (accounts: string[]) => {
         )
       })
 
-      it('should set the authorized keys', async () => {
+      it.only('should set the authorized keys', async () => {
         assert.equal(await accountsInstance.authorizedBy(authorized), releaseGoldInstance.address)
         assert.equal(
           await accountsInstance.getValidatorSigner(releaseGoldInstance.address),
@@ -2242,6 +2090,160 @@ contract('ReleaseGold', (accounts: string[]) => {
 
       const withdrawableAmount = await releaseGoldInstance.getWithdrawableAmount()
       assertEqualBN(withdrawableAmount, expectedWithdrawalAmount.div(2))
+    })
+  })
+
+  describe('authorization tests:', () => {
+    Object.keys(authorizationTestDescriptions).forEach((key) => {
+      let authorizationTest: any
+      const authorized = accounts[4] // the account that is to be authorized for whatever role
+      let sig: any
+
+      describe(`#authorize${_.upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
+        beforeEach(async () => {
+          const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
+          releaseGoldSchedule.revocable = false
+          releaseGoldSchedule.refundAddress = '0x0000000000000000000000000000000000000000'
+          releaseGoldSchedule.canValidate = true
+          await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
+          await releaseGoldInstance.createAccount({ from: beneficiary })
+
+          authorizationTests.voting = {
+            fn: releaseGoldInstance.authorizeVoteSigner,
+            eventName: 'VoteSignerAuthorized',
+            getAuthorizedFromAccount: accountsInstance.getVoteSigner,
+            authorizedSignerToAccount: accountsInstance.voteSignerToAccount,
+          }
+          authorizationTests.validating = {
+            fn: releaseGoldInstance.authorizeValidatorSigner,
+            eventName: 'ValidatorSignerAuthorized',
+            getAuthorizedFromAccount: accountsInstance.getValidatorSigner,
+            authorizedSignerToAccount: accountsInstance.validatorSignerToAccount,
+          }
+          authorizationTests.attestation = {
+            fn: releaseGoldInstance.authorizeAttestationSigner,
+            eventName: 'AttestationSignerAuthorized',
+            getAuthorizedFromAccount: accountsInstance.getAttestationSigner,
+            authorizedSignerToAccount: accountsInstance.attestationSignerToAccount,
+          }
+          authorizationTest = authorizationTests[key]
+          sig = await getParsedSignatureOfAddress(web3, releaseGoldInstance.address, authorized)
+        })
+
+        it(`should set the authorized ${authorizationTestDescriptions[key].me}`, async () => {
+          await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
+          assert.equal(await accountsInstance.authorizedBy(authorized), releaseGoldInstance.address)
+          assert.equal(
+            await authorizationTest.getAuthorizedFromAccount(releaseGoldInstance.address),
+            authorized
+          )
+          assert.equal(
+            await authorizationTest.authorizedSignerToAccount(authorized),
+            releaseGoldInstance.address
+          )
+        })
+
+        // The attestations signer does not send txs.
+        if (authorizationTestDescriptions[key].subject !== 'attestationSigner') {
+          it(`should transfer 1 CELO to the ${authorizationTestDescriptions[key].me}`, async () => {
+            const balance1 = await web3.eth.getBalance(authorized)
+            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
+            const balance2 = await web3.eth.getBalance(authorized)
+            assertEqualBN(new BigNumber(balance2).minus(balance1), web3.utils.toWei('1'))
+          })
+        } else {
+          it(`should not transfer 1 CELO to the ${authorizationTestDescriptions[key].me}`, async () => {
+            const balance1 = await web3.eth.getBalance(authorized)
+            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
+            const balance2 = await web3.eth.getBalance(authorized)
+            assertEqualBN(new BigNumber(balance2).minus(balance1), 0)
+          })
+        }
+
+        it(`should revert if the ${authorizationTestDescriptions[key].me} is an account`, async () => {
+          await accountsInstance.createAccount({ from: authorized })
+          await assertTransactionRevertWithReason(
+            authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary }),
+            'Cannot re-authorize address or locked gold account for another account'
+          )
+        })
+
+        it(`should revert if the ${authorizationTestDescriptions[key].me} is already authorized`, async () => {
+          const otherAccount = accounts[5]
+          const otherSig = await getParsedSignatureOfAddress(
+            web3,
+            releaseGoldInstance.address,
+            otherAccount
+          )
+          await accountsInstance.createAccount({ from: otherAccount })
+          await assertTransactionRevertWithReason(
+            authorizationTest.fn(otherAccount, otherSig.v, otherSig.r, otherSig.s, {
+              from: beneficiary,
+            }),
+            'Cannot re-authorize address or locked gold account for another account'
+          )
+        })
+
+        it('should revert if the signature is incorrect', async () => {
+          const nonVoter = accounts[5]
+          const incorrectSig = await getParsedSignatureOfAddress(
+            web3,
+            releaseGoldInstance.address,
+            nonVoter
+          )
+          await assertTransactionRevertWithReason(
+            authorizationTest.fn(authorized, incorrectSig.v, incorrectSig.r, incorrectSig.s, {
+              from: beneficiary,
+            }),
+            'Invalid signature'
+          )
+        })
+
+        describe('when a previous authorization has been made', () => {
+          const newAuthorized = accounts[6]
+          let balance1: string
+          let newSig: any
+          beforeEach(async () => {
+            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
+            newSig = await getParsedSignatureOfAddress(
+              web3,
+              releaseGoldInstance.address,
+              newAuthorized
+            )
+            balance1 = await web3.eth.getBalance(newAuthorized)
+            await authorizationTest.fn(newAuthorized, newSig.v, newSig.r, newSig.s, {
+              from: beneficiary,
+            })
+          })
+
+          it(`should set the new authorized ${authorizationTestDescriptions[key].me}`, async () => {
+            assert.equal(
+              await accountsInstance.authorizedBy(newAuthorized),
+              releaseGoldInstance.address
+            )
+            assert.equal(
+              await authorizationTest.getAuthorizedFromAccount(releaseGoldInstance.address),
+              newAuthorized
+            )
+            assert.equal(
+              await authorizationTest.authorizedSignerToAccount(newAuthorized),
+              releaseGoldInstance.address
+            )
+          })
+
+          it(`should not transfer 1 CELO to the ${authorizationTestDescriptions[key].me}`, async () => {
+            const balance2 = await web3.eth.getBalance(newAuthorized)
+            assertEqualBN(new BigNumber(balance2).minus(balance1), 0)
+          })
+
+          it('should preserve the previous authorization', async () => {
+            assert.equal(
+              await accountsInstance.authorizedBy(authorized),
+              releaseGoldInstance.address
+            )
+          })
+        })
+      })
     })
   })
 })
