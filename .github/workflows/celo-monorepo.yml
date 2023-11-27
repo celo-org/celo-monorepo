@@ -175,7 +175,6 @@ jobs:
             --ignore @celo/celotool \
             --ignore @celo/celocli \
             --ignore @celo/env-tests \
-            --ignore @celo/transactions-uri \
             --ignore '@celo/wallet-*' \
             run test
       - name: Upload Jest Test Results
