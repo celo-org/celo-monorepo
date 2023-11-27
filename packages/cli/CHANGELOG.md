@@ -1,5 +1,64 @@
 # Changelog
 
+## 3.1.0
+
+### Minor Changes
+
+- 06700f3ad: Update of Governance Upvote function
+- 32face3d8: Delegation of Governance votes
+- 1e8d07ba6: add FeeHandler contract info to `celocli network:contracts` command
+- 87647b46b: Add multisig:approve command to CLI, expose MultiSig.confirmTransaction in ContractKit.
+
+### Patch Changes
+
+- 22ea7f691: Remove moment.js dependency
+- Updated dependencies
+- Updated dependencies [679ef0c60]
+- Updated dependencies [97d5ccf43]
+- Updated dependencies [32face3d8]
+- Updated dependencies [97d5ccf43]
+- Updated dependencies [87647b46b]
+  - @celo/contractkit@5.2.0
+  - @celo/connect@5.1.1
+  - @celo/phone-utils@6.0.0
+  - @celo/base@6.0.0
+  - @celo/cryptographic-utils@5.0.6
+  - @celo/explorer@5.0.6
+  - @celo/governance@5.0.6
+  - @celo/utils@5.0.6
+  - @celo/wallet-hsm-azure@5.1.1
+  - @celo/wallet-ledger@5.1.1
+  - @celo/wallet-local@5.1.1
+
+## 3.1.0-beta.0
+
+### Minor Changes
+
+- 06700f3ad: Update of Governance Upvote function
+- 32face3d8: Delegation of Governance votes
+- 1e8d07ba6: add FeeHandler contract info to `celocli network:contracts` command
+- 87647b46b: Add multisig:approve command to CLI, expose MultiSig.confirmTransaction in ContractKit.
+
+### Patch Changes
+
+- 22ea7f691: Remove moment.js dependency
+- Updated dependencies
+- Updated dependencies [97d5ccf43]
+- Updated dependencies [32face3d8]
+- Updated dependencies [97d5ccf43]
+- Updated dependencies [87647b46b]
+  - @celo/contractkit@5.2.0-beta.0
+  - @celo/phone-utils@6.0.0-beta.0
+  - @celo/base@6.0.0-beta.0
+  - @celo/explorer@5.0.6-beta.0
+  - @celo/governance@5.0.6-beta.0
+  - @celo/connect@5.1.1-beta.0
+  - @celo/cryptographic-utils@5.0.6-beta.0
+  - @celo/utils@5.0.6-beta.0
+  - @celo/wallet-hsm-azure@5.1.1-beta.0
+  - @celo/wallet-ledger@5.1.1-beta.0
+  - @celo/wallet-local@5.1.1-beta.0
+
 ## 3.0.2
 
 ### Patch Changes

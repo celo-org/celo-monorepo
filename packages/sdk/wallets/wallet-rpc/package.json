@@ -1,6 +1,6 @@
 {
   "name": "@celo/wallet-rpc",
-  "version": "5.1.0",
+  "version": "5.1.1",
   "description": "Geth RPC wallet implementation",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -23,17 +23,17 @@
   },
   "dependencies": {
     "@types/bn.js": "^5.1.0",
-    "@celo/base": "^5.0.5",
-    "@celo/connect": "^5.1.0",
-    "@celo/utils": "^5.0.5",
-    "@celo/wallet-base": "^5.1.0",
-    "@celo/wallet-remote": "^5.1.0",
+    "@celo/base": "^6.0.0",
+    "@celo/connect": "^5.1.1",
+    "@celo/utils": "^5.0.6",
+    "@celo/wallet-base": "^5.1.1",
+    "@celo/wallet-remote": "^5.1.1",
     "bignumber.js": "^9.0.0",
     "debug": "^4.1.1"
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1",
-    "@celo/contractkit": "^5.1.0",
+    "@celo/contractkit": "^5.2.0",
     "bn.js": "^5.1.0",
     "web3": "1.10.0"
   },
