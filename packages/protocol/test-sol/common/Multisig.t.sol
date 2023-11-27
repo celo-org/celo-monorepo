@@ -20,7 +20,6 @@ contract MultiSigTest is Test {
   address[] public owners;
   bytes txData;
 
-  // event Transfer(address indexed from, address indexed to, uint256 value);
   event Confirmation(address indexed sender, uint256 indexed transactionId);
   event Revocation(address indexed sender, uint256 indexed transactionId);
   event Submission(uint256 indexed transactionId);
