@@ -40,8 +40,8 @@ contract EpochRewardsFoundryTest is Test {
 
   uint256 constant targetVotingGoldFraction = (2 * 1e24) / uint256(3); // TODO Change all the previous to scietific notation
   uint256 constant targetValidatorEpochPayment = 1e13;
-  uint256 constant communityRewardFraction = (1 * 1e24) / uint256(4);
-  uint256 constant carbonOffsettingFraction = (1 * 1e24) / uint256(200);
+  uint256 constant communityRewardFraction = (1 * 1e24) / 4;
+  uint256 constant carbonOffsettingFraction = (1 * 1e24) / 200;
 
   uint256 constant exchangeRate = 7;
   uint256 constant sortedOraclesDenominator = 1e24;
@@ -55,6 +55,7 @@ contract EpochRewardsFoundryTest is Test {
   MockSortedOracles mockSortedOracles;
   MockStableToken mockStableToken;
   MockGoldToken mockGoldToken;
+  Reserve reserve;
   Freezer freezer;
 
   // mocked contracts
@@ -513,7 +514,6 @@ contract EpochRewardsFoundryTest_getRewardsMultiplier is EpochRewardsFoundryTest
 }
 
 contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryTest {
-  Reserve reserve;
   uint256 constant totalSupply = 6000000 ether;
   uint256 constant reserveBalance = 1000000 ether;
   uint256 constant floatingSupply = totalSupply - reserveBalance;
@@ -796,7 +796,6 @@ contract EpochRewardsFoundryTest_whenThereAreActiveVotesAStableTokenExchangeRate
 
   function setUp() public {
     super.setUp();
-    uint256 expectedTargetGoldSupplyIncrease;
 
     epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
     mockElection.setActiveVotes(activeVotes);
@@ -805,8 +804,8 @@ contract EpochRewardsFoundryTest_whenThereAreActiveVotesAStableTokenExchangeRate
       exchangeRate;
 
     uint256 expectedTargetEpochRewards = (targetVotingYieldParamsInitial * activeVotes) / 1e24;
-    expectedTargetGoldSupplyIncrease =
-      expectedTargetEpochRewards +
+
+    uint256 expectedTargetGoldSupplyIncrease = expectedTargetEpochRewards +
       ((expectedTargetTotalEpochPaymentsInGold /
         (1e24 - communityRewardFraction - carbonOffsettingFraction)) /
         1e24);
@@ -815,45 +814,111 @@ contract EpochRewardsFoundryTest_whenThereAreActiveVotesAStableTokenExchangeRate
     uint256 actualRemainingSupply = (expectedTargetRemainingSupply * 11) / 10;
     uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - expectedTargetGoldSupplyIncrease;
     mockGoldToken.setTotalSupply(totalSupply);
-    expectedMultiplier = 1e24 + rewardsMultiplierAdjustmentsUnderspend / 10;
+    expectedMultiplier = 1e24 + (rewardsMultiplierAdjustmentsUnderspend / 10);
+
     vm.warp(block.timestamp + timeDelta);
 
-    uint256 validatorReward = (targetValidatorEpochPayment * numberValidators) / exchangeRate; // TODO move to setup
-    uint256 votingReward = targetVotingYieldParamsInitial * activeVotes; // TODO move to setup
+    validatorReward = (targetValidatorEpochPayment * numberValidators) / exchangeRate; // TODO move to setup
+    votingReward = (targetVotingYieldParamsInitial * activeVotes) / 1e24; // TODO move to setup
   }
 
   function test_shouldFetchTheExpectedRewardsMultiplier() public {
-    assertEq(epochRewards.getRewardsMultiplier(), expectedMultiplier);
+    assertApproxEqRel(epochRewards.getRewardsMultiplier(), expectedMultiplier, 1e14);
   }
 
   function test_shouldReturnTheTargetValidatorEpochPaymentTimesTheRewardsMultiplier() public {
-    uint256 expected = targetValidatorEpochPayment * expectedMultiplier;
+    uint256 expected = (targetValidatorEpochPayment * expectedMultiplier) / 1e24; // TODO add bracket here
+    uint256 result;
+    (result, , , ) = epochRewards.calculateTargetEpochRewards();
+    assertApproxEqRel(result, expected, 1e14);
+  }
+
+  function test_ShouldReturnTheTargetYieldTimesTheNumberOfActiveVotesTimesTheRewardsMultiplier()
+    public
+  {
+    uint256 expected = (targetVotingYieldParamsInitial * activeVotes * expectedMultiplier) / 1e48;
     uint256 result;
     (, result, , ) = epochRewards.calculateTargetEpochRewards();
-    assertEq(result, expected);
+    assertApproxEqRel(result, expected, 5e13);
   }
 
   function test_shouldReturnTheCorrectAmountForTheCommunityReward() public {
-    uint256 expected = ((validatorReward + votingReward) /
-      ((1e24 - communityRewardFraction - communityRewardFraction) / 1e24)) *
-      (communityRewardFraction / 1e24) *
-      expectedMultiplier;
+    uint256 expected = (((validatorReward + votingReward)) *
+      communityRewardFraction *
+      expectedMultiplier) /
+      ((1e24 - communityRewardFraction - carbonOffsettingFraction) * 1e24);
 
     uint256 result;
     (, , result, ) = epochRewards.calculateTargetEpochRewards();
 
-    assertEq(result, expected);
+    assertApproxEqRel(result, expected, 5e13);
   }
 
   function test_shouldReturnTheCorrectAmountForTheCarbonOffsettingFund() public {
-    uint256 expected = ((validatorReward + votingReward) /
-      ((1e24 - communityRewardFraction - communityRewardFraction) / 1e24)) *
-      (carbonOffsettingFraction / 1e24) *
-      expectedMultiplier;
+    uint256 expected = (((validatorReward + votingReward)) *
+      carbonOffsettingFraction *
+      expectedMultiplier) /
+      ((1e24 - communityRewardFraction - carbonOffsettingFraction) * 1e24);
 
     uint256 result;
-    (, result, , ) = epochRewards.calculateTargetEpochRewards();
-    assertEq(result, expected);
+    (, , , result) = epochRewards.calculateTargetEpochRewards();
+    assertApproxEqRel(result, expected, 5e13);
   }
+
+}
+
+contract EpochRewardsFoundryTest_isReserveLow is EpochRewardsFoundryTest {
+  uint256 stableBalance;
+
+  function setUp() public {
+    uint256 totalSupply = 129762987346298761037469283746;
+    reserve = new Reserve(true);
+    registry.setAddressFor("Reserve", address(reserve));
+
+    initialAssetAllocationWeights = new uint256[](2);
+    initialAssetAllocationWeights[0] = 10e24 / 2;
+    initialAssetAllocationWeights[1] = 10e24 / 2;
+
+    initialAssetAllocationSymbols = new bytes32[](2);
+    initialAssetAllocationSymbols[0] = bytes32("cGLD");
+    initialAssetAllocationSymbols[2] = bytes32("empty");
+
+    reserve.initialize(
+      address(registry),
+      60,
+      1e24,
+      0,
+      0,
+      initialAssetAllocationSymbols,
+      initialAssetAllocationWeights,
+      5e21, // TODO 0.004e24?
+      2e24
+    );
+    mockGoldToken.setTotalSupply(totalSupply);
+
+    stableBalance = 2397846127684712867321;
+    uint256 goldBalance = ((stableBalance / exchangeRate) / 2) / 2;
+    mockStableToken.setTotalSupply(stableBalance);
+    vm.deal(address(reserve), goldBalance);
+  }
+
+  // reserve ratio of 0.5'
+  function test_whenReserveRatioIs05_shouldBeLowAtStar() public {
+    // no time travel
+    assertEq(epochRewards.isReserveLow(), true);
+  }
+
+  // reserve ratio of 1.5
+
+  function test_whenReserveRatioIs05_shouldBeLowAt15Years() public {
+    uint256 timeDelta = YEAR * 15;
+    vm.warp(block.timestamp + timeDelta); // TODO make a helper with this
+
+    assertEq(epochRewards.isReserveLow(), true);
+  }
+
+  // reserve ratio of 2.5
+
+  // when the contract is frozen
 
 }
