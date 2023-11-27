@@ -783,3 +783,77 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
   }
 
 }
+
+contract EpochRewardsFoundryTest_whenThereAreActiveVotesAStableTokenExchangeRateIsSetAndTheActualRemainingSupplyIs10pMoreThanTheTargetRemainingSupplyAfterRewards_calculateTargetEpochRewards is
+  EpochRewardsFoundryTest
+{
+  uint256 constant numberValidators = 100;
+  uint256 constant activeVotes = 102398474 ether;
+  uint256 constant timeDelta = YEAR * 10;
+  uint256 expectedMultiplier;
+  uint256 validatorReward;
+  uint256 votingReward;
+
+  function setUp() public {
+    super.setUp();
+    uint256 expectedTargetGoldSupplyIncrease;
+
+    epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
+    mockElection.setActiveVotes(activeVotes);
+    uint256 expectedTargetTotalEpochPaymentsInGold = (targetValidatorEpochPayment *
+      numberValidators) /
+      exchangeRate;
+
+    uint256 expectedTargetEpochRewards = (targetVotingYieldParamsInitial * activeVotes) / 1e24;
+    expectedTargetGoldSupplyIncrease =
+      expectedTargetEpochRewards +
+      ((expectedTargetTotalEpochPaymentsInGold /
+        (1e24 - communityRewardFraction - carbonOffsettingFraction)) /
+        1e24);
+    uint256 expectedTargetTotalSupply = getExpectedTargetTotalSupply(timeDelta);
+    uint256 expectedTargetRemainingSupply = SUPPLY_CAP - expectedTargetTotalSupply;
+    uint256 actualRemainingSupply = (expectedTargetRemainingSupply * 11) / 10;
+    uint256 totalSupply = SUPPLY_CAP - actualRemainingSupply - expectedTargetGoldSupplyIncrease;
+    mockGoldToken.setTotalSupply(totalSupply);
+    expectedMultiplier = 1e24 + rewardsMultiplierAdjustmentsUnderspend / 10;
+    vm.warp(block.timestamp + timeDelta);
+
+    uint256 validatorReward = (targetValidatorEpochPayment * numberValidators) / exchangeRate; // TODO move to setup
+    uint256 votingReward = targetVotingYieldParamsInitial * activeVotes; // TODO move to setup
+  }
+
+  function test_shouldFetchTheExpectedRewardsMultiplier() public {
+    assertEq(epochRewards.getRewardsMultiplier(), expectedMultiplier);
+  }
+
+  function test_shouldReturnTheTargetValidatorEpochPaymentTimesTheRewardsMultiplier() public {
+    uint256 expected = targetValidatorEpochPayment * expectedMultiplier;
+    uint256 result;
+    (, result, , ) = epochRewards.calculateTargetEpochRewards();
+    assertEq(result, expected);
+  }
+
+  function test_shouldReturnTheCorrectAmountForTheCommunityReward() public {
+    uint256 expected = ((validatorReward + votingReward) /
+      ((1e24 - communityRewardFraction - communityRewardFraction) / 1e24)) *
+      (communityRewardFraction / 1e24) *
+      expectedMultiplier;
+
+    uint256 result;
+    (, , result, ) = epochRewards.calculateTargetEpochRewards();
+
+    assertEq(result, expected);
+  }
+
+  function test_shouldReturnTheCorrectAmountForTheCarbonOffsettingFund() public {
+    uint256 expected = ((validatorReward + votingReward) /
+      ((1e24 - communityRewardFraction - communityRewardFraction) / 1e24)) *
+      (carbonOffsettingFraction / 1e24) *
+      expectedMultiplier;
+
+    uint256 result;
+    (, result, , ) = epochRewards.calculateTargetEpochRewards();
+    assertEq(result, expected);
+  }
+
+}
