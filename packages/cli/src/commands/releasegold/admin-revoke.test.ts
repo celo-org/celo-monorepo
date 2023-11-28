@@ -5,8 +5,8 @@ import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper } from '@celo/contractkit/lib/wrappers/Governance'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import {
-  NetworkConfig,
   getContractFromEvent,
+  NetworkConfig,
   testWithGanache,
   timeTravel,
 } from '@celo/dev-utils/lib/ganache-test'
