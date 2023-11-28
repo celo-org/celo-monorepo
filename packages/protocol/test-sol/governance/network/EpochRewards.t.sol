@@ -125,11 +125,6 @@ contract EpochRewardsFoundryTest is Test {
       carbonOffsettingFraction
     );
 
-    initialAssetAllocationWeights = new uint256[](1);
-    initialAssetAllocationWeights[0] = 1e24;
-
-    initialAssetAllocationSymbols = new bytes32[](1);
-    initialAssetAllocationSymbols[0] = bytes32("cGLD");
   }
 
 }
@@ -524,6 +519,12 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
 
     registry.setAddressFor("Reserve", address(reserve));
 
+    initialAssetAllocationWeights = new uint256[](1);
+    initialAssetAllocationWeights[0] = 1e24;
+
+    initialAssetAllocationSymbols = new bytes32[](1);
+    initialAssetAllocationSymbols[0] = bytes32("cGLD");
+
     reserve.initialize(
       address(registry),
       60,
@@ -871,17 +872,19 @@ contract EpochRewardsFoundryTest_isReserveLow is EpochRewardsFoundryTest {
   uint256 stableBalance;
 
   function setUp() public {
+    super.setUp();
+
     uint256 totalSupply = 129762987346298761037469283746;
     reserve = new Reserve(true);
     registry.setAddressFor("Reserve", address(reserve));
 
     initialAssetAllocationWeights = new uint256[](2);
-    initialAssetAllocationWeights[0] = 10e24 / 2;
-    initialAssetAllocationWeights[1] = 10e24 / 2;
+    initialAssetAllocationWeights[0] = 1e24 / 2;
+    initialAssetAllocationWeights[1] = 1e24 / 2;
 
     initialAssetAllocationSymbols = new bytes32[](2);
     initialAssetAllocationSymbols[0] = bytes32("cGLD");
-    initialAssetAllocationSymbols[2] = bytes32("empty");
+    initialAssetAllocationSymbols[1] = bytes32("empty");
 
     reserve.initialize(
       address(registry),
@@ -894,16 +897,18 @@ contract EpochRewardsFoundryTest_isReserveLow is EpochRewardsFoundryTest {
       5e21, // TODO 0.004e24?
       2e24
     );
+    reserve.addToken(address(mockStableToken));
     mockGoldToken.setTotalSupply(totalSupply);
 
     stableBalance = 2397846127684712867321;
-    uint256 goldBalance = ((stableBalance / exchangeRate) / 2) / 2;
     mockStableToken.setTotalSupply(stableBalance);
-    vm.deal(address(reserve), goldBalance);
+
   }
 
   // reserve ratio of 0.5'
   function test_whenReserveRatioIs05_shouldBeLowAtStar() public {
+    uint256 goldBalance = ((stableBalance / exchangeRate) / 2) / 2;
+    vm.deal(address(reserve), goldBalance);
     // no time travel
     assertEq(epochRewards.isReserveLow(), true);
   }
@@ -911,14 +916,84 @@ contract EpochRewardsFoundryTest_isReserveLow is EpochRewardsFoundryTest {
   // reserve ratio of 1.5
 
   function test_whenReserveRatioIs05_shouldBeLowAt15Years() public {
+    uint256 goldBalance = ((stableBalance / exchangeRate) / 2) / 2;
+    vm.deal(address(reserve), goldBalance);
     uint256 timeDelta = YEAR * 15;
     vm.warp(block.timestamp + timeDelta); // TODO make a helper with this
 
     assertEq(epochRewards.isReserveLow(), true);
   }
 
-  // reserve ratio of 2.5
+  function test_whenReserveRatioIs05_shouldBeLowAt25Years() public {
+    uint256 goldBalance = ((stableBalance / exchangeRate) / 2) / 2;
+    vm.deal(address(reserve), goldBalance);
+    uint256 timeDelta = YEAR * 25;
+    vm.warp(block.timestamp + timeDelta); // TODO make a helper with this
+
+    assertEq(epochRewards.isReserveLow(), true);
+  }
+
+  function test_whenReserveRatioIs1point5_shouldBeLowAtStar() public {
+    uint256 goldBalance = ((3 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), goldBalance);
+    // no time travel
+    assertEq(epochRewards.isReserveLow(), true);
+  }
+
+  function test_whenReserveRatioIs1point5_shouldBeLowAt12Years() public {
+    uint256 goldBalance = ((3 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), goldBalance);
+    uint256 timeDelta = YEAR * 12;
+    vm.warp(block.timestamp + timeDelta); // TODO make a helper with this
+    assertEq(epochRewards.isReserveLow(), true);
+  }
+
+  function test_whenReserveRatioIs1point5_shouldNotBeLowAt15Years() public {
+    uint256 goldBalance = ((3 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), goldBalance);
+    uint256 timeDelta = YEAR * 15;
+    vm.warp(block.timestamp + timeDelta); // TODO make a helper with this
+    assertEq(epochRewards.isReserveLow(), false);
+  }
+
+  function test_whenReserveRatioIs1point5_shouldNotBeLowAt25Years() public {
+    uint256 goldBalance = ((3 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), goldBalance);
+    uint256 timeDelta = YEAR * 25;
+    vm.warp(block.timestamp + timeDelta); // TODO make a helper with this
+    assertEq(epochRewards.isReserveLow(), false);
+  }
+
+  function test_whenReserveRatioIs2point5_shouldBeLowAtStar() public {
+    uint256 goldBalance = ((5 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), goldBalance);
+    // no time travel
+    assertEq(epochRewards.isReserveLow(), false);
+  }
+
+  function test_whenReserveRatioIs2point5_shouldNotBeLowAt15Years() public {
+    uint256 goldBalance = ((5 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), goldBalance);
+    uint256 timeDelta = YEAR * 15;
+    vm.warp(block.timestamp + timeDelta); // TODO make a helper with this
+    assertEq(epochRewards.isReserveLow(), false);
+  }
+
+  function test_whenReserveRatioIs2point5_shouldNotBeLowAt25Years() public {
+    uint256 goldBalance = ((5 * stableBalance) / exchangeRate) / 4;
+    vm.deal(address(reserve), goldBalance);
+    uint256 timeDelta = YEAR * 25;
+    vm.warp(block.timestamp + timeDelta); // TODO make a helper with this
+    assertEq(epochRewards.isReserveLow(), false);
+  }
 
   // when the contract is frozen
+
+  function test_whenTheContractIsFrozen() public {
+    freezer.freeze(address(epochRewards));
+    vm.prank(address(0));
+    vm.expectRevert("can't call when contract is frozen");
+    epochRewards.updateTargetVotingYield();
+  }
 
 }
