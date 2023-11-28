@@ -6,14 +6,11 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/celo-org/celo-monorepo.git",
-    "directory": "packages/protocol/contracts"
+    "directory": "packages/protocol/abis"
   },
   "scripts": {},
   "dependencies": {},  
-  "main": "./lib/cjs/index.js",
-  "module": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
   "files": [
-    "lib/"
+    "./"
   ]
 }

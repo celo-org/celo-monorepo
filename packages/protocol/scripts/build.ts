@@ -114,7 +114,7 @@ async function generateFilesForContractKit({ coreContractsOnly, web3Types: outdi
     ? CoreContracts
     : CoreContracts.concat('Proxy').concat(Interfaces)
 
-  const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
+  const globPattern = `${BUILD_DIR}/contracts*/@(${contractKitContracts.join('|')}).json`
 
   const cwd = process.cwd()
 

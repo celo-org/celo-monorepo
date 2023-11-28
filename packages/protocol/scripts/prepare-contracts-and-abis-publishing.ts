@@ -7,7 +7,6 @@ import {
   ABIS_BUILD_DIR,
   ABIS_PACKAGE_SRC_DIR,
   BUILD_EXECUTABLE,
-  CONTRACTS_PACKAGE_SRC_DIR,
   CoreContracts,
   TSCONFIG_PATH,
 } from './consts'
@@ -31,10 +30,11 @@ try {
   build(`--solidity ${path.join(ABIS_BUILD_DIR)}`)
 
   // Generate ethers typings
-  build(`--ethersTypes ${path.join(ABIS_BUILD_DIR, 'ethers')}`)
+  build(`--ethersTypes ${path.join(ABIS_BUILD_DIR, 'types/ethers')}`)
 
   // Generate web3 typings
-  build(`--web3Types ${path.join(ABIS_BUILD_DIR, 'web3')}`)
+  // TODO web3 is generating nested dir structure
+  build(`--web3Types ${path.join(ABIS_BUILD_DIR, 'types/web3')}`)
 
   // Merge contracts-0.8, contracts-mento, etc.. at the root of the build dir
   log('Merging files at the root of the build dir')
@@ -46,6 +46,9 @@ try {
     const mvCommand = `mv -f ${ABIS_BUILD_DIR}/${folder}/* ${ABIS_BUILD_DIR}`
     log(mvCommand)
     child_process.execSync(mvCommand)
+
+    // Once copied all the files, remove the folder
+    child_process.execSync(`rm -r ${ABIS_BUILD_DIR}/${folder}`)
   }
 
   // Remove Mocks, tests, extraneous files
@@ -67,42 +70,23 @@ try {
   log('Running yarn wagmi generate')
   child_process.execSync(`yarn wagmi generate`, { stdio: 'inherit' })
 
-  // Generate an index.ts to be esm friendly
-  log('Generate index.ts from `CoreContracts`')
-  fs.writeFileSync(
-    path.join(ABIS_BUILD_DIR, 'index.ts'),
-    '// This is a generated file, do not modify\n' +
-      [...new Set(CoreContracts)]
-        .map((contract) => {
-          return `export * as ${contract} from './${contract}';`
-        })
-        .join('\n')
+  const sourcePackageJson = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json.dist')
+  const destinationPackageJson = path.join(ABIS_BUILD_DIR, 'package.json')
+
+  fs.copyFileSync(
+    path.join(ABIS_PACKAGE_SRC_DIR, 'README.md'),
+    path.join(ABIS_BUILD_DIR, 'README.md')
   )
 
-  // Generate the js folder to be published from ts files
-  log('Running tsc -b ')
-  child_process.execSync(`yarn tsc -b ${path.join(ABIS_PACKAGE_SRC_DIR, 'tsconfig.json')}`, {
-    stdio: 'inherit',
-  })
-  child_process.execSync(`yarn tsc -b ${path.join(ABIS_PACKAGE_SRC_DIR, 'tsconfig-cjs.json')}`, {
-    stdio: 'inherit',
-  })
-
   // Change the packages version to what CI is providing from environment variables
-  const packageJsons = [
-    path.join(CONTRACTS_PACKAGE_SRC_DIR, 'package.json'),
-    path.join(ABIS_PACKAGE_SRC_DIR, 'package.json'),
-  ]
-  packageJsons.forEach((packageJsonPath) => {
-    const file = fs.readFileSync(packageJsonPath).toString()
+  const file = fs.readFileSync(sourcePackageJson).toString()
 
-    if (process.env.RELEASE_VERSION) {
-      fs.writeFileSync(
-        packageJsonPath,
-        file.replace('0.0.0-template.version', process.env.RELEASE_VERSION)
-      )
-    }
-  })
+  if (process.env.RELEASE_VERSION) {
+    fs.writeFileSync(
+      destinationPackageJson,
+      file.replace('0.0.0-template.version', process.env.RELEASE_VERSION)
+    )
+  }
 } finally {
   // Cleanup
   log('Cleaning up folders and checking out dirty git files')
@@ -126,7 +110,7 @@ function lsRecursive(dir: string): string[] {
 function build(cmd: string) {
   log(`Running build for ${cmd}`)
   child_process.execSync(
-    `BUILD_DIR=./build/abis/src ts-node ${BUILD_EXECUTABLE} --coreContractsOnly ${cmd}`,
+    `BUILD_DIR=./build ts-node ${BUILD_EXECUTABLE} --coreContractsOnly ${cmd}`,
     { stdio: 'inherit' }
   )
 }

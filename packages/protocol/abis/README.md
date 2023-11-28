@@ -28,8 +28,8 @@ import { Accounts } from '@celo/abis/types/ethers'
 // web3
 import Accounts from '@celo/abis/types/web3/Accounts'
 
-// truffle
-import { AccountsContract } from '@celo/abis/types/truffle'
+// wagmi
+import Accounts from '@celo/abis/types/wagmi/Accounts'
 ```
 
 ## License
