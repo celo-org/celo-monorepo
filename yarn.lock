@@ -914,21 +914,10 @@
     "@stablelib/blake2xs" "0.10.4"
     big-integer "^1.6.44"
 
-"@celo/celo-devchain@^6.0.2":
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/@celo/celo-devchain/-/celo-devchain-6.0.2.tgz#600a33f339ba70a8e7e81b961d2f07a0a6fa4e80"
-  integrity sha512-t7Zd/eCW6bmMI3pfjBh2Pl0LQ/3jEahyF0J9+1MH6oKPdjsWnulq48tqmCbI0jUlr8EEHKUjGp5Umo1oKjmu7A==
-  dependencies:
-    commander "^10.0.0"
-    ganache "npm:@celo/ganache@7.8.0-unofficial.0"
-    node-fetch "^3.3.0"
-    targz "^1.0.1"
-    tmp "^0.2.1"
-
-"@celo/celo-devchain@^6.0.3-beta.0":
-  version "6.0.3-beta.0"
-  resolved "https://registry.yarnpkg.com/@celo/celo-devchain/-/celo-devchain-6.0.3-beta.0.tgz#561c8c7c21f5863a2a5ba453dc8ba211ab7188c6"
-  integrity sha512-mnTRRVM9ErB1OGsTdbu0WRpT6J3fm7j+rpxW3AxDWd0Z7HFBrCXuW5Pjuws12V0kt5AUpNzENG+pG/qHpmRkgA==
+"@celo/celo-devchain@^6.0.3-beta.1":
+  version "6.0.3-beta.1"
+  resolved "https://registry.yarnpkg.com/@celo/celo-devchain/-/celo-devchain-6.0.3-beta.1.tgz#0c0637c4646904de578fa28ebe2dcb3f8ad35259"
+  integrity sha512-Pjqbooy1eJ9qyMyIka3GFP0UrLATtSHJtGj/TNtuJ5nlpaBMAy2oA1zjKh0AsqyhvNkjs4Os6mgFYVEm5XuKuw==
   dependencies:
     commander "^10.0.0"
     ganache "npm:@celo/ganache@7.8.0-unofficial.0"

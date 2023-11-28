@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@celo/base": "^6.0.0",
-    "@celo/celo-devchain": "^6.0.3-beta.0",
+    "@celo/celo-devchain": "^6.0.3-beta.1",
     "@celo/connect": "^5.1.1",
     "@celo/contractkit": "^5.2.0",
     "@celo/explorer": "^5.0.6",
