@@ -1764,3 +1764,323 @@ contract GetWithdrawableAmount is ReleaseGoldTest {
     assertEq(releaseGold.getWithdrawableAmount(), initialReleaseGoldAmount / 4);
   }
 }
+
+contract AuthorizationTests is ReleaseGoldTest {
+  uint256 initialReleaseGoldAmount;
+
+  uint8 v;
+  bytes32 r;
+  bytes32 s;
+
+  address authorized;
+  uint256 authorizedPK;
+
+  function setUp() public {
+    super.setUp();
+    config.revocable = false;
+    config.refundAddress = address(0);
+    config.canValidate = true;
+    newReleaseGold(true, false);
+    vm.prank(beneficiary);
+    releaseGold.createAccount();
+
+    (authorized, authorizedPK) = actorWithPK("authorized");
+
+    (v, r, s) = getParsedSignatureOfAddress(address(releaseGold), authorizedPK);
+  }
+
+  function test_ShouldSetTheAuthorizedVoteSigner() public {
+    vm.prank(beneficiary);
+    releaseGold.authorizeVoteSigner(address(uint160(authorized)), v, r, s);
+    assertEq(accounts.authorizedBy(authorized), address(releaseGold));
+    assertEq(accounts.getVoteSigner(address(releaseGold)), authorized);
+    assertEq(accounts.voteSignerToAccount(authorized), address(releaseGold));
+  }
+
+  function test_ShouldSetTheAuthorizedValidatorSigner() public {
+    vm.prank(beneficiary);
+    releaseGold.authorizeValidatorSigner(address(uint160(authorized)), v, r, s);
+    assertEq(accounts.authorizedBy(authorized), address(releaseGold));
+    assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
+    assertEq(accounts.validatorSignerToAccount(authorized), address(releaseGold));
+  }
+
+  function test_ShouldSetTheAuthorizedAttestationSigner() public {
+    vm.prank(beneficiary);
+    releaseGold.authorizeAttestationSigner(address(uint160(authorized)), v, r, s);
+    assertEq(accounts.authorizedBy(authorized), address(releaseGold));
+    assertEq(accounts.getAttestationSigner(address(releaseGold)), authorized);
+    assertEq(accounts.attestationSignerToAccount(authorized), address(releaseGold));
+  }
+
+  function test_ShouldTransfer1CELOToVoteSigner() public {
+    uint256 authorizedBalanceBefore = goldToken.balanceOf(authorized);
+    vm.prank(beneficiary);
+    releaseGold.authorizeVoteSigner(address(uint160(authorized)), v, r, s);
+    uint256 authorizedBalanceAfter = goldToken.balanceOf(authorized);
+    assertEq(authorizedBalanceAfter - authorizedBalanceBefore, 1 ether);
+  }
+
+  function test_ShouldTransfer1CELOToValidatorSigner() public {
+    uint256 authorizedBalanceBefore = goldToken.balanceOf(authorized);
+    vm.prank(beneficiary);
+    releaseGold.authorizeValidatorSigner(address(uint160(authorized)), v, r, s);
+    uint256 authorizedBalanceAfter = goldToken.balanceOf(authorized);
+    assertEq(authorizedBalanceAfter - authorizedBalanceBefore, 1 ether);
+  }
+
+  function test_ShouldNotTransfer1CELOToAttestationSigner() public {
+    uint256 authorizedBalanceBefore = goldToken.balanceOf(authorized);
+    vm.prank(beneficiary);
+    releaseGold.authorizeAttestationSigner(address(uint160(authorized)), v, r, s);
+    uint256 authorizedBalanceAfter = goldToken.balanceOf(authorized);
+    assertEq(authorizedBalanceAfter - authorizedBalanceBefore, 0);
+  }
+
+  function test_ShouldRevertIfVoteSignerIsAnAccount() public {
+    vm.prank(authorized);
+    accounts.createAccount();
+    vm.prank(beneficiary);
+    vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
+    releaseGold.authorizeVoteSigner(address(uint160(authorized)), v, r, s);
+  }
+
+  function test_ShouldRevertIfValidatorSignerIsAnAccount() public {
+    vm.prank(authorized);
+    accounts.createAccount();
+    vm.prank(beneficiary);
+    vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
+    releaseGold.authorizeValidatorSigner(address(uint160(authorized)), v, r, s);
+  }
+
+  function test_ShouldRevertIfAttestationSignerIsAnAccount() public {
+    vm.prank(authorized);
+    accounts.createAccount();
+    vm.prank(beneficiary);
+    vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
+    releaseGold.authorizeAttestationSigner(address(uint160(authorized)), v, r, s);
+  }
+
+  function test_ShouldRevertIfTheVoteSignerIsAlreadyAuthorized() public {
+    (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount");
+    (uint8 otherV, bytes32 otherR, bytes32 otherS) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      otherAccountPK
+    );
+    vm.prank(otherAccount);
+    accounts.createAccount();
+    vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
+    vm.prank(beneficiary);
+    releaseGold.authorizeVoteSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+  }
+
+  function test_ShouldRevertIfTheValidatorSignerIsAlreadyAuthorized() public {
+    (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount");
+    (uint8 otherV, bytes32 otherR, bytes32 otherS) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      otherAccountPK
+    );
+    vm.prank(otherAccount);
+    accounts.createAccount();
+    vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
+    vm.prank(beneficiary);
+    releaseGold.authorizeValidatorSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+  }
+
+  function test_ShouldRevertIfTheAttestationSignerIsAlreadyAuthorized() public {
+    (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount");
+    (uint8 otherV, bytes32 otherR, bytes32 otherS) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      otherAccountPK
+    );
+    vm.prank(otherAccount);
+    accounts.createAccount();
+    vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
+    vm.prank(beneficiary);
+    releaseGold.authorizeAttestationSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+  }
+
+  function test_ShouldRevertIfTheSignatureIsIncorrect() public {
+    (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount");
+    (uint8 otherV, bytes32 otherR, bytes32 otherS) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      otherAccountPK
+    );
+    vm.prank(beneficiary);
+    vm.expectRevert("Invalid signature");
+    releaseGold.authorizeVoteSigner(address(uint160(authorized)), otherV, otherR, otherS);
+  }
+
+  function test_ShouldSetTheNewAuthorizedVoteSigner_WhenPreviousAuthorizationHasBeenMade() public {
+    vm.prank(beneficiary);
+    releaseGold.authorizeVoteSigner(address(uint160(authorized)), v, r, s);
+    assertEq(accounts.getVoteSigner(address(releaseGold)), authorized);
+
+    (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
+    (uint8 otherV, bytes32 otherR, bytes32 otherS) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      otherAccountPK
+    );
+    vm.prank(beneficiary);
+    releaseGold.authorizeVoteSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+
+    assertEq(accounts.authorizedBy(otherAccount), address(releaseGold));
+    assertEq(accounts.getVoteSigner(address(releaseGold)), otherAccount);
+    assertEq(accounts.voteSignerToAccount(otherAccount), address(releaseGold));
+  }
+
+  function test_ShouldSetTheNewAuthorizedValidatorSigner_WhenPreviousAuthorizationHasBeenMade()
+    public
+  {
+    vm.prank(beneficiary);
+    releaseGold.authorizeValidatorSigner(address(uint160(authorized)), v, r, s);
+    assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
+
+    (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
+    (uint8 otherV, bytes32 otherR, bytes32 otherS) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      otherAccountPK
+    );
+    vm.prank(beneficiary);
+    releaseGold.authorizeValidatorSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+
+    assertEq(accounts.authorizedBy(otherAccount), address(releaseGold));
+    assertEq(accounts.getValidatorSigner(address(releaseGold)), otherAccount);
+    assertEq(accounts.validatorSignerToAccount(otherAccount), address(releaseGold));
+  }
+
+  function test_ShouldSetTheNewAuthorizedAttestationSigner_WhenPreviousAuthorizationHasBeenMade()
+    public
+  {
+    vm.prank(beneficiary);
+    releaseGold.authorizeAttestationSigner(address(uint160(authorized)), v, r, s);
+    assertEq(accounts.getAttestationSigner(address(releaseGold)), authorized);
+
+    (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
+    (uint8 otherV, bytes32 otherR, bytes32 otherS) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      otherAccountPK
+    );
+    vm.prank(beneficiary);
+    releaseGold.authorizeAttestationSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+
+    assertEq(accounts.authorizedBy(otherAccount), address(releaseGold));
+    assertEq(accounts.getAttestationSigner(address(releaseGold)), otherAccount);
+    assertEq(accounts.attestationSignerToAccount(otherAccount), address(releaseGold));
+  }
+
+  function test_ShouldNotTransfer1CEloWhenNewAuthorizedVoteSigner_WhenPreviousAuthorizationHasBeenMade()
+    public
+  {
+    vm.prank(beneficiary);
+    releaseGold.authorizeVoteSigner(address(uint160(authorized)), v, r, s);
+    assertEq(accounts.getVoteSigner(address(releaseGold)), authorized);
+
+    (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
+    uint256 otherAccountBalanceBefore = goldToken.balanceOf(otherAccount);
+    (uint8 otherV, bytes32 otherR, bytes32 otherS) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      otherAccountPK
+    );
+    vm.prank(beneficiary);
+    releaseGold.authorizeVoteSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+
+    uint256 otherAccountBalanceAfter = goldToken.balanceOf(otherAccount);
+    assertEq(otherAccountBalanceAfter - otherAccountBalanceBefore, 0);
+  }
+
+  function test_ShouldNotTransfer1CEloWhenNewAuthorizedValidatorSigner_WhenPreviousAuthorizationHasBeenMade()
+    public
+  {
+    vm.prank(beneficiary);
+    releaseGold.authorizeValidatorSigner(address(uint160(authorized)), v, r, s);
+    assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
+
+    (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
+    uint256 otherAccountBalanceBefore = goldToken.balanceOf(otherAccount);
+    (uint8 otherV, bytes32 otherR, bytes32 otherS) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      otherAccountPK
+    );
+    vm.prank(beneficiary);
+    releaseGold.authorizeValidatorSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+
+    uint256 otherAccountBalanceAfter = goldToken.balanceOf(otherAccount);
+    assertEq(otherAccountBalanceAfter - otherAccountBalanceBefore, 0);
+  }
+
+  function test_ShouldNotTransfer1CEloWhenNewAuthorizedAttestationSigner_WhenPreviousAuthorizationHasBeenMade()
+    public
+  {
+    vm.prank(beneficiary);
+    releaseGold.authorizeAttestationSigner(address(uint160(authorized)), v, r, s);
+    assertEq(accounts.getAttestationSigner(address(releaseGold)), authorized);
+
+    (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
+    uint256 otherAccountBalanceBefore = goldToken.balanceOf(otherAccount);
+    (uint8 otherV, bytes32 otherR, bytes32 otherS) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      otherAccountPK
+    );
+    vm.prank(beneficiary);
+    releaseGold.authorizeAttestationSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+
+    uint256 otherAccountBalanceAfter = goldToken.balanceOf(otherAccount);
+    assertEq(otherAccountBalanceAfter - otherAccountBalanceBefore, 0);
+  }
+
+  function test_ShouldNotPreserveOriginalAuthorizationWhenNewAuthorizedVoteSigner_WhenPreviousAuthorizationHasBeenMade()
+    public
+  {
+    vm.prank(beneficiary);
+    releaseGold.authorizeVoteSigner(address(uint160(authorized)), v, r, s);
+    assertEq(accounts.getVoteSigner(address(releaseGold)), authorized);
+
+    (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
+    (uint8 otherV, bytes32 otherR, bytes32 otherS) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      otherAccountPK
+    );
+    vm.prank(beneficiary);
+    releaseGold.authorizeVoteSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+
+    assertEq(accounts.authorizedBy(authorized), address(releaseGold));
+  }
+
+  function test_ShouldNotPreserveOriginalAuthorizationWhenNewAuthorizedValidatorSigner_WhenPreviousAuthorizationHasBeenMade()
+    public
+  {
+    vm.prank(beneficiary);
+    releaseGold.authorizeValidatorSigner(address(uint160(authorized)), v, r, s);
+    assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
+
+    (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
+    (uint8 otherV, bytes32 otherR, bytes32 otherS) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      otherAccountPK
+    );
+    vm.prank(beneficiary);
+    releaseGold.authorizeValidatorSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+
+    assertEq(accounts.authorizedBy(authorized), address(releaseGold));
+  }
+
+  function test_ShouldNotPreserveOriginalAuthorizationWhenNewAuthorizedAttestationSigner_WhenPreviousAuthorizationHasBeenMade()
+    public
+  {
+    vm.prank(beneficiary);
+    releaseGold.authorizeAttestationSigner(address(uint160(authorized)), v, r, s);
+    assertEq(accounts.getAttestationSigner(address(releaseGold)), authorized);
+
+    (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
+    (uint8 otherV, bytes32 otherR, bytes32 otherS) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      otherAccountPK
+    );
+    vm.prank(beneficiary);
+    releaseGold.authorizeAttestationSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+
+    assertEq(accounts.authorizedBy(authorized), address(releaseGold));
+  }
+}
+
