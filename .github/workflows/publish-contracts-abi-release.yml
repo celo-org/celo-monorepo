@@ -75,7 +75,7 @@ jobs:
 
       - name: Publish @celo/abis
         run: npm publish $RELEASE_TYPE $DRY_RUN
-        working-directory: packages/protocol/abis
+        working-directory: packages/protocol/abis/src-generated
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE != '' && '--tag $RELEASE_TYPE' || '' }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
