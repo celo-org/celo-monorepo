@@ -263,8 +263,6 @@ contract AddressSortedLinkedListWithMedianWhenThereAreMultipleActionsTest is Tes
   }
 
   function test_MultipleInsertsUpdatesRemovals() public {
-    // This is a simplified version of your JS test logic.
-    // You will need to create a set of predefined keys and numerators for the test.
     address[100] memory keys;
     uint256[100] memory numerators;
 
@@ -303,8 +301,6 @@ contract AddressSortedLinkedListWithMedianWhenThereAreMultipleActionsTest is Tes
   }
 
   function test_MultipleInsertsUpdatesRemovalsIncorrectGreaterAndLesser() public {
-    // This is a simplified version of your JS test logic.
-    // You will need to create a set of predefined keys and numerators for the test.
     address[100] memory keys;
     uint256[100] memory numerators;
 
