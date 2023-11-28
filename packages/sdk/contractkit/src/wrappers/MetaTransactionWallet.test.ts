@@ -1,7 +1,7 @@
 import { Address } from '@celo/base/lib/address'
 import { Signature } from '@celo/base/lib/signatureUtils'
+import MTWContractArtifacts from '@celo/celo-devchain/contracts/contracts-0.5/MetaTransactionWallet.json'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import MTWContract from '@celo/protocol/build/contracts/MetaTransactionWallet.json'
 import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { bufferToHex } from '@ethereumjs/util'
 import BigNumber from 'bignumber.js'
@@ -15,7 +15,7 @@ import {
 } from './MetaTransactionWallet'
 
 const contract = require('@truffle/contract')
-const MetaTransactionWallet = contract(MTWContract)
+const MetaTransactionWallet = contract(MTWContractArtifacts)
 
 testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
   MetaTransactionWallet.setProvider(web3.currentProvider)

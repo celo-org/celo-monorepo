@@ -6,15 +6,14 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import {
-  GasPriceMinimumContract,
-  GasPriceMinimumInstance,
-  RegistryContract,
-  RegistryInstance,
-} from 'types'
+import { RegistryContract, RegistryInstance } from 'types'
+import { GasPriceMinimumContract, GasPriceMinimumInstance } from 'types/08'
+import { SOLIDITY_08_PACKAGE } from '../../contractPackages'
+import { ArtifactsSingleton } from '../../lib/artifactsSingleton'
 
 const Registry: RegistryContract = artifacts.require('Registry')
-const GasPriceMinimum: GasPriceMinimumContract = artifacts.require('GasPriceMinimum')
+const GasPriceMinimum: GasPriceMinimumContract =
+  ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE).require('GasPriceMinimum')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
@@ -37,7 +36,8 @@ contract('GasPriceMinimum', (accounts: string[]) => {
       registry.address,
       gasPriceMinimumFloor,
       targetDensity,
-      adjustmentSpeed
+      adjustmentSpeed,
+      0
     )
   })
 
@@ -73,7 +73,8 @@ contract('GasPriceMinimum', (accounts: string[]) => {
           registry.address,
           gasPriceMinimumFloor,
           targetDensity,
-          adjustmentSpeed
+          adjustmentSpeed,
+          0
         ),
         'contract already initialized'
       )

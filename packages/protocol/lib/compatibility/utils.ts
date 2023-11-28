@@ -17,9 +17,9 @@ export class ASTBackwardReport {
 
   static create = (
     oldArtifactsFolder: string,
-    newArtifactsFolder: string,
+    newArtifactsFolders: string[],
     oldArtifacts: BuildArtifacts,
-    newArtifacts: BuildArtifacts,
+    newArtifacts: BuildArtifacts[],
     exclude: RegExp,
     categorizer: Categorizer,
     logFunction: (msg: string) => void): ASTBackwardReport => {
@@ -45,14 +45,14 @@ export class ASTBackwardReport {
 
     return new ASTBackwardReport(
       oldArtifactsFolder,
-      newArtifactsFolder,
+      newArtifactsFolders,
       exclude.toString(),
       versionedReport)
   }
 
   constructor(
     public readonly oldArtifactsFolder: string,
-    public readonly newArtifactsFolder: string,
+    public readonly newArtifactsFolder: string[],
     public readonly exclude: string,
     public readonly report: ASTDetailedVersionedReport
   ) {}

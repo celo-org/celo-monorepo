@@ -10,9 +10,9 @@ This will bring up an interactive console which asks which packages are affect a
 
 ## Auto Releasing
 
-(coming soon)
+The Release.yaml workflow will create a PR called "Version Packages", each time a PR is merged to master with changeset files this PR will be rebased and updated to show what the versions would be of published then. Merging this PR in will lead to packages being built and published to npm and github release notes being published.
 
-## Manual Releasing
+## Manual Releasing (discouraged)
 
 when time to release new versions of npm package run `changeset version` this will look thru the changeset files that have been generated since last release to bump the versions for package automatically to major if any changesets specify major change minor if only minor and patch if a the package had no changesets of its own but depends on one which will be updated.
 
@@ -20,7 +20,24 @@ finally `changeset publish` will go thru and publish to npm the packages that ne
 
 after go ahead and run `git push --follow-tags` to push git tags up to github.
 
-### For Pre Releasing
+## Auto Pre-releasing (Recommended)
+
+For Detailed Steps read (scripts/beta-mode.sh)[]
+
+1. Run `yarn beta-enter`
+This will enter into the pre mode of changesets and create a prerelease/beta branch and push it up to origin(github)
+
+Any time a commit is pushed to prerelease/** github will go and open a specially Version Packages (Beta) PR. You can merge this and packages will be published as specified in the branch (should be beta)
+
+2. If you need to release another beta make a changeset and commit it up.
+
+3. When done run `yarn beta-exit`
+This will exit changeset pre mode. Push up.
+
+4. Now you can Open a Pr with your prerelease/? branch against main.
+
+
+## Manual Pre Releasing (discouraged)
 
 changesets has 2 strategies for pre release versions.
 

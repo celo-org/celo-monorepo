@@ -21,6 +21,8 @@ contract MockLockedGold is ILockedGold {
   mapping(address => address) public authorizedBy;
   uint256 private totalLockedGold;
   mapping(address => bool) public slashingWhitelist;
+  mapping(address => uint256) public totalGovernancePower;
+  mapping(address => uint256) public accountTotalDelegatedAmountInPercents;
 
   function incrementNonvotingAccountBalance(address account, uint256 value) external {
     nonvotingAccountBalance[account] = nonvotingAccountBalance[account].add(value);
@@ -32,6 +34,14 @@ contract MockLockedGold is ILockedGold {
 
   function setAccountTotalLockedGold(address account, uint256 value) external {
     accountTotalLockedGold[account] = value;
+  }
+
+  function setAccountTotalDelegatedAmountInPercents(address account, uint256 value) external {
+    accountTotalDelegatedAmountInPercents[account] = value;
+  }
+
+  function setAccountTotalGovernancePower(address account, uint256 value) external {
+    totalGovernancePower[account] = value;
   }
 
   function getAccountTotalLockedGold(address account) external view returns (uint256) {
@@ -92,6 +102,30 @@ contract MockLockedGold is ILockedGold {
   }
 
   function getTotalPendingWithdrawals(address) external view returns (uint256) {
+    return 0;
+  }
+
+  function getAccountTotalDelegatedFraction(address account) external view returns (uint256) {
+    return accountTotalDelegatedAmountInPercents[account];
+  }
+
+  function getAccountTotalGovernanceVotingPower(address account) external view returns (uint256) {
+    return totalGovernancePower[account];
+  }
+
+  function getPendingWithdrawal(address account, uint256 index)
+    external
+    view
+    returns (uint256, uint256)
+  {
+    return (0, 0);
+  }
+
+  function unlockingPeriod() external view returns (uint256) {
+    return 0;
+  }
+
+  function getAccountNonvotingLockedGold(address account) external view returns (uint256) {
     return 0;
   }
 }

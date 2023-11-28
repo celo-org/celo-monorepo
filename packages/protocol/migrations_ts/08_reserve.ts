@@ -54,14 +54,18 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
     })
 
     if (config.reserve.initialBalance) {
-      console.info('Sending the Reserve an initial gold balance')
       const network: any = truffle.networks[networkName]
+
+      const block = await web3.eth.getBlock('latest')
+      const nextGasPrice = Math.ceil(block.baseFeePerGas)
+
       await web3.eth.sendTransaction({
         from: network.from,
         to: reserve.address,
         value: web3.utils.toWei(config.reserve.initialBalance.toString(), 'ether').toString(),
         // @ts-ignore: typing not available https://github.com/web3/web3.js/issues/6123#issuecomment-1568250373
         type: 0,
+        gasPrice: nextGasPrice,
       })
 
       if (config.reserve.frozenAssetsStartBalance && config.reserve.frozenAssetsDays) {

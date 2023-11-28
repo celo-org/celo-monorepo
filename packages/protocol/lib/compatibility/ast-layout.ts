@@ -2,11 +2,11 @@ import { Contract as Web3Contract } from '@celo/connect';
 import { Artifact, TypeInfo } from '@celo/protocol/lib/compatibility/internal';
 import {
   BuildArtifacts,
-  compareStorageLayouts,
-  Contract as ZContract,
-  getStorageLayout,
   Operation,
-  StorageLayoutInfo
+  StorageLayoutInfo,
+  Contract as ZContract,
+  compareStorageLayouts,
+  getStorageLayout
 } from '@openzeppelin/upgrades';
 const  Web3 = require('web3')
 
@@ -198,6 +198,7 @@ export const generateCompatibilityReport  = (oldArtifact: Artifact, oldArtifacts
       const newLayout = getLayout(newArtifact, newArtifacts)
       const layoutReport = generateLayoutCompatibilityReport(oldLayout, newLayout)
       const structsReport = generateStructsCompatibilityReport(oldLayout, newLayout)
+
       return {
         contract: newArtifact.contractName,
         compatible: layoutReport.compatible && structsReport.compatible,
@@ -206,19 +207,25 @@ export const generateCompatibilityReport  = (oldArtifact: Artifact, oldArtifacts
       }
 }
 
-export const reportLayoutIncompatibilities = (oldArtifacts: BuildArtifacts, newArtifacts: BuildArtifacts): ASTStorageCompatibilityReport[] => {
-  return newArtifacts.listArtifacts().map((newArtifact) => {
-    const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
-    if (oldArtifact !== undefined) {
-      return generateCompatibilityReport(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
-    } else {
-      // Generate an empty report for new contracts, which are, by definition, backwards
-      // compatible.
-      return {
-        contract: newArtifact.contractName,
-        compatible: true,
-        errors: []
+export const reportLayoutIncompatibilities = (oldArtifacts: BuildArtifacts, newArtifactsSets: BuildArtifacts[]): ASTStorageCompatibilityReport[] => {
+  let out: ASTStorageCompatibilityReport[] = []
+  for (const newArtifacts of newArtifactsSets) {
+    const reports = newArtifacts.listArtifacts().map((newArtifact) => {
+      const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
+      if (oldArtifact !== undefined) {
+        return generateCompatibilityReport(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
+      } else {
+        // Generate an empty report for new contracts, which are, by definition, backwards
+        // compatible.
+        return {
+          contract: newArtifact.contractName,
+          compatible: true,
+          errors: []
+        }
       }
-    }
-  })
+    })
+    
+    out = [...out, ...reports]
+  }
+  return out
 }

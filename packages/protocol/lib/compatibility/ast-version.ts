@@ -11,12 +11,15 @@ const abi = require('ethereumjs-abi')
  * A mapping {contract name => {@link ContractVersion}}.
  */
 export class ASTContractVersions {
-  static fromArtifacts = async (artifacts: BuildArtifacts): Promise<ASTContractVersions>=> {
+  static fromArtifacts = async (artifactsSet: BuildArtifacts[]): Promise<ASTContractVersions>=> {
     const contracts = {}
 
-    await Promise.all(artifacts.listArtifacts().filter(c => !isLibrary(c.contractName, artifacts)).map(async (artifact) => {
-      contracts[artifact.contractName] = await getContractVersion(artifact)
-    }))
+    for (const artifacts of artifactsSet){
+      await Promise.all(artifacts.listArtifacts().filter(c => !isLibrary(c.contractName, [artifacts])).map(async (artifact) => {
+        contracts[artifact.contractName] = await getContractVersion(artifact)
+      }))
+    }
+
     return new ASTContractVersions(contracts)
   }
 
@@ -54,9 +57,9 @@ export async function getContractVersion(artifact: Artifact): Promise<ContractVe
 }
 
 export class ASTContractVersionsChecker {
-  static create = async (oldArtifacts: BuildArtifacts, newArtifacts: BuildArtifacts, expectedVersionDeltas: ContractVersionDeltaIndex): Promise<ASTContractVersionsChecker> => {
-    const oldVersions = await ASTContractVersions.fromArtifacts(oldArtifacts)
-    const newVersions = await ASTContractVersions.fromArtifacts(newArtifacts)
+  static create = async (oldArtifacts: BuildArtifacts, newArtifactsSet: BuildArtifacts[], expectedVersionDeltas: ContractVersionDeltaIndex): Promise<ASTContractVersionsChecker> => {
+    const oldVersions = await ASTContractVersions.fromArtifacts([oldArtifacts])
+    const newVersions = await ASTContractVersions.fromArtifacts(newArtifactsSet)
     const contracts = {}
     Object.keys(newVersions.contracts).map((contract:string) => {
       const versionDelta = expectedVersionDeltas[contract] === undefined ? ContractVersionDelta.fromChanges(false, false, false, false) : expectedVersionDeltas[contract]
@@ -65,6 +68,7 @@ export class ASTContractVersionsChecker {
     })
     return new ASTContractVersionsChecker(contracts)
   }
+  
   constructor(public readonly contracts: ContractVersionCheckerIndex) {}
 
   /**

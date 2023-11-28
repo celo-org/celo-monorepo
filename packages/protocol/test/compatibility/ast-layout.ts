@@ -68,28 +68,30 @@ const assertContractErrorsMatch = (report, contractName, expectedMatches) => {
 describe('#reportLayoutIncompatibilities()', () => {
   describe('when the contracts are the same', () => {
     it('reports no incompatibilities', () => {
-      const report = reportLayoutIncompatibilities(testCases.original, testCases.original)
+      const report = reportLayoutIncompatibilities(testCases.original, [testCases.original])
       assertCompatible(report)
     })
   })
 
   describe('when a constant is inserted in a contract', () => {
     it('reports no incompatibilities', () => {
-      const report = reportLayoutIncompatibilities(testCases.original, testCases.inserted_constant)
+      const report = reportLayoutIncompatibilities(testCases.original, [
+        testCases.inserted_constant,
+      ])
       assertCompatible(report)
     })
   })
 
   describe('when a variable is appended in a contract', () => {
     it('reports no incompatibilities', () => {
-      const report = reportLayoutIncompatibilities(testCases.original, testCases.appended)
+      const report = reportLayoutIncompatibilities(testCases.original, [testCases.appended])
       assertCompatible(report)
     })
   })
 
   describe('when a variable is inserted in a contract', () => {
     it('reports an inserted variable', () => {
-      const report = reportLayoutIncompatibilities(testCases.original, testCases.inserted)
+      const report = reportLayoutIncompatibilities(testCases.original, [testCases.inserted])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/inserted/])
     })
@@ -97,7 +99,9 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe('when a variable is appended in a parent contract', () => {
     it('reports an inserted variable', () => {
-      const report = reportLayoutIncompatibilities(testCases.original, testCases.appended_in_parent)
+      const report = reportLayoutIncompatibilities(testCases.original, [
+        testCases.appended_in_parent,
+      ])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/inserted/])
     })
@@ -105,7 +109,7 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe('when a variable is removed in a contract', () => {
     it('reports a removed variable', () => {
-      const report = reportLayoutIncompatibilities(testCases.original, testCases.removed)
+      const report = reportLayoutIncompatibilities(testCases.original, [testCases.removed])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/removed/])
     })
@@ -113,10 +117,9 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe('when a variable is removed in a parent contract', () => {
     it('reports a removed variable', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original,
-        testCases.removed_from_parent
-      )
+      const report = reportLayoutIncompatibilities(testCases.original, [
+        testCases.removed_from_parent,
+      ])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/removed/])
     })
@@ -124,7 +127,7 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe(`when a variable's type changes in a contract`, () => {
     it('reports a typechanged variable', () => {
-      const report = reportLayoutIncompatibilities(testCases.original, testCases.typechange)
+      const report = reportLayoutIncompatibilities(testCases.original, [testCases.typechange])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/had type/])
     })
@@ -132,10 +135,9 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe(`when a variable's type changes in a parent contract`, () => {
     it('reports a typechanged variable', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original,
-        testCases.typechange_in_parent
-      )
+      const report = reportLayoutIncompatibilities(testCases.original, [
+        testCases.typechange_in_parent,
+      ])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/had type/])
     })
@@ -143,57 +145,54 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe('when a field is added to a struct in mapping', () => {
     it('reports no incompatibilities', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original_struct_in_mapping,
-        testCases.inserted_in_struct_mapping
-      )
+      const report = reportLayoutIncompatibilities(testCases.original_struct_in_mapping, [
+        testCases.inserted_in_struct_mapping,
+      ])
       assertCompatible(report)
     })
   })
 
   describe('when a field is added to a library struct in mapping', () => {
     it('reports no incompatibilities', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original_struct_in_mapping,
-        testCases.inserted_in_library_struct_mapping
-      )
+      const report = reportLayoutIncompatibilities(testCases.original_struct_in_mapping, [
+        testCases.inserted_in_library_struct_mapping,
+      ])
       assertCompatible(report)
     })
   })
 
   describe('when a field is prefixed with deprecated to a library struct in mapping', () => {
     it('reports no incompatibilities', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original_struct_in_mapping,
-        testCases.deprecated_prefixed_in_library_struct_mapping
-      )
+      const report = reportLayoutIncompatibilities(testCases.original_struct_in_mapping, [
+        testCases.deprecated_prefixed_in_library_struct_mapping,
+      ])
       assertCompatible(report)
     })
   })
 
   describe('when a field is prefixed with deprecated to struct variable', () => {
     it('reports no incompatibilities', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original,
-        testCases.deprecated_prefixed_in_struct
-      )
+      const report = reportLayoutIncompatibilities(testCases.original, [
+        testCases.deprecated_prefixed_in_struct,
+      ])
       assertCompatible(report)
     })
   })
 
   describe('when a variable is prefixed with deprecated', () => {
     it('reports no incompatibilities', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original,
-        testCases.deprecated_prefixed_variable
-      )
+      const report = reportLayoutIncompatibilities(testCases.original, [
+        testCases.deprecated_prefixed_variable,
+      ])
       assertCompatible(report)
     })
   })
 
   describe('when a field is added to a struct', () => {
     it('reports a struct change', () => {
-      const report = reportLayoutIncompatibilities(testCases.original, testCases.inserted_in_struct)
+      const report = reportLayoutIncompatibilities(testCases.original, [
+        testCases.inserted_in_struct,
+      ])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
     })
@@ -201,10 +200,9 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe('when a field changes type in a struct', () => {
     it('reports a struct change', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original,
-        testCases.typechange_in_struct
-      )
+      const report = reportLayoutIncompatibilities(testCases.original, [
+        testCases.typechange_in_struct,
+      ])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
     })
@@ -212,10 +210,9 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe('when a field changes type in a library struct', () => {
     it('reports a struct change', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original,
-        testCases.typechange_in_library_struct
-      )
+      const report = reportLayoutIncompatibilities(testCases.original, [
+        testCases.typechange_in_library_struct,
+      ])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
     })
@@ -223,10 +220,9 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe('when a field is removed from a struct', () => {
     it('reports a struct change', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original,
-        testCases.removed_from_struct
-      )
+      const report = reportLayoutIncompatibilities(testCases.original, [
+        testCases.removed_from_struct,
+      ])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
     })
@@ -234,10 +230,9 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe('when a field is removed from a library struct', () => {
     it('reports a struct change', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original,
-        testCases.removed_from_library_struct
-      )
+      const report = reportLayoutIncompatibilities(testCases.original, [
+        testCases.removed_from_library_struct,
+      ])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
     })
@@ -245,10 +240,9 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe('when a field is inserted in a library struct', () => {
     it('reports a struct change', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original,
-        testCases.inserted_in_library_struct
-      )
+      const report = reportLayoutIncompatibilities(testCases.original, [
+        testCases.inserted_in_library_struct,
+      ])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
     })
@@ -256,10 +250,9 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe('when a fixed array has length increased', () => {
     it('reports a typechanged variable', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original_complex,
-        testCases.longer_fixed_array
-      )
+      const report = reportLayoutIncompatibilities(testCases.original_complex, [
+        testCases.longer_fixed_array,
+      ])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/had type/])
     })
@@ -267,10 +260,9 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe('when a fixed array has length decreased', () => {
     it('reports a typechanged variable', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original_complex,
-        testCases.shorter_fixed_array
-      )
+      const report = reportLayoutIncompatibilities(testCases.original_complex, [
+        testCases.shorter_fixed_array,
+      ])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/had type/])
     })
@@ -278,10 +270,9 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe('when a fixed array becomes dynamic', () => {
     it('reports a typechanged variable', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original_complex,
-        testCases.fixed_to_dynamic_array
-      )
+      const report = reportLayoutIncompatibilities(testCases.original_complex, [
+        testCases.fixed_to_dynamic_array,
+      ])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/had type/])
     })
@@ -289,10 +280,9 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe('when a dynamic array becomes fixed', () => {
     it('reports a typechanged variable', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original_complex,
-        testCases.dynamic_to_fixed_array
-      )
+      const report = reportLayoutIncompatibilities(testCases.original_complex, [
+        testCases.dynamic_to_fixed_array,
+      ])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/had type/])
     })
@@ -304,10 +294,9 @@ describe('#reportLayoutIncompatibilities()', () => {
   // incompatibility.
   describe.skip('when the source of a mapping changes', () => {
     it('reports a typechanged variable', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original_complex,
-        testCases.mapping_source_changed
-      )
+      const report = reportLayoutIncompatibilities(testCases.original_complex, [
+        testCases.mapping_source_changed,
+      ])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/had type/])
     })
@@ -315,10 +304,9 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe.skip('when the source of a nested mapping changes', () => {
     it('reports a typechanged variable', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original_complex,
-        testCases.internal_mapping_source_changed
-      )
+      const report = reportLayoutIncompatibilities(testCases.original_complex, [
+        testCases.internal_mapping_source_changed,
+      ])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/had type/])
     })
@@ -326,10 +314,9 @@ describe('#reportLayoutIncompatibilities()', () => {
 
   describe('when the target of a mapping changes', () => {
     it('reports a typechanged variable', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original_complex,
-        testCases.mapping_target_changed
-      )
+      const report = reportLayoutIncompatibilities(testCases.original_complex, [
+        testCases.mapping_target_changed,
+      ])
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/had type/])
     })

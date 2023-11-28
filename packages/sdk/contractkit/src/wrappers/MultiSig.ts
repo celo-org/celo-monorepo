@@ -60,6 +60,13 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
     )
   }
 
+  async confirmTransaction(transactionId: number) {
+    return toTransactionObject(
+      this.connection,
+      this.contract.methods.confirmTransaction(transactionId)
+    )
+  }
+
   isowner: (owner: Address) => Promise<boolean> = proxyCall(this.contract.methods.isOwner)
   getOwners = proxyCall(this.contract.methods.getOwners)
   getRequired = proxyCall(this.contract.methods.required, undefined, valueToBigNumber)

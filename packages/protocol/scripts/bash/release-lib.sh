@@ -18,8 +18,13 @@ function build_tag() {
   echo " - Checkout contracts source code at $BRANCH"
   BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
   [ -d contracts ] && rm -r contracts
-  git checkout $BRANCH -- contracts 2>>$LOG_FILE >> $LOG_FILE
 
+  # this remove is necesary because when bringing a contracts folder from previous commit
+  # if a folder didn't exist in the past, git will not remove the current one
+  # trying to compile it and leading to potental build errors
+  
+  rm -rf contracts*
+  git checkout $BRANCH -- contracts* 2>>$LOG_FILE >> $LOG_FILE
   if [ ! -d $BUILD_DIR ]; then
     echo " - Build contract artifacts at $BUILD_DIR"
     BUILD_DIR=$BUILD_DIR yarn build:sol >> $LOG_FILE

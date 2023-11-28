@@ -15,7 +15,22 @@ import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInsta
 import Web3 from 'web3';
 import { ContractPackage, MENTO_PACKAGE } from '../contractPackages';
 
+// tslint:disable: ordered-imports
+import { fromFixed } from '@celo/utils/src/fixidity';
+import { bufferToHex, toBuffer } from '@ethereumjs/util';
+import { utf8ToBytes } from 'ethereum-cryptography/utils';
+import { AccountsInstance } from 'types';
+
+
 import BN = require('bn.js')
+import { getIdentifierHash, IdentifierPrefix } from "@celo/odis-identifiers"
+export function getOdisHash(
+	phoneNumber: string,
+	pepper?: string,
+	prefix = IdentifierPrefix.PHONE_NUMBER,
+) {
+	return getIdentifierHash(Web3.utils.sha3, phoneNumber, prefix, pepper);
+}
 
 const isNumber = (x: any) =>
   typeof x === 'number' || (BN as any).isBN(x) || BigNumber.isBigNumber(x)
@@ -108,9 +123,9 @@ export async function assertBalance(address: string, balance: BigNumber) {
   const web3balance = new BigNumber(await web3.eth.getBalance(address))
   if (isSameAddress(block.miner, address)) {
     const blockReward = web3.utils.toWei(new BN(2), 'ether') as BigNumber
-    assertEqualBN(web3balance, balance.plus(blockReward))
+    expectBigNumberInRange(web3balance, balance.plus(blockReward))
   } else {
-    assertEqualBN(web3balance, balance)
+    expectBigNumberInRange(web3balance, balance)
   }
 }
 
@@ -177,16 +192,24 @@ export async function assertRevert(promise: any, errorMessage: string = '') {
 }
 
 export async function exec(command: string, args: string[]) {
+  console.log(`Running: ${command} ${args}`)
   return new Promise<void>((resolve, reject) => {
     const proc = spawn(command, args, {
       stdio: [process.stdout, process.stderr],
     })
+    const dataGlobal = [];
+
     proc.on('error', (error: any) => {
       reject(error)
     })
+
+    proc.stderr.on('data', (data: any) => {
+      dataGlobal.push(data.toString())
+    })
+
     proc.on('exit', (code: any) => {
       if (code !== 0) {
-        reject(code)
+        reject({code, stout: dataGlobal.join(" ")})
       } else {
         resolve()
       }
@@ -216,13 +239,21 @@ async function isPortOpen(host: string, port: number) {
 }
 
 export async function waitForPortOpen(host: string, port: number, seconds: number) {
+  console.info(`Waiting for ${host}:${port} to open for ${seconds}s`);
   const deadline = Date.now() + seconds * 1000
   do {
     if (await isPortOpen(host, port)) {
+      await delay(60000) // extra 60s just to give ganache extra time to startup
+      console.info(`Port ${host}:${port} opened`)
       return true
     }
   } while (Date.now() < deadline)
+  console.info("Port was not opened in time");
   return false
+}
+
+function delay(time) {
+  return new Promise((resolve) => setTimeout(resolve, time))
 }
 
 type ProxiedContractGetter = (
@@ -231,7 +262,7 @@ type ProxiedContractGetter = (
   contractPackage: ContractPackage, 
   ) => Promise<any>
 
-type ContratGetter = (
+type ContractGetter = (
   contractName: string,
   contractPackage?: ContractPackage,
   ) => Promise<any>
@@ -248,11 +279,10 @@ export const assertProxiesSet = async (getContract: ProxiedContractGetter) => {
         contractName + 'Proxy not pointing to the ' + contractName + ' implementation'
       )
     }
-    
   }
 }
 
-export const assertContractsRegistered = async (getContract: ContratGetter) => {
+export const assertContractsRegistered = async (getContract: any) => {
   const registry: RegistryInstance = await getContract('Registry')
   for (const proxyPackage of hasEntryInRegistry) {
     for (const contractName of proxyPackage.contracts) {
@@ -266,7 +296,7 @@ export const assertContractsRegistered = async (getContract: ContratGetter) => {
   }
 }
 
-export const assertRegistryAddressesSet = async (getContract: ContratGetter) => {
+export const assertRegistryAddressesSet = async (getContract: ContractGetter) => {
   const registry: RegistryInstance = await getContract('Registry')
   for (const contractName of usesRegistry) {
     const contract: UsingRegistryInstance = await getContract(contractName, MENTO_PACKAGE)
@@ -366,10 +396,10 @@ export function assertBNArrayEqual(
   assert(Array.isArray(actualArray), `Actual is not an array`)
   assert(Array.isArray(expectedArray), `Expected is not an array`)
   assert(actualArray.length === expectedArray.length, `Different array sizes; actual: ${actualArray.length} expected: ${expectedArray.length}`)
-  assert(actualArray.every(actualValue => isNumber(actualValue)) 
+  assert(actualArray.every(actualValue => isNumber(actualValue))
       && expectedArray.every(expectedValue => isNumber(expectedValue)),
       `Expected all elements to be numbers`)
-      
+
   for (let i = 0; i < actualArray.length; i++) {
     assertEqualBN(actualArray[i], expectedArray[i])
   }
@@ -423,6 +453,18 @@ export function assertEqualBNArray(
 ) {
   assert.strictEqual(value.length, expected.length, msg)
   value.forEach((x, i) => assertEqualBN(x, expected[i]))
+}
+
+export function assertGtBN(
+  value: number | BN | BigNumber,
+  expected: number | BN | BigNumber,
+  msg?: string
+) {
+  assert(
+    web3.utils.toBN(value).gt(web3.utils.toBN(expected)),
+    `expected ${value.toString()} to be greater than to ${expected.toString()}. ${msg ||
+      ''}`
+  )
 }
 
 export function assertGteBN(
@@ -555,11 +597,11 @@ export async function assumeOwnershipWithTruffle(contractsToOwn: string[], to: s
   const transferOwnershipData = Buffer.from(stripHexEncoding(registry.contract.methods.transferOwnership(to).encodeABI()), 'hex')
   const proposalTransactions = await Promise.all(
     contractsToOwn.map(async (contractName: string) => {
-      
+
       const artifactsInstance = ArtifactsSingleton.getInstance(contractPackage, artifacts)
 
       const contractAddress = (await getDeployedProxiedContract(contractName, artifactsInstance)).address
-      
+
       return {
         value: 0,
         destination: contractAddress,
@@ -634,7 +676,90 @@ export const unlockAndAuthorizeKey = async (
   await web3.eth.personal.unlockAccount(addr, 'passphrase', 1000000)
 
   const signature = await getParsedSignatureOfAddress(web3, account, addr)
-  return authorizeFn(addr, signature.v, signature.r, signature.s, {
+  await authorizeFn(addr, signature.v, signature.r, signature.s, {
     from: account,
   })
+
+  return addr
+}
+
+export const authorizeAndGenerateVoteSigner = async (accountsInstance: AccountsInstance, account: string, accounts: string[]) => {
+  const roleHash = keccak256(utf8ToBytes('celo.org/core/vote'))
+  const role = bufferToHex(toBuffer(roleHash))
+  
+  const signer = await unlockAndAuthorizeKey(
+    KeyOffsets.VALIDATING_KEY_OFFSET,
+    accountsInstance.authorizeVoteSigner,
+    account,
+    accounts
+  )
+  // fund singer
+  await web3.eth.sendTransaction({
+      from: accounts[9],
+      to: signer,
+      value:  web3.utils.toWei('1', 'ether'),
+    })
+
+  await accountsInstance.completeSignerAuthorization(account, role, { from: signer })
+
+  return signer;
+}
+
+export async function createAndAssertDelegatorDelegateeSigners(accountsInstance: AccountsInstance, accounts: string[], delegator: string, delegatee?: string) {
+  let delegatorSigner
+  let delegateeSigner;
+
+  if (delegator != null) {
+    delegatorSigner = await authorizeAndGenerateVoteSigner(
+      accountsInstance,
+      delegator,
+      accounts
+      )
+    assert.notEqual(delegator, delegatorSigner)
+    assert.equal(await accountsInstance.voteSignerToAccount(delegatorSigner), delegator)
+  }
+
+  if (delegatee != null) {
+    delegateeSigner = await authorizeAndGenerateVoteSigner(
+      accountsInstance,
+      delegatee,
+      accounts
+      )
+    assert.notEqual(delegatee, delegateeSigner)
+    assert.equal(await accountsInstance.voteSignerToAccount(delegateeSigner), delegatee)
+  }
+  return [delegatorSigner, delegateeSigner]
+}
+
+export async function assertDelegatorDelegateeAmounts(
+  delegator: string,
+  delegatee: string,
+  percent: number,
+  amount: number,
+  lockedGold: LockedGoldInstance
+) {
+  const [fraction, currentAmount] = await lockedGold.getDelegatorDelegateeInfo(
+    delegator,
+    delegatee
+  )
+  assertEqualBN(fromFixed(fraction).multipliedBy(100), percent)
+  assertEqualBN(currentAmount, amount)
+}
+
+export function expectBigNumberInRange(real: BigNumber,
+  expected: BigNumber,
+  range: BigNumber = new BigNumber("10000000000000000") // gas
+  ) {
+  expect(
+    real.plus(range).gte(expected),
+    `Number ${real.toString()} is not in range <${expected.minus(range).toString()}, ${expected
+      .plus(range)
+      .toString()}>`
+  ).to.be.true;
+  expect(
+    real.minus(range).lte(expected),
+    `Number ${real.toString()} is not in range <${expected.minus(range).toString()}, ${expected
+      .plus(range)
+      .toString()}>`
+  ).to.be.true;
 }

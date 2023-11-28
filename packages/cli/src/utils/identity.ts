@@ -1,7 +1,7 @@
 import { ContractKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { Claim } from '@celo/contractkit/lib/identity/claims/claim'
-import { VERIFIABLE_CLAIM_TYPES } from '@celo/contractkit/lib/identity/claims/types'
+import { now, VERIFIABLE_CLAIM_TYPES } from '@celo/contractkit/lib/identity/claims/types'
 import { verifyClaim } from '@celo/contractkit/lib/identity/claims/verify'
 import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
@@ -9,7 +9,7 @@ import { NativeSigner } from '@celo/utils/lib/signatureUtils'
 import { toChecksumAddress } from '@ethereumjs/util'
 import { cli } from 'cli-ux'
 import { writeFileSync } from 'fs'
-import moment from 'moment'
+import humanizeDuration from 'humanize-duration'
 import { BaseCommand } from '../base'
 import { Args, Flags } from './command'
 
@@ -23,7 +23,7 @@ export abstract class ClaimCommand extends BaseCommand {
     }),
   }
   static args = [Args.file('file', { description: 'Path of the metadata file' })]
-  public requireSynced: boolean = false
+  public requireSynced = false
   // We need this to properly parse flags for subclasses
   protected self = ClaimCommand
 
@@ -93,6 +93,10 @@ export abstract class ClaimCommand extends BaseCommand {
 
 export const claimArgs = [Args.file('file', { description: 'Path of the metadata file' })]
 
+const fromNow = (timeInSeconds: number) => {
+  return `${humanizeDuration((now() - timeInSeconds) * 1000)} ago`
+}
+
 export const displayMetadata = async (
   metadata: IdentityMetadataWrapper,
   kit: ContractKit,
@@ -123,7 +127,8 @@ export const displayMetadata = async (
       type: claim.type,
       extra,
       status: verifiable ? (status ? `Could not verify: ${status}` : 'Verified!') : 'N/A',
-      createdAt: moment.unix(claim.timestamp).fromNow(),
+      // timestamp is in seconds see packages/sdk/contractkit/src/identity/claims/types.ts#now
+      createdAt: fromNow(claim.timestamp), // or //new Date(claim.timestamp * 1000).toUTCString(),
     }
   })
 

@@ -1,17 +1,21 @@
 // tslint:disable: max-classes-per-file
 // tslint:disable: no-console
+// tslint:disable: ordered-imports
 import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
-// tslint:disable-next-line: ordered-imports
+
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
+import { makeTruffleContractForMigrationWithoutSingleton } from '@celo/protocol/lib/web3-utils'
 import { Address, NULL_ADDRESS, eqAddress } from '@celo/utils/lib/address'
 import { TruffleContract } from '@truffle/contract'
-// tslint:disable-next-line: ordered-imports
+
 import { readJsonSync, readdirSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
 import { RegistryInstance } from 'types'
 import { getReleaseVersion, ignoredContractsV9 } from '../../lib/compatibility/ignored-contracts-v9'
+import { networks } from '../../truffle-config.js'
 
 /*
  * A script that reads a backwards compatibility report, deploys changed contracts, and creates
@@ -29,6 +33,14 @@ import { getReleaseVersion, ignoredContractsV9 } from '../../lib/compatibility/i
 
 let ignoredContractsSet = new Set()
 
+function delay(time) {
+  return new Promise((resolve) => setTimeout(resolve, time))
+}
+
+function getRandomNumber(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
 class ContractAddresses {
   static async create(
     contracts: string[],
@@ -38,9 +50,17 @@ class ContractAddresses {
     const addresses = new Map()
     await Promise.all(
       contracts.map(async (contract: string) => {
-        const registeredAddress = await registry.getAddressForString(contract)
-        if (!eqAddress(registeredAddress, NULL_ADDRESS)) {
-          addresses.set(contract, registeredAddress)
+        // without this delay it sometimes fails with ProviderError
+        await delay(getRandomNumber(1, 1000))
+        try {
+          const registeredAddress = await registry.getAddressForString(contract)
+
+          if (!eqAddress(registeredAddress, NULL_ADDRESS)) {
+            addresses.set(contract, registeredAddress)
+          }
+        } catch (error) {
+          console.log('contract', contract, error)
+          throw error
         }
       })
     )
@@ -94,9 +114,14 @@ const deployImplementation = async (
   }
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
+
+  // without this delay it sometimes fails with ProviderError
+  await delay(getRandomNumber(1, 1000))
+
   const contract = await (dryRun
     ? Contract.at(celoRegistryAddress)
     : Contract.new(testingDeployment))
+
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
@@ -256,7 +281,10 @@ module.exports = async (callback: (error?: any) => number) => {
       ignoredContractsSet = new Set(ignoredContractsV9)
     }
 
+    const contracts08 = readdirSync(join(argv.build_directory, 'contracts-0.8'))
+
     const contracts = readdirSync(join(argv.build_directory, 'contracts'))
+      .concat(contracts08) // adding at the end so libraries that are already deployed don't get redeployed
       .map((x) => basename(x, '.json'))
       .filter(
         (contract) =>
@@ -269,25 +297,49 @@ module.exports = async (callback: (error?: any) => number) => {
     const released: Set<string> = new Set([])
     const proposal: ProposalTx[] = []
 
-    const release = async (contractName: string) => {
+    const release = async (contractNameIn: string) => {
+      const contractName = contractNameIn // not sure this will be needed
+
       // 0. Skip already released dependencies
       if (released.has(contractName)) {
         return
       }
-      // 1. Release all dependencies. Guarantees library addresses are canonical for linking.
-      const contractDependencies = dependencies.get(contractName)
-      for (const dependency of contractDependencies) {
-        await release(dependency)
-      }
-      console.log('Dependencies for contract', contractName)
-      // 2. Link dependencies.
-      const contractArtifact = await artifacts.require(contractName)
-      await Promise.all(contractDependencies.map((d) => contractArtifact.link(d, addresses.get(d))))
 
-      // 3. Deploy new versions of the contract or library, if indicated by the report.
+      console.log('Dependencies for contract', contractName)
+
+      let contractArtifact
+
+      try {
+        contractArtifact = await artifacts.require(contractName)
+      } catch {
+        // it wasn't found in the standard artifacts folder, check if it's 0.8 contract
+        // TODO this needs generalization to support more packages
+        // https://github.com/celo-org/celo-monorepo/issues/10563
+        contractArtifact = makeTruffleContractForMigrationWithoutSingleton(
+          contractName,
+          { ...networks[argv.network], name: argv.network },
+          SOLIDITY_08_PACKAGE.name,
+          web3
+        )
+        // TODO WARNING: make sure there are no libraries with the same name that don't get deployed
+      }
       const shouldDeployContract = Object.keys(report.contracts).includes(contractName)
       const shouldDeployLibrary = Object.keys(report.libraries).includes(contractName)
+
       if (shouldDeployContract) {
+        // Don't try to deploy and link libraries of contracts it doesn't have to deploy
+        // 1. Release all dependencies. Guarantees library addresses are canonical for linking.
+        const contractDependencies = dependencies.get(contractName)
+        for (const dependency of contractDependencies) {
+          console.log('Releasing dependency', dependency)
+          await release(dependency)
+        }
+        // 2. Link dependencies.
+        await Promise.all(
+          contractDependencies.map((d) => contractArtifact.link(d, addresses.get(d)))
+        )
+        // 3. Deploy new versions of the contract or library, if indicated by the report.
+        console.log('Deploying Contract:', contractName)
         await deployCoreContract(
           contractName,
           contractArtifact,
@@ -299,17 +351,22 @@ module.exports = async (callback: (error?: any) => number) => {
           argv.from
         )
       } else if (shouldDeployLibrary) {
+        console.log('Deploying library:', contractName)
         await deployLibrary(contractName, contractArtifact, addresses, argv.dry_run, argv.from)
+      } else {
+        console.log('Not deployed:', contractName, "(it's not included in the report)")
       }
 
       // 4. Mark the contract as released
       released.add(contractName)
     }
+
     for (const contractName of contracts) {
       if (isCoreContract(contractName) && isProxiedContract(contractName)) {
         await release(contractName)
       }
     }
+
     writeJsonSync(argv.proposal, proposal, { spaces: 2 })
     callback()
   } catch (error) {

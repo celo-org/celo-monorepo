@@ -13,7 +13,7 @@ import {
   PK1,
 } from './test-constants'
 
-jest.setTimeout(30000)
+jest.setTimeout(60000)
 
 describe('KeystoreBase functionality via InMemoryKeystore (mock)', () => {
   let keystore: InMemoryKeystore

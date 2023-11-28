@@ -213,7 +213,7 @@ function gethRepositoryFromFlags() {
 }
 
 export function getHooks(gethConfig: GethRunConfig) {
-  return getContext(gethConfig).hooks
+  return getContext(gethConfig, true).hooks
 }
 
 export function getContext(gethConfig: GethRunConfig, verbose: boolean = verboseOutput) {

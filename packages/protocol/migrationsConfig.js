@@ -83,10 +83,15 @@ const DefaultConfig = {
     minimumReports: 1,
     frozen: false,
   },
+  feeHandler: {
+    beneficiaryAddress: '0x2A486910DBC72cACcbb8d0e1439C96b03B2A4699',
+    burnFraction: 80 / 100,
+  },
   gasPriceMinimum: {
     minimumFloor: 100000000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
+    baseFeeOpCodeActivationBlock: 0,
   },
   goldToken: {
     frozen: false,
@@ -574,7 +579,7 @@ NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores
 NetworkConfigs.mainnet = NetworkConfigs.rc1
 
 const linkedLibraries = {
-  Proposals: ['Governance', 'GovernanceTest', 'ProposalsTest'],
+  Proposals: ['Governance', 'GovernanceTest'],
   AddressLinkedList: ['Validators', 'ValidatorsTest'],
   AddressSortedLinkedList: ['Election', 'ElectionTest'],
   IntegerSortedLinkedList: ['Governance', 'GovernanceTest', 'IntegerSortedLinkedListTest'],

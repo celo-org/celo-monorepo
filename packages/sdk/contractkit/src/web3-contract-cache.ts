@@ -3,6 +3,7 @@ import debugFactory from 'debug'
 import { AddressRegistry } from './address-registry'
 import { CeloContract, ProxyContracts } from './base'
 import { StableToken } from './celo-tokens'
+import { newGasPriceMinimum } from './generated/0.8/GasPriceMinimum'
 import { newAccounts } from './generated/Accounts'
 import { newAttestations } from './generated/Attestations'
 import { newBlockchainParameters } from './generated/BlockchainParameters'
@@ -13,11 +14,11 @@ import { newEpochRewards } from './generated/EpochRewards'
 import { newEscrow } from './generated/Escrow'
 import { newFederatedAttestations } from './generated/FederatedAttestations'
 import { newFeeCurrencyWhitelist } from './generated/FeeCurrencyWhitelist'
+import { newFeeHandler } from './generated/FeeHandler'
 import { newFreezer } from './generated/Freezer'
-import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
-import { newIerc20 } from './generated/IERC20'
+import { newIERC20 } from './generated/IERC20'
 import { newLockedGold } from './generated/LockedGold'
 import { newMetaTransactionWallet } from './generated/MetaTransactionWallet'
 import { newMetaTransactionWalletDeployer } from './generated/MetaTransactionWalletDeployer'
@@ -29,11 +30,14 @@ import { newRegistry } from './generated/Registry'
 import { newSortedOracles } from './generated/SortedOracles'
 import { newValidators } from './generated/Validators'
 import { newExchange } from './generated/mento/Exchange'
-import { newExchangeBrl } from './generated/mento/ExchangeBRL'
-import { newExchangeEur } from './generated/mento/ExchangeEUR'
+import { newExchangeBRL } from './generated/mento/ExchangeBRL'
+import { newExchangeEUR } from './generated/mento/ExchangeEUR'
 import { newGrandaMento } from './generated/mento/GrandaMento'
 import { newReserve } from './generated/mento/Reserve'
 import { newStableToken } from './generated/mento/StableToken'
+
+import { newMentoFeeHandlerSeller } from './generated/MentoFeeHandlerSeller'
+import { newUniswapFeeHandlerSeller } from './generated/UniswapFeeHandlerSeller'
 
 const debug = debugFactory('kit:web3-contract-cache')
 
@@ -45,14 +49,17 @@ export const ContractFactories = {
   [CeloContract.DowntimeSlasher]: newDowntimeSlasher,
   [CeloContract.Election]: newElection,
   [CeloContract.EpochRewards]: newEpochRewards,
-  [CeloContract.ERC20]: newIerc20,
+  [CeloContract.ERC20]: newIERC20,
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
-  [CeloContract.ExchangeEUR]: newExchangeEur,
-  [CeloContract.ExchangeBRL]: newExchangeBrl,
+  [CeloContract.ExchangeEUR]: newExchangeEUR,
+  [CeloContract.ExchangeBRL]: newExchangeBRL,
   [CeloContract.FederatedAttestations]: newFederatedAttestations,
   [CeloContract.FeeCurrencyWhitelist]: newFeeCurrencyWhitelist,
   [CeloContract.Freezer]: newFreezer,
+  [CeloContract.FeeHandler]: newFeeHandler,
+  [CeloContract.MentoFeeHandlerSeller]: newMentoFeeHandlerSeller,
+  [CeloContract.UniswapFeeHandlerSeller]: newUniswapFeeHandlerSeller,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
@@ -138,6 +145,9 @@ export class Web3ContractCache {
   getFreezer() {
     return this.getContract(CeloContract.Freezer)
   }
+  getFeeHandler() {
+    return this.getContract(CeloContract.FeeHandler)
+  }
   getGasPriceMinimum() {
     return this.getContract(CeloContract.GasPriceMinimum)
   }
@@ -153,9 +163,15 @@ export class Web3ContractCache {
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
   }
+  /*
+    @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
+  */
   getMetaTransactionWallet(address: string) {
     return this.getContract(CeloContract.MetaTransactionWallet, address)
   }
+  /*
+    @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
+  */
   getMetaTransactionWalletDeployer(address: string) {
     return this.getContract(CeloContract.MetaTransactionWalletDeployer, address)
   }
@@ -194,6 +210,8 @@ export class Web3ContractCache {
         address = await this.registry.addressFor(contract)
       }
       debug('Initiating contract %s', contract)
+      debug('is it included?', ProxyContracts.includes(contract))
+      debug('is it included?', ProxyContracts.toString())
       const createFn = ProxyContracts.includes(contract) ? newProxy : ContractFactories[contract]
       this.cacheMap[contract] = createFn(
         this.registry.connection.web3,

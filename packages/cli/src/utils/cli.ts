@@ -22,7 +22,6 @@ export async function displaySendTx<A>(
   cli.action.start(`Sending Transaction: ${name}`)
   try {
     const txResult = await txObj.send(tx)
-
     const txHash = await txResult.getHash()
 
     console.log(chalk`SendTransaction: {red.bold ${name}}`)

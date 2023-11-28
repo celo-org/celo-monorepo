@@ -4,4 +4,3 @@ certoraRun contracts/common/Registry.sol specs/harnesses/ReserveHarness.sol \
   --optimistic_loop \
   --short_output \
   --msg "Reserve" \
-  --solc_args "['--evm-version', 'istanbul']"

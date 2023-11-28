@@ -18,9 +18,12 @@ oracle:
       ],
       [
         {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false}
+      ],
+      [
+        {exchange: 'XIGNITE', symbol: 'EURXOF', toInvert: false}
       ]
   ]"
-  minPriceSourceCount: 2
+  minPriceSourceCount: 3
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:

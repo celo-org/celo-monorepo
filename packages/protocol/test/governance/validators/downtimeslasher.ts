@@ -109,9 +109,9 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     await validators.affiliate(groups[0], { from: validatorList[1] })
     await validators.affiliate(groups[1], { from: validatorList[2] })
     await slasher.initialize(registry.address, slashingPenalty, slashingReward, slashableDowntime)
-    await Promise.all(
-      accounts.map((account) => mockLockedGold.setAccountTotalLockedGold(account, 50000))
-    )
+    for (const account of accounts) {
+      await mockLockedGold.setAccountTotalLockedGold(account, 50000)
+    }
   })
 
   describe('#initialize()', () => {

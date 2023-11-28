@@ -1,3 +1,4 @@
+// tslint:disable: ordered-imports
 import {
   Address,
   CeloTx,
@@ -16,9 +17,9 @@ import { CeloContract, CeloTokenContract } from './base'
 import { CeloTokens, EachCeloToken } from './celo-tokens'
 import { ValidWrappers, WrapperCache } from './contract-cache'
 import {
+  HttpProviderOptions,
   ensureCurrentProvider,
   getWeb3ForKit,
-  HttpProviderOptions,
   setupAPIKey,
 } from './setupForKits'
 import { Web3ContractCache } from './web3-contract-cache'
@@ -108,6 +109,9 @@ export class ContractKit {
   readonly contracts: WrapperCache
   /** helper for interacting with CELO & stable tokens */
   readonly celoTokens: CeloTokens
+
+  /** @deprecated no longer needed since gasPrice is available on node rpc */
+  gasPriceSuggestionMultiplier = 5
 
   constructor(readonly connection: Connection) {
     this.registry = new AddressRegistry(connection)

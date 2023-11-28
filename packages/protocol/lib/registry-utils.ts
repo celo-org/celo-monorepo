@@ -6,7 +6,7 @@
  * an environment.
  */
 
-import { MENTO_PACKAGE } from "../contractPackages"
+import { ContractPackage, MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from "../contractPackages"
 
 export const celoRegistryAddress = '0x000000000000000000000000000000000000ce10'
 
@@ -23,6 +23,8 @@ export enum CeloContractName {
   ExchangeEUR = 'ExchangeEUR',
   ExchangeBRL = 'ExchangeBRL',
   FederatedAttestations = 'FederatedAttestations',
+  FeeHandler = 'FeeHandler',
+  MentoFeeHandlerSeller = 'MentoFeeHandlerSeller',
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
@@ -40,6 +42,8 @@ export enum CeloContractName {
   StableToken = 'StableToken',
   StableTokenEUR = 'StableTokenEUR',
   StableTokenBRL = 'StableTokenBRL',
+  TransferWhitelist = 'TransferWhitelist',
+  UniswapFeeHandlerSeller = 'UniswapFeeHandlerSeller',
   Validators = 'Validators',
 }
 
@@ -48,8 +52,9 @@ export const usesRegistry = [
   CeloContractName.StableToken,
 ]
 
-export const hasEntryInRegistry= [
+export const hasEntryInRegistry: ContractPackage[]= [
   {
+    name: "default",
     contracts:[
       CeloContractName.Accounts,
       CeloContractName.Attestations,
@@ -61,7 +66,6 @@ export const hasEntryInRegistry= [
       CeloContractName.FederatedAttestations,
       CeloContractName.FeeCurrencyWhitelist,
       CeloContractName.Freezer,
-      CeloContractName.GasPriceMinimum,
       CeloContractName.GoldToken,
       CeloContractName.GovernanceSlasher,
       CeloContractName.OdisPayments,
@@ -69,6 +73,8 @@ export const hasEntryInRegistry= [
       CeloContractName.SortedOracles,
     ]
   },
+  SOLIDITY_08_PACKAGE
+  ,
   {
     ...MENTO_PACKAGE,
     // not all Mentro contracts are supposed to be in the Registry

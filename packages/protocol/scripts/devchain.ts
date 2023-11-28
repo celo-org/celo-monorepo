@@ -15,6 +15,9 @@ const gasLimit = 20000000
 
 const ProtocolRoot = path.normalize(path.join(__dirname, '../'))
 
+// As documented https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
+const isCI = process.env.CI === 'true'
+
 // Move to where the caller made the call So to have relative paths
 const CallerCWD = process.env.INIT_CWD ? process.env.INIT_CWD : process.cwd()
 process.chdir(CallerCWD)
@@ -133,7 +136,8 @@ async function startGanache(
     database: { dbPath: datadir },
     wallet: { mnemonic: MNEMONIC, defaultBalance: 200000000 },
     miner: { blockGasLimit: gasLimit },
-    chain: { networkId: 1101, chainId: 1, allowUnlimitedContractSize: true, hardfork: 'istanbul' },
+    chain: { networkId: 1101, chainId: 1, allowUnlimitedContractSize: true },
+    allowUnlimitedInitCodeSize: true,
   })
 
   server.listen(8545, async (err) => {
@@ -247,7 +251,13 @@ async function runDevChainFromTar(filename: string) {
 
   await decompressChain(filename, chainCopy.name)
 
+  console.info('Starting Ganache ...')
   const stopGanache = await startGanache(chainCopy.name, { verbose: true }, chainCopy)
+  if (isCI) {
+    // If we are running on circle ci we need to wait for ganache to be up.
+    await waitForPortOpen('localhost', 8545, 120)
+  }
+
   return stopGanache
 }
 
@@ -304,18 +314,25 @@ async function runDevChain(
     await resetDir(datadir)
   }
   createDirIfMissing(datadir)
+  console.info('Starting Ganache ...')
   const stopGanache = await startGanache(datadir, { verbose: true })
+  if (isCI) {
+    // If we are running on circle ci we need to wait for ganache to be up.
+    await waitForPortOpen('localhost', 8545, 120)
+  }
   if (opts.reset || opts.runMigrations) {
     const code = await runMigrations({ upto: opts.upto, migrationOverride: opts.migrationOverride })
     if (code !== 0) {
       throw Error('Migrations failed')
     }
+    console.info('Migrations successfully applied')
   }
   if (opts.releaseGoldContracts) {
     const code = await deployReleaseGold(opts.releaseGoldContracts)
     if (code !== 0) {
       throw Error('ReleaseGold deployment failed')
     }
+    console.info('ReleaseGold successfully deployed')
   }
   return stopGanache
 }
@@ -368,4 +385,26 @@ async function compressChain(chainPath: string, filename: string): Promise<void>
       }
     })
   })
+}
+
+export async function waitForPortOpen(host: string, port: number, seconds: number) {
+  console.info(`Waiting for ${host}:${port} to open for ${seconds}s`)
+  const deadline = Date.now() + seconds * 1000
+  do {
+    if (await isPortOpen(host, port)) {
+      await delay(10000) // extra 10s just to give ganache extra time to startup
+      console.info(`Port ${host}:${port} opened`)
+      return true
+    }
+  } while (Date.now() < deadline)
+  console.info('Port was not opened in time')
+  return false
+}
+
+async function isPortOpen(host: string, port: number) {
+  return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
+}
+
+function delay(time) {
+  return new Promise((resolve) => setTimeout(resolve, time))
 }

@@ -1,6 +1,9 @@
 import { recoverFunds } from '@celo/protocol/lib/recover-funds'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertTransactionRevertWithReason } from '@celo/protocol/lib/test-utils'
+import {
+  assertTransactionRevertWithReason,
+  expectBigNumberInRange,
+} from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
 import {
   FreezerContract,
@@ -262,12 +265,15 @@ contract('Proxy', (accounts: string[]) => {
 
     await proxy._setImplementation(getSet.address)
 
-    assert((await goldToken.balanceOf(owner)).eq(initialBalance.minus(amount)))
+    const ownerBalance = await goldToken.balanceOf(owner)
+
+    expectBigNumberInRange(ownerBalance, initialBalance.minus(amount))
     const proxyBalance = await web3.eth.getBalance(proxy.address)
     assert(proxyBalance === amount.toString())
 
     await recoverFunds(proxy.address, owner)
+    const ownerBalance2 = await goldToken.balanceOf(owner)
     assert((await web3.eth.getBalance(proxy.address)) === '0')
-    assert((await goldToken.balanceOf(owner)).eq(initialBalance))
+    expectBigNumberInRange(ownerBalance2, initialBalance)
   })
 })

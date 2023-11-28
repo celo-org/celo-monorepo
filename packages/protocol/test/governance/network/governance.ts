@@ -7,6 +7,7 @@ import {
   assertLogMatches2,
   assertRevert,
   assertTransactionRevertWithReason,
+  createAndAssertDelegatorDelegateeSigners,
   matchAny,
   mineToNextEpoch,
   stripHexEncoding,
@@ -87,6 +88,7 @@ interface Transaction {
   data: Buffer
 }
 
+// TODO(asa): Test dequeueProposalsIfReady
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
 contract('Governance', (accounts: string[]) => {
   let governance: GovernanceTestInstance
@@ -149,7 +151,7 @@ contract('Governance', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await accountsInstance.initialize(registry.address)
     await accountsInstance.createAccount()
-    await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+    await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
     await mockLockedGold.setTotalLockedGold(yesVotes)
     transactionSuccess1 = {
       value: 0,
@@ -1192,7 +1194,9 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when it has been more than dequeueFrequency since the last dequeue', () => {
       const upvotedProposalId = 2
+      let originalLastDequeue: BigNumber
       beforeEach(async () => {
+        originalLastDequeue = await governance.lastDequeue()
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -1203,21 +1207,26 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
+        await timeTravel(dequeueFrequency, web3)
       })
 
-      it('should only dequeue proposal(s) which is past lastDequeue time', async () => {
-        await governance.upvote(proposalId, upvotedProposalId, 0)
-
-        assert.equal((await governance.getQueueLength()).toNumber(), 2)
-        await timeTravel(dequeueFrequency, web3)
-        await governance.upvote(upvotedProposalId, 0, proposalId)
-        assert.equal((await governance.getQueueLength()).toNumber(), 1)
+      it('should dequeue queued proposal(s)', async () => {
+        const queueLength = await governance.getQueueLength()
+        await governance.upvote(upvotedProposalId, 0, 0)
+        assert.isFalse(await governance.isQueued(proposalId))
+        assert.equal(
+          (await governance.getQueueLength()).toNumber(),
+          queueLength.minus(concurrentProposals).toNumber()
+        )
+        assertEqualBN(await governance.dequeued(0), proposalId)
+        assert.isBelow(originalLastDequeue.toNumber(), (await governance.lastDequeue()).toNumber())
       })
 
-      it('should return false when upvoting a proposal that will be dequeued', async () => {
-        await timeTravel(dequeueFrequency, web3)
-        const isUpvoted = await governance.upvote.call(proposalId, 0, 0)
-        assert.isFalse(isUpvoted)
+      it('should revert when upvoting a proposal that will be dequeued', async () => {
+        await assertTransactionRevertWithReason(
+          governance.upvote(proposalId, 0, 0),
+          'cannot upvote a proposal not in the queue'
+        )
       })
     })
 
@@ -1226,7 +1235,7 @@ contract('Governance', (accounts: string[]) => {
       // Expire the upvoted proposal without dequeueing it.
       const queueExpiry1 = 60
       beforeEach(async () => {
-        await governance.setQueueExpiry(queueExpiry1)
+        await governance.setQueueExpiry(60)
         await governance.upvote(proposalId, 0, 0)
         await timeTravel(queueExpiry1, web3)
         await governance.propose(
@@ -1691,7 +1700,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.approve(1, 0)
       await governance.approve(2, 1)
       await governance.approve(3, 2)
-      await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+      await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
     })
 
     for (let numVoted = 0; numVoted < 3; numVoted++) {
@@ -1810,7 +1819,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       })
 
       it('should return true', async () => {
@@ -1862,7 +1871,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should revert when the account weight is 0', async () => {
-        await mockLockedGold.setAccountTotalLockedGold(account, 0)
+        await mockLockedGold.setAccountTotalGovernancePower(account, 0)
         await assertTransactionRevertWithReason(
           governance.vote(proposalId, index, value),
           'Voter weight zero'
@@ -1927,7 +1936,7 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(newDequeueFrequency, web3)
           await governance.approve(proposalId2, index2)
-          await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+          await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
         })
 
         it('should set mostRecentReferendumProposal to the youngest proposal voted on', async () => {
@@ -2077,6 +2086,87 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
+    describe('When proposal is approved and have signer', () => {
+      let accountSigner
+      beforeEach(async () => {
+        ;[accountSigner] = await createAndAssertDelegatorDelegateeSigners(
+          accountsInstance,
+          accounts,
+          account
+        )
+
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(dequeueFrequency, web3)
+        await governance.approve(proposalId, index)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
+      })
+
+      it('should return true', async () => {
+        const success = await governance.vote.call(proposalId, index, value, {
+          from: accountSigner,
+        })
+        assert.isTrue(success)
+      })
+
+      it('should increment the vote totals', async () => {
+        await governance.vote(proposalId, index, value, { from: accountSigner })
+        const [yes, ,] = await governance.getVoteTotals(proposalId)
+        assert.equal(yes.toNumber(), yesVotes)
+      })
+
+      it("should set the voter's vote record", async () => {
+        await governance.vote(proposalId, index, value, { from: accountSigner })
+        const [recordProposalId, , , yesVotesRecord, noVotesRecord, abstainVotesRecord] =
+          await governance.getVoteRecord(account, index)
+        assertEqualBN(recordProposalId, proposalId)
+        assertEqualBN(yesVotesRecord, yesVotes)
+        assertEqualBN(noVotesRecord, 0)
+        assertEqualBN(abstainVotesRecord, 0)
+      })
+
+      it('should set the most recent referendum proposal voted on', async () => {
+        await governance.vote(proposalId, index, value, { from: accountSigner })
+        assert.equal(
+          (await governance.getMostRecentReferendumProposal(account)).toNumber(),
+          proposalId
+        )
+      })
+
+      it('should emit the ProposalVotedV2 event', async () => {
+        await governance.dequeueProposalsIfReady()
+        const resp = await governance.vote(proposalId, index, value, { from: accountSigner })
+        assert.equal(resp.logs.length, resp.logs.length)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'ProposalVotedV2',
+          args: {
+            proposalId: new BigNumber(proposalId),
+            account,
+            yesVotes,
+            noVotes: 0,
+            abstainVotes: 0,
+          },
+        })
+      })
+
+      it('should revert when the account weight is 0', async () => {
+        await mockLockedGold.setAccountTotalGovernancePower(account, 0)
+        await assertTransactionRevertWithReason(
+          governance.vote(proposalId, index, value, { from: accountSigner }),
+          'Voter weight zero'
+        )
+      })
+    })
+
     describe('when proposal is not approved', () => {
       beforeEach(async () => {
         await governance.propose(
@@ -2090,7 +2180,7 @@ contract('Governance', (accounts: string[]) => {
           { value: minDeposit }
         )
         await timeTravel(dequeueFrequency, web3)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       })
 
       it('should return true', async () => {
@@ -2140,7 +2230,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should revert when the account weight is 0', async () => {
-        await mockLockedGold.setAccountTotalLockedGold(account, 0)
+        await mockLockedGold.setAccountTotalGovernancePower(account, 0)
         await assertTransactionRevertWithReason(
           governance.vote(proposalId, index, value),
           'Voter weight zero'
@@ -2190,7 +2280,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
         await governance.vote(proposalId, index, value)
         await timeTravel(referendumStageDuration, web3)
         await timeTravel(executionStageDuration, web3)
@@ -2224,7 +2314,7 @@ contract('Governance', (accounts: string[]) => {
 
         const otherAccount1 = accounts[1]
         await accountsInstance.createAccount({ from: otherAccount1 })
-        await mockLockedGold.setAccountTotalLockedGold(otherAccount1, otherAccountWeight)
+        await mockLockedGold.setAccountTotalGovernancePower(otherAccount1, otherAccountWeight)
         await governance.vote(proposalId2, index, value, { from: otherAccount1 })
 
         await governance.vote(proposalId2, index, VoteValue.No)
@@ -2258,7 +2348,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       })
 
       it('should return true', async () => {
@@ -2321,7 +2411,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should revert when the account weight is 0', async () => {
-        await mockLockedGold.setAccountTotalLockedGold(account, 0)
+        await mockLockedGold.setAccountTotalGovernancePower(account, 0)
         await assertTransactionRevertWithReason(
           governance.votePartially(proposalId, index, yesVotes, 0, 0),
           "Voter doesn't have enough locked Celo [(]formerly known as Celo Gold[)]"
@@ -2401,7 +2491,7 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(newDequeueFrequency, web3)
           await governance.approve(proposalId2, index2)
-          await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+          await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
         })
 
         it('should set mostRecentReferendumProposal to the youngest proposal voted on', async () => {
@@ -2603,6 +2693,143 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
+    describe('when proposal is approved with signer', () => {
+      let accountSigner
+
+      beforeEach(async () => {
+        ;[accountSigner] = await createAndAssertDelegatorDelegateeSigners(
+          accountsInstance,
+          accounts,
+          account
+        )
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(dequeueFrequency, web3)
+        await governance.approve(proposalId, index)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
+      })
+
+      it('should return true', async () => {
+        const success = await governance.votePartially.call(proposalId, index, yesVotes, 0, 0, {
+          gas: 7000000,
+          from: accountSigner,
+        })
+        assert.isTrue(success)
+      })
+
+      it('should increment the vote totals', async () => {
+        await governance.votePartially(proposalId, index, yesVotes, 0, 0, { from: accountSigner })
+        const [yes, ,] = await governance.getVoteTotals(proposalId)
+        assert.equal(yes.toNumber(), yesVotes)
+      })
+
+      it('should increment the vote totals when voting partially', async () => {
+        const yes = 10
+        const no = 50
+        const abstain = 30
+        await governance.votePartially(proposalId, index, yes, no, abstain, { from: accountSigner })
+        const [yesTotal, noTotal, abstainTotal] = await governance.getVoteTotals(proposalId)
+        assert.equal(yesTotal.toNumber(), yes)
+        assert.equal(noTotal.toNumber(), no)
+        assert.equal(abstainTotal.toNumber(), abstain)
+      })
+
+      it("should set the voter's vote record", async () => {
+        await governance.votePartially(proposalId, index, yesVotes, 0, 0, { from: accountSigner })
+        const [recordProposalId, , , yesVotesRecord] = await governance.getVoteRecord(
+          account,
+          index
+        )
+        assertEqualBN(recordProposalId, proposalId)
+        assertEqualBN(yesVotesRecord, yesVotes)
+      })
+
+      it('should set the most recent referendum proposal voted on', async () => {
+        await governance.votePartially(proposalId, index, yesVotes, 0, 0, { from: accountSigner })
+        assert.equal(
+          (await governance.getMostRecentReferendumProposal(account)).toNumber(),
+          proposalId
+        )
+      })
+
+      it('should emit the ProposalVotedV2 event', async () => {
+        const resp = await governance.votePartially(proposalId, index, yesVotes, 0, 0, {
+          from: accountSigner,
+        })
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'ProposalVotedV2',
+          args: {
+            proposalId: new BigNumber(proposalId),
+            account,
+            yesVotes,
+            noVotes: 0,
+            abstainVotes: 0,
+          },
+        })
+      })
+
+      it('should revert when the account weight is 0', async () => {
+        await mockLockedGold.setAccountTotalGovernancePower(account, 0)
+        await assertTransactionRevertWithReason(
+          governance.votePartially(proposalId, index, yesVotes, 0, 0, { from: accountSigner }),
+          "Voter doesn't have enough locked Celo [(]formerly known as Celo Gold[)]"
+        )
+      })
+
+      it('should revert when the account does not have enough gold', async () => {
+        await assertTransactionRevertWithReason(
+          governance.votePartially(proposalId, index, yesVotes + 1, 0, 0, { from: accountSigner }),
+          "Voter doesn't have enough locked Celo [(]formerly known as Celo Gold[)]"
+        )
+      })
+
+      it('should revert when the account does not have enough gold when voting partially', async () => {
+        const noVotes = yesVotes
+        await assertTransactionRevertWithReason(
+          governance.votePartially(proposalId, index, yesVotes, noVotes, 0, {
+            from: accountSigner,
+          }),
+          "Voter doesn't have enough locked Celo [(]formerly known as Celo Gold[)]"
+        )
+      })
+
+      it('should revert when the index is out of bounds', async () => {
+        await assertTransactionRevertWithReason(
+          governance.votePartially(proposalId, index + 1, yesVotes, 0, 0, { from: accountSigner }),
+          'Provided index greater than dequeue length.'
+        )
+      })
+
+      it('should revert if the proposal id does not match the index', async () => {
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(dequeueFrequency, web3)
+        const otherProposalId = 2
+        await assertTransactionRevertWithReason(
+          governance.votePartially(otherProposalId, index, yesVotes, 0, 0, { from: accountSigner }),
+          'Reason given: Proposal not dequeued.'
+        )
+      })
+    })
+
     describe('when proposal is not approved', () => {
       beforeEach(async () => {
         await governance.propose(
@@ -2616,7 +2843,7 @@ contract('Governance', (accounts: string[]) => {
           { value: minDeposit }
         )
         await timeTravel(dequeueFrequency, web3)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       })
 
       it('should return true', async () => {
@@ -2666,10 +2893,9 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should revert when the account weight is 0', async () => {
-        await mockLockedGold.setAccountTotalLockedGold(account, 0)
+        await mockLockedGold.setAccountTotalGovernancePower(account, 0)
         await assertTransactionRevertWithReason(
-          governance.votePartially(proposalId, index, yesVotes, 0, 0),
-          "Voter doesn't have enough locked Celo [(]formerly known as Celo Gold[)]"
+          governance.votePartially(proposalId, index, yesVotes, 0, 0)
         )
       })
 
@@ -2716,7 +2942,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
         await governance.votePartially(proposalId, index, yesVotes, 0, 0)
         await timeTravel(referendumStageDuration, web3)
         await timeTravel(executionStageDuration, web3)
@@ -2750,7 +2976,7 @@ contract('Governance', (accounts: string[]) => {
 
         const otherAccount1 = accounts[1]
         await accountsInstance.createAccount({ from: otherAccount1 })
-        await mockLockedGold.setAccountTotalLockedGold(otherAccount1, otherAccountWeight)
+        await mockLockedGold.setAccountTotalGovernancePower(otherAccount1, otherAccountWeight)
         await governance.votePartially(proposalId2, index, otherAccountWeight, 0, 0, {
           from: otherAccount1,
         })
@@ -2788,7 +3014,7 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
-          await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+          await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -2859,7 +3085,7 @@ contract('Governance', (accounts: string[]) => {
             { value: minDeposit }
           )
           await timeTravel(dequeueFrequency, web3)
-          await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+          await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration + 1, web3)
           await governance.approve(proposalId, index)
@@ -2931,7 +3157,7 @@ contract('Governance', (accounts: string[]) => {
             { value: minDeposit }
           )
           await timeTravel(dequeueFrequency, web3)
-          await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+          await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -2958,7 +3184,7 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
-          await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+          await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -2985,7 +3211,7 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
-          await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+          await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -3014,7 +3240,7 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
-          await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+          await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -3081,7 +3307,7 @@ contract('Governance', (accounts: string[]) => {
             )
             await timeTravel(dequeueFrequency, web3)
             await governance.approve(proposalId, index)
-            await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+            await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
           })
@@ -3108,7 +3334,7 @@ contract('Governance', (accounts: string[]) => {
             )
             await timeTravel(dequeueFrequency, web3)
             await governance.approve(proposalId, index)
-            await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+            await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
           })
@@ -3137,7 +3363,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
         await governance.vote(proposalId, index, value)
         await timeTravel(referendumStageDuration, web3)
         await timeTravel(executionStageDuration, web3)
@@ -3200,7 +3426,7 @@ contract('Governance', (accounts: string[]) => {
           { value: minDeposit }
         )
         await timeTravel(dequeueFrequency, web3)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       })
 
       it('should not emit ProposalExecuted when not approved', async () => {
@@ -3621,7 +3847,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
         await governance.vote(proposalId, index, value)
       })
 
@@ -3662,8 +3888,8 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when the adjusted support is greater than threshold', () => {
       beforeEach(async () => {
-        await mockLockedGold.setAccountTotalLockedGold(account, (yesVotes * 51) / 100)
-        await mockLockedGold.setAccountTotalLockedGold(otherAccount, (yesVotes * 49) / 100)
+        await mockLockedGold.setAccountTotalGovernancePower(account, (yesVotes * 51) / 100)
+        await mockLockedGold.setAccountTotalGovernancePower(otherAccount, (yesVotes * 49) / 100)
         await governance.vote(proposalId, index, VoteValue.Yes)
         await governance.vote(proposalId, index, VoteValue.No, { from: otherAccount })
       })
@@ -3676,8 +3902,8 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when the adjusted support is less than or equal to threshold', () => {
       beforeEach(async () => {
-        await mockLockedGold.setAccountTotalLockedGold(account, (yesVotes * 50) / 100)
-        await mockLockedGold.setAccountTotalLockedGold(otherAccount, (yesVotes * 50) / 100)
+        await mockLockedGold.setAccountTotalGovernancePower(account, (yesVotes * 50) / 100)
+        await mockLockedGold.setAccountTotalGovernancePower(otherAccount, (yesVotes * 50) / 100)
         await governance.vote(proposalId, index, VoteValue.Yes)
         await governance.vote(proposalId, index, VoteValue.No, { from: otherAccount })
       })
@@ -3734,63 +3960,6 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe('#dequeueProposalIfReady()', () => {
-    it('should not update lastDequeue proposal does not exist in the queue', async () => {
-      const nonExistentProposalId = 7
-      const originalLastDequeue = await governance.lastDequeue()
-      await timeTravel(dequeueFrequency, web3)
-      await governance.dequeueProposalIfReady(nonExistentProposalId)
-      assert.equal((await governance.getQueueLength()).toNumber(), 0)
-      assert.equal((await governance.lastDequeue()).toNumber(), originalLastDequeue.toNumber())
-    })
-    describe('when a proposal exists', () => {
-      const proposalId = 1
-      beforeEach(async () => {
-        await governance.propose(
-          [transactionSuccess1.value],
-          [transactionSuccess1.destination],
-          // @ts-ignore bytes type
-          transactionSuccess1.data,
-          [transactionSuccess1.data.length],
-          descriptionUrl,
-          { value: minDeposit }
-        )
-      })
-
-      it('should not update `dequeued` when proposal has expired', async () => {
-        await timeTravel(queueExpiry, web3)
-        await governance.dequeueProposalIfReady(proposalId)
-        const dequeued = await governance.getDequeue()
-        assert.equal(dequeued.length, 0)
-      })
-
-      it('should update `dequeued` when proposal has not expired', async () => {
-        await timeTravel(dequeueFrequency, web3)
-        await governance.dequeueProposalIfReady(proposalId)
-        const dequeued = await governance.getDequeue()
-        assert.include(
-          dequeued.map((x) => x.toNumber()),
-          proposalId
-        )
-      })
-
-      it('should update lastDequeue', async () => {
-        const originalLastDequeue = await governance.lastDequeue()
-
-        await timeTravel(dequeueFrequency, web3)
-        await governance.dequeueProposalIfReady(proposalId)
-
-        assert.equal((await governance.getQueueLength()).toNumber(), 0)
-        assert.isTrue((await governance.lastDequeue()).toNumber() > originalLastDequeue.toNumber())
-      })
-
-      it('should still be valid if not dequeued or expired', async () => {
-        await governance.dequeueProposalIfReady(proposalId)
-        const isQueuedProposalExpired = await governance.isQueuedProposalExpired(1)
-        assert.isFalse(isQueuedProposalExpired)
-      })
-    })
-  })
   describe('#getProposalStage()', () => {
     const expectStage = async (expected: Stage, _proposalId: number) => {
       const stage = await governance.getProposalStage(_proposalId)
@@ -3994,7 +4163,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.approve(1, 0)
         await governance.approve(2, 1)
         await governance.approve(3, 2)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       })
       for (let numVoted = 0; numVoted < 3; numVoted++) {
         describe(`when account has partially voted on ${numVoted} proposals`, () => {
@@ -4031,7 +4200,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(1, 0)
-        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
       })
 
       describe('When account voted on proposal in V8', () => {
@@ -4101,4 +4270,242 @@ contract('Governance', (accounts: string[]) => {
       })
     })
   })
+
+  describe('#removeVotesWhenRevokingDelegatedVotes()', () => {
+    it('should revert when not called by staked celo contract', async () => {
+      await assertTransactionRevertWithReason(
+        governance.removeVotesWhenRevokingDelegatedVotes(NULL_ADDRESS, 0),
+        'msg.sender not lockedGold'
+      )
+    })
+
+    it('should should pass when no proposal is dequeued', async () => {
+      await governance.removeVotesWhenRevokingDelegatedVotesTest(NULL_ADDRESS, 0)
+    })
+
+    describe('When having three proposals voted', () => {
+      const proposalId = 1
+      const index = 0
+
+      const proposal2Id = 2
+      const index2 = 1
+
+      const proposal3Id = 3
+      const index3 = 2
+      beforeEach(async () => {
+        const newDequeueFrequency = 60
+        await governance.setDequeueFrequency(newDequeueFrequency)
+
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+
+        await governance.propose(
+          [transactionSuccess2.value],
+          [transactionSuccess2.destination],
+          // @ts-ignore bytes type
+          transactionSuccess2.data,
+          [transactionSuccess2.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+
+        await governance.propose(
+          [transactionSuccess2.value],
+          [transactionSuccess2.destination],
+          // @ts-ignore bytes type
+          transactionSuccess2.data,
+          [transactionSuccess2.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+
+        await governance.setConcurrentProposals(3)
+        await timeTravel(newDequeueFrequency, web3)
+        await governance.approve(proposalId, index)
+        await timeTravel(newDequeueFrequency, web3)
+        await governance.approve(proposal2Id, index2)
+        await timeTravel(newDequeueFrequency, web3)
+        await governance.approve(proposal3Id, index3)
+        await mockLockedGold.setAccountTotalGovernancePower(account, yesVotes)
+      })
+
+      describe('When voting only for yes', () => {
+        const yes = 100
+        const no = 0
+        const abstain = 0
+
+        const yes2 = 0
+        const no2 = 100
+        const abstain2 = 0
+        beforeEach(async () => {
+          await governance.votePartially(proposalId, index, yes, no, abstain)
+          await governance.votePartially(proposal2Id, index2, yes2, no2, abstain2)
+
+          await assertVoteRecord(governance, account, index, proposalId, yes, no, abstain)
+          await assertVoteRecord(governance, account, index2, proposal2Id, yes2, no2, abstain2)
+
+          await assertVotesTotal(governance, proposalId, yes, no, abstain)
+          await assertVotesTotal(governance, proposal2Id, yes2, no2, abstain2)
+        })
+
+        it('should adjust votes correctly to 0', async () => {
+          const maxAmount = 0
+
+          await governance.removeVotesWhenRevokingDelegatedVotesTest(account, maxAmount)
+
+          await assertVoteRecord(governance, account, index, proposalId, 0, 0, 0)
+          await assertVoteRecord(governance, account, index2, proposal2Id, 0, 0, 0)
+
+          await assertVotesTotal(governance, proposalId, 0, 0, 0)
+          await assertVotesTotal(governance, proposal2Id, 0, 0, 0)
+        })
+
+        it('should adjust votes correctly to 30', async () => {
+          const maxAmount = 30
+
+          await governance.removeVotesWhenRevokingDelegatedVotesTest(account, maxAmount)
+
+          await assertVoteRecord(governance, account, index, proposalId, maxAmount, 0, 0)
+          await assertVoteRecord(governance, account, index2, proposal2Id, 0, maxAmount, 0)
+
+          await assertVotesTotal(governance, proposalId, maxAmount, 0, 0)
+          await assertVotesTotal(governance, proposal2Id, 0, maxAmount, 0)
+        })
+      })
+
+      describe('When voting for all choices', () => {
+        const yes = 34
+        const no = 33
+        const abstain = 33
+
+        const yes2 = 0
+        const no2 = 35
+        const abstain2 = 65
+
+        const yes3 = 0
+        const no3 = 0
+        const abstain3 = 51
+
+        beforeEach(async () => {
+          await governance.votePartially(proposalId, index, yes, no, abstain)
+          await governance.votePartially(proposal2Id, index2, yes2, no2, abstain2)
+          await governance.votePartially(proposal3Id, index3, yes3, no3, abstain3)
+
+          await assertVoteRecord(governance, account, index, proposalId, yes, no, abstain)
+          await assertVoteRecord(governance, account, index2, proposal2Id, yes2, no2, abstain2)
+          await assertVoteRecord(governance, account, index3, proposal3Id, yes3, no3, abstain3)
+        })
+
+        it('should adjust votes correctly to 0', async () => {
+          const maxAmount = 0
+
+          await governance.removeVotesWhenRevokingDelegatedVotesTest(account, maxAmount)
+
+          await assertVoteRecord(governance, account, index, proposalId, 0, 0, 0)
+          await assertVoteRecord(governance, account, index2, proposal2Id, 0, 0, 0)
+        })
+
+        it('should adjust votes correctly to 50', async () => {
+          const maxAmount = 50
+          const sumOfVotes = yes + no + abstain
+          const toRemove = sumOfVotes - maxAmount
+          const yesPortion = (toRemove * yes) / sumOfVotes
+          const noPortion = (toRemove * no) / sumOfVotes
+          const abstainPortion = (toRemove * abstain) / sumOfVotes
+
+          const no2Portion = (toRemove * no2) / sumOfVotes
+          const abstain2Portion = (toRemove * abstain2) / sumOfVotes
+
+          await governance.removeVotesWhenRevokingDelegatedVotesTest(account, maxAmount)
+
+          const [yes1Total, no1Total, abstain1Total] = await governance.getVoteTotals(proposalId)
+          const [yes2Total, no2Total, abstain2Total] = await governance.getVoteTotals(proposal2Id)
+          const [yes3Total, no3Total, abstain3Total] = await governance.getVoteTotals(proposal3Id)
+
+          assertEqualBN(yes1Total.plus(no1Total).plus(abstain1Total), maxAmount)
+          assertEqualBN(yes2Total.plus(no2Total).plus(abstain2Total), maxAmount)
+          assertEqualBN(yes3Total.plus(no3Total).plus(abstain3Total), maxAmount)
+
+          assertEqualBN(yes1Total, Math.ceil(yesPortion) - 1) // -1 because of rounding
+          assertEqualBN(no1Total, Math.ceil(noPortion))
+          assertEqualBN(abstain1Total, Math.ceil(abstainPortion))
+
+          assertEqualBN(yes2Total, 0)
+          assertEqualBN(no2Total, Math.ceil(no2Portion) - 1) // -1 because of rounding
+          assertEqualBN(abstain2Total, Math.ceil(abstain2Portion))
+
+          await assertVoteRecord(
+            governance,
+            account,
+            index,
+            proposalId,
+            Math.ceil(yesPortion - 1), // -1 because of rounding
+            Math.ceil(noPortion),
+            Math.ceil(abstainPortion)
+          )
+          await assertVoteRecord(
+            governance,
+            account,
+            index2,
+            proposal2Id,
+            Math.ceil(0),
+            Math.ceil(no2Portion - 1), // -1 because of rounding
+            Math.ceil(abstain2Portion)
+          )
+        })
+
+        describe('When proposals are expired', () => {
+          beforeEach(async () => {
+            await timeTravel(queueExpiry, web3)
+          })
+
+          it('should not adjust votes', async () => {
+            await assertVoteRecord(governance, account, index, proposalId, yes, no, abstain)
+            await assertVoteRecord(governance, account, index2, proposal2Id, yes2, no2, abstain2)
+          })
+        })
+      })
+    })
+  })
 })
+
+async function assertVoteRecord(
+  governance: GovernanceTestInstance,
+  account: string,
+  index: number,
+  assertId: number,
+  assertYes: number,
+  assertNo: number,
+  asssertAbstain: number
+) {
+  const [recordProposalId2, , , yesVotesRecord2, noVotesRecord2, abstainVotesRecord2] =
+    await governance.getVoteRecord(account, index)
+
+  assertEqualBN(recordProposalId2, assertId)
+  assertEqualBN(yesVotesRecord2, assertYes)
+  assertEqualBN(noVotesRecord2, assertNo)
+  assertEqualBN(abstainVotesRecord2, asssertAbstain)
+}
+
+async function assertVotesTotal(
+  governance: GovernanceTestInstance,
+  proposalId: number,
+  assertYes: number,
+  assertNo: number,
+  assertAbstain: number
+) {
+  const [yesVotes, noVotes, abstainVotes] = await governance.getVoteTotals(proposalId)
+  assertEqualBN(yesVotes, assertYes)
+  assertEqualBN(noVotes, assertNo)
+  assertEqualBN(abstainVotes, assertAbstain)
+}
