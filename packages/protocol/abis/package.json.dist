@@ -9,8 +9,6 @@
     "directory": "packages/protocol/abis"
   },
   "scripts": {},
-  "dependencies": {},  
-  "files": [
-    "./"
-  ]
+  "dependencies": {},
+  "types": "./types/wagmi/index.d.ts"
 }

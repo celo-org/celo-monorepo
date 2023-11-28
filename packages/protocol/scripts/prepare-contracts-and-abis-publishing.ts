@@ -38,18 +38,16 @@ try {
 
   // Merge contracts-0.8, contracts-mento, etc.. at the root of the build dir
   log('Merging files at the root of the build dir')
-  for (const folder of [
-    'contracts',
-    `contracts-${MENTO_PACKAGE.name}`,
-    `contracts-${SOLIDITY_08_PACKAGE.name}`,
-  ]) {
-    const mvCommand = `mv -f ${ABIS_BUILD_DIR}/${folder}/* ${ABIS_BUILD_DIR}`
-    log(mvCommand)
-    child_process.execSync(mvCommand)
+  mergeFromFolder(
+    ['contracts', `contracts-${MENTO_PACKAGE.name}`, `contracts-${SOLIDITY_08_PACKAGE.name}`],
+    path.join(ABIS_BUILD_DIR)
+  )
 
-    // Once copied all the files, remove the folder
-    child_process.execSync(`rm -r ${ABIS_BUILD_DIR}/${folder}`)
-  }
+  log('Merging files in web3 folder')
+  mergeFromFolder(
+    [`${MENTO_PACKAGE.name}`, `${SOLIDITY_08_PACKAGE.name}`],
+    path.join(ABIS_BUILD_DIR, 'types/web3')
+  )
 
   // Remove Mocks, tests, extraneous files
   log('Deleting extraneous files')
@@ -113,4 +111,18 @@ function build(cmd: string) {
     `BUILD_DIR=./build ts-node ${BUILD_EXECUTABLE} --coreContractsOnly ${cmd}`,
     { stdio: 'inherit' }
   )
+}
+
+function mergeFromFolder(folderNames: string[], rootFolderName: string) {
+  for (const folderName of folderNames) {
+    const mvCommand = `mv -f ${rootFolderName}/${folderName}/* ${rootFolderName}`
+    const rmCommand = `rm -r ${rootFolderName}/${folderName}`
+
+    log(mvCommand)
+    child_process.execSync(mvCommand)
+
+    // Once copied all the files, remove the folder
+    log(rmCommand)
+    child_process.execSync(rmCommand)
+  }
 }
