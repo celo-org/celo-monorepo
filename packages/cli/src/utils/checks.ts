@@ -270,7 +270,7 @@ class CheckBuilder {
 
   signerMeetsValidatorBalanceRequirements = () =>
     this.addCheck(
-      `Signer's account has enough locked gold for registration`,
+      `Signer's account has enough locked celo for registration`,
       this.withValidators((validators, _signer, account) =>
         validators.meetsValidatorBalanceRequirements(account)
       )
@@ -278,7 +278,7 @@ class CheckBuilder {
 
   signerMeetsValidatorGroupBalanceRequirements = () =>
     this.addCheck(
-      `Signer's account has enough locked gold for group registration`,
+      `Signer's account has enough locked celo for group registration`,
       this.withValidators((validators, _signer, account) =>
         validators.meetsValidatorGroupBalanceRequirements(account)
       )
@@ -286,13 +286,13 @@ class CheckBuilder {
 
   meetsValidatorBalanceRequirements = (account: Address) =>
     this.addCheck(
-      `${account} has enough locked gold for registration`,
+      `${account} has enough locked celo for registration`,
       this.withValidators((validators) => validators.meetsValidatorBalanceRequirements(account))
     )
 
   meetsValidatorGroupBalanceRequirements = (account: Address) =>
     this.addCheck(
-      `${account} has enough locked gold for group registration`,
+      `${account} has enough locked celo for group registration`,
       this.withValidators((validators) =>
         validators.meetsValidatorGroupBalanceRequirements(account)
       )

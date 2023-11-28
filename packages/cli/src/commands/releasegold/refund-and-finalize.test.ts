@@ -23,7 +23,7 @@ testWithGanache('releasegold:refund-and-finalize cmd', (web3: Web3) => {
     kit = newKitFromWeb3(web3)
   })
 
-  test('can refund gold', async () => {
+  test('can refund celo', async () => {
     await testLocally(Revoke, ['--contract', contractAddress, '--yesreally'])
     const releaseGoldWrapper = new ReleaseGoldWrapper(
       kit.connection,
