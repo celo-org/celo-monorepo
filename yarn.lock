@@ -986,6 +986,17 @@
     "@stablelib/blake2xs" "0.10.4"
     big-integer "^1.6.44"
 
+"@celo/celo-devchain@^6.0.3-beta.1":
+  version "6.0.3-beta.1"
+  resolved "https://registry.yarnpkg.com/@celo/celo-devchain/-/celo-devchain-6.0.3-beta.1.tgz#0c0637c4646904de578fa28ebe2dcb3f8ad35259"
+  integrity sha512-Pjqbooy1eJ9qyMyIka3GFP0UrLATtSHJtGj/TNtuJ5nlpaBMAy2oA1zjKh0AsqyhvNkjs4Os6mgFYVEm5XuKuw==
+  dependencies:
+    commander "^10.0.0"
+    ganache "npm:@celo/ganache@7.8.0-unofficial.0"
+    node-fetch "^3.3.0"
+    targz "^1.0.1"
+    tmp "^0.2.1"
+
 "@celo/identity@^5.1.1":
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/@celo/identity/-/identity-5.1.1.tgz#e56cea67d820c7deae147e50b353f3c76b3e6d4d"
@@ -9763,6 +9774,11 @@ commander@3.0.2, commander@^3.0.0:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/commander/-/commander-3.0.2.tgz#6837c3fb677ad9933d1cfba42dd14d5117d6b39e"
   integrity sha512-Gar0ASD4BDyKC4hl4DwHqDrmvjoxWKZigVnAbn5H1owvm4CxCPdb0HQDehwNYMJpla5+M2tPmPARzhtYuwpHow==
+
+commander@^10.0.0:
+  version "10.0.1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-10.0.1.tgz#881ee46b4f77d1c1dccc5823433aa39b022cbe06"
+  integrity sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==
 
 commander@^2.12.1, commander@^2.20.3, commander@^2.8.1:
   version "2.20.3"
@@ -22853,7 +22869,7 @@ tmp@^0.1.0:
   dependencies:
     rimraf "^2.6.3"
 
-tmp@~0.2.1:
+tmp@^0.2.1, tmp@~0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.2.1.tgz#8457fc3037dcf4719c251367a1af6500ee1ccf14"
   integrity sha512-76SUhtfqR2Ijn+xllcI5P1oyannHNHByD80W1q447gU3mp9G9PSpGdWmjUOHRDPiHYacIk66W7ubDTuPF3BEtQ==
