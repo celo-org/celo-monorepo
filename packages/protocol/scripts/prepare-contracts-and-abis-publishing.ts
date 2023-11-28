@@ -8,6 +8,7 @@ import {
   ABIS_PACKAGE_SRC_DIR,
   BUILD_EXECUTABLE,
   CoreContracts,
+  Interfaces,
   TSCONFIG_PATH,
 } from './consts'
 
@@ -56,7 +57,12 @@ try {
     const name = path.basename(filePath)
     const baseName = name.replace(/.(sol|d.ts|json)$/, '')
 
-    if (baseName !== 'index' && !CoreContracts.includes(baseName)) {
+    if (
+      baseName !== 'index' &&
+      baseName !== 'Proxy' &&
+      !CoreContracts.includes(baseName) &&
+      !Interfaces.includes(baseName)
+    ) {
       rmrfSync(path.join(ABIS_BUILD_DIR, `${baseName}.json`))
       rmrfSync(path.join(ABIS_BUILD_DIR, `${baseName}.ts`))
       rmrfSync(path.join(ABIS_BUILD_DIR, '**', `${baseName}.d.ts`))
@@ -107,10 +113,9 @@ function lsRecursive(dir: string): string[] {
 
 function build(cmd: string) {
   log(`Running build for ${cmd}`)
-  child_process.execSync(
-    `BUILD_DIR=./build ts-node ${BUILD_EXECUTABLE} --coreContractsOnly ${cmd}`,
-    { stdio: 'inherit' }
-  )
+  child_process.execSync(`BUILD_DIR=./build ts-node ${BUILD_EXECUTABLE} ${cmd}`, {
+    stdio: 'inherit',
+  })
 }
 
 function mergeFromFolder(folderNames: string[], rootFolderName: string) {
