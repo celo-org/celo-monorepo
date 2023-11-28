@@ -2,16 +2,16 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
-import "../../../contracts/common/Registry.sol";
-import "../../../contracts/common/Freezer.sol";
+import "@celo-contracts/common/Registry.sol";
+import "@celo-contracts/common/Freezer.sol";
 
-import { MockElection } from "../../../contracts/governance/test/MockElection.sol";
-import { EpochRewardsTest } from "../../../contracts/governance/test/EpochRewardsTest.sol";
+import { MockElection } from "@celo-contracts/governance/test/MockElection.sol";
+import { EpochRewardsTest } from "@celo-contracts/governance/test/EpochRewardsTest.sol";
 import { Reserve } from "../../../lib/mento-core/contracts/Reserve.sol";
 
-import { MockSortedOracles } from "../../../contracts/stability/test/MockSortedOracles.sol";
-import { MockStableToken } from "../../../contracts/stability/test/MockStableToken.sol";
-import { MockGoldToken } from "../../../contracts/common/test/MockGoldToken.sol";
+import { MockSortedOracles } from "@celo-contracts/stability/test/MockSortedOracles.sol";
+import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.sol";
+import { MockGoldToken } from "@celo-contracts/common/test/MockGoldToken.sol";
 
 import { Constants } from "../../constants.sol";
 import { Utils } from "../../utils.sol";
