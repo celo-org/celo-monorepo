@@ -365,7 +365,9 @@ jobs:
       - name: Verify that a new account can be created
         run: |
           yarn --cwd=packages/cli run celocli account:new
-
+      - name: Test that releasecelo command topic is working
+        run: |
+          yarn --cwd=packages/cli run celocli releasecelo --help
   typescript-tests:
     name: Typescript package Tests
     runs-on: ['self-hosted', 'monorepo-node18']

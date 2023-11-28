@@ -1,6 +1,6 @@
 # `celocli releasegold`
 
-View and manage Release Gold contracts
+Alias for releasecelo
 
 
 ## `celocli releasegold:authorize`

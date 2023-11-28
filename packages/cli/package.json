@@ -142,8 +142,11 @@
       "node": {
         "description": "Manage your Celo node"
       },
+      "releasecelo": {
+        "description": "View and manage ReleaseGold contracts"
+      },
       "releasegold": {
-        "description": "View and manage Release Gold contracts"
+        "description": "Alias for releasecelo"
       },
       "transfer": {
         "description": "Transfer CELO and Celo Dollars"
