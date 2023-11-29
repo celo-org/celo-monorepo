@@ -65,6 +65,8 @@ try {
     }
   })
 
+  removeExtraneousFieldsFromGeneratedJsons()
+
   // Generate wagmi friendly ts files
   log('Running yarn wagmi generate')
   child_process.execSync(`yarn wagmi generate`, { stdio: 'inherit' })
@@ -86,6 +88,37 @@ try {
 }
 
 // Helper functions
+function removeExtraneousFieldsFromGeneratedJsons() {
+  log('Removing extraneous fields from generated json files')
+  const fileNames = fs.readdirSync(ABIS_BUILD_DIR)
+
+  fileNames.forEach((fileName) => {
+    const filePath = path.join(ABIS_BUILD_DIR, fileName)
+    const parsedPath = path.parse(filePath)
+
+    // TODO create a single const for all contracts
+    if (
+      Interfaces.includes(parsedPath.name) ||
+      CoreContracts.includes(parsedPath.name) ||
+      parsedPath.name === 'Proxy'
+    ) {
+      const json = JSON.parse(fs.readFileSync(filePath).toString())
+
+      fs.writeFileSync(
+        filePath,
+        JSON.stringify(
+          {
+            contractName: json.contractName,
+            abi: json.abi,
+          },
+          null,
+          2
+        )
+      )
+    }
+  })
+}
+
 function prepareAbisPackageJson() {
   log('Preparing @celo/abis package.json')
   const sourcePackageJson = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json.dist')
