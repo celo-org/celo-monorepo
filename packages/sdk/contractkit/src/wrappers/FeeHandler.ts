@@ -1,7 +1,7 @@
 import { Address } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import { StableTokenContract } from '../base'
-import { FeeHandler } from '../generated/FeeHandler'
+import { FeeHandler } from '@celo/abis/types/web3/FeeHandler'
 import { BaseWrapper, proxyCall, proxySend } from './BaseWrapper'
 
 export enum ExchangeProposalState {

@@ -2,7 +2,7 @@
 // after the move to node 10. This allows types to be inferred without
 // referencing '@celo/utils/node_modules/bignumber.js'
 import BigNumber from 'bignumber.js'
-import { IERC20 } from '../generated/IERC20'
+import { IERC20 } from '@celo/abis/types/web3/IERC20'
 import { BaseWrapper, proxyCall, proxySend, valueToBigNumber } from './BaseWrapper'
 
 /**

@@ -11,7 +11,7 @@ import {
 } from '@celo/connect'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { ICeloVersionedContract } from '../generated/ICeloVersionedContract'
+import { ICeloVersionedContract } from '@celo/abis/types/web3/ICeloVersionedContract'
 import { ContractVersion } from '../versions'
 
 /** Represents web3 native contract Method */

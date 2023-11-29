@@ -1,6 +1,6 @@
 import { Address } from '@celo/connect'
 import BigNumber from 'bignumber.js'
-import { DowntimeSlasher } from '../generated/DowntimeSlasher'
+import { DowntimeSlasher } from '@celo/abis/types/web3/DowntimeSlasher'
 import { BaseSlasher } from './BaseSlasher'
 import {
   blocksToDurationString,

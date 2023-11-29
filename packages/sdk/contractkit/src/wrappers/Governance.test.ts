@@ -4,7 +4,7 @@ import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { CeloContract } from '..'
-import { Registry } from '../generated/Registry'
+import { Registry } from '@celo/abis/types/web3/Registry'
 import { newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from './Accounts'
 import { GovernanceWrapper, Proposal, ProposalTransaction, VoteValue } from './Governance'

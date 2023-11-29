@@ -3,7 +3,7 @@ import { Signature } from '@celo/base/lib/signatureUtils'
 import { CeloTransactionObject, CeloTxObject, toTransactionObject } from '@celo/connect'
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import BigNumber from 'bignumber.js'
-import { MetaTransactionWallet } from '../generated/MetaTransactionWallet'
+import { MetaTransactionWallet } from '@celo/abis/types/web3/MetaTransactionWallet'
 import {
   BaseWrapper,
   proxyCall,

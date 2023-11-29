@@ -3,8 +3,11 @@ import MTWContractArtifacts from '@celo/celo-devchain/contracts/contracts-0.5/Me
 import MTWDeployerContractArtifacts from '@celo/celo-devchain/contracts/contracts-0.5/MetaTransactionWalletDeployer.json'
 import { CeloTxReceipt, EventLog } from '@celo/connect'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { MetaTransactionWallet, newMetaTransactionWallet } from '../generated/MetaTransactionWallet'
-import { newProxy } from '../generated/Proxy'
+import {
+  MetaTransactionWallet,
+  newMetaTransactionWallet,
+} from '@celo/abis/types/web3/MetaTransactionWallet'
+import { newProxy } from '@celo/abis/types/web3/Proxy'
 import { newKitFromWeb3 } from '../kit'
 import { MetaTransactionWalletDeployerWrapper } from './MetaTransactionWalletDeployer'
 

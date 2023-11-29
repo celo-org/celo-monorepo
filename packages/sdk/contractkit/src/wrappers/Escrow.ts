@@ -1,5 +1,5 @@
 import { Address, CeloTransactionObject } from '@celo/connect'
-import { Escrow } from '../generated/Escrow'
+import { Escrow } from '@celo/abis/types/web3/Escrow'
 import { BaseWrapper, proxyCall, proxySend } from './BaseWrapper'
 
 /**

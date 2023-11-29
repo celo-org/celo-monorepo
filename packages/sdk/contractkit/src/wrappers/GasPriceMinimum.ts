@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import { GasPriceMinimum } from '../generated/0.8/GasPriceMinimum'
+import { GasPriceMinimum } from '@celo/abis/types/web3/0.8/GasPriceMinimum'
 import { BaseWrapper, fixidityValueToBigNumber, proxyCall, valueToBigNumber } from './BaseWrapper'
 
 export interface GasPriceMinimumConfig {

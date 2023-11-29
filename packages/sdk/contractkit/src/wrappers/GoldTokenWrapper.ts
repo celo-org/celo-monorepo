@@ -3,7 +3,7 @@
 // referencing '@celo/utils/node_modules/bignumber.js'
 import { Address } from '@celo/base'
 import 'bignumber.js'
-import { GoldToken } from '../generated/GoldToken'
+import { GoldToken } from '@celo/abis/types/web3/GoldToken'
 import {
   proxySend,
   stringIdentity,

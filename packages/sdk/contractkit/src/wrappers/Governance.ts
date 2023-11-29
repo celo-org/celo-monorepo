@@ -10,7 +10,7 @@ import { zeroRange, zip } from '@celo/base/lib/collections'
 import { Address, CeloTxPending, toTransactionObject } from '@celo/connect'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { Governance } from '../generated/Governance'
+import { Governance } from '@celo/abis/types/web3/Governance'
 import {
   bufferToSolidityBytes,
   identity,

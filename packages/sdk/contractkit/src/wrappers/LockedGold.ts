@@ -6,7 +6,7 @@ import {
 } from '@celo/base/lib/collections'
 import { Address, CeloTransactionObject, EventLog } from '@celo/connect'
 import BigNumber from 'bignumber.js'
-import { LockedGold } from '../generated/LockedGold'
+import { LockedGold } from '@celo/abis/types/web3/LockedGold'
 import { ContractVersion } from '../versions'
 import {
   proxyCall,
