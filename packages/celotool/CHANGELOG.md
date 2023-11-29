@@ -1,5 +1,17 @@
 # @celo/celotool
 
+## 2.0.1-beta.0
+
+### Patch Changes
+
+- Updated dependencies [88e3788b8]
+- Updated dependencies [70f600bb0]
+- Updated dependencies [2985f9eb2]
+  - @celo/contractkit@5.2.1-beta.0
+  - @celo/env-tests@1.0.3-beta.0
+  - @celo/explorer@5.0.7-beta.0
+  - @celo/governance@5.0.7-beta.0
+
 ## 2.0.0
 
 ### Major Changes
