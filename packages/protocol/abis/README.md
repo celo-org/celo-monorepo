@@ -16,11 +16,14 @@ or
 yarn add @celo/abis
 ```
 
-### In your javascript or ts
+### JS/TS syntax
 
 ```ts
 // json abi
 import Accounts from '@celo/abis/Accounts.json'
+
+// viem
+import { accountsABI } from "@celo/abis/types/wagmi";
 
 // ethers
 import { Accounts } from '@celo/abis/types/ethers'
@@ -32,26 +35,19 @@ import Accounts from '@celo/abis/types/web3/Accounts'
 import { AccountsContract } from '@celo/abis/types/truffle'
 ```
 
-### In Node 
+### CommonJS syntax
 
 ```js
 const Accounts = require("@celo/abis/Accounts.json");
 
 // ethers
-const provider = new ethers.providers.JsonRpcProvider("https://forno.celo.org");
-
-const accounts = new ethers.Contract("[ACCOUNTS_ADDRESS]", Accounts.abi, provider);
+const accounts = new ethers.Contract("0x...", Accounts.abi, ...);
 
 // viem
-const publicClient = createPublicClient({
-  chain: celo
-  transport: http()
-});
-
 const accounts = getContract({
-  address: "[ACCOUNTS_ADDRESS]",
+  address: "0x...",
   abi: Accounts.abi,
-  publicClient
+  ...
 })
 ```
 
