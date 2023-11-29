@@ -81,10 +81,8 @@ try {
   )
 
   // Change the packages version to what CI is providing from environment variables
-  if (process.env.RELEASE_VERSION) {
-    prepareAbisPackageJson()
-    prepareContractsPackageJson()
-  }
+  prepareAbisPackageJson()
+  prepareContractsPackageJson()
 } finally {
   // Cleanup
   log('Cleaning up folders and checking out dirty git files')
@@ -95,26 +93,37 @@ try {
 
 // Helper functions
 function prepareAbisPackageJson() {
+  log('Preparing @celo/abis package.json')
   const sourcePackageJson = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json.dist')
   const destinationPackageJson = path.join(ABIS_BUILD_DIR, 'package.json')
+  let contents = fs.readFileSync(sourcePackageJson).toString()
 
-  fs.writeFileSync(
-    destinationPackageJson,
-    fs
-      .readFileSync(sourcePackageJson)
-      .toString()
-      .replace('0.0.0-template.version', process.env.RELEASE_VERSION)
-  )
+  if (process.env.RELEASE_VERSION) {
+    log('Replacing @celo/abis version with provided RELEASE_VERSION')
+
+    contents = contents.replace('0.0.0-template.version', process.env.RELEASE_VERSION)
+  } else {
+    log('No RELEASE_VERSION provided')
+  }
+
+  fs.writeFileSync(destinationPackageJson, contents)
 }
 
 function prepareContractsPackageJson() {
-  const contractsPackageJsonPath = path.join(CONTRACTS_PACKAGE_SRC_DIR, 'package.json')
-  const file = fs.readFileSync(contractsPackageJsonPath).toString()
+  if (process.env.RELEASE_VERSION) {
+    log('Replacing @celo/contracts version with RELEASE_VERSION)')
+    const contractsPackageJsonPath = path.join(CONTRACTS_PACKAGE_SRC_DIR, 'package.json')
+    const contents = fs.readFileSync(contractsPackageJsonPath).toString()
 
-  fs.writeFileSync(
-    contractsPackageJsonPath,
-    file.replace('0.0.0-template.version', process.env.RELEASE_VERSION)
-  )
+    fs.writeFileSync(
+      contractsPackageJsonPath,
+      contents.replace('0.0.0-template.version', process.env.RELEASE_VERSION)
+    )
+
+    return
+  }
+
+  log('Skipping @celo/contracts package.json preparation (no RELEASE_VERSION provided)')
 }
 
 function lsRecursive(dir: string): string[] {
