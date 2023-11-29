@@ -52,8 +52,14 @@ function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
   // check that there were no errors
   for (const contractName of contracts) {
     try {
+      const artifactPath = `${outdir}/contracts/${contractName}.json`
+      const artifactPath8 = `${outdir}/contracts-0.8/${contractName}.json`
+      let is08 = false
       // This is issuing a warning: https://github.com/celo-org/celo-monorepo/issues/10564
-      const fileStr = readJSONSync(`${outdir}/contracts/${contractName}.json`)
+      if (existsSync(artifactPath8)) {
+        is08 = true
+      }
+      const fileStr = readJSONSync(is08 ? artifactPath8 : artifactPath)
       if (hasEmptyBytecode(fileStr)) {
         console.error(
           `${contractName} has empty bytecode. Maybe you forgot to fully implement an interface?`
