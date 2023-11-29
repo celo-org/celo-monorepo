@@ -27,6 +27,7 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
+    "@celo/abis": "10.0.0-beta.3",
     "@celo/base": "^6.0.0",
     "@celo/connect": "^5.1.1",
     "@celo/utils": "^5.0.6",
@@ -43,7 +44,6 @@
     "web3-core-helpers": "1.10.0"
   },
   "devDependencies": {
-    "@celo/abis": "10.0.0-beta.3",
     "@celo/celo-devchain": "^6.0.3-beta.1",
     "@celo/odis-identifiers": "^1.0.0",
     "@celo/dev-utils": "0.0.1",
