@@ -2,14 +2,12 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
-import "forge-std/console.sol";
 import "../../contracts/common/MultiSig.sol";
 
 contract MultiSigTest is Test {
   function() external payable {}
 
   MultiSig public multiSig;
-  uint256 ONE_GOLDTOKEN = 1000000000000000000;
   address owner0;
   address owner1;
   address newOwner;
@@ -80,10 +78,6 @@ contract MultiSigFallbackFunction is MultiSigTest {
     _to.call.value(_amount)("");
   }
 
-  function uncheckedSendViaCallData(address payable _to, uint256 _amount) public payable {
-    _to.call.value(_amount)("ok");
-  }
-
   function test_emitsDepositEventWithCorrectParameters_whenReceivingCelo() public payable {
     vm.prank(sender);
     vm.expectEmit(true, false, false, false);
@@ -91,10 +85,11 @@ contract MultiSigFallbackFunction is MultiSigTest {
     uncheckedSendViaCall(address(multiSig), amount);
   }
 
+  // TODO: Implement after pragma ^0.8
   function SKIP_test_doesNotEmitEvent_whenReceivingZeroValue() public {
     vm.prank(sender);
     vm.recordLogs();
-    uncheckedSendViaCallData(address(multiSig), 0);
+    uncheckedSendViaCall(address(multiSig), 0);
     // Vm.Log[] memory entries = vm.getRecordedLogs();
     // assertEq(entries.length, 0);
   }
@@ -108,9 +103,7 @@ contract MultiSigSubmitTransaction is MultiSigTest {
   }
 
   function test_shouldAllowAnOwnerToSubmitATransaction() public {
-    // bytes memory addOwnerTxData = abi.encodeWithSignature("addOwner(address)", newOwner);
     vm.prank(owner0);
-
     vm.expectEmit(true, true, true, true);
     emit Confirmation(owner0, txId);
     multiSig.submitTransaction(address(multiSig), 0, addOwnerTxData);
