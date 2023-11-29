@@ -7,6 +7,7 @@ import {
   ABIS_BUILD_DIR,
   ABIS_PACKAGE_SRC_DIR,
   BUILD_EXECUTABLE,
+  CONTRACTS_PACKAGE_SRC_DIR,
   CoreContracts,
   Interfaces,
   TSCONFIG_PATH,
@@ -74,22 +75,15 @@ try {
   log('Running yarn wagmi generate')
   child_process.execSync(`yarn wagmi generate`, { stdio: 'inherit' })
 
-  const sourcePackageJson = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json.dist')
-  const destinationPackageJson = path.join(ABIS_BUILD_DIR, 'package.json')
-
   fs.copyFileSync(
     path.join(ABIS_PACKAGE_SRC_DIR, 'README.md'),
     path.join(ABIS_BUILD_DIR, 'README.md')
   )
 
   // Change the packages version to what CI is providing from environment variables
-  const file = fs.readFileSync(sourcePackageJson).toString()
-
   if (process.env.RELEASE_VERSION) {
-    fs.writeFileSync(
-      destinationPackageJson,
-      file.replace('0.0.0-template.version', process.env.RELEASE_VERSION)
-    )
+    prepareAbisPackageJson()
+    prepareContractsPackageJson()
   }
 } finally {
   // Cleanup
@@ -100,6 +94,29 @@ try {
 }
 
 // Helper functions
+function prepareAbisPackageJson() {
+  const sourcePackageJson = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json.dist')
+  const destinationPackageJson = path.join(ABIS_BUILD_DIR, 'package.json')
+
+  fs.writeFileSync(
+    destinationPackageJson,
+    fs
+      .readFileSync(sourcePackageJson)
+      .toString()
+      .replace('0.0.0-template.version', process.env.RELEASE_VERSION)
+  )
+}
+
+function prepareContractsPackageJson() {
+  const contractsPackageJsonPath = path.join(CONTRACTS_PACKAGE_SRC_DIR, 'package.json')
+  const file = fs.readFileSync(contractsPackageJsonPath).toString()
+
+  fs.writeFileSync(
+    contractsPackageJsonPath,
+    file.replace('0.0.0-template.version', process.env.RELEASE_VERSION)
+  )
+}
+
 function lsRecursive(dir: string): string[] {
   const filesAndDirectories = fs.readdirSync(dir, { withFileTypes: true })
   return filesAndDirectories.reduce((fileNames, fileOrDir) => {
