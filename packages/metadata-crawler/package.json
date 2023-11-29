@@ -1,6 +1,6 @@
 {
   "name": "@celo/metadata-crawler",
-  "version": "0.0.3",
+  "version": "0.0.4-beta.0",
   "description": "Celo metadata crawler",
   "main": "index.js",
   "types": "./lib/index.d.ts",
@@ -10,7 +10,7 @@
   "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/metadata-crawler",
   "dependencies": {
     "@celo/connect": "^5.1.1",
-    "@celo/contractkit": "^5.2.0",
+    "@celo/contractkit": "^5.2.1-beta.0",
     "@celo/utils": "^5.0.6",
     "@types/pg": "^7.14.3",
     "bunyan": "1.8.12",

@@ -1,5 +1,13 @@
 # @celo/contractkit
 
+## 5.2.1-beta.0
+
+### Patch Changes
+
+- 88e3788b8: add notice that LockedGold.getTotalPendingWithdrawalsCount is not yet available on all networks
+- 70f600bb0: Mark MetaTransactionWallet and MetaTransactionWalletDeployer as deprecated, including functions to get them and their wrappers. see https://github.com/celo-org/celo-monorepo/issues/10766
+- 2985f9eb2: Refactor Accounts.getParsedSignatureOfAddress
+
 ## 5.2.0
 
 ### Minor Changes

@@ -997,6 +997,26 @@
     targz "^1.0.1"
     tmp "^0.2.1"
 
+"@celo/contractkit@^5.1.0":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-5.2.0.tgz#f8b853560b4d87f82b562da1f3aedfbfdd106993"
+  integrity sha512-QetwAOilHQJ5u1xJooFN4ZfJCfomw+kIky8huoWFkgIEKCZOo4+FxGxn2Gq9xFeMW4BALuWvdDUTAR3DxZ7FOQ==
+  dependencies:
+    "@celo/base" "^6.0.0"
+    "@celo/connect" "^5.1.1"
+    "@celo/utils" "^5.0.6"
+    "@celo/wallet-local" "^5.1.1"
+    "@types/bn.js" "^5.1.0"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^9.0.0"
+    cross-fetch "3.0.6"
+    debug "^4.1.1"
+    fp-ts "2.1.1"
+    io-ts "2.0.1"
+    semver "^7.3.5"
+    web3 "1.10.0"
+    web3-core-helpers "1.10.0"
+
 "@celo/identity@^5.1.1":
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/@celo/identity/-/identity-5.1.1.tgz#e56cea67d820c7deae147e50b353f3c76b3e6d4d"
