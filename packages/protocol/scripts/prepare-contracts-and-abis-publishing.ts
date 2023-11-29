@@ -45,12 +45,6 @@ try {
     path.join(ABIS_BUILD_DIR)
   )
 
-  log('Merging files in web3 folder')
-  mergeFromFolder(
-    [`${MENTO_PACKAGE.name}`, `${SOLIDITY_08_PACKAGE.name}`],
-    path.join(ABIS_BUILD_DIR, 'types/web3')
-  )
-
   // Remove Mocks, tests, extraneous files
   log('Deleting extraneous files')
   const allFiles = lsRecursive(ABIS_BUILD_DIR)
