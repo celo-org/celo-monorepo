@@ -31,7 +31,7 @@ function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
       './',
       contractPackage.folderPath,
       contractPackage.path,
-      contractPackage.contracstFolder
+      contractPackage.contractsFolder
     )
     if (!existsSync(contractPath)) {
       console.log(`Contract package named ${contractPackage.name} doesn't exist`)

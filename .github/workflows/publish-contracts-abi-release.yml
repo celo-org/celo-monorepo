@@ -68,7 +68,7 @@ jobs:
         run: npm publish $RELEASE_TYPE $DRY_RUN
         working-directory: packages/protocol/contracts
         env:
-          RELEASE_TYPE: ${{ env.RELEASE_TYPE != '' && '--tag $RELEASE_TYPE' || '' }}
+          RELEASE_TYPE: ${{ env.RELEASE_TYPE != '' && '--tag' && env.RELEASE_TYPE || '' }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
           DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
@@ -77,7 +77,7 @@ jobs:
         run: npm publish $RELEASE_TYPE $DRY_RUN
         working-directory: packages/protocol/abis/src-generated
         env:
-          RELEASE_TYPE: ${{ env.RELEASE_TYPE != '' && '--tag $RELEASE_TYPE' || '' }}
+          RELEASE_TYPE: ${{ env.RELEASE_TYPE != '' && '--tag' && env.RELEASE_TYPE || '' }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
           DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
