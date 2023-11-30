@@ -1,4 +1,4 @@
-import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
+import { newReleaseGold } from '@celo/abis/types/web3/ReleaseGold'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import { BaseCommand } from '../base'
