@@ -88,7 +88,7 @@ export default class GetAttestations extends BaseCommand {
     console.log('Using network: ' + network)
     const authSigner: AuthSigner = {
       authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
-      // @ts-ignore
+      // @ts-ignore -- TODO: if identity depends on diff version of ck which has a slightly different type this complains
       contractKit: kit,
     }
 

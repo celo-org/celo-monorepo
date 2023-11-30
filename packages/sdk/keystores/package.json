@@ -1,6 +1,6 @@
 {
   "name": "@celo/keystores",
-  "version": "5.0.5",
+  "version": "5.0.6",
   "description": "keystore implementation",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -22,8 +22,8 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@celo/utils": "^5.0.5",
-    "@celo/wallet-local": "^5.1.0",
+    "@celo/utils": "^5.0.6",
+    "@celo/wallet-local": "^5.1.1",
     "ethereumjs-wallet": "^1.0.1"
   },
   "devDependencies": {

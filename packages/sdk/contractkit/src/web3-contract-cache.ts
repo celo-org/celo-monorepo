@@ -18,7 +18,7 @@ import { newFeeHandler } from './generated/FeeHandler'
 import { newFreezer } from './generated/Freezer'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
-import { newIerc20 } from './generated/IERC20'
+import { newIERC20 } from './generated/IERC20'
 import { newLockedGold } from './generated/LockedGold'
 import { newMetaTransactionWallet } from './generated/MetaTransactionWallet'
 import { newMetaTransactionWalletDeployer } from './generated/MetaTransactionWalletDeployer'
@@ -30,8 +30,8 @@ import { newRegistry } from './generated/Registry'
 import { newSortedOracles } from './generated/SortedOracles'
 import { newValidators } from './generated/Validators'
 import { newExchange } from './generated/mento/Exchange'
-import { newExchangeBrl } from './generated/mento/ExchangeBRL'
-import { newExchangeEur } from './generated/mento/ExchangeEUR'
+import { newExchangeBRL } from './generated/mento/ExchangeBRL'
+import { newExchangeEUR } from './generated/mento/ExchangeEUR'
 import { newGrandaMento } from './generated/mento/GrandaMento'
 import { newReserve } from './generated/mento/Reserve'
 import { newStableToken } from './generated/mento/StableToken'
@@ -49,11 +49,11 @@ export const ContractFactories = {
   [CeloContract.DowntimeSlasher]: newDowntimeSlasher,
   [CeloContract.Election]: newElection,
   [CeloContract.EpochRewards]: newEpochRewards,
-  [CeloContract.ERC20]: newIerc20,
+  [CeloContract.ERC20]: newIERC20,
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
-  [CeloContract.ExchangeEUR]: newExchangeEur,
-  [CeloContract.ExchangeBRL]: newExchangeBrl,
+  [CeloContract.ExchangeEUR]: newExchangeEUR,
+  [CeloContract.ExchangeBRL]: newExchangeBRL,
   [CeloContract.FederatedAttestations]: newFederatedAttestations,
   [CeloContract.FeeCurrencyWhitelist]: newFeeCurrencyWhitelist,
   [CeloContract.Freezer]: newFreezer,
@@ -163,9 +163,15 @@ export class Web3ContractCache {
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
   }
+  /*
+    @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
+  */
   getMetaTransactionWallet(address: string) {
     return this.getContract(CeloContract.MetaTransactionWallet, address)
   }
+  /*
+    @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
+  */
   getMetaTransactionWalletDeployer(address: string) {
     return this.getContract(CeloContract.MetaTransactionWalletDeployer, address)
   }

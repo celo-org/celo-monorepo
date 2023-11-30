@@ -1,4 +1,4 @@
-import { Ierc20 } from '@celo/contractkit/lib/generated/IERC20'
+import { IERC20 } from '@celo/contractkit/lib/generated/IERC20'
 import { Erc20Wrapper } from '@celo/contractkit/lib/wrappers/Erc20Wrapper'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
@@ -42,7 +42,7 @@ export default class TransferErc20 extends BaseCommand {
     const value = new BigNumber(res.flags.value)
 
     this.kit.defaultAccount = from
-    let celoToken: Erc20Wrapper<Ierc20>
+    let celoToken: Erc20Wrapper<IERC20>
     try {
       celoToken = await this.kit.contracts.getErc20(res.flags.erc20Address)
       // this call allow us to check if it is a valid erc20

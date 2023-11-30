@@ -25,10 +25,7 @@ export default class OffchainRead extends BaseCommand {
       args: { address },
       flags: { from, privateDEK },
     } = this.parse(OffchainRead)
-    // identity depends on a version of kit that doesnt support cip64 tx
-    // so the types dont match but it is fine to ignore here as the kit is not sending a tx
-    // its reading from AccountsWrapper
-    // @ts-expect-error
+    // @ts-ignore
     const provider = new BasicDataWrapper(from!, this.kit)
 
     if (privateDEK) {

@@ -1,12 +1,12 @@
+import { getParsedSignatureOfAddress } from '../utils/getParsedSignatureOfAddress'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { addressToPublicKey, parseSignature } from '@celo/utils/lib/signatureUtils'
+import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
 import { ContractKit, newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from './Accounts'
 import { valueToBigNumber, valueToFixidityString } from './BaseWrapper'
 import { LockedGoldWrapper } from './LockedGold'
 import { ValidatorsWrapper } from './Validators'
-
 jest.setTimeout(10 * 1000)
 
 /*
@@ -36,10 +36,13 @@ testWithGanache('Accounts Wrapper', (web3) => {
     await lockedGold.lock().sendAndWaitForReceipt({ from: account, value: minLockedGoldValue })
   }
 
-  const getParsedSignatureOfAddress = async (address: string, signer: string) => {
-    const addressHash = web3.utils.soliditySha3({ type: 'address', value: address })!
-    const signature = await kit.connection.sign(addressHash, signer)
-    return parseSignature(addressHash, signature, signer)
+  function getParsedSignatureOfAddressForTest(address: string, signer: string) {
+    return getParsedSignatureOfAddress(
+      web3.utils.soliditySha3,
+      kit.connection.sign,
+      address,
+      signer
+    )
   }
 
   beforeAll(async () => {
@@ -69,7 +72,7 @@ testWithGanache('Accounts Wrapper', (web3) => {
     const account = accounts[0]
     const signer = accounts[1]
     await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
-    const sig = await getParsedSignatureOfAddress(account, signer)
+    const sig = await getParsedSignatureOfAddressForTest(account, signer)
     await (
       await accountsInstance.authorizeAttestationSigner(signer, sig)
     ).sendAndWaitForReceipt({
@@ -83,7 +86,7 @@ testWithGanache('Accounts Wrapper', (web3) => {
     const account = accounts[0]
     const signer = accounts[1]
     await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
-    const sig = await getParsedSignatureOfAddress(account, signer)
+    const sig = await getParsedSignatureOfAddressForTest(account, signer)
     await (
       await accountsInstance.authorizeAttestationSigner(signer, sig)
     ).sendAndWaitForReceipt({
@@ -107,7 +110,7 @@ testWithGanache('Accounts Wrapper', (web3) => {
     const account = accounts[0]
     const signer = accounts[1]
     await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
-    const sig = await getParsedSignatureOfAddress(account, signer)
+    const sig = await getParsedSignatureOfAddressForTest(account, signer)
     await (
       await accountsInstance.authorizeValidatorSigner(signer, sig, validators)
     ).sendAndWaitForReceipt({ from: account })
@@ -121,7 +124,7 @@ testWithGanache('Accounts Wrapper', (web3) => {
     const signer = accounts[1]
     await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
     await setupValidator(account)
-    const sig = await getParsedSignatureOfAddress(account, signer)
+    const sig = await getParsedSignatureOfAddressForTest(account, signer)
     await (
       await accountsInstance.authorizeValidatorSigner(signer, sig, validators)
     ).sendAndWaitForReceipt({ from: account })
@@ -137,7 +140,7 @@ testWithGanache('Accounts Wrapper', (web3) => {
     const signer = accounts[1]
     await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
     await setupValidator(account)
-    const sig = await getParsedSignatureOfAddress(account, signer)
+    const sig = await getParsedSignatureOfAddressForTest(account, signer)
     await (
       await accountsInstance.authorizeValidatorSignerAndBls(signer, sig, newBlsPublicKey, newBlsPoP)
     ).sendAndWaitForReceipt({ from: account })

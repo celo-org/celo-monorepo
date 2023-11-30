@@ -1,0 +1,19 @@
+{
+  "name": "@celo/abis",
+  "version": "0.0.0-template.version",
+  "author": "cLabs",
+  "license": "LGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/celo-org/celo-monorepo.git",
+    "directory": "packages/protocol/contracts"
+  },
+  "scripts": {},
+  "dependencies": {},  
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "types": "./lib/esm/index.d.ts",
+  "files": [
+    "lib/"
+  ]
+}

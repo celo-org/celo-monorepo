@@ -1,5 +1,23 @@
 # @celo/wallet-hsm-aws
 
+## 5.1.1
+
+### Patch Changes
+
+- @celo/utils@5.0.6
+- @celo/wallet-base@5.1.1
+- @celo/wallet-hsm@5.1.1
+- @celo/wallet-remote@5.1.1
+
+## 5.1.1-beta.0
+
+### Patch Changes
+
+- @celo/utils@5.0.6-beta.0
+- @celo/wallet-base@5.1.1-beta.0
+- @celo/wallet-hsm@5.1.1-beta.0
+- @celo/wallet-remote@5.1.1-beta.0
+
 ## 5.1.0
 
 ### Patch Changes
