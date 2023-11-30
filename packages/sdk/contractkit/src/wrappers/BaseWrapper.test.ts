@@ -5,7 +5,7 @@ import Web3 from 'web3'
 import {
   ICeloVersionedContract,
   newICeloVersionedContract,
-} from '../generated/ICeloVersionedContract'
+} from '@celo/abis/types/web3/ICeloVersionedContract'
 import { ContractVersion, newContractVersion } from '../versions'
 import { BaseWrapper, unixSecondsTimestampToDateString } from './BaseWrapper'
 

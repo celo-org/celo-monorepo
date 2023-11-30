@@ -2,7 +2,7 @@ import { Address, NULL_ADDRESS } from '@celo/base/lib/address'
 import { Connection } from '@celo/connect'
 import debugFactory from 'debug'
 import { CeloContract, RegisteredContracts, stripProxy } from './base'
-import { newRegistry, Registry } from './generated/Registry'
+import { newRegistry, Registry } from '@celo/abis/types/web3/Registry'
 
 const debug = debugFactory('kit:registry')
 
