@@ -1,6 +1,6 @@
 import { Address, CeloTransactionObject } from '@celo/connect'
 import { BigNumber } from 'bignumber.js'
-import { OdisPayments } from '../generated/OdisPayments'
+import { OdisPayments } from '@celo/abis/types/web3/OdisPayments'
 import { BaseWrapper, proxyCall, proxySend, valueToBigNumber } from './BaseWrapper'
 
 export class OdisPaymentsWrapper extends BaseWrapper<OdisPayments> {

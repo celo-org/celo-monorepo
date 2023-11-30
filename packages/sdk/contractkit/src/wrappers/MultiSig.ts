@@ -1,6 +1,6 @@
 import { Address, CeloTransactionObject, CeloTxObject, toTransactionObject } from '@celo/connect'
 import BigNumber from 'bignumber.js'
-import { MultiSig } from '../generated/MultiSig'
+import { MultiSig } from '@celo/abis/types/web3/MultiSig'
 import {
   BaseWrapper,
   proxyCall,

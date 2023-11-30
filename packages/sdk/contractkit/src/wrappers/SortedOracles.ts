@@ -6,7 +6,7 @@ import BigNumber from 'bignumber.js'
 import { AddressRegistry } from '../address-registry'
 import { CeloContract, StableTokenContract } from '../base'
 import { isStableTokenContract, StableToken, stableTokenInfos } from '../celo-tokens'
-import { SortedOracles } from '../generated/SortedOracles'
+import { SortedOracles } from '@celo/abis/types/web3/SortedOracles'
 import {
   BaseWrapper,
   proxyCall,

@@ -1,6 +1,6 @@
 import { Address, EventLog } from '@celo/connect'
 import BigNumber from 'bignumber.js'
-import { Reserve } from '../generated/mento/Reserve'
+import { Reserve } from '@celo/abis/types/web3/mento/Reserve'
 import {
   BaseWrapper,
   fixidityValueToBigNumber,

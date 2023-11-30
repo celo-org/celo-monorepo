@@ -4,7 +4,7 @@ import { zeroRange, zip } from '@celo/base/lib/collections'
 import { Address, CeloTransactionObject, EventLog, toTransactionObject } from '@celo/connect'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { Validators } from '../generated/Validators'
+import { Validators } from '@celo/abis/types/web3/Validators'
 import {
   blocksToDurationString,
   proxyCall,
