@@ -4,11 +4,13 @@
   "author": "cLabs",
   "license": "LGPL-3.0",
   "repository": {
-    "type": "git",
-    "url": "https://github.com/celo-org/celo-monorepo.git",
+    "url": "git+https://github.com/celo-org/celo-monorepo.git",
     "directory": "packages/protocol/abis"
   },
   "scripts": {},
   "dependencies": {},
-  "types": "./types/wagmi/index.d.ts"
+  "peerDependencies": {},
+  "files": [
+    "./dist"
+  ]
 }

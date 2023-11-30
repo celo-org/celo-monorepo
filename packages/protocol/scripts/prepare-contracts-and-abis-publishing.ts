@@ -5,11 +5,11 @@ import { sync as rmrfSync } from 'rimraf'
 import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 import {
   ABIS_BUILD_DIR,
+  ABIS_DIST_DIR,
   ABIS_PACKAGE_SRC_DIR,
   BUILD_EXECUTABLE,
   CONTRACTS_PACKAGE_SRC_DIR,
-  CoreContracts,
-  Interfaces,
+  PublishContracts,
   TSCONFIG_PATH,
 } from './consts'
 
@@ -25,8 +25,9 @@ try {
   fs.writeFileSync(TSCONFIG_PATH, JSON.stringify(tsconfig, null, 4))
 
   // Start from scratch
-  rmrfSync([ABIS_BUILD_DIR, path.join(ABIS_PACKAGE_SRC_DIR, 'lib')])
+  rmrfSync([ABIS_BUILD_DIR, ABIS_DIST_DIR])
   fs.mkdirSync(ABIS_BUILD_DIR, { recursive: true })
+  fs.mkdirSync(ABIS_DIST_DIR, { recursive: true })
 
   // Generate all ABIs
   build(`--solidity ${path.join(ABIS_BUILD_DIR)}`)
@@ -35,7 +36,6 @@ try {
   build(`--ethersTypes ${path.join(ABIS_BUILD_DIR, 'types/ethers')}`)
 
   // Generate web3 typings
-  // TODO web3 is generating nested dir structure
   build(`--web3Types ${path.join(ABIS_BUILD_DIR, 'types/web3')}`)
 
   // Merge contracts-0.8, contracts-mento, etc.. at the root of the build dir
@@ -52,12 +52,7 @@ try {
     const name = path.basename(filePath)
     const baseName = name.replace(/.(sol|d.ts|json)$/, '')
 
-    if (
-      baseName !== 'index' &&
-      baseName !== 'Proxy' &&
-      !CoreContracts.includes(baseName) &&
-      !Interfaces.includes(baseName)
-    ) {
+    if (baseName !== 'index' && !PublishContracts.includes(baseName)) {
       rmrfSync(path.join(ABIS_BUILD_DIR, `${baseName}.json`))
       rmrfSync(path.join(ABIS_BUILD_DIR, `${baseName}.ts`))
       rmrfSync(path.join(ABIS_BUILD_DIR, '**', `${baseName}.d.ts`))
@@ -65,19 +60,29 @@ try {
     }
   })
 
-  removeExtraneousFieldsFromGeneratedJsons()
+  let exports = processRawJsonsAndPrepareExports()
 
   // Generate wagmi friendly ts files
   log('Running yarn wagmi generate')
   child_process.execSync(`yarn wagmi generate`, { stdio: 'inherit' })
 
-  fs.copyFileSync(
-    path.join(ABIS_PACKAGE_SRC_DIR, 'README.md'),
-    path.join(ABIS_BUILD_DIR, 'README.md')
-  )
+  log('Compiling esm')
+  child_process.execSync(`yarn tsc -b ${path.join(ABIS_PACKAGE_SRC_DIR, 'tsconfig.json')}`, {
+    stdio: 'inherit',
+  })
+
+  log('Compiling cjs')
+  child_process.execSync(`yarn tsc -b ${path.join(ABIS_PACKAGE_SRC_DIR, 'tsconfig-cjs.json')}`, {
+    stdio: 'inherit',
+  })
+
+  exports = {
+    ...exports,
+    ...prepareTargetTypesExports(),
+  }
 
   // Change the packages version to what CI is providing from environment variables
-  prepareAbisPackageJson()
+  prepareAbisPackageJson(exports)
   prepareContractsPackageJson()
 } finally {
   // Cleanup
@@ -88,7 +93,73 @@ try {
 }
 
 // Helper functions
-function removeExtraneousFieldsFromGeneratedJsons() {
+function prepareTargetTypesExports() {
+  const exports = {}
+  const targets = ['esm', 'cjs']
+
+  targets.forEach((target) => {
+    fs.copyFileSync(
+      path.join(ABIS_PACKAGE_SRC_DIR, `package-${target}.json`),
+      path.join(ABIS_DIST_DIR, target, 'package.json')
+    )
+
+    const filePaths = lsRecursive(path.join(ABIS_DIST_DIR, target))
+
+    filePaths.forEach((filePath) => {
+      const parsedPath = path.parse(filePath)
+
+      if (PublishContracts.includes(parsedPath.name)) {
+        const relativePath = path.join(
+          path.relative(ABIS_PACKAGE_SRC_DIR, parsedPath.dir),
+          parsedPath.name
+        )
+        const exportKey = `./${path.join(
+          path.relative(path.join(ABIS_DIST_DIR, target), parsedPath.dir),
+          parsedPath.name
+        )}`
+
+        if (!exports.hasOwnProperty(exportKey)) {
+          exports[exportKey] = {}
+        }
+
+        if (target == 'esm') {
+          const typesPath = `./${relativePath}.d.ts`
+          const importPath = `./${relativePath}.js`
+
+          expectFileExists(typesPath)
+          expectFileExists(importPath)
+
+          exports[exportKey] = {
+            ...exports[exportKey],
+            types: typesPath,
+            import: importPath,
+          }
+        } else {
+          const requirePath = `./${relativePath}.js`
+
+          expectFileExists(requirePath)
+
+          exports[exportKey] = {
+            ...exports[exportKey],
+            require: `./${relativePath}.js`,
+          }
+        }
+      }
+    })
+  })
+
+  return exports
+}
+
+function expectFileExists(relativePath: string) {
+  if (!fs.existsSync(path.join(ABIS_PACKAGE_SRC_DIR, relativePath))) {
+    throw new Error(`Expected file ${relativePath} to exist`)
+  }
+}
+
+function processRawJsonsAndPrepareExports() {
+  const exports = {}
+
   log('Removing extraneous fields from generated json files')
   const fileNames = fs.readdirSync(ABIS_BUILD_DIR)
 
@@ -96,16 +167,15 @@ function removeExtraneousFieldsFromGeneratedJsons() {
     const filePath = path.join(ABIS_BUILD_DIR, fileName)
     const parsedPath = path.parse(filePath)
 
-    // TODO create a single const for all contracts
-    if (
-      Interfaces.includes(parsedPath.name) ||
-      CoreContracts.includes(parsedPath.name) ||
-      parsedPath.name === 'Proxy'
-    ) {
+    if (PublishContracts.includes(parsedPath.name)) {
       const json = JSON.parse(fs.readFileSync(filePath).toString())
+      const defaultPath = path.join(
+        path.relative(ABIS_PACKAGE_SRC_DIR, ABIS_DIST_DIR),
+        `${parsedPath.name}.json`
+      )
 
       fs.writeFileSync(
-        filePath,
+        path.join(ABIS_DIST_DIR, fileName),
         JSON.stringify(
           {
             contractName: json.contractName,
@@ -115,25 +185,35 @@ function removeExtraneousFieldsFromGeneratedJsons() {
           2
         )
       )
+
+      expectFileExists(defaultPath)
+
+      exports[`./${parsedPath.name}.json`] = {
+        default: `./${defaultPath}`,
+      }
     }
   })
+
+  return exports
 }
 
-function prepareAbisPackageJson() {
+function prepareAbisPackageJson(exports) {
   log('Preparing @celo/abis package.json')
-  const sourcePackageJson = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json.dist')
-  const destinationPackageJson = path.join(ABIS_BUILD_DIR, 'package.json')
-  let contents = fs.readFileSync(sourcePackageJson).toString()
+  const packageJsonPath = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json')
+  let json = JSON.parse(fs.readFileSync(packageJsonPath).toString())
 
   if (process.env.RELEASE_VERSION) {
     log('Replacing @celo/abis version with provided RELEASE_VERSION')
 
-    contents = contents.replace('0.0.0-template.version', process.env.RELEASE_VERSION)
+    json.version = process.env.RELEASE_VERSION
   } else {
     log('No RELEASE_VERSION provided')
   }
 
-  fs.writeFileSync(destinationPackageJson, contents)
+  log('Setting @celo/abis exports')
+  json.exports = exports
+
+  fs.writeFileSync(packageJsonPath, JSON.stringify(json, null, 2))
 }
 
 function prepareContractsPackageJson() {

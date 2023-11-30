@@ -5,8 +5,11 @@ export const ROOT_DIR = path.join(__dirname, '../')
 export const CONTRACTS_PACKAGE_SRC_DIR = path.join(__dirname, '../contracts')
 export const ABIS_PACKAGE_SRC_DIR = path.join(__dirname, '../abis')
 export const ABIS_BUILD_DIR = path.join(ABIS_PACKAGE_SRC_DIR, 'src-generated')
+export const ABIS_DIST_DIR = path.join(ABIS_PACKAGE_SRC_DIR, 'dist')
 export const BUILD_EXECUTABLE = path.join(__dirname, 'build.ts')
 export const TSCONFIG_PATH = path.join(ROOT_DIR, 'tsconfig.json')
+
+const PROXY_CONTRACT = 'Proxy'
 
 export const ProxyContracts = [
   'AccountsProxy',
@@ -73,7 +76,7 @@ export const CoreContracts = [
 ]
 
 export const OtherContracts = [
-  'Proxy',
+  PROXY_CONTRACT,
   'Migrations',
   // abstract
   'Initializable',
@@ -85,3 +88,7 @@ export const contractPackages = [MENTO_PACKAGE, SOLIDITY_08_PACKAGE].filter(Bool
 export const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
 
 export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
+
+export const PublishContracts = CoreContracts.concat(Interfaces)
+  .concat(PROXY_CONTRACT)
+  .concat(MENTO_PACKAGE.contracts)

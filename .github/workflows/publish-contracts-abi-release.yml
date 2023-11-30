@@ -80,7 +80,7 @@ jobs:
         run: |
           cat package.json
           npm publish $RELEASE_TYPE $DRY_RUN
-        working-directory: packages/protocol/abis/src-generated
+        working-directory: packages/protocol/abis
         env:
           RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
