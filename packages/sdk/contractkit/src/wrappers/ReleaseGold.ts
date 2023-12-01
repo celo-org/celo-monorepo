@@ -1,3 +1,4 @@
+import { ReleaseGold } from '@celo/abis/types/web3/ReleaseGold'
 import { concurrentMap } from '@celo/base'
 import { findAddressIndex } from '@celo/base/lib/address'
 import { Signature } from '@celo/base/lib/signatureUtils'
@@ -5,7 +6,6 @@ import { Address, CeloTransactionObject, toTransactionObject } from '@celo/conne
 import { hashMessageWithPrefix, signedMessageToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { flatten } from 'fp-ts/lib/Array'
-import { ReleaseGold } from '@celo/abis/types/web3/ReleaseGold'
 import {
   proxyCall,
   proxySend,

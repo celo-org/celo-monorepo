@@ -1,3 +1,4 @@
+import { SortedOracles } from '@celo/abis/types/web3/SortedOracles'
 import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
 import { Address, CeloTransactionObject, Connection, toTransactionObject } from '@celo/connect'
 import { isValidAddress } from '@celo/utils/lib/address'
@@ -6,7 +7,6 @@ import BigNumber from 'bignumber.js'
 import { AddressRegistry } from '../address-registry'
 import { CeloContract, StableTokenContract } from '../base'
 import { isStableTokenContract, StableToken, stableTokenInfos } from '../celo-tokens'
-import { SortedOracles } from '@celo/abis/types/web3/SortedOracles'
 import {
   BaseWrapper,
   proxyCall,

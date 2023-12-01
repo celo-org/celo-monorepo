@@ -1,5 +1,5 @@
-import { fromFixed } from '@celo/utils/lib/fixidity'
 import { EpochRewards } from '@celo/abis/types/web3/EpochRewards'
+import { fromFixed } from '@celo/utils/lib/fixidity'
 import { BaseWrapper, proxyCall, valueToBigNumber } from './BaseWrapper'
 
 const parseFixidity = (v: string) => fromFixed(valueToBigNumber(v))

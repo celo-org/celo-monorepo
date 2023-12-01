@@ -1,5 +1,5 @@
-import { Address } from '@celo/connect'
 import { DoubleSigningSlasher } from '@celo/abis/types/web3/DoubleSigningSlasher'
+import { Address } from '@celo/connect'
 import { BaseSlasher } from './BaseSlasher'
 import { valueToInt } from './BaseWrapper'
 
