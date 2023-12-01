@@ -1,6 +1,7 @@
 {
   "extends": "@celo/typescript/tsconfig.library.json",
   "compilerOptions": {
+    "moduleResolution": "node16",
     "rootDir": "src",
     "outDir": "lib",
     "resolveJsonModule": true
