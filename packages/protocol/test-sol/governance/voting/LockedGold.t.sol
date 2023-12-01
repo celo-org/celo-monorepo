@@ -410,7 +410,7 @@ contract Unlock is LockedGoldFoundryTest {
     lockedGold.unlock(value);
   }
 
-  function test_ShouldSucceed_WhenTheCorrectTimeIsEarlierThanThRequirementTimeButRequestingCeloWithoutBalanceRequirement_WhenThereIsBalanceRequirement()
+  function test_ShouldSucceed_WhenTheCorrectTimeIsEarlierThanTheRequirementTimeButRequestingCeloWithoutBalanceRequirement_WhenThereIsBalanceRequirement()
     public
   {
     validators.setAccountLockedGoldRequirement(address(this), balanceRequirement);
