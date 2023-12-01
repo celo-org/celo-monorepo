@@ -295,6 +295,10 @@ jobs:
         with:
           rebuild-package: 'true'
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 60
+        if: contains(matrix.command, 'identity')
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
         with:
