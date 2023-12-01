@@ -61,7 +61,7 @@ export class BaseSlasher<T extends SlasherContract> extends BaseWrapperForGovern
   }
 
   protected slash = (...args: Parameters<T['methods']['slash']>) =>
-    toTransactionObject(this.connection, this.contract.methods.slash(...args))
+    toTransactionObject(this.connection, this.contract.methods.slash(...(args as any[])))
 
   /**
    * Returns slashing incentives.

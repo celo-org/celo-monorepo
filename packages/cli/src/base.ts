@@ -97,7 +97,7 @@ export abstract class BaseCommand extends Command {
   // For commands that don't require the node is synced, add the following line
   // to its definition:
   //   requireSynced = false
-  public requireSynced: boolean = true
+  public requireSynced = true
 
   private _web3: Web3 | null = null
   private _kit: ContractKit | null = null
@@ -155,6 +155,7 @@ export abstract class BaseCommand extends Command {
       try {
         // Importing for ledger uses only fixes running jest tests
         const TransportNodeHid = (await import('@ledgerhq/hw-transport-node-hid')).default
+        // @ts-expect-error // TODO fix types
         transport = await TransportNodeHid.open('')
         const derivationPathIndexes = res.raw.some(
           (value) => (value as any).flag === 'ledgerCustomAddresses'

@@ -30,7 +30,7 @@
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/abis": "10.0.0-beta.5",
+    "@celo/abis": "10.0.0-local",
     "@celo/base": "^6.0.0",
     "@celo/connect": "^5.1.1",
     "@celo/contractkit": "^5.2.0",
