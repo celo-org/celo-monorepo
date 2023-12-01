@@ -400,7 +400,7 @@ contract Unlock is LockedGoldFoundryTest {
     lockedGold.unlock(nonVotingGold);
   }
 
-  function test_ShouldRevert_WhenTheCorrectTimeIsEarlierThanThRequirementTime_WhenThereIsBalanceRequirement()
+  function test_ShouldRevert_WhenTheCorrectTimeIsEarlierThanTheRequirementTime_WhenThereIsBalanceRequirement()
     public
   {
     validators.setAccountLockedGoldRequirement(address(this), balanceRequirement);
