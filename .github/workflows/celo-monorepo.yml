@@ -279,6 +279,9 @@ jobs:
           - name: Protocol Governance Voting
             command: |
               yarn --cwd packages/protocol test governance/voting/
+          - name: Protocol Identity
+            command: |
+              yarn --cwd packages/protocol test identity/
           - name: Protocol Stability
             command: |
               yarn --cwd packages/protocol test stability/
@@ -291,6 +294,10 @@ jobs:
         with:
           rebuild-package: 'true'
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 60
+        if: contains(matrix.command, 'identity')
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
         with:
