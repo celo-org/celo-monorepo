@@ -234,7 +234,7 @@ contract Lock is LockedGoldFoundryTest {
     assertEq(lockedGold.getAccountTotalLockedGold(address(this)), value);
   }
 
-  function test_ShouldIncreaseTheNonvotingLockedGOldBalance() public {
+  function test_ShouldIncreaseTheNonvotingLockedGoldBalance() public {
     lockedGold.lock.value(value)();
     assertEq(lockedGold.getNonvotingLockedGold(), value);
   }
