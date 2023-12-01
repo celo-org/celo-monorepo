@@ -293,6 +293,14 @@ contract SetAccount is AccountsTest {
     accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
   }
 
+  function test_ShouldSetADifferentAddressWithAppropriateSignature_WhenTheAccountHasBeenCreated()
+    public
+  {
+    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(address(this), caller2PK);
+    accounts.setAccount(name, dataEncryptionKey, caller2, v, r, s);
+    assertEq(accounts.getWalletAddress(address(this)), caller2);
+  }
+
   function test_ShouldSetTheNameDataEncryptionKeyAndWalletAddress_WhenTheAccountHasNotBeenCreated()
     public
   {
