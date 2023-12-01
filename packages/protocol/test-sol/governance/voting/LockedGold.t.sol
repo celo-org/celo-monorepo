@@ -2816,7 +2816,7 @@ contract UpdateDelegatedAmount is LockedGoldFoundryTest {
     );
   }
 
-  function test_ShouldReturnCorrectValueWhenLockedAndDelegated_WhenDelegatorLockedMoreGold()
+  function test_ShouldReturnCorrectValueWhenLockedAndDelegated_WhenDelegatorLockedMoreCelo()
     public
   {
     vm.prank(delegator);
