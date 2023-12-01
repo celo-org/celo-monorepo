@@ -1036,7 +1036,7 @@ contract BackwardCompatibility is AccountsTest {
     assertEq(hasAuthorizedSigner(role, account, genericRead), true);
   }
 
-  function test_ShouldAuthorizeVoteSigningKey() public {
+  function test_ShouldAuthorizeVoteSigningKey_GenericReadFalse_GenericWriteFalse() public {
     helperShouldSetAuthorizedKey(false, false, Role.Vote);
   }
 
