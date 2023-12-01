@@ -16,7 +16,7 @@ import "../../../contracts/governance/test/MockElection.sol";
 import "../../../contracts/governance/test/MockGovernance.sol";
 import "../../../contracts/governance/test/MockValidators.sol";
 
-contract LockedGoldFoundryTest is Test {
+contract LockedGoldTest is Test {
   using FixidityLib for FixidityLib.Fraction;
 
   Registry registry;
