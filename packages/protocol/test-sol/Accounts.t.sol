@@ -304,37 +304,29 @@ contract SetAccount is AccountsTest {
   }
 
   function test_ShouldEmitAccountCreated_WhenTheAccountHasNotBeenCreated() public {
-    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(address(caller), caller2PK);
-    vm.prank(caller);
     vm.expectEmit(true, true, true, true);
-    emit AccountCreated(caller);
-    accounts.setAccount(name, dataEncryptionKey, caller2, v, r, s);
+    emit AccountCreated(address(this));
+    accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
   }
 
   function test_ShouldEmitAccountNameSetEvent_WhenTheAccountHasNotBeenCreated() public {
-    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(address(caller), caller2PK);
-    vm.prank(caller);
     vm.expectEmit(true, true, true, true);
-    emit AccountNameSet(caller, name);
-    accounts.setAccount(name, dataEncryptionKey, caller2, v, r, s);
+    emit AccountNameSet(address(this), name);
+    accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
   }
 
   function test_ShouldEmitAccountDataEncryptionKeySetEvent_WhenTheAccountHasNotBeenCreated()
     public
   {
-    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(address(caller), caller2PK);
-    vm.prank(caller);
     vm.expectEmit(true, true, true, true);
-    emit AccountDataEncryptionKeySet(caller, dataEncryptionKey);
-    accounts.setAccount(name, dataEncryptionKey, caller2, v, r, s);
+    emit AccountDataEncryptionKeySet(address(this), dataEncryptionKey);
+    accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
   }
 
   function test_ShouldEmitAccountWalletAddressSetEvent_WhenTheAccountHasNotBeenCreated() public {
-    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(address(caller), caller2PK);
-    vm.prank(caller);
     vm.expectEmit(true, true, true, true);
-    emit AccountWalletAddressSet(caller, caller2);
-    accounts.setAccount(name, dataEncryptionKey, caller2, v, r, s);
+    emit AccountWalletAddressSet(address(this), address(this));
+    accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
   }
 
   function test_ShouldRevertWhenIncorrectSignature() public {
