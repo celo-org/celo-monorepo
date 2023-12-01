@@ -1,5 +1,5 @@
-import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { newReleaseGold } from '@celo/abis/types/web3/ReleaseGold'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { getContractFromEvent, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
 import { BigNumber } from 'bignumber.js'

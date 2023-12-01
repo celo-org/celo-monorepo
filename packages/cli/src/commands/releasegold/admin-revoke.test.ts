@@ -1,6 +1,6 @@
+import { newReleaseGold } from '@celo/abis/types/web3/ReleaseGold'
 import { serializeSignature } from '@celo/base/lib/signatureUtils'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { newReleaseGold } from '@celo/abis/types/web3/ReleaseGold'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper } from '@celo/contractkit/lib/wrappers/Governance'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
