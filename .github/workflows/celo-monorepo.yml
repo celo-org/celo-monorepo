@@ -175,7 +175,6 @@ jobs:
             --ignore @celo/celotool \
             --ignore @celo/celocli \
             --ignore @celo/env-tests \
-            --ignore @celo/transactions-uri \
             --ignore '@celo/wallet-*' \
             run test
       - name: Upload Jest Test Results
@@ -325,10 +324,6 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Generate DevChain
-        run: |
-          cd packages/sdk/contractkit
-          yarn test:reset
       - name: Run tests
         run: |
           yarn --cwd=packages/sdk/contractkit test
@@ -356,10 +351,6 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Generate DevChain
-        run: |
-          cd packages/cli
-          yarn test:reset
       - name: Run tests
         run: |
           yarn --cwd=packages/cli test
