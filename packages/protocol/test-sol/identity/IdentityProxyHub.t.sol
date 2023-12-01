@@ -3,11 +3,11 @@ pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
 import "forge-std/console.sol";
-import "../contracts/identity/IdentityProxy.sol";
-import "../contracts/identity/IdentityProxyHub.sol";
-import "../contracts/identity/test/IdentityProxyTest.sol";
-import "../contracts/identity/test/MockAttestations.sol";
-import "../contracts/common/Registry.sol";
+import "../../contracts/identity/IdentityProxy.sol";
+import "../../contracts/identity/IdentityProxyHub.sol";
+import "../../contracts/identity/test/IdentityProxyTest.sol";
+import "../../contracts/identity/test/MockAttestations.sol";
+import "../../contracts/common/Registry.sol";
 
 contract IdentityProxyHubTest is Test {
   IdentityProxy identityProxy;
