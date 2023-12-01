@@ -527,7 +527,7 @@ contract RemoveStorageRoot is AccountsTest {
     accounts.removeStorageRoot(0);
   }
 
-  function test_ShouldRevertWithMEssage_WhenThereAreNoStorageRootsAndAccountHasBeenCreated()
+  function test_ShouldRevertWithMessage_WhenThereAreNoStorageRootsAndAccountHasBeenCreated()
     public
   {
     accounts.createAccount();
