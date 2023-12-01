@@ -105,19 +105,16 @@ function prepareTargetTypesExports() {
     // )
 
     const filePaths = lsRecursive(path.join(ABIS_DIST_DIR, target))
-    console.log(filePaths)
     filePaths.forEach((filePath) => {
       const parsedPath = path.parse(filePath)
 
       // Remove the .d from the name -- only for types types no harm otherwise
       const parsedPathName = parsedPath.name.replace('.d', '')
-      console.log('path name', parsedPathName)
       if (PublishContracts.includes(parsedPathName)) {
         const relativePath = path.join(
           path.relative(ABIS_PACKAGE_SRC_DIR, parsedPath.dir),
           parsedPathName
         )
-        console.log(relativePath)
         const exportKey = `./${path.join(
           path.relative(path.join(ABIS_DIST_DIR, target), parsedPath.dir),
           parsedPathName
@@ -127,7 +124,7 @@ function prepareTargetTypesExports() {
           exports[exportKey] = {}
         }
 
-        if (target == 'esm') {
+        if (target === 'esm') {
           const importPath = `./${relativePath}.js`
 
           expectFileExists(importPath)
@@ -136,7 +133,7 @@ function prepareTargetTypesExports() {
             ...exports[exportKey],
             import: importPath,
           }
-        } else if (target == 'cjs') {
+        } else if (target === 'cjs') {
           const requirePath = `./${relativePath}.js`
 
           expectFileExists(requirePath)
@@ -146,9 +143,9 @@ function prepareTargetTypesExports() {
             require: requirePath,
           }
         } else {
-          //types
+          // types
           const typesPath = `./${relativePath}.d.ts`
-          console.log('types', typesPath)
+
           expectFileExists(typesPath)
 
           exports[exportKey] = {
@@ -212,7 +209,7 @@ function processRawJsonsAndPrepareExports() {
 function prepareAbisPackageJson(exports) {
   log('Preparing @celo/abis package.json')
   const packageJsonPath = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json')
-  let json = JSON.parse(fs.readFileSync(packageJsonPath).toString())
+  const json = JSON.parse(fs.readFileSync(packageJsonPath).toString())
 
   if (process.env.RELEASE_VERSION) {
     log('Replacing @celo/abis version with provided RELEASE_VERSION')
