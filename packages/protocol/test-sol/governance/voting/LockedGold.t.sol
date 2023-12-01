@@ -2837,7 +2837,7 @@ contract UpdateDelegatedAmount is LockedGoldFoundryTest {
     assertDelegatorDelegateeAmounts(delegator, delegatee, delegatedPercent, delegatedAmount * 2);
   }
 
-  function test_ShouldReturnCorrectValueWhenLockedAndDelegated_WhenDelegatorLockedMoreGold_WhenVoteSigners()
+  function test_ShouldReturnCorrectValueWhenLockedAndDelegated_WhenDelegatorLockedMoreCelo_WhenVoteSigners()
     public
   {
     helper_WhenVoteSigners();
