@@ -115,7 +115,7 @@ jobs:
       - name: Get the artifacts to cache
         id: get_artifacts_to_cache
         run: |
-          artifacts_to_cache="$(git ls-files --others --ignored --exclude-standard | grep -v node_modules)"
+          artifacts_to_cache="$(git ls-files --others --ignored --exclude-standard | grep -v node_modules | grep -v cjs/types/wagmi |grep -v src-generated/types/ethers | grep -v .js.map)"
           echo "artifacts_to_cache<<EOF" >> $GITHUB_OUTPUT
           echo "$artifacts_to_cache" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
