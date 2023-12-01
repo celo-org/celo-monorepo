@@ -496,7 +496,7 @@ contract AddStorageRoot is AccountsTest {
 
   function test_ShouldEmitTheOffchainStorageRootAddedEvent_WhenAccountHasBeenCreated() public {
     accounts.createAccount();
-    vm.expectEmit(true, false, false, false);
+    vm.expectEmit(true, false, false, true);
     emit OffchainStorageRootAdded(address(this), bytes(metadataURL));
     accounts.addStorageRoot(bytes(metadataURL));
   }
