@@ -296,12 +296,11 @@ contract SetAccount is AccountsTest {
   function test_ShouldSetTheNameDataEncryptionKeyAndWalletAddress_WhenTheAccountHasNotBeenCreated()
     public
   {
-    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(address(caller), caller2PK);
-    vm.prank(caller);
-    accounts.setAccount(name, dataEncryptionKey, caller2, v, r, s);
-    assertEq(accounts.getName(caller), name);
-    assertEq(accounts.getDataEncryptionKey(caller), dataEncryptionKey);
-    assertEq(accounts.getWalletAddress(caller), caller2);
+    accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
+    assertEq(accounts.getName(address(this)), name);
+    assertEq(accounts.getDataEncryptionKey(address(this)), dataEncryptionKey);
+    assertEq(accounts.getWalletAddress(address(this)), address(this));
+    assertEq(accounts.isAccount(address(this)), true);
   }
 
   function test_ShouldEmitAccountCreated_WhenTheAccountHasNotBeenCreated() public {
