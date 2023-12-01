@@ -15,4 +15,6 @@ remappings = [
 no_match_contract = "RandomTest"
 no_match_path = "contracts/common/libraries/test/BLS12Passthrough.sol" # tested from celo-blockain repo
 
+fs_permissions = [{ access = "read", path = "./out"}]
+
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
