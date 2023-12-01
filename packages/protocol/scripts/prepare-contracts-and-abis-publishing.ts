@@ -76,6 +76,11 @@ try {
     stdio: 'inherit',
   })
 
+  log('Compiling declarations')
+  child_process.execSync(`yarn tsc -b ${path.join(ABIS_PACKAGE_SRC_DIR, 'tsconfig-types.json')}`, {
+    stdio: 'inherit',
+  })
+
   exports = {
     ...exports,
     ...prepareTargetTypesExports(),
@@ -95,27 +100,32 @@ try {
 // Helper functions
 function prepareTargetTypesExports() {
   const exports = {}
-  const targets = ['esm', 'cjs']
+  const targets = ['esm', 'cjs', 'types']
 
   targets.forEach((target) => {
-    fs.copyFileSync(
-      path.join(ABIS_PACKAGE_SRC_DIR, `package-${target}.json`),
-      path.join(ABIS_DIST_DIR, target, 'package.json')
-    )
+    // why?
+    // fs.copyFileSync(
+    //   path.join(ABIS_PACKAGE_SRC_DIR, `package-${target}.json`),
+    //   path.join(ABIS_DIST_DIR, target, 'package.json')
+    // )
 
     const filePaths = lsRecursive(path.join(ABIS_DIST_DIR, target))
-
+    console.log(filePaths)
     filePaths.forEach((filePath) => {
       const parsedPath = path.parse(filePath)
 
-      if (PublishContracts.includes(parsedPath.name)) {
+      // Remove the .d from the name -- only for types types no harm otherwise
+      const parsedPathName = parsedPath.name.replace('.d', '')
+      console.log('path name', parsedPathName)
+      if (PublishContracts.includes(parsedPathName)) {
         const relativePath = path.join(
           path.relative(ABIS_PACKAGE_SRC_DIR, parsedPath.dir),
-          parsedPath.name
+          parsedPathName
         )
+        console.log(relativePath)
         const exportKey = `./${path.join(
           path.relative(path.join(ABIS_DIST_DIR, target), parsedPath.dir),
-          parsedPath.name
+          parsedPathName
         )}`
 
         if (!exports.hasOwnProperty(exportKey)) {
@@ -123,25 +133,32 @@ function prepareTargetTypesExports() {
         }
 
         if (target == 'esm') {
-          const typesPath = `./${relativePath}.d.ts`
           const importPath = `./${relativePath}.js`
 
-          expectFileExists(typesPath)
           expectFileExists(importPath)
 
           exports[exportKey] = {
             ...exports[exportKey],
-            types: typesPath,
             import: importPath,
           }
-        } else {
+        } else if (target == 'cjs') {
           const requirePath = `./${relativePath}.js`
 
           expectFileExists(requirePath)
 
           exports[exportKey] = {
             ...exports[exportKey],
-            require: `./${relativePath}.js`,
+            require: requirePath,
+          }
+        } else {
+          //types
+          const typesPath = `./${relativePath}.d.ts`
+          console.log('types', typesPath)
+          expectFileExists(typesPath)
+
+          exports[exportKey] = {
+            ...exports[exportKey],
+            types: typesPath,
           }
         }
       }

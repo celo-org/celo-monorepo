@@ -5,7 +5,7 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "strict": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": false,
@@ -14,8 +14,7 @@
     "target": "ES2020",
     "downlevelIteration": true,
     "resolveJsonModule": true,
-    "declaration": true,
-    "module": "ES2020",
+    "declaration": false,
     "rootDir": "./src-generated",
     "outDir": "./dist/esm"
   },
