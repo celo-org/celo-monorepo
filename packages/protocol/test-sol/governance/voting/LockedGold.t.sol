@@ -2769,6 +2769,14 @@ contract LockedGoldGetAccountTotalGovernanceVotingPower is LockedGoldTest {
 
     vm.deal(delegator, 10 ether);
     vm.deal(delegatee, 10 ether);
+
+    vm.prank(delegator);
+    accounts.createAccount();
+    vm.prank(delegatee);
+    accounts.createAccount();
+
+    vm.prank(delegator);
+    lockedGold.lock.value(value)();
   }
 
   function test_ShouldReturn0WhenNothingLockedNorAccount() public {
@@ -2780,14 +2788,6 @@ contract LockedGoldGetAccountTotalGovernanceVotingPower is LockedGoldTest {
   {
     uint256 delegatedPercent = 70;
     uint256 delegatedAmount = (value / 100) * delegatedPercent;
-
-    vm.prank(delegator);
-    accounts.createAccount();
-    vm.prank(delegatee);
-    accounts.createAccount();
-
-    vm.prank(delegator);
-    lockedGold.lock.value(value)();
 
     vm.prank(delegator);
     lockedGold.delegateGovernanceVotes(
@@ -2805,13 +2805,6 @@ contract LockedGoldGetAccountTotalGovernanceVotingPower is LockedGoldTest {
     uint256 delegatedPercent = 70;
     uint256 delegatedAmount = (value / 100) * delegatedPercent;
 
-    vm.prank(delegator);
-    accounts.createAccount();
-    vm.prank(delegatee);
-    accounts.createAccount();
-
-    vm.prank(delegator);
-    lockedGold.lock.value(value)();
     vm.prank(delegatee);
     lockedGold.lock.value(value)();
 
@@ -3110,10 +3103,6 @@ contract LockedGoldUpdateDelegatedAmount is LockedGoldTest {
 }
 
 contract LockedGoldGetTotalPendingWithdrawalsCount is LockedGoldTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldReturn0_WhenAccountHasNoPendingWithdrawals() public {
     assertEq(lockedGold.getTotalPendingWithdrawalsCount(actor("account")), 0);
   }
