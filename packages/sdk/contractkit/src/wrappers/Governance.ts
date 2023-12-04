@@ -848,7 +848,6 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
     noVotes: BigNumber.Value,
     abstainVotes: BigNumber.Value
   ) {
-    const proposalIndex = await this.getDequeueIndex(proposalID)
     console.log('proposal INDEX', proposalIndex)
     return toTransactionObject(
       this.connection,
