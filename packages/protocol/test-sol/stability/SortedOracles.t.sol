@@ -3,10 +3,10 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import { Test } from "celo-foundry/Test.sol";
-import { SortedOracles } from "../contracts/stability/SortedOracles.sol";
-import "../contracts/common/FixidityLib.sol";
-import "../contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol";
-import "../contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
+import { SortedOracles } from "../../contracts/stability/SortedOracles.sol";
+import "../../contracts/common/FixidityLib.sol";
+import "../../contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol";
+import "../../contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
 import "forge-std/console.sol";
 
 contract SortedOraclesTest is Test {
@@ -210,7 +210,7 @@ contract RemoveExpiredReports is SortedOraclesTest {
     }
   }
 
-  function test_ShouldDoNothingWhenOldestReportIsNotExpired() public {
+  function test_ShouldDoNothingWhenOldestReportIsNotExpired_WhenMultipleReportsHaveBeenMade() public {
     vm.prank(oracleAccount);
     sortedOracle.report(
       aToken,
@@ -293,7 +293,7 @@ contract IsOldestReportExpired is SortedOraclesTest {
     assertEq(expired, true);
   }
 
-  function test_ShouldReturnFalseWhenOldestReportIsNotExpired() public {
+  function test_ShouldReturnFalseWhenOldestReportIsNotExpired_WhenUsingDefaultExpiry() public {
     vm.prank(oracleAccount);
     sortedOracle.report(
       aToken,
@@ -306,7 +306,7 @@ contract IsOldestReportExpired is SortedOraclesTest {
     assertEq(expired, false);
   }
 
-  function test_ShouldNotExpire_WhenNoTimeHasPassedAndPerTokenExpiryIsSetToHigherThanDefault()
+  function test_ShouldNotExpire_WhenNoTimeHasPassed_WhenPerTokenExpiryIsSetToHigherThanDefault()
     public
   {
     uint256 newReportExpiry = reportExpiry * 2;
@@ -457,7 +457,7 @@ contract RemoveOracle is SortedOraclesTest {
     sortedOracle.removeOracle(aToken, oracleAccount2, 1);
   }
 
-  function test_OracleReportRemoved_WhenTHereIsMOreThanOneReportMade() public {
+  function test_ShouldEmitOracleReportRemoved_WhenTHereIsMOreThanOneReportMade() public {
     helper_WhenThereIsMoreThanOneReportMade();
 
     vm.expectEmit(true, true, true, true);
@@ -465,7 +465,7 @@ contract RemoveOracle is SortedOraclesTest {
     sortedOracle.removeOracle(aToken, oracleAccount2, 1);
   }
 
-  function test_MedianUpdatedEvents_WhenTHereIsMOreThanOneReportMade() public {
+  function test_ShouldEmitMedianUpdatedEvents_WhenTHereIsMOreThanOneReportMade() public {
     helper_WhenThereIsMoreThanOneReportMade();
     vm.expectEmit(true, true, true, true);
     emit MedianUpdated(aToken, FixidityLib.newFixedFraction(1, 1).unwrap());
