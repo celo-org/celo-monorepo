@@ -436,7 +436,7 @@ contract RemoveOracle is SortedOraclesTest {
     sortedOracle.removeOracle(aToken, oracleAccount2, 1);
   }
 
-  function test_OracleReportRemoved_WhenTHereIsMOreThanOneReportMade() public {
+  function test_ShouldEmitOracleReportRemoved_WhenTHereIsMOreThanOneReportMade() public {
     helper_WhenThereIsMoreThanOneReportMade();
 
     vm.expectEmit(true, true, true, true);
