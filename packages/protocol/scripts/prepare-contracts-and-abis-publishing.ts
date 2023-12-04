@@ -106,10 +106,10 @@ function prepareTargetTypesExports() {
   targets.forEach((target) => {
     // We don't need package.json for type declarations
     if (target != BuildTarget.TYPES) {
-      fs.copyFileSync(
-        path.join(ABIS_PACKAGE_SRC_DIR, `package-${target}.json`),
-        path.join(ABIS_DIST_DIR, target, 'package.json')
-      )
+      // fs.copyFileSync(
+      //   path.join(ABIS_PACKAGE_SRC_DIR, `package-${target}.json`),
+      //   path.join(ABIS_DIST_DIR, target, 'package.json')
+      // )
     }
 
     const filePaths = lsRecursive(path.join(ABIS_DIST_DIR, target))
