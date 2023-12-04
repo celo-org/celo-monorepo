@@ -19,6 +19,5 @@
     "outDir": "./dist/esm"
   },
   "include": ["./src-generated"],
-  "exclude": ["./src-generated/types/ethers"],
-  "references": [{ "path": "../../sdk/utils" }]
+  "exclude": ["./src-generated/types/ethers"]
 }

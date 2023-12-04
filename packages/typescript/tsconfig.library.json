@@ -1,11 +1,10 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "lib": ["dom", "es2015", "es2016"],
+    "lib": ["es2015", "es2016"],
     "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
-    "jsx": "preserve",
     "composite": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
