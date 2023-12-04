@@ -289,7 +289,7 @@ contract IsOldestReportExpired is SortedOraclesTest {
     assertEq(expired, true);
   }
 
-  function test_ShouldReturnFalseWhenOldestReportIsNotExpired() public {
+  function test_ShouldReturnFalseWhenOldestReportIsNotExpired_WhenUsingDefaultExpiry() public {
     vm.prank(oracleAccount);
     sortedOracle.report(
       aToken,
