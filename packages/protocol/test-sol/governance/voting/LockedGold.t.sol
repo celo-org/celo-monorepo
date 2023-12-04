@@ -558,7 +558,7 @@ contract UnlockDelegation2Delegatees is LockedGoldFoundryTest {
   }
 }
 
-contract UnlockDelegation3Delegatees is LockedGoldFoundryTest {
+contract UnlockDelegationTo3Delegatees is LockedGoldFoundryTest {
   uint256 value = 5;
   uint256 availabilityTime = unlockingPeriod + block.timestamp;
 
