@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.1.1
+
+### Patch Changes
+
+- 6ff7f4a1e: network:contracts command fix added StableTokens to unversioned contracts list
+- Updated dependencies [88e3788b8]
+- Updated dependencies [70f600bb0]
+- Updated dependencies [2985f9eb2]
+  - @celo/contractkit@5.2.1
+
 ## 3.1.0
 
 ### Minor Changes
