@@ -160,6 +160,9 @@ contract LockedGoldTest is Test {
     bool lock;
   }
 
+  /**
+   * @notice Helper function to create assign vote signers to delegators and delegatees
+   */
   function helper_WhenVoteSigners(WhenVoteSignerStruct memory config) public {
     if (config.lock) {
       vm.prank(config.delegator);
@@ -739,11 +742,20 @@ contract LockedGoldRelock is LockedGoldTest {
     lockedGold.lock.value(pendingWithdrawalValue)();
   }
 
+  function helper_unlockRelockSameAmount() public {
+    lockedGold.unlock(pendingWithdrawalValue);
+    lockedGold.relock(index, pendingWithdrawalValue);
+  }
+
+  function helper_unlockAndRelockLess() public {
+    lockedGold.unlock(pendingWithdrawalValue);
+    lockedGold.relock(index, pendingWithdrawalValue - 1);
+  }
+
   function test_ShouldIncreaseTheAccountsNonVotingLockedGoldBalance_WhenRelockingValueEqualToTheValueOfThePendingWithdrawal_WhenPendingWithdrawalExists()
     public
   {
-    lockedGold.unlock(pendingWithdrawalValue);
-    lockedGold.relock(index, pendingWithdrawalValue);
+    helper_unlockRelockSameAmount();
 
     assertEq(lockedGold.getAccountNonvotingLockedGold(caller), pendingWithdrawalValue);
   }
@@ -751,8 +763,7 @@ contract LockedGoldRelock is LockedGoldTest {
   function test_ShouldIncreaseTheAccountsTotalLockedGoldBalance_WhenRelockingValueEqualToTheValueOfThePendingWithdrawal_WhenPendingWithdrawalExists()
     public
   {
-    lockedGold.unlock(pendingWithdrawalValue);
-    lockedGold.relock(index, pendingWithdrawalValue);
+    helper_unlockRelockSameAmount();
 
     assertEq(lockedGold.getAccountTotalLockedGold(caller), pendingWithdrawalValue);
   }
@@ -760,8 +771,7 @@ contract LockedGoldRelock is LockedGoldTest {
   function test_ShouldIncreaseTheNonVotingLockedGoldBalance_WhenRelockingValueEqualToTheValueOfThePendingWithdrawal_WhenPendingWithdrawalExists()
     public
   {
-    lockedGold.unlock(pendingWithdrawalValue);
-    lockedGold.relock(index, pendingWithdrawalValue);
+    helper_unlockRelockSameAmount();
 
     assertEq(lockedGold.getNonvotingLockedGold(), pendingWithdrawalValue);
   }
@@ -769,8 +779,7 @@ contract LockedGoldRelock is LockedGoldTest {
   function test_ShouldIncreaseTheTotalLockedGoldBalance_WhenRelockingValueEqualToTheValueOfThePendingWithdrawal_WhenPendingWithdrawalExists()
     public
   {
-    lockedGold.unlock(pendingWithdrawalValue);
-    lockedGold.relock(index, pendingWithdrawalValue);
+    helper_unlockRelockSameAmount();
 
     assertEq(lockedGold.getTotalLockedGold(), pendingWithdrawalValue);
   }
@@ -787,8 +796,7 @@ contract LockedGoldRelock is LockedGoldTest {
   function test_ShouldRemoveThePendingWithdrawal_WhenRelockingValueEqualToTheValueOfThePendingWithdrawal_WhenPendingWithdrawalExists()
     public
   {
-    lockedGold.unlock(pendingWithdrawalValue);
-    lockedGold.relock(index, pendingWithdrawalValue);
+    helper_unlockRelockSameAmount();
 
     (uint256[] memory vals, uint256[] memory timestamps) = lockedGold.getPendingWithdrawals(caller);
     assertEq(vals.length, 0);
@@ -798,8 +806,7 @@ contract LockedGoldRelock is LockedGoldTest {
   function test_ShouldIncreaseTheAccountsNonVotingLockedGoldBalance_WhenRelockingValueLessThanValueOfThePendingWithdrawal_WhenPendingWithdrawalExists()
     public
   {
-    lockedGold.unlock(pendingWithdrawalValue);
-    lockedGold.relock(index, pendingWithdrawalValue - 1);
+    helper_unlockAndRelockLess();
 
     assertEq(lockedGold.getAccountNonvotingLockedGold(caller), pendingWithdrawalValue - 1);
   }
@@ -807,8 +814,7 @@ contract LockedGoldRelock is LockedGoldTest {
   function test_ShouldIncreaseTheAccountsTotalLockedGoldBalance_WhenRelockingValueLessThanTheValueOfThePendingWithdrawal_WhenPendingWithdrawalExists()
     public
   {
-    lockedGold.unlock(pendingWithdrawalValue);
-    lockedGold.relock(index, pendingWithdrawalValue - 1);
+    helper_unlockAndRelockLess();
 
     assertEq(lockedGold.getAccountTotalLockedGold(caller), pendingWithdrawalValue - 1);
   }
@@ -816,8 +822,7 @@ contract LockedGoldRelock is LockedGoldTest {
   function test_ShouldIncreaseTheNonVotingLockedGoldBalance_WhenRelockingValueLessThanTheValueOfThePendingWithdrawal_WhenPendingWithdrawalExists()
     public
   {
-    lockedGold.unlock(pendingWithdrawalValue);
-    lockedGold.relock(index, pendingWithdrawalValue - 1);
+    helper_unlockAndRelockLess();
 
     assertEq(lockedGold.getNonvotingLockedGold(), pendingWithdrawalValue - 1);
   }
@@ -825,8 +830,7 @@ contract LockedGoldRelock is LockedGoldTest {
   function test_ShouldIncreaseTheTotalLockedGoldBalance_WhenRelockingValueLessThanTheValueOfThePendingWithdrawal_WhenPendingWithdrawalExists()
     public
   {
-    lockedGold.unlock(pendingWithdrawalValue);
-    lockedGold.relock(index, pendingWithdrawalValue - 1);
+    helper_unlockAndRelockLess();
 
     assertEq(lockedGold.getTotalLockedGold(), pendingWithdrawalValue - 1);
   }
@@ -932,16 +936,15 @@ contract LockedGoldWithdraw is LockedGoldTest {
 }
 
 contract LockedGoldAddSlasher is LockedGoldTest {
-  address downtimeSlasher = actor("DowntimeSlasher");
+  string slasherName = "DowntimeSlasher";
+  address downtimeSlasher = actor(slasherName);
 
   function setUp() public {
     super.setUp();
-    registry.setAddressFor("DowntimeSlasher", downtimeSlasher);
+    registry.setAddressFor(slasherName, downtimeSlasher);
   }
 
   function test_ShouldBeAbleToAddSlasherToWhitelist() public {
-    string memory slasherName = "DowntimeSlasher";
-
     lockedGold.addSlasher(slasherName);
     bytes32[] memory slashers = lockedGold.getSlashingWhitelist();
     assertEq(slashers[0], keccak256(abi.encodePacked(slasherName)));
@@ -950,12 +953,10 @@ contract LockedGoldAddSlasher is LockedGoldTest {
   function test_ShouldBeCallableOnlyByOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(randomAddress);
-    lockedGold.addSlasher("DowntimeSlasher");
+    lockedGold.addSlasher(slasherName);
   }
 
   function test_ShouldNotAllowToAddSlasherTwice() public {
-    string memory slasherName = "DowntimeSlasher";
-
     lockedGold.addSlasher(slasherName);
     vm.expectRevert("Cannot add slasher ID twice.");
     lockedGold.addSlasher(slasherName);
@@ -963,19 +964,19 @@ contract LockedGoldAddSlasher is LockedGoldTest {
 }
 
 contract LockedGoldRemoveSlasher is LockedGoldTest {
-  address downtimeSlasher = actor("DowntimeSlasher");
-  address governanceSlasher = actor("GovernanceSlasher");
+  string slasherName = "DowntimeSlasher";
+  string governanceSlasherName = "GovernanceSlasher";
+  address downtimeSlasher = actor(slasherName);
+  address governanceSlasher = actor(governanceSlasherName);
 
   function setUp() public {
     super.setUp();
-    registry.setAddressFor("DowntimeSlasher", downtimeSlasher);
-    registry.setAddressFor("GovernanceSlasher", governanceSlasher);
-    lockedGold.addSlasher("DowntimeSlasher");
+    registry.setAddressFor(slasherName, downtimeSlasher);
+    registry.setAddressFor(governanceSlasherName, governanceSlasher);
+    lockedGold.addSlasher(slasherName);
   }
 
   function test_ShouldRemoveItemFromWhitelist() public {
-    string memory slasherName = "DowntimeSlasher";
-
     lockedGold.removeSlasher(slasherName, 0);
     bytes32[] memory slashers = lockedGold.getSlashingWhitelist();
     assertEq(slashers.length, 0);
@@ -984,32 +985,33 @@ contract LockedGoldRemoveSlasher is LockedGoldTest {
   function test_ShouldBeCallableOnlyByTheOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(randomAddress);
-    lockedGold.removeSlasher("DowntimeSlasher", 0);
+    lockedGold.removeSlasher(slasherName, 0);
   }
 
   function test_ShouldRevertWhenIndexTooLarge() public {
     vm.expectRevert("Provided index exceeds whitelist bounds.");
-    lockedGold.removeSlasher("DowntimeSlasher", 1);
+    lockedGold.removeSlasher(slasherName, 1);
   }
 
   function test_ShouldRevertWhenKeyDoesNotExist() public {
     vm.expectRevert("Cannot remove slasher ID not yet added.");
-    lockedGold.removeSlasher("GovernanceSlasher", 0);
+    lockedGold.removeSlasher(governanceSlasherName, 0);
   }
 
   function test_ShouldRevertWhenIndexAndKeyHaveMismatch() public {
-    lockedGold.addSlasher("GovernanceSlasher");
+    lockedGold.addSlasher(governanceSlasherName);
     vm.expectRevert("Index doesn't match identifier");
-    lockedGold.removeSlasher("DowntimeSlasher", 1);
+    lockedGold.removeSlasher(slasherName, 1);
   }
 }
 
 contract LockedGoldSlash is LockedGoldTest {
+  string slasherName = "DowntimeSlasher";
   uint256 value = 1000;
   address group = actor("group");
   address groupMember = actor("groupMember");
   address reporter = actor("reporter");
-  address downtimeSlasher = actor("DowntimeSlasher");
+  address downtimeSlasher = actor(slasherName);
   address delegatee = actor("delegatee");
 
   Election electionSlashTest;
@@ -1036,8 +1038,8 @@ contract LockedGoldSlash is LockedGoldTest {
     validators.setNumRegisteredValidators(1);
 
     lockedGold.lock.value(value)();
-    registry.setAddressFor("DowntimeSlasher", downtimeSlasher);
-    lockedGold.addSlasher("DowntimeSlasher");
+    registry.setAddressFor(slasherName, downtimeSlasher);
+    lockedGold.addSlasher(slasherName);
 
     vm.prank(reporter);
     accounts.createAccount();
@@ -1095,7 +1097,7 @@ contract LockedGoldSlash is LockedGoldTest {
   function test_ShouldRevert_WhenTheSlashingContractIsRemovedFromIsSlasher() public {
     uint256 penalty = value;
     uint256 reward = value / 2;
-    lockedGold.removeSlasher("DowntimeSlasher", 0);
+    lockedGold.removeSlasher(slasherName, 0);
     vm.expectRevert("Caller is not a whitelisted slasher.");
     helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
   }
