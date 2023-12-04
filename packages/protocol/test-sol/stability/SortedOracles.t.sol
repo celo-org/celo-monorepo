@@ -7,7 +7,6 @@ import { SortedOracles } from "../../contracts/stability/SortedOracles.sol";
 import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../../contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
-import "forge-std/console.sol";
 
 contract SortedOraclesTest is Test {
   using FixidityLib for FixidityLib.Fraction;
