@@ -302,7 +302,7 @@ contract IsOldestReportExpired is SortedOraclesTest {
     assertEq(expired, false);
   }
 
-  function test_ShouldNotExpire_WhenNoTimeHasPassedAndPerTokenExpiryIsSetToHigherThanDefault()
+  function test_ShouldNotExpire_WhenNoTimeHasPassed_WhenPerTokenExpiryIsSetToHigherThanDefault()
     public
   {
     uint256 newReportExpiry = reportExpiry * 2;
