@@ -1,6 +1,6 @@
 {
   "name": "@celo/contractkit",
-  "version": "5.2.0-beta.0",
+  "version": "5.2.1",
   "description": "Celo's ContractKit to interact with Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -23,16 +23,14 @@
     "clean:all": "yarn clean && rm -rf src/generated",
     "prepublishOnly": "yarn build",
     "docs": "typedoc",
-    "test:reset": "yarn --cwd ../../protocol devchain:reset --migration_override ../../dev-utils/src/migration-override.json",
-    "test:livechain": "yarn --cwd ../../protocol devchain run-tar .tmp/devchain.tar.gz",
     "test": "jest --runInBand --forceExit",
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/base": "^6.0.0-beta.0",
-    "@celo/connect": "^5.1.1-beta.0",
-    "@celo/utils": "^5.0.6-beta.0",
-    "@celo/wallet-local": "^5.1.1-beta.0",
+    "@celo/base": "^6.0.0",
+    "@celo/connect": "^5.1.1",
+    "@celo/utils": "^5.0.6",
+    "@celo/wallet-local": "^5.1.1",
     "@types/bn.js": "^5.1.0",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
@@ -45,9 +43,10 @@
     "web3-core-helpers": "1.10.0"
   },
   "devDependencies": {
+    "@celo/celo-devchain": "^6.0.3-beta.1",
     "@celo/odis-identifiers": "^1.0.0",
     "@celo/dev-utils": "0.0.1",
-    "@celo/protocol": "1.0.2-beta.0",
+    "@celo/protocol": "1.0.2",
     "@types/debug": "^4.1.5",
     "fetch-mock": "9.10.4",
     "ganache": "npm:@celo/ganache@7.8.0-unofficial.0",

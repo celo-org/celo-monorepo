@@ -28,12 +28,14 @@ export type TransactionInput<T> = CeloTxObject<T> | TransactionObjectWithValue<T
 
 /**
  * Class that wraps the MetaTransactionWallet
+ * @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
  */
 export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWallet> {
   /**
    * Execute a transaction originating from the MTW
    * Reverts if the caller is not a signer
    * @param tx a TransactionInput
+   * @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
    */
   public executeTransaction(tx: TransactionInput<any>): CeloTransactionObject<string> {
     const rawTx = toRawTransaction(tx)
@@ -47,6 +49,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * Execute a batch of transactions originating from the MTW
    * Reverts if the caller is not a signer
    * @param txs An array of TransactionInput
+   * @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
    */
   public executeTransactions(
     txs: Array<TransactionInput<any>>
@@ -64,6 +67,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * Reverts if meta-tx signer is not a signer for the wallet
    * @param tx a TransactionInput
    * @param signature a Signature
+   * @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
    */
   public executeMetaTransaction(
     tx: TransactionInput<any>,
@@ -89,6 +93,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * @param tx a TransactionWrapper
    * @param nonce Optional -- will query contract state if not passed
    * @returns signature a Signature
+   * @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
    */
   public async signMetaTransaction(tx: TransactionInput<any>, nonce?: number): Promise<Signature> {
     if (nonce === undefined) {
@@ -108,6 +113,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * Execute a signed meta transaction
    * Reverts if meta-tx signer is not a signer for the wallet
    * @param tx a TransactionInput
+   * @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
    */
   public async signAndExecuteMetaTransaction(
     tx: TransactionInput<any>
@@ -123,7 +129,9 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
     const rawTx = toRawTransaction(tx)
     return [rawTx.destination, rawTx.value, rawTx.data, nonce]
   }
-
+  /*
+   * @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
+   */
   getMetaTransactionDigest = proxyCall(
     this.contract.methods.getMetaTransactionDigest,
     this.getMetaTransactionDigestParams,
@@ -146,27 +154,45 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
       signature.s,
     ]
   }
+  /*
+   * @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
+   */
   getMetaTransactionSigner = proxyCall(
     this.contract.methods.getMetaTransactionSigner,
     this.getMetaTransactionSignerParams,
     stringIdentity
   )
-
+  /*
+   * @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
+   */
   eip712DomainSeparator = proxyCall(this.contract.methods.eip712DomainSeparator)
+  /*
+   * @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
+   */
   isOwner = proxyCall(this.contract.methods.isOwner)
+  /*
+   * @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
+   */
   nonce = proxyCall(this.contract.methods.nonce, undefined, valueToInt)
   private getSigner = proxyCall(this.contract.methods.signer, undefined, stringIdentity)
 
+  /*
+   * @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
+   */
   transferOwnership: (newOwner: Address) => CeloTransactionObject<void> = proxySend(
     this.connection,
     this.contract.methods.transferOwnership
   )
-
+  /*
+   * @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
+   */
   setSigner: (newSigner: Address) => CeloTransactionObject<void> = proxySend(
     this.connection,
     this.contract.methods.setSigner
   )
-
+  /*
+   * @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
+   */
   setEip712DomainSeparator: () => CeloTransactionObject<void> = proxySend(
     this.connection,
     this.contract.methods.setEip712DomainSeparator

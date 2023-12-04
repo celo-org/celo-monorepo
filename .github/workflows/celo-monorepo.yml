@@ -175,7 +175,6 @@ jobs:
             --ignore @celo/celotool \
             --ignore @celo/celocli \
             --ignore @celo/env-tests \
-            --ignore @celo/transactions-uri \
             --ignore '@celo/wallet-*' \
             run test
       - name: Upload Jest Test Results
@@ -280,9 +279,6 @@ jobs:
           - name: Protocol Governance Voting
             command: |
               yarn --cwd packages/protocol test governance/voting/
-          - name: Protocol Identity
-            command: |
-              yarn --cwd packages/protocol test identity/
           - name: Protocol Stability
             command: |
               yarn --cwd packages/protocol test stability/
@@ -325,10 +321,6 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Generate DevChain
-        run: |
-          cd packages/sdk/contractkit
-          yarn test:reset
       - name: Run tests
         run: |
           yarn --cwd=packages/sdk/contractkit test
@@ -356,10 +348,6 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Generate DevChain
-        run: |
-          cd packages/cli
-          yarn test:reset
       - name: Run tests
         run: |
           yarn --cwd=packages/cli test
