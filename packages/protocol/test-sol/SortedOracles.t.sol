@@ -223,7 +223,9 @@ contract RemoveExpiredReports is SortedOraclesTest {
     assertEq(sortedOracle.numTimestamps(aToken), 5);
   }
 
-  function test_ShouldRemoveKAndStopWhenKIsLessThanNReportsAreExpired() public {
+  function test_ShouldRemoveKAndStopWhenKIsLessThanNReportsAreExpired_WhenMultipleReportsHaveBeenMade()
+    public
+  {
     vm.prank(oracleAccount);
     sortedOracle.report(
       aToken,
@@ -250,7 +252,9 @@ contract RemoveExpiredReports is SortedOraclesTest {
     sortedOracle.removeExpiredReports(aToken, 5);
   }
 
-  function test_ShouldRemoveNWhenNIsLesserThanNumTimestamps() public {
+  function test_ShouldRemoveNWhenNIsLesserThanNumTimestamps_WhenMultipleReportsHaveBeenMade()
+    public
+  {
     vm.prank(oracleAccount);
     sortedOracle.report(
       aToken,
@@ -316,6 +320,23 @@ contract IsOldestReportExpired is SortedOraclesTest {
     sortedOracle.setTokenReportExpiry(aToken, newReportExpiry);
     (bool expired, ) = sortedOracle.isOldestReportExpired(aToken);
     assertEq(expired, false);
+  }
+
+  function test_ShouldExpire_WhenTokenExpiryTimeHasPassedAndPerTokenExpiryIsSetToHigherThanDefault()
+    public
+  {
+    uint256 newReportExpiry = reportExpiry * 2;
+    vm.prank(oracleAccount);
+    sortedOracle.report(
+      aToken,
+      FixidityLib.newFixedFraction(1, 1).unwrap(),
+      address(0),
+      address(0)
+    );
+    sortedOracle.setTokenReportExpiry(aToken, newReportExpiry);
+    vm.warp(YEAR_IN_SECONDS + newReportExpiry + 1);
+    (bool expired, ) = sortedOracle.isOldestReportExpired(aToken);
+    assertEq(expired, true);
   }
 
   function test_ShouldNotExpire_WhenDefaultExpiryHasPassedAndPerTokenExpiryIsSetToHigherThanDefault()
