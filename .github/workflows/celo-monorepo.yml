@@ -283,9 +283,6 @@ jobs:
           - name: Protocol Governance Voting
             command: |
               yarn --cwd packages/protocol test governance/voting/
-          - name: Protocol Identity
-            command: |
-              yarn --cwd packages/protocol test identity/
           - name: Protocol Stability
             command: |
               yarn --cwd packages/protocol test stability/

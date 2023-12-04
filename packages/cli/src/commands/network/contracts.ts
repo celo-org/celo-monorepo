@@ -10,6 +10,9 @@ const UNVERSIONED_CONTRACTS = [
   CeloContract.Registry,
   CeloContract.FeeCurrencyWhitelist,
   CeloContract.Freezer,
+  CeloContract.StableToken,
+  CeloContract.StableTokenBRL,
+  CeloContract.StableTokenEUR,
 ]
 const UNPROXIED_CONTRACTS: CeloContract[] = []
 
