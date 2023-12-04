@@ -19,6 +19,11 @@ function log(...args: any[]) {
 }
 
 try {
+  log('Setting package.json target to ES2020')
+  const tsconfig = JSON.parse(fs.readFileSync(TSCONFIG_PATH, 'utf8'))
+  tsconfig.compilerOptions.target = 'ES2020'
+  fs.writeFileSync(TSCONFIG_PATH, JSON.stringify(tsconfig, null, 4))
+
   // Start from scratch
   rmrfSync([ABIS_BUILD_DIR, ABIS_DIST_DIR])
   fs.mkdirSync(ABIS_BUILD_DIR, { recursive: true })

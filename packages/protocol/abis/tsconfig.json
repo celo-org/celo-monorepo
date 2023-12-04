@@ -11,7 +11,7 @@
     "removeComments": false,
     "skipLibCheck": true,
     "sourceMap": true,
-    "target": "ES2020",
+    "target": "ES5",
     "downlevelIteration": true,
     "resolveJsonModule": true,
     "declaration": false,

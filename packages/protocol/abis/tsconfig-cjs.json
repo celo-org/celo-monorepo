@@ -6,5 +6,4 @@
     "module": "CommonJS",
     "outDir": "./dist/cjs"
   },
-  "references": [{ "path": "../../sdk/utils" }]
 }
