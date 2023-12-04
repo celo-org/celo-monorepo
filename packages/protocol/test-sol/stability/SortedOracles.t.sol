@@ -444,7 +444,7 @@ contract RemoveOracle is SortedOraclesTest {
     sortedOracle.removeOracle(aToken, oracleAccount2, 1);
   }
 
-  function test_MedianUpdatedEvents_WhenTHereIsMOreThanOneReportMade() public {
+  function test_ShouldEmitMedianUpdatedEvents_WhenTHereIsMOreThanOneReportMade() public {
     helper_WhenThereIsMoreThanOneReportMade();
     vm.expectEmit(true, true, true, true);
     emit MedianUpdated(aToken, FixidityLib.newFixedFraction(1, 1).unwrap());
