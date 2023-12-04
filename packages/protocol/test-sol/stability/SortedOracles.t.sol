@@ -210,7 +210,7 @@ contract RemoveExpiredReports is SortedOraclesTest {
     }
   }
 
-  function test_ShouldDoNothingWhenOldestReportIsNotExpired() public {
+  function test_ShouldDoNothingWhenOldestReportIsNotExpired_WhenMultipleReportsHaveBeenMade() public {
     vm.prank(oracleAccount);
     sortedOracle.report(
       aToken,
