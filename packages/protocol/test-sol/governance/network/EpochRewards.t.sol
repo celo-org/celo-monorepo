@@ -548,7 +548,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
     assertApproxEqRel(result, expected, 1e4);
   }
 
-  function test_ShouldDecreaseTheTargetVotingYieldByVotingfractionTargetVotingGoldPercentageTimesAdjustmentFactor_WhenThePercentageOfVotingGoldIs30p()
+  function test_ShouldDecreaseTheTargetVotingYieldByVotingFractionTargetVotingGoldPercentageTimesAdjustmentFactor_WhenThePercentageOfVotingGoldIs30p()
     public
   {
     uint256 totalVotes = (floatingSupply * 3) / 10;
@@ -562,7 +562,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
     assertApproxEqRel(result, expected, 1e1);
   }
 
-  function test_ShouldDecreaseTheTargetVotingYieldByVotingfractionTargetVotingGoldPercentageTimesAdjustmentFactor_WhenThePercentageOfVotingGoldIs90p()
+  function test_ShouldDecreaseTheTargetVotingYieldByVotingFractionTargetVotingGoldPercentageTimesAdjustmentFactor_WhenThePercentageOfVotingGoldIs90p()
     public
   {
     uint256 totalVotes = (floatingSupply * 9) / 10;
@@ -661,7 +661,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
     assertApproxEqRel(result, expected, 1e6);
   }
 
-  function test_ShouldAdjustTargetVotingYield_WhenVotingfractionFluctuatesAroundTheTarget() public {
+  function test_ShouldAdjustTargetVotingYield_WhenVotingFractionFluctuatesAroundTheTarget() public {
     uint256[] memory votingNumeratorArray = new uint256[](3);
     uint256[] memory votingDenominatorArray = new uint256[](3);
 
@@ -920,7 +920,7 @@ contract EpochRewardsFoundryTest_isReserveLow is EpochRewardsFoundryTest {
   }
 
   // when the contract is frozen
-  function test_ShouldMakeUpdatetargetVotingyieldRevert_WhenTheContractIsFrozen() public {
+  function test_ShouldMakeUpdateTargetVotingyieldRevert_WhenTheContractIsFrozen() public {
     freezer.freeze(address(epochRewards));
     vm.prank(address(0));
     vm.expectRevert("can't call when contract is frozen");
