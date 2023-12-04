@@ -8,6 +8,7 @@ import {
   ABIS_DIST_DIR,
   ABIS_PACKAGE_SRC_DIR,
   BUILD_EXECUTABLE,
+  BuildTarget,
   CONTRACTS_PACKAGE_SRC_DIR,
   PublishContracts,
   TSCONFIG_PATH,
@@ -100,13 +101,16 @@ try {
 // Helper functions
 function prepareTargetTypesExports() {
   const exports = {}
-  const targets = ['esm', 'cjs', 'types']
+  const targets = [BuildTarget.ESM, BuildTarget.CJS, BuildTarget.TYPES]
 
   targets.forEach((target) => {
-    fs.copyFileSync(
-      path.join(ABIS_PACKAGE_SRC_DIR, `package-${target}.json`),
-      path.join(ABIS_DIST_DIR, target, 'package.json')
-    )
+    // We don't need package.json for type declarations
+    if (target != BuildTarget.TYPES) {
+      fs.copyFileSync(
+        path.join(ABIS_PACKAGE_SRC_DIR, `package-${target}.json`),
+        path.join(ABIS_DIST_DIR, target, 'package.json')
+      )
+    }
 
     const filePaths = lsRecursive(path.join(ABIS_DIST_DIR, target))
     filePaths.forEach((filePath) => {
@@ -128,7 +132,7 @@ function prepareTargetTypesExports() {
           exports[exportKey] = {}
         }
 
-        if (target === 'esm') {
+        if (target === BuildTarget.ESM) {
           const importPath = `./${relativePath}.js`
 
           expectFileExists(importPath)
@@ -137,7 +141,7 @@ function prepareTargetTypesExports() {
             ...exports[exportKey],
             import: importPath,
           }
-        } else if (target === 'cjs') {
+        } else if (target === BuildTarget.CJS) {
           const requirePath = `./${relativePath}.js`
 
           expectFileExists(requirePath)

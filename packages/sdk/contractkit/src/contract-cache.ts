@@ -1,4 +1,4 @@
-import { IERC20 } from '@celo/abis/types/web3/IERC20'
+import { IERC20 } from '@celo/abis/web3/IERC20'
 import { Connection } from '@celo/connect'
 import { AddressRegistry } from './address-registry'
 import { CeloContract } from './base'

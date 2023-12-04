@@ -1,4 +1,4 @@
-import { EpochRewards } from '@celo/abis/types/web3/EpochRewards'
+import { EpochRewards } from '@celo/abis/web3/EpochRewards'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import { BaseWrapper, proxyCall, valueToBigNumber } from './BaseWrapper'
 

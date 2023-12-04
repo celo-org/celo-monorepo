@@ -1,4 +1,4 @@
-import { Accounts } from '@celo/abis/types/web3/Accounts'
+import { Accounts } from '@celo/abis/web3/Accounts'
 import { NativeSigner, Signature, Signer } from '@celo/base/lib/signatureUtils'
 import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
 import {

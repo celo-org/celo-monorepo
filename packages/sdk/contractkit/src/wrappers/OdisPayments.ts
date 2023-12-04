@@ -1,4 +1,4 @@
-import { OdisPayments } from '@celo/abis/types/web3/OdisPayments'
+import { OdisPayments } from '@celo/abis/web3/OdisPayments'
 import { Address, CeloTransactionObject } from '@celo/connect'
 import { BigNumber } from 'bignumber.js'
 import { BaseWrapper, proxyCall, proxySend, valueToBigNumber } from './BaseWrapper'

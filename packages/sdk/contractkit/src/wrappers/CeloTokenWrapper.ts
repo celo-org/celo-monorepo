@@ -1,8 +1,8 @@
 // NOTE: removing this import results in `yarn build` failures in Dockerfiles
 // after the move to node 10. This allows types to be inferred without
 // referencing '@celo/utils/node_modules/bignumber.js'
-import { ICeloToken } from '@celo/abis/types/web3/ICeloToken'
-import { IERC20 } from '@celo/abis/types/web3/IERC20'
+import { ICeloToken } from '@celo/abis/web3/ICeloToken'
+import { IERC20 } from '@celo/abis/web3/IERC20'
 import 'bignumber.js'
 import { proxyCall, proxySend, valueToInt } from './BaseWrapper'
 import { Erc20Wrapper } from './Erc20Wrapper'

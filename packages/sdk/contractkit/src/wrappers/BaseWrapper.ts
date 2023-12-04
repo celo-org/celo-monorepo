@@ -1,4 +1,4 @@
-import { ICeloVersionedContract } from '@celo/abis/types/web3/ICeloVersionedContract'
+import { ICeloVersionedContract } from '@celo/abis/web3/ICeloVersionedContract'
 import { bufferToHex, ensureLeading0x } from '@celo/base/lib/address'
 import { zip } from '@celo/base/lib/collections'
 import {

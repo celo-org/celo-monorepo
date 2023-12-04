@@ -1,4 +1,4 @@
-import { DowntimeSlasher } from '@celo/abis/types/web3/DowntimeSlasher'
+import { DowntimeSlasher } from '@celo/abis/web3/DowntimeSlasher'
 import { Address } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import { BaseSlasher } from './BaseSlasher'

@@ -1,4 +1,4 @@
-import { SortedOracles } from '@celo/abis/types/web3/SortedOracles'
+import { SortedOracles } from '@celo/abis/web3/SortedOracles'
 import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
 import { Address, CeloTransactionObject, Connection, toTransactionObject } from '@celo/connect'
 import { isValidAddress } from '@celo/utils/lib/address'

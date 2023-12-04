@@ -1,5 +1,5 @@
-import { GrandaMento } from '@celo/abis/types/web3/mento/GrandaMento'
-import { newStableToken } from '@celo/abis/types/web3/mento/StableToken'
+import { GrandaMento } from '@celo/abis/web3/mento/GrandaMento'
+import { newStableToken } from '@celo/abis/web3/mento/StableToken'
 import BigNumber from 'bignumber.js'
 import { StableTokenContract } from '../base'
 import { StableToken as StableTokenEnum, stableTokenInfos } from '../celo-tokens'

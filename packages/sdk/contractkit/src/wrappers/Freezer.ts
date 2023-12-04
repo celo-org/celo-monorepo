@@ -1,4 +1,4 @@
-import { Freezer } from '@celo/abis/types/web3/Freezer'
+import { Freezer } from '@celo/abis/web3/Freezer'
 import { BaseWrapper, proxyCall, proxySend } from './BaseWrapper'
 
 export class FreezerWrapper extends BaseWrapper<Freezer> {

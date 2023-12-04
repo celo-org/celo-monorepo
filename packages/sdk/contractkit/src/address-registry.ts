@@ -1,4 +1,4 @@
-import { newRegistry, Registry } from '@celo/abis/types/web3/Registry'
+import { newRegistry, Registry } from '@celo/abis/web3/Registry'
 import { Address, NULL_ADDRESS } from '@celo/base/lib/address'
 import { Connection } from '@celo/connect'
 import debugFactory from 'debug'

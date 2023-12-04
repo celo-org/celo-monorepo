@@ -1,4 +1,4 @@
-import { LockedGold } from '@celo/abis/types/web3/LockedGold'
+import { LockedGold } from '@celo/abis/web3/LockedGold'
 import {
   AddressListItem as ALI,
   Comparator,

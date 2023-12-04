@@ -6,8 +6,8 @@ import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import {
   MetaTransactionWallet,
   newMetaTransactionWallet,
-} from '@celo/abis/types/web3/MetaTransactionWallet'
-import { newProxy } from '@celo/abis/types/web3/Proxy'
+} from '@celo/abis/web3/MetaTransactionWallet'
+import { newProxy } from '@celo/abis/web3/Proxy'
 import { newKitFromWeb3 } from '../kit'
 import { MetaTransactionWalletDeployerWrapper } from './MetaTransactionWalletDeployer'
 

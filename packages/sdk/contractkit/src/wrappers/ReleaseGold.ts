@@ -1,4 +1,4 @@
-import { ReleaseGold } from '@celo/abis/types/web3/ReleaseGold'
+import { ReleaseGold } from '@celo/abis/web3/ReleaseGold'
 import { concurrentMap } from '@celo/base'
 import { findAddressIndex } from '@celo/base/lib/address'
 import { Signature } from '@celo/base/lib/signatureUtils'

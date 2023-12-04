@@ -1,5 +1,5 @@
-import { newICeloVersionedContract } from '@celo/abis/types/web3/ICeloVersionedContract'
-import { newProxy } from '@celo/abis/types/web3/Proxy'
+import { newICeloVersionedContract } from '@celo/abis/web3/ICeloVersionedContract'
+import { newProxy } from '@celo/abis/web3/Proxy'
 import { concurrentMap } from '@celo/base'
 import { CeloContract } from '@celo/contractkit'
 import { cli } from 'cli-ux'

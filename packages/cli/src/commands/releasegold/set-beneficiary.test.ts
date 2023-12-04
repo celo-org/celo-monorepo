@@ -1,4 +1,4 @@
-import { newReleaseGold } from '@celo/abis/types/web3/ReleaseGold'
+import { newReleaseGold } from '@celo/abis/web3/ReleaseGold'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { getContractFromEvent, testWithGanache } from '@celo/dev-utils/lib/ganache-test'

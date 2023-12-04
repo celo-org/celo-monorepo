@@ -1,5 +1,5 @@
-import { ABI as GovernanceABI } from '@celo/abis/types/web3/Governance'
-import { ABI as RegistryABI } from '@celo/abis/types/web3/Registry'
+import { ABI as GovernanceABI } from '@celo/abis/web3/Governance'
+import { ABI as RegistryABI } from '@celo/abis/web3/Registry'
 import { Address, isHexString, trimLeading0x } from '@celo/base/lib/address'
 import {
   AbiCoder,
@@ -462,7 +462,7 @@ export class InteractiveProposalBuilder {
       }
 
       const contractName = choice as CeloContract
-      const contractABI = require('@celo/abis/types/web3/' + contractName).ABI as ABIDefinition[]
+      const contractABI = require('@celo/abis/web3/' + contractName).ABI as ABIDefinition[]
 
       const txMethods = contractABI.filter(
         (def) => def.type === 'function' && def.stateMutability !== 'view'

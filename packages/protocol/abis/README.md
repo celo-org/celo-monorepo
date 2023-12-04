@@ -22,14 +22,11 @@ yarn add @celo/abis
 // json abi
 import Accounts from '@celo/abis/Accounts.json'
 
-// ethers
-import { Accounts } from '@celo/abis/types/ethers'
-
 // web3
-import Accounts from '@celo/abis/types/web3/Accounts'
+import Accounts from '@celo/abis/web3/Accounts'
 
 // wagmi
-import Accounts from '@celo/abis/types/wagmi/Accounts'
+import Accounts from '@celo/abis/wagmi/Accounts'
 ```
 
 ## License

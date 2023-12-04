@@ -1,4 +1,4 @@
-import { FeeHandler } from '@celo/abis/types/web3/FeeHandler'
+import { FeeHandler } from '@celo/abis/web3/FeeHandler'
 import { Address } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import { StableTokenContract } from '../base'

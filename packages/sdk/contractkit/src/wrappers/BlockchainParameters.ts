@@ -1,4 +1,4 @@
-import { BlockchainParameters } from '@celo/abis/types/web3/BlockchainParameters'
+import { BlockchainParameters } from '@celo/abis/web3/BlockchainParameters'
 import { BigNumber } from 'bignumber.js'
 import { BaseWrapper, proxyCall, proxySend, valueToBigNumber, valueToInt } from './BaseWrapper'
 

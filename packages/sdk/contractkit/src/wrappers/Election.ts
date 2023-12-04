@@ -1,4 +1,4 @@
-import { Election } from '@celo/abis/types/web3/Election'
+import { Election } from '@celo/abis/web3/Election'
 import {
   eqAddress,
   findAddressIndex,

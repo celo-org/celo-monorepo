@@ -92,3 +92,9 @@ export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreCo
 export const PublishContracts = CoreContracts.concat(Interfaces)
   .concat(PROXY_CONTRACT)
   .concat(MENTO_PACKAGE.contracts)
+
+export enum BuildTarget {
+  CJS = 'cjs',
+  ESM = 'esm',
+  TYPES = 'types',
+}

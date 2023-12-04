@@ -1,4 +1,4 @@
-import { FederatedAttestations } from '@celo/abis/types/web3/FederatedAttestations'
+import { FederatedAttestations } from '@celo/abis/web3/FederatedAttestations'
 import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
 import { registerAttestation as buildRegisterAttestationTypedData } from '@celo/utils/lib/typed-data-constructors'
 import { BaseWrapper, proxyCall, proxySend } from './BaseWrapper'

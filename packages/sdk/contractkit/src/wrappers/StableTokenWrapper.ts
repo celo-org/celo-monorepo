@@ -1,4 +1,4 @@
-import { StableToken } from '@celo/abis/types/web3/mento/StableToken'
+import { StableToken } from '@celo/abis/web3/mento/StableToken'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
