@@ -33,10 +33,10 @@ try {
   build(`--solidity ${path.join(ABIS_BUILD_DIR)}`)
 
   // Generate ethers typings
-  build(`--ethersTypes ${path.join(ABIS_BUILD_DIR, 'types/ethers')}`)
+  build(`--ethersTypes ${path.join(ABIS_BUILD_DIR, 'ethers')}`)
 
   // Generate web3 typings
-  build(`--web3Types ${path.join(ABIS_BUILD_DIR, 'types/web3')}`)
+  build(`--web3Types ${path.join(ABIS_BUILD_DIR, 'web3')}`)
 
   // Merge contracts-0.8, contracts-mento, etc.. at the root of the build dir
   log('Merging files at the root of the build dir')
@@ -103,11 +103,10 @@ function prepareTargetTypesExports() {
   const targets = ['esm', 'cjs', 'types']
 
   targets.forEach((target) => {
-    // why?
-    // fs.copyFileSync(
-    //   path.join(ABIS_PACKAGE_SRC_DIR, `package-${target}.json`),
-    //   path.join(ABIS_DIST_DIR, target, 'package.json')
-    // )
+    fs.copyFileSync(
+      path.join(ABIS_PACKAGE_SRC_DIR, `package-${target}.json`),
+      path.join(ABIS_DIST_DIR, target, 'package.json')
+    )
 
     const filePaths = lsRecursive(path.join(ABIS_DIST_DIR, target))
     filePaths.forEach((filePath) => {
