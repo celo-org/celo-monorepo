@@ -154,8 +154,10 @@ export abstract class BaseCommand extends Command {
       let transport
       try {
         // Importing for ledger uses only fixes running jest tests
-        const TransportNodeHid = (await import('@ledgerhq/hw-transport-node-hid')).default
-        // @ts-expect-error // TODO fix types
+        const _TransportNodeHid = (await import('@ledgerhq/hw-transport-node-hid')).default
+        // types seem to be suggesting 2 defaults but js is otherwise for TransportNodeHid
+        const TransportNodeHid: typeof _TransportNodeHid.default =
+          _TransportNodeHid.default || _TransportNodeHid
         transport = await TransportNodeHid.open('')
         const derivationPathIndexes = res.raw.some(
           (value) => (value as any).flag === 'ledgerCustomAddresses'
