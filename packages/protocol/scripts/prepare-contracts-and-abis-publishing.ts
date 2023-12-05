@@ -33,9 +33,6 @@ try {
   // Generate all ABIs
   build(`--solidity ${path.join(ABIS_BUILD_DIR)}`)
 
-  // Generate ethers typings
-  build(`--ethersTypes ${path.join(ABIS_BUILD_DIR, 'ethers')}`)
-
   // Generate web3 typings
   build(`--web3Types ${path.join(ABIS_BUILD_DIR, 'web3')}`)
 
