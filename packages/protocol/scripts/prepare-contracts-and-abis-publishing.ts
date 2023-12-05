@@ -65,7 +65,7 @@ try {
   child_process.execSync(`yarn wagmi generate`, { stdio: 'inherit' })
 
   log('Compiling esm')
-  child_process.execSync(`yarn tsc -b ${path.join(ABIS_PACKAGE_SRC_DIR, 'tsconfig.json')}`, {
+  child_process.execSync(`yarn tsc -b ${path.join(ABIS_PACKAGE_SRC_DIR, 'tsconfig-esm.json')}`, {
     stdio: 'inherit',
   })
 
