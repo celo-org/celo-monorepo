@@ -16,7 +16,6 @@
     "resolveJsonModule": true,
     "declaration": false,
     "rootDir": "./src-generated",
-    "outDir": "./dist/esm"
   },
   "include": ["./src-generated"],
 }
