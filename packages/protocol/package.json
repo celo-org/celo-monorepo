@@ -1,6 +1,6 @@
 {
   "name": "@celo/protocol",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "private": true,
   "main": "index.ts",
   "author": "Celo",
