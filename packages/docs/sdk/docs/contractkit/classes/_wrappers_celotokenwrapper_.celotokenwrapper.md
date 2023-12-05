@@ -6,7 +6,7 @@ Contract for Celo native currency that adheres to the ICeloToken and IERC20 inte
 
 ## Type parameters
 
-▪ **T**: *Ierc20 & ICeloToken*
+▪ **T**: *IERC20 & ICeloToken*
 
 ## Hierarchy
 

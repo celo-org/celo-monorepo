@@ -6,7 +6,7 @@ Kit ContractWrappers factory & cache.
 
 Provides access to all contract wrappers for celo core contracts
 
-**`remarks`** 
+**`remarks`**
 
 Because it provides access to all contract wrappers it must load all wrappers and the contract ABIs for them
 Consider Using {@link MiniWrapperCache}, building your own, or if you only need one Wrapper using it directly
@@ -200,7 +200,7 @@ ___
 
 ###  getErc20
 
-▸ **getErc20**(`address`: string): *Promise‹[Erc20Wrapper](_wrappers_erc20wrapper_.erc20wrapper.md)‹Ierc20‹›››*
+▸ **getErc20**(`address`: string): *Promise‹[Erc20Wrapper](_wrappers_erc20wrapper_.erc20wrapper.md)‹IERC20‹›››*
 
 *Defined in [packages/sdk/contractkit/src/contract-cache.ts:154](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/contract-cache.ts#L154)*
 
@@ -210,7 +210,7 @@ Name | Type |
 ------ | ------ |
 `address` | string |
 
-**Returns:** *Promise‹[Erc20Wrapper](_wrappers_erc20wrapper_.erc20wrapper.md)‹Ierc20‹›››*
+**Returns:** *Promise‹[Erc20Wrapper](_wrappers_erc20wrapper_.erc20wrapper.md)‹IERC20‹›››*
 
 ___
 

@@ -93,7 +93,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   }
 
   /**
-  * @dev Calculates the minimum amount of tokens that can be received for a given amount of sell tokens, 
+  * @dev Calculates the minimum amount of tokens that can be received for a given amount of sell tokens,
           taking into account the slippage and the rates of the sell token and CELO token on the Uniswap V2 pair.
   * @param sellTokenAddress The address of the sell token.
   * @param maxSlippage The maximum slippage allowed.

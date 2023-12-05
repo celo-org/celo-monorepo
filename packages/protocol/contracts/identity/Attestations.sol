@@ -440,7 +440,7 @@ contract Attestations is
   /**
    * @notice Validates the given attestation code.
    * @param identifier The hash of the identifier to be attested.
-   * @param account Address of the account. 
+   * @param account Address of the account.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.

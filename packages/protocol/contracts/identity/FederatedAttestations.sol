@@ -105,7 +105,7 @@ contract FederatedAttestations is
    * @notice Registers an attestation directly from the issuer
    * @param identifier Hash of the identifier to be attested
    * @param account Address of the account being mapped to the identifier
-   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time
    * @dev Attestation signer and issuer in storage is set to msg.sender
    * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
    */
@@ -120,7 +120,7 @@ contract FederatedAttestations is
    * @param identifier Hash of the identifier to be attested
    * @param issuer Address of the attestation issuer
    * @param account Address of the account being mapped to the identifier
-   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time
    * @param signer Address of the signer of the attestation
    * @param v The recovery id of the incoming ECDSA signature
    * @param r Output value r of the ECDSA signature
@@ -142,7 +142,7 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Revokes an attestation 
+   * @notice Revokes an attestation
    * @param identifier Hash of the identifier to be revoked
    * @param issuer Address of the attestation issuer
    * @param account Address of the account mapped to the identifier
@@ -186,13 +186,13 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Returns info about attestations for `identifier` produced by 
+   * @notice Returns info about attestations for `identifier` produced by
    *    signers of `trustedIssuers`
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
    * @return countsPerIssuer Array of number of attestations returned per issuer
-   *          For m (== sum([0])) found attestations: 
-   * @return accounts Array of m accounts 
+   *          For m (== sum([0])) found attestations:
+   * @return accounts Array of m accounts
    * @return signers Array of m signers
    * @return issuedOns Array of m issuedOns
    * @return publishedOns Array of m publishedOns
@@ -271,7 +271,7 @@ contract FederatedAttestations is
    * @param identifier Hash of the identifier to be attested
    * @param issuer Address of the attestation issuer
    * @param account Address of the account being mapped to the identifier
-   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time
    * @param signer Address of the signer of the attestation
    * @param v The recovery id of the incoming ECDSA signature
    * @param r Output value r of the ECDSA signature
@@ -405,7 +405,7 @@ contract FederatedAttestations is
    * @param identifier Hash of the identifier to be attested
    * @param issuer Address of the attestation issuer
    * @param account Address of the account being mapped to the identifier
-   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time
    * @param signer Address of the signer of the attestation
    */
   function _registerAttestation(

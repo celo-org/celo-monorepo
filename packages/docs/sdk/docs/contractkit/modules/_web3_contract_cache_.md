@@ -64,7 +64,7 @@
 
 ###  [CeloContract.ERC20]
 
-• **[CeloContract.ERC20]**: *newIerc20* = newIerc20
+• **[CeloContract.ERC20]**: *newIERC20* = newIERC20
 
 *Defined in [packages/sdk/contractkit/src/web3-contract-cache.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L46)*
 
@@ -88,13 +88,13 @@
 
 ###  [CeloContract.ExchangeBRL]
 
-• **[CeloContract.ExchangeBRL]**: *newExchangeBrl* = newExchangeBrl
+• **[CeloContract.ExchangeBRL]**: *newExchangeBRL* = newExchangeBRL
 
 *Defined in [packages/sdk/contractkit/src/web3-contract-cache.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L50)*
 
 ###  [CeloContract.ExchangeEUR]
 
-• **[CeloContract.ExchangeEUR]**: *newExchangeEur* = newExchangeEur
+• **[CeloContract.ExchangeEUR]**: *newExchangeEUR* = newExchangeEUR
 
 *Defined in [packages/sdk/contractkit/src/web3-contract-cache.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L49)*
 

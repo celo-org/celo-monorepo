@@ -6,7 +6,7 @@ ERC-20 contract only containing the non-optional functions
 
 ## Type parameters
 
-▪ **T**: *Ierc20*
+▪ **T**: *IERC20*
 
 ## Hierarchy
 

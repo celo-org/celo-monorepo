@@ -47,7 +47,7 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
   }
 
   /**
-    @dev Calculates the minimum amount of tokens that should be received for the specified 
+    @dev Calculates the minimum amount of tokens that should be received for the specified
     amount with the given mid-price and maximum slippage.
     @param midPriceNumerator The numerator of the mid-price for the token pair.
     @param midPriceDenominator The denominator of the mid-price for the token pair.
@@ -77,7 +77,7 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
   }
 
   /**
-  * @notice Allows owner to transfer tokens of this contract. It's meant for governance to 
+  * @notice Allows owner to transfer tokens of this contract. It's meant for governance to
     trigger use cases not contemplated in this contract.
     @param token The address of the token to transfer.
     @param amount The amount of tokens to transfer.
