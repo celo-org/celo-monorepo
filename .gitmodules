@@ -1,6 +1,6 @@
 [submodule "packages/protocol/lib/celo-foundry"]
 	path = packages/protocol/lib/celo-foundry
-	url = https://github.com/bowd/celo-foundry
+	url = https://github.com/celo-org/celo-foundry
 [submodule "packages/protocol/lib/solidity-bytes-utils"]
 	path = packages/protocol/lib/solidity-bytes-utils
 	url = https://github.com/GNSPS/solidity-bytes-utils
@@ -10,6 +10,6 @@
 [submodule "packages/protocol/lib/mento-core"]
 	path = packages/protocol/lib/mento-core
 	url = https://github.com/mento-protocol/mento-core
-[submodule "lib/memview.sol"]
+[submodule "packages/protocol/lib/memview.sol"]
 	path = packages/protocol/lib/memview.sol
 	url = https://github.com/summa-tx/memview.sol

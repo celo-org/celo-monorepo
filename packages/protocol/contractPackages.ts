@@ -1,9 +1,9 @@
 export interface ContractPackage {
   path?: string
   folderPath?: string
-  name?: string
-  contracstFolder?: string
+  name: string
   contracts: string[]
+  contractsFolder?: string
   proxyContracts?: string[]
   truffleConfig?: string
   solidityVersion?: string
@@ -12,7 +12,7 @@ export interface ContractPackage {
 
 export const MENTO_PACKAGE: ContractPackage = {
   path: 'mento-core',
-  contracstFolder: 'contracts',
+  contractsFolder: 'contracts',
   folderPath: 'lib',
   name: 'mento',
   contracts: [
@@ -42,7 +42,7 @@ export const MENTO_PACKAGE: ContractPackage = {
 
 export const SOLIDITY_08_PACKAGE: ContractPackage = {
   path: 'contracts-0.8',
-  contracstFolder: '',
+  contractsFolder: '',
   folderPath: '',
   name: '0.8',
   proxiesPath: '/', // Proxies are still with 0.5 contracts

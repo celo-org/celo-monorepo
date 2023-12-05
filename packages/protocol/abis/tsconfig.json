@@ -1,0 +1,23 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "strict": true,
+    "moduleResolution": "node16",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": false,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "target": "ES5",
+    "downlevelIteration": true,
+    "resolveJsonModule": true,
+    "declaration": false,
+    "rootDir": "./src-generated",
+    "outDir": "./dist/esm"
+  },
+  "include": ["./src-generated"],
+  "exclude": ["./src-generated/ethers"]
+}
