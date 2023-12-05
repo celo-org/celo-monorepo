@@ -19,5 +19,4 @@
     "outDir": "./dist/esm"
   },
   "include": ["./src-generated"],
-  "exclude": ["./src-generated/ethers"]
 }
