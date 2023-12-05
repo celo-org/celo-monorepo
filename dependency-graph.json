@@ -68,10 +68,9 @@
       "@celo/base",
       "@celo/connect",
       "@celo/cryptographic-utils",
-      "@celo/flake-tracker",
-      "@celo/phone-utils",
       "@celo/typescript",
-      "@celo/utils"
+      "@celo/utils",
+      "@celo/wallet-local"
     ]
   },
   "@celo/typescript": {
