@@ -4,7 +4,8 @@ pragma solidity >=0.8.7 <0.8.20;
 import "./test/Test.sol";
 
 import "../../contracts/common/FixidityLib.sol";
-import "../../contracts-0.8/common/Registry8.sol";
+
+import "../../contracts/common/interfaces/IRegistry.sol";
 
 // Contract to test
 import "../../contracts-0.8/common/GasPriceMinimum.sol";
@@ -12,7 +13,7 @@ import "../../contracts-0.8/common/GasPriceMinimum.sol";
 contract GasPriceMinimumTest is Test {
   using FixidityLib for FixidityLib.Fraction;
 
-  Registry8 registry;
+  IRegistry registry;
   GasPriceMinimum public gasPriceMinimum;
   address owner;
   address nonOwner;
@@ -35,10 +36,10 @@ contract GasPriceMinimumTest is Test {
     owner = address(this);
     nonOwner = actor("nonOwner");
 
-    deployCodeTo("Registry8.sol", abi.encode(false), registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
     gasPriceMinimum = new GasPriceMinimum(true);
 
-    registry = Registry8(registryAddress);
+    registry = IRegistry(registryAddress);
 
     registry.setAddressFor("GasPriceMinimum", address(gasPriceMinimum));
 
@@ -211,7 +212,8 @@ contract GasPriceMinimumGetUpdatedGasPriceMinimum is GasPriceMinimumTest {
     if (minNumber > 0) {
       return
         (uint256(keccak256(abi.encodePacked(nonce, msg.sender, blockhash(block.number - 1)))) %
-          (maxNumber - 1)) + 1;
+          (maxNumber - 1)) +
+        1;
     }
     return (uint256(keccak256(abi.encodePacked(nonce, msg.sender, blockhash(block.number - 1)))) %
       maxNumber);
