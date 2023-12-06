@@ -1,8 +1,8 @@
+import { Attestations } from '@celo/abis/web3/Attestations'
 import { StableToken } from '@celo/base'
 import { eqAddress } from '@celo/base/lib/address'
 import { Address, Connection, toTransactionObject } from '@celo/connect'
 import BigNumber from 'bignumber.js'
-import { Attestations } from '../generated/Attestations'
 import { AccountsWrapper } from './Accounts'
 import {
   BaseWrapper,

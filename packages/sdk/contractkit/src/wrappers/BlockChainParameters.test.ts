@@ -3,7 +3,7 @@ import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import BigNumber from 'bignumber.js'
 import { AddressRegistry } from '../address-registry'
 import { CeloContract } from '../base'
-import { newBlockchainParameters } from '../generated/BlockchainParameters'
+import { newBlockchainParameters } from '@celo/abis/web3/BlockchainParameters'
 import { BlockchainParametersWrapper } from './BlockchainParameters'
 
 testWithGanache('BlockChainParametersWrapper', (web3) => {

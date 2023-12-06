@@ -1,19 +1,492 @@
 {
   "name": "@celo/abis",
-  "version": "0.0.0-template.version",
+  "version": "10.0.0-local",
   "author": "cLabs",
   "license": "LGPL-3.0",
   "repository": {
-    "type": "git",
-    "url": "https://github.com/celo-org/celo-monorepo.git",
-    "directory": "packages/protocol/contracts"
+    "url": "git+https://github.com/celo-org/celo-monorepo.git",
+    "directory": "packages/protocol/abis"
   },
   "scripts": {},
-  "dependencies": {},  
-  "main": "./lib/cjs/index.js",
-  "module": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
+  "dependencies": {},
+  "peerDependencies": {},
   "files": [
-    "lib/"
-  ]
+    "./dist",
+    "!**/*.js.map"
+  ],
+  "exports": {
+    "./Accounts.json": {
+      "default": "./dist/Accounts.json"
+    },
+    "./Attestations.json": {
+      "default": "./dist/Attestations.json"
+    },
+    "./BlockchainParameters.json": {
+      "default": "./dist/BlockchainParameters.json"
+    },
+    "./DoubleSigningSlasher.json": {
+      "default": "./dist/DoubleSigningSlasher.json"
+    },
+    "./DowntimeSlasher.json": {
+      "default": "./dist/DowntimeSlasher.json"
+    },
+    "./Election.json": {
+      "default": "./dist/Election.json"
+    },
+    "./EpochRewards.json": {
+      "default": "./dist/EpochRewards.json"
+    },
+    "./Escrow.json": {
+      "default": "./dist/Escrow.json"
+    },
+    "./Exchange.json": {
+      "default": "./dist/Exchange.json"
+    },
+    "./ExchangeBRL.json": {
+      "default": "./dist/ExchangeBRL.json"
+    },
+    "./ExchangeEUR.json": {
+      "default": "./dist/ExchangeEUR.json"
+    },
+    "./FederatedAttestations.json": {
+      "default": "./dist/FederatedAttestations.json"
+    },
+    "./FeeCurrencyWhitelist.json": {
+      "default": "./dist/FeeCurrencyWhitelist.json"
+    },
+    "./FeeHandler.json": {
+      "default": "./dist/FeeHandler.json"
+    },
+    "./Freezer.json": {
+      "default": "./dist/Freezer.json"
+    },
+    "./GasPriceMinimum.json": {
+      "default": "./dist/GasPriceMinimum.json"
+    },
+    "./GoldToken.json": {
+      "default": "./dist/GoldToken.json"
+    },
+    "./Governance.json": {
+      "default": "./dist/Governance.json"
+    },
+    "./GovernanceApproverMultiSig.json": {
+      "default": "./dist/GovernanceApproverMultiSig.json"
+    },
+    "./GrandaMento.json": {
+      "default": "./dist/GrandaMento.json"
+    },
+    "./ICeloToken.json": {
+      "default": "./dist/ICeloToken.json"
+    },
+    "./ICeloVersionedContract.json": {
+      "default": "./dist/ICeloVersionedContract.json"
+    },
+    "./IERC20.json": {
+      "default": "./dist/IERC20.json"
+    },
+    "./LockedGold.json": {
+      "default": "./dist/LockedGold.json"
+    },
+    "./MentoFeeHandlerSeller.json": {
+      "default": "./dist/MentoFeeHandlerSeller.json"
+    },
+    "./MetaTransactionWallet.json": {
+      "default": "./dist/MetaTransactionWallet.json"
+    },
+    "./MetaTransactionWalletDeployer.json": {
+      "default": "./dist/MetaTransactionWalletDeployer.json"
+    },
+    "./MultiSig.json": {
+      "default": "./dist/MultiSig.json"
+    },
+    "./OdisPayments.json": {
+      "default": "./dist/OdisPayments.json"
+    },
+    "./Proxy.json": {
+      "default": "./dist/Proxy.json"
+    },
+    "./Random.json": {
+      "default": "./dist/Random.json"
+    },
+    "./Registry.json": {
+      "default": "./dist/Registry.json"
+    },
+    "./ReleaseGold.json": {
+      "default": "./dist/ReleaseGold.json"
+    },
+    "./Reserve.json": {
+      "default": "./dist/Reserve.json"
+    },
+    "./ReserveSpenderMultiSig.json": {
+      "default": "./dist/ReserveSpenderMultiSig.json"
+    },
+    "./SortedOracles.json": {
+      "default": "./dist/SortedOracles.json"
+    },
+    "./StableToken.json": {
+      "default": "./dist/StableToken.json"
+    },
+    "./StableTokenBRL.json": {
+      "default": "./dist/StableTokenBRL.json"
+    },
+    "./StableTokenEUR.json": {
+      "default": "./dist/StableTokenEUR.json"
+    },
+    "./UniswapFeeHandlerSeller.json": {
+      "default": "./dist/UniswapFeeHandlerSeller.json"
+    },
+    "./Validators.json": {
+      "default": "./dist/Validators.json"
+    },
+    "./wagmi/Accounts": {
+      "import": "./dist/esm/wagmi/Accounts.js",
+      "require": "./dist/cjs/wagmi/Accounts.js",
+      "types": "./dist/types/wagmi/Accounts.d.ts"
+    },
+    "./wagmi/Attestations": {
+      "import": "./dist/esm/wagmi/Attestations.js",
+      "require": "./dist/cjs/wagmi/Attestations.js",
+      "types": "./dist/types/wagmi/Attestations.d.ts"
+    },
+    "./wagmi/BlockchainParameters": {
+      "import": "./dist/esm/wagmi/BlockchainParameters.js",
+      "require": "./dist/cjs/wagmi/BlockchainParameters.js",
+      "types": "./dist/types/wagmi/BlockchainParameters.d.ts"
+    },
+    "./wagmi/DoubleSigningSlasher": {
+      "import": "./dist/esm/wagmi/DoubleSigningSlasher.js",
+      "require": "./dist/cjs/wagmi/DoubleSigningSlasher.js",
+      "types": "./dist/types/wagmi/DoubleSigningSlasher.d.ts"
+    },
+    "./wagmi/DowntimeSlasher": {
+      "import": "./dist/esm/wagmi/DowntimeSlasher.js",
+      "require": "./dist/cjs/wagmi/DowntimeSlasher.js",
+      "types": "./dist/types/wagmi/DowntimeSlasher.d.ts"
+    },
+    "./wagmi/Election": {
+      "import": "./dist/esm/wagmi/Election.js",
+      "require": "./dist/cjs/wagmi/Election.js",
+      "types": "./dist/types/wagmi/Election.d.ts"
+    },
+    "./wagmi/EpochRewards": {
+      "import": "./dist/esm/wagmi/EpochRewards.js",
+      "require": "./dist/cjs/wagmi/EpochRewards.js",
+      "types": "./dist/types/wagmi/EpochRewards.d.ts"
+    },
+    "./wagmi/Escrow": {
+      "import": "./dist/esm/wagmi/Escrow.js",
+      "require": "./dist/cjs/wagmi/Escrow.js",
+      "types": "./dist/types/wagmi/Escrow.d.ts"
+    },
+    "./wagmi/FederatedAttestations": {
+      "import": "./dist/esm/wagmi/FederatedAttestations.js",
+      "require": "./dist/cjs/wagmi/FederatedAttestations.js",
+      "types": "./dist/types/wagmi/FederatedAttestations.d.ts"
+    },
+    "./wagmi/FeeCurrencyWhitelist": {
+      "import": "./dist/esm/wagmi/FeeCurrencyWhitelist.js",
+      "require": "./dist/cjs/wagmi/FeeCurrencyWhitelist.js",
+      "types": "./dist/types/wagmi/FeeCurrencyWhitelist.d.ts"
+    },
+    "./wagmi/FeeHandler": {
+      "import": "./dist/esm/wagmi/FeeHandler.js",
+      "require": "./dist/cjs/wagmi/FeeHandler.js",
+      "types": "./dist/types/wagmi/FeeHandler.d.ts"
+    },
+    "./wagmi/Freezer": {
+      "import": "./dist/esm/wagmi/Freezer.js",
+      "require": "./dist/cjs/wagmi/Freezer.js",
+      "types": "./dist/types/wagmi/Freezer.d.ts"
+    },
+    "./wagmi/GasPriceMinimum": {
+      "import": "./dist/esm/wagmi/GasPriceMinimum.js",
+      "require": "./dist/cjs/wagmi/GasPriceMinimum.js",
+      "types": "./dist/types/wagmi/GasPriceMinimum.d.ts"
+    },
+    "./wagmi/GoldToken": {
+      "import": "./dist/esm/wagmi/GoldToken.js",
+      "require": "./dist/cjs/wagmi/GoldToken.js",
+      "types": "./dist/types/wagmi/GoldToken.d.ts"
+    },
+    "./wagmi/Governance": {
+      "import": "./dist/esm/wagmi/Governance.js",
+      "require": "./dist/cjs/wagmi/Governance.js",
+      "types": "./dist/types/wagmi/Governance.d.ts"
+    },
+    "./wagmi/GovernanceApproverMultiSig": {
+      "import": "./dist/esm/wagmi/GovernanceApproverMultiSig.js",
+      "require": "./dist/cjs/wagmi/GovernanceApproverMultiSig.js",
+      "types": "./dist/types/wagmi/GovernanceApproverMultiSig.d.ts"
+    },
+    "./wagmi/LockedGold": {
+      "import": "./dist/esm/wagmi/LockedGold.js",
+      "require": "./dist/cjs/wagmi/LockedGold.js",
+      "types": "./dist/types/wagmi/LockedGold.d.ts"
+    },
+    "./wagmi/MentoFeeHandlerSeller": {
+      "import": "./dist/esm/wagmi/MentoFeeHandlerSeller.js",
+      "require": "./dist/cjs/wagmi/MentoFeeHandlerSeller.js",
+      "types": "./dist/types/wagmi/MentoFeeHandlerSeller.d.ts"
+    },
+    "./wagmi/MetaTransactionWallet": {
+      "import": "./dist/esm/wagmi/MetaTransactionWallet.js",
+      "require": "./dist/cjs/wagmi/MetaTransactionWallet.js",
+      "types": "./dist/types/wagmi/MetaTransactionWallet.d.ts"
+    },
+    "./wagmi/MetaTransactionWalletDeployer": {
+      "import": "./dist/esm/wagmi/MetaTransactionWalletDeployer.js",
+      "require": "./dist/cjs/wagmi/MetaTransactionWalletDeployer.js",
+      "types": "./dist/types/wagmi/MetaTransactionWalletDeployer.d.ts"
+    },
+    "./wagmi/MultiSig": {
+      "import": "./dist/esm/wagmi/MultiSig.js",
+      "require": "./dist/cjs/wagmi/MultiSig.js",
+      "types": "./dist/types/wagmi/MultiSig.d.ts"
+    },
+    "./wagmi/OdisPayments": {
+      "import": "./dist/esm/wagmi/OdisPayments.js",
+      "require": "./dist/cjs/wagmi/OdisPayments.js",
+      "types": "./dist/types/wagmi/OdisPayments.d.ts"
+    },
+    "./wagmi/Random": {
+      "import": "./dist/esm/wagmi/Random.js",
+      "require": "./dist/cjs/wagmi/Random.js",
+      "types": "./dist/types/wagmi/Random.d.ts"
+    },
+    "./wagmi/Registry": {
+      "import": "./dist/esm/wagmi/Registry.js",
+      "require": "./dist/cjs/wagmi/Registry.js",
+      "types": "./dist/types/wagmi/Registry.d.ts"
+    },
+    "./wagmi/ReleaseGold": {
+      "import": "./dist/esm/wagmi/ReleaseGold.js",
+      "require": "./dist/cjs/wagmi/ReleaseGold.js",
+      "types": "./dist/types/wagmi/ReleaseGold.d.ts"
+    },
+    "./wagmi/SortedOracles": {
+      "import": "./dist/esm/wagmi/SortedOracles.js",
+      "require": "./dist/cjs/wagmi/SortedOracles.js",
+      "types": "./dist/types/wagmi/SortedOracles.d.ts"
+    },
+    "./wagmi/UniswapFeeHandlerSeller": {
+      "import": "./dist/esm/wagmi/UniswapFeeHandlerSeller.js",
+      "require": "./dist/cjs/wagmi/UniswapFeeHandlerSeller.js",
+      "types": "./dist/types/wagmi/UniswapFeeHandlerSeller.d.ts"
+    },
+    "./wagmi/Validators": {
+      "import": "./dist/esm/wagmi/Validators.js",
+      "require": "./dist/cjs/wagmi/Validators.js",
+      "types": "./dist/types/wagmi/Validators.d.ts"
+    },
+    "./web3/0.8/GasPriceMinimum": {
+      "import": "./dist/esm/web3/0.8/GasPriceMinimum.js",
+      "require": "./dist/cjs/web3/0.8/GasPriceMinimum.js",
+      "types": "./dist/types/web3/0.8/GasPriceMinimum.d.ts"
+    },
+    "./web3/Accounts": {
+      "import": "./dist/esm/web3/Accounts.js",
+      "require": "./dist/cjs/web3/Accounts.js",
+      "types": "./dist/types/web3/Accounts.d.ts"
+    },
+    "./web3/Attestations": {
+      "import": "./dist/esm/web3/Attestations.js",
+      "require": "./dist/cjs/web3/Attestations.js",
+      "types": "./dist/types/web3/Attestations.d.ts"
+    },
+    "./web3/BlockchainParameters": {
+      "import": "./dist/esm/web3/BlockchainParameters.js",
+      "require": "./dist/cjs/web3/BlockchainParameters.js",
+      "types": "./dist/types/web3/BlockchainParameters.d.ts"
+    },
+    "./web3/DoubleSigningSlasher": {
+      "import": "./dist/esm/web3/DoubleSigningSlasher.js",
+      "require": "./dist/cjs/web3/DoubleSigningSlasher.js",
+      "types": "./dist/types/web3/DoubleSigningSlasher.d.ts"
+    },
+    "./web3/DowntimeSlasher": {
+      "import": "./dist/esm/web3/DowntimeSlasher.js",
+      "require": "./dist/cjs/web3/DowntimeSlasher.js",
+      "types": "./dist/types/web3/DowntimeSlasher.d.ts"
+    },
+    "./web3/Election": {
+      "import": "./dist/esm/web3/Election.js",
+      "require": "./dist/cjs/web3/Election.js",
+      "types": "./dist/types/web3/Election.d.ts"
+    },
+    "./web3/EpochRewards": {
+      "import": "./dist/esm/web3/EpochRewards.js",
+      "require": "./dist/cjs/web3/EpochRewards.js",
+      "types": "./dist/types/web3/EpochRewards.d.ts"
+    },
+    "./web3/Escrow": {
+      "import": "./dist/esm/web3/Escrow.js",
+      "require": "./dist/cjs/web3/Escrow.js",
+      "types": "./dist/types/web3/Escrow.d.ts"
+    },
+    "./web3/FederatedAttestations": {
+      "import": "./dist/esm/web3/FederatedAttestations.js",
+      "require": "./dist/cjs/web3/FederatedAttestations.js",
+      "types": "./dist/types/web3/FederatedAttestations.d.ts"
+    },
+    "./web3/FeeCurrencyWhitelist": {
+      "import": "./dist/esm/web3/FeeCurrencyWhitelist.js",
+      "require": "./dist/cjs/web3/FeeCurrencyWhitelist.js",
+      "types": "./dist/types/web3/FeeCurrencyWhitelist.d.ts"
+    },
+    "./web3/FeeHandler": {
+      "import": "./dist/esm/web3/FeeHandler.js",
+      "require": "./dist/cjs/web3/FeeHandler.js",
+      "types": "./dist/types/web3/FeeHandler.d.ts"
+    },
+    "./web3/Freezer": {
+      "import": "./dist/esm/web3/Freezer.js",
+      "require": "./dist/cjs/web3/Freezer.js",
+      "types": "./dist/types/web3/Freezer.d.ts"
+    },
+    "./web3/GasPriceMinimum": {
+      "import": "./dist/esm/web3/GasPriceMinimum.js",
+      "require": "./dist/cjs/web3/GasPriceMinimum.js",
+      "types": "./dist/types/web3/GasPriceMinimum.d.ts"
+    },
+    "./web3/GoldToken": {
+      "import": "./dist/esm/web3/GoldToken.js",
+      "require": "./dist/cjs/web3/GoldToken.js",
+      "types": "./dist/types/web3/GoldToken.d.ts"
+    },
+    "./web3/Governance": {
+      "import": "./dist/esm/web3/Governance.js",
+      "require": "./dist/cjs/web3/Governance.js",
+      "types": "./dist/types/web3/Governance.d.ts"
+    },
+    "./web3/GovernanceApproverMultiSig": {
+      "import": "./dist/esm/web3/GovernanceApproverMultiSig.js",
+      "require": "./dist/cjs/web3/GovernanceApproverMultiSig.js",
+      "types": "./dist/types/web3/GovernanceApproverMultiSig.d.ts"
+    },
+    "./web3/ICeloToken": {
+      "import": "./dist/esm/web3/ICeloToken.js",
+      "require": "./dist/cjs/web3/ICeloToken.js",
+      "types": "./dist/types/web3/ICeloToken.d.ts"
+    },
+    "./web3/ICeloVersionedContract": {
+      "import": "./dist/esm/web3/ICeloVersionedContract.js",
+      "require": "./dist/cjs/web3/ICeloVersionedContract.js",
+      "types": "./dist/types/web3/ICeloVersionedContract.d.ts"
+    },
+    "./web3/IERC20": {
+      "import": "./dist/esm/web3/IERC20.js",
+      "require": "./dist/cjs/web3/IERC20.js",
+      "types": "./dist/types/web3/IERC20.d.ts"
+    },
+    "./web3/LockedGold": {
+      "import": "./dist/esm/web3/LockedGold.js",
+      "require": "./dist/cjs/web3/LockedGold.js",
+      "types": "./dist/types/web3/LockedGold.d.ts"
+    },
+    "./web3/MentoFeeHandlerSeller": {
+      "import": "./dist/esm/web3/MentoFeeHandlerSeller.js",
+      "require": "./dist/cjs/web3/MentoFeeHandlerSeller.js",
+      "types": "./dist/types/web3/MentoFeeHandlerSeller.d.ts"
+    },
+    "./web3/MetaTransactionWallet": {
+      "import": "./dist/esm/web3/MetaTransactionWallet.js",
+      "require": "./dist/cjs/web3/MetaTransactionWallet.js",
+      "types": "./dist/types/web3/MetaTransactionWallet.d.ts"
+    },
+    "./web3/MetaTransactionWalletDeployer": {
+      "import": "./dist/esm/web3/MetaTransactionWalletDeployer.js",
+      "require": "./dist/cjs/web3/MetaTransactionWalletDeployer.js",
+      "types": "./dist/types/web3/MetaTransactionWalletDeployer.d.ts"
+    },
+    "./web3/MultiSig": {
+      "import": "./dist/esm/web3/MultiSig.js",
+      "require": "./dist/cjs/web3/MultiSig.js",
+      "types": "./dist/types/web3/MultiSig.d.ts"
+    },
+    "./web3/OdisPayments": {
+      "import": "./dist/esm/web3/OdisPayments.js",
+      "require": "./dist/cjs/web3/OdisPayments.js",
+      "types": "./dist/types/web3/OdisPayments.d.ts"
+    },
+    "./web3/Proxy": {
+      "import": "./dist/esm/web3/Proxy.js",
+      "require": "./dist/cjs/web3/Proxy.js",
+      "types": "./dist/types/web3/Proxy.d.ts"
+    },
+    "./web3/Random": {
+      "import": "./dist/esm/web3/Random.js",
+      "require": "./dist/cjs/web3/Random.js",
+      "types": "./dist/types/web3/Random.d.ts"
+    },
+    "./web3/Registry": {
+      "import": "./dist/esm/web3/Registry.js",
+      "require": "./dist/cjs/web3/Registry.js",
+      "types": "./dist/types/web3/Registry.d.ts"
+    },
+    "./web3/ReleaseGold": {
+      "import": "./dist/esm/web3/ReleaseGold.js",
+      "require": "./dist/cjs/web3/ReleaseGold.js",
+      "types": "./dist/types/web3/ReleaseGold.d.ts"
+    },
+    "./web3/SortedOracles": {
+      "import": "./dist/esm/web3/SortedOracles.js",
+      "require": "./dist/cjs/web3/SortedOracles.js",
+      "types": "./dist/types/web3/SortedOracles.d.ts"
+    },
+    "./web3/UniswapFeeHandlerSeller": {
+      "import": "./dist/esm/web3/UniswapFeeHandlerSeller.js",
+      "require": "./dist/cjs/web3/UniswapFeeHandlerSeller.js",
+      "types": "./dist/types/web3/UniswapFeeHandlerSeller.d.ts"
+    },
+    "./web3/Validators": {
+      "import": "./dist/esm/web3/Validators.js",
+      "require": "./dist/cjs/web3/Validators.js",
+      "types": "./dist/types/web3/Validators.d.ts"
+    },
+    "./web3/mento/Exchange": {
+      "import": "./dist/esm/web3/mento/Exchange.js",
+      "require": "./dist/cjs/web3/mento/Exchange.js",
+      "types": "./dist/types/web3/mento/Exchange.d.ts"
+    },
+    "./web3/mento/ExchangeBRL": {
+      "import": "./dist/esm/web3/mento/ExchangeBRL.js",
+      "require": "./dist/cjs/web3/mento/ExchangeBRL.js",
+      "types": "./dist/types/web3/mento/ExchangeBRL.d.ts"
+    },
+    "./web3/mento/ExchangeEUR": {
+      "import": "./dist/esm/web3/mento/ExchangeEUR.js",
+      "require": "./dist/cjs/web3/mento/ExchangeEUR.js",
+      "types": "./dist/types/web3/mento/ExchangeEUR.d.ts"
+    },
+    "./web3/mento/GrandaMento": {
+      "import": "./dist/esm/web3/mento/GrandaMento.js",
+      "require": "./dist/cjs/web3/mento/GrandaMento.js",
+      "types": "./dist/types/web3/mento/GrandaMento.d.ts"
+    },
+    "./web3/mento/Reserve": {
+      "import": "./dist/esm/web3/mento/Reserve.js",
+      "require": "./dist/cjs/web3/mento/Reserve.js",
+      "types": "./dist/types/web3/mento/Reserve.d.ts"
+    },
+    "./web3/mento/ReserveSpenderMultiSig": {
+      "import": "./dist/esm/web3/mento/ReserveSpenderMultiSig.js",
+      "require": "./dist/cjs/web3/mento/ReserveSpenderMultiSig.js",
+      "types": "./dist/types/web3/mento/ReserveSpenderMultiSig.d.ts"
+    },
+    "./web3/mento/StableToken": {
+      "import": "./dist/esm/web3/mento/StableToken.js",
+      "require": "./dist/cjs/web3/mento/StableToken.js",
+      "types": "./dist/types/web3/mento/StableToken.d.ts"
+    },
+    "./web3/mento/StableTokenBRL": {
+      "import": "./dist/esm/web3/mento/StableTokenBRL.js",
+      "require": "./dist/cjs/web3/mento/StableTokenBRL.js",
+      "types": "./dist/types/web3/mento/StableTokenBRL.d.ts"
+    },
+    "./web3/mento/StableTokenEUR": {
+      "import": "./dist/esm/web3/mento/StableTokenEUR.js",
+      "require": "./dist/cjs/web3/mento/StableTokenEUR.js",
+      "types": "./dist/types/web3/mento/StableTokenEUR.d.ts"
+    }
+  }
 }
