@@ -60,7 +60,7 @@ try {
 
   let exports = processRawJsonsAndPrepareExports()
 
-  // Generate wagmi friendly ts files
+  // Generate ts abi files
   log('Running yarn wagmi generate')
   child_process.execSync(`yarn wagmi generate`, { stdio: 'inherit' })
 
