@@ -2,8 +2,12 @@ name: Publish ABIs and Solidity files to NPM
 on:
   push:
     branches: [release/core-contracts/*]
+    tags:
+      - core-contracts.v*
   pull_request:
-
+    branches: [release/core-contracts/*, master]
+    paths:
+      - 'packages/protocol/**'
   release:
     types: [released]
   workflow_dispatch:
