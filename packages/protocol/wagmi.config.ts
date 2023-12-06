@@ -19,7 +19,7 @@ for (const contractName of new Set(CoreContracts)) {
 
 export default defineConfig(
   contracts.map(({ name, abi }) => ({
-    out: path.join(ABIS_BUILD_DIR, `wagmi/${name}.ts`),
+    out: path.join(ABIS_BUILD_DIR, `${name}.ts`),
     contracts: [{ name, abi }],
     plugins: [],
   }))
