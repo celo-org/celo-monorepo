@@ -11,7 +11,8 @@
   "dependencies": {},
   "peerDependencies": {},
   "files": [
-    "./dist"
+    "./dist",
+    "!**/*.js.map"
   ],
   "exports": {
     "./Accounts.json": {
