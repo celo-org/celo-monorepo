@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
-import "./test/Test.sol";
+import "celo-foundry-8/Test.sol";
 
 import "../../contracts/common/FixidityLib.sol";
 

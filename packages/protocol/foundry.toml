@@ -4,13 +4,14 @@ out = 'out'
 test = 'test-sol'
 libs = ['lib', 'node_modules']
 remappings = [
-  '@openzeppelin/contracts8/=lib/openzeppelin-contracts8/contracts/',
-  'openzeppelin-solidity/=lib/openzeppelin-contracts/',
-  'solidity-bytes-utils/=lib/solidity-bytes-utils/',
-  'forge-std/=lib/celo-foundry/lib/forge-std/src/',
-  'forge-std8/=lib/forge-std/src/',
   'ds-test/=lib/celo-foundry/lib/forge-std/lib/ds-test/src/',
+  'forge-std/=lib/celo-foundry/lib/forge-std/src/',
+  'forge-std-8/=lib/celo-foundry-8/lib/forge-std/src/',
+  'openzeppelin-solidity/=lib/openzeppelin-contracts/',
+  '@openzeppelin/contracts8/=lib/openzeppelin-contracts8/contracts/',
   'celo-foundry/=lib/celo-foundry/src/',
+  'celo-foundry-8/=lib/celo-foundry-8/src/',
+  'solidity-bytes-utils/=lib/solidity-bytes-utils/',
   '@summa-tx/memview.sol/=lib/memview.sol',
 ]
 
