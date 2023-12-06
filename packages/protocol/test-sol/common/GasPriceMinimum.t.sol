@@ -54,10 +54,6 @@ contract GasPriceMinimumTest is Test {
 }
 
 contract GasPriceMinimumInitialize is GasPriceMinimumTest {
-  function setUp() public override {
-    super.setUp();
-  }
-
   function test_shouldHaveSetOwner() public {
     assertEq(gasPriceMinimum.owner(), owner);
   }
@@ -94,10 +90,6 @@ contract GasPriceMinimumSetAdjustmentSpeed is GasPriceMinimumTest {
   using FixidityLib for FixidityLib.Fraction;
 
   uint256 newAdjustmentSpeed = FixidityLib.newFixedFraction(1, 3).unwrap();
-
-  function setUp() public override {
-    super.setUp();
-  }
 
   function test_shouldSetTheAdjustmentSpeed() public {
     gasPriceMinimum.setAdjustmentSpeed(newAdjustmentSpeed);
@@ -154,10 +146,6 @@ contract GasPriceMinimumSetTargetDensity is GasPriceMinimumTest {
 contract GasPriceMinimumSetGasPriceMinimumFloor is GasPriceMinimumTest {
   uint256 newGasPriceMinimumFloor = 150;
 
-  function setUp() public override {
-    super.setUp();
-  }
-
   function test_ShouldSetGasPriceMinimumFloor() public {
     gasPriceMinimum.setGasPriceMinimumFloor(newGasPriceMinimumFloor);
 
@@ -185,10 +173,6 @@ contract GasPriceMinimumSetGasPriceMinimumFloor is GasPriceMinimumTest {
 contract GasPriceMinimumGetUpdatedGasPriceMinimum is GasPriceMinimumTest {
   using FixidityLib for FixidityLib.Fraction;
   uint256 nonce = 0;
-
-  function setUp() public override {
-    super.setUp();
-  }
 
   function getExpectedUpdatedGasPriceMinimum(
     uint256 gasPriceMinFloor,
