@@ -16,7 +16,7 @@ import "../../../contracts/common/Signatures.sol";
 import "../../../contracts/common/Registry.sol";
 import "../../../contracts/common/FixidityLib.sol";
 
-contract GovernanceForTest is Governance(true) {
+contract GovernanceTest is Governance(true) {
   address[] validatorSet;
 
   // Minimally override core functions from UsingPrecompiles
@@ -58,7 +58,7 @@ contract GovernanceForTest is Governance(true) {
     bytes calldata data,
     uint256[] calldata dataLengths,
     bytes32 salt
-  ) external returns (bytes32) {
+  ) external pure returns (bytes32) {
     return keccak256(abi.encode(values, destinations, data, dataLengths, salt));
   }
 }
@@ -83,7 +83,7 @@ contract BaseTest is Test {
   uint256 constant REFERENDUM_STAGE_DURATION = 5 * 60;
   uint256 constant CONCURRENT_PROPOSALS = 1;
 
-  GovernanceForTest governance;
+  GovernanceTest governance;
   Accounts accounts;
   MockLockedGold mockLockedGold;
   MockValidators mockValidators;
@@ -260,7 +260,7 @@ contract BaseTest is Test {
   }
 }
 
-contract Initialize is BaseTest {
+contract GovernanceInitialize is BaseTest {
   function test_SetsTheOwner() public {
     assertEq(governance.owner(), accOwner);
   }
@@ -315,7 +315,7 @@ contract Initialize is BaseTest {
   }
 }
 
-contract SetApprover is BaseTest {
+contract GovernanceSetApprover is BaseTest {
   event ApproverSet(address indexed approver);
 
   address NEW_APPROVER = address(7777);
@@ -352,7 +352,7 @@ contract SetApprover is BaseTest {
   }
 }
 
-contract SetMinDeposit is BaseTest {
+contract GovernanceSetMinDeposit is BaseTest {
   event MinDepositSet(uint256 minDeposit);
 
   uint256 NEW_MINDEPOSIT = 45;
@@ -383,7 +383,7 @@ contract SetMinDeposit is BaseTest {
   }
 }
 
-contract SetConcurrentProposals is BaseTest {
+contract GovernanceSetConcurrentProposals is BaseTest {
   event ConcurrentProposalsSet(uint256 concurrentProposals);
 
   uint256 NEW_CONCURRENT_PROPOSALS = 45;
@@ -420,7 +420,7 @@ contract SetConcurrentProposals is BaseTest {
   }
 }
 
-contract SetQueueExpiry is BaseTest {
+contract GovernanceSetQueueExpiry is BaseTest {
   event QueueExpirySet(uint256 queueExpiry);
 
   uint256 NEW_VALUE = 45;
@@ -457,7 +457,7 @@ contract SetQueueExpiry is BaseTest {
   }
 }
 
-contract SetDequeueFrequency is BaseTest {
+contract GovernanceSetDequeueFrequency is BaseTest {
   event DequeueFrequencySet(uint256 dequeueFrequency);
 
   uint256 NEW_VALUE = 45;
@@ -494,7 +494,7 @@ contract SetDequeueFrequency is BaseTest {
   }
 }
 
-contract SetReferendumStageDuration is BaseTest {
+contract GovernanceSetReferendumStageDuration is BaseTest {
   event ReferendumStageDurationSet(uint256 value);
 
   uint256 NEW_VALUE = 45;
@@ -531,7 +531,7 @@ contract SetReferendumStageDuration is BaseTest {
   }
 }
 
-contract SetExecutionStageDuration is BaseTest {
+contract GovernanceSetExecutionStageDuration is BaseTest {
   event ExecutionStageDurationSet(uint256 dequeueFrequency);
 
   uint256 NEW_VALUE = 45;
@@ -568,7 +568,7 @@ contract SetExecutionStageDuration is BaseTest {
   }
 }
 
-contract SetParticipationFloor is BaseTest {
+contract GovernanceSetParticipationFloor is BaseTest {
   event ParticipationFloorSet(uint256 value);
 
   uint256 NEW_VALUE = 45;
@@ -601,7 +601,7 @@ contract SetParticipationFloor is BaseTest {
   }
 }
 
-contract SetBaselineUpdateFactor is BaseTest {
+contract GovernanceSetBaselineUpdateFactor is BaseTest {
   event ParticipationBaselineUpdateFactorSet(uint256 value);
 
   uint256 NEW_VALUE = 45;
@@ -634,7 +634,7 @@ contract SetBaselineUpdateFactor is BaseTest {
   }
 }
 
-contract SetBaselineQuorumFactor is BaseTest {
+contract GovernanceSetBaselineQuorumFactor is BaseTest {
   event ParticipationBaselineQuorumFactorSet(uint256 value);
 
   uint256 NEW_VALUE = 45;
@@ -667,7 +667,7 @@ contract SetBaselineQuorumFactor is BaseTest {
   }
 }
 
-contract SetConstitution is BaseTest {
+contract GovernanceSetConstitution is BaseTest {
   event ConstitutionSet(address indexed destination, bytes4 indexed functionId, uint256 threshold);
 
   function testRevertsIf_DestinationIsZeroAddress() public {
@@ -743,7 +743,7 @@ contract SetConstitution is BaseTest {
   }
 }
 
-contract Propose is BaseTest {
+contract GovernancePropose is BaseTest {
   event ProposalQueued(
     uint256 indexed proposalId,
     address indexed proposer,
@@ -910,7 +910,7 @@ contract Propose is BaseTest {
   }
 }
 
-contract Upvote is BaseTest {
+contract GovernanceUpvote is BaseTest {
   event ProposalUpvoted(uint256 indexed proposalId, address indexed account, uint256 upvotes);
   event ProposalExpired(uint256 indexed proposalId);
 
@@ -1112,7 +1112,7 @@ contract Upvote is BaseTest {
   }
 }
 
-contract RevokeUpvote is BaseTest {
+contract GovernanceRevokeUpvote is BaseTest {
   event ProposalExpired(uint256 indexed proposalId);
   event ProposalUpvoteRevoked(
     uint256 indexed proposalId,
@@ -1204,7 +1204,7 @@ contract RevokeUpvote is BaseTest {
   }
 }
 
-contract Withdraw is BaseTest {
+contract GovernanceWithdraw is BaseTest {
   uint256 proposalId;
 
   address accProposer;
@@ -1243,7 +1243,7 @@ contract Withdraw is BaseTest {
   }
 }
 
-contract Approve is BaseTest {
+contract GovernanceApprove is BaseTest {
   event ProposalDequeued(uint256 indexed proposalId, uint256 timestamp);
   event ProposalApproved(uint256 indexed proposalId);
 
@@ -1411,7 +1411,7 @@ contract Approve is BaseTest {
   }
 }
 
-contract RevokeVotes is BaseTest {
+contract GovernanceRevokeVotes is BaseTest {
   event ProposalVoteRevokedV2(
     uint256 indexed proposalId,
     address indexed account,
@@ -1539,7 +1539,7 @@ contract RevokeVotes is BaseTest {
   }
 }
 
-contract VoteWhenProposalIsApproved is BaseTest {
+contract GovernanceVoteWhenProposalIsApproved is BaseTest {
   event ProposalVotedV2(
     uint256 indexed proposalId,
     address indexed account,
@@ -1777,7 +1777,7 @@ contract VoteWhenProposalIsApproved is BaseTest {
   }
 }
 
-contract VoteWhenProposalIsApprovedAndHaveSigner is BaseTest {
+contract GovernanceVoteWhenProposalIsApprovedAndHaveSigner is BaseTest {
   event ProposalVotedV2(
     uint256 indexed proposalId,
     address indexed account,
@@ -1851,7 +1851,7 @@ contract VoteWhenProposalIsApprovedAndHaveSigner is BaseTest {
   }
 }
 
-contract VoteWhenProposalIsNotApproved is BaseTest {
+contract GovernanceVoteWhenProposalIsNotApproved is BaseTest {
   event ProposalVotedV2(
     uint256 indexed proposalId,
     address indexed account,
@@ -1926,7 +1926,7 @@ contract VoteWhenProposalIsNotApproved is BaseTest {
   }
 }
 
-contract VoteWhenVotingOnDifferentProposalWithSameIndex is BaseTest {
+contract GovernanceVoteWhenVotingOnDifferentProposalWithSameIndex is BaseTest {
   function test_IgnoreVotesFromPreviousProposal() public {
     uint256 proposalId1 = makeValidProposal();
 
@@ -1976,7 +1976,7 @@ contract VoteWhenVotingOnDifferentProposalWithSameIndex is BaseTest {
   }
 }
 
-contract VotePartiallyWhenProposalIsApproved is BaseTest {
+contract GovernanceVotePartiallyWhenProposalIsApproved is BaseTest {
   event ProposalVotedV2(
     uint256 indexed proposalId,
     address indexed account,
@@ -2198,7 +2198,7 @@ contract VotePartiallyWhenProposalIsApproved is BaseTest {
   }
 }
 
-contract VotePartiallyWhenProposalIsApprovedAndHaveSigner is BaseTest {
+contract GovernanceVotePartiallyWhenProposalIsApprovedAndHaveSigner is BaseTest {
   event ProposalVotedV2(
     uint256 indexed proposalId,
     address indexed account,
@@ -2307,7 +2307,7 @@ contract VotePartiallyWhenProposalIsApprovedAndHaveSigner is BaseTest {
   }
 }
 
-contract VotePartiallyWhenProposalIsNotApproved is BaseTest {
+contract GovernanceVotePartiallyWhenProposalIsNotApproved is BaseTest {
   event ProposalVotedV2(
     uint256 indexed proposalId,
     address indexed account,
@@ -2382,7 +2382,7 @@ contract VotePartiallyWhenProposalIsNotApproved is BaseTest {
   }
 }
 
-contract VotePartiallyWhenVotingOnDifferentProposalWithSameIndex is BaseTest {
+contract GovernanceVotePartiallyWhenVotingOnDifferentProposalWithSameIndex is BaseTest {
   function test_IgnoreVotesFromPreviousProposal() public {
     uint256 proposalId1 = makeValidProposal();
 
@@ -2432,7 +2432,7 @@ contract VotePartiallyWhenVotingOnDifferentProposalWithSameIndex is BaseTest {
   }
 }
 
-contract Execute is BaseTest {
+contract GovernanceExecute is BaseTest {
   event ParticipationBaselineUpdated(uint256 participationBaseline);
   event ProposalExecuted(uint256 indexed proposalId);
 
@@ -2865,7 +2865,7 @@ contract Execute is BaseTest {
   }
 }
 
-contract ApproveHotfix is BaseTest {
+contract GovernanceApproveHotfix is BaseTest {
   event HotfixApproved(bytes32 indexed hash);
 
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
@@ -2890,7 +2890,7 @@ contract ApproveHotfix is BaseTest {
   }
 }
 
-contract WhitelistHotfix is BaseTest {
+contract GovernanceWhitelistHotfix is BaseTest {
   event HotfixWhitelisted(bytes32 indexed hash, address whitelister);
 
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
@@ -2907,7 +2907,7 @@ contract WhitelistHotfix is BaseTest {
   }
 }
 
-contract HotfixWhitelistValidatorTally is BaseTest {
+contract GovernanceHotfixWhitelistValidatorTally is BaseTest {
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
 
   address[] validators;
@@ -2974,7 +2974,7 @@ contract HotfixWhitelistValidatorTally is BaseTest {
   }
 }
 
-contract IsHotfixPassing is BaseTest {
+contract GovernanceIsHotfixPassing is BaseTest {
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
 
   function setUp() public {
@@ -3009,7 +3009,7 @@ contract IsHotfixPassing is BaseTest {
   }
 }
 
-contract PrepareHotfix is BaseTest {
+contract GovernancePrepareHotfix is BaseTest {
   event HotfixPrepared(bytes32 indexed hash, uint256 indexed epoch);
 
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
@@ -3067,7 +3067,7 @@ contract PrepareHotfix is BaseTest {
   }
 }
 
-contract ExecuteHotfix is BaseTest {
+contract GovernanceExecuteHotfix is BaseTest {
   event HotfixExecuted(bytes32 indexed hash);
 
   bytes32 SALT = 0x657ed9d64e84fa3d1af43b3a307db22aba2d90a158015df1c588c02e24ca08f0;
@@ -3164,7 +3164,7 @@ contract ExecuteHotfix is BaseTest {
   }
 }
 
-contract IsVoting is BaseTest {
+contract GovernanceIsVoting is BaseTest {
   uint256 proposalId;
 
   function setUp() public {
@@ -3220,7 +3220,7 @@ contract IsVoting is BaseTest {
   }
 }
 
-contract IsProposalPassing is BaseTest {
+contract GovernanceIsProposalPassing is BaseTest {
   uint256 proposalId;
   address accSndVoter;
 
@@ -3263,7 +3263,7 @@ contract IsProposalPassing is BaseTest {
   }
 }
 
-contract DequeueProposalsIfReady is BaseTest {
+contract GovernanceDequeueProposalsIfReady is BaseTest {
   function test_notUpdateLastDequeueWhenThereAreNoQueuedProposals() public {
     uint256 originalLastDequeue = governance.lastDequeue();
     vm.warp(block.timestamp + governance.dequeueFrequency());
@@ -3296,7 +3296,7 @@ contract DequeueProposalsIfReady is BaseTest {
   }
 }
 
-contract GetProposalStage is BaseTest {
+contract GovernanceGetProposalStage is BaseTest {
   function test_returnNoneStageWhenProposalDoesNotExists() public {
     assertEq(uint256(governance.getProposalStage(0)), uint256(Proposals.Stage.None));
     assertEq(uint256(governance.getProposalStage(1)), uint256(Proposals.Stage.None));
@@ -3428,7 +3428,7 @@ contract GetProposalStage is BaseTest {
   }
 }
 
-contract GetAmountOfGoldUsedForVoting is BaseTest {
+contract GovernanceGetAmountOfGoldUsedForVoting is BaseTest {
   function makeAndApprove3ConcurrentProposals() private {
     vm.prank(accOwner);
     governance.setConcurrentProposals(3);
@@ -3535,7 +3535,7 @@ contract GetAmountOfGoldUsedForVoting is BaseTest {
   }
 }
 
-contract RemoveVotesWhenRevokingDelegatedVotes is BaseTest {
+contract GovernanceRemoveVotesWhenRevokingDelegatedVotes is BaseTest {
   uint256[] proposalIds;
 
   function testRevert_WhenNotCalledByStakedCeloContract() public {
