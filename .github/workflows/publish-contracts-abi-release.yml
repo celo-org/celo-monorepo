@@ -1,15 +1,15 @@
 name: Publish ABIs and Solidity files to NPM
 on:
   push:
-    branches: [main]
+    branches: [release/core-contracts/*]
   pull_request:
 
   release:
     types: [released]
   workflow_dispatch:
     inputs:
-      npm_version:
-        description: 'NPM version'
+      npm_tag:
+        description: 'NPM TAG e.g. alpha, pre-merge (default: canary) '
         required: true
         type: string
 jobs:
@@ -55,7 +55,7 @@ jobs:
         working-directory: packages/protocol
         env:
           GITHUB_TAG: ${{ github.ref_name }}
-          INPUT_VERSION: ${{ inputs.npm_version }}
+          NPM_TAG: ${{ inputs.npm_tag }}
       - name: 'Build packages which will not need abis'
         shell: bash
         run:  yarn build --ignore @celo/contractkit  --ignore @celo/explorer --ignore @celo/celocli --ignore @celo/governance --ignore @celo/metadata-crawler --ignore @celo/celotool --ignore @celo/env-tests --ignore @celo/transactions-uri --ignore @celo/wallet-rpc --include-dependencies
