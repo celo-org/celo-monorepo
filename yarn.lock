@@ -1381,10 +1381,10 @@
     bigint-crypto-utils "^3.0.23"
     ethereum-cryptography "^1.1.2"
 
-"@ethereumjs/evm@npm:@soloseng/ethereumjs-evm@1.3.1":
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/@soloseng/ethereumjs-evm/-/ethereumjs-evm-1.3.1.tgz#89786afeb1b017e70f96d0622312bfe9c5ff33df"
-  integrity sha512-9oVEhVS0UVq4qxCsTwuXMQpBpBeJNPKNoFI65Nxa4JvHuFG9ihYS0t2VJV2nFvqi3PPKX1doJ24LzPQSYiUVWg==
+"@ethereumjs/evm@npm:@celo/ethereumjs-evm@1.3.1-unofficial.0":
+  version "1.3.1-unofficial.0"
+  resolved "https://registry.yarnpkg.com/@celo/ethereumjs-evm/-/ethereumjs-evm-1.3.1-unofficial.0.tgz#9083573f0fbf3d45a3ed3d69af8c78509e86803c"
+  integrity sha512-N321IctdVHY6PHesKGnUitjQ0dTRUBggordAmuBRF58foUwW5gMVzAY8c6L7rZVHiuiLYIvxQuQf8iadVzO5TA==
   dependencies:
     "@ethereumjs/common" "3.1.1"
     "@ethereumjs/tx" "4.1.1"
@@ -1483,15 +1483,15 @@
     ethereum-cryptography "^2.0.0"
     micro-ftch "^0.3.1"
 
-"@ethereumjs/vm@npm:@soloseng/ethereumjs-vm@6.4.1":
-  version "6.4.1"
-  resolved "https://registry.yarnpkg.com/@soloseng/ethereumjs-vm/-/ethereumjs-vm-6.4.1.tgz#3410be54e4c26452f139aee5c99de277ad0dba2f"
-  integrity sha512-5ypbEalBtHDlEqnTbkkBYNGIcw9M8J/+XTXLXddhKmtKXXYli84iLkVJgitoDrCrDloRAR2LKYRyYWW7ldB3rg==
+"@ethereumjs/vm@npm:@celo/ethereumjs-vm@6.4.1-unofficial.0":
+  version "6.4.1-unofficial.0"
+  resolved "https://registry.yarnpkg.com/@celo/ethereumjs-vm/-/ethereumjs-vm-6.4.1-unofficial.0.tgz#8a6b10e08bde5fe80ad9a2e01fe1a0fa8ef74bf5"
+  integrity sha512-fkCKEjeYVyt/fuLmIERRGCtp/oaGbxd0rzgYCAgHJrGDKGB+LdvzvvyuMOUEbIRzE0jLe4OrDOrnSFLv6QjvVg==
   dependencies:
     "@ethereumjs/block" "4.2.1"
     "@ethereumjs/blockchain" "6.2.1"
     "@ethereumjs/common" "3.1.1"
-    "@ethereumjs/evm" "npm:@soloseng/ethereumjs-evm@1.3.1"
+    "@ethereumjs/evm" "npm:@celo/ethereumjs-evm@1.3.1-unofficial.0"
     "@ethereumjs/rlp" "4.0.1"
     "@ethereumjs/statemanager" "1.0.4"
     "@ethereumjs/trie" "5.0.4"
