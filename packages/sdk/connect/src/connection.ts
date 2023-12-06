@@ -59,9 +59,6 @@ export class Connection {
   readonly paramsPopulator: TxParamsNormalizer
   rpcCaller!: RpcCaller
 
-  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
-  private currencyGasPrice: Map<Address, string> = new Map<Address, string>()
-
   constructor(readonly web3: Web3, public wallet?: ReadOnlyWallet, handleRevert = true) {
     web3.eth.handleRevert = handleRevert
 
@@ -333,21 +330,27 @@ export class Connection {
     return toTxResult(this.web3.eth.sendSignedTransaction(signedTransactionData))
   }
   // if neither gas price nor feeMarket fields are present set them.
+  setFeeMarketGas = async (tx: CeloTx): Promise<CeloTx> => {
+    // default to the current values
+    const calls = [Promise.resolve(tx.maxFeePerGas), Promise.resolve(tx.maxPriorityFeePerGas)]
 
-  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
-  fillGasPrice(tx: CeloTx): CeloTx {
-    if (tx.feeCurrency && tx.gasPrice === '0' && this.currencyGasPrice.has(tx.feeCurrency)) {
-      return {
-        ...tx,
-        gasPrice: this.currencyGasPrice.get(tx.feeCurrency),
-      }
+    if (isEmpty(tx.maxFeePerGas)) {
+      calls[0] = this.gasPrice(tx.feeCurrency)
     }
-    return tx
-  }
-
-  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
-  async setGasPriceForCurrency(address: Address, gasPrice: string) {
-    this.currencyGasPrice.set(address, gasPrice)
+    if (isEmpty(tx.maxPriorityFeePerGas)) {
+      calls[1] = this.rpcCaller
+        .call('eth_maxPriorityFeePerGas', [tx.feeCurrency])
+        .then((rpcResponse) => {
+          return rpcResponse.result
+        })
+    }
+    const [maxFeePerGas, maxPriorityFeePerGas] = await Promise.all(calls)
+    return {
+      ...tx,
+      gasPrice: undefined,
+      maxFeePerGas,
+      maxPriorityFeePerGas,
+    }
   }
 
   estimateGas = async (

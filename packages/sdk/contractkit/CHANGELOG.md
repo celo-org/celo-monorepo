@@ -1,5 +1,46 @@
 # @celo/contractkit
 
+## 5.2.1
+
+### Patch Changes
+
+- 88e3788b8: add notice that LockedGold.getTotalPendingWithdrawalsCount is not yet available on all networks
+- 70f600bb0: Mark MetaTransactionWallet and MetaTransactionWalletDeployer as deprecated, including functions to get them and their wrappers. see https://github.com/celo-org/celo-monorepo/issues/10766
+- 2985f9eb2: Refactor Accounts.getParsedSignatureOfAddress
+
+## 5.2.0
+
+### Minor Changes
+
+- add FeeHandler Wrapper
+- 32face3d8: Governance delegation functions added
+- 87647b46b: Add multisig:approve command to CLI, expose MultiSig.confirmTransaction in ContractKit.
+
+### Patch Changes
+
+- Updated dependencies [679ef0c60]
+- Updated dependencies [97d5ccf43]
+  - @celo/connect@5.1.1
+  - @celo/base@6.0.0
+  - @celo/utils@5.0.6
+  - @celo/wallet-local@5.1.1
+
+## 5.2.0-beta.0
+
+### Minor Changes
+
+- add FeeHandler Wrapper
+- 32face3d8: Governance delegation functions added
+- 87647b46b: Add multisig:approve command to CLI, expose MultiSig.confirmTransaction in ContractKit.
+
+### Patch Changes
+
+- Updated dependencies [97d5ccf43]
+  - @celo/base@6.0.0-beta.0
+  - @celo/connect@5.1.1-beta.0
+  - @celo/utils@5.0.6-beta.0
+  - @celo/wallet-local@5.1.1-beta.0
+
 ## 5.1.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@celo/transactions-uri",
-  "version": "5.0.5",
+  "version": "5.0.6",
   "description": "Celo's transactions uri generation",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -17,8 +17,6 @@
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
     "docs": "typedoc",
-    "test:reset": "yarn --cwd ../../protocol devchain:reset --migration_override ../../dev-utils/src/migration-override.json",
-    "test:livechain": "yarn --cwd ../../protocol devchain run-tar .tmp/devchain.tar.gz",
     "test": "jest --runInBand",
     "lint": "tslint -c tslint.json --project .",
     "prepublishOnly": "yarn build"
@@ -26,15 +24,16 @@
   "dependencies": {
     "@types/debug": "^4.1.5",
     "@types/qrcode": "^1.3.4",
-    "@celo/base": "^5.0.5",
-    "@celo/connect": "^5.1.0",
+    "@celo/base": "^6.0.0",
+    "@celo/connect": "^5.1.1",
     "bn.js": "4.11.9",
     "qrcode": "1.4.4",
     "web3-eth-abi": "1.10.0"
   },
   "devDependencies": {
+    "@celo/celo-devchain": "^6.0.3-beta.1",
     "@celo/dev-utils": "0.0.1",
-    "@celo/contractkit": "^5.1.0",
+    "@celo/contractkit": "^5.2.0",
     "dotenv": "^8.2.0"
   },
   "engines": {

@@ -22,7 +22,6 @@ runs:
         key: node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-${{ hashFiles('**/yarn.lock') }}
         enableCrossOsArchive: true
         fail-on-cache-miss: "!${{ fromJSON(env.REBUILD_PACKAGE) }}"
-
     - name: Restore build artifacts cache
       uses: actions/cache/restore@v3
       id: cache_build_artifacts

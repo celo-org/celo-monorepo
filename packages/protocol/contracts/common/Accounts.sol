@@ -756,7 +756,7 @@ contract Accounts is
    * @notice Returns the account associated with `signer`.
    * @param signer The address of the account or currently authorized attestation signer.
    * @dev Fails if the `signer` is not an account or currently authorized attestation signer.
-   * @return The associated account.
+   * @return The associated account that the signer is authorized to attest for.
    */
   function attestationSignerToAccount(address signer) external view returns (address) {
     return signerToAccountWithRole(signer, AttestationSigner);
@@ -766,7 +766,7 @@ contract Accounts is
    * @notice Returns the account associated with `signer`.
    * @param signer The address of an account or currently authorized validator signer.
    * @dev Fails if the `signer` is not an account or currently authorized validator.
-   * @return The associated account.
+   * @return The associated account that signer is authorized to validate for.
    */
   function validatorSignerToAccount(address signer) public view returns (address) {
     return signerToAccountWithRole(signer, ValidatorSigner);
@@ -776,7 +776,7 @@ contract Accounts is
    * @notice Returns the account associated with `signer`.
    * @param signer The address of the account or currently authorized vote signer.
    * @dev Fails if the `signer` is not an account or currently authorized vote signer.
-   * @return The associated account.
+   * @return The associated account that signer is authorized to vote for.
    */
   function voteSignerToAccount(address signer) external view returns (address) {
     return signerToAccountWithRole(signer, VoteSigner);
