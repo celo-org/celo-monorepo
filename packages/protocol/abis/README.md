@@ -16,17 +16,22 @@ or
 yarn add @celo/abis
 ```
 
+**There is no index so the following do not work**
+`import abis from '@celo/abis'` or  ` import web3AbiTypes from '@celo/abis/web3'`
+
 ### In your javascript or ts
 
 ```ts
-// json abi
+// abi in json
 import Accounts from '@celo/abis/Accounts.json'
 
-// web3
-import Accounts from '@celo/abis/web3/Accounts'
+// abi in js/ts
+import { accountsABI }  from '@celo/abis/Accounts'
 
-// wagmi
-import Accounts from '@celo/abis/wagmi/Accounts'
+// abi in js/ts for use with contractkit
+import { type Accounts, newAccounts, ABI } from '@celo/abis/web3/Accounts'
+
+
 ```
 
 ## License
