@@ -973,10 +973,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@celo/abis@10.0.0-rc.3":
-  version "10.0.0-rc.3"
-  resolved "https://registry.yarnpkg.com/@celo/abis/-/abis-10.0.0-rc.3.tgz#47311dbbcfc17ea5a67acd06921ce7c820fb0e8c"
-  integrity sha512-MuqEfSVrR6n3y3OzjKxHuNLjc/vea2RxZrPuOlA6vZel7SVnJlRF/24wu5fgxCvQOe2Q548bHhni5FG5WD9FUw==
+"@celo/abis@10.0.0-rc.4":
+  version "10.0.0-rc.4"
+  resolved "https://registry.yarnpkg.com/@celo/abis/-/abis-10.0.0-rc.4.tgz#eeb41417128c9bee5645f7d24a4148f4b5483186"
+  integrity sha512-xjPywJZhjmoRIqQTEOtCNZYYeXjnqGjZV6nhvkYp5W5QaAuuR3S2NyakLxpmsVLmxF/w8SK0lPErEfWlMXu5xg==
 
 "@celo/base@^5.0.5":
   version "5.0.5"
