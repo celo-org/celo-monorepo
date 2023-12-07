@@ -16,36 +16,31 @@ or
 yarn add @celo/abis
 ```
 
-
-**There is no index so the following do not work**
-`import abis from '@celo/abis'` or  ` import web3AbiTypes from '@celo/abis/web3'`
-
 ### In your javascript or ts
 
 ```ts
 // abi in json
 import AccountsABI from '@celo/abis/Accounts.json'
 
-
 // abi in js/ts for viem, wagmi, etc
+import { accountsABI }  from '@celo/abis'
+
+// abi in js/ts for viem, wagmi, etc (with moduleResolution and module set to "Node16" in your tsconfig.json file)
 import { accountsABI }  from '@celo/abis/Accounts'
 
 // abi in js/ts for use with contractkit
 import { type Accounts, newAccounts, ABI } from '@celo/abis/web3/Accounts'
-
-
 ```
 
 ### CommonJS syntax
 
 ```js
-const AccountsABI = require("@celo/abis/Accounts.json");
-
+const { accountsABI } = require('@celo/abis');
 
 // viem
 const accounts = getContract({
   address: "0x...",
-  abi: AccountsABI,
+  abi: accountsABI,
   ...
 })
 ```
