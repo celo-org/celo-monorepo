@@ -1,7 +1,6 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
-import "forge-std/console.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 
@@ -3287,7 +3286,7 @@ contract GovernanceDequeueProposalsIfReady is BaseTest {
   }
 
   function test_notUpdateLastDequeueWhenOnlyExpiredProposalQueued() public {
-    uint256 proposalId = makeValidProposal();
+    makeValidProposal();
     uint256 originalLastDequeue = governance.lastDequeue();
 
     vm.warp(block.timestamp + governance.queueExpiry());
