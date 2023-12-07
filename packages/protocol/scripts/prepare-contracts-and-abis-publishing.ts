@@ -83,6 +83,11 @@ try {
   })
 
   exports = {
+    '.': {
+      import: './dist/esm/index.js',
+      require: './dist/cjs/index.js',
+      types: './dist/types/index.d.ts',
+    },
     ...exports,
     ...prepareTargetTypesExports(),
   }
