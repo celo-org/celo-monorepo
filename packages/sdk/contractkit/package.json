@@ -24,7 +24,7 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/abis": "10.0.0-rc.4",
+    "@celo/abis": "10.0.0-rc.5",
     "@celo/base": "^6.0.0",
     "@celo/connect": "^5.1.1",
     "@celo/utils": "^5.0.6",
