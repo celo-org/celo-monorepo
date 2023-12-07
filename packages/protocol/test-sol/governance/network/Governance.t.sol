@@ -3276,7 +3276,7 @@ contract GovernanceDequeueProposalsIfReady is BaseTest {
   }
 
   function test_updateLastDequeue_whenProposalExists() public {
-    uint256 proposalId = makeValidProposal();
+    makeValidProposal();
     uint256 originalLastDequeue = governance.lastDequeue();
 
     vm.warp(block.timestamp + governance.dequeueFrequency());
