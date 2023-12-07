@@ -360,6 +360,8 @@ jobs:
           if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
             git --no-pager diff packages/docs/command-line-interface
             echo "There are git differences after generating CLI docs"
+            git status
+            git diff
             exit 1
           fi
       - name: Verify that a new account can be created
