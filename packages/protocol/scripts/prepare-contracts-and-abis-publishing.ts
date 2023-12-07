@@ -64,6 +64,9 @@ try {
   log('Running yarn wagmi generate')
   child_process.execSync(`yarn wagmi generate`, { stdio: 'inherit' })
 
+  // must be after wagmi gen but before compiling
+  createIndex()
+
   log('Compiling esm')
   child_process.execSync(`yarn tsc -b ${path.join(ABIS_PACKAGE_SRC_DIR, 'tsconfig-esm.json')}`, {
     stdio: 'inherit',
@@ -80,6 +83,11 @@ try {
   })
 
   exports = {
+    '.': {
+      import: './dist/esm/index.js',
+      require: './dist/cjs/index.js',
+      types: './dist/types/index.d.ts',
+    },
     ...exports,
     ...prepareTargetTypesExports(),
   }
@@ -93,6 +101,14 @@ try {
   rmrfSync(`rm -rf ${ABIS_BUILD_DIR}/contracts*`)
   rmrfSync(`rm -rf ${ABIS_BUILD_DIR}/truffle*`)
   child_process.execSync(`git checkout ${TSCONFIG_PATH}`, { stdio: 'inherit' })
+}
+
+function createIndex() {
+  const reExports = PublishContracts.map((contractName) => {
+    return `export * from './${contractName}.js'`
+  })
+
+  fs.writeFileSync(path.join(ABIS_BUILD_DIR, 'index.ts'), reExports.join('\n'))
 }
 
 // Helper functions
