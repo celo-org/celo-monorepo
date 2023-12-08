@@ -1,7 +1,7 @@
 import { execSync } from 'child_process'
 import { SemVer } from 'semver'
 const DAILY_RELEASE_TAG = 'canary'
-const npmTag = process.env.NPM_TAG?.trim() || 'hedghog'
+const npmTag = process.env.NPM_TAG?.trim() || ''
 const gitTag = process.env.GITHUB_TAG || ''
 let nextVersion: SemVer
 
