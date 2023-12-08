@@ -137,17 +137,25 @@ export const proposalToJSON = async (
     await blockExplorer.updateContractDetailsMapping(stripProxy(name), address)
   }
   if (registryAdditions) {
+    // Cant do in parallel due to https://github.com/celo-org/developer-tooling/issues/7
     // Update the registry mapping with registry additions prior to processing the proposal.
-    await Promise.all(
-      Object.keys(registryAdditions).map(async (nameStr) => {
-        const name = nameStr as CeloContract
-        if (CeloContract[name]) {
-          await updateRegistryMapping(name, registryAdditions[name])
-        } else {
-          debug(`Name ${nameStr} in registry additions not a CeloContract`)
-        }
-      })
-    )
+    for (const name of Object.keys(registryAdditions)) {
+      if (CeloContract[name as CeloContract]) {
+        await updateRegistryMapping(name as CeloContract, registryAdditions[name])
+      } else {
+        debug(`Name ${name} in registry additions not a CeloContract`)
+      }
+    }
+    // await Promise.all(
+    //   Object.keys(registryAdditions).map(async (nameStr) => {
+    //     const name = nameStr as CeloContract
+    //     if (CeloContract[name]) {
+    //       await updateRegistryMapping(name, registryAdditions[name])
+    //     } else {
+    //       debug(`Name ${nameStr} in registry additions not a CeloContract`)
+    //     }
+    //   })
+    // )
   }
   const abiCoder = kit.connection.getAbiCoder()
 
