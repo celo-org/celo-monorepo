@@ -53,7 +53,7 @@ jobs:
         shell: bash
         run: yarn
 
-      - name: Check if a release should be published
+      - name: Determine release type and version (or dry run)
         # This is what sets the RELEASE_TYPE and RELEASE_VERSION env variables
         run: yarn --silent is_contract_release >> "$GITHUB_ENV"
         working-directory: packages/protocol

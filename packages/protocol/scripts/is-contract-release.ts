@@ -20,16 +20,13 @@ const matchesPreAuditTag = gitTag.match(/core-contracts.v(.+).pre-audit/)
 const branchName = execSync('git branch --show-current').toString().trim()
 
 if (matchesReleaseTag) {
-  echoLog('Doing major release')
   nextVersion = getVersionFromGitTag(matchesReleaseTag)
 } else if (matchesPreAuditTag) {
-  echoLog('Doing pre-audit release')
   const tempVersion = getVersionFromGitTag(matchesPreAuditTag)
   nextVersion = new SemVer(
     `${tempVersion.major}.${tempVersion.minor}.${tempVersion.patch}-pre-audit.0`
   )
 } else if (branchName.startsWith(WORKING_RELEASE_BRANCH_PREFIX)) {
-  echoLog(`Doing ${DAILY_RELEASE_TAG} release`)
   const lastVersion = getPreviousVersion(DAILY_RELEASE_TAG, 'latest')
   const lastVersionSemVer = new SemVer(lastVersion)
 
@@ -45,11 +42,9 @@ if (matchesReleaseTag) {
 } else if (npmTag?.match(/^[a-zA-Z]+$/)) {
   // any string of letters only
 
-  echoLog(`Doing custom tag release: ${npmTag}`)
   const lastVersion = getPreviousVersion(npmTag, DAILY_RELEASE_TAG)
   nextVersion = new SemVer(lastVersion).inc('prerelease', npmTag)
 } else {
-  echoLog('No release tag found, skipping release')
   // dry-run will build the package but not publish it
   process.exit(0)
 }
@@ -76,8 +71,4 @@ function getVersionFromGitTag(matchedTag: RegExpMatchArray) {
   return new SemVer(
     [major, minor || 0, ...(patchAndMore.length ? patchAndMore : [0])].map((x) => x || 0).join('.')
   )
-}
-// echo the message to the console
-function echoLog(message: string) {
-  console.log(`echo "${message}"`)
 }
