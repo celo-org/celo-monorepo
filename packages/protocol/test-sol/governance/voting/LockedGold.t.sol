@@ -190,7 +190,7 @@ contract LockedGoldTest is Test {
     }
   }
 
-  function delegateVotes(address _delegator, address _delegatee, uint256 _percent) public {
+  function delegateCelo(address _delegator, address _delegatee, uint256 _percent) public {
     vm.prank(_delegator);
     lockedGold.delegateGovernanceVotes(
       _delegatee,
@@ -321,6 +321,12 @@ contract LockedGoldLock is LockedGoldTest {
     vm.prank(randomAddress);
     lockedGold.lock();
   }
+
+  function test_ShouldRevertWhenUserDoesntHaveEnoughBalance() public {
+    vm.expectRevert();
+    vm.prank(randomAddress);
+    lockedGold.lock.value(1)();
+  }
 }
 
 contract LockedGoldUnlock is LockedGoldTest {
@@ -387,6 +393,11 @@ contract LockedGoldUnlock is LockedGoldTest {
 
     vm.expectRevert("Not enough unlockable celo. Celo is locked in voting.");
     lockedGold.unlock(value);
+  }
+
+  function test_ShouldRevertWhenUnlockingMoreThenLocked() public {
+    vm.expectRevert("SafeMath: subtraction overflow");
+    lockedGold.unlock(value + 1);
   }
 
   function test_ShouldAddAPendingWithdrawal_WhenTheAccountIsRequestingOnlyNonVotingGold() public {
@@ -1375,11 +1386,9 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
   }
 
   function test_ShouldReturnCorrectDelegatedAmount_WhenNoGoldIsLocked_WhenNoVoteSigners() public {
-    uint256 delegatedAmount = 0;
+    delegateCelo(delegator, delegatee1, percentToDelegate);
 
-    delegateVotes(delegator, delegatee1, percentToDelegate);
-
-    assertDelegatorDelegateeAmounts(delegator, delegatee1, percentToDelegate, delegatedAmount);
+    assertDelegatorDelegateeAmounts(delegator, delegatee1, percentToDelegate, 0);
     assertEq(
       FixidityLib.wrap(lockedGold.getAccountTotalDelegatedFraction(delegator) * 100).fromFixed(),
       percentToDelegate
@@ -1394,24 +1403,24 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
       FixidityLib.newFixedFraction(percentToDelegate, 100).unwrap(),
       0
     );
-    delegateVotes(delegator, delegatee1, percentToDelegate);
+    delegateCelo(delegator, delegatee1, percentToDelegate);
   }
 
   function test_ShouldRevert_WhenDelegatingAsValidator() public {
     validators.setValidator(delegator);
     vm.expectRevert("Validators cannot delegate votes.");
-    delegateVotes(delegator, delegatee1, 100);
+    delegateCelo(delegator, delegatee1, 100);
   }
 
   function test_ShouldRevert_WhenDelegatingAsValidatorGroup() public {
     validators.setValidatorGroup(delegator);
     vm.expectRevert("Validator groups cannot delegate votes.");
-    delegateVotes(delegator, delegatee1, 100);
+    delegateCelo(delegator, delegatee1, 100);
   }
 
   function test_ShouldRevertWhenIncorrectPercentAmountIsInserted() public {
     vm.expectRevert("Delegate fraction must be less than or equal to 1");
-    delegateVotes(delegator, delegatee1, 101);
+    delegateCelo(delegator, delegatee1, 101);
   }
 
   function test_ShouldRevertWhenDelegatingVotesThatAreCurrentlyVotingForProposal_WhenDelegatorIsVotingInReferendum_WhenSomeGoldIsLocked()
@@ -1421,7 +1430,7 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
     governance.setTotalVotes(delegator, 1);
 
     vm.expectRevert("Cannot delegate votes that are voting in referendum");
-    delegateVotes(delegator, delegatee1, 100);
+    delegateCelo(delegator, delegatee1, 100);
   }
 
   function test_ShouldRevertWhenDelegatingVotesThatAreCurrentlyVotingForProposal2Delegatees_WhenDelegatorIsVotingInReferendum_WhenSomeGoldIsLocked()
@@ -1430,10 +1439,10 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
     lockCelo(delegator, value);
     governance.setTotalVotes(delegator, 1);
 
-    delegateVotes(delegator, delegatee1, 99);
+    delegateCelo(delegator, delegatee1, 99);
 
     vm.expectRevert("Cannot delegate votes that are voting in referendum");
-    delegateVotes(delegator, delegatee2, 1);
+    delegateCelo(delegator, delegatee2, 1);
   }
 
   function test_ShouldDelegateWhenVotingForLessThanRequestedForDelegatetion_WhenDelegatorIsVotingInReferendum_WhenSomeGoldIsLocked()
@@ -1442,7 +1451,7 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
     lockCelo(delegator, value);
     governance.setTotalVotes(delegator, 1);
 
-    delegateVotes(delegator, delegatee1, 99);
+    delegateCelo(delegator, delegatee1, 99);
 
     assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegator), 10);
     assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegatee1), 990);
@@ -1452,17 +1461,17 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
     public
   {
     lockCelo(delegator, value);
-    delegateVotes(delegator, delegatee1, 10);
+    delegateCelo(delegator, delegatee1, 10);
     vm.expectRevert("Cannot delegate more than 100%");
-    delegateVotes(delegator, delegatee2, 100);
+    delegateCelo(delegator, delegatee2, 100);
   }
 
   function test_ShouldDelegateCorrectlyWhenDelegatedToSameDelegateeInTwoSteps_WhenSomeGoldIsLocked()
     public
   {
     lockCelo(delegator, value);
-    delegateVotes(delegator, delegatee1, 10);
-    delegateVotes(delegator, delegatee1, 100);
+    delegateCelo(delegator, delegatee1, 10);
+    delegateCelo(delegator, delegatee1, 100);
 
     assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegator), 0);
     assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegatee1), 1000);
@@ -1478,21 +1487,21 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
       delegatedAmount
     );
 
-    delegateVotes(delegator, delegatee1, percentToDelegate);
+    delegateCelo(delegator, delegatee1, percentToDelegate);
   }
 
   function test_ShouldDelegateVotesCorrectly_WhenSomeGoldIsLocked() public {
     lockCelo(delegator, value);
-    delegateVotes(delegator, delegatee1, percentToDelegate);
+    delegateCelo(delegator, delegatee1, percentToDelegate);
 
     assertDelegatorDelegateeAmounts(delegator, delegatee1, percentToDelegate, delegatedAmount);
   }
 
   function test_ShouldDelegateVotesCorrectlyToMultipleAccounts_WhenSomeGoldIsLocked() public {
     lockCelo(delegator, value);
-    delegateVotes(delegator, delegatee1, percentToDelegate1);
-    delegateVotes(delegator, delegatee2, percentToDelegate2);
-    delegateVotes(delegator, delegatee3, percentToDelegate3);
+    delegateCelo(delegator, delegatee1, percentToDelegate1);
+    delegateCelo(delegator, delegatee2, percentToDelegate2);
+    delegateCelo(delegator, delegatee3, percentToDelegate3);
 
     assertDelegatorDelegateeAmounts(delegator, delegatee1, percentToDelegate1, delegatedAmount1);
     assertDelegatorDelegateeAmounts(delegator, delegatee2, percentToDelegate2, delegatedAmount2);
@@ -1503,10 +1512,10 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
     public
   {
     lockCelo(delegator, value);
-    delegateVotes(delegator, delegatee1, percentToDelegate);
+    delegateCelo(delegator, delegatee1, percentToDelegate);
 
     lockCelo(delegator, value);
-    delegateVotes(delegator, delegatee1, percentToDelegate);
+    delegateCelo(delegator, delegatee1, percentToDelegate);
 
     assertDelegatorDelegateeAmounts(delegator, delegatee1, percentToDelegate, delegatedAmount * 2);
   }
@@ -1515,7 +1524,7 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
     public
   {
     lockCelo(delegator, value);
-    delegateVotes(delegator, delegatee1, percentToDelegate);
+    delegateCelo(delegator, delegatee1, percentToDelegate);
     lockCelo(delegator, value);
 
     vm.expectEmit(true, true, true, true);
@@ -1526,15 +1535,15 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
       delegatedAmount * 2
     );
 
-    delegateVotes(delegator, delegatee1, percentToDelegate);
+    delegateCelo(delegator, delegatee1, percentToDelegate);
   }
 
   function test_ShouldDelegateVotesCorrectly_When2DelegatorsAreDelegatingToDelegatee() public {
     lockCelo(delegator, value);
-    delegateVotes(delegator, delegatee1, percentToDelegate1);
+    delegateCelo(delegator, delegatee1, percentToDelegate1);
 
     lockCelo(delegator2, value);
-    delegateVotes(delegator2, delegatee1, percentToDelegate2);
+    delegateCelo(delegator2, delegatee1, percentToDelegate2);
 
     assertDelegatorDelegateeAmounts(delegator, delegatee1, percentToDelegate1, delegatedAmount1);
     assertDelegatorDelegateeAmounts(delegator2, delegatee1, percentToDelegate2, delegatedAmount2);
@@ -1545,7 +1554,7 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
   {
     whenVoteSigner_LockedGoldDelegateGovernanceVotes();
     vm.expectRevert("Delegate fraction must be less than or equal to 1");
-    delegateVotes(delegatorSigner, delegatee1, 101);
+    delegateCelo(delegatorSigner, delegatee1, 101);
   }
 
   function test_ShouldRevertWhenDelegatingVotesThatAreCurrentlyVotingForProposal_WhenVoteSigners()
@@ -1554,7 +1563,7 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
     whenVoteSigner_LockedGoldDelegateGovernanceVotes();
     governance.setTotalVotes(delegator, 1);
     vm.expectRevert("Cannot delegate votes that are voting in referendum");
-    delegateVotes(delegatorSigner, delegatee1, 100);
+    delegateCelo(delegatorSigner, delegatee1, 100);
   }
 
   function test_ShouldRevertWhenVotingForProposalWIthVotesThatAreCurrentlyUsedInReferendum2Delegatees_WhenVoteSigners()
@@ -1562,9 +1571,9 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
   {
     whenVoteSigner_LockedGoldDelegateGovernanceVotes();
     governance.setTotalVotes(delegator, 1);
-    delegateVotes(delegatorSigner, delegatee1, 99);
+    delegateCelo(delegatorSigner, delegatee1, 99);
     vm.expectRevert("Cannot delegate votes that are voting in referendum");
-    delegateVotes(delegatorSigner, delegatee2, 1);
+    delegateCelo(delegatorSigner, delegatee2, 1);
   }
 
   function test_ShouldDelegate_WhenVotingForLessThanRequestedForDelegation_WHenVoteSigners()
@@ -1572,7 +1581,7 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
   {
     whenVoteSigner_LockedGoldDelegateGovernanceVotes();
     governance.setTotalVotes(delegator, 1);
-    delegateVotes(delegatorSigner, delegatee1, 99);
+    delegateCelo(delegatorSigner, delegatee1, 99);
 
     assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegator), 10);
     assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegatee1), 990);
@@ -1582,9 +1591,9 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
     public
   {
     whenVoteSigner_LockedGoldDelegateGovernanceVotes();
-    delegateVotes(delegatorSigner, delegatee1, 10);
+    delegateCelo(delegatorSigner, delegatee1, 10);
     vm.expectRevert("Cannot delegate more than 100%");
-    delegateVotes(delegatorSigner, delegatee2, 100);
+    delegateCelo(delegatorSigner, delegatee2, 100);
   }
 
   function test_ShouldDelegateCorrectlyWhenDelegatedToSameAccountInTwoSteps_WhenVoteSigners()
@@ -1592,8 +1601,8 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
   {
     whenVoteSigner_LockedGoldDelegateGovernanceVotes();
 
-    delegateVotes(delegatorSigner, delegatee1, 10);
-    delegateVotes(delegatorSigner, delegatee1, 100);
+    delegateCelo(delegatorSigner, delegatee1, 10);
+    delegateCelo(delegatorSigner, delegatee1, 100);
 
     assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegator), 0);
     assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegatee1), 1000);
@@ -1610,13 +1619,13 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
       delegatedAmount
     );
 
-    delegateVotes(delegatorSigner, delegatee1, percentToDelegate);
+    delegateCelo(delegatorSigner, delegatee1, percentToDelegate);
   }
 
   function test_ShouldDelegateVotesCorrectly_WhenVoteSigners() public {
     whenVoteSigner_LockedGoldDelegateGovernanceVotes();
 
-    delegateVotes(delegatorSigner, delegatee1, percentToDelegate);
+    delegateCelo(delegatorSigner, delegatee1, percentToDelegate);
     assertDelegatorDelegateeAmounts(delegator, delegatee1, percentToDelegate, delegatedAmount);
   }
 
@@ -1627,8 +1636,8 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
     uint256 delegatedAmount1 = 300;
     uint256 delegatedAmount2 = 200;
 
-    delegateVotes(delegatorSigner, delegatee1, percentToDelegate1);
-    delegateVotes(delegatorSigner2, delegatee2, percentToDelegate2);
+    delegateCelo(delegatorSigner, delegatee1, percentToDelegate1);
+    delegateCelo(delegatorSigner2, delegatee2, percentToDelegate2);
 
     assertDelegatorDelegateeAmounts(delegator, delegatee1, percentToDelegate1, delegatedAmount1);
     assertDelegatorDelegateeAmounts(delegator2, delegatee2, percentToDelegate2, delegatedAmount2);
@@ -1641,10 +1650,10 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
     uint256 percentToDelegate1 = 30;
     uint256 delegatedAmount1 = 300;
 
-    delegateVotes(delegatorSigner, delegateeSigner1, percentToDelegate1);
+    delegateCelo(delegatorSigner, delegateeSigner1, percentToDelegate1);
 
     lockCelo(delegator, value);
-    delegateVotes(delegatorSigner, delegatee1, percentToDelegate1);
+    delegateCelo(delegatorSigner, delegatee1, percentToDelegate1);
 
     assertDelegatorDelegateeAmounts(
       delegator,
@@ -1659,7 +1668,7 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
     uint256 percentToDelegate1 = 30;
     uint256 delegatedAmount1 = 300;
 
-    delegateVotes(delegatorSigner, delegatee1, percentToDelegate1);
+    delegateCelo(delegatorSigner, delegatee1, percentToDelegate1);
 
     lockCelo(delegator, value);
     vm.expectEmit(true, true, true, true);
@@ -1669,14 +1678,14 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
       FixidityLib.newFixedFraction(percentToDelegate1, 100).unwrap(),
       delegatedAmount1 * 2
     );
-    delegateVotes(delegatorSigner, delegatee1, percentToDelegate1);
+    delegateCelo(delegatorSigner, delegatee1, percentToDelegate1);
   }
 
   function shouldRevertWhenTryingToAddExtraDelegatee(address _delegatorSinger) public {
     lockedGold.setMaxDelegateesCount(2);
     lockCelo(delegator, value);
-    delegateVotes(_delegatorSinger, delegatee1, 50);
-    delegateVotes(_delegatorSinger, delegatee2, 50);
+    delegateCelo(_delegatorSinger, delegatee1, 50);
+    delegateCelo(_delegatorSinger, delegatee2, 50);
 
     address[] memory delegateesOfDelegator = lockedGold.getDelegateesOfDelegator(delegator);
     assertEq(delegateesOfDelegator.length, 2);
@@ -1684,7 +1693,7 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
     assertEq(delegateesOfDelegator[1], delegatee2);
 
     vm.expectRevert("Too many delegatees");
-    delegateVotes(_delegatorSinger, delegatee3, 50);
+    delegateCelo(_delegatorSinger, delegatee3, 50);
   }
 
   function test_ShouldRevertWhenTryingToAddExtraDelegatee() public {
@@ -1699,8 +1708,8 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
   function shouldAllowToAddExtraDelegatee_WhenLimitIsIncreased(address _delegatorSigner) public {
     lockedGold.setMaxDelegateesCount(2);
     lockCelo(delegator, value);
-    delegateVotes(_delegatorSigner, delegatee1, 50);
-    delegateVotes(_delegatorSigner, delegatee2, 40);
+    delegateCelo(_delegatorSigner, delegatee1, 50);
+    delegateCelo(_delegatorSigner, delegatee2, 40);
 
     address[] memory delegateesOfDelegator = lockedGold.getDelegateesOfDelegator(delegator);
     assertEq(delegateesOfDelegator.length, 2);
@@ -1797,8 +1806,8 @@ contract LockedGoldRevokeDelegatedGovernanceVotes is LockedGoldTest {
     uint256 amountFromDelegator1AfterRevoke = ((2 * delegatedAmount) / percentageToDelegate) *
       (percentageToDelegate - percentageToRevoke - percentageToRevokeAfterLock);
 
-    delegateVotes(_delegatorSigner, delegatee1, percentageToDelegate);
-    delegateVotes(_delegatorSigner2, delegatee1, percentageToDelegate);
+    delegateCelo(_delegatorSigner, delegatee1, percentageToDelegate);
+    delegateCelo(_delegatorSigner2, delegatee1, percentageToDelegate);
     revokeDelegatedVotes(_delegatorSigner, delegatee1, percentageToRevoke);
     assertEq(
       lockedGold.getAccountTotalGovernanceVotingPower(delegatee1),
@@ -1828,8 +1837,8 @@ contract LockedGoldRevokeDelegatedGovernanceVotes is LockedGoldTest {
     uint256 amountFromDelegator1AfterRevoke = ((2 * delegatedAmount) / percentageToDelegate) *
       (percentageToDelegate - percentageToRevoke - percentageToRevokeAfterLock);
 
-    delegateVotes(_delegatorSigner, delegatee1, percentageToDelegate);
-    delegateVotes(_delegatorSigner2, delegatee1, percentageToDelegate);
+    delegateCelo(_delegatorSigner, delegatee1, percentageToDelegate);
+    delegateCelo(_delegatorSigner2, delegatee1, percentageToDelegate);
     revokeDelegatedVotes(_delegatorSigner, delegatee1, percentageToRevoke);
 
     assertEq(
@@ -1879,8 +1888,8 @@ contract LockedGoldRevokeDelegatedGovernanceVotes is LockedGoldTest {
     if (lock) {
       lockCelo(_delegator, value);
     }
-    delegateVotes(_delegatorSigner, _delegatee1, percentageToDelegate);
-    delegateVotes(_delegatorSigner, _delegatee2, percentageToDelegate);
+    delegateCelo(_delegatorSigner, _delegatee1, percentageToDelegate);
+    delegateCelo(_delegatorSigner, _delegatee2, percentageToDelegate);
     governance.setTotalVotes(_delegatee1, votingWeight);
     revokeDelegatedVotes(_delegatorSigner, _delegatee1, percentageToRevoke);
 
@@ -1893,8 +1902,8 @@ contract LockedGoldRevokeDelegatedGovernanceVotes is LockedGoldTest {
     if (lockGold) {
       lockCelo(delegator, value);
     }
-    delegateVotes(_delegatorSigner, delegatee1, percentageToDelegate);
-    delegateVotes(_delegatorSigner, delegatee2, percentageToDelegate);
+    delegateCelo(_delegatorSigner, delegatee1, percentageToDelegate);
+    delegateCelo(_delegatorSigner, delegatee2, percentageToDelegate);
     revokeDelegatedVotes(_delegatorSigner, delegatee1, percentageToRevoke);
 
     assertDelegatedVotes_ShouldRevokeCorrectly();
@@ -1937,7 +1946,7 @@ contract LockedGoldRevokeDelegatedGovernanceVotes is LockedGoldTest {
 
   function test_ShouldRevertWhenTryingToRevertMorePercentThanDelegated() public {
     lockCelo(delegator, 100);
-    delegateVotes(delegator, delegatee1, 50);
+    delegateCelo(delegator, delegatee1, 50);
 
     vm.expectRevert("Not enough total delegated percents");
     revokeDelegatedVotes(delegator, delegatee1, 51);
@@ -1945,7 +1954,7 @@ contract LockedGoldRevokeDelegatedGovernanceVotes is LockedGoldTest {
 
   function test_ShouldRevokeVotesCorrectly_WhenDelegateeNotVoting() public {
     lockCelo(delegator, value);
-    delegateVotes(delegator, delegatee1, percentageToDelegate);
+    delegateCelo(delegator, delegatee1, percentageToDelegate);
     revokeDelegatedVotes(delegator, delegatee1, percentageToRevoke);
 
     assertDelegatorDelegateeAmounts(
@@ -1964,7 +1973,7 @@ contract LockedGoldRevokeDelegatedGovernanceVotes is LockedGoldTest {
 
   function test_ShouldEmitDelegatedCeloRevokedEvent() public {
     lockCelo(delegator, value);
-    delegateVotes(delegator, delegatee1, percentageToDelegate);
+    delegateCelo(delegator, delegatee1, percentageToDelegate);
 
     vm.expectEmit(true, true, true, true);
     emit DelegatedCeloRevoked(
@@ -2006,7 +2015,7 @@ contract LockedGoldRevokeDelegatedGovernanceVotes is LockedGoldTest {
 
   function test_ShouldRevertWhenTryingToRevertMorePercentThanDelegated_WhenVoteSigners() public {
     whenVoteSigner_LockedGoldRevokeDelegatedGovernanceVotes();
-    delegateVotes(delegatorSigner, delegateeSigner1, 50);
+    delegateCelo(delegatorSigner, delegateeSigner1, 50);
 
     vm.expectRevert("Not enough total delegated percents");
     revokeDelegatedVotes(delegatorSigner, delegateeSigner1, 51);
@@ -2015,7 +2024,7 @@ contract LockedGoldRevokeDelegatedGovernanceVotes is LockedGoldTest {
   function test_ShouldRevokeVotesCorrectly_WhenDelegateeNotVoting_WhenVoteSigners() public {
     whenVoteSigner_LockedGoldRevokeDelegatedGovernanceVotes();
 
-    delegateVotes(delegatorSigner, delegateeSigner1, percentageToDelegate);
+    delegateCelo(delegatorSigner, delegateeSigner1, percentageToDelegate);
     revokeDelegatedVotes(delegatorSigner, delegateeSigner1, percentageToRevoke);
 
     assertDelegatorDelegateeAmounts(
@@ -2034,7 +2043,7 @@ contract LockedGoldRevokeDelegatedGovernanceVotes is LockedGoldTest {
 
   function test_ShouldEmitDelegatedCeloRevokedEvent_WhenVoteSigners() public {
     whenVoteSigner_LockedGoldRevokeDelegatedGovernanceVotes();
-    delegateVotes(delegatorSigner, delegatee1, percentageToDelegate);
+    delegateCelo(delegatorSigner, delegatee1, percentageToDelegate);
 
     vm.expectEmit(true, true, true, true);
     emit DelegatedCeloRevoked(
@@ -2119,7 +2128,7 @@ contract LockedGoldGetAccountTotalGovernanceVotingPower is LockedGoldTest {
   function test_ShouldReturnCorrectValueWhenLockedAndDelegatedForDelegateeAndDelegator_WhenOnlyDelegated_WhenHavingAccounts()
     public
   {
-    delegateVotes(delegator, delegatee, delegatedPercent);
+    delegateCelo(delegator, delegatee, delegatedPercent);
 
     assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegatee), delegatedAmount);
     assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegator), value - delegatedAmount);
@@ -2129,7 +2138,7 @@ contract LockedGoldGetAccountTotalGovernanceVotingPower is LockedGoldTest {
     public
   {
     lockCelo(delegatee, value);
-    delegateVotes(delegator, delegatee, delegatedPercent);
+    delegateCelo(delegator, delegatee, delegatedPercent);
 
     assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegatee), delegatedAmount + value);
     assertEq(lockedGold.getAccountTotalGovernanceVotingPower(delegator), value - delegatedAmount);
@@ -2167,7 +2176,7 @@ contract LockedGoldGetDelegatorDelegateeInfo is LockedGoldTest {
   function test_ShouldReturnCorrectPercentAndAmount_WhenLockedCelo() public {
     lockCelo(delegator, value);
     lockCelo(delegatee, value);
-    delegateVotes(delegator, delegatee, percent);
+    delegateCelo(delegator, delegatee, percent);
 
     (uint256 fraction, uint256 currentAmount) = lockedGold.getDelegatorDelegateeInfo(
       delegator,
@@ -2242,7 +2251,7 @@ contract LockedGoldGetDelegatorDelegateeExpectedAndRealAmount is LockedGoldTest 
   }
 
   function test_ShouldReturnEqualAmounts_WhenDelegated() public {
-    delegateVotes(delegator, delegatee, percent);
+    delegateCelo(delegator, delegatee, percent);
     assertDelegatorDelegateeExpectedAndRealAmount(delegator, delegatee, amount, amount);
   }
 
@@ -2253,7 +2262,7 @@ contract LockedGoldGetDelegatorDelegateeExpectedAndRealAmount is LockedGoldTest 
   ) public {
     uint256 updatedDelegatedAmount = ((value * 2) / 100) * percent;
 
-    delegateVotes(_delegatorSigner, _delegatee, percent);
+    delegateCelo(_delegatorSigner, _delegatee, percent);
     lockCelo(_delegator, value);
 
     assertDelegatorDelegateeExpectedAndRealAmount(
@@ -2345,7 +2354,7 @@ contract LockedGoldUpdateDelegatedAmount is LockedGoldTest {
     address _delegatorSigner,
     address _delegatee
   ) public {
-    delegateVotes(_delegatorSigner, _delegatee, delegatedPercent);
+    delegateCelo(_delegatorSigner, _delegatee, delegatedPercent);
 
     assertEq(lockedGold.getAccountTotalGovernanceVotingPower(_delegatee), delegatedAmount);
     assertDelegatorDelegateeAmounts(_delegator, _delegatee, delegatedPercent, delegatedAmount);
