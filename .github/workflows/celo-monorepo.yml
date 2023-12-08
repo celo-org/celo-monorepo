@@ -77,11 +77,7 @@ jobs:
         run: yarn run postinstall
         if: steps.cache_node.outputs.cache-hit == 'true'
       - name: Build packages
-      # Just until contractkit is removed wait to build all packages the need abis to be built first
-        run: |
-          yarn build --ignore @celo/contractkit  --ignore @celo/explorer --ignore @celo/celocli --ignore @celo/governance --ignore @celo/metadata-crawler --ignore @celo/celotool --ignore @celo/env-tests --ignore @celo/transactions-uri --ignore @celo/wallet-rpc --include-dependencies
-          yarn --cwd packages/protocol run prepare_contracts_and_abis_publishing
-          yarn build --ignore docs --include-dependencies
+        run: yarn build --ignore docs --include-dependencies
       - name: Check licenses
         if: steps.cache_node.outputs.cache-hit != 'true'
         run: |
