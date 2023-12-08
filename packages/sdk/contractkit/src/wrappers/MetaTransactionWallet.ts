@@ -1,9 +1,9 @@
+import { MetaTransactionWallet } from '@celo/abis/web3/MetaTransactionWallet'
 import { Address, ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import { Signature } from '@celo/base/lib/signatureUtils'
 import { CeloTransactionObject, CeloTxObject, toTransactionObject } from '@celo/connect'
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import BigNumber from 'bignumber.js'
-import { MetaTransactionWallet } from '../generated/MetaTransactionWallet'
 import {
   BaseWrapper,
   proxyCall,
