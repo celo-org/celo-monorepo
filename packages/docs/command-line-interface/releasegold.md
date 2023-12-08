@@ -339,10 +339,10 @@ _See code: [src/commands/releasegold/set-can-expire.ts](https://github.com/celo-
 
 ## `celocli releasegold:set-liquidity-provision`
 
-Set the liquidity provision to true, allowing the beneficiary to withdraw released celo.
+Set the liquidity provision to true, allowing the beneficiary to withdraw released gold.
 
 ```
-Set the liquidity provision to true, allowing the beneficiary to withdraw released celo.
+Set the liquidity provision to true, allowing the beneficiary to withdraw released gold.
 
 USAGE
   $ celocli releasegold:set-liquidity-provision
