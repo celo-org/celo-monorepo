@@ -9,6 +9,8 @@ import {
   ABIS_PACKAGE_SRC_DIR,
   BUILD_EXECUTABLE,
   BuildTarget,
+  CONTRACTS_08_PACKAGE_DESTINATION_DIR,
+  CONTRACTS_08_SOURCE_DIR,
   CONTRACTS_PACKAGE_SRC_DIR,
   PublishContracts,
   TSCONFIG_PATH,
@@ -26,7 +28,7 @@ try {
   fs.writeFileSync(TSCONFIG_PATH, JSON.stringify(tsconfig, null, 4))
 
   // Start from scratch
-  rmrfSync([ABIS_BUILD_DIR, ABIS_DIST_DIR])
+  rmrfSync([ABIS_BUILD_DIR, ABIS_DIST_DIR, CONTRACTS_08_PACKAGE_DESTINATION_DIR])
   fs.mkdirSync(ABIS_BUILD_DIR, { recursive: true })
   fs.mkdirSync(ABIS_DIST_DIR, { recursive: true })
 
@@ -64,6 +66,9 @@ try {
   log('Running yarn wagmi generate')
   child_process.execSync(`yarn wagmi generate`, { stdio: 'inherit' })
 
+  // must be after wagmi gen but before compiling
+  createIndex()
+
   log('Compiling esm')
   child_process.execSync(`yarn tsc -b ${path.join(ABIS_PACKAGE_SRC_DIR, 'tsconfig-esm.json')}`, {
     stdio: 'inherit',
@@ -80,19 +85,32 @@ try {
   })
 
   exports = {
+    '.': {
+      import: './dist/esm/index.js',
+      require: './dist/cjs/index.js',
+      types: './dist/types/index.d.ts',
+    },
     ...exports,
     ...prepareTargetTypesExports(),
   }
 
   // Change the packages version to what CI is providing from environment variables
   prepareAbisPackageJson(exports)
-  prepareContractsPackageJson()
+  prepareContractsPackage()
 } finally {
   // Cleanup
   log('Cleaning up folders and checking out dirty git files')
   rmrfSync(`rm -rf ${ABIS_BUILD_DIR}/contracts*`)
   rmrfSync(`rm -rf ${ABIS_BUILD_DIR}/truffle*`)
   child_process.execSync(`git checkout ${TSCONFIG_PATH}`, { stdio: 'inherit' })
+}
+
+function createIndex() {
+  const reExports = PublishContracts.map((contractName) => {
+    return `export * from './${contractName}.js'`
+  })
+
+  fs.writeFileSync(path.join(ABIS_BUILD_DIR, 'index.ts'), reExports.join('\n'))
 }
 
 // Helper functions
@@ -230,7 +248,11 @@ function prepareAbisPackageJson(exports) {
   fs.writeFileSync(packageJsonPath, JSON.stringify(json, null, 2))
 }
 
-function prepareContractsPackageJson() {
+function prepareContractsPackage() {
+  const contracts08CpCommand = `cp -r ${CONTRACTS_08_SOURCE_DIR} ${CONTRACTS_08_PACKAGE_DESTINATION_DIR}`
+  log(contracts08CpCommand)
+  child_process.execSync(contracts08CpCommand)
+
   if (process.env.RELEASE_VERSION) {
     log('Replacing @celo/contracts version with RELEASE_VERSION)')
     const contractsPackageJsonPath = path.join(CONTRACTS_PACKAGE_SRC_DIR, 'package.json')
