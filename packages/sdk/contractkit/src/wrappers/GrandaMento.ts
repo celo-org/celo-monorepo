@@ -1,8 +1,8 @@
+import { GrandaMento } from '@celo/abis/web3/mento/GrandaMento'
+import { newStableToken } from '@celo/abis/web3/mento/StableToken'
 import BigNumber from 'bignumber.js'
 import { StableTokenContract } from '../base'
 import { StableToken as StableTokenEnum, stableTokenInfos } from '../celo-tokens'
-import { GrandaMento } from '../generated/mento/GrandaMento'
-import { newStableToken } from '../generated/mento/StableToken'
 import {
   BaseWrapper,
   fixidityValueToBigNumber,

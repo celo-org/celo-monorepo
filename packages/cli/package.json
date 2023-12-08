@@ -30,8 +30,8 @@
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
+    "@celo/abis": "10.0.0",
     "@celo/base": "^6.0.0",
-    "@celo/celo-devchain": "^6.0.3-beta.1",
     "@celo/connect": "^5.1.1",
     "@celo/contractkit": "^5.2.1",
     "@celo/explorer": "^5.0.6",
@@ -73,6 +73,7 @@
     "web3": "1.10.0"
   },
   "devDependencies": {
+    "@celo/celo-devchain": "^6.0.3",
     "@celo/dev-utils": "0.0.1",
     "@oclif/dev-cli": "^1.23.0",
     "@types/cli-table": "^0.3.0",
