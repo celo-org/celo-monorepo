@@ -1,6 +1,7 @@
 import { execSync } from 'child_process'
 import { SemVer } from 'semver'
 const DAILY_RELEASE_TAG = 'canary'
+const WORKING_RELEASE_BRANCH_PREFIX = 'release/core-contracts/'
 const npmTag = process.env.NPM_TAG?.trim() || ''
 const gitTag = process.env.GITHUB_TAG || ''
 let nextVersion: SemVer
@@ -29,13 +30,13 @@ if (matchesReleaseTag) {
   nextVersion = new SemVer(
     `${tempVersion.major}.${tempVersion.minor}.${tempVersion.patch}-pre-audit.0`
   )
-} else if (branchName.startsWith('release/core-contracts')) {
+} else if (branchName.startsWith(WORKING_RELEASE_BRANCH_PREFIX)) {
   console.log(`Doing ${DAILY_RELEASE_TAG} release`)
   const lastVersion = getPreviousVersion(DAILY_RELEASE_TAG, 'latest')
   const lastVersionSemVer = new SemVer(lastVersion)
 
   // since branch names are of the form release/core-contracts.XX we can check the major from the branch name
-  const major = branchName.split('release/core-contracts/')[1]
+  const major = branchName.split(WORKING_RELEASE_BRANCH_PREFIX)[1]
 
   const firstCanaryOfMajor = lastVersionSemVer.major !== parseInt(major, 10)
   nextVersion = lastVersionSemVer.inc(
