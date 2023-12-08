@@ -71,7 +71,7 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
     expect(destroyedContract).toBe(contractAddress)
   })
 
-  describe('#when account exists with locked gold', () => {
+  describe('#when account exists with locked celo', () => {
     const value = '10'
 
     beforeEach(async () => {
