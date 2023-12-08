@@ -159,75 +159,74 @@ export const proposalToJSON = async (
   }
   const abiCoder = kit.connection.getAbiCoder()
 
-  const proposalJson: ProposalTransactionJSON[] = await Promise.all(
-    proposal.map(async (tx) => {
-      debug(`decoding tx ${JSON.stringify(tx)}`)
-      const parsedTx = await blockExplorer.tryParseTx(tx as CeloTxPending)
-      if (parsedTx == null) {
-        throw new Error(`Unable to parse ${JSON.stringify(tx)} with block explorer`)
-      }
-      if (isRegistryRepointRaw(abiCoder, tx) && parsedTx.callDetails.isCoreContract) {
-        const args = registryRepointRawArgs(abiCoder, tx)
-        await updateRegistryMapping(args.name, args.address)
-      }
+  const proposalJson: ProposalTransactionJSON[] = []
 
-      const jsonTx: ProposalTransactionJSON = {
-        contract: parsedTx.callDetails.contract as CeloContract,
-        address: parsedTx.callDetails.contractAddress,
-        function: parsedTx.callDetails.function,
-        args: parsedTx.callDetails.argList,
-        params: parsedTx.callDetails.paramMap,
-        value: parsedTx.tx.value,
-      }
+  for (const tx of proposal) {
+    const parsedTx = await blockExplorer.tryParseTx(tx as CeloTxPending)
+    if (parsedTx == null) {
+      throw new Error(`Unable to parse ${JSON.stringify(tx)} with block explorer`)
+    }
+    if (isRegistryRepointRaw(abiCoder, tx) && parsedTx.callDetails.isCoreContract) {
+      const args = registryRepointRawArgs(abiCoder, tx)
+      await updateRegistryMapping(args.name, args.address)
+    }
 
-      if (isProxySetFunction(jsonTx)) {
+    const jsonTx: ProposalTransactionJSON = {
+      contract: parsedTx.callDetails.contract as CeloContract,
+      address: parsedTx.callDetails.contractAddress,
+      function: parsedTx.callDetails.function,
+      args: parsedTx.callDetails.argList,
+      params: parsedTx.callDetails.paramMap,
+      value: parsedTx.tx.value,
+    }
+
+    if (isProxySetFunction(jsonTx)) {
+      jsonTx.contract = suffixProxy(jsonTx.contract)
+      await blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
+    } else if (isProxySetAndInitFunction(jsonTx)) {
+      await blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
+      let initAbi
+      if (parsedTx.callDetails.isCoreContract) {
         jsonTx.contract = suffixProxy(jsonTx.contract)
-        await blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
-      } else if (isProxySetAndInitFunction(jsonTx)) {
-        await blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
-        let initAbi
-        if (parsedTx.callDetails.isCoreContract) {
-          jsonTx.contract = suffixProxy(jsonTx.contract)
-          initAbi = getInitializeAbiOfImplementation(jsonTx.contract as any)
-        } else {
-          const implAddress = jsonTx.args[0]
-          const metadata = await fetchMetadata(kit.connection, implAddress)
-          if (metadata && metadata.abi) {
-            initAbi = metadata?.abiForMethod('initialize')[0]
-          }
-        }
-
-        if (initAbi !== undefined) {
-          // Transform delegate call initialize args into a readable params map
-          // 8 bytes for function sig
-          const initSig = trimLeading0x(jsonTx.args[1]).slice(0, 8)
-          const initArgs = trimLeading0x(jsonTx.args[1]).slice(8)
-
-          const { params: initParams } = parseDecodedParams(
-            kit.connection.getAbiCoder().decodeParameters(initAbi.inputs!, initArgs)
-          )
-          jsonTx.params![`initialize@${initSig}`] = initParams
-        }
-      } else if (isGovernanceConstitutionSetter(jsonTx)) {
-        const [address, functionId, threshold] = jsonTx.args
-        const contractMapping = await blockExplorer.getContractMappingWithSelector(
-          address,
-          functionId
-        )
-        if (contractMapping === undefined) {
-          throw new Error(
-            `Governance.setConstitution targets unknown address ${address} and function id ${functionId}`
-          )
-        }
-        jsonTx.params![`setConstitution[${address}][${functionId}]`] = {
-          contract: contractMapping.details.name,
-          method: contractMapping.fnMapping.get(functionId)?.name,
-          threshold: fromFixed(new BigNumber(threshold)),
+        initAbi = getInitializeAbiOfImplementation(jsonTx.contract as any)
+      } else {
+        const implAddress = jsonTx.args[0]
+        const metadata = await fetchMetadata(kit.connection, implAddress)
+        if (metadata && metadata.abi) {
+          initAbi = metadata?.abiForMethod('initialize')[0]
         }
       }
-      return jsonTx
-    })
-  )
+
+      if (initAbi !== undefined) {
+        // Transform delegate call initialize args into a readable params map
+        // 8 bytes for function sig
+        const initSig = trimLeading0x(jsonTx.args[1]).slice(0, 8)
+        const initArgs = trimLeading0x(jsonTx.args[1]).slice(8)
+
+        const { params: initParams } = parseDecodedParams(
+          kit.connection.getAbiCoder().decodeParameters(initAbi.inputs!, initArgs)
+        )
+        jsonTx.params![`initialize@${initSig}`] = initParams
+      }
+    } else if (isGovernanceConstitutionSetter(jsonTx)) {
+      const [address, functionId, threshold] = jsonTx.args
+      const contractMapping = await blockExplorer.getContractMappingWithSelector(
+        address,
+        functionId
+      )
+      if (contractMapping === undefined) {
+        throw new Error(
+          `Governance.setConstitution targets unknown address ${address} and function id ${functionId}`
+        )
+      }
+      jsonTx.params![`setConstitution[${address}][${functionId}]`] = {
+        contract: contractMapping.details.name,
+        method: contractMapping.fnMapping.get(functionId)?.name,
+        threshold: fromFixed(new BigNumber(threshold)),
+      }
+    }
+    proposalJson.push(jsonTx)
+  }
 
   return proposalJson
 }
