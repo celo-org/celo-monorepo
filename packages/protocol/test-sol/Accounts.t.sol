@@ -3,10 +3,6 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
-import "../contracts/identity/Escrow.sol";
-import "../contracts/identity/FederatedAttestations.sol";
-import "../contracts/identity/test/MockAttestations.sol";
-import "../contracts/identity/test/MockERC20Token.sol";
 import "../contracts/common/FixidityLib.sol";
 import "../contracts/common/Registry.sol";
 import "../contracts/common/Accounts.sol";
