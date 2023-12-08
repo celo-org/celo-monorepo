@@ -343,7 +343,9 @@ contract LockedGoldUnlock is LockedGoldTest {
     lockedGold.lock.value(value)();
   }
 
-  function test_ShouldAddAPendingWithdrawal() public {
+  function test_ShouldAddAPendingWithdrawal_WhenAccountIsNotVotingInGovernance_WhenThereAreNoBalanceRequirements()
+    public
+  {
     lockedGold.unlock(value);
     (uint256 val, uint256 timestamp) = lockedGold.getPendingWithdrawal(caller, 0);
     assertEq(val, value);
@@ -352,7 +354,9 @@ contract LockedGoldUnlock is LockedGoldTest {
     lockedGold.getPendingWithdrawal(caller, 1);
   }
 
-  function test_ShouldAddPendingWithdrawals() public {
+  function test_ShouldAddPendingWithdrawals_WhenAccountIsNotVotingInGovernance_WhenThereAreNoBalanceRequirements()
+    public
+  {
     lockedGold.unlock(value);
     (uint256[] memory vals, uint256[] memory timestamps) = lockedGold.getPendingWithdrawals(caller);
     assertEq(vals.length, 1);
@@ -361,33 +365,45 @@ contract LockedGoldUnlock is LockedGoldTest {
     assertEq(timestamps[0], availabilityTime);
   }
 
-  function test_ShouldDecreaseTheACcountsNonVotingLockedGoldBalance() public {
+  function test_ShouldDecreaseTheACcountsNonVotingLockedGoldBalance_WhenAccountIsNotVotingInGovernance_WhenThereAreNoBalanceRequirements()
+    public
+  {
     lockedGold.unlock(value);
     assertEq(lockedGold.getAccountNonvotingLockedGold(caller), 0);
   }
 
-  function test_ShouldDecreaseTheAccountsTotalLockedGoldBalance() public {
+  function test_ShouldDecreaseTheAccountsTotalLockedGoldBalance_WhenAccountIsNotVotingInGovernance_WhenThereAreNoBalanceRequirements()
+    public
+  {
     lockedGold.unlock(value);
     assertEq(lockedGold.getAccountTotalLockedGold(caller), 0);
   }
 
-  function test_ShouldDecreaseTheNonVotingLockedGoldBalance() public {
+  function test_ShouldDecreaseTheNonVotingLockedGoldBalance_WhenAccountIsNotVotingInGovernance_WhenThereAreNoBalanceRequirements()
+    public
+  {
     lockedGold.unlock(value);
     assertEq(lockedGold.getNonvotingLockedGold(), 0);
   }
 
-  function test_ShouldDecreaseTheTotalLockedGoldBalance() public {
+  function test_ShouldDecreaseTheTotalLockedGoldBalance_WhenAccountIsNotVotingInGovernance_WhenThereAreNoBalanceRequirements()
+    public
+  {
     lockedGold.unlock(value);
     assertEq(lockedGold.getTotalLockedGold(), 0);
   }
 
-  function test_ShouldEmitGoldUnlockedEvent() public {
+  function test_ShouldEmitGoldUnlockedEvent_WhenAccountIsNotVotingInGovernance_WhenThereAreNoBalanceRequirements()
+    public
+  {
     vm.expectEmit(true, true, true, true);
     emit GoldUnlocked(caller, value, availabilityTime);
     lockedGold.unlock(value);
   }
 
-  function test_ShouldRevertWhenUnlockingGoldThatIsVotedWith() public {
+  function test_ShouldRevertWhenUnlockingGoldThatIsVotedWith_WhenThereAreNoBalanceRequirements()
+    public
+  {
     governance.setVoting(caller);
     governance.setTotalVotes(caller, votingGold);
 
@@ -395,12 +411,14 @@ contract LockedGoldUnlock is LockedGoldTest {
     lockedGold.unlock(value);
   }
 
-  function test_ShouldRevertWhenUnlockingMoreThenLocked() public {
+  function test_ShouldRevertWhenUnlockingMoreThenLocked_WhenThereAreNoBalanceRequirements() public {
     vm.expectRevert("SafeMath: subtraction overflow");
     lockedGold.unlock(value + 1);
   }
 
-  function test_ShouldAddAPendingWithdrawal_WhenTheAccountIsRequestingOnlyNonVotingGold() public {
+  function test_ShouldAddAPendingWithdrawal_WhenTheAccountIsRequestingOnlyNonVotingGold_WhenThereAreNoBalanceRequirements()
+    public
+  {
     governance.setVoting(caller);
     governance.setTotalVotes(caller, votingGold);
 
@@ -412,7 +430,9 @@ contract LockedGoldUnlock is LockedGoldTest {
     lockedGold.getPendingWithdrawal(caller, 1);
   }
 
-  function test_ShouldAddPendingWithdrawals_WhenTheAccountIsRequestingOnlyNonVotingGold() public {
+  function test_ShouldAddPendingWithdrawals_WhenTheAccountIsRequestingOnlyNonVotingGold_WhenThereAreNoBalanceRequirements()
+    public
+  {
     governance.setVoting(caller);
     governance.setTotalVotes(caller, votingGold);
 
@@ -424,7 +444,7 @@ contract LockedGoldUnlock is LockedGoldTest {
     assertEq(timestamps[0], availabilityTime);
   }
 
-  function test_ShouldDecreaseTheACcountsNonVotingLockedGoldBalance_WhenTheAccountIsRequestingOnlyNonVotingGold()
+  function test_ShouldDecreaseTheACcountsNonVotingLockedGoldBalance_WhenTheAccountIsRequestingOnlyNonVotingGold_WhenThereAreNoBalanceRequirements()
     public
   {
     governance.setVoting(caller);
@@ -434,7 +454,7 @@ contract LockedGoldUnlock is LockedGoldTest {
     assertEq(lockedGold.getAccountNonvotingLockedGold(caller), votingGold);
   }
 
-  function test_ShouldDecreaseTheAccountsTotalLockedGoldBalance_WhenTheAccountIsRequestingOnlyNonVotingGold()
+  function test_ShouldDecreaseTheAccountsTotalLockedGoldBalance_WhenTheAccountIsRequestingOnlyNonVotingGold_WhenThereAreNoBalanceRequirements()
     public
   {
     governance.setVoting(caller);
@@ -444,7 +464,7 @@ contract LockedGoldUnlock is LockedGoldTest {
     assertEq(lockedGold.getAccountTotalLockedGold(caller), votingGold);
   }
 
-  function test_ShouldDecreaseTheNonVotingLockedGoldBalance_WhenTheAccountIsRequestingOnlyNonVotingGold()
+  function test_ShouldDecreaseTheNonVotingLockedGoldBalance_WhenTheAccountIsRequestingOnlyNonVotingGold_WhenThereAreNoBalanceRequirements()
     public
   {
     governance.setVoting(caller);
@@ -454,7 +474,7 @@ contract LockedGoldUnlock is LockedGoldTest {
     assertEq(lockedGold.getNonvotingLockedGold(), votingGold);
   }
 
-  function test_ShouldDecreaseTheTotalLockedGoldBalance_WhenTheAccountIsRequestingOnlyNonVotingGold()
+  function test_ShouldDecreaseTheTotalLockedGoldBalance_WhenTheAccountIsRequestingOnlyNonVotingGold_WhenThereAreNoBalanceRequirements()
     public
   {
     governance.setVoting(caller);
