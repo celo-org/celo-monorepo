@@ -16,7 +16,7 @@ let nextVersion: SemVer
 const matchesReleaseTag = gitTag.match(/core-contracts.v(.+).post-audit/)
 const matchesPreAuditTag = gitTag.match(/core-contracts.v(.+).pre-audit/)
 
-const branchName = execSync('git symbolic-ref --short HEAD').toString().trim()
+const branchName = execSync('git branch --show-current').toString().trim()
 
 console.log('BRANCH_NAME', branchName, 'NPM_TAG', npmTag, 'GIT_TAG', gitTag)
 
