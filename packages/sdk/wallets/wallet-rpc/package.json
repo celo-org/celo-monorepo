@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1",
-    "@celo/contractkit": "^5.2.0",
+    "@celo/contractkit": "^6.0.0-beta.0",
     "bn.js": "^5.1.0",
     "web3": "1.10.0"
   },

@@ -1,5 +1,12 @@
 # @celo/env-tests
 
+## 1.0.3-beta.0
+
+### Patch Changes
+
+- Updated dependencies [1c9c844cf]
+  - @celo/contractkit@6.0.0-beta.0
+
 ## 1.0.2
 
 ### Patch Changes
