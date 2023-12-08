@@ -57,15 +57,18 @@ process.exit(0)
 // get the previous version for this tag or if not exists find the previous for the fallback
 function getPreviousVersion(tag = DAILY_RELEASE_TAG, fallbackTag = 'latest') {
   try {
-    return execSync(`npm view @celo/contracts@${tag} version`, { stdio: 'inherit' })
-      .toString()
-      .trim()
+    return fetchVersionFromNpm(tag)
   } catch (e) {
-    console.info('The  "npm ERR! 404 No match found for version" can be ignored')
-    return execSync(`npm view @celo/contracts@${fallbackTag} version`, { stdio: 'inherit' })
-      .toString()
-      .trim()
+    return fetchVersionFromNpm(fallbackTag)
   }
+}
+
+function fetchVersionFromNpm(tag: string) {
+  return execSync(`npm view @celo/contracts@${tag} version`, {
+    stdio: ['ignore', 'pipe', 'ignore'],
+  })
+    .toString()
+    .trim()
 }
 
 function getVersionFromGitTag(matchedTag: RegExpMatchArray) {
