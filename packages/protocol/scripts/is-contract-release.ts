@@ -16,8 +16,7 @@ let nextVersion: SemVer
 
 const matchesReleaseTag = gitTag.match(/core-contracts.v(.+).post-audit/)
 const matchesPreAuditTag = gitTag.match(/core-contracts.v(.+).pre-audit/)
-
-const branchName = execSync('git branch --show-current', { stdio: 'inherit' }).toString().trim()
+const branchName = execSync('git branch --show-current').toString().trim()
 
 if (matchesReleaseTag) {
   nextVersion = getVersionFromGitTag(matchesReleaseTag)
