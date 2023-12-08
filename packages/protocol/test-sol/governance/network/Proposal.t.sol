@@ -7,7 +7,7 @@ import "celo-foundry/Test.sol";
 import "../../../contracts/governance/Proposals.sol";
 import "../../../contracts/common/FixidityLib.sol";
 
-contract GetSupportWithQuorumPadding is Test {
+contract ProposalGetSupportWithQuorumPadding is Test {
   using Proposals for Proposals.Proposal;
   using FixidityLib for FixidityLib.Fraction;
 

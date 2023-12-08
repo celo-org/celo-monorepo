@@ -238,7 +238,7 @@ contract EscrowAddDefaultTrustedIssuer is EscrowTest {
   }
 }
 
-contract WhenMaxTrustedIssuersHaveBeenAdded is EscrowTest {
+contract EscrowWhenMaxTrustedIssuersHaveBeenAdded is EscrowTest {
   address[] expectedTrustedIssuers;
   function setUp() public {
     super.setUp();

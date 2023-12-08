@@ -34,7 +34,7 @@ contract ExtractFunctionSignatureTest is Test {
     testTransactions = new TestTransactions();
   }
 
-  function testExtractFunctionSignature() public {
+  function test_ExtractFunctionSignature() public {
     // Arrange
     bytes memory data = abi.encodeWithSignature("setValue(uint256,uint256,bool)", 1, 1, true);
     bytes4 expectedSignature = bytes4(keccak256("setValue(uint256,uint256,bool)"));
