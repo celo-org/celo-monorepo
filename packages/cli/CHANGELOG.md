@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.1.2-beta.0
+
+### Patch Changes
+
+- bb3cf9f2e: update terminology: refer to celo not gold.
+- bb3cf9f2e: Alias releasecelo to releasegold
+- Updated dependencies [1c9c844cf]
+- Updated dependencies [86bbfddf1]
+  - @celo/contractkit@6.0.0-beta.0
+  - @celo/governance@5.0.7-beta.0
+  - @celo/explorer@5.0.7-beta.0
+
 ## 3.1.1
 
 ### Patch Changes
