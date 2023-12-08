@@ -17,7 +17,7 @@ let nextVersion: SemVer
 const matchesReleaseTag = gitTag.match(/core-contracts.v(.+).post-audit/)
 const matchesPreAuditTag = gitTag.match(/core-contracts.v(.+).pre-audit/)
 
-const branchName = execSync('git branch --show-current').toString().trim()
+const branchName = execSync('git branch --show-current', { stdio: 'inherit' }).toString().trim()
 
 if (matchesReleaseTag) {
   nextVersion = getVersionFromGitTag(matchesReleaseTag)
@@ -58,10 +58,14 @@ process.exit(0)
 // get the previous version for this tag or if not exists find the previous for the fallback
 function getPreviousVersion(tag = DAILY_RELEASE_TAG, fallbackTag = 'latest') {
   try {
-    return execSync(`npm view @celo/contracts@${tag} version`).toString().trim()
+    return execSync(`npm view @celo/contracts@${tag} version`, { stdio: 'inherit' })
+      .toString()
+      .trim()
   } catch (e) {
     console.info('The  "npm ERR! 404 No match found for version" can be ignored')
-    return execSync(`npm view @celo/contracts@${fallbackTag} version`).toString().trim()
+    return execSync(`npm view @celo/contracts@${fallbackTag} version`, { stdio: 'inherit' })
+      .toString()
+      .trim()
   }
 }
 
