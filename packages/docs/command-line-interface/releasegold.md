@@ -98,14 +98,14 @@ USAGE
 
 OPTIONS
   -a, --action=lock|unlock|withdraw                      (required) Action to perform on
-                                                         contract's gold
+                                                         contract's celo
 
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the
                                                          ReleaseGold Contract
 
   --globalHelp                                           View all available global flags
 
-  --value=10000000000000000000000                        (required) Amount of gold to
+  --value=10000000000000000000000                        (required) Amount of celo to
                                                          perform `action` with
 
   --yes                                                  Answer yes to prompt
@@ -339,10 +339,10 @@ _See code: [src/commands/releasegold/set-can-expire.ts](https://github.com/celo-
 
 ## `celocli releasegold:set-liquidity-provision`
 
-Set the liquidity provision to true, allowing the beneficiary to withdraw released gold.
+Set the liquidity provision to true, allowing the beneficiary to withdraw released celo.
 
 ```
-Set the liquidity provision to true, allowing the beneficiary to withdraw released gold.
+Set the liquidity provision to true, allowing the beneficiary to withdraw released celo.
 
 USAGE
   $ celocli releasegold:set-liquidity-provision
@@ -364,10 +364,10 @@ _See code: [src/commands/releasegold/set-liquidity-provision.ts](https://github.
 
 ## `celocli releasegold:set-max-distribution`
 
-Set the maximum distribution of gold for the given contract
+Set the maximum distribution of celo for the given contract
 
 ```
-Set the maximum distribution of gold for the given contract
+Set the maximum distribution of celo for the given contract
 
 USAGE
   $ celocli releasegold:set-max-distribution
@@ -448,10 +448,10 @@ _See code: [src/commands/releasegold/transfer-dollars.ts](https://github.com/cel
 
 ## `celocli releasegold:withdraw`
 
-Withdraws `value` released gold to the beneficiary address. Fails if `value` worth of gold has not been released yet.
+Withdraws `value` released celo to the beneficiary address. Fails if `value` worth of celo has not been released yet.
 
 ```
-Withdraws `value` released gold to the beneficiary address. Fails if `value` worth of gold has not been released yet.
+Withdraws `value` released celo to the beneficiary address. Fails if `value` worth of celo has not been released yet.
 
 USAGE
   $ celocli releasegold:withdraw
@@ -463,7 +463,7 @@ OPTIONS
   --globalHelp                                           View all available global flags
 
   --value=10000000000000000000000                        (required) Amount of released
-                                                         gold (in wei) to withdraw
+                                                         celo (in wei) to withdraw
 
 EXAMPLE
   withdraw --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --value
