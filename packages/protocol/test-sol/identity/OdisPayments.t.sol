@@ -3,11 +3,10 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
-import "../contracts/identity/OdisPayments.sol";
-import { StableToken } from "../lib/mento-core/contracts/StableToken.sol";
-import "../contracts/common/Registry.sol";
-import "../contracts/common/Freezer.sol";
-import "forge-std/console.sol";
+import "../../contracts/identity/OdisPayments.sol";
+import { StableToken } from "../../lib/mento-core/contracts/StableToken.sol";
+import "../../contracts/common/Registry.sol";
+import "../../contracts/common/Freezer.sol";
 
 contract OdisPaymentsFoundryTest is Test {
   uint256 FIXED1 = 1000000000000000000000000;
@@ -141,6 +140,4 @@ contract OdisPaymentsFoundryTest_PayInCUSD is OdisPaymentsFoundryTest {
 
     assertEq(odisPayments.totalPaidCUSD(sender), 0);
   }
-
 }
-

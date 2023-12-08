@@ -2,14 +2,14 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
-import "../contracts/identity/test/AttestationsTest.sol";
-import "../contracts/identity/test/MockERC20Token.sol";
-import "../contracts/identity/test/MockRandom.sol";
-import "../contracts/governance/test/MockElection.sol";
-import "../contracts/governance/test/MockLockedGold.sol";
-import "../contracts/governance/test/MockValidators.sol";
-import "../contracts/common/Registry.sol";
-import "../contracts/common/Accounts.sol";
+import "../../contracts/identity/test/AttestationsTest.sol";
+import "../../contracts/identity/test/MockERC20Token.sol";
+import "../../contracts/identity/test/MockRandom.sol";
+import "../../contracts/governance/test/MockElection.sol";
+import "../../contracts/governance/test/MockLockedGold.sol";
+import "../../contracts/governance/test/MockValidators.sol";
+import "../../contracts/common/Registry.sol";
+import "../../contracts/common/Accounts.sol";
 
 contract AttestationsFoundryTest is Test {
   enum KeyOffsets {
