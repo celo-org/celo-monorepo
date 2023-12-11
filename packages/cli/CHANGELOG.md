@@ -8,6 +8,7 @@
 - Updated dependencies [e4da5a7a8]
   - @celo/governance@5.0.7-beta.1
 
+
 ## 3.1.2-beta.0
 
 ### Patch Changes
