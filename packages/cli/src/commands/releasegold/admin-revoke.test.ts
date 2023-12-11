@@ -1,6 +1,6 @@
+import { newReleaseGold } from '@celo/abis/web3/ReleaseGold'
 import { serializeSignature } from '@celo/base/lib/signatureUtils'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper } from '@celo/contractkit/lib/wrappers/Governance'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
@@ -71,7 +71,7 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
     expect(destroyedContract).toBe(contractAddress)
   })
 
-  describe('#when account exists with locked gold', () => {
+  describe('#when account exists with locked celo', () => {
     const value = '10'
 
     beforeEach(async () => {

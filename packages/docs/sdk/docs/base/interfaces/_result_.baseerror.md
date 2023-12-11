@@ -1,6 +1,6 @@
 [@celo/base](../README.md) › ["result"](../modules/_result_.md) › [BaseError](_result_.baseerror.md)
 
-# Interface: BaseError <**T**>
+# Interface: BaseError ‹**T**›
 
 ## Type parameters
 

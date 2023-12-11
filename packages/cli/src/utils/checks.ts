@@ -3,10 +3,6 @@ import { Address } from '@celo/connect'
 import { StableToken } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
-import {
-  ExchangeProposalState,
-  GrandaMentoWrapper,
-} from '@celo/contractkit/lib/wrappers/GrandaMento'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { MultiSigWrapper } from '@celo/contractkit/lib/wrappers/MultiSig'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
@@ -97,13 +93,6 @@ class CheckBuilder {
     }
   }
 
-  withGrandaMento<A>(f: (accounts: GrandaMentoWrapper) => A): () => Promise<Resolve<A>> {
-    return async () => {
-      const accounts = await this.kit.contracts.getGrandaMento()
-      return f(accounts) as Resolve<A>
-    }
-  }
-
   withGovernance<A>(
     f: (governance: GovernanceWrapper, signer: Address, account: Address, ctx: CheckBuilder) => A
   ): () => Promise<Resolve<A>> {
@@ -141,34 +130,6 @@ class CheckBuilder {
       `${proposalID} is an existing proposal`,
       this.withGovernance((governance) => governance.proposalExists(proposalID))
     )
-
-  grandaMentoProposalExists = (proposalID: string) =>
-    this.addCheck(
-      `${proposalID} is an existing proposal`,
-      this.withGrandaMento((grandaMento) => grandaMento.exchangeProposalExists(proposalID))
-    )
-
-  grandaMentoProposalHasState = (proposalID: string, state: ExchangeProposalState) =>
-    this.addCheck(
-      `${proposalID} has state ${ExchangeProposalState[state]}`,
-      this.withGrandaMento(async (grandaMento) => {
-        const exchangeProposal = await grandaMento.getExchangeProposal(proposalID)
-        return exchangeProposal.state === state
-      })
-    )
-
-  grandaMentoProposalIsExecutable = (proposalID: string) => {
-    this.grandaMentoProposalHasState(proposalID, ExchangeProposalState.Approved)
-    return this.addCheck(
-      `${proposalID} veto period has elapsed`,
-      this.withGrandaMento(async (grandaMento) => {
-        const exchangeProposal = await grandaMento.getExchangeProposal(proposalID)
-        return exchangeProposal.approvalTimestamp
-          .plus(exchangeProposal.vetoPeriodSeconds)
-          .isLessThanOrEqualTo(Date.now() / 1000)
-      })
-    )
-  }
 
   proposalInStage = (proposalID: string, stage: keyof typeof ProposalStage) =>
     this.addCheck(
@@ -270,7 +231,7 @@ class CheckBuilder {
 
   signerMeetsValidatorBalanceRequirements = () =>
     this.addCheck(
-      `Signer's account has enough locked gold for registration`,
+      `Signer's account has enough locked celo for registration`,
       this.withValidators((validators, _signer, account) =>
         validators.meetsValidatorBalanceRequirements(account)
       )
@@ -278,7 +239,7 @@ class CheckBuilder {
 
   signerMeetsValidatorGroupBalanceRequirements = () =>
     this.addCheck(
-      `Signer's account has enough locked gold for group registration`,
+      `Signer's account has enough locked celo for group registration`,
       this.withValidators((validators, _signer, account) =>
         validators.meetsValidatorGroupBalanceRequirements(account)
       )
@@ -286,13 +247,13 @@ class CheckBuilder {
 
   meetsValidatorBalanceRequirements = (account: Address) =>
     this.addCheck(
-      `${account} has enough locked gold for registration`,
+      `${account} has enough locked celo for registration`,
       this.withValidators((validators) => validators.meetsValidatorBalanceRequirements(account))
     )
 
   meetsValidatorGroupBalanceRequirements = (account: Address) =>
     this.addCheck(
-      `${account} has enough locked gold for group registration`,
+      `${account} has enough locked celo for group registration`,
       this.withValidators((validators) =>
         validators.meetsValidatorGroupBalanceRequirements(account)
       )

@@ -1,5 +1,5 @@
+import { newReleaseGold } from '@celo/abis/web3/ReleaseGold'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { getContractFromEvent, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
 import { BigNumber } from 'bignumber.js'
@@ -25,7 +25,7 @@ testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
     await testLocally(CreateAccount, ['--contract', contractAddress])
   })
 
-  test('can withdraw released gold to beneficiary', async () => {
+  test('can withdraw released celo to beneficiary', async () => {
     await testLocally(SetLiquidityProvision, ['--contract', contractAddress, '--yesreally'])
     // ReleasePeriod of default contract
     await timeTravel(300000000, web3)
