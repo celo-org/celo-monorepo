@@ -41,10 +41,6 @@ contract SortedOraclesTest is Test, Constants {
 }
 
 contract Initialize is SortedOraclesTest {
-  // function setUp() public {
-  //   super.setUp();
-  // }
-
   function test_ownerSet() public {
     assertEq(sortedOracle.owner(), address(this));
   }
@@ -60,10 +56,6 @@ contract Initialize is SortedOraclesTest {
 }
 
 contract SetReportExpiry is SortedOraclesTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldSetReportExpiry() public {
     uint256 newReportExpiry = 7200;
     sortedOracle.setReportExpiry(newReportExpiry);
@@ -85,10 +77,6 @@ contract SetReportExpiry is SortedOraclesTest {
 }
 
 contract SetTokenReportExpiry is SortedOraclesTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldSetTokenReportExpiry() public {
     uint256 newReportExpiry = 7200;
     sortedOracle.setTokenReportExpiry(aToken, newReportExpiry);
@@ -110,10 +98,6 @@ contract SetTokenReportExpiry is SortedOraclesTest {
 }
 
 contract AddOracle is SortedOraclesTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldAddOracle() public {
     sortedOracle.addOracle(aToken, oracleAccount);
     assertEq(sortedOracle.isOracle(aToken, oracleAccount), true);
@@ -155,10 +139,6 @@ contract AddOracle is SortedOraclesTest {
 }
 
 contract GetTokenReportExpirySeconds is SortedOraclesTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_ShouldGetTokenReportExpirySeconds_WhenNoTokenLevelExpiryIsSet() public {
     assertEq(sortedOracle.getTokenReportExpirySeconds(aToken), reportExpiry);
   }
@@ -646,7 +626,7 @@ contract Report is SortedOraclesTest {
 
   }
 
-  function test_ShouldUpdateTheLIstOfRatesCorrectly_WhenThereAreMultipleReportsTheMostRecentOneDoneByThisOracle()
+  function test_ShouldUpdateTheListOfRatesCorrectly_WhenThereAreMultipleReportsTheMostRecentOneIsDoneByThisOracle()
     public
   {
     helper_WhenThereAreMultipleReportsTheMostRecentOneDoneByThisOracle();
