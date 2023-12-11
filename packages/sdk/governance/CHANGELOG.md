@@ -1,5 +1,14 @@
 # @celo/governance
 
+## 5.0.7-beta.2
+
+### Patch Changes
+
+- 444db6de9: Turn back on parallel registry updating for governance proposal views
+- Updated dependencies [9ab9d00eb]
+- Updated dependencies [9ab9d00eb]
+  - @celo/contractkit@6.0.0-beta.1
+
 ## 5.0.7-beta.1
 
 ### Patch Changes

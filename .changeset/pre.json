@@ -31,10 +31,13 @@
     "@celo/typescript": "0.0.1"
   },
   "changesets": [
+    "cold-jobs-pay",
     "cool-waves-switch",
     "few-cycles-doubt",
     "light-buses-love",
+    "long-mangos-poke",
     "loud-tips-design",
-    "popular-numbers-fly"
+    "popular-numbers-fly",
+    "tiny-chairs-poke"
   ]
 }

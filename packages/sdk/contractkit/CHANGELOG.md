@@ -1,5 +1,12 @@
 # @celo/contractkit
 
+## 6.0.0-beta.1
+
+### Major Changes
+
+- 9ab9d00eb: Remove Support for deprecated MetaTransactionWallet and MetaTransactionWalletDeployer. IF absolutely needed the contracts can be accessed directly or an alternative such as account abstraction should be used
+- 9ab9d00eb: Removes Grandamento from cli and contractkit completely as it has become no op by mento team
+
 ## 6.0.0-beta.0
 
 ### Major Changes
