@@ -14,7 +14,7 @@ on:
 
 jobs:
   celotool-build-dev:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.13.0
     name: Build us-west1-docker.pkg.dev/devopsre/dev-images/celotool:${{ github.sha }}
     if: |
       github.ref != 'refs/heads/master'
@@ -22,13 +22,14 @@ jobs:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
       service-account: 'celo-monorepo-dev@devopsre.iam.gserviceaccount.com'
       artifact-registry: us-west1-docker.pkg.dev/devopsre/dev-images/celotool
-      tag: ${{ github.sha }}
+      tags: ${{ github.sha }}
+      platforms: linux/amd64,linux/arm64
       context: .
       file: dockerfiles/celotool/Dockerfile
       trivy: true
 
   celotool-build:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.13.0
     name: Build us-west1-docker.pkg.dev/devopsre/celo-monorepo/celotool:${{ github.sha }}
     if: |
       github.ref == 'refs/heads/master'
@@ -36,7 +37,8 @@ jobs:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo-master/providers/github-by-repos
       service-account: 'celo-monorepo@devopsre.iam.gserviceaccount.com'
       artifact-registry: us-west1-docker.pkg.dev/devopsre/celo-monorepo/celotool
-      tag: ${{ github.sha }}
+      tags: ${{ github.sha }}
+      platforms: linux/amd64,linux/arm64
       context: .
       file: dockerfiles/celotool/Dockerfile
       trivy: true
