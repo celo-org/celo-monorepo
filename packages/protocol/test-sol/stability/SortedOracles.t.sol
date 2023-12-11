@@ -102,9 +102,6 @@ contract SetTokenReportExpiry is SortedOraclesTest {
 }
 
 contract AddOracle is SortedOraclesTest {
-  function setUp() public {
-    super.setUp();
-  }
 
   function test_ShouldAddOracle() public {
     sortedOracle.addOracle(aToken, oracleAccount);
