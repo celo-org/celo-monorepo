@@ -2,9 +2,8 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
-import "forge-std/console.sol";
-import "../../contracts/identity/IdentityProxy.sol";
-import "../../contracts/identity/test/IdentityProxyTest.sol";
+import "@celo-contracts/identity/IdentityProxy.sol";
+import "@celo-contracts/identity/test/IdentityProxyTest.sol";
 
 contract IdentityProxyTestFoundry is Test {
   IdentityProxy identityProxy;

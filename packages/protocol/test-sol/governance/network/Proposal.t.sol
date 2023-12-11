@@ -2,13 +2,12 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
-import "forge-std/console.sol";
 
 // Contract to test
-import "../../../contracts/governance/Proposals.sol";
-import "../../../contracts/common/FixidityLib.sol";
+import "@celo-contracts/governance/Proposals.sol";
+import "@celo-contracts/common/FixidityLib.sol";
 
-contract GetSupportWithQuorumPadding is Test {
+contract ProposalGetSupportWithQuorumPadding is Test {
   using Proposals for Proposals.Proposal;
   using FixidityLib for FixidityLib.Fraction;
 
