@@ -1,3 +1,4 @@
+import { LockedGold } from '@celo/abis/web3/LockedGold'
 import {
   AddressListItem as ALI,
   Comparator,
@@ -6,7 +7,6 @@ import {
 } from '@celo/base/lib/collections'
 import { Address, CeloTransactionObject, EventLog } from '@celo/connect'
 import BigNumber from 'bignumber.js'
-import { LockedGold } from '../generated/LockedGold'
 import { ContractVersion } from '../versions'
 import {
   proxyCall,
@@ -417,6 +417,7 @@ export class LockedGoldWrapper extends BaseWrapperForGoverning<LockedGold> {
   }
 
   _getTotalPendingWithdrawalsCount = proxyCall(
+    // @ts-expect-error
     this.contract.methods.getTotalPendingWithdrawalsCount,
     undefined,
     valueToBigNumber

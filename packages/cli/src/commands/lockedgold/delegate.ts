@@ -9,7 +9,7 @@ import { Flags } from '../../utils/command'
 import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class Delegate extends BaseCommand {
-  static description = 'Delegate locked gold.'
+  static description = 'Delegate locked celo.'
 
   static flags = {
     ...BaseCommand.flags,
@@ -18,7 +18,7 @@ export default class Delegate extends BaseCommand {
     percent: flags.string({
       ...LockedGoldArgs.valueArg,
       required: true,
-      description: '1-100% of locked gold to be delegated',
+      description: '1-100% of locked celo to be delegated',
     }),
   }
 

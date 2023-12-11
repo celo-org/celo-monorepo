@@ -15,10 +15,10 @@ export default class LockedGold extends ReleaseGoldBaseCommand {
     action: flags.string({
       char: 'a',
       options: ['lock', 'unlock', 'withdraw'],
-      description: "Action to perform on contract's gold",
+      description: "Action to perform on contract's celo",
       required: true,
     }),
-    value: Flags.wei({ required: true, description: 'Amount of gold to perform `action` with' }),
+    value: Flags.wei({ required: true, description: 'Amount of celo to perform `action` with' }),
     yes: flags.boolean({ description: 'Answer yes to prompt' }),
   }
 

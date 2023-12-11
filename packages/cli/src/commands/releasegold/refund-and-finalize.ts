@@ -20,7 +20,7 @@ export default class RefundAndFinalize extends ReleaseGoldBaseCommand {
 
     await newCheckBuilder(this)
       .addCheck('Contract is revoked', () => isRevoked)
-      .addCheck('All contract gold is unlocked', () => remainingLockedBalance.eq(0))
+      .addCheck('All contract celo is unlocked', () => remainingLockedBalance.eq(0))
       .runChecks()
 
     this.kit.defaultAccount = await this.releaseGoldWrapper.getReleaseOwner()

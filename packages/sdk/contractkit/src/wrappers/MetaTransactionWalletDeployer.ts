@@ -1,4 +1,4 @@
-import { MetaTransactionWalletDeployer } from '../generated/MetaTransactionWalletDeployer'
+import { MetaTransactionWalletDeployer } from '@celo/abis/web3/MetaTransactionWalletDeployer'
 import { BaseWrapper, proxySend } from './BaseWrapper'
 
 /*

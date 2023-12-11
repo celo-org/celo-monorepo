@@ -1,6 +1,6 @@
+import { Exchange } from '@celo/abis/web3/mento/Exchange'
 import { CeloTransactionObject } from '@celo/connect'
 import BigNumber from 'bignumber.js'
-import { Exchange } from '../generated/mento/Exchange'
 import {
   BaseWrapper,
   fixidityValueToBigNumber,

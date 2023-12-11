@@ -4,14 +4,13 @@
     "allowSyntheticDefaultImports": false,
     "baseUrl": ".",
     "importHelpers": true,
-    "jsx": "react",
-    "lib": ["es7", "esnext", "dom"],
-    "moduleResolution": "node",
+    "lib": ["es7", "esnext"],
+    "moduleResolution": "node16",
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "strictNullChecks": true,
     "skipLibCheck": true,
-    "target": "es3",
+    "target": "es6",
     "strict": true
   },
   "exclude": ["node_modules"]

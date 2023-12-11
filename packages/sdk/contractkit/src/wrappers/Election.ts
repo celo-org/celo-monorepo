@@ -1,3 +1,4 @@
+import { Election } from '@celo/abis/web3/Election'
 import {
   eqAddress,
   findAddressIndex,
@@ -8,7 +9,6 @@ import { concurrentMap, concurrentValuesMap } from '@celo/base/lib/async'
 import { zeroRange, zip } from '@celo/base/lib/collections'
 import { Address, CeloTransactionObject, EventLog, toTransactionObject } from '@celo/connect'
 import BigNumber from 'bignumber.js'
-import { Election } from '../generated/Election'
 import {
   fixidityValueToBigNumber,
   identity,

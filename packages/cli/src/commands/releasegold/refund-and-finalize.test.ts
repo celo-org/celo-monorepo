@@ -1,5 +1,5 @@
+import { newReleaseGold } from '@celo/abis/web3/ReleaseGold'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { getContractFromEvent, testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
@@ -23,7 +23,7 @@ testWithGanache('releasegold:refund-and-finalize cmd', (web3: Web3) => {
     kit = newKitFromWeb3(web3)
   })
 
-  test('can refund gold', async () => {
+  test('can refund celo', async () => {
     await testLocally(Revoke, ['--contract', contractAddress, '--yesreally'])
     const releaseGoldWrapper = new ReleaseGoldWrapper(
       kit.connection,

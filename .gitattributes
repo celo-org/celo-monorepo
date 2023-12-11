@@ -33,5 +33,5 @@ packages/docs/developer-resources/wallet-remote/reference/**/*.md  -diff -merge
 packages/docs/developer-resources/wallet-remote/reference/**/*.md  linguist-generated=true
 packages/docs/developer-resources/wallet-rpc/reference/**/*.md  -diff -merge
 packages/docs/developer-resources/wallet-rpc/reference/**/*.md  linguist-generated=true
-packages/docs/command-line-interface/**/*.md  -diff -merge
-packages/docs/command-line-interface/**/*.md  linguist-generated=true
+# packages/docs/command-line-interface/**/*.md  -diff -merge
+# packages/docs/command-line-interface/**/*.md  linguist-generated=true

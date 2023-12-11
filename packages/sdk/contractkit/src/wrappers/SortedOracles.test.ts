@@ -1,7 +1,7 @@
+import SortedOraclesArtifacts from '@celo/celo-devchain/contracts/contracts-0.5/SortedOracles.json'
 import { Address } from '@celo/connect'
 import { describeEach } from '@celo/dev-utils/lib/describeEach'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
-import SortedOraclesArtifacts from '@celo/celo-devchain/contracts/contracts-0.5/SortedOracles.json'
 import { CeloContract } from '../base'
 import { StableToken } from '../celo-tokens'
 import { newKitFromWeb3 } from '../kit'

@@ -1,4 +1,4 @@
-import { IERC20 } from '@celo/contractkit/lib/generated/IERC20'
+import { IERC20 } from '@celo/abis/web3/IERC20'
 import { Erc20Wrapper } from '@celo/contractkit/lib/wrappers/Erc20Wrapper'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'

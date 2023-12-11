@@ -7,7 +7,7 @@ import { Flags } from '../../utils/command'
 
 export default class UpdateDelegatedAmount extends BaseCommand {
   static description =
-    'Updates the amount of delegated locked gold. There might be discrepancy between the amount of locked gold and the amount of delegated locked gold because of received rewards.'
+    'Updates the amount of delegated locked celo. There might be discrepancy between the amount of locked celo and the amount of delegated locked celo because of received rewards.'
 
   static flags = {
     ...BaseCommand.flags,
