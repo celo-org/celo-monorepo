@@ -1,43 +1,40 @@
 // tslint:disable: ordered-imports
+import { newGasPriceMinimum } from '@celo/abis/web3/0.8/GasPriceMinimum'
+import { newAccounts } from '@celo/abis/web3/Accounts'
+import { newAttestations } from '@celo/abis/web3/Attestations'
+import { newBlockchainParameters } from '@celo/abis/web3/BlockchainParameters'
+import { newDoubleSigningSlasher } from '@celo/abis/web3/DoubleSigningSlasher'
+import { newDowntimeSlasher } from '@celo/abis/web3/DowntimeSlasher'
+import { newElection } from '@celo/abis/web3/Election'
+import { newEpochRewards } from '@celo/abis/web3/EpochRewards'
+import { newEscrow } from '@celo/abis/web3/Escrow'
+import { newFederatedAttestations } from '@celo/abis/web3/FederatedAttestations'
+import { newFeeCurrencyWhitelist } from '@celo/abis/web3/FeeCurrencyWhitelist'
+import { newFeeHandler } from '@celo/abis/web3/FeeHandler'
+import { newFreezer } from '@celo/abis/web3/Freezer'
+import { newGoldToken } from '@celo/abis/web3/GoldToken'
+import { newGovernance } from '@celo/abis/web3/Governance'
+import { newIERC20 } from '@celo/abis/web3/IERC20'
+import { newLockedGold } from '@celo/abis/web3/LockedGold'
+import { newMultiSig } from '@celo/abis/web3/MultiSig'
+import { newOdisPayments } from '@celo/abis/web3/OdisPayments'
+import { newProxy } from '@celo/abis/web3/Proxy'
+import { newRandom } from '@celo/abis/web3/Random'
+import { newRegistry } from '@celo/abis/web3/Registry'
+import { newSortedOracles } from '@celo/abis/web3/SortedOracles'
+import { newValidators } from '@celo/abis/web3/Validators'
+import { newExchange } from '@celo/abis/web3/mento/Exchange'
+import { newExchangeBRL } from '@celo/abis/web3/mento/ExchangeBRL'
+import { newExchangeEUR } from '@celo/abis/web3/mento/ExchangeEUR'
+import { newReserve } from '@celo/abis/web3/mento/Reserve'
+import { newStableToken } from '@celo/abis/web3/mento/StableToken'
 import debugFactory from 'debug'
 import { AddressRegistry } from './address-registry'
 import { CeloContract, ProxyContracts } from './base'
 import { StableToken } from './celo-tokens'
-import { newGasPriceMinimum } from './generated/0.8/GasPriceMinimum'
-import { newAccounts } from './generated/Accounts'
-import { newAttestations } from './generated/Attestations'
-import { newBlockchainParameters } from './generated/BlockchainParameters'
-import { newDoubleSigningSlasher } from './generated/DoubleSigningSlasher'
-import { newDowntimeSlasher } from './generated/DowntimeSlasher'
-import { newElection } from './generated/Election'
-import { newEpochRewards } from './generated/EpochRewards'
-import { newEscrow } from './generated/Escrow'
-import { newFederatedAttestations } from './generated/FederatedAttestations'
-import { newFeeCurrencyWhitelist } from './generated/FeeCurrencyWhitelist'
-import { newFeeHandler } from './generated/FeeHandler'
-import { newFreezer } from './generated/Freezer'
-import { newGoldToken } from './generated/GoldToken'
-import { newGovernance } from './generated/Governance'
-import { newIERC20 } from './generated/IERC20'
-import { newLockedGold } from './generated/LockedGold'
-import { newMetaTransactionWallet } from './generated/MetaTransactionWallet'
-import { newMetaTransactionWalletDeployer } from './generated/MetaTransactionWalletDeployer'
-import { newMultiSig } from './generated/MultiSig'
-import { newOdisPayments } from './generated/OdisPayments'
-import { newProxy } from './generated/Proxy'
-import { newRandom } from './generated/Random'
-import { newRegistry } from './generated/Registry'
-import { newSortedOracles } from './generated/SortedOracles'
-import { newValidators } from './generated/Validators'
-import { newExchange } from './generated/mento/Exchange'
-import { newExchangeBRL } from './generated/mento/ExchangeBRL'
-import { newExchangeEUR } from './generated/mento/ExchangeEUR'
-import { newGrandaMento } from './generated/mento/GrandaMento'
-import { newReserve } from './generated/mento/Reserve'
-import { newStableToken } from './generated/mento/StableToken'
 
-import { newMentoFeeHandlerSeller } from './generated/MentoFeeHandlerSeller'
-import { newUniswapFeeHandlerSeller } from './generated/UniswapFeeHandlerSeller'
+import { newMentoFeeHandlerSeller } from '@celo/abis/web3/MentoFeeHandlerSeller'
+import { newUniswapFeeHandlerSeller } from '@celo/abis/web3/UniswapFeeHandlerSeller'
 
 const debug = debugFactory('kit:web3-contract-cache')
 
@@ -63,10 +60,7 @@ export const ContractFactories = {
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
-  [CeloContract.GrandaMento]: newGrandaMento,
   [CeloContract.LockedGold]: newLockedGold,
-  [CeloContract.MetaTransactionWallet]: newMetaTransactionWallet,
-  [CeloContract.MetaTransactionWalletDeployer]: newMetaTransactionWalletDeployer,
   [CeloContract.MultiSig]: newMultiSig,
   [CeloContract.OdisPayments]: newOdisPayments,
   [CeloContract.Random]: newRandom,
@@ -83,13 +77,13 @@ const StableToContract = {
   [StableToken.cEUR]: CeloContract.StableTokenEUR,
   [StableToken.cUSD]: CeloContract.StableToken,
   [StableToken.cREAL]: CeloContract.StableTokenBRL,
-}
+} as const
 
 const StableToExchange = {
   [StableToken.cEUR]: CeloContract.ExchangeEUR,
   [StableToken.cUSD]: CeloContract.Exchange,
   [StableToken.cREAL]: CeloContract.ExchangeBRL,
-}
+} as const
 
 export type CFType = typeof ContractFactories
 type ContractCacheMap = { [K in keyof CFType]?: ReturnType<CFType[K]> }
@@ -157,23 +151,8 @@ export class Web3ContractCache {
   getGovernance() {
     return this.getContract(CeloContract.Governance)
   }
-  getGrandaMento() {
-    return this.getContract(CeloContract.GrandaMento)
-  }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
-  }
-  /*
-    @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
-  */
-  getMetaTransactionWallet(address: string) {
-    return this.getContract(CeloContract.MetaTransactionWallet, address)
-  }
-  /*
-    @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
-  */
-  getMetaTransactionWalletDeployer(address: string) {
-    return this.getContract(CeloContract.MetaTransactionWalletDeployer, address)
   }
   getMultiSig(address: string) {
     return this.getContract(CeloContract.MultiSig, address)

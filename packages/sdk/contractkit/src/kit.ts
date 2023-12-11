@@ -30,7 +30,6 @@ import { ElectionConfig } from './wrappers/Election'
 import { ExchangeConfig } from './wrappers/Exchange'
 import { GasPriceMinimumConfig } from './wrappers/GasPriceMinimum'
 import { GovernanceConfig } from './wrappers/Governance'
-import { GrandaMentoConfig } from './wrappers/GrandaMento'
 import { LockedGoldConfig } from './wrappers/LockedGold'
 import { ReserveConfig } from './wrappers/Reserve'
 import { SortedOraclesConfig } from './wrappers/SortedOracles'
@@ -81,7 +80,6 @@ export interface NetworkConfig {
   validators: ValidatorsConfig
   downtimeSlasher: DowntimeSlasherConfig
   blockchainParameters: BlockchainParametersConfig
-  grandaMento: GrandaMentoConfig
 }
 
 interface AccountBalance extends EachCeloToken<BigNumber> {
@@ -156,7 +154,6 @@ export class ContractKit {
       CeloContract.DowntimeSlasher,
       CeloContract.BlockchainParameters,
       CeloContract.EpochRewards,
-      CeloContract.GrandaMento,
     ]
 
     const configMethod = async (contract: ValidWrappers) => {

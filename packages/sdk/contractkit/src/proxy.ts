@@ -1,37 +1,34 @@
 // tslint:disable: ordered-imports
 import { ABIDefinition, AbiItem } from '@celo/connect'
 import Web3 from 'web3'
-import { ABI as GasPriceMinimumABI } from './generated/0.8/GasPriceMinimum'
-import { ABI as AccountsABI } from './generated/Accounts'
-import { ABI as AttestationsABI } from './generated/Attestations'
-import { ABI as BlockchainParametersABI } from './generated/BlockchainParameters'
-import { ABI as DoubleSigningSlasherABI } from './generated/DoubleSigningSlasher'
-import { ABI as DowntimeSlasherABI } from './generated/DowntimeSlasher'
-import { ABI as ElectionABI } from './generated/Election'
-import { ABI as EpochRewardsABI } from './generated/EpochRewards'
-import { ABI as EscrowABI } from './generated/Escrow'
-import { ABI as FederatedAttestationsABI } from './generated/FederatedAttestations'
-import { ABI as FeeCurrencyWhitelistABI } from './generated/FeeCurrencyWhitelist'
-import { ABI as FeeHandlerABI } from './generated/FeeHandler'
-import { ABI as FreezerABI } from './generated/Freezer'
-import { ABI as GoldTokenABI } from './generated/GoldToken'
-import { ABI as GovernanceABI } from './generated/Governance'
-import { ABI as LockedGoldABI } from './generated/LockedGold'
-import { ABI as MentoFeeHandlerSellerABI } from './generated/MentoFeeHandlerSeller'
-import { ABI as MetaTransactionWalletABI } from './generated/MetaTransactionWallet'
-import { ABI as MetaTransactionWalletDeployerABI } from './generated/MetaTransactionWalletDeployer'
-import { ABI as MultiSigABI } from './generated/MultiSig'
-import { ABI as OdisPaymentsABI } from './generated/OdisPayments'
-import { ABI as ProxyABI } from './generated/Proxy'
-import { ABI as RandomABI } from './generated/Random'
-import { ABI as RegistryABI } from './generated/Registry'
-import { ABI as SortedOraclesABI } from './generated/SortedOracles'
-import { ABI as UniswapFeeHandlerSellerABI } from './generated/UniswapFeeHandlerSeller'
-import { ABI as ValidatorsABI } from './generated/Validators'
-import { ABI as ExchangeABI } from './generated/mento/Exchange'
-import { ABI as GrandaMentoABI } from './generated/mento/GrandaMento'
-import { ABI as ReserveABI } from './generated/mento/Reserve'
-import { ABI as StableTokenABI } from './generated/mento/StableToken'
+import { ABI as GasPriceMinimumABI } from '@celo/abis/web3/0.8/GasPriceMinimum'
+import { ABI as AccountsABI } from '@celo/abis/web3/Accounts'
+import { ABI as AttestationsABI } from '@celo/abis/web3/Attestations'
+import { ABI as BlockchainParametersABI } from '@celo/abis/web3/BlockchainParameters'
+import { ABI as DoubleSigningSlasherABI } from '@celo/abis/web3/DoubleSigningSlasher'
+import { ABI as DowntimeSlasherABI } from '@celo/abis/web3/DowntimeSlasher'
+import { ABI as ElectionABI } from '@celo/abis/web3/Election'
+import { ABI as EpochRewardsABI } from '@celo/abis/web3/EpochRewards'
+import { ABI as EscrowABI } from '@celo/abis/web3/Escrow'
+import { ABI as FederatedAttestationsABI } from '@celo/abis/web3/FederatedAttestations'
+import { ABI as FeeCurrencyWhitelistABI } from '@celo/abis/web3/FeeCurrencyWhitelist'
+import { ABI as FeeHandlerABI } from '@celo/abis/web3/FeeHandler'
+import { ABI as FreezerABI } from '@celo/abis/web3/Freezer'
+import { ABI as GoldTokenABI } from '@celo/abis/web3/GoldToken'
+import { ABI as GovernanceABI } from '@celo/abis/web3/Governance'
+import { ABI as LockedGoldABI } from '@celo/abis/web3/LockedGold'
+import { ABI as MentoFeeHandlerSellerABI } from '@celo/abis/web3/MentoFeeHandlerSeller'
+import { ABI as MultiSigABI } from '@celo/abis/web3/MultiSig'
+import { ABI as OdisPaymentsABI } from '@celo/abis/web3/OdisPayments'
+import { ABI as ProxyABI } from '@celo/abis/web3/Proxy'
+import { ABI as RandomABI } from '@celo/abis/web3/Random'
+import { ABI as RegistryABI } from '@celo/abis/web3/Registry'
+import { ABI as SortedOraclesABI } from '@celo/abis/web3/SortedOracles'
+import { ABI as UniswapFeeHandlerSellerABI } from '@celo/abis/web3/UniswapFeeHandlerSeller'
+import { ABI as ValidatorsABI } from '@celo/abis/web3/Validators'
+import { ABI as ExchangeABI } from '@celo/abis/web3/mento/Exchange'
+import { ABI as ReserveABI } from '@celo/abis/web3/mento/Reserve'
+import { ABI as StableTokenABI } from '@celo/abis/web3/mento/StableToken'
 
 export const GET_IMPLEMENTATION_ABI: ABIDefinition = {
   constant: true,
@@ -118,10 +115,7 @@ const initializeAbiMap = {
   GasPriceMinimumProxy: findInitializeAbi(GasPriceMinimumABI),
   GoldTokenProxy: findInitializeAbi(GoldTokenABI),
   GovernanceProxy: findInitializeAbi(GovernanceABI),
-  GrandaMentoProxy: findInitializeAbi(GrandaMentoABI),
   LockedGoldProxy: findInitializeAbi(LockedGoldABI),
-  MetaTransactionWalletProxy: findInitializeAbi(MetaTransactionWalletABI),
-  MetaTransactionWalletDeployerProxy: findInitializeAbi(MetaTransactionWalletDeployerABI),
   MultiSigProxy: findInitializeAbi(MultiSigABI),
   OdisPaymentsProxy: findInitializeAbi(OdisPaymentsABI),
   ProxyProxy: findInitializeAbi(ProxyABI),

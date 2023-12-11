@@ -173,15 +173,15 @@ export default class Show extends BaseCommand {
 
     cli.action.stop()
 
-    // At the end of each epoch: R, the total amount of rewards in gold to be allocated to stakers
+    // At the end of each epoch: R, the total amount of rewards in celo to be allocated to stakers
     // for this epoch is programmatically derived from considering the tradeoff between paying rewards
     // now vs. saving rewards for later.
     //
     // Every validator group has a slashing penalty M, initially M=1.0. All rewards to the group and to
     // voters for the group are weighted by this factor.
     //
-    // Let T be the total gold voting for groups eligible for rewards in this epoch. For each account
-    // holder, for each group, the amount of gold the account holder has voting for that group is increased
+    // Let T be the total celo voting for groups eligible for rewards in this epoch. For each account
+    // holder, for each group, the amount of celo the account holder has voting for that group is increased
     // by average_epoch_score_of_elected_validators_in_group * account_gold_voting_for_group * R * M / T.
     if (voterRewards.length > 0) {
       console.info('')

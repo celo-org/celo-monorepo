@@ -39,4 +39,5 @@ jobs:
         run: forge compile
 
       - name: Run tests
-        run: forge test -vvv
+        # can't use gas limit because some setUp function use more than the limit
+        run: forge test -vvv # --block-gas-limit 20000000
