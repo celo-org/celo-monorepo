@@ -1,8 +1,4 @@
 // tslint:disable: ordered-imports
-import debugFactory from 'debug'
-import { AddressRegistry } from './address-registry'
-import { CeloContract, ProxyContracts } from './base'
-import { StableToken } from './celo-tokens'
 import { newGasPriceMinimum } from '@celo/abis/web3/0.8/GasPriceMinimum'
 import { newAccounts } from '@celo/abis/web3/Accounts'
 import { newAttestations } from '@celo/abis/web3/Attestations'
@@ -32,9 +28,12 @@ import { newValidators } from '@celo/abis/web3/Validators'
 import { newExchange } from '@celo/abis/web3/mento/Exchange'
 import { newExchangeBRL } from '@celo/abis/web3/mento/ExchangeBRL'
 import { newExchangeEUR } from '@celo/abis/web3/mento/ExchangeEUR'
-import { newGrandaMento } from '@celo/abis/web3/mento/GrandaMento'
 import { newReserve } from '@celo/abis/web3/mento/Reserve'
 import { newStableToken } from '@celo/abis/web3/mento/StableToken'
+import debugFactory from 'debug'
+import { AddressRegistry } from './address-registry'
+import { CeloContract, ProxyContracts } from './base'
+import { StableToken } from './celo-tokens'
 
 import { newMentoFeeHandlerSeller } from '@celo/abis/web3/MentoFeeHandlerSeller'
 import { newUniswapFeeHandlerSeller } from '@celo/abis/web3/UniswapFeeHandlerSeller'
@@ -63,7 +62,6 @@ export const ContractFactories = {
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
-  [CeloContract.GrandaMento]: newGrandaMento,
   [CeloContract.LockedGold]: newLockedGold,
   [CeloContract.MetaTransactionWallet]: newMetaTransactionWallet,
   [CeloContract.MetaTransactionWalletDeployer]: newMetaTransactionWalletDeployer,
@@ -83,13 +81,13 @@ const StableToContract = {
   [StableToken.cEUR]: CeloContract.StableTokenEUR,
   [StableToken.cUSD]: CeloContract.StableToken,
   [StableToken.cREAL]: CeloContract.StableTokenBRL,
-}
+} as const
 
 const StableToExchange = {
   [StableToken.cEUR]: CeloContract.ExchangeEUR,
   [StableToken.cUSD]: CeloContract.Exchange,
   [StableToken.cREAL]: CeloContract.ExchangeBRL,
-}
+} as const
 
 export type CFType = typeof ContractFactories
 type ContractCacheMap = { [K in keyof CFType]?: ReturnType<CFType[K]> }
@@ -156,9 +154,6 @@ export class Web3ContractCache {
   }
   getGovernance() {
     return this.getContract(CeloContract.Governance)
-  }
-  getGrandaMento() {
-    return this.getContract(CeloContract.GrandaMento)
   }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
