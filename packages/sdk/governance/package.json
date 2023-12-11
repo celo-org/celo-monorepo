@@ -1,6 +1,6 @@
 {
   "name": "@celo/governance",
-  "version": "5.0.7-beta.0",
+  "version": "5.0.7-beta.1",
   "description": "Celo's governance proposals",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",

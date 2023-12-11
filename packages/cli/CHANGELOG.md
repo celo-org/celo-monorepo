@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.1.2-beta.1
+
+### Patch Changes
+
+- e4da5a7a8: Add textual feedback about parsing proposal
+- Updated dependencies [e4da5a7a8]
+  - @celo/governance@5.0.7-beta.1
+
 ## 3.1.2-beta.0
 
 ### Patch Changes

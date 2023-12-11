@@ -1,5 +1,11 @@
 # @celo/governance
 
+## 5.0.7-beta.1
+
+### Patch Changes
+
+- e4da5a7a8: Add textual feedback about parsing proposal
+
 ## 5.0.7-beta.0
 
 ### Patch Changes
