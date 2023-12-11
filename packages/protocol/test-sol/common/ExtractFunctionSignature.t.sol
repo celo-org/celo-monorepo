@@ -2,10 +2,9 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
-import "forge-std/console.sol";
 
 // Contract to test
-import "../../contracts/common/ExtractFunctionSignature.sol";
+import "@celo-contracts/common/ExtractFunctionSignature.sol";
 
 contract ExtractFunctionSignatureWrapper {
   function extractFunctionSignature(bytes memory input) public pure returns (bytes4) {
@@ -35,7 +34,7 @@ contract ExtractFunctionSignatureTest is Test {
     testTransactions = new TestTransactions();
   }
 
-  function testExtractFunctionSignature() public {
+  function test_ExtractFunctionSignature() public {
     // Arrange
     bytes memory data = abi.encodeWithSignature("setValue(uint256,uint256,bool)", 1, 1, true);
     bytes4 expectedSignature = bytes4(keccak256("setValue(uint256,uint256,bool)"));

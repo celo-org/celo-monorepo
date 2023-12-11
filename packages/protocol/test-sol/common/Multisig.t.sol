@@ -2,7 +2,7 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
-import "../../contracts/common/MultiSig.sol";
+import "@celo-contracts/common/MultiSig.sol";
 
 contract MultiSigTest is Test {
   function() external payable {}

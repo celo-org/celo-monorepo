@@ -3,16 +3,15 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
-import "../contracts/identity/test/AttestationsTest.sol";
-import "../contracts/identity/FederatedAttestations.sol";
-import "../contracts/identity/test/MockERC20Token.sol";
-import "../contracts/identity/test/MockRandom.sol";
-import "../contracts/governance/test/MockElection.sol";
-import "../contracts/governance/test/MockLockedGold.sol";
-import "../contracts/governance/test/MockValidators.sol";
-import "../contracts/common/Registry.sol";
-import "../contracts/common/Accounts.sol";
-import "forge-std/console.sol";
+import "@celo-contracts/identity/test/AttestationsTest.sol";
+import "@celo-contracts/identity/FederatedAttestations.sol";
+import "@celo-contracts/identity/test/MockERC20Token.sol";
+import "@celo-contracts/identity/test/MockRandom.sol";
+import "@celo-contracts/governance/test/MockElection.sol";
+import "@celo-contracts/governance/test/MockLockedGold.sol";
+import "@celo-contracts/governance/test/MockValidators.sol";
+import "@celo-contracts/common/Registry.sol";
+import "@celo-contracts/common/Accounts.sol";
 
 contract FederatedAttestationsFoundryTest is Test {
   enum KeyOffsets {
@@ -503,7 +502,7 @@ contract FederatedAttestations_LookupAttestations is FederatedAttestationsFoundr
   function test_WhenIdentifierHasNotBeenRegistered_ShouldReturnEmptyList() public {
     address[] memory trustedIssuers = new address[](1);
     trustedIssuers[0] = caller;
-    (uint256[] memory countsPerIssuer, address[] memory accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
+    (uint256[] memory countsPerIssuer, address[] memory _accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
       .lookupAttestations(phoneHash, trustedIssuers);
 
     uint256[] memory expectedCountsPerIssuer = new uint256[](1);
@@ -517,7 +516,7 @@ contract FederatedAttestations_LookupAttestations is FederatedAttestationsFoundr
       expectedAttestations,
       expectedPublishedOnLowerBound,
       countsPerIssuer,
-      accounts,
+      _accounts,
       signers,
       issuedOns,
       publishedOns
@@ -578,7 +577,7 @@ contract FederatedAttestations_LookupAttestations is FederatedAttestationsFoundr
     prepareTest();
 
     address[] memory trustedIssuers = new address[](0);
-    (uint256[] memory countsPerIssuer, address[] memory accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
+    (uint256[] memory countsPerIssuer, address[] memory _accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
       .lookupAttestations(phoneHash, trustedIssuers);
 
     uint256[] memory expectedCountsPerIssuer = new uint256[](0);
@@ -590,7 +589,7 @@ contract FederatedAttestations_LookupAttestations is FederatedAttestationsFoundr
       expectedAttestations,
       expectedPublishedOnLowerBound,
       countsPerIssuer,
-      accounts,
+      _accounts,
       signers,
       issuedOns,
       publishedOns
@@ -602,7 +601,7 @@ contract FederatedAttestations_LookupAttestations is FederatedAttestationsFoundr
 
     address[] memory trustedIssuers = new address[](1);
     trustedIssuers[0] = issuer1;
-    (uint256[] memory countsPerIssuer, address[] memory accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
+    (uint256[] memory countsPerIssuer, address[] memory _accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
       .lookupAttestations(phoneHash, trustedIssuers);
 
     uint256[] memory expectedCountsPerIssuer = new uint256[](1);
@@ -613,7 +612,7 @@ contract FederatedAttestations_LookupAttestations is FederatedAttestationsFoundr
       getIssuer1Attestations(),
       getPublishedOnLowerBound(),
       countsPerIssuer,
-      accounts,
+      _accounts,
       signers,
       issuedOns,
       publishedOns
@@ -626,7 +625,7 @@ contract FederatedAttestations_LookupAttestations is FederatedAttestationsFoundr
 
     address[] memory trustedIssuers = new address[](1);
     trustedIssuers[0] = issuer3;
-    (uint256[] memory countsPerIssuer, address[] memory accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
+    (uint256[] memory countsPerIssuer, address[] memory _accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
       .lookupAttestations(phoneHash, trustedIssuers);
 
     uint256[] memory expectedCountsPerIssuer = new uint256[](1);
@@ -639,7 +638,7 @@ contract FederatedAttestations_LookupAttestations is FederatedAttestationsFoundr
       expectedAttestations,
       expectedPublishedOnLowerBound,
       countsPerIssuer,
-      accounts,
+      _accounts,
       signers,
       issuedOns,
       publishedOns
@@ -653,7 +652,7 @@ contract FederatedAttestations_LookupAttestations is FederatedAttestationsFoundr
     trustedIssuers[0] = issuer3;
     trustedIssuers[1] = issuer2;
     trustedIssuers[2] = issuer1;
-    (uint256[] memory countsPerIssuer, address[] memory accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
+    (uint256[] memory countsPerIssuer, address[] memory _accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
       .lookupAttestations(phoneHash, trustedIssuers);
 
     uint256[] memory expectedCountsPerIssuer = new uint256[](3);
@@ -666,7 +665,7 @@ contract FederatedAttestations_LookupAttestations is FederatedAttestationsFoundr
       getIssuer2AndIssuer1Attestations(),
       getPublishedOnLowerBound(),
       countsPerIssuer,
-      accounts,
+      _accounts,
       signers,
       issuedOns,
       publishedOns
@@ -681,7 +680,7 @@ contract FederatedAttestations_LookupAttestations is FederatedAttestationsFoundr
 
     address[] memory trustedIssuers = new address[](1);
     trustedIssuers[0] = issuer1;
-    (uint256[] memory countsPerIssuer, address[] memory accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
+    (uint256[] memory countsPerIssuer, address[] memory _accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
       .lookupAttestations(phoneHash, trustedIssuers);
 
     uint256[] memory expectedCountsPerIssuer = new uint256[](1);
@@ -694,7 +693,7 @@ contract FederatedAttestations_LookupAttestations is FederatedAttestationsFoundr
       expectedAttestations,
       expectedPublishedOnLowerBound,
       countsPerIssuer,
-      accounts,
+      _accounts,
       signers,
       issuedOns,
       publishedOns
@@ -1641,7 +1640,7 @@ contract FederatedAttestations_BatchRevokeAttestations is FederatedAttestationsF
 
     address[] memory trustedIssuers = new address[](1);
     trustedIssuers[0] = issuer1;
-    (uint256[] memory countsPerIssuer, address[] memory accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
+    (uint256[] memory countsPerIssuer, address[] memory _accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
       .lookupAttestations(phoneHash, trustedIssuers);
 
     uint256[] memory expectedCountsPerIssuer = new uint256[](1);
@@ -1656,7 +1655,7 @@ contract FederatedAttestations_BatchRevokeAttestations is FederatedAttestationsF
       expectedAttestations,
       expectedPublishedOnLowerBound,
       countsPerIssuer,
-      accounts,
+      _accounts,
       signers,
       issuedOns,
       publishedOns
@@ -1664,7 +1663,7 @@ contract FederatedAttestations_BatchRevokeAttestations is FederatedAttestationsF
 
     trustedIssuers = new address[](1);
     trustedIssuers[0] = issuer1;
-    (countsPerIssuer, accounts, signers, issuedOns, publishedOns) = federatedAttestations
+    (countsPerIssuer, _accounts, signers, issuedOns, publishedOns) = federatedAttestations
       .lookupAttestations(phoneHash2, trustedIssuers);
 
     expectedCountsPerIssuer = new uint256[](1);
@@ -1677,7 +1676,7 @@ contract FederatedAttestations_BatchRevokeAttestations is FederatedAttestationsF
       expectedAttestations,
       expectedPublishedOnLowerBound,
       countsPerIssuer,
-      accounts,
+      _accounts,
       signers,
       issuedOns,
       publishedOns
@@ -1698,7 +1697,7 @@ contract FederatedAttestations_BatchRevokeAttestations is FederatedAttestationsF
 
     address[] memory trustedIssuers = new address[](1);
     trustedIssuers[0] = issuer1;
-    (uint256[] memory countsPerIssuer, address[] memory accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
+    (uint256[] memory countsPerIssuer, address[] memory _accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
       .lookupAttestations(phoneHash, trustedIssuers);
 
     uint256[] memory expectedCountsPerIssuer = new uint256[](1);
@@ -1713,7 +1712,7 @@ contract FederatedAttestations_BatchRevokeAttestations is FederatedAttestationsF
       expectedAttestations,
       expectedPublishedOnLowerBound,
       countsPerIssuer,
-      accounts,
+      _accounts,
       signers,
       issuedOns,
       publishedOns
@@ -1721,7 +1720,7 @@ contract FederatedAttestations_BatchRevokeAttestations is FederatedAttestationsF
 
     trustedIssuers = new address[](1);
     trustedIssuers[0] = issuer1;
-    (countsPerIssuer, accounts, signers, issuedOns, publishedOns) = federatedAttestations
+    (countsPerIssuer, _accounts, signers, issuedOns, publishedOns) = federatedAttestations
       .lookupAttestations(phoneHash2, trustedIssuers);
 
     expectedCountsPerIssuer = new uint256[](1);
@@ -1734,7 +1733,7 @@ contract FederatedAttestations_BatchRevokeAttestations is FederatedAttestationsF
       expectedAttestations,
       expectedPublishedOnLowerBound,
       countsPerIssuer,
-      accounts,
+      _accounts,
       signers,
       issuedOns,
       publishedOns
@@ -1755,7 +1754,7 @@ contract FederatedAttestations_BatchRevokeAttestations is FederatedAttestationsF
 
     address[] memory trustedIssuers = new address[](1);
     trustedIssuers[0] = issuer1;
-    (uint256[] memory countsPerIssuer, address[] memory accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
+    (uint256[] memory countsPerIssuer, address[] memory _accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = federatedAttestations
       .lookupAttestations(phoneHash, trustedIssuers);
 
     uint256[] memory expectedCountsPerIssuer = new uint256[](1);
@@ -1770,7 +1769,7 @@ contract FederatedAttestations_BatchRevokeAttestations is FederatedAttestationsF
       expectedAttestations,
       expectedPublishedOnLowerBound,
       countsPerIssuer,
-      accounts,
+      _accounts,
       signers,
       issuedOns,
       publishedOns
@@ -1778,7 +1777,7 @@ contract FederatedAttestations_BatchRevokeAttestations is FederatedAttestationsF
 
     trustedIssuers = new address[](1);
     trustedIssuers[0] = issuer1;
-    (countsPerIssuer, accounts, signers, issuedOns, publishedOns) = federatedAttestations
+    (countsPerIssuer, _accounts, signers, issuedOns, publishedOns) = federatedAttestations
       .lookupAttestations(phoneHash2, trustedIssuers);
 
     expectedCountsPerIssuer = new uint256[](1);
@@ -1791,7 +1790,7 @@ contract FederatedAttestations_BatchRevokeAttestations is FederatedAttestationsF
       expectedAttestations,
       expectedPublishedOnLowerBound,
       countsPerIssuer,
-      accounts,
+      _accounts,
       signers,
       issuedOns,
       publishedOns
