@@ -973,6 +973,11 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@celo/abis@10.0.0":
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/@celo/abis/-/abis-10.0.0.tgz#2c1002f2e82b29ca22cec70c988bf90d26fadc68"
+  integrity sha512-DC8UAEz89+1yEQqKzkxOWLYGUv/XWaqPAOkU0lKuQzhvN25ndP3fitawQl53WYn8i3ZPfRWfLO4w75l//tDSbg==
+
 "@celo/base@^5.0.5":
   version "5.0.5"
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-5.0.5.tgz#b4102faba080ce536411b7987259d9ca152b6e6d"
@@ -986,10 +991,10 @@
     "@stablelib/blake2xs" "0.10.4"
     big-integer "^1.6.44"
 
-"@celo/celo-devchain@^6.0.3-beta.1":
-  version "6.0.3-beta.1"
-  resolved "https://registry.yarnpkg.com/@celo/celo-devchain/-/celo-devchain-6.0.3-beta.1.tgz#0c0637c4646904de578fa28ebe2dcb3f8ad35259"
-  integrity sha512-Pjqbooy1eJ9qyMyIka3GFP0UrLATtSHJtGj/TNtuJ5nlpaBMAy2oA1zjKh0AsqyhvNkjs4Os6mgFYVEm5XuKuw==
+"@celo/celo-devchain@^6.0.3":
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/@celo/celo-devchain/-/celo-devchain-6.0.3.tgz#ccf1c9c02a1b40ff7b1ab2f180ec5829fb40b2c8"
+  integrity sha512-k282qgIJzKzTBcBqmarR8pq91SF/G85MuHI7iHEDNYNyHZKrZENjLoQ+V3zoqeLE67NQrVgRYNPGpJ2KCCzB9g==
   dependencies:
     commander "^10.0.0"
     ganache "npm:@celo/ganache@7.8.0-unofficial.0"

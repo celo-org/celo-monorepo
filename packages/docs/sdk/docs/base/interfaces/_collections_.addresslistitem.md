@@ -1,6 +1,6 @@
 [@celo/base](../README.md) › ["collections"](../modules/_collections_.md) › [AddressListItem](_collections_.addresslistitem.md)
 
-# Interface: AddressListItem <**T**>
+# Interface: AddressListItem ‹**T**›
 
 ## Type parameters
 

@@ -24,10 +24,10 @@ _See code: [src/commands/reserve/status.ts](https://github.com/celo-org/celo-mon
 
 ## `celocli reserve:transfergold`
 
-Transfers reserve gold to other reserve address
+Transfers reserve celo to other reserve address
 
 ```
-Transfers reserve gold to other reserve address
+Transfers reserve celo to other reserve address
 
 USAGE
   $ celocli reserve:transfergold

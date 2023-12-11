@@ -8,7 +8,7 @@
 
 ## Implemented by
 
-* [DefaultRpcCaller](../classes/_utils_rpc_caller_.defaultrpccaller.md)
+* [HttpRpcCaller](../classes/_utils_rpc_caller_.httprpccaller.md)
 
 ## Index
 
@@ -46,11 +46,19 @@ ___
 
 #### Type declaration:
 
-▸ (`payload`: [JsonRpcPayload](_types_.jsonrpcpayload.md), `callback`: [Callback](../modules/_types_.md#callback)‹[JsonRpcResponse](_types_.jsonrpcresponse.md)›): *void*
+▸ (`payload`: [JsonRpcPayload](_types_.jsonrpcpayload.md), `callback`: function): *void*
+
+**Parameters:**
+
+▪ **payload**: *[JsonRpcPayload](_types_.jsonrpcpayload.md)*
+
+▪ **callback**: *function*
+
+▸ (`error`: [Error](_types_.error.md) | null, `result?`: [JsonRpcResponse](_types_.jsonrpcresponse.md)): *void*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`payload` | [JsonRpcPayload](_types_.jsonrpcpayload.md) |
-`callback` | [Callback](../modules/_types_.md#callback)‹[JsonRpcResponse](_types_.jsonrpcresponse.md)› |
+`error` | [Error](_types_.error.md) &#124; null |
+`result?` | [JsonRpcResponse](_types_.jsonrpcresponse.md) |

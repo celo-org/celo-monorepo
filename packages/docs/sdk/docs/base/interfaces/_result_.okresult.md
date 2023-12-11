@@ -1,6 +1,6 @@
 [@celo/base](../README.md) › ["result"](../modules/_result_.md) › [OkResult](_result_.okresult.md)
 
-# Interface: OkResult <**TResult**>
+# Interface: OkResult ‹**TResult**›
 
 ## Type parameters
 

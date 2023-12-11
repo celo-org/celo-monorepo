@@ -19,18 +19,32 @@ yarn add @celo/abis
 ### In your javascript or ts
 
 ```ts
-// json abi
-import Accounts from '@celo/abis/Accounts.json'
+// abi in json
+import AccountsABI from '@celo/abis/Accounts.json'
 
-// ethers
-import { Accounts } from '@celo/abis/types/ethers'
+// abi in js/ts for viem, wagmi, etc
+import { accountsABI }  from '@celo/abis'
 
-// web3
-import Accounts from '@celo/abis/types/web3/Accounts'
+// abi in js/ts for viem, wagmi, etc (with moduleResolution and module set to "Node16" in your tsconfig.json file)
+import { accountsABI }  from '@celo/abis/Accounts'
 
-// truffle
-import { AccountsContract } from '@celo/abis/types/truffle'
+// abi in js/ts for use with contractkit
+import { type Accounts, newAccounts, ABI } from '@celo/abis/web3/Accounts'
 ```
+
+### CommonJS syntax
+
+```js
+const { accountsABI } = require('@celo/abis');
+
+// viem
+const accounts = getContract({
+  address: "0x...",
+  abi: accountsABI,
+  ...
+})
+```
+
 
 ## License
 

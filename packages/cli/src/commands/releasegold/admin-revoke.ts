@@ -134,7 +134,7 @@ export default class AdminRevoke extends ReleaseGoldBaseCommand {
         'ReleaseGoldInstanceDestroyed'
       )
     } else {
-      console.log('Some gold is still locked, printing pending withdrawals...')
+      console.log('Some celo is still locked, printing pending withdrawals...')
       const lockedGold = await this.kit.contracts.getLockedGold()
       const pendingWithdrawals = await lockedGold.getPendingWithdrawals(this.contractAddress)
       pendingWithdrawals.forEach((w) => printValueMap(w))

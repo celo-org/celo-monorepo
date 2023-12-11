@@ -45,7 +45,7 @@ Name | Type |
 
 ###  intersection
 
-▸ **intersection**<**T**>(`arrays`: T[][]): *T[]*
+▸ **intersection**‹**T**›(`arrays`: T[][]): *T[]*
 
 *Defined in [packages/sdk/base/src/collections.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L32)*
 
@@ -65,7 +65,7 @@ ___
 
 ###  linkedListChange
 
-▸ **linkedListChange**<**T**>(`sortedList`: Array‹[AddressListItem](../interfaces/_collections_.addresslistitem.md)‹T››, `change`: [AddressListItem](../interfaces/_collections_.addresslistitem.md)‹T›, `comparator`: [Comparator](_collections_.md#comparator)‹T›): *object*
+▸ **linkedListChange**‹**T**›(`sortedList`: Array‹[AddressListItem](../interfaces/_collections_.addresslistitem.md)‹T››, `change`: [AddressListItem](../interfaces/_collections_.addresslistitem.md)‹T›, `comparator`: [Comparator](_collections_.md#comparator)‹T›): *object*
 
 *Defined in [packages/sdk/base/src/collections.ts:90](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L90)*
 
@@ -93,7 +93,7 @@ ___
 
 ###  linkedListChanges
 
-▸ **linkedListChanges**<**T**>(`sortedList`: Array‹[AddressListItem](../interfaces/_collections_.addresslistitem.md)‹T››, `changeList`: Array‹[AddressListItem](../interfaces/_collections_.addresslistitem.md)‹T››, `comparator`: [Comparator](_collections_.md#comparator)‹T›): *object*
+▸ **linkedListChanges**‹**T**›(`sortedList`: Array‹[AddressListItem](../interfaces/_collections_.addresslistitem.md)‹T››, `changeList`: Array‹[AddressListItem](../interfaces/_collections_.addresslistitem.md)‹T››, `comparator`: [Comparator](_collections_.md#comparator)‹T›): *object*
 
 *Defined in [packages/sdk/base/src/collections.ts:100](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L100)*
 
@@ -121,7 +121,7 @@ ___
 
 ###  notEmpty
 
-▸ **notEmpty**<**TValue**>(`value`: TValue | null | undefined): *value is TValue*
+▸ **notEmpty**‹**TValue**›(`value`: TValue | null | undefined): *value is TValue*
 
 *Defined in [packages/sdk/base/src/collections.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L28)*
 
@@ -157,7 +157,7 @@ ___
 
 ###  zip
 
-▸ **zip**<**A**, **B**, **C**>(`fn`: function, `as`: A[], `bs`: B[]): *C[]*
+▸ **zip**‹**A**, **B**, **C**›(`fn`: function, `as`: A[], `bs`: B[]): *[zip](_collections_.md#zip)*
 
 *Defined in [packages/sdk/base/src/collections.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L3)*
 
@@ -186,13 +186,13 @@ Name | Type |
 
 ▪ **bs**: *B[]*
 
-**Returns:** *C[]*
+**Returns:** *[zip](_collections_.md#zip)*
 
 ___
 
 ###  zip3
 
-▸ **zip3**<**A**, **B**, **C**>(`as`: A[], `bs`: B[], `cs`: C[]): *[A, B, C][]*
+▸ **zip3**‹**A**, **B**, **C**›(`as`: A[], `bs`: B[], `cs`: C[]): *[zip3](_collections_.md#zip3)*
 
 *Defined in [packages/sdk/base/src/collections.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L13)*
 
@@ -212,4 +212,4 @@ Name | Type |
 `bs` | B[] |
 `cs` | C[] |
 
-**Returns:** *[A, B, C][]*
+**Returns:** *[zip3](_collections_.md#zip3)*
