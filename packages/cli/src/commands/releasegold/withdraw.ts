@@ -5,13 +5,13 @@ import { ReleaseGoldBaseCommand } from '../../utils/release-gold-base'
 
 export default class Withdraw extends ReleaseGoldBaseCommand {
   static description =
-    'Withdraws `value` released gold to the beneficiary address. Fails if `value` worth of gold has not been released yet.'
+    'Withdraws `value` released celo to the beneficiary address. Fails if `value` worth of celo has not been released yet.'
 
   static flags = {
     ...ReleaseGoldBaseCommand.flags,
     value: Flags.wei({
       required: true,
-      description: 'Amount of released gold (in wei) to withdraw',
+      description: 'Amount of released celo (in wei) to withdraw',
     }),
   }
 
@@ -30,7 +30,7 @@ export default class Withdraw extends ReleaseGoldBaseCommand {
     const maxDistribution = await this.releaseGoldWrapper.getMaxDistribution()
     const totalWithdrawn = await this.releaseGoldWrapper.getTotalWithdrawn()
     await newCheckBuilder(this)
-      .addCheck('Value does not exceed available unlocked gold', () =>
+      .addCheck('Value does not exceed available unlocked celo', () =>
         value.lte(remainingUnlockedBalance)
       )
       .addCheck('Value would not exceed maximum distribution', () =>

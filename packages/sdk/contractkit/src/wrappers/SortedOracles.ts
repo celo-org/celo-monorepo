@@ -1,3 +1,4 @@
+import { SortedOracles } from '@celo/abis/web3/SortedOracles'
 import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
 import { Address, CeloTransactionObject, Connection, toTransactionObject } from '@celo/connect'
 import { isValidAddress } from '@celo/utils/lib/address'
@@ -6,7 +7,6 @@ import BigNumber from 'bignumber.js'
 import { AddressRegistry } from '../address-registry'
 import { CeloContract, StableTokenContract } from '../base'
 import { isStableTokenContract, StableToken, stableTokenInfos } from '../celo-tokens'
-import { SortedOracles } from '../generated/SortedOracles'
 import {
   BaseWrapper,
   proxyCall,
@@ -136,7 +136,8 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   async isOldestReportExpired(target: ReportTarget): Promise<[boolean, Address]> {
     const identifier = await this.toCurrencyPairIdentifier(target)
     const response = await this.contract.methods.isOldestReportExpired(identifier).call()
-    return response as [boolean, Address]
+    // response is NOT an array, but a js object with two keys 0 and 1
+    return [response[0], response[1]]
   }
 
   /**

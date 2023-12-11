@@ -2,10 +2,10 @@ import { defineConfig } from '@wagmi/cli'
 import { readFileSync } from 'fs'
 import * as path from 'path'
 
-import { ABIS_BUILD_DIR, CoreContracts } from './scripts/consts'
+import { ABIS_BUILD_DIR, PublishContracts } from './scripts/consts'
 
 const contracts: { name: string; abi: any }[] = []
-for (const contractName of new Set(CoreContracts)) {
+for (const contractName of new Set(PublishContracts)) {
   try {
     const fileStr = readFileSync(path.join(ABIS_BUILD_DIR, `${contractName}.json`))
     contracts.push({

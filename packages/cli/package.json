@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -27,14 +27,13 @@
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "prepublish": "",
     "prepack": "yarn run build && oclif-dev manifest && oclif-dev readme",
-    "test:reset": "yarn --cwd ../protocol devchain:reset --migration_override ../dev-utils/src/migration-override.json --release_gold_contracts scripts/truffle/releaseGoldExampleConfigs.json",
-    "test:livechain": "yarn --cwd ../protocol devchain run-tar .tmp/devchain.tar.gz",
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
+    "@celo/abis": "10.0.0",
     "@celo/base": "^6.0.0",
     "@celo/connect": "^5.1.1",
-    "@celo/contractkit": "^5.2.0",
+    "@celo/contractkit": "^5.2.1",
     "@celo/explorer": "^5.0.6",
     "@celo/governance": "^5.0.6",
     "@celo/identity": "^5.1.1",
@@ -74,6 +73,7 @@
     "web3": "1.10.0"
   },
   "devDependencies": {
+    "@celo/celo-devchain": "^6.0.3",
     "@celo/dev-utils": "0.0.1",
     "@oclif/dev-cli": "^1.23.0",
     "@types/cli-table": "^0.3.0",
@@ -143,8 +143,11 @@
       "node": {
         "description": "Manage your Celo node"
       },
+      "releasecelo": {
+        "description": "View and manage ReleaseGold contracts"
+      },
       "releasegold": {
-        "description": "View and manage Release Gold contracts"
+        "description": "Alias for releasecelo"
       },
       "transfer": {
         "description": "Transfer CELO and Celo Dollars"

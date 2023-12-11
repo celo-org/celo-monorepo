@@ -1,3 +1,4 @@
+import { Accounts } from '@celo/abis/web3/Accounts'
 import { NativeSigner, Signature, Signer } from '@celo/base/lib/signatureUtils'
 import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
 import {
@@ -9,7 +10,7 @@ import {
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
 import type BN from 'bn.js' // just the types
-import { Accounts } from '../generated/Accounts'
+import { getParsedSignatureOfAddress } from '../utils/getParsedSignatureOfAddress'
 import { newContractVersion } from '../versions'
 import {
   proxyCall,
@@ -496,9 +497,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   private async getParsedSignatureOfAddress(address: Address, signer: string, signerFn: Signer) {
-    const hash = soliditySha3({ type: 'address', value: address })
-    const signature = await signerFn.sign(hash!)
-    return parseSignature(hash!, signature, signer)
+    return getParsedSignatureOfAddress(soliditySha3, signerFn.sign, address, signer)
   }
 
   private keccak256(value: string | BN): string {

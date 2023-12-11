@@ -17,8 +17,6 @@
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
     "docs": "typedoc",
-    "test:reset": "yarn --cwd ../../protocol devchain:reset --migration_override ../../dev-utils/src/migration-override.json",
-    "test:livechain": "yarn --cwd ../../protocol devchain run-tar .tmp/devchain.tar.gz",
     "test": "jest --runInBand",
     "lint": "tslint -c tslint.json --project .",
     "prepublishOnly": "yarn build"
@@ -33,6 +31,7 @@
     "web3-eth-abi": "1.10.0"
   },
   "devDependencies": {
+    "@celo/celo-devchain": "^6.0.3",
     "@celo/dev-utils": "0.0.1",
     "@celo/contractkit": "^5.2.0",
     "dotenv": "^8.2.0"

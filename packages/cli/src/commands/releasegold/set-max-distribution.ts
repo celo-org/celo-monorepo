@@ -5,7 +5,7 @@ import { displaySendTx } from '../../utils/cli'
 import { ReleaseGoldBaseCommand } from '../../utils/release-gold-base'
 
 export default class SetMaxDistribution extends ReleaseGoldBaseCommand {
-  static description = 'Set the maximum distribution of gold for the given contract'
+  static description = 'Set the maximum distribution of celo for the given contract'
 
   static flags = {
     ...ReleaseGoldBaseCommand.flags,

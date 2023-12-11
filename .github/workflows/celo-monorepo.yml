@@ -111,7 +111,7 @@ jobs:
       - name: Get the artifacts to cache
         id: get_artifacts_to_cache
         run: |
-          artifacts_to_cache="$(git ls-files --others --ignored --exclude-standard | grep -v node_modules)"
+          artifacts_to_cache="$(git ls-files --others --ignored --exclude-standard | grep -v node_modules | grep -v .js.map)"
           echo "artifacts_to_cache<<EOF" >> $GITHUB_OUTPUT
           echo "$artifacts_to_cache" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -175,7 +175,6 @@ jobs:
             --ignore @celo/celotool \
             --ignore @celo/celocli \
             --ignore @celo/env-tests \
-            --ignore @celo/transactions-uri \
             --ignore '@celo/wallet-*' \
             run test
       - name: Upload Jest Test Results
@@ -280,9 +279,6 @@ jobs:
           - name: Protocol Governance Voting
             command: |
               yarn --cwd packages/protocol test governance/voting/
-          - name: Protocol Identity
-            command: |
-              yarn --cwd packages/protocol test identity/
           - name: Protocol Stability
             command: |
               yarn --cwd packages/protocol test stability/
@@ -325,10 +321,6 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Generate DevChain
-        run: |
-          cd packages/sdk/contractkit
-          yarn test:reset
       - name: Run tests
         run: |
           yarn --cwd=packages/sdk/contractkit test
@@ -356,10 +348,6 @@ jobs:
         uses: ./.github/actions/sync-workspace
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Generate DevChain
-        run: |
-          cd packages/cli
-          yarn test:reset
       - name: Run tests
         run: |
           yarn --cwd=packages/cli test
@@ -369,12 +357,16 @@ jobs:
           if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
             git --no-pager diff packages/docs/command-line-interface
             echo "There are git differences after generating CLI docs"
+            git status
+            git diff
             exit 1
           fi
       - name: Verify that a new account can be created
         run: |
           yarn --cwd=packages/cli run celocli account:new
-
+      - name: Test that releasecelo command topic is working
+        run: |
+          yarn --cwd=packages/cli run celocli releasecelo --help
   typescript-tests:
     name: Typescript package Tests
     runs-on: ['self-hosted', 'monorepo-node18']

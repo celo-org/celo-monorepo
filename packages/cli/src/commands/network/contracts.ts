@@ -1,7 +1,7 @@
+import { newICeloVersionedContract } from '@celo/abis/web3/ICeloVersionedContract'
+import { newProxy } from '@celo/abis/web3/Proxy'
 import { concurrentMap } from '@celo/base'
 import { CeloContract } from '@celo/contractkit'
-import { newICeloVersionedContract } from '@celo/contractkit/lib/generated/ICeloVersionedContract'
-import { newProxy } from '@celo/contractkit/lib/generated/Proxy'
 import { cli } from 'cli-ux'
 import { table } from 'cli-ux/lib/styled/table'
 import { BaseCommand } from '../../base'
@@ -10,6 +10,9 @@ const UNVERSIONED_CONTRACTS = [
   CeloContract.Registry,
   CeloContract.FeeCurrencyWhitelist,
   CeloContract.Freezer,
+  CeloContract.StableToken,
+  CeloContract.StableTokenBRL,
+  CeloContract.StableTokenEUR,
 ]
 const UNPROXIED_CONTRACTS: CeloContract[] = []
 
