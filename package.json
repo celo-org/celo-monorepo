@@ -28,7 +28,7 @@
     "keys:decrypt": "bash scripts/key_placer.sh decrypt",
     "keys:encrypt": "bash scripts/key_placer.sh encrypt",
     "check:packages": "node ./scripts/check-packages.js",
-    "release": "yarn build && yarn cs publish",
+    "release": "yarn clean && yarn build && yarn --cwd packages/cli run prepack && yarn cs publish",
     "beta-enter": "bash scripts/beta-mode.sh",
     "beta-exit": "yarn changeset pre exit && git commit -am 'Complete beta mode'",
     "version-and-reinstall": "yarn changeset version && yarn install",
