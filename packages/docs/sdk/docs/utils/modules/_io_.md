@@ -17,7 +17,6 @@
 ### Variables
 
 * [AddressType](_io_.md#const-addresstype)
-* [AttestationServiceStatusResponseType](_io_.md#const-attestationservicestatusresponsetype)
 * [JSONStringType](_io_.md#const-jsonstringtype)
 * [PublicKeyType](_io_.md#const-publickeytype)
 * [SaltType](_io_.md#const-salttype)
@@ -69,29 +68,6 @@ ___
 )
 
 *Defined in [io.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L38)*
-
-___
-
-### `Const` AttestationServiceStatusResponseType
-
-• **AttestationServiceStatusResponseType**: *TypeC‹object›* = t.type({
-  status: t.literal('ok'),
-  smsProviders: t.array(t.string),
-  blacklistedRegionCodes: t.union([t.array(t.string), t.undefined]),
-  accountAddress: AddressType,
-  signature: t.union([SignatureType, t.undefined]),
-  version: t.string,
-  latestBlock: t.number,
-  ageOfLatestBlock: t.number,
-  isNodeSyncing: t.boolean,
-  appSignature: t.string,
-  smsProvidersRandomized: t.boolean,
-  maxDeliveryAttempts: t.number,
-  maxRerequestMins: t.number,
-  twilioVerifySidProvided: t.boolean,
-})
-
-*Defined in [io.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/io.ts#L68)*
 
 ___
 

@@ -9,7 +9,6 @@
 * ["account"](modules/_account_.md)
 * ["address"](modules/_address_.md)
 * ["async"](modules/_async_.md)
-* ["attestations"](modules/_attestations_.md)
 * ["collections"](modules/_collections_.md)
 * ["contacts"](modules/_contacts_.md)
 * ["currencies"](modules/_currencies_.md)

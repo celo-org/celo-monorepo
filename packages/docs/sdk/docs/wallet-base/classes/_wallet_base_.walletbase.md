@@ -1,6 +1,6 @@
 [@celo/wallet-base](../README.md) › ["wallet-base"](../modules/_wallet_base_.md) › [WalletBase](_wallet_base_.walletbase.md)
 
-# Class: WalletBase <**TSigner**>
+# Class: WalletBase ‹**TSigner**›
 
 ## Type parameters
 
@@ -33,7 +33,7 @@
 
 ▸ **computeSharedSecret**(`address`: Address, `publicKey`: string): *Promise‹Buffer›*
 
-*Defined in [wallets/wallet-base/src/wallet-base.ts:140](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L140)*
+*Defined in [wallets/wallet-base/src/wallet-base.ts:141](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L141)*
 
 Computes the shared secret (an ECDH key exchange object) between two accounts
 
@@ -52,7 +52,7 @@ ___
 
 ▸ **decrypt**(`address`: string, `ciphertext`: Buffer): *Promise‹Buffer‹››*
 
-*Defined in [wallets/wallet-base/src/wallet-base.ts:132](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L132)*
+*Defined in [wallets/wallet-base/src/wallet-base.ts:133](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L133)*
 
 **Parameters:**
 
@@ -117,7 +117,7 @@ ___
 
 ▸ **signPersonalMessage**(`address`: Address, `data`: string): *Promise‹string›*
 
-*Defined in [wallets/wallet-base/src/wallet-base.ts:96](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L96)*
+*Defined in [wallets/wallet-base/src/wallet-base.ts:97](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L97)*
 
 Sign a personal Ethereum signed message.
 
@@ -156,7 +156,7 @@ ___
 
 ▸ **signTypedData**(`address`: Address, `typedData`: EIP712TypedData): *Promise‹string›*
 
-*Defined in [wallets/wallet-base/src/wallet-base.ts:113](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L113)*
+*Defined in [wallets/wallet-base/src/wallet-base.ts:114](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/wallet-base.ts#L114)*
 
 Sign an EIP712 Typed Data message.
 
