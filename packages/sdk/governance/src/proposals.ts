@@ -134,6 +134,7 @@ export const proposalToJSON = async (
 
   const updateRegistryMapping = async (name: CeloContract, address: Address) => {
     debug(`updating registry to reflect ${name} => ${address}`)
+    // this just sets the mapping in memory not anywhere like on chain or on a server
     await blockExplorer.updateContractDetailsMapping(stripProxy(name), address)
   }
   if (registryAdditions) {
@@ -225,6 +226,7 @@ export const proposalToJSON = async (
         threshold: fromFixed(new BigNumber(threshold)),
       }
     }
+    console.info('.')
     proposalJson.push(jsonTx)
   }
 
