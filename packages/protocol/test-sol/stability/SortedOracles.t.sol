@@ -144,9 +144,6 @@ contract AddOracle is SortedOraclesTest {
 }
 
 contract GetTokenReportExpirySeconds is SortedOraclesTest {
-  function setUp() public {
-    super.setUp();
-  }
 
   function test_ShouldGetTokenReportExpirySeconds_WhenNoTokenLevelExpiryIsSet() public {
     assertEq(sortedOracle.getTokenReportExpirySeconds(aToken), reportExpiry);
