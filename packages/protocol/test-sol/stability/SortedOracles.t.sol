@@ -86,9 +86,6 @@ contract SetReportExpiry is SortedOraclesTest {
 }
 
 contract SetTokenReportExpiry is SortedOraclesTest {
-  function setUp() public {
-    super.setUp();
-  }
 
   function test_ShouldSetTokenReportExpiry() public {
     uint256 newReportExpiry = 7200;
