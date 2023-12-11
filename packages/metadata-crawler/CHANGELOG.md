@@ -6,6 +6,14 @@
 
 - Updated dependencies [1c9c844cf]
   - @celo/contractkit@6.0.0-beta.0
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [9ab9d00eb]
+- Updated dependencies [1c9c844cf]
+- Updated dependencies [9ab9d00eb]
+  - @celo/contractkit@6.0.0
 
 ## 0.0.3
 
