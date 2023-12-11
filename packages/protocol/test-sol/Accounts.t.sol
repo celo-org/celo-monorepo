@@ -3,14 +3,10 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
-import "../contracts/identity/Escrow.sol";
-import "../contracts/identity/FederatedAttestations.sol";
-import "../contracts/identity/test/MockAttestations.sol";
-import "../contracts/identity/test/MockERC20Token.sol";
-import "../contracts/common/FixidityLib.sol";
-import "../contracts/common/Registry.sol";
-import "../contracts/common/Accounts.sol";
-import "../contracts/governance/test/MockValidators.sol";
+import "@celo-contracts/common/FixidityLib.sol";
+import "@celo-contracts/common/Registry.sol";
+import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts/governance/test/MockValidators.sol";
 
 contract AccountsTest is Test {
   using FixidityLib for FixidityLib.Fraction;
@@ -205,7 +201,7 @@ contract AccountsTest is Test {
   }
 }
 
-contract CreateAccount is AccountsTest {
+contract AccountsCreateAccount is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -223,7 +219,7 @@ contract CreateAccount is AccountsTest {
   }
 }
 
-contract SetAccountDataEncryptionKey is AccountsTest {
+contract AccountsSetAccountDataEncryptionKey is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -257,7 +253,7 @@ contract SetAccountDataEncryptionKey is AccountsTest {
   }
 }
 
-contract SetAccount is AccountsTest {
+contract AccountsSetAccount is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -345,7 +341,7 @@ contract SetAccount is AccountsTest {
   }
 }
 
-contract SetWalletAddress is AccountsTest {
+contract AccountsSetWalletAddress is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -395,7 +391,7 @@ contract SetWalletAddress is AccountsTest {
   }
 }
 
-contract SetMetadataURL is AccountsTest {
+contract AccountsSetMetadataURL is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -419,7 +415,7 @@ contract SetMetadataURL is AccountsTest {
   }
 }
 
-contract BatchGetMetadataURL is AccountsTest {
+contract AccountsBatchGetMetadataURL is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -470,7 +466,7 @@ contract BatchGetMetadataURL is AccountsTest {
   }
 }
 
-contract AddStorageRoot is AccountsTest {
+contract AccountsAddStorageRoot is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -516,7 +512,7 @@ contract AddStorageRoot is AccountsTest {
   }
 }
 
-contract RemoveStorageRoot is AccountsTest {
+contract AccountsRemoveStorageRoot is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -592,7 +588,7 @@ contract RemoveStorageRoot is AccountsTest {
   }
 }
 
-contract SetPaymentDelegation is AccountsTest {
+contract AccountsSetPaymentDelegation is AccountsTest {
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
   uint256 badFraction = FixidityLib.newFixedFraction(12, 10).unwrap();
@@ -634,7 +630,7 @@ contract SetPaymentDelegation is AccountsTest {
   }
 }
 
-contract DeletePaymentDelegation is AccountsTest {
+contract AccountsDeletePaymentDelegation is AccountsTest {
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
 
@@ -664,7 +660,7 @@ contract DeletePaymentDelegation is AccountsTest {
   }
 }
 
-contract SetName is AccountsTest {
+contract AccountsSetName is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -688,7 +684,7 @@ contract SetName is AccountsTest {
   }
 }
 
-contract GenericAuthorization is AccountsTest {
+contract AccountsGenericAuthorization is AccountsTest {
   address account2 = actor("account2");
   address signer;
   uint256 signerPK;
@@ -872,7 +868,7 @@ contract GenericAuthorization is AccountsTest {
   }
 }
 
-contract BackwardCompatibility is AccountsTest {
+contract AccountsBackwardCompatibility is AccountsTest {
   address account = address(this);
   address otherAccount = actor("otherAccount");
 

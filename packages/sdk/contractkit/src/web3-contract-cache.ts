@@ -1,8 +1,4 @@
 // tslint:disable: ordered-imports
-import debugFactory from 'debug'
-import { AddressRegistry } from './address-registry'
-import { CeloContract, ProxyContracts } from './base'
-import { StableToken } from './celo-tokens'
 import { newGasPriceMinimum } from '@celo/abis/web3/0.8/GasPriceMinimum'
 import { newAccounts } from '@celo/abis/web3/Accounts'
 import { newAttestations } from '@celo/abis/web3/Attestations'
@@ -20,8 +16,6 @@ import { newGoldToken } from '@celo/abis/web3/GoldToken'
 import { newGovernance } from '@celo/abis/web3/Governance'
 import { newIERC20 } from '@celo/abis/web3/IERC20'
 import { newLockedGold } from '@celo/abis/web3/LockedGold'
-import { newMetaTransactionWallet } from '@celo/abis/web3/MetaTransactionWallet'
-import { newMetaTransactionWalletDeployer } from '@celo/abis/web3/MetaTransactionWalletDeployer'
 import { newMultiSig } from '@celo/abis/web3/MultiSig'
 import { newOdisPayments } from '@celo/abis/web3/OdisPayments'
 import { newProxy } from '@celo/abis/web3/Proxy'
@@ -32,9 +26,12 @@ import { newValidators } from '@celo/abis/web3/Validators'
 import { newExchange } from '@celo/abis/web3/mento/Exchange'
 import { newExchangeBRL } from '@celo/abis/web3/mento/ExchangeBRL'
 import { newExchangeEUR } from '@celo/abis/web3/mento/ExchangeEUR'
-import { newGrandaMento } from '@celo/abis/web3/mento/GrandaMento'
 import { newReserve } from '@celo/abis/web3/mento/Reserve'
 import { newStableToken } from '@celo/abis/web3/mento/StableToken'
+import debugFactory from 'debug'
+import { AddressRegistry } from './address-registry'
+import { CeloContract, ProxyContracts } from './base'
+import { StableToken } from './celo-tokens'
 
 import { newMentoFeeHandlerSeller } from '@celo/abis/web3/MentoFeeHandlerSeller'
 import { newUniswapFeeHandlerSeller } from '@celo/abis/web3/UniswapFeeHandlerSeller'
@@ -63,10 +60,7 @@ export const ContractFactories = {
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
-  [CeloContract.GrandaMento]: newGrandaMento,
   [CeloContract.LockedGold]: newLockedGold,
-  [CeloContract.MetaTransactionWallet]: newMetaTransactionWallet,
-  [CeloContract.MetaTransactionWalletDeployer]: newMetaTransactionWalletDeployer,
   [CeloContract.MultiSig]: newMultiSig,
   [CeloContract.OdisPayments]: newOdisPayments,
   [CeloContract.Random]: newRandom,
@@ -83,13 +77,13 @@ const StableToContract = {
   [StableToken.cEUR]: CeloContract.StableTokenEUR,
   [StableToken.cUSD]: CeloContract.StableToken,
   [StableToken.cREAL]: CeloContract.StableTokenBRL,
-}
+} as const
 
 const StableToExchange = {
   [StableToken.cEUR]: CeloContract.ExchangeEUR,
   [StableToken.cUSD]: CeloContract.Exchange,
   [StableToken.cREAL]: CeloContract.ExchangeBRL,
-}
+} as const
 
 export type CFType = typeof ContractFactories
 type ContractCacheMap = { [K in keyof CFType]?: ReturnType<CFType[K]> }
@@ -157,23 +151,8 @@ export class Web3ContractCache {
   getGovernance() {
     return this.getContract(CeloContract.Governance)
   }
-  getGrandaMento() {
-    return this.getContract(CeloContract.GrandaMento)
-  }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
-  }
-  /*
-    @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
-  */
-  getMetaTransactionWallet(address: string) {
-    return this.getContract(CeloContract.MetaTransactionWallet, address)
-  }
-  /*
-    @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
-  */
-  getMetaTransactionWalletDeployer(address: string) {
-    return this.getContract(CeloContract.MetaTransactionWalletDeployer, address)
   }
   getMultiSig(address: string) {
     return this.getContract(CeloContract.MultiSig, address)

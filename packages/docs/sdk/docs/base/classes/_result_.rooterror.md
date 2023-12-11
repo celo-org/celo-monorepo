@@ -1,6 +1,6 @@
 [@celo/base](../README.md) › ["result"](../modules/_result_.md) › [RootError](_result_.rooterror.md)
 
-# Class: RootError <**T**>
+# Class: RootError ‹**T**›
 
 ## Type parameters
 
@@ -66,7 +66,7 @@ ___
 
 *Inherited from [RootError](_result_.rooterror.md).[message](_result_.rooterror.md#message)*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:974
+Defined in node_modules/typescript/lib/lib.es5.d.ts:1029
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 *Inherited from [RootError](_result_.rooterror.md).[name](_result_.rooterror.md#name)*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:973
+Defined in node_modules/typescript/lib/lib.es5.d.ts:1028
 
 ___
 
@@ -86,9 +86,7 @@ ___
 
 *Inherited from [RootError](_result_.rooterror.md).[stack](_result_.rooterror.md#optional-stack)*
 
-*Overrides [RootError](_result_.rooterror.md).[stack](_result_.rooterror.md#optional-stack)*
-
-Defined in node_modules/typescript/lib/lib.es5.d.ts:975
+Defined in node_modules/typescript/lib/lib.es5.d.ts:1030
 
 ___
 
@@ -96,4 +94,4 @@ ___
 
 ▪ **Error**: *ErrorConstructor*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:984
+Defined in node_modules/typescript/lib/lib.es5.d.ts:1039

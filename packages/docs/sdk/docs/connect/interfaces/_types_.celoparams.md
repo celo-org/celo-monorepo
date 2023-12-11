@@ -20,7 +20,7 @@
 
 • **feeCurrency**: *string*
 
-*Defined in [types.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L7)*
+*Defined in [types.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L13)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **gatewayFee**: *string*
 
-*Defined in [types.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L9)*
+*Defined in [types.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L21)*
 
 ___
 
@@ -36,4 +36,4 @@ ___
 
 • **gatewayFeeRecipient**: *string*
 
-*Defined in [types.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L8)*
+*Defined in [types.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L17)*
