@@ -21,8 +21,6 @@ import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
 import { GovernanceWrapper } from './wrappers/Governance'
 import { LockedGoldWrapper } from './wrappers/LockedGold'
-import { MetaTransactionWalletWrapper } from './wrappers/MetaTransactionWallet'
-import { MetaTransactionWalletDeployerWrapper } from './wrappers/MetaTransactionWalletDeployer'
 import { MultiSigWrapper } from './wrappers/MultiSig'
 import { OdisPaymentsWrapper } from './wrappers/OdisPayments'
 import { ReserveWrapper } from './wrappers/Reserve'
@@ -46,8 +44,6 @@ const WrapperFactories = {
   [CeloContract.GoldToken]: GoldTokenWrapper,
   // [CeloContract.Random]: RandomWrapper,
   // [CeloContract.Registry]: RegistryWrapper,
-  [CeloContract.MetaTransactionWallet]: MetaTransactionWalletWrapper,
-  [CeloContract.MetaTransactionWalletDeployer]: MetaTransactionWalletDeployerWrapper,
   [CeloContract.MultiSig]: MultiSigWrapper,
   [CeloContract.OdisPayments]: OdisPaymentsWrapper,
   [CeloContract.Reserve]: ReserveWrapper,
@@ -100,8 +96,6 @@ interface WrapperCacheMap {
   [CeloContract.GoldToken]?: GoldTokenWrapper
   [CeloContract.Governance]?: GovernanceWrapper
   [CeloContract.LockedGold]?: LockedGoldWrapper
-  [CeloContract.MetaTransactionWallet]?: MetaTransactionWalletWrapper
-  [CeloContract.MetaTransactionWalletDeployer]?: MetaTransactionWalletDeployerWrapper
   [CeloContract.MultiSig]?: MultiSigWrapper
   [CeloContract.OdisPayments]?: OdisPaymentsWrapper
   // [CeloContract.Random]?: RandomWrapper,
@@ -180,18 +174,6 @@ export class WrapperCache implements ContractCacheType {
   }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
-  }
-  /*
-    @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
-  */
-  getMetaTransactionWallet(address: string) {
-    return this.getContract(CeloContract.MetaTransactionWallet, address)
-  }
-  /*
-    @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
-  */
-  getMetaTransactionWalletDeployer(address: string) {
-    return this.getContract(CeloContract.MetaTransactionWalletDeployer, address)
   }
   getMultiSig(address: string) {
     return this.getContract(CeloContract.MultiSig, address)

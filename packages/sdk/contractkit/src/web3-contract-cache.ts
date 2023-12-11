@@ -16,8 +16,6 @@ import { newGoldToken } from '@celo/abis/web3/GoldToken'
 import { newGovernance } from '@celo/abis/web3/Governance'
 import { newIERC20 } from '@celo/abis/web3/IERC20'
 import { newLockedGold } from '@celo/abis/web3/LockedGold'
-import { newMetaTransactionWallet } from '@celo/abis/web3/MetaTransactionWallet'
-import { newMetaTransactionWalletDeployer } from '@celo/abis/web3/MetaTransactionWalletDeployer'
 import { newMultiSig } from '@celo/abis/web3/MultiSig'
 import { newOdisPayments } from '@celo/abis/web3/OdisPayments'
 import { newProxy } from '@celo/abis/web3/Proxy'
@@ -63,8 +61,6 @@ export const ContractFactories = {
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
   [CeloContract.LockedGold]: newLockedGold,
-  [CeloContract.MetaTransactionWallet]: newMetaTransactionWallet,
-  [CeloContract.MetaTransactionWalletDeployer]: newMetaTransactionWalletDeployer,
   [CeloContract.MultiSig]: newMultiSig,
   [CeloContract.OdisPayments]: newOdisPayments,
   [CeloContract.Random]: newRandom,
@@ -157,18 +153,6 @@ export class Web3ContractCache {
   }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
-  }
-  /*
-    @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
-  */
-  getMetaTransactionWallet(address: string) {
-    return this.getContract(CeloContract.MetaTransactionWallet, address)
-  }
-  /*
-    @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
-  */
-  getMetaTransactionWalletDeployer(address: string) {
-    return this.getContract(CeloContract.MetaTransactionWalletDeployer, address)
   }
   getMultiSig(address: string) {
     return this.getContract(CeloContract.MultiSig, address)

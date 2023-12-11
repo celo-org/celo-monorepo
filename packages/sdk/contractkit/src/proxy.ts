@@ -18,8 +18,6 @@ import { ABI as GoldTokenABI } from '@celo/abis/web3/GoldToken'
 import { ABI as GovernanceABI } from '@celo/abis/web3/Governance'
 import { ABI as LockedGoldABI } from '@celo/abis/web3/LockedGold'
 import { ABI as MentoFeeHandlerSellerABI } from '@celo/abis/web3/MentoFeeHandlerSeller'
-import { ABI as MetaTransactionWalletABI } from '@celo/abis/web3/MetaTransactionWallet'
-import { ABI as MetaTransactionWalletDeployerABI } from '@celo/abis/web3/MetaTransactionWalletDeployer'
 import { ABI as MultiSigABI } from '@celo/abis/web3/MultiSig'
 import { ABI as OdisPaymentsABI } from '@celo/abis/web3/OdisPayments'
 import { ABI as ProxyABI } from '@celo/abis/web3/Proxy'
@@ -118,8 +116,6 @@ const initializeAbiMap = {
   GoldTokenProxy: findInitializeAbi(GoldTokenABI),
   GovernanceProxy: findInitializeAbi(GovernanceABI),
   LockedGoldProxy: findInitializeAbi(LockedGoldABI),
-  MetaTransactionWalletProxy: findInitializeAbi(MetaTransactionWalletABI),
-  MetaTransactionWalletDeployerProxy: findInitializeAbi(MetaTransactionWalletDeployerABI),
   MultiSigProxy: findInitializeAbi(MultiSigABI),
   OdisPaymentsProxy: findInitializeAbi(OdisPaymentsABI),
   ProxyProxy: findInitializeAbi(ProxyABI),
