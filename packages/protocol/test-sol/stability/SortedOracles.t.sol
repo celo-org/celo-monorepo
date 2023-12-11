@@ -632,7 +632,7 @@ contract Report is SortedOraclesTest {
 
   }
 
-  function test_ShouldUpdateTheLIstOfRatesCorrectly_WhenThereAreMultipleReportsTheMostRecentOneDoneByThisOracle()
+  function test_ShouldUpdateTheListOfRatesCorrectly_WhenThereAreMultipleReportsTheMostRecentOneIsDoneByThisOracle()
     public
   {
     helper_WhenThereAreMultipleReportsTheMostRecentOneDoneByThisOracle();
