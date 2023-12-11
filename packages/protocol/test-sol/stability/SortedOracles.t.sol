@@ -42,9 +42,6 @@ contract SortedOraclesTest is Test {
 }
 
 contract Initialize is SortedOraclesTest {
-  function setUp() public {
-    super.setUp();
-  }
 
   function test_ownerSet() public {
     assertEq(sortedOracle.owner(), address(this));
