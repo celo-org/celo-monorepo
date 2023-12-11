@@ -3,10 +3,10 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
-import "../../contracts/identity/OdisPayments.sol";
+import "@celo-contracts/identity/OdisPayments.sol";
 import { StableToken } from "../../lib/mento-core/contracts/StableToken.sol";
-import "../../contracts/common/Registry.sol";
-import "../../contracts/common/Freezer.sol";
+import "@celo-contracts/common/Registry.sol";
+import "@celo-contracts/common/Freezer.sol";
 
 contract OdisPaymentsFoundryTest is Test {
   uint256 FIXED1 = 1000000000000000000000000;

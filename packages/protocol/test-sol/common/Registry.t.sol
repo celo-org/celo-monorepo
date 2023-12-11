@@ -4,7 +4,7 @@ pragma solidity ^0.5.13;
 import "celo-foundry/Test.sol";
 
 // Contract to test
-import "../../contracts/common/Registry.sol";
+import "@celo-contracts/common/Registry.sol";
 
 contract RegistryTest is Test {
   event RegistryUpdated(string identifier, bytes32 indexed identifierHash, address indexed addr);

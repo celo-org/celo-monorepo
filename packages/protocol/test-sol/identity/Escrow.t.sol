@@ -3,13 +3,13 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
-import "../../contracts/identity/Escrow.sol";
-import "../../contracts/identity/FederatedAttestations.sol";
-import "../../contracts/identity/test/MockAttestations.sol";
-import "../../contracts/identity/test/MockERC20Token.sol";
-import "../../contracts/common/FixidityLib.sol";
-import "../../contracts/common/Registry.sol";
-import "../../contracts/common/Signatures.sol";
+import "@celo-contracts/identity/Escrow.sol";
+import "@celo-contracts/identity/FederatedAttestations.sol";
+import "@celo-contracts/identity/test/MockAttestations.sol";
+import "@celo-contracts/identity/test/MockERC20Token.sol";
+import "@celo-contracts/common/FixidityLib.sol";
+import "@celo-contracts/common/Registry.sol";
+import "@celo-contracts/common/Signatures.sol";
 
 contract EscrowTest is Test {
   using FixidityLib for FixidityLib.Fraction;

@@ -4,8 +4,8 @@ pragma solidity ^0.5.13;
 import "celo-foundry/Test.sol";
 
 // Contract to test
-import "../../contracts/identity/Random.sol";
-import "../../contracts/identity/test/RandomTest.sol";
+import "@celo-contracts/identity/Random.sol";
+import "@celo-contracts/identity/test/RandomTest.sol";
 
 contract SetRandomnessRetentionWindow is Test {
   event RandomnessBlockRetentionWindowSet(uint256 value);

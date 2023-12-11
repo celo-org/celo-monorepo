@@ -4,7 +4,7 @@ pragma solidity ^0.5.13;
 import "celo-foundry/Test.sol";
 
 // Contract to test
-import "../../contracts/common/test/LinkedListWrapper.sol";
+import "@celo-contracts/common/test/LinkedListWrapper.sol";
 
 contract LinkedListInsert is Test {
   LinkedListWrapper linkedList;

@@ -4,7 +4,7 @@ pragma solidity ^0.5.13;
 import "celo-foundry/Test.sol";
 
 // Contract to test
-import "../../contracts/common/test/FixidityWrapper.sol";
+import "@celo-contracts/common/test/FixidityWrapper.sol";
 
 contract FixidityTest is Test {
   uint256 private constant FIXED1_UINT = 1000000000000000000000000;

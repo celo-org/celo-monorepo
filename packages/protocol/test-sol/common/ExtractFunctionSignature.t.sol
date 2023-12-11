@@ -4,7 +4,7 @@ pragma solidity ^0.5.13;
 import "celo-foundry/Test.sol";
 
 // Contract to test
-import "../../contracts/common/ExtractFunctionSignature.sol";
+import "@celo-contracts/common/ExtractFunctionSignature.sol";
 
 contract ExtractFunctionSignatureWrapper {
   function extractFunctionSignature(bytes memory input) public pure returns (bytes4) {
