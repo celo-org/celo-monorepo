@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.0.0-beta.2
+
+### Major Changes
+
+- 9ab9d00eb: Removes Grandamento from cli and contractkit completely as it has become no op by mento team
+
+### Patch Changes
+
+- Updated dependencies [9ab9d00eb]
+- Updated dependencies [444db6de9]
+- Updated dependencies [9ab9d00eb]
+  - @celo/contractkit@6.0.0-beta.1
+  - @celo/governance@5.0.7-beta.2
+
 ## 3.1.2-beta.1
 
 ### Patch Changes
@@ -7,7 +21,6 @@
 - e4da5a7a8: Add textual feedback about parsing proposal
 - Updated dependencies [e4da5a7a8]
   - @celo/governance@5.0.7-beta.1
-
 
 ## 3.1.2-beta.0
 
