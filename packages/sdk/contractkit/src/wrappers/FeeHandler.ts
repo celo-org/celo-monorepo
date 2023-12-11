@@ -1,7 +1,6 @@
 import { FeeHandler } from '@celo/abis/web3/FeeHandler'
 import { Address } from '@celo/connect'
 import BigNumber from 'bignumber.js'
-import { StableTokenContract } from '../base'
 import { BaseWrapper, proxyCall, proxySend } from './BaseWrapper'
 
 export enum ExchangeProposalState {
@@ -10,14 +9,6 @@ export enum ExchangeProposalState {
   Approved,
   Executed,
   Cancelled,
-}
-
-export interface GrandaMentoConfig {
-  approver: string
-  spread: BigNumber
-  vetoPeriodSeconds: BigNumber
-  maxApprovalExchangeRateChange: BigNumber
-  exchangeLimits: AllStableConfig
 }
 
 export interface StableTokenExchangeLimits {
@@ -48,8 +39,6 @@ export interface ExchangeProposalReadable {
   id: string | number
   implictPricePerCelo: BigNumber
 }
-
-type AllStableConfig = Map<StableTokenContract, StableTokenExchangeLimits>
 
 export class FeeHandlerWrapper extends BaseWrapper<FeeHandler> {
   owner = proxyCall(this.contract.methods.owner)

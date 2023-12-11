@@ -1,6 +1,6 @@
 [@celo/base](../README.md) › ["task"](../modules/_task_.md) › [RunningTaskWithValue](_task_.runningtaskwithvalue.md)
 
-# Interface: RunningTaskWithValue <**A**>
+# Interface: RunningTaskWithValue ‹**A**›
 
 ## Type parameters
 

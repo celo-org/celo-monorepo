@@ -1,6 +1,6 @@
 [@celo/base](../README.md) › ["task"](../modules/_task_.md) › [RetryTaskOptions](_task_.retrytaskoptions.md)
 
-# Interface: RetryTaskOptions <**A**>
+# Interface: RetryTaskOptions ‹**A**›
 
 ## Type parameters
 

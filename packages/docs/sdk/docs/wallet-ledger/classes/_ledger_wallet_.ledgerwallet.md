@@ -256,19 +256,15 @@ ___
 
 ▸ **signTransaction**(`txParams`: CeloTx): *Promise‹EncodedTransaction›*
 
-*Inherited from [LedgerWallet](_ledger_wallet_.ledgerwallet.md).[signTransaction](_ledger_wallet_.ledgerwallet.md#signtransaction)*
-
 *Overrides void*
 
-Defined in wallet-remote/lib/remote-wallet.d.ts:37
-
-Signs the EVM transaction using the signer pulled from the from field
+*Defined in [wallet-ledger/src/ledger-wallet.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-wallet.ts#L70)*
 
 **Parameters:**
 
-Name | Type | Description |
------- | ------ | ------ |
-`txParams` | CeloTx | EVM transaction  |
+Name | Type |
+------ | ------ |
+`txParams` | CeloTx |
 
 **Returns:** *Promise‹EncodedTransaction›*
 

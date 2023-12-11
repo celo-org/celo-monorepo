@@ -17,7 +17,7 @@
 
 ###  pipeToFuture
 
-▸ **pipeToFuture**<**A**>(`p`: Promise‹A›, `future`: [Future](../classes/_future_.future.md)‹A›): *[Future](../classes/_future_.future.md)‹A›*
+▸ **pipeToFuture**‹**A**›(`p`: Promise‹A›, `future`: [Future](../classes/_future_.future.md)‹A›): *[Future](../classes/_future_.future.md)‹A›*
 
 *Defined in [packages/sdk/base/src/future.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/future.ts#L51)*
 
@@ -40,7 +40,7 @@ ___
 
 ###  toFuture
 
-▸ **toFuture**<**A**>(`p`: Promise‹A›): *[Future](../classes/_future_.future.md)‹A›*
+▸ **toFuture**‹**A**›(`p`: Promise‹A›): *[Future](../classes/_future_.future.md)‹A›*
 
 *Defined in [packages/sdk/base/src/future.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/future.ts#L46)*
 
