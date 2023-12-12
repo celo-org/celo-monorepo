@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.1.3
+
+### Patch Changes
+
+- 041fc926f: Add textual feedback about parsing proposal
+- Updated dependencies [041fc926f]
+- Updated dependencies [041fc926f]
+- Updated dependencies [041fc926f]
+  - @celo/governance@5.0.8
+
 ## 3.1.2-beta.2
 
 ### Patch Changes
@@ -7,7 +17,6 @@
 - ba27783ae: Revert removal of Contracts
 - Updated dependencies [ba27783ae]
   - @celo/contractkit@6.0.0-beta.2
-
 
 ### Patch Changes
 
