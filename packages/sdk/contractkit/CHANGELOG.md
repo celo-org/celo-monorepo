@@ -1,5 +1,16 @@
 # @celo/contractkit
 
+## 6.0.0
+
+### Major Changes
+
+- 1c9c844cf: Remove contracts from lib/generated. now available in @celo/abis package at @celo/abis/web3
+
+  If you were directly importing contracts from `@celo/contractkit/lib/generated/*` eg `@celo/lib/generated/Accounts` do a find replace
+
+  find: `@celo/contractkit/lib/generated/`
+  replace: `@celo/abis/web3/`
+
 ## 6.0.0-beta.2
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @celo/governance
 
+## 5.0.7
+
+### Patch Changes
+
+- 444db6de9: Turn back on parallel registry updating for governance proposal views
+- 49f94416c: Add textual feedback about parsing proposal
+- 998da4757: Fix Proposal View Regression when it includes proxy updates
+- Updated dependencies [1c9c844cf]
+  - @celo/contractkit@6.0.0
+  - @celo/explorer@5.0.7
+
 ## 5.0.7-beta.2
 
 ### Patch Changes

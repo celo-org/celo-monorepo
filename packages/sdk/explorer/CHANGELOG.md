@@ -1,5 +1,12 @@
 # @celo/explorer
 
+## 5.0.7
+
+### Patch Changes
+
+- Updated dependencies [1c9c844cf]
+  - @celo/contractkit@6.0.0
+
 ## 5.0.7-beta.0
 
 ### Patch Changes

@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.1.2
+
+### Patch Changes
+
+- bb3cf9f2e: update terminology: refer to celo not gold.
+- bb3cf9f2e: Alias releasecelo to releasegold
+- 49f94416c: Add textual feedback about parsing proposal
+- Updated dependencies [1c9c844cf]
+- Updated dependencies [444db6de9]
+- Updated dependencies [49f94416c]
+- Updated dependencies [998da4757]
+  - @celo/contractkit@6.0.0
+  - @celo/governance@5.0.7
+  - @celo/explorer@5.0.7
+
 ## 3.1.2-beta.2
 
 ### Patch Changes
