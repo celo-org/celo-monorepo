@@ -1,5 +1,11 @@
 # @celo/contractkit
 
+## 6.0.0-beta.2
+
+### Patch Changes
+
+- ba27783ae: Revert removal of Contracts
+
 ## 6.0.0-beta.1
 
 ### Major Changes
