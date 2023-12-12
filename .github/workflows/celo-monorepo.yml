@@ -171,10 +171,7 @@ jobs:
           # Skipping packages that are tested in a specific job below
           yarn run lerna \
             --ignore @celo/contractkit \
-            --ignore @celo/protocol \
-            --ignore @celo/celotool \
             --ignore @celo/celocli \
-            --ignore @celo/env-tests \
             --ignore '@celo/wallet-*' \
             run test
       - name: Upload Jest Test Results
@@ -199,117 +196,14 @@ jobs:
         run: |
           yarn run lerna --scope '@celo/wallet-*' run test
 
-  protocol-test-release:
-    name: Protocol Test Release
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 500
-    needs: [install-dependencies, lint-checks]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: recursive
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Download protocol devchain artifact
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          workflow: protocol-devchain.yml
-          name: devchain-${{ env.RELEASE_TAG }}
-          path: packages/protocol/.tmp/devchain
-      - name: Copy DevChain and Build generated from released tag
-        run: |
-          BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
-          (cp -r packages/protocol/.tmp/devchain packages/protocol/$BUILD_AND_DEVCHAIN_DIR)
-      - name: Test against current release
-        run: |
-          echo "Comparing against $RELEASE_TAG"
-          BUILD_AND_DEVCHAIN_DIR=$(echo build/$(echo $RELEASE_TAG | sed -e 's/\//_/g'))
-          yarn --cwd packages/protocol ci:test-make-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR
-
-  protocol-test-matrix:
-    # Keeping name short because GitHub UI does not handle long names well
-    name: ${{ matrix.name }}
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 60
-    needs: [install-dependencies, lint-checks]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: Protocol Release Snapshots
-            command: |
-              yarn --cwd packages/protocol test:release-snapshots
-              if [[ $(git status packages/protocol/releaseData/versionReports --porcelain) ]]; then
-                git --no-pager diff packages/protocol/releaseData/versionReports
-                echo "There are git differences after generating release version report snapshots"
-                echo "If these changes are intended, update the 'releaseData/versionReports' accordingly"
-                exit 1
-              fi
-          - name: Protocol Common tests
-            command: |
-              yarn --cwd packages/protocol test common/
-          - name: Protocol Compatibility
-            command: |
-              yarn --cwd packages/protocol test compatibility/
-          - name: Protocol Governance Network
-            command: |
-              yarn --cwd packages/protocol test governance/network/
-          - name: Protocol Governance Validators
-            command: |
-              yarn --cwd packages/protocol test governance/validators/
-          - name: Protocol Governance Voting
-            command: |
-              yarn --cwd packages/protocol test governance/voting/
-          - name: Protocol Stability
-            command: |
-              yarn --cwd packages/protocol test stability/
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          rebuild-package: 'true'
-          artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Execute matrix command for test
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 40
-          max_attempts: 3
-          command: |
-            ${{ matrix.command }}
-
   contractkit-tests:
     name: ContractKit Tests
     runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 30
     needs: [install-dependencies]
     if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
+      github.base_ref == 'master' ||  contains(github.base_ref, 'release') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -333,8 +227,6 @@ jobs:
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/cli') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
@@ -367,32 +259,6 @@ jobs:
       - name: Test that releasecelo command topic is working
         run: |
           yarn --cwd=packages/cli run celocli releasecelo --help
-  typescript-tests:
-    name: Typescript package Tests
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 30
-    needs: [install-dependencies]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Install and test the npm package
-        run: |
-          set -euo pipefail
-          cd packages/typescript
-          yarn pack
-          cd $RUNNER_TEMP
-          npm install $RUNNER_WORKSPACE/celo-monorepo/packages/typescript/*.tgz
 
   base-test:
     name: SDK Base package Tests
@@ -452,157 +318,3 @@ jobs:
           cd $RUNNER_TEMP
           npm install $RUNNER_WORKSPACE/celo-monorepo/packages/sdk/base/*.tgz
           npm install $RUNNER_WORKSPACE/celo-monorepo/packages/sdk/utils/*.tgz
-
-  end-to-end-geth-matrix:
-    # Keeping name short because GitHub UI does not handle long names well
-    name: e2e ${{ matrix.name }}
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 60
-    needs: [install-dependencies, lint-checks, contractkit-tests]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/celotool') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: Transfer test
-            command: |
-              set -e
-              # Forcing to load go and rust paths
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_transfers.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Blockchain Parameters test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_blockchain_parameters.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Slashing test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_slashing.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Governance test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_governance.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Replica test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_replicas.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Sync test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              ./ci_test_sync.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: CIP35 eth compatibility test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-              echo "Test is skipped because migrations somehow fail"
-              # ./ci_test_cip35.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-          - name: Validator order test
-            command: |
-              set -e
-              export PATH="/usr/local/go/bin:$HOME/.cargo/bin:${PATH}"
-              cd packages/celotool
-
-              ./ci_test_validator_order.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Execute matrix command for test
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 30
-          max_attempts: 3
-          command: |
-            ${{ matrix.command }}
-
-  # NOTE: This has not been fully tested as we don't have a license for certora
-  certora-test:
-    name: Certora test ${{ matrix.name }}
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 30
-    needs: [install-dependencies, lint-checks]
-    # Disable as certora license is not active
-    if: |
-      false && (
-        github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-        contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-        contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-        contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-        contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock')
-      )
-    env:
-      CERTORAKEY: NOT_ACTIVE
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: Locked Gold
-            command: |
-              cd packages/protocol
-              ./specs/scripts/lockedgold.sh
-          - name: Accounts
-            command: |
-              cd packages/protocol
-              ./specs/scripts/accounts.sh
-          - name: Accounts
-            command: |
-              cd packages/protocol
-              ./specs/scripts/accountsPrivileged.sh
-          - name: Accounts
-            command: |
-              cd packages/protocol
-              ./specs/scripts/applyHarness.sh
-              ./specs/scripts/governance.sh
-          - name: Accounts
-            command: |
-              cd packages/protocol
-              ./specs/scripts/reserve.sh
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '11'
-      - name: Certora dependencies
-        run: |
-          echo "export PATH=$PATH:~/.local/bin" >> ~/.bashrc
-          sudo apt-get update
-          sudo apt-get install -y software-properties-common python3-pip
-          pip3 install certora-cli
-          wget https://github.com/ethereum/solidity/releases/download/v0.5.13/solc-static-linux
-          chmod +x solc-static-linux
-          sudo mv solc-static-linux /usr/bin/solc
-      - name: Build and run command
-        run: |
-          ${{ matrix.command }}

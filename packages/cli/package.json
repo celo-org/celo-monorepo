@@ -73,12 +73,14 @@
     "web3": "1.10.0"
   },
   "devDependencies": {
+
     "@celo/celo-devchain": "^6.0.3",
-    "@celo/dev-utils": "0.0.1",
+    "@celo/dev-utils": "0.0.1-beta.1",
     "@oclif/dev-cli": "^1.23.0",
     "@types/cli-table": "^0.3.0",
     "@types/debug": "^4.1.4",
     "@types/fs-extra": "^8.0.0",
+    "@types/prompts": "^1.1.1",
     "@types/humanize-duration": "^3.27.0",
     "@types/inquirer": "^6.5.0",
     "@types/ledgerhq__hw-transport-node-hid": "^4.22.2",

@@ -43,7 +43,7 @@
   "devDependencies": {
     "@celo/celo-devchain": "^6.0.3",
     "@celo/odis-identifiers": "^1.0.0",
-    "@celo/dev-utils": "0.0.1",
+    "@celo/dev-utils": "0.0.1-beta.1",
     "@types/debug": "^4.1.5",
     "fetch-mock": "9.10.4",
     "ganache": "npm:@celo/ganache@7.8.0-unofficial.0",

@@ -13,14 +13,6 @@ packages/**/lib
 
 packages/docs/_book
 
-packages/protocol/build/
-packages/protocol/types/
-!packages/protocol/lib/**/*.ts
-packages/protocol/scripts/**/*.js
-packages/protocol/migrations/**/*.js
-packages/protocol/test/**/*.js
-packages/protocol/contractPackages.js
-packages/protocol/abis/src-generated/
 
 # prettier eats Latex underscore escapting and doesn't seem to have an option to disable
 packages/docs/celo-codebase/protocol/proof-of-stake/epoch-rewards.md

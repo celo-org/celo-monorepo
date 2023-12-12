@@ -11,12 +11,6 @@ coverage:
       celocli:
         paths:
           - packages/cli
-      odis:
-        paths:
-          - packages/phone-number-privacy
-      protocol:
-        paths:
-          - packages/protocol
       sdk:
         paths:
           - packages/sdk

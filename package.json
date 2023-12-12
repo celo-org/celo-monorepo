@@ -6,7 +6,6 @@
   "private": true,
   "scripts": {
     "preinstall": "git config --global url.\"https://\".insteadOf ssh://",
-    "install-pkg": "yarn install --link-duplicates",
     "lint": "yarn lerna run lint && yarn run --silent lint:do-not-merge",
     "lint:do-not-merge": "! git grep -E 'DO[ _]*NOT[ _]*MERGE'",
     "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx|sol|java)'",
@@ -24,17 +23,12 @@
     "check-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'",
     "report-coverage": "yarn run lerna run test-coverage",
     "test:watch": "node node_modules/jest/bin/jest.js --watch",
-    "postinstall": "yarn run lerna run postinstall && patch-package && yarn keys:decrypt",
-    "keys:decrypt": "bash scripts/key_placer.sh decrypt",
-    "keys:encrypt": "bash scripts/key_placer.sh encrypt",
-    "check:packages": "node ./scripts/check-packages.js",
+    "postinstall": "yarn run lerna run postinstal",
     "release": "yarn clean && yarn build && yarn --cwd packages/cli run prepack && yarn cs publish",
     "beta-enter": "bash scripts/beta-mode.sh",
     "beta-exit": "yarn changeset pre exit && git commit -am 'Complete beta mode'",
     "version-and-reinstall": "yarn changeset version && yarn install",
-    "celotool": "yarn --cwd packages/celotool run --silent cli",
     "celocli": "yarn --cwd packages/cli run --silent celocli",
-    "update-dependency-graph": "ts-node ./scripts/update_dependency_graph.ts",
     "deprecate-sdks": "ts-node ./scripts/unpublish-sdks.ts",
     "prepare": "husky install"
   },
@@ -43,10 +37,6 @@
       "packages/*",
       "packages/sdk/*",
       "packages/sdk/wallets/*"
-    ],
-    "nohoist": [
-      "**/openzeppelin-solidity",
-      "**/solidity-bytes-utils"
     ]
   },
   "devDependencies": {
@@ -59,9 +49,7 @@
     "husky": "^8.0.0",
     "jest": "^29.0.2",
     "lerna": "^5.5.0",
-    "patch-package": "^6.2.2",
     "prettier": "^2.7.1",
-    "prettier-plugin-solidity": "1.0.0-alpha.35",
     "pretty-quick": "^2.0.1",
     "prompt": "1.2.0",
     "semver": "7.3.5",

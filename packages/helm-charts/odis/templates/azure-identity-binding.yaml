@@ -1,7 +1,0 @@
-apiVersion: "aadpodidentity.k8s.io/v1"
-kind: AzureIdentityBinding
-metadata:
-  name: {{ template "azure-identity-binding-name" . }}
-spec:
-  azureIdentity: {{ template "azure-identity-name" . }}
-  selector: {{ template "azure-identity-binding-name" . }}

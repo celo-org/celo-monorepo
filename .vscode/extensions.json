@@ -7,12 +7,9 @@
     "eamodio.gitlens",
     "ms-vscode.vscode-typescript-tslint-plugin",
     "esbenp.prettier-vscode",
-    "juanblanco.solidity",
     "redhat.vscode-yaml",
     "smkamranqadri.vscode-bolt-language",
-    "pkief.material-icon-theme",
     "davidanson.vscode-markdownlint",
-    "mikestead.dotenv",
     "coenraads.bracket-pair-colorizer-2",
     "markis.code-coverage"
   ],

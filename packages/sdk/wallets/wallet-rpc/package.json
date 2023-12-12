@@ -32,7 +32,7 @@
     "debug": "^4.1.1"
   },
   "devDependencies": {
-    "@celo/dev-utils": "0.0.1",
+    "@celo/dev-utils": "0.0.1-beta.1",
     "@celo/contractkit": "^6.0.0",
     "bn.js": "^5.1.0",
     "web3": "1.10.0"

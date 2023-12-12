@@ -2,12 +2,4 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 
-# recreate this as it was removed in husky
-while read local_ref local_oid remote_ref remote_oid
-do
-  HUSKY_GIT_STD="$local_ref $local_oid $remote_ref $remote_oid"
-done
-
-HUSKY_GIT_STDIN=$HUSKY_GIT_STD node ./scripts/hooks/pre-push.js
-
 bash scripts/hooks/prereleasecheck.sh

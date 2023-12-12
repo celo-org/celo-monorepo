@@ -104,7 +104,10 @@ packages/react-components/*
 packages/phone-number-privacy/*
 packages/sdk/identity/*
 packages/sdk/encrypted-backup/*
-
+packages/protocol/*
+packages/celotool/*
+packages/dev-utils/*
+packages/helm-charts/*
 # temp json file for deploy-sdks script
 scripts/failedSDKs.json
 

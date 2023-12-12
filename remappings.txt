@@ -1,6 +1,0 @@
-ds-test/=packages/protocol/lib/celo-foundry/lib/forge-std/lib/ds-test/src/
-forge-std/=packages/protocol/lib/celo-foundry/lib/forge-std/src/
-celo-foundry/=packages/protocol/lib/celo-foundry/src/
-openzeppelin-solidity/=packages/protocol/lib/openzeppelin-contracts/
-solidity-bytes-utils/=packages/protocol/lib/solidity-bytes-utils/
-contracts=packages/protocol/contracts/
