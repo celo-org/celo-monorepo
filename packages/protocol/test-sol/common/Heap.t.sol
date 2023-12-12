@@ -41,6 +41,8 @@ contract HeapTest {
 contract HeapTestTestFoundry is Test {
   HeapTest heapTest;
 
+  mapping(uint256 => bool) public helperMapping;
+
   function setUp() public {
     heapTest = new HeapTest();
   }
@@ -52,21 +54,53 @@ contract HeapTestTestFoundry is Test {
       min;
   }
 
-  function generateRandomArray(uint256 min, uint256 max, uint256 length)
+  function generateRandomArray(uint256 min, uint256 max, uint256 length, bool repeatingAllowed)
     public
-    view
     returns (uint256[] memory)
   {
+    require(max > min, "Max must be greater than min");
+    require(length <= (max - min + 1) || repeatingAllowed, "Not enough unique numbers available");
+
     uint256[] memory array = new uint256[](length);
-    for (uint256 i = 0; i < length; i++) {
-      array[i] = generatePRN(min, max, i);
+
+    for (uint256 i = 0; i < length; ) {
+      uint256 randomNumber = generatePRN(min, max, i);
+
+      if (repeatingAllowed) {
+        array[i] = randomNumber;
+        i++;
+      } else {
+        if (!helperMapping[randomNumber]) {
+          array[i] = randomNumber;
+          i++;
+        } else {
+          helperMapping[randomNumber] = true;
+        }
+      }
     }
+
+    if (!repeatingAllowed) {
+      for (uint256 i = 0; i < length; i++) {
+        helperMapping[array[i]] = false;
+      }
+    }
+
     return array;
   }
 
-  function testSortWithRandomListsRepeatingItems() public {
+  function test_SortWithRandomListsNonRepeatingItems() public {
     for (uint256 i = 0; i < 1000; i++) {
-      uint256[] memory array = generateRandomArray(0, 10, 10);
+      uint256[] memory array = generateRandomArray(0, 10, 10, false);
+      uint256[] memory sortedArray = heapTest.sort(array);
+      for (uint256 j = 0; j < 9; j++) {
+        assertEq(sortedArray[j] <= sortedArray[j + 1], true, "Array is not sorted");
+      }
+    }
+  }
+
+  function test_SortWithRandomListsRepeatingItems() public {
+    for (uint256 i = 0; i < 1000; i++) {
+      uint256[] memory array = generateRandomArray(0, 10, 10, true);
       uint256[] memory sortedArray = heapTest.sort(array);
       for (uint256 j = 0; j < 9; j++) {
         assertEq(sortedArray[j] <= sortedArray[j + 1], true, "Array is not sorted");
