@@ -8,11 +8,6 @@
 - Updated dependencies [ba27783ae]
   - @celo/contractkit@6.0.0-beta.2
 
-## 4.0.0-beta.2
-
-### Major Changes
-
-- 9ab9d00eb: Removes Grandamento from cli and contractkit completely as it has become no op by mento team
 
 ### Patch Changes
 
@@ -41,6 +36,14 @@
   - @celo/contractkit@6.0.0-beta.0
   - @celo/governance@5.0.7-beta.0
   - @celo/explorer@5.0.7-beta.0
+- bb3cf9f2e: update terminology: refer to celo not gold.
+- bb3cf9f2e: Alias releasecelo to releasegold
+- Updated dependencies [9ab9d00eb]
+- Updated dependencies [1c9c844cf]
+- Updated dependencies [9ab9d00eb]
+  - @celo/contractkit@6.0.0
+  - @celo/explorer@5.0.7
+  - @celo/governance@5.0.7
 
 ## 3.1.1
 
