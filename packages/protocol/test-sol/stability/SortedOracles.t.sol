@@ -121,23 +121,17 @@ contract AddOracle is SortedOraclesTest {
 
   function test_ShouldRevertWhenAlreadyOracle() public {
     sortedOracle.addOracle(aToken, oracleAccount);
-    vm.expectRevert(
-      "token addr was null or oracle addr was null or oracle addr is not an oracle for token addr"
-    );
+    vm.expectRevert("oracle addr is not an oracle for token addr");
     sortedOracle.addOracle(aToken, oracleAccount);
   }
 
   function test_ShouldRevertWhenOracleIsZeroAddress() public {
-    vm.expectRevert(
-      "token addr was null or oracle addr was null or oracle addr is not an oracle for token addr"
-    );
+    vm.expectRevert("oracle addr was null");
     sortedOracle.addOracle(aToken, address(0));
   }
 
   function test_ShouldRevertWhenTokenIsZeroAddress() public {
-    vm.expectRevert(
-      "token addr was null or oracle addr was null or oracle addr is not an oracle for token addr"
-    );
+    vm.expectRevert("token addr was null");
     sortedOracle.addOracle(address(0), oracleAccount);
   }
 }
