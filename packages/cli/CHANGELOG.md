@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.1.2-beta.2
+
+### Patch Changes
+
+- ba27783ae: Revert removal of Contracts
+- Updated dependencies [ba27783ae]
+  - @celo/contractkit@6.0.0-beta.2
+
 ## 4.0.0-beta.2
 
 ### Major Changes
