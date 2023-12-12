@@ -33,10 +33,14 @@ contract SortedOraclesTest is Test, Constants {
   event TokenReportExpirySet(address token, uint256 reportExpiry);
 
   function setUp() public {
-    vm.warp(YEAR);
+    warp(0);
     sortedOracle = new SortedOracles(true);
     oracleAccount = actor("oracleAccount");
     sortedOracle.initialize(reportExpiry);
+  }
+
+  function warp(uint256 timeToWarpTo) public {
+    vm.warp(YEAR + timeToWarpTo);
   }
 }
 
@@ -169,7 +173,7 @@ contract RemoveExpiredReports is SortedOraclesTest {
   }
 
   function helper_AddMultipleReports(uint256 numReports) public {
-    vm.warp(YEAR + reportExpiry / 2);
+    warp(reportExpiry / 2);
     for (uint256 i = 0; i < numReports; i++) {
       address oracle = actor(string(abi.encode("oracle", i)));
       sortedOracle.addOracle(aToken, oracle);
@@ -199,7 +203,7 @@ contract RemoveExpiredReports is SortedOraclesTest {
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, FIXED1, address(0), address(0));
     helper_AddMultipleReports(4);
-    vm.warp(YEAR + reportExpiry + 1);
+    warp(reportExpiry + 1);
     sortedOracle.removeExpiredReports(aToken, 3);
     assertEq(sortedOracle.numTimestamps(aToken), 4);
   }
@@ -218,7 +222,7 @@ contract RemoveExpiredReports is SortedOraclesTest {
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, FIXED1, address(0), address(0));
     helper_AddMultipleReports(4);
-    vm.warp(YEAR + 2 * reportExpiry);
+    warp(2 * reportExpiry);
     sortedOracle.removeExpiredReports(aToken, 3);
     assertEq(sortedOracle.numTimestamps(aToken), 2);
   }
@@ -238,7 +242,7 @@ contract IsOldestReportExpired is SortedOraclesTest {
   function test_ShouldReturnTrueWhenOldestReportIsExpired() public {
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, FIXED1, address(0), address(0));
-    vm.warp(YEAR + reportExpiry + 1);
+    warp(reportExpiry + 1);
     (bool expired, ) = sortedOracle.isOldestReportExpired(aToken);
     assertEq(expired, true);
   }
@@ -246,7 +250,7 @@ contract IsOldestReportExpired is SortedOraclesTest {
   function test_ShouldReturnFalseWhenOldestReportIsNotExpired_WhenUsingDefaultExpiry() public {
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, FIXED1, address(0), address(0));
-    vm.warp(YEAR + reportExpiry - 1);
+    warp(reportExpiry - 1);
     (bool expired, ) = sortedOracle.isOldestReportExpired(aToken);
     assertEq(expired, false);
   }
@@ -269,7 +273,7 @@ contract IsOldestReportExpired is SortedOraclesTest {
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, FIXED1, address(0), address(0));
     sortedOracle.setTokenReportExpiry(aToken, newReportExpiry);
-    vm.warp(YEAR + newReportExpiry + 1);
+    warp(newReportExpiry + 1);
     (bool expired, ) = sortedOracle.isOldestReportExpired(aToken);
     assertEq(expired, true);
   }
@@ -281,7 +285,7 @@ contract IsOldestReportExpired is SortedOraclesTest {
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, FIXED1, address(0), address(0));
     sortedOracle.setTokenReportExpiry(aToken, newReportExpiry);
-    vm.warp(YEAR + reportExpiry + 1);
+    warp(reportExpiry + 1);
     (bool expired, ) = sortedOracle.isOldestReportExpired(aToken);
     assertEq(expired, false);
   }
@@ -304,7 +308,7 @@ contract IsOldestReportExpired is SortedOraclesTest {
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, FIXED1, address(0), address(0));
     sortedOracle.setTokenReportExpiry(aToken, newReportExpiry);
-    vm.warp(YEAR + reportExpiry + 1);
+    warp(reportExpiry + 1);
     (bool expired, ) = sortedOracle.isOldestReportExpired(aToken);
     assertEq(expired, true);
   }
@@ -316,7 +320,7 @@ contract IsOldestReportExpired is SortedOraclesTest {
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, FIXED1, address(0), address(0));
     sortedOracle.setTokenReportExpiry(aToken, newReportExpiry);
-    vm.warp(YEAR + newReportExpiry + 1);
+    warp(newReportExpiry + 1);
     (bool expired, ) = sortedOracle.isOldestReportExpired(aToken);
     assertEq(expired, true);
   }
@@ -546,10 +550,10 @@ contract Report is SortedOraclesTest {
     sortedOracle.addOracle(aToken, anotherOracle);
     vm.prank(anotherOracle);
     sortedOracle.report(aToken, anotherOracleValue, address(0), address(0));
-    vm.warp(YEAR + 5);
+    warp(5);
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, oracleValue1, anotherOracle, address(0));
-    vm.warp(YEAR + 10);
+    warp(10);
     (, uint256[] memory rateValues, ) = sortedOracle.getRates(aToken);
     assertEq(rateValues[0], oracleValue1);
     assertEq(rateValues[1], anotherOracleValue);
