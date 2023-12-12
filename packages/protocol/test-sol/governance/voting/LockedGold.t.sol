@@ -5,17 +5,17 @@ pragma experimental ABIEncoderV2;
 import "celo-foundry/Test.sol";
 import "forge-std/console.sol";
 
-import "../../../contracts/common/FixidityLib.sol";
-import "../../../contracts/common/Registry.sol";
-import "../../../contracts/common/Accounts.sol";
-import "../../../contracts/common/test/MockGoldToken.sol";
-import "../../../contracts/governance/LockedGold.sol";
-import "../../../contracts/governance/ReleaseGold.sol";
-import "../../../contracts/governance/Election.sol";
-import "../../../contracts/stability/test/MockStableToken.sol";
-import "../../../contracts/governance/test/MockElection.sol";
-import "../../../contracts/governance/test/MockGovernance.sol";
-import "../../../contracts/governance/test/MockValidators.sol";
+import "@celo-contracts/common/FixidityLib.sol";
+import "@celo-contracts/common/Registry.sol";
+import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts/common/test/MockGoldToken.sol";
+import "@celo-contracts/governance/LockedGold.sol";
+import "@celo-contracts/governance/ReleaseGold.sol";
+import "@celo-contracts/governance/Election.sol";
+import "@celo-contracts/stability/test/MockStableToken.sol";
+import "@celo-contracts/governance/test/MockElection.sol";
+import "@celo-contracts/governance/test/MockGovernance.sol";
+import "@celo-contracts/governance/test/MockValidators.sol";
 
 contract LockedGoldTest is Test {
   using FixidityLib for FixidityLib.Fraction;

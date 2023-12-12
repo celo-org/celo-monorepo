@@ -1,5 +1,12 @@
 # @celo/metadata-crawler
 
+## 0.0.4-beta.0
+
+### Patch Changes
+
+- Updated dependencies [1c9c844cf]
+  - @celo/contractkit@6.0.0-beta.0
+
 ## 0.0.3
 
 ### Patch Changes
