@@ -20,7 +20,10 @@ import { FreezerWrapper } from './wrappers/Freezer'
 import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
 import { GovernanceWrapper } from './wrappers/Governance'
+import { GrandaMentoWrapper } from './wrappers/GrandaMento'
 import { LockedGoldWrapper } from './wrappers/LockedGold'
+import { MetaTransactionWalletWrapper } from './wrappers/MetaTransactionWallet'
+import { MetaTransactionWalletDeployerWrapper } from './wrappers/MetaTransactionWalletDeployer'
 import { MultiSigWrapper } from './wrappers/MultiSig'
 import { OdisPaymentsWrapper } from './wrappers/OdisPayments'
 import { ReserveWrapper } from './wrappers/Reserve'
@@ -42,8 +45,11 @@ const WrapperFactories = {
   [CeloContract.Freezer]: FreezerWrapper,
   [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
   [CeloContract.GoldToken]: GoldTokenWrapper,
+  [CeloContract.GrandaMento]: GrandaMentoWrapper,
   // [CeloContract.Random]: RandomWrapper,
   // [CeloContract.Registry]: RegistryWrapper,
+  [CeloContract.MetaTransactionWallet]: MetaTransactionWalletWrapper,
+  [CeloContract.MetaTransactionWalletDeployer]: MetaTransactionWalletDeployerWrapper,
   [CeloContract.MultiSig]: MultiSigWrapper,
   [CeloContract.OdisPayments]: OdisPaymentsWrapper,
   [CeloContract.Reserve]: ReserveWrapper,
@@ -95,7 +101,10 @@ interface WrapperCacheMap {
   [CeloContract.GasPriceMinimum]?: GasPriceMinimumWrapper
   [CeloContract.GoldToken]?: GoldTokenWrapper
   [CeloContract.Governance]?: GovernanceWrapper
+  [CeloContract.GrandaMento]?: GrandaMentoWrapper
   [CeloContract.LockedGold]?: LockedGoldWrapper
+  [CeloContract.MetaTransactionWallet]?: MetaTransactionWalletWrapper
+  [CeloContract.MetaTransactionWalletDeployer]?: MetaTransactionWalletDeployerWrapper
   [CeloContract.MultiSig]?: MultiSigWrapper
   [CeloContract.OdisPayments]?: OdisPaymentsWrapper
   // [CeloContract.Random]?: RandomWrapper,
@@ -172,8 +181,23 @@ export class WrapperCache implements ContractCacheType {
   getGovernance() {
     return this.getContract(CeloContract.Governance)
   }
+  getGrandaMento() {
+    return this.getContract(CeloContract.GrandaMento)
+  }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
+  }
+  /*
+    @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
+  */
+  getMetaTransactionWallet(address: string) {
+    return this.getContract(CeloContract.MetaTransactionWallet, address)
+  }
+  /*
+    @deprecated https://github.com/celo-org/celo-monorepo/issues/10766
+  */
+  getMetaTransactionWalletDeployer(address: string) {
+    return this.getContract(CeloContract.MetaTransactionWalletDeployer, address)
   }
   getMultiSig(address: string) {
     return this.getContract(CeloContract.MultiSig, address)

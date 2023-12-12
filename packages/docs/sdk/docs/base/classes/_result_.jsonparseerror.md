@@ -72,7 +72,7 @@ ___
 
 *Inherited from [RootError](_result_.rooterror.md).[message](_result_.rooterror.md#message)*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:1029
+Defined in node_modules/typescript/lib/lib.es5.d.ts:974
 
 ___
 
@@ -82,7 +82,7 @@ ___
 
 *Inherited from [RootError](_result_.rooterror.md).[name](_result_.rooterror.md#name)*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:1028
+Defined in node_modules/typescript/lib/lib.es5.d.ts:973
 
 ___
 
@@ -92,4 +92,4 @@ ___
 
 *Inherited from [RootError](_result_.rooterror.md).[stack](_result_.rooterror.md#optional-stack)*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:1030
+Defined in node_modules/typescript/lib/lib.es5.d.ts:975

@@ -18,7 +18,7 @@
 
 ▸ **assertIsCeloProvider**(`provider`: any): *asserts provider is CeloProvider*
 
-*Defined in [celo-provider.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L34)*
+*Defined in [celo-provider.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L23)*
 
 **Parameters:**
 

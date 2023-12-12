@@ -9,7 +9,6 @@
 * [decodeStringParameter](_utils_abi_utils_.md#const-decodestringparameter)
 * [getAbiByName](_utils_abi_utils_.md#const-getabibyname)
 * [parseDecodedParams](_utils_abi_utils_.md#const-parsedecodedparams)
-* [signatureToAbiDefinition](_utils_abi_utils_.md#const-signaturetoabidefinition)
 
 ## Functions
 
@@ -17,7 +16,7 @@
 
 ▸ **decodeStringParameter**(`ethAbi`: [AbiCoder](../interfaces/_abi_types_.abicoder.md), `str`: string): *any*
 
-*Defined in [utils/abi-utils.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/abi-utils.ts#L55)*
+*Defined in [utils/abi-utils.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/abi-utils.ts#L25)*
 
 **`internal`** 
 
@@ -70,21 +69,3 @@ Name | Type |
 * **args**: *any[]*
 
 * **params**: *[DecodedParamsObject](../interfaces/_abi_types_.decodedparamsobject.md)*
-
-___
-
-### `Const` signatureToAbiDefinition
-
-▸ **signatureToAbiDefinition**(`fnSignature`: string): *[ABIDefinition](../interfaces/_abi_types_.abidefinition.md)*
-
-*Defined in [utils/abi-utils.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/abi-utils.ts#L25)*
-
-**`internal`** 
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`fnSignature` | string |
-
-**Returns:** *[ABIDefinition](../interfaces/_abi_types_.abidefinition.md)*
