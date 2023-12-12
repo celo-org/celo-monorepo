@@ -20,33 +20,21 @@
 
 ### Interfaces
 
-* [CIP42TXProperties](../interfaces/_types_.cip42txproperties.md)
-* [CIP64TXProperties](../interfaces/_types_.cip64txproperties.md)
 * [CeloParams](../interfaces/_types_.celoparams.md)
 * [CeloTxObject](../interfaces/_types_.celotxobject.md)
-* [EIP1559TXProperties](../interfaces/_types_.eip1559txproperties.md)
 * [EncodedTransaction](../interfaces/_types_.encodedtransaction.md)
-* [Error](../interfaces/_types_.error.md)
-* [FormattedCeloTx](../interfaces/_types_.formattedcelotx.md)
-* [HttpProvider](../interfaces/_types_.httpprovider.md)
 * [JsonRpcPayload](../interfaces/_types_.jsonrpcpayload.md)
 * [JsonRpcResponse](../interfaces/_types_.jsonrpcresponse.md)
-* [LegacyTXProperties](../interfaces/_types_.legacytxproperties.md)
 * [Provider](../interfaces/_types_.provider.md)
 * [RLPEncodedTx](../interfaces/_types_.rlpencodedtx.md)
 
 ### Type aliases
 
-* [AccessListRaw](_types_.md#accesslistraw)
 * [Address](_types_.md#address)
 * [Callback](_types_.md#callback)
 * [CeloTx](_types_.md#celotx)
 * [CeloTxPending](_types_.md#celotxpending)
 * [CeloTxReceipt](_types_.md#celotxreceipt)
-* [CeloTxWithSig](_types_.md#celotxwithsig)
-* [Hex](_types_.md#hex)
-* [HexOrMissing](_types_.md#hexormissing)
-* [TransactionTypes](_types_.md#transactiontypes)
 
 ## References
 
@@ -116,19 +104,11 @@ ___
 
 ## Type aliases
 
-###  AccessListRaw
-
-Ƭ **AccessListRaw**: *Array‹[string, string[]]›*
-
-*Defined in [types.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L24)*
-
-___
-
 ###  Address
 
 Ƭ **Address**: *string*
 
-*Defined in [types.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L9)*
+*Defined in [types.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L4)*
 
 ___
 
@@ -136,26 +116,26 @@ ___
 
 Ƭ **Callback**: *function*
 
-*Defined in [types.ts:124](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L124)*
+*Defined in [types.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L49)*
 
 #### Type declaration:
 
-▸ (`error`: [Error](../interfaces/_types_.error.md) | null, `result?`: T): *void*
+▸ (`error`: Error | null, `result?`: T): *void*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`error` | [Error](../interfaces/_types_.error.md) &#124; null |
+`error` | Error &#124; null |
 `result?` | T |
 
 ___
 
 ###  CeloTx
 
-Ƭ **CeloTx**: *TransactionConfig & Partial‹[CeloParams](../interfaces/_types_.celoparams.md)› & object*
+Ƭ **CeloTx**: *TransactionConfig & Partial‹[CeloParams](../interfaces/_types_.celoparams.md)›*
 
-*Defined in [types.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L51)*
+*Defined in [types.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L12)*
 
 ___
 
@@ -163,7 +143,7 @@ ___
 
 Ƭ **CeloTxPending**: *Transaction & Partial‹[CeloParams](../interfaces/_types_.celoparams.md)›*
 
-*Defined in [types.ts:121](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L121)*
+*Defined in [types.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L46)*
 
 ___
 
@@ -171,36 +151,4 @@ ___
 
 Ƭ **CeloTxReceipt**: *TransactionReceipt & Partial‹[CeloParams](../interfaces/_types_.celoparams.md)›*
 
-*Defined in [types.ts:122](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L122)*
-
-___
-
-###  CeloTxWithSig
-
-Ƭ **CeloTxWithSig**: *[CeloTx](_types_.md#celotx) & object*
-
-*Defined in [types.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L54)*
-
-___
-
-###  Hex
-
-Ƭ **Hex**: *`0x${string}`*
-
-*Defined in [types.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L11)*
-
-___
-
-###  HexOrMissing
-
-Ƭ **HexOrMissing**: *[Hex](_types_.md#hex) | undefined*
-
-*Defined in [types.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L26)*
-
-___
-
-###  TransactionTypes
-
-Ƭ **TransactionTypes**: *"eip1559" | "celo-legacy" | "cip42" | "cip64"*
-
-*Defined in [types.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L68)*
+*Defined in [types.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L47)*

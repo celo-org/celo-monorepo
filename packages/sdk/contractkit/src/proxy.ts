@@ -18,6 +18,8 @@ import { ABI as GoldTokenABI } from '@celo/abis/web3/GoldToken'
 import { ABI as GovernanceABI } from '@celo/abis/web3/Governance'
 import { ABI as LockedGoldABI } from '@celo/abis/web3/LockedGold'
 import { ABI as MentoFeeHandlerSellerABI } from '@celo/abis/web3/MentoFeeHandlerSeller'
+import { ABI as MetaTransactionWalletABI } from '@celo/abis/web3/MetaTransactionWallet'
+import { ABI as MetaTransactionWalletDeployerABI } from '@celo/abis/web3/MetaTransactionWalletDeployer'
 import { ABI as MultiSigABI } from '@celo/abis/web3/MultiSig'
 import { ABI as OdisPaymentsABI } from '@celo/abis/web3/OdisPayments'
 import { ABI as ProxyABI } from '@celo/abis/web3/Proxy'
@@ -27,6 +29,7 @@ import { ABI as SortedOraclesABI } from '@celo/abis/web3/SortedOracles'
 import { ABI as UniswapFeeHandlerSellerABI } from '@celo/abis/web3/UniswapFeeHandlerSeller'
 import { ABI as ValidatorsABI } from '@celo/abis/web3/Validators'
 import { ABI as ExchangeABI } from '@celo/abis/web3/mento/Exchange'
+import { ABI as GrandaMentoABI } from '@celo/abis/web3/mento/GrandaMento'
 import { ABI as ReserveABI } from '@celo/abis/web3/mento/Reserve'
 import { ABI as StableTokenABI } from '@celo/abis/web3/mento/StableToken'
 
@@ -115,7 +118,10 @@ const initializeAbiMap = {
   GasPriceMinimumProxy: findInitializeAbi(GasPriceMinimumABI),
   GoldTokenProxy: findInitializeAbi(GoldTokenABI),
   GovernanceProxy: findInitializeAbi(GovernanceABI),
+  GrandaMentoProxy: findInitializeAbi(GrandaMentoABI),
   LockedGoldProxy: findInitializeAbi(LockedGoldABI),
+  MetaTransactionWalletProxy: findInitializeAbi(MetaTransactionWalletABI),
+  MetaTransactionWalletDeployerProxy: findInitializeAbi(MetaTransactionWalletDeployerABI),
   MultiSigProxy: findInitializeAbi(MultiSigABI),
   OdisPaymentsProxy: findInitializeAbi(OdisPaymentsABI),
   ProxyProxy: findInitializeAbi(ProxyABI),

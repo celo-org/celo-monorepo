@@ -6,7 +6,7 @@
 
 ### Classes
 
-* [HttpRpcCaller](../classes/_utils_rpc_caller_.httprpccaller.md)
+* [DefaultRpcCaller](../classes/_utils_rpc_caller_.defaultrpccaller.md)
 
 ### Interfaces
 
@@ -31,7 +31,7 @@ ___
 
 ###  rpcCallHandler
 
-▸ **rpcCallHandler**(`payload`: [JsonRpcPayload](../interfaces/_types_.jsonrpcpayload.md), `handler`: function, `callback`: [Callback](_types_.md#callback)‹[JsonRpcResponse](../interfaces/_types_.jsonrpcresponse.md)›): *[rpcCallHandler](_utils_rpc_caller_.md#rpccallhandler)*
+▸ **rpcCallHandler**(`payload`: [JsonRpcPayload](../interfaces/_types_.jsonrpcpayload.md), `handler`: function, `callback`: [Callback](_types_.md#callback)‹[JsonRpcResponse](../interfaces/_types_.jsonrpcresponse.md)›): *void*
 
 *Defined in [utils/rpc-caller.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L8)*
 
@@ -51,4 +51,4 @@ Name | Type |
 
 ▪ **callback**: *[Callback](_types_.md#callback)‹[JsonRpcResponse](../interfaces/_types_.jsonrpcresponse.md)›*
 
-**Returns:** *[rpcCallHandler](_utils_rpc_caller_.md#rpccallhandler)*
+**Returns:** *void*
