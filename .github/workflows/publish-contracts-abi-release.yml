@@ -55,7 +55,7 @@ jobs:
 
       - name: Determine release type and version (or dry run)
         # This is what sets the RELEASE_TYPE and RELEASE_VERSION env variables
-        run: yarn --silent is_contract_release >> "$GITHUB_ENV"
+        run: yarn --silent determine-release-version >> "$GITHUB_ENV"
         working-directory: packages/protocol
         env:
           GITHUB_TAG: ${{ github.ref_name }}
