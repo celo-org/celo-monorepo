@@ -71,7 +71,7 @@ jobs:
           restore-keys: |
             node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-
       - name: Install yarn dependencies
-        run: git config --global url."https://".insteadOf ssh:// && yarn install --verbose --network-timeout 1000000
+        run: git config --global url."https://".insteadOf ssh:// && yarn install --verbose --frozen-lockfile --network-timeout 1000000
         if: steps.cache_node.outputs.cache-hit != 'true'
       - name: Run yarn postinstall if cache hitted
         run: yarn run postinstall
