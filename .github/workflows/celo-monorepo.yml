@@ -282,6 +282,9 @@ jobs:
           - name: Protocol Stability
             command: |
               yarn --cwd packages/protocol test stability/
+          - name: Protocol scripts test
+            command: |
+              yarn --cwd packages/protocol test:scripts
     steps:
       - uses: actions/checkout@v4
         with:
