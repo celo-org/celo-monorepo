@@ -1,5 +1,36 @@
 # @celo/contractkit
 
+## 6.0.0
+
+### Major Changes
+
+- 1c9c844cf: Remove contracts from lib/generated. now available in @celo/abis package at @celo/abis/web3
+
+## 6.0.0-beta.2
+
+### Patch Changes
+
+- ba27783ae: Revert removal of Contracts
+
+## 6.0.0-beta.1
+
+### Major Changes
+
+
+- 9ab9d00eb: Remove Support for deprecated MetaTransactionWallet and MetaTransactionWalletDeployer. IF absolutely needed the contracts can be accessed directly or an alternative such as account abstraction should be used
+- 9ab9d00eb: Removes Grandamento from cli and contractkit completely as it has become no op by mento team
+
+## 6.0.0-beta.0
+
+### Major Changes
+
+- 1c9c844cf: Remove contracts from lib/generated. now available in @celo/abis package at @celo/abis/web3
+
+  If you were directly importing contracts from `@celo/contractkit/lib/generated/*` eg `@celo/lib/generated/Accounts` do a find replace
+
+  find: `@celo/contractkit/lib/generated/`
+  replace: `@celo/abis/web3/`
+
 ## 5.2.1
 
 ### Patch Changes

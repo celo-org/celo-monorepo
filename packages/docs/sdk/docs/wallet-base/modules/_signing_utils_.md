@@ -17,12 +17,9 @@
 * [encodeTransaction](_signing_utils_.md#encodetransaction)
 * [extractSignature](_signing_utils_.md#extractsignature)
 * [getHashFromEncoded](_signing_utils_.md#gethashfromencoded)
-* [getSignerFromTxEIP2718TX](_signing_utils_.md#getsignerfromtxeip2718tx)
-* [isPriceToLow](_signing_utils_.md#ispricetolow)
 * [recoverMessageSigner](_signing_utils_.md#recovermessagesigner)
 * [recoverTransaction](_signing_utils_.md#recovertransaction)
 * [rlpEncodedTx](_signing_utils_.md#rlpencodedtx)
-* [stringNumberOrBNToHex](_signing_utils_.md#stringnumberorbntohex)
 * [verifyEIP712TypedDataSigner](_signing_utils_.md#verifyeip712typeddatasigner)
 * [verifySignatureWithoutPrefix](_signing_utils_.md#verifysignaturewithoutprefix)
 
@@ -32,7 +29,7 @@
 
 • **publicKeyPrefix**: *number* = 4
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L45)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L18)*
 
 ___
 
@@ -40,7 +37,7 @@ ___
 
 • **sixtyFour**: *number* = 64
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L46)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L19)*
 
 ___
 
@@ -48,7 +45,7 @@ ___
 
 • **thirtyTwo**: *number* = 32
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L47)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L20)*
 
 ## Functions
 
@@ -56,7 +53,7 @@ ___
 
 ▸ **chainIdTransformationForSigning**(`chainId`: number): *number*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L57)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L28)*
 
 **Parameters:**
 
@@ -70,9 +67,9 @@ ___
 
 ###  decodeSig
 
-▸ **decodeSig**(`sig`: any): *[decodeSig](_signing_utils_.md#decodesig)*
+▸ **decodeSig**(`sig`: any): *object*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:698](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L698)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:238](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L238)*
 
 **Parameters:**
 
@@ -80,7 +77,13 @@ Name | Type |
 ------ | ------ |
 `sig` | any |
 
-**Returns:** *[decodeSig](_signing_utils_.md#decodesig)*
+**Returns:** *object*
+
+* **r**: *Buffer‹›* = ethUtil.toBuffer(r) as Buffer
+
+* **s**: *Buffer‹›* = ethUtil.toBuffer(s) as Buffer
+
+* **v**: *number* = parseInt(v, 16)
 
 ___
 
@@ -88,7 +91,7 @@ ___
 
 ▸ **encodeTransaction**(`rlpEncoded`: RLPEncodedTx, `signature`: object): *Promise‹EncodedTransaction›*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:323](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L323)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:121](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L121)*
 
 **Parameters:**
 
@@ -108,9 +111,9 @@ ___
 
 ###  extractSignature
 
-▸ **extractSignature**(`rawTx`: string): *[extractSignature](_signing_utils_.md#extractsignature)*
+▸ **extractSignature**(`rawTx`: string): *object*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:406](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L406)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:155](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L155)*
 
 **Parameters:**
 
@@ -118,7 +121,13 @@ Name | Type |
 ------ | ------ |
 `rawTx` | string |
 
-**Returns:** *[extractSignature](_signing_utils_.md#extractsignature)*
+**Returns:** *object*
+
+* **r**: *Buffer*
+
+* **s**: *Buffer*
+
+* **v**: *number*
 
 ___
 
@@ -126,7 +135,7 @@ ___
 
 ▸ **getHashFromEncoded**(`rlpEncode`: string): *string*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L61)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L32)*
 
 **Parameters:**
 
@@ -138,43 +147,11 @@ Name | Type |
 
 ___
 
-###  getSignerFromTxEIP2718TX
-
-▸ **getSignerFromTxEIP2718TX**(`serializedTransaction`: string): *string*
-
-*Defined in [wallets/wallet-base/src/signing-utils.ts:501](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L501)*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`serializedTransaction` | string |
-
-**Returns:** *string*
-
-___
-
-###  isPriceToLow
-
-▸ **isPriceToLow**(`tx`: CeloTx): *[isPriceToLow](_signing_utils_.md#ispricetolow)*
-
-*Defined in [wallets/wallet-base/src/signing-utils.ts:272](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L272)*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`tx` | CeloTx |
-
-**Returns:** *[isPriceToLow](_signing_utils_.md#ispricetolow)*
-
-___
-
 ###  recoverMessageSigner
 
 ▸ **recoverMessageSigner**(`signingDataHex`: string, `signedData`: string): *string*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:666](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L666)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:205](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L205)*
 
 **Parameters:**
 
@@ -191,7 +168,7 @@ ___
 
 ▸ **recoverTransaction**(`rawTx`: string): *[CeloTx, string]*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:440](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L440)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:173](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L173)*
 
 **Parameters:**
 
@@ -207,7 +184,7 @@ ___
 
 ▸ **rlpEncodedTx**(`tx`: CeloTx): *RLPEncodedTx*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:114](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L114)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L70)*
 
 **Parameters:**
 
@@ -219,27 +196,11 @@ Name | Type |
 
 ___
 
-###  stringNumberOrBNToHex
-
-▸ **stringNumberOrBNToHex**(`num?`: number | string | ReturnType‹Web3["utils"]["toBN"]›): *Hex*
-
-*Defined in [wallets/wallet-base/src/signing-utils.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L98)*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`num?` | number &#124; string &#124; ReturnType‹Web3["utils"]["toBN"]› |
-
-**Returns:** *Hex*
-
-___
-
 ###  verifyEIP712TypedDataSigner
 
 ▸ **verifyEIP712TypedDataSigner**(`typedData`: EIP712TypedData, `signedData`: string, `expectedAddress`: string): *boolean*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:676](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L676)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:215](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L215)*
 
 **Parameters:**
 
@@ -255,9 +216,9 @@ ___
 
 ###  verifySignatureWithoutPrefix
 
-▸ **verifySignatureWithoutPrefix**(`messageHash`: string, `signature`: string, `signer`: string): *[verifySignatureWithoutPrefix](_signing_utils_.md#verifysignaturewithoutprefix)*
+▸ **verifySignatureWithoutPrefix**(`messageHash`: string, `signature`: string, `signer`: string): *boolean*
 
-*Defined in [wallets/wallet-base/src/signing-utils.ts:685](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L685)*
+*Defined in [wallets/wallet-base/src/signing-utils.ts:225](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L225)*
 
 **Parameters:**
 
@@ -267,4 +228,4 @@ Name | Type |
 `signature` | string |
 `signer` | string |
 
-**Returns:** *[verifySignatureWithoutPrefix](_signing_utils_.md#verifysignaturewithoutprefix)*
+**Returns:** *boolean*

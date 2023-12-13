@@ -19,7 +19,7 @@
 
 • **primaryType**: *string*
 
-*Defined in [sign-typed-data-utils.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L20)*
+*Defined in [sign-typed-data-utils.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L18)*
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 • **types**: *[EIP712Types](_sign_typed_data_utils_.eip712types.md)*
 
-*Defined in [sign-typed-data-utils.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L19)*
+*Defined in [sign-typed-data-utils.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L17)*
