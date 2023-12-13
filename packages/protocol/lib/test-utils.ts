@@ -16,7 +16,7 @@ import Web3 from 'web3';
 import { ContractPackage, MENTO_PACKAGE } from '../contractPackages';
 
 // tslint:disable: ordered-imports
-import { fromFixed } from '@celo/utils/src/fixidity';
+import { fromFixed } from '@celo/utils/lib/fixidity';
 import { bufferToHex, toBuffer } from '@ethereumjs/util';
 import { utf8ToBytes } from 'ethereum-cryptography/utils';
 import { AccountsInstance } from 'types';
@@ -259,7 +259,7 @@ function delay(time) {
 type ProxiedContractGetter = (
   contractName: string,
   type: string,
-  contractPackage: ContractPackage, 
+  contractPackage: ContractPackage,
   ) => Promise<any>
 
 type ContractGetter = (
@@ -370,8 +370,8 @@ export function assertObjectWithBNEqual(
     } else if (Array.isArray(actual[k])) {
       const actualArray = actual[k] as []
       const expectedArray = expected[k] as []
-      if (actualArray.length === expectedArray.length 
-        && actualArray.every(actualValue => isNumber(actualValue)) 
+      if (actualArray.length === expectedArray.length
+        && actualArray.every(actualValue => isNumber(actualValue))
         && expectedArray.every(expectedValue => isNumber(expectedValue))) {
         // if this is array of BNs, deepEqual will not work
         // since it is not able to compare number/string/BN
@@ -686,7 +686,7 @@ export const unlockAndAuthorizeKey = async (
 export const authorizeAndGenerateVoteSigner = async (accountsInstance: AccountsInstance, account: string, accounts: string[]) => {
   const roleHash = keccak256(utf8ToBytes('celo.org/core/vote'))
   const role = bufferToHex(toBuffer(roleHash))
-  
+
   const signer = await unlockAndAuthorizeKey(
     KeyOffsets.VALIDATING_KEY_OFFSET,
     accountsInstance.authorizeVoteSigner,

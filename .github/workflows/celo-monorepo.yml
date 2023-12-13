@@ -170,34 +170,16 @@ jobs:
           mkdir -p test-results/jest
           # Skipping packages that are tested in a specific job below
           yarn run lerna \
-            --ignore @celo/contractkit \
             --ignore @celo/protocol \
             --ignore @celo/celotool \
-            --ignore @celo/celocli \
             --ignore @celo/env-tests \
-            --ignore '@celo/wallet-*' \
             run test
       - name: Upload Jest Test Results
         uses: actions/upload-artifact@v3
         with:
           name: Jest Test Results
           path: test-results/jest
-  wallet-test:
-    name: Wallet test
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 30
-    needs: install-dependencies
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Run Wallet tests
-        run: |
-          yarn run lerna --scope '@celo/wallet-*' run test
+
 
   protocol-test-release:
     name: Protocol Test Release
@@ -205,10 +187,8 @@ jobs:
     timeout-minutes: 500
     needs: [install-dependencies, lint-checks]
     if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+      github.base_ref == 'master' || contains(github.base_ref, 'release') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
       false
@@ -246,7 +226,6 @@ jobs:
     if: |
       github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
@@ -299,172 +278,17 @@ jobs:
           command: |
             ${{ matrix.command }}
 
-  contractkit-tests:
-    name: ContractKit Tests
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 30
-    needs: [install-dependencies]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Run tests
-        run: |
-          yarn --cwd=packages/sdk/contractkit test
-
-  cli-tests:
-    name: CeloCli Tests
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 30
-    needs: [install-dependencies]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/cli') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Run tests
-        run: |
-          yarn --cwd=packages/cli test
-      - name: Fail if someone forgot to commit CLI docs
-        run: |
-          yarn --cwd=packages/cli docs
-          if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
-            git --no-pager diff packages/docs/command-line-interface
-            echo "There are git differences after generating CLI docs"
-            git status
-            git diff
-            exit 1
-          fi
-      - name: Verify that a new account can be created
-        run: |
-          yarn --cwd=packages/cli run celocli account:new
-      - name: Test that releasecelo command topic is working
-        run: |
-          yarn --cwd=packages/cli run celocli releasecelo --help
-  typescript-tests:
-    name: Typescript package Tests
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 30
-    needs: [install-dependencies]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Install and test the npm package
-        run: |
-          set -euo pipefail
-          cd packages/typescript
-          yarn pack
-          cd $RUNNER_TEMP
-          npm install $RUNNER_WORKSPACE/celo-monorepo/packages/typescript/*.tgz
-
-  base-test:
-    name: SDK Base package Tests
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 30
-    needs: [install-dependencies]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Install and test the npm package
-        run: |
-          set -euo pipefail
-          cd packages/sdk/base
-          yarn pack
-          cd $RUNNER_TEMP
-          npm install $RUNNER_WORKSPACE/celo-monorepo/packages/sdk/base/*.tgz
-
-  utils-test:
-    name: SDK Utils package Tests
-    runs-on: ['self-hosted', 'monorepo-node18']
-    timeout-minutes: 30
-    needs: [install-dependencies]
-    if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
-      false
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Install and test the npm package
-        run: |
-          set -euo pipefail
-          cd packages/sdk/base
-          yarn pack
-          cd ../utils
-          yarn pack
-          cd $RUNNER_TEMP
-          npm install $RUNNER_WORKSPACE/celo-monorepo/packages/sdk/base/*.tgz
-          npm install $RUNNER_WORKSPACE/celo-monorepo/packages/sdk/utils/*.tgz
-
   end-to-end-geth-matrix:
     # Keeping name short because GitHub UI does not handle long names well
     name: e2e ${{ matrix.name }}
     runs-on: ['self-hosted', 'monorepo-node18']
     timeout-minutes: 60
-    needs: [install-dependencies, lint-checks, contractkit-tests]
+    needs: [install-dependencies, lint-checks]
     if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+      github.base_ref == 'master' || contains(github.base_ref, 'release') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/celotool') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||
@@ -549,9 +373,8 @@ jobs:
     # Disable as certora license is not active
     if: |
       false && (
-        github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+        github.base_ref == 'master' || contains(github.base_ref, 'release') || contains(github.base_ref, 'production') ||
         contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-        contains(needs.install-dependencies.outputs.all_modified_files, 'packages/sdk') ||
         contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
         contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock')
       )

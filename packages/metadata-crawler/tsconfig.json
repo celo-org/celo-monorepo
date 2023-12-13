@@ -1,9 +1,0 @@
-{
-  "extends": "@celo/typescript/tsconfig.library.json",
-  "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "lib"
-  },
-  "include": ["src", "types/", "index.d.ts"],
-  "references": [{ "path": "../sdk/utils" }]
-}

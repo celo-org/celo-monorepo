@@ -1,1 +1,0 @@
-Wallet-rpc provides utilities for performing wallet functions via RPC.
