@@ -5,10 +5,10 @@ View and manage locked CELO
 
 ## `celocli lockedgold:delegate`
 
-Delegate locked gold.
+Delegate locked celo.
 
 ```
-Delegate locked gold.
+Delegate locked celo.
 
 USAGE
   $ celocli lockedgold:delegate
@@ -16,7 +16,7 @@ USAGE
 OPTIONS
   --from=from        (required)
   --globalHelp       View all available global flags
-  --percent=percent  (required) 1-100% of locked gold to be delegated
+  --percent=percent  (required) 1-100% of locked celo to be delegated
   --to=to            (required)
 
 EXAMPLE
@@ -88,10 +88,10 @@ _See code: [src/commands/lockedgold/max-delegatees-count.ts](https://github.com/
 
 ## `celocli lockedgold:revoke-delegate`
 
-Revoke delegated locked gold.
+Revoke delegated locked celo.
 
 ```
-Revoke delegated locked gold.
+Revoke delegated locked celo.
 
 USAGE
   $ celocli lockedgold:revoke-delegate
@@ -100,7 +100,7 @@ OPTIONS
   --from=from        (required)
   --globalHelp       View all available global flags
 
-  --percent=percent  (required) 1-100% of locked gold to be revoked from currently
+  --percent=percent  (required) 1-100% of locked celo to be revoked from currently
                      delegated amount
 
   --to=to            (required)
@@ -114,10 +114,10 @@ _See code: [src/commands/lockedgold/revoke-delegate.ts](https://github.com/celo-
 
 ## `celocli lockedgold:show ACCOUNT`
 
-Show Locked Gold information for a given account. This includes the total amount of locked gold, the amount being used for voting in Validator Elections, the Locked Gold balance this account is required to maintain due to a registered Validator or Validator Group, and any pending withdrawals that have been initiated via "lockedgold:unlock".
+Show Locked Gold information for a given account. This includes the total amount of locked celo, the amount being used for voting in Validator Elections, the Locked Gold balance this account is required to maintain due to a registered Validator or Validator Group, and any pending withdrawals that have been initiated via "lockedgold:unlock".
 
 ```
-Show Locked Gold information for a given account. This includes the total amount of locked gold, the amount being used for voting in Validator Elections, the Locked Gold balance this account is required to maintain due to a registered Validator or Validator Group, and any pending withdrawals that have been initiated via "lockedgold:unlock".
+Show Locked Gold information for a given account. This includes the total amount of locked celo, the amount being used for voting in Validator Elections, the Locked Gold balance this account is required to maintain due to a registered Validator or Validator Group, and any pending withdrawals that have been initiated via "lockedgold:unlock".
 
 USAGE
   $ celocli lockedgold:show ACCOUNT
@@ -133,10 +133,10 @@ _See code: [src/commands/lockedgold/show.ts](https://github.com/celo-org/celo-mo
 
 ## `celocli lockedgold:unlock`
 
-Unlocks CELO, which can be withdrawn after the unlocking period. Unlocked gold will appear as a "pending withdrawal" until the unlocking period is over, after which it can be withdrawn via "lockedgold:withdraw".
+Unlocks CELO, which can be withdrawn after the unlocking period. Unlocked celo will appear as a "pending withdrawal" until the unlocking period is over, after which it can be withdrawn via "lockedgold:withdraw".
 
 ```
-Unlocks CELO, which can be withdrawn after the unlocking period. Unlocked gold will appear as a "pending withdrawal" until the unlocking period is over, after which it can be withdrawn via "lockedgold:withdraw".
+Unlocks CELO, which can be withdrawn after the unlocking period. Unlocked celo will appear as a "pending withdrawal" until the unlocking period is over, after which it can be withdrawn via "lockedgold:withdraw".
 
 USAGE
   $ celocli lockedgold:unlock
@@ -154,10 +154,10 @@ _See code: [src/commands/lockedgold/unlock.ts](https://github.com/celo-org/celo-
 
 ## `celocli lockedgold:update-delegated-amount`
 
-Updates the amount of delegated locked gold. There might be discrepancy between the amount of locked gold and the amount of delegated locked gold because of received rewards.
+Updates the amount of delegated locked celo. There might be discrepancy between the amount of locked celo and the amount of delegated locked celo because of received rewards.
 
 ```
-Updates the amount of delegated locked gold. There might be discrepancy between the amount of locked gold and the amount of delegated locked gold because of received rewards.
+Updates the amount of delegated locked celo. There might be discrepancy between the amount of locked celo and the amount of delegated locked celo because of received rewards.
 
 USAGE
   $ celocli lockedgold:update-delegated-amount

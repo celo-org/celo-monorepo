@@ -20,7 +20,7 @@ testWithGanache('releasegold:locked-gold cmd', (web3: Web3) => {
     await testLocally(CreateAccount, ['--contract', contractAddress])
   })
 
-  test('can lock gold with pending withdrawals', async () => {
+  test('can lock celo with pending withdrawals', async () => {
     const lockedGold = await kit.contracts.getLockedGold()
     await testLocally(LockedGold, [
       '--contract',

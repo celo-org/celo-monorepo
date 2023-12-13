@@ -25,7 +25,7 @@ testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
     await testLocally(CreateAccount, ['--contract', contractAddress])
   })
 
-  test('can withdraw released gold to beneficiary', async () => {
+  test('can withdraw released celo to beneficiary', async () => {
     await testLocally(SetLiquidityProvision, ['--contract', contractAddress, '--yesreally'])
     // ReleasePeriod of default contract
     await timeTravel(300000000, web3)

@@ -1,0 +1,3 @@
+@celo-contracts=contracts/
+@test-sol=test-sol
+@lib=lib
