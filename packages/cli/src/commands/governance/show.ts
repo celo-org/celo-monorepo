@@ -97,6 +97,7 @@ export default class Show extends BaseCommand {
           await addExistingProposalJSONFileToBuilder(builder, res.flags.afterExecutingProposal)
         }
         try {
+          console.log(chalk.cyanBright(`Parsing ${proposal.length} proposal transactions...`))
           const jsonproposal = await proposalToJSON(this.kit, proposal, builder.registryAdditions)
           record.proposal = jsonproposal as any
 

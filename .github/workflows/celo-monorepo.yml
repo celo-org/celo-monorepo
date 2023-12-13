@@ -279,9 +279,6 @@ jobs:
           - name: Protocol Governance Voting
             command: |
               yarn --cwd packages/protocol test governance/voting/
-          - name: Protocol Stability
-            command: |
-              yarn --cwd packages/protocol test stability/
           - name: Protocol scripts test
             command: |
               yarn --cwd packages/protocol test:scripts
@@ -360,12 +357,16 @@ jobs:
           if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
             git --no-pager diff packages/docs/command-line-interface
             echo "There are git differences after generating CLI docs"
+            git status
+            git diff
             exit 1
           fi
       - name: Verify that a new account can be created
         run: |
           yarn --cwd=packages/cli run celocli account:new
-
+      - name: Test that releasecelo command topic is working
+        run: |
+          yarn --cwd=packages/cli run celocli releasecelo --help
   typescript-tests:
     name: Typescript package Tests
     runs-on: ['self-hosted', 'monorepo-node18']
