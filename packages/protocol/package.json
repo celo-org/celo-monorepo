@@ -25,7 +25,7 @@
     "build:sol": "yarn pull-submodules && mkdir -p migrations && ts-node --preferTsExts ./scripts/build.ts --solidity ${BUILD_DIR:-./build}",
     "build": "yarn build:sol && yarn build:ts",
     "prebuild": "rm -rf ./build",
-    "is_contract_release": "ts-node ./scripts/is-contract-release.ts",
+    "determine-release-version": "ts-node ./scripts/determine-release-version.ts",
     "prepare_contracts_and_abis_publishing": "ts-node ./scripts/prepare-contracts-and-abis-publishing.ts",
     "sourcify-publish": "ts-node ./scripts/sourcify-publish.ts",
     "migrate": "./scripts/bash/migrate.sh",
