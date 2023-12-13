@@ -11,14 +11,14 @@ afterEach(() => {
   jest.clearAllMocks()
 })
 
-const execSyncMock = execSync as jest.Mock
-
 const retrieveReleaseInformation = (version: SemVer): [string, string | number] => {
   return [version.version, getReleaseTypeFromSemVer(version)]
 }
 
 describe('utils', () => {
   describe('determineNextVersion()', () => {
+    const execSyncMock = execSync as jest.Mock
+
     it('determines "latest" release type and extracts version from "post-audit" git tag directly', () => {
       const nextVersion = determineNextVersion(
         'core-contracts.v11.2.3.post-audit',
