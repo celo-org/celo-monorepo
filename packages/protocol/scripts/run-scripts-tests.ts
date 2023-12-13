@@ -1,3 +1,3 @@
 import * as jest from 'jest'
 
-jest.run()
+jest.run().catch(console.error)

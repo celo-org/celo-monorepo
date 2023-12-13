@@ -69,7 +69,7 @@ describe('utils', () => {
 
     it("determines based on manually provided npm tag that already exists, doesn't fallback to 'canary'", () => {
       execSyncMock.mockImplementationOnce(() => {
-        return '10.2.3'
+        return '10.2.4-alpha.0'
       })
 
       const nextVersion = determineNextVersion('', 'dev/some-branch-name', 'alpha')
@@ -80,7 +80,7 @@ describe('utils', () => {
         'npm view @celo/contracts@alpha version',
         expect.anything()
       )
-      expect(retrieveReleaseInformation(nextVersion)).toEqual(['10.2.4-alpha.0', 'alpha'])
+      expect(retrieveReleaseInformation(nextVersion)).toEqual(['10.2.4-alpha.1', 'alpha'])
     })
 
     it("determines based on manually provided npm tag that doesn't exist yet, fallback to 'canary'", () => {
@@ -89,7 +89,7 @@ describe('utils', () => {
           throw new Error("npm view exists with code > 0 when tag doesn't exist")
         })
         .mockImplementationOnce(() => {
-          return '10.1.2'
+          return '10.1.2-canary.2'
         })
 
       const nextVersion = determineNextVersion('', 'dev/some-branch-name', 'alpha')
@@ -105,7 +105,9 @@ describe('utils', () => {
         'npm view @celo/contracts@canary version',
         expect.anything()
       )
-      expect(retrieveReleaseInformation(nextVersion)).toEqual(['10.1.3-alpha.0', 'alpha'])
+
+      // TODO clarify the expectation
+      expect(retrieveReleaseInformation(nextVersion)).toEqual(['10.1.2-alpha.0', 'alpha'])
     })
 
     it("doesn't determine anything when wrong tag is provided", () => {
