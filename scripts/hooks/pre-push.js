@@ -59,9 +59,8 @@ function getDateFromFirstCommit(fromSHA, toSHA) {
 /// MAIN
 ////////////////////////////////////////////////////////////////
 
-// must trim otherwise the name will be 'origin\n'
-
-const remoteName = execSync('git remote').toString().trim()
+// change if the remote name is different
+const remoteName = 'origin'
 // create remote tracking branches to ensure we can compare current to origin/master
 execSync('git ls-remote --heads origin master')
 
