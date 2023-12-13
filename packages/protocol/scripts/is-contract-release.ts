@@ -5,7 +5,6 @@ const npmTag = process.env.NPM_TAG?.trim() || ''
 const gitTag = process.env.GITHUB_TAG || ''
 const branchName = execSync('git branch --show-current').toString().trim()
 
-// TODO provide branch name
 const nextVersion = determineNextVersion(gitTag, branchName, npmTag)
 
 if (nextVersion === null) {
