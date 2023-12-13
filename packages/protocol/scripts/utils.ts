@@ -29,14 +29,16 @@ export const determineNextVersion = (gitTag: string, gitBranch: string, npmTag: 
       DAILY_RELEASE_TAG
     )
     nextVersion.major = parseInt(major, 10)
-  } else if (npmTag?.match(/^[a-zA-Z]+$/)) {
-    // any string of letters only
-
+  } else if (isValidNpmTag(npmTag)) {
     const lastVersion = getPreviousVersion(npmTag, DAILY_RELEASE_TAG)
     nextVersion = new SemVer(lastVersion).inc('prerelease', npmTag)
   }
 
   return nextVersion
+}
+
+export function isValidNpmTag(tag?: string) {
+  return tag?.match(/^[a-zA-Z]{1,}[a-zA-Z-]*[a-zA-Z]{1,}$/) !== null
 }
 
 // get the previous version for this tag or if not exists find the previous for the fallback

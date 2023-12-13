@@ -1,7 +1,7 @@
 import { expect } from '@jest/globals'
 import { execSync } from 'child_process'
 import { SemVer } from 'semver'
-import { determineNextVersion, getReleaseTypeFromSemVer } from './utils'
+import { determineNextVersion, getReleaseTypeFromSemVer, isValidNpmTag } from './utils'
 
 jest.mock('child_process', () => ({
   execSync: jest.fn(),
@@ -110,7 +110,7 @@ describe('utils', () => {
     })
 
     it("doesn't determine anything when wrong tag is provided", () => {
-      const nextVersion = determineNextVersion('', '', 'tag-with-dashes')
+      const nextVersion = determineNextVersion('', '', 'tag-with-dashes-at-the-end-')
 
       expect(nextVersion).toBeNull()
     })
@@ -119,6 +119,24 @@ describe('utils', () => {
       const nextVersion = determineNextVersion('', '', '')
 
       expect(nextVersion).toBeNull()
+    })
+  })
+
+  describe('isValidNpmTag()', () => {
+    it('recognizes valid tags', () => {
+      expect(isValidNpmTag('latest')).toEqual(true)
+      expect(isValidNpmTag('alpha')).toEqual(true)
+      expect(isValidNpmTag('beta')).toEqual(true)
+      expect(isValidNpmTag('canary')).toEqual(true)
+      expect(isValidNpmTag('rc')).toEqual(true)
+      expect(isValidNpmTag('valid-tag')).toEqual(true)
+    })
+
+    it('recognizes invalid tags', () => {
+      expect(isValidNpmTag('123')).toEqual(false)
+      expect(isValidNpmTag('alpha-')).toEqual(false)
+      expect(isValidNpmTag('-beta')).toEqual(false)
+      expect(isValidNpmTag('--')).toEqual(false)
     })
   })
 })
