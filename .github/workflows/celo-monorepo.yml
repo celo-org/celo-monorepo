@@ -77,7 +77,7 @@ jobs:
         run: yarn run postinstall
         if: steps.cache_node.outputs.cache-hit == 'true'
       - name: Build packages
-        run: yarn build --ignore docs --include-dependencies
+        run: yarn build --include-dependencies
       - name: Check licenses
         if: steps.cache_node.outputs.cache-hit != 'true'
         run: |
