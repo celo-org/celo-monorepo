@@ -24,8 +24,8 @@ jobs:
       access-token-lifetime: '14400s'
       artifact-registry: us-west1-docker.pkg.dev/devopsre/dev-images/celotool
       tags: ${{ github.sha }}
-      platforms: linux/amd64
-      # platforms: linux/amd64,linux/arm64
+      # platforms: linux/amd64
+      platforms: linux/amd64,linux/arm64
       context: .
       file: dockerfiles/celotool/Dockerfile
       trivy: true
@@ -41,8 +41,8 @@ jobs:
       access-token-lifetime: '14400s'
       artifact-registry: us-west1-docker.pkg.dev/devopsre/celo-monorepo/celotool
       tags: ${{ github.sha }}
-      platforms: linux/amd64
-      # platforms: linux/amd64,linux/arm64
+      # platforms: linux/amd64
+      platforms: linux/amd64,linux/arm64
       context: .
       file: dockerfiles/celotool/Dockerfile
       trivy: true
