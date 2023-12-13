@@ -19,7 +19,7 @@ const retrieveReleaseInformation = (version: SemVer): [string, string | number] 
 
 describe('utils', () => {
   describe('determineNextVersion()', () => {
-    it('determines post-audit release tag', () => {
+    it('determines "latest" release type and extracts version from "post-audit" git tag directly', () => {
       const nextVersion = determineNextVersion(
         'core-contracts.v11.2.3.post-audit',
         'release/core-contracts/11.0.0',
@@ -29,7 +29,7 @@ describe('utils', () => {
       expect(retrieveReleaseInformation(nextVersion)).toEqual(['11.2.3', 'latest'])
     })
 
-    it('determines pre-audit release tag', () => {
+    it('determines "pre-audit" release type and extracts version from "pre-audit" git tag directly', () => {
       const nextVersion = determineNextVersion(
         'core-contracts.v11.2.3.pre-audit',
         'release/core-contracts/11.0.0',
