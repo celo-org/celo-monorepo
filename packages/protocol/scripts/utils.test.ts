@@ -106,7 +106,6 @@ describe('utils', () => {
         expect.anything()
       )
 
-      // TODO clarify the expectation
       expect(retrieveReleaseInformation(nextVersion)).toEqual(['10.1.2-alpha.0', 'alpha'])
     })
 
