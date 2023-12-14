@@ -32,6 +32,7 @@
   "workspaces": {
     "packages": [
       "packages/*"
+      "packages/protocol/abis"
     ],
     "nohoist": [
       "**/openzeppelin-solidity",
