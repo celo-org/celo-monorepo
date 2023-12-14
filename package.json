@@ -31,7 +31,7 @@
   },
   "workspaces": {
     "packages": [
-      "packages/*"
+      "packages/*",
       "packages/protocol/abis"
     ],
     "nohoist": [
