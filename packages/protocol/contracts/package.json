@@ -1,8 +1,8 @@
 {
   "name": "@celo/contracts",
-  "version": "dont-publish-invalid-version",
   "author": "cLabs",
   "license": "LGPL-3.0",
+  "private": "true",
   "repository": {
     "type": "git",
     "url": "https://github.com/celo-org/celo-monorepo.git",
