@@ -42,7 +42,8 @@
     "packages": [
       "packages/*",
       "packages/sdk/*",
-      "packages/sdk/wallets/*"
+      "packages/sdk/wallets/*",
+      "packages/protocol/abis"
     ],
     "nohoist": [
       "**/openzeppelin-solidity",

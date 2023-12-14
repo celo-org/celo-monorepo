@@ -279,6 +279,9 @@ jobs:
           - name: Protocol Governance Voting
             command: |
               yarn --cwd packages/protocol test governance/voting/
+          - name: Protocol scripts test
+            command: |
+              yarn --cwd packages/protocol test:scripts
     steps:
       - uses: actions/checkout@v4
         with:
