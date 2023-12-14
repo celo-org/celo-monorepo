@@ -41,6 +41,7 @@ jobs:
       service-account: 'celo-monorepo-dev@devopsre.iam.gserviceaccount.com'
       artifact-registry: us-west1-docker.pkg.dev/devopsre/dev-images/celotool
       tags: ${{ github.sha }}
+      platforms: linux/amd64
       context: .
       file: dockerfiles/celotool/Dockerfile
       trivy: true
@@ -56,6 +57,7 @@ jobs:
       service-account: 'celo-monorepo@devopsre.iam.gserviceaccount.com'
       artifact-registry: us-west1-docker.pkg.dev/devopsre/celo-monorepo/celotool
       tags: ${{ github.sha }}
+      platforms: linux/amd64
       context: .
       file: dockerfiles/celotool/Dockerfile
       trivy: true
