@@ -9,7 +9,7 @@ jobs:
     name: Run tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Foundry cache
@@ -39,4 +39,5 @@ jobs:
         run: forge compile
 
       - name: Run tests
-        run: forge test -vvv
+        # can't use gas limit because some setUp function use more than the limit
+        run: forge test -vvv # --block-gas-limit 20000000
