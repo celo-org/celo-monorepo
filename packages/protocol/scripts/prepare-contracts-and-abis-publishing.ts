@@ -260,7 +260,7 @@ function prepareContractsPackage() {
 
     fs.writeFileSync(
       contractsPackageJsonPath,
-      contents.replace('0.0.0-template.version', process.env.RELEASE_VERSION)
+      contents.replace('dont-publish-invalid-version', process.env.RELEASE_VERSION)
     )
 
     return

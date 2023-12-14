@@ -1,6 +1,6 @@
 {
   "name": "@celo/contracts",
-  "version": "0.0.0-template.version",
+  "version": "dont-publish-invalid-version",
   "author": "cLabs",
   "license": "LGPL-3.0",
   "repository": {
