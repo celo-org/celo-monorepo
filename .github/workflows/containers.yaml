@@ -138,20 +138,20 @@ jobs:
       artifact-registry: us-west1-docker.pkg.dev/devopsre/dev-images/blockscoute-metadata-crawler
       tags: testing
       context: .
-      file: dockerfiles/metadata-crawler
+      file: dockerfiles/metadata-crawler/Dockerfile
       trivy: true
   metadata-crawler-build:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.13.1
     needs: changed-files
-    name: Build us-west1-docker.pkg.dev/devopsre/dev-images/blockscoute-metadata-crawler:testing
+    name: Build us-west1-docker.pkg.dev/devopsre/dev-images/blockscoute-metadata-crawler:latest
     if: |
-      github.ref != 'refs/heads/master' &&
+      github.ref == 'refs/heads/master' &&
       contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/metadata-crawler')
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
       service-account: 'celo-monorepo-dev@devopsre.iam.gserviceaccount.com'
       artifact-registry: us-west1-docker.pkg.dev/devopsre/dev-images/blockscoute-metadata-crawler
-      tags: master
+      tags: latest
       context: .
-      file: dockerfiles/metadata-crawler
+      file: dockerfiles/metadata-crawler/Dockerfile
       trivy: true
