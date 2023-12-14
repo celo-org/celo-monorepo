@@ -1,0 +1,14 @@
+name: Protocol Foundry tests
+on: [workflow_dispatch]
+
+jobs:
+  runs-on: ubuntu-latest
+
+for pod in $(kubectl get pods -l component=validators -n globaltestnet --no-headers -o custom-columns=":metadata.name"); do
+ echo "Validator $pod, block $(kubectl exec -it $pod -c geth -- geth attach --exec 'eth.blockNumber')"
+done
+
+k exec -it globaltestnet-load-test-0 -c geth -- geth attach --exec 'admin.addPeer("enode://f938f0246c4c3248f05ea2566cd5ad5a9004e59fdcc8040e6c59bf13edd02565c96a3ef81ebb8f9b005abccff90316fe291e3a6ab38569b493d7d91d8122e458@130.211.76.255:30303")'
+k exec -it globaltestnet-load-test-0 -c geth -- geth attach --exec 'admin.addPeer("enode://bd4ac93b6eebe34024c105984974215ee996ac99d0b2c30fccd50bdfff6cde9a774f2c35a1e91616d29fee12679894ce4bd6c812f1665a46f3d404311cb8cad3@35.195.20.98:30303")'
+k exec -it globaltestnet-load-test-0 -c geth -- geth attach --exec 'admin.addPeer("enode://b64363b8618a0b8f2b43869481c13c9da67e864377ffd3ce3bf3122a22fde471ed9ebfa8d1bfa97ec7cc8f4715a2e61845012417599b672bc266ac4e62c877d8@35.240.106.222:30303")'
+k exec -it globaltestnet-load-test-0 -c geth -- geth attach --exec 'admin.addPeer("enode://750bfdecc18ea107c251fda411dd3f75a6a9023d3565d6b6692a92157828fbccb66d5706d042cee333ae11541f2748237f8930407ab9505d0f1b3c2d60e9f60b@35.205.197.201:30303")'
