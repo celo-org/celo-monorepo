@@ -22,6 +22,7 @@
     "exclude": [
         "node_modules",
         "wagmi.config.ts",
-        "abis"
+        "abis",
+        "scripts/**/*.test.ts"
     ]
 }
