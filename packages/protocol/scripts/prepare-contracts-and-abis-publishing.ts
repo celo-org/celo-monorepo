@@ -229,23 +229,33 @@ function processRawJsonsAndPrepareExports() {
   return exports
 }
 
-function prepareAbisPackageJson(exports) {
-  log('Preparing @celo/abis package.json')
-  const packageJsonPath = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json')
+function replacePackageVersionAndMakePublic(packageJsonPath: string, onDone?: (json) => void) {
   const json = JSON.parse(fs.readFileSync(packageJsonPath).toString())
 
   if (process.env.RELEASE_VERSION) {
-    log('Replacing @celo/abis version with provided RELEASE_VERSION')
+    log(`Replacing ${json.name} version with provided RELEASE_VERSION`)
 
     json.version = process.env.RELEASE_VERSION
+    json.private = false
   } else {
     log('No RELEASE_VERSION provided')
   }
 
-  log('Setting @celo/abis exports')
-  json.exports = exports
+  if (onDone !== undefined) {
+    onDone(json)
+  }
 
   fs.writeFileSync(packageJsonPath, JSON.stringify(json, null, 2))
+}
+
+function prepareAbisPackageJson(exports) {
+  log('Preparing @celo/abis package.json')
+  const packageJsonPath = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json')
+
+  replacePackageVersionAndMakePublic(packageJsonPath, (json) => {
+    log('Setting @celo/abis exports')
+    json.exports = exports
+  })
 }
 
 function prepareContractsPackage() {
@@ -255,13 +265,8 @@ function prepareContractsPackage() {
 
   if (process.env.RELEASE_VERSION) {
     log('Replacing @celo/contracts version with RELEASE_VERSION)')
-    const contractsPackageJsonPath = path.join(CONTRACTS_PACKAGE_SRC_DIR, 'package.json')
-    const contents = fs.readFileSync(contractsPackageJsonPath).toString()
-
-    fs.writeFileSync(
-      contractsPackageJsonPath,
-      contents.replace('0.0.0-template.version', process.env.RELEASE_VERSION)
-    )
+    const packageJsonPath = path.join(CONTRACTS_PACKAGE_SRC_DIR, 'package.json')
+    replacePackageVersionAndMakePublic(packageJsonPath)
 
     return
   }
