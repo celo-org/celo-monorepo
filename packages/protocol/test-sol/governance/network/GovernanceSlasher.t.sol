@@ -8,7 +8,6 @@ import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/governance/Proposals.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
 
 // Contract to test
 import "@celo-contracts/governance/GovernanceSlasher.sol";
@@ -20,14 +19,12 @@ contract GovernanceSlasherTest is Test {
   IRegistry registry;
   Accounts accounts;
   MockLockedGold mockLockedGold;
-  MockValidators mockValidators;
 
   GovernanceSlasher public governanceSlasher;
   address owner;
   address nonOwner;
   address validator;
   address slashedAddress;
-
   address registryAddress = 0x000000000000000000000000000000000000ce10;
 
   function setUp() public {
@@ -38,14 +35,12 @@ contract GovernanceSlasherTest is Test {
 
     accounts = new Accounts(true);
     mockLockedGold = new MockLockedGold();
-    mockValidators = new MockValidators();
     governanceSlasher = new GovernanceSlasher(true);
 
     deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
     registry = IRegistry(registryAddress);
     registry.setAddressFor("Accounts", address(accounts));
     registry.setAddressFor("LockedGold", address(mockLockedGold));
-    registry.setAddressFor("Validators", address(mockValidators));
 
     governanceSlasher.initialize(registryAddress);
     mockLockedGold.setAccountTotalLockedGold(validator, 5000);
@@ -85,7 +80,6 @@ contract GovernanceSlasherApproveSlashingTest is GovernanceSlasherTest {
     vm.expectEmit(true, true, true, true);
     emit SlashingApproved(slashedAddress, 1000);
     governanceSlasher.approveSlashing(slashedAddress, 1000);
-
   }
 }
 
