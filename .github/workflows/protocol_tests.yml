@@ -38,13 +38,9 @@ jobs:
       - name: Compile Contracts
         run: forge compile
 
-      # - name: Run tests (all)
-      #   # can't use gas limit because some setUp function use more than the limit
-      #   # 
-      #   run: forge test -vvv --match-path --block-gas-limit 20000000
-
       - name: Run tests common
-        run: forge test -vvv --match-path "test-sol/common/*" --block-gas-limit 20000000 # make it fail on purpose
+        # can't use gas limit because some setUp function use more than the limit
+        run: forge test -vvv --match-path "test-sol/common/*" # --block-gas-limit 20000000 
 
       - name: Run tests compatibility
         if: success() || failure()
@@ -54,9 +50,18 @@ jobs:
         if: success() || failure()
         run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/governance/network/*"
 
-      - name: Run tests governance/network
+      - name: Run tests governance/validators
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/governance/network/*"
+        run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/governance/validators/*"
+      
+      - name: Run tests governance/voting
+        if: success() || failure()
+        run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/governance/voting/*"
 
+      - name: Run tests stability
+        if: success() || failure()
+        run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/stability/*"
 
-# common/  compatibility/ governance/network/ governance/validators/ governance/voting/ stability
+      - name: Fail if there are tests without folder
+        if: success() || failure()
+        run: ls test-sol | grep -i ".t.sol" | grep -q ˆ
