@@ -4,6 +4,7 @@ import { loadFromEnvFile } from './env'
 import { rootLogger } from './logger'
 import { clearAllFundsToRoot, parseStableTokensList } from './scaffold'
 import { runExchangeTest } from './tests/exchange'
+import { runGrandaMentoTest } from './tests/granda-mento'
 import { runOracleTest } from './tests/oracle'
 import { runReserveTest } from './tests/reserve'
 import { runTransfersTest } from './tests/transfer'
@@ -39,6 +40,7 @@ function runTests() {
     runExchangeTest(context, stableTokensToTest)
     runOracleTest(context)
     runReserveTest(context)
+    runGrandaMentoTest(context, stableTokensToTest)
 
     // TODO: Governance Proposals
     // TODO: Validator election + Slashing

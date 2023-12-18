@@ -17,14 +17,42 @@
 
 ###  raw
 
-• **raw**: *[Hex](../modules/_types_.md#hex)*
+• **raw**: *string*
 
-*Defined in [types.ts:117](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L117)*
+*Defined in [types.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L28)*
 
 ___
 
 ###  tx
 
-• **tx**: *[LegacyTXProperties](_types_.legacytxproperties.md) | [CIP42TXProperties](_types_.cip42txproperties.md) | [EIP1559TXProperties](_types_.eip1559txproperties.md) | [CIP64TXProperties](_types_.cip64txproperties.md)*
+• **tx**: *object*
 
-*Defined in [types.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L118)*
+*Defined in [types.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L29)*
+
+#### Type declaration:
+
+* **feeCurrency**: *string*
+
+* **gas**: *string*
+
+* **gasPrice**: *string*
+
+* **gatewayFee**: *string*
+
+* **gatewayFeeRecipient**: *string*
+
+* **hash**: *string*
+
+* **input**: *string*
+
+* **nonce**: *string*
+
+* **r**: *string*
+
+* **s**: *string*
+
+* **to**: *string*
+
+* **v**: *string*
+
+* **value**: *string*

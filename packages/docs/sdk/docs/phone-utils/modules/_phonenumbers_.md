@@ -27,7 +27,7 @@
 
 ▸ **getCountryCode**(`e164PhoneNumber`: string): *[getCountryCode](_phonenumbers_.md#getcountrycode)*
 
-*Defined in [phoneNumbers.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L12)*
+*Defined in [phoneNumbers.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L13)*
 
 **Parameters:**
 
@@ -43,7 +43,7 @@ ___
 
 ▸ **getDisplayNumberInternational**(`e164PhoneNumber`: string): *[getDisplayNumberInternational](_phonenumbers_.md#getdisplaynumberinternational)*
 
-*Defined in [phoneNumbers.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L58)*
+*Defined in [phoneNumbers.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L59)*
 
 **Parameters:**
 
@@ -59,7 +59,7 @@ ___
 
 ▸ **getDisplayPhoneNumber**(`phoneNumber`: string, `defaultCountryCode`: string): *[getDisplayPhoneNumber](_phonenumbers_.md#getdisplayphonenumber)*
 
-*Defined in [phoneNumbers.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L48)*
+*Defined in [phoneNumbers.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L49)*
 
 **Parameters:**
 
@@ -76,7 +76,7 @@ ___
 
 ▸ **getE164DisplayNumber**(`e164PhoneNumber`: string): *[getE164DisplayNumber](_phonenumbers_.md#gete164displaynumber)*
 
-*Defined in [phoneNumbers.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L69)*
+*Defined in [phoneNumbers.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L70)*
 
 **Parameters:**
 
@@ -92,7 +92,7 @@ ___
 
 ▸ **getE164Number**(`phoneNumber`: string, `defaultCountryCode`: string): *[getE164Number](_phonenumbers_.md#gete164number)*
 
-*Defined in [phoneNumbers.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L74)*
+*Defined in [phoneNumbers.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L75)*
 
 **Parameters:**
 
@@ -109,7 +109,7 @@ ___
 
 ▸ **getExampleNumber**(`regionCode`: string, `useOnlyZeroes`: boolean, `isInternational`: boolean): *[getExampleNumber](_phonenumbers_.md#getexamplenumber)*
 
-*Defined in [phoneNumbers.ts:211](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L211)*
+*Defined in [phoneNumbers.ts:212](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L212)*
 
 **Parameters:**
 
@@ -127,7 +127,7 @@ ___
 
 ▸ **getRegionCode**(`e164PhoneNumber`: string): *[getRegionCode](_phonenumbers_.md#getregioncode)*
 
-*Defined in [phoneNumbers.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L24)*
+*Defined in [phoneNumbers.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L25)*
 
 **Parameters:**
 
@@ -143,7 +143,7 @@ ___
 
 ▸ **getRegionCodeFromCountryCode**(`countryCode`: string): *[getRegionCodeFromCountryCode](_phonenumbers_.md#getregioncodefromcountrycode)*
 
-*Defined in [phoneNumbers.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L36)*
+*Defined in [phoneNumbers.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L37)*
 
 **Parameters:**
 
@@ -159,7 +159,7 @@ ___
 
 ▸ **isE164NumberStrict**(`phoneNumber`: string): *[isE164NumberStrict](_phonenumbers_.md#ise164numberstrict)*
 
-*Defined in [phoneNumbers.ts:84](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L84)*
+*Defined in [phoneNumbers.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L85)*
 
 **Parameters:**
 
@@ -175,7 +175,7 @@ ___
 
 ▸ **parsePhoneNumber**(`phoneNumberRaw`: string, `defaultCountryCode?`: undefined | string): *ParsedPhoneNumber | null*
 
-*Defined in [phoneNumbers.ts:96](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L96)*
+*Defined in [phoneNumbers.ts:97](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L97)*
 
 **Parameters:**
 
@@ -192,40 +192,46 @@ Name | Type |
 
 ### ▪ **PhoneNumberUtils**: *object*
 
-*Defined in [phoneNumbers.ts:239](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L239)*
+*Defined in [phoneNumbers.ts:240](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L240)*
 
 ###  getCountryCode
 
 • **getCountryCode**: *[getCountryCode](_phonenumbers_.md#getcountrycode)*
 
-*Defined in [phoneNumbers.ts:240](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L240)*
+*Defined in [phoneNumbers.ts:242](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L242)*
 
 ###  getDisplayPhoneNumber
 
 • **getDisplayPhoneNumber**: *[getDisplayPhoneNumber](_phonenumbers_.md#getdisplayphonenumber)*
 
-*Defined in [phoneNumbers.ts:242](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L242)*
+*Defined in [phoneNumbers.ts:244](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L244)*
 
 ###  getE164Number
 
 • **getE164Number**: *[getE164Number](_phonenumbers_.md#gete164number)*
 
-*Defined in [phoneNumbers.ts:243](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L243)*
+*Defined in [phoneNumbers.ts:245](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L245)*
+
+###  getPhoneHash
+
+• **getPhoneHash**: *getPhoneHash*
+
+*Defined in [phoneNumbers.ts:241](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L241)*
 
 ###  getRegionCode
 
 • **getRegionCode**: *[getRegionCode](_phonenumbers_.md#getregioncode)*
 
-*Defined in [phoneNumbers.ts:241](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L241)*
+*Defined in [phoneNumbers.ts:243](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L243)*
 
 ###  isE164Number
 
 • **isE164Number**: *isE164Number*
 
-*Defined in [phoneNumbers.ts:244](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L244)*
+*Defined in [phoneNumbers.ts:246](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L246)*
 
 ###  parsePhoneNumber
 
 • **parsePhoneNumber**: *[parsePhoneNumber](_phonenumbers_.md#parsephonenumber)*
 
-*Defined in [phoneNumbers.ts:245](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L245)*
+*Defined in [phoneNumbers.ts:247](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L247)*

@@ -19,17 +19,17 @@
 
 ### `Optional` error
 
-• **error**? : *undefined | object*
+• **error**? : *string | object*
 
-*Defined in [types.ts:130](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L130)*
+*Defined in [types.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L55)*
 
 ___
 
 ###  id
 
-• **id**: *string | number*
+• **id**: *number*
 
-*Defined in [types.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L128)*
+*Defined in [types.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L53)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • **jsonrpc**: *string*
 
-*Defined in [types.ts:127](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L127)*
+*Defined in [types.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L52)*
 
 ___
 
@@ -45,4 +45,4 @@ ___
 
 • **result**? : *any*
 
-*Defined in [types.ts:129](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L129)*
+*Defined in [types.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L54)*

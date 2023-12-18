@@ -7,7 +7,6 @@
 ### Functions
 
 * [hexToNumber](_utils_formatter_.md#hextonumber)
-* [inputAccessListFormatter](_utils_formatter_.md#inputaccesslistformatter)
 * [inputAddressFormatter](_utils_formatter_.md#inputaddressformatter)
 * [inputBlockNumberFormatter](_utils_formatter_.md#inputblocknumberformatter)
 * [inputCeloTxFormatter](_utils_formatter_.md#inputcelotxformatter)
@@ -19,7 +18,6 @@
 * [outputCeloTxFormatter](_utils_formatter_.md#outputcelotxformatter)
 * [outputCeloTxReceiptFormatter](_utils_formatter_.md#outputcelotxreceiptformatter)
 * [outputLogFormatter](_utils_formatter_.md#outputlogformatter)
-* [parseAccessList](_utils_formatter_.md#parseaccesslist)
 
 ## Functions
 
@@ -27,7 +25,7 @@
 
 ▸ **hexToNumber**(`hex?`: undefined | string): *number | undefined*
 
-*Defined in [utils/formatter.ts:223](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L223)*
+*Defined in [utils/formatter.ts:171](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L171)*
 
 **Parameters:**
 
@@ -39,27 +37,11 @@ Name | Type |
 
 ___
 
-###  inputAccessListFormatter
-
-▸ **inputAccessListFormatter**(`accessList?`: AccessList): *[AccessListRaw](_types_.md#accesslistraw)*
-
-*Defined in [utils/formatter.ts:303](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L303)*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`accessList?` | AccessList |
-
-**Returns:** *[AccessListRaw](_types_.md#accesslistraw)*
-
-___
-
 ###  inputAddressFormatter
 
-▸ **inputAddressFormatter**(`address?`: undefined | string): *StrongAddress | undefined*
+▸ **inputAddressFormatter**(`address?`: undefined | string): *string | undefined*
 
-*Defined in [utils/formatter.ts:320](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L320)*
+*Defined in [utils/formatter.ts:216](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L216)*
 
 **Parameters:**
 
@@ -67,15 +49,15 @@ Name | Type |
 ------ | ------ |
 `address?` | undefined &#124; string |
 
-**Returns:** *StrongAddress | undefined*
+**Returns:** *string | undefined*
 
 ___
 
 ###  inputBlockNumberFormatter
 
-▸ **inputBlockNumberFormatter**(`blockNumber`: [BlockNumber](_types_.md#blocknumber)): *[inputBlockNumberFormatter](_utils_formatter_.md#inputblocknumberformatter)*
+▸ **inputBlockNumberFormatter**(`blockNumber`: [BlockNumber](_types_.md#blocknumber)): *undefined | string | number | BN‹› | BigNumber‹›*
 
-*Defined in [utils/formatter.ts:168](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L168)*
+*Defined in [utils/formatter.ts:117](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L117)*
 
 **Parameters:**
 
@@ -83,15 +65,15 @@ Name | Type |
 ------ | ------ |
 `blockNumber` | [BlockNumber](_types_.md#blocknumber) |
 
-**Returns:** *[inputBlockNumberFormatter](_utils_formatter_.md#inputblocknumberformatter)*
+**Returns:** *undefined | string | number | BN‹› | BigNumber‹›*
 
 ___
 
 ###  inputCeloTxFormatter
 
-▸ **inputCeloTxFormatter**(`tx`: [CeloTx](_types_.md#celotx)): *[FormattedCeloTx](../interfaces/_types_.formattedcelotx.md)*
+▸ **inputCeloTxFormatter**(`tx`: [CeloTx](_types_.md#celotx)): *[CeloTx](_types_.md#celotx)*
 
-*Defined in [utils/formatter.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L23)*
+*Defined in [utils/formatter.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L19)*
 
 Formats the input of a transaction and converts all values to HEX
 
@@ -101,15 +83,15 @@ Name | Type |
 ------ | ------ |
 `tx` | [CeloTx](_types_.md#celotx) |
 
-**Returns:** *[FormattedCeloTx](../interfaces/_types_.formattedcelotx.md)*
+**Returns:** *[CeloTx](_types_.md#celotx)*
 
 ___
 
 ###  inputDefaultBlockNumberFormatter
 
-▸ **inputDefaultBlockNumberFormatter**(`blockNumber`: [BlockNumber](_types_.md#blocknumber) | null | undefined): *[inputDefaultBlockNumberFormatter](_utils_formatter_.md#inputdefaultblocknumberformatter)*
+▸ **inputDefaultBlockNumberFormatter**(`blockNumber`: [BlockNumber](_types_.md#blocknumber) | null | undefined): *undefined | string | number | BN‹› | BigNumber‹›*
 
-*Defined in [utils/formatter.ts:160](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L160)*
+*Defined in [utils/formatter.ts:109](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L109)*
 
 **Parameters:**
 
@@ -117,15 +99,15 @@ Name | Type |
 ------ | ------ |
 `blockNumber` | [BlockNumber](_types_.md#blocknumber) &#124; null &#124; undefined |
 
-**Returns:** *[inputDefaultBlockNumberFormatter](_utils_formatter_.md#inputdefaultblocknumberformatter)*
+**Returns:** *undefined | string | number | BN‹› | BigNumber‹›*
 
 ___
 
 ###  inputSignFormatter
 
-▸ **inputSignFormatter**(`data`: string): *[inputSignFormatter](_utils_formatter_.md#inputsignformatter)*
+▸ **inputSignFormatter**(`data`: string): *string*
 
-*Defined in [utils/formatter.ts:330](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L330)*
+*Defined in [utils/formatter.ts:226](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L226)*
 
 **Parameters:**
 
@@ -133,7 +115,7 @@ Name | Type |
 ------ | ------ |
 `data` | string |
 
-**Returns:** *[inputSignFormatter](_utils_formatter_.md#inputsignformatter)*
+**Returns:** *string*
 
 ___
 
@@ -141,7 +123,7 @@ ___
 
 ▸ **outputBigNumberFormatter**(`hex`: string): *string*
 
-*Defined in [utils/formatter.ts:264](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L264)*
+*Defined in [utils/formatter.ts:212](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L212)*
 
 **Parameters:**
 
@@ -157,7 +139,7 @@ ___
 
 ▸ **outputBlockFormatter**(`block`: any): *Block*
 
-*Defined in [utils/formatter.ts:202](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L202)*
+*Defined in [utils/formatter.ts:150](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L150)*
 
 **Parameters:**
 
@@ -173,7 +155,7 @@ ___
 
 ▸ **outputBlockHeaderFormatter**(`blockHeader`: any): *BlockHeader*
 
-*Defined in [utils/formatter.ts:187](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L187)*
+*Defined in [utils/formatter.ts:135](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L135)*
 
 **Parameters:**
 
@@ -189,7 +171,7 @@ ___
 
 ▸ **outputCeloTxFormatter**(`tx`: any): *[CeloTxPending](_types_.md#celotxpending)*
 
-*Defined in [utils/formatter.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L85)*
+*Defined in [utils/formatter.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L46)*
 
 **Parameters:**
 
@@ -205,7 +187,7 @@ ___
 
 ▸ **outputCeloTxReceiptFormatter**(`receipt`: any): *[CeloTxReceipt](_types_.md#celotxreceipt)*
 
-*Defined in [utils/formatter.ts:131](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L131)*
+*Defined in [utils/formatter.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L80)*
 
 **Parameters:**
 
@@ -221,7 +203,7 @@ ___
 
 ▸ **outputLogFormatter**(`log`: any): *Log*
 
-*Defined in [utils/formatter.ts:230](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L230)*
+*Defined in [utils/formatter.ts:178](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L178)*
 
 **Parameters:**
 
@@ -230,19 +212,3 @@ Name | Type |
 `log` | any |
 
 **Returns:** *Log*
-
-___
-
-###  parseAccessList
-
-▸ **parseAccessList**(`accessListRaw`: [AccessListRaw](_types_.md#accesslistraw) | undefined): *AccessList*
-
-*Defined in [utils/formatter.ts:272](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L272)*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`accessListRaw` | [AccessListRaw](_types_.md#accesslistraw) &#124; undefined |
-
-**Returns:** *AccessList*

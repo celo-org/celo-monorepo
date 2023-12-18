@@ -12,7 +12,7 @@
 
 ###  getErrorMessage
 
-▸ **getErrorMessage**(`error`: [Error](../classes/_result_.rooterror.md#static-error)): *[getErrorMessage](_displayformatting_.md#geterrormessage)*
+▸ **getErrorMessage**(`error`: [Error](../classes/_result_.rooterror.md#static-error)): *string*
 
 *Defined in [packages/sdk/base/src/displayFormatting.ts:2](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/displayFormatting.ts#L2)*
 
@@ -24,4 +24,4 @@ Name | Type |
 ------ | ------ |
 `error` | [Error](../classes/_result_.rooterror.md#static-error) |
 
-**Returns:** *[getErrorMessage](_displayformatting_.md#geterrormessage)*
+**Returns:** *string*

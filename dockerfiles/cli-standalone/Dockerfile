@@ -3,7 +3,7 @@
 # Example build command:
 #
 #   VERSION=x.y.z; docker build . --build-arg VERSION=$VERSION -t gcr.io/celo-testnet/celocli-standalone:$VERSION
-FROM node:12-alpine
+FROM node:20-alpine
 LABEL org.opencontainers.image.authors="devops@clabs.co"
 
 # Install cli install dependencies.

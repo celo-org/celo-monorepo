@@ -17,7 +17,7 @@
 
 ###  appendPath
 
-▸ **appendPath**(`baseUrl`: string, `path`: string): *[appendPath](_string_.md#appendpath)*
+▸ **appendPath**(`baseUrl`: string, `path`: string): *string*
 
 *Defined in [packages/sdk/base/src/string.ts:1](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/string.ts#L1)*
 
@@ -28,13 +28,13 @@ Name | Type |
 `baseUrl` | string |
 `path` | string |
 
-**Returns:** *[appendPath](_string_.md#appendpath)*
+**Returns:** *string*
 
 ___
 
 ###  normalizeAccents
 
-▸ **normalizeAccents**(`str`: string): *[normalizeAccents](_string_.md#normalizeaccents)*
+▸ **normalizeAccents**(`str`: string): *string*
 
 *Defined in [packages/sdk/base/src/string.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/string.ts#L10)*
 
@@ -44,7 +44,7 @@ Name | Type |
 ------ | ------ |
 `str` | string |
 
-**Returns:** *[normalizeAccents](_string_.md#normalizeaccents)*
+**Returns:** *string*
 
 ## Object literals
 
