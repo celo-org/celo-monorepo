@@ -67,7 +67,7 @@ jobs:
         if: success() || failure()
         run: |
           if ls test-sol | grep -qi '\.t\.sol'; then
-            echo "All tests should be in a file"
+            echo "All tests should be in a folder"
             exit 1
           fi
 
