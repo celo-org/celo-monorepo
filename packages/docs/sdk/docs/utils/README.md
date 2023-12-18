@@ -8,11 +8,13 @@
 
 * ["address"](modules/_address_.md)
 * ["async"](modules/_async_.md)
+* ["attestations"](modules/_attestations_.md)
 * ["bn"](modules/_bn_.md)
 * ["celoHistory"](modules/_celohistory_.md)
 * ["collections"](modules/_collections_.md)
 * ["contacts"](modules/_contacts_.md)
 * ["currencies"](modules/_currencies_.md)
+* ["dappkit"](modules/_dappkit_.md)
 * ["displayFormatting"](modules/_displayformatting_.md)
 * ["ecdh"](modules/_ecdh_.md)
 * ["ecies"](modules/_ecies_.md)

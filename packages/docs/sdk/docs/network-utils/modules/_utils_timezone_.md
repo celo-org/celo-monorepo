@@ -18,7 +18,7 @@
 
 ###  _testSetTimezoneOverride
 
-▸ **_testSetTimezoneOverride**(`zone`: string | undefined): *[_testSetTimezoneOverride](_utils_timezone_.md#_testsettimezoneoverride)*
+▸ **_testSetTimezoneOverride**(`zone`: string | undefined): *void*
 
 *Defined in [utils/timezone.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/network-utils/src/utils/timezone.ts#L7)*
 
@@ -28,7 +28,7 @@ Name | Type |
 ------ | ------ |
 `zone` | string &#124; undefined |
 
-**Returns:** *[_testSetTimezoneOverride](_utils_timezone_.md#_testsettimezoneoverride)*
+**Returns:** *void*
 
 ___
 

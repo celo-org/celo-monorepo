@@ -1,6 +1,6 @@
 [@celo/base](../README.md) › ["future"](../modules/_future_.md) › [Future](_future_.future.md)
 
-# Class: Future ‹**T**›
+# Class: Future <**T**>
 
 **`internal`** 
 

@@ -62,7 +62,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 2);
+    return (1, 1, 2, 3);
   }
 
   /**
@@ -112,10 +112,9 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @param oracleAddress The address of the oracle.
    */
   function addOracle(address token, address oracleAddress) external onlyOwner {
-    require(
-      token != address(0) && oracleAddress != address(0) && !isOracle[token][oracleAddress],
-      "token addr was null or oracle addr was null or oracle addr is not an oracle for token addr"
-    );
+    require(token != address(0), "token addr was null");
+    require(oracleAddress != address(0), "oracle addr was null");
+    require(!isOracle[token][oracleAddress], "oracle addr is not an oracle for token addr");
     isOracle[token][oracleAddress] = true;
     oracles[token].push(oracleAddress);
     emit OracleAdded(token, oracleAddress);

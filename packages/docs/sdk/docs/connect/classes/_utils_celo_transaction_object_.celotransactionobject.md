@@ -1,6 +1,6 @@
 [@celo/connect](../README.md) › [Globals](../globals.md) › ["utils/celo-transaction-object"](../modules/_utils_celo_transaction_object_.md) › [CeloTransactionObject](_utils_celo_transaction_object_.celotransactionobject.md)
 
-# Class: CeloTransactionObject ‹**O**›
+# Class: CeloTransactionObject <**O**>
 
 ## Type parameters
 

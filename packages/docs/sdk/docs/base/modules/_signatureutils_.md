@@ -59,9 +59,9 @@ ___
 
 ###  serializeSignature
 
-▸ **serializeSignature**(`signature`: [Signature](../interfaces/_signatureutils_.signature.md)): *[serializeSignature](_signatureutils_.md#serializesignature)*
+▸ **serializeSignature**(`signature`: [Signature](../interfaces/_signatureutils_.signature.md)): *string*
 
-*Defined in [packages/sdk/base/src/signatureUtils.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/signatureUtils.ts#L26)*
+*Defined in [packages/sdk/base/src/signatureUtils.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/signatureUtils.ts#L25)*
 
 **Parameters:**
 
@@ -69,7 +69,7 @@ Name | Type |
 ------ | ------ |
 `signature` | [Signature](../interfaces/_signatureutils_.signature.md) |
 
-**Returns:** *[serializeSignature](_signatureutils_.md#serializesignature)*
+**Returns:** *string*
 
 ## Object literals
 
@@ -77,16 +77,16 @@ Name | Type |
 
 ### ▪ **SignatureBase**: *object*
 
-*Defined in [packages/sdk/base/src/signatureUtils.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/signatureUtils.ts#L33)*
+*Defined in [packages/sdk/base/src/signatureUtils.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/signatureUtils.ts#L32)*
 
 ###  NativeSigner
 
 • **NativeSigner**: *[NativeSigner](_signatureutils_.md#nativesigner)*
 
-*Defined in [packages/sdk/base/src/signatureUtils.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/signatureUtils.ts#L34)*
+*Defined in [packages/sdk/base/src/signatureUtils.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/signatureUtils.ts#L33)*
 
 ###  serializeSignature
 
 • **serializeSignature**: *[serializeSignature](_signatureutils_.md#serializesignature)*
 
-*Defined in [packages/sdk/base/src/signatureUtils.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/signatureUtils.ts#L35)*
+*Defined in [packages/sdk/base/src/signatureUtils.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/signatureUtils.ts#L34)*

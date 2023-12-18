@@ -12,28 +12,19 @@
 
 * [rlpEncode](_types_.rlpencodedtx.md#rlpencode)
 * [transaction](_types_.rlpencodedtx.md#transaction)
-* [type](_types_.rlpencodedtx.md#type)
 
 ## Properties
 
 ###  rlpEncode
 
-• **rlpEncode**: *[Hex](../modules/_types_.md#hex)*
+• **rlpEncode**: *string*
 
-*Defined in [types.ts:166](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L166)*
+*Defined in [types.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L71)*
 
 ___
 
 ###  transaction
 
-• **transaction**: *[FormattedCeloTx](_types_.formattedcelotx.md)*
+• **transaction**: *[CeloTx](../modules/_types_.md#celotx)*
 
-*Defined in [types.ts:165](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L165)*
-
-___
-
-###  type
-
-• **type**: *[TransactionTypes](../modules/_types_.md#transactiontypes)*
-
-*Defined in [types.ts:167](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L167)*
+*Defined in [types.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L70)*

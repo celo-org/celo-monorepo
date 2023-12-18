@@ -130,7 +130,7 @@ jobs:
             code-${{ github.sha }}
       - name: Detect files changed in PR (or commit), and expose as output
         id: changed-files
-        uses: tj-actions/changed-files@v37
+        uses: tj-actions/changed-files@v40
         with:
           # Using comma as separator to be able to easily match full paths (using ,<path>)
           separator: ','
@@ -279,9 +279,9 @@ jobs:
           - name: Protocol Governance Voting
             command: |
               yarn --cwd packages/protocol test governance/voting/
-          - name: Protocol Stability
+          - name: Protocol scripts test
             command: |
-              yarn --cwd packages/protocol test stability/
+              yarn --cwd packages/protocol test:scripts
     steps:
       - uses: actions/checkout@v4
         with:
