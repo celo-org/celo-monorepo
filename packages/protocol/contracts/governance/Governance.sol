@@ -225,7 +225,7 @@ contract Governance is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 4, 0, 0);
+    return (1, 4, 0, 1);
   }
 
   /**
@@ -762,7 +762,6 @@ contract Governance is
         noVotes,
         abstainVotes
       );
-
     } else {
       proposal.updateVote(
         previousVoteRecord.yesVotes,
@@ -953,7 +952,7 @@ contract Governance is
     uint256[] calldata dataLengths,
     bytes32 salt
   ) external {
-    bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths, salt));
+    bytes32 hash = this.getHotfixHash(values, destinations, data, dataLengths, salt);
 
     (bool approved, bool executed, uint256 preparedEpoch) = getHotfixRecord(hash);
     require(!executed, "hotfix already executed");
@@ -1590,6 +1589,24 @@ contract Governance is
         .newFixed(totalToRemove)
         .multiply(FixidityLib.newFixedFraction(votes, sumOfAllVotes))
         .fromFixed();
+  }
+
+  /**
+   * @param values The values of CELO to be sent in the proposed transactions.
+   * @param destinations The destination addresses of the proposed transactions.
+   * @param data The concatenated data to be included in the proposed transactions.
+   * @param dataLengths The lengths of each transaction's data.
+   * @param salt Arbitrary salt associated with hotfix which guarantees uniqueness of hash.
+   * @return The hash of the hotfix.
+   */
+  function getHotfixHash(
+    uint256[] calldata values,
+    address[] calldata destinations,
+    bytes calldata data,
+    uint256[] calldata dataLengths,
+    bytes32 salt
+  ) external pure returns (bytes32) {
+    return keccak256(abi.encode(values, destinations, data, dataLengths, salt));
   }
 
   /**

@@ -37,31 +37,18 @@ contract GovernanceForTest is Governance(true) {
   }
 
   // exposes removeVotesWhenRevokingDelegatedVotes for tests
-  function removeVotesWhenRevokingDelegatedVotesTest(
-    address account,
-    uint256 maxAmountAllowed
-  ) public {
+  function removeVotesWhenRevokingDelegatedVotesTest(address account, uint256 maxAmountAllowed)
+    public
+  {
     _removeVotesWhenRevokingDelegatedVotes(account, maxAmountAllowed);
   }
 
-  function setDeprecatedWeight(
-    address voterAddress,
-    uint256 proposalIndex,
-    uint256 weight
-  ) external {
+  function setDeprecatedWeight(address voterAddress, uint256 proposalIndex, uint256 weight)
+    external
+  {
     Voter storage voter = voters[voterAddress];
     VoteRecord storage voteRecord = voter.referendumVotes[proposalIndex];
     voteRecord.deprecated_weight = weight;
-  }
-
-  function getHotfixHash(
-    uint256[] calldata values,
-    address[] calldata destinations,
-    bytes calldata data,
-    uint256[] calldata dataLengths,
-    bytes32 salt
-  ) external pure returns (bytes32) {
-    return keccak256(abi.encode(values, destinations, data, dataLengths, salt));
   }
 }
 
@@ -118,11 +105,11 @@ contract GovernanceBaseTest is Test {
     expectedParticipationBaseline = FixidityLib
       .multiply(baselineUpdateFactor, FixidityLib.fixed1())
       .add(
-        FixidityLib.multiply(
-          FixidityLib.fixed1().subtract(baselineUpdateFactor),
-          participationBaseline
-        )
+      FixidityLib.multiply(
+        FixidityLib.fixed1().subtract(baselineUpdateFactor),
+        participationBaseline
       )
+    )
       .unwrap();
 
     // change block.tiemstamp so we're not on timestamp = 0
@@ -292,12 +279,8 @@ contract GovernanceInitialize is GovernanceBaseTest {
   }
 
   function test_SetsParticipationParameters() public {
-    (
-      uint256 actualParticipationBaseline,
-      uint256 actualParticipationFloor,
-      uint256 actualBaselineUpdateFactor,
-      uint256 actualBaselineQuorumFactor
-    ) = governance.getParticipationParameters();
+    (uint256 actualParticipationBaseline, uint256 actualParticipationFloor, uint256 actualBaselineUpdateFactor, uint256 actualBaselineQuorumFactor) = governance
+      .getParticipationParameters();
     assertEq(actualParticipationBaseline, FixidityLib.newFixedFraction(5, 10).unwrap());
     assertEq(actualParticipationFloor, FixidityLib.newFixedFraction(5, 100).unwrap());
     assertEq(actualBaselineUpdateFactor, FixidityLib.newFixedFraction(1, 5).unwrap());
@@ -585,12 +568,8 @@ contract GovernanceSetParticipationFloor is GovernanceBaseTest {
   function test_SetsValue() public {
     vm.prank(accOwner);
     governance.setParticipationFloor(NEW_VALUE);
-    (
-      uint256 baseline,
-      uint256 baselineFloor,
-      uint256 _baselineUpdateFactor,
-      uint256 _baselineQuorumFactor
-    ) = governance.getParticipationParameters();
+    (uint256 baseline, uint256 baselineFloor, uint256 _baselineUpdateFactor, uint256 _baselineQuorumFactor) = governance
+      .getParticipationParameters();
     assertEq(baselineFloor, NEW_VALUE);
   }
 
@@ -622,12 +601,8 @@ contract GovernanceSetBaselineUpdateFactor is GovernanceBaseTest {
   function test_SetsValue() public {
     vm.prank(accOwner);
     governance.setBaselineUpdateFactor(NEW_VALUE);
-    (
-      uint256 baseline,
-      uint256 baselineFloor,
-      uint256 _baselineUpdateFactor,
-      uint256 _baselineQuorumFactor
-    ) = governance.getParticipationParameters();
+    (uint256 baseline, uint256 baselineFloor, uint256 _baselineUpdateFactor, uint256 _baselineQuorumFactor) = governance
+      .getParticipationParameters();
     assertEq(_baselineUpdateFactor, NEW_VALUE);
   }
 
@@ -659,12 +634,8 @@ contract GovernanceSetBaselineQuorumFactor is GovernanceBaseTest {
   function test_SetsValue() public {
     vm.prank(accOwner);
     governance.setBaselineQuorumFactor(NEW_VALUE);
-    (
-      uint256 baseline,
-      uint256 baselineFloor,
-      uint256 _baselineUpdateFactor,
-      uint256 _baselineQuorumFactor
-    ) = governance.getParticipationParameters();
+    (uint256 baseline, uint256 baselineFloor, uint256 _baselineUpdateFactor, uint256 _baselineQuorumFactor) = governance
+      .getParticipationParameters();
     assertEq(_baselineQuorumFactor, NEW_VALUE);
   }
 
@@ -804,15 +775,8 @@ contract GovernancePropose is GovernanceBaseTest {
       proposal.description
     );
 
-    (
-      address proposer,
-      uint256 deposit,
-      uint256 timestamp,
-      uint256 txCount,
-      string memory description,
-      uint256 networkWeight,
-      bool approved
-    ) = governance.getProposal(id);
+    (address proposer, uint256 deposit, uint256 timestamp, uint256 txCount, string memory description, uint256 networkWeight, bool approved) = governance
+      .getProposal(id);
 
     assertEq(proposer, address(this));
     assertEq(deposit, DEPOSIT);
@@ -1292,15 +1256,8 @@ contract GovernanceApprove is GovernanceBaseTest {
     vm.prank(accApprover);
     governance.approve(proposalId, INDEX);
 
-    (
-      address proposer,
-      uint256 deposit,
-      ,
-      uint256 txCount,
-      string memory description,
-      uint256 networkWeight,
-      bool approved
-    ) = governance.getProposal(proposalId);
+    (address proposer, uint256 deposit, , uint256 txCount, string memory description, uint256 networkWeight, bool approved) = governance
+      .getProposal(proposalId);
 
     assertEq(proposer, address(this));
     assertEq(deposit, DEPOSIT);
@@ -1610,14 +1567,8 @@ contract GovernanceVoteWhenProposalIsApproved is GovernanceBaseTest {
   function test_SetVotersVoteRecord() public {
     vm.prank(accVoter);
     governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
-    (
-      uint256 recordProposalId,
-      ,
-      ,
-      uint256 yesVotesRecord,
-      uint256 noVotesRecord,
-      uint256 abstainVotesRecord
-    ) = governance.getVoteRecord(accVoter, 0);
+    (uint256 recordProposalId, , , uint256 yesVotesRecord, uint256 noVotesRecord, uint256 abstainVotesRecord) = governance
+      .getVoteRecord(accVoter, 0);
     assertEq(recordProposalId, proposalId);
     assertEq(yesVotesRecord, VOTER_GOLD);
     assertEq(noVotesRecord, 0);
@@ -1861,14 +1812,8 @@ contract GovernanceVoteWhenProposalIsApprovedAndHaveSigner is GovernanceBaseTest
   function test_SetVotersVoteRecord() public {
     vm.prank(accSigner);
     governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
-    (
-      uint256 recordProposalId,
-      ,
-      ,
-      uint256 yesVotesRecord,
-      uint256 noVotesRecord,
-      uint256 abstainVotesRecord
-    ) = governance.getVoteRecord(accVoter, 0);
+    (uint256 recordProposalId, , , uint256 yesVotesRecord, uint256 noVotesRecord, uint256 abstainVotesRecord) = governance
+      .getVoteRecord(accVoter, 0);
     assertEq(recordProposalId, proposalId);
     assertEq(yesVotesRecord, VOTER_GOLD);
     assertEq(noVotesRecord, 0);
@@ -1928,14 +1873,8 @@ contract GovernanceVoteWhenProposalIsNotApproved is GovernanceBaseTest {
   function test_SetVotersValueRecord() public {
     vm.prank(accVoter);
     governance.vote(proposalId, 0, Proposals.VoteValue.Yes);
-    (
-      uint256 recordProposalId,
-      ,
-      ,
-      uint256 yesVotesRecord,
-      uint256 noVotesRecord,
-      uint256 abstainVotesRecord
-    ) = governance.getVoteRecord(accVoter, 0);
+    (uint256 recordProposalId, , , uint256 yesVotesRecord, uint256 noVotesRecord, uint256 abstainVotesRecord) = governance
+      .getVoteRecord(accVoter, 0);
     assertEq(recordProposalId, proposalId);
     assertEq(yesVotesRecord, VOTER_GOLD);
     assertEq(noVotesRecord, 0);
@@ -2074,14 +2013,8 @@ contract GovernanceVotePartiallyWhenProposalIsApproved is GovernanceBaseTest {
   function test_SetTheVotersVoteRecord() public {
     vm.prank(accVoter);
     governance.votePartially(proposalId, 0, VOTER_GOLD, 0, 0);
-    (
-      uint256 recordProposalId,
-      ,
-      ,
-      uint256 yesVotesRecord,
-      uint256 noVotesRecord,
-      uint256 abstainVotesRecord
-    ) = governance.getVoteRecord(accVoter, 0);
+    (uint256 recordProposalId, , , uint256 yesVotesRecord, uint256 noVotesRecord, uint256 abstainVotesRecord) = governance
+      .getVoteRecord(accVoter, 0);
     assertEq(recordProposalId, proposalId);
     assertEq(yesVotesRecord, VOTER_GOLD);
     assertEq(noVotesRecord, 0);
@@ -2309,14 +2242,8 @@ contract GovernanceVotePartiallyWhenProposalIsApprovedAndHaveSigner is Governanc
   function test_SetTheVotersVoteRecord() public {
     vm.prank(accSigner);
     governance.votePartially(proposalId, 0, VOTER_GOLD, 0, 0);
-    (
-      uint256 recordProposalId,
-      ,
-      ,
-      uint256 yesVotesRecord,
-      uint256 noVotesRecord,
-      uint256 abstainVotesRecord
-    ) = governance.getVoteRecord(accVoter, 0);
+    (uint256 recordProposalId, , , uint256 yesVotesRecord, uint256 noVotesRecord, uint256 abstainVotesRecord) = governance
+      .getVoteRecord(accVoter, 0);
     assertEq(recordProposalId, proposalId);
     assertEq(yesVotesRecord, VOTER_GOLD);
     assertEq(noVotesRecord, 0);
@@ -2402,14 +2329,8 @@ contract GovernanceVotePartiallyWhenProposalIsNotApproved is GovernanceBaseTest 
   function test_SetVotersValueRecord() public {
     vm.prank(accVoter);
     governance.votePartially(proposalId, 0, VOTER_GOLD, 0, 0);
-    (
-      uint256 recordProposalId,
-      ,
-      ,
-      uint256 yesVotesRecord,
-      uint256 noVotesRecord,
-      uint256 abstainVotesRecord
-    ) = governance.getVoteRecord(accVoter, 0);
+    (uint256 recordProposalId, , , uint256 yesVotesRecord, uint256 noVotesRecord, uint256 abstainVotesRecord) = governance
+      .getVoteRecord(accVoter, 0);
     assertEq(recordProposalId, proposalId);
     assertEq(yesVotesRecord, VOTER_GOLD);
     assertEq(noVotesRecord, 0);
