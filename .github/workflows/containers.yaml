@@ -145,14 +145,14 @@ jobs:
   metadata-crawler-build:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.13.1
     needs: changed-files
-    name: Build us-west1-docker.pkg.dev/devopsre/blockscout-metadata-crawler/blockscout-metadata-crawler:latest
+    name: Build us-west1-docker.pkg.dev/devopsre/celo-monorepo/blockscout-metadata-crawler:latest
     if: |
       github.ref == 'refs/heads/master' &&
       contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/metadata-crawler')
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
       service-account: 'celo-monorepo@devopsre.iam.gserviceaccount.com'
-      artifact-registry: us-west1-docker.pkg.dev/devopsre/blockscout-metadata-crawler/blockscout-metadata-crawler
+      artifact-registry: us-west1-docker.pkg.dev/devopsre/celo-monorepo/blockscout-metadata-crawler
       tags: latest
       context: .
       file: dockerfiles/metadata-crawler/Dockerfile
