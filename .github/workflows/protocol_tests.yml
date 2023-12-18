@@ -55,8 +55,9 @@ jobs:
         run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/governance/validators/*"
       
       - name: Run tests governance/voting
+        # can't use gas limit because some setUp function use more than the limit
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/governance/voting/*"
+        run: forge test -vvv --match-path "test-sol/governance/voting/*" # --block-gas-limit 20000000
 
       - name: Run tests stability
         if: success() || failure()
@@ -64,4 +65,8 @@ jobs:
 
       - name: Fail if there are tests without folder
         if: success() || failure()
-        run: ls test-sol | grep -i ".t.sol" | grep -q ˆ
+        run: ! ls test-sol | grep -qi '\.t\.sol'
+
+      - name: Run Everything just in case something was missed
+        # can't use gas limit because some setUp function use more than the limit
+        run: forge test -vvv
