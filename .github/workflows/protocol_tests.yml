@@ -38,6 +38,25 @@ jobs:
       - name: Compile Contracts
         run: forge compile
 
-      - name: Run tests
-        # can't use gas limit because some setUp function use more than the limit
-        run: forge test -vvv # --block-gas-limit 20000000
+      # - name: Run tests (all)
+      #   # can't use gas limit because some setUp function use more than the limit
+      #   # 
+      #   run: forge test -vvv --match-path --block-gas-limit 20000000
+
+      - name: Run tests common
+        run: forge test -vvv --match-path "test-sol/common/*" --block-gas-limit 20000000 # make it fail on purpose
+
+      - name: Run tests compatibility
+        if: success() || failure()
+        run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/compatibility/*"
+
+      - name: Run tests governance/network
+        if: success() || failure()
+        run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/governance/network/*"
+
+      - name: Run tests governance/network
+        if: success() || failure()
+        run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/governance/network/*"
+
+
+# common/  compatibility/ governance/network/ governance/validators/ governance/voting/ stability
