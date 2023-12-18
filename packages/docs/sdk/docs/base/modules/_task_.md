@@ -66,7 +66,7 @@ ___
 
 ###  tryObtainValueWithRetries
 
-▸ **tryObtainValueWithRetries**‹**A**›(`opts`: [RetryTaskOptions](../interfaces/_task_.retrytaskoptions.md)‹A›): *[RunningTaskWithValue](../interfaces/_task_.runningtaskwithvalue.md)‹A›*
+▸ **tryObtainValueWithRetries**<**A**>(`opts`: [RetryTaskOptions](../interfaces/_task_.retrytaskoptions.md)‹A›): *[RunningTaskWithValue](../interfaces/_task_.runningtaskwithvalue.md)‹A›*
 
 *Defined in [packages/sdk/base/src/task.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/task.ts#L128)*
 

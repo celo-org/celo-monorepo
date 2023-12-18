@@ -19,7 +19,7 @@
 
 ###  concurrentMap
 
-▸ **concurrentMap**‹**A**, **B**›(`concurrency`: number, `xs`: A[], `mapFn`: function): *Promise‹B[]›*
+▸ **concurrentMap**<**A**, **B**>(`concurrency`: number, `xs`: A[], `mapFn`: function): *Promise‹B[]›*
 
 *Defined in [packages/sdk/base/src/async.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L128)*
 
@@ -60,7 +60,7 @@ ___
 
 ###  concurrentValuesMap
 
-▸ **concurrentValuesMap**‹**IN**, **OUT**›(`concurrency`: number, `x`: Record‹string, IN›, `mapFn`: function): *Promise‹Record‹string, OUT››*
+▸ **concurrentValuesMap**<**IN**, **OUT**>(`concurrency`: number, `x`: Record‹string, IN›, `mapFn`: function): *Promise‹Record‹string, OUT››*
 
 *Defined in [packages/sdk/base/src/async.ts:150](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L150)*
 
@@ -101,7 +101,7 @@ ___
 
 ### `Const` retryAsync
 
-▸ **retryAsync**‹**T**, **U**›(`inFunction`: InFunction‹T, U›, `tries`: number, `params`: T, `delay`: number, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹U›*
+▸ **retryAsync**<**T**, **U**>(`inFunction`: InFunction‹T, U›, `tries`: number, `params`: T, `delay`: number, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹U›*
 
 *Defined in [packages/sdk/base/src/async.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L14)*
 
@@ -127,7 +127,7 @@ ___
 
 ### `Const` retryAsyncWithBackOff
 
-▸ **retryAsyncWithBackOff**‹**T**, **U**›(`inFunction`: InFunction‹T, U›, `tries`: number, `params`: T, `delay`: number, `factor`: number, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹U›*
+▸ **retryAsyncWithBackOff**<**T**, **U**>(`inFunction`: InFunction‹T, U›, `tries`: number, `params`: T, `delay`: number, `factor`: number, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹U›*
 
 *Defined in [packages/sdk/base/src/async.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L40)*
 
@@ -154,7 +154,7 @@ ___
 
 ### `Const` retryAsyncWithBackOffAndTimeout
 
-▸ **retryAsyncWithBackOffAndTimeout**‹**T**, **U**›(`inFunction`: InFunction‹T, U›, `tries`: number, `params`: T, `delayMs`: number, `factor`: number, `timeoutMs`: number, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹U›*
+▸ **retryAsyncWithBackOffAndTimeout**<**T**, **U**>(`inFunction`: InFunction‹T, U›, `tries`: number, `params`: T, `delayMs`: number, `factor`: number, `timeoutMs`: number, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹U›*
 
 *Defined in [packages/sdk/base/src/async.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L102)*
 
@@ -182,7 +182,7 @@ ___
 
 ### `Const` selectiveRetryAsyncWithBackOff
 
-▸ **selectiveRetryAsyncWithBackOff**‹**T**, **U**›(`inFunction`: InFunction‹T, U›, `tries`: number, `dontRetry`: string[], `params`: T, `delay`: number, `factor`: number, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹U›*
+▸ **selectiveRetryAsyncWithBackOff**<**T**, **U**>(`inFunction`: InFunction‹T, U›, `tries`: number, `dontRetry`: string[], `params`: T, `delay`: number, `factor`: number, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹U›*
 
 *Defined in [packages/sdk/base/src/async.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L68)*
 
@@ -228,7 +228,7 @@ ___
 
 ### `Const` timeout
 
-▸ **timeout**‹**T**, **U**›(`inFunction`: InFunction‹T, U›, `params`: T, `timeoutMs`: number, `timeoutError`: any, `timeoutLogMsg`: string | null, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹Awaited‹U››*
+▸ **timeout**<**T**, **U**>(`inFunction`: InFunction‹T, U›, `params`: T, `timeoutMs`: number, `timeoutError`: any, `timeoutLogMsg`: string | null, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹U›*
 
 *Defined in [packages/sdk/base/src/async.ts:173](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L173)*
 
@@ -251,4 +251,4 @@ Name | Type | Default | Description |
 `timeoutLogMsg` | string &#124; null | null | - |
 `logger` | [Logger](_logger_.md#logger) &#124; null | null | - |
 
-**Returns:** *Promise‹Awaited‹U››*
+**Returns:** *Promise‹U›*

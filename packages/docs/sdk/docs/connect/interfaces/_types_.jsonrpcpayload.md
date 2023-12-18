@@ -21,7 +21,7 @@
 
 • **id**? : *string | number*
 
-*Defined in [types.ts:141](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L141)*
+*Defined in [types.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L62)*
 
 ___
 
@@ -29,7 +29,7 @@ ___
 
 • **jsonrpc**: *string*
 
-*Defined in [types.ts:138](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L138)*
+*Defined in [types.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L59)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • **method**: *string*
 
-*Defined in [types.ts:139](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L139)*
+*Defined in [types.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L60)*
 
 ___
 
@@ -45,4 +45,4 @@ ___
 
 • **params**: *any[]*
 
-*Defined in [types.ts:140](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L140)*
+*Defined in [types.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L61)*

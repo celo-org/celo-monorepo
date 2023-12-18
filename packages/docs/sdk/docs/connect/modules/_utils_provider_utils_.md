@@ -13,7 +13,7 @@
 
 ###  hasProperty
 
-▸ **hasProperty**‹**T**›(`object`: any, `property`: string): *object is T*
+▸ **hasProperty**<**T**>(`object`: any, `property`: string): *object is T*
 
 *Defined in [utils/provider-utils.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/provider-utils.ts#L4)*
 
@@ -36,7 +36,7 @@ ___
 
 ###  stopProvider
 
-▸ **stopProvider**(`defaultProvider`: [Provider](../interfaces/_types_.provider.md)): *[stopProvider](_utils_provider_utils_.md#stopprovider)*
+▸ **stopProvider**(`defaultProvider`: [Provider](../interfaces/_types_.provider.md)): *void*
 
 *Defined in [utils/provider-utils.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/provider-utils.ts#L9)*
 
@@ -48,4 +48,4 @@ Name | Type |
 ------ | ------ |
 `defaultProvider` | [Provider](../interfaces/_types_.provider.md) |
 
-**Returns:** *[stopProvider](_utils_provider_utils_.md#stopprovider)*
+**Returns:** *void*
