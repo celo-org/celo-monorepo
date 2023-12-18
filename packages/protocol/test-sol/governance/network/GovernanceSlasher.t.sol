@@ -3,15 +3,15 @@ pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
 
-import "../../../contracts/common/Accounts.sol";
-import "../../../contracts/common/FixidityLib.sol";
-import "../../../contracts/common/interfaces/IRegistry.sol";
-import "../../../contracts/governance/Proposals.sol";
-import "../../../contracts/governance/test/MockLockedGold.sol";
-import "../../../contracts/governance/test/MockValidators.sol";
+import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts/common/FixidityLib.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts/governance/Proposals.sol";
+import "@celo-contracts/governance/test/MockLockedGold.sol";
+import "@celo-contracts/governance/test/MockValidators.sol";
 
 // Contract to test
-import "../../../contracts/governance/GovernanceSlasher.sol";
+import "@celo-contracts/governance/GovernanceSlasher.sol";
 
 contract GovernanceSlasherTest is Test {
   event SlashingApproved(address indexed account, uint256 amount);
