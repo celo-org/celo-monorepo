@@ -66,7 +66,7 @@ jobs:
       - name: Fail if there are tests without folder
         if: success() || failure()
         run: |
-          if ! ls test-sol | grep -qi '\.t\.sol'; then
+          if ls test-sol | grep -qi '\.t\.sol'; then
             echo "All tests should be in a file"
             exit 1
           fi
