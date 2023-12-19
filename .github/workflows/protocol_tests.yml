@@ -38,6 +38,43 @@ jobs:
       - name: Compile Contracts
         run: forge compile
 
-      - name: Run tests
+      - name: Run tests common
         # can't use gas limit because some setUp function use more than the limit
-        run: forge test -vvv # --block-gas-limit 20000000
+        run: forge test -vvv --match-path "test-sol/common/*" # --block-gas-limit 20000000 
+
+      - name: Run tests compatibility
+        if: success() || failure()
+        run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/compatibility/*"
+
+      - name: Run tests governance/network
+        if: success() || failure()
+        run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/governance/network/*"
+
+      - name: Run tests governance/validators
+        if: success() || failure()
+        run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/governance/validators/*"
+      
+      - name: Run tests governance/voting
+        # can't use gas limit because some setUp function use more than the limit
+        if: success() || failure()
+        run: forge test -vvv --match-path "test-sol/governance/voting/*" # --block-gas-limit 20000000
+
+      - name: Run tests stability
+        if: success() || failure()
+        run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/stability/*"
+
+      - name: Run tests identity
+        if: success() || failure()
+        run: forge test -vvv --match-path "test-sol/identity/*"
+
+      - name: Fail if there are tests without folder
+        if: success() || failure()
+        run: |
+          if ls test-sol | grep -qi '\.t\.sol'; then
+            echo "All tests should be in a folder"
+            exit 1
+          fi
+
+      - name: Run Everything just in case something was missed
+        # can't use gas limit because some setUp function use more than the limit
+        run: forge test -vvv
