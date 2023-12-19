@@ -59,14 +59,13 @@ function getDateFromFirstCommit(fromSHA, toSHA) {
 /// MAIN
 ////////////////////////////////////////////////////////////////
 
-// must trim otherwise the name will be 'origin\n'
-
-const remoteName = execSync('git remote').toString().trim()
+// change if the remote name is different
+const remoteName = 'origin'
 // create remote tracking branches to ensure we can compare current to origin/master
-const remoteTrackingMasterBranches = execSync('git ls-remote --heads origin master')
-if (remoteTrackingMasterBranches.toString().trim() === '') {
-  execSync('git fetch origin')
-}
+execSync('git ls-remote --heads origin master')
+
+execSync('git fetch origin')
+
 const changes = process.env.HUSKY_GIT_STDIN.split('\n')
   .filter((line) => line !== '')
   .map((line) => {

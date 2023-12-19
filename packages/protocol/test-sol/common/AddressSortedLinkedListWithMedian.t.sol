@@ -2,10 +2,9 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
-import "forge-std/console.sol";
 
 // Contract to test
-import "../../contracts/common/test/AddressSortedLinkedListWithMedianTest.sol";
+import "@celo-contracts/common/test/AddressSortedLinkedListWithMedianTest.sol";
 
 contract AddressSortedLinkedListWithMedianInsertTest is Test {
   AddressSortedLinkedListWithMedianTest sortedList;

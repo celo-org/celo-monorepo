@@ -9,5 +9,3 @@ do
 done
 
 HUSKY_GIT_STDIN=$HUSKY_GIT_STD node ./scripts/hooks/pre-push.js
-
-bash scripts/hooks/prereleasecheck.sh

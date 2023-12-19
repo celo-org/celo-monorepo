@@ -29,7 +29,7 @@ Follow these steps to get everything that you need installed to build the celo-m
 
 ### Common stuff
 
-#### Install Go
+#### (Optional) Install Go
 
 We need Go for [celo-blockchain](https://github.com/celo-org/celo-blockchain), the Go Celo implementation, and `gobind` to build Java language bindings to Go code for the Android Geth client.
 

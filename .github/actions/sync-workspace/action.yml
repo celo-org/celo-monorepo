@@ -44,4 +44,4 @@ runs:
       if: ${{ fromJSON(env.REBUILD_PACKAGE) }}
       run: |
         yarn install
-        yarn build --ignore docs --include-dependencies
+        yarn build --include-dependencies

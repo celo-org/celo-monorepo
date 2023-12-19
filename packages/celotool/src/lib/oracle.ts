@@ -1,4 +1,4 @@
-import { ensureLeading0x } from '@celo/utils/src/address'
+import { ensureLeading0x } from '@celo/utils/lib/address'
 import { DynamicEnvVar, envVar, fetchEnv } from 'src/lib/env-utils'
 import yargs from 'yargs'
 import { getCloudProviderFromContext, getDynamicEnvVarValues } from './context-utils'

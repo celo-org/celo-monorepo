@@ -5,6 +5,7 @@ WORKDIR /celo-monorepo
 
 # Needed for gsutil
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y lsb-release && \
     apt-get install -y curl build-essential git python3 && \
     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
@@ -23,20 +24,9 @@ COPY packages/celotool/package.json packages/celotool/
 COPY packages/dev-utils/package.json packages/dev-utils/
 COPY packages/env-tests/package.json packages/env-tests/package.json
 COPY packages/protocol/package.json packages/protocol/
-COPY packages/sdk/base/package.json packages/sdk/base/
-COPY packages/sdk/connect/package.json packages/sdk/connect/
-COPY packages/sdk/contractkit/package.json packages/sdk/contractkit/
-COPY packages/sdk/cryptographic-utils/package.json packages/sdk/cryptographic-utils/
-COPY packages/sdk/explorer/package.json packages/sdk/explorer/
-COPY packages/sdk/governance/package.json packages/sdk/governance/
-COPY packages/sdk/network-utils/package.json packages/sdk/network-utils/
-COPY packages/sdk/utils/package.json packages/sdk/utils/
-COPY packages/sdk/wallets/wallet-base/package.json packages/sdk/wallets/wallet-base/
-COPY packages/sdk/wallets/wallet-local/package.json packages/sdk/wallets/wallet-local/
 COPY packages/typescript/package.json packages/typescript/
 COPY patches/ patches/
 COPY scripts/ scripts/
-COPY packages/sdk/phone-utils/package.json packages/sdk/phone-utils/package.json
 # Makes build fail if it doesn't copy git, will be removed after build
 COPY .git .git
 COPY .gitmodules .gitmodules
@@ -48,18 +38,7 @@ COPY packages/dev-utils packages/dev-utils/
 COPY packages/env-tests packages/env-tests
 COPY packages/helm-charts packages/helm-charts
 COPY packages/protocol packages/protocol/
-COPY packages/sdk/base packages/sdk/base/
-COPY packages/sdk/connect packages/sdk/connect/
-COPY packages/sdk/contractkit packages/sdk/contractkit/
-COPY packages/sdk/cryptographic-utils packages/sdk/cryptographic-utils/
-COPY packages/sdk/explorer packages/sdk/explorer/
-COPY packages/sdk/governance packages/sdk/governance/
-COPY packages/sdk/network-utils packages/sdk/network-utils/
-COPY packages/sdk/utils packages/sdk/utils/
-COPY packages/sdk/wallets/wallet-base packages/sdk/wallets/wallet-base/
-COPY packages/sdk/wallets/wallet-local packages/sdk/wallets/wallet-local/
 COPY packages/typescript packages/typescript/
-COPY packages/sdk/phone-utils packages/sdk/phone-utils/
 
 RUN yarn build
 
@@ -68,7 +47,7 @@ RUN rm .gitmodules
 
 ENV PATH="/celo-monorepo/packages/celotool/bin:${PATH}"
 
-COPY --from=golang:1.16-stretch /usr/local/go/ /usr/local/go/
+COPY --from=golang:1.18-stretch /usr/local/go/ /usr/local/go/
 
 ENV PATH="/usr/local/go/bin:${PATH}"
 
