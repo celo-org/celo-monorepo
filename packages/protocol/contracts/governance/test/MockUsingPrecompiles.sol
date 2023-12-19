@@ -1,7 +1,5 @@
 pragma solidity ^0.5.13;
 
-import "../DoubleSigningSlasher.sol";
-
 contract MockUsingPrecompiles {
   mapping(bytes32 => bytes32) verifiedSealBitmap;
   mapping(uint256 => bytes32) parentSealBitmap;
@@ -26,7 +24,8 @@ contract MockUsingPrecompiles {
   }
 
   function calcEpoch(uint256 blockNumber) internal pure returns (uint256) {
-    uint256 epochSize = 100;
+    uint256 epochSize = 17280; // Epoch set by foundry.
+
     // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
     uint256 epochNumber = blockNumber / epochSize;
     if (blockNumber % epochSize == 0) {
