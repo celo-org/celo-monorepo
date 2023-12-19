@@ -19,7 +19,7 @@ contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecom
     uint256[] groupElectionIndices;
   }
 
-  function testSlash(SlashParams calldata slashParams) external {
+  function mockSlash(SlashParams calldata slashParams) external {
     slash(
       slashParams.signer,
       slashParams.index,

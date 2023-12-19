@@ -216,7 +216,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
       groupElectionIndices: groupElectionIndices
     });
     vm.expectRevert("Block headers are from different height");
-    slasher.testSlash(params);
+    slasher.mockSlash(params);
   }
 
   function test_RevertIf_NotSignedAtIndex() public {
@@ -236,7 +236,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
 
     vm.expectRevert("Didn't sign first block");
 
-    slasher.testSlash(params);
+    slasher.mockSlash(params);
   }
 
   function test_RevertIf_EpochSignerIsWrong() public {
@@ -255,7 +255,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
     });
 
     vm.expectRevert("Wasn't a signer with given index");
-    slasher.testSlash(params);
+    slasher.mockSlash(params);
   }
 
   function test_RevertIf_NotEnoughSigners() public {
@@ -276,7 +276,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
     });
 
     vm.expectRevert("Not enough signers in the first block");
-    slasher.testSlash(params);
+    slasher.mockSlash(params);
   }
 
   function test_Emits_DoubleSigningSlashPerformedEvent() public {
@@ -295,7 +295,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
     });
     vm.expectEmit(true, true, true, true);
     emit DoubleSigningSlashPerformed(validator, blockNumber);
-    slasher.testSlash(params);
+    slasher.mockSlash(params);
   }
 
   function test_ShouldDecrementCELO() public {
@@ -313,7 +313,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
       groupElectionIndices: groupElectionIndices
     });
 
-    slasher.testSlash(params);
+    slasher.mockSlash(params);
 
     assertEq(lockedGold.accountTotalLockedGold(validator), 40000);
   }
@@ -333,7 +333,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
       groupElectionIndices: groupElectionIndices
     });
 
-    slasher.testSlash(params);
+    slasher.mockSlash(params);
     assertEq(lockedGold.accountTotalLockedGold(group), 40000);
   }
 
@@ -351,8 +351,8 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
       groupElectionGreaters: groupElectionGreaters,
       groupElectionIndices: groupElectionIndices
     });
-    slasher.testSlash(params);
+    slasher.mockSlash(params);
     vm.expectRevert("Already slashed");
-    slasher.testSlash(params);
+    slasher.mockSlash(params);
   }
 }
