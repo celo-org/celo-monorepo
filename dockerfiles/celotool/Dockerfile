@@ -5,6 +5,7 @@ WORKDIR /celo-monorepo
 
 # Needed for gsutil
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y lsb-release && \
     apt-get install -y curl build-essential git python3 && \
     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
@@ -46,7 +47,7 @@ RUN rm .gitmodules
 
 ENV PATH="/celo-monorepo/packages/celotool/bin:${PATH}"
 
-COPY --from=golang:1.16-stretch /usr/local/go/ /usr/local/go/
+COPY --from=golang:1.18-stretch /usr/local/go/ /usr/local/go/
 
 ENV PATH="/usr/local/go/bin:${PATH}"
 
