@@ -1,1 +1,0 @@
-Wallet-ledger provides utilities for interacting with a Ledger hardware wallet.

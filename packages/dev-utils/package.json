@@ -1,6 +1,6 @@
 {
   "name": "@celo/dev-utils",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": false,
   "description": "util package for celo packages that should only be a devDependency",
   "main": "./lib/index.js",
@@ -12,9 +12,13 @@
   "keywords": [
     "celo"
   ],
+  "files": [
+    "lib/*"
+  ],
   "scripts": {
     "build": "tsc -b .",
-    "lint": "tslint -c tslint.json --project ."
+    "lint": "tslint -c tslint.json --project .",
+    "prepack": "yarn build"
   },
   "dependencies": {
     "ganache": "npm:@celo/ganache@7.8.0-unofficial.0",
@@ -30,6 +34,6 @@
     "@types/targz": "1.0.0"
   },
   "engines": {
-    "node": ">=8.14.2"
+    "node": ">=18.14.2"
   }
 }

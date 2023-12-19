@@ -10,7 +10,6 @@
     "@celo/utils": "^5.0.6",
     "@celo/base": "^6.0.0",
     "@celo/connect": "^5.1.1",
-    "@celo/phone-utils": "^6.0.0",
     "@celo/cryptographic-utils": "^5.0.6",
     "bignumber.js": "^9.0.0",
     "bunyan": "1.8.12",

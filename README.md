@@ -6,7 +6,7 @@
 
 **Celo Monorepo - Official repository for core projects comprising the Celo platform**
 
-This repository contains the source code for the Celo core projects including the [smart contracts](https://github.com/celo-org/celo-monorepo/tree/master/packages/protocol), [contractKit](https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/contractkit),
+This repository contains the source code for the Celo core projects including the [smart contracts](https://github.com/celo-org/celo-monorepo/tree/master/packages/protocol)
 and other packages. The source code for the Celo Blockchain which operates a node on the Celo Network is kept in a separate repo [here](https://github.com/celo-org/celo-blockchain).
 
 <!-- row 1 - status -->
@@ -105,14 +105,10 @@ See the [issue backlog](https://github.com/celo-org/celo-monorepo/issues) for a 
 The repository has the following packages (sub projects):
 
 - [celotool](packages/celotool) - scripts for deploying and managing testnets
-- [cli](packages/cli) - tool that uses ContractKit to interact with the Celo protocol ([docs](https://docs.celo.org/command-line-interface/introduction))
 - [dev-utils](packages/dev-utils) - a utils package for use as a dev dependency
-- [docs](packages/docs) - technical documentation for the Celo project ([live](https://docs.celo.org/))
+-
 - [helm-charts](packages/helm-charts) - (DEPRECATED) templatized deployments of entire environments to Kubernetes clusters. Check [celo-org/charts](https://github.com/celo-org/charts) instead.
 - [protocol](packages/protocol) - identity, stability and other smart contracts for the Celo protocol ([docs](https://docs.celo.org/protocol))
-- [sdk](packages/sdk) - Typescript packages for interacting with Celo, including Contracts, Wallets, Crypto++
-- [contractkit](packages/sdk/contractkit) - library to help developers and validators interact with the protocol and its smart contracts ([docs](https://docs.celo.org/developer/contractkit))
-- [typescript](packages/typescript) - no README available (improve?)
 
 Code owners for each package can be found in [.github/CODEOWNERS](.github/CODEOWNERS).
 
