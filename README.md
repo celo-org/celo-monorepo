@@ -11,7 +11,6 @@ and other packages. The source code for the Celo Blockchain which operates a nod
 
 <!-- row 1 - status -->
 
-[![GitHub Actions](https://github.com/celo-org/celo-monorepo/actions/workflows/container-all-monorepo.yml/badge.svg)](https://github.com/celo-org/celo-monorepo/actions/workflows/container-all-monorepo.yml)
 [![GitHub contributors](https://img.shields.io/github/contributors/celo-org/celo-monorepo)](https://github.com/celo-org/celo-monorepo/graphs/contributors)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/w/celo-org/celo-monorepo)](https://github.com/celo-org/celo-monorepo/graphs/contributors)
 [![GitHub Stars](https://img.shields.io/github/stars/celo-org/celo-monorepo.svg)](https://github.com/celo-org/celo-monorepo/stargazers)
