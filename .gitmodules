@@ -12,4 +12,10 @@
 	url = https://github.com/summa-tx/memview.sol
 [submodule "packages/protocol/lib/celo-foundry"]
 	path = packages/protocol/lib/celo-foundry
+  url = https://github.com/celo-org/celo-foundry
+[submodule "packages/protocol/lib/openzeppelin-contracts8"]
+	path = packages/protocol/lib/openzeppelin-contracts8
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "packages/protocol/lib/celo-foundry-8"]
+	path = packages/protocol/lib/celo-foundry-8
 	url = https://github.com/celo-org/celo-foundry

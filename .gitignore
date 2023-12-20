@@ -94,16 +94,9 @@ packages/docs/_book/
 .env.local
 
 # old packages
-packages/reserve-site/*
-packages/blockchain-api/*
-packages/mobile/*
-packages/faucet/*
-packages/moonpay-auth/*
-packages/notification-service/*
-packages/react-components/*
 packages/phone-number-privacy/*
-packages/sdk/identity/*
-packages/sdk/encrypted-backup/*
+packages/sdk/*
+packages/cli/*
 
 # temp json file for deploy-sdks script
 scripts/failedSDKs.json
