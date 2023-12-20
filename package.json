@@ -42,7 +42,6 @@
     "@types/node": "18.7.16",
     "@types/prompt": "1.1.1",
     "@types/semver": "7.3.8",
-    "codecov": "^3.6.5",
     "colors": "1.4.0",
     "husky": "^8.0.0",
     "jest": "^29.0.2",
