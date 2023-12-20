@@ -952,7 +952,7 @@ contract Governance is
     uint256[] calldata dataLengths,
     bytes32 salt
   ) external {
-    bytes32 hash = this.getHotfixHash(values, destinations, data, dataLengths, salt);
+    bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths, salt));
 
     (bool approved, bool executed, uint256 preparedEpoch) = getHotfixRecord(hash);
     require(!executed, "hotfix already executed");
