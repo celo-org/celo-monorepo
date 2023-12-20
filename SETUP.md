@@ -42,7 +42,7 @@ Once you have go installed run the following to install gobind
 
 #### Install Node
 
-Currently Node.js v18.14.2 is required in order to work with this repo.
+Currently Node.js v18 is required in order to work with this repo.
 
 Install `nvm` (allows you to manage multiple versions of Node) by following the [instructions here](https://github.com/nvm-sh/nvm).
 
@@ -50,8 +50,8 @@ Once `nvm` is successfully installed, restart the terminal and run the following
 
 ```bash
 # restart the terminal after installing nvm
-nvm install 18.14.2
-nvm alias default 18.14.2
+nvm install 18
+nvm alias default 18
 ```
 
 ### MacOS
