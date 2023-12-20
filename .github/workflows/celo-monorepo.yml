@@ -8,12 +8,10 @@ on:
   push:
     branches:
       - master
-      - changeset-release/master
   pull_request:
     branches:
       - master
       - 'release/**'
-      - 'prerelease/**'
 
 concurrency:
   group: celo-monorepo-${{ github.ref }}
