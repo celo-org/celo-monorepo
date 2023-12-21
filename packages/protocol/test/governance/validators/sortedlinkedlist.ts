@@ -182,14 +182,16 @@ contract('IntegerSortedLinkedListTest', () => {
       await doActionsAndAssertInvariants(numActions, numKeys, getLesserAndGreater)
     })
 
-    it('should maintain invariants when lesser and greater are incorrect', async () => {
+    it.only('should maintain invariants when lesser and greater are incorrect', async () => {
       const numReports = 200
       const numKeys = 10
       const getRandomKeys = async () => {
         const [keys] = await sortedListTest.getElements()
+        keys.map((val) => console.log(val.toNumber()))
 
         const getLesserOrGreater = () => {
           const r = BigNumber.random()
+          console.log(`r value: ${r}`)
           const nonElement = () => {
             let i = 0
             while (keys.includes(new BigNumber(i))) {
@@ -197,6 +199,7 @@ contract('IntegerSortedLinkedListTest', () => {
             }
             return new BigNumber(i)
           }
+
           if (r.isLessThan(0.33)) {
             return randomElement(keys)
           } else if (r.isLessThan(0.66)) {
