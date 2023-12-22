@@ -1,11 +1,17 @@
 /* tslint:disable no-console */
 import BigNumber from 'bignumber.js'
-import { AccountType, generateAddress, generatePrivateKey } from 'src/lib/generate_utils'
 import {
-  getIndexForLoadTestThread,
+  AccountType,
+  generateAddress,
+  generatePrivateKey,
+  privateKeyToAddress,
+} from 'src/lib/generate_utils'
+import {
   MAX_LOADTEST_THREAD_COUNT,
-  simulateClient,
   TestMode,
+  faucetLoadTestThreads,
+  getIndexForLoadTestThread,
+  simulateClient,
 } from 'src/lib/geth'
 import * as yargs from 'yargs'
 export const command = 'simulate-client'
@@ -26,6 +32,8 @@ interface SimulateClientArgv extends yargs.Argv {
   maxGasPrice: number
   totalTxGas: number
   testMode: string
+  web3Provider: string
+  chainId: number
 }
 
 export const builder = () => {
@@ -106,9 +114,26 @@ export const builder = () => {
       ],
       default: TestMode.Mixed,
     })
+    .options('web3-provider', {
+      type: 'string',
+      description: 'web3 endpoint to use for sending transactions',
+      default: 'http://localhost:8545',
+    })
+    .options('chainId', {
+      type: 'number',
+      description: 'ChainId to use for sending transactions',
+      default: '42220',
+    })
 }
 
 export const handler = async (argv: SimulateClientArgv) => {
+  await faucetLoadTestThreads(
+    argv.index,
+    argv.clientCount,
+    argv.mnemonic,
+    argv.web3Provider,
+    argv.chainId
+  )
   for (let thread = 0; thread < argv.clientCount; thread++) {
     const senderIndex = getIndexForLoadTestThread(argv.index, thread)
     const recipientIndex = getIndexForLoadTestThread(argv.recipientIndex, thread)
@@ -123,15 +148,14 @@ export const handler = async (argv: SimulateClientArgv) => {
       recipientIndex
     )
 
-    const web3ProviderPort = argv.reuseClient ? 8545 : 8545 + thread
-
     console.log(
-      `PK for sender index ${argv.index} thread ${thread}, final index ${senderIndex}: ${senderPK}`
+      `PK for sender index ${
+        argv.index
+      } thread ${thread}, final index ${senderIndex}: ${privateKeyToAddress(senderPK)}`
     )
     console.log(
       `Account for recipient index ${argv.recipientIndex} thread ${thread}, final index ${recipientIndex}: ${recipientAddress}`
     )
-    console.log(`web3ProviderPort for thread ${thread}: ${web3ProviderPort}`)
 
     // tslint:disable-next-line: no-floating-promises
     simulateClient(
@@ -147,7 +171,8 @@ export const handler = async (argv: SimulateClientArgv) => {
       thread,
       new BigNumber(argv.maxGasPrice),
       argv.totalTxGas,
-      `http://127.0.0.1:${web3ProviderPort}`
+      argv.web3Provider,
+      argv.chainId
     )
   }
 }
