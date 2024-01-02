@@ -8,6 +8,7 @@ import { Constants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
 
 contract BlockchainParametersTest is Test, Constants, Utils {
+  uint256 constant EPOCH_SIZE = 100;
   uint256 constant gasLimit = 7000000;
   uint256 constant gasForNonGoldCurrencies = 50000;
 
