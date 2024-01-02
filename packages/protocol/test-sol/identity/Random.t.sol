@@ -2,6 +2,7 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
+import { Utils } from "@test-sol/utils.sol";
 
 // Contract to test
 import "@celo-contracts/identity/Random.sol";
@@ -35,7 +36,7 @@ contract SetRandomnessRetentionWindow is Test {
   }
 }
 
-contract AddTestRandomness is Test {
+contract AddTestRandomness is Test, Utils {
   uint256 constant RETENTION_WINDOW = 5;
   uint256 constant EPOCH_SIZE = 10;
 
@@ -142,29 +143,29 @@ contract AddTestRandomness is Test {
     // [EPOCH_SIZE, EPOCH_SIZE+1... EPOCH_SIZE+n, 2 * EPOCH_SIZE, 2 * EPOCH_SIZE + 1... 2 * EPOCH_SIZE + RETENTION_WINDOW-1]
 
     // go to last block of epoch 1
+    // TODO add travel here
     vm.roll(EPOCH_SIZE);
     // Add randomness to epoch's last block
     random.addTestRandomness(block.number, valueForLastBlockOfEpoch);
 
     // Add a different randomness to all but last epoch blocks
     for (uint256 i = 0; i < EPOCH_SIZE - 1; i++) {
-      vm.roll(block.number + 1);
+      blockTravel(1);
       random.addTestRandomness(block.number, defaultValue);
     }
 
     // Add randomness to epoch's last block
-    vm.roll(block.number + 1);
+    blockTravel(1);
     random.addTestRandomness(block.number, valueForLastBlockOfEpoch);
 
     // Now we add `RETENTION_WINDOW` worth of blocks' randomness to flush out the new lastEpochBlock
     // This means we can test `lastEpochBlock` stores epoch i+1's last block,
     // and we test that epoch i's last block is not retained.
     for (uint256 i = 0; i < RETENTION_WINDOW + 1; i++) {
-      vm.roll(block.number + 1);
+      blockTravel(1);
       random.addTestRandomness(block.number, defaultValue);
     }
 
-    // vm.roll(block.number + 1);
     return EPOCH_SIZE * 2;
   }
 
@@ -211,7 +212,7 @@ contract AddTestRandomness is Test {
   }
 }
 
-contract RevealAndCommit is Test {
+contract RevealAndCommit is Test, Utils {
   address constant ACCOUNT = address(0x01);
   bytes32 constant RANDONMESS = bytes32(uint256(0x00));
 
@@ -237,9 +238,9 @@ contract RevealAndCommit is Test {
   }
 
   function test_CanRevealInitialCommitment() public {
-    vm.roll(2);
+    blockTravel(2);
     random.testRevealAndCommit(RANDONMESS, commitmentFor(0x01), ACCOUNT);
-    vm.roll(block.number + 1);
+    blockTravel(1);
     random.testRevealAndCommit(bytes32(uint256(0x01)), commitmentFor(0x02), ACCOUNT);
 
     bytes32 lastRandomness = random.getBlockRandomness(block.number - 1);

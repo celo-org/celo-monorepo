@@ -1,12 +1,11 @@
 pragma solidity ^0.5.13;
 
-import "celo-foundry/Test.sol";
-import "forge-std/console.sol";
+import "@celo-contracts/governance/BlockchainParameters.sol";
 
-// Contract to test
+import "celo-foundry/Test.sol";
+
 import { Constants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
-import "@celo-contracts/governance/BlockchainParameters.sol";
 
 contract BlockchainParametersTest is Test, Constants, Utils {
   uint256 constant gasLimit = 7000000;
