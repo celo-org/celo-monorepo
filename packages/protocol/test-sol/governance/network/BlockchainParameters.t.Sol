@@ -22,7 +22,6 @@ contract BlockchainParametersTest is Test, Constants, Utils {
   function setUp() public {
     ph.setEpochSize(EPOCH_SIZE);
     blockchainParameters = new BlockchainParameters(true);
-
   }
 
   function test_setBlockGasLimit_set_variable() public {
@@ -51,7 +50,6 @@ contract BlockchainParametersTest_initialize is BlockchainParametersTest {
   }
 
 }
-
 
 contract BlockchainParametersTest_setBlockGasLimit is BlockchainParametersTest {
 
@@ -90,7 +88,6 @@ contract BlockchainParametersTest_setIntrinsicGasForAlternativeFeeCurrency is Bl
     vm.expectRevert("Ownable: caller is not the owner");
     blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(gasForNonGoldCurrencies);
   }
-
 }
 
 contract BlockchainParametersTest_getUptimeLookbackWindow is BlockchainParametersTest {
@@ -100,13 +97,11 @@ contract BlockchainParametersTest_getUptimeLookbackWindow is BlockchainParameter
     blockchainParameters.getUptimeLookbackWindow();
   }
 
-
   function test_ShouldRevert_WhenInitializedButOnCurrentEpoch() public {
     blockchainParameters.setUptimeLookbackWindow(20);
     vm.expectRevert("UptimeLookbackWindow is not initialized");
     blockchainParameters.getUptimeLookbackWindow();
   }
-
 }
 
 
@@ -154,9 +149,6 @@ contract BlockchainParametersTest_setUptimeLookbackWindow is BlockchainParameter
   function test_ShouldRevert_WhenUsingValueGreaterThanEpochsizeminus2() public {
     vm.expectRevert("UptimeLookbackWindow must be smaller or equal to epochSize - 2");
     // 720 is harcoded as maximum in the code
-    blockchainParameters.setUptimeLookbackWindow(100 - 1);
-
+    blockchainParameters.setUptimeLookbackWindow(EPOCH_SIZE - 1);
   }
-  
-
 }
