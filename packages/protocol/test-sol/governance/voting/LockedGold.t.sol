@@ -3,7 +3,6 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
-import "forge-std/console.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
@@ -1651,10 +1650,6 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
 
   function test_ShouldDelegateVotesCorrectlyToMultipleAccounts_WhenVoteSigners() public {
     whenVoteSigner_LockedGoldDelegateGovernanceVotes();
-    uint256 percentToDelegate1 = 30;
-    uint256 percentToDelegate2 = 20;
-    uint256 delegatedAmount1 = 300;
-    uint256 delegatedAmount2 = 200;
 
     delegateCelo(delegatorSigner, delegatee1, percentToDelegate1);
     delegateCelo(delegatorSigner2, delegatee2, percentToDelegate2);
@@ -1667,8 +1662,6 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
     public
   {
     whenVoteSigner_LockedGoldDelegateGovernanceVotes();
-    uint256 percentToDelegate1 = 30;
-    uint256 delegatedAmount1 = 300;
 
     delegateCelo(delegatorSigner, delegateeSigner1, percentToDelegate1);
 
@@ -1685,8 +1678,6 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
 
   function test_ShouldEmitCeloDelegated_WhenLockedMoreGoldAndRedelegate_WhenVoteSigners() public {
     whenVoteSigner_LockedGoldDelegateGovernanceVotes();
-    uint256 percentToDelegate1 = 30;
-    uint256 delegatedAmount1 = 300;
 
     delegateCelo(delegatorSigner, delegatee1, percentToDelegate1);
 
