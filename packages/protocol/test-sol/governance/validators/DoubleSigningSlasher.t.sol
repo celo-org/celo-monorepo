@@ -58,6 +58,7 @@ contract DoubleSigningSlasherBaseTest is Test {
   event DoubleSigningSlashPerformed(address indexed validator, uint256 indexed blockNumber);
 
   function setUp() public {
+    ph.setEpochSize(100);
     (nonOwner, nonOwnerPK) = actorWithPK("nonOwner");
     (validator, validatorPK) = actorWithPK("validator");
     (group, groupPK) = actorWithPK("group");

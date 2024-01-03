@@ -24,7 +24,7 @@ contract MockUsingPrecompiles {
   }
 
   function calcEpoch(uint256 blockNumber) internal pure returns (uint256) {
-    uint256 epochSize = 17280; // Epoch set by foundry.
+    uint256 epochSize = 100;
 
     // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
     uint256 epochNumber = blockNumber / epochSize;
