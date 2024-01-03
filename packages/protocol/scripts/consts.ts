@@ -30,8 +30,6 @@ export const ProxyContracts = [
   'GovernanceApproverMultiSigProxy',
   'GovernanceProxy',
   'LockedGoldProxy',
-  'MetaTransactionWalletProxy',
-  'MetaTransactionWalletDeployerProxy',
   'OdisPaymentsProxy',
   'RegistryProxy',
   'SortedOraclesProxy',
@@ -47,12 +45,9 @@ export const CoreContracts = [
   'UniswapFeeHandlerSeller',
   'FeeCurrencyWhitelist',
   'GoldToken',
-  'MetaTransactionWallet',
-  'MetaTransactionWalletDeployer',
   'MultiSig',
   'Registry',
   'Freezer',
-  'MetaTransactionWallet',
 
   // governance
   'Election',
