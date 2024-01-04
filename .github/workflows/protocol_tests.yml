@@ -9,6 +9,9 @@ jobs:
     name: Run tests
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Fail if there are test with wrong extension
         if: success() || failure()
         run: |
@@ -17,10 +20,6 @@ jobs:
             tree test-sol | grep -i ".sol" | grep -v ".sol"
             exit 1
           fi
-
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
       - name: Foundry cache
         id: foundry-cache
         uses: actions/cache@v3
