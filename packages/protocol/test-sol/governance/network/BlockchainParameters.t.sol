@@ -26,8 +26,8 @@ contract BlockchainParametersTest is Test, Constants, Utils {
   }
 }
 
-contract BlockchainParametersTestInitialize is BlockchainParametersTest {
-  uint constant lookbackWindow = 20;
+contract BlockchainParametersTest_initialize is BlockchainParametersTest {
+  uint256 constant lookbackWindow = 20;
 
   function test_ShouldSetTheVariables() public {
     blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow);
@@ -41,13 +41,13 @@ contract BlockchainParametersTestInitialize is BlockchainParametersTest {
     emit IntrinsicGasForAlternativeFeeCurrencySet(gasForNonGoldCurrencies);
     blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow);
   }
-  
+
   function test_ShoudEmit_UptimeLookbackWindowSet() public {
     vm.expectEmit(true, true, true, true);
     emit UptimeLookbackWindowSet(lookbackWindow, 2);
     blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow);
   }
-  
+
   function test_ShoudEmit_ownershipTransferred() public {
     vm.expectEmit(true, true, true, true);
     emit OwnershipTransferred(msg.sender, msg.sender);
@@ -56,38 +56,39 @@ contract BlockchainParametersTestInitialize is BlockchainParametersTest {
 }
 
 contract BlockchainParametersTest_setBlockGasLimit is BlockchainParametersTest {
-
-  function test_ShouldSetTheVariable () public {
+  function test_ShouldSetTheVariable() public {
     blockchainParameters.setBlockGasLimit(gasLimit);
     assertEq(blockchainParameters.blockGasLimit(), gasLimit);
   }
 
-  function test_ShoudEmitBlockGasLimitSet () public {
+  function test_ShoudEmitBlockGasLimitSet() public {
     vm.expectEmit(true, true, true, true);
     emit BlockGasLimitSet(gasLimit);
     blockchainParameters.setBlockGasLimit(gasLimit);
   }
 
-  function test_ShouldRevert_WhenCalledByNonOwner() public {
+  function test_Reverts_WhenCalledByNonOwner() public {
     vm.prank(msg.sender);
     vm.expectRevert("Ownable: caller is not the owner");
     blockchainParameters.setBlockGasLimit(gasLimit);
   }
 }
 
-contract BlockchainParametersTestSetIntrinsicGasForAlternativeFeeCurrency is BlockchainParametersTest {
-  function test_ShouldSetTheVariable () public {
+contract BlockchainParametersTestSet_intrinsicGasForAlternativeFeeCurrency is
+  BlockchainParametersTest
+{
+  function test_ShouldSetTheVariable() public {
     blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(gasForNonGoldCurrencies);
     assertEq(blockchainParameters.intrinsicGasForAlternativeFeeCurrency(), gasForNonGoldCurrencies);
   }
 
-  function test_IntrinsicGasForAlternativeFeeCurrencySet () public {
+  function test_intrinsicGasForAlternativeFeeCurrencySet() public {
     vm.expectEmit(true, true, true, true);
     emit IntrinsicGasForAlternativeFeeCurrencySet(gasForNonGoldCurrencies);
     blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(gasForNonGoldCurrencies);
   }
 
-  function test_ShouldRevert_WhenCalledByNonOwner() public {
+  function test_Revert_WhenCalledByNonOwner() public {
     vm.prank(msg.sender);
     vm.expectRevert("Ownable: caller is not the owner");
     blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(gasForNonGoldCurrencies);
@@ -95,21 +96,19 @@ contract BlockchainParametersTestSetIntrinsicGasForAlternativeFeeCurrency is Blo
 }
 
 contract BlockchainParametersTest_getUptimeLookbackWindow is BlockchainParametersTest {
-
-  function test_ShouldRevert_WhenNotSet() public {
+  function test_dRevert_WhenNotSet() public {
     vm.expectRevert("UptimeLookbackWindow is not initialized");
     blockchainParameters.getUptimeLookbackWindow();
   }
 
-  function test_ShouldRevert_WhenInitializedButOnCurrentEpoch() public {
+  function test_Revert_WhenInitializedButOnCurrentEpoch() public {
     blockchainParameters.setUptimeLookbackWindow(20);
     vm.expectRevert("UptimeLookbackWindow is not initialized");
     blockchainParameters.getUptimeLookbackWindow();
   }
 }
 
-
-contract BlockchainParametersTestSetUptimeLookbackWindow is BlockchainParametersTest {
+contract BlockchainParametersTest_setUptimeLookbackWindow is BlockchainParametersTest {
   uint256 constant newValue = 20;
   uint256 constant otherValue = 50;
 
@@ -127,30 +126,30 @@ contract BlockchainParametersTestSetUptimeLookbackWindow is BlockchainParameters
     assertEq(blockchainParameters.getUptimeLookbackWindow(), otherValue);
   }
 
-  function test_ShoudEmitUptimeLookbackWindowSet () public {
+  function test_ShoudEmitUptimeLookbackWindowSet() public {
     vm.expectEmit(true, true, true, true);
     emit UptimeLookbackWindowSet(newValue, 2);
     blockchainParameters.setUptimeLookbackWindow(newValue);
   }
 
-  function test_ShouldRevert_WhenCalledByNonOwner() public {
+  function test_Revert_WhenCalledByNonOwner() public {
     vm.prank(msg.sender);
     vm.expectRevert("Ownable: caller is not the owner");
     blockchainParameters.setUptimeLookbackWindow(newValue);
   }
 
-  function test_ShouldRevert_ShouldFail_WhenUsingValueLowerThanSafeMinimum() public {
+  function test_Revert_ShouldFail_WhenUsingValueLowerThanSafeMinimum() public {
     vm.expectRevert("UptimeLookbackWindow must be within safe range");
     blockchainParameters.setUptimeLookbackWindow(2);
   }
 
-  function test_ShouldRevert_WhenUsingValueGreaterThanSafeMaximum() public {
+  function test_Revert_WhenUsingValueGreaterThanSafeMaximum() public {
     vm.expectRevert("UptimeLookbackWindow must be within safe range");
     blockchainParameters.setUptimeLookbackWindow(721);
 
   }
 
-  function test_ShouldRevert_WhenUsingValueGreaterThanEpochsizeminus2() public {
+  function test_Revert_WhenUsingValueGreaterThanEpochsizeminus2() public {
     vm.expectRevert("UptimeLookbackWindow must be smaller or equal to epochSize - 2");
     // 720 is harcoded as maximum in the code
     blockchainParameters.setUptimeLookbackWindow(EPOCH_SIZE - 1);
