@@ -12,6 +12,7 @@ contract BlockchainParametersTest is Test, Constants, Utils {
   uint256 constant EPOCH_SIZE = 100;
   uint256 constant gasLimit = 7000000;
   uint256 constant gasForNonGoldCurrencies = 50000;
+  address nonOwner;
 
   BlockchainParameters blockchainParameters;
 
@@ -21,6 +22,7 @@ contract BlockchainParametersTest is Test, Constants, Utils {
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
   function setUp() public {
+    nonOwner = actor("nonOwner");
     ph.setEpochSize(EPOCH_SIZE);
     blockchainParameters = new BlockchainParameters(true);
   }
@@ -36,19 +38,19 @@ contract BlockchainParametersTest_initialize is BlockchainParametersTest {
     assertEq(blockchainParameters.getUptimeLookbackWindow(), lookbackWindow);
   }
 
-  function test_ShoudEmit_IntrinsicGasForAlternativeFeeCurrencySet() public {
+  function test_Emits_IntrinsicGasForAlternativeFeeCurrencySet() public {
     vm.expectEmit(true, true, true, true);
     emit IntrinsicGasForAlternativeFeeCurrencySet(gasForNonGoldCurrencies);
     blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow);
   }
 
-  function test_ShoudEmit_UptimeLookbackWindowSet() public {
+  function test_Emits_UptimeLookbackWindowSet() public {
     vm.expectEmit(true, true, true, true);
     emit UptimeLookbackWindowSet(lookbackWindow, 2);
     blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow);
   }
 
-  function test_ShoudEmit_OwnershipTransferred() public {
+  function test_Emits_OwnershipTransferred() public {
     vm.expectEmit(true, true, true, true);
     emit OwnershipTransferred(address(this), address(this));
     blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow);
@@ -61,14 +63,14 @@ contract BlockchainParametersTest_setBlockGasLimit is BlockchainParametersTest {
     assertEq(blockchainParameters.blockGasLimit(), gasLimit);
   }
 
-  function test_ShoudEmitBlockGasLimitSet() public {
+  function test_Emits_BlockGasLimitSet() public {
     vm.expectEmit(true, true, true, true);
     emit BlockGasLimitSet(gasLimit);
     blockchainParameters.setBlockGasLimit(gasLimit);
   }
 
   function test_Reverts_WhenCalledByNonOwner() public {
-    vm.prank(msg.sender);
+    vm.prank(nonOwner);
     vm.expectRevert("Ownable: caller is not the owner");
     blockchainParameters.setBlockGasLimit(gasLimit);
   }
@@ -82,14 +84,14 @@ contract BlockchainParametersTestSet_intrinsicGasForAlternativeFeeCurrency is
     assertEq(blockchainParameters.intrinsicGasForAlternativeFeeCurrency(), gasForNonGoldCurrencies);
   }
 
-  function test_intrinsicGasForAlternativeFeeCurrencySet() public {
+  function test_Emits_intrinsicGasForAlternativeFeeCurrencySet() public {
     vm.expectEmit(true, true, true, true);
     emit IntrinsicGasForAlternativeFeeCurrencySet(gasForNonGoldCurrencies);
     blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(gasForNonGoldCurrencies);
   }
 
   function test_Revert_WhenCalledByNonOwner() public {
-    vm.prank(msg.sender);
+    vm.prank(nonOwner);
     vm.expectRevert("Ownable: caller is not the owner");
     blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(gasForNonGoldCurrencies);
   }
@@ -126,14 +128,14 @@ contract BlockchainParametersTest_setUptimeLookbackWindow is BlockchainParameter
     assertEq(blockchainParameters.getUptimeLookbackWindow(), otherValue);
   }
 
-  function test_ShoudEmitUptimeLookbackWindowSet() public {
+  function test_Emits_UptimeLookbackWindowSet() public {
     vm.expectEmit(true, true, true, true);
     emit UptimeLookbackWindowSet(newValue, 2);
     blockchainParameters.setUptimeLookbackWindow(newValue);
   }
 
   function test_Revert_WhenCalledByNonOwner() public {
-    vm.prank(msg.sender);
+    vm.prank(nonOwner);
     vm.expectRevert("Ownable: caller is not the owner");
     blockchainParameters.setUptimeLookbackWindow(newValue);
   }
