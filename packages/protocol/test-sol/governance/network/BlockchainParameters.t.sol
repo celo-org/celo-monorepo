@@ -48,9 +48,9 @@ contract BlockchainParametersTest_initialize is BlockchainParametersTest {
     blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow);
   }
 
-  function test_ShoudEmit_ownershipTransferred() public {
+  function test_ShoudEmit_OwnershipTransferred() public {
     vm.expectEmit(true, true, true, true);
-    emit OwnershipTransferred(msg.sender, msg.sender);
+    emit OwnershipTransferred(address(this), address(this));
     blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow);
   }
 }
