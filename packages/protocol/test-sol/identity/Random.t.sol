@@ -143,7 +143,6 @@ contract AddTestRandomness is Test, Utils {
     // [EPOCH_SIZE, EPOCH_SIZE+1... EPOCH_SIZE+n, 2 * EPOCH_SIZE, 2 * EPOCH_SIZE + 1... 2 * EPOCH_SIZE + RETENTION_WINDOW-1]
 
     // go to last block of epoch 1
-    // TODO add travel here
     vm.roll(EPOCH_SIZE);
     // Add randomness to epoch's last block
     random.addTestRandomness(block.number, valueForLastBlockOfEpoch);
