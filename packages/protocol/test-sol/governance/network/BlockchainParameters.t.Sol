@@ -8,6 +8,7 @@ import { Constants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
 
 contract BlockchainParametersTest is Test, Constants, Utils {
+  // using the mainnet epoch size would not allow to test an edge case
   uint256 constant EPOCH_SIZE = 100;
   uint256 constant gasLimit = 7000000;
   uint256 constant gasForNonGoldCurrencies = 50000;
@@ -23,15 +24,9 @@ contract BlockchainParametersTest is Test, Constants, Utils {
     ph.setEpochSize(EPOCH_SIZE);
     blockchainParameters = new BlockchainParameters(true);
   }
-
-  function test_setBlockGasLimit_set_variable() public {
-    blockchainParameters.setBlockGasLimit(gasLimit);
-    assertEq(blockchainParameters.blockGasLimit(), gasLimit);
-  }
-
 }
 
-contract BlockchainParametersTest_initialize is BlockchainParametersTest {
+contract BlockchainParametersTestInitialize is BlockchainParametersTest {
   uint constant lookbackWindow = 20;
 
   function test_ShouldSetTheVariables() public {
@@ -41,14 +36,23 @@ contract BlockchainParametersTest_initialize is BlockchainParametersTest {
     assertEq(blockchainParameters.getUptimeLookbackWindow(), lookbackWindow);
   }
 
-  function test_ShoudEmitIntrinsicGasForAlternativeFeeCurrencySet() public {
+  function test_ShoudEmit_IntrinsicGasForAlternativeFeeCurrencySet() public {
     vm.expectEmit(true, true, true, true);
     emit IntrinsicGasForAlternativeFeeCurrencySet(gasForNonGoldCurrencies);
+    blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow);
+  }
+  
+  function test_ShoudEmit_UptimeLookbackWindowSet() public {
+    vm.expectEmit(true, true, true, true);
     emit UptimeLookbackWindowSet(lookbackWindow, 2);
+    blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow);
+  }
+  
+  function test_ShoudEmit_ownershipTransferred() public {
+    vm.expectEmit(true, true, true, true);
     emit OwnershipTransferred(msg.sender, msg.sender);
     blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow);
   }
-
 }
 
 contract BlockchainParametersTest_setBlockGasLimit is BlockchainParametersTest {
@@ -71,13 +75,13 @@ contract BlockchainParametersTest_setBlockGasLimit is BlockchainParametersTest {
   }
 }
 
-contract BlockchainParametersTest_setIntrinsicGasForAlternativeFeeCurrency is BlockchainParametersTest {
+contract BlockchainParametersTestSetIntrinsicGasForAlternativeFeeCurrency is BlockchainParametersTest {
   function test_ShouldSetTheVariable () public {
     blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(gasForNonGoldCurrencies);
     assertEq(blockchainParameters.intrinsicGasForAlternativeFeeCurrency(), gasForNonGoldCurrencies);
   }
 
-  function test_ShoudEmitBlockGasLimitSet () public {
+  function test_IntrinsicGasForAlternativeFeeCurrencySet () public {
     vm.expectEmit(true, true, true, true);
     emit IntrinsicGasForAlternativeFeeCurrencySet(gasForNonGoldCurrencies);
     blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(gasForNonGoldCurrencies);
@@ -105,7 +109,7 @@ contract BlockchainParametersTest_getUptimeLookbackWindow is BlockchainParameter
 }
 
 
-contract BlockchainParametersTest_setUptimeLookbackWindow is BlockchainParametersTest {
+contract BlockchainParametersTestSetUptimeLookbackWindow is BlockchainParametersTest {
   uint256 constant newValue = 20;
   uint256 constant otherValue = 50;
 
