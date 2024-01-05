@@ -1,8 +1,13 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
+import "openzeppelin-solidity/contracts/utils/EnumerableSet.sol";
 
 contract Utils is Test {
+  using EnumerableSet for EnumerableSet.AddressSet;
+
+  EnumerableSet.AddressSet addressSet;
+
   function timeTravel(uint256 timeDelta) public {
     vm.warp(block.timestamp + timeDelta);
   }
@@ -32,4 +37,31 @@ contract Utils is Test {
     return string(bstr);
   }
 
+  function arraysEqual(address[] memory arr1, address[] memory arr2) public returns (bool) {
+    if (arr1.length != arr2.length) {
+      return false; // Arrays of different lengths cannot be equal
+    }
+
+    // Add addresses from arr1 to the set
+    for (uint256 i = 0; i < arr1.length; i++) {
+      addressSet.add(arr1[i]);
+    }
+
+    // Check if each address in arr2 is in the set
+    for (uint256 i = 0; i < arr2.length; i++) {
+      if (!addressSet.contains(arr2[i])) {
+        clearSet(arr1);
+        return false;
+      }
+    }
+
+    clearSet(arr1);
+    return true;
+  }
+
+  function clearSet(address[] memory arr1) private {
+    for (uint256 i = 0; i < arr1.length; i++) {
+      addressSet.remove(arr1[i]);
+    }
+  }
 }

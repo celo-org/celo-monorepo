@@ -1393,6 +1393,10 @@ contract Election_ElectionValidatorSigners is ElectionTestFoundry {
   address validator6 = account8;
   address validator7 = account9;
 
+  address[] group1Members = new address[](4);
+  address[] group2Members = new address[](2);
+  address[] group3Members = new address[](1);
+
   bytes32 hash = 0xa5b9d60f32436310afebcfda832817a68921beb782fabf7915cc0460b443116a;
 
   // If voterN votes for groupN:
@@ -1419,7 +1423,21 @@ contract Election_ElectionValidatorSigners is ElectionTestFoundry {
 
   MemberWithVotes[] membersWithVotes;
 
-  function setRandomness(uint256 randomness) public {
+  function setUp() public {
+    super.setUp();
+
+    group1Members[0] = validator1;
+    group1Members[1] = validator2;
+    group1Members[2] = validator3;
+    group1Members[3] = validator4;
+
+    group2Members[0] = validator5;
+    group2Members[1] = validator6;
+
+    group3Members[0] = validator7;
+  }
+
+  function setRandomness() public {
     random.addTestRandomness(block.number + 1, hash);
   }
 
@@ -1508,4 +1526,114 @@ contract Election_ElectionValidatorSigners is ElectionTestFoundry {
     }
   }
 
+  function WhenThereAreSomeGroups() public {
+    validators.setMembers(group1, group1Members);
+    validators.setMembers(group2, group2Members);
+    validators.setMembers(group3, group3Members);
+
+    registry.setAddressFor("Validators", address(this));
+    election.markGroupEligible(group1, address(0), address(0));
+    election.markGroupEligible(group2, address(0), group1);
+    election.markGroupEligible(group3, address(0), group2);
+    registry.setAddressFor("Validators", address(validators));
+
+    lockedGold.incrementNonvotingAccountBalance(address(voter1), voter1Weight);
+    lockedGold.incrementNonvotingAccountBalance(address(voter2), voter2Weight);
+    lockedGold.incrementNonvotingAccountBalance(address(voter3), voter3Weight);
+
+    lockedGold.setTotalLockedGold(totalLockedGold);
+    validators.setNumRegisteredValidators(7);
+  }
+
+  function test_ShouldReturnThatGroupsMemberLIst_WhenASingleGroupHasMoreOrEqualToMinElectableValidatorsAsMembersAndReceivedVotes()
+    public
+  {
+    WhenThereAreSomeGroups();
+    vm.prank(voter1);
+    election.vote(group1, voter1Weight, group2, address(0));
+    setRandomness();
+    arraysEqual(election.electValidatorSigners(), group1Members);
+  }
+
+  function test_ShouldReturnMaxElectableValidatorsElectedValidators_WhenGroupWithMoreThenMaxElectableValidatorsMembersReceivesVotes()
+    public
+  {
+    WhenThereAreSomeGroups();
+    vm.prank(voter1);
+    election.vote(group1, voter1Weight, group2, address(0));
+    vm.prank(voter2);
+    election.vote(group2, voter2Weight, address(0), group1);
+    vm.prank(voter3);
+    election.vote(group3, voter3Weight, address(0), group2);
+
+    setRandomness();
+    address[] memory expected = new address[](6);
+    expected[0] = validator1;
+    expected[1] = validator2;
+    expected[2] = validator3;
+    expected[3] = validator5;
+    expected[4] = validator6;
+    expected[5] = validator7;
+    arraysEqual(election.electValidatorSigners(), expected);
+  }
+
+  function test_ShouldElectOnlyNMembersFromThatGroup_WhenAGroupReceivesEnoughVotesForMoreThanNSeatsButOnlyHasNMembers()
+    public
+  {
+    WhenThereAreSomeGroups();
+    uint256 increment = 80;
+    uint256 votes = 80;
+    lockedGold.incrementNonvotingAccountBalance(address(voter3), increment);
+    lockedGold.setTotalLockedGold(totalLockedGold + increment);
+    vm.prank(voter3);
+    election.vote(group3, votes, group2, address(0));
+    vm.prank(voter1);
+    election.vote(group1, voter1Weight, address(0), group3);
+    vm.prank(voter2);
+    election.vote(group2, voter2Weight, address(0), group1);
+    setRandomness();
+
+    address[] memory expected = new address[](6);
+    expected[0] = validator1;
+    expected[1] = validator2;
+    expected[2] = validator3;
+    expected[3] = validator5;
+    expected[4] = validator6;
+    expected[5] = validator7;
+    arraysEqual(election.electValidatorSigners(), expected);
+  }
+
+  function test_ShouldNotElectAnyMembersFromThatGroup_WhenAGroupDoesNotReceiveElectabilityThresholdVotes()
+    public
+  {
+    WhenThereAreSomeGroups();
+    uint256 thresholdExcludingGroup3 = (voter3Weight + 1) / totalLockedGold;
+    election.setElectabilityThreshold(thresholdExcludingGroup3);
+    vm.prank(voter1);
+    election.vote(group1, voter1Weight, group2, address(0));
+    vm.prank(voter2);
+    election.vote(group2, voter2Weight, address(0), group1);
+    vm.prank(voter3);
+    election.vote(group3, voter3Weight, address(0), group2);
+
+    address[] memory expected = new address[](6);
+    expected[0] = validator1;
+    expected[1] = validator2;
+    expected[2] = validator3;
+    expected[3] = validator4;
+    expected[4] = validator5;
+    expected[5] = validator6;
+    arraysEqual(election.electValidatorSigners(), expected);
+  }
+
+  function test_ShouldRevert_WhenThereAnoNotEnoughElectableValidators() public {
+    WhenThereAreSomeGroups();
+    vm.prank(voter2);
+    election.vote(group2, voter2Weight, group1, address(0));
+    vm.prank(voter3);
+    election.vote(group3, voter3Weight, address(0), group2);
+    setRandomness();
+    vm.expectRevert("Not enough elected validators");
+    election.electValidatorSigners();
+  }
 }
