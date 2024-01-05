@@ -2,8 +2,6 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "forge-std/console.sol";
-
 import "celo-foundry/Test.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
@@ -12,12 +10,6 @@ import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/DoubleSigningSlasher.sol";
 import "@celo-contracts/governance/test/MockUsingPrecompiles.sol";
-
-// pragma solidity ^0.5.13;
-// pragma experimental ABIEncoderV2;
-
-// import "../DoubleSigningSlasher.sol";
-// import "./MockUsingPrecompiles.sol";
 
 contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecompiles {
   struct SlashParams {
