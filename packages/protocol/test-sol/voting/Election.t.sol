@@ -2361,10 +2361,210 @@ contract Election_ConsistencyChecks is ElectionTestFoundry {
   address group = account2;
   uint256 rewardValue2 = 10000000;
 
+  AccountStruct[] accounts;
+
+  struct AccountStruct {
+    address account;
+    uint256 active;
+    uint256 pending;
+    uint256 nonVoting;
+  }
+
+  enum VoteActionType { Vote, Activate, RevokePending, RevokeActive }
+
   function setUp() public {
     super.setUp();
 
+    // 50M gives us 500M total locked gold
+    uint256 voterStartBalance = 50000000 ether;
+    address[] memory members = new address[](1);
+    members[0] = account9;
+    validators.setMembers(group, members);
+    registry.setAddressFor("Validators", address(this));
+    election.markGroupEligible(group, address(0), address(0));
+    registry.setAddressFor("Validators", address(validators));
+    lockedGold.setTotalLockedGold(voterStartBalance * accountsArray.length);
+    validators.setNumRegisteredValidators(1);
+    for (uint256 i = 0; i < accountsArray.length; i++) {
+      lockedGold.incrementNonvotingAccountBalance(accountsArray[i], voterStartBalance);
+
+      accounts.push(
+        AccountStruct(
+          accountsArray[i],
+          election.getActiveVotesForGroupByAccount(group, accountsArray[i]),
+          election.getPendingVotesForGroupByAccount(group, accountsArray[i]),
+          lockedGold.nonvotingAccountBalance(accountsArray[i])
+        )
+      );
+    }
   }
 
-  function checkVoterInvariants() public {}
+  function makeRandomAction(AccountStruct storage account, uint256 salt) internal {
+    VoteActionType[] memory actions = new VoteActionType[](4);
+    uint256 actionCount = 0;
+
+    if (account.nonVoting > 0) {
+      actions[actionCount++] = VoteActionType.Vote;
+    }
+    if (election.hasActivatablePendingVotes(account.account, group)) {
+      // Assuming this is a view function
+      actions[actionCount++] = VoteActionType.Activate;
+    }
+    if (account.pending > 0) {
+      actions[actionCount++] = VoteActionType.RevokePending;
+    }
+    if (account.active > 0) {
+      actions[actionCount++] = VoteActionType.RevokeActive;
+    }
+
+    VoteActionType action = actions[generatePRN(0, actionCount - 1, uint256(account.account))];
+    uint256 value;
+
+    vm.startPrank(account.account);
+    if (action == VoteActionType.Vote) {
+      value = generatePRN(0, account.nonVoting, uint256(account.account) + salt);
+      election.vote(group, value, address(0), address(0));
+      account.nonVoting -= value;
+      account.pending += value;
+    } else if (action == VoteActionType.Activate) {
+      value = account.pending;
+      election.activate(group);
+      account.pending -= value;
+      account.active += value;
+    } else if (action == VoteActionType.RevokePending) {
+      value = generatePRN(0, account.pending, uint256(account.account) + salt);
+      election.revokePending(group, value, address(0), address(0), 0);
+      account.pending -= value;
+      account.nonVoting += value;
+    } else if (action == VoteActionType.RevokeActive) {
+      value = generatePRN(0, account.active, uint256(account.account) + salt);
+      election.revokeActive(group, value, address(0), address(0), 0);
+      account.active -= value;
+      account.nonVoting += value;
+    }
+    vm.stopPrank();
+  }
+
+  function checkVoterInvariants(AccountStruct memory account, uint256 delta) public {
+    assertAlmostEqual(
+      election.getPendingVotesForGroupByAccount(group, account.account),
+      account.pending,
+      delta
+    );
+    assertAlmostEqual(
+      election.getActiveVotesForGroupByAccount(group, account.account),
+      account.active,
+      delta
+    );
+    assertAlmostEqual(
+      election.getTotalVotesForGroupByAccount(group, account.account),
+      account.active + account.pending,
+      delta
+    );
+    assertAlmostEqual(
+      lockedGold.nonvotingAccountBalance(account.account),
+      account.nonVoting,
+      delta
+    );
+  }
+
+  function checkGroupInvariants(uint256 delta) public {
+    uint256 pendingTotal;
+
+    for (uint256 i = 0; i < accounts.length; i++) {
+      pendingTotal += accounts[i].pending;
+    }
+
+    uint256 activateTotal;
+
+    for (uint256 i = 0; i < accounts.length; i++) {
+      activateTotal += accounts[i].active;
+    }
+
+    assertAlmostEqual(election.getPendingVotesForGroup(group), pendingTotal, delta);
+    assertAlmostEqual(election.getActiveVotesForGroup(group), activateTotal, delta);
+    assertAlmostEqual(election.getTotalVotesForGroup(group), pendingTotal + activateTotal, delta);
+
+    assertAlmostEqual(election.getTotalVotes(), election.getTotalVotesForGroup(group), delta);
+  }
+
+  function revokeAllAndCheckInvariants(uint256 delta) public {
+    for (uint256 i = 0; i < accounts.length; i++) {
+      AccountStruct storage account = accounts[i];
+
+      checkVoterInvariants(account, delta);
+
+      uint256 active = election.getActiveVotesForGroupByAccount(group, account.account);
+      if (active > 0) {
+        vm.prank(account.account);
+        election.revokeActive(group, active, address(0), address(0), 0);
+        account.active = 0;
+        account.nonVoting += active;
+      }
+
+      uint256 pending = account.pending;
+      if (pending > 0) {
+        vm.prank(account.account);
+        election.revokePending(group, pending, address(0), address(0), 0);
+        account.pending = 0;
+        account.nonVoting += pending;
+      }
+
+      assertEq(election.getActiveVotesForGroupByAccount(group, account.account), 0);
+      assertEq(election.getPendingVotesForGroupByAccount(group, account.account), 0);
+      assertEq(lockedGold.nonvotingAccountBalance(account.account), account.nonVoting);
+    }
+  }
+
+  function test_ActualAndExpectedShouldAlwaysMatchExactly_WhenNoEpochRewardsAreDistributed()
+    public
+  {
+    for (uint256 i = 0; i < 10; i++) {
+      for (uint256 j = 0; j < accounts.length; j++) {
+        makeRandomAction(accounts[j], j);
+        checkVoterInvariants(accounts[j], 0);
+        checkGroupInvariants(0);
+        vm.roll((i + 1) * EPOCH_SIZE + (i + 1));
+      }
+    }
+    revokeAllAndCheckInvariants(0);
+  }
+
+  function distributeEpochRewards(uint256 salt) public {
+    // 1% compounded 100x gives up to a 2.7x multiplier.
+    uint256 reward = generatePRN(0, election.getTotalVotes() / 100, salt);
+    uint256 activeTotal;
+
+    for (uint256 i = 0; i < accounts.length; i++) {
+      activeTotal += accounts[i].active;
+    }
+
+    if (reward > 0 && activeTotal > 0) {
+      election.distributeEpochRewards(group, reward, address(0), address(0));
+
+      for (uint256 i = 0; i < accounts.length; i++) {
+        AccountStruct storage account = accounts[i];
+        account.active = ((activeTotal + reward) * accounts[i].active) / activeTotal;
+      }
+    }
+  }
+
+  function test_ActualAndExpectedShouldAlwaysMatchWithinSmallDelta() public {
+    for (uint256 i = 0; i < 30; i++) {
+      for (uint256 j = 0; j < accounts.length; j++) {
+        makeRandomAction(accounts[j], j);
+        checkVoterInvariants(accounts[j], 100);
+        checkGroupInvariants(100);
+      }
+
+      distributeEpochRewards(i);
+      vm.roll((i + 1) * EPOCH_SIZE + (i + 1));
+
+      for (uint256 j = 0; j < accounts.length; j++) {
+        checkVoterInvariants(accounts[j], 100);
+        checkGroupInvariants(100);
+      }
+    }
+    revokeAllAndCheckInvariants(100);
+  }
 }
