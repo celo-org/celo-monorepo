@@ -22,7 +22,7 @@ contract SetRandomnessRetentionWindow is Test {
     assertEq(random.randomnessBlockRetentionWindow(), 1000);
   }
 
-  function test_ShouldEmitTheEvent() public {
+  function test_Emits_TheEvent() public {
     vm.expectEmit(true, true, true, true);
     emit RandomnessBlockRetentionWindowSet(1000);
     random.setRandomnessBlockRetentionWindow(1000);

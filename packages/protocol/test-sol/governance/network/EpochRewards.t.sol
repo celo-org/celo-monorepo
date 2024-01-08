@@ -174,7 +174,7 @@ contract EpochRewardsFoundryTest_SetTargetVotingGoldFraction is EpochRewardsFoun
     assertEq(epochRewards.getTargetVotingGoldFraction(), newFraction);
   }
 
-  function test_ShouldEmitTargetVotingGoldFractionSet_WhenFractionIsDifferent_WhenCalledByOwner()
+  function test_Emits_TargetVotingGoldFractionSet_WhenFractionIsDifferent_WhenCalledByOwner()
     public
   {
     vm.expectEmit(true, true, true, true);
@@ -205,7 +205,7 @@ contract EpochRewardsFoundryTest_SetCommunityRewardFraction is EpochRewardsFound
     assertEq(epochRewards.getCommunityRewardFraction(), newFraction);
   }
 
-  function test_ShouldEmitCommunityRewardFractionSet_WhenFractionIsDifferent_WhenCalledByOwner()
+  function test_Emits_CommunityRewardFractionSet_WhenFractionIsDifferent_WhenCalledByOwner()
     public
   {
     vm.expectEmit(true, true, true, true);
@@ -244,7 +244,7 @@ contract EpochRewardsFoundryTest_SetTargetValidatorEpochPayment is EpochRewardsF
     assertEq(epochRewards.targetValidatorEpochPayment(), newPayment);
   }
 
-  function test_ShouldEmitTargetValidatorEpochPaymentSet_WhenPaymentIsDifferent_WhenCalledByOwner()
+  function test_Emits_TargetValidatorEpochPaymentSet_WhenPaymentIsDifferent_WhenCalledByOwner()
     public
   {
     vm.expectEmit(true, true, true, true);
@@ -282,7 +282,7 @@ contract EpochRewardsFoundryTest_SetRewardsMultiplierParameters is EpochRewardsF
     assertEq(overspend, rewardsMultiplierAdjustmentsOverspend);
   }
 
-  function test_ShouldEmitRewardsMultiplierParametersSet_WhenCalledByOwner() public {
+  function test_Emits_RewardsMultiplierParametersSet_WhenCalledByOwner() public {
     vm.expectEmit(true, true, true, true);
     emit RewardsMultiplierParametersSet(
       rewardsMultiplierMax,
@@ -332,7 +332,7 @@ contract EpochRewardsFoundryTest_SetTargetVotingYieldParameters is EpochRewardsF
     assertEq(factor, newTargetVotingYieldParamsAdjustmentFactor);
   }
 
-  function test_ShouldEmitTargetVotingYieldParametersSet_WhenCalledByOwner() public {
+  function test_Emits_TargetVotingYieldParametersSet_WhenCalledByOwner() public {
     vm.expectEmit(true, true, true, true);
     emit TargetVotingYieldParametersSet(
       newTargetVotingYieldParamsMax,
@@ -372,7 +372,7 @@ contract EpochRewardsFoundryTest_SetTargetVotingYield is EpochRewardsFoundryTest
     assertEq(target, newTargetVotingYieldParamsInitial);
   }
 
-  function test_ShouldEmitTargetVotingYieldSet_WhenCalledByOwner() public {
+  function test_Emits_TargetVotingYieldSet_WhenCalledByOwner() public {
     vm.expectEmit(true, true, true, true);
     emit TargetVotingYieldSet(newTargetVotingYieldParamsInitial);
     epochRewards.setTargetVotingYield(newTargetVotingYieldParamsInitial);

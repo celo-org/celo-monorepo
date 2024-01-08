@@ -61,7 +61,7 @@ contract MultiSigInitialize is MultiSigTest {
     assertEq(uint256(multiSig.internalRequired()), 2);
   }
 
-  function test_revertsWhenCalledTwice() public {
+  function test_t_Reverts_WhenCalledTwice() public {
     vm.expectRevert("contract already initialized");
     multiSig.initialize(owners, requiredSignatures, internalRequiredSignatures);
   }
@@ -78,7 +78,7 @@ contract MultiSigFallbackFunction is MultiSigTest {
     _to.call.value(_amount)("");
   }
 
-  function test_emitsDepositEventWithCorrectParameters_whenReceivingCelo() public payable {
+  function test_Emits_DepositEventWithCorrectParameters_whenReceivingCelo() public payable {
     vm.prank(sender);
     vm.expectEmit(true, false, false, false);
     emit Deposit(sender, amount);

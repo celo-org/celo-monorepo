@@ -932,7 +932,7 @@ contract GovernanceUpvote is GovernanceBaseTest {
     assertTrue(governance.upvote(proposalId, 0, 0));
   }
 
-  function test_emitsProposalUpvotedEvent() public {
+  function test_Emits_ProposalUpvotedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit ProposalUpvoted(proposalId, accVoter, VOTER_GOLD);
 
@@ -1474,7 +1474,7 @@ contract GovernanceRevokeVotes is GovernanceBaseTest {
     assertFalse(governance.isVoting(accVoter));
   }
 
-  function test_shouldEmitProposalVoteRevokedV2EventXtimes_whenAccountHasVotedOnXProposal()
+  function test_Emits_ProposalVoteRevokedV2EventXtimes_whenAccountHasVotedOnXProposal()
     public
     voteForEachNumVoted
   {
@@ -1510,7 +1510,7 @@ contract GovernanceRevokeVotes is GovernanceBaseTest {
     assertEq(governance.getAmountOfGoldUsedForVoting(accVoter), 0);
   }
 
-  function test_shouldEmitProposalVoteRevokedV2EventXtimes_whenAccountHasVotedPartiallyOnXProposal()
+  function test_Emits_ProposalVoteRevokedV2EventXtimes_whenAccountHasVotedPartiallyOnXProposal()
     public
     votePartiallyForEachNumVoted
   {

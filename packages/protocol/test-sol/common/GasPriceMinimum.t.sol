@@ -97,7 +97,7 @@ contract GasPriceMinimumSetAdjustmentSpeed is GasPriceMinimumTest {
     assertEq(gasPriceMinimum.adjustmentSpeed(), newAdjustmentSpeed);
   }
 
-  function test_shouldEmitAdjustmentSpeedSetEvent() public {
+  function test_Emits_AdjustmentSpeedSetEvent() public {
     vm.expectEmit(true, false, false, false);
     emit AdjustmentSpeedSet(newAdjustmentSpeed);
     gasPriceMinimum.setAdjustmentSpeed(newAdjustmentSpeed);
@@ -125,7 +125,7 @@ contract GasPriceMinimumSetTargetDensity is GasPriceMinimumTest {
     assertEq(gasPriceMinimum.targetDensity(), newTargetDensity);
   }
 
-  function test_ShouldEmitTargetDensitySetEvent() public {
+  function test_Emits_TargetDensitySetEvent() public {
     vm.expectEmit(true, true, true, true);
     emit TargetDensitySet(newTargetDensity);
     gasPriceMinimum.setTargetDensity(newTargetDensity);
@@ -152,7 +152,7 @@ contract GasPriceMinimumSetGasPriceMinimumFloor is GasPriceMinimumTest {
     assertEq(gasPriceMinimum.gasPriceMinimumFloor(), newGasPriceMinimumFloor);
   }
 
-  function test_emitsGasPriceMinimumFloorSet() public {
+  function test_Emits_GasPriceMinimumFloorSet() public {
     vm.expectEmit(true, true, true, true);
     emit GasPriceMinimumFloorSet(newGasPriceMinimumFloor);
     gasPriceMinimum.setGasPriceMinimumFloor(newGasPriceMinimumFloor);

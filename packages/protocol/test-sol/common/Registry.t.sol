@@ -40,7 +40,7 @@ contract RegistryTest is Test {
     assertEq(registry.registry(ID_HASH), SOME_ADDRESS);
   }
 
-  function test_setAddressFor_reverts_other_user() public {
+  function test_setAddressFor_t_Reverts_other_user() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(msg.sender);
     registry.setAddressFor(SOME_ID, SOME_ADDRESS);
@@ -58,7 +58,7 @@ contract RegistryTest is Test {
     assertEq(registry.getAddressForOrDie(ID_HASH), SOME_ADDRESS);
   }
 
-  function test_getAddressForOrDie_reverts_address_not_set() public {
+  function test_getAddressForOrDie_t_Reverts_address_not_set() public {
     vm.expectRevert("identifier has no registry entry");
     registry.getAddressForOrDie(ID_HASH);
   }
@@ -77,7 +77,7 @@ contract RegistryTest is Test {
     assertEq(registry.getAddressForStringOrDie(SOME_ID), SOME_ADDRESS);
   }
 
-  function test_getAddressForStringOrDie_reverts() public {
+  function test_getAddressForStringOrDie_t_Reverts_() public {
     vm.expectRevert("identifier has no registry entry");
     registry.getAddressForStringOrDie(SOME_ID);
   }
