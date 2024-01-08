@@ -1637,3 +1637,734 @@ contract Election_ElectionValidatorSigners is ElectionTestFoundry {
     election.electValidatorSigners();
   }
 }
+
+contract Election_GetGroupEpochRewards is ElectionTestFoundry {
+  address voter = address(this);
+  address group1 = account2;
+  address group2 = account3;
+  uint256 voteValue1 = 2000000000;
+  uint256 voteValue2 = 1000000000;
+  uint256 totalRewardValue = 3000000000;
+
+  function setUp() public {
+    super.setUp();
+
+    registry.setAddressFor("Validators", address(this));
+    election.markGroupEligible(group1, address(0), address(0));
+    election.markGroupEligible(group2, address(0), group1);
+    registry.setAddressFor("Validators", address(validators));
+    lockedGold.setTotalLockedGold(voteValue1 + voteValue2);
+
+    address[] memory membersGroup1 = new address[](1);
+    membersGroup1[0] = account8;
+
+    validators.setMembers(group1, membersGroup1);
+
+    address[] memory membersGroup2 = new address[](1);
+    membersGroup2[0] = account9;
+    validators.setMembers(group2, membersGroup2);
+    validators.setNumRegisteredValidators(2);
+    lockedGold.incrementNonvotingAccountBalance(voter, voteValue1 + voteValue2);
+    election.vote(group1, voteValue1, group2, address(0));
+    election.vote(group2, voteValue2, address(0), group1);
+  }
+
+  function WhenOneGroupHasActiveVotes() public {
+    vm.roll(EPOCH_SIZE + 1);
+    election.activate(group1);
+  }
+
+  function test_ShouldReturnTheTotalRewardValue_WhenGroupUptimeIs100Percent_WhenOneGroupHasActiveVotes()
+    public
+  {
+    WhenOneGroupHasActiveVotes();
+
+    uint256[] memory uptimes = new uint256[](1);
+    uptimes[0] = FIXED1;
+    assertEq(election.getGroupEpochRewards(group1, totalRewardValue, uptimes), totalRewardValue);
+  }
+
+  function test_ShouldReturnPartOfTheTotalRewardValue_WhenWhenGroupUptimeIsLessThan100Percent_WhenOneGroupHasActiveVotes()
+    public
+  {
+    WhenOneGroupHasActiveVotes();
+
+    uint256[] memory uptimes = new uint256[](1);
+    uptimes[0] = FIXED1 / 2;
+    assertEq(
+      election.getGroupEpochRewards(group1, totalRewardValue, uptimes),
+      totalRewardValue / 2
+    );
+  }
+
+  function test_ShouldReturnZero_WhenTheGroupDoesNotMeetTheLockedGoldRequirements_WhenOneGroupHasActiveVotes()
+    public
+  {
+    WhenOneGroupHasActiveVotes();
+
+    validators.setDoesNotMeetAccountLockedGoldRequirements(group1);
+    uint256[] memory uptimes = new uint256[](1);
+    uptimes[0] = FIXED1;
+    assertEq(election.getGroupEpochRewards(group1, totalRewardValue, uptimes), 0);
+  }
+
+  function WhenTwoGroupsHaveActiveVotes() public {
+    vm.roll(EPOCH_SIZE + 1);
+    election.activate(group1);
+    election.activate(group2);
+  }
+
+  function test_ShouldReturn0_WhenOneGroupDoesNotMeetLockedGoldRequirements_WhenTwoGroupsHaveActiveVotes()
+    public
+  {
+    WhenTwoGroupsHaveActiveVotes();
+
+    validators.setDoesNotMeetAccountLockedGoldRequirements(group2);
+    uint256[] memory uptimes = new uint256[](1);
+    uptimes[0] = FIXED1;
+    assertEq(election.getGroupEpochRewards(group2, totalRewardValue, uptimes), 0);
+  }
+
+  uint256 expectedGroup1EpochRewards = FixidityLib
+    .newFixedFraction(voteValue1, voteValue1 + voteValue2)
+    .multiply(FixidityLib.newFixed(totalRewardValue))
+    .fromFixed();
+
+  function test_ShouldReturnProportionalRewardValueForOtherGroup_WhenOneGroupDoesNotMeetLockedGoldRequirements_WhenTwoGroupsHaveActiveVotes()
+    public
+  {
+    WhenTwoGroupsHaveActiveVotes();
+
+    validators.setDoesNotMeetAccountLockedGoldRequirements(group2);
+    uint256[] memory uptimes = new uint256[](1);
+    uptimes[0] = FIXED1;
+
+    assertEq(
+      election.getGroupEpochRewards(group1, totalRewardValue, uptimes),
+      expectedGroup1EpochRewards
+    );
+  }
+
+  function test_ShouldReturn0_WhenTheGroupMeetsLockedGoldRequirements_WhenThenGroupDoesNotHaveActiveVotes()
+    public
+  {
+    uint256[] memory uptimes = new uint256[](1);
+    uptimes[0] = FIXED1;
+    assertEq(election.getGroupEpochRewards(group1, totalRewardValue, uptimes), 0);
+  }
+}
+
+contract Election_DistributeEpochRewards is ElectionTestFoundry {
+  address voter = address(this);
+  address voter2 = account4;
+  address group = account2;
+  address group2 = account3;
+  uint256 voteValue = 1000000;
+  uint256 voteValue2 = 1000000;
+  uint256 rewardValue = 1000000;
+  uint256 rewardValue2 = 10000000;
+
+  function setUp() public {
+    super.setUp();
+
+    registry.setAddressFor("Validators", address(this));
+    election.markGroupEligible(group, address(0), address(0));
+    registry.setAddressFor("Validators", address(validators));
+    lockedGold.setTotalLockedGold(voteValue);
+
+    address[] memory membersGroup = new address[](1);
+    membersGroup[0] = account8;
+
+    validators.setMembers(group, membersGroup);
+
+    validators.setNumRegisteredValidators(1);
+    lockedGold.incrementNonvotingAccountBalance(voter, voteValue);
+    election.vote(group, voteValue, address(0), address(0));
+
+    vm.roll(EPOCH_SIZE + 1);
+    election.activate(group);
+  }
+
+  function test_ShouldIncrementTheAccountActiveVotesForGroup_WhenThereIsSingleGroupWithActiveVotes()
+    public
+  {
+    election.distributeEpochRewards(group, rewardValue, address(0), address(0));
+    assertEq(election.getActiveVotesForGroupByAccount(group, voter), voteValue + rewardValue);
+  }
+
+  function test_ShouldIncrementAccountTotalVotesForGroup_WhenThereIsSingleGroupWithActiveVotes()
+    public
+  {
+    election.distributeEpochRewards(group, rewardValue, address(0), address(0));
+    assertEq(election.getTotalVotesForGroupByAccount(group, voter), voteValue + rewardValue);
+  }
+
+  function test_ShouldIncrementAccountTotalVotes_WhenThereIsSingleGroupWithActiveVotes() public {
+    election.distributeEpochRewards(group, rewardValue, address(0), address(0));
+    assertEq(election.getTotalVotesByAccount(voter), voteValue + rewardValue);
+  }
+
+  function test_ShouldIncrementTotalVotesForGroup_WhenThereIsSingleGroupWithActiveVotes() public {
+    election.distributeEpochRewards(group, rewardValue, address(0), address(0));
+    assertEq(election.getTotalVotesForGroup(group), voteValue + rewardValue);
+  }
+
+  function test_ShouldIncrementTotalVotes_WhenThereIsSingleGroupWithActiveVotes() public {
+    election.distributeEpochRewards(group, rewardValue, address(0), address(0));
+    assertEq(election.getTotalVotes(), voteValue + rewardValue);
+  }
+
+  uint256 expectedGroupTotalActiveVotes = voteValue + voteValue2 / 2 + rewardValue;
+  uint256 expectedVoterActiveVotesForGroup = FixidityLib
+    .newFixedFraction(expectedGroupTotalActiveVotes * 2, 3)
+    .fromFixed();
+  uint256 expectedVoter2ActiveVotesForGroup = FixidityLib
+    .newFixedFraction(expectedGroupTotalActiveVotes, 3)
+    .fromFixed();
+  uint256 expectedVoter2ActiveVotesForGroup2 = voteValue / 2 + rewardValue2;
+
+  function WhenThereAreTwoGroupsWithActiveVotes() public {
+    registry.setAddressFor("Validators", address(this));
+    election.markGroupEligible(group2, address(0), group);
+    registry.setAddressFor("Validators", address(validators));
+    lockedGold.setTotalLockedGold(voteValue + voteValue2);
+
+    validators.setNumRegisteredValidators(2);
+    lockedGold.incrementNonvotingAccountBalance(voter2, voteValue2);
+
+    vm.startPrank(voter2);
+    // Split voter2's vote between the two groups.
+    election.vote(group, voteValue2 / 2, group2, address(0));
+    election.vote(group2, voteValue2 / 2, address(0), group);
+    vm.roll(2 * EPOCH_SIZE + 2);
+    election.activate(group);
+    election.activate(group2);
+    vm.stopPrank();
+
+    election.distributeEpochRewards(group, rewardValue, group2, address(0));
+    election.distributeEpochRewards(group2, rewardValue2, group, address(0));
+  }
+
+  function test_ShouldIncrementTheAccountsActiveVotesForBothGroups_WhenThereAreTwoGroupsWithActiveVotes()
+    public
+  {
+    WhenThereAreTwoGroupsWithActiveVotes();
+    assertEq(
+      election.getActiveVotesForGroupByAccount(group, voter),
+      expectedVoterActiveVotesForGroup
+    );
+    assertEq(
+      election.getActiveVotesForGroupByAccount(group, voter2),
+      expectedVoter2ActiveVotesForGroup
+    );
+    assertEq(
+      election.getActiveVotesForGroupByAccount(group2, voter2),
+      expectedVoter2ActiveVotesForGroup2
+    );
+  }
+
+  function test_ShouldIncrementTheAccountsTotalVOtesForBothGroups_WhenThereAreTwoGroupsWithActiveVotes()
+    public
+  {
+    WhenThereAreTwoGroupsWithActiveVotes();
+    assertEq(
+      election.getTotalVotesForGroupByAccount(group, voter),
+      expectedVoterActiveVotesForGroup
+    );
+    assertEq(
+      election.getTotalVotesForGroupByAccount(group, voter2),
+      expectedVoter2ActiveVotesForGroup
+    );
+    assertEq(
+      election.getTotalVotesForGroupByAccount(group2, voter2),
+      expectedVoter2ActiveVotesForGroup2
+    );
+  }
+
+  function test_ShouldIncrementTheAccountsTotalVotes_WhenThereAreTwoGroupsWithActiveVotes() public {
+    WhenThereAreTwoGroupsWithActiveVotes();
+    assertEq(election.getTotalVotesByAccount(voter), expectedVoterActiveVotesForGroup);
+    assertEq(
+      election.getTotalVotesByAccount(voter2),
+      expectedVoter2ActiveVotesForGroup + expectedVoter2ActiveVotesForGroup2
+    );
+  }
+
+  function test_ShouldIncrementTotalVotesForBothGroups_WhenThereAreTwoGroupsWithActiveVotes()
+    public
+  {
+    WhenThereAreTwoGroupsWithActiveVotes();
+    assertEq(election.getTotalVotesForGroup(group), expectedGroupTotalActiveVotes);
+    assertEq(election.getTotalVotesForGroup(group2), expectedVoter2ActiveVotesForGroup2);
+  }
+
+  function test_ShouldIncrementTotalVotes_WhenThereAreTwoGroupsWithActiveVotes() public {
+    WhenThereAreTwoGroupsWithActiveVotes();
+    assertEq(
+      election.getTotalVotes(),
+      expectedGroupTotalActiveVotes + expectedVoter2ActiveVotesForGroup2
+    );
+  }
+
+  function test_ShouldUpdateTheORderingOFEligibleGroups_WhenThereAreTwoGroupsWithActiveVotes()
+    public
+  {
+    WhenThereAreTwoGroupsWithActiveVotes();
+    assertEq(election.getEligibleValidatorGroups().length, 2);
+    assertEq(election.getEligibleValidatorGroups()[0], group2);
+    assertEq(election.getEligibleValidatorGroups()[1], group);
+  }
+}
+
+contract Election_ForceDecrementVotes is ElectionTestFoundry {
+  address voter = address(this);
+  address group = account2;
+  address group2 = account7;
+  uint256 value = 1000;
+  uint256 value2 = 1500;
+  uint256 index = 0;
+  uint256 slashedValue = value;
+  uint256 remaining = value - slashedValue;
+
+  function setUp() public {
+    super.setUp();
+
+  }
+
+  function WhenAccountHasVotedForOneGroup() public {
+    address[] memory membersGroup = new address[](1);
+    membersGroup[0] = account8;
+
+    validators.setMembers(group, membersGroup);
+
+    registry.setAddressFor("Validators", address(this));
+    election.markGroupEligible(group, address(0), address(0));
+    registry.setAddressFor("Validators", address(validators));
+    lockedGold.setTotalLockedGold(value);
+    validators.setNumRegisteredValidators(1);
+    lockedGold.incrementNonvotingAccountBalance(voter, value);
+    election.vote(group, value, address(0), address(0));
+
+    registry.setAddressFor("LockedGold", account2);
+  }
+
+  function WhenAccountHasOnlyPendingVotes() public {
+    WhenAccountHasVotedForOneGroup();
+    address[] memory lessers = new address[](1);
+    lessers[0] = address(0);
+    address[] memory greaters = new address[](1);
+    greaters[0] = address(0);
+    uint256[] memory indices = new uint256[](1);
+    indices[0] = index;
+
+    vm.prank(account2);
+    election.forceDecrementVotes(voter, slashedValue, lessers, greaters, indices);
+  }
+
+  function test_ShouldDecrementPendingVotesToZero_WhenAccountHasOnlyPendingVotes() public {
+    WhenAccountHasOnlyPendingVotes();
+    assertEq(election.getPendingVotesForGroupByAccount(group, voter), remaining);
+  }
+
+  function test_ShouldDecrementTotalVotesToZero_WhenAccountHasOnlyPendingVotes() public {
+    WhenAccountHasOnlyPendingVotes();
+    assertEq(election.getTotalVotesForGroupByAccount(group, voter), remaining);
+    assertEq(election.getTotalVotesByAccount(voter), remaining);
+    assertEq(election.getTotalVotesForGroup(group), remaining);
+    assertEq(election.getTotalVotes(), remaining);
+  }
+
+  function test_ShouldRemoveTheGroupFromTheVotersVotedSet_WhenAccountHasOnlyPendingVotes() public {
+    WhenAccountHasOnlyPendingVotes();
+    assertEq(election.getGroupsVotedForByAccount(voter).length, 0);
+  }
+
+  function WhenAccountHasOnlyActiveVotes() public {
+    WhenAccountHasVotedForOneGroup();
+    vm.roll(EPOCH_SIZE + 1);
+    election.activate(group);
+    vm.prank(account2);
+
+    address[] memory lessers = new address[](1);
+    lessers[0] = address(0);
+    address[] memory greaters = new address[](1);
+    greaters[0] = address(0);
+    uint256[] memory indices = new uint256[](1);
+    indices[0] = index;
+
+    election.forceDecrementVotes(voter, slashedValue, lessers, greaters, indices);
+  }
+
+  function test_ShouldDecrementActiveVotesToZero_WhenAccountHasOnlyActiveVotes() public {
+    WhenAccountHasOnlyActiveVotes();
+    assertEq(election.getActiveVotesForGroupByAccount(group, voter), remaining);
+  }
+
+  function test_ShouldDecrementTotalVotesToZero_WhenAccountHasOnlyActiveVotes() public {
+    WhenAccountHasOnlyActiveVotes();
+    assertEq(election.getTotalVotesForGroupByAccount(group, voter), remaining);
+    assertEq(election.getTotalVotesByAccount(voter), remaining);
+    assertEq(election.getTotalVotesForGroup(group), remaining);
+    assertEq(election.getTotalVotes(), remaining);
+  }
+
+  function test_ShouldRemoveTheGroupFromTheVotersVotedSet_WhenAccountHasOnlyActiveVotes() public {
+    WhenAccountHasOnlyActiveVotes();
+    assertEq(election.getGroupsVotedForByAccount(voter).length, 0);
+  }
+
+  function WhenAccountHasVotedForMoreThanOneGroupEqually() public {
+    address[] memory membersGroup = new address[](1);
+    membersGroup[0] = account8;
+    validators.setMembers(group, membersGroup);
+
+    address[] memory membersGroup2 = new address[](1);
+    membersGroup2[0] = account9;
+    validators.setMembers(group2, membersGroup2);
+
+    registry.setAddressFor("Validators", address(this));
+    election.markGroupEligible(group, address(0), address(0));
+    election.markGroupEligible(group2, group, address(0));
+    registry.setAddressFor("Validators", address(validators));
+    lockedGold.setTotalLockedGold(value);
+    validators.setNumRegisteredValidators(2);
+    lockedGold.incrementNonvotingAccountBalance(voter, value);
+    election.vote(group, value / 2, group2, address(0));
+    election.vote(group2, value / 2, address(0), group);
+    registry.setAddressFor("LockedGold", account2);
+  }
+
+  function WhenAccountsOnlyHavePendingVotes() public {
+    WhenAccountHasVotedForMoreThanOneGroupEqually();
+    address[] memory lessers = new address[](2);
+    lessers[0] = group2;
+    lessers[1] = address(0);
+    address[] memory greaters = new address[](2);
+    greaters[0] = address(0);
+    greaters[1] = group;
+    uint256[] memory indices = new uint256[](2);
+    indices[0] = 0;
+    indices[1] = 1;
+
+    vm.prank(account2);
+    election.forceDecrementVotes(voter, slashedValue, lessers, greaters, indices);
+  }
+
+  function test_ShouldDecrementBothGroupPendingVotesToZero_WhenAccountsOnlyHavePendingVotes_WhenAccountHasVotedForMoreThanOneGroupEqually()
+    public
+  {
+    WhenAccountsOnlyHavePendingVotes();
+    assertEq(election.getPendingVotesForGroupByAccount(group, voter), remaining);
+    assertEq(election.getPendingVotesForGroupByAccount(group2, voter), remaining);
+  }
+
+  function test_ShouldDecrementBothGroupTotalVotesToZero_WhenAccountsOnlyHavePendingVotes_WhenAccountHasVotedForMoreThanOneGroupEqually()
+    public
+  {
+    WhenAccountsOnlyHavePendingVotes();
+    assertEq(election.getTotalVotesForGroupByAccount(group, voter), remaining);
+    assertEq(election.getTotalVotesForGroupByAccount(group2, voter), remaining);
+    assertEq(election.getTotalVotesByAccount(voter), remaining);
+    assertEq(election.getTotalVotesForGroup(group), remaining);
+    assertEq(election.getTotalVotesForGroup(group2), remaining);
+    assertEq(election.getTotalVotes(), remaining);
+  }
+
+  function test_ShouldRemoveBothGroupsFromTheVotersVotedSet_WhenAccountsOnlyHavePendingVotes_WhenAccountHasVotedForMoreThanOneGroupEqually()
+    public
+  {
+    WhenAccountsOnlyHavePendingVotes();
+    assertEq(election.getGroupsVotedForByAccount(voter).length, 0);
+  }
+
+  function WhenAccountHasVotedForMoreThanOneGroupInequally() public {
+    address[] memory membersGroup = new address[](1);
+    membersGroup[0] = account8;
+    validators.setMembers(group, membersGroup);
+
+    address[] memory membersGroup2 = new address[](1);
+    membersGroup2[0] = account9;
+    validators.setMembers(group2, membersGroup2);
+
+    registry.setAddressFor("Validators", address(this));
+    election.markGroupEligible(group, address(0), address(0));
+    election.markGroupEligible(group2, group, address(0));
+    registry.setAddressFor("Validators", address(validators));
+    lockedGold.setTotalLockedGold(value + value2);
+    validators.setNumRegisteredValidators(2);
+    lockedGold.incrementNonvotingAccountBalance(voter, value + value2);
+    election.vote(group2, value2 / 2, group, address(0));
+    election.vote(group, value / 2, address(0), group2);
+  }
+
+  function WhenBothGroupsHaveBothPendingAndActiveVotes_WhenAccountHasVotedForMoreThanOneGroupInequally()
+    public
+  {
+    WhenAccountHasVotedForMoreThanOneGroupInequally();
+    vm.roll(EPOCH_SIZE + 1);
+    election.activate(group);
+    vm.roll(2 * EPOCH_SIZE + 2);
+    election.activate(group2);
+
+    election.vote(group2, value2 / 2, group, address(0));
+    election.vote(group, value / 2, address(0), group2);
+
+    registry.setAddressFor("LockedGold", account2);
+
+    slashedValue = value / 2 + 1;
+    remaining = value - slashedValue;
+  }
+
+  function WhenBothGroupsHaveBothPendingAndActiveVotes_WhenAccountHasVotedForMoreThanOneGroupInequallyWithDecrement()
+    public
+  {
+    WhenBothGroupsHaveBothPendingAndActiveVotes_WhenAccountHasVotedForMoreThanOneGroupInequally();
+
+    address[] memory lessers = new address[](2);
+    lessers[0] = address(0);
+    lessers[1] = address(0);
+    address[] memory greaters = new address[](2);
+    greaters[0] = group;
+    greaters[1] = group2;
+    uint256[] memory indices = new uint256[](2);
+    indices[0] = 0;
+    indices[1] = 1;
+
+    vm.prank(account2);
+    election.forceDecrementVotes(voter, slashedValue, lessers, greaters, indices);
+  }
+
+  function test_ShouldNotAffectGroup2_WhenWeSlash1MoreVoteThanGroup1PendingVoteTotal_WhenAccountHasVotedForMoreThanOneGroupInequally()
+    public
+  {
+    WhenBothGroupsHaveBothPendingAndActiveVotes_WhenAccountHasVotedForMoreThanOneGroupInequallyWithDecrement();
+
+    assertEq(election.getTotalVotesForGroupByAccount(group2, voter), value2);
+    assertEq(election.getTotalVotesForGroup(group2), value2);
+  }
+
+  function test_ShouldReduceGroup1Votes_WhenWeSlash1MoreVoteThanGroup1PendingVoteTotal_WhenAccountHasVotedForMoreThanOneGroupInequally()
+    public
+  {
+    WhenBothGroupsHaveBothPendingAndActiveVotes_WhenAccountHasVotedForMoreThanOneGroupInequallyWithDecrement();
+
+    assertEq(election.getTotalVotesForGroupByAccount(group, voter), remaining);
+    assertEq(election.getTotalVotesForGroup(group), remaining);
+  }
+
+  function test_ShouldReduceVoterTotalVotes_WhenWeSlash1MoreVoteThanGroup1PendingVoteTotal_WhenAccountHasVotedForMoreThanOneGroupInequally()
+    public
+  {
+    WhenBothGroupsHaveBothPendingAndActiveVotes_WhenAccountHasVotedForMoreThanOneGroupInequallyWithDecrement();
+
+    assertEq(election.getTotalVotesByAccount(voter), remaining + value2);
+  }
+
+  function test_ShouldReduceGroup1PendingVotesTo0_WhenWeSlash1MoreVoteThanGroup1PendingVoteTotal_WhenAccountHasVotedForMoreThanOneGroupInequally()
+    public
+  {
+    WhenBothGroupsHaveBothPendingAndActiveVotes_WhenAccountHasVotedForMoreThanOneGroupInequallyWithDecrement();
+    assertEq(election.getPendingVotesForGroupByAccount(group, voter), 0);
+  }
+
+  function test_ShouldReduceGroup1ActiveVotesBy1_WhenWeSlash1MoreVoteThanGroup1PendingVoteTotal_WhenAccountHasVotedForMoreThanOneGroupInequally()
+    public
+  {
+    WhenBothGroupsHaveBothPendingAndActiveVotes_WhenAccountHasVotedForMoreThanOneGroupInequallyWithDecrement();
+    assertEq(election.getActiveVotesForGroupByAccount(group, voter), remaining);
+  }
+
+  uint256 totalRemaining;
+  uint256 group1Remaining;
+  uint256 group2TotalRemaining;
+  uint256 group2PendingRemaining;
+  uint256 group2ActiveRemaining;
+
+  function WhenWeSlashAllOfGroup1VotesAndSomeOfGroup2__WhenWeSlash1MoreVoteThanGroup1PendingVoteTotal_WhenAccountHasVotedForMoreThanOneGroupInequally()
+    public
+  {
+    WhenBothGroupsHaveBothPendingAndActiveVotes_WhenAccountHasVotedForMoreThanOneGroupInequally();
+
+    slashedValue = value + 1;
+
+    totalRemaining = value + value2 - slashedValue;
+    group1Remaining = 0;
+    group2TotalRemaining = value2 - 1;
+    group2PendingRemaining = value2 / 2 - 1;
+    group2ActiveRemaining = value2 / 2;
+    console.log("slashedValue", slashedValue);
+
+    address[] memory lessers = new address[](2);
+    lessers[0] = group;
+    lessers[1] = address(0);
+    address[] memory greaters = new address[](2);
+    greaters[0] = address(0);
+    greaters[1] = group2;
+    uint256[] memory indices = new uint256[](2);
+    indices[0] = 0;
+    indices[1] = 1;
+
+    vm.prank(account2);
+    election.forceDecrementVotes(voter, slashedValue, lessers, greaters, indices);
+  }
+
+  function test_ShouldDecrementGroup1Votes_WhenWeSlashAllOfGroup1VotesAndSomeOfGroup2__WhenWeSlash1MoreVoteThanGroup1PendingVoteTotal_WhenAccountHasVotedForMoreThanOneGroupInequally()
+    public
+  {
+    WhenWeSlashAllOfGroup1VotesAndSomeOfGroup2__WhenWeSlash1MoreVoteThanGroup1PendingVoteTotal_WhenAccountHasVotedForMoreThanOneGroupInequally();
+    assertEq(election.getTotalVotesForGroupByAccount(group, voter), group1Remaining);
+    assertEq(election.getTotalVotesForGroup(group), group1Remaining);
+    assertEq(election.getPendingVotesForGroupByAccount(group, voter), group1Remaining);
+    assertEq(election.getActiveVotesForGroupByAccount(group, voter), group1Remaining);
+  }
+
+  function test_ShouldDecrementGroup2Votes_WhenWeSlashAllOfGroup1VotesAndSomeOfGroup2__WhenWeSlash1MoreVoteThanGroup1PendingVoteTotal_WhenAccountHasVotedForMoreThanOneGroupInequally()
+    public
+  {
+    WhenWeSlashAllOfGroup1VotesAndSomeOfGroup2__WhenWeSlash1MoreVoteThanGroup1PendingVoteTotal_WhenAccountHasVotedForMoreThanOneGroupInequally();
+    assertEq(election.getTotalVotesForGroupByAccount(group2, voter), group2TotalRemaining);
+    assertEq(election.getTotalVotesByAccount(voter), totalRemaining);
+    assertEq(election.getPendingVotesForGroupByAccount(group2, voter), group2PendingRemaining);
+    assertEq(election.getActiveVotesForGroupByAccount(group2, voter), group2ActiveRemaining);
+  }
+
+  uint256 group1RemainingActiveVotes;
+  address[] initialOrdering;
+
+  function WhenSlashAffectsElectionOrder() public {
+    WhenAccountHasVotedForMoreThanOneGroupInequally();
+
+    slashedValue = value / 4;
+    group1RemainingActiveVotes = value - slashedValue;
+
+    election.vote(group, value / 2, group2, address(0));
+    vm.roll(EPOCH_SIZE + 1);
+    election.activate(group);
+    vm.roll(2 * EPOCH_SIZE + 2);
+    election.activate(group2);
+
+    (initialOrdering, ) = election.getTotalVotesForEligibleValidatorGroups();
+    registry.setAddressFor("LockedGold", account2);
+
+    address[] memory lessers = new address[](2);
+    lessers[0] = group;
+    lessers[1] = address(0);
+    address[] memory greaters = new address[](2);
+    greaters[0] = address(0);
+    greaters[1] = group2;
+    uint256[] memory indices = new uint256[](2);
+    indices[0] = 0;
+    indices[1] = 1;
+
+    vm.prank(account2);
+    election.forceDecrementVotes(voter, slashedValue, lessers, greaters, indices);
+  }
+
+  function test_ShouldDecrementGroup1TotalVotesByOneQuarter_WhenSlashAffectsElectionOrder() public {
+    WhenSlashAffectsElectionOrder();
+    assertEq(election.getTotalVotesForGroupByAccount(group, voter), group1RemainingActiveVotes);
+    assertEq(election.getTotalVotesForGroup(group), group1RemainingActiveVotes);
+  }
+
+  function test_ShouldChangeTheOrderingOfTheElection_WhenSlashAffectsElectionOrder() public {
+    WhenSlashAffectsElectionOrder();
+    (address[] memory newOrdering, ) = election.getTotalVotesForEligibleValidatorGroups();
+    assertEq(newOrdering[0], initialOrdering[1]);
+    assertEq(newOrdering[1], initialOrdering[0]);
+  }
+
+  function test_ShouldRevert_WhenCalledToSlashMoreValueThanGroupsHave_WhenCalledWithMalformedInputs()
+    public
+  {
+    WhenAccountHasVotedForMoreThanOneGroupInequally();
+    slashedValue = value + value2 + 1;
+    address[] memory lessers = new address[](2);
+    lessers[0] = group;
+    lessers[1] = address(0);
+    address[] memory greaters = new address[](2);
+    greaters[0] = address(0);
+    greaters[1] = group2;
+    uint256[] memory indices = new uint256[](2);
+    indices[0] = 0;
+    indices[1] = 1;
+
+    registry.setAddressFor("LockedGold", account2);
+    vm.prank(account2);
+    vm.expectRevert("Failure to decrement all votes.");
+    election.forceDecrementVotes(voter, slashedValue, lessers, greaters, indices);
+  }
+
+  function test_ShouldRevert_WhenCalledToSlashWithIncorrectLessersGreaters_WhenCalledWithMalformedInputs()
+    public
+  {
+    WhenAccountHasVotedForMoreThanOneGroupInequally();
+    slashedValue = value;
+    address[] memory lessers = new address[](2);
+    lessers[0] = address(0);
+    lessers[1] = address(0);
+    address[] memory greaters = new address[](2);
+    greaters[0] = address(0);
+    greaters[1] = group2;
+    uint256[] memory indices = new uint256[](2);
+    indices[0] = 0;
+    indices[1] = 1;
+
+    registry.setAddressFor("LockedGold", account2);
+    vm.prank(account2);
+    vm.expectRevert("greater and lesser key zero");
+    election.forceDecrementVotes(voter, slashedValue, lessers, greaters, indices);
+  }
+
+  function test_ShouldRevert_WhenCalledToSlashWithIncorrectIndices_WhenCalledWithMalformedInputs()
+    public
+  {
+    WhenAccountHasVotedForMoreThanOneGroupInequally();
+    slashedValue = value;
+    address[] memory lessers = new address[](2);
+    lessers[0] = address(0);
+    lessers[1] = address(0);
+    address[] memory greaters = new address[](2);
+    greaters[0] = address(0);
+    greaters[1] = group2;
+    uint256[] memory indices = new uint256[](2);
+    indices[0] = 0;
+    indices[1] = 0;
+
+    registry.setAddressFor("LockedGold", account2);
+    vm.prank(account2);
+    vm.expectRevert("Bad index");
+    election.forceDecrementVotes(voter, slashedValue, lessers, greaters, indices);
+  }
+
+  function test_ShouldRevert_WhenCalledByAnyoneElseThanLockedGoldContract_WhenCalledWithMalformedInputs()
+    public
+  {
+    WhenAccountHasVotedForMoreThanOneGroupInequally();
+    slashedValue = value;
+    address[] memory lessers = new address[](2);
+    lessers[0] = address(0);
+    lessers[1] = address(0);
+    address[] memory greaters = new address[](2);
+    greaters[0] = address(0);
+    greaters[1] = group2;
+    uint256[] memory indices = new uint256[](2);
+    indices[0] = 0;
+    indices[1] = 0;
+
+    vm.expectRevert("only registered contract");
+    election.forceDecrementVotes(voter, slashedValue, lessers, greaters, indices);
+  }
+}
+
+contract Election_ConsistencyChecks is ElectionTestFoundry {
+  address voter = address(this);
+  address group = account2;
+  uint256 rewardValue2 = 10000000;
+
+  function setUp() public {
+    super.setUp();
+
+  }
+
+  function checkVoterInvariants() public {}
+}
