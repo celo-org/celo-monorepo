@@ -44,11 +44,7 @@ contract MultiSigTest is Test {
   }
 }
 
-contract MultiSigInitialize is MultiSigTest {
-  function setUp() public {
-    super.setUp();
-  }
-
+contract MultiSigTest_initialize is MultiSigTest {
   function test_shouldHaveSetTheOwners() public {
     assertEq(multiSig.getOwners(), owners);
   }
@@ -67,12 +63,8 @@ contract MultiSigInitialize is MultiSigTest {
   }
 }
 
-contract MultiSigFallbackFunction is MultiSigTest {
+contract MultiSigTest_fallbackFunction is MultiSigTest {
   uint256 amount = 100;
-
-  function setUp() public {
-    super.setUp();
-  }
 
   function uncheckedSendViaCall(address payable _to, uint256 _amount) public payable {
     _to.call.value(_amount)("");
@@ -95,12 +87,8 @@ contract MultiSigFallbackFunction is MultiSigTest {
   }
 }
 
-contract MultiSigSubmitTransaction is MultiSigTest {
+contract MultiSigTest_submitTransaction is MultiSigTest {
   uint256 txId = 0;
-
-  function setUp() public {
-    super.setUp();
-  }
 
   function test_shouldAllowAnOwnerToSubmitATransaction() public {
     vm.prank(owner0);
@@ -129,7 +117,7 @@ contract MultiSigSubmitTransaction is MultiSigTest {
   }
 }
 
-contract MultiSigConfirmTransaction is MultiSigTest {
+contract MultiSigTest_confirmTransaction is MultiSigTest {
   uint256 txId = 0;
 
   function setUp() public {
@@ -161,7 +149,7 @@ contract MultiSigConfirmTransaction is MultiSigTest {
   }
 }
 
-contract MultiSigRevokeConfirmation is MultiSigTest {
+contract MultiSigTest_revokeConfirmation is MultiSigTest {
   uint256 txId = 0;
 
   function setUp() public {
@@ -189,7 +177,7 @@ contract MultiSigRevokeConfirmation is MultiSigTest {
   }
 }
 
-contract MultiSigAddOwner is MultiSigTest {
+contract MultiSigTest_addOwner is MultiSigTest {
   uint256 txId = 0;
   address[] public updatedOwners;
 
@@ -225,7 +213,7 @@ contract MultiSigAddOwner is MultiSigTest {
   }
 }
 
-contract MultiSigRemoveOwner is MultiSigTest {
+contract MultiSigTest_removeOwner is MultiSigTest {
   uint256 txId = 0;
   address[] public updatedOwners;
 
@@ -255,7 +243,7 @@ contract MultiSigRemoveOwner is MultiSigTest {
   }
 }
 
-contract MultiSigReplaceOwner is MultiSigTest {
+contract MultiSigTest_replaceOwner is MultiSigTest {
   uint256 txId = 0;
   address[] public updatedOwners;
 
@@ -302,12 +290,8 @@ contract MultiSigReplaceOwner is MultiSigTest {
   }
 }
 
-contract MultiSigChangeRequirements is MultiSigTest {
+contract MultiSigTest_changeRequirements is MultiSigTest {
   uint256 txId = 0;
-
-  function setUp() public {
-    super.setUp();
-  }
 
   function test_shouldAllowTheRequirementToBeChangedViaMultiSig() public {
     bytes memory txData_change_req = abi.encodeWithSignature("changeRequirement(uint256)", 1);
@@ -327,12 +311,8 @@ contract MultiSigChangeRequirements is MultiSigTest {
   }
 }
 
-contract MultiSigChangeInternalRequirements is MultiSigTest {
+contract MultiSigTest_changeInternalRequirements is MultiSigTest {
   uint256 txId = 0;
-
-  function setUp() public {
-    super.setUp();
-  }
 
   function test_shouldAllowTheInternalRequirementToBeChangedViaMultiSig() public {
     bytes memory txData_change_req = abi.encodeWithSignature(
@@ -355,7 +335,7 @@ contract MultiSigChangeInternalRequirements is MultiSigTest {
   }
 }
 
-contract MultiSigGetConfirmationCount is MultiSigTest {
+contract MultiSigTest_confirmationCount is MultiSigTest {
   uint256 txId = 0;
 
   function setUp() public {
@@ -369,7 +349,7 @@ contract MultiSigGetConfirmationCount is MultiSigTest {
   }
 }
 
-contract MultiSigGetTransactionCount is MultiSigTest {
+contract MultiSigTest_getTransactionCount is MultiSigTest {
   uint256 txId = 0;
 
   function setUp() public {
@@ -383,7 +363,7 @@ contract MultiSigGetTransactionCount is MultiSigTest {
   }
 }
 
-contract MultiSigGetOwners is MultiSigTest {
+contract MultiSigTest_getOwners is MultiSigTest {
   function setUp() public {
     super.setUp();
   }
@@ -393,7 +373,7 @@ contract MultiSigGetOwners is MultiSigTest {
   }
 }
 
-contract MultiSigGetConfirmations is MultiSigTest {
+contract MultiSigTest_getConfirmations is MultiSigTest {
   uint256 txId = 0;
 
   function setUp() public {
@@ -409,7 +389,7 @@ contract MultiSigGetConfirmations is MultiSigTest {
   }
 }
 
-contract MultiSigGetTransactionIds is MultiSigTest {
+contract MultiSigTest_getTransactionIds is MultiSigTest {
   uint256 txId = 0;
 
   function setUp() public {

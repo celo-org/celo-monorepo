@@ -53,7 +53,7 @@ contract GasPriceMinimumTest is Test {
   }
 }
 
-contract GasPriceMinimumInitialize is GasPriceMinimumTest {
+contract GasPriceMinimumTest_initialize is GasPriceMinimumTest {
   function test_shouldHaveSetOwner() public {
     assertEq(gasPriceMinimum.owner(), owner);
   }
@@ -86,7 +86,7 @@ contract GasPriceMinimumInitialize is GasPriceMinimumTest {
   }
 }
 
-contract GasPriceMinimumSetAdjustmentSpeed is GasPriceMinimumTest {
+contract GasPriceMinimumTest_setAdjustmentSpeed is GasPriceMinimumTest {
   using FixidityLib for FixidityLib.Fraction;
 
   uint256 newAdjustmentSpeed = FixidityLib.newFixedFraction(1, 3).unwrap();
@@ -115,7 +115,7 @@ contract GasPriceMinimumSetAdjustmentSpeed is GasPriceMinimumTest {
   }
 }
 
-contract GasPriceMinimumSetTargetDensity is GasPriceMinimumTest {
+contract GasPriceMinimumTest_setTargetDensity is GasPriceMinimumTest {
   using FixidityLib for FixidityLib.Fraction;
 
   uint256 newTargetDensity = FixidityLib.newFixedFraction(1, 3).unwrap();
@@ -143,7 +143,7 @@ contract GasPriceMinimumSetTargetDensity is GasPriceMinimumTest {
   }
 }
 
-contract GasPriceMinimumSetGasPriceMinimumFloor is GasPriceMinimumTest {
+contract GasPriceMinimumTest_setGasPriceMinimumFloor is GasPriceMinimumTest {
   uint256 newGasPriceMinimumFloor = 150;
 
   function test_ShouldSetGasPriceMinimumFloor() public {
@@ -170,7 +170,7 @@ contract GasPriceMinimumSetGasPriceMinimumFloor is GasPriceMinimumTest {
   }
 }
 
-contract GasPriceMinimumGetUpdatedGasPriceMinimum is GasPriceMinimumTest {
+contract GasPriceMinimumTest_setUpdatedGasPriceMinimum is GasPriceMinimumTest {
   using FixidityLib for FixidityLib.Fraction;
   uint256 nonce = 0;
 

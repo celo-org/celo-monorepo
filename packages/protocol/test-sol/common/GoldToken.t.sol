@@ -23,7 +23,7 @@ contract GoldTokenTest is Test {
   }
 }
 
-contract BasicGoldTokenTest is GoldTokenTest {
+contract GoldTokenTest_General is GoldTokenTest {
   function setUp() public {
     super.setUp();
   }
@@ -73,7 +73,7 @@ contract BasicGoldTokenTest is GoldTokenTest {
   }
 }
 
-contract GoldTokenTransfer is GoldTokenTest {
+contract GoldTokenTest_transfer is GoldTokenTest {
   function setUp() public {
     super.setUp();
   }
@@ -108,7 +108,7 @@ contract GoldTokenTransfer is GoldTokenTest {
   }
 }
 
-contract GoldTokenTransferFrom is GoldTokenTest {
+contract GoldTokenTest_transferFrom is GoldTokenTest {
   function setUp() public {
     super.setUp();
     vm.prank(sender);
@@ -145,7 +145,7 @@ contract GoldTokenTransferFrom is GoldTokenTest {
   }
 }
 
-contract BurnGoldToken is GoldTokenTest {
+contract GoldTokenTest_burn is GoldTokenTest {
   uint256 startBurn;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
 
@@ -183,7 +183,7 @@ contract MockGoldTokenTest is Test {
   }
 }
 
-contract MockGoldTokenCirculatingSupply is MockGoldTokenTest {
+contract MockGoldToken_circulatingSupply is MockGoldTokenTest {
   function setUp() public {
     super.setUp();
   }

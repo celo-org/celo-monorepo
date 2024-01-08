@@ -6,7 +6,7 @@ import "celo-foundry/Test.sol";
 // Contract to test
 import "@celo-contracts/common/test/LinkedListWrapper.sol";
 
-contract LinkedListInsert is Test {
+contract LinkedListTest_Insert is Test {
   LinkedListWrapper linkedList;
   bytes32 private constant NULL_KEY = bytes32(uint256(0x00));
   bytes32 private constant FIRST_KEY = bytes32(uint256(0x01));
@@ -87,7 +87,7 @@ contract LinkedListInsert is Test {
   }
 }
 
-contract LinkedListRemove is Test {
+contract LinkedListTest_remove is Test {
   LinkedListWrapper linkedList;
 
   bytes32 private constant NULL_KEY = bytes32(uint256(0x00));

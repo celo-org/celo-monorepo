@@ -201,7 +201,7 @@ contract AccountsTest is Test {
   }
 }
 
-contract AccountsCreateAccount is AccountsTest {
+contract AccountsTest_createAccount is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -219,7 +219,7 @@ contract AccountsCreateAccount is AccountsTest {
   }
 }
 
-contract AccountsSetAccountDataEncryptionKey is AccountsTest {
+contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -253,7 +253,7 @@ contract AccountsSetAccountDataEncryptionKey is AccountsTest {
   }
 }
 
-contract AccountsSetAccount is AccountsTest {
+contract AccountsTest_setAccount is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -339,7 +339,7 @@ contract AccountsSetAccount is AccountsTest {
   }
 }
 
-contract AccountsSetWalletAddress is AccountsTest {
+contract AccountsTest_setWalletAddress is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -389,7 +389,7 @@ contract AccountsSetWalletAddress is AccountsTest {
   }
 }
 
-contract AccountsSetMetadataURL is AccountsTest {
+contract AccountsTest_setMetadataURL is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -413,7 +413,7 @@ contract AccountsSetMetadataURL is AccountsTest {
   }
 }
 
-contract AccountsBatchGetMetadataURL is AccountsTest {
+contract AccountsTest_batchGetMetadataURL is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -464,7 +464,7 @@ contract AccountsBatchGetMetadataURL is AccountsTest {
   }
 }
 
-contract AccountsAddStorageRoot is AccountsTest {
+contract AccountsTest_addStorageRoot is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -510,7 +510,7 @@ contract AccountsAddStorageRoot is AccountsTest {
   }
 }
 
-contract AccountsRemoveStorageRoot is AccountsTest {
+contract AccountsTest_removeStorageRoot is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -586,7 +586,7 @@ contract AccountsRemoveStorageRoot is AccountsTest {
   }
 }
 
-contract AccountsSetPaymentDelegation is AccountsTest {
+contract AccountsTest_setPaymentDelegation is AccountsTest {
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
   uint256 badFraction = FixidityLib.newFixedFraction(12, 10).unwrap();
@@ -628,7 +628,7 @@ contract AccountsSetPaymentDelegation is AccountsTest {
   }
 }
 
-contract AccountsDeletePaymentDelegation is AccountsTest {
+contract AccountsTest_deletePaymentDelegation is AccountsTest {
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
 
@@ -658,7 +658,7 @@ contract AccountsDeletePaymentDelegation is AccountsTest {
   }
 }
 
-contract AccountsSetName is AccountsTest {
+contract AccountsTest_setName is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -682,7 +682,7 @@ contract AccountsSetName is AccountsTest {
   }
 }
 
-contract AccountsGenericAuthorization is AccountsTest {
+contract AccountsTest_GenericAuthorization is AccountsTest {
   address account2 = actor("account2");
   address signer;
   uint256 signerPK;
@@ -866,7 +866,7 @@ contract AccountsGenericAuthorization is AccountsTest {
   }
 }
 
-contract AccountsBackwardCompatibility is AccountsTest {
+contract AccountsTest_BackwardCompatibility is AccountsTest {
   address account = address(this);
   address otherAccount = actor("otherAccount");
 
