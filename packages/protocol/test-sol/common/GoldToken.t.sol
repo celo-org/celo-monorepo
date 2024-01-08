@@ -172,18 +172,18 @@ contract GoldTokenTest_burn is GoldTokenTest {
   }
 }
 
-contract MockGoldTokenTest is Test {
-  MockGoldToken mockGoldToken;
+contract GoldTokenMockTest is Test {
+  GoldTokenMock mockGoldToken;
   uint256 ONE_GOLDTOKEN = 1000000000000000000;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
 
   function setUp() public {
-    mockGoldToken = new MockGoldToken();
+    mockGoldToken = new GoldTokenMock();
     mockGoldToken.setTotalSupply(ONE_GOLDTOKEN * 1000);
   }
 }
 
-contract MockGoldToken_circulatingSupply is MockGoldTokenTest {
+contract GoldTokenMock_circulatingSupply is GoldTokenMockTest {
   function setUp() public {
     super.setUp();
   }
