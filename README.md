@@ -106,7 +106,6 @@ The repository has the following packages (sub projects):
 
 - [celotool](packages/celotool) - scripts for deploying and managing testnets
 - [dev-utils](packages/dev-utils) - a utils package for use as a dev dependency
--
 - [helm-charts](packages/helm-charts) - (DEPRECATED) templatized deployments of entire environments to Kubernetes clusters. Check [celo-org/charts](https://github.com/celo-org/charts) instead.
 - [protocol](packages/protocol) - identity, stability and other smart contracts for the Celo protocol ([docs](https://docs.celo.org/protocol))
 
