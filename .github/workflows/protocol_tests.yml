@@ -12,6 +12,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - name: Fail if there are test with wrong extension
+        if: success() || failure()
+        run: |
+          if  tree test-sol | grep -i ".sol" | grep -v ".sol"; then
+            echo "There are tests with wrong extensions"
+            tree test-sol | grep -i ".sol" | grep -v ".sol"
+            exit 1
+          fi
       - name: Foundry cache
         id: foundry-cache
         uses: actions/cache@v3

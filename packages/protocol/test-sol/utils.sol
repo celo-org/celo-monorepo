@@ -7,4 +7,8 @@ contract Utils is Test {
     vm.warp(block.timestamp + timeDelta);
   }
 
+  function blockTravel(uint256 blockTravel) public {
+    vm.roll(block.number + blockTravel);
+  }
+
 }
