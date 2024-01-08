@@ -7,7 +7,7 @@ import "@celo-contracts/identity/test/AttestationsTest.sol";
 import "@celo-contracts/identity/FederatedAttestations.sol";
 import "@celo-contracts/identity/test/MockERC20Token.sol";
 import "@celo-contracts/identity/test/MockRandom.sol";
-import "@test-sol/governance/network/ElectionMock.sol";
+import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/common/Registry.sol";
@@ -25,7 +25,7 @@ contract FederatedAttestationsFoundryTest is Test {
   AttestationsTest attestationsTest;
   MockERC20Token mockERC20Token;
   MockERC20Token otherMockERC20Token;
-  ElectionMock mockElection;
+  MockElection mockElection;
   MockLockedGold mockLockedGold;
   MockValidators mockValidators;
   MockRandom random;
@@ -335,7 +335,7 @@ contract FederatedAttestationsFoundryTest is Test {
     attestationsTest = new AttestationsTest();
     mockERC20Token = new MockERC20Token();
     otherMockERC20Token = new MockERC20Token();
-    mockElection = new ElectionMock();
+    mockElection = new MockElection();
     mockLockedGold = new MockLockedGold();
     mockValidators = new MockValidators();
     random = new MockRandom();

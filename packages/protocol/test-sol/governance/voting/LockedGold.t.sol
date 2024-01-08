@@ -12,7 +12,7 @@ import "@celo-contracts/governance/LockedGold.sol";
 import "@celo-contracts/governance/ReleaseGold.sol";
 import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/stability/test/MockStableToken.sol";
-import "@test-sol/governance/network/ElectionMock.sol";
+import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockGovernance.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 
@@ -23,7 +23,7 @@ contract LockedGoldTest is Test {
   Accounts accounts;
   GoldToken goldToken;
   MockStableToken stableToken;
-  ElectionMock election;
+  MockElection election;
   MockGovernance governance;
   MockValidators validators;
   LockedGold lockedGold;
@@ -71,7 +71,7 @@ contract LockedGoldTest is Test {
     goldToken = new GoldTokenMock();
     accounts = new Accounts(true);
     lockedGold = new LockedGold(true);
-    election = new ElectionMock();
+    election = new MockElection();
     validators = new MockValidators();
     governance = new MockGovernance();
     stableToken = new MockStableToken();

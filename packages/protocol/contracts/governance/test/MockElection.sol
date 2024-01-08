@@ -3,7 +3,7 @@ pragma solidity ^0.5.13;
 /**
  * @title Holds a list of addresses of validators
  */
-contract ElectionMock {
+contract MockElection {
   mapping(address => bool) public isIneligible;
   mapping(address => bool) public isEligible;
   mapping(address => bool) public allowedToVoteOverMaxNumberOfGroups;
