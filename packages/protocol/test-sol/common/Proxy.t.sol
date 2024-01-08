@@ -64,7 +64,7 @@ contract ProxyTest_setImplementation is ProxyTest {
     assertEq(proxiedGetSet.get(), numberTotest);
   }
 
-  function test_ShouldEmitImplementationSet() public {
+  function test_Emits_ImplementationSet() public {
     vm.expectEmit(true, true, true, true);
     emit ImplementationSet(address(getSet));
     proxy._setImplementation(address(getSet));
@@ -89,7 +89,7 @@ contract ProxyTest_setAndInitializeImplementation is ProxyTest {
     assertEq(proxy._getImplementation(), address(hasInitializer));
   }
 
-  function test_ShouldEmitImplementationSet() public {
+  function test_Emits_ImplementationSet() public {
     vm.expectEmit(true, true, true, true);
     emit ImplementationSet(address(hasInitializer));
     proxy._setAndInitializeImplementation(
