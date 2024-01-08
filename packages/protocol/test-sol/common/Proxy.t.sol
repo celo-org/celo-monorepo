@@ -17,10 +17,12 @@ contract ProxyTest is Test, Constants, Utils {
   GetSetV0 getSet;
   GetSetV0 proxiedGetSet;
 
+  address nonOwner;
   event ImplementationSet(address indexed implementation);
   event OwnerSet(address indexed owner);
 
   function setUp() public {
+    nonOwner = actor("nonOwner");
     proxy = new Proxy();
     getSet = new GetSetV0();
     proxiedGetSet = new GetSetV0();
@@ -39,9 +41,9 @@ contract ProxyTest_setImplementation is ProxyTest {
     assertEq(proxy._getImplementation(), address(getSet));
   }
 
-  function test_shouldNotAllowANonOwnerToSetAnImplementation() public {
+  function test_Reverts_NonOwnerSsetAnImplementation() public {
     vm.expectRevert("sender was not owner");
-    vm.prank(msg.sender);
+    vm.prank(nonOwner);
     proxy._setImplementation(address(getSet));
   }
 
@@ -96,25 +98,25 @@ contract ProxyTest_setAndInitializeImplementation is ProxyTest {
     );
   }
 
-  function test_test_ShouldRevert_WhenCalledANonContractAddress() public {
+  function test_Reverts_WhenCalledANonContractAddress() public {
     vm.expectRevert("sender was not owner");
-    vm.prank(msg.sender);
+    vm.prank(nonOwner);
     proxy._setAndInitializeImplementation(
-      address(msg.sender),
+      address(nonOwner),
       abi.encodeWithSignature("initialize(uint256)", 42)
     );
   }
 
-  function test_ShouldRevert_WehCalleBbyANonOwner() public {
+  function test_Reverts_WehCalleBbyANonOwner() public {
     vm.expectRevert("sender was not owner");
-    vm.prank(msg.sender);
+    vm.prank(nonOwner);
     proxy._setAndInitializeImplementation(
       address(hasInitializer),
       abi.encodeWithSignature("initialize(uint256)", 42)
     );
   }
 
-  function test_ShouldRevert_WhenInitializeAlreadyCalled() public {
+  function test_Reverts_WhenInitializeAlreadyCalled() public {
     proxy._setAndInitializeImplementation(
       address(hasInitializer),
       abi.encodeWithSignature("initialize(uint256)", 42)
@@ -132,10 +134,10 @@ contract ProxyTest_transferOwnership is ProxyTest {
     assertEq(proxy._getOwner(), newOwner);
   }
 
-  function test_ShouldRevert_ShouldNotAllowANonOwnerToTransferOwnership() public {
-    vm.prank(msg.sender);
+  function test_Reverts_ShouldNotAllowANonOwnerToTransferOwnership() public {
+    vm.prank(nonOwner);
     vm.expectRevert("sender was not owner");
-    proxy._transferOwnership(msg.sender);
+    proxy._transferOwnership(nonOwner);
   }
 
   function test_ShouldEmitOwnerSet() public {
@@ -144,14 +146,14 @@ contract ProxyTest_transferOwnership is ProxyTest {
     proxy._transferOwnership(newOwner);
   }
 
-  function test_ShouldAllowTheNewOwnerToPerformOwneronlyActions_WhenTransferedOwnership() public {
+  function test_ShouldAllowTheNewOwnerToPerformOwneronlyActions_AfterTransferingOwnership() public {
     GetSetV1 getSet1 = new GetSetV1();
     proxy._transferOwnership(newOwner);
     vm.prank(newOwner);
     proxy._setImplementation(address(getSet1));
   }
 
-  function test_ShouldRevert_OldOwnerPerformsOwneronlyActions_WhenTransferedOwnership() public {
+  function test_Reverts_OldOwnerPerformsOwnerOnlyActions_AfterTransferingOwnership() public {
     GetSetV1 getSet1 = new GetSetV1();
     proxy._transferOwnership(newOwner);
     vm.expectRevert("sender was not owner");
@@ -189,7 +191,7 @@ contract ProxyTest_fallback is ProxyTest {
     proxiedMsgSenderCheck.checkMsgSender(address(this));
   }
 
-  function test_ShouldBeAbleToProxyToTheNewContract_WhenChangingTheImplementation() public {
+  function test_ShouldBeAbleToProxyToTheNewContract_AfterChangingTheImplementation() public {
     GetSetV1 getSet1 = new GetSetV1();
     GetSetV1 proxiedGetSet1 = GetSetV1(address(proxy));
     proxy._setImplementation(address(getSet1));
