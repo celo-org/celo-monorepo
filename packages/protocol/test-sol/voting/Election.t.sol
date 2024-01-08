@@ -3,7 +3,6 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import { Test } from "celo-foundry/Test.sol";
-import { TestSortedLinkedList } from "../../contracts/stability/TestSortedLinkedList.sol";
 import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/governance/Election.sol";
 import "../../contracts/governance/test/MockLockedGold.sol";
