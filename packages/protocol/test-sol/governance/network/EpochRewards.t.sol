@@ -50,7 +50,7 @@ contract EpochRewardsTest is Test, Constants, Utils {
 
   // Mocked contracts
   EpochRewardsMock epochRewards;
-  MockElection eElection;
+  MockElection election;
   MockSortedOracles mockSortedOracles;
   MockStableToken mockStableToken;
   GoldTokenMock mockGoldToken;
@@ -70,7 +70,7 @@ contract EpochRewardsTest is Test, Constants, Utils {
   function setUp() public {
     // Mocked contracts
     epochRewards = new EpochRewardsMock();
-    eElection = new MockElection();
+    election = new MockElection();
     mockSortedOracles = new MockSortedOracles();
     mockStableToken = new MockStableToken();
     mockGoldToken = new GoldTokenMock();
@@ -78,7 +78,7 @@ contract EpochRewardsTest is Test, Constants, Utils {
     freezer = new Freezer(true);
     registry = new Registry(true);
 
-    registry.setAddressFor(ElectionContract, address(eElection));
+    registry.setAddressFor(ElectionContract, address(election));
     registry.setAddressFor(SortedOraclesContract, address(mockSortedOracles));
     registry.setAddressFor(StableTokenContract, address(mockStableToken));
     registry.setAddressFor(GoldTokenContract, address(mockGoldToken));
@@ -397,7 +397,7 @@ contract EpochRewardsTest_getTargetGoldTotalSupply is EpochRewardsTest {
 contract EpochRewardsTest_getTargetVoterRewards is EpochRewardsTest {
   function test_ShouldReturnAPercentageOfActiveVotes_WhenThereAreActiveVotes() public {
     uint256 activeVotes = 1000000;
-    eElection.setActiveVotes(activeVotes);
+    election.setActiveVotes(activeVotes);
 
     uint256 expected = uint256((activeVotes * targetVotingYieldParamsInitial) / FIXED1);
     assertEq(epochRewards.getTargetVoterRewards(), expected);
@@ -498,7 +498,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
   }
 
   function mockVotes(uint256 votes) internal {
-    eElection.setTotalVotes(votes);
+    election.setTotalVotes(votes);
     vm.prank(address(0));
     epochRewards.updateTargetVotingYield();
   }
@@ -610,7 +610,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     public
   {
     uint256 totalVotes = (floatingSupply * 98) / 100;
-    eElection.setTotalVotes(totalVotes);
+    election.setTotalVotes(totalVotes);
     // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
     for (uint256 i = 0; i < 800; i++) {
       vm.prank(address(0));
@@ -625,7 +625,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     public
   {
     uint256 totalVotes = (floatingSupply * 3) / 10;
-    eElection.setTotalVotes(totalVotes);
+    election.setTotalVotes(totalVotes);
     // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
     for (uint256 i = 0; i < 5; i++) {
       vm.prank(address(0));
@@ -645,7 +645,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     public
   {
     uint256 totalVotes = (floatingSupply * 8) / 10;
-    eElection.setTotalVotes(totalVotes);
+    election.setTotalVotes(totalVotes);
     // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
     for (uint256 i = 0; i < 5; i++) {
       vm.prank(address(0));
@@ -694,7 +694,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     public
   {
     uint256 totalVotes = (floatingSupply * (targetVotingGoldFraction - 0.1e24)) / FIXED1;
-    eElection.setTotalVotes(totalVotes);
+    election.setTotalVotes(totalVotes);
     for (uint256 i = 0; i < 356; i++) {
       vm.prank(address(0));
       epochRewards.updateTargetVotingYield();
@@ -710,7 +710,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     public
   {
     uint256 totalVotes = (floatingSupply * (targetVotingGoldFraction + 0.1e24)) / FIXED1;
-    eElection.setTotalVotes(totalVotes);
+    election.setTotalVotes(totalVotes);
     for (uint256 i = 0; i < 356; i++) {
       vm.prank(address(0));
       epochRewards.updateTargetVotingYield();
@@ -738,7 +738,7 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
     super.setUp();
 
     epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
-    eElection.setActiveVotes(activeVotes);
+    election.setActiveVotes(activeVotes);
     uint256 expectedTargetTotalEpochPaymentsInGold = (targetValidatorEpochPayment *
       numberValidators) /
       exchangeRate;
