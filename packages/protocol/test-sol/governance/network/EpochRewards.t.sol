@@ -5,7 +5,7 @@ import "celo-foundry/Test.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Freezer.sol";
 
-import { ElectionMock } from "@celo-contracts/governance/test/ElectionMock.sol";
+import { ElectionMock } from "@test-sol/governance/network/ElectionMock.sol";
 import { EpochRewardsMock } from "@celo-contracts/governance/test/EpochRewardsMock.sol";
 import { Reserve } from "@lib/mento-core/contracts/Reserve.sol";
 

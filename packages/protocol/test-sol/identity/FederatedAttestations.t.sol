@@ -7,7 +7,7 @@ import "@celo-contracts/identity/test/AttestationsTest.sol";
 import "@celo-contracts/identity/FederatedAttestations.sol";
 import "@celo-contracts/identity/test/MockERC20Token.sol";
 import "@celo-contracts/identity/test/MockRandom.sol";
-import "@celo-contracts/governance/test/ElectionMock.sol";
+import "@test-sol/ElectionMock.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/common/Registry.sol";

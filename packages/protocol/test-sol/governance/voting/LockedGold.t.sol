@@ -12,7 +12,7 @@ import "@celo-contracts/governance/LockedGold.sol";
 import "@celo-contracts/governance/ReleaseGold.sol";
 import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/stability/test/MockStableToken.sol";
-import "@celo-contracts/governance/test/ElectionMock.sol";
+import "@test-sol/ElectionMock.sol";
 import "@celo-contracts/governance/test/MockGovernance.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 
