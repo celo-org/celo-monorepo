@@ -37,7 +37,7 @@ contract HeapMock {
   }
 }
 
-contract HeapTestTest is Test {
+contract HeapTest is Test {
   HeapMock heapTest;
 
   mapping(uint256 => bool) public helperMapping;

@@ -11,7 +11,7 @@ import { Reserve } from "@lib/mento-core/contracts/Reserve.sol";
 
 import { MockSortedOracles } from "@celo-contracts/stability/test/MockSortedOracles.sol";
 import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.sol";
-import { MockGoldToken } from "@test-sol/common/GoldTokenMock.sol";
+import { GoldTokenMock } from "@test-sol/common/GoldTokenMock.sol";
 
 import { Constants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
@@ -53,7 +53,7 @@ contract EpochRewardsTest is Test, Constants, Utils {
   ElectionMock mockElection;
   MockSortedOracles mockSortedOracles;
   MockStableToken mockStableToken;
-  MockGoldToken mockGoldToken;
+  GoldTokenMock mockGoldToken;
   Reserve reserve;
   Freezer freezer;
 
@@ -73,7 +73,7 @@ contract EpochRewardsTest is Test, Constants, Utils {
     mockElection = new ElectionMock();
     mockSortedOracles = new MockSortedOracles();
     mockStableToken = new MockStableToken();
-    mockGoldToken = new MockGoldToken();
+    mockGoldToken = new GoldTokenMock();
 
     freezer = new Freezer(true);
     registry = new Registry(true);

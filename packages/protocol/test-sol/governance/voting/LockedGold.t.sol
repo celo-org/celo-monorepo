@@ -68,7 +68,7 @@ contract LockedGoldTest is Test {
     deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
     registry = Registry(registryAddress);
 
-    goldToken = new MockGoldToken();
+    goldToken = new GoldTokenMock();
     accounts = new Accounts(true);
     lockedGold = new LockedGold(true);
     election = new ElectionMock();
