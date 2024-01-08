@@ -69,7 +69,7 @@ contract BlockchainParametersTest_setBlockGasLimit is BlockchainParametersTest {
     blockchainParameters.setBlockGasLimit(gasLimit);
   }
 
-  function test_Reverts_WhenCalledByNonOwner() public {
+  function test_t_Reverts_WhenCalledByNonOwner() public {
     vm.prank(nonOwner);
     vm.expectRevert("Ownable: caller is not the owner");
     blockchainParameters.setBlockGasLimit(gasLimit);

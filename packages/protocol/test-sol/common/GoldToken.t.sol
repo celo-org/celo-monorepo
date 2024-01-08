@@ -3,7 +3,7 @@ pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
 import "@celo-contracts/common/GoldToken.sol";
-import "@celo-contracts/common/test/MockGoldToken.sol";
+import "./GoldTokenMock.sol";
 
 contract GoldTokenTest is Test {
   GoldToken goldToken;

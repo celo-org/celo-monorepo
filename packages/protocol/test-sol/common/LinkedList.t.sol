@@ -6,17 +6,21 @@ import "celo-foundry/Test.sol";
 // Contract to test
 import "@celo-contracts/common/test/LinkedListWrapper.sol";
 
-contract LinkedListTest_Insert is Test {
+contract LinkedListTest is Test {
   LinkedListWrapper linkedList;
-  bytes32 private constant NULL_KEY = bytes32(uint256(0x00));
-  bytes32 private constant FIRST_KEY = bytes32(uint256(0x01));
-  bytes32 private constant SECOND_KEY = bytes32(uint256(0x02));
-  bytes32 private constant THIRD_KEY = bytes32(uint256(0x03));
-  bytes32 private constant ADDED_KEY = bytes32(uint256(0x04));
+  bytes32 internal constant NULL_KEY = bytes32(uint256(0x00));
+  bytes32 internal constant FIRST_KEY = bytes32(uint256(0x01));
+  bytes32 internal constant SECOND_KEY = bytes32(uint256(0x02));
+  bytes32 internal constant THIRD_KEY = bytes32(uint256(0x03));
+  bytes32 internal constant ADDED_KEY = bytes32(uint256(0x04));
+
   function setUp() public {
     linkedList = new LinkedListWrapper();
   }
 
+}
+
+contract LinkedListTest_insert is LinkedListTest {
   function setUpListWithManyElements() private {
     linkedList.insert(FIRST_KEY, NULL_KEY, NULL_KEY);
     linkedList.insert(SECOND_KEY, NULL_KEY, FIRST_KEY);
@@ -87,19 +91,7 @@ contract LinkedListTest_Insert is Test {
   }
 }
 
-contract LinkedListTest_remove is Test {
-  LinkedListWrapper linkedList;
-
-  bytes32 private constant NULL_KEY = bytes32(uint256(0x00));
-  bytes32 private constant FIRST_KEY = bytes32(uint256(0x01));
-  bytes32 private constant SECOND_KEY = bytes32(uint256(0x02));
-  bytes32 private constant THIRD_KEY = bytes32(uint256(0x03));
-  bytes32 private constant ADDED_KEY = bytes32(uint256(0x04));
-
-  function setUp() public {
-    linkedList = new LinkedListWrapper();
-  }
-
+contract LinkedListTest_remove is LinkedListTest {
   function setUpListWithManyElements() private {
     linkedList.insert(FIRST_KEY, NULL_KEY, NULL_KEY);
     linkedList.insert(SECOND_KEY, FIRST_KEY, NULL_KEY);

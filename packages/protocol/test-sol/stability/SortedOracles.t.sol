@@ -4,9 +4,9 @@ pragma experimental ABIEncoderV2;
 
 import { Test } from "celo-foundry/Test.sol";
 import { SortedOracles } from "../../contracts/stability/SortedOracles.sol";
-import "../../contracts/common/FixidityLib.sol";
-import "../../contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol";
-import "../../contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
+import "@celo-contracts/common/FixidityLib.sol";
+import "@celo-contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol";
+import "@celo-contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
 import { Constants } from "../constants.sol";
 
 contract SortedOraclesTest is Test, Constants {
