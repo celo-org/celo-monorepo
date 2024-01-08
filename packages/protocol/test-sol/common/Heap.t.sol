@@ -2,8 +2,7 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
-import "../../contracts/common/libraries/Heap.sol";
-import "forge-std/console.sol";
+import "@celo-contracts/common/libraries/Heap.sol";
 
 contract HeapTest {
   using FixidityLib for FixidityLib.Fraction;
