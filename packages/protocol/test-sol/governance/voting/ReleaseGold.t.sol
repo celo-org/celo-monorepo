@@ -706,7 +706,7 @@ contract SetMaxDistribution is ReleaseGoldTest {
     assertTrue(releaseGold.maxDistribution() >= TOTAL_AMOUNT);
   }
 
-  function test_ShouldRevertWhenTryingToLowerMaxDistribution() public {
+  function test_ShouldRevertWhenTryingToLowerMaxDistribution_WhenMaxDistributionIsSetTo100Percent() public {
     vm.prank(releaseOwner);
     releaseGold.setMaxDistribution(1000);
     vm.prank(releaseOwner);
