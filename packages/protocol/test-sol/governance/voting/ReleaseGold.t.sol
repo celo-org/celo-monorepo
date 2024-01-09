@@ -1476,7 +1476,7 @@ contract WithdrawLockedGold is ReleaseGoldTest {
     newReleaseGold(true, false);
   }
 
-  function test_ShouldRemoveThePendingWithdrawal_WhenItIsAfterTheAvailabilityTimeAndWhenPendingWithdrawalExits()
+  function test_ShouldRemoveThePendingWithdrawal_WhenItIsAfterTheAvailabilityTime_WhenPendingWithdrawalExits()
     public
   {
     vm.startPrank(beneficiary);
