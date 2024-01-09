@@ -572,7 +572,7 @@ contract SetAccountWalletAddress is ReleaseGoldTest {
     releaseGold.setAccountWalletAddress(walletAddress, v, r, s);
   }
 
-  function test_ShouldAllowBeneficiaryToSetNullAddress() public {
+  function test_ShouldAllowBeneficiaryToSetNullAddress_WhenAccountWasCreatedAndUnrevoked() public {
     vm.prank(beneficiary);
     releaseGold.createAccount();
     vm.prank(beneficiary);
