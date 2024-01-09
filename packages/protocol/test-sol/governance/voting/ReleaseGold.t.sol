@@ -1015,7 +1015,7 @@ contract AuthorizationTests is ReleaseGoldTest {
     assertEq(accounts.authorizedBy(authorized), address(releaseGold));
   }
 
-  function test_ShouldNotPreserveOriginalAuthorizationWhenNewAuthorizedAttestationSigner_WhenPreviousAuthorizationHasBeenMade()
+  function test_ShouldPreserveOriginalAuthorizationWhenNewAuthorizedAttestationSigner_WhenPreviousAuthorizationHasBeenMade()
     public
   {
     vm.prank(beneficiary);
