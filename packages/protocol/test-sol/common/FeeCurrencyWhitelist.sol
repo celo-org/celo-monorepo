@@ -46,7 +46,7 @@ contract FeeCurrencyWhitelistAddToken is FeeCurrencyWhitelistTest {
   }
 }
 
-contract FeeCurrencyWhitelistRemopv is FeeCurrencyWhitelistTest {
+contract FeeCurrencyWhitelistRemoveToken is FeeCurrencyWhitelistTest {
   function setUp() public {
     super.setUp();
     feeCurrencyWhitelist.addToken(address(1));
