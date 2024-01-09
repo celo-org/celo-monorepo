@@ -1599,7 +1599,7 @@ contract RelockGold is ReleaseGoldTest {
     assertEq(values[0], 1);
   }
 
-  function test_ShouldRevert_WhenRelockingValueLessToValueOfThePendingWithdrawalAndWhenPendingWithdrawalExits()
+  function test_ShouldRevert_WhenRelockingValueLessToValueOfThePendingWithdrawal_WhenPendingWithdrawalExits()
     public
   {
     vm.expectRevert("Requested value larger than pending value");
