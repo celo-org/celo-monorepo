@@ -62,7 +62,7 @@ contract FeeCurrencyWhitelistRemoveToken is FeeCurrencyWhitelistTest {
     assertEq(whitelist[1], address(3));
   }
 
-  function test_ShouldNotRemoveWhenIndexIsWrong() public {
+  function test_RevertWhen_IndexIsWrong() public {
     vm.expectRevert("Index does not match");
     feeCurrencyWhitelist.removeToken(address(2), 2);
   }
