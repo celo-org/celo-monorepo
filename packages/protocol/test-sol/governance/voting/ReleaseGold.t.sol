@@ -1999,7 +1999,7 @@ contract GetCurrentReleasedTotalAmount is ReleaseGoldTest {
     assertEq(releaseGold.getCurrentReleasedTotalAmount(), (initialReleaseGoldAmount / 4) * 3);
   }
 
-  function test_ShouldReturn1000PercentOfReleasedAmountOfGoldRightAfterTheBeginningOfTheFourthQuarter()
+  function test_ShouldReturn100PercentOfReleasedAmountOfGoldRightAfterTheBeginningOfTheFourthQuarter()
     public
   {
     vm.warp(block.timestamp + 12 * MONTH + 1 * DAY);
