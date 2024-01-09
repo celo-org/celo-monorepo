@@ -1250,7 +1250,7 @@ contract Expire is ReleaseGoldTest {
     assertEq(releasedBalanceAtRevoke, TOTAL_AMOUNT / 2);
   }
 
-  function test_ShouldAllowToRefundOfAllRemainingGold_WhenCalledReleaseOwner_WhenEXPIRATION_TIMEHasPassedAfterReleaseScheduleCompletionAndBeneficiaryHasWithdrawnSomeBalance()
+  function test_ShouldAllowToRefundOfAllRemainingGold_WhenAnInstanceIsExpired_WhenBeneficiaryHasWithdrawnSomeBalance_WhenEXPIRATION_TIMEHasPassedAfterReleaseScheduleCompletionAndBeneficiaryHasWithdrawnSomeBalance()
     public
   {
     (uint256 releaseStartTime, , uint256 numReleasePeriods, uint256 releasePeriod, ) = releaseGold
