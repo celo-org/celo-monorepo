@@ -41,7 +41,7 @@ contract ProxyTest_setImplementation is ProxyTest {
     assertEq(proxy._getImplementation(), address(getSet));
   }
 
-  function test_t_Reverts_NonOwnerSsetAnImplementation() public {
+  function test_Reverts_NonOwnerSsetAnImplementation() public {
     vm.expectRevert("sender was not owner");
     vm.prank(nonOwner);
     proxy._setImplementation(address(getSet));
@@ -98,7 +98,7 @@ contract ProxyTest_setAndInitializeImplementation is ProxyTest {
     );
   }
 
-  function test_t_Reverts_WhenCalledANonContractAddress() public {
+  function test_Reverts_WhenCalledANonContractAddress() public {
     vm.expectRevert("sender was not owner");
     vm.prank(nonOwner);
     proxy._setAndInitializeImplementation(
@@ -107,7 +107,7 @@ contract ProxyTest_setAndInitializeImplementation is ProxyTest {
     );
   }
 
-  function test_t_Reverts_WehCalleBbyANonOwner() public {
+  function test_Reverts_WehCalleBbyANonOwner() public {
     vm.expectRevert("sender was not owner");
     vm.prank(nonOwner);
     proxy._setAndInitializeImplementation(
@@ -116,7 +116,7 @@ contract ProxyTest_setAndInitializeImplementation is ProxyTest {
     );
   }
 
-  function test_t_Reverts_WhenInitializeAlreadyCalled() public {
+  function test_Reverts_WhenInitializeAlreadyCalled() public {
     proxy._setAndInitializeImplementation(
       address(hasInitializer),
       abi.encodeWithSignature("initialize(uint256)", 42)
@@ -134,7 +134,7 @@ contract ProxyTest_transferOwnership is ProxyTest {
     assertEq(proxy._getOwner(), newOwner);
   }
 
-  function test_t_Reverts_ShouldNotAllowANonOwnerToTransferOwnership() public {
+  function test_Reverts_ShouldNotAllowANonOwnerToTransferOwnership() public {
     vm.prank(nonOwner);
     vm.expectRevert("sender was not owner");
     proxy._transferOwnership(nonOwner);
@@ -153,7 +153,7 @@ contract ProxyTest_transferOwnership is ProxyTest {
     proxy._setImplementation(address(getSet1));
   }
 
-  function test_t_Reverts_OldOwnerPerformsOwnerOnlyActions_AfterTransferingOwnership() public {
+  function test_Reverts_OldOwnerPerformsOwnerOnlyActions_AfterTransferingOwnership() public {
     GetSetV1 getSet1 = new GetSetV1();
     proxy._transferOwnership(newOwner);
     vm.expectRevert("sender was not owner");
