@@ -1354,7 +1354,7 @@ contract ExpireSelfDestructTest is ReleaseGoldTest {
     releaseGold.refundAndFinalize();
   }
 
-  function test_ShouldDestructReleaseGoldInstanceAfterFinalizingAndPReventCallingFurtherActions_WhenRevoked()
+  function test_ShouldDestructReleaseGoldInstanceAfterFinalizingAndPreventCallingFurtherActions_WhenRevoked()
     public
   {
     vm.expectRevert();
