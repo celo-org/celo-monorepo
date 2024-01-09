@@ -3,7 +3,6 @@ pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
 import "../../contracts/common/FeeCurrencyWhitelist.sol";
-import "forge-std/console.sol";
 
 contract FeeCurrencyWhitelistTest is Test {
   FeeCurrencyWhitelist feeCurrencyWhitelist;
@@ -20,26 +19,26 @@ contract FeeCurrencyWhitelistTest is Test {
 }
 
 contract FeeCurrencyWhitelistInitialize is FeeCurrencyWhitelistTest {
-  function testInitializeOwner() public {
+  function test_InitializeOwner() public {
     assertTrue(feeCurrencyWhitelist.isOwner());
     assertEq(feeCurrencyWhitelist.owner(), address(this));
   }
 
-  function testShouldNotBeCallableAgain() public {
+  function test_ShouldNotBeCallableAgain() public {
     vm.expectRevert("contract already initialized");
     feeCurrencyWhitelist.initialize();
   }
 }
 
 contract FeeCurrencyWhitelistAddToken is FeeCurrencyWhitelistTest {
-  function testShouldAllowTheOwnerToAddAToken() public {
+  function test_ShouldAllowTheOwnerToAddAToken() public {
     feeCurrencyWhitelist.addToken(address(1));
     address[] memory whitelist = feeCurrencyWhitelist.getWhitelist();
     assertEq(whitelist.length, 1);
     assertEq(whitelist[0], address(1));
   }
 
-  function testShouldNotAllowNonOwnerToAddAToken() public {
+  function test_ShouldRevert_WhenNonOwnerAddsAToken() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(nonOwner);
     feeCurrencyWhitelist.addToken(address(1));
@@ -54,7 +53,7 @@ contract FeeCurrencyWhitelistRemoveToken is FeeCurrencyWhitelistTest {
     feeCurrencyWhitelist.addToken(address(3));
   }
 
-  function testShouldRemove() public {
+  function test_ShouldRemoveToken() public {
     feeCurrencyWhitelist.removeToken(address(2), 1);
     address[] memory whitelist = feeCurrencyWhitelist.getWhitelist();
     assertEq(whitelist.length, 2);
@@ -62,12 +61,12 @@ contract FeeCurrencyWhitelistRemoveToken is FeeCurrencyWhitelistTest {
     assertEq(whitelist[1], address(3));
   }
 
-  function test_RevertWhen_IndexIsWrong() public {
+  function test_ShouldRevert_WhenIndexIsWrong() public {
     vm.expectRevert("Index does not match");
     feeCurrencyWhitelist.removeToken(address(2), 2);
   }
 
-  function test_RevertWhen_NonOwnerRemovesToken() public {
+  function test_ShouldRevert_WhenNonOwnerRemovesToken() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(nonOwner);
     feeCurrencyWhitelist.removeToken(address(2), 1);
