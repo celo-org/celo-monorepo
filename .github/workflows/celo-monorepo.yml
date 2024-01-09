@@ -97,7 +97,7 @@ jobs:
       # Get workdir local changes and fail if there are any change
       - name: Verify Changed files
         id: verify-changed-files
-        uses: tj-actions/verify-changed-files@v16
+        uses: tj-actions/verify-changed-files@v17
         with:
           fail-if-changed: 'true'
           fail-message: 'Files changed during build. Please build locally and commit the changes.'
@@ -128,7 +128,7 @@ jobs:
             code-${{ github.sha }}
       - name: Detect files changed in PR (or commit), and expose as output
         id: changed-files
-        uses: tj-actions/changed-files@v40
+        uses: tj-actions/changed-files@v41
         with:
           # Using comma as separator to be able to easily match full paths (using ,<path>)
           separator: ','
@@ -247,9 +247,6 @@ jobs:
           - name: Protocol Compatibility
             command: |
               yarn --cwd packages/protocol test compatibility/
-          - name: Protocol Governance Network
-            command: |
-              yarn --cwd packages/protocol test governance/network/
           - name: Protocol Governance Validators
             command: |
               yarn --cwd packages/protocol test governance/validators/

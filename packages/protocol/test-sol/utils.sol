@@ -71,4 +71,8 @@ contract Utils is Test {
         (max - min + 1)) +
       min;
   }
+  function blockTravel(uint256 blockTravel) public {
+    vm.roll(block.number + blockTravel);
+  }
+
 }
