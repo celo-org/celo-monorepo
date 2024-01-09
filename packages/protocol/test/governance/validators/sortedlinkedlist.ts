@@ -34,7 +34,10 @@ contract('IntegerSortedLinkedListTest', () => {
     }
 
     const randomElement = (list: any[]) => {
-      return list[Math.floor(BigNumber.random().times(list.length).toNumber())]
+      let element = list[Math.floor(BigNumber.random().times(list.length).toNumber())]
+      console.log(`### generated random element: ${element}`)
+      return element
+      // return list[Math.floor(BigNumber.random().times(list.length).toNumber())]
     }
 
     const makeActionSequence = (length: number, numKeys: number): SortedLinkedListAction[] => {
@@ -56,6 +59,7 @@ contract('IntegerSortedLinkedListTest', () => {
           action = SortedLinkedListActionType.Insert
           listKeys.add(key.toNumber())
         }
+        console.log(`### action: ${action}`)
         sequence.push({
           actionType: action,
           element: {
@@ -129,9 +133,14 @@ contract('IntegerSortedLinkedListTest', () => {
           } else {
             const { lesser, greater } = await getLesserAndGreater(action.element)
             if (action.actionType === SortedLinkedListActionType.Insert) {
+              console.log(`### Inserting key: ${action.element.key}`)
+              console.log(`### Inserting value: ${action.element.value}`)
+              console.log(`###lesser: ${lesser}`)
+              console.log(`###greater: ${greater}`)
               await sortedListTest.insert(action.element.key, action.element.value, lesser, greater)
               listKeys.add(action.element.key.toNumber())
             } else if (action.actionType === SortedLinkedListActionType.Update) {
+              console.log('### Update Action Type')
               await sortedListTest.update(action.element.key, action.element.value, lesser, greater)
             }
           }
@@ -187,30 +196,38 @@ contract('IntegerSortedLinkedListTest', () => {
       const numKeys = 10
       const getRandomKeys = async () => {
         const [keys] = await sortedListTest.getElements()
-        keys.map((val) => console.log(val.toNumber()))
+        console.log(`### full list: ${keys.toString()}`)
+        console.log(`### number of returned elements: ${keys.length}`)
+        // keys.map((val) => console.log(`### val from keys: ${val.toNumber()}`))
 
         const getLesserOrGreater = () => {
           const r = BigNumber.random()
           console.log(`r value: ${r}`)
           const nonElement = () => {
             let i = 0
+            console.log('### getting non element')
             while (keys.includes(new BigNumber(i))) {
               i++
+              console.log('### was included')
             }
+            console.log(`### returning nonElement ${new BigNumber(i)}`)
             return new BigNumber(i)
           }
 
           if (r.isLessThan(0.33)) {
+            console.log('### r < 33%')
             return randomElement(keys)
           } else if (r.isLessThan(0.66)) {
+            console.log('### r < 66%')
             return nonElement()
           } else {
+            console.log('### Otherwise')
             return new BigNumber(0)
           }
         }
         return { lesser: getLesserOrGreater(), greater: getLesserOrGreater() }
       }
-      await doActionsAndAssertInvariants(numReports, numKeys, getRandomKeys, true)
+      await doActionsAndAssertInvariants(numReports, numKeys, getRandomKeys, false)
     })
   })
 })

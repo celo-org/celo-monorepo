@@ -1,14 +1,18 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity >=0.5.13 <0.8.20;
 pragma experimental ABIEncoderV2;
 
-import "celo-foundry/Test.sol";
-import "forge-std/console.sol";
+import "celo-foundry-8/Test.sol";
+import "forge-std-8/console.sol";
+
+import { CommonBase } from "forge-std-8/Base.sol";
+import { StdCheats } from "forge-std-8/StdCheats.sol";
+import { StdUtils } from "forge-std-8/StdUtils.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "@celo-contracts/common/test/IntegerSortedLinkedListTest.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@celo-contracts-8/common/test/IntegerSortedLinkedListTest.sol";
 
 contract IntegerSortedLinkedListBaseTest is Test {
   IntegerSortedLinkedListTest public integerSortedLinkedListTest;
@@ -27,26 +31,30 @@ contract IntegerSortedLinkedListBaseTest is Test {
 
   uint256[] public listKeys;
 
-  function setUp() public {
+  function setUp() public virtual {
     integerSortedLinkedListTest = new IntegerSortedLinkedListTest();
   }
 
   /// Simulate randomness using the current block's hash
   function getRandomValue() internal view returns (uint256) {
-    bytes32 hash = blockhash(block.number);
+    bytes32 hash = blockhash(block.number); //TODO fix this value to make it random.
     return uint256(hash);
   }
 
   /// Simulate randomness using the last block's hash
-  function getRandomActionType() internal view returns (ActionType) {
-    bytes32 hash = blockhash(block.number - 1);
-    uint256 randomValue = uint256(hash) % 2;
+  function getRandomActionType() internal returns (ActionType) {
+    // bytes32 hash = blockhash(vm.unixTime());
+    uint256 randomValue = uint256(keccak256(abi.encodePacked(vm.unixTime()))) % 2;
+    vm.sleep(1);
+    // uint256 randomValue = uint256(hash) % 2;
+    console.log("### Action type value:");
+    console.log(randomValue);
+    // console.logBytes32(hash);
     return ActionType(randomValue);
   }
 
   function makeActionSequence(uint256 _length, uint256 _numKeys)
     internal
-    view
     returns (Action[] memory)
   {
     require(_numKeys > 0, "numKeys must be greater than 0");
@@ -62,19 +70,24 @@ contract IntegerSortedLinkedListBaseTest is Test {
     uint256 currentIndex = 0;
 
     for (uint256 i = 0; i < _length; i++) {
-      uint256 key = keyOptions[i % _numKeys];
+      uint256 key = randomElement(keyOptions);
+      // uint256 key = keyOptions[i % _numKeys];
       ActionType action;
 
       if (contains(_listKeys, key)) {
         action = getRandomActionType();
 
         if (action == ActionType.Remove) {
+          console.log("### remove action type");
+          console.log(key);
+          console.log(_listKeys.length);
           _listKeys = removeFromArray(_listKeys, key);
         }
       } else {
         action = ActionType.Insert;
-        console.log("Inserted Action type");
+        console.log("### Insert Action type");
         console.log(key);
+
         _listKeys[currentIndex] = key;
         currentIndex++;
       }
@@ -103,6 +116,15 @@ contract IntegerSortedLinkedListBaseTest is Test {
         listKeys = removeFromArray(listKeys, action.element.key);
       } else {
         (uint256 lesser, uint256 greater) = getLesserAndGreater(action.element);
+
+        console.log("### Lesser");
+        console.log(lesser);
+        console.log("### Greater");
+        console.log(greater);
+        console.log("### key");
+        console.log(action.element.key);
+        console.log("### value");
+        console.log(action.element.value);
 
         if (action.actionType == ActionType.Insert) {
           integerSortedLinkedListTest.insert(
@@ -142,21 +164,6 @@ contract IntegerSortedLinkedListBaseTest is Test {
         );
       }
     }
-  }
-
-  function containz(uint256[] memory array, uint256 value) internal returns (bool) {
-    for (uint256 i = 0; i < array.length; i++) {
-      console.log("### Index");
-      console.log(i);
-      console.log("### expected value");
-      console.log(value);
-      if (array[i] == value) {
-        console.log("### contains stuff");
-        return true;
-      }
-    }
-    console.log("### does not contains stuff");
-    return false;
   }
 
   function contains(uint256[] memory array, uint256 value) internal pure returns (bool) {
@@ -247,15 +254,15 @@ contract IntegerSortedLinkedListBaseTest is Test {
   function assertSortedLinkedListInvariants(
     uint256[] memory keys,
     uint256[] memory values,
-    uint256 numElements,
-    uint256 head,
-    uint256 tail,
-    uint256[] memory expectedKeys
+    uint256 numElements, // fetched
+    uint256 head, // fetched
+    uint256 tail, // fetched
+    uint256[] memory expectedKeys // from handler
   ) internal {
     console.log("### Asserting Invariants");
     SortedElement[] memory sortedElements = parseElements(keys, values);
 
-    assertEq(numElements, expectedKeys.length, "Incorrect number of elements here");
+    assertEq(numElements, expectedKeys.length, "Incorrect number of elements");
     assertEq(sortedElements.length, expectedKeys.length, "Incorrect number of elements");
     assertSorted(sortedElements);
     if (sortedElements.length > 0) {
@@ -266,6 +273,28 @@ contract IntegerSortedLinkedListBaseTest is Test {
       assertEq(tail, 0, "Tail not Zero");
     }
     console.log("### Asserted Invariants");
+  }
+
+  function randomElement(uint256[] memory list) internal returns (uint256) {
+    console.log("gettting random element w/unix timestamp");
+    uint256 curTime = vm.unixTime();
+    // console.log("### curTime2:");
+    uint256 index = 0;
+    console.log(curTime);
+    if (list.length == 0) {
+      index = 0;
+      // index = uint256(keccak256(abi.encodePacked(curTime, block.difficulty))) % 10;
+    }
+    index = uint256(keccak256(abi.encodePacked(curTime))) % list.length;
+
+    // index = uint256(keccak256(abi.encodePacked(curTime, block.difficulty))) % list.length;
+
+    vm.sleep(1); // Halts execution for 1 milliseconds
+
+    console.log("### index:");
+    console.log(index);
+
+    return list[index];
   }
 }
 
@@ -337,7 +366,7 @@ contract IntegerSortedLinkedListUpdate is IntegerSortedLinkedListBaseTest {
   uint256 value = 10;
   uint256 newValue = 20;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     integerSortedLinkedListTest.insert(key, value, 0, 0);
   }
@@ -374,7 +403,7 @@ contract IntegerSortedLinkedListRemove is IntegerSortedLinkedListBaseTest {
   uint256 key = 1;
   uint256 value = 10;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     integerSortedLinkedListTest.insert(key, value, 0, 0);
   }
@@ -413,7 +442,7 @@ contract IntegerSortedLinkedListPopN is IntegerSortedLinkedListBaseTest {
   uint256 n = 3;
   uint256 numElements = 10;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     for (uint256 key = 1; key < numElements + 1; key++) {
@@ -478,171 +507,115 @@ contract IntegerSortedLinkedListPopN is IntegerSortedLinkedListBaseTest {
   }
 }
 
-contract IntegerSortedLinkedListWhenMultipleInsertsUpdatesAndRemovals is
+contract IntegerSortedLinkedListInvariantWhenMultipleInsertsUpdatesAndRemovals is
   IntegerSortedLinkedListBaseTest
 {
-  using SafeMath for uint256;
-  using FixidityLib for FixidityLib.Fraction;
+  Handler public handler;
 
-  function test_ShouldMaintainInvariantsWhenLesserAndGreaterAreCorrect() public {
-    doActionsAndAssertInvariants(100, 20, false);
+  function setUp() public override {
+    super.setUp();
+
+    handler = new Handler(integerSortedLinkedListTest);
+    targetContract(address(handler));
+
+    bytes4[] memory selectors = new bytes4[](3);
+
+    selectors[0] = handler.insert.selector;
+    selectors[1] = handler.update.selector;
+    selectors[2] = handler.remove.selector;
+    targetSelector(FuzzSelector({ addr: address(handler), selectors: selectors }));
   }
 
-  function test_ShouldMaintainInvariantsWhenLesserAndGreaterAreIncorrect() public {
-    doActionsAndAssertInvariants2(200, 10, true);
-  }
+  function assertInvariants() public {
+    assertEq(
+      integerSortedLinkedListTest.getNumElements(),
+      handler.actionListLength(),
+      "Incorrect number of elements here"
+    );
 
-  uint256 ay = 0;
-
-  function nonElement(uint256[] memory _keys) internal returns (uint256) {
-    // uint256 i = 0;
-    if (_keys.length < 1) {
-      console.log("### No keys found");
-      return ay;
-    }
-    while (containz(_keys, ay)) {
-      ay = ay.add(1);
-      console.log("### contained ay");
-    }
-    console.log("### returning ay");
-    console.log(ay);
-    return ay;
-  }
-
-  function getRandomKeys() public returns (uint256 lesser, uint256 greater) {
-    console.log("### getting random keys");
-    (uint256[] memory _keys, ) = integerSortedLinkedListTest.getElements();
-    console.log("### keys length");
-    console.log(_keys.length);
-
-    if (_keys.length > 0) {
-      console.log("### first key:");
-      console.log(_keys[0]);
-    }
-
-    lesser = getLesserOrGreater(_keys);
-    greater = getLesserOrGreater(_keys);
-
-    console.log("### final lesser & greater");
-    console.log(lesser);
-    console.log(greater);
-  }
-
-  function getLesserOrGreater(uint256[] memory _keys) internal returns (uint256) {
-    uint256 r = uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty))) % 100;
-    // uint256 r = uint256(71) % 100;
-    console.log("### r value");
-    console.log(r);
-
-    if (r < 33) {
-      uint256 rand = randomElement(_keys);
-      console.log("### returning Random");
-      console.log(rand);
-      return rand;
-      // return randomElement(_keys);
-    } else if (r < 66) {
-      uint256 nonElem = nonElement(_keys);
-      console.log("### returning nonElement");
-      console.log(nonElem);
-      return nonElem;
-      // return nonElement(_keys);
-    } else {
-      return 0;
-    }
-  }
-
-  function randomElement(uint256[] memory list) internal view returns (uint256) {
-    uint256 index = uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty))) %
-      list.length;
-    return list[index];
-  }
-
-  function doActionsAndAssertInvariants2(uint256 numActions, uint256 numKeys, bool allowFailingTx)
-    internal
-  {
-    Action[] memory sequence = makeActionSequence(numActions, numKeys);
-
-    console.log("### sequence length");
-    console.log(sequence.length);
-
-    uint256 successes = 0;
-
-    for (uint256 i = 0; i < numActions; i++) {
-      Action memory action = sequence[i];
-
-      if (action.actionType == ActionType.Remove) {
-        console.log("### Remove Action");
-        integerSortedLinkedListTest.remove(action.element.key);
-        listKeys = removeFromArray(listKeys, action.element.key);
-      } else {
-        (uint256 lesser, uint256 greater) = getRandomKeys();
-
-        // (uint256 lesser, uint256 greater) = getLesserAndGreater(action.element);
-
-        if (action.actionType == ActionType.Insert) {
-          console.log("### inserting Action");
-          console.log(action.element.key);
-          console.log(action.element.value);
-
-          integerSortedLinkedListTest.insert(
-            action.element.key,
-            action.element.value,
-            lesser,
-            greater
-          );
-
-          listKeys.push(action.element.key);
-        } else if (action.actionType == ActionType.Update) {
-          console.log("### Update Action");
-          integerSortedLinkedListTest.update(
-            action.element.key,
-            action.element.value,
-            lesser,
-            greater
-          );
-        }
-      }
-
-      successes += 1;
-      (uint256[] memory keys, uint256[] memory values) = integerSortedLinkedListTest.getElements();
-      assertSortedLinkedListInvariants(
-        keys,
-        values,
-        integerSortedLinkedListTest.getNumElements(),
-        integerSortedLinkedListTest.head(),
+    (uint256[] memory keys, uint256[] memory values) = integerSortedLinkedListTest.getElements();
+    SortedElement[] memory sortedElements = parseElements(keys, values);
+    assertSorted(sortedElements);
+    if (sortedElements.length > 0) {
+      assertEq(integerSortedLinkedListTest.head(), sortedElements[0].key, "Incorrect head");
+      assertEq(
         integerSortedLinkedListTest.tail(),
-        listKeys
+        sortedElements[sortedElements.length - 1].key,
+        "Incorrect tail"
       );
-
-      // if (allowFailingTx) {
-      //   uint256 expectedSuccessRate = (2 * 10 ** 18) / numKeys; // 2.0 represented in fixed-point
-      //   successes
-      //   require(
-      //     (successes * 10 ** 18) / numActions >= (expectedSuccessRate * 75) / 100,
-      //     "Success rate not met"
-      //   );
-      // }
-      if (allowFailingTx) {
-        FixidityLib.Fraction memory expectedSuccessRate = FixidityLib.newFixedFraction(2, numKeys);
-        FixidityLib.Fraction memory seventyFivePercent = FixidityLib.newFixedFraction(75, 100);
-        FixidityLib.Fraction memory successRatio = FixidityLib.newFixedFraction(
-          successes,
-          numActions
-        );
-
-        require(
-          FixidityLib.fromFixed(successRatio) >=
-            FixidityLib.fromFixed(expectedSuccessRate).mul(
-              FixidityLib.fromFixed(seventyFivePercent)
-            ),
-          "Success rate not met"
-        );
-        console.log("### success Rate Met");
-        // require(
-        //   successes.div(numActions) >= expectedSuccessRate.mul(seventyFivePercent),
-        //   "Success rate not met"
-        // );
-      }
+    } else {
+      assertEq(integerSortedLinkedListTest.head(), 0, "Head not zero");
+      assertEq(integerSortedLinkedListTest.tail(), 0, "Tail not Zero");
     }
+  }
+
+  /// forge-config: default.invariant.runs = 256
+  /// forge-config: default.invariant.depth = 100
+  /// forge-config: default.invariant.fail-on-revert = false
+
+  function invariant_ShouldMaintainInvariantsWhenLesserAndGreaterAreCorrect() public {
+    assertInvariants();
+  }
+
+  /// forge-config: default.invariant.runs = 256
+  /// forge-config: default.invariant.depth = 200
+  /// forge-config: default.invariant.fail-on-revert = true
+
+  function invariant_ShouldMaintainInvariantsWhenLesserAndGreaterAreIncorrect() public {
+    assertInvariants();
+  }
+}
+
+contract Handler is CommonBase, StdCheats, StdUtils {
+  constructor(IntegerSortedLinkedListTest _integerSortedLinkedList) {
+    listTest = _integerSortedLinkedList;
+  }
+
+  uint256 public actionListLength;
+
+  IntegerSortedLinkedListTest private listTest;
+
+  function insert(uint256 key, uint256 value, uint256 lesserKey, uint256 greaterKey) external {
+    key = bound(key, 0, 9);
+    lesserKey = bound(lesserKey, 0, 9);
+    greaterKey = bound(greaterKey, 0, 9);
+
+    actionListLength++;
+
+    listTest.insert(key, value, lesserKey, greaterKey);
+    console.log("### Inserted");
+    console.log(key);
+    console.log(value);
+    console.log(lesserKey);
+    console.log(greaterKey);
+  }
+
+  function update(uint256 key, uint256 value, uint256 lesserKey, uint256 greaterKey) external {
+    key = bound(key, 0, 9);
+    lesserKey = bound(lesserKey, 0, 9);
+    greaterKey = bound(greaterKey, 0, 9);
+
+    listTest.update(key, value, lesserKey, greaterKey);
+    console.log("### Updated");
+    console.log(key);
+    console.log(value);
+  }
+
+  function remove(uint256 key) external {
+    key = bound(key, 0, 9);
+
+    actionListLength--;
+
+    listTest.remove(key);
+    console.log("### Removed");
+    console.log(key);
+  }
+
+  function getNumElements() external view returns (uint256) {
+    return listTest.getNumElements();
+  }
+
+  function getElements() external view returns (uint256[] memory, uint256[] memory) {
+    return listTest.getElements();
   }
 }
