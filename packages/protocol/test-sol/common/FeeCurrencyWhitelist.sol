@@ -67,7 +67,7 @@ contract FeeCurrencyWhitelistRemoveToken is FeeCurrencyWhitelistTest {
     feeCurrencyWhitelist.removeToken(address(2), 2);
   }
 
-  function test_ShouldNotAllowNonOwnerToRemove() public {
+  function test_RevertWhen_NonOwnerRemovesToken() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(nonOwner);
     feeCurrencyWhitelist.removeToken(address(2), 1);
