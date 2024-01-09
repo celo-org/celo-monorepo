@@ -1783,7 +1783,7 @@ contract Withdraw is ReleaseGoldTest {
     releaseGold.withdraw(expectedWIthdrawalAmount);
   }
 
-  function test_ShouldAllowDistributionOfInitialBalanceAndRewards_WhenTheGrantHasFullyReleased_WhenRewardsAreSimulated__WhenNotRevoked_WhenMaxDistributionIs50Percent()
+  function test_ShouldRevertWhenWithdrawing MoreThan50Percent_WhenTheGrantHasFullyReleased_WhenRewardsAreSimulated__WhenNotRevoked_WhenMaxDistributionIs50Percent()
     public
   {
     vm.prank(releaseOwner);
