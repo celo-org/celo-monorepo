@@ -979,7 +979,7 @@ contract AuthorizationTests is ReleaseGoldTest {
     assertEq(otherAccountBalanceAfter - otherAccountBalanceBefore, 0);
   }
 
-  function test_ShouldNotPreserveOriginalAuthorizationWhenNewAuthorizedVoteSigner_WhenPreviousAuthorizationHasBeenMade()
+  function test_ShouldPreserveOriginalAuthorizationWhenNewAuthorizedVoteSigner_WhenPreviousAuthorizationHasBeenMade()
     public
   {
     vm.prank(beneficiary);
