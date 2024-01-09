@@ -1513,7 +1513,7 @@ contract WithdrawLockedGold is ReleaseGoldTest {
     vm.stopPrank();
   }
 
-  function test_ShouldRevertWhenCalledByNonBeneficiary_WhenItIsAfterTheAvailabilityTimeAndWhenPendingWithdrawalExits()
+  function test_ShouldRevert_WhenCalledByNonBeneficiary_WhenItIsAfterTheAvailabilityTime_WhenPendingWithdrawalExits()
     public
   {
     vm.startPrank(beneficiary);
