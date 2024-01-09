@@ -1528,7 +1528,7 @@ contract WithdrawLockedGold is ReleaseGoldTest {
     releaseGold.withdrawLockedGold(index);
   }
 
-  function test_ShouldRevertWhenPendingWithdrawalDoesNotExist() public {
+  function test_ShouldRevert_WhenPendingWithdrawalDoesNotExist() public {
     vm.prank(beneficiary);
     releaseGold.createAccount();
 
