@@ -172,7 +172,7 @@ contract ReleaseGoldTest is Test {
   }
 }
 
-contract Initialize is ReleaseGoldTest {
+contract ReleaseGoldInitialize is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
   }
