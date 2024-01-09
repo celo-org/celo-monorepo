@@ -1316,7 +1316,7 @@ contract RefundAndFinalize is ReleaseGoldTest {
     releaseGold.refundAndFinalize();
   }
 
-  function test_ShouldTransferGoldProportionsToBOthBeneficiaryAndRefundAddressWhenNoGoldLocked_WhenRevoked()
+  function test_ShouldTransferGoldProportionsToBothBeneficiaryAndRefundAddressWhenNoGoldLocked_WhenRevoked()
     public
   {
     vm.prank(releaseOwner);
