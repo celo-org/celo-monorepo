@@ -552,7 +552,7 @@ contract Election_Vote is ElectionTestFoundry {
 
   function WhenVotesAreBeingActivated() public returns (address newGroup) {
     newGroup = WhenVotedForMoreThanMaxNumberOfGroups();
-    vm.roll(EPOCH_SIZE + 1);
+    blockTravel(EPOCH_SIZE + 1);
     election.activateForAccount(group, voter);
   }
 
@@ -664,7 +664,7 @@ contract Election_Activate is ElectionTestFoundry {
 
   function WhenEpochBoundaryHasPassed() public {
     WhenVoterHasPendingVotes();
-    vm.roll(EPOCH_SIZE + 1);
+    blockTravel(EPOCH_SIZE + 1);
     election.activate(group);
   }
 
@@ -706,7 +706,7 @@ contract Election_Activate is ElectionTestFoundry {
 
   function test_ShouldEmitValidatorGroupVoteActivatedEvent_WhenEpochBoundaryHasPassed() public {
     WhenVoterHasPendingVotes();
-    vm.roll(EPOCH_SIZE + 1);
+    blockTravel(EPOCH_SIZE + 1);
     vm.expectEmit(true, true, true, false);
     emit ValidatorGroupVoteActivated(voter, group, value, value * 100000000000000000000);
     election.activate(group);
@@ -720,7 +720,7 @@ contract Election_Activate is ElectionTestFoundry {
     lockedGold.incrementNonvotingAccountBalance(voter2, value2);
     vm.prank(voter2);
     election.vote(group, value2, address(0), address(0));
-    vm.roll(2 * EPOCH_SIZE + 2);
+    blockTravel(EPOCH_SIZE + 1);
     vm.prank(voter2);
     election.activate(group);
   }
@@ -820,7 +820,7 @@ contract Election_ActivateForAccount is ElectionTestFoundry {
 
   function WhenEpochBoundaryHasPassed() public {
     WhenVoterHasPendingVotes();
-    vm.roll(EPOCH_SIZE + 1);
+    blockTravel(EPOCH_SIZE + 1);
     election.activateForAccount(group, voter);
   }
 
@@ -862,7 +862,7 @@ contract Election_ActivateForAccount is ElectionTestFoundry {
 
   function test_ShouldEmitValidatorGroupVoteActivatedEvent_WhenEpochBoundaryHasPassed() public {
     WhenVoterHasPendingVotes();
-    vm.roll(EPOCH_SIZE + 1);
+    blockTravel(EPOCH_SIZE + 1);
     vm.expectEmit(true, true, true, false);
     emit ValidatorGroupVoteActivated(voter, group, value, value * 100000000000000000000);
     election.activate(group);
@@ -876,7 +876,7 @@ contract Election_ActivateForAccount is ElectionTestFoundry {
     lockedGold.incrementNonvotingAccountBalance(voter2, value2);
     vm.prank(voter2);
     election.vote(group, value2, address(0), address(0));
-    vm.roll(2 * EPOCH_SIZE + 2);
+    blockTravel(EPOCH_SIZE + 1);
     election.activateForAccount(group, voter2);
   }
 
@@ -1147,7 +1147,7 @@ contract Election_RevokeActive is ElectionTestFoundry {
     // Gives 1000 units to voter 0
     election.vote(group, voteValue0, address(0), address(0));
     assertConsistentSums();
-    vm.roll(EPOCH_SIZE + 1);
+    blockTravel(EPOCH_SIZE + 1);
     election.activate(group);
     assertConsistentSums();
 
@@ -1159,7 +1159,7 @@ contract Election_RevokeActive is ElectionTestFoundry {
     vm.prank(voter1);
     election.vote(group, voteValue1, address(0), address(0));
     assertConsistentSums();
-    vm.roll(2 * EPOCH_SIZE + 2);
+    blockTravel(EPOCH_SIZE + 1);
     vm.prank(voter1);
     election.activate(group);
     assertConsistentSums();
@@ -1669,7 +1669,7 @@ contract Election_GetGroupEpochRewards is ElectionTestFoundry {
   }
 
   function WhenOneGroupHasActiveVotes() public {
-    vm.roll(EPOCH_SIZE + 1);
+    blockTravel(EPOCH_SIZE + 1);
     election.activate(group1);
   }
 
@@ -1708,7 +1708,7 @@ contract Election_GetGroupEpochRewards is ElectionTestFoundry {
   }
 
   function WhenTwoGroupsHaveActiveVotes() public {
-    vm.roll(EPOCH_SIZE + 1);
+    blockTravel(EPOCH_SIZE + 1);
     election.activate(group1);
     election.activate(group2);
   }
@@ -1780,7 +1780,7 @@ contract Election_DistributeEpochRewards is ElectionTestFoundry {
     lockedGold.incrementNonvotingAccountBalance(voter, voteValue);
     election.vote(group, voteValue, address(0), address(0));
 
-    vm.roll(EPOCH_SIZE + 1);
+    blockTravel(EPOCH_SIZE + 1);
     election.activate(group);
   }
 
@@ -1835,7 +1835,7 @@ contract Election_DistributeEpochRewards is ElectionTestFoundry {
     // Split voter2's vote between the two groups.
     election.vote(group, voteValue2 / 2, group2, address(0));
     election.vote(group2, voteValue2 / 2, address(0), group);
-    vm.roll(2 * EPOCH_SIZE + 2);
+    blockTravel(EPOCH_SIZE + 1);
     election.activate(group);
     election.activate(group2);
     vm.stopPrank();
@@ -1980,7 +1980,7 @@ contract Election_ForceDecrementVotes is ElectionTestFoundry {
 
   function WhenAccountHasOnlyActiveVotes() public {
     WhenAccountHasVotedForOneGroup();
-    vm.roll(EPOCH_SIZE + 1);
+    blockTravel(EPOCH_SIZE + 1);
     election.activate(group);
     vm.prank(account2);
 
@@ -2033,20 +2033,29 @@ contract Election_ForceDecrementVotes is ElectionTestFoundry {
     registry.setAddressFor("LockedGold", account2);
   }
 
-  function WhenAccountsOnlyHavePendingVotes() public {
-    WhenAccountHasVotedForMoreThanOneGroupEqually();
+  function forceDecrementVotes2Groups(
+    address lesser0,
+    address lesser1,
+    address greater0,
+    address greater1
+  ) public {
     address[] memory lessers = new address[](2);
-    lessers[0] = group2;
-    lessers[1] = address(0);
+    lessers[0] = lesser0;
+    lessers[1] = lesser1;
     address[] memory greaters = new address[](2);
-    greaters[0] = address(0);
-    greaters[1] = group;
+    greaters[0] = greater0;
+    greaters[1] = greater1;
     uint256[] memory indices = new uint256[](2);
     indices[0] = 0;
     indices[1] = 1;
 
     vm.prank(account2);
     election.forceDecrementVotes(voter, slashedValue, lessers, greaters, indices);
+  }
+
+  function WhenAccountsOnlyHavePendingVotes() public {
+    WhenAccountHasVotedForMoreThanOneGroupEqually();
+    forceDecrementVotes2Groups(group2, address(0), address(0), group);
   }
 
   function test_ShouldDecrementBothGroupPendingVotesToZero_WhenAccountsOnlyHavePendingVotes_WhenAccountHasVotedForMoreThanOneGroupEqually()
@@ -2100,9 +2109,9 @@ contract Election_ForceDecrementVotes is ElectionTestFoundry {
     public
   {
     WhenAccountHasVotedForMoreThanOneGroupInequally();
-    vm.roll(EPOCH_SIZE + 1);
+    blockTravel(EPOCH_SIZE + 1);
     election.activate(group);
-    vm.roll(2 * EPOCH_SIZE + 2);
+    blockTravel(EPOCH_SIZE + 1);
     election.activate(group2);
 
     election.vote(group2, value2 / 2, group, address(0));
@@ -2118,19 +2127,7 @@ contract Election_ForceDecrementVotes is ElectionTestFoundry {
     public
   {
     WhenBothGroupsHaveBothPendingAndActiveVotes_WhenAccountHasVotedForMoreThanOneGroupInequally();
-
-    address[] memory lessers = new address[](2);
-    lessers[0] = address(0);
-    lessers[1] = address(0);
-    address[] memory greaters = new address[](2);
-    greaters[0] = group;
-    greaters[1] = group2;
-    uint256[] memory indices = new uint256[](2);
-    indices[0] = 0;
-    indices[1] = 1;
-
-    vm.prank(account2);
-    election.forceDecrementVotes(voter, slashedValue, lessers, greaters, indices);
+    forceDecrementVotes2Groups(address(0), address(0), group, group2);
   }
 
   function test_ShouldNotAffectGroup2_WhenWeSlash1MoreVoteThanGroup1PendingVoteTotal_WhenAccountHasVotedForMoreThanOneGroupInequally()
@@ -2191,20 +2188,8 @@ contract Election_ForceDecrementVotes is ElectionTestFoundry {
     group2TotalRemaining = value2 - 1;
     group2PendingRemaining = value2 / 2 - 1;
     group2ActiveRemaining = value2 / 2;
-    console.log("slashedValue", slashedValue);
 
-    address[] memory lessers = new address[](2);
-    lessers[0] = group;
-    lessers[1] = address(0);
-    address[] memory greaters = new address[](2);
-    greaters[0] = address(0);
-    greaters[1] = group2;
-    uint256[] memory indices = new uint256[](2);
-    indices[0] = 0;
-    indices[1] = 1;
-
-    vm.prank(account2);
-    election.forceDecrementVotes(voter, slashedValue, lessers, greaters, indices);
+    forceDecrementVotes2Groups(group, address(0), address(0), group2);
   }
 
   function test_ShouldDecrementGroup1Votes_WhenWeSlashAllOfGroup1VotesAndSomeOfGroup2__WhenWeSlash1MoreVoteThanGroup1PendingVoteTotal_WhenAccountHasVotedForMoreThanOneGroupInequally()
@@ -2237,26 +2222,15 @@ contract Election_ForceDecrementVotes is ElectionTestFoundry {
     group1RemainingActiveVotes = value - slashedValue;
 
     election.vote(group, value / 2, group2, address(0));
-    vm.roll(EPOCH_SIZE + 1);
+    blockTravel(EPOCH_SIZE + 1);
     election.activate(group);
-    vm.roll(2 * EPOCH_SIZE + 2);
+    blockTravel(EPOCH_SIZE + 1);
     election.activate(group2);
 
     (initialOrdering, ) = election.getTotalVotesForEligibleValidatorGroups();
     registry.setAddressFor("LockedGold", account2);
 
-    address[] memory lessers = new address[](2);
-    lessers[0] = group;
-    lessers[1] = address(0);
-    address[] memory greaters = new address[](2);
-    greaters[0] = address(0);
-    greaters[1] = group2;
-    uint256[] memory indices = new uint256[](2);
-    indices[0] = 0;
-    indices[1] = 1;
-
-    vm.prank(account2);
-    election.forceDecrementVotes(voter, slashedValue, lessers, greaters, indices);
+    forceDecrementVotes2Groups(group, address(0), address(0), group2);
   }
 
   function test_ShouldDecrementGroup1TotalVotesByOneQuarter_WhenSlashAffectsElectionOrder() public {

@@ -65,14 +65,15 @@ contract Utils is Test {
     }
   }
 
+  // Generates pseudo random number in the range [min, max] using block attributes
   function generatePRN(uint256 min, uint256 max, uint256 salt) public view returns (uint256) {
     return
       (uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, msg.sender, salt))) %
         (max - min + 1)) +
       min;
   }
+
   function blockTravel(uint256 blockTravel) public {
     vm.roll(block.number + blockTravel);
   }
-
 }
