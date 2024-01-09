@@ -1137,7 +1137,7 @@ contract Revoke is ReleaseGoldTest {
     assertEq(revokeTime, block.timestamp);
   }
 
-  function test__ShouldRevertWhenNonReleaseOwnerAttemptsToRevokeTheReleaseGold() public {
+  function test_ShouldRevertWhenNonReleaseOwnerAttemptsToRevokeTheReleaseGold() public {
     newReleaseGold(true, false);
     vm.expectRevert("Sender must be the registered releaseOwner address");
     vm.prank(randomAddress);
