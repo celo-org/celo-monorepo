@@ -462,7 +462,7 @@ contract SetAccount is ReleaseGoldTest {
     (v, r, s) = getParsedSignatureOfAddress(address(releaseGold), beneficiaryPrivateKey);
   }
 
-  function test_ShouldSetTheAccountByBEneficiary_WhenUnrevoked() public {
+  function test_ShouldSetTheAccountByBeneficiary_WhenUnrevoked() public {
     assertEq(accounts.isAccount(address(releaseGold)), false);
     vm.prank(beneficiary);
     releaseGold.setAccount(accountName, dataEncryptionKey, walletAddress, v, r, s);
