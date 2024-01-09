@@ -299,7 +299,7 @@ contract Creation is ReleaseGoldTest {
     assertEq(releaseGold.releaseOwner(), config.releaseOwner);
   }
 
-  function test_ShouldSetReleaseGoldNUmberOfPeriods() public {
+  function test_ShouldSetReleaseGoldNumberOfPeriods() public {
     newReleaseGold(true, false);
     (, , uint256 releaseGoldNumPeriods, , ) = releaseGold.releaseSchedule();
     assertEq(releaseGoldNumPeriods, config.numReleasePeriods);
