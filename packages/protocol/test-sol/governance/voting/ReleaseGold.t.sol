@@ -1553,7 +1553,7 @@ contract RelockGold is ReleaseGoldTest {
     vm.stopPrank();
   }
 
-  function test_ShouldIncreaseUpdateCorrectly_WhenRelockingValueEqualToValueOfThePendingWithdrawalAndWhenPendingWithdrawalExits()
+  function test_ShouldIncreaseUpdateCorrectly_WhenRelockingValueEqualToValueOfThePendingWithdrawal_WhenPendingWithdrawalExits()
     public
   {
     vm.prank(beneficiary);
