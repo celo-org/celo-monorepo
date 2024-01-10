@@ -1,22 +1,23 @@
-pragma solidity ^0.5.13;
-// pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.8.7 <0.8.20;
+// pragma solidity ^0.5.13;
 // Can be moved to 0.8 if I use the interfaces? Need to do for Proxy
+// TODO proxy should have getOwner as external
 
 import "forge-std/Script.sol";
+import "forge-std/console.sol";
 
 import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts/common/interfaces/IFreezer.sol";
+import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+import "@celo-contracts/common/interfaces/ICeloToken.sol";
 
-// import "@openzeppelin/contracts8/utils/Create2.sol";
-// import "@celo-contracts/common/Create2.sol";
-import "@celo-contracts/common/Proxy.sol";
 
-import "forge-std/console.sol";
 
 // Using Registry
 contract Migration is Script {
   uint256 proxyNonce = 0;
-  address payable constant registryAddress = 0x000000000000000000000000000000000000ce10;
+  address constant registryAddress = address(0x000000000000000000000000000000000000ce10);
 
   function create2deploy(bytes32 salt, bytes memory initCode) internal returns (address) {
     address deployedAddress;
@@ -30,12 +31,13 @@ contract Migration is Script {
   }
 
   // TODO remove this duplicated block (it's in tests)
+  // can't remove because of the syntax of value
   function deployCodeTo(string memory what, bytes memory args, uint256 value, address where)
     internal
   {
     bytes memory creationCode = vm.getCode(what);
     vm.etch(where, abi.encodePacked(creationCode, args));
-    (bool success, bytes memory runtimeBytecode) = where.call.value(value)("");
+    (bool success, bytes memory runtimeBytecode) = where.call{value: value}("");
     require(
       success,
       "StdCheats deployCodeTo(string,bytes,uint256,address): Failed to create runtime bytecode."
@@ -58,12 +60,12 @@ contract Migration is Script {
 
   function deployProxiedContract(
     string memory contractName,
-    address payable toProxy,
+    address toProxy,
     bytes memory initializeCalldata
   ) public {
     console.log("Deploying: ", contractName);
     deployCodeTo("Proxy.sol", abi.encode(false), toProxy);
-    Proxy proxy = Proxy(toProxy);
+    IProxy proxy = IProxy(toProxy);
     console.log(" Proxy deployed to:", toProxy);
 
     setImplementationOnProxy(proxy, contractName, initializeCalldata);
@@ -71,7 +73,7 @@ contract Migration is Script {
   }
 
   function setImplementationOnProxy(
-    Proxy proxy,
+    IProxy proxy,
     string memory contractName,
     bytes memory initializeCalldata
   ) public {
@@ -79,8 +81,8 @@ contract Migration is Script {
     console.log("msg.sender", msg.sender);
     console.log("address(this)", address(this));
     // console.log("address(Create2)", address(Create2));
-    console.log("owner of proxy is:", proxy._getOwner());
-    bytes memory implementationBytecode = vm.getCode(contractName);
+    // console.log("owner of proxy is:", proxy._getOwner());
+    bytes memory implementationBytecode = vm.getCode(string.concat(contractName, ".sol"));
     bool testingDeployment = false;
     bytes memory initialCode = abi.encodePacked(
       implementationBytecode,
@@ -89,68 +91,44 @@ contract Migration is Script {
 
     address implementation = create2deploy(0, initialCode);
     console.log(" Implementation deployed to:", address(implementation));
-    // vm.prank(proxy._getOwner());
     proxy._setAndInitializeImplementation(implementation, initializeCalldata);
   }
 
   function deployProxiedContract(string memory contractName, bytes memory initializeCalldata)
     public
-    returns (uint256)
   {
     console.log("Deploying: ", contractName);
 
+    // Can't deploy with new Proxy() because Proxy is in 0.5
     // Proxy proxy = new Proxy();
-    // estoy no anda porque el owner queda malo, porque?
+    // In production this should use create2, in testing can't do that
+    // because forge re-routes the create2 via Create2Deployer contract to have predictable address
     // address payable proxyAddress = address(uint160(create2deploy(bytes32(proxyNonce), vm.getCode("Proxy.sol"))));
-
-    address payable proxyAddress = address(
-      (uint256(sha256(abi.encode(vm.getCode("Proxy.sol"), proxyNonce))))
+    // TODO figure out if this works in production
+    address proxyAddress = address(
+      uint160((uint256(sha256(abi.encode(vm.getCode("Proxy.sol"), proxyNonce)))))
     );
     deployCodeTo("Proxy.sol", abi.encode(false), proxyAddress);
-    proxyNonce++;
-    Proxy proxy = Proxy(proxyAddress);
-    // IProxy proxy = IProxy(proxyAddress);
+    proxyNonce++; // nonce to avoid having the same address to deploy to
+
+    IProxy proxy = IProxy(proxyAddress);
     console.log(" Proxy deployed to:", address(proxy));
 
     setImplementationOnProxy(proxy, contractName, initializeCalldata);
     addToRegistry(contractName, address(proxy));
   }
 
-  // function deployProxiedContract() public {
-  //   address payable registryAddress = 0x000000000000000000000000000000000000ce10;
-  //   deployCodeTo("Proxy.sol", abi.encode(false), registryAddress);
-  //   Proxy proxy = Proxy(registryAddress);
-
-  //   bytes memory implementationBytecode = vm.getCode("Registry.sol");
-  //   // bytes memory implementationBytecode = type(Registry).creationCode;
-
-  //   // TODO here can check that the contract is not already deployed
-  //   bool testingDeployment = false;
-  //   bytes memory initialCode = abi.encodePacked(implementationBytecode, abi.encode(testingDeployment));
-
-  //   address implementation  = Create2.deploy("123", initialCode);
-
-  //   // TODO make initialize general
-  //   proxy._setAndInitializeImplementation(implementation, abi.encodeWithSignature("initialize()"));
-
-  //   // play a bit with the registry
-
-  // }
-
   function run() external {
     // it's anvil key
     vm.startBroadcast(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80);
 
-    // TODO generalize the initialize
-    deployProxiedContract("Registry.sol", registryAddress, abi.encodeWithSignature("initialize()"));
-    deployProxiedContract("Freezer.sol", abi.encodeWithSignature("initialize()"));
-    deployProxiedContract("FeeCurrencyWhitelist.sol", abi.encodeWithSignature("initialize()"));
+    deployProxiedContract("Registry", registryAddress, abi.encodeWithSelector(IRegistry.initialize.selector));
+    deployProxiedContract("Freezer", abi.encodeWithSelector(IFreezer.initialize.selector));
+    deployProxiedContract("FeeCurrencyWhitelist", abi.encodeWithSelector(IFeeCurrencyWhitelist.initialize.selector));
     deployProxiedContract(
-      "GoldToken.sol",
-      abi.encodeWithSignature("initialize(address)", registryAddress)
-    );
+      "GoldToken",
+      abi.encodeWithSelector(ICeloToken.initialize.selector, registryAddress));
 
-    // GoldToken()
 
     // little sanity check, remove
     IRegistry registry = IRegistry(registryAddress);
