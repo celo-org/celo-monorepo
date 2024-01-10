@@ -268,7 +268,7 @@ contract IntegerSortedLinkedListPopN is IntegerSortedLinkedListBaseTest {
   }
 
   function generateExpectedPopped(uint256 _numElements, uint256 _n)
-    public
+    internal
     pure
     returns (uint256[] memory)
   {
