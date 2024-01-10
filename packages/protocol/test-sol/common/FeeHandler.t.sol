@@ -199,4 +199,100 @@ contract FeeHandlerSetBurnFraction is FeeHandlerFoundry {
     );
   }
 
+  function testRevertsOnFractionsGreaterThanOne() public {
+    vm.prank(owner);
+    vm.expectRevert("Burn fraction must be less than or equal to 1");
+    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(3, 2).unwrap());
+  }
 }
+
+contract FeeHandlerSetHandler is FeeHandlerFoundry {
+  function testOnlyOwnerCanSetHandler() public {
+    vm.prank(user);
+    vm.expectRevert("Ownable: caller is not the owner");
+    feeHandler.setHandler(address(stableToken), address(mentoSeller));
+  }
+
+  function testSetsHandler() public {
+    vm.prank(owner);
+    feeHandler.setHandler(address(stableToken), address(mentoSeller));
+    assertEq(
+      feeHandler.getTokenHandler(address(stableToken)),
+      address(mentoSeller),
+      "Handler should be set"
+    );
+  }
+}
+
+contract FeeHandlerAddToken is FeeHandlerFoundry {
+  function testOnlyOwnerCanAddToken() public {
+    vm.prank(user);
+    vm.expectRevert("Ownable: caller is not the owner");
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+  }
+
+  function testAddsToken() public {
+    vm.prank(owner);
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+    assertEq(
+      feeHandler.getActiveTokens(),
+      address(stableToken)
+    );
+    assertTrue(feeHandler.getTokenActive(address(stableToken)));
+    assertEq(
+      feeHandler.getTokenHandler(address(stableToken)),
+      address(mentoSeller)
+    );
+  }
+}
+
+contract FeeHandlerRemoveToken is FeeHandlerFoundry {
+  function testOnlyOwnerCanRemoveToken() public {
+    vm.prank(user);
+    vm.expectRevert("Ownable: caller is not the owner");
+    feeHandler.removeToken(address(stableToken));
+  }
+
+  function testRemovesToken() public {
+    vm.prank(owner);
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+    feeHandler.removeToken(address(stableToken));
+    assertFalse(feeHandler.getTokenActive(address(stableToken)));
+    assertEq(
+      feeHandler.getActiveTokens(),
+      new address[](0)
+    );
+    assertEq(
+      feeHandler.getTokenHandler(address(stableToken), address(0))
+    );
+  }
+}
+
+contract FeeHandlerDeactivateAndActivateToken is FeeHandlerFoundry {
+  function testOnlyOwnerCanDeactivateToken() public {
+    vm.prank(user);
+    vm.expectRevert("Ownable: caller is not the owner");
+    feeHandler.deactivateToken(address(stableToken));
+  }
+
+  function testOnlyOwnerCanActivateToken() public {
+    vm.prank(user);
+    vm.expectRevert("Ownable: caller is not the owner");
+    feeHandler.activateToken(address(stableToken));
+  }
+
+  function testDeactivateAndActivateToken() public {
+    vm.prank(owner);
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+    feeHandler.deactivateToken(address(stableToken));
+    assertFalse(feeHandler.getTokenActive(address(stableToken)));
+    assertEq(feeHandler.getActiveTokens(), new address[](0));
+
+    feeHandler.activateToken(address(stableToken));
+    assertTrue(feeHandler.getTokenActive(address(stableToken)));
+    assertEq(feeHandler.getActiveTokens(), address(stableToken));
+  }
+}
+
+
+
