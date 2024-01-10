@@ -37,19 +37,15 @@ contract IntegerSortedLinkedListBaseTest is Test {
 
   /// Simulate randomness using the current block's hash
   function getRandomValue() internal view returns (uint256) {
-    bytes32 hash = blockhash(block.number); //TODO fix this value to make it random.
+    bytes32 hash = blockhash(block.number);
     return uint256(hash);
   }
 
   /// Simulate randomness using the last block's hash
   function getRandomActionType() internal returns (ActionType) {
-    // bytes32 hash = blockhash(vm.unixTime());
     uint256 randomValue = uint256(keccak256(abi.encodePacked(vm.unixTime()))) % 2;
     vm.sleep(1);
-    // uint256 randomValue = uint256(hash) % 2;
-    console.log("### Action type value:");
-    console.log(randomValue);
-    // console.logBytes32(hash);
+
     return ActionType(randomValue);
   }
 
@@ -71,22 +67,17 @@ contract IntegerSortedLinkedListBaseTest is Test {
 
     for (uint256 i = 0; i < _length; i++) {
       uint256 key = randomElement(keyOptions);
-      // uint256 key = keyOptions[i % _numKeys];
+
       ActionType action;
 
       if (contains(_listKeys, key)) {
         action = getRandomActionType();
 
         if (action == ActionType.Remove) {
-          console.log("### remove action type");
-          console.log(key);
-          console.log(_listKeys.length);
           _listKeys = removeFromArray(_listKeys, key);
         }
       } else {
         action = ActionType.Insert;
-        console.log("### Insert Action type");
-        console.log(key);
 
         _listKeys[currentIndex] = key;
         currentIndex++;
@@ -116,15 +107,6 @@ contract IntegerSortedLinkedListBaseTest is Test {
         listKeys = removeFromArray(listKeys, action.element.key);
       } else {
         (uint256 lesser, uint256 greater) = getLesserAndGreater(action.element);
-
-        console.log("### Lesser");
-        console.log(lesser);
-        console.log("### Greater");
-        console.log(greater);
-        console.log("### key");
-        console.log(action.element.key);
-        console.log("### value");
-        console.log(action.element.value);
 
         if (action.actionType == ActionType.Insert) {
           integerSortedLinkedListTest.insert(
@@ -259,7 +241,6 @@ contract IntegerSortedLinkedListBaseTest is Test {
     uint256 tail, // fetched
     uint256[] memory expectedKeys // from handler
   ) internal {
-    console.log("### Asserting Invariants");
     SortedElement[] memory sortedElements = parseElements(keys, values);
 
     assertEq(numElements, expectedKeys.length, "Incorrect number of elements");
@@ -272,27 +253,19 @@ contract IntegerSortedLinkedListBaseTest is Test {
       assertEq(head, 0, "Head not zero");
       assertEq(tail, 0, "Tail not Zero");
     }
-    console.log("### Asserted Invariants");
   }
 
   function randomElement(uint256[] memory list) internal returns (uint256) {
-    console.log("gettting random element w/unix timestamp");
     uint256 curTime = vm.unixTime();
-    // console.log("### curTime2:");
+
     uint256 index = 0;
-    console.log(curTime);
+
     if (list.length == 0) {
       index = 0;
-      // index = uint256(keccak256(abi.encodePacked(curTime, block.difficulty))) % 10;
     }
     index = uint256(keccak256(abi.encodePacked(curTime))) % list.length;
 
-    // index = uint256(keccak256(abi.encodePacked(curTime, block.difficulty))) % list.length;
-
     vm.sleep(1); // Halts execution for 1 milliseconds
-
-    console.log("### index:");
-    console.log(index);
 
     return list[index];
   }
@@ -507,7 +480,7 @@ contract IntegerSortedLinkedListPopN is IntegerSortedLinkedListBaseTest {
   }
 }
 
-contract IntegerSortedLinkedListInvariantWhenMultipleInsertsUpdatesAndRemovals is
+contract IntegerSortedLinkedListInvariant_WhenLesserAndGreaterAreCorrect_WhenMultipleInsertsUpdatesAndRemovals is
   IntegerSortedLinkedListBaseTest
 {
   Handler public handler;
@@ -520,9 +493,62 @@ contract IntegerSortedLinkedListInvariantWhenMultipleInsertsUpdatesAndRemovals i
 
     bytes4[] memory selectors = new bytes4[](3);
 
-    selectors[0] = handler.insert.selector;
-    selectors[1] = handler.update.selector;
-    selectors[2] = handler.remove.selector;
+    selectors[0] = handler.insertCorrectKeys.selector;
+    selectors[1] = handler.updateExisting.selector;
+    selectors[2] = handler.removeExisting.selector;
+    targetSelector(FuzzSelector({ addr: address(handler), selectors: selectors }));
+  }
+
+  function assertInvariants() public {
+    assertEq(
+      integerSortedLinkedListTest.getNumElements(),
+      handler.actionListLength(),
+      "Incorrect number of elements here"
+    );
+
+    (uint256[] memory keys, uint256[] memory values) = integerSortedLinkedListTest.getElements();
+    SortedElement[] memory sortedElements = parseElements(keys, values);
+    assertSorted(sortedElements);
+    if (sortedElements.length > 0) {
+      assertEq(integerSortedLinkedListTest.head(), sortedElements[0].key, "Incorrect head");
+      assertEq(
+        integerSortedLinkedListTest.tail(),
+        sortedElements[sortedElements.length - 1].key,
+        "Incorrect tail"
+      );
+    } else {
+      assertEq(integerSortedLinkedListTest.head(), 0, "Head not zero");
+      assertEq(integerSortedLinkedListTest.tail(), 0, "Tail not Zero");
+    }
+  }
+
+  // TODO some insert are still failing.
+  /// forge-config: default.invariant.runs = 256
+  /// forge-config: default.invariant.depth = 100
+  /// forge-config: default.invariant.fail-on-revert = true
+
+  function invariant_ShouldMaintainInvariants_WhenLesserAndGreaterAreCorrect() public {
+    // May have to created a second contract for incorrect leseer and greater keys
+    assertInvariants();
+  }
+}
+
+contract IntegerSortedLinkedListInvariant_WhenLesserAndGreaterAreIncorrect_WhenMultipleInsertsUpdatesAndRemovals is
+  IntegerSortedLinkedListBaseTest
+{
+  Handler public handler;
+
+  function setUp() public override {
+    super.setUp();
+
+    handler = new Handler(integerSortedLinkedListTest);
+    targetContract(address(handler));
+
+    bytes4[] memory selectors = new bytes4[](3);
+
+    selectors[0] = handler.insertRandomly.selector;
+    selectors[1] = handler.updateRandomly.selector;
+    selectors[2] = handler.removeExisting.selector;
     targetSelector(FuzzSelector({ addr: address(handler), selectors: selectors }));
   }
 
@@ -550,16 +576,8 @@ contract IntegerSortedLinkedListInvariantWhenMultipleInsertsUpdatesAndRemovals i
   }
 
   /// forge-config: default.invariant.runs = 256
-  /// forge-config: default.invariant.depth = 100
-  /// forge-config: default.invariant.fail-on-revert = false
-
-  function invariant_ShouldMaintainInvariantsWhenLesserAndGreaterAreCorrect() public {
-    assertInvariants();
-  }
-
-  /// forge-config: default.invariant.runs = 256
   /// forge-config: default.invariant.depth = 200
-  /// forge-config: default.invariant.fail-on-revert = true
+  /// forge-config: default.invariant.fail-on-revert = false
 
   function invariant_ShouldMaintainInvariantsWhenLesserAndGreaterAreIncorrect() public {
     assertInvariants();
@@ -571,51 +589,135 @@ contract Handler is CommonBase, StdCheats, StdUtils {
     listTest = _integerSortedLinkedList;
   }
 
+  struct ActionElement {
+    uint256 key;
+    uint256 value;
+  }
   uint256 public actionListLength;
 
   IntegerSortedLinkedListTest private listTest;
 
-  function insert(uint256 key, uint256 value, uint256 lesserKey, uint256 greaterKey) external {
-    key = bound(key, 0, 9);
-    lesserKey = bound(lesserKey, 0, 9);
-    greaterKey = bound(greaterKey, 0, 9);
+  function getLesserAndGreater(ActionElement memory element)
+    internal
+    view
+    returns (uint256 lesser, uint256 greater)
+  {
+    uint256[] memory keys;
+    uint256[] memory values;
+    (keys, values) = getElements();
+    ActionElement[] memory sortedElements = parseElements(keys, values);
+
+    for (uint256 i = 0; i < sortedElements.length; i++) {
+      if (sortedElements[i].key != element.key) {
+        if (sortedElements[i].value >= element.value) {
+          greater = sortedElements[i].key;
+        }
+      }
+
+      uint256 j = sortedElements.length - i - 1;
+
+      if (sortedElements[j].key != element.key) {
+        if (sortedElements[j].value <= element.value) {
+          lesser = sortedElements[j].key;
+        }
+      }
+    }
+
+    return (lesser, greater);
+  }
+
+  function parseElements(uint256[] memory keys, uint256[] memory values)
+    internal
+    pure
+    returns (ActionElement[] memory)
+  {
+    require(
+      keys.length == values.length,
+      "Invalid input: keys and values must have the same length"
+    );
+
+    ActionElement[] memory elements = new ActionElement[](keys.length);
+
+    for (uint256 i = 0; i < keys.length; i++) {
+      elements[i] = ActionElement({ key: keys[i], value: values[i] });
+    }
+
+    return elements;
+  }
+
+  function insertCorrectKeys(uint256 key, uint256 value) external {
+    key = bound(key, 1, 10);
+    if (!contains(key)) {
+      (uint256 lesserKey, uint256 greaterKey) = getLesserAndGreater(
+        ActionElement({ key: key, value: value })
+      );
+
+      actionListLength++;
+
+      listTest.insert(key, value, lesserKey, greaterKey);
+    }
+  }
+
+  function insertRandomly(uint256 key, uint256 value, uint256 lesserKey, uint256 greaterKey)
+    external
+  {
+    key = bound(key, 1, 10);
+    lesserKey = bound(lesserKey, 0, 11);
+    greaterKey = bound(greaterKey, 0, 11);
 
     actionListLength++;
 
     listTest.insert(key, value, lesserKey, greaterKey);
-    console.log("### Inserted");
-    console.log(key);
-    console.log(value);
-    console.log(lesserKey);
-    console.log(greaterKey);
   }
 
-  function update(uint256 key, uint256 value, uint256 lesserKey, uint256 greaterKey) external {
-    key = bound(key, 0, 9);
-    lesserKey = bound(lesserKey, 0, 9);
-    greaterKey = bound(greaterKey, 0, 9);
+  function updateExisting(uint256 key, uint256 value) external {
+    key = bound(key, 1, 10);
+    if (contains(key)) {
+      (uint256 lesserKey, uint256 greaterKey) = getLesserAndGreater(
+        ActionElement({ key: key, value: value })
+      );
+
+      listTest.update(key, value, lesserKey, greaterKey);
+    }
+  }
+
+  function updateRandomly(uint256 key, uint256 value, uint256 lesserKey, uint256 greaterKey)
+    external
+  {
+    key = bound(key, 1, 10);
+    lesserKey = bound(lesserKey, 0, 11);
+    greaterKey = bound(greaterKey, 0, 11);
 
     listTest.update(key, value, lesserKey, greaterKey);
-    console.log("### Updated");
-    console.log(key);
-    console.log(value);
   }
 
-  function remove(uint256 key) external {
-    key = bound(key, 0, 9);
+  function removeExisting(uint256 key) external {
+    key = bound(key, 1, 10);
 
-    actionListLength--;
+    if (contains(key)) {
+      actionListLength--;
 
-    listTest.remove(key);
-    console.log("### Removed");
-    console.log(key);
+      listTest.remove(key);
+    }
   }
+
+  // function removeRandomly(uint256 key) external {
+  //   key = bound(key, 1, 10);
+
+  //   actionListLength--;
+
+  //   listTest.remove(key);
+  // }
 
   function getNumElements() external view returns (uint256) {
     return listTest.getNumElements();
   }
 
-  function getElements() external view returns (uint256[] memory, uint256[] memory) {
+  function getElements() public view returns (uint256[] memory, uint256[] memory) {
     return listTest.getElements();
+  }
+
+  function contains(uint256 key) public view returns (bool) {
+    return listTest.contains(key);
   }
 }

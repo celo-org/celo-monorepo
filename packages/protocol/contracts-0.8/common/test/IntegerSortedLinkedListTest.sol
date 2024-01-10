@@ -1,7 +1,6 @@
 pragma solidity >=0.5.13 <0.8.20;
 
 import "../linkedlists/IntegerSortedLinkedList.sol";
-import "forge-std-8/console.sol";
 
 contract IntegerSortedLinkedListTest {
   using IntegerSortedLinkedList for SortedLinkedList.List;
@@ -9,13 +8,7 @@ contract IntegerSortedLinkedListTest {
   SortedLinkedList.List private list;
 
   function insert(uint256 key, uint256 value, uint256 lesserKey, uint256 greaterKey) external {
-    // console.log("### Inserting real");
-    // console.log(key);
-    // console.log(value);
-    // console.log(lesserKey);
-    // console.log(greaterKey);
     list.insert(key, value, lesserKey, greaterKey);
-    console.log("### Inserted real");
   }
 
   function update(uint256 key, uint256 value, uint256 lesserKey, uint256 greaterKey) external {
