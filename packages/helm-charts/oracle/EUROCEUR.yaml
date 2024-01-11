@@ -25,11 +25,11 @@ oracle:
       ],
       [
         {exchange: 'BITMART', symbol: 'EUROCUSDT', toInvert: false},
-        {exchange: 'BITMART', symbol: 'USDTEUR', toInvert: false}
+        {exchange: 'KRAKEN', symbol: 'USDTEUR', toInvert: false}
       ],
       [
         {exchange: 'BITMART', symbol: 'EUROCUSDC', toInvert: false},
-        {exchange: 'BITMART', symbol: 'USDCEUR', toInvert: false}
+        {exchange: 'KRAKEN', symbol: 'USDCEUR', toInvert: false}
       ]
     ]"
   minPriceSourceCount: 2
