@@ -1,8 +1,8 @@
 pragma solidity >=0.5.13 <0.8.20;
 
-import "../linkedlists/IntegerSortedLinkedList.sol";
+import "@celo-contracts-8/common/linkedlists/IntegerSortedLinkedList.sol";
 
-contract IntegerSortedLinkedListTest {
+contract IntegerSortedLinkedListMock {
   using IntegerSortedLinkedList for SortedLinkedList.List;
 
   SortedLinkedList.List private list;

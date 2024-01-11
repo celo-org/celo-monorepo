@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.5.13 <0.8.20;
-pragma experimental ABIEncoderV2;
 
 import "celo-foundry-8/Test.sol";
 
@@ -8,10 +7,10 @@ import { CommonBase } from "forge-std-8/Base.sol";
 import { StdCheats } from "forge-std-8/StdCheats.sol";
 import { StdUtils } from "forge-std-8/StdUtils.sol";
 
-import "@celo-contracts-8/common/test/IntegerSortedLinkedListTest.sol";
+import "@test-sol/governance/validators/IntegerSortedLinkedListMock-8.sol";
 
-contract IntegerSortedLinkedList8_BaseTest is Test {
-  IntegerSortedLinkedListTest public integerSortedLinkedListTest;
+contract IntegerSortedLinkedListTest8 is Test {
+  IntegerSortedLinkedListMock public integerSortedLinkedListTest;
   Handler public handler;
 
   struct SortedElement {
@@ -20,7 +19,7 @@ contract IntegerSortedLinkedList8_BaseTest is Test {
   }
 
   function setUp() public virtual {
-    integerSortedLinkedListTest = new IntegerSortedLinkedListTest();
+    integerSortedLinkedListTest = new IntegerSortedLinkedListMock();
   }
 
   function parseElements(uint256[] memory keys, uint256[] memory values)
@@ -74,7 +73,7 @@ contract IntegerSortedLinkedList8_BaseTest is Test {
   }
 }
 
-contract IntegerSortedLinkedList8_Insert is IntegerSortedLinkedList8_BaseTest {
+contract IntegerSortedLinkedListTest8_Insert is IntegerSortedLinkedListTest8 {
   uint256 key = 1;
   uint256 value = 5;
 
@@ -106,28 +105,28 @@ contract IntegerSortedLinkedList8_Insert is IntegerSortedLinkedList8_BaseTest {
     assertEq(integerSortedLinkedListTest.tail(), key);
   }
 
-  function test_RevertIf_KeyIsZero() public {
+  function test_Reverts_IfKeyIsZero() public {
     vm.expectRevert("invalid key");
     integerSortedLinkedListTest.insert(0, value, 0, 0);
   }
 
-  function test_RevertIf_LesserEqualsKey() public {
+  function test_Reverts_IfLesserEqualsKey() public {
     vm.expectRevert("invalid key");
     integerSortedLinkedListTest.insert(key, value, key, 0);
   }
 
-  function test_RevertIf_GreaterEqualsKey() public {
+  function test_Reverts_IfGreaterEqualsKey() public {
     vm.expectRevert("invalid key");
     integerSortedLinkedListTest.insert(key, value, 0, key);
   }
 
-  function test_RevertWhen_InsertingElementAlreadyInList_WhenListIsNotEmpty() public {
+  function test_Reverts_WhenInsertingElementAlreadyInList_WhenListIsNotEmpty() public {
     integerSortedLinkedListTest.insert(key, value, 0, 0);
     vm.expectRevert("invalid key");
     integerSortedLinkedListTest.insert(key, value, 0, key);
   }
 
-  function test_RevertWhen_InsertingNonMaximalElementAtHeadOfList_WhenListIsNotEmpty() public {
+  function test_Reverts_WhenInsertingNonMaximalElementAtHeadOfList_WhenListIsNotEmpty() public {
     integerSortedLinkedListTest.insert(key, value, 0, 0);
 
     uint256 nonKey = key - 1;
@@ -137,7 +136,7 @@ contract IntegerSortedLinkedList8_Insert is IntegerSortedLinkedList8_BaseTest {
   }
 }
 
-contract IntegerSortedLinkedList8_Update is IntegerSortedLinkedList8_BaseTest {
+contract IntegerSortedLinkedListTest8_Update is IntegerSortedLinkedListTest8 {
   uint256 key = 1;
   uint256 value = 10;
   uint256 newValue = 20;
@@ -159,23 +158,23 @@ contract IntegerSortedLinkedList8_Update is IntegerSortedLinkedList8_BaseTest {
     assertEq(values[0], newValue);
   }
 
-  function test_RevertIf_KeyIsNotInList() public {
+  function test_Reverts_IfKeyIsNotInList() public {
     vm.expectRevert("key not in list");
     integerSortedLinkedListTest.update(key + 1, newValue, 0, 0);
   }
 
-  function test_RevertIf_LesserEqualsKey() public {
+  function test_Reverts_IfLesserEqualsKey() public {
     vm.expectRevert("invalid key");
     integerSortedLinkedListTest.update(key, newValue, key, 0);
   }
 
-  function test_RevertIf_GreaterEqualsKey() public {
+  function test_Reverts_IfGreaterEqualsKey() public {
     vm.expectRevert("invalid key");
     integerSortedLinkedListTest.update(key, newValue, 0, key);
   }
 }
 
-contract IntegerSortedLinkedList8_Remove is IntegerSortedLinkedList8_BaseTest {
+contract IntegerSortedLinkedListTest8_Remove is IntegerSortedLinkedListTest8 {
   uint256 key = 1;
   uint256 value = 10;
 
@@ -208,13 +207,13 @@ contract IntegerSortedLinkedList8_Remove is IntegerSortedLinkedList8_BaseTest {
     assertEq(integerSortedLinkedListTest.tail(), 0);
   }
 
-  function test_RevertIf_KeyIsNotInList() public {
+  function test_Reverts_IfKeyIsNotInList() public {
     vm.expectRevert("key not in list");
     integerSortedLinkedListTest.remove(key + 1);
   }
 }
 
-contract IntegerSortedLinkedList8_PopN is IntegerSortedLinkedList8_BaseTest {
+contract IntegerSortedLinkedListTest8_PopN is IntegerSortedLinkedListTest8 {
   uint256 n = 3;
   uint256 numElements = 10;
 
@@ -259,7 +258,7 @@ contract IntegerSortedLinkedList8_PopN is IntegerSortedLinkedList8_BaseTest {
     assertEq(integerSortedLinkedListTest.head(), numElements - n);
   }
 
-  function test_RevertIf_NIsGreaterThanNumElements() public {
+  function test_Reverts_IfNIsGreaterThanNumElements() public {
     vm.expectRevert("not enough elements");
     integerSortedLinkedListTest.popN(numElements + 1);
   }
@@ -283,8 +282,8 @@ contract IntegerSortedLinkedList8_PopN is IntegerSortedLinkedList8_BaseTest {
   }
 }
 
-contract IntegerSortedLinkedList8_Invariant_WhenLesserAndGreaterAreCorrect_WhenMultipleInsertsUpdatesAndRemovals is
-  IntegerSortedLinkedList8_BaseTest
+contract IntegerSortedLinkedListTest8_Invariant_WhenLesserAndGreaterAreCorrect_WhenMultipleInsertsUpdatesAndRemovals is
+  IntegerSortedLinkedListTest8
 {
   function setUp() public override {
     super.setUp();
@@ -309,8 +308,8 @@ contract IntegerSortedLinkedList8_Invariant_WhenLesserAndGreaterAreCorrect_WhenM
   }
 }
 
-contract IntegerSortedLinkedList8_Invariant_WhenLesserAndGreaterAreIncorrect_WhenMultipleInsertsUpdatesAndRemovals is
-  IntegerSortedLinkedList8_BaseTest
+contract IntegerSortedLinkedListTest8_Invariant_WhenLesserAndGreaterAreIncorrect_WhenMultipleInsertsUpdatesAndRemovals is
+  IntegerSortedLinkedListTest8
 {
   function setUp() public override {
     super.setUp();
@@ -336,7 +335,7 @@ contract IntegerSortedLinkedList8_Invariant_WhenLesserAndGreaterAreIncorrect_Whe
 }
 
 contract Handler is CommonBase, StdCheats, StdUtils {
-  constructor(IntegerSortedLinkedListTest _integerSortedLinkedList) {
+  constructor(IntegerSortedLinkedListMock _integerSortedLinkedList) {
     listTest = _integerSortedLinkedList;
   }
 
@@ -346,7 +345,7 @@ contract Handler is CommonBase, StdCheats, StdUtils {
   }
   uint256 public actionListLength;
 
-  IntegerSortedLinkedListTest private listTest;
+  IntegerSortedLinkedListMock private listTest;
 
   function getLesserAndGreater(ActionElement memory element)
     internal
