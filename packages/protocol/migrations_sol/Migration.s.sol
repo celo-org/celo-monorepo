@@ -5,6 +5,7 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "forge-std/Script.sol";
 import "forge-std/console.sol";
+import "@celo-contracts/common/interfaces/IProxyFactory.sol";
 
 import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
@@ -16,6 +17,8 @@ import "@celo-contracts/common/interfaces/ICeloToken.sol";
 
 // Using Registry
 contract Migration is Script {
+  IProxyFactory proxyFactory;
+
   uint256 proxyNonce = 0;
   address constant registryAddress = address(0x000000000000000000000000000000000000ce10);
 
@@ -103,12 +106,15 @@ contract Migration is Script {
     // Proxy proxy = new Proxy();
     // In production this should use create2, in testing can't do that
     // because forge re-routes the create2 via Create2Deployer contract to have predictable address
-    // address payable proxyAddress = address(uint160(create2deploy(bytes32(proxyNonce), vm.getCode("Proxy.sol"))));
+    // address proxyAddress = create2deploy(bytes32(proxyNonce), vm.getCode("Proxy.sol"));
     // TODO figure out if this works in production
-    address proxyAddress = address(
-      uint160((uint256(sha256(abi.encode(vm.getCode("Proxy.sol"), proxyNonce)))))
-    );
-    deployCodeTo("Proxy.sol", abi.encode(false), proxyAddress);
+
+    // address proxyAddress = address(
+    //   uint160((uint256(sha256(abi.encode(vm.getCode("Proxy.sol"), proxyNonce)))))
+    // );
+    // deployCodeTo("Proxy.sol", abi.encode(false), proxyAddress);
+    address proxyAddress = proxyFactory.deployProxy();
+
     proxyNonce++; // nonce to avoid having the same address to deploy to
 
     IProxy proxy = IProxy(proxyAddress);
@@ -122,7 +128,11 @@ contract Migration is Script {
     // it's anvil key
     vm.startBroadcast(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80);
 
+    proxyFactory = IProxyFactory(create2deploy(0, vm.getCode("ProxyFactory.sol")));
+
+    // TODO in production the proxy of the registry is created using a cheatcode
     deployProxiedContract("Registry", registryAddress, abi.encodeWithSelector(IRegistry.initialize.selector));
+
     deployProxiedContract("Freezer", abi.encodeWithSelector(IFreezer.initialize.selector));
     deployProxiedContract("FeeCurrencyWhitelist", abi.encodeWithSelector(IFeeCurrencyWhitelist.initialize.selector));
     deployProxiedContract(
@@ -130,7 +140,7 @@ contract Migration is Script {
       abi.encodeWithSelector(ICeloToken.initialize.selector, registryAddress));
 
 
-    // little sanity check, remove
+    // little sanity check, remove later
     IRegistry registry = IRegistry(registryAddress);
     registry.setAddressFor("registry", address(1));
     console.log("print:");
