@@ -5,11 +5,13 @@ on:
   push:
     paths:
       - 'dockerfiles/**'
+      - 'packages/celotool/**'
     branches:
       - master
   pull_request:
     paths:
       - 'dockerfiles/**'
+      - 'packages/celotool/**'
   workflow_dispatch:
 
 jobs:
@@ -35,7 +37,9 @@ jobs:
     needs: changed-files
     if: |
       github.ref != 'refs/heads/master' &&
-      contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/celotool/Dockerfile')
+      (contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/celotool/Dockerfile') ||
+      contains(needs.changed-files.outputs.all_modified_files, ',packages/celotool'))
+
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
       service-account: 'celo-monorepo-dev@devopsre.iam.gserviceaccount.com'
@@ -51,7 +55,8 @@ jobs:
     needs: changed-files
     if: |
       github.ref == 'refs/heads/master' &&
-      contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/celotool/Dockerfile')
+      (contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/celotool/Dockerfile') ||
+      contains(needs.changed-files.outputs.all_modified_files, ',packages/celotool'))
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo-master/providers/github-by-repos
       service-account: 'celo-monorepo@devopsre.iam.gserviceaccount.com'

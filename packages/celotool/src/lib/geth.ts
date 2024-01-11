@@ -14,17 +14,18 @@ import path from 'path'
 import sleep from 'sleep-promise'
 import Web3 from 'web3'
 import { Admin } from 'web3-eth-admin'
+import { numberToHex } from 'web3-utils'
 import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
+  Validator,
   generateGenesis,
   generateGenesisWithMigrations,
   generatePrivateKey,
   privateKeyToAddress,
   privateKeyToPublicKey,
-  Validator,
 } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
@@ -448,6 +449,7 @@ export const transferCalldata = async (
   amount: BigNumber,
   dataStr?: string,
   txOptions: {
+    chainId?: number
     gas?: number
     gasPrice?: string
     feeCurrency?: string
@@ -459,6 +461,7 @@ export const transferCalldata = async (
   return kit.sendTransaction({
     from: fromAddress,
     to: toAddress,
+    chainId: numberToHex(txOptions.chainId || 0),
     value: amount.toString(),
     data: dataStr,
     gas: txOptions.gas,
@@ -476,6 +479,7 @@ export const transferCeloGold = async (
   amount: BigNumber,
   _?: string,
   txOptions: {
+    chainId?: number
     gas?: number
     gasPrice?: string
     feeCurrency?: string
@@ -487,6 +491,7 @@ export const transferCeloGold = async (
   const kitGoldToken = await kit.contracts.getGoldToken()
   return kitGoldToken.transfer(toAddress, amount.toString()).send({
     from: fromAddress,
+    chainId: numberToHex(txOptions.chainId || 0),
     gas: txOptions.gas,
     gasPrice: txOptions.gasPrice,
     feeCurrency: txOptions.feeCurrency || undefined,
@@ -503,6 +508,7 @@ export const transferCeloDollars = async (
   amount: BigNumber,
   _?: string,
   txOptions: {
+    chainId?: number
     gas?: number
     gasPrice?: string
     feeCurrency?: string
@@ -514,6 +520,7 @@ export const transferCeloDollars = async (
   const kitStableToken = await kit.contracts.getStableToken()
   return kitStableToken.transfer(toAddress, amount.toString()).send({
     from: fromAddress,
+    chainId: numberToHex(txOptions.chainId || 0),
     gas: txOptions.gas,
     gasPrice: txOptions.gasPrice,
     feeCurrency: txOptions.feeCurrency || undefined,
@@ -557,7 +564,8 @@ export const simulateClient = async (
   thread: number,
   maxGasPrice: BigNumber = new BigNumber(0),
   totalTxGas: number = 500000, // aim for half million gas txs
-  web3Provider: string = 'http://127.0.0.1:8545'
+  web3Provider: string = 'http://127.0.0.1:8545',
+  chainId: number = 42220
 ) => {
   // Assume the node is accessible via localhost with senderAddress unlocked
   const kit = newKitFromWeb3(new Web3(web3Provider))
@@ -646,6 +654,7 @@ export const simulateClient = async (
       }
       lastGasPriceMinimum = gasPrice
       txOptions = {
+        chainId,
         gasPrice: gasPrice.toString(),
         feeCurrency,
         nonce,
@@ -846,6 +855,57 @@ export const onLoadTestTxResult = async (
       })
     }
   })
+}
+
+export async function faucetLoadTestThreads(
+  index: number,
+  threads: number,
+  mnemonic: string,
+  web3Provider: string = 'http://localhost:8545',
+  chainId: number = 42220
+) {
+  const minimumEthBalance = 5
+  const kit = newKitFromWeb3(new Web3(web3Provider))
+  const privateKey = generatePrivateKey(mnemonic, AccountType.LOAD_TESTING_ACCOUNT, index)
+  kit.addAccount(privateKey)
+  const fundingAddress = privateKeyToAddress(privateKey)
+  console.info(`Addind account ${fundingAddress} to kit`)
+  kit.defaultAccount = privateKeyToAddress(privateKey)
+  const sleepTime = 5000
+  while ((await kit.connection.isSyncing()) || (await kit.connection.getBlockNumber()) < 1) {
+    console.info(`Sleeping ${sleepTime}ms while waiting for web3Provider to be synced.`)
+    await sleep(sleepTime)
+  }
+  const [goldToken, stableToken] = await Promise.all([
+    kit.contracts.getGoldToken(),
+    kit.contracts.getStableToken(),
+  ])
+  const [goldAmount, stableTokenAmount] = await Promise.all([
+    convertToContractDecimals(minimumEthBalance, goldToken),
+    convertToContractDecimals(minimumEthBalance, stableToken),
+  ])
+  for (let thread = 0; thread < threads; thread++) {
+    const senderIndex = getIndexForLoadTestThread(index, thread)
+    const threadPkey = generatePrivateKey(mnemonic, AccountType.LOAD_TESTING_ACCOUNT, senderIndex)
+    const threadAddress = privateKeyToAddress(threadPkey)
+    console.info(`Funding account ${threadAddress} using ${kit.defaultAccount}`)
+    if ((await goldToken.balanceOf(threadAddress)).lt(goldAmount)) {
+      console.log(`Sending gold to ${threadAddress}`)
+      await goldToken
+        .transfer(threadAddress, goldAmount.toFixed())
+        .send({ from: fundingAddress, chainId: numberToHex(chainId) })
+    } else {
+      console.log(`Account ${threadAddress} already has enough gold`)
+    }
+    if ((await stableToken.balanceOf(threadAddress)).lt(stableTokenAmount)) {
+      console.log(`Sending cusd to ${threadAddress} using ${kit.defaultAccount}`)
+      await stableToken
+        .transfer(threadAddress, stableTokenAmount.toFixed())
+        .send({ from: fundingAddress, chainId: numberToHex(chainId) })
+    } else {
+      console.log(`Account ${threadAddress} already has enough cusd`)
+    }
+  }
 }
 
 /**
