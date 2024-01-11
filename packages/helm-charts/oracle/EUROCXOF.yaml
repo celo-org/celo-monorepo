@@ -56,6 +56,38 @@ oracle:
       [
         {exchange: 'BITSTAMP', symbol: 'EUROCEUR', toInvert: false},
         {exchange: 'XIGNITE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+
+      [
+        {exchange: 'BITMART', symbol: 'EUROCUSDT', toInvert: false},
+        {exchange: 'BITMART', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'BITMART', symbol: 'EUROCUSDT', toInvert: false},
+        {exchange: 'BITMART', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'BITMART', symbol: 'EUROCUSDT', toInvert: false},
+        {exchange: 'BITMART', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'XIGNITE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+      
+      [
+        {exchange: 'BITMART', symbol: 'EUROCUSDC', toInvert: false},
+        {exchange: 'BITMART', symbol: 'USDCEUR', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'BITMART', symbol: 'EUROCUSDC', toInvert: false},
+        {exchange: 'BITMART', symbol: 'USDCEUR', toInvert: false},
+        {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'BITMART', symbol: 'EUROCUSDC', toInvert: false},
+        {exchange: 'BITMART', symbol: 'USDCEUR', toInvert: false},
+        {exchange: 'XIGNITE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
       ]
   ]"
   minPriceSourceCount: 6
