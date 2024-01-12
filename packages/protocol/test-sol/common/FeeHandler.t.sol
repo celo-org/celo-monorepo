@@ -234,15 +234,11 @@ contract FeeHandlerAddToken is FeeHandlerFoundry {
   function testAddsToken() public {
     vm.prank(owner);
     feeHandler.addToken(address(stableToken), address(mentoSeller));
-    assertEq(
-      feeHandler.getActiveTokens(),
-      address(stableToken)
-    );
+    address[] memory expectedActiveTokens = new address[](1);
+    expectedActiveTokens[0] = address(stableToken);
+    assertEq(feeHandler.getActiveTokens(), expectedActiveTokens);
     assertTrue(feeHandler.getTokenActive(address(stableToken)));
-    assertEq(
-      feeHandler.getTokenHandler(address(stableToken)),
-      address(mentoSeller)
-    );
+    assertEq(feeHandler.getTokenHandler(address(stableToken)), address(mentoSeller));
   }
 }
 
@@ -258,13 +254,8 @@ contract FeeHandlerRemoveToken is FeeHandlerFoundry {
     feeHandler.addToken(address(stableToken), address(mentoSeller));
     feeHandler.removeToken(address(stableToken));
     assertFalse(feeHandler.getTokenActive(address(stableToken)));
-    assertEq(
-      feeHandler.getActiveTokens(),
-      new address[](0)
-    );
-    assertEq(
-      feeHandler.getTokenHandler(address(stableToken), address(0))
-    );
+    assertEq(feeHandler.getActiveTokens().length, 0);
+    assertEq(feeHandler.getTokenHandler(address(stableToken)), address(0));
   }
 }
 
@@ -286,13 +277,276 @@ contract FeeHandlerDeactivateAndActivateToken is FeeHandlerFoundry {
     feeHandler.addToken(address(stableToken), address(mentoSeller));
     feeHandler.deactivateToken(address(stableToken));
     assertFalse(feeHandler.getTokenActive(address(stableToken)));
-    assertEq(feeHandler.getActiveTokens(), new address[](0));
+    assertEq(feeHandler.getActiveTokens().length, 0);
 
     feeHandler.activateToken(address(stableToken));
     assertTrue(feeHandler.getTokenActive(address(stableToken)));
-    assertEq(feeHandler.getActiveTokens(), address(stableToken));
+    address[] memory expectedActiveTokens = new address[](1);
+    expectedActiveTokens[0] = address(stableToken);
+    assertEq(feeHandler.getActiveTokens(), expectedActiveTokens);
   }
 }
 
+contract FeeHandlerSetFeeBeneficiary is FeeHandlerFoundry {
+  function testOnlyOwnerCanSetFeeBeneficiary() public {
+    vm.prank(user);
+    vm.expectRevert("Ownable: caller is not the owner");
+    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
+  }
 
+  function testSetsAddressCorrectly() public {
+    vm.prank(owner);
+    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
+    assertEq(feeHandler.feeBeneficiary(), EXAMPLE_BENEFICIARY_ADDRESS);
+  }
+}
 
+contract FeeHandlerDistribute is FeeHandlerFoundry {
+  // TODO(Alec) review these tests
+
+  function testCantDistributeWhenNotActive() public {
+    // TODO(Alec) is there a canonical way to do beforeEach in foundry?
+    vm.prank(owner);
+    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
+
+    vm.expectRevert("Handler has to be set to sell token");
+    feeHandler.distribute(address(stableToken));
+  }
+
+  function testCantDistributeWhenFrozen() public {
+    vm.prank(owner);
+    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+    feeHandler.activateToken(address(stableToken));
+
+    freezer.freeze(address(feeHandler));
+    vm.expectRevert("can't call when contract is frozen");
+    feeHandler.distribute(address(stableToken));
+  }
+
+  function testDoesntDistributeWhenBalanceIsZero() public {
+    vm.prank(owner);
+    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+    feeHandler.activateToken(address(stableToken));
+
+    assertEq(stableToken.balanceOf(address(feeHandler)), 0);
+    feeHandler.distribute(address(stableToken));
+    // TODO(Alec) how to check events in foundry?
+  }
+
+  function testDistribute() public {
+    // TODO(Alec) go through and understand this test
+    vm.prank(owner);
+    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+    feeHandler.activateToken(address(stableToken));
+
+    uint256 celoAmount = 100000000000000000;
+    uint256 stableTokenAmount = 100000000000000000;
+
+    vm.prank(user);
+    celoToken.approve(address(exchange), celoAmount);
+    exchange.sell(celoAmount, 0, true);
+    vm.prank(owner);
+    feeHandler.setMaxSplippage(address(stableToken), FixidityLib.newFixedFraction(1, 50).unwrap());
+    // feeHandler.addToken(address(stableToken), address(mentoSeller));
+    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
+    stableToken.transfer(address(feeHandler), stableTokenAmount);
+    feeHandler.setMaxSplippage(address(stableToken), FIXED1);
+    feeHandler.sell(address(stableToken));
+
+    feeHandler.distribute(address(stableToken));
+
+    assertEq(stableToken.balanceOf(address(feeHandler)), 0);
+    assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 200000000000000000);
+  }
+}
+
+contract FeeHandlerBurnCelo is FeeHandlerFoundry {
+  // TODO(Alec) understand these tests
+
+  function testBurnsCorrectly() public {
+    uint256 celoAmount = 100000000000000000;
+
+    vm.prank(owner);
+    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
+    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+    feeHandler.activateToken(address(stableToken));
+    feeHandler.activateToken(address(celoToken));
+    vm.prank(user);
+    celoToken.transfer(address(feeHandler), celoAmount);
+
+    feeHandler.burnCelo();
+    assertEq(celoToken.balanceOf(address(feeHandler)), 200000000000000000);
+    assertEq(celoToken.getBurnedAmount(), 800000000000000000);
+  }
+
+  function testDoesntBurnPendingDistribution() public {
+    uint256 celoAmount = 100000000000000000;
+
+    vm.prank(owner);
+    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
+    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+    feeHandler.activateToken(address(stableToken));
+    feeHandler.activateToken(address(celoToken));
+    vm.prank(user);
+    celoToken.transfer(address(feeHandler), celoAmount);
+
+    // TODO(Alec) is state reset between tests?
+    uint256 prevBurn = celoToken.getBurnedAmount();
+
+    feeHandler.burnCelo();
+
+    assertEq(celoToken.getBurnedAmount(), 800000000000000000 + prevBurn);
+
+    feeHandler.burnCelo();
+    assertEq(celoToken.balanceOf(address(feeHandler)), 200000000000000000);
+    assertEq(celoToken.getBurnedAmount(), 800000000000000000 + prevBurn);
+  }
+
+  function testDistributesCorrectlyAfterBurn() public {
+    // TODO(Alec) isn't this also tested above in Distribute?
+    feeHandler.burnCelo();
+    feeHandler.distribute(address(stableToken));
+    assertEq(stableToken.balanceOf(address(feeHandler)), 200000000000000000);
+    feeHandler.distribute(address(celoToken));
+    assertEq(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 200000000000000000);
+  }
+}
+
+contract FeeHandlerSell is FeeHandlerFoundry {
+  // TODO(Alec) can't sell when frozen
+
+  function testCantSellWhenFrozen() public {
+    vm.prank(owner);
+    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
+    freezer.freeze(address(feeHandler));
+    vm.expectRevert("can't call when contract is frozen.");
+    feeHandler.sell(address(stableToken));
+  }
+
+  function testWontSellWhenBalanceLow() public {
+    uint256 celoAmount = 1000000000000000000;
+    vm.prank(user);
+    celoToken.approve(address(exchange), celoAmount);
+    exchange.sell(celoAmount, 0, true);
+    vm.prank(owner);
+    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+    feeHandler.setMaxSplippage(address(stableToken), FIXED1);
+
+    vm.prank(user);
+    stableToken.transfer(address(feeHandler), feeHandler.MIN_BURN());
+    uint256 balanceBefore = stableToken.balanceOf(address(feeHandler));
+    feeHandler.sell(address(stableToken));
+    assertEq(stableToken.balanceOf(address(feeHandler)), balanceBefore);
+  }
+
+  function testResetSellLimit() public {
+    uint256 celoAmount = 1000000000000000000;
+    vm.prank(user);
+    celoToken.approve(address(exchange), celoAmount);
+    exchange.sell(celoAmount, 0, true);
+    vm.prank(owner);
+    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+    feeHandler.setMaxSplippage(address(stableToken), FIXED1);
+
+    feeHandler.setDailySellLimit(address(stableToken), 1000);
+    vm.prank(user);
+    stableToken.transfer(address(feeHandler), 3000);
+    feeHandler.sell(address(stableToken));
+    vm.warp(DAY);
+    feeHandler.sell(address(stableToken));
+
+    assertEq(stableToken.balanceOf(address(feeHandler), 1000));
+  }
+
+  function testDoesntSellWhenBiggerThanLimit() public {
+    uint256 celoAmount = 1000000000000000000;
+    vm.prank(user);
+    celoToken.approve(address(exchange), celoAmount);
+    exchange.sell(celoAmount, 0, true);
+    vm.prank(owner);
+    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+    feeHandler.setMaxSplippage(address(stableToken), FIXED1);
+
+    feeHandler.setDailySellLimit(address(stableToken), 1000);
+    vm.prank(user);
+    stableToken.transfer(address(feeHandler), 3000);
+
+    feeHandler.sell(address(stableToken));
+    assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
+    // selling again shouldn't do anything
+    feeHandler.sell(address(stableToken));
+    assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
+  }
+
+  function testSellsWithMento() public {
+    uint256 celoAmount = 1000000000000000000;
+    vm.prank(user);
+    celoToken.approve(address(exchange), celoAmount);
+    exchange.sell(celoAmount, 0, true);
+    vm.prank(owner);
+    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+    feeHandler.setMaxSplippage(address(stableToken), FIXED1);
+    vm.prank(user);
+    stableToken.transfer(address(feeHandler), celoAmount);
+
+    assertEq(feeHandler.getPastBurnForToken(address(stableToken), 0));
+    uint256 startFeeHandlerBalanceStable = stableToken.balanceOf(address(feeHandler));
+    feeHandler.setMaxSplippage(address(stableToken), FIXED1);
+    feeHandler.sell(address(stableToken));
+    assertEq(
+      feeHandler.getPastBurnForToken(address(feeHandler)),
+      startFeeHandlerBalanceStable * 0.8
+    );
+    assertEq(stableToken.balanceOf(address(feeHandler), 200000000000000000));
+    assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 200000000000000000);
+    // TODO(Alec) how to do 'expectBigNumberInRange'
+  }
+
+  function testDoesntExchangeWhenNotEnoughReports() public {
+    uint256 celoAmount = 1000000000000000000;
+    vm.prank(user);
+    celoToken.approve(address(exchange), celoAmount);
+    exchange.sell(celoAmount, 0, true);
+    vm.prank(owner);
+    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+    feeHandler.setMaxSplippage(address(stableToken), FIXED1);
+    vm.prank(user);
+    stableToken.transfer(address(feeHandler), celoAmount);
+
+    mentoSeller.setMinimumReports(address(tokenA), 2);
+    // TODO(Alec) from before migration "this balance is wrong"
+    uint256 balanceBefore = stableToken.balanceOf(address(feeHandler));
+    feeHandler.setMaxSplippage(address(tokenA), maxSlippage);
+    vm.expectRevert("Handler has to be set to sell token.");
+    feeHandler.sell(address(tokenA));
+    assertEq(stableToken.balanceOf(address(feeHandler)), balanceBefore);
+  }
+
+  function testDoesntBurnBalanceIfHasntDistributed() public {
+    uint256 celoAmount = 1000000000000000000;
+    vm.prank(user);
+    celoToken.approve(address(exchange), celoAmount);
+    exchange.sell(celoAmount, 0, true);
+    vm.prank(owner);
+    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+    feeHandler.setMaxSplippage(address(stableToken), FIXED1);
+    vm.prank(user);
+    stableToken.transfer(address(feeHandler), celoAmount);
+
+    feeHandler.sell(address(stableToken));
+    uint256 balanceBefore = stableToken.balanceOf(address(feeHandler));
+    feeHandler.sell(address(stableToken));
+    assertEq(stableToken.balanceOf(address(feeHandler)), balanceBefore);
+  }
+}
