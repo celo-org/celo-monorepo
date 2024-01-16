@@ -1,6 +1,8 @@
 pragma solidity ^0.5.13;
 
-import "@celo-contracts/common/linkedlists/IntegerSortedLinkedList.sol";
+// TODO: move file to @test-sol/governance/validator when migrations is moved to foundry.
+
+import "../linkedlists/IntegerSortedLinkedList.sol";
 
 contract IntegerSortedLinkedListMock {
   using IntegerSortedLinkedList for SortedLinkedList.List;

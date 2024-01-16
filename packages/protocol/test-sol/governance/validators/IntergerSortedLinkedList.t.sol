@@ -3,7 +3,7 @@ pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
 
-import "@test-sol/governance/validators/IntegerSortedLinkedListMock.sol";
+import "@celo-contracts/common/test/IntegerSortedLinkedListMock.sol";
 
 contract IntegerSortedLinkedListTest is Test {
   IntegerSortedLinkedListMock public integerSortedLinkedListMock;
