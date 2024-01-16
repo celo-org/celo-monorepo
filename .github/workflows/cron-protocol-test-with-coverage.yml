@@ -22,7 +22,7 @@ jobs:
       - name: Run protocol tests with coverage
         run: yarn --cwd packages/protocol test:coverage
       - name: Store results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: protocol-coverage
           path: packages/protocol/coverage
