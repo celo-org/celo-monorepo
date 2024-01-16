@@ -16,7 +16,7 @@ import "../../contracts/common/MentoFeeHandlerSeller.sol";
 import "../../contracts/common/UniswapFeeHandlerSeller.sol";
 import "../../contracts/uniswap/test/MockUniswapV2Router02.sol";
 import "../../contracts/uniswap/test/MockUniswapV2Factory.sol";
-import "../../contracts/identity/test/MockERC20Token.sol";
+import "../../contracts/uniswap/test/MockERC20.sol";
 import "../../lib/mento-core/test/mocks/MockSortedOracles.sol";
 import "../../lib/mento-core/test/mocks/MockReserve.sol";
 
@@ -32,7 +32,7 @@ contract FeeHandlerFoundry is Test, Constants {
   MockReserve mockReserve;
 
   Freezer freezer;
-  MockERC20Token tokenA;
+  MockERC20 tokenA;
 
   MockUniswapV2Router02 uniswapRouter;
   MockUniswapV2Router02 uniswapRouter2;
@@ -56,7 +56,7 @@ contract FeeHandlerFoundry is Test, Constants {
   address user = actor("user");
 
   uint256 celoAmountForRate = 1000000000000000000000000;
-  uint256 stableAmountForRate = 2 * goldAmountForRate;
+  uint256 stableAmountForRate = 2 * celoAmountForRate;
   uint256 spread;
   uint256 reserveFraction;
   uint256 maxSlippage;
@@ -86,7 +86,7 @@ contract FeeHandlerFoundry is Test, Constants {
     mentoSeller = new MentoFeeHandlerSeller(true);
     uniswapFeeHandlerSeller = new UniswapFeeHandlerSeller(true);
 
-    tokenA = new MockERC20Token();
+    tokenA = new MockERC20();
 
     feeCurrencyWhitelist.initialize();
     registry.setAddressFor("FeeCurrencyWhitelist", address(feeCurrencyWhitelist));
@@ -464,7 +464,7 @@ contract FeeHandlerSellMentoTokens is FeeHandlerFoundry {
     vm.warp(DAY);
     feeHandler.sell(address(stableToken));
 
-    assertEq(stableToken.balanceOf(address(feeHandler), 1000));
+    assertEq(stableToken.balanceOf(address(feeHandler)), 1000);
   }
 
   function testDoesntSellWhenBiggerThanLimit() public {
@@ -500,15 +500,18 @@ contract FeeHandlerSellMentoTokens is FeeHandlerFoundry {
     vm.prank(user);
     stableToken.transfer(address(feeHandler), celoAmount);
 
-    assertEq(feeHandler.getPastBurnForToken(address(stableToken), 0));
+    assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 0);
     uint256 startFeeHandlerBalanceStable = stableToken.balanceOf(address(feeHandler));
     feeHandler.setMaxSplippage(address(stableToken), FIXED1);
     feeHandler.sell(address(stableToken));
     assertEq(
       feeHandler.getPastBurnForToken(address(feeHandler)),
-      startFeeHandlerBalanceStable * 0.8
+      FixidityLib
+        .newFixed(startFeeHandlerBalanceStable)
+        .multiply(FixidityLib.newFixedFraction(80, 100))
+        .unwrap()
     );
-    assertEq(stableToken.balanceOf(address(feeHandler), 200000000000000000));
+    assertEq(stableToken.balanceOf(address(feeHandler)), 200000000000000000);
     assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 200000000000000000);
     // TODO(Alec) how to do 'expectBigNumberInRange'
   }
@@ -555,35 +558,36 @@ contract FeeHandlerSellMentoTokens is FeeHandlerFoundry {
 
 contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
   function testDoesntExchangeWhenNotEnoughReports() public {
-    uint256 deadline = vm.block.timestamp + 100;
-    uniswapFactory = new MockUniswapV2Factory("0x0000000000000000000000000000000000000000"); // feeSetter
+    uint256 deadline = block.timestamp + 100;
+    uniswapFactory = new MockUniswapV2Factory(0x0000000000000000000000000000000000000000); // feeSetter
     bytes32 initCodePairHash = uniswapFactory.INIT_CODE_PAIR_HASH();
     uniswapRouter = new MockUniswapV2Router02(
       address(uniswapFactory),
-      "0x0000000000000000000000000000000000000000",
+      0x0000000000000000000000000000000000000000,
       initCodePairHash
     );
 
-    uniswapFactory2 = new MockUniswapV2Factory("0x0000000000000000000000000000000000000000"); // feeSetter
+    uniswapFactory2 = new MockUniswapV2Factory(0x0000000000000000000000000000000000000000); // feeSetter
     uniswapRouter2 = new MockUniswapV2Router02(
       address(uniswapFactory2),
-      "0x0000000000000000000000000000000000000000",
+      0x0000000000000000000000000000000000000000,
       initCodePairHash
     );
 
     vm.prank(owner);
     feeCurrencyWhitelist.addToken(address(tokenA));
-    uniswapFeeHandlerSeller.initialize(address(registry));
-    uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswap));
+
+    uniswapFeeHandlerSeller.initialize(address(registry), new address[](0), new uint256[](0));
+    uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswapRouter));
     tokenA.mint(address(feeHandler), 10000000000000000000);
     tokenA.mint(user, 10000000000000000000);
     celoToken.transfer(user, 10000000000000000000);
     uint256 toTransfer = 5000000000000000000;
 
     vm.prank(user);
-    tokenA.approve(address(uniswap), toTransfer);
-    celoToken.approve(address(uniswap), toTransfer);
-    uniswap.addLiquidity(
+    tokenA.approve(address(uniswapRouter), toTransfer);
+    celoToken.approve(address(uniswapRouter), toTransfer);
+    uniswapRouter.addLiquidity(
       address(tokenA),
       address(celoToken),
       toTransfer,
@@ -596,7 +600,7 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
 
     vm.prank(owner);
     feeHandler.addToken(address(tokenA), address(uniswapFeeHandlerSeller));
-    feeHandler.setMaxSplippage(address(tokenA), FIXED_1);
+    feeHandler.setMaxSplippage(address(tokenA), FIXED1);
 
     // TODO(Alec) beforeEach
 
@@ -612,35 +616,35 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
   }
 
   function testSellWorksWithCheck() public {
-    uint256 deadline = vm.block.timestamp + 100;
-    uniswapFactory = new MockUniswapV2Factory("0x0000000000000000000000000000000000000000"); // feeSetter
+    uint256 deadline = block.timestamp + 100;
+    uniswapFactory = new MockUniswapV2Factory(0x0000000000000000000000000000000000000000); // feeSetter
     bytes32 initCodePairHash = uniswapFactory.INIT_CODE_PAIR_HASH();
     uniswapRouter = new MockUniswapV2Router02(
       address(uniswapFactory),
-      "0x0000000000000000000000000000000000000000",
+      0x0000000000000000000000000000000000000000,
       initCodePairHash
     );
 
-    uniswapFactory2 = new MockUniswapV2Factory("0x0000000000000000000000000000000000000000"); // feeSetter
+    uniswapFactory2 = new MockUniswapV2Factory(0x0000000000000000000000000000000000000000); // feeSetter
     uniswapRouter2 = new MockUniswapV2Router02(
       address(uniswapFactory2),
-      "0x0000000000000000000000000000000000000000",
+      0x0000000000000000000000000000000000000000,
       initCodePairHash
     );
 
     vm.prank(owner);
     feeCurrencyWhitelist.addToken(address(tokenA));
-    uniswapFeeHandlerSeller.initialize(address(registry));
-    uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswap));
+    uniswapFeeHandlerSeller.initialize(address(registry), new address[](0), new uint256[](0));
+    uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswapRouter));
     tokenA.mint(address(feeHandler), 10000000000000000000);
     tokenA.mint(user, 10000000000000000000);
     celoToken.transfer(user, 10000000000000000000);
     uint256 toTransfer = 5000000000000000000;
 
     vm.prank(user);
-    tokenA.approve(address(uniswap), toTransfer);
-    celoToken.approve(address(uniswap), toTransfer);
-    uniswap.addLiquidity(
+    tokenA.approve(address(uniswapRouter), toTransfer);
+    celoToken.approve(address(uniswapRouter), toTransfer);
+    uniswapRouter.addLiquidity(
       address(tokenA),
       address(celoToken),
       toTransfer,
@@ -653,7 +657,7 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
 
     vm.prank(owner);
     feeHandler.addToken(address(tokenA), address(uniswapFeeHandlerSeller));
-    feeHandler.setMaxSplippage(address(tokenA), FIXED_1);
+    feeHandler.setMaxSplippage(address(tokenA), FIXED1);
 
     // TODO(Alec) beforeEach
 
@@ -669,35 +673,35 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
   }
 
   function testFailsWhenOracleSlippageIsHigh() public {
-    uint256 deadline = vm.block.timestamp + 100;
-    uniswapFactory = new MockUniswapV2Factory("0x0000000000000000000000000000000000000000"); // feeSetter
+    uint256 deadline = block.timestamp + 100;
+    uniswapFactory = new MockUniswapV2Factory(0x0000000000000000000000000000000000000000); // feeSetter
     bytes32 initCodePairHash = uniswapFactory.INIT_CODE_PAIR_HASH();
     uniswapRouter = new MockUniswapV2Router02(
       address(uniswapFactory),
-      "0x0000000000000000000000000000000000000000",
+      0x0000000000000000000000000000000000000000,
       initCodePairHash
     );
 
-    uniswapFactory2 = new MockUniswapV2Factory("0x0000000000000000000000000000000000000000"); // feeSetter
+    uniswapFactory2 = new MockUniswapV2Factory(0x0000000000000000000000000000000000000000); // feeSetter
     uniswapRouter2 = new MockUniswapV2Router02(
       address(uniswapFactory2),
-      "0x0000000000000000000000000000000000000000",
+      0x0000000000000000000000000000000000000000,
       initCodePairHash
     );
 
     vm.prank(owner);
     feeCurrencyWhitelist.addToken(address(tokenA));
-    uniswapFeeHandlerSeller.initialize(address(registry));
-    uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswap));
+    uniswapFeeHandlerSeller.initialize(address(registry), new address[](0), new uint256[](0));
+    uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswapRouter));
     tokenA.mint(address(feeHandler), 10000000000000000000);
     tokenA.mint(user, 10000000000000000000);
     celoToken.transfer(user, 10000000000000000000);
     uint256 toTransfer = 5000000000000000000;
 
     vm.prank(user);
-    tokenA.approve(address(uniswap), toTransfer);
-    celoToken.approve(address(uniswap), toTransfer);
-    uniswap.addLiquidity(
+    tokenA.approve(address(uniswapRouter), toTransfer);
+    celoToken.approve(address(uniswapRouter), toTransfer);
+    uniswapRouter.addLiquidity(
       address(tokenA),
       address(celoToken),
       toTransfer,
@@ -710,7 +714,7 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
 
     vm.prank(owner);
     feeHandler.addToken(address(tokenA), address(uniswapFeeHandlerSeller));
-    feeHandler.setMaxSplippage(address(tokenA), FIXED_1);
+    feeHandler.setMaxSplippage(address(tokenA), FIXED1);
 
     // TODO(Alec) beforeEach
 
@@ -721,7 +725,7 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
     // TODO(Alec) beforeEach
 
     mockSortedOracles.setNumRates(address(tokenA), 2);
-    feeHandler.setMaxSlippage(address(tokenA), FixidityLib.newFixedFraction(80, 100).unwrap());
+    feeHandler.setMaxSplippage(address(tokenA), FixidityLib.newFixedFraction(80, 100).unwrap());
 
     mockSortedOracles.setMedianRate(address(tokenA), 300 * celoAmountForRate);
     vm.expectRevert("UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT");
@@ -729,35 +733,35 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
   }
 
   function testUniswapTrade() public {
-    uint256 deadline = vm.block.timestamp + 100;
-    uniswapFactory = new MockUniswapV2Factory("0x0000000000000000000000000000000000000000"); // feeSetter
+    uint256 deadline = block.timestamp + 100;
+    uniswapFactory = new MockUniswapV2Factory(0x0000000000000000000000000000000000000000); // feeSetter
     bytes32 initCodePairHash = uniswapFactory.INIT_CODE_PAIR_HASH();
     uniswapRouter = new MockUniswapV2Router02(
       address(uniswapFactory),
-      "0x0000000000000000000000000000000000000000",
+      0x0000000000000000000000000000000000000000,
       initCodePairHash
     );
 
-    uniswapFactory2 = new MockUniswapV2Factory("0x0000000000000000000000000000000000000000"); // feeSetter
+    uniswapFactory2 = new MockUniswapV2Factory(0x0000000000000000000000000000000000000000); // feeSetter
     uniswapRouter2 = new MockUniswapV2Router02(
       address(uniswapFactory2),
-      "0x0000000000000000000000000000000000000000",
+      0x0000000000000000000000000000000000000000,
       initCodePairHash
     );
 
     vm.prank(owner);
     feeCurrencyWhitelist.addToken(address(tokenA));
-    uniswapFeeHandlerSeller.initialize(address(registry));
-    uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswap));
+    uniswapFeeHandlerSeller.initialize(address(registry), new address[](0), new uint256[](0));
+    uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswapRouter));
     tokenA.mint(address(feeHandler), 10000000000000000000);
     tokenA.mint(user, 10000000000000000000);
     celoToken.transfer(user, 10000000000000000000);
     uint256 toTransfer = 5000000000000000000;
 
     vm.prank(user);
-    tokenA.approve(address(uniswap), toTransfer);
-    celoToken.approve(address(uniswap), toTransfer);
-    uniswap.addLiquidity(
+    tokenA.approve(address(uniswapRouter), toTransfer);
+    celoToken.approve(address(uniswapRouter), toTransfer);
+    uniswapRouter.addLiquidity(
       address(tokenA),
       address(celoToken),
       toTransfer,
@@ -770,7 +774,7 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
 
     vm.prank(owner);
     feeHandler.addToken(address(tokenA), address(uniswapFeeHandlerSeller));
-    feeHandler.setMaxSplippage(address(tokenA), FIXED_1);
+    feeHandler.setMaxSplippage(address(tokenA), FIXED1);
 
     // TODO(Alec) beforeEach
 
@@ -778,46 +782,47 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
     uint256 balanceBbefore = celoToken.balanceOf(user);
 
     vm.prank(user);
-    tokenA.approve(address(uniswap), 1000000000000000000);
-    address[] tokenAddresses = new address[](2);
+    tokenA.approve(address(uniswapRouter), 1000000000000000000);
+    address[] memory tokenAddresses = new address[](2);
     tokenAddresses[0] = address(tokenA);
     tokenAddresses[1] = address(celoToken);
-    uniswap.swapExactTokensForTokens(1000000000000000000, 0, tokenAddresses, user, deadline);
+    uniswapRouter.swapExactTokensForTokens(1000000000000000000, 0, tokenAddresses, user, deadline);
 
-    assertEq(balanceAbefore, token.balanceOf(user));
+    assertEq(balanceAbefore, tokenA.balanceOf(user));
     assertEq(celoToken.balanceOf(user), balanceBbefore);
   }
 
   function testSellsNonMentoTokens() public {
-    uint256 deadline = vm.block.timestamp + 100;
-    uniswapFactory = new MockUniswapV2Factory("0x0000000000000000000000000000000000000000"); // feeSetter
+    uint256 deadline = block.timestamp + 100;
+    uniswapFactory = new MockUniswapV2Factory(0x0000000000000000000000000000000000000000); // feeSetter
     bytes32 initCodePairHash = uniswapFactory.INIT_CODE_PAIR_HASH();
     uniswapRouter = new MockUniswapV2Router02(
       address(uniswapFactory),
-      "0x0000000000000000000000000000000000000000",
+      0x0000000000000000000000000000000000000000,
       initCodePairHash
     );
 
-    uniswapFactory2 = new MockUniswapV2Factory("0x0000000000000000000000000000000000000000"); // feeSetter
+    // TODO(Alec) are these being used??
+    uniswapFactory2 = new MockUniswapV2Factory(0x0000000000000000000000000000000000000000); // feeSetter
     uniswapRouter2 = new MockUniswapV2Router02(
       address(uniswapFactory2),
-      "0x0000000000000000000000000000000000000000",
+      0x0000000000000000000000000000000000000000,
       initCodePairHash
     );
 
     vm.prank(owner);
     feeCurrencyWhitelist.addToken(address(tokenA));
-    uniswapFeeHandlerSeller.initialize(address(registry));
-    uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswap));
+    uniswapFeeHandlerSeller.initialize(address(registry), new address[](0), new uint256[](0));
+    uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswapRouter));
     tokenA.mint(address(feeHandler), 10000000000000000000);
     tokenA.mint(user, 10000000000000000000);
     celoToken.transfer(user, 10000000000000000000);
     uint256 toTransfer = 5000000000000000000;
 
     vm.prank(user);
-    tokenA.approve(address(uniswap), toTransfer);
-    celoToken.approve(address(uniswap), toTransfer);
-    uniswap.addLiquidity(
+    tokenA.approve(address(uniswapRouter), toTransfer);
+    celoToken.approve(address(uniswapRouter), toTransfer);
+    uniswapRouter.addLiquidity(
       address(tokenA),
       address(celoToken),
       toTransfer,
@@ -830,45 +835,45 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
 
     vm.prank(owner);
     feeHandler.addToken(address(tokenA), address(uniswapFeeHandlerSeller));
-    feeHandler.setMaxSplippage(address(tokenA), FIXED_1);
+    feeHandler.setMaxSplippage(address(tokenA), FIXED1);
 
     // TODO(Alec) beforeEach
 
     assertTrue(tokenA.balanceOf(address(feeHandler)) > 0);
     feeHandler.sell(address(tokenA));
-    assertEq(tokenA.balanceOf(address(feeHandler), 2000000000000000000));
+    assertEq(tokenA.balanceOf(address(feeHandler)), 2000000000000000000);
   }
 
   function testDoesntExchangeWhenSlippageIsTooHigh() public {
-    uint256 deadline = vm.block.timestamp + 100;
-    uniswapFactory = new MockUniswapV2Factory("0x0000000000000000000000000000000000000000"); // feeSetter
+    uint256 deadline = block.timestamp + 100;
+    uniswapFactory = new MockUniswapV2Factory(0x0000000000000000000000000000000000000000); // feeSetter
     bytes32 initCodePairHash = uniswapFactory.INIT_CODE_PAIR_HASH();
     uniswapRouter = new MockUniswapV2Router02(
       address(uniswapFactory),
-      "0x0000000000000000000000000000000000000000",
+      0x0000000000000000000000000000000000000000,
       initCodePairHash
     );
 
-    uniswapFactory2 = new MockUniswapV2Factory("0x0000000000000000000000000000000000000000"); // feeSetter
+    uniswapFactory2 = new MockUniswapV2Factory(0x0000000000000000000000000000000000000000); // feeSetter
     uniswapRouter2 = new MockUniswapV2Router02(
       address(uniswapFactory2),
-      "0x0000000000000000000000000000000000000000",
+      0x0000000000000000000000000000000000000000,
       initCodePairHash
     );
 
     vm.prank(owner);
     feeCurrencyWhitelist.addToken(address(tokenA));
-    uniswapFeeHandlerSeller.initialize(address(registry));
-    uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswap));
+    uniswapFeeHandlerSeller.initialize(address(registry), new address[](0), new uint256[](0));
+    uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswapRouter));
     tokenA.mint(address(feeHandler), 10000000000000000000);
     tokenA.mint(user, 10000000000000000000);
     celoToken.transfer(user, 10000000000000000000);
     uint256 toTransfer = 5000000000000000000;
 
     vm.prank(user);
-    tokenA.approve(address(uniswap), toTransfer);
-    celoToken.approve(address(uniswap), toTransfer);
-    uniswap.addLiquidity(
+    tokenA.approve(address(uniswapRouter), toTransfer);
+    celoToken.approve(address(uniswapRouter), toTransfer);
+    uniswapRouter.addLiquidity(
       address(tokenA),
       address(celoToken),
       toTransfer,
@@ -891,35 +896,35 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
   }
 
   function testTriesToGetBestRateWithManyExchanges() public {
-    uint256 deadline = vm.block.timestamp + 100;
-    uniswapFactory = new MockUniswapV2Factory("0x0000000000000000000000000000000000000000"); // feeSetter
+    uint256 deadline = block.timestamp + 100;
+    uniswapFactory = new MockUniswapV2Factory(0x0000000000000000000000000000000000000000); // feeSetter
     bytes32 initCodePairHash = uniswapFactory.INIT_CODE_PAIR_HASH();
     uniswapRouter = new MockUniswapV2Router02(
       address(uniswapFactory),
-      "0x0000000000000000000000000000000000000000",
+      0x0000000000000000000000000000000000000000,
       initCodePairHash
     );
 
-    uniswapFactory2 = new MockUniswapV2Factory("0x0000000000000000000000000000000000000000"); // feeSetter
+    uniswapFactory2 = new MockUniswapV2Factory(0x0000000000000000000000000000000000000000); // feeSetter
     uniswapRouter2 = new MockUniswapV2Router02(
       address(uniswapFactory2),
-      "0x0000000000000000000000000000000000000000",
+      0x0000000000000000000000000000000000000000,
       initCodePairHash
     );
 
     vm.prank(owner);
     feeCurrencyWhitelist.addToken(address(tokenA));
-    uniswapFeeHandlerSeller.initialize(address(registry));
-    uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswap));
+    uniswapFeeHandlerSeller.initialize(address(registry), new address[](0), new uint256[](0));
+    uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswapRouter));
     tokenA.mint(address(feeHandler), 10000000000000000000);
     tokenA.mint(user, 10000000000000000000);
     celoToken.transfer(user, 10000000000000000000);
     uint256 toTransfer = 5000000000000000000;
 
     vm.prank(user);
-    tokenA.approve(address(uniswap), toTransfer);
-    celoToken.approve(address(uniswap), toTransfer);
-    uniswap.addLiquidity(
+    tokenA.approve(address(uniswapRouter), toTransfer);
+    celoToken.approve(address(uniswapRouter), toTransfer);
+    uniswapRouter.addLiquidity(
       address(tokenA),
       address(celoToken),
       toTransfer,
@@ -932,11 +937,11 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
 
     vm.prank(owner);
     feeHandler.addToken(address(tokenA), address(uniswapFeeHandlerSeller));
-    feeHandler.setMaxSplippage(address(tokenA), FIXED_1);
+    feeHandler.setMaxSplippage(address(tokenA), FIXED1);
 
     // TODO(Alec) beforeEach
 
-    uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswap2));
+    uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswapRouter2));
     tokenA.mint(user, 10000000000000000000);
 
     // safety check, check that the balance is no empty before the burn
@@ -945,10 +950,10 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
     uint256 toTransfer2 = 100000000000000000000;
 
     vm.prank(user);
-    tokenA.approve(address(uniswap2), toTransfer2);
-    celoToken.approve(address(uniswap2), toTransfer2);
+    tokenA.approve(address(uniswapRouter2), toTransfer2);
+    celoToken.approve(address(uniswapRouter2), toTransfer2);
 
-    uniswap2.addLiquidity(
+    uniswapRouter2.addLiquidity(
       address(tokenA),
       address(celoToken),
       toTransfer2,
@@ -959,20 +964,20 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
       deadline
     );
 
-    address[] tokenAddresses = new address[](2);
+    address[] memory tokenAddresses = new address[](2);
     tokenAddresses[0] = address(tokenA);
     tokenAddresses[1] = address(celoToken);
 
-    uint256 quote1before = uniswap.getAmountsOut(1000000000000000000, tokenAddresses)[1];
-    uint256 quote2before = uniswap2.getAmountsOut(1000000000000000000, tokenAddresses)[1];
+    uint256 quote1before = uniswapRouter.getAmountsOut(1000000000000000000, tokenAddresses)[1];
+    uint256 quote2before = uniswapRouter2.getAmountsOut(1000000000000000000, tokenAddresses)[1];
 
     feeHandler.sell(address(tokenA));
 
     // liquidity should have been taken of uniswap2, because it has better liquidity, and thus higher quote
     // so the quote gets worse (smaller number)
 
-    uint256 quote1after = uniswap.getAmountsOut(1000000000000000000, tokenAddresses)[1];
-    uint256 quote2after = uniswap.getAmountsOut(1000000000000000000, tokenAddresses)[1];
+    uint256 quote1after = uniswapRouter.getAmountsOut(1000000000000000000, tokenAddresses)[1];
+    uint256 quote2after = uniswapRouter.getAmountsOut(1000000000000000000, tokenAddresses)[1];
 
     assertEq(quote1before, quote1after); // uniswap 1 should be untouched
     assertTrue(quote2before > quote2after);
@@ -1030,9 +1035,9 @@ contract FeeHandlerHandleAll is FeeHandlerFoundry {
     vm.prank(owner);
 
     feeHandler.addToken(address(stableToken), address(mentoSeller));
-    feeHandler.addToken(address(stableToken2), address(mentoSeller));
-    feeHandler.setMaxSplippage(address(stableToken), FIXED_1);
-    feeHandler.setMaxSplippage(address(stableToken2), FIXED_1);
+    feeHandler.addToken(address(stableTokenEUR), address(mentoSeller));
+    feeHandler.setMaxSplippage(address(stableToken), FIXED1);
+    feeHandler.setMaxSplippage(address(stableTokenEUR), FIXED1);
 
     feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
     feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
@@ -1040,21 +1045,33 @@ contract FeeHandlerHandleAll is FeeHandlerFoundry {
     uint256 previousBurn = celoToken.getBurnedAmount();
     vm.prank(user);
     stableToken.transfer(address(feeHandler), 1000000000000000000);
-    stableToken2.transfer(address(feeHandler), 1000000000000000000);
+    stableTokenEUR.transfer(address(feeHandler), 1000000000000000000);
 
     assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 0);
     uint256 burnedAmountStable = stableToken.balanceOf(address(feeHandler));
 
     feeHandler.handleAll();
 
-    assertEq(feeHandler.getPastBurnForToken(address(stableToken)), burnedAmountStable * 0.8);
-    assertEq(feeHandler.getPastBurnForToken(address(stableToken2)), burnedAmountStable * 0.8);
+    assertEq(
+      feeHandler.getPastBurnForToken(address(stableToken)),
+      FixidityLib
+        .newFixed(burnedAmountStable)
+        .multiply(FixidityLib.newFixedFraction(80, 100))
+        .unwrap()
+    );
+    assertEq(
+      feeHandler.getPastBurnForToken(address(stableTokenEUR)),
+      FixidityLib
+        .newFixed(burnedAmountStable)
+        .multiply(FixidityLib.newFixedFraction(80, 100))
+        .unwrap()
+    );
     assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 200000000000000000);
-    assertEq(stableToken2.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 200000000000000000);
+    assertEq(stableTokenEUR.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 200000000000000000);
 
     // everything should have been burned
-    assertEq(feeHandler.getTokenToDistribute(address(stableToken), 0));
-    assertEq(feeHandler.getTokenToDistribute(address(stableToken2), 0));
+    assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 0);
+    assertEq(feeHandler.getTokenToDistribute(address(stableTokenEUR)), 0);
 
     // burn is non zero
     assertTrue(celoToken.getBurnedAmount() > previousBurn);
@@ -1081,7 +1098,7 @@ contract FeeHandlerSetDailySellLimit is FeeHandlerFoundry {
   function testOnlyOwnerCanSetLimit() public {
     vm.expectRevert("Ownable: caller is not the owner.");
     vm.prank(user);
-    feeHandler.setDailySellLimit(address(stableToken), celoTokenAmountForRate);
+    feeHandler.setDailySellLimit(address(stableToken), celoAmountForRate);
   }
 }
 
