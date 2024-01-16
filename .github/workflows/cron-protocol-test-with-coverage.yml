@@ -14,7 +14,7 @@ jobs:
   protocol-test-with-code-coverage:
     runs-on: ["self-hosted", "monorepo-node18"]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install yarn dependencies
         run: yarn install
       - name: Build packages
