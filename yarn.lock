@@ -1827,12 +1827,12 @@
     p-defer "^1.0.0"
     protobufjs "^6.8.1"
 
-"@google-cloud/secret-manager@3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@google-cloud/secret-manager/-/secret-manager-3.0.0.tgz#31842287bd0eee380210488ae40cae3732b2b32f"
-  integrity sha512-ZAWoqiMbWv2Osx6Enq6TLPw/LR8kuSUWKhAsaJVy+q1GCR7clVNVuaPhizWIc4p88QYjW0h2j/wUBJ6OKFUmAw==
+"@google-cloud/secret-manager@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@google-cloud/secret-manager/-/secret-manager-3.12.0.tgz#ff975190e45da3aaa762905f2b7c679c06a0f4a3"
+  integrity sha512-nFNm5lYgH2RRAn1x8vPKt1c+MBMJtBXqkYB5Jpi68PjN7Emjcu7/kl+0/+FamFLp3qJUU7RKRCwETFNNZAOkuw==
   dependencies:
-    google-gax "^2.0.1"
+    google-gax "^2.30.0"
 
 "@google-cloud/storage@^2.4.3":
   version "2.5.0"
@@ -11569,7 +11569,7 @@ google-gax@^0.25.0:
     semver "^6.0.0"
     walkdir "^0.3.2"
 
-google-gax@^2.0.1:
+google-gax@^2.30.0:
   version "2.30.5"
   resolved "https://registry.yarnpkg.com/google-gax/-/google-gax-2.30.5.tgz#e836f984f3228900a8336f608c83d75f9cb73eff"
   integrity sha512-Jey13YrAN2hfpozHzbtrwEfEHdStJh1GwaQ2+Akh1k0Tv/EuNVSuBtHZoKSBm5wBMvNsxTsEIZ/152NrYyZgxQ==
