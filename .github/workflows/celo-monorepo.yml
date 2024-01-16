@@ -173,7 +173,7 @@ jobs:
             --ignore @celo/env-tests \
             run test
       - name: Upload Jest Test Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Jest Test Results
           path: test-results/jest
