@@ -19,10 +19,18 @@ oracle:
         {exchange: 'COINBASE', symbol: 'EUROCUSD', toInvert: false},
         {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: true},
         {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false}
-      ],      
+      ],
       [
         {exchange: 'BITSTAMP', symbol: 'EUROCEUR', toInvert: false},
-      ]    
+      ],
+      [
+        {exchange: 'BITMART', symbol: 'EUROCUSDT', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDTEUR', toInvert: false}
+      ],
+      [
+        {exchange: 'BITMART', symbol: 'EUROCUSDC', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDCEUR', toInvert: false}
+      ]
     ]"
   minPriceSourceCount: 2
   reportStrategy: BLOCK_BASED

@@ -12,6 +12,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - name: Fail if there are test with wrong extension
+        if: success() || failure()
+        run: |
+          if  tree test-sol | grep -i ".sol" | grep -v ".sol"; then
+            echo "There are tests with wrong extensions"
+            tree test-sol | grep -i ".sol" | grep -v ".sol"
+            exit 1
+          fi
       - name: Foundry cache
         id: foundry-cache
         uses: actions/cache@v3
@@ -40,32 +48,32 @@ jobs:
 
       - name: Run tests common
         # can't use gas limit because some setUp function use more than the limit
-        run: forge test -vvv --match-path "test-sol/common/*" # --block-gas-limit 20000000 
+        run: forge test -vvv --match-path "test-sol/common/*" # --block-gas-limit 50000000 
 
       - name: Run tests compatibility
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/compatibility/*"
+        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/compatibility/*"
 
       - name: Run tests governance/network
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/governance/network/*"
+        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/governance/network/*"
 
       - name: Run tests governance/validators
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/governance/validators/*"
+        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/governance/validators/*"
       
       - name: Run tests governance/voting
         # can't use gas limit because some setUp function use more than the limit
         if: success() || failure()
-        run: forge test -vvv --match-path "test-sol/governance/voting/*" # --block-gas-limit 20000000
+        run: forge test -vvv --match-path "test-sol/governance/voting/*" --block-gas-limit 50000000
 
       - name: Run tests stability
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 20000000 --match-path "test-sol/stability/*"
+        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/stability/*"
 
       - name: Run tests identity
         if: success() || failure()
-        run: forge test -vvv --match-path "test-sol/identity/*"
+        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/identity/*"
 
       - name: Fail if there are tests without folder
         if: success() || failure()
