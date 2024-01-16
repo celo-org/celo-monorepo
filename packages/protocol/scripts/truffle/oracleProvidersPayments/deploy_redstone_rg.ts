@@ -29,23 +29,23 @@ interface ReleaseGoldConfig {
   canVote: boolean
 }
 
-const CELO_PRICE_USD = 0.7515
+const CELO_PRICE_USD = 0.758
 const MENTO_MULTISIG_ADDRESS = '0x87647780180B8f55980C7D3fFeFe08a9B29e9aE1'
 
-const T_SYSTEMS_BENEFICIARY_ADDRESS: Address = '0xe6B210F1299a3B0D74BfA24D678A9dC1e2a27e34'
+const REDSTONE_BENEFICIARY_ADDRESS: Address = '0xe6B210F1299a3B0D74BfA24D678A9dC1e2a27e34'
 
 // ======= One time payment contract
 const ONE_TIME_PAYMENT_AMOUNT_USD = 6600 // initial setup
 const ONE_TIME_PAYMENT_AMOUNT_CELO = ONE_TIME_PAYMENT_AMOUNT_USD / CELO_PRICE_USD
 const ONE_TIME_PAYMENT_RG: ReleaseGoldConfig = {
   identifier: 'Redstone One Time Payment',
-  releaseStartTime: new Date('12/22/2023').toISOString(), // prev contract start time Fri, Dec 16, 2022, 10:34 AM AST:
+  releaseStartTime: new Date('12/22/2023').toISOString(), // When first reports came on-chain after CGP145 executed
   releaseCliffTime: 60 * 60 * 24 * 30 * 3, // 3 months,
   numReleasePeriods: 1,
   releasePeriod: 1, // released inmmediately but subject to cliff
   amountReleasedPerPeriod: ONE_TIME_PAYMENT_AMOUNT_CELO,
   revocable: true,
-  beneficiary: T_SYSTEMS_BENEFICIARY_ADDRESS,
+  beneficiary: REDSTONE_BENEFICIARY_ADDRESS,
   releaseOwner: MENTO_MULTISIG_ADDRESS,
   // refundAddress: GOV_ADDRESS, // filled in later to fetch it from the network
   subjectToLiquidityProvision: false,
@@ -59,13 +59,13 @@ const MONTHLY_PAYMENT_AMOUNT = 2000 // Tier 2, up to 10 oracle fees
 const MONTHLY_PAYMENT_AMOUNT_CELO = MONTHLY_PAYMENT_AMOUNT / CELO_PRICE_USD
 const MONTHLY_PAYMENT_RG: ReleaseGoldConfig = {
   identifier: 'Redstone Monthly Payment',
-  releaseStartTime: new Date('12/22/2023').toISOString(), // prev contract start time Fri, Dec 16, 2022, 10:34 AM AST:
+  releaseStartTime: new Date('12/22/2023').toISOString(), // When first reports came on-chain after CGP145 executed
   releaseCliffTime: 60 * 60 * 24 * 30 * 3, // 3 months,
   numReleasePeriods: 12,
   releasePeriod: 2628000, // one month
   amountReleasedPerPeriod: MONTHLY_PAYMENT_AMOUNT_CELO,
   revocable: true,
-  beneficiary: T_SYSTEMS_BENEFICIARY_ADDRESS,
+  beneficiary: REDSTONE_BENEFICIARY_ADDRESS,
   releaseOwner: MENTO_MULTISIG_ADDRESS,
   // refundAddress: GOV_ADDRESS, // filled in later to fetch it from the network
   subjectToLiquidityProvision: false,
