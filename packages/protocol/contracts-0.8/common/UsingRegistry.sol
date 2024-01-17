@@ -8,6 +8,7 @@ import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
 import "../../contracts/common/interfaces/IRegistry.sol";
+import "../../contracts/stability/interfaces/ISortedOracles.sol";
 
 contract UsingRegistry is Ownable {
   event RegistrySet(address indexed registryAddress);
@@ -62,5 +63,9 @@ contract UsingRegistry is Ownable {
 
   function getGoldToken() internal view returns (IERC20) {
     return IERC20(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
+  }
+
+  function getSortedOracles() internal view returns (ISortedOracles) {
+    return ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
   }
 }
