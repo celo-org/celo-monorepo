@@ -38,7 +38,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   // Maps a token address to its equivalent token address.
   // For example, maps the USDC token address to the cUSD token address.
-  // Original token will return the median value as equivalent token.
+  // Original token will return the median value same as the value of equivalent token.
   mapping(address => address) public equivalentTokens;
 
   event OracleAdded(address indexed token, address indexed oracleAddress);
