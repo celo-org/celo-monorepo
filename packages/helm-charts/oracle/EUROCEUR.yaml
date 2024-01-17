@@ -4,7 +4,7 @@ oracle:
     mid:
       maxExchangeVolumeShare: 1
       maxPercentageDeviation: 0.01
-      maxPercentageBidAskSpread: 0.005
+      maxPercentageBidAskSpread: 0.0075
   metrics:
     enabled: true
     prometheusPort: 9090
