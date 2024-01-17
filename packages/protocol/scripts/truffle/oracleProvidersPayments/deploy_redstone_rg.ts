@@ -21,7 +21,7 @@ interface ReleaseGoldConfig {
   amountReleasedPerPeriod: number
   revocable: boolean
   beneficiary: Address
-  releaseOwner: Address
+  releaseOwner?: Address
   refundAddress?: Address
   subjectToLiquidityProvision: boolean
   initialDistributionRatio: number
@@ -30,7 +30,6 @@ interface ReleaseGoldConfig {
 }
 
 const CELO_PRICE_USD = 0.758
-const MENTO_MULTISIG_ADDRESS = '0x87647780180B8f55980C7D3fFeFe08a9B29e9aE1'
 
 const REDSTONE_BENEFICIARY_ADDRESS: Address = '0xe6B210F1299a3B0D74BfA24D678A9dC1e2a27e34'
 
@@ -46,7 +45,7 @@ const ONE_TIME_PAYMENT_RG: ReleaseGoldConfig = {
   amountReleasedPerPeriod: ONE_TIME_PAYMENT_AMOUNT_CELO,
   revocable: true,
   beneficiary: REDSTONE_BENEFICIARY_ADDRESS,
-  releaseOwner: MENTO_MULTISIG_ADDRESS,
+  // releaseOwner: GOV_ADDRESS // filled in later to fetch it from the network
   // refundAddress: GOV_ADDRESS, // filled in later to fetch it from the network
   subjectToLiquidityProvision: false,
   initialDistributionRatio: 1000,
@@ -66,7 +65,7 @@ const MONTHLY_PAYMENT_RG: ReleaseGoldConfig = {
   amountReleasedPerPeriod: MONTHLY_PAYMENT_AMOUNT_CELO,
   revocable: true,
   beneficiary: REDSTONE_BENEFICIARY_ADDRESS,
-  releaseOwner: MENTO_MULTISIG_ADDRESS,
+  // releaseOwner: GOV_ADDRESS // filled in later to fetch it from the network
   // refundAddress: GOV_ADDRESS, // filled in later to fetch it from the network
   subjectToLiquidityProvision: false,
   initialDistributionRatio: 1000,
@@ -105,11 +104,16 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number): Promis
     Total Grant Value (IN CELO): ${
       config.numReleasePeriods * Math.round(config.amountReleasedPerPeriod)
     }
+    Amount released per period (IN CELO): ${Math.round(config.amountReleasedPerPeriod)}
     Beneficiary: ${config.beneficiary}
     Start Date (Unix timestamp): ${releaseStartTime}
     Cliff time (in seconds): ${config.releaseCliffTime}
     Num release periods: ${config.numReleasePeriods}
     Release period length (in seconds): ${config.releasePeriod}
+
+    Release Owner: ${config.releaseOwner}
+    Refund Address: ${config.refundAddress}
+
 
     Deploy this grant? (y/n): `
 
@@ -172,11 +176,13 @@ module.exports = async (callback: (error?: any) => number) => {
 
     const configOneTimePayment: ReleaseGoldConfig = {
       ...ONE_TIME_PAYMENT_RG,
+      releaseOwner: governanceProxyAddress,
       refundAddress: governanceProxyAddress,
     }
 
     const configMonthlyPayment: ReleaseGoldConfig = {
       ...MONTHLY_PAYMENT_RG,
+      releaseOwner: governanceProxyAddress,
       refundAddress: governanceProxyAddress,
     }
 
