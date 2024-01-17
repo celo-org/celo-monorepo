@@ -36,6 +36,11 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   uint256 public reportExpirySeconds;
   mapping(address => uint256) public tokenReportExpirySeconds;
 
+  // Maps a token address to its equivalent token address.
+  // For example, maps the USDC token address to the cUSD token address.
+  // Original token will return the median value as equivalent token.
+  mapping(address => address) public equivalentTokens;
+
   event OracleAdded(address indexed token, address indexed oracleAddress);
   event OracleRemoved(address indexed token, address indexed oracleAddress);
   event OracleReported(
@@ -48,6 +53,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   event MedianUpdated(address indexed token, uint256 value);
   event ReportExpirySet(uint256 reportExpiry);
   event TokenReportExpirySet(address token, uint256 reportExpiry);
+  event EquivalentTokenSet(address indexed token, address indexed equivalentToken);
 
   modifier onlyOracle(address token) {
     require(isOracle[token][msg.sender], "sender was not an oracle for token addr");
@@ -181,6 +187,17 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   }
 
   /**
+   * @notice Sets the equivalent token for a token.
+   * @param token The address of the token.
+   * @param equivalentToken The address of the equivalent token.
+   */
+  function setEquivalentToken(address token, address equivalentToken) external onlyOwner {
+    require(token != address(0), "token address cannot be 0");
+    equivalentTokens[token] = equivalentToken;
+    emit EquivalentTokenSet(token, equivalentToken);
+  }
+
+  /**
    * @notice Updates an oracle value and the median.
    * @param token The address of the token for which the CELO exchange rate is being reported.
    * @param value The amount of `token` equal to one CELO, expressed as a fixidity value.
@@ -239,8 +256,17 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @return The median exchange rate for `token`.
    * @return fixidity
    */
-  function medianRate(address token) external view returns (uint256, uint256) {
-    return (rates[token].getMedianValue(), numRates(token) == 0 ? 0 : FIXED1_UINT);
+  function medianRate(address token) external view returns (uint256 rate, uint256 numRates) {
+    address equivalentToken = equivalentTokens[token];
+    if (equivalentToken != address(0)) {
+      rate = rates[equivalentToken].getMedianValue();
+      numRates = rates[equivalentToken].getNumElements();
+    } else {
+      rate = rates[token].getMedianValue();
+      numRates = rates[token].getNumElements();
+    }
+
+    numRates = numRates == 0 ? 0 : FIXED1_UINT;
   }
 
   /**
