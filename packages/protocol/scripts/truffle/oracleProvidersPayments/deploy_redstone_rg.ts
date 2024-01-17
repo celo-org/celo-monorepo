@@ -103,7 +103,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number): Promis
     Please review this grant before you deploy:
 
     Total Grant Value (IN CELO): ${
-      Number(config.numReleasePeriods) * Number(config.amountReleasedPerPeriod)
+      config.numReleasePeriods * Math.round(config.amountReleasedPerPeriod)
     }
     Beneficiary: ${config.beneficiary}
     Start Date (Unix timestamp): ${releaseStartTime}
