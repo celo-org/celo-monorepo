@@ -1,11 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.0 <0.8.20;
 
-// Note: This is not an exact copy of UsingRegistry or UsingRegistryV2 in the contract's folder
-// because Mento's interfaces still don't support Solidity 0.8
-
 import "@openzeppelin/contracts8/access/Ownable.sol";
-import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
 import "../../contracts/common/interfaces/IRegistry.sol";
 import "../../contracts/common/Initializable.sol";
@@ -34,6 +30,12 @@ contract ExchangeOracles is Ownable, Initializable, UsingRegistry {
     setRegistry(_registryAddress);
   }
 
+  /**
+   * Returns exchange rate between two tokens.
+   * If any of the tokens is not in SortedOracles, 0 will be returned.
+   * @param token1 token1 address.
+   * @param token2 token2 address.
+   */
   function getExchangeRate(address token1, address token2) public view returns (uint256) {
     require(token1 != address(0), "token1 is 0");
     require(token2 != address(0), "token2 is 0");
@@ -66,6 +68,10 @@ contract ExchangeOracles is Ownable, Initializable, UsingRegistry {
     return FixidityLib.newFixed(rate2).divide(FixidityLib.newFixed(rate1)).fromFixed();
   }
 
+  /**
+   * Returns exchange rate between two tokens, if default token pair is set.
+   * @param token token address.
+   */
   function medianRate(address token) external view returns (uint256, uint256) {
     address token2 = defaultTokenExchangePair[token];
     require(token2 != address(0), "no default token pair");
@@ -73,6 +79,11 @@ contract ExchangeOracles is Ownable, Initializable, UsingRegistry {
     return (getExchangeRate(token, token2), FIXED1_UINT);
   }
 
+  /**
+   * Sets default token pair.
+   * @param token1 token1 address.
+   * @param token2 token2 address.
+   */
   function setTokenPair(address token1, address token2) external onlyOwner {
     require(token1 != address(0), "token1 is 0");
     require(token2 != address(0), "token2 is 0");
