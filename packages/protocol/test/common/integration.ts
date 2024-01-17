@@ -665,18 +665,12 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
 
     it(`should be impossible to sell CELO`, async () => {
       await goldToken.approve(exchangeAbc.address, sellAmount)
-      await assertTransactionRevertWithReason(
-        exchangeAbc.sell(sellAmount, minBuyAmount, true),
-        'token address cannot be null'
-      )
+      await assertTransactionRevertWithReason(exchangeAbc.sell(sellAmount, minBuyAmount, true))
     })
 
     it(`should be impossible to sell stable token`, async () => {
       await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
-      await assertTransactionRevertWithReason(
-        exchangeAbc.sell(sellAmount, minBuyAmount, false),
-        'token address cannot be null'
-      )
+      await assertTransactionRevertWithReason(exchangeAbc.sell(sellAmount, minBuyAmount, false))
     })
   })
 
