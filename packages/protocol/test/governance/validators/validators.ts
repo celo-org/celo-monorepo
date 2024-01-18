@@ -28,12 +28,12 @@ import {
   MockStableTokenInstance,
   RegistryContract,
   RegistryInstance,
-  ValidatorsTestContract,
-  ValidatorsTestInstance,
+  ValidatorsMockContract,
+  ValidatorsMockInstance,
 } from 'types'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
-const Validators: ValidatorsTestContract = artifacts.require('ValidatorsTest')
+const Validators: ValidatorsMockContract = artifacts.require('ValidatorsTest')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
@@ -79,7 +79,7 @@ const DAY = 24 * HOUR
 
 contract('Validators', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
-  let validators: ValidatorsTestInstance
+  let validators: ValidatorsMockInstance
   let registry: RegistryInstance
   let mockElection: MockElectionInstance
   let mockLockedGold: MockLockedGoldInstance
@@ -126,10 +126,12 @@ contract('Validators', (accounts: string[]) => {
     registry = await Registry.new(true)
     validators = await Validators.new()
     await accountsInstance.initialize(registry.address)
+
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await registry.setAddressFor(CeloContractName.Validators, validators.address)
+
     await validators.initialize(
       registry.address,
       groupLockedGoldRequirements.value,
@@ -144,6 +146,7 @@ contract('Validators', (accounts: string[]) => {
       commissionUpdateDelay,
       downtimeGracePeriod
     )
+    console.log('### adj speed:', validatorScoreParameters.adjustmentSpeed)
   })
 
   const registerValidator = async (validator: string) => {
