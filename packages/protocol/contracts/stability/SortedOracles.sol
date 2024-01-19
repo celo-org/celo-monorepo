@@ -331,8 +331,8 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @notice Returns the median of the currently stored rates for a specified rateFeedId.
    * @dev Does not take account of equivalentTokens mapping.
    * @param token The rateFeedId of the rates for which the median value is being retrieved.
-   * @return uint256 The median exchange rate for rateFeedId.
-   * @return fixidity
+   * @return uint256 The median exchange rate for rateFeedId (fixidity).
+   * @return uint256 num of rates
    */
   function medianRateWithoutEquivalentMapping(address token)
     public
@@ -347,8 +347,8 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @dev Please note that this function respects the equivalentToken mapping, and so may
    * return the median identified as an equivalent to the supplied rateFeedId.
    * @param token The rateFeedId of the rates for which the median value is being retrieved.
-   * @return uint256 The median exchange rate for rateFeedId.
-   * @return fixidity
+   * @return uint256 The median exchange rate for rateFeedId (fixidity).
+   * @return uint256 num of rates
    */
   function medianRate(address token) external view returns (uint256, uint256) {
     EquivalentToken storage equivalentToken = equivalentTokens[token];
