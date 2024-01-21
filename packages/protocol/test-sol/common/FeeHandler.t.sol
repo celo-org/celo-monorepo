@@ -328,7 +328,7 @@ contract FeeHandlerDistribute is FeeHandlerFoundry {
     vm.expectEmit(false, false, false, false);
     emit Transfer(address(feeHandler), address(mentoSeller), 0);
     feeHandler.distribute(address(stableToken));
-    // TODO(Alec) check that this works / is there a better way? ß
+    // TODO(Alec, next) check that this works / is there a better way?
   }
 
   function test_Distribute() public setUpBeneficiary activateToken {
@@ -497,7 +497,12 @@ contract FeeHandlerSellMentoTokens is FeeHandlerFoundry {
     assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 8e17);
     assertEq(stableToken.balanceOf(address(feeHandler)), 2e17);
     assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 2e17);
-    // TODO(Alec) how to do 'expectBigNumberInRange'
+    // TODO(Alec) why do we need expect number in range here?
+    // assertEq(feeHandler.celoToBeBurned(), exchangeUSD.getBuyTokenAmount(2e17, true));
+    uint256 actual = feeHandler.celoToBeBurned();
+    uint256 expected = exchangeUSD.getBuyTokenAmount(2e17, true);
+    uint256 range = 1e17;
+    assertTrue(expected + range > actual || expected - range < actual);
   }
 
   function testDoesntSellWhenNotEnoughReports()
@@ -658,6 +663,7 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
     tokenAddresses[0] = address(tokenA);
     tokenAddresses[1] = address(celoToken);
     uniswapRouter.swapExactTokensForTokens(1e18, 0, tokenAddresses, user, deadline);
+    vm.stopPrank();
 
     // simple directional check
     assertGt(balanceBeforeA, tokenA.balanceOf(user));
@@ -703,7 +709,7 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
   {
     // feeCurrencyWhitelist.addToken(address(tokenA)); // TODO(Alec) why is this line in the old beforeEach?
     // feeHandler.setMaxSplippage(address(tokenA), FIXED1); // TODO(Alec) does this need to be consistent with original tests?
-    // TODO(Alec) beforeEach above
+    // beforeEach above
 
     // Setup second uniswap exchange
     uniswapFeeHandlerSeller.setRouter(address(tokenA), address(uniswapRouter2));
@@ -778,102 +784,113 @@ contract FeeHandlerHandleMentoTokens is FeeHandlerFoundry {
   }
 
   function testHandleCelo() public setBurnFraction setUpBeneficiary fundFeeHandler(1e18) {
-    // uint256 pastBurn = celoToken.getBurnedAmount();
-    // uint256 prevBeneficiaryBalance = celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS);
     feeHandler.handle(address(celoToken));
     assertEq(celoToken.getBurnedAmount(), 8e17);
     assertEq(celoToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e17);
   }
 }
 
-// TODO(Alec) Reviewed up to here
+// TODO(Alec) Fix this test
 
 // contract FeeHandlerHandleAll is FeeHandlerFoundry {
-//   function testBurnsWithMento() public {
-//     uint256 celoTokenAmount = 1000000000000000000;
+//   modifier setBurnFraction() {
+//     feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
+//     _;
+//   }
 
-//     vm.startPrank(user);
+//   modifier setUpBeneficiary() {
+//     feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
+//     _;
+//   }
 
-//     celoToken.approve(address(exchangeUSD), celoTokenAmount);
-//     celoToken.approve(address(exchangeEUR), celoTokenAmount);
+//   // modifier fundFeeHandler(uint256 amount) {
+//   //   celoToken.transfer(address(feeHandler), amount);
+//   //   _;
+//   // }
 
-//     exchangeUSD.sell(celoTokenAmount, 0, true);
-//     exchangeEUR.sell(celoTokenAmount, 0, true);
-
-//     vm.startPrank(owner);
-
+//   modifier addTokens() {
 //     feeHandler.addToken(address(stableToken), address(mentoSeller));
 //     feeHandler.addToken(address(stableTokenEUR), address(mentoSeller));
+//     _;
+//   }
+
+//   modifier setMaxSlippage() {
 //     feeHandler.setMaxSplippage(address(stableToken), FIXED1);
 //     feeHandler.setMaxSplippage(address(stableTokenEUR), FIXED1);
+//     _;
+//   }
 
-//     feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
-//     feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
+//   modifier fundFeeHandlerStable(uint256 celoAmount, uint256 stableAmount) {
+//     celoToken.approve(address(exchangeUSD), celoAmount);
+//     celoToken.approve(address(exchangeEUR), celoAmount);
+//     exchangeUSD.sell(celoAmount, 0, true);
+//     // exchangeEUR.sell(celoAmount, 0, true);
+//     stableToken.transfer(address(feeHandler), stableAmount);
+//     // stableTokenEUR.transfer(address(feeHandler), stableAmount);
+//     _;
+//   }
 
-//     uint256 previousBurn = celoToken.getBurnedAmount();
-//     vm.startPrank(user);
-//     stableToken.transfer(address(feeHandler), 1000000000000000000);
-//     stableTokenEUR.transfer(address(feeHandler), 1000000000000000000);
-
+//   function testBurnsWithMento()
+//     public
+//     setUpBeneficiary
+//     setBurnFraction
+//     setMaxSlippage
+//     fundFeeHandlerStable(1e17, 1e17)
+//     addTokens
+//   {
+//     uint256 previousCeloBurn = celoToken.getBurnedAmount();
 //     assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 0);
-//     uint256 burnedAmountStable = stableToken.balanceOf(address(feeHandler));
+//     assertEq(feeHandler.getPastBurnForToken(address(stableTokenEUR)), 0);
+
+//     uint256 preBurnBalanceUSD = stableToken.balanceOf(address(feeHandler));
+//     uint256 preBurnBalanceEUR = stableTokenEUR.balanceOf(address(feeHandler));
 
 //     feeHandler.handleAll();
 
-//     assertEq(
-//       feeHandler.getPastBurnForToken(address(stableToken)),
-//       FixidityLib
-//         .newFixed(burnedAmountStable)
-//         .multiply(FixidityLib.newFixedFraction(80, 100))
-//         .unwrap()
-//     );
-//     assertEq(
-//       feeHandler.getPastBurnForToken(address(stableTokenEUR)),
-//       FixidityLib
-//         .newFixed(burnedAmountStable)
-//         .multiply(FixidityLib.newFixedFraction(80, 100))
-//         .unwrap()
-//     );
-//     assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 200000000000000000);
-//     assertEq(stableTokenEUR.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 200000000000000000);
+//     assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 8e16);
+//     assertEq(feeHandler.getPastBurnForToken(address(stableTokenEUR)), 8e16);
+//     assertEq(stableToken.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e16);
+//     assertEq(stableTokenEUR.balanceOf(EXAMPLE_BENEFICIARY_ADDRESS), 2e16);
 
-//     // everything should have been burned
+//     // everything should have been burned or distributed
 //     assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 0);
 //     assertEq(feeHandler.getTokenToDistribute(address(stableTokenEUR)), 0);
 
-//     // burn is non zero
-//     assertTrue(celoToken.getBurnedAmount() > previousBurn);
+//     // celo burn is non zero
+//     assertTrue(celoToken.getBurnedAmount() > previousCeloBurn);
 //   }
 // }
 
-// contract FeeHandlerTransfer is FeeHandlerFoundry {
-//   function testOnlyOwnerCanTakeFundsOut() public {
-//     tokenA.mint(address(feeHandler), 1000000000000000000);
+contract FeeHandlerTransfer is FeeHandlerFoundry {
+  modifier mintToken(uint256 amount) {
+    tokenA.mint(address(feeHandler), amount);
+    _;
+  }
 
-//     vm.expectRevert("Ownable: caller is not the owner.");
-//     feeHandler.transfer(address(tokenA), user, 1000000000000000000);
-//   }
+  function testOnlyOwnerCanTakeFundsOut() public mintToken(1e18) {
+    vm.prank(user);
+    vm.expectRevert("Ownable: caller is not the owner");
+    feeHandler.transfer(address(tokenA), user, 1e18);
+  }
 
-//   function testCanTakeFundsOut() public {
-//     tokenA.mint(address(feeHandler), 1000000000000000000);
+  function testCanTakeFundsOut() public mintToken(1e18) {
+    feeHandler.transfer(address(tokenA), user, 1e18);
+    assertEq(tokenA.balanceOf(user), 1e18);
+  }
+}
 
-//     feeHandler.transfer(address(tokenA), user, 1000000000000000000);
-//     assertEq(tokenA.balanceOf(user), 1000000000000000000);
-//   }
-// }
+contract FeeHandlerSetDailySellLimit is FeeHandlerFoundry {
+  function testOnlyOwnerCanSetLimit() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(user);
+    feeHandler.setDailySellLimit(address(stableToken), celoAmountForRate);
+  }
+}
 
-// contract FeeHandlerSetDailySellLimit is FeeHandlerFoundry {
-//   function testOnlyOwnerCanSetLimit() public {
-//     vm.expectRevert("Ownable: caller is not the owner.");
-//     vm.startPrank(user);
-//     feeHandler.setDailySellLimit(address(stableToken), celoAmountForRate);
-//   }
-// }
-
-// contract FeeHandlerSetMaxSlippage is FeeHandlerFoundry {
-//   function testShouldOnlyBeCalledByOwner() public {
-//     vm.expectRevert("Ownable: caller is not the owner.");
-//     vm.startPrank(user);
-//     feeHandler.setMaxSplippage(address(stableToken), maxSlippage);
-//   }
-// }
+contract FeeHandlerSetMaxSlippage is FeeHandlerFoundry {
+  function testShouldOnlyBeCalledByOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(user);
+    feeHandler.setMaxSplippage(address(stableToken), maxSlippage);
+  }
+}
