@@ -20,7 +20,7 @@ jobs:
       node12: ${{ steps.changes.outputs.node12 }}
       gcloud: ${{ steps.changes.outputs.gcloud }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Check for changes
         uses: dorny/paths-filter@v2
         id: changes
