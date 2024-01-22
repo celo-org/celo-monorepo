@@ -5145,9 +5145,9 @@
     "@types/tar-fs" "*"
 
 "@types/targz@^1.0.0":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@types/targz/-/targz-1.0.1.tgz#8b68a867b5dc28a755fd57e62d8b17f94e28462f"
-  integrity sha512-Uf5QxuLICkVOmSyDhPicBpIXk2oLIqaldObfr/WsTKTAPk666OpbeL0wZuNXwc5yg9OH1cBVj1rpMHGBJe4ilg==
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@types/targz/-/targz-1.0.4.tgz#bf78d46b564ac1a2527532c915892a96ddf1ed01"
+  integrity sha512-4i2weIjweWsnrvutLH7dM/+FPVSFSqxb+XKWo61tAiHxyYYHveImqys5JijMboKJz+jhFu24SlFrdVAB0xAMIw==
   dependencies:
     "@types/tar-fs" "*"
 
