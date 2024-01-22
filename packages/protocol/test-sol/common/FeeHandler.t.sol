@@ -68,7 +68,7 @@ contract FeeHandlerFoundry is Test, Constants {
   uint256 minimumReports = 2;
 
   function setUp() public {
-    vm.warp(YEAR); // TODO(Alec) why do we do this?
+    vm.warp(YEAR); // foundry starts block.timestamp at 0, which leads to underflow errors in Uniswap contracts
 
     spread = FixidityLib.newFixedFraction(3, 1000).unwrap();
     reserveFraction = FixidityLib.newFixedFraction(5, 100).unwrap();
