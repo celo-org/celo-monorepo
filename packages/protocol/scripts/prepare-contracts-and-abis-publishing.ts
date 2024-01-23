@@ -17,8 +17,8 @@ import {
 } from './consts'
 
 function log(...args: any[]) {
-  // tslint:disable-next-line
-  console.log('[prepare-contracts-and-abis]', ...args)
+  // eslint-disable-next-line
+  console.info('[prepare-contracts-and-abis]', ...args)
 }
 
 try {
@@ -143,6 +143,7 @@ function prepareTargetTypesExports() {
           parsedPathName
         )}`
 
+        // eslint-disable-next-line no-prototype-builtins
         if (!exports.hasOwnProperty(exportKey)) {
           exports[exportKey] = {}
         }

@@ -24,7 +24,7 @@ export const handler = async (argv: DescribeArgv) => {
   await switchToClusterFromEnv(argv.celoEnv, false)
 
   const web3 = new Web3(getFornoUrl(argv.celoEnv))
-  const kit = await newKitFromWeb3(web3)
+  const kit = newKitFromWeb3(web3)
   const blockExplorer = await newBlockExplorer(kit)
   const logExplorer = await newLogExplorer(kit)
   const transaction = await web3.eth.getTransaction(argv.transactionHash)

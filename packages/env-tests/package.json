@@ -22,7 +22,7 @@
   "scripts": {
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
-    "lint": "tslint -c tslint.json --project tsconfig.json",
+    "lint": "yarn run --top-level eslint .",
     "test": "jest --runInBand",
     "baklava-test": "CELO_ENV=baklava CELO_PROVIDER=https://baklava-forno.celo-testnet.org jest --runInBand",
     "alfajores-test": "CELO_ENV=alfajores CELO_PROVIDER=https://alfajores-forno.celo-testnet.org jest --runInBand",

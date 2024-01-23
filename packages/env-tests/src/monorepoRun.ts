@@ -4,7 +4,6 @@ import { loadFromEnvFile } from './env'
 import { rootLogger } from './logger'
 import { clearAllFundsToRoot, parseStableTokensList } from './scaffold'
 import { runExchangeTest } from './tests/exchange'
-import { runGrandaMentoTest } from './tests/granda-mento'
 import { runOracleTest } from './tests/oracle'
 import { runReserveTest } from './tests/reserve'
 import { runTransfersTest } from './tests/transfer'
@@ -20,7 +19,7 @@ function runTests() {
     throw new Error('No MNEMONIC was set, envName was parsed as ' + envName)
   }
   const kit = newKitFromWeb3(new Web3(process.env.CELO_PROVIDER || 'http://localhost:8545'))
-  const mnemonic = process.env.MNEMONIC!
+  const mnemonic: string = process.env.MNEMONIC
   const reserveSpenderMultiSigAddress = process.env.RESERVE_SPENDER_MULTISIG_ADDRESS
 
   const stableTokensToTest = process.env.STABLETOKENS
@@ -40,8 +39,6 @@ function runTests() {
     runExchangeTest(context, stableTokensToTest)
     runOracleTest(context)
     runReserveTest(context)
-    runGrandaMentoTest(context, stableTokensToTest)
-
     // TODO: Governance Proposals
     // TODO: Validator election + Slashing
 

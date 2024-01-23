@@ -281,7 +281,7 @@ export const handler = async (argv: StartArgv) => {
   if (gethConfig.migrate || gethConfig.migrateTo) {
     const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, instances)
 
-    console.log('Migrating contracts (this will take a long time) ...')
+    console.info('Migrating contracts (this will take a long time) ...')
 
     await migrateContracts(
       monorepoDir,
@@ -293,6 +293,6 @@ export const handler = async (argv: StartArgv) => {
       verbose
     )
 
-    console.log('... done migrating contracts!')
+    console.info('... done migrating contracts!')
   }
 }

@@ -1,4 +1,4 @@
-// tslint:disable: no-console
+/* eslint-disable */
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { getBlsPoP, getBlsPublicKey } from '@celo/cryptographic-utils/lib/bls'
 import { eqAddress, privateKeyToAddress } from '@celo/utils/lib/address'
@@ -949,7 +949,7 @@ describe('governance tests', () => {
 
       await connectPeers([...gethConfig.instances, validatorGroup], verbose)
 
-      console.log('wait for validatorGroup to finish syncing')
+      console.info('wait for validatorGroup to finish syncing')
       await waitToFinishInstanceSyncing(validatorGroup)
 
       const additionalValidatingNodes: GethInstanceConfig[] = [
@@ -986,7 +986,7 @@ describe('governance tests', () => {
       // Connect the validating nodes to the non-validating nodes, to test that announce messages are properly gossiped.
       await connectBipartiteClique(gethConfig.instances, additionalValidatingNodes, verbose)
 
-      console.log('wait for new validators to sync')
+      console.infoo('wait for new validators to sync')
       await Promise.all(additionalValidatingNodes.map((i) => waitToFinishInstanceSyncing(i)))
 
       validatorAccounts = await getValidatorGroupMembers()
@@ -994,7 +994,7 @@ describe('governance tests', () => {
       epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
       assert.equal(epoch, 10)
 
-      console.log('wait for end of epoch')
+      console.info('wait for end of epoch')
       // Wait for an epoch transition to ensure everyone is connected to one another.
       await waitForEpochTransition(web3, epoch)
 
@@ -1067,7 +1067,7 @@ describe('governance tests', () => {
     it('validator 0 should have signed at least one block', async () => {
       const rotation0MinedBlock = miners.some((a) => eqAddress(a, rotation0Address))
       if (!rotation0MinedBlock) {
-        console.log(rotation0Address, rotation1Address, miners)
+        console.info(rotation0Address, rotation1Address, miners)
       }
       assert.isTrue(rotation0MinedBlock)
     })
@@ -1075,7 +1075,7 @@ describe('governance tests', () => {
     it('validator 1 should have signed at least one block', async () => {
       const rotation1MinedBlock = miners.some((a) => eqAddress(a, rotation1Address))
       if (!rotation1MinedBlock) {
-        console.log(rotation0Address, rotation1Address, miners)
+        console.info(rotation0Address, rotation1Address, miners)
       }
       assert.isTrue(rotation1MinedBlock)
     })

@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "build": "tsc -b .",
-    "lint": "tslint -c tslint.json --project .",
+    "lint": "yarn run --top-level eslint .",
     "prepack": "yarn build"
   },
   "dependencies": {

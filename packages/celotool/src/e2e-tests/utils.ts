@@ -1,4 +1,3 @@
-/* tslint:disable: no-console */
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import fs from 'fs'
@@ -58,6 +57,7 @@ export async function initAndSyncGethWithRetry(
       await waitToFinishInstanceSyncing(instance)
       break
     } catch (error) {
+      // eslint-disable-next-line  @typescript-eslint/restrict-template-expressions
       console.info(`initAndSyncGethWithRetry error: ${error}`)
       const logFilename = getLogFilename(gethConfig.runPath, instance)
       console.info(`tail -50 ${logFilename}`)
@@ -184,7 +184,7 @@ export async function shutdownOrKill(identifier: string | number, signal: Signal
 
 export function sleep(seconds: number, verbose = false) {
   if (verbose) {
-    console.log(`Sleeping for ${seconds} seconds. Stay tuned!`)
+    console.info(`Sleeping for ${seconds} seconds. Stay tuned!`)
   }
   return new Promise<void>((resolve) => setTimeout(resolve, seconds * 1000))
 }
@@ -257,7 +257,6 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
     }
 
     if (!fs.existsSync(gethConfig.runPath)) {
-      // @ts-ignore
       fs.mkdirSync(gethConfig.runPath, { recursive: true })
     }
 
@@ -270,7 +269,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       }
       await writeGenesisWithMigrations(gethConfig, repo.path, mnemonic, validators.length, verbose)
     } else {
-      await writeGenesis(gethConfig, validators, verbose)
+      writeGenesis(gethConfig, validators, verbose)
     }
 
     let validatorIndex = 0
@@ -286,7 +285,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
           throw new Error('proxied validator must have exactly one proxy')
         }
 
-        instance.proxies = [proxyEnode[0][1]!, proxyEnode[0][2]!]
+        instance.proxies = [proxyEnode[0][1], proxyEnode[0][2]]
       }
 
       // Set the private key for the validator or proxy instance

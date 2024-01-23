@@ -2318,8 +2318,8 @@ contract('Election', (accounts: string[]) => {
 
     const debugLog = (s: string) => {
       if (debug) {
-        // tslint:disable-next-line: no-console
-        console.log(s)
+        // eslint-disable-next-line: no-console
+        console.info(s)
       }
     }
 
@@ -2548,7 +2548,7 @@ contract('Election', (accounts: string[]) => {
                 NULL_ADDRESS,
                 NULL_ADDRESS
               )
-              // tslint:disable-next-line
+              // eslint-disable-next-line
               for (let i = 0; i < vAccounts.length; i++) {
                 vAccounts[i].active = activeTotal
                   .plus(reward)

@@ -6,13 +6,13 @@ import {
   assertGteBN,
   assertLogMatches,
   assertSameAddress,
-  // tslint:disable-next-line: ordered-imports
+  // eslint-disable-next-line: ordered-imports
   assertTransactionRevertWithReason,
   assertTransactionRevertWithoutReason,
   expectBigNumberInRange,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-// tslint:disable-next-line: ordered-imports
+// eslint-disable-next-line: ordered-imports
 import { Signature, addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import _ from 'lodash'
