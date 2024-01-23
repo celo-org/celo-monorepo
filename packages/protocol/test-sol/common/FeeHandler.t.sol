@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 import "celo-foundry/Test.sol";
 import "../../contracts/common/FeeHandler.sol";
 import "forge-std/console.sol";
-import "../Constants.sol";
+import "../constants.sol";
 
 import { Exchange } from "../../lib/mento-core/contracts/Exchange.sol";
 import { StableToken } from "../../lib/mento-core/contracts/StableToken.sol";
