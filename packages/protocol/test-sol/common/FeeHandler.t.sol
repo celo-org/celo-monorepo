@@ -522,16 +522,12 @@ contract FeeHandlerSellMentoTokens is FeeHandlerFoundry {
     fundFeeHandlerStable(1e18)
   {
     assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 0);
+    uint256 expectedCeloAmount = exchangeUSD.getBuyTokenAmount(8e17, false);
     feeHandler.sell(address(stableToken));
     assertEq(feeHandler.getPastBurnForToken(address(stableToken)), 8e17);
     assertEq(stableToken.balanceOf(address(feeHandler)), 2e17);
     assertEq(feeHandler.getTokenToDistribute(address(stableToken)), 2e17);
-    // TODO(Alec) why do we need expect number in range here?
-    // assertEq(feeHandler.celoToBeBurned(), exchangeUSD.getBuyTokenAmount(2e17, true));
-    uint256 actual = feeHandler.celoToBeBurned();
-    uint256 expected = exchangeUSD.getBuyTokenAmount(2e17, true);
-    uint256 range = 1e17;
-    assertTrue(expected + range > actual || expected - range < actual);
+    assertEq(feeHandler.celoToBeBurned(), expectedCeloAmount);
   }
 
   function test_DoesntSellWhenNotEnoughReports()
