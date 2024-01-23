@@ -1,3 +1,5 @@
+import { satisfies } from 'semver'
+
 export interface ContractPackage {
   path?: string
   folderPath?: string
@@ -10,7 +12,7 @@ export interface ContractPackage {
   proxiesPath?: string
 }
 
-export const MENTO_PACKAGE: ContractPackage = {
+export const MENTO_PACKAGE = {
   path: 'mento-core',
   contractsFolder: 'contracts',
   folderPath: 'lib',
@@ -38,9 +40,9 @@ export const MENTO_PACKAGE: ContractPackage = {
     'StableTokenProxy',
   ],
   truffleConfig: 'truffle-config.js',
-}
+} satisfies ContractPackage
 
-export const SOLIDITY_08_PACKAGE: ContractPackage = {
+export const SOLIDITY_08_PACKAGE = {
   path: 'contracts-0.8',
   contractsFolder: '',
   folderPath: '',
@@ -51,4 +53,4 @@ export const SOLIDITY_08_PACKAGE: ContractPackage = {
   contracts: ['GasPriceMinimum'],
   proxyContracts: ['GasPriceMinimumProxy'],
   truffleConfig: 'truffle-config0.8.js',
-}
+} satisfies ContractPackage

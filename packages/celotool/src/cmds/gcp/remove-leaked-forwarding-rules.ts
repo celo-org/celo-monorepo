@@ -49,6 +49,7 @@ export const handler = async (argv: Argv) => {
           true
         )
         return false
+        // @ts-expect-error
       } catch ([error, stdout, stderr]) {
         if (typeof stdout === 'string') {
           const healthyInstances = JSON.parse(stdout).length

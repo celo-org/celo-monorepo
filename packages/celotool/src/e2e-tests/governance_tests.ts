@@ -986,7 +986,7 @@ describe('governance tests', () => {
       // Connect the validating nodes to the non-validating nodes, to test that announce messages are properly gossiped.
       await connectBipartiteClique(gethConfig.instances, additionalValidatingNodes, verbose)
 
-      console.infoo('wait for new validators to sync')
+      console.info('wait for new validators to sync')
       await Promise.all(additionalValidatingNodes.map((i) => waitToFinishInstanceSyncing(i)))
 
       validatorAccounts = await getValidatorGroupMembers()

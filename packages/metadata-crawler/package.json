@@ -23,6 +23,7 @@
     "web3": "1.10.0"
   },
   "devDependencies": {
+    "@tsconfig/recommended": "^1.0.3",
     "@types/bunyan": "1.8.8",
     "@types/dotenv": "^8.2.0",
     "bunyan-debug-stream": "^2.0.0"

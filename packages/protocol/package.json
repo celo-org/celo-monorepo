@@ -110,6 +110,7 @@
     "truffle-plugin-verify": "^0.6.5"
   },
   "devDependencies": {
+    "@tsconfig/recommended": "^1.0.3",
     "@celo/odis-identifiers": "^1.0.0",
     "@celo/typechain-target-web3-v1-celo": "^1.0.0",
     "@celo/typescript": "0.0.1",

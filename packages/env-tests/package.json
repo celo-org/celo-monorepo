@@ -30,7 +30,8 @@
     "staging-test": "CELO_ENV=staging CELO_PROVIDER=https://staging-forno.celo-networks-dev.org jest --runInBand"
   },
   "devDependencies": {
+    "@tsconfig/recommended": "^1.0.3",
     "@jest/globals": "^29.5.0",
-    "typescript": "4.4.3"
+    "typescript": "^5.3.3"
   }
 }

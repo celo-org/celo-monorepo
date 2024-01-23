@@ -32,5 +32,5 @@ try {
   writeJsonSync(argv.output_proposal, makeRelease6Changes(releaseProposal), { spaces: 2 })
   console.info(`Modifications made sucessfully; written to ${argv.output_proposal}`)
 } catch (e) {
-  console.error(`Something went wrong: ${e}`)
+  console.error(`Something went wrong: ${e instanceof Error ? JSON.stringify(e) : e?.toString()}`)
 }
