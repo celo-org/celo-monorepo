@@ -1,0 +1,69 @@
+pragma solidity >=0.8.7 <0.8.20;
+
+
+import "forge-std/console.sol";
+import "@celo-contracts/common/interfaces/IProxyFactory.sol";
+
+import "@celo-contracts/common/interfaces/IProxy.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts/common/interfaces/IFreezer.sol";
+import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+import "@celo-contracts/common/interfaces/ICeloToken.sol";
+
+contract Migration {
+
+  function addToRegistry(string memory contractName, address proxyAddress) public {
+    IRegistry registry = IRegistry(registryAddress);
+    console.log(" Setting on the registry contract:", contractName);
+    registry.setAddressFor(contractName, proxyAddress);
+  }
+
+  function setImplementationOnProxy(
+    IProxy proxy,
+    string memory contractName,
+    bytes memory initializeCalldata
+  ) public {
+    // bytes memory implementationBytecode = vm.getCode(string.concat(contractName, ".sol"));
+    console.log("msg.sender", msg.sender);
+    console.log("address(this)", address(this));
+    // console.log("address(Create2)", address(Create2));
+    // console.log("owner of proxy is:", proxy._getOwner());
+    bytes memory implementationBytecode = vm.getCode(string.concat(contractName, ".sol"));
+    bool testingDeployment = false;
+    bytes memory initialCode = abi.encodePacked(
+      implementationBytecode,
+      abi.encode(testingDeployment)
+    );
+
+    address implementation = create2deploy(0, initialCode);
+    console.log(" Implementation deployed to:", address(implementation));
+    proxy._setAndInitializeImplementation(implementation, initializeCalldata);
+  }
+
+  function deployProxiedContract(
+    string memory contractName,
+    address toProxy,
+    bytes memory initializeCalldata
+  ) public {
+    console.log("Deploying: ", contractName);
+    deployCodeTo("Proxy.sol", abi.encode(false), toProxy);
+    IProxy proxy = IProxy(toProxy);
+    console.log(" Proxy deployed to:", toProxy);
+
+    setImplementationOnProxy(proxy, contractName, initializeCalldata);
+    addToRegistry(contractName, address(proxy));
+  }
+
+
+
+  function runAllMigrations() external {
+    
+  
+    deployProxiedContract(
+      "GoldToken",
+      abi.encodeWithSelector(ICeloToken.initialize.selector, registryAddress));
+
+  }
+
+
+}

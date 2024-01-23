@@ -1,0 +1,6100 @@
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1704991938[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getStorageAt
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_getStorageAt
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1704991956[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getStorageAt
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getStorageAt
+eth_getStorageAt
+eth_getStorageAt
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getStorageAt
+eth_getStorageAt
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1704992389[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+eth_getTransactionCount
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getStorageAt
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getStorageAt
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0x5d8e185cc83431b3ce40c1e6dc8d78859a5902f2a3ccd4927a6d2e9849ed32a2
+    Gas used: 570599
+
+    Block Number: 1
+    Block Hash: 0x69bbae58691877ae7f9754c8de1b8086bbbf48f1adf47f5d8405de024e99acca
+    Block Time: "Thu, 11 Jan 2024 17:00:16 +0000"
+
+
+    Transaction: 0xaf4b4f638e39691b262be04bdaa26e9b19025f826f0363ce711377eaa8a5506b
+    Gas used: 21000
+
+    Transaction: 0xbbdcc5614a41a9c3abfe17e0e93f4eea083b711108563938718686e5b26fcdc3
+    Gas used: 632352
+
+    Transaction: 0x6e5e84b32eb044300e7bb8cd01839e09e5aea1ffd80107a9aa65bcab77bedf2a
+    Gas used: 21876
+
+    Transaction: 0xfd4e6a5c847a783940e920b9cdb732091cd7b63a6e06cc22db02988f47c5f8e0
+    Gas used: 21720
+
+    Transaction: 0x8eba8e579d0d0fffd54123ce70adff2ec5699919085cc0869c46b0d39d2f1e95
+    Gas used: 433131
+
+    Transaction: 0x90df7bccb871462a4171e038df8826961e681620e9e448eec4f22b25ba702bc6
+    Gas used: 369421
+
+    Transaction: 0xe75063cdd76270980b01d84b96cac7240c4a8a7835b261ab472867132def89e9
+    Gas used: 75658
+
+    Transaction: 0xa7f5b264a6b0231c8d188f28d362904dfb0acb9e8aaa7313e617ce72f8f0f972
+    Gas used: 21900
+
+    Transaction: 0xbcf6f1ed203ee0c8fa8c86b6e252464a90303964fca447bd8bf48acb4cbb7808
+    Gas used: 433131
+
+    Block Number: 2
+    Block Hash: 0x2e4e01ca352b19c7bdbd9feb291233be22ef9d4f012faf8c1d020cb877045fe1
+    Block Time: "Thu, 11 Jan 2024 17:00:17 +0000"
+
+eth_sendRawTransaction
+
+    Transaction: 0x599115b64644639b5026d1de9857b7b1feee5a8aa8cac7bf5e32dbd9f2d21a1b
+    Gas used: 515760
+
+    Block Number: 3
+    Block Hash: 0x5ee10d8b94e598e702c23210c3a2d39272d9cda1b27325932817c17abcdd82e9
+    Block Time: "Thu, 11 Jan 2024 17:00:18 +0000"
+
+
+    Transaction: 0x3882d240e0a581ec8e58113a722f82e3c63d3eede6257c5e2070bc26a39f8589
+    Gas used: 75603
+
+    Transaction: 0x4b50f7f3d09a8b5587342105552a78f72700af4235d9bceda453912db6851055
+    Gas used: 22080
+
+    Transaction: 0x5c0c8d260c79fce2af0c759f1b2d6da2efbc7408521db23ee19aac918a8d1c7e
+    Gas used: 433131
+
+    Transaction: 0x80461c6ed96a4109f111f17000218786c6950e7a9422b3df112be1d10c906185
+    Gas used: 1301894
+
+    Transaction: 0xb70019112bdafc75aee84b8d116d52df823c7e630347dcf8ee26273e32b0964d
+    Gas used: 101664
+
+    Transaction: 0xde6135baab8fa4e48e73d4e1319cc5cb16a7370c572089c149bab6d3363966f5
+    Gas used: 21948
+
+    Block Number: 4
+    Block Hash: 0x8483d3001b7d3c95edd72e6e4237089fef44309b272b96627c86f55e1c93f9b5
+    Block Time: "Thu, 11 Jan 2024 17:00:19 +0000"
+
+
+    Transaction: 0xbddc49702b15a18300edce25137f8c8620cae229f5008a1fe78715618c60ef21
+    Gas used: 21708
+
+    Block Number: 5
+    Block Hash: 0x07433684592a0598c41bf0f09e63c1f4ec7e7f2ffdff7e685beff0b772bddcdd
+    Block Time: "Thu, 11 Jan 2024 17:00:20 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1704992757[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getStorageAt
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getStorageAt
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0x5d8e185cc83431b3ce40c1e6dc8d78859a5902f2a3ccd4927a6d2e9849ed32a2
+    Gas used: 570599
+
+    Block Number: 1
+    Block Hash: 0xc18b2c2c146c957fc2f04cd72531f9755812f492286401786a8a574e49ea0427
+    Block Time: "Thu, 11 Jan 2024 17:07:40 +0000"
+
+
+    Transaction: 0xaf4b4f638e39691b262be04bdaa26e9b19025f826f0363ce711377eaa8a5506b
+    Gas used: 21000
+
+    Transaction: 0xbbdcc5614a41a9c3abfe17e0e93f4eea083b711108563938718686e5b26fcdc3
+    Gas used: 632352
+
+    Transaction: 0x6e5e84b32eb044300e7bb8cd01839e09e5aea1ffd80107a9aa65bcab77bedf2a
+    Gas used: 21876
+
+    Transaction: 0xfd4e6a5c847a783940e920b9cdb732091cd7b63a6e06cc22db02988f47c5f8e0
+    Gas used: 21720
+
+    Transaction: 0x8eba8e579d0d0fffd54123ce70adff2ec5699919085cc0869c46b0d39d2f1e95
+    Gas used: 433131
+
+    Transaction: 0x90df7bccb871462a4171e038df8826961e681620e9e448eec4f22b25ba702bc6
+    Gas used: 369421
+
+    Block Number: 2
+    Block Hash: 0x1779fbffdebb2474610e0e93c647bcbe6e54464f1f56856b5f50beb916c59e0a
+    Block Time: "Thu, 11 Jan 2024 17:07:41 +0000"
+
+
+    Transaction: 0xe75063cdd76270980b01d84b96cac7240c4a8a7835b261ab472867132def89e9
+    Gas used: 75658
+
+    Transaction: 0xa7f5b264a6b0231c8d188f28d362904dfb0acb9e8aaa7313e617ce72f8f0f972
+    Gas used: 21900
+
+    Transaction: 0xbcf6f1ed203ee0c8fa8c86b6e252464a90303964fca447bd8bf48acb4cbb7808
+    Gas used: 433131
+
+    Transaction: 0x599115b64644639b5026d1de9857b7b1feee5a8aa8cac7bf5e32dbd9f2d21a1b
+    Gas used: 515760
+
+    Transaction: 0x3882d240e0a581ec8e58113a722f82e3c63d3eede6257c5e2070bc26a39f8589
+    Gas used: 75603
+
+    Transaction: 0x4b50f7f3d09a8b5587342105552a78f72700af4235d9bceda453912db6851055
+    Gas used: 22080
+
+    Transaction: 0x5c0c8d260c79fce2af0c759f1b2d6da2efbc7408521db23ee19aac918a8d1c7e
+    Gas used: 433131
+
+    Block Number: 3
+    Block Hash: 0x2d5cb273e7fd1a60a15d545f24c96904b03811a12caef1f8a580621c6d22bc27
+    Block Time: "Thu, 11 Jan 2024 17:07:42 +0000"
+
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0x80461c6ed96a4109f111f17000218786c6950e7a9422b3df112be1d10c906185
+    Gas used: 1301894
+
+    Block Number: 4
+    Block Hash: 0x87f9979196321b9fda43f3d6766f0c47128a7325f51a32f3223d614b42e1551c
+    Block Time: "Thu, 11 Jan 2024 17:07:43 +0000"
+
+
+    Transaction: 0xb70019112bdafc75aee84b8d116d52df823c7e630347dcf8ee26273e32b0964d
+    Gas used: 101664
+
+    Transaction: 0xde6135baab8fa4e48e73d4e1319cc5cb16a7370c572089c149bab6d3363966f5
+    Gas used: 21948
+
+    Transaction: 0xbddc49702b15a18300edce25137f8c8620cae229f5008a1fe78715618c60ef21
+    Gas used: 21708
+
+    Block Number: 5
+    Block Hash: 0x9e021c0afe64874e473e4893bc68844989989884e3a60b85b12709795de56d8d
+    Block Time: "Thu, 11 Jan 2024 17:07:44 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1704993015[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getStorageAt
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getStorageAt
+eth_getStorageAt
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getStorageAt
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0x5d8e185cc83431b3ce40c1e6dc8d78859a5902f2a3ccd4927a6d2e9849ed32a2
+    Gas used: 570599
+
+    Block Number: 1
+    Block Hash: 0x8a832aff036413eab636628b2d584f713e690c8fa3a70b8f7bfa3833aa31ed65
+    Block Time: "Thu, 11 Jan 2024 17:10:24 +0000"
+
+
+    Transaction: 0xaf4b4f638e39691b262be04bdaa26e9b19025f826f0363ce711377eaa8a5506b
+    Gas used: 21000
+
+    Transaction: 0xbbdcc5614a41a9c3abfe17e0e93f4eea083b711108563938718686e5b26fcdc3
+    Gas used: 632352
+
+    Transaction: 0x6e5e84b32eb044300e7bb8cd01839e09e5aea1ffd80107a9aa65bcab77bedf2a
+    Gas used: 21876
+
+    Transaction: 0xfd4e6a5c847a783940e920b9cdb732091cd7b63a6e06cc22db02988f47c5f8e0
+    Gas used: 21720
+
+    Transaction: 0x8eba8e579d0d0fffd54123ce70adff2ec5699919085cc0869c46b0d39d2f1e95
+    Gas used: 433131
+
+    Transaction: 0x90df7bccb871462a4171e038df8826961e681620e9e448eec4f22b25ba702bc6
+    Gas used: 369421
+
+    Transaction: 0xe75063cdd76270980b01d84b96cac7240c4a8a7835b261ab472867132def89e9
+    Gas used: 75658
+
+    Block Number: 2
+    Block Hash: 0x939a5ca478ff1193bb8db6606d5aae6165817f5e886c8622bb30cea0f38fc1c9
+    Block Time: "Thu, 11 Jan 2024 17:10:25 +0000"
+
+eth_sendRawTransaction
+
+    Transaction: 0xa7f5b264a6b0231c8d188f28d362904dfb0acb9e8aaa7313e617ce72f8f0f972
+    Gas used: 21900
+
+    Transaction: 0xbcf6f1ed203ee0c8fa8c86b6e252464a90303964fca447bd8bf48acb4cbb7808
+    Gas used: 433131
+
+    Transaction: 0x599115b64644639b5026d1de9857b7b1feee5a8aa8cac7bf5e32dbd9f2d21a1b
+    Gas used: 515760
+
+    Transaction: 0x3882d240e0a581ec8e58113a722f82e3c63d3eede6257c5e2070bc26a39f8589
+    Gas used: 75603
+
+    Transaction: 0x4b50f7f3d09a8b5587342105552a78f72700af4235d9bceda453912db6851055
+    Gas used: 22080
+
+    Transaction: 0x5c0c8d260c79fce2af0c759f1b2d6da2efbc7408521db23ee19aac918a8d1c7e
+    Gas used: 433131
+
+    Transaction: 0x80461c6ed96a4109f111f17000218786c6950e7a9422b3df112be1d10c906185
+    Gas used: 1301894
+
+eth_sendRawTransaction
+eth_sendRawTransaction
+    Block Number: 3
+    Block Hash: 0x18eb94b725c57e06c1af7cd2eebce74c4a70e41018f694a190325e70f683f932
+    Block Time: "Thu, 11 Jan 2024 17:10:26 +0000"
+
+
+    Transaction: 0xb70019112bdafc75aee84b8d116d52df823c7e630347dcf8ee26273e32b0964d
+    Gas used: 101664
+
+    Block Number: 4
+    Block Hash: 0xa032e65e7f672324dcab45141f71c325f50c15b20351bcaf2c85ff3b0e3d8812
+    Block Time: "Thu, 11 Jan 2024 17:10:27 +0000"
+
+
+    Transaction: 0xde6135baab8fa4e48e73d4e1319cc5cb16a7370c572089c149bab6d3363966f5
+    Gas used: 21948
+
+    Transaction: 0xbddc49702b15a18300edce25137f8c8620cae229f5008a1fe78715618c60ef21
+    Gas used: 21708
+
+    Block Number: 5
+    Block Hash: 0x79c02862056bfad52afe0e087795cdf4f2d186e8cd7fdcdac9d40b6c0ea01292
+    Block Time: "Thu, 11 Jan 2024 17:10:28 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_chainId
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_chainId
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1704993207[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getStorageAt
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_getStorageAt
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0x5d8e185cc83431b3ce40c1e6dc8d78859a5902f2a3ccd4927a6d2e9849ed32a2
+    Gas used: 570599
+
+    Block Number: 1
+    Block Hash: 0xc4614b86c09c87523457106f1a4466af1dfdab8f428036ad31271ef5d298bdf9
+    Block Time: "Thu, 11 Jan 2024 17:13:30 +0000"
+
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0xaf4b4f638e39691b262be04bdaa26e9b19025f826f0363ce711377eaa8a5506b
+    Gas used: 21000
+
+    Block Number: 2
+    Block Hash: 0x11ca789dff10ae33c6f3d41d28e29bf647a6a5175e33c7856088e56b04d4d753
+    Block Time: "Thu, 11 Jan 2024 17:13:31 +0000"
+
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0xbbdcc5614a41a9c3abfe17e0e93f4eea083b711108563938718686e5b26fcdc3
+    Gas used: 632352
+
+    Block Number: 3
+    Block Hash: 0xbdac2cf2ec548ef2ef814c1311a9400a31bf0c8e9fdddc50c55763724d6d3f3c
+    Block Time: "Thu, 11 Jan 2024 17:13:32 +0000"
+
+
+eth_sendRawTransaction
+    Transaction: 0x6e5e84b32eb044300e7bb8cd01839e09e5aea1ffd80107a9aa65bcab77bedf2a
+    Gas used: 21876
+
+    Block Number: 4
+    Block Hash: 0x016915fe590ec7c3c8e45b3838051b6e2459328ae50c042b3b09c1bde8a525e0
+    Block Time: "Thu, 11 Jan 2024 17:13:33 +0000"
+
+eth_sendRawTransaction
+
+    Transaction: 0xfd4e6a5c847a783940e920b9cdb732091cd7b63a6e06cc22db02988f47c5f8e0
+    Gas used: 21720
+
+    Transaction: 0x8eba8e579d0d0fffd54123ce70adff2ec5699919085cc0869c46b0d39d2f1e95
+    Gas used: 433131
+
+    Block Number: 5
+    Block Hash: 0xaec86619a2290bc86e5ca54a6270fd1bb576edda47b9c61b2a1b883be369660e
+    Block Time: "Thu, 11 Jan 2024 17:13:34 +0000"
+
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0x90df7bccb871462a4171e038df8826961e681620e9e448eec4f22b25ba702bc6
+    Gas used: 369421
+
+    Transaction: 0xe75063cdd76270980b01d84b96cac7240c4a8a7835b261ab472867132def89e9
+    Gas used: 75658
+
+    Transaction: 0xa7f5b264a6b0231c8d188f28d362904dfb0acb9e8aaa7313e617ce72f8f0f972
+    Gas used: 21900
+
+    Transaction: 0xbcf6f1ed203ee0c8fa8c86b6e252464a90303964fca447bd8bf48acb4cbb7808
+    Gas used: 433131
+
+    Block Number: 6
+    Block Hash: 0x1aee689be8334e139831b67b2153f31469429fa5500590d2debe3b378f668fff
+    Block Time: "Thu, 11 Jan 2024 17:13:35 +0000"
+
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0x599115b64644639b5026d1de9857b7b1feee5a8aa8cac7bf5e32dbd9f2d21a1b
+    Gas used: 515760
+
+    Transaction: 0x3882d240e0a581ec8e58113a722f82e3c63d3eede6257c5e2070bc26a39f8589
+    Gas used: 75603
+
+    Transaction: 0x4b50f7f3d09a8b5587342105552a78f72700af4235d9bceda453912db6851055
+    Gas used: 22080
+
+    Block Number: 7
+    Block Hash: 0x859af5894421abe9946743691ea079ffd4aebfd73bb3eb0c25aa512de460f596
+    Block Time: "Thu, 11 Jan 2024 17:13:36 +0000"
+
+
+    Transaction: 0x5c0c8d260c79fce2af0c759f1b2d6da2efbc7408521db23ee19aac918a8d1c7e
+    Gas used: 433131
+
+    Transaction: 0x80461c6ed96a4109f111f17000218786c6950e7a9422b3df112be1d10c906185
+    Gas used: 1301894
+
+    Transaction: 0xb70019112bdafc75aee84b8d116d52df823c7e630347dcf8ee26273e32b0964d
+    Gas used: 101664
+
+    Transaction: 0xde6135baab8fa4e48e73d4e1319cc5cb16a7370c572089c149bab6d3363966f5
+    Gas used: 21948
+
+    Block Number: 8
+    Block Hash: 0xb52c7c7cd9f144e08cf24e29512eb6a58b94de0dd2418e51c6caf16578c335fd
+    Block Time: "Thu, 11 Jan 2024 17:13:37 +0000"
+
+
+    Transaction: 0xbddc49702b15a18300edce25137f8c8620cae229f5008a1fe78715618c60ef21
+    Gas used: 21708
+
+    Block Number: 9
+    Block Hash: 0xc909ac02f09a9d459a49bac15446b9b5de6289010f8811aae765f4be3eec2e45
+    Block Time: "Thu, 11 Jan 2024 17:13:38 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1704993335[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getStorageAt
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getStorageAt
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0x5d8e185cc83431b3ce40c1e6dc8d78859a5902f2a3ccd4927a6d2e9849ed32a2
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+    Gas used: 570599
+
+eth_sendRawTransaction
+eth_sendRawTransaction
+    Block Number: 1
+    Block Hash: 0xeda184ae21de9de87739598ba56bcdf8c991a76b281d1e79bccbc20654b49121
+    Block Time: "Thu, 11 Jan 2024 17:15:44 +0000"
+
+eth_sendRawTransaction
+
+    Transaction: 0xaf4b4f638e39691b262be04bdaa26e9b19025f826f0363ce711377eaa8a5506b
+    Gas used: 21000
+
+eth_sendRawTransaction
+    Transaction: 0xbbdcc5614a41a9c3abfe17e0e93f4eea083b711108563938718686e5b26fcdc3
+    Gas used: 632352
+
+    Transaction: 0x6e5e84b32eb044300e7bb8cd01839e09e5aea1ffd80107a9aa65bcab77bedf2a
+    Gas used: 21876
+
+    Transaction: 0xfd4e6a5c847a783940e920b9cdb732091cd7b63a6e06cc22db02988f47c5f8e0
+    Gas used: 21720
+
+    Block Number: 2
+    Block Hash: 0x491995838a095dca4db971ed8b76d81457d4170e6cd41ada5cd5e2be61490dff
+    Block Time: "Thu, 11 Jan 2024 17:15:45 +0000"
+
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0x8eba8e579d0d0fffd54123ce70adff2ec5699919085cc0869c46b0d39d2f1e95
+    Gas used: 433131
+
+    Transaction: 0x90df7bccb871462a4171e038df8826961e681620e9e448eec4f22b25ba702bc6
+    Gas used: 369421
+
+    Transaction: 0xe75063cdd76270980b01d84b96cac7240c4a8a7835b261ab472867132def89e9
+    Gas used: 75658
+
+    Transaction: 0xa7f5b264a6b0231c8d188f28d362904dfb0acb9e8aaa7313e617ce72f8f0f972
+    Gas used: 21900
+
+    Block Number: 3
+eth_sendRawTransaction
+    Block Hash: 0x9524b9ff29488c91a96c03a30f9dfe0a2698f2cf7163c7f55a58306888f2b5f0
+    Block Time: "Thu, 11 Jan 2024 17:15:46 +0000"
+
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0xbcf6f1ed203ee0c8fa8c86b6e252464a90303964fca447bd8bf48acb4cbb7808
+    Gas used: 433131
+
+    Transaction: 0x599115b64644639b5026d1de9857b7b1feee5a8aa8cac7bf5e32dbd9f2d21a1b
+    Gas used: 515760
+
+    Transaction: 0x3882d240e0a581ec8e58113a722f82e3c63d3eede6257c5e2070bc26a39f8589
+    Gas used: 75603
+
+    Block Number: 4
+    Block Hash: 0x6c350ffe7f2f478258ed1932947f260dfb8314e801e145bfb0c8bf7765655f5d
+    Block Time: "Thu, 11 Jan 2024 17:15:47 +0000"
+
+
+    Transaction: 0x4b50f7f3d09a8b5587342105552a78f72700af4235d9bceda453912db6851055
+    Gas used: 22080
+
+    Transaction: 0x5c0c8d260c79fce2af0c759f1b2d6da2efbc7408521db23ee19aac918a8d1c7e
+    Gas used: 433131
+
+    Transaction: 0x80461c6ed96a4109f111f17000218786c6950e7a9422b3df112be1d10c906185
+    Gas used: 1301894
+
+    Transaction: 0xb70019112bdafc75aee84b8d116d52df823c7e630347dcf8ee26273e32b0964d
+    Gas used: 101664
+
+    Block Number: 5
+    Block Hash: 0xca350c9d1a7bbe8600207004480756f3e1a0f84390dfd881dbde41820a1e619c
+    Block Time: "Thu, 11 Jan 2024 17:15:48 +0000"
+
+
+    Transaction: 0xde6135baab8fa4e48e73d4e1319cc5cb16a7370c572089c149bab6d3363966f5
+    Gas used: 21948
+
+    Transaction: 0xbddc49702b15a18300edce25137f8c8620cae229f5008a1fe78715618c60ef21
+    Gas used: 21708
+
+    Block Number: 6
+    Block Hash: 0x9929403adbc356e4eb4cb4413f2efdd92cca59cf365e1f768eff165302fdeabc
+    Block Time: "Thu, 11 Jan 2024 17:15:49 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1705070232[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getStorageAt
+eth_getStorageAt
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getStorageAt
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0x5d8e185cc83431b3ce40c1e6dc8d78859a5902f2a3ccd4927a6d2e9849ed32a2
+    Gas used: 570599
+
+    Block Number: 1
+    Block Hash: 0x7634262dd129e55e43877911095cb68e2b22af91038206100cfcec05ce3f2822
+    Block Time: "Fri, 12 Jan 2024 14:37:20 +0000"
+
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0xaf4b4f638e39691b262be04bdaa26e9b19025f826f0363ce711377eaa8a5506b
+    Gas used: 21000
+
+    Transaction: 0xbbdcc5614a41a9c3abfe17e0e93f4eea083b711108563938718686e5b26fcdc3
+    Gas used: 632352
+
+    Block Number: 2
+eth_sendRawTransaction
+    Block Hash: 0x11660180e7aaf84757bb74940859d020fb4445e55c2554deda81bcd40bf47960
+    Block Time: "Fri, 12 Jan 2024 14:37:21 +0000"
+
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0x6e5e84b32eb044300e7bb8cd01839e09e5aea1ffd80107a9aa65bcab77bedf2a
+    Gas used: 21876
+
+    Transaction: 0xfd4e6a5c847a783940e920b9cdb732091cd7b63a6e06cc22db02988f47c5f8e0
+    Gas used: 21720
+
+    Block Number: 3
+    Block Hash: 0xaf795b091def152eec40e470741e1917c538ad1fa15a4944c70dc26d51cc899e
+    Block Time: "Fri, 12 Jan 2024 14:37:22 +0000"
+
+eth_sendRawTransaction
+
+    Transaction: 0x8eba8e579d0d0fffd54123ce70adff2ec5699919085cc0869c46b0d39d2f1e95
+    Gas used: 433131
+
+    Transaction: 0x90df7bccb871462a4171e038df8826961e681620e9e448eec4f22b25ba702bc6
+    Gas used: 369421
+
+    Transaction: 0xe75063cdd76270980b01d84b96cac7240c4a8a7835b261ab472867132def89e9
+    Gas used: 75658
+
+    Transaction: 0xa7f5b264a6b0231c8d188f28d362904dfb0acb9e8aaa7313e617ce72f8f0f972
+    Gas used: 21900
+
+eth_sendRawTransaction
+    Block Number: 4
+    Block Hash: 0x20219231da3345142a8e71af7f5ebab31ffb4a36db7dd932cc5e0cca603a6592
+    Block Time: "Fri, 12 Jan 2024 14:37:23 +0000"
+
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0xbcf6f1ed203ee0c8fa8c86b6e252464a90303964fca447bd8bf48acb4cbb7808
+    Gas used: 433131
+
+    Transaction: 0x599115b64644639b5026d1de9857b7b1feee5a8aa8cac7bf5e32dbd9f2d21a1b
+    Gas used: 515760
+
+    Block Number: 5
+    Block Hash: 0xe44127154c8ba985951969fa5267620a4b3367120e83cdbcc75b7e5ec5ee3cda
+    Block Time: "Fri, 12 Jan 2024 14:37:24 +0000"
+
+eth_sendRawTransaction
+
+    Transaction: 0x3882d240e0a581ec8e58113a722f82e3c63d3eede6257c5e2070bc26a39f8589
+    Gas used: 75603
+
+    Transaction: 0x4b50f7f3d09a8b5587342105552a78f72700af4235d9bceda453912db6851055
+    Gas used: 22080
+
+    Transaction: 0x5c0c8d260c79fce2af0c759f1b2d6da2efbc7408521db23ee19aac918a8d1c7e
+    Gas used: 433131
+
+    Block Number: 6
+    Block Hash: 0x47bf7a2039cf36ca52bbab8f0d7f6517f1fe0f3ade82a63e4fbd24f868b99a32
+    Block Time: "Fri, 12 Jan 2024 14:37:25 +0000"
+
+
+    Transaction: 0x80461c6ed96a4109f111f17000218786c6950e7a9422b3df112be1d10c906185
+    Gas used: 1301894
+
+    Transaction: 0xb70019112bdafc75aee84b8d116d52df823c7e630347dcf8ee26273e32b0964d
+    Gas used: 101664
+
+    Transaction: 0xde6135baab8fa4e48e73d4e1319cc5cb16a7370c572089c149bab6d3363966f5
+    Gas used: 21948
+
+    Transaction: 0xbddc49702b15a18300edce25137f8c8620cae229f5008a1fe78715618c60ef21
+    Gas used: 21708
+
+    Block Number: 7
+    Block Hash: 0x96a75acb4e4bb918b165069e727203fdaad99226d06555839cb308bca62dc02c
+    Block Time: "Fri, 12 Jan 2024 14:37:26 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_getTransactionReceipt
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1705070514[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getStorageAt
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_getStorageAt
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getStorageAt
+eth_chainId
+eth_chainId
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_estimateGas
+eth_estimateGas
+eth_estimateGas
+eth_estimateGas
+eth_estimateGas
+eth_estimateGas
+eth_estimateGas
+eth_sendRawTransaction
+eth_sendRawTransaction
+
+    Transaction: 0x1a2034afa993d6bd4f87e9bc2b9f36d9886a36536646ecdb82b1e9aa8939cc4b
+    Gas used: 570599
+
+    Block Number: 1
+    Block Hash: 0x13a6dd1b81475592483083fb517e49ccf980702cdc7427e2a209fe922e37a602
+    Block Time: "Fri, 12 Jan 2024 14:42:01 +0000"
+
+
+    Transaction: 0x2a4558463d8e24778a2e947a2c794381a1e392f678450d7a3c86c446ea9a1d0a
+    Gas used: 21000
+
+    Block Number: 2
+    Block Hash: 0x70b322428589aa78b7162490779e2e59794ab26afcc2b992cb6d5175bb392657
+    Block Time: "Fri, 12 Jan 2024 14:42:02 +0000"
+
+eth_estimateGas
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1705072935[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1705076150[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1705076238[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_chainId
+eth_call
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_chainId
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1705076897[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_chainId
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_chainId
+eth_chainId
+eth_call
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1705077070[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getStorageAt
+eth_chainId
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1705077107[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_chainId
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1705077141[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getStorageAt
+eth_chainId
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_getStorageAt
+eth_getStorageAt
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_chainId
+eth_chainId
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0x1a2034afa993d6bd4f87e9bc2b9f36d9886a36536646ecdb82b1e9aa8939cc4b
+    Gas used: 570599
+
+    Block Number: 1
+    Block Hash: 0x8860a65a442b55107d8d353d13c9c7c676d5891a9c8d28ea8cf6715dfdadd4c9
+    Block Time: "Fri, 12 Jan 2024 16:33:21 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1705077371[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getStorageAt
+eth_getStorageAt
+eth_getStorageAt
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_chainId
+eth_chainId
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0x1a2034afa993d6bd4f87e9bc2b9f36d9886a36536646ecdb82b1e9aa8939cc4b
+    Gas used: 570599
+
+    Block Number: 1
+    Block Hash: 0x4d82144e42d9b823204091aedaff1b03a67d34b12b27509fc6ea7568f738e724
+    Block Time: "Fri, 12 Jan 2024 16:37:03 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0xb085d3cb3709f90660951f92adbdc51003f08284f6f057a3f7e9a85ca248255f
+    Gas used: 632352
+
+    Block Number: 2
+    Block Hash: 0x04fe5b8288d68bff2cde0330ebd1114792407bf14692a4d1e5e94369572c3b16
+    Block Time: "Fri, 12 Jan 2024 16:37:04 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0xa52089d122bc25e9dfaca580cca7eb2778ad787e747e30c6f545853274dfe0ae
+    Gas used: 75680
+
+    Block Number: 3
+    Block Hash: 0x2afa76542284d22708758cd4d89f04f1375e28b499c9ff563b294437048b6d81
+    Block Time: "Fri, 12 Jan 2024 16:37:05 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0x25193f3b05995e6d7558750881ac4df319005ce4b7d3fb8e650b9fff11af982a
+    Gas used: 433131
+
+    Block Number: 4
+    Block Hash: 0xd15a6986bee1398783d323610d36677dd5c3246d05e892f27f0bae0caf9e47fc
+    Block Time: "Fri, 12 Jan 2024 16:37:06 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0xd3ee320d994effffa81d9fcae31350e3920e6d03b83e4ac06ed2a323818358cf
+    Gas used: 369421
+
+    Block Number: 5
+    Block Hash: 0xc3b32c5221b837e90ddda6d3abdd035c1ab1275e7f735e783d8ff63254bbcbfc
+    Block Time: "Fri, 12 Jan 2024 16:37:07 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0x79c368ed87315aadb0ff60d175d19e4ceb76ab915cf5db4d964c0d9d676fe6d5
+    Gas used: 75658
+
+    Block Number: 6
+    Block Hash: 0x4f586e54aab1dd2610218832bacf6ae760b79f757fb4c2112810cceddabb359f
+    Block Time: "Fri, 12 Jan 2024 16:37:08 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0x251be967bc07f95c23cbc5ee5e6c74015357e4d79717651cec5cba03f6a2cfb8
+    Gas used: 54725
+
+    Block Number: 7
+    Block Hash: 0x0fad6f378602c38a69e78111332d53df5803bedede2ad161a534ce2361243583
+    Block Time: "Fri, 12 Jan 2024 16:37:09 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0xdd6cd005681d07c6cb38fd86fdeb1020cf373975c8618ce9f648c277654b025a
+    Gas used: 433131
+
+    Block Number: 8
+    Block Hash: 0x965c0d10c0d3214b9d9677a10122cef4f49be7a334c12b5fba8bbb0aa33d9140
+    Block Time: "Fri, 12 Jan 2024 16:37:10 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0x9be68eb0c8a205de7a5ddc6487e4d0c8093419c6fdd18b56026f69f5f3079eac
+    Gas used: 515760
+
+    Block Number: 9
+    Block Hash: 0x5a50fb8ce72bf9d09bad1b61538031ae1e93fe9647e72564ed5e12cf39a3e6bd
+    Block Time: "Fri, 12 Jan 2024 16:37:11 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0x927c6b6f5ec66d6e7e940510c4ed101baa16c76b426feff8c67b6df3fdf407f8
+    Gas used: 75603
+
+    Block Number: 10
+    Block Hash: 0xd839db81dfe358a288cd0940b7c989d7bba64d749bfaf99fb019e8d130d78677
+    Block Time: "Fri, 12 Jan 2024 16:37:12 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0xfdadcea5aad49c61cae7fe76143176c99ae62e725540c59d37a733b40e977f38
+    Gas used: 54908
+
+    Block Number: 11
+    Block Hash: 0xd95aba566d9a31a33911f8fca42afbebbf8f08b238a4b4c5a01dbf289fecffb0
+    Block Time: "Fri, 12 Jan 2024 16:37:13 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0x6f04bb76e509b1a108948a45fcfe2680bd87f9f7cd01e18c9105d143f559c2f4
+    Gas used: 433131
+
+    Block Number: 12
+    Block Hash: 0x116c3be9bd09b390e04ffa7aa07bd5b5d5650d0dff0ced5b9a4d88a3f1c2be75
+    Block Time: "Fri, 12 Jan 2024 16:37:14 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+eth_getTransactionReceipt
+
+    Transaction: 0x843de85c6ae4c6f895f3e9d376794c368c32d7165a9d72f5508bca52e6a9a995
+    Gas used: 1301894
+
+    Block Number: 13
+    Block Hash: 0xe09ddc785131d402ee0b83b72a83d4afe06d3d598bbd70e08b3e4c0f5f3d3b4f
+    Block Time: "Fri, 12 Jan 2024 16:37:15 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+eth_getTransactionReceipt
+
+    Transaction: 0x5f3383435dcc3ed4c1047296e1113ab35ffd8c865e3aa6fcde3dc660d6f3d5dd
+    Gas used: 101664
+
+    Block Number: 14
+    Block Hash: 0x50fba82b583c82c060d7da2347aee73de80fd0788c0f951f1b2eb3da12186e3a
+    Block Time: "Fri, 12 Jan 2024 16:37:16 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0xc97b1a64ad3e4ad0a70edbe7e6543e2c4e9317611abab056b651f0a7acb2143a
+    Gas used: 54773
+
+    Block Number: 15
+    Block Hash: 0x3948b728bb695a50a6f7983e1e436bdde1a390e4757b59e60697309b40db039a
+    Block Time: "Fri, 12 Jan 2024 16:37:17 +0000"
+
+eth_getTransactionReceipt
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getStorageAt
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getStorageAt
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_chainId
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1705078342[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_getStorageAt
+eth_getStorageAt
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_chainId
+eth_chainId
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+eth_getTransactionReceipt
+
+    Transaction: 0x9678f9e9f404e07d9731aea16cfd359ee6f7a49dfb9bb3e1a009a7c462bc3274
+    Gas used: 646162
+
+    Block Number: 1
+    Block Hash: 0x5558ee0447ed28f047de7e4a4c343f7275d89fa0bdfced1a8aaac750a9924cd7
+    Block Time: "Fri, 12 Jan 2024 16:52:25 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0xb085d3cb3709f90660951f92adbdc51003f08284f6f057a3f7e9a85ca248255f
+    Gas used: 632352
+
+    Block Number: 2
+    Block Hash: 0x4b20c88c611d8c6d9671613da5d31bf8d4a81d8a71cdfabcb34d447f335c72fc
+    Block Time: "Fri, 12 Jan 2024 16:52:26 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0xa52089d122bc25e9dfaca580cca7eb2778ad787e747e30c6f545853274dfe0ae
+    Gas used: 75680
+
+    Block Number: 3
+    Block Hash: 0x1891595ea9e0a4e6fb9478b73ede041d9e1a56a37eceada7c98c327ea5daa36f
+    Block Time: "Fri, 12 Jan 2024 16:52:27 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+eth_sendRawTransaction
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+eth_getTransactionReceipt
+
+    Transaction: 0x3a9cf82478ac15ac74fc3ee8ad59b5a46ac52b6428eeca8983c94c1f70700194
+    Gas used: 506377
+
+    Block Number: 4
+    Block Hash: 0x3a4b0e60d52f47d226b5eef2a8865349e5153b2cf4218d990a84962fbedfd55f
+    Block Time: "Fri, 12 Jan 2024 16:52:28 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0xd3ee320d994effffa81d9fcae31350e3920e6d03b83e4ac06ed2a323818358cf
+    Gas used: 369421
+
+    Block Number: 5
+    Block Hash: 0x89db90e8b4fbed6aeacb03364750a29e93ca271f61617ea36f37ee57696dd295
+    Block Time: "Fri, 12 Jan 2024 16:52:29 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+eth_sendRawTransaction
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+
+    Transaction: 0x2ecae3e2fb8dbf57b94d035ae7d29673a7813b847c0188443ec5f26b20678861
+    Gas used: 79729
+
+    Block Number: 6
+    Block Hash: 0x94961dd5c293257c59beef435d6a0cb6f8c116d18e5e9aba24dd19bd71668153
+    Block Time: "Fri, 12 Jan 2024 16:52:30 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0x551a1f203137835ccef29b47d81619a2c5d0105f1cc62f6d081a6e9aefb249d9
+    Gas used: 54749
+
+    Block Number: 7
+    Block Hash: 0x0b3c2defaa785722ce452feba8fd56669bec0b92efe399d8c8e476c9e1842290
+    Block Time: "Fri, 12 Jan 2024 16:52:31 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+eth_sendRawTransaction
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+
+    Transaction: 0x58290309ae209f9173b4c256218cc56f5e243172ea82d28b3aefa7a7ed79f0d5
+    Gas used: 506377
+
+    Block Number: 8
+    Block Hash: 0x1b512abc375a9109adcb68b94ef1f097467e4c20d271c3cc632dee6b2a9f5330
+    Block Time: "Fri, 12 Jan 2024 16:52:32 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0x9be68eb0c8a205de7a5ddc6487e4d0c8093419c6fdd18b56026f69f5f3079eac
+    Gas used: 515760
+
+    Block Number: 9
+    Block Hash: 0x0a678ac0f5ca4873efbc42c9f23edff0cd8ac2d749432e2e51487d1420b7e824
+    Block Time: "Fri, 12 Jan 2024 16:52:33 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+eth_sendRawTransaction
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+
+    Transaction: 0x11bf11712f9c74db66edce106218ec551be7bf83998c86142e8be75b2f5a4725
+    Gas used: 79674
+
+eth_getTransactionReceipt
+    Block Number: 10
+    Block Hash: 0xaaf0586dc8c9735b1a22e2e8b652585f43003f474dd5ad2c56d7cd5b689fd3c7
+    Block Time: "Fri, 12 Jan 2024 16:52:34 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+eth_getTransactionReceipt
+
+    Transaction: 0xeb77823ddbeac461b347a2c87bf5449ae4b87ead63166b66cc6dae9e9861b670
+    Gas used: 54908
+
+    Block Number: 11
+    Block Hash: 0x3e8418e7b0dde7847c3fa17acaa5842b8d5076934b91aa30ae6668152b323c6f
+    Block Time: "Fri, 12 Jan 2024 16:52:35 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+eth_sendRawTransaction
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+eth_getTransactionReceipt
+
+    Transaction: 0x79048d369fdbec61151c7ca2212c40deb20c5405414b28b6d270aee3962451ca
+    Gas used: 506377
+
+    Block Number: 12
+    Block Hash: 0x08492208561e14143314f728934fcb87ec562a250413fcca9348a0f01291952c
+    Block Time: "Fri, 12 Jan 2024 16:52:36 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+eth_getTransactionReceipt
+
+    Transaction: 0x843de85c6ae4c6f895f3e9d376794c368c32d7165a9d72f5508bca52e6a9a995
+    Gas used: 1301894
+
+    Block Number: 13
+    Block Hash: 0x5618da593af09a797ededf22f4bc3deddfbe73958af114ab2c6290d101288762
+    Block Time: "Fri, 12 Jan 2024 16:52:37 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+eth_sendRawTransaction
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+
+    Transaction: 0x0161c8f54c79a848de70eb458f2c14e937540b43930931726c7f5b681c6366c2
+    Gas used: 105732
+
+    Block Number: 14
+    Block Hash: 0xc719fc534c685547ab28f8bca5539e4936b467276d95080d15de743a1d240554
+eth_getTransactionReceipt
+    Block Time: "Fri, 12 Jan 2024 16:52:38 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0x6553ddd85944f1a02d373049d3fbd214b573b61cac26a7e6387d9847e6d6885a
+    Gas used: 54773
+
+    Block Number: 15
+    Block Hash: 0x517c1931ea4b0b657768a5c61fc9522dd1f77fc71f96dc559a72f97bbc834439
+    Block Time: "Fri, 12 Jan 2024 16:52:39 +0000"
+
+eth_getTransactionReceipt
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_chainId
+eth_gasPrice
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getStorageAt
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_accounts
+eth_accounts
+eth_accounts
+eth_accounts
+eth_accounts
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1705415918[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getStorageAt
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getStorageAt
+eth_chainId
+eth_chainId
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+eth_getTransactionReceipt
+
+    Transaction: 0x9678f9e9f404e07d9731aea16cfd359ee6f7a49dfb9bb3e1a009a7c462bc3274
+    Gas used: 646162
+
+    Block Number: 1
+    Block Hash: 0x44b97e86e7ea345a58dcd8ebf954e6b2e32b4c494956ca53279ffdf10e4156ea
+    Block Time: "Tue, 16 Jan 2024 14:38:47 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+eth_getTransactionReceipt
+
+    Transaction: 0xb085d3cb3709f90660951f92adbdc51003f08284f6f057a3f7e9a85ca248255f
+    Gas used: 632352
+
+    Block Number: 2
+    Block Hash: 0x8fdff04807ab6ffd7bfe8cb41a71776216dbb4deee2dc3d1e7e7d2dd79fababd
+    Block Time: "Tue, 16 Jan 2024 14:38:48 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0xa52089d122bc25e9dfaca580cca7eb2778ad787e747e30c6f545853274dfe0ae
+    Gas used: 75680
+
+    Block Number: 3
+    Block Hash: 0x21d265f190bc7df0271b370e5fbea2d5e001d420fdc5f47a0175d8286bff9530
+    Block Time: "Tue, 16 Jan 2024 14:38:49 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+eth_sendRawTransaction
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+eth_getTransactionReceipt
+
+    Transaction: 0x3a9cf82478ac15ac74fc3ee8ad59b5a46ac52b6428eeca8983c94c1f70700194
+    Gas used: 506377
+
+    Block Number: 4
+    Block Hash: 0x565e38e2e4d03a9cc258a22b92ab569537d9d72f21e27798d6496bf2fdb14fba
+    Block Time: "Tue, 16 Jan 2024 14:38:50 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+eth_getTransactionReceipt
+    Transaction: 0xd3ee320d994effffa81d9fcae31350e3920e6d03b83e4ac06ed2a323818358cf
+    Gas used: 369421
+
+    Block Number: 5
+    Block Hash: 0x325913a4d5f9db053c2e89b73383eb08f0f48c3d402a701cd9b0ec27ee4140f9
+    Block Time: "Tue, 16 Jan 2024 14:38:51 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+eth_sendRawTransaction
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+
+    Transaction: 0x2ecae3e2fb8dbf57b94d035ae7d29673a7813b847c0188443ec5f26b20678861
+    Gas used: 79729
+
+    Block Number: 6
+    Block Hash: 0x5c6c64876591bbb6bf18819342cb1d7367aed1213b4e12f5fe18406f9e41a23f
+    Block Time: "Tue, 16 Jan 2024 14:38:52 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0x551a1f203137835ccef29b47d81619a2c5d0105f1cc62f6d081a6e9aefb249d9
+    Gas used: 54749
+
+    Block Number: 7
+    Block Hash: 0xe485e407913f76e9fb3c34737170401974949318b3cd1afc1561127a5165bd68
+    Block Time: "Tue, 16 Jan 2024 14:38:53 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+eth_sendRawTransaction
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+
+    Transaction: 0x58290309ae209f9173b4c256218cc56f5e243172ea82d28b3aefa7a7ed79f0d5
+    Gas used: 506377
+
+    Block Number: 8
+    Block Hash: 0x62c62be7c263baaeb393aeb09f315387640bd1bcb82a7c181091cd34844467c6
+    Block Time: "Tue, 16 Jan 2024 14:38:54 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+eth_getTransactionReceipt
+
+    Transaction: 0x9be68eb0c8a205de7a5ddc6487e4d0c8093419c6fdd18b56026f69f5f3079eac
+    Gas used: 515760
+
+    Block Number: 9
+    Block Hash: 0x92f545235f6e88da717a79dd521d55033eb8ae18cfff6534d9e1623e60aeeb30
+    Block Time: "Tue, 16 Jan 2024 14:38:55 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+eth_sendRawTransaction
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+
+    Transaction: 0x11bf11712f9c74db66edce106218ec551be7bf83998c86142e8be75b2f5a4725
+    Gas used: 79674
+
+    Block Number: 10
+    Block Hash: 0x799c646fb9a584207257dd4054a8c4336547aabcbfd9e50570db443cabafd767
+    Block Time: "Tue, 16 Jan 2024 14:38:56 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0xeb77823ddbeac461b347a2c87bf5449ae4b87ead63166b66cc6dae9e9861b670
+    Gas used: 54908
+
+    Block Number: 11
+    Block Hash: 0x83ddff5042860236df33e965d0056433c76a457c6f549dc74b5365d7f33733bc
+    Block Time: "Tue, 16 Jan 2024 14:38:57 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+eth_sendRawTransaction
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+eth_getTransactionReceipt
+
+    Transaction: 0x79048d369fdbec61151c7ca2212c40deb20c5405414b28b6d270aee3962451ca
+    Gas used: 506377
+
+    Block Number: 12
+    Block Hash: 0x6834fe51c4221f2aed8d3a373f5f62f07322ad254c968eb994470d5255694d2c
+    Block Time: "Tue, 16 Jan 2024 14:38:58 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+eth_getTransactionReceipt
+
+    Transaction: 0x843de85c6ae4c6f895f3e9d376794c368c32d7165a9d72f5508bca52e6a9a995
+    Gas used: 1301894
+
+    Block Number: 13
+    Block Hash: 0xc7ed1fa21cf91ea2c3a4656c332245b53413127203b6db21122a3426465952e9
+    Block Time: "Tue, 16 Jan 2024 14:38:59 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+eth_sendRawTransaction
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+
+    Transaction: 0x0161c8f54c79a848de70eb458f2c14e937540b43930931726c7f5b681c6366c2
+    Gas used: 105732
+
+    Block Number: 14
+    Block Hash: 0x65dbddee0991d69bacd1bd75aeb7366afbee156fe3d1cacd5a429016388de228
+    Block Time: "Tue, 16 Jan 2024 14:39:00 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0x6553ddd85944f1a02d373049d3fbd214b573b61cac26a7e6387d9847e6d6885a
+eth_getTransactionReceipt
+    Gas used: 54773
+
+    Block Number: 15
+    Block Hash: 0x3d3e17476a6edee3e813522dbab5eda6cc9931947345731f994c617c94e31da1
+    Block Time: "Tue, 16 Jan 2024 14:39:01 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_chainId
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_chainId
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_chainId
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1705420670[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_getBlockByNumber
+eth_chainId
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getStorageAt
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getStorageAt
+eth_chainId
+eth_chainId
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_chainId
+eth_getBlockByNumber
+eth_feeHistory
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+eth_getTransactionReceipt
+
+    Transaction: 0x9678f9e9f404e07d9731aea16cfd359ee6f7a49dfb9bb3e1a009a7c462bc3274
+    Gas used: 646162
+
+    Block Number: 1
+    Block Hash: 0xa24765ed151b3e28502fe9d3c80c57da1a4315204229516537ba36446d778533
+    Block Time: "Tue, 16 Jan 2024 15:58:11 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0xb085d3cb3709f90660951f92adbdc51003f08284f6f057a3f7e9a85ca248255f
+    Gas used: 632352
+
+    Block Number: 2
+    Block Hash: 0x1cf198711ffbcf7d606de8ad2deada5146211fee17111c504e9224b161a224f3
+    Block Time: "Tue, 16 Jan 2024 15:58:12 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0xa52089d122bc25e9dfaca580cca7eb2778ad787e747e30c6f545853274dfe0ae
+    Gas used: 75680
+
+    Block Number: 3
+    Block Hash: 0x91c9af380050c5813a2761ca9c4ad5f7e8b9919cb897978268eff0b3a1cba837
+    Block Time: "Tue, 16 Jan 2024 15:58:13 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+eth_sendRawTransaction
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+
+    Transaction: 0x3a9cf82478ac15ac74fc3ee8ad59b5a46ac52b6428eeca8983c94c1f70700194
+    Gas used: 506377
+
+    Block Number: 4
+    Block Hash: 0x848a0cbb02d4f3116059a6c494be9d4efa11cf89df2902bfcde8ea199906f8b5
+eth_getTransactionReceipt
+    Block Time: "Tue, 16 Jan 2024 15:58:14 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0xd3ee320d994effffa81d9fcae31350e3920e6d03b83e4ac06ed2a323818358cf
+    Gas used: 369421
+
+    Block Number: 5
+    Block Hash: 0x5339fb2d2cb5a3ec0918e51148dbbd52a7178eb3fd96938acd57a32d97371b4f
+    Block Time: "Tue, 16 Jan 2024 15:58:15 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+eth_sendRawTransaction
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+
+    Transaction: 0x2ecae3e2fb8dbf57b94d035ae7d29673a7813b847c0188443ec5f26b20678861
+    Gas used: 79729
+
+    Block Number: 6
+    Block Hash: 0x4ccf0a4593e528ffb9ba4858a1903bdb29f11ee45dc0fa8b7282e4088214e536
+    Block Time: "Tue, 16 Jan 2024 15:58:16 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0x551a1f203137835ccef29b47d81619a2c5d0105f1cc62f6d081a6e9aefb249d9
+    Gas used: 54749
+
+    Block Number: 7
+    Block Hash: 0xd051913e30ca58420969e724a7a666c8cec062ce87cd4b147cae3976809320b4
+    Block Time: "Tue, 16 Jan 2024 15:58:17 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+eth_sendRawTransaction
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+
+    Transaction: 0x58290309ae209f9173b4c256218cc56f5e243172ea82d28b3aefa7a7ed79f0d5
+    Gas used: 506377
+
+    Block Number: 8
+    Block Hash: 0x207762c54b74a8f247df7d15d53db08fa98851c8a254194045ee2b59dff89d67
+eth_getTransactionReceipt
+    Block Time: "Tue, 16 Jan 2024 15:58:18 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0x9be68eb0c8a205de7a5ddc6487e4d0c8093419c6fdd18b56026f69f5f3079eac
+    Gas used: 515760
+
+    Block Number: 9
+    Block Hash: 0xfe1eb0187c4e6e90ddf4e492e95ade28d4fcb4d348403b62dd6f057b412ba262
+    Block Time: "Tue, 16 Jan 2024 15:58:19 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+eth_sendRawTransaction
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+
+    Transaction: 0x11bf11712f9c74db66edce106218ec551be7bf83998c86142e8be75b2f5a4725
+    Gas used: 79674
+
+    Block Number: 10
+    Block Hash: 0x34290b2917d409693531b215f8162b0d2721cf49eb99588f218c19d4bbeacf67
+    Block Time: "Tue, 16 Jan 2024 15:58:20 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0xeb77823ddbeac461b347a2c87bf5449ae4b87ead63166b66cc6dae9e9861b670
+    Gas used: 54908
+
+    Block Number: 11
+    Block Hash: 0x9facc90700484cf6319570fd06f5f6b8b73911a9df4ca056fd1a45746ca000dc
+    Block Time: "Tue, 16 Jan 2024 15:58:21 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+eth_sendRawTransaction
+Owner is: 0x462eBbd336802F4422fb80847098d993c2c851d0
+
+    Transaction: 0x79048d369fdbec61151c7ca2212c40deb20c5405414b28b6d270aee3962451ca
+    Gas used: 506377
+
+    Block Number: 12
+    Block Hash: 0x5170d4d3a485742a800278e005a794bfe15cb2652a168908eb44310d508437d7
+    Block Time: "Tue, 16 Jan 2024 15:58:22 +0000"
+
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+eth_getTransactionReceipt
+
+    Transaction: 0x9610f0d0d8219cdeb35c078c797e3cb90241028fa4e39d0dd20f9b2a04c25d4f
+    Gas used: 1301894
+
+    Block Number: 13
+    Block Hash: 0x9aa48881ebb5c63893318a46643a133ad9f655c380d025fd98d5bf78aaaad07b
+    Block Time: "Tue, 16 Jan 2024 15:58:23 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+eth_sendRawTransaction
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Owner is: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+
+    Transaction: 0xc07cced74c7a736f8e87627e8473511d68c4b653fc0eb8a13a3094ea24148f51
+eth_getTransactionReceipt
+    Gas used: 105720
+
+    Block Number: 14
+    Block Hash: 0xdcce6f01bd3f4eded48aa001ce7445601c04d476c2e0d4b4dc944b5c83f77a64
+    Block Time: "Tue, 16 Jan 2024 15:58:24 +0000"
+
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_getTransactionCount
+eth_estimateGas
+eth_sendRawTransaction
+
+    Transaction: 0x6553ddd85944f1a02d373049d3fbd214b573b61cac26a7e6387d9847e6d6885a
+    Gas used: 54773
+
+    Block Number: 15
+    Block Hash: 0x15a0113260c343d20b0dde0568eb882a727f3a98dc72422c982b62af11320566
+    Block Time: "Tue, 16 Jan 2024 15:58:25 +0000"
+
+eth_getTransactionReceipt
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getStorageAt
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getStorageAt
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+
+[32m
+                             _   _
+                            (_) | |
+      __ _   _ __   __   __  _  | |
+     / _` | | '_ \  \ \ / / | | | |
+    | (_| | | | | |  \ V /  | | | |
+     \__,_| |_| |_|   \_/   |_| |_|
+[0m
+    0.2.0 (7b45265 2023-11-21T00:18:30.369032000Z)
+    [32mhttps://github.com/foundry-rs/foundry[0m
+
+Available Accounts
+==================
+
+(0) "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" (10000.000000000000000000 ETH)
+(1) "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" (10000.000000000000000000 ETH)
+(2) "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC" (10000.000000000000000000 ETH)
+(3) "0x90F79bf6EB2c4f870365E785982E1f101E93b906" (10000.000000000000000000 ETH)
+(4) "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65" (10000.000000000000000000 ETH)
+(5) "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc" (10000.000000000000000000 ETH)
+(6) "0x976EA74026E726554dB657fA54763abd0C3a0aa9" (10000.000000000000000000 ETH)
+(7) "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" (10000.000000000000000000 ETH)
+(8) "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" (10000.000000000000000000 ETH)
+(9) "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720" (10000.000000000000000000 ETH)
+
+Private Keys
+==================
+
+(0) 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+(1) 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+(2) 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+(3) 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+(4) 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+(5) 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+(6) 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+(7) 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+(8) 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+(9) 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+
+Wallet
+==================
+Mnemonic:          test test test test test test test test test test test junk
+Derivation path:   m/44'/60'/0'/0/
+
+
+Chain ID
+==================
+[32m
+31337[0m
+
+Base Fee
+==================
+[32m
+1000000000[0m
+
+Gas Limit
+==================
+[32m
+30000000[0m
+
+Genesis Timestamp
+==================
+[32m
+1705420888[0m
+
+Listening on 127.0.0.1:8545
+thread 'main' panicked at /Users/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/hyper-0.14.27/src/server/server.rs:79:13:
+error binding to 127.0.0.1:8545: error creating server listener: Address already in use (os error 48)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getStorageAt
+eth_getStorageAt
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_getCode
+eth_getStorageAt
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_chainId
+anvil_setCode
+anvil_setStorageAt
+eth_getTransactionCount
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_blockNumber
+eth_gasPrice
+eth_chainId
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getStorageAt
+eth_getStorageAt
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getStorageAt
+eth_getTransactionCount
+eth_getBalance
+eth_getCode
+eth_getTransactionCount
+eth_getCode
+eth_getBalance
+eth_getStorageAt
+eth_getCode
+eth_getBalance
+eth_getTransactionCount
+eth_chainId

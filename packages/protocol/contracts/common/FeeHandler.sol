@@ -317,7 +317,7 @@ contract FeeHandler is
     // small numbers cause rounding errors and zero case should be skipped
     if (balanceToBurn < MIN_BURN) {
       return;
-    }
+    } // eso debería estar antes de quemar el storage
 
     if (dailySellLimitHit(tokenAddress, balanceToBurn)) {
       // in case the limit is hit, burn the max possible
@@ -475,7 +475,7 @@ contract FeeHandler is
     }
     _burnCelo();
     _distribute(tokenAddress);
-    _distribute(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
+    _distribute(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)); // function distribute Celo
   }
 
   /**

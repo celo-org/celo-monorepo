@@ -3,6 +3,8 @@ pragma solidity >=0.8.7 <0.8.20;
 // Can be moved to 0.8 if I use the interfaces? Need to do for Proxy
 // TODO proxy should have getOwner as external
 
+// Note: This scrip should not include any cheatcode so that it can run in production
+
 import "forge-std/Script.sol";
 import "forge-std/console.sol";
 import "@celo-contracts/common/interfaces/IProxyFactory.sol";
@@ -12,6 +14,7 @@ import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import "@celo-contracts/common/interfaces/ICeloToken.sol";
+import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 
 
 
@@ -61,20 +64,6 @@ contract Migration is Script {
     registry.setAddressFor(contractName, proxyAddress);
   }
 
-  function deployProxiedContract(
-    string memory contractName,
-    address toProxy,
-    bytes memory initializeCalldata
-  ) public {
-    console.log("Deploying: ", contractName);
-    deployCodeTo("Proxy.sol", abi.encode(false), toProxy);
-    IProxy proxy = IProxy(toProxy);
-    console.log(" Proxy deployed to:", toProxy);
-
-    setImplementationOnProxy(proxy, contractName, initializeCalldata);
-    addToRegistry(contractName, address(proxy));
-  }
-
   function setImplementationOnProxy(
     IProxy proxy,
     string memory contractName,
@@ -95,6 +84,20 @@ contract Migration is Script {
     address implementation = create2deploy(0, initialCode);
     console.log(" Implementation deployed to:", address(implementation));
     proxy._setAndInitializeImplementation(implementation, initializeCalldata);
+  }
+
+  function deployProxiedContract(
+    string memory contractName,
+    address toProxy,
+    bytes memory initializeCalldata
+  ) public {
+    console.log("Deploying: ", contractName);
+    deployCodeTo("Proxy.sol", abi.encode(false), toProxy);
+    IProxy proxy = IProxy(toProxy);
+    console.log(" Proxy deployed to:", toProxy);
+
+    setImplementationOnProxy(proxy, contractName, initializeCalldata);
+    addToRegistry(contractName, address(proxy));
   }
 
   function deployProxiedContract(string memory contractName, bytes memory initializeCalldata)
@@ -128,23 +131,41 @@ contract Migration is Script {
     // it's anvil key
     vm.startBroadcast(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80);
 
+    // TODO replace all the lines here with "Migrations.deployA()"
+    // TODO rename this script to MigrationsScript
+
     proxyFactory = IProxyFactory(create2deploy(0, vm.getCode("ProxyFactory.sol")));
 
-    // TODO in production the proxy of the registry is created using a cheatcode
-    deployProxiedContract("Registry", registryAddress, abi.encodeWithSelector(IRegistry.initialize.selector));
+    // deploy a proxy just to get the owner
+    // IProxy deployedProxy = IProxy(proxyFactory.deployProxy());
+    // deployedProxy._transferOwnership(address(this));
+    // console.log("Proxy with owner at:",  address(deployedProxy));
+    // console.logBytes32(bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1));
 
+    // TODO in production the proxy of the registry is created using a cheatcode
+    // deployProxiedContract("Registry", registryAddress, abi.encodeWithSelector(IRegistry.initialize.selector));
+
+    // just set the initialization of a proxy
+    setImplementationOnProxy(IProxy(registryAddress), "Registry", abi.encodeWithSelector(IRegistry.initialize.selector));
+
+    // TODO migrate the initializations
     deployProxiedContract("Freezer", abi.encodeWithSelector(IFreezer.initialize.selector));
     deployProxiedContract("FeeCurrencyWhitelist", abi.encodeWithSelector(IFeeCurrencyWhitelist.initialize.selector));
     deployProxiedContract(
       "GoldToken",
       abi.encodeWithSelector(ICeloToken.initialize.selector, registryAddress));
+    
+    uint256 reportExpirySeconds = 300;
+    deployProxiedContract(
+      "SortedOracles",
+      abi.encodeWithSelector(ISortedOracles.initialize.selector, reportExpirySeconds));
 
 
-    // little sanity check, remove later
-    IRegistry registry = IRegistry(registryAddress);
-    registry.setAddressFor("registry", address(1));
-    console.log("print:");
-    console.logAddress(registry.getAddressForStringOrDie("registry"));
+    // // // little sanity check, remove later
+    // IRegistry registry = IRegistry(registryAddress);
+    // registry.setAddressFor("registry", address(1));
+    // console.log("print:");
+    // console.logAddress(registry.getAddressForStringOrDie("registry"));
 
     vm.stopBroadcast();
   }
