@@ -19,7 +19,7 @@ import "@celo-contracts/governance/test/MockLockedGold.sol";
 
 import "@celo-contracts/governance/test/ValidatorsMock.sol";
 
-contract ValidatorsMockTunnel {
+contract ValidatorsMockTunnel is Test {
   ValidatorsMock private tunnelValidators;
   address validatorContractAddress;
 
@@ -45,10 +45,11 @@ contract ValidatorsMockTunnel {
     uint256 _downtimeGracePeriod;
   }
 
-  function MockInitialize(InitParams calldata params, InitParams2 calldata params2)
-    external
-    returns (bool, bytes memory)
-  {
+  function MockInitialize(
+    address sender,
+    InitParams calldata params,
+    InitParams2 calldata params2
+  ) external returns (bool, bytes memory) {
     bytes memory data = abi.encodeWithSignature(
       "initialize(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)",
       params.registryAddress,
@@ -64,10 +65,9 @@ contract ValidatorsMockTunnel {
       params2._commissionUpdateDelay,
       params2._downtimeGracePeriod
     );
-
-    // Use delegatecall to call the function in ContractB
-    (bool success, bytes memory result) = address(tunnelValidators).delegatecall(data);
-    require(success, "failed to delegateCall");
+    vm.prank(sender);
+    (bool success, bytes memory result) = address(tunnelValidators).call(data);
+    require(success);
   }
 }
 
@@ -78,8 +78,8 @@ contract ValidatorsTest is Test {
   Accounts accounts;
   MockStableToken stableToken;
   MockElection election;
-  ValidatorsMockTunnel validatorsMockTunnel;
-  ValidatorsMock public _validators;
+  ValidatorsMockTunnel public validatorsMockTunnel;
+  ValidatorsMock public validators;
   MockLockedGold lockedGold;
 
   uint256 HOUR = 60 * 60;
@@ -88,8 +88,10 @@ contract ValidatorsTest is Test {
   address nonOwner;
   address owner;
 
-  bytes public constant blsPublicKey = "0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00";
-  bytes public constant blsPop = "0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900";
+  bytes public constant blsPublicKey =
+    "0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00";
+  bytes public constant blsPop =
+    "0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900";
 
   event AccountSlashed(
     address indexed slashed,
@@ -127,9 +129,17 @@ contract ValidatorsTest is Test {
     owner = address(this);
     nonOwner = actor("nonOwner");
 
-    validatorLockedGoldRequirements = ValidatorLockedGoldRequirements(1000, 60 * DAY);
-    groupLockedGoldRequirements = GroupLockedGoldRequirements(1000, 100 * DAY);
-    validatorScoreParameters = ValidatorScoreParameters(5, FixidityLib.newFixedFraction(5, 20));
+    validatorLockedGoldRequirements = ValidatorLockedGoldRequirements({
+      value: 1000,
+      duration: 60 * DAY
+    });
+
+    groupLockedGoldRequirements = GroupLockedGoldRequirements({ value: 1000, duration: 100 * DAY });
+
+    validatorScoreParameters = ValidatorScoreParameters({
+      exponent: 5,
+      adjustmentSpeed: FixidityLib.newFixedFraction(5, 20)
+    });
 
     address registryAddress = 0x000000000000000000000000000000000000ce10;
     deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
@@ -140,15 +150,15 @@ contract ValidatorsTest is Test {
 
     lockedGold = new MockLockedGold();
     election = new MockElection();
-    _validators = new ValidatorsMock();
-    validatorsMockTunnel = new ValidatorsMockTunnel(address(_validators));
+    validators = new ValidatorsMock();
+    validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
 
     stableToken = new MockStableToken();
 
     registry.setAddressFor("Accounts", address(accounts));
     registry.setAddressFor("Election", address(election));
     registry.setAddressFor("LockedGold", address(lockedGold));
-    registry.setAddressFor("Validators", address(_validators));
+    registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("StableToken", address(stableToken));
 
     accounts.createAccount(); // do this for 10 accounts?
@@ -170,7 +180,7 @@ contract ValidatorsTest is Test {
       _downtimeGracePeriod: downtimeGracePeriod
     });
 
-    validatorsMockTunnel.MockInitialize(initParams, initParams2);
+    validatorsMockTunnel.MockInitialize(owner, initParams, initParams2);
   }
 
   // function registerValidator(address validator) public {
@@ -181,11 +191,82 @@ contract ValidatorsTest is Test {
   //     blsPop
   //   );
   // }
-
 }
 
 contract ValidatorsTest_Initialize is ValidatorsTest {
   function test_ShouldhaveSetTheOwner() public {
-    assertEq(_validators.owner(), owner);
+    assertEq(validators.owner(), owner, "Incorrect Owner.");
+  }
+
+  function test_Reverts_WhenCalledMoreThanOnce() public {
+    vm.expectRevert();
+    validatorsMockTunnel.MockInitialize(owner, initParams, initParams2);
+  }
+
+  function test_shouldHaveSetGroupLockedGoldRequirements() public {
+    (uint256 value, uint256 duration) = validators.getGroupLockedGoldRequirements();
+    assertEq(value, groupLockedGoldRequirements.value, "Wrong groupLockedGoldRequirements value.");
+    assertEq(
+      duration,
+      groupLockedGoldRequirements.duration,
+      "Wrong groupLockedGoldRequirements duration."
+    );
+  }
+
+  function test_shouldHaveSetValidatorLockedGoldRequirements() public {
+    (uint256 value, uint256 duration) = validators.getValidatorLockedGoldRequirements();
+    assertEq(
+      value,
+      validatorLockedGoldRequirements.value,
+      "Wrong validatorLockedGoldRequirements value."
+    );
+    assertEq(
+      duration,
+      validatorLockedGoldRequirements.duration,
+      "Wrong validatorLockedGoldRequirements duration."
+    );
+  }
+
+  function test_shouldHaveSetValidatorScoreParameters() public {
+    (uint256 exponent, uint256 adjustmentSpeed) = validators.getValidatorScoreParameters();
+    assertEq(
+      exponent,
+      validatorScoreParameters.exponent,
+      "Wrong validatorScoreParameters exponent."
+    );
+    assertEq(
+      adjustmentSpeed,
+      validatorScoreParameters.adjustmentSpeed.unwrap(),
+      "Wrong validatorScoreParameters adjustmentSpeed."
+    );
+  }
+
+  function test_shouldHaveSetMembershipHistory() public {
+    uint256 actual = validators.membershipHistoryLength();
+    assertEq(actual, membershipHistoryLength, "Wrong membershipHistoryLength.");
+  }
+
+  function test_shouldHaveSetMaxGroupSize() public {
+    uint256 actual = validators.maxGroupSize();
+    assertEq(actual, maxGroupSize, "Wrong maxGroupSize.");
+  }
+
+  function test_shouldHaveSetCommissionUpdateDelay() public {
+    uint256 actual = validators.getCommissionUpdateDelay();
+    assertEq(actual, commissionUpdateDelay, "Wrong commissionUpdateDelay.");
+  }
+
+  function test_shouldHaveSetDowntimeGracePeriod() public {
+    uint256 actual = validators.downtimeGracePeriod();
+    assertEq(actual, downtimeGracePeriod, "Wrong downtimeGracePeriod.");
+  }
+}
+
+contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
+
+  function test_Name_ShouldDoSomething_WhenSomethingHappens() public {
+      //setUp
+      //execution
+      //assert
   }
 }
