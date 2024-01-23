@@ -45,11 +45,10 @@ contract ValidatorsMockTunnel is Test {
     uint256 _downtimeGracePeriod;
   }
 
-  function MockInitialize(
-    address sender,
-    InitParams calldata params,
-    InitParams2 calldata params2
-  ) external returns (bool, bytes memory) {
+  function MockInitialize(address sender, InitParams calldata params, InitParams2 calldata params2)
+    external
+    returns (bool, bytes memory)
+  {
     bytes memory data = abi.encodeWithSignature(
       "initialize(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)",
       params.registryAddress,
@@ -67,7 +66,7 @@ contract ValidatorsMockTunnel is Test {
     );
     vm.prank(sender);
     (bool success, bytes memory result) = address(tunnelValidators).call(data);
-    require(success);
+    require(success, "unsuccessful tunnel call");
   }
 }
 
@@ -88,10 +87,8 @@ contract ValidatorsTest is Test {
   address nonOwner;
   address owner;
 
-  bytes public constant blsPublicKey =
-    "0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00";
-  bytes public constant blsPop =
-    "0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900";
+  bytes public constant blsPublicKey = "0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00";
+  bytes public constant blsPop = "0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900";
 
   event AccountSlashed(
     address indexed slashed,
@@ -191,6 +188,7 @@ contract ValidatorsTest is Test {
   //     blsPop
   //   );
   // }
+
 }
 
 contract ValidatorsTest_Initialize is ValidatorsTest {
@@ -263,10 +261,28 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
 }
 
 contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
+  uint256 newLength = membershipHistoryLength + 1;
+  event MembershipHistoryLengthSet(uint256 length);
 
-  function test_Name_ShouldDoSomething_WhenSomethingHappens() public {
-      //setUp
-      //execution
-      //assert
+  function test_Reverts_WhenLengthIsSame() public {
+    vm.expectRevert("Membership history length not changed");
+    validators.setMembershipHistoryLength(membershipHistoryLength);
+  }
+
+  function test_shouldSetTheMembershipHistoryLength() public {
+    validators.setMembershipHistoryLength(newLength);
+    assertEq(validators.membershipHistoryLength(), newLength);
+  }
+
+  function test_Emits_MembershipHistoryLengthSet() public {
+    vm.expectEmit(true, true, true, true);
+    emit MembershipHistoryLengthSet(newLength);
+    validators.setMembershipHistoryLength(newLength);
+  }
+
+  function test_Reverts_WhenCalledByNonOwner() public {
+    vm.prank(nonOwner);
+    vm.expectRevert("Ownable: caller is not the owner");
+    validators.setMembershipHistoryLength(newLength);
   }
 }

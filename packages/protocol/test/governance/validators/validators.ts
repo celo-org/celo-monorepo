@@ -177,117 +177,103 @@ contract('Validators', (accounts: string[]) => {
   }
 
   describe('#initialize()', () => {
-    it('should have set the owner', async () => {
-      const owner: string = await validators.owner()
-      assert.equal(owner, accounts[0])
-    })
-
-    it('should have set the group locked gold requirements', async () => {
-      const [value, duration] = await validators.getGroupLockedGoldRequirements()
-      assertEqualBN(value, groupLockedGoldRequirements.value)
-      assertEqualBN(duration, groupLockedGoldRequirements.duration)
-    })
-
-    it('should have set the validator locked gold requirements', async () => {
-      const [value, duration] = await validators.getValidatorLockedGoldRequirements()
-      assertEqualBN(value, validatorLockedGoldRequirements.value)
-      assertEqualBN(duration, validatorLockedGoldRequirements.duration)
-    })
-
-    it('should have set the validator score parameters', async () => {
-      const [exponent, adjustmentSpeed] = await validators.getValidatorScoreParameters()
-      assertEqualBN(exponent, validatorScoreParameters.exponent)
-      assertEqualBN(adjustmentSpeed, validatorScoreParameters.adjustmentSpeed)
-    })
-
-    it('should have set the membership history length', async () => {
-      const actual = await validators.membershipHistoryLength()
-      assertEqualBN(actual, membershipHistoryLength)
-    })
-
-    it('should have set the max group size', async () => {
-      const actualMaxGroupSize = await validators.getMaxGroupSize()
-      assertEqualBN(actualMaxGroupSize, maxGroupSize)
-    })
-
-    it('should have set the commision update delay', async () => {
-      const actualCommissionUpdateDelay = await validators.getCommissionUpdateDelay()
-      assertEqualBN(actualCommissionUpdateDelay, commissionUpdateDelay)
-    })
-
-    it('should have set the downtime grace period', async () => {
-      const actualDowntimeGracePeriod = await validators.downtimeGracePeriod()
-      assertEqualBN(actualDowntimeGracePeriod, downtimeGracePeriod)
-    })
-
-    it('should not be callable again', async () => {
-      await assertTransactionRevertWithReason(
-        validators.initialize(
-          registry.address,
-          groupLockedGoldRequirements.value,
-          groupLockedGoldRequirements.duration,
-          validatorLockedGoldRequirements.value,
-          validatorLockedGoldRequirements.duration,
-          validatorScoreParameters.exponent,
-          validatorScoreParameters.adjustmentSpeed,
-          membershipHistoryLength,
-          slashingMultiplierResetPeriod,
-          maxGroupSize,
-          commissionUpdateDelay,
-          downtimeGracePeriod
-        ),
-        'contract already initialized'
-      )
-    })
+    // it('should have set the owner', async () => {
+    //   const owner: string = await validators.owner()
+    //   assert.equal(owner, accounts[0])
+    // })
+    // it('should have set the group locked gold requirements', async () => {
+    //   const [value, duration] = await validators.getGroupLockedGoldRequirements()
+    //   assertEqualBN(value, groupLockedGoldRequirements.value)
+    //   assertEqualBN(duration, groupLockedGoldRequirements.duration)
+    // })
+    // it('should have set the validator locked gold requirements', async () => {
+    //   const [value, duration] = await validators.getValidatorLockedGoldRequirements()
+    //   assertEqualBN(value, validatorLockedGoldRequirements.value)
+    //   assertEqualBN(duration, validatorLockedGoldRequirements.duration)
+    // })
+    // it('should have set the validator score parameters', async () => {
+    //   const [exponent, adjustmentSpeed] = await validators.getValidatorScoreParameters()
+    //   assertEqualBN(exponent, validatorScoreParameters.exponent)
+    //   assertEqualBN(adjustmentSpeed, validatorScoreParameters.adjustmentSpeed)
+    // })
+    // it('should have set the membership history length', async () => {
+    //   const actual = await validators.membershipHistoryLength()
+    //   assertEqualBN(actual, membershipHistoryLength)
+    // })
+    // it('should have set the max group size', async () => {
+    //   const actualMaxGroupSize = await validators.getMaxGroupSize()
+    //   assertEqualBN(actualMaxGroupSize, maxGroupSize)
+    // })
+    // it('should have set the commision update delay', async () => {
+    //   const actualCommissionUpdateDelay = await validators.getCommissionUpdateDelay()
+    //   assertEqualBN(actualCommissionUpdateDelay, commissionUpdateDelay)
+    // })
+    // it('should have set the downtime grace period', async () => {
+    //   const actualDowntimeGracePeriod = await validators.downtimeGracePeriod()
+    //   assertEqualBN(actualDowntimeGracePeriod, downtimeGracePeriod)
+    // })
+    // it('should not be callable again', async () => {
+    //   await assertTransactionRevertWithReason(
+    //     validators.initialize(
+    //       registry.address,
+    //       groupLockedGoldRequirements.value,
+    //       groupLockedGoldRequirements.duration,
+    //       validatorLockedGoldRequirements.value,
+    //       validatorLockedGoldRequirements.duration,
+    //       validatorScoreParameters.exponent,
+    //       validatorScoreParameters.adjustmentSpeed,
+    //       membershipHistoryLength,
+    //       slashingMultiplierResetPeriod,
+    //       maxGroupSize,
+    //       commissionUpdateDelay,
+    //       downtimeGracePeriod
+    //     ),
+    //     'contract already initialized'
+    //   )
+    // })
   })
 
   describe('#setMembershipHistoryLength()', () => {
-    describe('when the length is different', () => {
-      const newLength = membershipHistoryLength.plus(1)
-
-      describe('when called by the owner', () => {
-        let resp: any
-
-        beforeEach(async () => {
-          resp = await validators.setMembershipHistoryLength(newLength)
-        })
-
-        it('should set the membership history length', async () => {
-          assertEqualBN(await validators.membershipHistoryLength(), newLength)
-        })
-
-        it('should emit the MembershipHistoryLengthSet event', async () => {
-          assert.equal(resp.logs.length, 1)
-          const log = resp.logs[0]
-          assertContainSubset(log, {
-            event: 'MembershipHistoryLengthSet',
-            args: {
-              length: new BigNumber(newLength),
-            },
-          })
-        })
-
-        describe('when called by a non-owner', () => {
-          it('should revert', async () => {
-            await assertTransactionRevertWithReason(
-              validators.setMembershipHistoryLength(newLength, {
-                from: nonOwner,
-              }),
-              'Ownable: caller is not the owner'
-            )
-          })
-        })
-      })
-
-      describe('when the length is the same', () => {
-        it('should revert', async () => {
-          await assertTransactionRevertWithReason(
-            validators.setMembershipHistoryLength(membershipHistoryLength),
-            'Membership history length not changed'
-          )
-        })
-      })
-    })
+    // describe('when the length is different', () => {
+    //   const newLength = membershipHistoryLength.plus(1)
+    //   describe('when called by the owner', () => {
+    //     let resp: any
+    //     beforeEach(async () => {
+    //       resp = await validators.setMembershipHistoryLength(newLength)
+    //     })
+    //     // it('should set the membership history length', async () => {
+    //     //   assertEqualBN(await validators.membershipHistoryLength(), newLength)
+    //     // })
+    //     // it('should emit the MembershipHistoryLengthSet event', async () => {
+    //     //   assert.equal(resp.logs.length, 1)
+    //     //   const log = resp.logs[0]
+    //     //   assertContainSubset(log, {
+    //     //     event: 'MembershipHistoryLengthSet',
+    //     //     args: {
+    //     //       length: new BigNumber(newLength),
+    //     //     },
+    //     //   })
+    //     // })
+    //     describe('when called by a non-owner', () => {
+    //       // it('should revert', async () => {
+    //       //   await assertTransactionRevertWithReason(
+    //       //     validators.setMembershipHistoryLength(newLength, {
+    //       //       from: nonOwner,
+    //       //     }),
+    //       //     'Ownable: caller is not the owner'
+    //       //   )
+    //       // })
+    //     })
+    //   })
+    //   // describe('when the length is the same', () => {
+    //   //   it('should revert', async () => {
+    //   //     await assertTransactionRevertWithReason(
+    //   //       validators.setMembershipHistoryLength(membershipHistoryLength),
+    //   //       'Membership history length not changed'
+    //   //     )
+    //   //   })
+    //   // })
+    // })
   })
 
   describe('#setMaxGroupSize()', () => {
