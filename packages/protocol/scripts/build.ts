@@ -165,6 +165,7 @@ type BuildTargets = Record<keyof typeof _buildTargets, string> & {
 }
 
 async function main(buildTargets: BuildTargets) {
+  console.log('protocol: Building contracts')
   if (buildTargets.solidity) {
     compile(buildTargets)
   }
@@ -174,6 +175,7 @@ async function main(buildTargets: BuildTargets) {
   if (buildTargets.ethersTypes) {
     generateFilesForEthers(buildTargets)
   }
+  console.log('generateFilesForContractKit', buildTargets.web3Types)
   if (buildTargets.web3Types) {
     await generateFilesForContractKit(buildTargets)
   }

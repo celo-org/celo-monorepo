@@ -1,5 +1,4 @@
 {
-  "extends": "@tsconfig/recommended/tsconfig.json",
   "compileOnSave": false,
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
@@ -7,6 +6,7 @@
     "baseUrl": ".",
     "strict": true,
     "moduleResolution": "node16",
+    "module": "Node16",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": true,
@@ -18,5 +18,5 @@
     "declaration": false,
     "rootDir": "./src-generated",
   },
-  "include": ["./src-generated"],
+  "include": ["./src-generated", "./src-generated/web3", "./src-generated/web3/0.8"],
 }

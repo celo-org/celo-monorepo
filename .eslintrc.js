@@ -33,7 +33,6 @@ module.exports = {
     'packages/protocol/truffle-config0.8.js',
     'packages/protocol/truffle-config-parent.js',
     'packages/protocol/abis',
-    'packages/protocol/test/**',
     'packages/protocol/wagmi.config.ts',
     '**/jest.config.js',
   ],

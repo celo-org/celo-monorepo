@@ -1,18 +1,31 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Recommended",
-  "compilerOptions": {
-    "target": "es2015",
-    "module": "commonjs",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-  },
-  "exclude": [
-      "node_modules",
-      "wagmi.config.ts",
-      "abis",
-      "scripts/**/*.test.ts"
-  ]
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "display": "Recommended",
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "baseUrl": ".",
+        "lib": [
+            "es2015",
+            "es2016"
+        ],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "removeComments": false,
+        "sourceMap": true,
+        "target": "es5",
+        "downlevelIteration": true,
+        "resolveJsonModule": true,
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "exclude": [
+        "node_modules",
+        "wagmi.config.ts",
+        "abis",
+        "scripts/**/*.test.ts"
+    ]
 }

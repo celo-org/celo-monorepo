@@ -977,9 +977,11 @@ contract('ReleaseGold', (accounts: string[]) => {
       })
     })
   })
+  type Key = keyof typeof authorizationTestDescriptions
 
   describe('authorization tests:', () => {
-    Object.keys(authorizationTestDescriptions).forEach((key) => {
+    Object.keys(authorizationTestDescriptions).forEach((key0) => {
+      const key: Key = key0 as unknown as Key
       let authorizationTest: any
       const authorized = accounts[4] // the account that is to be authorized for whatever role
       let sig: any
@@ -1461,7 +1463,7 @@ contract('ReleaseGold', (accounts: string[]) => {
   })
 
   describe('#lockGold', () => {
-    let lockAmount = null
+    let lockAmount: BigNumber = new BigNumber(0)
 
     beforeEach(async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
@@ -1516,7 +1518,7 @@ contract('ReleaseGold', (accounts: string[]) => {
   })
 
   describe('#unlockGold', () => {
-    let lockAmount: any
+    let lockAmount: BigNumber = new BigNumber(0)
 
     beforeEach(async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)

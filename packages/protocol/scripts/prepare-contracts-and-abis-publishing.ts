@@ -106,16 +106,24 @@ try {
 }
 
 function createIndex() {
-  const reExports = PublishContracts.map((contractName) => {
+  const reExports = PublishContracts.filter((contractName) => {
+    return fs.existsSync(path.join(ABIS_BUILD_DIR, `${contractName}.ts`))
+  }).map((contractName) => {
+    console.info(`Re-exporting ${contractName}`)
     return `export * from './${contractName}.js'`
   })
 
   fs.writeFileSync(path.join(ABIS_BUILD_DIR, 'index.ts'), reExports.join('\n'))
 }
 
+type Exports = Record<
+  string,
+  { import?: string; require?: string; types?: string; default?: string }
+>
+
 // Helper functions
 function prepareTargetTypesExports() {
-  const exports = {}
+  const exports: Exports = {}
   const targets = [BuildTarget.ESM, BuildTarget.CJS, BuildTarget.TYPES]
 
   targets.forEach((target) => {
@@ -191,7 +199,7 @@ function expectFileExists(relativePath: string) {
 }
 
 function processRawJsonsAndPrepareExports() {
-  const exports = {}
+  const exports: Exports = {}
 
   log('Removing extraneous fields from generated json files')
   const fileNames = fs.readdirSync(ABIS_BUILD_DIR)
@@ -230,7 +238,10 @@ function processRawJsonsAndPrepareExports() {
   return exports
 }
 
-function replacePackageVersionAndMakePublic(packageJsonPath: string, onDone?: (json) => void) {
+function replacePackageVersionAndMakePublic(
+  packageJsonPath: string,
+  onDone?: (json: Record<string, unknown>) => void
+) {
   const json = JSON.parse(fs.readFileSync(packageJsonPath).toString())
 
   if (process.env.RELEASE_VERSION) {
@@ -249,7 +260,7 @@ function replacePackageVersionAndMakePublic(packageJsonPath: string, onDone?: (j
   fs.writeFileSync(packageJsonPath, JSON.stringify(json, null, 2))
 }
 
-function prepareAbisPackageJson(exports) {
+function prepareAbisPackageJson(exports: Exports) {
   log('Preparing @celo/abis package.json')
   const packageJsonPath = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json')
 

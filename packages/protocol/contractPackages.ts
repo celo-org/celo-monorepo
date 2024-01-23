@@ -1,5 +1,3 @@
-import { satisfies } from 'semver'
-
 export interface ContractPackage {
   path?: string
   folderPath?: string
