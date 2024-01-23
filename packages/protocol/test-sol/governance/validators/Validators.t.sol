@@ -286,3 +286,66 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
     validators.setMembershipHistoryLength(newLength);
   }
 }
+
+contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
+  uint256 newSize = maxGroupSize + 1;
+  event MaxGroupSizeSet(uint256 size);
+
+  function test_ShouldSetMaxGroupSize() public {
+    validators.setMaxGroupSize(newSize);
+    assertEq(validators.getMaxGroupSize(), newSize, "MaxGroupSize not properly set");
+  }
+
+  function test_Emits_MaxGroupSizeSet() public {
+    vm.expectEmit(true, true, true, true);
+    emit MaxGroupSizeSet(newSize);
+    validators.setMaxGroupSize(newSize);
+  }
+
+  function test_Revert_WhenCalledByNonOwner() public {
+    vm.prank(nonOwner);
+    vm.expectRevert("Ownable: caller is not the owner");
+    validators.setMaxGroupSize(newSize);
+  }
+
+  function test_Reverts_WhenSizeIsSame() public {
+    vm.expectRevert("Max group size not changed");
+    validators.setMaxGroupSize(maxGroupSize);
+  }
+}
+
+contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
+  GroupLockedGoldRequirements private newRequirements = GroupLockedGoldRequirements({
+    value: groupLockedGoldRequirements.value + 1,
+    duration: groupLockedGoldRequirements.duration + 1
+  });
+
+  event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
+
+  function test_ShouldHaveSetgroupLockedGoldRequirements() public {
+    validators.setGroupLockedGoldRequirements(newRequirements.value, newRequirements.duration);
+    (uint256 _value, uint256 _duration) = validators.getGroupLockedGoldRequirements();
+    assertEq(_value, newRequirements.value);
+    assertEq(_duration, newRequirements.duration);
+  }
+
+  function test_Emits_GroupLockedGoldRequirementsSet() public {
+    vm.expectEmit(true, true, true, true);
+    emit GroupLockedGoldRequirementsSet(newRequirements.value, newRequirements.duration);
+    validators.setGroupLockedGoldRequirements(newRequirements.value, newRequirements.duration);
+  }
+
+  function test_Reverts_WhenCalledByNonOwner() public {
+    vm.prank(nonOwner);
+    vm.expectRevert("Ownable: caller is not the owner");
+    validators.setGroupLockedGoldRequirements(newRequirements.value, newRequirements.duration);
+  }
+
+  function test_Reverts_WhenRequirementsAreUnchanged() public {
+    vm.expectRevert("Group requirements not changed");
+    validators.setGroupLockedGoldRequirements(
+      groupLockedGoldRequirements.value,
+      groupLockedGoldRequirements.duration
+    );
+  }
+}
