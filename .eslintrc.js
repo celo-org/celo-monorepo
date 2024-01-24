@@ -29,6 +29,7 @@ module.exports = {
     'packages/protocol/scripts/truffle/**',
     // ignoring any files that for which "TSConfig does not include this file" error was given
     'packages/protocol/scripts/utils.test.ts',
+    'packages/protocol/test',
     'packages/protocol/truffle-config.js',
     'packages/protocol/truffle-config0.8.js',
     'packages/protocol/truffle-config-parent.js',

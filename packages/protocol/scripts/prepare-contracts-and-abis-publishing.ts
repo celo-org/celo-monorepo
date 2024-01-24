@@ -238,14 +238,16 @@ function processRawJsonsAndPrepareExports() {
   return exports
 }
 
+type JSON = Record<string, string | boolean | Exports>
+
 function replacePackageVersionAndMakePublic(
   packageJsonPath: string,
-  onDone?: (json: Record<string, unknown>) => void
+  onDone?: (json: JSON) => void
 ) {
-  const json = JSON.parse(fs.readFileSync(packageJsonPath).toString())
+  const json: JSON = JSON.parse(fs.readFileSync(packageJsonPath).toString())
 
   if (process.env.RELEASE_VERSION) {
-    log(`Replacing ${json.name} version with provided RELEASE_VERSION`)
+    log(`Replacing ${json.name as string} version with provided RELEASE_VERSION`)
 
     json.version = process.env.RELEASE_VERSION
     json.private = false
