@@ -4,6 +4,7 @@
     "outDir": "lib",
     "rootDir": "src",
     "baseUrl": ".",
+    "strict": false,
     "lib": ["es7", "es2017", "es2020"],
     "target": "es2020",
     "resolveJsonModule": true,

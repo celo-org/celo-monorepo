@@ -44,9 +44,22 @@ function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
   }
 
   // compile everything else
-  exec(
-    `yarn run --silent truffle compile --contracts_directory="./contracts/" --build_directory=${outdir}`
-  )
+  try {
+    exec(
+      `yarn run --silent truffle compile --contracts_directory="./contracts/" --build_directory=${outdir}`
+    )
+  } catch (e) {
+    console.error(e)
+    console.info(
+      `
+
+    If error is something like "using solc 0.5.13, but  specify "pragma solidity >=0.8.7 <0.8.20".
+    Then try to delete the 0.8 folder inside of contracts folder (not the contracts-0.8 folder)
+
+    `
+    )
+    process.exit(1)
+  }
 
   const contracts = coreContractsOnly ? CoreContracts : ImplContracts
   // check that there were no errors

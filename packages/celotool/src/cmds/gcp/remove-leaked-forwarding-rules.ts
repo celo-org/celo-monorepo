@@ -49,7 +49,6 @@ export const handler = async (argv: Argv) => {
           true
         )
         return false
-        // @ts-expect-error eslint doesn't like the destructuring here
       } catch ([error, stdout, stderr]) {
         if (typeof stdout === 'string') {
           const healthyInstances = JSON.parse(stdout).length

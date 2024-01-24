@@ -2,6 +2,7 @@
   "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
+    "strict": false,
     "outDir": "lib",
     "resolveJsonModule": true
   },
