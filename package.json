@@ -60,7 +60,7 @@
     "semver": "7.3.5",
     "solc": "0.5.8",
     "ts-jest": "^29.0.0",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "tsconfig-paths": "^3.8.0",
     "typescript": "^5.3.3"
   },
