@@ -23,7 +23,7 @@ async function execCmd(cmd: string, args: string[], options?: SpawnOptions & { s
     const process = spawn(cmd, args, { ...spawnOptions, stdio: silent ? 'ignore' : 'inherit' })
     process.on('close', (code) => {
       try {
-        resolve(code as number)
+        resolve(code)
       } catch (error) {
         reject(error)
       }

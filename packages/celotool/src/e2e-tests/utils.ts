@@ -235,7 +235,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
   const proxyNodeKeys = getPrivateKeysFor(AccountType.PROXY, mnemonic, numProxies)
   const proxyEnodes = proxyNodeKeys.map((x: string, i: number) => [
     proxyInstances[i].name,
-    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', proxyInstances[i].proxyport!),
+    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', proxyInstances[i].proxyport),
     getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', proxyInstances[i].port),
   ])
 
@@ -298,7 +298,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       }
 
       if (!instance.minerValidator && (instance.validating || instance.isProxied)) {
-        instance.minerValidator = privateKeyToAddress(instance.privateKey!)
+        instance.minerValidator = privateKeyToAddress(instance.privateKey)
       }
     }
 
@@ -313,7 +313,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
           throw new Error('proxied validator must have exactly one proxy')
         }
 
-        instance.proxiedValidatorAddress = privateKeyToAddress(proxiedValidator[0].privateKey!)
+        instance.proxiedValidatorAddress = privateKeyToAddress(proxiedValidator[0].privateKey)
       }
     }
 
@@ -389,7 +389,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       }
 
       if (!instance.minerValidator && (instance.validating || instance.isProxied)) {
-        instance.minerValidator = privateKeyToAddress(instance.privateKey!)
+        instance.minerValidator = privateKeyToAddress(instance.privateKey)
       }
 
       await startGeth(gethConfig, gethBinaryPath, instance, verbose)

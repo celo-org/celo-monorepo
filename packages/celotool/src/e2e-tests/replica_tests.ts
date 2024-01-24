@@ -133,7 +133,7 @@ describe('replica swap tests', () => {
 
       await restart()
 
-      const proxyPubKey = privateKeyToPublicKey(gethConfig.instances[1].nodekey!)
+      const proxyPubKey = privateKeyToPublicKey(gethConfig.instances[1].nodekey)
       const replica: GethInstanceConfig = {
         name: 'validator0-replica0',
         replica: true,
@@ -142,7 +142,7 @@ describe('replica swap tests', () => {
         port: 30315,
         rpcport: 8555,
         privateKey: gethConfig.instances[0].privateKey,
-        minerValidator: privateKeyToAddress(gethConfig.instances[0].privateKey!),
+        minerValidator: privateKeyToAddress(gethConfig.instances[0].privateKey),
         proxy: 'validator0-proxy0',
         isProxied: true,
         proxyport: 30304,

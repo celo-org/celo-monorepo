@@ -298,7 +298,7 @@ class TestEnv {
       if (ethCompatible && !this.cipIsActivated) {
         it('fails due to being ethereum-compatible', () => {
           assert.isNull(minedTx, 'Transaction succeeded when it should have failed')
-          assert.equal(error!, notYetActivatedError)
+          assert.equal(error, notYetActivatedError)
         })
       } else if (this.cipIsActivated) {
         if (this.replayProtectionIsNotMandatory) {
@@ -310,7 +310,7 @@ class TestEnv {
           // Replay protection is mandatory, so the transaction should fail
           it('fails due to replay protection being mandatory', () => {
             assert.isNull(minedTx, 'Transaction succeeded when it should have failed')
-            assert.equal(error!, noReplayProtectionError)
+            assert.equal(error, noReplayProtectionError)
           })
         }
       } else {
@@ -375,7 +375,7 @@ class TestEnv {
               const signed = await w3.eth.accounts.signTransaction(tx, validatorPrivateKey)
               raw = signed.rawTransaction!
             } else {
-              const signed = await kLocal.connection.wallet!.signTransaction(tx)
+              const signed = await kLocal.connection.wallet.signTransaction(tx)
               raw = signed.raw
             }
             // Once the transaction is signed and encoded, it doesn't matter whether we send it with web3 or contractkit
@@ -406,8 +406,8 @@ class TestEnv {
         it(`fails with the expected error (${testCase.errorReason})`, () => {
           assert.notEqual(error, null, "Expected an error but didn't get one")
           assert.match(
-            error!,
-            new RegExp(testCase.errorString!, 'i'),
+            error,
+            new RegExp(testCase.errorString, 'i'),
             `Got "${error}", expected "${testCase.errorString}"`
           )
         })

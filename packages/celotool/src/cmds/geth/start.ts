@@ -1,4 +1,3 @@
-/* tslint:disable: no-console */
 import { readFileSync } from 'fs'
 import { addCeloGethMiddleware } from 'src/lib/utils'
 import yargs from 'yargs'
@@ -261,7 +260,7 @@ export const handler = async (argv: StartArgv) => {
       node.isProxied = true
       node.proxyAllowPrivateIp = true
       node.proxies = [
-        getEnodeAddress(privateKeyToPublicKey(proxyPrivateKeys[x]), '127.0.0.1', proxy.proxyport!),
+        getEnodeAddress(privateKeyToPublicKey(proxyPrivateKeys[x]), '127.0.0.1', proxy.proxyport),
         getEnodeAddress(privateKeyToPublicKey(validatorPrivateKeys[x]), '127.0.0.1', node.port),
       ]
     }

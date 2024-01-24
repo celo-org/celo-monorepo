@@ -69,7 +69,7 @@ export const handler = async (argv: DescribeArgv) => {
         to: transaction.to ? transaction.to : undefined,
         from: transaction.from,
       },
-      transaction.blockNumber!
+      transaction.blockNumber
     )
 
     if (called.startsWith('0x08c379a')) {
