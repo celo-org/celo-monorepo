@@ -5118,14 +5118,14 @@
   integrity sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==
 
 "@types/string-hash@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@types/string-hash/-/string-hash-1.1.1.tgz#4c336e61d1e13ce2d3efaaa5910005fd080e106b"
-  integrity sha512-ijt3zdHi2DmZxQpQTmozXszzDo78V4R3EdvX0jFMfnMH2ZzQSmCbaWOMPGXFUYSzSIdStv78HDjg32m5dxc+tA==
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@types/string-hash/-/string-hash-1.1.3.tgz#8d9a73cf25574d45daf11e3ae2bf6b50e69aa212"
+  integrity sha512-p6skq756fJWiA59g2Uss+cMl6tpoDGuCBuxG0SI1t0NwJmYOU66LAMS6QiCgu7cUh3/hYCaMl5phcCW1JP5wOA==
 
 "@types/tar-fs@*":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@types/tar-fs/-/tar-fs-2.0.1.tgz#6391dcad1b03dea2d79fac07371585ab54472bb1"
-  integrity sha512-qlsQyIY9sN7p221xHuXKNoMfUenOcvEBN4zI8dGsYbYCqHtTarXOEXSIgUnK+GcR0fZDse6pAIc5pIrCh9NefQ==
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@types/tar-fs/-/tar-fs-2.0.4.tgz#7c7502d281d436db0ad0f78282acef71da02a292"
+  integrity sha512-ipPec0CjTmVDWE+QKr9cTmIIoTl7dFG/yARCM5MqK8i6CNLIG1P8x4kwDsOQY1ChZOZjH0wO9nvfgBvWl4R3kA==
   dependencies:
     "@types/node" "*"
     "@types/tar-stream" "*"
@@ -5145,9 +5145,9 @@
     "@types/tar-fs" "*"
 
 "@types/targz@^1.0.0":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@types/targz/-/targz-1.0.1.tgz#8b68a867b5dc28a755fd57e62d8b17f94e28462f"
-  integrity sha512-Uf5QxuLICkVOmSyDhPicBpIXk2oLIqaldObfr/WsTKTAPk666OpbeL0wZuNXwc5yg9OH1cBVj1rpMHGBJe4ilg==
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@types/targz/-/targz-1.0.4.tgz#bf78d46b564ac1a2527532c915892a96ddf1ed01"
+  integrity sha512-4i2weIjweWsnrvutLH7dM/+FPVSFSqxb+XKWo61tAiHxyYYHveImqys5JijMboKJz+jhFu24SlFrdVAB0xAMIw==
   dependencies:
     "@types/tar-fs" "*"
 
