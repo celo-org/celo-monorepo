@@ -14,15 +14,15 @@
         "noUnusedParameters": true,
         "removeComments": false,
         "sourceMap": true,
-        "target": "es5",
+        "target": "es6",
         "downlevelIteration": true,
         "resolveJsonModule": true,
-        "strict": true,
+        "strict": false,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "paths": {
-          "@celo/protocol/*": ["./*"],
+          "@celo/protocol/*": ["./*"]
         }
     },
     "exclude": [

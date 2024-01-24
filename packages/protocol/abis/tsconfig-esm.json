@@ -6,5 +6,5 @@
     "declaration": false,
     "module": "ES2020",
     "outDir": "./dist/esm"
-  },
+  }
 }

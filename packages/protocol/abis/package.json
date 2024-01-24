@@ -335,6 +335,206 @@
       "import": "./dist/esm/Validators.js",
       "require": "./dist/cjs/Validators.js",
       "types": "./dist/types/Validators.d.ts"
+    },
+    "./web3/0.8/GasPriceMinimum": {
+      "import": "./dist/esm/web3/0.8/GasPriceMinimum.js",
+      "require": "./dist/cjs/web3/0.8/GasPriceMinimum.js",
+      "types": "./dist/types/web3/0.8/GasPriceMinimum.d.ts"
+    },
+    "./web3/Accounts": {
+      "import": "./dist/esm/web3/Accounts.js",
+      "require": "./dist/cjs/web3/Accounts.js",
+      "types": "./dist/types/web3/Accounts.d.ts"
+    },
+    "./web3/Attestations": {
+      "import": "./dist/esm/web3/Attestations.js",
+      "require": "./dist/cjs/web3/Attestations.js",
+      "types": "./dist/types/web3/Attestations.d.ts"
+    },
+    "./web3/BlockchainParameters": {
+      "import": "./dist/esm/web3/BlockchainParameters.js",
+      "require": "./dist/cjs/web3/BlockchainParameters.js",
+      "types": "./dist/types/web3/BlockchainParameters.d.ts"
+    },
+    "./web3/DoubleSigningSlasher": {
+      "import": "./dist/esm/web3/DoubleSigningSlasher.js",
+      "require": "./dist/cjs/web3/DoubleSigningSlasher.js",
+      "types": "./dist/types/web3/DoubleSigningSlasher.d.ts"
+    },
+    "./web3/DowntimeSlasher": {
+      "import": "./dist/esm/web3/DowntimeSlasher.js",
+      "require": "./dist/cjs/web3/DowntimeSlasher.js",
+      "types": "./dist/types/web3/DowntimeSlasher.d.ts"
+    },
+    "./web3/Election": {
+      "import": "./dist/esm/web3/Election.js",
+      "require": "./dist/cjs/web3/Election.js",
+      "types": "./dist/types/web3/Election.d.ts"
+    },
+    "./web3/EpochRewards": {
+      "import": "./dist/esm/web3/EpochRewards.js",
+      "require": "./dist/cjs/web3/EpochRewards.js",
+      "types": "./dist/types/web3/EpochRewards.d.ts"
+    },
+    "./web3/Escrow": {
+      "import": "./dist/esm/web3/Escrow.js",
+      "require": "./dist/cjs/web3/Escrow.js",
+      "types": "./dist/types/web3/Escrow.d.ts"
+    },
+    "./web3/FederatedAttestations": {
+      "import": "./dist/esm/web3/FederatedAttestations.js",
+      "require": "./dist/cjs/web3/FederatedAttestations.js",
+      "types": "./dist/types/web3/FederatedAttestations.d.ts"
+    },
+    "./web3/FeeCurrencyWhitelist": {
+      "import": "./dist/esm/web3/FeeCurrencyWhitelist.js",
+      "require": "./dist/cjs/web3/FeeCurrencyWhitelist.js",
+      "types": "./dist/types/web3/FeeCurrencyWhitelist.d.ts"
+    },
+    "./web3/FeeHandler": {
+      "import": "./dist/esm/web3/FeeHandler.js",
+      "require": "./dist/cjs/web3/FeeHandler.js",
+      "types": "./dist/types/web3/FeeHandler.d.ts"
+    },
+    "./web3/Freezer": {
+      "import": "./dist/esm/web3/Freezer.js",
+      "require": "./dist/cjs/web3/Freezer.js",
+      "types": "./dist/types/web3/Freezer.d.ts"
+    },
+    "./web3/GasPriceMinimum": {
+      "import": "./dist/esm/web3/GasPriceMinimum.js",
+      "require": "./dist/cjs/web3/GasPriceMinimum.js",
+      "types": "./dist/types/web3/GasPriceMinimum.d.ts"
+    },
+    "./web3/GoldToken": {
+      "import": "./dist/esm/web3/GoldToken.js",
+      "require": "./dist/cjs/web3/GoldToken.js",
+      "types": "./dist/types/web3/GoldToken.d.ts"
+    },
+    "./web3/Governance": {
+      "import": "./dist/esm/web3/Governance.js",
+      "require": "./dist/cjs/web3/Governance.js",
+      "types": "./dist/types/web3/Governance.d.ts"
+    },
+    "./web3/GovernanceApproverMultiSig": {
+      "import": "./dist/esm/web3/GovernanceApproverMultiSig.js",
+      "require": "./dist/cjs/web3/GovernanceApproverMultiSig.js",
+      "types": "./dist/types/web3/GovernanceApproverMultiSig.d.ts"
+    },
+    "./web3/ICeloToken": {
+      "import": "./dist/esm/web3/ICeloToken.js",
+      "require": "./dist/cjs/web3/ICeloToken.js",
+      "types": "./dist/types/web3/ICeloToken.d.ts"
+    },
+    "./web3/ICeloVersionedContract": {
+      "import": "./dist/esm/web3/ICeloVersionedContract.js",
+      "require": "./dist/cjs/web3/ICeloVersionedContract.js",
+      "types": "./dist/types/web3/ICeloVersionedContract.d.ts"
+    },
+    "./web3/IERC20": {
+      "import": "./dist/esm/web3/IERC20.js",
+      "require": "./dist/cjs/web3/IERC20.js",
+      "types": "./dist/types/web3/IERC20.d.ts"
+    },
+    "./web3/LockedGold": {
+      "import": "./dist/esm/web3/LockedGold.js",
+      "require": "./dist/cjs/web3/LockedGold.js",
+      "types": "./dist/types/web3/LockedGold.d.ts"
+    },
+    "./web3/MentoFeeHandlerSeller": {
+      "import": "./dist/esm/web3/MentoFeeHandlerSeller.js",
+      "require": "./dist/cjs/web3/MentoFeeHandlerSeller.js",
+      "types": "./dist/types/web3/MentoFeeHandlerSeller.d.ts"
+    },
+    "./web3/MultiSig": {
+      "import": "./dist/esm/web3/MultiSig.js",
+      "require": "./dist/cjs/web3/MultiSig.js",
+      "types": "./dist/types/web3/MultiSig.d.ts"
+    },
+    "./web3/OdisPayments": {
+      "import": "./dist/esm/web3/OdisPayments.js",
+      "require": "./dist/cjs/web3/OdisPayments.js",
+      "types": "./dist/types/web3/OdisPayments.d.ts"
+    },
+    "./web3/Proxy": {
+      "import": "./dist/esm/web3/Proxy.js",
+      "require": "./dist/cjs/web3/Proxy.js",
+      "types": "./dist/types/web3/Proxy.d.ts"
+    },
+    "./web3/Random": {
+      "import": "./dist/esm/web3/Random.js",
+      "require": "./dist/cjs/web3/Random.js",
+      "types": "./dist/types/web3/Random.d.ts"
+    },
+    "./web3/Registry": {
+      "import": "./dist/esm/web3/Registry.js",
+      "require": "./dist/cjs/web3/Registry.js",
+      "types": "./dist/types/web3/Registry.d.ts"
+    },
+    "./web3/ReleaseGold": {
+      "import": "./dist/esm/web3/ReleaseGold.js",
+      "require": "./dist/cjs/web3/ReleaseGold.js",
+      "types": "./dist/types/web3/ReleaseGold.d.ts"
+    },
+    "./web3/SortedOracles": {
+      "import": "./dist/esm/web3/SortedOracles.js",
+      "require": "./dist/cjs/web3/SortedOracles.js",
+      "types": "./dist/types/web3/SortedOracles.d.ts"
+    },
+    "./web3/UniswapFeeHandlerSeller": {
+      "import": "./dist/esm/web3/UniswapFeeHandlerSeller.js",
+      "require": "./dist/cjs/web3/UniswapFeeHandlerSeller.js",
+      "types": "./dist/types/web3/UniswapFeeHandlerSeller.d.ts"
+    },
+    "./web3/Validators": {
+      "import": "./dist/esm/web3/Validators.js",
+      "require": "./dist/cjs/web3/Validators.js",
+      "types": "./dist/types/web3/Validators.d.ts"
+    },
+    "./web3/mento/Exchange": {
+      "import": "./dist/esm/web3/mento/Exchange.js",
+      "require": "./dist/cjs/web3/mento/Exchange.js",
+      "types": "./dist/types/web3/mento/Exchange.d.ts"
+    },
+    "./web3/mento/ExchangeBRL": {
+      "import": "./dist/esm/web3/mento/ExchangeBRL.js",
+      "require": "./dist/cjs/web3/mento/ExchangeBRL.js",
+      "types": "./dist/types/web3/mento/ExchangeBRL.d.ts"
+    },
+    "./web3/mento/ExchangeEUR": {
+      "import": "./dist/esm/web3/mento/ExchangeEUR.js",
+      "require": "./dist/cjs/web3/mento/ExchangeEUR.js",
+      "types": "./dist/types/web3/mento/ExchangeEUR.d.ts"
+    },
+    "./web3/mento/GrandaMento": {
+      "import": "./dist/esm/web3/mento/GrandaMento.js",
+      "require": "./dist/cjs/web3/mento/GrandaMento.js",
+      "types": "./dist/types/web3/mento/GrandaMento.d.ts"
+    },
+    "./web3/mento/Reserve": {
+      "import": "./dist/esm/web3/mento/Reserve.js",
+      "require": "./dist/cjs/web3/mento/Reserve.js",
+      "types": "./dist/types/web3/mento/Reserve.d.ts"
+    },
+    "./web3/mento/ReserveSpenderMultiSig": {
+      "import": "./dist/esm/web3/mento/ReserveSpenderMultiSig.js",
+      "require": "./dist/cjs/web3/mento/ReserveSpenderMultiSig.js",
+      "types": "./dist/types/web3/mento/ReserveSpenderMultiSig.d.ts"
+    },
+    "./web3/mento/StableToken": {
+      "import": "./dist/esm/web3/mento/StableToken.js",
+      "require": "./dist/cjs/web3/mento/StableToken.js",
+      "types": "./dist/types/web3/mento/StableToken.d.ts"
+    },
+    "./web3/mento/StableTokenBRL": {
+      "import": "./dist/esm/web3/mento/StableTokenBRL.js",
+      "require": "./dist/cjs/web3/mento/StableTokenBRL.js",
+      "types": "./dist/types/web3/mento/StableTokenBRL.d.ts"
+    },
+    "./web3/mento/StableTokenEUR": {
+      "import": "./dist/esm/web3/mento/StableTokenEUR.js",
+      "require": "./dist/cjs/web3/mento/StableTokenEUR.js",
+      "types": "./dist/types/web3/mento/StableTokenEUR.d.ts"
     }
   }
 }
