@@ -389,7 +389,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       }
 
       if (!instance.minerValidator && (instance.validating || instance.isProxied)) {
-        instance.minerValidator = privateKeyToAddress(instance.privateKey)
+        instance.minerValidator = privateKeyToAddress(instance.privateKey!)
       }
 
       await startGeth(gethConfig, gethBinaryPath, instance, verbose)
