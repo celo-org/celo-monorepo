@@ -56,7 +56,7 @@ contract FeeCurrency6DecimalsTest is ERC20, IFeeCurrency {
 contract FeeCurrencyAdapterTestContract is FeeCurrencyAdapter {
   constructor(bool test) FeeCurrencyAdapter(test) {}
 
- function upscaleVisible(uint256 value) external view returns (uint256) {
+  function upscaleVisible(uint256 value) external view returns (uint256) {
     return upscale(value);
   }
 
@@ -205,14 +205,14 @@ contract FeeCurrencyAdapter_UpscaleAndDownScaleTests is FeeCurrencyAdapterTest {
     assertEq(FeeCurrencyAdapter.upscaleVisible(1e12), 1e24);
   }
 
-function test_ShouldRevertUpscale_WhenOverflow() public {
+  function test_ShouldRevertUpscale_WhenOverflow() public {
     uint256 digitDifference = 10**12;
     uint256 maxValue = type(uint256).max;
     uint256 boundaryValue = maxValue / digitDifference + 1;
 
     vm.expectRevert();
     FeeCurrencyAdapter.upscaleVisible(boundaryValue);
-}
+  }
 
   function test_shouldDownscale() public {
     assertEq(FeeCurrencyAdapter.downscaleVisible(1e12), 1);

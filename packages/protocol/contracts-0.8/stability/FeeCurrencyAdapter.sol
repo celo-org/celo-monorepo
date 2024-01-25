@@ -47,10 +47,12 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
    * @param _symbol The symbol of the wrapped token.
    * @param _expectedDecimals The expected number of decimals of the wrapped token.
    */
-  function initialize(address _wrappedToken, string memory _name, string memory _symbol, uint8 _expectedDecimals)
-    external
-    initializer
-  {
+  function initialize(
+    address _wrappedToken,
+    string memory _name,
+    string memory _symbol,
+    uint8 _expectedDecimals
+  ) external initializer {
     wrappedToken = IFeeCurrency(_wrappedToken);
     name = _name;
     symbol = _symbol;
@@ -129,7 +131,7 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
       0,
       baseTxFeeScaled
     );
-    
+
     debited = 0;
   }
 
