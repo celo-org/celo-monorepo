@@ -17,7 +17,7 @@ export const command = 'hotfix'
 
 export const describe = 'runs a hotfix'
 
-type EthstatsArgv = UpgradeArgv & {}
+type EthstatsArgv = UpgradeArgv
 
 export const builder = (argv: yargs.Argv) => {
   return argv
@@ -92,7 +92,11 @@ export const handler = async (argv: EthstatsArgv) => {
       try {
         await governance.whitelistHotfix(proposalHash).sendAndWaitForReceipt({ from: address })
       } catch (error) {
-        console.error(`Error whitelisting for validator ${index} (${address}): ${error}`)
+        console.error(
+          `Error whitelisting for validator ${index} (${address}): ${
+            error instanceof Error ? JSON.stringify(error) : error?.toString()
+          }`
+        )
       }
     })
 

@@ -32,7 +32,7 @@ export const builder = (args: yargs.Argv) => {
     })
 }
 
-export const handler = async (argv: ForkEnvArgs) => {
+export const handler = (argv: ForkEnvArgs) => {
   const genericEnvFile = readFileSync(genericEnvFilePath)
   const defaultEnvVars = parse(genericEnvFile)
 

@@ -1,7 +1,8 @@
 {
-  "extends": "@celo/typescript/tsconfig.library.json",
+  "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
+    "strict": false,
     "outDir": "lib",
     "resolveJsonModule": true
   },

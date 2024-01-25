@@ -69,7 +69,11 @@ jobs:
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-
+        # a safety check especially useful if some package is upgraded
+      - name: 'Validate ABIS Exports'
+        shell: bash
+        run: yarn validate_abis_exports
+        working-directory: packages/protocol
       - name: Publish @celo/contracts
         run: |
           cat package.json

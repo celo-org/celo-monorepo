@@ -12,7 +12,7 @@ export const builder = {}
 
 export const handler = async (argv: DestroyArgv) => {
   exitIfCelotoolHelmDryRun()
-  const envType = fetchEnv(envVar.ENV_TYPE)
+  const envType = fetchEnv(envVar.ENV_TYPE) as envTypes
   if (envType !== envTypes.DEVELOPMENT) {
     console.error('You can only delete dev clusters')
     process.exit(1)
