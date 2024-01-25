@@ -13,21 +13,30 @@ import "@openzeppelin/contracts8/token/ERC20/ERC20.sol";
 import "forge-std/console.sol";
 
 contract FeeCurrency6DecimalsTest is ERC20, IFeeCurrency {
+  uint256 debited;
+
   constructor(uint256 initialSupply) ERC20("ExampleFeeCurrency", "EFC") {
     _mint(msg.sender, initialSupply);
   }
 
   function debitGasFees(address from, uint256 value) external {
     _burn(from, value);
+    debited = value;
   }
 
   // New function signature, will be used when all fee currencies have migrated
   function creditGasFees(address[] calldata recipients, uint256[] calldata amounts) public {
     require(recipients.length == amounts.length, "Recipients and amounts must be the same length.");
 
+    uint256 totalSum = 0;
+
     for (uint256 i = 0; i < recipients.length; i++) {
       _mint(recipients[i], amounts[i]);
+      totalSum += amounts[i];
     }
+
+    require(debited == totalSum, "Cannot credit more than debited.");
+    debited = 0;
   }
 
   // Old function signature for backwards compatibility
@@ -41,11 +50,14 @@ contract FeeCurrency6DecimalsTest is ERC20, IFeeCurrency {
     uint256, // gatewayFee, unused
     uint256 baseTxFee
   ) public {
+    require(debited == refund + tipTxFee + baseTxFee, "Cannot credit more than debited.");
     // Calling the new creditGasFees would make sense here, but that is not
     // possible due to its calldata arguments.
     _mint(from, refund);
     _mint(feeRecipient, tipTxFee);
     _mint(communityFund, baseTxFee);
+
+    debited = 0;
   }
 
   function decimals() public pure override returns (uint8) {
@@ -227,3 +239,17 @@ contract FeeCurrencyAdapter_UpscaleAndDownScaleTests is FeeCurrencyAdapterTest {
   }
 }
 
+contract FeeCurrencyAdapter_SetWrappedToken is FeeCurrencyAdapterTest {
+  function test_shouldRevert_WhenNotCalledByOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(nonOwner);
+    FeeCurrencyAdapter.setWrappedToken(address(0));
+  }
+
+  function test_shouldSetWrappedToken() public {
+    address newWrappedToken = actor("newWrappedToken");
+    FeeCurrencyAdapter.setWrappedToken(newWrappedToken);
+    assertEq(address(FeeCurrencyAdapter.wrappedToken()), newWrappedToken);
+    assertEq(FeeCurrencyAdapter.getWrappedToken(), newWrappedToken);
+  }
+}

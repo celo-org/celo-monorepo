@@ -3,7 +3,7 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
-import "forge-std/console.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "../../contracts/common/CalledByVm.sol";
 import "../../contracts/common/Initializable.sol";
@@ -13,7 +13,7 @@ import "../../contracts/stability/interfaces/ISortedOracles.sol";
 import "./interfaces/IFeeCurrency.sol";
 import "./interfaces/IDecimals.sol";
 
-contract FeeCurrencyAdapter is Initializable, CalledByVm {
+contract FeeCurrencyAdapter is Initializable, CalledByVm, Ownable {
   IFeeCurrency public wrappedToken;
 
   uint96 public digitDifference;
@@ -53,6 +53,7 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
     string memory _symbol,
     uint8 _expectedDecimals
   ) external initializer {
+    _transferOwnership(msg.sender);
     wrappedToken = IFeeCurrency(_wrappedToken);
     name = _name;
     symbol = _symbol;
@@ -133,6 +134,22 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
     );
 
     debited = 0;
+  }
+
+  /**
+   * @notice Sets wrapped token address.
+   * @param _wrappedToken The address of the wrapped token.
+   */
+  function setWrappedToken(address _wrappedToken) external onlyOwner {
+    wrappedToken = IFeeCurrency(_wrappedToken);
+  }
+
+  /**
+   * @notice Returns wrapped token address.
+   * @return The wrapped token address.
+   */
+  function getWrappedToken() external view returns (address) {
+    return address(wrappedToken);
   }
 
   function upscale(uint256 value) internal view returns (uint256) {
