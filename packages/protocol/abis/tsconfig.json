@@ -18,5 +18,5 @@
     "declaration": false,
     "rootDir": "./src-generated"
   },
-  "include": ["./src-generated", "./src-generated/web3", "./src-generated/web3/0.8"]
+  "include": ["./src-generated"]
 }
