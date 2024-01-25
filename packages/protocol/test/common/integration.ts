@@ -216,7 +216,6 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
 
     it('should increment the vote totals', async () => {
       const response = await governance.getVoteTotals(proposalId)
-      console.error('response', response)
       assertEqualBN(response[0], value)
     })
   })
@@ -391,7 +390,6 @@ contract('Integration: Governance', (accounts: string[]) => {
 
     it('should increment the vote totals', async () => {
       const response = await governance.getVoteTotals(proposalId)
-      console.error('response', response)
       assertEqualBN(response[0], value)
     })
   })
