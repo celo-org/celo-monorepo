@@ -14,7 +14,7 @@
         "noUnusedParameters": true,
         "removeComments": false,
         "sourceMap": true,
-        "target": "es6",
+        "target": "es2020",
         "downlevelIteration": true,
         "resolveJsonModule": true,
         "strict": false,
