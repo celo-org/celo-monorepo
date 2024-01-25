@@ -7,10 +7,9 @@ import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/common/interfaces/IRegistry.sol";
 
 // Contract to test
-import "@celo-contracts-8/stability/FeeCurrencyAdapter.sol";
+import "@celo-contracts-8/stability/CeloFeeCurrencyAdapterOwnable.sol";
 import "@celo-contracts-8/stability/interfaces/IFeeCurrency.sol";
 import "@openzeppelin/contracts8/token/ERC20/ERC20.sol";
-import "forge-std/console.sol";
 
 contract FeeCurrency6DecimalsTest is ERC20, IFeeCurrency {
   uint256 debited;
@@ -65,8 +64,8 @@ contract FeeCurrency6DecimalsTest is ERC20, IFeeCurrency {
   }
 }
 
-contract FeeCurrencyAdapterTestContract is FeeCurrencyAdapter {
-  constructor(bool test) FeeCurrencyAdapter(test) {}
+contract CeloFeeCurrencyAdapterTestContract is CeloFeeCurrencyAdapterOwnable {
+  constructor(bool test) CeloFeeCurrencyAdapterOwnable(test) {}
 
   function upscaleVisible(uint256 value) external view returns (uint256) {
     return upscale(value);
@@ -80,7 +79,7 @@ contract FeeCurrencyAdapterTestContract is FeeCurrencyAdapter {
 contract FeeCurrencyAdapterTest is Test {
   using FixidityLib for FixidityLib.Fraction;
 
-  FeeCurrencyAdapterTestContract public FeeCurrencyAdapter;
+  CeloFeeCurrencyAdapterTestContract public feeCurrencyAdapter;
   address owner;
   address nonOwner;
   IFeeCurrency feeCurrency;
@@ -91,7 +90,8 @@ contract FeeCurrencyAdapterTest is Test {
     owner = address(this);
     nonOwner = actor("nonOwner");
 
-    FeeCurrencyAdapter = new FeeCurrencyAdapterTestContract(true);
+    feeCurrencyAdapter = new CeloFeeCurrencyAdapterTestContract(true);
+
     address feeCurrencyAddress = actor("feeCurrency");
 
     string memory name = "tokenName";
@@ -99,25 +99,25 @@ contract FeeCurrencyAdapterTest is Test {
 
     feeCurrency = new FeeCurrency6DecimalsTest(initialSupply);
 
-    FeeCurrencyAdapter.initialize(address(feeCurrency), "wrapper", "wr", 18);
+    feeCurrencyAdapter.initialize(address(feeCurrency), "wrapper", "wr", 18);
   }
 }
 
 contract FeeCurrencyAdapter_Initialize is FeeCurrencyAdapterTest {
   function test_ShouldSetDigitDifference() public {
-    assertEq(FeeCurrencyAdapter.digitDifference(), 10**12);
+    assertEq(feeCurrencyAdapter.digitDifference(), 10**12);
   }
 
   function test_shouldRevertWhenCalledAgain() public {
     vm.expectRevert("contract already initialized");
-    FeeCurrencyAdapter.initialize(address(feeCurrency), "wrapper", "wr", 18);
+    feeCurrencyAdapter.initialize(address(feeCurrency), "wrapper", "wr", 18);
   }
 }
 
 contract FeeCurrencyAdapter_BalanceOf is FeeCurrencyAdapterTest {
   function test_shouldReturnBalanceOf() public {
     assertEq(feeCurrency.balanceOf(address(this)), initialSupply);
-    assertEq(FeeCurrencyAdapter.balanceOf(address(this)), initialSupply * 1e12);
+    assertEq(feeCurrencyAdapter.balanceOf(address(this)), initialSupply * 1e12);
   }
 }
 
@@ -125,15 +125,15 @@ contract FeeCurrencyAdapter_DebitGasFees is FeeCurrencyAdapterTest {
   function test_shouldDebitGasFees() public {
     uint256 amount = 1000 * 1e12;
     vm.prank(address(0));
-    FeeCurrencyAdapter.debitGasFees(address(this), amount);
+    feeCurrencyAdapter.debitGasFees(address(this), amount);
     assertEq(feeCurrency.balanceOf(address(this)), initialSupply - amount / 1e12);
-    assertEq(FeeCurrencyAdapter.balanceOf(address(this)), (initialSupply * 1e12 - amount));
-    assertEq(FeeCurrencyAdapter.debited(), amount / 1e12);
+    assertEq(feeCurrencyAdapter.balanceOf(address(this)), (initialSupply * 1e12 - amount));
+    assertEq(feeCurrencyAdapter.debited(), amount / 1e12);
   }
 
   function test_shouldRevert_WhenNotCalledByVm() public {
     vm.expectRevert("Only VM can call");
-    FeeCurrencyAdapter.debitGasFees(address(this), 1000);
+    feeCurrencyAdapter.debitGasFees(address(this), 1000);
   }
 
 }
@@ -142,10 +142,10 @@ contract FeeCurrencyAdapter_CreditGasFees is FeeCurrencyAdapterTest {
   function test_shouldCreditGasFees() public {
     uint256 amount = 1000 * 1e12;
     vm.prank(address(0));
-    FeeCurrencyAdapter.debitGasFees(address(this), amount);
+    feeCurrencyAdapter.debitGasFees(address(this), amount);
 
     vm.prank(address(0));
-    FeeCurrencyAdapter.creditGasFees(
+    feeCurrencyAdapter.creditGasFees(
       address(this),
       address(this),
       address(0),
@@ -156,17 +156,17 @@ contract FeeCurrencyAdapter_CreditGasFees is FeeCurrencyAdapterTest {
       amount / 4
     );
     assertEq(feeCurrency.balanceOf(address(this)), initialSupply);
-    assertEq(FeeCurrencyAdapter.balanceOf(address(this)), initialSupply * 1e12);
+    assertEq(feeCurrencyAdapter.balanceOf(address(this)), initialSupply * 1e12);
   }
 
   function test_shouldRevert_WhenTryingToCreditMoreThanBurned() public {
     uint256 amount = 1 * 1e12;
     vm.prank(address(0));
-    FeeCurrencyAdapter.debitGasFees(address(this), amount);
+    feeCurrencyAdapter.debitGasFees(address(this), amount);
 
     vm.expectRevert("Cannot credit more than debited.");
     vm.prank(address(0));
-    FeeCurrencyAdapter.creditGasFees(
+    feeCurrencyAdapter.creditGasFees(
       address(this),
       address(this),
       address(this),
@@ -180,7 +180,7 @@ contract FeeCurrencyAdapter_CreditGasFees is FeeCurrencyAdapterTest {
 
   function test_shouldRevert_WhenNotCalledByVm() public {
     vm.expectRevert("Only VM can call");
-    FeeCurrencyAdapter.creditGasFees(
+    feeCurrencyAdapter.creditGasFees(
       address(this),
       address(this),
       address(this),
@@ -195,7 +195,7 @@ contract FeeCurrencyAdapter_CreditGasFees is FeeCurrencyAdapterTest {
   function test_shouldNotRunFunctionBody_WhenDebitedIs0() public {
     uint256 balanceBefore = feeCurrency.balanceOf(address(this));
     vm.prank(address(0));
-    FeeCurrencyAdapter.creditGasFees(
+    feeCurrencyAdapter.creditGasFees(
       address(this),
       address(this),
       address(this),
@@ -212,9 +212,9 @@ contract FeeCurrencyAdapter_CreditGasFees is FeeCurrencyAdapterTest {
 
 contract FeeCurrencyAdapter_UpscaleAndDownScaleTests is FeeCurrencyAdapterTest {
   function test_shouldUpscale() public {
-    assertEq(FeeCurrencyAdapter.upscaleVisible(1), 1e12);
-    assertEq(FeeCurrencyAdapter.upscaleVisible(1e6), 1e18);
-    assertEq(FeeCurrencyAdapter.upscaleVisible(1e12), 1e24);
+    assertEq(feeCurrencyAdapter.upscaleVisible(1), 1e12);
+    assertEq(feeCurrencyAdapter.upscaleVisible(1e6), 1e18);
+    assertEq(feeCurrencyAdapter.upscaleVisible(1e12), 1e24);
   }
 
   function test_ShouldRevertUpscale_WhenOverflow() public {
@@ -223,19 +223,19 @@ contract FeeCurrencyAdapter_UpscaleAndDownScaleTests is FeeCurrencyAdapterTest {
     uint256 boundaryValue = maxValue / digitDifference + 1;
 
     vm.expectRevert();
-    FeeCurrencyAdapter.upscaleVisible(boundaryValue);
+    feeCurrencyAdapter.upscaleVisible(boundaryValue);
   }
 
   function test_shouldDownscale() public {
-    assertEq(FeeCurrencyAdapter.downscaleVisible(1e12), 1);
-    assertEq(FeeCurrencyAdapter.downscaleVisible(1e18), 1e6);
-    assertEq(FeeCurrencyAdapter.downscaleVisible(1e24), 1e12);
+    assertEq(feeCurrencyAdapter.downscaleVisible(1e12), 1);
+    assertEq(feeCurrencyAdapter.downscaleVisible(1e18), 1e6);
+    assertEq(feeCurrencyAdapter.downscaleVisible(1e24), 1e12);
   }
 
   function test_ShouldReturn0_WhenSmallEnough() public {
-    assertEq(FeeCurrencyAdapter.downscaleVisible(1), 0);
-    assertEq(FeeCurrencyAdapter.downscaleVisible(1e6 - 1), 0);
-    assertEq(FeeCurrencyAdapter.downscaleVisible(1e12 - 1), 0);
+    assertEq(feeCurrencyAdapter.downscaleVisible(1), 0);
+    assertEq(feeCurrencyAdapter.downscaleVisible(1e6 - 1), 0);
+    assertEq(feeCurrencyAdapter.downscaleVisible(1e12 - 1), 0);
   }
 }
 
@@ -243,13 +243,13 @@ contract FeeCurrencyAdapter_SetWrappedToken is FeeCurrencyAdapterTest {
   function test_shouldRevert_WhenNotCalledByOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(nonOwner);
-    FeeCurrencyAdapter.setWrappedToken(address(0));
+    feeCurrencyAdapter.setWrappedToken(address(0));
   }
 
   function test_shouldSetWrappedToken() public {
     address newWrappedToken = actor("newWrappedToken");
-    FeeCurrencyAdapter.setWrappedToken(newWrappedToken);
-    assertEq(address(FeeCurrencyAdapter.wrappedToken()), newWrappedToken);
-    assertEq(FeeCurrencyAdapter.getWrappedToken(), newWrappedToken);
+    feeCurrencyAdapter.setWrappedToken(newWrappedToken);
+    assertEq(address(feeCurrencyAdapter.wrappedToken()), newWrappedToken);
+    assertEq(feeCurrencyAdapter.getWrappedToken(), newWrappedToken);
   }
 }
