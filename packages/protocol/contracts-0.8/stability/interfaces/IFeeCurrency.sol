@@ -46,7 +46,7 @@ interface IFeeCurrency is IERC20 {
    * @param baseFeeAmount The amount of the base fee (in wrapped token digits).
    */
   function creditGasFees(
-   address refundRecipient,
+    address refundRecipient,
     address tipRecipient,
     address _gatewayFeeRecipient,
     address baseFeeRecipient,
