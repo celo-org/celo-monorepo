@@ -35,6 +35,6 @@ contract FeeCurrencyAdapterOwnable is FeeCurrencyAdapter, Ownable {
    * @param _wrappedToken The address of the wrapped token.
    */
   function setWrappedToken(address _wrappedToken) public onlyOwner {
-    wrappedToken = IFeeCurrency(_wrappedToken);
+    _setWrappedToken(_wrappedToken);
   }
 }

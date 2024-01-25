@@ -41,7 +41,7 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
     string memory _symbol,
     uint8 _expectedDecimals
   ) public virtual initializer {
-    wrappedToken = IFeeCurrency(_wrappedToken);
+    _setWrappedToken(_wrappedToken);
     name = _name;
     symbol = _symbol;
     uint8 decimals = IDecimals(_wrappedToken).decimals();
@@ -137,5 +137,9 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
 
   function downscale(uint256 value) internal view returns (uint256) {
     return value / digitDifference;
+  }
+
+  function _setWrappedToken(address _wrappedToken) internal virtual {
+    wrappedToken = IFeeCurrency(_wrappedToken);
   }
 }
