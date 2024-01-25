@@ -82,7 +82,7 @@ for (const change of changes) {
   )
   if (pushedMnemonicFiles.length > 0) {
     console.error(`Trying to push conflicting files`)
-    console.log(`Conflicting Files:\n  ${pushedMnemonicFiles.join('\n  ')}`)
+    console.info(`Conflicting Files:\n  ${pushedMnemonicFiles.join('\n  ')}`)
     console.error(chalk.red(`(${change.remoteRef}) Push rejected!`))
     process.exit(1)
   }

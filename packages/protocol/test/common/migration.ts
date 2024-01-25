@@ -9,7 +9,7 @@ import { ArtifactsSingleton } from '../../lib/artifactsSingleton'
 
 const getProxiedContract = async (contractName: string, contractPackage: ContractPackage) => {
   const artifactsObject = ArtifactsSingleton.getInstance(contractPackage, artifacts)
-  /* tslint:disable-next-line */
+  /* eslint-disable-next-line */
   return await getDeployedProxiedContract(contractName, artifactsObject)
 }
 
@@ -18,15 +18,15 @@ const getContract = async (
   type: string,
   contractPackage: ContractPackage
 ) => {
-  // /* tslint:disable-next-line */
+  // /* eslint-disable-next-line */
   const artifactsObject = ArtifactsSingleton.getInstance(contractPackage, artifacts)
 
   if (type === 'contract') {
-    /* tslint:disable-next-line */
+    /* eslint-disable-next-line */
     return await artifactsObject.require(contractName).deployed()
   }
   if (type === 'proxy') {
-    /* tslint:disable-next-line */
+    /* eslint-disable-next-line */
     return await artifactsObject.require(contractName + 'Proxy').deployed()
   }
 }

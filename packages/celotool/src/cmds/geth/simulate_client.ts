@@ -2,10 +2,10 @@
 import BigNumber from 'bignumber.js'
 import { AccountType, generateAddress, generatePrivateKey } from 'src/lib/generate_utils'
 import {
-  getIndexForLoadTestThread,
   MAX_LOADTEST_THREAD_COUNT,
-  simulateClient,
   TestMode,
+  getIndexForLoadTestThread,
+  simulateClient,
 } from 'src/lib/geth'
 import * as yargs from 'yargs'
 export const command = 'simulate-client'
@@ -125,16 +125,15 @@ export const handler = async (argv: SimulateClientArgv) => {
 
     const web3ProviderPort = argv.reuseClient ? 8545 : 8545 + thread
 
-    console.log(
+    console.info(
       `PK for sender index ${argv.index} thread ${thread}, final index ${senderIndex}: ${senderPK}`
     )
-    console.log(
+    console.info(
       `Account for recipient index ${argv.recipientIndex} thread ${thread}, final index ${recipientIndex}: ${recipientAddress}`
     )
-    console.log(`web3ProviderPort for thread ${thread}: ${web3ProviderPort}`)
+    console.info(`web3ProviderPort for thread ${thread}: ${web3ProviderPort}`)
 
-    // tslint:disable-next-line: no-floating-promises
-    simulateClient(
+    await simulateClient(
       senderPK,
       recipientAddress,
       argv.contractAddress,

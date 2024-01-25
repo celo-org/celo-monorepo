@@ -36,13 +36,13 @@ export const handler = async (argv: ListArgv) => {
 
   const web3 = await getWeb3Client(argv.celoEnv)
   const blockscoutURL = getBlockscoutUrl(argv.celoEnv)
-  const kit = await newKitFromWeb3(web3)
+  const kit = newKitFromWeb3(web3)
   const blockExplorer = await newBlockExplorer(kit)
   const logExplorer = await newLogExplorer(kit)
   const resp = await fetch(
     `${blockscoutURL}/api?module=account&action=txlist&address=${argv.address}&sort=desc`
   )
-  const jsonResp = (await resp.json()) as any
+  const jsonResp = await resp.json()
 
   if (jsonResp.result === undefined) {
     return
@@ -88,7 +88,7 @@ async function fetchTx(
 
         console.info(`\t${parsedLog.event}(${JSON.stringify(parsedLog.returnValues)})`)
       } catch (e) {
-        console.error(`Error while parsing log ${log}`)
+        console.error(`Error while parsing log ${JSON.stringify(log)}`)
       }
     })
   }

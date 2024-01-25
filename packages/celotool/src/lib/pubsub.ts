@@ -43,7 +43,7 @@ export const createStreamingPull = (
   client: any,
   projectID: string,
   subscriptionName: string,
-  // tslint:disable-next-line: ban-types
+  // eslint-disable-next-line: ban-types
   handler: Function
 ) => {
   const stream = client.streamingPull().on('data', handler)

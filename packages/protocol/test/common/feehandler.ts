@@ -1,5 +1,5 @@
 // TODO remove magic numbers
-// tslint:disable: ordered-imports
+/* eslint:disabled ordered-imports: 0 */
 // TODO either pretiffy is not fixing this or the linter is broken
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
@@ -577,8 +577,8 @@ contract('FeeHandler', (accounts: string[]) => {
       beforeEach(async () => {
         deadline = (await web3.eth.getBlock('latest')).timestamp + 100
         uniswapFactory = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
-        // tslint:disable-next-line
-        console.log('Uniswap INIT CODE PAIR HASH:', await uniswapFactory.INIT_CODE_PAIR_HASH())
+        // eslint-disable-next-line
+        console.info('Uniswap INIT CODE PAIR HASH:', await uniswapFactory.INIT_CODE_PAIR_HASH())
 
         const initCodePairHash = await uniswapFactory.INIT_CODE_PAIR_HASH()
 
