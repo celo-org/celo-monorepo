@@ -29,12 +29,10 @@ import "../common/linkedlists/SortedLinkedListWithMedian.sol";
  *          of this contract, the rateFeedId was set as the address of the stable
  *          asset contract that used the rate. However, this implementation has since
  *          been updated, and the rateFeedId now also refers to an address derived from the
- *          concatenation other asset symbols. One project using this is Mento.
- *          This change enables the contract to store multiple exchange rates for a
+ *          concatenation other asset symbols. This change enables the contract to store multiple exchange rates for a
  *          single token. As a result of this change, there may be instances
  *          where the term "token" is used in the contract code. These useages of the term
- *          "token" are actually referring to the rateFeedId. You can refer to the Mento
- *          protocol documentation to learn more about the rateFeedId and how it is derived.
+ *          "token" are actually referring to the rateFeedId.
  *
  */
 contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initializable {
