@@ -181,42 +181,21 @@ contract FeeCurrencyAdapter_CreditGasFees is FeeCurrencyAdapterTest {
   }
 
   function test_shouldNotRunFunctionBody_WhenDebitedIs0() public {
+    uint256 balanceBefore = feeCurrency.balanceOf(address(this));
     vm.prank(address(0));
-    FeeCurrencyAdapter.creditGasFees(new address[](1), new uint256[](2));
+    FeeCurrencyAdapter.creditGasFees(
+      address(this),
+      address(this),
+      address(this),
+      address(this),
+      1000,
+      1000,
+      1000,
+      1000
+    );
+    uint256 balanceAfter = feeCurrency.balanceOf(address(this));
+    assertEq(balanceBefore, balanceAfter);
   }
-
-  function test_shouldRevert_WhenRecipientsAndAmountsAreDifferentLengths_New() public {
-    uint256 amount = 1000 * 1e12;
-    vm.prank(address(0));
-    FeeCurrencyAdapter.debitGasFees(address(this), amount);
-    
-    vm.prank(address(0));
-    vm.expectRevert("Recipients and amounts must be the same length.");
-    FeeCurrencyAdapter.creditGasFees(new address[](1), new uint256[](2));
-  }
-
-  function test_shouldRevert_WhenNotCalledByVm_New() public {
-    vm.expectRevert("Only VM can call");
-    FeeCurrencyAdapter.creditGasFees(new address[](1), new uint256[](2));
-  }
-
-  function test_shouldRevert_WhenTryingToCreditMoreThanBurned_New() public {
-    uint256 amount = 1 * 1e12;
-    vm.prank(address(0));
-    FeeCurrencyAdapter.debitGasFees(address(this), amount);
-
-    vm.expectRevert("Cannot credit more than debited.");
-    vm.prank(address(0));
-    address[] memory recipients = new address[](2);
-    recipients[0] = address(this);
-    recipients[1] = address(this);
-    uint256[] memory amounts = new uint256[](2);
-    amounts[0] = 1 ether;
-    amounts[1] = 1 ether;
-
-    FeeCurrencyAdapter.creditGasFees(recipients, amounts);
-  }
-
 }
 
 contract FeeCurrencyAdapter_UpscaleAndDownScaleTests is FeeCurrencyAdapterTest {

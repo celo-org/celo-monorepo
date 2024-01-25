@@ -81,38 +81,6 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
 
   /**
    * Downscales value to the wrapped token's native digits and credits it.
-   * @param recipients The recipients
-   * @param amounts The amounts (in wrapped token digits)
-   */
-  function creditGasFees(address[] calldata recipients, uint256[] calldata amounts) public onlyVm {
-    if (debited == 0) {
-      return;
-    }
-    require(recipients.length == amounts.length, "Recipients and amounts must be the same length.");
-
-    uint256[] memory scaledAmounts = new uint256[](amounts.length);
-
-    uint256 totalToBeCredited = 0;
-
-    for (uint256 i = 0; i < amounts.length; i++) {
-      scaledAmounts[i] = downscale(amounts[i]);
-      totalToBeCredited += scaledAmounts[i];
-    }
-
-    require(totalToBeCredited <= debited, "Cannot credit more than debited.");
-
-    uint256 roundingError = debited - totalToBeCredited;
-    if (roundingError > 0) {
-      scaledAmounts[0] += roundingError;
-    }
-
-    wrappedToken.creditGasFees(recipients, scaledAmounts);
-    // Reset debited since we rely on this value in creditGasFees to know if we should credit or not (during eth.estimateGas).
-    debited = 0;
-  }
-
-  /**
-   * Downscales value to the wrapped token's native digits and credits it.
    * @param refundRecipient The recipient of the refund.
    * @param tipRecipient The recipient of the tip.
    * @param _gatewayFeeRecipient The recipient of the gateway fee. Unused.
