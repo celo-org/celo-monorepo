@@ -44,7 +44,7 @@ contract SortedOraclesTest is Test, Constants {
   }
 }
 
-contract Initialize is SortedOraclesTest {
+contract SortedOraclesTest_Initialize is SortedOraclesTest {
   function test_ownerSet() public {
     assertEq(sortedOracle.owner(), address(this));
   }
