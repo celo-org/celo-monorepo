@@ -17,7 +17,7 @@ contract SortedOraclesTest is Test, Constants {
 
   address oracleAccount;
   address aToken = 0x00000000000000000000000000000000DeaDBeef;
-  uint256 reportExpiry = 1 * 60 * 60; // 1 hour
+  uint256 reportExpiry = HOUR;
 
   event OracleAdded(address indexed token, address indexed oracleAddress);
   event OracleRemoved(address indexed token, address indexed oracleAddress);
@@ -53,7 +53,7 @@ contract SortedOraclesTest_Initialize is SortedOraclesTest {
     assertEq(sortedOracle.reportExpirySeconds(), reportExpiry);
   }
 
-  function test_ShouldRevertWhenCalledAgain() public {
+  function test_ShouldRevert_WhenCalledAgain() public {
     vm.expectRevert("contract already initialized");
     sortedOracle.initialize(reportExpiry);
   }
