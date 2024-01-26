@@ -574,30 +574,43 @@ contract Report is SortedOraclesTest {
     assertEq(denominator, FIXED1);
   }
 
-  function test_ShouldReturnTheMedianRateWithDifferentMultiplier_WhenEquivalentTokenIsSet() public {
+  function setEquivalentTokenFuzzyHelper(uint256 oneCeloDigits, uint256 oneUSDDigits, uint256 onecUSDDigits) public {
     uint256 cUSDRate = 700000000000000000000000;
 
-    uint256 oneCELO = 1e18;
-    uint256 oneUSD = 1e6;
-    uint256 oncecUSD = 1e18;
+    uint256 oneCELO = 10 ** oneCeloDigits;
+    uint256 oneUSD = 10 ** oneUSDDigits;
+    uint256 onecUSD = 10 ** onecUSDDigits;
+    uint256 diff = oneCELO / oneUSD;
 
     uint256 celoFromcUSD = FixidityLib
       .wrap(cUSDRate)
-      .multiply(FixidityLib.newFixed(oncecUSD))
+      .multiply(FixidityLib.newFixed(onecUSD))
       .fromFixed();
 
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, cUSDRate, address(0), address(0));
-    uint256 usdMultiplier = FixidityLib.newFixedFraction(1e12, 1).unwrap();
+    uint256 usdMultiplier = FixidityLib.newFixedFraction(diff, 1).unwrap();
     sortedOracle.setEquivalentToken(bToken, aToken, usdMultiplier);
     (uint256 medianRate, uint256 denominator) = sortedOracle.medianRate(bToken);
-    assertEq(medianRate, cUSDRate * 1e12);
+    assertEq(medianRate, cUSDRate * diff);
     assertEq(denominator, FIXED1);
     uint256 celoFromUSD = FixidityLib
       .wrap(medianRate)
       .multiply(FixidityLib.newFixed(oneUSD))
       .fromFixed();
     assertEq(celoFromUSD, celoFromcUSD);
+  }
+
+  function test_ShouldReturnTheMedianRateWithDifferentMultiplier_WhenEquivalentTokenIsSet() public {
+    setEquivalentTokenFuzzyHelper(18, 6, 18);
+  }
+
+  function test_ShouldReturnTheMedianRateWithDifferentMultiplier_WhenEquivalentTokenIsSet_WhenMultiplierIsOneBigger() public {
+    setEquivalentTokenFuzzyHelper(18, 17, 18);
+  }
+
+  function test_ShouldReturnTheMedianRateWithDifferentMultiplier_WhenEquivalentTokenIsSet_WhenMultiplierIsALotBigger() public {
+    setEquivalentTokenFuzzyHelper(18, 0, 18);
   }
 
   function test_ShouldNotReturnTheMedianRate_WhenEquivalentTokenIsSet() public {
