@@ -4,8 +4,8 @@ name: Protocol tests with coverage
 # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
 on:
   schedule:
-  # daily at 13:00 UTC
-  - cron: 0 13 * * *
+  # Every Saturday at 13:00 UTC
+  - cron: 0 13 * * 6
   workflow_dispatch:
 
 jobs:
@@ -14,7 +14,7 @@ jobs:
   protocol-test-with-code-coverage:
     runs-on: ["self-hosted", "monorepo-node18"]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install yarn dependencies
         run: yarn install
       - name: Build packages
@@ -22,7 +22,7 @@ jobs:
       - name: Run protocol tests with coverage
         run: yarn --cwd packages/protocol test:coverage
       - name: Store results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: protocol-coverage
           path: packages/protocol/coverage

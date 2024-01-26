@@ -133,7 +133,7 @@ describe('replica swap tests', () => {
 
       await restart()
 
-      const proxyPubKey = privateKeyToPublicKey(gethConfig.instances[1].nodekey!)
+      const proxyPubKey = privateKeyToPublicKey(gethConfig.instances[1].nodekey)
       const replica: GethInstanceConfig = {
         name: 'validator0-replica0',
         replica: true,
@@ -142,7 +142,7 @@ describe('replica swap tests', () => {
         port: 30315,
         rpcport: 8555,
         privateKey: gethConfig.instances[0].privateKey,
-        minerValidator: privateKeyToAddress(gethConfig.instances[0].privateKey!),
+        minerValidator: privateKeyToAddress(gethConfig.instances[0].privateKey),
         proxy: 'validator0-proxy0',
         isProxied: true,
         proxyport: 30304,
@@ -186,7 +186,6 @@ describe('replica swap tests', () => {
             if (verbose) {
               console.info(`Swapping validators at block ${swapBlock}`)
             }
-            // tslint:disable-next-line: no-shadowed-variable
             let resp = await replicaRPC.call(IstanbulManagement.startAtBlock, [swapBlock])
             assert.equal(resp.error, null)
             resp = await validatoRPC.call(IstanbulManagement.stopAtBlock, [swapBlock])
@@ -230,17 +229,17 @@ describe('replica swap tests', () => {
     })
 
     it('replica is validating', async () => {
-      const validating = (await replicaRPC.call(IstanbulManagement.validating, [])).result as any
+      const validating = (await replicaRPC.call(IstanbulManagement.validating, [])).result
       assert.isTrue(validating)
     })
 
     it('primary is not validating', async () => {
-      const validating = (await validatoRPC.call(IstanbulManagement.validating, [])).result as any
+      const validating = (await validatoRPC.call(IstanbulManagement.validating, [])).result
       assert.isFalse(validating)
     })
 
     it('replica should have good val enode table', async () => {
-      const resp = (await replicaRPC.call(IstanbulManagement.valEnodeTableInfo, [])).result as any
+      const resp = (await replicaRPC.call(IstanbulManagement.valEnodeTableInfo, [])).result
       Object.keys(resp).forEach((k) => {
         const enode = resp[k].enode
         assert.isTrue((enode || '') !== '')
@@ -253,7 +252,7 @@ describe('replica swap tests', () => {
       assert.equal(resp.length, 2)
     })
 
-    it('should switch without downtime', async () => {
+    it('should switch without downtime', () => {
       if (missed.length !== 0) {
         missed.forEach((x: any) => console.warn(`Validator idx ${x.idx} missed block ${x.num}`))
         console.warn(`Val idx 0 should have switched on block ${swapBlock}`)

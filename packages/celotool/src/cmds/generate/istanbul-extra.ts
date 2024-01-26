@@ -27,7 +27,7 @@ export const builder = (argv: yargs.Argv) => {
   )
 }
 
-export const handler = async (argv: IstanbulExtraArgv) => {
+export const handler = (argv: IstanbulExtraArgv) => {
   const validators: Validator[] =
     argv.validators === 'env'
       ? getValidatorsInformation(

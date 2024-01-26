@@ -2,9 +2,8 @@ import sleep from 'sleep-promise'
 import yargs from 'yargs'
 import { switchToClusterFromEnv } from './cluster'
 import { execCmdWithExitOnFailure } from './cmd-utils'
-import { envVar, fetchEnv, isVmBased } from './env-utils'
+import { envVar, fetchEnv } from './env-utils'
 import { retrieveIPAddress } from './helm_deploy'
-import { getTestnetOutputs } from './vm-testnet-utils'
 
 export async function outputIncludes(cmd: string, matchString: string, matchMessage?: string) {
   const [stdout] = await execCmdWithExitOnFailure(cmd)
@@ -18,12 +17,7 @@ export async function outputIncludes(cmd: string, matchString: string, matchMess
 }
 
 export async function retrieveTxNodeIpAddress(celoEnv: string, txNodeIndex: number) {
-  if (isVmBased()) {
-    const outputs = await getTestnetOutputs(celoEnv)
-    return outputs.tx_node_ip_addresses.value[txNodeIndex]
-  } else {
-    return retrieveIPAddress(`${celoEnv}-tx-nodes-${txNodeIndex}`)
-  }
+  return retrieveIPAddress(`${celoEnv}-tx-nodes-${txNodeIndex}`)
 }
 
 export async function getVerificationPoolConfig(celoEnv: string) {

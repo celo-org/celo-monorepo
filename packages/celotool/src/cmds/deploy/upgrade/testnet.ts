@@ -1,5 +1,4 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { failIfVmBased } from 'src/lib/env-utils'
 import {
   isCelotoolHelmDryRun,
   resetAndUpgradeHelmChart,
@@ -36,8 +35,6 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: TestnetArgv) => {
-  failIfVmBased()
-
   await switchToClusterFromEnv(argv.celoEnv)
 
   await upgradeStaticIPs(argv.celoEnv)

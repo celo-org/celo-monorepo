@@ -22,14 +22,15 @@ const makeRelease3Changes = (releaseProposal: ProposalTx[]) => {
 }
 
 try {
-  const argv = require('minimist')(process.argv.slice(2), {
-    string: ['input_proposal', 'output_proposal'],
-  })
+  const argv: { input_proposal: string; output_proposal: string } = require('minimist')(
+    process.argv.slice(2),
+    {
+      string: ['input_proposal', 'output_proposal'],
+    }
+  )
   const releaseProposal: ProposalTx[] = readJsonSync(argv.input_proposal)
   writeJsonSync(argv.output_proposal, makeRelease3Changes(releaseProposal), { spaces: 2 })
-  // tslint:disable-next-line: no-console
-  console.log(`Modifications made sucessfully; written to ${argv.output_proposal}`)
+  console.info(`Modifications made sucessfully; written to ${argv.output_proposal}`)
 } catch (e) {
-  // tslint:disable-next-line: no-console
-  console.error(`Something went wrong: ${e}`)
+  console.error(`Something went wrong: ${e?.message || e?.toString()}`)
 }

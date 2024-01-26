@@ -39,7 +39,8 @@ Bypassing rate-limits
 Clickjacking on pages with no sensitive actions                                                               
 Host header injection without proven business impact                                                           
 Anything related to email spoofing, SPF, DMARC or DKIM                                                      
-Open ports without an accompanying proof-of-concept demonstrating vulnerability                                  
+Open ports without an accompanying proof-of-concept demonstrating vulnerability
+Open write access of documents pertain to the community                                  
 
 # General
 ----------------------------------------------------------------------------------------------------------------

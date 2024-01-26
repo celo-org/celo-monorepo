@@ -1,4 +1,4 @@
-// /* tslint:disable */
+// /* eslint:disable */
 
 // TODO remove magic numbers
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'

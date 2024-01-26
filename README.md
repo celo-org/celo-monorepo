@@ -1,17 +1,17 @@
 <p align="center">
   <a href="https://celo.org/">
-    <img src="https://i.imgur.com/fyrJi0R.png" alt="celo logo" title="Go to celo.org" width="600" style="border:none;"/>
+    <img src="https://i.imgur.com/OxWGKrK.png" alt="celo logo" title="Go to celo.org" width="600" style="border:none;"/>
   </a>
 </p>
 
 **Celo Monorepo - Official repository for core projects comprising the Celo platform**
 
-This repository contains the source code for the Celo core projects including the [smart contracts](https://github.com/celo-org/celo-monorepo/tree/master/packages/protocol), [contractKit](https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/contractkit),
+This repository contains the source code for the Celo core projects including the [smart contracts](https://github.com/celo-org/celo-monorepo/tree/master/packages/protocol)
 and other packages. The source code for the Celo Blockchain which operates a node on the Celo Network is kept in a separate repo [here](https://github.com/celo-org/celo-blockchain).
 
 <!-- row 1 - status -->
 
-[![CircleCI](https://img.shields.io/circleci/build/github/celo-org/celo-monorepo/master)](https://circleci.com/gh/celo-org/celo-monorepo/tree/master)
+[![GitHub Actions](https://github.com/celo-org/celo-monorepo/actions/workflows/container-all-monorepo.yml/badge.svg)](https://github.com/celo-org/celo-monorepo/actions/workflows/container-all-monorepo.yml)
 [![Codecov](https://img.shields.io/codecov/c/github/celo-org/celo-monorepo)](https://codecov.io/gh/celo-org/celo-monorepo)
 [![GitHub contributors](https://img.shields.io/github/contributors/celo-org/celo-monorepo)](https://github.com/celo-org/celo-monorepo/graphs/contributors)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/w/celo-org/celo-monorepo)](https://github.com/celo-org/celo-monorepo/graphs/contributors)
@@ -36,8 +36,6 @@ and other packages. The source code for the Celo Blockchain which operates a nod
 [![GitHub pull requests by-label](https://img.shields.io/github/issues-pr-raw/celo-org/celo-monorepo)](https://github.com/celo-org/celo-monorepo/pulls)
 [![GitHub Issues](https://img.shields.io/github/issues-raw/celo-org/celo-monorepo.svg)](https://github.com/celo-org/celo-monorepo/issues)
 [![GitHub issues by-label](https://img.shields.io/github/issues/celo-org/celo-monorepo/1%20hour%20tasks)](https://github.com/celo-org/celo-monorepo/issues?q=is%3Aopen+is%3Aissue+label%3A%221+hour+tasks%22)
-[![GitHub issues by-label](https://img.shields.io/github/issues/celo-org/celo-monorepo/betanet-phase-2)](https://github.com/celo-org/celo-monorepo/issues?q=is%3Aopen+is%3Aissue+label%3Abetanet-phase-2)
-[![GitHub issues by-label](https://img.shields.io/github/issues/celo-org/celo-monorepo/betanet-phase-3)](https://github.com/celo-org/celo-monorepo/issues?q=is%3Aopen+is%3Aissue+label%3Abetanet-phase-3)
 
 Contents:
 
@@ -96,7 +94,7 @@ The Celo stack is structured into the following logical layers:
 
 Follow the instructions in [SETUP.md](SETUP.md) to get a development environment set up.
 
-See [Developer's Guide](https://docs.celo.org/) for full details about the design of the Celo protocol and other information about running these projects.
+See [Developer's Guide](https://docs.celo.org/developer) for full details about the design of the Celo protocol and other information about running these projects.
 
 ## 🙋 <a id="issues"></a>Issues
 
@@ -107,15 +105,9 @@ See the [issue backlog](https://github.com/celo-org/celo-monorepo/issues) for a 
 The repository has the following packages (sub projects):
 
 - [celotool](packages/celotool) - scripts for deploying and managing testnets
-- [cli](packages/cli) - tool that uses ContractKit to interact with the Celo protocol ([docs](https://docs.celo.org/command-line-interface/introduction))
 - [dev-utils](packages/dev-utils) - a utils package for use as a dev dependency
-- [docs](packages/docs) - technical documentation for the Celo project ([live](https://docs.celo.org/))
-- [helm-charts](packages/helm-charts) - templatized deployments of entire environments to Kubernetes clusters
-- [protocol](packages/protocol) - identity, stability and other smart contracts for the Celo protocol ([docs](https://docs.celo.org/celo-codebase/protocol))
-- [sdk](packages/sdk) - Typescript packages for interacting with Celo, including Contracts, Wallets, Crypto++
-- [contractkit](packages/sdk/contractkit) - library to help developers and validators interact with the protocol and its smart contracts ([docs](https://docs.celo.org/developer-guide/contractkit))
-- [terraform-modules](packages/terraform-modules) - templatized deployments of entire VM-based testnets for Google Cloud Platform
-- [typescript](packages/typescript) - no README available (improve?)
+- [helm-charts](packages/helm-charts) - (DEPRECATED) templatized deployments of entire environments to Kubernetes clusters. Check [celo-org/charts](https://github.com/celo-org/charts) instead.
+- [protocol](packages/protocol) - identity, stability and other smart contracts for the Celo protocol ([docs](https://docs.celo.org/protocol))
 
 Code owners for each package can be found in [.github/CODEOWNERS](.github/CODEOWNERS).
 

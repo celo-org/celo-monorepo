@@ -39,5 +39,5 @@ export const handler = async (argv: BackupArgv) => {
   const createSnapshotCommand = `gcloud compute disks snapshot ${pdId} --zone ${zone} --snapshot-names ${snapshotName}`
   await execCmdWithExitOnFailure(createSnapshotCommand)
   const gcloudSnapshotsUrl = 'https://console.cloud.google.com/compute/snapshots'
-  console.info(`Snapshot \"${snapshotName}\" can be seen at ${gcloudSnapshotsUrl}`)
+  console.info(`Snapshot "${snapshotName}" can be seen at ${gcloudSnapshotsUrl}`)
 }

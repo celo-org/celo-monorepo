@@ -1,5 +1,4 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { failIfVmBased } from 'src/lib/env-utils'
 import { deleteFromCluster, deleteStaticIPs, exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { DestroyArgv } from '../../deploy/destroy'
 
@@ -10,7 +9,6 @@ export const builder = {}
 
 export const handler = async (argv: DestroyArgv) => {
   exitIfCelotoolHelmDryRun()
-  failIfVmBased()
 
   await switchToClusterFromEnv(argv.celoEnv)
 

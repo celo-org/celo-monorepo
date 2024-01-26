@@ -1,4 +1,3 @@
-/* tslint:disable no-console */
 import {
   coerceMnemonicAccountType,
   generateAddress,
@@ -45,11 +44,11 @@ export const builder = (argv: yargs.Argv) => {
     })
 }
 
-export const handler = async (argv: AccountAddressArgv) => {
+export const handler = (argv: AccountAddressArgv) => {
   if (argv.privateKey) {
-    console.log(privateKeyToAddress(argv.privateKey))
+    console.info(privateKeyToAddress(argv.privateKey))
   } else if (argv.mnemonic && argv.accountType && argv.index != null) {
-    console.log(
+    console.info(
       generateAddress(argv.mnemonic, coerceMnemonicAccountType(argv.accountType), argv.index)
     )
   } else {
