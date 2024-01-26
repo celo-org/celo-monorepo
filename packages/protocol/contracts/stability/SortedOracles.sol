@@ -40,6 +40,11 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
   using FixidityLib for FixidityLib.Fraction;
 
+  struct EquivalentToken {
+    address token;
+    uint256 multiplier;
+  }
+
   uint256 private constant FIXED1_UINT = 1e24;
 
   // Maps a rateFeedID to a sorted list of report values.
@@ -59,6 +64,9 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   mapping(address => uint256) public tokenReportExpirySeconds;
 
   IBreakerBox public breakerBox;
+  // Maps a token address to its equivalent token address.
+  // Original token will return the median value same as the value of equivalent token.
+  mapping(address => EquivalentToken) public equivalentTokens;
 
   event OracleAdded(address indexed token, address indexed oracleAddress);
   event OracleRemoved(address indexed token, address indexed oracleAddress);
@@ -73,6 +81,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   event ReportExpirySet(uint256 reportExpiry);
   event TokenReportExpirySet(address token, uint256 reportExpiry);
   event BreakerBoxUpdated(address indexed newBreakerBox);
+  event EquivalentTokenSet(address indexed token, address indexed equivalentToken);
 
   modifier onlyOracle(address token) {
     require(isOracle[token][msg.sender], "sender was not an oracle for token addr");
@@ -87,7 +96,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 3);
+    return (1, 1, 3, 0);
   }
 
   /**
@@ -220,6 +229,44 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   }
 
   /**
+   * @notice Sets the equivalent token for a token.
+   * @param token The address of the token.
+   * @param equivalentToken The address of the equivalent token.
+   * @param multiplier The multiplier to convert the equivalent token median value to the token value (fixidity).
+   * @dev For tokens with 6 decimals multiplier is 1e18 / 1e6 = 1e12
+   */
+  function setEquivalentToken(address token, address equivalentToken, uint256 multiplier)
+    external
+    onlyOwner
+  {
+    require(token != address(0), "token address cannot be 0");
+    require(equivalentToken != address(0), "equivalentToken address cannot be 0");
+    require(multiplier > 0, "multiplier must be > 0");
+    equivalentTokens[token] = EquivalentToken(equivalentToken, multiplier);
+    emit EquivalentTokenSet(token, equivalentToken);
+  }
+
+  /**
+   * @notice Sets the equivalent token for a token.
+   * @param token The address of the token.
+   */
+  function deleteEquivalentToken(address token) external onlyOwner {
+    require(token != address(0), "token address cannot be 0");
+    delete equivalentTokens[token];
+    emit EquivalentTokenSet(token, address(0));
+  }
+
+  /**
+   * @notice Gets the equivalent token for a token.
+   * @param token The address of the token.
+   * @return The address of the equivalent token.
+   * @return The multiplier to convert the equivalent token median value to the token value (fixidity).
+   */
+  function getEquivalentToken(address token) external view returns (address, uint256) {
+    return (equivalentTokens[token].token, equivalentTokens[token].multiplier);
+  }
+
+  /**
    * @notice Updates an oracle value and the median.
    * @param token The rateFeedId for the rate that is being reported.
    * @param value The number of stable asset that equate to one unit of collateral asset, for the
@@ -270,6 +317,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Returns the number of rates that are currently stored for a specifed rateFeedId.
+   * @dev Does not take account of equivalentTokens mapping.
    * @param token The rateFeedId for which to retrieve the number of rates.
    * @return uint256 The number of reported oracle rates stored for the given rateFeedId.
    */
@@ -279,16 +327,48 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Returns the median of the currently stored rates for a specified rateFeedId.
+   * @dev Does not take account of equivalentTokens mapping.
    * @param token The rateFeedId of the rates for which the median value is being retrieved.
-   * @return uint256 The median exchange rate for rateFeedId.
-   * @return fixidity
+   * @return uint256 The median exchange rate for rateFeedId (fixidity).
+   * @return uint256 num of rates
    */
-  function medianRate(address token) external view returns (uint256, uint256) {
+  function medianRateWithoutEquivalentMapping(address token)
+    public
+    view
+    returns (uint256, uint256)
+  {
     return (rates[token].getMedianValue(), numRates(token) == 0 ? 0 : FIXED1_UINT);
   }
 
   /**
+   * @notice Returns the median of the currently stored rates for a specified rateFeedId.
+   * @dev Please note that this function respects the equivalentToken mapping, and so may
+   * return the median identified as an equivalent to the supplied rateFeedId.
+   * @param token The rateFeedId of the rates for which the median value is being retrieved.
+   * @return uint256 The median exchange rate for rateFeedId (fixidity).
+   * @return uint256 num of rates
+   */
+  function medianRate(address token) external view returns (uint256, uint256) {
+    EquivalentToken storage equivalentToken = equivalentTokens[token];
+    if (equivalentToken.token != address(0)) {
+      (uint256 equivalentMedianRate, uint256 numRates) = medianRateWithoutEquivalentMapping(
+        equivalentToken.token
+      );
+      return (
+        FixidityLib
+          .wrap(equivalentMedianRate)
+          .multiply(FixidityLib.wrap(equivalentToken.multiplier))
+          .unwrap(),
+        numRates
+      );
+    }
+
+    return medianRateWithoutEquivalentMapping(token);
+  }
+
+  /**
    * @notice Gets all elements from the doubly linked list.
+   * @dev Does not take account of equivalentTokens mapping.
    * @param token The rateFeedId for which the collateral asset exchange rate is being reported.
    * @return keys Keys of an unpacked list of elements from largest to smallest.
    * @return values Values of an unpacked list of elements from largest to smallest.
@@ -304,6 +384,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Returns the number of timestamps.
+   * @dev Does not take account of equivalentTokens mapping.
    * @param token The rateFeedId for which the collateral asset exchange rate is being reported.
    * @return uint256 The number of oracle report timestamps for the specified rateFeedId.
    */
@@ -313,6 +394,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Returns the median timestamp.
+   * @dev Does not take account of equivalentTokens mapping.
    * @param token The rateFeedId for which the collateral asset exchange rate is being reported.
    * @return uint256 The median report timestamp for the specified rateFeedId.
    */
@@ -322,6 +404,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Gets all elements from the doubly linked list.
+   * @dev Does not take account of equivalentTokens mapping.
    * @param token The rateFeedId for which the collateral asset exchange rate is being reported.
    * @return keys Keys of nn unpacked list of elements from largest to smallest.
    * @return values Values of an unpacked list of elements from largest to smallest.
@@ -337,6 +420,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Checks if a report exists for a specified rateFeedId from a given oracle.
+   * @dev Does not take account of equivalentTokens mapping.
    * @param token The rateFeedId to be checked.
    * @param oracle The oracle whose report should be checked.
    * @return bool True if a report exists, false otherwise.
@@ -347,6 +431,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Returns the list of oracles for a speficied rateFeedId.
+   * @dev Does not take account of equivalentTokens mapping.
    * @param token The rateFeedId whose oracles should be returned.
    * @return address[] A list of oracles for the given rateFeedId.
    */
@@ -356,6 +441,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Returns the expiry for specified rateFeedId if it exists, if not the default is returned.
+   * @dev Does not take account of equivalentTokens mapping.
    * @param token The rateFeedId.
    * @return The report expiry in seconds.
    */
@@ -369,6 +455,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Removes an oracle value and updates the median.
+   * @dev Does not take account of equivalentTokens mapping.
    * @param token The rateFeedId for which the collateral asset exchange rate is being reported.
    * @param oracle The oracle whose value should be removed.
    * @dev This can be used to delete elements for oracles that have been removed.
