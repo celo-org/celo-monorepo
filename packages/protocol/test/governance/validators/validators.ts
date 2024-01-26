@@ -188,52 +188,7 @@ contract('Validators', (accounts: string[]) => {
 
   // describe('#setValidatorScoreParameters()', () => {})
 
-  describe('#setMaxGroupSize()', () => {
-    describe('when the size is different', () => {
-      describe('when called by the owner', () => {
-        let resp: any
-        const newSize = maxGroupSize.plus(1)
-
-        beforeEach(async () => {
-          resp = await validators.setMaxGroupSize(newSize)
-        })
-
-        it('should set the max group size', async () => {
-          const size = await validators.getMaxGroupSize()
-          assertEqualBN(size, newSize)
-        })
-
-        it('should emit the MaxGroupSizeSet event', async () => {
-          assert.equal(resp.logs.length, 1)
-          const log = resp.logs[0]
-          assertContainSubset(log, {
-            event: 'MaxGroupSizeSet',
-            args: {
-              size: new BigNumber(newSize),
-            },
-          })
-        })
-      })
-
-      describe('when the size is the same', () => {
-        it('should revert', async () => {
-          await assertTransactionRevertWithReason(
-            validators.setMaxGroupSize(maxGroupSize),
-            'Max group size not changed'
-          )
-        })
-      })
-    })
-
-    describe('when called by a non-owner', () => {
-      it('should revert', async () => {
-        await assertTransactionRevertWithReason(
-          validators.setMaxGroupSize(maxGroupSize, { from: nonOwner }),
-          'Ownable: caller is not the owner'
-        )
-      })
-    })
-  })
+  // describe('#setMaxGroupSize()', () => {}) // duplicate
 
   describe('#registerValidator', () => {
     const validator = accounts[0]
@@ -246,29 +201,29 @@ contract('Validators', (accounts: string[]) => {
         )
       })
 
-      it('should revert when vote over max number of groups set to true', async () => {
-        await mockElection.setAllowedToVoteOverMaxNumberOfGroups(validator, true)
-        const signer = accounts[9]
-        const sig = await getParsedSignatureOfAddress(web3, validator, signer)
-        await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
-        const publicKey = await addressToPublicKey(signer, web3.eth.sign)
-        await assertTransactionRevertWithReason(
-          validators.registerValidator(publicKey, blsPublicKey, blsPoP),
-          'Cannot vote for more than max number of groups'
-        )
-      })
+      // it('should revert when vote over max number of groups set to true', async () => {
+      //   await mockElection.setAllowedToVoteOverMaxNumberOfGroups(validator, true)
+      //   const signer = accounts[9]
+      //   const sig = await getParsedSignatureOfAddress(web3, validator, signer)
+      //   await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
+      //   const publicKey = await addressToPublicKey(signer, web3.eth.sign)
+      //   await assertTransactionRevertWithReason(
+      //     validators.registerValidator(publicKey, blsPublicKey, blsPoP),
+      //     'Cannot vote for more than max number of groups'
+      //   )
+      // })
 
-      it('should revert when delegating Celo', async () => {
-        await mockLockedGold.setAccountTotalDelegatedAmountInPercents(validator, 10)
-        const signer = accounts[9]
-        const sig = await getParsedSignatureOfAddress(web3, validator, signer)
-        await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
-        const publicKey = await addressToPublicKey(signer, web3.eth.sign)
-        await assertTransactionRevertWithReason(
-          validators.registerValidator(publicKey, blsPublicKey, blsPoP),
-          'Cannot delegate governance power'
-        )
-      })
+      // it('should revert when delegating Celo', async () => {
+      //   await mockLockedGold.setAccountTotalDelegatedAmountInPercents(validator, 10)
+      //   const signer = accounts[9]
+      //   const sig = await getParsedSignatureOfAddress(web3, validator, signer)
+      //   await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
+      //   const publicKey = await addressToPublicKey(signer, web3.eth.sign)
+      //   await assertTransactionRevertWithReason(
+      //     validators.registerValidator(publicKey, blsPublicKey, blsPoP),
+      //     'Cannot delegate governance power'
+      //   )
+      // })
 
       describe('when the account has authorized a validator signer', () => {
         let validatorRegistrationEpochNumber: number

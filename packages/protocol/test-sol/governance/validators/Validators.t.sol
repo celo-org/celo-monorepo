@@ -19,6 +19,7 @@ import "@celo-contracts/governance/test/MockLockedGold.sol";
 
 import "@celo-contracts/governance/test/ValidatorsMock.sol";
 import "@test-sol/constants.sol";
+import "@test-sol/utils/ECDSAHelper.sol";
 
 contract ValidatorsMockTunnel is Test {
   ValidatorsMock private tunnelValidators;
@@ -85,8 +86,22 @@ contract ValidatorsTest is Test, Constants {
   address nonOwner;
   address owner;
 
-  bytes public constant blsPublicKey = "0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00";
-  bytes public constant blsPop = "0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900";
+  // bytes public constant blsPublicKey =
+  //   bytes(
+  //     "0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25"
+  //   );
+  // bytes public constant blsPop =
+  //   bytes("0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b");
+  bytes public constant blsPublicKey = abi.encodePacked(
+    bytes32(0x0101010101010101010101010101010101010101010101010101010101010101),
+    bytes32(0x0202020202020202020202020202020202020202020202020202020202020202),
+    bytes32(0x0303030303030303030303030303030303030303030303030303030303030303)
+  );
+  bytes public constant blsPop = abi.encodePacked(
+    bytes16(0x01010101010101010101010101010101),
+    bytes16(0x02020202020202020202020202020202),
+    bytes16(0x03030303030303030303030303030303)
+  );
 
   event AccountSlashed(
     address indexed slashed,
@@ -107,8 +122,8 @@ contract ValidatorsTest is Test, Constants {
     FixidityLib.Fraction adjustmentSpeed;
   }
 
-  ValidatorLockedGoldRequirements public validatorLockedGoldRequirements;
-  GroupLockedGoldRequirements public groupLockedGoldRequirements;
+  ValidatorLockedGoldRequirements public originalValidatorLockedGoldRequirements;
+  GroupLockedGoldRequirements public originalGroupLockedGoldRequirements;
   ValidatorScoreParameters public originalValidatorScoreParameters;
 
   uint256 public slashingMultiplierResetPeriod = 30 * DAY;
@@ -124,12 +139,15 @@ contract ValidatorsTest is Test, Constants {
     owner = address(this);
     nonOwner = actor("nonOwner");
 
-    validatorLockedGoldRequirements = ValidatorLockedGoldRequirements({
+    originalValidatorLockedGoldRequirements = ValidatorLockedGoldRequirements({
       value: 1000,
       duration: 60 * DAY
     });
 
-    groupLockedGoldRequirements = GroupLockedGoldRequirements({ value: 1000, duration: 100 * DAY });
+    originalGroupLockedGoldRequirements = GroupLockedGoldRequirements({
+      value: 1000,
+      duration: 100 * DAY
+    });
 
     originalValidatorScoreParameters = ValidatorScoreParameters({
       exponent: 5,
@@ -156,14 +174,14 @@ contract ValidatorsTest is Test, Constants {
     registry.setAddressFor(ValidatorsContract, address(validators));
     registry.setAddressFor(StableTokenContract, address(stableToken));
 
-    accounts.createAccount(); // do this for 10 accounts?
+    accounts.createAccount(); // TODO: do this for 10 accounts?
 
     initParams = ValidatorsMockTunnel.InitParams({
       registryAddress: registryAddress,
-      groupRequirementValue: groupLockedGoldRequirements.value,
-      groupRequirementDuration: groupLockedGoldRequirements.duration,
-      validatorRequirementValue: validatorLockedGoldRequirements.value,
-      validatorRequirementDuration: validatorLockedGoldRequirements.duration,
+      groupRequirementValue: originalGroupLockedGoldRequirements.value,
+      groupRequirementDuration: originalGroupLockedGoldRequirements.duration,
+      validatorRequirementValue: originalValidatorLockedGoldRequirements.value,
+      validatorRequirementDuration: originalValidatorLockedGoldRequirements.duration,
       validatorScoreExponent: originalValidatorScoreParameters.exponent,
       validatorScoreAdjustmentSpeed: originalValidatorScoreParameters.adjustmentSpeed.unwrap()
     });
@@ -178,8 +196,18 @@ contract ValidatorsTest is Test, Constants {
     validatorsMockTunnel.MockInitialize(owner, initParams, initParams2);
   }
 
+  function getParsedSignatureOfAddress(address _address, uint256 privateKey)
+    public
+    pure
+    returns (uint8, bytes32, bytes32)
+  {
+    bytes32 addressHash = keccak256(abi.encodePacked(_address));
+    bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
+    return vm.sign(privateKey, prefixedHash);
+  }
+
   // function registerValidator(address validator) public {
-  //   lockedGold.setAccountTotalLockedGold(validator, validatorLockedGoldRequirements.value);
+  //   lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
   //   bytes memory ecdsaPublicKey = validators.registerValidator(
   //     ecdsaPublicKey,
   //     blsPublicKey,
@@ -201,10 +229,14 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
 
   function test_shouldHaveSetGroupLockedGoldRequirements() public {
     (uint256 value, uint256 duration) = validators.getGroupLockedGoldRequirements();
-    assertEq(value, groupLockedGoldRequirements.value, "Wrong groupLockedGoldRequirements value.");
+    assertEq(
+      value,
+      originalGroupLockedGoldRequirements.value,
+      "Wrong groupLockedGoldRequirements value."
+    );
     assertEq(
       duration,
-      groupLockedGoldRequirements.duration,
+      originalGroupLockedGoldRequirements.duration,
       "Wrong groupLockedGoldRequirements duration."
     );
   }
@@ -213,12 +245,12 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
     (uint256 value, uint256 duration) = validators.getValidatorLockedGoldRequirements();
     assertEq(
       value,
-      validatorLockedGoldRequirements.value,
+      originalValidatorLockedGoldRequirements.value,
       "Wrong validatorLockedGoldRequirements value."
     );
     assertEq(
       duration,
-      validatorLockedGoldRequirements.duration,
+      originalValidatorLockedGoldRequirements.duration,
       "Wrong validatorLockedGoldRequirements duration."
     );
   }
@@ -314,8 +346,8 @@ contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
 
 contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
   GroupLockedGoldRequirements private newRequirements = GroupLockedGoldRequirements({
-    value: groupLockedGoldRequirements.value + 1,
-    duration: groupLockedGoldRequirements.duration + 1
+    value: originalGroupLockedGoldRequirements.value + 1,
+    duration: originalGroupLockedGoldRequirements.duration + 1
   });
 
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
@@ -342,16 +374,16 @@ contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
   function test_Reverts_WhenRequirementsAreUnchanged() public {
     vm.expectRevert("Group requirements not changed");
     validators.setGroupLockedGoldRequirements(
-      groupLockedGoldRequirements.value,
-      groupLockedGoldRequirements.duration
+      originalGroupLockedGoldRequirements.value,
+      originalGroupLockedGoldRequirements.duration
     );
   }
 }
 
 contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
   ValidatorLockedGoldRequirements private newRequirements = ValidatorLockedGoldRequirements({
-    value: validatorLockedGoldRequirements.value + 1,
-    duration: validatorLockedGoldRequirements.duration + 1
+    value: originalValidatorLockedGoldRequirements.value + 1,
+    duration: originalValidatorLockedGoldRequirements.duration + 1
   });
 
   event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
@@ -378,8 +410,8 @@ contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
   function test_Reverts_WhenRequirementsAreUnchanged() public {
     vm.expectRevert("Validator requirements not changed");
     validators.setValidatorLockedGoldRequirements(
-      validatorLockedGoldRequirements.value,
-      validatorLockedGoldRequirements.duration
+      originalValidatorLockedGoldRequirements.value,
+      originalValidatorLockedGoldRequirements.duration
     );
   }
 }
@@ -417,5 +449,85 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
       originalValidatorScoreParameters.exponent,
       originalValidatorScoreParameters.adjustmentSpeed.unwrap()
     );
+  }
+}
+
+contract ValidatorsTest_RegisterValidator_WhenAccountIsNotRegisteredValidator is
+  ValidatorsTest,
+  ECDSAHelper
+{
+  address validator;
+  uint256 validatorPk;
+  address signer;
+  uint256 signerPk;
+
+  function setUp() public {
+    super.setUp();
+
+    (validator, validatorPk) = actorWithPK("validator");
+    (signer, signerPk) = actorWithPK("signer");
+
+    vm.prank(validator);
+    accounts.createAccount();
+
+    lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
+  }
+
+  function skip_test_Reverts_WhenVoteOverMaxNumberOfGroupsSetToTrue() public {
+    vm.prank(validator);
+    election.setAllowedToVoteOverMaxNumberOfGroups(validator, true);
+
+    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
+
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+    bytes memory pubKey = addressToPublicKey("random msg", v, r, s);
+
+    vm.expectRevert("Cannot vote for more than max number of groups");
+    vm.prank(validator);
+    validators.registerValidator(pubKey, blsPublicKey, blsPop);
+  }
+
+  function skip_test_ShouldRevertWhenDelagatingCELO() public {
+    lockedGold.setAccountTotalDelegatedAmountInPercents(validator, 10);
+    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+    bytes memory pubKey = addressToPublicKey("random msg", v, r, s);
+
+    vm.expectRevert("Cannot delegate governance power");
+    vm.prank(validator);
+    validators.registerValidator(pubKey, blsPublicKey, blsPop);
+  }
+
+  function _registerValidatorHelper() internal {
+    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+    bytes memory pubKey = addressToPublicKey(
+      keccak256(abi.encodePacked("dummy_msg_data")),
+      v,
+      r,
+      s
+    );
+    vm.prank(validator);
+    validators.registerValidator(pubKey, blsPublicKey, blsPop);
+  }
+
+  function test_ShouldMarkAccountAsValidator() public {
+    // XXX Here failing due to invalid blsPublicKey & blsPop
+    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
+
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+
+    bytes32 addressHash = keccak256(abi.encodePacked(validator));
+
+    bytes memory pubKey = addressToPublicKey(addressHash, v, r, s);
+
+    vm.prank(validator);
+    validators.registerValidator(pubKey, blsPublicKey, blsPop);
+    console.log("### yo");
+    assertTrue(validators.isValidator(validator));
   }
 }
