@@ -43,9 +43,12 @@ contract GovernanceForTest is Governance(true) {
     _removeVotesWhenRevokingDelegatedVotes(account, maxAmountAllowed);
   }
 
-  function setDeprecatedWeight(address voterAddress, uint256 proposalIndex, uint256 weight, uint256 proposalId)
-    external
-  {
+  function setDeprecatedWeight(
+    address voterAddress,
+    uint256 proposalIndex,
+    uint256 weight,
+    uint256 proposalId
+  ) external {
     Voter storage voter = voters[voterAddress];
     VoteRecord storage voteRecord = voter.referendumVotes[proposalIndex];
     voteRecord.deprecated_weight = weight;
