@@ -3062,7 +3062,7 @@ contract GovernanceExecuteHotfix is GovernanceBaseTest {
   event HotfixExecuted(bytes32 indexed hash);
 
   bytes32 SALT = 0x657ed9d64e84fa3d1af43b3a307db22aba2d90a158015df1c588c02e24ca08f0;
-  bytes32 hotfixHash;
+  bytes32 hotfixHash = 0x7e8d32af14ccc9a20ffa203ac31dbfb82cdace273d68cab5deacf6fe81b118a0;
 
   address validator;
 
@@ -3072,15 +3072,6 @@ contract GovernanceExecuteHotfix is GovernanceBaseTest {
     vm.prank(validator);
     accounts.createAccount();
     governance.addValidator(validator);
-
-    // call governance test method to generate proper hotfix (needs calldata arguments)
-    hotfixHash = governance.getHotfixHash(
-      okProp.values,
-      okProp.destinations,
-      okProp.data,
-      okProp.dataLengths,
-      SALT
-    );
   }
 
   function executeHotfixTx() private {
