@@ -68,6 +68,11 @@ contract FeeCurrencyWhitelist is
     return (result != address(0)) ? result : underlyingToken;
   }
 
+  function removeAdapter(address token) external onlyOwner {
+    delete adapters[token];
+    emit AdapterSet(token, address(0));
+  }
+
   function setUnderlyingToken(address tokenAddress) external onlyOwner() {
     underlyingTokens.push(tokenAddress);
     emit UnderlyingTokenSet(tokenAddress);
@@ -80,16 +85,17 @@ contract FeeCurrencyWhitelist is
   // TODO when this contracts gets moved to Solidity 0.8 it should
   // return an array of tuples
   // sequence of underlying token and it's corresponding adapter
-  function getWhitelistUnderlingPairs() external view returns (address[] memory) {
-    uint256 outLength = underlyingTokens.length * 2;
-    address[] memory result = new address[](outLength);
+  function getWhitelistUnderlingPairs() external view returns (address[] memory, address[] memory) {
+    uint256 length = underlyingTokens.length;
+    address[] memory tokensRes = new address[](length);
+    address[] memory adaptersRes = new address[](length);
 
     for (uint256 i = 0; i < underlyingTokens.length; i++) {
       address underlyingToken = underlyingTokens[i];
-      result[i * 2] = getAdapter(underlyingToken);
-      result[(i * 2) + 1] = underlyingToken;
+      tokensRes[i] = underlyingToken;
+      adaptersRes[i] = getAdapter(underlyingToken);
     }
-    return result;
+    return (tokensRes, adaptersRes);
   }
 
   function removeUnderlyingTokens(address tokenAddress, uint256 index) external onlyOwner {

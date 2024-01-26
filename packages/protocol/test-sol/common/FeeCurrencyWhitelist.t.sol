@@ -50,7 +50,6 @@ contract FeeCurrencyWhitelist_adaptedTokens is FeeCurrencyWhitelistTest {
     feeCurrencyWhitelist.setUnderlyingToken(token2);
 
     feeCurrencyWhitelist.setAdapter(token1, whitelistedAddress2);
-
   }
 }
 
@@ -77,6 +76,29 @@ contract FeeCurrencyWhitelist_setAdapter is FeeCurrencyWhitelist_adaptedTokens {
     emit AdapterSet(token2, whitelistedAddress3);
     feeCurrencyWhitelist.setAdapter(token2, whitelistedAddress3);
   }
+}
+
+contract FeeCurrencyWhitelist_removeAdapter is FeeCurrencyWhitelist_adaptedTokens {
+  event AdapterSet(address underlyingToken, address adapter);
+
+  function test_ShouldRemoveNonExistentAdapter() public {
+    feeCurrencyWhitelist.removeAdapter(token1);
+    assertEq(feeCurrencyWhitelist.getAdapter(token1), token1);
+  }
+
+  function test_ShouldRemoveAdapter() public {
+    feeCurrencyWhitelist.setAdapter(token1, whitelistedAddress2);
+    assertEq(feeCurrencyWhitelist.getAdapter(token1), whitelistedAddress2);
+    feeCurrencyWhitelist.removeAdapter(token1);
+    assertEq(feeCurrencyWhitelist.getAdapter(token1), token1);
+  }
+
+  function test_ShouldEmitAdapterSet_WhenAdapterRemoved() public {
+    vm.expectEmit(true, true, true, true);
+    emit AdapterSet(token1, address(0));
+    feeCurrencyWhitelist.removeAdapter(token1);
+  }
+
 }
 
 contract FeeCurrencyWhitelist_setUnderlyingTokens is FeeCurrencyWhitelist_adaptedTokens {
@@ -136,22 +158,24 @@ contract FeeCurrencyWhitelist_removeUnderlyingTokens is FeeCurrencyWhitelist_ada
 }
 
 contract FeeCurrencyWhitelist_getWhitelistUnderlingPairs is FeeCurrencyWhitelist_adaptedTokens {
-  function test_getsRightTouples() external {
+  function test_getsRightTuples() external {
     feeCurrencyWhitelist.setAdapter(token2, whitelistedAddress3);
-    address[6] memory addresses = [
-      whitelistedAddress1,
+    address[3] memory expectedTokens = [whitelistedAddress1, token1, token2];
+
+    address[3] memory expectedAdapters = [
       whitelistedAddress1,
       whitelistedAddress2,
-      token1,
-      whitelistedAddress3,
-      token2
+      whitelistedAddress3
     ];
-    address[] memory results = feeCurrencyWhitelist.getWhitelistUnderlingPairs();
 
-    assertEq(results.length, addresses.length);
-    for (uint256 i = 0; i < results.length; i++) {
-      assertEq(results[i], addresses[i]);
+    (address[] memory tokens, address[] memory adapters) = feeCurrencyWhitelist
+      .getWhitelistUnderlingPairs();
 
+    assertEq(tokens.length, expectedTokens.length);
+    assertEq(adapters.length, expectedTokens.length);
+    for (uint256 i = 0; i < tokens.length; i++) {
+      assertEq(tokens[i], expectedTokens[i]);
+      assertEq(adapters[i], expectedAdapters[i]);
     }
   }
 }
