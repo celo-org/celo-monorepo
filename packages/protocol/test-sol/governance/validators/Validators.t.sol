@@ -18,6 +18,7 @@ import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 
 import "@celo-contracts/governance/test/ValidatorsMock.sol";
+import "@test-sol/constants.sol";
 
 contract ValidatorsMockTunnel is Test {
   ValidatorsMock private tunnelValidators;
@@ -70,7 +71,7 @@ contract ValidatorsMockTunnel is Test {
   }
 }
 
-contract ValidatorsTest is Test {
+contract ValidatorsTest is Test, Constants {
   using FixidityLib for FixidityLib.Fraction;
 
   Registry registry;
@@ -80,9 +81,6 @@ contract ValidatorsTest is Test {
   ValidatorsMockTunnel public validatorsMockTunnel;
   ValidatorsMock public validators;
   MockLockedGold lockedGold;
-
-  uint256 HOUR = 60 * 60;
-  uint256 DAY = 24 * HOUR;
 
   address nonOwner;
   address owner;
@@ -111,7 +109,7 @@ contract ValidatorsTest is Test {
 
   ValidatorLockedGoldRequirements public validatorLockedGoldRequirements;
   GroupLockedGoldRequirements public groupLockedGoldRequirements;
-  ValidatorScoreParameters public validatorScoreParameters;
+  ValidatorScoreParameters public originalValidatorScoreParameters;
 
   uint256 public slashingMultiplierResetPeriod = 30 * DAY;
   uint256 public membershipHistoryLength = 5;
@@ -133,7 +131,7 @@ contract ValidatorsTest is Test {
 
     groupLockedGoldRequirements = GroupLockedGoldRequirements({ value: 1000, duration: 100 * DAY });
 
-    validatorScoreParameters = ValidatorScoreParameters({
+    originalValidatorScoreParameters = ValidatorScoreParameters({
       exponent: 5,
       adjustmentSpeed: FixidityLib.newFixedFraction(5, 20)
     });
@@ -152,11 +150,11 @@ contract ValidatorsTest is Test {
 
     stableToken = new MockStableToken();
 
-    registry.setAddressFor("Accounts", address(accounts));
-    registry.setAddressFor("Election", address(election));
-    registry.setAddressFor("LockedGold", address(lockedGold));
-    registry.setAddressFor("Validators", address(validators));
-    registry.setAddressFor("StableToken", address(stableToken));
+    registry.setAddressFor(AccountsContract, address(accounts));
+    registry.setAddressFor(ElectionContract, address(election));
+    registry.setAddressFor(LockedGoldContract, address(lockedGold));
+    registry.setAddressFor(ValidatorsContract, address(validators));
+    registry.setAddressFor(StableTokenContract, address(stableToken));
 
     accounts.createAccount(); // do this for 10 accounts?
 
@@ -166,8 +164,8 @@ contract ValidatorsTest is Test {
       groupRequirementDuration: groupLockedGoldRequirements.duration,
       validatorRequirementValue: validatorLockedGoldRequirements.value,
       validatorRequirementDuration: validatorLockedGoldRequirements.duration,
-      validatorScoreExponent: validatorScoreParameters.exponent,
-      validatorScoreAdjustmentSpeed: validatorScoreParameters.adjustmentSpeed.unwrap()
+      validatorScoreExponent: originalValidatorScoreParameters.exponent,
+      validatorScoreAdjustmentSpeed: originalValidatorScoreParameters.adjustmentSpeed.unwrap()
     });
     initParams2 = ValidatorsMockTunnel.InitParams2({
       _membershipHistoryLength: membershipHistoryLength,
@@ -229,12 +227,12 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
     (uint256 exponent, uint256 adjustmentSpeed) = validators.getValidatorScoreParameters();
     assertEq(
       exponent,
-      validatorScoreParameters.exponent,
+      originalValidatorScoreParameters.exponent,
       "Wrong validatorScoreParameters exponent."
     );
     assertEq(
       adjustmentSpeed,
-      validatorScoreParameters.adjustmentSpeed.unwrap(),
+      originalValidatorScoreParameters.adjustmentSpeed.unwrap(),
       "Wrong validatorScoreParameters adjustmentSpeed."
     );
   }
@@ -322,7 +320,7 @@ contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
 
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
 
-  function test_ShouldHaveSetgroupLockedGoldRequirements() public {
+  function test_ShouldHaveSetGroupLockedGoldRequirements() public {
     validators.setGroupLockedGoldRequirements(newRequirements.value, newRequirements.duration);
     (uint256 _value, uint256 _duration) = validators.getGroupLockedGoldRequirements();
     assertEq(_value, newRequirements.value);
@@ -346,6 +344,78 @@ contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
     validators.setGroupLockedGoldRequirements(
       groupLockedGoldRequirements.value,
       groupLockedGoldRequirements.duration
+    );
+  }
+}
+
+contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
+  ValidatorLockedGoldRequirements private newRequirements = ValidatorLockedGoldRequirements({
+    value: validatorLockedGoldRequirements.value + 1,
+    duration: validatorLockedGoldRequirements.duration + 1
+  });
+
+  event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
+
+  function test_ShouldHaveSetValidatorLockedGoldRequirements() public {
+    validators.setValidatorLockedGoldRequirements(newRequirements.value, newRequirements.duration);
+    (uint256 _value, uint256 _duration) = validators.getValidatorLockedGoldRequirements();
+    assertEq(_value, newRequirements.value);
+    assertEq(_duration, newRequirements.duration);
+  }
+
+  function test_Emits_ValidatorLockedGoldRequirementsSet() public {
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorLockedGoldRequirementsSet(newRequirements.value, newRequirements.duration);
+    validators.setValidatorLockedGoldRequirements(newRequirements.value, newRequirements.duration);
+  }
+
+  function test_Reverts_WhenCalledByNonOwner() public {
+    vm.prank(nonOwner);
+    vm.expectRevert("Ownable: caller is not the owner");
+    validators.setValidatorLockedGoldRequirements(newRequirements.value, newRequirements.duration);
+  }
+
+  function test_Reverts_WhenRequirementsAreUnchanged() public {
+    vm.expectRevert("Validator requirements not changed");
+    validators.setValidatorLockedGoldRequirements(
+      validatorLockedGoldRequirements.value,
+      validatorLockedGoldRequirements.duration
+    );
+  }
+}
+
+contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
+  ValidatorScoreParameters newParams = ValidatorScoreParameters({
+    exponent: originalValidatorScoreParameters.exponent + 1,
+    adjustmentSpeed: FixidityLib.newFixedFraction(6, 20)
+  });
+
+  event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
+
+  function test_ShouldsetExponentAndAdjustmentSpeed() public {
+    validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
+    (uint256 _exponent, uint256 _adjustmentSpeed) = validators.getValidatorScoreParameters();
+    assertEq(_exponent, newParams.exponent, "Incorrect Exponent");
+    assertEq(_adjustmentSpeed, newParams.adjustmentSpeed.unwrap(), "Incorrect AdjustmentSpeed");
+  }
+
+  function test_Emits_ValidatorScoreParametersSet() public {
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorScoreParametersSet(newParams.exponent, newParams.adjustmentSpeed.unwrap());
+    validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
+  }
+
+  function test_Reverts_whenCalledByNonOwner() public {
+    vm.prank(nonOwner);
+    vm.expectRevert("Ownable: caller is not the owner");
+    validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
+  }
+
+  function test_Reverts_WhenLockupsAreUnchanged() public {
+    vm.expectRevert("Adjustment speed and exponent not changed");
+    validators.setValidatorScoreParameters(
+      originalValidatorScoreParameters.exponent,
+      originalValidatorScoreParameters.adjustmentSpeed.unwrap()
     );
   }
 }
