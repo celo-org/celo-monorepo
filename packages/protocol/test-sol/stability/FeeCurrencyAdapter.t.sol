@@ -10,6 +10,7 @@ import "../../contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts-8/stability/CeloFeeCurrencyAdapterOwnable.sol";
 import "@celo-contracts-8/stability/interfaces/IFeeCurrency.sol";
 import "@openzeppelin/contracts8/token/ERC20/ERC20.sol";
+import "forge-std/console.sol";
 
 contract FeeCurrency6DecimalsTest is ERC20, IFeeCurrency {
   uint256 debited;
@@ -79,7 +80,19 @@ contract CeloFeeCurrencyAdapterTestContract is CeloFeeCurrencyAdapterOwnable {
 contract FeeCurrencyAdapterTest is Test {
   using FixidityLib for FixidityLib.Fraction;
 
+  event GasFeesDebited(address indexed debitedFrom, uint256 debitedAmount);
+
+  event GasFeesCredited(
+    address indexed refundRecipient,
+    address indexed tipRecipient,
+    address indexed baseFeeRecipient,
+    uint256 refundAmount,
+    uint256 tipAmount,
+    uint256 baseFeeAmount
+  );
+
   CeloFeeCurrencyAdapterTestContract public feeCurrencyAdapter;
+  CeloFeeCurrencyAdapterTestContract public feeCurrencyAdapterForFuzzyTests;
   address owner;
   address nonOwner;
   IFeeCurrency feeCurrency;
@@ -91,6 +104,7 @@ contract FeeCurrencyAdapterTest is Test {
     nonOwner = actor("nonOwner");
 
     feeCurrencyAdapter = new CeloFeeCurrencyAdapterTestContract(true);
+    feeCurrencyAdapterForFuzzyTests = new CeloFeeCurrencyAdapterTestContract(true);
 
     address feeCurrencyAddress = actor("feeCurrency");
 
@@ -110,7 +124,17 @@ contract FeeCurrencyAdapter_Initialize is FeeCurrencyAdapterTest {
 
   function test_shouldRevertWhenCalledAgain() public {
     vm.expectRevert("contract already initialized");
-    feeCurrencyAdapter.initialize(address(feeCurrency), "wrapper", "wr", 18);
+    feeCurrencyAdapter.initialize(address(feeCurrency), "adapter", "ad", 18);
+  }
+
+  function test_ShouldRevert_WhenExpectedDecimalsAreLessThenDecimals() public {
+    vm.expectRevert("Decimals of adapted token must be < expected decimals.");
+    feeCurrencyAdapterForFuzzyTests.initialize(address(feeCurrency), "adapter", "ad", 5);
+  }
+
+  function test_ShouldRevert_WhenExpectedDecimalsAreEqualToDecimals() public {
+    vm.expectRevert("Decimals of adapted token must be < expected decimals.");
+    feeCurrencyAdapterForFuzzyTests.initialize(address(feeCurrency), "adapter", "ad", 6);
   }
 }
 
@@ -136,6 +160,43 @@ contract FeeCurrencyAdapter_DebitGasFees is FeeCurrencyAdapterTest {
     feeCurrencyAdapter.debitGasFees(address(this), 1000);
   }
 
+  function test_ShouldEmitGasFeesDebitedEvent() public {
+    uint256 amount = 1000 * 1e12;
+    vm.expectEmit(true, true, true, true);
+    emit GasFeesDebited(address(this), amount / 1e12);
+    vm.prank(address(0));
+    feeCurrencyAdapter.debitGasFees(address(this), amount);
+  }
+
+  function test_ShouldDebitCorrectAmount_WhenExpectedDigitsOnlyOneBigger() public {
+    debitFuzzyHelper(7, 1e1);
+  }
+
+  function test_ShouldDebitCorrectAmount_WhenExpectedDigitsBigger() public {
+    debitFuzzyHelper(10, 1e4);
+  }
+
+  function test_ShouldDebitCorrectAmount_WhenExpectedDigitsALotBigger() public {
+    debitFuzzyHelper(30, 1e24);
+  }
+
+  function debitFuzzyHelper(uint8 expectedDigits, uint256 multiplier) public {
+    feeCurrencyAdapterForFuzzyTests.initialize(
+      address(feeCurrency),
+      "adapter",
+      "ad",
+      expectedDigits
+    );
+    uint256 amount = 1000 * multiplier;
+    vm.prank(address(0));
+    feeCurrencyAdapterForFuzzyTests.debitGasFees(address(this), amount);
+    assertEq(feeCurrency.balanceOf(address(this)), initialSupply - amount / multiplier);
+    assertEq(
+      feeCurrencyAdapterForFuzzyTests.balanceOf(address(this)),
+      (initialSupply * multiplier - amount)
+    );
+    assertEq(feeCurrencyAdapterForFuzzyTests.debited(), amount / multiplier);
+  }
 }
 
 contract FeeCurrencyAdapter_CreditGasFees is FeeCurrencyAdapterTest {
@@ -208,6 +269,94 @@ contract FeeCurrencyAdapter_CreditGasFees is FeeCurrencyAdapterTest {
     uint256 balanceAfter = feeCurrency.balanceOf(address(this));
     assertEq(balanceBefore, balanceAfter);
   }
+
+  function test_ShouldEmitGasFeesCredited() public {
+    uint256 amount = 1000 * 1e12;
+    vm.prank(address(0));
+    feeCurrencyAdapter.debitGasFees(address(this), amount);
+
+    vm.expectEmit(true, true, true, true);
+    emit GasFeesCredited(
+      address(this),
+      address(this),
+      address(this),
+      amount / 1e12 / 4,
+      amount / 1e12 / 4,
+      amount / 1e12 / 2
+    );
+    vm.prank(address(0));
+    feeCurrencyAdapter.creditGasFees(
+      address(this),
+      address(this),
+      address(0),
+      address(this),
+      amount / 4,
+      amount / 4,
+      0,
+      amount / 4
+    );
+  }
+
+  function test_shouldCreditGasFees_WhenOnlyOneBigger() public {
+    creditFuzzHelper(7, 1e1);
+  }
+
+  function test_shouldCreditGasFees_WhenBigger() public {
+    creditFuzzHelper(10, 1e4);
+  }
+
+  function test_shouldCreditGasFees_WhenALotBigger() public {
+    creditFuzzHelper(30, 1e24);
+  }
+
+  function creditFuzzHelper(uint8 expectedDigits, uint256 multiplier) public {
+    uint256 originalAmount = 1000;
+    uint256 amount = originalAmount * multiplier;
+    console.log("amount", amount);
+
+    address secondAddress = actor("secondAddress");
+    address thirdAddress = actor("thirdAddress");
+
+    feeCurrencyAdapterForFuzzyTests.initialize(
+      address(feeCurrency),
+      "adapter",
+      "ad",
+      expectedDigits
+    );
+    vm.prank(address(0));
+    feeCurrencyAdapterForFuzzyTests.debitGasFees(address(this), amount);
+
+    vm.prank(address(0));
+    feeCurrencyAdapterForFuzzyTests.creditGasFees(
+      address(this),
+      secondAddress,
+      address(0),
+      thirdAddress,
+      amount / 4,
+      amount / 4,
+      0,
+      amount / 4
+    );
+    assertEq(
+      feeCurrency.balanceOf(address(this)),
+      (initialSupply - originalAmount) + (originalAmount / 4)
+    );
+    assertEq(feeCurrency.balanceOf(secondAddress), originalAmount / 4);
+    assertEq(feeCurrency.balanceOf(thirdAddress), originalAmount / 2);
+
+    assertEq(
+      feeCurrencyAdapterForFuzzyTests.balanceOf(address(this)),
+      (initialSupply - originalAmount) * multiplier + ((originalAmount * multiplier) / 4)
+    );
+    assertEq(
+      feeCurrencyAdapterForFuzzyTests.balanceOf(secondAddress),
+      (originalAmount * multiplier) / 4
+    );
+    assertEq(
+      feeCurrencyAdapterForFuzzyTests.balanceOf(thirdAddress),
+      (originalAmount * multiplier) / 2
+    );
+  }
 }
 
 contract FeeCurrencyAdapter_UpscaleAndDownScaleTests is FeeCurrencyAdapterTest {
@@ -239,17 +388,17 @@ contract FeeCurrencyAdapter_UpscaleAndDownScaleTests is FeeCurrencyAdapterTest {
   }
 }
 
-contract FeeCurrencyAdapter_SetWrappedToken is FeeCurrencyAdapterTest {
+contract FeeCurrencyAdapter_SetAdaptedToken is FeeCurrencyAdapterTest {
   function test_shouldRevert_WhenNotCalledByOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(nonOwner);
-    feeCurrencyAdapter.setWrappedToken(address(0));
+    feeCurrencyAdapter.setAdaptedToken(address(0));
   }
 
-  function test_shouldSetWrappedToken() public {
+  function test_shouldSetAdaptedToken() public {
     address newWrappedToken = actor("newWrappedToken");
-    feeCurrencyAdapter.setWrappedToken(newWrappedToken);
-    assertEq(address(feeCurrencyAdapter.wrappedToken()), newWrappedToken);
-    assertEq(feeCurrencyAdapter.getWrappedToken(), newWrappedToken);
+    feeCurrencyAdapter.setAdaptedToken(newWrappedToken);
+    assertEq(address(feeCurrencyAdapter.adaptedToken()), newWrappedToken);
+    assertEq(feeCurrencyAdapter.getAdaptedToken(), newWrappedToken);
   }
 }

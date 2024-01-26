@@ -13,7 +13,7 @@ import "./interfaces/IFeeCurrency.sol";
 import "./interfaces/IDecimals.sol";
 
 contract FeeCurrencyAdapter is Initializable, CalledByVm {
-  IFeeCurrency public wrappedToken;
+  IFeeCurrency public adaptedToken;
 
   uint96 public digitDifference;
 
@@ -21,6 +21,17 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
 
   string public name;
   string public symbol;
+
+  event GasFeesDebited(address indexed debitedFrom, uint256 debitedAmount);
+
+  event GasFeesCredited(
+    address indexed refundRecipient,
+    address indexed tipRecipient,
+    address indexed baseFeeRecipient,
+    uint256 refundAmount,
+    uint256 tipAmount,
+    uint256 baseFeeAmount
+  );
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -30,21 +41,22 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-   * @param _wrappedToken The address of the wrapped token.
-   * @param _name The name of the wrapped token.
-   * @param _symbol The symbol of the wrapped token.
-   * @param _expectedDecimals The expected number of decimals of the wrapped token.
+   * @param _adaptedToken The address of the adapted token.
+   * @param _name The name of the adapted token.
+   * @param _symbol The symbol of the adapted token.
+   * @param _expectedDecimals The expected number of decimals of the adapted token.
    */
   function initialize(
-    address _wrappedToken,
+    address _adaptedToken,
     string memory _name,
     string memory _symbol,
     uint8 _expectedDecimals
   ) public virtual initializer {
-    _setWrappedToken(_wrappedToken);
+    _setAdaptedToken(_adaptedToken);
     name = _name;
     symbol = _symbol;
-    uint8 decimals = IDecimals(_wrappedToken).decimals();
+    uint8 decimals = IDecimals(_adaptedToken).decimals();
+    require(decimals < _expectedDecimals, "Decimals of adapted token must be < expected decimals.");
     digitDifference = uint96(10**(_expectedDecimals - decimals));
   }
 
@@ -54,31 +66,33 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
      * @return The balance of the specified address.
      */
   function balanceOf(address account) public view returns (uint256) {
-    return upscale(wrappedToken.balanceOf(account));
+    return upscale(adaptedToken.balanceOf(account));
   }
 
   /**
-   * Downscales value to the wrapped token's native digits and debits it.
+   * Downscales value to the adapted token's native digits and debits it.
    * @param from from address
-   * @param value Debited value in the wrapped digits.
+   * @param value Debited value in the adapted digits.
    */
   function debitGasFees(address from, uint256 value) external onlyVm {
-    uint256 toDebit = downscale(value);
-    require(toDebit > 0, "Must debit at least one token.");
-    debited = toDebit;
-    wrappedToken.debitGasFees(from, toDebit);
+    uint256 valueScaled = downscale(value);
+    require(valueScaled > 0, "Must debit at least one token.");
+    debited = valueScaled;
+    adaptedToken.debitGasFees(from, valueScaled);
+
+    emit GasFeesDebited(from, valueScaled);
   }
 
   /**
-   * Downscales value to the wrapped token's native digits and credits it.
+   * Downscales value to the adapted token's native digits and credits it.
    * @param refundRecipient The recipient of the refund.
    * @param tipRecipient The recipient of the tip.
    * @param _gatewayFeeRecipient The recipient of the gateway fee. Unused.
    * @param baseFeeRecipient The recipient of the base fee.
-   * @param refundAmount The amount to refund (in wrapped token digits).
-   * @param tipAmount The amount to tip (in wrapped token digits).
-   * @param _gatewayFeeAmount The amount of the gateway fee (in wrapped token digits). Unused.
-   * @param baseFeeAmount The amount of the base fee (in wrapped token digits).
+   * @param refundAmount The amount to refund (in adapted token digits).
+   * @param tipAmount The amount to tip (in adapted token digits).
+   * @param _gatewayFeeAmount The amount of the gateway fee (in adapted token digits). Unused.
+   * @param baseFeeAmount The amount of the base fee (in adapted token digits).
    */
   function creditGasFees(
     address refundRecipient,
@@ -109,7 +123,7 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
     if (roundingError > 0) {
       baseTxFeeScaled += roundingError;
     }
-    wrappedToken.creditGasFees(
+    adaptedToken.creditGasFees(
       refundRecipient,
       tipRecipient,
       address(0),
@@ -121,14 +135,23 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
     );
 
     debited = 0;
+
+    emit GasFeesCredited(
+      refundRecipient,
+      tipRecipient,
+      baseFeeRecipient,
+      refundScaled,
+      tipTxFeeScaled,
+      baseTxFeeScaled
+    );
   }
 
   /**
-   * @notice Returns wrapped token address.
-   * @return The wrapped token address.
+   * @notice Returns adapted token address.
+   * @return The adapted token address.
    */
-  function getWrappedToken() external view returns (address) {
-    return address(wrappedToken);
+  function getAdaptedToken() external view returns (address) {
+    return address(adaptedToken);
   }
 
   function upscale(uint256 value) internal view returns (uint256) {
@@ -139,7 +162,7 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
     return value / digitDifference;
   }
 
-  function _setWrappedToken(address _wrappedToken) internal virtual {
-    wrappedToken = IFeeCurrency(_wrappedToken);
+  function _setAdaptedToken(address _adaptedToken) internal virtual {
+    adaptedToken = IFeeCurrency(_adaptedToken);
   }
 }

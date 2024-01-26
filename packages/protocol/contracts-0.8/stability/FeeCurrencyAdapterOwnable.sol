@@ -15,26 +15,26 @@ contract FeeCurrencyAdapterOwnable is FeeCurrencyAdapter, Ownable {
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-   * @param _wrappedToken The address of the wrapped token.
-   * @param _name The name of the wrapped token.
-   * @param _symbol The symbol of the wrapped token.
-   * @param _expectedDecimals The expected number of decimals of the wrapped token.
+   * @param _adaptedToken The address of the adapted token.
+   * @param _name The name of the adapted token.
+   * @param _symbol The symbol of the adapted token.
+   * @param _expectedDecimals The expected number of decimals of the adapted token.
    */
   function initialize(
-    address _wrappedToken,
+    address _adaptedToken,
     string memory _name,
     string memory _symbol,
     uint8 _expectedDecimals
   ) public override {
     _transferOwnership(msg.sender);
-    super.initialize(_wrappedToken, _name, _symbol, _expectedDecimals);
+    super.initialize(_adaptedToken, _name, _symbol, _expectedDecimals);
   }
 
   /**
-   * @notice Sets wrapped token address.
-   * @param _wrappedToken The address of the wrapped token.
+   * @notice Sets adapted token address.
+   * @param _adaptedToken The address of the adapted token.
    */
-  function setWrappedToken(address _wrappedToken) public onlyOwner {
-    _setWrappedToken(_wrappedToken);
+  function setAdaptedToken(address _adaptedToken) public onlyOwner {
+    _setAdaptedToken(_adaptedToken);
   }
 }
