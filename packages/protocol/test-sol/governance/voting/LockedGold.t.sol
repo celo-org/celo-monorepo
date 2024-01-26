@@ -2399,33 +2399,3 @@ contract LockedGoldUpdateDelegatedAmount is LockedGoldTest {
     helper_ShouldReturnCorrectValue(delegator, delegatorSigner, delegatee);
   }
 }
-
-contract LockedGoldGetTotalPendingWithdrawalsCount is LockedGoldTest {
-  uint256 value = 1000;
-  address account = actor("account");
-
-  function setUp() public {
-    super.setUp();
-
-    vm.deal(account, 10 ether);
-  }
-
-  function test_ShouldReturn0_WhenAccountHasNoPendingWithdrawals() public {
-    assertEq(lockedGold.getTotalPendingWithdrawalsCount(actor("account")), 0);
-  }
-
-  function test_ShouldReturnCorrectValue_WhenAccountHasPendingWithdrawals() public {
-    vm.startPrank(account);
-    accounts.createAccount();
-    lockedGold.lock.value(value)();
-
-    lockedGold.unlock(value / 2);
-    lockedGold.unlock(value / 2);
-
-    assertEq(lockedGold.getTotalPendingWithdrawalsCount(account), 2);
-  }
-
-  function test_ShouldReturn0_WhenNonExistentAccount() public {
-    assertEq(lockedGold.getTotalPendingWithdrawalsCount(randomAddress), 0);
-  }
-}

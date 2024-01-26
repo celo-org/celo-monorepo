@@ -770,15 +770,6 @@ contract LockedGold is
   }
 
   /**
-    * @notice Returns the number of pending withdrawals for the specified account.
-    * @param account The address of the account.
-    * @return The count of pending withdrawals.
-    */
-  function getTotalPendingWithdrawalsCount(address account) external view returns (uint256) {
-    return balances[account].pendingWithdrawals.length;
-  }
-
-  /**
    * @notice Returns the total amount to withdraw from unlocked gold for an account.
    * @param account The address of the account.
    * @return Total amount to withdraw.
