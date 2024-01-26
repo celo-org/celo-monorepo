@@ -69,7 +69,6 @@ contract FeeCurrencyWhitelist is
   }
 
   function setUnderlyinToken(address tokenAddress) external onlyOwner() {
-    // TODO add remove UnderlyinToken
     underlyingTokens.push(tokenAddress);
     emit UnderlyinTokenSet(tokenAddress);
   }
