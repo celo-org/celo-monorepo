@@ -136,7 +136,7 @@ export const generateAddress = (mnemonic: string, accountType: AccountType, inde
 export const privateKeyToPublicKey = (privateKey: string): string => {
   // NOTE: elliptic is disabled elsewhere in this library to prevent
   // accidental signing of truncated messages.
-  // tslint:disable-next-line:import-blacklist
+  // eslint-disable-next-line:import-blacklist
   const EC = require('elliptic').ec
   const ec = new EC('secp256k1')
   const ecPrivateKey = ec.keyFromPrivate(Buffer.from(privateKey, 'hex'))

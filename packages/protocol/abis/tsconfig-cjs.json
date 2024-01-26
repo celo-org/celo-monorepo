@@ -1,8 +1,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "esModuleInterop": false,
+    "declaration": false,
+    "moduleResolution": "node",
     "module": "CommonJS",
-    "outDir": "./lib/cjs"
+    "outDir": "./dist/cjs"
   },
-  "references": [{ "path": "../../sdk/utils" }]
 }

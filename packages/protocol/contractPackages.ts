@@ -3,16 +3,16 @@ export interface ContractPackage {
   folderPath?: string
   name: string
   contracts: string[]
-  contracstFolder?: string
+  contractsFolder?: string
   proxyContracts?: string[]
   truffleConfig?: string
   solidityVersion?: string
   proxiesPath?: string
 }
 
-export const MENTO_PACKAGE: ContractPackage = {
+export const MENTO_PACKAGE = {
   path: 'mento-core',
-  contracstFolder: 'contracts',
+  contractsFolder: 'contracts',
   folderPath: 'lib',
   name: 'mento',
   contracts: [
@@ -38,11 +38,11 @@ export const MENTO_PACKAGE: ContractPackage = {
     'StableTokenProxy',
   ],
   truffleConfig: 'truffle-config.js',
-}
+} satisfies ContractPackage
 
-export const SOLIDITY_08_PACKAGE: ContractPackage = {
+export const SOLIDITY_08_PACKAGE = {
   path: 'contracts-0.8',
-  contracstFolder: '',
+  contractsFolder: '',
   folderPath: '',
   name: '0.8',
   proxiesPath: '/', // Proxies are still with 0.5 contracts
@@ -51,4 +51,4 @@ export const SOLIDITY_08_PACKAGE: ContractPackage = {
   contracts: ['GasPriceMinimum'],
   proxyContracts: ['GasPriceMinimumProxy'],
   truffleConfig: 'truffle-config0.8.js',
-}
+} satisfies ContractPackage

@@ -23,7 +23,7 @@ export const getSignatureForAttestation = async (
         method: 'eth_signTypedData',
         params: [signer, typedData],
       },
-      (error, resp) => {
+      (error: Error, resp: {result: string}) => {
         if (error) {
           reject(error)
         } else {

@@ -23,7 +23,7 @@ async function getKubernetesPortForwardCmd(
   if (!component) {
     component = DEFAULT_COMPONENT
   }
-  console.log(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
+  console.info(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
   const portForwardArgs = await getPortForwardArgs(celoEnv, component, ports)
   return `kubectl ${portForwardArgs.join(' ')}`
 }
@@ -32,7 +32,7 @@ async function getPortForwardArgs(celoEnv: string, component?: string, ports = d
   if (!component) {
     component = DEFAULT_COMPONENT
   }
-  console.log(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
+  console.info(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
   // The testnet helm chart used to have the label app=ethereum, but this was changed
   // to app=testnet. To preserve backward compatibility, we search for both labels.
   // It's not expected to ever have a situation where a namespace has pods with
@@ -47,8 +47,8 @@ export async function portForward(celoEnv: string, component?: string, ports?: s
   try {
     const portForwardCmd = await getPortForwardCmd(celoEnv, component, ports)
     const splitCmd = portForwardCmd.split(' ')
-    console.log(`Port-forwarding to celoEnv ${celoEnv} ports ${ports}`)
-    console.log(`\t$ ${portForwardCmd}`)
+    console.info(`Port-forwarding to celoEnv ${celoEnv} ports ${ports}`)
+    console.info(`\t$ ${portForwardCmd}`)
     await spawnSync(splitCmd[0], splitCmd.slice(1), {
       stdio: 'inherit',
     })

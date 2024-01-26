@@ -1,4 +1,4 @@
-// tslint:disable:no-console
+/* eslint-disable no-console: 0 */
 import { CeloTxReceipt, TransactionResult } from '@celo/connect'
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
@@ -19,12 +19,12 @@ import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
+  Validator,
   generateGenesis,
   generateGenesisWithMigrations,
   generatePrivateKey,
   privateKeyToAddress,
   privateKeyToPublicKey,
-  Validator,
 } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
@@ -309,7 +309,7 @@ const validateTransactionAndReceipt = (
 }
 
 const tracerLog = (logMessage: any) => {
-  console.log(JSON.stringify(logMessage))
+  console.info(JSON.stringify(logMessage))
 }
 
 const exitTracerTool = (logMessage: any) => {
@@ -941,7 +941,7 @@ export const runGethNodes = async ({
 
   if (verbose) {
     const validatorAddresses = validators.map((validator) => validator.address)
-    console.log('Validators', JSON.stringify(validatorAddresses, null, 2))
+    console.info('Validators', JSON.stringify(validatorAddresses, null, 2))
   }
 
   for (const instance of gethConfig.instances) {
@@ -997,7 +997,7 @@ export async function initGeth(
   const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
   if (verbose) {
     console.info(`geth:${instance.name}: init datadir ${datadir}`)
-    console.log(`init geth with genesis at ${genesisPath}`)
+    console.info(`init geth with genesis at ${genesisPath}`)
   }
 
   await spawnCmdWithExitOnFailure('rm', ['-rf', datadir], { silent: !verbose })
@@ -1036,7 +1036,7 @@ export async function importPrivateKey(
   ]
 
   if (verbose) {
-    console.log(gethBinaryPath, ...args)
+    console.info(gethBinaryPath, ...args)
   }
 
   await spawnCmdWithExitOnFailure(gethBinaryPath, args, { silent: true })
@@ -1070,14 +1070,14 @@ export async function getEnode(peer: string, ws: boolean = false) {
 export async function addStaticPeers(datadir: string, peers: string[], verbose: boolean) {
   const staticPeersPath = path.join(datadir, 'static-nodes.json')
   if (verbose) {
-    console.log(`Writing static peers to ${staticPeersPath}`)
+    console.info(`Writing static peers to ${staticPeersPath}`)
   }
 
   const enodes = await Promise.all(peers.map((peer) => getEnode(peer)))
   const enodesString = JSON.stringify(enodes, null, 2)
 
   if (verbose) {
-    console.log('eNodes', enodesString)
+    console.info('eNodes', enodesString)
   }
 
   fs.writeFileSync(staticPeersPath, enodesString)
@@ -1106,9 +1106,9 @@ export async function startGeth(
   verbose: boolean
 ) {
   if (verbose) {
-    console.log('starting geth with config', JSON.stringify(instance, null, 2))
+    console.info('starting geth with config', JSON.stringify(instance, null, 2))
   } else {
-    console.log(`${instance.name}: starting.`)
+    console.info(`${instance.name}: starting.`)
   }
 
   const datadir = getDatadir(gethConfig.runPath, instance)
@@ -1295,19 +1295,19 @@ export async function startGeth(
     try {
       block = await new Web3('http://localhost:8545').eth.getBlock('latest')
     } catch (e) {
-      console.log(`Failed to fetch test block: ${e}`)
+      console.info(`Failed to fetch test block: ${e}`)
     }
     if (block) {
       break
     }
-    console.log('Could not fetch test block. Wait one second, then retry.')
+    console.info('Could not fetch test block. Wait one second, then retry.')
     await sleep(1000)
   }
   if (tries === maxTries) {
     throw new Error(`Geth did not start within ${tries} seconds`)
   }
 
-  console.log(
+  console.info(
     `${instance.name}: running.`,
     rpcport ? `RPC: ${rpcport}` : '',
     wsport ? `WS: ${wsport}` : '',
@@ -1331,13 +1331,13 @@ export function writeGenesis(gethConfig: GethRunConfig, validators: Validator[],
   const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
 
   if (verbose) {
-    console.log('writing genesis')
+    console.info('writing genesis')
   }
 
   fs.writeFileSync(genesisPath, genesis)
 
   if (verbose) {
-    console.log(`wrote genesis to ${genesisPath}`)
+    console.info(`wrote genesis to ${genesisPath}`)
   }
 }
 
@@ -1366,13 +1366,13 @@ export async function writeGenesisWithMigrations(
   const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
 
   if (verbose) {
-    console.log('writing genesis')
+    console.info('writing genesis')
   }
 
   fs.writeFileSync(genesisPath, genesis)
 
   if (verbose) {
-    console.log(`wrote genesis to ${genesisPath}`)
+    console.info(`wrote genesis to ${genesisPath}`)
   }
 }
 
@@ -1382,7 +1382,7 @@ export async function snapshotDatadir(
   verbose: boolean
 ) {
   if (verbose) {
-    console.log('snapshotting data dir')
+    console.info('snapshotting data dir')
   }
 
   // Sometimes the socket is still present, preventing us from snapshotting.
@@ -1441,7 +1441,7 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string, 
   const logStream = fs.createWriteStream(logsFilepath, { flags: 'a' })
 
   if (verbose) {
-    console.log(cmd, ...args)
+    console.info(cmd, ...args)
   }
 
   const p = spawn(cmd, args)
@@ -1488,7 +1488,7 @@ export async function connectBipartiteClique(
               return
             }
             if (verbose) {
-              console.log(`connecting ${sourceEnode} with ${enode}`)
+              console.info(`connecting ${sourceEnode} with ${enode}`)
             }
             const success = await admin.addPeer(enode)
             if (!success) {

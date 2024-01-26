@@ -1,4 +1,4 @@
-/* tslint:disable no-console */
+/* eslint:disable no-console */
 import FormData from 'form-data'
 import fs from 'fs'
 import fetch from 'node-fetch'
@@ -39,6 +39,10 @@ interface BuildOptions {
   proposalPath: string
 }
 
+type Artifact = {
+  contractName: string
+}
+
 async function main(buildTargets: BuildOptions) {
   const artifactBasePath = buildTargets.buildArtifactsPath || './build/contracts'
   const artifactPaths = fs.readdirSync(artifactBasePath)
@@ -48,16 +52,17 @@ async function main(buildTargets: BuildOptions) {
   const web3 = new Web3('http://localhost:8545')
   const chainId = await web3.eth.getChainId()
 
-  console.log('Uploading sources & metadata')
-  console.log('============================')
-  console.log(artifactPaths)
+  console.info('Uploading sources & metadata')
+  console.info('============================')
+  console.info(artifactPaths)
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   const artifacts = artifactPaths.map((a) => require(path.join(process.cwd(), artifactBasePath, a)))
 
   if (
     !isEqual(
-      artifacts.map((a) => a.contractName),
-      report.map((a) => a.contract)
+      artifacts.map((a: Artifact) => a.contractName),
+      report.map((a: { contract: string }) => a.contract)
     )
   ) {
     if (report.length !== artifactPaths.length) {
@@ -70,11 +75,11 @@ async function main(buildTargets: BuildOptions) {
   }
 
   for (const r of report) {
-    const artifact = artifacts.find((a) => a.contractName === r.contract)
+    const artifact: Artifact = artifacts.find((a) => a.contractName === r.contract)
 
-    console.log()
-    console.log(artifact.contractName)
-    console.log('-'.repeat(artifact.contractName.length))
+    console.info()
+    console.info(artifact.contractName)
+    console.info('-'.repeat(artifact.contractName.length))
 
     const address = r.contract.includes('Proxy') ? r.args[0] : r.args[1]
     const formData = new FormData()
@@ -96,19 +101,19 @@ async function main(buildTargets: BuildOptions) {
         )
       )
   }
-  console.log('Finished.')
+  console.info('Finished.')
 }
 
 const isEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b)
 
 const minimist = require('minimist')
-const argv = minimist(process.argv.slice(3), {
+const argv: BuildOptions = minimist(process.argv.slice(3), {
   string: ['network', 'build_artifacts_path', 'proposal_path'],
 })
 
 main(argv)
   .then(() => process.exit(0))
   .catch((err) => {
-    console.log(err)
+    console.info(err)
     process.exit(1)
   })

@@ -1,4 +1,3 @@
-// tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { ensureLeading0x } from '@celo/utils/lib/address'

@@ -579,10 +579,10 @@ NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores
 NetworkConfigs.mainnet = NetworkConfigs.rc1
 
 const linkedLibraries = {
-  Proposals: ['Governance', 'GovernanceTest'],
+  Proposals: ['Governance'],
   AddressLinkedList: ['Validators', 'ValidatorsTest'],
   AddressSortedLinkedList: ['Election', 'ElectionTest'],
-  IntegerSortedLinkedList: ['Governance', 'GovernanceTest', 'IntegerSortedLinkedListTest'],
+  IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
   Signatures: [
     'Accounts',
@@ -590,7 +590,6 @@ const linkedLibraries = {
     'AttestationsTest',
     'LockedGold',
     'Escrow',
-    'MetaTransactionWallet',
     'FederatedAttestations',
   ],
 }
