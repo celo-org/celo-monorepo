@@ -127,6 +127,13 @@ contract FeeCurrencyAdapter_Initialize is FeeCurrencyAdapterTest {
     feeCurrencyAdapter.initialize(address(feeCurrency), "adapter", "ad", 18);
   }
 
+  function test_ShouldSucceed_WhenExpectedDecimalsAreMoreThenDecimals_Fuzz(uint8 amount) public {
+    vm.assume(amount > 6);
+    vm.assume(amount < 50);
+    console.log("amount", amount);
+    feeCurrencyAdapterForFuzzyTests.initialize(address(feeCurrency), "adapter", "ad", amount);
+  }
+
   function test_ShouldRevert_WhenExpectedDecimalsAreLessThenDecimals() public {
     vm.expectRevert("Decimals of adapted token must be < expected decimals.");
     feeCurrencyAdapterForFuzzyTests.initialize(address(feeCurrency), "adapter", "ad", 5);
@@ -158,14 +165,6 @@ contract FeeCurrencyAdapter_DebitGasFees is FeeCurrencyAdapterTest {
   function test_shouldRevert_WhenNotCalledByVm() public {
     vm.expectRevert("Only VM can call");
     feeCurrencyAdapter.debitGasFees(address(this), 1000);
-  }
-
-  function test_ShouldEmitGasFeesDebitedEvent() public {
-    uint256 amount = 1000 * 1e12;
-    vm.expectEmit(true, true, true, true);
-    emit GasFeesDebited(address(this), amount / 1e12);
-    vm.prank(address(0));
-    feeCurrencyAdapter.debitGasFees(address(this), amount);
   }
 
   function test_ShouldDebitCorrectAmount_WhenExpectedDigitsOnlyOneBigger() public {
@@ -268,33 +267,6 @@ contract FeeCurrencyAdapter_CreditGasFees is FeeCurrencyAdapterTest {
     );
     uint256 balanceAfter = feeCurrency.balanceOf(address(this));
     assertEq(balanceBefore, balanceAfter);
-  }
-
-  function test_ShouldEmitGasFeesCredited() public {
-    uint256 amount = 1000 * 1e12;
-    vm.prank(address(0));
-    feeCurrencyAdapter.debitGasFees(address(this), amount);
-
-    vm.expectEmit(true, true, true, true);
-    emit GasFeesCredited(
-      address(this),
-      address(this),
-      address(this),
-      amount / 1e12 / 4,
-      amount / 1e12 / 4,
-      amount / 1e12 / 2
-    );
-    vm.prank(address(0));
-    feeCurrencyAdapter.creditGasFees(
-      address(this),
-      address(this),
-      address(0),
-      address(this),
-      amount / 4,
-      amount / 4,
-      0,
-      amount / 4
-    );
   }
 
   function test_shouldCreditGasFees_WhenOnlyOneBigger() public {

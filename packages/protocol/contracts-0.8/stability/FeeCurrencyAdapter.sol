@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/access/Ownable.sol";
@@ -21,17 +21,6 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
 
   string public name;
   string public symbol;
-
-  event GasFeesDebited(address indexed debitedFrom, uint256 debitedAmount);
-
-  event GasFeesCredited(
-    address indexed refundRecipient,
-    address indexed tipRecipient,
-    address indexed baseFeeRecipient,
-    uint256 refundAmount,
-    uint256 tipAmount,
-    uint256 baseFeeAmount
-  );
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -79,8 +68,6 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
     require(valueScaled > 0, "Must debit at least one token.");
     debited = valueScaled;
     adaptedToken.debitGasFees(from, valueScaled);
-
-    emit GasFeesDebited(from, valueScaled);
   }
 
   /**
@@ -135,15 +122,6 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
     );
 
     debited = 0;
-
-    emit GasFeesCredited(
-      refundRecipient,
-      tipRecipient,
-      baseFeeRecipient,
-      refundScaled,
-      tipTxFeeScaled,
-      baseTxFeeScaled
-    );
   }
 
   /**
