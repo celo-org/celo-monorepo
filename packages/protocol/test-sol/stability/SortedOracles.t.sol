@@ -574,12 +574,16 @@ contract Report is SortedOraclesTest {
     assertEq(denominator, FIXED1);
   }
 
-  function setEquivalentTokenFuzzyHelper(uint256 oneCeloDigits, uint256 oneUSDDigits, uint256 onecUSDDigits) public {
+  function setEquivalentTokenFuzzyHelper(
+    uint256 oneCeloDigits,
+    uint256 oneUSDDigits,
+    uint256 onecUSDDigits
+  ) public {
     uint256 cUSDRate = 700000000000000000000000;
 
-    uint256 oneCELO = 10 ** oneCeloDigits;
-    uint256 oneUSD = 10 ** oneUSDDigits;
-    uint256 onecUSD = 10 ** onecUSDDigits;
+    uint256 oneCELO = 10**oneCeloDigits;
+    uint256 oneUSD = 10**oneUSDDigits;
+    uint256 onecUSD = 10**onecUSDDigits;
     uint256 diff = oneCELO / oneUSD;
 
     uint256 celoFromcUSD = FixidityLib
@@ -605,11 +609,15 @@ contract Report is SortedOraclesTest {
     setEquivalentTokenFuzzyHelper(18, 6, 18);
   }
 
-  function test_ShouldReturnTheMedianRateWithDifferentMultiplier_WhenEquivalentTokenIsSet_WhenMultiplierIsOneBigger() public {
+  function test_ShouldReturnTheMedianRateWithDifferentMultiplier_WhenEquivalentTokenIsSet_WhenMultiplierIsOneBigger()
+    public
+  {
     setEquivalentTokenFuzzyHelper(18, 17, 18);
   }
 
-  function test_ShouldReturnTheMedianRateWithDifferentMultiplier_WhenEquivalentTokenIsSet_WhenMultiplierIsALotBigger() public {
+  function test_ShouldReturnTheMedianRateWithDifferentMultiplier_WhenEquivalentTokenIsSet_WhenMultiplierIsALotBigger()
+    public
+  {
     setEquivalentTokenFuzzyHelper(18, 0, 18);
   }
 
