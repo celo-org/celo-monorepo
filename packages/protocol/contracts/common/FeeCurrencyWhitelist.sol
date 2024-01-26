@@ -20,10 +20,17 @@ contract FeeCurrencyWhitelist is
 {
   // Array of all the tokens enabled
   address[] public whitelist;
+  // it is not enforce that underlyingTokens in the same order as their underlying
+  // whitelisted address
+  address[] public underlyingTokens;
+  mapping(address => address) public adapters;
 
   event FeeCurrencyWhitelisted(address token);
 
   event FeeCurrencyWhitelistRemoved(address token);
+  event AdaptorSet(address underlyingToken, address adapter);
+  event UnderlyinTokenSet(address underlyingToken);
+  event UnderlyinTokenRemoved(address underlyingToken);
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -46,7 +53,52 @@ contract FeeCurrencyWhitelist is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 2, 0);
+  }
+
+  // removed with address zero
+  function setAdaptor(address token, address adaptor) external onlyOwner {
+    adapters[token] = adaptor;
+    emit AdaptorSet(token, adaptor);
+  }
+
+  // TODO make external
+  function getAdaptor(address underlyingToken) public view returns(address){
+    address result = adapters[underlyingToken];
+    return (result != address(0))? result: underlyingToken;
+  }
+
+  function setUnderlyinToken(address tokenAddress) external onlyOwner() {
+    // TODO add remove UnderlyinToken
+    underlyingTokens.push(tokenAddress);
+    emit UnderlyinTokenSet(tokenAddress);
+  }
+
+  function getUnderlyingTokens() external view returns(address[] memory){
+    return underlyingTokens;
+  }
+
+  // TODO when this contracts gets moved to Solidity 0.8 it should
+  // return an array of tuples
+  // secuence of underlyingtoken and it's corresponding adapter
+  function getWhitelistUnderlyngPairs() external view returns(address[] memory){
+    uint256 outLenght = underlyingTokens.length*2;
+    address[] memory result = new address[](outLenght);
+
+    for (uint256 i=0; i < underlyingTokens.length; i++){
+      address underlyingToken = underlyingTokens[i];
+      result[i*2] = getAdaptor(underlyingToken);
+      result[(i*2)+1] = underlyingToken;
+    }
+    return result;
+  }
+
+  function removeUnderlyinTokens(address tokenAddress, uint256 index) external onlyOwner {
+    require(underlyingTokens[index] == tokenAddress, "Index does not match");
+    uint256 length = underlyingTokens.length;
+    underlyingTokens[index] = underlyingTokens[length - 1];
+    underlyingTokens.pop();
+    emit UnderlyinTokenRemoved(tokenAddress);
   }
 
   /**
