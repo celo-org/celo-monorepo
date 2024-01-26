@@ -20,10 +20,6 @@ oracle:
       {exchange: 'BITSO', symbol: 'USDBRL', toInvert: false }
     ],
     [
-      {exchange: 'BINANCEUS', symbol: 'USDCUSD', toInvert: false},
-      {exchange: 'BITSO', symbol: 'USDBRL', toInvert: false }
-    ],
-    [
       {exchange: 'COINBASE', symbol: 'USDTUSDC', toInvert: true},
       {exchange: 'BINANCE', symbol: 'USDTBRL', toInvert: false }
     ],

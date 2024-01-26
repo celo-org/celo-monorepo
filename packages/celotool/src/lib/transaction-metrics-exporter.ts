@@ -1,10 +1,9 @@
-import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from 'src/lib/env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import {
   installGenericHelmChart,
   removeGenericHelmChart,
   upgradeGenericHelmChart,
 } from 'src/lib/helm_deploy'
-import { getInternalTxNodeLoadBalancerIP } from 'src/lib/vm-testnet-utils'
 
 const chartDir = '../helm-charts/transaction-metrics-exporter/'
 
@@ -58,8 +57,5 @@ async function helmParameters(celoEnv: string) {
       ''
     )}`,
   ]
-  if (isVmBased()) {
-    params.push(`--set web3Provider="ws://${await getInternalTxNodeLoadBalancerIP(celoEnv)}:8546"`)
-  }
   return params
 }

@@ -1,21 +1,34 @@
 {
-  "compileOnSave": false,
-  "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "baseUrl": ".",
-    "jsx": "preserve",
-    "lib": ["dom", "es2015", "es2016"],
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "removeComments": false,
-    "skipLibCheck": true,
-    "sourceMap": true,
-    "target": "es5",
-    "downlevelIteration": true
-  },
-  "exclude": ["node_modules"],
-  "references": [{ "path": "../sdk/utils" }]
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "display": "Recommended",
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "baseUrl": ".",
+        "lib": [
+            "es2015",
+            "es2016"
+        ],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "removeComments": false,
+        "sourceMap": false,
+        "target": "es5",
+        "downlevelIteration": true,
+        "resolveJsonModule": true,
+        "strict": false,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "paths": {
+          "@celo/protocol/*": ["./*"]
+        }
+    },
+    "exclude": [
+        "node_modules",
+        "wagmi.config.ts",
+        "abis",
+        "scripts/**/*.test.ts"
+    ]
 }

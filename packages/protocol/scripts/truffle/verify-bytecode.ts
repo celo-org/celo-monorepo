@@ -60,11 +60,11 @@ module.exports = async (callback: (error?: any) => number) => {
       network
     )
 
-    // tslint:disable-next-line: no-console
-    console.log('Success, no bytecode mismatches found!')
+    // eslint-disable-next-line: no-console
+    console.info('Success, no bytecode mismatches found!')
 
-    // tslint:disable-next-line: no-console
-    console.log(`Writing linked library addresses to ${librariesFile}`)
+    // eslint-disable-next-line: no-console
+    console.info(`Writing linked library addresses to ${librariesFile}`)
     writeJsonSync(librariesFile, libraryAddresses.addresses, { spaces: 2 })
   } catch (error) {
     callback(error)

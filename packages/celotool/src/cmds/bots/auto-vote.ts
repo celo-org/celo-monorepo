@@ -175,11 +175,11 @@ async function castVote(
       return tx.sendAndWaitForReceipt({ from: botAccount })
     })
     const group = normalizeAddressWith0x(vote.group)
-    const oldCapacity = groupCapacities.get(group)!
+    const oldCapacity = groupCapacities.get(group)
     groupCapacities.set(group, oldCapacity.plus(vote.pending.plus(vote.active)))
   }
 
-  const groupCapacity = groupCapacities.get(voteForGroup)!
+  const groupCapacity = groupCapacities.get(voteForGroup)
   const voteAmount = BigNumber.minimum(lockedGoldAmount, groupCapacity)
   const voteTx = await election.vote(voteForGroup, BigNumber.minimum(voteAmount))
   await voteTx.sendAndWaitForReceipt({ from: botAccount })
@@ -218,7 +218,7 @@ async function calculateGroupScores(kit: ContractKit): Promise<Map<string, BigNu
   ).filter((v) => !!v.affiliation) // Skip unaffiliated
 
   const validatorsByGroup = groupBy(validatorAccounts, (validator) =>
-    normalizeAddressWith0x(validator.affiliation!)
+    normalizeAddressWith0x(validator.affiliation)
   )
 
   const validatorGroupScores = mapValues(validatorsByGroup, (vals) => {
@@ -258,7 +258,7 @@ function getWeightedRandomChoice(
   const sortedGroupKeys = [...groupWeights.keys()]
     .filter((k) => groupsToConsider.includes(k))
     .sort((a, b) => {
-      return groupWeights.get(b)!.comparedTo(groupWeights.get(a)!)
+      return groupWeights.get(b).comparedTo(groupWeights.get(a))
     })
 
   let weightTotal = new BigNumber(0)
@@ -270,7 +270,7 @@ function getWeightedRandomChoice(
   let totalSoFar = new BigNumber(0)
 
   for (const key of sortedGroupKeys) {
-    totalSoFar = totalSoFar.plus(groupWeights.get(key)!)
+    totalSoFar = totalSoFar.plus(groupWeights.get(key))
     if (totalSoFar.isGreaterThanOrEqualTo(choice)) {
       return key
     }

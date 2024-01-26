@@ -136,7 +136,6 @@ remote_write:
               |coredns.*\
               |cortex.*\
               |csi_operations.*\
-              |eksportisto_step_duration_bucket\
               |erlang_.+\
               |etcd_.+\
               |go_gc_.*\

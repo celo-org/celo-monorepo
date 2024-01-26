@@ -1,5 +1,3 @@
-/* tslint:disable:no-console */
-
 import { constitution } from '@celo/protocol/governanceConstitution'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
@@ -12,6 +10,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance } from 'types'
 import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
+
 import { ArtifactsSingleton } from '../lib/artifactsSingleton'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
@@ -54,7 +53,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       )
 
       for (const contractName of constitutionContractNames) {
-        console.log(`\tSetting constitution thresholds for ${contractName}`)
+        console.info(`\tSetting constitution thresholds for ${contractName}`)
 
         const artifactsObject = ArtifactsSingleton.getInstance(
           constitution[contractName].__contractPackage,

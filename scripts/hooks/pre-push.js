@@ -59,7 +59,12 @@ function getDateFromFirstCommit(fromSHA, toSHA) {
 /// MAIN
 ////////////////////////////////////////////////////////////////
 
-const [remoteName, remoteUrl] = process.env.HUSKY_GIT_PARAMS.split(' ')
+// change if the remote name is different
+const remoteName = 'origin'
+// create remote tracking branches to ensure we can compare current to origin/master
+execSync('git ls-remote --heads origin master')
+
+execSync('git fetch origin')
 
 const changes = process.env.HUSKY_GIT_STDIN.split('\n')
   .filter((line) => line !== '')
@@ -67,9 +72,7 @@ const changes = process.env.HUSKY_GIT_STDIN.split('\n')
     const [localRef, localSHA, remoteRef, remoteSHA] = line.split(' ')
     return { localRef, localSHA, remoteRef, remoteSHA }
   })
-
 for (const change of changes) {
-  // console.log('Checking commits to push to ', change.remoteRef)
   const [from, to] = getCommitRange(change, remoteName)
 
   const changedFiles = getChangedFiled(from, to)
@@ -79,7 +82,7 @@ for (const change of changes) {
   )
   if (pushedMnemonicFiles.length > 0) {
     console.error(`Trying to push conflicting files`)
-    console.log(`Conflicting Files:\n  ${pushedMnemonicFiles.join('\n  ')}`)
+    console.info(`Conflicting Files:\n  ${pushedMnemonicFiles.join('\n  ')}`)
     console.error(chalk.red(`(${change.remoteRef}) Push rejected!`))
     process.exit(1)
   }

@@ -16,8 +16,8 @@ import "../common/linkedlists/SortedLinkedListWithMedian.sol";
 /**
  * @title   SortedOracles
  *
- * @notice  This contract stores a collection of exchange rate reports between mento
- *          collateral assets and other currencies. The most recent exchange rates
+ * @notice  This contract stores a collection of exchange rates with of CELO
+ *          expressed in units of other assets. The most recent exchange rates
  *          are gathered off-chain by oracles, who then use the `report` function to
  *          submit the rates to this contract. Before submitting a rate report, an
  *          oracle's address must be added to the `isOracle` mapping for a specific
@@ -26,15 +26,13 @@ import "../common/linkedlists/SortedLinkedListWithMedian.sol";
  *          to read the reports, the calculated median rate, or the list of oracles.
  *
  * @dev     A unique rateFeedId identifies each exchange rate. In the initial implementation
- *          of this contract, the rateFeedId was set as the address of the mento stable
+ *          of this contract, the rateFeedId was set as the address of the stable
  *          asset contract that used the rate. However, this implementation has since
- *          been updated, and the rateFeedId now refers to an address derived from the
- *          concatenation of the mento collateral asset and the currency symbols' hash.
- *          This change enables the contract to store multiple exchange rates for a
- *          single stable asset. As a result of this change, there may be instances
+ *          been updated, and the rateFeedId now also refers to an address derived from the
+ *          concatenation other asset symbols. This change enables the contract to store multiple exchange rates for a
+ *          single token. As a result of this change, there may be instances
  *          where the term "token" is used in the contract code. These useages of the term
- *          "token" are actually referring to the rateFeedId. You can refer to the Mento
- *          protocol documentation to learn more about the rateFeedId and how it is derived.
+ *          "token" are actually referring to the rateFeedId.
  *
  */
 contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initializable {
