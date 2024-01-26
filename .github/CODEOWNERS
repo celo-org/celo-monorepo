@@ -7,22 +7,17 @@
 
 # directory and file-level owners. Feel free to add to this!
 
+.github/actions/ @celo-org/devopsre
+.github/workflows/ @celo-org/devopsre
+
+/dockerfiles/ @celo-org/devopsre
+
 /packages/celotool/ @celo-org/devopsre
-/packages/cli/ @celo-org/applications
-/packages/dev-utils/ @celo-org/applications
-/packages/docs/ @celo-org/applications @celo-org/devrel
-/packages/env-tests/ @celo-org/applications
-/packages/faucet/ @celo-org/applications
-/packages/flake-tracker/ @celo-org/flake-trackers
+/packages/dev-utils/ @celo-org/devtooling
+/packages/env-tests/ @celo-org/primitives
 /packages/helm-charts/ @celo-org/devopsre
-/packages/helm-charts/blockscout/ @celo-org/data-services @celo-org/devopsre
+/packages/helm-charts/mock-oracle/ @celo-org/mento  @celo-org/devopsre
+/packages/helm-charts/oracle-rbac/ @celo-org/mento  @celo-org/devopsre
 /packages/helm-charts/oracle/ @celo-org/mento  @celo-org/devopsre
-/packages/metadata-crawler/ @celo-org/data-services
-/packages/phone-number-privacy/ @celo-org/identity
-/packages/protocol/ @celo-org/primitives @celo-org/identity
-/packages/sdk/ @celo-org/applications
-/packages/sdk/identity/  @celo-org/identity @celo-org/applications
-/packages/sdk/contractkit/ @celo-org/applications
-/packages/terraform-modules-public/ @celo-org/devopsre
-/packages/terraform-modules/ @celo-org/devopsre
-/packages/typescript/ @celo-org/applications
+/packages/metadata-crawler/ @celo-org/devopsre
+/packages/protocol/ @celo-org/primitives

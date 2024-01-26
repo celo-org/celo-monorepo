@@ -1,4 +1,3 @@
-/* tslint:disable:no-console */
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloTxObject } from '@celo/connect'
 import { getBlsPoP, getBlsPublicKey } from '@celo/cryptographic-utils/lib/bls'
@@ -105,7 +104,7 @@ async function registerValidatorGroup(
   // Add a premium to cover tx fees
   const v = lockedGoldValue.times(1.01).integerValue()
 
-  console.info(`    - send funds ${v} to group address ${account.address}`)
+  console.info(`    - send funds ${v} to group address ${account.address}}`)
   await sendTransaction(web3, null, privateKey, {
     to: account.address,
     value: v,
@@ -400,5 +399,5 @@ module.exports = async (_deployer: any, networkName: string) => {
       to: election.address,
     })
   }
-  console.log('Done with migrations')
+  console.info('Done with migrations')
 }

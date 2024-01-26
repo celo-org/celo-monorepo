@@ -2,93 +2,15 @@
 
 import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
-import { existsSync, readJSONSync } from 'fs-extra'
+import fsExtraPkg from 'fs-extra'
 import minimist, { ParsedArgs } from 'minimist'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
-import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
+import { contractPackages, CoreContracts, ImplContracts, Interfaces, ROOT_DIR } from './consts'
 
-const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
+const { existsSync, readJSONSync } = fsExtraPkg
+
 const BUILD_DIR = path.join(ROOT_DIR, process.env.BUILD_DIR ?? './build')
-
-export const ProxyContracts = [
-  'AccountsProxy',
-  'AttestationsProxy',
-  'BlockchainParametersProxy',
-  'DoubleSigningSlasherProxy',
-  'DowntimeSlasherProxy',
-  'ElectionProxy',
-  'EpochRewardsProxy',
-  'EscrowProxy',
-  'FederatedAttestationsProxy',
-  'FeeHandlerProxy',
-  'MentoFeeHandlerSellerProxy',
-  'FeeCurrencyWhitelistProxy',
-  // 'GasPriceMinimumProxy',
-  'GoldTokenProxy',
-  'GovernanceApproverMultiSigProxy',
-  'GovernanceProxy',
-  'LockedGoldProxy',
-  'MetaTransactionWalletProxy',
-  'MetaTransactionWalletDeployerProxy',
-  'OdisPaymentsProxy',
-  'RegistryProxy',
-  'SortedOraclesProxy',
-  'UniswapFeeHandlerSellerProxy',
-]
-
-export const CoreContracts = [
-  // common
-  'Accounts',
-  'GasPriceMinimum',
-  'FeeHandler',
-  'MentoFeeHandlerSeller',
-  'UniswapFeeHandlerSeller',
-  'FeeCurrencyWhitelist',
-  'GoldToken',
-  'MetaTransactionWallet',
-  'MetaTransactionWalletDeployer',
-  'MultiSig',
-  'Registry',
-  'Freezer',
-  'MetaTransactionWallet',
-
-  // governance
-  'Election',
-  'EpochRewards',
-  'Governance',
-  'GovernanceApproverMultiSig',
-  'BlockchainParameters',
-  'DoubleSigningSlasher',
-  'DowntimeSlasher',
-  'LockedGold',
-  'Validators',
-  'ReleaseGold',
-
-  // identity
-  'Attestations',
-  'Escrow',
-  'FederatedAttestations',
-  'Random',
-  'OdisPayments',
-
-  // stability
-  'SortedOracles',
-]
-
-const OtherContracts = [
-  'Proxy',
-  'Migrations',
-  // abstract
-  'Initializable',
-  'UsingRegistry',
-]
-
-const contractPackages = [MENTO_PACKAGE, SOLIDITY_08_PACKAGE]
-
-const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
-
-export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
 
 function exec(cmd: string) {
   return execSync(cmd, { cwd: ROOT_DIR, stdio: 'inherit' })
@@ -98,21 +20,21 @@ function hasEmptyBytecode(contract: any) {
   return contract.bytecode === '0x'
 }
 
-function compile(outdir: string) {
-  console.log(`protocol: Compiling solidity to ${outdir}`)
+function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
+  console.info(`protocol: Compiling solidity to ${outdir}`)
 
   // the reason to generate a different folder is to avoid path collisions, which could be very dangerous
   for (const contractPackage of contractPackages) {
-    console.log(`Building Contracts for package ${contractPackage.name}`)
+    console.info(`Building Contracts for package ${contractPackage.name}`)
 
     const contractPath = path.join(
       './',
       contractPackage.folderPath,
       contractPackage.path,
-      contractPackage.contracstFolder
+      contractPackage.contractsFolder
     )
     if (!existsSync(contractPath)) {
-      console.log(`Contract package named ${contractPackage.name} doesn't exist`)
+      console.info(`Contract package named ${contractPackage.name} doesn't exist`)
       continue
     }
 
@@ -122,15 +44,35 @@ function compile(outdir: string) {
   }
 
   // compile everything else
-  exec(
-    `yarn run --silent truffle compile --contracts_directory="./contracts/" --build_directory=${outdir}`
-  )
+  try {
+    exec(
+      `yarn run --silent truffle compile --contracts_directory="./contracts/" --build_directory=${outdir}`
+    )
+  } catch (e) {
+    console.error(e)
+    console.info(
+      `
 
+    If error is something like "using solc 0.5.13, but  specify "pragma solidity >=0.8.7 <0.8.20".
+    Then try to delete the 0.8 folder inside of contracts folder (not the contracts-0.8 folder)
+
+    `
+    )
+    process.exit(1)
+  }
+
+  const contracts = coreContractsOnly ? CoreContracts : ImplContracts
   // check that there were no errors
-  for (const contractName of ImplContracts) {
+  for (const contractName of contracts) {
     try {
+      const artifactPath = `${outdir}/contracts/${contractName}.json`
+      const artifactPath8 = `${outdir}/contracts-0.8/${contractName}.json`
+      let is08 = false
       // This is issuing a warning: https://github.com/celo-org/celo-monorepo/issues/10564
-      const fileStr = readJSONSync(`${outdir}/contracts/${contractName}.json`)
+      if (existsSync(artifactPath8)) {
+        is08 = true
+      }
+      const fileStr = readJSONSync(is08 ? artifactPath8 : artifactPath)
       if (hasEmptyBytecode(fileStr)) {
         console.error(
           `${contractName} has empty bytecode. Maybe you forgot to fully implement an interface?`
@@ -138,7 +80,7 @@ function compile(outdir: string) {
         process.exit(1)
       }
     } catch (e) {
-      console.log(e)
+      console.info(e)
       console.debug(
         `WARNING: ${contractName} artifact could not be fetched. Maybe it doesn't exist?`
       )
@@ -146,11 +88,11 @@ function compile(outdir: string) {
   }
 }
 
-function generateFilesForTruffle(outdir: string) {
-  // tslint:disable-next-line
+function generateFilesForTruffle({ coreContractsOnly, truffleTypes: outdir }: BuildTargets) {
+  // eslint-disable-next-line
   for (let externalContractPackage of contractPackages) {
     const outdirExternal = outdir + '-' + externalContractPackage.name
-    console.log(
+    console.info(
       `protocol: Generating Truffle Types for external dependency ${externalContractPackage.name} to ${outdirExternal}`
     )
 
@@ -160,20 +102,38 @@ function generateFilesForTruffle(outdir: string) {
     )
   }
 
-  console.log(`protocol: Generating Truffle Types to ${outdir}`)
+  console.info(`protocol: Generating Truffle Types to ${outdir}`)
   exec(`rm -rf "${outdir}"`)
-  const globPattern = `${BUILD_DIR}/contracts/*.json`
+
+  const globPattern = coreContractsOnly
+    ? `${BUILD_DIR}/contracts/@(${CoreContracts.join('|')}).json`
+    : `${BUILD_DIR}/contracts/*.json`
+
   exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}"`)
 }
 
-async function generateFilesForContractKit(outdir: string) {
-  console.log(`protocol: Generating Web3 Types to ${outdir}`)
+function generateFilesForEthers({ coreContractsOnly, ethersTypes: outdir }: BuildTargets) {
+  console.info(`protocol: Generating Ethers Types to ${outdir}`)
+  exec(`rm -rf "${outdir}"`)
+
+  const contractKitContracts = coreContractsOnly
+    ? CoreContracts
+    : CoreContracts.concat('Proxy').concat(Interfaces)
+  const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
+
+  exec(`yarn run --silent typechain --target=ethers-v5 --outDir "${outdir}" "${globPattern}"`)
+}
+
+async function generateFilesForContractKit({ coreContractsOnly, web3Types: outdir }: BuildTargets) {
+  console.info(`protocol: Generating Web3 Types to ${outdir}`)
   exec(`rm -rf ${outdir}`)
   const relativePath = path.relative(ROOT_DIR, outdir)
 
-  const contractKitContracts = CoreContracts.concat('Proxy').concat(Interfaces)
+  const contractKitContracts = coreContractsOnly
+    ? CoreContracts
+    : CoreContracts.concat('Proxy').concat(Interfaces)
 
-  const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
+  const globPattern = `${BUILD_DIR}/contracts*/@(${contractKitContracts.join('|')}).json`
 
   const cwd = process.cwd()
 
@@ -207,27 +167,35 @@ async function generateFilesForContractKit(outdir: string) {
 }
 
 const _buildTargets: ParsedArgs = {
-  _: [],
+  _: [] as string[],
   solidity: undefined,
   truffleTypes: undefined,
   web3Types: undefined,
+  ethersTypes: undefined,
+} as const
+type BuildTargets = Record<keyof typeof _buildTargets, string> & {
+  coreContractsOnly: boolean
 }
 
-async function main(buildTargets: ParsedArgs) {
+async function main(buildTargets: BuildTargets) {
   if (buildTargets.solidity) {
-    compile(buildTargets.solidity)
+    compile(buildTargets)
   }
   if (buildTargets.truffleTypes) {
-    generateFilesForTruffle(buildTargets.truffleTypes)
+    generateFilesForTruffle(buildTargets)
+  }
+  if (buildTargets.ethersTypes) {
+    generateFilesForEthers(buildTargets)
   }
   if (buildTargets.web3Types) {
-    await generateFilesForContractKit(buildTargets.web3Types)
+    await generateFilesForContractKit(buildTargets)
   }
 }
 
 const argv = minimist(process.argv.slice(2), {
   string: Object.keys(_buildTargets),
-})
+  boolean: ['coreContractsOnly'],
+}) as unknown as BuildTargets
 
 main(argv).catch((err) => {
   console.error(err)

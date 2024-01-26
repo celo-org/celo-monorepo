@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import { CONTRACTS_TO_COPY, downloadArtifacts, getContractAddresses } from 'src/lib/artifacts'
-import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
+import { CeloEnvArgv, addCeloEnvMiddleware } from 'src/lib/env-utils'
 import yargs from 'yargs'
 
 export const command = 'contract-addresses'
@@ -36,7 +36,6 @@ export const handler = async (argv: CopyContractArtifactsArgs) => {
   if (argv.outputPath) {
     fs.writeFileSync(argv.outputPath, JSON.stringify(addressMap, null, 2))
   } else {
-    // tslint:disable-next-line: no-console
-    console.log(addressMap)
+    console.info(addressMap)
   }
 }

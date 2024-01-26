@@ -1,6 +1,5 @@
 import { CloudProvider } from '../k8s-cluster/base'
 import { AksFullNodeDeployer, AksFullNodeDeploymentConfig } from './aks'
-import { AwsFullNodeDeployer, AwsFullNodeDeploymentConfig } from './aws'
 import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
 import { GCPFullNodeDeployer, GCPFullNodeDeploymentConfig } from './gcp'
 
@@ -10,8 +9,6 @@ const fullNodeDeployerByCloudProvider: {
     celoEnv: string
   ) => BaseFullNodeDeployer
 } = {
-  [CloudProvider.AWS]: (deploymentConfig: BaseFullNodeDeploymentConfig, celoEnv: string) =>
-    new AwsFullNodeDeployer(deploymentConfig as AwsFullNodeDeploymentConfig, celoEnv),
   [CloudProvider.AZURE]: (deploymentConfig: BaseFullNodeDeploymentConfig, celoEnv: string) =>
     new AksFullNodeDeployer(deploymentConfig as AksFullNodeDeploymentConfig, celoEnv),
   [CloudProvider.GCP]: (deploymentConfig: BaseFullNodeDeploymentConfig, celoEnv: string) =>

@@ -12,7 +12,7 @@ export const builder = (argv: yargs.Argv) => {
   return addCeloEnvMiddleware(argv)
 }
 
-export const handler = async (_argv: GenesisFileArgv) => {
+export const handler = (_argv: GenesisFileArgv) => {
   const genesisFile = generateGenesisFromEnv()
   console.info(genesisFile)
 }

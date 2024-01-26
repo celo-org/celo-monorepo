@@ -1,11 +1,11 @@
-// tslint:disable: no-console
+/* eslint-disable no-console: 0 */
 import { ensureLeading0x } from '@celo/base/lib/address'
 import {
-  LibraryAddresses,
-  LibraryPositions,
-  linkLibraries,
-  stripMetadata,
-  verifyAndStripLibraryPrefix,
+    LibraryAddresses,
+    LibraryPositions,
+    linkLibraries,
+    stripMetadata,
+    verifyAndStripLibraryPrefix,
 } from '@celo/protocol/lib/bytecode'
 import { verifyProxyStorageProof } from '@celo/protocol/lib/proxy-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'

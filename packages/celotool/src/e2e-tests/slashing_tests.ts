@@ -1,4 +1,3 @@
-// tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { ensureLeading0x } from '@celo/utils/lib/address'
@@ -18,17 +17,38 @@ const TMP_PATH = '/tmp/e2e'
 const safeMarginBlocks = 4
 
 function headerArray(block: any) {
+  if (!block.nonce) {
+    // Before Gingerbread fork
+    return [
+      block.parentHash,
+      block.miner,
+      block.stateRoot,
+      block.transactionsRoot,
+      block.receiptsRoot,
+      block.logsBloom,
+      block.number,
+      block.gasUsed,
+      block.timestamp,
+      block.extraData,
+    ]
+  }
   return [
     block.parentHash,
+    block.sha3Uncles,
     block.miner,
     block.stateRoot,
     block.transactionsRoot,
     block.receiptsRoot,
     block.logsBloom,
+    new BigNumber(block.difficulty).toNumber(),
     block.number,
+    block.gasLimit,
     block.gasUsed,
     block.timestamp,
     block.extraData,
+    block.mixHash,
+    block.nonce,
+    block.baseFee,
   ]
 }
 

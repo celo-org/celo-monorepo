@@ -1,21 +1,21 @@
-/* tslint:disable:no-console */
-// TODO(asa): Refactor and rename to 'deployment-utils.ts'
-import { Address, CeloTxObject } from '@celo/connect';
-import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils';
-import { CeloContractName } from '@celo/protocol/lib/registry-utils';
-import { signTransaction } from '@celo/protocol/lib/signing-utils';
-import { privateKeyToAddress } from '@celo/utils/lib/address';
-import { BuildArtifacts } from '@openzeppelin/upgrades';
-import { BigNumber } from 'bignumber.js';
 
-import { createInterfaceAdapter } from '@truffle/interface-adapter';
-import path from 'path';
-import prompts from 'prompts';
-import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types';
-import { StableTokenInstance } from 'types/mento';
-import Web3 from 'web3';
-import { ContractPackage } from '../contractPackages';
-import { ArtifactsSingleton } from './artifactsSingleton';
+// TODO(asa): Refactor and rename to 'deployment-utils.ts'
+import { Address, CeloTxObject } from '@celo/connect'
+import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { signTransaction } from '@celo/protocol/lib/signing-utils'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { BuildArtifacts } from '@openzeppelin/upgrades'
+import { createInterfaceAdapter } from '@truffle/interface-adapter'
+import { BigNumber } from 'bignumber.js'
+import path from 'path'
+import prompts from 'prompts'
+import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types'
+import { StableTokenInstance } from 'types/mento'
+import Web3 from 'web3'
+import { ContractPackage } from '../contractPackages'
+import { ArtifactsSingleton } from './artifactsSingleton'
+
 
 const truffleContract = require('@truffle/contract');
 
@@ -39,8 +39,7 @@ export async function sendTransactionWithPrivateKey<T>(
       from: address,
     })
   }
-
-  const signedTx: any = await signTransaction(
+  const signedTx = await signTransaction(
     web3,
     {
       ...txArgs,
@@ -53,7 +52,7 @@ export async function sendTransactionWithPrivateKey<T>(
     privateKey
   )
 
-  const rawTransaction = signedTx.rawTransaction.toString('hex')
+  const rawTransaction = signedTx.raw
   return web3.eth.sendSignedTransaction(rawTransaction)
 }
 
@@ -152,10 +151,10 @@ export function checkFunctionArgsLength(args: any[], abi: any) {
 export async function setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
 >(web3: Web3, artifacts: any, contractName: string, contractPackage?: ContractPackage, ...args: any[]): Promise<ContractInstance> {
-  
+
   const wrappedArtifacts = ArtifactsSingleton.getInstance(contractPackage, artifacts)
   const Contract = wrappedArtifacts.require(contractName)
-  
+
   // getProxy function supports the case the proxy is in a different package
   // which is the case for GasPriceMimimum
   const ContractProxy = wrappedArtifacts.getProxy(contractName, artifacts)
@@ -189,7 +188,7 @@ export async function _setInitialProxyImplementation<
   if (initializerAbi) {
     // TODO(Martin): check types, not just argument number
     checkFunctionArgsLength(args, initializerAbi)
-    console.log(`  Setting initial ${contractName} implementation on proxy`)
+    console.info(`  Setting initial ${contractName} implementation on proxy`)
     receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, txOptions, ...args)
   } else {
     if (txOptions.from != null) {
@@ -214,7 +213,7 @@ export async function getDeployedProxiedContract<ContractInstance extends Truffl
 ): Promise<ContractInstance> {
 
   const Contract: Truffle.Contract<ContractInstance> = customArtifacts.require(contractName)
-  
+
   let Proxy:ProxyContract
   // this wrap avoids a lot of rewrite
   const overloadedArtifact = ArtifactsSingleton.wrap(customArtifacts)
@@ -267,7 +266,7 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
 
 }
 
-// TODO change name
+
 export const makeTruffleContractForMigrationWithoutSingleton = (contractName: string, network:any, contractPath:string, web3: Web3) => {
 
   const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath}/${contractName}.json`)
@@ -275,11 +274,11 @@ export const makeTruffleContractForMigrationWithoutSingleton = (contractName: st
     abi: artifact.abi,
     unlinked_binary: artifact.bytecode,
   })
-  
-  
+
+
   Contract.setProvider(web3.currentProvider)
-  Contract.setNetwork(network.name)
-  
+  Contract.setNetwork(network.network_id)
+
   Contract.interfaceAdapter = createInterfaceAdapter({
     networkType: "ethereum",
     provider: web3.currentProvider
@@ -287,6 +286,7 @@ export const makeTruffleContractForMigrationWithoutSingleton = (contractName: st
   Contract.configureNetwork({networkType: "ethereum", provider: web3.currentProvider})
 
   Contract.defaults({from: network.from, gas: network.gas})
+
   return Contract
 }
 
@@ -308,16 +308,16 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   artifactPath?: ContractPackage
 ) {
 
-  console.log("-> Started deployment for", name)
-  let Contract 
+  console.info("-> Started deployment for", name)
+  let Contract
   let ContractProxy
   if (artifactPath) {
     Contract = makeTruffleContractForMigration(name, artifactPath, web3)
-    
+
     // This supports the case the proxy is in a different package
     if (artifactPath.proxiesPath){
       if (artifactPath.proxiesPath == "/"){
-        ContractProxy = artifacts.require(name + 'Proxy')  
+        ContractProxy = artifacts.require(name + 'Proxy')
       } else {
         throw "Loading proxies for custom path not supported"
       }
@@ -328,10 +328,10 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
     Contract = artifacts.require(name)
     ContractProxy = artifacts.require(name + 'Proxy')
   }
- 
+
   const testingDeployment = false
   return (deployer: any, networkName: string, _accounts: string[]) => {
-    console.log("\n-> Deploying", name)
+    console.info("\n-> Deploying", name)
 
     deployer.deploy(ContractProxy)
     deployer.deploy(Contract, testingDeployment)
@@ -383,7 +383,7 @@ export async function transferOwnershipOfProxy(
 export async function transferOwnershipOfProxyAndImplementation<
   ContractInstance extends OwnableInstance
 >(contractName: string, owner: string, artifacts: any) {
-  console.log(`  Transferring ownership of ${contractName} and its Proxy to ${owner}`)
+  console.info(`  Transferring ownership of ${contractName} and its Proxy to ${owner}`)
   const contract: ContractInstance = await getDeployedProxiedContract<ContractInstance>(
     contractName,
     artifacts
@@ -447,12 +447,12 @@ export function getFunctionSelectorsForContract(contract: any, contractName: str
 export function checkImports(baseContractName: string, derivativeContractArtifact: any, artifacts: any) {
   const isImport = (astNode: any) => astNode.nodeType === 'ImportDirective'
   const imports: any[] = derivativeContractArtifact.ast.nodes.filter((astNode: any) => isImport(astNode))
-  while (imports.length) { // BFS 
+  while (imports.length) { // BFS
     const importedContractName = (imports.pop().file as string).split('/').pop().split('.')[0]
     if (importedContractName ===  baseContractName) {
       return true
     }
-    const importedContractArtifact = artifacts instanceof BuildArtifacts ? 
+    const importedContractArtifact = artifacts instanceof BuildArtifacts ?
       artifacts.getArtifactByName(importedContractName) :
       artifacts.require(importedContractName)
     imports.unshift(...importedContractArtifact.ast.nodes.filter((astNode: any) => isImport(astNode)))

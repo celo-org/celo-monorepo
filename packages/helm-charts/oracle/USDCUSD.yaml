@@ -3,7 +3,7 @@ oracle:
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
-      maxPercentageDeviation: 0.01
+      maxPercentageDeviation: 0.005
       maxPercentageBidAskSpread: 0.005
   metrics:
     enabled: true
@@ -11,23 +11,40 @@ oracle:
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
   gasPriceMultiplier: 1.5
-  priceSources: "[
+  priceSources: "[      
+      [
+        {exchange: 'BINANCE', symbol: 'USDCUSDT', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDTUSD', toInvert: false }
+      ],
       [
         {exchange: 'KRAKEN', symbol: 'USDCUSD', toInvert: false}
       ],
       [
-        {exchange: 'BINANCEUS', symbol: 'USDCUSD', toInvert: false}
+        {exchange: 'BITSTAMP', symbol: 'USDCUSD', toInvert: false}
       ],
       [
         {exchange: 'COINBASE', symbol: 'USDTUSDC', toInvert: true},
         {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
       ],
       [
-        {exchange: 'WHITEBIT', symbol: 'USDCUSDT', toInvert: false},
+        {exchange: 'OKX', symbol: 'USDCUSDT', toInvert: false},
+        {exchange: 'BITSTAMP', symbol: 'USDTUSD', toInvert: false}
+      ],
+      [
+        {exchange: 'BITGET', symbol: 'USDTUSDC', toInvert: true},
+        {exchange: 'KRAKEN', symbol: 'USDTUSD', toInvert: false}
+      ],
+      [
+        {exchange: 'KUCOIN', symbol: 'USDCUSDT', toInvert: false},
         {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
       ]
     ]"
-  minPriceSourceCount: 2
+    # Additional sources missing adapters 
+    # [
+    #     {exchange: 'Bybit', symbol: 'USDTUSDC', toInvert: true},
+    #     {exchange: 'Kraken', symbol: 'USDTUSD', toInvert: false}
+    #   ],
+  minPriceSourceCount: 5
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:

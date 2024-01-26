@@ -290,7 +290,6 @@ async function createPrometheusGcloudServiceAccount(
 
 function getCloudProviderPrefix(clusterConfig: BaseClusterConfig) {
   const prefixByCloudProvider: { [key in CloudProvider]: string } = {
-    [CloudProvider.AWS]: 'aws',
     [CloudProvider.AZURE]: 'aks',
     [CloudProvider.GCP]: 'gcp',
   }

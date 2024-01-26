@@ -1,4 +1,4 @@
-// tslint:disable: max-classes-per-file
+/* eslint-disable max-classes-per-file: 0 */
 export const DEFAULT_VERSION_STRING = '1.1.0.0'
 
 export class ContractVersion {
@@ -126,12 +126,12 @@ export class ContractVersionDelta {
 
   public isVersionIncremented = () : boolean => {
     return (
-      this.storage === Delta.Increment || 
-      this.major === Delta.Increment || 
-      this.minor === Delta.Increment|| 
+      this.storage === Delta.Increment ||
+      this.major === Delta.Increment ||
+      this.minor === Delta.Increment||
       this.patch === Delta.Increment
     )
-  } 
+  }
 }
 
 /**
@@ -158,7 +158,7 @@ export class ContractVersionChecker {
     if (this.oldVersion === null) {
       // Newly added contracts should have version 1.1.0.0
       return ContractVersion.fromString(DEFAULT_VERSION_STRING)
-    } else { 
+    } else {
       return this.expectedDelta.appliedTo(this.oldVersion)
     }
   }

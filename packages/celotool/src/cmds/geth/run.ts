@@ -80,7 +80,7 @@ export const builder = (argv: yargs.Argv) => {
     )
 }
 
-export const handler = async (argv: RunArgv) => {
+export const handler = (argv: RunArgv) => {
   const gethBinary = `${argv.gethDir}/build/bin/geth`
   const datadir = argv.dataDir
   const networkId = argv.networkId

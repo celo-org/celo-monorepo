@@ -39,3 +39,11 @@ export function getFullNodeHttpRpcInternalUrl(celoEnv: string) {
 export function getFullNodeWebSocketRpcInternalUrl(celoEnv: string) {
   return `ws://${celoEnv}-fullnodes-rpc.${celoEnv}.svc.cluster.local:8546`
 }
+
+export function getLightNodeHttpRpcInternalUrl(celoEnv: string) {
+  return `http://${celoEnv}-lightnodes-rpc.${celoEnv}.svc.cluster.local:8545`
+}
+
+export function getLightNodeWebSocketRpcInternalUrl(celoEnv: string) {
+  return `ws://${celoEnv}-lightnodes-rpc.${celoEnv}.svc.cluster.local:8546`
+}

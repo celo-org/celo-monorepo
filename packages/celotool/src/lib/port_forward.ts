@@ -1,7 +1,6 @@
 /* tslint:disable: no-console */
 import { ChildProcess, spawnSync } from 'child_process'
 import { execBackgroundCmd, execCmd } from './cmd-utils'
-import { envVar, fetchEnv, isVmBased } from './env-utils'
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -13,19 +12,7 @@ const PORT_CONTROL_CMD = 'nc -z 127.0.0.1 8545'
 const DEFAULT_COMPONENT = 'validators'
 
 async function getPortForwardCmd(celoEnv: string, component?: string, ports = defaultPortsString) {
-  if (isVmBased()) {
-    return Promise.resolve(getVmPortForwardCmd(celoEnv, component, ports))
-  } else {
-    return getKubernetesPortForwardCmd(celoEnv, component, ports)
-  }
-}
-
-function getVmPortForwardCmd(celoEnv: string, machine = 'validator-0', ports = defaultPortsString) {
-  const zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
-  // this command expects port mappings to be of the form `[localPort]:localhost:[remotePort]`
-  const portMappings = ports.replace(/:/g, ':localhost:').split(' ')
-  const portsWithFlags = portMappings.map((mapping) => `-L ${mapping}`).join(' ')
-  return `gcloud compute ssh --zone ${zone} ${celoEnv}-${machine} -- -N ${portsWithFlags}`
+  return getKubernetesPortForwardCmd(celoEnv, component, ports)
 }
 
 async function getKubernetesPortForwardCmd(
@@ -36,7 +23,7 @@ async function getKubernetesPortForwardCmd(
   if (!component) {
     component = DEFAULT_COMPONENT
   }
-  console.log(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
+  console.info(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
   const portForwardArgs = await getPortForwardArgs(celoEnv, component, ports)
   return `kubectl ${portForwardArgs.join(' ')}`
 }
@@ -45,7 +32,7 @@ async function getPortForwardArgs(celoEnv: string, component?: string, ports = d
   if (!component) {
     component = DEFAULT_COMPONENT
   }
-  console.log(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
+  console.info(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
   // The testnet helm chart used to have the label app=ethereum, but this was changed
   // to app=testnet. To preserve backward compatibility, we search for both labels.
   // It's not expected to ever have a situation where a namespace has pods with
@@ -60,8 +47,8 @@ export async function portForward(celoEnv: string, component?: string, ports?: s
   try {
     const portForwardCmd = await getPortForwardCmd(celoEnv, component, ports)
     const splitCmd = portForwardCmd.split(' ')
-    console.log(`Port-forwarding to celoEnv ${celoEnv} ports ${ports}`)
-    console.log(`\t$ ${portForwardCmd}`)
+    console.info(`Port-forwarding to celoEnv ${celoEnv} ports ${ports}`)
+    console.info(`\t$ ${portForwardCmd}`)
     await spawnSync(splitCmd[0], splitCmd.slice(1), {
       stdio: 'inherit',
     })

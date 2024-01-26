@@ -1,5 +1,4 @@
 import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
-import { failIfVmBased } from 'src/lib/env-utils'
 import {
   createStaticIPs,
   installHelmChart,
@@ -34,8 +33,6 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: TestnetInitialArgv) => {
-  failIfVmBased()
-
   const createdCluster = await createClusterIfNotExists()
   await switchToClusterFromEnv(argv.celoEnv)
 

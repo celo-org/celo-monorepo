@@ -1,8 +1,8 @@
 import {
   getFornoUrl,
   getFornoWebSocketUrl,
-  getFullNodeHttpRpcInternalUrl,
-  getFullNodeWebSocketRpcInternalUrl,
+  getLightNodeHttpRpcInternalUrl,
+  getLightNodeWebSocketRpcInternalUrl,
 } from 'src/lib/endpoints'
 import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import {
@@ -68,11 +68,12 @@ export abstract class BaseOracleDeployer {
   async helmParameters() {
     const httpRpcProviderUrl = this.deploymentConfig.useForno
       ? getFornoUrl(this.celoEnv)
-      : getFullNodeHttpRpcInternalUrl(this.celoEnv)
+      : getLightNodeHttpRpcInternalUrl(this.celoEnv)
     const wsRpcProviderUrl = this.deploymentConfig.useForno
       ? getFornoWebSocketUrl(this.celoEnv)
-      : getFullNodeWebSocketRpcInternalUrl(this.celoEnv)
+      : getLightNodeWebSocketRpcInternalUrl(this.celoEnv)
     return [
+      `--set-literal oracle.api_keys=${fetchEnv(envVar.ORACLE_FX_ADAPTERS_API_KEYS)}`,
       `--set environment.name=${this.celoEnv}`,
       `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
       `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
