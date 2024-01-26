@@ -22,6 +22,8 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
   string public name;
   string public symbol;
 
+  uint8 public expectedDecimals;
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -47,6 +49,7 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
     uint8 decimals = IDecimals(_adaptedToken).decimals();
     require(decimals < _expectedDecimals, "Decimals of adapted token must be < expected decimals.");
     digitDifference = uint96(10**(_expectedDecimals - decimals));
+    expectedDecimals = _expectedDecimals;
   }
 
   /**
@@ -56,6 +59,22 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
      */
   function balanceOf(address account) public view returns (uint256) {
     return upscale(adaptedToken.balanceOf(account));
+  }
+
+  /**
+   * @notice Gets the total supply with correct digits.
+   * @return The total supply.
+   */
+  function totalSupply() public view returns (uint256) {
+    return upscale(adaptedToken.totalSupply());
+  }
+
+  /**
+   * @notice Gets the total supply with correct digits.
+   * @return The total supply.
+   */
+  function decimals() public view returns (uint8) {
+    return expectedDecimals;
   }
 
   /**

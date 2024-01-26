@@ -152,6 +152,19 @@ contract FeeCurrencyAdapter_BalanceOf is FeeCurrencyAdapterTest {
   }
 }
 
+contract FeeCurrencyAdapter_TotalSupply is FeeCurrencyAdapterTest {
+  function test_shouldReturnTotalSupply() public {
+    assertEq(feeCurrency.totalSupply(), initialSupply);
+    assertEq(feeCurrencyAdapter.totalSupply(), initialSupply * 1e12);
+  }
+}
+
+contract FeeCurrencyAdapter_Decimals is FeeCurrencyAdapterTest {
+  function test_shouldReturnDecimals() public {
+    assertEq(feeCurrencyAdapter.decimals(), 18);
+  }
+}
+
 contract FeeCurrencyAdapter_DebitGasFees is FeeCurrencyAdapterTest {
   function test_shouldDebitGasFees() public {
     uint256 amount = 1000 * 1e12;
