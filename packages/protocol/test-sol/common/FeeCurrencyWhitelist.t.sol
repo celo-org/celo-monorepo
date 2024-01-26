@@ -39,18 +39,19 @@ contract FeeCurrencyWhitelist_adaptedTokens is FeeCurrencyWhitelistTest{
   address token2 = address(5);
 
   function setUp() public {
-    // TODO rename variables
+    
     super.setUp();
-
+    
     feeCurrencyWhitelist.addToken(whitelistedAddress1); // real token
     feeCurrencyWhitelist.addToken(whitelistedAddress2); // adaptor of token 1
     feeCurrencyWhitelist.addToken(whitelistedAddress3); // adaptor of token 2
-
-    feeCurrencyWhitelist.setAdaptor(token1, whitelistedAddress2);
-
+    
     feeCurrencyWhitelist.setUnderlyinToken(whitelistedAddress1);
     feeCurrencyWhitelist.setUnderlyinToken(token1);
     feeCurrencyWhitelist.setUnderlyinToken(token2);
+
+    feeCurrencyWhitelist.setAdaptor(token1, whitelistedAddress2);
+
   }
 }
 
