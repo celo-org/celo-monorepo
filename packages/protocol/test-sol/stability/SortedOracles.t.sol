@@ -8,6 +8,7 @@ import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../../contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
 import { Constants } from "../constants.sol";
+import "forge-std/console.sol";
 
 contract SortedOraclesTest is Test, Constants {
   using FixidityLib for FixidityLib.Fraction;
@@ -17,7 +18,7 @@ contract SortedOraclesTest is Test, Constants {
 
   address oracleAccount;
   address aToken = 0x00000000000000000000000000000000DeaDBeef;
-  uint256 reportExpiry = 1 * 60 * 60; // 1 hour
+  uint256 reportExpiry = HOUR;
 
   event OracleAdded(address indexed token, address indexed oracleAddress);
   event OracleRemoved(address indexed token, address indexed oracleAddress);
@@ -31,6 +32,7 @@ contract SortedOraclesTest is Test, Constants {
   event MedianUpdated(address indexed token, uint256 value);
   event ReportExpirySet(uint256 reportExpiry);
   event TokenReportExpirySet(address token, uint256 reportExpiry);
+  event EquivalentTokenSet(address indexed token, address indexed equivalentToken);
 
   function setUp() public {
     warp(0);
@@ -44,7 +46,7 @@ contract SortedOraclesTest is Test, Constants {
   }
 }
 
-contract Initialize is SortedOraclesTest {
+contract SortedOraclesTest_Initialize is SortedOraclesTest {
   function test_ownerSet() public {
     assertEq(sortedOracle.owner(), address(this));
   }
@@ -53,7 +55,7 @@ contract Initialize is SortedOraclesTest {
     assertEq(sortedOracle.reportExpirySeconds(), reportExpiry);
   }
 
-  function test_ShouldRevertWhenCalledAgain() public {
+  function test_ShouldRevert_WhenCalledAgain() public {
     vm.expectRevert("contract already initialized");
     sortedOracle.initialize(reportExpiry);
   }
@@ -77,6 +79,69 @@ contract SetReportExpiry is SortedOraclesTest {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(oracleAccount);
     sortedOracle.setReportExpiry(7200);
+  }
+}
+
+contract SortedOracles_SetEquivalentToken is SortedOraclesTest {
+  address bToken = actor("bToken");
+
+  function test_ShouldSetReportExpiry() public {
+    sortedOracle.setEquivalentToken(aToken, bToken, FIXED1);
+    (address equivalentToken, uint256 multiplier) = sortedOracle.getEquivalentToken(aToken);
+    assertEq(equivalentToken, bToken);
+    assertEq(multiplier, FIXED1);
+  }
+
+  function test_ShouldRevert_WhenToken0() public {
+    vm.expectRevert("token address cannot be 0");
+    sortedOracle.setEquivalentToken(address(0), bToken, FIXED1);
+  }
+
+  function test_ShouldRevert_WhenEquivalentToken0() public {
+    vm.expectRevert("equivalentToken address cannot be 0");
+    sortedOracle.setEquivalentToken(aToken, address(0), FIXED1);
+  }
+
+  function test_ShouldEmitEquivalentTokenSet() public {
+    vm.expectEmit(true, true, true, true);
+    emit EquivalentTokenSet(aToken, bToken);
+    sortedOracle.setEquivalentToken(aToken, bToken, FIXED1);
+  }
+
+  function test_ShouldRevertWhenNotOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(oracleAccount);
+    sortedOracle.setEquivalentToken(aToken, bToken, FIXED1);
+  }
+}
+
+contract SortedOracles_DeleteEquivalentToken is SortedOraclesTest {
+  address bToken = actor("bToken");
+
+  function test_ShouldDeleteEquivalentToken() public {
+    sortedOracle.setEquivalentToken(aToken, bToken, FIXED1);
+    sortedOracle.deleteEquivalentToken(aToken);
+    (address equivalentToken, uint256 multiplier) = sortedOracle.getEquivalentToken(aToken);
+    assertEq(equivalentToken, address(0));
+    assertEq(multiplier, 0);
+  }
+
+  function test_ShouldRevert_WhenEquivalentToken0() public {
+    vm.expectRevert("token address cannot be 0");
+    sortedOracle.deleteEquivalentToken(address(0));
+  }
+
+  function test_ShouldEmitEquivalentTokenSet() public {
+    sortedOracle.setEquivalentToken(aToken, bToken, FIXED1);
+    vm.expectEmit(true, true, true, true);
+    emit EquivalentTokenSet(aToken, address(0));
+    sortedOracle.deleteEquivalentToken(aToken);
+  }
+
+  function test_ShouldRevertWhenNotOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(oracleAccount);
+    sortedOracle.deleteEquivalentToken(aToken);
   }
 }
 
@@ -121,17 +186,23 @@ contract AddOracle is SortedOraclesTest {
 
   function test_ShouldRevertWhenAlreadyOracle() public {
     sortedOracle.addOracle(aToken, oracleAccount);
-    vm.expectRevert("oracle addr is not an oracle for token addr");
+    vm.expectRevert(
+      "token addr was null or oracle addr was null or oracle addr is already an oracle for token addr"
+    );
     sortedOracle.addOracle(aToken, oracleAccount);
   }
 
   function test_ShouldRevertWhenOracleIsZeroAddress() public {
-    vm.expectRevert("oracle addr was null");
+    vm.expectRevert(
+      "token addr was null or oracle addr was null or oracle addr is already an oracle for token addr"
+    );
     sortedOracle.addOracle(aToken, address(0));
   }
 
   function test_ShouldRevertWhenTokenIsZeroAddress() public {
-    vm.expectRevert("token addr was null");
+    vm.expectRevert(
+      "token addr was null or oracle addr was null or oracle addr is already an oracle for token addr"
+    );
     sortedOracle.addOracle(address(0), oracleAccount);
   }
 }
@@ -473,6 +544,8 @@ contract Report is SortedOraclesTest {
   uint256 oracleValue2 = FixidityLib.newFixedFraction(3, 1).unwrap();
   uint256 anotherOracleValue = FIXED1;
 
+  address bToken = actor("bToken");
+
   function setUp() public {
     super.setUp();
     sortedOracle.addOracle(aToken, oracleAccount);
@@ -490,6 +563,90 @@ contract Report is SortedOraclesTest {
     (uint256 medianRate, uint256 denominator) = sortedOracle.medianRate(aToken);
     assertEq(medianRate, value);
     assertEq(denominator, FIXED1);
+  }
+
+  function test_ShouldReturnTheMedianRate_WhenEquivalentTokenIsSet() public {
+    vm.prank(oracleAccount);
+    sortedOracle.report(aToken, value, address(0), address(0));
+    sortedOracle.setEquivalentToken(bToken, aToken, FIXED1);
+    (uint256 medianRate, uint256 denominator) = sortedOracle.medianRate(bToken);
+    assertEq(medianRate, value);
+    assertEq(denominator, FIXED1);
+  }
+
+  function setEquivalentTokenFuzzyHelper(
+    uint256 oneCeloDigits,
+    uint256 oneUSDDigits,
+    uint256 onecUSDDigits
+  ) public {
+    uint256 cUSDRate = 700000000000000000000000;
+
+    uint256 oneCELO = 10**oneCeloDigits;
+    uint256 oneUSD = 10**oneUSDDigits;
+    uint256 onecUSD = 10**onecUSDDigits;
+    uint256 diff = oneCELO / oneUSD;
+
+    uint256 celoFromcUSD = FixidityLib
+      .wrap(cUSDRate)
+      .multiply(FixidityLib.newFixed(onecUSD))
+      .fromFixed();
+
+    vm.prank(oracleAccount);
+    sortedOracle.report(aToken, cUSDRate, address(0), address(0));
+    uint256 usdMultiplier = FixidityLib.newFixedFraction(diff, 1).unwrap();
+    sortedOracle.setEquivalentToken(bToken, aToken, usdMultiplier);
+    (uint256 medianRate, uint256 denominator) = sortedOracle.medianRate(bToken);
+    assertEq(medianRate, cUSDRate * diff);
+    assertEq(denominator, FIXED1);
+    uint256 celoFromUSD = FixidityLib
+      .wrap(medianRate)
+      .multiply(FixidityLib.newFixed(oneUSD))
+      .fromFixed();
+    assertEq(celoFromUSD, celoFromcUSD);
+  }
+
+  function test_ShouldReturnTheMedianRateWithDifferentMultiplier_WhenEquivalentTokenIsSet() public {
+    setEquivalentTokenFuzzyHelper(18, 6, 18);
+  }
+
+  function test_ShouldReturnTheMedianRateWithDifferentMultiplier_WhenEquivalentTokenIsSet_WhenMultiplierIsOneBigger()
+    public
+  {
+    setEquivalentTokenFuzzyHelper(18, 17, 18);
+  }
+
+  function test_ShouldReturnTheMedianRateWithDifferentMultiplier_WhenEquivalentTokenIsSet_WhenMultiplierIsALotBigger()
+    public
+  {
+    setEquivalentTokenFuzzyHelper(18, 0, 18);
+  }
+
+  function test_ShouldNotReturnTheMedianRate_WhenEquivalentTokenIsSet() public {
+    vm.prank(oracleAccount);
+    sortedOracle.report(aToken, value, address(0), address(0));
+    sortedOracle.setEquivalentToken(bToken, aToken, FIXED1);
+    (uint256 medianRate, uint256 denominator) = sortedOracle.medianRateWithoutEquivalentMapping(
+      bToken
+    );
+    assertEq(medianRate, 0);
+    assertEq(denominator, 0);
+  }
+
+  function test_ShouldNotReturnTheMedianRateOfEquivalentToken_WhenEquivalentTokenIsSetAndDeleted()
+    public
+  {
+    vm.prank(oracleAccount);
+    sortedOracle.report(aToken, value, address(0), address(0));
+    sortedOracle.setEquivalentToken(bToken, aToken, FIXED1);
+    uint256 medianRate;
+    uint256 denominator;
+    (medianRate, denominator) = sortedOracle.medianRate(bToken);
+    assertEq(medianRate, value);
+    assertEq(denominator, FIXED1);
+    sortedOracle.deleteEquivalentToken(bToken);
+    (medianRate, denominator) = sortedOracle.medianRate(bToken);
+    assertEq(medianRate, 0);
+    assertEq(denominator, 0);
   }
 
   function test_ShouldIncreaseTheNumberOfTimestamps() public {
