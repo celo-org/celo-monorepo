@@ -41,7 +41,6 @@ contract GasPriceMinimumTest is Test {
     owner = address(this);
     nonOwner = actor("nonOwner");
     celoToken = actor("CeloToken");
-    // address sortedOracleAddress = address(0xd3b544dD9DE0B5D935453418E581Fa6A2A8f33A7);
 
     deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
 
