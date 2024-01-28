@@ -20,7 +20,7 @@ contract FeeCurrencyWhitelist is
 {
   // Array of all the tokens enabled
   address[] public whitelist;
-  // it is not enforce that underlyingTokens in the same order as their underlying
+  // it is not enforce that underlyingTokens in the same order as their respective
   // whitelisted address
   address[] public underlyingTokens;
   mapping(address => address) public adapters;
