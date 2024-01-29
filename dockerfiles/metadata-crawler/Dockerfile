@@ -15,8 +15,6 @@ RUN npm install -g typescript npm
 
 COPY lerna.json package.json yarn.lock ./
 COPY scripts scripts/
-COPY packages/typescript packages/typescript/
-COPY packages/sdk packages/sdk/
 COPY packages/dev-utils packages/dev-utils/
 COPY packages/metadata-crawler packages/metadata-crawler/
 
