@@ -40,10 +40,10 @@ interface IFeeCurrency is IERC20 {
    * @param tipRecipient The recipient of the tip.
    * @param _gatewayFeeRecipient The recipient of the gateway fee. Unused.
    * @param baseFeeRecipient The recipient of the base fee.
-   * @param refundAmount The amount to refund (in wrapped token digits).
-   * @param tipAmount The amount to tip (in wrapped token digits).
-   * @param _gatewayFeeAmount The amount of the gateway fee (in wrapped token digits). Unused.
-   * @param baseFeeAmount The amount of the base fee (in wrapped token digits).
+   * @param refundAmount The amount to refund.
+   * @param tipAmount The amount to tip.
+   * @param _gatewayFeeAmount The amount of the gateway fee. Unused.
+   * @param baseFeeAmount The amount of the base fee.
    */
   function creditGasFees(
     address refundRecipient,
