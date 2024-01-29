@@ -11,8 +11,9 @@ import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
 import "./interfaces/IFeeCurrency.sol";
 import "./interfaces/IDecimals.sol";
+import "./interfaces/IFeeCurrencyAdapter.sol";
 
-contract FeeCurrencyAdapter is Initializable, CalledByVm {
+contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
   IFeeCurrency public adaptedToken;
 
   uint96 public digitDifference;
@@ -46,35 +47,13 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
     _setAdaptedToken(_adaptedToken);
     name = _name;
     symbol = _symbol;
-    uint8 decimals = IDecimals(_adaptedToken).decimals();
-    require(decimals < _expectedDecimals, "Decimals of adapted token must be < expected decimals.");
-    digitDifference = uint96(10**(_expectedDecimals - decimals));
+    uint8 _decimals = IDecimals(_adaptedToken).decimals();
+    require(
+      _decimals < _expectedDecimals,
+      "Decimals of adapted token must be < expected decimals."
+    );
+    digitDifference = uint96(10**(_expectedDecimals - _decimals));
     expectedDecimals = _expectedDecimals;
-  }
-
-  /**
-     * @notice Gets the balance of the specified address with correct digits.
-     * @param account The address to query the balance of.
-     * @return The balance of the specified address.
-     */
-  function balanceOf(address account) public view returns (uint256) {
-    return upscale(adaptedToken.balanceOf(account));
-  }
-
-  /**
-   * @notice Gets the total supply with correct digits.
-   * @return The total supply.
-   */
-  function totalSupply() public view returns (uint256) {
-    return upscale(adaptedToken.totalSupply());
-  }
-
-  /**
-   * @notice Gets the total supply with correct digits.
-   * @return The total supply.
-   */
-  function decimals() public view returns (uint8) {
-    return expectedDecimals;
   }
 
   /**
@@ -108,7 +87,7 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
     uint256 tipAmount,
     uint256 _gatewayFeeAmount,
     uint256 baseFeeAmount
-  ) public onlyVm {
+  ) external onlyVm {
     if (debited == 0) {
       // When eth.estimateGas is called, this function is called but we don't want to credit anything.
       return;
@@ -148,6 +127,31 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
    */
   function getAdaptedToken() external view returns (address) {
     return address(adaptedToken);
+  }
+
+  /**
+     * @notice Gets the balance of the specified address with correct digits.
+     * @param account The address to query the balance of.
+     * @return The balance of the specified address.
+     */
+  function balanceOf(address account) external view returns (uint256) {
+    return upscale(adaptedToken.balanceOf(account));
+  }
+
+  /**
+   * @notice Gets the total supply with correct digits.
+   * @return The total supply.
+   */
+  function totalSupply() external view returns (uint256) {
+    return upscale(adaptedToken.totalSupply());
+  }
+
+  /**
+   * @notice Gets the total supply with correct digits.
+   * @return The total supply.
+   */
+  function decimals() external view returns (uint8) {
+    return expectedDecimals;
   }
 
   function upscale(uint256 value) internal view returns (uint256) {
