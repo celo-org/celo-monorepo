@@ -1,5 +1,0 @@
-environment:
-  name: default
-
-relayer:
-  replicas: 2

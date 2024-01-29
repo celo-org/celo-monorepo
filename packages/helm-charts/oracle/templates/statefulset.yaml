@@ -115,6 +115,11 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
+        - name: API_KEYS
+          valueFrom:
+            secretKeyRef:
+              key: api_keys
+              name: {{ template "api-keys-secret-name" . }}
 {{ include "common.env-var" (dict "name" "API_REQUEST_TIMEOUT" "dict" .Values.oracle "value_name" "apiRequestTimeoutMs" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_TRY_COUNT" "dict" .Values.oracle.azureHsm "value_name" "initTryCount") | indent 8 }}
 {{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_MAX_RETRY_BACKOFF_MS" "dict" .Values.oracle.azureHsm "value_name" "initMaxRetryBackoffMs") | indent 8 }}

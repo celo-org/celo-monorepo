@@ -4,7 +4,6 @@ const ProviderEngine = require('web3-provider-engine')
 const WebsocketSubprovider = require('web3-provider-engine/subproviders/websocket.js')
 const { TruffleArtifactAdapter } = require('@0x/sol-trace')
 const { CoverageSubprovider } = require('@0x/sol-coverage')
-const flakeTrackingConfig = require('@celo/flake-tracker/src/mocha/config.js')
 var Web3 = require('web3')
 var net = require('net')
 
@@ -125,7 +124,7 @@ const networks = {
 
         coverageProvider.start((err) => {
           if (err !== undefined) {
-            // tslint:disable-next-line: no-console
+            // eslint-disable-next-line: no-console
             console.error(err)
             process.exit(1)
           }

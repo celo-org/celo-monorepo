@@ -1,7 +1,7 @@
 #!/usr/bin/env yarn run ts-node -r tsconfig-paths/register --cwd ../celotool
 import yargs from 'yargs'
 
-// tslint:disable-next-line: no-unused-expression
+// eslint-disable-next-line  @typescript-eslint/no-unused-expressions
 yargs
   .scriptName('celotooljs')
   .option('verbose', {

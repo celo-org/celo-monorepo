@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -5,6 +6,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/ISortedOracles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
+import "./interfaces/IBreakerBox.sol";
 
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
@@ -12,18 +14,42 @@ import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
 
 /**
- * @title Maintains a sorted list of oracle exchange rates between CELO and other currencies.
+ * @title   SortedOracles
+ *
+ * @notice  This contract stores a collection of exchange rates with of CELO
+ *          expressed in units of other assets. The most recent exchange rates
+ *          are gathered off-chain by oracles, who then use the `report` function to
+ *          submit the rates to this contract. Before submitting a rate report, an
+ *          oracle's address must be added to the `isOracle` mapping for a specific
+ *          rateFeedId, with the flag set to true. While submitting a report requires
+ *          an address to be added to the mapping, no additional permissions are needed
+ *          to read the reports, the calculated median rate, or the list of oracles.
+ *
+ * @dev     A unique rateFeedId identifies each exchange rate. In the initial implementation
+ *          of this contract, the rateFeedId was set as the address of the stable
+ *          asset contract that used the rate. However, this implementation has since
+ *          been updated, and the rateFeedId now also refers to an address derived from the
+ *          concatenation other asset symbols. This change enables the contract to store multiple exchange rates for a
+ *          single token. As a result of this change, there may be instances
+ *          where the term "token" is used in the contract code. These useages of the term
+ *          "token" are actually referring to the rateFeedId.
+ *
  */
 contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initializable {
   using SafeMath for uint256;
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
   using FixidityLib for FixidityLib.Fraction;
 
-  uint256 private constant FIXED1_UINT = 1000000000000000000000000;
+  struct EquivalentToken {
+    address token;
+    uint256 multiplier;
+  }
 
-  // Maps a token address to a sorted list of report values.
+  uint256 private constant FIXED1_UINT = 1e24;
+
+  // Maps a rateFeedID to a sorted list of report values.
   mapping(address => SortedLinkedListWithMedian.List) private rates;
-  // Maps a token address to a sorted list of report timestamps.
+  // Maps a rateFeedID to a sorted list of report timestamps.
   mapping(address => SortedLinkedListWithMedian.List) private timestamps;
   mapping(address => mapping(address => bool)) public isOracle;
   mapping(address => address[]) public oracles;
@@ -34,7 +60,13 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   // doesn't have a value in the mapping (i.e. it's 0), the fallback is used.
   // See: #getTokenReportExpirySeconds
   uint256 public reportExpirySeconds;
+  // Maps a rateFeedId to its report expiry time in seconds.
   mapping(address => uint256) public tokenReportExpirySeconds;
+
+  IBreakerBox public breakerBox;
+  // Maps a token address to its equivalent token address.
+  // Original token will return the median value same as the value of equivalent token.
+  mapping(address => EquivalentToken) public equivalentTokens;
 
   event OracleAdded(address indexed token, address indexed oracleAddress);
   event OracleRemoved(address indexed token, address indexed oracleAddress);
@@ -48,6 +80,8 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   event MedianUpdated(address indexed token, uint256 value);
   event ReportExpirySet(uint256 reportExpiry);
   event TokenReportExpirySet(address token, uint256 reportExpiry);
+  event BreakerBoxUpdated(address indexed newBreakerBox);
+  event EquivalentTokenSet(address indexed token, address indexed equivalentToken);
 
   modifier onlyOracle(address token) {
     require(isOracle[token][msg.sender], "sender was not an oracle for token addr");
@@ -62,7 +96,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 2);
+    return (1, 1, 3, 0);
   }
 
   /**
@@ -92,8 +126,8 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   }
 
   /**
-   * @notice Sets the report expiry parameter for a token.
-   * @param _token The address of the token to set expiry for.
+   * @notice Sets the report expiry parameter for a rateFeedId.
+   * @param _token The rateFeedId for which the expiry is to be set.
    * @param _reportExpirySeconds The number of seconds before a report is considered expired.
    */
   function setTokenReportExpiry(address _token, uint256 _reportExpirySeconds) external onlyOwner {
@@ -107,14 +141,25 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   }
 
   /**
-   * @notice Adds a new Oracle.
-   * @param token The address of the token.
+   * @notice Sets the address of the BreakerBox.
+   * @param newBreakerBox The new BreakerBox address.
+   */
+  function setBreakerBox(IBreakerBox newBreakerBox) public onlyOwner {
+    require(address(newBreakerBox) != address(0), "BreakerBox address must be set");
+    breakerBox = newBreakerBox;
+    emit BreakerBoxUpdated(address(newBreakerBox));
+  }
+
+  /**
+   * @notice Adds a new Oracle for a specified rate feed.
+   * @param token The rateFeedId that the specified oracle is permitted to report.
    * @param oracleAddress The address of the oracle.
    */
   function addOracle(address token, address oracleAddress) external onlyOwner {
+    // solhint-disable-next-line reason-string
     require(
       token != address(0) && oracleAddress != address(0) && !isOracle[token][oracleAddress],
-      "token addr was null or oracle addr was null or oracle addr is not an oracle for token addr"
+      "token addr was null or oracle addr was null or oracle addr is already an oracle for token addr"
     );
     isOracle[token][oracleAddress] = true;
     oracles[token].push(oracleAddress);
@@ -122,12 +167,13 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   }
 
   /**
-   * @notice Removes an Oracle.
-   * @param token The address of the token.
+   * @notice Removes an Oracle from a specified rate feed.
+   * @param token The rateFeedId that the specified oracle is no longer permitted to report.
    * @param oracleAddress The address of the oracle.
    * @param index The index of `oracleAddress` in the list of oracles.
    */
   function removeOracle(address token, address oracleAddress, uint256 index) external onlyOwner {
+    // solhint-disable-next-line reason-string
     require(
       token != address(0) &&
         oracleAddress != address(0) &&
@@ -146,7 +192,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Removes a report that is expired.
-   * @param token The address of the token for which the CELO exchange rate is being reported.
+   * @param token The rateFeedId of the report to be removed.
    * @param n The number of expired reports to remove, at most (deterministic upper gas bound).
    */
   function removeExpiredReports(address token, uint256 n) external {
@@ -166,12 +212,13 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Check if last report is expired.
-   * @param token The address of the token for which the CELO exchange rate is being reported.
-   * @return isExpired
-   * @return The address of the last report.
+   * @param token The rateFeedId of the reports to be checked.
+   * @return bool A bool indicating if the last report is expired.
+   * @return address Oracle address of the last report.
    */
   function isOldestReportExpired(address token) public view returns (bool, address) {
-    require(token != address(0), "token address cannot be null");
+    // solhint-disable-next-line reason-string
+    require(token != address(0));
     address oldest = timestamps[token].getTail();
     uint256 timestamp = timestamps[token].getValue(oldest);
     // solhint-disable-next-line not-rely-on-time
@@ -182,9 +229,48 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   }
 
   /**
+   * @notice Sets the equivalent token for a token.
+   * @param token The address of the token.
+   * @param equivalentToken The address of the equivalent token.
+   * @param multiplier The multiplier to convert the equivalent token median value to the token value (fixidity).
+   * @dev For tokens with 6 decimals multiplier is 1e18 / 1e6 = 1e12
+   */
+  function setEquivalentToken(address token, address equivalentToken, uint256 multiplier)
+    external
+    onlyOwner
+  {
+    require(token != address(0), "token address cannot be 0");
+    require(equivalentToken != address(0), "equivalentToken address cannot be 0");
+    require(multiplier > 0, "multiplier must be > 0");
+    equivalentTokens[token] = EquivalentToken(equivalentToken, multiplier);
+    emit EquivalentTokenSet(token, equivalentToken);
+  }
+
+  /**
+   * @notice Sets the equivalent token for a token.
+   * @param token The address of the token.
+   */
+  function deleteEquivalentToken(address token) external onlyOwner {
+    require(token != address(0), "token address cannot be 0");
+    delete equivalentTokens[token];
+    emit EquivalentTokenSet(token, address(0));
+  }
+
+  /**
+   * @notice Gets the equivalent token for a token.
+   * @param token The address of the token.
+   * @return The address of the equivalent token.
+   * @return The multiplier to convert the equivalent token median value to the token value (fixidity).
+   */
+  function getEquivalentToken(address token) external view returns (address, uint256) {
+    return (equivalentTokens[token].token, equivalentTokens[token].multiplier);
+  }
+
+  /**
    * @notice Updates an oracle value and the median.
-   * @param token The address of the token for which the CELO exchange rate is being reported.
-   * @param value The amount of `token` equal to one CELO, expressed as a fixidity value.
+   * @param token The rateFeedId for the rate that is being reported.
+   * @param value The number of stable asset that equate to one unit of collateral asset, for the
+   *              specified rateFeedId, expressed as a fixidity value.
    * @param lesserKey The element which should be just left of the new oracle value.
    * @param greaterKey The element which should be just right of the new oracle value.
    * @dev Note that only one of `lesserKey` or `greaterKey` needs to be correct to reduce friction.
@@ -223,31 +309,68 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     if (newMedian != originalMedian) {
       emit MedianUpdated(token, newMedian);
     }
+
+    if (address(breakerBox) != address(0)) {
+      breakerBox.checkAndSetBreakers(token);
+    }
   }
 
   /**
-   * @notice Returns the number of rates.
-   * @param token The address of the token for which the CELO exchange rate is being reported.
-   * @return The number of reported oracle rates for `token`.
+   * @notice Returns the number of rates that are currently stored for a specifed rateFeedId.
+   * @dev Does not take account of equivalentTokens mapping.
+   * @param token The rateFeedId for which to retrieve the number of rates.
+   * @return uint256 The number of reported oracle rates stored for the given rateFeedId.
    */
   function numRates(address token) public view returns (uint256) {
     return rates[token].getNumElements();
   }
 
   /**
-   * @notice Returns the median rate.
-   * @param token The address of the token for which the CELO exchange rate is being reported.
-   * @return The median exchange rate for `token`.
-   * @return fixidity
+   * @notice Returns the median of the currently stored rates for a specified rateFeedId.
+   * @dev Does not take account of equivalentTokens mapping.
+   * @param token The rateFeedId of the rates for which the median value is being retrieved.
+   * @return uint256 The median exchange rate for rateFeedId (fixidity).
+   * @return uint256 num of rates
    */
-  function medianRate(address token) external view returns (uint256, uint256) {
+  function medianRateWithoutEquivalentMapping(address token)
+    public
+    view
+    returns (uint256, uint256)
+  {
     return (rates[token].getMedianValue(), numRates(token) == 0 ? 0 : FIXED1_UINT);
   }
 
   /**
+   * @notice Returns the median of the currently stored rates for a specified rateFeedId.
+   * @dev Please note that this function respects the equivalentToken mapping, and so may
+   * return the median identified as an equivalent to the supplied rateFeedId.
+   * @param token The rateFeedId of the rates for which the median value is being retrieved.
+   * @return uint256 The median exchange rate for rateFeedId (fixidity).
+   * @return uint256 num of rates
+   */
+  function medianRate(address token) external view returns (uint256, uint256) {
+    EquivalentToken storage equivalentToken = equivalentTokens[token];
+    if (equivalentToken.token != address(0)) {
+      (uint256 equivalentMedianRate, uint256 numRates) = medianRateWithoutEquivalentMapping(
+        equivalentToken.token
+      );
+      return (
+        FixidityLib
+          .wrap(equivalentMedianRate)
+          .multiply(FixidityLib.wrap(equivalentToken.multiplier))
+          .unwrap(),
+        numRates
+      );
+    }
+
+    return medianRateWithoutEquivalentMapping(token);
+  }
+
+  /**
    * @notice Gets all elements from the doubly linked list.
-   * @param token The address of the token for which the CELO exchange rate is being reported.
-   * @return keys Keys of nn unpacked list of elements from largest to smallest.
+   * @dev Does not take account of equivalentTokens mapping.
+   * @param token The rateFeedId for which the collateral asset exchange rate is being reported.
+   * @return keys Keys of an unpacked list of elements from largest to smallest.
    * @return values Values of an unpacked list of elements from largest to smallest.
    * @return relations Relations of an unpacked list of elements from largest to smallest.
    */
@@ -261,8 +384,9 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Returns the number of timestamps.
-   * @param token The address of the token for which the CELO exchange rate is being reported.
-   * @return The number of oracle report timestamps for `token`.
+   * @dev Does not take account of equivalentTokens mapping.
+   * @param token The rateFeedId for which the collateral asset exchange rate is being reported.
+   * @return uint256 The number of oracle report timestamps for the specified rateFeedId.
    */
   function numTimestamps(address token) public view returns (uint256) {
     return timestamps[token].getNumElements();
@@ -270,8 +394,9 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Returns the median timestamp.
-   * @param token The address of the token for which the CELO exchange rate is being reported.
-   * @return The median report timestamp for `token`.
+   * @dev Does not take account of equivalentTokens mapping.
+   * @param token The rateFeedId for which the collateral asset exchange rate is being reported.
+   * @return uint256 The median report timestamp for the specified rateFeedId.
    */
   function medianTimestamp(address token) external view returns (uint256) {
     return timestamps[token].getMedianValue();
@@ -279,7 +404,8 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Gets all elements from the doubly linked list.
-   * @param token The address of the token for which the CELO exchange rate is being reported.
+   * @dev Does not take account of equivalentTokens mapping.
+   * @param token The rateFeedId for which the collateral asset exchange rate is being reported.
    * @return keys Keys of nn unpacked list of elements from largest to smallest.
    * @return values Values of an unpacked list of elements from largest to smallest.
    * @return relations Relations of an unpacked list of elements from largest to smallest.
@@ -293,26 +419,30 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   }
 
   /**
-   * @notice Returns whether a report exists on token from oracle.
-   * @param token The address of the token for which the CELO exchange rate is being reported.
+   * @notice Checks if a report exists for a specified rateFeedId from a given oracle.
+   * @dev Does not take account of equivalentTokens mapping.
+   * @param token The rateFeedId to be checked.
    * @param oracle The oracle whose report should be checked.
+   * @return bool True if a report exists, false otherwise.
    */
   function reportExists(address token, address oracle) internal view returns (bool) {
     return rates[token].contains(oracle) && timestamps[token].contains(oracle);
   }
 
   /**
-   * @notice Returns the list of oracles for a particular token.
-   * @param token The address of the token whose oracles should be returned.
-   * @return The list of oracles for a particular token.
+   * @notice Returns the list of oracles for a speficied rateFeedId.
+   * @dev Does not take account of equivalentTokens mapping.
+   * @param token The rateFeedId whose oracles should be returned.
+   * @return address[] A list of oracles for the given rateFeedId.
    */
   function getOracles(address token) external view returns (address[] memory) {
     return oracles[token];
   }
 
   /**
-   * @notice Returns the expiry for the token if exists, if not the default.
-   * @param token The address of the token.
+   * @notice Returns the expiry for specified rateFeedId if it exists, if not the default is returned.
+   * @dev Does not take account of equivalentTokens mapping.
+   * @param token The rateFeedId.
    * @return The report expiry in seconds.
    */
   function getTokenReportExpirySeconds(address token) public view returns (uint256) {
@@ -325,7 +455,8 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Removes an oracle value and updates the median.
-   * @param token The address of the token for which the CELO exchange rate is being reported.
+   * @dev Does not take account of equivalentTokens mapping.
+   * @param token The rateFeedId for which the collateral asset exchange rate is being reported.
    * @param oracle The oracle whose value should be removed.
    * @dev This can be used to delete elements for oracles that have been removed.
    * However, a > 1 elements reports list should always be maintained
@@ -339,6 +470,9 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     uint256 newMedian = rates[token].getMedianValue();
     if (newMedian != originalMedian) {
       emit MedianUpdated(token, newMedian);
+      if (address(breakerBox) != address(0)) {
+        breakerBox.checkAndSetBreakers(token);
+      }
     }
   }
 }

@@ -1,7 +1,7 @@
 /* tslint:disable no-console */
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
+import { CeloEnvArgv, addCeloEnvMiddleware } from 'src/lib/env-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
 import Web3 from 'web3'
 import yargs from 'yargs'
@@ -54,7 +54,7 @@ export const handler = async (argv: UnfreezeContractsArgv) => {
     const web3: Web3 = new Web3('http://localhost:8545')
     const kit: ContractKit = newKitFromWeb3(web3)
     const account = (await kit.connection.getAccounts())[0]
-    console.log(`Using account: ${account}`)
+    console.info(`Using account: ${account}`)
     kit.connection.defaultAccount = account
 
     const [exchange, epochRewards] = await Promise.all([
@@ -68,7 +68,7 @@ export const handler = async (argv: UnfreezeContractsArgv) => {
         continue
       }
 
-      const address = (contract as any)._address
+      const address = contract._address
       if (argv.precheck) {
         const frozen = await freezerContract.methods.isFrozen(address).call()
         // console.debug(`${name}.frozen = ${frozen}`)

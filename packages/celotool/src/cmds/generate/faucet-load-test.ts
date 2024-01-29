@@ -1,4 +1,3 @@
-/* tslint:disable no-console */
 import { newKit } from '@celo/contractkit'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { convertToContractDecimals } from 'src/lib/contract-utils'
@@ -65,7 +64,7 @@ export const handler = async (argv: CeloEnvArgv & FaucetLoadTest) => {
   const cb = async () => {
     const kit = newKit('http://localhost:8545')
     const account = (await kit.web3.eth.getAccounts())[0]
-    console.log(`Using account: ${account}`)
+    console.info(`Using account: ${account}`)
     kit.defaultAccount = account
 
     const [goldToken, stableToken] = await Promise.all([
@@ -82,9 +81,9 @@ export const handler = async (argv: CeloEnvArgv & FaucetLoadTest) => {
       for (let threadIndex = argv.threads_from; threadIndex <= argv.threads_to; threadIndex++) {
         const index = getIndexForLoadTestThread(podIndex, threadIndex)
         const address = generateAddress(mnemonic, accountType, index)
-        console.log(`${index} --> Fauceting ${goldAmount.toFixed()} Gold to ${address}`)
+        console.info(`${index} --> Fauceting ${goldAmount.toFixed()} Gold to ${address}`)
         await goldToken.transfer(address, goldAmount.toFixed()).send()
-        console.log(`${index} --> Fauceting ${stableTokenAmount.toFixed()} Dollars to ${address}`)
+        console.info(`${index} --> Fauceting ${stableTokenAmount.toFixed()} Dollars to ${address}`)
         await stableToken.transfer(address, stableTokenAmount.toFixed()).send()
       }
     }
@@ -92,7 +91,8 @@ export const handler = async (argv: CeloEnvArgv & FaucetLoadTest) => {
 
   try {
     await portForwardAnd(argv.celoEnv, cb)
-    await cb
+    // note this wasnt called before
+    await cb()
   } catch (error) {
     console.error(`Unable to faucet load-test accounts on ${argv.celoEnv}`)
     console.error(error)

@@ -20,7 +20,7 @@ jobs:
       node12: ${{ steps.changes.outputs.node12 }}
       gcloud: ${{ steps.changes.outputs.gcloud }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Check for changes
         uses: dorny/paths-filter@v2
         id: changes
@@ -47,6 +47,7 @@ jobs:
       artifact-registry: us-west1-docker.pkg.dev/devopsre/dev-images/circleci-geth
       tag: testing
       context: dockerfiles/circleci
+      trivy: true
 
   geth-build:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
@@ -61,6 +62,7 @@ jobs:
       artifact-registry: us-west1-docker.pkg.dev/devopsre/celo-monorepo/circleci-geth
       tag: latest
       context: dockerfiles/circleci
+      trivy: true
 
   node12-build-dev:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
@@ -75,6 +77,7 @@ jobs:
       artifact-registry: us-west1-docker.pkg.dev/devopsre/dev-images/circleci-node12
       tag: testing
       context: dockerfiles/circleci
+      trivy: true
 
   node12-build:
     uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
@@ -89,4 +92,5 @@ jobs:
       artifact-registry: us-west1-docker.pkg.dev/devopsre/celo-monorepo/circleci-node12
       tag: latest
       context: dockerfiles/circleci
+      trivy: true
 
