@@ -24,7 +24,6 @@ COPY packages/celotool/package.json packages/celotool/
 COPY packages/dev-utils/package.json packages/dev-utils/
 COPY packages/env-tests/package.json packages/env-tests/package.json
 COPY packages/protocol/package.json packages/protocol/
-COPY patches/ patches/
 COPY scripts/ scripts/
 # Makes build fail if it doesn't copy git, will be removed after build
 COPY .git .git
