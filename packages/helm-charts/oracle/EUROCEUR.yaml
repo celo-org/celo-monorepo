@@ -1,0 +1,39 @@
+oracle:
+  currencyPair: EUROCEUR
+  aggregation:
+    mid:
+      maxExchangeVolumeShare: 1
+      maxPercentageDeviation: 0.01
+      maxPercentageBidAskSpread: 0.0075
+  metrics:
+    enabled: true
+    prometheusPort: 9090
+  apiRequestTimeoutMs: 5000
+  circuitBreakerPriceChangeThreshold: 0.25
+  gasPriceMultiplier: 1.5
+  priceSources: "[
+      [
+        {exchange: 'COINBASE', symbol: 'EUROCEUR', toInvert: false}
+      ],
+      [
+        {exchange: 'COINBASE', symbol: 'EUROCUSD', toInvert: false},
+        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: true},
+        {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false}
+      ],
+      [
+        {exchange: 'BITSTAMP', symbol: 'EUROCEUR', toInvert: false},
+      ],
+      [
+        {exchange: 'BITMART', symbol: 'EUROCUSDT', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDTEUR', toInvert: false}
+      ],
+      [
+        {exchange: 'BITMART', symbol: 'EUROCUSDC', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDCEUR', toInvert: false}
+      ]
+    ]"
+  minPriceSourceCount: 2
+  reportStrategy: BLOCK_BASED
+  reporter:
+    blockBased:
+      minReportPriceChangeThreshold: 0.0005 # 0.05%

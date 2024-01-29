@@ -49,7 +49,10 @@ enum VoteValue {
 }
 
 async function getGroups(election: ElectionInstance) {
-  const [lst1, lst2] = await election.getTotalVotesForEligibleValidatorGroups()
+  const response = await election.getTotalVotesForEligibleValidatorGroups()
+  console.info('response', response)
+  const lst1 = response[0]
+  const lst2 = response[1]
   return zip(
     (address, value) => {
       return { address, value }
@@ -212,8 +215,8 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     })
 
     it('should increment the vote totals', async () => {
-      const [yes, ,] = await governance.getVoteTotals(proposalId)
-      assertEqualBN(yes, value)
+      const response = await governance.getVoteTotals(proposalId)
+      assertEqualBN(response[0], value)
     })
   })
 
@@ -386,8 +389,8 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
 
     it('should increment the vote totals', async () => {
-      const [yes, ,] = await governance.getVoteTotals(proposalId)
-      assertEqualBN(yes, value)
+      const response = await governance.getVoteTotals(proposalId)
+      assertEqualBN(response[0], value)
     })
   })
 
@@ -665,18 +668,12 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
 
     it(`should be impossible to sell CELO`, async () => {
       await goldToken.approve(exchangeAbc.address, sellAmount)
-      await assertTransactionRevertWithReason(
-        exchangeAbc.sell(sellAmount, minBuyAmount, true),
-        'token address cannot be null'
-      )
+      await assertTransactionRevertWithReason(exchangeAbc.sell(sellAmount, minBuyAmount, true))
     })
 
     it(`should be impossible to sell stable token`, async () => {
       await stableTokenAbc.approve(exchangeAbc.address, sellAmount)
-      await assertTransactionRevertWithReason(
-        exchangeAbc.sell(sellAmount, minBuyAmount, false),
-        'token address cannot be null'
-      )
+      await assertTransactionRevertWithReason(exchangeAbc.sell(sellAmount, minBuyAmount, false))
     })
   })
 

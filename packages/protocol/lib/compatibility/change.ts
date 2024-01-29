@@ -1,4 +1,4 @@
-// tslint:disable: max-classes-per-file
+/* eslint-disable max-classes-per-file: 0 */
 /**
  * A code change detected from an old to a new version of a contract.
  */

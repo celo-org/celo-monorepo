@@ -7,7 +7,6 @@ import {
 } from '../helm_deploy'
 
 export enum CloudProvider {
-  AWS,
   AZURE,
   GCP,
 }

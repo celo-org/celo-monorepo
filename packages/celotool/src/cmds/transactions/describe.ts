@@ -24,7 +24,7 @@ export const handler = async (argv: DescribeArgv) => {
   await switchToClusterFromEnv(argv.celoEnv, false)
 
   const web3 = new Web3(getFornoUrl(argv.celoEnv))
-  const kit = await newKitFromWeb3(web3)
+  const kit = newKitFromWeb3(web3)
   const blockExplorer = await newBlockExplorer(kit)
   const logExplorer = await newLogExplorer(kit)
   const transaction = await web3.eth.getTransaction(argv.transactionHash)
@@ -69,7 +69,7 @@ export const handler = async (argv: DescribeArgv) => {
         to: transaction.to ? transaction.to : undefined,
         from: transaction.from,
       },
-      transaction.blockNumber!
+      transaction.blockNumber
     )
 
     if (called.startsWith('0x08c379a')) {

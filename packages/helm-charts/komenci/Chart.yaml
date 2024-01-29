@@ -1,9 +1,0 @@
-apiVersion: v1
-appVersion: "0.2.0"
-description: A Helm chart for the Komenci app
-name: komenci
-version: 0.1.0
-dependencies:
-  - name: common
-    repository: oci://us-west1-docker.pkg.dev/devopsre/clabs-public-oci
-    version: 0.2.0

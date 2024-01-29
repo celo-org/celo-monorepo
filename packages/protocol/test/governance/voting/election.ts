@@ -104,9 +104,9 @@ contract('Election', (accounts: string[]) => {
     })
 
     it('should have set electableValidators', async () => {
-      const [min, max] = await election.getElectableValidators()
-      assertEqualBN(min, electableValidators.min)
-      assertEqualBN(max, electableValidators.max)
+      const actualElectedValidators = await election.getElectableValidators()
+      assertEqualBN(actualElectedValidators[0], electableValidators.min)
+      assertEqualBN(actualElectedValidators[1], electableValidators.max)
     })
 
     it('should have set maxNumGroupsVotedFor', async () => {
@@ -158,9 +158,9 @@ contract('Election', (accounts: string[]) => {
 
     it('should set the minimum electable valdiators', async () => {
       await election.setElectableValidators(newElectableValidators.min, newElectableValidators.max)
-      const [min, max] = await election.getElectableValidators()
-      assertEqualBN(min, newElectableValidators.min)
-      assertEqualBN(max, newElectableValidators.max)
+      const electable = await election.getElectableValidators()
+      assertEqualBN(electable[0], newElectableValidators.min)
+      assertEqualBN(electable[1], newElectableValidators.max)
     })
 
     it('should emit the ElectableValidatorsSet event', async () => {
@@ -2318,8 +2318,8 @@ contract('Election', (accounts: string[]) => {
 
     const debugLog = (s: string) => {
       if (debug) {
-        // tslint:disable-next-line: no-console
-        console.log(s)
+        // eslint-disable-next-line: no-console
+        console.info(s)
       }
     }
 
@@ -2548,7 +2548,7 @@ contract('Election', (accounts: string[]) => {
                 NULL_ADDRESS,
                 NULL_ADDRESS
               )
-              // tslint:disable-next-line
+              // eslint-disable-next-line
               for (let i = 0; i < vAccounts.length; i++) {
                 vAccounts[i].active = activeTotal
                   .plus(reward)

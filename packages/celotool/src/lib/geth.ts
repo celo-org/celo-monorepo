@@ -1,4 +1,4 @@
-// tslint:disable:no-console
+/* eslint-disable no-console: 0 */
 import { CeloTxReceipt, TransactionResult } from '@celo/connect'
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
@@ -16,20 +16,20 @@ import Web3 from 'web3'
 import { Admin } from 'web3-eth-admin'
 import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { convertToContractDecimals } from './contract-utils'
-import { envVar, fetchEnv, isVmBased } from './env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
+  Validator,
   generateGenesis,
   generateGenesisWithMigrations,
   generatePrivateKey,
+  privateKeyToAddress,
   privateKeyToPublicKey,
-  Validator,
 } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
 import { GethRunConfig } from './interfaces/geth-run-config'
 import { ensure0x } from './utils'
-import { getTestnetOutputs } from './vm-testnet-utils'
 
 export async function unlockAccount(
   web3: Web3,
@@ -78,6 +78,8 @@ export const LOG_TAG_TRANSACTION_VALIDATION_ERROR = 'validate_transaction_error'
 // for log messages which show time needed to receive the receipt after
 // the transaction has been sent
 export const LOG_TAG_TX_TIME_MEASUREMENT = 'tx_time_measurement'
+// max number of threads used for load testing
+export const MAX_LOADTEST_THREAD_COUNT = 100
 
 export const getEnodeAddress = (nodeId: string, ipAddress: string, port: number) => {
   return `enode://${nodeId}@${ipAddress}:${port}`
@@ -91,29 +93,19 @@ export const getBootnodeEnode = async (namespace: string) => {
 }
 
 export const retrieveBootnodeIPAddress = async (namespace: string) => {
-  if (isVmBased()) {
-    const outputs = await getTestnetOutputs(namespace)
-    return outputs.bootnode_ip_address.value
+  // Baklava bootnode address comes from VM and has an different name (not possible to update name after creation)
+  const resourceName =
+    namespace === 'baklava' ? `${namespace}-bootnode-address` : `${namespace}-bootnode`
+  if (fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true') {
+    return retrieveIPAddress(resourceName)
   } else {
-    // Baklava bootnode address comes from VM and has an different name (not possible to update name after creation)
-    const resourceName =
-      namespace === 'baklava' ? `${namespace}-bootnode-address` : `${namespace}-bootnode`
-    if (fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true') {
-      return retrieveIPAddress(resourceName)
-    } else {
-      return retrieveClusterIPAddress('service', resourceName, namespace)
-    }
+    return retrieveClusterIPAddress('service', resourceName, namespace)
   }
 }
 
 const retrieveTxNodeAddresses = async (namespace: string, txNodesNum: number) => {
-  if (isVmBased()) {
-    const outputs = await getTestnetOutputs(namespace)
-    return outputs.tx_node_ip_addresses.value
-  } else {
-    const txNodesRange = range(0, txNodesNum)
-    return Promise.all(txNodesRange.map((i) => retrieveIPAddress(`${namespace}-tx-nodes-${i}`)))
-  }
+  const txNodesRange = range(0, txNodesNum)
+  return Promise.all(txNodesRange.map((i) => retrieveIPAddress(`${namespace}-tx-nodes-${i}`)))
 }
 
 const getEnodesWithIpAddresses = async (namespace: string, getExternalIP: boolean) => {
@@ -317,7 +309,7 @@ const validateTransactionAndReceipt = (
 }
 
 const tracerLog = (logMessage: any) => {
-  console.log(JSON.stringify(logMessage))
+  console.info(JSON.stringify(logMessage))
 }
 
 const exitTracerTool = (logMessage: any) => {
@@ -548,30 +540,37 @@ export enum TestMode {
   Mixed = 'mixed',
   Data = 'data',
   Transfer = 'transfer',
+  StableTransfer = 'stable_transfer',
+  ContractCall = 'contract_call',
 }
 
 export const simulateClient = async (
-  senderAddress: string,
+  senderPK: string,
   recipientAddress: string,
+  contractAddress: string,
+  contractData: string,
   txPeriodMs: number, // time between new transactions in ms
   blockscoutUrl: string,
   blockscoutMeasurePercent: number, // percent of time in range [0, 100] to measure blockscout for a tx
   index: number,
   testMode: TestMode,
   thread: number,
-  web3Provider: string = 'http://localhost:8545'
+  maxGasPrice: BigNumber = new BigNumber(0),
+  totalTxGas: number = 500000, // aim for half million gas txs
+  web3Provider: string = 'http://127.0.0.1:8545'
 ) => {
   // Assume the node is accessible via localhost with senderAddress unlocked
   const kit = newKitFromWeb3(new Web3(web3Provider))
-  const password = fetchEnv('PASSWORD')
 
   let lastNonce: number = -1
   let lastTx: string = ''
   let lastGasPriceMinimum: BigNumber = new BigNumber(0)
   let nonce: number = 0
-  let unlockNeeded: boolean = true
   let recipientAddressFinal: string = recipientAddress
-  const useRandomRecipient = fetchEnv(envVar.LOAD_TEST_USE_RANDOM_RECIPIENT)
+  const useRandomRecipient = fetchEnvOrFallback(envVar.LOAD_TEST_USE_RANDOM_RECIPIENT, 'false')
+
+  kit.connection.addAccount(senderPK)
+  kit.defaultAccount = privateKeyToAddress(senderPK)
 
   const sleepTime = 5000
   while (await kit.connection.isSyncing()) {
@@ -580,7 +579,6 @@ export const simulateClient = async (
     )
     await sleep(sleepTime)
   }
-  kit.defaultAccount = senderAddress
 
   // sleep a random amount of time in the range [0, txPeriodMs) before starting so
   // that if multiple simulations are started at the same time, they don't all
@@ -589,23 +587,35 @@ export const simulateClient = async (
   console.info(`Sleeping for ${randomSleep} ms`)
   await sleep(randomSleep)
 
+  const txConf = await getTxConf(testMode)
+  const intrinsicGas = txConf.feeCurrencyGold ? 21000 : 71000
+  const calldataGas = totalTxGas - intrinsicGas
+  const calldataSize = calldataGas / 4 // 119750 < tx pool size limit (128k)
+  let dataStr = testMode === TestMode.Data ? getBigData(calldataSize) : undefined // aim for half million gas txs
+  // Also running below the 128kb limit from the tx pool
+  let transferAmount = LOAD_TEST_TRANSFER_WEI
+
+  if (testMode === TestMode.ContractCall) {
+    if (!contractData || !contractAddress) {
+      throw new Error('Contract address and data must be provided for TestMode.ContractCall')
+    }
+    dataStr = contractData
+    recipientAddressFinal = contractAddress
+    transferAmount = new BigNumber(0)
+  }
+
   const baseLogMessage: any = {
     loadTestID: index,
     threadID: thread,
-    sender: senderAddress,
+    sender: kit.defaultAccount,
     recipient: recipientAddressFinal,
     feeCurrency: '',
     txHash: '',
+    tokenName: txConf.tokenName,
   }
 
   while (true) {
     const sendTransactionTime = Date.now()
-    if (unlockNeeded) {
-      await unlock(kit, kit.defaultAccount, password, 9223372036)
-      unlockNeeded = false
-    }
-    const txConf = await getTxConf(testMode)
-    baseLogMessage.tokenName = txConf.tokenName
 
     // randomly choose the recipientAddress if configured
     if (useRandomRecipient === 'true') {
@@ -631,6 +641,9 @@ export const simulateClient = async (
       )
       nonce = nonceResult.nonce
       gasPrice = nonceResult.newPrice
+      if (maxGasPrice.isGreaterThan(0)) {
+        gasPrice = BigNumber.min(gasPrice, maxGasPrice)
+      }
       lastGasPriceMinimum = gasPrice
       txOptions = {
         gasPrice: gasPrice.toString(),
@@ -644,19 +657,21 @@ export const simulateClient = async (
         ...baseLogMessage,
       })
     }
-    const intrinsicGas = 21000
-    const totalTxGas = 500000 // aim for half million gas txs
-    const calldataGas = totalTxGas - intrinsicGas
-    const calldataSize = calldataGas / 4 // 119750 < tx pool size limit (128k)
-    const dataStr = testMode === TestMode.Data ? getBigData(calldataSize) : undefined // aim for half million gas txs
-    // Also running below the 128kb limit from the tx pool
+
+    if (testMode === TestMode.ContractCall) {
+      if (!contractData || !contractAddress) {
+        throw new Error('Contract address and data must be provided for TestMode.ContractCall')
+      }
+      dataStr = contractData
+      recipientAddressFinal = contractAddress
+    }
 
     await txConf
       .transferFn(
         kit,
-        senderAddress,
+        kit.defaultAccount,
         recipientAddressFinal,
-        LOAD_TEST_TRANSFER_WEI,
+        transferAmount,
         dataStr,
         txOptions
       )
@@ -665,7 +680,7 @@ export const simulateClient = async (
         lastNonce = (await kit.web3.eth.getTransaction(lastTx)).nonce
         await onLoadTestTxResult(
           kit,
-          senderAddress,
+          kit.defaultAccount!,
           txResult,
           sendTransactionTime,
           baseLogMessage,
@@ -674,9 +689,11 @@ export const simulateClient = async (
         )
       })
       .catch((error: any) => {
-        if (catchNeedUnlock(error, baseLogMessage)) {
-          unlockNeeded = true
-        }
+        tracerLog({
+          tag: LOG_TAG_TRANSACTION_ERROR,
+          error: error.toString(),
+          ...baseLogMessage,
+        })
       })
     if (sendTransactionTime + txPeriodMs > Date.now()) {
       await sleep(sendTransactionTime + txPeriodMs - Date.now())
@@ -689,32 +706,46 @@ const getBigData = (size: number) => {
 }
 
 const getTxConf = async (testMode: TestMode) => {
-  if (testMode === TestMode.Data) {
-    return {
-      feeCurrencyGold: true,
-      tokenName: 'cGLD.L',
-      transferFn: transferCalldata,
-    }
-  }
-  if (testMode === TestMode.Transfer) {
-    return {
-      feeCurrencyGold: true,
-      tokenName: 'cGLD',
-      transferFn: transferCeloGold,
-    }
-  }
+  switch (testMode) {
+    case TestMode.Data:
+      return {
+        feeCurrencyGold: true,
+        tokenName: 'cGLD.L',
+        transferFn: transferCalldata,
+      }
+    case TestMode.Transfer:
+      return {
+        feeCurrencyGold: true,
+        tokenName: 'cGLD',
+        transferFn: transferCeloGold,
+      }
+    case TestMode.StableTransfer:
+      return {
+        feeCurrencyGold: false,
+        tokenName: 'cUSD',
+        transferFn: transferCeloDollars,
+      }
+    case TestMode.Mixed:
+      // randomly choose which token to use
+      const useGold = Boolean(Math.round(Math.random()))
+      const _transferFn = useGold ? transferCeloGold : transferCeloDollars
+      const _tokenName = useGold ? 'cGLD' : 'cUSD'
 
-  // randomly choose which token to use
-  const useGold = Boolean(Math.round(Math.random()))
-  const _transferFn = useGold ? transferCeloGold : transferCeloDollars
-  const _tokenName = useGold ? 'cGLD' : 'cUSD'
-
-  // randomly choose which gas currency to use
-  const _feeCurrencyGold = Boolean(Math.round(Math.random()))
-  return {
-    feeCurrencyGold: _feeCurrencyGold,
-    tokenName: _tokenName,
-    transferFn: _transferFn,
+      // randomly choose which gas currency to use
+      const _feeCurrencyGold = Boolean(Math.round(Math.random()))
+      return {
+        feeCurrencyGold: _feeCurrencyGold,
+        tokenName: _tokenName,
+        transferFn: _transferFn,
+      }
+    case TestMode.ContractCall:
+      return {
+        feeCurrencyGold: true,
+        tokenName: 'contract', // For logging
+        transferFn: transferCalldata,
+      }
+    default:
+      throw new Error(`Unimplemented TestMode: ${testMode}`)
   }
 }
 
@@ -743,27 +774,6 @@ const getNonce = async (
     newPrice: _newPrice,
     nonce: _nonce,
   }
-}
-
-// Catch errors from the transfer Fn, and returns if an account unlock
-// is needed.
-const catchNeedUnlock = (error: any, baseLogMessage: any) => {
-  let unlockNeeded = false
-  if (
-    typeof error === 'string' &&
-    error.includes('Error: authentication needed: password or unlock')
-  ) {
-    console.warn('Load test transaction failed with locked account:', error)
-    unlockNeeded = true
-  } else {
-    console.error('Load test transaction failed with error:', error)
-    tracerLog({
-      tag: LOG_TAG_TRANSACTION_ERROR,
-      error: error.toString(),
-      ...baseLogMessage,
-    })
-  }
-  return unlockNeeded
 }
 
 const getFeeCurrency = async (kit: ContractKit, feeCurrencyGold: boolean, baseLogMessage: any) => {
@@ -845,9 +855,11 @@ export const onLoadTestTxResult = async (
  * @param thread the thread number inside the pod
  */
 export function getIndexForLoadTestThread(pod: number, thread: number) {
-  // max number of threads to avoid overlap is [0, base)
-  const base = 10000
-  return pod * base + thread
+  if (thread > MAX_LOADTEST_THREAD_COUNT) {
+    throw new Error(`thread count must be smaller than ${MAX_LOADTEST_THREAD_COUNT}`)
+  }
+  // max number of threads to avoid overlap is [0, MAX_LOADTEST_THREAD_COUNT)
+  return pod * MAX_LOADTEST_THREAD_COUNT + thread
 }
 
 /**
@@ -929,7 +941,7 @@ export const runGethNodes = async ({
 
   if (verbose) {
     const validatorAddresses = validators.map((validator) => validator.address)
-    console.log('Validators', JSON.stringify(validatorAddresses, null, 2))
+    console.info('Validators', JSON.stringify(validatorAddresses, null, 2))
   }
 
   for (const instance of gethConfig.instances) {
@@ -985,7 +997,7 @@ export async function initGeth(
   const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
   if (verbose) {
     console.info(`geth:${instance.name}: init datadir ${datadir}`)
-    console.log(`init geth with genesis at ${genesisPath}`)
+    console.info(`init geth with genesis at ${genesisPath}`)
   }
 
   await spawnCmdWithExitOnFailure('rm', ['-rf', datadir], { silent: !verbose })
@@ -1024,7 +1036,7 @@ export async function importPrivateKey(
   ]
 
   if (verbose) {
-    console.log(gethBinaryPath, ...args)
+    console.info(gethBinaryPath, ...args)
   }
 
   await spawnCmdWithExitOnFailure(gethBinaryPath, args, { silent: true })
@@ -1058,14 +1070,14 @@ export async function getEnode(peer: string, ws: boolean = false) {
 export async function addStaticPeers(datadir: string, peers: string[], verbose: boolean) {
   const staticPeersPath = path.join(datadir, 'static-nodes.json')
   if (verbose) {
-    console.log(`Writing static peers to ${staticPeersPath}`)
+    console.info(`Writing static peers to ${staticPeersPath}`)
   }
 
   const enodes = await Promise.all(peers.map((peer) => getEnode(peer)))
   const enodesString = JSON.stringify(enodes, null, 2)
 
   if (verbose) {
-    console.log('eNodes', enodesString)
+    console.info('eNodes', enodesString)
   }
 
   fs.writeFileSync(staticPeersPath, enodesString)
@@ -1094,9 +1106,9 @@ export async function startGeth(
   verbose: boolean
 ) {
   if (verbose) {
-    console.log('starting geth with config', JSON.stringify(instance, null, 2))
+    console.info('starting geth with config', JSON.stringify(instance, null, 2))
   } else {
-    console.log(`${instance.name}: starting.`)
+    console.info(`${instance.name}: starting.`)
   }
 
   const datadir = getDatadir(gethConfig.runPath, instance)
@@ -1274,10 +1286,28 @@ export async function startGeth(
     }
   }
 
-  // Geth startup isn't fully done even when the port is open, so give it another second
-  await sleep(1000)
+  // Geth startup isn't fully done even when the port is open, so check until it responds
+  const maxTries = 5
+  let tries = 0
+  while (tries < maxTries) {
+    tries++
+    let block = null
+    try {
+      block = await new Web3('http://localhost:8545').eth.getBlock('latest')
+    } catch (e) {
+      console.info(`Failed to fetch test block: ${e}`)
+    }
+    if (block) {
+      break
+    }
+    console.info('Could not fetch test block. Wait one second, then retry.')
+    await sleep(1000)
+  }
+  if (tries === maxTries) {
+    throw new Error(`Geth did not start within ${tries} seconds`)
+  }
 
-  console.log(
+  console.info(
     `${instance.name}: running.`,
     rpcport ? `RPC: ${rpcport}` : '',
     wsport ? `WS: ${wsport}` : '',
@@ -1301,13 +1331,13 @@ export function writeGenesis(gethConfig: GethRunConfig, validators: Validator[],
   const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
 
   if (verbose) {
-    console.log('writing genesis')
+    console.info('writing genesis')
   }
 
   fs.writeFileSync(genesisPath, genesis)
 
   if (verbose) {
-    console.log(`wrote genesis to ${genesisPath}`)
+    console.info(`wrote genesis to ${genesisPath}`)
   }
 }
 
@@ -1336,13 +1366,13 @@ export async function writeGenesisWithMigrations(
   const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
 
   if (verbose) {
-    console.log('writing genesis')
+    console.info('writing genesis')
   }
 
   fs.writeFileSync(genesisPath, genesis)
 
   if (verbose) {
-    console.log(`wrote genesis to ${genesisPath}`)
+    console.info(`wrote genesis to ${genesisPath}`)
   }
 }
 
@@ -1352,7 +1382,7 @@ export async function snapshotDatadir(
   verbose: boolean
 ) {
   if (verbose) {
-    console.log('snapshotting data dir')
+    console.info('snapshotting data dir')
   }
 
   // Sometimes the socket is still present, preventing us from snapshotting.
@@ -1411,7 +1441,7 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string, 
   const logStream = fs.createWriteStream(logsFilepath, { flags: 'a' })
 
   if (verbose) {
-    console.log(cmd, ...args)
+    console.info(cmd, ...args)
   }
 
   const p = spawn(cmd, args)
@@ -1458,7 +1488,7 @@ export async function connectBipartiteClique(
               return
             }
             if (verbose) {
-              console.log(`connecting ${sourceEnode} with ${enode}`)
+              console.info(`connecting ${sourceEnode} with ${enode}`)
             }
             const success = await admin.addPeer(enode)
             if (!success) {

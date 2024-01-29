@@ -1,11 +1,8 @@
-[default]
+[profile.default]
 src = 'contracts'
 out = 'out'
 test = 'test-sol'
-libs = [
-    'lib',
-    'node_modules',
-]
+libs = ['lib', 'node_modules']
 remappings = [
     'openzeppelin-solidity/=lib/openzeppelin-contracts/',
     'solidity-bytes-utils/=lib/solidity-bytes-utils/',
@@ -21,6 +18,8 @@ remappings = [
 ]
 
 no_match_contract = "RandomTest"
-no_match_path = "contracts/common/libraries/test/BLS12Passthrough.sol"  # tested from celo-blockain repo
+no_match_path = "contracts/common/libraries/test/BLS12Passthrough.sol" # tested from celo-blockain repo
+
+fs_permissions = [{ access = "read", path = "./out"}]
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config

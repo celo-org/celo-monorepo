@@ -227,18 +227,20 @@ spec:
 echo "Generating proxy enode url pair for proxy $PROXY_INDEX"
 PROXY_INTERNAL_IP_ENV_VAR={{ $.Release.Namespace | upper }}_VALIDATORS_${RID}_PROXY_INTERNAL_${PROXY_INDEX}_SERVICE_HOST
 echo "PROXY_INTERNAL_IP_ENV_VAR=$PROXY_INTERNAL_IP_ENV_VAR"
-PROXY_INTERNAL_IP=$(eval "echo \\${${PROXY_INTERNAL_IP_ENV_VAR}}")
+PROXY_INTERNAL_IP=`eval "echo \\${${PROXY_INTERNAL_IP_ENV_VAR}}"`
 # If $PROXY_IPS is not empty, then we use the IPs from there. Otherwise,
 # we use the IP address of the proxy internal service
 if [ ! -z $PROXY_IPS ]; then
   echo "Proxy external IP from PROXY_IPS=$PROXY_IPS: "
-  PROXY_EXTERNAL_IP=$(echo -n $PROXY_IPS | cut -d '/' -f $((PROXY_INDEX + 1)))
+  PROXY_EXTERNAL_IP=`echo -n $PROXY_IPS | cut -d '/' -f $((PROXY_INDEX + 1))`
 else
   PROXY_EXTERNAL_IP=$PROXY_INTERNAL_IP
 fi
+echo "Proxy internal IP: $PROXY_INTERNAL_IP"
+echo "Proxy external IP: $PROXY_EXTERNAL_IP"
 # Proxy key index to allow for a high number of proxies per validator without overlap
 PROXY_KEY_INDEX=$(( ($RID * 10000) + $PROXY_INDEX ))
-PROXY_ENODE_ADDRESS=$(celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType proxy --index $PROXY_KEY_INDEX)
+PROXY_ENODE_ADDRESS=`celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType proxy --index $PROXY_KEY_INDEX`
 PROXY_INTERNAL_ENODE=enode://${PROXY_ENODE_ADDRESS}@${PROXY_INTERNAL_IP}:30503
 PROXY_EXTERNAL_ENODE=enode://${PROXY_ENODE_ADDRESS}@${PROXY_EXTERNAL_IP}:30303
 echo "Proxy internal enode: $PROXY_INTERNAL_ENODE"

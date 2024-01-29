@@ -29,7 +29,7 @@ export const handler = async (argv: ListArgv) => {
 
   await switchToClusterFromEnv(argv.celoEnv, false, true)
 
-  console.log(`Getting list of users for "${argv.celoEnv}" environment`)
+  console.info(`Getting list of users for "${argv.celoEnv}" environment`)
   const resp = await fetch(listUsersUrl)
   const jsonResp = await resp.json()
   await handleListOfUsers(domain, jsonResp, process.env.CELOTOOL_VERBOSE === 'true')
@@ -37,7 +37,7 @@ export const handler = async (argv: ListArgv) => {
 
 async function handleListOfUsers(domain: string, json: any, verboseMode: boolean) {
   if (verboseMode) {
-    console.log('verbose mode enabled')
+    console.info('verbose mode enabled')
   }
   const transactionUrlPrefix = `${domain}/api?module=account&action=tokentx&address=`
   const users = new Set<string>()
@@ -45,7 +45,7 @@ async function handleListOfUsers(domain: string, json: any, verboseMode: boolean
     users.add(object.from)
   }
 
-  console.log(`Num of users: ${users.size}`)
+  console.info(`Num of users: ${users.size}`)
   const usersArray = Array.from(users.values())
   const usersAndTransactions = new Array(usersArray.length)
 
@@ -100,7 +100,7 @@ async function handleListOfUsers(domain: string, json: any, verboseMode: boolean
     if (knownAccounts.has(address)) {
       infoString = `${infoString} (${knownAccounts.get(address)}`
     }
-    console.log(infoString)
+    console.info(infoString)
   }
 }
 

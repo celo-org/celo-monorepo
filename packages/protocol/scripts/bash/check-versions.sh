@@ -10,14 +10,14 @@ set -euo pipefail
 # -r: Path that the contract compatibility report should be written to.
 # -l: Path to a file to which logs should be appended
 
-OLD_BRANCH=""
+BRANCH=""
 NEW_BRANCH=""
 REPORT=""
 LOG_FILE="/tmp/celo-check-versions.log"
 
 while getopts 'a:b:r:l:i' flag; do
   case "${flag}" in
-    a) OLD_BRANCH="${OPTARG}" ;;
+    a) BRANCH="${OPTARG}" ;;
     b) NEW_BRANCH="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
     l) LOG_FILE="${OPTARG}" ;;
@@ -25,7 +25,7 @@ while getopts 'a:b:r:l:i' flag; do
   esac
 done
 
-[ -z "$OLD_BRANCH" ] && echo "Need to set the old branch via the -a flag" && exit 1;
+[ -z "$BRANCH" ] && echo "Need to set the old branch via the -a flag" && exit 1;
 [ -z "$NEW_BRANCH" ] && echo "Need to set the new branch via the -b flag" && exit 1;
 
 # CONTRACT_EXCLUSION_REGEX imported from here
@@ -38,8 +38,8 @@ fi
 
 source scripts/bash/release-lib.sh
 
-build_tag $OLD_BRANCH $LOG_FILE
-OLD_BRANCH_BUILD_DIR=$BUILD_DIR
+build_tag $BRANCH $LOG_FILE
+BRANCH_BUILD_DIR=$BUILD_DIR
 build_tag $NEW_BRANCH $LOG_FILE
 NEW_BRANCH_BUILD_DIR=$BUILD_DIR
 
@@ -49,7 +49,7 @@ CURRENT_HASH=`git log -n 1 --oneline | cut -c 1-9`
 git checkout $NEW_BRANCH -- migrationsConfig.js
 
 yarn ts-node scripts/check-backward.ts sem_check \
-  --old_contracts $OLD_BRANCH_BUILD_DIR/contracts \
+  --old_contracts $BRANCH_BUILD_DIR/contracts \
   --new_contracts $NEW_BRANCH_BUILD_DIR/contracts \
   --exclude $CONTRACT_EXCLUSION_REGEX \
   $REPORT_FLAG

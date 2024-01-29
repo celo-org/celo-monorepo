@@ -15,10 +15,7 @@ contract EpochRewardsTest is EpochRewards(true) {
     return _getRewardsMultiplier(targetGoldTotalSupplyIncrease).unwrap();
   }
 
-  function updateTargetVotingYield() external {
-    _updateTargetVotingYield();
-  }
-
+  // mocks the precompile
   function numberValidatorsInCurrentSet() public view returns (uint256) {
     return numValidatorsInCurrentSet;
   }
