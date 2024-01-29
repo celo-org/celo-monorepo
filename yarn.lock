@@ -10878,7 +10878,7 @@ functions-have-names@^1.2.2, functions-have-names@^1.2.3:
   resolved "https://registry.yarnpkg.com/functions-have-names/-/functions-have-names-1.2.3.tgz#0404fe4ee2ba2f607f0e0ec3c80bae994133b834"
   integrity sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==
 
-ganache@7.8.0, ganache@^7.4.0, "ganache@npm:@celo/ganache@7.8.0-unofficial.0", "ganache@npm:@soloseng/ganache@7.8.0-beta.1":
+ganache@7.8.0, ganache@^7.4.0, "ganache@npm:@celo/ganache@7.8.0-unofficial.0":
   version "7.8.0-beta.1"
   resolved "https://registry.yarnpkg.com/@soloseng/ganache/-/ganache-7.8.0-beta.1.tgz#168d3c2f1ea05c350e972f227872d4a4b15e5f9e"
   integrity sha512-ptjs631aKpxG7xexDDyxh5NevKQaUcSfm3/Aeh0smJ/3xQgNrJ+st6CVYVbVbhGkgNcq9NIvCCaIgt0L64GOCA==
