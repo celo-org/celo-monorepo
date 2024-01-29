@@ -84,7 +84,6 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
    */
   function debitGasFees(address from, uint256 value) external onlyVm {
     uint256 valueScaled = downscale(value);
-    require(valueScaled > 0, "Must debit at least one token.");
     debited = valueScaled;
     adaptedToken.debitGasFees(from, valueScaled);
   }
