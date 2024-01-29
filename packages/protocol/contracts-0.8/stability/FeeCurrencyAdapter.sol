@@ -17,7 +17,7 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm {
 
   uint96 public digitDifference;
 
-  uint256 public debited;
+  uint256 public debited = 0;
 
   string public name;
   string public symbol;
