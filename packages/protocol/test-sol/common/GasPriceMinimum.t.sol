@@ -36,7 +36,6 @@ contract GasPriceMinimumTest is Test {
   event GasPriceMinimumUpdated(uint256 gasPriceMinimum);
   event BaseFeeOpCodeActivationBlockSet(uint256 baseFeeOpCodeActivationBlock);
 
-
   function setUp() public virtual {
     owner = address(this);
     nonOwner = actor("nonOwner");
@@ -48,7 +47,6 @@ contract GasPriceMinimumTest is Test {
     // fails with `data did not match any variant of untagged enum Bytecode at line 822 column 3]`
     sortedOracles = new MockSortedOracles();
 
-
     gasPriceMinimum = new GasPriceMinimum(true);
 
     registry = IRegistry(registryAddress);
@@ -56,7 +54,6 @@ contract GasPriceMinimumTest is Test {
     registry.setAddressFor("GasPriceMinimum", address(gasPriceMinimum));
     registry.setAddressFor("SortedOracles", address(sortedOracles));
     registry.setAddressFor("GoldToken", celoToken);
-    
 
     gasPriceMinimum.initialize(
       registryAddress,
@@ -72,7 +69,6 @@ contract GasPriceMinimumTest_initialize is GasPriceMinimumTest {
   function test_shouldHaveSetOwner() public {
     assertEq(gasPriceMinimum.owner(), owner);
   }
-
 
   function test_shouldHaveTargetDensity() public {
     assertEq(gasPriceMinimum.targetDensity(), targetDensity);
@@ -116,10 +112,9 @@ contract GasPriceMinimumTest_getGasPriceMinimum is GasPriceMinimumTest {
 
   function test_shouldReturnTheRightRateForToken() public {
     sortedOracles.setMedianRate(whateverAddress, 2e24);
-    assertEq(gasPriceMinimum.getGasPriceMinimum(whateverAddress), initialGasPriceMinimum*2);
+    assertEq(gasPriceMinimum.getGasPriceMinimum(whateverAddress), initialGasPriceMinimum * 2);
   }
 }
-
 
 contract GasPriceMinimumTest_setAdjustmentSpeed is GasPriceMinimumTest {
   using FixidityLib for FixidityLib.Fraction;

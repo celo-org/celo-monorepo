@@ -11,7 +11,6 @@ import "./UsingRegistry.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 
-
 /**
  * @title Stores and provides gas price minimum for various currencies.
  */
@@ -169,7 +168,6 @@ contract GasPriceMinimum is
       return ((gasPriceMinimum() * rateNumerator) / rateDenominator);
     }
   }
-
 
   /**
    * @notice Retrieve the current gas price minimum for a currency.
