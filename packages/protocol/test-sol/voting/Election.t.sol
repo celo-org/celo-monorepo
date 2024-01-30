@@ -510,7 +510,7 @@ contract Election_Vote is ElectionTestFoundry {
     election.vote(group, voterFirstGroupVote, newGroup, address(0));
   }
 
-  function test_ShouldRevert_WhenTurningOffSetAllowedToVoteOverMaxNUmberOfGroups() public {
+  function test_ShouldRevert_WhenTurningOffSetAllowedToVoteOverMaxNUmberOfGroups_WhenOverMaximumNumberOfGroupsVoted() public {
     WhenVotedForMoreThanMaxNumberOfGroups();
 
     vm.expectRevert("Too many groups voted for!");
