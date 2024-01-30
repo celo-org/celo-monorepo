@@ -146,7 +146,7 @@ contract ElectionTest is Utils, Constants {
   }
 }
 
-contract Election_Initialize is ElectionTestFoundry {
+contract ElectionTest_Initialize is ElectionTestFoundry {
   function test_shouldHaveSetOwner() public {
     assertEq(election.owner(), owner);
   }
