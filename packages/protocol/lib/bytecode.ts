@@ -1,4 +1,4 @@
-// tslint:disable: max-classes-per-file
+/* eslint-disable max-classes-per-file: 0 */
 /*
  * The Solidity compiler appends a Swarm Hash of compilation metadata to the end
  * of bytecode. We find this hash based on the specification here:

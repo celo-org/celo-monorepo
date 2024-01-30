@@ -1,4 +1,3 @@
-// tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
 import { CeloTxPending, CeloTxReceipt, TransactionResult } from '@celo/connect'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { CeloTokenType, EachCeloToken, StableToken, Token } from '@celo/contractkit/lib/celo-tokens'
@@ -174,8 +173,8 @@ async function newBalanceWatcher(kit: ContractKit, accounts: string[]): Promise<
       return initial[address][token] || new BigNumber(0)
     },
     debugPrint(address: string, token: CeloTokenType) {
-      // tslint:disable-next-line: no-console
-      console.log({
+      // eslint-disable-next-line: no-console
+      console.info({
         initial: initial[address][token]?.toString(),
         current: current[address][token]?.toString(),
         delta: (current[address][token] || new BigNumber(0))
@@ -454,8 +453,8 @@ describe('Transfer tests', function (this: any) {
     const events = parseEvents(receipt)
 
     if (receipt != null && receipt.gasUsed !== expectedGasUsed) {
-      // tslint:disable-next-line: no-console
-      console.log('OOPSS: Different Gas', receipt.gasUsed, expectedGasUsed)
+      // eslint-disable-next-line: no-console
+      console.info('OOPSS: Different Gas', receipt.gasUsed, expectedGasUsed)
     }
 
     const gasVal = receipt ? receipt.gasUsed : expectedGasUsed
