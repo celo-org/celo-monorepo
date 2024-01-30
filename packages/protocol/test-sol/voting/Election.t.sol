@@ -516,7 +516,7 @@ contract Election_Vote is ElectionTest {
     election.setAllowedToVoteOverMaxNumberOfGroups(false);
   }
 
-  function test_ShouldReturnOnlyLastVotedWithSinceVotesWereNotManuallyCounted() public {
+  function test_ShouldReturnOnlyLastVotedWith_WhenVotesWereNotManuallyCounted() public {
     WhenVotedForMoreThanMaxNumberOfGroups();
     assertEq(election.getTotalVotesByAccount(voter), voterFirstGroupVote);
   }
@@ -2333,7 +2333,7 @@ contract Election_ConsistencyChecks is ElectionTest {
   address group = account2;
   uint256 rewardValue2 = 10000000;
 
-  AccountStruct[] accounts;
+  AccountStruct[] _accounts;
 
   struct AccountStruct {
     address account;
@@ -2360,7 +2360,7 @@ contract Election_ConsistencyChecks is ElectionTest {
     for (uint256 i = 0; i < accountsArray.length; i++) {
       lockedGold.incrementNonvotingAccountBalance(accountsArray[i], voterStartBalance);
 
-      accounts.push(
+      _accounts.push(
         AccountStruct(
           accountsArray[i],
           election.getActiveVotesForGroupByAccount(group, accountsArray[i]),
@@ -2443,14 +2443,14 @@ contract Election_ConsistencyChecks is ElectionTest {
   function checkGroupInvariants(uint256 delta) public {
     uint256 pendingTotal;
 
-    for (uint256 i = 0; i < accounts.length; i++) {
-      pendingTotal += accounts[i].pending;
+    for (uint256 i = 0; i < _accounts.length; i++) {
+      pendingTotal += _accounts[i].pending;
     }
 
     uint256 activateTotal;
 
-    for (uint256 i = 0; i < accounts.length; i++) {
-      activateTotal += accounts[i].active;
+    for (uint256 i = 0; i < _accounts.length; i++) {
+      activateTotal += _accounts[i].active;
     }
 
     assertAlmostEqual(election.getPendingVotesForGroup(group), pendingTotal, delta);
@@ -2461,8 +2461,8 @@ contract Election_ConsistencyChecks is ElectionTest {
   }
 
   function revokeAllAndCheckInvariants(uint256 delta) public {
-    for (uint256 i = 0; i < accounts.length; i++) {
-      AccountStruct storage account = accounts[i];
+    for (uint256 i = 0; i < _accounts.length; i++) {
+      AccountStruct storage account = _accounts[i];
 
       checkVoterInvariants(account, delta);
 
@@ -2492,9 +2492,9 @@ contract Election_ConsistencyChecks is ElectionTest {
     public
   {
     for (uint256 i = 0; i < 10; i++) {
-      for (uint256 j = 0; j < accounts.length; j++) {
-        makeRandomAction(accounts[j], j);
-        checkVoterInvariants(accounts[j], 0);
+      for (uint256 j = 0; j < _accounts.length; j++) {
+        makeRandomAction(_accounts[j], j);
+        checkVoterInvariants(_accounts[j], 0);
         checkGroupInvariants(0);
         vm.roll((i + 1) * EPOCH_SIZE + (i + 1));
       }
@@ -2507,33 +2507,33 @@ contract Election_ConsistencyChecks is ElectionTest {
     uint256 reward = generatePRN(0, election.getTotalVotes() / 100, salt);
     uint256 activeTotal;
 
-    for (uint256 i = 0; i < accounts.length; i++) {
-      activeTotal += accounts[i].active;
+    for (uint256 i = 0; i < _accounts.length; i++) {
+      activeTotal += _accounts[i].active;
     }
 
     if (reward > 0 && activeTotal > 0) {
       election.distributeEpochRewards(group, reward, address(0), address(0));
 
-      for (uint256 i = 0; i < accounts.length; i++) {
-        AccountStruct storage account = accounts[i];
-        account.active = ((activeTotal + reward) * accounts[i].active) / activeTotal;
+      for (uint256 i = 0; i < _accounts.length; i++) {
+        AccountStruct storage account = _accounts[i];
+        account.active = ((activeTotal + reward) * _accounts[i].active) / activeTotal;
       }
     }
   }
 
   function test_ActualAndExpectedShouldAlwaysMatchWithinSmallDelta_WhenEpochRewardsAreDistributed() public {
     for (uint256 i = 0; i < 30; i++) {
-      for (uint256 j = 0; j < accounts.length; j++) {
-        makeRandomAction(accounts[j], j);
-        checkVoterInvariants(accounts[j], 100);
+      for (uint256 j = 0; j < _accounts.length; j++) {
+        makeRandomAction(_accounts[j], j);
+        checkVoterInvariants(_accounts[j], 100);
         checkGroupInvariants(100);
       }
 
       distributeEpochRewards(i);
       vm.roll((i + 1) * EPOCH_SIZE + (i + 1));
 
-      for (uint256 j = 0; j < accounts.length; j++) {
-        checkVoterInvariants(accounts[j], 100);
+      for (uint256 j = 0; j < _accounts.length; j++) {
+        checkVoterInvariants(_accounts[j], 100);
         checkGroupInvariants(100);
       }
     }
