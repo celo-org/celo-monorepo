@@ -15,7 +15,7 @@ import { Constants } from "../constants.sol";
 import "../utils.sol";
 import "forge-std/console.sol";
 
-contract ElectionTest is Election(true) {
+contract ElectionMock is Election(true) {
   function distributeEpochRewards(address group, uint256 value, address lesser, address greater)
     external
   {
