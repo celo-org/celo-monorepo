@@ -275,7 +275,7 @@ contract Election_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTestFoundry {
     election.setAllowedToVoteOverMaxNumberOfGroups(true);
   }
 
-  function test_ShouldSwitchAllowedToVoteOVerMaxNumberOfGroupsOff_WhenTurnedOn() public {
+  function test_ShouldSwitchAllowedToVoteOverMaxNumberOfGroupsOff_WhenTurnedOn() public {
     election.setAllowedToVoteOverMaxNumberOfGroups(true);
     assertEq(election.allowedToVoteOverMaxNumberOfGroups(address(this)), true);
     election.setAllowedToVoteOverMaxNumberOfGroups(false);
