@@ -248,6 +248,11 @@ contract Election_SetMaxNumGroupsVotedFor is ElectionTest {
     vm.prank(nonOwner);
     election.setMaxNumGroupsVotedFor(1);
   }
+
+  function test_ShouldRevert_WhenMaxNumGroupsVotedForIsUnchanged() public {
+    vm.expectRevert("Max groups voted for not changed");
+    election.setMaxNumGroupsVotedFor(maxNumGroupsVotedFor);
+  }
 }
 
 contract Election_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
@@ -456,6 +461,57 @@ contract Election_Vote is ElectionTest {
     WhenGroupCanReceiveVotes();
     WhenTheVoterCanVoteForAnAdditionalGroup();
     vm.expectEmit(true, false, false, false);
+    emit ValidatorGroupVoteCast(voter, group, value);
+    election.vote(group, value, address(0), address(0));
+  }
+
+  function WhenTheVoterHasAlreadyVotedForThisGroup() public {
+    WhenTheVoterHasNotAlreadyVotedForThisGroup();
+    lockedGold.incrementNonvotingAccountBalance(voter, value);
+    election.vote(group, value, address(0), address(0));
+  }
+
+  function test_ShouldNotChangeTheListOfGroupsTheAccountVotedFor_WhenTheVoterHasAlreadyVotedForThisGroup() public {
+    WhenTheVoterHasAlreadyVotedForThisGroup();
+    address[] memory groupsVotedFor = election.getGroupsVotedForByAccount(voter);
+    assertEq(groupsVotedFor.length, 1);
+    assertEq(groupsVotedFor[0], group);
+  }
+
+  function test_ShouldIncreaseAccountsPendingVotesForTheGroup_WhenTheVoterHasAlreadyVotedForThisGroup() public {
+    WhenTheVoterHasAlreadyVotedForThisGroup();
+    assertEq(election.getPendingVotesForGroupByAccount(group, voter), value * 2);
+  }
+
+  function test_ShouldIncrementAccountTotalVotesForTheGroup_WhenTheVoterHasAlreadyVotedForThisGroup() public {
+    WhenTheVoterHasAlreadyVotedForThisGroup();
+    assertEq(election.getTotalVotesForGroupByAccount(group, voter), value * 2);
+  }
+
+  function test_ShouldIncrementTheAccountsTotalVotes_WhenTheVoterHasAlreadyVotedForThisGroup() public {
+    WhenTheVoterHasAlreadyVotedForThisGroup();
+    assertEq(election.getTotalVotesByAccount(voter), value * 2);
+  }
+
+  function test_ShouldIncrementTotalVotesForTheGroup_WhenTheVoterHasAlreadyVotedForThisGroup() public {
+    WhenTheVoterHasAlreadyVotedForThisGroup();
+    assertEq(election.getTotalVotesForGroup(group), value * 2);
+  }
+
+  function test_ShouldIncrementTotalVotes_WhenTheVoterHasAlreadyVotedForThisGroup() public {
+    WhenTheVoterHasAlreadyVotedForThisGroup();
+    assertEq(election.getTotalVotes(), value * 2);
+  }
+
+  function test_ShouldDecrementAccountNonVotingBalance_WhenTheVoterHasAlreadyVotedForThisGroup() public {
+    WhenTheVoterHasAlreadyVotedForThisGroup();
+    assertEq(lockedGold.nonvotingAccountBalance(voter), 0);
+  }
+
+  function test_ShouldEmitValidatorGroupVoteCast_WhenTheVoterHasAlreadyVotedForThisGroup() public {
+    WhenTheVoterHasNotAlreadyVotedForThisGroup();
+    lockedGold.incrementNonvotingAccountBalance(voter, value);
+    vm.expectEmit(true, true, false, false);
     emit ValidatorGroupVoteCast(voter, group, value);
     election.vote(group, value, address(0), address(0));
   }
