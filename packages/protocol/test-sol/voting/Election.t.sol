@@ -200,7 +200,7 @@ contract Election_SetElectableValidators is ElectionTestFoundry {
     assertEq(max, newElectableValidatorsMax);
   }
 
-  function test_ShouldEmitTHeElectableValidatorsSetEvent() public {
+  function test_ShouldEmitTheElectableValidatorsSetEvent() public {
     uint256 newElectableValidatorsMin = 2;
     uint256 newElectableValidatorsMax = 4;
     vm.expectEmit(true, false, false, false);
