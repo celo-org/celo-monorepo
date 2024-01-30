@@ -49,5 +49,3 @@ COPY --from=golang:1.18-stretch /usr/local/go/ /usr/local/go/
 ENV PATH="/usr/local/go/bin:${PATH}"
 
 CMD ["celotooljs.sh"]
-
-
