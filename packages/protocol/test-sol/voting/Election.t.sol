@@ -3,17 +3,16 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import { Test } from "celo-foundry/Test.sol";
-import "../../contracts/common/FixidityLib.sol";
-import "../../contracts/governance/Election.sol";
-import "../../contracts/governance/test/MockLockedGold.sol";
-import "../../contracts/governance/test/MockValidators.sol";
-import "../../contracts/common/Accounts.sol";
-import "../../contracts/common/linkedlists/AddressSortedLinkedList.sol";
-import "../../contracts/identity/test/MockRandom.sol";
-import "../../contracts/common/Freezer.sol";
+import "@celo-contracts/common/FixidityLib.sol";
+import "@celo-contracts/governance/Election.sol";
+import "@celo-contracts/governance/test/MockLockedGold.sol";
+import "@celo-contracts/governance/test/MockValidators.sol";
+import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
+import "@celo-contracts/identity/test/MockRandom.sol";
+import "@celo-contracts/common/Freezer.sol";
 import { Constants } from "../constants.sol";
 import "../utils.sol";
-import "forge-std/console.sol";
 
 contract ElectionMock is Election(true) {
   function distributeEpochRewards(address group, uint256 value, address lesser, address greater)
@@ -53,7 +52,7 @@ contract ElectionTest is Utils, Constants {
   event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
 
   Accounts accounts;
-  ElectionTest election;
+  ElectionMock election;
   Freezer freezer;
   MockLockedGold lockedGold;
   MockValidators validators;
@@ -123,7 +122,7 @@ contract ElectionTest is Utils, Constants {
 
     createAccount(address(this));
 
-    election = new ElectionTest();
+    election = new ElectionMock();
     freezer = new Freezer(true);
     lockedGold = new MockLockedGold();
     validators = new MockValidators();
@@ -146,7 +145,7 @@ contract ElectionTest is Utils, Constants {
   }
 }
 
-contract ElectionTest_Initialize is ElectionTestFoundry {
+contract ElectionTest_Initialize is ElectionTest {
   function test_shouldHaveSetOwner() public {
     assertEq(election.owner(), owner);
   }
@@ -177,7 +176,7 @@ contract ElectionTest_Initialize is ElectionTestFoundry {
   }
 }
 
-contract Election_SetElectabilityThreshold is ElectionTestFoundry {
+contract Election_SetElectabilityThreshold is ElectionTest {
   function test_shouldSetElectabilityThreshold() public {
     uint256 newElectabilityThreshold = FixidityLib.newFixedFraction(1, 200).unwrap();
     election.setElectabilityThreshold(newElectabilityThreshold);
@@ -190,7 +189,7 @@ contract Election_SetElectabilityThreshold is ElectionTestFoundry {
   }
 }
 
-contract Election_SetElectableValidators is ElectionTestFoundry {
+contract Election_SetElectableValidators is ElectionTest {
   function test_shouldSetElectableValidators() public {
     uint256 newElectableValidatorsMin = 2;
     uint256 newElectableValidatorsMax = 4;
@@ -230,7 +229,7 @@ contract Election_SetElectableValidators is ElectionTestFoundry {
   }
 }
 
-contract Election_SetMaxNumGroupsVotedFor is ElectionTestFoundry {
+contract Election_SetMaxNumGroupsVotedFor is ElectionTest {
   function test_shouldSetMaxNumGroupsVotedFor() public {
     uint256 newMaxNumGroupsVotedFor = 4;
     election.setMaxNumGroupsVotedFor(newMaxNumGroupsVotedFor);
@@ -251,7 +250,7 @@ contract Election_SetMaxNumGroupsVotedFor is ElectionTestFoundry {
   }
 }
 
-contract Election_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTestFoundry {
+contract Election_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
   function test_shouldSetAllowedToVoteOverMaxNumberOfGroups() public {
     election.setAllowedToVoteOverMaxNumberOfGroups(true);
     assertEq(election.allowedToVoteOverMaxNumberOfGroups(address(this)), true);
@@ -291,7 +290,7 @@ contract Election_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTestFoundry {
 
 }
 
-contract Election_MarkGroupEligible is ElectionTestFoundry {
+contract Election_MarkGroupEligible is ElectionTest {
   function setUp() public {
     super.setUp();
 
@@ -327,7 +326,7 @@ contract Election_MarkGroupEligible is ElectionTestFoundry {
   }
 }
 
-contract Election_MarkGroupInEligible is ElectionTestFoundry {
+contract Election_MarkGroupInEligible is ElectionTest {
   function setUp() public {
     super.setUp();
 
@@ -363,7 +362,7 @@ contract Election_MarkGroupInEligible is ElectionTestFoundry {
   }
 }
 
-contract Election_Vote is ElectionTestFoundry {
+contract Election_Vote is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -636,7 +635,7 @@ contract Election_Vote is ElectionTestFoundry {
 
 }
 
-contract Election_Activate is ElectionTestFoundry {
+contract Election_Activate is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -792,7 +791,7 @@ contract Election_Activate is ElectionTestFoundry {
   }
 }
 
-contract Election_ActivateForAccount is ElectionTestFoundry {
+contract Election_ActivateForAccount is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -948,7 +947,7 @@ contract Election_ActivateForAccount is ElectionTestFoundry {
 
 }
 
-contract Election_RevokePending is ElectionTestFoundry {
+contract Election_RevokePending is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -1105,7 +1104,7 @@ contract Election_RevokePending is ElectionTestFoundry {
   }
 }
 
-contract Election_RevokeActive is ElectionTestFoundry {
+contract Election_RevokeActive is ElectionTest {
   address voter0 = address(this);
   address voter1 = account1;
   address group = account2;
@@ -1379,7 +1378,7 @@ contract Election_RevokeActive is ElectionTestFoundry {
 
 }
 
-contract Election_ElectionValidatorSigners is ElectionTestFoundry {
+contract Election_ElectionValidatorSigners is ElectionTest {
   address group1 = address(this);
   address group2 = account1;
   address group3 = account2;
@@ -1637,7 +1636,7 @@ contract Election_ElectionValidatorSigners is ElectionTestFoundry {
   }
 }
 
-contract Election_GetGroupEpochRewards is ElectionTestFoundry {
+contract Election_GetGroupEpochRewards is ElectionTest {
   address voter = address(this);
   address group1 = account2;
   address group2 = account3;
@@ -1753,7 +1752,7 @@ contract Election_GetGroupEpochRewards is ElectionTestFoundry {
   }
 }
 
-contract Election_DistributeEpochRewards is ElectionTestFoundry {
+contract Election_DistributeEpochRewards is ElectionTest {
   address voter = address(this);
   address voter2 = account4;
   address group = account2;
@@ -1915,7 +1914,7 @@ contract Election_DistributeEpochRewards is ElectionTestFoundry {
   }
 }
 
-contract Election_ForceDecrementVotes is ElectionTestFoundry {
+contract Election_ForceDecrementVotes is ElectionTest {
   address voter = address(this);
   address group = account2;
   address group2 = account7;
@@ -2329,7 +2328,7 @@ contract Election_ForceDecrementVotes is ElectionTestFoundry {
   }
 }
 
-contract Election_ConsistencyChecks is ElectionTestFoundry {
+contract Election_ConsistencyChecks is ElectionTest {
   address voter = address(this);
   address group = account2;
   uint256 rewardValue2 = 10000000;
