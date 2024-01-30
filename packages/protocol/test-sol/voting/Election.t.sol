@@ -487,7 +487,7 @@ contract Election_Vote is ElectionTestFoundry {
     election.vote(group, value - maxNumGroupsVotedFor, newGroup, address(0));
   }
 
-  function test_ShouldAllowToVoteForAnotherGroup_WhenTheVoterIsOVerMaxNumberGroupsVotedForButCanVoteForAdditionalGroup()
+  function test_ShouldAllowToVoteForAnotherGroup_WhenTheVoterIsOverMaxNumberGroupsVotedForButCanVoteForAdditionalGroup()
     public
   {
     address newGroup = WhenVotedForMaxNumberOfGroups();
