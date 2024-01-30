@@ -23,7 +23,7 @@ contract ElectionMock is Election(true) {
   }
 }
 
-contract ElectionTestFoundry is Utils, Constants {
+contract ElectionTest is Utils, Constants {
   using FixidityLib for FixidityLib.Fraction;
 
   event ElectableValidatorsSet(uint256 min, uint256 max);
