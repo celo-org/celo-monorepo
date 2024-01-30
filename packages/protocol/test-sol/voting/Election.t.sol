@@ -402,7 +402,7 @@ contract Election_Vote is ElectionTestFoundry {
     election.vote(group, value, address(0), address(0));
   }
 
-  function test_ShouldAddTheGroupToLIstOfGroupsTheAccountHasVotedFor_WhenTheVoterHasNotAlreadyVotedForThisGroup()
+  function test_ShouldAddTheGroupToListOfGroupsTheAccountHasVotedFor_WhenTheVoterHasNotAlreadyVotedForThisGroup()
     public
   {
     WhenTheVoterHasNotAlreadyVotedForThisGroup();
