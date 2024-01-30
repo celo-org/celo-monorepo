@@ -2522,7 +2522,7 @@ contract Election_ConsistencyChecks is ElectionTestFoundry {
     }
   }
 
-  function test_ActualAndExpectedShouldAlwaysMatchWithinSmallDelta() public {
+  function test_ActualAndExpectedShouldAlwaysMatchWithinSmallDelta_WhenEpochRewardsAreDistributed() public {
     for (uint256 i = 0; i < 30; i++) {
       for (uint256 j = 0; j < accounts.length; j++) {
         makeRandomAction(accounts[j], j);
