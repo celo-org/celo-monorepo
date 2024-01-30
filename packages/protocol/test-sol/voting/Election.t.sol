@@ -366,8 +366,7 @@ contract Election_MarkGroupInEligible is ElectionTest {
     election.markGroupIneligible(address(this));
   }
 }
-
-contract Election_Vote is ElectionTest {
+contract Election_Vote_WhenGroupEligible is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -382,149 +381,19 @@ contract Election_Vote is ElectionTest {
     address[] memory members = new address[](1);
     members[0] = account9;
     validators.setMembers(group, members);
-  }
 
-  function WhenGroupEligible() public {
     registry.setAddressFor("Validators", address(this));
     election.markGroupEligible(group, address(0), address(0));
     registry.setAddressFor("Validators", address(validators));
   }
 
-  function WhenGroupCanReceiveVotes() public {
-    WhenGroupEligible();
-    lockedGold.setTotalLockedGold(value);
-    validators.setNumRegisteredValidators(1);
-  }
-
-  function WhenTheVoterCanVoteForAnAdditionalGroup() public {
-    lockedGold.incrementNonvotingAccountBalance(voter, value);
-  }
-
-  function WhenTheVoterHasNotAlreadyVotedForThisGroup() public {
-    WhenGroupCanReceiveVotes();
-    WhenTheVoterCanVoteForAnAdditionalGroup();
-    election.vote(group, value, address(0), address(0));
-  }
-
-  function test_ShouldAddTheGroupToListOfGroupsTheAccountHasVotedFor_WhenTheVoterHasNotAlreadyVotedForThisGroup()
-    public
-  {
-    WhenTheVoterHasNotAlreadyVotedForThisGroup();
-    address[] memory groupsVotedFor = election.getGroupsVotedForByAccount(voter);
-    assertEq(groupsVotedFor.length, 1);
-    assertEq(groupsVotedFor[0], group);
-  }
-
-  function test_ShouldIncrementTheAccountsPendingVotesForTheGroup_WhenTheVoterHasNotAlreadyVotedForThisGroup()
-    public
-  {
-    WhenTheVoterHasNotAlreadyVotedForThisGroup();
-    assertEq(election.getPendingVotesForGroupByAccount(group, voter), value);
-  }
-
-  function test_ShouldIncrementTheAccountsTotalVotesForTheGroup_WhenTheVoterHasNotAlreadyVotedForThisGroup()
-    public
-  {
-    WhenTheVoterHasNotAlreadyVotedForThisGroup();
-    assertEq(election.getTotalVotesForGroupByAccount(group, voter), value);
-  }
-
-  function test_ShouldIncrementTheACcountsTotalVotes_WhenTheVoterHasNotAlreadyVotedForThisGroup()
-    public
-  {
-    WhenTheVoterHasNotAlreadyVotedForThisGroup();
-    assertEq(election.getTotalVotesByAccount(voter), value);
-  }
-
-  function test_ShouldIncrementTheTotalVotesForTheGroup_WhenTheVoterHasNotAlreadyVotedForThisGroup()
-    public
-  {
-    WhenTheVoterHasNotAlreadyVotedForThisGroup();
-    assertEq(election.getTotalVotesForGroup(group), value);
-  }
-
-  function test_ShouldIncrementTheTotalVotes_WhenTheVoterHasNotAlreadyVotedForThisGroup() public {
-    WhenTheVoterHasNotAlreadyVotedForThisGroup();
-    assertEq(election.getTotalVotes(), value);
-  }
-
-  function test_ShouldDecrementTheAccountsNonVotingLockedGoldBalance_WhenTheVoterHasNotAlreadyVotedForThisGroup()
-    public
-  {
-    WhenTheVoterHasNotAlreadyVotedForThisGroup();
-    assertEq(lockedGold.nonvotingAccountBalance(voter), 0);
-  }
-
-  function test_ShouldEmitTheValidatorGroupVoteCastEvent_WhenTheVoterHasNotAlreadyVotedForThisGroup()
-    public
-  {
-    WhenGroupCanReceiveVotes();
-    WhenTheVoterCanVoteForAnAdditionalGroup();
-    vm.expectEmit(true, false, false, false);
-    emit ValidatorGroupVoteCast(voter, group, value);
-    election.vote(group, value, address(0), address(0));
-  }
-
-  function WhenTheVoterHasAlreadyVotedForThisGroup() public {
-    WhenTheVoterHasNotAlreadyVotedForThisGroup();
-    lockedGold.incrementNonvotingAccountBalance(voter, value);
-    election.vote(group, value, address(0), address(0));
-  }
-
-  function test_ShouldNotChangeTheListOfGroupsTheAccountVotedFor_WhenTheVoterHasAlreadyVotedForThisGroup() public {
-    WhenTheVoterHasAlreadyVotedForThisGroup();
-    address[] memory groupsVotedFor = election.getGroupsVotedForByAccount(voter);
-    assertEq(groupsVotedFor.length, 1);
-    assertEq(groupsVotedFor[0], group);
-  }
-
-  function test_ShouldIncreaseAccountsPendingVotesForTheGroup_WhenTheVoterHasAlreadyVotedForThisGroup() public {
-    WhenTheVoterHasAlreadyVotedForThisGroup();
-    assertEq(election.getPendingVotesForGroupByAccount(group, voter), value * 2);
-  }
-
-  function test_ShouldIncrementAccountTotalVotesForTheGroup_WhenTheVoterHasAlreadyVotedForThisGroup() public {
-    WhenTheVoterHasAlreadyVotedForThisGroup();
-    assertEq(election.getTotalVotesForGroupByAccount(group, voter), value * 2);
-  }
-
-  function test_ShouldIncrementTheAccountsTotalVotes_WhenTheVoterHasAlreadyVotedForThisGroup() public {
-    WhenTheVoterHasAlreadyVotedForThisGroup();
-    assertEq(election.getTotalVotesByAccount(voter), value * 2);
-  }
-
-  function test_ShouldIncrementTotalVotesForTheGroup_WhenTheVoterHasAlreadyVotedForThisGroup() public {
-    WhenTheVoterHasAlreadyVotedForThisGroup();
-    assertEq(election.getTotalVotesForGroup(group), value * 2);
-  }
-
-  function test_ShouldIncrementTotalVotes_WhenTheVoterHasAlreadyVotedForThisGroup() public {
-    WhenTheVoterHasAlreadyVotedForThisGroup();
-    assertEq(election.getTotalVotes(), value * 2);
-  }
-
-  function test_ShouldDecrementAccountNonVotingBalance_WhenTheVoterHasAlreadyVotedForThisGroup() public {
-    WhenTheVoterHasAlreadyVotedForThisGroup();
-    assertEq(lockedGold.nonvotingAccountBalance(voter), 0);
-  }
-
-  function test_ShouldEmitValidatorGroupVoteCast_WhenTheVoterHasAlreadyVotedForThisGroup() public {
-    WhenTheVoterHasNotAlreadyVotedForThisGroup();
-    lockedGold.incrementNonvotingAccountBalance(voter, value);
-    vm.expectEmit(true, true, false, false);
-    emit ValidatorGroupVoteCast(voter, group, value);
-    election.vote(group, value, address(0), address(0));
-  }
-
   function test_ShouldRevert_WhenTheVoterDoesNotHaveSufficientNonVotingBalance() public {
-    WhenGroupEligible();
     lockedGold.incrementNonvotingAccountBalance(voter, value - 1);
     vm.expectRevert("SafeMath: subtraction overflow");
     election.vote(group, value, address(0), address(0));
   }
 
   function WhenVotedForMaxNumberOfGroups() public returns (address newGroup) {
-    WhenGroupEligible();
     lockedGold.incrementNonvotingAccountBalance(voter, value);
 
     for (uint256 i = 0; i < maxNumGroupsVotedFor; i++) {
@@ -565,7 +434,9 @@ contract Election_Vote is ElectionTest {
     election.vote(group, voterFirstGroupVote, newGroup, address(0));
   }
 
-  function test_ShouldRevert_WhenTurningOffSetAllowedToVoteOverMaxNUmberOfGroups_WhenOverMaximumNumberOfGroupsVoted() public {
+  function test_ShouldRevert_WhenTurningOffSetAllowedToVoteOverMaxNUmberOfGroups_WhenOverMaximumNumberOfGroupsVoted()
+    public
+  {
     WhenVotedForMoreThanMaxNumberOfGroups();
 
     vm.expectRevert("Too many groups voted for!");
@@ -672,7 +543,6 @@ contract Election_Vote is ElectionTest {
   }
 
   function test_ShouldRevert_WhenTheGroupCannotReceiveVotes() public {
-    WhenGroupEligible();
     lockedGold.setTotalLockedGold(value / 2 - 1);
     address[] memory members = new address[](1);
     members[0] = account9;
@@ -683,12 +553,185 @@ contract Election_Vote is ElectionTest {
     vm.expectRevert("Group cannot receive votes");
     election.vote(group, value, address(0), address(0));
   }
+}
+
+contract Election_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes is ElectionTest {
+  address voter = address(this);
+  address group = account1;
+  uint256 value = 1000;
+
+  uint256 originallyNotVotedWithAmount = 1;
+  uint256 voterFirstGroupVote = value - maxNumGroupsVotedFor - originallyNotVotedWithAmount;
+  uint256 rewardValue = 1000000;
+
+  function setUp() public {
+    super.setUp();
+
+    address[] memory members = new address[](1);
+    members[0] = account9;
+    validators.setMembers(group, members);
+
+    registry.setAddressFor("Validators", address(this));
+    election.markGroupEligible(group, address(0), address(0));
+    registry.setAddressFor("Validators", address(validators));
+
+    lockedGold.setTotalLockedGold(value);
+    validators.setNumRegisteredValidators(1);
+  }
+
+  function WhenTheVoterCanVoteForAnAdditionalGroup() public {
+    lockedGold.incrementNonvotingAccountBalance(voter, value);
+  }
+
+  function WhenTheVoterHasNotAlreadyVotedForThisGroup() public {
+    WhenTheVoterCanVoteForAnAdditionalGroup();
+    election.vote(group, value, address(0), address(0));
+  }
+
+  function test_ShouldAddTheGroupToListOfGroupsTheAccountHasVotedFor_WhenTheVoterHasNotAlreadyVotedForThisGroup()
+    public
+  {
+    WhenTheVoterHasNotAlreadyVotedForThisGroup();
+    address[] memory groupsVotedFor = election.getGroupsVotedForByAccount(voter);
+    assertEq(groupsVotedFor.length, 1);
+    assertEq(groupsVotedFor[0], group);
+  }
+
+  function test_ShouldIncrementTheAccountsPendingVotesForTheGroup_WhenTheVoterHasNotAlreadyVotedForThisGroup()
+    public
+  {
+    WhenTheVoterHasNotAlreadyVotedForThisGroup();
+    assertEq(election.getPendingVotesForGroupByAccount(group, voter), value);
+  }
+
+  function test_ShouldIncrementTheAccountsTotalVotesForTheGroup_WhenTheVoterHasNotAlreadyVotedForThisGroup()
+    public
+  {
+    WhenTheVoterHasNotAlreadyVotedForThisGroup();
+    assertEq(election.getTotalVotesForGroupByAccount(group, voter), value);
+  }
+
+  function test_ShouldIncrementTheACcountsTotalVotes_WhenTheVoterHasNotAlreadyVotedForThisGroup()
+    public
+  {
+    WhenTheVoterHasNotAlreadyVotedForThisGroup();
+    assertEq(election.getTotalVotesByAccount(voter), value);
+  }
+
+  function test_ShouldIncrementTheTotalVotesForTheGroup_WhenTheVoterHasNotAlreadyVotedForThisGroup()
+    public
+  {
+    WhenTheVoterHasNotAlreadyVotedForThisGroup();
+    assertEq(election.getTotalVotesForGroup(group), value);
+  }
+
+  function test_ShouldIncrementTheTotalVotes_WhenTheVoterHasNotAlreadyVotedForThisGroup() public {
+    WhenTheVoterHasNotAlreadyVotedForThisGroup();
+    assertEq(election.getTotalVotes(), value);
+  }
+
+  function test_ShouldDecrementTheAccountsNonVotingLockedGoldBalance_WhenTheVoterHasNotAlreadyVotedForThisGroup()
+    public
+  {
+    WhenTheVoterHasNotAlreadyVotedForThisGroup();
+    assertEq(lockedGold.nonvotingAccountBalance(voter), 0);
+  }
+
+  function test_ShouldEmitTheValidatorGroupVoteCastEvent_WhenTheVoterHasNotAlreadyVotedForThisGroup()
+    public
+  {
+    WhenTheVoterCanVoteForAnAdditionalGroup();
+    vm.expectEmit(true, false, false, false);
+    emit ValidatorGroupVoteCast(voter, group, value);
+    election.vote(group, value, address(0), address(0));
+  }
+
+  function WhenTheVoterHasAlreadyVotedForThisGroup() public {
+    WhenTheVoterHasNotAlreadyVotedForThisGroup();
+    lockedGold.incrementNonvotingAccountBalance(voter, value);
+    election.vote(group, value, address(0), address(0));
+  }
+
+  function test_ShouldNotChangeTheListOfGroupsTheAccountVotedFor_WhenTheVoterHasAlreadyVotedForThisGroup()
+    public
+  {
+    WhenTheVoterHasAlreadyVotedForThisGroup();
+    address[] memory groupsVotedFor = election.getGroupsVotedForByAccount(voter);
+    assertEq(groupsVotedFor.length, 1);
+    assertEq(groupsVotedFor[0], group);
+  }
+
+  function test_ShouldIncreaseAccountsPendingVotesForTheGroup_WhenTheVoterHasAlreadyVotedForThisGroup()
+    public
+  {
+    WhenTheVoterHasAlreadyVotedForThisGroup();
+    assertEq(election.getPendingVotesForGroupByAccount(group, voter), value * 2);
+  }
+
+  function test_ShouldIncrementAccountTotalVotesForTheGroup_WhenTheVoterHasAlreadyVotedForThisGroup()
+    public
+  {
+    WhenTheVoterHasAlreadyVotedForThisGroup();
+    assertEq(election.getTotalVotesForGroupByAccount(group, voter), value * 2);
+  }
+
+  function test_ShouldIncrementTheAccountsTotalVotes_WhenTheVoterHasAlreadyVotedForThisGroup()
+    public
+  {
+    WhenTheVoterHasAlreadyVotedForThisGroup();
+    assertEq(election.getTotalVotesByAccount(voter), value * 2);
+  }
+
+  function test_ShouldIncrementTotalVotesForTheGroup_WhenTheVoterHasAlreadyVotedForThisGroup()
+    public
+  {
+    WhenTheVoterHasAlreadyVotedForThisGroup();
+    assertEq(election.getTotalVotesForGroup(group), value * 2);
+  }
+
+  function test_ShouldIncrementTotalVotes_WhenTheVoterHasAlreadyVotedForThisGroup() public {
+    WhenTheVoterHasAlreadyVotedForThisGroup();
+    assertEq(election.getTotalVotes(), value * 2);
+  }
+
+  function test_ShouldDecrementAccountNonVotingBalance_WhenTheVoterHasAlreadyVotedForThisGroup()
+    public
+  {
+    WhenTheVoterHasAlreadyVotedForThisGroup();
+    assertEq(lockedGold.nonvotingAccountBalance(voter), 0);
+  }
+
+  function test_ShouldEmitValidatorGroupVoteCast_WhenTheVoterHasAlreadyVotedForThisGroup() public {
+    WhenTheVoterHasNotAlreadyVotedForThisGroup();
+    lockedGold.incrementNonvotingAccountBalance(voter, value);
+    vm.expectEmit(true, true, false, false);
+    emit ValidatorGroupVoteCast(voter, group, value);
+    election.vote(group, value, address(0), address(0));
+  }
+
+}
+
+contract Election_Vote_GroupNotEligible is ElectionTest {
+  address voter = address(this);
+  address group = account1;
+  uint256 value = 1000;
+
+  uint256 originallyNotVotedWithAmount = 1;
+  uint256 voterFirstGroupVote = value - maxNumGroupsVotedFor - originallyNotVotedWithAmount;
+  uint256 rewardValue = 1000000;
+
+  function setUp() public {
+    super.setUp();
+
+    address[] memory members = new address[](1);
+    members[0] = account9;
+    validators.setMembers(group, members);
+  }
 
   function test_ShouldRevert_WhenTheGroupIsNotEligible() public {
     vm.expectRevert("Group not eligible");
     election.vote(group, value, address(0), address(0));
   }
-
 }
 
 contract Election_Activate is ElectionTest {
@@ -2577,7 +2620,9 @@ contract Election_ConsistencyChecks is ElectionTest {
     }
   }
 
-  function test_ActualAndExpectedShouldAlwaysMatchWithinSmallDelta_WhenEpochRewardsAreDistributed() public {
+  function test_ActualAndExpectedShouldAlwaysMatchWithinSmallDelta_WhenEpochRewardsAreDistributed()
+    public
+  {
     for (uint256 i = 0; i < 30; i++) {
       for (uint256 j = 0; j < _accounts.length; j++) {
         makeRandomAction(_accounts[j], j);
