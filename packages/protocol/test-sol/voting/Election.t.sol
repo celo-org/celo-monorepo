@@ -444,7 +444,7 @@ contract Election_Vote is ElectionTestFoundry {
     assertEq(election.getTotalVotes(), value);
   }
 
-  function test_ShouldDecrementTheACcountsNonVotingLockedGoldBalance_WhenTheVoterHasNotAlreadyVotedForThisGroup()
+  function test_ShouldDecrementTheAccountsNonVotingLockedGoldBalance_WhenTheVoterHasNotAlreadyVotedForThisGroup()
     public
   {
     WhenTheVoterHasNotAlreadyVotedForThisGroup();
