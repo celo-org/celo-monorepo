@@ -461,7 +461,7 @@ contract Election_Vote is ElectionTestFoundry {
     election.vote(group, value, address(0), address(0));
   }
 
-  function test_ShouldRevert_WhenTheVOterDoesNotHaveSufficientNonVotingBalance() public {
+  function test_ShouldRevert_WhenTheVoterDoesNotHaveSufficientNonVotingBalance() public {
     WhenGroupEligible();
     lockedGold.incrementNonvotingAccountBalance(voter, value - 1);
     vm.expectRevert("SafeMath: subtraction overflow");
