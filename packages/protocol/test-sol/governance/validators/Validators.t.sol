@@ -4,8 +4,6 @@ pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
 
-import "forge-std/console.sol";
-
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
@@ -20,8 +18,9 @@ import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/ValidatorsMock.sol";
 import "@test-sol/constants.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
+import { Test as ForgeTest } from "forge-std/Test.sol";
 
-contract ValidatorsMockTunnel is Test {
+contract ValidatorsMockTunnel is ForgeTest {
   ValidatorsMock private tunnelValidators;
   address validatorContractAddress;
 
@@ -86,21 +85,15 @@ contract ValidatorsTest is Test, Constants {
   address nonOwner;
   address owner;
 
-  // bytes public constant blsPublicKey =
-  //   bytes(
-  //     "0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25"
-  //   );
-  // bytes public constant blsPop =
-  //   bytes("0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b");
   bytes public constant blsPublicKey = abi.encodePacked(
     bytes32(0x0101010101010101010101010101010101010101010101010101010101010101),
     bytes32(0x0202020202020202020202020202020202020202020202020202020202020202),
     bytes32(0x0303030303030303030303030303030303030303030303030303030303030303)
   );
   bytes public constant blsPop = abi.encodePacked(
-    bytes16(0x01010101010101010101010101010101),
-    bytes16(0x02020202020202020202020202020202),
-    bytes16(0x03030303030303030303030303030303)
+    bytes16(0x04040404040404040404040404040404),
+    bytes16(0x05050505050505050505050505050505),
+    bytes16(0x06060606060606060606060606060606)
   );
 
   event AccountSlashed(
@@ -515,7 +508,7 @@ contract ValidatorsTest_RegisterValidator_WhenAccountIsNotRegisteredValidator is
   }
 
   function test_ShouldMarkAccountAsValidator() public {
-    // XXX Here failing due to invalid blsPublicKey & blsPop
+    // XXX made changes to the precompileHandler it needs to be added to the repo.
     (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
 
     vm.prank(validator);
@@ -525,9 +518,13 @@ contract ValidatorsTest_RegisterValidator_WhenAccountIsNotRegisteredValidator is
 
     bytes memory pubKey = addressToPublicKey(addressHash, v, r, s);
 
+    ph.setDebug(true);
+
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+
     vm.prank(validator);
     validators.registerValidator(pubKey, blsPublicKey, blsPop);
-    console.log("### yo");
+
     assertTrue(validators.isValidator(validator));
   }
 }

@@ -33,7 +33,7 @@ import {
 } from 'types'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
-const Validators: ValidatorsMockContract = artifacts.require('ValidatorsTest')
+const Validators: ValidatorsMockContract = artifacts.require('ValidatorsMock')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
@@ -83,7 +83,6 @@ contract('Validators', (accounts: string[]) => {
   let registry: RegistryInstance
   let mockElection: MockElectionInstance
   let mockLockedGold: MockLockedGoldInstance
-  const nonOwner = accounts[1]
 
   const validatorLockedGoldRequirements = {
     value: new BigNumber(1000),
@@ -113,7 +112,7 @@ contract('Validators', (accounts: string[]) => {
   const blsPublicKey =
     '0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00'
   const blsPoP =
-    '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900'
+    '0xfdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923955'
   const commission = toFixed(1 / 100)
   beforeEach(async () => {
     accountsInstance = await Accounts.new(true)
@@ -146,7 +145,6 @@ contract('Validators', (accounts: string[]) => {
       commissionUpdateDelay,
       downtimeGracePeriod
     )
-    console.log('### adj speed:', validatorScoreParameters.adjustmentSpeed)
   })
 
   const registerValidator = async (validator: string) => {
@@ -238,7 +236,7 @@ contract('Validators', (accounts: string[]) => {
           validatorRegistrationEpochNumber = await currentEpochNumber(web3)
         })
 
-        it('should mark the account as a validator', async () => {
+        it.only('should mark the account as a validator', async () => {
           assert.isTrue(await validators.isValidator(validator))
         })
 
