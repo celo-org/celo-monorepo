@@ -65,10 +65,6 @@ const out = (msg: string, force?: boolean): void => {
 const outFile = argv.output_file ? argv.output_file : tmp.tmpNameSync({})
 const exclude: RegExp = argv.exclude ? new RegExp(argv.exclude) : null
 // old artifacts needs to be generalized https://github.com/celo-org/celo-monorepo/issues/10567
-console.log('oldArtifactsFolder', oldArtifactsFolder)
-console.log('oldArtifacts08', oldArtifactsFolder08)
-console.log('newArtifactsFolder', newArtifactsFolder)
-console.log('newArtifacts08', newArtifactsFolder08)
 const oldArtifacts = instantiateArtifacts(oldArtifactsFolder)
 const oldArtifacts08 = instantiateArtifacts(oldArtifactsFolder08)
 const newArtifacts = instantiateArtifacts(newArtifactsFolder)
