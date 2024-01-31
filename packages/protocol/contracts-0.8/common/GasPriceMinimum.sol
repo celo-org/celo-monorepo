@@ -189,10 +189,6 @@ contract GasPriceMinimum is
     return deprecated_gasPriceMinimum;
   }
 
-  function getGasPriceMinimumFloor() external view returns (uint256) {
-    return gasPriceMinimumFloor;
-  }
-
   /**
    * @notice Calculates the gas price minimum based on governable parameters
    * and block congestion.
