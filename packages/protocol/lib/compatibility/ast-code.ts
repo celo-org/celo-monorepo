@@ -247,7 +247,7 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
  * Runs an ast code comparison and returns the spotted changes from the built artifacts given.
  *
  * @param oldArtifactsSet
- * @param newArtifacts
+ * @param newArtifactsSets
  */
 export function reportASTIncompatibilities(
   // oldArtifacts also needs to be a set
