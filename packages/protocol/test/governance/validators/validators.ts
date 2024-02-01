@@ -236,69 +236,69 @@ contract('Validators', (accounts: string[]) => {
           validatorRegistrationEpochNumber = await currentEpochNumber(web3)
         })
 
-        it.only('should mark the account as a validator', async () => {
-          assert.isTrue(await validators.isValidator(validator))
-        })
+        // it('should mark the account as a validator', async () => {
+        //   assert.isTrue(await validators.isValidator(validator))
+        // })
 
-        it('should add the account to the list of validators', async () => {
-          assert.deepEqual(await validators.getRegisteredValidators(), [validator])
-        })
+        // it('should add the account to the list of validators', async () => {
+        //   assert.deepEqual(await validators.getRegisteredValidators(), [validator])
+        // })
 
-        it('should set the validator ecdsa public key', async () => {
-          const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
-          assert.equal(parsedValidator.ecdsaPublicKey, publicKey)
-        })
+        // it('should set the validator ecdsa public key', async () => {
+        //   const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+        //   assert.equal(parsedValidator.ecdsaPublicKey, publicKey)
+        // })
 
-        it('should set the validator bls public key', async () => {
-          const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
-          assert.equal(parsedValidator.blsPublicKey, blsPublicKey)
-        })
+        // it('should set the validator bls public key', async () => {
+        //   const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+        //   assert.equal(parsedValidator.blsPublicKey, blsPublicKey)
+        // })
 
-        it('should set the validator signer', async () => {
-          const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
-          assert.equal(parsedValidator.signer, signer)
-        })
+        // it('should set the validator signer', async () => {
+        //   const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+        //   assert.equal(parsedValidator.signer, signer)
+        // })
 
-        it('should set account locked gold requirements', async () => {
-          const requirement = await validators.getAccountLockedGoldRequirement(validator)
-          assertEqualBN(requirement, validatorLockedGoldRequirements.value)
-        })
+        // it('should set account locked gold requirements', async () => {
+        //   const requirement = await validators.getAccountLockedGoldRequirement(validator)
+        //   assertEqualBN(requirement, validatorLockedGoldRequirements.value)
+        // })
 
-        it('should set the validator membership history', async () => {
-          const membershipHistory = await validators.getMembershipHistory(validator)
-          assertEqualBNArray(membershipHistory[0], [validatorRegistrationEpochNumber])
-          assert.deepEqual(membershipHistory[1], [NULL_ADDRESS])
-        })
+        // it('should set the validator membership history', async () => {
+        //   const membershipHistory = await validators.getMembershipHistory(validator)
+        //   assertEqualBNArray(membershipHistory[0], [validatorRegistrationEpochNumber])
+        //   assert.deepEqual(membershipHistory[1], [NULL_ADDRESS])
+        // })
 
-        it('should set the validator membership history', async () => {
-          const membershipHistory = await validators.getMembershipHistory(validator)
-          assertEqualBNArray(membershipHistory[0], [validatorRegistrationEpochNumber])
-          assert.deepEqual(membershipHistory[1], [NULL_ADDRESS])
-        })
+        // it('should set the validator membership history', async () => {
+        //   const membershipHistory = await validators.getMembershipHistory(validator)
+        //   assertEqualBNArray(membershipHistory[0], [validatorRegistrationEpochNumber])
+        //   assert.deepEqual(membershipHistory[1], [NULL_ADDRESS])
+        // })
 
-        it('should emit the ValidatorEcdsaPublicKeyUpdated, ValidatorBlsPublicKeyUpdated, and ValidatorRegistered events', async () => {
-          assert.equal(resp.logs.length, 3)
-          assertContainSubset(resp.logs[0], {
-            event: 'ValidatorEcdsaPublicKeyUpdated',
-            args: {
-              validator,
-              ecdsaPublicKey: publicKey,
-            },
-          })
-          assertContainSubset(resp.logs[1], {
-            event: 'ValidatorBlsPublicKeyUpdated',
-            args: {
-              validator,
-              blsPublicKey,
-            },
-          })
-          assertContainSubset(resp.logs[2], {
-            event: 'ValidatorRegistered',
-            args: {
-              validator,
-            },
-          })
-        })
+        // it('should emit the ValidatorEcdsaPublicKeyUpdated, ValidatorBlsPublicKeyUpdated, and ValidatorRegistered events', async () => {
+        //   assert.equal(resp.logs.length, 3)
+        //   assertContainSubset(resp.logs[0], {
+        //     event: 'ValidatorEcdsaPublicKeyUpdated',
+        //     args: {
+        //       validator,
+        //       ecdsaPublicKey: publicKey,
+        //     },
+        //   })
+        //   assertContainSubset(resp.logs[1], {
+        //     event: 'ValidatorBlsPublicKeyUpdated',
+        //     args: {
+        //       validator,
+        //       blsPublicKey,
+        //     },
+        //   })
+        //   assertContainSubset(resp.logs[2], {
+        //     event: 'ValidatorRegistered',
+        //     args: {
+        //       validator,
+        //     },
+        //   })
+        // })
       })
     })
 

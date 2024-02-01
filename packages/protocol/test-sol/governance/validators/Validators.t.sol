@@ -128,6 +128,10 @@ contract ValidatorsTest is Test, Constants {
   ValidatorsMockTunnel.InitParams public initParams;
   ValidatorsMockTunnel.InitParams2 public initParams2;
 
+  event ValidatorRegistered(address indexed validator);
+  event ValidatorEcdsaPublicKeyUpdated(address indexed validator, bytes ecdsaPublicKey);
+  event ValidatorBlsPublicKeyUpdated(address indexed validator, bytes blsPublicKey);
+
   function setUp() public {
     owner = address(this);
     nonOwner = actor("nonOwner");
@@ -453,6 +457,8 @@ contract ValidatorsTest_RegisterValidator_WhenAccountIsNotRegisteredValidator is
   uint256 validatorPk;
   address signer;
   uint256 signerPk;
+  bytes ecdsaPubKey;
+  uint256 validatorRegistrationEpochNumber;
 
   function setUp() public {
     super.setUp();
@@ -466,7 +472,29 @@ contract ValidatorsTest_RegisterValidator_WhenAccountIsNotRegisteredValidator is
     lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
   }
 
-  function skip_test_Reverts_WhenVoteOverMaxNumberOfGroupsSetToTrue() public {
+  function _generateEcdsaPubKey() internal {
+    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
+
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+
+    bytes32 addressHash = keccak256(abi.encodePacked(validator));
+
+    ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
+  }
+
+  function _registerValidatorHelper() internal {
+    _generateEcdsaPubKey();
+    ph.setDebug(true);
+
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+
+    vm.prank(validator);
+    validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
+    validatorRegistrationEpochNumber = validators.getEpochNumber();
+  }
+
+  function test_Reverts_WhenVoteOverMaxNumberOfGroupsSetToTrue() public {
     vm.prank(validator);
     election.setAllowedToVoteOverMaxNumberOfGroups(validator, true);
 
@@ -481,7 +509,7 @@ contract ValidatorsTest_RegisterValidator_WhenAccountIsNotRegisteredValidator is
     validators.registerValidator(pubKey, blsPublicKey, blsPop);
   }
 
-  function skip_test_ShouldRevertWhenDelagatingCELO() public {
+  function test_Reverts_WhenDelagatingCELO() public {
     lockedGold.setAccountTotalDelegatedAmountInPercents(validator, 10);
     (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
     vm.prank(validator);
@@ -493,22 +521,127 @@ contract ValidatorsTest_RegisterValidator_WhenAccountIsNotRegisteredValidator is
     validators.registerValidator(pubKey, blsPublicKey, blsPop);
   }
 
-  function _registerValidatorHelper() internal {
-    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
-    vm.prank(validator);
-    accounts.authorizeValidatorSigner(signer, v, r, s);
-    bytes memory pubKey = addressToPublicKey(
-      keccak256(abi.encodePacked("dummy_msg_data")),
-      v,
-      r,
-      s
-    );
-    vm.prank(validator);
-    validators.registerValidator(pubKey, blsPublicKey, blsPop);
+  function test_ShouldMarkAccountAsValidator_WhenAccountHasAuthorizedValidatorSigner() public {
+    _registerValidatorHelper();
+
+    assertTrue(validators.isValidator(validator));
   }
 
-  function test_ShouldMarkAccountAsValidator() public {
-    // XXX made changes to the precompileHandler it needs to be added to the repo.
+  function test_ShouldAddAccountToValidatorList_WhenAccountHasAuthorizedValidatorSigner() public {
+    address[] memory ExpectedRegisteredValidators = new address[](1);
+    ExpectedRegisteredValidators[0] = validator;
+    _registerValidatorHelper();
+    assertEq(validators.getRegisteredValidators().length, ExpectedRegisteredValidators.length);
+    assertEq(validators.getRegisteredValidators()[0], ExpectedRegisteredValidators[0]);
+  }
+
+  function test_ShouldSetValidatorEcdsaPublicKey_WhenAccountHasAuthorizedValidatorSigner() public {
+    _registerValidatorHelper();
+    (bytes memory actualEcdsaPubKey, , , , ) = validators.getValidator(validator);
+
+    assertEq(actualEcdsaPubKey, ecdsaPubKey);
+  }
+
+  function test_ShouldSetValidatorBlsPublicKey_WhenAccountHasAuthorizedValidatorSigner() public {
+    _registerValidatorHelper();
+    (, bytes memory actualBlsPubKey, , , ) = validators.getValidator(validator);
+
+    assertEq(actualBlsPubKey, blsPublicKey);
+  }
+
+  function test_ShouldSetValidatorSigner_WhenAccountHasAuthorizedValidatorSigner() public {
+    _registerValidatorHelper();
+    (, , , , address ActualSigner) = validators.getValidator(validator);
+
+    assertEq(ActualSigner, signer);
+  }
+
+  function test_ShouldSetLockGoldRequirements_WhenAccountHasAuthorizedValidatorSigner() public {
+    _registerValidatorHelper();
+    uint256 _lockedGoldReq = validators.getAccountLockedGoldRequirement(validator);
+
+    assertEq(_lockedGoldReq, originalValidatorLockedGoldRequirements.value);
+  }
+
+  function test_ShouldSetValidatorMembershipHistory_WhenAccountHasAuthorizedValidatorSigner()
+    public
+  {
+    _registerValidatorHelper();
+    (uint256[] memory _epoch, address[] memory _membershipGroups, , ) = validators
+      .getMembershipHistory(validator);
+
+    uint256[] memory validatorRegistrationEpochNumberList = new uint256[](1);
+    validatorRegistrationEpochNumberList[0] = validatorRegistrationEpochNumber;
+    address[] memory ExpectedMembershipGroups = new address[](1);
+    ExpectedMembershipGroups[0] = address(0);
+
+    assertEq(_epoch, validatorRegistrationEpochNumberList);
+    assertEq(_membershipGroups, ExpectedMembershipGroups);
+  }
+
+  function test_Emits_ValidatorEcdsaPublicKeyUpdatedEvent() public {
+    _generateEcdsaPubKey();
+
+    ph.setDebug(true);
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorEcdsaPublicKeyUpdated(validator, ecdsaPubKey);
+
+    vm.prank(validator);
+    validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
+  }
+
+  function test_Emits_ValidatorBlsPublicKeyUpdatedEvent() public {
+    _generateEcdsaPubKey();
+
+    ph.setDebug(true);
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorBlsPublicKeyUpdated(validator, blsPublicKey);
+
+    vm.prank(validator);
+    validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
+  }
+
+  function test_Emits_ValidatorRegisteredEvent() public {
+    _generateEcdsaPubKey();
+
+    ph.setDebug(true);
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorRegistered(validator);
+
+    vm.prank(validator);
+    validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
+  }
+}
+contract ValidatorsTest_RegisterValidator_WhenAccountIsRegisteredValidator is
+  ValidatorsTest,
+  ECDSAHelper
+{
+  address validator;
+  uint256 validatorPk;
+  address signer;
+  uint256 signerPk;
+  bytes ecdsaPubKey;
+  uint256 validatorRegistrationEpochNumber;
+
+  function setUp() public {
+    super.setUp();
+
+    (validator, validatorPk) = actorWithPK("validator");
+    (signer, signerPk) = actorWithPK("signer");
+
+    vm.prank(validator);
+    accounts.createAccount();
+
+    lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
+  }
+
+  function _generateEcdsaPubKey() internal {
     (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
 
     vm.prank(validator);
@@ -516,15 +649,141 @@ contract ValidatorsTest_RegisterValidator_WhenAccountIsNotRegisteredValidator is
 
     bytes32 addressHash = keccak256(abi.encodePacked(validator));
 
-    bytes memory pubKey = addressToPublicKey(addressHash, v, r, s);
+    ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
+  }
 
+  function _registerValidatorHelper() internal {
+    _generateEcdsaPubKey();
     ph.setDebug(true);
 
     ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
 
     vm.prank(validator);
+    validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
+    validatorRegistrationEpochNumber = validators.getEpochNumber();
+  }
+
+  function test_Reverts_WhenVoteOverMaxNumberOfGroupsSetToTrue() public {
+    vm.prank(validator);
+    election.setAllowedToVoteOverMaxNumberOfGroups(validator, true);
+
+    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
+
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+    bytes memory pubKey = addressToPublicKey("random msg", v, r, s);
+
+    vm.expectRevert("Cannot vote for more than max number of groups");
+    vm.prank(validator);
     validators.registerValidator(pubKey, blsPublicKey, blsPop);
+  }
+
+  function test_Reverts_WhenDelagatingCELO() public {
+    lockedGold.setAccountTotalDelegatedAmountInPercents(validator, 10);
+    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+    bytes memory pubKey = addressToPublicKey("random msg", v, r, s);
+
+    vm.expectRevert("Cannot delegate governance power");
+    vm.prank(validator);
+    validators.registerValidator(pubKey, blsPublicKey, blsPop);
+  }
+
+  function test_ShouldMarkAccountAsValidator_WhenAccountHasAuthorizedValidatorSigner() public {
+    _registerValidatorHelper();
 
     assertTrue(validators.isValidator(validator));
+  }
+
+  function test_ShouldAddAccountToValidatorList_WhenAccountHasAuthorizedValidatorSigner() public {
+    address[] memory ExpectedRegisteredValidators = new address[](1);
+    ExpectedRegisteredValidators[0] = validator;
+    _registerValidatorHelper();
+    assertEq(validators.getRegisteredValidators().length, ExpectedRegisteredValidators.length);
+    assertEq(validators.getRegisteredValidators()[0], ExpectedRegisteredValidators[0]);
+  }
+
+  function test_ShouldSetValidatorEcdsaPublicKey_WhenAccountHasAuthorizedValidatorSigner() public {
+    _registerValidatorHelper();
+    (bytes memory actualEcdsaPubKey, , , , ) = validators.getValidator(validator);
+
+    assertEq(actualEcdsaPubKey, ecdsaPubKey);
+  }
+
+  function test_ShouldSetValidatorBlsPublicKey_WhenAccountHasAuthorizedValidatorSigner() public {
+    _registerValidatorHelper();
+    (, bytes memory actualBlsPubKey, , , ) = validators.getValidator(validator);
+
+    assertEq(actualBlsPubKey, blsPublicKey);
+  }
+
+  function test_ShouldSetValidatorSigner_WhenAccountHasAuthorizedValidatorSigner() public {
+    _registerValidatorHelper();
+    (, , , , address ActualSigner) = validators.getValidator(validator);
+
+    assertEq(ActualSigner, signer);
+  }
+
+  function test_ShouldSetLockGoldRequirements_WhenAccountHasAuthorizedValidatorSigner() public {
+    _registerValidatorHelper();
+    uint256 _lockedGoldReq = validators.getAccountLockedGoldRequirement(validator);
+
+    assertEq(_lockedGoldReq, originalValidatorLockedGoldRequirements.value);
+  }
+
+  function test_ShouldSetValidatorMembershipHistory_WhenAccountHasAuthorizedValidatorSigner()
+    public
+  {
+    _registerValidatorHelper();
+    (uint256[] memory _epoch, address[] memory _membershipGroups, , ) = validators
+      .getMembershipHistory(validator);
+
+    uint256[] memory validatorRegistrationEpochNumberList = new uint256[](1);
+    validatorRegistrationEpochNumberList[0] = validatorRegistrationEpochNumber;
+    address[] memory ExpectedMembershipGroups = new address[](1);
+    ExpectedMembershipGroups[0] = address(0);
+
+    assertEq(_epoch, validatorRegistrationEpochNumberList);
+    assertEq(_membershipGroups, ExpectedMembershipGroups);
+  }
+
+  function test_Emits_ValidatorEcdsaPublicKeyUpdatedEvent() public {
+    _generateEcdsaPubKey();
+
+    ph.setDebug(true);
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorEcdsaPublicKeyUpdated(validator, ecdsaPubKey);
+
+    vm.prank(validator);
+    validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
+  }
+
+  function test_Emits_ValidatorBlsPublicKeyUpdatedEvent() public {
+    _generateEcdsaPubKey();
+
+    ph.setDebug(true);
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorBlsPublicKeyUpdated(validator, blsPublicKey);
+
+    vm.prank(validator);
+    validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
+  }
+
+  function test_Emits_ValidatorRegisteredEvent() public {
+    _generateEcdsaPubKey();
+
+    ph.setDebug(true);
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorRegistered(validator);
+
+    vm.prank(validator);
+    validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
   }
 }
