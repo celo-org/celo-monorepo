@@ -17,7 +17,7 @@ contract GoldTokenTest is Test {
   function setUp() public {
     goldToken = new GoldToken(true);
     receiver = actor("receiver");
-    receiver = actor("sender");
+    sender = actor("sender");
     vm.deal(receiver, ONE_GOLDTOKEN);
     vm.deal(sender, ONE_GOLDTOKEN);
   }
