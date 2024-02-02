@@ -186,25 +186,17 @@ contract EscrowTest is Test {
 }
 
 contract EscrowInitialize is EscrowTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_Should_have_set_the_owner() public {
     assertEq(escrowContract.owner(), address(this));
   }
 
-  function testt_Reverts_If_InitializedAgain() public {
+  function test_Reverts_If_InitializedAgain() public {
     vm.expectRevert("contract already initialized");
     escrowContract.initialize();
   }
 }
 
 contract EscrowAddDefaultTrustedIssuer is EscrowTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_AllowOwnerToAddTrustedIssuer() public {
     address[] memory expected1 = new address[](0);
     assertEq(escrowContract.getDefaultTrustedIssuers(), expected1);
@@ -214,7 +206,7 @@ contract EscrowAddDefaultTrustedIssuer is EscrowTest {
     assertEq(escrowContract.getDefaultTrustedIssuers(), expected2);
   }
 
-  function test_t_Reverts_WhenNonOwnerTriesToAdd() public {
+  function test_Reverts_WhenNonOwnerTriesToAdd() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(sender);
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
@@ -226,7 +218,7 @@ contract EscrowAddDefaultTrustedIssuer is EscrowTest {
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
   }
 
-  function test_t_Reverts_WhenEmptyAddress() public {
+  function test_Reverts_WhenEmptyAddress() public {
     vm.expectRevert("trustedIssuer can't be null");
     escrowContract.addDefaultTrustedIssuer(address(0));
   }
@@ -287,7 +279,7 @@ contract EscrowRemoveDefaultTrustedIssuer is EscrowTest {
     assertEq(escrowContract.getDefaultTrustedIssuers(), expected1);
   }
 
-  function test_t_Reverts_WhenNonOwnerTriesToRemoveTrustedIssuer() public {
+  function test_Reverts_WhenNonOwnerTriesToRemoveTrustedIssuer() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(sender);
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 0);
@@ -299,12 +291,12 @@ contract EscrowRemoveDefaultTrustedIssuer is EscrowTest {
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 0);
   }
 
-  function test_t_Reverts_WhenIndexIsIncorrect() public {
+  function test_Reverts_WhenIndexIsIncorrect() public {
     vm.expectRevert("index is invalid");
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 1);
   }
 
-  function test_t_Reverts_WhenIssuerIsNotOnIndex() public {
+  function test_Reverts_WhenIssuerIsNotOnIndex() public {
     escrowContract.addDefaultTrustedIssuer(trustedIssuer2);
     vm.expectRevert("trustedIssuer does not match address found at defaultTrustedIssuers[index]");
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 1);
@@ -532,8 +524,6 @@ contract EscrowTestsWithTokens is EscrowTest {
   }
 
   function test_Emits_TheTrustedIssuerEvent() public {
-    // should emit the TrustedIssuersSet event
-
     address[] memory trustedIssuers = new address[](1);
     trustedIssuers[0] = trustedIssuer1;
 
