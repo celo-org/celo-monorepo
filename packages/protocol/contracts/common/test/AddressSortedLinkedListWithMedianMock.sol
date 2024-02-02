@@ -1,5 +1,3 @@
-// TODO esta la puedo mover
-
 pragma solidity ^0.5.13;
 
 import "../linkedlists/AddressSortedLinkedListWithMedian.sol";
