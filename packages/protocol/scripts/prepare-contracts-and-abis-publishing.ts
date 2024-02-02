@@ -17,8 +17,8 @@ import {
 } from './consts'
 
 function log(...args: any[]) {
-  // tslint:disable-next-line
-  console.log('[prepare-contracts-and-abis]', ...args)
+  // eslint-disable-next-line
+  console.info('[prepare-contracts-and-abis]', ...args)
 }
 
 try {
@@ -106,16 +106,24 @@ try {
 }
 
 function createIndex() {
-  const reExports = PublishContracts.map((contractName) => {
+  const reExports = PublishContracts.filter((contractName) => {
+    return fs.existsSync(path.join(ABIS_BUILD_DIR, `${contractName}.ts`))
+  }).map((contractName) => {
+    console.info(`Re-exporting ${contractName}`)
     return `export * from './${contractName}.js'`
   })
 
   fs.writeFileSync(path.join(ABIS_BUILD_DIR, 'index.ts'), reExports.join('\n'))
 }
 
+type Exports = Record<
+  string,
+  { import?: string; require?: string; types?: string; default?: string }
+>
+
 // Helper functions
 function prepareTargetTypesExports() {
-  const exports = {}
+  const exports: Exports = {}
   const targets = [BuildTarget.ESM, BuildTarget.CJS, BuildTarget.TYPES]
 
   targets.forEach((target) => {
@@ -143,6 +151,7 @@ function prepareTargetTypesExports() {
           parsedPathName
         )}`
 
+        // eslint-disable-next-line no-prototype-builtins
         if (!exports.hasOwnProperty(exportKey)) {
           exports[exportKey] = {}
         }
@@ -190,7 +199,7 @@ function expectFileExists(relativePath: string) {
 }
 
 function processRawJsonsAndPrepareExports() {
-  const exports = {}
+  const exports: Exports = {}
 
   log('Removing extraneous fields from generated json files')
   const fileNames = fs.readdirSync(ABIS_BUILD_DIR)
@@ -229,11 +238,16 @@ function processRawJsonsAndPrepareExports() {
   return exports
 }
 
-function replacePackageVersionAndMakePublic(packageJsonPath: string, onDone?: (json) => void) {
-  const json = JSON.parse(fs.readFileSync(packageJsonPath).toString())
+type JSON = Record<string, string | boolean | Exports>
+
+function replacePackageVersionAndMakePublic(
+  packageJsonPath: string,
+  onDone?: (json: JSON) => void
+) {
+  const json: JSON = JSON.parse(fs.readFileSync(packageJsonPath).toString())
 
   if (process.env.RELEASE_VERSION) {
-    log(`Replacing ${json.name} version with provided RELEASE_VERSION`)
+    log(`Replacing ${json.name as string} version with provided RELEASE_VERSION`)
 
     json.version = process.env.RELEASE_VERSION
     json.private = false
@@ -248,7 +262,7 @@ function replacePackageVersionAndMakePublic(packageJsonPath: string, onDone?: (j
   fs.writeFileSync(packageJsonPath, JSON.stringify(json, null, 2))
 }
 
-function prepareAbisPackageJson(exports) {
+function prepareAbisPackageJson(exports: Exports) {
   log('Preparing @celo/abis package.json')
   const packageJsonPath = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json')
 

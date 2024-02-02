@@ -5,7 +5,7 @@ oracle:
     mid:
       maxExchangeVolumeShare: 1
       maxPercentageDeviation: 0.01
-      maxPercentageBidAskSpread: 0.005
+      maxPercentageBidAskSpread: 0.0075
   metrics:
     enabled: true
     prometheusPort: 9090
@@ -55,6 +55,38 @@ oracle:
       ],
       [
         {exchange: 'BITSTAMP', symbol: 'EUROCEUR', toInvert: false},
+        {exchange: 'XIGNITE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+
+      [
+        {exchange: 'BITMART', symbol: 'EUROCUSDT', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'BITMART', symbol: 'EUROCUSDT', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'BITMART', symbol: 'EUROCUSDT', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDTEUR', toInvert: false},
+        {exchange: 'XIGNITE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+      
+      [
+        {exchange: 'BITMART', symbol: 'EUROCUSDC', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDCEUR', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'BITMART', symbol: 'EUROCUSDC', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDCEUR', toInvert: false},
+        {exchange: 'CURRENCYAPI', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'BITMART', symbol: 'EUROCUSDC', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDCEUR', toInvert: false},
         {exchange: 'XIGNITE', symbol: 'EURXOF', toInvert: false, ignoreVolume: true}
       ]
   ]"

@@ -36,7 +36,7 @@ function getEnvMnemonic(env: string): string {
   if (envMemonicResult.error) {
     throw envMemonicResult.error
   } else if (envMemonicResult.parsed) {
-    return envMemonicResult.parsed.MNEMONIC as string
+    return envMemonicResult.parsed.MNEMONIC
   }
   throw new Error('Could not get mnmonic')
 }
@@ -79,7 +79,7 @@ export const handler = async (argv: UpgradeFaucetArgs) => {
 
     // // Need to clear because we generate the same account each time here.
     console.info(`Clearing accounts for network ${argv.celoEnv} on ${argv.firebaseProject}`)
-    await execSync(`yarn --cwd ../faucet cli accounts:clear --net ${argv.celoEnv}`, {
+    execSync(`yarn --cwd ../faucet cli accounts:clear --net ${argv.celoEnv}`, {
       stdio: 'inherit',
     })
 

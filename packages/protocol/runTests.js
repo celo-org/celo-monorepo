@@ -74,7 +74,7 @@ async function test() {
         : `test/\*\*/*.ts`
     const testFiles = glob.readdirSync(testGlob)
     if (testFiles.length === 0) {
-      // tslint:disable-next-line: no-console
+      // eslint-disable-next-line: no-console
       console.error(`No test files matched with ${testGlob}`)
       process.exit(1)
     }
@@ -83,7 +83,7 @@ async function test() {
     await exec('yarn', testArgs)
     await closeGanache()
   } catch (e) {
-    // tslint:disable-next-line: no-console
+    // eslint-disable-next-line: no-console
     console.error(e.stdout ? e.stdout : e)
     process.nextTick(() => process.exit(1))
   }

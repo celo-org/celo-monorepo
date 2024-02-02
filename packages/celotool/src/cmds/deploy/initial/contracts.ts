@@ -76,7 +76,7 @@ export const handler = async (argv: ContractsArgv) => {
   exitIfCelotoolHelmDryRun()
   await switchToClusterFromEnv(argv.celoEnv)
 
-  console.log(`Deploying smart contracts to ${argv.celoEnv}`)
+  console.info(`Deploying smart contracts to ${argv.celoEnv}`)
   const cb = async () => {
     await execCmd(
       `yarn --cwd ../protocol run init-network -n ${argv.celoEnv} -c '${JSON.stringify(

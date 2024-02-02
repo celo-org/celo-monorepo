@@ -1,8 +1,9 @@
 import { StableToken } from '@celo/contractkit'
+// eslint-disable-next-line  import/no-extraneous-dependencies
 import { describe, expect, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
 import { EnvTestContext } from '../context'
-import { fundAccountWithStableToken, getKey, ONE, TestAccounts } from '../scaffold'
+import { ONE, TestAccounts, fundAccountWithStableToken, getKey } from '../scaffold'
 
 export function runTransfersTest(context: EnvTestContext, stableTokensToTest: StableToken[]) {
   describe('Transfer Test', () => {
