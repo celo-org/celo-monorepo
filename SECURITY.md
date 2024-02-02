@@ -14,9 +14,9 @@
 The Celo community asks that all suspected vulnerabilities be privately and responsibly disclosed.
 
 ## Creating a report:
-1. Submit your vulnerability to [Celo on Intigriti](https://app.intigriti.com/programs/clabs/clabs/detail).
-	- This is currently a public program
-2. You can also email the [security@clabs.co](mailto:security@clabs.co) list with the details of reproducing the vulnerability as well as the usual details expected for all bug reports.
+1. Submit your vulnerability to [Celo on Remedy](https://r.xyz).
+	- This is currently a private program in beta.  Message us for an invite.   
+2. You can also email the [security.report@clabs.co](mailto:security.report@clabs.co) list with the details of reproducing the vulnerability as well as the usual details expected for all bug reports.
 
 ## Primary Focus 
 - Celo protocol, but the team may be able to assist in coordinating a response to a vulnerability in the third-party apps or tools in the Celo ecosystem.
@@ -26,7 +26,10 @@ The Celo community asks that all suspected vulnerabilities be privately and resp
  https://celo.org                            
  https://\*.celo.org                          
  https://\*.clabs.co                          
- https://github.com/celo-org/*               
+ https://github.com/celo-org/*  
+ https://stcelo.xyz  
+ https://\*.stcelo.xyz  
+
 
 # Out of Scope
 ----------------------------------------------------------------------------------------------------------------
@@ -40,7 +43,7 @@ Clickjacking on pages with no sensitive actions
 Host header injection without proven business impact                                                           
 Anything related to email spoofing, SPF, DMARC or DKIM                                                      
 Open ports without an accompanying proof-of-concept demonstrating vulnerability
-Open write access of documents pertain to the community                                  
+Open write access of documents pertain to the community
 
 # General
 ----------------------------------------------------------------------------------------------------------------
