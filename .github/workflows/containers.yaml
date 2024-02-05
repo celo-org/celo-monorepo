@@ -30,7 +30,7 @@ jobs:
 
   # Celotool images
   celotool-build-dev:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.14.1
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.1
     name: Build us-west1-docker.pkg.dev/devopsre/dev-images/celotool:${{ github.sha }}
     needs: changed-files
     if: |
@@ -46,7 +46,7 @@ jobs:
       file: dockerfiles/celotool/Dockerfile
       trivy: true
   celotool-build:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.14.1
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.1
     name: Build us-west1-docker.pkg.dev/devopsre/celo-monorepo/celotool:${{ github.sha }}
     needs: changed-files
     if: |
@@ -64,7 +64,7 @@ jobs:
 
   # All monorepo
   celomonorepo-build-dev:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.14.1
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.1
     name: Build us-west1-docker.pkg.dev/devopsre/dev-images/monorepo:${{ github.sha }}
     needs: changed-files
     if: |
@@ -79,7 +79,7 @@ jobs:
       file: dockerfiles/all-monorepo/Dockerfile
       trivy: true
   celomonorepo-build:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.14.1
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.1
     name: Build us-west1-docker.pkg.dev/devopsre/celo-monorepo/monorepo:${{ github.sha }}
     needs: changed-files
     if: |
@@ -96,7 +96,7 @@ jobs:
 
   # Blockscout Metadata crawler images
   metadata-crawler-build-dev:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.14.1
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.1
     needs: changed-files
     name: Build us-west1-docker.pkg.dev/devopsre/dev-images/blockscout-metadata-crawler:testing
     if: |
@@ -111,7 +111,7 @@ jobs:
       file: dockerfiles/metadata-crawler/Dockerfile
       trivy: true
   metadata-crawler-build:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.14.1
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.1
     needs: changed-files
     name: Build us-west1-docker.pkg.dev/devopsre/celo-monorepo/blockscout-metadata-crawler:latest
     if: |
