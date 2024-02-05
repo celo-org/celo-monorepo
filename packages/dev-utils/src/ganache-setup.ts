@@ -1,9 +1,9 @@
 import * as fs from 'fs-extra'
-// @ts-ignore
 import * as ganache from 'ganache'
 import * as path from 'path'
 import * as targz from 'targz'
 
+/* eslint no-console: 0 */ // --> OFF
 const MNEMONIC = 'concert load couple harbor equip island argue ramp clarify fence smart topic'
 export const ACCOUNT_PRIVATE_KEYS = [
   '0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d',
@@ -37,16 +37,16 @@ export async function startGanache(
 ) {
   const chainCopyBase = process.env.GANACHE_CHAIN_DATA_PATH || path.resolve(filePath)
   const chainCopy: string = path.resolve(path.join(chainCopyBase, 'tmp/copychain'))
-  console.log(chainCopy)
-  console.log(filePath, datafile)
+  console.info(chainCopy)
+  console.info(filePath, datafile)
   const filenameWithPath: string = path.resolve(path.join(filePath, datafile))
 
   // erases tmp chain
   if (fs.existsSync(chainCopy)) {
-    console.log(`Removing old chain tmp folder: ${chainCopy}`)
+    console.info(`Removing old chain tmp folder: ${chainCopy}`)
     fs.removeSync(chainCopy)
   }
-  console.log(`Creating chain tmp folder: ${chainCopy}`)
+  console.info(`Creating chain tmp folder: ${chainCopy}`)
   fs.mkdirsSync(chainCopy)
 
   if (opts.from_targz) {
@@ -58,12 +58,12 @@ export async function startGanache(
   return launchServer(opts, chainCopy)
 }
 
-async function launchServer(opts: { verbose?: boolean; from_targz?: boolean }, chain?: string) {
+function launchServer(opts: { verbose?: boolean; from_targz?: boolean }, chain?: string) {
   const logFn = opts.verbose
-    ? // tslint:disable-next-line: no-console
-      (...args: any[]) => console.log(...args)
+    ? // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      (...args: any[]) => console.info(...args)
     : () => {
-        /*nothing*/
+        /* nothing */
       }
 
   const server = ganache.server({
@@ -74,30 +74,28 @@ async function launchServer(opts: { verbose?: boolean; from_targz?: boolean }, c
     chain: { networkId: 1101, chainId: 1, allowUnlimitedContractSize: true, hardfork: 'istanbul' },
   })
 
-  server.listen(8545, async (err: any) => {
+  server.listen(8545, (err: any) => {
     if (err) {
       throw err
     }
   })
 
-  return async () => {
-    try {
-      await server.close()
-    } catch (e) {
-      throw e
-    }
+  async function stopGanache() {
+    return server.close()
   }
+
+  return { stopGanache }
 }
 
 function decompressChain(tarPath: string, copyChainPath: string): Promise<void> {
-  console.log('Decompressing chain')
+  console.info('Decompressing chain')
   return new Promise((resolve, reject) => {
     targz.decompress({ src: tarPath, dest: copyChainPath }, (err) => {
       if (err) {
         console.error(err)
         reject(err)
       } else {
-        console.log('Chain decompressed')
+        console.info('Chain decompressed')
         resolve()
       }
     })
@@ -110,7 +108,8 @@ export default function setup(
   opts: { verbose?: boolean; from_targz?: boolean } = {}
 ) {
   return startGanache(filePath, datafile, opts)
-    .then((stopGanache) => {
+    .then(({ stopGanache }) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       ;(global as any).stopGanache = stopGanache
     })
     .catch((err) => {
@@ -121,12 +120,12 @@ export default function setup(
 }
 
 export function emptySetup(opts: { verbose?: boolean; from_targz?: boolean } = {}) {
-  return launchServer(opts)
-    .then((stopGanache) => {
-      ;(global as any).stopGanache = stopGanache
-    })
-    .catch((err) => {
-      console.error(err)
-      process.exit(1)
-    })
+  try {
+    const { stopGanache } = launchServer(opts)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    ;(global as any).stopGanache = stopGanache
+  } catch (err) {
+    console.error(err)
+    process.exit(1)
+  }
 }

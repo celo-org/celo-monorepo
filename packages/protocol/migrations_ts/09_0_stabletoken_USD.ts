@@ -1,4 +1,3 @@
-/* tslint:disable:no-console */
 import { ensureLeading0x, eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {

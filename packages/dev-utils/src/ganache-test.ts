@@ -7,7 +7,7 @@ export const NetworkConfig = migrationOverride
 export function jsonRpcCall<O>(web3: Web3, method: string, params: any[]): Promise<O> {
   return new Promise<O>((resolve, reject) => {
     if (web3.currentProvider && typeof web3.currentProvider !== 'string') {
-      web3.currentProvider.send!(
+      web3.currentProvider.send(
         {
           id: new Date().getTime(),
           jsonrpc: '2.0',
@@ -22,12 +22,13 @@ export function jsonRpcCall<O>(web3: Web3, method: string, params: any[]): Promi
           } else if (res.error) {
             reject(
               new Error(
-                `Failed JsonRpcResponse: method: ${method} params: ${params} error: ${JSON.stringify(
-                  res.error
-                )}`
+                `Failed JsonRpcResponse: method: ${method} params: ${JSON.stringify(
+                  params
+                )} error: ${JSON.stringify(res.error)}`
               )
             )
           } else {
+            // eslint-disable-next-line  @typescript-eslint/no-unsafe-argument
             resolve(res.result)
           }
         }

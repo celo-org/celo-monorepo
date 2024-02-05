@@ -1,6 +1,6 @@
-// tslint:disable: max-classes-per-file
-// tslint:disable: no-console
-// tslint:disable: ordered-imports
+/* eslint-disable max-classes-per-file: 0 */
+/* eslint-disable no-console: 0 */
+/* eslint:disabled ordered-imports: 0 */
 import { LibraryAddresses } from '@celo/protocol/lib/bytecode'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
@@ -59,7 +59,7 @@ class ContractAddresses {
             addresses.set(contract, registeredAddress)
           }
         } catch (error) {
-          console.log('contract', contract, error)
+          console.info('contract', contract, error)
           throw error
         }
       })
@@ -112,7 +112,7 @@ const deployImplementation = async (
   if (from) {
     Contract.defaults({ from }) // override truffle with provided from address
   }
-  console.log(`Deploying ${contractName}`)
+  console.info(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
 
   // without this delay it sometimes fails with ProviderError
@@ -148,7 +148,7 @@ const deployProxy = async (
   if (contractName === 'Governance') {
     throw new Error(`Storage incompatible changes to Governance are not yet supported`)
   }
-  console.log(`Deploying ${contractName}Proxy`)
+  console.info(`Deploying ${contractName}Proxy`)
   const Proxy = await artifacts.require(`${contractName}Proxy`)
   if (from) {
     Proxy.defaults({ from }) // override truffle with provided from address
@@ -157,7 +157,7 @@ const deployProxy = async (
   const proxy = await (dryRun ? Proxy.at(celoRegistryAddress) : Proxy.new())
 
   // This makes essentially every contract dependent on Governance.
-  console.log(`Transferring ownership of ${contractName}Proxy to Governance`)
+  console.info(`Transferring ownership of ${contractName}Proxy to Governance`)
   if (!dryRun) {
     await proxy._transferOwnership(addresses.get('Governance'))
   }
@@ -225,7 +225,7 @@ const deployCoreContract = async (
       setImplementationTx.function = '_setAndInitializeImplementation'
       setImplementationTx.args.push(callData)
     }
-    console.log(
+    console.info(
       `Add '${contractName}.${setImplementationTx.function} with ${setImplementationTx.args}' to proposal`
     )
     proposal.push(setImplementationTx)
@@ -305,7 +305,7 @@ module.exports = async (callback: (error?: any) => number) => {
         return
       }
 
-      console.log('Dependencies for contract', contractName)
+      console.info('Dependencies for contract', contractName)
 
       let contractArtifact
 
@@ -331,7 +331,7 @@ module.exports = async (callback: (error?: any) => number) => {
         // 1. Release all dependencies. Guarantees library addresses are canonical for linking.
         const contractDependencies = dependencies.get(contractName)
         for (const dependency of contractDependencies) {
-          console.log('Releasing dependency', dependency)
+          console.info('Releasing dependency', dependency)
           await release(dependency)
         }
         // 2. Link dependencies.
@@ -339,7 +339,7 @@ module.exports = async (callback: (error?: any) => number) => {
           contractDependencies.map((d) => contractArtifact.link(d, addresses.get(d)))
         )
         // 3. Deploy new versions of the contract or library, if indicated by the report.
-        console.log('Deploying Contract:', contractName)
+        console.info('Deploying Contract:', contractName)
         await deployCoreContract(
           contractName,
           contractArtifact,
@@ -351,10 +351,10 @@ module.exports = async (callback: (error?: any) => number) => {
           argv.from
         )
       } else if (shouldDeployLibrary) {
-        console.log('Deploying library:', contractName)
+        console.info('Deploying library:', contractName)
         await deployLibrary(contractName, contractArtifact, addresses, argv.dry_run, argv.from)
       } else {
-        console.log('Not deployed:', contractName, "(it's not included in the report)")
+        console.info('Not deployed:', contractName, "(it's not included in the report)")
       }
 
       // 4. Mark the contract as released

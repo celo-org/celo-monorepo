@@ -6,6 +6,7 @@
     "baseUrl": ".",
     "strict": true,
     "moduleResolution": "node16",
+    "module": "Node16",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": true,
@@ -15,7 +16,7 @@
     "downlevelIteration": true,
     "resolveJsonModule": true,
     "declaration": false,
-    "rootDir": "./src-generated",
+    "rootDir": "./src-generated"
   },
-  "include": ["./src-generated"],
+  "include": ["./src-generated"]
 }
