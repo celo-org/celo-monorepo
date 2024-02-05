@@ -3,27 +3,24 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
-import "../../contracts/common/FeeHandler.sol";
-import "forge-std/console.sol";
+import "@celo-contracts/common/FeeHandler.sol";
 import "../constants.sol";
 
 import { Exchange } from "../../lib/mento-core/contracts/Exchange.sol";
 import { StableToken } from "../../lib/mento-core/contracts/StableToken.sol";
-import "../../contracts/common/FixidityLib.sol";
-import "../../contracts/common/Freezer.sol";
-import "../../contracts/common/GoldToken.sol";
-import "../../contracts/common/FeeCurrencyWhitelist.sol";
-import "../../contracts/common/MentoFeeHandlerSeller.sol";
-import "../../contracts/common/UniswapFeeHandlerSeller.sol";
-import "../../contracts/uniswap/test/MockUniswapV2Router02.sol";
-import "../../contracts/uniswap/test/MockUniswapV2Factory.sol";
-import "../../contracts/uniswap/test/MockERC20.sol";
+import "@celo-contracts/common/FixidityLib.sol";
+import "@celo-contracts/common/Freezer.sol";
+import "@celo-contracts/common/GoldToken.sol";
+import "@celo-contracts/common/FeeCurrencyWhitelist.sol";
+import "@celo-contracts/common/MentoFeeHandlerSeller.sol";
+import "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
+import "@celo-contracts/uniswap/test/MockUniswapV2Router02.sol";
+import "@celo-contracts/uniswap/test/MockUniswapV2Factory.sol";
+import "@celo-contracts/uniswap/test/MockERC20.sol";
 import "../../lib/mento-core/test/mocks/MockSortedOracles.sol";
 import "../../lib/mento-core/test/mocks/MockReserve.sol";
 
-import "contracts/common/FixidityLib.sol";
-
-contract FeeHandlerFoundry is Test, Constants {
+contract FeeHandlerTest is Test, Constants {
   using FixidityLib for FixidityLib.Fraction;
 
   FeeHandler feeHandler;
@@ -185,7 +182,7 @@ contract FeeHandlerFoundry is Test, Constants {
   }
 }
 
-contract FeeHandlerSetBurnFraction is FeeHandlerFoundry {
+contract FeeHandlerTest_SetBurnFraction is FeeHandlerTest {
   function test_OnlyOwnerCanSetBurnFraction() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
@@ -207,7 +204,7 @@ contract FeeHandlerSetBurnFraction is FeeHandlerFoundry {
   }
 }
 
-contract FeeHandlerSetHandler is FeeHandlerFoundry {
+contract FeeHandlerTest_SetHandler is FeeHandlerTest {
   function test_OnlyOwnerCanSetHandler() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
@@ -224,7 +221,7 @@ contract FeeHandlerSetHandler is FeeHandlerFoundry {
   }
 }
 
-contract FeeHandlerAddToken is FeeHandlerFoundry {
+contract FeeHandlerTest_AddToken is FeeHandlerTest {
   function test_OnlyOwnerCanAddToken() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
@@ -241,7 +238,7 @@ contract FeeHandlerAddToken is FeeHandlerFoundry {
   }
 }
 
-contract FeeHandlerRemoveToken is FeeHandlerFoundry {
+contract FeeHandlerTest_RemoveToken is FeeHandlerTest {
   function test_OnlyOwnerCanRemoveToken() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
@@ -257,7 +254,7 @@ contract FeeHandlerRemoveToken is FeeHandlerFoundry {
   }
 }
 
-contract FeeHandlerDeactivateAndActivateToken is FeeHandlerFoundry {
+contract FeeHandlerTest_DeactivateAndActivateToken is FeeHandlerTest {
   function test_OnlyOwnerCanDeactivateToken() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
@@ -284,7 +281,7 @@ contract FeeHandlerDeactivateAndActivateToken is FeeHandlerFoundry {
   }
 }
 
-contract FeeHandlerSetFeeBeneficiary is FeeHandlerFoundry {
+contract FeeHandlerTest_SetFeeBeneficiary is FeeHandlerTest {
   function test_OnlyOwnerCanSetFeeBeneficiary() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
@@ -297,7 +294,7 @@ contract FeeHandlerSetFeeBeneficiary is FeeHandlerFoundry {
   }
 }
 
-contract FeeHandlerDistribute is FeeHandlerFoundry {
+contract FeeHandlerTest_Distribute is FeeHandlerTest {
   modifier setUpBeneficiary() {
     feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
     _;
@@ -371,7 +368,7 @@ contract FeeHandlerDistribute is FeeHandlerFoundry {
   }
 }
 
-contract FeeHandlerBurnCelo is FeeHandlerFoundry {
+contract FeeHandlerTest_BurnCelo is FeeHandlerTest {
   modifier activateToken() {
     feeHandler.activateToken(address(celoToken)); // celoToken doesn't need to be added before activating
     _;
@@ -427,7 +424,7 @@ contract FeeHandlerBurnCelo is FeeHandlerFoundry {
   }
 }
 
-contract FeeHandlerSellMentoTokens is FeeHandlerFoundry {
+contract FeeHandlerTest_SellMentoTokens is FeeHandlerTest {
   modifier addStableToken() {
     feeHandler.addToken(address(stableToken), address(mentoSeller));
     _;
@@ -556,7 +553,7 @@ contract FeeHandlerSellMentoTokens is FeeHandlerFoundry {
   }
 }
 
-contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
+contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTest {
   uint256 deadline;
 
   modifier setMaxSlippage() {
@@ -772,7 +769,7 @@ contract FeeHandlerSellNonMentoTokens is FeeHandlerFoundry {
   }
 }
 
-contract FeeHandlerHandleMentoTokens is FeeHandlerFoundry {
+contract FeeHandlerTest_HandleMentoTokens is FeeHandlerTest {
   modifier setBurnFraction() {
     feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
     _;
@@ -810,7 +807,7 @@ contract FeeHandlerHandleMentoTokens is FeeHandlerFoundry {
   }
 }
 
-contract FeeHandlerHandleAll is FeeHandlerFoundry {
+contract FeeHandlerTest_HandleAll is FeeHandlerTest {
   modifier setBurnFraction() {
     feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
     _;
@@ -871,7 +868,7 @@ contract FeeHandlerHandleAll is FeeHandlerFoundry {
   }
 }
 
-contract FeeHandlerTransfer is FeeHandlerFoundry {
+contract FeeHandlerTest_Transfer is FeeHandlerTest {
   modifier mintToken(uint256 amount) {
     tokenA.mint(address(feeHandler), amount);
     _;
@@ -889,7 +886,7 @@ contract FeeHandlerTransfer is FeeHandlerFoundry {
   }
 }
 
-contract FeeHandlerSetDailySellLimit is FeeHandlerFoundry {
+contract FeeHandlerTest_SetDailySellLimit is FeeHandlerTest {
   function test_OnlyOwnerCanSetLimit() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(user);
@@ -897,7 +894,7 @@ contract FeeHandlerSetDailySellLimit is FeeHandlerFoundry {
   }
 }
 
-contract FeeHandlerSetMaxSlippage is FeeHandlerFoundry {
+contract FeeHandlerTest_SetMaxSlippage is FeeHandlerTest {
   function test_ShouldOnlyBeCalledByOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(user);
