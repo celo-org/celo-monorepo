@@ -22,6 +22,12 @@ This will run all tests in this folder. To run only a specific file you can use
 forge test --match-path ./path/to/file.t.sol
 ```
 
+To run only a specific contract in a test file, you can use
+
+```bash
+forge test --match-contract CONTRACT_NAME
+```
+
 To run only a specific test, you can use
 
 ```bash
@@ -31,9 +37,11 @@ forge test --match-test test_ToMatch
 You can specify a verbosity level with the `-v`, `-vv`, `-vvv`, and `-vvvv` flags. The more `v`s you put the more verbose the output will be.
 
 Putting it all together, you might run something like
+
 ```bash
 forge test --match-path ./path/to/file.t.sol --match-test test_ToMatch -vvv
 ```
+
 You can read more about the `forge test` command [here](https://book.getfoundry.sh/reference/forge/forge-test).
 
 To skip a specific test, you can add `vm.skip(true);` as the first line of the test.
