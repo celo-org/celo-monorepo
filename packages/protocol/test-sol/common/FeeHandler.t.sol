@@ -183,7 +183,7 @@ contract FeeHandlerTest is Test, Constants {
 }
 
 contract FeeHandlerTest_SetBurnFraction is FeeHandlerTest {
-  function test_OnlyOwnerCanSetBurnFraction() public {
+  function test_Reverts_WhenCallerNotOwner() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
     feeHandler.setBurnFraction(100);
@@ -198,14 +198,14 @@ contract FeeHandlerTest_SetBurnFraction is FeeHandlerTest {
     );
   }
 
-  function test_RevertsOnFractionsGreaterThanOne() public {
+  function test_Reverts_WhenFractionsGreaterThanOne() public {
     vm.expectRevert("Burn fraction must be less than or equal to 1");
     feeHandler.setBurnFraction(FixidityLib.newFixedFraction(3, 2).unwrap());
   }
 }
 
 contract FeeHandlerTest_SetHandler is FeeHandlerTest {
-  function test_OnlyOwnerCanSetHandler() public {
+  function test_Reverts_WhenCallerNotOwner() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
     feeHandler.setHandler(address(stableToken), address(mentoSeller));
@@ -222,7 +222,7 @@ contract FeeHandlerTest_SetHandler is FeeHandlerTest {
 }
 
 contract FeeHandlerTest_AddToken is FeeHandlerTest {
-  function test_OnlyOwnerCanAddToken() public {
+  function test_Reverts_WhenCallerNotOwner() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
     feeHandler.addToken(address(stableToken), address(mentoSeller));
@@ -239,7 +239,7 @@ contract FeeHandlerTest_AddToken is FeeHandlerTest {
 }
 
 contract FeeHandlerTest_RemoveToken is FeeHandlerTest {
-  function test_OnlyOwnerCanRemoveToken() public {
+  function test_Reverts_WhenCallerNotOwner() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
     feeHandler.removeToken(address(stableToken));
@@ -255,13 +255,13 @@ contract FeeHandlerTest_RemoveToken is FeeHandlerTest {
 }
 
 contract FeeHandlerTest_DeactivateAndActivateToken is FeeHandlerTest {
-  function test_OnlyOwnerCanDeactivateToken() public {
+  function test_Reverts_WhenActivateCallerNotOwner() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
     feeHandler.deactivateToken(address(stableToken));
   }
 
-  function test_OnlyOwnerCanActivateToken() public {
+  function test_Reverts_WhenDeactivateCallerNotOwner() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
     feeHandler.activateToken(address(stableToken));
@@ -282,7 +282,7 @@ contract FeeHandlerTest_DeactivateAndActivateToken is FeeHandlerTest {
 }
 
 contract FeeHandlerTest_SetFeeBeneficiary is FeeHandlerTest {
-  function test_OnlyOwnerCanSetFeeBeneficiary() public {
+  function test_Reverts_WhenCallerNotOwner() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
     feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
@@ -324,12 +324,12 @@ contract FeeHandlerTest_Distribute is FeeHandlerTest {
     _;
   }
 
-  function test_CantDistributeWhenNotActive() public setUpBeneficiary {
+  function test_Reverts_WhenNotActive() public setUpBeneficiary {
     vm.expectRevert("Handler has to be set to sell token");
     feeHandler.distribute(address(stableToken));
   }
 
-  function test_CantDistributeWhenFrozen() public setUpBeneficiary activateToken {
+  function test_Reverts_WhenFrozen() public setUpBeneficiary activateToken {
     freezer.freeze(address(feeHandler));
     vm.expectRevert("can't call when contract is frozen");
     feeHandler.distribute(address(stableToken));
@@ -453,7 +453,7 @@ contract FeeHandlerTest_SellMentoTokens is FeeHandlerTest {
     _;
   }
 
-  function test_CantSellWhenFrozen() public {
+  function test_Reverts_WhenFrozen() public {
     freezer.freeze(address(feeHandler));
     vm.expectRevert("can't call when contract is frozen");
     feeHandler.sell(address(stableToken));
@@ -501,7 +501,7 @@ contract FeeHandlerTest_SellMentoTokens is FeeHandlerTest {
     assertEq(stableToken.balanceOf(address(feeHandler)), 2000);
   }
 
-  function test_DoesntSellWhenHandlerNotSet()
+  function test_Reverts_WhenHandlerNotSet()
     public
     setBurnFraction
     setMaxSlippage
@@ -527,7 +527,7 @@ contract FeeHandlerTest_SellMentoTokens is FeeHandlerTest {
     assertEq(feeHandler.celoToBeBurned(), expectedCeloAmount);
   }
 
-  function test_DoesntSellWhenNotEnoughReports()
+  function test_Reverts_WhenNotEnoughReports()
     public
     setBurnFraction
     setMaxSlippage
@@ -622,7 +622,7 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTest {
     _;
   }
 
-  function test_DoesntSellWhenNotEnoughReports()
+  function test_Reverts_WhenNotEnoughReports()
     public
     setMaxSlippage
     setUpUniswap
@@ -650,7 +650,7 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTest {
     assertEq(tokenA.balanceOf(address(feeHandler)), 2e18);
   }
 
-  function test_FailsWhenOracleSlippageIsHigh()
+  function test_Reverts_WhenOracleSlippageIsHigh()
     public
     setUpUniswap
     setUpLiquidity(1e19, 5e18)
@@ -705,7 +705,7 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTest {
     assertEq(tokenA.balanceOf(address(feeHandler)), 2e18);
   }
 
-  function test_DoesntExchangeWhenSlippageIsTooHigh()
+  function test_Reverts_WhenSlippageIsTooHigh()
     public
     setUpUniswap
     setUpLiquidity(1e19, 5e18)
@@ -790,7 +790,7 @@ contract FeeHandlerTest_HandleMentoTokens is FeeHandlerTest {
     _;
   }
 
-  function test_RevertsWhenTokenNotAdded()
+  function test_Reverts_WhenTokenNotAdded()
     public
     setBurnFraction
     setUpBeneficiary
@@ -874,7 +874,7 @@ contract FeeHandlerTest_Transfer is FeeHandlerTest {
     _;
   }
 
-  function test_OnlyOwnerCanTakeFundsOut() public mintToken(1e18) {
+  function test_Reverts_WhenCallerNotOwner() public mintToken(1e18) {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
     feeHandler.transfer(address(tokenA), user, 1e18);
@@ -887,7 +887,7 @@ contract FeeHandlerTest_Transfer is FeeHandlerTest {
 }
 
 contract FeeHandlerTest_SetDailySellLimit is FeeHandlerTest {
-  function test_OnlyOwnerCanSetLimit() public {
+  function test_Reverts_WhenCallerNotOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(user);
     feeHandler.setDailySellLimit(address(stableToken), celoAmountForRate);
@@ -895,7 +895,7 @@ contract FeeHandlerTest_SetDailySellLimit is FeeHandlerTest {
 }
 
 contract FeeHandlerTest_SetMaxSlippage is FeeHandlerTest {
-  function test_ShouldOnlyBeCalledByOwner() public {
+  function test_Reverts_WhenCallerNotOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(user);
     feeHandler.setMaxSplippage(address(stableToken), maxSlippage);
