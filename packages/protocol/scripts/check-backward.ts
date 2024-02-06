@@ -51,6 +51,7 @@ const argv = yargs
 
 // old artifacts folder needs to be generalized https://github.com/celo-org/celo-monorepo/issues/10567
 const oldArtifactsFolder = path.relative(process.cwd(), argv.old_contracts)
+const oldArtifactsFolder08 = path.relative(process.cwd(), argv.old_contracts + '-0.8')
 const newArtifactsFolder = path.relative(process.cwd(), argv.new_contracts)
 const newArtifactsFolder08 = path.relative(process.cwd(), argv.new_contracts + '-0.8')
 const newArtifactsFolders = [newArtifactsFolder, newArtifactsFolder08]
@@ -65,6 +66,7 @@ const outFile = argv.output_file ? argv.output_file : tmp.tmpNameSync({})
 const exclude: RegExp = argv.exclude ? new RegExp(argv.exclude) : null
 // old artifacts needs to be generalized https://github.com/celo-org/celo-monorepo/issues/10567
 const oldArtifacts = instantiateArtifacts(oldArtifactsFolder)
+const oldArtifacts08 = instantiateArtifacts(oldArtifactsFolder08)
 const newArtifacts = instantiateArtifacts(newArtifactsFolder)
 const newArtifacts08 = instantiateArtifacts(newArtifactsFolder08)
 
@@ -72,7 +74,7 @@ try {
   const backward = ASTBackwardReport.create(
     oldArtifactsFolder,
     newArtifactsFolders,
-    oldArtifacts,
+    [oldArtifacts, oldArtifacts08],
     [newArtifacts, newArtifacts08],
     exclude,
     new DefaultCategorizer(),
@@ -88,7 +90,7 @@ try {
   } else if (argv._.includes(COMMAND_SEM_CHECK)) {
     const doVersionCheck = async () => {
       const versionChecker = await ASTContractVersionsChecker.create(
-        oldArtifacts,
+        [oldArtifacts, oldArtifacts08],
         [newArtifacts, newArtifacts08],
         backward.report.versionDeltas()
       )
