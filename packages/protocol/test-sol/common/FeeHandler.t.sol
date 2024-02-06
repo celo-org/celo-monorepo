@@ -64,6 +64,16 @@ contract FeeHandlerTest is Test, Constants {
   uint256 updateFrequency = 60 * 60;
   uint256 minimumReports = 2;
 
+  event SoldAndBurnedToken(address token, uint256 value);
+  event DailyLimitSet(address tokenAddress, uint256 newLimit);
+  event DailyLimitHit(address token, uint256 burning);
+  event MaxSlippageSet(address token, uint256 maxSlippage);
+  event DailySellLimitUpdated(uint256 amount);
+  event FeeBeneficiarySet(address newBeneficiary);
+  event BurnFractionSet(uint256 fraction);
+  event TokenAdded(address tokenAddress, address handlerAddress);
+  event TokenRemoved(address tokenAddress);
+
   function setUp() public {
     vm.warp(YEAR); // foundry starts block.timestamp at 0, which leads to underflow errors in Uniswap contracts
 
@@ -189,6 +199,11 @@ contract FeeHandlerTest_SetBurnFraction is FeeHandlerTest {
     feeHandler.setBurnFraction(100);
   }
 
+  function test_Reverts_WhenFractionsGreaterThanOne() public {
+    vm.expectRevert("Burn fraction must be less than or equal to 1");
+    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(3, 2).unwrap());
+  }
+
   function test_SetBurnFraction() public {
     feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
     assertEq(
@@ -198,9 +213,10 @@ contract FeeHandlerTest_SetBurnFraction is FeeHandlerTest {
     );
   }
 
-  function test_Reverts_WhenFractionsGreaterThanOne() public {
-    vm.expectRevert("Burn fraction must be less than or equal to 1");
-    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(3, 2).unwrap());
+  function test_ShouldEmitFeeBeneficiarySet() public {
+    vm.expectEmit(true, true, true, true);
+    emit BurnFractionSet(FixidityLib.newFixedFraction(80, 100).unwrap());
+    feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
   }
 }
 
@@ -236,6 +252,12 @@ contract FeeHandlerTest_AddToken is FeeHandlerTest {
     assertTrue(feeHandler.getTokenActive(address(stableToken)));
     assertEq(feeHandler.getTokenHandler(address(stableToken)), address(mentoSeller));
   }
+
+  function test_ShouldEmitTokenAdded() public {
+    vm.expectEmit(true, true, true, true);
+    emit TokenAdded(address(stableToken), address(mentoSeller));
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+  }
 }
 
 contract FeeHandlerTest_RemoveToken is FeeHandlerTest {
@@ -251,6 +273,13 @@ contract FeeHandlerTest_RemoveToken is FeeHandlerTest {
     assertFalse(feeHandler.getTokenActive(address(stableToken)));
     assertEq(feeHandler.getActiveTokens().length, 0);
     assertEq(feeHandler.getTokenHandler(address(stableToken)), address(0));
+  }
+
+  function test_ShouldEmitTokenRemoved() public {
+    feeHandler.addToken(address(stableToken), address(mentoSeller));
+    vm.expectEmit(true, true, true, true);
+    emit TokenRemoved(address(stableToken));
+    feeHandler.removeToken(address(stableToken));
   }
 }
 
@@ -285,6 +314,12 @@ contract FeeHandlerTest_SetFeeBeneficiary is FeeHandlerTest {
   function test_Reverts_WhenCallerNotOwner() public {
     vm.prank(user);
     vm.expectRevert("Ownable: caller is not the owner");
+    feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
+  }
+
+  function test_ShouldEmitFeeBeneficiarySet() public {
+    vm.expectEmit(true, true, true, true);
+    emit FeeBeneficiarySet(EXAMPLE_BENEFICIARY_ADDRESS);
     feeHandler.setFeeBeneficiary(EXAMPLE_BENEFICIARY_ADDRESS);
   }
 
