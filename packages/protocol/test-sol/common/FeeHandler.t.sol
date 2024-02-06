@@ -335,7 +335,7 @@ contract FeeHandlerTest_Distribute is FeeHandlerTest {
     feeHandler.distribute(address(stableToken));
   }
 
-  function test_DoesntDistributeWhenBalanceIsZero()
+  function test_DoesntDistributeWhenToDistributeIsZero()
     public
     setBurnFraction
     setMaxSlippage
@@ -345,6 +345,19 @@ contract FeeHandlerTest_Distribute is FeeHandlerTest {
   {
     // If we uncomment this the test should fail
     // feeHandler.sell(address(stableToken));
+    vm.recordLogs();
+    feeHandler.distribute(address(stableToken));
+    Vm.Log[] memory entries = vm.getRecordedLogs();
+    assertEq(entries.length, 0);
+  }
+
+  function test_DoesntDistributeWhenBalanceIsZero()
+    public
+    setBurnFraction
+    setMaxSlippage
+    setUpBeneficiary
+    activateToken
+  {
     vm.recordLogs();
     feeHandler.distribute(address(stableToken));
     Vm.Log[] memory entries = vm.getRecordedLogs();
