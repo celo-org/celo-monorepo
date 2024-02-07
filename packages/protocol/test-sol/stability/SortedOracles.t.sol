@@ -86,32 +86,31 @@ contract SortedOracles_SetEquivalentToken is SortedOraclesTest {
   address bToken = actor("bToken");
 
   function test_ShouldSetReportExpiry() public {
-    sortedOracle.setEquivalentToken(aToken, bToken, FIXED1);
-    (address equivalentToken, uint256 multiplier) = sortedOracle.getEquivalentToken(aToken);
+    sortedOracle.setEquivalentToken(aToken, bToken);
+    address equivalentToken = sortedOracle.getEquivalentToken(aToken);
     assertEq(equivalentToken, bToken);
-    assertEq(multiplier, FIXED1);
   }
 
   function test_ShouldRevert_WhenToken0() public {
     vm.expectRevert("token address cannot be 0");
-    sortedOracle.setEquivalentToken(address(0), bToken, FIXED1);
+    sortedOracle.setEquivalentToken(address(0), bToken);
   }
 
   function test_ShouldRevert_WhenEquivalentToken0() public {
     vm.expectRevert("equivalentToken address cannot be 0");
-    sortedOracle.setEquivalentToken(aToken, address(0), FIXED1);
+    sortedOracle.setEquivalentToken(aToken, address(0));
   }
 
   function test_ShouldEmitEquivalentTokenSet() public {
     vm.expectEmit(true, true, true, true);
     emit EquivalentTokenSet(aToken, bToken);
-    sortedOracle.setEquivalentToken(aToken, bToken, FIXED1);
+    sortedOracle.setEquivalentToken(aToken, bToken);
   }
 
   function test_ShouldRevertWhenNotOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(oracleAccount);
-    sortedOracle.setEquivalentToken(aToken, bToken, FIXED1);
+    sortedOracle.setEquivalentToken(aToken, bToken);
   }
 }
 
@@ -119,11 +118,10 @@ contract SortedOracles_DeleteEquivalentToken is SortedOraclesTest {
   address bToken = actor("bToken");
 
   function test_ShouldDeleteEquivalentToken() public {
-    sortedOracle.setEquivalentToken(aToken, bToken, FIXED1);
+    sortedOracle.setEquivalentToken(aToken, bToken);
     sortedOracle.deleteEquivalentToken(aToken);
-    (address equivalentToken, uint256 multiplier) = sortedOracle.getEquivalentToken(aToken);
+    address equivalentToken = sortedOracle.getEquivalentToken(aToken);
     assertEq(equivalentToken, address(0));
-    assertEq(multiplier, 0);
   }
 
   function test_ShouldRevert_WhenEquivalentToken0() public {
@@ -132,7 +130,7 @@ contract SortedOracles_DeleteEquivalentToken is SortedOraclesTest {
   }
 
   function test_ShouldEmitEquivalentTokenSet() public {
-    sortedOracle.setEquivalentToken(aToken, bToken, FIXED1);
+    sortedOracle.setEquivalentToken(aToken, bToken);
     vm.expectEmit(true, true, true, true);
     emit EquivalentTokenSet(aToken, address(0));
     sortedOracle.deleteEquivalentToken(aToken);
@@ -568,63 +566,16 @@ contract Report is SortedOraclesTest {
   function test_ShouldReturnTheMedianRate_WhenEquivalentTokenIsSet() public {
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, value, address(0), address(0));
-    sortedOracle.setEquivalentToken(bToken, aToken, FIXED1);
+    sortedOracle.setEquivalentToken(bToken, aToken);
     (uint256 medianRate, uint256 denominator) = sortedOracle.medianRate(bToken);
     assertEq(medianRate, value);
     assertEq(denominator, FIXED1);
   }
 
-  function setEquivalentTokenFuzzyHelper(
-    uint256 oneCeloDigits,
-    uint256 oneUSDDigits,
-    uint256 onecUSDDigits
-  ) public {
-    uint256 cUSDRate = 700000000000000000000000;
-
-    uint256 oneCELO = 10**oneCeloDigits;
-    uint256 oneUSD = 10**oneUSDDigits;
-    uint256 onecUSD = 10**onecUSDDigits;
-    uint256 diff = oneCELO / oneUSD;
-
-    uint256 celoFromcUSD = FixidityLib
-      .wrap(cUSDRate)
-      .multiply(FixidityLib.newFixed(onecUSD))
-      .fromFixed();
-
-    vm.prank(oracleAccount);
-    sortedOracle.report(aToken, cUSDRate, address(0), address(0));
-    uint256 usdMultiplier = FixidityLib.newFixedFraction(diff, 1).unwrap();
-    sortedOracle.setEquivalentToken(bToken, aToken, usdMultiplier);
-    (uint256 medianRate, uint256 denominator) = sortedOracle.medianRate(bToken);
-    assertEq(medianRate, cUSDRate * diff);
-    assertEq(denominator, FIXED1);
-    uint256 celoFromUSD = FixidityLib
-      .wrap(medianRate)
-      .multiply(FixidityLib.newFixed(oneUSD))
-      .fromFixed();
-    assertEq(celoFromUSD, celoFromcUSD);
-  }
-
-  function test_ShouldReturnTheMedianRateWithDifferentMultiplier_WhenEquivalentTokenIsSet() public {
-    setEquivalentTokenFuzzyHelper(18, 6, 18);
-  }
-
-  function test_ShouldReturnTheMedianRateWithDifferentMultiplier_WhenEquivalentTokenIsSet_WhenMultiplierIsOneBigger()
-    public
-  {
-    setEquivalentTokenFuzzyHelper(18, 17, 18);
-  }
-
-  function test_ShouldReturnTheMedianRateWithDifferentMultiplier_WhenEquivalentTokenIsSet_WhenMultiplierIsALotBigger()
-    public
-  {
-    setEquivalentTokenFuzzyHelper(18, 0, 18);
-  }
-
   function test_ShouldNotReturnTheMedianRate_WhenEquivalentTokenIsSet() public {
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, value, address(0), address(0));
-    sortedOracle.setEquivalentToken(bToken, aToken, FIXED1);
+    sortedOracle.setEquivalentToken(bToken, aToken);
     (uint256 medianRate, uint256 denominator) = sortedOracle.medianRateWithoutEquivalentMapping(
       bToken
     );
@@ -637,7 +588,7 @@ contract Report is SortedOraclesTest {
   {
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, value, address(0), address(0));
-    sortedOracle.setEquivalentToken(bToken, aToken, FIXED1);
+    sortedOracle.setEquivalentToken(bToken, aToken);
     uint256 medianRate;
     uint256 denominator;
     (medianRate, denominator) = sortedOracle.medianRate(bToken);

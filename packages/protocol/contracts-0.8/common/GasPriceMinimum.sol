@@ -39,7 +39,6 @@ contract GasPriceMinimum is
   FixidityLib.Fraction public adjustmentSpeed;
 
   uint256 public baseFeeOpCodeActivationBlock;
-  uint256 public constant ABSOLUTE_MINIMAL_GAS_PRICE = 1;
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -174,14 +173,15 @@ contract GasPriceMinimum is
    * When caled for 0x0 or Celo address, it returns gasPriceMinimum().
    * For other addresses it returns gasPriceMinimum() mutiplied by 
    * the SortedOracles median of the token. It does not check tokenAddress is a valid fee currency.
-   * this function will never returns values less than ABSOLUTE_MINIMAL_GAS_PRICE.
-   * If Oracle rate doesn't exist, it returns ABSOLUTE_MINIMAL_GAS_PRICE.
    * @dev This functions assumes one unit of token has 18 digits.
    * @param tokenAddress The currency the gas price should be in (defaults to Celo).
    * @return current gas price minimum in the requested currency
    */
   function getGasPriceMinimum(address tokenAddress) external view returns (uint256) {
-    return Math.max(_getGasPriceMinimum(tokenAddress), ABSOLUTE_MINIMAL_GAS_PRICE);
+    uint256 _gasPriceMinimum = _getGasPriceMinimum(tokenAddress);
+    require(_gasPriceMinimum > 0, "gas price minimum must be greater than zero");
+
+    return _gasPriceMinimum;
   }
 
   /**

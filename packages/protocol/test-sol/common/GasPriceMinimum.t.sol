@@ -105,9 +105,10 @@ contract GasPriceMinimumTest_getGasPriceMinimum is GasPriceMinimumTest {
     assertEq(gasPriceMinimum.getGasPriceMinimum(address(0)), initialGasPriceMinimum);
   }
 
-  function test_shouldReturnAbsoluteMinInsteadOfZero() public {
+  function test_shouldReturnRevert_When0() public {
     sortedOracles.setMedianRate(whateverAddress, 1);
-    assertEq(gasPriceMinimum.getGasPriceMinimum(whateverAddress), ABSOLUTE_MINIMAL_GAS_PRICE);
+    vm.expectRevert("gas price minimum must be greater than zero");
+    gasPriceMinimum.getGasPriceMinimum(whateverAddress);
   }
 
   function test_shouldReturnTheRightRateForToken() public {
