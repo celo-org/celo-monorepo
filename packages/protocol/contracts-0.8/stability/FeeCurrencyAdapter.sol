@@ -25,6 +25,8 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
 
   uint8 public expectedDecimals;
 
+  uint256[48] __gap;
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization

@@ -7,6 +7,8 @@ import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import "./FeeCurrencyAdapter.sol";
 
 contract FeeCurrencyAdapterOwnable is FeeCurrencyAdapter, Ownable {
+  uint256[48] __gap2;
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
