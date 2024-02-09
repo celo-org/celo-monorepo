@@ -180,6 +180,12 @@ contract FeeCurrencyAdapter_DebitGasFees is FeeCurrencyAdapterTest {
     feeCurrencyAdapter.debitGasFees(address(this), 1000);
   }
 
+  function test_ShouldRevert_WhenScaledDebitValueIs0() public {
+    vm.expectRevert("Scaled debit value must be > 0.");
+    vm.prank(address(0));
+    feeCurrencyAdapter.debitGasFees(address(this), 1e7);
+  }
+
   function test_ShouldDebitCorrectAmount_WhenExpectedDigitsOnlyOneBigger() public {
     debitFuzzyHelper(7, 1e1);
   }
