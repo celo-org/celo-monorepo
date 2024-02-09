@@ -625,11 +625,8 @@ contract Report is SortedOraclesTest {
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, value, address(0), address(0));
     sortedOracle.setEquivalentToken(bToken, aToken, FIXED1);
-    (uint256 medianRate, uint256 denominator) = sortedOracle.medianRateWithoutEquivalentMapping(
-      bToken
-    );
-    assertEq(medianRate, 0);
-    assertEq(denominator, 0);
+    vm.expectRevert("Token has no rate");
+    sortedOracle.medianRateWithoutEquivalentMapping(bToken);
   }
 
   function test_ShouldNotReturnTheMedianRateOfEquivalentToken_WhenEquivalentTokenIsSetAndDeleted()
@@ -644,9 +641,8 @@ contract Report is SortedOraclesTest {
     assertEq(medianRate, value);
     assertEq(denominator, FIXED1);
     sortedOracle.deleteEquivalentToken(bToken);
+    vm.expectRevert("Token has no rate");
     (medianRate, denominator) = sortedOracle.medianRate(bToken);
-    assertEq(medianRate, 0);
-    assertEq(denominator, 0);
   }
 
   function test_ShouldIncreaseTheNumberOfTimestamps() public {

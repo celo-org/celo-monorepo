@@ -162,11 +162,8 @@ contract GasPriceMinimum is
       ISortedOracles sortedOracles = ISortedOracles(
         registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
       );
-      uint256 rateNumerator;
-      uint256 rateDenominator;
-      (rateNumerator, rateDenominator) = sortedOracles.medianRate(tokenAddress);
-      require(rateDenominator > 0, "Token has no rate");
-      return ((gasPriceMinimum() * rateNumerator) / rateDenominator);
+      (uint256 medianRate, uint256 denominator) = sortedOracles.medianRate(tokenAddress);
+      return ((gasPriceMinimum() * medianRate) / denominator);
     }
   }
 

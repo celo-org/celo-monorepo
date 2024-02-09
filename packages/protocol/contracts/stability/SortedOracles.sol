@@ -330,14 +330,16 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @dev Does not take account of equivalentTokens mapping.
    * @param token The rateFeedId of the rates for which the median value is being retrieved.
    * @return uint256 The median exchange rate for rateFeedId (fixidity).
-   * @return uint256 num of rates
+   * @return uint256 denominator
    */
   function medianRateWithoutEquivalentMapping(address token)
     public
     view
     returns (uint256, uint256)
   {
-    return (rates[token].getMedianValue(), numRates(token) == 0 ? 0 : FIXED1_UINT);
+    uint256 _numOfRates = numRates(token);
+    require(_numOfRates > 0, "Token has no rate");
+    return (rates[token].getMedianValue(), _numOfRates == 0 ? 0 : FIXED1_UINT);
   }
 
   /**
@@ -351,7 +353,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   function medianRate(address token) external view returns (uint256, uint256) {
     EquivalentToken storage equivalentToken = equivalentTokens[token];
     if (equivalentToken.token != address(0)) {
-      (uint256 equivalentMedianRate, uint256 numRates) = medianRateWithoutEquivalentMapping(
+      (uint256 equivalentMedianRate, uint256 denominator) = medianRateWithoutEquivalentMapping(
         equivalentToken.token
       );
       return (
@@ -359,7 +361,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
           .wrap(equivalentMedianRate)
           .multiply(FixidityLib.wrap(equivalentToken.multiplier))
           .unwrap(),
-        numRates
+        denominator
       );
     }
 
