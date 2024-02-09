@@ -165,6 +165,7 @@ contract GasPriceMinimum is
       uint256 rateNumerator;
       uint256 rateDenominator;
       (rateNumerator, rateDenominator) = sortedOracles.medianRate(tokenAddress);
+      require(rateDenominator > 0, "Token has no rate");
       return ((gasPriceMinimum() * rateNumerator) / rateDenominator);
     }
   }
@@ -175,7 +176,7 @@ contract GasPriceMinimum is
    * For other addresses it returns gasPriceMinimum() mutiplied by 
    * the SortedOracles median of the token. It does not check tokenAddress is a valid fee currency.
    * this function will never returns values less than ABSOLUTE_MINIMAL_GAS_PRICE.
-   * If Oracle rate doesn't exist, it returns ABSOLUTE_MINIMAL_GAS_PRICE.
+   * If Oracle rate doesn't exist, it reverts.
    * @dev This functions assumes one unit of token has 18 digits.
    * @param tokenAddress The currency the gas price should be in (defaults to Celo).
    * @return current gas price minimum in the requested currency
