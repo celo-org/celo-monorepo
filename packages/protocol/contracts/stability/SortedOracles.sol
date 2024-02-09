@@ -231,7 +231,6 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @notice Sets the equivalent token for a token.
    * @param token The address of the token.
    * @param equivalentToken The address of the equivalent token.
-   * @dev For tokens with 6 decimals multiplier is 1e18 / 1e6 = 1e12
    */
   function setEquivalentToken(address token, address equivalentToken) external onlyOwner {
     require(token != address(0), "token address cannot be 0");
