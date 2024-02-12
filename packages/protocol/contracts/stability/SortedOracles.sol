@@ -253,7 +253,6 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @notice Gets the equivalent token for a token.
    * @param token The address of the token.
    * @return The address of the equivalent token.
-   * @return The multiplier to convert the equivalent token median value to the token value (fixidity).
    */
   function getEquivalentToken(address token) external view returns (address) {
     return (equivalentTokens[token].token);
