@@ -4,6 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
 
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
@@ -73,6 +74,7 @@ contract ValidatorsMockTunnel is ForgeTest {
 
 contract ValidatorsTest is Test, Constants {
   using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
 
   Registry registry;
   Accounts accounts;
@@ -95,6 +97,8 @@ contract ValidatorsTest is Test, Constants {
     bytes16(0x05050505050505050505050505050505),
     bytes16(0x06060606060606060606060606060606)
   );
+
+  FixidityLib.Fraction public commission = FixidityLib.newFixedFraction(1, 100);
 
   event AccountSlashed(
     address indexed slashed,
@@ -449,10 +453,7 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_RegisterValidator_WhenAccountIsNotRegisteredValidator is
-  ValidatorsTest,
-  ECDSAHelper
-{
+contract ValidatorsTest_RegisterValidator is ValidatorsTest, ECDSAHelper {
   address validator;
   uint256 validatorPk;
   address signer;
@@ -483,6 +484,13 @@ contract ValidatorsTest_RegisterValidator_WhenAccountIsNotRegisteredValidator is
     ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
   }
 
+  function _registerValidatorGroupHelper() internal {
+    lockedGold.setAccountTotalLockedGold(validator, originalGroupLockedGoldRequirements.value);
+
+    vm.prank(validator);
+    validators.registerValidatorGroup(commission.unwrap());
+
+  }
   function _registerValidatorHelper() internal {
     _generateEcdsaPubKey();
     ph.setDebug(true);
@@ -617,172 +625,25 @@ contract ValidatorsTest_RegisterValidator_WhenAccountIsNotRegisteredValidator is
     vm.prank(validator);
     validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
   }
-}
-contract ValidatorsTest_RegisterValidator_WhenAccountIsRegisteredValidator is
-  ValidatorsTest,
-  ECDSAHelper
-{
-  address validator;
-  uint256 validatorPk;
-  address signer;
-  uint256 signerPk;
-  bytes ecdsaPubKey;
-  uint256 validatorRegistrationEpochNumber;
 
-  function setUp() public {
-    super.setUp();
-
-    (validator, validatorPk) = actorWithPK("validator");
-    (signer, signerPk) = actorWithPK("signer");
-
-    vm.prank(validator);
-    accounts.createAccount();
-
-    lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
-  }
-
-  function _generateEcdsaPubKey() internal {
-    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
-
-    vm.prank(validator);
-    accounts.authorizeValidatorSigner(signer, v, r, s);
-
-    bytes32 addressHash = keccak256(abi.encodePacked(validator));
-
-    ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
-  }
-
-  function _registerValidatorHelper() internal {
-    _generateEcdsaPubKey();
-    ph.setDebug(true);
-
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
-
-    vm.prank(validator);
-    validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
-    validatorRegistrationEpochNumber = validators.getEpochNumber();
-  }
-
-  function test_Reverts_WhenVoteOverMaxNumberOfGroupsSetToTrue() public {
-    vm.prank(validator);
-    election.setAllowedToVoteOverMaxNumberOfGroups(validator, true);
-
-    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
-
-    vm.prank(validator);
-    accounts.authorizeValidatorSigner(signer, v, r, s);
-    bytes memory pubKey = addressToPublicKey("random msg", v, r, s);
-
-    vm.expectRevert("Cannot vote for more than max number of groups");
-    vm.prank(validator);
-    validators.registerValidator(pubKey, blsPublicKey, blsPop);
-  }
-
-  function test_Reverts_WhenDelagatingCELO() public {
-    lockedGold.setAccountTotalDelegatedAmountInPercents(validator, 10);
-    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
-    vm.prank(validator);
-    accounts.authorizeValidatorSigner(signer, v, r, s);
-    bytes memory pubKey = addressToPublicKey("random msg", v, r, s);
-
-    vm.expectRevert("Cannot delegate governance power");
-    vm.prank(validator);
-    validators.registerValidator(pubKey, blsPublicKey, blsPop);
-  }
-
-  function test_ShouldMarkAccountAsValidator_WhenAccountHasAuthorizedValidatorSigner() public {
+  function test_Reverts_WhenAccountAlreadyRegisteredAsValidator() public {
     _registerValidatorHelper();
-
-    assertTrue(validators.isValidator(validator));
-  }
-
-  function test_ShouldAddAccountToValidatorList_WhenAccountHasAuthorizedValidatorSigner() public {
-    address[] memory ExpectedRegisteredValidators = new address[](1);
-    ExpectedRegisteredValidators[0] = validator;
-    _registerValidatorHelper();
-    assertEq(validators.getRegisteredValidators().length, ExpectedRegisteredValidators.length);
-    assertEq(validators.getRegisteredValidators()[0], ExpectedRegisteredValidators[0]);
-  }
-
-  function test_ShouldSetValidatorEcdsaPublicKey_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorHelper();
-    (bytes memory actualEcdsaPubKey, , , , ) = validators.getValidator(validator);
-
-    assertEq(actualEcdsaPubKey, ecdsaPubKey);
-  }
-
-  function test_ShouldSetValidatorBlsPublicKey_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorHelper();
-    (, bytes memory actualBlsPubKey, , , ) = validators.getValidator(validator);
-
-    assertEq(actualBlsPubKey, blsPublicKey);
-  }
-
-  function test_ShouldSetValidatorSigner_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorHelper();
-    (, , , , address ActualSigner) = validators.getValidator(validator);
-
-    assertEq(ActualSigner, signer);
-  }
-
-  function test_ShouldSetLockGoldRequirements_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorHelper();
-    uint256 _lockedGoldReq = validators.getAccountLockedGoldRequirement(validator);
-
-    assertEq(_lockedGoldReq, originalValidatorLockedGoldRequirements.value);
-  }
-
-  function test_ShouldSetValidatorMembershipHistory_WhenAccountHasAuthorizedValidatorSigner()
-    public
-  {
-    _registerValidatorHelper();
-    (uint256[] memory _epoch, address[] memory _membershipGroups, , ) = validators
-      .getMembershipHistory(validator);
-
-    uint256[] memory validatorRegistrationEpochNumberList = new uint256[](1);
-    validatorRegistrationEpochNumberList[0] = validatorRegistrationEpochNumber;
-    address[] memory ExpectedMembershipGroups = new address[](1);
-    ExpectedMembershipGroups[0] = address(0);
-
-    assertEq(_epoch, validatorRegistrationEpochNumberList);
-    assertEq(_membershipGroups, ExpectedMembershipGroups);
-  }
-
-  function test_Emits_ValidatorEcdsaPublicKeyUpdatedEvent() public {
-    _generateEcdsaPubKey();
-
-    ph.setDebug(true);
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
-
-    vm.expectEmit(true, true, true, true);
-    emit ValidatorEcdsaPublicKeyUpdated(validator, ecdsaPubKey);
-
+    vm.expectRevert("Already registered");
     vm.prank(validator);
     validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
   }
-
-  function test_Emits_ValidatorBlsPublicKeyUpdatedEvent() public {
-    _generateEcdsaPubKey();
-
-    ph.setDebug(true);
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
-
-    vm.expectEmit(true, true, true, true);
-    emit ValidatorBlsPublicKeyUpdated(validator, blsPublicKey);
-
+  function test_Reverts_WhenAccountAlreadyRegisteredAsValidatorGroup() public {
+    _registerValidatorGroupHelper();
+    vm.expectRevert("Already registered");
     vm.prank(validator);
     validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
   }
-
-  function test_Emits_ValidatorRegisteredEvent() public {
-    _generateEcdsaPubKey();
-
-    ph.setDebug(true);
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
-
-    vm.expectEmit(true, true, true, true);
-    emit ValidatorRegistered(validator);
-
+  function test_Reverts_WhenAccountDoesNotMeetLockedGoldRequirements() public {
+    lockedGold.setAccountTotalLockedGold(
+      validator,
+      originalValidatorLockedGoldRequirements.value.sub(11)
+    );
+    vm.expectRevert("Deposit too small");
     vm.prank(validator);
     validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
   }
