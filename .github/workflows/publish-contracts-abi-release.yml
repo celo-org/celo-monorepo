@@ -7,18 +7,18 @@ on:
   pull_request:
     branches: [release/core-contracts/*, master]
     paths:
-      - 'packages/protocol/**'
+      - "packages/protocol/**"
   release:
     types: [released]
   workflow_dispatch:
     inputs:
       npm_tag:
-        description: 'NPM TAG e.g. alpha, pre-merge (default: canary) '
+        description: "NPM TAG e.g. alpha, pre-merge (default: canary) "
         required: true
         type: string
 jobs:
   publish:
-    runs-on: ['self-hosted', 'org', 'npm-publish']
+    runs-on: ["self-hosted", "org", "npm-publish"]
     permissions:
       contents: write
       id-token: write
@@ -39,17 +39,17 @@ jobs:
       # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "18.x"
+          registry-url: "https://registry.npmjs.org"
           #scope: '@celo'
 
-      - name: 'Setup yarn'
+      - name: "Setup yarn"
         shell: bash
         run: |
           npm install --global yarn
           source ~/.bashrc
 
-      - name: 'Install packages'
+      - name: "Install packages"
         shell: bash
         run: yarn
 
@@ -60,9 +60,9 @@ jobs:
         env:
           GITHUB_TAG: ${{ github.ref_name }}
           NPM_TAG: ${{ inputs.npm_tag }}
-      - name: 'Build packages'
+      - name: "Build packages"
         shell: bash
-        run:  yarn build --ignore @celo/celotool --ignore @celo/env-tests --include-dependencies
+        run: yarn build --ignore @celo/celotool --ignore @celo/env-tests --include-dependencies
       - name: Compile solidity contracts and typescript files
         run: yarn prepare_contracts_and_abis_publishing
         working-directory: packages/protocol
@@ -70,7 +70,7 @@ jobs:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
         # a safety check especially useful if some package is upgraded
-      - name: 'Validate ABIS Exports'
+      - name: "Validate ABIS Exports"
         shell: bash
         run: yarn validate_abis_exports
         working-directory: packages/protocol

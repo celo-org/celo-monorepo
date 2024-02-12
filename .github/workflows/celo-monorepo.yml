@@ -1,5 +1,5 @@
 name: Build & Integration Tests
-run-name: 'Build & Integration Tests: ${{ github.head_ref || github.ref_name }}'
+run-name: "Build & Integration Tests: ${{ github.head_ref || github.ref_name }}"
 
 # Dockefile for the self-hosted runner:
 # https://github.com/celo-org/infrastructure/blob/master/terraform/root-modules/gcp/integration-tests-gke/files/github-arc/Dockerfile-monorepo
@@ -11,7 +11,7 @@ on:
   pull_request:
     branches:
       - master
-      - 'release/**'
+      - "release/**"
 
 concurrency:
   group: celo-monorepo-${{ github.ref }}
@@ -24,7 +24,7 @@ defaults:
 env:
   # Increment these to force cache rebuilding
   NODE_MODULE_CACHE_VERSION: 5
-  NODE_OPTIONS: '--max-old-space-size=4096'
+  NODE_OPTIONS: "--max-old-space-size=4096"
   TERM: dumb
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
   # Git Tag for contract release to use
@@ -47,10 +47,10 @@ jobs:
     outputs:
       # Propagate more outputs if you need https://github.com/tj-actions/changed-files#outputs
       # Adding a initial comma so ',<path>' matches also for the first file
-      all_modified_files: ',${{ steps.changed-files.outputs.all_modified_files }}'
+      all_modified_files: ",${{ steps.changed-files.outputs.all_modified_files }}"
       artifacts_to_cache: ${{ steps.get_artifacts_to_cache.outputs.artifacts_to_cache }}
     # runs-on: ubuntu-latest
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ["self-hosted", "monorepo-node18"]
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -99,8 +99,8 @@ jobs:
         id: verify-changed-files
         uses: tj-actions/verify-changed-files@v17
         with:
-          fail-if-changed: 'true'
-          fail-message: 'Files changed during build. Please build locally and commit the changes.'
+          fail-if-changed: "true"
+          fail-message: "Files changed during build. Please build locally and commit the changes."
           files: |
             **/*
             ${{ steps.get_submodules_to_ignore.outputs.submodules }}
@@ -131,14 +131,14 @@ jobs:
         uses: tj-actions/changed-files@v41
         with:
           # Using comma as separator to be able to easily match full paths (using ,<path>)
-          separator: ','
+          separator: ","
           # Checking if changed in the last 100 commits in PRs
-          fetch_depth: '150'
+          fetch_depth: "150"
       - run: echo ",${{ steps.changed-files.outputs.all_modified_files }}"
 
   lint-checks:
     name: Lint code
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ["self-hosted", "monorepo-node18"]
     timeout-minutes: 30
     needs: install-dependencies
     steps:
@@ -153,7 +153,7 @@ jobs:
       - run: yarn run lint
   general_test:
     name: General jest test
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ["self-hosted", "monorepo-node18"]
     needs: install-dependencies
     steps:
       - uses: actions/checkout@v4
@@ -178,10 +178,9 @@ jobs:
           name: Jest Test Results
           path: test-results/jest
 
-
   protocol-test-release:
     name: Protocol Test Release
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ["self-hosted", "monorepo-node18"]
     timeout-minutes: 500
     needs: [install-dependencies, lint-checks]
     if: |
@@ -218,7 +217,7 @@ jobs:
   protocol-test-matrix:
     # Keeping name short because GitHub UI does not handle long names well
     name: ${{ matrix.name }}
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ["self-hosted", "monorepo-node18"]
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks]
     if: |
@@ -263,7 +262,7 @@ jobs:
       - name: Sync workspace
         uses: ./.github/actions/sync-workspace
         with:
-          rebuild-package: 'true'
+          rebuild-package: "true"
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
       - name: Execute matrix command for test
         uses: nick-fields/retry@v2
@@ -276,7 +275,7 @@ jobs:
   end-to-end-geth-matrix:
     # Keeping name short because GitHub UI does not handle long names well
     name: e2e ${{ matrix.name }}
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ["self-hosted", "monorepo-node18"]
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks]
     if: |
@@ -362,7 +361,7 @@ jobs:
   # NOTE: This has not been fully tested as we don't have a license for certora
   certora-test:
     name: Certora test ${{ matrix.name }}
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ["self-hosted", "monorepo-node18"]
     timeout-minutes: 30
     needs: [install-dependencies, lint-checks]
     # Disable as certora license is not active
@@ -410,8 +409,8 @@ jobs:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
       - uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: '11'
+          distribution: "zulu"
+          java-version: "11"
       - name: Certora dependencies
         run: |
           echo "export PATH=$PATH:~/.local/bin" >> ~/.bashrc

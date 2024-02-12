@@ -4,12 +4,12 @@ name: Build containers
 on:
   push:
     paths:
-      - 'dockerfiles/**'
+      - "dockerfiles/**"
     branches:
       - master
   pull_request:
     paths:
-      - 'dockerfiles/**'
+      - "dockerfiles/**"
   workflow_dispatch:
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
     outputs:
       # Propagate more outputs if you need https://github.com/tj-actions/changed-files#outputs
       # Adding a initial comma so ',<path>' matches also for the first file
-      all_modified_files: ',${{ steps.changed-files.outputs.all_modified_files }}'
+      all_modified_files: ",${{ steps.changed-files.outputs.all_modified_files }}"
     steps:
       - uses: actions/checkout@v4
       - name: Detect files changed in PR (or commit), and expose as output
@@ -26,7 +26,7 @@ jobs:
         uses: tj-actions/changed-files@v41
         with:
           # Using comma as separator to be able to easily match full paths (using ,<path>)
-          separator: ','
+          separator: ","
 
   # Celotool images
   celotool-build-dev:
@@ -38,7 +38,7 @@ jobs:
       contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/celotool/Dockerfile')
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
-      service-account: 'celo-monorepo-dev@devopsre.iam.gserviceaccount.com'
+      service-account: "celo-monorepo-dev@devopsre.iam.gserviceaccount.com"
       artifact-registry: us-west1-docker.pkg.dev/devopsre/dev-images/celotool
       tags: ${{ github.sha }}
       platforms: linux/amd64
@@ -54,7 +54,7 @@ jobs:
       contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/celotool/Dockerfile')
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo-master/providers/github-by-repos
-      service-account: 'celo-monorepo@devopsre.iam.gserviceaccount.com'
+      service-account: "celo-monorepo@devopsre.iam.gserviceaccount.com"
       artifact-registry: us-west1-docker.pkg.dev/devopsre/celo-monorepo/celotool
       tags: ${{ github.sha }}
       platforms: linux/amd64
@@ -72,7 +72,7 @@ jobs:
       contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/all-monorepo/Dockerfile')
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
-      service-account: 'celo-monorepo-dev@devopsre.iam.gserviceaccount.com'
+      service-account: "celo-monorepo-dev@devopsre.iam.gserviceaccount.com"
       artifact-registry: us-west1-docker.pkg.dev/devopsre/dev-images/monorepo
       tags: ${{ github.sha }}
       context: .
@@ -87,7 +87,7 @@ jobs:
       contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/all-monorepo/Dockerfile')
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo-master/providers/github-by-repos
-      service-account: 'celo-monorepo@devopsre.iam.gserviceaccount.com'
+      service-account: "celo-monorepo@devopsre.iam.gserviceaccount.com"
       artifact-registry: us-west1-docker.pkg.dev/devopsre/celo-monorepo/monorepo
       tags: ${{ github.sha }}
       context: .
@@ -104,7 +104,7 @@ jobs:
       contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/metadata-crawler')
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
-      service-account: 'celo-monorepo-dev@devopsre.iam.gserviceaccount.com'
+      service-account: "celo-monorepo-dev@devopsre.iam.gserviceaccount.com"
       artifact-registry: us-west1-docker.pkg.dev/devopsre/dev-images/blockscout-metadata-crawler
       tags: testing
       context: .
@@ -119,7 +119,7 @@ jobs:
       contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/metadata-crawler')
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo-master/providers/github-by-repos
-      service-account: 'celo-monorepo@devopsre.iam.gserviceaccount.com'
+      service-account: "celo-monorepo@devopsre.iam.gserviceaccount.com"
       artifact-registry: us-west1-docker.pkg.dev/devopsre/celo-monorepo/blockscout-metadata-crawler
       tags: latest
       context: .

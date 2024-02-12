@@ -1,5 +1,5 @@
-name: 'CoreContracts: Devchain For Contract Release'
-run-name: 'CoreContracts: Devchain For Contract Release'
+name: "CoreContracts: Devchain For Contract Release"
+run-name: "CoreContracts: Devchain For Contract Release"
 
 on:
   schedule:
@@ -10,7 +10,7 @@ on:
 jobs:
   generate-protocol-devchain:
     name: Generate protocol devchain used in celo-monorepo.yml workflow
-    runs-on: ['self-hosted', 'monorepo-node18']
+    runs-on: ["self-hosted", "monorepo-node18"]
     timeout-minutes: 60
     strategy:
       fail-fast: false
