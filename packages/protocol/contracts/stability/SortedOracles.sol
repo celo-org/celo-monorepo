@@ -42,7 +42,6 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   struct EquivalentToken {
     address token;
-    uint256 multiplier;
   }
 
   uint256 private constant FIXED1_UINT = 1e24;
@@ -232,17 +231,11 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @notice Sets the equivalent token for a token.
    * @param token The address of the token.
    * @param equivalentToken The address of the equivalent token.
-   * @param multiplier The multiplier to convert the equivalent token median value to the token value (fixidity).
-   * @dev For tokens with 6 decimals multiplier is 1e18 / 1e6 = 1e12
    */
-  function setEquivalentToken(address token, address equivalentToken, uint256 multiplier)
-    external
-    onlyOwner
-  {
+  function setEquivalentToken(address token, address equivalentToken) external onlyOwner {
     require(token != address(0), "token address cannot be 0");
     require(equivalentToken != address(0), "equivalentToken address cannot be 0");
-    require(multiplier > 0, "multiplier must be > 0");
-    equivalentTokens[token] = EquivalentToken(equivalentToken, multiplier);
+    equivalentTokens[token] = EquivalentToken(equivalentToken);
     emit EquivalentTokenSet(token, equivalentToken);
   }
 
@@ -260,10 +253,9 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @notice Gets the equivalent token for a token.
    * @param token The address of the token.
    * @return The address of the equivalent token.
-   * @return The multiplier to convert the equivalent token median value to the token value (fixidity).
    */
-  function getEquivalentToken(address token) external view returns (address, uint256) {
-    return (equivalentTokens[token].token, equivalentTokens[token].multiplier);
+  function getEquivalentToken(address token) external view returns (address) {
+    return (equivalentTokens[token].token);
   }
 
   /**
@@ -348,7 +340,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * return the median identified as an equivalent to the supplied rateFeedId.
    * @param token The rateFeedId of the rates for which the median value is being retrieved.
    * @return uint256 The median exchange rate for rateFeedId (fixidity).
-   * @return uint256 num of rates
+   * @return uint256 denominator
    */
   function medianRate(address token) external view returns (uint256, uint256) {
     EquivalentToken storage equivalentToken = equivalentTokens[token];
@@ -356,13 +348,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
       (uint256 equivalentMedianRate, uint256 denominator) = medianRateWithoutEquivalentMapping(
         equivalentToken.token
       );
-      return (
-        FixidityLib
-          .wrap(equivalentMedianRate)
-          .multiply(FixidityLib.wrap(equivalentToken.multiplier))
-          .unwrap(),
-        denominator
-      );
+      return (equivalentMedianRate, denominator);
     }
 
     return medianRateWithoutEquivalentMapping(token);
