@@ -576,11 +576,8 @@ contract Report is SortedOraclesTest {
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, value, address(0), address(0));
     sortedOracle.setEquivalentToken(bToken, aToken);
-    (uint256 medianRate, uint256 denominator) = sortedOracle.medianRateWithoutEquivalentMapping(
-      bToken
-    );
-    assertEq(medianRate, 0);
-    assertEq(denominator, 0);
+    vm.expectRevert("Token has no rate");
+    sortedOracle.medianRateWithoutEquivalentMapping(bToken);
   }
 
   function test_ShouldNotReturnTheMedianRateOfEquivalentToken_WhenEquivalentTokenIsSetAndDeleted()
