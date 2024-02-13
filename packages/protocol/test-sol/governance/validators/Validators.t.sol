@@ -19,6 +19,7 @@ import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/ValidatorsMock.sol";
 import "@test-sol/constants.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
+import { Utils } from "@test-sol/utils.sol";
 import { Test as ForgeTest } from "forge-std/Test.sol";
 
 contract ValidatorsMockTunnel is ForgeTest {
@@ -72,7 +73,7 @@ contract ValidatorsMockTunnel is ForgeTest {
   }
 }
 
-contract ValidatorsTest is Test, Constants {
+contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -86,6 +87,14 @@ contract ValidatorsTest is Test, Constants {
 
   address nonOwner;
   address owner;
+  address nonValidator;
+  address validator;
+  uint256 validatorPk;
+  address signer;
+  uint256 signerPk;
+  address group;
+  bytes ecdsaPubKey;
+  uint256 validatorRegistrationEpochNumber;
 
   bytes public constant blsPublicKey = abi.encodePacked(
     bytes32(0x0101010101010101010101010101010101010101010101010101010101010101),
@@ -135,10 +144,15 @@ contract ValidatorsTest is Test, Constants {
   event ValidatorRegistered(address indexed validator);
   event ValidatorEcdsaPublicKeyUpdated(address indexed validator, bytes ecdsaPublicKey);
   event ValidatorBlsPublicKeyUpdated(address indexed validator, bytes blsPublicKey);
+  event ValidatorDeregistered(address indexed validator);
 
   function setUp() public {
     owner = address(this);
     nonOwner = actor("nonOwner");
+    group = actor("group");
+    nonValidator = actor("nonValidator");
+    (validator, validatorPk) = actorWithPK("validator");
+    (signer, signerPk) = actorWithPK("signer");
 
     originalValidatorLockedGoldRequirements = ValidatorLockedGoldRequirements({
       value: 1000,
@@ -195,6 +209,13 @@ contract ValidatorsTest is Test, Constants {
     });
 
     validatorsMockTunnel.MockInitialize(owner, initParams, initParams2);
+
+    vm.prank(validator);
+    accounts.createAccount();
+    vm.prank(group);
+    accounts.createAccount();
+    vm.prank(nonValidator);
+    accounts.createAccount();
   }
 
   function getParsedSignatureOfAddress(address _address, uint256 privateKey)
@@ -207,14 +228,59 @@ contract ValidatorsTest is Test, Constants {
     return vm.sign(privateKey, prefixedHash);
   }
 
-  // function registerValidator(address validator) public {
-  //   lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
-  //   bytes memory ecdsaPublicKey = validators.registerValidator(
-  //     ecdsaPublicKey,
-  //     blsPublicKey,
-  //     blsPop
-  //   );
-  // }
+  function _generateEcdsaPubKeyWithSigner() internal {
+    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
+
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+
+    bytes32 addressHash = keccak256(abi.encodePacked(validator));
+
+    ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
+  }
+
+  function _registerValidatorWithSignerHelper() internal {
+    lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
+
+    _generateEcdsaPubKeyWithSigner();
+    ph.setDebug(true);
+
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+
+    vm.prank(validator);
+    validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
+    validatorRegistrationEpochNumber = validators.getEpochNumber();
+  }
+
+  function _generateEcdsaPubKey() internal {
+    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, validatorPk);
+    bytes32 addressHash = keccak256(abi.encodePacked(validator));
+
+    ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
+  }
+
+  function _registerValidatorHelper() internal {
+    lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
+    _generateEcdsaPubKey();
+    ph.setDebug(true);
+
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+
+    vm.prank(validator);
+    validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
+    validatorRegistrationEpochNumber = validators.getEpochNumber();
+  }
+
+  function _registerValidatorGroupHelper(address _group, uint256 numMembers) internal {
+    lockedGold.setAccountTotalLockedGold(
+      _group,
+      originalGroupLockedGoldRequirements.value.mul(numMembers)
+    );
+
+    vm.prank(_group);
+    validators.registerValidatorGroup(commission.unwrap());
+
+  }
 
 }
 
@@ -453,53 +519,11 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
   }
 }
 
-contract ValidatorsTest_RegisterValidator is ValidatorsTest, ECDSAHelper {
-  address validator;
-  uint256 validatorPk;
-  address signer;
-  uint256 signerPk;
-  bytes ecdsaPubKey;
-  uint256 validatorRegistrationEpochNumber;
-
+contract ValidatorsTest_RegisterValidator is ValidatorsTest {
   function setUp() public {
     super.setUp();
 
-    (validator, validatorPk) = actorWithPK("validator");
-    (signer, signerPk) = actorWithPK("signer");
-
-    vm.prank(validator);
-    accounts.createAccount();
-
     lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
-  }
-
-  function _generateEcdsaPubKey() internal {
-    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(validator, signerPk);
-
-    vm.prank(validator);
-    accounts.authorizeValidatorSigner(signer, v, r, s);
-
-    bytes32 addressHash = keccak256(abi.encodePacked(validator));
-
-    ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
-  }
-
-  function _registerValidatorGroupHelper() internal {
-    lockedGold.setAccountTotalLockedGold(validator, originalGroupLockedGoldRequirements.value);
-
-    vm.prank(validator);
-    validators.registerValidatorGroup(commission.unwrap());
-
-  }
-  function _registerValidatorHelper() internal {
-    _generateEcdsaPubKey();
-    ph.setDebug(true);
-
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
-
-    vm.prank(validator);
-    validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
-    validatorRegistrationEpochNumber = validators.getEpochNumber();
   }
 
   function test_Reverts_WhenVoteOverMaxNumberOfGroupsSetToTrue() public {
@@ -530,7 +554,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest, ECDSAHelper {
   }
 
   function test_ShouldMarkAccountAsValidator_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorHelper();
+    _registerValidatorWithSignerHelper();
 
     assertTrue(validators.isValidator(validator));
   }
@@ -538,34 +562,34 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest, ECDSAHelper {
   function test_ShouldAddAccountToValidatorList_WhenAccountHasAuthorizedValidatorSigner() public {
     address[] memory ExpectedRegisteredValidators = new address[](1);
     ExpectedRegisteredValidators[0] = validator;
-    _registerValidatorHelper();
+    _registerValidatorWithSignerHelper();
     assertEq(validators.getRegisteredValidators().length, ExpectedRegisteredValidators.length);
     assertEq(validators.getRegisteredValidators()[0], ExpectedRegisteredValidators[0]);
   }
 
   function test_ShouldSetValidatorEcdsaPublicKey_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorHelper();
+    _registerValidatorWithSignerHelper();
     (bytes memory actualEcdsaPubKey, , , , ) = validators.getValidator(validator);
 
     assertEq(actualEcdsaPubKey, ecdsaPubKey);
   }
 
   function test_ShouldSetValidatorBlsPublicKey_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorHelper();
+    _registerValidatorWithSignerHelper();
     (, bytes memory actualBlsPubKey, , , ) = validators.getValidator(validator);
 
     assertEq(actualBlsPubKey, blsPublicKey);
   }
 
   function test_ShouldSetValidatorSigner_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorHelper();
+    _registerValidatorWithSignerHelper();
     (, , , , address ActualSigner) = validators.getValidator(validator);
 
     assertEq(ActualSigner, signer);
   }
 
   function test_ShouldSetLockGoldRequirements_WhenAccountHasAuthorizedValidatorSigner() public {
-    _registerValidatorHelper();
+    _registerValidatorWithSignerHelper();
     uint256 _lockedGoldReq = validators.getAccountLockedGoldRequirement(validator);
 
     assertEq(_lockedGoldReq, originalValidatorLockedGoldRequirements.value);
@@ -574,7 +598,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest, ECDSAHelper {
   function test_ShouldSetValidatorMembershipHistory_WhenAccountHasAuthorizedValidatorSigner()
     public
   {
-    _registerValidatorHelper();
+    _registerValidatorWithSignerHelper();
     (uint256[] memory _epoch, address[] memory _membershipGroups, , ) = validators
       .getMembershipHistory(validator);
 
@@ -588,7 +612,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest, ECDSAHelper {
   }
 
   function test_Emits_ValidatorEcdsaPublicKeyUpdatedEvent() public {
-    _generateEcdsaPubKey();
+    _generateEcdsaPubKeyWithSigner();
 
     ph.setDebug(true);
     ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
@@ -601,7 +625,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest, ECDSAHelper {
   }
 
   function test_Emits_ValidatorBlsPublicKeyUpdatedEvent() public {
-    _generateEcdsaPubKey();
+    _generateEcdsaPubKeyWithSigner();
 
     ph.setDebug(true);
     ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
@@ -614,7 +638,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest, ECDSAHelper {
   }
 
   function test_Emits_ValidatorRegisteredEvent() public {
-    _generateEcdsaPubKey();
+    _generateEcdsaPubKeyWithSigner();
 
     ph.setDebug(true);
     ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
@@ -627,13 +651,13 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest, ECDSAHelper {
   }
 
   function test_Reverts_WhenAccountAlreadyRegisteredAsValidator() public {
-    _registerValidatorHelper();
+    _registerValidatorWithSignerHelper();
     vm.expectRevert("Already registered");
     vm.prank(validator);
     validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
   }
   function test_Reverts_WhenAccountAlreadyRegisteredAsValidatorGroup() public {
-    _registerValidatorGroupHelper();
+    _registerValidatorGroupHelper(validator, 1);
     vm.expectRevert("Already registered");
     vm.prank(validator);
     validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
@@ -646,5 +670,170 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest, ECDSAHelper {
     vm.expectRevert("Deposit too small");
     vm.prank(validator);
     validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
+  }
+}
+
+contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValidatorGroup is
+  ValidatorsTest
+{
+  uint256 public constant INDEX = 0;
+  function setUp() public {
+    super.setUp();
+
+    _registerValidatorHelper();
+
+    timeTravel(originalValidatorLockedGoldRequirements.duration);
+  }
+
+  function _deregisterValidator(address _validator) internal {
+    vm.prank(_validator);
+    validators.deregisterValidator(INDEX);
+  }
+
+  function test_ShouldMarkAccountAsNotValidator_WhenAccountHasNeverBeenMemberOfValidatorGroup()
+    public
+  {
+    assertTrue(validators.isValidator(validator));
+
+    _deregisterValidator(validator);
+
+    assertFalse(validators.isValidator(validator));
+  }
+
+  function test_ShouldRemoveAccountFromValidatorList_WhenAccountHasNeverBeenMemberOfValidatorGroup()
+    public
+  {
+    address[] memory ExpectedRegisteredValidators = new address[](0);
+
+    assertTrue(validators.isValidator(validator));
+    _deregisterValidator(validator);
+    assertEq(validators.getRegisteredValidators().length, ExpectedRegisteredValidators.length);
+  }
+
+  function test_ShouldResetAccountBalanceRequirements_WhenAccountHasNeverBeenMemberOfValidatorGroup()
+    public
+  {
+    assertTrue(validators.isValidator(validator));
+    _deregisterValidator(validator);
+    assertEq(validators.getAccountLockedGoldRequirement(validator), 0);
+  }
+
+  function test_Emits_ValidatorDeregisteredEvent_WhenAccountHasNeverBeenMemberOfValidatorGroup()
+    public
+  {
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorDeregistered(validator);
+    _deregisterValidator(validator);
+  }
+
+}
+
+contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorGroup is
+  ValidatorsTest
+{
+  uint256 public constant INDEX = 0;
+  function setUp() public {
+    super.setUp();
+    _registerValidatorHelper();
+
+    _registerValidatorGroupHelper(group, 1);
+  }
+
+  function _affiliateAndAddMember(address _validator, address _group) public {
+    vm.prank(_validator);
+    validators.affiliate(_group);
+
+    vm.prank(_group);
+    validators.addFirstMember(_validator, address(0), address(0));
+  }
+
+  function _deregisterValidator(address _validator) internal {
+    vm.prank(_validator);
+    validators.deregisterValidator(INDEX);
+  }
+
+  function test_ShouldMarkAccountAsNotValidator_WhenValidatorNoLongerMemberOfValidatorGroup()
+    public
+  {
+    _affiliateAndAddMember(validator, group);
+    vm.prank(group);
+    validators.removeMember(validator);
+    timeTravel(originalValidatorLockedGoldRequirements.duration.add(1));
+    assertTrue(validators.isValidator(validator));
+    _deregisterValidator(validator);
+    assertFalse(validators.isValidator(validator));
+  }
+
+  function test_ShouldRemoveAccountFromValidatorList_WhenValidatorNoLongerMemberOfValidatorGroup()
+    public
+  {
+    address[] memory ExpectedRegisteredValidators = new address[](0);
+
+    _affiliateAndAddMember(validator, group);
+    vm.prank(group);
+    validators.removeMember(validator);
+    timeTravel(originalValidatorLockedGoldRequirements.duration.add(1));
+
+    assertTrue(validators.isValidator(validator));
+    _deregisterValidator(validator);
+    assertEq(validators.getRegisteredValidators().length, ExpectedRegisteredValidators.length);
+  }
+
+  function test_ShouldResetAccountBalanceRequirements_WhenValidatorNoLongerMemberOfValidatorGroup()
+    public
+  {
+    _affiliateAndAddMember(validator, group);
+
+    vm.prank(group);
+    validators.removeMember(validator);
+    timeTravel(originalValidatorLockedGoldRequirements.duration.add(1));
+
+    _deregisterValidator(validator);
+    assertEq(validators.getAccountLockedGoldRequirement(validator), 0);
+  }
+
+  function test_Emits_ValidatorDeregisteredEvent_WhenValidatorNoLongerMemberOfValidatorGroup()
+    public
+  {
+    _affiliateAndAddMember(validator, group);
+    vm.prank(group);
+    validators.removeMember(validator);
+    timeTravel(originalValidatorLockedGoldRequirements.duration.add(1));
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorDeregistered(validator);
+    _deregisterValidator(validator);
+  }
+
+  function test_Reverts_WhenItHasBeenLessThanValidatorLockedGoldRequirementsDurationSinceValidatorWasRemovedromGroup()
+    public
+  {
+    _affiliateAndAddMember(validator, group);
+
+    vm.prank(group);
+    validators.removeMember(validator);
+    timeTravel(originalValidatorLockedGoldRequirements.duration.sub(1));
+
+    vm.expectRevert("Not yet requirement end time");
+    _deregisterValidator(validator);
+  }
+
+  function test_Rverts_WhenValidatorStillMemberOfValidatorGroup() public {
+    _affiliateAndAddMember(validator, group);
+    vm.expectRevert("Has been group member recently");
+    _deregisterValidator(validator);
+  }
+
+  function test_Reverts_WhenAccountNotRegisteredValidator() public {
+    vm.expectRevert("Not a validator");
+    vm.prank(nonValidator);
+    validators.deregisterValidator(INDEX);
+  }
+
+  function test_Reverts_WhenWrongIndexProvided() public {
+    timeTravel(originalValidatorLockedGoldRequirements.duration);
+    vm.expectRevert("deleteElement: index out of range");
+    vm.prank(validator);
+    validators.deregisterValidator(INDEX + 1);
+
   }
 }
