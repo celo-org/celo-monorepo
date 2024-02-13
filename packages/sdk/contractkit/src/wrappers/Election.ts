@@ -325,17 +325,24 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
 
   private _activate = proxySend(this.connection, this.contract.methods.activate)
 
+  private _activateForAccount = proxySend(this.connection, this.contract.methods.activateForAccount)
+
   /**
    * Activates any activatable pending votes.
    * @param account The account with pending votes to activate.
    */
-  async activate(account: Address): Promise<Array<CeloTransactionObject<boolean>>> {
+  async activate(
+    account: Address,
+    onBehalfOfAccount?: boolean
+  ): Promise<Array<CeloTransactionObject<boolean>>> {
     const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
     const isActivatable = await Promise.all(
       groups.map((g) => this.contract.methods.hasActivatablePendingVotes(account, g).call())
     )
     const groupsActivatable = groups.filter((_, i) => isActivatable[i])
-    return groupsActivatable.map((g) => this._activate(g))
+    return groupsActivatable.map((g) =>
+      onBehalfOfAccount ? this._activateForAccount(g, account) : this._activate(g)
+    )
   }
 
   async revokePending(
