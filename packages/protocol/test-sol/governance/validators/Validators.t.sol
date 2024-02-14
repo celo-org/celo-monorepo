@@ -145,13 +145,36 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
   ValidatorsMockTunnel.InitParams public initParams;
   ValidatorsMockTunnel.InitParams2 public initParams2;
 
+  event MaxGroupSizeSet(uint256 size);
+  event CommissionUpdateDelaySet(uint256 delay);
+  event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
+  event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
+  event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
+  event MembershipHistoryLengthSet(uint256 length);
   event ValidatorRegistered(address indexed validator);
-  event ValidatorEcdsaPublicKeyUpdated(address indexed validator, bytes ecdsaPublicKey);
-  event ValidatorBlsPublicKeyUpdated(address indexed validator, bytes blsPublicKey);
   event ValidatorDeregistered(address indexed validator);
   event ValidatorAffiliated(address indexed validator, address indexed group);
   event ValidatorDeaffiliated(address indexed validator, address indexed group);
+  event ValidatorEcdsaPublicKeyUpdated(address indexed validator, bytes ecdsaPublicKey);
+  event ValidatorBlsPublicKeyUpdated(address indexed validator, bytes blsPublicKey);
+  event ValidatorScoreUpdated(address indexed validator, uint256 score, uint256 epochScore);
+  event ValidatorGroupRegistered(address indexed group, uint256 commission);
+  event ValidatorGroupDeregistered(address indexed group);
+  event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
   event ValidatorGroupMemberRemoved(address indexed group, address indexed validator);
+  event ValidatorGroupMemberReordered(address indexed group, address indexed validator);
+  event ValidatorGroupCommissionUpdateQueued(
+    address indexed group,
+    uint256 commission,
+    uint256 activationBlock
+  );
+  event ValidatorGroupCommissionUpdated(address indexed group, uint256 commission);
+  event ValidatorEpochPaymentDistributed(
+    address indexed validator,
+    uint256 validatorPayment,
+    address indexed group,
+    uint256 groupPayment
+  );
 
   function setUp() public {
     owner = address(this);
@@ -1025,6 +1048,125 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     vm.prank(validator);
     validators.affiliate(otherGroup);
 
+    assertTrue(election.isIneligible(group));
+  }
+}
+
+contract ValidatorsTest_Deaffiliate is ValidatorsTest {
+  uint256 additionEpoch;
+  uint256 deaffiliationEpoch;
+
+  function setUp() public {
+    super.setUp();
+
+    _registerValidatorHelper();
+
+    _registerValidatorGroupHelper(group, 1);
+    vm.prank(validator);
+    validators.affiliate(group);
+    (, , address _affiliation, , ) = validators.getValidator(validator);
+
+    require(_affiliation == group, "Affiliation failed.");
+  }
+
+  function test_ShouldClearAffiliate() public {
+    vm.prank(validator);
+    validators.deaffiliate();
+    (, , address _affiliation, , ) = validators.getValidator(validator);
+
+    assertEq(_affiliation, address(0));
+  }
+
+  function test_Emits_ValidatorDeaffiliatedEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorDeaffiliated(validator, group);
+    vm.prank(validator);
+    validators.deaffiliate();
+  }
+
+  function test_Reverts_WhenAccountNotRegisteredValidator() public {
+    vm.expectRevert("Not a validator");
+    vm.prank(nonValidator);
+    validators.deaffiliate();
+  }
+
+  function test_Reverts_WhenValidatorNotAffiliatedWithValidatorGroup() public {
+    vm.prank(validator);
+    validators.deaffiliate();
+    vm.expectRevert("deaffiliate: not affiliated");
+
+    vm.prank(validator);
+    validators.deaffiliate();
+  }
+
+  function test_ShouldRemoveValidatorFromGroupMembershipList_WhenValidatorIsMemberOfAffiliatedGroup()
+    public
+  {
+    address[] memory ExpectedMembersList = new address[](0);
+
+    vm.prank(group);
+    validators.addFirstMember(validator, address(0), address(0));
+    additionEpoch = validators.getEpochNumber();
+
+    vm.prank(validator);
+    validators.deaffiliate();
+    deaffiliationEpoch = validators.getEpochNumber();
+
+    (address[] memory members, , , , , , ) = validators.getValidatorGroup(group);
+    assertEq(members, ExpectedMembersList);
+  }
+
+  function test_ShouldUpdateMemberMembershipHisory_WhenValidatorIsMemberOfAffiliatedGroup() public {
+    vm.prank(group);
+    validators.addFirstMember(validator, address(0), address(0));
+
+    additionEpoch = validators.getEpochNumber();
+
+    timeTravel(10);
+
+    vm.prank(validator);
+    validators.deaffiliate();
+    deaffiliationEpoch = validators.getEpochNumber();
+
+    (uint256[] memory epochs, address[] memory groups, uint256 lastRemovedFromGroupTimestamp, uint256 tail) = validators
+      .getMembershipHistory(validator);
+
+    uint256 expectedEntries = 1;
+
+    if (additionEpoch != validatorRegistrationEpochNumber || additionEpoch != deaffiliationEpoch) {
+      expectedEntries = 2;
+    }
+
+    assertEq(epochs.length, expectedEntries);
+    assertEq(epochs[expectedEntries - 1], deaffiliationEpoch);
+    assertEq(groups.length, expectedEntries);
+    assertEq(groups[expectedEntries - 1], address(0));
+    assertEq(lastRemovedFromGroupTimestamp, uint256(block.timestamp));
+  }
+
+  function test_Emits_ValidatorGroupMemberRemovedEvent_WhenValidatorIsMemberOfAffiliatedGroup()
+    public
+  {
+    vm.prank(group);
+    validators.addFirstMember(validator, address(0), address(0));
+
+    additionEpoch = validators.getEpochNumber();
+
+    timeTravel(10);
+
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorGroupMemberRemoved(group, validator);
+
+    vm.prank(validator);
+    validators.deaffiliate();
+  }
+
+  function test_ShouldMarkGroupAsIneligibleForElecion_WhenValidatorIsTheOnlyMemberOfGroup() public {
+    vm.prank(group);
+    validators.addFirstMember(validator, address(0), address(0));
+
+    vm.prank(validator);
+    validators.deaffiliate();
     assertTrue(election.isIneligible(group));
   }
 }
