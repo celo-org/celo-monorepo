@@ -40,6 +40,7 @@ contract ValidatorsMockTunnel is ForgeTest {
     uint256 validatorScoreExponent;
     uint256 validatorScoreAdjustmentSpeed;
   }
+
   struct InitParams2 {
     uint256 _membershipHistoryLength;
     uint256 _slashingMultiplierResetPeriod;
@@ -115,14 +116,17 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     address indexed reporter,
     uint256 reward
   );
+
   struct ValidatorLockedGoldRequirements {
     uint256 value;
     uint256 duration;
   }
+
   struct GroupLockedGoldRequirements {
     uint256 value;
     uint256 duration;
   }
+
   struct ValidatorScoreParameters {
     uint256 exponent;
     FixidityLib.Fraction adjustmentSpeed;
@@ -145,6 +149,9 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
   event ValidatorEcdsaPublicKeyUpdated(address indexed validator, bytes ecdsaPublicKey);
   event ValidatorBlsPublicKeyUpdated(address indexed validator, bytes blsPublicKey);
   event ValidatorDeregistered(address indexed validator);
+  event ValidatorAffiliated(address indexed validator, address indexed group);
+  event ValidatorDeaffiliated(address indexed validator, address indexed group);
+  event ValidatorGroupMemberRemoved(address indexed group, address indexed validator);
 
   function setUp() public {
     owner = address(this);
@@ -212,8 +219,10 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
 
     vm.prank(validator);
     accounts.createAccount();
+
     vm.prank(group);
     accounts.createAccount();
+
     vm.prank(nonValidator);
     accounts.createAccount();
   }
@@ -279,9 +288,7 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
 
     vm.prank(_group);
     validators.registerValidatorGroup(commission.unwrap());
-
   }
-
 }
 
 contract ValidatorsTest_Initialize is ValidatorsTest {
@@ -359,6 +366,7 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
 
 contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
   uint256 newLength = membershipHistoryLength + 1;
+
   event MembershipHistoryLengthSet(uint256 length);
 
   function test_Reverts_WhenLengthIsSame() public {
@@ -386,6 +394,7 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
 
 contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
   uint256 newSize = maxGroupSize + 1;
+
   event MaxGroupSizeSet(uint256 size);
 
   function test_ShouldSetMaxGroupSize() public {
@@ -656,12 +665,14 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
     vm.prank(validator);
     validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
   }
+
   function test_Reverts_WhenAccountAlreadyRegisteredAsValidatorGroup() public {
     _registerValidatorGroupHelper(validator, 1);
     vm.expectRevert("Already registered");
     vm.prank(validator);
     validators.registerValidator(ecdsaPubKey, blsPublicKey, blsPop);
   }
+
   function test_Reverts_WhenAccountDoesNotMeetLockedGoldRequirements() public {
     lockedGold.setAccountTotalLockedGold(
       validator,
@@ -677,6 +688,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValid
   ValidatorsTest
 {
   uint256 public constant INDEX = 0;
+
   function setUp() public {
     super.setUp();
 
@@ -725,15 +737,16 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValid
     emit ValidatorDeregistered(validator);
     _deregisterValidator(validator);
   }
-
 }
 
 contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorGroup is
   ValidatorsTest
 {
   uint256 public constant INDEX = 0;
+
   function setUp() public {
     super.setUp();
+
     _registerValidatorHelper();
 
     _registerValidatorGroupHelper(group, 1);
@@ -834,6 +847,184 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
     vm.expectRevert("deleteElement: index out of range");
     vm.prank(validator);
     validators.deregisterValidator(INDEX + 1);
+  }
+}
 
+contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirements is
+  ValidatorsTest
+{
+  address nonRegisteredGroup;
+
+  function setUp() public {
+    super.setUp();
+    nonRegisteredGroup = actor("nonRegisteredGroup");
+
+    _registerValidatorHelper();
+    _registerValidatorGroupHelper(group, 1);
+  }
+
+  function test_ShouldSetAffiliate_WhenAffiliatingWithRegisteredValidatorGroup() public {
+    vm.prank(validator);
+    validators.affiliate(group);
+
+    (, , address affiliation, , ) = validators.getValidator(validator);
+
+    assertEq(affiliation, group);
+  }
+
+  function test_Emits_ValidatorAffiliatedEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorAffiliated(validator, group);
+    vm.prank(validator);
+    validators.affiliate(group);
+  }
+
+  function test_Reverts_WhenGroupDoesNotMeetLockedGoldrequirements() public {
+    lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value.sub(11));
+
+    vm.expectRevert("Group doesn't meet requirements");
+
+    vm.prank(validator);
+    validators.affiliate(group);
+  }
+
+  function test_Reverts_WhenValidatorDoesNotMeetLockedGoldrequirements() public {
+    lockedGold.setAccountTotalLockedGold(
+      validator,
+      originalValidatorLockedGoldRequirements.value.sub(11)
+    );
+
+    vm.expectRevert("Validator doesn't meet requirements");
+
+    vm.prank(validator);
+    validators.affiliate(group);
+  }
+
+  function test_Reverts_whenAffiliatingWithNonRegisteredValidatorGroup() public {
+    vm.expectRevert("Not a validator group");
+    vm.prank(validator);
+    validators.affiliate(nonRegisteredGroup);
+  }
+
+  function test_Reverts_WhenAccountNotRegisteredValidator() public {
+    vm.expectRevert("Not a validator");
+    vm.prank(nonValidator);
+    validators.affiliate(group);
+  }
+}
+
+contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorGroup is
+  ValidatorsTest
+{
+  address otherGroup;
+
+  uint256 validatorAffiliationEpochNumber;
+  uint256 validatorAdditionEpochNumber;
+
+  function setUp() public {
+    super.setUp();
+
+    otherGroup = actor("otherGroup");
+    vm.prank(otherGroup);
+    accounts.createAccount();
+
+    _registerValidatorHelper();
+    validatorRegistrationEpochNumber = validators.getEpochNumber();
+
+    _registerValidatorGroupHelper(group, 1);
+    _registerValidatorGroupHelper(otherGroup, 1);
+
+    vm.prank(validator);
+    validators.affiliate(group);
+  }
+
+  function test_ShouldSetAffiliate_WhenValidatorNotMemberOfThatValidatorGroup() public {
+    vm.prank(validator);
+    validators.affiliate(otherGroup);
+    (, , address affiliation, , ) = validators.getValidator(validator);
+    assertEq(affiliation, otherGroup);
+  }
+
+  function test_Emits_ValidatorDeaffiliatedEvent_WhenValidatorNotMemberOfThatValidatorGroup()
+    public
+  {
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorDeaffiliated(validator, group);
+    vm.prank(validator);
+    validators.affiliate(otherGroup);
+  }
+
+  function test_Emits_ValidatorAffiliatedEvent_WhenValidatorNotMemberOfThatValidatorGroup() public {
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorAffiliated(validator, otherGroup);
+    vm.prank(validator);
+    validators.affiliate(otherGroup);
+  }
+
+  function test_ShouldRemoveValidatorFromGroupMembershipList_WhenValidatorIsMemberOfThatValidatorGroup()
+    public
+  {
+    address[] memory ExpectedMembersList = new address[](0);
+    vm.prank(group);
+    validators.addFirstMember(validator, address(0), address(0));
+    vm.prank(validator);
+    validators.affiliate(otherGroup);
+
+    (address[] memory members, , , , , , ) = validators.getValidatorGroup(group);
+    assertEq(members, ExpectedMembersList);
+  }
+
+  function test_ShouldUpdateValidatorsMembershipHistory_WhenValidatorIsMemberOfThatValidatorGroup()
+    public
+  {
+    vm.prank(group);
+    validators.addFirstMember(validator, address(0), address(0));
+
+    validatorAdditionEpochNumber = validators.getEpochNumber();
+
+    timeTravel(10);
+
+    vm.prank(validator);
+    validators.affiliate(otherGroup);
+    validatorAffiliationEpochNumber = validators.getEpochNumber();
+
+    (uint256[] memory epochs, address[] memory groups, uint256 lastRemovedFromGroupTimestamp, uint256 tail) = validators
+      .getMembershipHistory(validator);
+
+    uint256 expectedEntries = 1;
+
+    if (
+      validatorAdditionEpochNumber != validatorRegistrationEpochNumber ||
+      validatorAdditionEpochNumber != validatorAffiliationEpochNumber
+    ) {
+      expectedEntries = 2;
+    }
+
+    assertEq(epochs.length, expectedEntries);
+    assertEq(epochs[expectedEntries - 1], validatorAffiliationEpochNumber);
+    assertEq(groups.length, expectedEntries);
+    assertEq(groups[expectedEntries - 1], address(0));
+    assertEq(lastRemovedFromGroupTimestamp, uint256(block.timestamp));
+  }
+
+  function test_Emits_ValidatorGroupMemberRemovedEvent_WhenValidatorIsMemberOfThatValidatorGroup()
+    public
+  {
+    vm.prank(group);
+    validators.addFirstMember(validator, address(0), address(0));
+
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorGroupMemberRemoved(group, validator);
+    vm.prank(validator);
+    validators.affiliate(otherGroup);
+  }
+
+  function test_ShouldMarkGroupIneligibleForElection() public {
+    vm.prank(group);
+    validators.addFirstMember(validator, address(0), address(0));
+    vm.prank(validator);
+    validators.affiliate(otherGroup);
+
+    assertTrue(election.isIneligible(group));
   }
 }
