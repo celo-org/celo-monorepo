@@ -14,18 +14,28 @@ import "forge-std/console.sol";
 
 contract FeeCurrency6DecimalsTest is ERC20, IFeeCurrency {
   uint256 debited;
+  address adapter;
 
-  constructor(uint256 initialSupply) ERC20("ExampleFeeCurrency", "EFC") {
-    _mint(msg.sender, initialSupply);
+  modifier onlyAdapter() {
+    require(msg.sender == adapter, "Only adapter can call");
+    _;
   }
 
-  function debitGasFees(address from, uint256 value) external {
+  constructor(uint256 initialSupply, address _adapter) ERC20("ExampleFeeCurrency", "EFC") {
+    _mint(msg.sender, initialSupply);
+    adapter = _adapter;
+  }
+
+  function debitGasFees(address from, uint256 value) external onlyAdapter {
     _burn(from, value);
     debited = value;
   }
 
   // New function signature, will be used when all fee currencies have migrated
-  function creditGasFees(address[] calldata recipients, uint256[] calldata amounts) public {
+  function creditGasFees(address[] calldata recipients, uint256[] calldata amounts)
+    public
+    onlyAdapter
+  {
     require(recipients.length == amounts.length, "Recipients and amounts must be the same length.");
 
     uint256 totalSum = 0;
@@ -96,6 +106,7 @@ contract FeeCurrencyAdapterTest is Test {
   address owner;
   address nonOwner;
   IFeeCurrency feeCurrency;
+  IFeeCurrency feeCurrencyFuzzTest;
 
   uint256 initialSupply = 10_000;
 
@@ -111,7 +122,11 @@ contract FeeCurrencyAdapterTest is Test {
     string memory name = "tokenName";
     string memory symbol = "tN";
 
-    feeCurrency = new FeeCurrency6DecimalsTest(initialSupply);
+    feeCurrency = new FeeCurrency6DecimalsTest(initialSupply, address(feeCurrencyAdapter));
+    feeCurrencyFuzzTest = new FeeCurrency6DecimalsTest(
+      initialSupply,
+      address(feeCurrencyAdapterForFuzzyTests)
+    );
 
     feeCurrencyAdapter.initialize(address(feeCurrency), "wrapper", "wr", 18);
   }
@@ -200,7 +215,7 @@ contract FeeCurrencyAdapter_DebitGasFees is FeeCurrencyAdapterTest {
 
   function debitFuzzyHelper(uint8 expectedDigits, uint256 multiplier) public {
     feeCurrencyAdapterForFuzzyTests.initialize(
-      address(feeCurrency),
+      address(feeCurrencyFuzzTest),
       "adapter",
       "ad",
       expectedDigits
@@ -208,7 +223,7 @@ contract FeeCurrencyAdapter_DebitGasFees is FeeCurrencyAdapterTest {
     uint256 amount = 1000 * multiplier;
     vm.prank(address(0));
     feeCurrencyAdapterForFuzzyTests.debitGasFees(address(this), amount);
-    assertEq(feeCurrency.balanceOf(address(this)), initialSupply - amount / multiplier);
+    assertEq(feeCurrencyFuzzTest.balanceOf(address(this)), initialSupply - amount / multiplier);
     assertEq(
       feeCurrencyAdapterForFuzzyTests.balanceOf(address(this)),
       (initialSupply * multiplier - amount)
@@ -309,7 +324,7 @@ contract FeeCurrencyAdapter_CreditGasFees is FeeCurrencyAdapterTest {
     address thirdAddress = actor("thirdAddress");
 
     feeCurrencyAdapterForFuzzyTests.initialize(
-      address(feeCurrency),
+      address(feeCurrencyFuzzTest),
       "adapter",
       "ad",
       expectedDigits
@@ -329,11 +344,11 @@ contract FeeCurrencyAdapter_CreditGasFees is FeeCurrencyAdapterTest {
       amount / 4
     );
     assertEq(
-      feeCurrency.balanceOf(address(this)),
+      feeCurrencyFuzzTest.balanceOf(address(this)),
       (initialSupply - originalAmount) + (originalAmount / 4)
     );
-    assertEq(feeCurrency.balanceOf(secondAddress), originalAmount / 4);
-    assertEq(feeCurrency.balanceOf(thirdAddress), originalAmount / 2);
+    assertEq(feeCurrencyFuzzTest.balanceOf(secondAddress), originalAmount / 4);
+    assertEq(feeCurrencyFuzzTest.balanceOf(thirdAddress), originalAmount / 2);
 
     assertEq(
       feeCurrencyAdapterForFuzzyTests.balanceOf(address(this)),
