@@ -19,6 +19,3 @@
 [submodule "packages/protocol/lib/celo-foundry"]
 	path = packages/protocol/lib/celo-foundry
 	url = https://github.com/celo-org/celo-foundry
-[submodule "packages/protocol/lib/secp256k1"]
-	path = packages/protocol/lib/secp256k1
-	url = https://github.com/0xcyphered/secp256k1-solidity

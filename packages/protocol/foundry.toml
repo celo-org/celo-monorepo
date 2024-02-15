@@ -13,7 +13,6 @@ remappings = [
   'celo-foundry-8/=lib/celo-foundry-8/src/',
   'solidity-bytes-utils/=lib/solidity-bytes-utils/',
   '@summa-tx/memview.sol/=lib/memview.sol',
-  '@0xcyphered/=lib/secp256k1-solidity/contracts/',
 ]
 
 no_match_contract = "RandomTest"
