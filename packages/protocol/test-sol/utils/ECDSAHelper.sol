@@ -1,16 +1,7 @@
-pragma solidity >=0.5.13;
-// pragma solidity >=0.5.13 <0.8.20;
+pragma solidity >=0.5.13 <0.8.20;
 
 import "celo-foundry/Test.sol";
-
-// import "@0xcyphered/SECP256K1.sol";
-
-interface ISECP256K1 {
-  function recover(uint256 digest, uint8 v, uint256 r, uint256 s)
-    external
-    pure
-    returns (uint256, uint256);
-}
+import "@test-sol/utils/SECP256K1.sol";
 
 contract ECDSAHelper is Test {
   ISECP256K1 sECP256K1;
