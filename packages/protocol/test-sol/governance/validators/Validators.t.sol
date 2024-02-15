@@ -1364,3 +1364,184 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
     validators.updatePublicKeys(validator, signer, _newEcdsaPubKey, newBlsPublicKey, newBlsPop);
   }
 }
+
+contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
+  bytes validatorEcdsaPubKey;
+
+  bytes public constant newBlsPublicKey = abi.encodePacked(
+    bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
+    bytes32(0x0202020202020202020202020202020202020202020202020202020202020203),
+    bytes32(0x0303030303030303030303030303030303030303030303030303030303030304)
+  );
+
+  bytes public constant newBlsPop = abi.encodePacked(
+    bytes16(0x04040404040404040404040404040405),
+    bytes16(0x05050505050505050505050505050506),
+    bytes16(0x06060606060606060606060606060607)
+  );
+
+  bytes public constant wrongBlsPublicKey = abi.encodePacked(
+    bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
+    bytes32(0x0202020202020202020202020202020202020202020202020202020202020203),
+    bytes16(0x06060606060606060606060606060607)
+  );
+
+  bytes public constant wrongBlsPop = abi.encodePacked(
+    bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
+    bytes16(0x05050505050505050505050505050506),
+    bytes16(0x06060606060606060606060606060607)
+  );
+
+  function setUp() public {
+    super.setUp();
+
+    validatorEcdsaPubKey = _registerValidatorHelper();
+  }
+
+  function test_ShouldSetNewValidatorBlsPubKey() public {
+    ph.setDebug(true);
+
+    ph.mockSuccess(
+      ph.PROOF_OF_POSSESSION(),
+      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
+    );
+
+    vm.prank(validator);
+    validators.updateBlsPublicKey(newBlsPublicKey, newBlsPop);
+
+    (, bytes memory actualBlsPublicKey, , , ) = validators.getValidator(validator);
+
+    assertEq(actualBlsPublicKey, newBlsPublicKey);
+  }
+
+  function test_Emits_ValidatorValidatorBlsPublicKeyUpdatedEvent() public {
+    ph.setDebug(true);
+
+    ph.mockSuccess(
+      ph.PROOF_OF_POSSESSION(),
+      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
+    );
+
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorBlsPublicKeyUpdated(validator, newBlsPublicKey);
+
+    vm.prank(validator);
+    validators.updateBlsPublicKey(newBlsPublicKey, newBlsPop);
+  }
+
+  function test_Reverts_WhenPublicKeyIsNot96Bytes() public {
+    ph.setDebug(true);
+
+    ph.mockSuccess(
+      ph.PROOF_OF_POSSESSION(),
+      abi.encodePacked(validator, wrongBlsPublicKey, newBlsPop)
+    );
+
+    vm.expectRevert("Wrong BLS public key length");
+    vm.prank(validator);
+    validators.updateBlsPublicKey(wrongBlsPublicKey, newBlsPop);
+  }
+  function test_Reverts_WhenProofOfPossessionIsNot48Bytes() public {
+    ph.setDebug(true);
+
+    ph.mockSuccess(
+      ph.PROOF_OF_POSSESSION(),
+      abi.encodePacked(validator, newBlsPublicKey, wrongBlsPop)
+    );
+
+    vm.expectRevert("Wrong BLS PoP length");
+    vm.prank(validator);
+    validators.updateBlsPublicKey(newBlsPublicKey, wrongBlsPop);
+  }
+}
+
+contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
+  function setUp() public {
+    super.setUp();
+  }
+
+  function test_Reverts_WhenVoteOverMaxNumberGroupsSetTrue() public {
+    vm.prank(group);
+    election.setAllowedToVoteOverMaxNumberOfGroups(group, true);
+    lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value);
+    vm.expectRevert("Cannot vote for more than max number of groups");
+    vm.prank(group);
+    validators.registerValidatorGroup(commission.unwrap());
+  }
+
+  function test_Reverts_WhenDelagatingCELO() public {
+    lockedGold.setAccountTotalDelegatedAmountInPercents(group, 10);
+    lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value);
+    vm.expectRevert("Cannot delegate governance power");
+    vm.prank(group);
+    validators.registerValidatorGroup(commission.unwrap());
+  }
+
+  function test_ShouldMarkAccountAsValidatorGroup() public {
+    _registerValidatorGroupHelper(group, 1);
+    assertTrue(validators.isValidatorGroup(group));
+  }
+
+  function test_ShouldAddAccountToListOfValidatorGroup() public {
+    address[] memory ExpectedRegisteredValidatorGroups = new address[](1);
+    ExpectedRegisteredValidatorGroups[0] = group;
+    _registerValidatorGroupHelper(group, 1);
+    validators.getRegisteredValidatorGroups();
+    assertEq(
+      validators.getRegisteredValidatorGroups().length,
+      ExpectedRegisteredValidatorGroups.length
+    );
+    assertEq(validators.getRegisteredValidatorGroups()[0], ExpectedRegisteredValidatorGroups[0]);
+  }
+
+  function test_ShoulSetValidatorGroupCommission() public {
+    _registerValidatorGroupHelper(group, 1);
+    (, uint256 _commission, , , , , ) = validators.getValidatorGroup(group);
+
+    assertEq(_commission, commission.unwrap());
+  }
+
+  function test_ShouldSetAccountLockedGoldRequirements() public {
+    _registerValidatorGroupHelper(group, 1);
+    assertEq(
+      validators.getAccountLockedGoldRequirement(group),
+      originalGroupLockedGoldRequirements.value
+    );
+  }
+
+  function test_Emits_ValidatorGroupRegisteredEvent() public {
+    lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value);
+
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorGroupRegistered(group, commission.unwrap());
+    vm.prank(group);
+    validators.registerValidatorGroup(commission.unwrap());
+  }
+
+  function test_Reverts_WhenAccountDoesNotMeetLockedGoldRequirements() public {
+    lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value.sub(11));
+    vm.expectRevert("Not enough locked gold");
+    vm.prank(group);
+    validators.registerValidatorGroup(commission.unwrap());
+  }
+
+  function test_Reverts_WhenTheAccountIsAlreadyRegisteredValidator() public {
+    _registerValidatorHelper();
+
+    lockedGold.setAccountTotalLockedGold(
+      validator,
+      originalGroupLockedGoldRequirements.value.sub(11)
+    );
+    vm.expectRevert("Already registered as validator");
+    vm.prank(validator);
+    validators.registerValidatorGroup(commission.unwrap());
+  }
+  function test_Reverts_WhenTheAccountIsAlreadyRegisteredValidatorGroup() public {
+    _registerValidatorGroupHelper(group, 1);
+
+    lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value.sub(11));
+    vm.expectRevert("Already registered as group");
+    vm.prank(group);
+    validators.registerValidatorGroup(commission.unwrap());
+  }
+}
