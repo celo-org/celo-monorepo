@@ -1,4 +1,3 @@
-// tslint:disable:no-console
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { BlockchainParametersWrapper } from '@celo/contractkit/lib/wrappers/BlockchainParameters'
 import { assert } from 'chai'

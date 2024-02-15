@@ -1,4 +1,3 @@
-/* tslint:disable: no-console */
 import { readFileSync } from 'fs'
 import { addCeloGethMiddleware } from 'src/lib/utils'
 import yargs from 'yargs'
@@ -261,7 +260,7 @@ export const handler = async (argv: StartArgv) => {
       node.isProxied = true
       node.proxyAllowPrivateIp = true
       node.proxies = [
-        getEnodeAddress(privateKeyToPublicKey(proxyPrivateKeys[x]), '127.0.0.1', proxy.proxyport!),
+        getEnodeAddress(privateKeyToPublicKey(proxyPrivateKeys[x]), '127.0.0.1', proxy.proxyport),
         getEnodeAddress(privateKeyToPublicKey(validatorPrivateKeys[x]), '127.0.0.1', node.port),
       ]
     }
@@ -281,7 +280,7 @@ export const handler = async (argv: StartArgv) => {
   if (gethConfig.migrate || gethConfig.migrateTo) {
     const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, instances)
 
-    console.log('Migrating contracts (this will take a long time) ...')
+    console.info('Migrating contracts (this will take a long time) ...')
 
     await migrateContracts(
       monorepoDir,
@@ -293,6 +292,6 @@ export const handler = async (argv: StartArgv) => {
       verbose
     )
 
-    console.log('... done migrating contracts!')
+    console.info('... done migrating contracts!')
   }
 }

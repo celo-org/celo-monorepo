@@ -1,8 +1,8 @@
 {
-    "compileOnSave": false,
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "display": "Recommended",
     "compilerOptions": {
         "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
         "baseUrl": ".",
         "lib": [
             "es2015",
@@ -13,11 +13,17 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "removeComments": false,
-        "skipLibCheck": true,
-        "sourceMap": true,
+        "sourceMap": false,
         "target": "es5",
         "downlevelIteration": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "strict": false,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "paths": {
+          "@celo/protocol/*": ["./*"]
+        }
     },
     "exclude": [
         "node_modules",

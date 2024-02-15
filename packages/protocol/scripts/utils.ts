@@ -4,7 +4,11 @@ import { SemVer } from 'semver'
 const DAILY_RELEASE_TAG = 'canary'
 const WORKING_RELEASE_BRANCH_PREFIX = 'release/core-contracts/'
 
-export const determineNextVersion = (gitTag: string, gitBranch: string, npmTag: string): SemVer => {
+export const determineNextVersion = (
+  gitTag: string,
+  gitBranch: string,
+  npmTag: string
+): SemVer | null => {
   let nextVersion: SemVer | null = null
   const matchesReleaseTag = gitTag.match(/core-contracts.v(.+).post-audit/)
   const matchesPreAuditTag = gitTag.match(/core-contracts.v(.+).pre-audit/)

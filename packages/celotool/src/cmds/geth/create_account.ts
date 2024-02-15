@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
-import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
+import { CeloEnvArgv, addCeloEnvMiddleware } from 'src/lib/env-utils'
 import { fetchPassword } from 'src/lib/geth'
 import { addCeloGethMiddleware } from 'src/lib/utils'
 import yargs from 'yargs'
@@ -81,7 +81,7 @@ export const handler = async (argv: CreateAccountArgv) => {
     console.info(`Created account address: 0x${address}`)
 
     if (needFaucet) {
-      console.log(`Fauceting 0x${address} on ${env}`)
+      console.info(`Fauceting 0x${address} on ${env}`)
       await execCmdWithExitOnFailure(
         `yarn --cwd ${process.cwd()} run cli account faucet -e ${env} --account 0x${address}`
       )
