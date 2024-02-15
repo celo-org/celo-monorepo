@@ -1,6 +1,8 @@
 pragma solidity >=0.5.13 <0.8.20;
 
-import "celo-foundry/Test.sol";
+/// XXX: Adding this library here instead of importing as a submodule, because of a version incompatibility,
+/// causing foundry to not build the contract when testing contracts with versions < 0.8.17.
+/// copied from https://github.com/0xcyphered/secp256k1-solidity/blob/main/contracts/SECP256K1.sol
 
 interface ISECP256K1 {
   function recover(uint256 digest, uint8 v, uint256 r, uint256 s)
