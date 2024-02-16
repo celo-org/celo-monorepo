@@ -8,10 +8,9 @@ import yargs from 'yargs'
 
 export const command = 'unfreeze-contracts'
 
-export const describe = 'command for unfreezing epoch rewards and the exchange'
+export const describe = 'command for unfreezing epoch rewards'
 
 interface UnfreezeContractsArgv extends CeloEnvArgv {
-  exchange: boolean
   rewards: boolean
   freeze: boolean
   precheck: boolean
@@ -20,11 +19,6 @@ interface UnfreezeContractsArgv extends CeloEnvArgv {
 
 export const builder = (argv: yargs.Argv) => {
   return addCeloEnvMiddleware(argv)
-    .option('exchange', {
-      type: 'boolean',
-      description: 'Affect the exchange',
-      default: true,
-    })
     .option('rewards', {
       type: 'boolean',
       description: 'Affect epoch rewards',
@@ -57,13 +51,12 @@ export const handler = async (argv: UnfreezeContractsArgv) => {
     console.info(`Using account: ${account}`)
     kit.connection.defaultAccount = account
 
-    const [exchange, epochRewards] = await Promise.all([
-      argv.exchange ? kit._web3Contracts.getExchange() : null,
+    const [epochRewards, freezerContract] = await Promise.all([
       argv.rewards ? kit._web3Contracts.getEpochRewards() : null,
+      kit._web3Contracts.getFreezer(),
     ])
-    const freezerContract = await kit._web3Contracts.getFreezer()
 
-    for (const [name, contract] of Object.entries({ exchange, epochRewards })) {
+    for (const [name, contract] of Object.entries({ epochRewards })) {
       if (contract === null) {
         continue
       }
