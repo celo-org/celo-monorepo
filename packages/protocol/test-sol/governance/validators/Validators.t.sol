@@ -1881,3 +1881,117 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
     validators.addMember(validator);
   }
 }
+
+contract ValidatorsTest_RemoveMember is ValidatorsTest {
+  function setUp() public {
+    super.setUp();
+    _registerValidatorGroupWithMembers(group, 1);
+  }
+
+  function _registerValidatorGroupWithMembers(address _group, uint256 _numMembers) public {
+    _registerValidatorGroupHelper(_group, _numMembers);
+
+    for (uint256 i = 0; i < _numMembers; i++) {
+      if (i == 0) {
+        _registerValidatorHelper(validator, validatorPk);
+
+        vm.prank(validator);
+        validators.affiliate(group);
+
+        vm.prank(group);
+        validators.addFirstMember(validator, address(0), address(0));
+      } else {
+        uint256 _validator1Pk = i;
+        address _validator1 = vm.addr(_validator1Pk);
+
+        vm.prank(_validator1);
+        accounts.createAccount();
+        _registerValidatorHelper(_validator1, _validator1Pk);
+        vm.prank(validator);
+        validators.affiliate(group);
+        vm.prank(group);
+        validators.addMember(_validator1);
+      }
+    }
+  }
+
+  function test_ShouldRemoveMemberFromListOfMembers() public {
+    address[] memory expectedMembersList = new address[](0);
+
+    vm.prank(group);
+    validators.removeMember(validator);
+
+    (address[] memory members, , , , , , ) = validators.getValidatorGroup(group);
+
+    assertEq(members, expectedMembersList);
+    assertEq(members.length, expectedMembersList.length);
+  }
+
+  uint256 _registrationEpoch;
+  uint256 _additionEpoch;
+
+  function test_ShouldUpdateMemberMembershipHistory() public {
+    vm.prank(group);
+    validators.removeMember(validator);
+    uint256 _expectedEpoch = validators.getEpochNumber();
+
+    (uint256[] memory _epochs, address[] memory _membershipGroups, uint256 _historyLastRemovedTimestamp, uint256 _historyTail) = validators
+      .getMembershipHistory(validator);
+
+    assertEq(_epochs.length, 1);
+    assertEq(_membershipGroups.length, 1);
+
+    assertEq(_epochs[0], _expectedEpoch);
+
+    assertEq(_membershipGroups[0], address(0));
+    assertEq(_historyLastRemovedTimestamp, uint256(block.timestamp));
+  }
+
+  function test_ShouldUpdateGroupSizeHistory() public {
+    vm.prank(group);
+    validators.removeMember(validator);
+
+    (, , , , uint256[] memory _sizeHistory, , ) = validators.getValidatorGroup(group);
+
+    assertEq(_sizeHistory.length, 2);
+    assertEq(_sizeHistory[1], uint256(block.timestamp));
+  }
+
+  function test_Emits_ValidatorGroupMemberRemovedEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorGroupMemberRemoved(group, validator);
+
+    vm.prank(group);
+    validators.removeMember(validator);
+  }
+
+  // When vlidator ins only member of the group
+
+  function test_ShouldMarkGroupIneligible_WhenValidatorIsOnlyMemberOfTheGroup() public {
+    vm.prank(group);
+    validators.removeMember(validator);
+
+    assertTrue(election.isIneligible(group));
+  }
+
+  function test_Reverts_WhenAccountIsNotRegisteredValidatorGroup() public {
+    vm.expectRevert("is not group and validator");
+    vm.prank(nonValidator);
+    validators.removeMember(validator);
+  }
+
+  function test_Reverts_WhenMemberNotRegisteredValidatorGroup() public {
+    vm.expectRevert("is not group and validator");
+    vm.prank(group);
+    validators.removeMember(nonValidator);
+  }
+
+  function test_Reverts_WhenValidatorNotMemberOfValidatorGroup() public {
+    vm.prank(validator);
+    validators.deaffiliate();
+
+    vm.expectRevert("Not affiliated to group");
+    vm.prank(group);
+    validators.removeMember(validator);
+  }
+}

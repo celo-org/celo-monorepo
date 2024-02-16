@@ -6,7 +6,6 @@ import {
   assertEqualBNArray,
   assertEqualDpBN,
   assertRevert,
-  assertSameAddress,
   assertTransactionRevertWithReason,
   currentEpochNumber,
   mineBlocks,
@@ -207,96 +206,7 @@ contract('Validators', (accounts: string[]) => {
 
   // describe('#addMember', () => {})
 
-  describe('#removeMember', () => {
-    const group = accounts[0]
-    const validator = accounts[1]
-    beforeEach(async () => {
-      await registerValidatorGroupWithMembers(group, [validator])
-    })
-
-    it('should remove the member from the list of members', async () => {
-      await validators.removeMember(validator)
-      const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
-      assert.deepEqual(parsedGroup.members, [])
-    })
-
-    it("should update the member's membership history", async () => {
-      await validators.removeMember(validator)
-      const membershipHistory = parseMembershipHistory(
-        await validators.getMembershipHistory(validator)
-      )
-      const expectedEpoch = await currentEpochNumber(web3)
-
-      // Depending on test timing, we may or may not span an epoch boundary between registration
-      // and removal.
-      const numEntries = membershipHistory.epochs.length
-      assert.isTrue(numEntries === 1 || numEntries === 2)
-      assert.equal(membershipHistory.groups.length, numEntries)
-      if (numEntries === 1) {
-        assertEqualBN(membershipHistory.epochs[0], expectedEpoch)
-        assertSameAddress(membershipHistory.groups[0], NULL_ADDRESS)
-      } else {
-        assertEqualBN(membershipHistory.epochs[1], expectedEpoch)
-        assertSameAddress(membershipHistory.groups[1], NULL_ADDRESS)
-      }
-      const latestBlock = await web3.eth.getBlock('latest')
-      assert.equal(membershipHistory.lastRemovedFromGroupTimestamp, latestBlock.timestamp)
-    })
-
-    it("should update the group's size history", async () => {
-      await validators.removeMember(validator)
-      const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
-      assert.equal(parsedGroup.sizeHistory.length, 2)
-      assertEqualBN(parsedGroup.sizeHistory[1], (await web3.eth.getBlock('latest')).timestamp)
-    })
-
-    it('should emit the ValidatorGroupMemberRemoved event', async () => {
-      const resp = await validators.removeMember(validator)
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertContainSubset(log, {
-        event: 'ValidatorGroupMemberRemoved',
-        args: {
-          group,
-          validator,
-        },
-      })
-    })
-
-    describe('when the validator is the only member of the group', () => {
-      it('should mark the group ineligible', async () => {
-        await validators.removeMember(validator)
-        assert.isTrue(await mockElection.isIneligible(group))
-      })
-    })
-
-    it('should revert when the account is not a registered validator group', async () => {
-      await assertTransactionRevertWithReason(
-        validators.removeMember(validator, { from: accounts[2] }),
-        'is not group and validator'
-      )
-    })
-
-    it('should revert when the member is not a registered validator', async () => {
-      await assertTransactionRevertWithReason(
-        validators.removeMember(accounts[2]),
-        'is not group and validator'
-      )
-    })
-
-    describe('when the validator is not a member of the validator group', () => {
-      beforeEach(async () => {
-        await validators.deaffiliate({ from: validator })
-      })
-
-      it('should revert', async () => {
-        await assertTransactionRevertWithReason(
-          validators.removeMember(validator),
-          'Not affiliated to group'
-        )
-      })
-    })
-  })
+  // describe('#removeMember', () => {})
 
   describe('#reorderMember', () => {
     const group = accounts[0]
