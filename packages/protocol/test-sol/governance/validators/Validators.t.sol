@@ -773,6 +773,19 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValid
     emit ValidatorDeregistered(validator);
     _deregisterValidator(validator);
   }
+
+  function test_Reverts_WhenAccountNotRegisteredValidator() public {
+    vm.expectRevert("Not a validator");
+    vm.prank(nonValidator);
+    validators.deregisterValidator(INDEX);
+  }
+
+  function test_Reverts_WhenWrongIndexProvided() public {
+    timeTravel(originalValidatorLockedGoldRequirements.duration);
+    vm.expectRevert("deleteElement: index out of range");
+    vm.prank(validator);
+    validators.deregisterValidator(INDEX + 1);
+  }
 }
 
 contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorGroup is
@@ -786,14 +799,12 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
     _registerValidatorHelper();
 
     _registerValidatorGroupHelper(group, 1);
-  }
 
-  function _affiliateAndAddMember(address _validator, address _group) public {
-    vm.prank(_validator);
-    validators.affiliate(_group);
+    vm.prank(validator);
+    validators.affiliate(group);
 
-    vm.prank(_group);
-    validators.addFirstMember(_validator, address(0), address(0));
+    vm.prank(group);
+    validators.addFirstMember(validator, address(0), address(0));
   }
 
   function _deregisterValidator(address _validator) internal {
@@ -804,7 +815,6 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
   function test_ShouldMarkAccountAsNotValidator_WhenValidatorNoLongerMemberOfValidatorGroup()
     public
   {
-    _affiliateAndAddMember(validator, group);
     vm.prank(group);
     validators.removeMember(validator);
     timeTravel(originalValidatorLockedGoldRequirements.duration.add(1));
@@ -818,7 +828,6 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
   {
     address[] memory ExpectedRegisteredValidators = new address[](0);
 
-    _affiliateAndAddMember(validator, group);
     vm.prank(group);
     validators.removeMember(validator);
     timeTravel(originalValidatorLockedGoldRequirements.duration.add(1));
@@ -831,8 +840,6 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
   function test_ShouldResetAccountBalanceRequirements_WhenValidatorNoLongerMemberOfValidatorGroup()
     public
   {
-    _affiliateAndAddMember(validator, group);
-
     vm.prank(group);
     validators.removeMember(validator);
     timeTravel(originalValidatorLockedGoldRequirements.duration.add(1));
@@ -844,7 +851,6 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
   function test_Emits_ValidatorDeregisteredEvent_WhenValidatorNoLongerMemberOfValidatorGroup()
     public
   {
-    _affiliateAndAddMember(validator, group);
     vm.prank(group);
     validators.removeMember(validator);
     timeTravel(originalValidatorLockedGoldRequirements.duration.add(1));
@@ -856,8 +862,6 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
   function test_Reverts_WhenItHasBeenLessThanValidatorLockedGoldRequirementsDurationSinceValidatorWasRemovedromGroup()
     public
   {
-    _affiliateAndAddMember(validator, group);
-
     vm.prank(group);
     validators.removeMember(validator);
     timeTravel(originalValidatorLockedGoldRequirements.duration.sub(1));
@@ -867,22 +871,8 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
   }
 
   function test_Rverts_WhenValidatorStillMemberOfValidatorGroup() public {
-    _affiliateAndAddMember(validator, group);
     vm.expectRevert("Has been group member recently");
     _deregisterValidator(validator);
-  }
-
-  function test_Reverts_WhenAccountNotRegisteredValidator() public {
-    vm.expectRevert("Not a validator");
-    vm.prank(nonValidator);
-    validators.deregisterValidator(INDEX);
-  }
-
-  function test_Reverts_WhenWrongIndexProvided() public {
-    timeTravel(originalValidatorLockedGoldRequirements.duration);
-    vm.expectRevert("deleteElement: index out of range");
-    vm.prank(validator);
-    validators.deregisterValidator(INDEX + 1);
   }
 }
 
@@ -1687,3 +1677,8 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
     validators.deregisterValidatorGroup(INDEX);
   }
 }
+
+// contract ValidatorsTest_AddMember is ValidatorsTest {
+
+// }
+
