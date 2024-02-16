@@ -1545,3 +1545,145 @@ contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
     validators.registerValidatorGroup(commission.unwrap());
   }
 }
+
+contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers is ValidatorsTest {
+  uint256 public constant INDEX = 0;
+
+  function setUp() public {
+    super.setUp();
+
+    _registerValidatorGroupHelper(group, 1);
+  }
+  //when group never had members
+  function test_AccountShouldNoLongerBeValidatorGroup_WhenGroupNeverHadMembers() public {
+    vm.prank(group);
+    validators.deregisterValidatorGroup(INDEX);
+    assertFalse(validators.isValidatorGroup(group));
+  }
+
+  function test_ShouldRemoveAccountFromListOfValidatorGroups() public {
+    address[] memory ExpectedRegisteredValidatorGroups = new address[](0);
+
+    vm.prank(group);
+    validators.deregisterValidatorGroup(INDEX);
+    assertEq(validators.getRegisteredValidatorGroups(), ExpectedRegisteredValidatorGroups);
+  }
+
+  function test_ShouldResetAccountBalanceRequirements() public {
+    vm.prank(group);
+    validators.deregisterValidatorGroup(INDEX);
+
+    assertEq(validators.getAccountLockedGoldRequirement(group), 0);
+  }
+
+  function test_Emits_ValidatorGroupDeregisteredEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorGroupDeregistered(group);
+
+    vm.prank(group);
+    validators.deregisterValidatorGroup(INDEX);
+  }
+
+  function test_Reverts_WhenWrongIndexProvided() public {
+    vm.expectRevert("deleteElement: index out of range");
+    vm.prank(group);
+    validators.deregisterValidatorGroup(INDEX.add(1));
+  }
+
+  function test_Reverts_WhenAccountDoesNotHaveRegisteredValidatorGroup() public {
+    vm.expectRevert("Not a validator group");
+
+    vm.prank(nonValidator);
+    validators.deregisterValidatorGroup(INDEX);
+  }
+}
+
+contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is ValidatorsTest {
+  uint256 public constant INDEX = 0;
+
+  function setUp() public {
+    super.setUp();
+
+    _registerValidatorGroupHelper(group, 1);
+    _registerValidatorHelper();
+
+    vm.prank(validator);
+    validators.affiliate(group);
+
+    vm.prank(group);
+    validators.addFirstMember(validator, address(0), address(0));
+  }
+
+  function test_ShouldMarkAccountAsNotValidatorGroup_whenItHasBeenMoreThanGrouplockedGoldRequirementDuration()
+    public
+  {
+    vm.prank(group);
+    validators.removeMember(validator);
+
+    timeTravel(originalGroupLockedGoldRequirements.duration.add(1));
+
+    vm.prank(group);
+    validators.deregisterValidatorGroup(INDEX);
+
+    assertFalse(validators.isValidatorGroup(group));
+  }
+
+  function test_ShouldRemoveAccountFromValidatorGroupList_whenItHasBeenMoreThanGrouplockedGoldRequirementDuration()
+    public
+  {
+    address[] memory ExpectedRegisteredValidatorGroups = new address[](0);
+
+    vm.prank(group);
+    validators.removeMember(validator);
+
+    timeTravel(originalGroupLockedGoldRequirements.duration.add(1));
+
+    vm.prank(group);
+    validators.deregisterValidatorGroup(INDEX);
+    assertEq(validators.getRegisteredValidatorGroups(), ExpectedRegisteredValidatorGroups);
+  }
+
+  function test_ShouldResetAccountBalanceRequirements_whenItHasBeenMoreThanGrouplockedGoldRequirementDuration()
+    public
+  {
+    vm.prank(group);
+    validators.removeMember(validator);
+
+    timeTravel(originalGroupLockedGoldRequirements.duration.add(1));
+
+    vm.prank(group);
+    validators.deregisterValidatorGroup(INDEX);
+    assertEq(validators.getAccountLockedGoldRequirement(group), 0);
+  }
+
+  function test_Emits_ValidatorGroupDeregistered_whenItHasBeenMoreThanGrouplockedGoldRequirementDuration()
+    public
+  {
+    vm.prank(group);
+    validators.removeMember(validator);
+
+    timeTravel(originalGroupLockedGoldRequirements.duration.add(1));
+
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorGroupDeregistered(group);
+    vm.prank(group);
+    validators.deregisterValidatorGroup(INDEX);
+  }
+
+  function test_Reverts_WhenItHasBeenLessThanGroupLockedGoldRequirementsDuration() public {
+    vm.prank(group);
+    validators.removeMember(validator);
+
+    timeTravel(originalGroupLockedGoldRequirements.duration.sub(1));
+
+    vm.expectRevert("Hasn't been empty for long enough");
+    vm.prank(group);
+    validators.deregisterValidatorGroup(INDEX);
+  }
+
+  function test_Reverts_WhenGroupStillHasMembers() public {
+    vm.expectRevert("Validator group not empty");
+    vm.prank(group);
+    validators.deregisterValidatorGroup(INDEX);
+  }
+}
