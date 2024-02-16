@@ -63,15 +63,6 @@ const parseValidatorGroupParams = (groupParams: any) => {
   }
 }
 
-const parseMembershipHistory = (membershipHistory: any) => {
-  return {
-    epochs: membershipHistory[0],
-    groups: membershipHistory[1],
-    lastRemovedFromGroupTimestamp: membershipHistory[2],
-    tail: membershipHistory[3],
-  }
-}
-
 const HOUR = 60 * 60
 const DAY = 24 * HOUR
 
