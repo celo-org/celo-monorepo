@@ -205,7 +205,7 @@ contract('Validators', (accounts: string[]) => {
 
   // describe('#deregisterValidatorGroup', () => {})
 
-  describe('#addMember', () => {})
+  // describe('#addMember', () => {})
 
   describe('#removeMember', () => {
     const group = accounts[0]
