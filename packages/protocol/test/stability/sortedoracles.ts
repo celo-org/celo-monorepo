@@ -128,14 +128,14 @@ contract('SortedOracles', (accounts: string[]) => {
     it('should revert when token is the null address', async () => {
       await assertTransactionRevertWithReason(
         sortedOracles.addOracle(NULL_ADDRESS, anOracle),
-        'token addr was null or oracle addr was null or oracle addr is not an oracle for token addr'
+        'token addr was null or oracle addr was null or oracle addr is already an oracle for token addr'
       )
     })
 
     it('should revert when the oracle is the null address', async () => {
       await assertTransactionRevertWithReason(
         sortedOracles.addOracle(aToken, NULL_ADDRESS),
-        'token addr was null or oracle addr was null or oracle addr is not an oracle for token addr'
+        'token addr was null or oracle addr was null or oracle addr is already an oracle for token addr'
       )
     })
 
@@ -143,7 +143,7 @@ contract('SortedOracles', (accounts: string[]) => {
       await sortedOracles.addOracle(aToken, anOracle)
       await assertTransactionRevertWithReason(
         sortedOracles.addOracle(aToken, anOracle),
-        'token addr was null or oracle addr was null or oracle addr is not an oracle for token addr'
+        'token addr was null or oracle addr was null or oracle addr is already an oracle for token addr'
       )
     })
 
