@@ -39,6 +39,7 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
    * @param _name The name of the adapted token.
    * @param _symbol The symbol of the adapted token.
    * @param _expectedDecimals The expected number of decimals of the adapted token.
+   * @notice _expectedDecimals must be bigger than _adaptedToken.decimals().
    */
   function initialize(
     address _adaptedToken,
