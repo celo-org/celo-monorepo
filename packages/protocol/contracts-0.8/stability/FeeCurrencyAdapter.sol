@@ -162,7 +162,7 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
   }
 
   function downscale(uint256 value) internal view returns (uint256) {
-    return value / digitDifference;
+    return (value + digitDifference - 1) / digitDifference;
   }
 
   function _setAdaptedToken(address _adaptedToken) internal virtual {
