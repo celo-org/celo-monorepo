@@ -5226,14 +5226,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/targz@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@types/targz/-/targz-1.0.0.tgz#cca3b2c87548d98f961b57306dc36d06f9fd15b2"
-  integrity sha512-kNFPOpsmdtT+DMXHuu5H7gXD5LlMHtS/kSQjuVY3QqxHQqGFV854o+EimC1GZ5/+iYZWzk9dNRiAUFbI/mvUsQ==
-  dependencies:
-    "@types/tar-fs" "*"
-
-"@types/targz@^1.0.0":
+"@types/targz@1.0.4", "@types/targz@^1.0.0":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@types/targz/-/targz-1.0.4.tgz#bf78d46b564ac1a2527532c915892a96ddf1ed01"
   integrity sha512-4i2weIjweWsnrvutLH7dM/+FPVSFSqxb+XKWo61tAiHxyYYHveImqys5JijMboKJz+jhFu24SlFrdVAB0xAMIw==
@@ -6569,7 +6562,7 @@ bip32@3.1.0, bip32@^3.1.0:
     typeforce "^1.11.5"
     wif "^2.0.6"
 
-bip39@2.5.0, bip39@^2.2.0, bip39@^2.5.0, "bip39@git+https://github.com/bitcoinjs/bip39.git#a7ecbfe2e60d0214ce17163d610cad9f7b23140c", "bip39@https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2":
+bip39@2.5.0, bip39@^2.2.0, bip39@^2.5.0, "bip39@https://github.com/bitcoinjs/bip39#a7ecbfe2e60d0214ce17163d610cad9f7b23140c", "bip39@https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2":
   version "3.0.3"
   resolved "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2"
   dependencies:
