@@ -199,60 +199,7 @@ contract('Validators', (accounts: string[]) => {
 
   // describe('#removeMember', () => {})
 
-  describe('#reorderMember', () => {
-    const group = accounts[0]
-    const validator1 = accounts[1]
-    const validator2 = accounts[2]
-    beforeEach(async () => {
-      await registerValidatorGroupWithMembers(group, [validator1, validator2])
-    })
-
-    it('should reorder the list of group members', async () => {
-      await validators.reorderMember(validator2, validator1, NULL_ADDRESS)
-      const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
-      assert.deepEqual(parsedGroup.members, [validator2, validator1])
-    })
-
-    it('should emit the ValidatorGroupMemberReordered event', async () => {
-      const resp = await validators.reorderMember(validator2, validator1, NULL_ADDRESS)
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertContainSubset(log, {
-        event: 'ValidatorGroupMemberReordered',
-        args: {
-          group,
-          validator: validator2,
-        },
-      })
-    })
-
-    it('should revert when the account is not a registered validator group', async () => {
-      await assertTransactionRevertWithReason(
-        validators.reorderMember(validator2, validator1, NULL_ADDRESS, { from: accounts[2] }),
-        'Not a group'
-      )
-    })
-
-    it('should revert when the member is not a registered validator', async () => {
-      await assertTransactionRevertWithReason(
-        validators.reorderMember(accounts[3], validator1, NULL_ADDRESS),
-        'Not a validator'
-      )
-    })
-
-    describe('when the validator is not a member of the validator group', () => {
-      beforeEach(async () => {
-        await validators.deaffiliate({ from: validator2 })
-      })
-
-      it('should revert', async () => {
-        await assertTransactionRevertWithReason(
-          validators.reorderMember(validator2, validator1, NULL_ADDRESS),
-          'Not a member of the group'
-        )
-      })
-    })
-  })
+  // describe('#reorderMember', () => {})
 
   describe('#setNextCommissionUpdate()', () => {
     describe('when the commission is different', () => {

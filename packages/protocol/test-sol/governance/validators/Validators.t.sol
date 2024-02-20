@@ -334,6 +334,34 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     vm.prank(_group);
     validators.registerValidatorGroup(commission.unwrap());
   }
+
+  function _registerValidatorGroupWithMembers(address _group, uint256 _numMembers) public {
+    _registerValidatorGroupHelper(_group, _numMembers);
+
+    for (uint256 i = 0; i < _numMembers; i++) {
+      if (i == 0) {
+        _registerValidatorHelper(validator, validatorPk);
+
+        vm.prank(validator);
+        validators.affiliate(group);
+
+        vm.prank(group);
+        validators.addFirstMember(validator, address(0), address(0));
+      } else {
+        uint256 _validator1Pk = i;
+        address _validator1 = vm.addr(_validator1Pk);
+
+        vm.prank(_validator1);
+        accounts.createAccount();
+        _registerValidatorHelper(_validator1, _validator1Pk);
+        vm.prank(_validator1);
+        validators.affiliate(group);
+
+        vm.prank(group);
+        validators.addMember(_validator1);
+      }
+    }
+  }
 }
 
 contract ValidatorsTest_Initialize is ValidatorsTest {
@@ -1888,33 +1916,6 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
     _registerValidatorGroupWithMembers(group, 1);
   }
 
-  function _registerValidatorGroupWithMembers(address _group, uint256 _numMembers) public {
-    _registerValidatorGroupHelper(_group, _numMembers);
-
-    for (uint256 i = 0; i < _numMembers; i++) {
-      if (i == 0) {
-        _registerValidatorHelper(validator, validatorPk);
-
-        vm.prank(validator);
-        validators.affiliate(group);
-
-        vm.prank(group);
-        validators.addFirstMember(validator, address(0), address(0));
-      } else {
-        uint256 _validator1Pk = i;
-        address _validator1 = vm.addr(_validator1Pk);
-
-        vm.prank(_validator1);
-        accounts.createAccount();
-        _registerValidatorHelper(_validator1, _validator1Pk);
-        vm.prank(validator);
-        validators.affiliate(group);
-        vm.prank(group);
-        validators.addMember(_validator1);
-      }
-    }
-  }
-
   function test_ShouldRemoveMemberFromListOfMembers() public {
     address[] memory expectedMembersList = new address[](0);
 
@@ -1965,8 +1966,6 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
     validators.removeMember(validator);
   }
 
-  // When vlidator ins only member of the group
-
   function test_ShouldMarkGroupIneligible_WhenValidatorIsOnlyMemberOfTheGroup() public {
     vm.prank(group);
     validators.removeMember(validator);
@@ -1993,5 +1992,53 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
     vm.expectRevert("Not affiliated to group");
     vm.prank(group);
     validators.removeMember(validator);
+  }
+}
+
+contract ValidatorsTest_ReorderMember is ValidatorsTest {
+  function setUp() public {
+    super.setUp();
+    _registerValidatorGroupWithMembers(group, 2);
+  }
+
+  function test_ShouldReorderGroupMemberList() public {
+    address[] memory expectedMembersList = new address[](2);
+    expectedMembersList[0] = vm.addr(1);
+    expectedMembersList[1] = validator;
+
+    vm.prank(group);
+    validators.reorderMember(vm.addr(1), validator, address(0));
+    (address[] memory members, , , , , , ) = validators.getValidatorGroup(group);
+
+    assertEq(expectedMembersList, members);
+    assertEq(expectedMembersList.length, members.length);
+  }
+
+  function test_Emits_ValidatorGroupMemberReorderedEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorGroupMemberReordered(group, vm.addr(1));
+
+    vm.prank(group);
+    validators.reorderMember(vm.addr(1), validator, address(0));
+  }
+
+  function test_Reverts_WhenAccountIsNotRegisteredValidatorGroup() public {
+    vm.expectRevert("Not a group");
+    vm.prank(vm.addr(1));
+    validators.reorderMember(vm.addr(1), validator, address(0));
+  }
+  function test_Reverts_WhenMemberNotRegisteredValidator() public {
+    vm.expectRevert("Not a validator");
+    vm.prank(group);
+    validators.reorderMember(nonValidator, validator, address(0));
+  }
+
+  function test_Reverts_whenValidatorNotMemberOfValidatorGroup() public {
+    vm.prank(vm.addr(1));
+    validators.deaffiliate();
+
+    vm.expectRevert("Not a member of the group");
+    vm.prank(group);
+    validators.reorderMember(vm.addr(1), validator, address(0));
   }
 }
