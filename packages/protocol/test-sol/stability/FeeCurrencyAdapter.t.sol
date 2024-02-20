@@ -197,7 +197,7 @@ contract FeeCurrencyAdapter_DebitGasFees is FeeCurrencyAdapterTest {
   function test_ShouldRevert_WhenScaledDebitValueIs0() public {
     vm.expectRevert("Scaled debit value must be > 0.");
     vm.prank(address(0));
-    feeCurrencyAdapter.debitGasFees(address(this), 1e7);
+    feeCurrencyAdapter.debitGasFees(address(this), 0);
   }
 
   function test_ShouldDebitCorrectAmount_WhenExpectedDigitsOnlyOneBigger() public {
@@ -386,10 +386,10 @@ contract FeeCurrencyAdapter_UpscaleAndDownScaleTests is FeeCurrencyAdapterTest {
     assertEq(feeCurrencyAdapter.downscaleVisible(1e24), 1e12);
   }
 
-  function test_ShouldReturn0_WhenSmallEnough() public {
-    assertEq(feeCurrencyAdapter.downscaleVisible(1), 0);
-    assertEq(feeCurrencyAdapter.downscaleVisible(1e6 - 1), 0);
-    assertEq(feeCurrencyAdapter.downscaleVisible(1e12 - 1), 0);
+  function test_ShouldReturn1_WhenSmallEnoughAndRoundingUp() public {
+    assertEq(feeCurrencyAdapter.downscaleVisible(1), 1);
+    assertEq(feeCurrencyAdapter.downscaleVisible(1e6 - 1), 1);
+    assertEq(feeCurrencyAdapter.downscaleVisible(1e12 - 1), 1);
   }
 }
 

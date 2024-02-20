@@ -400,6 +400,9 @@ contract RemoveOracle is SortedOraclesTest {
   function test_ShouldRemoveOracle() public {
     sortedOracle.removeOracle(aToken, oracleAccount, 0);
     assertEq(sortedOracle.isOracle(aToken, oracleAccount), false);
+
+    address[] memory oracles = sortedOracle.getOracles(aToken);
+    assertEq(oracles.length, 0);
   }
 
   function helper_WhenThereIsMoreThanOneReportMade() public {
