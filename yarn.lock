@@ -5231,14 +5231,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/targz@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@types/targz/-/targz-1.0.0.tgz#cca3b2c87548d98f961b57306dc36d06f9fd15b2"
-  integrity sha512-kNFPOpsmdtT+DMXHuu5H7gXD5LlMHtS/kSQjuVY3QqxHQqGFV854o+EimC1GZ5/+iYZWzk9dNRiAUFbI/mvUsQ==
-  dependencies:
-    "@types/tar-fs" "*"
-
-"@types/targz@^1.0.0":
+"@types/targz@1.0.4", "@types/targz@^1.0.0":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@types/targz/-/targz-1.0.4.tgz#bf78d46b564ac1a2527532c915892a96ddf1ed01"
   integrity sha512-4i2weIjweWsnrvutLH7dM/+FPVSFSqxb+XKWo61tAiHxyYYHveImqys5JijMboKJz+jhFu24SlFrdVAB0xAMIw==
