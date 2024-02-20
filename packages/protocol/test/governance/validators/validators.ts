@@ -1,14 +1,12 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
-  assertContainSubset,
   assertEqualBN,
   assertEqualBNArray,
   assertEqualDpBN,
   assertRevert,
   assertTransactionRevertWithReason,
   currentEpochNumber,
-  mineBlocks,
   mineToNextEpoch,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -202,72 +200,7 @@ contract('Validators', (accounts: string[]) => {
   // describe('#reorderMember', () => {})
 
   // describe('#setNextCommissionUpdate()', () => {})
-  describe('#updateCommission()', () => {
-    const group = accounts[0]
-    const newCommission = commission.plus(1)
-
-    beforeEach(async () => {
-      await registerValidatorGroup(group)
-    })
-
-    describe('when activationBlock has passed', () => {
-      let resp: any
-
-      beforeEach(async () => {
-        await validators.setNextCommissionUpdate(newCommission)
-        await mineBlocks(commissionUpdateDelay.toNumber(), web3)
-        resp = await validators.updateCommission()
-      })
-
-      it('should set the validator group commission', async () => {
-        const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
-        assertEqualBN(parsedGroup.commission, newCommission)
-      })
-
-      it('should emit the ValidatorGroupCommissionUpdated event', async () => {
-        assert.equal(resp.logs.length, 1)
-        const log = resp.logs[0]
-        assertContainSubset(log, {
-          event: 'ValidatorGroupCommissionUpdated',
-          args: {
-            group,
-            commission: newCommission,
-          },
-        })
-      })
-    })
-
-    describe('when activationBlock has NOT passed', () => {
-      it('should revert', async () => {
-        await validators.setNextCommissionUpdate(newCommission)
-        await assertTransactionRevertWithReason(
-          validators.updateCommission(),
-          "Can't apply commission update yet"
-        )
-      })
-    })
-
-    describe('when NO Commission has been queued', () => {
-      it('should revert', async () => {
-        await assertTransactionRevertWithReason(
-          validators.updateCommission(),
-          'No commission update queued'
-        )
-      })
-    })
-
-    describe('when try to apply an already applied Commission', () => {
-      it('should revert', async () => {
-        await validators.setNextCommissionUpdate(newCommission)
-        await mineBlocks(commissionUpdateDelay.toNumber(), web3)
-        await validators.updateCommission()
-        await assertTransactionRevertWithReason(
-          validators.updateCommission(),
-          'No commission update queued'
-        )
-      })
-    })
-  })
+  describe('#updateCommission()', () => {})
 
   describe('#calculateEpochScore', () => {
     describe('when uptime is in the interval [0, 1.0]', () => {
