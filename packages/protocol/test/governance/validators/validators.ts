@@ -201,63 +201,7 @@ contract('Validators', (accounts: string[]) => {
 
   // describe('#reorderMember', () => {})
 
-  describe('#setNextCommissionUpdate()', () => {
-    describe('when the commission is different', () => {
-      const newCommission = commission.plus(1)
-      const group = accounts[0]
-
-      describe('when called by a registered validator group', () => {
-        let resp: any
-
-        beforeEach(async () => {
-          await registerValidatorGroup(group)
-          resp = await validators.setNextCommissionUpdate(newCommission)
-        })
-
-        it('should NOT set the validator group commission', async () => {
-          const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
-          assertEqualBN(parsedGroup.commission, commission)
-        })
-
-        it('should set the validator group next commission', async () => {
-          const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
-          assertEqualBN(parsedGroup.nextCommission, newCommission)
-        })
-
-        it('should emit the ValidatorGroupCommissionUpdateQueued event', async () => {
-          assert.equal(resp.logs.length, 1)
-          const log = resp.logs[0]
-          const blockNumber = log.blockNumber
-          assertContainSubset(log, {
-            event: 'ValidatorGroupCommissionUpdateQueued',
-            args: {
-              group,
-              commission: newCommission,
-              activationBlock: commissionUpdateDelay.plus(blockNumber),
-            },
-          })
-        })
-      })
-
-      describe('when the commission is the same', () => {
-        it('should revert', async () => {
-          await assertTransactionRevertWithReason(
-            validators.setNextCommissionUpdate(commission),
-            'Not a validator group'
-          )
-        })
-      })
-
-      describe('when the commission is greater than one', () => {
-        it('should revert', async () => {
-          await assertTransactionRevertWithReason(
-            validators.setNextCommissionUpdate(fixed1.plus(1)),
-            'Not a validator group'
-          )
-        })
-      })
-    })
-  })
+  // describe('#setNextCommissionUpdate()', () => {})
   describe('#updateCommission()', () => {
     const group = accounts[0]
     const newCommission = commission.plus(1)

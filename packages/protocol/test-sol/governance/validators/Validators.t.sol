@@ -111,6 +111,7 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
   );
 
   FixidityLib.Fraction public commission = FixidityLib.newFixedFraction(1, 100);
+  FixidityLib.Fraction public fixed1 = FixidityLib.newFixedFraction(100, 100);
 
   event AccountSlashed(
     address indexed slashed,
@@ -2040,5 +2041,59 @@ contract ValidatorsTest_ReorderMember is ValidatorsTest {
     vm.expectRevert("Not a member of the group");
     vm.prank(group);
     validators.reorderMember(vm.addr(1), validator, address(0));
+  }
+}
+
+contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
+  // When commision is different
+
+  uint256 newCommission = commission.unwrap().add(1);
+
+  // when called by a registered validator group
+
+  function setUp() public {
+    super.setUp();
+    _registerValidatorGroupHelper(group, 1);
+  }
+  function test_ShouldNotSetValidatorGroupCommision() public {
+    vm.prank(group);
+    validators.setNextCommissionUpdate(newCommission);
+
+    (, uint256 _commission, , , , , ) = validators.getValidatorGroup(group);
+
+    assertEq(_commission, commission.unwrap());
+  }
+
+  function test_ShouldSetValidatorGroupNextCommission() public {
+    vm.prank(group);
+    validators.setNextCommissionUpdate(newCommission);
+    (, , uint256 _nextCommission, , , , ) = validators.getValidatorGroup(group);
+
+    assertEq(_nextCommission, newCommission);
+  }
+
+  function test_Emits_ValidatorGroupCommissionUpdateQueuedEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorGroupCommissionUpdateQueued(
+      group,
+      newCommission,
+      commissionUpdateDelay.add(uint256(block.number))
+    );
+    vm.prank(group);
+    validators.setNextCommissionUpdate(newCommission);
+  }
+
+  function test_Reverts_WhenCommissionIsUnchanged() public {
+    vm.expectRevert("Commission must be different");
+
+    vm.prank(group);
+    validators.setNextCommissionUpdate(commission.unwrap());
+  }
+
+  function test_Reverts_whenCommissionGreaterThan1() public {
+    vm.expectRevert("Commission can't be greater than 100%");
+
+    vm.prank(group);
+    validators.setNextCommissionUpdate(fixed1.unwrap().add(1));
   }
 }
