@@ -372,7 +372,7 @@ contract FeeCurrencyAdapter_UpscaleAndDownScaleTests is FeeCurrencyAdapterTest {
     assertEq(feeCurrencyAdapter.downscaleVisible(1e24), 1e12);
   }
 
-  function test_ShouldReturn0_WhenSmallEnough() public {
+  function test_ShouldReturn1_WhenSmallEnoughAndRoundingUp() public {
     assertEq(feeCurrencyAdapter.downscaleVisible(1), 1);
     assertEq(feeCurrencyAdapter.downscaleVisible(1e6 - 1), 1);
     assertEq(feeCurrencyAdapter.downscaleVisible(1e12 - 1), 1);

@@ -161,6 +161,16 @@ contract FeeCurrencyAdapter is Initializable, CalledByVm, IFeeCurrencyAdapter {
     return value * digitDifference;
   }
 
+  /**
+   * @notice Downscales value to the adapted token's native digits.
+   * @dev Downscale is rounding up in favour of protocol. User possibly can pay a bit more than expected (up to 1 unit of a token).
+   * Example:
+   * USDC has 6 decimals and in such case user can pay up to 0.000001 USDC more than expected.
+   * WBTC (currently not supported by Celo chain as fee currency) has 8 decimals and in such case user can pay up to 0.00000001 WBTC more than expected.
+   * Considering the current price of WBTC, it's less than 0.0005 USD. Even when WBTC price would be 1 mil USD, it's still would be only 0.01 USD.
+   * In general it is a very small amount and it is acceptable to round up in favor of the protocol.
+   * @param value The value to downscale. 
+   */
   function downscale(uint256 value) internal view returns (uint256) {
     return (value + digitDifference - 1) / digitDifference;
   }
