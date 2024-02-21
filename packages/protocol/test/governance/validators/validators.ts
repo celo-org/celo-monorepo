@@ -3,7 +3,6 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
   assertEqualBNArray,
-  assertEqualDpBN,
   assertRevert,
   assertTransactionRevertWithReason,
   currentEpochNumber,
@@ -204,62 +203,7 @@ contract('Validators', (accounts: string[]) => {
 
   // describe('#calculateEpochScore', () => {})
 
-  describe('#calculateGroupEpochScore', () => {
-    describe('when all uptimes are in the interval [0, 1.0]', () => {
-      const testGroupUptimeCalculation = async (_uptimes) => {
-        const gracePeriod = await validators.downtimeGracePeriod()
-        const expected = _uptimes
-          .map((uptime) => new BigNumber(uptime))
-          .map((uptime) => calculateScore(uptime, gracePeriod))
-          .reduce((sum, n) => sum.plus(n))
-          .div(_uptimes.length)
-
-        it('should calculate the group score correctly', async () => {
-          assertEqualDpBN(
-            fromFixed(await validators.calculateGroupEpochScore(_uptimes.map(toFixed))),
-            expected,
-            8
-          )
-        })
-      }
-
-      // 5 random uptimes between zero and one.
-      const uptimes = [0.969, 0.485, 0.456, 0.744, 0.257]
-      for (const count of [1, 3, 5]) {
-        it(`when there are ${count} validators in the group`, async () => {
-          await testGroupUptimeCalculation(uptimes.slice(0, count))
-        })
-      }
-
-      it('when only zeros are provided', async () => {
-        await testGroupUptimeCalculation([0, 0, 0, 0])
-      })
-
-      it('when there are zeros in the uptimes', async () => {
-        await testGroupUptimeCalculation([0.75, 0, 0.95])
-      })
-
-      describe('when there are more than maxGroupSize uptimes', () => {
-        it('should revert', async () => {
-          await assertRevert(
-            validators.calculateGroupEpochScore([0.9, 0.9, 0.9, 0.9, 0.9, 0.9].map(toFixed))
-          )
-        })
-      })
-    })
-
-    describe('when no uptimes are provided', () => {
-      it('should revert', async () => {
-        await assertRevert(validators.calculateGroupEpochScore([]))
-      })
-    })
-
-    describe('when uptimes are > 1.0', () => {
-      it('should revert', async () => {
-        await assertRevert(validators.calculateGroupEpochScore([0.95, 1.01, 0.99].map(toFixed)))
-      })
-    })
-  })
+  // describe('#calculateGroupEpochScore', () => {})
 
   describe('#updateValidatorScoreFromSigner', () => {
     const validator = accounts[0]
