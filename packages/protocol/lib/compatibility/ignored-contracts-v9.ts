@@ -14,7 +14,7 @@ export const ignoredContractsV9 = [
 
 export const ignoredContractsV9Only = [
   'SortedOracles'
-  // In CR9 the SortedOracles contract was deployed by Mento team, in CR10 we redeployed it ourselves
+  // Between CR9 and CR10, a Mento upgrade MU03 also upgraded SortedOracles. For the purposes of our compatibility tests, we use the Mento version of the contract in CR10, so that we're comparing the most recent pre-CR10 contracts with the CR10 versions.
 ]
 
 export function getReleaseVersion(tag: string) {

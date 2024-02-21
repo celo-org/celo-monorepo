@@ -47,8 +47,8 @@ if [ "$BRANCH" = "core-contracts.v10" ]; then
 
   # Replace the bytecode of the SortedOracles contracts with the bytecode from Mento core v2.2.1
   orig_value_SortedOracles=$(jq -r '.deployedBytecode.object' out/SortedOracles.sol/SortedOracles.json)
-  substring_to_replace='__$e9f4a9f9de32ce6d7070252f1b707ecbd2$__'
-  replacement='__AddressSortedLinkedListWithMedian_____'
+  substring_to_replace='__$e9f4a9f9de32ce6d7070252f1b707ecbd2$__' # Foundry artifact bytecode differs for linked libraries, instead of library name it inserts a hashed value of library name in-place
+  replacement='__AddressSortedLinkedListWithMedian_____' # Replace with Truffle specific library placeholder
   value_SortedOracles="${orig_value_SortedOracles//$substring_to_replace/$replacement}"
   jq --arg value "$value_SortedOracles" '.deployedBytecode = $value' ../../../$BUILD_DIR/contracts/SortedOracles.json > "temp.json" && mv "temp.json" ../../../$BUILD_DIR/contracts/SortedOracles.json
 
