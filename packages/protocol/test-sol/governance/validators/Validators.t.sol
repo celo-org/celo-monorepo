@@ -114,7 +114,6 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     );
 
   FixidityLib.Fraction public commission = FixidityLib.newFixedFraction(1, 100);
-  FixidityLib.Fraction public fixed1 = FixidityLib.newFixedFraction(100, 100);
 
   event AccountSlashed(
     address indexed slashed,
@@ -2118,7 +2117,7 @@ contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
     vm.expectRevert("Commission can't be greater than 100%");
 
     vm.prank(group);
-    validators.setNextCommissionUpdate(fixed1.unwrap().add(1));
+    validators.setNextCommissionUpdate(FixidityLib.fixed1().unwrap().add(1));
   }
 }
 
@@ -2185,5 +2184,128 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
 
     vm.prank(group);
     validators.updateCommission();
+  }
+}
+
+contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
+  function setUp() public {
+    super.setUp();
+
+    _registerValidatorGroupHelper(group, 1);
+  }
+
+  function _max1(uint256 num) internal view returns (FixidityLib.Fraction memory) {
+    return num > FixidityLib.fixed1().unwrap() ? FixidityLib.fixed1() : FixidityLib.wrap(num);
+  }
+
+  function _safeExponent(
+    FixidityLib.Fraction memory base,
+    FixidityLib.Fraction memory exponent
+  ) internal view returns (uint256) {
+    if (FixidityLib.equals(base, FixidityLib.newFixed(0))) return 0;
+    if (FixidityLib.equals(exponent, FixidityLib.newFixed(0))) return FixidityLib.fixed1().unwrap();
+
+    FixidityLib.Fraction memory result = FixidityLib.fixed1();
+
+    for (uint256 i = 0; i < exponent.unwrap(); i++) {
+      if (FixidityLib.multiply(result, base).value < 1) revert("SafeExponent: Overflow");
+
+      result = FixidityLib.multiply(result, base);
+    }
+    return result.unwrap();
+  }
+  function _calculateScore(uint256 _uptime, uint256 _gracePeriod) internal returns (uint256) {
+    return
+      _safeExponent(
+        _max1(_uptime.add(_gracePeriod)),
+        FixidityLib.wrap(originalValidatorScoreParameters.exponent)
+      );
+  }
+
+  // when uptime is in the interval [0, 1.0]
+  function test_ShouldCalculateScoreCorrectly_WhenUptimeInInterval0AND1() public {
+    FixidityLib.Fraction memory uptime = FixidityLib.newFixedFraction(99, 100);
+    FixidityLib.Fraction memory gracePeriod = FixidityLib.newFixedFraction(
+      validators.downtimeGracePeriod(),
+      1
+    );
+
+    uint256 _expectedScore0 = _calculateScore(uptime.unwrap(), gracePeriod.unwrap());
+    ph.setDebug(true);
+    ph.mockReturn(
+      ph.FRACTION_MUL(),
+      abi.encodePacked(
+        FixidityLib.fixed1().unwrap(),
+        FixidityLib.fixed1().unwrap(),
+        uptime.unwrap(),
+        FixidityLib.fixed1().unwrap(),
+        originalValidatorScoreParameters.exponent,
+        uint256(18)
+      ),
+      abi.encodePacked(uint256(950990049900000000000000), FixidityLib.fixed1().unwrap())
+    );
+    uint256 _score0 = validators.calculateEpochScore(uptime.unwrap());
+
+    uint256 _expectedScore1 = _calculateScore(0, gracePeriod.unwrap());
+    uint256 _expectedScore2 = 1;
+
+    ph.mockReturn(
+      ph.FRACTION_MUL(),
+      abi.encodePacked(
+        FixidityLib.fixed1().unwrap(),
+        FixidityLib.fixed1().unwrap(),
+        uint256(0),
+        FixidityLib.fixed1().unwrap(),
+        originalValidatorScoreParameters.exponent,
+        uint256(18)
+      ),
+      abi.encodePacked(uint256(0), FixidityLib.fixed1().unwrap())
+    );
+
+    uint256 _score1 = validators.calculateEpochScore(0);
+
+    ph.mockReturn(
+      ph.FRACTION_MUL(),
+      abi.encodePacked(
+        FixidityLib.fixed1().unwrap(),
+        FixidityLib.fixed1().unwrap(),
+        FixidityLib.fixed1().unwrap(),
+        FixidityLib.fixed1().unwrap(),
+        originalValidatorScoreParameters.exponent,
+        uint256(18)
+      ),
+      abi.encodePacked(uint256(1), FixidityLib.fixed1().unwrap())
+    );
+
+    uint256 _score2 = validators.calculateEpochScore(FixidityLib.fixed1().unwrap());
+
+    assertEq(_score0, _expectedScore0);
+    assertEq(_score1, _expectedScore1);
+    assertEq(_score2, _expectedScore2);
+  }
+
+  function test_Reverts_WhenUptimeGreaterThan1() public {
+    FixidityLib.Fraction memory uptime = FixidityLib.add(
+      FixidityLib.fixed1(),
+      FixidityLib.newFixedFraction(1,10)
+    );
+
+    ph.setDebug(true);
+
+    ph.mockRevert(
+      ph.FRACTION_MUL(),
+      abi.encodePacked(
+        FixidityLib.fixed1().unwrap(),
+        FixidityLib.fixed1().unwrap(),
+        uptime.unwrap(),
+        FixidityLib.fixed1().unwrap(),
+        originalValidatorScoreParameters.exponent,
+        uint256(18)
+      )
+    );
+    console2.log("### uptime:");
+    console2.log(uptime.unwrap());
+    vm.expectRevert("Uptime cannot be larger than one");
+    validators.calculateEpochScore(uptime.unwrap());
   }
 }

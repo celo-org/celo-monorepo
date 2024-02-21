@@ -10,7 +10,7 @@ import {
   mineToNextEpoch,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import {
@@ -200,36 +200,9 @@ contract('Validators', (accounts: string[]) => {
   // describe('#reorderMember', () => {})
 
   // describe('#setNextCommissionUpdate()', () => {})
-  describe('#updateCommission()', () => {})
+  // describe('#updateCommission()', () => {})
 
-  describe('#calculateEpochScore', () => {
-    describe('when uptime is in the interval [0, 1.0]', () => {
-      it('should calculate the score correctly', async () => {
-        // Compare expected and actual to 8 decimal places.
-        const uptime = new BigNumber(0.99)
-        const grace = await validators.downtimeGracePeriod()
-        assertEqualDpBN(
-          fromFixed(await validators.calculateEpochScore(toFixed(uptime))),
-          calculateScore(uptime, grace),
-          8
-        )
-        assertEqualDpBN(
-          fromFixed(await validators.calculateEpochScore(new BigNumber(0))),
-          calculateScore(new BigNumber(0), grace),
-          8
-        )
-
-        assertEqualDpBN(fromFixed(await validators.calculateEpochScore(fixed1)), 1, 8)
-      })
-    })
-
-    describe('when uptime > 1.0', () => {
-      const uptime = new BigNumber(1.01)
-      it('should revert', async () => {
-        await assertRevert(validators.calculateEpochScore(toFixed(uptime)))
-      })
-    })
-  })
+  // describe('#calculateEpochScore', () => {})
 
   describe('#calculateGroupEpochScore', () => {
     describe('when all uptimes are in the interval [0, 1.0]', () => {
