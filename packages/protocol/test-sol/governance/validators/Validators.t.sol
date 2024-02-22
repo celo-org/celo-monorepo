@@ -324,6 +324,10 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
   }
 
   function _registerValidatorGroupHelper(address _group, uint256 numMembers) internal {
+    if (!accounts.isAccount(_group)) {
+      vm.prank(_group);
+      accounts.createAccount();
+    }
     lockedGold.setAccountTotalLockedGold(
       _group,
       originalGroupLockedGoldRequirements.value.mul(numMembers)
@@ -707,11 +711,11 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
 
     uint256[] memory validatorRegistrationEpochNumberList = new uint256[](1);
     validatorRegistrationEpochNumberList[0] = validatorRegistrationEpochNumber;
-    address[] memory ExpectedMembershipGroups = new address[](1);
-    ExpectedMembershipGroups[0] = address(0);
+    address[] memory expectedMembershipGroups = new address[](1);
+    expectedMembershipGroups[0] = address(0);
 
     assertEq(_epoch, validatorRegistrationEpochNumberList);
-    assertEq(_membershipGroups, ExpectedMembershipGroups);
+    assertEq(_membershipGroups, expectedMembershipGroups);
   }
 
   function test_Emits_ValidatorBlsPublicKeyUpdatedEvent() public {
@@ -2493,5 +2497,114 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
     uptime = FixidityLib.add(FixidityLib.fixed1(), FixidityLib.newFixedFraction(1, 10));
     vm.expectRevert("Uptime cannot be larger than one");
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
+  }
+}
+
+contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
+  function setUp() public {
+    super.setUp();
+    _registerValidatorHelper(validator, validatorPk);
+    validatorRegistrationEpochNumber = validators.getEpochNumber();
+
+    // 8 groups
+    _registerValidatorGroupHelper(group, 1);
+    for (uint256 i = 1; i < 8; i++) {
+      _registerValidatorGroupHelper(vm.addr(i), 1);
+    }
+  }
+
+  address[] public expectedMembershipHistoryGroups;
+  uint256[] public expectedMembershipHistoryEpochs;
+
+  address[] public actualMembershipHistoryGroups;
+  uint256[] public actualMembershipHistoryEpochs;
+
+  function test_ShouldOverwritePreviousEntry_WhenChangingGroupsInSameEpoch() public {
+    uint256 numTest = 10;
+
+    expectedMembershipHistoryGroups.push(address(0));
+    expectedMembershipHistoryEpochs.push(validatorRegistrationEpochNumber);
+
+    for (uint256 i = 0; i < numTest; i++) {
+      blockTravel(ph.epochSize());
+      uint256 epochNumber = validators.getEpochNumber();
+
+      vm.prank(validator);
+      validators.affiliate(group);
+      vm.prank(group);
+      validators.addFirstMember(validator, address(0), address(0));
+
+      (actualMembershipHistoryEpochs, actualMembershipHistoryGroups, , ) = validators
+        .getMembershipHistory(validator);
+
+      expectedMembershipHistoryGroups.push(group);
+
+      expectedMembershipHistoryEpochs.push(epochNumber);
+
+      if (expectedMembershipHistoryGroups.length > membershipHistoryLength) {
+        for (uint256 i = 0; i < expectedMembershipHistoryGroups.length - 1; i++) {
+          expectedMembershipHistoryGroups[i] = expectedMembershipHistoryGroups[i + 1];
+          expectedMembershipHistoryEpochs[i] = expectedMembershipHistoryEpochs[i + 1];
+        }
+
+        expectedMembershipHistoryGroups.pop();
+        expectedMembershipHistoryEpochs.pop();
+      }
+
+      assertEq(actualMembershipHistoryEpochs, expectedMembershipHistoryEpochs);
+      assertEq(actualMembershipHistoryGroups, expectedMembershipHistoryGroups);
+
+      vm.prank(validator);
+      validators.affiliate(vm.addr(1));
+
+      vm.prank(vm.addr(1));
+      validators.addFirstMember(validator, address(0), address(0));
+
+      (actualMembershipHistoryEpochs, actualMembershipHistoryGroups, , ) = validators
+        .getMembershipHistory(validator);
+      expectedMembershipHistoryGroups[expectedMembershipHistoryGroups.length - 1] = vm.addr(1);
+
+      assertEq(actualMembershipHistoryEpochs, expectedMembershipHistoryEpochs);
+      assertEq(actualMembershipHistoryGroups, expectedMembershipHistoryGroups);
+    }
+  }
+
+  // when changing groups more times than membership history length
+
+  function test_ShouldAlwaysStoreMostRecentMemberships_WhenChangingGroupsMoreThanMembershipHistoryLength()
+    public
+  {
+    expectedMembershipHistoryGroups.push(address(0));
+    expectedMembershipHistoryEpochs.push(validatorRegistrationEpochNumber);
+
+    for (uint256 i = 0; i < membershipHistoryLength.add(1); i++) {
+      blockTravel(ph.epochSize());
+      uint256 epochNumber = validators.getEpochNumber();
+
+      vm.prank(validator);
+      validators.affiliate(vm.addr(i + 1));
+      vm.prank(vm.addr(i + 1));
+      validators.addFirstMember(validator, address(0), address(0));
+
+      expectedMembershipHistoryGroups.push(vm.addr(i + 1));
+
+      expectedMembershipHistoryEpochs.push(epochNumber);
+
+      if (expectedMembershipHistoryGroups.length > membershipHistoryLength) {
+        for (uint256 i = 0; i < expectedMembershipHistoryGroups.length - 1; i++) {
+          expectedMembershipHistoryGroups[i] = expectedMembershipHistoryGroups[i + 1];
+          expectedMembershipHistoryEpochs[i] = expectedMembershipHistoryEpochs[i + 1];
+        }
+
+        expectedMembershipHistoryGroups.pop();
+        expectedMembershipHistoryEpochs.pop();
+      }
+
+      (actualMembershipHistoryEpochs, actualMembershipHistoryGroups, , ) = validators
+        .getMembershipHistory(validator);
+
+      assertEq(actualMembershipHistoryEpochs, expectedMembershipHistoryEpochs);
+      assertEq(actualMembershipHistoryGroups, expectedMembershipHistoryGroups);
+    }
   }
 }

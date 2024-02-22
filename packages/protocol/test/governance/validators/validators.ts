@@ -2,7 +2,6 @@ import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
-  assertEqualBNArray,
   assertRevert,
   assertTransactionRevertWithReason,
   currentEpochNumber,
@@ -207,80 +206,7 @@ contract('Validators', (accounts: string[]) => {
 
   // describe('#updateValidatorScoreFromSigner', () => {})
 
-  describe('#updateMembershipHistory', () => {
-    const validator = accounts[0]
-    const groups = accounts.slice(1, -1)
-    let validatorRegistrationEpochNumber: number
-    beforeEach(async () => {
-      await registerValidator(validator)
-      validatorRegistrationEpochNumber = await currentEpochNumber(web3)
-      for (const group of groups) {
-        await registerValidatorGroup(group)
-      }
-    })
-
-    describe('when changing groups in the same epoch', () => {
-      it('should overwrite the previous entry', async () => {
-        const numTests = 10
-        // We store an entry upon registering the validator.
-        const expectedMembershipHistoryGroups = [NULL_ADDRESS]
-        const expectedMembershipHistoryEpochs = [new BigNumber(validatorRegistrationEpochNumber)]
-        for (let i = 0; i < numTests; i++) {
-          await mineToNextEpoch(web3)
-          const epochNumber = await currentEpochNumber(web3)
-          let group = groups[0]
-          await validators.affiliate(group)
-          await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
-            from: group,
-          })
-          let membershipHistory = await validators.getMembershipHistory(validator)
-          expectedMembershipHistoryGroups.push(group)
-          expectedMembershipHistoryEpochs.push(new BigNumber(epochNumber))
-          if (expectedMembershipHistoryGroups.length > membershipHistoryLength.toNumber()) {
-            expectedMembershipHistoryGroups.shift()
-            expectedMembershipHistoryEpochs.shift()
-          }
-          assertEqualBNArray(membershipHistory[0], expectedMembershipHistoryEpochs)
-          assert.deepEqual(membershipHistory[1], expectedMembershipHistoryGroups)
-
-          group = groups[1]
-          await validators.affiliate(group)
-          await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
-            from: group,
-          })
-          membershipHistory = await validators.getMembershipHistory(validator)
-          expectedMembershipHistoryGroups[expectedMembershipHistoryGroups.length - 1] = group
-          assertEqualBNArray(membershipHistory[0], expectedMembershipHistoryEpochs)
-          assert.deepEqual(membershipHistory[1], expectedMembershipHistoryGroups)
-        }
-      })
-    })
-
-    describe('when changing groups more times than membership history length', () => {
-      it('should always store the most recent memberships', async () => {
-        // We store an entry upon registering the validator.
-        const expectedMembershipHistoryGroups = [NULL_ADDRESS]
-        const expectedMembershipHistoryEpochs = [new BigNumber(validatorRegistrationEpochNumber)]
-        for (let i = 0; i < membershipHistoryLength.plus(1).toNumber(); i++) {
-          await mineToNextEpoch(web3)
-          const epochNumber = await currentEpochNumber(web3)
-          await validators.affiliate(groups[i])
-          await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
-            from: groups[i],
-          })
-          expectedMembershipHistoryGroups.push(groups[i])
-          expectedMembershipHistoryEpochs.push(new BigNumber(epochNumber))
-          if (expectedMembershipHistoryGroups.length > membershipHistoryLength.toNumber()) {
-            expectedMembershipHistoryGroups.shift()
-            expectedMembershipHistoryEpochs.shift()
-          }
-          const membershipHistory = await validators.getMembershipHistory(validator)
-          assertEqualBNArray(membershipHistory[0], expectedMembershipHistoryEpochs)
-          assert.deepEqual(membershipHistory[1], expectedMembershipHistoryGroups)
-        }
-      })
-    })
-  })
+  // describe('#updateMembershipHistory', () => {})
 
   describe('#getMembershipInLastEpoch', () => {
     const validator = accounts[0]
