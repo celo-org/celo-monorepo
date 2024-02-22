@@ -2276,8 +2276,7 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
         uint256(18)
       )
     );
-    console2.log("### uptime:");
-    console2.log(uptime.unwrap());
+
     vm.expectRevert("Uptime cannot be larger than one");
     validators.calculateEpochScore(uptime.unwrap());
   }
@@ -2428,5 +2427,86 @@ contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
     );
     vm.expectRevert("Uptime cannot be larger than one");
     uint256 _actualScore = validators.calculateGroupEpochScore(unwrapedUptimes);
+  }
+}
+
+contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
+  FixidityLib.Fraction public gracePeriod;
+  FixidityLib.Fraction public uptime;
+  uint256 public _epochScore;
+  function setUp() public {
+    super.setUp();
+
+    _registerValidatorHelper(validator, validatorPk);
+    gracePeriod = FixidityLib.newFixedFraction(validators.downtimeGracePeriod(), 1);
+
+    uptime = FixidityLib.newFixedFraction(99, 100);
+
+    _epochScore = _calculateScore(uptime.unwrap(), gracePeriod.unwrap());
+
+    ph.mockReturn(
+      ph.FRACTION_MUL(),
+      abi.encodePacked(
+        FixidityLib.fixed1().unwrap(),
+        FixidityLib.fixed1().unwrap(),
+        uptime.unwrap(),
+        FixidityLib.fixed1().unwrap(),
+        originalValidatorScoreParameters.exponent,
+        uint256(18)
+      ),
+      abi.encodePacked(_epochScore, FixidityLib.fixed1().unwrap())
+    );
+  }
+
+  function test_ShouldUpdateValidatorScore_WhenUptimeInRange0And1() public {
+    uint256 _expectedScore = FixidityLib
+      .multiply(
+      originalValidatorScoreParameters
+        .adjustmentSpeed,
+      FixidityLib.newFixedFraction(_epochScore, FixidityLib.fixed1().unwrap())
+    )
+      .unwrap();
+
+    validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
+
+    (, , , uint256 _actualScore, ) = validators.getValidator(validator);
+
+    assertEq(_actualScore, _expectedScore);
+  }
+
+  function test_ShouldUpdateValidatorScore_WhenValidatorHasNonZeroScore() public {
+    validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
+
+    uint256 _expectedScore = FixidityLib
+      .multiply(
+      originalValidatorScoreParameters
+        .adjustmentSpeed,
+      FixidityLib.newFixedFraction(_epochScore, FixidityLib.fixed1().unwrap())
+    )
+      .unwrap();
+
+    _expectedScore = FixidityLib
+      .add(
+      FixidityLib.multiply(
+        FixidityLib.subtract(
+          FixidityLib.fixed1(),
+          originalValidatorScoreParameters.adjustmentSpeed
+        ),
+        FixidityLib.newFixedFraction(_expectedScore, FixidityLib.fixed1().unwrap())
+      ),
+      FixidityLib.newFixedFraction(_expectedScore, FixidityLib.fixed1().unwrap())
+    )
+      .unwrap();
+
+    validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
+    (, , , uint256 _actualScore, ) = validators.getValidator(validator);
+
+    assertEq(_actualScore, _expectedScore);
+  }
+
+  function test_Reverts_WhenUptimeGreaterThan1() public {
+    uptime = FixidityLib.add(FixidityLib.fixed1(), FixidityLib.newFixedFraction(1, 10));
+    vm.expectRevert("Uptime cannot be larger than one");
+    validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
   }
 }

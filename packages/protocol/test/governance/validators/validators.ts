@@ -205,60 +205,7 @@ contract('Validators', (accounts: string[]) => {
 
   // describe('#calculateGroupEpochScore', () => {})
 
-  describe('#updateValidatorScoreFromSigner', () => {
-    const validator = accounts[0]
-    let grace: BigNumber
-
-    beforeEach(async () => {
-      await registerValidator(validator)
-      grace = await validators.downtimeGracePeriod()
-    })
-
-    describe('when 0 <= uptime <= 1.0', () => {
-      const uptime = new BigNumber(0.99)
-
-      let epochScore: BigNumber
-      let adjustmentSpeed: BigNumber
-
-      beforeEach(async () => {
-        epochScore = calculateScore(uptime, grace)
-        adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
-        await validators.updateValidatorScoreFromSigner(validator, toFixed(uptime))
-      })
-
-      it('should update the validator score', async () => {
-        const expectedScore = adjustmentSpeed.times(epochScore).decimalPlaces(12)
-        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
-        assertEqualBN(parsedValidator.score, toFixed(expectedScore))
-      })
-
-      describe('when the validator already has a non-zero score', () => {
-        beforeEach(async () => {
-          await validators.updateValidatorScoreFromSigner(validator, toFixed(uptime))
-        })
-
-        it('should update the validator score', async () => {
-          let expectedScore = adjustmentSpeed.times(epochScore).decimalPlaces(12)
-          expectedScore = new BigNumber(1)
-            .minus(adjustmentSpeed)
-            .times(expectedScore)
-            .plus(expectedScore)
-          const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
-          assertEqualBN(parsedValidator.score, toFixed(expectedScore))
-        })
-      })
-    })
-
-    describe('when uptime > 1.0', () => {
-      const uptime = 1.01
-      it('should revert', async () => {
-        await assertTransactionRevertWithReason(
-          validators.updateValidatorScoreFromSigner(validator, toFixed(uptime)),
-          'Uptime cannot be larger than one'
-        )
-      })
-    })
-  })
+  // describe('#updateValidatorScoreFromSigner', () => {})
 
   describe('#updateMembershipHistory', () => {
     const validator = accounts[0]
