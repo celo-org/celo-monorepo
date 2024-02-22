@@ -32,7 +32,7 @@
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.3",
     "@types/fs-extra": "^8.1.0",
-    "@types/targz": "1.0.0"
+    "@types/targz": "1.0.4"
   },
   "engines": {
     "node": ">=18.14.2"
