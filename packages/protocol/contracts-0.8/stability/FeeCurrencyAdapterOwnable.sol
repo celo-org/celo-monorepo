@@ -7,7 +7,7 @@ import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import "./FeeCurrencyAdapter.sol";
 
 contract FeeCurrencyAdapterOwnable is FeeCurrencyAdapter, Ownable {
-  uint256[48] __gap2;
+  uint256[49] __gap2;
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -29,7 +29,7 @@ contract FeeCurrencyAdapterOwnable is FeeCurrencyAdapter, Ownable {
     uint8 _expectedDecimals
   ) public override {
     _transferOwnership(msg.sender);
-    FeeCurrencyAdapter.initialize(_adaptedToken, _name, _symbol, _expectedDecimals);
+    super.initialize(_adaptedToken, _name, _symbol, _expectedDecimals);
   }
 
   /**
