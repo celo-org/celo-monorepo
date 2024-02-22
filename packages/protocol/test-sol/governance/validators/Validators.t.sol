@@ -2569,8 +2569,6 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
     }
   }
 
-  // when changing groups more times than membership history length
-
   function test_ShouldAlwaysStoreMostRecentMemberships_WhenChangingGroupsMoreThanMembershipHistoryLength()
     public
   {
@@ -2605,6 +2603,40 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
 
       assertEq(actualMembershipHistoryEpochs, expectedMembershipHistoryEpochs);
       assertEq(actualMembershipHistoryGroups, expectedMembershipHistoryGroups);
+    }
+  }
+}
+
+contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
+  function setUp() public {
+    super.setUp();
+
+    _registerValidatorHelper(validator, validatorPk);
+    validatorRegistrationEpochNumber = validators.getEpochNumber();
+
+    // 8 groups
+    _registerValidatorGroupHelper(group, 1);
+    for (uint256 i = 1; i < 8; i++) {
+      _registerValidatorGroupHelper(vm.addr(i), 1);
+    }
+  }
+
+  function test_ShouldAlwaysReturnCorrectMembershipForLastEpoch_WhenChangingMoreTimesThanMembershipHistoryLength()
+    public
+  {
+    for (uint256 i = 0; i < membershipHistoryLength.add(1); i++) {
+      blockTravel(ph.epochSize());
+
+      vm.prank(validator);
+      validators.affiliate(vm.addr(i + 1));
+      vm.prank(vm.addr(i + 1));
+      validators.addFirstMember(validator, address(0), address(0));
+
+      if (i == 0) {
+        assertEq(validators.getMembershipInLastEpoch(validator), address(0));
+      } else {
+        assertEq(validators.getMembershipInLastEpoch(validator), vm.addr(i));
+      }
     }
   }
 }

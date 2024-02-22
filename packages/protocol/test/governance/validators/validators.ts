@@ -208,35 +208,7 @@ contract('Validators', (accounts: string[]) => {
 
   // describe('#updateMembershipHistory', () => {})
 
-  describe('#getMembershipInLastEpoch', () => {
-    const validator = accounts[0]
-    const groups = accounts.slice(1, -1)
-    beforeEach(async () => {
-      await registerValidator(validator)
-      for (const group of groups) {
-        await registerValidatorGroup(group)
-      }
-    })
-
-    describe('when changing groups more times than membership history length', () => {
-      it('should always return the correct membership for the last epoch', async () => {
-        for (let i = 0; i < membershipHistoryLength.plus(1).toNumber(); i++) {
-          await mineToNextEpoch(web3)
-
-          await validators.affiliate(groups[i])
-          await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
-            from: groups[i],
-          })
-
-          if (i === 0) {
-            assert.equal(await validators.getMembershipInLastEpoch(validator), NULL_ADDRESS)
-          } else {
-            assert.equal(await validators.getMembershipInLastEpoch(validator), groups[i - 1])
-          }
-        }
-      })
-    })
-  })
+  // describe('#getMembershipInLastEpoch', () => {})
 
   describe('#getEpochSize', () => {
     it('should always return 100', async () => {
