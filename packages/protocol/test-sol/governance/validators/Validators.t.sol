@@ -286,7 +286,6 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
       signer,
       signerPk
     );
-    ph.setDebug(true);
 
     ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
 
@@ -315,7 +314,6 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
   {
     lockedGold.setAccountTotalLockedGold(_validator, originalValidatorLockedGoldRequirements.value);
     bytes memory _ecdsaPubKey = _generateEcdsaPubKey(_validator, _validatorPk);
-    ph.setDebug(true);
 
     ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(_validator, blsPublicKey, blsPop));
 
@@ -725,7 +723,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
 
     vm.prank(validator);
     accounts.authorizeValidatorSigner(signer, v, r, s);
-    ph.setDebug(true);
+
     ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
 
     vm.expectEmit(true, true, true, true);
@@ -744,7 +742,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
 
     vm.prank(validator);
     accounts.authorizeValidatorSigner(signer, v, r, s);
-    ph.setDebug(true);
+
     ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
 
     vm.expectEmit(true, true, true, true);
@@ -1345,7 +1343,6 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
       signer,
       signerPk
     );
-    ph.setDebug(true);
 
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
@@ -1370,7 +1367,6 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
       signer,
       signerPk
     );
-    ph.setDebug(true);
 
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
@@ -1395,7 +1391,6 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
       otherValidator,
       otherValidatorPk
     );
-    ph.setDebug(true);
 
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
@@ -1456,8 +1451,6 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
   }
 
   function test_ShouldSetNewValidatorBlsPubKey() public {
-    ph.setDebug(true);
-
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
       abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
@@ -1472,8 +1465,6 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
   }
 
   function test_Emits_ValidatorValidatorBlsPublicKeyUpdatedEvent() public {
-    ph.setDebug(true);
-
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
       abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
@@ -1487,8 +1478,6 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
   }
 
   function test_Reverts_WhenPublicKeyIsNot96Bytes() public {
-    ph.setDebug(true);
-
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
       abi.encodePacked(validator, wrongBlsPublicKey, newBlsPop)
@@ -1499,8 +1488,6 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
     validators.updateBlsPublicKey(wrongBlsPublicKey, newBlsPop);
   }
   function test_Reverts_WhenProofOfPossessionIsNot48Bytes() public {
-    ph.setDebug(true);
-
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
       abi.encodePacked(validator, newBlsPublicKey, wrongBlsPop)
@@ -2204,7 +2191,7 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
     );
 
     uint256 _expectedScore0 = _calculateScore(uptime.unwrap(), gracePeriod.unwrap());
-    ph.setDebug(true);
+
     ph.mockReturn(
       ph.FRACTION_MUL(),
       abi.encodePacked(
@@ -2262,8 +2249,6 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
       FixidityLib.fixed1(),
       FixidityLib.newFixedFraction(1, 10)
     );
-
-    ph.setDebug(true);
 
     ph.mockRevert(
       ph.FRACTION_MUL(),
