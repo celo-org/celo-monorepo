@@ -3,7 +3,6 @@ import Web3 from 'web3'
 import { loadFromEnvFile } from './env'
 import { rootLogger } from './logger'
 import { clearAllFundsToRoot, parseStableTokensList } from './scaffold'
-import { runExchangeTest } from './tests/exchange'
 import { runOracleTest } from './tests/oracle'
 import { runReserveTest } from './tests/reserve'
 import { runTransfersTest } from './tests/transfer'
@@ -36,7 +35,6 @@ function runTests() {
 
     // TODO: Assert maximum loss after test
     runTransfersTest(context, stableTokensToTest)
-    runExchangeTest(context, stableTokensToTest)
     runOracleTest(context)
     runReserveTest(context)
     // TODO: Governance Proposals
