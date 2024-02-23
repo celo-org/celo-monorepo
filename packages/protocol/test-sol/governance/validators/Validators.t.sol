@@ -2640,3 +2640,9 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
     }
   }
 }
+
+contract ValidatorsTest_GetEpochSize is ValidatorsTest {
+  function test_ShouldRetun100() public {
+    assertEq(validators.getEpochSize(), 17280);
+  }
+}

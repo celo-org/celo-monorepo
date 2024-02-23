@@ -210,11 +210,7 @@ contract('Validators', (accounts: string[]) => {
 
   // describe('#getMembershipInLastEpoch', () => {})
 
-  describe('#getEpochSize', () => {
-    it('should always return 100', async () => {
-      assertEqualBN(await validators.getEpochSize(), 100)
-    })
-  })
+  // describe('#getEpochSize', () => {})
 
   describe('#getAccountLockedGoldRequirement', () => {
     describe('when a validator group has added members', () => {
