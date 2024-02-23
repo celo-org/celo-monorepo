@@ -275,7 +275,7 @@ contract FeeHandlerTest_RemoveToken is FeeHandlerTest {
     assertEq(feeHandler.getTokenHandler(address(stableToken)), address(0));
   }
 
-  function test_ShouldEmitTokenRemoved() public {
+  function test_Emits_TokenRemoved() public {
     feeHandler.addToken(address(stableToken), address(mentoSeller));
     vm.expectEmit(true, true, true, true);
     emit TokenRemoved(address(stableToken));
