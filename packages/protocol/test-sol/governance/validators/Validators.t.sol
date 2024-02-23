@@ -312,6 +312,11 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     internal
     returns (bytes memory)
   {
+    if (!accounts.isAccount(_validator)) {
+      vm.prank(_validator);
+      accounts.createAccount();
+    }
+
     lockedGold.setAccountTotalLockedGold(_validator, originalValidatorLockedGoldRequirements.value);
     bytes memory _ecdsaPubKey = _generateEcdsaPubKey(_validator, _validatorPk);
 
@@ -328,6 +333,7 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
       vm.prank(_group);
       accounts.createAccount();
     }
+
     lockedGold.setAccountTotalLockedGold(
       _group,
       originalGroupLockedGoldRequirements.value.mul(numMembers)
@@ -2644,5 +2650,64 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
 contract ValidatorsTest_GetEpochSize is ValidatorsTest {
   function test_ShouldRetun100() public {
     assertEq(validators.getEpochSize(), 17280);
+  }
+}
+contract ValidatorsTest_GetAccountLockedGoldRequirement is ValidatorsTest {
+  uint256 public numMembers = 5;
+  uint256[] public actualRequirements;
+  uint256[] removalTimestamps;
+  function setUp() public {
+    super.setUp();
+
+    _registerValidatorGroupHelper(group, 1);
+
+    for (uint256 i = 1; i < numMembers + 1; i++) {
+      _registerValidatorHelper(vm.addr(i), i);
+      vm.prank(vm.addr(i));
+      validators.affiliate(group);
+
+      lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value.mul(i));
+
+      if (i == 1) {
+        vm.prank(group);
+        validators.addFirstMember(vm.addr(i), address(0), address(0));
+      } else {
+        vm.prank(group);
+        validators.addMember(vm.addr(i));
+      }
+
+      actualRequirements.push(validators.getAccountLockedGoldRequirement(group));
+    }
+  }
+
+  function test_ShouldIncreaseRequirementsWithEachAddedMember() public {
+    for (uint256 i = 0; i < numMembers; i++) {
+      assertEq(actualRequirements[i], originalGroupLockedGoldRequirements.value.mul(i.add(1)));
+    }
+  }
+
+  function test_ShouldDecreaseRequirementDuration1SecondAfterRemoval_WhenRemovingMembers() public {
+    for (uint256 i = 1; i < numMembers + 1; i++) {
+      vm.prank(group);
+      validators.removeMember(vm.addr(i));
+      removalTimestamps.push(uint256(block.timestamp));
+      timeTravel(47);
+    }
+
+    for (uint256 i = 0; i < numMembers; i++) {
+      assertEq(
+        validators.getAccountLockedGoldRequirement(group),
+        originalGroupLockedGoldRequirements.value.mul(numMembers.sub(i))
+      );
+
+      uint256 removalTimestamp = removalTimestamps[i];
+      uint256 requirementExpiry = originalGroupLockedGoldRequirements.duration.add(
+        removalTimestamp
+      );
+
+      uint256 currentTimestamp = uint256(block.timestamp);
+
+      timeTravel(requirementExpiry.sub(currentTimestamp).add(1));
+    }
   }
 }

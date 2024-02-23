@@ -212,65 +212,7 @@ contract('Validators', (accounts: string[]) => {
 
   // describe('#getEpochSize', () => {})
 
-  describe('#getAccountLockedGoldRequirement', () => {
-    describe('when a validator group has added members', () => {
-      const group = accounts[0]
-      const numMembers = 5
-      let actualRequirements: BigNumber[]
-      beforeEach(async () => {
-        actualRequirements = []
-        await registerValidatorGroup(group)
-        for (let i = 1; i < numMembers + 1; i++) {
-          const validator = accounts[i]
-          await registerValidator(validator)
-          await validators.affiliate(group, { from: validator })
-          await mockLockedGold.setAccountTotalLockedGold(
-            group,
-            groupLockedGoldRequirements.value.times(i)
-          )
-          if (i === 1) {
-            await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS)
-          } else {
-            await validators.addMember(validator)
-          }
-          actualRequirements.push(await validators.getAccountLockedGoldRequirement(group))
-        }
-      })
-
-      it('should increase the requirement with each added member', async () => {
-        for (let i = 0; i < numMembers; i++) {
-          assertEqualBN(actualRequirements[i], groupLockedGoldRequirements.value.times(i + 1))
-        }
-      })
-
-      describe('when a validator group is removing members', () => {
-        let removalTimestamps: number[]
-        beforeEach(async () => {
-          removalTimestamps = []
-          for (let i = 1; i < numMembers + 1; i++) {
-            const validator = accounts[i]
-            await validators.removeMember(validator)
-            removalTimestamps.push((await web3.eth.getBlock('latest')).timestamp)
-            // Space things out.
-            await timeTravel(47, web3)
-          }
-        })
-
-        it('should decrease the requirement `duration`+1 seconds after removal', async () => {
-          for (let i = 0; i < numMembers; i++) {
-            assertEqualBN(
-              await validators.getAccountLockedGoldRequirement(group),
-              groupLockedGoldRequirements.value.times(numMembers - i)
-            )
-            const removalTimestamp = removalTimestamps[i]
-            const requirementExpiry = groupLockedGoldRequirements.duration.plus(removalTimestamp)
-            const currentTimestamp = (await web3.eth.getBlock('latest')).timestamp
-            await timeTravel(requirementExpiry.minus(currentTimestamp).plus(1).toNumber(), web3)
-          }
-        })
-      })
-    })
-  })
+  // describe('#getAccountLockedGoldRequirement', () => {})
 
   describe('#distributeEpochPaymentsFromSigner', () => {
     const validator = accounts[0]
