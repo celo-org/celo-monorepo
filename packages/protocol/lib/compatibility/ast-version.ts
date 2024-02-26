@@ -1,4 +1,4 @@
-// tslint:disable: max-classes-per-file
+/* eslint-disable max-classes-per-file: 0 */
 import { Artifact } from '@celo/protocol/lib/compatibility/internal';
 import { ContractVersion, ContractVersionChecker, ContractVersionCheckerIndex, ContractVersionDelta, ContractVersionDeltaIndex, ContractVersionIndex, DEFAULT_VERSION_STRING } from '@celo/protocol/lib/compatibility/version';
 import { Address as EJSAddress } from "@ethereumjs/util";
@@ -68,7 +68,7 @@ export class ASTContractVersionsChecker {
     })
     return new ASTContractVersionsChecker(contracts)
   }
-  
+
   constructor(public readonly contracts: ContractVersionCheckerIndex) {}
 
   /**

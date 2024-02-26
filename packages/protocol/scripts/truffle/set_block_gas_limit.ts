@@ -1,4 +1,3 @@
-/* tslint:disable:no-console */
 import {
   getDeployedProxiedContract,
   transferOwnershipOfProxyAndImplementation,
@@ -15,7 +14,7 @@ module.exports = async (callback: (error?: any) => number) => {
       'BlockchainParameters',
       artifacts
     )
-    console.log('Setting block gas limit to', config.blockchainParameters.blockGasLimit)
+    console.info('Setting block gas limit to', config.blockchainParameters.blockGasLimit)
     await bcp.setBlockGasLimit(config.blockchainParameters.blockGasLimit)
     if (!config.governance.skipTransferOwnership) {
       const governance = await getDeployedProxiedContract<GovernanceInstance>(

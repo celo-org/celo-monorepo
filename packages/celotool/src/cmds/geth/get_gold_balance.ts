@@ -39,7 +39,7 @@ export const handler = async (argv: GetGoldBalanceArgv) => {
   if (account.length !== 42) {
     invalidArgumentExit(account, 'Account must be 40 hex-chars')
   }
-
+  // eslint-disable-next-line  no-useless-escape
   const jsCmd = `eth.getBalance\('${account}'\)`
   const returnValues = await execGethJsCmd(gethBinary, datadir, jsCmd)
   console.info('Gold balance: ' + returnValues[0])

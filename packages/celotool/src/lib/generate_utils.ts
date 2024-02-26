@@ -8,7 +8,7 @@ import fs from 'fs'
 import { merge, range, repeat } from 'lodash'
 import { tmpdir } from 'os'
 import path from 'path'
-import * as rlp from 'rlp' // TODO(soloseng): update?
+import * as rlp from 'rlp'
 import { MyceloGenesisConfig } from 'src/lib/interfaces/mycelo-genesis-config'
 import { CurrencyPair } from 'src/lib/k8s-oracle/base'
 import * as ecc from 'tiny-secp256k1'
@@ -136,7 +136,7 @@ export const generateAddress = (mnemonic: string, accountType: AccountType, inde
 export const privateKeyToPublicKey = (privateKey: string): string => {
   // NOTE: elliptic is disabled elsewhere in this library to prevent
   // accidental signing of truncated messages.
-  // tslint:disable-next-line:import-blacklist
+  // eslint-disable-next-line:import-blacklist
   const EC = require('elliptic').ec
   const ec = new EC('secp256k1')
   const ecPrivateKey = ec.keyFromPrivate(Buffer.from(privateKey, 'hex'))

@@ -1,4 +1,3 @@
-// tslint:disable:no-console
 import { CeloTx } from '@celo/connect'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
@@ -35,10 +34,10 @@ const bytecode =
 
 const verbose = false
 
-///////// Configurable values to run only some of the tests during development ////////////////
+/// ////// Configurable values to run only some of the tests during development ////////////////
 // ReplayProtectionTests lets you skip or run only the replay-protection tests during dev
 // Value when committing should be "run"
-// tslint:disable-next-line
+// eslint-disable-next-line
 let replayProtectionTests: 'run' | 'skip' | 'only' = 'run'
 // devFilter can be used during development to only run a subset of testcases.
 // But if you're going to commit you should set them all back to undefined (i.e. no filter).
@@ -52,7 +51,7 @@ const devFilter: Filter = {
   useGatewayFeeRecipient: undefined,
   sendRawTransaction: undefined,
 }
-///////////////////////////////////////////////////////////////////////////////////////////////
+/// ////////////////////////////////////////////////////////////////////////////////////////////
 
 // Filter specifies which subset of cases to generate.
 // (e.g. {lightNode: true, sendRawTransaction: false} makes it only run cases which send through a light
@@ -130,7 +129,7 @@ function generateTestCases(cipIsActivated: boolean) {
 }
 
 function getGethRunConfig(withDonut: boolean, withEspresso: boolean): GethRunConfig {
-  console.log('getGethRunConfig', withDonut)
+  console.info('getGethRunConfig', withDonut)
   return {
     migrate: true,
     runPath: TMP_PATH,
@@ -299,7 +298,7 @@ class TestEnv {
       if (ethCompatible && !this.cipIsActivated) {
         it('fails due to being ethereum-compatible', () => {
           assert.isNull(minedTx, 'Transaction succeeded when it should have failed')
-          assert.equal(error!, notYetActivatedError)
+          assert.equal(error, notYetActivatedError)
         })
       } else if (this.cipIsActivated) {
         if (this.replayProtectionIsNotMandatory) {
@@ -311,7 +310,7 @@ class TestEnv {
           // Replay protection is mandatory, so the transaction should fail
           it('fails due to replay protection being mandatory', () => {
             assert.isNull(minedTx, 'Transaction succeeded when it should have failed')
-            assert.equal(error!, noReplayProtectionError)
+            assert.equal(error, noReplayProtectionError)
           })
         }
       } else {
@@ -357,7 +356,7 @@ class TestEnv {
         if (testCase.contractCreation) {
           tx.data = bytecode
         } else {
-          tx.to = await toAddress
+          tx.to = toAddress
           tx.value = 5
         }
 
@@ -376,7 +375,7 @@ class TestEnv {
               const signed = await w3.eth.accounts.signTransaction(tx, validatorPrivateKey)
               raw = signed.rawTransaction!
             } else {
-              const signed = await kLocal.connection.wallet!.signTransaction(tx)
+              const signed = await kLocal.connection.wallet.signTransaction(tx)
               raw = signed.raw
             }
             // Once the transaction is signed and encoded, it doesn't matter whether we send it with web3 or contractkit
@@ -407,8 +406,8 @@ class TestEnv {
         it(`fails with the expected error (${testCase.errorReason})`, () => {
           assert.notEqual(error, null, "Expected an error but didn't get one")
           assert.match(
-            error!,
-            new RegExp(testCase.errorString!, 'i'),
+            error,
+            new RegExp(testCase.errorString, 'i'),
             `Got "${error}", expected "${testCase.errorString}"`
           )
         })
@@ -453,7 +452,7 @@ describe('CIP-35 >', function (this: any) {
     })
   })
 
-  describe('after activation', async () => {
+  describe('after activation', () => {
     if (devFilter.cipIsActivated === false) {
       return
     }
@@ -479,7 +478,7 @@ describe('CIP-35 >', function (this: any) {
     })
   })
 
-  describe('after cip50 (optional replay protection)', async () => {
+  describe('after cip50 (optional replay protection)', () => {
     if (devFilter.cipIsActivated === false) {
       return
     }
