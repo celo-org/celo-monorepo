@@ -1,5 +1,7 @@
 import { ASTContractVersionsChecker } from '@celo/protocol/lib/compatibility/ast-version'
 import { DefaultCategorizer } from '@celo/protocol/lib/compatibility/categorizer'
+import { getReleaseVersion } from '@celo/protocol/lib/compatibility/ignored-contracts-v9'
+import { CategorizedChanges } from '@celo/protocol/lib/compatibility/report'
 import { ASTBackwardReport, instantiateArtifacts } from '@celo/protocol/lib/compatibility/utils'
 import { writeJsonSync } from 'fs-extra'
 import path from 'path'
@@ -43,6 +45,11 @@ const argv = yargs
     default: false,
     type: 'boolean',
   })
+  .option('new_branch', {
+    alias: 'nb',
+    description: 'Branch name (for versioning)',
+    type: 'string',
+  })
   .help()
   .alias('help', 'h')
   .showHelpOnFail(true)
@@ -80,6 +87,13 @@ try {
     new DefaultCategorizer(),
     out
   )
+
+  const version = getReleaseVersion(argv.new_branch)
+  if (version === 11) {
+    // force redeploy of AddressSortedLinkedListWithMedian for CR11
+    // since it was deployed by Mento team with different settings and bytecode
+    backward.report.libraries.AddressSortedLinkedListWithMedian = {} as CategorizedChanges
+  }
 
   out(`Writing compatibility report to ${outFile} ...`)
   writeJsonSync(outFile, backward, { spaces: 2 })
