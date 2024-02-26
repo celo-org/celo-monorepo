@@ -88,11 +88,15 @@ try {
     out
   )
 
-  const version = getReleaseVersion(argv.new_branch)
-  if (version === 11) {
-    // force redeploy of AddressSortedLinkedListWithMedian for CR11
-    // since it was deployed by Mento team with different settings and bytecode
-    backward.report.libraries.AddressSortedLinkedListWithMedian = {} as CategorizedChanges
+  try {
+    const version = getReleaseVersion(argv.new_branch)
+    if (version === 11) {
+      // force redeploy of AddressSortedLinkedListWithMedian for CR11
+      // since it was deployed by Mento team with different settings and bytecode
+      backward.report.libraries.AddressSortedLinkedListWithMedian = {} as CategorizedChanges
+    }
+  } catch (error) {
+    out(`Error parsing branch name: ${argv.new_branch}\n`)
   }
 
   out(`Writing compatibility report to ${outFile} ...`)
