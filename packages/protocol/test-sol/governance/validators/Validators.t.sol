@@ -2652,6 +2652,7 @@ contract ValidatorsTest_GetEpochSize is ValidatorsTest {
     assertEq(validators.getEpochSize(), 17280);
   }
 }
+
 contract ValidatorsTest_GetAccountLockedGoldRequirement is ValidatorsTest {
   uint256 public numMembers = 5;
   uint256[] public actualRequirements;
@@ -2710,4 +2711,145 @@ contract ValidatorsTest_GetAccountLockedGoldRequirement is ValidatorsTest {
       timeTravel(requirementExpiry.sub(currentTimestamp).add(1));
     }
   }
+}
+
+contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
+  address public delegatee;
+  uint256 public numMembers = 5;
+  uint256[] public actualRequirements;
+  uint256[] public removalTimestamps;
+  FixidityLib.Fraction public delegatedFraction;
+  uint256 public maxPayment = 20122394876;
+
+  uint256 ret;
+  FixidityLib.Fraction public expectedScore;
+  FixidityLib.Fraction public expectedTotalPayment;
+  FixidityLib.Fraction public expectedGroupPayment;
+  uint256 public expectedDelegatedPayment;
+
+  uint256 public expectedValidatorPayment;
+
+  FixidityLib.Fraction public gracePeriod;
+  FixidityLib.Fraction public uptime;
+
+  function setUp() public {
+    super.setUp();
+
+    delegatee = actor("delegatee");
+    delegatedFraction = FixidityLib.newFixedFraction(10, 100);
+    _registerValidatorGroupWithMembers(group, 1);
+    blockTravel(ph.epochSize());
+
+    lockedGold.addSlasher(delegatee);
+
+    vm.prank(validator);
+    accounts.setPaymentDelegation(delegatee, delegatedFraction.unwrap());
+
+    // address account = accounts.signerToAccount(validator);
+    // (address beneficiary, uint256 fraction) = accounts.getPaymentDelegation(account);
+
+    uptime = FixidityLib.newFixedFraction(99, 100);
+
+    expectedScore = FixidityLib.multiply(
+      originalValidatorScoreParameters.adjustmentSpeed,
+      FixidityLib.newFixed(_calculateScore(uptime.unwrap(), validators.downtimeGracePeriod()))
+    );
+
+    console2.log("expectedScore");
+
+    console2.log(FixidityLib.fromFixed(expectedScore));
+
+    expectedTotalPayment = FixidityLib.multiply(
+      expectedScore,
+      FixidityLib.newFixedFraction(maxPayment, FixidityLib.fixed1().unwrap())
+    ); // XXX
+
+    console2.log("expectedTotalPayment");
+    console2.log(FixidityLib.fromFixed(expectedTotalPayment));
+
+    expectedGroupPayment = FixidityLib.multiply(commission, expectedTotalPayment);
+    console2.log("expectedGroupPayment");
+    console2.log(FixidityLib.fromFixed(expectedGroupPayment));
+
+    uint256 remainingPayment = FixidityLib.fromFixed(expectedTotalPayment).sub(
+      FixidityLib.fromFixed(expectedGroupPayment)
+    );
+
+    console2.log("remainingPayment");
+    console2.log(remainingPayment);
+
+    expectedDelegatedPayment = FixidityLib.fromFixed(
+      FixidityLib.multiply(FixidityLib.newFixed(remainingPayment), delegatedFraction)
+    );
+
+    console2.log("expectedDelegatedPayment");
+    console2.log(expectedDelegatedPayment);
+
+    expectedValidatorPayment = remainingPayment.sub(expectedDelegatedPayment);
+
+    console2.log("expectedValidatorPayment");
+    console2.log(expectedValidatorPayment);
+
+    console2.log("uptime");
+    console2.log(uptime.unwrap());
+
+    // ph.setDebug(true);
+
+    ph.mockReturn(
+      ph.FRACTION_MUL(),
+      abi.encodePacked(
+        FixidityLib.fixed1().unwrap(),
+        FixidityLib.fixed1().unwrap(),
+        uptime.unwrap(),
+        FixidityLib.fixed1().unwrap(),
+        originalValidatorScoreParameters.exponent,
+        uint256(18)
+      ),
+      // abi.encodePacked(expectedScore.unwrap(), FixidityLib.fixed1().unwrap())
+      abi.encodePacked(
+        _calculateScore(uptime.unwrap(), validators.downtimeGracePeriod()),
+        FixidityLib.fixed1().unwrap()
+      )
+    );
+    console2.log("EpochScore:");
+    console2.log(_calculateScore(uptime.unwrap(), validators.downtimeGracePeriod()));
+    validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
+  }
+
+  function test_ShouldPayValidator_WhenValidatorAndGroupMeetBalanceRequirements() public {
+    validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
+    console2.log("stableBalance:");
+    console2.log(stableToken.balanceOf(validator));
+    assertEq(stableToken.balanceOf(validator), expectedValidatorPayment);
+
+  }
+
+  function test_ShouldPayGroup_WhenValidatorAndGroupMeetBalanceRequirements() public {
+    validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
+    console2.log("stableBalance:");
+    console2.log(stableToken.balanceOf(group));
+    assertEq(stableToken.balanceOf(group), FixidityLib.fromFixed(expectedGroupPayment));
+
+  }
+  function test_ShouldPayDelegatee_WhenValidatorAndGroupMeetBalanceRequirements() public {
+    validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
+    console2.log("stableBalance:");
+    console2.log(stableToken.balanceOf(delegatee));
+    assertEq(stableToken.balanceOf(delegatee), expectedDelegatedPayment);
+
+  }
+  function test_ShouldReturnTheExpectedTotalPayment_WhenValidatorAndGroupMeetBalanceRequirements()
+    public
+  {
+    validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
+
+    assertEq(
+      validators.distributeEpochPaymentsFromSigner(validator, maxPayment),
+      FixidityLib.fromFixed(expectedTotalPayment)
+    );
+
+  }
+
+  // when the validator score is non-zero
+
 }
