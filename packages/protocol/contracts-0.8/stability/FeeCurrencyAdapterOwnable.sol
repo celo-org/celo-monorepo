@@ -27,7 +27,7 @@ contract FeeCurrencyAdapterOwnable is FeeCurrencyAdapter, Ownable {
     string memory _name,
     string memory _symbol,
     uint8 _expectedDecimals
-  ) public initializer {
+  ) public override initializer {
     _transferOwnership(msg.sender);
     FeeCurrencyAdapter.initialize(_adaptedToken, _name, _symbol, _expectedDecimals);
   }
