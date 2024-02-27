@@ -8,7 +8,7 @@ import {
   mineToNextEpoch,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import {
@@ -19,7 +19,6 @@ import {
   MockLockedGoldContract,
   MockLockedGoldInstance,
   MockStableTokenContract,
-  MockStableTokenInstance,
   RegistryContract,
   RegistryInstance,
   ValidatorsMockContract,
@@ -214,226 +213,9 @@ contract('Validators', (accounts: string[]) => {
 
   // describe('#getAccountLockedGoldRequirement', () => {})
 
-  describe('#distributeEpochPaymentsFromSigner', () => {
-    const validator = accounts[0]
-    const group = accounts[1]
-    const delegatee = accounts[2]
-    const delegatedFraction = toFixed(0.1)
+  // describe('#distributeEpochPaymentsFromSigner', () => {})
 
-    const maxPayment = new BigNumber(20122394876)
-    let mockStableToken: MockStableTokenInstance
-    beforeEach(async () => {
-      await registerValidatorGroupWithMembers(group, [validator])
-      mockStableToken = await MockStableToken.new()
-      await registry.setAddressFor(CeloContractName.StableToken, mockStableToken.address)
-      // Fast-forward to the next epoch, so that the getMembershipInLastEpoch(validator) == group
-      await mineToNextEpoch(web3)
-      await mockLockedGold.addSlasher(accounts[2])
-
-      await accountsInstance.setPaymentDelegation(delegatee, delegatedFraction)
-    })
-
-    describe('when the validator score is non-zero', () => {
-      let ret: BigNumber
-      let expectedScore: BigNumber
-      let expectedTotalPayment: BigNumber
-      let expectedGroupPayment: BigNumber
-      let expectedValidatorPayment: BigNumber
-      let expectedDelegatedPayment: BigNumber
-
-      beforeEach(async () => {
-        const uptime = new BigNumber(0.99)
-        const adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
-
-        expectedScore = adjustmentSpeed.times(
-          calculateScore(new BigNumber(0.99), await validators.downtimeGracePeriod())
-        )
-        expectedTotalPayment = expectedScore.times(maxPayment).dp(0, BigNumber.ROUND_FLOOR)
-        expectedGroupPayment = expectedTotalPayment
-          .times(fromFixed(commission))
-          .dp(0, BigNumber.ROUND_FLOOR)
-        const remainingPayment = expectedTotalPayment.minus(expectedGroupPayment)
-        expectedDelegatedPayment = remainingPayment
-          .times(fromFixed(delegatedFraction))
-          .dp(0, BigNumber.ROUND_FLOOR)
-        expectedValidatorPayment = remainingPayment.minus(expectedDelegatedPayment)
-
-        await validators.updateValidatorScoreFromSigner(validator, toFixed(uptime))
-      })
-
-      describe('when the validator and group meet the balance requirements', () => {
-        beforeEach(async () => {
-          ret = await validators.distributeEpochPaymentsFromSigner.call(validator, maxPayment)
-          await validators.distributeEpochPaymentsFromSigner(validator, maxPayment)
-        })
-
-        it('should pay the validator', async () => {
-          assertEqualBN(await mockStableToken.balanceOf(validator), expectedValidatorPayment)
-        })
-
-        it('should pay the group', async () => {
-          assertEqualBN(await mockStableToken.balanceOf(group), expectedGroupPayment)
-        })
-
-        it('should pay the delegatee', async () => {
-          assertEqualBN(await mockStableToken.balanceOf(delegatee), expectedDelegatedPayment)
-        })
-
-        it('should return the expected total payment', async () => {
-          assertEqualBN(ret, expectedTotalPayment)
-        })
-      })
-
-      describe('when the validator and group meet the balance requirements and no payment is delegated', async () => {
-        beforeEach(async () => {
-          expectedDelegatedPayment = new BigNumber(0)
-          expectedValidatorPayment = expectedTotalPayment.minus(expectedGroupPayment)
-
-          await accountsInstance.deletePaymentDelegation()
-
-          ret = await validators.distributeEpochPaymentsFromSigner.call(validator, maxPayment)
-          await validators.distributeEpochPaymentsFromSigner(validator, maxPayment)
-        })
-
-        it('should pay the validator', async () => {
-          assertEqualBN(await mockStableToken.balanceOf(validator), expectedValidatorPayment)
-        })
-
-        it('should pay the group', async () => {
-          assertEqualBN(await mockStableToken.balanceOf(group), expectedGroupPayment)
-        })
-
-        it('should return the expected total payment', async () => {
-          assertEqualBN(ret, expectedTotalPayment)
-        })
-      })
-
-      describe('when slashing multiplier is halved', () => {
-        let halfExpectedTotalPayment: BigNumber
-        let halfExpectedGroupPayment: BigNumber
-        let halfExpectedValidatorPayment: BigNumber
-        let halfExpectedDelegatedPayment: BigNumber
-
-        beforeEach(async () => {
-          halfExpectedTotalPayment = expectedScore
-            .times(maxPayment)
-            .div(2)
-            .dp(0, BigNumber.ROUND_FLOOR)
-          halfExpectedGroupPayment = halfExpectedTotalPayment
-            .times(fromFixed(commission))
-            .dp(0, BigNumber.ROUND_FLOOR)
-          const remainingPayment = halfExpectedTotalPayment.minus(halfExpectedGroupPayment)
-          halfExpectedDelegatedPayment = remainingPayment
-            .times(fromFixed(delegatedFraction))
-            .dp(0, BigNumber.ROUND_FLOOR)
-          halfExpectedValidatorPayment = remainingPayment.minus(halfExpectedDelegatedPayment)
-
-          await validators.halveSlashingMultiplier(group, { from: accounts[2] })
-          ret = await validators.distributeEpochPaymentsFromSigner.call(validator, maxPayment)
-          await validators.distributeEpochPaymentsFromSigner(validator, maxPayment)
-        })
-
-        it('should pay the validator only half', async () => {
-          assertEqualBN(await mockStableToken.balanceOf(validator), halfExpectedValidatorPayment)
-        })
-
-        it('should pay the group only half', async () => {
-          assertEqualBN(await mockStableToken.balanceOf(group), halfExpectedGroupPayment)
-        })
-
-        it('should pay the delegatee only half', async () => {
-          assertEqualBN(await mockStableToken.balanceOf(delegatee), halfExpectedDelegatedPayment)
-        })
-
-        it('should return the expected total payment', async () => {
-          assertEqualBN(ret, halfExpectedTotalPayment)
-        })
-      })
-
-      describe('when the validator does not meet the balance requirements', () => {
-        beforeEach(async () => {
-          await mockLockedGold.setAccountTotalLockedGold(
-            validator,
-            validatorLockedGoldRequirements.value.minus(11)
-          )
-          ret = await validators.distributeEpochPaymentsFromSigner.call(validator, maxPayment)
-          await validators.distributeEpochPaymentsFromSigner(validator, maxPayment)
-        })
-
-        it('should not pay the validator', async () => {
-          assertEqualBN(await mockStableToken.balanceOf(validator), 0)
-        })
-
-        it('should not pay the group', async () => {
-          assertEqualBN(await mockStableToken.balanceOf(group), 0)
-        })
-
-        it('should not pay the delegatee', async () => {
-          assertEqualBN(await mockStableToken.balanceOf(delegatee), 0)
-        })
-
-        it('should return zero', async () => {
-          assertEqualBN(ret, 0)
-        })
-      })
-
-      describe('when the group does not meet the balance requirements', () => {
-        beforeEach(async () => {
-          await mockLockedGold.setAccountTotalLockedGold(
-            group,
-            groupLockedGoldRequirements.value.minus(11)
-          )
-          ret = await validators.distributeEpochPaymentsFromSigner.call(validator, maxPayment)
-          await validators.distributeEpochPaymentsFromSigner(validator, maxPayment)
-        })
-
-        it('should not pay the validator', async () => {
-          assertEqualBN(await mockStableToken.balanceOf(validator), 0)
-        })
-
-        it('should not pay the group', async () => {
-          assertEqualBN(await mockStableToken.balanceOf(group), 0)
-        })
-
-        it('should not pay the delegatee', async () => {
-          assertEqualBN(await mockStableToken.balanceOf(delegatee), 0)
-        })
-
-        it('should return zero', async () => {
-          assertEqualBN(ret, 0)
-        })
-      })
-    })
-  })
-
-  describe('#forceDeaffiliateIfValidator', () => {
-    const validator = accounts[0]
-    const group = accounts[1]
-
-    beforeEach(async () => {
-      await registerValidator(validator)
-      await registerValidatorGroup(group)
-      await validators.affiliate(group)
-      await mockLockedGold.addSlasher(accounts[2])
-    })
-
-    describe('when the sender is one of the whitelisted slashing addresses', () => {
-      it('should succeed when the account is manually added', async () => {
-        await validators.forceDeaffiliateIfValidator(validator, { from: accounts[2] })
-        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
-        assert.equal(parsedValidator.affiliation, NULL_ADDRESS)
-      })
-    })
-
-    describe('when the sender is not an approved address', () => {
-      it('should revert', async () => {
-        await assertTransactionRevertWithReason(
-          validators.forceDeaffiliateIfValidator(validator),
-          'Only registered slasher can call'
-        )
-      })
-    })
-  })
+  // describe('#forceDeaffiliateIfValidator', () => {})
 
   describe('#groupMembershipInEpoch', () => {
     const validator = accounts[0]
