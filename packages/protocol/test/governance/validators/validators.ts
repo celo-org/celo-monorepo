@@ -1,11 +1,7 @@
-import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
-  assertRevert,
   assertTransactionRevertWithReason,
-  currentEpochNumber,
-  mineToNextEpoch,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { toFixed } from '@celo/utils/lib/fixidity'
@@ -18,7 +14,7 @@ import {
   MockElectionInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
-  MockStableTokenContract,
+  // MockStableTokenContract,
   RegistryContract,
   RegistryInstance,
   ValidatorsMockContract,
@@ -29,22 +25,22 @@ const Accounts: AccountsContract = artifacts.require('Accounts')
 const Validators: ValidatorsMockContract = artifacts.require('ValidatorsMock')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
-const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
+// const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const Registry: RegistryContract = artifacts.require('Registry')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
 Validators.numberFormat = 'BigNumber'
 
-const parseValidatorParams = (validatorParams: any) => {
-  return {
-    ecdsaPublicKey: validatorParams[0],
-    blsPublicKey: validatorParams[1],
-    affiliation: validatorParams[2],
-    score: validatorParams[3],
-    signer: validatorParams[4],
-  }
-}
+// const parseValidatorParams = (validatorParams: any) => {
+//   return {
+//     ecdsaPublicKey: validatorParams[0],
+//     blsPublicKey: validatorParams[1],
+//     affiliation: validatorParams[2],
+//     score: validatorParams[3],
+//     signer: validatorParams[4],
+//   }
+// }
 
 const parseValidatorGroupParams = (groupParams: any) => {
   return {
@@ -81,10 +77,10 @@ contract('Validators', (accounts: string[]) => {
     adjustmentSpeed: toFixed(0.25),
   }
 
-  const one = new BigNumber(1)
-  const max1 = (num: BigNumber) => (num.gt(one) ? one : num)
-  const calculateScore = (uptime: BigNumber, gracePeriod: BigNumber) =>
-    max1(uptime.plus(gracePeriod)).pow(validatorScoreParameters.exponent)
+  // const one = new BigNumber(1)
+  // const max1 = (num: BigNumber) => (num.gt(one) ? one : num)
+  // const calculateScore = (uptime: BigNumber, gracePeriod: BigNumber) =>
+  //   max1(uptime.plus(gracePeriod)).pow(validatorScoreParameters.exponent)
 
   const slashingMultiplierResetPeriod = 30 * DAY
   const membershipHistoryLength = new BigNumber(5)
@@ -145,18 +141,18 @@ contract('Validators', (accounts: string[]) => {
     await validators.registerValidatorGroup(commission, { from: group })
   }
 
-  const registerValidatorGroupWithMembers = async (group: string, members: string[]) => {
-    await registerValidatorGroup(group, members.length)
-    for (const validator of members) {
-      await registerValidator(validator)
-      await validators.affiliate(group, { from: validator })
-      if (validator === members[0]) {
-        await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, { from: group })
-      } else {
-        await validators.addMember(validator, { from: group })
-      }
-    }
-  }
+  // const registerValidatorGroupWithMembers = async (group: string, members: string[]) => {
+  //   await registerValidatorGroup(group, members.length)
+  //   for (const validator of members) {
+  //     await registerValidator(validator)
+  //     await validators.affiliate(group, { from: validator })
+  //     if (validator === members[0]) {
+  //       await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, { from: group })
+  //     } else {
+  //       await validators.addMember(validator, { from: group })
+  //     }
+  //   }
+  // }
 
   // describe('#initialize()', () => {})
 
@@ -217,114 +213,7 @@ contract('Validators', (accounts: string[]) => {
 
   // describe('#forceDeaffiliateIfValidator', () => {})
 
-  describe('#groupMembershipInEpoch', () => {
-    const validator = accounts[0]
-    const groups = accounts.slice(1, -1)
-    const gapSize = 3
-    // Multiple of gapSize
-    const totalEpochs = 24
-    // Stored index on chain
-    let contractIndex = 0
-
-    describe('when the validator is added to different groups with gaps in between epochs', () => {
-      let epochs = []
-
-      beforeEach(async () => {
-        // epochs stores [epochNumber, group] of the corresponding i + 1 indexed entry on chain
-        // i + 1 because registering validators adds a dummy null address as the first entry
-        epochs = []
-        await registerValidator(validator)
-        contractIndex = 1
-        for (const group of groups) {
-          await registerValidatorGroup(group)
-        }
-        // Start at 1 since we can't start with deaffiliate
-        for (let i = 1; i < totalEpochs; i++) {
-          await mineToNextEpoch(web3)
-
-          const epochNumber = await currentEpochNumber(web3)
-          if (i % gapSize === 0) {
-            const group =
-              i % (gapSize * gapSize) !== 0
-                ? groups[Math.floor(i / gapSize) % groups.length]
-                : NULL_ADDRESS
-            contractIndex += 1
-            // Current epochNumber is 1 greater since we just called `mineBlocks`
-            epochs.push([epochNumber + 1, group])
-            // deaffiliate every gapSize^2 entry
-            if (i % (gapSize * gapSize) !== 0) {
-              await validators.affiliate(group)
-              await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
-                from: group,
-              })
-            } else {
-              await validators.deaffiliate()
-            }
-          }
-        }
-      })
-
-      it('should correctly get the group address for exact epoch numbers', async () => {
-        for (let i = 0; i < epochs.length; i++) {
-          const group = epochs[i][1]
-          if (epochs.length - i <= membershipHistoryLength.toNumber()) {
-            assert.equal(
-              await validators.groupMembershipInEpoch(validator, epochs[i][0], 1 + i),
-              group
-            )
-          } else {
-            await assertRevert(validators.groupMembershipInEpoch(validator, epochs[i][0], 1 + i))
-          }
-        }
-      })
-
-      describe('when called with various malformed inputs', () => {
-        it('should revert when epochNumber at given index is greater than provided epochNumber', async () => {
-          await assertRevert(
-            validators.groupMembershipInEpoch(
-              validator,
-              epochs[epochs.length - 2][0],
-              contractIndex
-            )
-          )
-        })
-
-        it("should revert when epochNumber fits into a different index's bucket", async () => {
-          await assertRevert(
-            validators.groupMembershipInEpoch(
-              validator,
-              epochs[epochs.length - 1][0],
-              contractIndex - 2
-            )
-          )
-        })
-
-        it("should revert when epochNumber is greater than the chain's current epochNumber", async () => {
-          const epochNumber = await currentEpochNumber(web3)
-          await assertRevert(
-            validators.groupMembershipInEpoch(validator, epochNumber + 1, contractIndex)
-          )
-        })
-
-        it('should revert when provided index is greater than greatest index on chain', async () => {
-          const epochNumber = await currentEpochNumber(web3)
-          await assertRevert(
-            validators.groupMembershipInEpoch(validator, epochNumber, contractIndex + 1)
-          )
-        })
-
-        it('should revert when provided index is less than `tail` index on chain', async () => {
-          await assertRevert(
-            validators.groupMembershipInEpoch(
-              validator,
-              epochs[epochs.length - membershipHistoryLength.toNumber() - 1][0],
-              contractIndex - membershipHistoryLength.toNumber()
-            )
-          )
-        })
-      })
-    })
-  })
+  // describe('#groupMembershipInEpoch', () => {})
 
   describe('#halveSlashingMultiplier', async () => {
     const group = accounts[1]

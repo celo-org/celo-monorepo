@@ -2344,9 +2344,9 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
             expectedMembershipHistoryEpochs.push(epochNumber);
 
             if (expectedMembershipHistoryGroups.length > membershipHistoryLength) {
-                for (uint256 i = 0; i < expectedMembershipHistoryGroups.length - 1; i++) {
-                    expectedMembershipHistoryGroups[i] = expectedMembershipHistoryGroups[i + 1];
-                    expectedMembershipHistoryEpochs[i] = expectedMembershipHistoryEpochs[i + 1];
+                for (uint256 j = 0; j < expectedMembershipHistoryGroups.length - 1; j++) {
+                    expectedMembershipHistoryGroups[j] = expectedMembershipHistoryGroups[j + 1];
+                    expectedMembershipHistoryEpochs[j] = expectedMembershipHistoryEpochs[j + 1];
                 }
 
                 expectedMembershipHistoryGroups.pop();
@@ -2389,9 +2389,9 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
             expectedMembershipHistoryEpochs.push(epochNumber);
 
             if (expectedMembershipHistoryGroups.length > membershipHistoryLength) {
-                for (uint256 i = 0; i < expectedMembershipHistoryGroups.length - 1; i++) {
-                    expectedMembershipHistoryGroups[i] = expectedMembershipHistoryGroups[i + 1];
-                    expectedMembershipHistoryEpochs[i] = expectedMembershipHistoryEpochs[i + 1];
+                for (uint256 j = 0; j < expectedMembershipHistoryGroups.length - 1; j++) {
+                    expectedMembershipHistoryGroups[j] = expectedMembershipHistoryGroups[j + 1];
+                    expectedMembershipHistoryEpochs[j] = expectedMembershipHistoryEpochs[j + 1];
                 }
 
                 expectedMembershipHistoryGroups.pop();
@@ -2591,7 +2591,6 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
         validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
     }
 
-    // XXX:when the validator score is non-zero
     function test_ShouldPayValidator_WhenValidatorAndGroupMeetBalanceRequirements() public {
         validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
         assertEq(stableToken.balanceOf(validator), expectedValidatorPayment);
@@ -2611,8 +2610,6 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
         validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
         assertEq(validators.distributeEpochPaymentsFromSigner(validator, maxPayment), expectedTotalPayment);
     }
-
-    // XXX: when the validator and group meet the balance requirements and no payment is delegated
 
     function test_ShouldPayValidator_WhenValidatorAndGroupMeetBalanceRequirementsAndNoPaymentDelegated() public {
         expectedDelegatedPayment = 0;
@@ -2648,8 +2645,6 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
         assertEq(stableToken.balanceOf(group), expectedGroupPayment);
     }
 
-    /// XXX: when slashing multiplier is halved
-
     function test_shouldPayValidatorOnlyHalf_whenSlashingMultiplierIsHalved() public {
         vm.prank(paymentDelegatee);
         validators.halveSlashingMultiplier(group);
@@ -2682,8 +2677,6 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
         assertEq(validators.distributeEpochPaymentsFromSigner(validator, maxPayment), halfExpectedTotalPayment);
     }
 
-    /// XXX: when the validator does not meet the balance requirements
-
     function test_ShouldNotPayValidator_WhenValidatorDoesNotMeetBalanceRequirement() public {
         lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value.sub(11));
 
@@ -2710,8 +2703,6 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
 
         assertEq(validators.distributeEpochPaymentsFromSigner(validator, maxPayment), 0);
     }
-
-    ///XXX: when the group does not meet the balance requirements
 
     function test_ShouldNotPayValidator_WhenGroupDoesNotMeetBalanceRequirement() public {
         lockedGold.setAccountTotalLockedGold(validator, originalGroupLockedGoldRequirements.value.sub(11));
@@ -2767,3 +2758,104 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
     }
 }
 
+contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
+    uint256 totalEpochs = 24;
+    uint256 gapSize = 3;
+    uint256 contractIndex;
+
+    EpochInfo[] public epochInfoList;
+    uint256 groupLength = 8;
+
+    struct EpochInfo {
+        uint256 epochNumber;
+        address groupy;
+    }
+
+    function setUp() public {
+        super.setUp();
+
+        _registerValidatorHelper(validator, validatorPk);
+        contractIndex = 1;
+        _registerValidatorGroupHelper(group, 1);
+        for (uint256 i = 1; i < groupLength; i++) {
+            _registerValidatorGroupHelper(vm.addr(i), 1);
+        }
+
+        // Start at 1 since we can't start with deaffiliate
+        for (uint256 i = 1; i < totalEpochs; i++) {
+            blockTravel(ph.epochSize());
+
+            uint256 epochNumber = validators.getEpochNumber();
+
+            if (i % gapSize == 0) {
+                address _group = (i % gapSize.mul(gapSize)) != 0 ? vm.addr(i.div(gapSize) % groupLength) : address(0);
+
+                contractIndex += 1;
+
+                epochInfoList.push(EpochInfo(epochNumber, _group));
+
+                if (i % (gapSize.mul(gapSize)) != 0) {
+                    vm.prank(validator);
+                    validators.affiliate(_group);
+
+                    vm.prank(_group);
+                    validators.addFirstMember(validator, address(0), address(0));
+                } else {
+                    vm.prank(validator);
+                    validators.deaffiliate();
+                }
+            }
+        }
+    }
+
+    function test_ShouldCorrectlyGetGroupAddressForExactEpochNumbers() public {
+        for (uint256 i = 0; i < epochInfoList.length; i++) {
+            address _group = epochInfoList[i].groupy;
+
+            if (epochInfoList.length.sub(i) <= membershipHistoryLength) {
+                assertEq(
+                    validators.groupMembershipInEpoch(validator, epochInfoList[i].epochNumber, uint256(1).add(i)),
+                    _group
+                );
+            } else {
+                vm.expectRevert("index out of bounds");
+                validators.groupMembershipInEpoch(validator, epochInfoList[i].epochNumber, uint256(1).add(i));
+            }
+        }
+    }
+
+    function test_Reverts_WhenEpochNumberAtGivenIndexIsGreaterThanProvidedEpochNumber() public {
+        vm.expectRevert("index out of bounds");
+        validators.groupMembershipInEpoch(
+            validator, epochInfoList[epochInfoList.length.sub(2)].epochNumber, contractIndex
+        );
+    }
+
+    function test_Reverts_WhenEpochNumberFitsIntoDifferentIndexBucket() public {
+        vm.expectRevert("provided index does not match provided epochNumber at index in history.");
+        validators.groupMembershipInEpoch(
+            validator, epochInfoList[epochInfoList.length.sub(1)].epochNumber, contractIndex.sub(2)
+        );
+    }
+
+    function test_Reverts_WhenProvidedEpochNumberGreaterThanCurrentEpochNumber() public {
+        uint256 _epochNumber = validators.getEpochNumber();
+        vm.expectRevert("Epoch cannot be larger than current");
+        validators.groupMembershipInEpoch(validator, _epochNumber.add(1), contractIndex);
+    }
+
+    function test_Reverts_WhenProvidedIndexGreaterThanIndexOnChain() public {
+        uint256 _epochNumber = validators.getEpochNumber();
+        vm.expectRevert("index out of bounds");
+        validators.groupMembershipInEpoch(validator, _epochNumber, contractIndex.add(1));
+    }
+
+    function test_Reverts_WhenProvidedIndexIsLessThanTailIndexOnChain() public {
+        vm.expectRevert("provided index does not match provided epochNumber at index in history.");
+        validators.groupMembershipInEpoch(
+            validator,
+            epochInfoList[epochInfoList.length.sub(membershipHistoryLength).sub(1)].epochNumber,
+            contractIndex.sub(membershipHistoryLength)
+        );
+    }
+}
