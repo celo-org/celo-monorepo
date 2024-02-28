@@ -498,7 +498,8 @@ export const transferOrdinals = async (
       'hex'
     ),
     gas: '40000',
-    gasPrice: txOptions.gasPrice,
+    maxFeePerGas: txOptions.gasPrice,
+    maxPriorityFeePerGas: '0',
     nonce: txOptions.nonce,
   })
 }
