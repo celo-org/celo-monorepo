@@ -498,8 +498,8 @@ export const transferOrdinals = async (
       'hex'
     ),
     gas: '40000',
-    maxFeePerGas: txOptions.gasPrice,
-    maxPriorityFeePerGas: '0',
+    maxFeePerGas: Web3.utils.toWei('5', 'gwei'),
+    maxPriorityFeePerGas: '1',
     nonce: txOptions.nonce,
   })
 }
