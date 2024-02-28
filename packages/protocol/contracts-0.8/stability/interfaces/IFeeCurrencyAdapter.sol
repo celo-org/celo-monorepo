@@ -8,7 +8,7 @@ interface IFeeCurrencyAdapter {
   function getAdaptedToken() external view returns (address);
 
   /**
-   * @return The multiplier that should be used when upscaling and downscaling.
+   * @return The multiplier that should be used when upscaling and downscaling. This is the result of 10**(expectedDecimals - getAdaptedToken().decimals()).
    */
   function digitDifference() external view returns (uint96);
 
