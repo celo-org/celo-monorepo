@@ -21,11 +21,11 @@ function hasEmptyBytecode(contract: any) {
 }
 
 function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
-  console.log(`protocol: Compiling solidity to ${outdir}`)
+  console.info(`protocol: Compiling solidity to ${outdir}`)
 
   // the reason to generate a different folder is to avoid path collisions, which could be very dangerous
   for (const contractPackage of contractPackages) {
-    console.log(`Building Contracts for package ${contractPackage.name}`)
+    console.info(`Building Contracts for package ${contractPackage.name}`)
 
     const contractPath = path.join(
       './',
@@ -34,7 +34,7 @@ function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
       contractPackage.contractsFolder
     )
     if (!existsSync(contractPath)) {
-      console.log(`Contract package named ${contractPackage.name} doesn't exist`)
+      console.info(`Contract package named ${contractPackage.name} doesn't exist`)
       continue
     }
 
@@ -44,9 +44,22 @@ function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
   }
 
   // compile everything else
-  exec(
-    `yarn run --silent truffle compile --contracts_directory="./contracts/" --build_directory=${outdir}`
-  )
+  try {
+    exec(
+      `yarn run --silent truffle compile --contracts_directory="./contracts/" --build_directory=${outdir}`
+    )
+  } catch (e) {
+    console.error(e)
+    console.info(
+      `
+
+    If error is something like "using solc 0.5.13, but  specify "pragma solidity >=0.8.7 <0.8.20".
+    Then try to delete the 0.8 folder inside of contracts folder (not the contracts-0.8 folder)
+
+    `
+    )
+    process.exit(1)
+  }
 
   const contracts = coreContractsOnly ? CoreContracts : ImplContracts
   // check that there were no errors
@@ -67,7 +80,7 @@ function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
         process.exit(1)
       }
     } catch (e) {
-      console.log(e)
+      console.info(e)
       console.debug(
         `WARNING: ${contractName} artifact could not be fetched. Maybe it doesn't exist?`
       )
@@ -76,10 +89,10 @@ function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
 }
 
 function generateFilesForTruffle({ coreContractsOnly, truffleTypes: outdir }: BuildTargets) {
-  // tslint:disable-next-line
+  // eslint-disable-next-line
   for (let externalContractPackage of contractPackages) {
     const outdirExternal = outdir + '-' + externalContractPackage.name
-    console.log(
+    console.info(
       `protocol: Generating Truffle Types for external dependency ${externalContractPackage.name} to ${outdirExternal}`
     )
 
@@ -89,7 +102,7 @@ function generateFilesForTruffle({ coreContractsOnly, truffleTypes: outdir }: Bu
     )
   }
 
-  console.log(`protocol: Generating Truffle Types to ${outdir}`)
+  console.info(`protocol: Generating Truffle Types to ${outdir}`)
   exec(`rm -rf "${outdir}"`)
 
   const globPattern = coreContractsOnly
@@ -100,7 +113,7 @@ function generateFilesForTruffle({ coreContractsOnly, truffleTypes: outdir }: Bu
 }
 
 function generateFilesForEthers({ coreContractsOnly, ethersTypes: outdir }: BuildTargets) {
-  console.log(`protocol: Generating Ethers Types to ${outdir}`)
+  console.info(`protocol: Generating Ethers Types to ${outdir}`)
   exec(`rm -rf "${outdir}"`)
 
   const contractKitContracts = coreContractsOnly
@@ -112,7 +125,7 @@ function generateFilesForEthers({ coreContractsOnly, ethersTypes: outdir }: Buil
 }
 
 async function generateFilesForContractKit({ coreContractsOnly, web3Types: outdir }: BuildTargets) {
-  console.log(`protocol: Generating Web3 Types to ${outdir}`)
+  console.info(`protocol: Generating Web3 Types to ${outdir}`)
   exec(`rm -rf ${outdir}`)
   const relativePath = path.relative(ROOT_DIR, outdir)
 

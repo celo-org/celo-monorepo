@@ -1,4 +1,3 @@
-/* tslint:disable:no-console */
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloTxObject } from '@celo/connect'
 import { getBlsPoP, getBlsPublicKey } from '@celo/cryptographic-utils/lib/bls'
@@ -400,5 +399,5 @@ module.exports = async (_deployer: any, networkName: string) => {
       to: election.address,
     })
   }
-  console.log('Done with migrations')
+  console.info('Done with migrations')
 }

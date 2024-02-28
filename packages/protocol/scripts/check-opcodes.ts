@@ -21,13 +21,14 @@ const handleGrepOutput = (err: ExecException, grepOutput: string, stderr: string
     const contractMatch = contractPath.slice(contractPath.lastIndexOf('/') + 1)
     if (CHECK_CONTRACTS.includes(contractMatch)) {
       safe = false
-      console.error(`Core contract ${contractMatch} should not include ${UNSAFE_OPCODES} opcodes`)
+      console.error(
+        `Core contract ${contractMatch} should not include ${UNSAFE_OPCODES.join('+')} opcodes`
+      )
     }
   })
 
   if (safe) {
-    // tslint:disable:no-console
-    console.log(`Core contracts are safe against ${UNSAFE_OPCODES} vulnerabilities`)
+    console.info(`Core contracts are safe against ${UNSAFE_OPCODES.join('+')} vulnerabilities`)
   } else {
     process.exit(1)
   }
