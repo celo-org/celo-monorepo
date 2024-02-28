@@ -18,7 +18,7 @@ export class ASTBackwardReport {
   static create = (
     oldArtifactsFolder: string,
     newArtifactsFolders: string[],
-    oldArtifacts: BuildArtifacts,
+    oldArtifacts: BuildArtifacts[],
     newArtifacts: BuildArtifacts[],
     exclude: RegExp,
     categorizer: Categorizer,
@@ -55,7 +55,7 @@ export class ASTBackwardReport {
     public readonly newArtifactsFolder: string[],
     public readonly exclude: string,
     public readonly report: ASTDetailedVersionedReport
-  ) {}
+  ) { }
 }
 
 function ensureValidArtifacts(artifactsPaths: string[]): void {

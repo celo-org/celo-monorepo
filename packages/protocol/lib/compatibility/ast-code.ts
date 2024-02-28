@@ -45,7 +45,7 @@ const OUT_VOID_PARAMETER_STRING = 'void'
  * contract folders.
  */
 export class ASTCodeCompatibilityReport {
-  constructor(private readonly changes: Change[]) {}
+  constructor(private readonly changes: Change[]) { }
   push(...changes: Change[]) {
     this.changes.push(...changes)
   }
@@ -101,7 +101,7 @@ function createMethodIndex(methods: Method[]): MethodIndex {
   return Object.assign({}, ...asPairs)
 }
 
-function mergeReports(reports: ASTCodeCompatibilityReport[]): ASTCodeCompatibilityReport{
+function mergeReports(reports: ASTCodeCompatibilityReport[]): ASTCodeCompatibilityReport {
   const report = new ASTCodeCompatibilityReport([])
   reports.forEach((r: ASTCodeCompatibilityReport): void => {
     report.include(r)
@@ -246,25 +246,31 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
 /**
  * Runs an ast code comparison and returns the spotted changes from the built artifacts given.
  *
- * @param oldArtifacts
- * @param newArtifacts
+ * @param oldArtifactsSet
+ * @param newArtifactsSets
  */
 export function reportASTIncompatibilities(
   // oldArtifacts also needs to be a set
   // https://github.com/celo-org/celo-monorepo/issues/10567
-  oldArtifacts: BuildArtifacts,
+  oldArtifactsSet: BuildArtifacts[],
   newArtifactsSets: BuildArtifacts[]): ASTCodeCompatibilityReport {
-    
+
   let out: ASTCodeCompatibilityReport[] = []
   for (const newArtifacts of newArtifactsSets) {
     const reports = newArtifacts.listArtifacts()
-    .map((newArtifact) => {
-      const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
-      const oldZContract = oldArtifact ? makeZContract(oldArtifact) : null
-      return generateASTCompatibilityReport(oldZContract, oldArtifacts, makeZContract(newArtifact), newArtifacts)
-    })
-    out = [...out, ...reports] 
-    
+      .map((newArtifact) => {
+
+        for (const oldArtifacts of oldArtifactsSet) {
+          const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
+          if (oldArtifact) {
+            return generateASTCompatibilityReport(makeZContract(oldArtifact), oldArtifacts, makeZContract(newArtifact), newArtifacts)
+          }
+        }
+
+        return generateASTCompatibilityReport(null, oldArtifactsSet[0], makeZContract(newArtifact), newArtifacts)
+      })
+    out = [...out, ...reports]
+
   }
 
   return mergeReports(out)

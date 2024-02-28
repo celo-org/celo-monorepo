@@ -1,18 +1,18 @@
 /* eslint-disable no-console: 0 */
 import { ensureLeading0x } from '@celo/base/lib/address'
 import {
-    LibraryAddresses,
-    LibraryPositions,
-    linkLibraries,
-    stripMetadata,
-    verifyAndStripLibraryPrefix,
+  LibraryAddresses,
+  LibraryPositions,
+  linkLibraries,
+  stripMetadata,
+  verifyAndStripLibraryPrefix,
 } from '@celo/protocol/lib/bytecode'
 import { verifyProxyStorageProof } from '@celo/protocol/lib/proxy-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { ProxyInstance, RegistryInstance } from 'types'
 import Web3 from 'web3'
-import { ignoredContractsV9 } from './ignored-contracts-v9'
+import { ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'
 
 let ignoredContracts = [
   // This contract is not proxied
@@ -143,8 +143,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
     throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
   } else {
     console.log(
-      `${
-        isLibrary(contract, context) ? 'Library' : 'Contract'
+      `${isLibrary(contract, context) ? 'Library' : 'Contract'
       } deployed at ${implementationAddress} matches ${contract}`
     )
   }
@@ -231,15 +230,17 @@ export const verifyBytecodes = async (
 
   const compiledContracts = artifacts.listArtifacts().map((a) => a.contractName)
 
-  if (version >= 9) {
+  if (version > 9) {
     ignoredContracts = [...ignoredContracts, ...ignoredContractsV9]
+  } else if (version == 9) {
+    ignoredContracts = [...ignoredContracts, ...ignoredContractsV9, ...ignoredContractsV9Only]
   }
 
   const queue = contracts.filter(
     (contract) => !ignoredContracts.includes(contract)
-    ).filter(
-      (contract) => compiledContracts.includes(contract)
-      )
+  ).filter(
+    (contract) => compiledContracts.includes(contract)
+  )
 
   const visited: Set<string> = new Set(queue)
 

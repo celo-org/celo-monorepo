@@ -9,6 +9,7 @@ import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "../../contracts/common/FixidityLib.sol";
 import "./UsingRegistry.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 /**
  * @title Stores and provides gas price minimum for various currencies.
@@ -38,6 +39,7 @@ contract GasPriceMinimum is
   FixidityLib.Fraction public adjustmentSpeed;
 
   uint256 public baseFeeOpCodeActivationBlock;
+  uint256 public constant ABSOLUTE_MINIMAL_GAS_PRICE = 1;
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -53,7 +55,7 @@ contract GasPriceMinimum is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 0);
+    return (1, 2, 0, 1);
   }
 
   /**
@@ -150,12 +152,7 @@ contract GasPriceMinimum is
     }
   }
 
-  /**
-   * @notice Retrieve the current gas price minimum for a currency.
-   * @param tokenAddress The currency the gas price should be in (defaults to gold).
-   * @return current gas price minimum in the requested currency
-   */
-  function getGasPriceMinimum(address tokenAddress) external view returns (uint256) {
+  function _getGasPriceMinimum(address tokenAddress) private view returns (uint256) {
     if (
       tokenAddress == address(0) ||
       tokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)
@@ -170,6 +167,21 @@ contract GasPriceMinimum is
       (rateNumerator, rateDenominator) = sortedOracles.medianRate(tokenAddress);
       return ((gasPriceMinimum() * rateNumerator) / rateDenominator);
     }
+  }
+
+  /**
+   * @notice Retrieve the current gas price minimum for a currency.
+   * When caled for 0x0 or Celo address, it returns gasPriceMinimum().
+   * For other addresses it returns gasPriceMinimum() mutiplied by 
+   * the SortedOracles median of the token. It does not check tokenAddress is a valid fee currency.
+   * this function will never returns values less than ABSOLUTE_MINIMAL_GAS_PRICE.
+   * If Oracle rate doesn't exist, it returns ABSOLUTE_MINIMAL_GAS_PRICE.
+   * @dev This functions assumes one unit of token has 18 digits.
+   * @param tokenAddress The currency the gas price should be in (defaults to Celo).
+   * @return current gas price minimum in the requested currency
+   */
+  function getGasPriceMinimum(address tokenAddress) external view returns (uint256) {
+    return Math.max(_getGasPriceMinimum(tokenAddress), ABSOLUTE_MINIMAL_GAS_PRICE);
   }
 
   /**
