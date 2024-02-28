@@ -1,4 +1,4 @@
-/* eslint-disable no-console: 0 */
+/* eslint-disable no-console */
 import { CeloTxReceipt, TransactionResult } from '@celo/connect'
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'

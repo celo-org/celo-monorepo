@@ -1,4 +1,4 @@
-/* tslint:disable no-console */
+/* eslint-disable no-console */
 import BigNumber from 'bignumber.js'
 import {
   AccountType,
@@ -157,8 +157,7 @@ export const handler = async (argv: SimulateClientArgv) => {
     console.info(
       `Account for recipient index ${argv.recipientIndex} thread ${thread}, final index ${recipientIndex}: ${recipientAddress}`
     )
-    // tslint:disable-next-line: no-floating-promises
-    simulateClient(
+    void simulateClient(
       senderPK,
       recipientAddress,
       argv.contractAddress,
