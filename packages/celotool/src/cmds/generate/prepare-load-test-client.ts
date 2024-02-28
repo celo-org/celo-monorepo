@@ -1,6 +1,7 @@
 /* tslint:disable no-console */
 import * as fs from 'fs'
 import { AccountType, generatePrivateKey, privateKeyToAddress } from 'src/lib/generate_utils'
+import { getIndexForLoadTestThread } from 'src/lib/geth'
 import yargs from 'yargs'
 
 interface Bip32Argv {
@@ -39,7 +40,8 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = (argv: Bip32Argv) => {
   const accountType = AccountType.LOAD_TESTING_ACCOUNT
   for (let t = 0; t < argv.threads; t++) {
-    const index = argv.index * 10000 + t
+    const index = getIndexForLoadTestThread(argv.index, t)
+    console.info(`Index for thread ${t} --> ${index}`)
 
     const privateKey = generatePrivateKey(argv.mnemonic, accountType, index)
     const address = privateKeyToAddress(privateKey)
