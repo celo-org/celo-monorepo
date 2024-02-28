@@ -16,6 +16,8 @@ import "../common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
+import "../../lib/celo-foundry/lib/forge-std/src/console.sol";
+
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
  */
@@ -453,7 +455,7 @@ contract Validators is
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
    * @return True upon success.
    */
-  function updateValidatorScoreFromSigner(address signer, uint256 uptime) external onlyVm() {
+  function updateValidatorScoreFromSigner(address signer, uint256 uptime) external onlyVm {
     _updateValidatorScoreFromSigner(signer, uptime);
   }
 
@@ -469,6 +471,7 @@ contract Validators is
     require(isValidator(account), "Not a validator");
 
     FixidityLib.Fraction memory epochScore = FixidityLib.wrap(calculateEpochScore(uptime));
+
     FixidityLib.Fraction memory newComponent = validatorScoreParameters.adjustmentSpeed.multiply(
       epochScore
     );
@@ -476,10 +479,13 @@ contract Validators is
     FixidityLib.Fraction memory currentComponent = FixidityLib.fixed1().subtract(
       validatorScoreParameters.adjustmentSpeed
     );
+
     currentComponent = currentComponent.multiply(validators[account].score);
+
     validators[account].score = FixidityLib.wrap(
       Math.min(epochScore.unwrap(), newComponent.add(currentComponent).unwrap())
     );
+
     emit ValidatorScoreUpdated(account, validators[account].score.unwrap(), epochScore.unwrap());
   }
 
@@ -492,7 +498,7 @@ contract Validators is
    */
   function distributeEpochPaymentsFromSigner(address signer, uint256 maxPayment)
     external
-    onlyVm()
+    onlyVm
     returns (uint256)
   {
     return _distributeEpochPaymentsFromSigner(signer, maxPayment);
@@ -1397,5 +1403,4 @@ contract Validators is
     );
     return history.entries[index].group;
   }
-
 }

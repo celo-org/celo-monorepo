@@ -5,6 +5,7 @@ contract Constants {
   uint256 public constant FIXED1 = 1e24;
   uint256 public constant HOUR = 60 * 60;
   uint256 public constant DAY = 24 * HOUR;
+  uint256 constant WEEK = 7 * DAY;
   uint256 public constant YEAR = 365 * DAY;
   uint256 public constant EPOCH_SIZE = DAY / 5;
 
