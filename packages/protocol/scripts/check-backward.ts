@@ -46,7 +46,7 @@ const argv = yargs
     type: 'boolean',
   })
   .option('new_branch', {
-    alias: 'nb',
+    alias: 'b',
     description: 'Branch name (for versioning)',
     type: 'string',
   })
