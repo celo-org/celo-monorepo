@@ -39,7 +39,7 @@ interface IFeeCurrencyAdapter {
 
 
   /**
-   * @notice See IFeeCurrency.
+   * @notice As debitGasFees in IFeeCurrency, always using the number of decimals the evm expects.
    */
   function debitGasFees(address from, uint256 value) external;
 
