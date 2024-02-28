@@ -13,7 +13,7 @@ interface IFeeCurrencyAdapter {
   function digitDifference() external view returns (uint96);
 
   /**
-   * @return returns the amount that it's debited after calling debitGasFees().
+   * @return The amount that is debited after calling debitGasFees() and before creditGasFees().
    */
   function debited() external view returns (uint256);
 
