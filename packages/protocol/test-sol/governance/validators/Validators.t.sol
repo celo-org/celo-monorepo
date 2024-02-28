@@ -69,7 +69,7 @@ contract ValidatorsMockTunnel is ForgeTest {
       params2._downtimeGracePeriod
     );
     vm.prank(sender);
-    (bool success, bytes memory result) = address(tunnelValidators).call(data);
+    (bool success, ) = address(tunnelValidators).call(data);
     require(success, "unsuccessful tunnel call");
   }
 }
@@ -99,6 +99,8 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
   uint256 otherValidatorPk;
   address group;
   uint256 validatorRegistrationEpochNumber;
+
+  uint256 groupLength = 8;
 
   bytes public constant blsPublicKey = abi.encodePacked(
     bytes32(0x0101010101010101010101010101010101010101010101010101010101010101),
@@ -225,8 +227,6 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     registry.setAddressFor(ValidatorsContract, address(validators));
     registry.setAddressFor(StableTokenContract, address(stableToken));
 
-    accounts.createAccount(); // TODO: do this for 10 accounts?
-
     initParams = ValidatorsMockTunnel.InitParams({
       registryAddress: registryAddress,
       groupRequirementValue: originalGroupLockedGoldRequirements.value,
@@ -269,7 +269,7 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     return vm.sign(privateKey, prefixedHash);
   }
 
-  function _generateEcdsaPubKeyWithSigner(address _validator, address _signer, uint256 _signerPk)
+  function _generateEcdsaPubKeyWithSigner(address _validator, uint256 _signerPk)
     internal
     returns (bytes memory ecdsaPubKey, uint8 v, bytes32 r, bytes32 s)
   {
@@ -285,7 +285,6 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
 
     (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
       validator,
-      signer,
       signerPk
     );
 
@@ -373,13 +372,13 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     }
   }
 
-  function _max1(uint256 num) internal view returns (FixidityLib.Fraction memory) {
+  function _max1(uint256 num) internal pure returns (FixidityLib.Fraction memory) {
     return num > FixidityLib.fixed1().unwrap() ? FixidityLib.fixed1() : FixidityLib.wrap(num);
   }
 
   function _safeExponent(FixidityLib.Fraction memory base, FixidityLib.Fraction memory exponent)
     internal
-    view
+    pure
     returns (uint256)
   {
     if (FixidityLib.equals(base, FixidityLib.newFixed(0))) return 0;
@@ -395,7 +394,7 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     return result.unwrap();
   }
 
-  function _calculateScore(uint256 _uptime, uint256 _gracePeriod) internal returns (uint256) {
+  function _calculateScore(uint256 _uptime, uint256 _gracePeriod) internal view returns (uint256) {
     return
       _safeExponent(
         _max1(_uptime.add(_gracePeriod)),
@@ -730,7 +729,6 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
   function test_Emits_ValidatorBlsPublicKeyUpdatedEvent() public {
     (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
       validator,
-      signer,
       signerPk
     );
 
@@ -749,7 +747,6 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
   function test_Emits_ValidatorRegisteredEvent() public {
     (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
       validator,
-      signer,
       signerPk
     );
 
@@ -1092,7 +1089,7 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     validators.affiliate(otherGroup);
     validatorAffiliationEpochNumber = validators.getEpochNumber();
 
-    (uint256[] memory epochs, address[] memory groups, uint256 lastRemovedFromGroupTimestamp, uint256 tail) = validators
+    (uint256[] memory epochs, address[] memory groups, uint256 lastRemovedFromGroupTimestamp, ) = validators
       .getMembershipHistory(validator);
 
     uint256 expectedEntries = 1;
@@ -1209,7 +1206,7 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
     validators.deaffiliate();
     deaffiliationEpoch = validators.getEpochNumber();
 
-    (uint256[] memory epochs, address[] memory groups, uint256 lastRemovedFromGroupTimestamp, uint256 tail) = validators
+    (uint256[] memory epochs, address[] memory groups, uint256 lastRemovedFromGroupTimestamp, ) = validators
       .getMembershipHistory(validator);
 
     uint256 expectedEntries = 1;
@@ -1267,7 +1264,6 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
   function test_ShouldSetValidatorEcdsaPubKey_WhenCalledByRegisteredAccountsContract() public {
     (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
       address(accounts),
-      signer,
       signerPk
     );
     vm.prank(address(accounts));
@@ -1283,7 +1279,6 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
   {
     (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
       address(accounts),
-      signer,
       signerPk
     );
 
@@ -1299,7 +1294,6 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
   {
     (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
       address(accounts),
-      otherValidator,
       otherValidatorPk
     );
 
@@ -1309,11 +1303,7 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
   }
 
   function test_Reverts_whenNotCalledByRegisteredAccountsContract() public {
-    (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
-      validator,
-      signer,
-      signerPk
-    );
+    (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(validator, signerPk);
 
     vm.expectRevert("only registered contract");
     vm.prank(validator);
@@ -1344,16 +1334,11 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
     validatorEcdsaPubKey = _registerValidatorHelper(validator, validatorPk);
   }
 
-  // When called by the registerdAccounts contract
-
-  // When pubkey matches signer
-
   function test_ShouldSetValidatorNewBlsPubKeyAndEcdsaPubKey_WhenCalledByRegisteredAccountsContract()
     public
   {
     (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
       address(accounts),
-      signer,
       signerPk
     );
 
@@ -1377,7 +1362,6 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
   {
     (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
       address(accounts),
-      signer,
       signerPk
     );
 
@@ -1401,7 +1385,6 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
   {
     (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
       address(accounts),
-      otherValidator,
       otherValidatorPk
     );
 
@@ -1418,11 +1401,7 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
   function test_Reverts_WhenPublicKeyMatchesSigner_WhenNotCalledByRegisteredAccountsContract()
     public
   {
-    (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
-      validator,
-      signer,
-      signerPk
-    );
+    (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(validator, signerPk);
 
     vm.expectRevert("only registered contract");
     vm.prank(validator);
@@ -1613,7 +1592,6 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers is 
 
     _registerValidatorGroupHelper(group, 1);
   }
-  //when group never had members
 
   function test_AccountShouldNoLongerBeValidatorGroup_WhenGroupNeverHadMembers() public {
     vm.prank(group);
@@ -1800,7 +1778,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
       expectedEntries = 2;
     }
 
-    (uint256[] memory _epochs, address[] memory _membershipGroups, uint256 _historyLastRemovedTimestamp, uint256 _historyTail) = validators
+    (uint256[] memory _epochs, address[] memory _membershipGroups, , ) = validators
       .getMembershipHistory(validator);
 
     assertEq(_epochs.length, expectedEntries);
@@ -1970,7 +1948,7 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
     validators.removeMember(validator);
     uint256 _expectedEpoch = validators.getEpochNumber();
 
-    (uint256[] memory _epochs, address[] memory _membershipGroups, uint256 _historyLastRemovedTimestamp, uint256 _historyTail) = validators
+    (uint256[] memory _epochs, address[] memory _membershipGroups, uint256 _historyLastRemovedTimestamp, ) = validators
       .getMembershipHistory(validator);
 
     assertEq(_epochs.length, 1);
@@ -2203,7 +2181,6 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
     _registerValidatorGroupHelper(group, 1);
   }
 
-  // when uptime is in the interval [0, 1.0]
   function test_ShouldCalculateScoreCorrectly_WhenUptimeInInterval0AND1() public {
     FixidityLib.Fraction memory uptime = FixidityLib.newFixedFraction(99, 100);
     FixidityLib.Fraction memory gracePeriod = FixidityLib.newFixedFraction(
@@ -2295,8 +2272,6 @@ contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
     _registerValidatorGroupHelper(group, 1);
   }
 
-  // when all uptimes are in the interval [0, 1.0]
-
   function _computeGroupUptimeCalculation(FixidityLib.Fraction[] memory _uptimes)
     public
     returns (uint256[] memory, uint256)
@@ -2329,7 +2304,7 @@ contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
       unwrapedUptimes[i] = _uptimes[i].unwrap();
     }
 
-    expectedScore = sum.div(_uptimes.length); // Integer division, truncates remainder
+    expectedScore = sum.div(_uptimes.length);
 
     return (unwrapedUptimes, expectedScore);
   }
@@ -2410,18 +2385,16 @@ contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
     uptimes[4] = FixidityLib.newFixedFraction(9, 10);
     uptimes[5] = FixidityLib.newFixedFraction(9, 10);
 
-    (uint256[] memory unwrapedUptimes, uint256 expectedScore) = _computeGroupUptimeCalculation(
-      uptimes
-    );
+    (uint256[] memory unwrapedUptimes, ) = _computeGroupUptimeCalculation(uptimes);
     vm.expectRevert("Uptime array larger than maximum group size");
-    uint256 _actualScore = validators.calculateGroupEpochScore(unwrapedUptimes);
+    validators.calculateGroupEpochScore(unwrapedUptimes);
   }
 
   function test_Reverts_WhenNoUptimesProvided() public {
     uint256[] memory uptimes = new uint256[](0);
 
     vm.expectRevert("Uptime array empty");
-    uint256 _actualScore = validators.calculateGroupEpochScore(uptimes);
+    validators.calculateGroupEpochScore(uptimes);
   }
 
   function test_Reverts_WhenUptimesGreaterThan1() public {
@@ -2432,11 +2405,9 @@ contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
     uptimes[3] = FixidityLib.newFixedFraction(9, 10);
     uptimes[4] = FixidityLib.newFixedFraction(9, 10);
 
-    (uint256[] memory unwrapedUptimes, uint256 expectedScore) = _computeGroupUptimeCalculation(
-      uptimes
-    );
+    (uint256[] memory unwrapedUptimes, ) = _computeGroupUptimeCalculation(uptimes);
     vm.expectRevert("Uptime cannot be larger than one");
-    uint256 _actualScore = validators.calculateGroupEpochScore(unwrapedUptimes);
+    validators.calculateGroupEpochScore(unwrapedUptimes);
   }
 }
 
@@ -2528,9 +2499,8 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
     _registerValidatorHelper(validator, validatorPk);
     validatorRegistrationEpochNumber = validators.getEpochNumber();
 
-    // 8 groups
     _registerValidatorGroupHelper(group, 1);
-    for (uint256 i = 1; i < 8; i++) {
+    for (uint256 i = 1; i < groupLength; i++) {
       _registerValidatorGroupHelper(vm.addr(i), 1);
     }
   }
@@ -2636,9 +2606,8 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
     _registerValidatorHelper(validator, validatorPk);
     validatorRegistrationEpochNumber = validators.getEpochNumber();
 
-    // 8 groups
     _registerValidatorGroupHelper(group, 1);
-    for (uint256 i = 1; i < 8; i++) {
+    for (uint256 i = 1; i < groupLength; i++) {
       _registerValidatorGroupHelper(vm.addr(i), 1);
     }
   }
@@ -3041,7 +3010,6 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
   uint256 contractIndex;
 
   EpochInfo[] public epochInfoList;
-  uint256 groupLength = 8;
 
   struct EpochInfo {
     uint256 epochNumber;
@@ -3157,8 +3125,6 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
     _registerValidatorGroupHelper(group, 1);
     lockedGold.addSlasher(paymentDelegatee);
   }
-
-  // XXX: when run from an approved address
 
   function test_ShouldHalveslashingMultiplier() public {
     FixidityLib.Fraction memory expectedMultiplier = FixidityLib.fixed1();
