@@ -19,3 +19,4 @@
 [submodule "packages/protocol/lib/celo-foundry"]
 	path = packages/protocol/lib/celo-foundry
 	url = https://github.com/celo-org/celo-foundry
+	branch = celo-foundry-v0.5.13
