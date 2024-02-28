@@ -45,7 +45,7 @@ interface IFeeCurrencyAdapter {
 
 
   /**
-   * @notice See IFeeCurrency.
+   * @notice Same as creditGasFees in IFeeCurrency, always using the number of decimals the evm expects.
    */
   function creditGasFees(
     address refundRecipient,
