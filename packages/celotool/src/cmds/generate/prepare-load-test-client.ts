@@ -39,6 +39,9 @@ export const builder = (argv: yargs.Argv) => {
 
 export const handler = (argv: Bip32Argv) => {
   const accountType = AccountType.LOAD_TESTING_ACCOUNT
+  // Empty address file if there is any address (i.e.: Used a snapshot with addresses already generated)
+  fs.writeFileSync(`/root/.celo/address`, ``)
+  // Generate private keys and addresses for each thread
   for (let t = 0; t < argv.threads; t++) {
     const index = getIndexForLoadTestThread(argv.index, t)
     console.info(`Index for thread ${t} --> ${index}`)
