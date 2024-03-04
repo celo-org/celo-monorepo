@@ -1045,7 +1045,6 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     accounts.createAccount();
 
     _registerValidatorHelper(validator, validatorPk);
-    validatorRegistrationEpochNumber = validators.getEpochNumber();
 
     _registerValidatorGroupHelper(group, 1);
     _registerValidatorGroupHelper(otherGroup, 1);
@@ -2518,7 +2517,6 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
   function setUp() public {
     super.setUp();
     _registerValidatorHelper(validator, validatorPk);
-    validatorRegistrationEpochNumber = validators.getEpochNumber();
 
     _registerValidatorGroupHelper(group, 1);
     for (uint256 i = 1; i < groupLength; i++) {
@@ -2625,7 +2623,6 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
-    validatorRegistrationEpochNumber = validators.getEpochNumber();
 
     _registerValidatorGroupHelper(group, 1);
     for (uint256 i = 1; i < groupLength; i++) {
