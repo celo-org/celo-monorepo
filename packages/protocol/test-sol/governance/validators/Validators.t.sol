@@ -619,7 +619,7 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
     validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
   }
 
-  function test_Reverts_whenCalledByNonOwner() public {
+  function test_Reverts_WhenCalledByNonOwner() public {
     vm.prank(nonOwner);
     vm.expectRevert("Ownable: caller is not the owner");
     validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
@@ -1001,7 +1001,7 @@ contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirement
     validators.affiliate(group);
   }
 
-  function test_Reverts_whenAffiliatingWithNonRegisteredValidatorGroup() public {
+  function test_Reverts_WhenAffiliatingWithNonRegisteredValidatorGroup() public {
     vm.expectRevert("Not a validator group");
     vm.prank(validator);
     validators.affiliate(nonRegisteredGroup);
@@ -1654,7 +1654,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
     validators.addFirstMember(validator, address(0), address(0));
   }
 
-  function test_ShouldMarkAccountAsNotValidatorGroup_whenItHasBeenMoreThanGrouplockedGoldRequirementDuration()
+  function test_ShouldMarkAccountAsNotValidatorGroup_WhenItHasBeenMoreThanGrouplockedGoldRequirementDuration()
     public
   {
     vm.prank(group);
@@ -1668,7 +1668,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
     assertFalse(validators.isValidatorGroup(group));
   }
 
-  function test_ShouldRemoveAccountFromValidatorGroupList_whenItHasBeenMoreThanGrouplockedGoldRequirementDuration()
+  function test_ShouldRemoveAccountFromValidatorGroupList_WhenItHasBeenMoreThanGrouplockedGoldRequirementDuration()
     public
   {
     address[] memory ExpectedRegisteredValidatorGroups = new address[](0);
@@ -1683,7 +1683,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
     assertEq(validators.getRegisteredValidatorGroups(), ExpectedRegisteredValidatorGroups);
   }
 
-  function test_ShouldResetAccountBalanceRequirements_whenItHasBeenMoreThanGrouplockedGoldRequirementDuration()
+  function test_ShouldResetAccountBalanceRequirements_WhenItHasBeenMoreThanGrouplockedGoldRequirementDuration()
     public
   {
     vm.prank(group);
@@ -1696,7 +1696,7 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
     assertEq(validators.getAccountLockedGoldRequirement(group), 0);
   }
 
-  function test_Emits_ValidatorGroupDeregistered_whenItHasBeenMoreThanGrouplockedGoldRequirementDuration()
+  function test_Emits_ValidatorGroupDeregistered_WhenItHasBeenMoreThanGrouplockedGoldRequirementDuration()
     public
   {
     vm.prank(group);
@@ -1911,7 +1911,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
     validators.addFirstMember(otherValidator, address(0), address(0));
   }
 
-  function test_Reverts_whenTheAccountDoesNotHaveARegisteredValidatorGroup() public {
+  function test_Reverts_WhenTheAccountDoesNotHaveARegisteredValidatorGroup() public {
     vm.expectRevert("Not validator and group");
     vm.prank(group);
     validators.addFirstMember(otherValidator, address(0), address(0));
@@ -2048,7 +2048,7 @@ contract ValidatorsTest_ReorderMember is ValidatorsTest {
     validators.reorderMember(nonValidator, validator, address(0));
   }
 
-  function test_Reverts_whenValidatorNotMemberOfValidatorGroup() public {
+  function test_Reverts_WhenValidatorNotMemberOfValidatorGroup() public {
     vm.prank(vm.addr(1));
     validators.deaffiliate();
 
@@ -2101,7 +2101,7 @@ contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
     validators.setNextCommissionUpdate(commission.unwrap());
   }
 
-  function test_Reverts_whenCommissionGreaterThan1() public {
+  function test_Reverts_WhenCommissionGreaterThan1() public {
     vm.expectRevert("Commission can't be greater than 100%");
 
     vm.prank(group);
@@ -2866,7 +2866,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
     assertEq(stableToken.balanceOf(group), expectedGroupPayment);
   }
 
-  function test_shouldPayValidatorOnlyHalf_whenSlashingMultiplierIsHalved() public {
+  function test_shouldPayValidatorOnlyHalf_WhenSlashingMultiplierIsHalved() public {
     vm.prank(paymentDelegatee);
     validators.halveSlashingMultiplier(group);
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
@@ -2874,7 +2874,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
     assertEq(stableToken.balanceOf(validator), halfExpectedValidatorPayment);
   }
 
-  function test_shouldPayGroupOnlyHalf_whenSlashingMultiplierIsHalved() public {
+  function test_shouldPayGroupOnlyHalf_WhenSlashingMultiplierIsHalved() public {
     vm.prank(paymentDelegatee);
     validators.halveSlashingMultiplier(group);
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
@@ -2882,7 +2882,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
     assertEq(stableToken.balanceOf(group), halfExpectedGroupPayment);
   }
 
-  function test_shouldPayDelegateeOnlyHalf_whenSlashingMultiplierIsHalved() public {
+  function test_shouldPayDelegateeOnlyHalf_WhenSlashingMultiplierIsHalved() public {
     vm.prank(paymentDelegatee);
     validators.halveSlashingMultiplier(group);
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
@@ -2890,7 +2890,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
     assertEq(stableToken.balanceOf(paymentDelegatee), halfExpectedDelegatedPayment);
   }
 
-  function test_shouldReturnHalfExpectedTotalPayment_whenSlashingMultiplierIsHalved() public {
+  function test_shouldReturnHalfExpectedTotalPayment_WhenSlashingMultiplierIsHalved() public {
     vm.prank(paymentDelegatee);
     validators.halveSlashingMultiplier(group);
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
@@ -3188,7 +3188,7 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     assertEq(actualMultiplier, FixidityLib.fixed1().unwrap());
   }
 
-  function test_Reverts_whenSlashingMultiplierIsResetBeforeResetPeriod() public {
+  function test_Reverts_WhenSlashingMultiplierIsResetBeforeResetPeriod() public {
     vm.expectRevert("`resetSlashingMultiplier` called before resetPeriod expired");
     vm.prank(group);
     validators.resetSlashingMultiplier();
