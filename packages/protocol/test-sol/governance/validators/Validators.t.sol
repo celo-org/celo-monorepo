@@ -1194,7 +1194,9 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
     assertEq(members, expectedMembersList);
   }
 
-  function test_ShouldUpdateMemberMembershipHisory_WhenValidatorIsMemberOfAffiliatedGroup() public {
+  function test_ShouldUpdateMembershipHisoryOfMember_WhenValidatorIsMemberOfAffiliatedGroup()
+    public
+  {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
 
@@ -1302,7 +1304,7 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
     validators.updateEcdsaPublicKey(validator, signer, _newEcdsaPubKey);
   }
 
-  function test_Reverts_whenNotCalledByRegisteredAccountsContract() public {
+  function test_Reverts_WhenNotCalledByRegisteredAccountsContract() public {
     (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(validator, signerPk);
 
     vm.expectRevert("only registered contract");
@@ -1506,7 +1508,7 @@ contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
     validators.registerValidatorGroup(commission.unwrap());
   }
 
-  function test_Reverts_WhenDelagatingCELO() public {
+  function test_Reverts_WhenDelegatingCELO() public {
     lockedGold.setAccountTotalDelegatedAmountInPercents(group, 10);
     lockedGold.setAccountTotalLockedGold(group, originalGroupLockedGoldRequirements.value);
     vm.expectRevert("Cannot delegate governance power");
@@ -1767,7 +1769,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
     assertEq(_sizeHistory[0], uint256(block.timestamp));
   }
 
-  function test_ShouldUpdateMemberMembershipHistory() public {
+  function test_ShouldUpdateMembershipHistoryOfMember() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
     _additionEpoch = validators.getEpochNumber();
@@ -2888,7 +2890,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
     assertEq(stableToken.balanceOf(paymentDelegatee), halfExpectedDelegatedPayment);
   }
 
-  function test_shouldreturnHalfExpectedTotalPayment_whenSlashingMultiplierIsHalved() public {
+  function test_shouldReturnHalfExpectedTotalPayment_whenSlashingMultiplierIsHalved() public {
     vm.prank(paymentDelegatee);
     validators.halveSlashingMultiplier(group);
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
