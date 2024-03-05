@@ -56,7 +56,7 @@ const selectReportFor = (report, contractName) => {
  * @param expectedMatches The regular expressions that each successive error for
  * `contractName` should match.
  */
-const assertContractErrorsMatch = (report, contractName, expectedMatches) => {
+const assertContractErrorsMatch = (report, contractName: string, expectedMatches) => {
   const contractReport = selectReportFor(report, contractName)
   assert.equal(contractReport.errors.length, 1)
 

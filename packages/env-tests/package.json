@@ -1,17 +1,16 @@
 {
   "name": "@celo/env-tests",
   "private": true,
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Environment tests",
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@celo/contractkit": "^5.2.0",
+    "@celo/contractkit": "^7.0.0",
     "@celo/utils": "^5.0.6",
     "@celo/base": "^6.0.0",
-    "@celo/connect": "^5.1.1",
-    "@celo/phone-utils": "^6.0.0",
-    "@celo/cryptographic-utils": "^5.0.6",
+    "@celo/connect": "^5.1.2",
+    "@celo/cryptographic-utils": "^5.0.7",
     "bignumber.js": "^9.0.0",
     "bunyan": "1.8.12",
     "bunyan-gke-stackdriver": "0.1.2",
@@ -23,7 +22,7 @@
   "scripts": {
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
-    "lint": "tslint -c tslint.json --project tsconfig.json",
+    "lint": "yarn run --top-level eslint .",
     "test": "jest --runInBand",
     "baklava-test": "CELO_ENV=baklava CELO_PROVIDER=https://baklava-forno.celo-testnet.org jest --runInBand",
     "alfajores-test": "CELO_ENV=alfajores CELO_PROVIDER=https://alfajores-forno.celo-testnet.org jest --runInBand",
@@ -31,7 +30,8 @@
     "staging-test": "CELO_ENV=staging CELO_PROVIDER=https://staging-forno.celo-networks-dev.org jest --runInBand"
   },
   "devDependencies": {
+    "@tsconfig/recommended": "^1.0.3",
     "@jest/globals": "^29.5.0",
-    "typescript": "4.4.3"
+    "typescript": "^5.3.3"
   }
 }

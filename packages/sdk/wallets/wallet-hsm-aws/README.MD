@@ -1,1 +1,0 @@
-Wallet-hsm-aws allows you to easily interact with a cloud HSM wallet built on AWS KMS.

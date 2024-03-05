@@ -1,5 +1,3 @@
-/* tslint:disable:no-console */
-
 import { constitution } from '@celo/protocol/governanceConstitution'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
@@ -55,7 +53,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       )
 
       for (const contractName of constitutionContractNames) {
-        console.log(`\tSetting constitution thresholds for ${contractName}`)
+        console.info(`\tSetting constitution thresholds for ${contractName}`)
 
         const artifactsObject = ArtifactsSingleton.getInstance(
           constitution[contractName].__contractPackage,

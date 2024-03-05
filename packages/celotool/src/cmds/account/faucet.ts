@@ -1,4 +1,3 @@
-/* tslint:disable no-console */
 import { newKitFromWeb3 } from '@celo/contractkit'
 import { celoTokenInfos, CeloTokenType, Token } from '@celo/contractkit/lib/celo-tokens'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
@@ -65,7 +64,7 @@ export const builder = (argv: yargs.Argv) => {
           }
           // Note: this does not check if token has been deployed on network
           if (!validCeloTokens.includes(token as CeloTokenType)) {
-            throw Error(`Invalid token '${token}', must be one of: ${validCeloTokens}.`)
+            throw Error(`Invalid token '${token}', must be one of: ${validCeloTokens.join('|')}.`)
           }
           if (!(amount && /^\d+$/.test(amount))) {
             throw Error(`Invalid amount '${amount}', must consist of only numbers.`)
@@ -102,7 +101,7 @@ export const handler = async (argv: FaucetArgv) => {
     const web3 = new Web3('http://localhost:8545')
     const kit = newKitFromWeb3(web3)
     const account = (await kit.connection.getAccounts())[0]
-    console.log(`Using account: ${account}`)
+    console.info(`Using account: ${account}`)
     kit.connection.defaultAccount = account
 
     // Check that input token has been deployed to this network
@@ -115,7 +114,9 @@ export const handler = async (argv: FaucetArgv) => {
       argv.tokenParams.map((tokenParam) => {
         if (!deployedCeloTokens.includes(tokenParam.token)) {
           throw Error(
-            `Invalid token '${tokenParam.token}' (or not yet deployed on ${argv.celoEnv}) must be one of: ${deployedCeloTokens}.`
+            `Invalid token '${tokenParam.token}' (or not yet deployed on ${
+              argv.celoEnv
+            }) must be one of: ${deployedCeloTokens.join('|')}.`
           )
         }
       })
@@ -137,7 +138,7 @@ export const handler = async (argv: FaucetArgv) => {
           }
         }
         const tokenAmount = await convertToContractDecimals(tokenParams.amount, tokenWrapper)
-        console.log(`Fauceting ${tokenAmount.toFixed()} of ${tokenParams.token} to ${address}`)
+        console.info(`Fauceting ${tokenAmount.toFixed()} of ${tokenParams.token} to ${address}`)
 
         if (tokenParams.token === Token.CELO) {
           // Special handling for reserve transfer
@@ -148,7 +149,7 @@ export const handler = async (argv: FaucetArgv) => {
           }
         }
         await tokenWrapper.transfer(address, tokenAmount.toFixed()).sendAndWaitForReceipt()
-        console.log(`Successfully fauceted ${tokenParams.token}`)
+        console.info(`Successfully fauceted ${tokenParams.token}`)
       }
     }
     // Ensure all faucets attempts are independent of failures and report failures.

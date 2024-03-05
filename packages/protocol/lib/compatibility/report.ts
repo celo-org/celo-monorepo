@@ -1,4 +1,4 @@
-// tslint:disable: max-classes-per-file
+/* eslint-disable max-classes-per-file: 0 */
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import ContractAST from '@openzeppelin/upgrades/lib/utils/ContractAST'
 
@@ -127,7 +127,7 @@ export const isLibrary = (contract: string, artifactsSet: BuildArtifacts[]) => {
 
     const artifact = artifacts.getArtifactByName(contract)
     if (artifact === undefined){
-      // EAFP 
+      // EAFP
       // the library may be in another package
       continue
     }

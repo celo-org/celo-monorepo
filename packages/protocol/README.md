@@ -102,6 +102,8 @@ truffle(rc1)> let exchange = await kit.contracts.getExchange()
 
 ### Testing
 
+Warning / TODO: We are migrating our tests to Foundry, so this section may be out of date. For instruction on how to run tests with Foundry see [here](./test-sol/README.md).
+
 To test the smart contracts, run:
 
 ```bash

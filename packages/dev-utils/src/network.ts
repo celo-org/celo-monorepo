@@ -14,8 +14,8 @@ export async function isPortOpen(host: string, port: number) {
   return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
 }
 
-function execCmd(cmd: string, args: string[], options?: SpawnOptions & { silent?: boolean }) {
-  return new Promise<number>(async (resolve, reject) => {
+async function execCmd(cmd: string, args: string[], options?: SpawnOptions & { silent?: boolean }) {
+  return new Promise<number>((resolve, reject) => {
     const { silent, ...spawnOptions } = options || { silent: false }
     if (!silent) {
       console.debug('$ ' + [cmd].concat(args).join(' '))
@@ -23,7 +23,7 @@ function execCmd(cmd: string, args: string[], options?: SpawnOptions & { silent?
     const process = spawn(cmd, args, { ...spawnOptions, stdio: silent ? 'ignore' : 'inherit' })
     process.on('close', (code) => {
       try {
-        resolve(code as number)
+        resolve(code)
       } catch (error) {
         reject(error)
       }

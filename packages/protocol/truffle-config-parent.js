@@ -124,7 +124,7 @@ const networks = {
 
         coverageProvider.start((err) => {
           if (err !== undefined) {
-            // tslint:disable-next-line: no-console
+            // eslint-disable-next-line: no-console
             console.error(err)
             process.exit(1)
           }

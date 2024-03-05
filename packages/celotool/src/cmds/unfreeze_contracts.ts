@@ -1,17 +1,16 @@
 /* tslint:disable no-console */
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
+import { CeloEnvArgv, addCeloEnvMiddleware } from 'src/lib/env-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
 import Web3 from 'web3'
 import yargs from 'yargs'
 
 export const command = 'unfreeze-contracts'
 
-export const describe = 'command for unfreezing epoch rewards and the exchange'
+export const describe = 'command for unfreezing epoch rewards'
 
 interface UnfreezeContractsArgv extends CeloEnvArgv {
-  exchange: boolean
   rewards: boolean
   freeze: boolean
   precheck: boolean
@@ -20,11 +19,6 @@ interface UnfreezeContractsArgv extends CeloEnvArgv {
 
 export const builder = (argv: yargs.Argv) => {
   return addCeloEnvMiddleware(argv)
-    .option('exchange', {
-      type: 'boolean',
-      description: 'Affect the exchange',
-      default: true,
-    })
     .option('rewards', {
       type: 'boolean',
       description: 'Affect epoch rewards',
@@ -54,21 +48,20 @@ export const handler = async (argv: UnfreezeContractsArgv) => {
     const web3: Web3 = new Web3('http://localhost:8545')
     const kit: ContractKit = newKitFromWeb3(web3)
     const account = (await kit.connection.getAccounts())[0]
-    console.log(`Using account: ${account}`)
+    console.info(`Using account: ${account}`)
     kit.connection.defaultAccount = account
 
-    const [exchange, epochRewards] = await Promise.all([
-      argv.exchange ? kit._web3Contracts.getExchange() : null,
+    const [epochRewards, freezerContract] = await Promise.all([
       argv.rewards ? kit._web3Contracts.getEpochRewards() : null,
+      kit._web3Contracts.getFreezer(),
     ])
-    const freezerContract = await kit._web3Contracts.getFreezer()
 
-    for (const [name, contract] of Object.entries({ exchange, epochRewards })) {
+    for (const [name, contract] of Object.entries({ epochRewards })) {
       if (contract === null) {
         continue
       }
 
-      const address = (contract as any)._address
+      const address = contract._address
       if (argv.precheck) {
         const frozen = await freezerContract.methods.isFrozen(address).call()
         // console.debug(`${name}.frozen = ${frozen}`)
