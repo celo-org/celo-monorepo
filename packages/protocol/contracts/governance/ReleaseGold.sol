@@ -1,5 +1,4 @@
 pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -41,43 +40,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     uint256 releasedBalanceAtRevoke;
     // The time at which the release schedule was revoked.
     uint256 revokeTime;
-  }
-
-  /**
-   * @param releaseStartTime The time (in Unix time) at which point releasing starts.
-   * @param releaseCliffTime Duration (in seconds) after `releaseStartTime` of the golds' cliff.
-   * @param numReleasePeriods Number of releasing periods.
-   * @param releasePeriod Duration (in seconds) of each release period.
-   * @param amountReleasedPerPeriod The released gold amount per period.
-   * @param revocable Whether the release schedule is revocable or not.
-   * @param _beneficiary Address of the beneficiary to whom released tokens are transferred.
-   * @param _releaseOwner Address capable of revoking, setting the liquidity provision
-   *                      and setting the withdrawal amount.
-   *                      0x0 if grant is not subject to these operations.
-   * @param _refundAddress Address that receives refunded funds if contract is revoked.
-   *                       0x0 if contract is not revocable.
-   * @param subjectToLiquidityProvision If this schedule is subject to a liquidity provision.
-   * @param initialDistributionRatio Amount in range [0, 1000] (3 significant figures)
-   *                                 indicating % of total balance available for distribution.
-   * @param _canValidate If this schedule's gold can be used for validating.
-   * @param _canVote If this schedule's gold can be used for voting.
-   * @param registryAddress Address of the deployed contracts registry.
-   */
-  struct ReleaseGoldConfig {
-    uint256 releaseStartTime;
-    uint256 releaseCliffTime;
-    uint256 numReleasePeriods;
-    uint256 releasePeriod;
-    uint256 amountReleasedPerPeriod;
-    bool revocable;
-    address payable beneficiary;
-    address releaseOwner;
-    address payable refundAddress;
-    bool subjectToLiquidityProvision;
-    uint256 initialDistributionRatio;
-    bool canValidate;
-    bool canVote;
-    address registryAddress;
   }
 
   // uint256(-1) == 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
@@ -236,15 +198,47 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
 
   /**
    * @notice A constructor for initialising a new instance of a Releasing Schedule contract.
-   * @param config Release gold configuration parameters.
+   * @param releaseStartTime The time (in Unix time) at which point releasing starts.
+   * @param releaseCliffTime Duration (in seconds) after `releaseStartTime` of the golds' cliff.
+   * @param numReleasePeriods Number of releasing periods.
+   * @param releasePeriod Duration (in seconds) of each release period.
+   * @param amountReleasedPerPeriod The released gold amount per period.
+   * @param revocable Whether the release schedule is revocable or not.
+   * @param _beneficiary Address of the beneficiary to whom released tokens are transferred.
+   * @param _releaseOwner Address capable of revoking, setting the liquidity provision
+   *                      and setting the withdrawal amount.
+   *                      0x0 if grant is not subject to these operations.
+   * @param _refundAddress Address that receives refunded funds if contract is revoked.
+   *                       0x0 if contract is not revocable.
+   * @param subjectToLiquidityProvision If this schedule is subject to a liquidity provision.
+   * @param initialDistributionRatio Amount in range [0, 1000] (3 significant figures)
+   *                                 indicating % of total balance available for distribution.
+   * @param _canValidate If this schedule's gold can be used for validating.
+   * @param _canVote If this schedule's gold can be used for voting.
+   * @param registryAddress Address of the deployed contracts registry.
    */
-  function initialize(ReleaseGoldConfig calldata config) external initializer {
+  function initialize(
+    uint256 releaseStartTime,
+    uint256 releaseCliffTime,
+    uint256 numReleasePeriods,
+    uint256 releasePeriod,
+    uint256 amountReleasedPerPeriod,
+    bool revocable,
+    address payable _beneficiary,
+    address _releaseOwner,
+    address payable _refundAddress,
+    bool subjectToLiquidityProvision,
+    uint256 initialDistributionRatio,
+    bool _canValidate,
+    bool _canVote,
+    address registryAddress
+  ) external initializer {
     _transferOwnership(msg.sender);
-    releaseSchedule.numReleasePeriods = config.numReleasePeriods;
-    releaseSchedule.amountReleasedPerPeriod = config.amountReleasedPerPeriod;
-    releaseSchedule.releasePeriod = config.releasePeriod;
-    releaseSchedule.releaseCliff = config.releaseStartTime.add(config.releaseCliffTime);
-    releaseSchedule.releaseStartTime = config.releaseStartTime;
+    releaseSchedule.numReleasePeriods = numReleasePeriods;
+    releaseSchedule.amountReleasedPerPeriod = amountReleasedPerPeriod;
+    releaseSchedule.releasePeriod = releasePeriod;
+    releaseSchedule.releaseCliff = releaseStartTime.add(releaseCliffTime);
+    releaseSchedule.releaseStartTime = releaseStartTime;
     // Expiry is opt-in for folks who can validate, opt-out for folks who cannot.
     // This is because folks who are running Validators or Groups are likely to want to keep
     // CELO in the ReleaseGold contract even after it becomes withdrawable.
@@ -255,39 +249,35 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       "The released amount per period must be greater than zero"
     );
     require(
-      config.beneficiary != address(0),
+      _beneficiary != address(0),
       "The release schedule beneficiary cannot be the zero addresss"
     );
+    require(registryAddress != address(0), "The registry address cannot be the zero address");
+    require(!(revocable && _canValidate), "Revocable contracts cannot validate");
+    require(initialDistributionRatio <= 1000, "Initial distribution ratio out of bounds");
     require(
-      config.registryAddress != address(0),
-      "The registry address cannot be the zero address"
-    );
-    require(!(config.revocable && config.canValidate), "Revocable contracts cannot validate");
-    require(config.initialDistributionRatio <= 1000, "Initial distribution ratio out of bounds");
-    require(
-      (config.revocable && config.refundAddress != address(0)) ||
-        (!config.revocable && config.refundAddress == address(0)),
+      (revocable && _refundAddress != address(0)) || (!revocable && _refundAddress == address(0)),
       "If contract is revocable there must be an address to refund"
     );
-    setRegistry(config.registryAddress);
-    _setBeneficiary(config.beneficiary);
-    revocationInfo.revocable = config.revocable;
-    releaseOwner = config.releaseOwner;
-    refundAddress = config.refundAddress;
+    setRegistry(registryAddress);
+    _setBeneficiary(_beneficiary);
+    revocationInfo.revocable = revocable;
+    releaseOwner = _releaseOwner;
+    refundAddress = _refundAddress;
 
-    if (config.initialDistributionRatio < 1000) {
+    if (initialDistributionRatio < 1000) {
       // Cannot use `getTotalBalance()` here because the factory has not yet sent the gold.
       uint256 totalGrant = releaseSchedule.amountReleasedPerPeriod.mul(
         releaseSchedule.numReleasePeriods
       );
       // Initial ratio is expressed to 3 significant figures: [0, 1000].
-      maxDistribution = totalGrant.mul(config.initialDistributionRatio).div(1000);
+      maxDistribution = totalGrant.mul(initialDistributionRatio).div(1000);
     } else {
       maxDistribution = MAX_UINT;
     }
-    liquidityProvisionMet = (config.subjectToLiquidityProvision) ? false : true;
-    canValidate = config.canValidate;
-    canVote = config.canVote;
+    liquidityProvisionMet = (subjectToLiquidityProvision) ? false : true;
+    canValidate = _canValidate;
+    canVote = _canVote;
     emit ReleaseGoldInstanceCreated(beneficiary, address(this));
   }
 

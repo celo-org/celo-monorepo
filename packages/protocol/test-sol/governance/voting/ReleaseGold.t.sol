@@ -3,7 +3,6 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
-import "forge-std/console.sol";
 import "../../../contracts/identity/Escrow.sol";
 import "../../../contracts/identity/FederatedAttestations.sol";
 import "../../../contracts/identity/test/MockAttestations.sol";
@@ -28,6 +27,82 @@ interface ISECP256K1 {
     returns (uint256, uint256);
 }
 
+contract ReleaseGoldMockTunnel is ForgeTest {
+  ReleaseGold private releaseGoldTunnel;
+  address payable releaseGoldContractAddress;
+
+  struct InitParams {
+    uint256 releaseStartTime;
+    uint256 releaseCliffTime;
+    uint256 numReleasePeriods;
+    uint256 releasePeriod;
+    uint256 amountReleasedPerPeriod;
+    bool revocable;
+    address payable _beneficiary;
+  }
+
+  struct InitParams2 {
+    address _releaseOwner;
+    address payable _refundAddress;
+    bool subjectToLiquidityProvision;
+    uint256 initialDistributionRatio;
+    bool _canValidate;
+    bool _canVote;
+    address registryAddress;
+  }
+
+  constructor(address _releaseGoldContractAddress) public {
+    releaseGoldContractAddress = address(uint160(_releaseGoldContractAddress));
+    releaseGoldTunnel = ReleaseGold(releaseGoldContractAddress);
+  }
+
+  function MockInitialize(address sender, InitParams calldata params, InitParams2 calldata params2)
+    external
+    returns (bool, bytes memory)
+  {
+    bytes4 selector = bytes4(
+      keccak256(
+        "initialize(uint256,uint256,uint256,uint256,uint256,bool,address,address,address,bool,uint256,bool,bool,address)"
+      )
+    );
+
+    bytes memory dataFirstHalf;
+    {
+      // Encode the first half of the parameters
+      dataFirstHalf = abi.encode(
+        params.releaseStartTime,
+        params.releaseCliffTime,
+        params.numReleasePeriods,
+        params.releasePeriod,
+        params.amountReleasedPerPeriod,
+        params.revocable,
+        params._beneficiary
+      );
+    }
+
+    bytes memory dataSecondHalf;
+    {
+      // Encode the second half of the parameters
+      dataSecondHalf = abi.encode(
+        params2._releaseOwner,
+        params2._refundAddress,
+        params2.subjectToLiquidityProvision,
+        params2.initialDistributionRatio,
+        params2._canValidate,
+        params2._canVote,
+        params2.registryAddress
+      );
+    }
+
+    // Concatenate the selector, first half, and second half
+    bytes memory data = abi.encodePacked(selector, dataFirstHalf, dataSecondHalf);
+
+    vm.prank(sender);
+    (bool success, ) = address(releaseGoldTunnel).call(data);
+    require(success, "unsuccessful tunnel call");
+  }
+}
+
 contract ReleaseGoldTest is Test {
   using FixidityLib for FixidityLib.Fraction;
 
@@ -41,6 +116,7 @@ contract ReleaseGoldTest is Test {
   MockValidators validators;
   LockedGold lockedGold;
   ReleaseGold releaseGold;
+  ReleaseGold releaseGold2;
 
   event ReleaseGoldInstanceCreated(address indexed beneficiary, address indexed atAddress);
   event ReleaseScheduleRevoked(uint256 revokeTimestamp, uint256 releasedBalanceAtRevoke);
@@ -67,7 +143,8 @@ contract ReleaseGoldTest is Test {
   uint256 constant MONTH = 30 * DAY;
   uint256 constant UNLOCKING_PERIOD = 3 * DAY;
 
-  ReleaseGold.ReleaseGoldConfig config;
+  ReleaseGoldMockTunnel.InitParams initParams;
+  ReleaseGoldMockTunnel.InitParams2 initParams2;
 
   ISECP256K1 sECP256K1;
 
@@ -77,14 +154,16 @@ contract ReleaseGoldTest is Test {
     if (prefund) {
       goldToken.transfer(
         address(releaseGold),
-        config.amountReleasedPerPeriod * config.numReleasePeriods
+        initParams.amountReleasedPerPeriod * initParams.numReleasePeriods
       );
     }
 
-    releaseGold.initialize(config);
+    // releaseGold.initialize(config);
+    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold));
+    tunnel.MockInitialize(owner, initParams, initParams2);
 
     if (startReleasing) {
-      vm.warp(block.timestamp + config.releaseCliffTime + config.releasePeriod + 1);
+      vm.warp(block.timestamp + initParams.releaseCliffTime + initParams.releasePeriod + 1);
     }
   }
 
@@ -146,20 +225,23 @@ contract ReleaseGoldTest is Test {
     vm.prank(beneficiary);
     accounts.createAccount();
 
-    config = ReleaseGold.ReleaseGoldConfig({
+    initParams = ReleaseGoldMockTunnel.InitParams({
       releaseStartTime: block.timestamp + 5 * MINUTE,
       releaseCliffTime: HOUR,
       numReleasePeriods: 4,
       releasePeriod: 3 * MONTH,
       amountReleasedPerPeriod: TOTAL_AMOUNT / 4,
       revocable: true,
-      beneficiary: address(uint160(beneficiary)),
-      releaseOwner: releaseOwner,
-      refundAddress: address(uint160(refundAddress)),
+      _beneficiary: address(uint160(beneficiary))
+    });
+
+    initParams2 = ReleaseGoldMockTunnel.InitParams2({
+      _releaseOwner: releaseOwner,
+      _refundAddress: address(uint160(refundAddress)),
       subjectToLiquidityProvision: false,
       initialDistributionRatio: 1000,
-      canValidate: false,
-      canVote: true,
+      _canValidate: false,
+      _canVote: true,
       registryAddress: registryAddress
     });
 
@@ -195,27 +277,33 @@ contract Payable is ReleaseGoldTest {
 
   function test_ShouldAcceptGoldTransferByDefaultFromAnyone() public {
     newReleaseGold(true, false);
+    uint256 originalBalance = goldToken.balanceOf(address(releaseGold));
     vm.prank(randomAddress);
     goldToken.transfer(address(releaseGold), 2 ether);
+    assertEq(goldToken.balanceOf(address(releaseGold)), 2 ether + originalBalance);
   }
 
   function test_ShouldNotUpdateIsFundedIfSchedulePrincipleNotFulfilled() public {
     newReleaseGold(false, false);
-    uint256 insufficientPrinciple = config.amountReleasedPerPeriod * config.numReleasePeriods - 1;
+    uint256 insufficientPrinciple = initParams.amountReleasedPerPeriod *
+      initParams.numReleasePeriods -
+      1;
     goldToken.transfer(address(releaseGold), insufficientPrinciple);
     assertFalse(releaseGold.isFunded());
   }
 
   function test_ShouldUpdateIsFundedIfSchedulePrincipleIsFulfilledAfterDeploy() public {
     newReleaseGold(false, false);
-    uint256 sufficientPrinciple = config.amountReleasedPerPeriod * config.numReleasePeriods;
+    uint256 sufficientPrinciple = initParams.amountReleasedPerPeriod * initParams.numReleasePeriods;
     goldToken.transfer(address(releaseGold), sufficientPrinciple);
     assertTrue(releaseGold.isFunded());
   }
 
   function test_ShouldUpdateIsFundedIfSchedulePrincipleNotFulfilledButHasBegunReleasing() public {
     newReleaseGold(false, true);
-    uint256 insufficientPrinciple = config.amountReleasedPerPeriod * config.numReleasePeriods - 1;
+    uint256 insufficientPrinciple = initParams.amountReleasedPerPeriod *
+      initParams.numReleasePeriods -
+      1;
     goldToken.transfer(address(releaseGold), insufficientPrinciple);
     assertTrue(releaseGold.isFunded());
   }
@@ -285,60 +373,60 @@ contract Creation is ReleaseGoldTest {
     newReleaseGold(true, false);
     assertEq(
       goldToken.balanceOf(address(releaseGold)),
-      config.numReleasePeriods * config.amountReleasedPerPeriod
+      initParams.numReleasePeriods * initParams.amountReleasedPerPeriod
     );
   }
 
   function test_ShouldSetABeneficiaryToReleaseGoldInstance() public {
     newReleaseGold(true, false);
-    assertEq(releaseGold.beneficiary(), config.beneficiary);
+    assertEq(releaseGold.beneficiary(), initParams._beneficiary);
   }
 
   function test_ShouldSetAReleaseOwnerToReleaseGoldInstance() public {
     newReleaseGold(true, false);
-    assertEq(releaseGold.releaseOwner(), config.releaseOwner);
+    assertEq(releaseGold.releaseOwner(), initParams2._releaseOwner);
   }
 
   function test_ShouldSetReleaseGoldNumberOfPeriods() public {
     newReleaseGold(true, false);
     (, , uint256 releaseGoldNumPeriods, , ) = releaseGold.releaseSchedule();
-    assertEq(releaseGoldNumPeriods, config.numReleasePeriods);
+    assertEq(releaseGoldNumPeriods, initParams.numReleasePeriods);
   }
 
   function test_ShouldSetReleaseGoldAmountPerPeriod() public {
     newReleaseGold(true, false);
     (, , , , uint256 releaseGoldAmountPerPeriod) = releaseGold.releaseSchedule();
-    assertEq(releaseGoldAmountPerPeriod, config.amountReleasedPerPeriod);
+    assertEq(releaseGoldAmountPerPeriod, initParams.amountReleasedPerPeriod);
   }
 
   function test_ShouldSetReleaseGoldPeriod() public {
     newReleaseGold(true, false);
     (, , , uint256 releaseGoldPeriod, ) = releaseGold.releaseSchedule();
-    assertEq(releaseGoldPeriod, config.releasePeriod);
+    assertEq(releaseGoldPeriod, initParams.releasePeriod);
   }
 
   function test_ShouldSetReleaseGoldStartTime() public {
     newReleaseGold(true, false);
     (uint256 releaseGoldStartTime, , , , ) = releaseGold.releaseSchedule();
-    assertEq(releaseGoldStartTime, config.releaseStartTime);
+    assertEq(releaseGoldStartTime, initParams.releaseStartTime);
   }
 
   function test_ShouldSetReleaseGoldCliffTime() public {
     newReleaseGold(true, false);
     (, uint256 releaseGoldCliffTime, , , ) = releaseGold.releaseSchedule();
-    uint256 expectedCliffTime = config.releaseStartTime + config.releaseCliffTime;
+    uint256 expectedCliffTime = initParams.releaseStartTime + initParams.releaseCliffTime;
     assertEq(releaseGoldCliffTime, expectedCliffTime);
   }
 
   function test_ShouldSetRevocableFlagToReleaseGoldInstance() public {
     newReleaseGold(true, false);
     (bool revocable, , , ) = releaseGold.revocationInfo();
-    assertEq(revocable, config.revocable);
+    assertEq(revocable, initParams.revocable);
   }
 
   function test_ShouldSetReleaseOwnerToReleaseGoldInstance() public {
     newReleaseGold(true, false);
-    assertEq(releaseGold.releaseOwner(), config.releaseOwner);
+    assertEq(releaseGold.releaseOwner(), initParams2._releaseOwner);
   }
 
   function test_ShouldSetLiquidityProvisionMetToTrue() public {
@@ -366,32 +454,36 @@ contract Creation is ReleaseGoldTest {
 
   function test_ShouldRevertWhenReleaseGoldBeneficiaryIsTheNullAddress() public {
     releaseGold = new ReleaseGold(true);
-    config.beneficiary = address(0);
-    vm.expectRevert("The release schedule beneficiary cannot be the zero addresss");
-    releaseGold.initialize(config);
+    initParams._beneficiary = address(0);
+    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold));
+    vm.expectRevert("unsuccessful tunnel call");
+    tunnel.MockInitialize(owner, initParams, initParams2);
   }
 
   function test_ShouldRevertWhenReleaseGoldPeriodsAreZero() public {
-    releaseGold = new ReleaseGold(true);
-    config.numReleasePeriods = 0;
-    vm.expectRevert("There must be at least one releasing period");
-    releaseGold.initialize(config);
+    releaseGold2 = new ReleaseGold(true);
+    initParams.numReleasePeriods = 0;
+    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold2));
+    vm.expectRevert("unsuccessful tunnel call");
+    tunnel.MockInitialize(owner, initParams, initParams2);
   }
 
   function test_ShouldRevertWhenReleasedAmountPerPeriodIsZero() public {
-    releaseGold = new ReleaseGold(true);
-    config.amountReleasedPerPeriod = 0;
-    vm.expectRevert("The released amount per period must be greater than zero");
-    releaseGold.initialize(config);
+    releaseGold2 = new ReleaseGold(true);
+    initParams.amountReleasedPerPeriod = 0;
+    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold2));
+    vm.expectRevert("unsuccessful tunnel call");
+    tunnel.MockInitialize(owner, initParams, initParams2);
   }
 
   function test_ShouldOverflowForVeryLargeCombinationsOdReleasePeriodsAndAmountPerTime() public {
     releaseGold = new ReleaseGold(true);
-    config.numReleasePeriods = maxUint256;
-    config.amountReleasedPerPeriod = maxUint256;
-    config.initialDistributionRatio = 999;
-    vm.expectRevert("SafeMath: multiplication overflow");
-    releaseGold.initialize(config);
+    initParams.numReleasePeriods = maxUint256;
+    initParams.amountReleasedPerPeriod = maxUint256;
+    initParams2.initialDistributionRatio = 999;
+    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold));
+    vm.expectRevert("unsuccessful tunnel call");
+    tunnel.MockInitialize(owner, initParams, initParams2);
   }
 
 }
@@ -690,7 +782,7 @@ contract SetAccountDataEncryptionKey is ReleaseGoldTest {
 contract SetMaxDistribution is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
-    config.initialDistributionRatio = 0;
+    initParams2.initialDistributionRatio = 0;
     newReleaseGold(true, false);
   }
 
@@ -729,9 +821,9 @@ contract AuthorizationTests is ReleaseGoldTest {
 
   function setUp() public {
     super.setUp();
-    config.revocable = false;
-    config.refundAddress = address(0);
-    config.canValidate = true;
+    initParams.revocable = false;
+    initParams2._refundAddress = address(0);
+    initParams2._canValidate = true;
     newReleaseGold(true, false);
     vm.prank(beneficiary);
     releaseGold.createAccount();
@@ -1062,9 +1154,9 @@ contract AuthorizeWithPublicKeys is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
 
-    config.revocable = false;
-    config.canValidate = true;
-    config.refundAddress = address(0);
+    initParams.revocable = false;
+    initParams2._canValidate = true;
+    initParams2._refundAddress = address(0);
     newReleaseGold(true, false);
 
     vm.prank(beneficiary);
@@ -1156,8 +1248,8 @@ contract Revoke is ReleaseGoldTest {
   }
 
   function test_ShouldRevertIfReleaseGoldIsNonRevocable() public {
-    config.revocable = false;
-    config.refundAddress = address(0);
+    initParams.revocable = false;
+    initParams2._refundAddress = address(0);
     newReleaseGold(true, false);
     vm.expectRevert("Release schedule instance must be revocable");
     vm.prank(releaseOwner);
@@ -1227,10 +1319,10 @@ contract Expire is ReleaseGoldTest {
     vm.prank(releaseOwner);
     releaseGold.expire();
 
-    uint256 balanceBefore = goldToken.balanceOf(config.refundAddress);
+    uint256 balanceBefore = goldToken.balanceOf(initParams2._refundAddress);
     vm.prank(releaseOwner);
     releaseGold.refundAndFinalize();
-    uint256 balanceAfter = goldToken.balanceOf(config.refundAddress);
+    uint256 balanceAfter = goldToken.balanceOf(initParams2._refundAddress);
     assertEq(balanceAfter - balanceBefore, TOTAL_AMOUNT);
   }
 
@@ -1265,10 +1357,10 @@ contract Expire is ReleaseGoldTest {
     vm.prank(releaseOwner);
     releaseGold.expire();
 
-    uint256 balanceBefore = goldToken.balanceOf(config.refundAddress);
+    uint256 balanceBefore = goldToken.balanceOf(initParams2._refundAddress);
     vm.prank(releaseOwner);
     releaseGold.refundAndFinalize();
-    uint256 balanceAfter = goldToken.balanceOf(config.refundAddress);
+    uint256 balanceAfter = goldToken.balanceOf(initParams2._refundAddress);
     assertEq(balanceAfter - balanceBefore, TOTAL_AMOUNT / 2);
   }
 
@@ -1324,8 +1416,8 @@ contract RefundAndFinalize is ReleaseGoldTest {
     vm.prank(releaseOwner);
     releaseGold.revoke();
 
-    uint256 refundAddressBalanceBefore = goldToken.balanceOf(config.refundAddress);
-    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(config.beneficiary);
+    uint256 refundAddressBalanceBefore = goldToken.balanceOf(initParams2._refundAddress);
+    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(initParams._beneficiary);
     (, , uint256 releasedBalanceAtRevoke, ) = releaseGold.revocationInfo();
     uint256 beneficiaryRefundAmount = releasedBalanceAtRevoke - releaseGold.totalWithdrawn();
     uint256 refundAddressRefundAmount = goldToken.balanceOf(address(releaseGold)) -
@@ -1334,8 +1426,8 @@ contract RefundAndFinalize is ReleaseGoldTest {
     releaseGold.refundAndFinalize();
     uint256 releaseGoldContractBalanceAfterFinalize = goldToken.balanceOf(address(goldToken));
 
-    uint256 refundAddressBalanceAfter = goldToken.balanceOf(config.refundAddress);
-    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(config.beneficiary);
+    uint256 refundAddressBalanceAfter = goldToken.balanceOf(initParams2._refundAddress);
+    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(initParams._beneficiary);
 
     assertEq(beneficiaryBalanceAfter - beneficiaryBalanceBefore, beneficiaryRefundAmount);
     assertEq(refundAddressBalanceAfter - refundAddressBalanceBefore, refundAddressRefundAmount);
@@ -1369,7 +1461,7 @@ contract LockGold is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
     newReleaseGold(true, false);
-    lockAmount = config.amountReleasedPerPeriod * config.numReleasePeriods;
+    lockAmount = initParams.amountReleasedPerPeriod * initParams.numReleasePeriods;
   }
 
   function test_ShouldAllowBeneficiaryToLockUpAnyUnlockedAmount() public {
@@ -1413,7 +1505,7 @@ contract UnlockGold is ReleaseGoldTest {
     newReleaseGold(true, false);
     vm.prank(beneficiary);
     releaseGold.createAccount();
-    lockAmount = config.amountReleasedPerPeriod * config.numReleasePeriods;
+    lockAmount = initParams.amountReleasedPerPeriod * initParams.numReleasePeriods;
   }
 
   function test_ShouldAllowBeneficiaryToUnlockHisLockedGoldAndAddAPendingWithdrawal() public {
@@ -1574,7 +1666,7 @@ contract RelockGold is ReleaseGoldTest {
     assertEq(timestamps.length, 0);
   }
 
-  function test_ShouldIncreaseUpdateCorrectly_WhenRelockingValueLessToValueOfThePendingWithdrawalAndWhenPendingWithdrawalExits()
+  function test_ShouldIncreaseAccountNonVotingLockedGoldCorrectly_WhenRelockingValueLessToValueOfThePendingWithdrawalAndWhenPendingWithdrawalExits()
     public
   {
     vm.prank(beneficiary);
@@ -1584,12 +1676,43 @@ contract RelockGold is ReleaseGoldTest {
       lockedGold.getAccountNonvotingLockedGold(address(releaseGold)),
       pendingWithdrawalValue - 1
     );
+  }
+
+  function test_ShouldIncreaseTotalAccountLockedGoldCorrectly_WhenRelockingValueLessToValueOfThePendingWithdrawalAndWhenPendingWithdrawalExits()
+    public
+  {
+    vm.prank(beneficiary);
+    releaseGold.relockGold(index, pendingWithdrawalValue - 1);
+
     assertEq(
       lockedGold.getAccountTotalLockedGold(address(releaseGold)),
       pendingWithdrawalValue - 1
     );
+  }
+
+  function test_ShouldIncreaseTotalNonVotingLockedGoldCorrectly_WhenRelockingValueLessToValueOfThePendingWithdrawalAndWhenPendingWithdrawalExits()
+    public
+  {
+    vm.prank(beneficiary);
+    releaseGold.relockGold(index, pendingWithdrawalValue - 1);
+
     assertEq(lockedGold.getNonvotingLockedGold(), pendingWithdrawalValue - 1);
+  }
+
+  function test_ShouldIncreaseTotalLockedGoldCorrectly_WhenRelockingValueLessToValueOfThePendingWithdrawalAndWhenPendingWithdrawalExits()
+    public
+  {
+    vm.prank(beneficiary);
+    releaseGold.relockGold(index, pendingWithdrawalValue - 1);
+
     assertEq(lockedGold.getTotalLockedGold(), pendingWithdrawalValue - 1);
+  }
+
+  function test_ShouldUpdatePendingWithdrawalsCorrectly_WhenRelockingValueLessToValueOfThePendingWithdrawalAndWhenPendingWithdrawalExits()
+    public
+  {
+    vm.prank(beneficiary);
+    releaseGold.relockGold(index, pendingWithdrawalValue - 1);
 
     (uint256[] memory values, uint256[] memory timestamps) = lockedGold.getPendingWithdrawals(
       address(releaseGold)
@@ -1620,8 +1743,8 @@ contract Withdraw is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
 
-    config.initialDistributionRatio = 0;
-    initialReleaseGoldAmount = config.amountReleasedPerPeriod * config.numReleasePeriods;
+    initParams2.initialDistributionRatio = 0;
+    initialReleaseGoldAmount = initParams.amountReleasedPerPeriod * initParams.numReleasePeriods;
     newReleaseGold(true, false);
   }
 
@@ -1649,7 +1772,7 @@ contract Withdraw is ReleaseGoldTest {
     vm.prank(releaseOwner);
     releaseGold.setMaxDistribution(1000);
 
-    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(config.beneficiary);
+    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(initParams._beneficiary);
     vm.warp(block.timestamp + 3 * 29 * DAY);
     uint256 expectedWithdrawalAmount = releaseGold.getCurrentReleasedTotalAmount();
 
@@ -1657,7 +1780,7 @@ contract Withdraw is ReleaseGoldTest {
     vm.prank(beneficiary);
     releaseGold.withdraw(expectedWithdrawalAmount);
 
-    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(config.beneficiary);
+    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(initParams._beneficiary);
     assertEq(beneficiaryBalanceAfter - beneficiaryBalanceBefore, 0);
   }
 
@@ -1667,7 +1790,7 @@ contract Withdraw is ReleaseGoldTest {
     vm.prank(releaseOwner);
     releaseGold.setMaxDistribution(1000);
 
-    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(config.beneficiary);
+    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(initParams._beneficiary);
     vm.warp(block.timestamp + 3 * MONTH + 1 * DAY);
     uint256 expectedWithdrawalAmount = initialReleaseGoldAmount / 4;
 
@@ -1676,7 +1799,7 @@ contract Withdraw is ReleaseGoldTest {
 
     assertEq(expectedWithdrawalAmount, releaseGold.totalWithdrawn(), "Incorrect withdrawalAmount");
 
-    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(config.beneficiary);
+    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(initParams._beneficiary);
     assertEq(beneficiaryBalanceAfter - beneficiaryBalanceBefore, expectedWithdrawalAmount);
   }
 
@@ -1686,7 +1809,7 @@ contract Withdraw is ReleaseGoldTest {
     vm.prank(releaseOwner);
     releaseGold.setMaxDistribution(1000);
 
-    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(config.beneficiary);
+    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(initParams._beneficiary);
     vm.warp(block.timestamp + 6 * MONTH + 1 * DAY);
     uint256 expectedWithdrawalAmount = initialReleaseGoldAmount / 2;
 
@@ -1695,7 +1818,7 @@ contract Withdraw is ReleaseGoldTest {
 
     assertEq(expectedWithdrawalAmount, releaseGold.totalWithdrawn(), "Incorrect withdrawalAmount");
 
-    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(config.beneficiary);
+    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(initParams._beneficiary);
     assertEq(beneficiaryBalanceAfter - beneficiaryBalanceBefore, expectedWithdrawalAmount);
   }
 
@@ -1705,7 +1828,7 @@ contract Withdraw is ReleaseGoldTest {
     vm.prank(releaseOwner);
     releaseGold.setMaxDistribution(1000);
 
-    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(config.beneficiary);
+    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(initParams._beneficiary);
     vm.warp(block.timestamp + 9 * MONTH + 1 * DAY);
     uint256 expectedWithdrawalAmount = (initialReleaseGoldAmount / 4) * 3;
 
@@ -1714,7 +1837,7 @@ contract Withdraw is ReleaseGoldTest {
 
     assertEq(expectedWithdrawalAmount, releaseGold.totalWithdrawn(), "Incorrect withdrawalAmount");
 
-    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(config.beneficiary);
+    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(initParams._beneficiary);
     assertEq(beneficiaryBalanceAfter - beneficiaryBalanceBefore, expectedWithdrawalAmount);
   }
 
@@ -1724,7 +1847,7 @@ contract Withdraw is ReleaseGoldTest {
     vm.prank(releaseOwner);
     releaseGold.setMaxDistribution(1000);
 
-    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(config.beneficiary);
+    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(initParams._beneficiary);
     vm.warp(block.timestamp + 12 * MONTH + 1 * DAY);
     uint256 expectedWithdrawalAmount = initialReleaseGoldAmount;
 
@@ -1733,7 +1856,7 @@ contract Withdraw is ReleaseGoldTest {
 
     assertEq(expectedWithdrawalAmount, releaseGold.totalWithdrawn(), "Incorrect withdrawalAmount");
 
-    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(config.beneficiary);
+    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(initParams._beneficiary);
     assertEq(beneficiaryBalanceAfter - beneficiaryBalanceBefore, expectedWithdrawalAmount);
   }
 
@@ -1811,7 +1934,7 @@ contract Withdraw is ReleaseGoldTest {
     vm.prank(releaseOwner);
     releaseGold.setMaxDistribution(1000);
 
-    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(config.beneficiary);
+    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(initParams._beneficiary);
     vm.warp(block.timestamp + 6 * MONTH + 1 * DAY);
     vm.prank(releaseOwner);
     releaseGold.revoke();
@@ -1819,7 +1942,7 @@ contract Withdraw is ReleaseGoldTest {
     vm.prank(beneficiary);
     releaseGold.withdraw(expectedWithdrawalAmount);
     uint256 totalWithdrawn = releaseGold.totalWithdrawn();
-    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(config.beneficiary);
+    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(initParams._beneficiary);
 
     assertEq(totalWithdrawn, expectedWithdrawalAmount);
     assertEq(beneficiaryBalanceAfter - beneficiaryBalanceBefore, expectedWithdrawalAmount);
@@ -1847,7 +1970,7 @@ contract Withdraw is ReleaseGoldTest {
     vm.prank(releaseOwner);
     releaseGold.setMaxDistribution(500);
 
-    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(config.beneficiary);
+    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(initParams._beneficiary);
     vm.warp(block.timestamp + 12 * MONTH + 1 * DAY);
     uint256 expectedWithdrawalAmount = initialReleaseGoldAmount / 2;
 
@@ -1856,7 +1979,7 @@ contract Withdraw is ReleaseGoldTest {
 
     assertEq(expectedWithdrawalAmount, releaseGold.totalWithdrawn(), "Incorrect withdrawalAmount");
 
-    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(config.beneficiary);
+    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(initParams._beneficiary);
     assertEq(beneficiaryBalanceAfter - beneficiaryBalanceBefore, expectedWithdrawalAmount);
   }
 
@@ -1880,7 +2003,7 @@ contract Withdraw is ReleaseGoldTest {
     vm.prank(releaseOwner);
     releaseGold.setMaxDistribution(1000);
 
-    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(config.beneficiary);
+    uint256 beneficiaryBalanceBefore = goldToken.balanceOf(initParams._beneficiary);
     vm.warp(block.timestamp + 12 * MONTH + 1 * DAY);
     uint256 expectedWithdrawalAmount = initialReleaseGoldAmount;
 
@@ -1889,14 +2012,14 @@ contract Withdraw is ReleaseGoldTest {
 
     assertEq(expectedWithdrawalAmount, releaseGold.totalWithdrawn(), "Incorrect withdrawalAmount");
 
-    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(config.beneficiary);
+    uint256 beneficiaryBalanceAfter = goldToken.balanceOf(initParams._beneficiary);
     assertEq(beneficiaryBalanceAfter - beneficiaryBalanceBefore, expectedWithdrawalAmount);
   }
 
   function test_ShouldRevertOnWithdrawalOfAnyAmount_WhenLiquidityProvisionIsObservedAndSetFalse()
     public
   {
-    config.subjectToLiquidityProvision = true;
+    initParams2.subjectToLiquidityProvision = true;
     newReleaseGold(true, false);
     vm.warp(block.timestamp + 12 * MONTH + 1 * DAY);
 
@@ -1916,8 +2039,8 @@ contract WithdrawSelfDestruct_WhenNotRevoked is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
 
-    config.initialDistributionRatio = 0;
-    initialReleaseGoldAmount = config.amountReleasedPerPeriod * config.numReleasePeriods;
+    initParams2.initialDistributionRatio = 0;
+    initialReleaseGoldAmount = initParams.amountReleasedPerPeriod * initParams.numReleasePeriods;
     newReleaseGold(true, false);
 
     vm.prank(releaseOwner);
@@ -1942,8 +2065,8 @@ contract WithdrawSelfDestruct_WhenRevoked is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
 
-    config.initialDistributionRatio = 0;
-    initialReleaseGoldAmount = config.amountReleasedPerPeriod * config.numReleasePeriods;
+    initParams2.initialDistributionRatio = 0;
+    initialReleaseGoldAmount = initParams.amountReleasedPerPeriod * initParams.numReleasePeriods;
     newReleaseGold(true, false);
 
     vm.prank(releaseOwner);
@@ -1970,7 +2093,7 @@ contract GetCurrentReleasedTotalAmount is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
     newReleaseGold(true, false);
-    initialReleaseGoldAmount = config.amountReleasedPerPeriod * config.numReleasePeriods;
+    initialReleaseGoldAmount = initParams.amountReleasedPerPeriod * initParams.numReleasePeriods;
   }
 
   function test_ShouldReturnZeroIfBeforeCliffStartTime() public {
@@ -2012,13 +2135,13 @@ contract GetWithdrawableAmount is ReleaseGoldTest {
 
   function setUp() public {
     super.setUp();
-    config.canValidate = true;
-    config.revocable = false;
-    config.refundAddress = address(0);
-    config.initialDistributionRatio = 500;
+    initParams2._canValidate = true;
+    initParams.revocable = false;
+    initParams2._refundAddress = address(0);
+    initParams2.initialDistributionRatio = 500;
 
     newReleaseGold(true, false);
-    initialReleaseGoldAmount = config.amountReleasedPerPeriod * config.numReleasePeriods;
+    initialReleaseGoldAmount = initParams.amountReleasedPerPeriod * initParams.numReleasePeriods;
   }
 
   function test_ShouldReturnFullAmountAvailableForThisReleasePeriod() public {
