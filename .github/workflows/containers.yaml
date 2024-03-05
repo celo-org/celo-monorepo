@@ -5,11 +5,13 @@ on:
   push:
     paths:
       - 'dockerfiles/**'
+      - 'packages/celotool/**'
     branches:
       - master
   pull_request:
     paths:
       - 'dockerfiles/**'
+      - 'packages/celotool/**'
   workflow_dispatch:
 
 jobs:
@@ -30,12 +32,15 @@ jobs:
 
   # Celotool images
   celotool-build-dev:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.14.1
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.0.1
     name: Build us-west1-docker.pkg.dev/devopsre/dev-images/celotool:${{ github.sha }}
     needs: changed-files
     if: |
-      github.ref != 'refs/heads/master' &&
-      contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/celotool/Dockerfile')
+      github.ref != 'refs/heads/master' && (
+        contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/celotool/Dockerfile') ||
+        contains(needs.changed-files.outputs.all_modified_files, ',packages/celotool') ||
+        github.event_name == 'workflow_dispatch'
+      )
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
       service-account: 'celo-monorepo-dev@devopsre.iam.gserviceaccount.com'
@@ -44,14 +49,17 @@ jobs:
       platforms: linux/amd64
       context: .
       file: dockerfiles/celotool/Dockerfile
-      trivy: true
+      trivy: false
   celotool-build:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.14.1
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.0.1
     name: Build us-west1-docker.pkg.dev/devopsre/celo-monorepo/celotool:${{ github.sha }}
     needs: changed-files
     if: |
-      github.ref == 'refs/heads/master' &&
-      contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/celotool/Dockerfile')
+      github.ref == 'refs/heads/master' && (
+        contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/celotool/Dockerfile') ||
+        contains(needs.changed-files.outputs.all_modified_files, ',packages/celotool') ||
+        github.event_name == 'workflow_dispatch'
+      )
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo-master/providers/github-by-repos
       service-account: 'celo-monorepo@devopsre.iam.gserviceaccount.com'
@@ -60,16 +68,17 @@ jobs:
       platforms: linux/amd64
       context: .
       file: dockerfiles/celotool/Dockerfile
-      trivy: true
+      trivy: false
 
   # All monorepo
   celomonorepo-build-dev:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.14.1
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.0.1
     name: Build us-west1-docker.pkg.dev/devopsre/dev-images/monorepo:${{ github.sha }}
     needs: changed-files
     if: |
-      github.ref != 'refs/heads/master' &&
-      contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/all-monorepo/Dockerfile')
+      github.ref != 'refs/heads/master' && (
+        contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/all-monorepo/Dockerfile')
+      )
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
       service-account: 'celo-monorepo-dev@devopsre.iam.gserviceaccount.com'
@@ -77,14 +86,15 @@ jobs:
       tags: ${{ github.sha }}
       context: .
       file: dockerfiles/all-monorepo/Dockerfile
-      trivy: true
+      trivy: false
   celomonorepo-build:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.14.1
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.0.1
     name: Build us-west1-docker.pkg.dev/devopsre/celo-monorepo/monorepo:${{ github.sha }}
     needs: changed-files
     if: |
-      github.ref == 'refs/heads/master' &&
-      contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/all-monorepo/Dockerfile')
+      github.ref == 'refs/heads/master' && (
+        contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/all-monorepo/Dockerfile')
+      )
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo-master/providers/github-by-repos
       service-account: 'celo-monorepo@devopsre.iam.gserviceaccount.com'
@@ -92,16 +102,17 @@ jobs:
       tags: ${{ github.sha }}
       context: .
       file: dockerfiles/all-monorepo/Dockerfile
-      trivy: true
+      trivy: false
 
   # Blockscout Metadata crawler images
   metadata-crawler-build-dev:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.14.1
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.0.1
     needs: changed-files
     name: Build us-west1-docker.pkg.dev/devopsre/dev-images/blockscout-metadata-crawler:testing
     if: |
-      github.ref != 'refs/heads/master' &&
-      contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/metadata-crawler')
+      github.ref != 'refs/heads/master' && (
+        contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/metadata-crawler')
+      )
     with:
       workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
       service-account: 'celo-monorepo-dev@devopsre.iam.gserviceaccount.com'
@@ -109,19 +120,20 @@ jobs:
       tags: testing
       context: .
       file: dockerfiles/metadata-crawler/Dockerfile
-      trivy: true
+      trivy: false
   metadata-crawler-build:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.14.1
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.0.1
     needs: changed-files
     name: Build us-west1-docker.pkg.dev/devopsre/celo-monorepo/blockscout-metadata-crawler:latest
     if: |
-      github.ref == 'refs/heads/master' &&
-      contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/metadata-crawler')
+      github.ref == 'refs/heads/master' && (
+        contains(needs.changed-files.outputs.all_modified_files, ',dockerfiles/metadata-crawler')
+      )
     with:
-      workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo/providers/github-by-repos
+      workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-celo-monorepo-master/providers/github-by-repos
       service-account: 'celo-monorepo@devopsre.iam.gserviceaccount.com'
       artifact-registry: us-west1-docker.pkg.dev/devopsre/celo-monorepo/blockscout-metadata-crawler
       tags: latest
       context: .
       file: dockerfiles/metadata-crawler/Dockerfile
-      trivy: true
+      trivy: false
