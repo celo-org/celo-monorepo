@@ -706,7 +706,9 @@ contract SetMaxDistribution is ReleaseGoldTest {
     assertTrue(releaseGold.maxDistribution() >= TOTAL_AMOUNT);
   }
 
-  function test_ShouldRevertWhenTryingToLowerMaxDistribution_WhenMaxDistributionIsSetTo100Percent() public {
+  function test_ShouldRevertWhenTryingToLowerMaxDistribution_WhenMaxDistributionIsSetTo100Percent()
+    public
+  {
     vm.prank(releaseOwner);
     releaseGold.setMaxDistribution(1000);
     vm.prank(releaseOwner);
@@ -1498,9 +1500,7 @@ contract WithdrawLockedGold is ReleaseGoldTest {
     vm.stopPrank();
   }
 
-  function test_ShouldRevert_WhenItIsBeforeTheAvailabilityTime_WhenPendingWithdrawalExits()
-    public
-  {
+  function test_ShouldRevert_WhenItIsBeforeTheAvailabilityTime_WhenPendingWithdrawalExits() public {
     vm.startPrank(beneficiary);
     releaseGold.createAccount();
     releaseGold.lockGold(value);
@@ -1783,7 +1783,7 @@ contract Withdraw is ReleaseGoldTest {
     releaseGold.withdraw(expectedWIthdrawalAmount);
   }
 
-  function test_ShouldRevertWhenWithdrawing MoreThan50Percent_WhenTheGrantHasFullyReleased_WhenRewardsAreSimulated__WhenNotRevoked_WhenMaxDistributionIs50Percent()
+  function test_ShouldRevertWhenWithdrawingMoreThan50Percent_WhenTheGrantHasFullyReleased_WhenRewardsAreSimulated__WhenNotRevoked_WhenMaxDistributionIs50Percent()
     public
   {
     vm.prank(releaseOwner);
