@@ -1326,7 +1326,7 @@ contract Expire is ReleaseGoldTest {
     assertEq(balanceAfter - balanceBefore, TOTAL_AMOUNT);
   }
 
-  function test_ShouldSucceed_WhenAnInstanceIsExpired_WhenBeneficiaryHasNotWithdrawnAnyBalanceYet_WhenEXPIRATION_TIMEHasPassedAfterReleaseScheduleCompletionAndBeneficiaryHasWithdrawnSomeBalance()
+  function test_ShouldRevokeTheContract_WhenAnInstanceIsExpired_WhenBeneficiaryHasNotWithdrawnAnyBalanceYet_WhenEXPIRATION_TIMEHasPassedAfterReleaseScheduleCompletionAndBeneficiaryHasWithdrawnSomeBalance()
     public
   {
     (uint256 releaseStartTime, , uint256 numReleasePeriods, uint256 releasePeriod, ) = releaseGold
@@ -1334,14 +1334,26 @@ contract Expire is ReleaseGoldTest {
     vm.warp(
       releaseStartTime + numReleasePeriods * releasePeriod + releaseGold.EXPIRATION_TIME() + 1
     );
-    vm.prank(beneficiary);
-    releaseGold.withdraw(TOTAL_AMOUNT / 2);
+
+    vm.prank(releaseOwner);
+    releaseGold.expire();
+    assertEq(releaseGold.isRevoked(), true);
+  }
+
+  function test_SetTheReleasedBalanceAtRevocationToTotalWithdrawn_WhenAnInstanceIsExpired_WhenBeneficiaryHasNotWithdrawnAnyBalanceYet_WhenEXPIRATION_TIMEHasPassedAfterReleaseScheduleCompletionAndBeneficiaryHasWithdrawnSomeBalance()
+    public
+  {
+    (uint256 releaseStartTime, , uint256 numReleasePeriods, uint256 releasePeriod, ) = releaseGold
+      .releaseSchedule();
+    vm.warp(
+      releaseStartTime + numReleasePeriods * releasePeriod + releaseGold.EXPIRATION_TIME() + 1
+    );
+
     vm.prank(releaseOwner);
     releaseGold.expire();
 
-    assertEq(releaseGold.isRevoked(), true);
     (, , uint256 releasedBalanceAtRevoke, ) = releaseGold.revocationInfo();
-    assertEq(releasedBalanceAtRevoke, TOTAL_AMOUNT / 2);
+    assertEq(releasedBalanceAtRevoke, 0);
   }
 
   function test_ShouldAllowToRefundOfAllRemainingGold_WhenAnInstanceIsExpired_WhenBeneficiaryHasWithdrawnSomeBalance_WhenEXPIRATION_TIMEHasPassedAfterReleaseScheduleCompletionAndBeneficiaryHasWithdrawnSomeBalance()
