@@ -12,6 +12,10 @@ contract Utils is Test {
     vm.warp(block.timestamp + timeDelta);
   }
 
+  function blockTravel(uint256 blockDelta) public {
+    vm.roll(block.number + blockDelta);
+  }
+
   function assertAlmostEqual(uint256 actual, uint256 expected, uint256 margin) public {
     uint256 diff = actual > expected ? actual - expected : expected - actual;
     assertTrue(diff <= margin, string(abi.encodePacked("Difference is ", uintToStr(diff))));
@@ -71,9 +75,5 @@ contract Utils is Test {
       (uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, msg.sender, salt))) %
         (max - min + 1)) +
       min;
-  }
-
-  function blockTravel(uint256 blockTravel) public {
-    vm.roll(block.number + blockTravel);
   }
 }

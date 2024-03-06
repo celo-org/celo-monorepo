@@ -6,7 +6,7 @@ import "../../common/FixidityLib.sol";
 /**
  * @title A wrapper around Validators that exposes onlyVm functions for testing.
  */
-contract ValidatorsTest is Validators(true) {
+contract ValidatorsMock is Validators(true) {
   function updateValidatorScoreFromSigner(address signer, uint256 uptime) external {
     return _updateValidatorScoreFromSigner(signer, uptime);
   }
