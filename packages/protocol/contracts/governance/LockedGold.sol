@@ -567,6 +567,35 @@ contract LockedGold is
   }
 
   /**
+   * @notice Returns the pending withdrawals from unlocked gold for an account in a given range.
+   * @param account The address of the account.
+   * @param from The start index of the pending withdrawals.
+   * @param to The end index of the pending withdrawals.
+   * @return The value for each pending withdrawal.
+   * @return The timestamp for each pending withdrawal.
+   */
+  function getPendingWithdrawalsInBatch(address account, uint256 from, uint256 to)
+    public
+    view
+    returns (uint256[] memory, uint256[] memory)
+  {
+    if (balances[account].pendingWithdrawals.length == 0) {
+      return (new uint256[](0), new uint256[](0));
+    }
+    require(from <= to, "Invalid range");
+    require(to < balances[account].pendingWithdrawals.length, "Invalid range");
+    uint256 length = to - from + 1;
+    uint256[] memory values = new uint256[](length);
+    uint256[] memory timestamps = new uint256[](length);
+    for (uint256 i = from; i <= to; i = i.add(1)) {
+      PendingWithdrawal memory pendingWithdrawal = (balances[account].pendingWithdrawals[i]);
+      values[i - from] = pendingWithdrawal.value;
+      timestamps[i - from] = pendingWithdrawal.timestamp;
+    }
+    return (values, timestamps);
+  }
+
+  /**
    * Updates real delegated amount to delegatee.
    * There might be discrepancy because of validator rewards or extra locked gold.
    * Voting power will always be smaller or equal to what it is supposed to be.
@@ -732,19 +761,8 @@ contract LockedGold is
     view
     returns (uint256[] memory, uint256[] memory)
   {
-    require(
-      getAccounts().isAccount(account),
-      "Unknown account: only registered accounts have pending withdrawals"
-    );
-    uint256 length = balances[account].pendingWithdrawals.length;
-    uint256[] memory values = new uint256[](length);
-    uint256[] memory timestamps = new uint256[](length);
-    for (uint256 i = 0; i < length; i = i.add(1)) {
-      PendingWithdrawal memory pendingWithdrawal = (balances[account].pendingWithdrawals[i]);
-      values[i] = pendingWithdrawal.value;
-      timestamps[i] = pendingWithdrawal.timestamp;
-    }
-    return (values, timestamps);
+    return
+      getPendingWithdrawalsInBatch(account, 0, balances[account].pendingWithdrawals.length - 1);
   }
 
   /**
