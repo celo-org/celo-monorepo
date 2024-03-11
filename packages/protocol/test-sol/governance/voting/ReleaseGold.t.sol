@@ -19,13 +19,7 @@ import "../../../contracts/stability/test/MockStableToken.sol";
 import "../../../contracts/governance/test/MockElection.sol";
 import "../../../contracts/governance/test/MockGovernance.sol";
 import "../../../contracts/governance/test/MockValidators.sol";
-
-interface ISECP256K1 {
-  function recover(uint256 digest, uint8 v, uint256 r, uint256 s)
-    external
-    pure
-    returns (uint256, uint256);
-}
+import "@test-sol/utils/ECDSAHelper.sol";
 
 contract ReleaseGoldMockTunnel is ForgeTest {
   ReleaseGold private releaseGoldTunnel;
@@ -103,7 +97,7 @@ contract ReleaseGoldMockTunnel is ForgeTest {
   }
 }
 
-contract ReleaseGoldTest is Test {
+contract ReleaseGoldTest is Test, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
 
   Registry registry;
@@ -146,8 +140,6 @@ contract ReleaseGoldTest is Test {
   ReleaseGoldMockTunnel.InitParams initParams;
   ReleaseGoldMockTunnel.InitParams2 initParams2;
 
-  ISECP256K1 sECP256K1;
-
   function newReleaseGold(bool prefund, bool startReleasing) internal returns (ReleaseGold) {
     releaseGold = new ReleaseGold(true);
 
@@ -175,22 +167,6 @@ contract ReleaseGoldTest is Test {
     bytes32 addressHash = keccak256(abi.encodePacked(_address));
     bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
     return vm.sign(privateKey, prefixedHash);
-  }
-
-  function addressToPublicKey(bytes32 message, uint8 _v, bytes32 _r, bytes32 _s)
-    public
-    view
-    returns (bytes memory)
-  {
-    string memory header = "\x19Ethereum Signed Message:\n32";
-    bytes32 _message = keccak256(abi.encodePacked(header, message));
-    (uint256 x, uint256 y) = sECP256K1.recover(
-      uint256(_message),
-      _v - 27,
-      uint256(_r),
-      uint256(_s)
-    );
-    return abi.encodePacked(x, y);
   }
 
   function setUp() public {
@@ -246,11 +222,6 @@ contract ReleaseGoldTest is Test {
     });
 
     vm.deal(randomAddress, 1000 ether);
-
-    address SECP256K1Address = actor("SECP256K1Address");
-
-    deployCodeTo("SECP256K1.sol", SECP256K1Address);
-    sECP256K1 = ISECP256K1(SECP256K1Address);
   }
 }
 
