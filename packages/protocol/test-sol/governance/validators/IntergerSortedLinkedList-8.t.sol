@@ -10,7 +10,7 @@ import { StdUtils } from "forge-std-8/StdUtils.sol";
 import "@test-sol/governance/validators/IntegerSortedLinkedListMock-8.sol";
 
 contract IntegerSortedLinkedListTest8 is Test {
-  IntegerSortedLinkedListMock public integerSortedLinkedListTest;
+  IntegerSortedLinkedListMock public integerSortedLinkedListMock;
   Handler public handler;
 
   struct SortedElement {
@@ -19,7 +19,7 @@ contract IntegerSortedLinkedListTest8 is Test {
   }
 
   function setUp() public virtual {
-    integerSortedLinkedListTest = new IntegerSortedLinkedListMock();
+    integerSortedLinkedListMock = new IntegerSortedLinkedListMock();
   }
 
   function parseElements(uint256[] memory keys, uint256[] memory values)
@@ -51,24 +51,24 @@ contract IntegerSortedLinkedListTest8 is Test {
 
   function assertInvariants() internal {
     assertEq(
-      integerSortedLinkedListTest.getNumElements(),
+      integerSortedLinkedListMock.getNumElements(),
       handler.actionListLength(),
       "Incorrect number of elements here"
     );
 
-    (uint256[] memory keys, uint256[] memory values) = integerSortedLinkedListTest.getElements();
+    (uint256[] memory keys, uint256[] memory values) = integerSortedLinkedListMock.getElements();
     SortedElement[] memory sortedElements = parseElements(keys, values);
     assertSorted(sortedElements);
     if (sortedElements.length > 0) {
-      assertEq(integerSortedLinkedListTest.head(), sortedElements[0].key, "Incorrect head");
+      assertEq(integerSortedLinkedListMock.head(), sortedElements[0].key, "Incorrect head");
       assertEq(
-        integerSortedLinkedListTest.tail(),
+        integerSortedLinkedListMock.tail(),
         sortedElements[sortedElements.length - 1].key,
         "Incorrect tail"
       );
     } else {
-      assertEq(integerSortedLinkedListTest.head(), 0, "Head not zero");
-      assertEq(integerSortedLinkedListTest.tail(), 0, "Tail not Zero");
+      assertEq(integerSortedLinkedListMock.head(), 0, "Head not zero");
+      assertEq(integerSortedLinkedListMock.tail(), 0, "Tail not Zero");
     }
   }
 }
@@ -78,10 +78,10 @@ contract IntegerSortedLinkedListTest8_Insert is IntegerSortedLinkedListTest8 {
   uint256 value = 5;
 
   function test_ShouldAddASingleElementToList() public {
-    integerSortedLinkedListTest.insert(key, value, 0, 0);
-    assertTrue(integerSortedLinkedListTest.contains(key));
+    integerSortedLinkedListMock.insert(key, value, 0, 0);
+    assertTrue(integerSortedLinkedListMock.contains(key));
 
-    (uint256[] memory keys, uint256[] memory values) = integerSortedLinkedListTest.getElements();
+    (uint256[] memory keys, uint256[] memory values) = integerSortedLinkedListMock.getElements();
 
     assertEq(keys.length, 1);
     assertEq(values.length, 1);
@@ -91,48 +91,48 @@ contract IntegerSortedLinkedListTest8_Insert is IntegerSortedLinkedListTest8 {
   }
 
   function test_ShouldIncrementNumElements() public {
-    integerSortedLinkedListTest.insert(key, value, 0, 0);
-    assertEq(integerSortedLinkedListTest.getNumElements(), 1);
+    integerSortedLinkedListMock.insert(key, value, 0, 0);
+    assertEq(integerSortedLinkedListMock.getNumElements(), 1);
   }
 
   function test_ShouldUpdateTheHead() public {
-    integerSortedLinkedListTest.insert(key, value, 0, 0);
-    assertEq(integerSortedLinkedListTest.head(), key);
+    integerSortedLinkedListMock.insert(key, value, 0, 0);
+    assertEq(integerSortedLinkedListMock.head(), key);
   }
 
   function test_ShouldUpdateTail() public {
-    integerSortedLinkedListTest.insert(key, value, 0, 0);
-    assertEq(integerSortedLinkedListTest.tail(), key);
+    integerSortedLinkedListMock.insert(key, value, 0, 0);
+    assertEq(integerSortedLinkedListMock.tail(), key);
   }
 
   function test_Reverts_IfKeyIsZero() public {
     vm.expectRevert("invalid key");
-    integerSortedLinkedListTest.insert(0, value, 0, 0);
+    integerSortedLinkedListMock.insert(0, value, 0, 0);
   }
 
   function test_Reverts_IfLesserEqualsKey() public {
     vm.expectRevert("invalid key");
-    integerSortedLinkedListTest.insert(key, value, key, 0);
+    integerSortedLinkedListMock.insert(key, value, key, 0);
   }
 
   function test_Reverts_IfGreaterEqualsKey() public {
     vm.expectRevert("invalid key");
-    integerSortedLinkedListTest.insert(key, value, 0, key);
+    integerSortedLinkedListMock.insert(key, value, 0, key);
   }
 
   function test_Reverts_WhenInsertingElementAlreadyInList_WhenListIsNotEmpty() public {
-    integerSortedLinkedListTest.insert(key, value, 0, 0);
+    integerSortedLinkedListMock.insert(key, value, 0, 0);
     vm.expectRevert("invalid key");
-    integerSortedLinkedListTest.insert(key, value, 0, key);
+    integerSortedLinkedListMock.insert(key, value, 0, key);
   }
 
   function test_Reverts_WhenInsertingNonMaximalElementAtHeadOfList_WhenListIsNotEmpty() public {
-    integerSortedLinkedListTest.insert(key, value, 0, 0);
+    integerSortedLinkedListMock.insert(key, value, 0, 0);
 
     uint256 nonKey = key - 1;
     uint256 newKey = key + 1;
     vm.expectRevert("greater and lesser key zero");
-    integerSortedLinkedListTest.insert(newKey, value - 1, nonKey, 0);
+    integerSortedLinkedListMock.insert(newKey, value - 1, nonKey, 0);
   }
 }
 
@@ -143,14 +143,14 @@ contract IntegerSortedLinkedListTest8_Update is IntegerSortedLinkedListTest8 {
 
   function setUp() public override {
     super.setUp();
-    integerSortedLinkedListTest.insert(key, value, 0, 0);
+    integerSortedLinkedListMock.insert(key, value, 0, 0);
   }
 
   function test_ShouldUpdateTheValueForExistingElement() public {
-    integerSortedLinkedListTest.update(key, newValue, 0, 0);
+    integerSortedLinkedListMock.update(key, newValue, 0, 0);
 
-    assertTrue(integerSortedLinkedListTest.contains(key));
-    (uint256[] memory keys, uint256[] memory values) = integerSortedLinkedListTest.getElements();
+    assertTrue(integerSortedLinkedListMock.contains(key));
+    (uint256[] memory keys, uint256[] memory values) = integerSortedLinkedListMock.getElements();
     assertEq(keys.length, 1);
     assertEq(values.length, 1);
 
@@ -160,17 +160,17 @@ contract IntegerSortedLinkedListTest8_Update is IntegerSortedLinkedListTest8 {
 
   function test_Reverts_IfKeyIsNotInList() public {
     vm.expectRevert("key not in list");
-    integerSortedLinkedListTest.update(key + 1, newValue, 0, 0);
+    integerSortedLinkedListMock.update(key + 1, newValue, 0, 0);
   }
 
   function test_Reverts_IfLesserEqualsKey() public {
     vm.expectRevert("invalid key");
-    integerSortedLinkedListTest.update(key, newValue, key, 0);
+    integerSortedLinkedListMock.update(key, newValue, key, 0);
   }
 
   function test_Reverts_IfGreaterEqualsKey() public {
     vm.expectRevert("invalid key");
-    integerSortedLinkedListTest.update(key, newValue, 0, key);
+    integerSortedLinkedListMock.update(key, newValue, 0, key);
   }
 }
 
@@ -180,36 +180,36 @@ contract IntegerSortedLinkedListTest8_Remove is IntegerSortedLinkedListTest8 {
 
   function setUp() public override {
     super.setUp();
-    integerSortedLinkedListTest.insert(key, value, 0, 0);
+    integerSortedLinkedListMock.insert(key, value, 0, 0);
   }
 
   function test_ShouldRemoveElementFromList() public {
-    integerSortedLinkedListTest.remove(key);
-    assertFalse(integerSortedLinkedListTest.contains(key));
+    integerSortedLinkedListMock.remove(key);
+    assertFalse(integerSortedLinkedListMock.contains(key));
 
-    (uint256[] memory keys, uint256[] memory values) = integerSortedLinkedListTest.getElements();
+    (uint256[] memory keys, uint256[] memory values) = integerSortedLinkedListMock.getElements();
     assertEq(keys.length, 0);
     assertEq(values.length, 0);
   }
 
   function test_ShouldDecrementNumElements() public {
-    integerSortedLinkedListTest.remove(key);
-    assertEq(integerSortedLinkedListTest.getNumElements(), 0);
+    integerSortedLinkedListMock.remove(key);
+    assertEq(integerSortedLinkedListMock.getNumElements(), 0);
   }
 
   function test_ShouldUpdateHead() public {
-    integerSortedLinkedListTest.remove(key);
-    assertEq(integerSortedLinkedListTest.head(), 0);
+    integerSortedLinkedListMock.remove(key);
+    assertEq(integerSortedLinkedListMock.head(), 0);
   }
 
   function test_ShouldUpdateTail() public {
-    integerSortedLinkedListTest.remove(key);
-    assertEq(integerSortedLinkedListTest.tail(), 0);
+    integerSortedLinkedListMock.remove(key);
+    assertEq(integerSortedLinkedListMock.tail(), 0);
   }
 
   function test_Reverts_IfKeyIsNotInList() public {
     vm.expectRevert("key not in list");
-    integerSortedLinkedListTest.remove(key + 1);
+    integerSortedLinkedListMock.remove(key + 1);
   }
 }
 
@@ -222,26 +222,26 @@ contract IntegerSortedLinkedListTest8_PopN is IntegerSortedLinkedListTest8 {
 
     for (uint256 key = 1; key < numElements + 1; key++) {
       uint256 value = key * 10;
-      integerSortedLinkedListTest.insert(key, value, key - 1, 0);
+      integerSortedLinkedListMock.insert(key, value, key - 1, 0);
     }
   }
 
   function test_ShouldRemoveTheNKeyWithLargestValues() public {
-    integerSortedLinkedListTest.popN(n);
+    integerSortedLinkedListMock.popN(n);
     for (uint256 key = 1; key < numElements + 1; key++) {
       if (key <= numElements - n) {
-        assertTrue(integerSortedLinkedListTest.contains(key));
+        assertTrue(integerSortedLinkedListMock.contains(key));
       } else {
-        assertFalse(integerSortedLinkedListTest.contains(key));
+        assertFalse(integerSortedLinkedListMock.contains(key));
       }
     }
-    (uint256[] memory keys, uint256[] memory values) = integerSortedLinkedListTest.getElements();
+    (uint256[] memory keys, uint256[] memory values) = integerSortedLinkedListMock.getElements();
     assertEq(keys.length, numElements - n);
     assertEq(values.length, numElements - n);
   }
 
   function test_ShouldReturnTheNKeyWithTheLargestValues() public {
-    uint256[] memory popped = integerSortedLinkedListTest.popN(n);
+    uint256[] memory popped = integerSortedLinkedListMock.popN(n);
 
     uint256[] memory expectedPopped = generateExpectedPopped(numElements, n);
 
@@ -249,18 +249,18 @@ contract IntegerSortedLinkedListTest8_PopN is IntegerSortedLinkedListTest8 {
   }
 
   function test_ShouldDecrementNumElements() public {
-    integerSortedLinkedListTest.popN(n);
-    assertEq(integerSortedLinkedListTest.getNumElements(), numElements - n);
+    integerSortedLinkedListMock.popN(n);
+    assertEq(integerSortedLinkedListMock.getNumElements(), numElements - n);
   }
 
   function test_ShouldUpdateHead() public {
-    integerSortedLinkedListTest.popN(n);
-    assertEq(integerSortedLinkedListTest.head(), numElements - n);
+    integerSortedLinkedListMock.popN(n);
+    assertEq(integerSortedLinkedListMock.head(), numElements - n);
   }
 
   function test_Reverts_IfNIsGreaterThanNumElements() public {
     vm.expectRevert("not enough elements");
-    integerSortedLinkedListTest.popN(numElements + 1);
+    integerSortedLinkedListMock.popN(numElements + 1);
   }
 
   function generateExpectedPopped(uint256 _numElements, uint256 _n)
@@ -288,7 +288,7 @@ contract IntegerSortedLinkedListTest8_Invariant_WhenLesserAndGreaterAreCorrect_W
   function setUp() public override {
     super.setUp();
 
-    handler = new Handler(integerSortedLinkedListTest);
+    handler = new Handler(integerSortedLinkedListMock);
     targetContract(address(handler));
 
     bytes4[] memory selectors = new bytes4[](3);
@@ -314,7 +314,7 @@ contract IntegerSortedLinkedListTest8_Invariant_WhenLesserAndGreaterAreIncorrect
   function setUp() public override {
     super.setUp();
 
-    handler = new Handler(integerSortedLinkedListTest);
+    handler = new Handler(integerSortedLinkedListMock);
     targetContract(address(handler));
 
     bytes4[] memory selectors = new bytes4[](3);
