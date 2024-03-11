@@ -2429,3 +2429,86 @@ contract LockedGoldGetTotalPendingWithdrawalsCount is LockedGoldTest {
     assertEq(lockedGold.getTotalPendingWithdrawalsCount(randomAddress), 0);
   }
 }
+
+contract LockedGoldTestGetPendingWithdrawalsInBatch is LockedGoldTest {
+  uint256 value = 1000;
+
+  function setUp() public {
+    super.setUp();
+  }
+
+  function test_ShouldReturn0_WhenAccountHasNoPendingWithdrawals() public {
+    (uint256[] memory pendingWithdrawals, uint256[] memory timestamps) = lockedGold
+      .getPendingWithdrawalsInBatch(randomAddress, 0, 0);
+    assertEq(pendingWithdrawals.length, 0);
+    assertEq(timestamps.length, 0);
+  }
+
+  function test_ShouldReturnCorrectValue_WhenAccountHasPendingWithdrawals() public {
+    lockedGold.lock.value(value)();
+
+    lockedGold.unlock(value / 2);
+    lockedGold.unlock(value / 2);
+
+    (uint256[] memory pendingWithdrawals, uint256[] memory timestamps) = lockedGold
+      .getPendingWithdrawalsInBatch(caller, 0, 1);
+    assertEq(pendingWithdrawals.length, 2);
+    assertEq(timestamps.length, 2);
+    assertEq(pendingWithdrawals[0], value / 2);
+    assertEq(pendingWithdrawals[1], value / 2);
+  }
+
+  function test_ShouldReturnCorrectValue_WhenAccountHasFourPendingWithdrawals() public {
+    lockedGold.lock.value(value)();
+
+    lockedGold.unlock(value / 4 - 1);
+    lockedGold.unlock(value / 4 + 1);
+    lockedGold.unlock(value / 4 - 2);
+    lockedGold.unlock(value / 4 + 2);
+
+    (uint256[] memory pendingWithdrawals, uint256[] memory timestamps) = lockedGold
+      .getPendingWithdrawalsInBatch(caller, 0, 1);
+    assertEq(pendingWithdrawals.length, 2);
+    assertEq(timestamps.length, 2);
+    assertEq(pendingWithdrawals[0], value / 4 - 1);
+    assertEq(pendingWithdrawals[1], value / 4 + 1);
+    (pendingWithdrawals, ) = lockedGold.getPendingWithdrawalsInBatch(caller, 2, 3);
+    assertEq(pendingWithdrawals.length, 2);
+    assertEq(timestamps.length, 2);
+    assertEq(pendingWithdrawals[0], value / 4 - 2);
+    assertEq(pendingWithdrawals[1], value / 4 + 2);
+  }
+
+  function test_ShouldReturnAsMuchAsPossible_WhenOverflowRangeProvided_WhenAccountHasPendingWithdrawals()
+    public
+  {
+    lockedGold.lock.value(value)();
+
+    lockedGold.unlock(value / 2);
+    lockedGold.unlock(value / 2);
+
+    (uint256[] memory pendingWithdrawals, uint256[] memory timestamps) = lockedGold
+      .getPendingWithdrawalsInBatch(caller, 0, 2);
+    assertEq(pendingWithdrawals.length, 2);
+    assertEq(timestamps.length, 2);
+    assertEq(pendingWithdrawals[0], value / 2);
+    assertEq(pendingWithdrawals[1], value / 2);
+  }
+
+  function test_Revert_WhenFromIsBiggerThanTo_WhenAccountHasPendingWithdrawals() public {
+    lockedGold.lock.value(value)();
+
+    lockedGold.unlock(value / 2);
+    lockedGold.unlock(value / 2);
+
+    vm.expectRevert("Invalid range");
+    lockedGold.getPendingWithdrawalsInBatch(caller, 1, 0);
+  }
+
+  function test_ShouldReturn0_WhenNonExistentAccount() public {
+    (uint256[] memory pendingWithdrawals, uint256[] memory timestamps) = lockedGold
+      .getPendingWithdrawalsInBatch(randomAddress, 0, 1);
+    assertEq(pendingWithdrawals.length, 0);
+    assertEq(timestamps.length, 0);
+  }
+}
