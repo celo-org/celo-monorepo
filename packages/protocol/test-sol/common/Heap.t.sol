@@ -4,7 +4,7 @@ pragma solidity ^0.5.13;
 import "celo-foundry/Test.sol";
 import "@celo-contracts/common/libraries/Heap.sol";
 
-contract HeapTest {
+contract HeapMock {
   using FixidityLib for FixidityLib.Fraction;
 
   function swapKeys(uint256[] memory keys, uint256 i, uint256 j) internal pure {
@@ -37,13 +37,13 @@ contract HeapTest {
   }
 }
 
-contract HeapTestTestFoundry is Test {
-  HeapTest heapTest;
+contract HeapTest is Test {
+  HeapMock heapTest;
 
   mapping(uint256 => bool) public helperMapping;
 
   function setUp() public {
-    heapTest = new HeapTest();
+    heapTest = new HeapMock();
   }
 
   function generatePRN(uint256 min, uint256 max, uint256 salt) public view returns (uint256) {

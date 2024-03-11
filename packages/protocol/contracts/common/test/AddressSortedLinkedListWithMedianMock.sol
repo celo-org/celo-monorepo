@@ -3,7 +3,7 @@ pragma solidity ^0.5.13;
 import "../linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../linkedlists/SortedLinkedListWithMedian.sol";
 
-contract AddressSortedLinkedListWithMedianTest {
+contract AddressSortedLinkedListWithMedianMock {
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
 
   SortedLinkedListWithMedian.List private list;

@@ -465,7 +465,7 @@ contract FederatedAttestations_Initialize is FederatedAttestationsFoundryTest {
     assertEq(federatedAttestations.eip712DomainSeparator(), expectedDomainSeparator);
   }
 
-  function test_ShouldEmitTheEIP712DomainSeparatorSet_Event() public {
+  function test_Emits_TheEIP712DomainSeparatorSet_Event() public {
     bytes32 expectedDomainSeparator = keccak256(
       abi.encode(
         keccak256(
@@ -1072,7 +1072,7 @@ contract FederatedAttestations_RegisterAttestation is FederatedAttestationsFound
 
   }
 
-  function test_ShouldEmitAttestationRegisteredForAValidAttestation() public {
+  function test_Emits_AttestationRegisteredForAValidAttestation() public {
     vm.expectEmit(true, true, true, true);
     emit AttestationRegistered(
       phoneHash,
@@ -1469,7 +1469,7 @@ contract FederatedAttestations_RevokeAttestation is FederatedAttestationsFoundry
     federatedAttestations.revokeAttestation(phoneHash, issuer1, account1);
   }
 
-  function test_ShouldEmitAnAttestationRevokedEventAfterSuccessfullyRevoking() public {
+  function test_Emits_AnAttestationRevokedEventAfterSuccessfullyRevoking() public {
     vm.expectEmit(true, true, true, true);
     emit AttestationRevoked(
       phoneHash,

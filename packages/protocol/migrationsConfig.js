@@ -583,7 +583,7 @@ const linkedLibraries = {
   AddressLinkedList: ['Validators', 'ValidatorsMock'],
   AddressSortedLinkedList: ['Election', 'ElectionTest'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
-  AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
+  AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianMock'],
   Signatures: [
     'Accounts',
     'Attestations',

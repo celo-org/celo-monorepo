@@ -3,7 +3,7 @@ pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
 import "@celo-contracts/common/GoldToken.sol";
-import "@celo-contracts/common/test/MockGoldToken.sol";
+import "./GoldTokenMock.sol";
 
 contract GoldTokenTest is Test {
   GoldToken goldToken;
@@ -23,7 +23,7 @@ contract GoldTokenTest is Test {
   }
 }
 
-contract BasicGoldTokenTest is GoldTokenTest {
+contract GoldTokenTest_General is GoldTokenTest {
   function setUp() public {
     super.setUp();
   }
@@ -73,7 +73,7 @@ contract BasicGoldTokenTest is GoldTokenTest {
   }
 }
 
-contract GoldTokenTransfer is GoldTokenTest {
+contract GoldTokenTest_transfer is GoldTokenTest {
   function setUp() public {
     super.setUp();
   }
@@ -108,7 +108,7 @@ contract GoldTokenTransfer is GoldTokenTest {
   }
 }
 
-contract GoldTokenTransferFrom is GoldTokenTest {
+contract GoldTokenTest_transferFrom is GoldTokenTest {
   function setUp() public {
     super.setUp();
     vm.prank(sender);
@@ -145,7 +145,7 @@ contract GoldTokenTransferFrom is GoldTokenTest {
   }
 }
 
-contract BurnGoldToken is GoldTokenTest {
+contract GoldTokenTest_burn is GoldTokenTest {
   uint256 startBurn;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
 
@@ -172,18 +172,18 @@ contract BurnGoldToken is GoldTokenTest {
   }
 }
 
-contract MockGoldTokenTest is Test {
-  MockGoldToken mockGoldToken;
+contract GoldTokenMockTest is Test {
+  GoldTokenMock mockGoldToken;
   uint256 ONE_GOLDTOKEN = 1000000000000000000;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
 
   function setUp() public {
-    mockGoldToken = new MockGoldToken();
+    mockGoldToken = new GoldTokenMock();
     mockGoldToken.setTotalSupply(ONE_GOLDTOKEN * 1000);
   }
 }
 
-contract MockGoldTokenCirculatingSupply is MockGoldTokenTest {
+contract GoldTokenMock_circulatingSupply is GoldTokenMockTest {
   function setUp() public {
     super.setUp();
   }

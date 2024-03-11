@@ -47,7 +47,7 @@ contract GovernanceSlasherTest is Test {
   }
 }
 
-contract GovernanceSlasherInitializeTest is GovernanceSlasherTest {
+contract GovernanceSlasherTest_initialize is GovernanceSlasherTest {
   function test_shouldHaveSetOwner() public {
     assertEq(governanceSlasher.owner(), owner);
   }
@@ -58,7 +58,7 @@ contract GovernanceSlasherInitializeTest is GovernanceSlasherTest {
   }
 }
 
-contract GovernanceSlasherApproveSlashingTest is GovernanceSlasherTest {
+contract GovernanceSlasherTest_approveSlashingTest is GovernanceSlasherTest {
   function test_ShouldSetSlashableAmount() public {
     governanceSlasher.approveSlashing(slashedAddress, 1000);
     assertEq(governanceSlasher.getApprovedSlashing(slashedAddress), 1000);
@@ -83,7 +83,7 @@ contract GovernanceSlasherApproveSlashingTest is GovernanceSlasherTest {
   }
 }
 
-contract GovernanceSlasherSlashTest is GovernanceSlasherTest {
+contract GovernanceSlasherTest_slasherSlashTest is GovernanceSlasherTest {
   address[] lessers = new address[](0);
   address[] greaters = new address[](0);
   uint256[] indices = new uint256[](0);
