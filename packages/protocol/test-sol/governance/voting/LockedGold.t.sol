@@ -2430,7 +2430,7 @@ contract LockedGoldGetTotalPendingWithdrawalsCount is LockedGoldTest {
   }
 }
 
-contract getPendingWithdrawalsInBatch is LockedGoldTest {
+contract LockedGoldTestGetPendingWithdrawalsInBatch is LockedGoldTest {
   uint256 value = 1000;
 
   function setUp() public {
