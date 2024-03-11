@@ -2479,15 +2479,30 @@ contract LockedGoldTestGetPendingWithdrawalsInBatch is LockedGoldTest {
     assertEq(pendingWithdrawals[1], value / 4 + 2);
   }
 
-  function test_Reverts_WhenInvalidRangeProvided_WhenAccountHasPendingWithdrawals() public {
+  function test_ShouldReturnAsMuchAsPossible_WhenOverflowRangeProvided_WhenAccountHasPendingWithdrawals()
+    public
+  {
+    lockedGold.lock.value(value)();
+
+    lockedGold.unlock(value / 2);
+    lockedGold.unlock(value / 2);
+
+    (uint256[] memory pendingWithdrawals, uint256[] memory timestamps) = lockedGold
+      .getPendingWithdrawalsInBatch(caller, 0, 2);
+    assertEq(pendingWithdrawals.length, 2);
+    assertEq(timestamps.length, 2);
+    assertEq(pendingWithdrawals[0], value / 2);
+    assertEq(pendingWithdrawals[1], value / 2);
+  }
+
+  function test_Revert_WhenFromIsBiggerThanTo_WhenAccountHasPendingWithdrawals() public {
     lockedGold.lock.value(value)();
 
     lockedGold.unlock(value / 2);
     lockedGold.unlock(value / 2);
 
     vm.expectRevert("Invalid range");
-    (uint256[] memory pendingWithdrawals, uint256[] memory timestamps) = lockedGold
-      .getPendingWithdrawalsInBatch(caller, 0, 2);
+    lockedGold.getPendingWithdrawalsInBatch(caller, 1, 0);
   }
 
   function test_ShouldReturn0_WhenNonExistentAccount() public {
