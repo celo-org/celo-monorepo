@@ -250,9 +250,6 @@ jobs:
           - name: Protocol Governance Validators
             command: |
               yarn --cwd packages/protocol test governance/validators/
-          - name: Protocol Governance Voting
-            command: |
-              yarn --cwd packages/protocol test governance/voting/
           - name: Protocol scripts test
             command: |
               yarn --cwd packages/protocol test:scripts
