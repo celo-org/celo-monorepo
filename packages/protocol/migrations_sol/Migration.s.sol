@@ -16,6 +16,10 @@ import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 
+// import { SortedOracles } from "@celo-contract/stability/SortedOracles.sol";
+
+// import "./SortedOracles.sol";
+
 
 
 // Using Registry
@@ -118,7 +122,7 @@ contract Migration is Script {
     // deployCodeTo("Proxy.sol", abi.encode(false), proxyAddress);
     address proxyAddress = proxyFactory.deployProxy();
 
-    proxyNonce++; // nonce to avoid having the same address to deploy to
+    proxyNonce++; // nonce to avoid having the same address to deploy to// likely
 
     IProxy proxy = IProxy(proxyAddress);
     console.log(" Proxy deployed to:", address(proxy));
@@ -156,6 +160,7 @@ contract Migration is Script {
       abi.encodeWithSelector(ICeloToken.initialize.selector, registryAddress));
     
     uint256 reportExpirySeconds = 300;
+    
     deployProxiedContract(
       "SortedOracles",
       abi.encodeWithSelector(ISortedOracles.initialize.selector, reportExpirySeconds));

@@ -11,7 +11,7 @@ if nc -z localhost 8545; then
   exit 1
 fi
 
-# forge compile
+forge compile
 anvil &
 # ANVIL_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
 ANVIL_PID=$!
@@ -42,10 +42,15 @@ cast rpc anvil_setStorageAt --rpc-url http://127.0.0.1:8545 0x000000000000000000
 
 
 # set cheat codes, likely with another script
+# Deploy libraries
+output=$(forge create AddressSortedLinkedListWithMedian --from 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --unlocked)
+deployed_to=$(echo "$output" | grep -oE 'Deployed to: 0x[[:xdigit:]]+' | awk '{print $3}')
+echo "Library deployed to address: $deployed_to"
 
 
+forge compile --libraries contracts/common/linkedlist/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian:$deployed_to
 # run migrations
-forge script migrations_sol/Migration.s.sol --rpc-url http://127.0.0.1:8545 -vvv --broadcast --skip-simulation --slow || echo "Migration script failed"
+forge script migrations_sol/Migration.s.sol --rpc-url http://127.0.0.1:8545 -vvv --broadcast --skip-simulation --slow --libraries contracts/common/linkedlist/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian:$deployed_to || echo "Migration script failed"
 
 # Run integration tests
 # TODO for some reason match path doesn't work
@@ -57,3 +62,6 @@ echo "Killing Anvil"
 if [[ -n $ANVIL_PID ]]; then
     kill $ANVIL_PID
 fi
+
+# helper kill anvil
+# kill $(lsof -i tcp:8545 | tail -n 1 | awk '{print $2}')
