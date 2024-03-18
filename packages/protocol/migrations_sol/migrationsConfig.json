@@ -1,0 +1,8 @@
+{
+  "gasPriceMinimum": {
+    "minimumFloor": 100000000,
+    "targetDensity": 500000000000000000000000,
+    "adjustmentSpeed": 500000000000000000000000,
+    "baseFeeOpCodeActivationBlock": 0
+  }
+}

@@ -7,14 +7,20 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "forge-std/Script.sol";
 import "forge-std/console.sol";
-import "@celo-contracts/common/interfaces/IProxyFactory.sol";
+import "forge-std/StdJson.sol";
 
+import "@celo-contracts/common/interfaces/IProxyFactory.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
+import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
+
+
+import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+
 
 // import { SortedOracles } from "@celo-contract/stability/SortedOracles.sol";
 
@@ -24,6 +30,8 @@ import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 
 // Using Registry
 contract Migration is Script {
+  using stdJson for string;
+
   IProxyFactory proxyFactory;
 
   uint256 proxyNonce = 0;
@@ -138,6 +146,9 @@ contract Migration is Script {
     // TODO replace all the lines here with "Migrations.deployA()"
     // TODO rename this script to MigrationsScript
 
+    // load migration confirm 
+    string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
+
     proxyFactory = IProxyFactory(create2deploy(0, vm.getCode("ProxyFactory.sol")));
 
     // deploy a proxy just to get the owner
@@ -164,6 +175,29 @@ contract Migration is Script {
     deployProxiedContract(
       "SortedOracles",
       abi.encodeWithSelector(ISortedOracles.initialize.selector, reportExpirySeconds));
+
+
+    uint256 gasPriceMinimumFloor = abi.decode(json.parseRaw(".gasPriceMinimum.minimumFloor"), (uint256));
+    uint256 targetDensity = abi.decode(json.parseRaw(".gasPriceMinimum.targetDensity"), (uint256));
+    uint256 adjustmentSpeed = abi.decode(json.parseRaw(".gasPriceMinimum.adjustmentSpeed"), (uint256));
+    uint256 baseFeeOpCodeActivationBlock = abi.decode(json.parseRaw(".gasPriceMinimum.baseFeeOpCodeActivationBlock"), (uint256));
+
+    console.log("GasPriceMinimumFloor is", gasPriceMinimumFloor);
+
+    deployProxiedContract(
+      "GasPriceMinimum",
+      abi.encodeWithSelector(IGasPriceMinimumInitializer.initialize.selector, registryAddress, gasPriceMinimumFloor, targetDensity, adjustmentSpeed, baseFeeOpCodeActivationBlock));
+
+    deployProxiedContract(
+      "GasPriceMinimum",
+      abi.encodeWithSelector(IGasPriceMinimumInitializer.initialize.selector, registryAddress, gasPriceMinimumFloor, targetDensity, adjustmentSpeed, baseFeeOpCodeActivationBlock));
+
+    // Reserve spend multisig not migrates
+
+    // copy initializer from Mento and make the pragma flexible
+    deployProxiedContract(
+      "Reserve",
+      abi.encodeWithSelector(IGasPriceMinimumInitializer.initialize.selector, registryAddress, gasPriceMinimumFloor, targetDensity, adjustmentSpeed, baseFeeOpCodeActivationBlock));
 
 
     // // // little sanity check, remove later
