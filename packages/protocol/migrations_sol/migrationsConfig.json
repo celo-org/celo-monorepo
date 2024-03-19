@@ -4,5 +4,21 @@
     "targetDensity": 500000000000000000000000,
     "adjustmentSpeed": 500000000000000000000000,
     "baseFeeOpCodeActivationBlock": 0
+  },
+  "reserve": {
+    "tobinTaxStalenessThreshold": 3153600000,
+    "tobinTax": 0,
+    "tobinTaxReserveRatio": 0,
+    "spendingRatio": 50000000000000000000000,
+    "frozenGold": null,
+    "frozenDays": null,
+    "spenders": [],
+    "otherAddresses": [
+      "0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB",
+      "0x298FbD6dad2Fc2cB56d7E37d8aCad8Bf07324f67"
+    ],
+    "assetAllocationSymbols_": ["cGLD", "BTC", "ETH", "DAI", "They are don't by converting string to hex, and then cast to-bytes32"],
+    "assetAllocationSymbols": ["0x63474c4400000000000000000000000000000000000000000000000000000000", "0x4254430000000000000000000000000000000000000000000000000000000000", "0x4554480000000000000000000000000000000000000000000000000000000000", "0x4441490000000000000000000000000000000000000000000000000000000000"],
+    "assetAllocationWeights": [500000000000000000000000, 300000000000000000000000, 150000000000000000000000, 50000000000000000000000]
   }
 }

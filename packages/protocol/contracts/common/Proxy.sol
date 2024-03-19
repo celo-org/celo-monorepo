@@ -28,7 +28,6 @@ contract Proxy {
    * @notice Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
-    console.log("Owner is:", msg.sender);
     require(msg.sender == _getOwner(), "sender was not owner");
     _;
   }

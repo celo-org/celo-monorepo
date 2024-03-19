@@ -5,7 +5,7 @@ set -euo pipefail
 # TODO move me to another folder
 # Compile everything
 
-./start_abvil.sh
+./start_anvil.sh
 
 
 # recomile with the libraries

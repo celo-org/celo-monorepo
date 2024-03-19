@@ -17,6 +17,7 @@ import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
+import "./HelperInterFaces.sol";
 
 
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
@@ -95,6 +96,7 @@ contract Migration is Script {
 
     address implementation = create2deploy(0, initialCode);
     console.log(" Implementation deployed to:", address(implementation));
+    console.log(" Calling initialize(..)");
     proxy._setAndInitializeImplementation(implementation, initializeCalldata);
   }
 
@@ -182,22 +184,12 @@ contract Migration is Script {
     uint256 adjustmentSpeed = abi.decode(json.parseRaw(".gasPriceMinimum.adjustmentSpeed"), (uint256));
     uint256 baseFeeOpCodeActivationBlock = abi.decode(json.parseRaw(".gasPriceMinimum.baseFeeOpCodeActivationBlock"), (uint256));
 
-    console.log("GasPriceMinimumFloor is", gasPriceMinimumFloor);
-
     deployProxiedContract(
       "GasPriceMinimum",
       abi.encodeWithSelector(IGasPriceMinimumInitializer.initialize.selector, registryAddress, gasPriceMinimumFloor, targetDensity, adjustmentSpeed, baseFeeOpCodeActivationBlock));
 
-    deployProxiedContract(
-      "GasPriceMinimum",
-      abi.encodeWithSelector(IGasPriceMinimumInitializer.initialize.selector, registryAddress, gasPriceMinimumFloor, targetDensity, adjustmentSpeed, baseFeeOpCodeActivationBlock));
+    migrateReserve(json);
 
-    // Reserve spend multisig not migrates
-
-    // copy initializer from Mento and make the pragma flexible
-    deployProxiedContract(
-      "Reserve",
-      abi.encodeWithSelector(IGasPriceMinimumInitializer.initialize.selector, registryAddress, gasPriceMinimumFloor, targetDensity, adjustmentSpeed, baseFeeOpCodeActivationBlock));
 
 
     // // // little sanity check, remove later
@@ -207,5 +199,46 @@ contract Migration is Script {
     // console.logAddress(registry.getAddressForStringOrDie("registry"));
 
     vm.stopBroadcast();
+  }
+
+  function migrateReserve(string memory json) public {
+
+    // Reserve spend multisig not migrates
+
+    uint256 tobinTaxStalenessThreshold = abi.decode(json.parseRaw(".reserve.tobinTaxStalenessThreshold"), (uint256));
+    uint256 spendingRatio = abi.decode(json.parseRaw(".reserve.spendingRatio"), (uint256));
+    uint256 frozenGold = abi.decode(json.parseRaw(".reserve.frozenGold"), (uint256));
+    uint256 frozenDays = abi.decode(json.parseRaw(".reserve.frozenDays"), (uint256));
+    bytes32[] memory assetAllocationSymbols = abi.decode(json.parseRaw(".reserve.assetAllocationSymbols"), (bytes32[]));
+    bytes32[] memory assetAllocationSymbolBytes;
+    
+    for (uint8 i=0; i<assetAllocationSymbols.length; i++){
+      // bytes32 result;
+      // string memory tempString = assetAllocationSymbols[i];
+      // tempString.
+      
+      // assembly {
+      //   result := mload(add(tempString, 32))
+      // }
+      // console.log(assetAllocationSymbols[i]);
+      // assetAllocationSymbolBytes[i] = bytes32(bytes(assetAllocationSymbols[i]));
+    }
+
+    uint256[] memory assetAllocationWeights = abi.decode(json.parseRaw(".reserve.assetAllocationWeights"), (uint256[]));
+    uint256 tobinTax = abi.decode(json.parseRaw(".reserve.tobinTax"), (uint256));
+    uint256 tobinTaxReserveRatio = abi.decode(json.parseRaw(".reserve.tobinTaxReserveRatio"), (uint256));
+
+    // string memory converted = string(abi.encodePacked(assetAllocationSymbols[0]));
+    // console.log(assetAllocationSymbols[0]);
+    
+    deployProxiedContract(
+      "Reserve",
+      abi.encodeWithSelector(IReserveInitializer.initialize.selector, registryAddress, tobinTaxStalenessThreshold, spendingRatio, frozenGold, frozenDays, assetAllocationSymbols, assetAllocationWeights, tobinTax, tobinTaxReserveRatio));
+
+    // with the reserve we migrate:
+    // spender, wont do
+    // otherReserveAddress, wont do
+    // send initialBalance to Reserve
+    // reserve.setFrozenGold, don't know
   }
 }
