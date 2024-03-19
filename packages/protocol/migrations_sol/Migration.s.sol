@@ -167,7 +167,7 @@ contract Migration is Script, UsingRegistry {
 
     // just set the initialization of a proxy
     migrateRegistry();
-
+    setRegistry(registryAddress); // UsingRegistry
     
     migrateFreezer();
     migrateFeeCurrencyWhitelist();
@@ -175,6 +175,8 @@ contract Migration is Script, UsingRegistry {
     migrateSortedOracles(json);
     migrateGasPriceMinimum(json);
     migrateReserve(json);
+    migrateStableToken(json);
+
 
 
 
@@ -264,36 +266,49 @@ contract Migration is Script, UsingRegistry {
     console.log("reserveSpenderMultiSig set to:", reserveSpenderMultiSig);
   }
 
-  function migrateStableToken(string memory json) external {
-    // "decimals": 18,
-    // "goldPrice": 1,
-    // "tokenName": "Celo Dollar",
-    // "tokenSymbol": "cUSD",
-    // "inflationRate": 1,
-    // "inflationPeriod": 47304000,
-    // "initialBalance": 5000000000000000000000000,
-    // "frozen": false
+  function migrateStableToken(string memory json) public {
+    // function initialize(
+    //     string calldata _name,
+    //     string calldata _symbol,
+    //     uint8 _decimals,
+    //     address registryAddress,
+    //     uint256 inflationRate,
+    //     uint256 inflationFactorUpdatePeriod,
+    //     address[] calldata initialBalanceAddresses,
+    //     uint256[] calldata initialBalanceValues,
+    //     string calldata exchangeIdentifier
+    // ) external
 
 
-    string memory _name = abi.decode(json.parseRaw(".stableToken.tokenName"), (string));
-    string memory _symbol = abi.decode(json.parseRaw(".stableToken.tokenSymbol"), (string));
-    uint8 _decimals = abi.decode(json.parseRaw(".stableToken.decimals"), (uint8));
+    string memory name = abi.decode(json.parseRaw(".stableToken.tokenName"), (string));
+    string memory symbol = abi.decode(json.parseRaw(".stableToken.tokenSymbol"), (string));
+    uint8 decimals = abi.decode(json.parseRaw(".stableToken.decimals"), (uint8));
     uint256 inflationRate = abi.decode(json.parseRaw(".stableToken.inflationRate"), (uint256));
-    uint256 inflationFactorUpdatePeriod = abi.decode(json.parseRaw(".stableToken.inflationPeriod."), (uint256));
-    // address[] calldata initialBalanceAddresses = abi.decode(json.parseRaw(".stableToken.initialBalance"), (address));
+    uint256 inflationFactorUpdatePeriod = abi.decode(json.parseRaw(".stableToken.inflationPeriod"), (uint256));
     uint256 initialBalanceValue = abi.decode(json.parseRaw(".stableToken.initialBalance"), (uint256));
+    
+    
+    address[] memory initialBalanceAddresses = new address[](1);
+    initialBalanceAddresses[0] = deployerAccount;
+    // initialBalanceAddresses.push(deployerAccount);
+    uint256[] memory initialBalanceValuees = new uint256[](1);
+    initialBalanceValuees[0] = initialBalanceValue;
+    // initialBalanceValuees.push(initialBalanceValue);
+    
     string memory exchangeIdentifier = "Exchange";
-    bool frozen = abi.decode(json.parseRaw(".stableToken.frozen"), (bool));
 
     address stableTokenProxyAddress = deployProxiedContract(
       "StableToken",
-      abi.encodeWithSelector(IStableTokenInitialize.initialize.selector, registryAddress, _name, _symbol, _decimals, inflationRate, inflationFactorUpdatePeriod, [deployerAccount], [initialBalanceValue], exchangeIdentifier));
+      abi.encodeWithSelector(IStableTokenInitialize.initialize.selector, name, symbol, decimals, registryAddress, inflationRate, inflationFactorUpdatePeriod, initialBalanceAddresses, initialBalanceValuees, exchangeIdentifier));
   
+    bool frozen = abi.decode(json.parseRaw(".stableToken.frozen"), (bool));
     if (frozen){
       getFreezer().freeze(stableTokenProxyAddress);
     }
 
     // TODO add more configurable oracles from the json
+    getSortedOracles();
+    console.log("this worked");
     getSortedOracles().addOracle(stableTokenProxyAddress, deployerAccount);
 
     uint256 celoPrice = abi.decode(json.parseRaw(".stableToken.celoPrice"), (uint256));
@@ -302,6 +317,8 @@ contract Migration is Script, UsingRegistry {
     }
 
     IReserve(registry.getAddressForStringOrDie("Reserve")).addToken(stableTokenProxyAddress);
+
+    getFeeCurrencyWhitelist().addToken(stableTokenProxyAddress);
 
   }
 

@@ -11,6 +11,9 @@ import "../../contracts/common/interfaces/IRegistry.sol";
 import "../../contracts/common/interfaces/IFreezer.sol";
 // import "../../lib/mento-core/contracts/interfaces/IReserve.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
+import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+
+import "forge-std/console.sol";
 
 contract UsingRegistry is Ownable {
   event RegistrySet(address indexed registryAddress);
@@ -72,6 +75,11 @@ contract UsingRegistry is Ownable {
   }
 
   function getSortedOracles() internal view returns (ISortedOracles) {
+    console.log("From here");
     return ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
+  }
+
+  function getFeeCurrencyWhitelist() internal view returns (IFeeCurrencyWhitelist) {
+    return IFeeCurrencyWhitelist(registry.getAddressForOrDie(FEE_CURRENCY_WHITELIST_REGISTRY_ID));
   }
 }
