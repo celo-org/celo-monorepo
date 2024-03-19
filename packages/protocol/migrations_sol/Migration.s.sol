@@ -35,6 +35,8 @@ import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 contract Migration is Script, UsingRegistry {
   using stdJson for string;
 
+  address constant deployerAccount = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+
   IProxyFactory proxyFactory;
 
   uint256 proxyNonce = 0;
@@ -143,6 +145,7 @@ contract Migration is Script, UsingRegistry {
 
   function run() external {
     // it's anvil key
+    // TODO check that this matches deployerAccount and the pK can be avoided with --unlock
     vm.startBroadcast(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80);
 
     // TODO replace all the lines here with "Migrations.deployA()"
@@ -243,8 +246,9 @@ contract Migration is Script, UsingRegistry {
     uint256[] memory assetAllocationWeights = abi.decode(json.parseRaw(".reserve.assetAllocationWeights"), (uint256[]));
     uint256 tobinTax = abi.decode(json.parseRaw(".reserve.tobinTax"), (uint256));
     uint256 tobinTaxReserveRatio = abi.decode(json.parseRaw(".reserve.tobinTaxReserveRatio"), (uint256));
+    uint256 initialBalance = abi.decode(json.parseRaw(".reserve.initialBalance"), (uint256));
     
-    deployProxiedContract(
+    address reserveProxyAddress = deployProxiedContract(
       "Reserve",
       abi.encodeWithSelector(IReserveInitializer.initialize.selector, registryAddress, tobinTaxStalenessThreshold, spendingRatio, frozenGold, frozenDays, assetAllocationSymbols, assetAllocationWeights, tobinTax, tobinTaxReserveRatio));
 
@@ -252,7 +256,54 @@ contract Migration is Script, UsingRegistry {
     // spender, wont do
     // otherReserveAddress, wont do
     // send initialBalance to Reserve
-    // reserve.setFrozenGold, don't know
+    // TODO this should be a transfer from the deployer rather than a deal
+    vm.deal(reserveProxyAddress, initialBalance);
+    // reserve.setFrozenGold, wont do
+    address reserveSpenderMultiSig = deployerAccount;
+    IReserve(reserveProxyAddress).addSpender(reserveSpenderMultiSig);
+    console.log("reserveSpenderMultiSig set to:", reserveSpenderMultiSig);
+  }
+
+  function migrateStableToken(string memory json) external {
+    // "decimals": 18,
+    // "goldPrice": 1,
+    // "tokenName": "Celo Dollar",
+    // "tokenSymbol": "cUSD",
+    // "inflationRate": 1,
+    // "inflationPeriod": 47304000,
+    // "initialBalance": 5000000000000000000000000,
+    // "frozen": false
+
+
+    string memory _name = abi.decode(json.parseRaw(".stableToken.tokenName"), (string));
+    string memory _symbol = abi.decode(json.parseRaw(".stableToken.tokenSymbol"), (string));
+    uint8 _decimals = abi.decode(json.parseRaw(".stableToken.decimals"), (uint8));
+    uint256 inflationRate = abi.decode(json.parseRaw(".stableToken.inflationRate"), (uint256));
+    uint256 inflationFactorUpdatePeriod = abi.decode(json.parseRaw(".stableToken.inflationPeriod."), (uint256));
+    // address[] calldata initialBalanceAddresses = abi.decode(json.parseRaw(".stableToken.initialBalance"), (address));
+    uint256 initialBalanceValue = abi.decode(json.parseRaw(".stableToken.initialBalance"), (uint256));
+    string memory exchangeIdentifier = "Exchange";
+    bool frozen = abi.decode(json.parseRaw(".stableToken.frozen"), (bool));
+
+    address stableTokenProxyAddress = deployProxiedContract(
+      "StableToken",
+      abi.encodeWithSelector(IStableTokenInitialize.initialize.selector, registryAddress, _name, _symbol, _decimals, inflationRate, inflationFactorUpdatePeriod, [deployerAccount], [initialBalanceValue], exchangeIdentifier));
+  
+    if (frozen){
+      getFreezer().freeze(stableTokenProxyAddress);
+    }
+
+    // TODO add more configurable oracles from the json
+    getSortedOracles().addOracle(stableTokenProxyAddress, deployerAccount);
+
+    uint256 celoPrice = abi.decode(json.parseRaw(".stableToken.celoPrice"), (uint256));
+    if (celoPrice != 0 ) {
+      getSortedOracles().report(stableTokenProxyAddress, celoPrice * 1e24, address(0), address(0)); // TODO use fixidity
+    }
+
+    IReserve(registry.getAddressForStringOrDie("Reserve")).addToken(stableTokenProxyAddress);
 
   }
+
+
 }
