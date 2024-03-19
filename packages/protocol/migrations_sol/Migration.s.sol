@@ -19,6 +19,8 @@ import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
 import "./HelperInterFaces.sol";
 
+import "@celo-contracts-8/common/UsingRegistry.sol";
+
 
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 
@@ -30,7 +32,7 @@ import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 
 
 // Using Registry
-contract Migration is Script {
+contract Migration is Script, UsingRegistry {
   using stdJson for string;
 
   IProxyFactory proxyFactory;
@@ -114,9 +116,7 @@ contract Migration is Script {
     addToRegistry(contractName, address(proxy));
   }
 
-  function deployProxiedContract(string memory contractName, bytes memory initializeCalldata)
-    public
-  {
+  function deployProxiedContract(string memory contractName, bytes memory initializeCalldata) public returns (address proxyAddress) {
     console.log("Deploying: ", contractName);
 
     // Can't deploy with new Proxy() because Proxy is in 0.5
@@ -130,7 +130,7 @@ contract Migration is Script {
     //   uint160((uint256(sha256(abi.encode(vm.getCode("Proxy.sol"), proxyNonce)))))
     // );
     // deployCodeTo("Proxy.sol", abi.encode(false), proxyAddress);
-    address proxyAddress = proxyFactory.deployProxy();
+    proxyAddress = proxyFactory.deployProxy();
 
     proxyNonce++; // nonce to avoid having the same address to deploy to// likely
 
@@ -163,31 +163,14 @@ contract Migration is Script {
     // deployProxiedContract("Registry", registryAddress, abi.encodeWithSelector(IRegistry.initialize.selector));
 
     // just set the initialization of a proxy
-    setImplementationOnProxy(IProxy(registryAddress), "Registry", abi.encodeWithSelector(IRegistry.initialize.selector));
+    migrateRegistry();
 
-    // TODO migrate the initializations
-    deployProxiedContract("Freezer", abi.encodeWithSelector(IFreezer.initialize.selector));
-    deployProxiedContract("FeeCurrencyWhitelist", abi.encodeWithSelector(IFeeCurrencyWhitelist.initialize.selector));
-    deployProxiedContract(
-      "GoldToken",
-      abi.encodeWithSelector(ICeloToken.initialize.selector, registryAddress));
     
-    uint256 reportExpirySeconds = 300;
-    
-    deployProxiedContract(
-      "SortedOracles",
-      abi.encodeWithSelector(ISortedOracles.initialize.selector, reportExpirySeconds));
-
-
-    uint256 gasPriceMinimumFloor = abi.decode(json.parseRaw(".gasPriceMinimum.minimumFloor"), (uint256));
-    uint256 targetDensity = abi.decode(json.parseRaw(".gasPriceMinimum.targetDensity"), (uint256));
-    uint256 adjustmentSpeed = abi.decode(json.parseRaw(".gasPriceMinimum.adjustmentSpeed"), (uint256));
-    uint256 baseFeeOpCodeActivationBlock = abi.decode(json.parseRaw(".gasPriceMinimum.baseFeeOpCodeActivationBlock"), (uint256));
-
-    deployProxiedContract(
-      "GasPriceMinimum",
-      abi.encodeWithSelector(IGasPriceMinimumInitializer.initialize.selector, registryAddress, gasPriceMinimumFloor, targetDensity, adjustmentSpeed, baseFeeOpCodeActivationBlock));
-
+    migrateFreezer();
+    migrateFeeCurrencyWhitelist();
+    migrateGoldToken(json);
+    migrateSortedOracles(json);
+    migrateGasPriceMinimum(json);
     migrateReserve(json);
 
 
@@ -201,6 +184,51 @@ contract Migration is Script {
     vm.stopBroadcast();
   }
 
+  function migrateRegistry() public {
+    setImplementationOnProxy(IProxy(registryAddress), "Registry", abi.encodeWithSelector(IRegistry.initialize.selector));
+  }
+
+  function migrateFreezer() public {
+    // TODO migrate the initializations interface
+    deployProxiedContract("Freezer", abi.encodeWithSelector(IFreezer.initialize.selector));
+  }
+
+  function migrateFeeCurrencyWhitelist() public {
+    // TODO migrate the initializations interface
+    deployProxiedContract("FeeCurrencyWhitelist", abi.encodeWithSelector(IFeeCurrencyWhitelist.initialize.selector));
+  }
+
+  function migrateGoldToken(string memory json) public {
+    // TODO change pre-funded addresses to make it match circulation supply
+    address goldProxyAddress = deployProxiedContract(
+      "GoldToken",
+      abi.encodeWithSelector(ICeloToken.initialize.selector, registryAddress));
+
+    bool frozen = abi.decode(json.parseRaw(".goldToken.frozen"), (bool));
+    if (frozen){
+      getFreezer().freeze(goldProxyAddress);
+    }
+
+  }
+
+  function migrateSortedOracles(string memory json) public {
+    uint256 reportExpirySeconds = abi.decode(json.parseRaw(".sortedOracles.reportExpirySeconds"), (uint256));
+    deployProxiedContract(
+      "SortedOracles",
+      abi.encodeWithSelector(ISortedOracles.initialize.selector, reportExpirySeconds));
+  }
+
+  function migrateGasPriceMinimum(string memory json) public {
+    uint256 gasPriceMinimumFloor = abi.decode(json.parseRaw(".gasPriceMinimum.minimumFloor"), (uint256));
+    uint256 targetDensity = abi.decode(json.parseRaw(".gasPriceMinimum.targetDensity"), (uint256));
+    uint256 adjustmentSpeed = abi.decode(json.parseRaw(".gasPriceMinimum.adjustmentSpeed"), (uint256));
+    uint256 baseFeeOpCodeActivationBlock = abi.decode(json.parseRaw(".gasPriceMinimum.baseFeeOpCodeActivationBlock"), (uint256));
+
+    deployProxiedContract(
+      "GasPriceMinimum",
+      abi.encodeWithSelector(IGasPriceMinimumInitializer.initialize.selector, registryAddress, gasPriceMinimumFloor, targetDensity, adjustmentSpeed, baseFeeOpCodeActivationBlock));
+  }
+
   function migrateReserve(string memory json) public {
 
     // Reserve spend multisig not migrates
@@ -211,25 +239,10 @@ contract Migration is Script {
     uint256 frozenDays = abi.decode(json.parseRaw(".reserve.frozenDays"), (uint256));
     bytes32[] memory assetAllocationSymbols = abi.decode(json.parseRaw(".reserve.assetAllocationSymbols"), (bytes32[]));
     bytes32[] memory assetAllocationSymbolBytes;
-    
-    for (uint8 i=0; i<assetAllocationSymbols.length; i++){
-      // bytes32 result;
-      // string memory tempString = assetAllocationSymbols[i];
-      // tempString.
-      
-      // assembly {
-      //   result := mload(add(tempString, 32))
-      // }
-      // console.log(assetAllocationSymbols[i]);
-      // assetAllocationSymbolBytes[i] = bytes32(bytes(assetAllocationSymbols[i]));
-    }
 
     uint256[] memory assetAllocationWeights = abi.decode(json.parseRaw(".reserve.assetAllocationWeights"), (uint256[]));
     uint256 tobinTax = abi.decode(json.parseRaw(".reserve.tobinTax"), (uint256));
     uint256 tobinTaxReserveRatio = abi.decode(json.parseRaw(".reserve.tobinTaxReserveRatio"), (uint256));
-
-    // string memory converted = string(abi.encodePacked(assetAllocationSymbols[0]));
-    // console.log(assetAllocationSymbols[0]);
     
     deployProxiedContract(
       "Reserve",
@@ -240,5 +253,6 @@ contract Migration is Script {
     // otherReserveAddress, wont do
     // send initialBalance to Reserve
     // reserve.setFrozenGold, don't know
+
   }
 }
