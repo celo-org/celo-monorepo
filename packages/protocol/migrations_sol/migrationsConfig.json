@@ -35,5 +35,45 @@
     "inflationPeriod": 47304000,
     "initialBalance": 5000000000000000000000000,
     "frozen": false
+  },
+  "exchange": {
+    "spread": 5000000000000000000000,
+    "reserveFraction": 10000000000000000000000, 
+    "updateFrequency": 300,
+    "minimumReports": 1,
+    "frozen": false
+  },
+  "lockedGold": {
+    "unlockingPeriod": 21600,
+    "unlockingPeriod_helper": "6 * HOUR"
+  },
+  "validators": {
+    "groupLockedGoldRequirements": {
+      "value": 10000000000000000000000,
+      "duration": 15552000,
+      "duration_help": "180 * DAY"
+    },
+    "validatorLockedGoldRequirements": {
+      "value": 10000000000000000000000,
+      "duration": 5184000,
+      "duration_help": "60 * DAY"
+    },
+    "validatorScoreParameters": {
+      "exponent": 10,
+      "adjustmentSpeed": 100000000000000000000000
+    },
+    "membershipHistoryLength": 60,
+    "commissionUpdateDelay": 51840, 
+    "commissionUpdateDelay_help": "(3 * DAY) / 5", 
+
+    "maxGroupSize": 5,
+    "slashingMultiplierResetPeriod": 2592000,
+    "slashingPenaltyResetPeriod_help": "30 * DAY",
+    "downtimeGracePeriod": 0,
+    "validatorKeys": [],
+    "attestationKeys": [],
+    "groupName": "cLabs",
+    "commission": 100000000000000000000000,
+    "votesRatioOfLastVsFirstGroup": 2000000000000000000000000
   }
 }

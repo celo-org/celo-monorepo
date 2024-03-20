@@ -13,7 +13,7 @@ import "../../contracts/common/interfaces/IFreezer.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
 import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 
-import "forge-std/console.sol";
+// import "forge-std/console.sol";
 
 contract UsingRegistry is Ownable {
   event RegistrySet(address indexed registryAddress);
@@ -75,7 +75,7 @@ contract UsingRegistry is Ownable {
   }
 
   function getSortedOracles() internal view returns (ISortedOracles) {
-    console.log("From here");
+    // console.log("From here");
     return ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
   }
 

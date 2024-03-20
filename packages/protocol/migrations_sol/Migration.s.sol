@@ -14,7 +14,13 @@ import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
-import "@celo-contracts/common/interfaces/ICeloToken.sol";
+import "@celo-contracts/common/interfaces/ICeloToken.sol"; // TODO move these to Initializer
+import "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
+import "@celo-contracts/common/interfaces/IAccounts.sol";
+import "@celo-contracts/governance/interfaces/LockedGoldfunctionInitializer.sol";
+import "@celo-contracts/governance/interfaces/IValidatorsInitializer.sol";
+
+
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
 import "./HelperInterFaces.sol";
@@ -116,6 +122,8 @@ contract Migration is Script, UsingRegistry {
 
     setImplementationOnProxy(proxy, contractName, initializeCalldata);
     addToRegistry(contractName, address(proxy));
+    console.log(" Done deploying:", contractName);
+    console.log("------------------------------");
   }
 
   function deployProxiedContract(string memory contractName, bytes memory initializeCalldata) public returns (address proxyAddress) {
@@ -141,6 +149,9 @@ contract Migration is Script, UsingRegistry {
 
     setImplementationOnProxy(proxy, contractName, initializeCalldata);
     addToRegistry(contractName, address(proxy));
+
+    console.log(" Done deploying:", contractName);
+    console.log("------------------------------");
   }
 
   function run() external {
@@ -175,7 +186,12 @@ contract Migration is Script, UsingRegistry {
     migrateSortedOracles(json);
     migrateGasPriceMinimum(json);
     migrateReserve(json);
+    // cUER and cREAL not migrated
     migrateStableToken(json);
+    migrateExchange(json);
+    migrateAccount();
+    migrateLockedGold(json);
+    migrateValidators(json);
 
 
 
@@ -243,7 +259,6 @@ contract Migration is Script, UsingRegistry {
     uint256 frozenGold = abi.decode(json.parseRaw(".reserve.frozenGold"), (uint256));
     uint256 frozenDays = abi.decode(json.parseRaw(".reserve.frozenDays"), (uint256));
     bytes32[] memory assetAllocationSymbols = abi.decode(json.parseRaw(".reserve.assetAllocationSymbols"), (bytes32[]));
-    bytes32[] memory assetAllocationSymbolBytes;
 
     uint256[] memory assetAllocationWeights = abi.decode(json.parseRaw(".reserve.assetAllocationWeights"), (uint256[]));
     uint256 tobinTax = abi.decode(json.parseRaw(".reserve.tobinTax"), (uint256));
@@ -267,18 +282,6 @@ contract Migration is Script, UsingRegistry {
   }
 
   function migrateStableToken(string memory json) public {
-    // function initialize(
-    //     string calldata _name,
-    //     string calldata _symbol,
-    //     uint8 _decimals,
-    //     address registryAddress,
-    //     uint256 inflationRate,
-    //     uint256 inflationFactorUpdatePeriod,
-    //     address[] calldata initialBalanceAddresses,
-    //     uint256[] calldata initialBalanceValues,
-    //     string calldata exchangeIdentifier
-    // ) external
-
 
     string memory name = abi.decode(json.parseRaw(".stableToken.tokenName"), (string));
     string memory symbol = abi.decode(json.parseRaw(".stableToken.tokenSymbol"), (string));
@@ -322,5 +325,72 @@ contract Migration is Script, UsingRegistry {
 
   }
 
+  function migrateExchange(string memory json) public {
+  
+    string memory stableTokenIdentifier = "StableToken";
+    uint256 spread = abi.decode(json.parseRaw(".exchange.spread"), (uint256));
+    uint256 reserveFraction = abi.decode(json.parseRaw(".exchange.reserveFraction"), (uint256));
+    uint256 updateFrequency = abi.decode(json.parseRaw(".exchange.updateFrequency"), (uint256));
+    uint256 minimumReports = abi.decode(json.parseRaw(".exchange.minimumReports"), (uint256));
+  
+
+    bool frozen = abi.decode(json.parseRaw(".exchange.frozen"), (bool));
+    address exchangeProxyAddress = deployProxiedContract(
+      "Exchange",
+      abi.encodeWithSelector(IExchangeInitializer.initialize.selector, registryAddress, stableTokenIdentifier, spread, reserveFraction, updateFrequency, minimumReports));
+
+    if (frozen){
+      getFreezer().freeze(exchangeProxyAddress);
+    }
+
+    IExchange(exchangeProxyAddress).activateStable();
+  }
+
+  function migrateAccount() public {
+
+    address accountsProxyAddress = deployProxiedContract(
+      "Accounts",
+      abi.encodeWithSelector(IAccountsInitializer.initialize.selector, registryAddress));
+
+    IAccounts(accountsProxyAddress).setEip712DomainSeparator();
+  }
+
+  function migrateLockedGold(string memory json) public {
+   
+    uint256 unlockingPeriod = abi.decode(json.parseRaw(".lockedGold.unlockingPeriod"), (uint256));
+
+    deployProxiedContract(
+      "LockedGold",
+      abi.encodeWithSelector(ILockedGoldInitializer.initialize.selector, registryAddress, unlockingPeriod));
+
+  }
+
+  function migrateValidators(string memory json) public {
+    uint256 groupRequirementValue = abi.decode(json.parseRaw(".validators.groupLockedGoldRequirements.value"), (uint256));
+    uint256 groupRequirementDuration = abi.decode(json.parseRaw(".validators.groupLockedGoldRequirements.duration"), (uint256));
+    uint256 validatorRequirementValue = abi.decode(json.parseRaw(".validators.validatorLockedGoldRequirements.value"), (uint256));
+    uint256 validatorRequirementDuration = abi.decode(json.parseRaw(".validators.validatorLockedGoldRequirements.duration"), (uint256));
+    uint256 validatorScoreExponent = abi.decode(json.parseRaw(".validators.validatorScoreParameters.exponent"), (uint256));
+    uint256 validatorScoreAdjustmentSpeed = abi.decode(json.parseRaw(".validators.validatorScoreParameters.adjustmentSpeed"), (uint256));
+    uint256 membershipHistoryLength = abi.decode(json.parseRaw(".validators.membershipHistoryLength"), (uint256));
+    uint256 slashingMultiplierResetPeriod = abi.decode(json.parseRaw(".validators.slashingMultiplierResetPeriod"), (uint256));
+    uint256 maxGroupSize = abi.decode(json.parseRaw(".validators.maxGroupSize"), (uint256));
+    uint256 commissionUpdateDelay = abi.decode(json.parseRaw(".validators.commissionUpdateDelay"), (uint256));
+    uint256 downtimeGracePeriod = abi.decode(json.parseRaw(".validators.downtimeGracePeriod"), (uint256));
+
+    deployProxiedContract(
+      "Validators",
+      abi.encodeWithSelector(IValidatorsInitializer.initialize.selector, registryAddress, groupRequirementValue,
+          groupRequirementDuration,
+          validatorRequirementValue,
+          validatorRequirementDuration,
+          validatorScoreExponent,
+          validatorScoreAdjustmentSpeed,
+          membershipHistoryLength,
+          slashingMultiplierResetPeriod,
+          maxGroupSize,
+          commissionUpdateDelay,
+          downtimeGracePeriod));
+  }
 
 }

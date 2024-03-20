@@ -20,6 +20,7 @@ contract GasPriceMinimum is
   UsingRegistry,
   CalledByVm
 {
+  // TODO add IGasPriceMinimum
   using FixidityLib for FixidityLib.Fraction;
 
   event TargetDensitySet(uint256 targetDensity);

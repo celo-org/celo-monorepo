@@ -1,9 +1,9 @@
 pragma solidity ^0.5.13;
 
 // import "@celo-contracts/common/interfaces/IProxy.sol";
-import "@celo-contracts/common/Proxy.sol";
+import "./Proxy.sol";
 import "./interfaces/IProxyFactory.sol";
-import "forge-std/console.sol";
+// import "forge-std/console.sol";
 
 contract ProxyFactory is IProxyFactory {
   function _deployProxy(address owner) private returns (address) {
