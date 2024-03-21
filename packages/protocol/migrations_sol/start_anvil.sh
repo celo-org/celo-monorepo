@@ -48,6 +48,9 @@ echo "1"
 output=$(forge create AddressSortedLinkedListWithMedian --from 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --unlocked)
 forge create Signatures --from 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --unlocked
 
+forge create AddressLinkedList --from 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --unlocked
+forge create AddressSortedLinkedList --from 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --unlocked
+
 echo "2"
 deployed_to=$(echo "$output" | grep -oE 'Deployed to: 0x[[:xdigit:]]+' | awk '{print $3}')
 echo "3"

@@ -75,5 +75,38 @@
     "groupName": "cLabs",
     "commission": 100000000000000000000000,
     "votesRatioOfLastVsFirstGroup": 2000000000000000000000000
+  },
+  "election": {
+    "minElectableValidators": 1,
+    "maxElectableValidators": 100,
+    "maxNumGroupsVotedFor": 10,
+    "electabilityThreshold": 1000000000000000000000
+  },
+  "epochRewards": {
+    "targetVotingYieldParameters": {
+      "initial": 0,
+      "max": 500000000000000000000, 
+      "max_helper": "(x + 1) ^ 365 = 1.20",
+      "adjustmentFactor": 0, 
+      "adjustmentFactor_helper": "Change to 1 / 3650 once Mainnet activated."
+    },
+    "rewardsMultiplierParameters": {
+      "max": 2,
+      "adjustmentFactors": {
+        "underspend": 500000000000000000000000,
+        "overspend": 5000000000000000000000000
+      }
+    },
+    "targetVotingGoldFraction": 500000000000000000000000,
+    "maxValidatorEpochPayment": 205479452054794520547,
+    "maxValidatorEpochPayment_helper": "(75,000 / 365) * 10 ^ 18",
+    "communityRewardFraction": 250000000000000000000000,
+    "carbonOffsettingPartner": "0x0000000000000000000000000000000000000000",
+    "carbonOffsettingFraction": 1000000000000000000000,
+    "frozen": false
+  },
+  "random": {
+    "randomnessBlockRetentionWindow": "720",
+    "randomnessBlockRetentionWindow_helper": "HOUR / 5"
   }
 }

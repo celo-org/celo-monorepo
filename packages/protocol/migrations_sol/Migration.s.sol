@@ -19,8 +19,11 @@ import "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
 import "@celo-contracts/governance/interfaces/LockedGoldfunctionInitializer.sol";
 import "@celo-contracts/governance/interfaces/IValidatorsInitializer.sol";
+import "@celo-contracts/governance/interfaces/IElectionInitializer.sol";
+import "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
 
-
+import "@celo-contracts/identity/interfaces/IRandomInitializer.sol";
+import "@celo-contracts/identity/interfaces/IEscrowInitializer.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
 import "./HelperInterFaces.sol";
@@ -192,6 +195,11 @@ contract Migration is Script, UsingRegistry {
     migrateAccount();
     migrateLockedGold(json);
     migrateValidators(json);
+    migrateElection(json);
+    migrateEpochRewards(json);
+    migrateRandom(json);
+    migrateEscrow();
+    // attestations not migrates
 
 
 
@@ -334,11 +342,11 @@ contract Migration is Script, UsingRegistry {
     uint256 minimumReports = abi.decode(json.parseRaw(".exchange.minimumReports"), (uint256));
   
 
-    bool frozen = abi.decode(json.parseRaw(".exchange.frozen"), (bool));
     address exchangeProxyAddress = deployProxiedContract(
       "Exchange",
       abi.encodeWithSelector(IExchangeInitializer.initialize.selector, registryAddress, stableTokenIdentifier, spread, reserveFraction, updateFrequency, minimumReports));
 
+    bool frozen = abi.decode(json.parseRaw(".exchange.frozen"), (bool));
     if (frozen){
       getFreezer().freeze(exchangeProxyAddress);
     }
@@ -391,6 +399,68 @@ contract Migration is Script, UsingRegistry {
           maxGroupSize,
           commissionUpdateDelay,
           downtimeGracePeriod));
+  }
+
+  function migrateElection(string memory json) public{
+    uint256 minElectableValidators = abi.decode(json.parseRaw(".election.minElectableValidators"), (uint256));
+    uint256 maxElectableValidators = abi.decode(json.parseRaw(".election.maxElectableValidators"), (uint256));
+    uint256 maxNumGroupsVotedFor = abi.decode(json.parseRaw(".election.maxNumGroupsVotedFor"), (uint256));
+    uint256 electabilityThreshold = abi.decode(json.parseRaw(".election.electabilityThreshold"), (uint256));
+
+    deployProxiedContract(
+      "Election",
+      abi.encodeWithSelector(IElectionInitializer.initialize.selector, registryAddress, minElectableValidators, maxElectableValidators, maxNumGroupsVotedFor, electabilityThreshold));
+  }
+
+  function migrateEpochRewards(string memory json) public {
+
+    uint256 targetVotingYieldInitial = abi.decode(json.parseRaw(".epochRewards.targetVotingYieldParameters.initial"), (uint256));
+    uint256 targetVotingYieldMax = abi.decode(json.parseRaw(".epochRewards.targetVotingYieldParameters.max"), (uint256));
+    uint256 targetVotingYieldAdjustmentFactor = abi.decode(json.parseRaw(".epochRewards.targetVotingYieldParameters.adjustmentFactor"), (uint256));
+    uint256 rewardsMultiplierMax = abi.decode(json.parseRaw(".epochRewards.rewardsMultiplierParameters.max"), (uint256));
+    uint256 rewardsMultiplierUnderspendAdjustmentFactor = abi.decode(json.parseRaw(".epochRewards.rewardsMultiplierParameters.adjustmentFactors.underspend"), (uint256));
+    uint256 rewardsMultiplierOverspendAdjustmentFactor = abi.decode(json.parseRaw(".epochRewards.rewardsMultiplierParameters.adjustmentFactors.overspend"), (uint256));
+    uint256 targetVotingGoldFraction = abi.decode(json.parseRaw(".epochRewards.targetVotingGoldFraction"), (uint256));
+    uint256 targetValidatorEpochPayment = abi.decode(json.parseRaw(".epochRewards.maxValidatorEpochPayment"), (uint256));
+    uint256 communityRewardFraction = abi.decode(json.parseRaw(".epochRewards.communityRewardFraction"), (uint256));
+    address carbonOffsettingPartner = abi.decode(json.parseRaw(".epochRewards.carbonOffsettingPartner"), (address));
+    uint256 carbonOffsettingFraction = abi.decode(json.parseRaw(".epochRewards.carbonOffsettingFraction"), (uint256));
+
+    address epochRewardsProxy = deployProxiedContract(
+      "EpochRewards",
+      abi.encodeWithSelector(IEpochRewardsInitializer.initialize.selector, registryAddress, targetVotingYieldInitial,
+              targetVotingYieldMax,
+              targetVotingYieldAdjustmentFactor,
+              rewardsMultiplierMax,
+              rewardsMultiplierUnderspendAdjustmentFactor,
+              rewardsMultiplierOverspendAdjustmentFactor,
+              targetVotingGoldFraction,
+              targetValidatorEpochPayment,
+              communityRewardFraction,
+              carbonOffsettingPartner,
+              carbonOffsettingFraction));
+
+    bool frozen = abi.decode(json.parseRaw(".epochRewards.frozen"), (bool));
+  
+    if (frozen){
+      getFreezer().freeze(epochRewardsProxy);
+    }
+  }
+
+  function migrateRandom(string memory json) public {
+
+    uint256 randomnessBlockRetentionWindow = abi.decode(json.parseRaw(".random.randomnessBlockRetentionWindow"), (uint256));
+
+    deployProxiedContract(
+      "Random",
+      abi.encodeWithSelector(IRandomInitializer.initialize.selector, randomnessBlockRetentionWindow));
+  }
+
+  function migrateEscrow() public {
+
+    deployProxiedContract(
+      "Escrow",
+      abi.encodeWithSelector(IEscrowInitializer.initialize.selector));
   }
 
 }
