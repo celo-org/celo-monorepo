@@ -4,6 +4,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingPrecompiles.sol";
+import "forge-std/console.sol";
 
 /**
  * @title Contract for storing blockchain parameters that can be set by governance.
@@ -93,10 +94,13 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    */
   function setUptimeLookbackWindow(uint256 window) public onlyOwner {
     require(window >= 3 && window <= 720, "UptimeLookbackWindow must be within safe range");
+    console.log("fail before epoch");
+    console.log("BlockchainParameters.getEpochSize()", getEpochSize());
     require(
       window <= getEpochSize().sub(2),
       "UptimeLookbackWindow must be smaller or equal to epochSize - 2"
     );
+    console.log("fail after epoch");
 
     uptimeLookbackWindow.oldValue = _getUptimeLookbackWindow();
 

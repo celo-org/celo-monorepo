@@ -9,7 +9,7 @@ import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
 import "../../contracts/common/interfaces/IRegistry.sol";
 import "../../contracts/common/interfaces/IFreezer.sol";
-// import "../../lib/mento-core/contracts/interfaces/IReserve.sol";
+import "../../contracts/governance/interfaces/ILockedGold.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
 import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 
@@ -75,11 +75,14 @@ contract UsingRegistry is Ownable {
   }
 
   function getSortedOracles() internal view returns (ISortedOracles) {
-    // console.log("From here");
     return ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
   }
 
   function getFeeCurrencyWhitelist() internal view returns (IFeeCurrencyWhitelist) {
     return IFeeCurrencyWhitelist(registry.getAddressForOrDie(FEE_CURRENCY_WHITELIST_REGISTRY_ID));
+  }
+
+  function getLockedGold() internal view returns (ILockedGold) {
+    return ILockedGold(registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
   }
 }

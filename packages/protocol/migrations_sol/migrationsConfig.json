@@ -108,5 +108,28 @@
   "random": {
     "randomnessBlockRetentionWindow": "720",
     "randomnessBlockRetentionWindow_helper": "HOUR / 5"
+  },
+  "blockchainParameters": {
+    "gasForNonGoldCurrencies": 50000,
+    "deploymentBlockGasLimit": 20000000,
+    "gasLimit": 13000000,
+    "lookbackWindow": 12
+  },
+  "doubleSigningSlasher": {
+    "reward": 1000000000000000000000,
+    "penalty": 9000000000000000000000
+  },
+  "downtimeSlasher": {
+    "reward": 10000000000000000000,
+    "penalty": 100000000000000000000,
+    "slashableDowntime": 60
+  },
+  "governanceApproverMultiSig": {
+    "required": 1,
+    "internalRequired": 1
+  },
+  "feeHandler": {
+    "beneficiary": "0x2A486910DBC72cACcbb8d0e1439C96b03B2A4699",
+    "burnFraction": 800000000000000000000000
   }
 }

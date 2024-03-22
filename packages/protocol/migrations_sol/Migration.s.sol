@@ -21,9 +21,17 @@ import "@celo-contracts/governance/interfaces/IValidatorsInitializer.sol";
 import "@celo-contracts/governance/interfaces/IElectionInitializer.sol";
 import "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
 import "@celo-contracts/governance/interfaces/IBlockchainParametersInitializer.sol";
+import "@celo-contracts/governance/interfaces/IGovernanceSlasherInitializer.sol";
+import "@celo-contracts/governance/interfaces/IDoubleSigningSlasherInitializer.sol";
+import "@celo-contracts/governance/interfaces/IDowntimeSlasherInitializer.sol";
+import "@celo-contracts/governance/interfaces/IGovernanceApproverMultiSigInitializer.sol";
+import "@celo-contracts/common/interfaces/IFeeHandlerSellerInitializer.sol";
+import "@celo-contracts/common/interfaces/IFeeHandlerInitializer.sol";
+
 
 import "@celo-contracts/identity/interfaces/IRandomInitializer.sol";
 import "@celo-contracts/identity/interfaces/IEscrowInitializer.sol";
+import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
 import "./HelperInterFaces.sol";
@@ -206,14 +214,14 @@ contract Migration is Script, UsingRegistry {
     migrateEscrow();
     // attestations not migrates
     migrateBlockchainParameters(json);
-    // migrateGovernanceSlasher();
-    // migrateDoubleSigningSlasher();
-    // migrateDowntimeSlasher();
-    // migrateGovernanceApproverMultiSig();
+    migrateGovernanceSlasher();
+    migrateDoubleSigningSlasher(json);
+    migrateDowntimeSlasher(json);
+    migrateGovernanceApproverMultiSig(json);
     // GrandaMento not migrated
-    // migrateFederatedAttestations();
-    // migrateMentoFeeHandlerSeller();
-    // migrateUniswapFeeHandlerSeller();
+    migrateFederatedAttestations();
+    migrateMentoFeeHandlerSeller();
+    migrateUniswapFeeHandlerSeller();
     // migrateFeeHandler();
     // migrateOdisPayments();
     // migrateGovernance();
@@ -483,11 +491,6 @@ contract Migration is Script, UsingRegistry {
     uint256 gasLimit = abi.decode(json.parseRaw(".blockchainParameters.gasLimit"), (uint256));
     uint256 lookbackWindow = abi.decode(json.parseRaw(".blockchainParameters.lookbackWindow"), (uint256));
 
-    // new EpochSizePrecompile();
-    console.log("lookbackWindow", lookbackWindow);
-
-    // console.log("(new EpochSizePrecompile()).getAddress()", (new EpochSizePrecompile()).getAddress());
-
     deployProxiedContract(
       "BlockchainParameters",
       abi.encodeWithSelector(IBlockchainParametersInitializer.initialize.selector, gasForNonGoldCurrencies, gasLimit, lookbackWindow));
@@ -495,37 +498,90 @@ contract Migration is Script, UsingRegistry {
     
   }
 
-  function migrateGovernanceSlasher() public{
-  //   deployProxiedContract(
-  //     "GovernanceSlasher",
-  //     abi.encodeWithSelector(IGovernanceSlasherInitializer.initialize.selector, registryAddress));
+  function migrateGovernanceSlasher() public {
+    deployProxiedContract(
+      "GovernanceSlasher",
+      abi.encodeWithSelector(IGovernanceSlasherInitializer.initialize.selector, registryAddress));
+
+      getLockedGold().addSlasher("GovernanceSlasher");
   }
 
-  function migrateDoubleSigningSlasher() public{
+  function migrateDoubleSigningSlasher(string memory json) public {
+    uint256 penalty = abi.decode(json.parseRaw(".doubleSigningSlasher.penalty"), (uint256));
+    uint256 reward = abi.decode(json.parseRaw(".doubleSigningSlasher.reward"), (uint256));
+
+    deployProxiedContract(
+      "DoubleSigningSlasher",
+      abi.encodeWithSelector(IDoubleSigningSlasherInitializer.initialize.selector, registryAddress, penalty, reward));
+
+      getLockedGold().addSlasher("DoubleSigningSlasher");
+  }
+
+  function migrateDowntimeSlasher(string memory json) public {
+    uint256 penalty = abi.decode(json.parseRaw(".downtimeSlasher.penalty"), (uint256));
+    uint256 reward = abi.decode(json.parseRaw(".downtimeSlasher.reward"), (uint256));
+    uint256 slashableDowntime = abi.decode(json.parseRaw(".downtimeSlasher.slashableDowntime"), (uint256));
+
+    deployProxiedContract(
+      "DowntimeSlasher",
+      abi.encodeWithSelector(IDowntimeSlasherInitializer.initialize.selector, registryAddress, penalty, reward, slashableDowntime));
+
+      getLockedGold().addSlasher("DowntimeSlasher");
 
   }
 
-  function migrateDowntimeSlasher() public{
+  function migrateGovernanceApproverMultiSig(string memory json) public {
+    address[] memory owners = new address[](1);
+    owners[0] = deployerAccount;
 
+    uint256 required = abi.decode(json.parseRaw(".governanceApproverMultiSig.required"), (uint256));
+    uint256 internalRequired = abi.decode(json.parseRaw(".governanceApproverMultiSig.internalRequired"), (uint256));
+
+    deployProxiedContract(
+      "GovernanceApproverMultiSig",
+      abi.encodeWithSelector(IGovernanceApproverMultiSigInitializer.initialize.selector, owners, required, internalRequired));
   }
 
-  function migrateGovernanceApproverMultiSig() public{
-
-  }
-
-  function migrateFederatedAttestations() public{
+  function migrateFederatedAttestations() public {
+    deployProxiedContract(
+      "FederatedAttestations",
+      abi.encodeWithSelector(IFederatedAttestationsInitializer.initialize.selector));
 
   }
 
   function migrateMentoFeeHandlerSeller() public{
+    address[] memory tokenAddresses;
+    uint256[] memory minimumReports;
 
+    deployProxiedContract(
+      "MentoFeeHandlerSeller",
+      abi.encodeWithSelector(IFeeHandlerSellerInitializer.initialize.selector, registryAddress, tokenAddresses, minimumReports));
   }
 
   function migrateUniswapFeeHandlerSeller() public{
+    address[] memory tokenAddresses;
+    uint256[] memory minimumReports;
 
+    deployProxiedContract(
+      "UniswapFeeHandlerSeller",
+      abi.encodeWithSelector(IFeeHandlerSellerInitializer.initialize.selector, registryAddress, tokenAddresses, minimumReports));
   }
 
-  function migrateFeeHandler() public{
+  function migrateFeeHandler(string memory json) public {
+
+    address newFeeBeneficiary = abi.decode(json.parseRaw(".feeHandler.beneficiary"), (address));
+    uint256 newBurnFraction = abi.decode(json.parseRaw(".feeHandler.burnFraction"), (uint256));
+    address[] memory tokens;
+    address[] memory handlers;
+    uint256[] memory newLimits;
+    uint256[] memory newMaxSlippages ;
+
+
+    deployProxiedContract(
+      "FeeHandler",
+      abi.encodeWithSelector(IFeeHandlerInitializer.initialize.selector, registryAddress, newFeeBeneficiary, newBurnFraction, tokens, handlers, newLimits, newMaxSlippages));
+
+    // TODO set it up
 
   }
 

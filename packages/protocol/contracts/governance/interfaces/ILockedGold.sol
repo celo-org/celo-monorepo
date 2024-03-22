@@ -35,4 +35,5 @@ interface ILockedGold {
   function getAccountTotalGovernanceVotingPower(address account) external view returns (uint256);
   function unlockingPeriod() external view returns (uint256);
   function getAccountNonvotingLockedGold(address account) external view returns (uint256);
+  function addSlasher(string calldata slasherIdentifier) external;
 }
