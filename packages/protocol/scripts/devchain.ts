@@ -206,7 +206,8 @@ function runMigrations(opts: { upto?: number; migrationOverride?: string } = {})
 
   if (opts.migrationOverride) {
     cmdArgs.push('--migration_override')
-    cmdArgs.push(fs.readFileSync(opts.migrationOverride).toString())
+    const file: string = fs.readFileSync(opts.migrationOverride).toString()
+    cmdArgs.push(file)
   }
   return execCmd(`yarn`, cmdArgs, { cwd: ProtocolRoot })
 }
