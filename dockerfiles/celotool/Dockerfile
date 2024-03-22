@@ -21,7 +21,6 @@ RUN alias python=python3
 # ensure yarn.lock is evaluated by kaniko cache diff
 COPY lerna.json package.json yarn.lock ./
 COPY packages/celotool/package.json packages/celotool/
-COPY packages/dev-utils/package.json packages/dev-utils/
 COPY packages/env-tests/package.json packages/env-tests/package.json
 COPY packages/protocol/package.json packages/protocol/
 COPY scripts/ scripts/
@@ -32,7 +31,6 @@ COPY .gitmodules .gitmodules
 RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 
 COPY packages/celotool packages/celotool/
-COPY packages/dev-utils packages/dev-utils/
 COPY packages/env-tests packages/env-tests
 COPY packages/helm-charts packages/helm-charts
 COPY packages/protocol packages/protocol/
