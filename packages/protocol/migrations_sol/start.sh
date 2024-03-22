@@ -6,6 +6,8 @@ set -euo pipefail
 # Compile everything
 
 ./start_anvil.sh
+./deploy_precompiles.sh
+
 
 
 # recomile with the libraries

@@ -1,5 +1,4 @@
 pragma solidity >=0.8.7 <0.8.20;
-// pragma solidity ^0.5.13;
 // Can be moved to 0.8 if I use the interfaces? Need to do for Proxy
 // TODO proxy should have getOwner as external
 
@@ -21,6 +20,7 @@ import "@celo-contracts/governance/interfaces/LockedGoldfunctionInitializer.sol"
 import "@celo-contracts/governance/interfaces/IValidatorsInitializer.sol";
 import "@celo-contracts/governance/interfaces/IElectionInitializer.sol";
 import "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
+import "@celo-contracts/governance/interfaces/IBlockchainParametersInitializer.sol";
 
 import "@celo-contracts/identity/interfaces/IRandomInitializer.sol";
 import "@celo-contracts/identity/interfaces/IEscrowInitializer.sol";
@@ -32,6 +32,11 @@ import "@celo-contracts-8/common/UsingRegistry.sol";
 
 
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+
+
+// import "@celo-contracts/precompiles/EpochSizePrecompile.sol";
+// import "./precompiles/EpochSizePrecompile.sol";
+
 
 
 // import { SortedOracles } from "@celo-contract/stability/SortedOracles.sol";
@@ -200,9 +205,19 @@ contract Migration is Script, UsingRegistry {
     migrateRandom(json);
     migrateEscrow();
     // attestations not migrates
-
-
-
+    migrateBlockchainParameters(json);
+    // migrateGovernanceSlasher();
+    // migrateDoubleSigningSlasher();
+    // migrateDowntimeSlasher();
+    // migrateGovernanceApproverMultiSig();
+    // GrandaMento not migrated
+    // migrateFederatedAttestations();
+    // migrateMentoFeeHandlerSeller();
+    // migrateUniswapFeeHandlerSeller();
+    // migrateFeeHandler();
+    // migrateOdisPayments();
+    // migrateGovernance();
+    // electValidators();
 
     // // // little sanity check, remove later
     // IRegistry registry = IRegistry(registryAddress);
@@ -463,4 +478,68 @@ contract Migration is Script, UsingRegistry {
       abi.encodeWithSelector(IEscrowInitializer.initialize.selector));
   }
 
+  function migrateBlockchainParameters(string memory json) public {
+    uint256 gasForNonGoldCurrencies = abi.decode(json.parseRaw(".blockchainParameters.gasForNonGoldCurrencies"), (uint256));
+    uint256 gasLimit = abi.decode(json.parseRaw(".blockchainParameters.gasLimit"), (uint256));
+    uint256 lookbackWindow = abi.decode(json.parseRaw(".blockchainParameters.lookbackWindow"), (uint256));
+
+    // new EpochSizePrecompile();
+    console.log("lookbackWindow", lookbackWindow);
+
+    // console.log("(new EpochSizePrecompile()).getAddress()", (new EpochSizePrecompile()).getAddress());
+
+    deployProxiedContract(
+      "BlockchainParameters",
+      abi.encodeWithSelector(IBlockchainParametersInitializer.initialize.selector, gasForNonGoldCurrencies, gasLimit, lookbackWindow));
+
+    
+  }
+
+  function migrateGovernanceSlasher() public{
+  //   deployProxiedContract(
+  //     "GovernanceSlasher",
+  //     abi.encodeWithSelector(IGovernanceSlasherInitializer.initialize.selector, registryAddress));
+  }
+
+  function migrateDoubleSigningSlasher() public{
+
+  }
+
+  function migrateDowntimeSlasher() public{
+
+  }
+
+  function migrateGovernanceApproverMultiSig() public{
+
+  }
+
+  function migrateFederatedAttestations() public{
+
+  }
+
+  function migrateMentoFeeHandlerSeller() public{
+
+  }
+
+  function migrateUniswapFeeHandlerSeller() public{
+
+  }
+
+  function migrateFeeHandler() public{
+
+  }
+
+  function migrateOdisPayments() public{
+
+  }
+
+  function migrateGovernance() public{
+
+  }
+
+  function electValidators() public{
+
+  }
 }
+
+
