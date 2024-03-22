@@ -25,12 +25,15 @@ import "@celo-contracts/governance/interfaces/IGovernanceSlasherInitializer.sol"
 import "@celo-contracts/governance/interfaces/IDoubleSigningSlasherInitializer.sol";
 import "@celo-contracts/governance/interfaces/IDowntimeSlasherInitializer.sol";
 import "@celo-contracts/governance/interfaces/IGovernanceApproverMultiSigInitializer.sol";
+import "@celo-contracts/governance/interfaces/IGovernanceInitializer.sol";
+
 import "@celo-contracts/common/interfaces/IFeeHandlerSellerInitializer.sol";
 import "@celo-contracts/common/interfaces/IFeeHandlerInitializer.sol";
-
+import "@celo-contracts/common/interfaces/IFeeHandler.sol";
 
 import "@celo-contracts/identity/interfaces/IRandomInitializer.sol";
 import "@celo-contracts/identity/interfaces/IEscrowInitializer.sol";
+import "@celo-contracts/identity/interfaces/IOdisPaymentsInitializer.sol";
 import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
@@ -222,9 +225,9 @@ contract Migration is Script, UsingRegistry {
     migrateFederatedAttestations();
     migrateMentoFeeHandlerSeller();
     migrateUniswapFeeHandlerSeller();
-    // migrateFeeHandler();
-    // migrateOdisPayments();
-    // migrateGovernance();
+    migrateFeeHandler(json);
+    migrateOdisPayments();
+    migrateGovernance(json);
     // electValidators();
 
     // // // little sanity check, remove later
@@ -537,6 +540,8 @@ contract Migration is Script, UsingRegistry {
     uint256 required = abi.decode(json.parseRaw(".governanceApproverMultiSig.required"), (uint256));
     uint256 internalRequired = abi.decode(json.parseRaw(".governanceApproverMultiSig.internalRequired"), (uint256));
 
+    // This adds the multisig to the registry, which is not a case in mainnet but it's useful to keep a reference
+    // of the deployed contract
     deployProxiedContract(
       "GovernanceApproverMultiSig",
       abi.encodeWithSelector(IGovernanceApproverMultiSigInitializer.initialize.selector, owners, required, internalRequired));
@@ -577,25 +582,63 @@ contract Migration is Script, UsingRegistry {
     uint256[] memory newMaxSlippages ;
 
 
-    deployProxiedContract(
+    address feeHandlerProxyAddress = deployProxiedContract(
       "FeeHandler",
       abi.encodeWithSelector(IFeeHandlerInitializer.initialize.selector, registryAddress, newFeeBeneficiary, newBurnFraction, tokens, handlers, newLimits, newMaxSlippages));
 
-    // TODO set it up
-
+    IFeeHandler(feeHandlerProxyAddress).addToken(getStableToken(), address(getMentoFeeHandlerSeller()));
   }
 
   function migrateOdisPayments() public{
-
+    deployProxiedContract(
+      "OdisPayments",
+      abi.encodeWithSelector(IOdisPaymentsInitializer.initialize.selector));
   }
 
-  function migrateGovernance() public{
+  function migrateGovernance(string memory json) public {
+    bool useApprover = abi.decode(json.parseRaw(".governanceApproverMultiSig.required"), (bool));
+
+    address approver = useApprover? registry.getAddressForString("GovernanceApproverMultiSig"): deployerAccount;
+    uint256 concurrentProposals = abi.decode(json.parseRaw(".governance.concurrentProposals"), (uint256));
+    uint256 minDeposit = abi.decode(json.parseRaw(".governance.minDeposit"), (uint256));
+    uint256 queueExpiry = abi.decode(json.parseRaw(".governance.queueExpiry"), (uint256));
+    uint256 dequeueFrequency = abi.decode(json.parseRaw(".governance.dequeueFrequency"), (uint256));
+    uint256 referendumStageDuration = abi.decode(json.parseRaw(".governance.referendumStageDuration"), (uint256));
+    uint256 executionStageDuration = abi.decode(json.parseRaw(".governance.executionStageDuration"), (uint256));
+    uint256 participationBaseline = abi.decode(json.parseRaw(".governance.participationBaseline"), (uint256));
+    uint256 participationFloor = abi.decode(json.parseRaw(".governance.participationFloor"), (uint256));
+    uint256 baselineUpdateFactor = abi.decode(json.parseRaw(".governance.baselineUpdateFactor"), (uint256));
+    uint256 baselineQuorumFactor = abi.decode(json.parseRaw(".governance.baselineQuorumFactor"), (uint256));
+
+    deployProxiedContract(
+    "Governance",
+    abi.encodeWithSelector(IGovernanceInitializer.initialize.selector, registryAddress, approver,
+      concurrentProposals,
+      minDeposit,
+      queueExpiry,
+      dequeueFrequency,
+      referendumStageDuration,
+      executionStageDuration,
+      participationBaseline,
+      participationFloor,
+      baselineUpdateFactor,
+      baselineQuorumFactor
+    ));
+
+    bool skipSetConstitution = abi.decode(json.parseRaw(".governance.skipSetConstitution"), (bool));
+    if (skipSetConstitution){
+      return;
+    }
+
+    // .*~
+    // TODO set constitution
 
   }
 
   function electValidators() public{
 
   }
+
 }
 
 

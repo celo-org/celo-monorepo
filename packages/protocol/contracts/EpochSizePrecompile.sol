@@ -1,8 +1,6 @@
 // TODO move this to test folder
 pragma solidity >=0.8.7 <0.8.20;
 
-import "forge-std/console.sol";
-
 
 contract EpochSizePrecompile {
   address constant _address = address(0xff - 7);
@@ -14,7 +12,6 @@ contract EpochSizePrecompile {
   }
 
   fallback (bytes calldata) external payable returns (bytes memory) {
-    console.log("Hello from precompile3");
     return abi.encodePacked(epochSize);
   }
   //   bytes memory returnData = abi.encode(epochSize);

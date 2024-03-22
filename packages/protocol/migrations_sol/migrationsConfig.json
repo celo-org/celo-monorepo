@@ -126,10 +126,30 @@
   },
   "governanceApproverMultiSig": {
     "required": 1,
-    "internalRequired": 1
+    "internalRequired": 1,
+    "governanceApproverMultiSig": true
   },
   "feeHandler": {
     "beneficiary": "0x2A486910DBC72cACcbb8d0e1439C96b03B2A4699",
     "burnFraction": 800000000000000000000000
+  },
+  "governance": {
+    "concurrentProposals": 3,
+    "dequeueFrequency": 14400,
+    "queueExpiry": 2419200,
+    "queueExpiry_helper": "4 * WEEK",
+    "dequeueFrequency_helper":"4 * HOUR",
+    "approvalStageDuration": 14400,
+    "approvalStageDuration_helper": "4 * HOUR",
+    "referendumStageDuration": 86400,
+    "referendumStageDuration_hlper": "DAY",
+    "executionStageDuration": 604800,
+    "executionStageDuration_hlper": "WEEK",
+    "participationBaseline": 5000000000000000000000,
+    "minDeposit": 100000000000000000000,
+    "participationFloor": 10000000000000000000000,
+    "baselineUpdateFactor": 200000000000000000000000,
+    "baselineQuorumFactor": 1000000000000000000000000
+
   }
 }

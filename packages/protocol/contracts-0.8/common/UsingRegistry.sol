@@ -13,6 +13,8 @@ import "../../contracts/governance/interfaces/ILockedGold.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
 import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 
+import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
+
 // import "forge-std/console.sol";
 
 contract UsingRegistry is Ownable {
@@ -42,6 +44,9 @@ contract UsingRegistry is Ownable {
   bytes32 constant SORTED_ORACLES_REGISTRY_ID = keccak256(abi.encodePacked("SortedOracles"));
   bytes32 constant STABLE_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableToken"));
   bytes32 constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
+  bytes32 constant MENTOFEEHANDLERSELLER_REGISTRY_ID = keccak256(
+    abi.encodePacked("MentoFeeHandlerSeller")
+  );
   // solhint-enable state-visibility
 
   IRegistry public registry;
@@ -84,5 +89,13 @@ contract UsingRegistry is Ownable {
 
   function getLockedGold() internal view returns (ILockedGold) {
     return ILockedGold(registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
+  }
+
+  // When updating Mento contracts return the interface rather than the address
+  function getStableToken() internal view returns (address) {
+    return registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID);
+  }
+  function getMentoFeeHandlerSeller() internal view returns (IFeeHandlerSeller) {
+    return IFeeHandlerSeller(registry.getAddressForOrDie(MENTOFEEHANDLERSELLER_REGISTRY_ID));
   }
 }
