@@ -1,4 +1,4 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.5.13 <0.9.0;
 
 interface IFederatedAttestations {
   function registerAttestationAsIssuer(bytes32 identifier, address account, uint64 issuedOn)

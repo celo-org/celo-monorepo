@@ -128,4 +128,8 @@ contract MockLockedGold is ILockedGold {
   function getAccountNonvotingLockedGold(address account) external view returns (uint256) {
     return 0;
   }
+
+  function addSlasher(string calldata) external {
+    require(false, "Not implemented");
+  }
 }

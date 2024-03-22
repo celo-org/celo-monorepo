@@ -48,4 +48,5 @@ interface IAccounts {
   function setPaymentDelegation(address, uint256) external;
   function getPaymentDelegation(address) external view returns (address, uint256);
   function isSigner(address, address, bytes32) external view returns (bool);
+  function setEip712DomainSeparator() external;
 }

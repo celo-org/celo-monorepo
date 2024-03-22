@@ -22,6 +22,7 @@ contract LockedGold is
   Initializable,
   UsingRegistry
 {
+  // TODO add initializer
   using SafeMath for uint256;
   using Address for address payable; // prettier-ignore
   using FixidityLib for FixidityLib.Fraction;
