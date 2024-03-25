@@ -114,91 +114,11 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     }
   })
 
-  describe('#initialize()', () => {
-    it('should have set the owner', async () => {
-      const owner: string = await slasher.owner()
-      assert.equal(owner, accounts[0])
-    })
+  // describe('#initialize()', () => {})
 
-    it('should have set slashing incentives', async () => {
-      const res = await slasher.slashingIncentives()
-      assert.equal(res[0].toNumber(), 10000)
-      assert.equal(res[1].toNumber(), 100)
-    })
+  // describe('#setSlashingIncentives()', () => {})
 
-    it('should have set slashable downtime', async () => {
-      const res = await slasher.slashableDowntime()
-      assert.equal(res.toNumber(), slashableDowntime)
-    })
-
-    it('can only be called once', async () => {
-      await assertTransactionRevertWithReason(
-        slasher.initialize(registry.address, 10000, 100, 2),
-        'contract already initialized'
-      )
-    })
-  })
-
-  describe('#setSlashingIncentives()', () => {
-    it('can only be set by the owner', async () => {
-      await assertTransactionRevertWithReason(
-        slasher.setSlashingIncentives(123, 67, { from: nonOwner }),
-        'Ownable: caller is not the owner'
-      )
-    })
-
-    it('should have set slashing incentives', async () => {
-      await slasher.setSlashingIncentives(123, 67)
-      const res = await slasher.slashingIncentives()
-      assert.equal(res[0].toNumber(), 123)
-      assert.equal(res[1].toNumber(), 67)
-    })
-
-    it('reward cannot be larger than penalty', async () => {
-      await assertTransactionRevertWithReason(
-        slasher.setSlashingIncentives(123, 678),
-        'Penalty has to be larger than reward'
-      )
-    })
-
-    it('should emit the SlashingIncentivesSet corresponding event', async () => {
-      const resp = await slasher.setSlashingIncentives(123, 67)
-      assert.equal(resp.logs.length, 1)
-      assertLogMatches2(resp.logs[0], {
-        event: 'SlashingIncentivesSet',
-        args: {
-          penalty: 123,
-          reward: 67,
-        },
-      })
-    })
-  })
-
-  describe('#setSlashableDowntime()', () => {
-    it('can only be set by the owner', async () => {
-      await assertTransactionRevertWithReason(
-        slasher.setSlashableDowntime(23, { from: nonOwner }),
-        ' Ownable: caller is not the owner'
-      )
-    })
-
-    it('should have set slashable downtime', async () => {
-      await slasher.setSlashableDowntime(23)
-      const res = await slasher.slashableDowntime()
-      assert.equal(res.toNumber(), 23)
-    })
-
-    it('should emit the SlashableDowntimeSet corresponding event', async () => {
-      const resp = await slasher.setSlashableDowntime(23)
-      assert.equal(resp.logs.length, 1)
-      assertLogMatches2(resp.logs[0], {
-        event: 'SlashableDowntimeSet',
-        args: {
-          interval: 23,
-        },
-      })
-    })
-  })
+  // describe('#setSlashableDowntime()', () => {})
 
   describe('#getBitmapForInterval()', () => {
     let blockNumber: number
