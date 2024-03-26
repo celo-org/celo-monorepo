@@ -2651,7 +2651,7 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
 }
 
 contract ValidatorsTest_GetEpochSize is ValidatorsTest {
-  function test_ShouldRetun17280() public {
+  function test_ShouldReturn17280() public {
     assertEq(validators.getEpochSize(), 17280);
   }
 }

@@ -93,7 +93,7 @@ contract DoubleSigningSlasherBaseTest is Test {
     (nonOwner, nonOwnerPK) = actorWithPK("nonOwner");
     (validator, validatorPK) = actorWithPK("validator");
     (group, groupPK) = actorWithPK("group");
-    (otherValidator, validatorPK) = actorWithPK("otherValidator");
+    (otherValidator, otherValidatorPK) = actorWithPK("otherValidator");
     (otherGroup, groupPK) = actorWithPK("otherGroup");
     (caller2, caller2PK) = actorWithPK("caller2");
 
