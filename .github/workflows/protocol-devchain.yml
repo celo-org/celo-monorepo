@@ -7,6 +7,9 @@ on:
     - cron: 0 0 1 * *
   workflow_dispatch:
 
+env:
+  RELEASE_TAG: core-contracts.v11
+
 jobs:
   generate-protocol-devchain:
     name: Generate protocol devchain used in celo-monorepo.yml workflow
@@ -18,7 +21,7 @@ jobs:
         include:
           - tag: core-contracts.v9
             node-version: 12
-          - tag: core-contracts.v10
+          - tag: core-contracts.v11
             node-version: 18
     steps:
       - uses: actions/checkout@v4
