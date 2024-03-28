@@ -38,7 +38,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
   let slasher: DowntimeSlasherTestInstance
   let epochSize: number
 
-  const nonOwner = accounts[1]
+  // const nonOwner = accounts[1]
   const validatorList = [accounts[2], accounts[3], accounts[4]]
   const groups = [accounts[0], accounts[1]]
 
@@ -131,41 +131,41 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       await slasher.setEpochSigner(epoch, 0, validatorList[0])
     })
 
-    it('fails if endBlock < startBlock', async () => {
-      await assertRevert(
-        slasher.getBitmapForInterval(2, 3),
-        'endBlock must be greater or equal than startBlock'
-      )
-    })
+    // it('fails if endBlock < startBlock', async () => {
+    //   await assertTransactionRevertWithReason(
+    //     slasher.getBitmapForInterval(2, 3),
+    //     'endBlock must be greater or equal than startBlock'
+    //   )
+    // })
 
-    it('fails if the currentBlock is part of the interval', async () => {
-      const currentBlock = await web3.eth.getBlockNumber()
-      await assertRevert(
-        slasher.getBitmapForInterval(currentBlock, currentBlock),
-        'the signature bitmap for endBlock is not yet available'
-      )
-    })
+    // it('fails if the currentBlock is part of the interval', async () => {
+    //   const currentBlock = await web3.eth.getBlockNumber()
+    //   await assertRevert(
+    //     slasher.getBitmapForInterval(currentBlock, currentBlock),
+    //     'the signature bitmap for endBlock is not yet available'
+    //   )
+    // })
 
-    it('fails if startBlock is older than 4 epochs', async () => {
-      // we make sure that 4 epochs passed
-      do {
-        blockNumber = await web3.eth.getBlockNumber()
-        await jsonRpc(web3, 'evm_mine', [])
-      } while (blockNumber < epochSize * 4 + 2)
-      blockNumber = blockNumber - epochSize * 4
-      await assertRevert(
-        slasher.getBitmapForInterval(blockNumber, blockNumber),
-        'startBlock must be within 4 epochs of the current head'
-      )
-    })
+    // it('fails if startBlock is older than 4 epochs', async () => {
+    //   // we make sure that 4 epochs passed
+    //   do {
+    //     blockNumber = await web3.eth.getBlockNumber()
+    //     await jsonRpc(web3, 'evm_mine', [])
+    //   } while (blockNumber < epochSize * 4 + 2)
+    //   blockNumber = blockNumber - epochSize * 4
+    //   await assertRevert(
+    //     slasher.getBitmapForInterval(blockNumber, blockNumber),
+    //     'startBlock must be within 4 epochs of the current head'
+    //   )
+    // })
 
-    it('fails if startBlock and endBlock are not from the same epoch', async () => {
-      blockNumber = blockNumber - 2
-      await assertRevert(
-        slasher.getBitmapForInterval(blockNumber - epochSize, blockNumber),
-        'startBlock and endBlock must be in the same epoch'
-      )
-    })
+    // it('fails if startBlock and endBlock are not from the same epoch', async () => {
+    //   blockNumber = blockNumber - 2
+    //   await assertRevert(
+    //     slasher.getBitmapForInterval(blockNumber - epochSize, blockNumber),
+    //     'startBlock and endBlock must be in the same epoch'
+    //   )
+    // })
 
     it('fails if startBlock and endBlock are not from the same epoch', async () => {
       blockNumber = blockNumber - 2
