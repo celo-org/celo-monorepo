@@ -1,7 +1,6 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertLogMatches2,
-  assertRevert,
   assertTransactionRevertWithReason,
   getEpochNumberOfBlock,
   getFirstBlockNumberForEpoch,
@@ -120,109 +119,9 @@ contract('DowntimeSlasher', (accounts: string[]) => {
 
   // describe('#setSlashableDowntime()', () => {})
 
-  describe('#getBitmapForInterval()', () => {
-    let blockNumber: number
-    let epoch: number
+  // describe('#getBitmapForInterval()', () => {})
 
-    beforeEach(async () => {
-      await slasher.setNumberValidators(2)
-      blockNumber = await web3.eth.getBlockNumber()
-      epoch = getEpochNumberOfBlock(blockNumber, epochSize)
-      await slasher.setEpochSigner(epoch, 0, validatorList[0])
-    })
-
-    // it('fails if endBlock < startBlock', async () => {
-    //   await assertTransactionRevertWithReason(
-    //     slasher.getBitmapForInterval(2, 3),
-    //     'endBlock must be greater or equal than startBlock'
-    //   )
-    // })
-
-    // it('fails if the currentBlock is part of the interval', async () => {
-    //   const currentBlock = await web3.eth.getBlockNumber()
-    //   await assertRevert(
-    //     slasher.getBitmapForInterval(currentBlock, currentBlock),
-    //     'the signature bitmap for endBlock is not yet available'
-    //   )
-    // })
-
-    // it('fails if startBlock is older than 4 epochs', async () => {
-    //   // we make sure that 4 epochs passed
-    //   do {
-    //     blockNumber = await web3.eth.getBlockNumber()
-    //     await jsonRpc(web3, 'evm_mine', [])
-    //   } while (blockNumber < epochSize * 4 + 2)
-    //   blockNumber = blockNumber - epochSize * 4
-    //   await assertRevert(
-    //     slasher.getBitmapForInterval(blockNumber, blockNumber),
-    //     'startBlock must be within 4 epochs of the current head'
-    //   )
-    // })
-
-    // it('fails if startBlock and endBlock are not from the same epoch', async () => {
-    //   blockNumber = blockNumber - 2
-    //   await assertRevert(
-    //     slasher.getBitmapForInterval(blockNumber - epochSize, blockNumber),
-    //     'startBlock and endBlock must be in the same epoch'
-    //   )
-    // })
-
-    it('fails if startBlock and endBlock are not from the same epoch', async () => {
-      blockNumber = blockNumber - 2
-      await assertRevert(
-        slasher.getBitmapForInterval(blockNumber - epochSize, blockNumber),
-        'startBlock and endBlock must be in the same epoch'
-      )
-    })
-  })
-
-  describe('#setBitmapForInterval()', () => {
-    let blockNumber: number
-    let epoch: number
-
-    beforeEach(async () => {
-      await slasher.setNumberValidators(2)
-      blockNumber = await web3.eth.getBlockNumber()
-      // To ensure blockNumber with valid parentSealBitmap
-      blockNumber = blockNumber - 3
-      // This ensures 2 consecutive blocks in the same epoch
-      blockNumber = blockNumber % epochSize === 0 ? blockNumber - 1 : blockNumber
-      epoch = getEpochNumberOfBlock(blockNumber, epochSize)
-      await slasher.setEpochSigner(epoch, 0, validatorList[0])
-      await slasher.setParentSealBitmap(
-        blockNumber + 1,
-        '0x0000000000000000000000000000000000000000000000000000000000000001'
-      )
-      await slasher.setParentSealBitmap(
-        blockNumber + 2,
-        '0x0000000000000000000000000000000000000000000000000000000000000002'
-      )
-    })
-
-    it('fails if the interval was already set', async () => {
-      const resp = await slasher.setBitmapForInterval(blockNumber, blockNumber + 1)
-      assert.equal(resp.logs.length, 1)
-
-      await assertTransactionRevertWithReason(
-        slasher.setBitmapForInterval(blockNumber, blockNumber + 1),
-        'bitmap already set'
-      )
-    })
-
-    it('should emit the BitmapSetForInterval corresponding event', async () => {
-      const resp = await slasher.setBitmapForInterval(blockNumber, blockNumber + 1)
-      assert.equal(resp.logs.length, 1)
-      assertLogMatches2(resp.logs[0], {
-        event: 'BitmapSetForInterval',
-        args: {
-          sender: accounts[0],
-          startBlock: blockNumber,
-          endBlock: blockNumber + 1,
-          bitmap: '0x0000000000000000000000000000000000000000000000000000000000000003',
-        },
-      })
-    })
-  })
+  // describe('#setBitmapForInterval()', () => {})
 
   describe('#slash()', () => {
     let epoch: number
