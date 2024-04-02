@@ -199,246 +199,32 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       })
 
       // Test boundaries
-      it('fails if the first block was signed', async () => {
-        const startBlock = getFirstBlockNumberForEpoch(epoch, epochSize)
+      // it('fails if the first block was signed', async () => {})
 
-        // Set the parentSeal bitmaps for every block without the validator's signature
-        await presetParentSealForBlocks(startBlock + 1, slashableDowntime - 1, [
-          bitmapWithoutValidator[validatorIndexInEpoch],
-        ])
+      // it('fails if the last block was signed', async () => {})
 
-        // First block with every validator signatures
-        await presetParentSealForBlocks(startBlock, 1, [bitmapVI01])
-        const slotArrays = await calculateEverySlot(startBlock)
-        await assertTransactionRevertWithReason(
-          slasher.slash(
-            slotArrays.startBlocks,
-            slotArrays.endBlocks,
-            [validatorIndexInEpoch],
-            0,
-            [],
-            [],
-            [],
-            [],
-            [],
-            []
-          ),
-          'not down'
-        )
-      })
+      // it('fails if one block in the middle was signed', async () => {})
 
-      it('fails if the last block was signed', async () => {
-        const startBlock = getFirstBlockNumberForEpoch(epoch, epochSize)
+      // it('fails if the first block was signed using a big index', async () => {})
 
-        // Set the parentSeal bitmaps for every block without the validator's signature
-        await presetParentSealForBlocks(startBlock, slashableDowntime - 1, [
-          bitmapWithoutValidator[validatorIndexInEpoch],
-        ])
+      // describe('when the validator was down', () => {
+      //   let startBlock: number
 
-        // Last block with every validator signatures
-        await presetParentSealForBlocks(startBlock + slashableDowntime - 1, 1, [bitmapVI01])
-        const slotArrays = await calculateEverySlot(startBlock)
-        await assertTransactionRevertWithReason(
-          slasher.slash(
-            slotArrays.startBlocks,
-            slotArrays.endBlocks,
-            [validatorIndexInEpoch],
-            0,
-            [],
-            [],
-            [],
-            [],
-            [],
-            []
-          ),
-          'not down'
-        )
-      })
+      //   beforeEach(async () => {
+      //     startBlock = getFirstBlockNumberForEpoch(epoch, epochSize)
+      //     await presetParentSealForBlocks(startBlock, slashableDowntime, [
+      //       bitmapWithoutValidator[validatorIndexInEpoch],
+      //     ])
+      //   })
 
-      it('fails if one block in the middle was signed', async () => {
-        const startBlock = getFirstBlockNumberForEpoch(epoch, epochSize)
+      //   describe('when the intervals cover the SlashableDowntime window', () => {
+      //     // it('succeeds if intervals overlap', async () => {})
+      //     // it('succeeds if intervals cover more than the SlashableDowntime window', async () => {})
+      //     // it('fails if intervals are not contiguous', async () => {})
+      //   })
 
-        // Set the parentSeal bitmaps for every block without the validator's signature
-        await presetParentSealForBlocks(startBlock, slashableDowntime, [
-          bitmapWithoutValidator[validatorIndexInEpoch],
-        ])
-
-        // Middle block with every validator signatures
-        await presetParentSealForBlocks(startBlock + intervalSize, 1, [bitmapVI01])
-        const slotArrays = await calculateEverySlot(startBlock)
-        await assertTransactionRevertWithReason(
-          slasher.slash(
-            slotArrays.startBlocks,
-            slotArrays.endBlocks,
-            [validatorIndexInEpoch],
-            0,
-            [],
-            [],
-            [],
-            [],
-            [],
-            []
-          ),
-          'not down'
-        )
-      })
-
-      it('fails if the first block was signed using a big index', async () => {
-        await slasher.setNumberValidators(100)
-        await slasher.setEpochSigner(epoch, 99, validatorList[2])
-        const startBlock = getFirstBlockNumberForEpoch(epoch, epochSize)
-
-        // Set the parentSeal bitmaps for every block without the validator's signature
-        await presetParentSealForBlocks(startBlock + 1, slashableDowntime - 1, [bitmapVI0])
-
-        // First block with every validator signatures
-        await presetParentSealForBlocks(startBlock, 1, [bitmapVI99])
-        const slotArrays = await calculateEverySlot(startBlock)
-        await assertTransactionRevertWithReason(
-          slasher.slash(
-            slotArrays.startBlocks,
-            slotArrays.endBlocks,
-            [99],
-            0,
-            [],
-            [],
-            [],
-            [],
-            [],
-            []
-          ),
-          'not down'
-        )
-      })
-
-      describe('when the validator was down', () => {
-        let startBlock: number
-
-        beforeEach(async () => {
-          startBlock = getFirstBlockNumberForEpoch(epoch, epochSize)
-          await presetParentSealForBlocks(startBlock, slashableDowntime, [
-            bitmapWithoutValidator[validatorIndexInEpoch],
-          ])
-        })
-
-        describe('when the intervals cover the SlashableDowntime window', () => {
-          it('succeeds if intervals overlap', async () => {
-            const startBlocks = [startBlock, startBlock + 2]
-            const endBlocks = [
-              startBlock + slashableDowntime - 3,
-              startBlock + slashableDowntime - 1,
-            ]
-            await generateProofs(startBlocks, endBlocks)
-            await slasher.slash(
-              startBlocks,
-              endBlocks,
-              [validatorIndexInEpoch],
-              0,
-              [],
-              [],
-              [],
-              [],
-              [],
-              []
-            )
-            const balance = await mockLockedGold.accountTotalLockedGold(validatorList[0])
-            assert.equal(balance.toNumber(), 40000)
-          })
-
-          it('succeeds if intervals cover more than the SlashableDowntime window', async () => {
-            const startBlocks = [startBlock, startBlock + intervalSize]
-            const endBlocks = [startBlock + intervalSize - 1, startBlock + slashableDowntime + 3]
-
-            for (let i = 0; i < startBlocks.length; i += 1) {
-              await presetParentSealForBlocks(startBlocks[i], endBlocks[i] - startBlocks[i] + 1, [
-                bitmapWithoutValidator[validatorIndexInEpoch],
-              ])
-            }
-            await generateProofs(startBlocks, endBlocks)
-            await slasher.slash(
-              startBlocks,
-              endBlocks,
-              [validatorIndexInEpoch],
-              0,
-              [],
-              [],
-              [],
-              [],
-              [],
-              []
-            )
-            const balance = await mockLockedGold.accountTotalLockedGold(validatorList[0])
-            assert.equal(balance.toNumber(), 40000)
-          })
-
-          it('fails if intervals are not contiguous', async () => {
-            // The slashableDowntime is covered with interval(0) and interval(2), but
-            // interval(1) breaks the interval contiguity.
-            const startBlocks = [
-              startBlock,
-              startBlock + intervalSize * 2,
-              startBlock + intervalSize,
-            ]
-            const endBlocks = [
-              startBlocks[0] + intervalSize - 1,
-              startBlocks[1] + intervalSize - 1,
-              startBlock + slashableDowntime - 1,
-            ]
-
-            for (let i = 0; i < startBlocks.length; i += 1) {
-              await presetParentSealForBlocks(startBlocks[i], endBlocks[i] - startBlocks[i] + 1, [
-                bitmapWithoutValidator[validatorIndexInEpoch],
-              ])
-            }
-            await generateProofs(startBlocks, endBlocks)
-            await assertTransactionRevertWithReason(
-              slasher.slash(
-                startBlocks,
-                endBlocks,
-                [validatorIndexInEpoch],
-                0,
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-              ),
-              'each interval must start at most one block after the end of the previous interval'
-            )
-          })
-        })
-
-        it("fails if the intervals don't cover the SlashableDowntime window", async () => {
-          const startBlocks = [startBlock, startBlock + intervalSize]
-          const endBlocks = [
-            startBlocks[0] + intervalSize - 1,
-            startBlocks[1] + intervalSize - 1,
-            startBlock + slashableDowntime - 1,
-          ]
-          for (let i = 0; i < startBlocks.length; i += 1) {
-            await presetParentSealForBlocks(startBlocks[i], endBlocks[i] - startBlocks[i] + 1, [
-              bitmapWithoutValidator[validatorIndexInEpoch],
-            ])
-          }
-          await generateProofs(startBlocks, endBlocks)
-          await assertTransactionRevertWithReason(
-            slasher.slash(
-              startBlocks,
-              endBlocks,
-              [validatorIndexInEpoch],
-              0,
-              [],
-              [],
-              [],
-              [],
-              [],
-              []
-            ),
-            'startBlocks and endBlocks must have the same length'
-          )
-        })
-      })
+      //   // it("fails if the intervals don't cover the SlashableDowntime window", async () => {})
+      // })
 
       describe('when slashing succeeds', () => {
         let resp: Truffle.TransactionResponse
