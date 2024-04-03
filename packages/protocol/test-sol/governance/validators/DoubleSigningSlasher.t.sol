@@ -11,7 +11,7 @@ import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/DoubleSigningSlasher.sol";
 import "@celo-contracts/governance/test/MockUsingPrecompiles.sol";
 
-contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecompiles {
+contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecompiles, Test {
   struct SlashParams {
     address signer;
     uint256 index;
@@ -26,7 +26,13 @@ contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecom
     uint256[] groupElectionIndices;
   }
 
-  function mockSlash(SlashParams calldata slashParams) external {
+  function mockSlash(SlashParams calldata slashParams, address _validator) external {
+    ph.mockReturn(
+      ph.GET_VALIDATOR(),
+      abi.encodePacked(slashParams.index, getBlockNumberFromHeader(slashParams.headerA)),
+      abi.encode(_validator)
+    );
+
     slash(
       slashParams.signer,
       slashParams.index,
@@ -248,7 +254,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
       groupElectionIndices: groupElectionIndices
     });
     vm.expectRevert("Block headers are from different height");
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, validator);
   }
 
   function test_RevertIf_NotSignedAtIndex() public {
@@ -268,7 +274,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
 
     vm.expectRevert("Didn't sign first block");
 
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, otherValidator);
   }
 
   function test_RevertIf_EpochSignerIsWrong() public {
@@ -287,7 +293,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
     });
 
     vm.expectRevert("Wasn't a signer with given index");
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, validator);
   }
 
   function test_RevertIf_NotEnoughSigners() public {
@@ -308,7 +314,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
     });
 
     vm.expectRevert("Not enough signers in the first block");
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, validator);
   }
 
   function test_Emits_DoubleSigningSlashPerformedEvent() public {
@@ -327,7 +333,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
     });
     vm.expectEmit(true, true, true, true);
     emit DoubleSigningSlashPerformed(validator, blockNumber);
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, validator);
   }
 
   function test_ShouldDecrementCELO() public {
@@ -345,7 +351,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
       groupElectionIndices: groupElectionIndices
     });
 
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, validator);
 
     assertEq(lockedGold.accountTotalLockedGold(validator), 40000);
   }
@@ -365,7 +371,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
       groupElectionIndices: groupElectionIndices
     });
 
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, validator);
     assertEq(lockedGold.accountTotalLockedGold(group), 40000);
   }
 
@@ -383,8 +389,8 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
       groupElectionGreaters: groupElectionGreaters,
       groupElectionIndices: groupElectionIndices
     });
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, validator);
     vm.expectRevert("Already slashed");
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, validator);
   }
 }
