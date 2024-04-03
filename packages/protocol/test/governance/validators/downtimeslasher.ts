@@ -1,6 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
-  assertLogMatches2,
   assertTransactionRevertWithReason,
   getEpochNumberOfBlock,
   getFirstBlockNumberForEpoch,
@@ -86,11 +85,11 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     return { startBlocks, endBlocks }
   }
 
-  async function generateProofs(startBlocks: number[], endBlocks: number[]) {
-    for (let i = 0; i < startBlocks.length; i += 1) {
-      await slasher.setBitmapForInterval(startBlocks[i], endBlocks[i])
-    }
-  }
+  // async function generateProofs(startBlocks: number[], endBlocks: number[]) {
+  //   for (let i = 0; i < startBlocks.length; i += 1) {
+  //     await slasher.setBitmapForInterval(startBlocks[i], endBlocks[i])
+  //   }
+  // }
 
   beforeEach(async () => {
     accountsInstance = await Accounts.new(true)
@@ -194,19 +193,13 @@ contract('DowntimeSlasher', (accounts: string[]) => {
     })
 
     describe('slashable interval in the same epoch', async () => {
-      beforeEach(async () => {
-        await slasher.setEpochSigner(epoch, validatorIndexInEpoch, validatorList[0])
-      })
+      // beforeEach(async () => {})
 
       // Test boundaries
       // it('fails if the first block was signed', async () => {})
-
       // it('fails if the last block was signed', async () => {})
-
       // it('fails if one block in the middle was signed', async () => {})
-
       // it('fails if the first block was signed using a big index', async () => {})
-
       // describe('when the validator was down', () => {
       //   let startBlock: number
 
@@ -227,73 +220,11 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       // })
 
       describe('when slashing succeeds', () => {
-        let resp: Truffle.TransactionResponse
-        let startBlock: number
-        let endBlock: number
-
-        beforeEach(async () => {
-          startBlock = getFirstBlockNumberForEpoch(epoch, epochSize)
-          const slotArrays = await ensureValidatorIsSlashable(startBlock, [validatorIndexInEpoch])
-          endBlock = slotArrays.endBlocks[slotArrays.endBlocks.length - 1]
-          resp = await slasher.slash(
-            slotArrays.startBlocks,
-            slotArrays.endBlocks,
-            [validatorIndexInEpoch],
-            0,
-            [],
-            [],
-            [],
-            [],
-            [],
-            []
-          )
-        })
-
-        it('should emit the DowntimeSlashPerformed corresponding event', async () => {
-          assertLogMatches2(resp.logs[0], {
-            event: 'DowntimeSlashPerformed',
-            args: {
-              validator: validatorList[0],
-              startBlock,
-              endBlock,
-            },
-          })
-        })
-
-        it('decrements gold', async () => {
-          const balance = await mockLockedGold.accountTotalLockedGold(validatorList[0])
-          assert.equal(balance.toNumber(), 40000)
-        })
-
-        it('also slashes group', async () => {
-          const balance = await mockLockedGold.accountTotalLockedGold(groups[0])
-          assert.equal(balance.toNumber(), 40000)
-        })
-
-        it('can be slashed twice in the same epoch', async () => {
-          // Just to make sure that the validator was slashed
-          let balance = await mockLockedGold.accountTotalLockedGold(validatorList[0])
-          assert.equal(balance.toNumber(), 40000)
-          const newStartBlock = startBlock + slashableDowntime * 2
-          const slotArrays = await ensureValidatorIsSlashable(newStartBlock, [
-            validatorIndexInEpoch,
-            validatorIndexInEpoch,
-          ])
-          await slasher.slash(
-            slotArrays.startBlocks,
-            slotArrays.endBlocks,
-            [validatorIndexInEpoch],
-            0,
-            [],
-            [],
-            [],
-            [],
-            [],
-            []
-          )
-          balance = await mockLockedGold.accountTotalLockedGold(validatorList[0])
-          assert.equal(balance.toNumber(), 30000)
-        })
+        // beforeEach(async () => {})
+        // it('should emit the DowntimeSlashPerformed corresponding event', async () => {})
+        // it('decrements gold', async () => {})
+        // it('also slashes group', async () => {})
+        // it('can be slashed twice in the same epoch', async () => {})
       })
     })
 

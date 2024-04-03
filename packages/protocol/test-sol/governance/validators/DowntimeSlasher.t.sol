@@ -93,6 +93,17 @@ contract DowntimeSlasherTest is Test, Utils {
     // Value of LockedGold to send to the observer.
     uint256 reward;
   }
+  uint256[] public _startingBlocks;
+  uint256[] public _endingBlocks;
+
+  // Signed by validators 0 and 1
+  bytes32 bitmapVI01 = bytes32(0x0000000000000000000000000000000000000000000000000000000000000003);
+  // Signed by validator 1
+  bytes32 bitmapVI1 = bytes32(0x0000000000000000000000000000000000000000000000000000000000000002);
+  // Signed by validator 0
+  bytes32 bitmapVI0 = bytes32(0x0000000000000000000000000000000000000000000000000000000000000001);
+  // Signed by validator 99
+  bytes32 bitmapVI99 = bytes32(0x0000000000000000000000000000000000000008000000000000000000000000);
 
   DowntimeSlasherMock.SlashParams slashParams;
 
@@ -365,15 +376,6 @@ contract DowntimeSlasherTestSlash_WhenIntervalInSameEpoch is DowntimeSlasherTest
   uint256 _epochSize;
   uint256 blockNumber;
 
-  // Signed by validators 0 and 1
-  bytes32 bitmapVI01 = bytes32(0x0000000000000000000000000000000000000000000000000000000000000003);
-  // Signed by validator 1
-  bytes32 bitmapVI1 = bytes32(0x0000000000000000000000000000000000000000000000000000000000000002);
-  // Signed by validator 0
-  bytes32 bitmapVI0 = bytes32(0x0000000000000000000000000000000000000000000000000000000000000001);
-  // Signed by validator 99
-  bytes32 bitmapVI99 = bytes32(0x0000000000000000000000000000000000000008000000000000000000000000);
-
   uint256 validatorIndexInEpoch = 0;
 
   bytes32[] bitmapWithoutValidator = [bitmapVI1, bitmapVI0];
@@ -441,15 +443,14 @@ contract DowntimeSlasherTestSlash_WhenIntervalInSameEpoch is DowntimeSlasherTest
     public
     returns (uint256[] memory, uint256[] memory)
   {
+    delete _startingBlocks;
+    delete _endingBlocks;
     uint256 actualSlashableDowntime = slasher.slashableDowntime();
     uint256 startEpoch = _getFirstBlockNumberOfEpoch(startBlock);
     uint256 nextEpochStart = _getFirstBlockNumberOfEpoch(startEpoch);
     uint256 endBlock = startBlock.add(actualSlashableDowntime).sub(1);
 
-    uint256[] memory _startBlocks = new uint256[](endBlock.sub(startBlock.sub(1)));
-    uint256[] memory _endBlocks = new uint256[](endBlock.sub(startBlock.sub(1)));
-
-    for (uint256 i = startBlock; i <= endBlock; i++) {
+    for (uint256 i = startBlock; i <= endBlock; ) {
       uint256 endBlockForSlot = i.add(intervalSize.sub(1));
       endBlockForSlot = endBlockForSlot > endBlock ? endBlock : endBlockForSlot;
 
@@ -459,38 +460,34 @@ contract DowntimeSlasherTestSlash_WhenIntervalInSameEpoch is DowntimeSlasherTest
         ? nextEpochStart.sub(1)
         : endBlockForSlot;
 
-      uint256 index = i.sub(startBlock);
+      _startingBlocks.push(i);
 
-      _startBlocks[index] = i;
-
-      _endBlocks[index] = endBlockForSlot;
+      _endingBlocks.push(endBlockForSlot);
 
       slasher.setBitmapForInterval(i, endBlockForSlot);
+      i = endBlockForSlot.add(1);
     }
 
-    return (_startBlocks, _endBlocks);
+    return (_startingBlocks, _endingBlocks);
   }
 
   function _ensureValidatorIsSlashable(uint256 startBlock, uint256[] memory validatorIndices)
     public
     returns (uint256[] memory, uint256[] memory)
   {
-    bytes32[] memory _bitmaps2 = new bytes32[](1);
-    _bitmaps2[0] = bitmapVI01;
-
+    _bitmaps1[0] = bitmapVI01;
     bytes32[] memory bitmapMasks = new bytes32[](validatorIndices.length);
     for (uint256 i = 0; i < validatorIndices.length; i++) {
       bitmapMasks[i] = bitmapWithoutValidator[validatorIndices[i]];
     }
+
     _presetParentSealForBlock(startBlock, slashableDowntime, bitmapMasks);
-    _presetParentSealForBlock(startBlock.sub(1), 1, _bitmaps2);
-    _presetParentSealForBlock(startBlock.add(slashableDowntime), 1, bitmapMasks);
+    _presetParentSealForBlock(startBlock.sub(1), 1, _bitmaps1);
+    _presetParentSealForBlock(startBlock.add(slashableDowntime), 1, _bitmaps1);
     return _calculateEverySlot(startBlock);
   }
 
   function test_Reverts_IfFirstBlockWasSigned_WhenSlashableIntervalInSameEpoch() public {
-    // _signerIndices[0] = validatorIndexInEpoch;
-
     slasher.setEpochSigner(epoch, validatorIndexInEpoch, validator);
     uint256 startBlock = _getFirstBlockNumberOfEpoch(epoch);
 
@@ -776,27 +773,41 @@ contract DowntimeSlasherTestSlash_WhenIntervalInSameEpoch is DowntimeSlasherTest
     slasher.mockSlash(slashParams, validator);
   }
 
-  function test_Emits_DowntimeSlashPerformedEvent() public {
+  function _setupSlashTest() public {
+    slasher.setEpochSigner(epoch, 0, validator);
     uint256 startBlock = _getFirstBlockNumberOfEpoch(epoch);
-    // uint256[] memory validatorIndices = new uint256[](1);
-    // validatorIndices[0] = validatorIndexInEpoch;
-    // (uint256[] memory _startBlocks, uint256[] memory _endBlocks) = _ensureValidatorIsSlashable(
-    //   startBlock,
-    //   _signerIndices
-    // );
+    uint256[] memory validatorIndices = new uint256[](1);
+    validatorIndices[0] = validatorIndexInEpoch;
+    (uint256[] memory _startBlocks, uint256[] memory _endBlocks) = _ensureValidatorIsSlashable(
+      startBlock,
+      _signerIndices
+    );
 
-    // bytes32[] memory _bitmaps2 = new bytes32[](1);
-    // _bitmaps2[0] = bitmapVI01;
+    slashParams = DowntimeSlasherMock.SlashParams({
+      startBlocks: _startBlocks,
+      endBlocks: _endBlocks,
+      signerIndices: _signerIndices,
+      groupMembershipHistoryIndex: 0,
+      validatorElectionLessers: validatorElectionLessers,
+      validatorElectionGreaters: validatorElectionGreaters,
+      validatorElectionIndices: validatorElectionIndices,
+      groupElectionLessers: groupElectionLessers,
+      groupElectionGreaters: groupElectionGreaters,
+      groupElectionIndices: groupElectionIndices
+    });
+    slasher.mockSlash(slashParams, validator);
+  }
+  function test_Emits_DowntimeSlashPerformedEvent() public {
+    slasher.setEpochSigner(epoch, 0, validator);
+    uint256 startBlock = _getFirstBlockNumberOfEpoch(epoch);
 
-    _presetParentSealForBlock(startBlock, slashableDowntime, _bitmaps0);
-    console2.log("### HERE0");
-    _presetParentSealForBlock(startBlock.sub(1), 1, _bitmaps1);
-    console2.log("### HERE1");
-    _presetParentSealForBlock(startBlock.add(slashableDowntime), 1, _bitmaps1);
-    console2.log("### HERE2");
+    (uint256[] memory _startBlocks, uint256[] memory _endBlocks) = _ensureValidatorIsSlashable(
+      startBlock,
+      _signerIndices
+    );
 
-    (uint256[] memory _startBlocks, uint256[] memory _endBlocks) = _calculateEverySlot(startBlock);
     uint256 endBlock = _endBlocks[_endBlocks.length.sub(1)];
+
     slashParams = DowntimeSlasherMock.SlashParams({
       startBlocks: _startBlocks,
       endBlocks: _endBlocks,
@@ -810,11 +821,55 @@ contract DowntimeSlasherTestSlash_WhenIntervalInSameEpoch is DowntimeSlasherTest
       groupElectionIndices: groupElectionIndices
     });
 
-    // vm.expectEmit(true, true, true, true);
-    // emit DowntimeSlashPerformed(validator, startBlock, endBlock);
+    vm.expectEmit(true, true, true, true);
+    emit DowntimeSlashPerformed(validator, startBlock, endBlock);
 
     slasher.mockSlash(slashParams, validator);
+  }
+
+  function test_ShouldDecrementGold() public {
+    _setupSlashTest();
+    uint256 _balance = lockedGold.accountTotalLockedGold(validator);
+    assertEq(_balance, 40000);
+  }
+  function test_AlsoSlashesGroup() public {
+    _setupSlashTest();
+    uint256 _balance = lockedGold.accountTotalLockedGold(group);
+    assertEq(_balance, 40000);
+  }
+  function test_ItCanBeSlashedTwiceInSameEpoch() public {
+    _setupSlashTest();
+    uint256 _balance = lockedGold.accountTotalLockedGold(validator);
+    assertEq(_balance, 40000);
+
+    uint256 newStartBlock = _getFirstBlockNumberOfEpoch(epoch).add(slashableDowntime.mul(2));
+
+    uint256[] memory validatorIndices = new uint256[](2);
+    validatorIndices[0] = validatorIndexInEpoch;
+    validatorIndices[1] = validatorIndexInEpoch;
+    (uint256[] memory _startBlocks, uint256[] memory _endBlocks) = _ensureValidatorIsSlashable(
+      newStartBlock,
+      validatorIndices
+    );
+
+    slashParams = DowntimeSlasherMock.SlashParams({
+      startBlocks: _startBlocks,
+      endBlocks: _endBlocks,
+      signerIndices: _signerIndices,
+      groupMembershipHistoryIndex: 0,
+      validatorElectionLessers: validatorElectionLessers,
+      validatorElectionGreaters: validatorElectionGreaters,
+      validatorElectionIndices: validatorElectionIndices,
+      groupElectionLessers: groupElectionLessers,
+      groupElectionGreaters: groupElectionGreaters,
+      groupElectionIndices: groupElectionIndices
+    });
+    slasher.mockSlash(slashParams, validator);
+
+    _balance = lockedGold.accountTotalLockedGold(validator);
+    assertEq(_balance, 30000);
   }
 }
 
 contract DowntimeSlasherTestSlash_WhenIntervalCrossingEpoch is DowntimeSlasherTest {}
+
