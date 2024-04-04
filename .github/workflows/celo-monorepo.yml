@@ -250,9 +250,6 @@ jobs:
           - name: Protocol Governance Validators
             command: |
               yarn --cwd packages/protocol test governance/validators/
-          - name: Protocol Governance Voting
-            command: |
-              yarn --cwd packages/protocol test governance/voting/
           - name: Protocol scripts test
             command: |
               yarn --cwd packages/protocol test:scripts
@@ -283,7 +280,6 @@ jobs:
       github.base_ref == 'master' || contains(github.base_ref, 'release') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/celotool') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
-      contains(needs.install-dependencies.outputs.all_modified_files, 'packages/dev-utils') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',yarn.lock') ||

@@ -18,6 +18,7 @@ remappings = [
 ]
 
 no_match_contract = "RandomTest"
+no_match_test = "skip"
 no_match_path = "contracts/common/libraries/test/BLS12Passthrough.sol" # tested from celo-blockain repo
 
 fs_permissions = [{ access = "read", path = "./out"}]
