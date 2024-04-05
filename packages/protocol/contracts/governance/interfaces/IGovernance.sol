@@ -21,4 +21,5 @@ interface IGovernance {
     returns (address, uint256, uint256, uint256, string memory, uint256, bool);
 
   function getReferendumStageDuration() external view returns (uint256);
+  function setConstitution(address destination, bytes4 functionId, uint256 threshold) external;
 }

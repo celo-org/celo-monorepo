@@ -245,6 +245,8 @@ contract Migration is Script, UsingRegistry {
 
   function migrateRegistry() public {
     setImplementationOnProxy(IProxy(registryAddress), "Registry", abi.encodeWithSelector(IRegistry.initialize.selector));
+    // set registry in registry itself
+    addToRegistry("Registry", registryAddress);
   }
 
   function migrateFreezer() public {
@@ -630,42 +632,51 @@ contract Migration is Script, UsingRegistry {
         baselineQuorumFactor
       ));
 
-    setConstitution(governanceProxyAddress, json);
-    
-    // "$.*~"
+    _setConstitution(governanceProxyAddress, json);
 
-    // .*~
-    // TODO set constitution
+    // TODO 
+    // _transferOwnerShipCoreContact(governanceProxyAddress, json);
 
   }
-  function setConstitution(address governanceAddress, string memory json) public {
+  function _setConstitution(address governanceAddress, string memory json) public {
+    // if I set this function outside 
     bool skipSetConstitution = abi.decode(json.parseRaw(".governance.skipSetConstitution"), (bool));
     IGovernance governance = IGovernance(governanceAddress);
   // function setConstitution(IGovernance governance, bool skipSetConstitution) public {
-    // string memory constitutionJson = vm.readFile("./governanceConstitution.json");
-    // // this query gets all the keys
-    // // string[] memory contractsKeys = abi.decode(constitutionJson.parseRaw("$"), (string[]));
-    // string[] memory contractsKeys = vm.parseJsonKeys(constitutionJson, "$");
+    string memory constitutionJson = vm.readFile("./governanceConstitution.json");
+    // this query gets all the keys
+    // string[] memory contractsKeys = abi.decode(constitutionJson.parseRaw("$"), (string[]));
+    string[] memory contractsKeys = vm.parseJsonKeys(constitutionJson, "$");
 
-    // if (!skipSetConstitution){
-    //   for (uint256 i = 0; i < contractsKeys.length; i++) {
-    //     // // TODO need to handle the special case for proxy
-    //     // string memory contractName = contractsKeys[i];
-    //     // console.log(string.concat("Setting constitution thresholds for: ", contractName));
-    //     // IRegistry registry = IRegistry(registryAddress);
-    //     // registry.getAddressForString(contractName);
+    if (!skipSetConstitution){
+      for (uint256 i = 0; i < contractsKeys.length; i++) {
+        // TODO need to handle the special case for "proxy"
+        string memory contractName = contractsKeys[i];
+        
+        // TODO make helper function for string comparison
+        if (keccak256(abi.encodePacked(contractName)) == keccak256(abi.encodePacked("proxy"))){
+          continue;
+        }
 
-    //     // bytes4(keccak256(bytes(_functionName)))
-    //     // string[] memory functionNames = vm.parseJsonKeys(constitutionJson, string.concat(".", contractName));
-    //     // for (uint256 j = 0; j < functionNames.length; j++) {
-    //     //   string memory functionName = functionNames[j];
-    //     //   console.log(string.concat("  Setting constitution thresholds for function : ", functionName));
+        console.log(string.concat("Setting constitution thresholds for: ", contractName));
+        IRegistry registry = IRegistry(registryAddress);
+        
+        address contractAddress = registry.getAddressForString(contractName);
 
-    //     // }
+        string[] memory functionNames = vm.parseJsonKeys(constitutionJson, string.concat(".", contractName));
+        for (uint256 j = 0; j < functionNames.length; j++) {
+          string memory functionName = functionNames[j];
+          console.log(string.concat("  Setting constitution thresholds for function : ", functionName));
+          bytes4 functionHash = bytes4(keccak256(bytes(functionName)));
+          uint256 threshold = abi.decode(constitutionJson.parseRaw(string.concat(".", contractName, ".", functionName)), (uint256));
 
-    //     // console.log(contractsKeys[i]);
-    //   }
-    // }
+          governance.setConstitution(contractAddress, functionHash, threshold);
+
+        }
+
+        // console.log(contractsKeys[i]);
+      }
+    }
   }
 
   function electValidators() public {

@@ -149,7 +149,7 @@
     "minDeposit": 100000000000000000000,
     "participationFloor": 10000000000000000000000,
     "baselineUpdateFactor": 200000000000000000000000,
-    "baselineQuorumFactor": 1000000000000000000000000
-
+    "baselineQuorumFactor": 1000000000000000000000000,
+    "skipSetConstitution": false
   }
 }

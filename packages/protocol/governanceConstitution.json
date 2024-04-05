@@ -2,13 +2,6 @@
   "Accounts": {
     "default": 600000000000000000000000
   },
-  "Attestations": {
-    "default": 600000000000000000000000,
-    "setRegistry": 900000000000000000000000,
-    "setAttestationRequestFee": 600000000000000000000000,
-    "setAttestationExpiryBlocks": 600000000000000000000000,
-    "setSelectIssuersWaitBlocks": 600000000000000000000000,
-  },
   "BlockchainParameters": {
     "default": 900000000000000000000000,
     "setBlockGasLimit": 800000000000000000000000,
