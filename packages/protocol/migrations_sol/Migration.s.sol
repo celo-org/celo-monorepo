@@ -27,6 +27,8 @@ import "@celo-contracts/governance/interfaces/IDowntimeSlasherInitializer.sol";
 import "@celo-contracts/governance/interfaces/IGovernanceApproverMultiSigInitializer.sol";
 import "@celo-contracts/governance/interfaces/IGovernanceInitializer.sol";
 
+import "@celo-contracts/governance/interfaces/IGovernance.sol";
+
 import "@celo-contracts/common/interfaces/IFeeHandlerSellerInitializer.sol";
 import "@celo-contracts/common/interfaces/IFeeHandlerInitializer.sol";
 import "@celo-contracts/common/interfaces/IFeeHandler.sol";
@@ -612,31 +614,23 @@ contract Migration is Script, UsingRegistry {
     uint256 baselineUpdateFactor = abi.decode(json.parseRaw(".governance.baselineUpdateFactor"), (uint256));
     uint256 baselineQuorumFactor = abi.decode(json.parseRaw(".governance.baselineQuorumFactor"), (uint256));
 
-    deployProxiedContract(
-    "Governance",
-    abi.encodeWithSelector(IGovernanceInitializer.initialize.selector, registryAddress, approver,
-      concurrentProposals,
-      minDeposit,
-      queueExpiry,
-      dequeueFrequency,
-      referendumStageDuration,
-      executionStageDuration,
-      participationBaseline,
-      participationFloor,
-      baselineUpdateFactor,
-      baselineQuorumFactor
-    ));
+    // // address governanceProxyAddress = deployProxiedContract(
+    address governanceProxyAddress = deployProxiedContract(
+      "Governance",
+      abi.encodeWithSelector(IGovernanceInitializer.initialize.selector, registryAddress, approver,
+        concurrentProposals,
+        minDeposit,
+        queueExpiry,
+        dequeueFrequency,
+        referendumStageDuration,
+        executionStageDuration,
+        participationBaseline,
+        participationFloor,
+        baselineUpdateFactor,
+        baselineQuorumFactor
+      ));
 
-    bool skipSetConstitution = abi.decode(json.parseRaw(".governance.skipSetConstitution"), (bool));
-    if (skipSetConstitution){
-      return;
-    }
-
-    string memory constitutionJson = vm.readFile("./governanceConstitution.json");
-    // this query gets all the keys
-    // string[] memory contractsKeys = abi.decode(constitutionJson.parseRaw("$"), (string[]));
-    string[] memory contractsKeys = vm.parseJsonKeys(constitutionJson, "$");
-    console.log(contractsKeys[0]);
+    setConstitution(governanceProxyAddress, json);
     
     // "$.*~"
 
@@ -644,8 +638,37 @@ contract Migration is Script, UsingRegistry {
     // TODO set constitution
 
   }
+  function setConstitution(address governanceAddress, string memory json) public {
+    bool skipSetConstitution = abi.decode(json.parseRaw(".governance.skipSetConstitution"), (bool));
+    IGovernance governance = IGovernance(governanceAddress);
+  // function setConstitution(IGovernance governance, bool skipSetConstitution) public {
+    // string memory constitutionJson = vm.readFile("./governanceConstitution.json");
+    // // this query gets all the keys
+    // // string[] memory contractsKeys = abi.decode(constitutionJson.parseRaw("$"), (string[]));
+    // string[] memory contractsKeys = vm.parseJsonKeys(constitutionJson, "$");
 
-  function electValidators() public{
+    // if (!skipSetConstitution){
+    //   for (uint256 i = 0; i < contractsKeys.length; i++) {
+    //     // // TODO need to handle the special case for proxy
+    //     // string memory contractName = contractsKeys[i];
+    //     // console.log(string.concat("Setting constitution thresholds for: ", contractName));
+    //     // IRegistry registry = IRegistry(registryAddress);
+    //     // registry.getAddressForString(contractName);
+
+    //     // bytes4(keccak256(bytes(_functionName)))
+    //     // string[] memory functionNames = vm.parseJsonKeys(constitutionJson, string.concat(".", contractName));
+    //     // for (uint256 j = 0; j < functionNames.length; j++) {
+    //     //   string memory functionName = functionNames[j];
+    //     //   console.log(string.concat("  Setting constitution thresholds for function : ", functionName));
+
+    //     // }
+
+    //     // console.log(contractsKeys[i]);
+    //   }
+    // }
+  }
+
+  function electValidators() public {
 
   }
 
