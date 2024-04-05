@@ -4,7 +4,7 @@ pragma solidity >=0.8.7 <0.8.20;
 
 // Note: This scrip should not include any cheatcode so that it can run in production
 
-import "forge-std/Script.sol";
+import {Script} from "forge-std-8/Script.sol";
 import "forge-std/console.sol";
 import "forge-std/StdJson.sol";
 
@@ -116,7 +116,7 @@ contract Migration is Script, UsingRegistry {
     console.log("address(this)", address(this));
     // console.log("address(Create2)", address(Create2));
     // console.log("owner of proxy is:", proxy._getOwner());
-    bytes memory implementationBytecode = vm.getCode(string.concat(contractName, ".sol"));
+    bytes memory implementationBytecode = vm.getCode(string.concat("out/", contractName, ".sol/", contractName, ".json"));
     bool testingDeployment = false;
     bytes memory initialCode = abi.encodePacked(
       implementationBytecode,
@@ -184,7 +184,9 @@ contract Migration is Script, UsingRegistry {
     // load migration confirm 
     string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
 
-    proxyFactory = IProxyFactory(create2deploy(0, vm.getCode("ProxyFactory.sol")));
+    // proxyFactory = IProxyFactory(create2deploy(0, vm.getCode("ProxyFactory.sol")));
+    // https://github.com/foundry-rs/foundry/issues/7569
+    proxyFactory = IProxyFactory(create2deploy(0, vm.getCode("./out/ProxyFactory.sol/ProxyFactory.json")));
 
     // deploy a proxy just to get the owner
     // IProxy deployedProxy = IProxy(proxyFactory.deployProxy());
@@ -629,6 +631,14 @@ contract Migration is Script, UsingRegistry {
     if (skipSetConstitution){
       return;
     }
+
+    string memory constitutionJson = vm.readFile("./governanceConstitution.json");
+    // this query gets all the keys
+    // string[] memory contractsKeys = abi.decode(constitutionJson.parseRaw("$"), (string[]));
+    string[] memory contractsKeys = vm.parseJsonKeys(constitutionJson, "$");
+    console.log(contractsKeys[0]);
+    
+    // "$.*~"
 
     // .*~
     // TODO set constitution
