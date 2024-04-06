@@ -31,5 +31,7 @@ if [[ -n $ANVIL_PID ]]; then
     kill $ANVIL_PID
 fi
 
+# TODO dump state to temp folder
+
 # helper kill anvil
 # kill $(lsof -i tcp:8545 | tail -n 1 | awk '{print $2}')
