@@ -12,7 +12,6 @@ import "./interfaces/IRegistry.sol";
 import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IGovernance.sol";
 import "../governance/interfaces/ILockedGold.sol";
-import "../governance/interfaces/IValidators.sol";
 
 import "../identity/interfaces/IRandom.sol";
 import "../identity/interfaces/IAttestations.sol";
@@ -123,9 +122,5 @@ contract UsingRegistry is Ownable {
 
   function getStableToken() internal view returns (IStableToken) {
     return IStableToken(registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID));
-  }
-
-  function getValidators() internal view returns (IValidators) {
-    return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
   }
 }

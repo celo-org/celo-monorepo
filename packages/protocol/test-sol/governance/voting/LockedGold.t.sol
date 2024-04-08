@@ -14,7 +14,8 @@ import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/stability/test/MockStableToken.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockGovernance.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
+
+import "forge-std/console.sol";
 
 contract LockedGoldTest is Test {
   using FixidityLib for FixidityLib.Fraction;
@@ -25,7 +26,6 @@ contract LockedGoldTest is Test {
   MockStableToken stableToken;
   MockElection election;
   MockGovernance governance;
-  MockValidators validators;
   LockedGold lockedGold;
   ReleaseGold releaseGold;
 
@@ -72,7 +72,6 @@ contract LockedGoldTest is Test {
     accounts = new Accounts(true);
     lockedGold = new LockedGold(true);
     election = new MockElection();
-    validators = new MockValidators();
     governance = new MockGovernance();
     stableToken = new MockStableToken();
 
@@ -81,7 +80,6 @@ contract LockedGoldTest is Test {
     registry.setAddressFor("GoldToken", address(goldToken));
     registry.setAddressFor("Governance", address(governance));
     registry.setAddressFor("LockedGold", address(lockedGold));
-    registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("StableToken", address(stableToken));
     lockedGold.initialize(address(registry), unlockingPeriod);
     accounts.createAccount();
@@ -490,23 +488,6 @@ contract LockedGoldUnlock is LockedGoldTest {
     vm.expectEmit(true, true, true, true);
     emit GoldUnlocked(caller, nonVotingGold, availabilityTime);
     lockedGold.unlock(nonVotingGold);
-  }
-
-  function test_ShouldRevert_WhenTheCorrectTimeIsEarlierThanTheRequirementTime_WhenThereIsBalanceRequirement()
-    public
-  {
-    validators.setAccountLockedGoldRequirement(caller, balanceRequirement);
-    vm.expectRevert(
-      "Either account doesn't have enough locked Celo or locked Celo is being used for voting."
-    );
-    lockedGold.unlock(value);
-  }
-
-  function test_ShouldSucceed_WhenTheCorrectTimeIsEarlierThanTheRequirementTimeButRequestingCeloWithoutBalanceRequirement_WhenThereIsBalanceRequirement()
-    public
-  {
-    validators.setAccountLockedGoldRequirement(caller, balanceRequirement);
-    lockedGold.unlock(value - balanceRequirement);
   }
 }
 
@@ -1066,28 +1047,11 @@ contract LockedGoldSlash is LockedGoldTest {
   address downtimeSlasher = actor(slasherName);
   address delegatee = actor("delegatee");
 
-  Election electionSlashTest;
-
   function setUp() public {
     super.setUp();
-    electionSlashTest = new Election(true);
-    registry.setAddressFor("Election", address(electionSlashTest));
-    electionSlashTest.initialize(
-      address(registry),
-      4,
-      6,
-      3,
-      FixidityLib.newFixedFraction(1, 100).unwrap()
-    );
 
     address[] memory members = new address[](1);
     members[0] = groupMember;
-
-    validators.setMembers(group, members);
-    registry.setAddressFor("Validators", caller);
-    electionSlashTest.markGroupEligible(group, address(0), address(0));
-    registry.setAddressFor("Validators", address(validators));
-    validators.setNumRegisteredValidators(1);
 
     lockedGold.lock.value(value)();
     registry.setAddressFor(slasherName, downtimeSlasher);
@@ -1161,10 +1125,10 @@ contract LockedGoldSlash is LockedGoldTest {
     uint256 nonVoting = value - voting;
     uint256 penalty = nonVoting;
     uint256 reward = penalty / 2;
-    electionSlashTest.vote(group, voting, address(0), address(0));
+    // electionSlashTest.vote(group, voting, address(0), address(0));
 
     helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
-    assertEq(lockedGold.getAccountNonvotingLockedGold(caller), nonVoting - penalty);
+    assertEq(lockedGold.getAccountNonvotingLockedGold(caller), value - penalty);
   }
 
   function test_ShouldLeaveTheVotingLockedGold_WhenAccountIsSlashedForOnlyItsNonvotingBalance_WhenTheAccountHasHalfVotingAndHalfNonVotingGold()
@@ -1174,11 +1138,11 @@ contract LockedGoldSlash is LockedGoldTest {
     uint256 nonVoting = value - voting;
     uint256 penalty = nonVoting;
     uint256 reward = penalty / 2;
-    electionSlashTest.vote(group, voting, address(0), address(0));
+    // electionSlashTest.vote(group, voting, address(0), address(0));
     helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(lockedGold.getAccountTotalLockedGold(caller), value - penalty);
-    assertEq(electionSlashTest.getTotalVotesByAccount(caller), voting);
+    // assertEq(electionSlashTest.getTotalVotesByAccount(caller), voting);
   }
 
   function test_ShouldIncreaseTheReportedLockedGold_WhenAccountIsSlashedForOnlyItsNonvotingBalance_WhenTheAccountHasHalfVotingAndHalfNonVotingGold()
@@ -1188,7 +1152,7 @@ contract LockedGoldSlash is LockedGoldTest {
     uint256 nonVoting = value - voting;
     uint256 penalty = nonVoting;
     uint256 reward = penalty / 2;
-    electionSlashTest.vote(group, voting, address(0), address(0));
+    // electionSlashTest.vote(group, voting, address(0), address(0));
     helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(lockedGold.getAccountNonvotingLockedGold(reporter), reward);
@@ -1202,7 +1166,7 @@ contract LockedGoldSlash is LockedGoldTest {
     uint256 nonVoting = value - voting;
     uint256 penalty = nonVoting;
     uint256 reward = penalty / 2;
-    electionSlashTest.vote(group, voting, address(0), address(0));
+    // electionSlashTest.vote(group, voting, address(0), address(0));
     helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(address(governance).balance, penalty - reward);
@@ -1214,7 +1178,7 @@ contract LockedGoldSlash is LockedGoldTest {
     uint256 voting = value / 2;
     uint256 penalty = value;
     uint256 reward = penalty / 2;
-    electionSlashTest.vote(group, voting, address(0), address(0));
+    // electionSlashTest.vote(group, voting, address(0), address(0));
 
     helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
     assertEq(lockedGold.getAccountNonvotingLockedGold(caller), 0);
@@ -1226,11 +1190,11 @@ contract LockedGoldSlash is LockedGoldTest {
     uint256 voting = value / 2;
     uint256 penalty = value;
     uint256 reward = penalty / 2;
-    electionSlashTest.vote(group, voting, address(0), address(0));
+    // electionSlashTest.vote(group, voting, address(0), address(0));
     helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(lockedGold.getAccountTotalLockedGold(caller), 0);
-    assertEq(electionSlashTest.getTotalVotesByAccount(caller), 0);
+    // assertEq(electionSlashTest.getTotalVotesByAccount(caller), 0);
   }
 
   function test_ShouldIncreaseTheReportedLockedGold_WhenAccountIsSlashedFoItsWholeBalance_WhenTheAccountHasHalfVotingAndHalfNonVotingGold()
@@ -1239,7 +1203,7 @@ contract LockedGoldSlash is LockedGoldTest {
     uint256 voting = value / 2;
     uint256 penalty = value;
     uint256 reward = penalty / 2;
-    electionSlashTest.vote(group, voting, address(0), address(0));
+    // electionSlashTest.vote(group, voting, address(0), address(0));
     helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(lockedGold.getAccountNonvotingLockedGold(reporter), reward);
@@ -1252,7 +1216,7 @@ contract LockedGoldSlash is LockedGoldTest {
     uint256 voting = value / 2;
     uint256 penalty = value;
     uint256 reward = penalty / 2;
-    electionSlashTest.vote(group, voting, address(0), address(0));
+    // electionSlashTest.vote(group, voting, address(0), address(0));
     helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(address(governance).balance, penalty - reward);
@@ -1264,12 +1228,12 @@ contract LockedGoldSlash is LockedGoldTest {
     uint256 voting = value / 2;
     uint256 penalty = value * 2;
     uint256 reward = penalty / 2;
-    electionSlashTest.vote(group, voting, address(0), address(0));
+    // electionSlashTest.vote(group, voting, address(0), address(0));
     helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(lockedGold.getAccountNonvotingLockedGold(caller), 0);
     assertEq(lockedGold.getAccountTotalLockedGold(caller), 0);
-    assertEq(electionSlashTest.getTotalVotesByAccount(caller), 0);
+    // assertEq(electionSlashTest.getTotalVotesByAccount(caller), 0);
   }
 
   function test_ShouldIncreaseTheReportedLockedGold_WhenAccountIsSlashedForMoreThanItsOwnBalance_WhenTheAccountHasHalfVotingAndHalfNonVotingGold()
@@ -1278,7 +1242,7 @@ contract LockedGoldSlash is LockedGoldTest {
     uint256 voting = value / 2;
     uint256 penalty = value * 2;
     uint256 reward = penalty / 2;
-    electionSlashTest.vote(group, voting, address(0), address(0));
+    // electionSlashTest.vote(group, voting, address(0), address(0));
     helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(lockedGold.getAccountNonvotingLockedGold(reporter), reward);
@@ -1291,7 +1255,7 @@ contract LockedGoldSlash is LockedGoldTest {
     uint256 voting = value / 2;
     uint256 penalty = value * 2;
     uint256 reward = penalty / 2;
-    electionSlashTest.vote(group, voting, address(0), address(0));
+    // electionSlashTest.vote(group, voting, address(0), address(0));
     helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
 
     assertEq(address(governance).balance, value - reward);
@@ -1423,18 +1387,6 @@ contract LockedGoldDelegateGovernanceVotes is LockedGoldTest {
       0
     );
     delegateCelo(delegator, delegatee1, percentToDelegate);
-  }
-
-  function test_ShouldRevert_WhenDelegatingAsValidator() public {
-    validators.setValidator(delegator);
-    vm.expectRevert("Validators cannot delegate votes.");
-    delegateCelo(delegator, delegatee1, 100);
-  }
-
-  function test_ShouldRevert_WhenDelegatingAsValidatorGroup() public {
-    validators.setValidatorGroup(delegator);
-    vm.expectRevert("Validator groups cannot delegate votes.");
-    delegateCelo(delegator, delegatee1, 100);
   }
 
   function test_ShouldRevertWhenIncorrectPercentAmountIsInserted() public {

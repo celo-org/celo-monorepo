@@ -572,18 +572,18 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev The v,r and s signature should be signed by the authorized signer
    *      key, with the ReleaseGold contract address as the message.
    */
-  function authorizeValidatorSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
-    external
-    nonReentrant
-    onlyCanValidate
-    onlyWhenInProperState
-  {
-    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
-    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
-      fundSigner(signer);
-    }
-    getAccounts().authorizeValidatorSigner(signer, v, r, s);
-  }
+  // function authorizeValidatorSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
+  //   external
+  //   nonReentrant
+  //   onlyCanValidate
+  //   onlyWhenInProperState
+  // {
+  //   // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+  //   if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
+  //     fundSigner(signer);
+  //   }
+  //   getAccounts().authorizeValidatorSigner(signer, v, r, s);
+  // }
 
   /**
    * @notice A wrapper function for the authorize validator signer with public key account method.
@@ -595,19 +595,19 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev The v,r and s signature should be signed by the authorized signer
    *      key, with the ReleaseGold contract address as the message.
    */
-  function authorizeValidatorSignerWithPublicKey(
-    address payable signer,
-    uint8 v,
-    bytes32 r,
-    bytes32 s,
-    bytes calldata ecdsaPublicKey
-  ) external nonReentrant onlyCanValidate onlyWhenInProperState {
-    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
-    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
-      fundSigner(signer);
-    }
-    getAccounts().authorizeValidatorSignerWithPublicKey(signer, v, r, s, ecdsaPublicKey);
-  }
+  // function authorizeValidatorSignerWithPublicKey(
+  //   address payable signer,
+  //   uint8 v,
+  //   bytes32 r,
+  //   bytes32 s,
+  //   bytes calldata ecdsaPublicKey
+  // ) external nonReentrant onlyCanValidate onlyWhenInProperState {
+  //   // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+  //   if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
+  //     fundSigner(signer);
+  //   }
+  //   getAccounts().authorizeValidatorSignerWithPublicKey(signer, v, r, s, ecdsaPublicKey);
+  // }
 
   /**
    * @notice A wrapper function for the authorize validator signer with keys account method.
@@ -623,29 +623,29 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev The v,r and s signature should be signed by the authorized signer
    *      key, with the ReleaseGold contract address as the message.
    */
-  function authorizeValidatorSignerWithKeys(
-    address payable signer,
-    uint8 v,
-    bytes32 r,
-    bytes32 s,
-    bytes calldata ecdsaPublicKey,
-    bytes calldata blsPublicKey,
-    bytes calldata blsPop
-  ) external nonReentrant onlyCanValidate onlyWhenInProperState {
-    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
-    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
-      fundSigner(signer);
-    }
-    getAccounts().authorizeValidatorSignerWithKeys(
-      signer,
-      v,
-      r,
-      s,
-      ecdsaPublicKey,
-      blsPublicKey,
-      blsPop
-    );
-  }
+  // function authorizeValidatorSignerWithKeys(
+  //   address payable signer,
+  //   uint8 v,
+  //   bytes32 r,
+  //   bytes32 s,
+  //   bytes calldata ecdsaPublicKey,
+  //   bytes calldata blsPublicKey,
+  //   bytes calldata blsPop
+  // ) external nonReentrant onlyCanValidate onlyWhenInProperState {
+  //   // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+  //   if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
+  //     fundSigner(signer);
+  //   }
+  //   getAccounts().authorizeValidatorSignerWithKeys(
+  //     signer,
+  //     v,
+  //     r,
+  //     s,
+  //     ecdsaPublicKey,
+  //     blsPublicKey,
+  //     blsPop
+  //   );
+  // }
 
   /**
    * @notice A wrapper function for the authorize attestation signer account method.
@@ -767,7 +767,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     address greater,
     uint256 index
   ) external nonReentrant onlyWhenInProperState {
-    getElection().revokeActive(group, value, lesser, greater, index);
+    // getElection().revokeActive(group, value, lesser, greater, index);
   }
 
   /**
@@ -788,7 +788,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     address greater,
     uint256 index
   ) external nonReentrant onlyWhenInProperState {
-    getElection().revokePending(group, value, lesser, greater, index);
+    // getElection().revokePending(group, value, lesser, greater, index);
   }
 
   /**

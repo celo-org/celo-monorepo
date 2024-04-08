@@ -11,7 +11,6 @@ import "./interfaces/IRegistry.sol";
 import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IGovernance.sol";
 import "../governance/interfaces/ILockedGold.sol";
-import "../governance/interfaces/IValidators.sol";
 
 import "../identity/interfaces/IRandom.sol";
 import "../identity/interfaces/IAttestations.sol";
@@ -64,7 +63,6 @@ contract UsingRegistryV2 {
   bytes32 internal constant STABLE_REAL_TOKEN_REGISTRY_ID = keccak256(
     abi.encodePacked("StableTokenBRL")
   );
-  bytes32 internal constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
 
   modifier onlyRegisteredContract(bytes32 identifierHash) {
     require(
@@ -163,9 +161,5 @@ contract UsingRegistryV2 {
 
   function getStableRealToken() internal view returns (IStableToken) {
     return IStableToken(registryContract.getAddressForOrDie(STABLE_REAL_TOKEN_REGISTRY_ID));
-  }
-
-  function getValidators() internal view returns (IValidators) {
-    return IValidators(registryContract.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
   }
 }

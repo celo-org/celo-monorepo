@@ -6,23 +6,23 @@ interface IReleaseGold {
   function unlockGold(uint256) external;
   function withdrawLockedGold(uint256) external;
   function authorizeVoteSigner(address payable, uint8, bytes32, bytes32) external;
-  function authorizeValidatorSigner(address payable, uint8, bytes32, bytes32) external;
-  function authorizeValidatorSignerWithPublicKey(
-    address payable,
-    uint8,
-    bytes32,
-    bytes32,
-    bytes calldata
-  ) external;
-  function authorizeValidatorSignerWithKeys(
-    address payable,
-    uint8,
-    bytes32,
-    bytes32,
-    bytes calldata,
-    bytes calldata,
-    bytes calldata
-  ) external;
+  // function authorizeValidatorSigner(address payable, uint8, bytes32, bytes32) external;
+  // function authorizeValidatorSignerWithPublicKey(
+  //   address payable,
+  //   uint8,
+  //   bytes32,
+  //   bytes32,
+  //   bytes calldata
+  // ) external;
+  // function authorizeValidatorSignerWithKeys(
+  //   address payable,
+  //   uint8,
+  //   bytes32,
+  //   bytes32,
+  //   bytes calldata,
+  //   bytes calldata,
+  //   bytes calldata
+  // ) external;
   function authorizeAttestationSigner(address payable, uint8, bytes32, bytes32) external;
   function revokeActive(address, uint256, address, address, uint256) external;
   function revokePending(address, uint256, address, address, uint256) external;

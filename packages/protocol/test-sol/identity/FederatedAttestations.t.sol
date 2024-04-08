@@ -9,7 +9,6 @@ import "@celo-contracts/identity/test/MockERC20Token.sol";
 import "@celo-contracts/identity/test/MockRandom.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 
@@ -27,7 +26,6 @@ contract FederatedAttestationsFoundryTest is Test {
   MockERC20Token otherMockERC20Token;
   MockElection mockElection;
   MockLockedGold mockLockedGold;
-  MockValidators mockValidators;
   MockRandom random;
   Registry registry;
   Accounts accounts;
@@ -337,7 +335,6 @@ contract FederatedAttestationsFoundryTest is Test {
     otherMockERC20Token = new MockERC20Token();
     mockElection = new MockElection();
     mockLockedGold = new MockLockedGold();
-    mockValidators = new MockValidators();
     random = new MockRandom();
     registry = Registry(registryAddress);
     accounts = new Accounts(true);
@@ -345,7 +342,6 @@ contract FederatedAttestationsFoundryTest is Test {
     random.initialize(256);
     random.addTestRandomness(0, bytes32(0));
     accounts.initialize(address(registry));
-    registry.setAddressFor("Validators", address(mockValidators));
 
     callerPK = 0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d;
     caller = getAddressFromPrivateKey(callerPK);

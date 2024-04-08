@@ -6,14 +6,12 @@ import "celo-foundry/Test.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
 
 contract AccountsTest is Test {
   using FixidityLib for FixidityLib.Fraction;
 
   Registry registry;
   Accounts accounts;
-  MockValidators validators;
 
   string constant name = "Account";
   string constant metadataURL = "https://www.celo.org";
@@ -83,11 +81,9 @@ contract AccountsTest is Test {
     deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
 
     accounts = new Accounts(true);
-    validators = new MockValidators();
 
     registry = Registry(registryAddress);
 
-    registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("Accounts", address(accounts));
 
     accounts.initialize(address(registry));
@@ -961,7 +957,7 @@ contract AccountsBackwardCompatibility is AccountsTest {
       } else if (role == Role.Vote) {
         accounts.authorizeVoteSigner(_signer, _v, _r, _s);
       } else if (role == Role.Validator) {
-        accounts.authorizeValidatorSigner(_signer, _v, _r, _s);
+        // accounts.authorizeValidatorSigner(_signer, _v, _r, _s);
       }
     }
     vm.stopPrank();
@@ -1063,22 +1059,6 @@ contract AccountsBackwardCompatibility is AccountsTest {
     helperShouldSetAuthorizedKey(true, true, Role.Attestation);
   }
 
-  function test_ShouldAuthorizeValidatorSigningKey_GenericReadFalse_GenericWriteFalse() public {
-    helperShouldSetAuthorizedKey(false, false, Role.Validator);
-  }
-
-  function test_ShouldAuthorizeValidatorSigningKey_GenericReadFalse_GenericWriteTrue() public {
-    helperShouldSetAuthorizedKey(false, true, Role.Validator);
-  }
-
-  function test_ShouldAuthorizeValidatorSigningKey_GenericReadTrue_GenericWriteFalse() public {
-    helperShouldSetAuthorizedKey(true, false, Role.Validator);
-  }
-
-  function test_ShouldAuthorizeValidatorSigningKey_GenericReadTrue_GenericWriteTrue() public {
-    helperShouldSetAuthorizedKey(true, true, Role.Validator);
-  }
-
   function test_ShouldEmitRightEventVote_GenericWriteTrue() public {
     vm.expectEmit(true, true, true, true);
     emit SignerAuthorized(account, signer, getRole(Role.Vote));
@@ -1109,12 +1089,6 @@ contract AccountsBackwardCompatibility is AccountsTest {
     authorize(Role.Validator, true, account, signer, signerPK);
   }
 
-  function test_ShouldEmitRightEventValidator_GenericWriteFalse() public {
-    vm.expectEmit(true, true, true, true);
-    emit ValidatorSignerAuthorized(account, signer);
-    authorize(Role.Validator, false, account, signer, signerPK);
-  }
-
   function test_ShouldRevertIfVoteIsAnAccount_GenericWriteTrue() public {
     vm.prank(signer);
     accounts.createAccount();
@@ -1129,22 +1103,6 @@ contract AccountsBackwardCompatibility is AccountsTest {
     accounts.createAccount();
     vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
     authorize(Role.Vote, false, account, signer, signerPK);
-  }
-
-  function test_ShouldRevertIfValidatorIsAnAccount_GenericWriteTrue() public {
-    vm.prank(signer);
-    accounts.createAccount();
-    vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
-    bytes32 _role = getRole(Role.Validator);
-    (uint8 _v, bytes32 _r, bytes32 _s) = getSignature(account, _role, signerPK, true);
-    authorizeSignerFactory(signer, _role, _v, _r, _s, true);
-  }
-
-  function test_ShouldRevertIfValidatorIsAnAccount_GenericWriteFalse() public {
-    vm.prank(signer);
-    accounts.createAccount();
-    vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
-    authorize(Role.Validator, false, account, signer, signerPK);
   }
 
   function test_ShouldRevertIfAttestationIsAnAccount_GenericWriteTrue() public {
@@ -1178,25 +1136,6 @@ contract AccountsBackwardCompatibility is AccountsTest {
     authorize(Role.Vote, true, otherAccount, signer, signerPK);
     vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
     bytes32 _role = getRole(Role.Vote);
-    (uint8 _v, bytes32 _r, bytes32 _s) = getSignature(account, _role, signerPK, true);
-    authorizeSignerFactory(signer, _role, _v, _r, _s, true);
-  }
-
-  function test_ShouldRevertIfValidatorIsAlreadyAuthorized_GenericWriteFalse() public {
-    vm.prank(otherAccount);
-    accounts.createAccount();
-    authorize(Role.Validator, true, otherAccount, signer, signerPK);
-    vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
-
-    authorize(Role.Validator, false, account, signer, signerPK);
-  }
-
-  function test_ShouldRevertIfValidatorIsAlreadyAuthorized_GenericWriteTrue() public {
-    vm.prank(otherAccount);
-    accounts.createAccount();
-    authorize(Role.Validator, true, otherAccount, signer, signerPK);
-    vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
-    bytes32 _role = getRole(Role.Validator);
     (uint8 _v, bytes32 _r, bytes32 _s) = getSignature(account, _role, signerPK, true);
     authorizeSignerFactory(signer, _role, _v, _r, _s, true);
   }
@@ -1323,18 +1262,6 @@ contract AccountsBackwardCompatibility is AccountsTest {
     helperShouldSetTheNewAuthorized(Role.Validator, true, false);
   }
 
-  function test_ShouldSetTheNewAuthorized_WhenPreviousAuthorizationHasBeenMade_Validator_GenericWriteFalse_GenericReadTrue()
-    public
-  {
-    helperShouldSetTheNewAuthorized(Role.Validator, false, true);
-  }
-
-  function test_ShouldSetTheNewAuthorized_WhenPreviousAuthorizationHasBeenMade_Validator_GenericWriteFalse_GenericReadFalse()
-    public
-  {
-    helperShouldSetTheNewAuthorized(Role.Validator, false, false);
-  }
-
   function helperShouldReturnCorrectValues_WhenAccountHasNotAuthorized(Role role, bool genericRead)
     public
   {
@@ -1442,30 +1369,6 @@ contract AccountsBackwardCompatibility is AccountsTest {
     helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Vote, false, false);
   }
 
-  function test_ShouldReturnCorrectValues_WhenAccountHasAuthorized_Validator_GenericReadTrue_GenericWriteTrue()
-    public
-  {
-    helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Validator, true, true);
-  }
-
-  function test_ShouldReturnCorrectValues_WhenAccountHasAuthorized_Validator_GenericReadFalse_GenericWriteTrue()
-    public
-  {
-    helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Validator, false, true);
-  }
-
-  function test_ShouldReturnCorrectValues_WhenAccountHasAuthorized_Validator_GenericReadTrue_GenericWriteFalse()
-    public
-  {
-    helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Validator, true, false);
-  }
-
-  function test_ShouldReturnCorrectValues_WhenAccountHasAuthorized_Validator_GenericReadFalse_GenericWriteFalse()
-    public
-  {
-    helperShouldReturnCorrectValues_WhenAccountHasAuthorized(Role.Validator, false, false);
-  }
-
   function helper_ShouldRemoveSigner(Role role, bool genericRead, bool genericWrite) public {
     authorize(role, genericWrite, account, signer, signerPK);
     assertEq(hasAuthorizedSigner(role, account, genericRead), true, "No authorized signer");
@@ -1511,18 +1414,6 @@ contract AccountsBackwardCompatibility is AccountsTest {
 
   function test_ShouldRemoveSigner_Vote_GenericReadFalse_GenericWriteFalse() public {
     helper_ShouldRemoveSigner(Role.Vote, false, true);
-  }
-
-  function test_ShouldRemoveSigner_Validator_GenericReadTrue_GenericWriteTrue() public {
-    helper_ShouldRemoveSigner(Role.Validator, true, true);
-  }
-
-  function test_ShouldRemoveSigner_Validator_GenericReadFalse_GenericWriteTrue() public {
-    helper_ShouldRemoveSigner(Role.Validator, false, true);
-  }
-
-  function test_ShouldRemoveSigner_Validator_GenericReadTrue_GenericWriteFalse() public {
-    helper_ShouldRemoveSigner(Role.Validator, true, false);
   }
 
   function test_ShouldRemoveSigner_Validator_GenericReadFalse_GenericWriteFalse() public {

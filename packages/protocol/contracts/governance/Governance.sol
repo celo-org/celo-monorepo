@@ -192,11 +192,6 @@ contract Governance is
 
   event HotfixExecuted(bytes32 indexed hash);
 
-  modifier hotfixNotExecuted(bytes32 hash) {
-    require(!hotfixes[hash].executed, "hotfix already executed");
-    _;
-  }
-
   modifier onlyApprover() {
     require(msg.sender == approver, "msg.sender not approver");
     _;
@@ -898,74 +893,6 @@ contract Governance is
   }
 
   /**
-   * @notice Approves the hash of a hotfix transaction(s).
-   * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be approved.
-   */
-  function approveHotfix(bytes32 hash) external hotfixNotExecuted(hash) onlyApprover {
-    hotfixes[hash].approved = true;
-    emit HotfixApproved(hash);
-  }
-
-  /**
-   * @notice Returns whether given hotfix hash has been whitelisted by given address.
-   * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
-   * @param whitelister Address to check whitelist status of.
-   */
-  function isHotfixWhitelistedBy(bytes32 hash, address whitelister) public view returns (bool) {
-    return hotfixes[hash].whitelisted[whitelister];
-  }
-
-  /**
-   * @notice Whitelists the hash of a hotfix transaction(s).
-   * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
-   */
-  function whitelistHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
-    hotfixes[hash].whitelisted[msg.sender] = true;
-    emit HotfixWhitelisted(hash, msg.sender);
-  }
-
-  /**
-   * @notice Gives hotfix a prepared epoch for execution.
-   * @param hash The hash of the hotfix to be prepared.
-   */
-  function prepareHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
-    require(isHotfixPassing(hash), "hotfix not whitelisted by 2f+1 validators");
-    uint256 epoch = getEpochNumber();
-    require(hotfixes[hash].preparedEpoch < epoch, "hotfix already prepared for this epoch");
-    hotfixes[hash].preparedEpoch = epoch;
-    emit HotfixPrepared(hash, epoch);
-  }
-
-  /**
-   * @notice Executes a whitelisted proposal.
-   * @param values The values of CELO to be sent in the proposed transactions.
-   * @param destinations The destination addresses of the proposed transactions.
-   * @param data The concatenated data to be included in the proposed transactions.
-   * @param dataLengths The lengths of each transaction's data.
-   * @param salt Arbitrary salt associated with hotfix which guarantees uniqueness of hash.
-   * @dev Reverts if hotfix is already executed, not approved, or not prepared for current epoch.
-   */
-  function executeHotfix(
-    uint256[] calldata values,
-    address[] calldata destinations,
-    bytes calldata data,
-    uint256[] calldata dataLengths,
-    bytes32 salt
-  ) external {
-    bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths, salt));
-
-    (bool approved, bool executed, uint256 preparedEpoch) = getHotfixRecord(hash);
-    require(!executed, "hotfix already executed");
-    require(approved, "hotfix not approved");
-    require(preparedEpoch == getEpochNumber(), "hotfix must be prepared for this epoch");
-
-    Proposals.makeMem(values, destinations, data, dataLengths, msg.sender, 0).executeMem();
-
-    hotfixes[hash].executed = true;
-    emit HotfixExecuted(hash);
-  }
-
-  /**
    * @notice Withdraws refunded CELO deposits.
    * @return Whether or not the withdraw was successful.
    */
@@ -1170,37 +1097,6 @@ contract Governance is
    */
   function getMostRecentReferendumProposal(address account) external view returns (uint256) {
     return voters[account].mostRecentReferendumProposal;
-  }
-
-  /**
-   * @notice Returns number of validators from current set which have whitelisted the given hotfix.
-   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
-   * @return Whitelist tally
-   */
-  function hotfixWhitelistValidatorTally(bytes32 hash) public view returns (uint256) {
-    uint256 tally = 0;
-    uint256 n = numberValidatorsInCurrentSet();
-    IAccounts accounts = getAccounts();
-    for (uint256 i = 0; i < n; i = i.add(1)) {
-      address validatorSigner = validatorSignerAddressFromCurrentSet(i);
-      address validatorAccount = accounts.signerToAccount(validatorSigner);
-      if (
-        isHotfixWhitelistedBy(hash, validatorSigner) ||
-        isHotfixWhitelistedBy(hash, validatorAccount)
-      ) {
-        tally = tally.add(1);
-      }
-    }
-    return tally;
-  }
-
-  /**
-   * @notice Checks if a byzantine quorum of validators has whitelisted the given hotfix.
-   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
-   * @return Whether validator whitelist tally >= validator byzantine quorum
-   */
-  function isHotfixPassing(bytes32 hash) public view returns (bool) {
-    return hotfixWhitelistValidatorTally(hash) >= minQuorumSizeInCurrentSet();
   }
 
   /**

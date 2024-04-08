@@ -77,6 +77,7 @@ contract LockedGold is
   }
 
   uint256 public totalNonvoting;
+  // TODO: should we update unlocking period
   uint256 public unlockingPeriod;
 
   // Info about delegator
@@ -250,11 +251,6 @@ contract LockedGold is
       revokeFromDelegatedWhenUnlocking(msg.sender, value);
     }
 
-    uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
-    require(
-      balanceRequirement == 0 || balanceRequirement <= remainingLockedGold,
-      "Either account doesn't have enough locked Celo or locked Celo is being used for voting."
-    );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
     // CERTORA: the slot containing the length could be MAX_UINT
@@ -336,13 +332,6 @@ contract LockedGold is
     );
     address delegatorAccount = getAccounts().voteSignerToAccount(msg.sender);
     address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
-
-    IValidators validators = getValidators();
-    require(!validators.isValidator(delegatorAccount), "Validators cannot delegate votes.");
-    require(
-      !validators.isValidatorGroup(delegatorAccount),
-      "Validator groups cannot delegate votes."
-    );
 
     Delegated storage delegated = delegatorInfo[delegatorAccount];
     delegated.delegatees.add(delegateeAccount);
