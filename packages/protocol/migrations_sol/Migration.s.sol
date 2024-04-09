@@ -350,13 +350,15 @@ contract Migration is Script, UsingRegistry {
     }
 
     // TODO add more configurable oracles from the json
-    getSortedOracles();
-    console.log("this worked");
+    // getSortedOracles();
+    // console.log("this worked");
     getSortedOracles().addOracle(stableTokenProxyAddress, deployerAccount);
 
     uint256 celoPrice = abi.decode(json.parseRaw(".stableToken.celoPrice"), (uint256));
     if (celoPrice != 0 ) {
+      console.log("before report");
       getSortedOracles().report(stableTokenProxyAddress, celoPrice * 1e24, address(0), address(0)); // TODO use fixidity
+      console.log("After report report");
     }
 
     IReserve(registry.getAddressForStringOrDie("Reserve")).addToken(stableTokenProxyAddress);
