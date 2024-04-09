@@ -88,4 +88,5 @@ jobs:
         run: forge test -vvv
 
       - name: Generate migrations
+        if: success() || failure()
         run: ./migrations_sol/start.sh
