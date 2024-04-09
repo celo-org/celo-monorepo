@@ -10,7 +10,7 @@ if nc -z localhost $ANVIL_PORT; then
 fi
 
 
-anvil --port $ANVIL_PORT &
+anvil --port $ANVIL_PORT --gas-limit 50000000 &
 # ANVIL_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
 export ANVIL_PID=$!
 

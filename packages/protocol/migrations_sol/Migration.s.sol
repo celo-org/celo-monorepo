@@ -214,7 +214,7 @@ contract Migration is Script, UsingRegistry {
     migrateExchange(json);
     migrateAccount();
     migrateLockedGold(json);
-    migrateValidators(json);
+    migrateValidators(json); // this triggers a revert, the deploy after the json reads
     migrateElection(json);
     migrateEpochRewards(json);
     migrateRandom(json);
@@ -419,6 +419,8 @@ contract Migration is Script, UsingRegistry {
     uint256 maxGroupSize = abi.decode(json.parseRaw(".validators.maxGroupSize"), (uint256));
     uint256 commissionUpdateDelay = abi.decode(json.parseRaw(".validators.commissionUpdateDelay"), (uint256));
     uint256 downtimeGracePeriod = abi.decode(json.parseRaw(".validators.downtimeGracePeriod"), (uint256));
+
+    // revert("Must revert");
 
     deployProxiedContract(
       "Validators",
