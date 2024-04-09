@@ -86,3 +86,6 @@ jobs:
       - name: Run Everything just in case something was missed
         # can't use gas limit because some setUp function use more than the limit
         run: forge test -vvv
+
+      - name: Generate migrations
+        run: ./migrations_sol/start.sh
