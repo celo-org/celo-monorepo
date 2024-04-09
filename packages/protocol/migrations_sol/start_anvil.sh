@@ -21,6 +21,9 @@ while ! nc -z localhost $ANVIL_PORT; do
   sleep 0.1 # wait for 1/10 of the second before check again
 done
 
+# enabled logging
+cast rpc anvil_setLoggingEnabled true --rpc-url http://127.0.0.1:$ANVIL_PORT
+
 echo "Anvil launched"
 sleep 1
 
