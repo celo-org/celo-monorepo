@@ -31,7 +31,7 @@ env:
   #RELEASE_TAG: ganache-v7-core-contracts.v9
   RELEASE_TAG: core-contracts.v10
   # CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
-  CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.7.x
+  CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.8.x
 
 # EXAMPLE on debug ssh step
 #  - name: Setup tmate session
