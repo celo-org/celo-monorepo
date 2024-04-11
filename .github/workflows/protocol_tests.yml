@@ -1,6 +1,10 @@
 name: Protocol Foundry tests
 on: [push, pull_request]
 
+env:
+  # Increment these to force cache rebuilding
+  FOUNDRY_CACHE_KEY: 1
+
 jobs:
   check:
     defaults:
@@ -25,13 +29,13 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./cache
-          key: ${{ runner.os }}-foundry-cache
+          key: ${{ runner.os }}-foundry-cache-${{ env.FOUNDRY_CACHE_KEY }}
       - name: Foundry out
         id: foundry-out
         uses: actions/cache@v3
         with:
           path: ./out
-          key: ${{ runner.os }}-foundry-out
+          key: ${{ runner.os }}-foundry-out-${{ env.FOUNDRY_CACHE_KEY }}
 
       - name: Install Foundry
         uses: onbjerg/foundry-toolchain@v1
