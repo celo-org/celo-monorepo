@@ -310,6 +310,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   /**
    * @notice Returns the number of rates that are currently stored for a specifed rateFeedId.
    * @dev Does not take the equivalentTokens mapping into account.
+   * For that, the underlying token should be queried.
    * @param token The token for which the number of rates is being retrieved.
    * @return uint256 The number of reported oracle rates stored for the given rateFeedId.
    */
@@ -355,6 +356,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   /**
    * @notice Gets all elements from the doubly linked list.
    * @dev Does not take the equivalentTokens mapping into account.
+   * For that, the underlying token should be queried.
    * @param token The token for which the rates are being retrieved.
    * @return keys Keys of an unpacked list of elements from largest to smallest.
    * @return values Values of an unpacked list of elements from largest to smallest.
@@ -371,6 +373,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   /**
    * @notice Returns the number of timestamps.
    * @dev Does not take the equivalentTokens mapping into account.
+   * For that, the underlying token should be queried.
    * @param token The token for which the number of timestamps is being retrieved.
    * @return uint256 The number of oracle report timestamps for the specified rateFeedId.
    */
@@ -381,6 +384,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   /**
    * @notice Returns the median timestamp.
    * @dev Does not take the equivalentTokens mapping into account.
+   * For that, the underlying token should be queried.
    * @param token The token for which the median timestamp is being retrieved.
    * @return uint256 The median report timestamp for the specified rateFeedId.
    */
@@ -391,6 +395,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   /**
    * @notice Gets all elements from the doubly linked list.
    * @dev Does not take the equivalentTokens mapping into account.
+   * For that, the underlying token should be queried.
    * @param token The token for which the timestamps are being retrieved.
    * @return keys Keys of nn unpacked list of elements from largest to smallest.
    * @return values Values of an unpacked list of elements from largest to smallest.
@@ -407,6 +412,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   /**
    * @notice Checks if a report exists for a specified rateFeedId from a given oracle.
    * @dev Does not take the equivalentTokens mapping into account.
+   * For that, the underlying token should be queried.
    * @param token The token for which the report should be checked.
    * @param oracle The oracle whose report should be checked.
    * @return bool True if a report exists, false otherwise.
@@ -418,6 +424,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   /**
    * @notice Returns the list of oracles for a speficied rateFeedId.
    * @dev Does not take the equivalentTokens mapping into account.
+   * For that, the underlying token should be queried.
    * @param token The token for which the oracles are being retrieved.
    * @return address[] A list of oracles for the given rateFeedId.
    */
@@ -428,6 +435,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   /**
    * @notice Returns the expiry for specified rateFeedId if it exists, if not the default is returned.
    * @dev Does not take the equivalentTokens mapping into account.
+   * For that, the underlying token should be queried.
    * @param token The token for which the report expiry is being retrieved.
    * @return The report expiry in seconds.
    */
@@ -442,6 +450,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   /**
    * @notice Removes an oracle value and updates the median.
    * @dev Does not take the equivalentTokens mapping into account.
+   * For that, the underlying token should be queried.
    * @param token The token for which the oracle report should be removed.
    * @param oracle The oracle whose value should be removed.
    * @dev This can be used to delete elements for oracles that have been removed.
