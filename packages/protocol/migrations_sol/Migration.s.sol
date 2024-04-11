@@ -103,6 +103,12 @@ contract Migration is Script, UsingRegistry {
   }
 
   function addToRegistry(string memory contractName, address proxyAddress) public {
+    IProxy proxy = IProxy(registryAddress);
+    if (proxy._getImplementation() == address(0)){
+      console.log("Can't add to registry because implementation not set");
+      return;
+
+    }
     IRegistry registry = IRegistry(registryAddress);
     console.log(" Setting on the registry contract:", contractName);
     registry.setAddressFor(contractName, proxyAddress);
@@ -118,17 +124,23 @@ contract Migration is Script, UsingRegistry {
     console.log("address(this)", address(this));
     // console.log("address(Create2)", address(Create2));
     // console.log("owner of proxy is:", proxy._getOwner());
+    addToRegistry("last", address(31));
     bytes memory implementationBytecode = vm.getCode(string.concat("out/", contractName, ".sol/", contractName, ".json"));
+    addToRegistry("last", address(32));
     bool testingDeployment = false;
+    addToRegistry("last", address(33));
     bytes memory initialCode = abi.encodePacked(
       implementationBytecode,
       abi.encode(testingDeployment)
     );
-
-    address implementation = create2deploy(0, initialCode);
+    addToRegistry("last", address(34));
+    address implementation = create2deploy(bytes32(proxyNonce), initialCode);
+    proxyNonce++; // nonce to avoid having the same address to deploy to, likely won't needed but just in case
+    addToRegistry("last", address(35));
     console.log(" Implementation deployed to:", address(implementation));
     console.log(" Calling initialize(..)");
     proxy._setAndInitializeImplementation(implementation, initializeCalldata);
+    addToRegistry("last", address(36));
   }
 
   function deployProxiedContract(
@@ -161,15 +173,18 @@ contract Migration is Script, UsingRegistry {
     //   uint160((uint256(sha256(abi.encode(vm.getCode("Proxy.sol"), proxyNonce)))))
     // );
     // deployCodeTo("Proxy.sol", abi.encode(false), proxyAddress);
+    addToRegistry("last", address(1));
     proxyAddress = proxyFactory.deployProxy();
-
-    proxyNonce++; // nonce to avoid having the same address to deploy to// likely
+    addToRegistry("last", address(2));
 
     IProxy proxy = IProxy(proxyAddress);
     console.log(" Proxy deployed to:", address(proxy));
+    addToRegistry("last", address(3));
 
     setImplementationOnProxy(proxy, contractName, initializeCalldata);
+    addToRegistry("last", address(4));
     addToRegistry(contractName, address(proxy));
+    addToRegistry("last", address(5));
 
     console.log(" Done deploying:", contractName);
     console.log("------------------------------");
@@ -215,24 +230,24 @@ contract Migration is Script, UsingRegistry {
     migrateAccount();
     migrateLockedGold(json);
     migrateValidators(json); // this triggers a revert, the deploy after the json reads
-    migrateElection(json);
+    // migrateElection(json);
     migrateEpochRewards(json);
     migrateRandom(json);
     migrateEscrow();
-    // attestations not migrates
+    // // attestations not migrates
     migrateBlockchainParameters(json);
     migrateGovernanceSlasher();
     migrateDoubleSigningSlasher(json);
     migrateDowntimeSlasher(json);
     migrateGovernanceApproverMultiSig(json);
-    // GrandaMento not migrated
+    // // GrandaMento not migrated
     migrateFederatedAttestations();
     migrateMentoFeeHandlerSeller();
     migrateUniswapFeeHandlerSeller();
     migrateFeeHandler(json);
     migrateOdisPayments();
-    migrateGovernance(json);
-    // electValidators();
+    // migrateGovernance(json);
+    electValidators(); // migration finished
 
     // // // little sanity check, remove later
     // IRegistry registry = IRegistry(registryAddress);
@@ -684,7 +699,7 @@ contract Migration is Script, UsingRegistry {
   }
 
   function electValidators() public {
-
+    addToRegistry("MigrationFinishesCorrectly", registryAddress);
   }
 
 }
