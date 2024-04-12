@@ -689,7 +689,11 @@ contract Migration is Script, UsingRegistry {
           bytes4 functionHash = bytes4(keccak256(bytes(functionName)));
           uint256 threshold = abi.decode(constitutionJson.parseRaw(string.concat(".", contractName, ".", functionName)), (uint256));
 
-          governance.setConstitution(contractAddress, functionHash, threshold);
+          if (contractAddress != address(0)){
+            // TODO fix this case
+            governance.setConstitution(contractAddress, functionHash, threshold);
+
+          }
 
         }
 

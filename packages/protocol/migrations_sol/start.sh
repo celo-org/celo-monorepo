@@ -52,7 +52,7 @@ time forge script migrations_sol/Migration.s.sol --rpc-url http://127.0.0.1:$ANV
 
 # Run integration tests
 # TODO for some reason match path doesn't work
-forge test --fork-url http://127.0.0.1:8545 --match-contract=IntegrationTest -vvv # || echo "Test failed" # TODO for some reason the echo didn't work
+forge test --fork-url http://127.0.0.1:$ANVIL_PORT --match-contract=IntegrationTest -vvv # || echo "Test failed" # TODO for some reason the echo didn't work
 
 
 
