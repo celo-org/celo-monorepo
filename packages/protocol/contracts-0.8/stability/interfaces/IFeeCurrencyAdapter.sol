@@ -28,7 +28,7 @@ interface IFeeCurrencyAdapter {
   function symbol() external view returns (string memory);
 
   /**
-   * @return Returns the decimals expected by the vm.
+   * @return The decimals expected by the vm.
    */
   function decimals() external view returns (uint8);
 
