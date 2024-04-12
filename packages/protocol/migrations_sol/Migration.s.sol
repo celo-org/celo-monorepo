@@ -246,7 +246,7 @@ contract Migration is Script, UsingRegistry {
     migrateUniswapFeeHandlerSeller();
     migrateFeeHandler(json);
     migrateOdisPayments();
-    // migrateGovernance(json);
+    migrateGovernance(json);
     electValidators(); // migration finished
 
     // // // little sanity check, remove later
