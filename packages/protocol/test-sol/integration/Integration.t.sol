@@ -20,6 +20,7 @@ contract IntegrationTest is Test {
     // registry.setAddressFor("registry", address(1));
     console.log("print:");
     console.logAddress(registry.getAddressForStringOrDie("GoldToken"));
+    console.logAddress(registry.getAddressForStringOrDie("MigrationFinishesCorrectly"));
   }
 
   function test_transfer() public {
