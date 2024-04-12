@@ -33,7 +33,7 @@ interface IFeeCurrencyAdapter {
   function decimals() external view returns (uint8);
 
   /**
-   * @return same as decimals.
+   * @return Same as decimals.
    */
   function expectedDecimals() external view returns (uint8);
 
