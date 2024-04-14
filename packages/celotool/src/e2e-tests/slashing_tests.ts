@@ -162,7 +162,7 @@ describe('slashing tests', function (this: any) {
     ],
   }
 
-  // Do a shallow copy so that the instance objects are the the same (even after the init step fills private keys, etc.)
+  // Do a shallow copy so that the instance objects are the same (even after the init step fills private keys, etc.)
   const gethConfigDown = _.clone(gethConfig)
   // Exclude the last validator to simulate it being down
   gethConfigDown.instances = gethConfig.instances.slice(0, gethConfig.instances.length - 1)
