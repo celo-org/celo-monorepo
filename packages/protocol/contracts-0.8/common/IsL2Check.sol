@@ -6,8 +6,10 @@ pragma solidity >=0.8.0 <0.8.20;
 contract IsL2Check {
   address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
-  modifier onlyL2() {
-    revert("This method is not supported in L2 anymore.");
+  modifier onlyL1() {
+    if (IsL2()) {
+      revert("This method is not supported in L2 anymore.");
+    }
     _;
   }
 
