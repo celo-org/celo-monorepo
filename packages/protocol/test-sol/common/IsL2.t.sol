@@ -3,10 +3,6 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
 
-import "@celo-contracts/common/FixidityLib.sol";
-
-import "@celo-contracts/common/interfaces/IRegistry.sol";
-
 // Contract to test
 import "@celo-contracts-8/common/IsL2.sol";
 
