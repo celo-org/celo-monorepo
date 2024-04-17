@@ -31,6 +31,62 @@ contract FeeCurrencyDirectory is Initializable, Ownable {
   }
 
   /**
+     * @notice Sets the currency configuration for a token.
+     * @dev This action can only be performed by the contract owner.
+     * @param token The token address.
+     * @param currencyIdentifier The currency identifier.
+     * @param oracle The oracle address for price fetching.
+     * @param intrinsicGas The intrinsic gas value for transactions.
+     */
+  function setCurrencyConfig(
+    address token,
+    address currencyIdentifier,
+    address oracle,
+    uint256 intrinsicGas
+  ) external onlyOwner {
+    require(currencyIdentifier != address(0), "Currency identifier cannot be zero");
+    require(oracle != address(0), "Oracle address cannot be zero");
+    require(intrinsicGas > 0, "Intrinsic gas cannot be zero");
+
+    whitelistedCurrencies[token] = CurrencyConfig({
+      currencyIdentifier: currencyIdentifier,
+      oracle: oracle,
+      intrinsicGas: intrinsicGas
+    });
+    whitelistedCurrencyList.push(token);
+  }
+
+  /**
+     * @notice Removes a token from the whitelist.
+     * @dev This action can only be performed by the contract owner.
+     * @param token The token address to remove.
+     * @param index The index in the list of whitelisted currencies.
+     */
+  function removeWhitelistedCurrencies(address token, uint256 index) external onlyOwner {
+    require(index < whitelistedCurrencyList.length, "Index out of bounds");
+    require(whitelistedCurrencyList[index] == token, "Index does not match token");
+
+    delete whitelistedCurrencies[token];
+    whitelistedCurrencyList[index] = whitelistedCurrencyList[whitelistedCurrencyList.length - 1];
+    whitelistedCurrencyList.pop();
+  }
+
+  /**
+     * @notice Converts the gas price from CELO to another token.
+     * @param token The token address for which to translate the gas price.
+     * @param priceInCelo The price in CELO.
+     * @return gasInToken The converted gas price in the token.
+     */
+  function translateGasPrice(address token, uint256 priceInCelo)
+    public
+    view
+    returns (uint256 gasInToken)
+  {
+    uint256 pricePerUnit = getPrice(token);
+    return priceInCelo * pricePerUnit;
+  }
+
+  /**
      * @notice Returns the list of all whitelisted currency addresses.
      * @return An array of addresses that are whitelisted.
      */
@@ -61,58 +117,13 @@ contract FeeCurrencyDirectory is Initializable, Ownable {
   }
 
   /**
-     * @notice Sets the currency configuration for a token.
-     * @dev This action can only be performed by the contract owner.
-     * @param token The token address.
-     * @param currencyIdentifier The currency identifier.
-     * @param oracle The oracle address for price fetching.
-     * @param intrinsicGas The intrinsic gas value for transactions.
-     */
-  function setCurrencyConfig(
-    address token,
-    address currencyIdentifier,
-    address oracle,
-    uint256 intrinsicGas
-  ) public onlyOwner {
-    require(currencyIdentifier != address(0), "Currency identifier cannot be zero");
-    require(oracle != address(0), "Oracle address cannot be zero");
-    require(intrinsicGas > 0, "Intrinsic gas cannot be zero");
-
-    whitelistedCurrencies[token] = CurrencyConfig({
-      currencyIdentifier: currencyIdentifier,
-      oracle: oracle,
-      intrinsicGas: intrinsicGas
-    });
-    whitelistedCurrencyList.push(token);
-  }
-
-  /**
-     * @notice Removes a token from the whitelist.
-     * @dev This action can only be performed by the contract owner.
-     * @param token The token address to remove.
-     * @param index The index in the list of whitelisted currencies.
-     */
-  function removeWhitelistedCurrencies(address token, uint256 index) public onlyOwner {
-    require(index < whitelistedCurrencyList.length, "Index out of bounds");
-    require(whitelistedCurrencyList[index] == token, "Index does not match token");
-
-    delete whitelistedCurrencies[token];
-    whitelistedCurrencyList[index] = whitelistedCurrencyList[whitelistedCurrencyList.length - 1];
-    whitelistedCurrencyList.pop();
-  }
-
-  /**
-     * @notice Converts the gas price from CELO to another token.
-     * @param token The token address for which to translate the gas price.
-     * @param priceInCelo The price in CELO.
-     * @return gasInToken The converted gas price in the token.
-     */
-  function translateGasPrice(address token, uint256 priceInCelo)
-    public
-    view
-    returns (uint256 gasInToken)
-  {
-    uint256 pricePerUnit = getPrice(token);
-    return priceInCelo * pricePerUnit;
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 0, 0);
   }
 }
