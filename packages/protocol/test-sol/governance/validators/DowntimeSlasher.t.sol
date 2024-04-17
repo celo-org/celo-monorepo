@@ -28,7 +28,6 @@ contract DowntimeSlasherMock is DowntimeSlasher(true), MockUsingPrecompiles, Tes
   }
 
   function mockSlash(SlashParams calldata slashParams, address _validator) external {
-    ph.setDebug(true);
     ph.mockReturn(
       ph.GET_VALIDATOR(),
       abi.encodePacked(slashParams.signerIndices[0], slashParams.startBlocks[0]),
@@ -872,4 +871,3 @@ contract DowntimeSlasherTestSlash_WhenIntervalInSameEpoch is DowntimeSlasherTest
 }
 
 contract DowntimeSlasherTestSlash_WhenIntervalCrossingEpoch is DowntimeSlasherTest {}
-
