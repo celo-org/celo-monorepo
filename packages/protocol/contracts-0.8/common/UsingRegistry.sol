@@ -8,8 +8,10 @@ import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
 import "../../contracts/common/interfaces/IRegistry.sol";
+import "../../contracts/common/interfaces/IAccounts.sol";
 import "../../contracts/common/interfaces/IFreezer.sol";
 import "../../contracts/governance/interfaces/ILockedGold.sol";
+import "../../contracts/governance/interfaces/IValidators.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
 import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 
@@ -95,7 +97,17 @@ contract UsingRegistry is Ownable {
   function getStableToken() internal view returns (address) {
     return registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID);
   }
+
   function getMentoFeeHandlerSeller() internal view returns (IFeeHandlerSeller) {
     return IFeeHandlerSeller(registry.getAddressForOrDie(MENTOFEEHANDLERSELLER_REGISTRY_ID));
   }
+
+  function getAccounts() internal view returns (IAccounts) {
+    return IAccounts(registry.getAddressForOrDie(ACCOUNTS_REGISTRY_ID));
+  }
+
+  function getValidators() internal view returns (IValidators) {
+    return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
+  }
+
 }

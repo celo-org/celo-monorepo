@@ -5,6 +5,7 @@ set -euo pipefail
 
 # Compile everything
 export ANVIL_PORT=8546
+// TODO make this configurable
 FROM_ACCOUNT=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 
 
@@ -51,13 +52,14 @@ echo "Library flags are: $LIBRARIES"
 
 # run migrations
 BROADCAST="--broadcast"
+# --skip-simulation
 # BROADCAST=""
 
 echo "Compiling with libraries... "
 time forge build $LIBRARIES
-
+exit 1
 #--skip-simulation
-time forge script migrations_sol/Migration.s.sol --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive --skip-simulation -- $LIBRARIES --revert-strings || echo "Migration script failed"
+time forge script migrations_sol/Migration.s.sol --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive -- $LIBRARIES --revert-strings || echo "Migration script failed"
 
 # Run integration tests
 source $PWD/migrations_sol/integration_tests.sh

@@ -21,6 +21,8 @@ import "@celo-contracts/governance/interfaces/IValidatorsInitializer.sol";
 import "@celo-contracts/governance/interfaces/IElectionInitializer.sol";
 import "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
 import "@celo-contracts/governance/interfaces/IBlockchainParametersInitializer.sol";
+import "@celo-contracts/governance/interfaces/ILockedGold.sol";
+import "@celo-contracts/common/interfaces/IAccounts.sol";
 import "@celo-contracts/governance/interfaces/IGovernanceSlasherInitializer.sol";
 import "@celo-contracts/governance/interfaces/IDoubleSigningSlasherInitializer.sol";
 import "@celo-contracts/governance/interfaces/IDowntimeSlasherInitializer.sol";
@@ -40,6 +42,7 @@ import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.so
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
 import "./HelperInterFaces.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 import "@celo-contracts-8/common/UsingRegistry.sol";
 
@@ -236,7 +239,9 @@ contract Migration is Script, UsingRegistry {
     migrateFeeHandler(json);
     migrateOdisPayments();
     migrateGovernance(json);
-    electValidators(); // migration finished
+    vm.stopBroadcast();
+
+    electValidators(json);
 
     // // // little sanity check, remove later
     // IRegistry registry = IRegistry(registryAddress);
@@ -244,7 +249,6 @@ contract Migration is Script, UsingRegistry {
     // console.log("print:");
     // console.logAddress(registry.getAddressForStringOrDie("registry"));
 
-    vm.stopBroadcast();
   }
 
   function migrateRegistry() public {
@@ -326,7 +330,7 @@ contract Migration is Script, UsingRegistry {
   }
 
   function migrateStableToken(string memory json) public {
-
+    // TODO add cEUR, cBRL, etc
     string memory name = abi.decode(json.parseRaw(".stableToken.tokenName"), (string));
     string memory symbol = abi.decode(json.parseRaw(".stableToken.tokenSymbol"), (string));
     uint8 decimals = abi.decode(json.parseRaw(".stableToken.decimals"), (uint8));
@@ -649,7 +653,8 @@ contract Migration is Script, UsingRegistry {
   function _transferOwnerShipCoreContact(address governanceAddress, string memory json) public {
     bool skipTransferOwnership = abi.decode(json.parseRaw(".governance.skipTransferOwnership"), (bool));
     if (!skipTransferOwnership){
-      string[20] memory fixedStringArray = ['Accounts',
+      // TODO move this list somewhere else
+      string[22] memory fixedStringArray = ['Accounts',
         // 'Attestations',
         // BlockchainParameters ownership transitioned to governance in a follow-up script.?
         'BlockchainParameters',
@@ -725,8 +730,117 @@ contract Migration is Script, UsingRegistry {
     }
   }
 
-  function electValidators() public {
-    addToRegistry("MigrationFinishesCorrectly", registryAddress);
+  function lockGold(
+    uint256 value
+    // string memory privateKey
+    ) public {
+      
+      // lock just one
+      getAccounts().createAccount();
+      getLockedGold().lock{value:value}();
+
+
+    }
+
+  function registerValidator(
+      uint256 validatorIndex,
+      address validatorKey,
+      uint256 amountToLock
+    ) public {
+      vm.startBroadcast(validatorKey);
+      lockGold(amountToLock);
+      // TODO convert validatorIndex to string and make it a name
+      // getAccounts().setName(groupName);
+      // potentially create a precompile that validates everything for the proofs of posession
+      // getValidators().registerValidator(commission);
+      vm.stopBroadcast();
+
+  }
+
+  function getValidatorKeyFromGroupGroup(address[] memory keys, uint256 groupIndex, uint256 validatorIndex, uint256 membersInAGroup) public returns(address) {
+    return keys[groupIndex*membersInAGroup + validatorIndex + 1];
+  }
+
+  function registerValidatorGroup(
+      string memory groupName,
+      address validator0Key,
+      uint256 amountToLock,
+      uint256 commission
+    ) public {
+      vm.startBroadcast(validator0Key);
+      lockGold(amountToLock);
+      getAccounts().setName(groupName);
+      getValidators().registerValidatorGroup(commission);
+      vm.stopBroadcast();
+    }
+
+  function electValidators(string memory json) public {
+    console.log("Electing validators: ");
+
+    uint256 commission = abi.decode(json.parseRaw(".validators.commission"), (uint256));
+    uint256 votesRatioOfLastVsFirstGroup = abi.decode(json.parseRaw(".validators.votesRatioOfLastVsFirstGroup"), (uint256));
+    string memory groupName = abi.decode(json.parseRaw(".validators.groupName"), (string));
+    uint256 minElectableValidators = abi.decode(json.parseRaw(".election.minElectableValidators"), (uint256));
+    address[] memory valKeys = abi.decode(json.parseRaw(".validators.valKeys"), (address[]));
+    uint256 maxGroupSize = abi.decode(json.parseRaw(".validators.maxGroupSize"), (uint256));
+    uint256 validatorLockedGoldRequirements = abi.decode(json.parseRaw(".validators.validatorLockedGoldRequirements.value"), (uint256));
+    uint256 lockedGoldPerValAtFirstGroup = abi.decode(json.parseRaw(".validators.groupLockedGoldRequirements"), (uint256));
+
+    // attestationKeys not migrated
+
+    if (valKeys.length == 0) {
+      console.log('  No validators to register');
+      // return;
+    }
+
+    if (valKeys.length < minElectableValidators) {
+      console.log(
+        "Warning: Have ${valKeys.length} Validator keys but require a minimum of ${config.election.minElectableValidators} Validators in order for a new validator set to be elected."
+      );
+    }
+
+    address validator0Key = valKeys[0];
+
+    if (votesRatioOfLastVsFirstGroup < 1) {
+      revert("votesRatioOfLastVsFirstGroup needs to be >= 1");
+    }
+
+    // Assumptions about where funds are located:
+    // * Validator 0 holds funds for all groups' stakes
+    // * Validator 1-n holds funds needed for their own stake
+    // const validator0Key = valKeys[0]
+
+    // REPLACED WITH getValidatorGroup
+    // Split the validator keys into groups that will fit within the max group size.
+    uint256 amountOfGroups = valKeys.length / maxGroupSize;
+    // string[][] memory  valKeyGroups;
+    // for (uint256 i = 0; i < valKeys.length; i += maxGroupSize) {
+    //   string[] memory validatorKeysfForGroup;
+    //   valKeyGroups.push(validatorKeysfForGroup);
+    //   // for (uint256 j = i+1; j <= maxGroupSize; i++) {
+    //   //   valKeyGroups[i].push(valKeys[i]);
+    //   // }
+    // }
+
+    // uint256 lockedGoldPerValEachGroup = ((votesRatioOfLastVsFirstGroup - 1)*lockedGoldPerValAtFirstGroup)/Math.max(amountOfGroups, 1);
+
+    registerValidatorGroup(
+      groupName,
+      validator0Key,
+      // TODO change to group
+      maxGroupSize*validatorLockedGoldRequirements,
+      commission
+    );
+
+    console.log("  * Registering ${group.valKeys.length} validators ...");
+
+    for (uint256 validatorIndex = 0; validatorIndex < amountOfGroups; validatorIndex++){
+      registerValidator(validatorIndex, getValidatorKeyFromGroupGroup(valKeys, 0, validatorIndex, maxGroupSize), validatorLockedGoldRequirements);
+    }
+    
+
+
+    
   }
 
 }

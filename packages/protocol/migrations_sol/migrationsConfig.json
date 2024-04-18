@@ -74,7 +74,8 @@
     "attestationKeys": [],
     "groupName": "cLabs",
     "commission": 100000000000000000000000,
-    "votesRatioOfLastVsFirstGroup": 2000000000000000000000000
+    "votesRatioOfLastVsFirstGroup": 2000000000000000000000000,
+    "valKeys": ["0x70997970C51812dc3A010C7d01b50e0d17dc79C8"]
   },
   "election": {
     "minElectableValidators": 1,
