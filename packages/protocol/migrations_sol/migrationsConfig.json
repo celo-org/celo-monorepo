@@ -150,6 +150,7 @@
     "participationFloor": 10000000000000000000000,
     "baselineUpdateFactor": 200000000000000000000000,
     "baselineQuorumFactor": 1000000000000000000000000,
-    "skipSetConstitution": false
+    "skipSetConstitution": false,
+    "skipTransferOwnership": false
   }
 }

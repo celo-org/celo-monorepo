@@ -124,23 +124,17 @@ contract Migration is Script, UsingRegistry {
     console.log("address(this)", address(this));
     // console.log("address(Create2)", address(Create2));
     // console.log("owner of proxy is:", proxy._getOwner());
-    addToRegistry("last", address(31));
     bytes memory implementationBytecode = vm.getCode(string.concat("out/", contractName, ".sol/", contractName, ".json"));
-    addToRegistry("last", address(32));
     bool testingDeployment = false;
-    addToRegistry("last", address(33));
     bytes memory initialCode = abi.encodePacked(
       implementationBytecode,
       abi.encode(testingDeployment)
     );
-    addToRegistry("last", address(34));
     address implementation = create2deploy(bytes32(proxyNonce), initialCode);
     proxyNonce++; // nonce to avoid having the same address to deploy to, likely won't needed but just in case
-    addToRegistry("last", address(35));
     console.log(" Implementation deployed to:", address(implementation));
     console.log(" Calling initialize(..)");
     proxy._setAndInitializeImplementation(implementation, initializeCalldata);
-    addToRegistry("last", address(36));
   }
 
   function deployProxiedContract(
@@ -173,18 +167,13 @@ contract Migration is Script, UsingRegistry {
     //   uint160((uint256(sha256(abi.encode(vm.getCode("Proxy.sol"), proxyNonce)))))
     // );
     // deployCodeTo("Proxy.sol", abi.encode(false), proxyAddress);
-    addToRegistry("last", address(1));
     proxyAddress = proxyFactory.deployProxy();
-    addToRegistry("last", address(2));
 
     IProxy proxy = IProxy(proxyAddress);
     console.log(" Proxy deployed to:", address(proxy));
-    addToRegistry("last", address(3));
 
     setImplementationOnProxy(proxy, contractName, initializeCalldata);
-    addToRegistry("last", address(4));
     addToRegistry(contractName, address(proxy));
-    addToRegistry("last", address(5));
 
     console.log(" Done deploying:", contractName);
     console.log("------------------------------");
@@ -230,7 +219,7 @@ contract Migration is Script, UsingRegistry {
     migrateAccount();
     migrateLockedGold(json);
     migrateValidators(json); // this triggers a revert, the deploy after the json reads
-    // migrateElection(json);
+    migrateElection(json);
     migrateEpochRewards(json);
     migrateRandom(json);
     migrateEscrow();
@@ -652,19 +641,55 @@ contract Migration is Script, UsingRegistry {
       ));
 
     _setConstitution(governanceProxyAddress, json);
+    _transferOwnerShipCoreContact(governanceProxyAddress, json);
 
-    // TODO 
-    // _transferOwnerShipCoreContact(governanceProxyAddress, json);
 
   }
+
+  function _transferOwnerShipCoreContact(address governanceAddress, string memory json) public {
+    bool skipTransferOwnership = abi.decode(json.parseRaw(".governance.skipTransferOwnership"), (bool));
+    if (!skipTransferOwnership){
+      string[20] memory fixedStringArray = ['Accounts',
+        // 'Attestations',
+        // BlockchainParameters ownership transitioned to governance in a follow-up script.?
+        'BlockchainParameters',
+        'DoubleSigningSlasher',
+        'DowntimeSlasher',
+        'Election',
+        'EpochRewards',
+        'Escrow',
+        'FederatedAttestations',
+        'FeeCurrencyWhitelist',
+        'Freezer',
+        'FeeHandler',
+        'GoldToken',
+        'Governance',
+        'GovernanceSlasher',
+        'LockedGold',
+        'OdisPayments',
+        'Random',
+        'Registry',
+        'SortedOracles',
+        'UniswapFeeHandlerSeller',
+        'MentoFeeHandlerSeller',
+        'Validators'
+        ];
+
+      for (uint256 i = 0; i < fixedStringArray.length; i++) {
+        string memory contractToTransfer = fixedStringArray[i];
+        console.log("Transfering ownership of: ", contractToTransfer);
+        IProxy proxy = IProxy(registry.getAddressForStringOrDie(contractToTransfer));
+        proxy._transferOwnership(governanceAddress);
+      }
+    }
+  }
+
+
   function _setConstitution(address governanceAddress, string memory json) public {
     // if I set this function outside 
     bool skipSetConstitution = abi.decode(json.parseRaw(".governance.skipSetConstitution"), (bool));
     IGovernance governance = IGovernance(governanceAddress);
-  // function setConstitution(IGovernance governance, bool skipSetConstitution) public {
     string memory constitutionJson = vm.readFile("./governanceConstitution.json");
-    // this query gets all the keys
-    // string[] memory contractsKeys = abi.decode(constitutionJson.parseRaw("$"), (string[]));
     string[] memory contractsKeys = vm.parseJsonKeys(constitutionJson, "$");
 
     if (!skipSetConstitution){
@@ -696,8 +721,6 @@ contract Migration is Script, UsingRegistry {
           }
 
         }
-
-        // console.log(contractsKeys[i]);
       }
     }
   }
