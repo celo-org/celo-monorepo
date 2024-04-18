@@ -1,8 +1,10 @@
 pragma solidity ^0.5.13;
 
+// TODO: move file to @test-sol/governance/validator when migrations is moved to foundry.
+
 import "../linkedlists/IntegerSortedLinkedList.sol";
 
-contract IntegerSortedLinkedListTest {
+contract IntegerSortedLinkedListMock {
   using IntegerSortedLinkedList for SortedLinkedList.List;
 
   SortedLinkedList.List private list;

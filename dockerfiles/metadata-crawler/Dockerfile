@@ -15,7 +15,6 @@ RUN npm install -g typescript npm
 
 COPY lerna.json package.json yarn.lock ./
 COPY scripts scripts/
-COPY packages/dev-utils packages/dev-utils/
 COPY packages/metadata-crawler packages/metadata-crawler/
 
 RUN yarn install --network-timeout 100000 --frozen-lockfile && \
