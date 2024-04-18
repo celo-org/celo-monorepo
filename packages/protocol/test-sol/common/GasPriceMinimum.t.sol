@@ -7,7 +7,6 @@ import "@celo-contracts/common/FixidityLib.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 
-// Contract to test
 import "@celo-contracts-8/common/GasPriceMinimum.sol";
 
 contract GasPriceMinimumTest is Test {

@@ -9,7 +9,6 @@ import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/governance/Proposals.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 
-// Contract to test
 import "@celo-contracts/governance/GovernanceSlasher.sol";
 
 contract GovernanceSlasherTest is Test {

@@ -4,7 +4,6 @@ import "celo-foundry/Test.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 
-// Contract to test
 import "@celo-contracts/governance/Governance.sol";
 import "@celo-contracts/governance/Proposals.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";

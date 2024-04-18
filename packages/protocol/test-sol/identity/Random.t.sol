@@ -4,7 +4,6 @@ pragma solidity ^0.5.13;
 import "celo-foundry/Test.sol";
 import { Utils } from "@test-sol/utils.sol";
 
-// Contract to test
 import "@celo-contracts/identity/Random.sol";
 import "@celo-contracts/identity/test/RandomTest.sol";
 

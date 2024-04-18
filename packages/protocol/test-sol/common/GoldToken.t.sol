@@ -78,7 +78,7 @@ contract GoldTokenTest_transfer is GoldTokenTest {
     super.setUp();
   }
 
-  function testTransfer_ShouldTransferBalanceFromOneUserToAnother() public {
+  function test_ShouldTransferBalanceFromOneUserToAnother() public {
     uint256 startBalanceFrom = goldToken.balanceOf(sender);
     uint256 startBalanceTo = goldToken.balanceOf(receiver);
     vm.prank(sender);
@@ -87,7 +87,7 @@ contract GoldTokenTest_transfer is GoldTokenTest {
     assertEq(receiver.balance, startBalanceTo + ONE_GOLDTOKEN);
   }
 
-  function testTransfer_ShouldTransferBalanceWithAComment() public {
+  function test_ShouldTransferBalanceWithAComment() public {
     string memory comment = "tacos at lunch";
     uint256 startBalanceFrom = goldToken.balanceOf(sender);
     uint256 startBalanceTo = goldToken.balanceOf(receiver);
@@ -101,7 +101,7 @@ contract GoldTokenTest_transfer is GoldTokenTest {
     assertEq(receiver.balance, startBalanceTo + ONE_GOLDTOKEN);
   }
 
-  function testTransfer_ShouldNotAllowToTransferToNullAddress() public {
+  function test_ShouldNotAllowToTransferToNullAddress() public {
     vm.prank(sender);
     vm.expectRevert();
     goldToken.transfer(address(0), ONE_GOLDTOKEN);
@@ -124,13 +124,13 @@ contract GoldTokenTest_transferFrom is GoldTokenTest {
     assertEq(receiver.balance, startBalanceTo + ONE_GOLDTOKEN);
   }
 
-  function testTransfer_ShouldNotAllowToTransferToNullAddress() public {
+  function test_ShouldNotAllowToTransferToNullAddress() public {
     vm.prank(receiver);
     vm.expectRevert();
     goldToken.transferFrom(sender, address(0), ONE_GOLDTOKEN);
   }
 
-  function testTransfer_ShouldNotAllowTransferMoreThanSenderHas() public {
+  function test_ShouldNotAllowTransferMoreThanSenderHas() public {
     uint256 value = sender.balance + ONE_GOLDTOKEN * 4;
 
     vm.prank(receiver);
@@ -138,7 +138,7 @@ contract GoldTokenTest_transferFrom is GoldTokenTest {
     goldToken.transferFrom(sender, receiver, value);
   }
 
-  function testTransfer_ShouldNotAllowTransferringMoreThanTheSpenderIsAllowed() public {
+  function test_ShouldNotAllowTransferringMoreThanTheSpenderIsAllowed() public {
     vm.prank(receiver);
     vm.expectRevert();
     goldToken.transferFrom(sender, receiver, ONE_GOLDTOKEN + 1);

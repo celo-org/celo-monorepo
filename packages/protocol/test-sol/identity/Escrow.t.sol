@@ -906,7 +906,6 @@ contract EscrowWithdrawalTest is EscrowTest {
   }
 
   function test_Emits_TheTrustedIssuersUnsetEvent() public {
-    // should emit the TrustedIssuersUnset event
     mintAndTransfer(
       sender,
       bytes32(0),
@@ -931,7 +930,6 @@ contract EscrowWithdrawalTest is EscrowTest {
   }
 
   function test_Emits_WithdwaralEvent() public {
-    // should emit the Withdrawal event
     mintAndTransfer(
       sender,
       bytes32(0),
@@ -1401,7 +1399,6 @@ contract EscrowRevokeTestIdentifierEmptyMinAttestations0TrustedIssuersEmpty is E
   }
 
   function test_Emits_TheTrustedIssuersUnsetEvent() public {
-    // should emit the TrustedIssuersUnset event
     vm.warp(oneDayInSecs + 1);
 
     vm.expectEmit(true, true, true, true);
@@ -1412,7 +1409,6 @@ contract EscrowRevokeTestIdentifierEmptyMinAttestations0TrustedIssuersEmpty is E
   }
 
   function test_Emits_RevokationEvent() public {
-    // should emit the Revocation event
     vm.warp(oneDayInSecs + 1);
 
     vm.expectEmit(true, true, true, true);
@@ -1554,7 +1550,6 @@ contract EscrowRevokeTestIdentifierNotEmptyMinAttestations0TrustedIssuersEmpty i
   }
 
   function test_Emits_TheTrustedIssuersUnsetEvent() public {
-    // should emit the TrustedIssuersUnset event
     vm.warp(oneDayInSecs + 1);
 
     vm.expectEmit(true, true, true, true);
@@ -1565,7 +1560,6 @@ contract EscrowRevokeTestIdentifierNotEmptyMinAttestations0TrustedIssuersEmpty i
   }
 
   function test_Emits_RevokationEvent() public {
-    // should emit the Revocation event
     vm.warp(oneDayInSecs + 1);
 
     vm.expectEmit(true, true, true, true);
@@ -1709,7 +1703,6 @@ contract EscrowRevokeTestIdentifierNotEmptyMinAttestations1TrustedIssuersNonEmpt
   }
 
   function test_Emits_TheTrustedIssuersUnsetEvent() public {
-    // should emit the TrustedIssuersUnset event
     vm.warp(oneDayInSecs + 1);
 
     vm.expectEmit(true, true, true, true);
@@ -1720,7 +1713,6 @@ contract EscrowRevokeTestIdentifierNotEmptyMinAttestations1TrustedIssuersNonEmpt
   }
 
   function test_Emits_RevokationEvent() public {
-    // should emit the Revocation event
     vm.warp(oneDayInSecs + 1);
 
     vm.expectEmit(true, true, true, true);

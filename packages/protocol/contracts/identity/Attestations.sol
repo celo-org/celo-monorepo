@@ -24,8 +24,7 @@ contract Attestations is
   Ownable,
   Initializable,
   UsingRegistry,
-  ReentrancyGuard,
-  UsingPrecompiles
+  ReentrancyGuard
 {
   using SafeMath for uint256;
   using SafeCast for uint256;
