@@ -14,10 +14,5 @@ contract EpochSizePrecompile {
   fallback (bytes calldata) external payable returns (bytes memory) {
     return abi.encodePacked(epochSize);
   }
-  //   bytes memory returnData = abi.encode(epochSize);
-  //       assembly {
-  //           let rds := mload(returnData)
-  //           return(add(returnData, 0x20), rds)
-  //       }
 
 }

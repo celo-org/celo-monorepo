@@ -752,7 +752,21 @@ contract Migration is Script, UsingRegistry {
       // TODO convert validatorIndex to string and make it a name
       // getAccounts().setName(groupName);
       // potentially create a precompile that validates everything for the proofs of posession
-      // getValidators().registerValidator(commission);
+      bytes public constant newBlsPublicKey = abi.encodePacked(
+        bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
+        bytes32(0x0202020202020202020202020202020202020202020202020202020202020203),
+        bytes32(0x0303030303030303030303030303030303030303030303030303030303030304)
+      );
+      bytes public constant newBlsPop = abi.encodePacked(
+        bytes16(0x04040404040404040404040404040405),
+        bytes16(0x05050505050505050505050505050506),
+        bytes16(0x06060606060606060606060606060607)
+      );
+      // (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
+      //   validator,
+      //   signerPk
+      // );
+      // getValidators().registerValidator(_ecdsaPubKey, newBlsPublicKey, newBlsPop);
       vm.stopBroadcast();
 
   }

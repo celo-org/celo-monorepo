@@ -5,7 +5,7 @@ set -euo pipefail
 
 # Compile everything
 export ANVIL_PORT=8546
-// TODO make this configurable
+# TODO make this configurable
 FROM_ACCOUNT=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 
 
