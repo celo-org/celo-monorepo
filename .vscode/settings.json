@@ -25,25 +25,24 @@
   "[javascriptreact]": {
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-      "source.organizeImports": true
+      "source.organizeImports": "explicit"
     }
   },
   "[typescript]": {
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-      "source.organizeImports": true
+      "source.organizeImports": "explicit"
     }
   },
   "[typescriptreact]": {
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-      "source.organizeImports": true
+      "source.organizeImports": "explicit"
     }
   },
   "javascript.format.enable": false,
   "editor.tabSize": 2,
   "editor.detectIndentation": false,
-  "tslint.jsEnable": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "[javascriptreact][typescript][typescriptreact]": {
     "editor.codeActionsOnSave": {

@@ -545,6 +545,15 @@ contract LockedGold is
     _updateDelegatedAmount(delegatorAccount);
   }
 
+  /**
+    * @notice Returns the number of pending withdrawals for the specified account.
+    * @param account The address of the account.
+    * @return The count of pending withdrawals.
+    */
+  function getTotalPendingWithdrawalsCount(address account) public view returns (uint256) {
+    return balances[account].pendingWithdrawals.length;
+  }
+
   function _updateDelegatedAmount(address delegator) private {
     address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
     EnumerableSet.AddressSet storage delegatees = delegatorInfo[delegatorAccount].delegatees;
@@ -565,6 +574,37 @@ contract LockedGold is
     address delegateeAccount = getAccounts().voteSignerToAccount(delegatee);
 
     return _updateDelegatedAmount(delegatorAccount, delegateeAccount);
+  }
+
+  /**
+   * @notice Returns the pending withdrawals from unlocked CELO for an account in a given range.
+   * @param account The address of the account.
+   * @param from The start index of the pending withdrawals.
+   * @param to The end index of the pending withdrawals.
+   * @return The value for each pending withdrawal.
+   * @return The timestamp for each pending withdrawal.
+   */
+  function getPendingWithdrawalsInBatch(address account, uint256 from, uint256 to)
+    public
+    view
+    returns (uint256[] memory, uint256[] memory)
+  {
+    uint256 pendingWithdrawalsLength = getTotalPendingWithdrawalsCount(account);
+
+    if (pendingWithdrawalsLength == 0) {
+      return (new uint256[](0), new uint256[](0));
+    }
+    require(from <= to, "Invalid range");
+    uint256 _to = Math.min(to, pendingWithdrawalsLength - 1);
+    uint256 length = _to - from + 1;
+    uint256[] memory values = new uint256[](length);
+    uint256[] memory timestamps = new uint256[](length);
+    for (uint256 i = from; i <= _to; i = i.add(1)) {
+      PendingWithdrawal memory pendingWithdrawal = balances[account].pendingWithdrawals[i];
+      values[i - from] = pendingWithdrawal.value;
+      timestamps[i - from] = pendingWithdrawal.timestamp;
+    }
+    return (values, timestamps);
   }
 
   /**
@@ -723,7 +763,7 @@ contract LockedGold is
   }
 
   /**
-   * @notice Returns the pending withdrawals from unlocked gold for an account.
+   * @notice Returns the pending withdrawals from unlocked CELO for an account.
    * @param account The address of the account.
    * @return The value for each pending withdrawal.
    * @return The timestamp for each pending withdrawal.
@@ -733,19 +773,8 @@ contract LockedGold is
     view
     returns (uint256[] memory, uint256[] memory)
   {
-    require(
-      getAccounts().isAccount(account),
-      "Unknown account: only registered accounts have pending withdrawals"
-    );
-    uint256 length = balances[account].pendingWithdrawals.length;
-    uint256[] memory values = new uint256[](length);
-    uint256[] memory timestamps = new uint256[](length);
-    for (uint256 i = 0; i < length; i = i.add(1)) {
-      PendingWithdrawal memory pendingWithdrawal = (balances[account].pendingWithdrawals[i]);
-      values[i] = pendingWithdrawal.value;
-      timestamps[i] = pendingWithdrawal.timestamp;
-    }
-    return (values, timestamps);
+    return
+      getPendingWithdrawalsInBatch(account, 0, balances[account].pendingWithdrawals.length - 1);
   }
 
   /**
@@ -768,15 +797,6 @@ contract LockedGold is
     PendingWithdrawal memory pendingWithdrawal = (balances[account].pendingWithdrawals[index]);
 
     return (pendingWithdrawal.value, pendingWithdrawal.timestamp);
-  }
-
-  /**
-    * @notice Returns the number of pending withdrawals for the specified account.
-    * @param account The address of the account.
-    * @return The count of pending withdrawals.
-    */
-  function getTotalPendingWithdrawalsCount(address account) external view returns (uint256) {
-    return balances[account].pendingWithdrawals.length;
   }
 
   /**

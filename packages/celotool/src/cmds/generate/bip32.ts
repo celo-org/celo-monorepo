@@ -1,4 +1,3 @@
-/* tslint:disable no-console */
 import {
   coerceMnemonicAccountType,
   generatePrivateKey,
@@ -44,8 +43,8 @@ export const builder = (argv: yargs.Argv) => {
  * https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
  * https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
  */
-export const handler = async (argv: Bip32Argv) => {
-  console.log(
+export const handler = (argv: Bip32Argv) => {
+  console.info(
     generatePrivateKey(argv.mnemonic, coerceMnemonicAccountType(argv.accountType), argv.index)
   )
 }

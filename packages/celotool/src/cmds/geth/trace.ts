@@ -29,7 +29,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 const sleep = (ms: number) => {
-  return new Promise((resolve: any) => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 export const handler = async (argv: TraceArgv) => {
@@ -40,7 +40,7 @@ export const handler = async (argv: TraceArgv) => {
   checkGethStarted(dataDir)
 
   let iterations = 70
-  let web3AndContracts = null
+  let web3AndContracts: Awaited<ReturnType<typeof getWeb3AndTokensContracts>> | null = null
   outerwhile: while (iterations-- > 0) {
     try {
       web3AndContracts = await getWeb3AndTokensContracts()
@@ -59,6 +59,10 @@ export const handler = async (argv: TraceArgv) => {
       await sleep(1000)
     }
   }
+  if (!web3AndContracts) {
+    console.error('bad start -- could not get contracts')
+    process.exit(1)
+  }
 
   if (iterations <= 0) {
     console.warn('Can not wait for geth to sync')
@@ -66,7 +70,7 @@ export const handler = async (argv: TraceArgv) => {
     process.exit(1)
   }
 
-  const { kit, goldToken, stableToken } = web3AndContracts!
+  const { kit, goldToken, stableToken } = web3AndContracts
 
   // This is needed to turn off debug logging which is made in `sendTransaction`
   // and needed only for mobile client.
@@ -77,7 +81,6 @@ export const handler = async (argv: TraceArgv) => {
   await traceTransactions(
     kit,
     goldToken,
-    // @ts-ignore - TODO: remove when web3 upgrade completed everywhere
     stableToken,
     [address1, address2],
     getBlockscoutUrl(argv.celoEnv)

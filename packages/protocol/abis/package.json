@@ -19,6 +19,11 @@
     "!**/*.js.map"
   ],
   "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
     "./Accounts.json": {
       "default": "./dist/Accounts.json"
     },
@@ -93,12 +98,6 @@
     },
     "./MentoFeeHandlerSeller.json": {
       "default": "./dist/MentoFeeHandlerSeller.json"
-    },
-    "./MetaTransactionWallet.json": {
-      "default": "./dist/MetaTransactionWallet.json"
-    },
-    "./MetaTransactionWalletDeployer.json": {
-      "default": "./dist/MetaTransactionWalletDeployer.json"
     },
     "./MultiSig.json": {
       "default": "./dist/MultiSig.json"
@@ -266,16 +265,6 @@
       "import": "./dist/esm/MentoFeeHandlerSeller.js",
       "require": "./dist/cjs/MentoFeeHandlerSeller.js",
       "types": "./dist/types/MentoFeeHandlerSeller.d.ts"
-    },
-    "./MetaTransactionWallet": {
-      "import": "./dist/esm/MetaTransactionWallet.js",
-      "require": "./dist/cjs/MetaTransactionWallet.js",
-      "types": "./dist/types/MetaTransactionWallet.d.ts"
-    },
-    "./MetaTransactionWalletDeployer": {
-      "import": "./dist/esm/MetaTransactionWalletDeployer.js",
-      "require": "./dist/cjs/MetaTransactionWalletDeployer.js",
-      "types": "./dist/types/MetaTransactionWalletDeployer.d.ts"
     },
     "./MultiSig": {
       "import": "./dist/esm/MultiSig.js",
@@ -456,16 +445,6 @@
       "import": "./dist/esm/web3/MentoFeeHandlerSeller.js",
       "require": "./dist/cjs/web3/MentoFeeHandlerSeller.js",
       "types": "./dist/types/web3/MentoFeeHandlerSeller.d.ts"
-    },
-    "./web3/MetaTransactionWallet": {
-      "import": "./dist/esm/web3/MetaTransactionWallet.js",
-      "require": "./dist/cjs/web3/MetaTransactionWallet.js",
-      "types": "./dist/types/web3/MetaTransactionWallet.d.ts"
-    },
-    "./web3/MetaTransactionWalletDeployer": {
-      "import": "./dist/esm/web3/MetaTransactionWalletDeployer.js",
-      "require": "./dist/cjs/web3/MetaTransactionWalletDeployer.js",
-      "types": "./dist/types/web3/MetaTransactionWalletDeployer.d.ts"
     },
     "./web3/MultiSig": {
       "import": "./dist/esm/web3/MultiSig.js",

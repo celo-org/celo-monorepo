@@ -12,7 +12,6 @@ and other packages. The source code for the Celo Blockchain which operates a nod
 <!-- row 1 - status -->
 
 [![GitHub Actions](https://github.com/celo-org/celo-monorepo/actions/workflows/container-all-monorepo.yml/badge.svg)](https://github.com/celo-org/celo-monorepo/actions/workflows/container-all-monorepo.yml)
-[![Codecov](https://img.shields.io/codecov/c/github/celo-org/celo-monorepo)](https://codecov.io/gh/celo-org/celo-monorepo)
 [![GitHub contributors](https://img.shields.io/github/contributors/celo-org/celo-monorepo)](https://github.com/celo-org/celo-monorepo/graphs/contributors)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/w/celo-org/celo-monorepo)](https://github.com/celo-org/celo-monorepo/graphs/contributors)
 [![GitHub Stars](https://img.shields.io/github/stars/celo-org/celo-monorepo.svg)](https://github.com/celo-org/celo-monorepo/stargazers)
@@ -105,7 +104,6 @@ See the [issue backlog](https://github.com/celo-org/celo-monorepo/issues) for a 
 The repository has the following packages (sub projects):
 
 - [celotool](packages/celotool) - scripts for deploying and managing testnets
-- [dev-utils](packages/dev-utils) - a utils package for use as a dev dependency
 - [helm-charts](packages/helm-charts) - (DEPRECATED) templatized deployments of entire environments to Kubernetes clusters. Check [celo-org/charts](https://github.com/celo-org/charts) instead.
 - [protocol](packages/protocol) - identity, stability and other smart contracts for the Celo protocol ([docs](https://docs.celo.org/protocol))
 

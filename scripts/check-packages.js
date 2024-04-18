@@ -55,7 +55,7 @@ function getErrors(pkgJson) {
 
 const errors = [].concat(...pkgJsons.map(getErrors).filter((err) => err.length > 0))
 
-console.log(
+console.info(
   errors
     .map(
       (err) =>

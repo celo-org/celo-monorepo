@@ -45,7 +45,7 @@ jobs:
           yarn --cwd packages/protocol devchain generate-tar devchain/devchain.tar.gz --release_gold_contracts $GRANTS_FILE
           mv packages/protocol/build/contracts* devchain/
       - name: Upload devchain as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: devchain-${{ matrix.tag }}
           path: devchain
