@@ -4,9 +4,9 @@ pragma experimental ABIEncoderV2;
 
 import { Test } from "celo-foundry/Test.sol";
 import { SortedOracles } from "../../contracts/stability/SortedOracles.sol";
-import "../../contracts/common/FixidityLib.sol";
-import "../../contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol";
-import "../../contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
+import "@celo-contracts/common/FixidityLib.sol";
+import "@celo-contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol";
+import "@celo-contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
 import { Constants } from "../constants.sol";
 import "forge-std/console.sol";
 
@@ -68,7 +68,7 @@ contract SetReportExpiry is SortedOraclesTest {
     assertEq(sortedOracle.reportExpirySeconds(), newReportExpiry);
   }
 
-  function test_ShouldEmitReportExpirySetEvent() public {
+  function test_Emits_ReportExpirySetEvent() public {
     uint256 newReportExpiry = reportExpiry * 2;
     vm.expectEmit(true, true, true, true);
     emit ReportExpirySet(newReportExpiry);
@@ -150,7 +150,7 @@ contract SetTokenReportExpiry is SortedOraclesTest {
     assertEq(sortedOracle.tokenReportExpirySeconds(aToken), newReportExpiry);
   }
 
-  function test_ShouldEmitTokenReportExpirySetEvent() public {
+  function test_Emits_TokenReportExpirySetEvent() public {
     uint256 newReportExpiry = reportExpiry * 2;
     vm.expectEmit(true, true, true, true);
     emit TokenReportExpirySet(aToken, newReportExpiry);
@@ -170,7 +170,7 @@ contract AddOracle is SortedOraclesTest {
     assertEq(sortedOracle.isOracle(aToken, oracleAccount), true);
   }
 
-  function test_ShouldEmitOracleAddedEvent() public {
+  function test_Emits_OracleAddedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit OracleAdded(aToken, oracleAccount);
     sortedOracle.addOracle(aToken, oracleAccount);
@@ -430,14 +430,14 @@ contract RemoveOracle is SortedOraclesTest {
     assertEq(sortedOracle.numTimestamps(aToken), 1);
   }
 
-  function test_ShouldEmitOracleRemoved_WhenTHereIsMOreThanOneReportMade() public {
+  function test_Emits_OracleRemoved_WhenTHereIsMOreThanOneReportMade() public {
     helper_WhenThereIsMoreThanOneReportMade();
     vm.expectEmit(true, true, true, true);
     emit OracleRemoved(aToken, oracleAccount2);
     sortedOracle.removeOracle(aToken, oracleAccount2, 1);
   }
 
-  function test_ShouldEmitOracleReportRemoved_WhenTHereIsMOreThanOneReportMade() public {
+  function test_Emits_OracleReportRemoved_WhenTHereIsMOreThanOneReportMade() public {
     helper_WhenThereIsMoreThanOneReportMade();
 
     vm.expectEmit(true, true, true, true);
@@ -445,7 +445,7 @@ contract RemoveOracle is SortedOraclesTest {
     sortedOracle.removeOracle(aToken, oracleAccount2, 1);
   }
 
-  function test_ShouldEmitMedianUpdatedEvents_WhenTHereIsMOreThanOneReportMade() public {
+  function test_Emits_MedianUpdatedEvents_WhenTHereIsMOreThanOneReportMade() public {
     helper_WhenThereIsMoreThanOneReportMade();
     vm.expectEmit(true, true, true, true);
     emit MedianUpdated(aToken, FIXED1);
@@ -509,7 +509,7 @@ contract RemoveOracle is SortedOraclesTest {
 
   // TODO: add test for not emitting any of the remove events once we migrate to 0.8
 
-  function test_ShouldEmitOracleRemovedEvent() public {
+  function test_Emits_OracleRemovedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit OracleRemoved(aToken, oracleAccount);
     sortedOracle.removeOracle(aToken, oracleAccount, 0);
@@ -609,14 +609,14 @@ contract Report is SortedOraclesTest {
     assertEq(sortedOracle.numTimestamps(aToken), 1);
   }
 
-  function test_ShouldEmitOracleReportedEvent() public {
+  function test_Emits_OracleReportedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit OracleReported(aToken, oracleAccount, now, value);
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, value, address(0), address(0));
   }
 
-  function test_ShouldEmitMedianUpdatedEvent() public {
+  function test_Emits_MedianUpdatedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit MedianUpdated(aToken, value);
     vm.prank(oracleAccount);

@@ -395,7 +395,7 @@ contract AttestationsSetAttestationsExpirySeconds is AttestationsFoundryTest {
     assertEq(attestationsTest.attestationExpiryBlocks(), newMaxNumBlocksPerAttestation);
   }
 
-  function test_ShouldEmitAttestationExpiryBlocksSetEvent() public {
+  function test_Emits_AttestationExpiryBlocksSetEvent() public {
     vm.expectEmit(true, true, true, true);
     emit AttestationExpiryBlocksSet(newMaxNumBlocksPerAttestation);
     attestationsTest.setAttestationExpiryBlocks(newMaxNumBlocksPerAttestation);
@@ -425,7 +425,7 @@ contract AttestationsSetAttestationsRequestFee is AttestationsFoundryTest {
     attestationsTest.setAttestationRequestFee(address(mockERC20Token), 0);
   }
 
-  function test_ShouldEmitAttestationRequestFeeSetEvent() public {
+  function test_Emits_AttestationRequestFeeSetEvent() public {
     vm.expectEmit(true, true, true, true);
     emit AttestationRequestFeeSet(address(mockERC20Token), newAttestationFee);
     attestationsTest.setAttestationRequestFee(address(mockERC20Token), newAttestationFee);
@@ -450,7 +450,7 @@ contract AttestationsSetSelectedIssuersWaitBlock is AttestationsFoundryTest {
     assertEq(attestationsTest.selectIssuersWaitBlocks(), newSelectIssuersWaitBlocks);
   }
 
-  function test_ShouldEmitAttestationRequestFeeSetEvent() public {
+  function test_Emits_AttestationRequestFeeSetEvent() public {
     vm.expectEmit(true, true, true, true);
     emit SelectIssuersWaitBlocksSet(newSelectIssuersWaitBlocks);
     attestationsTest.setSelectIssuersWaitBlocks(newSelectIssuersWaitBlocks);
@@ -475,7 +475,7 @@ contract AttestationsSetMaxAttestations is AttestationsFoundryTest {
     assertEq(attestationsTest.maxAttestations(), newMaxAttestations);
   }
 
-  function test_ShouldEmitAttestationRequestFeeSetEvent() public {
+  function test_Emits_AttestationRequestFeeSetEvent() public {
     vm.expectEmit(true, true, true, true);
     emit MaxAttestationsSet(newMaxAttestations);
     attestationsTest.setMaxAttestations(newMaxAttestations);
@@ -520,7 +520,7 @@ contract AttestationsWithdraw is AttestationsFoundryTest {
     attestationsTest.withdraw(address(mockERC20Token));
   }
 
-  function test_ShouldEmitTheWithdrawalEvent() public {
+  function test_Emits_TheWithdrawalEvent() public {
     vm.expectEmit(true, true, true, true);
     emit Withdrawal(issuer, address(mockERC20Token), attestationFee);
     vm.prank(issuer);

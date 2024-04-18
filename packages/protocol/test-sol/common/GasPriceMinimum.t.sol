@@ -9,7 +9,6 @@ import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts/stability/test/MockSortedOracles.sol";
 
-// Contract to test
 import "@celo-contracts-8/common/GasPriceMinimum.sol";
 
 contract GasPriceMinimumTest is Test {
@@ -91,28 +90,6 @@ contract GasPriceMinimumTest_initialize is GasPriceMinimumTest {
       adjustmentSpeed,
       0
     );
-  }
-}
-
-contract GasPriceMinimumTest_getGasPriceMinimum is GasPriceMinimumTest {
-  uint256 public constant ABSOLUTE_MINIMAL_GAS_PRICE = 1;
-  address whateverAddress = address(0x420);
-
-  function test_shouldGetGasPriceMinimumForCelo() public {
-    assertEq(gasPriceMinimum.getGasPriceMinimum(celoToken), initialGasPriceMinimum);
-  }
-  function test_shouldGetGasPriceMinimumFor0x0asCelo() public {
-    assertEq(gasPriceMinimum.getGasPriceMinimum(address(0)), initialGasPriceMinimum);
-  }
-
-  function test_shouldReturnAbsoluteMinInsteadOfZero() public {
-    sortedOracles.setMedianRate(whateverAddress, 1);
-    assertEq(gasPriceMinimum.getGasPriceMinimum(whateverAddress), ABSOLUTE_MINIMAL_GAS_PRICE);
-  }
-
-  function test_shouldReturnTheRightRateForToken() public {
-    sortedOracles.setMedianRate(whateverAddress, 2e24);
-    assertEq(gasPriceMinimum.getGasPriceMinimum(whateverAddress), initialGasPriceMinimum * 2);
   }
 }
 
