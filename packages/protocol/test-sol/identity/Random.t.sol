@@ -4,7 +4,6 @@ pragma solidity ^0.5.13;
 import "celo-foundry/Test.sol";
 import { Utils } from "@test-sol/utils.sol";
 
-// Contract to test
 import "@celo-contracts/identity/Random.sol";
 import "@celo-contracts/identity/test/RandomTest.sol";
 
@@ -23,7 +22,7 @@ contract SetRandomnessRetentionWindow is Test {
     assertEq(random.randomnessBlockRetentionWindow(), 1000);
   }
 
-  function test_ShouldEmitTheEvent() public {
+  function test_Emits_TheEvent() public {
     vm.expectEmit(true, true, true, true);
     emit RandomnessBlockRetentionWindowSet(1000);
     random.setRandomnessBlockRetentionWindow(1000);

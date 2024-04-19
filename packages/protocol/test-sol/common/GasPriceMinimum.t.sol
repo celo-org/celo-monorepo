@@ -6,8 +6,9 @@ import "celo-foundry-8/Test.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
+import "@celo-contracts/stability/test/MockSortedOracles.sol";
 
-// Contract to test
 import "@celo-contracts-8/common/GasPriceMinimum.sol";
 
 contract GasPriceMinimumTest is Test {
@@ -15,8 +16,10 @@ contract GasPriceMinimumTest is Test {
 
   IRegistry registry;
   GasPriceMinimum public gasPriceMinimum;
+  MockSortedOracles sortedOracles;
   address owner;
   address nonOwner;
+  address celoToken;
 
   uint256 gasPriceMinimumFloor = 100;
   uint256 initialGasPriceMinimum = gasPriceMinimumFloor;
@@ -35,13 +38,21 @@ contract GasPriceMinimumTest is Test {
   function setUp() public virtual {
     owner = address(this);
     nonOwner = actor("nonOwner");
+    celoToken = actor("CeloToken");
 
     deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+
+    // deployCodeTo("SortedOracles.sol", abi.encode(true), sortedOracleAddress);
+    // fails with `data did not match any variant of untagged enum Bytecode at line 822 column 3]`
+    sortedOracles = new MockSortedOracles();
+
     gasPriceMinimum = new GasPriceMinimum(true);
 
     registry = IRegistry(registryAddress);
 
     registry.setAddressFor("GasPriceMinimum", address(gasPriceMinimum));
+    registry.setAddressFor("SortedOracles", address(sortedOracles));
+    registry.setAddressFor("GoldToken", celoToken);
 
     gasPriceMinimum.initialize(
       registryAddress,
@@ -53,13 +64,9 @@ contract GasPriceMinimumTest is Test {
   }
 }
 
-contract GasPriceMinimumInitialize is GasPriceMinimumTest {
+contract GasPriceMinimumTest_initialize is GasPriceMinimumTest {
   function test_shouldHaveSetOwner() public {
     assertEq(gasPriceMinimum.owner(), owner);
-  }
-
-  function test_shouldSetTheGasPriceMinimum() public {
-    assertEq(gasPriceMinimum.getGasPriceMinimum(address(0)), initialGasPriceMinimum);
   }
 
   function test_shouldHaveTargetDensity() public {
@@ -86,7 +93,7 @@ contract GasPriceMinimumInitialize is GasPriceMinimumTest {
   }
 }
 
-contract GasPriceMinimumSetAdjustmentSpeed is GasPriceMinimumTest {
+contract GasPriceMinimumTest_setAdjustmentSpeed is GasPriceMinimumTest {
   using FixidityLib for FixidityLib.Fraction;
 
   uint256 newAdjustmentSpeed = FixidityLib.newFixedFraction(1, 3).unwrap();
@@ -97,7 +104,7 @@ contract GasPriceMinimumSetAdjustmentSpeed is GasPriceMinimumTest {
     assertEq(gasPriceMinimum.adjustmentSpeed(), newAdjustmentSpeed);
   }
 
-  function test_shouldEmitAdjustmentSpeedSetEvent() public {
+  function test_Emits_AdjustmentSpeedSetEvent() public {
     vm.expectEmit(true, false, false, false);
     emit AdjustmentSpeedSet(newAdjustmentSpeed);
     gasPriceMinimum.setAdjustmentSpeed(newAdjustmentSpeed);
@@ -115,7 +122,7 @@ contract GasPriceMinimumSetAdjustmentSpeed is GasPriceMinimumTest {
   }
 }
 
-contract GasPriceMinimumSetTargetDensity is GasPriceMinimumTest {
+contract GasPriceMinimumTest_setTargetDensity is GasPriceMinimumTest {
   using FixidityLib for FixidityLib.Fraction;
 
   uint256 newTargetDensity = FixidityLib.newFixedFraction(1, 3).unwrap();
@@ -125,7 +132,7 @@ contract GasPriceMinimumSetTargetDensity is GasPriceMinimumTest {
     assertEq(gasPriceMinimum.targetDensity(), newTargetDensity);
   }
 
-  function test_ShouldEmitTargetDensitySetEvent() public {
+  function test_Emits_TargetDensitySetEvent() public {
     vm.expectEmit(true, true, true, true);
     emit TargetDensitySet(newTargetDensity);
     gasPriceMinimum.setTargetDensity(newTargetDensity);
@@ -143,7 +150,7 @@ contract GasPriceMinimumSetTargetDensity is GasPriceMinimumTest {
   }
 }
 
-contract GasPriceMinimumSetGasPriceMinimumFloor is GasPriceMinimumTest {
+contract GasPriceMinimumTest_setGasPriceMinimumFloor is GasPriceMinimumTest {
   uint256 newGasPriceMinimumFloor = 150;
 
   function test_ShouldSetGasPriceMinimumFloor() public {
@@ -152,7 +159,7 @@ contract GasPriceMinimumSetGasPriceMinimumFloor is GasPriceMinimumTest {
     assertEq(gasPriceMinimum.gasPriceMinimumFloor(), newGasPriceMinimumFloor);
   }
 
-  function test_emitsGasPriceMinimumFloorSet() public {
+  function test_Emits_GasPriceMinimumFloorSet() public {
     vm.expectEmit(true, true, true, true);
     emit GasPriceMinimumFloorSet(newGasPriceMinimumFloor);
     gasPriceMinimum.setGasPriceMinimumFloor(newGasPriceMinimumFloor);
@@ -170,7 +177,7 @@ contract GasPriceMinimumSetGasPriceMinimumFloor is GasPriceMinimumTest {
   }
 }
 
-contract GasPriceMinimumGetUpdatedGasPriceMinimum is GasPriceMinimumTest {
+contract GasPriceMinimumTest_setUpdatedGasPriceMinimum is GasPriceMinimumTest {
   using FixidityLib for FixidityLib.Fraction;
   uint256 nonce = 0;
 

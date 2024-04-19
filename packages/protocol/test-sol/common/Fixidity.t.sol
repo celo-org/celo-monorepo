@@ -3,7 +3,6 @@ pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
 
-// Contract to test
 import "@celo-contracts/common/test/FixidityWrapper.sol";
 
 contract FixidityTest is Test {
