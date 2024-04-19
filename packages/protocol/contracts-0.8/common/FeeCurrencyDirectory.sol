@@ -12,8 +12,8 @@ interface IOracle {
 }
 
 contract FeeCurrencyDirectory is Initializable, Ownable {
-  mapping(address => CurrencyConfig) public whitelistedCurrencies;
-  address[] private whitelistedCurrencyList;
+  mapping(address => CurrencyConfig) public currencies;
+  address[] private currencyList;
 
   struct CurrencyConfig {
     address currencyIdentifier;
@@ -47,73 +47,67 @@ contract FeeCurrencyDirectory is Initializable, Ownable {
     require(currencyIdentifier != address(0), "Currency identifier cannot be zero");
     require(oracle != address(0), "Oracle address cannot be zero");
     require(intrinsicGas > 0, "Intrinsic gas cannot be zero");
+    require(
+      currencies[token].currencyIdentifier == address(0),
+      "Currency already in the directory"
+    );
 
-    whitelistedCurrencies[token] = CurrencyConfig({
+    currencies[token] = CurrencyConfig({
       currencyIdentifier: currencyIdentifier,
       oracle: oracle,
       intrinsicGas: intrinsicGas
     });
-    whitelistedCurrencyList.push(token);
+    currencyList.push(token);
   }
 
   /**
-     * @notice Removes a token from the whitelist.
+     * @notice Removes a token from the directory.
      * @dev This action can only be performed by the contract owner.
      * @param token The token address to remove.
-     * @param index The index in the list of whitelisted currencies.
+     * @param index The index in the list of directory currencies.
      */
-  function removeWhitelistedCurrencies(address token, uint256 index) external onlyOwner {
-    require(index < whitelistedCurrencyList.length, "Index out of bounds");
-    require(whitelistedCurrencyList[index] == token, "Index does not match token");
+  function removeCurrencies(address token, uint256 index) external onlyOwner {
+    require(index < currencyList.length, "Index out of bounds");
+    require(currencyList[index] == token, "Index does not match token");
 
-    delete whitelistedCurrencies[token];
-    whitelistedCurrencyList[index] = whitelistedCurrencyList[whitelistedCurrencyList.length - 1];
-    whitelistedCurrencyList.pop();
+    delete currencies[token];
+    currencyList[index] = currencyList[currencyList.length - 1];
+    currencyList.pop();
   }
 
   /**
-     * @notice Converts the gas price from CELO to another token.
-     * @param token The token address for which to translate the gas price.
-     * @param priceInCelo The price in CELO.
-     * @return gasInToken The converted gas price in the token.
+     * @notice Returns the list of all currency addresses.
+     * @return An array of addresses.
      */
-  function translateGasPrice(address token, uint256 priceInCelo)
-    public
-    view
-    returns (uint256 gasInToken)
-  {
-    uint256 pricePerUnit = getPrice(token);
-    return priceInCelo * pricePerUnit;
+  function getCurrencies() public view returns (address[] memory) {
+    return currencyList;
   }
 
   /**
-     * @notice Returns the list of all whitelisted currency addresses.
-     * @return An array of addresses that are whitelisted.
-     */
-  function getWhitelistedCurrencies() public view returns (address[] memory) {
-    return whitelistedCurrencyList;
-  }
-
-  /**
-     * @notice Returns the configuration for a whitelisted currency.
+     * @notice Returns the configuration for a currency.
      * @param token The address of the token.
      * @return Currency configuration of the token.
      */
-  function getWhitelistedCurrencyConfig(address token) public view returns (CurrencyConfig memory) {
-    return whitelistedCurrencies[token];
+  function getCurrencyConfig(address token) public view returns (CurrencyConfig memory) {
+    return currencies[token];
   }
 
   /**
-     * @notice Retrieves the price of the token in terms of CELO.
+     * @notice Retrieves exchange rate between token and CELO.
      * @param token The token address whose price is to be fetched.
-     * @return The price of the token in CELO.
+     * @return numerator The exchange rate numerator.
+     * @return denominator The exchange rate denominator.
      */
-  function getPrice(address token) public view returns (uint256) {
-    CurrencyConfig memory currencyConfig = getWhitelistedCurrencyConfig(token);
-    require(currencyConfig.currencyIdentifier != address(0), "Currency not whitelisted");
-    (uint256 numerator, uint256 denominator, ) = IOracle(whitelistedCurrencies[token].oracle)
-      .getExchangeRateFor(currencyConfig.currencyIdentifier);
-    return numerator / denominator;
+  function getExchangeRate(address token)
+    public
+    view
+    returns (uint256 numerator, uint256 denominator)
+  {
+    CurrencyConfig memory currencyConfig = getCurrencyConfig(token);
+    require(currencyConfig.currencyIdentifier != address(0), "Currency not in the directory");
+    (numerator, denominator, ) = IOracle(currencies[token].oracle).getExchangeRateFor(
+      currencyConfig.currencyIdentifier
+    );
   }
 
   /**

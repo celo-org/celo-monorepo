@@ -43,11 +43,9 @@ contract TestSetCurrencyConfig is FeeCurrencyDirectoryTestBase {
     address token = address(1);
     uint256 intrinsicGas = 21000;
     directory.setCurrencyConfig(token, tokenIdentifier, address(oracle), intrinsicGas);
-    FeeCurrencyDirectory.CurrencyConfig memory config = directory.getWhitelistedCurrencyConfig(
-      token
-    );
+    FeeCurrencyDirectory.CurrencyConfig memory config = directory.getCurrencyConfig(token);
 
-    assertEq(directory.getWhitelistedCurrencies().length, 1);
+    assertEq(directory.getCurrencies().length, 1);
     assertEq(config.currencyIdentifier, tokenIdentifier);
     assertEq(config.oracle, address(oracle));
     assertEq(config.intrinsicGas, intrinsicGas);
@@ -80,35 +78,41 @@ contract TestSetCurrencyConfig is FeeCurrencyDirectoryTestBase {
     vm.expectRevert(bytes("Intrinsic gas cannot be zero"));
     directory.setCurrencyConfig(token, address(2), address(oracle), 0);
   }
+
+  function test_Reverts_CurrencyAlreadyWhitelisted() public {
+    address token = address(1);
+    uint256 intrinsicGas = 21000;
+    directory.setCurrencyConfig(token, tokenIdentifier, address(oracle), intrinsicGas);
+    vm.expectRevert(bytes("Currency already in the directory"));
+    directory.setCurrencyConfig(token, tokenIdentifier, address(oracle), intrinsicGas);
+  }
 }
 
-contract TestRemoveWhitelistedCurrencies is FeeCurrencyDirectoryTestBase {
+contract TestRemoveCurrencies is FeeCurrencyDirectoryTestBase {
   function setUp() public override {
     super.setUp();
     address token = address(4);
     directory.setCurrencyConfig(token, tokenIdentifier, address(oracle), 21000);
   }
 
-  function test_RemoveWhitelistedCurrencies() public {
+  function test_RemoveCurrencies() public {
     address token = address(4);
-    directory.removeWhitelistedCurrencies(token, 0);
-    FeeCurrencyDirectory.CurrencyConfig memory config = directory.getWhitelistedCurrencyConfig(
-      token
-    );
-    assertEq(directory.getWhitelistedCurrencies().length, 0);
+    directory.removeCurrencies(token, 0);
+    FeeCurrencyDirectory.CurrencyConfig memory config = directory.getCurrencyConfig(token);
+    assertEq(directory.getCurrencies().length, 0);
     assertEq(config.currencyIdentifier, address(0));
   }
 
-  function test_Reverts_WhenNonOwnerRemovesWhitelistedCurrencies() public {
+  function test_Reverts_WhenNonOwnerRemovesCurrencies() public {
     address token = address(4);
     vm.prank(nonOwner);
     vm.expectRevert("Ownable: caller is not the owner");
-    directory.removeWhitelistedCurrencies(token, 0);
+    directory.removeCurrencies(token, 0);
   }
 
   function test_Reverts_WhenInvalidIndex() public {
     vm.expectRevert(bytes("Index out of bounds"));
-    directory.removeWhitelistedCurrencies(address(4), 1); // Index 1 is out of bounds for only one item
+    directory.removeCurrencies(address(4), 1); // Index 1 is out of bounds for only one item
   }
 
   function test_Reverts_WhenMismatchedTokenAndIndex() public {
@@ -116,7 +120,7 @@ contract TestRemoveWhitelistedCurrencies is FeeCurrencyDirectoryTestBase {
     directory.setCurrencyConfig(token, address(oracle), address(oracle), 21000);
 
     vm.expectRevert(bytes("Index does not match token"));
-    directory.removeWhitelistedCurrencies(token, 0); // Index 0 is associated with address(4), not address(5)
+    directory.removeCurrencies(token, 0); // Index 0 is associated with address(4), not address(5)
   }
 }
 
@@ -131,34 +135,13 @@ contract TestGetPrice is FeeCurrencyDirectoryTestBase {
   }
 
   function test_ReturnsPriceSuccessfully() public {
-    uint256 price = directory.getPrice(token);
-    assertEq(price, 50); // Expecting 50 since 200 / 4 = 50
+    (uint256 numerator, uint256 denominator) = directory.getExchangeRate(token);
+    assertEq(numerator, 200); // Expecting 50 since 200 / 4 = 50
+    assertEq(denominator, 4); // Expecting 50 since 200 / 4 = 50
   }
 
   function test_Reverts_WhenTokenDoesntExist() public {
-    vm.expectRevert("Currency not whitelisted");
-    directory.getPrice(address(4));
-  }
-}
-
-contract TestTranslateGasPrice is FeeCurrencyDirectoryTestBase {
-  address token;
-
-  function setUp() public override {
-    super.setUp();
-    oracle.setExchangeRate(200, 4); // 50:1 ratio
-    token = address(3);
-    directory.setCurrencyConfig(token, tokenIdentifier, address(oracle), 21000);
-  }
-
-  function test_ReturnsGasPriceSuccessfully() public {
-    uint256 priceInCelo = 100; // Expecting 5000 since 100 * 50 = 5000
-    uint256 gasInToken = directory.translateGasPrice(token, priceInCelo);
-    assertEq(gasInToken, 5000);
-  }
-
-  function test_Reverts_WhenTokenDoesntExist() public {
-    vm.expectRevert("Currency not whitelisted");
-    directory.translateGasPrice(address(4), 100);
+    vm.expectRevert("Currency not in the directory");
+    directory.getExchangeRate(address(4));
   }
 }
