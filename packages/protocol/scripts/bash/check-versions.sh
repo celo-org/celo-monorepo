@@ -52,6 +52,7 @@ yarn ts-node scripts/check-backward.ts sem_check \
   --old_contracts $BRANCH_BUILD_DIR/contracts \
   --new_contracts $NEW_BRANCH_BUILD_DIR/contracts \
   --exclude $CONTRACT_EXCLUSION_REGEX \
+  --new_branch $NEW_BRANCH \
   $REPORT_FLAG
 
 git checkout $CURRENT_HASH -- migrationsConfig.js
