@@ -8,7 +8,7 @@ import {
   compareStorageLayouts,
   getStorageLayout
 } from '@openzeppelin/upgrades';
-const  Web3 = require('web3')
+const Web3 = require('web3')
 
 const web3 = new Web3(null)
 
@@ -42,7 +42,7 @@ export const getLayout = (artifact: Artifact, artifacts: BuildArtifacts) => {
 
 const selectIncompatibleOperations = (diff: Operation[]) =>
   diff.filter(operation => operation.action !== 'append'
-  && !(operation.action === 'rename' && (`deprecated_${operation.original.label}` === operation.updated.label && operation.original.type === operation.updated.type)))
+    && !(operation.action === 'rename' && (`deprecated_${operation.original.label}` === operation.updated.label && operation.original.type === operation.updated.type)))
 
 export interface ASTStorageCompatibilityReport {
   contract: string
@@ -117,7 +117,7 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo, structEx
       if (oldMember.label !== newMember.label && `deprecated_${oldMember.label}` !== newMember.label) {
         return `struct ${newType.label} had ${oldMember.label} in slot ${i}, now has ${newMember.label}`
       }
-  
+
       if (oldMember.type !== newMember.type) {
         return `struct ${newType.label}'s member ${newMember.label} changed type from ${oldMember.type} to ${newMember.type}`
       }
@@ -164,7 +164,7 @@ const isStructExpandable = (oldType: TypeInfo, oldLayout: StorageLayoutInfo) => 
   return !oldLayout.storage.some(storage => storage.type === structString)
 }
 
-const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayout: StorageLayoutInfo): {compatible: boolean, errors: any[], expanded?: boolean} => {
+const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayout: StorageLayoutInfo): { compatible: boolean, errors: any[], expanded?: boolean } => {
   let compatible = true
   let errors = []
   let expanded: boolean
@@ -191,40 +191,43 @@ const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLay
   }
 }
 
-export const generateCompatibilityReport  = (oldArtifact: Artifact, oldArtifacts: BuildArtifacts,
-                       newArtifact: Artifact, newArtifacts: BuildArtifacts)
-                       : {contract: string, compatible: boolean, errors: any[], expanded?: boolean } => {
-      const oldLayout = getLayout(oldArtifact, oldArtifacts)
-      const newLayout = getLayout(newArtifact, newArtifacts)
-      const layoutReport = generateLayoutCompatibilityReport(oldLayout, newLayout)
-      const structsReport = generateStructsCompatibilityReport(oldLayout, newLayout)
+export const generateCompatibilityReport = (oldArtifact: Artifact, oldArtifacts: BuildArtifacts,
+  newArtifact: Artifact, newArtifacts: BuildArtifacts)
+  : { contract: string, compatible: boolean, errors: any[], expanded?: boolean } => {
+  const oldLayout = getLayout(oldArtifact, oldArtifacts)
+  const newLayout = getLayout(newArtifact, newArtifacts)
+  const layoutReport = generateLayoutCompatibilityReport(oldLayout, newLayout)
+  const structsReport = generateStructsCompatibilityReport(oldLayout, newLayout)
 
-      return {
-        contract: newArtifact.contractName,
-        compatible: layoutReport.compatible && structsReport.compatible,
-        errors: layoutReport.errors.concat(structsReport.errors),
-        expanded: structsReport.expanded
-      }
+  return {
+    contract: newArtifact.contractName,
+    compatible: layoutReport.compatible && structsReport.compatible,
+    errors: layoutReport.errors.concat(structsReport.errors),
+    expanded: structsReport.expanded
+  }
 }
 
-export const reportLayoutIncompatibilities = (oldArtifacts: BuildArtifacts, newArtifactsSets: BuildArtifacts[]): ASTStorageCompatibilityReport[] => {
+export const reportLayoutIncompatibilities = (oldArtifactsSet: BuildArtifacts[], newArtifactsSets: BuildArtifacts[]): ASTStorageCompatibilityReport[] => {
   let out: ASTStorageCompatibilityReport[] = []
   for (const newArtifacts of newArtifactsSets) {
     const reports = newArtifacts.listArtifacts().map((newArtifact) => {
-      const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
-      if (oldArtifact !== undefined) {
-        return generateCompatibilityReport(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
-      } else {
-        // Generate an empty report for new contracts, which are, by definition, backwards
-        // compatible.
-        return {
-          contract: newArtifact.contractName,
-          compatible: true,
-          errors: []
+
+      for (const oldArtifacts of oldArtifactsSet) {
+        const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
+        if (oldArtifact !== undefined) {
+          return generateCompatibilityReport(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
         }
       }
+
+      // Generate an empty report for new contracts, which are, by definition, backwards
+      // compatible.
+      return {
+        contract: newArtifact.contractName,
+        compatible: true,
+        errors: []
+      }
     })
-    
+
     out = [...out, ...reports]
   }
   return out
