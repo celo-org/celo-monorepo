@@ -86,14 +86,6 @@ contract FederatedAttestations is
   constructor(bool test) public Initializable(test) {}
 
   /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
-  }
-
-  /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    */
   function initialize() external initializer {
@@ -264,6 +256,14 @@ contract FederatedAttestations is
       }
     }
     return (countsPerIssuer, identifiers);
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 0, 0);
   }
 
   /**

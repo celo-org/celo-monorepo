@@ -76,6 +76,141 @@ library TypedMemView {
   bytes private constant NIBBLE_LOOKUP = "0123456789abcdef";
 
   /**
+     * @notice          Copies the referenced memory to a new loc in memory, returning a `bytes` pointing to
+     *                  the new memory
+     * @dev             Shortcuts if the pointers are identical, otherwise compares type and digest.
+     * @param memView   The view
+     * @return          ret - The view pointing to the new memory
+     */
+  function clone(bytes29 memView) internal view returns (bytes memory ret) {
+    uint256 ptr;
+    uint256 _len = len(memView);
+    assembly {
+      // solium-disable-previous-line security/no-inline-assembly
+      ptr := mload(0x40) // load unused memory pointer
+      ret := ptr
+    }
+    unsafeCopyTo(memView, ptr + 0x20);
+    assembly {
+      // solium-disable-previous-line security/no-inline-assembly
+      mstore(0x40, add(add(ptr, _len), 0x20)) // write new unused pointer
+      mstore(ptr, _len) // write len of new array (in bytes)
+    }
+  }
+
+  /**
+     * @notice          Produce the keccak256 digest of the concatenated contents of multiple views.
+     * @param memViews  The views
+     * @return          bytes32 - The keccak256 digest
+     */
+  function joinKeccak(bytes29[] memory memViews) internal view returns (bytes32) {
+    uint256 ptr;
+    assembly {
+      // solium-disable-previous-line security/no-inline-assembly
+      ptr := mload(0x40) // load unused memory pointer
+    }
+    return keccak(unsafeJoin(memViews, ptr));
+  }
+
+  /**
+     * @notice          Produce the sha256 digest of the concatenated contents of multiple views.
+     * @param memViews  The views
+     * @return          bytes32 - The sha256 digest
+     */
+  function joinSha2(bytes29[] memory memViews) internal view returns (bytes32) {
+    uint256 ptr;
+    assembly {
+      // solium-disable-previous-line security/no-inline-assembly
+      ptr := mload(0x40) // load unused memory pointer
+    }
+    return sha2(unsafeJoin(memViews, ptr));
+  }
+
+  /**
+     * @notice          copies all views, joins them into a new bytearray.
+     * @param memViews  The views
+     * @return          ret - The new byte array
+     */
+  function join(bytes29[] memory memViews) internal view returns (bytes memory ret) {
+    uint256 ptr;
+    assembly {
+      // solium-disable-previous-line security/no-inline-assembly
+      ptr := mload(0x40) // load unused memory pointer
+    }
+
+    bytes29 _newView = unsafeJoin(memViews, ptr + 0x20);
+    uint256 _written = len(_newView);
+    uint256 _footprint = footprint(_newView);
+
+    assembly {
+      // solium-disable-previous-line security/no-inline-assembly
+      // store the legnth
+      mstore(ptr, _written)
+      // new pointer is old + 0x20 + the footprint of the body
+      mstore(0x40, add(add(ptr, _footprint), 0x20))
+      ret := ptr
+    }
+  }
+
+  /**
+     * @notice          Return the sha2 digest of the underlying memory.
+     * @dev             We explicitly deallocate memory afterwards.
+     * @param memView   The view
+     * @return          digest - The sha2 hash of the underlying memory
+     */
+  function sha2(bytes29 memView) internal view returns (bytes32 digest) {
+    uint256 _loc = loc(memView);
+    uint256 _len = len(memView);
+
+    bool res;
+    assembly {
+      // solium-disable-previous-line security/no-inline-assembly
+      let ptr := mload(0x40)
+      res := staticcall(gas, 2, _loc, _len, ptr, 0x20) // sha2 #1
+      digest := mload(ptr)
+    }
+    require(res, "sha2 OOG");
+  }
+
+  /**
+     * @notice          Implements bitcoin's hash160 (rmd160(sha2()))
+     * @param memView   The pre-image
+     * @return          digest - the Digest
+     */
+  function hash160(bytes29 memView) internal view returns (bytes20 digest) {
+    uint256 _loc = loc(memView);
+    uint256 _len = len(memView);
+    bool res;
+    assembly {
+      // solium-disable-previous-line security/no-inline-assembly
+      let ptr := mload(0x40)
+      res := staticcall(gas, 2, _loc, _len, ptr, 0x20) // sha2
+      res := and(res, staticcall(gas, 3, ptr, 0x20, ptr, 0x20)) // rmd160
+      digest := mload(add(ptr, 0xc)) // return value is 0-prefixed.
+    }
+    require(res, "hash160 OOG");
+  }
+
+  /**
+     * @notice          Implements bitcoin's hash256 (double sha2)
+     * @param memView   A view of the preimage
+     * @return          digest - the Digest
+     */
+  function hash256(bytes29 memView) internal view returns (bytes32 digest) {
+    uint256 _loc = loc(memView);
+    uint256 _len = len(memView);
+    bool res;
+    assembly {
+      // solium-disable-previous-line security/no-inline-assembly
+      let ptr := mload(0x40)
+      res := staticcall(gas, 2, _loc, _len, ptr, 0x20) // sha2 #1
+      res := and(res, staticcall(gas, 2, ptr, 0x20, ptr, 0x20)) // sha2 #2
+      digest := mload(ptr)
+    }
+    require(res, "hash256 OOG");
+  }
+
+  /**
      * @notice Returns the encoded hex character that represents the lower 4 bits of the argument.
      * @param _byte The byte
      * @return _char The encoded hex character
@@ -149,19 +284,6 @@ library TypedMemView {
       ((v & 0x0000000000000000FFFFFFFFFFFFFFFF0000000000000000FFFFFFFFFFFFFFFF) << 64);
     // swap 16-byte long pairs
     v = (v >> 128) | (v << 128);
-  }
-
-  /**
-     * @notice      Create a mask with the highest `_len` bits set.
-     * @param _len  The length
-     * @return      mask - The mask
-     */
-  function leftMask(uint8 _len) private pure returns (uint256 mask) {
-    // ugly. redo without assembly?
-    assembly {
-      // solium-disable-previous-line security/no-inline-assembly
-      mask := sar(sub(_len, 1), 0x8000000000000000000000000000000000000000000000000000000000000000)
-    }
   }
 
   /**
@@ -262,31 +384,6 @@ library TypedMemView {
       // shift off the top 5 bytes
       newView := or(newView, shr(_typeBits, shl(_typeBits, memView)))
       newView := or(newView, shl(_typeShift, _newType))
-    }
-  }
-
-  /**
-     * @notice          Unsafe raw pointer construction. This should generally not be called
-     *                  directly. Prefer `ref` wherever possible.
-     * @dev             Unsafe raw pointer construction. This should generally not be called
-     *                  directly. Prefer `ref` wherever possible.
-     * @param _type     The type
-     * @param _loc      The memory address
-     * @param _len      The length
-     * @return          newView - The new view with the specified type, location and length
-     */
-  function unsafeBuildUnchecked(uint256 _type, uint256 _loc, uint256 _len)
-    private
-    pure
-    returns (bytes29 newView)
-  {
-    uint256 _uint96Bits = 96;
-    uint256 _emptyBits = 24;
-    assembly {
-      // solium-disable-previous-line security/no-inline-assembly
-      newView := shl(_uint96Bits, or(newView, _type)) // insert type
-      newView := shl(_uint96Bits, or(newView, _loc)) // insert loc
-      newView := shl(_emptyBits, or(newView, _len)) // empty bottom 3 bytes
     }
   }
 
@@ -583,64 +680,6 @@ library TypedMemView {
   }
 
   /**
-     * @notice          Return the sha2 digest of the underlying memory.
-     * @dev             We explicitly deallocate memory afterwards.
-     * @param memView   The view
-     * @return          digest - The sha2 hash of the underlying memory
-     */
-  function sha2(bytes29 memView) internal view returns (bytes32 digest) {
-    uint256 _loc = loc(memView);
-    uint256 _len = len(memView);
-
-    bool res;
-    assembly {
-      // solium-disable-previous-line security/no-inline-assembly
-      let ptr := mload(0x40)
-      res := staticcall(gas, 2, _loc, _len, ptr, 0x20) // sha2 #1
-      digest := mload(ptr)
-    }
-    require(res, "sha2 OOG");
-  }
-
-  /**
-     * @notice          Implements bitcoin's hash160 (rmd160(sha2()))
-     * @param memView   The pre-image
-     * @return          digest - the Digest
-     */
-  function hash160(bytes29 memView) internal view returns (bytes20 digest) {
-    uint256 _loc = loc(memView);
-    uint256 _len = len(memView);
-    bool res;
-    assembly {
-      // solium-disable-previous-line security/no-inline-assembly
-      let ptr := mload(0x40)
-      res := staticcall(gas, 2, _loc, _len, ptr, 0x20) // sha2
-      res := and(res, staticcall(gas, 3, ptr, 0x20, ptr, 0x20)) // rmd160
-      digest := mload(add(ptr, 0xc)) // return value is 0-prefixed.
-    }
-    require(res, "hash160 OOG");
-  }
-
-  /**
-     * @notice          Implements bitcoin's hash256 (double sha2)
-     * @param memView   A view of the preimage
-     * @return          digest - the Digest
-     */
-  function hash256(bytes29 memView) internal view returns (bytes32 digest) {
-    uint256 _loc = loc(memView);
-    uint256 _len = len(memView);
-    bool res;
-    assembly {
-      // solium-disable-previous-line security/no-inline-assembly
-      let ptr := mload(0x40)
-      res := staticcall(gas, 2, _loc, _len, ptr, 0x20) // sha2 #1
-      res := and(res, staticcall(gas, 2, ptr, 0x20, ptr, 0x20)) // sha2 #2
-      digest := mload(ptr)
-    }
-    require(res, "hash256 OOG");
-  }
-
-  /**
      * @notice          Return true if the underlying memory is equal. Else false.
      * @param left      The first view
      * @param right     The second view
@@ -717,29 +756,6 @@ library TypedMemView {
   }
 
   /**
-     * @notice          Copies the referenced memory to a new loc in memory, returning a `bytes` pointing to
-     *                  the new memory
-     * @dev             Shortcuts if the pointers are identical, otherwise compares type and digest.
-     * @param memView   The view
-     * @return          ret - The view pointing to the new memory
-     */
-  function clone(bytes29 memView) internal view returns (bytes memory ret) {
-    uint256 ptr;
-    uint256 _len = len(memView);
-    assembly {
-      // solium-disable-previous-line security/no-inline-assembly
-      ptr := mload(0x40) // load unused memory pointer
-      ret := ptr
-    }
-    unsafeCopyTo(memView, ptr + 0x20);
-    assembly {
-      // solium-disable-previous-line security/no-inline-assembly
-      mstore(0x40, add(add(ptr, _len), 0x20)) // write new unused pointer
-      mstore(ptr, _len) // write len of new array (in bytes)
-    }
-  }
-
-  /**
      * @notice          Join the views in memory, return an unsafe reference to the memory.
      * @dev             Super Dangerous direct memory access.
      *
@@ -774,56 +790,40 @@ library TypedMemView {
   }
 
   /**
-     * @notice          Produce the keccak256 digest of the concatenated contents of multiple views.
-     * @param memViews  The views
-     * @return          bytes32 - The keccak256 digest
+     * @notice      Create a mask with the highest `_len` bits set.
+     * @param _len  The length
+     * @return      mask - The mask
      */
-  function joinKeccak(bytes29[] memory memViews) internal view returns (bytes32) {
-    uint256 ptr;
+  function leftMask(uint8 _len) private pure returns (uint256 mask) {
+    // ugly. redo without assembly?
     assembly {
       // solium-disable-previous-line security/no-inline-assembly
-      ptr := mload(0x40) // load unused memory pointer
+      mask := sar(sub(_len, 1), 0x8000000000000000000000000000000000000000000000000000000000000000)
     }
-    return keccak(unsafeJoin(memViews, ptr));
   }
 
   /**
-     * @notice          Produce the sha256 digest of the concatenated contents of multiple views.
-     * @param memViews  The views
-     * @return          bytes32 - The sha256 digest
+     * @notice          Unsafe raw pointer construction. This should generally not be called
+     *                  directly. Prefer `ref` wherever possible.
+     * @dev             Unsafe raw pointer construction. This should generally not be called
+     *                  directly. Prefer `ref` wherever possible.
+     * @param _type     The type
+     * @param _loc      The memory address
+     * @param _len      The length
+     * @return          newView - The new view with the specified type, location and length
      */
-  function joinSha2(bytes29[] memory memViews) internal view returns (bytes32) {
-    uint256 ptr;
+  function unsafeBuildUnchecked(uint256 _type, uint256 _loc, uint256 _len)
+    private
+    pure
+    returns (bytes29 newView)
+  {
+    uint256 _uint96Bits = 96;
+    uint256 _emptyBits = 24;
     assembly {
       // solium-disable-previous-line security/no-inline-assembly
-      ptr := mload(0x40) // load unused memory pointer
-    }
-    return sha2(unsafeJoin(memViews, ptr));
-  }
-
-  /**
-     * @notice          copies all views, joins them into a new bytearray.
-     * @param memViews  The views
-     * @return          ret - The new byte array
-     */
-  function join(bytes29[] memory memViews) internal view returns (bytes memory ret) {
-    uint256 ptr;
-    assembly {
-      // solium-disable-previous-line security/no-inline-assembly
-      ptr := mload(0x40) // load unused memory pointer
-    }
-
-    bytes29 _newView = unsafeJoin(memViews, ptr + 0x20);
-    uint256 _written = len(_newView);
-    uint256 _footprint = footprint(_newView);
-
-    assembly {
-      // solium-disable-previous-line security/no-inline-assembly
-      // store the legnth
-      mstore(ptr, _written)
-      // new pointer is old + 0x20 + the footprint of the body
-      mstore(0x40, add(add(ptr, _footprint), 0x20))
-      ret := ptr
+      newView := shl(_uint96Bits, or(newView, _type)) // insert type
+      newView := shl(_uint96Bits, or(newView, _loc)) // insert loc
+      newView := shl(_emptyBits, or(newView, _len)) // empty bottom 3 bytes
     }
   }
 }

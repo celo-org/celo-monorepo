@@ -35,17 +35,6 @@ contract Random is
   event RandomnessBlockRetentionWindowSet(uint256 value);
 
   /**
-  * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-  */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
-  }
-
-  /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
@@ -59,16 +48,6 @@ contract Random is
   function initialize(uint256 _randomnessBlockRetentionWindow) external initializer {
     _transferOwnership(msg.sender);
     setRandomnessBlockRetentionWindow(_randomnessBlockRetentionWindow);
-  }
-
-  /**
-   * @notice Sets the number of old random blocks whose randomness values can be queried.
-   * @param value Number of old random blocks whose randomness values can be queried.
-   */
-  function setRandomnessBlockRetentionWindow(uint256 value) public onlyOwner {
-    require(value > 0, "randomnessBlockRetetionWindow cannot be zero");
-    randomnessBlockRetentionWindow = value;
-    emit RandomnessBlockRetentionWindowSet(value);
   }
 
   /**
@@ -86,6 +65,53 @@ contract Random is
     onlyVm
   {
     _revealAndCommit(randomness, newCommitment, proposer);
+  }
+
+  /**
+   * @notice Querying the current randomness value.
+   * @return Returns the current randomness value.
+   */
+  function random() external view returns (bytes32) {
+    return _getBlockRandomness(block.number, block.number);
+  }
+
+  /**
+   * @notice Get randomness values of previous blocks.
+   * @param blockNumber The number of block whose randomness value we want to know.
+   * @return The associated randomness value.
+   */
+  function getBlockRandomness(uint256 blockNumber) external view returns (bytes32) {
+    return _getBlockRandomness(blockNumber, block.number);
+  }
+
+  /**
+  * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+  */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
+  /**
+   * @notice Sets the number of old random blocks whose randomness values can be queried.
+   * @param value Number of old random blocks whose randomness values can be queried.
+   */
+  function setRandomnessBlockRetentionWindow(uint256 value) public onlyOwner {
+    require(value > 0, "randomnessBlockRetetionWindow cannot be zero");
+    randomnessBlockRetentionWindow = value;
+    emit RandomnessBlockRetentionWindowSet(value);
+  }
+
+  /**
+   * @notice Compute the commitment hash for a given randomness value.
+   * @param randomness The value for which the commitment hash is computed.
+   * @return Commitment parameter.
+   */
+  function computeCommitment(bytes32 randomness) public pure returns (bytes32) {
+    return keccak256(abi.encodePacked(randomness));
   }
 
   /**
@@ -149,30 +175,10 @@ contract Random is
     }
   }
 
-  /**
-   * @notice Compute the commitment hash for a given randomness value.
-   * @param randomness The value for which the commitment hash is computed.
-   * @return Commitment parameter.
-   */
-  function computeCommitment(bytes32 randomness) public pure returns (bytes32) {
-    return keccak256(abi.encodePacked(randomness));
-  }
-
-  /**
-   * @notice Querying the current randomness value.
-   * @return Returns the current randomness value.
-   */
-  function random() external view returns (bytes32) {
-    return _getBlockRandomness(block.number, block.number);
-  }
-
-  /**
-   * @notice Get randomness values of previous blocks.
-   * @param blockNumber The number of block whose randomness value we want to know.
-   * @return The associated randomness value.
-   */
-  function getBlockRandomness(uint256 blockNumber) external view returns (bytes32) {
-    return _getBlockRandomness(blockNumber, block.number);
+  function deleteHistoryIfNotLastEpochBlock(uint256 blockNumber) internal {
+    if (blockNumber != lastEpochBlock) {
+      delete history[blockNumber];
+    }
   }
 
   /**
@@ -193,9 +199,4 @@ contract Random is
     return history[blockNumber];
   }
 
-  function deleteHistoryIfNotLastEpochBlock(uint256 blockNumber) internal {
-    if (blockNumber != lastEpochBlock) {
-      delete history[blockNumber];
-    }
-  }
 }

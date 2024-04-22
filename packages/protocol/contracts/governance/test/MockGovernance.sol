@@ -20,10 +20,6 @@ contract MockGovernance is IGovernance {
     totalVotes[voter] = votes;
   }
 
-  function getAmountOfGoldUsedForVoting(address account) external view returns (uint256) {
-    return totalVotes[account];
-  }
-
   function removeVotesWhenRevokingDelegatedVotes(address account, uint256 maxAmountAllowed)
     external
   {
@@ -46,6 +42,10 @@ contract MockGovernance is IGovernance {
     returns (address, uint256, uint256, uint256, string memory, uint256, bool)
   {
     return (address(0), 0, 0, 0, "", 0, false);
+  }
+
+  function getAmountOfGoldUsedForVoting(address account) external view returns (uint256) {
+    return totalVotes[account];
   }
 
   function getReferendumStageDuration() external view returns (uint256) {

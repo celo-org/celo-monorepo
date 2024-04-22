@@ -30,17 +30,6 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   // without this line the contract can't receive native Celo transfers
   function() external payable {}
 
-  /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
-  }
-
   function sell(
     address sellTokenAddress,
     address buyTokenAddress,
@@ -81,5 +70,16 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
 
     emit TokenSold(sellTokenAddress, buyTokenAddress, amount);
     return celoAmount;
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 0, 0);
   }
 }

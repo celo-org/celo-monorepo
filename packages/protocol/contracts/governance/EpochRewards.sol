@@ -26,11 +26,6 @@ contract EpochRewards is
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  uint256 constant GENESIS_GOLD_SUPPLY = 600000000 ether; // 600 million Gold
-  uint256 constant GOLD_SUPPLY_CAP = 1000000000 ether; // 1 billion Gold
-  uint256 constant YEARS_LINEAR = 15;
-  uint256 constant SECONDS_LINEAR = YEARS_LINEAR * 365 * 1 days;
-
   // This struct governs how the rewards multiplier should deviate from 1.0 based on the ratio of
   // supply remaining to target supply remaining.
   struct RewardsMultiplierAdjustmentFactors {
@@ -61,6 +56,11 @@ contract EpochRewards is
     FixidityLib.Fraction max;
   }
 
+  uint256 constant GENESIS_GOLD_SUPPLY = 600000000 ether; // 600 million Gold
+  uint256 constant GOLD_SUPPLY_CAP = 1000000000 ether; // 1 billion Gold
+  uint256 constant YEARS_LINEAR = 15;
+  uint256 constant SECONDS_LINEAR = YEARS_LINEAR * 365 * 1 days;
+
   uint256 public startTime = 0;
   RewardsMultiplierParameters private rewardsMultiplierParams;
   TargetVotingYieldParameters private targetVotingYieldParams;
@@ -83,17 +83,6 @@ contract EpochRewards is
   );
 
   event TargetVotingYieldUpdated(uint256 fraction);
-
-  /**
-  * @notice Returns the storage, major, minor, and patch version of the contract.
-  * @return Storage version of the contract.
-  * @return Major version of the contract.
-  * @return Minor version of the contract.
-  * @return Patch version of the contract.
-  */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
-  }
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -150,6 +139,67 @@ contract EpochRewards is
   }
 
   /**
+   * @notice Updates the target voting yield based on the difference between the target and current
+   *   voting Gold fraction.
+   * @dev Only called directly by the protocol.
+   */
+  function updateTargetVotingYield() external onlyVm onlyWhenNotFrozen {
+    _updateTargetVotingYield();
+  }
+
+  /**
+   * @notice Determines if the reserve is low enough to demand a diversion from
+   *    the community reward. Targets initial critical ratio of 2 with a linear
+   *    decline until 25 years have passed where the critical ratio will be 1.
+   */
+  function isReserveLow() external view returns (bool) {
+    // critical reserve ratio = 2 - time in second / 25 years
+    FixidityLib.Fraction memory timeSinceInitialization = FixidityLib.newFixed(now.sub(startTime));
+    FixidityLib.Fraction memory m = FixidityLib.newFixed(25 * 365 * 1 days);
+    FixidityLib.Fraction memory b = FixidityLib.newFixed(2);
+    FixidityLib.Fraction memory criticalRatio;
+    // Don't let the critical reserve ratio go under 1 after 25 years.
+    if (timeSinceInitialization.gte(m)) {
+      criticalRatio = FixidityLib.fixed1();
+    } else {
+      criticalRatio = b.subtract(timeSinceInitialization.divide(m));
+    }
+    FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserve().getReserveRatio());
+    return ratio.lte(criticalRatio);
+  }
+
+  /**
+   * @notice Calculates the per validator epoch payment and the total rewards to voters.
+   * @return The per validator epoch reward.
+   * @return The total rewards to voters.
+   * @return The total community reward.
+   * @return The total carbon offsetting partner reward.
+   */
+  function calculateTargetEpochRewards()
+    external
+    view
+    returns (uint256, uint256, uint256, uint256)
+  {
+    uint256 targetVoterReward = getTargetVoterRewards();
+    uint256 targetGoldSupplyIncrease = _getTargetGoldSupplyIncrease();
+    FixidityLib.Fraction memory rewardsMultiplier = _getRewardsMultiplier(targetGoldSupplyIncrease);
+    return (
+      FixidityLib.newFixed(targetValidatorEpochPayment).multiply(rewardsMultiplier).fromFixed(),
+      FixidityLib.newFixed(targetVoterReward).multiply(rewardsMultiplier).fromFixed(),
+      FixidityLib
+        .newFixed(targetGoldSupplyIncrease)
+        .multiply(communityRewardFraction)
+        .multiply(rewardsMultiplier)
+        .fromFixed(),
+      FixidityLib
+        .newFixed(targetGoldSupplyIncrease)
+        .multiply(carbonOffsettingFraction)
+        .multiply(rewardsMultiplier)
+        .fromFixed()
+    );
+  }
+
+  /**
    * @notice Returns the target voting yield parameters.
    * @return The target factor for target voting yield.
    * @return The max factor for target voting yield.
@@ -176,6 +226,49 @@ contract EpochRewards is
   }
 
   /**
+   * @notice Returns the community reward fraction.
+   * @return The percentage of total reward which goes to the community funds.
+   */
+  function getCommunityRewardFraction() external view returns (uint256) {
+    return communityRewardFraction.unwrap();
+  }
+
+  /**
+   * @notice Returns the carbon offsetting partner reward fraction.
+   * @return The percentage of total reward which goes to the carbon offsetting partner.
+   */
+  function getCarbonOffsettingFraction() external view returns (uint256) {
+    return carbonOffsettingFraction.unwrap();
+  }
+
+  /**
+   * @notice Returns the target voting Gold fraction.
+   * @return The percentage of floating Gold voting to target.
+   */
+  function getTargetVotingGoldFraction() external view returns (uint256) {
+    return targetVotingGoldFraction.unwrap();
+  }
+
+  /**
+   * @notice Returns the rewards multiplier based on the current and target Gold supplies.
+   * @return The rewards multiplier based on the current and target Gold supplies.
+   */
+  function getRewardsMultiplier() external view returns (uint256) {
+    return _getRewardsMultiplier(_getTargetGoldSupplyIncrease()).unwrap();
+  }
+
+  /**
+  * @notice Returns the storage, major, minor, and patch version of the contract.
+  * @return Storage version of the contract.
+  * @return Major version of the contract.
+  * @return Minor version of the contract.
+  * @return Patch version of the contract.
+  */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
+  /**
    * @notice Sets the community reward percentage
    * @param value The percentage of the total reward to be sent to the community funds.
    * @return True upon success.
@@ -188,14 +281,6 @@ contract EpochRewards is
     communityRewardFraction = FixidityLib.wrap(value);
     emit CommunityRewardFractionSet(value);
     return true;
-  }
-
-  /**
-   * @notice Returns the community reward fraction.
-   * @return The percentage of total reward which goes to the community funds.
-   */
-  function getCommunityRewardFraction() external view returns (uint256) {
-    return communityRewardFraction.unwrap();
   }
 
   /**
@@ -217,14 +302,6 @@ contract EpochRewards is
   }
 
   /**
-   * @notice Returns the carbon offsetting partner reward fraction.
-   * @return The percentage of total reward which goes to the carbon offsetting partner.
-   */
-  function getCarbonOffsettingFraction() external view returns (uint256) {
-    return carbonOffsettingFraction.unwrap();
-  }
-
-  /**
    * @notice Sets the target voting Gold fraction.
    * @param value The percentage of floating Gold voting to target.
    * @return True upon success.
@@ -238,14 +315,6 @@ contract EpochRewards is
     targetVotingGoldFraction = FixidityLib.wrap(value);
     emit TargetVotingGoldFractionSet(value);
     return true;
-  }
-
-  /**
-   * @notice Returns the target voting Gold fraction.
-   * @return The percentage of floating Gold voting to target.
-   */
-  function getTargetVotingGoldFraction() external view returns (uint256) {
-    return targetVotingGoldFraction.unwrap();
   }
 
   /**
@@ -352,48 +421,6 @@ contract EpochRewards is
   }
 
   /**
-   * @notice Returns the rewards multiplier based on the current and target Gold supplies.
-   * @param targetGoldSupplyIncrease The target increase in current Gold supply.
-   * @return The rewards multiplier based on the current and target Gold supplies.
-   */
-  function _getRewardsMultiplier(uint256 targetGoldSupplyIncrease)
-    internal
-    view
-    returns (FixidityLib.Fraction memory)
-  {
-    uint256 targetSupply = getTargetGoldTotalSupply();
-    uint256 totalSupply = getGoldToken().totalSupply();
-    uint256 remainingSupply = GOLD_SUPPLY_CAP.sub(totalSupply.add(targetGoldSupplyIncrease));
-    uint256 targetRemainingSupply = GOLD_SUPPLY_CAP.sub(targetSupply);
-    FixidityLib.Fraction memory remainingToTargetRatio = FixidityLib
-      .newFixed(remainingSupply)
-      .divide(FixidityLib.newFixed(targetRemainingSupply));
-    if (remainingToTargetRatio.gt(FixidityLib.fixed1())) {
-      FixidityLib.Fraction memory delta = remainingToTargetRatio
-        .subtract(FixidityLib.fixed1())
-        .multiply(rewardsMultiplierParams.adjustmentFactors.underspend);
-      FixidityLib.Fraction memory multiplier = FixidityLib.fixed1().add(delta);
-      if (multiplier.lt(rewardsMultiplierParams.max)) {
-        return multiplier;
-      } else {
-        return rewardsMultiplierParams.max;
-      }
-    } else if (remainingToTargetRatio.lt(FixidityLib.fixed1())) {
-      FixidityLib.Fraction memory delta = FixidityLib
-        .fixed1()
-        .subtract(remainingToTargetRatio)
-        .multiply(rewardsMultiplierParams.adjustmentFactors.overspend);
-      if (delta.lt(FixidityLib.fixed1())) {
-        return FixidityLib.fixed1().subtract(delta);
-      } else {
-        return FixidityLib.wrap(0);
-      }
-    } else {
-      return FixidityLib.fixed1();
-    }
-  }
-
-  /**
    * @notice Returns the total target epoch rewards for voters.
    * @return the total target epoch rewards for voters.
    */
@@ -416,32 +443,6 @@ contract EpochRewards is
       numberValidatorsInCurrentSet().mul(targetValidatorEpochPayment).mul(denominator).div(
         numerator
       );
-  }
-
-  /**
-   * @notice Returns the target gold supply increase used in calculating the rewards multiplier.
-   * @return The target increase in gold w/out the rewards multiplier.
-   */
-  function _getTargetGoldSupplyIncrease() internal view returns (uint256) {
-    uint256 targetEpochRewards = getTargetVoterRewards();
-    uint256 targetTotalEpochPaymentsInGold = getTargetTotalEpochPaymentsInGold();
-    uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);
-    // increase /= (1 - fraction) st the final community reward is fraction * increase
-    targetGoldSupplyIncrease = FixidityLib
-      .newFixed(targetGoldSupplyIncrease)
-      .divide(
-      FixidityLib.newFixed(1).subtract(communityRewardFraction).subtract(carbonOffsettingFraction)
-    )
-      .fromFixed();
-    return targetGoldSupplyIncrease;
-  }
-
-  /**
-   * @notice Returns the rewards multiplier based on the current and target Gold supplies.
-   * @return The rewards multiplier based on the current and target Gold supplies.
-   */
-  function getRewardsMultiplier() external view returns (uint256) {
-    return _getRewardsMultiplier(_getTargetGoldSupplyIncrease()).unwrap();
   }
 
   /**
@@ -490,63 +491,63 @@ contract EpochRewards is
   }
 
   /**
-   * @notice Updates the target voting yield based on the difference between the target and current
-   *   voting Gold fraction.
-   * @dev Only called directly by the protocol.
+   * @notice Returns the rewards multiplier based on the current and target Gold supplies.
+   * @param targetGoldSupplyIncrease The target increase in current Gold supply.
+   * @return The rewards multiplier based on the current and target Gold supplies.
    */
-  function updateTargetVotingYield() external onlyVm onlyWhenNotFrozen {
-    _updateTargetVotingYield();
-  }
-
-  /**
-   * @notice Determines if the reserve is low enough to demand a diversion from
-   *    the community reward. Targets initial critical ratio of 2 with a linear
-   *    decline until 25 years have passed where the critical ratio will be 1.
-   */
-  function isReserveLow() external view returns (bool) {
-    // critical reserve ratio = 2 - time in second / 25 years
-    FixidityLib.Fraction memory timeSinceInitialization = FixidityLib.newFixed(now.sub(startTime));
-    FixidityLib.Fraction memory m = FixidityLib.newFixed(25 * 365 * 1 days);
-    FixidityLib.Fraction memory b = FixidityLib.newFixed(2);
-    FixidityLib.Fraction memory criticalRatio;
-    // Don't let the critical reserve ratio go under 1 after 25 years.
-    if (timeSinceInitialization.gte(m)) {
-      criticalRatio = FixidityLib.fixed1();
-    } else {
-      criticalRatio = b.subtract(timeSinceInitialization.divide(m));
-    }
-    FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserve().getReserveRatio());
-    return ratio.lte(criticalRatio);
-  }
-
-  /**
-   * @notice Calculates the per validator epoch payment and the total rewards to voters.
-   * @return The per validator epoch reward.
-   * @return The total rewards to voters.
-   * @return The total community reward.
-   * @return The total carbon offsetting partner reward.
-   */
-  function calculateTargetEpochRewards()
-    external
+  function _getRewardsMultiplier(uint256 targetGoldSupplyIncrease)
+    internal
     view
-    returns (uint256, uint256, uint256, uint256)
+    returns (FixidityLib.Fraction memory)
   {
-    uint256 targetVoterReward = getTargetVoterRewards();
-    uint256 targetGoldSupplyIncrease = _getTargetGoldSupplyIncrease();
-    FixidityLib.Fraction memory rewardsMultiplier = _getRewardsMultiplier(targetGoldSupplyIncrease);
-    return (
-      FixidityLib.newFixed(targetValidatorEpochPayment).multiply(rewardsMultiplier).fromFixed(),
-      FixidityLib.newFixed(targetVoterReward).multiply(rewardsMultiplier).fromFixed(),
-      FixidityLib
-        .newFixed(targetGoldSupplyIncrease)
-        .multiply(communityRewardFraction)
-        .multiply(rewardsMultiplier)
-        .fromFixed(),
-      FixidityLib
-        .newFixed(targetGoldSupplyIncrease)
-        .multiply(carbonOffsettingFraction)
-        .multiply(rewardsMultiplier)
-        .fromFixed()
-    );
+    uint256 targetSupply = getTargetGoldTotalSupply();
+    uint256 totalSupply = getGoldToken().totalSupply();
+    uint256 remainingSupply = GOLD_SUPPLY_CAP.sub(totalSupply.add(targetGoldSupplyIncrease));
+    uint256 targetRemainingSupply = GOLD_SUPPLY_CAP.sub(targetSupply);
+    FixidityLib.Fraction memory remainingToTargetRatio = FixidityLib
+      .newFixed(remainingSupply)
+      .divide(FixidityLib.newFixed(targetRemainingSupply));
+    if (remainingToTargetRatio.gt(FixidityLib.fixed1())) {
+      FixidityLib.Fraction memory delta = remainingToTargetRatio
+        .subtract(FixidityLib.fixed1())
+        .multiply(rewardsMultiplierParams.adjustmentFactors.underspend);
+      FixidityLib.Fraction memory multiplier = FixidityLib.fixed1().add(delta);
+      if (multiplier.lt(rewardsMultiplierParams.max)) {
+        return multiplier;
+      } else {
+        return rewardsMultiplierParams.max;
+      }
+    } else if (remainingToTargetRatio.lt(FixidityLib.fixed1())) {
+      FixidityLib.Fraction memory delta = FixidityLib
+        .fixed1()
+        .subtract(remainingToTargetRatio)
+        .multiply(rewardsMultiplierParams.adjustmentFactors.overspend);
+      if (delta.lt(FixidityLib.fixed1())) {
+        return FixidityLib.fixed1().subtract(delta);
+      } else {
+        return FixidityLib.wrap(0);
+      }
+    } else {
+      return FixidityLib.fixed1();
+    }
   }
+
+  /**
+   * @notice Returns the target gold supply increase used in calculating the rewards multiplier.
+   * @return The target increase in gold w/out the rewards multiplier.
+   */
+  function _getTargetGoldSupplyIncrease() internal view returns (uint256) {
+    uint256 targetEpochRewards = getTargetVoterRewards();
+    uint256 targetTotalEpochPaymentsInGold = getTargetTotalEpochPaymentsInGold();
+    uint256 targetGoldSupplyIncrease = targetEpochRewards.add(targetTotalEpochPaymentsInGold);
+    // increase /= (1 - fraction) st the final community reward is fraction * increase
+    targetGoldSupplyIncrease = FixidityLib
+      .newFixed(targetGoldSupplyIncrease)
+      .divide(
+      FixidityLib.newFixed(1).subtract(communityRewardFraction).subtract(carbonOffsettingFraction)
+    )
+      .fromFixed();
+    return targetGoldSupplyIncrease;
+  }
+
 }

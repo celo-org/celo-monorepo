@@ -47,20 +47,8 @@ contract MockValidators {
     doesNotMeetAccountLockedGoldRequirements[account] = true;
   }
 
-  function meetsAccountLockedGoldRequirements(address account) external view returns (bool) {
-    return !doesNotMeetAccountLockedGoldRequirements[account];
-  }
-
-  function getGroupNumMembers(address group) public view returns (uint256) {
-    return members[group].length;
-  }
-
   function setNumRegisteredValidators(uint256 value) external {
     numRegisteredValidators = value;
-  }
-
-  function getNumRegisteredValidators() external view returns (uint256) {
-    return numRegisteredValidators;
   }
 
   function setMembers(address group, address[] calldata _members) external {
@@ -71,13 +59,9 @@ contract MockValidators {
     lockedGoldRequirements[account] = value;
   }
 
-  function getAccountLockedGoldRequirement(address account) external view returns (uint256) {
-    return lockedGoldRequirements[account];
-  }
+  function halveSlashingMultiplier(address) external {}
 
-  function calculateGroupEpochScore(uint256[] calldata uptimes) external view returns (uint256) {
-    return uptimes[0];
-  }
+  function forceDeaffiliateIfValidator(address validator) external {}
 
   function getTopGroupValidators(address group, uint256 n)
     external
@@ -92,6 +76,26 @@ contract MockValidators {
     return validators;
   }
 
+  function getValidatorGroupSlashingMultiplier(address) external view returns (uint256) {
+    return FIXED1_UINT;
+  }
+
+  function meetsAccountLockedGoldRequirements(address account) external view returns (bool) {
+    return !doesNotMeetAccountLockedGoldRequirements[account];
+  }
+
+  function getNumRegisteredValidators() external view returns (uint256) {
+    return numRegisteredValidators;
+  }
+
+  function getAccountLockedGoldRequirement(address account) external view returns (uint256) {
+    return lockedGoldRequirements[account];
+  }
+
+  function calculateGroupEpochScore(uint256[] calldata uptimes) external view returns (uint256) {
+    return uptimes[0];
+  }
+
   function getGroupsNumMembers(address[] calldata groups) external view returns (uint256[] memory) {
     uint256[] memory numMembers = new uint256[](groups.length);
     for (uint256 i = 0; i < groups.length; i = i.add(1)) {
@@ -104,10 +108,7 @@ contract MockValidators {
     return affiliations[addr];
   }
 
-  function halveSlashingMultiplier(address) external {}
-
-  function forceDeaffiliateIfValidator(address validator) external {}
-  function getValidatorGroupSlashingMultiplier(address) external view returns (uint256) {
-    return FIXED1_UINT;
+  function getGroupNumMembers(address group) public view returns (uint256) {
+    return members[group].length;
   }
 }

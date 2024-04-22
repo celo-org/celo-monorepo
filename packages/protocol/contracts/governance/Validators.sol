@@ -159,17 +159,6 @@ contract Validators is
   }
 
   /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 5);
-  }
-
-  /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
@@ -217,125 +206,28 @@ contract Validators is
   }
 
   /**
-   * @notice Updates the block delay for a ValidatorGroup's commission udpdate
-   * @param delay Number of blocks to delay the update
+   * @notice Updates a validator's score based on its uptime for the epoch.
+   * @param signer The validator signer of the validator account whose score needs updating.
+   * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
+   * @return True upon success.
    */
-  function setCommissionUpdateDelay(uint256 delay) public onlyOwner {
-    require(delay != commissionUpdateDelay, "commission update delay not changed");
-    commissionUpdateDelay = delay;
-    emit CommissionUpdateDelaySet(delay);
+  function updateValidatorScoreFromSigner(address signer, uint256 uptime) external onlyVm() {
+    _updateValidatorScoreFromSigner(signer, uptime);
   }
 
   /**
-   * @notice Updates the maximum number of members a group can have.
-   * @param size The maximum group size.
-   * @return True upon success.
+   * @notice Distributes epoch payments to the account associated with `signer` and its group.
+   * @param signer The validator signer of the account to distribute the epoch payment to.
+   * @param maxPayment The maximum payment to the validator. Actual payment is based on score and
+   *   group commission.
+   * @return The total payment paid to the validator and their group.
    */
-  function setMaxGroupSize(uint256 size) public onlyOwner returns (bool) {
-    require(0 < size, "Max group size cannot be zero");
-    require(size != maxGroupSize, "Max group size not changed");
-    maxGroupSize = size;
-    emit MaxGroupSizeSet(size);
-    return true;
-  }
-
-  /**
-   * @notice Updates the number of validator group membership entries to store.
-   * @param length The number of validator group membership entries to store.
-   * @return True upon success.
-   */
-  function setMembershipHistoryLength(uint256 length) public onlyOwner returns (bool) {
-    require(0 < length, "Membership history length cannot be zero");
-    require(length != membershipHistoryLength, "Membership history length not changed");
-    membershipHistoryLength = length;
-    emit MembershipHistoryLengthSet(length);
-    return true;
-  }
-
-  /**
-   * @notice Updates the validator score parameters.
-   * @param exponent The exponent used in calculating the score.
-   * @param adjustmentSpeed The speed at which the score is adjusted.
-   * @return True upon success.
-   */
-  function setValidatorScoreParameters(uint256 exponent, uint256 adjustmentSpeed)
-    public
-    onlyOwner
-    returns (bool)
+  function distributeEpochPaymentsFromSigner(address signer, uint256 maxPayment)
+    external
+    onlyVm()
+    returns (uint256)
   {
-    require(
-      adjustmentSpeed <= FixidityLib.fixed1().unwrap(),
-      "Adjustment speed cannot be larger than 1"
-    );
-    require(
-      exponent != validatorScoreParameters.exponent ||
-        !FixidityLib.wrap(adjustmentSpeed).equals(validatorScoreParameters.adjustmentSpeed),
-      "Adjustment speed and exponent not changed"
-    );
-    validatorScoreParameters = ValidatorScoreParameters(
-      exponent,
-      FixidityLib.wrap(adjustmentSpeed)
-    );
-    emit ValidatorScoreParametersSet(exponent, adjustmentSpeed);
-    return true;
-  }
-
-  /**
-   * @notice Returns the maximum number of members a group can add.
-   * @return The maximum number of members a group can add.
-   */
-  function getMaxGroupSize() external view returns (uint256) {
-    return maxGroupSize;
-  }
-
-  /**
-   * @notice Returns the block delay for a ValidatorGroup's commission udpdate.
-   * @return The block delay for a ValidatorGroup's commission udpdate.
-   */
-  function getCommissionUpdateDelay() external view returns (uint256) {
-    return commissionUpdateDelay;
-  }
-
-  /**
-   * @notice Updates the Locked Gold requirements for Validator Groups.
-   * @param value The per-member amount of Locked Gold required.
-   * @param duration The time (in seconds) that these requirements persist for.
-   * @return True upon success.
-   */
-  function setGroupLockedGoldRequirements(uint256 value, uint256 duration)
-    public
-    onlyOwner
-    returns (bool)
-  {
-    LockedGoldRequirements storage requirements = groupLockedGoldRequirements;
-    require(
-      value != requirements.value || duration != requirements.duration,
-      "Group requirements not changed"
-    );
-    groupLockedGoldRequirements = LockedGoldRequirements(value, duration);
-    emit GroupLockedGoldRequirementsSet(value, duration);
-    return true;
-  }
-
-  /**
-   * @notice Updates the Locked Gold requirements for Validators.
-   * @param value The amount of Locked Gold required.
-   * @param duration The time (in seconds) that these requirements persist for.
-   * @return True upon success.
-   */
-  function setValidatorLockedGoldRequirements(uint256 value, uint256 duration)
-    public
-    onlyOwner
-    returns (bool)
-  {
-    LockedGoldRequirements storage requirements = validatorLockedGoldRequirements;
-    require(
-      value != requirements.value || duration != requirements.duration,
-      "Validator requirements not changed"
-    );
-    validatorLockedGoldRequirements = LockedGoldRequirements(value, duration);
-    emit ValidatorLockedGoldRequirementsSet(value, duration);
-    return true;
+    return _distributeEpochPaymentsFromSigner(signer, maxPayment);
   }
 
   /**
@@ -374,172 +266,6 @@ contract Validators is
     updateMembershipHistory(account, address(0));
     emit ValidatorRegistered(account);
     return true;
-  }
-
-  /**
-   * @notice Returns the parameters that govern how a validator's score is calculated.
-   * @return The exponent that governs how a validator's score is calculated.
-   * @return The adjustment speed that governs how a validator's score is calculated.
-   */
-  function getValidatorScoreParameters() external view returns (uint256, uint256) {
-    return (validatorScoreParameters.exponent, validatorScoreParameters.adjustmentSpeed.unwrap());
-  }
-
-  /**
-   * @notice Returns the group membership history of a validator.
-   * @param account The validator whose membership history to return.
-   * @return epochs The epochs of a validator.
-   * @return The membership groups of a validator.
-   * @return The last removed from group timestamp of a validator.
-   * @return The tail of a validator.
-   */
-  function getMembershipHistory(address account)
-    external
-    view
-    returns (uint256[] memory, address[] memory, uint256, uint256)
-  {
-    MembershipHistory storage history = validators[account].membershipHistory;
-    uint256[] memory epochs = new uint256[](history.numEntries);
-    address[] memory membershipGroups = new address[](history.numEntries);
-    for (uint256 i = 0; i < history.numEntries; i = i.add(1)) {
-      uint256 index = history.tail.add(i);
-      epochs[i] = history.entries[index].epochNumber;
-      membershipGroups[i] = history.entries[index].group;
-    }
-    return (epochs, membershipGroups, history.lastRemovedFromGroupTimestamp, history.tail);
-  }
-
-  /**
-   * @notice Calculates the validator score for an epoch from the uptime value for the epoch.
-   * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
-   * @dev epoch_score = uptime ** exponent
-   * @return Fixidity representation of the epoch score between 0 and 1.
-   */
-  function calculateEpochScore(uint256 uptime) public view returns (uint256) {
-    require(uptime <= FixidityLib.fixed1().unwrap(), "Uptime cannot be larger than one");
-    uint256 numerator;
-    uint256 denominator;
-    uptime = Math.min(uptime.add(downtimeGracePeriod), FixidityLib.fixed1().unwrap());
-    (numerator, denominator) = fractionMulExp(
-      FixidityLib.fixed1().unwrap(),
-      FixidityLib.fixed1().unwrap(),
-      uptime,
-      FixidityLib.fixed1().unwrap(),
-      validatorScoreParameters.exponent,
-      18
-    );
-    return FixidityLib.newFixedFraction(numerator, denominator).unwrap();
-  }
-
-  /**
-   * @notice Calculates the aggregate score of a group for an epoch from individual uptimes.
-   * @param uptimes Array of Fixidity representations of the validators' uptimes, between 0 and 1.
-   * @dev group_score = average(uptimes ** exponent)
-   * @return Fixidity representation of the group epoch score between 0 and 1.
-   */
-  function calculateGroupEpochScore(uint256[] calldata uptimes) external view returns (uint256) {
-    require(uptimes.length > 0, "Uptime array empty");
-    require(uptimes.length <= maxGroupSize, "Uptime array larger than maximum group size");
-    FixidityLib.Fraction memory sum;
-    for (uint256 i = 0; i < uptimes.length; i = i.add(1)) {
-      sum = sum.add(FixidityLib.wrap(calculateEpochScore(uptimes[i])));
-    }
-    return sum.divide(FixidityLib.newFixed(uptimes.length)).unwrap();
-  }
-
-  /**
-   * @notice Updates a validator's score based on its uptime for the epoch.
-   * @param signer The validator signer of the validator account whose score needs updating.
-   * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
-   * @return True upon success.
-   */
-  function updateValidatorScoreFromSigner(address signer, uint256 uptime) external onlyVm() {
-    _updateValidatorScoreFromSigner(signer, uptime);
-  }
-
-  /**
-   * @notice Updates a validator's score based on its uptime for the epoch.
-   * @param signer The validator signer of the validator whose score needs updating.
-   * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
-   * @dev new_score = uptime ** exponent * adjustmentSpeed + old_score * (1 - adjustmentSpeed)
-   * @return True upon success.
-   */
-  function _updateValidatorScoreFromSigner(address signer, uint256 uptime) internal {
-    address account = getAccounts().signerToAccount(signer);
-    require(isValidator(account), "Not a validator");
-
-    FixidityLib.Fraction memory epochScore = FixidityLib.wrap(calculateEpochScore(uptime));
-    FixidityLib.Fraction memory newComponent = validatorScoreParameters.adjustmentSpeed.multiply(
-      epochScore
-    );
-
-    FixidityLib.Fraction memory currentComponent = FixidityLib.fixed1().subtract(
-      validatorScoreParameters.adjustmentSpeed
-    );
-    currentComponent = currentComponent.multiply(validators[account].score);
-    validators[account].score = FixidityLib.wrap(
-      Math.min(epochScore.unwrap(), newComponent.add(currentComponent).unwrap())
-    );
-    emit ValidatorScoreUpdated(account, validators[account].score.unwrap(), epochScore.unwrap());
-  }
-
-  /**
-   * @notice Distributes epoch payments to the account associated with `signer` and its group.
-   * @param signer The validator signer of the account to distribute the epoch payment to.
-   * @param maxPayment The maximum payment to the validator. Actual payment is based on score and
-   *   group commission.
-   * @return The total payment paid to the validator and their group.
-   */
-  function distributeEpochPaymentsFromSigner(address signer, uint256 maxPayment)
-    external
-    onlyVm()
-    returns (uint256)
-  {
-    return _distributeEpochPaymentsFromSigner(signer, maxPayment);
-  }
-
-  /**
-   * @notice Distributes epoch payments to the account associated with `signer` and its group.
-   * @param signer The validator signer of the validator to distribute the epoch payment to.
-   * @param maxPayment The maximum payment to the validator. Actual payment is based on score and
-   *   group commission.
-   * @return The total payment paid to the validator and their group.
-   */
-  function _distributeEpochPaymentsFromSigner(address signer, uint256 maxPayment)
-    internal
-    returns (uint256)
-  {
-    address account = getAccounts().signerToAccount(signer);
-    require(isValidator(account), "Not a validator");
-    // The group that should be paid is the group that the validator was a member of at the
-    // time it was elected.
-    address group = getMembershipInLastEpoch(account);
-    require(group != address(0), "Validator not registered with a group");
-    // Both the validator and the group must maintain the minimum locked gold balance in order to
-    // receive epoch payments.
-    if (meetsAccountLockedGoldRequirements(account) && meetsAccountLockedGoldRequirements(group)) {
-      FixidityLib.Fraction memory totalPayment = FixidityLib
-        .newFixed(maxPayment)
-        .multiply(validators[account].score)
-        .multiply(groups[group].slashInfo.multiplier);
-      uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
-      FixidityLib.Fraction memory remainingPayment = FixidityLib.newFixed(
-        totalPayment.fromFixed().sub(groupPayment)
-      );
-      (address beneficiary, uint256 fraction) = getAccounts().getPaymentDelegation(account);
-      uint256 delegatedPayment = remainingPayment.multiply(FixidityLib.wrap(fraction)).fromFixed();
-      uint256 validatorPayment = remainingPayment.fromFixed().sub(delegatedPayment);
-      IStableToken stableToken = getStableToken();
-      require(stableToken.mint(group, groupPayment), "mint failed to validator group");
-      require(stableToken.mint(account, validatorPayment), "mint failed to validator account");
-      if (fraction != 0) {
-        require(stableToken.mint(beneficiary, delegatedPayment), "mint failed to delegatee");
-      }
-      emit ValidatorEpochPaymentDistributed(account, validatorPayment, group, groupPayment);
-      return totalPayment.fromFixed();
-    } else {
-      return 0;
-    }
   }
 
   /**
@@ -632,30 +358,6 @@ contract Validators is
   }
 
   /**
-   * @notice Updates a validator's BLS key.
-   * @param validator The validator whose BLS public key should be updated.
-   * @param account The address under which the validator is registered.
-   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
-   *   proof of possession. 96 bytes.
-   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
-   *   account address. 48 bytes.
-   * @return True upon success.
-   */
-  function _updateBlsPublicKey(
-    Validator storage validator,
-    address account,
-    bytes memory blsPublicKey,
-    bytes memory blsPop
-  ) private returns (bool) {
-    require(blsPublicKey.length == 96, "Wrong BLS public key length");
-    require(blsPop.length == 48, "Wrong BLS PoP length");
-    require(checkProofOfPossession(account, blsPublicKey, blsPop), "Invalid BLS PoP");
-    validator.publicKeys.bls = blsPublicKey;
-    emit ValidatorBlsPublicKeyUpdated(account, blsPublicKey);
-    return true;
-  }
-
-  /**
    * @notice Updates a validator's ECDSA key.
    * @param account The address under which the validator is registered.
    * @param signer The address which the validator is using to sign consensus messages.
@@ -677,26 +379,28 @@ contract Validators is
   }
 
   /**
-   * @notice Updates a validator's ECDSA key.
-   * @param validator The validator whose ECDSA public key should be updated.
-   * @param signer The address with which the validator is signing consensus messages.
-   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus. Should
-   *   match `signer`. 64 bytes.
+   * @notice De-registers a validator group.
+   * @param index The index of this validator group in the list of all validator groups.
    * @return True upon success.
+   * @dev Fails if the account is not a validator group with no members.
+   * @dev Fails if the group has had members too recently.
    */
-  function _updateEcdsaPublicKey(
-    Validator storage validator,
-    address account,
-    address signer,
-    bytes memory ecdsaPublicKey
-  ) private returns (bool) {
-    require(ecdsaPublicKey.length == 64, "Wrong ECDSA public key length");
-    require(
-      address(uint160(uint256(keccak256(ecdsaPublicKey)))) == signer,
-      "ECDSA key does not match signer"
-    );
-    validator.publicKeys.ecdsa = ecdsaPublicKey;
-    emit ValidatorEcdsaPublicKeyUpdated(account, ecdsaPublicKey);
+  function deregisterValidatorGroup(uint256 index) external nonReentrant returns (bool) {
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
+    // Only Validator Groups that have never had members or have been empty for at least
+    // `groupLockedGoldRequirements.duration` seconds can be deregistered.
+    require(isValidatorGroup(account), "Not a validator group");
+    require(groups[account].members.numElements == 0, "Validator group not empty");
+    uint256[] storage sizeHistory = groups[account].sizeHistory;
+    if (sizeHistory.length > 1) {
+      require(
+        sizeHistory[1].add(groupLockedGoldRequirements.duration) < now,
+        "Hasn't been empty for long enough"
+      );
+    }
+    delete groups[account];
+    deleteElement(registeredGroups, account, index);
+    emit ValidatorGroupDeregistered(account);
     return true;
   }
 
@@ -756,45 +460,6 @@ contract Validators is
     return true;
   }
 
-  function _isRegistrationAllowed(address account) private returns (bool) {
-    require(
-      !getElection().allowedToVoteOverMaxNumberOfGroups(account),
-      "Cannot vote for more than max number of groups"
-    );
-    require(
-      // Validator could avoid getting slashed by delegating Celo to delegatees that would be voting
-      // for lots of proposals. Such transaction could run out of gas.
-      getLockedGold().getAccountTotalDelegatedFraction(account) == 0,
-      "Cannot delegate governance power"
-    );
-  }
-
-  /**
-   * @notice De-registers a validator group.
-   * @param index The index of this validator group in the list of all validator groups.
-   * @return True upon success.
-   * @dev Fails if the account is not a validator group with no members.
-   * @dev Fails if the group has had members too recently.
-   */
-  function deregisterValidatorGroup(uint256 index) external nonReentrant returns (bool) {
-    address account = getAccounts().validatorSignerToAccount(msg.sender);
-    // Only Validator Groups that have never had members or have been empty for at least
-    // `groupLockedGoldRequirements.duration` seconds can be deregistered.
-    require(isValidatorGroup(account), "Not a validator group");
-    require(groups[account].members.numElements == 0, "Validator group not empty");
-    uint256[] storage sizeHistory = groups[account].sizeHistory;
-    if (sizeHistory.length > 1) {
-      require(
-        sizeHistory[1].add(groupLockedGoldRequirements.duration) < now,
-        "Hasn't been empty for long enough"
-      );
-    }
-    delete groups[account];
-    deleteElement(registeredGroups, account, index);
-    emit ValidatorGroupDeregistered(account);
-    return true;
-  }
-
   /**
    * @notice Adds a member to the end of a validator group's list of members.
    * @param validator The validator to add to the group
@@ -825,38 +490,6 @@ contract Validators is
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(groups[account].members.numElements == 0, "Validator group not empty");
     return _addMember(account, validator, lesser, greater);
-  }
-
-  /**
-   * @notice Adds a member to the end of a validator group's list of members.
-   * @param group The address of the validator group.
-   * @param validator The validator to add to the group.
-   * @param lesser The address of the group that has received fewer votes than this group.
-   * @param greater The address of the group that has received more votes than this group.
-   * @return True upon success.
-   * @dev Fails if `validator` has not set their affiliation to this account.
-   * @dev Fails if the group has > 0 members.
-   */
-  function _addMember(address group, address validator, address lesser, address greater)
-    private
-    returns (bool)
-  {
-    require(isValidatorGroup(group) && isValidator(validator), "Not validator and group");
-    ValidatorGroup storage _group = groups[group];
-    require(_group.members.numElements < maxGroupSize, "group would exceed maximum size");
-    require(validators[validator].affiliation == group, "Not affiliated to group");
-    require(!_group.members.contains(validator), "Already in group");
-    uint256 numMembers = _group.members.numElements.add(1);
-    _group.members.push(validator);
-    require(meetsAccountLockedGoldRequirements(group), "Group requirements not met");
-    require(meetsAccountLockedGoldRequirements(validator), "Validator requirements not met");
-    if (numMembers == 1) {
-      getElection().markGroupEligible(group, lesser, greater);
-    }
-    updateMembershipHistory(validator, group);
-    updateSizeHistory(group, numMembers.sub(1));
-    emit ValidatorGroupMemberAdded(group, validator);
-    return true;
   }
 
   /**
@@ -931,39 +564,42 @@ contract Validators is
   }
 
   /**
-   * @notice Returns the current locked gold balance requirement for the supplied account.
-   * @param account The account that may have to meet locked gold balance requirements.
-   * @return The current locked gold balance requirement for the supplied account.
+   * @notice Removes a validator from the group for which it is a member.
+   * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
-  function getAccountLockedGoldRequirement(address account) public view returns (uint256) {
-    if (isValidator(account)) {
-      return validatorLockedGoldRequirements.value;
-    } else if (isValidatorGroup(account)) {
-      uint256 multiplier = Math.max(1, groups[account].members.numElements);
-      uint256[] storage sizeHistory = groups[account].sizeHistory;
-      if (sizeHistory.length > 0) {
-        for (uint256 i = sizeHistory.length.sub(1); i > 0; i = i.sub(1)) {
-          if (sizeHistory[i].add(groupLockedGoldRequirements.duration) >= now) {
-            multiplier = Math.max(i, multiplier);
-            break;
-          }
-        }
+  function forceDeaffiliateIfValidator(address validatorAccount) external nonReentrant onlySlasher {
+    if (isValidator(validatorAccount)) {
+      Validator storage validator = validators[validatorAccount];
+      if (validator.affiliation != address(0)) {
+        _deaffiliate(validator, validatorAccount);
       }
-      return groupLockedGoldRequirements.value.mul(multiplier);
     }
-    return 0;
   }
 
   /**
-   * @notice Returns whether or not an account meets its Locked Gold requirements.
-   * @param account The address of the account.
-   * @return Whether or not an account meets its Locked Gold requirements.
+   * @notice Resets a group's slashing multiplier if it has been >= the reset period since
+   *         the last time the group was slashed.
    */
-  function meetsAccountLockedGoldRequirements(address account) public view returns (bool) {
-    uint256 balance = getLockedGold().getAccountTotalLockedGold(account);
-    // Add a bit of "wiggle room" to accommodate the fact that vote activation can result in ~1
-    // wei rounding errors. Using 10 as an additional margin of safety.
-    return balance.add(10) >= getAccountLockedGoldRequirement(account);
+  function resetSlashingMultiplier() external nonReentrant {
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
+    require(isValidatorGroup(account), "Not a validator group");
+    ValidatorGroup storage group = groups[account];
+    require(
+      now >= group.slashInfo.lastSlashed.add(slashingMultiplierResetPeriod),
+      "`resetSlashingMultiplier` called before resetPeriod expired"
+    );
+    group.slashInfo.multiplier = FixidityLib.fixed1();
+  }
+
+  /**
+   * @notice Halves the group's slashing multiplier.
+   * @param account The group being slashed.
+   */
+  function halveSlashingMultiplier(address account) external nonReentrant onlySlasher {
+    require(isValidatorGroup(account), "Not a validator group");
+    ValidatorGroup storage group = groups[account];
+    group.slashInfo.multiplier = FixidityLib.wrap(group.slashInfo.multiplier.unwrap().div(2));
+    group.slashInfo.lastSlashed = now;
   }
 
   /**
@@ -979,33 +615,6 @@ contract Validators is
     address account = getAccounts().signerToAccount(signer);
     require(isValidator(account), "Not a validator");
     return validators[account].publicKeys.bls;
-  }
-
-  /**
-   * @notice Returns validator information.
-   * @param account The account that registered the validator.
-   * @return The unpacked validator struct.
-   */
-  function getValidator(address account)
-    public
-    view
-    returns (
-      bytes memory ecdsaPublicKey,
-      bytes memory blsPublicKey,
-      address affiliation,
-      uint256 score,
-      address signer
-    )
-  {
-    require(isValidator(account), "Not a validator");
-    Validator storage validator = validators[account];
-    return (
-      validator.publicKeys.ecdsa,
-      validator.publicKeys.bls,
-      validator.affiliation,
-      validator.score.unwrap(),
-      getAccounts().getValidatorSigner(account)
-    );
   }
 
   /**
@@ -1035,16 +644,6 @@ contract Validators is
       group.slashInfo.multiplier.unwrap(),
       group.slashInfo.lastSlashed
     );
-  }
-
-  /**
-   * @notice Returns the number of members in a validator group.
-   * @param account The address of the validator group.
-   * @return The number of members in a validator group.
-   */
-  function getGroupNumMembers(address account) public view returns (uint256) {
-    require(isValidatorGroup(account), "Not validator group");
-    return groups[account].members.numElements;
   }
 
   /**
@@ -1139,6 +738,367 @@ contract Validators is
   }
 
   /**
+   * @notice Returns the group that `account` was a member of at the end of the last epoch.
+   * @param signer The signer of the account whose group membership should be returned.
+   * @return The group that `account` was a member of at the end of the last epoch.
+   */
+  function getMembershipInLastEpochFromSigner(address signer) external view returns (address) {
+    address account = getAccounts().signerToAccount(signer);
+    require(isValidator(account), "Not a validator");
+    return getMembershipInLastEpoch(account);
+  }
+
+  /**
+   * @notice Getter for a group's slashing multiplier.
+   * @param account The group to fetch slashing multiplier for.
+   */
+  function getValidatorGroupSlashingMultiplier(address account) external view returns (uint256) {
+    require(isValidatorGroup(account), "Not a validator group");
+    ValidatorGroup storage group = groups[account];
+    return group.slashInfo.multiplier.unwrap();
+  }
+
+  /**
+   * @notice Returns the group that `account` was a member of during `epochNumber`.
+   * @param account The account whose group membership should be returned.
+   * @param epochNumber The epoch number we are querying this account's membership at.
+   * @param index The index into the validator's history struct for their history at `epochNumber`.
+   * @return The group that `account` was a member of during `epochNumber`.
+   */
+  function groupMembershipInEpoch(address account, uint256 epochNumber, uint256 index)
+    external
+    view
+    returns (address)
+  {
+    require(isValidator(account), "Not a validator");
+    require(epochNumber <= getEpochNumber(), "Epoch cannot be larger than current");
+    MembershipHistory storage history = validators[account].membershipHistory;
+    require(index < history.tail.add(history.numEntries), "index out of bounds");
+    require(index >= history.tail && history.numEntries > 0, "index out of bounds");
+    bool isExactMatch = history.entries[index].epochNumber == epochNumber;
+    bool isLastEntry = index.sub(history.tail) == history.numEntries.sub(1);
+    bool isWithinRange = history.entries[index].epochNumber < epochNumber &&
+      (history.entries[index.add(1)].epochNumber > epochNumber || isLastEntry);
+    require(
+      isExactMatch || isWithinRange,
+      "provided index does not match provided epochNumber at index in history."
+    );
+    return history.entries[index].group;
+  }
+
+  /**
+   * @notice Returns the parameters that govern how a validator's score is calculated.
+   * @return The exponent that governs how a validator's score is calculated.
+   * @return The adjustment speed that governs how a validator's score is calculated.
+   */
+  function getValidatorScoreParameters() external view returns (uint256, uint256) {
+    return (validatorScoreParameters.exponent, validatorScoreParameters.adjustmentSpeed.unwrap());
+  }
+
+  /**
+   * @notice Returns the group membership history of a validator.
+   * @param account The validator whose membership history to return.
+   * @return epochs The epochs of a validator.
+   * @return The membership groups of a validator.
+   * @return The last removed from group timestamp of a validator.
+   * @return The tail of a validator.
+   */
+  function getMembershipHistory(address account)
+    external
+    view
+    returns (uint256[] memory, address[] memory, uint256, uint256)
+  {
+    MembershipHistory storage history = validators[account].membershipHistory;
+    uint256[] memory epochs = new uint256[](history.numEntries);
+    address[] memory membershipGroups = new address[](history.numEntries);
+    for (uint256 i = 0; i < history.numEntries; i = i.add(1)) {
+      uint256 index = history.tail.add(i);
+      epochs[i] = history.entries[index].epochNumber;
+      membershipGroups[i] = history.entries[index].group;
+    }
+    return (epochs, membershipGroups, history.lastRemovedFromGroupTimestamp, history.tail);
+  }
+
+  /**
+   * @notice Calculates the aggregate score of a group for an epoch from individual uptimes.
+   * @param uptimes Array of Fixidity representations of the validators' uptimes, between 0 and 1.
+   * @dev group_score = average(uptimes ** exponent)
+   * @return Fixidity representation of the group epoch score between 0 and 1.
+   */
+  function calculateGroupEpochScore(uint256[] calldata uptimes) external view returns (uint256) {
+    require(uptimes.length > 0, "Uptime array empty");
+    require(uptimes.length <= maxGroupSize, "Uptime array larger than maximum group size");
+    FixidityLib.Fraction memory sum;
+    for (uint256 i = 0; i < uptimes.length; i = i.add(1)) {
+      sum = sum.add(FixidityLib.wrap(calculateEpochScore(uptimes[i])));
+    }
+    return sum.divide(FixidityLib.newFixed(uptimes.length)).unwrap();
+  }
+
+  /**
+   * @notice Returns the maximum number of members a group can add.
+   * @return The maximum number of members a group can add.
+   */
+  function getMaxGroupSize() external view returns (uint256) {
+    return maxGroupSize;
+  }
+
+  /**
+   * @notice Returns the block delay for a ValidatorGroup's commission udpdate.
+   * @return The block delay for a ValidatorGroup's commission udpdate.
+   */
+  function getCommissionUpdateDelay() external view returns (uint256) {
+    return commissionUpdateDelay;
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 2, 0, 5);
+  }
+
+  /**
+   * @notice Updates the block delay for a ValidatorGroup's commission udpdate
+   * @param delay Number of blocks to delay the update
+   */
+  function setCommissionUpdateDelay(uint256 delay) public onlyOwner {
+    require(delay != commissionUpdateDelay, "commission update delay not changed");
+    commissionUpdateDelay = delay;
+    emit CommissionUpdateDelaySet(delay);
+  }
+
+  /**
+   * @notice Updates the maximum number of members a group can have.
+   * @param size The maximum group size.
+   * @return True upon success.
+   */
+  function setMaxGroupSize(uint256 size) public onlyOwner returns (bool) {
+    require(0 < size, "Max group size cannot be zero");
+    require(size != maxGroupSize, "Max group size not changed");
+    maxGroupSize = size;
+    emit MaxGroupSizeSet(size);
+    return true;
+  }
+
+  /**
+   * @notice Updates the number of validator group membership entries to store.
+   * @param length The number of validator group membership entries to store.
+   * @return True upon success.
+   */
+  function setMembershipHistoryLength(uint256 length) public onlyOwner returns (bool) {
+    require(0 < length, "Membership history length cannot be zero");
+    require(length != membershipHistoryLength, "Membership history length not changed");
+    membershipHistoryLength = length;
+    emit MembershipHistoryLengthSet(length);
+    return true;
+  }
+
+  /**
+   * @notice Updates the validator score parameters.
+   * @param exponent The exponent used in calculating the score.
+   * @param adjustmentSpeed The speed at which the score is adjusted.
+   * @return True upon success.
+   */
+  function setValidatorScoreParameters(uint256 exponent, uint256 adjustmentSpeed)
+    public
+    onlyOwner
+    returns (bool)
+  {
+    require(
+      adjustmentSpeed <= FixidityLib.fixed1().unwrap(),
+      "Adjustment speed cannot be larger than 1"
+    );
+    require(
+      exponent != validatorScoreParameters.exponent ||
+        !FixidityLib.wrap(adjustmentSpeed).equals(validatorScoreParameters.adjustmentSpeed),
+      "Adjustment speed and exponent not changed"
+    );
+    validatorScoreParameters = ValidatorScoreParameters(
+      exponent,
+      FixidityLib.wrap(adjustmentSpeed)
+    );
+    emit ValidatorScoreParametersSet(exponent, adjustmentSpeed);
+    return true;
+  }
+
+  /**
+   * @notice Updates the Locked Gold requirements for Validator Groups.
+   * @param value The per-member amount of Locked Gold required.
+   * @param duration The time (in seconds) that these requirements persist for.
+   * @return True upon success.
+   */
+  function setGroupLockedGoldRequirements(uint256 value, uint256 duration)
+    public
+    onlyOwner
+    returns (bool)
+  {
+    LockedGoldRequirements storage requirements = groupLockedGoldRequirements;
+    require(
+      value != requirements.value || duration != requirements.duration,
+      "Group requirements not changed"
+    );
+    groupLockedGoldRequirements = LockedGoldRequirements(value, duration);
+    emit GroupLockedGoldRequirementsSet(value, duration);
+    return true;
+  }
+
+  /**
+   * @notice Updates the Locked Gold requirements for Validators.
+   * @param value The amount of Locked Gold required.
+   * @param duration The time (in seconds) that these requirements persist for.
+   * @return True upon success.
+   */
+  function setValidatorLockedGoldRequirements(uint256 value, uint256 duration)
+    public
+    onlyOwner
+    returns (bool)
+  {
+    LockedGoldRequirements storage requirements = validatorLockedGoldRequirements;
+    require(
+      value != requirements.value || duration != requirements.duration,
+      "Validator requirements not changed"
+    );
+    validatorLockedGoldRequirements = LockedGoldRequirements(value, duration);
+    emit ValidatorLockedGoldRequirementsSet(value, duration);
+    return true;
+  }
+
+  /**
+   * @notice Sets the slashingMultiplierRestPeriod property if called by owner.
+   * @param value New reset period for slashing multiplier.
+   */
+  function setSlashingMultiplierResetPeriod(uint256 value) public nonReentrant onlyOwner {
+    slashingMultiplierResetPeriod = value;
+  }
+
+  /**
+   * @notice Sets the downtimeGracePeriod property if called by owner.
+   * @param value New downtime grace period for calculating epoch scores.
+   */
+  function setDowntimeGracePeriod(uint256 value) public nonReentrant onlyOwner {
+    downtimeGracePeriod = value;
+  }
+
+  /**
+   * @notice Returns the current locked gold balance requirement for the supplied account.
+   * @param account The account that may have to meet locked gold balance requirements.
+   * @return The current locked gold balance requirement for the supplied account.
+   */
+  function getAccountLockedGoldRequirement(address account) public view returns (uint256) {
+    if (isValidator(account)) {
+      return validatorLockedGoldRequirements.value;
+    } else if (isValidatorGroup(account)) {
+      uint256 multiplier = Math.max(1, groups[account].members.numElements);
+      uint256[] storage sizeHistory = groups[account].sizeHistory;
+      if (sizeHistory.length > 0) {
+        for (uint256 i = sizeHistory.length.sub(1); i > 0; i = i.sub(1)) {
+          if (sizeHistory[i].add(groupLockedGoldRequirements.duration) >= now) {
+            multiplier = Math.max(i, multiplier);
+            break;
+          }
+        }
+      }
+      return groupLockedGoldRequirements.value.mul(multiplier);
+    }
+    return 0;
+  }
+
+  /**
+   * @notice Returns the group that `account` was a member of at the end of the last epoch.
+   * @param account The account whose group membership should be returned.
+   * @return The group that `account` was a member of at the end of the last epoch.
+   */
+  function getMembershipInLastEpoch(address account) public view returns (address) {
+    uint256 epochNumber = getEpochNumber();
+    MembershipHistory storage history = validators[account].membershipHistory;
+    uint256 head = history.numEntries == 0 ? 0 : history.tail.add(history.numEntries.sub(1));
+    // If the most recent entry in the membership history is for the current epoch number, we need
+    // to look at the previous entry.
+    if (history.entries[head].epochNumber == epochNumber) {
+      if (head > history.tail) {
+        head = head.sub(1);
+      }
+    }
+    return history.entries[head].group;
+  }
+
+  /**
+   * @notice Calculates the validator score for an epoch from the uptime value for the epoch.
+   * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
+   * @dev epoch_score = uptime ** exponent
+   * @return Fixidity representation of the epoch score between 0 and 1.
+   */
+  function calculateEpochScore(uint256 uptime) public view returns (uint256) {
+    require(uptime <= FixidityLib.fixed1().unwrap(), "Uptime cannot be larger than one");
+    uint256 numerator;
+    uint256 denominator;
+    uptime = Math.min(uptime.add(downtimeGracePeriod), FixidityLib.fixed1().unwrap());
+    (numerator, denominator) = fractionMulExp(
+      FixidityLib.fixed1().unwrap(),
+      FixidityLib.fixed1().unwrap(),
+      uptime,
+      FixidityLib.fixed1().unwrap(),
+      validatorScoreParameters.exponent,
+      18
+    );
+    return FixidityLib.newFixedFraction(numerator, denominator).unwrap();
+  }
+
+  /**
+   * @notice Returns whether or not an account meets its Locked Gold requirements.
+   * @param account The address of the account.
+   * @return Whether or not an account meets its Locked Gold requirements.
+   */
+  function meetsAccountLockedGoldRequirements(address account) public view returns (bool) {
+    uint256 balance = getLockedGold().getAccountTotalLockedGold(account);
+    // Add a bit of "wiggle room" to accommodate the fact that vote activation can result in ~1
+    // wei rounding errors. Using 10 as an additional margin of safety.
+    return balance.add(10) >= getAccountLockedGoldRequirement(account);
+  }
+
+  /**
+   * @notice Returns validator information.
+   * @param account The account that registered the validator.
+   * @return The unpacked validator struct.
+   */
+  function getValidator(address account)
+    public
+    view
+    returns (
+      bytes memory ecdsaPublicKey,
+      bytes memory blsPublicKey,
+      address affiliation,
+      uint256 score,
+      address signer
+    )
+  {
+    require(isValidator(account), "Not a validator");
+    Validator storage validator = validators[account];
+    return (
+      validator.publicKeys.ecdsa,
+      validator.publicKeys.bls,
+      validator.affiliation,
+      validator.score.unwrap(),
+      getAccounts().getValidatorSigner(account)
+    );
+  }
+
+  /**
+   * @notice Returns the number of members in a validator group.
+   * @param account The address of the validator group.
+   * @return The number of members in a validator group.
+   */
+  function getGroupNumMembers(address account) public view returns (uint256) {
+    require(isValidatorGroup(account), "Not validator group");
+    return groups[account].members.numElements;
+  }
+
+  /**
    * @notice Returns whether a particular account has a registered validator group.
    * @param account The account.
    * @return Whether a particular address is a registered validator group.
@@ -1154,6 +1114,169 @@ contract Validators is
    */
   function isValidator(address account) public view returns (bool) {
     return validators[account].publicKeys.bls.length > 0;
+  }
+
+  /**
+   * @notice Distributes epoch payments to the account associated with `signer` and its group.
+   * @param signer The validator signer of the validator to distribute the epoch payment to.
+   * @param maxPayment The maximum payment to the validator. Actual payment is based on score and
+   *   group commission.
+   * @return The total payment paid to the validator and their group.
+   */
+  function _distributeEpochPaymentsFromSigner(address signer, uint256 maxPayment)
+    internal
+    returns (uint256)
+  {
+    address account = getAccounts().signerToAccount(signer);
+    require(isValidator(account), "Not a validator");
+    // The group that should be paid is the group that the validator was a member of at the
+    // time it was elected.
+    address group = getMembershipInLastEpoch(account);
+    require(group != address(0), "Validator not registered with a group");
+    // Both the validator and the group must maintain the minimum locked gold balance in order to
+    // receive epoch payments.
+    if (meetsAccountLockedGoldRequirements(account) && meetsAccountLockedGoldRequirements(group)) {
+      FixidityLib.Fraction memory totalPayment = FixidityLib
+        .newFixed(maxPayment)
+        .multiply(validators[account].score)
+        .multiply(groups[group].slashInfo.multiplier);
+      uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
+      FixidityLib.Fraction memory remainingPayment = FixidityLib.newFixed(
+        totalPayment.fromFixed().sub(groupPayment)
+      );
+      (address beneficiary, uint256 fraction) = getAccounts().getPaymentDelegation(account);
+      uint256 delegatedPayment = remainingPayment.multiply(FixidityLib.wrap(fraction)).fromFixed();
+      uint256 validatorPayment = remainingPayment.fromFixed().sub(delegatedPayment);
+      IStableToken stableToken = getStableToken();
+      require(stableToken.mint(group, groupPayment), "mint failed to validator group");
+      require(stableToken.mint(account, validatorPayment), "mint failed to validator account");
+      if (fraction != 0) {
+        require(stableToken.mint(beneficiary, delegatedPayment), "mint failed to delegatee");
+      }
+      emit ValidatorEpochPaymentDistributed(account, validatorPayment, group, groupPayment);
+      return totalPayment.fromFixed();
+    } else {
+      return 0;
+    }
+  }
+
+  /**
+   * @notice Updates a validator's score based on its uptime for the epoch.
+   * @param signer The validator signer of the validator whose score needs updating.
+   * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
+   * @dev new_score = uptime ** exponent * adjustmentSpeed + old_score * (1 - adjustmentSpeed)
+   * @return True upon success.
+   */
+  function _updateValidatorScoreFromSigner(address signer, uint256 uptime) internal {
+    address account = getAccounts().signerToAccount(signer);
+    require(isValidator(account), "Not a validator");
+
+    FixidityLib.Fraction memory epochScore = FixidityLib.wrap(calculateEpochScore(uptime));
+    FixidityLib.Fraction memory newComponent = validatorScoreParameters.adjustmentSpeed.multiply(
+      epochScore
+    );
+
+    FixidityLib.Fraction memory currentComponent = FixidityLib.fixed1().subtract(
+      validatorScoreParameters.adjustmentSpeed
+    );
+    currentComponent = currentComponent.multiply(validators[account].score);
+    validators[account].score = FixidityLib.wrap(
+      Math.min(epochScore.unwrap(), newComponent.add(currentComponent).unwrap())
+    );
+    emit ValidatorScoreUpdated(account, validators[account].score.unwrap(), epochScore.unwrap());
+  }
+
+  function _isRegistrationAllowed(address account) private returns (bool) {
+    require(
+      !getElection().allowedToVoteOverMaxNumberOfGroups(account),
+      "Cannot vote for more than max number of groups"
+    );
+    require(
+      // Validator could avoid getting slashed by delegating Celo to delegatees that would be voting
+      // for lots of proposals. Such transaction could run out of gas.
+      getLockedGold().getAccountTotalDelegatedFraction(account) == 0,
+      "Cannot delegate governance power"
+    );
+  }
+
+  /**
+   * @notice Adds a member to the end of a validator group's list of members.
+   * @param group The address of the validator group.
+   * @param validator The validator to add to the group.
+   * @param lesser The address of the group that has received fewer votes than this group.
+   * @param greater The address of the group that has received more votes than this group.
+   * @return True upon success.
+   * @dev Fails if `validator` has not set their affiliation to this account.
+   * @dev Fails if the group has > 0 members.
+   */
+  function _addMember(address group, address validator, address lesser, address greater)
+    private
+    returns (bool)
+  {
+    require(isValidatorGroup(group) && isValidator(validator), "Not validator and group");
+    ValidatorGroup storage _group = groups[group];
+    require(_group.members.numElements < maxGroupSize, "group would exceed maximum size");
+    require(validators[validator].affiliation == group, "Not affiliated to group");
+    require(!_group.members.contains(validator), "Already in group");
+    uint256 numMembers = _group.members.numElements.add(1);
+    _group.members.push(validator);
+    require(meetsAccountLockedGoldRequirements(group), "Group requirements not met");
+    require(meetsAccountLockedGoldRequirements(validator), "Validator requirements not met");
+    if (numMembers == 1) {
+      getElection().markGroupEligible(group, lesser, greater);
+    }
+    updateMembershipHistory(validator, group);
+    updateSizeHistory(group, numMembers.sub(1));
+    emit ValidatorGroupMemberAdded(group, validator);
+    return true;
+  }
+
+  /**
+   * @notice Updates a validator's BLS key.
+   * @param validator The validator whose BLS public key should be updated.
+   * @param account The address under which the validator is registered.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
+   *   proof of possession. 96 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 48 bytes.
+   * @return True upon success.
+   */
+  function _updateBlsPublicKey(
+    Validator storage validator,
+    address account,
+    bytes memory blsPublicKey,
+    bytes memory blsPop
+  ) private returns (bool) {
+    require(blsPublicKey.length == 96, "Wrong BLS public key length");
+    require(blsPop.length == 48, "Wrong BLS PoP length");
+    require(checkProofOfPossession(account, blsPublicKey, blsPop), "Invalid BLS PoP");
+    validator.publicKeys.bls = blsPublicKey;
+    emit ValidatorBlsPublicKeyUpdated(account, blsPublicKey);
+    return true;
+  }
+
+  /**
+   * @notice Updates a validator's ECDSA key.
+   * @param validator The validator whose ECDSA public key should be updated.
+   * @param signer The address with which the validator is signing consensus messages.
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus. Should
+   *   match `signer`. 64 bytes.
+   * @return True upon success.
+   */
+  function _updateEcdsaPublicKey(
+    Validator storage validator,
+    address account,
+    address signer,
+    bytes memory ecdsaPublicKey
+  ) private returns (bool) {
+    require(ecdsaPublicKey.length == 64, "Wrong ECDSA public key length");
+    require(
+      address(uint160(uint256(keccak256(ecdsaPublicKey)))) == signer,
+      "ECDSA key does not match signer"
+    );
+    validator.publicKeys.ecdsa = ecdsaPublicKey;
+    emit ValidatorEcdsaPublicKeyUpdated(account, ecdsaPublicKey);
+    return true;
   }
 
   /**
@@ -1256,36 +1379,6 @@ contract Validators is
   }
 
   /**
-   * @notice Returns the group that `account` was a member of at the end of the last epoch.
-   * @param signer The signer of the account whose group membership should be returned.
-   * @return The group that `account` was a member of at the end of the last epoch.
-   */
-  function getMembershipInLastEpochFromSigner(address signer) external view returns (address) {
-    address account = getAccounts().signerToAccount(signer);
-    require(isValidator(account), "Not a validator");
-    return getMembershipInLastEpoch(account);
-  }
-
-  /**
-   * @notice Returns the group that `account` was a member of at the end of the last epoch.
-   * @param account The account whose group membership should be returned.
-   * @return The group that `account` was a member of at the end of the last epoch.
-   */
-  function getMembershipInLastEpoch(address account) public view returns (address) {
-    uint256 epochNumber = getEpochNumber();
-    MembershipHistory storage history = validators[account].membershipHistory;
-    uint256 head = history.numEntries == 0 ? 0 : history.tail.add(history.numEntries.sub(1));
-    // If the most recent entry in the membership history is for the current epoch number, we need
-    // to look at the previous entry.
-    if (history.entries[head].epochNumber == epochNumber) {
-      if (head > history.tail) {
-        head = head.sub(1);
-      }
-    }
-    return history.entries[head].group;
-  }
-
-  /**
    * @notice De-affiliates a validator, removing it from the group for which it is a member.
    * @param validator The validator to deaffiliate from their affiliated validator group.
    * @param validatorAccount The LockedGold account of the validator.
@@ -1304,98 +1397,4 @@ contract Validators is
     emit ValidatorDeaffiliated(validatorAccount, affiliation);
     return true;
   }
-
-  /**
-   * @notice Removes a validator from the group for which it is a member.
-   * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
-   */
-  function forceDeaffiliateIfValidator(address validatorAccount) external nonReentrant onlySlasher {
-    if (isValidator(validatorAccount)) {
-      Validator storage validator = validators[validatorAccount];
-      if (validator.affiliation != address(0)) {
-        _deaffiliate(validator, validatorAccount);
-      }
-    }
-  }
-
-  /**
-   * @notice Sets the slashingMultiplierRestPeriod property if called by owner.
-   * @param value New reset period for slashing multiplier.
-   */
-  function setSlashingMultiplierResetPeriod(uint256 value) public nonReentrant onlyOwner {
-    slashingMultiplierResetPeriod = value;
-  }
-
-  /**
-   * @notice Sets the downtimeGracePeriod property if called by owner.
-   * @param value New downtime grace period for calculating epoch scores.
-   */
-  function setDowntimeGracePeriod(uint256 value) public nonReentrant onlyOwner {
-    downtimeGracePeriod = value;
-  }
-
-  /**
-   * @notice Resets a group's slashing multiplier if it has been >= the reset period since
-   *         the last time the group was slashed.
-   */
-  function resetSlashingMultiplier() external nonReentrant {
-    address account = getAccounts().validatorSignerToAccount(msg.sender);
-    require(isValidatorGroup(account), "Not a validator group");
-    ValidatorGroup storage group = groups[account];
-    require(
-      now >= group.slashInfo.lastSlashed.add(slashingMultiplierResetPeriod),
-      "`resetSlashingMultiplier` called before resetPeriod expired"
-    );
-    group.slashInfo.multiplier = FixidityLib.fixed1();
-  }
-
-  /**
-   * @notice Halves the group's slashing multiplier.
-   * @param account The group being slashed.
-   */
-  function halveSlashingMultiplier(address account) external nonReentrant onlySlasher {
-    require(isValidatorGroup(account), "Not a validator group");
-    ValidatorGroup storage group = groups[account];
-    group.slashInfo.multiplier = FixidityLib.wrap(group.slashInfo.multiplier.unwrap().div(2));
-    group.slashInfo.lastSlashed = now;
-  }
-
-  /**
-   * @notice Getter for a group's slashing multiplier.
-   * @param account The group to fetch slashing multiplier for.
-   */
-  function getValidatorGroupSlashingMultiplier(address account) external view returns (uint256) {
-    require(isValidatorGroup(account), "Not a validator group");
-    ValidatorGroup storage group = groups[account];
-    return group.slashInfo.multiplier.unwrap();
-  }
-
-  /**
-   * @notice Returns the group that `account` was a member of during `epochNumber`.
-   * @param account The account whose group membership should be returned.
-   * @param epochNumber The epoch number we are querying this account's membership at.
-   * @param index The index into the validator's history struct for their history at `epochNumber`.
-   * @return The group that `account` was a member of during `epochNumber`.
-   */
-  function groupMembershipInEpoch(address account, uint256 epochNumber, uint256 index)
-    external
-    view
-    returns (address)
-  {
-    require(isValidator(account), "Not a validator");
-    require(epochNumber <= getEpochNumber(), "Epoch cannot be larger than current");
-    MembershipHistory storage history = validators[account].membershipHistory;
-    require(index < history.tail.add(history.numEntries), "index out of bounds");
-    require(index >= history.tail && history.numEntries > 0, "index out of bounds");
-    bool isExactMatch = history.entries[index].epochNumber == epochNumber;
-    bool isLastEntry = index.sub(history.tail) == history.numEntries.sub(1);
-    bool isWithinRange = history.entries[index].epochNumber < epochNumber &&
-      (history.entries[index.add(1)].epochNumber > epochNumber || isLastEntry);
-    require(
-      isExactMatch || isWithinRange,
-      "provided index does not match provided epochNumber at index in history."
-    );
-    return history.entries[index].group;
-  }
-
 }

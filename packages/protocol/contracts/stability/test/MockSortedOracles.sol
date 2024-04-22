@@ -39,11 +39,11 @@ contract MockSortedOracles {
     return (0, 0);
   }
 
-  function isOldestReportExpired(address token) public view returns (bool, address) {
-    return (expired[token], token);
-  }
-
   function setOldestReportExpired(address token) public {
     expired[token] = true;
+  }
+
+  function isOldestReportExpired(address token) public view returns (bool, address) {
+    return (expired[token], token);
   }
 }
