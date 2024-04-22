@@ -1,4 +1,4 @@
-/* tslint:disable:no-console */
+
 // TODO(asa): Refactor and rename to 'deployment-utils.ts'
 import { Address, CeloTxObject } from '@celo/connect'
 import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
@@ -151,10 +151,10 @@ export function checkFunctionArgsLength(args: any[], abi: any) {
 export async function setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
 >(web3: Web3, artifacts: any, contractName: string, contractPackage?: ContractPackage, ...args: any[]): Promise<ContractInstance> {
-  
+
   const wrappedArtifacts = ArtifactsSingleton.getInstance(contractPackage, artifacts)
   const Contract = wrappedArtifacts.require(contractName)
-  
+
   // getProxy function supports the case the proxy is in a different package
   // which is the case for GasPriceMimimum
   const ContractProxy = wrappedArtifacts.getProxy(contractName, artifacts)
@@ -188,7 +188,7 @@ export async function _setInitialProxyImplementation<
   if (initializerAbi) {
     // TODO(Martin): check types, not just argument number
     checkFunctionArgsLength(args, initializerAbi)
-    console.log(`  Setting initial ${contractName} implementation on proxy`)
+    console.info(`  Setting initial ${contractName} implementation on proxy`)
     receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, txOptions, ...args)
   } else {
     if (txOptions.from != null) {
@@ -213,7 +213,7 @@ export async function getDeployedProxiedContract<ContractInstance extends Truffl
 ): Promise<ContractInstance> {
 
   const Contract: Truffle.Contract<ContractInstance> = customArtifacts.require(contractName)
-  
+
   let Proxy:ProxyContract
   // this wrap avoids a lot of rewrite
   const overloadedArtifact = ArtifactsSingleton.wrap(customArtifacts)
@@ -308,16 +308,16 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   artifactPath?: ContractPackage
 ) {
 
-  console.log("-> Started deployment for", name)
+  console.info("-> Started deployment for", name)
   let Contract
   let ContractProxy
   if (artifactPath) {
     Contract = makeTruffleContractForMigration(name, artifactPath, web3)
-    
+
     // This supports the case the proxy is in a different package
     if (artifactPath.proxiesPath){
       if (artifactPath.proxiesPath == "/"){
-        ContractProxy = artifacts.require(name + 'Proxy')  
+        ContractProxy = artifacts.require(name + 'Proxy')
       } else {
         throw "Loading proxies for custom path not supported"
       }
@@ -331,7 +331,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
 
   const testingDeployment = false
   return (deployer: any, networkName: string, _accounts: string[]) => {
-    console.log("\n-> Deploying", name)
+    console.info("\n-> Deploying", name)
 
     deployer.deploy(ContractProxy)
     deployer.deploy(Contract, testingDeployment)
@@ -383,7 +383,7 @@ export async function transferOwnershipOfProxy(
 export async function transferOwnershipOfProxyAndImplementation<
   ContractInstance extends OwnableInstance
 >(contractName: string, owner: string, artifacts: any) {
-  console.log(`  Transferring ownership of ${contractName} and its Proxy to ${owner}`)
+  console.info(`  Transferring ownership of ${contractName} and its Proxy to ${owner}`)
   const contract: ContractInstance = await getDeployedProxiedContract<ContractInstance>(
     contractName,
     artifacts

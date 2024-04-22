@@ -1,5 +1,3 @@
-/* tslint:disable:no-console */
-
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,

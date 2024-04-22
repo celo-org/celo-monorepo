@@ -7,7 +7,7 @@ export class ContractDependencies {
     Object.keys(libraries).forEach((lib: string) => {
       libraries[lib].forEach((contract: string) => {
         if (this.dependencies.has(contract)) {
-          this.dependencies.get(contract).push(lib)
+          this.dependencies.get(contract)!.push(lib)
         } else {
           this.dependencies.set(contract, [lib])
         }
@@ -16,7 +16,7 @@ export class ContractDependencies {
   }
 
   public get = (contract: string): string[] => {
-    return this.dependencies.has(contract) ? this.dependencies.get(contract) : []
+    return this.dependencies.has(contract) ? this.dependencies.get(contract)! : []
   }
 }
 

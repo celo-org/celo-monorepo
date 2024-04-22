@@ -1,4 +1,5 @@
 import { CeloContract } from '@celo/contractkit'
+// eslint-disable-next-line  import/no-extraneous-dependencies
 import { describe, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
 import { EnvTestContext } from '../context'

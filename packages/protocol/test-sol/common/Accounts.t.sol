@@ -201,7 +201,7 @@ contract AccountsTest is Test {
   }
 }
 
-contract AccountsCreateAccount is AccountsTest {
+contract AccountsTest_createAccount is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -212,14 +212,14 @@ contract AccountsCreateAccount is AccountsTest {
     assertEq(accounts.isAccount(address(this)), true);
   }
 
-  function test_ShouldEmitAccountCreatedEvent() public {
+  function test_Emits_AccountCreatedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit AccountCreated(address(this));
     accounts.createAccount();
   }
 }
 
-contract AccountsSetAccountDataEncryptionKey is AccountsTest {
+contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -246,14 +246,14 @@ contract AccountsSetAccountDataEncryptionKey is AccountsTest {
     assertEq(accounts.getDataEncryptionKey(address(this)), longDataEncryptionKey);
   }
 
-  function test_ShouldEmitAccountDataEncryptionKeySet() public {
+  function test_Emits_AccountDataEncryptionKeySet() public {
     vm.expectEmit(true, true, true, true);
     emit AccountDataEncryptionKeySet(address(this), dataEncryptionKey);
     accounts.setAccountDataEncryptionKey(dataEncryptionKey);
   }
 }
 
-contract AccountsSetAccount is AccountsTest {
+contract AccountsTest_setAccount is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -268,21 +268,21 @@ contract AccountsSetAccount is AccountsTest {
     assertEq(accounts.getWalletAddress(address(this)), address(this));
   }
 
-  function test_ShouldEmitAccountNameSetEvent_WhenTheAccountHasBeenCreated() public {
+  function test_Emits_AccountNameSetEvent_WhenTheAccountHasBeenCreated() public {
     accounts.createAccount();
     vm.expectEmit(true, true, true, true);
     emit AccountNameSet(address(this), name);
     accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
   }
 
-  function test_ShouldEmitAccountDataEncryptionKeySetEvent_WhenTheAccountHasBeenCreated() public {
+  function test_Emits_AccountDataEncryptionKeySetEvent_WhenTheAccountHasBeenCreated() public {
     accounts.createAccount();
     vm.expectEmit(true, true, true, true);
     emit AccountDataEncryptionKeySet(address(this), dataEncryptionKey);
     accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
   }
 
-  function test_ShouldEmitAccountWalletAddressSetEvent_WhenTheAccountHasBeenCreated() public {
+  function test_Emits_AccountWalletAddressSetEvent_WhenTheAccountHasBeenCreated() public {
     accounts.createAccount();
     vm.expectEmit(true, true, true, true);
     emit AccountWalletAddressSet(address(this), address(this));
@@ -307,27 +307,25 @@ contract AccountsSetAccount is AccountsTest {
     assertEq(accounts.isAccount(address(this)), true);
   }
 
-  function test_ShouldEmitAccountCreated_WhenTheAccountHasNotBeenCreated() public {
+  function test_Emits_AccountCreated_WhenTheAccountHasNotBeenCreated() public {
     vm.expectEmit(true, true, true, true);
     emit AccountCreated(address(this));
     accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
   }
 
-  function test_ShouldEmitAccountNameSetEvent_WhenTheAccountHasNotBeenCreated() public {
+  function test_Emits_AccountNameSetEvent_WhenTheAccountHasNotBeenCreated() public {
     vm.expectEmit(true, true, true, true);
     emit AccountNameSet(address(this), name);
     accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
   }
 
-  function test_ShouldEmitAccountDataEncryptionKeySetEvent_WhenTheAccountHasNotBeenCreated()
-    public
-  {
+  function test_Emits_AccountDataEncryptionKeySetEvent_WhenTheAccountHasNotBeenCreated() public {
     vm.expectEmit(true, true, true, true);
     emit AccountDataEncryptionKeySet(address(this), dataEncryptionKey);
     accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
   }
 
-  function test_ShouldEmitAccountWalletAddressSetEvent_WhenTheAccountHasNotBeenCreated() public {
+  function test_Emits_AccountWalletAddressSetEvent_WhenTheAccountHasNotBeenCreated() public {
     vm.expectEmit(true, true, true, true);
     emit AccountWalletAddressSet(address(this), address(this));
     accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
@@ -341,7 +339,7 @@ contract AccountsSetAccount is AccountsTest {
   }
 }
 
-contract AccountsSetWalletAddress is AccountsTest {
+contract AccountsTest_setWalletAddress is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -373,7 +371,7 @@ contract AccountsSetWalletAddress is AccountsTest {
     assertEq(accounts.getWalletAddress(address(this)), address(0));
   }
 
-  function test_ShouldEmitTheAccountWalletAddressSetEvent_WhenAccountHasBeenCreated() public {
+  function test_Emits_TheAccountWalletAddressSetEvent_WhenAccountHasBeenCreated() public {
     accounts.createAccount();
     vm.expectEmit(true, true, true, true);
     emit AccountWalletAddressSet(address(this), address(this));
@@ -391,7 +389,7 @@ contract AccountsSetWalletAddress is AccountsTest {
   }
 }
 
-contract AccountsSetMetadataURL is AccountsTest {
+contract AccountsTest_setMetadataURL is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -407,7 +405,7 @@ contract AccountsSetMetadataURL is AccountsTest {
     assertEq(accounts.getMetadataURL(address(this)), metadataURL);
   }
 
-  function test_ShouldEmitTheAccountMetadataURLSetEvent() public {
+  function test_Emits_TheAccountMetadataURLSetEvent() public {
     accounts.createAccount();
     vm.expectEmit(true, true, true, true);
     emit AccountMetadataURLSet(address(this), metadataURL);
@@ -415,7 +413,7 @@ contract AccountsSetMetadataURL is AccountsTest {
   }
 }
 
-contract AccountsBatchGetMetadataURL is AccountsTest {
+contract AccountsTest_batchGetMetadataURL is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -466,7 +464,7 @@ contract AccountsBatchGetMetadataURL is AccountsTest {
   }
 }
 
-contract AccountsAddStorageRoot is AccountsTest {
+contract AccountsTest_addStorageRoot is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -489,7 +487,7 @@ contract AccountsAddStorageRoot is AccountsTest {
     assertStorageRoots(string(concatenated), length, urls);
   }
 
-  function test_ShouldEmitTheOffchainStorageRootAddedEvent_WhenAccountHasBeenCreated() public {
+  function test_Emits_TheOffchainStorageRootAddedEvent_WhenAccountHasBeenCreated() public {
     accounts.createAccount();
     vm.expectEmit(true, true, true, true);
     emit OffchainStorageRootAdded(address(this), bytes(metadataURL));
@@ -512,7 +510,7 @@ contract AccountsAddStorageRoot is AccountsTest {
   }
 }
 
-contract AccountsRemoveStorageRoot is AccountsTest {
+contract AccountsTest_removeStorageRoot is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -566,7 +564,7 @@ contract AccountsRemoveStorageRoot is AccountsTest {
     assertStorageRoots(string(concatenated), length, urls);
   }
 
-  function test_ShouldEmitOffchainStorageRootRemovedEvent_WhenThereAreStorageRootsAndAccountHasBeenCreated()
+  function test_Emits_OffchainStorageRootRemovedEvent_WhenThereAreStorageRootsAndAccountHasBeenCreated()
     public
   {
     accounts.createAccount();
@@ -588,7 +586,7 @@ contract AccountsRemoveStorageRoot is AccountsTest {
   }
 }
 
-contract AccountsSetPaymentDelegation is AccountsTest {
+contract AccountsTest_setPaymentDelegation is AccountsTest {
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
   uint256 badFraction = FixidityLib.newFixedFraction(12, 10).unwrap();
@@ -622,7 +620,7 @@ contract AccountsSetPaymentDelegation is AccountsTest {
     accounts.setPaymentDelegation(address(0), badFraction);
   }
 
-  function test_ShouldEmitAPaymentDelegationSetEvent() public {
+  function test_Emits_APaymentDelegationSetEvent() public {
     accounts.createAccount();
     vm.expectEmit(true, true, true, true);
     emit PaymentDelegationSet(beneficiary, fraction);
@@ -630,7 +628,7 @@ contract AccountsSetPaymentDelegation is AccountsTest {
   }
 }
 
-contract AccountsDeletePaymentDelegation is AccountsTest {
+contract AccountsTest_deletePaymentDelegation is AccountsTest {
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
 
@@ -653,14 +651,14 @@ contract AccountsDeletePaymentDelegation is AccountsTest {
     assertEq(realFraction, 0);
   }
 
-  function test_ShouldEmitAPaymentDelegationSetEvent() public {
+  function test_Emits_APaymentDelegationSetEvent() public {
     vm.expectEmit(true, true, true, true);
     emit PaymentDelegationSet(address(0), 0);
     accounts.deletePaymentDelegation();
   }
 }
 
-contract AccountsSetName is AccountsTest {
+contract AccountsTest_setName is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -676,7 +674,7 @@ contract AccountsSetName is AccountsTest {
     assertEq(accounts.getName(address(this)), name);
   }
 
-  function test_ShouldEmitAccountNameSetEvent() public {
+  function test_Emits_AccountNameSetEvent() public {
     accounts.createAccount();
     vm.expectEmit(true, true, true, true);
     emit AccountNameSet(address(this), name);
@@ -684,7 +682,7 @@ contract AccountsSetName is AccountsTest {
   }
 }
 
-contract AccountsGenericAuthorization is AccountsTest {
+contract AccountsTest_GenericAuthorization is AccountsTest {
   address account2 = actor("account2");
   address signer;
   uint256 signerPK;
@@ -747,7 +745,7 @@ contract AccountsGenericAuthorization is AccountsTest {
     assertEq(accounts.isAuthorizedSigner(signer), true);
   }
 
-  function test_ShouldEmitTheRightEvents_WhenSmartContractSigner() public {
+  function test_Emits_TheRightEvents_WhenSmartContractSigner() public {
     vm.expectEmit(true, true, true, true);
     emit SignerAuthorizationStarted(address(this), signer, role);
     accounts.authorizeSigner(signer, role);
@@ -766,7 +764,7 @@ contract AccountsGenericAuthorization is AccountsTest {
     assertEq(accounts.isAuthorizedSigner(signer), true);
   }
 
-  function test_ShouldEmitTheRightEvents_WhenEOASigner() public {
+  function test_Emits_TheRightEvents_WhenEOASigner() public {
     vm.expectEmit(true, true, true, true);
     emit SignerAuthorized(address(this), signer, role);
     accounts.authorizeSignerWithSignature(signer, role, v, r, s);
@@ -868,7 +866,7 @@ contract AccountsGenericAuthorization is AccountsTest {
   }
 }
 
-contract AccountsBackwardCompatibility is AccountsTest {
+contract AccountsTest_BackwardCompatibility is AccountsTest {
   address account = address(this);
   address otherAccount = actor("otherAccount");
 
@@ -1079,37 +1077,37 @@ contract AccountsBackwardCompatibility is AccountsTest {
     helperShouldSetAuthorizedKey(true, true, Role.Validator);
   }
 
-  function test_ShouldEmitRightEventVote_GenericWriteTrue() public {
+  function test_Emits_RightEventVote_GenericWriteTrue() public {
     vm.expectEmit(true, true, true, true);
     emit SignerAuthorized(account, signer, getRole(Role.Vote));
     authorize(Role.Vote, true, account, signer, signerPK);
   }
 
-  function test_ShouldEmitRightEventVote_GenericWriteFalse() public {
+  function test_Emits_RightEventVote_GenericWriteFalse() public {
     vm.expectEmit(true, true, true, true);
     emit VoteSignerAuthorized(account, signer);
     authorize(Role.Vote, false, account, signer, signerPK);
   }
 
-  function test_ShouldEmitRightEventAttestation_GenericWriteTrue() public {
+  function test_Emits_RightEventAttestation_GenericWriteTrue() public {
     vm.expectEmit(true, true, true, true);
     emit SignerAuthorized(account, signer, getRole(Role.Attestation));
     authorize(Role.Attestation, true, account, signer, signerPK);
   }
 
-  function test_ShouldEmitRightEventAttestation_GenericWriteFalse() public {
+  function test_Emits_RightEventAttestation_GenericWriteFalse() public {
     vm.expectEmit(true, true, true, true);
     emit AttestationSignerAuthorized(account, signer);
     authorize(Role.Attestation, false, account, signer, signerPK);
   }
 
-  function test_ShouldEmitRightEventValidator_GenericWriteTrue() public {
+  function test_Emits_RightEventValidator_GenericWriteTrue() public {
     vm.expectEmit(true, true, true, true);
     emit SignerAuthorized(account, signer, getRole(Role.Validator));
     authorize(Role.Validator, true, account, signer, signerPK);
   }
 
-  function test_ShouldEmitRightEventValidator_GenericWriteFalse() public {
+  function test_Emits_RightEventValidator_GenericWriteFalse() public {
     vm.expectEmit(true, true, true, true);
     emit ValidatorSignerAuthorized(account, signer);
     authorize(Role.Validator, false, account, signer, signerPK);

@@ -6,21 +6,25 @@ import { fetchEnvOrDefault } from './env'
 const logLevel = fetchEnvOrDefault('LOG_LEVEL', 'info') as LogLevelString
 const logFormat = fetchEnvOrDefault('LOG_FORMAT', 'human')
 
-let stream: any
+const streams: Logger.LoggerOptions['streams'] = []
 switch (logFormat) {
   case 'stackdriver':
-    stream = createStream(levelFromName[logLevel])
+    streams.push(createStream(levelFromName[logLevel]))
     break
   case 'json':
-    stream = { stream: process.stdout, level: logLevel }
+    streams.push({ stream: process.stdout, level: logLevel })
     break
   default:
-    stream = { level: logLevel, stream: bunyanDebugStream() }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    streams.push({
+      level: logLevel,
+      stream: bunyanDebugStream() as unknown as NodeJS.WritableStream,
+    })
     break
 }
 
 export const rootLogger: Logger = createLogger({
   name: 'env-tests',
   serializers: stdSerializers,
-  streams: [stream],
+  streams,
 })

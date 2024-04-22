@@ -35,21 +35,21 @@ const comp = (c1: Change, c2: Change): number => {
 describe('#reportASTIncompatibilities()', () => {
   describe('when the contracts are the same', () => {
     it('reports no changes', () => {
-      const report = reportASTIncompatibilities(testCases.original, [testCases.original_copy])
+      const report = reportASTIncompatibilities([testCases.original], [testCases.original_copy])
       assert.isEmpty(report.getChanges())
     })
   })
 
   describe('when only metadata has changed', () => {
     it('reports no changes', () => {
-      const report = reportASTIncompatibilities(testCases.original, [testCases.metadata_changed])
+      const report = reportASTIncompatibilities([testCases.original], [testCases.metadata_changed])
       assert.isEmpty(report.getChanges())
     })
   })
 
   describe('when a contract storage is changed', () => {
     it('reports only bytecode changes', () => {
-      const report = reportASTIncompatibilities(testCases.original, [testCases.inserted_constant])
+      const report = reportASTIncompatibilities([testCases.original], [testCases.inserted_constant])
       const expected = [new DeployedBytecodeChange('TestContract')]
       assert.deepEqual(report.getChanges(), expected)
     })
@@ -57,9 +57,10 @@ describe('#reportASTIncompatibilities()', () => {
 
   describe('when a contract and methods are added', () => {
     it('reports proper changes', () => {
-      const report = reportASTIncompatibilities(testCases.original, [
-        testCases.added_methods_and_contracts,
-      ])
+      const report = reportASTIncompatibilities(
+        [testCases.original],
+        [testCases.added_methods_and_contracts]
+      )
       const expected = [
         new NewContractChange('TestContractNew'),
         new DeployedBytecodeChange('TestContract'),
@@ -74,9 +75,10 @@ describe('#reportASTIncompatibilities()', () => {
 
   describe('when methods are removed', () => {
     it('reports proper changes', () => {
-      const report = reportASTIncompatibilities(testCases.added_methods_and_contracts, [
-        testCases.original,
-      ])
+      const report = reportASTIncompatibilities(
+        [testCases.added_methods_and_contracts],
+        [testCases.original]
+      )
       const expected = [
         new DeployedBytecodeChange('TestContract'),
         new MethodRemovedChange('TestContract', 'newMethod1(uint256)'),
@@ -90,9 +92,10 @@ describe('#reportASTIncompatibilities()', () => {
 
   describe('when many changes are made', () => {
     it('reports proper changes', () => {
-      const report = reportASTIncompatibilities(testCases.big_original, [
-        testCases.big_original_modified,
-      ])
+      const report = reportASTIncompatibilities(
+        [testCases.big_original],
+        [testCases.big_original_modified]
+      )
       const expected = [
         new NewContractChange('NewContract'),
         new DeployedBytecodeChange('ImplementationChangeContract'),

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.5.13 <0.9.0;
 
 /**
  * @title A mock SortedOracles for testing.
@@ -21,7 +21,7 @@ contract MockSortedOracles {
 
   function setMedianTimestampToNow(address token) external {
     // solhint-disable-next-line not-rely-on-time
-    medianTimestamp[token] = uint128(now);
+    medianTimestamp[token] = uint128(block.timestamp);
   }
 
   function setNumRates(address token, uint256 rate) external {

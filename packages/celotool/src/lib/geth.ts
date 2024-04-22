@@ -1,9 +1,8 @@
-// tslint:disable:no-console
+/* eslint-disable no-console */
 import { CeloTxReceipt, TransactionResult } from '@celo/connect'
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
-import { waitForPortOpen } from '@celo/dev-utils/lib/network'
 import BigNumber from 'bignumber.js'
 import { spawn } from 'child_process'
 import { randomBytes } from 'crypto'
@@ -14,21 +13,23 @@ import path from 'path'
 import sleep from 'sleep-promise'
 import Web3 from 'web3'
 import { Admin } from 'web3-eth-admin'
+import { numberToHex } from 'web3-utils'
 import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
+  Validator,
   generateGenesis,
   generateGenesisWithMigrations,
   generatePrivateKey,
   privateKeyToAddress,
   privateKeyToPublicKey,
-  Validator,
 } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
 import { GethRunConfig } from './interfaces/geth-run-config'
+import { waitForPortOpen } from './port-utils'
 import { ensure0x } from './utils'
 
 export async function unlockAccount(
@@ -79,7 +80,7 @@ export const LOG_TAG_TRANSACTION_VALIDATION_ERROR = 'validate_transaction_error'
 // the transaction has been sent
 export const LOG_TAG_TX_TIME_MEASUREMENT = 'tx_time_measurement'
 // max number of threads used for load testing
-export const MAX_LOADTEST_THREAD_COUNT = 100
+export const MAX_LOADTEST_THREAD_COUNT = 10000
 
 export const getEnodeAddress = (nodeId: string, ipAddress: string, port: number) => {
   return `enode://${nodeId}@${ipAddress}:${port}`
@@ -309,7 +310,7 @@ const validateTransactionAndReceipt = (
 }
 
 const tracerLog = (logMessage: any) => {
-  console.log(JSON.stringify(logMessage))
+  console.info(JSON.stringify(logMessage))
 }
 
 const exitTracerTool = (logMessage: any) => {
@@ -448,6 +449,7 @@ export const transferCalldata = async (
   amount: BigNumber,
   dataStr?: string,
   txOptions: {
+    chainId?: number
     gas?: number
     gasPrice?: string
     feeCurrency?: string
@@ -459,12 +461,45 @@ export const transferCalldata = async (
   return kit.sendTransaction({
     from: fromAddress,
     to: toAddress,
+    chainId: numberToHex(txOptions.chainId || 0),
     value: amount.toString(),
     data: dataStr,
     gas: txOptions.gas,
     gasPrice: txOptions.gasPrice,
     gatewayFeeRecipient: txOptions.gatewayFeeRecipient,
     gatewayFee: txOptions.gatewayFee,
+    nonce: txOptions.nonce,
+  })
+}
+
+// Reference: https://celoscan.io/tx/0x88928b2abfcfb915077341087defc4ba345ce771ed6190bc9d21f34fdc1d34e1
+export const transferOrdinals = async (
+  kit: ContractKit,
+  fromAddress: string,
+  toAddress: string,
+  amount: BigNumber,
+  dataStr?: string,
+  txOptions: {
+    chainId?: number
+    gas?: number
+    gasPrice?: string
+    feeCurrency?: string
+    gatewayFeeRecipient?: string
+    gatewayFee?: string
+    nonce?: number
+  } = {}
+) => {
+  return kit.connection.sendTransaction({
+    from: fromAddress,
+    to: fromAddress,
+    value: '0',
+    chainId: numberToHex(txOptions.chainId || 0),
+    data: Buffer.from('data:,{"p":"cls-20","op":"mint","tick":"cels","amt":"100000000"}').toString(
+      'hex'
+    ),
+    gas: '40000',
+    maxFeePerGas: Web3.utils.toWei('5', 'gwei'),
+    maxPriorityFeePerGas: '1',
     nonce: txOptions.nonce,
   })
 }
@@ -476,6 +511,7 @@ export const transferCeloGold = async (
   amount: BigNumber,
   _?: string,
   txOptions: {
+    chainId?: number
     gas?: number
     gasPrice?: string
     feeCurrency?: string
@@ -487,6 +523,7 @@ export const transferCeloGold = async (
   const kitGoldToken = await kit.contracts.getGoldToken()
   return kitGoldToken.transfer(toAddress, amount.toString()).send({
     from: fromAddress,
+    chainId: numberToHex(txOptions.chainId || 0),
     gas: txOptions.gas,
     gasPrice: txOptions.gasPrice,
     feeCurrency: txOptions.feeCurrency || undefined,
@@ -503,6 +540,7 @@ export const transferCeloDollars = async (
   amount: BigNumber,
   _?: string,
   txOptions: {
+    chainId?: number
     gas?: number
     gasPrice?: string
     feeCurrency?: string
@@ -514,6 +552,7 @@ export const transferCeloDollars = async (
   const kitStableToken = await kit.contracts.getStableToken()
   return kitStableToken.transfer(toAddress, amount.toString()).send({
     from: fromAddress,
+    chainId: numberToHex(txOptions.chainId || 0),
     gas: txOptions.gas,
     gasPrice: txOptions.gasPrice,
     feeCurrency: txOptions.feeCurrency || undefined,
@@ -542,6 +581,7 @@ export enum TestMode {
   Transfer = 'transfer',
   StableTransfer = 'stable_transfer',
   ContractCall = 'contract_call',
+  Ordinals = 'ordinals',
 }
 
 export const simulateClient = async (
@@ -557,7 +597,8 @@ export const simulateClient = async (
   thread: number,
   maxGasPrice: BigNumber = new BigNumber(0),
   totalTxGas: number = 500000, // aim for half million gas txs
-  web3Provider: string = 'http://127.0.0.1:8545'
+  web3Provider: string = 'http://127.0.0.1:8545',
+  chainId: number = 42220
 ) => {
   // Assume the node is accessible via localhost with senderAddress unlocked
   const kit = newKitFromWeb3(new Web3(web3Provider))
@@ -579,6 +620,10 @@ export const simulateClient = async (
     )
     await sleep(sleepTime)
   }
+  kit.addAccount(senderPK)
+  kit.defaultAccount = privateKeyToAddress(senderPK)
+  kit.connection.addAccount(senderPK)
+  kit.connection.defaultAccount = privateKeyToAddress(senderPK)
 
   // sleep a random amount of time in the range [0, txPeriodMs) before starting so
   // that if multiple simulations are started at the same time, they don't all
@@ -589,6 +634,7 @@ export const simulateClient = async (
 
   const txConf = await getTxConf(testMode)
   const intrinsicGas = txConf.feeCurrencyGold ? 21000 : 71000
+  // const totalTxGas = 500000 // aim for half million gas txs
   const calldataGas = totalTxGas - intrinsicGas
   const calldataSize = calldataGas / 4 // 119750 < tx pool size limit (128k)
   let dataStr = testMode === TestMode.Data ? getBigData(calldataSize) : undefined // aim for half million gas txs
@@ -608,6 +654,8 @@ export const simulateClient = async (
     loadTestID: index,
     threadID: thread,
     sender: kit.defaultAccount,
+    nonce: '',
+    gasPrice: '',
     recipient: recipientAddressFinal,
     feeCurrency: '',
     txHash: '',
@@ -616,6 +664,8 @@ export const simulateClient = async (
 
   while (true) {
     const sendTransactionTime = Date.now()
+    const txConf = await getTxConf(testMode)
+    baseLogMessage.tokenName = txConf.tokenName
 
     // randomly choose the recipientAddress if configured
     if (useRandomRecipient === 'true') {
@@ -641,11 +691,14 @@ export const simulateClient = async (
       )
       nonce = nonceResult.nonce
       gasPrice = nonceResult.newPrice
+      baseLogMessage.nonce = nonce
+      baseLogMessage.gasPrice = gasPrice.toString()
       if (maxGasPrice.isGreaterThan(0)) {
         gasPrice = BigNumber.min(gasPrice, maxGasPrice)
       }
       lastGasPriceMinimum = gasPrice
       txOptions = {
+        chainId,
         gasPrice: gasPrice.toString(),
         feeCurrency,
         nonce,
@@ -689,6 +742,7 @@ export const simulateClient = async (
         )
       })
       .catch((error: any) => {
+        console.error('Load test transaction failed with error:', error)
         tracerLog({
           tag: LOG_TAG_TRANSACTION_ERROR,
           error: error.toString(),
@@ -707,6 +761,12 @@ const getBigData = (size: number) => {
 
 const getTxConf = async (testMode: TestMode) => {
   switch (testMode) {
+    case TestMode.Ordinals:
+      return {
+        feeCurrencyGold: true,
+        tokenName: 'cGLD',
+        transferFn: transferOrdinals,
+      }
     case TestMode.Data:
       return {
         feeCurrencyGold: true,
@@ -848,6 +908,57 @@ export const onLoadTestTxResult = async (
   })
 }
 
+export async function faucetLoadTestThreads(
+  index: number,
+  threads: number,
+  mnemonic: string,
+  web3Provider: string = 'http://localhost:8545',
+  chainId: number = 42220
+) {
+  const minimumEthBalance = 5
+  const kit = newKitFromWeb3(new Web3(web3Provider))
+  const privateKey = generatePrivateKey(mnemonic, AccountType.LOAD_TESTING_ACCOUNT, index)
+  kit.addAccount(privateKey)
+  const fundingAddress = privateKeyToAddress(privateKey)
+  console.info(`Addind account ${fundingAddress} to kit`)
+  kit.defaultAccount = privateKeyToAddress(privateKey)
+  const sleepTime = 5000
+  while ((await kit.connection.isSyncing()) || (await kit.connection.getBlockNumber()) < 1) {
+    console.info(`Sleeping ${sleepTime}ms while waiting for web3Provider to be synced.`)
+    await sleep(sleepTime)
+  }
+  const [goldToken, stableToken] = await Promise.all([
+    kit.contracts.getGoldToken(),
+    kit.contracts.getStableToken(),
+  ])
+  const [goldAmount, stableTokenAmount] = await Promise.all([
+    convertToContractDecimals(minimumEthBalance, goldToken),
+    convertToContractDecimals(minimumEthBalance, stableToken),
+  ])
+  for (let thread = 0; thread < threads; thread++) {
+    const senderIndex = getIndexForLoadTestThread(index, thread)
+    const threadPkey = generatePrivateKey(mnemonic, AccountType.LOAD_TESTING_ACCOUNT, senderIndex)
+    const threadAddress = privateKeyToAddress(threadPkey)
+    console.info(`Funding account ${threadAddress} using ${kit.defaultAccount}`)
+    if ((await goldToken.balanceOf(threadAddress)).lt(goldAmount)) {
+      console.log(`Sending gold to ${threadAddress}`)
+      await goldToken
+        .transfer(threadAddress, goldAmount.toFixed())
+        .send({ from: fundingAddress, chainId: numberToHex(chainId) })
+    } else {
+      console.log(`Account ${threadAddress} already has enough gold`)
+    }
+    if ((await stableToken.balanceOf(threadAddress)).lt(stableTokenAmount)) {
+      console.log(`Sending cusd to ${threadAddress} using ${kit.defaultAccount}`)
+      await stableToken
+        .transfer(threadAddress, stableTokenAmount.toFixed())
+        .send({ from: fundingAddress, chainId: numberToHex(chainId) })
+    } else {
+      console.log(`Account ${threadAddress} already has enough cusd`)
+    }
+  }
+}
+
 /**
  * This method generates key derivation index for loadtest clients and threads
  *
@@ -941,7 +1052,7 @@ export const runGethNodes = async ({
 
   if (verbose) {
     const validatorAddresses = validators.map((validator) => validator.address)
-    console.log('Validators', JSON.stringify(validatorAddresses, null, 2))
+    console.info('Validators', JSON.stringify(validatorAddresses, null, 2))
   }
 
   for (const instance of gethConfig.instances) {
@@ -997,7 +1108,7 @@ export async function initGeth(
   const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
   if (verbose) {
     console.info(`geth:${instance.name}: init datadir ${datadir}`)
-    console.log(`init geth with genesis at ${genesisPath}`)
+    console.info(`init geth with genesis at ${genesisPath}`)
   }
 
   await spawnCmdWithExitOnFailure('rm', ['-rf', datadir], { silent: !verbose })
@@ -1036,7 +1147,7 @@ export async function importPrivateKey(
   ]
 
   if (verbose) {
-    console.log(gethBinaryPath, ...args)
+    console.info(gethBinaryPath, ...args)
   }
 
   await spawnCmdWithExitOnFailure(gethBinaryPath, args, { silent: true })
@@ -1070,14 +1181,14 @@ export async function getEnode(peer: string, ws: boolean = false) {
 export async function addStaticPeers(datadir: string, peers: string[], verbose: boolean) {
   const staticPeersPath = path.join(datadir, 'static-nodes.json')
   if (verbose) {
-    console.log(`Writing static peers to ${staticPeersPath}`)
+    console.info(`Writing static peers to ${staticPeersPath}`)
   }
 
   const enodes = await Promise.all(peers.map((peer) => getEnode(peer)))
   const enodesString = JSON.stringify(enodes, null, 2)
 
   if (verbose) {
-    console.log('eNodes', enodesString)
+    console.info('eNodes', enodesString)
   }
 
   fs.writeFileSync(staticPeersPath, enodesString)
@@ -1106,9 +1217,9 @@ export async function startGeth(
   verbose: boolean
 ) {
   if (verbose) {
-    console.log('starting geth with config', JSON.stringify(instance, null, 2))
+    console.info('starting geth with config', JSON.stringify(instance, null, 2))
   } else {
-    console.log(`${instance.name}: starting.`)
+    console.info(`${instance.name}: starting.`)
   }
 
   const datadir = getDatadir(gethConfig.runPath, instance)
@@ -1295,19 +1406,19 @@ export async function startGeth(
     try {
       block = await new Web3('http://localhost:8545').eth.getBlock('latest')
     } catch (e) {
-      console.log(`Failed to fetch test block: ${e}`)
+      console.info(`Failed to fetch test block: ${e}`)
     }
     if (block) {
       break
     }
-    console.log('Could not fetch test block. Wait one second, then retry.')
+    console.info('Could not fetch test block. Wait one second, then retry.')
     await sleep(1000)
   }
   if (tries === maxTries) {
     throw new Error(`Geth did not start within ${tries} seconds`)
   }
 
-  console.log(
+  console.info(
     `${instance.name}: running.`,
     rpcport ? `RPC: ${rpcport}` : '',
     wsport ? `WS: ${wsport}` : '',
@@ -1331,13 +1442,13 @@ export function writeGenesis(gethConfig: GethRunConfig, validators: Validator[],
   const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
 
   if (verbose) {
-    console.log('writing genesis')
+    console.info('writing genesis')
   }
 
   fs.writeFileSync(genesisPath, genesis)
 
   if (verbose) {
-    console.log(`wrote genesis to ${genesisPath}`)
+    console.info(`wrote genesis to ${genesisPath}`)
   }
 }
 
@@ -1366,13 +1477,13 @@ export async function writeGenesisWithMigrations(
   const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
 
   if (verbose) {
-    console.log('writing genesis')
+    console.info('writing genesis')
   }
 
   fs.writeFileSync(genesisPath, genesis)
 
   if (verbose) {
-    console.log(`wrote genesis to ${genesisPath}`)
+    console.info(`wrote genesis to ${genesisPath}`)
   }
 }
 
@@ -1382,7 +1493,7 @@ export async function snapshotDatadir(
   verbose: boolean
 ) {
   if (verbose) {
-    console.log('snapshotting data dir')
+    console.info('snapshotting data dir')
   }
 
   // Sometimes the socket is still present, preventing us from snapshotting.
@@ -1441,7 +1552,7 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string, 
   const logStream = fs.createWriteStream(logsFilepath, { flags: 'a' })
 
   if (verbose) {
-    console.log(cmd, ...args)
+    console.info(cmd, ...args)
   }
 
   const p = spawn(cmd, args)
@@ -1488,7 +1599,7 @@ export async function connectBipartiteClique(
               return
             }
             if (verbose) {
-              console.log(`connecting ${sourceEnode} with ${enode}`)
+              console.info(`connecting ${sourceEnode} with ${enode}`)
             }
             const success = await admin.addPeer(enode)
             if (!success) {

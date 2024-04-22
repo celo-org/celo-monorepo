@@ -22,7 +22,7 @@ const isCI = process.env.CI === 'true'
 const CallerCWD = process.env.INIT_CWD ? process.env.INIT_CWD : process.cwd()
 process.chdir(CallerCWD)
 
-// tslint:disable-next-line: no-unused-expression
+// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 yargs
   .scriptName('devchain')
   .recommendCommands()
@@ -119,16 +119,12 @@ yargs
     (args) => exitOnError(compressChain(args.datadir, args.filename))
   ).argv
 
-async function startGanache(
-  datadir: string,
-  opts: { verbose?: boolean },
-  chainCopy?: tmp.DirResult
-) {
+function startGanache(datadir: string, opts: { verbose?: boolean }, chainCopy?: tmp.DirResult) {
   const logFn = opts.verbose
-    ? // tslint:disable-next-line: no-console
-      (...args: any[]) => console.log(...args)
+    ? // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      (...args: any[]) => console.info(...args)
     : () => {
-        /*nothing*/
+        /* nothing */
       }
 
   const server = ganache.server({
@@ -140,25 +136,20 @@ async function startGanache(
     allowUnlimitedInitCodeSize: true,
   })
 
-  server.listen(8545, async (err) => {
+  server.listen(8545, (err) => {
     if (err) {
       throw err
     }
-    // tslint:disable-next-line: no-console
-    console.log(chalk.red('Ganache STARTED'))
+    // eslint-disable-next-line: no-console
+    console.info(chalk.red('Ganache STARTED'))
   })
 
   return async () => {
-    try {
-      await server.close()
-      if (chainCopy) {
-        chainCopy.removeCallback()
-      }
-      // tslint:disable-next-line: no-console
-      console.log(chalk.red('Ganache server CLOSED'))
-    } catch (e) {
-      throw e
+    await server.close()
+    if (chainCopy) {
+      chainCopy.removeCallback()
     }
+    console.info(chalk.red('Ganache server CLOSED'))
   }
 }
 
@@ -167,7 +158,7 @@ export function execCmd(
   args: string[],
   options?: SpawnOptions & { silent?: boolean }
 ) {
-  return new Promise<number>(async (resolve, reject) => {
+  return new Promise<number>((resolve, reject) => {
     const { silent, ...spawnOptions } = options || { silent: false }
     if (!silent) {
       console.debug('$ ' + [cmd].concat(args).join(' '))
@@ -215,7 +206,8 @@ function runMigrations(opts: { upto?: number; migrationOverride?: string } = {})
 
   if (opts.migrationOverride) {
     cmdArgs.push('--migration_override')
-    cmdArgs.push(fs.readFileSync(opts.migrationOverride).toString())
+    const file: string = fs.readFileSync(opts.migrationOverride).toString()
+    cmdArgs.push(file)
   }
   return execCmd(`yarn`, cmdArgs, { cwd: ProtocolRoot })
 }
@@ -246,13 +238,13 @@ function deployReleaseGold(releaseGoldContracts: string) {
 
 async function runDevChainFromTar(filename: string) {
   const chainCopy: tmp.DirResult = tmp.dirSync({ keep: false, unsafeCleanup: true })
-  // tslint:disable-next-line: no-console
-  console.log(`Creating tmp folder: ${chainCopy.name}`)
+  // eslint-disable-next-line: no-console
+  console.info(`Creating tmp folder: ${chainCopy.name}`)
 
   await decompressChain(filename, chainCopy.name)
 
   console.info('Starting Ganache ...')
-  const stopGanache = await startGanache(chainCopy.name, { verbose: true }, chainCopy)
+  const stopGanache = startGanache(chainCopy.name, { verbose: true }, chainCopy)
   if (isCI) {
     // If we are running on circle ci we need to wait for ganache to be up.
     await waitForPortOpen('localhost', 8545, 120)
@@ -272,8 +264,8 @@ async function runDevChainFromTarInBackGround(filename: string) {
   // keep is set to true, because `release-on-devchain` fails when set to false.
   const chainCopy: tmp.DirResult = tmp.dirSync({ keep: true, unsafeCleanup: true })
 
-  // tslint:disable-next-line: no-console
-  console.log(`Creating tmp folder: ${chainCopy.name}`)
+  // eslint-disable-next-line: no-console
+  console.info(`Creating tmp folder: ${chainCopy.name}`)
 
   await decompressChain(filename, chainCopy.name)
 
@@ -283,16 +275,16 @@ async function runDevChainFromTarInBackGround(filename: string) {
 }
 
 function decompressChain(tarPath: string, copyChainPath: string): Promise<void> {
-  // tslint:disable-next-line: no-console
-  console.log('Decompressing chain')
+  // eslint-disable-next-line: no-console
+  console.info('Decompressing chain')
   return new Promise((resolve, reject) => {
     targz.decompress({ src: tarPath, dest: copyChainPath }, (err) => {
       if (err) {
         console.error(err)
         reject(err)
       } else {
-        // tslint:disable-next-line: no-console
-        console.log('Chain decompressed')
+        // eslint-disable-next-line: no-console
+        console.info('Chain decompressed')
         resolve()
       }
     })
@@ -315,7 +307,7 @@ async function runDevChain(
   }
   createDirIfMissing(datadir)
   console.info('Starting Ganache ...')
-  const stopGanache = await startGanache(datadir, { verbose: true })
+  const stopGanache = startGanache(datadir, { verbose: true })
   if (isCI) {
     // If we are running on circle ci we need to wait for ganache to be up.
     await waitForPortOpen('localhost', 8545, 120)
@@ -369,18 +361,18 @@ async function generateDevChain(
 }
 
 async function compressChain(chainPath: string, filename: string): Promise<void> {
-  // tslint:disable-next-line: no-console
-  console.log('Compressing chain')
+  // eslint-disable-next-line: no-console
+  console.info('Compressing chain')
   return new Promise((resolve, reject) => {
     // ensures the path to the file
     fs.ensureFileSync(filename)
-    targz.compress({ src: chainPath, dest: filename }, async (err: Error) => {
+    targz.compress({ src: chainPath, dest: filename }, (err: Error) => {
       if (err) {
         console.error(err)
         reject(err)
       } else {
-        // tslint:disable-next-line: no-console
-        console.log('Chain compressed')
+        // eslint-disable-next-line: no-console
+        console.info('Chain compressed')
         resolve()
       }
     })
@@ -405,6 +397,6 @@ async function isPortOpen(host: string, port: number) {
   return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
 }
 
-function delay(time) {
+function delay(time: number) {
   return new Promise((resolve) => setTimeout(resolve, time))
 }

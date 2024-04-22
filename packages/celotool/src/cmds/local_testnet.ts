@@ -24,6 +24,7 @@ Examples:
 * local-testnet --validators 5 --proxies 3 --bootnode
 * local-testnet --tx-nodes 2 --light-clients 3
 * local-testnet --migrate-to 19 --migration-override '{ "lockedGold": { "unlockingPeriod": 30 } }'
+* local-testnet --migrate-to 19 --migration-override ../../node_modules/@celo/dev-utils/lib/migration-override.json
 * local-testnet --no-migrate --genesis-override '{ "blockTime": 3, "epoch": 50 }'
 
 Network makeup is configured the --validators, --tx-nodes, --light-clients, and --lightest-client
