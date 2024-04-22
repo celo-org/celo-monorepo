@@ -24,8 +24,7 @@ contract Attestations is
   Ownable,
   Initializable,
   UsingRegistry,
-  ReentrancyGuard,
-  UsingPrecompiles
+  ReentrancyGuard
 {
   using SafeMath for uint256;
   using SafeCast for uint256;
@@ -180,7 +179,7 @@ contract Attestations is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 0);
+    return (1, 3, 0, 0);
   }
 
   /**
