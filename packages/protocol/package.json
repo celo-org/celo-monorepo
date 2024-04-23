@@ -7,7 +7,7 @@
   "license": "LGPL-3.0",
   "scripts": {
     "lint:ts": "yarn run --top-level eslint .",
-    "lint:sol": "solhint './contracts/**/*.sol' && solhint './contracts-0.8/**/*.sol'",
+    "lint:sol": "solhint --version && solhint './contracts/**/*.sol' && solhint './contracts-0.8/**/*.sol'",
     "lint": "yarn run lint:ts && yarn run lint:sol",
     "clean": "rm -rf ./types/typechain && rm -rf build/* && rm -rf .0x-artifacts/* && rm -rf migrations/*.js* && rm -rf migrations_ts/*.js* && rm -rf test/**/*.js* && rm -f lib/*.js* && rm -f lib/**/*.js* && rm -f scripts/*.js* && yarn clean:foundry",
     "clean:foundry": "rm -rf cache out",
