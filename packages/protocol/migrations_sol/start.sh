@@ -57,7 +57,7 @@ BROADCAST="--broadcast"
 
 echo "Compiling with libraries... "
 time forge build $LIBRARIES
-exit 1
+# exit 1
 #--skip-simulation
 time forge script migrations_sol/Migration.s.sol --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive -- $LIBRARIES --revert-strings || echo "Migration script failed"
 
