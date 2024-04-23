@@ -178,7 +178,7 @@ module.exports = {
       },
     ],
     'import/no-internal-modules': 'off',
-    'indent': 'off',
+    indent: ['off', 2],
     'linebreak-style': 'off',
     'max-classes-per-file': ['error', 1],
     'max-len': 'off',
