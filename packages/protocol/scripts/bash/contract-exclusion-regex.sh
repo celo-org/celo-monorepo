@@ -18,17 +18,8 @@ if [ $VERSION_NUMBER -gt 8 ]
   CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|^Ownable|Initializable|BLS12_377Passthrough|BLS12_381Passthrough]UniswapV2ERC20"
 fi
 
-  # https://github.com/celo-org/celo-monorepo/issues/10435
-  # SortedOracles is currently not deployable
-  # after fixing that this should be modified to VERSION_NUMBER==10
-if [ $VERSION_NUMBER -gt 9 ]
+# In CR9 the SortedOracles contract was deployed by Mento team, in CR10 we redeployed it ourselves
+if [ $VERSION_NUMBER -eq 9 ]
   then
   CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|SortedOracles"
-fi
-
-# TODO remove this after merge by fixing the report creation scipt to include GasPriceMinimum (0.8 contracts)
-# https://github.com/celo-org/celo-monorepo/issues/10567
-if [ $VERSION_NUMBER -gt 9 ]
-  then
-  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|GasPriceMinimum"
 fi

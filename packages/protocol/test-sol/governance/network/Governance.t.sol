@@ -42,12 +42,16 @@ contract GovernanceMock is Governance(true) {
     _removeVotesWhenRevokingDelegatedVotes(account, maxAmountAllowed);
   }
 
-  function setDeprecatedWeight(address voterAddress, uint256 proposalIndex, uint256 weight)
-    external
-  {
+  function setDeprecatedWeight(
+    address voterAddress,
+    uint256 proposalIndex,
+    uint256 weight,
+    uint256 proposalId
+  ) external {
     Voter storage voter = voters[voterAddress];
     VoteRecord storage voteRecord = voter.referendumVotes[proposalIndex];
     voteRecord.deprecated_weight = weight;
+    voteRecord.proposalId = proposalId;
   }
 }
 
@@ -3476,7 +3480,7 @@ contract GovernanceTest_getAmountOfGoldUsedForVoting is GovernanceTest {
     vm.warp(block.timestamp + governance.dequeueFrequency());
     vm.prank(accApprover);
     governance.approve(proposalId, 0);
-    governance.setDeprecatedWeight(accVoter, 0, 100);
+    governance.setDeprecatedWeight(accVoter, 0, 100, 1);
     assertEq(governance.getAmountOfGoldUsedForVoting(accVoter), 100);
   }
 
@@ -3502,6 +3506,27 @@ contract GovernanceTest_getAmountOfGoldUsedForVoting is GovernanceTest {
     vm.warp(
       block.timestamp + REFERENDUM_STAGE_DURATION + governance.getExecutionStageDuration() + 1
     );
+    assertEq(governance.getAmountOfGoldUsedForVoting(accVoter), 0);
+  }
+
+  function test_return0Votes_WhenIndexOfProposalGetsReused() public {
+    uint256 proposalId = makeValidProposal();
+    vm.warp(block.timestamp + governance.dequeueFrequency());
+    vm.prank(accApprover);
+    governance.approve(proposalId, 0);
+    vm.prank(accVoter);
+    governance.votePartially(proposalId, 0, 10, 30, 0);
+    vm.warp(block.timestamp + REFERENDUM_STAGE_DURATION);
+    governance.execute(proposalId, 0);
+    vm.warp(block.timestamp + governance.getExecutionStageDuration() + 1);
+    assertEq(governance.getAmountOfGoldUsedForVoting(accVoter), 0);
+
+    governance.dequeueProposalsIfReady();
+    proposalId = makeValidProposal();
+
+    vm.warp(block.timestamp + governance.dequeueFrequency() + 1);
+    vm.prank(accApprover);
+    governance.approve(proposalId, 0);
     assertEq(governance.getAmountOfGoldUsedForVoting(accVoter), 0);
   }
 
