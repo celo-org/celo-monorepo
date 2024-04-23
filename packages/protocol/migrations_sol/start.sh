@@ -6,7 +6,8 @@ set -euo pipefail
 # Compile everything
 export ANVIL_PORT=8546
 # TODO make this configurable
-FROM_ACCOUNT=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+FROM_ACCOUNT_NO_ZERO="f39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+FROM_ACCOUNT="0x$FROM_ACCOUNT_NO_ZERO"
 
 
 source $PWD/migrations_sol/start_anvil.sh
@@ -22,7 +23,7 @@ echo "Setting Registry Proxy"
 REGISTRY_ADDRESS="0x000000000000000000000000000000000000ce10"
 PROXY_BYTECODE=`cat ./out/Proxy.sol/Proxy.json | jq -r '.deployedBytecode.object'`
 cast rpc anvil_setCode --rpc-url http://127.0.0.1:$ANVIL_PORT $REGISTRY_ADDRESS $PROXY_BYTECODE
-REGISTRY_OWNER_ADDRESS="f39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+REGISTRY_OWNER_ADDRESS=$FROM_ACCOUNT_NO_ZERO
 # pasition is bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1);
 echo "Setting Registry owner"
 # Sets the storage of the registry so that it has an owner we control
@@ -59,14 +60,15 @@ echo "Compiling with libraries... "
 time forge build $LIBRARIES
 # exit 1
 #--skip-simulation
-time forge script migrations_sol/Migration.s.sol --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive -- $LIBRARIES --revert-strings || echo "Migration script failed"
+time forge script migrations_sol/Migration.s.sol --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive --sender $FROM_ACCOUNT --unlocked -- $LIBRARIES --revert-strings || echo "Migration script failed"
 
+# exit 1
 # Run integration tests
 source $PWD/migrations_sol/integration_tests.sh
 
 
 # helper kill anvil
-# kill $(lsof -i tcp:8545 | tail -n 1 | awk '{print $2}')
+# kill $(lsof -i tcp:$ANVIL_PORT | tail -n 1 | awk '{print $2}')
 
 echo "Killing Anvil"
 if [[ -n $ANVIL_PID ]]; then

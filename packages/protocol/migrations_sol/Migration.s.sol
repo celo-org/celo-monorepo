@@ -8,6 +8,7 @@ import {Script} from "forge-std-8/Script.sol";
 import "forge-std/console.sol";
 import "forge-std/StdJson.sol";
 
+import "@celo-contracts/common/interfaces/IOwnable.sol";
 import "@celo-contracts/common/interfaces/IProxyFactory.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
@@ -41,25 +42,14 @@ import "@celo-contracts/identity/interfaces/IOdisPaymentsInitializer.sol";
 import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
+
+
+
 import "./HelperInterFaces.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 import "@celo-contracts-8/common/UsingRegistry.sol";
-
-
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
-
-
-// import "@celo-contracts/precompiles/EpochSizePrecompile.sol";
-// import "./precompiles/EpochSizePrecompile.sol";
-
-
-
-// import { SortedOracles } from "@celo-contract/stability/SortedOracles.sol";
-
-// import "./SortedOracles.sol";
-
-
 
 // Using Registry
 contract Migration is Script, UsingRegistry {
@@ -185,7 +175,7 @@ contract Migration is Script, UsingRegistry {
   function run() external {
     // it's anvil key
     // TODO check that this matches deployerAccount and the pK can be avoided with --unlock
-    vm.startBroadcast(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80);
+    vm.startBroadcast(deployerAccount);
 
     // TODO replace all the lines here with "Migrations.deployA()"
     // TODO rename this script to MigrationsScript
@@ -208,8 +198,9 @@ contract Migration is Script, UsingRegistry {
 
     // just set the initialization of a proxy
     migrateRegistry();
+    console.log("Before set registry");
+    _transferOwnership(deployerAccount); //UsingRegistry
     setRegistry(registryAddress); // UsingRegistry
-    
     migrateFreezer();
     migrateFeeCurrencyWhitelist();
     migrateGoldToken(json);
@@ -254,7 +245,10 @@ contract Migration is Script, UsingRegistry {
   function migrateRegistry() public {
     setImplementationOnProxy(IProxy(registryAddress), "Registry", abi.encodeWithSelector(IRegistry.initialize.selector));
     // set registry in registry itself
+    console.log("Owner of the Registry Proxy is", IProxy(registryAddress)._getOwner());
+    console.log("Owner of registry contract is", IOwnable(registryAddress).owner());
     addToRegistry("Registry", registryAddress);
+    console.log("Done migration registry");
   }
 
   function migrateFreezer() public {
@@ -838,19 +832,19 @@ contract Migration is Script, UsingRegistry {
 
     // uint256 lockedGoldPerValEachGroup = ((votesRatioOfLastVsFirstGroup - 1)*lockedGoldPerValAtFirstGroup)/Math.max(amountOfGroups, 1);
 
-    registerValidatorGroup(
-      groupName,
-      validator0Key,
-      // TODO change to group
-      maxGroupSize*validatorLockedGoldRequirements,
-      commission
-    );
+    // registerValidatorGroup(
+    //   groupName,
+    //   validator0Key,
+    //   // TODO change to group
+    //   maxGroupSize*validatorLockedGoldRequirements,
+    //   commission
+    // );
 
-    console.log("  * Registering ${group.valKeys.length} validators ...");
+    // console.log("  * Registering ${group.valKeys.length} validators ...");
 
-    for (uint256 validatorIndex = 0; validatorIndex < amountOfGroups; validatorIndex++){
-      registerValidator(validatorIndex, getValidatorKeyFromGroupGroup(valKeys, 0, validatorIndex, maxGroupSize), validatorLockedGoldRequirements);
-    }
+    // for (uint256 validatorIndex = 0; validatorIndex < amountOfGroups; validatorIndex++){
+    //   registerValidator(validatorIndex, getValidatorKeyFromGroupGroup(valKeys, 0, validatorIndex, maxGroupSize), validatorLockedGoldRequirements);
+    // }
     
 
 
