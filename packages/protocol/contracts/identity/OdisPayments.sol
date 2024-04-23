@@ -26,29 +26,18 @@ contract OdisPayments is
   using SafeMath for uint256;
   using SafeERC20 for IERC20;
 
-  event PaymentMade(address indexed account, uint256 valueInCUSD);
-
   // Store amount sent (all time) from account to this contract.
   // Values in totalPaidCUSD should only ever be incremented, since ODIS relies
   // on all-time paid balance to compute every quota.
   mapping(address => uint256) public totalPaidCUSD;
+
+  event PaymentMade(address indexed account, uint256 valueInCUSD);
 
   /**
    * @notice Sets initialized == true on implementation contracts.
    * @param test Set to true to skip implementation initialization.
    */
   constructor(bool test) public Initializable(test) {}
-
-  /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
-  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -71,5 +60,16 @@ contract OdisPayments is
     );
     totalPaidCUSD[account] = totalPaidCUSD[account].add(value);
     emit PaymentMade(account, value);
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 0, 0);
   }
 }

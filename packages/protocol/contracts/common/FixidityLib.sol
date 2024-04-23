@@ -20,14 +20,14 @@ library FixidityLib {
     uint256 value;
   }
 
+  uint256 private constant FIXED1_UINT = 1000000000000000000000000;
+
   /**
    * @notice Number of positions that the comma is shifted to the right.
    */
   function digits() internal pure returns (uint8) {
     return 24;
   }
-
-  uint256 private constant FIXED1_UINT = 1000000000000000000000000;
 
   /**
    * @notice This is 1 in the fixed point units used in this library.

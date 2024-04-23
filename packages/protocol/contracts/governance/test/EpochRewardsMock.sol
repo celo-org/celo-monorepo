@@ -7,6 +7,11 @@ import "../EpochRewards.sol";
  */
 contract EpochRewardsMock is EpochRewards(true) {
   uint256 private numValidatorsInCurrentSet;
+
+  function setNumberValidatorsInCurrentSet(uint256 value) external {
+    numValidatorsInCurrentSet = value;
+  }
+
   function getRewardsMultiplier(uint256 targetGoldTotalSupplyIncrease)
     external
     view
@@ -20,7 +25,4 @@ contract EpochRewardsMock is EpochRewards(true) {
     return numValidatorsInCurrentSet;
   }
 
-  function setNumberValidatorsInCurrentSet(uint256 value) external {
-    numValidatorsInCurrentSet = value;
-  }
 }

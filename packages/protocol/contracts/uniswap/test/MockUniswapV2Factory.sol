@@ -20,10 +20,6 @@ contract MockUniswapV2Factory is IUniswapV2Factory {
     feeToSetter = _feeToSetter;
   }
 
-  function allPairsLength() external view returns (uint256) {
-    return allPairs.length;
-  }
-
   function createPair(address tokenA, address tokenB) external returns (address pair) {
     require(tokenA != tokenB, "UniswapV2: IDENTICAL_ADDRESSES");
     (address token0, address token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
@@ -49,5 +45,9 @@ contract MockUniswapV2Factory is IUniswapV2Factory {
   function setFeeToSetter(address _feeToSetter) external {
     require(msg.sender == feeToSetter, "UniswapV2: FORBIDDEN");
     feeToSetter = _feeToSetter;
+  }
+
+  function allPairsLength() external view returns (uint256) {
+    return allPairs.length;
   }
 }

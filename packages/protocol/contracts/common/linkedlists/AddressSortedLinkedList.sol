@@ -12,14 +12,6 @@ library AddressSortedLinkedList {
   using SafeMath for uint256;
   using SortedLinkedList for SortedLinkedList.List;
 
-  function toBytes(address a) public pure returns (bytes32) {
-    return bytes32(uint256(a) << 96);
-  }
-
-  function toAddress(bytes32 b) public pure returns (address) {
-    return address(uint256(b) >> 96);
-  }
-
   /**
    * @notice Inserts an element into a doubly linked list.
    * @param list A storage pointer to the underlying list.
@@ -155,5 +147,13 @@ library AddressSortedLinkedList {
    */
   function getKeys(SortedLinkedList.List storage list) public view returns (address[] memory) {
     return headN(list, list.list.numElements);
+  }
+
+  function toBytes(address a) public pure returns (bytes32) {
+    return bytes32(uint256(a) << 96);
+  }
+
+  function toAddress(bytes32 b) public pure returns (address) {
+    return address(uint256(b) >> 96);
   }
 }
