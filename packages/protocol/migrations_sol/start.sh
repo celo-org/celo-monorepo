@@ -31,9 +31,9 @@ cast rpc anvil_setStorageAt --rpc-url http://127.0.0.1:$ANVIL_PORT $REGISTRY_ADD
 
 
 echo "Deploying libraries"
-LIBRARIES_PATH=("contracts/common/linkedlist/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
+LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
                 "contracts/common/Signatures.sol:Signatures"
-                "contracts/common/linkedlist/AddressLinkedList.sol:AddressLinkedList"
+                "contracts/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
                 "contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList"
                 "contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
                 "contracts/governance/Proposals.sol:Proposals"
@@ -43,7 +43,7 @@ LIBRARIES=""
 for library in "${LIBRARIES_PATH[@]}"; do
     library_name="${library#*:}" 
     echo "Deploying library: $library_name"
-    create_library_out=`forge create $library_name --from $FROM_ACCOUNT --rpc-url http://127.0.0.1:$ANVIL_PORT --unlocked --json`
+    create_library_out=`forge create $library --from $FROM_ACCOUNT --rpc-url http://127.0.0.1:$ANVIL_PORT --unlocked --json`
     library_address=`echo $create_library_out | jq -r '.deployedTo'`
     
     LIBRARIES="$LIBRARIES --libraries $library:$library_address"
