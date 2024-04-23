@@ -72,6 +72,8 @@ contract Migration is Script, UsingRegistry {
   uint256 proxyNonce = 0;
   address constant registryAddress = address(0x000000000000000000000000000000000000ce10);
 
+  event Result(bytes);
+
   function create2deploy(bytes32 salt, bytes memory initCode) internal returns (address) {
     address deployedAddress;
     assembly {
@@ -742,9 +744,40 @@ contract Migration is Script, UsingRegistry {
 
     }
 
+  //   function getParsedSignatureOfAddress(address _address, uint256 privateKey)
+  //     public
+  //     pure
+  //     returns (uint8, bytes32, bytes32)
+  //   {
+  //     bytes32 addressHash = keccak256(abi.encodePacked(_address));
+  //     bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
+  //     return vm.sign(privateKey, prefixedHash);
+  //   }
+
+  // function _generateEcdsaPubKeyWithSigner(address _validator, uint256 _signerPk)
+  //   internal
+  //   returns (bytes memory ecdsaPubKey, uint8 v, bytes32 r, bytes32 s)
+  //   {
+  //     (v, r, s) = getParsedSignatureOfAddress(_validator, _signerPk);
+
+  //     bytes32 addressHash = keccak256(abi.encodePacked(_validator));
+
+  //     ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
+  //   }
+
+    function uint256ToBytes(uint256 data) public pure returns (bytes memory result) {
+        // Initialize result as a new dynamic byte array with 32 bytes length
+        result = new bytes(64);
+        // Copy the uint256 data to the memory of result
+        assembly {
+            mstore(add(result, 64), data)
+        }
+    }
+
   function registerValidator(
       uint256 validatorIndex,
-      address validatorKey,
+      uint256 ecdsaPubKey,
+      uint256 validatorKey,
       uint256 amountToLock
     ) public {
       vm.startBroadcast(validatorKey);
@@ -752,32 +785,47 @@ contract Migration is Script, UsingRegistry {
       // TODO convert validatorIndex to string and make it a name
       // getAccounts().setName(groupName);
       // potentially create a precompile that validates everything for the proofs of posession
-      // bytes public constant newBlsPublicKey = abi.encodePacked(
-      //   bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
-      //   bytes32(0x0202020202020202020202020202020202020202020202020202020202020203),
-      //   bytes32(0x0303030303030303030303030303030303030303030303030303030303030304)
-      // );
-      // bytes public constant newBlsPop = abi.encodePacked(
-      //   bytes16(0x04040404040404040404040404040405),
-      //   bytes16(0x05050505050505050505050505050506),
-      //   bytes16(0x06060606060606060606060606060607)
-      // );
+      console.log("Validator key", validatorKey);
+      bytes memory _ecdsaPubKey = abi.encodePacked(
+        bytes16(0xba5734d8f7091719471e7f7ed6b9df17),
+        bytes16(0x0dc70cc661ca05e688601ad984f068b0),
+        bytes16(0xd67351e5f06073092499336ab0839ef8),
+        bytes16(0xa521afd334e53807205fa2f08eec74f4)
+      );
+      emit Result(_ecdsaPubKey);
+      bytes memory newBlsPublicKey = abi.encodePacked(
+        bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
+        bytes32(0x0202020202020202020202020202020202020202020202020202020202020203),
+        bytes32(0x0303030303030303030303030303030303030303030303030303030303030304)
+      );
+      bytes memory newBlsPop = abi.encodePacked(
+        bytes16(0x04040404040404040404040404040405),
+        bytes16(0x05050505050505050505050505050506),
+        bytes16(0x06060606060606060606060606060607)
+      );
       // (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
       //   validator,
       //   signerPk
       // );
-      // getValidators().registerValidator(_ecdsaPubKey, newBlsPublicKey, newBlsPop);
+      // bytes memory _ecdsaPubKey = 0xba5734d8f7091719471e7f7ed6b9df170dc70cc661ca05e688601ad984f068b0d67351e5f06073092499336ab0839ef8a521afd334e53807205fa2f08eec74f4;
+      // console.log("key in uint:", ecdsaPubKey);
+      getValidators().registerValidator(_ecdsaPubKey, newBlsPublicKey, newBlsPop);
+      console.log("Done registering validators");
       vm.stopBroadcast();
-
+// 
   }
 
-  function getValidatorKeyFromGroupGroup(address[] memory keys, uint256 groupIndex, uint256 validatorIndex, uint256 membersInAGroup) public returns(address) {
-    return keys[groupIndex*membersInAGroup + validatorIndex + 1];
+  function getValidatorKeyIndex(uint256 groupIndex, uint256 validatorIndex, uint256 membersInAGroup) public returns(uint256) {
+    return groupIndex*membersInAGroup + validatorIndex + 1;
+  }
+
+  function getValidatorKeyFromGroupGroup(uint256[] memory keys, uint256 groupIndex, uint256 validatorIndex, uint256 membersInAGroup) public returns(uint256) {
+    return keys[getValidatorKeyIndex(groupIndex, validatorIndex, membersInAGroup)];
   }
 
   function registerValidatorGroup(
       string memory groupName,
-      address validator0Key,
+      uint256 validator0Key,
       uint256 amountToLock,
       uint256 commission
     ) public {
@@ -795,11 +843,11 @@ contract Migration is Script, UsingRegistry {
     uint256 votesRatioOfLastVsFirstGroup = abi.decode(json.parseRaw(".validators.votesRatioOfLastVsFirstGroup"), (uint256));
     string memory groupName = abi.decode(json.parseRaw(".validators.groupName"), (string));
     uint256 minElectableValidators = abi.decode(json.parseRaw(".election.minElectableValidators"), (uint256));
-    address[] memory valKeys = abi.decode(json.parseRaw(".validators.valKeys"), (address[]));
+    uint256[] memory valKeys = abi.decode(json.parseRaw(".validators.valKeys"), (uint256[]));
     uint256 maxGroupSize = abi.decode(json.parseRaw(".validators.maxGroupSize"), (uint256));
     uint256 validatorLockedGoldRequirements = abi.decode(json.parseRaw(".validators.validatorLockedGoldRequirements.value"), (uint256));
     uint256 lockedGoldPerValAtFirstGroup = abi.decode(json.parseRaw(".validators.groupLockedGoldRequirements"), (uint256));
-
+    uint256[] memory ecdsaPubKeys = abi.decode(json.parseRaw(".validators.ecdsaPubKeys"), (uint256[]));
     // attestationKeys not migrated
 
     if (valKeys.length == 0) {
@@ -813,7 +861,7 @@ contract Migration is Script, UsingRegistry {
       );
     }
 
-    address validator0Key = valKeys[0];
+    uint256 validator0Key = valKeys[0];
 
     if (votesRatioOfLastVsFirstGroup < 1) {
       revert("votesRatioOfLastVsFirstGroup needs to be >= 1");
@@ -826,7 +874,7 @@ contract Migration is Script, UsingRegistry {
 
     // REPLACED WITH getValidatorGroup
     // Split the validator keys into groups that will fit within the max group size.
-    uint256 amountOfGroups = valKeys.length / maxGroupSize;
+    uint256 amountOfGroups = Math.ceilDiv(valKeys.length, maxGroupSize);
     // string[][] memory  valKeyGroups;
     // for (uint256 i = 0; i < valKeys.length; i += maxGroupSize) {
     //   string[] memory validatorKeysfForGroup;
@@ -849,7 +897,10 @@ contract Migration is Script, UsingRegistry {
     console.log("  * Registering ${group.valKeys.length} validators ...");
 
     for (uint256 validatorIndex = 0; validatorIndex < amountOfGroups; validatorIndex++){
-      registerValidator(validatorIndex, getValidatorKeyFromGroupGroup(valKeys, 0, validatorIndex, maxGroupSize), validatorLockedGoldRequirements);
+      console.log("Registering validator #: ", validatorIndex);
+      uint256 ecdsaPubKey = ecdsaPubKeys[getValidatorKeyIndex(0, validatorIndex, maxGroupSize)];
+      registerValidator(validatorIndex, ecdsaPubKey, getValidatorKeyFromGroupGroup(valKeys, 0, validatorIndex, maxGroupSize), validatorLockedGoldRequirements);
+      return;
     }
     
 

@@ -366,6 +366,7 @@ contract Validators is
       _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey),
       "Error updating ECDSA public key"
     );
+    // TODO double check blob
     require(
       _updateBlsPublicKey(validator, account, blsPublicKey, blsPop),
       "Error updating BLS public key"

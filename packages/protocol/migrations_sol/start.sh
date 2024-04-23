@@ -52,6 +52,7 @@ echo "Library flags are: $LIBRARIES"
 
 # run migrations
 BROADCAST="--broadcast"
+SKIP_SUMULATION=""
 # --skip-simulation
 # BROADCAST=""
 
@@ -59,7 +60,8 @@ echo "Compiling with libraries... "
 time forge build $LIBRARIES
 exit 1
 #--skip-simulation
-time forge script migrations_sol/Migration.s.sol --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive -- $LIBRARIES --revert-strings || echo "Migration script failed"
+# TODO for some reason the flag --unlocked is not working for all the anvil keys, so pk is given
+time forge script migrations_sol/Migration.s.sol --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST $SKIP_SUMULATION --non-interactive -- $LIBRARIES --revert-strings || echo "Migration script failed"
 
 # Run integration tests
 source $PWD/migrations_sol/integration_tests.sh
