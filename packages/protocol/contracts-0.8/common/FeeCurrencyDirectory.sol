@@ -2,14 +2,8 @@
 pragma solidity ^0.8.0;
 
 import "../../contracts/common/Initializable.sol";
+import "./interfaces/IOracle.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
-
-interface IOracle {
-  function getExchangeRateFor(address identifier)
-    external
-    view
-    returns (uint256 numerator, uint256 denominator, uint256 lastUpdateTimestamp);
-}
 
 contract FeeCurrencyDirectory is Initializable, Ownable {
   mapping(address => CurrencyConfig) public currencies;
@@ -105,7 +99,7 @@ contract FeeCurrencyDirectory is Initializable, Ownable {
   {
     CurrencyConfig memory currencyConfig = getCurrencyConfig(token);
     require(currencyConfig.currencyIdentifier != address(0), "Currency not in the directory");
-    (numerator, denominator, ) = IOracle(currencies[token].oracle).getExchangeRateFor(
+    (numerator, denominator) = IOracle(currencies[token].oracle).getExchangeRateFor(
       currencyConfig.currencyIdentifier
     );
   }

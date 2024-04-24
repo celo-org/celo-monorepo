@@ -136,8 +136,8 @@ contract TestGetPrice is FeeCurrencyDirectoryTestBase {
 
   function test_ReturnsPriceSuccessfully() public {
     (uint256 numerator, uint256 denominator) = directory.getExchangeRate(token);
-    assertEq(numerator, 200); // Expecting 50 since 200 / 4 = 50
-    assertEq(denominator, 4); // Expecting 50 since 200 / 4 = 50
+    assertEq(numerator, 200);
+    assertEq(denominator, 4);
   }
 
   function test_Reverts_WhenTokenDoesntExist() public {
