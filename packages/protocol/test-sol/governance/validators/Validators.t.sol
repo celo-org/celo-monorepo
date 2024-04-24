@@ -3,6 +3,7 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
+import "forge-std/console.sol";
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
@@ -288,7 +289,10 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
       signerPk
     );
 
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+    ph.mockSuccess(
+      ph.PROOF_OF_POSSESSION(),
+      keccak256(abi.encodePacked(validator, blsPublicKey, blsPop))
+    );
 
     vm.prank(validator);
     accounts.authorizeValidatorSigner(signer, v, r, s);
@@ -321,7 +325,10 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     lockedGold.setAccountTotalLockedGold(_validator, originalValidatorLockedGoldRequirements.value);
     bytes memory _ecdsaPubKey = _generateEcdsaPubKey(_validator, _validatorPk);
 
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(_validator, blsPublicKey, blsPop));
+    ph.mockSuccess(
+      ph.PROOF_OF_POSSESSION(),
+      keccak256(abi.encodePacked(_validator, blsPublicKey, blsPop))
+    );
 
     vm.prank(_validator);
     validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
@@ -743,7 +750,10 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
     vm.prank(validator);
     accounts.authorizeValidatorSigner(signer, v, r, s);
 
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+    ph.mockSuccess(
+      ph.PROOF_OF_POSSESSION(),
+      keccak256(abi.encodePacked(validator, blsPublicKey, blsPop))
+    );
 
     vm.expectEmit(true, true, true, true);
     emit ValidatorBlsPublicKeyUpdated(validator, blsPublicKey);
@@ -761,7 +771,10 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
     vm.prank(validator);
     accounts.authorizeValidatorSigner(signer, v, r, s);
 
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+    ph.mockSuccess(
+      ph.PROOF_OF_POSSESSION(),
+      keccak256(abi.encodePacked(validator, blsPublicKey, blsPop))
+    );
 
     vm.expectEmit(true, true, true, true);
     emit ValidatorRegistered(validator);
@@ -1360,7 +1373,7 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
 
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
-      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
+      keccak256(abi.encodePacked(validator, newBlsPublicKey, newBlsPop))
     );
 
     vm.prank(address(accounts));
@@ -1383,7 +1396,7 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
 
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
-      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
+      keccak256(abi.encodePacked(validator, newBlsPublicKey, newBlsPop))
     );
 
     vm.expectEmit(true, true, true, true);
@@ -1406,7 +1419,7 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
 
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
-      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
+      keccak256(abi.encodePacked(validator, newBlsPublicKey, newBlsPop))
     );
 
     vm.expectRevert("ECDSA key does not match signer");
@@ -1461,7 +1474,7 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
   function test_ShouldSetNewValidatorBlsPubKey() public {
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
-      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
+      keccak256(abi.encodePacked(validator, newBlsPublicKey, newBlsPop))
     );
 
     vm.prank(validator);
@@ -1475,7 +1488,7 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
   function test_Emits_ValidatorValidatorBlsPublicKeyUpdatedEvent() public {
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
-      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
+      keccak256(abi.encodePacked(validator, newBlsPublicKey, newBlsPop))
     );
 
     vm.expectEmit(true, true, true, true);
@@ -1488,7 +1501,7 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
   function test_Reverts_WhenPublicKeyIsNot96Bytes() public {
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
-      abi.encodePacked(validator, wrongBlsPublicKey, newBlsPop)
+      keccak256(abi.encodePacked(validator, wrongBlsPublicKey, newBlsPop))
     );
 
     vm.expectRevert("Wrong BLS public key length");
@@ -1499,7 +1512,7 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
   function test_Reverts_WhenProofOfPossessionIsNot48Bytes() public {
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
-      abi.encodePacked(validator, newBlsPublicKey, wrongBlsPop)
+      keccak256(abi.encodePacked(validator, newBlsPublicKey, wrongBlsPop))
     );
 
     vm.expectRevert("Wrong BLS PoP length");
@@ -2212,13 +2225,15 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
 
     ph.mockReturn(
       ph.FRACTION_MUL(),
-      abi.encodePacked(
-        FixidityLib.fixed1().unwrap(),
-        FixidityLib.fixed1().unwrap(),
-        uptime.unwrap(),
-        FixidityLib.fixed1().unwrap(),
-        originalValidatorScoreParameters.exponent,
-        uint256(18)
+      keccak256(
+        abi.encodePacked(
+          FixidityLib.fixed1().unwrap(),
+          FixidityLib.fixed1().unwrap(),
+          uptime.unwrap(),
+          FixidityLib.fixed1().unwrap(),
+          originalValidatorScoreParameters.exponent,
+          uint256(18)
+        )
       ),
       abi.encodePacked(uint256(950990049900000000000000), FixidityLib.fixed1().unwrap())
     );
@@ -2229,13 +2244,15 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
 
     ph.mockReturn(
       ph.FRACTION_MUL(),
-      abi.encodePacked(
-        FixidityLib.fixed1().unwrap(),
-        FixidityLib.fixed1().unwrap(),
-        uint256(0),
-        FixidityLib.fixed1().unwrap(),
-        originalValidatorScoreParameters.exponent,
-        uint256(18)
+      keccak256(
+        abi.encodePacked(
+          FixidityLib.fixed1().unwrap(),
+          FixidityLib.fixed1().unwrap(),
+          uint256(0),
+          FixidityLib.fixed1().unwrap(),
+          originalValidatorScoreParameters.exponent,
+          uint256(18)
+        )
       ),
       abi.encodePacked(uint256(0), FixidityLib.fixed1().unwrap())
     );
@@ -2244,13 +2261,15 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
 
     ph.mockReturn(
       ph.FRACTION_MUL(),
-      abi.encodePacked(
-        FixidityLib.fixed1().unwrap(),
-        FixidityLib.fixed1().unwrap(),
-        FixidityLib.fixed1().unwrap(),
-        FixidityLib.fixed1().unwrap(),
-        originalValidatorScoreParameters.exponent,
-        uint256(18)
+      keccak256(
+        abi.encodePacked(
+          FixidityLib.fixed1().unwrap(),
+          FixidityLib.fixed1().unwrap(),
+          FixidityLib.fixed1().unwrap(),
+          FixidityLib.fixed1().unwrap(),
+          originalValidatorScoreParameters.exponent,
+          uint256(18)
+        )
       ),
       abi.encodePacked(uint256(1), FixidityLib.fixed1().unwrap())
     );
@@ -2270,13 +2289,15 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
 
     ph.mockRevert(
       ph.FRACTION_MUL(),
-      abi.encodePacked(
-        FixidityLib.fixed1().unwrap(),
-        FixidityLib.fixed1().unwrap(),
-        uptime.unwrap(),
-        FixidityLib.fixed1().unwrap(),
-        originalValidatorScoreParameters.exponent,
-        uint256(18)
+      keccak256(
+        abi.encodePacked(
+          FixidityLib.fixed1().unwrap(),
+          FixidityLib.fixed1().unwrap(),
+          uptime.unwrap(),
+          FixidityLib.fixed1().unwrap(),
+          originalValidatorScoreParameters.exponent,
+          uint256(18)
+        )
       )
     );
 
@@ -2311,13 +2332,15 @@ contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
 
       ph.mockReturn(
         ph.FRACTION_MUL(),
-        abi.encodePacked(
-          FixidityLib.fixed1().unwrap(),
-          FixidityLib.fixed1().unwrap(),
-          _uptimes[i].unwrap(),
-          FixidityLib.fixed1().unwrap(),
-          originalValidatorScoreParameters.exponent,
-          uint256(18)
+        keccak256(
+          abi.encodePacked(
+            FixidityLib.fixed1().unwrap(),
+            FixidityLib.fixed1().unwrap(),
+            _uptimes[i].unwrap(),
+            FixidityLib.fixed1().unwrap(),
+            originalValidatorScoreParameters.exponent,
+            uint256(18)
+          )
         ),
         abi.encodePacked(_currentscore, FixidityLib.fixed1().unwrap())
       );
@@ -2448,13 +2471,15 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
 
     ph.mockReturn(
       ph.FRACTION_MUL(),
-      abi.encodePacked(
-        FixidityLib.fixed1().unwrap(),
-        FixidityLib.fixed1().unwrap(),
-        uptime.unwrap(),
-        FixidityLib.fixed1().unwrap(),
-        originalValidatorScoreParameters.exponent,
-        uint256(18)
+      keccak256(
+        abi.encodePacked(
+          FixidityLib.fixed1().unwrap(),
+          FixidityLib.fixed1().unwrap(),
+          uptime.unwrap(),
+          FixidityLib.fixed1().unwrap(),
+          originalValidatorScoreParameters.exponent,
+          uint256(18)
+        )
       ),
       abi.encodePacked(_epochScore, FixidityLib.fixed1().unwrap())
     );
@@ -2798,13 +2823,15 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
 
     ph.mockReturn(
       ph.FRACTION_MUL(),
-      abi.encodePacked(
-        FixidityLib.fixed1().unwrap(),
-        FixidityLib.fixed1().unwrap(),
-        uptime.unwrap(),
-        FixidityLib.fixed1().unwrap(),
-        originalValidatorScoreParameters.exponent,
-        uint256(18)
+      keccak256(
+        abi.encodePacked(
+          FixidityLib.fixed1().unwrap(),
+          FixidityLib.fixed1().unwrap(),
+          uptime.unwrap(),
+          FixidityLib.fixed1().unwrap(),
+          originalValidatorScoreParameters.exponent,
+          uint256(18)
+        )
       ),
       abi.encodePacked(
         _calculateScore(uptime.unwrap(), validators.downtimeGracePeriod()),
