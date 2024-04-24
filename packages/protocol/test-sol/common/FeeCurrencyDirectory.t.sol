@@ -3,22 +3,7 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
 import "../../contracts-0.8/common/FeeCurrencyDirectory.sol";
-
-contract MockOracle is IOracle {
-  uint256 numerator;
-  uint256 denominator;
-  uint256 lastUpdateTimestamp;
-
-  function setExchangeRate(uint256 _numerator, uint256 _denominator) public {
-    numerator = _numerator;
-    denominator = _denominator;
-    lastUpdateTimestamp = block.timestamp;
-  }
-
-  function getExchangeRateFor(address) external view returns (uint256, uint256, uint256) {
-    return (numerator, denominator, lastUpdateTimestamp);
-  }
-}
+import "../../contracts-0.8/common/mocks/MockOracle.sol";
 
 contract FeeCurrencyDirectoryTestBase is Test {
   FeeCurrencyDirectory directory;
@@ -39,11 +24,11 @@ contract FeeCurrencyDirectoryTestBase is Test {
 }
 
 contract TestSetCurrencyConfig is FeeCurrencyDirectoryTestBase {
-  function test_OwnerCanSetCurrencyConfig() public {
+  function test_ShouldAllowOwnerSetCurrencyConfig() public {
     address token = address(1);
     uint256 intrinsicGas = 21000;
     directory.setCurrencyConfig(token, tokenIdentifier, address(oracle), intrinsicGas);
-    FeeCurrencyDirectory.CurrencyConfig memory config = directory.getCurrencyConfig(token);
+    CurrencyConfig memory config = directory.getCurrencyConfig(token);
 
     assertEq(directory.getCurrencies().length, 1);
     assertEq(config.currencyIdentifier, tokenIdentifier);
@@ -51,7 +36,7 @@ contract TestSetCurrencyConfig is FeeCurrencyDirectoryTestBase {
     assertEq(config.intrinsicGas, intrinsicGas);
   }
 
-  function test_NonOwnerCannotSetCurrencyConfig() public {
+  function test_Reverts_WhenNonOwnerSetsCurrencyConfig() public {
     address token = address(2);
     uint256 intrinsicGas = 21000;
     vm.prank(nonOwner);
@@ -95,10 +80,10 @@ contract TestRemoveCurrencies is FeeCurrencyDirectoryTestBase {
     directory.setCurrencyConfig(token, tokenIdentifier, address(oracle), 21000);
   }
 
-  function test_RemoveCurrencies() public {
+  function test_ShouldRemoveCurrencies() public {
     address token = address(4);
     directory.removeCurrencies(token, 0);
-    FeeCurrencyDirectory.CurrencyConfig memory config = directory.getCurrencyConfig(token);
+    CurrencyConfig memory config = directory.getCurrencyConfig(token);
     assertEq(directory.getCurrencies().length, 0);
     assertEq(config.currencyIdentifier, address(0));
   }
@@ -134,7 +119,7 @@ contract TestGetPrice is FeeCurrencyDirectoryTestBase {
     directory.setCurrencyConfig(token, tokenIdentifier, address(oracle), 21000);
   }
 
-  function test_ReturnsPriceSuccessfully() public {
+  function test_ShouldReturnPriceSuccessfully() public {
     (uint256 numerator, uint256 denominator) = directory.getExchangeRate(token);
     assertEq(numerator, 200);
     assertEq(denominator, 4);

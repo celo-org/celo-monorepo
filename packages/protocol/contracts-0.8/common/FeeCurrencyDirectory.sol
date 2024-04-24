@@ -3,17 +3,12 @@ pragma solidity ^0.8.0;
 
 import "../../contracts/common/Initializable.sol";
 import "./interfaces/IOracle.sol";
+import "./interfaces/IFeeCurrencyDirectory.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
-contract FeeCurrencyDirectory is Initializable, Ownable {
+contract FeeCurrencyDirectory is IFeeCurrencyDirectory, Initializable, Ownable {
   mapping(address => CurrencyConfig) public currencies;
   address[] private currencyList;
-
-  struct CurrencyConfig {
-    address currencyIdentifier;
-    address oracle;
-    uint256 intrinsicGas;
-  }
 
   constructor(bool test) public Initializable(test) {}
 
