@@ -14,6 +14,7 @@ import "../../contracts/governance/interfaces/ILockedGold.sol";
 import "../../contracts/governance/interfaces/IValidators.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
 import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+import "../../contracts/governance/interfaces/IElection.sol";
 
 import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
 
@@ -108,6 +109,10 @@ contract UsingRegistry is Ownable {
 
   function getValidators() internal view returns (IValidators) {
     return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
+  }
+
+  function getElection() internal view returns (IElection) {
+    return IElection(registry.getAddressForOrDie(ELECTION_REGISTRY_ID));
   }
 
 }
