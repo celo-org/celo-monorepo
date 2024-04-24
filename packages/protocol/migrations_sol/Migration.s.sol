@@ -8,7 +8,6 @@ import {Script} from "forge-std-8/Script.sol";
 import "forge-std/console.sol";
 import "forge-std/StdJson.sol";
 
-import "@celo-contracts/common/interfaces/IOwnable.sol";
 import "@celo-contracts/common/interfaces/IProxyFactory.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
@@ -260,7 +259,6 @@ contract Migration is Script, UsingRegistry {
     setImplementationOnProxy(IProxy(registryAddress), "Registry", abi.encodeWithSelector(IRegistry.initialize.selector));
     // set registry in registry itself
     console.log("Owner of the Registry Proxy is", IProxy(registryAddress)._getOwner());
-    console.log("Owner of registry contract is", IOwnable(registryAddress).owner());
     addToRegistry("Registry", registryAddress);
     console.log("Done migration registry");
   }
