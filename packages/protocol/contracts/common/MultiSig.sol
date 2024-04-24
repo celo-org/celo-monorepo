@@ -28,18 +28,13 @@ import "./Initializable.sol";
  */
 contract MultiSig is Initializable {
   using SafeMath for uint256;
-  /*
-   *  Events
-   */
-  event Confirmation(address indexed sender, uint256 indexed transactionId);
-  event Revocation(address indexed sender, uint256 indexed transactionId);
-  event Submission(uint256 indexed transactionId);
-  event Execution(uint256 indexed transactionId, bytes returnData);
-  event Deposit(address indexed sender, uint256 value);
-  event OwnerAddition(address indexed owner);
-  event OwnerRemoval(address indexed owner);
-  event RequirementChange(uint256 required);
-  event InternalRequirementChange(uint256 internalRequired);
+
+  struct Transaction {
+    address destination;
+    uint256 value;
+    bytes data;
+    bool executed;
+  }
 
   /*
    *  Constants
@@ -57,18 +52,18 @@ contract MultiSig is Initializable {
   uint256 public internalRequired;
   uint256 public transactionCount;
 
-  struct Transaction {
-    address destination;
-    uint256 value;
-    bytes data;
-    bool executed;
-  }
-
-  /**
-   * @notice Sets initialized == true on implementation contracts
-   * @param test Set to true to skip implementation initialization
+  /*
+   *  Events
    */
-  constructor(bool test) public Initializable(test) {}
+  event Confirmation(address indexed sender, uint256 indexed transactionId);
+  event Revocation(address indexed sender, uint256 indexed transactionId);
+  event Submission(uint256 indexed transactionId);
+  event Execution(uint256 indexed transactionId, bytes returnData);
+  event Deposit(address indexed sender, uint256 value);
+  event OwnerAddition(address indexed owner);
+  event OwnerRemoval(address indexed owner);
+  event RequirementChange(uint256 required);
+  event InternalRequirementChange(uint256 internalRequired);
 
   /*
    *  Modifiers
@@ -121,10 +116,11 @@ contract MultiSig is Initializable {
     _;
   }
 
-  /// @dev Fallback function allows to deposit ether.
-  function() external payable {
-    if (msg.value > 0) emit Deposit(msg.sender, msg.value);
-  }
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
 
   /*
    * Public functions
@@ -149,6 +145,11 @@ contract MultiSig is Initializable {
     owners = _owners;
     required = _required;
     internalRequired = _internalRequired;
+  }
+
+  /// @dev Fallback function allows to deposit ether.
+  function() external payable {
+    if (msg.value > 0) emit Deposit(msg.sender, msg.value);
   }
 
   /// @dev Allows to add a new owner. Transaction has to be sent by wallet.
@@ -201,28 +202,16 @@ contract MultiSig is Initializable {
     emit OwnerAddition(newOwner);
   }
 
-  /// @dev Allows to change the number of required confirmations. Transaction has to be sent by
-  /// wallet.
-  /// @param _required Number of required confirmations.
-  function changeRequirement(uint256 _required)
-    public
-    onlyWallet
-    validRequirement(owners.length, _required)
+  /// @dev Allows an owner to revoke a confirmation for a transaction.
+  /// @param transactionId Transaction ID.
+  function revokeConfirmation(uint256 transactionId)
+    external
+    ownerExists(msg.sender)
+    confirmed(transactionId, msg.sender)
+    notExecuted(transactionId)
   {
-    required = _required;
-    emit RequirementChange(_required);
-  }
-
-  /// @dev Allows to change the number of required confirmations. Transaction has to be sent by
-  /// wallet.
-  /// @param _internalRequired Number of required confirmations for interal txs.
-  function changeInternalRequirement(uint256 _internalRequired)
-    public
-    onlyWallet
-    validRequirement(owners.length, _internalRequired)
-  {
-    internalRequired = _internalRequired;
-    emit InternalRequirementChange(_internalRequired);
+    confirmations[transactionId][msg.sender] = false;
+    emit Revocation(msg.sender, transactionId);
   }
 
   /// @dev Allows an owner to submit and confirm a transaction.
@@ -236,86 +225,6 @@ contract MultiSig is Initializable {
   {
     transactionId = addTransaction(destination, value, data);
     confirmTransaction(transactionId);
-  }
-
-  /// @dev Allows an owner to confirm a transaction.
-  /// @param transactionId Transaction ID.
-  function confirmTransaction(uint256 transactionId)
-    public
-    ownerExists(msg.sender)
-    transactionExists(transactionId)
-    notConfirmed(transactionId, msg.sender)
-  {
-    confirmations[transactionId][msg.sender] = true;
-    emit Confirmation(msg.sender, transactionId);
-    if (isConfirmed(transactionId)) {
-      executeTransaction(transactionId);
-    }
-  }
-
-  /// @dev Allows an owner to revoke a confirmation for a transaction.
-  /// @param transactionId Transaction ID.
-  function revokeConfirmation(uint256 transactionId)
-    external
-    ownerExists(msg.sender)
-    confirmed(transactionId, msg.sender)
-    notExecuted(transactionId)
-  {
-    confirmations[transactionId][msg.sender] = false;
-    emit Revocation(msg.sender, transactionId);
-  }
-
-  /// @dev Allows anyone to execute a confirmed transaction.
-  /// @param transactionId Transaction ID.
-  function executeTransaction(uint256 transactionId)
-    public
-    ownerExists(msg.sender)
-    confirmed(transactionId, msg.sender)
-    notExecuted(transactionId)
-  {
-    require(isConfirmed(transactionId), "Transaction not confirmed.");
-    Transaction storage txn = transactions[transactionId];
-    txn.executed = true;
-    bytes memory returnData = ExternalCall.execute(txn.destination, txn.value, txn.data);
-    emit Execution(transactionId, returnData);
-  }
-
-  /// @dev Returns the confirmation status of a transaction.
-  /// @param transactionId Transaction ID.
-  /// @return Confirmation status.
-  function isConfirmed(uint256 transactionId) public view returns (bool) {
-    uint256 count = 0;
-    for (uint256 i = 0; i < owners.length; i = i.add(1)) {
-      if (confirmations[transactionId][owners[i]]) count = count.add(1);
-      bool isInternal = transactions[transactionId].destination == address(this);
-      if ((isInternal && count == internalRequired) || (!isInternal && count == required))
-        return true;
-    }
-    return false;
-  }
-
-  /*
-   * Internal functions
-   */
-  /// @dev Adds a new transaction to the transaction mapping, if transaction does not exist yet.
-  /// @param destination Transaction target address.
-  /// @param value Transaction ether value.
-  /// @param data Transaction data payload.
-  /// @return Returns transaction ID.
-  function addTransaction(address destination, uint256 value, bytes memory data)
-    internal
-    notNull(destination)
-    returns (uint256 transactionId)
-  {
-    transactionId = transactionCount;
-    transactions[transactionId] = Transaction({
-      destination: destination,
-      value: value,
-      data: data,
-      executed: false
-    });
-    transactionCount = transactionCount.add(1);
-    emit Submission(transactionId);
   }
 
   /*
@@ -387,4 +296,97 @@ contract MultiSig is Initializable {
     _transactionIds = new uint256[](to.sub(from));
     for (i = from; i < to; i = i.add(1)) _transactionIds[i.sub(from)] = transactionIdsTemp[i];
   }
+
+  /// @dev Allows to change the number of required confirmations. Transaction has to be sent by
+  /// wallet.
+  /// @param _required Number of required confirmations.
+  function changeRequirement(uint256 _required)
+    public
+    onlyWallet
+    validRequirement(owners.length, _required)
+  {
+    required = _required;
+    emit RequirementChange(_required);
+  }
+
+  /// @dev Allows to change the number of required confirmations. Transaction has to be sent by
+  /// wallet.
+  /// @param _internalRequired Number of required confirmations for interal txs.
+  function changeInternalRequirement(uint256 _internalRequired)
+    public
+    onlyWallet
+    validRequirement(owners.length, _internalRequired)
+  {
+    internalRequired = _internalRequired;
+    emit InternalRequirementChange(_internalRequired);
+  }
+
+  /// @dev Allows an owner to confirm a transaction.
+  /// @param transactionId Transaction ID.
+  function confirmTransaction(uint256 transactionId)
+    public
+    ownerExists(msg.sender)
+    transactionExists(transactionId)
+    notConfirmed(transactionId, msg.sender)
+  {
+    confirmations[transactionId][msg.sender] = true;
+    emit Confirmation(msg.sender, transactionId);
+    if (isConfirmed(transactionId)) {
+      executeTransaction(transactionId);
+    }
+  }
+
+  /// @dev Allows anyone to execute a confirmed transaction.
+  /// @param transactionId Transaction ID.
+  function executeTransaction(uint256 transactionId)
+    public
+    ownerExists(msg.sender)
+    confirmed(transactionId, msg.sender)
+    notExecuted(transactionId)
+  {
+    require(isConfirmed(transactionId), "Transaction not confirmed.");
+    Transaction storage txn = transactions[transactionId];
+    txn.executed = true;
+    bytes memory returnData = ExternalCall.execute(txn.destination, txn.value, txn.data);
+    emit Execution(transactionId, returnData);
+  }
+
+  /// @dev Returns the confirmation status of a transaction.
+  /// @param transactionId Transaction ID.
+  /// @return Confirmation status.
+  function isConfirmed(uint256 transactionId) public view returns (bool) {
+    uint256 count = 0;
+    for (uint256 i = 0; i < owners.length; i = i.add(1)) {
+      if (confirmations[transactionId][owners[i]]) count = count.add(1);
+      bool isInternal = transactions[transactionId].destination == address(this);
+      if ((isInternal && count == internalRequired) || (!isInternal && count == required))
+        return true;
+    }
+    return false;
+  }
+
+  /*
+   * Internal functions
+   */
+  /// @dev Adds a new transaction to the transaction mapping, if transaction does not exist yet.
+  /// @param destination Transaction target address.
+  /// @param value Transaction ether value.
+  /// @param data Transaction data payload.
+  /// @return Returns transaction ID.
+  function addTransaction(address destination, uint256 value, bytes memory data)
+    internal
+    notNull(destination)
+    returns (uint256 transactionId)
+  {
+    transactionId = transactionCount;
+    transactions[transactionId] = Transaction({
+      destination: destination,
+      value: value,
+      data: data,
+      executed: false
+    });
+    transactionCount = transactionCount.add(1);
+    emit Submission(transactionId);
+  }
+
 }

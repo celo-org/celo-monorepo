@@ -164,38 +164,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    */
   constructor(bool test) public Initializable(test) {}
 
-  function isFunded() public view returns (bool) {
-    // grants which have already released are considered funded for backwards compatibility
-    return
-      getCurrentReleasedTotalAmount() > 0 ||
-      address(this).balance >=
-      releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods);
-  }
-
-  function() external payable {}
-
-  /**
-   * @notice Wrapper function for stable token transfer function.
-   */
-  function transfer(address to, uint256 value) external onlyWhenInProperState {
-    IERC20(registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID)).transfer(to, value);
-  }
-
-  /**
-   * @notice Wrapper function for any ERC-20 transfer function.
-   * @dev Protects against celo balance changes.
-   */
-  function genericTransfer(address erc20, address to, uint256 value)
-    external
-    onlyWhenInProperState
-  {
-    require(
-      erc20 != registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
-      "Transfer must not target celo balance"
-    );
-    SafeERC20.safeTransfer(IERC20(erc20), to, value);
-  }
-
   /**
    * @notice A constructor for initialising a new instance of a Releasing Schedule contract.
    * @param releaseStartTime The time (in Unix time) at which point releasing starts.
@@ -281,12 +249,28 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     emit ReleaseGoldInstanceCreated(beneficiary, address(this));
   }
 
+  function() external payable {}
+
   /**
-   * @notice Returns if the release schedule has been revoked or not.
-   * @return True if instance revoked.
+   * @notice Wrapper function for stable token transfer function.
    */
-  function isRevoked() public view returns (bool) {
-    return revocationInfo.revokeTime > 0;
+  function transfer(address to, uint256 value) external onlyWhenInProperState {
+    IERC20(registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID)).transfer(to, value);
+  }
+
+  /**
+   * @notice Wrapper function for any ERC-20 transfer function.
+   * @dev Protects against celo balance changes.
+   */
+  function genericTransfer(address erc20, address to, uint256 value)
+    external
+    onlyWhenInProperState
+  {
+    require(
+      erc20 != registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
+      "Transfer must not target celo balance"
+    );
+    SafeERC20.safeTransfer(IERC20(erc20), to, value);
   }
 
   /**
@@ -341,16 +325,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    */
   function setBeneficiary(address payable newBeneficiary) external onlyOwner {
     _setBeneficiary(newBeneficiary);
-  }
-
-  /**
-   * @notice Sets the beneficiary of the instance
-   * @param newBeneficiary The address of the new beneficiary
-   */
-  function _setBeneficiary(address payable newBeneficiary) private {
-    require(newBeneficiary != address(0x0), "Can't set the beneficiary to the zero address");
-    beneficiary = newBeneficiary;
-    emit BeneficiarySet(newBeneficiary);
   }
 
   /**
@@ -421,124 +395,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     revocationInfo.revokeTime = block.timestamp;
     revocationInfo.releasedBalanceAtRevoke = totalWithdrawn;
     emit ReleaseScheduleRevoked(revocationInfo.revokeTime, totalWithdrawn);
-  }
-
-  /**
-   * @notice Calculates the total balance of the release schedule instance including withdrawals.
-   * @return The total released instance gold balance.
-   * @dev The returned amount may vary over time due to locked gold rewards.
-   */
-  function getTotalBalance() public view returns (uint256) {
-    return getRemainingUnlockedBalance().add(getRemainingLockedBalance()).add(totalWithdrawn);
-  }
-
-  /**
-   * @notice Calculates the sum of locked and unlocked gold in the release schedule instance.
-   * @return The remaining total released instance gold balance.
-   * @dev The returned amount may vary over time due to locked gold rewards.
-   */
-  function getRemainingTotalBalance() public view returns (uint256) {
-    return getRemainingUnlockedBalance().add(getRemainingLockedBalance());
-  }
-
-  /**
-   * @notice Calculates remaining unlocked gold balance in the release schedule instance.
-   * @return The available unlocked release schedule instance gold balance.
-   */
-  function getRemainingUnlockedBalance() public view returns (uint256) {
-    return address(this).balance;
-  }
-
-  /**
-   * @notice Calculates remaining locked gold balance in the release schedule instance.
-   *         The returned amount also includes pending withdrawals to maintain consistent releases.
-   *         Return 0 if address of caller is not an account.
-   * @return The remaining locked gold of the release schedule instance.
-   * @dev The returned amount may vary over time due to locked gold rewards.
-   */
-  function getRemainingLockedBalance() public view returns (uint256) {
-    if (getAccounts().isAccount(address(this))) {
-      ILockedGold lockedGold = getLockedGold();
-      uint256 pendingWithdrawalSum = lockedGold.getTotalPendingWithdrawals(address(this));
-      return lockedGold.getAccountTotalLockedGold(address(this)).add(pendingWithdrawalSum);
-    }
-    return 0;
-  }
-
-  /**
-   * @dev Calculates the total amount that has already released up to now.
-   * @return The already released amount up to the point of call.
-   * @dev The returned amount may vary over time due to locked gold rewards.
-   */
-  function getCurrentReleasedTotalAmount() public view returns (uint256) {
-    if (block.timestamp < releaseSchedule.releaseCliff || !liquidityProvisionMet) {
-      return 0;
-    }
-    uint256 totalBalance = getTotalBalance();
-
-    if (
-      block.timestamp >=
-      releaseSchedule.releaseStartTime.add(
-        releaseSchedule.numReleasePeriods.mul(releaseSchedule.releasePeriod)
-      )
-    ) {
-      return totalBalance;
-    }
-
-    uint256 timeSinceStart = block.timestamp.sub(releaseSchedule.releaseStartTime);
-    uint256 periodsSinceStart = timeSinceStart.div(releaseSchedule.releasePeriod);
-    return totalBalance.mul(periodsSinceStart).div(releaseSchedule.numReleasePeriods);
-  }
-
-  /**
-   * @notice A wrapper function for the lock gold method.
-   * @param value The value of gold to be locked.
-   */
-  function lockGold(uint256 value) external nonReentrant onlyBeneficiaryAndNotRevoked {
-    getLockedGold().lock.gas(gasleft()).value(value)();
-  }
-
-  /**
-   * @notice A wrapper function for the unlock gold method function.
-   * @param value The value of gold to be unlocked for the release schedule instance.
-   */
-  function unlockGold(uint256 value) external nonReentrant onlyWhenInProperState {
-    getLockedGold().unlock(value);
-  }
-
-  /**
-   * @notice A wrapper function for the relock locked gold method function.
-   * @param index The index of the pending locked gold withdrawal.
-   * @param value The value of gold to be relocked for the release schedule instance.
-   */
-  function relockGold(uint256 index, uint256 value)
-    external
-    nonReentrant
-    onlyBeneficiaryAndNotRevoked
-  {
-    getLockedGold().relock(index, value);
-  }
-
-  /**
-   * @notice A wrapper function for the withdraw locked gold method function.
-   * @param index The index of the pending locked gold withdrawal.
-   * @dev The amount shall be withdrawn back to the release schedule instance.
-   */
-  function withdrawLockedGold(uint256 index) external nonReentrant onlyWhenInProperState {
-    getLockedGold().withdraw(index);
-  }
-
-  /**
-   * @notice Funds a signer address so that transaction fees can be paid.
-   * @param signer The signer address to fund.
-   * @dev Note that this effectively decreases the total balance by 1 CELO.
-   */
-  function fundSigner(address payable signer) private {
-    // Fund signer account with 1 CELO.
-    uint256 value = 1 ether;
-    require(address(this).balance >= value, "no available CELO to fund signer");
-    signer.sendValue(value);
-    require(getRemainingTotalBalance() > 0, "no remaining balance");
   }
 
   /**
@@ -771,6 +627,44 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   /**
+   * @notice A wrapper function for the lock gold method.
+   * @param value The value of gold to be locked.
+   */
+  function lockGold(uint256 value) external nonReentrant onlyBeneficiaryAndNotRevoked {
+    getLockedGold().lock.gas(gasleft()).value(value)();
+  }
+
+  /**
+   * @notice A wrapper function for the unlock gold method function.
+   * @param value The value of gold to be unlocked for the release schedule instance.
+   */
+  function unlockGold(uint256 value) external nonReentrant onlyWhenInProperState {
+    getLockedGold().unlock(value);
+  }
+
+  /**
+   * @notice A wrapper function for the relock locked gold method function.
+   * @param index The index of the pending locked gold withdrawal.
+   * @param value The value of gold to be relocked for the release schedule instance.
+   */
+  function relockGold(uint256 index, uint256 value)
+    external
+    nonReentrant
+    onlyBeneficiaryAndNotRevoked
+  {
+    getLockedGold().relock(index, value);
+  }
+
+  /**
+   * @notice A wrapper function for the withdraw locked gold method function.
+   * @param index The index of the pending locked gold withdrawal.
+   * @dev The amount shall be withdrawn back to the release schedule instance.
+   */
+  function withdrawLockedGold(uint256 index) external nonReentrant onlyWhenInProperState {
+    getLockedGold().withdraw(index);
+  }
+
+  /**
    * @notice Revokes `value` pending votes for `group`.
    * @param group The validator group to revoke votes from.
    * @param value The number of votes to revoke.
@@ -791,6 +685,89 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     getElection().revokePending(group, value, lesser, greater, index);
   }
 
+  function isFunded() public view returns (bool) {
+    // grants which have already released are considered funded for backwards compatibility
+    return
+      getCurrentReleasedTotalAmount() > 0 ||
+      address(this).balance >=
+      releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods);
+  }
+
+  /**
+   * @notice Returns if the release schedule has been revoked or not.
+   * @return True if instance revoked.
+   */
+  function isRevoked() public view returns (bool) {
+    return revocationInfo.revokeTime > 0;
+  }
+
+  /**
+   * @notice Calculates the total balance of the release schedule instance including withdrawals.
+   * @return The total released instance gold balance.
+   * @dev The returned amount may vary over time due to locked gold rewards.
+   */
+  function getTotalBalance() public view returns (uint256) {
+    return getRemainingUnlockedBalance().add(getRemainingLockedBalance()).add(totalWithdrawn);
+  }
+
+  /**
+   * @notice Calculates the sum of locked and unlocked gold in the release schedule instance.
+   * @return The remaining total released instance gold balance.
+   * @dev The returned amount may vary over time due to locked gold rewards.
+   */
+  function getRemainingTotalBalance() public view returns (uint256) {
+    return getRemainingUnlockedBalance().add(getRemainingLockedBalance());
+  }
+
+  /**
+   * @notice Calculates remaining unlocked gold balance in the release schedule instance.
+   * @return The available unlocked release schedule instance gold balance.
+   */
+  function getRemainingUnlockedBalance() public view returns (uint256) {
+    return address(this).balance;
+  }
+
+  /**
+   * @notice Calculates remaining locked gold balance in the release schedule instance.
+   *         The returned amount also includes pending withdrawals to maintain consistent releases.
+   *         Return 0 if address of caller is not an account.
+   * @return The remaining locked gold of the release schedule instance.
+   * @dev The returned amount may vary over time due to locked gold rewards.
+   */
+  function getRemainingLockedBalance() public view returns (uint256) {
+    if (getAccounts().isAccount(address(this))) {
+      ILockedGold lockedGold = getLockedGold();
+      uint256 pendingWithdrawalSum = lockedGold.getTotalPendingWithdrawals(address(this));
+      return lockedGold.getAccountTotalLockedGold(address(this)).add(pendingWithdrawalSum);
+    }
+    return 0;
+  }
+
+  /**
+   * @dev Calculates the total amount that has already released up to now.
+   * @return The already released amount up to the point of call.
+   * @dev The returned amount may vary over time due to locked gold rewards.
+   */
+  function getCurrentReleasedTotalAmount() public view returns (uint256) {
+    if (block.timestamp < releaseSchedule.releaseCliff || !liquidityProvisionMet) {
+      return 0;
+    }
+    uint256 totalBalance = getTotalBalance();
+
+    if (
+      block.timestamp >=
+      releaseSchedule.releaseStartTime.add(
+        releaseSchedule.numReleasePeriods.mul(releaseSchedule.releasePeriod)
+      )
+    ) {
+      return totalBalance;
+    }
+
+    uint256 timeSinceStart = block.timestamp.sub(releaseSchedule.releaseStartTime);
+    uint256 periodsSinceStart = timeSinceStart.div(releaseSchedule.releasePeriod);
+    return totalBalance.mul(periodsSinceStart).div(releaseSchedule.numReleasePeriods);
+  }
+
   /**
    * @return The currently withdrawable release amount.
   */
@@ -800,5 +777,28 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
         Math.min(maxDistribution, getCurrentReleasedTotalAmount()).sub(totalWithdrawn),
         getRemainingUnlockedBalance()
       );
+  }
+
+  /**
+   * @notice Funds a signer address so that transaction fees can be paid.
+   * @param signer The signer address to fund.
+   * @dev Note that this effectively decreases the total balance by 1 CELO.
+   */
+  function fundSigner(address payable signer) private {
+    // Fund signer account with 1 CELO.
+    uint256 value = 1 ether;
+    require(address(this).balance >= value, "no available CELO to fund signer");
+    signer.sendValue(value);
+    require(getRemainingTotalBalance() > 0, "no remaining balance");
+  }
+
+  /**
+   * @notice Sets the beneficiary of the instance
+   * @param newBeneficiary The address of the new beneficiary
+   */
+  function _setBeneficiary(address payable newBeneficiary) private {
+    require(newBeneficiary != address(0x0), "Can't set the beneficiary to the zero address");
+    beneficiary = newBeneficiary;
+    emit BeneficiarySet(newBeneficiary);
   }
 }

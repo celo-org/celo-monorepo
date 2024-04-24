@@ -26,6 +26,38 @@ contract Escrow is
   using SafeMath for uint256;
   using SafeERC20 for ERC20;
 
+  struct EscrowedPayment {
+    bytes32 recipientIdentifier;
+    address sender;
+    address token;
+    uint256 value;
+    uint256 sentIndex; // Location of this payment in sender's list of sent payments.
+    uint256 receivedIndex; // Location of this payment in receivers's list of received payments.
+    uint256 timestamp;
+    uint256 expirySeconds;
+    uint256 minAttestations;
+  }
+
+  // Maps unique payment IDs to escrowed payments.
+  // These payment IDs are the temporary wallet addresses created with the escrowed payments.
+  mapping(address => EscrowedPayment) public escrowedPayments;
+
+  // Maps receivers' identifiers to a list of received escrowed payment IDs.
+  mapping(bytes32 => address[]) public receivedPaymentIds;
+
+  // Maps senders' addresses to a list of sent escrowed payment IDs.
+  mapping(address => address[]) public sentPaymentIds;
+
+  // Maps payment ID to a list of issuers whose attestations will be accepted.
+  mapping(address => address[]) public trustedIssuersPerPayment;
+
+  // Governable list of trustedIssuers to set for payments by default.
+  address[] public defaultTrustedIssuers;
+
+  // Based on benchmarking of FederatedAttestations lookup gas consumption
+  // in the worst case (with a significant amount of buffer).
+  uint256 public constant MAX_TRUSTED_ISSUERS_PER_PAYMENT = 100;
+
   event DefaultTrustedIssuerAdded(address indexed trustedIssuer);
   event DefaultTrustedIssuerRemoved(address indexed trustedIssuer);
 
@@ -59,54 +91,11 @@ contract Escrow is
     address paymentId
   );
 
-  struct EscrowedPayment {
-    bytes32 recipientIdentifier;
-    address sender;
-    address token;
-    uint256 value;
-    uint256 sentIndex; // Location of this payment in sender's list of sent payments.
-    uint256 receivedIndex; // Location of this payment in receivers's list of received payments.
-    uint256 timestamp;
-    uint256 expirySeconds;
-    uint256 minAttestations;
-  }
-
-  // Maps unique payment IDs to escrowed payments.
-  // These payment IDs are the temporary wallet addresses created with the escrowed payments.
-  mapping(address => EscrowedPayment) public escrowedPayments;
-
-  // Maps receivers' identifiers to a list of received escrowed payment IDs.
-  mapping(bytes32 => address[]) public receivedPaymentIds;
-
-  // Maps senders' addresses to a list of sent escrowed payment IDs.
-  mapping(address => address[]) public sentPaymentIds;
-
-  // Maps payment ID to a list of issuers whose attestations will be accepted.
-  mapping(address => address[]) public trustedIssuersPerPayment;
-
-  // Governable list of trustedIssuers to set for payments by default.
-  address[] public defaultTrustedIssuers;
-
-  // Based on benchmarking of FederatedAttestations lookup gas consumption
-  // in the worst case (with a significant amount of buffer).
-  uint256 public constant MAX_TRUSTED_ISSUERS_PER_PAYMENT = 100;
-
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
   constructor(bool test) public Initializable(test) {}
-
-  /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 0);
-  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -369,6 +358,17 @@ contract Escrow is
   */
   function getTrustedIssuersPerPayment(address paymentId) external view returns (address[] memory) {
     return trustedIssuersPerPayment[paymentId];
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 2, 0, 0);
   }
 
   /**

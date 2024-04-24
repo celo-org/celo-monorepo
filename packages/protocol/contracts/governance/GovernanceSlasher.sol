@@ -42,15 +42,6 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
   }
 
   /**
-   * @notice Gets account penalty.
-   * @param account Address that is punished.
-   * @return Amount slashed.
-   */
-  function getApprovedSlashing(address account) external view returns (uint256) {
-    return slashed[account];
-  }
-
-  /**
    * @notice Calls `LockedGold.slash` on `account` if `account` has an entry in `slashed`.
    * @param account Account to slash
    * @param electionLessers Lesser pointers for slashing locked election gold.
@@ -77,5 +68,14 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
     );
     emit GovernanceSlashPerformed(account, penalty);
     return true;
+  }
+
+  /**
+   * @notice Gets account penalty.
+   * @param account Address that is punished.
+   * @return Amount slashed.
+   */
+  function getApprovedSlashing(address account) external view returns (uint256) {
+    return slashed[account];
   }
 }

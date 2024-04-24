@@ -17,16 +17,16 @@ contract Proxy {
   event OwnerSet(address indexed owner);
   event ImplementationSet(address indexed implementation);
 
-  constructor() public {
-    _setOwner(msg.sender);
-  }
-
   /**
    * @notice Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
     require(msg.sender == _getOwner(), "sender was not owner");
     _;
+  }
+
+  constructor() public {
+    _setOwner(msg.sender);
   }
 
   /**

@@ -5,13 +5,13 @@ import "../common/ExternalCall.sol";
 contract IdentityProxy {
   address public deployer;
 
-  constructor() public {
-    deployer = msg.sender;
-  }
-
   modifier onlyDeployer() {
     require(msg.sender == deployer, "Only callable by original deployer");
     _;
+  }
+
+  constructor() public {
+    deployer = msg.sender;
   }
 
   /**

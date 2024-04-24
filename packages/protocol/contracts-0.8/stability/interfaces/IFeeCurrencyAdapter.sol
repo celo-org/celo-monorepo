@@ -3,6 +3,25 @@ pragma solidity >=0.8.7 <0.8.20;
 
 interface IFeeCurrencyAdapter {
   /**
+   * @notice Same as debitGasFees in IFeeCurrency, always using the number of decimals the evm expects.
+   */
+  function debitGasFees(address from, uint256 value) external;
+
+  /**
+   * @notice Same as creditGasFees in IFeeCurrency, always using the number of decimals the evm expects.
+   */
+  function creditGasFees(
+    address refundRecipient,
+    address tipRecipient,
+    address _gatewayFeeRecipient,
+    address baseFeeRecipient,
+    uint256 refundAmount,
+    uint256 tipAmount,
+    uint256 _gatewayFeeAmount,
+    uint256 baseFeeAmount
+  ) external;
+
+  /**
    * @return The address of the adapted token.
    */
   function getAdaptedToken() external view returns (address);
@@ -36,23 +55,4 @@ interface IFeeCurrencyAdapter {
    * @return Same as decimals.
    */
   function expectedDecimals() external view returns (uint8);
-
-  /**
-   * @notice Same as debitGasFees in IFeeCurrency, always using the number of decimals the evm expects.
-   */
-  function debitGasFees(address from, uint256 value) external;
-
-  /**
-   * @notice Same as creditGasFees in IFeeCurrency, always using the number of decimals the evm expects.
-   */
-  function creditGasFees(
-    address refundRecipient,
-    address tipRecipient,
-    address _gatewayFeeRecipient,
-    address baseFeeRecipient,
-    uint256 refundAmount,
-    uint256 tipAmount,
-    uint256 _gatewayFeeAmount,
-    uint256 baseFeeAmount
-  ) external;
 }

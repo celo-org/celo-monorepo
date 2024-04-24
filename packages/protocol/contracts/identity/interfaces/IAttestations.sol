@@ -5,6 +5,12 @@ interface IAttestations {
   function revoke(bytes32, uint256) external;
   function withdraw(address) external;
 
+  // only owner
+  function setAttestationRequestFee(address, uint256) external;
+  function setAttestationExpiryBlocks(uint256) external;
+  function setSelectIssuersWaitBlocks(uint256) external;
+  function setMaxAttestations(uint256) external;
+
   // view functions
   function getUnselectedRequest(bytes32, address) external view returns (uint32, uint32, address);
   function getAttestationIssuers(bytes32, address) external view returns (address[] memory);
@@ -29,10 +35,4 @@ interface IAttestations {
     returns (address);
   function lookupAccountsForIdentifier(bytes32) external view returns (address[] memory);
   function requireNAttestationsRequested(bytes32, address, uint32) external view;
-
-  // only owner
-  function setAttestationRequestFee(address, uint256) external;
-  function setAttestationExpiryBlocks(uint256) external;
-  function setSelectIssuersWaitBlocks(uint256) external;
-  function setMaxAttestations(uint256) external;
 }
