@@ -78,6 +78,8 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
+
   Registry registry;
   Accounts accounts;
   MockStableToken stableToken;
@@ -409,6 +411,10 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
         FixidityLib.wrap(originalValidatorScoreParameters.exponent)
       );
   }
+
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+  }
 }
 
 contract ValidatorsTest_Initialize is ValidatorsTest {
@@ -478,9 +484,21 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
     assertEq(actual, commissionUpdateDelay, "Wrong commissionUpdateDelay.");
   }
 
+  function test_Reverts_setCommissionUpdateDelay_WhenL2() public {
+    _whenL2();
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.setCommissionUpdateDelay(commissionUpdateDelay);
+  }
+
   function test_shouldHaveSetDowntimeGracePeriod() public {
     uint256 actual = validators.downtimeGracePeriod();
     assertEq(actual, downtimeGracePeriod, "Wrong downtimeGracePeriod.");
+  }
+
+  function test_Reverts_SetDowntimeGracePeriod_WhenL2() public {
+    _whenL2();
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.setDowntimeGracePeriod(downtimeGracePeriod);
   }
 }
 
@@ -495,6 +513,12 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
   function test_shouldSetTheMembershipHistoryLength() public {
     validators.setMembershipHistoryLength(newLength);
     assertEq(validators.membershipHistoryLength(), newLength);
+  }
+
+  function test_Reverts_SetTheMembershipHistoryLength_WhenL2() public {
+    _whenL2();
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.setMembershipHistoryLength(newLength);
   }
 
   function test_Emits_MembershipHistoryLengthSet() public {
@@ -518,6 +542,12 @@ contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
   function test_ShouldSetMaxGroupSize() public {
     validators.setMaxGroupSize(newSize);
     assertEq(validators.getMaxGroupSize(), newSize, "MaxGroupSize not properly set");
+  }
+
+  function test_Reverts_SetMaxGroupSize_WhenL2() public {
+    _whenL2();
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.setMaxGroupSize(newSize);
   }
 
   function test_Emits_MaxGroupSizeSet() public {
@@ -614,11 +644,17 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
 
   event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
 
-  function test_ShouldsetExponentAndAdjustmentSpeed() public {
+  function test_ShouldSetExponentAndAdjustmentSpeed() public {
     validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
     (uint256 _exponent, uint256 _adjustmentSpeed) = validators.getValidatorScoreParameters();
     assertEq(_exponent, newParams.exponent, "Incorrect Exponent");
     assertEq(_adjustmentSpeed, newParams.adjustmentSpeed.unwrap(), "Incorrect AdjustmentSpeed");
+  }
+
+  function test_Reverts_SetExponentAndAdjustmentSpeed_WhenL2() public {
+    _whenL2();
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
   }
 
   function test_Emits_ValidatorScoreParametersSet() public {
@@ -680,6 +716,27 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
     _registerValidatorWithSignerHelper();
 
     assertTrue(validators.isValidator(validator));
+  }
+
+  function test_ShouldRevert_WhenInL2_WhenAccountHasAuthorizedValidatorSigner() public {
+    lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
+
+    (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
+      validator,
+      signerPk
+    );
+
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+
+    vm.prank(validator);
+    accounts.authorizeValidatorSigner(signer, v, r, s);
+
+    _whenL2();
+
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.prank(validator);
+    validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
+    validatorRegistrationEpochNumber = validators.getEpochNumber();
   }
 
   function test_ShouldAddAccountToValidatorList_WhenAccountHasAuthorizedValidatorSigner() public {
@@ -988,6 +1045,13 @@ contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirement
     assertEq(affiliation, group);
   }
 
+  function test_Reverts_WhenL2_WhenAffiliatingWithRegisteredValidatorGroup() public {
+    _whenL2();
+    vm.prank(validator);
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.affiliate(group);
+  }
+
   function test_Emits_ValidatorAffiliatedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit ValidatorAffiliated(validator, group);
@@ -1058,6 +1122,13 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     validators.affiliate(otherGroup);
     (, , address affiliation, , ) = validators.getValidator(validator);
     assertEq(affiliation, otherGroup);
+  }
+
+  function test_ShouldRevert_WhenL2_WhenValidatorNotMemberOfThatValidatorGroup() public {
+    _whenL2();
+    vm.prank(validator);
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.affiliate(otherGroup);
   }
 
   function test_Emits_ValidatorDeaffiliatedEvent_WhenValidatorNotMemberOfThatValidatorGroup()
@@ -1290,6 +1361,19 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
     assertEq(actualEcdsaPubKey, _newEcdsaPubKey);
   }
 
+  function test_Reverts_SetValidatorEcdsaPubKey_WhenCalledByRegisteredAccountsContract_WhenL2()
+    public
+  {
+    _whenL2();
+    (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
+      address(accounts),
+      signerPk
+    );
+    vm.prank(address(accounts));
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.updateEcdsaPublicKey(validator, signer, _newEcdsaPubKey);
+  }
+
   function test_Emits_ValidatorEcdsaPublicKeyUpdatedEvent_WhenCalledByRegisteredAccountsContract()
     public
   {
@@ -1371,6 +1455,25 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
 
     assertEq(actualEcdsaPubKey, _newEcdsaPubKey);
     assertEq(actualBlsPublicKey, newBlsPublicKey);
+  }
+
+  function test_Reverts_SetValidatorNewBlsPubKeyAndEcdsaPubKey_WhenCalledByRegisteredAccountsContract_WhenL2()
+    public
+  {
+    _whenL2();
+    (bytes memory _newEcdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(
+      address(accounts),
+      signerPk
+    );
+
+    ph.mockSuccess(
+      ph.PROOF_OF_POSSESSION(),
+      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
+    );
+
+    vm.prank(address(accounts));
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.updatePublicKeys(validator, signer, _newEcdsaPubKey, newBlsPublicKey, newBlsPop);
   }
 
   function test_Emits_ValidatorEcdsaPublicKeyUpdatedAndValidatorBlsPublicKeyUpdatedEvent_WhenCalledByRegisteredAccountsContract()
@@ -1470,6 +1573,18 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
     (, bytes memory actualBlsPublicKey, , , ) = validators.getValidator(validator);
 
     assertEq(actualBlsPublicKey, newBlsPublicKey);
+  }
+
+  function test_Reverts_SetNewValidatorBlsPubKey_WhenL2() public {
+    _whenL2();
+    ph.mockSuccess(
+      ph.PROOF_OF_POSSESSION(),
+      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
+    );
+
+    vm.prank(validator);
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.updateBlsPublicKey(newBlsPublicKey, newBlsPop);
   }
 
   function test_Emits_ValidatorValidatorBlsPublicKeyUpdatedEvent() public {
@@ -1777,6 +1892,26 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
     assertEq(members, expectedMembersList);
   }
 
+  function test_Reverts_AddFirstMemberToTheList_WhenL2() public {
+    _whenL2();
+    address[] memory expectedMembersList = new address[](1);
+    expectedMembersList[0] = validator;
+
+    vm.prank(group);
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.addFirstMember(validator, address(0), address(0));
+  }
+
+  function test_Reverts_AddMemberToTheList_WhenL2() public {
+    _whenL2();
+    address[] memory expectedMembersList = new address[](1);
+    expectedMembersList[0] = validator;
+
+    vm.prank(group);
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.addMember(validator);
+  }
+
   function test_ShouldUpdateGroupSizeHistory() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
@@ -2046,6 +2181,17 @@ contract ValidatorsTest_ReorderMember is ValidatorsTest {
     assertEq(expectedMembersList.length, members.length);
   }
 
+  function test_Reverts_ReorderGroupMemberList_WhenL2() public {
+    _whenL2();
+    address[] memory expectedMembersList = new address[](2);
+    expectedMembersList[0] = vm.addr(1);
+    expectedMembersList[1] = validator;
+
+    vm.prank(group);
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.reorderMember(vm.addr(1), validator, address(0));
+  }
+
   function test_Emits_ValidatorGroupMemberReorderedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit ValidatorGroupMemberReordered(group, vm.addr(1));
@@ -2091,6 +2237,13 @@ contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
     (, uint256 _commission, , , , , ) = validators.getValidatorGroup(group);
 
     assertEq(_commission, commission.unwrap());
+  }
+
+  function test_Reverts_SetValidatorGroupCommission_WhenL2() public {
+    _whenL2();
+    vm.prank(group);
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.setNextCommissionUpdate(newCommission);
   }
 
   function test_ShouldSetValidatorGroupNextCommission() public {
@@ -2148,6 +2301,13 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
     (, uint256 _commission, , , , , ) = validators.getValidatorGroup(group);
 
     assertEq(_commission, newCommission);
+  }
+
+  function test_Reverts_SetValidatorGroupCommission_WhenL2() public {
+    _whenL2();
+    vm.prank(group);
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.setNextCommissionUpdate(newCommission);
   }
 
   function test_Emits_ValidatorGroupCommissionUpdated() public {
@@ -2648,6 +2808,19 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
       }
     }
   }
+
+  function test_Reverts_getMembershipInLastEpoch_WhenL2() public {
+    blockTravel(ph.epochSize());
+
+    vm.prank(validator);
+    validators.affiliate(vm.addr(1));
+    vm.prank(vm.addr(1));
+    validators.addFirstMember(validator, address(0), address(0));
+
+    _whenL2();
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.getMembershipInLastEpoch(validator);
+  }
 }
 
 contract ValidatorsTest_GetEpochSize is ValidatorsTest {
@@ -2813,6 +2986,12 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
     );
 
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
+  }
+
+  function test_Reverts_WhenL2_WhenValidatorAndGroupMeetBalanceRequirements() public {
+    _whenL2();
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
   }
 
   function test_ShouldPayValidator_WhenValidatorAndGroupMeetBalanceRequirements() public {
@@ -3016,6 +3195,13 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
     assertEq(affiliation, address(0));
   }
 
+  function test_Reverts_WhenSenderIsWhitelistedSlashingAddress_WhenL2() public {
+    _whenL2();
+    vm.prank(paymentDelegatee);
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.forceDeaffiliateIfValidator(validator);
+  }
+
   function test_Reverts_WhenSenderNotApprovedAddress() public {
     vm.expectRevert("Only registered slasher can call");
     validators.forceDeaffiliateIfValidator(validator);
@@ -3096,6 +3282,29 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
     }
   }
 
+  function test_Reverts_GroupMembershipInEpoch_WhenL2() public {
+    _whenL2();
+    for (uint256 i = 0; i < epochInfoList.length; i++) {
+      address _group = epochInfoList[i].groupy;
+
+      if (epochInfoList.length.sub(i) <= membershipHistoryLength) {
+        vm.expectRevert("This method is not supported in L2 anymore.");
+        validators.groupMembershipInEpoch(
+          validator,
+          epochInfoList[i].epochNumber,
+          uint256(1).add(i)
+        );
+      } else {
+        vm.expectRevert("This method is not supported in L2 anymore.");
+        validators.groupMembershipInEpoch(
+          validator,
+          epochInfoList[i].epochNumber,
+          uint256(1).add(i)
+        );
+      }
+    }
+  }
+
   function test_Reverts_WhenEpochNumberAtGivenIndexIsGreaterThanProvidedEpochNumber() public {
     vm.expectRevert("index out of bounds");
     validators.groupMembershipInEpoch(
@@ -3157,6 +3366,14 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
     }
   }
 
+  function test_Reverts_HalveSlashingMultiplier_WhenL2() public {
+    _whenL2();
+    FixidityLib.Fraction memory expectedMultiplier = FixidityLib.fixed1();
+    vm.prank(paymentDelegatee);
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.halveSlashingMultiplier(group);
+  }
+
   function test_ShouldUpdateLastSlashedTimestamp() public {
     (, , , , , , uint256 initialLastSlashed) = validators.getValidatorGroup(group);
 
@@ -3204,6 +3421,15 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     assertEq(actualMultiplier, FixidityLib.fixed1().unwrap());
   }
 
+  function test_Reverts_WhenSlashingMultiplierIsResetAfterResetPeriod_WhenL2() public {
+    _whenL2();
+    timeTravel(slashingMultiplierResetPeriod);
+
+    vm.prank(group);
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.resetSlashingMultiplier();
+  }
+
   function test_Reverts_WhenSlashingMultiplierIsResetBeforeResetPeriod() public {
     vm.expectRevert("`resetSlashingMultiplier` called before resetPeriod expired");
     vm.prank(group);
@@ -3218,5 +3444,12 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     validators.resetSlashingMultiplier();
     (, , , , , uint256 actualMultiplier, ) = validators.getValidatorGroup(group);
     assertEq(actualMultiplier, FixidityLib.fixed1().unwrap());
+  }
+
+  function test_Reverts_SetSlashingMultiplierResetPeriod_WhenL2() public {
+    _whenL2();
+    uint256 newResetPeriod = 10 * DAY;
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    validators.setSlashingMultiplierResetPeriod(newResetPeriod);
   }
 }

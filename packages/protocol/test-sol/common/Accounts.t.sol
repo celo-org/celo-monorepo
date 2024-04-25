@@ -15,6 +15,8 @@ contract AccountsTest is Test {
   Accounts accounts;
   MockValidators validators;
 
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
+
   string constant name = "Account";
   string constant metadataURL = "https://www.celo.org";
   string constant otherMetadataURL = "https://clabs.co";
@@ -95,6 +97,11 @@ contract AccountsTest is Test {
 
     (caller, callerPK) = actorWithPK("caller");
     (caller2, caller2PK) = actorWithPK("caller2");
+  }
+
+
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
   }
 
   function getParsedSignatureOfAddress(address _address, uint256 privateKey)
@@ -606,6 +613,13 @@ contract AccountsTest_setPaymentDelegation is AccountsTest {
     (address realBeneficiary, uint256 realFraction) = accounts.getPaymentDelegation(address(this));
     assertEq(realBeneficiary, beneficiary);
     assertEq(realFraction, fraction);
+  }
+
+  function test_Revert_SetPaymentDelegation_WhenL2() public {
+    _whenL2();
+    accounts.createAccount();
+    vm.expectRevert("This method is not supported in L2 anymore.");
+    accounts.setPaymentDelegation(beneficiary, fraction);
   }
 
   function test_ShouldNotAllowFractionGreaterThan1() public {

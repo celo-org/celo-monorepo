@@ -11,6 +11,7 @@ import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
 import "../common/libraries/ReentrancyGuard.sol";
+import "../../contracts-0.8/common/IsL2Check.sol";
 
 contract Accounts is
   IAccounts,
@@ -18,7 +19,8 @@ contract Accounts is
   Ownable,
   ReentrancyGuard,
   Initializable,
-  UsingRegistry
+  UsingRegistry,
+  IsL2Check
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -584,7 +586,7 @@ contract Accounts is
    * be greater than 1.
    * @dev Use `deletePaymentDelegation` to unset the payment delegation.
    */
-  function setPaymentDelegation(address beneficiary, uint256 fraction) public {
+  function setPaymentDelegation(address beneficiary, uint256 fraction) public onlyL1 {
     require(isAccount(msg.sender), "Must first register address with Account.createAccount");
     require(beneficiary != address(0), "Beneficiary cannot be address 0x0");
     FixidityLib.Fraction memory f = FixidityLib.wrap(fraction);
