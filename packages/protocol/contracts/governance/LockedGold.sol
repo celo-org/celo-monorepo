@@ -14,13 +14,15 @@ import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
+import "../../contracts-0.8/common/IsL2Check.sol";
 
 contract LockedGold is
   ILockedGold,
   ICeloVersionedContract,
   ReentrancyGuard,
   Initializable,
-  UsingRegistry
+  UsingRegistry,
+  IsL2Check
 {
   using SafeMath for uint256;
   using Address for address payable; // prettier-ignore
@@ -65,7 +67,7 @@ contract LockedGold is
   bytes32[] public slashingWhitelist;
 
   uint256 public totalNonvoting;
-  uint256 public unlockingPeriod;
+  uint256 public legacy_unlockingPeriod;
 
   // Info about delegator
   mapping(address => Delegated) delegatorInfo;
@@ -132,13 +134,17 @@ contract LockedGold is
    * @notice Locks gold to be used for voting.
    */
   function lock() external payable nonReentrant {
-    require(
-      getAccounts().isAccount(msg.sender),
-      "Must first register address with Account.createAccount"
-    );
-    _incrementNonvotingAccountBalance(msg.sender, msg.value);
-    _updateDelegatedAmount(msg.sender);
-    emit GoldLocked(msg.sender, msg.value);
+    if (isL1()) {
+      require(
+        getAccounts().isAccount(msg.sender),
+        "Must first register address with Account.createAccount"
+      );
+      _incrementNonvotingAccountBalance(msg.sender, msg.value);
+      _updateDelegatedAmount(msg.sender);
+      emit GoldLocked(msg.sender, msg.value);
+    } else {
+      revert("This method is no longer supported in L2.");
+    }
   }
 
   /**
@@ -202,7 +208,9 @@ contract LockedGold is
       "Either account doesn't have enough locked Celo or locked Celo is being used for voting."
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
-    uint256 available = now.add(unlockingPeriod);
+
+    uint256 available = now.add(unlockingPeriod());
+
     // CERTORA: the slot containing the length could be MAX_UINT
     account.pendingWithdrawals.push(PendingWithdrawal(value, available));
     emit GoldUnlocked(msg.sender, value, available);
@@ -214,22 +222,26 @@ contract LockedGold is
    * @param value The value to relock from the specified pending withdrawal.
    */
   function relock(uint256 index, uint256 value) external nonReentrant {
-    require(
-      getAccounts().isAccount(msg.sender),
-      "Sender must be registered with Account.createAccount to lock or relock"
-    );
-    Balances storage account = balances[msg.sender];
-    require(index < account.pendingWithdrawals.length, "Bad pending withdrawal index");
-    PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
-    require(value <= pendingWithdrawal.value, "Requested value larger than pending value");
-    if (value == pendingWithdrawal.value) {
-      deletePendingWithdrawal(account.pendingWithdrawals, index);
+    if (isL1()) {
+      require(
+        getAccounts().isAccount(msg.sender),
+        "Sender must be registered with Account.createAccount to lock or relock"
+      );
+      Balances storage account = balances[msg.sender];
+      require(index < account.pendingWithdrawals.length, "Bad pending withdrawal index");
+      PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
+      require(value <= pendingWithdrawal.value, "Requested value larger than pending value");
+      if (value == pendingWithdrawal.value) {
+        deletePendingWithdrawal(account.pendingWithdrawals, index);
+      } else {
+        pendingWithdrawal.value = pendingWithdrawal.value.sub(value);
+      }
+      _incrementNonvotingAccountBalance(msg.sender, value);
+      _updateDelegatedAmount(msg.sender);
+      emit GoldRelocked(msg.sender, value);
     } else {
-      pendingWithdrawal.value = pendingWithdrawal.value.sub(value);
+      revert("This method is no longer supported in L2.");
     }
-    _incrementNonvotingAccountBalance(msg.sender, value);
-    _updateDelegatedAmount(msg.sender);
-    emit GoldRelocked(msg.sender, value);
   }
 
   /**
@@ -467,36 +479,40 @@ contract LockedGold is
     address[] calldata greaters,
     uint256[] calldata indices
   ) external onlySlasher {
-    uint256 maxSlash = Math.min(penalty, getAccountTotalLockedGold(account));
-    require(maxSlash >= reward, "reward cannot exceed penalty.");
-    // `reporter` receives the reward in locked CELO, so it must be given to an account
-    // There is no reward for slashing via the GovernanceSlasher, and `reporter`
-    // is set to 0x0.
-    if (reporter != address(0)) {
-      reporter = getAccounts().signerToAccount(reporter);
-    }
-    // Local scoping is required to avoid Solc "stack too deep" error from too many locals.
-    {
-      uint256 nonvotingBalance = balances[account].nonvoting;
-      uint256 difference = 0;
-      // If not enough nonvoting, revoke the difference
-      if (nonvotingBalance < maxSlash) {
-        difference = maxSlash.sub(nonvotingBalance);
-        require(
-          getElection().forceDecrementVotes(account, difference, lessers, greaters, indices) ==
-            difference,
-          "Cannot revoke enough voting gold."
-        );
+    if (isL1()) {
+      uint256 maxSlash = Math.min(penalty, getAccountTotalLockedGold(account));
+      require(maxSlash >= reward, "reward cannot exceed penalty.");
+      // `reporter` receives the reward in locked CELO, so it must be given to an account
+      // There is no reward for slashing via the GovernanceSlasher, and `reporter`
+      // is set to 0x0.
+      if (reporter != address(0)) {
+        reporter = getAccounts().signerToAccount(reporter);
       }
-      // forceDecrementVotes does not increment nonvoting account balance, so we can't double count
-      _decrementNonvotingAccountBalance(account, maxSlash.sub(difference));
-      _incrementNonvotingAccountBalance(reporter, reward);
+      // Local scoping is required to avoid Solc "stack too deep" error from too many locals.
+      {
+        uint256 nonvotingBalance = balances[account].nonvoting;
+        uint256 difference = 0;
+        // If not enough nonvoting, revoke the difference
+        if (nonvotingBalance < maxSlash) {
+          difference = maxSlash.sub(nonvotingBalance);
+          require(
+            getElection().forceDecrementVotes(account, difference, lessers, greaters, indices) ==
+              difference,
+            "Cannot revoke enough voting gold."
+          );
+        }
+        // forceDecrementVotes does not increment nonvoting account balance, so we can't double count
+        _decrementNonvotingAccountBalance(account, maxSlash.sub(difference));
+        _incrementNonvotingAccountBalance(reporter, reward);
+      }
+      address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
+      address payable communityFundPayable = address(uint160(communityFund));
+      require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
+      communityFundPayable.sendValue(maxSlash.sub(reward));
+      emit AccountSlashed(account, maxSlash, reporter, reward);
+    } else {
+      revert("This method is no longer supported in L2.");
     }
-    address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
-    address payable communityFundPayable = address(uint160(communityFund));
-    require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
-    communityFundPayable.sendValue(maxSlash.sub(reward));
-    emit AccountSlashed(account, maxSlash, reporter, reward);
   }
 
   /**
@@ -521,14 +537,14 @@ contract LockedGold is
   }
 
   /**
- * Return percentage and amount that delegator assigned to delegateee.
- * Please note that amount doesn't have to be up to date. 
- * In such case please use `updateDelegatedBalance`.
- * @param delegator The delegator address.
- * @param delegatee The delegatee address.
- * @return fraction The fraction that is delegator asigning to delegatee.
- * @return currentAmount The current actual Celo amount that is assigned to delegatee.
- */
+   * Return percentage and amount that delegator assigned to delegateee.
+   * Please note that amount doesn't have to be up to date.
+   * In such case please use `updateDelegatedBalance`.
+   * @param delegator The delegator address.
+   * @param delegatee The delegatee address.
+   * @return fraction The fraction that is delegator asigning to delegatee.
+   * @return currentAmount The current actual Celo amount that is assigned to delegatee.
+   */
   function getDelegatorDelegateeInfo(address delegator, address delegatee)
     external
     view
@@ -606,12 +622,12 @@ contract LockedGold is
   }
 
   /**
-  * @notice Returns the storage, major, minor, and patch version of the contract.
-  * @return Storage version of the contract.
-  * @return Major version of the contract.
-  * @return Minor version of the contract.
-  * @return Patch version of the contract.
-  */
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 5, 0);
   }
@@ -621,9 +637,13 @@ contract LockedGold is
    * @param value The unlocking period in seconds.
    */
   function setUnlockingPeriod(uint256 value) public onlyOwner {
-    require(value != unlockingPeriod, "Unlocking period not changed");
-    unlockingPeriod = value;
-    emit UnlockingPeriodSet(value);
+    if (isL1()) {
+      require(value != legacy_unlockingPeriod, "Unlocking period not changed");
+      legacy_unlockingPeriod = value;
+      emit UnlockingPeriodSet(value);
+    } else {
+      revert("This method is no longer supported in L2.");
+    }
   }
 
   /**
@@ -631,8 +651,12 @@ contract LockedGold is
    * @param value The max delegatees count.
    */
   function setMaxDelegateesCount(uint256 value) public onlyOwner {
-    maxDelegateesCount = value;
-    emit MaxDelegateesCountSet(value);
+    if (isL1()) {
+      maxDelegateesCount = value;
+      emit MaxDelegateesCountSet(value);
+    } else {
+      revert("This method is no longer supported in L2.");
+    }
   }
 
   /**
@@ -660,10 +684,10 @@ contract LockedGold is
   }
 
   /**
-    * @notice Returns the number of pending withdrawals for the specified account.
-    * @param account The address of the account.
-    * @return The count of pending withdrawals.
-    */
+   * @notice Returns the number of pending withdrawals for the specified account.
+   * @param account The address of the account.
+   * @return The count of pending withdrawals.
+   */
   function getTotalPendingWithdrawalsCount(address account) public view returns (uint256) {
     return balances[account].pendingWithdrawals.length;
   }
@@ -747,12 +771,12 @@ contract LockedGold is
   }
 
   /**
-   * Returns expected vs real delegated amount. 
+   * Returns expected vs real delegated amount.
    * If there is a discrepancy it can be fixed by calling `updateDelegatedAmount` function.
    * @param delegator The delegator address.
    * @param delegatee The delegatee address.
    * @return expected The expected amount.
-   * @return real The real amount. 
+   * @return real The real amount.
    */
   function getDelegatorDelegateeExpectedAndRealAmount(address delegator, address delegatee)
     public
@@ -766,6 +790,11 @@ contract LockedGold is
       delegatorAccount,
       delegateeAccount
     );
+  }
+
+  function unlockingPeriod() public view returns (uint256) {
+    if (isL1()) return legacy_unlockingPeriod;
+    if (isL2()) return 1;
   }
 
   /**
@@ -890,12 +919,12 @@ contract LockedGold is
   }
 
   /**
-   * Returns expected vs real delegated amount. 
+   * Returns expected vs real delegated amount.
    * If there is a discrepancy it can be fixed by calling `updateDelegatedAmount` function.
    * @param delegator The delegator address.
    * @param delegatee The delegatee address.
    * @return expected The expected amount.
-   * @return real The real amount. 
+   * @return real The real amount.
    */
   function _getDelegatorDelegateeExpectedAndRealAmount(address delegator, address delegatee)
     private
