@@ -18,4 +18,5 @@ contract Constants {
   string constant AccountsContract = "Accounts";
   string constant LockedGoldContract = "LockedGold";
   string constant ValidatorsContract = "Validators";
+  string constant GovernanceContract = "Governance";
 }
