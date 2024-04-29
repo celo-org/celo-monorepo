@@ -16,9 +16,6 @@ source $PWD/migrations_sol/start_anvil.sh
 source $PWD/migrations_sol/deploy_precompiles.sh
 
 
-# cast rpc eth_getStorageAt --rpc-url http://127.0.0.1:8545 0x037A5D00E894d857Dd4eE9500ABa00032B5669BE
-# cast rpc anvil_impersonateAccount --rpc-url http://127.0.0.1:8545 0x0000000000000000000000000000000000000000
-# Set's the bytecode of a Poxy to the registry address
 echo "Setting Registry Proxy"
 REGISTRY_ADDRESS="0x000000000000000000000000000000000000ce10"
 PROXY_BYTECODE=`cat ./out/Proxy.sol/Proxy.json | jq -r '.deployedBytecode.object'`
@@ -26,6 +23,7 @@ cast rpc anvil_setCode --rpc-url http://127.0.0.1:$ANVIL_PORT $REGISTRY_ADDRESS 
 REGISTRY_OWNER_ADDRESS=$FROM_ACCOUNT_NO_ZERO
 # pasition is bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1);
 echo "Setting Registry owner"
+
 # Sets the storage of the registry so that it has an owner we control
 cast rpc anvil_setStorageAt --rpc-url http://127.0.0.1:$ANVIL_PORT $REGISTRY_ADDRESS 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 "0x000000000000000000000000$REGISTRY_OWNER_ADDRESS"
 
@@ -50,6 +48,9 @@ for library in "${LIBRARIES_PATH[@]}"; do
 done
 
 echo "Library flags are: $LIBRARIES"
+echo "Backing up libraries"
+
+echo "$LIBRARIES" > .tmp/libraries.txt
 
 # run migrations
 BROADCAST="--broadcast"

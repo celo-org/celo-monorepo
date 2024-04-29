@@ -660,6 +660,7 @@ contract Migration is Script, UsingRegistry {
     bool skipTransferOwnership = abi.decode(json.parseRaw(".governance.skipTransferOwnership"), (bool));
     if (!skipTransferOwnership){
       // TODO move this list somewhere else
+
       string[22] memory fixedStringArray = ['Accounts',
         // 'Attestations',
         // BlockchainParameters ownership transitioned to governance in a follow-up script.?
@@ -736,76 +737,39 @@ contract Migration is Script, UsingRegistry {
     }
   }
 
-  function lockGold(
-    uint256 value
-    // string memory privateKey
-    ) public {
-      
-      // lock just one
-      getAccounts().createAccount();
-      getLockedGold().lock{value:value}();
-
-
-    }
-
-  //   function getParsedSignatureOfAddress(address _address, uint256 privateKey)
-  //     public
-  //     pure
-  //     returns (uint8, bytes32, bytes32)
-  //   {
-  //     bytes32 addressHash = keccak256(abi.encodePacked(_address));
-  //     bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
-  //     return vm.sign(privateKey, prefixedHash);
-  //   }
-
-  // function _generateEcdsaPubKeyWithSigner(address _validator, uint256 _signerPk)
-  //   internal
-  //   returns (bytes memory ecdsaPubKey, uint8 v, bytes32 r, bytes32 s)
-  //   {
-  //     (v, r, s) = getParsedSignatureOfAddress(_validator, _signerPk);
-
-  //     bytes32 addressHash = keccak256(abi.encodePacked(_validator));
-
-  //     ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
-  //   }
-
-    function uint256ToBytes(uint256 data) public pure returns (bytes memory result) {
-        // Initialize result as a new dynamic byte array with 32 bytes length
-        result = new bytes(64);
-        // Copy the uint256 data to the memory of result
-        assembly {
-            mstore(add(result, 64), data)
-        }
-    }
+  function lockGold(uint256 value) public {
+    getAccounts().createAccount();
+    getLockedGold().lock{value:value}();
+  }
 
   function registerValidator(
-      uint256 validatorIndex,
-      bytes memory ecdsaPubKey,
-      uint256 validatorKey,
-      uint256 amountToLock,
-      address groupToAffiliate
-    ) public returns (address){
-      vm.startBroadcast(validatorKey);
-      lockGold(amountToLock);
-      bytes memory _ecdsaPubKey = ecdsaPubKey;
-      address accountAddress = (new ForceTx()).identity();
-      // emit Result(ecdsaPubKey); Debugging, there's no console.log for bytes
-      bytes memory newBlsPublicKey = abi.encodePacked(
-        bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
-        bytes32(0x0202020202020202020202020202020202020202020202020202020202020203),
-        bytes32(0x0303030303030303030303030303030303030303030303030303030303030304)
-      );
-      bytes memory newBlsPop = abi.encodePacked(
-        bytes16(0x04040404040404040404040404040405),
-        bytes16(0x05050505050505050505050505050506),
-        bytes16(0x06060606060606060606060606060607)
-      );
-      getValidators().registerValidator(ecdsaPubKey, newBlsPublicKey, newBlsPop);
-      getValidators().affiliate(groupToAffiliate);
-      console.log("Done registering validatora");
+    uint256 validatorIndex,
+    bytes memory ecdsaPubKey,
+    uint256 validatorKey,
+    uint256 amountToLock,
+    address groupToAffiliate
+  ) public returns (address){
+    vm.startBroadcast(validatorKey);
+    lockGold(amountToLock);
+    bytes memory _ecdsaPubKey = ecdsaPubKey;
+    address accountAddress = (new ForceTx()).identity();
+    // emit Result(ecdsaPubKey); Debugging, there's no console.log for bytes
+    bytes memory newBlsPublicKey = abi.encodePacked(
+      bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
+      bytes32(0x0202020202020202020202020202020202020202020202020202020202020203),
+      bytes32(0x0303030303030303030303030303030303030303030303030303030303030304)
+    );
+    bytes memory newBlsPop = abi.encodePacked(
+      bytes16(0x04040404040404040404040404040405),
+      bytes16(0x05050505050505050505050505050506),
+      bytes16(0x06060606060606060606060606060607)
+    );
+    getValidators().registerValidator(ecdsaPubKey, newBlsPublicKey, newBlsPop);
+    getValidators().affiliate(groupToAffiliate);
+    console.log("Done registering validatora");
 
-      vm.stopBroadcast();
-      return accountAddress;
+    vm.stopBroadcast();
+    return accountAddress;
 // 
   }
 
@@ -889,6 +853,7 @@ contract Migration is Script, UsingRegistry {
       address validator = registerValidator(validatorIndex, ecdsaPubKey, getValidatorKeyFromGroupGroup(valKeys, 0, validatorIndex, maxGroupSize), validatorLockedGoldRequirements, groupAddress);
       // TODO start broadcast
       console.log("Adding to group...");
+
       vm.startBroadcast(validatorGroup0Key);
       if (validatorIndex == 0){
         getValidators().addFirstMember(validator, address(0), address(0));
@@ -897,6 +862,7 @@ contract Migration is Script, UsingRegistry {
       } else {
         // unimplemented
       }
+
       vm.stopBroadcast();
       
     }
