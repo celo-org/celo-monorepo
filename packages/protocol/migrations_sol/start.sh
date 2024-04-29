@@ -8,7 +8,7 @@ export ANVIL_PORT=8546
 # TODO make this configurable
 FROM_ACCOUNT_NO_ZERO="f39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
 FROM_ACCOUNT="0x$FROM_ACCOUNT_NO_ZERO"
-
+TEMP_FOLDER="$PWD/.tmp"
 
 source $PWD/migrations_sol/start_anvil.sh
 
@@ -50,7 +50,13 @@ done
 echo "Library flags are: $LIBRARIES"
 echo "Backing up libraries"
 
-echo "$LIBRARIES" > .tmp/libraries.txt
+mkdir -p foo
+
+LIBRARIES_FILE="$TEMP_FOLDER/libraries.tx"
+rm -f $LIBRARIES_FILE
+touch $LIBRARIES_FILE
+
+echo "$LIBRARIES" > $LIBRARIES_FILE
 
 # run migrations
 BROADCAST="--broadcast"

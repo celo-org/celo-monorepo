@@ -2,7 +2,7 @@
 set -euo pipefail
 
 timestamp=`date -Iseconds`
-ANVI_FILE="./tmp/anvil_state-$timestamp"
+ANVI_FILE="$TEMP_FOLDER/anvil_state-$timestamp"
 
 if nc -z localhost $ANVIL_PORT; then
   echo "Port already used"
