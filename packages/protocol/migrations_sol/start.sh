@@ -50,7 +50,7 @@ done
 echo "Library flags are: $LIBRARIES"
 echo "Backing up libraries"
 
-mkdir -p foo
+mkdir -p $TEMP_FOLDER
 
 LIBRARIES_FILE="$TEMP_FOLDER/libraries.tx"
 rm -f $LIBRARIES_FILE
