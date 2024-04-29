@@ -2,7 +2,6 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-
 import "@celo-contracts/governance/test/ValidatorsMock.sol";
 import { Test as ForgeTest } from "forge-std/Test.sol";
 

@@ -194,7 +194,7 @@ contract Election_SetElectabilityThreshold is ElectionTest {
     election.setElectabilityThreshold(FixidityLib.fixed1().unwrap() + 1);
   }
 
-   function test_Revert_setElectabilityThreshold_WhenL2() public {
+  function test_Revert_setElectabilityThreshold_WhenL2() public {
     _whenL2();
     vm.expectRevert("This method is not supported in L2 anymore.");
     election.setElectabilityThreshold(FixidityLib.fixed1().unwrap() + 1);
@@ -288,7 +288,7 @@ contract Election_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
     assertEq(election.allowedToVoteOverMaxNumberOfGroups(address(this)), true);
   }
 
-    function test_Revert_SetAllowedToVoteOverMaxNumberOfGroups_WhenL2() public {
+  function test_Revert_SetAllowedToVoteOverMaxNumberOfGroups_WhenL2() public {
     _whenL2();
     vm.expectRevert("This method is not supported in L2 anymore.");
     election.setAllowedToVoteOverMaxNumberOfGroups(true);
@@ -463,11 +463,9 @@ contract Election_Vote_WhenGroupEligible is ElectionTest {
     assertEq(election.getPendingVotesForGroupByAccount(group, voter), value - maxNumGroupsVotedFor);
   }
 
-  function test_Revert_Vote_WhenL2()
-    public
-  {
+  function test_Revert_Vote_WhenL2() public {
     _whenL2();
-    
+
     vm.expectRevert("This method is not supported in L2 anymore.");
     election.vote(group, value - maxNumGroupsVotedFor, address(0), address(0));
   }
@@ -1951,9 +1949,7 @@ contract Election_DistributeEpochRewards is ElectionTest {
     assertEq(election.getActiveVotesForGroupByAccount(group, voter), voteValue + rewardValue);
   }
 
-   function test_Revert_DistributeEpochRewards_WhenL2()
-    public
-  {
+  function test_Revert_DistributeEpochRewards_WhenL2() public {
     _whenL2();
     vm.expectRevert("This method is not supported in L2 anymore.");
     vm.prank(address(0));
@@ -2714,9 +2710,7 @@ contract Election_ConsistencyChecks is ElectionTest {
 }
 
 contract Election_HasActivatablePendingVotes is ElectionTest {
-  function test_Revert_hasActivatablePendingVotes_WhenL2()
-    public
-  {
+  function test_Revert_hasActivatablePendingVotes_WhenL2() public {
     _whenL2();
     vm.expectRevert("This method is not supported in L2 anymore.");
     vm.prank(address(0));

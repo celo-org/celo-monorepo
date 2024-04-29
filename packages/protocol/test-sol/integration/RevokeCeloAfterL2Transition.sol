@@ -12,6 +12,7 @@ import "@celo-contracts/common/GoldToken.sol";
 
 import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/governance/LockedGold.sol";
+import "@celo-contracts/governance/ReleaseGold.sol";
 
 import "@celo-contracts/stability/test/MockStableToken.sol";
 import "@celo-contracts/governance/Election.sol";
@@ -23,11 +24,13 @@ import "@test-sol/utils/ECDSAHelper.sol";
 import { Utils } from "@test-sol/utils.sol";
 import { Test as ForgeTest } from "forge-std/Test.sol";
 import "../governance/validators/mocks/ValidatorsMockTunnel.sol";
+import "../governance/voting/mocks/ReleaseGoldMockTunnel.sol";
 
 contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
   using FixidityLib for FixidityLib.Fraction;
 
   address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
+  uint256 constant TOTAL_AMOUNT = 1 ether * 1_000_000;
 
   Registry registry;
   Accounts accounts;
@@ -38,6 +41,7 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
   LockedGold lockedGold;
   Governance governance;
   GoldToken goldToken;
+  ReleaseGold releaseGold;
 
   address owner;
   address accApprover;
@@ -46,6 +50,18 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
   address member;
   address validator;
   uint256 validatorPk;
+  address beneficiary;
+  address refundAddress;
+  address releaseOwner;
+
+  address authorizedValidatorSigner;
+  uint256 authorizedValidatorSignerPK;
+  address authorizedVoteSigner;
+  uint256 authorizedVoteSignerPK;
+  address authorizedValidatorSigner2;
+  uint256 authorizedValidatorSignerPK2;
+  address authorizedVoteSigner2;
+  uint256 authorizedVoteSignerPK2;
 
   bytes public constant blsPublicKey = abi.encodePacked(
     bytes32(0x0101010101010101010101010101010101010101010101010101010101010101),
@@ -98,16 +114,25 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
   ValidatorsMockTunnel.InitParams public initParams;
   ValidatorsMockTunnel.InitParams2 public initParams2;
 
+  ReleaseGoldMockTunnel.InitParams releaseGoldInitParams;
+  ReleaseGoldMockTunnel.InitParams2 releaseGoldInitParams2;
+
   uint256 validatorRegistrationEpochNumber;
 
   function setUp() public {
     owner = address(this);
-    console.log("owner", owner);
     accApprover = actor("approver");
     group = actor("group");
     member = actor("member");
+    beneficiary = actor("beneficiary");
+    refundAddress = actor("refundAddress");
+    releaseOwner = actor("releaseOwner");
 
     (validator, validatorPk) = actorWithPK("validator");
+    (authorizedValidatorSigner, authorizedValidatorSignerPK) = actorWithPK("authorizedValidatorSigner");
+    (authorizedVoteSigner, authorizedVoteSignerPK) = actorWithPK("authorizedVoteSigner");
+    (authorizedValidatorSigner2, authorizedValidatorSignerPK2) = actorWithPK("authorizedValidatorSigner2");
+    (authorizedVoteSigner2, authorizedVoteSignerPK2) = actorWithPK("authorizedVoteSigner2");
 
     uint256 electableValidatorsMin = 4;
     uint256 electableValidatorsMax = 6;
@@ -148,6 +173,7 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
     validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
     governance = new Governance(true);
     goldToken = new GoldToken(true);
+    releaseGold = new ReleaseGold(true);
 
     registry.setAddressFor(AccountsContract, address(accounts));
     registry.setAddressFor(ElectionContract, address(election));
@@ -157,9 +183,37 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
     registry.setAddressFor(GovernanceContract, address(governance));
     registry.setAddressFor(GoldTokenContract, address(goldToken));
 
+    // (v, r, s) = getParsedSignatureOfAddress(address(releaseGold), authorizedPK);
+
     goldToken.initialize(address(registry));
 
     accounts.initialize(registryAddress);
+
+    releaseGold = new ReleaseGold(true);
+    
+
+    releaseGoldInitParams = ReleaseGoldMockTunnel.InitParams({
+      releaseStartTime: block.timestamp + 5 * MINUTE,
+      releaseCliffTime: HOUR,
+      numReleasePeriods: 4,
+      releasePeriod: 3 * MONTH,
+      amountReleasedPerPeriod: TOTAL_AMOUNT / 4,
+      revocable: false,
+      _beneficiary: address(uint160(beneficiary))
+    });
+
+    releaseGoldInitParams2 = ReleaseGoldMockTunnel.InitParams2({
+      _releaseOwner: releaseOwner,
+      _refundAddress: address(0),
+      subjectToLiquidityProvision: false,
+      initialDistributionRatio: 1000,
+      _canValidate: true,
+      _canVote: true,
+      registryAddress: registryAddress
+    });
+
+    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold));
+    tunnel.MockInitialize(owner, releaseGoldInitParams, releaseGoldInitParams2);
 
     election.initialize(
       registryAddress,
@@ -221,6 +275,8 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
     );
 
     accounts.createAccount();
+
+    vm.deal(address(releaseGold), TOTAL_AMOUNT);
   }
 
   function _whenL2() public {
@@ -391,5 +447,96 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
     assertEq(group.balance, 10000e18);
 
     vm.stopPrank();
+  }
+
+  function _generateEcdsaPubKeyWithSigner(address _validator, uint256 _signerPk)
+    internal
+    returns (bytes memory ecdsaPubKey, uint8 v, bytes32 r, bytes32 s)
+  {
+    (v, r, s) = getParsedSignatureOfAddress(_validator, _signerPk);
+
+    bytes32 addressHash = keccak256(abi.encodePacked(_validator));
+
+    ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
+  }
+
+   function _registerValidatorWithSignerHelper(address validator, uint256 signerPk) internal returns (bytes memory) {
+    (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
+      validator,
+      signerPk
+    );
+
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+
+    vm.prank(validator);
+    validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
+    validatorRegistrationEpochNumber = validators.getEpochNumber();
+    return _ecdsaPubKey;
+  }
+
+  /// @notice Test that a ReleaseGold owner can remove CELO from their account after transitioning to L2
+  /// @dev Release gold beneficiary assigns a validator and a vote signer, locks CELO, votes, transitions to L2,
+  /// revokes votes with newly assigned voted signer, and removes CELO.
+  function test_releaseGoldOwnerHasValidator_CanRemoveCelo_WhenTransitionedToL2() public {
+    _registerValidatorGroupWithMembers(group, 1);
+
+    (uint8 vValidator, bytes32 rValidator, bytes32 sValidator) = getParsedSignatureOfAddress(address(releaseGold), authorizedValidatorSignerPK);
+    (uint8 vVote, bytes32 rVote, bytes32 sVote) = getParsedSignatureOfAddress(address(releaseGold), authorizedVoteSignerPK);
+
+    vm.startPrank(beneficiary);
+    releaseGold.createAccount();
+    releaseGold.authorizeValidatorSigner(address(uint160(authorizedValidatorSigner)), vValidator, rValidator, sValidator);
+    releaseGold.authorizeVoteSigner(address(uint160(authorizedVoteSigner)), vVote, rVote, sVote);
+    releaseGold.lockGold(TOTAL_AMOUNT - 10 ether);
+    vm.stopPrank();
+
+    _registerValidatorWithSignerHelper(address(releaseGold), authorizedValidatorSignerPK);
+    vm.prank(authorizedValidatorSigner);
+    validators.affiliate(group);
+
+    uint256 active = 12;
+    uint256 pending = 11;
+
+    vm.startPrank(authorizedVoteSigner);
+    election.vote(group, active, address(0), address(0));
+    blockTravel(EPOCH_SIZE + 1);
+    election.activate(group);
+    election.vote(group, pending, address(0), address(0));
+    vm.stopPrank();
+
+    assertEq(lockedGold.getAccountNonvotingLockedGold(address(releaseGold)), TOTAL_AMOUNT - 10 ether - active - pending);
+    assertEq(lockedGold.getAccountTotalLockedGold(address(releaseGold)), TOTAL_AMOUNT - 10 ether);
+    assertEq(election.getPendingVotesForGroupByAccount(group, address(releaseGold)), pending);
+    assertEq(election.getActiveVotesForGroupByAccount(group, address(releaseGold)), active);
+
+    _whenL2();
+
+    (uint8 vVote2, bytes32 rVote2, bytes32 sVote2) = getParsedSignatureOfAddress(address(releaseGold), authorizedVoteSignerPK2);
+
+    vm.startPrank(beneficiary);
+    releaseGold.authorizeVoteSigner(address(uint160(authorizedVoteSigner2)), vVote2, rVote2, sVote2);
+
+    vm.startPrank(authorizedVoteSigner2);
+
+    election.revokeActive(group, active, address(0), address(0), 0);
+    election.revokePending(group, pending, address(0), address(0), 0);
+
+    assertEq(lockedGold.getAccountNonvotingLockedGold(address(releaseGold)), TOTAL_AMOUNT - 10 ether);
+    vm.stopPrank();
+
+    vm.startPrank(authorizedValidatorSigner);
+    validators.deaffiliate();
+    timeTravel(originalValidatorLockedGoldRequirements.duration + 1);
+    validators.deregisterValidator(1);
+    vm.stopPrank();
+
+    uint256 totalLockedCelo = lockedGold.getAccountTotalLockedGold(address(releaseGold));
+    vm.startPrank(beneficiary);
+    releaseGold.unlockGold(totalLockedCelo);
+
+    timeTravel(unlockingPeriod + 1);
+    releaseGold.withdrawLockedGold(0);
+    // 2 ethers were sent to vote and validator signers
+    assertEq(address(releaseGold).balance, TOTAL_AMOUNT - 2 ether);
   }
 }
