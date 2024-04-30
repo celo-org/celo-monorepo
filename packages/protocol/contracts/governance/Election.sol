@@ -243,7 +243,12 @@ contract Election is
    * @return True upon success.
    * @dev Pending votes cannot be activated until an election has been held.
    */
-  function activateForAccount(address group, address account) external nonReentrant onlyL1 returns (bool) {
+  function activateForAccount(address group, address account)
+    external
+    nonReentrant
+    onlyL1
+    returns (bool)
+  {
     return _activate(group, account);
   }
 
@@ -574,7 +579,12 @@ contract Election is
    * @return Whether or not `account` has activatable votes for `group`.
    * @dev Pending votes cannot be activated until an election has been held.
    */
-  function hasActivatablePendingVotes(address account, address group) external view onlyL1 returns (bool) {
+  function hasActivatablePendingVotes(address account, address group)
+    external
+    view
+    onlyL1
+    returns (bool)
+  {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
     return pendingVote.epoch < getEpochNumber() && pendingVote.value > 0;
   }
@@ -630,7 +640,12 @@ contract Election is
    * @param _maxNumGroupsVotedFor The maximum number of groups an account can vote for.
    * @return True upon success.
    */
-  function setMaxNumGroupsVotedFor(uint256 _maxNumGroupsVotedFor) public onlyOwner onlyL1 returns (bool) {
+  function setMaxNumGroupsVotedFor(uint256 _maxNumGroupsVotedFor)
+    public
+    onlyOwner
+    onlyL1
+    returns (bool)
+  {
     require(_maxNumGroupsVotedFor != maxNumGroupsVotedFor, "Max groups voted for not changed");
     maxNumGroupsVotedFor = _maxNumGroupsVotedFor;
     emit MaxNumGroupsVotedForSet(_maxNumGroupsVotedFor);

@@ -23,7 +23,6 @@ import "@test-sol/utils/ECDSAHelper.sol";
 import { Utils } from "@test-sol/utils.sol";
 import { Test as ForgeTest } from "forge-std/Test.sol";
 
-
 contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;

@@ -99,7 +99,6 @@ contract AccountsTest is Test {
     (caller2, caller2PK) = actorWithPK("caller2");
   }
 
-
   function _whenL2() public {
     deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
   }

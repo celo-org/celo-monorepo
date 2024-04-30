@@ -129,9 +129,13 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
     releaseOwner = actor("releaseOwner");
 
     (validator, validatorPk) = actorWithPK("validator");
-    (authorizedValidatorSigner, authorizedValidatorSignerPK) = actorWithPK("authorizedValidatorSigner");
+    (authorizedValidatorSigner, authorizedValidatorSignerPK) = actorWithPK(
+      "authorizedValidatorSigner"
+    );
     (authorizedVoteSigner, authorizedVoteSignerPK) = actorWithPK("authorizedVoteSigner");
-    (authorizedValidatorSigner2, authorizedValidatorSignerPK2) = actorWithPK("authorizedValidatorSigner2");
+    (authorizedValidatorSigner2, authorizedValidatorSignerPK2) = actorWithPK(
+      "authorizedValidatorSigner2"
+    );
     (authorizedVoteSigner2, authorizedVoteSignerPK2) = actorWithPK("authorizedVoteSigner2");
 
     uint256 electableValidatorsMin = 4;
@@ -183,14 +187,11 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
     registry.setAddressFor(GovernanceContract, address(governance));
     registry.setAddressFor(GoldTokenContract, address(goldToken));
 
-    // (v, r, s) = getParsedSignatureOfAddress(address(releaseGold), authorizedPK);
-
     goldToken.initialize(address(registry));
 
     accounts.initialize(registryAddress);
 
     releaseGold = new ReleaseGold(true);
-    
 
     releaseGoldInitParams = ReleaseGoldMockTunnel.InitParams({
       releaseStartTime: block.timestamp + 5 * MINUTE,
@@ -383,7 +384,10 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
     election.activate(group);
     election.vote(group, pending, address(0), address(0));
 
-    assertEq(lockedGold.getAccountNonvotingLockedGold(address(this)), lockedGoldValue - active - pending);
+    assertEq(
+      lockedGold.getAccountNonvotingLockedGold(address(this)),
+      lockedGoldValue - active - pending
+    );
     assertEq(lockedGold.getAccountTotalLockedGold(address(this)), lockedGoldValue);
     assertEq(election.getPendingVotesForGroupByAccount(group, address(this)), pending);
     assertEq(election.getActiveVotesForGroupByAccount(group, address(this)), active);
@@ -460,7 +464,10 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
     ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
   }
 
-   function _registerValidatorWithSignerHelper(address validator, uint256 signerPk) internal returns (bytes memory) {
+  function _registerValidatorWithSignerHelper(address validator, uint256 signerPk)
+    internal
+    returns (bytes memory)
+  {
     (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
       validator,
       signerPk
@@ -474,18 +481,26 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
     return _ecdsaPubKey;
   }
 
-  /// @notice Test that a ReleaseGold owner can remove CELO from their account after transitioning to L2
-  /// @dev Release gold beneficiary assigns a validator and a vote signer, locks CELO, votes, transitions to L2,
-  /// revokes votes with newly assigned voted signer, and removes CELO.
   function test_releaseGoldOwnerHasValidator_CanRemoveCelo_WhenTransitionedToL2() public {
     _registerValidatorGroupWithMembers(group, 1);
 
-    (uint8 vValidator, bytes32 rValidator, bytes32 sValidator) = getParsedSignatureOfAddress(address(releaseGold), authorizedValidatorSignerPK);
-    (uint8 vVote, bytes32 rVote, bytes32 sVote) = getParsedSignatureOfAddress(address(releaseGold), authorizedVoteSignerPK);
+    (uint8 vValidator, bytes32 rValidator, bytes32 sValidator) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      authorizedValidatorSignerPK
+    );
+    (uint8 vVote, bytes32 rVote, bytes32 sVote) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      authorizedVoteSignerPK
+    );
 
     vm.startPrank(beneficiary);
     releaseGold.createAccount();
-    releaseGold.authorizeValidatorSigner(address(uint160(authorizedValidatorSigner)), vValidator, rValidator, sValidator);
+    releaseGold.authorizeValidatorSigner(
+      address(uint160(authorizedValidatorSigner)),
+      vValidator,
+      rValidator,
+      sValidator
+    );
     releaseGold.authorizeVoteSigner(address(uint160(authorizedVoteSigner)), vVote, rVote, sVote);
     releaseGold.lockGold(TOTAL_AMOUNT - 10 ether);
     vm.stopPrank();
@@ -504,24 +519,38 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
     election.vote(group, pending, address(0), address(0));
     vm.stopPrank();
 
-    assertEq(lockedGold.getAccountNonvotingLockedGold(address(releaseGold)), TOTAL_AMOUNT - 10 ether - active - pending);
+    assertEq(
+      lockedGold.getAccountNonvotingLockedGold(address(releaseGold)),
+      TOTAL_AMOUNT - 10 ether - active - pending
+    );
     assertEq(lockedGold.getAccountTotalLockedGold(address(releaseGold)), TOTAL_AMOUNT - 10 ether);
     assertEq(election.getPendingVotesForGroupByAccount(group, address(releaseGold)), pending);
     assertEq(election.getActiveVotesForGroupByAccount(group, address(releaseGold)), active);
 
     _whenL2();
 
-    (uint8 vVote2, bytes32 rVote2, bytes32 sVote2) = getParsedSignatureOfAddress(address(releaseGold), authorizedVoteSignerPK2);
+    (uint8 vVote2, bytes32 rVote2, bytes32 sVote2) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      authorizedVoteSignerPK2
+    );
 
     vm.startPrank(beneficiary);
-    releaseGold.authorizeVoteSigner(address(uint160(authorizedVoteSigner2)), vVote2, rVote2, sVote2);
+    releaseGold.authorizeVoteSigner(
+      address(uint160(authorizedVoteSigner2)),
+      vVote2,
+      rVote2,
+      sVote2
+    );
 
     vm.startPrank(authorizedVoteSigner2);
 
     election.revokeActive(group, active, address(0), address(0), 0);
     election.revokePending(group, pending, address(0), address(0), 0);
 
-    assertEq(lockedGold.getAccountNonvotingLockedGold(address(releaseGold)), TOTAL_AMOUNT - 10 ether);
+    assertEq(
+      lockedGold.getAccountNonvotingLockedGold(address(releaseGold)),
+      TOTAL_AMOUNT - 10 ether
+    );
     vm.stopPrank();
 
     vm.startPrank(authorizedValidatorSigner);
@@ -536,7 +565,6 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
 
     timeTravel(unlockingPeriod + 1);
     releaseGold.withdrawLockedGold(0);
-    // 2 ethers were sent to vote and validator signers
     assertEq(address(releaseGold).balance, TOTAL_AMOUNT - 2 ether);
   }
 }
