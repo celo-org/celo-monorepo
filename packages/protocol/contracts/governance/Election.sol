@@ -614,7 +614,7 @@ contract Election is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 3, 0);
+    return (1, 1, 4, 0);
   }
 
   /**
