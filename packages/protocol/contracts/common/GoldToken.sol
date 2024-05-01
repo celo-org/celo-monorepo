@@ -5,18 +5,19 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./UsingRegistry.sol";
-import "./CalledByVm.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
+import "./interfaces/IGoldTokenMintingSchedule.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts-0.8/common/IsL2Check.sol";
 
 contract GoldToken is
   Initializable,
-  CalledByVm,
   UsingRegistry,
   IERC20,
   ICeloToken,
-  ICeloVersionedContract
+  ICeloVersionedContract,
+  IsL2Check
 {
   using SafeMath for uint256;
 
@@ -34,11 +35,42 @@ contract GoldToken is
   // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
   address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
 
+  address constant L2_GOVERNANCE = address(0x4200000000000000000000000000000000000018);
+
+  IGoldTokenMintingSchedule public goldTokenMintingSchedule;
+
   event Transfer(address indexed from, address indexed to, uint256 value);
 
   event TransferComment(string comment);
 
   event Approval(address indexed owner, address indexed spender, uint256 value);
+
+  event IncreasedTotalSupply(uint256 amount);
+
+  event setCeloMintingScheduleAddress(address indexed newAddress);
+
+  modifier onlyGovernanceOrVm() {
+    if (isL1()) {
+      require(msg.sender == address(0), "Only VM can call");
+    } else {
+      require(msg.sender == L2_GOVERNANCE, "Only L2 governance can call");
+    }
+    _;
+  }
+
+  modifier isRestricted() {
+    if (isL1()) {
+      require(msg.sender == address(0), "Only VM can call");
+    } else {
+      if (
+        (msg.sender != address(goldTokenMintingSchedule) && msg.sender != L2_GOVERNANCE) ||
+        msg.sender == address(0)
+      ) {
+        revert("Only L2 governance or goldTokenMintingSchedule can call");
+      }
+    }
+    _;
+  }
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -54,6 +86,20 @@ contract GoldToken is
     totalSupply_ = 0;
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
+  }
+
+  function setGoldTokenMintingScheduleAddress(address goldTokenMintingScheduleAddress)
+    external
+    onlyGovernanceOrVm
+  {
+    require(
+      goldTokenMintingScheduleAddress != address(0) ||
+        goldTokenMintingScheduleAddress != address(goldTokenMintingSchedule),
+      "Invalid address."
+    );
+    goldTokenMintingSchedule = IGoldTokenMintingSchedule(goldTokenMintingScheduleAddress);
+
+    emit setCeloMintingScheduleAddress(goldTokenMintingScheduleAddress);
   }
 
   /**
@@ -165,7 +211,7 @@ contract GoldToken is
    * @param to The account for which to mint tokens.
    * @param value The amount of CELO to mint.
    */
-  function mint(address to, uint256 value) external onlyVm returns (bool) {
+  function mint(address to, uint256 value) external isRestricted returns (bool) {
     if (value == 0) {
       return true;
     }
@@ -174,6 +220,9 @@ contract GoldToken is
     totalSupply_ = totalSupply_.add(value);
 
     bool success;
+    // XXX:(soloseng) There is a check in geth to make sure caller is vm.
+    // TODO:(soloseng) This need to be modified for L2.
+
     (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(address(0), to, value));
     require(success, "CELO transfer failed");
 
@@ -185,8 +234,9 @@ contract GoldToken is
    * @notice Increases the variable for total amount of CELO in existence.
    * @param amount The amount to increase counter by
    */
-  function increaseSupply(uint256 amount) external onlyVm {
+  function increaseSupply(uint256 amount) external onlyGovernanceOrVm {
     totalSupply_ = totalSupply_.add(amount);
+    emit IncreasedTotalSupply(amount);
   }
 
   /**
