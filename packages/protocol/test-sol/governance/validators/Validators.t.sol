@@ -488,11 +488,6 @@ contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
 
   event MaxGroupSizeSet(uint256 size);
 
-  function test_ShouldSetMaxGroupSize() public {
-    validators.setMaxGroupSize(newSize);
-    assertEq(validators.getMaxGroupSize(), newSize, "MaxGroupSize not properly set");
-  }
-
   function test_Reverts_SetMaxGroupSize_WhenL2() public {
     _whenL2();
     vm.expectRevert("This method is not supported in L2 anymore.");

@@ -7,9 +7,7 @@ contract IsL2Check {
   address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   modifier onlyL1() {
-    if (isL2()) {
-      revert("This method is not supported in L2 anymore.");
-    }
+    allowOnlyL1();
     _;
   }
 
@@ -20,11 +18,8 @@ contract IsL2Check {
   }
 
   function isL2() public view returns (bool) {
-    return isContract(proxyAdminAddress);
-  }
-
-  function isContract(address _addr) private view returns (bool) {
     uint32 size;
+    address _addr = proxyAdminAddress;
     assembly {
       size := extcodesize(_addr)
     }

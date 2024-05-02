@@ -43,7 +43,6 @@ interface IValidators {
   function halveSlashingMultiplier(address) external;
 
   // view functions
-  function getMaxGroupSize() external view returns (uint256);
   function getCommissionUpdateDelay() external view returns (uint256);
   function getValidatorScoreParameters() external view returns (uint256, uint256);
   function getMembershipHistory(address)
