@@ -13,6 +13,12 @@ contract IsL2Check {
     _;
   }
 
+  function allowOnlyL1() view internal {
+    if (isL2()) {
+      revert("This method is not supported in L2 anymore.");
+    }
+  }
+
   function isL2() public view returns (bool) {
     return isContract(proxyAdminAddress);
   }
