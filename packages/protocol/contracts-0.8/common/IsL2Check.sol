@@ -13,7 +13,7 @@ contract IsL2Check {
     _;
   }
 
-  function allowOnlyL1() view internal {
+  function allowOnlyL1() internal view {
     if (isL2()) {
       revert("This method is not supported in L2 anymore.");
     }

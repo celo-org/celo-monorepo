@@ -582,11 +582,7 @@ contract Validators is
    * @notice Removes a validator from the group for which it is a member.
    * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
-  function forceDeaffiliateIfValidator(address validatorAccount)
-    external
-    nonReentrant
-    onlySlasher
-  {
+  function forceDeaffiliateIfValidator(address validatorAccount) external nonReentrant onlySlasher {
     allowOnlyL1();
     if (isValidator(validatorAccount)) {
       Validator storage validator = validators[validatorAccount];
@@ -774,11 +770,7 @@ contract Validators is
    * @notice Getter for a group's slashing multiplier.
    * @param account The group to fetch slashing multiplier for.
    */
-  function getValidatorGroupSlashingMultiplier(address account)
-    external
-    view
-    returns (uint256)
-  {
+  function getValidatorGroupSlashingMultiplier(address account) external view returns (uint256) {
     allowOnlyL1();
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
