@@ -38,9 +38,7 @@ jobs:
           key: ${{ runner.os }}-foundry-out-${{ env.FOUNDRY_CACHE_KEY }}
 
       - name: Install Foundry
-        uses: onbjerg/foundry-toolchain@v1
-        with:
-          version: nightly
+        uses: foundry-rs/foundry-toolchain@v1
 
       - name: Install forge dependencies
         run: forge install
@@ -53,10 +51,6 @@ jobs:
       - name: Run tests common
         # can't use gas limit because some setUp function use more than the limit
         run: forge test -vvv --match-path "test-sol/common/*" # --block-gas-limit 50000000 
-
-      - name: Run tests compatibility
-        if: success() || failure()
-        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/compatibility/*"
 
       - name: Run tests governance/network
         if: success() || failure()

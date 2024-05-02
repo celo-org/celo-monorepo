@@ -11,12 +11,44 @@ library AddressSortedLinkedListWithMedian {
   using SafeMath for uint256;
   using SortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
 
-  function toBytes(address a) public pure returns (bytes32) {
-    return bytes32(uint256(a) << 96);
+  /**
+   * @notice Returns the key of the first element in the list.
+   * @param list A storage pointer to the underlying list.
+   * @return The key of the first element in the list.
+   */
+  function getHead(SortedLinkedListWithMedian.List storage list) external view returns (address) {
+    return toAddress(list.getHead());
   }
 
-  function toAddress(bytes32 b) public pure returns (address) {
-    return address(uint256(b) >> 96);
+  /**
+   * @notice Returns the key of the median element in the list.
+   * @param list A storage pointer to the underlying list.
+   * @return The key of the median element in the list.
+   */
+  function getMedian(SortedLinkedListWithMedian.List storage list) external view returns (address) {
+    return toAddress(list.getMedian());
+  }
+
+  /**
+   * @notice Returns the key of the last element in the list.
+   * @param list A storage pointer to the underlying list.
+   * @return The key of the last element in the list.
+   */
+  function getTail(SortedLinkedListWithMedian.List storage list) external view returns (address) {
+    return toAddress(list.getTail());
+  }
+
+  /**
+   * @notice Returns the number of elements in the list.
+   * @param list A storage pointer to the underlying list.
+   * @return The number of elements in the list.
+   */
+  function getNumElements(SortedLinkedListWithMedian.List storage list)
+    external
+    view
+    returns (uint256)
+  {
+    return list.getNumElements();
   }
 
   /**
@@ -107,46 +139,6 @@ library AddressSortedLinkedListWithMedian {
   }
 
   /**
-   * @notice Returns the key of the first element in the list.
-   * @param list A storage pointer to the underlying list.
-   * @return The key of the first element in the list.
-   */
-  function getHead(SortedLinkedListWithMedian.List storage list) external view returns (address) {
-    return toAddress(list.getHead());
-  }
-
-  /**
-   * @notice Returns the key of the median element in the list.
-   * @param list A storage pointer to the underlying list.
-   * @return The key of the median element in the list.
-   */
-  function getMedian(SortedLinkedListWithMedian.List storage list) external view returns (address) {
-    return toAddress(list.getMedian());
-  }
-
-  /**
-   * @notice Returns the key of the last element in the list.
-   * @param list A storage pointer to the underlying list.
-   * @return The key of the last element in the list.
-   */
-  function getTail(SortedLinkedListWithMedian.List storage list) external view returns (address) {
-    return toAddress(list.getTail());
-  }
-
-  /**
-   * @notice Returns the number of elements in the list.
-   * @param list A storage pointer to the underlying list.
-   * @return The number of elements in the list.
-   */
-  function getNumElements(SortedLinkedListWithMedian.List storage list)
-    external
-    view
-    returns (uint256)
-  {
-    return list.getNumElements();
-  }
-
-  /**
    * @notice Gets all elements from the doubly linked list.
    * @param list A storage pointer to the underlying list.
    * @return Array of all keys in the list.
@@ -170,5 +162,13 @@ library AddressSortedLinkedListWithMedian {
       relations[i] = list.relation[byteKeys[i]];
     }
     return (keys, values, relations);
+  }
+
+  function toBytes(address a) public pure returns (bytes32) {
+    return bytes32(uint256(a) << 96);
+  }
+
+  function toAddress(bytes32 b) public pure returns (address) {
+    return address(uint256(b) >> 96);
   }
 }

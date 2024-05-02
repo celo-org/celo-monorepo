@@ -19,18 +19,6 @@ contract MockElection {
     isEligible[account] = true;
   }
 
-  function getTotalVotes() external view returns (uint256) {
-    return total;
-  }
-
-  function getActiveVotes() external view returns (uint256) {
-    return active;
-  }
-
-  function getTotalVotesByAccount(address) external view returns (uint256) {
-    return 0;
-  }
-
   function setActiveVotes(uint256 value) external {
     active = value;
   }
@@ -41,10 +29,6 @@ contract MockElection {
 
   function setElectedValidators(address[] calldata _electedValidators) external {
     electedValidators = _electedValidators;
-  }
-
-  function electValidatorSigners() external view returns (address[] memory) {
-    return electedValidators;
   }
 
   function vote(address, uint256, address, address) external returns (bool) {
@@ -67,10 +51,6 @@ contract MockElection {
     return true;
   }
 
-  function setAllowedToVoteOverMaxNumberOfGroups(address account, bool flag) public {
-    allowedToVoteOverMaxNumberOfGroups[account] = flag;
-  }
-
   function forceDecrementVotes(
     address,
     uint256 value,
@@ -80,5 +60,25 @@ contract MockElection {
   ) external returns (uint256) {
     this.setActiveVotes(this.getActiveVotes() - value);
     return value;
+  }
+
+  function getTotalVotes() external view returns (uint256) {
+    return total;
+  }
+
+  function getActiveVotes() external view returns (uint256) {
+    return active;
+  }
+
+  function getTotalVotesByAccount(address) external view returns (uint256) {
+    return 0;
+  }
+
+  function electValidatorSigners() external view returns (address[] memory) {
+    return electedValidators;
+  }
+
+  function setAllowedToVoteOverMaxNumberOfGroups(address account, bool flag) public {
+    allowedToVoteOverMaxNumberOfGroups[account] = flag;
   }
 }

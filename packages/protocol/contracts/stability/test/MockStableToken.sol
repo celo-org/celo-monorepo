@@ -23,10 +23,6 @@ contract MockStableToken {
     setInflationFactor(FixidityLib.fixed1().unwrap());
   }
 
-  function setInflationFactor(uint256 newInflationFactor) public {
-    inflationFactor = FixidityLib.wrap(newInflationFactor);
-  }
-
   function setTotalSupply(uint256 value) external {
     _totalSupply = value;
   }
@@ -44,10 +40,6 @@ contract MockStableToken {
     return true;
   }
 
-  function totalSupply() external view returns (uint256) {
-    return _totalSupply;
-  }
-
   function transfer(address to, uint256 value) external returns (bool) {
     return _transfer(msg.sender, to, value);
   }
@@ -56,15 +48,12 @@ contract MockStableToken {
     return _transfer(from, to, value);
   }
 
-  function _transfer(address from, address to, uint256 value) internal returns (bool) {
-    uint256 balanceValue = balanceOf(from);
-    if (balanceValue < value) {
-      return false;
-    }
-    uint256 units = valueToUnits(value);
-    balances[from] = balances[from].sub(units);
-    balances[to] = balances[to].add(units);
-    return true;
+  function totalSupply() external view returns (uint256) {
+    return _totalSupply;
+  }
+
+  function setInflationFactor(uint256 newInflationFactor) public {
+    inflationFactor = FixidityLib.wrap(newInflationFactor);
   }
 
   function balanceOf(address account) public view returns (uint256) {
@@ -77,5 +66,16 @@ contract MockStableToken {
 
   function valueToUnits(uint256 value) public view returns (uint256) {
     return inflationFactor.multiply(FixidityLib.newFixed(value)).fromFixed();
+  }
+
+  function _transfer(address from, address to, uint256 value) internal returns (bool) {
+    uint256 balanceValue = balanceOf(from);
+    if (balanceValue < value) {
+      return false;
+    }
+    uint256 units = valueToUnits(value);
+    balances[from] = balances[from].sub(units);
+    balances[to] = balances[to].add(units);
+    return true;
   }
 }

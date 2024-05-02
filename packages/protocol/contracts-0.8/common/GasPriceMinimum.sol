@@ -9,6 +9,7 @@ import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "../../contracts/common/FixidityLib.sol";
 import "./UsingRegistry.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 /**
  * @title Stores and provides gas price minimum for various currencies.
@@ -22,12 +23,6 @@ contract GasPriceMinimum is
 {
   using FixidityLib for FixidityLib.Fraction;
 
-  event TargetDensitySet(uint256 targetDensity);
-  event GasPriceMinimumFloorSet(uint256 gasPriceMinimumFloor);
-  event AdjustmentSpeedSet(uint256 adjustmentSpeed);
-  event GasPriceMinimumUpdated(uint256 gasPriceMinimum);
-  event BaseFeeOpCodeActivationBlockSet(uint256 baseFeeOpCodeActivationBlock);
-
   uint256 public deprecated_gasPriceMinimum;
   uint256 public gasPriceMinimumFloor;
 
@@ -38,23 +33,19 @@ contract GasPriceMinimum is
   FixidityLib.Fraction public adjustmentSpeed;
 
   uint256 public baseFeeOpCodeActivationBlock;
+  uint256 public constant ABSOLUTE_MINIMAL_GAS_PRICE = 1;
+
+  event TargetDensitySet(uint256 targetDensity);
+  event GasPriceMinimumFloorSet(uint256 gasPriceMinimumFloor);
+  event AdjustmentSpeedSet(uint256 adjustmentSpeed);
+  event GasPriceMinimumUpdated(uint256 gasPriceMinimum);
+  event BaseFeeOpCodeActivationBlockSet(uint256 baseFeeOpCodeActivationBlock);
 
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
   constructor(bool test) public Initializable(test) {}
-
-  /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 0);
-  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -78,6 +69,60 @@ contract GasPriceMinimum is
     setTargetDensity(_targetDensity);
     setAdjustmentSpeed(_adjustmentSpeed);
     _setBaseFeeOpCodeActivationBlock(_baseFeeOpCodeActivationBlock, true);
+  }
+
+  /**
+   * @notice Set the activation block of the baseFee opCode.
+   * @param _baseFeeOpCodeActivationBlock Block number where the baseFee opCode is activated
+   * @dev Value is expected to be > 0.
+   */
+  function setBaseFeeOpCodeActivationBlock(uint256 _baseFeeOpCodeActivationBlock)
+    external
+    onlyOwner
+  {
+    _setBaseFeeOpCodeActivationBlock(_baseFeeOpCodeActivationBlock, false);
+  }
+
+  /**
+   * @notice Adjust the gas price minimum based on governable parameters
+   * and block congestion.
+   * @param blockGasTotal The amount of gas in the most recent block.
+   * @param blockGasLimit The maxBlockGasLimit of the past block.
+   * @return result of the calculation (new gas price minimum)
+   */
+  function updateGasPriceMinimum(uint256 blockGasTotal, uint256 blockGasLimit)
+    external
+    onlyVm
+    returns (uint256)
+  {
+    deprecated_gasPriceMinimum = getUpdatedGasPriceMinimum(blockGasTotal, blockGasLimit);
+    emit GasPriceMinimumUpdated(deprecated_gasPriceMinimum);
+    return deprecated_gasPriceMinimum;
+  }
+
+  /**
+   * @notice Retrieve the current gas price minimum for a currency.
+   * When caled for 0x0 or Celo address, it returns gasPriceMinimum().
+   * For other addresses it returns gasPriceMinimum() mutiplied by 
+   * the SortedOracles median of the token. It does not check tokenAddress is a valid fee currency.
+   * this function will never returns values less than ABSOLUTE_MINIMAL_GAS_PRICE.
+   * If Oracle rate doesn't exist, it returns ABSOLUTE_MINIMAL_GAS_PRICE.
+   * @dev This functions assumes one unit of token has 18 digits.
+   * @param tokenAddress The currency the gas price should be in (defaults to Celo).
+   * @return current gas price minimum in the requested currency
+   */
+  function getGasPriceMinimum(address tokenAddress) external view returns (uint256) {
+    return Math.max(_getGasPriceMinimum(tokenAddress), ABSOLUTE_MINIMAL_GAS_PRICE);
+  }
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 2, 0, 1);
   }
 
   /**
@@ -113,80 +158,12 @@ contract GasPriceMinimum is
     emit GasPriceMinimumFloorSet(_gasPriceMinimumFloor);
   }
 
-  /**
-   * @notice Set the activation block of the baseFee opCode.
-   * @param _baseFeeOpCodeActivationBlock Block number where the baseFee opCode is activated
-   * @dev Value is expected to be > 0.
-   */
-  function setBaseFeeOpCodeActivationBlock(uint256 _baseFeeOpCodeActivationBlock)
-    external
-    onlyOwner
-  {
-    _setBaseFeeOpCodeActivationBlock(_baseFeeOpCodeActivationBlock, false);
-  }
-
-  /**
-   * @notice Set the activation block of the baseFee opCode.
-   * @param _baseFeeOpCodeActivationBlock Block number where the baseFee opCode is activated
-   * @dev Value is expected to be > 0.
-   */
-  function _setBaseFeeOpCodeActivationBlock(uint256 _baseFeeOpCodeActivationBlock, bool allowZero)
-    private
-    onlyOwner
-  {
-    require(
-      allowZero || _baseFeeOpCodeActivationBlock > 0,
-      "baseFee opCode activation block must be greater than zero"
-    );
-    baseFeeOpCodeActivationBlock = _baseFeeOpCodeActivationBlock;
-    emit BaseFeeOpCodeActivationBlockSet(_baseFeeOpCodeActivationBlock);
-  }
-
   function gasPriceMinimum() public view returns (uint256) {
     if (baseFeeOpCodeActivationBlock > 0 && block.number >= baseFeeOpCodeActivationBlock) {
       return block.basefee;
     } else {
       return deprecated_gasPriceMinimum;
     }
-  }
-
-  /**
-   * @notice Retrieve the current gas price minimum for a currency.
-   * @param tokenAddress The currency the gas price should be in (defaults to gold).
-   * @return current gas price minimum in the requested currency
-   */
-  function getGasPriceMinimum(address tokenAddress) external view returns (uint256) {
-    if (
-      tokenAddress == address(0) ||
-      tokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)
-    ) {
-      return gasPriceMinimum();
-    } else {
-      ISortedOracles sortedOracles = ISortedOracles(
-        registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
-      );
-      uint256 rateNumerator;
-      uint256 rateDenominator;
-      (rateNumerator, rateDenominator) = sortedOracles.medianRate(tokenAddress);
-      return ((gasPriceMinimum() * rateNumerator) / rateDenominator);
-    }
-  }
-
-  /**
-   * @notice Adjust the gas price minimum based on governable parameters
-   * and block congestion.
-   * @param blockGasTotal The amount of gas in the most recent block.
-   * @param blockGasLimit The maxBlockGasLimit of the past block.
-   * @return result of the calculation (new gas price minimum)
-   */
-  function updateGasPriceMinimum(uint256 blockGasTotal, uint256 blockGasLimit)
-    external
-    onlyVm
-    returns (uint256)
-  {
-    deprecated_gasPriceMinimum = getUpdatedGasPriceMinimum(blockGasTotal, blockGasLimit);
-    emit GasPriceMinimumUpdated(deprecated_gasPriceMinimum);
-    return deprecated_gasPriceMinimum;
   }
 
   /**
@@ -222,4 +199,39 @@ contract GasPriceMinimum is
 
     return newGasPriceMinimum >= gasPriceMinimumFloor ? newGasPriceMinimum : gasPriceMinimumFloor;
   }
+
+  /**
+   * @notice Set the activation block of the baseFee opCode.
+   * @param _baseFeeOpCodeActivationBlock Block number where the baseFee opCode is activated
+   * @dev Value is expected to be > 0.
+   */
+  function _setBaseFeeOpCodeActivationBlock(uint256 _baseFeeOpCodeActivationBlock, bool allowZero)
+    private
+    onlyOwner
+  {
+    require(
+      allowZero || _baseFeeOpCodeActivationBlock > 0,
+      "baseFee opCode activation block must be greater than zero"
+    );
+    baseFeeOpCodeActivationBlock = _baseFeeOpCodeActivationBlock;
+    emit BaseFeeOpCodeActivationBlockSet(_baseFeeOpCodeActivationBlock);
+  }
+
+  function _getGasPriceMinimum(address tokenAddress) private view returns (uint256) {
+    if (
+      tokenAddress == address(0) ||
+      tokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)
+    ) {
+      return gasPriceMinimum();
+    } else {
+      ISortedOracles sortedOracles = ISortedOracles(
+        registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
+      );
+      uint256 rateNumerator;
+      uint256 rateDenominator;
+      (rateNumerator, rateDenominator) = sortedOracles.medianRate(tokenAddress);
+      return ((gasPriceMinimum() * rateNumerator) / rateDenominator);
+    }
+  }
+
 }

@@ -10,18 +10,6 @@ import "../Attestations.sol";
 contract AttestationsTest is Attestations(true) {
   address[] private __testValidators;
 
-  function __setValidators(address[] memory validators) public {
-    __testValidators = validators;
-  }
-
-  function numberValidatorsInCurrentSet() public view returns (uint256) {
-    return __testValidators.length;
-  }
-
-  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
-    return __testValidators[index];
-  }
-
   // some deprecated functions are mocked here to ensure that the tests for
   // revoke and withdraw can still run
 
@@ -141,6 +129,18 @@ contract AttestationsTest is Attestations(true) {
     }
 
     emit AttestationCompleted(identifier, msg.sender, issuer);
+  }
+
+  function __setValidators(address[] memory validators) public {
+    __testValidators = validators;
+  }
+
+  function numberValidatorsInCurrentSet() public view returns (uint256) {
+    return __testValidators.length;
+  }
+
+  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
+    return __testValidators[index];
   }
 
   /**

@@ -125,7 +125,7 @@ contract OdisPaymentsFoundryTest_PayInCUSD is OdisPaymentsFoundryTest {
     checkStatecUSD(sender, sender, valueApprovedForTransfer);
   }
 
-  function test_ShouldEmitPaymentMadeEvent() public {
+  function test_Emits_PaymentMadeEvent() public {
     vm.expectEmit(true, true, true, true);
     emit PaymentMade(receiver, valueApprovedForTransfer);
 

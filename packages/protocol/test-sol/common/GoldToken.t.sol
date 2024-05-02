@@ -3,7 +3,7 @@ pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
 import "@celo-contracts/common/GoldToken.sol";
-import "@celo-contracts/common/test/MockGoldToken.sol";
+import "./GoldTokenMock.sol";
 
 contract GoldTokenTest is Test {
   GoldToken goldToken;
@@ -23,7 +23,7 @@ contract GoldTokenTest is Test {
   }
 }
 
-contract BasicGoldTokenTest is GoldTokenTest {
+contract GoldTokenTest_General is GoldTokenTest {
   function setUp() public {
     super.setUp();
   }
@@ -73,12 +73,12 @@ contract BasicGoldTokenTest is GoldTokenTest {
   }
 }
 
-contract GoldTokenTransfer is GoldTokenTest {
+contract GoldTokenTest_transfer is GoldTokenTest {
   function setUp() public {
     super.setUp();
   }
 
-  function testTransfer_ShouldTransferBalanceFromOneUserToAnother() public {
+  function test_ShouldTransferBalanceFromOneUserToAnother() public {
     uint256 startBalanceFrom = goldToken.balanceOf(sender);
     uint256 startBalanceTo = goldToken.balanceOf(receiver);
     vm.prank(sender);
@@ -87,7 +87,7 @@ contract GoldTokenTransfer is GoldTokenTest {
     assertEq(receiver.balance, startBalanceTo + ONE_GOLDTOKEN);
   }
 
-  function testTransfer_ShouldTransferBalanceWithAComment() public {
+  function test_ShouldTransferBalanceWithAComment() public {
     string memory comment = "tacos at lunch";
     uint256 startBalanceFrom = goldToken.balanceOf(sender);
     uint256 startBalanceTo = goldToken.balanceOf(receiver);
@@ -101,14 +101,14 @@ contract GoldTokenTransfer is GoldTokenTest {
     assertEq(receiver.balance, startBalanceTo + ONE_GOLDTOKEN);
   }
 
-  function testTransfer_ShouldNotAllowToTransferToNullAddress() public {
+  function test_ShouldNotAllowToTransferToNullAddress() public {
     vm.prank(sender);
     vm.expectRevert();
     goldToken.transfer(address(0), ONE_GOLDTOKEN);
   }
 }
 
-contract GoldTokenTransferFrom is GoldTokenTest {
+contract GoldTokenTest_transferFrom is GoldTokenTest {
   function setUp() public {
     super.setUp();
     vm.prank(sender);
@@ -124,13 +124,13 @@ contract GoldTokenTransferFrom is GoldTokenTest {
     assertEq(receiver.balance, startBalanceTo + ONE_GOLDTOKEN);
   }
 
-  function testTransfer_ShouldNotAllowToTransferToNullAddress() public {
+  function test_ShouldNotAllowToTransferToNullAddress() public {
     vm.prank(receiver);
     vm.expectRevert();
     goldToken.transferFrom(sender, address(0), ONE_GOLDTOKEN);
   }
 
-  function testTransfer_ShouldNotAllowTransferMoreThanSenderHas() public {
+  function test_ShouldNotAllowTransferMoreThanSenderHas() public {
     uint256 value = sender.balance + ONE_GOLDTOKEN * 4;
 
     vm.prank(receiver);
@@ -138,14 +138,14 @@ contract GoldTokenTransferFrom is GoldTokenTest {
     goldToken.transferFrom(sender, receiver, value);
   }
 
-  function testTransfer_ShouldNotAllowTransferringMoreThanTheSpenderIsAllowed() public {
+  function test_ShouldNotAllowTransferringMoreThanTheSpenderIsAllowed() public {
     vm.prank(receiver);
     vm.expectRevert();
     goldToken.transferFrom(sender, receiver, ONE_GOLDTOKEN + 1);
   }
 }
 
-contract BurnGoldToken is GoldTokenTest {
+contract GoldTokenTest_burn is GoldTokenTest {
   uint256 startBurn;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
 
@@ -172,18 +172,18 @@ contract BurnGoldToken is GoldTokenTest {
   }
 }
 
-contract MockGoldTokenTest is Test {
-  MockGoldToken mockGoldToken;
+contract GoldTokenMockTest is Test {
+  GoldTokenMock mockGoldToken;
   uint256 ONE_GOLDTOKEN = 1000000000000000000;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
 
   function setUp() public {
-    mockGoldToken = new MockGoldToken();
+    mockGoldToken = new GoldTokenMock();
     mockGoldToken.setTotalSupply(ONE_GOLDTOKEN * 1000);
   }
 }
 
-contract MockGoldTokenCirculatingSupply is MockGoldTokenTest {
+contract GoldTokenMock_circulatingSupply is GoldTokenMockTest {
   function setUp() public {
     super.setUp();
   }

@@ -44,33 +44,12 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   function() external payable {}
 
   /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
-  }
-
-  /**
     * @notice Allows owner to set the router for a token.
     * @param token Address of the token to set.
     * @param router The new router.
     */
   function setRouter(address token, address router) external onlyOwner {
     _setRouter(token, router);
-  }
-
-  function _setRouter(address token, address router) private {
-    require(router != address(0), "Router can't be address zero");
-    routerAddresses[token].add(router);
-    require(
-      routerAddresses[token].values.length <= MAX_NUMBER_ROUTERS_PER_TOKEN,
-      "Max number of routers reached"
-    );
-    emit RouterAddressSet(token, router);
   }
 
   /**
@@ -81,66 +60,6 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   function removeRouter(address token, address router) external onlyOwner {
     routerAddresses[token].remove(router);
     emit RouterAddressRemoved(token, router);
-  }
-
-  /**
-    * @notice Get the list of routers for a token.
-    * @param token The address of the token to query.
-    * @return An array of all the allowed router.
-    */
-  function getRoutersForToken(address token) external view returns (address[] memory) {
-    return routerAddresses[token].values;
-  }
-
-  /**
-  * @dev Calculates the minimum amount of tokens that can be received for a given amount of sell tokens, 
-          taking into account the slippage and the rates of the sell token and CELO token on the Uniswap V2 pair.
-  * @param sellTokenAddress The address of the sell token.
-  * @param maxSlippage The maximum slippage allowed.
-  * @param amount The amount of sell tokens to be traded.
-  * @param bestRouter The Uniswap V2 router with the best price.
-  * @return The minimum amount of tokens that can be received.
-  */
-  function calculateAllMinAmount(
-    address sellTokenAddress,
-    uint256 maxSlippage,
-    uint256 amount,
-    IUniswapV2RouterMin bestRouter
-  ) private view returns (uint256) {
-    ISortedOracles sortedOracles = getSortedOracles();
-    uint256 minReports = minimumReports[sellTokenAddress];
-
-    require(
-      sortedOracles.numRates(sellTokenAddress) >= minReports,
-      "Number of reports for token not enough"
-    );
-
-    uint256 minimalSortedOracles = 0;
-    // if minimumReports for this token is zero, assume the check is not needed
-    if (minReports > 0) {
-      (uint256 rateNumerator, uint256 rateDenominator) = sortedOracles.medianRate(sellTokenAddress);
-
-      minimalSortedOracles = calculateMinAmount(
-        rateNumerator,
-        rateDenominator,
-        amount,
-        maxSlippage
-      );
-    }
-
-    IERC20 celoToken = getGoldToken();
-    address pair = IUniswapV2FactoryMin(bestRouter.factory()).getPair(
-      sellTokenAddress,
-      address(celoToken)
-    );
-    uint256 minAmountPair = calculateMinAmount(
-      IERC20(sellTokenAddress).balanceOf(pair),
-      celoToken.balanceOf(pair),
-      amount,
-      maxSlippage
-    );
-
-    return Math.max(minAmountPair, minimalSortedOracles);
   }
 
   // This function explicitly defines few variables because it was getting error "stack too deep"
@@ -210,4 +129,86 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     emit TokenSold(sellTokenAddress, buyTokenAddress, amount);
     return celoAmount;
   }
+
+  /**
+    * @notice Get the list of routers for a token.
+    * @param token The address of the token to query.
+    * @return An array of all the allowed router.
+    */
+  function getRoutersForToken(address token) external view returns (address[] memory) {
+    return routerAddresses[token].values;
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 0, 0);
+  }
+
+  function _setRouter(address token, address router) private {
+    require(router != address(0), "Router can't be address zero");
+    routerAddresses[token].add(router);
+    require(
+      routerAddresses[token].values.length <= MAX_NUMBER_ROUTERS_PER_TOKEN,
+      "Max number of routers reached"
+    );
+    emit RouterAddressSet(token, router);
+  }
+
+  /**
+  * @dev Calculates the minimum amount of tokens that can be received for a given amount of sell tokens, 
+          taking into account the slippage and the rates of the sell token and CELO token on the Uniswap V2 pair.
+  * @param sellTokenAddress The address of the sell token.
+  * @param maxSlippage The maximum slippage allowed.
+  * @param amount The amount of sell tokens to be traded.
+  * @param bestRouter The Uniswap V2 router with the best price.
+  * @return The minimum amount of tokens that can be received.
+  */
+  function calculateAllMinAmount(
+    address sellTokenAddress,
+    uint256 maxSlippage,
+    uint256 amount,
+    IUniswapV2RouterMin bestRouter
+  ) private view returns (uint256) {
+    ISortedOracles sortedOracles = getSortedOracles();
+    uint256 minReports = minimumReports[sellTokenAddress];
+
+    require(
+      sortedOracles.numRates(sellTokenAddress) >= minReports,
+      "Number of reports for token not enough"
+    );
+
+    uint256 minimalSortedOracles = 0;
+    // if minimumReports for this token is zero, assume the check is not needed
+    if (minReports > 0) {
+      (uint256 rateNumerator, uint256 rateDenominator) = sortedOracles.medianRate(sellTokenAddress);
+
+      minimalSortedOracles = calculateMinAmount(
+        rateNumerator,
+        rateDenominator,
+        amount,
+        maxSlippage
+      );
+    }
+
+    IERC20 celoToken = getGoldToken();
+    address pair = IUniswapV2FactoryMin(bestRouter.factory()).getPair(
+      sellTokenAddress,
+      address(celoToken)
+    );
+    uint256 minAmountPair = calculateMinAmount(
+      IERC20(sellTokenAddress).balanceOf(pair),
+      celoToken.balanceOf(pair),
+      amount,
+      maxSlippage
+    );
+
+    return Math.max(minAmountPair, minimalSortedOracles);
+  }
+
 }
