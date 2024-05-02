@@ -17,10 +17,6 @@ contract IsL2Check {
     return isContract(proxyAdminAddress);
   }
 
-  function isL1() public view returns (bool) {
-    return !isL2();
-  }
-
   function isContract(address _addr) private view returns (bool) {
     uint32 size;
     assembly {
