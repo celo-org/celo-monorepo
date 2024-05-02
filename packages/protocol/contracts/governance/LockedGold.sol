@@ -104,7 +104,7 @@ contract LockedGold is
   );
   event MaxDelegateesCountSet(uint256 value);
 
-  modifier onlySlasher {
+  modifier onlySlasher() {
     require(
       registry.isOneOf(slashingWhitelist, msg.sender),
       "Caller is not a whitelisted slasher."
@@ -133,18 +133,14 @@ contract LockedGold is
   /**
    * @notice Locks gold to be used for voting.
    */
-  function lock() external payable nonReentrant {
-    if (isL1()) {
-      require(
-        getAccounts().isAccount(msg.sender),
-        "Must first register address with Account.createAccount"
-      );
-      _incrementNonvotingAccountBalance(msg.sender, msg.value);
-      _updateDelegatedAmount(msg.sender);
-      emit GoldLocked(msg.sender, msg.value);
-    } else {
-      revert("This method is no longer supported in L2.");
-    }
+  function lock() external payable nonReentrant onlyL1 {
+    require(
+      getAccounts().isAccount(msg.sender),
+      "Must first register address with Account.createAccount"
+    );
+    _incrementNonvotingAccountBalance(msg.sender, msg.value);
+    _updateDelegatedAmount(msg.sender);
+    emit GoldLocked(msg.sender, msg.value);
   }
 
   /**
@@ -221,27 +217,23 @@ contract LockedGold is
    * @param index The index of the pending withdrawal to relock from.
    * @param value The value to relock from the specified pending withdrawal.
    */
-  function relock(uint256 index, uint256 value) external nonReentrant {
-    if (isL1()) {
-      require(
-        getAccounts().isAccount(msg.sender),
-        "Sender must be registered with Account.createAccount to lock or relock"
-      );
-      Balances storage account = balances[msg.sender];
-      require(index < account.pendingWithdrawals.length, "Bad pending withdrawal index");
-      PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
-      require(value <= pendingWithdrawal.value, "Requested value larger than pending value");
-      if (value == pendingWithdrawal.value) {
-        deletePendingWithdrawal(account.pendingWithdrawals, index);
-      } else {
-        pendingWithdrawal.value = pendingWithdrawal.value.sub(value);
-      }
-      _incrementNonvotingAccountBalance(msg.sender, value);
-      _updateDelegatedAmount(msg.sender);
-      emit GoldRelocked(msg.sender, value);
+  function relock(uint256 index, uint256 value) external nonReentrant onlyL1 {
+    require(
+      getAccounts().isAccount(msg.sender),
+      "Sender must be registered with Account.createAccount to lock or relock"
+    );
+    Balances storage account = balances[msg.sender];
+    require(index < account.pendingWithdrawals.length, "Bad pending withdrawal index");
+    PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
+    require(value <= pendingWithdrawal.value, "Requested value larger than pending value");
+    if (value == pendingWithdrawal.value) {
+      deletePendingWithdrawal(account.pendingWithdrawals, index);
     } else {
-      revert("This method is no longer supported in L2.");
+      pendingWithdrawal.value = pendingWithdrawal.value.sub(value);
     }
+    _incrementNonvotingAccountBalance(msg.sender, value);
+    _updateDelegatedAmount(msg.sender);
+    emit GoldRelocked(msg.sender, value);
   }
 
   /**
@@ -478,41 +470,37 @@ contract LockedGold is
     address[] calldata lessers,
     address[] calldata greaters,
     uint256[] calldata indices
-  ) external onlySlasher {
-    if (isL1()) {
-      uint256 maxSlash = Math.min(penalty, getAccountTotalLockedGold(account));
-      require(maxSlash >= reward, "reward cannot exceed penalty.");
-      // `reporter` receives the reward in locked CELO, so it must be given to an account
-      // There is no reward for slashing via the GovernanceSlasher, and `reporter`
-      // is set to 0x0.
-      if (reporter != address(0)) {
-        reporter = getAccounts().signerToAccount(reporter);
-      }
-      // Local scoping is required to avoid Solc "stack too deep" error from too many locals.
-      {
-        uint256 nonvotingBalance = balances[account].nonvoting;
-        uint256 difference = 0;
-        // If not enough nonvoting, revoke the difference
-        if (nonvotingBalance < maxSlash) {
-          difference = maxSlash.sub(nonvotingBalance);
-          require(
-            getElection().forceDecrementVotes(account, difference, lessers, greaters, indices) ==
-              difference,
-            "Cannot revoke enough voting gold."
-          );
-        }
-        // forceDecrementVotes does not increment nonvoting account balance, so we can't double count
-        _decrementNonvotingAccountBalance(account, maxSlash.sub(difference));
-        _incrementNonvotingAccountBalance(reporter, reward);
-      }
-      address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
-      address payable communityFundPayable = address(uint160(communityFund));
-      require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
-      communityFundPayable.sendValue(maxSlash.sub(reward));
-      emit AccountSlashed(account, maxSlash, reporter, reward);
-    } else {
-      revert("This method is no longer supported in L2.");
+  ) external onlySlasher onlyL1 {
+    uint256 maxSlash = Math.min(penalty, getAccountTotalLockedGold(account));
+    require(maxSlash >= reward, "reward cannot exceed penalty.");
+    // `reporter` receives the reward in locked CELO, so it must be given to an account
+    // There is no reward for slashing via the GovernanceSlasher, and `reporter`
+    // is set to 0x0.
+    if (reporter != address(0)) {
+      reporter = getAccounts().signerToAccount(reporter);
     }
+    // Local scoping is required to avoid Solc "stack too deep" error from too many locals.
+    {
+      uint256 nonvotingBalance = balances[account].nonvoting;
+      uint256 difference = 0;
+      // If not enough nonvoting, revoke the difference
+      if (nonvotingBalance < maxSlash) {
+        difference = maxSlash.sub(nonvotingBalance);
+        require(
+          getElection().forceDecrementVotes(account, difference, lessers, greaters, indices) ==
+            difference,
+          "Cannot revoke enough voting gold."
+        );
+      }
+      // forceDecrementVotes does not increment nonvoting account balance, so we can't double count
+      _decrementNonvotingAccountBalance(account, maxSlash.sub(difference));
+      _incrementNonvotingAccountBalance(reporter, reward);
+    }
+    address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
+    address payable communityFundPayable = address(uint160(communityFund));
+    require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
+    communityFundPayable.sendValue(maxSlash.sub(reward));
+    emit AccountSlashed(account, maxSlash, reporter, reward);
   }
 
   /**
@@ -636,27 +624,19 @@ contract LockedGold is
    * @notice Sets the duration in seconds users must wait before withdrawing gold after unlocking.
    * @param value The unlocking period in seconds.
    */
-  function setUnlockingPeriod(uint256 value) public onlyOwner {
-    if (isL1()) {
-      require(value != legacy_unlockingPeriod, "Unlocking period not changed");
-      legacy_unlockingPeriod = value;
-      emit UnlockingPeriodSet(value);
-    } else {
-      revert("This method is no longer supported in L2.");
-    }
+  function setUnlockingPeriod(uint256 value) public onlyOwner onlyL1 {
+    require(value != legacy_unlockingPeriod, "Unlocking period not changed");
+    legacy_unlockingPeriod = value;
+    emit UnlockingPeriodSet(value);
   }
 
   /**
    * @notice Sets max delegatees count.
    * @param value The max delegatees count.
    */
-  function setMaxDelegateesCount(uint256 value) public onlyOwner {
-    if (isL1()) {
-      maxDelegateesCount = value;
-      emit MaxDelegateesCountSet(value);
-    } else {
-      revert("This method is no longer supported in L2.");
-    }
+  function setMaxDelegateesCount(uint256 value) public onlyOwner onlyL1 {
+    maxDelegateesCount = value;
+    emit MaxDelegateesCountSet(value);
   }
 
   /**
