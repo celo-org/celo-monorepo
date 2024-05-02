@@ -70,7 +70,7 @@ class ContractAddresses {
     return new ContractAddresses(addresses)
   }
 
-  constructor(public addresses: Map<string, Address>) { }
+  constructor(public addresses: Map<string, Address>) {}
 
   public get = (contract: string): Address => {
     if (this.addresses.has(contract)) {
@@ -118,17 +118,17 @@ const deployImplementation = async (
   // without this delay it sometimes fails with ProviderError
   await delay(getRandomNumber(1, 1000))
 
-  console.log("gas update in2");
-  console.log("dryRun", dryRun);
+  console.log('gas update in2')
+  console.log('dryRun', dryRun)
 
-  const bytecodeSize = (Contract.bytecode.length - 2) / 2;
-  console.log('Bytecode size in bytes:', bytecodeSize);
+  const bytecodeSize = (Contract.bytecode.length - 2) / 2
+  console.log('Bytecode size in bytes:', bytecodeSize)
 
   const contract = await (dryRun
     ? Contract.at(celoRegistryAddress)
     : Contract.new({
-      gas: 5000000 // Setting the gas limit
-    }))
+        gas: 5000000, // Setting the gas limit
+      }))
 
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
@@ -334,7 +334,7 @@ module.exports = async (callback: (error?: any) => number) => {
       const shouldDeployContract = Object.keys(report.contracts).includes(contractName)
       const shouldDeployLibrary = Object.keys(report.libraries).includes(contractName)
 
-      if (shouldDeployContract || contractName == "Validators") {
+      if (shouldDeployContract || contractName == 'Validators') {
         // Don't try to deploy and link libraries of contracts it doesn't have to deploy
         // 1. Release all dependencies. Guarantees library addresses are canonical for linking.
         const contractDependencies = dependencies.get(contractName)
