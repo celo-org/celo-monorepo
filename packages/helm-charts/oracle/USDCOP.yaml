@@ -1,11 +1,11 @@
 oracle:
-  currencyPair: USDCOP
+  currencyPair: COPUSD
   overrideOracleCount: 12 # At 5s block time, every client reports once per minute
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
       maxPercentageDeviation: 0.01
-      maxPercentageBidAskSpread: 0.005
+      maxPercentageBidAskSpread: 0.03
   metrics:
     enabled: true
     prometheusPort: 9090
@@ -14,10 +14,10 @@ oracle:
   gasPriceMultiplier: 1.5
   priceSources: "[
       [
-        {exchange: 'ALPHAVANTAGE', symbol: 'USDCOP', toInvert: false}
+        {exchange: 'ALPHAVANTAGE', symbol: 'USDCOP', toInvert: true}
       ],
       [
-        {exchange: 'XIGNITE', symbol: 'USDCOP', toInvert: false}
+        {exchange: 'XIGNITE', symbol: 'COPUSD', toInvert: false}
       ]
   ]"
   minPriceSourceCount: 2
