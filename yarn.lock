@@ -925,11 +925,6 @@
     cross-fetch "3.0.6"
     debug "^4.1.1"
 
-"@celo/odis-identifiers@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@celo/odis-identifiers/-/odis-identifiers-1.0.0.tgz#9bafbb77d989f1f1064f293a54d64af3298f0e91"
-  integrity sha512-ZcBMGrr+DRX7FqNO0dWZpOVnYi5xWUxGaDtSeWnFQH9JwQ37ZmXQLEyraDXHx3gTgVEl+xSgCfJUnc1+w88PSQ==
-
 "@celo/typechain-target-web3-v1-celo@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@celo/typechain-target-web3-v1-celo/-/typechain-target-web3-v1-celo-1.0.0.tgz#9b22ae2624c06d9cddb1616fa232970b45056aa9"
