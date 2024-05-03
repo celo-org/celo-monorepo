@@ -1,11 +1,11 @@
 oracle:
-  currencyPair: USDKES
+  currencyPair: KESUSD
   overrideOracleCount: 12 # At 5s block time, every client reports once per minute
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
       maxPercentageDeviation: 0.01
-      maxPercentageBidAskSpread: 0.005
+      maxPercentageBidAskSpread: 0.03
   metrics:
     enabled: true
     prometheusPort: 9090
@@ -14,7 +14,7 @@ oracle:
   gasPriceMultiplier: 1.5
   priceSources: "[
       [
-        {exchange: 'ALPHAVANTAGE', symbol: 'USDKES', toInvert: false}
+        {exchange: 'ALPHAVANTAGE', symbol: 'KESUSD', toInvert: true}
       ],
       [
         {exchange: 'XIGNITE', symbol: 'USDKES', toInvert: false}
