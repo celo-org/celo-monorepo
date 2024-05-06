@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 struct CurrencyConfig {
-  address currencyIdentifier;
   address oracle;
   uint256 intrinsicGas;
 }

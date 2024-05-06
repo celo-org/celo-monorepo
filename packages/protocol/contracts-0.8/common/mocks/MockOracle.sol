@@ -7,14 +7,17 @@ contract MockOracle is IOracle {
   uint256 numerator;
   uint256 denominator;
   uint256 lastUpdateTimestamp;
+  address token;
 
-  function setExchangeRate(uint256 _numerator, uint256 _denominator) public {
+  function setExchangeRate(address _token, uint256 _numerator, uint256 _denominator) public {
     numerator = _numerator;
     denominator = _denominator;
     lastUpdateTimestamp = block.timestamp;
+    token = _token;
   }
 
-  function getExchangeRateFor(address) external view returns (uint256, uint256) {
+  function getExchangeRate(address _token) external view returns (uint256, uint256) {
+    require(token == _token, "Token not supported");
     return (numerator, denominator);
   }
 }
