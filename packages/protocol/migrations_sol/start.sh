@@ -66,7 +66,7 @@ SKIP_SUMULATION=""
 
 echo "Compiling with libraries... "
 time forge build $LIBRARIES
-# exit 1
+#exit 1
 #--skip-simulation
 time forge script migrations_sol/Migration.s.sol --tc Migration --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive --sender $FROM_ACCOUNT --unlocked -- $LIBRARIES --revert-strings || echo "Migration script failed"
 
@@ -82,5 +82,3 @@ echo "Killing Anvil"
 if [[ -n $ANVIL_PID ]]; then
     kill $ANVIL_PID
 fi
-
-# TODO dump state to temp folder

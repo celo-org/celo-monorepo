@@ -243,7 +243,8 @@ contract Migration is Script, UsingRegistry {
     migrateFeeHandler(json);
     migrateOdisPayments();
     migrateGovernance(json);
-    vm.stopBroadcast();
+    
+    vm.stopBroadcast(); // TODO shouldn't elect validators be before this?
 
     electValidators(json);
 
@@ -335,30 +336,26 @@ contract Migration is Script, UsingRegistry {
     console.log("reserveSpenderMultiSig set to:", reserveSpenderMultiSig);
   }
 
-  function migrateStableToken(string memory json) public {
-    // TODO add cEUR, cBRL, etc
-    string memory name = abi.decode(json.parseRaw(".stableToken.tokenName"), (string));
-    string memory symbol = abi.decode(json.parseRaw(".stableToken.tokenSymbol"), (string));
-    uint8 decimals = abi.decode(json.parseRaw(".stableToken.decimals"), (uint8));
-    uint256 inflationRate = abi.decode(json.parseRaw(".stableToken.inflationRate"), (uint256));
-    uint256 inflationFactorUpdatePeriod = abi.decode(json.parseRaw(".stableToken.inflationPeriod"), (uint256));
-    uint256 initialBalanceValue = abi.decode(json.parseRaw(".stableToken.initialBalance"), (uint256));
-    
-    
-    address[] memory initialBalanceAddresses = new address[](1);
-    initialBalanceAddresses[0] = deployerAccount;
-    // initialBalanceAddresses.push(deployerAccount);
-    uint256[] memory initialBalanceValuees = new uint256[](1);
-    initialBalanceValuees[0] = initialBalanceValue;
-    // initialBalanceValuees.push(initialBalanceValue);
-    
-    string memory exchangeIdentifier = "Exchange";
+  function deployStable(
+    string memory name,
+    string memory symbol,
+    string memory sufix,
+    uint8 decimals,
+    uint256 inflationRate,
+    uint256 inflationFactorUpdatePeriod,
+    address[] memory  initialBalanceAddresses,
+    uint256[] memory initialBalanceValues,
+    bool frozen,
+    uint256 celoPrice
+  ) public {
 
-    address stableTokenProxyAddress = deployProxiedContract(
-      "StableToken",
-      abi.encodeWithSelector(IStableTokenInitialize.initialize.selector, name, symbol, decimals, registryAddress, inflationRate, inflationFactorUpdatePeriod, initialBalanceAddresses, initialBalanceValuees, exchangeIdentifier));
+
+    // TODO import StableTokenEUR so that it gets compiled and can get deployed
+   string memory exchangeIdentifier = string.concat("Exchange", sufix);
+   address stableTokenProxyAddress = deployProxiedContract(
+      string.concat("StableToken", sufix),
+      abi.encodeWithSelector(IStableTokenInitialize.initialize.selector, name, symbol, decimals, registryAddress, inflationRate, inflationFactorUpdatePeriod, initialBalanceAddresses, initialBalanceValues, exchangeIdentifier));
   
-    bool frozen = abi.decode(json.parseRaw(".stableToken.frozen"), (bool));
     if (frozen){
       getFreezer().freeze(stableTokenProxyAddress);
     }
@@ -368,7 +365,6 @@ contract Migration is Script, UsingRegistry {
     // console.log("this worked");
     getSortedOracles().addOracle(stableTokenProxyAddress, deployerAccount);
 
-    uint256 celoPrice = abi.decode(json.parseRaw(".stableToken.celoPrice"), (uint256));
     if (celoPrice != 0 ) {
       console.log("before report");
       getSortedOracles().report(stableTokenProxyAddress, celoPrice * 1e24, address(0), address(0)); // TODO use fixidity
@@ -379,6 +375,38 @@ contract Migration is Script, UsingRegistry {
 
     getFeeCurrencyWhitelist().addToken(stableTokenProxyAddress);
 
+  }
+
+  function migrateStableToken(string memory json) public {
+    // TODO add cEUR, cBRL, etc
+
+    string[] memory names = abi.decode(json.parseRaw(".stableTokens.names"), (string[]));
+    string[] memory symbols = abi.decode(json.parseRaw(".stableTokens.names"), (string[]));
+    string[] memory contractSufixs = abi.decode(json.parseRaw(".stableTokens.contractSufixs"), (string[]));
+
+    require(names.length == symbols.length, "Ticker and stable names should match");
+
+    uint8 decimals = abi.decode(json.parseRaw(".stableTokens.decimals"), (uint8));
+    uint256 inflationRate = abi.decode(json.parseRaw(".stableTokens.inflationRate"), (uint256));
+    uint256 inflationFactorUpdatePeriod = abi.decode(json.parseRaw(".stableTokens.inflationPeriod"), (uint256));
+    uint256 initialBalanceValue = abi.decode(json.parseRaw(".stableTokens.initialBalance"), (uint256));
+    bool frozen = abi.decode(json.parseRaw(".stableTokens.frozen"), (bool));
+    uint256 celoPrice = abi.decode(json.parseRaw(".stableTokens.celoPrice"), (uint256));
+    
+    
+    address[] memory initialBalanceAddresses = new address[](1);
+    initialBalanceAddresses[0] = deployerAccount;
+    // initialBalanceAddresses.push(deployerAccount);
+    uint256[] memory initialBalanceValues = new uint256[](1);
+    initialBalanceValues[0] = initialBalanceValue;
+    // initialBalanceValuees.push(initialBalanceValue);
+    
+    string memory exchangeIdentifier = "Exchange";
+
+    // TODO change `exchangeIdentifier`
+    for (uint256 i; i < names.length; i++){
+      deployStable(names[i], symbols[i], contractSufixs[i], decimals, inflationRate, inflationFactorUpdatePeriod, initialBalanceAddresses, initialBalanceValues, frozen, celoPrice);
+    }
   }
 
   function migrateExchange(string memory json) public {
