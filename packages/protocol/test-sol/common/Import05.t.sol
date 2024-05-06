@@ -5,5 +5,4 @@ import "../../lib/mento-core/contracts/StableToken.sol";
 import "../../lib/mento-core/contracts/StableTokenBRL.sol";
 import "../../lib/mento-core/contracts/StableTokenEUR.sol";
 
-
 contract Import05 {}
