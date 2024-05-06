@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# TODO move me to another folder
-
 # Compile everything
+forge build
+
 export ANVIL_PORT=8546
+
 # TODO make this configurable
 FROM_ACCOUNT_NO_ZERO="f39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
 FROM_ACCOUNT="0x$FROM_ACCOUNT_NO_ZERO"
@@ -12,7 +13,6 @@ TEMP_FOLDER="$PWD/.tmp"
 
 source $PWD/migrations_sol/start_anvil.sh
 
-# forge build
 source $PWD/migrations_sol/deploy_precompiles.sh
 
 
@@ -59,7 +59,8 @@ touch $LIBRARIES_FILE
 
 echo "$LIBRARIES" > $LIBRARIES_FILE
 
-# run migrations
+# helpers to disable broadcast and simulation
+# TODO move to configuration
 BROADCAST="--broadcast"
 SKIP_SUMULATION=""
 # SKIP_SUMULATION="--skip-simulation" 
@@ -68,16 +69,5 @@ SKIP_SUMULATION=""
 echo "Compiling with libraries... "
 time forge build $LIBRARIES
 
+# run migrations
 time forge script migrations_sol/Migration.s.sol --tc Migration --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive --sender $FROM_ACCOUNT --unlocked -- $LIBRARIES --revert-strings || echo "Migration script failed"
-
-# Run integration tests
-source $PWD/migrations_sol/integration_tests.sh
-
-
-# helper kill anvil
-# kill $(lsof -i tcp:$ANVIL_PORT | tail -n 1 | awk '{print $2}')
-
-echo "Killing Anvil"
-if [[ -n $ANVIL_PID ]]; then
-    kill $ANVIL_PID
-fi
