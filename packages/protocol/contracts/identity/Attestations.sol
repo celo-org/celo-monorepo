@@ -174,17 +174,6 @@ contract Attestations is
   }
 
   /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 3, 0, 0);
-  }
-
-  /**
    * @notice Revokes an account for an identifier.
    * @param identifier The identifier for which to revoke.
    * @param index The index of the account in the accounts array.
@@ -388,6 +377,50 @@ contract Attestations is
   }
 
   /**
+   * @notice Query 'maxAttestations'
+   * @return Maximum number of attestations that can be requested.
+   */
+  function getMaxAttestations() external view returns (uint256) {
+    return maxAttestations;
+  }
+
+  function lookupAccountsForIdentifier(bytes32 identifier)
+    external
+    view
+    returns (address[] memory)
+  {
+    return identifiers[identifier].accounts;
+  }
+
+  /**
+   * @notice Require that a given identifier/address pair has
+   * requested a specific number of attestations.
+   * @param identifier Hash of the identifier.
+   * @param account Address of the account.
+   * @param expected Number of expected attestations
+   * @dev It can be used when batching meta-transactions to validate
+   * attestation are requested as expected in untrusted scenarios
+   */
+  function requireNAttestationsRequested(bytes32 identifier, address account, uint32 expected)
+    external
+    view
+  {
+    uint256 requested = identifiers[identifier].attestations[account].requested;
+    require(requested == expected, "requested attestations does not match expected");
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 3, 0, 0);
+  }
+
+  /**
    * @notice Updates the fee  for a particular token.
    * @param token The address of the attestationRequestFeeToken.
    * @param fee The fee in 'token' that is required for each attestation.
@@ -431,14 +464,6 @@ contract Attestations is
   }
 
   /**
-   * @notice Query 'maxAttestations'
-   * @return Maximum number of attestations that can be requested.
-   */
-  function getMaxAttestations() external view returns (uint256) {
-    return maxAttestations;
-  }
-
-  /**
    * @notice Validates the given attestation code.
    * @param identifier The hash of the identifier to be attested.
    * @param account Address of the account. 
@@ -470,31 +495,6 @@ contract Attestations is
     require(!isAttestationExpired(attestation.blockNumber), "Attestation timed out");
 
     return issuer;
-  }
-
-  function lookupAccountsForIdentifier(bytes32 identifier)
-    external
-    view
-    returns (address[] memory)
-  {
-    return identifiers[identifier].accounts;
-  }
-
-  /**
-   * @notice Require that a given identifier/address pair has
-   * requested a specific number of attestations.
-   * @param identifier Hash of the identifier.
-   * @param account Address of the account.
-   * @param expected Number of expected attestations
-   * @dev It can be used when batching meta-transactions to validate
-   * attestation are requested as expected in untrusted scenarios
-   */
-  function requireNAttestationsRequested(bytes32 identifier, address account, uint32 expected)
-    external
-    view
-  {
-    uint256 requested = identifiers[identifier].attestations[account].requested;
-    require(requested == expected, "requested attestations does not match expected");
   }
 
   /**

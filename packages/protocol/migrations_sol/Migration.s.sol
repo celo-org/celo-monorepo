@@ -220,7 +220,6 @@ contract Migration is Script, UsingRegistry {
     migrateSortedOracles(json);
     migrateGasPriceMinimum(json);
     migrateReserve(json);
-    // cUER and cREAL not migrated
     migrateStableToken(json);
     migrateExchange(json);
     migrateAccount();
@@ -350,7 +349,6 @@ contract Migration is Script, UsingRegistry {
   ) public {
 
 
-    // TODO import StableTokenEUR so that it gets compiled and can get deployed
    string memory exchangeIdentifier = string.concat("Exchange", sufix);
    address stableTokenProxyAddress = deployProxiedContract(
       string.concat("StableToken", sufix),
@@ -361,8 +359,6 @@ contract Migration is Script, UsingRegistry {
     }
 
     // TODO add more configurable oracles from the json
-    // getSortedOracles();
-    // console.log("this worked");
     getSortedOracles().addOracle(stableTokenProxyAddress, deployerAccount);
 
     if (celoPrice != 0 ) {
@@ -378,7 +374,7 @@ contract Migration is Script, UsingRegistry {
   }
 
   function migrateStableToken(string memory json) public {
-    // TODO add cEUR, cBRL, etc
+
 
     string[] memory names = abi.decode(json.parseRaw(".stableTokens.names"), (string[]));
     string[] memory symbols = abi.decode(json.parseRaw(".stableTokens.names"), (string[]));
@@ -396,20 +392,17 @@ contract Migration is Script, UsingRegistry {
     
     address[] memory initialBalanceAddresses = new address[](1);
     initialBalanceAddresses[0] = deployerAccount;
-    // initialBalanceAddresses.push(deployerAccount);
+
     uint256[] memory initialBalanceValues = new uint256[](1);
     initialBalanceValues[0] = initialBalanceValue;
-    // initialBalanceValuees.push(initialBalanceValue);
-    
-    string memory exchangeIdentifier = "Exchange";
 
-    // TODO change `exchangeIdentifier`
     for (uint256 i; i < names.length; i++){
       deployStable(names[i], symbols[i], contractSufixs[i], decimals, inflationRate, inflationFactorUpdatePeriod, initialBalanceAddresses, initialBalanceValues, frozen, celoPrice);
     }
   }
 
   function migrateExchange(string memory json) public {
+    // TODO make this for all stables
   
     string memory stableTokenIdentifier = "StableToken";
     uint256 spread = abi.decode(json.parseRaw(".exchange.spread"), (uint256));
@@ -726,7 +719,6 @@ contract Migration is Script, UsingRegistry {
 
 
   function _setConstitution(address governanceAddress, string memory json) public {
-    // if I set this function outside 
     bool skipSetConstitution = abi.decode(json.parseRaw(".governance.skipSetConstitution"), (bool));
     IGovernance governance = IGovernance(governanceAddress);
     string memory constitutionJson = vm.readFile("./governanceConstitution.json");
@@ -798,7 +790,6 @@ contract Migration is Script, UsingRegistry {
 
     vm.stopBroadcast();
     return accountAddress;
-// 
   }
 
   function getValidatorKeyIndex(uint256 groupIndex, uint256 validatorIndex, uint256 membersInAGroup) public returns(uint256) {
@@ -829,12 +820,10 @@ contract Migration is Script, UsingRegistry {
     console.log("Electing validators: ");
 
     uint256 commission = abi.decode(json.parseRaw(".validators.commission"), (uint256));
-    // uint256 votesRatioOfLastVsFirstGroup = abi.decode(json.parseRaw(".validators.votesRatioOfLastVsFirstGroup"), (uint256));
     uint256 minElectableValidators = abi.decode(json.parseRaw(".election.minElectableValidators"), (uint256));
     uint256[] memory valKeys = abi.decode(json.parseRaw(".validators.valKeys"), (uint256[]));
     uint256 maxGroupSize = abi.decode(json.parseRaw(".validators.maxGroupSize"), (uint256));
     uint256 validatorLockedGoldRequirements = abi.decode(json.parseRaw(".validators.validatorLockedGoldRequirements.value"), (uint256));
-    // uint256 lockedGoldPerValAtFirstGroup = abi.decode(json.parseRaw(".validators.groupLockedGoldRequirements"), (uint256));
     bytes[] memory ecdsaPubKeys = abi.decode(json.parseRaw(".validators.ecdsaPubKeys"), (bytes[]));
     // attestationKeys not migrated
 

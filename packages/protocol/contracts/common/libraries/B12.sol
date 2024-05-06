@@ -17,10 +17,6 @@ library B12 {
     uint256 b;
   }
 
-  // Base field modulus from https://eips.ethereum.org/EIPS/eip-2539#specification
-  uint256 constant BLS12_377_BASE_A = 0x1ae3a4617c510eac63b05c06ca1493b;
-  uint256 constant BLS12_377_BASE_B = 0x1a22d9f300f5138f1ef3622fba094800170b5d44300000008508c00000000001;
-
   // Fp2 is an extension field element with the coefficient of the
   // quadratic non-residue stored in `b`, i.e. p = a + i * b
   struct Fp2 {
@@ -55,47 +51,9 @@ library B12 {
     G2Point g2;
   }
 
-  function FpEq(Fp memory a, Fp memory b) internal pure returns (bool) {
-    return (a.a == b.a && a.b == b.b);
-  }
-
-  function fpGt(Fp memory a, Fp memory b) internal pure returns (bool) {
-    return (a.a > b.a || (a.a == b.a && a.b > b.b));
-  }
-
-  function Fp2Eq(Fp2 memory a, Fp2 memory b) internal pure returns (bool) {
-    return FpEq(a.a, b.a) && FpEq(a.b, b.b);
-  }
-
-  function fp2Gt(Fp2 memory a, Fp2 memory b) internal pure returns (bool) {
-    if (FpEq(a.b, b.b)) return fpGt(a.a, b.a);
-    else return fpGt(a.b, b.b);
-  }
-
-  function fpAdd2(uint256 a, uint256 b) internal pure returns (Fp memory) {
-    return fpAdd(Fp(0, a), Fp(0, b));
-  }
-
-  function fpAdd3(uint256 a, uint256 b, uint256 c) internal pure returns (Fp memory) {
-    return fpAdd(Fp(0, a), fpAdd(Fp(0, b), Fp(0, c)));
-  }
-
-  function fpAdd4(uint256 a, uint256 b, uint256 c, uint256 d) internal pure returns (Fp memory) {
-    return fpAdd(Fp(0, a), fpAdd(Fp(0, b), fpAdd(Fp(0, c), Fp(0, d))));
-  }
-
-  function fpAdd(Fp memory a, Fp memory b) internal pure returns (Fp memory) {
-    uint256 bb = a.b + b.b;
-    uint256 aa = a.a + b.a + (bb >= a.b && bb >= b.b ? 0 : 1);
-    return Fp(aa, bb);
-  }
-
-  function fpSub(Fp memory a, Fp memory b) internal pure returns (Fp memory) {
-    Fp memory x = fpAdd(a, Fp(BLS12_377_BASE_A, BLS12_377_BASE_B));
-    uint256 bb = x.b - b.b;
-    uint256 aa = x.a - b.a - (bb <= x.b ? 0 : 1);
-    return Fp(aa, bb);
-  }
+  // Base field modulus from https://eips.ethereum.org/EIPS/eip-2539#specification
+  uint256 constant BLS12_377_BASE_A = 0x1ae3a4617c510eac63b05c06ca1493b;
+  uint256 constant BLS12_377_BASE_B = 0x1a22d9f300f5138f1ef3622fba094800170b5d44300000008508c00000000001;
 
   function fpModExp(Fp memory base, uint256 exponent, Fp memory modulus)
     internal
@@ -200,10 +158,6 @@ library B12 {
     return Fp2(fpNormal(a.a), fpNormal(a.b));
   }
 
-  function fp2Add(Fp2 memory a, Fp2 memory b) internal pure returns (Fp2 memory) {
-    return Fp2(fpAdd(a.a, b.a), fpAdd(a.b, b.b));
-  }
-
   function fp2Mul(Fp2 memory a, Fp2 memory b) internal view returns (Fp2 memory) {
     Fp memory non_residue = B12.Fp(
       0x01ae3a4617c510eac63b05c06ca1493b,
@@ -258,167 +212,6 @@ library B12 {
     require(FpEq(sqhint2, res), "y2 not sqrt");
     require(fpGt(hint1, hint2), "y1 not greatest");
     return G1Point(x, greatest ? hint1 : hint2);
-  }
-
-  function parsePointGen(bytes memory h, uint256 offset)
-    internal
-    pure
-    returns (uint256, uint256, uint256)
-  {
-    uint256 a = 0;
-    uint256 b = 0;
-    for (uint256 i = 0; i < 32; i++) {
-      uint256 byt = uint256(uint8(h[offset + i]));
-      b = b + (byt << (i * 8));
-    }
-    for (uint256 i = 0; i < 15; i++) {
-      uint256 byt = uint256(uint8(h[offset + i + 32]));
-      a = a + (byt << (i * 8));
-    }
-    return (a, b, uint256(uint8(h[offset + 47])));
-  }
-
-  function parsePoint(bytes memory h, uint256 offset) internal pure returns (Fp memory, bool) {
-    (uint256 a, uint256 b, uint256 byt) = parsePointGen(h, offset);
-    a = a + ((byt & 0x7f) << (15 * 8));
-    return (Fp(a, b), byt & 0xa0 != 0);
-  }
-
-  function parseSimplePoint(bytes memory h, uint256 offset) internal pure returns (Fp memory) {
-    Fp memory res = Fp(0, 0);
-    parseSimplePoint(h, offset, res);
-    return res;
-  }
-
-  function parseSimplePoint(bytes memory h, uint256 offset, Fp memory p) internal pure {
-    uint256 a;
-    uint256 b;
-    assembly {
-      a := mload(add(0x20, add(h, offset)))
-      b := mload(add(0x40, add(h, offset)))
-    }
-    p.a = a;
-    p.b = b;
-  }
-
-  function parsePoint(bytes memory h) internal pure returns (Fp memory, bool) {
-    return parsePoint(h, 0);
-  }
-
-  function parseRandomPoint(bytes memory h) internal pure returns (Fp memory, bool) {
-    (uint256 a, uint256 b, uint256 byt) = parsePointGen(h, 0);
-    a = a + ((byt & 0x01) << (15 * 8));
-    return (Fp(a, b), byt & 0x02 != 0);
-  }
-
-  function readFp2(bytes memory h, uint256 offset) internal pure returns (Fp2 memory) {
-    Fp memory a = parseSimplePoint(h, offset);
-    Fp memory b = parseSimplePoint(h, 64 + offset);
-    return Fp2(a, b);
-  }
-
-  function readFp2(bytes memory h, uint256 offset, Fp2 memory p) internal pure {
-    parseSimplePoint(h, offset, p.a);
-    parseSimplePoint(h, 64 + offset, p.b);
-  }
-
-  function readG2(bytes memory h, uint256 offset) internal pure returns (G2Point memory) {
-    Fp2 memory a = readFp2(h, offset);
-    Fp2 memory b = readFp2(h, 128 + offset);
-    return G2Point(a, b);
-  }
-
-  function readG2(bytes memory h, uint256 offset, G2Point memory p) internal pure {
-    readFp2(h, offset, p.X);
-    readFp2(h, 128 + offset, p.Y);
-  }
-
-  function g1Eq(G1Point memory a, G1Point memory b) internal pure returns (bool) {
-    return FpEq(a.X, b.X) && FpEq(a.Y, b.Y);
-  }
-
-  function g1Eq(G2Point memory a, G2Point memory b) internal pure returns (bool) {
-    return (Fp2Eq(a.X, b.X) && Fp2Eq(a.Y, b.Y));
-  }
-
-  function parseFp(bytes memory input, uint256 offset) internal pure returns (Fp memory ret) {
-    bytes29 ref = input.ref(0).postfix(input.length - offset, 0);
-
-    ret.a = ref.indexUint(0, 32);
-    ret.b = ref.indexUint(32, 32);
-  }
-
-  function parseFp2(bytes memory input, uint256 offset) internal pure returns (Fp2 memory ret) {
-    bytes29 ref = input.ref(0).postfix(input.length - offset, 0);
-
-    ret.a.a = ref.indexUint(0, 32);
-    ret.a.b = ref.indexUint(32, 32);
-    ret.b.a = ref.indexUint(64, 32);
-    ret.b.b = ref.indexUint(96, 32);
-  }
-
-  function parseCompactFp(bytes memory input, uint256 offset)
-    internal
-    pure
-    returns (Fp memory ret)
-  {
-    bytes29 ref = input.ref(0).postfix(input.length - offset, 0);
-
-    ret.a = ref.indexUint(0, 16);
-    ret.b = ref.indexUint(16, 32);
-  }
-
-  function parseCompactFp2(bytes memory input, uint256 offset)
-    internal
-    pure
-    returns (Fp2 memory ret)
-  {
-    bytes29 ref = input.ref(0).postfix(input.length - offset, 0);
-
-    ret.a.a = ref.indexUint(48, 16);
-    ret.a.b = ref.indexUint(64, 32);
-    ret.b.a = ref.indexUint(0, 16);
-    ret.b.b = ref.indexUint(16, 32);
-  }
-
-  function parseG1(bytes memory input, uint256 offset) internal pure returns (G1Point memory ret) {
-    // unchecked sub is safe due to view validity checks
-    bytes29 ref = input.ref(0).postfix(input.length - offset, 0);
-
-    ret.X.a = ref.indexUint(0, 32);
-    ret.X.b = ref.indexUint(32, 32);
-    ret.Y.a = ref.indexUint(64, 32);
-    ret.Y.b = ref.indexUint(96, 32);
-  }
-
-  function parseG2(bytes memory input, uint256 offset) internal pure returns (G2Point memory ret) {
-    // unchecked sub is safe due to view validity checks
-    bytes29 ref = input.ref(0).postfix(input.length - offset, 0);
-
-    ret.X.a.a = ref.indexUint(0, 32);
-    ret.X.a.b = ref.indexUint(32, 32);
-    ret.X.b.a = ref.indexUint(64, 32);
-    ret.X.b.b = ref.indexUint(96, 32);
-    ret.Y.a.a = ref.indexUint(128, 32);
-    ret.Y.a.b = ref.indexUint(160, 32);
-    ret.Y.b.a = ref.indexUint(192, 32);
-    ret.Y.b.b = ref.indexUint(224, 32);
-  }
-
-  function serializeFp(Fp memory p) internal pure returns (bytes memory) {
-    return abi.encodePacked(p.a, p.b);
-  }
-
-  function serializeFp2(Fp2 memory p) internal pure returns (bytes memory) {
-    return abi.encodePacked(p.a.a, p.a.b, p.b.a, p.b.b);
-  }
-
-  function serializeG1(G1Point memory p) internal pure returns (bytes memory) {
-    return abi.encodePacked(p.X.a, p.X.b, p.Y.a, p.Y.b);
-  }
-
-  function serializeG2(G2Point memory p) internal pure returns (bytes memory) {
-    return abi.encodePacked(p.X.a.a, p.X.a.b, p.X.b.a, p.X.b.b, p.Y.a.a, p.Y.a.b, p.Y.b.a, p.Y.b.b);
   }
 
   function g1Add(G1Point memory a, G1Point memory b, uint8 precompile, uint256 gasEstimate)
@@ -698,6 +491,213 @@ library B12 {
     }
     require(success, "pairing precompile failed");
   }
+
+  function fp2Add(Fp2 memory a, Fp2 memory b) internal pure returns (Fp2 memory) {
+    return Fp2(fpAdd(a.a, b.a), fpAdd(a.b, b.b));
+  }
+
+  function FpEq(Fp memory a, Fp memory b) internal pure returns (bool) {
+    return (a.a == b.a && a.b == b.b);
+  }
+
+  function fpGt(Fp memory a, Fp memory b) internal pure returns (bool) {
+    return (a.a > b.a || (a.a == b.a && a.b > b.b));
+  }
+
+  function Fp2Eq(Fp2 memory a, Fp2 memory b) internal pure returns (bool) {
+    return FpEq(a.a, b.a) && FpEq(a.b, b.b);
+  }
+
+  function fp2Gt(Fp2 memory a, Fp2 memory b) internal pure returns (bool) {
+    if (FpEq(a.b, b.b)) return fpGt(a.a, b.a);
+    else return fpGt(a.b, b.b);
+  }
+
+  function fpAdd2(uint256 a, uint256 b) internal pure returns (Fp memory) {
+    return fpAdd(Fp(0, a), Fp(0, b));
+  }
+
+  function fpAdd3(uint256 a, uint256 b, uint256 c) internal pure returns (Fp memory) {
+    return fpAdd(Fp(0, a), fpAdd(Fp(0, b), Fp(0, c)));
+  }
+
+  function fpAdd4(uint256 a, uint256 b, uint256 c, uint256 d) internal pure returns (Fp memory) {
+    return fpAdd(Fp(0, a), fpAdd(Fp(0, b), fpAdd(Fp(0, c), Fp(0, d))));
+  }
+
+  function fpAdd(Fp memory a, Fp memory b) internal pure returns (Fp memory) {
+    uint256 bb = a.b + b.b;
+    uint256 aa = a.a + b.a + (bb >= a.b && bb >= b.b ? 0 : 1);
+    return Fp(aa, bb);
+  }
+
+  function fpSub(Fp memory a, Fp memory b) internal pure returns (Fp memory) {
+    Fp memory x = fpAdd(a, Fp(BLS12_377_BASE_A, BLS12_377_BASE_B));
+    uint256 bb = x.b - b.b;
+    uint256 aa = x.a - b.a - (bb <= x.b ? 0 : 1);
+    return Fp(aa, bb);
+  }
+
+  function parsePointGen(bytes memory h, uint256 offset)
+    internal
+    pure
+    returns (uint256, uint256, uint256)
+  {
+    uint256 a = 0;
+    uint256 b = 0;
+    for (uint256 i = 0; i < 32; i++) {
+      uint256 byt = uint256(uint8(h[offset + i]));
+      b = b + (byt << (i * 8));
+    }
+    for (uint256 i = 0; i < 15; i++) {
+      uint256 byt = uint256(uint8(h[offset + i + 32]));
+      a = a + (byt << (i * 8));
+    }
+    return (a, b, uint256(uint8(h[offset + 47])));
+  }
+
+  function parsePoint(bytes memory h, uint256 offset) internal pure returns (Fp memory, bool) {
+    (uint256 a, uint256 b, uint256 byt) = parsePointGen(h, offset);
+    a = a + ((byt & 0x7f) << (15 * 8));
+    return (Fp(a, b), byt & 0xa0 != 0);
+  }
+
+  function parseSimplePoint(bytes memory h, uint256 offset) internal pure returns (Fp memory) {
+    Fp memory res = Fp(0, 0);
+    parseSimplePoint(h, offset, res);
+    return res;
+  }
+
+  function parseSimplePoint(bytes memory h, uint256 offset, Fp memory p) internal pure {
+    uint256 a;
+    uint256 b;
+    assembly {
+      a := mload(add(0x20, add(h, offset)))
+      b := mload(add(0x40, add(h, offset)))
+    }
+    p.a = a;
+    p.b = b;
+  }
+
+  function parsePoint(bytes memory h) internal pure returns (Fp memory, bool) {
+    return parsePoint(h, 0);
+  }
+
+  function parseRandomPoint(bytes memory h) internal pure returns (Fp memory, bool) {
+    (uint256 a, uint256 b, uint256 byt) = parsePointGen(h, 0);
+    a = a + ((byt & 0x01) << (15 * 8));
+    return (Fp(a, b), byt & 0x02 != 0);
+  }
+
+  function readFp2(bytes memory h, uint256 offset) internal pure returns (Fp2 memory) {
+    Fp memory a = parseSimplePoint(h, offset);
+    Fp memory b = parseSimplePoint(h, 64 + offset);
+    return Fp2(a, b);
+  }
+
+  function readFp2(bytes memory h, uint256 offset, Fp2 memory p) internal pure {
+    parseSimplePoint(h, offset, p.a);
+    parseSimplePoint(h, 64 + offset, p.b);
+  }
+
+  function readG2(bytes memory h, uint256 offset) internal pure returns (G2Point memory) {
+    Fp2 memory a = readFp2(h, offset);
+    Fp2 memory b = readFp2(h, 128 + offset);
+    return G2Point(a, b);
+  }
+
+  function readG2(bytes memory h, uint256 offset, G2Point memory p) internal pure {
+    readFp2(h, offset, p.X);
+    readFp2(h, 128 + offset, p.Y);
+  }
+
+  function g1Eq(G1Point memory a, G1Point memory b) internal pure returns (bool) {
+    return FpEq(a.X, b.X) && FpEq(a.Y, b.Y);
+  }
+
+  function g1Eq(G2Point memory a, G2Point memory b) internal pure returns (bool) {
+    return (Fp2Eq(a.X, b.X) && Fp2Eq(a.Y, b.Y));
+  }
+
+  function parseFp(bytes memory input, uint256 offset) internal pure returns (Fp memory ret) {
+    bytes29 ref = input.ref(0).postfix(input.length - offset, 0);
+
+    ret.a = ref.indexUint(0, 32);
+    ret.b = ref.indexUint(32, 32);
+  }
+
+  function parseFp2(bytes memory input, uint256 offset) internal pure returns (Fp2 memory ret) {
+    bytes29 ref = input.ref(0).postfix(input.length - offset, 0);
+
+    ret.a.a = ref.indexUint(0, 32);
+    ret.a.b = ref.indexUint(32, 32);
+    ret.b.a = ref.indexUint(64, 32);
+    ret.b.b = ref.indexUint(96, 32);
+  }
+
+  function parseCompactFp(bytes memory input, uint256 offset)
+    internal
+    pure
+    returns (Fp memory ret)
+  {
+    bytes29 ref = input.ref(0).postfix(input.length - offset, 0);
+
+    ret.a = ref.indexUint(0, 16);
+    ret.b = ref.indexUint(16, 32);
+  }
+
+  function parseCompactFp2(bytes memory input, uint256 offset)
+    internal
+    pure
+    returns (Fp2 memory ret)
+  {
+    bytes29 ref = input.ref(0).postfix(input.length - offset, 0);
+
+    ret.a.a = ref.indexUint(48, 16);
+    ret.a.b = ref.indexUint(64, 32);
+    ret.b.a = ref.indexUint(0, 16);
+    ret.b.b = ref.indexUint(16, 32);
+  }
+
+  function parseG1(bytes memory input, uint256 offset) internal pure returns (G1Point memory ret) {
+    // unchecked sub is safe due to view validity checks
+    bytes29 ref = input.ref(0).postfix(input.length - offset, 0);
+
+    ret.X.a = ref.indexUint(0, 32);
+    ret.X.b = ref.indexUint(32, 32);
+    ret.Y.a = ref.indexUint(64, 32);
+    ret.Y.b = ref.indexUint(96, 32);
+  }
+
+  function parseG2(bytes memory input, uint256 offset) internal pure returns (G2Point memory ret) {
+    // unchecked sub is safe due to view validity checks
+    bytes29 ref = input.ref(0).postfix(input.length - offset, 0);
+
+    ret.X.a.a = ref.indexUint(0, 32);
+    ret.X.a.b = ref.indexUint(32, 32);
+    ret.X.b.a = ref.indexUint(64, 32);
+    ret.X.b.b = ref.indexUint(96, 32);
+    ret.Y.a.a = ref.indexUint(128, 32);
+    ret.Y.a.b = ref.indexUint(160, 32);
+    ret.Y.b.a = ref.indexUint(192, 32);
+    ret.Y.b.b = ref.indexUint(224, 32);
+  }
+
+  function serializeFp(Fp memory p) internal pure returns (bytes memory) {
+    return abi.encodePacked(p.a, p.b);
+  }
+
+  function serializeFp2(Fp2 memory p) internal pure returns (bytes memory) {
+    return abi.encodePacked(p.a.a, p.a.b, p.b.a, p.b.b);
+  }
+
+  function serializeG1(G1Point memory p) internal pure returns (bytes memory) {
+    return abi.encodePacked(p.X.a, p.X.b, p.Y.a, p.Y.b);
+  }
+
+  function serializeG2(G2Point memory p) internal pure returns (bytes memory) {
+    return abi.encodePacked(p.X.a.a, p.X.a.b, p.X.b.a, p.X.b.b, p.Y.a.a, p.Y.a.b, p.Y.b.a, p.Y.b.b);
+  }
 }
 
 library B12_381Lib {
@@ -713,13 +713,6 @@ library B12_381Lib {
   uint8 constant PAIRING = 0xEC;
   uint8 constant MAP_TO_G1 = 0xEB;
   uint8 constant MAP_TO_G2 = 0xEA;
-
-  function negativeP1() internal pure returns (B12.G1Point memory p) {
-    p.X.a = 31827880280837800241567138048534752271;
-    p.X.b = 88385725958748408079899006800036250932223001591707578097800747617502997169851;
-    p.Y.a = 22997279242622214937712647648895181298;
-    p.Y.b = 46816884707101390882112958134453447585552332943769894357249934112654335001290;
-  }
 
   function mapToG1(B12.Fp memory a) internal view returns (B12.G1Point memory b) {
     uint256[2] memory input;
@@ -820,6 +813,13 @@ library B12_381Lib {
   function pairing(B12.PairingArg[] memory argVec) internal view returns (bool result) {
     uint256 roughCost = (23000 * argVec.length) + 115000;
     return B12.pairing(argVec, PAIRING, roughCost);
+  }
+
+  function negativeP1() internal pure returns (B12.G1Point memory p) {
+    p.X.a = 31827880280837800241567138048534752271;
+    p.X.b = 88385725958748408079899006800036250932223001591707578097800747617502997169851;
+    p.Y.a = 22997279242622214937712647648895181298;
+    p.Y.b = 46816884707101390882112958134453447585552332943769894357249934112654335001290;
   }
 }
 

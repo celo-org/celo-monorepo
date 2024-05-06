@@ -114,6 +114,13 @@ interface IBreakerBox {
   event BreakerStatusUpdated(address breaker, address rateFeedID, bool status);
 
   /**
+   * @notice Checks breakers for the rateFeedID and sets correct trading mode
+   * if any breakers are tripped or need to be reset.
+   * @param rateFeedID The address of the rate feed to run checks for.
+   */
+  function checkAndSetBreakers(address rateFeedID) external;
+
+  /**
    * @notice Retrives an array of all breaker addresses.
    */
   function getBreakers() external view returns (address[] memory);
@@ -124,13 +131,6 @@ interface IBreakerBox {
    * @return A bool indicating whether or not the breaker has been added.
    */
   function isBreaker(address breaker) external view returns (bool);
-
-  /**
-   * @notice Checks breakers for the rateFeedID and sets correct trading mode
-   * if any breakers are tripped or need to be reset.
-   * @param rateFeedID The address of the rate feed to run checks for.
-   */
-  function checkAndSetBreakers(address rateFeedID) external;
 
   /**
    * @notice Gets the trading mode for the specified rateFeedID.

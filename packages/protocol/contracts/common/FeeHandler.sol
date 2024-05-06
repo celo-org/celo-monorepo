@@ -38,6 +38,18 @@ contract FeeHandler is
   using FixidityLib for FixidityLib.Fraction;
   using EnumerableSet for EnumerableSet.AddressSet;
 
+  struct TokenState {
+    address handler;
+    FixidityLib.Fraction maxSlippage;
+    // Max amounts that can be burned in a day for a token
+    uint256 dailySellLimit;
+    // Max amounts that can be burned today for a token
+    uint256 currentDaySellLimit;
+    uint256 toDistribute;
+    // Historical amounts burned by this contract
+    uint256 pastBurn;
+  }
+
   uint256 public constant FIXED1_UINT = 1000000000000000000000000; // TODO move to FIX and add check
 
   // Min units that can be burned
@@ -56,18 +68,6 @@ contract FeeHandler is
   // and that'd be only supported with experimental features in this
   // compiler version
   mapping(address => TokenState) private tokenStates;
-
-  struct TokenState {
-    address handler;
-    FixidityLib.Fraction maxSlippage;
-    // Max amounts that can be burned in a day for a token
-    uint256 dailySellLimit;
-    // Max amounts that can be burned today for a token
-    uint256 currentDaySellLimit;
-    uint256 toDistribute;
-    // Historical amounts burned by this contract
-    uint256 pastBurn;
-  }
 
   EnumerableSet.AddressSet private activeTokens;
 
@@ -120,6 +120,146 @@ contract FeeHandler is
 
   // Without this the contract cant receive Celo as native transfer
   function() external payable {}
+
+  /**
+    @dev Sets the fee beneficiary address to the specified address.
+    @param beneficiary The address to set as the fee beneficiary.
+  */
+  function setFeeBeneficiary(address beneficiary) external onlyOwner {
+    return _setFeeBeneficiary(beneficiary);
+  }
+
+  /**
+    @dev Sets the burn fraction to the specified value.
+    @param fraction The value to set as the burn fraction.
+  */
+  function setBurnFraction(uint256 fraction) external onlyOwner {
+    return _setBurnFraction(fraction);
+  }
+
+  /**
+    @dev Sets the burn fraction to the specified value. Token has to have a handler set.
+    @param tokenAddress The address of the token to sell
+  */
+  function sell(address tokenAddress) external {
+    return _sell(tokenAddress);
+  }
+
+  /**
+    @dev Adds a new token to the contract with the specified token and handler addresses.
+    @param tokenAddress The address of the token to add.
+    @param handlerAddress The address of the handler contract for the specified token.
+  */
+  function addToken(address tokenAddress, address handlerAddress) external onlyOwner {
+    _addToken(tokenAddress, handlerAddress);
+  }
+
+  /**
+    @notice Allows the owner to activate a specified token.
+    @param tokenAddress The address of the token to be activated.
+  */
+  function activateToken(address tokenAddress) external onlyOwner {
+    _activateToken(tokenAddress);
+  }
+
+  /**
+    @dev Deactivates the specified token by marking it as inactive.
+    @param tokenAddress The address of the token to deactivate.
+  */
+  function deactivateToken(address tokenAddress) external onlyOwner {
+    _deactivateToken(tokenAddress);
+  }
+
+  /**
+    @notice Allows the owner to set a handler contract for a specified token.
+    @param tokenAddress The address of the token to set the handler for.
+    @param handlerAddress The address of the handler contract to be set.
+  */
+  function setHandler(address tokenAddress, address handlerAddress) external onlyOwner {
+    _setHandler(tokenAddress, handlerAddress);
+  }
+
+  function removeToken(address tokenAddress) external onlyOwner {
+    _removeToken(tokenAddress);
+  }
+
+  /**
+    @dev Distributes the available tokens for the specified token address to the fee beneficiary.
+    @param tokenAddress The address of the token for which to distribute the available tokens.
+  */
+  function distribute(address tokenAddress) external {
+    return _distribute(tokenAddress);
+  }
+
+  /**
+    * @notice Allows owner to set max slippage for a token.
+    * @param token Address of the token to set.
+    * @param newMax New sllipage to set, as Fixidity fraction.
+    */
+  function setMaxSplippage(address token, uint256 newMax) external onlyOwner {
+    _setMaxSplippage(token, newMax);
+  }
+
+  /**
+    * @notice Allows owner to set the daily burn limit for a token.
+    * @param token Address of the token to set.
+    * @param newLimit The new limit to set, in the token units.
+    */
+  function setDailySellLimit(address token, uint256 newLimit) external onlyOwner {
+    _setDailySellLimit(token, newLimit);
+  }
+
+  /**
+  @dev Burns CELO tokens according to burnFraction.
+  */
+  function burnCelo() external {
+    return _burnCelo();
+  }
+
+  /**
+    @dev Distributes the available tokens for all registered tokens to the feeBeneficiary.
+  */
+  function distributeAll() external {
+    return _distributeAll();
+  }
+
+  /**
+    @dev Distributes the available tokens for all registered tokens to the feeBeneficiary.
+  */
+  function handleAll() external {
+    return _handleAll();
+  }
+
+  /**
+    @dev Distributes the the token for to the feeBeneficiary.
+  */
+  function handle(address tokenAddress) external {
+    return _handle(tokenAddress);
+  }
+
+  /**
+    * @notice Allows owner to transfer tokens of this contract. It's meant for governance to
+      trigger use cases not contemplated in this contract.
+      @param token The address of the token to transfer.
+      @param recipient The address of the recipient to transfer the tokens to.
+      @param value The amount of tokens to transfer.
+      @return A boolean indicating whether the transfer was successful or not.
+    */
+  function transfer(address token, address recipient, uint256 value)
+    external
+    onlyOwner
+    returns (bool)
+  {
+    return IERC20(token).transfer(recipient, value);
+  }
+
+  /**
+    * @param token The address of the token to query.
+    * @return The amount burned for a token.
+    */
+  function getPastBurnForToken(address token) external view returns (uint256) {
+    return tokenStates[token].pastBurn;
+  }
 
   /**
     @dev Returns the handler address for the specified token.
@@ -178,29 +318,47 @@ contract FeeHandler is
     return tokenStates[tokenAddress].toDistribute;
   }
 
-  function getActiveTokens() public view returns (address[] memory) {
-    return activeTokens.values;
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 0, 0);
   }
 
   /**
-    @dev Sets the fee beneficiary address to the specified address.
-    @param beneficiary The address to set as the fee beneficiary.
-  */
-  function setFeeBeneficiary(address beneficiary) external onlyOwner {
-    return _setFeeBeneficiary(beneficiary);
+    * @param token The address of the token to query.
+    * @param amountToBurn The amount of the token to burn.
+    * @return Returns true if burning amountToBurn would exceed the daily limit.
+    */
+  function dailySellLimitHit(address token, uint256 amountToBurn) public returns (bool) {
+    TokenState storage tokenState = tokenStates[token];
+
+    if (tokenState.dailySellLimit == 0) {
+      // if no limit set, assume uncapped
+      return false;
+    }
+
+    uint256 currentDay = now / 1 days;
+    // Pattern borrowed from Reserve.sol
+    if (currentDay > lastLimitDay) {
+      lastLimitDay = currentDay;
+      tokenState.currentDaySellLimit = tokenState.dailySellLimit;
+    }
+
+    return amountToBurn >= tokenState.currentDaySellLimit;
+  }
+
+  function getActiveTokens() public view returns (address[] memory) {
+    return activeTokens.values;
   }
 
   function _setFeeBeneficiary(address beneficiary) private {
     feeBeneficiary = beneficiary;
     emit FeeBeneficiarySet(beneficiary);
-  }
-
-  /**
-    @dev Sets the burn fraction to the specified value.
-    @param fraction The value to set as the burn fraction.
-  */
-  function setBurnFraction(uint256 fraction) external onlyOwner {
-    return _setBurnFraction(fraction);
   }
 
   function _setBurnFraction(uint256 newFraction) private {
@@ -213,23 +371,6 @@ contract FeeHandler is
     emit BurnFractionSet(newFraction);
   }
 
-  /**
-    @dev Sets the burn fraction to the specified value. Token has to have a handler set.
-    @param tokenAddress The address of the token to sell
-  */
-  function sell(address tokenAddress) external {
-    return _sell(tokenAddress);
-  }
-
-  /**
-    @dev Adds a new token to the contract with the specified token and handler addresses.
-    @param tokenAddress The address of the token to add.
-    @param handlerAddress The address of the handler contract for the specified token.
-  */
-  function addToken(address tokenAddress, address handlerAddress) external onlyOwner {
-    _addToken(tokenAddress, handlerAddress);
-  }
-
   function _addToken(address tokenAddress, address handlerAddress) private {
     require(handlerAddress != address(0), "Can't set handler to zero");
     TokenState storage tokenState = tokenStates[tokenAddress];
@@ -237,14 +378,6 @@ contract FeeHandler is
 
     activeTokens.add(tokenAddress);
     emit TokenAdded(tokenAddress, handlerAddress);
-  }
-
-  /**
-    @notice Allows the owner to activate a specified token.
-    @param tokenAddress The address of the token to be activated.
-  */
-  function activateToken(address tokenAddress) external onlyOwner {
-    _activateToken(tokenAddress);
   }
 
   function _activateToken(address tokenAddress) private {
@@ -257,35 +390,14 @@ contract FeeHandler is
     activeTokens.add(tokenAddress);
   }
 
-  /**
-    @dev Deactivates the specified token by marking it as inactive.
-    @param tokenAddress The address of the token to deactivate.
-  */
-  function deactivateToken(address tokenAddress) external onlyOwner {
-    _deactivateToken(tokenAddress);
-  }
-
   function _deactivateToken(address tokenAddress) private {
     activeTokens.remove(tokenAddress);
-  }
-
-  /**
-    @notice Allows the owner to set a handler contract for a specified token.
-    @param tokenAddress The address of the token to set the handler for.
-    @param handlerAddress The address of the handler contract to be set.
-  */
-  function setHandler(address tokenAddress, address handlerAddress) external onlyOwner {
-    _setHandler(tokenAddress, handlerAddress);
   }
 
   function _setHandler(address tokenAddress, address handlerAddress) private {
     require(handlerAddress != address(0), "Can't set handler to zero, use deactivateToken");
     TokenState storage tokenState = tokenStates[tokenAddress];
     tokenState.handler = handlerAddress;
-  }
-
-  function removeToken(address tokenAddress) external onlyOwner {
-    _removeToken(tokenAddress);
   }
 
   function _removeToken(address tokenAddress) private {
@@ -342,14 +454,6 @@ contract FeeHandler is
     emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
   }
 
-  /**
-    @dev Distributes the available tokens for the specified token address to the fee beneficiary.
-    @param tokenAddress The address of the token for which to distribute the available tokens.
-  */
-  function distribute(address tokenAddress) external {
-    return _distribute(tokenAddress);
-  }
-
   function _distribute(address tokenAddress) private onlyWhenNotFrozen nonReentrant {
     require(feeBeneficiary != address(0), "Can't distribute to the zero address");
     IERC20 token = IERC20(tokenAddress);
@@ -374,26 +478,6 @@ contract FeeHandler is
     tokenState.toDistribute = tokenState.toDistribute.sub(balanceToDistribute);
   }
 
-  /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
-  }
-
-  /**
-    * @notice Allows owner to set max slippage for a token.
-    * @param token Address of the token to set.
-    * @param newMax New sllipage to set, as Fixidity fraction.
-    */
-  function setMaxSplippage(address token, uint256 newMax) external onlyOwner {
-    _setMaxSplippage(token, newMax);
-  }
-
   function _setMaxSplippage(address token, uint256 newMax) private {
     TokenState storage tokenState = tokenStates[token];
     require(newMax != 0, "Cannot set max slippage to zero");
@@ -405,33 +489,10 @@ contract FeeHandler is
     emit MaxSlippageSet(token, newMax);
   }
 
-  /**
-    * @notice Allows owner to set the daily burn limit for a token.
-    * @param token Address of the token to set.
-    * @param newLimit The new limit to set, in the token units.
-    */
-  function setDailySellLimit(address token, uint256 newLimit) external onlyOwner {
-    _setDailySellLimit(token, newLimit);
-  }
-
   function _setDailySellLimit(address token, uint256 newLimit) private {
     TokenState storage tokenState = tokenStates[token];
     tokenState.dailySellLimit = newLimit;
     emit DailyLimitSet(token, newLimit);
-  }
-
-  /**
-  @dev Burns CELO tokens according to burnFraction.
-  */
-  function burnCelo() external {
-    return _burnCelo();
-  }
-
-  /**
-    @dev Distributes the available tokens for all registered tokens to the feeBeneficiary.
-  */
-  function distributeAll() external {
-    return _distributeAll();
   }
 
   function _distributeAll() private {
@@ -443,13 +504,6 @@ contract FeeHandler is
     _distribute(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 
-  /**
-    @dev Distributes the available tokens for all registered tokens to the feeBeneficiary.
-  */
-  function handleAll() external {
-    return _handleAll();
-  }
-
   function _handleAll() private {
     for (uint256 i = 0; i < EnumerableSet.length(activeTokens); i++) {
       // calling _handle would trigger may burn Celo and distributions
@@ -459,13 +513,6 @@ contract FeeHandler is
     }
     _distributeAll(); // distributes Celo as well
     _burnCelo();
-  }
-
-  /**
-    @dev Distributes the the token for to the feeBeneficiary.
-  */
-  function handle(address tokenAddress) external {
-    return _handle(tokenAddress);
   }
 
   function _handle(address tokenAddress) private {
@@ -504,37 +551,6 @@ contract FeeHandler is
   }
 
   /**
-    * @param token The address of the token to query.
-    * @return The amount burned for a token.
-    */
-  function getPastBurnForToken(address token) external view returns (uint256) {
-    return tokenStates[token].pastBurn;
-  }
-
-  /**
-    * @param token The address of the token to query.
-    * @param amountToBurn The amount of the token to burn.
-    * @return Returns true if burning amountToBurn would exceed the daily limit.
-    */
-  function dailySellLimitHit(address token, uint256 amountToBurn) public returns (bool) {
-    TokenState storage tokenState = tokenStates[token];
-
-    if (tokenState.dailySellLimit == 0) {
-      // if no limit set, assume uncapped
-      return false;
-    }
-
-    uint256 currentDay = now / 1 days;
-    // Pattern borrowed from Reserve.sol
-    if (currentDay > lastLimitDay) {
-      lastLimitDay = currentDay;
-      tokenState.currentDaySellLimit = tokenState.dailySellLimit;
-    }
-
-    return amountToBurn >= tokenState.currentDaySellLimit;
-  }
-
-  /**
     * @notice Updates the current day limit for a token.
     * @param token The address of the token to query.
     * @param amountBurned the amount of the token that was burned.
@@ -548,21 +564,5 @@ contract FeeHandler is
     }
     tokenState.currentDaySellLimit = tokenState.currentDaySellLimit.sub(amountBurned);
     emit DailySellLimitUpdated(amountBurned);
-  }
-
-  /**
-    * @notice Allows owner to transfer tokens of this contract. It's meant for governance to
-      trigger use cases not contemplated in this contract.
-      @param token The address of the token to transfer.
-      @param recipient The address of the recipient to transfer the tokens to.
-      @param value The amount of tokens to transfer.
-      @return A boolean indicating whether the transfer was successful or not.
-    */
-  function transfer(address token, address recipient, uint256 value)
-    external
-    onlyOwner
-    returns (bool)
-  {
-    return IERC20(token).transfer(recipient, value);
   }
 }

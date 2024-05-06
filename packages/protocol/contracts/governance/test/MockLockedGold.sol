@@ -28,10 +28,6 @@ contract MockLockedGold is ILockedGold {
     nonvotingAccountBalance[account] = nonvotingAccountBalance[account].add(value);
   }
 
-  function decrementNonvotingAccountBalance(address account, uint256 value) public {
-    nonvotingAccountBalance[account] = nonvotingAccountBalance[account].sub(value);
-  }
-
   function setAccountTotalLockedGold(address account, uint256 value) external {
     accountTotalLockedGold[account] = value;
   }
@@ -44,15 +40,8 @@ contract MockLockedGold is ILockedGold {
     totalGovernancePower[account] = value;
   }
 
-  function getAccountTotalLockedGold(address account) external view returns (uint256) {
-    return accountTotalLockedGold[account];
-  }
-
   function setTotalLockedGold(uint256 value) external {
     totalLockedGold = value;
-  }
-  function getTotalLockedGold() external view returns (uint256) {
-    return totalLockedGold;
   }
 
   function lock() external payable {
@@ -87,6 +76,14 @@ contract MockLockedGold is ILockedGold {
   }
   function removeSlasher(address slasher) external {
     slashingWhitelist[slasher] = false;
+  }
+
+  function getAccountTotalLockedGold(address account) external view returns (uint256) {
+    return accountTotalLockedGold[account];
+  }
+
+  function getTotalLockedGold() external view returns (uint256) {
+    return totalLockedGold;
   }
   function isSlasher(address slasher) external view returns (bool) {
     return slashingWhitelist[slasher];
@@ -129,7 +126,7 @@ contract MockLockedGold is ILockedGold {
     return 0;
   }
 
-  function addSlasher(string calldata) external {
-    require(false, "Not implemented");
+  function decrementNonvotingAccountBalance(address account, uint256 value) public {
+    nonvotingAccountBalance[account] = nonvotingAccountBalance[account].sub(value);
   }
 }

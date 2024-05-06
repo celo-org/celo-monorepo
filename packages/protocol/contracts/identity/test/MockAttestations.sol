@@ -39,10 +39,6 @@ contract MockAttestations {
     identifiers[identifier].attestations[msg.sender].requested++;
   }
 
-  function getMaxAttestations() external pure returns (uint256) {
-    return 20;
-  }
-
   function getAttestationStats(bytes32 identifier, address account)
     external
     view
@@ -60,5 +56,9 @@ contract MockAttestations {
     returns (address[] memory)
   {
     return identifiers[identifier].accounts;
+  }
+
+  function getMaxAttestations() external pure returns (uint256) {
+    return 20;
   }
 }

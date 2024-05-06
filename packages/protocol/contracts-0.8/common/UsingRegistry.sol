@@ -21,8 +21,6 @@ import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
 // import "forge-std/console.sol";
 
 contract UsingRegistry is Ownable {
-  event RegistrySet(address indexed registryAddress);
-
   // solhint-disable state-visibility
   bytes32 constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
   bytes32 constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));
@@ -53,6 +51,8 @@ contract UsingRegistry is Ownable {
   // solhint-enable state-visibility
 
   IRegistry public registry;
+
+  event RegistrySet(address indexed registryAddress);
 
   modifier onlyRegisteredContract(bytes32 identifierHash) {
     require(registry.getAddressForOrDie(identifierHash) == msg.sender, "only registered contract");

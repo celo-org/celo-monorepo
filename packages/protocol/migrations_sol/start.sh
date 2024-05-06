@@ -38,6 +38,7 @@ LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.
 )
 
 LIBRARIES=""
+
 for library in "${LIBRARIES_PATH[@]}"; do
     library_name="${library#*:}" 
     echo "Deploying library: $library_name"
