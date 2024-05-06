@@ -1,8 +1,6 @@
 pragma solidity >=0.8.7 <0.8.20;
-// Can be moved to 0.8 if I use the interfaces? Need to do for Proxy
-// TODO proxy should have getOwner as external
 
-// Note: This scrip should not include any cheatcode so that it can run in production
+// Note: This script should not include any cheatcode so that it can run in production
 
 import {Script} from "forge-std-8/Script.sol";
 import "forge-std/console.sol";
@@ -53,15 +51,16 @@ import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 
 contract ForceTx {
 
-  event VanillaEvent(string); // event to trigger so a tx can be processed
+  // event to trigger so a tx can be processed
+  event VanillaEvent(string);
 
+  // helper used to know the account broadcasting a tx
   function identity() public returns (address) {
     emit VanillaEvent("nop");
     return msg.sender;
   }
 }
 
-// Using Registry
 contract Migration is Script, UsingRegistry {
   using stdJson for string;
 
@@ -125,11 +124,6 @@ contract Migration is Script, UsingRegistry {
     string memory contractName,
     bytes memory initializeCalldata
   ) public {
-    // bytes memory implementationBytecode = vm.getCode(string.concat(contractName, ".sol"));
-    console.log("msg.sender", msg.sender);
-    console.log("address(this)", address(this));
-    // console.log("address(Create2)", address(Create2));
-    // console.log("owner of proxy is:", proxy._getOwner());
     bytes memory implementationBytecode = vm.getCode(string.concat("out/", contractName, ".sol/", contractName, ".json"));
     bool testingDeployment = false;
     bytes memory initialCode = abi.encodePacked(
@@ -137,7 +131,8 @@ contract Migration is Script, UsingRegistry {
       abi.encode(testingDeployment)
     );
     address implementation = create2deploy(bytes32(proxyNonce), initialCode);
-    proxyNonce++; // nonce to avoid having the same address to deploy to, likely won't needed but just in case
+    // nonce to avoid having the same address to deploy to, likely won't needed but just in case
+    proxyNonce++;
     console.log(" Implementation deployed to:", address(implementation));
     console.log(" Calling initialize(..)");
     proxy._setAndInitializeImplementation(implementation, initializeCalldata);
@@ -164,15 +159,10 @@ contract Migration is Script, UsingRegistry {
 
     // Can't deploy with new Proxy() because Proxy is in 0.5
     // Proxy proxy = new Proxy();
-    // In production this should use create2, in testing can't do that
+    // In production this should use create2, in anvil can't do that
     // because forge re-routes the create2 via Create2Deployer contract to have predictable address
-    // address proxyAddress = create2deploy(bytes32(proxyNonce), vm.getCode("Proxy.sol"));
-    // TODO figure out if this works in production
-
-    // address proxyAddress = address(
-    //   uint160((uint256(sha256(abi.encode(vm.getCode("Proxy.sol"), proxyNonce)))))
-    // );
-    // deployCodeTo("Proxy.sol", abi.encode(false), proxyAddress);
+    // then, a owner can be set
+  
     proxyAddress = proxyFactory.deployProxy();
 
     IProxy proxy = IProxy(proxyAddress);
@@ -186,34 +176,23 @@ contract Migration is Script, UsingRegistry {
   }
 
   function run() external {
-    // it's anvil key
+
     // TODO check that this matches deployerAccount and the pK can be avoided with --unlock
     vm.startBroadcast(deployerAccount);
 
-    // TODO replace all the lines here with "Migrations.deployA()"
-    // TODO rename this script to MigrationsScript
-
-    // load migration confirm 
     string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
 
-    // proxyFactory = IProxyFactory(create2deploy(0, vm.getCode("ProxyFactory.sol")));
-    // https://github.com/foundry-rs/foundry/issues/7569
     proxyFactory = IProxyFactory(create2deploy(0, vm.getCode("./out/ProxyFactory.sol/ProxyFactory.json")));
 
-    // deploy a proxy just to get the owner
-    // IProxy deployedProxy = IProxy(proxyFactory.deployProxy());
-    // deployedProxy._transferOwnership(address(this));
-    // console.log("Proxy with owner at:",  address(deployedProxy));
-    // console.logBytes32(bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1));
-
-    // TODO in production the proxy of the registry is created using a cheatcode
-    // deployProxiedContract("Registry", registryAddress, abi.encodeWithSelector(IRegistry.initialize.selector));
-
-    // just set the initialization of a proxy
+    // Proxy for Registry is already set, just deploy implementation
     migrateRegistry();
-    console.log("Before set registry");
-    _transferOwnership(deployerAccount); //UsingRegistry
-    setRegistry(registryAddress); // UsingRegistry
+
+    // Foloowing  lines required by parent UsingRegistry
+    _transferOwnership(deployerAccount); 
+    setRegistry(registryAddress);
+    
+    // End UsingRegistry setup
+    
     migrateFreezer();
     migrateFeeCurrencyWhitelist();
     migrateGoldToken(json);
@@ -229,13 +208,13 @@ contract Migration is Script, UsingRegistry {
     migrateEpochRewards(json);
     migrateRandom(json);
     migrateEscrow();
-    // // attestations not migrates
+    // attestation not migrated
     migrateBlockchainParameters(json);
     migrateGovernanceSlasher();
     migrateDoubleSigningSlasher(json);
     migrateDowntimeSlasher(json);
     migrateGovernanceApproverMultiSig(json);
-    // // GrandaMento not migrated
+    // GrandaMento not migrated
     migrateFederatedAttestations();
     migrateMentoFeeHandlerSeller();
     migrateUniswapFeeHandlerSeller();
@@ -243,16 +222,11 @@ contract Migration is Script, UsingRegistry {
     migrateOdisPayments();
     migrateGovernance(json);
     
-    vm.stopBroadcast(); // TODO shouldn't elect validators be before this?
+    vm.stopBroadcast();
 
+    // Functions with broadcast with different addresses
+    // Validators needs to lock, which can be only used by the msg.sender
     electValidators(json);
-
-    // // // little sanity check, remove later
-    // IRegistry registry = IRegistry(registryAddress);
-    // registry.setAddressFor("registry", address(1));
-    // console.log("print:");
-    // console.logAddress(registry.getAddressForStringOrDie("registry"));
-
   }
 
   function migrateRegistry() public {
@@ -306,7 +280,7 @@ contract Migration is Script, UsingRegistry {
 
   function migrateReserve(string memory json) public {
 
-    // Reserve spend multisig not migrates
+    // Reserve spend multisig not migrated
 
     uint256 tobinTaxStalenessThreshold = abi.decode(json.parseRaw(".reserve.tobinTaxStalenessThreshold"), (uint256));
     uint256 spendingRatio = abi.decode(json.parseRaw(".reserve.spendingRatio"), (uint256));
@@ -323,13 +297,10 @@ contract Migration is Script, UsingRegistry {
       "Reserve",
       abi.encodeWithSelector(IReserveInitializer.initialize.selector, registryAddress, tobinTaxStalenessThreshold, spendingRatio, frozenGold, frozenDays, assetAllocationSymbols, assetAllocationWeights, tobinTax, tobinTaxReserveRatio));
 
-    // with the reserve we migrate:
-    // spender, wont do
-    // otherReserveAddress, wont do
-    // send initialBalance to Reserve
+    
     // TODO this should be a transfer from the deployer rather than a deal
     vm.deal(reserveProxyAddress, initialBalance);
-    // reserve.setFrozenGold, wont do
+
     address reserveSpenderMultiSig = deployerAccount;
     IReserve(reserveProxyAddress).addSpender(reserveSpenderMultiSig);
     console.log("reserveSpenderMultiSig set to:", reserveSpenderMultiSig);
@@ -402,7 +373,7 @@ contract Migration is Script, UsingRegistry {
   }
 
   function migrateExchange(string memory json) public {
-    // TODO make this for all stables
+    // TODO make this for all stables (using a loop like in stable)
   
     string memory stableTokenIdentifier = "StableToken";
     uint256 spread = abi.decode(json.parseRaw(".exchange.spread"), (uint256));
@@ -454,8 +425,6 @@ contract Migration is Script, UsingRegistry {
     uint256 maxGroupSize = abi.decode(json.parseRaw(".validators.maxGroupSize"), (uint256));
     uint256 commissionUpdateDelay = abi.decode(json.parseRaw(".validators.commissionUpdateDelay"), (uint256));
     uint256 downtimeGracePeriod = abi.decode(json.parseRaw(".validators.downtimeGracePeriod"), (uint256));
-
-    // revert("Must revert");
 
     deployProxiedContract(
       "Validators",
@@ -542,8 +511,6 @@ contract Migration is Script, UsingRegistry {
     deployProxiedContract(
       "BlockchainParameters",
       abi.encodeWithSelector(IBlockchainParametersInitializer.initialize.selector, gasForNonGoldCurrencies, gasLimit, lookbackWindow));
-
-    
   }
 
   function migrateGovernanceSlasher() public {
@@ -655,7 +622,6 @@ contract Migration is Script, UsingRegistry {
     uint256 baselineUpdateFactor = abi.decode(json.parseRaw(".governance.baselineUpdateFactor"), (uint256));
     uint256 baselineQuorumFactor = abi.decode(json.parseRaw(".governance.baselineQuorumFactor"), (uint256));
 
-    // // address governanceProxyAddress = deployProxiedContract(
     address governanceProxyAddress = deployProxiedContract(
       "Governance",
       abi.encodeWithSelector(IGovernanceInitializer.initialize.selector, registryAddress, approver,
@@ -747,7 +713,8 @@ contract Migration is Script, UsingRegistry {
           uint256 threshold = abi.decode(constitutionJson.parseRaw(string.concat(".", contractName, ".", functionName)), (uint256));
 
           if (contractAddress != address(0)){
-            // TODO fix this case
+            // TODO fix this case, it should never be zero
+            // contract key is likely wrong
             governance.setConstitution(contractAddress, functionHash, threshold);
 
           }
@@ -773,7 +740,9 @@ contract Migration is Script, UsingRegistry {
     lockGold(amountToLock);
     bytes memory _ecdsaPubKey = ecdsaPubKey;
     address accountAddress = (new ForceTx()).identity();
-    // emit Result(ecdsaPubKey); Debugging, there's no console.log for bytes
+    
+    // these blobs are not checked in the contract
+    // TODO make this configurable
     bytes memory newBlsPublicKey = abi.encodePacked(
       bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
       bytes32(0x0202020202020202020202020202020202020202020202020202020202020203),
@@ -839,19 +808,6 @@ contract Migration is Script, UsingRegistry {
 
     uint256 validatorGroup0Key = valKeys[0];
 
-    // if (votesRatioOfLastVsFirstGroup < 1) {
-    //   revert("votesRatioOfLastVsFirstGroup needs to be >= 1");
-    // }
-
-    // Assumptions about where funds are located:
-    // * Validator 0 holds funds for all groups' stakes
-    // * Validator 1-n holds funds needed for their own stake
-    // const validator0Key = valKeys[0]
-
-    // REPLACED WITH getValidatorGroup
-    // Split the validator keys into groups that will fit within the max group size.
-    uint256 amountOfGroups = Math.ceilDiv(valKeys.length, maxGroupSize);
-
 
     address groupAddress = registerValidatorGroup(
       validatorGroup0Key,
@@ -878,13 +834,12 @@ contract Migration is Script, UsingRegistry {
         getElection().vote(groupAddress, getLockedGold().getAccountNonvotingLockedGold(groupAddress) ,address(0), address(0));
       } else {
         // unimplemented
+        console.log("WARNING: case not implemented");
       }
 
       vm.stopBroadcast();
       
     }
-    
-
     
   }
 

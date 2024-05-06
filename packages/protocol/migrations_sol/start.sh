@@ -21,10 +21,10 @@ REGISTRY_ADDRESS="0x000000000000000000000000000000000000ce10"
 PROXY_BYTECODE=`cat ./out/Proxy.sol/Proxy.json | jq -r '.deployedBytecode.object'`
 cast rpc anvil_setCode --rpc-url http://127.0.0.1:$ANVIL_PORT $REGISTRY_ADDRESS $PROXY_BYTECODE
 REGISTRY_OWNER_ADDRESS=$FROM_ACCOUNT_NO_ZERO
-# pasition is bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1);
-echo "Setting Registry owner"
 
+echo "Setting Registry owner"
 # Sets the storage of the registry so that it has an owner we control
+# pasition is bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1);
 cast rpc anvil_setStorageAt --rpc-url http://127.0.0.1:$ANVIL_PORT $REGISTRY_ADDRESS 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 "0x000000000000000000000000$REGISTRY_OWNER_ADDRESS"
 
 
@@ -62,16 +62,14 @@ echo "$LIBRARIES" > $LIBRARIES_FILE
 # run migrations
 BROADCAST="--broadcast"
 SKIP_SUMULATION=""
-# --skip-simulation
+# SKIP_SUMULATION="--skip-simulation" 
 # BROADCAST=""
 
 echo "Compiling with libraries... "
 time forge build $LIBRARIES
-#exit 1
-#--skip-simulation
+
 time forge script migrations_sol/Migration.s.sol --tc Migration --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive --sender $FROM_ACCOUNT --unlocked -- $LIBRARIES --revert-strings || echo "Migration script failed"
 
-# exit 1
 # Run integration tests
 source $PWD/migrations_sol/integration_tests.sh
 

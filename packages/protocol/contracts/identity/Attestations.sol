@@ -26,8 +26,6 @@ contract Attestations is
   UsingRegistry,
   ReentrancyGuard
 {
-  // ,
-  // UsingPrecompiles
   using SafeMath for uint256;
   using SafeCast for uint256;
 

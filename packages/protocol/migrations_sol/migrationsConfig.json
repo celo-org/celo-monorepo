@@ -26,11 +26,12 @@
     "assetAllocationWeights": [500000000000000000000000, 300000000000000000000000, 150000000000000000000000, 50000000000000000000000],
     "initialBalance": 5000000000000000000000000
   },
-  "stableToken": {
+  "stableTokens": {
+    "names": ["Celo Dollar", "Celo Euro", "Celo Brazilian Real"],
+    "symbols": ["cUSD", "cEUR", "cREAL"],
+    "contractSufixs": ["", "EUR", "BRL"],
     "decimals": 18,
     "celoPrice": 1,
-    "tokenName": "Celo Dollar",
-    "tokenSymbol": "cUSD",
     "inflationRate": 1,
     "inflationPeriod": 47304000,
     "initialBalance": 5000000000000000000000000,

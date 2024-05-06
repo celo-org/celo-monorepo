@@ -1,6 +1,7 @@
 pragma solidity >=0.8.7 <0.8.20;
-// import precompiles so that they get compiled
-// TODO move mento ones to other file
+
+
+// this file only exists so that foundry compiles this contracts
 import "@test-sol/precompiles/ProofOfPossesionPrecompile.sol";
 import "@test-sol/precompiles/EpochSizePrecompile.sol";
 

@@ -18,8 +18,6 @@ import "../../contracts/governance/interfaces/IElection.sol";
 
 import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
 
-// import "forge-std/console.sol";
-
 contract UsingRegistry is Ownable {
   // solhint-disable state-visibility
   bytes32 constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
@@ -94,7 +92,7 @@ contract UsingRegistry is Ownable {
     return ILockedGold(registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
   }
 
-  // When updating Mento contracts return the interface rather than the address
+  // Current version of Mento doesn't support 0.8
   function getStableToken() internal view returns (address) {
     return registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID);
   }

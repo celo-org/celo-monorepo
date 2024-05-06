@@ -500,7 +500,7 @@ contract Accounts is
   /**
    * @notice Sets the EIP712 domain separator for the Celo Accounts abstraction.
    */
-  function setEip712DomainSeparator() public {
+  function _setEip712DomainSeparator() internal {
     uint256 chainId;
     assembly {
       chainId := chainid
