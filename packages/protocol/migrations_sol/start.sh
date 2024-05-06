@@ -68,7 +68,7 @@ SKIP_SUMULATION=""
 echo "Compiling with libraries... "
 time forge build $LIBRARIES
 
-time forge script migrations_sol/Migration.s.sol --tc Migration --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive --sender $FROM_ACCOUNT --unlocked $LIBRARIES --revert-strings || echo "Migration script failed"
+time forge script migrations_sol/Migration.s.sol --tc Migration --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive --sender $FROM_ACCOUNT --unlocked -- $LIBRARIES --revert-strings || echo "Migration script failed"
 
 # Run integration tests
 source $PWD/migrations_sol/integration_tests.sh
