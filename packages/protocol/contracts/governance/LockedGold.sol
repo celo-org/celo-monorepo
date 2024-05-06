@@ -67,7 +67,7 @@ contract LockedGold is
   bytes32[] public slashingWhitelist;
 
   uint256 public totalNonvoting;
-  uint256 public legacy_unlockingPeriod;
+  uint256 public deprecated_unlockingPeriod;
 
   // Info about delegator
   mapping(address => Delegated) delegatorInfo;
@@ -625,8 +625,8 @@ contract LockedGold is
    * @param value The unlocking period in seconds.
    */
   function setUnlockingPeriod(uint256 value) public onlyOwner onlyL1 {
-    require(value != legacy_unlockingPeriod, "Unlocking period not changed");
-    legacy_unlockingPeriod = value;
+    require(value != deprecated_unlockingPeriod, "Unlocking period not changed");
+    deprecated_unlockingPeriod = value;
     emit UnlockingPeriodSet(value);
   }
 
@@ -773,7 +773,7 @@ contract LockedGold is
   }
 
   function unlockingPeriod() public view returns (uint256) {
-    if (isL1()) return legacy_unlockingPeriod;
+    if (isL1()) return deprecated_unlockingPeriod;
     if (isL2()) return 1;
   }
 
