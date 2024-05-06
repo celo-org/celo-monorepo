@@ -817,6 +817,8 @@ contract Migration is Script, UsingRegistry {
     );
 
     console.log("  * Registering ${group.valKeys.length} validators ...");
+     // Split the validator keys into groups that will fit within the max group size.
+    uint256 amountOfGroups = Math.ceilDiv(valKeys.length, maxGroupSize);
 
     // TODO change name of variable amount of groups for amount in group
     for (uint256 validatorIndex = 0; validatorIndex < amountOfGroups; validatorIndex++){
