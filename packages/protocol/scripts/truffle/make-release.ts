@@ -334,7 +334,7 @@ module.exports = async (callback: (error?: any) => number) => {
       const shouldDeployContract = Object.keys(report.contracts).includes(contractName)
       const shouldDeployLibrary = Object.keys(report.libraries).includes(contractName)
 
-      if (shouldDeployContract || contractName == 'Validators') {
+      if (shouldDeployContract) {
         // Don't try to deploy and link libraries of contracts it doesn't have to deploy
         // 1. Release all dependencies. Guarantees library addresses are canonical for linking.
         const contractDependencies = dependencies.get(contractName)
