@@ -10,6 +10,7 @@ contract ECDSAHelper is Test {
     public
     returns (bytes memory)
   {
+    address SECP256K1Address = actor("SECP256K1Address");
     deployCodeTo("SECP256K1.sol:SECP256K1.0.5.17", SECP256K1Address);
     sECP256K1 = ISECP256K1(SECP256K1Address);
 
