@@ -26,7 +26,9 @@ contract TestSetCurrencyConfig is MentoFeeCurrencyAdapterBase {
     address token = address(1);
     address currencyIdentifier = address(2);
     mentoAdapter.setCurrencyConfig(token, currencyIdentifier, address(oracle));
-    MentoFeeCurrencyAdapter.MentoCurrencyConfig memory config = mentoAdapter.getCurrencyConfig(token);
+    MentoFeeCurrencyAdapter.MentoCurrencyConfig memory config = mentoAdapter.getCurrencyConfig(
+      token
+    );
 
     assertEq(mentoAdapter.getCurrencies().length, 1);
     assertEq(config.oracle, address(oracle));
@@ -62,11 +64,10 @@ contract TestSetCurrencyConfig is MentoFeeCurrencyAdapterBase {
     vm.expectRevert(bytes("Currency already in the adapter"));
     mentoAdapter.setCurrencyConfig(token, currencyIdentifier, address(oracle));
   }
-  
+
 }
 
 contract TestRemoveCurrencies is MentoFeeCurrencyAdapterBase {
-
   address token;
   address currencyIdentifier;
 

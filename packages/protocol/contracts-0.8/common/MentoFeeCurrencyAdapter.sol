@@ -6,7 +6,6 @@ import "./interfaces/IOracle.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
 contract MentoFeeCurrencyAdapter is IOracle, Initializable, Ownable {
-
   struct MentoCurrencyConfig {
     address oracle;
     address currencyIdentifier;
@@ -31,17 +30,13 @@ contract MentoFeeCurrencyAdapter is IOracle, Initializable, Ownable {
      * @param currencyIdentifier The currency identifier.
      * @param oracle The oracle address for price fetching.
      */
-  function setCurrencyConfig(
-    address token,
-    address currencyIdentifier,
-    address oracle
-  ) external onlyOwner {
+  function setCurrencyConfig(address token, address currencyIdentifier, address oracle)
+    external
+    onlyOwner
+  {
     require(currencyIdentifier != address(0), "Currency identifier cannot be zero");
     require(oracle != address(0), "Oracle address cannot be zero");
-    require(
-      currencies[token].currencyIdentifier == address(0),
-      "Currency already in the adapter"
-    );
+    require(currencies[token].currencyIdentifier == address(0), "Currency already in the adapter");
 
     currencies[token] = MentoCurrencyConfig({
       currencyIdentifier: currencyIdentifier,
