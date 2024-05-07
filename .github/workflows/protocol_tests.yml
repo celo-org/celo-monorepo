@@ -1,6 +1,10 @@
 name: Protocol Foundry tests
 on: [push, pull_request]
 
+env:
+  # Increment these to force cache rebuilding
+  FOUNDRY_CACHE_KEY: 1
+
 jobs:
   check:
     defaults:
@@ -25,13 +29,13 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./cache
-          key: ${{ runner.os }}-foundry-cache
+          key: ${{ runner.os }}-foundry-cache-${{ env.FOUNDRY_CACHE_KEY }}
       - name: Foundry out
         id: foundry-out
         uses: actions/cache@v3
         with:
           path: ./out
-          key: ${{ runner.os }}-foundry-out
+          key: ${{ runner.os }}-foundry-out-${{ env.FOUNDRY_CACHE_KEY }}
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
@@ -47,10 +51,6 @@ jobs:
       - name: Run tests common
         # can't use gas limit because some setUp function use more than the limit
         run: forge test -vvv --match-path "test-sol/common/*" # --block-gas-limit 50000000 
-
-      - name: Run tests compatibility
-        if: success() || failure()
-        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/compatibility/*"
 
       - name: Run tests governance/network
         if: success() || failure()

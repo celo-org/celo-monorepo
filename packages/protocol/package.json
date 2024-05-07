@@ -7,7 +7,7 @@
   "license": "LGPL-3.0",
   "scripts": {
     "lint:ts": "yarn run --top-level eslint .",
-    "lint:sol": "solhint './contracts/**/*.sol'",
+    "lint:sol": "solhint --version && solhint './contracts/**/*.sol' && solhint './contracts-0.8/**/*.sol'",
     "lint": "yarn run lint:ts && yarn run lint:sol",
     "clean": "rm -rf ./types/typechain && rm -rf build/* && rm -rf .0x-artifacts/* && rm -rf migrations/*.js* && rm -rf migrations_ts/*.js* && rm -rf test/**/*.js* && rm -f lib/*.js* && rm -f lib/**/*.js* && rm -f scripts/*.js* && yarn clean:foundry",
     "clean:foundry": "rm -rf cache out",
@@ -97,7 +97,7 @@
     "node-fetch": "^2.6.9",
     "openzeppelin-solidity": "^2.5.0",
     "prompts": "^2.0.1",
-    "solhint": "^2.3.1",
+    "solhint": "^4.5.4",
     "semver": "^7.5.4",
     "solidity-bytes-utils": "0.0.7",
     "truffle": "5.9.0",
@@ -112,7 +112,7 @@
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.3",
-    "@celo/odis-identifiers": "^1.0.0",
+    "@celo/dev-utils":"^0.0.3",
     "@celo/typechain-target-web3-v1-celo": "^1.0.0",
     "@celo/typescript": "0.0.1",
     "@jest/globals": "^29.5.0",

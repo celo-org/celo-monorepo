@@ -28,6 +28,20 @@ interface IValidators {
   function setValidatorLockedGoldRequirements(uint256, uint256) external returns (bool);
   function setSlashingMultiplierResetPeriod(uint256) external;
 
+  // only registered contract
+  function updateEcdsaPublicKey(address, address, bytes calldata) external returns (bool);
+  function updatePublicKeys(address, address, bytes calldata, bytes calldata, bytes calldata)
+    external
+    returns (bool);
+
+  // only VM
+  function updateValidatorScoreFromSigner(address, uint256) external;
+  function distributeEpochPaymentsFromSigner(address, uint256) external returns (uint256);
+
+  // only slasher
+  function forceDeaffiliateIfValidator(address) external;
+  function halveSlashingMultiplier(address) external;
+
   // view functions
   function getMaxGroupSize() external view returns (uint256);
   function getCommissionUpdateDelay() external view returns (uint256);
@@ -58,11 +72,6 @@ interface IValidators {
   function getNumRegisteredValidators() external view returns (uint256);
   function groupMembershipInEpoch(address, uint256, uint256) external view returns (address);
 
-  // only registered contract
-  function updateEcdsaPublicKey(address, address, bytes calldata) external returns (bool);
-  function updatePublicKeys(address, address, bytes calldata, bytes calldata, bytes calldata)
-    external
-    returns (bool);
   function getValidatorLockedGoldRequirements() external view returns (uint256, uint256);
   function getGroupLockedGoldRequirements() external view returns (uint256, uint256);
   function getRegisteredValidators() external view returns (address[] memory);
@@ -73,13 +82,4 @@ interface IValidators {
   function getValidatorGroupSlashingMultiplier(address) external view returns (uint256);
   function getMembershipInLastEpoch(address) external view returns (address);
   function getMembershipInLastEpochFromSigner(address) external view returns (address);
-
-  // only VM
-  function updateValidatorScoreFromSigner(address, uint256) external;
-  function distributeEpochPaymentsFromSigner(address, uint256) external returns (uint256);
-
-  // only slasher
-  function forceDeaffiliateIfValidator(address) external;
-  function halveSlashingMultiplier(address) external;
-
 }

@@ -11,6 +11,8 @@ interface IStableTokenMento {
 
   function setInflationParameters(uint256, uint256) external;
 
+  function approve(address spender, uint256 value) external returns (bool);
+
   function valueToUnits(uint256) external view returns (uint256);
 
   function unitsToValue(uint256) external view returns (uint256);
@@ -21,6 +23,4 @@ interface IStableTokenMento {
   function balanceOf(address) external view returns (uint256);
 
   function getExchangeRegistryId() external view returns (bytes32);
-
-  function approve(address spender, uint256 value) external returns (bool);
 }

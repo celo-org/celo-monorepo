@@ -39,6 +39,22 @@ contract FeeCurrencyWhitelist is
   }
 
   /**
+   * @dev Add a token to the whitelist
+   * @param tokenAddress The address of the token to add.
+   */
+  function addToken(address tokenAddress) external onlyOwner {
+    whitelist.push(tokenAddress);
+    emit FeeCurrencyWhitelisted(tokenAddress);
+  }
+
+  /**
+   * @return a list of all tokens enabled as gas fee currency.
+   */
+  function getWhitelist() external view returns (address[] memory) {
+    return whitelist;
+  }
+
+  /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return Storage version of the contract.
    * @return Major version of the contract.
@@ -61,21 +77,5 @@ contract FeeCurrencyWhitelist is
     whitelist[index] = whitelist[length - 1];
     whitelist.pop();
     emit FeeCurrencyWhitelistRemoved(tokenAddress);
-  }
-
-  /**
-   * @dev Add a token to the whitelist
-   * @param tokenAddress The address of the token to add.
-   */
-  function addToken(address tokenAddress) external onlyOwner {
-    whitelist.push(tokenAddress);
-    emit FeeCurrencyWhitelisted(tokenAddress);
-  }
-
-  /**
-   * @return a list of all tokens enabled as gas fee currency.
-   */
-  function getWhitelist() external view returns (address[] memory) {
-    return whitelist;
   }
 }

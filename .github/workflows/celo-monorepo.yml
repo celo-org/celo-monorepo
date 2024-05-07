@@ -23,15 +23,14 @@ defaults:
 
 env:
   # Increment these to force cache rebuilding
-  NODE_MODULE_CACHE_VERSION: 5
+  NODE_MODULE_CACHE_VERSION: 6
   NODE_OPTIONS: '--max-old-space-size=4096'
   TERM: dumb
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
   # Git Tag for contract release to use
-  #RELEASE_TAG: ganache-v7-core-contracts.v9
-  RELEASE_TAG: core-contracts.v10
+  RELEASE_TAG: core-contracts.v11
   # CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
-  CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.7.x
+  CELO_BLOCKCHAIN_BRANCH_TO_TEST: release/1.8.x
 
 # EXAMPLE on debug ssh step
 #  - name: Setup tmate session
@@ -151,33 +150,6 @@ jobs:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
       - run: yarn run prettify:diff
       - run: yarn run lint
-  general_test:
-    name: General jest test
-    runs-on: ['self-hosted', 'monorepo-node18']
-    needs: install-dependencies
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Sync workspace
-        uses: ./.github/actions/sync-workspace
-        with:
-          artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
-      - name: Run Jest Tests
-        run: |
-          mkdir -p test-results/jest
-          # Skipping packages that are tested in a specific job below
-          yarn run lerna \
-            --ignore @celo/protocol \
-            --ignore @celo/celotool \
-            --ignore @celo/env-tests \
-            run test
-      - name: Upload Jest Test Results
-        uses: actions/upload-artifact@v4
-        with:
-          name: Jest Test Results
-          path: test-results/jest
-
 
   protocol-test-release:
     name: Protocol Test Release

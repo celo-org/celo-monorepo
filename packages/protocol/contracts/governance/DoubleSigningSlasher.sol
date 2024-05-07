@@ -15,17 +15,6 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
   event DoubleSigningSlashPerformed(address indexed validator, uint256 indexed blockNumber);
 
   /**
-  * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-  */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
-  }
-
-  /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
@@ -47,66 +36,14 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
   }
 
   /**
-   * @notice Counts the number of set bits (Hamming weight).
-   * @param v Bitmap.
-   * @return Number of set bits.
-   */
-  function countSetBits(uint256 v) internal pure returns (uint256) {
-    uint256 res = 0;
-    uint256 acc = v;
-    for (uint256 i = 0; i < 256; i = i.add(1)) {
-      if (acc & 1 == 1) res = res.add(1);
-      acc = acc >> 1;
-    }
-    return res;
-  }
-
-  /**
-   * @notice Given two RLP encoded blocks, calls into precompiles to require that
-   * the two block hashes are different, have the same height, have a
-   * quorum of signatures, and that `signer` was part of the quorum.
-   * @param signer The signer to be slashed.
-   * @param index Validator index at the block.
-   * @param headerA First double signed block header.
-   * @param headerB Second double signed block header.
-   * @return Block number where double signing occured. Throws if no double signing is detected.
-   */
-  function checkForDoubleSigning(
-    address signer,
-    uint256 index,
-    bytes memory headerA,
-    bytes memory headerB
-  ) public view returns (uint256) {
-    require(hashHeader(headerA) != hashHeader(headerB), "Block hashes have to be different");
-    uint256 blockNumber = getBlockNumberFromHeader(headerA);
-    require(
-      blockNumber == getBlockNumberFromHeader(headerB),
-      "Block headers are from different height"
-    );
-    require(index < numberValidatorsInSet(blockNumber), "Bad validator index");
-    require(
-      signer == validatorSignerAddressFromSet(index, blockNumber),
-      "Wasn't a signer with given index"
-    );
-    uint256 mapA = uint256(getVerifiedSealBitmapFromHeader(headerA));
-    uint256 mapB = uint256(getVerifiedSealBitmapFromHeader(headerB));
-    require(mapA & (1 << index) != 0, "Didn't sign first block");
-    require(mapB & (1 << index) != 0, "Didn't sign second block");
-    require(
-      countSetBits(mapA) >= minQuorumSize(blockNumber),
-      "Not enough signers in the first block"
-    );
-    require(
-      countSetBits(mapB) >= minQuorumSize(blockNumber),
-      "Not enough signers in the second block"
-    );
-    return blockNumber;
-  }
-
-  function checkIfAlreadySlashed(address signer, bytes memory header) internal {
-    bytes32 bhash = hashHeader(header);
-    require(!isSlashed[signer][bhash], "Already slashed");
-    isSlashed[signer][bhash] = true;
+  * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+  */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
   }
 
   /**
@@ -161,4 +98,68 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
     );
     emit DoubleSigningSlashPerformed(validator, blockNumber);
   }
+
+  /**
+   * @notice Given two RLP encoded blocks, calls into precompiles to require that
+   * the two block hashes are different, have the same height, have a
+   * quorum of signatures, and that `signer` was part of the quorum.
+   * @param signer The signer to be slashed.
+   * @param index Validator index at the block.
+   * @param headerA First double signed block header.
+   * @param headerB Second double signed block header.
+   * @return Block number where double signing occured. Throws if no double signing is detected.
+   */
+  function checkForDoubleSigning(
+    address signer,
+    uint256 index,
+    bytes memory headerA,
+    bytes memory headerB
+  ) public view returns (uint256) {
+    require(hashHeader(headerA) != hashHeader(headerB), "Block hashes have to be different");
+    uint256 blockNumber = getBlockNumberFromHeader(headerA);
+    require(
+      blockNumber == getBlockNumberFromHeader(headerB),
+      "Block headers are from different height"
+    );
+    require(index < numberValidatorsInSet(blockNumber), "Bad validator index");
+    require(
+      signer == validatorSignerAddressFromSet(index, blockNumber),
+      "Wasn't a signer with given index"
+    );
+    uint256 mapA = uint256(getVerifiedSealBitmapFromHeader(headerA));
+    uint256 mapB = uint256(getVerifiedSealBitmapFromHeader(headerB));
+    require(mapA & (1 << index) != 0, "Didn't sign first block");
+    require(mapB & (1 << index) != 0, "Didn't sign second block");
+    require(
+      countSetBits(mapA) >= minQuorumSize(blockNumber),
+      "Not enough signers in the first block"
+    );
+    require(
+      countSetBits(mapB) >= minQuorumSize(blockNumber),
+      "Not enough signers in the second block"
+    );
+    return blockNumber;
+  }
+
+  function checkIfAlreadySlashed(address signer, bytes memory header) internal {
+    bytes32 bhash = hashHeader(header);
+    require(!isSlashed[signer][bhash], "Already slashed");
+    isSlashed[signer][bhash] = true;
+  }
+
+  /**
+   * @notice Counts the number of set bits (Hamming weight).
+   * @param v Bitmap.
+   * @return Number of set bits.
+   */
+  function countSetBits(uint256 v) internal pure returns (uint256) {
+    uint256 res = 0;
+    uint256 acc = v;
+    for (uint256 i = 0; i < 256; i = i.add(1)) {
+      if (acc & 1 == 1) res = res.add(1);
+      acc = acc >> 1;
+    }
+    return res;
+  }
+
 }

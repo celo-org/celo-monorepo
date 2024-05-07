@@ -10,12 +10,6 @@ contract ReentrancyGuard {
   /// @dev counter to allow mutex lock with only one SSTORE operation
   uint256 private _guardCounter;
 
-  constructor() internal {
-    // The counter starts at one to prevent changing it from zero to a non-zero
-    // value, which is a more expensive operation.
-    _guardCounter = 1;
-  }
-
   /**
    * @dev Prevents a contract from calling itself, directly or indirectly.
    * Calling a `nonReentrant` function from another `nonReentrant`
@@ -28,5 +22,11 @@ contract ReentrancyGuard {
     uint256 localCounter = _guardCounter;
     _;
     require(localCounter == _guardCounter, "reentrant call");
+  }
+
+  constructor() internal {
+    // The counter starts at one to prevent changing it from zero to a non-zero
+    // value, which is a more expensive operation.
+    _guardCounter = 1;
   }
 }

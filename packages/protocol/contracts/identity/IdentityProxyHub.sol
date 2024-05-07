@@ -12,6 +12,23 @@ contract IdentityProxyHub is UsingRegistry, ICeloVersionedContract {
   );
 
   /**
+   * @notice Performs an arbitrary call through the identifier's IdentityProxy,
+   * assuming msg.sender passes the identity heuristic.
+   * @param identifier The identifier whose IdentityProxy to call through.
+   * @param destination The address the IdentityProxy should call.
+   * @param data The calldata the IdentityProxy should send with the call.
+   * @return The return value of the external call.
+   */
+  function makeCall(bytes32 identifier, address destination, bytes calldata data)
+    external
+    payable
+    returns (bytes memory)
+  {
+    require(passesIdentityHeuristic(msg.sender, identifier), "does not pass identity heuristic");
+    return getOrDeployIdentityProxy(identifier).makeCall.value(msg.value)(destination, data);
+  }
+
+  /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return Storage version of the contract.
    * @return Major version of the contract.
@@ -20,18 +37,6 @@ contract IdentityProxyHub is UsingRegistry, ICeloVersionedContract {
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 0, 0, 1);
-  }
-
-  /**
-   * @notice Returns the IdentityProxy address corresponding to the identifier.
-   * @param identifier The identifier whose proxy address is computed.
-   * @return The identifier's IdentityProxy address.
-   * @dev This function will return a correct address whether or not the
-   * corresponding IdentityProxy has been deployed. IdentityProxies are deployed
-   * using CREATE2 and this computes a CREATE2 address.
-   */
-  function getIdentityProxy(bytes32 identifier) public view returns (IdentityProxy) {
-    return IdentityProxy(Create2.computeAddress(address(this), identifier, identityProxyCodeHash));
   }
 
   /**
@@ -52,6 +57,18 @@ contract IdentityProxyHub is UsingRegistry, ICeloVersionedContract {
     }
 
     return identityProxy;
+  }
+
+  /**
+   * @notice Returns the IdentityProxy address corresponding to the identifier.
+   * @param identifier The identifier whose proxy address is computed.
+   * @return The identifier's IdentityProxy address.
+   * @dev This function will return a correct address whether or not the
+   * corresponding IdentityProxy has been deployed. IdentityProxies are deployed
+   * using CREATE2 and this computes a CREATE2 address.
+   */
+  function getIdentityProxy(bytes32 identifier) public view returns (IdentityProxy) {
+    return IdentityProxy(Create2.computeAddress(address(this), identifier, identityProxyCodeHash));
   }
 
   /**
@@ -96,23 +113,6 @@ contract IdentityProxyHub is UsingRegistry, ICeloVersionedContract {
     // Return true if the account passed all three checks above.
     // Note: We do not return early on failures as we are optimizing for the passing case.
     return hasEnoughCompletions && completedOverHalfRequests && hasMostCompletions;
-  }
-
-  /**
-   * @notice Performs an arbitrary call through the identifier's IdentityProxy,
-   * assuming msg.sender passes the identity heuristic.
-   * @param identifier The identifier whose IdentityProxy to call through.
-   * @param destination The address the IdentityProxy should call.
-   * @param data The calldata the IdentityProxy should send with the call.
-   * @return The return value of the external call.
-   */
-  function makeCall(bytes32 identifier, address destination, bytes calldata data)
-    external
-    payable
-    returns (bytes memory)
-  {
-    require(passesIdentityHeuristic(msg.sender, identifier), "does not pass identity heuristic");
-    return getOrDeployIdentityProxy(identifier).makeCall.value(msg.value)(destination, data);
   }
 
   function deployIdentityProxy(bytes32 identifier) internal returns (IdentityProxy) {
