@@ -39,6 +39,8 @@ jobs:
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: "nightly-f625d0fa7c51e65b4bf1e8f7931cd1c6e2e285e9"
 
       - name: Install forge dependencies
         run: forge install
@@ -83,7 +85,7 @@ jobs:
 
       - name: Run Everything just in case something was missed
         # can't use gas limit because some setUp function use more than the limit
-        run: forge test -vvv
+        run: forge test -vvv #TODO this should ignore integration tests
 
       - name: Generate migrations
         if: success() || failure()
