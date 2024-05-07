@@ -74,7 +74,6 @@ interface IValidators {
   function getValidatorLockedGoldRequirements() external view returns (uint256, uint256);
   function getGroupLockedGoldRequirements() external view returns (uint256, uint256);
   function getRegisteredValidators() external view returns (address[] memory);
-  function getRegisteredValidatorSigners() external view returns (address[] memory);
   function getRegisteredValidatorGroups() external view returns (address[] memory);
   function isValidatorGroup(address) external view returns (bool);
   function isValidator(address) external view returns (bool);

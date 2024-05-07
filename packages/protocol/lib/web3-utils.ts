@@ -333,9 +333,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
     console.info("\n-> Deploying", name)
 
     deployer.deploy(ContractProxy)
-    console.log("Proxy deployed");
     deployer.deploy(Contract, { gas: 5000000 })
-    console.log("Contract deployed");
 
     deployer.then(async () => {
       const proxy: ProxyInstance = await ContractProxy.deployed()
