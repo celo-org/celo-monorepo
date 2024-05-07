@@ -464,18 +464,18 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
     ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
   }
 
-  function _registerValidatorWithSignerHelper(address validator, uint256 signerPk)
+  function _registerValidatorWithSignerHelper(address _validator, uint256 signerPk)
     internal
     returns (bytes memory)
   {
     (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
-      validator,
+      _validator,
       signerPk
     );
 
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(_validator, blsPublicKey, blsPop));
 
-    vm.prank(validator);
+    vm.prank(_validator);
     validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
     validatorRegistrationEpochNumber = validators.getEpochNumber();
     return _ecdsaPubKey;
