@@ -26,7 +26,7 @@ contract TestSetCurrencyConfig is FeeCurrencyDirectoryTestBase {
     address token = address(1);
     uint256 intrinsicGas = 21000;
     directory.setCurrencyConfig(token, address(oracle), intrinsicGas);
-    CurrencyConfig memory config = directory.getCurrencyConfig(token);
+    IFeeCurrencyDirectory.CurrencyConfig memory config = directory.getCurrencyConfig(token);
 
     assertEq(directory.getCurrencies().length, 1);
     assertEq(config.oracle, address(oracle));
@@ -73,7 +73,7 @@ contract TestRemoveCurrencies is FeeCurrencyDirectoryTestBase {
   function test_ShouldRemoveCurrencies() public {
     address token = address(4);
     directory.removeCurrencies(token, 0);
-    CurrencyConfig memory config = directory.getCurrencyConfig(token);
+    IFeeCurrencyDirectory.CurrencyConfig memory config = directory.getCurrencyConfig(token);
     assertEq(directory.getCurrencies().length, 0);
     assertEq(config.oracle, address(0));
   }

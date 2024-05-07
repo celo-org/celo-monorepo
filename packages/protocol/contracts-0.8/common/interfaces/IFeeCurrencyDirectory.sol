@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-struct CurrencyConfig {
-  address oracle;
-  uint256 intrinsicGas;
-}
-
 interface IFeeCurrencyDirectory {
+  struct CurrencyConfig {
+    address oracle;
+    uint256 intrinsicGas;
+  }
+
   /**
      * @notice Returns the list of all currency addresses.
      * @return An array of addresses.
