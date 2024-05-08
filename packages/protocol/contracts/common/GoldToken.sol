@@ -7,7 +7,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "./UsingRegistry.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
-import "./interfaces/IGoldTokenMintingSchedule.sol";
+import "./interfaces/IMintGoldSchedule.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 
@@ -35,9 +35,7 @@ contract GoldToken is
   // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
   address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
 
-  address constant L2_GOVERNANCE = address(0x4200000000000000000000000000000000000018);
-
-  IGoldTokenMintingSchedule public goldTokenMintingSchedule;
+  IMintGoldSchedule public goldTokenMintingSchedule;
 
   event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -53,7 +51,7 @@ contract GoldToken is
     if (isL1()) {
       require(msg.sender == address(0), "Only VM can call");
     } else {
-      require(msg.sender == L2_GOVERNANCE, "Only L2 governance can call");
+      require(msg.sender == owner(), "Only owner can call");
     }
     _;
   }
@@ -62,12 +60,11 @@ contract GoldToken is
     if (isL1()) {
       require(msg.sender == address(0), "Only VM can call");
     } else {
-      if (
-        (msg.sender != address(goldTokenMintingSchedule) && msg.sender != L2_GOVERNANCE) ||
-        msg.sender == address(0)
-      ) {
-        revert("Only L2 governance or goldTokenMintingSchedule can call");
-      }
+      require(
+        (msg.sender == address(goldTokenMintingSchedule) || msg.sender == owner()) ||
+          msg.sender != address(0),
+        "Only owner or goldTokenMintingSchedule can call"
+      );
     }
     _;
   }
@@ -90,14 +87,14 @@ contract GoldToken is
 
   function setGoldTokenMintingScheduleAddress(address goldTokenMintingScheduleAddress)
     external
-    onlyGovernanceOrVm
+    onlyOwner
   {
     require(
       goldTokenMintingScheduleAddress != address(0) ||
         goldTokenMintingScheduleAddress != address(goldTokenMintingSchedule),
       "Invalid address."
     );
-    goldTokenMintingSchedule = IGoldTokenMintingSchedule(goldTokenMintingScheduleAddress);
+    goldTokenMintingSchedule = IMintGoldSchedule(goldTokenMintingScheduleAddress);
 
     emit setCeloMintingScheduleAddress(goldTokenMintingScheduleAddress);
   }
@@ -276,12 +273,12 @@ contract GoldToken is
 
   /**
    * @notice Gets the amount of owner's CELO allowed to be spent by spender.
-   * @param owner The owner of the CELO.
+   * @param _owner The owner of the CELO.
    * @param spender The spender of the CELO.
    * @return The amount of CELO owner is allowing spender to spend.
    */
-  function allowance(address owner, address spender) external view returns (uint256) {
-    return allowed[owner][spender];
+  function allowance(address _owner, address spender) external view returns (uint256) {
+    return allowed[_owner][spender];
   }
 
   /**
@@ -292,7 +289,7 @@ contract GoldToken is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 0);
+    return (1, 1, 3, 0);
   }
 
   /**
@@ -305,11 +302,11 @@ contract GoldToken is
 
   /**
    * @notice Gets the balance of the specified address.
-   * @param owner The address to query the balance of.
+   * @param _owner The address to query the balance of.
    * @return The balance of the specified address.
    */
-  function balanceOf(address owner) public view returns (uint256) {
-    return owner.balance;
+  function balanceOf(address _owner) public view returns (uint256) {
+    return _owner.balance;
   }
 
   /**
