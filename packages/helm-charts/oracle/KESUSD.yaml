@@ -14,10 +14,13 @@ oracle:
   gasPriceMultiplier: 1.5
   priceSources: "[
       [
-        {exchange: 'ALPHAVANTAGE', symbol: 'KESUSD', toInvert: true}
+        {exchange: 'ALPHAVANTAGE', symbol: 'KESUSD', toInvert: false}
       ],
       [
-        {exchange: 'XIGNITE', symbol: 'USDKES', toInvert: false}
+        {exchange: 'OPENEXCHANGERATES', symbol: 'KESUSD', toInvert: false}
+      ],
+      [
+        {exchange: 'XIGNITE', symbol: 'KESUSD', toInvert: false}
       ]
   ]"
   minPriceSourceCount: 2
