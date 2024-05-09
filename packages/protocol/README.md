@@ -180,3 +180,87 @@ yarn truffle-verify MentoFeeHandlerSeller@0x4efa274b7e33476c961065000d58ee09f792
           }
     }
     ```
+
+## Calculate smart contract sizes
+
+Sometimes it's useful to know the bytecode size of core contracts.
+We can calculate that in two ways:
+
+1. Using the bytecode of actually deployed smart contracts.
+2. Using the build artifacts of locally built smart contracts.
+
+### Using build artifacts
+
+Usage:
+
+```sh
+$ yarn size:artifacts
+```
+
+Description: This command uses a script ([`get_smart_contract_size_from_build_artifacts.sh`](./scripts/bash/get_smart_contract_size_from_build_artifacts.sh)) to calculate the size of smart contracts from Truffle build artifacts. It extracts the bytecode of each contract, calculates its size in kilobytes, and outputs the results to a CSV file in the `scripts/bash/out/` directory.
+
+> [!NOTE]  
+> The script requires Truffle build artifacts to be located in the `packages/protocol/build/` directory.
+
+For example:
+
+```sh
+$ yarn size:artifacts
+
+# ...
+ReleaseGold,31.721
+OdisPaymentsProxy,2.868
+Data extraction complete. Results saved to /Users/arthur/Documents/celo-org/celo-monorepo/packages/protocol/scripts/bash/out/build_artefact_bytecode_sizes_20240509_151111.csv
+✨  Done in 9.57s.
+```
+
+How it works:
+
+1.  The script first creates an output directory named `out` in the current directory if it doesn't exist.
+2.  It then generates a timestamp and uses it to create a unique output file in the `out` directory.
+3.  The script searches for all JSON files in the `protocol/build/contracts`, `protocol/build/contracts-0.8`, and `protocol/build/contracts-mento` directories.
+4.  For each JSON file found, it extracts the contract name and bytecode using the `jq` command-line JSON processor.
+5.  It calculates the size of the bytecode in kilobytes and appends the contract name and size to a temporary file.
+6.  The script then sorts the data in the temporary file by size in descending order and appends it to the output file.
+7.  Finally, it removes the temporary file and prints a completion message with the location of the output file.
+
+Output: The output is a CSV file named `build_artefact_bytecode_sizes_<timestamp>.csv` in the `out` directory. Each line in the file contains a contract name and its size in kilobytes, sorted in descending order by size.
+
+Requirements: This script requires the `jq` and `bc` command-line tools to be installed on your system.
+
+### Using contracts deployed on-chain
+
+Usage:
+
+```sh
+$ yarn size:onchain
+```
+
+Description: This command uses a script ([`get_smart_contract_size_from_onchain_address.sh`](./scripts/bash/get_smart_contract_size_from_onchain_address.sh)) to calculate the size of smart contracts deployed on Celo Mainnet. It uses the Celo CLI to fetch the addresses of all core contracts, and Foundry to get the bytecode deployed at each address. The size of the bytecode is then calculated and the results are output to a CSV file.
+
+> [!NOTE]  
+> The script requires the Celo CLI and Foundry to be installed on your system.
+
+For example:
+
+```sh
+$ yarn size:onchain
+
+# ...
+StableTokenEUR,0x434563B0604BE100F04B7Ae485BcafE3c9D8850E,9.180
+Validators,0xe52EaC18fB3C1e1713e73d4A5b7dCb12a2f2C697,58.228
+Data extraction complete. Results saved to /Users/arthur/Documents/celo-org/celo-monorepo/packages/protocol/out/onchain_bytecode_sizes_20240509_145556.csv
+✨  Done in 19.15s.
+```
+
+How it works:
+
+1.  The script first creates an output directory named `out` in the current directory if it doesn't exist.
+2.  It then generates a timestamp and uses it to create a unique output file in the `out` directory.
+3.  The script sets the RPC URL for the Celo blockchain to `https://forno.celo.org`.
+4.  It initializes a temporary file and the output file with headers.
+5.  The script uses the `celocli network:contracts` command to fetch the addresses of all core contracts.
+6.  For each contract address, it uses Foundry to get the deployed bytecode.
+7.  It calculates the size of the bytecode in kilobytes and appends the contract name, address, and size to the output file.
+
+Output: The output is a CSV file named `onchain_bytecode_sizes_<timestamp>.csv` in the `out` directory. Each line in the file contains a contract name, its implementation address, and its size in kilobytes.
