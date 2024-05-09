@@ -415,44 +415,42 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     TransferHelper.safeTransferETH(to, amountETH);
   }
 
-  function getAmountsOut(uint256 amountIn, address[] memory path)
-    public
-    view
-    returns (uint256[] memory amounts)
-  {
+  function getAmountsOut(
+    uint256 amountIn,
+    address[] memory path
+  ) public view returns (uint256[] memory amounts) {
     return UniswapV2Library.getAmountsOut(factory, amountIn, path, INIT_CODE_PAIR_HASH);
   }
 
-  function getAmountsIn(uint256 amountOut, address[] memory path)
-    public
-    view
-    returns (uint256[] memory amounts)
-  {
+  function getAmountsIn(
+    uint256 amountOut,
+    address[] memory path
+  ) public view returns (uint256[] memory amounts) {
     return UniswapV2Library.getAmountsIn(factory, amountOut, path, INIT_CODE_PAIR_HASH);
   }
 
   // **** LIBRARY FUNCTIONS ****
-  function quote(uint256 amountA, uint256 reserveA, uint256 reserveB)
-    public
-    pure
-    returns (uint256 amountB)
-  {
+  function quote(
+    uint256 amountA,
+    uint256 reserveA,
+    uint256 reserveB
+  ) public pure returns (uint256 amountB) {
     return UniswapV2Library.quote(amountA, reserveA, reserveB);
   }
 
-  function getAmountOut(uint256 amountIn, uint256 reserveIn, uint256 reserveOut)
-    public
-    pure
-    returns (uint256 amountOut)
-  {
+  function getAmountOut(
+    uint256 amountIn,
+    uint256 reserveIn,
+    uint256 reserveOut
+  ) public pure returns (uint256 amountOut) {
     return UniswapV2Library.getAmountOut(amountIn, reserveIn, reserveOut);
   }
 
-  function getAmountIn(uint256 amountOut, uint256 reserveIn, uint256 reserveOut)
-    public
-    pure
-    returns (uint256 amountIn)
-  {
+  function getAmountIn(
+    uint256 amountOut,
+    uint256 reserveIn,
+    uint256 reserveOut
+  ) public pure returns (uint256 amountIn) {
     return UniswapV2Library.getAmountIn(amountOut, reserveIn, reserveOut);
   }
 

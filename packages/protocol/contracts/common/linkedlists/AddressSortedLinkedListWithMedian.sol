@@ -43,11 +43,9 @@ library AddressSortedLinkedListWithMedian {
    * @param list A storage pointer to the underlying list.
    * @return The number of elements in the list.
    */
-  function getNumElements(SortedLinkedListWithMedian.List storage list)
-    external
-    view
-    returns (uint256)
-  {
+  function getNumElements(
+    SortedLinkedListWithMedian.List storage list
+  ) external view returns (uint256) {
     return list.getNumElements();
   }
 
@@ -103,11 +101,10 @@ library AddressSortedLinkedListWithMedian {
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
-  function contains(SortedLinkedListWithMedian.List storage list, address key)
-    public
-    view
-    returns (bool)
-  {
+  function contains(
+    SortedLinkedListWithMedian.List storage list,
+    address key
+  ) public view returns (bool) {
     return list.contains(toBytes(key));
   }
 
@@ -117,11 +114,10 @@ library AddressSortedLinkedListWithMedian {
    * @param key The element key.
    * @return The element value.
    */
-  function getValue(SortedLinkedListWithMedian.List storage list, address key)
-    public
-    view
-    returns (uint256)
-  {
+  function getValue(
+    SortedLinkedListWithMedian.List storage list,
+    address key
+  ) public view returns (uint256) {
     return list.getValue(toBytes(key));
   }
 
@@ -130,11 +126,9 @@ library AddressSortedLinkedListWithMedian {
    * @param list A storage pointer to the underlying list.
    * @return The median value.
    */
-  function getMedianValue(SortedLinkedListWithMedian.List storage list)
-    public
-    view
-    returns (uint256)
-  {
+  function getMedianValue(
+    SortedLinkedListWithMedian.List storage list
+  ) public view returns (uint256) {
     return list.getValue(list.median);
   }
 
@@ -145,7 +139,9 @@ library AddressSortedLinkedListWithMedian {
    * @return Values corresponding to keys, which will be ordered largest to smallest.
    * @return Array of relations to median of corresponding list elements.
    */
-  function getElements(SortedLinkedListWithMedian.List storage list)
+  function getElements(
+    SortedLinkedListWithMedian.List storage list
+  )
     public
     view
     returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)

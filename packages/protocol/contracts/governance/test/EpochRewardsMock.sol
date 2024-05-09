@@ -12,11 +12,9 @@ contract EpochRewardsMock is EpochRewards(true) {
     numValidatorsInCurrentSet = value;
   }
 
-  function getRewardsMultiplier(uint256 targetGoldTotalSupplyIncrease)
-    external
-    view
-    returns (uint256)
-  {
+  function getRewardsMultiplier(
+    uint256 targetGoldTotalSupplyIncrease
+  ) external view returns (uint256) {
     return _getRewardsMultiplier(targetGoldTotalSupplyIncrease).unwrap();
   }
 
@@ -24,5 +22,4 @@ contract EpochRewardsMock is EpochRewards(true) {
   function numberValidatorsInCurrentSet() public view returns (uint256) {
     return numValidatorsInCurrentSet;
   }
-
 }

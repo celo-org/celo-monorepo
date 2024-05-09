@@ -15,5 +15,4 @@ interface IEpochRewardsInitializer {
     address _carbonOffsettingPartner,
     uint256 _carbonOffsettingFraction
   ) external;
-
 }

@@ -22,12 +22,10 @@ contract IdentityProxy {
    * the IdentityProxyHub after it checks the identity heuristic.
    * @return The return value of the external call.
    */
-  function makeCall(address destination, bytes calldata data)
-    external
-    payable
-    onlyDeployer
-    returns (bytes memory)
-  {
+  function makeCall(
+    address destination,
+    bytes calldata data
+  ) external payable onlyDeployer returns (bytes memory) {
     return ExternalCall.execute(destination, msg.value, data);
   }
 }

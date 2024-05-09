@@ -87,11 +87,10 @@ contract LockedGoldTest is Test {
     accounts.createAccount();
   }
 
-  function getParsedSignatureOfAddress(address _address, uint256 privateKey)
-    public
-    pure
-    returns (uint8, bytes32, bytes32)
-  {
+  function getParsedSignatureOfAddress(
+    address _address,
+    uint256 privateKey
+  ) public pure returns (uint8, bytes32, bytes32) {
     bytes32 addressHash = keccak256(abi.encodePacked(_address));
     bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
     return vm.sign(privateKey, prefixedHash);
@@ -209,7 +208,6 @@ contract LockedGoldTest is Test {
     vm.prank(celoOwner);
     lockedGold.lock.value(value)();
   }
-
 }
 
 contract LockedGoldTest_initialize is LockedGoldTest {
@@ -715,7 +713,6 @@ contract LockedGoldTest_unlock_WhenDelegatingTo3Delegatees is LockedGoldTest {
 
     assertEq(expected3, 1);
     assertEq(real3, 1);
-
   }
 
   function test_ShouldCorrectlyUnlockWhenGettingLessOrEqualToLockedAmount() public {
@@ -1097,9 +1094,10 @@ contract LockedGoldTest_slash is LockedGoldTest {
     accounts.createAccount();
   }
 
-  function helper_WhenAccountIsSlashedForAllOfItsLockedGold(uint256 penalty, uint256 reward)
-    public
-  {
+  function helper_WhenAccountIsSlashedForAllOfItsLockedGold(
+    uint256 penalty,
+    uint256 reward
+  ) public {
     address[] memory lessers = new address[](1);
     lessers[0] = address(0);
     address[] memory greaters = new address[](1);
@@ -1907,9 +1905,10 @@ contract LockedGoldTest_revokeDelegatedGovernanceVotes is LockedGoldTest {
     assertDelegatedVotes_ShouldRevokeCorrectly();
   }
 
-  function shouldRevokeCorrectlyWhenDelegateeNotVoting(address _delegatorSigner, bool lockGold)
-    public
-  {
+  function shouldRevokeCorrectlyWhenDelegateeNotVoting(
+    address _delegatorSigner,
+    bool lockGold
+  ) public {
     if (lockGold) {
       lockCelo(delegator, value);
     }
@@ -2311,7 +2310,6 @@ contract LockedGoldTest_getDelegatorDelegateeExpectedAndRealAmount is LockedGold
   {
     whenVoteSigner_LockedGoldGetDelegatorDelegateeExpectedAndRealAmount();
     helper_ShouldReturnEqualAmount(delegator, delegatorSigner, delegatee);
-
   }
 }
 

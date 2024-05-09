@@ -161,14 +161,13 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
    * @param endBlock Last block of the interval.
    * @return The signature uptime bitmap for the specified interval.
    * @dev startBlock and endBlock must be in the same epoch.
-   * @dev The getParentSealBitmap precompile requires that startBlock must be within 4 epochs of 
+   * @dev The getParentSealBitmap precompile requires that startBlock must be within 4 epochs of
    * the current block.
    */
-  function getBitmapForInterval(uint256 startBlock, uint256 endBlock)
-    public
-    view
-    returns (bytes32)
-  {
+  function getBitmapForInterval(
+    uint256 startBlock,
+    uint256 endBlock
+  ) public view returns (bytes32) {
     require(endBlock >= startBlock, "endBlock must be greater or equal than startBlock");
     // The signature bitmap for block N is stored in block N+1.
     // The latest block is `block.number - 1`, which stores the signature bitmap for
@@ -209,11 +208,11 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
    * @return True if the validator did not sign any blocks in the specified interval.
    * @dev Both startBlock and endBlock should be part of the same epoch.
    */
-  function wasDownForInterval(uint256 startBlock, uint256 endBlock, uint256 signerIndex)
-    public
-    view
-    returns (bool)
-  {
+  function wasDownForInterval(
+    uint256 startBlock,
+    uint256 endBlock,
+    uint256 signerIndex
+  ) public view returns (bool) {
     require(signerIndex < numberValidatorsInSet(startBlock), "bad validator index at start block");
     require(
       isBitmapSetForInterval(startBlock, endBlock),
@@ -306,11 +305,10 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
    * @param blockNumber Block number where the validator was elected.
    * @return Validator's address.
    */
-  function getValidatorAccountFromSignerIndex(uint256 signerIndex, uint256 blockNumber)
-    internal
-    view
-    returns (address)
-  {
+  function getValidatorAccountFromSignerIndex(
+    uint256 signerIndex,
+    uint256 blockNumber
+  ) internal view returns (address) {
     return getAccounts().signerToAccount(validatorSignerAddressFromSet(signerIndex, blockNumber));
   }
 }

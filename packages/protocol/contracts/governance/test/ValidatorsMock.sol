@@ -11,10 +11,10 @@ contract ValidatorsMock is Validators(true) {
     return _updateValidatorScoreFromSigner(signer, uptime);
   }
 
-  function distributeEpochPaymentsFromSigner(address signer, uint256 maxPayment)
-    external
-    returns (uint256)
-  {
+  function distributeEpochPaymentsFromSigner(
+    address signer,
+    uint256 maxPayment
+  ) external returns (uint256) {
     return _distributeEpochPaymentsFromSigner(signer, maxPayment);
   }
 }

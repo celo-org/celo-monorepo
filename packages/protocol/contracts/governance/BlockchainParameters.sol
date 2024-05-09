@@ -48,10 +48,11 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    * @param gasLimit Block gas limit.
    * @param lookbackWindow Lookback window for measuring validator uptime.
    */
-  function initialize(uint256 _gasForNonGoldCurrencies, uint256 gasLimit, uint256 lookbackWindow)
-    external
-    initializer
-  {
+  function initialize(
+    uint256 _gasForNonGoldCurrencies,
+    uint256 gasLimit,
+    uint256 lookbackWindow
+  ) external initializer {
     _transferOwnership(msg.sender);
     setBlockGasLimit(gasLimit);
     setIntrinsicGasForAlternativeFeeCurrency(_gasForNonGoldCurrencies);
@@ -125,5 +126,4 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
       return uptimeLookbackWindow.oldValue;
     }
   }
-
 }

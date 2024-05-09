@@ -136,8 +136,17 @@ contract EscrowTest is Test {
   }
 
   function getEscrowedPayment(address paymentId) public view returns (EscrowedPayment memory) {
-    (bytes32 recipientIdentifier, address _sender, address token, uint256 value, uint256 sentIndex, uint256 receivedIndex, uint256 timestamp, uint256 expirySeconds, uint256 minAttestations) = escrowContract
-      .escrowedPayments(paymentId);
+    (
+      bytes32 recipientIdentifier,
+      address _sender,
+      address token,
+      uint256 value,
+      uint256 sentIndex,
+      uint256 receivedIndex,
+      uint256 timestamp,
+      uint256 expirySeconds,
+      uint256 minAttestations
+    ) = escrowContract.escrowedPayments(paymentId);
     return
       EscrowedPayment(
         recipientIdentifier,
@@ -152,11 +161,10 @@ contract EscrowTest is Test {
       );
   }
 
-  function getParsedSignatureOfAddress(address _address, uint256 privateKey)
-    public
-    pure
-    returns (uint8, bytes32, bytes32)
-  {
+  function getParsedSignatureOfAddress(
+    address _address,
+    uint256 privateKey
+  ) public pure returns (uint8, bytes32, bytes32) {
     bytes32 addressHash = keccak256(abi.encodePacked(_address));
     bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
     return vm.sign(privateKey, prefixedHash);
@@ -823,9 +831,11 @@ contract EscrowWithdrawalTest is EscrowTest {
     mockERC20Token.mint(sender, aValue);
   }
 
-  function completeAttestations(address account, bytes32 identifier, uint256 attestationsToComplete)
-    public
-  {
+  function completeAttestations(
+    address account,
+    bytes32 identifier,
+    uint256 attestationsToComplete
+  ) public {
     for (uint256 i = 0; i < attestationsToComplete; i++) {
       vm.prank(account);
       mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));

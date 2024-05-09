@@ -20,4 +20,3 @@ contract ProxyFactory is IProxyFactory {
     return address(proxy);
   }
 }
-

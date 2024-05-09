@@ -15,5 +15,4 @@ interface IValidatorsInitializer {
     uint256 _commissionUpdateDelay,
     uint256 _downtimeGracePeriod
   ) external;
-
 }

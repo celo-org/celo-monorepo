@@ -35,5 +35,4 @@ interface IFeeHandler {
 
   // in case some funds need to be returned or moved to another contract
   function transfer(address token, address recipient, uint256 value) external returns (bool);
-
 }

@@ -77,10 +77,9 @@ contract GasPriceMinimum is
    * @param _baseFeeOpCodeActivationBlock Block number where the baseFee opCode is activated
    * @dev Value is expected to be > 0.
    */
-  function setBaseFeeOpCodeActivationBlock(uint256 _baseFeeOpCodeActivationBlock)
-    external
-    onlyOwner
-  {
+  function setBaseFeeOpCodeActivationBlock(
+    uint256 _baseFeeOpCodeActivationBlock
+  ) external onlyOwner {
     _setBaseFeeOpCodeActivationBlock(_baseFeeOpCodeActivationBlock, false);
   }
 
@@ -91,11 +90,10 @@ contract GasPriceMinimum is
    * @param blockGasLimit The maxBlockGasLimit of the past block.
    * @return result of the calculation (new gas price minimum)
    */
-  function updateGasPriceMinimum(uint256 blockGasTotal, uint256 blockGasLimit)
-    external
-    onlyVm
-    returns (uint256)
-  {
+  function updateGasPriceMinimum(
+    uint256 blockGasTotal,
+    uint256 blockGasLimit
+  ) external onlyVm returns (uint256) {
     deprecated_gasPriceMinimum = getUpdatedGasPriceMinimum(blockGasTotal, blockGasLimit);
     emit GasPriceMinimumUpdated(deprecated_gasPriceMinimum);
     return deprecated_gasPriceMinimum;
@@ -104,7 +102,7 @@ contract GasPriceMinimum is
   /**
    * @notice Retrieve the current gas price minimum for a currency.
    * When caled for 0x0 or Celo address, it returns gasPriceMinimum().
-   * For other addresses it returns gasPriceMinimum() mutiplied by 
+   * For other addresses it returns gasPriceMinimum() mutiplied by
    * the SortedOracles median of the token. It does not check tokenAddress is a valid fee currency.
    * this function will never returns values less than ABSOLUTE_MINIMAL_GAS_PRICE.
    * If Oracle rate doesn't exist, it returns ABSOLUTE_MINIMAL_GAS_PRICE.
@@ -176,11 +174,10 @@ contract GasPriceMinimum is
    * @dev Calculate using the following formula:
    * oldGasPriceMinimum * (1 + (adjustmentSpeed * (blockDensity - targetDensity))) + 1.
    */
-  function getUpdatedGasPriceMinimum(uint256 blockGasTotal, uint256 blockGasLimit)
-    public
-    view
-    returns (uint256)
-  {
+  function getUpdatedGasPriceMinimum(
+    uint256 blockGasTotal,
+    uint256 blockGasLimit
+  ) public view returns (uint256) {
     FixidityLib.Fraction memory blockDensity = FixidityLib.newFixedFraction(
       blockGasTotal,
       blockGasLimit
@@ -206,10 +203,10 @@ contract GasPriceMinimum is
    * @param _baseFeeOpCodeActivationBlock Block number where the baseFee opCode is activated
    * @dev Value is expected to be > 0.
    */
-  function _setBaseFeeOpCodeActivationBlock(uint256 _baseFeeOpCodeActivationBlock, bool allowZero)
-    private
-    onlyOwner
-  {
+  function _setBaseFeeOpCodeActivationBlock(
+    uint256 _baseFeeOpCodeActivationBlock,
+    bool allowZero
+  ) private onlyOwner {
     require(
       allowZero || _baseFeeOpCodeActivationBlock > 0,
       "baseFee opCode activation block must be greater than zero"
@@ -234,5 +231,4 @@ contract GasPriceMinimum is
       return ((gasPriceMinimum() * rateNumerator) / rateDenominator);
     }
   }
-
 }

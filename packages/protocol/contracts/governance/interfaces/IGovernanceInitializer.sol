@@ -16,5 +16,4 @@ interface IGovernanceInitializer {
     uint256 baselineUpdateFactor,
     uint256 baselineQuorumFactor
   ) external;
-
 }
