@@ -10,8 +10,17 @@
 # Get the current date and time for the filename
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
+# Get the directory where the script is located, assuming the script is in the root or a subdirectory of the repo
+BASE_DIRECTORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+# Get the root of the repo based on the known structure
+REPO_ROOT_DIRECTORY="$BASE_DIRECTORY/../../../"
+
+# Get the directory with build artifacts
+BUILD_ARTIFACT_DIRECTORY="${REPO_ROOT_DIRECTORY}protocol/build/contracts"
+
 # Create the output directory if it doesn't exist
-OUTPUT_DIRECTORY="$(pwd)/out"
+OUTPUT_DIRECTORY="$BASE_DIRECTORY/out"
 mkdir -p "$OUTPUT_DIRECTORY"
 OUTPUT_FILE="$OUTPUT_DIRECTORY/build_artefact_bytecode_sizes_$TIMESTAMP.csv"
 
@@ -22,9 +31,9 @@ TEMP_FILE=$(mktemp)
 echo "Contract,Size (KB)" > "$OUTPUT_FILE"
 
 # Find all JSON files in the subdirectories and process them
-find "../../../protocol/build/contracts" \
-     "../../../protocol/build/contracts-0.8" \
-     "../../../protocol/build/contracts-mento" -name '*.json' | while read -r file
+find "$BUILD_ARTIFACT_DIRECTORY" \
+     "${BUILD_ARTIFACT_DIRECTORY}-0.8" \
+     "${BUILD_ARTIFACT_DIRECTORY}-mento" -name '*.json' | while read -r file
 do
     # Extract the contract name and bytecode using jq
     contract=$(jq -r '.contractName' "$file")
