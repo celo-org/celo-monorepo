@@ -37,7 +37,7 @@ find "$BUILD_ARTIFACT_DIRECTORY" \
 do
     # Extract the contract name and bytecode using jq
     contract=$(jq -r '.contractName' "$file")
-    bytecode=$(jq -r '.bytecode' "$file")
+    bytecode=$(jq -r '.deployedBytecode' "$file")
     
     : '
       Converts the hexadecimal string to bytes, to measure the size in kilobytes.
