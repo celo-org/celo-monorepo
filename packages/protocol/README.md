@@ -197,7 +197,7 @@ Usage:
 $ yarn size:artifacts
 ```
 
-Description: This command uses a script ([`get_smart_contract_size_from_build_artifacts.sh`](./scripts/bash/get_smart_contract_size_from_build_artifacts.sh)) to calculate the size of smart contracts from Truffle build artifacts. It extracts the bytecode of each contract, calculates its size in kilobytes, and outputs the results to a CSV file in the `scripts/bash/out/` directory.
+Description: This command uses a script ([`get_smart_contract_size_from_build_artifacts.sh`](./scripts/bash/get_smart_contract_size_from_build_artifacts.sh)) to calculate the size of smart contracts from Truffle build artifacts. It extracts the `deployedBytecode` of each contract, calculates its size in kilobytes, and outputs the results to a CSV file in the `scripts/bash/out/` directory.
 
 > [!NOTE]  
 > The script requires Truffle build artifacts to be located in the `packages/protocol/build/` directory.
@@ -219,8 +219,8 @@ How it works:
 1.  The script first creates an output directory named `out` in the current directory if it doesn't exist.
 2.  It then generates a timestamp and uses it to create a unique output file in the `out` directory.
 3.  The script searches for all JSON files in the `protocol/build/contracts`, `protocol/build/contracts-0.8`, and `protocol/build/contracts-mento` directories.
-4.  For each JSON file found, it extracts the contract name and bytecode using the `jq` command-line JSON processor.
-5.  It calculates the size of the bytecode in kilobytes and appends the contract name and size to a temporary file.
+4.  For each JSON file found, it extracts the contract name and `deployedBytecode` using the `jq` command-line JSON processor.
+5.  It calculates the size of the `deployedBytecode` in kilobytes and appends the contract name and size to a temporary file.
 6.  The script then sorts the data in the temporary file by size in descending order and appends it to the output file.
 7.  Finally, it removes the temporary file and prints a completion message with the location of the output file.
 
