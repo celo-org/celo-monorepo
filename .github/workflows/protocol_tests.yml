@@ -48,7 +48,7 @@ jobs:
       # "Run tests" already tries to compile the contracts
       # Making it explicit here to have easier to read errors
       - name: Compile Contracts
-        run: forge --version & forge compile
+        run: forge --version & forge compile & find ./out -print
 
       - name: Run tests common
         # can't use gas limit because some setUp function use more than the limit
