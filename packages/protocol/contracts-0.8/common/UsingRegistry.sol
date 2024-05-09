@@ -8,15 +8,6 @@ import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
 import "../../contracts/common/interfaces/IRegistry.sol";
-import "../../contracts/common/interfaces/IAccounts.sol";
-import "../../contracts/common/interfaces/IFreezer.sol";
-import "../../contracts/governance/interfaces/ILockedGold.sol";
-import "../../contracts/governance/interfaces/IValidators.sol";
-import "../../contracts/stability/interfaces/ISortedOracles.sol";
-import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
-import "../../contracts/governance/interfaces/IElection.sol";
-
-import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
 
 contract UsingRegistry is Ownable {
   // solhint-disable state-visibility
@@ -40,8 +31,6 @@ contract UsingRegistry is Ownable {
   bytes32 constant SORTED_ORACLES_REGISTRY_ID = keccak256(abi.encodePacked("SortedOracles"));
   bytes32 constant STABLE_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableToken"));
   bytes32 constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
-  bytes32 constant MENTOFEEHANDLERSELLER_REGISTRY_ID =
-    keccak256(abi.encodePacked("MentoFeeHandlerSeller"));
   // solhint-enable state-visibility
 
   IRegistry public registry;
@@ -70,42 +59,5 @@ contract UsingRegistry is Ownable {
 
   function getGoldToken() internal view returns (IERC20) {
     return IERC20(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
-  }
-
-  function getFreezer() internal view returns (IFreezer) {
-    return IFreezer(registry.getAddressForOrDie(FREEZER_REGISTRY_ID));
-  }
-
-  function getSortedOracles() internal view returns (ISortedOracles) {
-    return ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
-  }
-
-  function getFeeCurrencyWhitelist() internal view returns (IFeeCurrencyWhitelist) {
-    return IFeeCurrencyWhitelist(registry.getAddressForOrDie(FEE_CURRENCY_WHITELIST_REGISTRY_ID));
-  }
-
-  function getLockedGold() internal view returns (ILockedGold) {
-    return ILockedGold(registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
-  }
-
-  // Current version of Mento doesn't support 0.8
-  function getStableToken() internal view returns (address) {
-    return registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID);
-  }
-
-  function getMentoFeeHandlerSeller() internal view returns (IFeeHandlerSeller) {
-    return IFeeHandlerSeller(registry.getAddressForOrDie(MENTOFEEHANDLERSELLER_REGISTRY_ID));
-  }
-
-  function getAccounts() internal view returns (IAccounts) {
-    return IAccounts(registry.getAddressForOrDie(ACCOUNTS_REGISTRY_ID));
-  }
-
-  function getValidators() internal view returns (IValidators) {
-    return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
-  }
-
-  function getElection() internal view returns (IElection) {
-    return IElection(registry.getAddressForOrDie(ELECTION_REGISTRY_ID));
   }
 }
