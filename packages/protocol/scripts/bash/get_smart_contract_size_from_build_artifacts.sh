@@ -1,10 +1,10 @@
 #!/bin/bash
 : '
   Uses:
-    1. Truffle build artefacts located in the packages/protocol/build/ directory
+    1. Truffle build artifacts located in the packages/protocol/build/ directory
 
   Requirements:
-  1. Have the Truffle build artefacts in the packages/protocol/build/ directory
+  1. Have the Truffle build artifacts in the packages/protocol/build/ directory
   '
 
 # Get the current date and time for the filename
