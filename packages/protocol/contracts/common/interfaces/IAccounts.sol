@@ -22,6 +22,7 @@ interface IAccounts {
     bytes calldata
   ) external;
   function authorizeAttestationSigner(address, uint8, bytes32, bytes32) external;
+  function setEip712DomainSeparator() external;
   function createAccount() external returns (bool);
 
   function setPaymentDelegation(address, uint256) external;
@@ -51,5 +52,4 @@ interface IAccounts {
 
   function getPaymentDelegation(address) external view returns (address, uint256);
   function isSigner(address, address, bytes32) external view returns (bool);
-  function setEip712DomainSeparator() external;
 }

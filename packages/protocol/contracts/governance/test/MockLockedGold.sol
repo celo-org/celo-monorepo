@@ -126,10 +126,6 @@ contract MockLockedGold is ILockedGold {
     return 0;
   }
 
-  function addSlasher(string calldata) external {
-    require(false, "Not implemented");
-  }
-
   function decrementNonvotingAccountBalance(address account, uint256 value) public {
     nonvotingAccountBalance[account] = nonvotingAccountBalance[account].sub(value);
   }

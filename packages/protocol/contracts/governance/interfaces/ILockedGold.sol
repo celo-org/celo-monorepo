@@ -18,6 +18,7 @@ interface ILockedGold {
     address[] calldata greaters,
     uint256[] calldata indices
   ) external;
+  function addSlasher(string calldata slasherIdentifier) external;
 
   function getAccountTotalLockedGold(address) external view returns (uint256);
   function getTotalLockedGold() external view returns (uint256);
@@ -37,5 +38,4 @@ interface ILockedGold {
   function getAccountTotalGovernanceVotingPower(address account) external view returns (uint256);
   function unlockingPeriod() external view returns (uint256);
   function getAccountNonvotingLockedGold(address account) external view returns (uint256);
-  function addSlasher(string calldata slasherIdentifier) external;
 }

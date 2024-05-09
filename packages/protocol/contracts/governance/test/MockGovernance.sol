@@ -26,6 +26,10 @@ contract MockGovernance is IGovernance {
     removeVotesCalledFor[account] = maxAmountAllowed;
   }
 
+  function setConstitution(address destination, bytes4 functionId, uint256 threshold) external {
+    revert("not implemented");
+  }
+
   function votePartially(
     uint256 proposalId,
     uint256 index,
@@ -50,9 +54,5 @@ contract MockGovernance is IGovernance {
 
   function getReferendumStageDuration() external view returns (uint256) {
     return 0;
-  }
-
-  function setConstitution(address destination, bytes4 functionId, uint256 threshold) external {
-    revert("not implemented");
   }
 }

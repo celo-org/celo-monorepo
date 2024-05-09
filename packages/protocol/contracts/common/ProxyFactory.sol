@@ -6,12 +6,6 @@ import "./interfaces/IProxyFactory.sol";
 // import "forge-std/console.sol";
 
 contract ProxyFactory is IProxyFactory {
-  function _deployProxy(address owner) private returns (address) {
-    Proxy proxy = new Proxy();
-    proxy._transferOwnership(msg.sender);
-    return address(proxy);
-  }
-
   function deployProxy(address owner) external returns (address) {
     return _deployProxy(owner);
   }
@@ -20,5 +14,10 @@ contract ProxyFactory is IProxyFactory {
     return _deployProxy(msg.sender);
   }
 
+  function _deployProxy(address owner) private returns (address) {
+    Proxy proxy = new Proxy();
+    proxy._transferOwnership(msg.sender);
+    return address(proxy);
+  }
 }
 

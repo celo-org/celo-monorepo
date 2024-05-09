@@ -498,28 +498,6 @@ contract Accounts is
   }
 
   /**
-   * @notice Sets the EIP712 domain separator for the Celo Accounts abstraction.
-   */
-  function _setEip712DomainSeparator() internal {
-    uint256 chainId;
-    assembly {
-      chainId := chainid
-    }
-
-    eip712DomainSeparator = keccak256(
-      abi.encode(
-        keccak256(
-          "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-        ),
-        keccak256(bytes("Celo Core Contracts")),
-        keccak256("1.0"),
-        chainId,
-        address(this)
-      )
-    );
-  }
-
-  /**
    * @notice Creates an account.
    * @return True if account creation succeeded.
    */
@@ -995,6 +973,28 @@ contract Accounts is
    */
   function isLegacyRole(bytes32 role) public pure returns (bool) {
     return role == VoteSigner || role == ValidatorSigner || role == AttestationSigner;
+  }
+
+  /**
+   * @notice Sets the EIP712 domain separator for the Celo Accounts abstraction.
+   */
+  function _setEip712DomainSeparator() internal {
+    uint256 chainId;
+    assembly {
+      chainId := chainid
+    }
+
+    eip712DomainSeparator = keccak256(
+      abi.encode(
+        keccak256(
+          "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+        ),
+        keccak256(bytes("Celo Core Contracts")),
+        keccak256("1.0"),
+        chainId,
+        address(this)
+      )
+    );
   }
 
   /**

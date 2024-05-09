@@ -15,6 +15,5 @@ contract IntegrationTest is Test {
 
   function setUp() public {}
 
-  function test_dummy() public {
-  }
+  function test_dummy() public {}
 }

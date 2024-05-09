@@ -3,16 +3,17 @@ pragma solidity >=0.8.7 <0.8.20;
 
 
 contract EpochSizePrecompile {
-  address constant _address = address(0xff - 7);
+  address constant ADDRESS = address(0xff - 7);
 
-  uint256 public constant epochSize = 17280;
+  uint256 public constant EPOCH_SIZE = 17280;
 
-  function getAddress() external returns (address){
-    return _address;
+  receive() external payable {}
+
+  fallback(bytes calldata) external payable returns (bytes memory) {
+    return abi.encodePacked(EPOCH_SIZE);
   }
 
-  fallback (bytes calldata) external payable returns (bytes memory) {
-    return abi.encodePacked(epochSize);
+  function getAddress() public pure returns (address){
+    return ADDRESS;
   }
-
 }

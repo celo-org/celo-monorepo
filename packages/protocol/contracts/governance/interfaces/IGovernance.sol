@@ -12,6 +12,8 @@ interface IGovernance {
     uint256 abstainVotes
   ) external returns (bool);
 
+  function setConstitution(address destination, bytes4 functionId, uint256 threshold) external;
+
   function isVoting(address) external view returns (bool);
   function getAmountOfGoldUsedForVoting(address account) external view returns (uint256);
 
@@ -21,5 +23,4 @@ interface IGovernance {
     returns (address, uint256, uint256, uint256, string memory, uint256, bool);
 
   function getReferendumStageDuration() external view returns (uint256);
-  function setConstitution(address destination, bytes4 functionId, uint256 threshold) external;
 }
