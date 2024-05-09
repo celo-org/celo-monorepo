@@ -11,8 +11,11 @@
 # Get the current date and time for the filename
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
+# Get the directory where the script is located, assuming the script is in the root or a subdirectory of the repo
+BASE_DIRECTORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
 # Create the output directory if it doesn't exist
-OUTPUT_DIRECTORY="$(pwd)/out"
+OUTPUT_DIRECTORY="$BASE_DIRECTORY/out"
 mkdir -p "$OUTPUT_DIRECTORY"
 OUTPUT_FILE="$OUTPUT_DIRECTORY/onchain_bytecode_sizes_$TIMESTAMP.csv"
 TEMP_FILE="temp_$TIMESTAMP.txt"
