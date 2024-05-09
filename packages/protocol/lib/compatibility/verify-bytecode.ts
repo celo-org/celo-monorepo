@@ -1,18 +1,18 @@
 /* eslint-disable no-console: 0 */
-import { ensureLeading0x } from '@celo/base/lib/address'
+import { ensureLeading0x } from '@celo/base/lib/address';
 import {
   LibraryAddresses,
   LibraryPositions,
   linkLibraries,
   stripMetadata,
   verifyAndStripLibraryPrefix,
-} from '@celo/protocol/lib/bytecode'
-import { verifyProxyStorageProof } from '@celo/protocol/lib/proxy-utils'
-import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
-import { BuildArtifacts } from '@openzeppelin/upgrades'
-import { ProxyInstance, RegistryInstance } from 'types'
-import Web3 from 'web3'
-import { ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'
+} from '@celo/protocol/lib/bytecode';
+import { verifyProxyStorageProof } from '@celo/protocol/lib/proxy-utils';
+import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release';
+import { BuildArtifacts } from '@openzeppelin/upgrades';
+import { ProxyInstance, RegistryInstance } from 'types';
+import Web3 from 'web3';
+import { ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9';
 
 let ignoredContracts = [
   // This contract is not proxied
@@ -76,8 +76,9 @@ export const getProposedProxyAddress = (contract: string, proposal: ProposalTx[]
   return relevantTx.args[1]
 }
 
-const getSourceBytecodeFromArtifacts = (contract: string, artifacts: BuildArtifacts): string =>
-  stripMetadata(artifacts.getArtifactByName(contract).deployedBytecode)
+const getSourceBytecodeFromArtifacts = (contract: string, artifacts: BuildArtifacts): string =>{
+ console.log("### verify-bytecode : Current Contract ",artifacts.getArtifactByName(contract).contractName)
+  return  stripMetadata(artifacts.getArtifactByName(contract).deployedBytecode)}
 
 const getSourceBytecode = (contract: string, context: VerificationContext): string =>
   getSourceBytecodeFromArtifacts(contract, context.artifacts)

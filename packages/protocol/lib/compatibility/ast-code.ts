@@ -1,16 +1,16 @@
-import { stripMetadata } from '@celo/protocol/lib/bytecode'
+import { stripMetadata } from '@celo/protocol/lib/bytecode';
 import {
   Change,
   ContractKindChange, DeployedBytecodeChange, MethodAddedChange,
   MethodMutabilityChange, MethodRemovedChange, MethodReturnChange,
   MethodVisibilityChange, NewContractChange
-} from '@celo/protocol/lib/compatibility/change'
-import { makeZContract } from '@celo/protocol/lib/compatibility/internal'
+} from '@celo/protocol/lib/compatibility/change';
+import { makeZContract } from '@celo/protocol/lib/compatibility/internal';
 import {
   BuildArtifacts,
   Contract as ZContract
-} from '@openzeppelin/upgrades'
-import ContractAST from '@openzeppelin/upgrades/lib/utils/ContractAST'
+} from '@openzeppelin/upgrades';
+import ContractAST from '@openzeppelin/upgrades/lib/utils/ContractAST';
 
 export enum Visibility {
   NONE = "",
@@ -237,6 +237,7 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
 
   const report = doASTCompatibilityReport(contractName, oldAST, newAST)
   // Check deployed byte code change
+  console.log("ast-code : CurrentContract",oldContract.schema.contractName)
   if (stripMetadata(oldContract.schema.deployedBytecode) !== stripMetadata(newContract.schema.deployedBytecode)) {
     report.push(new DeployedBytecodeChange(contractName))
   }
