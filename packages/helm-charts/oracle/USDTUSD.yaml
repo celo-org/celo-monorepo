@@ -1,0 +1,31 @@
+# Testnet only config, replace with mainnet config later on
+oracle:
+  currencyPair: USDTUSD
+  aggregation:
+    mid:
+      maxExchangeVolumeShare: 1
+      maxPercentageDeviation: 0.005
+      maxPercentageBidAskSpread: 0.005
+  metrics:
+    enabled: true
+    prometheusPort: 9090
+  apiRequestTimeoutMs: 5000
+  circuitBreakerPriceChangeThreshold: 0.25
+  gasPriceMultiplier: 1.5
+  priceSources:
+    "[
+    [
+    {exchange: 'KRAKEN', symbol: 'USDTUSD', toInvert: false }
+    ],
+    [
+    {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
+    ],
+    [
+    {exchange: 'BITSTAMP', symbol: 'USDTUSD', toInvert: false}
+    ]
+    ]"
+  minPriceSourceCount: 5
+  reportStrategy: BLOCK_BASED
+  reporter:
+    blockBased:
+      minReportPriceChangeThreshold: 0.0005 # 0.05%
