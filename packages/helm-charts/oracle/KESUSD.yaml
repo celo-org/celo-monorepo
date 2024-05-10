@@ -17,9 +17,6 @@ oracle:
         {exchange: 'ALPHAVANTAGE', symbol: 'KESUSD', toInvert: false}
       ],
       [
-        {exchange: 'OPENEXCHANGERATES', symbol: 'KESUSD', toInvert: false}
-      ],
-      [
         {exchange: 'XIGNITE', symbol: 'KESUSD', toInvert: false}
       ]
   ]"
