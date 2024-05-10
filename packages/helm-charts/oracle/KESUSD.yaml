@@ -23,6 +23,10 @@ oracle:
         {exchange: 'XIGNITE', symbol: 'KESUSD', toInvert: false}
       ]
   ]"
+  # Additional sources missing adapters [
+  # [
+  #       {exchange: 'OPENEXCHANGERATES', symbol: 'KESUSD', toInvert: false}
+  #     ],
   minPriceSourceCount: 2
   reportStrategy: BLOCK_BASED
   reporter:
