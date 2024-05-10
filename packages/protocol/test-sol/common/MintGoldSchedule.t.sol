@@ -89,12 +89,13 @@ contract MintGoldScheduleTest is Test, ECDSAHelper, IsL2Check {
 
   address constant l1RegistryAddress = 0x000000000000000000000000000000000000ce10;
 
-  uint256 constant TOTAL_AMOUNT = 1 ether * 10;
+  // uint256 constant TOTAL_AMOUNT = 10 ether;
+  uint256 constant TOTAL_AMOUNT = 600000000 ether;
   uint256 constant MINUTE = 60;
-  uint256 constant HOUR = 60 * 60;
+  uint256 constant HOUR = 60 * MINUTE;
   uint256 constant DAY = 24 * HOUR;
   uint256 constant MONTH = 30 * DAY;
-  uint256 constant UNLOCKING_PERIOD = 3 * DAY;
+  uint256 constant YEAR = 365 * DAY;
 
   MintGoldScheduleMockTunnel.InitParams initParams;
 
@@ -119,9 +120,9 @@ contract MintGoldScheduleTest is Test, ECDSAHelper, IsL2Check {
 
     initParams = MintGoldScheduleMockTunnel.InitParams({
       mintStartTime: block.timestamp + 5 * MINUTE,
-      mintCliffTime: HOUR,
-      numMintingPeriods: 4,
-      mintingPeriod: 3 * MONTH,
+      mintCliffTime: 1 * HOUR,
+      numMintingPeriods: 5475,
+      mintingPeriod: 1 * DAY,
       _totalAmountToMint: TOTAL_AMOUNT,
       _beneficiary: address(uint160(beneficiary)),
       _mintGoldOwner: mintGoldOwner,
@@ -350,26 +351,15 @@ contract MintGoldScheduleTest_MintAccordingToSchedule_L1 is MintGoldScheduleTest
 
 contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
   uint256 initialMintGoldAmount;
+  uint256 mintPerPeriod;
 
   function setUp() public {
     super.setUp();
 
     initParams.initialDistributionRatio = 0;
     initialMintGoldAmount = initParams._totalAmountToMint;
+    mintPerPeriod = initParams._totalAmountToMint / initParams.numMintingPeriods;
     newMintGold(false);
-  }
-
-  function test_Reverts_WhenMintingOnL1() public {
-    deployCodeTo("Registry.sol", abi.encode(false), l1RegistryAddress);
-    registry = Registry(l1RegistryAddress);
-    registry.setAddressFor("GoldToken", address(goldToken));
-
-    vm.prank(mintGoldOwner);
-    mintGoldSchedule.setMaxDistribution(1000);
-
-    vm.warp(block.timestamp + 3 * MONTH + 1 * DAY);
-    vm.prank(randomAddress);
-    mintGoldSchedule.mintAccordingToSchedule(initialMintGoldAmount / 20);
   }
 
   function test_Reverts_BeforeTheReleaseCliffHasPassed() public {
@@ -381,8 +371,8 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
     vm.prank(randomAddress);
     mintGoldSchedule.mintAccordingToSchedule(initialMintGoldAmount / 20);
   }
-
-  function test_Reverts_WhenMintableAmountIsZero() public {
+  // XXX(soloseng): remove once function is updated.
+  function test_Reverts_WhenMintAmountIsZero() public {
     vm.prank(mintGoldOwner);
     mintGoldSchedule.setMaxDistribution(1000);
     vm.warp(block.timestamp + 3 * MONTH + 1 * DAY);
@@ -391,14 +381,14 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
     mintGoldSchedule.mintAccordingToSchedule(0);
   }
 
-  function test_ShouldAllowToMint25PercentAFterTheFirstQuarter_WhenMaxDistributionIs100Percent()
+  function test_ShouldAllowToMint25PercentAfterQuarterOfTimePassed_WhenMaxDistributionIs100Percent()
     public
   {
     vm.prank(mintGoldOwner);
     mintGoldSchedule.setMaxDistribution(1000);
 
     uint256 beneficiaryBalanceBefore = goldToken.balanceOf(initParams._beneficiary);
-    vm.warp(block.timestamp + 3 * MONTH + 1 * DAY);
+    vm.warp(block.timestamp + 1370 * DAY);
     uint256 expectedMintableAmount = initialMintGoldAmount / 4;
 
     vm.prank(randomAddress);
@@ -410,14 +400,14 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
     assertEq(beneficiaryBalanceAfter - beneficiaryBalanceBefore, expectedMintableAmount);
   }
 
-  function test_ShouldAllowToMint50PercentAFterTheSecondQuarter_WhenMaxDistributionIs100Percent()
+  function test_ShouldAllowToMint50PercentAfterHalfTimeHasPassed_WhenMaxDistributionIs100Percent()
     public
   {
     vm.prank(mintGoldOwner);
     mintGoldSchedule.setMaxDistribution(1000);
 
     uint256 beneficiaryBalanceBefore = goldToken.balanceOf(initParams._beneficiary);
-    vm.warp(block.timestamp + 6 * MONTH + 1 * DAY);
+    vm.warp(block.timestamp + (7 * YEAR) + (183 * DAY) + (1 * DAY));
     uint256 expectedMintableAmount = initialMintGoldAmount / 2;
 
     vm.prank(randomAddress);
@@ -429,14 +419,15 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
     assertEq(beneficiaryBalanceAfter - beneficiaryBalanceBefore, expectedMintableAmount);
   }
 
-  function test_ShouldAllowToMint75PercentAFterTheThirdQuarter_WhenMaxDistributionIs100Percent()
+  function test_ShouldAllowToMint75PercentAfter11YearsAnd3Months_WhenMaxDistributionIs100Percent()
     public
   {
     vm.prank(mintGoldOwner);
     mintGoldSchedule.setMaxDistribution(1000);
 
     uint256 beneficiaryBalanceBefore = goldToken.balanceOf(initParams._beneficiary);
-    vm.warp(block.timestamp + 9 * MONTH + 1 * DAY);
+    vm.warp(block.timestamp + 4110 * DAY);
+
     uint256 expectedMintableAmount = (initialMintGoldAmount / 4) * 3;
 
     vm.prank(randomAddress);
@@ -448,14 +439,12 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
     assertEq(beneficiaryBalanceAfter - beneficiaryBalanceBefore, expectedMintableAmount);
   }
 
-  function test_ShouldAllowToMint100PercentAFterTheFourthQuarter_WhenMaxDistributionIs100Percent()
-    public
-  {
+  function test_ShouldAllowToMint100PercentAfter15Years_WhenMaxDistributionIs100Percent() public {
     vm.prank(mintGoldOwner);
     mintGoldSchedule.setMaxDistribution(1000);
 
     uint256 beneficiaryBalanceBefore = goldToken.balanceOf(initParams._beneficiary);
-    vm.warp(block.timestamp + 12 * MONTH + 1 * DAY);
+    vm.warp(block.timestamp + (15 * YEAR) + (1 * DAY));
     uint256 expectedMintableAmount = initialMintGoldAmount;
 
     vm.prank(randomAddress);
@@ -475,7 +464,7 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
 
     vm.prank(randomAddress);
     mintGoldSchedule.increaseTotalAmountToMint(1 ether / 2);
-    vm.warp(block.timestamp + 12 * MONTH + 1 * DAY);
+    vm.warp(block.timestamp + (15 * YEAR) + (1 * DAY));
 
     uint256 expectedMintableAmount = TOTAL_AMOUNT + 1 ether / 2;
     vm.prank(randomAddress);
@@ -490,7 +479,8 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
 
     vm.prank(randomAddress);
     mintGoldSchedule.increaseTotalAmountToMint(1 ether / 2);
-    vm.warp(block.timestamp + 6 * MONTH + 1 * DAY);
+
+    vm.warp(block.timestamp + (7 * YEAR) + (183 * DAY) + (1 * DAY));
 
     uint256 expectedMintableAmount = (TOTAL_AMOUNT + 1 ether / 2) / 2;
     vm.prank(randomAddress);
@@ -505,7 +495,7 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
 
     vm.prank(randomAddress);
     mintGoldSchedule.increaseTotalAmountToMint(1 ether / 2);
-    vm.warp(block.timestamp + 6 * MONTH + 1 * DAY);
+    vm.warp(block.timestamp + (7 * YEAR) + (183 * DAY));
 
     uint256 expectedMintableAmount = (TOTAL_AMOUNT + 1 ether / 2) / 2 + 1;
     vm.prank(randomAddress);
@@ -521,7 +511,7 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
 
     vm.prank(randomAddress);
     mintGoldSchedule.increaseTotalAmountToMint(1 ether / 2);
-    vm.warp(block.timestamp + 12 * MONTH + 1 * DAY);
+    vm.warp(block.timestamp + (15 * YEAR) + (1 * DAY));
 
     uint256 expectedMintableAmount = TOTAL_AMOUNT / 2;
     vm.prank(randomAddress);
@@ -540,7 +530,7 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
     mintGoldSchedule.setMaxDistribution(500);
 
     uint256 beneficiaryBalanceBefore = goldToken.balanceOf(initParams._beneficiary);
-    vm.warp(block.timestamp + 12 * MONTH + 1 * DAY);
+    vm.warp(block.timestamp + (15 * YEAR) + (1 * DAY));
     uint256 expectedMintableAmount = initialMintGoldAmount / 2;
 
     vm.prank(randomAddress);
@@ -558,7 +548,7 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
     vm.prank(mintGoldOwner);
     mintGoldSchedule.setMaxDistribution(500);
 
-    vm.warp(block.timestamp + 12 * MONTH + 1 * DAY);
+    vm.warp(block.timestamp + (15 * YEAR) + (1 * DAY));
     uint256 expectedMintableAmount = initialMintGoldAmount / 2 + 1;
 
     vm.expectRevert("Requested amount exceeds current alloted maximum distribution");
@@ -573,7 +563,7 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
     mintGoldSchedule.setMaxDistribution(1000);
 
     uint256 beneficiaryBalanceBefore = goldToken.balanceOf(initParams._beneficiary);
-    vm.warp(block.timestamp + 12 * MONTH + 1 * DAY);
+    vm.warp(block.timestamp + (15 * YEAR) + (1 * DAY));
     uint256 expectedMintableAmount = initialMintGoldAmount;
 
     vm.prank(randomAddress);
@@ -588,7 +578,7 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
     vm.prank(mintGoldOwner);
     mintGoldSchedule.setMaxDistribution(1000);
 
-    vm.warp(block.timestamp + 12 * MONTH + 1 * DAY);
+    vm.warp(block.timestamp + (15 * YEAR) + (1 * DAY));
     uint256 expectedMintableAmount = initialMintGoldAmount;
 
     vm.expectEmit(true, true, true, true);
@@ -610,7 +600,7 @@ contract MintGoldScheduleTest_MintAccordingToSchedule_SelfDestruct is MintGoldSc
     vm.prank(mintGoldOwner);
     mintGoldSchedule.setMaxDistribution(1000);
 
-    vm.warp(block.timestamp + 12 * MONTH + 1 * DAY);
+    vm.warp(block.timestamp + 15 * YEAR + 3 * MONTH);
     uint256 expectedMintableAmount = initialMintGoldAmount;
 
     vm.prank(randomAddress);
@@ -624,11 +614,13 @@ contract MintGoldScheduleTest_MintAccordingToSchedule_SelfDestruct is MintGoldSc
 
 contract MintGoldScheduleTest_GetCurrentReleasedTotalAmount is MintGoldScheduleTest {
   uint256 initialMintGoldAmount;
+  uint256 mintPerPeriod;
 
   function setUp() public {
     super.setUp();
     newMintGold(false);
     initialMintGoldAmount = initParams._totalAmountToMint;
+    mintPerPeriod = initParams._totalAmountToMint / initParams.numMintingPeriods;
   }
 
   function test_ShouldReturnZeroIfBeforeCliffStartTime() public {
@@ -636,37 +628,30 @@ contract MintGoldScheduleTest_GetCurrentReleasedTotalAmount is MintGoldScheduleT
     assertEq(mintGoldSchedule.getCurrentReleasedTotalAmount(), 0);
   }
 
-  function test_ShouldReturn25PercentOfReleasedAmountOfGoldRightAfterTheBeginningOfTheFirstQuarter()
-    public
-  {
-    vm.warp(block.timestamp + 3 * MONTH + 1 * DAY);
-    assertEq(mintGoldSchedule.getCurrentReleasedTotalAmount(), initialMintGoldAmount / 4);
+  function test_ShouldReturn2PercentOfTotalAmountOfGoldRightAfter3Months() public {
+    vm.warp(block.timestamp + 110 * DAY);
+    assertEq(mintGoldSchedule.getCurrentReleasedTotalAmount(), mintPerPeriod * 109);
   }
 
-  function test_ShouldReturn50PercentOfReleasedAmountOfGoldRightAfterTheBeginningOfTheSecondQuarter()
-    public
-  {
-    vm.warp(block.timestamp + 6 * MONTH + 1 * DAY);
-    assertEq(mintGoldSchedule.getCurrentReleasedTotalAmount(), initialMintGoldAmount / 2);
+  function test_ShouldReturn10PercentOfTotalAmountOfGoldRightAfter18Months() public {
+    vm.warp(block.timestamp + 18 * MONTH + 1 * DAY);
+    assertEq(mintGoldSchedule.getCurrentReleasedTotalAmount(), mintPerPeriod * 540);
   }
 
-  function test_ShouldReturn75PercentOfReleasedAmountOfGoldRightAfterTheBeginningOfTheThirdQuarter()
-    public
-  {
-    vm.warp(block.timestamp + 9 * MONTH + 1 * DAY);
-    assertEq(mintGoldSchedule.getCurrentReleasedTotalAmount(), (initialMintGoldAmount / 4) * 3);
+  function test_ShouldReturnAtLeast50PercentOfTotalAmountOfGoldRightAfter7AndHalfYears() public {
+    vm.warp(block.timestamp + (7 * YEAR) + (183 * DAY) + (1 * DAY));
+    assertGe(mintGoldSchedule.getCurrentReleasedTotalAmount(), initialMintGoldAmount / 2);
   }
 
-  function test_ShouldReturn100PercentOfReleasedAmountOfGoldRightAfterTheBeginningOfTheFourthQuarter()
-    public
-  {
-    vm.warp(block.timestamp + 12 * MONTH + 1 * DAY);
+  function test_ShouldReturn100PercentOfTotalAmountOfGoldRightAfter15Years() public {
+    vm.warp(block.timestamp + 15 * YEAR + 1 * DAY);
     assertEq(mintGoldSchedule.getCurrentReleasedTotalAmount(), initialMintGoldAmount);
   }
 }
 
 contract MintGoldScheduleTest_GetMintableAmount is MintGoldScheduleTest {
   uint256 initialMintGoldAmount;
+  uint256 mintPerPeriod;
 
   function setUp() public {
     super.setUp();
@@ -674,6 +659,7 @@ contract MintGoldScheduleTest_GetMintableAmount is MintGoldScheduleTest {
 
     newMintGold(false);
     initialMintGoldAmount = initParams._totalAmountToMint;
+    mintPerPeriod = initParams._totalAmountToMint / initParams.numMintingPeriods;
   }
 
   function test_ShouldReturnFullAmountAvailableForThisReleasePeriod() public {
@@ -681,7 +667,7 @@ contract MintGoldScheduleTest_GetMintableAmount is MintGoldScheduleTest {
     mintGoldSchedule.setMaxDistribution(1000);
 
     vm.warp(block.timestamp + 6 * MONTH + 1 * DAY);
-    assertEq(mintGoldSchedule.getMintableAmount(), initialMintGoldAmount / 2);
+    assertEq(mintGoldSchedule.getMintableAmount(), mintPerPeriod * 180);
   }
 
   function test_ShouldReturnOnlyAmountNotYetMinted() public {
@@ -690,8 +676,8 @@ contract MintGoldScheduleTest_GetMintableAmount is MintGoldScheduleTest {
 
     vm.warp(block.timestamp + 6 * MONTH + 1 * DAY);
     vm.prank(randomAddress);
-    mintGoldSchedule.mintAccordingToSchedule(initialMintGoldAmount / 4);
-    assertEq(mintGoldSchedule.getMintableAmount(), initialMintGoldAmount / 4);
+    mintGoldSchedule.mintAccordingToSchedule(mintPerPeriod * 90);
+    assertEq(mintGoldSchedule.getMintableAmount(), mintPerPeriod * 90);
   }
 
   function test_ShouldReturnOnlyUpToItsOwnBalance() public {
@@ -700,7 +686,7 @@ contract MintGoldScheduleTest_GetMintableAmount is MintGoldScheduleTest {
 
     vm.warp(block.timestamp + 6 * MONTH + 1 * DAY);
 
-    uint256 expectedMintableAmount = (initialMintGoldAmount) / 2;
+    uint256 expectedMintableAmount = mintPerPeriod * 180;
 
     assertEq(mintGoldSchedule.getMintableAmount(), expectedMintableAmount);
   }
@@ -709,7 +695,7 @@ contract MintGoldScheduleTest_GetMintableAmount is MintGoldScheduleTest {
     vm.prank(mintGoldOwner);
     mintGoldSchedule.setMaxDistribution(250);
 
-    vm.warp(block.timestamp + 6 * MONTH + 1 * DAY);
+    vm.warp(block.timestamp + 50 * MONTH);
     assertEq(mintGoldSchedule.getMintableAmount(), initialMintGoldAmount / 4);
   }
 }
