@@ -23,3 +23,10 @@ if [ $VERSION_NUMBER -eq 9 ]
   then
   CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|SortedOracles"
 fi
+
+
+if [ $VERSION_NUMBER -eq 11 ]
+  then
+  echo "- excluding new files"
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|CompileExchange|ProxyFactory"
+fi
