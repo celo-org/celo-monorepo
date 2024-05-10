@@ -28,5 +28,5 @@ fi
 if [ $VERSION_NUMBER -eq 11 ]
   then
   echo "- excluding new files"
-  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|CompileExchange|ProxyFactory"
+  CONTRACT_EXCLUSION_REGEX="$CONTRACT_EXCLUSION_REGEX|CompileExchange|ProxyFactory|Exchange"
 fi
