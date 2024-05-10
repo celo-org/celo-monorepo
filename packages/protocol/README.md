@@ -230,9 +230,16 @@ Requirements: This script requires the `jq` and `bc` command-line tools to b
 
 ### Using contracts deployed on-chain
 
-Usage:
+Default usage (Celo Mainnet):
 
 ```sh
+$ yarn size:onchain
+```
+
+Custom usage (any Celo RPC URL)
+
+```sh
+$ export RPC_URL=https://alfajores-forno.celo-testnet.org
 $ yarn size:onchain
 ```
 
@@ -246,6 +253,7 @@ For example:
 ```sh
 $ yarn size:onchain
 
+No custom RPC URL provided. Using default RPC URL: https://forno.celo.org
 # ...
 StableTokenEUR,0x434563B0604BE100F04B7Ae485BcafE3c9D8850E,9.180
 Validators,0xe52EaC18fB3C1e1713e73d4A5b7dCb12a2f2C697,58.228
@@ -253,11 +261,25 @@ Data extraction complete. Results saved to /Users/arthur/Documents/celo-org/celo
 ✨  Done in 19.15s.
 ```
 
+Or with custom RPC URL:
+
+```sh
+$ export RPC_URL=https://alfajores-forno.celo-testnet.org
+$ yarn size:onchain
+
+Using custom RPC URL: https://alfajores-forno.celo-testnet.org
+# ...
+StableTokenEUR,0x3Bd899048f4f6951fFeB5474205B79FDB09D6212,9.180
+Validators,0xF17D8624e0c3402D02b6F8D5870Fff0Dd35e4f0B,58.228
+Data extraction complete. Results saved to /Users/arthur/Documents/celo-org/celo-monorepo/packages/protocol/scripts/bash/out/onchain_bytecode_sizes_20240510_122254.csv
+✨  Done in 38.59s.
+```
+
 How it works:
 
 1.  The script first creates an output directory named `out` in the current directory if it doesn't exist.
 2.  It then generates a timestamp and uses it to create a unique output file in the `out` directory.
-3.  The script sets the RPC URL for the Celo blockchain to `https://forno.celo.org`.
+3.  The script sets the RPC URL to `https://forno.celo.org` (default), or uses the user-specific RPC URL.
 4.  It initializes a temporary file and the output file with headers.
 5.  The script uses the `celocli network:contracts` command to fetch the addresses of all core contracts.
 6.  For each contract address, it uses Foundry to get the deployed bytecode.
