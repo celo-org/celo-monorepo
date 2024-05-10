@@ -20,8 +20,13 @@ mkdir -p "$OUTPUT_DIRECTORY"
 OUTPUT_FILE="$OUTPUT_DIRECTORY/onchain_bytecode_sizes_$TIMESTAMP.csv"
 TEMP_FILE="temp_$TIMESTAMP.txt"
 
-# Set the RPC URL for the blockchain
-RPC_URL="https://forno.celo.org"
+# Set the RPC URL using environment variable or fallback to the default value
+RPC_URL="${RPC_URL:-https://forno.celo.org}"
+if [ "$RPC_URL" == "https://forno.celo.org" ]; then
+  echo "No custom RPC URL provided. Using default RPC URL: $RPC_URL."
+else
+  echo "Using custom RPC URL: $RPC_URL"
+fi
 
 # Initialize the temporary file
 echo "" > $TEMP_FILE
