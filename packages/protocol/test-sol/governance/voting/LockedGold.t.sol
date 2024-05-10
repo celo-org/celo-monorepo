@@ -19,18 +19,6 @@ import "@celo-contracts/governance/test/MockValidators.sol";
 contract LockedGoldTest is Test {
   using FixidityLib for FixidityLib.Fraction;
 
-  struct WhenVoteSignerStruct {
-    address delegator;
-    address delegator2;
-    address delegatee1;
-    address delegatee2;
-    uint256 delegatorSigner1PK;
-    uint256 delegateeSigner1PK;
-    uint256 delegatorSigner2PK;
-    uint256 delegateeSigner2PK;
-    bool lock;
-  }
-
   Registry registry;
   Accounts accounts;
   GoldToken goldToken;
@@ -44,8 +32,6 @@ contract LockedGoldTest is Test {
   uint256 HOUR = 60 * 60;
   uint256 DAY = 24 * HOUR;
   uint256 unlockingPeriod = 3 * DAY;
-
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   address randomAddress = actor("randomAddress");
   address caller = address(this);
@@ -77,11 +63,6 @@ contract LockedGoldTest is Test {
   );
   event MaxDelegateesCountSet(uint256 value);
 
-  modifier _whenL2() {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
-    _;
-  }
-
   function setUp() public {
     address registryAddress = 0x000000000000000000000000000000000000ce10;
     deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
@@ -104,6 +85,16 @@ contract LockedGoldTest is Test {
     registry.setAddressFor("StableToken", address(stableToken));
     lockedGold.initialize(address(registry), unlockingPeriod);
     accounts.createAccount();
+  }
+
+  function getParsedSignatureOfAddress(address _address, uint256 privateKey)
+    public
+    pure
+    returns (uint8, bytes32, bytes32)
+  {
+    bytes32 addressHash = keccak256(abi.encodePacked(_address));
+    bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
+    return vm.sign(privateKey, prefixedHash);
   }
 
   function authorizeVoteSigner(address _delegator, uint256 _signerPK) public {
@@ -154,6 +145,18 @@ contract LockedGoldTest is Test {
     );
     assertEq(FixidityLib.wrap(fraction * 100).fromFixed(), percent, "fraction incorrect");
     assertEq(currentAmount, amount, "amount incorrect");
+  }
+
+  struct WhenVoteSignerStruct {
+    address delegator;
+    address delegator2;
+    address delegatee1;
+    address delegatee2;
+    uint256 delegatorSigner1PK;
+    uint256 delegateeSigner1PK;
+    uint256 delegatorSigner2PK;
+    uint256 delegateeSigner2PK;
+    bool lock;
   }
 
   /**
@@ -207,15 +210,6 @@ contract LockedGoldTest is Test {
     lockedGold.lock.value(value)();
   }
 
-  function getParsedSignatureOfAddress(address _address, uint256 privateKey)
-    public
-    pure
-    returns (uint8, bytes32, bytes32)
-  {
-    bytes32 addressHash = keccak256(abi.encodePacked(_address));
-    bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
-    return vm.sign(privateKey, prefixedHash);
-  }
 }
 
 contract LockedGoldTest_initialize is LockedGoldTest {
@@ -287,12 +281,6 @@ contract LockedGoldTest_setUnlockingPeriod is LockedGoldTest {
     vm.prank(randomAddress);
     lockedGold.setUnlockingPeriod(100);
   }
-
-  function test_Revert_WhenSetUnlockingPeriod() public _whenL2 {
-    uint256 newUnlockingPeriod = 100;
-    vm.expectRevert("This method is no longer supported in L2.");
-    lockedGold.setUnlockingPeriod(newUnlockingPeriod);
-  }
 }
 
 contract LockedGoldTest_lock is LockedGoldTest {
@@ -301,10 +289,6 @@ contract LockedGoldTest_lock is LockedGoldTest {
     super.setUp();
   }
 
-  function test_Reverts_WhenLockingOnL2() public _whenL2 {
-    vm.expectRevert("This method is no longer supported in L2.");
-    lockedGold.lock.value(value)();
-  }
   function test_ShouldIncreaseTheAccountsNonVotingLockedGoldBalance() public {
     lockedGold.lock.value(value)();
     assertEq(lockedGold.getAccountNonvotingLockedGold(caller), value);
@@ -356,191 +340,6 @@ contract LockedGoldTest_unlock is LockedGoldTest {
   function setUp() public {
     super.setUp();
     lockedGold.lock.value(value)();
-  }
-
-  function test_ShouldAddAPendingWithdrawal_WhenAccountIsNotVotingInGovernance_WhenThereAreNoBalanceRequirements()
-    public
-  {
-    lockedGold.unlock(value);
-    (uint256 val, uint256 timestamp) = lockedGold.getPendingWithdrawal(caller, 0);
-    assertEq(val, value);
-    assertEq(timestamp, availabilityTime);
-    vm.expectRevert();
-    lockedGold.getPendingWithdrawal(caller, 1);
-  }
-
-  function test_ShouldAddPendingWithdrawals_WhenAccountIsNotVotingInGovernance_WhenThereAreNoBalanceRequirements()
-    public
-  {
-    lockedGold.unlock(value);
-    (uint256[] memory vals, uint256[] memory timestamps) = lockedGold.getPendingWithdrawals(caller);
-    assertEq(vals.length, 1);
-    assertEq(timestamps.length, 1);
-    assertEq(vals[0], value);
-    assertEq(timestamps[0], availabilityTime);
-  }
-
-  function test_ShouldDecreaseTheACcountsNonVotingLockedGoldBalance_WhenAccountIsNotVotingInGovernance_WhenThereAreNoBalanceRequirements()
-    public
-  {
-    lockedGold.unlock(value);
-    assertEq(lockedGold.getAccountNonvotingLockedGold(caller), 0);
-  }
-
-  function test_ShouldDecreaseTheAccountsTotalLockedGoldBalance_WhenAccountIsNotVotingInGovernance_WhenThereAreNoBalanceRequirements()
-    public
-  {
-    lockedGold.unlock(value);
-    assertEq(lockedGold.getAccountTotalLockedGold(caller), 0);
-  }
-
-  function test_ShouldDecreaseTheNonVotingLockedGoldBalance_WhenAccountIsNotVotingInGovernance_WhenThereAreNoBalanceRequirements()
-    public
-  {
-    lockedGold.unlock(value);
-    assertEq(lockedGold.getNonvotingLockedGold(), 0);
-  }
-
-  function test_ShouldDecreaseTheTotalLockedGoldBalance_WhenAccountIsNotVotingInGovernance_WhenThereAreNoBalanceRequirements()
-    public
-  {
-    lockedGold.unlock(value);
-    assertEq(lockedGold.getTotalLockedGold(), 0);
-  }
-
-  function test_Emits_GoldUnlockedEvent_WhenAccountIsNotVotingInGovernance_WhenThereAreNoBalanceRequirements()
-    public
-  {
-    vm.expectEmit(true, true, true, true);
-    emit GoldUnlocked(caller, value, availabilityTime);
-    lockedGold.unlock(value);
-  }
-
-  function test_ShouldRevertWhenUnlockingGoldThatIsVotedWith_WhenThereAreNoBalanceRequirements()
-    public
-  {
-    governance.setVoting(caller);
-    governance.setTotalVotes(caller, votingGold);
-
-    vm.expectRevert("Not enough unlockable celo. Celo is locked in voting.");
-    lockedGold.unlock(value);
-  }
-
-  function test_ShouldRevertWhenUnlockingMoreThenLocked_WhenThereAreNoBalanceRequirements() public {
-    vm.expectRevert("SafeMath: subtraction overflow");
-    lockedGold.unlock(value + 1);
-  }
-
-  function test_ShouldAddAPendingWithdrawal_WhenTheAccountIsRequestingOnlyNonVotingGold_WhenThereAreNoBalanceRequirements()
-    public
-  {
-    governance.setVoting(caller);
-    governance.setTotalVotes(caller, votingGold);
-
-    lockedGold.unlock(nonVotingGold);
-    (uint256 val, uint256 timestamp) = lockedGold.getPendingWithdrawal(caller, 0);
-    assertEq(val, nonVotingGold);
-    assertEq(timestamp, availabilityTime);
-    vm.expectRevert();
-    lockedGold.getPendingWithdrawal(caller, 1);
-  }
-
-  function test_ShouldAddPendingWithdrawals_WhenTheAccountIsRequestingOnlyNonVotingGold_WhenThereAreNoBalanceRequirements()
-    public
-  {
-    governance.setVoting(caller);
-    governance.setTotalVotes(caller, votingGold);
-
-    lockedGold.unlock(nonVotingGold);
-    (uint256[] memory vals, uint256[] memory timestamps) = lockedGold.getPendingWithdrawals(caller);
-    assertEq(vals.length, 1);
-    assertEq(timestamps.length, 1);
-    assertEq(vals[0], nonVotingGold);
-    assertEq(timestamps[0], availabilityTime);
-  }
-
-  function test_ShouldDecreaseTheACcountsNonVotingLockedGoldBalance_WhenTheAccountIsRequestingOnlyNonVotingGold_WhenThereAreNoBalanceRequirements()
-    public
-  {
-    governance.setVoting(caller);
-    governance.setTotalVotes(caller, votingGold);
-
-    lockedGold.unlock(nonVotingGold);
-    assertEq(lockedGold.getAccountNonvotingLockedGold(caller), votingGold);
-  }
-
-  function test_ShouldDecreaseTheAccountsTotalLockedGoldBalance_WhenTheAccountIsRequestingOnlyNonVotingGold_WhenThereAreNoBalanceRequirements()
-    public
-  {
-    governance.setVoting(caller);
-    governance.setTotalVotes(caller, votingGold);
-
-    lockedGold.unlock(nonVotingGold);
-    assertEq(lockedGold.getAccountTotalLockedGold(caller), votingGold);
-  }
-
-  function test_ShouldDecreaseTheNonVotingLockedGoldBalance_WhenTheAccountIsRequestingOnlyNonVotingGold_WhenThereAreNoBalanceRequirements()
-    public
-  {
-    governance.setVoting(caller);
-    governance.setTotalVotes(caller, votingGold);
-
-    lockedGold.unlock(nonVotingGold);
-    assertEq(lockedGold.getNonvotingLockedGold(), votingGold);
-  }
-
-  function test_ShouldDecreaseTheTotalLockedGoldBalance_WhenTheAccountIsRequestingOnlyNonVotingGold_WhenThereAreNoBalanceRequirements()
-    public
-  {
-    governance.setVoting(caller);
-    governance.setTotalVotes(caller, votingGold);
-
-    lockedGold.unlock(nonVotingGold);
-    assertEq(lockedGold.getTotalLockedGold(), votingGold);
-  }
-
-  function test_Emits_GoldUnlockedEvent_WhenTheAccountIsRequestingOnlyNonVotingGold() public {
-    governance.setVoting(caller);
-    governance.setTotalVotes(caller, votingGold);
-
-    vm.expectEmit(true, true, true, true);
-    emit GoldUnlocked(caller, nonVotingGold, availabilityTime);
-    lockedGold.unlock(nonVotingGold);
-  }
-
-  function test_ShouldRevert_WhenTheCorrectTimeIsEarlierThanTheRequirementTime_WhenThereIsBalanceRequirement()
-    public
-  {
-    validators.setAccountLockedGoldRequirement(caller, balanceRequirement);
-    vm.expectRevert(
-      "Either account doesn't have enough locked Celo or locked Celo is being used for voting."
-    );
-    lockedGold.unlock(value);
-  }
-
-  function test_ShouldSucceed_WhenTheCorrectTimeIsEarlierThanTheRequirementTimeButRequestingCeloWithoutBalanceRequirement_WhenThereIsBalanceRequirement()
-    public
-  {
-    validators.setAccountLockedGoldRequirement(caller, balanceRequirement);
-    lockedGold.unlock(value - balanceRequirement);
-  }
-}
-contract LockedGoldTest_unlock_L2 is LockedGoldTest {
-  uint256 value = 1000;
-
-  uint256 availabilityTime;
-
-  uint256 votingGold = 1;
-  uint256 nonVotingGold = value - votingGold;
-
-  uint256 balanceRequirement = 10;
-
-  function setUp() public {
-    super.setUp();
-    lockedGold.lock.value(value)();
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
-    unlockingPeriod = 1;
-    availabilityTime = unlockingPeriod + block.timestamp;
   }
 
   function test_ShouldAddAPendingWithdrawal_WhenAccountIsNotVotingInGovernance_WhenThereAreNoBalanceRequirements()
@@ -916,6 +715,7 @@ contract LockedGoldTest_unlock_WhenDelegatingTo3Delegatees is LockedGoldTest {
 
     assertEq(expected3, 1);
     assertEq(real3, 1);
+
   }
 
   function test_ShouldCorrectlyUnlockWhenGettingLessOrEqualToLockedAmount() public {
@@ -1001,17 +801,6 @@ contract LockedGoldTest_lock_AfterUnlocking is LockedGoldTest {
 
   function helper_unlockAndRelockLess() public {
     lockedGold.unlock(pendingWithdrawalValue);
-    lockedGold.relock(index, pendingWithdrawalValue - 1);
-  }
-
-  function test_Reverts_WhenRelockingSameAmountOnL2() public _whenL2 {
-    lockedGold.unlock(pendingWithdrawalValue);
-    vm.expectRevert("This method is no longer supported in L2.");
-    lockedGold.relock(index, pendingWithdrawalValue);
-  }
-  function test_Reverts_WhenRelockingLessAmountOnL2() public _whenL2 {
-    lockedGold.unlock(pendingWithdrawalValue);
-    vm.expectRevert("This method is no longer supported in L2.");
     lockedGold.relock(index, pendingWithdrawalValue - 1);
   }
 
@@ -1161,7 +950,7 @@ contract LockedGoldTest_lock_AfterUnlocking is LockedGoldTest {
 contract LockedGoldTest_withdraw is LockedGoldTest {
   uint256 value = 1000;
   uint256 index = 0;
-  function() external payable {}
+
   function setUp() public {
     super.setUp();
     lockedGold.lock.value(value)();
@@ -1194,6 +983,8 @@ contract LockedGoldTest_withdraw is LockedGoldTest {
     vm.expectRevert("Bad pending withdrawal index");
     lockedGold.withdraw(index);
   }
+
+  function() external payable {}
 }
 
 contract LockedGoldTest_addSlasher is LockedGoldTest {
@@ -2520,6 +2311,7 @@ contract LockedGoldTest_getDelegatorDelegateeExpectedAndRealAmount is LockedGold
   {
     whenVoteSigner_LockedGoldGetDelegatorDelegateeExpectedAndRealAmount();
     helper_ShouldReturnEqualAmount(delegator, delegatorSigner, delegatee);
+
   }
 }
 
