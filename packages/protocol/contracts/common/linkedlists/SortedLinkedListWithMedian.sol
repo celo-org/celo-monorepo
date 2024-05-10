@@ -11,9 +11,18 @@ library SortedLinkedListWithMedian {
   using SafeMath for uint256;
   using SortedLinkedList for SortedLinkedList.List;
 
-  enum MedianAction { None, Lesser, Greater }
+  enum MedianAction {
+    None,
+    Lesser,
+    Greater
+  }
 
-  enum MedianRelation { Undefined, Lesser, Greater, Equal }
+  enum MedianRelation {
+    Undefined,
+    Lesser,
+    Greater,
+    Equal
+  }
 
   struct List {
     SortedLinkedList.List list;
@@ -223,11 +232,9 @@ library SortedLinkedListWithMedian {
    * @return Values corresponding to keys, which will be ordered largest to smallest.
    * @return Array of relations to median of corresponding list elements.
    */
-  function getElements(List storage list)
-    internal
-    view
-    returns (bytes32[] memory, uint256[] memory, MedianRelation[] memory)
-  {
+  function getElements(
+    List storage list
+  ) internal view returns (bytes32[] memory, uint256[] memory, MedianRelation[] memory) {
     bytes32[] memory keys = getKeys(list);
     uint256[] memory values = new uint256[](keys.length);
     MedianRelation[] memory relations = new MedianRelation[](keys.length);

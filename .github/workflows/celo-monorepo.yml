@@ -23,7 +23,7 @@ defaults:
 
 env:
   # Increment these to force cache rebuilding
-  NODE_MODULE_CACHE_VERSION: 6
+  NODE_MODULE_CACHE_VERSION: 7
   NODE_OPTIONS: '--max-old-space-size=4096'
   TERM: dumb
   GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
@@ -68,7 +68,7 @@ jobs:
           restore-keys: |
             node-${{ runner.os }}-${{ runner.arch }}-${{ env.NODE_MODULE_CACHE_VERSION }}-
       - name: Install yarn dependencies
-        run: git config --global url."https://".insteadOf ssh:// && yarn install --frozen-lockfile --network-timeout 1000000
+        run: git config --global url."https://".insteadOf ssh:// && yarn generate-lock-entry && yarn install --frozen-lockfile --network-timeout 1000000
         if: steps.cache_node.outputs.cache-hit != 'true'
       - name: Run yarn postinstall if cache hitted
         run: yarn run postinstall

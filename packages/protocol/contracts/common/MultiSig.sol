@@ -129,7 +129,11 @@ contract MultiSig is Initializable {
   /// @param _owners List of initial owners.
   /// @param _required Number of required confirmations for external transactions.
   /// @param _internalRequired Number of required confirmations for internal transactions.
-  function initialize(address[] calldata _owners, uint256 _required, uint256 _internalRequired)
+  function initialize(
+    address[] calldata _owners,
+    uint256 _required,
+    uint256 _internalRequired
+  )
     external
     initializer
     validRequirement(_owners.length, _required)
@@ -154,7 +158,9 @@ contract MultiSig is Initializable {
 
   /// @dev Allows to add a new owner. Transaction has to be sent by wallet.
   /// @param owner Address of new owner.
-  function addOwner(address owner)
+  function addOwner(
+    address owner
+  )
     external
     onlyWallet
     ownerDoesNotExist(owner)
@@ -184,13 +190,10 @@ contract MultiSig is Initializable {
   /// @dev Allows to replace an owner with a new owner. Transaction has to be sent by wallet.
   /// @param owner Address of owner to be replaced.
   /// @param newOwner Address of new owner.
-  function replaceOwner(address owner, address newOwner)
-    external
-    onlyWallet
-    ownerExists(owner)
-    notNull(newOwner)
-    ownerDoesNotExist(newOwner)
-  {
+  function replaceOwner(
+    address owner,
+    address newOwner
+  ) external onlyWallet ownerExists(owner) notNull(newOwner) ownerDoesNotExist(newOwner) {
     for (uint256 i = 0; i < owners.length; i = i.add(1))
       if (owners[i] == owner) {
         owners[i] = newOwner;
@@ -204,7 +207,9 @@ contract MultiSig is Initializable {
 
   /// @dev Allows an owner to revoke a confirmation for a transaction.
   /// @param transactionId Transaction ID.
-  function revokeConfirmation(uint256 transactionId)
+  function revokeConfirmation(
+    uint256 transactionId
+  )
     external
     ownerExists(msg.sender)
     confirmed(transactionId, msg.sender)
@@ -219,10 +224,11 @@ contract MultiSig is Initializable {
   /// @param value Transaction ether value.
   /// @param data Transaction data payload.
   /// @return Returns transaction ID.
-  function submitTransaction(address destination, uint256 value, bytes calldata data)
-    external
-    returns (uint256 transactionId)
-  {
+  function submitTransaction(
+    address destination,
+    uint256 value,
+    bytes calldata data
+  ) external returns (uint256 transactionId) {
     transactionId = addTransaction(destination, value, data);
     confirmTransaction(transactionId);
   }
@@ -257,11 +263,9 @@ contract MultiSig is Initializable {
   /// @dev Returns array with owner addresses, which confirmed transaction.
   /// @param transactionId Transaction ID.
   /// @return Returns array of owner addresses.
-  function getConfirmations(uint256 transactionId)
-    external
-    view
-    returns (address[] memory _confirmations)
-  {
+  function getConfirmations(
+    uint256 transactionId
+  ) external view returns (address[] memory _confirmations) {
     address[] memory confirmationsTemp = new address[](owners.length);
     uint256 count = 0;
     uint256 i;
@@ -280,11 +284,12 @@ contract MultiSig is Initializable {
   /// @param pending Include pending transactions.
   /// @param executed Include executed transactions.
   /// @return Returns array of transaction IDs.
-  function getTransactionIds(uint256 from, uint256 to, bool pending, bool executed)
-    external
-    view
-    returns (uint256[] memory _transactionIds)
-  {
+  function getTransactionIds(
+    uint256 from,
+    uint256 to,
+    bool pending,
+    bool executed
+  ) external view returns (uint256[] memory _transactionIds) {
     uint256[] memory transactionIdsTemp = new uint256[](transactionCount);
     uint256 count = 0;
     uint256 i;
@@ -300,11 +305,9 @@ contract MultiSig is Initializable {
   /// @dev Allows to change the number of required confirmations. Transaction has to be sent by
   /// wallet.
   /// @param _required Number of required confirmations.
-  function changeRequirement(uint256 _required)
-    public
-    onlyWallet
-    validRequirement(owners.length, _required)
-  {
+  function changeRequirement(
+    uint256 _required
+  ) public onlyWallet validRequirement(owners.length, _required) {
     required = _required;
     emit RequirementChange(_required);
   }
@@ -312,18 +315,18 @@ contract MultiSig is Initializable {
   /// @dev Allows to change the number of required confirmations. Transaction has to be sent by
   /// wallet.
   /// @param _internalRequired Number of required confirmations for interal txs.
-  function changeInternalRequirement(uint256 _internalRequired)
-    public
-    onlyWallet
-    validRequirement(owners.length, _internalRequired)
-  {
+  function changeInternalRequirement(
+    uint256 _internalRequired
+  ) public onlyWallet validRequirement(owners.length, _internalRequired) {
     internalRequired = _internalRequired;
     emit InternalRequirementChange(_internalRequired);
   }
 
   /// @dev Allows an owner to confirm a transaction.
   /// @param transactionId Transaction ID.
-  function confirmTransaction(uint256 transactionId)
+  function confirmTransaction(
+    uint256 transactionId
+  )
     public
     ownerExists(msg.sender)
     transactionExists(transactionId)
@@ -338,12 +341,9 @@ contract MultiSig is Initializable {
 
   /// @dev Allows anyone to execute a confirmed transaction.
   /// @param transactionId Transaction ID.
-  function executeTransaction(uint256 transactionId)
-    public
-    ownerExists(msg.sender)
-    confirmed(transactionId, msg.sender)
-    notExecuted(transactionId)
-  {
+  function executeTransaction(
+    uint256 transactionId
+  ) public ownerExists(msg.sender) confirmed(transactionId, msg.sender) notExecuted(transactionId) {
     require(isConfirmed(transactionId), "Transaction not confirmed.");
     Transaction storage txn = transactions[transactionId];
     txn.executed = true;
@@ -373,11 +373,11 @@ contract MultiSig is Initializable {
   /// @param value Transaction ether value.
   /// @param data Transaction data payload.
   /// @return Returns transaction ID.
-  function addTransaction(address destination, uint256 value, bytes memory data)
-    internal
-    notNull(destination)
-    returns (uint256 transactionId)
-  {
+  function addTransaction(
+    address destination,
+    uint256 value,
+    bytes memory data
+  ) internal notNull(destination) returns (uint256 transactionId) {
     transactionId = transactionCount;
     transactions[transactionId] = Transaction({
       destination: destination,
@@ -388,5 +388,4 @@ contract MultiSig is Initializable {
     transactionCount = transactionCount.add(1);
     emit Submission(transactionId);
   }
-
 }

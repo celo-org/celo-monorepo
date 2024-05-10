@@ -662,7 +662,6 @@ contract Report is SortedOraclesTest {
     (, uint256[] memory rateValues, ) = sortedOracle.getRates(aToken);
     assertEq(rateValues[0], oracleValue1);
     assertEq(rateValues[1], anotherOracleValue);
-
   }
 
   function test_ShouldUpdateTheListOfRatesCorrectly_WhenThereAreMultipleReportsTheMostRecentOneIsDoneByThisOracle()
@@ -693,5 +692,4 @@ contract Report is SortedOraclesTest {
     assertGt(timestampValuesAfter[0], timestampValuesBefore[0]);
     assertEq(timestampValuesBefore[1], timestampValuesAfter[1]);
   }
-
 }

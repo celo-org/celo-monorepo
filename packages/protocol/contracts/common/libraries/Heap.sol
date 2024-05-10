@@ -53,5 +53,4 @@ library Heap {
   function heapifyDown(uint256[] memory keys, FixidityLib.Fraction[] memory values) internal pure {
     siftDown(keys, values, 0, keys.length);
   }
-
 }

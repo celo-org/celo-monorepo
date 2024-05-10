@@ -41,11 +41,10 @@ contract MockUsingPrecompiles {
     return keccak256(header);
   }
 
-  function validatorSignerAddressFromSet(uint256 index, uint256 blockNumber)
-    public
-    view
-    returns (address)
-  {
+  function validatorSignerAddressFromSet(
+    uint256 index,
+    uint256 blockNumber
+  ) public view returns (address) {
     return epochSigner[keccak256(abi.encodePacked(calcEpoch(blockNumber), index))];
   }
 

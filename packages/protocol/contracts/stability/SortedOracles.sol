@@ -208,10 +208,12 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @param greaterKey The element which should be just right of the new oracle value.
    * @dev Note that only one of `lesserKey` or `greaterKey` needs to be correct to reduce friction.
    */
-  function report(address token, uint256 value, address lesserKey, address greaterKey)
-    external
-    onlyOracle(token)
-  {
+  function report(
+    address token,
+    uint256 value,
+    address lesserKey,
+    address greaterKey
+  ) external onlyOracle(token) {
     uint256 originalMedian = rates[token].getMedianValue();
     if (rates[token].contains(msg.sender)) {
       rates[token].update(msg.sender, value, lesserKey, greaterKey);
@@ -277,7 +279,9 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @return values Values of an unpacked list of elements from largest to smallest.
    * @return relations Relations of an unpacked list of elements from largest to smallest.
    */
-  function getTimestamps(address token)
+  function getTimestamps(
+    address token
+  )
     external
     view
     returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
@@ -305,7 +309,9 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @return values Values of an unpacked list of elements from largest to smallest.
    * @return relations Relations of an unpacked list of elements from largest to smallest.
    */
-  function getRates(address token)
+  function getRates(
+    address token
+  )
     external
     view
     returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
@@ -401,11 +407,9 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @return uint256 The median exchange rate for rateFeedId (fixidity).
    * @return uint256 denominator
    */
-  function medianRateWithoutEquivalentMapping(address token)
-    public
-    view
-    returns (uint256, uint256)
-  {
+  function medianRateWithoutEquivalentMapping(
+    address token
+  ) public view returns (uint256, uint256) {
     return (rates[token].getMedianValue(), numRates(token) == 0 ? 0 : FIXED1_UINT);
   }
 

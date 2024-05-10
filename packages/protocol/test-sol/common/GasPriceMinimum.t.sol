@@ -203,8 +203,7 @@ contract GasPriceMinimumTest_setUpdatedGasPriceMinimum is GasPriceMinimumTest {
     if (minNumber > 0) {
       return
         (uint256(keccak256(abi.encodePacked(nonce, msg.sender, blockhash(block.number - 1)))) %
-          (maxNumber - 1)) +
-        1;
+          (maxNumber - 1)) + 1;
     }
     return (uint256(keccak256(abi.encodePacked(nonce, msg.sender, blockhash(block.number - 1)))) %
       maxNumber);

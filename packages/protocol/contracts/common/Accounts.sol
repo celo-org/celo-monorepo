@@ -75,9 +75,8 @@ contract Accounts is
   // solhint-disable-next-line max-line-length
   mapping(address => mapping(bytes32 => mapping(address => SignerAuthorization))) signerAuthorizations;
 
-  bytes32 public constant EIP712_AUTHORIZE_SIGNER_TYPEHASH = keccak256(
-    "AuthorizeSigner(address account,address signer,bytes32 role)"
-  );
+  bytes32 public constant EIP712_AUTHORIZE_SIGNER_TYPEHASH =
+    keccak256("AuthorizeSigner(address account,address signer,bytes32 role)");
   bytes32 public eip712DomainSeparator;
 
   // A per-account list of CIP8 storage roots, bypassing CIP3.
@@ -128,7 +127,11 @@ contract Accounts is
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    setEip712DomainSeparator();
+    _setEip712DomainSeparator();
+  }
+
+  function setEip712DomainSeparator() external {
+    _setEip712DomainSeparator();
   }
 
   /**
@@ -205,10 +208,12 @@ contract Accounts is
    * @param s Output value s of the ECDSA signature.
    * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
    */
-  function authorizeVoteSigner(address signer, uint8 v, bytes32 r, bytes32 s)
-    external
-    nonReentrant
-  {
+  function authorizeVoteSigner(
+    address signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external nonReentrant {
     legacyAuthorizeSignerWithSignature(signer, VoteSigner, v, r, s);
     setIndexedSigner(signer, VoteSigner);
 
@@ -223,10 +228,12 @@ contract Accounts is
    * @param s Output value s of the ECDSA signature.
    * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
    */
-  function authorizeValidatorSigner(address signer, uint8 v, bytes32 r, bytes32 s)
-    external
-    nonReentrant
-  {
+  function authorizeValidatorSigner(
+    address signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external nonReentrant {
     legacyAuthorizeSignerWithSignature(signer, ValidatorSigner, v, r, s);
     setIndexedSigner(signer, ValidatorSigner);
 
@@ -298,11 +305,9 @@ contract Accounts is
    * @return The length of each string in bytes.
    * @return All strings concatenated.
    */
-  function batchGetMetadataURL(address[] calldata accountsToQuery)
-    external
-    view
-    returns (uint256[] memory, bytes memory)
-  {
+  function batchGetMetadataURL(
+    address[] calldata accountsToQuery
+  ) external view returns (uint256[] memory, bytes memory) {
     uint256 totalSize = 0;
     uint256[] memory sizes = new uint256[](accountsToQuery.length);
     for (uint256 i = 0; i < accountsToQuery.length; i = i.add(1)) {
@@ -327,11 +332,9 @@ contract Accounts is
    * @return Concatenated storage root URLs.
    * @return Lengths of storage root URLs.
    */
-  function getOffchainStorageRoots(address account)
-    external
-    view
-    returns (bytes memory, uint256[] memory)
-  {
+  function getOffchainStorageRoots(
+    address account
+  ) external view returns (bytes memory, uint256[] memory) {
     require(isAccount(account), "Unknown account");
     uint256 numberRoots = offchainStorageRoots[account].length;
     uint256 totalLength = 0;
@@ -490,29 +493,7 @@ contract Accounts is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 4, 1);
-  }
-
-  /**
-   * @notice Sets the EIP712 domain separator for the Celo Accounts abstraction.
-   */
-  function setEip712DomainSeparator() public {
-    uint256 chainId;
-    assembly {
-      chainId := chainid
-    }
-
-    eip712DomainSeparator = keccak256(
-      abi.encode(
-        keccak256(
-          "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-        ),
-        keccak256(bytes("Celo Core Contracts")),
-        keccak256("1.0"),
-        chainId,
-        address(this)
-      )
-    );
+    return (1, 1, 4, 2);
   }
 
   /**
@@ -645,9 +626,13 @@ contract Accounts is
    * @dev v, r, s constitute `signer`'s EIP712 signature over `role`, `msg.sender`
    *      and `signer`.
    */
-  function authorizeSignerWithSignature(address signer, bytes32 role, uint8 v, bytes32 r, bytes32 s)
-    public
-  {
+  function authorizeSignerWithSignature(
+    address signer,
+    bytes32 role,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) public {
     authorizeAddressWithRole(signer, role, v, r, s);
     signerAuthorizations[msg.sender][role][signer] = SignerAuthorization({
       started: true,
@@ -788,11 +773,11 @@ contract Accounts is
    * @param signer The address of the signer.
    * @param role The role that has been authorized.
    */
-  function isLegacySigner(address _account, address signer, bytes32 role)
-    public
-    view
-    returns (bool)
-  {
+  function isLegacySigner(
+    address _account,
+    address signer,
+    bytes32 role
+  ) public view returns (bool) {
     Account storage account = accounts[_account];
     if (role == ValidatorSigner && account.signers.validator == signer) {
       return true;
@@ -811,11 +796,11 @@ contract Accounts is
    * @param signer The address of the signer.
    * @param role The role that has been authorized.
    */
-  function isDefaultSigner(address account, address signer, bytes32 role)
-    public
-    view
-    returns (bool)
-  {
+  function isDefaultSigner(
+    address account,
+    address signer,
+    bytes32 role
+  ) public view returns (bool) {
     return defaultSigners[account][role] == signer;
   }
 
@@ -825,11 +810,11 @@ contract Accounts is
    * @param signer The address of the signer.
    * @param role The role that has been authorized.
    */
-  function isIndexedSigner(address account, address signer, bytes32 role)
-    public
-    view
-    returns (bool)
-  {
+  function isIndexedSigner(
+    address account,
+    address signer,
+    bytes32 role
+  ) public view returns (bool) {
     return
       isLegacyRole(role)
         ? isLegacySigner(account, signer, role)
@@ -994,6 +979,28 @@ contract Accounts is
   }
 
   /**
+   * @notice Sets the EIP712 domain separator for the Celo Accounts abstraction.
+   */
+  function _setEip712DomainSeparator() internal {
+    uint256 chainId;
+    assembly {
+      chainId := chainid
+    }
+
+    eip712DomainSeparator = keccak256(
+      abi.encode(
+        keccak256(
+          "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+        ),
+        keccak256(bytes("Celo Core Contracts")),
+        keccak256("1.0"),
+        chainId,
+        address(this)
+      )
+    );
+  }
+
+  /**
    * @notice Check if an account already exists.
    * @param account The address of the account
    * @return Returns `false` if account exists. Returns `true` otherwise.
@@ -1018,11 +1025,10 @@ contract Accounts is
    * @param signer The possibly authorized address.
    * @return Returns `false` if authorized. Returns `true` otherwise.
    */
-  function isNotAuthorizedSignerForAnotherAccount(address account, address signer)
-    internal
-    view
-    returns (bool)
-  {
+  function isNotAuthorizedSignerForAnotherAccount(
+    address account,
+    address signer
+  ) internal view returns (bool) {
     return (authorizedBy[signer] == address(0) || authorizedBy[signer] == account);
   }
 
@@ -1104,9 +1110,13 @@ contract Accounts is
    * @dev Note that this signature is EIP712 compliant over the authorizing `account`
    * (`msg.sender`), `signer` (`authorized`) and `role`.
    */
-  function authorizeAddressWithRole(address authorized, bytes32 role, uint8 v, bytes32 r, bytes32 s)
-    private
-  {
+  function authorizeAddressWithRole(
+    address authorized,
+    bytes32 role,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) private {
     address signer = getRoleAuthorizationSigner(msg.sender, authorized, role, v, r, s);
     require(signer == authorized, "Invalid signature");
 

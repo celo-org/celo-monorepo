@@ -17,23 +17,24 @@ contract MentoFeeCurrencyAdapter is IOracle, Initializable, Ownable {
   constructor(bool test) public Initializable(test) {}
 
   /**
-     * @notice Initializes the contract with the owner set.
-     */
+   * @notice Initializes the contract with the owner set.
+   */
   function initialize() public initializer {
     _transferOwnership(msg.sender);
   }
 
   /**
-     * @notice Sets the currency configuration for a token.
-     * @dev This action can only be performed by the contract owner.
-     * @param token The token address.
-     * @param currencyIdentifier The currency identifier.
-     * @param oracle The oracle address for price fetching.
-     */
-  function setCurrencyConfig(address token, address currencyIdentifier, address oracle)
-    external
-    onlyOwner
-  {
+   * @notice Sets the currency configuration for a token.
+   * @dev This action can only be performed by the contract owner.
+   * @param token The token address.
+   * @param currencyIdentifier The currency identifier.
+   * @param oracle The oracle address for price fetching.
+   */
+  function setCurrencyConfig(
+    address token,
+    address currencyIdentifier,
+    address oracle
+  ) external onlyOwner {
     require(currencyIdentifier != address(0), "Currency identifier cannot be zero");
     require(oracle != address(0), "Oracle address cannot be zero");
     require(currencies[token].currencyIdentifier == address(0), "Currency already in the adapter");
@@ -46,11 +47,11 @@ contract MentoFeeCurrencyAdapter is IOracle, Initializable, Ownable {
   }
 
   /**
-     * @notice Removes a token from the adapter.
-     * @dev This action can only be performed by the contract owner.
-     * @param token The token address to remove.
-     * @param index The index in the list of adapter currencies.
-     */
+   * @notice Removes a token from the adapter.
+   * @dev This action can only be performed by the contract owner.
+   * @param token The token address to remove.
+   * @param index The index in the list of adapter currencies.
+   */
   function removeCurrencies(address token, uint256 index) external onlyOwner {
     require(index < currencyList.length, "Index out of bounds");
     require(currencyList[index] == token, "Index does not match token");
@@ -61,33 +62,31 @@ contract MentoFeeCurrencyAdapter is IOracle, Initializable, Ownable {
   }
 
   /**
-     * @notice Returns the list of all currency addresses.
-     * @return An array of addresses.
-     */
+   * @notice Returns the list of all currency addresses.
+   * @return An array of addresses.
+   */
   function getCurrencies() public view returns (address[] memory) {
     return currencyList;
   }
 
   /**
-     * @notice Returns the configuration for a currency.
-     * @param token The address of the token.
-     * @return Currency configuration of the token.
-     */
+   * @notice Returns the configuration for a currency.
+   * @param token The address of the token.
+   * @return Currency configuration of the token.
+   */
   function getCurrencyConfig(address token) public view returns (MentoCurrencyConfig memory) {
     return currencies[token];
   }
 
   /**
-     * @notice Retrieves exchange rate between token and CELO.
-     * @param token The token address whose price is to be fetched.
-     * @return numerator The exchange rate numerator.
-     * @return denominator The exchange rate denominator.
-     */
-  function getExchangeRate(address token)
-    public
-    view
-    returns (uint256 numerator, uint256 denominator)
-  {
+   * @notice Retrieves exchange rate between token and CELO.
+   * @param token The token address whose price is to be fetched.
+   * @return numerator The exchange rate numerator.
+   * @return denominator The exchange rate denominator.
+   */
+  function getExchangeRate(
+    address token
+  ) public view returns (uint256 numerator, uint256 denominator) {
     MentoCurrencyConfig memory currencyConfig = getCurrencyConfig(token);
     require(currencyConfig.currencyIdentifier != address(0), "Currency not in the mentoAdapter");
     (numerator, denominator) = IOracle(currencies[token].oracle).getExchangeRate(

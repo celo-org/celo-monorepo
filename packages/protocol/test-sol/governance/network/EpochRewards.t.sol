@@ -103,9 +103,7 @@ contract EpochRewardsTest is Test, Constants, Utils {
       address(0),
       carbonOffsettingFraction
     );
-
   }
-
 }
 
 contract EpochRewardsTest_initialize is EpochRewardsTest {
@@ -156,7 +154,6 @@ contract EpochRewardsTest_initialize is EpochRewardsTest {
       carbonOffsettingFraction
     );
   }
-
 }
 
 contract EpochRewardsTest_setTargetVotingGoldFraction is EpochRewardsTest {
@@ -192,7 +189,6 @@ contract EpochRewardsTest_setTargetVotingGoldFraction is EpochRewardsTest {
     vm.expectRevert("Target voting gold fraction unchanged");
     epochRewards.setTargetVotingGoldFraction(targetVotingGoldFraction);
   }
-
 }
 
 contract EpochRewardsTest_setCommunityRewardFraction is EpochRewardsTest {
@@ -391,7 +387,6 @@ contract EpochRewardsTest_getTargetGoldTotalSupply is EpochRewardsTest {
     timeTravel(timeDelta);
     assertEq(epochRewards.getTargetGoldTotalSupply(), getExpectedTargetTotalSupply(timeDelta));
   }
-
 }
 
 contract EpochRewardsTest_getTargetVoterRewards is EpochRewardsTest {
@@ -402,7 +397,6 @@ contract EpochRewardsTest_getTargetVoterRewards is EpochRewardsTest {
     uint256 expected = uint256((activeVotes * targetVotingYieldParamsInitial) / FIXED1);
     assertEq(epochRewards.getTargetVoterRewards(), expected);
   }
-
 }
 
 contract EpochRewardsTest_getTargetTotalEpochPaymentsInGold is EpochRewardsTest {
@@ -413,7 +407,6 @@ contract EpochRewardsTest_getTargetTotalEpochPaymentsInGold is EpochRewardsTest 
     uint256 expected = uint256((targetValidatorEpochPayment * numberValidators) / exchangeRate);
     assertEq(epochRewards.getTargetTotalEpochPaymentsInGold(), expected);
   }
-
 }
 
 contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
@@ -459,9 +452,7 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
     uint256 actual = epochRewards.getRewardsMultiplier();
     uint256 expected = uint256((FIXED1 - (rewardsMultiplierAdjustmentsOverspend / 10)));
     assertApproxEqRel(actual, expected, 1e6);
-
   }
-
 }
 
 contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
@@ -682,8 +673,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
         (targetVotingYieldParamsAdjustmentFactor *
           ((targetVotingGoldFraction /
             FIXED1 -
-            ((votingNumeratorArray[i] * FIXED1) / votingDenominatorArray[i])) /
-            FIXED1));
+            ((votingNumeratorArray[i] * FIXED1) / votingDenominatorArray[i])) / FIXED1));
     }
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
@@ -721,7 +711,6 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
     assertApproxEqRel(result, expected, 1e16); // TODO I suspect it has a 1% error due rounding errors, but need to double check
   }
-
 }
 
 contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAndTheActualRemainingSupplyIs10pMoreThanTheTargetRemainingSupplyAfterRewards_calculateTargetEpochRewards is
@@ -740,15 +729,13 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
     epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
     election.setActiveVotes(activeVotes);
     uint256 expectedTargetTotalEpochPaymentsInGold = (targetValidatorEpochPayment *
-      numberValidators) /
-      exchangeRate;
+      numberValidators) / exchangeRate;
 
     uint256 expectedTargetEpochRewards = (targetVotingYieldParamsInitial * activeVotes) / FIXED1;
 
     uint256 expectedTargetGoldSupplyIncrease = expectedTargetEpochRewards +
       ((expectedTargetTotalEpochPaymentsInGold /
-        (FIXED1 - communityRewardFraction - carbonOffsettingFraction)) /
-        FIXED1);
+        (FIXED1 - communityRewardFraction - carbonOffsettingFraction)) / FIXED1);
     uint256 expectedTargetTotalSupply = getExpectedTargetTotalSupply(timeDelta);
     uint256 expectedTargetRemainingSupply = SUPPLY_CAP - expectedTargetTotalSupply;
     uint256 actualRemainingSupply = (expectedTargetRemainingSupply * 11) / 10;
@@ -800,7 +787,6 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
     (, , , uint256 result) = epochRewards.calculateTargetEpochRewards();
     assertApproxEqRel(result, expected, 5e13);
   }
-
 }
 
 contract EpochRewardsTest_isReserveLow is EpochRewardsTest {
@@ -835,7 +821,6 @@ contract EpochRewardsTest_isReserveLow is EpochRewardsTest {
     reserve.addToken(address(mockStableToken));
     mockGoldToken.setTotalSupply(totalSupply);
     mockStableToken.setTotalSupply(stableBalance);
-
   }
 
   // reserve ratio of 0.5'
@@ -926,5 +911,4 @@ contract EpochRewardsTest_isReserveLow is EpochRewardsTest {
     vm.expectRevert("can't call when contract is frozen");
     epochRewards.updateTargetVotingYield();
   }
-
 }

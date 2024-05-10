@@ -12,11 +12,11 @@ library Create2 {
     return deployedAddress;
   }
 
-  function computeAddress(address deployer, bytes32 salt, bytes32 initCodeHash)
-    internal
-    pure
-    returns (address)
-  {
+  function computeAddress(
+    address deployer,
+    bytes32 salt,
+    bytes32 initCodeHash
+  ) internal pure returns (address) {
     return
       address(
         uint160(uint256(keccak256(abi.encodePacked(bytes1(0xff), deployer, salt, initCodeHash))))

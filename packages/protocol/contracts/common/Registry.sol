@@ -86,11 +86,10 @@ contract Registry is IRegistry, Ownable, Initializable {
    * @return True if `sender` corresponds to the address of any of `identifiers`
    *         registry entries.
    */
-  function isOneOf(bytes32[] calldata identifierHashes, address sender)
-    external
-    view
-    returns (bool)
-  {
+  function isOneOf(
+    bytes32[] calldata identifierHashes,
+    address sender
+  ) external view returns (bool) {
     for (uint256 i = 0; i < identifierHashes.length; i = i.add(1)) {
       if (registry[identifierHashes[i]] == sender) {
         return true;
