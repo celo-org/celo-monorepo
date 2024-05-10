@@ -1,9 +1,8 @@
 pragma solidity ^0.5.13;
 
-// import "forge-std/console2.sol";
+import "forge-std/console2.sol";
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
 import "openzeppelin-solidity/contracts/utils/Address.sol";
 
@@ -132,7 +131,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       maxDistribution != MAX_UINT,
       "Cannot set max distribution lower if already set to 1000"
     );
-    // If ratio is 1000, we set maxDistribution to maxUint to account for future rewards.
+    // If ratio is 1000, we set maxDistribution to maxUint.
     if (distributionRatio == 1000) {
       maxDistribution = MAX_UINT;
     } else {
@@ -156,27 +155,29 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
 
   /**
    * @notice Mints CELO to the beneficiaries according to the predefined schedule.
-   * @param amount The requested CELO amount.
    */
-  function mintAccordingToSchedule(uint256 amount) external nonReentrant {
-    require(amount > 0, "Requested amount to mint must be greater than zero");
-
+  function mintAccordingToSchedule() external nonReentrant {
+    uint256 mintableAmount = getMintableAmount();
+    require(mintableAmount > 0, "Mintable amount must be greater than zero");
     uint256 mintedAmount;
 
     mintedAmount = getCurrentReleasedTotalAmount();
 
     require(
-      mintedAmount.sub(totalMinted) >= amount,
+      mintedAmount.sub(totalMinted) >= mintableAmount,
       "Requested amount is greater than available mintable funds"
     );
     require(
-      maxDistribution >= totalMinted.add(amount),
+      maxDistribution >= totalMinted.add(mintableAmount),
       "Requested amount exceeds current alloted maximum distribution"
     );
-    require(getRemainingBalanceToMint() >= amount, "Insufficient unlocked balance to mint amount");
-    totalMinted = totalMinted.add(amount);
+    require(
+      getRemainingBalanceToMint() >= mintableAmount,
+      "Insufficient unlocked balance to mint amount"
+    );
+    totalMinted = totalMinted.add(mintableAmount);
 
-    getGoldToken().mint(beneficiary, amount);
+    getGoldToken().mint(beneficiary, mintableAmount);
     if (getRemainingBalanceToMint() == 0) {
       emit MintGoldInstanceDestroyed(address(this));
       selfdestruct(BURN_ADDRESS);
@@ -194,6 +195,8 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     return (1, 0, 0, 0);
   }
 
+  //XXX(soloseng): should the number of periods also be increased to prevent when increasing total amount to mint?
+  // this would prevent minting too soon after the amount is increased.
   function increaseTotalAmountToMint(uint256 amount) public {
     totalAmountToMint = totalAmountToMint.add(amount);
   }
@@ -208,7 +211,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
 
   /**
    * @dev Calculates the total amount that has already released for minting up to now.
-   * @return The mint balance already released up to the point of call.
+   * @return The mintable balance already released up to the point of call.
    */
   function getCurrentReleasedTotalAmount() public view returns (uint256) {
     if (block.timestamp < mintingSchedule.mintCliffTime) {
@@ -225,9 +228,21 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     }
 
     uint256 timeSinceStart = block.timestamp.sub(mintingSchedule.mintStartTime);
-    uint256 periodsSinceStart = timeSinceStart.div(mintingSchedule.mintingPeriod);
 
-    return totalAmountToMint.mul(periodsSinceStart).div(mintingSchedule.numMintingPeriods);
+    uint256 periodsSinceStart = timeSinceStart.div(mintingSchedule.mintingPeriod);
+    console2.log("### totalAmountToMint", totalAmountToMint);
+    console2.log("### 50% of totalAmountToMint", totalAmountToMint / 2);
+    console2.log("### periodsSinceStart", periodsSinceStart);
+    console2.log("### mintingSchedule.numMintingPeriods", mintingSchedule.numMintingPeriods);
+    // return totalAmountToMint.mul(periodsSinceStart).div(mintingSchedule.numMintingPeriods);
+    return totalAmountToMint.div(mintingSchedule.numMintingPeriods).mul(periodsSinceStart);
+  }
+
+  function getFinalReleaseTimestamp() public view returns (uint256) {
+    return
+      mintingSchedule.mintStartTime.add(
+        mintingSchedule.numMintingPeriods.mul(mintingSchedule.mintingPeriod)
+      );
   }
 
   /**
