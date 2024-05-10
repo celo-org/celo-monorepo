@@ -64,7 +64,6 @@ contract TestSetCurrencyConfig is MentoFeeCurrencyAdapterBase {
     vm.expectRevert(bytes("Currency already in the adapter"));
     mentoAdapter.setCurrencyConfig(token, currencyIdentifier, address(oracle));
   }
-
 }
 
 contract TestRemoveCurrencies is MentoFeeCurrencyAdapterBase {
