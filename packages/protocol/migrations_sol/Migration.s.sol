@@ -12,6 +12,7 @@ import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 // TODO(Arthur): import FeeCurrencyDirectory interface?
+import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
 import "@celo-contracts/common/interfaces/ICeloToken.sol"; // TODO move these to Initializer
 import "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
@@ -206,6 +207,7 @@ contract Migration is Script, UsingRegistry {
     migrateFreezer();
     migrateFeeCurrencyWhitelist();
     // TODO(Arthur): Add FeeCurrencyDirectory here
+    migrateFeeCurrencyDirectory();
     migrateGoldToken(json);
     migrateSortedOracles(json);
     migrateGasPriceMinimum(json);
@@ -266,6 +268,13 @@ contract Migration is Script, UsingRegistry {
   }
 
   // TODO(Arthur): Add FeeCurrencyDirectory function
+  function migrateFeeCurrencyDirectory() public {
+    // TODO migrate the initializations interface
+    deployProxiedContract(
+      "FeeCurrencyDirectory",
+      abi.encodeWithSelector(IFeeCurrencyDirectory.initialize.selector)
+    );
+  }
 
   function migrateGoldToken(string memory json) public {
     // TODO change pre-funded addresses to make it match circulation supply
@@ -414,6 +423,7 @@ contract Migration is Script, UsingRegistry {
     IReserve(registry.getAddressForStringOrDie("Reserve")).addToken(stableTokenProxyAddress);
 
     getFeeCurrencyWhitelist().addToken(stableTokenProxyAddress);
+    // TODO(Arthur): Add stabletoken to FeeCurrencyDirectory
   }
 
   function migrateStableToken(string memory json) public {
@@ -940,7 +950,8 @@ contract Migration is Script, UsingRegistry {
         "EpochRewards",
         "Escrow",
         "FederatedAttestations",
-        "FeeCurrencyWhitelist",
+        "FeeCurrencyWhitelist", // TODO(Arthur): Add FeeCurrencyDirectory
+        "FeeCurrencyDirectory",
         "Freezer",
         "FeeHandler",
         "GoldToken",
