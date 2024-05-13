@@ -205,6 +205,7 @@ contract Migration is Script, UsingRegistry {
 
     migrateFreezer();
     migrateFeeCurrencyWhitelist();
+    // TODO(Arthur): Add FeeCurrencyDirectory here
     migrateGoldToken(json);
     migrateSortedOracles(json);
     migrateGasPriceMinimum(json);
@@ -263,6 +264,8 @@ contract Migration is Script, UsingRegistry {
       abi.encodeWithSelector(IFeeCurrencyWhitelist.initialize.selector)
     );
   }
+
+  // TODO(Arthur): Add FeeCurrencyDirectory function
 
   function migrateGoldToken(string memory json) public {
     // TODO change pre-funded addresses to make it match circulation supply
