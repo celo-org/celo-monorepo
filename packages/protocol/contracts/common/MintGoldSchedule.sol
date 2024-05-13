@@ -12,21 +12,13 @@ import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 
+/**
+ * @title Contract for minting new CELO token based on a schedule.
+ */
 contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2Check {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
   using Address for address payable; // prettier-ignore
-
-  struct MintingSchedule {
-    // Timestamp (in UNIX time) that minting begins.
-    uint256 mintStartTime;
-    // Timestamp (in UNIX time) of the minting cliff.
-    uint256 mintCliffTime;
-    // Number of minting periods.
-    uint256 numMintingPeriods;
-    // Duration (in seconds) of one period.
-    uint256 mintingPeriod;
-  }
 
   // uint256(-1) == 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
   uint256 internal constant MAX_UINT = uint256(-1);
@@ -39,18 +31,15 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   // TODO:(soloseng) make this a list of beneficiaries.
   // address payable[] public beneficiaries;
 
+  uint256 constant GENESIS_GOLD_SUPPLY = 600000000 ether; // 600 million Gold
+  uint256 constant GOLD_SUPPLY_CAP = 1000000000 ether; // 1 billion Gold
+  uint256 constant YEARS_LINEAR = 15;
+  uint256 constant SECONDS_LINEAR = YEARS_LINEAR * 365 * 1 days;
+
+  uint256 public startTime = 1587587214; // Copied over from `EpochRewards().startTime()`.
+
   // Indicates how much of the CELO has been minted so far.
   uint256 public totalMinted;
-
-  // Indicates the maximum CELO currently available for distribution, regardless of schedule.
-  // Only settable by the owner.
-  uint256 public maxDistribution;
-
-  // Public struct housing params pertaining to minting CELO.
-  MintingSchedule public mintingSchedule;
-
-  // Total amount of CELO that should be minted by this contract.
-  uint256 public totalAmountToMint;
 
   event MintGoldInstanceCreated(address indexed beneficiary, address indexed atAddress);
   event MintGoldInstanceDestroyed(address indexed contractAddress);
@@ -65,83 +54,28 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
 
   /**
    * @notice A constructor for initialising a new instance of a MintGold contract.
-   * @param mintStartTime The time (in Unix time) at which point releasing starts.
-   * @param mintCliffTime Duration (in seconds) after `mintStartTime` of the CELO cliff.
-   * @param numMintingPeriods Number of Minting periods.
-   * @param mintingPeriod Duration (in seconds) of each minting period.
-   * @param _totalAmountToMint Amount of CELO to mint
    * @param _beneficiary Address of the beneficiary to whom minted CELO are transferred.
    * @param _mintGoldScheduleOwner Final Owner of the MintGoldSchedule contract.
-   * @param initialDistributionRatio Amount in range [0, 1000] (3 significant figures)
-   *                                 indicating % of total balance available for distribution.
    * @param registryAddress Address of the deployed contracts registry.
    */
   function initialize(
-    uint256 mintStartTime,
-    uint256 mintCliffTime,
-    uint256 numMintingPeriods,
-    uint256 mintingPeriod,
-    uint256 _totalAmountToMint,
     address payable _beneficiary,
     address _mintGoldScheduleOwner,
-    uint256 initialDistributionRatio,
     address registryAddress
   ) external initializer {
     _transferOwnership(msg.sender);
-    mintingSchedule.numMintingPeriods = numMintingPeriods;
-    mintingSchedule.mintingPeriod = mintingPeriod;
-    mintingSchedule.mintCliffTime = mintStartTime.add(mintCliffTime);
-    mintingSchedule.mintStartTime = mintStartTime;
 
-    require(_totalAmountToMint > 0, "Total amount to mint cannot be zero.");
-    require(_totalAmountToMint < MAX_UINT, "Total amount to mint cannot be infinite.");
-    require(mintingSchedule.numMintingPeriods >= 1, "There must be at least one minting period");
     require(
       _beneficiary != address(0),
       "The minting schedule beneficiary cannot be the zero addresss"
     );
     require(registryAddress != address(0), "The registry address cannot be the zero address");
-    require(initialDistributionRatio <= 1000, "Initial distribution ratio out of bounds");
 
     setRegistry(registryAddress);
     _setBeneficiary(_beneficiary);
 
-    totalAmountToMint = _totalAmountToMint;
-
-    if (initialDistributionRatio < 1000) {
-      // Initial ratio is expressed to 3 significant figures: [0, 1000].
-      maxDistribution = totalAmountToMint.mul(initialDistributionRatio).div(1000);
-    } else {
-      maxDistribution = MAX_UINT;
-    }
     _transferOwnership(_mintGoldScheduleOwner);
     emit MintGoldInstanceCreated(beneficiary, address(this));
-  }
-
-  /**
-   * @notice Controls the maximum distribution ratio.
-   *         Calculates `distributionRatio`/1000 of current `totalAmountToMint`
-   *         and sets this value as the maximum allowed CELO to be currently Minted.
-   * @param distributionRatio Amount in range [0, 1000] (3 significant figures)
-   *                          indicating % of total balance available for distribution.
-   */
-  function setMaxDistribution(uint256 distributionRatio) external onlyOwner {
-    require(distributionRatio <= 1000, "Max distribution ratio must be within bounds");
-    require(
-      maxDistribution != MAX_UINT,
-      "Cannot set max distribution lower if already set to 1000"
-    );
-    // If ratio is 1000, we set maxDistribution to maxUint.
-    if (distributionRatio == 1000) {
-      maxDistribution = MAX_UINT;
-    } else {
-      require(
-        totalAmountToMint > 0,
-        "Cannot set max distribution before totalAmountToMint is set."
-      );
-      maxDistribution = totalAmountToMint.mul(distributionRatio).div(1000);
-    }
-    emit DistributionLimitSet(beneficiary, maxDistribution);
   }
 
   //  XXX: add new beneficiaries
@@ -156,21 +90,9 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   /**
    * @notice Mints CELO to the beneficiaries according to the predefined schedule.
    */
-  function mintAccordingToSchedule() external nonReentrant {
+  function mintAccordingToSchedule() external nonReentrant onlyL2 {
     uint256 mintableAmount = getMintableAmount();
     require(mintableAmount > 0, "Mintable amount must be greater than zero");
-    uint256 mintedAmount;
-
-    mintedAmount = getCurrentReleasedTotalAmount();
-
-    require(
-      mintedAmount.sub(totalMinted) >= mintableAmount,
-      "Requested amount is greater than available mintable funds"
-    );
-    require(
-      maxDistribution >= totalMinted.add(mintableAmount),
-      "Requested amount exceeds current alloted maximum distribution"
-    );
     require(
       getRemainingBalanceToMint() >= mintableAmount,
       "Insufficient unlocked balance to mint amount"
@@ -178,10 +100,6 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     totalMinted = totalMinted.add(mintableAmount);
 
     getGoldToken().mint(beneficiary, mintableAmount);
-    if (getRemainingBalanceToMint() == 0) {
-      emit MintGoldInstanceDestroyed(address(this));
-      selfdestruct(BURN_ADDRESS);
-    }
   }
 
   /**
@@ -195,66 +113,48 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     return (1, 0, 0, 0);
   }
 
-  //XXX(soloseng): should the number of periods also be increased to prevent when increasing total amount to mint?
-  // this would prevent minting too soon after the amount is increased.
-  function increaseTotalAmountToMint(uint256 amount) public {
-    totalAmountToMint = totalAmountToMint.add(amount);
-  }
-
   /**
    * @notice Calculates remaining CELO balance to mint.
    * @return The remaining CELO balance to mint.
    */
   function getRemainingBalanceToMint() public view returns (uint256) {
-    return totalAmountToMint.sub(totalMinted);
+    return GOLD_SUPPLY_CAP.sub(getGoldToken().totalSupply());
   }
 
-  /**
-   * @dev Calculates the total amount that has already released for minting up to now.
-   * @return The mintable balance already released up to the point of call.
-   */
-  function getCurrentReleasedTotalAmount() public view returns (uint256) {
-    if (block.timestamp < mintingSchedule.mintCliffTime) {
-      return 0;
-    }
-
-    if (
-      block.timestamp >=
-      mintingSchedule.mintStartTime.add(
-        mintingSchedule.numMintingPeriods.mul(mintingSchedule.mintingPeriod)
-      )
-    ) {
-      return totalAmountToMint;
-    }
-
-    uint256 timeSinceStart = block.timestamp.sub(mintingSchedule.mintStartTime);
-
-    uint256 periodsSinceStart = timeSinceStart.div(mintingSchedule.mintingPeriod);
-    console2.log("### totalAmountToMint", totalAmountToMint);
-    console2.log("### 50% of totalAmountToMint", totalAmountToMint / 2);
-    console2.log("### periodsSinceStart", periodsSinceStart);
-    console2.log("### mintingSchedule.numMintingPeriods", mintingSchedule.numMintingPeriods);
-    // return totalAmountToMint.mul(periodsSinceStart).div(mintingSchedule.numMintingPeriods);
-    return totalAmountToMint.div(mintingSchedule.numMintingPeriods).mul(periodsSinceStart);
-  }
-
-  function getFinalReleaseTimestamp() public view returns (uint256) {
-    return
-      mintingSchedule.mintStartTime.add(
-        mintingSchedule.numMintingPeriods.mul(mintingSchedule.mintingPeriod)
-      );
+  function getTotalMintedBySchedule() public view returns (uint256) {
+    return totalMinted;
   }
 
   /**
    * @return The currently mintable amount.
    */
   function getMintableAmount() public view returns (uint256) {
-    return
-      Math.min(
-        Math.min(maxDistribution, getCurrentReleasedTotalAmount()).sub(totalMinted),
-        getRemainingBalanceToMint()
-      );
+    return getTargetGoldTotalSupply().sub(getGoldToken().totalSupply());
   }
+
+  /**
+   * @notice Returns the target Gold supply according to the target schedule.
+   * @return The target Gold supply according to the target schedule.
+   */
+  function getTargetGoldTotalSupply() public view returns (uint256) {
+    require(now > startTime, "StartTime has now yet been reached.");
+    uint256 timeSinceGenesis = now.sub(startTime);
+
+    // Pay out half of all block rewards linearly.
+    uint256 linearRewards = GOLD_SUPPLY_CAP.sub(GENESIS_GOLD_SUPPLY).div(2);
+    if (timeSinceGenesis < SECONDS_LINEAR) {
+      uint256 targetRewards = linearRewards.mul(timeSinceGenesis).div(SECONDS_LINEAR);
+      return targetRewards.add(GENESIS_GOLD_SUPPLY);
+    } else {
+      uint256 targetRewards = linearRewards.mul(SECONDS_LINEAR.sub(1)).div(SECONDS_LINEAR);
+      if (totalMinted.add(GENESIS_GOLD_SUPPLY) < targetRewards.add(GENESIS_GOLD_SUPPLY)) {
+        return targetRewards.add(GENESIS_GOLD_SUPPLY);
+      }
+      require(false, "Block reward calculation for years 15-30 unimplemented");
+      return 0;
+    }
+  }
+
   // XXX: _addBeneficiary
   /**
    * @notice Sets the beneficiary of the instance
