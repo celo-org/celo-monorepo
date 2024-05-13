@@ -11,6 +11,7 @@ import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+// TODO(Arthur): import FeeCurrencyDirectory interface?
 import "@celo-contracts/common/interfaces/ICeloToken.sol"; // TODO move these to Initializer
 import "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
@@ -44,7 +45,7 @@ import "./HelperInterFaces.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 import "@celo-contracts-8/common/UsingRegistry.sol";
-import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol"; // TODO(Arthur): Is this a duplicate?
 
 contract ForceTx {
   // event to trigger so a tx can be processed
@@ -60,6 +61,9 @@ contract ForceTx {
 contract Migration is Script, UsingRegistry {
   using stdJson for string;
 
+  /**
+   * This is Anvil's default account
+   */
   address constant deployerAccount = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
   IProxyFactory proxyFactory;
@@ -177,6 +181,9 @@ contract Migration is Script, UsingRegistry {
     console.log("------------------------------");
   }
 
+  /**
+   * Entry point of the script
+   */
   function run() external {
     // TODO check that this matches deployerAccount and the pK can be avoided with --unlock
     vm.startBroadcast(deployerAccount);
