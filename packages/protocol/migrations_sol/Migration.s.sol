@@ -423,7 +423,17 @@ contract Migration is Script, UsingRegistry {
     IReserve(registry.getAddressForStringOrDie("Reserve")).addToken(stableTokenProxyAddress);
 
     getFeeCurrencyWhitelist().addToken(stableTokenProxyAddress);
-    // TODO(Arthur): Add stabletoken to FeeCurrencyDirectory
+    /* 
+    TODO(Arthur): Add stabletoken to FeeCurrencyDirectory 
+    1. Check that the syntax below is correct to .setCurrencyCongif
+    2. Set oracle address (is this sortedOracle?)
+    3. Set intrinsic gas value
+    */
+    IFeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory")).setCurrencyConfig(
+      stableTokenProxyAddress,
+      , // TODO(Arthur): add oracle address
+      , // TODO(Arthur): add intrinsice gas value
+    )
   }
 
   function migrateStableToken(string memory json) public {
