@@ -29,7 +29,6 @@ export enum CeloContractName {
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
   FeeCurrencyDirectory = 'FeeCurrencyDirectory',
-  MentoFeeCurrencyAdapterV1 = 'MentoFeeCurrencyAdapterV1',
   GoldToken = 'GoldToken',
   Governance = 'Governance',
   GovernanceSlasher = 'GovernanceSlasher',
