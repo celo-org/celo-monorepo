@@ -9,7 +9,6 @@ import "openzeppelin-solidity/contracts/math/Math.sol";
 import "./UsingRegistry.sol";
 
 import "../common/interfaces/IFeeHandlerSeller.sol";
-import "../common/interfaces/IGoldToken.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
@@ -84,7 +83,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     // and if it generates a better outcome that the ones enabled that gets used
     // and the user gets a reward
 
-    IGoldToken celoToken = getGoldToken();
+    IERC20 celoToken = getGoldToken();
 
     IUniswapV2RouterMin bestRouter;
     uint256 bestRouterQuote = 0;
@@ -197,7 +196,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
       );
     }
 
-    IGoldToken celoToken = getGoldToken();
+    IERC20 celoToken = getGoldToken();
     address pair = IUniswapV2FactoryMin(bestRouter.factory()).getPair(
       sellTokenAddress,
       address(celoToken)

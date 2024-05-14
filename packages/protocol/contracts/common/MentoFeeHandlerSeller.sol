@@ -2,10 +2,10 @@ pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "../../lib/mento-core/contracts/interfaces/IExchange.sol";
 import "./interfaces/IStableTokenMento.sol";
-import "./interfaces/IGoldToken.sol";
 
 import "./UsingRegistry.sol";
 import "../common/interfaces/IFeeHandlerSeller.sol";
@@ -64,7 +64,7 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     stableToken.approve(exchangeAddress, amount);
     exchange.sell(amount, minAmount, false);
 
-    IGoldToken goldToken = getGoldToken();
+    IERC20 goldToken = getGoldToken();
     uint256 celoAmount = goldToken.balanceOf(address(this));
     goldToken.transfer(msg.sender, celoAmount);
 
