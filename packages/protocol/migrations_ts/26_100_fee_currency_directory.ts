@@ -18,7 +18,6 @@ module.exports = deploymentForCoreContract<FeeCurrencyDirectoryInstance>(
   CeloContractName.FeeCurrencyDirectory,
   initializeArgs,
   async (feeCurrencyDirectory: FeeCurrencyDirectoryInstance, _web3: Web3, networkName: string) => {
-    console.log("in after");
     const sortedOracles = await getDeployedProxiedContract<SortedOraclesInstance>(
       'SortedOracles',
       artifacts
@@ -40,11 +39,7 @@ module.exports = deploymentForCoreContract<FeeCurrencyDirectoryInstance>(
         'on network',
         networkName
       )
-      await feeCurrencyDirectory.setCurrencyConfig(
-        stableToken.address,
-        sortedOracles.address,
-        1
-      )
+      await feeCurrencyDirectory.setCurrencyConfig(stableToken.address, sortedOracles.address, 1)
     }
 
     console.log(
