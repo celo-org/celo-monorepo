@@ -5,7 +5,7 @@ import "@openzeppelin/contracts8/access/Ownable.sol";
 
 contract MentoFeeCurrencyAdapterV1 is IOracle, Initializable, Ownable {
   ISortedOracles public sortedOracles;
-  
+
   constructor(bool test) public Initializable(test) {}
 
   /**

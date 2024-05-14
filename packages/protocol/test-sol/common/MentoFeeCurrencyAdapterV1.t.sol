@@ -18,10 +18,9 @@ contract MockOracleV1 {
   }
 
   function medianRate(address token) external view returns (uint256, uint256) {
-   return (numerator, denominator);
+    return (numerator, denominator);
   }
 }
-
 
 contract MentoFeeCurrencyAdapterBase is Test {
   MentoFeeCurrencyAdapterV1 mentoAdapter;

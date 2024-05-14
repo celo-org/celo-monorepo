@@ -49,6 +49,10 @@ export const SOLIDITY_08_PACKAGE = {
   // Proxies shouldn't have to be added to a list manually
   // https://github.com/celo-org/celo-monorepo/issues/10555
   contracts: ['GasPriceMinimum', 'FeeCurrencyDirectory', 'MentoFeeCurrencyAdapterV1'],
-  proxyContracts: ['GasPriceMinimumProxy', 'FeeCurrencyDirectoryProxy', 'MentoFeeCurrencyAdapterV1'],
+  proxyContracts: [
+    'GasPriceMinimumProxy',
+    'FeeCurrencyDirectoryProxy',
+    'MentoFeeCurrencyAdapterV1',
+  ],
   truffleConfig: 'truffle-config0.8.js',
 } satisfies ContractPackage
