@@ -5,14 +5,16 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./UsingRegistry.sol";
+import "./CalledByVm.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
+import "./interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IMintGoldSchedule.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 
 contract GoldToken is
   Initializable,
+  CalledByVm,
   UsingRegistry,
   IERC20,
   ICeloToken,
@@ -43,18 +45,7 @@ contract GoldToken is
 
   event Approval(address indexed owner, address indexed spender, uint256 value);
 
-  event IncreasedTotalSupply(uint256 amount);
-
-  event setCeloMintingScheduleAddress(address indexed newAddress);
-
-  modifier onlyGovernanceOrVm() {
-    if (isL1()) {
-      require(msg.sender == address(0), "Only VM can call");
-    } else {
-      require(msg.sender == owner(), "Only owner can call");
-    }
-    _;
-  }
+  event SetGoldTokenMintingScheduleAddress(address indexed newScheduleAddress);
 
   modifier isRestricted() {
     if (isL1()) {
@@ -96,7 +87,7 @@ contract GoldToken is
     );
     goldTokenMintingSchedule = IMintGoldSchedule(goldTokenMintingScheduleAddress);
 
-    emit setCeloMintingScheduleAddress(goldTokenMintingScheduleAddress);
+    emit SetGoldTokenMintingScheduleAddress(goldTokenMintingScheduleAddress);
   }
 
   /**
@@ -231,9 +222,8 @@ contract GoldToken is
    * @notice Increases the variable for total amount of CELO in existence.
    * @param amount The amount to increase counter by
    */
-  function increaseSupply(uint256 amount) external onlyGovernanceOrVm {
+  function increaseSupply(uint256 amount) external onlyL1 onlyVm {
     totalSupply_ = totalSupply_.add(amount);
-    emit IncreasedTotalSupply(amount);
   }
 
   /**

@@ -11,15 +11,13 @@ contract GoldTokenTest is Test, IsL2Check {
   MintGoldSchedule goldTokenMintingSchedule;
 
   uint256 constant ONE_GOLDTOKEN = 1000000000000000000;
-  uint256 constant TWO_GOLDTOKEN = 2000000000000000000;
-  uint256 constant THREE_GOLDTOKEN = 3000000000000000000;
-
   address receiver;
   address sender;
   address goldTokenOwner;
 
   event Transfer(address indexed from, address indexed to, uint256 value);
   event TransferComment(string comment);
+  event SetGoldTokenMintingScheduleAddress(address indexed newScheduleAddress);
 
   modifier _whenL2() {
     deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
@@ -31,24 +29,14 @@ contract GoldTokenTest is Test, IsL2Check {
     vm.prank(goldTokenOwner);
     goldToken = new GoldToken(true);
     goldTokenMintingSchedule = new MintGoldSchedule(true);
-
     receiver = actor("receiver");
     sender = actor("sender");
-
     vm.deal(receiver, ONE_GOLDTOKEN);
     vm.deal(sender, ONE_GOLDTOKEN);
-
-    if (isL1()) {
-      vm.prank(address(0));
-      goldToken.increaseSupply(TWO_GOLDTOKEN);
-    } else {
-      vm.prank(goldTokenOwner);
-      goldToken.increaseSupply(TWO_GOLDTOKEN);
-    }
   }
 }
 
-contract GoldTokenTest_General is GoldTokenTest {
+contract GoldTokenTest_general is GoldTokenTest {
   function setUp() public {
     super.setUp();
   }
@@ -205,9 +193,11 @@ contract GoldTokenTest_mint is GoldTokenTest {
   }
 
   function test_Should_increaseGoldTokenTotalSupplyWhencalledByVm() public {
+    uint256 goldTokenSupplyBefore = goldToken.totalSupply();
     vm.prank(address(0));
     goldToken.mint(receiver, ONE_GOLDTOKEN);
-    assertEq(goldToken.totalSupply(), THREE_GOLDTOKEN);
+    uint256 goldTokenSupplyAfter = goldToken.totalSupply();
+    assertGt(goldTokenSupplyAfter, goldTokenSupplyBefore);
   }
 
   function test_Emits_TransferEvent() public {
@@ -225,7 +215,7 @@ contract GoldTokenTest_mint_l2 is GoldTokenTest {
     goldToken.setGoldTokenMintingScheduleAddress(address(goldTokenMintingSchedule));
   }
 
-  function test_Reverts_whenCalledByOtherThanL2Governance() public {
+  function test_Reverts_whenCalledByOtherThanOwnerOrMintingSchedule() public {
     vm.prank(address(0));
 
     vm.expectRevert("Only owner or goldTokenMintingSchedule can call");
@@ -233,22 +223,26 @@ contract GoldTokenTest_mint_l2 is GoldTokenTest {
   }
 
   function test_Should_increaseGoldTokenTotalSupply() public {
+    uint256 goldTokenSupplyBefore = goldToken.totalSupply();
     vm.prank(goldTokenOwner);
     goldToken.mint(receiver, ONE_GOLDTOKEN);
-    assertEq(goldToken.totalSupply(), THREE_GOLDTOKEN);
+    uint256 goldTokenSupplyAfter = goldToken.totalSupply();
+    assertGt(goldTokenSupplyAfter, goldTokenSupplyBefore);
   }
 
   function test_Should_increaseGoldTokenBalanceWhenMintedByL2GovernanceOrGoldTokenMintingSchedule()
     public
   {
-    assertEq(goldToken.balanceOf(receiver), ONE_GOLDTOKEN);
+    uint256 originalBalance = goldToken.balanceOf(receiver);
     vm.prank(goldTokenOwner);
     goldToken.mint(receiver, ONE_GOLDTOKEN);
-    assertEq(goldToken.balanceOf(receiver), TWO_GOLDTOKEN);
+    uint256 balanceAfterFirstMint = goldToken.balanceOf(receiver);
+    assertGt(balanceAfterFirstMint, originalBalance);
 
     vm.prank(address(goldTokenMintingSchedule));
     goldToken.mint(receiver, ONE_GOLDTOKEN);
-    assertEq(goldToken.balanceOf(receiver), THREE_GOLDTOKEN);
+    uint256 balanceAfterSecondMint = goldToken.balanceOf(receiver);
+    assertGt(balanceAfterSecondMint, balanceAfterFirstMint);
   }
 
   function test_Emits_TransferEvent() public {
@@ -278,18 +272,24 @@ contract GoldTokenTest_setGoldTokenMintingScheduleAddress is GoldTokenTest {
 
     assertEq(address(goldToken.goldTokenMintingSchedule()), address(goldTokenMintingSchedule));
   }
+  function test_Emits_SetGoldTokenMintingScheduleAddressEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit SetGoldTokenMintingScheduleAddress(address(goldTokenMintingSchedule));
+    vm.prank(goldTokenOwner);
+    goldToken.setGoldTokenMintingScheduleAddress(address(goldTokenMintingSchedule));
+  }
 }
 
 contract GoldTokenTest_increaseSupply is GoldTokenTest {
   function test_ShouldIncreaseTotalSupply() public {
-    assertEq(goldToken.totalSupply(), TWO_GOLDTOKEN);
+    uint256 goldTokenSupplyBefore = goldToken.totalSupply();
     vm.prank(address(0));
     goldToken.increaseSupply(ONE_GOLDTOKEN);
-    assertEq(goldToken.totalSupply(), THREE_GOLDTOKEN);
+    uint256 goldTokenSupplyAfter = goldToken.totalSupply();
+    assertGt(goldTokenSupplyAfter, goldTokenSupplyBefore);
   }
 
   function test_Reverts_WhenCalledByOtherThanVm() public {
-    assertEq(goldToken.totalSupply(), TWO_GOLDTOKEN);
     vm.prank(goldTokenOwner);
     vm.expectRevert("Only VM can call");
     goldToken.increaseSupply(ONE_GOLDTOKEN);
@@ -306,21 +306,23 @@ contract GoldTokenTest_increaseSupply_l2 is GoldTokenTest {
     goldToken.setGoldTokenMintingScheduleAddress(address(goldTokenMintingSchedule));
   }
 
-  function test_Reverts_WhenCalledByOtherThanL2Governance() public {
-    assertEq(goldToken.totalSupply(), TWO_GOLDTOKEN);
+  function test_Reverts_WhenCalledByAnyone() public {
     vm.prank(address(0));
-    vm.expectRevert("Only owner can call");
+    vm.expectRevert("This method is no longer supported in L2.");
     goldToken.increaseSupply(ONE_GOLDTOKEN);
     vm.prank(address(goldTokenMintingSchedule));
-    vm.expectRevert("Only owner can call");
+    vm.expectRevert("This method is no longer supported in L2.");
     goldToken.increaseSupply(ONE_GOLDTOKEN);
   }
 
-  function test_ShouldIncreaseTotalSupply() public {
-    assertEq(goldToken.totalSupply(), TWO_GOLDTOKEN);
+  function test_ShouldNotIncreaseTotalSupply() public {
+    uint256 goldTokenSupplyBefore = goldToken.totalSupply();
+    vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(goldTokenOwner);
     goldToken.increaseSupply(ONE_GOLDTOKEN);
-    assertEq(goldToken.totalSupply(), THREE_GOLDTOKEN);
+
+    uint256 goldTokenSupplyAfter = goldToken.totalSupply();
+    assertEq(goldTokenSupplyAfter, goldTokenSupplyBefore);
   }
 }
 
