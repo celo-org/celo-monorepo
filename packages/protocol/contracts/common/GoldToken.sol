@@ -76,10 +76,9 @@ contract GoldToken is
     setRegistry(registryAddress);
   }
 
-  function setGoldTokenMintingScheduleAddress(address goldTokenMintingScheduleAddress)
-    external
-    onlyOwner
-  {
+  function setGoldTokenMintingScheduleAddress(
+    address goldTokenMintingScheduleAddress
+  ) external onlyOwner {
     require(
       goldTokenMintingScheduleAddress != address(0) ||
         goldTokenMintingScheduleAddress != address(goldTokenMintingSchedule),
@@ -108,10 +107,11 @@ contract GoldToken is
    * @param comment The transfer comment
    * @return True if the transaction succeeds.
    */
-  function transferWithComment(address to, uint256 value, string calldata comment)
-    external
-    returns (bool)
-  {
+  function transferWithComment(
+    address to,
+    uint256 value,
+    string calldata comment
+  ) external returns (bool) {
     bool succeeded = _transferWithCheck(to, value);
     emit TransferComment(comment);
     return succeeded;

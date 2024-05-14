@@ -5,9 +5,7 @@ pragma solidity ^0.5.13;
 
 import { Test, console2 as console } from "celo-foundry/Test.sol";
 
-import {
-  SortedLinkedListWithMedian
-} from "contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
+import { SortedLinkedListWithMedian } from "contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
 import { FixidityLib } from "contracts/common/FixidityLib.sol";
 
 import { IBreakerBox } from "../../contracts/stability/interfaces/IBreakerBox.sol";

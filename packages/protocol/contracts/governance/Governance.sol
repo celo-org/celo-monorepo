@@ -36,7 +36,12 @@ contract Governance is
   using BytesLib for bytes;
   using Address for address payable; // prettier-ignore
 
-  enum VoteValue { None, Abstain, No, Yes }
+  enum VoteValue {
+    None,
+    Abstain,
+    No,
+    Yes
+  }
 
   struct UpvoteRecord {
     uint256 proposalId;
@@ -275,10 +280,11 @@ contract Governance is
    * @param threshold The threshold.
    * @dev If no constitution is explicitly set the default is a simple majority, i.e. 1:2.
    */
-  function setConstitution(address destination, bytes4 functionId, uint256 threshold)
-    external
-    onlyOwner
-  {
+  function setConstitution(
+    address destination,
+    bytes4 functionId,
+    uint256 threshold
+  ) external onlyOwner {
     require(destination != address(0), "Destination cannot be zero");
     require(
       threshold > FIXED_HALF && threshold <= FixidityLib.fixed1().unwrap(),
@@ -331,11 +337,11 @@ contract Governance is
    * @dev Provide 0 for `lesser`/`greater` when the proposal will be at the tail/head of the queue.
    * @dev Reverts if the account has already upvoted a proposal in the queue.
    */
-  function upvote(uint256 proposalId, uint256 lesser, uint256 greater)
-    external
-    nonReentrant
-    returns (bool)
-  {
+  function upvote(
+    uint256 proposalId,
+    uint256 lesser,
+    uint256 greater
+  ) external nonReentrant returns (bool) {
     dequeueProposalsIfReady();
     // If acting on an expired proposal, expire the proposal and take no action.
     if (removeIfQueuedAndExpired(proposalId)) {
@@ -426,11 +432,11 @@ contract Governance is
    * @return Whether or not the vote was cast successfully.
    */
   /* solhint-disable code-complexity */
-  function vote(uint256 proposalId, uint256 index, Proposals.VoteValue value)
-    external
-    nonReentrant
-    returns (bool)
-  {
+  function vote(
+    uint256 proposalId,
+    uint256 index,
+    Proposals.VoteValue value
+  ) external nonReentrant returns (bool) {
     dequeueProposalsIfReady();
     (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteExpired(
       proposalId,
@@ -784,11 +790,9 @@ contract Governance is
    * @return transaction Transaction count.
    * @return description Description url.
    */
-  function getProposal(uint256 proposalId)
-    external
-    view
-    returns (address, uint256, uint256, uint256, string memory, uint256, bool)
-  {
+  function getProposal(
+    uint256 proposalId
+  ) external view returns (address, uint256, uint256, uint256, string memory, uint256, bool) {
     return proposals[proposalId].unpack();
   }
 
@@ -800,11 +804,10 @@ contract Governance is
    * @return destination Transaction destination.
    * @return data Transaction data.
    */
-  function getProposalTransaction(uint256 proposalId, uint256 index)
-    external
-    view
-    returns (uint256, address, bytes memory)
-  {
+  function getProposalTransaction(
+    uint256 proposalId,
+    uint256 index
+  ) external view returns (uint256, address, bytes memory) {
     return proposals[proposalId].getTransaction(index);
   }
 
@@ -839,11 +842,10 @@ contract Governance is
    * @return The no weight.
    * @return The abstain weight.
    */
-  function getVoteRecord(address account, uint256 index)
-    external
-    view
-    returns (uint256, uint256, uint256, uint256, uint256, uint256)
-  {
+  function getVoteRecord(
+    address account,
+    uint256 index
+  ) external view returns (uint256, uint256, uint256, uint256, uint256, uint256) {
     VoteRecord storage record = voters[account].referendumVotes[index];
     return (
       record.proposalId,
@@ -1160,10 +1162,10 @@ contract Governance is
    * @param account The address of the account.
    * @param newVotingPower The adjusted voting power of delegatee.
    */
-  function removeVotesWhenRevokingDelegatedVotes(address account, uint256 newVotingPower)
-    public
-    onlyLockedGold
-  {
+  function removeVotesWhenRevokingDelegatedVotes(
+    address account,
+    uint256 newVotingPower
+  ) public onlyLockedGold {
     _removeVotesWhenRevokingDelegatedVotes(account, newVotingPower);
   }
 
@@ -1287,9 +1289,10 @@ contract Governance is
    * @param account The address of the account.
    * @param newVotingPower The adjusted voting power of delegatee.
    */
-  function _removeVotesWhenRevokingDelegatedVotes(address account, uint256 newVotingPower)
-    internal
-  {
+  function _removeVotesWhenRevokingDelegatedVotes(
+    address account,
+    uint256 newVotingPower
+  ) internal {
     Voter storage voter = voters[account];
 
     for (uint256 index = 0; index < dequeued.length; index = index.add(1)) {
@@ -1360,11 +1363,10 @@ contract Governance is
     }
   }
 
-  function _getConstitution(address destination, bytes4 functionId)
-    internal
-    view
-    returns (FixidityLib.Fraction memory)
-  {
+  function _getConstitution(
+    address destination,
+    bytes4 functionId
+  ) internal view returns (FixidityLib.Fraction memory) {
     // Default to a simple majority.
     FixidityLib.Fraction memory threshold = FixidityLib.wrap(FIXED_HALF);
     if (constitution[destination].functionThresholds[functionId].unwrap() != 0) {
@@ -1381,11 +1383,9 @@ contract Governance is
    * @return The stage of the dequeued proposal.
    * @dev Must be called on a dequeued proposal.
    */
-  function getProposalDequeuedStage(Proposals.Proposal storage proposal)
-    internal
-    view
-    returns (Proposals.Stage)
-  {
+  function getProposalDequeuedStage(
+    Proposals.Proposal storage proposal
+  ) internal view returns (Proposals.Stage) {
     uint256 stageStartTime = proposal.timestamp.add(stageDurations.referendum).add(
       stageDurations.execution
     );
@@ -1427,10 +1427,10 @@ contract Governance is
    * @return The proposal storage struct corresponding to `proposalId`.
    * @return The proposal stage corresponding to `proposalId`.
    */
-  function requireDequeuedAndDeleteExpired(uint256 proposalId, uint256 index)
-    private
-    returns (Proposals.Proposal storage, Proposals.Stage)
-  {
+  function requireDequeuedAndDeleteExpired(
+    uint256 proposalId,
+    uint256 index
+  ) private returns (Proposals.Proposal storage, Proposals.Stage) {
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(_isDequeuedProposal(proposal, proposalId, index), "Proposal not dequeued");
     Proposals.Stage stage = getProposalDequeuedStage(proposal);
@@ -1609,11 +1609,10 @@ contract Governance is
    * @param proposal The proposal struct.
    * @return Whether or not the dequeued proposal has expired.
    */
-  function _isDequeuedProposalExpired(Proposals.Proposal storage proposal, Proposals.Stage stage)
-    private
-    view
-    returns (bool)
-  {
+  function _isDequeuedProposalExpired(
+    Proposals.Proposal storage proposal,
+    Proposals.Stage stage
+  ) private view returns (bool) {
     // The proposal is considered expired under the following conditions:
     //   1. Past the referendum stage and not passing.
     //   2. Past the execution stage.
@@ -1626,11 +1625,9 @@ contract Governance is
    * @param proposal The proposal struct.
    * @return Whether or not the dequeued proposal has expired.
    */
-  function _isQueuedProposalExpired(Proposals.Proposal storage proposal)
-    private
-    view
-    returns (bool)
-  {
+  function _isQueuedProposalExpired(
+    Proposals.Proposal storage proposal
+  ) private view returns (bool) {
     // solhint-disable-next-line not-rely-on-time
     return now >= proposal.timestamp.add(queueExpiry);
   }
@@ -1641,11 +1638,11 @@ contract Governance is
    * @param votes Yes/no/abstrain votes
    * @param sumOfAllVotes Sum of yes, no, and abstain votes.
    */
-  function getVotesPortion(uint256 totalToRemove, uint256 votes, uint256 sumOfAllVotes)
-    private
-    pure
-    returns (uint256)
-  {
+  function getVotesPortion(
+    uint256 totalToRemove,
+    uint256 votes,
+    uint256 sumOfAllVotes
+  ) private pure returns (uint256) {
     return
       FixidityLib
         .newFixed(totalToRemove)

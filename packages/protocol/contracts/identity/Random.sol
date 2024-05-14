@@ -60,10 +60,11 @@ contract Random is
    * `randomness` and `newCommitment`. Before running regular transactions, this function should be
    * called.
    */
-  function revealAndCommit(bytes32 randomness, bytes32 newCommitment, address proposer)
-    external
-    onlyVm
-  {
+  function revealAndCommit(
+    bytes32 randomness,
+    bytes32 newCommitment,
+    address proposer
+  ) external onlyVm {
     _revealAndCommit(randomness, newCommitment, proposer);
   }
 
@@ -85,12 +86,12 @@ contract Random is
   }
 
   /**
-  * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return Storage version of the contract.
    * @return Major version of the contract.
    * @return Minor version of the contract.
    * @return Patch version of the contract.
-  */
+   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 1, 0);
   }
@@ -198,5 +199,4 @@ contract Random is
     );
     return history[blockNumber];
   }
-
 }

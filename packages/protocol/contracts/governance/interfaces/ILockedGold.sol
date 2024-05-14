@@ -18,17 +18,17 @@ interface ILockedGold {
     address[] calldata greaters,
     uint256[] calldata indices
   ) external;
+  function addSlasher(string calldata slasherIdentifier) external;
 
   function getAccountTotalLockedGold(address) external view returns (uint256);
   function getTotalLockedGold() external view returns (uint256);
-  function getPendingWithdrawals(address)
-    external
-    view
-    returns (uint256[] memory, uint256[] memory);
-  function getPendingWithdrawal(address account, uint256 index)
-    external
-    view
-    returns (uint256, uint256);
+  function getPendingWithdrawals(
+    address
+  ) external view returns (uint256[] memory, uint256[] memory);
+  function getPendingWithdrawal(
+    address account,
+    uint256 index
+  ) external view returns (uint256, uint256);
   function getTotalPendingWithdrawals(address) external view returns (uint256);
   function isSlasher(address) external view returns (bool);
 

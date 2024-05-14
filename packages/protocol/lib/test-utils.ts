@@ -1,36 +1,28 @@
-import { ArtifactsSingleton } from '@celo/protocol/lib/artifactsSingleton'
-import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
-import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
-import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
-import { config } from '@celo/protocol/migrationsConfig'
-import { privateKeyToAddress } from '@celo/utils/lib/address'
-import { soliditySha3 } from '@celo/utils/lib/solidity'
-import BigNumber from 'bignumber.js'
-import chai from 'chai'
-import chaiSubset from 'chai-subset'
+import { ArtifactsSingleton } from '@celo/protocol/lib/artifactsSingleton';
+import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils';
+import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils';
+import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils';
+import { config } from '@celo/protocol/migrationsConfig';
+import { privateKeyToAddress } from '@celo/utils/lib/address';
+import { soliditySha3 } from '@celo/utils/lib/solidity';
+import BigNumber from 'bignumber.js';
+import chai from 'chai';
+import chaiSubset from 'chai-subset';
 // eslint-disable-next-line: ordered-imports
-import { spawn, SpawnOptions } from 'child_process'
-import { keccak256 } from 'ethereum-cryptography/keccak'
-import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
-import Web3 from 'web3'
-import { ContractPackage, MENTO_PACKAGE } from '../contractPackages'
+import { spawn, SpawnOptions } from 'child_process';
+import { keccak256 } from 'ethereum-cryptography/keccak';
+import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types';
+import Web3 from 'web3';
+import { ContractPackage, MENTO_PACKAGE } from '../contractPackages';
 
 /* eslint:disabled ordered-imports: 0 */
-import { getIdentifierHash, IdentifierPrefix } from "@celo/odis-identifiers"
-import { fromFixed } from '@celo/utils/lib/fixidity'
-import { bufferToHex, toBuffer } from '@ethereumjs/util'
-import { utf8ToBytes } from 'ethereum-cryptography/utils'
-import { AccountsInstance } from 'types'
+import { fromFixed } from '@celo/utils/lib/fixidity';
+import { bufferToHex, toBuffer } from '@ethereumjs/util';
+import { utf8ToBytes } from 'ethereum-cryptography/utils';
+import { AccountsInstance } from 'types';
 
 
 import BN = require('bn.js')
-export function getOdisHash(
-	phoneNumber: string,
-	pepper?: string,
-	prefix = IdentifierPrefix.PHONE_NUMBER,
-) {
-	return getIdentifierHash(Web3.utils.sha3, phoneNumber, prefix, pepper);
-}
 
 const isNumber = (x: any) =>
   typeof x === 'number' || (BN as any).isBN(x) || BigNumber.isBigNumber(x)
