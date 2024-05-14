@@ -10,6 +10,7 @@ import "../common/FixidityLib.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
+import "../common/interfaces/IGoldToken.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 
 /**
@@ -98,8 +99,8 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       "Insufficient unlocked balance to mint amount"
     );
     totalMinted = totalMinted.add(mintableAmount);
-
-    getGoldToken().mint(beneficiary, mintableAmount);
+    IGoldToken goldToken = IGoldToken(address(getGoldToken()));
+    require(goldToken.mint(beneficiary, mintableAmount));
   }
 
   /**
