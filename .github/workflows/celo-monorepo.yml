@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - master
+      - soloseng/celo-minting-schedule
   pull_request:
     branches:
       - master
