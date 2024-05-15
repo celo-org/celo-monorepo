@@ -57,7 +57,7 @@ contract UsingPrecompiles {
   function getEpochSize() public view returns (uint256) {
     bytes memory out;
     bool success;
-    (success, out) = EPOCH_SIZE.staticcall(abi.encodePacked());
+    (success, out) = EPOCH_SIZE.staticcall(abi.encodePacked(true));
     require(success, "error calling getEpochSize precompile");
     return getUint256FromBytes(out, 0);
   }
