@@ -15,9 +15,12 @@ import { Constants } from "../constants.sol";
 import "../utils.sol";
 
 contract ElectionMock is Election(true) {
-  function distributeEpochRewards(address group, uint256 value, address lesser, address greater)
-    external
-  {
+  function distributeEpochRewards(
+    address group,
+    uint256 value,
+    address lesser,
+    address greater
+  ) external {
     return _distributeEpochRewards(group, value, lesser, greater);
   }
 }
@@ -292,7 +295,6 @@ contract Election_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
     emit AllowedToVoteOverMaxNumberOfGroups(address(this), false);
     election.setAllowedToVoteOverMaxNumberOfGroups(false);
   }
-
 }
 
 contract Election_MarkGroupEligible is ElectionTest {
@@ -708,7 +710,6 @@ contract Election_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes is ElectionTes
     emit ValidatorGroupVoteCast(voter, group, value);
     election.vote(group, value, address(0), address(0));
   }
-
 }
 
 contract Election_Vote_GroupNotEligible is ElectionTest {
@@ -1043,7 +1044,6 @@ contract Election_ActivateForAccount is ElectionTest {
     vm.expectRevert("Vote value cannot be zero");
     election.activateForAccount(group, voter);
   }
-
 }
 
 contract Election_RevokePending is ElectionTest {
@@ -1474,7 +1474,6 @@ contract Election_RevokeActive is ElectionTest {
     vm.expectRevert("Vote value larger than active votes");
     election.revokeActive(group, voteValue0 + reward0 + 1, address(0), address(0), index);
   }
-
 }
 
 contract Election_ElectionValidatorSigners is ElectionTest {
@@ -1553,11 +1552,9 @@ contract Election_ElectionValidatorSigners is ElectionTest {
     return data;
   }
 
-  function sortMembersWithVotesDesc(MemberWithVotes[] memory data)
-    internal
-    pure
-    returns (MemberWithVotes[] memory)
-  {
+  function sortMembersWithVotesDesc(
+    MemberWithVotes[] memory data
+  ) internal pure returns (MemberWithVotes[] memory) {
     uint256 length = data.length;
     for (uint256 i = 0; i < length; i++) {
       for (uint256 j = i + 1; j < length; j++) {
@@ -1822,10 +1819,11 @@ contract Election_GetGroupEpochRewards is ElectionTest {
     assertEq(election.getGroupEpochRewards(group2, totalRewardValue, uptimes), 0);
   }
 
-  uint256 expectedGroup1EpochRewards = FixidityLib
-    .newFixedFraction(voteValue1, voteValue1 + voteValue2)
-    .multiply(FixidityLib.newFixed(totalRewardValue))
-    .fromFixed();
+  uint256 expectedGroup1EpochRewards =
+    FixidityLib
+      .newFixedFraction(voteValue1, voteValue1 + voteValue2)
+      .multiply(FixidityLib.newFixed(totalRewardValue))
+      .fromFixed();
 
   function test_ShouldReturnProportionalRewardValueForOtherGroup_WhenOneGroupDoesNotMeetLockedGoldRequirements_WhenTwoGroupsHaveActiveVotes()
     public
@@ -1912,12 +1910,10 @@ contract Election_DistributeEpochRewards is ElectionTest {
   }
 
   uint256 expectedGroupTotalActiveVotes = voteValue + voteValue2 / 2 + rewardValue;
-  uint256 expectedVoterActiveVotesForGroup = FixidityLib
-    .newFixedFraction(expectedGroupTotalActiveVotes * 2, 3)
-    .fromFixed();
-  uint256 expectedVoter2ActiveVotesForGroup = FixidityLib
-    .newFixedFraction(expectedGroupTotalActiveVotes, 3)
-    .fromFixed();
+  uint256 expectedVoterActiveVotesForGroup =
+    FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes * 2, 3).fromFixed();
+  uint256 expectedVoter2ActiveVotesForGroup =
+    FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes, 3).fromFixed();
   uint256 expectedVoter2ActiveVotesForGroup2 = voteValue / 2 + rewardValue2;
 
   function WhenThereAreTwoGroupsWithActiveVotes() public {
@@ -2025,7 +2021,6 @@ contract Election_ForceDecrementVotes is ElectionTest {
 
   function setUp() public {
     super.setUp();
-
   }
 
   function WhenAccountHasVotedForOneGroup() public {
@@ -2441,7 +2436,12 @@ contract Election_ConsistencyChecks is ElectionTest {
     uint256 nonVoting;
   }
 
-  enum VoteActionType { Vote, Activate, RevokePending, RevokeActive }
+  enum VoteActionType {
+    Vote,
+    Activate,
+    RevokePending,
+    RevokeActive
+  }
 
   function setUp() public {
     super.setUp();

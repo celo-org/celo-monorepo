@@ -8,5 +8,4 @@ contract IRegistryExtended {
   function getVoterFromAccount(address) external returns (address);
   function getAccountWeight(address) external returns (uint256);
   function getAccountFromVoter(address voter) external returns (address);
-
 }

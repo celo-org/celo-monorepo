@@ -262,10 +262,11 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @notice Wrapper function for any ERC-20 transfer function.
    * @dev Protects against celo balance changes.
    */
-  function genericTransfer(address erc20, address to, uint256 value)
-    external
-    onlyWhenInProperState
-  {
+  function genericTransfer(
+    address erc20,
+    address to,
+    uint256 value
+  ) external onlyWhenInProperState {
     require(
       erc20 != registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
       "Transfer must not target celo balance"
@@ -406,12 +407,12 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev The v,r and s signature should be signed by the authorized signer
    *      key, with the ReleaseGold contract address as the message.
    */
-  function authorizeVoteSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
-    external
-    nonReentrant
-    onlyCanVote
-    onlyWhenInProperState
-  {
+  function authorizeVoteSigner(
+    address payable signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external nonReentrant onlyCanVote onlyWhenInProperState {
     // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
     if (getAccounts().getVoteSigner(address(this)) == address(this)) {
       fundSigner(signer);
@@ -428,12 +429,12 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev The v,r and s signature should be signed by the authorized signer
    *      key, with the ReleaseGold contract address as the message.
    */
-  function authorizeValidatorSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
-    external
-    nonReentrant
-    onlyCanValidate
-    onlyWhenInProperState
-  {
+  function authorizeValidatorSigner(
+    address payable signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external nonReentrant onlyCanValidate onlyWhenInProperState {
     // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
     if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
       fundSigner(signer);
@@ -512,12 +513,12 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev The v,r and s signature should be signed by the authorized signer
    *      key, with the ReleaseGold contract address as the message.
    */
-  function authorizeAttestationSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
-    external
-    nonReentrant
-    onlyCanValidate
-    onlyWhenInProperState
-  {
+  function authorizeAttestationSigner(
+    address payable signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external nonReentrant onlyCanValidate onlyWhenInProperState {
     getAccounts().authorizeAttestationSigner(signer, v, r, s);
   }
 
@@ -574,10 +575,12 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev v, r, s constitute `signer`'s signature on `msg.sender` (unless the wallet address
    *      is 0x0 or msg.sender).
    */
-  function setAccountWalletAddress(address walletAddress, uint8 v, bytes32 r, bytes32 s)
-    external
-    onlyBeneficiaryAndNotRevoked
-  {
+  function setAccountWalletAddress(
+    address walletAddress,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external onlyBeneficiaryAndNotRevoked {
     getAccounts().setWalletAddress(walletAddress, v, r, s);
   }
 
@@ -587,10 +590,9 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @param dataEncryptionKey Secp256k1 public key for data encryption.
    *                          Preferably compressed.
    */
-  function setAccountDataEncryptionKey(bytes calldata dataEncryptionKey)
-    external
-    onlyBeneficiaryAndNotRevoked
-  {
+  function setAccountDataEncryptionKey(
+    bytes calldata dataEncryptionKey
+  ) external onlyBeneficiaryAndNotRevoked {
     getAccounts().setAccountDataEncryptionKey(dataEncryptionKey);
   }
 
@@ -598,10 +600,9 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @notice A wrapper setter function for the metadata of an account.
    * @param metadataURL The URL to access the metadata..
    */
-  function setAccountMetadataURL(string calldata metadataURL)
-    external
-    onlyBeneficiaryAndNotRevoked
-  {
+  function setAccountMetadataURL(
+    string calldata metadataURL
+  ) external onlyBeneficiaryAndNotRevoked {
     getAccounts().setMetadataURL(metadataURL);
   }
 
@@ -647,11 +648,10 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @param index The index of the pending locked gold withdrawal.
    * @param value The value of gold to be relocked for the release schedule instance.
    */
-  function relockGold(uint256 index, uint256 value)
-    external
-    nonReentrant
-    onlyBeneficiaryAndNotRevoked
-  {
+  function relockGold(
+    uint256 index,
+    uint256 value
+  ) external nonReentrant onlyBeneficiaryAndNotRevoked {
     getLockedGold().relock(index, value);
   }
 
@@ -770,7 +770,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
 
   /**
    * @return The currently withdrawable release amount.
-  */
+   */
   function getWithdrawableAmount() public view returns (uint256) {
     return
       Math.min(

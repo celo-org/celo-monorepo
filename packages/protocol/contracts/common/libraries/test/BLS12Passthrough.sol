@@ -17,11 +17,12 @@ contract Common {
 
   constructor() public {}
 
-  function fpMulTest(uint256 a1, uint256 a2, uint256 b1, uint256 b2)
-    external
-    view
-    returns (uint256, uint256)
-  {
+  function fpMulTest(
+    uint256 a1,
+    uint256 a2,
+    uint256 b1,
+    uint256 b2
+  ) external view returns (uint256, uint256) {
     B12.Fp memory a = B12.Fp(a1, a2);
     B12.Fp memory b = B12.Fp(b1, b2);
     B12.Fp memory res = B12.fpMul(a, b);
@@ -39,11 +40,9 @@ contract Common {
     return (res.a, res.b);
   }
 
-  function fp2MulTest(uint256[] calldata arr)
-    external
-    view
-    returns (uint256, uint256, uint256, uint256)
-  {
+  function fp2MulTest(
+    uint256[] calldata arr
+  ) external view returns (uint256, uint256, uint256, uint256) {
     B12.Fp2 memory x = B12.Fp2(B12.Fp(arr[0], arr[1]), B12.Fp(arr[2], arr[3]));
     B12.Fp2 memory y = B12.Fp2(B12.Fp(arr[4], arr[5]), B12.Fp(arr[6], arr[7]));
     B12.Fp2 memory res = B12.fp2Mul(x, y);
@@ -75,11 +74,12 @@ contract Common {
     ret[3] = a.Y.b;
   }
 
-  function testSerializeG1(uint256 w, uint256 x, uint256 y, uint256 z)
-    external
-    pure
-    returns (bytes memory)
-  {
+  function testSerializeG1(
+    uint256 w,
+    uint256 x,
+    uint256 y,
+    uint256 z
+  ) external pure returns (bytes memory) {
     B12.G1Point memory a;
     a.X.a = w;
     a.X.b = x;
@@ -144,11 +144,11 @@ contract Common {
     emit MEMDUMP(a, b, c, d);
   }
 
-  function executePrecompile(bytes memory input, uint8 addr, uint256 output_len)
-    internal
-    view
-    returns (bytes memory output)
-  {
+  function executePrecompile(
+    bytes memory input,
+    uint8 addr,
+    uint256 output_len
+  ) internal view returns (bytes memory output) {
     bool success;
     assembly {
       success := staticcall(

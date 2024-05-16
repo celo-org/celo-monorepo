@@ -11,7 +11,6 @@ contract AddressSortedLinkedListWithMedianTest is Test {
   function setUp() public {
     sortedList = new AddressSortedLinkedListWithMedianMock();
   }
-
 }
 
 contract AddressSortedLinkedListWithMedianTest_insert is AddressSortedLinkedListWithMedianTest {
@@ -154,7 +153,11 @@ contract AddressSortedLinkedListWithMedianTest_WhenThereAreMultipleActions is
 {
   uint256 nonce = 0;
 
-  enum SortedListActionType { Update, Remove, Insert }
+  enum SortedListActionType {
+    Update,
+    Remove,
+    Insert
+  }
 
   struct SortedElement {
     address key;
@@ -166,11 +169,9 @@ contract AddressSortedLinkedListWithMedianTest_WhenThereAreMultipleActions is
     SortedElement element;
   }
 
-  function getLesserAndGreater(uint256 numerator)
-    internal
-    view
-    returns (address lesser, address greater)
-  {
+  function getLesserAndGreater(
+    uint256 numerator
+  ) internal view returns (address lesser, address greater) {
     // Fetch all elements from the list
     (address[] memory keys, uint256[] memory numerators, ) = sortedList.getElements();
     uint256 length = keys.length;
@@ -217,8 +218,11 @@ contract AddressSortedLinkedListWithMedianTest_WhenThereAreMultipleActions is
 
   function assertSortedFractionListInvariants() internal view {
     // Fetch all elements from the list
-    (address[] memory keys, uint256[] memory numerators, SortedLinkedListWithMedian.MedianRelation[] memory relations) = sortedList
-      .getElements();
+    (
+      address[] memory keys,
+      uint256[] memory numerators,
+      SortedLinkedListWithMedian.MedianRelation[] memory relations
+    ) = sortedList.getElements();
     uint256 numElements = sortedList.getNumElements(); // Assuming getNumElements() returns the total number of elements
     address medianKey = sortedList.medianKey(); // Assuming medianKey() returns the key of the median element
 

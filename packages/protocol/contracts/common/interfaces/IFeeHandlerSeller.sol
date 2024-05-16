@@ -1,6 +1,4 @@
-pragma solidity ^0.5.13;
-
-import "../FixidityLib.sol";
+pragma solidity >=0.5.13 <0.9.0;
 
 interface IFeeHandlerSeller {
   function sell(

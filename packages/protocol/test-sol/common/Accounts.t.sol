@@ -22,8 +22,10 @@ contract AccountsTest is Test {
   bytes storageRoot = abi.encodePacked(metadataURL);
   bytes otherStorageRoot = abi.encodePacked(otherMetadataURL);
 
-  bytes constant dataEncryptionKey = hex"02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111";
-  bytes constant longDataEncryptionKey = hex"04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0161111111102f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111";
+  bytes constant dataEncryptionKey =
+    hex"02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111";
+  bytes constant longDataEncryptionKey =
+    hex"04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0161111111102f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111";
 
   address caller;
   uint256 callerPK;
@@ -31,13 +33,11 @@ contract AccountsTest is Test {
   address caller2;
   uint256 caller2PK;
 
-  bytes32 constant EIP712DOMAIN_TYPEHASH = keccak256(
-    "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-  );
+  bytes32 constant EIP712DOMAIN_TYPEHASH =
+    keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
-  bytes32 public constant EIP712_AUTHORIZE_SIGNER_TYPEHASH = keccak256(
-    "AuthorizeSigner(address account,address signer,bytes32 role)"
-  );
+  bytes32 public constant EIP712_AUTHORIZE_SIGNER_TYPEHASH =
+    keccak256("AuthorizeSigner(address account,address signer,bytes32 role)");
 
   struct Domain {
     string name;
@@ -97,11 +97,10 @@ contract AccountsTest is Test {
     (caller2, caller2PK) = actorWithPK("caller2");
   }
 
-  function getParsedSignatureOfAddress(address _address, uint256 privateKey)
-    public
-    pure
-    returns (uint8, bytes32, bytes32)
-  {
+  function getParsedSignatureOfAddress(
+    address _address,
+    uint256 privateKey
+  ) public pure returns (uint8, bytes32, bytes32) {
     bytes32 addressHash = keccak256(abi.encodePacked(_address));
     bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
     return vm.sign(privateKey, prefixedHash);
@@ -126,11 +125,11 @@ contract AccountsTest is Test {
     assertEq(roots.length, currentIndex);
   }
 
-  function slice(bytes memory data, uint256 start, uint256 end)
-    internal
-    pure
-    returns (bytes memory)
-  {
+  function slice(
+    bytes memory data,
+    uint256 start,
+    uint256 end
+  ) internal pure returns (bytes memory) {
     bytes memory part = new bytes(end - start);
     for (uint256 i = 0; i < part.length; i++) {
       part[i] = data[i + start];
@@ -161,21 +160,18 @@ contract AccountsTest is Test {
     return (v, r, s);
   }
 
-  function generateTypedDataHash(Domain memory domain, AuthorizeSigner memory authorizeSigner)
-    public
-    pure
-    returns (bytes32)
-  {
+  function generateTypedDataHash(
+    Domain memory domain,
+    AuthorizeSigner memory authorizeSigner
+  ) public pure returns (bytes32) {
     bytes32 domainSeparator = structHashEIP712Domain(domain);
     bytes32 authorizeSignerHash = getAuthorizeSigner(authorizeSigner);
     return keccak256(abi.encodePacked("\x19\x01", domainSeparator, authorizeSignerHash));
   }
 
-  function getAuthorizeSigner(AuthorizeSigner memory authorizeSigner)
-    public
-    pure
-    returns (bytes32)
-  {
+  function getAuthorizeSigner(
+    AuthorizeSigner memory authorizeSigner
+  ) public pure returns (bytes32) {
     return
       keccak256(
         abi.encode(
@@ -230,7 +226,8 @@ contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
   }
 
   function test_ShouldAllowSettingAKeyWithLEadingZeros() public {
-    bytes memory keyWithLeadingZeros = hex"00000000000000000000000000000000000000000000000f2f48ee19680706191111";
+    bytes
+      memory keyWithLeadingZeros = hex"00000000000000000000000000000000000000000000000f2f48ee19680706191111";
     accounts.setAccountDataEncryptionKey(keyWithLeadingZeros);
     assertEq(accounts.getDataEncryptionKey(address(this)), keyWithLeadingZeros);
   }
@@ -418,11 +415,10 @@ contract AccountsTest_batchGetMetadataURL is AccountsTest {
     super.setUp();
   }
 
-  function parseSolidityStringArray(uint256[] memory stringLengths, bytes memory data)
-    private
-    pure
-    returns (string[] memory)
-  {
+  function parseSolidityStringArray(
+    uint256[] memory stringLengths,
+    bytes memory data
+  ) private pure returns (string[] memory) {
     string[] memory strings = new string[](stringLengths.length);
     uint256 offset = 0;
 
@@ -875,7 +871,11 @@ contract AccountsTest_BackwardCompatibility is AccountsTest {
   address signer2;
   uint256 signer2PK;
 
-  enum Role { Attestation, Vote, Validator }
+  enum Role {
+    Attestation,
+    Vote,
+    Validator
+  }
 
   function setUp() public {
     super.setUp();
@@ -900,11 +900,12 @@ contract AccountsTest_BackwardCompatibility is AccountsTest {
     }
   }
 
-  function getSignature(address _account, bytes32 role, uint256 _signerPK, bool genericWrite)
-    public
-    view
-    returns (uint8, bytes32, bytes32)
-  {
+  function getSignature(
+    address _account,
+    bytes32 role,
+    uint256 _signerPK,
+    bool genericWrite
+  ) public view returns (uint8, bytes32, bytes32) {
     if (genericWrite) {
       return getSignatureForAuthorization(_account, role, _signerPK, 31337, address(accounts));
     }
@@ -922,11 +923,11 @@ contract AccountsTest_BackwardCompatibility is AccountsTest {
     }
   }
 
-  function hasAuthorizedSigner(Role role, address _signer, bool genericRead)
-    public
-    view
-    returns (bool)
-  {
+  function hasAuthorizedSigner(
+    Role role,
+    address _signer,
+    bool genericRead
+  ) public view returns (bool) {
     bytes32 _role = getRole(role);
     if (genericRead) {
       return accounts.hasIndexedSigner(_signer, _role);
@@ -983,11 +984,11 @@ contract AccountsTest_BackwardCompatibility is AccountsTest {
     vm.stopPrank();
   }
 
-  function getAuthorizedFromAccount(Role role, bool genericRead, address _account)
-    public
-    view
-    returns (address)
-  {
+  function getAuthorizedFromAccount(
+    Role role,
+    bool genericRead,
+    address _account
+  ) public view returns (address) {
     bytes32 _role = getRole(role);
     if (genericRead) {
       return accounts.getIndexedSigner(_account, _role);
@@ -1002,11 +1003,11 @@ contract AccountsTest_BackwardCompatibility is AccountsTest {
     }
   }
 
-  function authorizedSignerToAccount(Role role, bool genericRead, address _signer)
-    public
-    view
-    returns (address)
-  {
+  function authorizedSignerToAccount(
+    Role role,
+    bool genericRead,
+    address _signer
+  ) public view returns (address) {
     if (genericRead) {
       return accounts.signerToAccount(_signer);
     } else {
@@ -1333,9 +1334,10 @@ contract AccountsTest_BackwardCompatibility is AccountsTest {
     helperShouldSetTheNewAuthorized(Role.Validator, false, false);
   }
 
-  function helperShouldReturnCorrectValues_WhenAccountHasNotAuthorized(Role role, bool genericRead)
-    public
-  {
+  function helperShouldReturnCorrectValues_WhenAccountHasNotAuthorized(
+    Role role,
+    bool genericRead
+  ) public {
     assertEq(authorizedSignerToAccount(role, genericRead, account), account);
 
     vm.expectRevert("Must first register address with Account.createAccount");

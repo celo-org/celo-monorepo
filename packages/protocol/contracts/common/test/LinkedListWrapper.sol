@@ -38,5 +38,4 @@ contract LinkedListWrapper {
   function tail() external view returns (bytes32) {
     return list.tail;
   }
-
 }

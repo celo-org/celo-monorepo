@@ -49,14 +49,15 @@ contract HeapTest is Test {
   function generatePRN(uint256 min, uint256 max, uint256 salt) public view returns (uint256) {
     return
       (uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, msg.sender, salt))) %
-        (max - min + 1)) +
-      min;
+        (max - min + 1)) + min;
   }
 
-  function generateRandomArray(uint256 min, uint256 max, uint256 length, bool repeatingAllowed)
-    public
-    returns (uint256[] memory)
-  {
+  function generateRandomArray(
+    uint256 min,
+    uint256 max,
+    uint256 length,
+    bool repeatingAllowed
+  ) public returns (uint256[] memory) {
     require(max > min, "Max must be greater than min");
     require(length <= (max - min + 1) || repeatingAllowed, "Not enough unique numbers available");
 

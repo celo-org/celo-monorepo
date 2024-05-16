@@ -21,5 +21,4 @@ contract MethodsModifiedContract {
   function someMethod4(uint256 s) public payable returns (uint256) {
     return s + 1;
   }
-
 }

@@ -46,9 +46,9 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
   }
 
   /**
-    * @notice Allows owner to set the minimum number of reports required.
-    * @param newMininumReports The new update minimum number of reports required.
-    */
+   * @notice Allows owner to set the minimum number of reports required.
+   * @param newMininumReports The new update minimum number of reports required.
+   */
   function setMinimumReports(address tokenAddress, uint256 newMininumReports) public onlyOwner {
     _setMinimumReports(tokenAddress, newMininumReports);
   }
@@ -87,5 +87,4 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
     minimumReports[tokenAddress] = newMininumReports;
     emit MinimumReportsSet(tokenAddress, newMininumReports);
   }
-
 }

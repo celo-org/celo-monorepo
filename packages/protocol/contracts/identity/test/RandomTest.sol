@@ -7,9 +7,11 @@ contract RandomTest is Random(true) {
     addRandomness(blockNumber, randomness);
   }
 
-  function testRevealAndCommit(bytes32 randomness, bytes32 newCommitment, address proposer)
-    external
-  {
+  function testRevealAndCommit(
+    bytes32 randomness,
+    bytes32 newCommitment,
+    address proposer
+  ) external {
     _revealAndCommit(randomness, newCommitment, proposer);
   }
 

@@ -258,14 +258,14 @@ contract EpochRewards is
   }
 
   /**
-  * @notice Returns the storage, major, minor, and patch version of the contract.
-  * @return Storage version of the contract.
-  * @return Major version of the contract.
-  * @return Minor version of the contract.
-  * @return Patch version of the contract.
-  */
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 1, 1);
   }
 
   /**
@@ -366,11 +366,10 @@ contract EpochRewards is
    * @param adjustmentFactor The target block reward adjustment factor for voters.
    * @return True upon success.
    */
-  function setTargetVotingYieldParameters(uint256 max, uint256 adjustmentFactor)
-    public
-    onlyOwner
-    returns (bool)
-  {
+  function setTargetVotingYieldParameters(
+    uint256 max,
+    uint256 adjustmentFactor
+  ) public onlyOwner returns (bool) {
     require(
       max != targetVotingYieldParams.max.unwrap() ||
         adjustmentFactor != targetVotingYieldParams.adjustmentFactor.unwrap(),
@@ -495,11 +494,9 @@ contract EpochRewards is
    * @param targetGoldSupplyIncrease The target increase in current Gold supply.
    * @return The rewards multiplier based on the current and target Gold supplies.
    */
-  function _getRewardsMultiplier(uint256 targetGoldSupplyIncrease)
-    internal
-    view
-    returns (FixidityLib.Fraction memory)
-  {
+  function _getRewardsMultiplier(
+    uint256 targetGoldSupplyIncrease
+  ) internal view returns (FixidityLib.Fraction memory) {
     uint256 targetSupply = getTargetGoldTotalSupply();
     uint256 totalSupply = getGoldToken().totalSupply();
     uint256 remainingSupply = GOLD_SUPPLY_CAP.sub(totalSupply.add(targetGoldSupplyIncrease));
@@ -544,10 +541,9 @@ contract EpochRewards is
     targetGoldSupplyIncrease = FixidityLib
       .newFixed(targetGoldSupplyIncrease)
       .divide(
-      FixidityLib.newFixed(1).subtract(communityRewardFraction).subtract(carbonOffsettingFraction)
-    )
+        FixidityLib.newFixed(1).subtract(communityRewardFraction).subtract(carbonOffsettingFraction)
+      )
       .fromFixed();
     return targetGoldSupplyIncrease;
   }
-
 }

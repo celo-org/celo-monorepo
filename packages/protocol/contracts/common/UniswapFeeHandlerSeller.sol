@@ -44,19 +44,19 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   function() external payable {}
 
   /**
-    * @notice Allows owner to set the router for a token.
-    * @param token Address of the token to set.
-    * @param router The new router.
-    */
+   * @notice Allows owner to set the router for a token.
+   * @param token Address of the token to set.
+   * @param router The new router.
+   */
   function setRouter(address token, address router) external onlyOwner {
     _setRouter(token, router);
   }
 
   /**
-    * @notice Allows owner to remove a router for a token.
-    * @param token Address of the token.
-    * @param router Address of the router to remove.
-    */
+   * @notice Allows owner to remove a router for a token.
+   * @param token Address of the token.
+   * @param router Address of the router to remove.
+   */
   function removeRouter(address token, address router) external onlyOwner {
     routerAddresses[token].remove(router);
     emit RouterAddressRemoved(token, router);
@@ -131,10 +131,10 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   }
 
   /**
-    * @notice Get the list of routers for a token.
-    * @param token The address of the token to query.
-    * @return An array of all the allowed router.
-    */
+   * @notice Get the list of routers for a token.
+   * @param token The address of the token to query.
+   * @return An array of all the allowed router.
+   */
   function getRoutersForToken(address token) external view returns (address[] memory) {
     return routerAddresses[token].values;
   }
@@ -210,5 +210,4 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
 
     return Math.max(minAmountPair, minimalSortedOracles);
   }
-
 }

@@ -18,9 +18,12 @@ library AddressLinkedList {
    * @param previousKey The key of the element that comes before the element to insert.
    * @param nextKey The key of the element that comes after the element to insert.
    */
-  function insert(LinkedList.List storage list, address key, address previousKey, address nextKey)
-    public
-  {
+  function insert(
+    LinkedList.List storage list,
+    address key,
+    address previousKey,
+    address nextKey
+  ) public {
     list.insert(toBytes(key), toBytes(previousKey), toBytes(nextKey));
   }
 
@@ -49,9 +52,12 @@ library AddressLinkedList {
    * @param previousKey The key of the element that comes before the updated element.
    * @param nextKey The key of the element that comes after the updated element.
    */
-  function update(LinkedList.List storage list, address key, address previousKey, address nextKey)
-    public
-  {
+  function update(
+    LinkedList.List storage list,
+    address key,
+    address previousKey,
+    address nextKey
+  ) public {
     list.update(toBytes(key), toBytes(previousKey), toBytes(nextKey));
   }
 
@@ -97,5 +103,4 @@ library AddressLinkedList {
   function toAddress(bytes32 b) public pure returns (address) {
     return address(uint256(b) >> 96);
   }
-
 }
