@@ -36,6 +36,7 @@ const argv = require('minimist')(process.argv.slice(2), {
 })
 
 const artifactsDirectory = argv.build_artifacts ? argv.build_artifacts : './build/contracts'
+const artifacts08Directory = argv.build_artifacts08 ? argv.build_artifacts08 : './build/contracts-0.8'
 const branch = (argv.branch ? argv.branch : '') as string
 const network = argv.network ?? 'development'
 const proposal = argv.proposal ? readJsonSync(argv.proposal) : []
@@ -48,9 +49,10 @@ module.exports = async (callback: (error?: any) => number) => {
 
     const registry = await Registry.at(celoRegistryAddress)
     const buildArtifacts = getBuildArtifacts(artifactsDirectory)
+    const artifacts08 = getBuildArtifacts(artifacts08Directory)
     const libraryAddresses = await verifyBytecodes(
       Object.keys(CeloContractName),
-      buildArtifacts,
+      [buildArtifacts, artifacts08],
       registry,
       proposal,
       Proxy,
