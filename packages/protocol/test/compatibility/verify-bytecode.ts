@@ -123,7 +123,7 @@ contract('', (accounts) => {
 
     describe('verifyBytecodes', () => {
       it(`doesn't throw on matching contracts`, async () => {
-        await verifyBytecodes(['TestContract'], buildArtifacts, registry, [], Proxy, web3)
+        await verifyBytecodes(['TestContract'], [buildArtifacts], registry, [], Proxy, web3)
         assert(true)
       })
 
@@ -131,7 +131,7 @@ contract('', (accounts) => {
         const oldBytecode = artifact.deployedBytecode
         artifact.deployedBytecode = '0x0' + oldBytecode.slice(3, artifact.deployedBytecode.length)
         await assertThrowsAsync(
-          verifyBytecodes(['TestContract'], buildArtifacts, registry, [], Proxy, web3)
+          verifyBytecodes(['TestContract'], [buildArtifacts], registry, [], Proxy, web3)
         )
         artifact.deployedBytecode = oldBytecode
       })
@@ -142,7 +142,7 @@ contract('', (accounts) => {
         libraryArtifact.deployedBytecode =
           oldBytecode.slice(0, 44) + '00' + oldBytecode.slice(46, oldBytecode.length)
         await assertThrowsAsync(
-          verifyBytecodes(['TestContract'], buildArtifacts, registry, [], Proxy, web3)
+          verifyBytecodes(['TestContract'], [buildArtifacts], registry, [], Proxy, web3)
         )
         libraryArtifact.deployedBytecode = oldBytecode
       })
@@ -171,7 +171,7 @@ contract('', (accounts) => {
 
           await verifyBytecodes(
             ['TestContract'],
-            upgradedLibBuildArtifacts,
+            [upgradedLibBuildArtifacts],
             registry,
             proposal,
             Proxy,
@@ -191,7 +191,7 @@ contract('', (accounts) => {
           ]
 
           await assertThrowsAsync(
-            verifyBytecodes(['TestContract'], buildArtifacts, registry, proposal, Proxy, web3)
+            verifyBytecodes(['TestContract'], [buildArtifacts], registry, proposal, Proxy, web3)
           )
         })
 
@@ -206,7 +206,7 @@ contract('', (accounts) => {
           ]
 
           await assertThrowsAsync(
-            verifyBytecodes(['TestContract'], buildArtifacts, registry, proposal, Proxy, web3)
+            verifyBytecodes(['TestContract'], [buildArtifacts], registry, proposal, Proxy, web3)
           )
         })
       })
@@ -233,7 +233,7 @@ contract('', (accounts) => {
 
           await verifyBytecodes(
             ['TestContract'],
-            upgradedContractBuildArtifacts,
+            [upgradedContractBuildArtifacts],
             registry,
             proposal,
             Proxy,
@@ -253,7 +253,7 @@ contract('', (accounts) => {
           ]
 
           await assertThrowsAsync(
-            verifyBytecodes(['TestContract'], buildArtifacts, registry, proposal, Proxy, web3)
+            verifyBytecodes(['TestContract'], [buildArtifacts], registry, proposal, Proxy, web3)
           )
         })
 
@@ -268,7 +268,7 @@ contract('', (accounts) => {
           ]
 
           await assertThrowsAsync(
-            verifyBytecodes(['TestContract'], buildArtifacts, registry, proposal, Proxy, web3)
+            verifyBytecodes(['TestContract'], [buildArtifacts], registry, proposal, Proxy, web3)
           )
         })
 
@@ -278,7 +278,7 @@ contract('', (accounts) => {
           await assertThrowsAsync(
             verifyBytecodes(
               ['TestContract'],
-              upgradedContractBuildArtifacts,
+              [upgradedContractBuildArtifacts],
               registry,
               proposal,
               Proxy,
@@ -311,7 +311,7 @@ contract('', (accounts) => {
 
           await verifyBytecodes(
             ['TestContract'],
-            upgradedContractBuildArtifacts,
+            [upgradedContractBuildArtifacts],
             registry,
             proposal,
             Proxy,
@@ -331,7 +331,7 @@ contract('', (accounts) => {
           ]
 
           await assertThrowsAsync(
-            verifyBytecodes(['TestContract'], buildArtifacts, registry, proposal, Proxy, web3)
+            verifyBytecodes(['TestContract'], [buildArtifacts], registry, proposal, Proxy, web3)
           )
         })
 
@@ -346,7 +346,7 @@ contract('', (accounts) => {
           ]
 
           await assertThrowsAsync(
-            verifyBytecodes(['TestContract'], buildArtifacts, registry, proposal, Proxy, web3)
+            verifyBytecodes(['TestContract'], [buildArtifacts], registry, proposal, Proxy, web3)
           )
         })
       })
@@ -364,7 +364,7 @@ contract('', (accounts) => {
         await assertThrowsAsync(
           verifyBytecodes(
             ['TestContract'],
-            upgradedContractBuildArtifacts,
+            [upgradedContractBuildArtifacts],
             registry,
             proposal,
             Proxy,
