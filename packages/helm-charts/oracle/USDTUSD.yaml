@@ -1,4 +1,3 @@
-# Testnet only config, replace with mainnet config later on
 oracle:
   currencyPair: USDTUSD
   aggregation:
@@ -12,19 +11,33 @@ oracle:
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
   gasPriceMultiplier: 1.5
-  priceSources:
-    "[
-    [
-    {exchange: 'KRAKEN', symbol: 'USDTUSD', toInvert: false }
-    ],
-    [
-    {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
-    ],
-    [
-    {exchange: 'BITSTAMP', symbol: 'USDTUSD', toInvert: false}
-    ]
+  priceSources: "[
+      [
+        {exchange: 'OKX', symbol: 'USDCUSDT', toInvert: true},
+        {exchange: 'KRAKEN', symbol: 'USDCUSD', toInvert: false }
+      ],
+      [
+        {exchange: 'KRAKEN', symbol: 'USDTUSD', toInvert: false}
+      ],
+      [
+        {exchange: 'BITSTAMP', symbol: 'USDTUSD', toInvert: false}
+      ],
+      [
+        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
+      ],
     ]"
-  minPriceSourceCount: 5
+    # Additional sources missing adapters
+    # [
+    #   {exchange: 'BYBIT', symbol: 'USDCUSDT', toInvert: true},
+    #   {exchange: 'BITSTAMP', symbol: 'USDCUSD', toInvert: false }
+    # ],
+    #
+    # https://api.bybit.com/v5/market/tickers?category=spot&symbol=USDCUSDT
+    # [
+    #   {exchange: 'CRYPTO', symbol: 'USDTUSD', toInvert: false}
+    # ],
+    # https://api.crypto.com/exchange/v1/public/get-tickers?instrument_name=USDT_USD
+  minPriceSourceCount: 3 # 4 with additional sources
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
