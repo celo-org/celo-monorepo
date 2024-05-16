@@ -1,6 +1,5 @@
 pragma solidity ^0.5.13;
 
-import "forge-std/console2.sol";
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
@@ -79,12 +78,12 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   /**
    * @notice Mints CELO to the beneficiaries according to the predefined schedule.
    */
-  function mintAccordingToSchedule() external nonReentrant onlyL2 {
+  function mintAccordingToSchedule() external nonReentrant onlyL2 returns (bool) {
     (
       uint256 targetGoldTotalSupply,
       uint256 communityRewardFundMintAmount,
       uint256 carbonOffsettingPartnerMintAmount
-    ) = getTargetTotalGoldSupply();
+    ) = getTargetGoldTotalSupply();
 
     uint256 mintableAmount = targetGoldTotalSupply.sub(getGoldToken().totalSupply());
 
@@ -110,6 +109,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       goldToken.mint(carbonOffsettingPartner, carbonOffsettingPartnerMintAmount),
       "Failed to mint to carbon offsetting partner."
     );
+    return true;
   }
 
   /**
@@ -189,7 +189,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
    * @return The currently mintable amount.
    */
   function getMintableAmount() public view returns (uint256) {
-    (uint256 targetGoldTotalSupply, , ) = getTargetTotalGoldSupply();
+    (uint256 targetGoldTotalSupply, , ) = getTargetGoldTotalSupply();
     return targetGoldTotalSupply.sub(getGoldToken().totalSupply());
   }
 
@@ -197,7 +197,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
    * @notice Returns the target Gold supply according to the target schedule.
    * @return The target Gold supply according to the target schedule.
    */
-  function getTargetTotalGoldSupply()
+  function getTargetGoldTotalSupply()
     public
     view
     returns (
@@ -211,15 +211,11 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
 
     uint256 timeSinceL2 = now.sub(l2StartTime);
     uint256 mintedOnL1 = totalSupplyAtL2Start.sub(GENESIS_GOLD_SUPPLY);
-    console2.log("### timeSinceL2", timeSinceL2);
-    console2.log("### minted on L1", mintedOnL1);
     uint256 linearSecondsLeft = SECONDS_LINEAR.sub((l2StartTime.sub(genesisStartTime)));
-    console2.log("### linearSecondsLeft", linearSecondsLeft);
 
     // Pay out half of all block rewards linearly.
     uint256 l1LinearRewards = GOLD_SUPPLY_CAP.sub(GENESIS_GOLD_SUPPLY).div(2); //(200 million) includes validator rewards.
     uint256 l2LinearRewards = l1LinearRewards.sub(mintedOnL1);
-    console2.log("### l2LinearRewards", l2LinearRewards);
 
     uint256 linearRewardsToCommunity = FixidityLib
       .newFixed(l2LinearRewards)
@@ -231,9 +227,6 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       .multiply(carbonOffsettingFraction)
       .fromFixed();
 
-    console2.log("### linearRewardsToCommunity", linearRewardsToCommunity);
-    console2.log("### linearRewardsToCarbon", linearRewardsToCarbon);
-
     if (timeSinceL2 < linearSecondsLeft) {
       communityTargetRewards = linearRewardsToCommunity.mul(timeSinceL2).div(linearSecondsLeft);
       carbonFundTargetRewards = linearRewardsToCarbon.mul(timeSinceL2).div(linearSecondsLeft);
@@ -242,9 +235,6 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
         .add(carbonFundTargetRewards)
         .add(GENESIS_GOLD_SUPPLY)
         .add(mintedOnL1);
-
-      console2.log("### communityTargetRewards", communityTargetRewards);
-      console2.log("### carbonFundTargetRewards", carbonFundTargetRewards);
 
       return (targetGoldTotalSupply, communityTargetRewards, carbonFundTargetRewards);
     } else {
@@ -267,44 +257,6 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       }
       require(false, "Block reward calculation for years 15-30 unimplemented");
       return (0, 0, 0);
-    }
-  }
-
-  function getTargetGoldTotalSupply() public view returns (uint256) {
-    require(now > genesisStartTime, "genesisStartTime has now yet been reached.");
-    require(now > l2StartTime, "l2StartTime has now yet been reached.");
-
-    uint256 timeSinceL2 = now.sub(l2StartTime);
-    uint256 mintedOnL1 = totalSupplyAtL2Start.sub(GENESIS_GOLD_SUPPLY);
-
-    uint256 linearSecondsLeft = SECONDS_LINEAR.sub((l2StartTime.sub(genesisStartTime)));
-
-    // Pay out half of all block rewards linearly.
-    uint256 l1LinearRewards = GOLD_SUPPLY_CAP.sub(GENESIS_GOLD_SUPPLY).div(2); //(200 million) includes validator rewards.
-    uint256 l2LinearRewards = l1LinearRewards.sub(mintedOnL1);
-
-    uint256 linearRewardsToCommunityAndCarbon = FixidityLib
-      .newFixed(l2LinearRewards)
-      .multiply(communityRewardFraction.add(carbonOffsettingFraction))
-      .fromFixed();
-
-    if (timeSinceL2 < linearSecondsLeft) {
-      uint256 targetRewards = linearRewardsToCommunityAndCarbon.mul(timeSinceL2).div(
-        linearSecondsLeft
-      );
-      return targetRewards.add(GENESIS_GOLD_SUPPLY).add(mintedOnL1);
-    } else {
-      uint256 targetRewards = linearRewardsToCommunityAndCarbon.mul(linearSecondsLeft.sub(1)).div(
-        linearSecondsLeft
-      );
-      if (
-        totalMinted.add(GENESIS_GOLD_SUPPLY).add(mintedOnL1) <
-        targetRewards.add(GENESIS_GOLD_SUPPLY).add(mintedOnL1)
-      ) {
-        return targetRewards.add(GENESIS_GOLD_SUPPLY).add(mintedOnL1);
-      }
-      require(false, "Block reward calculation for years 15-30 unimplemented");
-      return 0;
     }
   }
 }

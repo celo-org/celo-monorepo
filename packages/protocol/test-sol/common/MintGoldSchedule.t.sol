@@ -107,8 +107,8 @@ contract MintGoldScheduleTest is Test, ECDSAHelper, Constants, IsL2Check {
 
   uint256 constant communityRewardFraction = FIXED1 / 4; // 25%
   uint256 constant carbonOffsettingFraction = FIXED1 / 1000; // 0.1%
-  uint256 constant newCommunityRewardFraction = FIXED1 / 2; // 25%
-  uint256 constant newCarbonOffsettingFraction = FIXED1 / 500; // 0.1%
+  uint256 constant newCommunityRewardFraction = FIXED1 / 2; // 50%
+  uint256 constant newCarbonOffsettingFraction = FIXED1 / 500; // 0.2%
 
   MintGoldScheduleMockTunnel.InitParams initParams;
 
