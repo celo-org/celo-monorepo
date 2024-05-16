@@ -476,8 +476,11 @@ contract RemoveOracle is SortedOraclesTest {
 
     sortedOracle.removeOracle(aToken, oracleAccount, 0);
     (uint256 newMedianRate, uint256 newNumOfRates) = sortedOracle.medianRate(aToken);
+    (uint256 exchangeRate, uint256 exchangeRateDenominator) = sortedOracle.getExchangeRate(aToken);
     assertEq(originalMedianRate, newMedianRate);
     assertEq(originalNumOfRates, newNumOfRates);
+    assertEq(exchangeRate, newMedianRate);
+    assertEq(exchangeRateDenominator, FIXED1);
   }
 
   function test_ShouldNotDecreaseTheNumberOfTimestamps_WhenThereIsASingleReportLeft() public {
