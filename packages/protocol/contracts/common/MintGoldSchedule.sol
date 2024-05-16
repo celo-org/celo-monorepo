@@ -61,7 +61,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     uint256 _carbonOffsettingFraction,
     address _mintGoldScheduleOwner,
     address registryAddress
-  ) external initializer {
+  ) external initializer onlyL2 {
     _transferOwnership(msg.sender);
 
     require(registryAddress != address(0), "The registry address cannot be the zero address");
@@ -136,7 +136,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 0, 0, 0);
+    return (1, 1, 0, 0);
   }
 
   /**

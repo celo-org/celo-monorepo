@@ -116,24 +116,7 @@ contract MintGoldScheduleTest is Test, ECDSAHelper, Constants, IsL2Check {
   event CarbonOffsettingFundSet(address indexed partner, uint256 fraction);
 
   function setUp() public {
-    registryAddress = l1RegistryAddress;
-
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-    registry = Registry(registryAddress);
-
-    vm.prank(goldTokenOwner);
-    goldToken = new GoldToken(true);
-
-    vm.prank(governanceOwner);
-    governance = new Governance(true);
-
-    registry.setAddressFor("GoldToken", address(goldToken));
-
-    vm.prank(goldTokenOwner);
-    goldToken.initialize(registryAddress);
-
-    vm.prank(address(0));
-    goldToken.mint(randomAddress, L1_MINTED_GOLD_SUPPLY);
+    setUpL1();
 
     // Setup L2 after minting L1 supply.
     registryAddress = proxyAdminAddress;
@@ -153,8 +136,28 @@ contract MintGoldScheduleTest is Test, ECDSAHelper, Constants, IsL2Check {
       _mintGoldOwner: mintGoldOwner,
       registryAddress: registryAddress
     });
+  }
 
-    vm.deal(randomAddress, 1000 ether);
+  function setUpL1() public {
+    registryAddress = l1RegistryAddress;
+
+    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    registry = Registry(registryAddress);
+
+    vm.prank(goldTokenOwner);
+    goldToken = new GoldToken(true);
+    vm.prank(governanceOwner);
+    governance = new Governance(true);
+
+    registry.setAddressFor("GoldToken", address(goldToken));
+    registry.setAddressFor("Governance", address(governance));
+
+    vm.prank(goldTokenOwner);
+    goldToken.initialize(registryAddress);
+
+    // Mint L1 supply
+    vm.prank(address(0));
+    goldToken.mint(randomAddress, L1_MINTED_GOLD_SUPPLY);
   }
 
   function newMintGold() internal returns (MintGoldSchedule) {
@@ -170,6 +173,31 @@ contract MintGoldScheduleTest is Test, ECDSAHelper, Constants, IsL2Check {
   }
 }
 
+contract MintGoldScheduleTest_initialize_L1 is MintGoldScheduleTest {
+  uint256 initialMintGoldAmount;
+
+  function setUp() public {
+    super.setUpL1();
+    initParams = MintGoldScheduleMockTunnel.InitParams({
+      _communityRewardFraction: communityRewardFraction,
+      _carbonOffsettingPartner: carbonOffsettingPartner,
+      _carbonOffsettingFraction: carbonOffsettingFraction,
+      _mintGoldOwner: mintGoldOwner,
+      registryAddress: registryAddress
+    });
+  }
+
+  function test_Reverts_WhenInitializingOnL1() public {
+    vm.warp(block.timestamp + 1715808537); // Arbitary later date (May 15 2024)
+    mintGoldSchedule = new MintGoldSchedule(true);
+
+    vm.prank(goldTokenOwner);
+    goldToken.setGoldTokenMintingScheduleAddress(address(mintGoldSchedule));
+    MintGoldScheduleMockTunnel tunnel = new MintGoldScheduleMockTunnel(address(mintGoldSchedule));
+    vm.expectRevert();
+    tunnel.MockInitialize(owner, initParams);
+  }
+}
 contract MintGoldScheduleTest_Initialize is MintGoldScheduleTest {
   function test_ShouldSetBeneficiariesToMintGoldScheduleInstance() public {
     newMintGold();
@@ -267,48 +295,6 @@ contract MintGoldScheduleTest_setCarbonOffsettingFund is MintGoldScheduleTest {
     emit CarbonOffsettingFundSet(newBeneficiary, carbonOffsettingFraction);
     vm.prank(mintGoldOwner);
     mintGoldSchedule.setCarbonOffsettingFund(newBeneficiary, carbonOffsettingFraction);
-  }
-}
-
-contract MintGoldScheduleTest_MintAccordingToSchedule_L1 is MintGoldScheduleTest {
-  uint256 initialMintGoldAmount;
-
-  function setUp() public {
-    registryAddress = l1RegistryAddress;
-
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-    registry = Registry(registryAddress);
-
-    vm.prank(goldTokenOwner);
-    goldToken = new GoldToken(true);
-    vm.prank(governanceOwner);
-    governance = new Governance(true);
-
-    registry.setAddressFor("GoldToken", address(goldToken));
-    registry.setAddressFor("Governance", address(governance));
-
-    vm.prank(goldTokenOwner);
-    goldToken.initialize(registryAddress);
-
-    initParams = MintGoldScheduleMockTunnel.InitParams({
-      _communityRewardFraction: communityRewardFraction,
-      _carbonOffsettingPartner: carbonOffsettingPartner,
-      _carbonOffsettingFraction: carbonOffsettingFraction,
-      _mintGoldOwner: mintGoldOwner,
-      registryAddress: registryAddress
-    });
-
-    vm.deal(randomAddress, 1000 ether);
-
-    newMintGold();
-  }
-
-  function test_Reverts_WhenMintingOnL1() public {
-    vm.warp(block.timestamp + 3 * MONTH + 1 * DAY);
-
-    vm.expectRevert("This method is not supported in L1.");
-    vm.prank(randomAddress);
-    mintGoldSchedule.mintAccordingToSchedule();
   }
 }
 
