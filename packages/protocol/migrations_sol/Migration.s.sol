@@ -429,12 +429,23 @@ contract Migration is Script, UsingRegistry {
     2. Set oracle address (is this sortedOracle?)
     3. Set intrinsic gas value
     */
+    /*
+    This is an arbitrary hex address I took from celoscan.
+    For now, I only want to test if I can set a currency config.
+    */
+    address mockOracleAddress = 0xefB84935239dAcdecF7c5bA76d8dE40b077B7b33;
+    /*
+    Arbitrary intrinsic gas number take from existing `FeeCurrencyDirectory.t.sol` tests
+    Source: https://github.com/celo-org/celo-monorepo/blob/2cec07d43328cf4216c62491a35eacc4960fffb6/packages/protocol/test-sol/common/FeeCurrencyDirectory.t.sol#L27 
+    */
+    uint256 mockIntrinsicGas = 21000;
     IFeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory")).setCurrencyConfig(
       stableTokenProxyAddress,
-      , // TODO(Arthur): add oracle address
-      , // TODO(Arthur): add intrinsice gas value
-    )
+      mockOracleAddress,
+      mockIntrinsicGas
+    );
   }
+  
 
   function migrateStableToken(string memory json) public {
     string[] memory names = abi.decode(json.parseRaw(".stableTokens.names"), (string[]));
