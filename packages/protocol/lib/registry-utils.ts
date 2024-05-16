@@ -28,6 +28,7 @@ export enum CeloContractName {
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
+  FeeCurrencyDirectory = 'FeeCurrencyDirectory',
   GoldToken = 'GoldToken',
   Governance = 'Governance',
   GovernanceSlasher = 'GovernanceSlasher',
@@ -52,10 +53,10 @@ export const usesRegistry = [
   CeloContractName.StableToken,
 ]
 
-export const hasEntryInRegistry: ContractPackage[]= [
+export const hasEntryInRegistry: ContractPackage[] = [
   {
     name: "default",
-    contracts:[
+    contracts: [
       CeloContractName.Accounts,
       CeloContractName.Attestations,
       CeloContractName.BlockchainParameters,
@@ -78,7 +79,7 @@ export const hasEntryInRegistry: ContractPackage[]= [
   {
     ...MENTO_PACKAGE,
     // not all Mentro contracts are supposed to be in the Registry
-    contracts:[
+    contracts: [
       CeloContractName.Exchange,
       CeloContractName.GrandaMento,
       CeloContractName.Reserve,
