@@ -88,7 +88,7 @@ oracle:
       #   {exchange: 'XIGNITE', symbol: 'USDKES', toInvert: false, ignoreVolume: true}
       # ],
       
-  minPriceSourceCount: 10
+  minPriceSourceCount: 7
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
