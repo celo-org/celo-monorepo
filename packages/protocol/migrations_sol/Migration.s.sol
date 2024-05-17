@@ -111,7 +111,7 @@ contract Migration is Script, UsingRegistry {
       console.log("Can't add to registry because implementation not set");
       return;
     }
-    IRegistry registry = IRegistry(registryAddress);
+    registry = IRegistry(registryAddress);
     console.log(" Setting on the registry contract:", contractName);
     registry.setAddressFor(contractName, proxyAddress);
   }
