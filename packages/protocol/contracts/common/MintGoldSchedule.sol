@@ -47,17 +47,19 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
 
   /**
    * @notice A constructor for initialising a new instance of a MintGoldSchedule contract.
+   * @param _l2StartTime timestamp for L1 to L2 transition
    * @param _communityRewardFraction The percentage of rewards that go the community funds.
    * @param _carbonOffsettingPartner The address of the carbon offsetting partner.
    * @param _carbonOffsettingFraction The percentage of rewards going to carbon offsetting partner.
    * @param registryAddress Address of the deployed contracts registry.
    */
   function initialize(
+    uint256 _l2StartTime,
     uint256 _communityRewardFraction,
     address _carbonOffsettingPartner,
     uint256 _carbonOffsettingFraction,
     address registryAddress
-  ) external initializer onlyL2 {
+  ) external initializer {
     _transferOwnership(msg.sender);
     require(registryAddress != address(0), "The registry address cannot be the zero address");
     setRegistry(registryAddress);
@@ -65,7 +67,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     setCommunityRewardFraction(_communityRewardFraction);
     setCarbonOffsettingFund(_carbonOffsettingPartner, _carbonOffsettingFraction);
     totalSupplyAtL2Start = getGoldToken().totalSupply();
-    l2StartTime = now;
+    l2StartTime = _l2StartTime;
   }
 
   /**

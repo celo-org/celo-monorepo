@@ -137,6 +137,7 @@ const DefaultConfig = {
     unlockingPeriod: 3 * DAY,
   },
   mintGoldSchedule: {
+    l2StartTime: 1715808537, // TODO: This need to be properly set with the actual L2 start datetime
     communityRewardFraction: 1 / 4,
     carbonOffsettingPartner: '0xce10d577295d34782815919843a3a4ef70dc33ce',
     carbonOffsettingFraction: 1 / 1000,
