@@ -6,6 +6,7 @@ import { MintGoldScheduleInstance } from 'types'
 
 const initializeArgs = async () => {
   return [
+    config.mintGoldSchedule.l2StartTime,
     toFixed(config.mintGoldSchedule.communityRewardFraction).toFixed(),
     config.mintGoldSchedule.carbonOffsettingPartner,
     toFixed(config.mintGoldSchedule.carbonOffsettingFraction).toFixed(),
