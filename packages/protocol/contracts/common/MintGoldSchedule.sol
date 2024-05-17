@@ -89,11 +89,6 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     );
     totalMintedBySchedule = totalMintedBySchedule.add(mintableAmount);
 
-    require(
-      FixidityLib.newFixed(1).gt(communityRewardFraction.add(carbonOffsettingFraction)),
-      "Sum of partner fractions must be less than 1."
-    );
-
     IGoldToken goldToken = IGoldToken(address(getGoldToken()));
     require(
       goldToken.mint(communityRewardFund, communityRewardFundMintAmount),
@@ -145,6 +140,10 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       "Value must be different from existing community reward fraction and less than 1."
     );
     communityRewardFraction = FixidityLib.wrap(value);
+    require(
+      FixidityLib.newFixed(1).gte(communityRewardFraction.add(carbonOffsettingFraction)),
+      "Sum of partner fractions must be less than or equal to 1."
+    );
     emit CommunityRewardFractionSet(value);
     return true;
   }
@@ -164,6 +163,10 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     require(value < FixidityLib.fixed1().unwrap(), "Value must be less than 1.");
     carbonOffsettingPartner = partner;
     carbonOffsettingFraction = FixidityLib.wrap(value);
+    require(
+      FixidityLib.newFixed(1).gte(communityRewardFraction.add(carbonOffsettingFraction)),
+      "Sum of partner fractions must be less than or equal to 1."
+    );
     emit CarbonOffsettingFundSet(partner, value);
     return true;
   }

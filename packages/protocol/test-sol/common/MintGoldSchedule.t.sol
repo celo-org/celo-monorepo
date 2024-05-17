@@ -77,7 +77,7 @@ contract MintGoldScheduleTest is Test, ECDSAHelper, Constants, IsL2Check {
   address communityRewardFund = actor("communityRewardFund");
   address carbonOffsettingPartner = actor("carbonOffsettingPartner");
 
-  address newBeneficiary = actor("newBeneficiary");
+  address newPartner = actor("newPartner");
   address randomAddress = actor("randomAddress");
 
   address constant l1RegistryAddress = 0x000000000000000000000000000000000000ce10;
@@ -264,6 +264,11 @@ contract MintGoldScheduleTest_setCommunityRewardFraction is MintGoldScheduleTest
     vm.prank(mintGoldOwner);
     mintGoldSchedule.setCommunityRewardFraction(communityRewardFraction);
   }
+  function test_Reverts_WhenSumOfFractionsGtOne() public {
+    vm.expectRevert("Sum of partner fractions must be less than or equal to 1.");
+    vm.prank(mintGoldOwner);
+    mintGoldSchedule.setCommunityRewardFraction((FIXED1 - 1));
+  }
 }
 
 contract MintGoldScheduleTest_setCarbonOffsettingFund is MintGoldScheduleTest {
@@ -272,10 +277,10 @@ contract MintGoldScheduleTest_setCarbonOffsettingFund is MintGoldScheduleTest {
     newMintGold();
   }
 
-  function test_ShouldSetNewBeneficiary() public {
+  function test_ShouldSetNewPartner() public {
     vm.prank(mintGoldOwner);
-    mintGoldSchedule.setCarbonOffsettingFund(newBeneficiary, carbonOffsettingFraction);
-    assertEq(mintGoldSchedule.carbonOffsettingPartner(), newBeneficiary);
+    mintGoldSchedule.setCarbonOffsettingFund(newPartner, carbonOffsettingFraction);
+    assertEq(mintGoldSchedule.carbonOffsettingPartner(), newPartner);
   }
   function test_ShouldSetNewFraction() public {
     vm.prank(mintGoldOwner);
@@ -286,7 +291,7 @@ contract MintGoldScheduleTest_setCarbonOffsettingFund is MintGoldScheduleTest {
   function test_Reverts_WhenCalledByOtherThanOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(randomAddress);
-    mintGoldSchedule.setCarbonOffsettingFund(newBeneficiary, carbonOffsettingFraction);
+    mintGoldSchedule.setCarbonOffsettingFund(newPartner, carbonOffsettingFraction);
   }
 
   function test_Reverts_WhenPartnerAndFractionAreTheSame() public {
@@ -295,11 +300,17 @@ contract MintGoldScheduleTest_setCarbonOffsettingFund is MintGoldScheduleTest {
     mintGoldSchedule.setCarbonOffsettingFund(carbonOffsettingPartner, carbonOffsettingFraction);
   }
 
+  function test_Reverts_WhenSumOfFractionsGtOne() public {
+    vm.expectRevert("Sum of partner fractions must be less than or equal to 1.");
+    vm.prank(mintGoldOwner);
+    mintGoldSchedule.setCarbonOffsettingFund(carbonOffsettingPartner, (FIXED1 - 1));
+  }
+
   function test_Emits_BeneficiarySetEvent() public {
     vm.expectEmit(true, true, true, true);
-    emit CarbonOffsettingFundSet(newBeneficiary, carbonOffsettingFraction);
+    emit CarbonOffsettingFundSet(newPartner, carbonOffsettingFraction);
     vm.prank(mintGoldOwner);
-    mintGoldSchedule.setCarbonOffsettingFund(newBeneficiary, carbonOffsettingFraction);
+    mintGoldSchedule.setCarbonOffsettingFund(newPartner, carbonOffsettingFraction);
   }
 }
 
@@ -462,17 +473,8 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
     );
   }
 
-  function test_Reverts_WhenSumOfPartnerFractionGreaterThan1() public {
-    vm.prank(mintGoldOwner);
-
-    mintGoldSchedule.setCarbonOffsettingFund(carbonOffsettingPartner, ((FIXED1 / 4) * 3));
-
-    vm.expectRevert("Sum of partner fractions must be less than 1.");
-    vm.prank(randomAddress);
-    mintGoldSchedule.mintAccordingToSchedule();
-  }
   function test_ShouldMintUpToLinearSuppplyAfter15Years() public {
-    vm.warp(block.timestamp + (15 * YEAR) + (1 * DAY));
+    vm.warp(block.timestamp + (15 * YEAR) + (4 * DAY));
 
     assertEq(mintGoldSchedule.totalMintedBySchedule(), 0, "Incorrect mintableAmount");
 
@@ -489,6 +491,7 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
       MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION,
       "Incorrect mintableAmount"
     );
+    assertLt(mintGoldSchedule.totalMintedBySchedule(), MAX_L2_DISTRIBUTION / 2);
   }
 
   function test_Reverts_WhenMintingSecondTimeAfter15Years() public {
