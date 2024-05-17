@@ -31,10 +31,6 @@ contract IsL2Check_IsL2Test is IsL2CheckBase {
     assertFalse(isL2Check.isL2());
   }
 
-  function test_IsL1() public {
-    assertTrue(isL2Check.isL1());
-  }
-
   function test_IsL2_WhenProxyAdminSet() public {
     helper_WhenProxyAdminAddressIsSet();
     assertTrue(isL2Check.isL2());
@@ -42,7 +38,7 @@ contract IsL2Check_IsL2Test is IsL2CheckBase {
 
   function test_IsL1_WhenProxyAdminSet() public {
     helper_WhenProxyAdminAddressIsSet();
-    assertFalse(isL2Check.isL1());
+    assertFalse(!isL2Check.isL2());
   }
 }
 

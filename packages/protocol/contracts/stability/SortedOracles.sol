@@ -344,26 +344,6 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   }
 
   /**
-   * @notice Returns the median of the currently stored rates for a specified rateFeedId.
-   * @dev Please note that this function respects the equivalentToken mapping, and so may
-   * return the median identified as an equivalent to the supplied rateFeedId.
-   * @param token The token for which the median value is being retrieved.
-   * @return uint256 The median exchange rate for rateFeedId (fixidity).
-   * @return uint256 denominator
-   */
-  function medianRate(address token) public view returns (uint256, uint256) {
-    EquivalentToken storage equivalentToken = equivalentTokens[token];
-    if (equivalentToken.token != address(0)) {
-      (uint256 equivalentMedianRate, uint256 denominator) = medianRateWithoutEquivalentMapping(
-        equivalentToken.token
-      );
-      return (equivalentMedianRate, denominator);
-    }
-
-    return medianRateWithoutEquivalentMapping(token);
-  }
-
-  /**
    * @notice Sets the report expiry parameter.
    * @param _reportExpirySeconds The number of seconds before a report is considered expired.
    */
@@ -382,6 +362,26 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     require(address(newBreakerBox) != address(0), "BreakerBox address must be set");
     breakerBox = newBreakerBox;
     emit BreakerBoxUpdated(address(newBreakerBox));
+  }
+
+  /**
+   * @notice Returns the median of the currently stored rates for a specified rateFeedId.
+   * @dev Please note that this function respects the equivalentToken mapping, and so may
+   * return the median identified as an equivalent to the supplied rateFeedId.
+   * @param token The token for which the median value is being retrieved.
+   * @return uint256 The median exchange rate for rateFeedId (fixidity).
+   * @return uint256 denominator
+   */
+  function medianRate(address token) public view returns (uint256, uint256) {
+    EquivalentToken storage equivalentToken = equivalentTokens[token];
+    if (equivalentToken.token != address(0)) {
+      (uint256 equivalentMedianRate, uint256 denominator) = medianRateWithoutEquivalentMapping(
+        equivalentToken.token
+      );
+      return (equivalentMedianRate, denominator);
+    }
+
+    return medianRateWithoutEquivalentMapping(token);
   }
 
   /**

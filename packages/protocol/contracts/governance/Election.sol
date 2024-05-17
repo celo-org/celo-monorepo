@@ -15,6 +15,7 @@ import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/Heap.sol";
 import "../common/libraries/ReentrancyGuard.sol";
+import "../../contracts-0.8/common/IsL2Check.sol";
 
 contract Election is
   IElection,
@@ -24,7 +25,8 @@ contract Election is
   Initializable,
   UsingRegistry,
   UsingPrecompiles,
-  CalledByVm
+  CalledByVm,
+  IsL2Check
 {
   using AddressSortedLinkedList for SortedLinkedList.List;
   using FixidityLib for FixidityLib.Fraction;
@@ -196,7 +198,7 @@ contract Election is
     uint256 value,
     address lesser,
     address greater
-  ) external nonReentrant returns (bool) {
+  ) external nonReentrant onlyL1 returns (bool) {
     require(votes.total.eligible.contains(group), "Group not eligible");
     require(0 < value, "Vote value cannot be zero");
     require(canReceiveVotes(group, value), "Group cannot receive votes");
@@ -229,7 +231,7 @@ contract Election is
    * @return True upon success.
    * @dev Pending votes cannot be activated until an election has been held.
    */
-  function activate(address group) external nonReentrant returns (bool) {
+  function activate(address group) external nonReentrant onlyL1 returns (bool) {
     address account = getAccounts().voteSignerToAccount(msg.sender);
     return _activate(group, account);
   }
@@ -241,7 +243,10 @@ contract Election is
    * @return True upon success.
    * @dev Pending votes cannot be activated until an election has been held.
    */
-  function activateForAccount(address group, address account) external nonReentrant returns (bool) {
+  function activateForAccount(
+    address group,
+    address account
+  ) external nonReentrant onlyL1 returns (bool) {
     return _activate(group, account);
   }
 
@@ -338,7 +343,7 @@ contract Election is
     uint256 value,
     address lesser,
     address greater
-  ) external onlyVm {
+  ) external onlyVm onlyL1 {
     _distributeEpochRewards(group, value, lesser, greater);
   }
 
@@ -364,7 +369,7 @@ contract Election is
     address group,
     address lesser,
     address greater
-  ) external onlyRegisteredContract(VALIDATORS_REGISTRY_ID) {
+  ) external onlyL1 onlyRegisteredContract(VALIDATORS_REGISTRY_ID) {
     uint256 value = getTotalVotesForGroup(group);
     votes.total.eligible.insert(group, value, lesser, greater);
     emit ValidatorGroupMarkedEligible(group);
@@ -572,7 +577,10 @@ contract Election is
    * @return Whether or not `account` has activatable votes for `group`.
    * @dev Pending votes cannot be activated until an election has been held.
    */
-  function hasActivatablePendingVotes(address account, address group) external view returns (bool) {
+  function hasActivatablePendingVotes(
+    address account,
+    address group
+  ) external view onlyL1 returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
     return pendingVote.epoch < getEpochNumber() && pendingVote.value > 0;
   }
@@ -602,7 +610,7 @@ contract Election is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 3, 1);
+    return (1, 1, 4, 0);
   }
 
   /**
@@ -611,7 +619,7 @@ contract Election is
    * @param max The maximum number of validators that can be elected.
    * @return True upon success.
    */
-  function setElectableValidators(uint256 min, uint256 max) public onlyOwner returns (bool) {
+  function setElectableValidators(uint256 min, uint256 max) public onlyOwner onlyL1 returns (bool) {
     require(0 < min, "Minimum electable validators cannot be zero");
     require(min <= max, "Maximum electable validators cannot be smaller than minimum");
     require(
@@ -628,7 +636,9 @@ contract Election is
    * @param _maxNumGroupsVotedFor The maximum number of groups an account can vote for.
    * @return True upon success.
    */
-  function setMaxNumGroupsVotedFor(uint256 _maxNumGroupsVotedFor) public onlyOwner returns (bool) {
+  function setMaxNumGroupsVotedFor(
+    uint256 _maxNumGroupsVotedFor
+  ) public onlyOwner onlyL1 returns (bool) {
     require(_maxNumGroupsVotedFor != maxNumGroupsVotedFor, "Max groups voted for not changed");
     maxNumGroupsVotedFor = _maxNumGroupsVotedFor;
     emit MaxNumGroupsVotedForSet(_maxNumGroupsVotedFor);
@@ -640,7 +650,7 @@ contract Election is
    * @param threshold Electability threshold as unwrapped Fraction.
    * @return True upon success.
    */
-  function setElectabilityThreshold(uint256 threshold) public onlyOwner returns (bool) {
+  function setElectabilityThreshold(uint256 threshold) public onlyOwner onlyL1 returns (bool) {
     electabilityThreshold = FixidityLib.wrap(threshold);
     require(
       electabilityThreshold.lt(FixidityLib.fixed1()),
@@ -671,7 +681,7 @@ contract Election is
    * If not run, voting power of account will not reflect rewards awarded.
    * @param flag The on/off flag.
    */
-  function setAllowedToVoteOverMaxNumberOfGroups(bool flag) public {
+  function setAllowedToVoteOverMaxNumberOfGroups(bool flag) public onlyL1 {
     address account = getAccounts().voteSignerToAccount(msg.sender);
     IValidators validators = getValidators();
     require(
@@ -900,7 +910,7 @@ contract Election is
     uint256 value,
     address lesser,
     address greater
-  ) internal {
+  ) internal onlyL1 {
     if (votes.total.eligible.contains(group)) {
       uint256 newVoteTotal = votes.total.eligible.getValue(group).add(value);
       votes.total.eligible.update(group, newVoteTotal, lesser, greater);
