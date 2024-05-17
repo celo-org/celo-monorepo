@@ -27,14 +27,6 @@ contract CompileExchange is
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
-  event Exchanged(address indexed exchanger, uint256 sellAmount, uint256 buyAmount, bool soldGold);
-  event UpdateFrequencySet(uint256 updateFrequency);
-  event MinimumReportsSet(uint256 minimumReports);
-  event StableTokenSet(address indexed stable);
-  event SpreadSet(uint256 spread);
-  event ReserveFractionSet(uint256 reserveFraction);
-  event BucketsUpdated(uint256 goldBucket, uint256 stableBucket);
-
   FixidityLib.Fraction public spread;
 
   // Fraction of the Reserve that is committed to the gold bucket when updating
@@ -54,20 +46,17 @@ contract CompileExchange is
 
   bytes32 public stableTokenRegistryId;
 
+  event Exchanged(address indexed exchanger, uint256 sellAmount, uint256 buyAmount, bool soldGold);
+  event UpdateFrequencySet(uint256 updateFrequency);
+  event MinimumReportsSet(uint256 minimumReports);
+  event StableTokenSet(address indexed stable);
+  event SpreadSet(uint256 spread);
+  event ReserveFractionSet(uint256 reserveFraction);
+  event BucketsUpdated(uint256 goldBucket, uint256 stableBucket);
+
   modifier updateBucketsIfNecessary() {
     _updateBucketsIfNecessary();
     _;
-  }
-
-  /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
   }
 
   /**
@@ -113,30 +102,6 @@ contract CompileExchange is
     require(stable == address(0), "StableToken address already activated");
     _setStableToken(registry.getAddressForOrDie(stableTokenRegistryId));
     _updateBucketsIfNecessary();
-  }
-
-  /**
-   * @notice Exchanges a specific amount of one token for an unspecified amount
-   * (greater than a threshold) of another.
-   * @param sellAmount The number of tokens to send to the exchange.
-   * @param minBuyAmount The minimum number of tokens for the exchange to send in return.
-   * @param sellGold True if the caller is sending CELO to the exchange, false otherwise.
-   * @return The number of tokens sent by the exchange.
-   * @dev The caller must first have approved `sellAmount` to the exchange.
-   * @dev This function can be frozen via the Freezable interface.
-   */
-  function sell(
-    uint256 sellAmount,
-    uint256 minBuyAmount,
-    bool sellGold
-  ) public onlyWhenNotFrozen updateBucketsIfNecessary nonReentrant returns (uint256) {
-    (uint256 buyTokenBucket, uint256 sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
-    uint256 buyAmount = _getBuyTokenAmount(buyTokenBucket, sellTokenBucket, sellAmount);
-
-    require(buyAmount >= minBuyAmount, "Calculated buyAmount was less than specified minBuyAmount");
-
-    _exchange(sellAmount, buyAmount, sellGold);
-    return buyAmount;
   }
 
   /**
@@ -187,38 +152,6 @@ contract CompileExchange is
   }
 
   /**
-   * @notice Exchanges a specific amount of one token for a specific amount of another.
-   * @param sellAmount The number of tokens to send to the exchange.
-   * @param buyAmount The number of tokens for the exchange to send in return.
-   * @param sellGold True if the msg.sender is sending CELO to the exchange, false otherwise.
-   */
-  function _exchange(uint256 sellAmount, uint256 buyAmount, bool sellGold) private {
-    IReserve reserve = IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
-
-    if (sellGold) {
-      goldBucket = goldBucket.add(sellAmount);
-      stableBucket = stableBucket.sub(buyAmount);
-      require(
-        getGoldToken().transferFrom(msg.sender, address(reserve), sellAmount),
-        "Transfer of sell token failed"
-      );
-      require(IStableToken(stable).mint(msg.sender, buyAmount), "Mint of stable token failed");
-    } else {
-      stableBucket = stableBucket.add(sellAmount);
-      goldBucket = goldBucket.sub(buyAmount);
-      require(
-        IERC20(stable).transferFrom(msg.sender, address(this), sellAmount),
-        "Transfer of sell token failed"
-      );
-      IStableToken(stable).burn(sellAmount);
-
-      require(reserve.transferExchangeGold(msg.sender, buyAmount), "Transfer of buyToken failed");
-    }
-
-    emit Exchanged(msg.sender, sellAmount, buyAmount, sellGold);
-  }
-
-  /**
    * @notice Returns the amount of buy tokens a user would get for sellAmount of the sell token.
    * @param sellAmount The amount of sellToken the user is selling to the exchange.
    * @param sellGold `true` if gold is the sell token.
@@ -242,25 +175,38 @@ contract CompileExchange is
   }
 
   /**
-   * @notice Returns the buy token and sell token bucket sizes, in order. The ratio of
-   * the two also represents the exchange rate between the two.
-   * @param sellGold `true` if gold is the sell token.
-   * @return buyTokenBucket
-   * @return sellTokenBucket
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
-  function getBuyAndSellBuckets(bool sellGold) public view returns (uint256, uint256) {
-    uint256 currentGoldBucket = goldBucket;
-    uint256 currentStableBucket = stableBucket;
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 0, 0);
+  }
 
-    if (shouldUpdateBuckets()) {
-      (currentGoldBucket, currentStableBucket) = getUpdatedBuckets();
-    }
+  /**
+   * @notice Exchanges a specific amount of one token for an unspecified amount
+   * (greater than a threshold) of another.
+   * @param sellAmount The number of tokens to send to the exchange.
+   * @param minBuyAmount The minimum number of tokens for the exchange to send in return.
+   * @param sellGold True if the caller is sending CELO to the exchange, false otherwise.
+   * @return The number of tokens sent by the exchange.
+   * @dev The caller must first have approved `sellAmount` to the exchange.
+   * @dev This function can be frozen via the Freezable interface.
+   */
+  function sell(
+    uint256 sellAmount,
+    uint256 minBuyAmount,
+    bool sellGold
+  ) public onlyWhenNotFrozen updateBucketsIfNecessary nonReentrant returns (uint256) {
+    (uint256 buyTokenBucket, uint256 sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
+    uint256 buyAmount = _getBuyTokenAmount(buyTokenBucket, sellTokenBucket, sellAmount);
 
-    if (sellGold) {
-      return (currentStableBucket, currentGoldBucket);
-    } else {
-      return (currentGoldBucket, currentStableBucket);
-    }
+    require(buyAmount >= minBuyAmount, "Calculated buyAmount was less than specified minBuyAmount");
+
+    _exchange(sellAmount, buyAmount, sellGold);
+    return buyAmount;
   }
 
   /**
@@ -312,9 +258,77 @@ contract CompileExchange is
     emit ReserveFractionSet(newReserveFraction);
   }
 
+  /**
+   * @notice Returns the buy token and sell token bucket sizes, in order. The ratio of
+   * the two also represents the exchange rate between the two.
+   * @param sellGold `true` if gold is the sell token.
+   * @return buyTokenBucket
+   * @return sellTokenBucket
+   */
+  function getBuyAndSellBuckets(bool sellGold) public view returns (uint256, uint256) {
+    uint256 currentGoldBucket = goldBucket;
+    uint256 currentStableBucket = stableBucket;
+
+    if (shouldUpdateBuckets()) {
+      (currentGoldBucket, currentStableBucket) = getUpdatedBuckets();
+    }
+
+    if (sellGold) {
+      return (currentStableBucket, currentGoldBucket);
+    } else {
+      return (currentGoldBucket, currentStableBucket);
+    }
+  }
+
   function _setStableToken(address newStableToken) internal {
     stable = newStableToken;
     emit StableTokenSet(newStableToken);
+  }
+
+  /**
+   * @notice If conditions are met, updates the Uniswap bucket sizes to track
+   * the price reported by the Oracle.
+   */
+  function _updateBucketsIfNecessary() private {
+    if (shouldUpdateBuckets()) {
+      // solhint-disable-next-line not-rely-on-time
+      lastBucketUpdate = now;
+
+      (goldBucket, stableBucket) = getUpdatedBuckets();
+      emit BucketsUpdated(goldBucket, stableBucket);
+    }
+  }
+
+  /**
+   * @notice Exchanges a specific amount of one token for a specific amount of another.
+   * @param sellAmount The number of tokens to send to the exchange.
+   * @param buyAmount The number of tokens for the exchange to send in return.
+   * @param sellGold True if the msg.sender is sending CELO to the exchange, false otherwise.
+   */
+  function _exchange(uint256 sellAmount, uint256 buyAmount, bool sellGold) private {
+    IReserve reserve = IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
+
+    if (sellGold) {
+      goldBucket = goldBucket.add(sellAmount);
+      stableBucket = stableBucket.sub(buyAmount);
+      require(
+        getGoldToken().transferFrom(msg.sender, address(reserve), sellAmount),
+        "Transfer of sell token failed"
+      );
+      require(IStableToken(stable).mint(msg.sender, buyAmount), "Mint of stable token failed");
+    } else {
+      stableBucket = stableBucket.add(sellAmount);
+      goldBucket = goldBucket.sub(buyAmount);
+      require(
+        IERC20(stable).transferFrom(msg.sender, address(this), sellAmount),
+        "Transfer of sell token failed"
+      );
+      IStableToken(stable).burn(sellAmount);
+
+      require(reserve.transferExchangeGold(msg.sender, buyAmount), "Transfer of buyToken failed");
+    }
+
+    emit Exchanged(msg.sender, sellAmount, buyAmount, sellGold);
   }
 
   /**
@@ -403,20 +417,6 @@ contract CompileExchange is
   function getUpdatedGoldBucket() private view returns (uint256) {
     uint256 reserveGoldBalance = getReserve().getUnfrozenReserveGoldBalance();
     return reserveFraction.multiply(FixidityLib.newFixed(reserveGoldBalance)).fromFixed();
-  }
-
-  /**
-   * @notice If conditions are met, updates the Uniswap bucket sizes to track
-   * the price reported by the Oracle.
-   */
-  function _updateBucketsIfNecessary() private {
-    if (shouldUpdateBuckets()) {
-      // solhint-disable-next-line not-rely-on-time
-      lastBucketUpdate = now;
-
-      (goldBucket, stableBucket) = getUpdatedBuckets();
-      emit BucketsUpdated(goldBucket, stableBucket);
-    }
   }
 
   /**
