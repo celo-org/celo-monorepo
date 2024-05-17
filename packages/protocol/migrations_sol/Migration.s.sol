@@ -13,6 +13,7 @@ import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 // TODO(Arthur): import FeeCurrencyDirectory interface?
 import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
+import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts/common/interfaces/ICeloToken.sol"; // TODO move these to Initializer
 import "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
@@ -272,7 +273,7 @@ contract Migration is Script, UsingRegistry {
     // TODO migrate the initializations interface
     deployProxiedContract(
       "FeeCurrencyDirectory",
-      abi.encodeWithSelector(IFeeCurrencyDirectory.initialize.selector)
+      abi.encodeWithSelector(FeeCurrencyDirectory.initialize.selector)
     );
   }
 
@@ -439,7 +440,7 @@ contract Migration is Script, UsingRegistry {
     Source: https://github.com/celo-org/celo-monorepo/blob/2cec07d43328cf4216c62491a35eacc4960fffb6/packages/protocol/test-sol/common/FeeCurrencyDirectory.t.sol#L27 
     */
     uint256 mockIntrinsicGas = 21000;
-    IFeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory")).setCurrencyConfig(
+    FeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory")).setCurrencyConfig(
       stableTokenProxyAddress,
       mockOracleAddress,
       mockIntrinsicGas
@@ -960,7 +961,7 @@ contract Migration is Script, UsingRegistry {
     if (!skipTransferOwnership) {
       // TODO move this list somewhere else
 
-      string[22] memory fixedStringArray = [
+      string[23] memory fixedStringArray = [
         "Accounts",
         // 'Attestations',
         // BlockchainParameters ownership transitioned to governance in a follow-up script.?
