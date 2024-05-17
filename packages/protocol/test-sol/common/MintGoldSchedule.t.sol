@@ -20,7 +20,6 @@ contract MintGoldScheduleMockTunnel is ForgeTest {
     uint256 _communityRewardFraction;
     address _carbonOffsettingPartner;
     uint256 _carbonOffsettingFraction;
-    address _mintGoldOwner;
     address registryAddress;
   }
 
@@ -36,7 +35,7 @@ contract MintGoldScheduleMockTunnel is ForgeTest {
     address sender,
     InitParams calldata params
   ) external returns (bool, bytes memory) {
-    bytes4 selector = bytes4(keccak256("initialize(uint256,address,uint256,address,address)"));
+    bytes4 selector = bytes4(keccak256("initialize(uint256,address,uint256,address)"));
 
     bytes memory dataFirstHalf;
     {
@@ -45,7 +44,6 @@ contract MintGoldScheduleMockTunnel is ForgeTest {
         params._communityRewardFraction,
         params._carbonOffsettingPartner,
         params._carbonOffsettingFraction,
-        params._mintGoldOwner,
         params.registryAddress
       );
     }
@@ -133,7 +131,6 @@ contract MintGoldScheduleTest is Test, ECDSAHelper, Constants, IsL2Check {
       _communityRewardFraction: communityRewardFraction,
       _carbonOffsettingPartner: carbonOffsettingPartner,
       _carbonOffsettingFraction: carbonOffsettingFraction,
-      _mintGoldOwner: mintGoldOwner,
       registryAddress: registryAddress
     });
   }
@@ -169,7 +166,7 @@ contract MintGoldScheduleTest is Test, ECDSAHelper, Constants, IsL2Check {
     goldToken.setGoldTokenMintingScheduleAddress(address(mintGoldSchedule));
     MintGoldScheduleMockTunnel tunnel = new MintGoldScheduleMockTunnel(address(mintGoldSchedule));
 
-    tunnel.MockInitialize(owner, initParams);
+    tunnel.MockInitialize(mintGoldOwner, initParams);
   }
 }
 
@@ -182,7 +179,6 @@ contract MintGoldScheduleTest_initialize_L1 is MintGoldScheduleTest {
       _communityRewardFraction: communityRewardFraction,
       _carbonOffsettingPartner: carbonOffsettingPartner,
       _carbonOffsettingFraction: carbonOffsettingFraction,
-      _mintGoldOwner: mintGoldOwner,
       registryAddress: registryAddress
     });
   }
@@ -207,7 +203,7 @@ contract MintGoldScheduleTest_Initialize is MintGoldScheduleTest {
 
   function test_ShouldSetAOwnerToMintGoldScheduleInstance() public {
     newMintGold();
-    assertEq(mintGoldSchedule.owner(), initParams._mintGoldOwner);
+    assertEq(mintGoldSchedule.owner(), mintGoldOwner);
   }
 
   function test_ShouldHaveZeroTotalMintedByScheduleOnInit() public {
