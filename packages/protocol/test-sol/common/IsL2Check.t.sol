@@ -35,16 +35,20 @@ contract IsL2Check_IsL2Test is IsL2CheckBase {
     helper_WhenProxyAdminAddressIsSet();
     assertTrue(isL2Check.isL2());
   }
+
+  function test_IsL1_WhenProxyAdminSet() public {
+    helper_WhenProxyAdminAddressIsSet();
+    assertFalse(!isL2Check.isL2());
+  }
 }
 
 contract IsL2Check_OnlyL1 is IsL2CheckBase {
-  function test_WhenIsL1() public view {
-    isL2Check.onlyL1Function();
-  }
-
   function test_WhenIsL2_WhenProxyAdminSet() public {
     helper_WhenProxyAdminAddressIsSet();
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
+    isL2Check.onlyL1Function();
+  }
+  function test_WhenIsL1() public view {
     isL2Check.onlyL1Function();
   }
 }

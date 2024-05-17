@@ -437,7 +437,7 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
 
   function test_Reverts_setCommissionUpdateDelay_WhenL2() public {
     _whenL2();
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.setCommissionUpdateDelay(commissionUpdateDelay);
   }
 
@@ -448,7 +448,7 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
 
   function test_Reverts_SetDowntimeGracePeriod_WhenL2() public {
     _whenL2();
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.setDowntimeGracePeriod(downtimeGracePeriod);
   }
 }
@@ -468,7 +468,7 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
 
   function test_Reverts_SetTheMembershipHistoryLength_WhenL2() public {
     _whenL2();
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.setMembershipHistoryLength(newLength);
   }
 
@@ -492,7 +492,7 @@ contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
 
   function test_Reverts_SetMaxGroupSize_WhenL2() public {
     _whenL2();
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.setMaxGroupSize(newSize);
   }
 
@@ -602,7 +602,7 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
 
   function test_Reverts_SetExponentAndAdjustmentSpeed_WhenL2() public {
     _whenL2();
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
   }
 
@@ -682,7 +682,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
 
     _whenL2();
 
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(validator);
     validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
     validatorRegistrationEpochNumber = validators.getEpochNumber();
@@ -997,7 +997,7 @@ contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirement
   function test_Reverts_WhenL2_WhenAffiliatingWithRegisteredValidatorGroup() public {
     _whenL2();
     vm.prank(validator);
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.affiliate(group);
   }
 
@@ -1076,7 +1076,7 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
   function test_ShouldRevert_WhenL2_WhenValidatorNotMemberOfThatValidatorGroup() public {
     _whenL2();
     vm.prank(validator);
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.affiliate(otherGroup);
   }
 
@@ -1327,7 +1327,7 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
       signerPk
     );
     vm.prank(address(accounts));
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.updateEcdsaPublicKey(validator, signer, _newEcdsaPubKey);
   }
 
@@ -1431,7 +1431,7 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
     );
 
     vm.prank(address(accounts));
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.updatePublicKeys(validator, signer, _newEcdsaPubKey, newBlsPublicKey, newBlsPop);
   }
 
@@ -1546,7 +1546,7 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
     );
 
     vm.prank(validator);
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.updateBlsPublicKey(newBlsPublicKey, newBlsPop);
   }
 
@@ -1861,7 +1861,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
     expectedMembersList[0] = validator;
 
     vm.prank(group);
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.addFirstMember(validator, address(0), address(0));
   }
 
@@ -1871,7 +1871,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
     expectedMembersList[0] = validator;
 
     vm.prank(group);
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.addMember(validator);
   }
 
@@ -2155,7 +2155,7 @@ contract ValidatorsTest_ReorderMember is ValidatorsTest {
     expectedMembersList[1] = validator;
 
     vm.prank(group);
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.reorderMember(vm.addr(1), validator, address(0));
   }
 
@@ -2209,7 +2209,7 @@ contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
   function test_Reverts_SetValidatorGroupCommission_WhenL2() public {
     _whenL2();
     vm.prank(group);
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.setNextCommissionUpdate(newCommission);
   }
 
@@ -2273,7 +2273,7 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
   function test_Reverts_SetValidatorGroupCommission_WhenL2() public {
     _whenL2();
     vm.prank(group);
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.setNextCommissionUpdate(newCommission);
   }
 
@@ -2782,7 +2782,7 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
     validators.addFirstMember(validator, address(0), address(0));
 
     _whenL2();
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.getMembershipInLastEpoch(validator);
   }
 }
@@ -2954,7 +2954,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
 
   function test_Reverts_WhenL2_WhenValidatorAndGroupMeetBalanceRequirements() public {
     _whenL2();
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);
   }
 
@@ -3162,7 +3162,7 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
   function test_Reverts_WhenSenderIsWhitelistedSlashingAddress_WhenL2() public {
     _whenL2();
     vm.prank(paymentDelegatee);
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.forceDeaffiliateIfValidator(validator);
   }
 
@@ -3252,14 +3252,14 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
       address _group = epochInfoList[i].groupy;
 
       if (epochInfoList.length.sub(i) <= membershipHistoryLength) {
-        vm.expectRevert("This method is not supported in L2 anymore.");
+        vm.expectRevert("This method is no longer supported in L2.");
         validators.groupMembershipInEpoch(
           validator,
           epochInfoList[i].epochNumber,
           uint256(1).add(i)
         );
       } else {
-        vm.expectRevert("This method is not supported in L2 anymore.");
+        vm.expectRevert("This method is no longer supported in L2.");
         validators.groupMembershipInEpoch(
           validator,
           epochInfoList[i].epochNumber,
@@ -3334,7 +3334,7 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
     _whenL2();
     FixidityLib.Fraction memory expectedMultiplier = FixidityLib.fixed1();
     vm.prank(paymentDelegatee);
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.halveSlashingMultiplier(group);
   }
 
@@ -3390,7 +3390,7 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     timeTravel(slashingMultiplierResetPeriod);
 
     vm.prank(group);
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.resetSlashingMultiplier();
   }
 
@@ -3413,7 +3413,7 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
   function test_Reverts_SetSlashingMultiplierResetPeriod_WhenL2() public {
     _whenL2();
     uint256 newResetPeriod = 10 * DAY;
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.setSlashingMultiplierResetPeriod(newResetPeriod);
   }
 }

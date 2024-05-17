@@ -11,6 +11,13 @@ contract IsL2Check {
     _;
   }
 
+  modifier onlyL2() {
+    if (!isL2()) {
+      revert("This method is not supported in L1.");
+    }
+    _;
+  }
+
   function isL2() public view returns (bool) {
     uint32 size;
     address _addr = proxyAdminAddress;
@@ -22,7 +29,7 @@ contract IsL2Check {
 
   function allowOnlyL1() internal view {
     if (isL2()) {
-      revert("This method is not supported in L2 anymore.");
+      revert("This method is no longer supported in L2.");
     }
   }
 }

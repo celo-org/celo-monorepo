@@ -613,7 +613,7 @@ contract AccountsTest_setPaymentDelegation is AccountsTest {
   function test_Revert_SetPaymentDelegation_WhenL2() public {
     _whenL2();
     accounts.createAccount();
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     accounts.setPaymentDelegation(beneficiary, fraction);
   }
 

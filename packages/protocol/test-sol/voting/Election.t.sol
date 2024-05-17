@@ -199,7 +199,7 @@ contract Election_SetElectabilityThreshold is ElectionTest {
 
   function test_Revert_setElectabilityThreshold_WhenL2() public {
     _whenL2();
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     election.setElectabilityThreshold(FixidityLib.fixed1().unwrap() + 1);
   }
 }
@@ -218,7 +218,7 @@ contract Election_SetElectableValidators is ElectionTest {
     _whenL2();
     uint256 newElectableValidatorsMin = 2;
     uint256 newElectableValidatorsMax = 4;
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     election.setElectableValidators(newElectableValidatorsMin, newElectableValidatorsMax);
   }
 
@@ -262,7 +262,7 @@ contract Election_SetMaxNumGroupsVotedFor is ElectionTest {
   function test_Revert_SetMaxNumGroupsVotedFor_WhenL2() public {
     _whenL2();
     uint256 newMaxNumGroupsVotedFor = 4;
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     election.setMaxNumGroupsVotedFor(newMaxNumGroupsVotedFor);
   }
 
@@ -293,7 +293,7 @@ contract Election_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
 
   function test_Revert_SetAllowedToVoteOverMaxNumberOfGroups_WhenL2() public {
     _whenL2();
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     election.setAllowedToVoteOverMaxNumberOfGroups(true);
   }
 
@@ -348,7 +348,7 @@ contract Election_MarkGroupEligible is ElectionTest {
   function test_Revert_MarkGroupEligible_WhenL2() public {
     _whenL2();
     address group = address(this);
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     election.markGroupEligible(group, address(0), address(0));
   }
 
@@ -468,7 +468,7 @@ contract Election_Vote_WhenGroupEligible is ElectionTest {
   function test_Revert_Vote_WhenL2() public {
     _whenL2();
 
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     election.vote(group, value - maxNumGroupsVotedFor, address(0), address(0));
   }
 
@@ -861,7 +861,7 @@ contract Election_Activate is ElectionTest {
   function test_Revert_Activate_WhenL2() public {
     WhenVoterHasPendingVotes();
     _whenL2();
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     election.activate(group);
   }
 
@@ -941,7 +941,7 @@ contract Election_Activate is ElectionTest {
 
   function test_Revert_ActivateForAccount_WhenL2() public {
     _whenL2();
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     election.activateForAccount(group, voter);
   }
 
@@ -1949,7 +1949,7 @@ contract Election_DistributeEpochRewards is ElectionTest {
 
   function test_Revert_DistributeEpochRewards_WhenL2() public {
     _whenL2();
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(address(0));
     election.distributeEpochRewards(group, rewardValue, address(0), address(0));
   }
@@ -2712,7 +2712,7 @@ contract Election_ConsistencyChecks is ElectionTest {
 contract Election_HasActivatablePendingVotes is ElectionTest {
   function test_Revert_hasActivatablePendingVotes_WhenL2() public {
     _whenL2();
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(address(0));
     election.hasActivatablePendingVotes(address(0), address(0));
   }
