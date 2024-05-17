@@ -103,7 +103,8 @@ contract AttestationsTest is Attestations(true) {
   function complete(bytes32 identifier, uint8 v, bytes32 r, bytes32 s) external {
     address issuer = validateAttestationCode(identifier, msg.sender, v, r, s);
 
-    Attestation storage attestation = identifiers[identifier].attestations[msg.sender]
+    Attestation storage attestation = identifiers[identifier]
+      .attestations[msg.sender]
       .issuedAttestations[issuer];
 
     address token = attestation.attestationRequestFeeToken;
@@ -149,8 +150,9 @@ contract AttestationsTest is Attestations(true) {
    */
   function addIncompleteAttestations(bytes32 identifier) internal {
     AttestedAddress storage state = identifiers[identifier].attestations[msg.sender];
-    UnselectedRequest storage unselectedRequest = identifiers[identifier].unselectedRequests[msg
-      .sender];
+    UnselectedRequest storage unselectedRequest = identifiers[identifier].unselectedRequests[
+      msg.sender
+    ];
 
     bytes32 seed = getRandom().getBlockRandomness(
       uint256(unselectedRequest.blockNumber).add(selectIssuersWaitBlocks)

@@ -13,7 +13,7 @@ contract MockUniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
   using SafeMath for uint256;
   using UQ112x112 for uint224;
 
-  uint256 public constant MINIMUM_LIQUIDITY = 10**3;
+  uint256 public constant MINIMUM_LIQUIDITY = 10 ** 3;
   bytes4 private constant SELECTOR = bytes4(keccak256(bytes("transfer(address,uint256)")));
 
   address public factory;
@@ -112,10 +112,12 @@ contract MockUniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
   }
 
   // this low-level function should be called from a contract which performs important safety checks
-  function swap(uint256 amount0Out, uint256 amount1Out, address to, bytes calldata data)
-    external
-    lock
-  {
+  function swap(
+    uint256 amount0Out,
+    uint256 amount1Out,
+    address to,
+    bytes calldata data
+  ) external lock {
     require(amount0Out > 0 || amount1Out > 0, "UniswapV2: INSUFFICIENT_OUTPUT_AMOUNT");
     (uint112 _reserve0, uint112 _reserve1, ) = getReserves(); // gas savings
     require(amount0Out < _reserve0 && amount1Out < _reserve1, "UniswapV2: INSUFFICIENT_LIQUIDITY");
@@ -142,7 +144,7 @@ contract MockUniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
       uint256 balance0Adjusted = balance0.mul(1000).sub(amount0In.mul(3));
       uint256 balance1Adjusted = balance1.mul(1000).sub(amount1In.mul(3));
       require(
-        balance0Adjusted.mul(balance1Adjusted) >= uint256(_reserve0).mul(_reserve1).mul(1000**2),
+        balance0Adjusted.mul(balance1Adjusted) >= uint256(_reserve0).mul(_reserve1).mul(1000 ** 2),
         "UniswapV2: K"
       );
     }
@@ -188,11 +190,14 @@ contract MockUniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
   }
 
   // update reserves and, on the first call per block, price accumulators
-  function _update(uint256 balance0, uint256 balance1, uint112 _reserve0, uint112 _reserve1)
-    private
-  {
+  function _update(
+    uint256 balance0,
+    uint256 balance1,
+    uint112 _reserve0,
+    uint112 _reserve1
+  ) private {
     require(balance0 <= uint112(-1) && balance1 <= uint112(-1), "UniswapV2: OVERFLOW");
-    uint32 blockTimestamp = uint32(block.timestamp % 2**32);
+    uint32 blockTimestamp = uint32(block.timestamp % 2 ** 32);
     uint32 timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
     if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {
       // * never overflows, and + overflow is desired
@@ -225,5 +230,4 @@ contract MockUniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
       kLast = 0;
     }
   }
-
 }

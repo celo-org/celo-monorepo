@@ -43,6 +43,8 @@
     "make-release": "./scripts/bash/make-release.sh",
     "verify-deployed": "./scripts/bash/verify-deployed.sh",
     "verify-release": "./scripts/bash/verify-release.sh",
+    "size:onchain": "./scripts/bash/get_smart_contract_size_from_onchain_address.sh",
+    "size:artifacts": "./scripts/bash/get_smart_contract_size_from_build_artifacts.sh",
     "ganache-dev": "./scripts/bash/ganache.sh",
     "ganache-devchain": "./scripts/bash/ganache_devchain.sh",
     "truffle:migrate": "truffle migrate",
@@ -113,7 +115,6 @@
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.3",
     "@celo/dev-utils":"^0.0.3",
-    "@celo/odis-identifiers": "^1.0.0",
     "@celo/typechain-target-web3-v1-celo": "^1.0.0",
     "@celo/typescript": "0.0.1",
     "@jest/globals": "^29.5.0",

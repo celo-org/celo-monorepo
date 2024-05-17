@@ -192,19 +192,19 @@ contract FeeHandler is
   }
 
   /**
-    * @notice Allows owner to set max slippage for a token.
-    * @param token Address of the token to set.
-    * @param newMax New sllipage to set, as Fixidity fraction.
-    */
+   * @notice Allows owner to set max slippage for a token.
+   * @param token Address of the token to set.
+   * @param newMax New sllipage to set, as Fixidity fraction.
+   */
   function setMaxSplippage(address token, uint256 newMax) external onlyOwner {
     _setMaxSplippage(token, newMax);
   }
 
   /**
-    * @notice Allows owner to set the daily burn limit for a token.
-    * @param token Address of the token to set.
-    * @param newLimit The new limit to set, in the token units.
-    */
+   * @notice Allows owner to set the daily burn limit for a token.
+   * @param token Address of the token to set.
+   * @param newLimit The new limit to set, in the token units.
+   */
   function setDailySellLimit(address token, uint256 newLimit) external onlyOwner {
     _setDailySellLimit(token, newLimit);
   }
@@ -245,18 +245,18 @@ contract FeeHandler is
       @param value The amount of tokens to transfer.
       @return A boolean indicating whether the transfer was successful or not.
     */
-  function transfer(address token, address recipient, uint256 value)
-    external
-    onlyOwner
-    returns (bool)
-  {
+  function transfer(
+    address token,
+    address recipient,
+    uint256 value
+  ) external onlyOwner returns (bool) {
     return IERC20(token).transfer(recipient, value);
   }
 
   /**
-    * @param token The address of the token to query.
-    * @return The amount burned for a token.
-    */
+   * @param token The address of the token to query.
+   * @return The amount burned for a token.
+   */
   function getPastBurnForToken(address token) external view returns (uint256) {
     return tokenStates[token].pastBurn;
   }
@@ -330,10 +330,10 @@ contract FeeHandler is
   }
 
   /**
-    * @param token The address of the token to query.
-    * @param amountToBurn The amount of the token to burn.
-    * @return Returns true if burning amountToBurn would exceed the daily limit.
-    */
+   * @param token The address of the token to query.
+   * @param amountToBurn The amount of the token to burn.
+   * @return Returns true if burning amountToBurn would exceed the daily limit.
+   */
   function dailySellLimitHit(address token, uint256 amountToBurn) public returns (bool) {
     TokenState storage tokenState = tokenStates[token];
 
@@ -429,7 +429,7 @@ contract FeeHandler is
     // small numbers cause rounding errors and zero case should be skipped
     if (balanceToBurn < MIN_BURN) {
       return;
-    }
+    } // eso debería estar antes de quemar el storage
 
     if (dailySellLimitHit(tokenAddress, balanceToBurn)) {
       // in case the limit is hit, burn the max possible
@@ -522,16 +522,16 @@ contract FeeHandler is
     }
     _burnCelo();
     _distribute(tokenAddress);
-    _distribute(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
+    _distribute(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)); // function distribute Celo
   }
 
   /**
-    * @notice Burns all the Celo balance of this contract.
-    */
+   * @notice Burns all the Celo balance of this contract.
+   */
   function _burnCelo() private {
-    TokenState storage tokenState = tokenStates[registry.getAddressForOrDie(
-      GOLD_TOKEN_REGISTRY_ID
-    )];
+    TokenState storage tokenState = tokenStates[
+      registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)
+    ];
     ICeloToken celo = ICeloToken(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
 
     uint256 balanceOfCelo = address(this).balance;
@@ -551,10 +551,10 @@ contract FeeHandler is
   }
 
   /**
-    * @notice Updates the current day limit for a token.
-    * @param token The address of the token to query.
-    * @param amountBurned the amount of the token that was burned.
-    */
+   * @notice Updates the current day limit for a token.
+   * @param token The address of the token to query.
+   * @param amountBurned the amount of the token that was burned.
+   */
   function updateLimits(address token, uint256 amountBurned) private {
     TokenState storage tokenState = tokenStates[token];
 

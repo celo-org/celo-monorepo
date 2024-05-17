@@ -34,10 +34,11 @@ contract ReleaseGoldMockTunnel is ForgeTest {
     releaseGoldTunnel = ReleaseGold(releaseGoldContractAddress);
   }
 
-  function MockInitialize(address sender, InitParams calldata params, InitParams2 calldata params2)
-    external
-    returns (bool, bytes memory)
-  {
+  function MockInitialize(
+    address sender,
+    InitParams calldata params,
+    InitParams2 calldata params2
+  ) external returns (bool, bytes memory) {
     bytes4 selector = bytes4(
       keccak256(
         "initialize(uint256,uint256,uint256,uint256,uint256,bool,address,address,address,bool,uint256,bool,bool,address)"

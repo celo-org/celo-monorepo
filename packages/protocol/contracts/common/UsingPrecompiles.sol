@@ -57,7 +57,7 @@ contract UsingPrecompiles {
   function getEpochSize() public view returns (uint256) {
     bytes memory out;
     bool success;
-    (success, out) = EPOCH_SIZE.staticcall(abi.encodePacked());
+    (success, out) = EPOCH_SIZE.staticcall(abi.encodePacked(true));
     require(success, "error calling getEpochSize precompile");
     return getUint256FromBytes(out, 0);
   }
@@ -98,11 +98,10 @@ contract UsingPrecompiles {
    * @param blockNumber Block number to retrieve the validator set from.
    * @return Address of validator at the requested index.
    */
-  function validatorSignerAddressFromSet(uint256 index, uint256 blockNumber)
-    public
-    view
-    returns (address)
-  {
+  function validatorSignerAddressFromSet(
+    uint256 index,
+    uint256 blockNumber
+  ) public view returns (address) {
     bytes memory out;
     bool success;
     (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, blockNumber));
@@ -144,11 +143,11 @@ contract UsingPrecompiles {
    *   account address. 96 bytes.
    * @return True upon success.
    */
-  function checkProofOfPossession(address sender, bytes memory blsKey, bytes memory blsPop)
-    public
-    view
-    returns (bool)
-  {
+  function checkProofOfPossession(
+    address sender,
+    bytes memory blsKey,
+    bytes memory blsPop
+  ) public view returns (bool) {
     bool success;
     (success, ) = PROOF_OF_POSSESSION.staticcall(abi.encodePacked(sender, blsKey, blsPop));
     return success;
@@ -230,11 +229,10 @@ contract UsingPrecompiles {
    * @param epochSize The epoch size in blocks.
    * @return Epoch number.
    */
-  function epochNumberOfBlock(uint256 blockNumber, uint256 epochSize)
-    internal
-    pure
-    returns (uint256)
-  {
+  function epochNumberOfBlock(
+    uint256 blockNumber,
+    uint256 epochSize
+  ) internal pure returns (uint256) {
     // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
     uint256 epochNumber = blockNumber / epochSize;
     if (blockNumber % epochSize == 0) {

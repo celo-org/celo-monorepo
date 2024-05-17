@@ -118,7 +118,6 @@ contract BlockchainParametersTest_setUptimeLookbackWindow is BlockchainParameter
     blockchainParameters.setUptimeLookbackWindow(newValue);
     blockTravel(EPOCH_SIZE);
     assertEq(blockchainParameters.getUptimeLookbackWindow(), newValue);
-
   }
 
   function test_MultipleCallsWithinEpochOnlyAppliesLast() public {
@@ -148,7 +147,6 @@ contract BlockchainParametersTest_setUptimeLookbackWindow is BlockchainParameter
   function test_Revert_WhenUsingValueGreaterThanSafeMaximum() public {
     vm.expectRevert("UptimeLookbackWindow must be within safe range");
     blockchainParameters.setUptimeLookbackWindow(721);
-
   }
 
   function test_Revert_WhenUsingValueGreaterThanEpochsizeminus2() public {

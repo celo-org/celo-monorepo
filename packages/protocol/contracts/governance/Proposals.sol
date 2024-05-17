@@ -14,9 +14,21 @@ library Proposals {
   using SafeMath for uint256;
   using BytesLib for bytes;
 
-  enum Stage { None, Queued, Approval, Referendum, Execution, Expiration }
+  enum Stage {
+    None,
+    Queued,
+    Approval,
+    Referendum,
+    Execution,
+    Expiration
+  }
 
-  enum VoteValue { None, Abstain, No, Yes }
+  enum VoteValue {
+    None,
+    Abstain,
+    No,
+    Yes
+  }
 
   struct StageDurations {
     uint256 approval;
@@ -134,11 +146,10 @@ library Proposals {
    * @return Transaction destination.
    * @return Transaction data.
    */
-  function getTransaction(Proposal storage proposal, uint256 index)
-    public
-    view
-    returns (uint256, address, bytes memory)
-  {
+  function getTransaction(
+    Proposal storage proposal,
+    uint256 index
+  ) public view returns (uint256, address, bytes memory) {
     require(index < proposal.transactions.length, "getTransaction: bad index");
     Transaction storage transaction = proposal.transactions[index];
     return (transaction.value, transaction.destination, transaction.data);
@@ -248,11 +259,9 @@ library Proposals {
    * @param proposal The proposal struct.
    * @return The participation of the proposal.
    */
-  function getParticipation(Proposal storage proposal)
-    internal
-    view
-    returns (FixidityLib.Fraction memory)
-  {
+  function getParticipation(
+    Proposal storage proposal
+  ) internal view returns (FixidityLib.Fraction memory) {
     uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
     return FixidityLib.newFixedFraction(totalVotes, proposal.networkWeight);
   }
@@ -267,11 +276,9 @@ library Proposals {
    * @return description Description url.
    * @return networkWeight Network weight.
    */
-  function unpack(Proposal storage proposal)
-    internal
-    view
-    returns (address, uint256, uint256, uint256, string storage, uint256, bool)
-  {
+  function unpack(
+    Proposal storage proposal
+  ) internal view returns (address, uint256, uint256, uint256, string storage, uint256, bool) {
     return (
       proposal.proposer,
       proposal.deposit,
@@ -290,11 +297,9 @@ library Proposals {
    * @return The no vote totals.
    * @return The abstain vote totals.
    */
-  function getVoteTotals(Proposal storage proposal)
-    internal
-    view
-    returns (uint256, uint256, uint256)
-  {
+  function getVoteTotals(
+    Proposal storage proposal
+  ) internal view returns (uint256, uint256, uint256) {
     return (proposal.votes.yes, proposal.votes.no, proposal.votes.abstain);
   }
 
@@ -325,10 +330,12 @@ library Proposals {
    * @param dataLength The length of the data to be included in the function call.
    * @param data The data to be included in the function call.
    */
-  function externalCall(address destination, uint256 value, uint256 dataLength, bytes memory data)
-    private
-    returns (bool)
-  {
+  function externalCall(
+    address destination,
+    uint256 value,
+    uint256 dataLength,
+    bytes memory data
+  ) private returns (bool) {
     bool result;
 
     if (dataLength > 0) require(Address.isContract(destination), "Invalid contract address");

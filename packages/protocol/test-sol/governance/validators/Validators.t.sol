@@ -53,16 +53,18 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
 
   uint256 groupLength = 8;
 
-  bytes public constant blsPublicKey = abi.encodePacked(
-    bytes32(0x0101010101010101010101010101010101010101010101010101010101010101),
-    bytes32(0x0202020202020202020202020202020202020202020202020202020202020202),
-    bytes32(0x0303030303030303030303030303030303030303030303030303030303030303)
-  );
-  bytes public constant blsPop = abi.encodePacked(
-    bytes16(0x04040404040404040404040404040404),
-    bytes16(0x05050505050505050505050505050505),
-    bytes16(0x06060606060606060606060606060606)
-  );
+  bytes public constant blsPublicKey =
+    abi.encodePacked(
+      bytes32(0x0101010101010101010101010101010101010101010101010101010101010101),
+      bytes32(0x0202020202020202020202020202020202020202020202020202020202020202),
+      bytes32(0x0303030303030303030303030303030303030303030303030303030303030303)
+    );
+  bytes public constant blsPop =
+    abi.encodePacked(
+      bytes16(0x04040404040404040404040404040404),
+      bytes16(0x05050505050505050505050505050505),
+      bytes16(0x06060606060606060606060606060606)
+    );
 
   FixidityLib.Fraction public commission = FixidityLib.newFixedFraction(1, 100);
 
@@ -210,20 +212,19 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     accounts.createAccount();
   }
 
-  function getParsedSignatureOfAddress(address _address, uint256 privateKey)
-    public
-    pure
-    returns (uint8, bytes32, bytes32)
-  {
+  function getParsedSignatureOfAddress(
+    address _address,
+    uint256 privateKey
+  ) public pure returns (uint8, bytes32, bytes32) {
     bytes32 addressHash = keccak256(abi.encodePacked(_address));
     bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
     return vm.sign(privateKey, prefixedHash);
   }
 
-  function _generateEcdsaPubKeyWithSigner(address _validator, uint256 _signerPk)
-    internal
-    returns (bytes memory ecdsaPubKey, uint8 v, bytes32 r, bytes32 s)
-  {
+  function _generateEcdsaPubKeyWithSigner(
+    address _validator,
+    uint256 _signerPk
+  ) internal returns (bytes memory ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) {
     (v, r, s) = getParsedSignatureOfAddress(_validator, _signerPk);
 
     bytes32 addressHash = keccak256(abi.encodePacked(_validator));
@@ -250,20 +251,20 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     return _ecdsaPubKey;
   }
 
-  function _generateEcdsaPubKey(address _account, uint256 _accountPk)
-    internal
-    returns (bytes memory ecdsaPubKey)
-  {
+  function _generateEcdsaPubKey(
+    address _account,
+    uint256 _accountPk
+  ) internal returns (bytes memory ecdsaPubKey) {
     (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(_account, _accountPk);
     bytes32 addressHash = keccak256(abi.encodePacked(_account));
 
     ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
   }
 
-  function _registerValidatorHelper(address _validator, uint256 _validatorPk)
-    internal
-    returns (bytes memory)
-  {
+  function _registerValidatorHelper(
+    address _validator,
+    uint256 _validatorPk
+  ) internal returns (bytes memory) {
     if (!accounts.isAccount(_validator)) {
       vm.prank(_validator);
       accounts.createAccount();
@@ -323,9 +324,11 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     }
   }
 
-  function _removeMemberAndTimeTravel(address _group, address _validator, uint256 _duration)
-    internal
-  {
+  function _removeMemberAndTimeTravel(
+    address _group,
+    address _validator,
+    uint256 _duration
+  ) internal {
     vm.prank(_group);
     validators.removeMember(_validator);
     timeTravel(_duration);
@@ -335,11 +338,10 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     return num > FixidityLib.fixed1().unwrap() ? FixidityLib.fixed1() : FixidityLib.wrap(num);
   }
 
-  function _safeExponent(FixidityLib.Fraction memory base, FixidityLib.Fraction memory exponent)
-    internal
-    pure
-    returns (uint256)
-  {
+  function _safeExponent(
+    FixidityLib.Fraction memory base,
+    FixidityLib.Fraction memory exponent
+  ) internal pure returns (uint256) {
     if (FixidityLib.equals(base, FixidityLib.newFixed(0))) return 0;
     if (FixidityLib.equals(exponent, FixidityLib.newFixed(0))) return FixidityLib.fixed1().unwrap();
 
@@ -513,10 +515,11 @@ contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
 }
 
 contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
-  GroupLockedGoldRequirements private newRequirements = GroupLockedGoldRequirements({
-    value: originalGroupLockedGoldRequirements.value + 1,
-    duration: originalGroupLockedGoldRequirements.duration + 1
-  });
+  GroupLockedGoldRequirements private newRequirements =
+    GroupLockedGoldRequirements({
+      value: originalGroupLockedGoldRequirements.value + 1,
+      duration: originalGroupLockedGoldRequirements.duration + 1
+    });
 
   function test_ShouldHaveSetGroupLockedGoldRequirements() public {
     validators.setGroupLockedGoldRequirements(newRequirements.value, newRequirements.duration);
@@ -547,10 +550,11 @@ contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
 }
 
 contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
-  ValidatorLockedGoldRequirements private newRequirements = ValidatorLockedGoldRequirements({
-    value: originalValidatorLockedGoldRequirements.value + 1,
-    duration: originalValidatorLockedGoldRequirements.duration + 1
-  });
+  ValidatorLockedGoldRequirements private newRequirements =
+    ValidatorLockedGoldRequirements({
+      value: originalValidatorLockedGoldRequirements.value + 1,
+      duration: originalValidatorLockedGoldRequirements.duration + 1
+    });
 
   function test_ShouldHaveSetValidatorLockedGoldRequirements() public {
     validators.setValidatorLockedGoldRequirements(newRequirements.value, newRequirements.duration);
@@ -581,10 +585,11 @@ contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
 }
 
 contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
-  ValidatorScoreParameters newParams = ValidatorScoreParameters({
-    exponent: originalValidatorScoreParameters.exponent + 1,
-    adjustmentSpeed: FixidityLib.newFixedFraction(6, 20)
-  });
+  ValidatorScoreParameters newParams =
+    ValidatorScoreParameters({
+      exponent: originalValidatorScoreParameters.exponent + 1,
+      adjustmentSpeed: FixidityLib.newFixedFraction(6, 20)
+    });
 
   event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
 
@@ -1118,8 +1123,12 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     validators.affiliate(otherGroup);
     validatorAffiliationEpochNumber = validators.getEpochNumber();
 
-    (uint256[] memory epochs, address[] memory groups, uint256 lastRemovedFromGroupTimestamp, ) = validators
-      .getMembershipHistory(validator);
+    (
+      uint256[] memory epochs,
+      address[] memory groups,
+      uint256 lastRemovedFromGroupTimestamp,
+
+    ) = validators.getMembershipHistory(validator);
 
     uint256 expectedEntries = 1;
 
@@ -1237,8 +1246,12 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
     validators.deaffiliate();
     deaffiliationEpoch = validators.getEpochNumber();
 
-    (uint256[] memory epochs, address[] memory groups, uint256 lastRemovedFromGroupTimestamp, ) = validators
-      .getMembershipHistory(validator);
+    (
+      uint256[] memory epochs,
+      address[] memory groups,
+      uint256 lastRemovedFromGroupTimestamp,
+
+    ) = validators.getMembershipHistory(validator);
 
     uint256 expectedEntries = 1;
 
@@ -1358,16 +1371,18 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
 contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
   bytes validatorEcdsaPubKey;
 
-  bytes public constant newBlsPublicKey = abi.encodePacked(
-    bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
-    bytes32(0x0202020202020202020202020202020202020202020202020202020202020203),
-    bytes32(0x0303030303030303030303030303030303030303030303030303030303030304)
-  );
-  bytes public constant newBlsPop = abi.encodePacked(
-    bytes16(0x04040404040404040404040404040405),
-    bytes16(0x05050505050505050505050505050506),
-    bytes16(0x06060606060606060606060606060607)
-  );
+  bytes public constant newBlsPublicKey =
+    abi.encodePacked(
+      bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
+      bytes32(0x0202020202020202020202020202020202020202020202020202020202020203),
+      bytes32(0x0303030303030303030303030303030303030303030303030303030303030304)
+    );
+  bytes public constant newBlsPop =
+    abi.encodePacked(
+      bytes16(0x04040404040404040404040404040405),
+      bytes16(0x05050505050505050505050505050506),
+      bytes16(0x06060606060606060606060606060607)
+    );
 
   function setUp() public {
     super.setUp();
@@ -1475,29 +1490,33 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
 contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
   bytes validatorEcdsaPubKey;
 
-  bytes public constant newBlsPublicKey = abi.encodePacked(
-    bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
-    bytes32(0x0202020202020202020202020202020202020202020202020202020202020203),
-    bytes32(0x0303030303030303030303030303030303030303030303030303030303030304)
-  );
+  bytes public constant newBlsPublicKey =
+    abi.encodePacked(
+      bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
+      bytes32(0x0202020202020202020202020202020202020202020202020202020202020203),
+      bytes32(0x0303030303030303030303030303030303030303030303030303030303030304)
+    );
 
-  bytes public constant newBlsPop = abi.encodePacked(
-    bytes16(0x04040404040404040404040404040405),
-    bytes16(0x05050505050505050505050505050506),
-    bytes16(0x06060606060606060606060606060607)
-  );
+  bytes public constant newBlsPop =
+    abi.encodePacked(
+      bytes16(0x04040404040404040404040404040405),
+      bytes16(0x05050505050505050505050505050506),
+      bytes16(0x06060606060606060606060606060607)
+    );
 
-  bytes public constant wrongBlsPublicKey = abi.encodePacked(
-    bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
-    bytes32(0x0202020202020202020202020202020202020202020202020202020202020203),
-    bytes16(0x06060606060606060606060606060607)
-  );
+  bytes public constant wrongBlsPublicKey =
+    abi.encodePacked(
+      bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
+      bytes32(0x0202020202020202020202020202020202020202020202020202020202020203),
+      bytes16(0x06060606060606060606060606060607)
+    );
 
-  bytes public constant wrongBlsPop = abi.encodePacked(
-    bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
-    bytes16(0x05050505050505050505050505050506),
-    bytes16(0x06060606060606060606060606060607)
-  );
+  bytes public constant wrongBlsPop =
+    abi.encodePacked(
+      bytes32(0x0101010101010101010101010101010101010101010101010101010101010102),
+      bytes16(0x05050505050505050505050505050506),
+      bytes16(0x06060606060606060606060606060607)
+    );
 
   function setUp() public {
     super.setUp();
@@ -2047,8 +2066,12 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
     validators.removeMember(validator);
     uint256 _expectedEpoch = validators.getEpochNumber();
 
-    (uint256[] memory _epochs, address[] memory _membershipGroups, uint256 _historyLastRemovedTimestamp, ) = validators
-      .getMembershipHistory(validator);
+    (
+      uint256[] memory _epochs,
+      address[] memory _membershipGroups,
+      uint256 _historyLastRemovedTimestamp,
+
+    ) = validators.getMembershipHistory(validator);
 
     assertEq(_epochs.length, 1);
     assertEq(_membershipGroups.length, 1);
@@ -2396,10 +2419,9 @@ contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
     _registerValidatorGroupHelper(group, 1);
   }
 
-  function _computeGroupUptimeCalculation(FixidityLib.Fraction[] memory _uptimes)
-    public
-    returns (uint256[] memory, uint256)
-  {
+  function _computeGroupUptimeCalculation(
+    FixidityLib.Fraction[] memory _uptimes
+  ) public returns (uint256[] memory, uint256) {
     FixidityLib.Fraction memory gracePeriod = FixidityLib.newFixedFraction(
       validators.downtimeGracePeriod(),
       1
@@ -2567,10 +2589,9 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
   function test_ShouldUpdateValidatorScore_WhenUptimeInRange0And1() public {
     uint256 _expectedScore = FixidityLib
       .multiply(
-      originalValidatorScoreParameters
-        .adjustmentSpeed,
-      FixidityLib.newFixedFraction(_epochScore, FixidityLib.fixed1().unwrap())
-    )
+        originalValidatorScoreParameters.adjustmentSpeed,
+        FixidityLib.newFixedFraction(_epochScore, FixidityLib.fixed1().unwrap())
+      )
       .unwrap();
 
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
@@ -2585,23 +2606,22 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
 
     uint256 _expectedScore = FixidityLib
       .multiply(
-      originalValidatorScoreParameters
-        .adjustmentSpeed,
-      FixidityLib.newFixedFraction(_epochScore, FixidityLib.fixed1().unwrap())
-    )
+        originalValidatorScoreParameters.adjustmentSpeed,
+        FixidityLib.newFixedFraction(_epochScore, FixidityLib.fixed1().unwrap())
+      )
       .unwrap();
 
     _expectedScore = FixidityLib
       .add(
-      FixidityLib.multiply(
-        FixidityLib.subtract(
-          FixidityLib.fixed1(),
-          originalValidatorScoreParameters.adjustmentSpeed
+        FixidityLib.multiply(
+          FixidityLib.subtract(
+            FixidityLib.fixed1(),
+            originalValidatorScoreParameters.adjustmentSpeed
+          ),
+          FixidityLib.newFixedFraction(_expectedScore, FixidityLib.fixed1().unwrap())
         ),
         FixidityLib.newFixedFraction(_expectedScore, FixidityLib.fixed1().unwrap())
-      ),
-      FixidityLib.newFixedFraction(_expectedScore, FixidityLib.fixed1().unwrap())
-    )
+      )
       .unwrap();
 
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
@@ -2861,7 +2881,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
     _registerValidatorGroupWithMembers(group, 1);
     blockTravel(ph.epochSize());
 
-    lockedGold.addSlasher(paymentDelegatee);
+    lockedGold.addSlasherTest(paymentDelegatee);
 
     vm.prank(validator);
     accounts.setPaymentDelegation(paymentDelegatee, delegatedFraction.unwrap());
@@ -2894,11 +2914,11 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
 
     halfExpectedTotalPayment = FixidityLib
       .fromFixed(
-      FixidityLib.multiply(
-        expectedScore,
-        FixidityLib.newFixedFraction(maxPayment, FixidityLib.fixed1().unwrap())
+        FixidityLib.multiply(
+          expectedScore,
+          FixidityLib.newFixedFraction(maxPayment, FixidityLib.fixed1().unwrap())
+        )
       )
-    )
       .div(2);
 
     halfExpectedGroupPayment = FixidityLib.fromFixed(
@@ -3129,7 +3149,7 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
     vm.prank(validator);
     validators.affiliate(group);
 
-    lockedGold.addSlasher(paymentDelegatee);
+    lockedGold.addSlasherTest(paymentDelegatee);
   }
 
   function test_ShouldSucceed_WhenSenderIsWhitelistedSlashingAddress() public {
@@ -3294,7 +3314,7 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
-    lockedGold.addSlasher(paymentDelegatee);
+    lockedGold.addSlasherTest(paymentDelegatee);
   }
 
   function test_ShouldHalveslashingMultiplier() public {
@@ -3344,7 +3364,7 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     vm.prank(validator);
     validators.affiliate(group);
 
-    lockedGold.addSlasher(paymentDelegatee);
+    lockedGold.addSlasherTest(paymentDelegatee);
 
     vm.prank(paymentDelegatee);
     validators.halveSlashingMultiplier(group);

@@ -32,10 +32,11 @@ contract ValidatorsMockTunnel is ForgeTest {
     uint256 _downtimeGracePeriod;
   }
 
-  function MockInitialize(address sender, InitParams calldata params, InitParams2 calldata params2)
-    external
-    returns (bool, bytes memory)
-  {
+  function MockInitialize(
+    address sender,
+    InitParams calldata params,
+    InitParams2 calldata params2
+  ) external returns (bool, bytes memory) {
     bytes memory data = abi.encodeWithSignature(
       "initialize(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)",
       params.registryAddress,

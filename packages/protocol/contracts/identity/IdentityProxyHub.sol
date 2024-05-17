@@ -6,10 +6,11 @@ import "../common/UsingRegistry.sol";
 import "./IdentityProxy.sol";
 
 contract IdentityProxyHub is UsingRegistry, ICeloVersionedContract {
-  bytes32 public constant identityProxyCodeHash = keccak256(
-    // solhint-disable-next-line indent
-    abi.encodePacked(type(IdentityProxy).creationCode)
-  );
+  bytes32 public constant identityProxyCodeHash =
+    keccak256(
+      // solhint-disable-next-line indent
+      abi.encodePacked(type(IdentityProxy).creationCode)
+    );
 
   /**
    * @notice Performs an arbitrary call through the identifier's IdentityProxy,
@@ -19,11 +20,11 @@ contract IdentityProxyHub is UsingRegistry, ICeloVersionedContract {
    * @param data The calldata the IdentityProxy should send with the call.
    * @return The return value of the external call.
    */
-  function makeCall(bytes32 identifier, address destination, bytes calldata data)
-    external
-    payable
-    returns (bytes memory)
-  {
+  function makeCall(
+    bytes32 identifier,
+    address destination,
+    bytes calldata data
+  ) external payable returns (bytes memory) {
     require(passesIdentityHeuristic(msg.sender, identifier), "does not pass identity heuristic");
     return getOrDeployIdentityProxy(identifier).makeCall.value(msg.value)(destination, data);
   }

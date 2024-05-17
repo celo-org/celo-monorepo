@@ -119,7 +119,7 @@ contract FeeCurrencyAdapterTest is Test {
 
 contract FeeCurrencyAdapter_Initialize is FeeCurrencyAdapterTest {
   function test_ShouldSetDigitDifference() public {
-    assertEq(feeCurrencyAdapter.digitDifference(), 10**12);
+    assertEq(feeCurrencyAdapter.digitDifference(), 10 ** 12);
   }
 
   function test_shouldRevertWhenCalledAgain() public {
@@ -358,7 +358,7 @@ contract FeeCurrencyAdapter_UpscaleAndDownScaleTests is FeeCurrencyAdapterTest {
   }
 
   function test_ShouldRevertUpscale_WhenOverflow() public {
-    uint256 digitDifference = 10**12;
+    uint256 digitDifference = 10 ** 12;
     uint256 maxValue = type(uint256).max;
     uint256 boundaryValue = maxValue / digitDifference + 1;
 

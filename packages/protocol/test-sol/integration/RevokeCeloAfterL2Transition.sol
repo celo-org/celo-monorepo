@@ -63,16 +63,18 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
   address authorizedVoteSigner2;
   uint256 authorizedVoteSignerPK2;
 
-  bytes public constant blsPublicKey = abi.encodePacked(
-    bytes32(0x0101010101010101010101010101010101010101010101010101010101010101),
-    bytes32(0x0202020202020202020202020202020202020202020202020202020202020202),
-    bytes32(0x0303030303030303030303030303030303030303030303030303030303030303)
-  );
-  bytes public constant blsPop = abi.encodePacked(
-    bytes16(0x04040404040404040404040404040404),
-    bytes16(0x05050505050505050505050505050505),
-    bytes16(0x06060606060606060606060606060606)
-  );
+  bytes public constant blsPublicKey =
+    abi.encodePacked(
+      bytes32(0x0101010101010101010101010101010101010101010101010101010101010101),
+      bytes32(0x0202020202020202020202020202020202020202020202020202020202020202),
+      bytes32(0x0303030303030303030303030303030303030303030303030303030303030303)
+    );
+  bytes public constant blsPop =
+    abi.encodePacked(
+      bytes16(0x04040404040404040404040404040404),
+      bytes16(0x05050505050505050505050505050505),
+      bytes16(0x06060606060606060606060606060606)
+    );
 
   struct ValidatorLockedGoldRequirements {
     uint256 value;
@@ -158,11 +160,11 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
     expectedParticipationBaseline = FixidityLib
       .multiply(baselineUpdateFactor, FixidityLib.fixed1())
       .add(
-      FixidityLib.multiply(
-        FixidityLib.fixed1().subtract(baselineUpdateFactor),
-        participationBaseline
+        FixidityLib.multiply(
+          FixidityLib.fixed1().subtract(baselineUpdateFactor),
+          participationBaseline
+        )
       )
-    )
       .unwrap();
 
     address registryAddress = 0x000000000000000000000000000000000000ce10;
@@ -323,10 +325,10 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
     }
   }
 
-  function _registerValidatorHelper(address _validator, uint256 _validatorPk)
-    internal
-    returns (bytes memory)
-  {
+  function _registerValidatorHelper(
+    address _validator,
+    uint256 _validatorPk
+  ) internal returns (bytes memory) {
     if (!accounts.isAccount(_validator)) {
       vm.prank(_validator);
       accounts.createAccount();
@@ -346,21 +348,20 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
     return _ecdsaPubKey;
   }
 
-  function _generateEcdsaPubKey(address _account, uint256 _accountPk)
-    internal
-    returns (bytes memory ecdsaPubKey)
-  {
+  function _generateEcdsaPubKey(
+    address _account,
+    uint256 _accountPk
+  ) internal returns (bytes memory ecdsaPubKey) {
     (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(_account, _accountPk);
     bytes32 addressHash = keccak256(abi.encodePacked(_account));
 
     ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
   }
 
-  function getParsedSignatureOfAddress(address _address, uint256 privateKey)
-    public
-    pure
-    returns (uint8, bytes32, bytes32)
-  {
+  function getParsedSignatureOfAddress(
+    address _address,
+    uint256 privateKey
+  ) public pure returns (uint8, bytes32, bytes32) {
     bytes32 addressHash = keccak256(abi.encodePacked(_address));
     bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
     return vm.sign(privateKey, prefixedHash);
@@ -453,10 +454,10 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
     vm.stopPrank();
   }
 
-  function _generateEcdsaPubKeyWithSigner(address _validator, uint256 _signerPk)
-    internal
-    returns (bytes memory ecdsaPubKey, uint8 v, bytes32 r, bytes32 s)
-  {
+  function _generateEcdsaPubKeyWithSigner(
+    address _validator,
+    uint256 _signerPk
+  ) internal returns (bytes memory ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) {
     (v, r, s) = getParsedSignatureOfAddress(_validator, _signerPk);
 
     bytes32 addressHash = keccak256(abi.encodePacked(_validator));
@@ -464,10 +465,10 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
     ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
   }
 
-  function _registerValidatorWithSignerHelper(address _validator, uint256 signerPk)
-    internal
-    returns (bytes memory)
-  {
+  function _registerValidatorWithSignerHelper(
+    address _validator,
+    uint256 signerPk
+  ) internal returns (bytes memory) {
     (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
       _validator,
       signerPk

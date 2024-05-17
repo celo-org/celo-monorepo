@@ -84,11 +84,10 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
     }
   }
 
-  function getParsedSignatureOfAddress(address _address, uint256 privateKey)
-    public
-    pure
-    returns (uint8, bytes32, bytes32)
-  {
+  function getParsedSignatureOfAddress(
+    address _address,
+    uint256 privateKey
+  ) public pure returns (uint8, bytes32, bytes32) {
     bytes32 addressHash = keccak256(abi.encodePacked(_address));
     bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
     return vm.sign(privateKey, prefixedHash);
@@ -221,7 +220,6 @@ contract Transfer is ReleaseGoldTest {
     assertEq(stableToken.balanceOf(address(releaseGold)), 0);
     assertEq(stableToken.balanceOf(receiver), transferAmount);
   }
-
 }
 
 contract GenericTransfer is ReleaseGoldTest {
@@ -255,7 +253,6 @@ contract GenericTransfer is ReleaseGoldTest {
     vm.prank(beneficiary);
     releaseGold.genericTransfer(address(goldToken), receiver, transferAmount);
   }
-
 }
 
 contract Creation is ReleaseGoldTest {
@@ -381,7 +378,6 @@ contract Creation is ReleaseGoldTest {
     vm.expectRevert("unsuccessful tunnel call");
     tunnel.MockInitialize(owner, initParams, initParams2);
   }
-
 }
 
 contract SetBeneficiary is ReleaseGoldTest {
@@ -628,7 +624,8 @@ contract SetAccountMetadataURL is ReleaseGoldTest {
 
 contract SetAccountDataEncryptionKey is ReleaseGoldTest {
   bytes dataEncryptionKey = hex"02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111";
-  bytes longDataEncryptionKey = hex"04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0161111111102f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111";
+  bytes longDataEncryptionKey =
+    hex"04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0161111111102f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111";
 
   function setUp() public {
     super.setUp();
@@ -654,7 +651,8 @@ contract SetAccountDataEncryptionKey is ReleaseGoldTest {
   }
 
   function test_ShouldAllowSettingAKeyWithLEadingZeros() public {
-    bytes memory keyWithLeadingZeros = hex"00000000000000000000000000000000000000000000000f2f48ee19680706191111";
+    bytes
+      memory keyWithLeadingZeros = hex"00000000000000000000000000000000000000000000000f2f48ee19680706191111";
     vm.prank(beneficiary);
     releaseGold.setAccountDataEncryptionKey(keyWithLeadingZeros);
     assertEq(accounts.getDataEncryptionKey(address(releaseGold)), keyWithLeadingZeros);
@@ -672,7 +670,6 @@ contract SetAccountDataEncryptionKey is ReleaseGoldTest {
     releaseGold.setAccountDataEncryptionKey(longDataEncryptionKey);
     assertEq(accounts.getDataEncryptionKey(address(releaseGold)), longDataEncryptionKey);
   }
-
 }
 
 contract SetMaxDistribution is ReleaseGoldTest {
