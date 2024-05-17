@@ -12,6 +12,7 @@ contract IsL2Check {
     }
     _;
   }
+
   modifier onlyL2() {
     if (isL1()) {
       revert("This method is not supported in L1.");

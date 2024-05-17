@@ -59,7 +59,7 @@ jobs:
       - name: Run tests governance/validators
         if: success() || failure()
         run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/governance/validators/*"
-
+      
       - name: Run tests governance/voting
         # can't use gas limit because some setUp function use more than the limit
         if: success() || failure()

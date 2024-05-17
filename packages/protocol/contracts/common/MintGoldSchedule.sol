@@ -24,14 +24,12 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   uint256 constant GOLD_SUPPLY_CAP = 1000000000 ether; // 1 billion Gold
   uint256 constant YEARS_LINEAR = 15;
   uint256 constant SECONDS_LINEAR = YEARS_LINEAR * 365 * 1 days;
-  uint256 constant SECONDS_LINEAR2 = YEARS_LINEAR * 365 * 1 days;
 
   uint256 public genesisStartTime = 1587587214; // Copied over from `EpochRewards().startTime()`.
   uint256 public l2StartTime;
   uint256 public totalSupplyAtL2Start;
 
-  // Indicates how much of the CELO has been minted so far.
-  uint256 public totalMinted;
+  uint256 public totalMintedBySchedule;
   address public communityRewardFund;
   address public carbonOffsettingPartner;
 
@@ -48,7 +46,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   constructor(bool test) public Initializable(test) {}
 
   /**
-   * @notice A constructor for initialising a new instance of a MintGold contract.
+   * @notice A constructor for initialising a new instance of a MintGoldSchedule contract.
    * @param _communityRewardFraction The percentage of rewards that go the community funds.
    * @param _carbonOffsettingPartner The address of the carbon offsetting partner.
    * @param _carbonOffsettingFraction The percentage of rewards going to carbon offsetting partner.
@@ -71,7 +69,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   }
 
   /**
-   * @notice Mints CELO to the beneficiaries according to the predefined schedule.
+   * @notice Mints CELO to the community and carbon offsetting funds according to the predefined schedule.
    */
   function mintAccordingToSchedule() external nonReentrant onlyL2 returns (bool) {
     (
@@ -87,7 +85,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       getRemainingBalanceToMint() >= mintableAmount,
       "Insufficient unlocked balance to mint amount"
     );
-    totalMinted = totalMinted.add(mintableAmount);
+    totalMintedBySchedule = totalMintedBySchedule.add(mintableAmount);
 
     require(
       FixidityLib.newFixed(1).gt(communityRewardFraction.add(carbonOffsettingFraction)),
@@ -176,8 +174,11 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     return GOLD_SUPPLY_CAP.sub(getGoldToken().totalSupply());
   }
 
+  /**
+   * @return The total balance minted by the MintGoldSchedule contract.
+   */
   function getTotalMintedBySchedule() public view returns (uint256) {
-    return totalMinted;
+    return totalMintedBySchedule;
   }
 
   /**
@@ -189,8 +190,10 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   }
 
   /**
-   * @notice Returns the target Gold supply according to the target schedule.
-   * @return The target Gold supply according to the target schedule.
+   * @notice Returns the target CELO supply according to the target schedule.
+   * @return The target total CELO supply according to the target schedule.
+   * @return The community reward that can be minted according to the target schedule.
+   * @return The carbon offsetting reward that can be minted according to the target schedule.
    */
   function getTargetGoldTotalSupply()
     public
@@ -245,7 +248,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
         .add(mintedOnL1);
 
       if (
-        totalMinted.add(GENESIS_GOLD_SUPPLY).add(mintedOnL1) <
+        totalMintedBySchedule.add(GENESIS_GOLD_SUPPLY).add(mintedOnL1) <
         communityTargetRewards.add(carbonFundTargetRewards).add(GENESIS_GOLD_SUPPLY).add(mintedOnL1)
       ) {
         return (targetGoldTotalSupply, communityTargetRewards, carbonFundTargetRewards);

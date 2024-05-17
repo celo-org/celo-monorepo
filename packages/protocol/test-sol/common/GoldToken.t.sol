@@ -190,6 +190,10 @@ contract GoldTokenTest_mint is GoldTokenTest {
     vm.prank(goldTokenOwner);
     vm.expectRevert("Only VM can call");
     goldToken.mint(receiver, ONE_GOLDTOKEN);
+
+    vm.prank(address(goldTokenMintingSchedule));
+    vm.expectRevert("Only VM can call");
+    goldToken.mint(receiver, ONE_GOLDTOKEN);
   }
 
   function test_Should_increaseGoldTokenTotalSupplyWhencalledByVm() public {

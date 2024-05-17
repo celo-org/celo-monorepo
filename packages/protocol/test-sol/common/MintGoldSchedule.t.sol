@@ -14,7 +14,6 @@ import "@test-sol/utils/ECDSAHelper.sol";
 import { Constants } from "@test-sol/constants.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 
-// XXX(soloseng): add L1 test.
 contract MintGoldScheduleMockTunnel is ForgeTest {
   struct InitParams {
     uint256 _communityRewardFraction;
@@ -208,7 +207,7 @@ contract MintGoldScheduleTest_Initialize is MintGoldScheduleTest {
 
   function test_ShouldHaveZeroTotalMintedByScheduleOnInit() public {
     newMintGold();
-    assertEq(mintGoldSchedule.totalMinted(), 0);
+    assertEq(mintGoldSchedule.totalMintedBySchedule(), 0);
   }
 
   function test_Reverts_WhenRegistryIsTheNullAddress() public {
@@ -330,7 +329,11 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
     vm.prank(randomAddress);
     mintGoldSchedule.mintAccordingToSchedule();
 
-    assertEq(mintGoldSchedule.totalMinted(), expectedMintedAmount, "Incorrect mintableAmount");
+    assertEq(
+      mintGoldSchedule.totalMintedBySchedule(),
+      expectedMintedAmount,
+      "Incorrect mintableAmount"
+    );
   }
 
   function test_ShouldAllowToMint50Percent5AndHalfYearsPostL2Launch() public {
@@ -342,8 +345,16 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
     vm.prank(randomAddress);
     mintGoldSchedule.mintAccordingToSchedule();
 
-    assertLe(mintGoldSchedule.totalMinted(), expectedMintedAmountUpper, "Incorrect mintableAmount");
-    assertGe(mintGoldSchedule.totalMinted(), expectedMintedAmountLower, "Incorrect mintableAmount");
+    assertLe(
+      mintGoldSchedule.totalMintedBySchedule(),
+      expectedMintedAmountUpper,
+      "Incorrect mintableAmount"
+    );
+    assertGe(
+      mintGoldSchedule.totalMintedBySchedule(),
+      expectedMintedAmountLower,
+      "Incorrect mintableAmount"
+    );
   }
 
   function test_ShouldAllowToMint75Percent11YearsAnd3MonthsPostL2Launch() public {
@@ -357,8 +368,16 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
     vm.prank(randomAddress);
     mintGoldSchedule.mintAccordingToSchedule();
 
-    assertLe(mintGoldSchedule.totalMinted(), expectedMintedAmountUpper, "Incorrect mintableAmount");
-    assertGe(mintGoldSchedule.totalMinted(), expectedMintedAmountLower, "Incorrect mintableAmount");
+    assertLe(
+      mintGoldSchedule.totalMintedBySchedule(),
+      expectedMintedAmountUpper,
+      "Incorrect mintableAmount"
+    );
+    assertGe(
+      mintGoldSchedule.totalMintedBySchedule(),
+      expectedMintedAmountLower,
+      "Incorrect mintableAmount"
+    );
   }
 
   function test_ShouldAllowToMint100Percent11YearsPostL2Launch() public {
@@ -372,12 +391,12 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
     mintGoldSchedule.mintAccordingToSchedule();
 
     assertLe(
-      mintGoldSchedule.totalMinted(),
+      mintGoldSchedule.totalMintedBySchedule(),
       MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION,
       "Incorrect mintableAmount"
     );
     assertGe(
-      mintGoldSchedule.totalMinted(),
+      mintGoldSchedule.totalMintedBySchedule(),
       MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION - 1 ether,
       "Incorrect mintableAmount"
     );
@@ -415,18 +434,18 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
   function test_ShouldMintUpToLinearSuppplyAfter15Years() public {
     vm.warp(block.timestamp + (15 * YEAR) + (1 * DAY));
 
-    assertEq(mintGoldSchedule.totalMinted(), 0, "Incorrect mintableAmount");
+    assertEq(mintGoldSchedule.totalMintedBySchedule(), 0, "Incorrect mintableAmount");
 
     vm.prank(randomAddress);
     mintGoldSchedule.mintAccordingToSchedule();
 
     assertGe(
-      mintGoldSchedule.totalMinted(),
+      mintGoldSchedule.totalMintedBySchedule(),
       MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION - 1 ether,
       "Incorrect mintableAmount"
     );
     assertLe(
-      mintGoldSchedule.totalMinted(),
+      mintGoldSchedule.totalMintedBySchedule(),
       MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION,
       "Incorrect mintableAmount"
     );
@@ -439,12 +458,12 @@ contract MintGoldScheduleTest_MintAccordingToSchedule is MintGoldScheduleTest {
     mintGoldSchedule.mintAccordingToSchedule();
 
     assertGe(
-      mintGoldSchedule.totalMinted(),
+      mintGoldSchedule.totalMintedBySchedule(),
       MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION - 1 ether,
       "Incorrect mintableAmount"
     );
     assertLe(
-      mintGoldSchedule.totalMinted(),
+      mintGoldSchedule.totalMintedBySchedule(),
       MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION,
       "Incorrect mintableAmount"
     );

@@ -208,9 +208,6 @@ contract GoldToken is
     totalSupply_ = totalSupply_.add(value);
 
     bool success;
-    // XXX:(soloseng) There is a check in geth to make sure caller is vm.
-    // TODO:(soloseng) This need to be modified for L2.
-
     (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(address(0), to, value));
     require(success, "CELO transfer failed");
 
@@ -221,6 +218,8 @@ contract GoldToken is
   /**
    * @notice Increases the variable for total amount of CELO in existence.
    * @param amount The amount to increase counter by
+   * @dev This function will be deprecated in L2. The onlyway to increase
+   * the supply is with the mint function.
    */
   function increaseSupply(uint256 amount) external onlyL1 onlyVm {
     totalSupply_ = totalSupply_.add(amount);
