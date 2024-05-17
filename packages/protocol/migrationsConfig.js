@@ -136,6 +136,11 @@ const DefaultConfig = {
   lockedGold: {
     unlockingPeriod: 3 * DAY,
   },
+  mintGoldSchedule: {
+    communityRewardFraction: 1 / 4,
+    carbonOffsettingPartner: '0xce10d577295d34782815919843a3a4ef70dc33ce',
+    carbonOffsettingFraction: 1 / 1000,
+  },
   oracles: {
     reportExpiry: 5 * MINUTE,
   },
