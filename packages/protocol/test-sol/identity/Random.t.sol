@@ -7,7 +7,7 @@ import { Utils } from "@test-sol/utils.sol";
 import "@celo-contracts/identity/Random.sol";
 import "@celo-contracts/identity/test/RandomTest.sol";
 
-contract SetRandomnessRetentionWindow is Test {
+contract RandomnessTest_SetRandomnessRetentionWindow is Test, IsL2Check {
   event RandomnessBlockRetentionWindowSet(uint256 value);
 
   RandomTest random;
@@ -33,9 +33,15 @@ contract SetRandomnessRetentionWindow is Test {
     vm.prank(address(0x45));
     random.setRandomnessBlockRetentionWindow(1000);
   }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    vm.expectRevert("This method is no longer supported in L2.");
+    random.setRandomnessBlockRetentionWindow(1000);
+  }
 }
 
-contract AddTestRandomness is Test, Utils {
+contract RandomnessTest_AddTestRandomness is Test, Utils, IsL2Check {
   uint256 constant RETENTION_WINDOW = 5;
   uint256 constant EPOCH_SIZE = 10;
 
@@ -208,9 +214,17 @@ contract AddTestRandomness is Test, Utils {
     vm.expectRevert("Cannot query randomness older than the stored history");
     random.getTestRandomness(lastBlockOfEpoch - EPOCH_SIZE, block.number);
   }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    vm.expectRevert("This method is no longer supported in L2.");
+    random.addTestRandomness(1, 0x0000000000000000000000000000000000000000000000000000000000000001);
+    vm.expectRevert("This method is no longer supported in L2.");
+    random.getTestRandomness(1, 4);
+  }
 }
 
-contract RevealAndCommit is Test, Utils {
+contract RandomnessTest_RevealAndCommit is Test, Utils, IsL2Check {
   address constant ACCOUNT = address(0x01);
   bytes32 constant RANDONMESS = bytes32(uint256(0x00));
 
@@ -245,5 +259,12 @@ contract RevealAndCommit is Test, Utils {
     bytes32 expected = keccak256(abi.encodePacked(lastRandomness, bytes32(uint256(0x01))));
 
     assertEq(random.getBlockRandomness(block.number), expected);
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    vm.expectRevert("This method is no longer supported in L2.");
+    blockTravel(2);
+    random.testRevealAndCommit(RANDONMESS, commitmentFor(0x01), ACCOUNT);
   }
 }
