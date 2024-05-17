@@ -223,6 +223,7 @@ contract Migration is Script, UsingRegistry {
     migrateUniswapFeeHandlerSeller();
     migrateFeeHandler(json);
     migrateOdisPayments();
+    migrateMintGoldSchedule(json);
     migrateGovernance(json);
 
     vm.stopBroadcast();
@@ -847,6 +848,35 @@ contract Migration is Script, UsingRegistry {
     deployProxiedContract(
       "OdisPayments",
       abi.encodeWithSelector(IOdisPaymentsInitializer.initialize.selector)
+    );
+  }
+
+  function migrateMintGoldSchedule(string memory json) public {
+    uint256 l2StartTime = abi.decode(json.parseRaw(".mintGoldSchedule.l2StartTime"), (uint256));
+
+    uint256 communityRewardFraction = abi.decode(
+      json.parseRaw(".mintGoldSchedule.communityRewardFraction"),
+      (uint256)
+    );
+    address carbonOffsettingPartner = abi.decode(
+      json.parseRaw(".mintGoldSchedule.carbonOffsettingPartner"),
+      (address)
+    );
+    uint256 carbonOffsettingFraction = abi.decode(
+      json.parseRaw(".mintGoldSchedule.carbonOffsettingFraction"),
+      (uint256)
+    );
+
+    address epochRewardsProxy = deployProxiedContract(
+      "MintGoldSchedule",
+      abi.encodeWithSelector(
+        IMintGoldScheduleInitializer.initialize.selector,
+        l2StartTime,
+        communityRewardFraction,
+        carbonOffsettingPartner,
+        carbonOffsettingFraction,
+        registryAddress
+      )
     );
   }
 
