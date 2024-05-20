@@ -79,7 +79,12 @@ contract DowntimeSlasherTest is Test, Utils {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  SlashingIncentives public expectedSlashingIncentives;
+  struct SlashingIncentives {
+    // Value of LockedGold to slash from the account.
+    uint256 penalty;
+    // Value of LockedGold to send to the observer.
+    uint256 reward;
+  }
 
   Registry registry;
   Accounts accounts;
@@ -117,12 +122,6 @@ contract DowntimeSlasherTest is Test, Utils {
   uint256 epoch;
   uint256 blockNumber;
 
-  struct SlashingIncentives {
-    // Value of LockedGold to slash from the account.
-    uint256 penalty;
-    // Value of LockedGold to send to the observer.
-    uint256 reward;
-  }
   uint256[] public _startingBlocks;
   uint256[] public _endingBlocks;
 
@@ -146,6 +145,7 @@ contract DowntimeSlasherTest is Test, Utils {
   uint256[] public groupElectionIndices = new uint256[](0);
 
   DowntimeSlasherMock.SlashParams slashParams;
+  SlashingIncentives public expectedSlashingIncentives;
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
   event SlashableDowntimeSet(uint256 interval);
@@ -228,13 +228,6 @@ contract DowntimeSlasherTest is Test, Utils {
     lockedGold.setAccountTotalLockedGold(otherGroup, 50000);
   }
 
-  function _getFirstBlockNumberOfEpoch(uint256 _epochNumber) internal view returns (uint256) {
-    if (_epochNumber == 0) {
-      return 0;
-    }
-    return (_epochNumber.sub(1)).mul(epochSize).add(1);
-  }
-
   // This function will wait until the middle of a new epoch is reached.
   // We consider blocks are "safe" if the test could perform a slash, without
   // the context of the other tests.
@@ -260,10 +253,10 @@ contract DowntimeSlasherTest is Test, Utils {
       slasher.setParentSealBitmap(i.add(1), i < nextEpochStart ? _bitmaps[0] : _bitmaps[1]);
     }
   }
-  function _calculateEverySlot(uint256 _startBlock)
-    internal
-    returns (uint256[] memory, uint256[] memory)
-  {
+
+  function _calculateEverySlot(
+    uint256 _startBlock
+  ) internal returns (uint256[] memory, uint256[] memory) {
     delete _startingBlocks;
     delete _endingBlocks;
     uint256 actualSlashableDowntime = slasher.slashableDowntime();
@@ -292,10 +285,10 @@ contract DowntimeSlasherTest is Test, Utils {
     return (_startingBlocks, _endingBlocks);
   }
 
-  function _ensureValidatorIsSlashable(uint256 startBlock, uint256[] memory validatorIndices)
-    internal
-    returns (uint256[] memory, uint256[] memory)
-  {
+  function _ensureValidatorIsSlashable(
+    uint256 startBlock,
+    uint256[] memory validatorIndices
+  ) internal returns (uint256[] memory, uint256[] memory) {
     bytes32[] memory bitmapMasks = new bytes32[](validatorIndices.length);
     bytes32[] memory _bitmaps = new bytes32[](1);
     _bitmaps[0] = bitmapVI01;
@@ -319,6 +312,13 @@ contract DowntimeSlasherTest is Test, Utils {
 
     _waitUntilSafeBlocks(epoch);
     slasher.setNumberValidators(2);
+  }
+
+  function _getFirstBlockNumberOfEpoch(uint256 _epochNumber) internal view returns (uint256) {
+    if (_epochNumber == 0) {
+      return 0;
+    }
+    return (_epochNumber.sub(1)).mul(epochSize).add(1);
   }
 }
 
@@ -1113,10 +1113,10 @@ contract DowntimeSlasherTestSlash_WhenIntervalCrossingEpoch is DowntimeSlasherTe
     address[] memory newValidatorsList = new address[](1);
     newValidatorsList[0] = validator;
 
-    (uint256[] memory _newStartBlocks, uint256[] memory _newEndBlocks) = _ensureValidatorIsSlashable(
-      newStartBlock,
-      _newSignerIndices
-    );
+    (
+      uint256[] memory _newStartBlocks,
+      uint256[] memory _newEndBlocks
+    ) = _ensureValidatorIsSlashable(newStartBlock, _newSignerIndices);
 
     slashParams = DowntimeSlasherMock.SlashParams({
       startBlocks: _newStartBlocks,
