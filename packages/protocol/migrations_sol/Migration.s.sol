@@ -11,8 +11,6 @@ import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
-// TODO(Arthur): import FeeCurrencyDirectory interface?
-import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts/common/interfaces/ICeloToken.sol"; // TODO move these to Initializer
 import "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
@@ -209,7 +207,6 @@ contract Migration is Script, UsingRegistry {
 
     migrateFreezer();
     migrateFeeCurrencyWhitelist();
-    // TODO(Arthur): Add FeeCurrencyDirectory here
     migrateFeeCurrencyDirectory();
     migrateGoldToken(json);
     migrateSortedOracles(json);
@@ -270,7 +267,6 @@ contract Migration is Script, UsingRegistry {
     );
   }
 
-  // TODO(Arthur): Add FeeCurrencyDirectory function
   function migrateFeeCurrencyDirectory() public {
     // TODO migrate the initializations interface
     deployProxiedContract(
@@ -426,16 +422,7 @@ contract Migration is Script, UsingRegistry {
     IReserve(registry.getAddressForStringOrDie("Reserve")).addToken(stableTokenProxyAddress);
 
     getFeeCurrencyWhitelist().addToken(stableTokenProxyAddress);
-    /* 
-    TODO(Arthur): Add stabletoken to FeeCurrencyDirectory 
-    1. Check that the syntax below is correct to .setCurrencyCongif
-    2. Set oracle address (is this sortedOracle?)
-    3. Set intrinsic gas value
-    */
-    /*
-    This is an arbitrary hex address I took from celoscan.
-    For now, I only want to test if I can set a currency config.
-    */
+    
     MockOracle mockOracle = new MockOracle();
     address mockOracleAddress = address(mockOracle);
     mockOracle.setExchangeRate(stableTokenProxyAddress, 10, 5); // TODO(Arthur): These are arbitrary numerator and denumerators.
@@ -977,7 +964,7 @@ contract Migration is Script, UsingRegistry {
         "EpochRewards",
         "Escrow",
         "FederatedAttestations",
-        "FeeCurrencyWhitelist", // TODO(Arthur): Add FeeCurrencyDirectory
+        "FeeCurrencyWhitelist",
         "FeeCurrencyDirectory",
         "Freezer",
         "FeeHandler",
