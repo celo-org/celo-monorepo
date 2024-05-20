@@ -4,6 +4,7 @@ import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
 import "openzeppelin-solidity/contracts/utils/Address.sol";
+// import "@ganache/console.log/console.sol";
 
 import "../common/FixidityLib.sol";
 import "../common/libraries/ReentrancyGuard.sol";
@@ -25,7 +26,8 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   uint256 constant YEARS_LINEAR = 15;
   uint256 constant SECONDS_LINEAR = YEARS_LINEAR * 365 * 1 days;
 
-  uint256 public genesisStartTime = 1587587214; // Copied over from `EpochRewards().startTime()`.
+  bool public areDependenciesSet;
+  uint256 constant genesisStartTime = 1587587214; // Copied over from `EpochRewards().startTime()`.
   uint256 public l2StartTime;
   uint256 public totalSupplyAtL2Start;
 
@@ -39,6 +41,11 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   event CommunityRewardFractionSet(uint256 fraction);
   event CarbonOffsettingFundSet(address indexed partner, uint256 fraction);
 
+  modifier whenDependenciesSet() {
+    require(areDependenciesSet, "Minting schedule has not been configured.");
+    _;
+  }
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -47,21 +54,28 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
 
   /**
    * @notice A constructor for initialising a new instance of a MintGoldSchedule contract.
-   * @param _l2StartTime timestamp for L1 to L2 transition
+   */
+  function initialize() external initializer {
+    _transferOwnership(msg.sender);
+  }
+
+  /**
+   * @notice Sets the minting schedule dependencies during L2 transition.
+   * @param _l2StartTime The timestamp of L1 to L2 transition.
    * @param _communityRewardFraction The percentage of rewards that go the community funds.
    * @param _carbonOffsettingPartner The address of the carbon offsetting partner.
    * @param _carbonOffsettingFraction The percentage of rewards going to carbon offsetting partner.
    * @param registryAddress Address of the deployed contracts registry.
    */
-  function initialize(
+  function setDependecies(
     uint256 _l2StartTime,
     uint256 _communityRewardFraction,
     address _carbonOffsettingPartner,
     uint256 _carbonOffsettingFraction,
     address registryAddress
-  ) external initializer {
-    _transferOwnership(msg.sender);
+  ) external onlyOwner onlyL2 {
     require(registryAddress != address(0), "The registry address cannot be the zero address");
+    areDependenciesSet = true;
     setRegistry(registryAddress);
     communityRewardFund = address(getGovernance());
     setCommunityRewardFraction(_communityRewardFraction);
@@ -134,7 +148,9 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
    * @param value The percentage of the total reward to be sent to the community funds.
    * @return True upon success.
    */
-  function setCommunityRewardFraction(uint256 value) public onlyOwner returns (bool) {
+  function setCommunityRewardFraction(
+    uint256 value
+  ) public onlyOwner whenDependenciesSet returns (bool) {
     require(
       value != communityRewardFraction.unwrap() && value < FixidityLib.fixed1().unwrap(),
       "Value must be different from existing community reward fraction and less than 1."
@@ -154,7 +170,10 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
    * @param value The percentage of the total reward to be sent to the carbon offsetting partner.
    * @return True upon success.
    */
-  function setCarbonOffsettingFund(address partner, uint256 value) public onlyOwner returns (bool) {
+  function setCarbonOffsettingFund(
+    address partner,
+    uint256 value
+  ) public onlyOwner whenDependenciesSet returns (bool) {
     require(partner != address(0), "Partner cannot be the zero address.");
     require(
       partner != carbonOffsettingPartner || value != carbonOffsettingFraction.unwrap(),
@@ -203,6 +222,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   function getTargetGoldTotalSupply()
     public
     view
+    whenDependenciesSet
     returns (
       uint256 targetGoldTotalSupply,
       uint256 communityTargetRewards,
