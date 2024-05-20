@@ -45,9 +45,6 @@ import "./HelperInterFaces.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 import "@celo-contracts-8/common/UsingRegistry.sol";
-import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol"; // TODO(Arthur): Is this a duplicate?
-
-import "@celo-contracts-8/common/mocks/MockOracle.sol";
 
 contract ForceTx {
   // event to trigger so a tx can be processed
