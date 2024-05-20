@@ -422,19 +422,16 @@ contract Migration is Script, UsingRegistry {
     IReserve(registry.getAddressForStringOrDie("Reserve")).addToken(stableTokenProxyAddress);
 
     getFeeCurrencyWhitelist().addToken(stableTokenProxyAddress);
-    
-    MockOracle mockOracle = new MockOracle();
-    address mockOracleAddress = address(mockOracle);
-    mockOracle.setExchangeRate(stableTokenProxyAddress, 10, 5); // TODO(Arthur): These are arbitrary numerator and denumerators.
 
     /*
     Arbitrary intrinsic gas number take from existing `FeeCurrencyDirectory.t.sol` tests
     Source: https://github.com/celo-org/celo-monorepo/blob/2cec07d43328cf4216c62491a35eacc4960fffb6/packages/protocol/test-sol/common/FeeCurrencyDirectory.t.sol#L27 
     */
     uint256 mockIntrinsicGas = 21000;
+    
     FeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory")).setCurrencyConfig(
       stableTokenProxyAddress,
-      mockOracleAddress, 
+      address(getSortedOracles()), 
       mockIntrinsicGas
     );
   }
