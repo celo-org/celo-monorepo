@@ -18,5 +18,4 @@ contract GoldTokenHarness is GoldToken {
     emit Transfer(msg.sender, to, value);
     return true;
   }
-
 }

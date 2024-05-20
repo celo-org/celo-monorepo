@@ -11,15 +11,16 @@ library CIP20Lib {
   uint8 private constant BLAKE2S_SELECTOR = 0x10;
 
   // BLAKE2S_DEFAULT_CONFIG = createBlake2sConfig(32, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0)
-  bytes32 private constant BLAKE2S_DEFAULT_CONFIG = 0x2000010100000000000000000000000000000000000000000000000000000000;
+  bytes32 private constant BLAKE2S_DEFAULT_CONFIG =
+    0x2000010100000000000000000000000000000000000000000000000000000000;
 
   // Accepts a fully formed input blob. This should include any config
   // options and the preimage, but not the selector.
-  function executeCIP20(bytes memory input, uint8 selector, uint256 output_len)
-    internal
-    view
-    returns (bytes memory)
-  {
+  function executeCIP20(
+    bytes memory input,
+    uint8 selector,
+    uint256 output_len
+  ) internal view returns (bytes memory) {
     uint8 addr = CIP20_ADDRESS;
     bytes memory output = new bytes(output_len);
 
@@ -66,11 +67,11 @@ library CIP20Lib {
     return executeCIP20(input, SHA2_512_SELECTOR, 64);
   }
 
-  function blake2sWithConfig(bytes32 config, bytes memory key, bytes memory preimage)
-    internal
-    view
-    returns (bytes memory)
-  {
+  function blake2sWithConfig(
+    bytes32 config,
+    bytes memory key,
+    bytes memory preimage
+  ) internal view returns (bytes memory) {
     require(
       key.length == uint256(config >> (8 * 30)) & 0xff,
       "CIP20Lib/blake2sWithConfig - Provided key length does not match key length in config"

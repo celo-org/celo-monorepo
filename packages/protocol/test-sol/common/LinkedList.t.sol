@@ -16,7 +16,6 @@ contract LinkedListTest is Test {
   function setUp() public {
     linkedList = new LinkedListWrapper();
   }
-
 }
 
 contract LinkedListTest_insert is LinkedListTest {

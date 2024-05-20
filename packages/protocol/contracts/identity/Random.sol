@@ -8,6 +8,7 @@ import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts-0.8/common/IsL2Check.sol";
 
 /**
  * @title Provides randomness for verifier selection
@@ -18,7 +19,8 @@ contract Random is
   Ownable,
   Initializable,
   UsingPrecompiles,
-  CalledByVm
+  CalledByVm,
+  IsL2Check
 {
   using SafeMath for uint256;
 
@@ -60,18 +62,20 @@ contract Random is
    * `randomness` and `newCommitment`. Before running regular transactions, this function should be
    * called.
    */
-  function revealAndCommit(bytes32 randomness, bytes32 newCommitment, address proposer)
-    external
-    onlyVm
-  {
+  function revealAndCommit(
+    bytes32 randomness,
+    bytes32 newCommitment,
+    address proposer
+  ) external onlyL1 onlyVm {
     _revealAndCommit(randomness, newCommitment, proposer);
   }
 
   /**
    * @notice Querying the current randomness value.
    * @return Returns the current randomness value.
+   * @dev Only available on L1.
    */
-  function random() external view returns (bytes32) {
+  function random() external view onlyL1 returns (bytes32) {
     return _getBlockRandomness(block.number, block.number);
   }
 
@@ -79,27 +83,29 @@ contract Random is
    * @notice Get randomness values of previous blocks.
    * @param blockNumber The number of block whose randomness value we want to know.
    * @return The associated randomness value.
+   * @dev Only available on L1.
    */
-  function getBlockRandomness(uint256 blockNumber) external view returns (bytes32) {
+  function getBlockRandomness(uint256 blockNumber) external view onlyL1 returns (bytes32) {
     return _getBlockRandomness(blockNumber, block.number);
   }
 
   /**
-  * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return Storage version of the contract.
    * @return Major version of the contract.
    * @return Minor version of the contract.
    * @return Patch version of the contract.
-  */
+   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 2, 0);
   }
 
   /**
    * @notice Sets the number of old random blocks whose randomness values can be queried.
    * @param value Number of old random blocks whose randomness values can be queried.
+   * @dev Only available on L1.
    */
-  function setRandomnessBlockRetentionWindow(uint256 value) public onlyOwner {
+  function setRandomnessBlockRetentionWindow(uint256 value) public onlyL1 onlyOwner {
     require(value > 0, "randomnessBlockRetetionWindow cannot be zero");
     randomnessBlockRetentionWindow = value;
     emit RandomnessBlockRetentionWindowSet(value);
@@ -119,8 +125,13 @@ contract Random is
    * @param randomness Bytes that will be added to the entropy pool.
    * @param newCommitment The hash of randomness that will be revealed in the future.
    * @param proposer Address of the block proposer.
+   * @dev Only available on L1.
    */
-  function _revealAndCommit(bytes32 randomness, bytes32 newCommitment, address proposer) internal {
+  function _revealAndCommit(
+    bytes32 randomness,
+    bytes32 newCommitment,
+    address proposer
+  ) internal onlyL1 {
     require(newCommitment != computeCommitment(0), "cannot commit zero randomness");
 
     // ensure revealed randomness matches previous commitment
@@ -148,8 +159,9 @@ contract Random is
    * @param randomness The new randomness added to history.
    * @dev The calls to this function should be made so that on the next call, blockNumber will
    * be the previous one, incremented by one.
+   * @dev Only available on L1.
    */
-  function addRandomness(uint256 blockNumber, bytes32 randomness) internal {
+  function addRandomness(uint256 blockNumber, bytes32 randomness) internal onlyL1 {
     history[blockNumber] = randomness;
     if (blockNumber % getEpochSize() == 0) {
       if (lastEpochBlock < historyFirst) {
@@ -186,8 +198,12 @@ contract Random is
    * @param blockNumber The number of block whose randomness value we want to know.
    * @param cur Number of the current block.
    * @return The associated randomness value.
+   * @dev Only available on L1.
    */
-  function _getBlockRandomness(uint256 blockNumber, uint256 cur) internal view returns (bytes32) {
+  function _getBlockRandomness(
+    uint256 blockNumber,
+    uint256 cur
+  ) internal view onlyL1 returns (bytes32) {
     require(blockNumber <= cur, "Cannot query randomness of future blocks");
     require(
       blockNumber == lastEpochBlock ||
@@ -198,5 +214,4 @@ contract Random is
     );
     return history[blockNumber];
   }
-
 }

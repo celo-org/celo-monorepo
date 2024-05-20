@@ -202,5 +202,4 @@ contract ProxyTest_fallback is ProxyTest {
     assertEq(numberReturn, numberTotest);
     assertEq(stringReturn, "DON'T PANIC");
   }
-
 }

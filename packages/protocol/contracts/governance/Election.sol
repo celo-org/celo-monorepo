@@ -15,6 +15,7 @@ import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/Heap.sol";
 import "../common/libraries/ReentrancyGuard.sol";
+import "../../contracts-0.8/common/IsL2Check.sol";
 
 contract Election is
   IElection,
@@ -24,7 +25,8 @@ contract Election is
   Initializable,
   UsingRegistry,
   UsingPrecompiles,
-  CalledByVm
+  CalledByVm,
+  IsL2Check
 {
   using AddressSortedLinkedList for SortedLinkedList.List;
   using FixidityLib for FixidityLib.Fraction;
@@ -191,11 +193,12 @@ contract Election is
    * @return True upon success.
    * @dev Fails if `group` is empty or not a validator group.
    */
-  function vote(address group, uint256 value, address lesser, address greater)
-    external
-    nonReentrant
-    returns (bool)
-  {
+  function vote(
+    address group,
+    uint256 value,
+    address lesser,
+    address greater
+  ) external nonReentrant onlyL1 returns (bool) {
     require(votes.total.eligible.contains(group), "Group not eligible");
     require(0 < value, "Vote value cannot be zero");
     require(canReceiveVotes(group, value), "Group cannot receive votes");
@@ -228,7 +231,7 @@ contract Election is
    * @return True upon success.
    * @dev Pending votes cannot be activated until an election has been held.
    */
-  function activate(address group) external nonReentrant returns (bool) {
+  function activate(address group) external nonReentrant onlyL1 returns (bool) {
     address account = getAccounts().voteSignerToAccount(msg.sender);
     return _activate(group, account);
   }
@@ -240,7 +243,10 @@ contract Election is
    * @return True upon success.
    * @dev Pending votes cannot be activated until an election has been held.
    */
-  function activateForAccount(address group, address account) external nonReentrant returns (bool) {
+  function activateForAccount(
+    address group,
+    address account
+  ) external nonReentrant onlyL1 returns (bool) {
     return _activate(group, account);
   }
 
@@ -291,11 +297,12 @@ contract Election is
    * @return True upon success.
    * @dev Fails if the account has not voted on a validator group.
    */
-  function revokeAllActive(address group, address lesser, address greater, uint256 index)
-    external
-    nonReentrant
-    returns (bool)
-  {
+  function revokeAllActive(
+    address group,
+    address lesser,
+    address greater,
+    uint256 index
+  ) external nonReentrant returns (bool) {
     address account = getAccounts().voteSignerToAccount(msg.sender);
     uint256 value = getActiveVotesForGroupByAccount(group, account);
     return _revokeActive(group, value, lesser, greater, index);
@@ -331,10 +338,12 @@ contract Election is
    * @param greater The group receiving more votes than `group` after the rewards are added.
    * @dev Can only be called directly by the protocol.
    */
-  function distributeEpochRewards(address group, uint256 value, address lesser, address greater)
-    external
-    onlyVm
-  {
+  function distributeEpochRewards(
+    address group,
+    uint256 value,
+    address lesser,
+    address greater
+  ) external onlyVm onlyL1 {
     _distributeEpochRewards(group, value, lesser, greater);
   }
 
@@ -343,10 +352,9 @@ contract Election is
    * @param group The address of the validator group.
    * @dev Can only be called by the registered "Validators" contract.
    */
-  function markGroupIneligible(address group)
-    external
-    onlyRegisteredContract(VALIDATORS_REGISTRY_ID)
-  {
+  function markGroupIneligible(
+    address group
+  ) external onlyRegisteredContract(VALIDATORS_REGISTRY_ID) {
     votes.total.eligible.remove(group);
     emit ValidatorGroupMarkedIneligible(group);
   }
@@ -357,10 +365,11 @@ contract Election is
    * @param lesser The address of the group that has received fewer votes than this group.
    * @param greater The address of the group that has received more votes than this group.
    */
-  function markGroupEligible(address group, address lesser, address greater)
-    external
-    onlyRegisteredContract(VALIDATORS_REGISTRY_ID)
-  {
+  function markGroupEligible(
+    address group,
+    address lesser,
+    address greater
+  ) external onlyL1 onlyRegisteredContract(VALIDATORS_REGISTRY_ID) {
     uint256 value = getTotalVotesForGroup(group);
     votes.total.eligible.insert(group, value, lesser, greater);
     emit ValidatorGroupMarkedEligible(group);
@@ -498,11 +507,10 @@ contract Election is
    * @param account The address of the voting account.
    * @return The active vote units for `group` made by `account`.
    */
-  function getActiveVoteUnitsForGroupByAccount(address group, address account)
-    external
-    view
-    returns (uint256)
-  {
+  function getActiveVoteUnitsForGroupByAccount(
+    address group,
+    address account
+  ) external view returns (uint256) {
     return votes.active.forGroup[group].unitsByAccount[account];
   }
 
@@ -569,7 +577,10 @@ contract Election is
    * @return Whether or not `account` has activatable votes for `group`.
    * @dev Pending votes cannot be activated until an election has been held.
    */
-  function hasActivatablePendingVotes(address account, address group) external view returns (bool) {
+  function hasActivatablePendingVotes(
+    address account,
+    address group
+  ) external view onlyL1 returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
     return pendingVote.epoch < getEpochNumber() && pendingVote.value > 0;
   }
@@ -599,7 +610,7 @@ contract Election is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 3, 0);
+    return (1, 1, 4, 0);
   }
 
   /**
@@ -608,7 +619,7 @@ contract Election is
    * @param max The maximum number of validators that can be elected.
    * @return True upon success.
    */
-  function setElectableValidators(uint256 min, uint256 max) public onlyOwner returns (bool) {
+  function setElectableValidators(uint256 min, uint256 max) public onlyOwner onlyL1 returns (bool) {
     require(0 < min, "Minimum electable validators cannot be zero");
     require(min <= max, "Maximum electable validators cannot be smaller than minimum");
     require(
@@ -625,7 +636,9 @@ contract Election is
    * @param _maxNumGroupsVotedFor The maximum number of groups an account can vote for.
    * @return True upon success.
    */
-  function setMaxNumGroupsVotedFor(uint256 _maxNumGroupsVotedFor) public onlyOwner returns (bool) {
+  function setMaxNumGroupsVotedFor(
+    uint256 _maxNumGroupsVotedFor
+  ) public onlyOwner onlyL1 returns (bool) {
     require(_maxNumGroupsVotedFor != maxNumGroupsVotedFor, "Max groups voted for not changed");
     maxNumGroupsVotedFor = _maxNumGroupsVotedFor;
     emit MaxNumGroupsVotedForSet(_maxNumGroupsVotedFor);
@@ -637,7 +650,7 @@ contract Election is
    * @param threshold Electability threshold as unwrapped Fraction.
    * @return True upon success.
    */
-  function setElectabilityThreshold(uint256 threshold) public onlyOwner returns (bool) {
+  function setElectabilityThreshold(uint256 threshold) public onlyOwner onlyL1 returns (bool) {
     electabilityThreshold = FixidityLib.wrap(threshold);
     require(
       electabilityThreshold.lt(FixidityLib.fixed1()),
@@ -653,8 +666,9 @@ contract Election is
    * @param group The address of the validator group.
    */
   function updateTotalVotesByAccountForGroup(address account, address group) public {
-    cachedVotesByAccount[account].totalVotes -= cachedVotesByAccount[account]
-      .cachedVotesPerGroup[group];
+    cachedVotesByAccount[account].totalVotes -= cachedVotesByAccount[account].cachedVotesPerGroup[
+      group
+    ];
     uint256 newTotalVotesForGroupByAccount = getTotalVotesForGroupByAccount(group, account);
     cachedVotesByAccount[account].cachedVotesPerGroup[group] = newTotalVotesForGroupByAccount;
     cachedVotesByAccount[account].totalVotes += newTotalVotesForGroupByAccount;
@@ -667,7 +681,7 @@ contract Election is
    * If not run, voting power of account will not reflect rewards awarded.
    * @param flag The on/off flag.
    */
-  function setAllowedToVoteOverMaxNumberOfGroups(bool flag) public {
+  function setAllowedToVoteOverMaxNumberOfGroups(bool flag) public onlyL1 {
     address account = getAccounts().voteSignerToAccount(msg.sender);
     IValidators validators = getValidators();
     require(
@@ -734,11 +748,10 @@ contract Election is
    * @return The list of elected validators.
    * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
    */
-  function electNValidatorSigners(uint256 minElectableValidators, uint256 maxElectableValidators)
-    public
-    view
-    returns (address[] memory)
-  {
+  function electNValidatorSigners(
+    uint256 minElectableValidators,
+    uint256 maxElectableValidators
+  ) public view returns (address[] memory) {
     // Groups must have at least `electabilityThreshold` proportion of the total votes to be
     // considered for the election.
     uint256 requiredVotes = electabilityThreshold
@@ -823,11 +836,10 @@ contract Election is
    * @param account The address of the voting account.
    * @return The pending votes for `group` made by `account`.
    */
-  function getPendingVotesForGroupByAccount(address group, address account)
-    public
-    view
-    returns (uint256)
-  {
+  function getPendingVotesForGroupByAccount(
+    address group,
+    address account
+  ) public view returns (uint256) {
     return votes.pending.forGroup[group].byAccount[account].value;
   }
 
@@ -837,11 +849,10 @@ contract Election is
    * @param account The address of the voting account.
    * @return The active votes for `group` made by `account`.
    */
-  function getActiveVotesForGroupByAccount(address group, address account)
-    public
-    view
-    returns (uint256)
-  {
+  function getActiveVotesForGroupByAccount(
+    address group,
+    address account
+  ) public view returns (uint256) {
     return unitsToVotes(group, votes.active.forGroup[group].unitsByAccount[account]);
   }
 
@@ -851,11 +862,10 @@ contract Election is
    * @param account The address of the voting account.
    * @return The total votes for `group` made by `account`.
    */
-  function getTotalVotesForGroupByAccount(address group, address account)
-    public
-    view
-    returns (uint256)
-  {
+  function getTotalVotesForGroupByAccount(
+    address group,
+    address account
+  ) public view returns (uint256) {
     uint256 pending = getPendingVotesForGroupByAccount(group, account);
     uint256 active = getActiveVotesForGroupByAccount(group, account);
     return pending.add(active);
@@ -895,9 +905,12 @@ contract Election is
    * @param lesser The group receiving fewer votes than `group` after the rewards are added.
    * @param greater The group receiving more votes than `group` after the rewards are added.
    */
-  function _distributeEpochRewards(address group, uint256 value, address lesser, address greater)
-    internal
-  {
+  function _distributeEpochRewards(
+    address group,
+    uint256 value,
+    address lesser,
+    address greater
+  ) internal onlyL1 {
     if (votes.total.eligible.contains(group)) {
       uint256 newVoteTotal = votes.total.eligible.getValue(group).add(value);
       votes.total.eligible.update(group, newVoteTotal, lesser, greater);
@@ -1087,10 +1100,11 @@ contract Election is
    * @param account The address of the voting account.
    * @param value The number of votes.
    */
-  function incrementActiveVotes(address group, address account, uint256 value)
-    private
-    returns (uint256)
-  {
+  function incrementActiveVotes(
+    address group,
+    address account,
+    uint256 value
+  ) private returns (uint256) {
     ActiveVotes storage active = votes.active;
     active.total = active.total.add(value);
 
@@ -1110,10 +1124,11 @@ contract Election is
    * @param account The address of the voting account.
    * @param value The number of votes.
    */
-  function decrementActiveVotes(address group, address account, uint256 value)
-    private
-    returns (uint256)
-  {
+  function decrementActiveVotes(
+    address group,
+    address account,
+    uint256 value
+  ) private returns (uint256) {
     ActiveVotes storage active = votes.active;
     active.total = active.total.sub(value);
 
@@ -1177,5 +1192,4 @@ contract Election is
         value.mul(votes.active.forGroup[group].total).div(votes.active.forGroup[group].totalUnits);
     }
   }
-
 }

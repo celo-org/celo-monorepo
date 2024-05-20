@@ -53,13 +53,14 @@ library B12 {
 
   // Base field modulus from https://eips.ethereum.org/EIPS/eip-2539#specification
   uint256 constant BLS12_377_BASE_A = 0x1ae3a4617c510eac63b05c06ca1493b;
-  uint256 constant BLS12_377_BASE_B = 0x1a22d9f300f5138f1ef3622fba094800170b5d44300000008508c00000000001;
+  uint256 constant BLS12_377_BASE_B =
+    0x1a22d9f300f5138f1ef3622fba094800170b5d44300000008508c00000000001;
 
-  function fpModExp(Fp memory base, uint256 exponent, Fp memory modulus)
-    internal
-    view
-    returns (Fp memory)
-  {
+  function fpModExp(
+    Fp memory base,
+    uint256 exponent,
+    Fp memory modulus
+  ) internal view returns (Fp memory) {
     uint256 base1 = base.a;
     uint256 base2 = base.b;
     uint256 modulus1 = modulus.a;
@@ -84,22 +85,23 @@ library B12 {
       // call the precompiled contract BigModExp (0x05)
       let success := staticcall(gas, 0x05, add(arg, 0x20), 0x100, add(ret, 0x20), 0x40)
       switch success
-        case 0 {
-          revert(0x0, 0x0)
-        }
-        default {
-          result1 := mload(add(0x20, ret))
-          result2 := mload(add(0x40, ret))
-        }
+      case 0 {
+        revert(0x0, 0x0)
+      }
+      default {
+        result1 := mload(add(0x20, ret))
+        result2 := mload(add(0x40, ret))
+      }
     }
     return Fp(result1, result2);
   }
 
-  function fpModExp2(Fp memory base, uint256 idx, uint256 exponent, Fp memory modulus)
-    internal
-    view
-    returns (Fp memory)
-  {
+  function fpModExp2(
+    Fp memory base,
+    uint256 idx,
+    uint256 exponent,
+    Fp memory modulus
+  ) internal view returns (Fp memory) {
     uint256 base1 = base.a;
     uint256 base2 = base.b;
     uint256 modulus1 = modulus.a;
@@ -124,13 +126,13 @@ library B12 {
       // call the precompiled contract BigModExp (0x05)
       let success := staticcall(gas, 0x05, add(arg, 0x20), add(idx, 0x100), add(ret, 0x20), 0x40)
       switch success
-        case 0 {
-          revert(0x0, 0x0)
-        }
-        default {
-          result1 := mload(add(0x20, ret))
-          result2 := mload(add(0x40, ret))
-        }
+      case 0 {
+        revert(0x0, 0x0)
+      }
+      default {
+        result1 := mload(add(0x20, ret))
+        result2 := mload(add(0x40, ret))
+      }
     }
     return Fp(result1, result2);
   }
@@ -183,11 +185,12 @@ library B12 {
     return fpModExp(a, 1, Fp(BLS12_377_BASE_A, BLS12_377_BASE_B));
   }
 
-  function mapToG2(Fp2 memory x, Fp2 memory hint1, Fp2 memory hint2, bool greatest)
-    internal
-    view
-    returns (G2Point memory)
-  {
+  function mapToG2(
+    Fp2 memory x,
+    Fp2 memory hint1,
+    Fp2 memory hint2,
+    bool greatest
+  ) internal view returns (G2Point memory) {
     Fp2 memory one = Fp2(Fp(0, 1), Fp(0, 0));
     Fp2 memory res = fp2Add(fp2Mul(x, fp2Mul(x, x)), one);
     Fp2 memory sqhint1 = fp2Mul(hint1, hint1);
@@ -199,11 +202,12 @@ library B12 {
     return p;
   }
 
-  function mapToG1(Fp memory x, Fp memory hint1, Fp memory hint2, bool greatest)
-    internal
-    view
-    returns (G1Point memory)
-  {
+  function mapToG1(
+    Fp memory x,
+    Fp memory hint1,
+    Fp memory hint2,
+    bool greatest
+  ) internal view returns (G1Point memory) {
     Fp memory one = Fp(0, 1);
     Fp memory res = fpAdd(fpModExp(x, 3, Fp(BLS12_377_BASE_A, BLS12_377_BASE_B)), one);
     Fp memory sqhint1 = fpModExp(hint1, 2, Fp(BLS12_377_BASE_A, BLS12_377_BASE_B));
@@ -214,11 +218,12 @@ library B12 {
     return G1Point(x, greatest ? hint1 : hint2);
   }
 
-  function g1Add(G1Point memory a, G1Point memory b, uint8 precompile, uint256 gasEstimate)
-    internal
-    view
-    returns (G1Point memory c)
-  {
+  function g1Add(
+    G1Point memory a,
+    G1Point memory b,
+    uint8 precompile,
+    uint256 gasEstimate
+  ) internal view returns (G1Point memory c) {
     uint256[8] memory input;
     input[0] = a.X.a;
     input[1] = a.X.b;
@@ -245,11 +250,12 @@ library B12 {
   }
 
   // Overwrites A
-  function g1Mul(G1Point memory a, uint256 scalar, uint8 precompile, uint256 gasEstimate)
-    internal
-    view
-    returns (G1Point memory c)
-  {
+  function g1Mul(
+    G1Point memory a,
+    uint256 scalar,
+    uint8 precompile,
+    uint256 gasEstimate
+  ) internal view returns (G1Point memory c) {
     uint256[5] memory input;
     input[0] = a.X.a;
     input[1] = a.X.b;
@@ -278,11 +284,11 @@ library B12 {
     c.Y.b = input[3];
   }
 
-  function g1MultiExp(G1MultiExpArg[] memory argVec, uint8 precompile, uint256 gasEstimate)
-    internal
-    view
-    returns (G1Point memory c)
-  {
+  function g1MultiExp(
+    G1MultiExpArg[] memory argVec,
+    uint8 precompile,
+    uint256 gasEstimate
+  ) internal view returns (G1Point memory c) {
     uint256[] memory input = new uint256[](argVec.length * 5);
     // hate this
     for (uint256 i = 0; i < argVec.length; i++) {
@@ -313,11 +319,12 @@ library B12 {
     c.Y.b = input[3];
   }
 
-  function g2Add(G2Point memory a, G2Point memory b, uint8 precompile, uint256 gasEstimate)
-    internal
-    view
-    returns (G2Point memory c)
-  {
+  function g2Add(
+    G2Point memory a,
+    G2Point memory b,
+    uint8 precompile,
+    uint256 gasEstimate
+  ) internal view returns (G2Point memory c) {
     uint256[16] memory input;
     input[0] = a.X.a.a;
     input[1] = a.X.a.b;
@@ -365,10 +372,12 @@ library B12 {
   }
 
   // Overwrites A
-  function g2Mul(G2Point memory a, uint256 scalar, uint8 precompile, uint256 gasEstimate)
-    internal
-    view
-  {
+  function g2Mul(
+    G2Point memory a,
+    uint256 scalar,
+    uint8 precompile,
+    uint256 gasEstimate
+  ) internal view {
     uint256[9] memory input;
 
     input[0] = a.X.a.a;
@@ -407,11 +416,11 @@ library B12 {
     a.Y.b.b = input[7];
   }
 
-  function g2MultiExp(G2MultiExpArg[] memory argVec, uint8 precompile, uint256 gasEstimate)
-    internal
-    view
-    returns (G2Point memory c)
-  {
+  function g2MultiExp(
+    G2MultiExpArg[] memory argVec,
+    uint8 precompile,
+    uint256 gasEstimate
+  ) internal view returns (G2Point memory c) {
     uint256[] memory input = new uint256[](argVec.length * 9);
     // hate this
     for (uint256 i = 0; i < input.length / 9; i += 1) {
@@ -451,11 +460,11 @@ library B12 {
     c.Y.b.b = input[7];
   }
 
-  function pairing(PairingArg[] memory argVec, uint8 precompile, uint256 gasEstimate)
-    internal
-    view
-    returns (bool result)
-  {
+  function pairing(
+    PairingArg[] memory argVec,
+    uint8 precompile,
+    uint256 gasEstimate
+  ) internal view returns (bool result) {
     uint256 len = argVec.length;
     uint256[] memory input = new uint256[](len * 12);
 
@@ -538,11 +547,10 @@ library B12 {
     return Fp(aa, bb);
   }
 
-  function parsePointGen(bytes memory h, uint256 offset)
-    internal
-    pure
-    returns (uint256, uint256, uint256)
-  {
+  function parsePointGen(
+    bytes memory h,
+    uint256 offset
+  ) internal pure returns (uint256, uint256, uint256) {
     uint256 a = 0;
     uint256 b = 0;
     for (uint256 i = 0; i < 32; i++) {
@@ -635,22 +643,20 @@ library B12 {
     ret.b.b = ref.indexUint(96, 32);
   }
 
-  function parseCompactFp(bytes memory input, uint256 offset)
-    internal
-    pure
-    returns (Fp memory ret)
-  {
+  function parseCompactFp(
+    bytes memory input,
+    uint256 offset
+  ) internal pure returns (Fp memory ret) {
     bytes29 ref = input.ref(0).postfix(input.length - offset, 0);
 
     ret.a = ref.indexUint(0, 16);
     ret.b = ref.indexUint(16, 32);
   }
 
-  function parseCompactFp2(bytes memory input, uint256 offset)
-    internal
-    pure
-    returns (Fp2 memory ret)
-  {
+  function parseCompactFp2(
+    bytes memory input,
+    uint256 offset
+  ) internal pure returns (Fp2 memory ret) {
     bytes29 ref = input.ref(0).postfix(input.length - offset, 0);
 
     ret.a.a = ref.indexUint(48, 16);
@@ -764,36 +770,31 @@ library B12_381Lib {
     }
   }
 
-  function g1Add(B12.G1Point memory a, B12.G1Point memory b)
-    internal
-    view
-    returns (B12.G1Point memory c)
-  {
+  function g1Add(
+    B12.G1Point memory a,
+    B12.G1Point memory b
+  ) internal view returns (B12.G1Point memory c) {
     return a.g1Add(b, G1_ADD, 15000);
   }
 
-  function g1Mul(B12.G1Point memory a, uint256 scalar)
-    internal
-    view
-    returns (B12.G1Point memory c)
-  {
+  function g1Mul(
+    B12.G1Point memory a,
+    uint256 scalar
+  ) internal view returns (B12.G1Point memory c) {
     return a.g1Mul(scalar, G1_MUL, 50000);
   }
 
-  function g1MultiExp(B12.G1MultiExpArg[] memory argVec)
-    internal
-    view
-    returns (B12.G1Point memory c)
-  {
+  function g1MultiExp(
+    B12.G1MultiExpArg[] memory argVec
+  ) internal view returns (B12.G1Point memory c) {
     uint256 roughCost = (argVec.length * 12000 * 1200) / 1000;
     return B12.g1MultiExp(argVec, G1_MULTI_EXP, roughCost);
   }
 
-  function g2Add(B12.G2Point memory a, B12.G2Point memory b)
-    internal
-    view
-    returns (B12.G2Point memory c)
-  {
+  function g2Add(
+    B12.G2Point memory a,
+    B12.G2Point memory b
+  ) internal view returns (B12.G2Point memory c) {
     return a.g2Add(b, G2_ADD, 20000);
   }
 
@@ -801,11 +802,9 @@ library B12_381Lib {
     return a.g2Mul(scalar, G2_MUL, 60000);
   }
 
-  function g2MultiExp(B12.G2MultiExpArg[] memory argVec)
-    internal
-    view
-    returns (B12.G2Point memory c)
-  {
+  function g2MultiExp(
+    B12.G2MultiExpArg[] memory argVec
+  ) internal view returns (B12.G2Point memory c) {
     uint256 roughCost = (argVec.length * 55000 * 1200) / 1000;
     return B12.g2MultiExp(argVec, G2_MULTI_EXP, roughCost);
   }
@@ -835,36 +834,31 @@ library B12_377Lib {
   uint8 constant G2_MULTI_EXP = 0xE4;
   uint8 constant PAIRING = 0xE3;
 
-  function g1Add(B12.G1Point memory a, B12.G1Point memory b)
-    internal
-    view
-    returns (B12.G1Point memory c)
-  {
+  function g1Add(
+    B12.G1Point memory a,
+    B12.G1Point memory b
+  ) internal view returns (B12.G1Point memory c) {
     return a.g1Add(b, G1_ADD, 15000);
   }
 
-  function g1Mul(B12.G1Point memory a, uint256 scalar)
-    internal
-    view
-    returns (B12.G1Point memory c)
-  {
+  function g1Mul(
+    B12.G1Point memory a,
+    uint256 scalar
+  ) internal view returns (B12.G1Point memory c) {
     return a.g1Mul(scalar, G1_MUL, 50000);
   }
 
-  function g1MultiExp(B12.G1MultiExpArg[] memory argVec)
-    internal
-    view
-    returns (B12.G1Point memory c)
-  {
+  function g1MultiExp(
+    B12.G1MultiExpArg[] memory argVec
+  ) internal view returns (B12.G1Point memory c) {
     uint256 roughCost = (argVec.length * 12000 * 1200) / 1000;
     return B12.g1MultiExp(argVec, G1_MULTI_EXP, roughCost);
   }
 
-  function g2Add(B12.G2Point memory a, B12.G2Point memory b)
-    internal
-    view
-    returns (B12.G2Point memory c)
-  {
+  function g2Add(
+    B12.G2Point memory a,
+    B12.G2Point memory b
+  ) internal view returns (B12.G2Point memory c) {
     return a.g2Add(b, G2_ADD, 20000);
   }
 
@@ -872,11 +866,9 @@ library B12_377Lib {
     return a.g2Mul(scalar, G2_MUL, 60000);
   }
 
-  function g2MultiExp(B12.G2MultiExpArg[] memory argVec)
-    internal
-    view
-    returns (B12.G2Point memory c)
-  {
+  function g2MultiExp(
+    B12.G2MultiExpArg[] memory argVec
+  ) internal view returns (B12.G2Point memory c) {
     uint256 roughCost = (argVec.length * 55000 * 1200) / 1000;
     return B12.g2MultiExp(argVec, G2_MULTI_EXP, roughCost);
   }

@@ -38,5 +38,4 @@ contract GoldTokenMock is GoldToken(true) {
   function balanceOf(address a) public view returns (uint256) {
     return balances[a];
   }
-
 }

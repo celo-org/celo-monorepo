@@ -103,11 +103,10 @@ library FixidityLib {
    * Test newFixedFraction(1,1) returns fixed1()
    * Test newFixedFraction(1,fixed1()) returns 1
    */
-  function newFixedFraction(uint256 numerator, uint256 denominator)
-    internal
-    pure
-    returns (Fraction memory)
-  {
+  function newFixedFraction(
+    uint256 numerator,
+    uint256 denominator
+  ) internal pure returns (Fraction memory) {
     Fraction memory convertedNumerator = newFixed(numerator);
     Fraction memory convertedDenominator = newFixed(denominator);
     return divide(convertedNumerator, convertedDenominator);

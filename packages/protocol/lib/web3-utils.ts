@@ -214,7 +214,7 @@ export async function getDeployedProxiedContract<ContractInstance extends Truffl
 
   const Contract: Truffle.Contract<ContractInstance> = customArtifacts.require(contractName)
 
-  let Proxy:ProxyContract
+  let Proxy: ProxyContract
   // this wrap avoids a lot of rewrite
   const overloadedArtifact = ArtifactsSingleton.wrap(customArtifacts)
   // if global artifacts are not defined we need to handle it
@@ -267,7 +267,7 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
 }
 
 
-export const makeTruffleContractForMigrationWithoutSingleton = (contractName: string, network:any, contractPath:string, web3: Web3) => {
+export const makeTruffleContractForMigrationWithoutSingleton = (contractName: string, network: any, contractPath: string, web3: Web3) => {
 
   const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath}/${contractName}.json`)
   const Contract = truffleContract({
@@ -283,15 +283,15 @@ export const makeTruffleContractForMigrationWithoutSingleton = (contractName: st
     networkType: "ethereum",
     provider: web3.currentProvider
   })
-  Contract.configureNetwork({networkType: "ethereum", provider: web3.currentProvider})
+  Contract.configureNetwork({ networkType: "ethereum", provider: web3.currentProvider })
 
-  Contract.defaults({from: network.from, gas: network.gas})
+  Contract.defaults({ from: network.from, gas: network.gas })
 
   return Contract
 }
 
 
-export const makeTruffleContractForMigration = (contractName: string, contractPath:ContractPackage, web3: Web3) => {
+export const makeTruffleContractForMigration = (contractName: string, contractPath: ContractPackage, web3: Web3) => {
   const network = ArtifactsSingleton.getNetwork()
   const Contract = makeTruffleContractForMigrationWithoutSingleton(contractName, network, contractPath.name, web3)
   ArtifactsSingleton.getInstance(contractPath).addArtifact(contractName, Contract)
@@ -315,8 +315,8 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
     Contract = makeTruffleContractForMigration(name, artifactPath, web3)
 
     // This supports the case the proxy is in a different package
-    if (artifactPath.proxiesPath){
-      if (artifactPath.proxiesPath == "/"){
+    if (artifactPath.proxiesPath) {
+      if (artifactPath.proxiesPath == "/") {
         ContractProxy = artifacts.require(name + 'Proxy')
       } else {
         throw "Loading proxies for custom path not supported"
@@ -329,12 +329,11 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
     ContractProxy = artifacts.require(name + 'Proxy')
   }
 
-  const testingDeployment = false
   return (deployer: any, networkName: string, _accounts: string[]) => {
     console.info("\n-> Deploying", name)
 
     deployer.deploy(ContractProxy)
-    deployer.deploy(Contract, testingDeployment)
+    deployer.deploy(Contract, { gas: 5000000 })
 
     deployer.then(async () => {
       const proxy: ProxyInstance = await ContractProxy.deployed()
@@ -397,7 +396,7 @@ export async function transferOwnershipOfProxyAndImplementation<
 * Builds and returns mapping of function names to selectors.
 * Each function name maps to an array of selectors to account for overloading.
 */
-export function getFunctionSelectorsForContractProxy(contract: any, proxy: any, web3:any) {
+export function getFunctionSelectorsForContractProxy(contract: any, proxy: any, web3: any) {
   const selectors: { [index: string]: string[] } = {}
   proxy.abi
     .concat(contract.abi)
@@ -449,7 +448,7 @@ export function checkImports(baseContractName: string, derivativeContractArtifac
   const imports: any[] = derivativeContractArtifact.ast.nodes.filter((astNode: any) => isImport(astNode))
   while (imports.length) { // BFS
     const importedContractName = (imports.pop().file as string).split('/').pop().split('.')[0]
-    if (importedContractName ===  baseContractName) {
+    if (importedContractName === baseContractName) {
       return true
     }
     const importedContractArtifact = artifacts instanceof BuildArtifacts ?

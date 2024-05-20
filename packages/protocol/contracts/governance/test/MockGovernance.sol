@@ -20,10 +20,15 @@ contract MockGovernance is IGovernance {
     totalVotes[voter] = votes;
   }
 
-  function removeVotesWhenRevokingDelegatedVotes(address account, uint256 maxAmountAllowed)
-    external
-  {
+  function removeVotesWhenRevokingDelegatedVotes(
+    address account,
+    uint256 maxAmountAllowed
+  ) external {
     removeVotesCalledFor[account] = maxAmountAllowed;
+  }
+
+  function setConstitution(address destination, bytes4 functionId, uint256 threshold) external {
+    revert("not implemented");
   }
 
   function votePartially(
@@ -36,11 +41,9 @@ contract MockGovernance is IGovernance {
     return true;
   }
 
-  function getProposal(uint256 proposalId)
-    external
-    view
-    returns (address, uint256, uint256, uint256, string memory, uint256, bool)
-  {
+  function getProposal(
+    uint256 proposalId
+  ) external view returns (address, uint256, uint256, uint256, string memory, uint256, bool) {
     return (address(0), 0, 0, 0, "", 0, false);
   }
 

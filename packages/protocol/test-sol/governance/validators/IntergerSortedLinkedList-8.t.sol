@@ -22,11 +22,10 @@ contract IntegerSortedLinkedListTest8 is Test {
     integerSortedLinkedListMock = new IntegerSortedLinkedListMock();
   }
 
-  function parseElements(uint256[] memory keys, uint256[] memory values)
-    internal
-    pure
-    returns (SortedElement[] memory)
-  {
+  function parseElements(
+    uint256[] memory keys,
+    uint256[] memory values
+  ) internal pure returns (SortedElement[] memory) {
     require(
       keys.length == values.length,
       "Invalid input: keys and values must have the same length"
@@ -263,11 +262,10 @@ contract IntegerSortedLinkedListTest8_PopN is IntegerSortedLinkedListTest8 {
     integerSortedLinkedListMock.popN(numElements + 1);
   }
 
-  function generateExpectedPopped(uint256 _numElements, uint256 _n)
-    internal
-    pure
-    returns (uint256[] memory)
-  {
+  function generateExpectedPopped(
+    uint256 _numElements,
+    uint256 _n
+  ) internal pure returns (uint256[] memory) {
     require(_n <= _numElements, "Invalid input: _n must be less than or equal to _numElements");
 
     uint256[] memory expectedPopped = new uint256[](_n);
@@ -347,11 +345,9 @@ contract Handler is CommonBase, StdCheats, StdUtils {
 
   IntegerSortedLinkedListMock private listTest;
 
-  function getLesserAndGreater(ActionElement memory element)
-    internal
-    view
-    returns (uint256 lesser, uint256 greater)
-  {
+  function getLesserAndGreater(
+    ActionElement memory element
+  ) internal view returns (uint256 lesser, uint256 greater) {
     uint256[] memory keys;
     uint256[] memory values;
     (keys, values) = getElements();
@@ -376,11 +372,10 @@ contract Handler is CommonBase, StdCheats, StdUtils {
     return (lesser, greater);
   }
 
-  function parseActionElements(uint256[] memory keys, uint256[] memory values)
-    internal
-    pure
-    returns (ActionElement[] memory)
-  {
+  function parseActionElements(
+    uint256[] memory keys,
+    uint256[] memory values
+  ) internal pure returns (ActionElement[] memory) {
     require(
       keys.length == values.length,
       "Invalid input: keys and values must have the same length"
@@ -408,9 +403,12 @@ contract Handler is CommonBase, StdCheats, StdUtils {
     }
   }
 
-  function insertRandomly(uint256 key, uint256 value, uint256 lesserKey, uint256 greaterKey)
-    external
-  {
+  function insertRandomly(
+    uint256 key,
+    uint256 value,
+    uint256 lesserKey,
+    uint256 greaterKey
+  ) external {
     key = bound(key, 1, 10);
     lesserKey = bound(lesserKey, 0, 11);
     greaterKey = bound(greaterKey, 0, 11);
@@ -431,9 +429,12 @@ contract Handler is CommonBase, StdCheats, StdUtils {
     }
   }
 
-  function updateRandomly(uint256 key, uint256 value, uint256 lesserKey, uint256 greaterKey)
-    external
-  {
+  function updateRandomly(
+    uint256 key,
+    uint256 value,
+    uint256 lesserKey,
+    uint256 greaterKey
+  ) external {
     key = bound(key, 1, 10);
     lesserKey = bound(lesserKey, 0, 11);
     greaterKey = bound(greaterKey, 0, 11);

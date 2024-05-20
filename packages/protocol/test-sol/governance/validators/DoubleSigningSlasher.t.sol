@@ -81,6 +81,7 @@ contract DoubleSigningSlasherBaseTest is Test {
   address caller2;
   uint256 caller2PK;
   address public registryAddress = 0x000000000000000000000000000000000000ce10;
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   struct SlashingIncentives {
     // Value of LockedGold to slash from the account.
@@ -152,6 +153,10 @@ contract DoubleSigningSlasherBaseTest is Test {
     lockedGold.setAccountTotalLockedGold(otherValidator, 50000);
     lockedGold.setAccountTotalLockedGold(group, 50000);
     lockedGold.setAccountTotalLockedGold(otherGroup, 50000);
+  }
+
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
   }
 }
 
@@ -391,6 +396,25 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
     });
     slasher.mockSlash(params, validator);
     vm.expectRevert("Already slashed");
+    slasher.mockSlash(params, validator);
+  }
+
+  function test_Reverts_WhenL2() public {
+    _whenL2();
+    params = DoubleSigningSlasherTest.SlashParams({
+      signer: validator,
+      index: validatorIndex,
+      headerA: headerA,
+      headerB: headerC,
+      groupMembershipHistoryIndex: 0,
+      validatorElectionLessers: validatorElectionLessers,
+      validatorElectionGreaters: validatorElectionGreaters,
+      validatorElectionIndices: validatorElectionIndices,
+      groupElectionLessers: groupElectionLessers,
+      groupElectionGreaters: groupElectionGreaters,
+      groupElectionIndices: groupElectionIndices
+    });
+    vm.expectRevert("This method is no longer supported in L2.");
     slasher.mockSlash(params, validator);
   }
 }

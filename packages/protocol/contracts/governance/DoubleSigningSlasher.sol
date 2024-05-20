@@ -4,8 +4,9 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "./SlasherUtil.sol";
+import "../../contracts-0.8/common/IsL2Check.sol";
 
-contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
+contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil, IsL2Check {
   using SafeMath for uint256;
 
   // For each signer address, check if a block header has already been slashed
@@ -26,24 +27,25 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
    * @param _penalty Penalty for the slashed signer.
    * @param _reward Reward that the observer gets.
    */
-  function initialize(address registryAddress, uint256 _penalty, uint256 _reward)
-    external
-    initializer
-  {
+  function initialize(
+    address registryAddress,
+    uint256 _penalty,
+    uint256 _reward
+  ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setSlashingIncentives(_penalty, _reward);
   }
 
   /**
-  * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return Storage version of the contract.
    * @return Major version of the contract.
    * @return Minor version of the contract.
    * @return Patch version of the contract.
-  */
+   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 2, 0);
   }
 
   /**
@@ -79,7 +81,7 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
     address[] memory groupElectionLessers,
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
-  ) public {
+  ) public onlyL1 {
     checkIfAlreadySlashed(signer, headerA);
     checkIfAlreadySlashed(signer, headerB);
     uint256 blockNumber = checkForDoubleSigning(signer, index, headerA, headerB);
@@ -161,5 +163,4 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
     }
     return res;
   }
-
 }

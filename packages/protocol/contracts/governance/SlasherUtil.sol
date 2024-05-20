@@ -96,5 +96,4 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
     validators.forceDeaffiliateIfValidator(validator);
     validators.halveSlashingMultiplier(group);
   }
-
 }

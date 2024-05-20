@@ -10,8 +10,13 @@ interface IAccounts {
 
   function authorizeVoteSigner(address, uint8, bytes32, bytes32) external;
   function authorizeValidatorSigner(address, uint8, bytes32, bytes32) external;
-  function authorizeValidatorSignerWithPublicKey(address, uint8, bytes32, bytes32, bytes calldata)
-    external;
+  function authorizeValidatorSignerWithPublicKey(
+    address,
+    uint8,
+    bytes32,
+    bytes32,
+    bytes calldata
+  ) external;
   function authorizeValidatorSignerWithKeys(
     address,
     uint8,
@@ -22,6 +27,7 @@ interface IAccounts {
     bytes calldata
   ) external;
   function authorizeAttestationSigner(address, uint8, bytes32, bytes32) external;
+  function setEip712DomainSeparator() external;
   function createAccount() external returns (bool);
 
   function setPaymentDelegation(address, uint256) external;
@@ -38,10 +44,9 @@ interface IAccounts {
   function hasAuthorizedValidatorSigner(address) external view returns (bool);
   function hasAuthorizedAttestationSigner(address) external view returns (bool);
 
-  function batchGetMetadataURL(address[] calldata)
-    external
-    view
-    returns (uint256[] memory, bytes memory);
+  function batchGetMetadataURL(
+    address[] calldata
+  ) external view returns (uint256[] memory, bytes memory);
 
   function getDataEncryptionKey(address) external view returns (bytes memory);
   function getWalletAddress(address) external view returns (address);
