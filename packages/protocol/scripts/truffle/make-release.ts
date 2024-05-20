@@ -108,7 +108,7 @@ const deployImplementation = async (
   from: string,
   requireVersion = true
 ) => {
-  const testingDeployment = false
+  // const testingDeployment = false
   if (from) {
     Contract.defaults({ from }) // override truffle with provided from address
   }
@@ -118,9 +118,17 @@ const deployImplementation = async (
   // without this delay it sometimes fails with ProviderError
   await delay(getRandomNumber(1, 1000))
 
+  console.log('gas update in2')
+  console.log('dryRun', dryRun)
+
+  const bytecodeSize = (Contract.bytecode.length - 2) / 2
+  console.log('Bytecode size in bytes:', bytecodeSize)
+
   const contract = await (dryRun
     ? Contract.at(celoRegistryAddress)
-    : Contract.new(testingDeployment))
+    : Contract.new({
+        gas: 5000000, // Setting the gas limit
+      }))
 
   // Sanity check that any contracts that are being changed set a version number.
   const getVersionNumberAbi = contract.abi.find(
