@@ -7,7 +7,7 @@ forge build
 export ANVIL_PORT=8546
 
 # TODO make this configurable
-FROM_ACCOUNT_NO_ZERO="f39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+FROM_ACCOUNT_NO_ZERO="f39Fd6e51aad88F6F4ce6aB8827279cffFb92266" # This is Anvil's default account (1)
 FROM_ACCOUNT="0x$FROM_ACCOUNT_NO_ZERO"
 TEMP_FOLDER="$PWD/.tmp"
 

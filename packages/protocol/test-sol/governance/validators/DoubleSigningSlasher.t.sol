@@ -408,7 +408,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
       groupElectionGreaters: groupElectionGreaters,
       groupElectionIndices: groupElectionIndices
     });
-    vm.expectRevert("This method is not supported in L2 anymore.");
+    vm.expectRevert("This method is no longer supported in L2.");
     slasher.mockSlash(params);
   }
 }

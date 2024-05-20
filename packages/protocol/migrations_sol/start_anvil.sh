@@ -2,7 +2,7 @@
 set -euo pipefail
 
 timestamp=`date -Iseconds`
-ANVI_FILE="$TEMP_FOLDER/anvil_state-$timestamp"
+ANVIL_FILE="$TEMP_FOLDER/anvil_state-$timestamp"
 
 if nc -z localhost $ANVIL_PORT; then
   echo "Port already used"
@@ -12,7 +12,7 @@ fi
 
 
 
-anvil --port $ANVIL_PORT --gas-limit 50000000 --steps-tracing --code-size-limit 245760 --balance 60000 --dump-state $ANVI_FILE &
+anvil --port $ANVIL_PORT --gas-limit 50000000 --steps-tracing --code-size-limit 245760 --balance 60000 --dump-state $ANVIL_FILE &
 
 # alternatively:
 # ANVIL_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
