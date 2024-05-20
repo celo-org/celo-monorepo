@@ -425,14 +425,10 @@ contract Migration is Script, UsingRegistry {
     Source: https://github.com/celo-org/celo-monorepo/blob/2cec07d43328cf4216c62491a35eacc4960fffb6/packages/protocol/test-sol/common/FeeCurrencyDirectory.t.sol#L27 
     */
     uint256 mockIntrinsicGas = 21000;
-    
-    FeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory")).setCurrencyConfig(
-      stableTokenProxyAddress,
-      address(getSortedOracles()), 
-      mockIntrinsicGas
-    );
+
+    FeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory"))
+      .setCurrencyConfig(stableTokenProxyAddress, address(getSortedOracles()), mockIntrinsicGas);
   }
-  
 
   function migrateStableToken(string memory json) public {
     string[] memory names = abi.decode(json.parseRaw(".stableTokens.names"), (string[]));
