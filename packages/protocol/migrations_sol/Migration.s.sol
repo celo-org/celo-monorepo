@@ -49,6 +49,8 @@ import "@openzeppelin/contracts8/utils/math/Math.sol";
 import "@celo-contracts-8/common/UsingRegistry.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol"; // TODO(Arthur): Is this a duplicate?
 
+import "@celo-contracts-8/common/mocks/MockOracle.sol";
+
 contract ForceTx {
   // event to trigger so a tx can be processed
   event VanillaEvent(string);
@@ -434,7 +436,10 @@ contract Migration is Script, UsingRegistry {
     This is an arbitrary hex address I took from celoscan.
     For now, I only want to test if I can set a currency config.
     */
-    address mockOracleAddress = 0xefB84935239dAcdecF7c5bA76d8dE40b077B7b33;
+    MockOracle mockOracle = new MockOracle();
+    address mockOracleAddress = address(mockOracle);
+    mockOracle.setExchangeRate(stableTokenProxyAddress, 10, 5); // TODO(Arthur): These are arbitrary numerator and denumerators.
+
     /*
     Arbitrary intrinsic gas number take from existing `FeeCurrencyDirectory.t.sol` tests
     Source: https://github.com/celo-org/celo-monorepo/blob/2cec07d43328cf4216c62491a35eacc4960fffb6/packages/protocol/test-sol/common/FeeCurrencyDirectory.t.sol#L27 
@@ -442,7 +447,7 @@ contract Migration is Script, UsingRegistry {
     uint256 mockIntrinsicGas = 21000;
     FeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory")).setCurrencyConfig(
       stableTokenProxyAddress,
-      mockOracleAddress,
+      mockOracleAddress, 
       mockIntrinsicGas
     );
   }
