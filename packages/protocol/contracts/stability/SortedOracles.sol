@@ -36,7 +36,7 @@ import "../../contracts-0.8/common/interfaces/IOracle.sol";
  *          "token" are actually referring to the rateFeedId.
  *
  */
-contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initializable {
+contract SortedOracles is ISortedOracles, IOracle, ICeloVersionedContract, Ownable, Initializable {
   using SafeMath for uint256;
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
   using FixidityLib for FixidityLib.Fraction;
