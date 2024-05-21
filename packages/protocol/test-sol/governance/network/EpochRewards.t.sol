@@ -17,17 +17,6 @@ import { Constants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
 
 contract EpochRewardsTest is Test, Constants, Utils {
-  event TargetVotingGoldFractionSet(uint256 fraction);
-  event CommunityRewardFractionSet(uint256 fraction);
-  event TargetValidatorEpochPaymentSet(uint256 payment);
-  event RewardsMultiplierParametersSet(
-    uint256 max,
-    uint256 underspendAdjustmentFactor,
-    uint256 overspendAdjustmentFactor
-  );
-  event TargetVotingYieldParametersSet(uint256 max, uint256 adjustmentFactor);
-  event TargetVotingYieldSet(uint256 target);
-
   uint256 constant targetVotingYieldParamsInitial = 0.00016e24; // 0.00016
   uint256 constant targetVotingYieldParamsMax = 0.0005e24; // 0.0005
   uint256 constant targetVotingYieldParamsAdjustmentFactor = 1127990000000000000; // 0.00000112799
@@ -45,6 +34,7 @@ contract EpochRewardsTest is Test, Constants, Utils {
   uint256 constant sortedOraclesDenominator = FIXED1;
 
   uint256 constant SUPPLY_CAP = 1e9 ether;
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
   bytes32[] initialAssetAllocationSymbols;
   uint256[] initialAssetAllocationWeights;
 
@@ -61,11 +51,16 @@ contract EpochRewardsTest is Test, Constants, Utils {
 
   address caller = address(this);
 
-  function getExpectedTargetTotalSupply(uint256 timeDelta) internal pure returns (uint256) {
-    uint256 genesisSupply = 600000000 ether;
-    uint256 linearRewards = 200000000 ether;
-    return uint256(genesisSupply + (timeDelta * linearRewards) / (YEAR * 15));
-  }
+  event TargetVotingGoldFractionSet(uint256 fraction);
+  event CommunityRewardFractionSet(uint256 fraction);
+  event TargetValidatorEpochPaymentSet(uint256 payment);
+  event RewardsMultiplierParametersSet(
+    uint256 max,
+    uint256 underspendAdjustmentFactor,
+    uint256 overspendAdjustmentFactor
+  );
+  event TargetVotingYieldParametersSet(uint256 max, uint256 adjustmentFactor);
+  event TargetVotingYieldSet(uint256 target);
 
   function setUp() public {
     // Mocked contracts
@@ -103,6 +98,15 @@ contract EpochRewardsTest is Test, Constants, Utils {
       address(0),
       carbonOffsettingFraction
     );
+  }
+
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+  }
+  function getExpectedTargetTotalSupply(uint256 timeDelta) internal pure returns (uint256) {
+    uint256 genesisSupply = 600000000 ether;
+    uint256 linearRewards = 200000000 ether;
+    return uint256(genesisSupply + (timeDelta * linearRewards) / (YEAR * 15));
   }
 }
 
@@ -179,14 +183,20 @@ contract EpochRewardsTest_setTargetVotingGoldFraction is EpochRewardsTest {
     epochRewards.setTargetVotingGoldFraction(newFraction);
   }
 
-  function test_ShouldRevert_WhenFractionIsDifferent_WhenCalledByNonOwner() public {
+  function test_Reverts_WhenFractionIsDifferent_WhenCalledByNonOwner() public {
     vm.prank(msg.sender);
     vm.expectRevert("Ownable: caller is not the owner");
     epochRewards.setTargetVotingGoldFraction(newFraction);
   }
 
-  function test_ShouldRevert_WhenFractionIsSame_WhenCalledByOwner() public {
+  function test_Reverts_WhenFractionIsSame_WhenCalledByOwner() public {
     vm.expectRevert("Target voting gold fraction unchanged");
+    epochRewards.setTargetVotingGoldFraction(targetVotingGoldFraction);
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     epochRewards.setTargetVotingGoldFraction(targetVotingGoldFraction);
   }
 }
@@ -209,24 +219,30 @@ contract EpochRewardsTest_setCommunityRewardFraction is EpochRewardsTest {
     epochRewards.setCommunityRewardFraction(newFraction);
   }
 
-  function test_ShouldRevert_WhenFractionIsDifferent_WhenCalledByNonOwner() public {
+  function test_ShouldBeLessThan1() public {
+    vm.expectRevert(
+      "Value must be different from existing community reward fraction and less than 1"
+    );
+    epochRewards.setCommunityRewardFraction(1000000 ether);
+  }
+
+  function test_Reverts_WhenFractionIsDifferent_WhenCalledByNonOwner() public {
     vm.prank(msg.sender);
     vm.expectRevert("Ownable: caller is not the owner");
     epochRewards.setCommunityRewardFraction(newFraction);
   }
 
-  function test_ShouldRevert_WhenFractionIsDifferent_WhenCalledByOwner() public {
+  function test_Reverts_WhenFractionIsDifferent_WhenCalledByOwner() public {
     vm.expectRevert(
       "Value must be different from existing community reward fraction and less than 1"
     );
     epochRewards.setCommunityRewardFraction(communityRewardFraction);
   }
 
-  function test_ShouldBeLessThan1() public {
-    vm.expectRevert(
-      "Value must be different from existing community reward fraction and less than 1"
-    );
-    epochRewards.setCommunityRewardFraction(1000000 ether);
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    epochRewards.setCommunityRewardFraction(communityRewardFraction);
   }
 }
 
@@ -248,14 +264,20 @@ contract EpochRewardsTest_setTargetValidatorEpochPayment is EpochRewardsTest {
     epochRewards.setTargetValidatorEpochPayment(newPayment);
   }
 
-  function test_ShouldRevert_WhenPaymentIsDifferent_WhenCalledByNonOwner() public {
+  function test_Reverts_WhenPaymentIsDifferent_WhenCalledByNonOwner() public {
     vm.prank(msg.sender);
     vm.expectRevert("Ownable: caller is not the owner");
     epochRewards.setTargetValidatorEpochPayment(newPayment);
   }
 
-  function test_ShouldRevert_WhenFractionIsDifferent_WhenCalledByOwner() public {
+  function test_Reverts_WhenFractionIsDifferent_WhenCalledByOwner() public {
     vm.expectRevert("Target validator epoch payment unchanged");
+    epochRewards.setTargetValidatorEpochPayment(targetValidatorEpochPayment);
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     epochRewards.setTargetValidatorEpochPayment(targetValidatorEpochPayment);
   }
 }
@@ -292,7 +314,7 @@ contract EpochRewardsTest_setRewardsMultiplierParameters is EpochRewardsTest {
     );
   }
 
-  function test_ShouldRevert_WhenCalledByOwner() public {
+  function test_Reverts_WhenCalledByOwner() public {
     vm.prank(msg.sender);
     vm.expectRevert("Ownable: caller is not the owner");
     epochRewards.setRewardsMultiplierParameters(
@@ -302,8 +324,18 @@ contract EpochRewardsTest_setRewardsMultiplierParameters is EpochRewardsTest {
     );
   }
 
-  function test_ShouldRevert_WhenCalledByNonOwner_WhenParameterAreTheSame() public {
+  function test_Reverts_WhenCalledByNonOwner_WhenParameterAreTheSame() public {
     vm.expectRevert("Bad rewards multiplier parameters");
+    epochRewards.setRewardsMultiplierParameters(
+      rewardsMultiplierMax,
+      rewardsMultiplierAdjustmentsUnderspend,
+      rewardsMultiplierAdjustmentsOverspend
+    );
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     epochRewards.setRewardsMultiplierParameters(
       rewardsMultiplierMax,
       rewardsMultiplierAdjustmentsUnderspend,
@@ -340,7 +372,7 @@ contract EpochRewardsTest_setTargetVotingYieldParameters is EpochRewardsTest {
     );
   }
 
-  function test_ShouldRevert_WhenCalledByOwner_WhenParameterAreTheSame() public {
+  function test_Reverts_WhenCalledByOwner_WhenParameterAreTheSame() public {
     vm.expectRevert("Bad target voting yield parameters");
     epochRewards.setTargetVotingYieldParameters(
       targetVotingYieldParamsMax,
@@ -348,9 +380,18 @@ contract EpochRewardsTest_setTargetVotingYieldParameters is EpochRewardsTest {
     );
   }
 
-  function test_ShouldRevert_WhenCalledByNonOwner() public {
+  function test_Reverts_WhenCalledByNonOwner() public {
     vm.prank(msg.sender);
     vm.expectRevert("Ownable: caller is not the owner");
+    epochRewards.setTargetVotingYieldParameters(
+      newTargetVotingYieldParamsMax,
+      newTargetVotingYieldParamsAdjustmentFactor
+    );
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     epochRewards.setTargetVotingYieldParameters(
       newTargetVotingYieldParamsMax,
       newTargetVotingYieldParamsAdjustmentFactor
@@ -374,9 +415,15 @@ contract EpochRewardsTest_setTargetVotingYield is EpochRewardsTest {
     epochRewards.setTargetVotingYield(newTargetVotingYieldParamsInitial);
   }
 
-  function test_ShouldRevert_WhenCalledByNonOwner() public {
+  function test_Reverts_WhenCalledByNonOwner() public {
     vm.prank(msg.sender);
     vm.expectRevert("Ownable: caller is not the owner");
+    epochRewards.setTargetVotingYield(newTargetVotingYieldParamsInitial);
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     epochRewards.setTargetVotingYield(newTargetVotingYieldParamsInitial);
   }
 }
@@ -486,12 +533,6 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
 
     mockGoldToken.setTotalSupply(totalSupply);
     vm.deal(address(reserve), reserveBalance);
-  }
-
-  function mockVotes(uint256 votes) internal {
-    election.setTotalVotes(votes);
-    vm.prank(address(0));
-    epochRewards.updateTargetVotingYield();
   }
 
   function test_ShouldNotChangeTheTargetVotingYield_WhenThePercentageOfVotingGoldIsEqualToTheTarget()
@@ -710,6 +751,19 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
       ((targetVotingYieldParamsAdjustmentFactor * 365) / 10);
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
     assertApproxEqRel(result, expected, 1e16); // TODO I suspect it has a 1% error due rounding errors, but need to double check
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(address(0));
+    epochRewards.updateTargetVotingYield();
+  }
+
+  function mockVotes(uint256 votes) internal {
+    election.setTotalVotes(votes);
+    vm.prank(address(0));
+    epochRewards.updateTargetVotingYield();
   }
 }
 
