@@ -9,7 +9,6 @@ import { Utils } from "@test-sol/utils.sol";
 
 contract BlockchainParametersTest is Test, Constants, Utils {
   // using the mainnet epoch size would not allow to test an edge case
-  uint256 constant EPOCH_SIZE = 100;
   uint256 constant gasLimit = 7000000;
   uint256 constant gasForNonGoldCurrencies = 50000;
   address nonOwner;
@@ -23,7 +22,7 @@ contract BlockchainParametersTest is Test, Constants, Utils {
 
   function setUp() public {
     nonOwner = actor("nonOwner");
-    ph.setEpochSize(EPOCH_SIZE);
+    ph.setEpochSize(100);
     blockchainParameters = new BlockchainParameters(true);
   }
 }
@@ -34,7 +33,7 @@ contract BlockchainParametersTest_initialize is BlockchainParametersTest {
   function test_ShouldSetTheVariables() public {
     blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow);
     assertEq(blockchainParameters.blockGasLimit(), gasLimit);
-    blockTravel(EPOCH_SIZE);
+    blockTravel(ph.epochSize());
     assertEq(blockchainParameters.getUptimeLookbackWindow(), lookbackWindow);
   }
 
@@ -116,14 +115,14 @@ contract BlockchainParametersTest_setUptimeLookbackWindow is BlockchainParameter
 
   function test_ShouldSetTheValueForNextEpoch() public {
     blockchainParameters.setUptimeLookbackWindow(newValue);
-    blockTravel(EPOCH_SIZE);
+    blockTravel(ph.epochSize());
     assertEq(blockchainParameters.getUptimeLookbackWindow(), newValue);
   }
 
   function test_MultipleCallsWithinEpochOnlyAppliesLast() public {
     blockchainParameters.setUptimeLookbackWindow(newValue);
     blockchainParameters.setUptimeLookbackWindow(otherValue);
-    blockTravel(EPOCH_SIZE);
+    blockTravel(ph.epochSize());
     assertEq(blockchainParameters.getUptimeLookbackWindow(), otherValue);
   }
 
@@ -150,8 +149,9 @@ contract BlockchainParametersTest_setUptimeLookbackWindow is BlockchainParameter
   }
 
   function test_Revert_WhenUsingValueGreaterThanEpochsizeminus2() public {
+    uint256 _epochSize = ph.epochSize();
     vm.expectRevert("UptimeLookbackWindow must be smaller or equal to epochSize - 2");
     // 720 is harcoded as maximum in the code
-    blockchainParameters.setUptimeLookbackWindow(EPOCH_SIZE - 1);
+    blockchainParameters.setUptimeLookbackWindow(_epochSize - 1);
   }
 }

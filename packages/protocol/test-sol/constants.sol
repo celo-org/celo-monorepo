@@ -1,6 +1,6 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.5.13 <0.8.20;
 
-// This contract is only required for Solidity 0.5
 contract Constants {
   uint256 public constant FIXED1 = 1e24;
   uint256 public constant MINUTE = 60;
@@ -9,7 +9,6 @@ contract Constants {
   uint256 public constant MONTH = 30 * DAY;
   uint256 constant WEEK = 7 * DAY;
   uint256 public constant YEAR = 365 * DAY;
-  uint256 public constant EPOCH_SIZE = DAY / 5;
 
   // contract names
   string constant ElectionContract = "Election";
