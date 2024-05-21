@@ -13,6 +13,7 @@ import { Constants } from "@test-sol/constants.sol";
 
 import "../governance/mock/MockGovernance.sol";
 
+// TODO(soloseng): use assertApproxEqRel(result, expected, 1e16) for test with approx results.
 contract MintGoldScheduleTest is Test, Constants, IsL2Check {
   using FixidityLib for FixidityLib.Fraction;
 
@@ -36,18 +37,18 @@ contract MintGoldScheduleTest is Test, Constants, IsL2Check {
 
   address constant l1RegistryAddress = 0x000000000000000000000000000000000000ce10;
 
-  uint256 constant DAILY_MINT_AMOUNT_UPPER = 6749 ether; // 6,749 Gold
-  uint256 constant DAILY_MINT_AMOUNT_LOWER = 6748 ether; // 6,748 Gold
+  // uint256 constant DAILY_MINT_AMOUNT_UPPER = 6749 ether; // 6,749 Gold
+  uint256 constant DAILY_MINT_AMOUNT_LOWER = 6748256563599655349558; // 6,748 Gold
+  uint256 constant L1_MINTED_GOLD_SUPPLY = 692702432463315819704447326; // as of May 15 2024
 
   uint256 constant GOLD_SUPPLY_CAP = 1000000000 ether; // 1 billion Gold
   uint256 constant GENESIS_GOLD_SUPPLY = 600000000 ether; // 600 million Gold
-  uint256 constant L1_MINTED_GOLD_SUPPLY = 692702432463315819704447326; // as of May 15 2024
-  uint256 constant FIFTEEN_YEAR_GOLD_SUPPLY = 800000000 ether; // 800 million Gold
+
+  uint256 constant FIFTEEN_YEAR_LINEAR_REWARD = (GOLD_SUPPLY_CAP - GENESIS_GOLD_SUPPLY) / 2; // 200 million Gold
+  uint256 constant FIFTEEN_YEAR_GOLD_SUPPLY = GENESIS_GOLD_SUPPLY + FIFTEEN_YEAR_LINEAR_REWARD; // 800 million Gold (includes GENESIS_GOLD_SUPPLY)
 
   uint256 constant MAX_L2_DISTRIBUTION = FIFTEEN_YEAR_GOLD_SUPPLY - L1_MINTED_GOLD_SUPPLY; // 107.2 million Gold
-
   uint256 constant MAX_L2_COMMUNITY_DISTRIBUTION = MAX_L2_DISTRIBUTION / 4; // 26.8 million Gold
-
   uint256 constant MAX_L2_CARBON_FUND_DISTRIBUTION = MAX_L2_DISTRIBUTION / 1000; // 107,297 Gold
 
   uint256 constant L2_FIFTEEN_YEAR_GOLD_SUPPLY =
@@ -471,60 +472,28 @@ contract MintGoldScheduleTest_mintAccordingToSchedule is MintGoldScheduleTest {
     vm.prank(randomAddress);
     mintGoldSchedule.mintAccordingToSchedule();
 
-    assertLe(
-      mintGoldSchedule.totalMintedBySchedule(),
-      expectedMintedAmount,
-      "Incorrect mintableAmount"
-    );
-    assertGe(
-      mintGoldSchedule.totalMintedBySchedule(),
-      expectedMintedAmount - (1 ether),
-      "Incorrect mintableAmount"
-    );
+    assertApproxEqRel(mintGoldSchedule.totalMintedBySchedule(), expectedMintedAmount, 1e10);
   }
 
   function test_ShouldAllowToMint50Percent5AndHalfYearsPostL2Launch() public {
     vm.warp(block.timestamp + (5 * YEAR) + (170 * DAY) + 41338);
 
-    uint256 expectedMintedAmountUpper = ((L2_FIFTEEN_YEAR_GOLD_SUPPLY - L1_MINTED_GOLD_SUPPLY) /
-      2) + 1 ether;
-    uint256 expectedMintedAmountLower = (L2_FIFTEEN_YEAR_GOLD_SUPPLY - L1_MINTED_GOLD_SUPPLY) / 2;
+    uint256 expectedMintedAmount = (L2_FIFTEEN_YEAR_GOLD_SUPPLY - L1_MINTED_GOLD_SUPPLY) / 2;
     vm.prank(randomAddress);
     mintGoldSchedule.mintAccordingToSchedule();
 
-    assertLe(
-      mintGoldSchedule.totalMintedBySchedule(),
-      expectedMintedAmountUpper,
-      "Incorrect mintableAmount"
-    );
-    assertGe(
-      mintGoldSchedule.totalMintedBySchedule(),
-      expectedMintedAmountLower,
-      "Incorrect mintableAmount"
-    );
+    assertApproxEqRel(mintGoldSchedule.totalMintedBySchedule(), expectedMintedAmount, 1e10);
   }
 
   function test_ShouldAllowToMint75Percent11YearsAnd3MonthsPostL2Launch() public {
     vm.warp(block.timestamp + 8 * YEAR + 73 * DAY + 18807);
 
-    uint256 expectedMintedAmountUpper = (((L2_FIFTEEN_YEAR_GOLD_SUPPLY - L1_MINTED_GOLD_SUPPLY) /
-      4) * 3) + 1 ether;
-    uint256 expectedMintedAmountLower = ((L2_FIFTEEN_YEAR_GOLD_SUPPLY - L1_MINTED_GOLD_SUPPLY) /
-      4) * 3;
+    uint256 expectedMintedAmount = ((L2_FIFTEEN_YEAR_GOLD_SUPPLY - L1_MINTED_GOLD_SUPPLY) / 4) * 3;
 
     vm.prank(randomAddress);
     mintGoldSchedule.mintAccordingToSchedule();
 
-    assertLe(
-      mintGoldSchedule.totalMintedBySchedule(),
-      expectedMintedAmountUpper,
-      "Incorrect mintableAmount"
-    );
-    assertGe(
-      mintGoldSchedule.totalMintedBySchedule(),
-      expectedMintedAmountLower,
-      "Incorrect mintableAmount"
-    );
+    assertApproxEqRel(mintGoldSchedule.totalMintedBySchedule(), expectedMintedAmount, 1e10);
   }
 
   function test_ShouldAllowToMint100Percent11YearsPostL2Launch() public {
@@ -535,33 +504,25 @@ contract MintGoldScheduleTest_mintAccordingToSchedule is MintGoldScheduleTest {
     vm.prank(randomAddress);
     mintGoldSchedule.mintAccordingToSchedule();
 
-    assertLe(
+    assertApproxEqRel(
       mintGoldSchedule.totalMintedBySchedule(),
       MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION,
-      "Incorrect mintableAmount"
-    );
-    assertGe(
-      mintGoldSchedule.totalMintedBySchedule(),
-      MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION - 1 ether,
-      "Incorrect mintableAmount"
+      1e10
     );
 
     uint256 communityFundBalanceAfter = goldToken.balanceOf(address(governance));
     uint256 carbonOffsettingPartnerBalanceAfter = goldToken.balanceOf(carbonOffsettingPartner);
 
-    assertLe(communityFundBalanceAfter - communityFundBalanceBefore, MAX_L2_COMMUNITY_DISTRIBUTION);
-    assertGe(
+    assertApproxEqRel(
       communityFundBalanceAfter - communityFundBalanceBefore,
-      MAX_L2_COMMUNITY_DISTRIBUTION - 1 ether
+      MAX_L2_COMMUNITY_DISTRIBUTION,
+      1e10
     );
 
-    assertLe(
+    assertApproxEqRel(
       carbonOffsettingPartnerBalanceAfter - carbonOffsettingPartnerBalanceBefore,
-      MAX_L2_CARBON_FUND_DISTRIBUTION
-    );
-    assertGe(
-      carbonOffsettingPartnerBalanceAfter - carbonOffsettingPartnerBalanceBefore,
-      MAX_L2_CARBON_FUND_DISTRIBUTION - 1 ether
+      MAX_L2_CARBON_FUND_DISTRIBUTION,
+      1e10
     );
   }
 
@@ -573,17 +534,11 @@ contract MintGoldScheduleTest_mintAccordingToSchedule is MintGoldScheduleTest {
     vm.prank(randomAddress);
     mintGoldSchedule.mintAccordingToSchedule();
 
-    assertGe(
-      mintGoldSchedule.totalMintedBySchedule(),
-      MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION - 1 ether,
-      "Incorrect mintableAmount"
-    );
-    assertLe(
+    assertApproxEqRel(
       mintGoldSchedule.totalMintedBySchedule(),
       MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION,
-      "Incorrect mintableAmount"
+      1e10
     );
-    assertLt(mintGoldSchedule.totalMintedBySchedule(), MAX_L2_DISTRIBUTION / 2);
   }
 
   function test_Reverts_WhenMintingSecondTimeAfter15Years() public {
@@ -592,15 +547,10 @@ contract MintGoldScheduleTest_mintAccordingToSchedule is MintGoldScheduleTest {
     vm.prank(randomAddress);
     mintGoldSchedule.mintAccordingToSchedule();
 
-    assertGe(
-      mintGoldSchedule.totalMintedBySchedule(),
-      MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION - 1 ether,
-      "Incorrect mintableAmount"
-    );
-    assertLe(
+    assertApproxEqRel(
       mintGoldSchedule.totalMintedBySchedule(),
       MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION,
-      "Incorrect mintableAmount"
+      1e10
     );
 
     vm.expectRevert("Block reward calculation for years 15-30 unimplemented");
@@ -621,8 +571,7 @@ contract MintGoldScheduleTest_getMintableAmount is MintGoldScheduleTest {
 
   function test_ShouldReturnFullAmountAvailableForThisReleasePeriod() public {
     vm.warp(block.timestamp + 1 * DAY);
-    assertGe(mintGoldSchedule.getMintableAmount(), DAILY_MINT_AMOUNT_LOWER); 
-    assertLe(mintGoldSchedule.getMintableAmount(), DAILY_MINT_AMOUNT_UPPER);
+    assertApproxEqRel(mintGoldSchedule.getMintableAmount(), DAILY_MINT_AMOUNT_LOWER, 1e10);
   }
 
   function test_ShouldReturnOnlyAmountNotYetMinted() public {
@@ -630,23 +579,16 @@ contract MintGoldScheduleTest_getMintableAmount is MintGoldScheduleTest {
     vm.prank(randomAddress);
     mintGoldSchedule.mintAccordingToSchedule();
 
-    vm.warp(block.timestamp + 1 * DAY);
-    assertGe(mintGoldSchedule.getMintableAmount(), DAILY_MINT_AMOUNT_LOWER);
-    assertLe(mintGoldSchedule.getMintableAmount(), DAILY_MINT_AMOUNT_UPPER);
+    vm.warp(block.timestamp + 1 * DAY + 1);
+    assertApproxEqRel(mintGoldSchedule.getMintableAmount(), DAILY_MINT_AMOUNT_LOWER, 1e10);
   }
 
   function test_ShouldReturnOnlyUpToMaxL2DistributionBeforeItIsMinted() public {
     vm.warp(block.timestamp + 16 * YEAR);
-
-    assertGe(
-      mintGoldSchedule.getMintableAmount(),
-      MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION - 1 ether,
-      "Incorrect mintableAmount"
-    );
-    assertLe(
+    assertApproxEqRel(
       mintGoldSchedule.getMintableAmount(),
       MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION,
-      "Incorrect mintableAmount"
+      1e10
     );
   }
 
