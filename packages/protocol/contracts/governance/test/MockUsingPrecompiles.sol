@@ -41,30 +41,11 @@ contract MockUsingPrecompiles {
     return keccak256(header);
   }
 
-  function validatorSignerAddressFromSet(
-    uint256 index,
-    uint256 blockNumber
-  ) public view returns (address) {
-    return epochSigner[keccak256(abi.encodePacked(calcEpoch(blockNumber), index))];
-  }
-
   function getVerifiedSealBitmapFromHeader(bytes memory header) public view returns (bytes32) {
     return verifiedSealBitmap[keccak256(abi.encodePacked(header))];
   }
 
   function getParentSealBitmap(uint256 blockNumber) public view returns (bytes32) {
     return parentSealBitmap[blockNumber];
-  }
-
-  function calcEpoch(uint256 blockNumber) internal pure returns (uint256) {
-    uint256 epochSize = 100;
-
-    // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    uint256 epochNumber = blockNumber / epochSize;
-    if (blockNumber % epochSize == 0) {
-      return epochNumber;
-    } else {
-      return epochNumber + 1;
-    }
   }
 }

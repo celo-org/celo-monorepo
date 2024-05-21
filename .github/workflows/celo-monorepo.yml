@@ -219,9 +219,6 @@ jobs:
           - name: Protocol Compatibility
             command: |
               yarn --cwd packages/protocol test compatibility/
-          - name: Protocol Governance Validators
-            command: |
-              yarn --cwd packages/protocol test governance/validators/
           - name: Protocol scripts test
             command: |
               yarn --cwd packages/protocol test:scripts

@@ -11,6 +11,7 @@ import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts/common/interfaces/ICeloToken.sol"; // TODO move these to Initializer
 import "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
@@ -44,7 +45,6 @@ import "./HelperInterFaces.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 import "@celo-contracts-8/common/UsingRegistry.sol";
-import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 
 contract ForceTx {
   // event to trigger so a tx can be processed
@@ -60,6 +60,9 @@ contract ForceTx {
 contract Migration is Script, UsingRegistry {
   using stdJson for string;
 
+  /**
+   * This is Anvil's default account
+   */
   address constant deployerAccount = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
   IProxyFactory proxyFactory;
@@ -177,6 +180,9 @@ contract Migration is Script, UsingRegistry {
     console.log("------------------------------");
   }
 
+  /**
+   * Entry point of the script
+   */
   function run() external {
     // TODO check that this matches deployerAccount and the pK can be avoided with --unlock
     vm.startBroadcast(deployerAccount);
@@ -198,6 +204,7 @@ contract Migration is Script, UsingRegistry {
 
     migrateFreezer();
     migrateFeeCurrencyWhitelist();
+    migrateFeeCurrencyDirectory();
     migrateGoldToken(json);
     migrateSortedOracles(json);
     migrateGasPriceMinimum(json);
@@ -255,6 +262,14 @@ contract Migration is Script, UsingRegistry {
     deployProxiedContract(
       "FeeCurrencyWhitelist",
       abi.encodeWithSelector(IFeeCurrencyWhitelist.initialize.selector)
+    );
+  }
+
+  function migrateFeeCurrencyDirectory() public {
+    // TODO migrate the initializations interface
+    deployProxiedContract(
+      "FeeCurrencyDirectory",
+      abi.encodeWithSelector(FeeCurrencyDirectory.initialize.selector)
     );
   }
 
@@ -405,6 +420,15 @@ contract Migration is Script, UsingRegistry {
     IReserve(registry.getAddressForStringOrDie("Reserve")).addToken(stableTokenProxyAddress);
 
     getFeeCurrencyWhitelist().addToken(stableTokenProxyAddress);
+
+    /*
+    Arbitrary intrinsic gas number take from existing `FeeCurrencyDirectory.t.sol` tests
+    Source: https://github.com/celo-org/celo-monorepo/blob/2cec07d43328cf4216c62491a35eacc4960fffb6/packages/protocol/test-sol/common/FeeCurrencyDirectory.t.sol#L27 
+    */
+    uint256 mockIntrinsicGas = 21000;
+
+    FeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory"))
+      .setCurrencyConfig(stableTokenProxyAddress, address(getSortedOracles()), mockIntrinsicGas);
   }
 
   function migrateStableToken(string memory json) public {
@@ -927,7 +951,7 @@ contract Migration is Script, UsingRegistry {
     if (!skipTransferOwnership) {
       // TODO move this list somewhere else
 
-      string[22] memory fixedStringArray = [
+      string[23] memory fixedStringArray = [
         "Accounts",
         // 'Attestations',
         // BlockchainParameters ownership transitioned to governance in a follow-up script.?
@@ -939,6 +963,7 @@ contract Migration is Script, UsingRegistry {
         "Escrow",
         "FederatedAttestations",
         "FeeCurrencyWhitelist",
+        "FeeCurrencyDirectory",
         "Freezer",
         "FeeHandler",
         "GoldToken",
