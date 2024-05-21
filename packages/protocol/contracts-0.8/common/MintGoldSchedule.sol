@@ -1,25 +1,20 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.5.13 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
-import "openzeppelin-solidity/contracts/utils/Address.sol";
-// import "@ganache/console.log/console.sol";
+import "@openzeppelin/contracts8/security/ReentrancyGuard.sol";
 
-import "../common/FixidityLib.sol";
-import "../common/libraries/ReentrancyGuard.sol";
-import "../common/Initializable.sol";
-import "../common/UsingRegistry.sol";
-import "../common/interfaces/IGoldToken.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
+import "./UsingRegistry.sol";
+import "../common/IsL2Check.sol";
+
+import "../../contracts/common/FixidityLib.sol";
+import "../../contracts/common/Initializable.sol";
+import "../../contracts/common/interfaces/IGoldToken.sol";
 
 /**
  * @title Contract for minting new CELO token based on a schedule.
  */
 contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2Check {
-  using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
-  using Address for address payable; // prettier-ignore
 
   uint256 constant GENESIS_GOLD_SUPPLY = 600000000 ether; // 600 million Gold
   uint256 constant GOLD_SUPPLY_CAP = 1000000000 ether; // 1 billion Gold
@@ -74,14 +69,16 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     uint256 _carbonOffsettingFraction,
     address registryAddress
   ) external onlyOwner onlyL2 {
+    require(!areDependenciesSet, "Dependencies have already been set.");
     require(registryAddress != address(0), "The registry address cannot be the zero address");
+    require(block.timestamp > _l2StartTime, "L2 start time cannot be set to a future date.");
     areDependenciesSet = true;
+    l2StartTime = _l2StartTime;
     setRegistry(registryAddress);
     communityRewardFund = address(getGovernance());
+    totalSupplyAtL2Start = getGoldToken().totalSupply();
     setCommunityRewardFraction(_communityRewardFraction);
     setCarbonOffsettingFund(_carbonOffsettingPartner, _carbonOffsettingFraction);
-    totalSupplyAtL2Start = getGoldToken().totalSupply();
-    l2StartTime = _l2StartTime;
   }
 
   /**
@@ -94,14 +91,14 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       uint256 carbonOffsettingPartnerMintAmount
     ) = getTargetGoldTotalSupply();
 
-    uint256 mintableAmount = targetGoldTotalSupply.sub(getGoldToken().totalSupply());
+    uint256 mintableAmount = targetGoldTotalSupply - getGoldToken().totalSupply();
 
     require(mintableAmount > 0, "Mintable amount must be greater than zero");
     require(
       getRemainingBalanceToMint() >= mintableAmount,
       "Insufficient unlocked balance to mint amount"
     );
-    totalMintedBySchedule = totalMintedBySchedule.add(mintableAmount);
+    totalMintedBySchedule = totalMintedBySchedule + (mintableAmount);
 
     IGoldToken goldToken = IGoldToken(address(getGoldToken()));
     require(
@@ -151,6 +148,13 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   function setCommunityRewardFraction(
     uint256 value
   ) public onlyOwner whenDependenciesSet returns (bool) {
+    uint256 timeSinceL2 = block.timestamp - l2StartTime;
+    uint256 linearSecondsLeft = SECONDS_LINEAR - (l2StartTime - genesisStartTime);
+
+    require(
+      timeSinceL2 < linearSecondsLeft,
+      "Can only update fraction once block reward calculation for years 15-30 has been implemented."
+    );
     require(
       value != communityRewardFraction.unwrap() && value < FixidityLib.fixed1().unwrap(),
       "Value must be different from existing community reward fraction and less than 1."
@@ -174,6 +178,12 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     address partner,
     uint256 value
   ) public onlyOwner whenDependenciesSet returns (bool) {
+    uint256 timeSinceL2 = block.timestamp - l2StartTime;
+    uint256 linearSecondsLeft = SECONDS_LINEAR - (l2StartTime - genesisStartTime);
+    require(
+      timeSinceL2 < linearSecondsLeft,
+      "Can only update fraction once block reward calculation for years 15-30 has been implemented."
+    );
     require(partner != address(0), "Partner cannot be the zero address.");
     require(
       partner != carbonOffsettingPartner || value != carbonOffsettingFraction.unwrap(),
@@ -195,7 +205,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
    * @return The remaining CELO balance to mint.
    */
   function getRemainingBalanceToMint() public view returns (uint256) {
-    return GOLD_SUPPLY_CAP.sub(getGoldToken().totalSupply());
+    return GOLD_SUPPLY_CAP - getGoldToken().totalSupply();
   }
 
   /**
@@ -210,14 +220,14 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
    */
   function getMintableAmount() public view returns (uint256) {
     (uint256 targetGoldTotalSupply, , ) = getTargetGoldTotalSupply();
-    return targetGoldTotalSupply.sub(getGoldToken().totalSupply());
+    return targetGoldTotalSupply - getGoldToken().totalSupply();
   }
 
   /**
    * @notice Returns the target CELO supply according to the target schedule.
-   * @return The target total CELO supply according to the target schedule.
-   * @return The community reward that can be minted according to the target schedule.
-   * @return The carbon offsetting reward that can be minted according to the target schedule.
+   * @return targetGoldTotalSupply The target total CELO supply according to the target schedule.
+   * @return communityTargetRewards The community reward that can be minted according to the target schedule.
+   * @return carbonFundTargetRewards The carbon offsetting reward that can be minted according to the target schedule.
    */
   function getTargetGoldTotalSupply()
     public
@@ -229,16 +239,16 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       uint256 carbonFundTargetRewards
     )
   {
-    require(now > genesisStartTime, "genesisStartTime has now yet been reached.");
-    require(now > l2StartTime, "l2StartTime has now yet been reached.");
+    require(block.timestamp > genesisStartTime, "genesisStartTime has not yet been reached.");
+    require(block.timestamp > l2StartTime, "l2StartTime has not yet been reached.");
 
-    uint256 timeSinceL2 = now.sub(l2StartTime);
-    uint256 mintedOnL1 = totalSupplyAtL2Start.sub(GENESIS_GOLD_SUPPLY);
-    uint256 linearSecondsLeft = SECONDS_LINEAR.sub((l2StartTime.sub(genesisStartTime)));
+    uint256 timeSinceL2 = block.timestamp - l2StartTime;
+    uint256 linearSecondsLeft = SECONDS_LINEAR - (l2StartTime - genesisStartTime);
+    uint256 mintedOnL1 = totalSupplyAtL2Start - GENESIS_GOLD_SUPPLY;
 
     // Pay out half of all block rewards linearly.
-    uint256 l1LinearRewards = GOLD_SUPPLY_CAP.sub(GENESIS_GOLD_SUPPLY).div(2); //(200 million) includes validator rewards.
-    uint256 l2LinearRewards = l1LinearRewards.sub(mintedOnL1);
+    uint256 l1LinearRewards = (GOLD_SUPPLY_CAP - GENESIS_GOLD_SUPPLY) / 2; //(200 million) includes validator rewards.
+    uint256 l2LinearRewards = l1LinearRewards - mintedOnL1;
 
     uint256 linearRewardsToCommunity = FixidityLib
       .newFixed(l2LinearRewards)
@@ -251,30 +261,32 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       .fromFixed();
 
     if (timeSinceL2 < linearSecondsLeft) {
-      communityTargetRewards = linearRewardsToCommunity.mul(timeSinceL2).div(linearSecondsLeft);
-      carbonFundTargetRewards = linearRewardsToCarbon.mul(timeSinceL2).div(linearSecondsLeft);
+      communityTargetRewards = (linearRewardsToCommunity * (timeSinceL2)) / linearSecondsLeft;
+      carbonFundTargetRewards = (linearRewardsToCarbon * (timeSinceL2)) / linearSecondsLeft;
 
-      targetGoldTotalSupply = communityTargetRewards
-        .add(carbonFundTargetRewards)
-        .add(GENESIS_GOLD_SUPPLY)
-        .add(mintedOnL1);
+      targetGoldTotalSupply =
+        communityTargetRewards +
+        (carbonFundTargetRewards) +
+        (GENESIS_GOLD_SUPPLY) +
+        (mintedOnL1);
 
       return (targetGoldTotalSupply, communityTargetRewards, carbonFundTargetRewards);
     } else {
-      communityTargetRewards = linearRewardsToCommunity.mul(linearSecondsLeft.sub(1)).div(
-        linearSecondsLeft
-      );
-      carbonFundTargetRewards = linearRewardsToCarbon.mul(linearSecondsLeft.sub(1)).div(
-        linearSecondsLeft
-      );
-      targetGoldTotalSupply = communityTargetRewards
-        .add(carbonFundTargetRewards)
-        .add(GENESIS_GOLD_SUPPLY)
-        .add(mintedOnL1);
+      communityTargetRewards =
+        (linearRewardsToCommunity * (linearSecondsLeft - 1)) /
+        linearSecondsLeft;
+      carbonFundTargetRewards =
+        (linearRewardsToCarbon * (linearSecondsLeft - 1)) /
+        linearSecondsLeft;
+      targetGoldTotalSupply =
+        communityTargetRewards +
+        (carbonFundTargetRewards) +
+        (GENESIS_GOLD_SUPPLY) +
+        (mintedOnL1);
 
       if (
-        totalMintedBySchedule.add(GENESIS_GOLD_SUPPLY).add(mintedOnL1) <
-        communityTargetRewards.add(carbonFundTargetRewards).add(GENESIS_GOLD_SUPPLY).add(mintedOnL1)
+        totalMintedBySchedule + (GENESIS_GOLD_SUPPLY) + (mintedOnL1) <
+        communityTargetRewards + (carbonFundTargetRewards) + (GENESIS_GOLD_SUPPLY) + (mintedOnL1)
       ) {
         return (targetGoldTotalSupply, communityTargetRewards, carbonFundTargetRewards);
       }
