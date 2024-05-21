@@ -76,6 +76,10 @@ contract GoldToken is
     setRegistry(registryAddress);
   }
 
+  /**
+   * @notice Used set the address of the MintGoldSchedule contract.
+   * @param goldTokenMintingScheduleAddress The address of the MintGoldSchedule contract.
+   */
   function setGoldTokenMintingScheduleAddress(
     address goldTokenMintingScheduleAddress
   ) external onlyOwner {
