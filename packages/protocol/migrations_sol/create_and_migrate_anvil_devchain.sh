@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Keeping track of start time to measure how long it takes to run the script entirely
+START_TIME=$SECONDS
+
 # Compile everything
-forge build
+time forge build
 
 export ANVIL_PORT=8546
 
@@ -71,3 +74,7 @@ time forge build $LIBRARIES
 
 # run migrations
 time forge script migrations_sol/Migration.s.sol --tc Migration --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive --sender $FROM_ACCOUNT --unlocked $LIBRARIES || echo "Migration script failed"
+
+# Keeping track of the finish time to measure how long it takes to run the script entirely
+ELAPSED_TIME=$(($SECONDS - $START_TIME))
+echo "Total elapsed time: $ELAPSED_TIME seconds"
