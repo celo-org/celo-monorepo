@@ -5,8 +5,9 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./SlasherUtil.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts-0.8/common/IsL2Check.sol";
 
-contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
+contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil, IsL2Check {
   using SafeMath for uint256;
 
   // Maps validator address -> end block of the latest interval for which it has been slashed.
@@ -64,14 +65,14 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (2, 0, 0, 1);
+    return (2, 0, 1, 0);
   }
 
   /**
    * @notice Sets the slashable downtime.
    * @param interval Slashable downtime in blocks.
    */
-  function setSlashableDowntime(uint256 interval) public onlyOwner {
+  function setSlashableDowntime(uint256 interval) public onlyOwner onlyL1 {
     require(interval != 0, "slashable downtime cannot be zero");
     slashableDowntime = interval;
     emit SlashableDowntimeSet(interval);
@@ -84,7 +85,7 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
    * @return The signature bitmap for the specified interval.
    * @dev startBlock and endBlock must be in the same epoch.
    */
-  function setBitmapForInterval(uint256 startBlock, uint256 endBlock) public returns (bytes32) {
+  function setBitmapForInterval(uint256 startBlock, uint256 endBlock) public onlyL1 returns (bytes32) {
     require(!isBitmapSetForInterval(startBlock, endBlock), "bitmap already set");
 
     bytes32 bitmap = getBitmapForInterval(startBlock, endBlock);
@@ -124,7 +125,7 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
     address[] memory groupElectionLessers,
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
-  ) public {
+  ) public onlyL1 {
     uint256 startBlock = startBlocks[0];
     uint256 endBlock = endBlocks[endBlocks.length.sub(1)];
     require(
