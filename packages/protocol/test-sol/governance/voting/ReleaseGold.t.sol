@@ -37,14 +37,6 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
   ReleaseGold releaseGold;
   ReleaseGold releaseGold2;
 
-  event ReleaseGoldInstanceCreated(address indexed beneficiary, address indexed atAddress);
-  event ReleaseScheduleRevoked(uint256 revokeTimestamp, uint256 releasedBalanceAtRevoke);
-  event ReleaseGoldInstanceDestroyed(address indexed beneficiary, address indexed atAddress);
-  event DistributionLimitSet(address indexed beneficiary, uint256 maxDistribution);
-  event LiquidityProvisionSet(address indexed beneficiary);
-  event CanExpireSet(bool canExpire);
-  event BeneficiarySet(address indexed beneficiary);
-
   address owner = address(this);
   address beneficiary;
   uint256 beneficiaryPrivateKey;
@@ -64,6 +56,14 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
 
   ReleaseGoldMockTunnel.InitParams initParams;
   ReleaseGoldMockTunnel.InitParams2 initParams2;
+
+  event ReleaseGoldInstanceCreated(address indexed beneficiary, address indexed atAddress);
+  event ReleaseScheduleRevoked(uint256 revokeTimestamp, uint256 releasedBalanceAtRevoke);
+  event ReleaseGoldInstanceDestroyed(address indexed beneficiary, address indexed atAddress);
+  event DistributionLimitSet(address indexed beneficiary, uint256 maxDistribution);
+  event LiquidityProvisionSet(address indexed beneficiary);
+  event CanExpireSet(bool canExpire);
+  event BeneficiarySet(address indexed beneficiary);
 
   function newReleaseGold(bool prefund, bool startReleasing) internal returns (ReleaseGold) {
     releaseGold = new ReleaseGold(true);
@@ -149,7 +149,7 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
   }
 }
 
-contract ReleaseGoldInitialize is ReleaseGoldTest {
+contract ReleaseGoldTest_ReleaseGoldInitialize is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
   }
@@ -165,7 +165,7 @@ contract ReleaseGoldInitialize is ReleaseGoldTest {
   }
 }
 
-contract Payable is ReleaseGoldTest {
+contract ReleaseGoldTest_Payable is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
   }
@@ -204,7 +204,7 @@ contract Payable is ReleaseGoldTest {
   }
 }
 
-contract Transfer is ReleaseGoldTest {
+contract ReleaseGoldTest_Transfer is ReleaseGoldTest {
   address receiver = actor("receiver");
   uint256 transferAmount = 10;
 
@@ -222,7 +222,7 @@ contract Transfer is ReleaseGoldTest {
   }
 }
 
-contract GenericTransfer is ReleaseGoldTest {
+contract ReleaseGoldTest_GenericTransfer is ReleaseGoldTest {
   address receiver = actor("receiver");
   uint256 transferAmount = 10;
 
@@ -255,7 +255,7 @@ contract GenericTransfer is ReleaseGoldTest {
   }
 }
 
-contract Creation is ReleaseGoldTest {
+contract ReleaseGoldTest_Creation is ReleaseGoldTest {
   uint256 public maxUint256 = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
 
   function setUp() public {
@@ -380,7 +380,7 @@ contract Creation is ReleaseGoldTest {
   }
 }
 
-contract SetBeneficiary is ReleaseGoldTest {
+contract ReleaseGoldTest_SetBeneficiary is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
     newReleaseGold(true, false);
@@ -404,7 +404,7 @@ contract SetBeneficiary is ReleaseGoldTest {
   }
 }
 
-contract CreateAccount is ReleaseGoldTest {
+contract ReleaseGoldTest_CreateAccount is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
     newReleaseGold(true, false);
@@ -478,7 +478,7 @@ contract SetAccount is ReleaseGoldTest {
   }
 }
 
-contract SetAccountName is ReleaseGoldTest {
+contract ReleaseGoldTest_SetAccountName is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
     newReleaseGold(true, false);
@@ -519,7 +519,7 @@ contract SetAccountName is ReleaseGoldTest {
   }
 }
 
-contract SetAccountWalletAddress is ReleaseGoldTest {
+contract ReleaseGoldTest_SetAccountWalletAddress is ReleaseGoldTest {
   uint8 v;
   bytes32 r;
   bytes32 s;
@@ -577,7 +577,7 @@ contract SetAccountWalletAddress is ReleaseGoldTest {
   }
 }
 
-contract SetAccountMetadataURL is ReleaseGoldTest {
+contract ReleaseGoldTest_SetAccountMetadataURL is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
     newReleaseGold(true, false);
@@ -622,7 +622,7 @@ contract SetAccountMetadataURL is ReleaseGoldTest {
   }
 }
 
-contract SetAccountDataEncryptionKey is ReleaseGoldTest {
+contract ReleaseGoldTest_SetAccountDataEncryptionKey is ReleaseGoldTest {
   bytes dataEncryptionKey = hex"02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111";
   bytes longDataEncryptionKey =
     hex"04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0161111111102f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111";
@@ -672,7 +672,7 @@ contract SetAccountDataEncryptionKey is ReleaseGoldTest {
   }
 }
 
-contract SetMaxDistribution is ReleaseGoldTest {
+contract ReleaseGoldTest_SetMaxDistribution is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
     initParams2.initialDistributionRatio = 0;
@@ -702,7 +702,7 @@ contract SetMaxDistribution is ReleaseGoldTest {
   }
 }
 
-contract AuthorizationTests is ReleaseGoldTest {
+contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
 
   uint8 v;
@@ -1021,7 +1021,7 @@ contract AuthorizationTests is ReleaseGoldTest {
   }
 }
 
-contract AuthorizeWithPublicKeys is ReleaseGoldTest {
+contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest {
   uint8 v;
   bytes32 r;
   bytes32 s;
@@ -1108,7 +1108,7 @@ contract AuthorizeWithPublicKeys is ReleaseGoldTest {
   }
 }
 
-contract Revoke is ReleaseGoldTest {
+contract ReleaseGoldTest_Revoke is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
   }
@@ -1150,7 +1150,7 @@ contract Revoke is ReleaseGoldTest {
   }
 }
 
-contract Expire is ReleaseGoldTest {
+contract ReleaseGoldTest_Expire is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
     newReleaseGold(true, false);
@@ -1285,7 +1285,7 @@ contract Expire is ReleaseGoldTest {
   }
 }
 
-contract RefundAndFinalize is ReleaseGoldTest {
+contract ReleaseGoldTest_RefundAndFinalize is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
     newReleaseGold(true, false);
@@ -1341,7 +1341,7 @@ contract RefundAndFinalize is ReleaseGoldTest {
   }
 }
 
-contract ExpireSelfDestructTest is ReleaseGoldTest {
+contract ReleaseGoldTest_ExpireSelfDestructTest is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
     newReleaseGold(true, false);
@@ -1361,7 +1361,7 @@ contract ExpireSelfDestructTest is ReleaseGoldTest {
   }
 }
 
-contract LockGold is ReleaseGoldTest {
+contract ReleaseGoldTest_LockGold is ReleaseGoldTest {
   uint256 lockAmount;
   function setUp() public {
     super.setUp();
@@ -1403,7 +1403,7 @@ contract LockGold is ReleaseGoldTest {
   }
 }
 
-contract UnlockGold is ReleaseGoldTest {
+contract ReleaseGoldTest_UnlockGold is ReleaseGoldTest {
   uint256 lockAmount;
   function setUp() public {
     super.setUp();
@@ -1466,7 +1466,7 @@ contract UnlockGold is ReleaseGoldTest {
   }
 }
 
-contract WithdrawLockedGold is ReleaseGoldTest {
+contract ReleaseGoldTest_WithdrawLockedGold is ReleaseGoldTest {
   uint256 value = 1000;
   uint256 index = 0;
 
@@ -1536,7 +1536,7 @@ contract WithdrawLockedGold is ReleaseGoldTest {
   }
 }
 
-contract RelockGold is ReleaseGoldTest {
+contract ReleaseGoldTest_RelockGold is ReleaseGoldTest {
   uint256 pendingWithdrawalValue = 1000;
   uint256 index = 0;
 
@@ -1642,7 +1642,7 @@ contract RelockGold is ReleaseGoldTest {
   }
 }
 
-contract Withdraw is ReleaseGoldTest {
+contract ReleaseGoldTest_Withdraw is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
 
   function setUp() public {
@@ -1938,7 +1938,7 @@ contract Withdraw is ReleaseGoldTest {
   }
 }
 
-contract WithdrawSelfDestruct_WhenNotRevoked is ReleaseGoldTest {
+contract ReleaseGoldTest_WithdrawSelfDestruct_WhenNotRevoked is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
 
   function setUp() public {
@@ -1964,7 +1964,7 @@ contract WithdrawSelfDestruct_WhenNotRevoked is ReleaseGoldTest {
   }
 }
 
-contract WithdrawSelfDestruct_WhenRevoked is ReleaseGoldTest {
+contract ReleaseGoldTest_WithdrawSelfDestruct_WhenRevoked is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
 
   function setUp() public {
@@ -1992,7 +1992,7 @@ contract WithdrawSelfDestruct_WhenRevoked is ReleaseGoldTest {
   }
 }
 
-contract GetCurrentReleasedTotalAmount is ReleaseGoldTest {
+contract ReleaseGoldTest_GetCurrentReleasedTotalAmount is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
 
   function setUp() public {
@@ -2035,7 +2035,7 @@ contract GetCurrentReleasedTotalAmount is ReleaseGoldTest {
   }
 }
 
-contract GetWithdrawableAmount is ReleaseGoldTest {
+contract ReleaseGoldTest_GetWithdrawableAmount is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
 
   function setUp() public {
