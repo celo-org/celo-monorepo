@@ -409,7 +409,7 @@ contract DowntimeSlasherTestSetSlashableDowntime is DowntimeSlasherTest {
     assertEq(_slashableDowntime, _newSlashableDowntime);
   }
 
-   function test_Reverts_WhenInL2() public {
+  function test_Reverts_WhenInL2() public {
     uint256 _newSlashableDowntime = 23;
 
     _whenL2();
@@ -514,7 +514,7 @@ contract DowntimeSlasherTestSetBitmapForInterval is DowntimeSlasherTest {
     slasher.setBitmapForInterval(blockNumber, blockNumber.add(1));
   }
 
-   function test_Reverts_WhenInL2_SetBitmapForInterval() public {
+  function test_Reverts_WhenInL2_SetBitmapForInterval() public {
     _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
     slasher.setBitmapForInterval(blockNumber, blockNumber.add(1));

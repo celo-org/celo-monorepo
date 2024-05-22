@@ -207,7 +207,7 @@ contract DoubleSigningSlasherSetSlashingIncentives is DoubleSigningSlasherBaseTe
     slasher.setSlashingIncentives(newPenalty, newReward);
   }
 
-   function test_ShouldRevert_WhenInL2() public {
+  function test_ShouldRevert_WhenInL2() public {
     uint256 newPenalty = 123;
     uint256 newReward = 67;
     _whenL2();
