@@ -4,9 +4,6 @@ set -euo pipefail
 # Keeping track of start time to measure how long it takes to run the script entirely
 START_TIME=$SECONDS
 
-# Compile everything
-time forge build
-
 export ANVIL_PORT=8546
 
 # TODO make this configurable
@@ -16,22 +13,7 @@ TEMP_FOLDER="$PWD/.tmp"
 
 source $PWD/migrations_sol/start_anvil.sh
 
-source $PWD/migrations_sol/deploy_precompiles.sh
-
-
-echo "Setting Registry Proxy"
-REGISTRY_ADDRESS="0x000000000000000000000000000000000000ce10"
-PROXY_BYTECODE=`cat ./out/Proxy.sol/Proxy.json | jq -r '.deployedBytecode.object'`
-cast rpc anvil_setCode --rpc-url http://127.0.0.1:$ANVIL_PORT $REGISTRY_ADDRESS $PROXY_BYTECODE
-REGISTRY_OWNER_ADDRESS=$FROM_ACCOUNT_NO_ZERO
-
-echo "Setting Registry owner"
-# Sets the storage of the registry so that it has an owner we control
-# pasition is bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1);
-cast rpc anvil_setStorageAt --rpc-url http://127.0.0.1:$ANVIL_PORT $REGISTRY_ADDRESS 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 "0x000000000000000000000000$REGISTRY_OWNER_ADDRESS"
-
-
-echo "Deploying libraries"
+# List of libraries
 LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
                 "contracts/common/Signatures.sol:Signatures"
                 "contracts/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
@@ -42,6 +24,29 @@ LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.
 
 LIBRARIES=""
 
+# Create a temporary directory and copy the libraries to the temporary directory.
+# The goal is to only build the libraries and not all smart contracts in the project.
+TEMP_DIR=$(mktemp -d -t forge-libraries-XXXXXX)
+########### DEBUGGING START ##########
+echo "DEBUGGING: TEMP_DIR is ${TEMP_DIR}"
+########### DEBUGGING END ##########
+for LIBRARY in "${LIBRARIES_PATH[@]}"; do
+    IFS=":" read -r SOURCE DEST <<< "$LIBRARY"
+    mkdir -p "$TEMP_DIR/$(dirname "$DEST")"
+    cp "$SOURCE" "$TEMP_DIR/$DEST"
+done
+
+# Ensure the forge.toml exists in the temporary directory for proper forge build
+cp $PWD/foundry.toml "$TEMP_DIR/"
+
+# Build the libraries in the temporary directory.
+echo "Building libraries"
+pushd "$TEMP_DIR"
+forge build --contracts . --out "$PWD/out"
+popd
+
+# Deploy the libraries
+echo "Deploying libraries"
 for library in "${LIBRARIES_PATH[@]}"; do
     library_name="${library#*:}" 
     echo "Deploying library: $library_name"
@@ -50,6 +55,9 @@ for library in "${LIBRARIES_PATH[@]}"; do
     
     LIBRARIES="$LIBRARIES --libraries $library:$library_address"
 done
+
+# Remove the temporary directory
+rm -rf "$TEMP_DIR"
 
 echo "Library flags are: $LIBRARIES"
 echo "Backing up libraries"
@@ -65,14 +73,32 @@ echo "$LIBRARIES" > $LIBRARIES_FILE
 # helpers to disable broadcast and simulation
 # TODO move to configuration
 BROADCAST="--broadcast"
-SKIP_SUMULATION=""
-# SKIP_SUMULATION="--skip-simulation" 
+SKIP_SIMULATION=""
+# SKIP_SIMULATION="--skip-simulation" 
 # BROADCAST=""
 
+# Build all contracts
+# Including contracts that depend on libraries. This step replaces the library placeholder
+# in the bytecode with the address of the actually deployed library.
 echo "Compiling with libraries... "
 time forge build $LIBRARIES
 
+# Deploy precompile contracts
+source $PWD/migrations_sol/deploy_precompiles.sh
+
+echo "Setting Registry Proxy"
+REGISTRY_ADDRESS="0x000000000000000000000000000000000000ce10"
+PROXY_BYTECODE=`cat ./out/Proxy.sol/Proxy.json | jq -r '.deployedBytecode.object'`
+cast rpc anvil_setCode --rpc-url http://127.0.0.1:$ANVIL_PORT $REGISTRY_ADDRESS $PROXY_BYTECODE
+REGISTRY_OWNER_ADDRESS=$FROM_ACCOUNT_NO_ZERO
+
+echo "Setting Registry owner"
+# Sets the storage of the registry so that it has an owner we control
+# position is bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1);
+cast rpc anvil_setStorageAt --rpc-url http://127.0.0.1:$ANVIL_PORT $REGISTRY_ADDRESS 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 "0x000000000000000000000000$REGISTRY_OWNER_ADDRESS"
+
 # run migrations
+echo "Running migration script... "
 time forge script migrations_sol/Migration.s.sol --tc Migration --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive --sender $FROM_ACCOUNT --unlocked $LIBRARIES || echo "Migration script failed"
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely
