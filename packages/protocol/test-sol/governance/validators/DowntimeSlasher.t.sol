@@ -671,7 +671,9 @@ contract DowntimeSlasherTestSlash_WhenIntervalInSameEpoch is DowntimeSlasherTest
     slasher.mockSlash(slashParams, _validatorsList);
   }
 
-   function test_Reverts_WhenL2_IfIntervalsOverlap_WhenIntervalCoverSlashableDowntimeWindow() public {
+  function test_Reverts_WhenL2_IfIntervalsOverlap_WhenIntervalCoverSlashableDowntimeWindow()
+    public
+  {
     uint256 startBlock = _getFirstBlockNumberOfEpoch(epoch);
     _bitmaps0[0] = bitmapWithoutValidator[validatorIndexInEpoch];
     _presetParentSealForBlock(startBlock, slashableDowntime, _bitmaps0);

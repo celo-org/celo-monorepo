@@ -85,7 +85,10 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil, IsL2Check {
    * @return The signature bitmap for the specified interval.
    * @dev startBlock and endBlock must be in the same epoch.
    */
-  function setBitmapForInterval(uint256 startBlock, uint256 endBlock) public onlyL1 returns (bytes32) {
+  function setBitmapForInterval(
+    uint256 startBlock,
+    uint256 endBlock
+  ) public onlyL1 returns (bytes32) {
     require(!isBitmapSetForInterval(startBlock, endBlock), "bitmap already set");
 
     bytes32 bitmap = getBitmapForInterval(startBlock, endBlock);
