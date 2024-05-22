@@ -1,7 +1,10 @@
+// TODO make Iproxy
+
 pragma solidity ^0.5.13;
 /* solhint-disable no-inline-assembly, no-complex-fallback, avoid-low-level-calls */
 
 import "openzeppelin-solidity/contracts/utils/Address.sol";
+// import "forge-std/console.sol";
 
 /**
  * @title A Proxy utilizing the Unstructured Storage pattern.
@@ -10,16 +13,11 @@ contract Proxy {
   // Used to store the address of the owner.
   bytes32 private constant OWNER_POSITION = bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1);
   // Used to store the address of the implementation contract.
-  bytes32 private constant IMPLEMENTATION_POSITION = bytes32(
-    uint256(keccak256("eip1967.proxy.implementation")) - 1
-  );
+  bytes32 private constant IMPLEMENTATION_POSITION =
+    bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1);
 
   event OwnerSet(address indexed owner);
   event ImplementationSet(address indexed implementation);
-
-  constructor() public {
-    _setOwner(msg.sender);
-  }
 
   /**
    * @notice Throws if called by any account other than the owner.
@@ -27,6 +25,10 @@ contract Proxy {
   modifier onlyOwner() {
     require(msg.sender == _getOwner(), "sender was not owner");
     _;
+  }
+
+  constructor() public {
+    _setOwner(msg.sender);
   }
 
   /**
@@ -72,12 +74,12 @@ contract Proxy {
 
       // Revert or return depending on whether or not the call was successful.
       switch delegatecallSuccess
-        case 0 {
-          revert(returnDataPosition, returnDataSize)
-        }
-        default {
-          return(returnDataPosition, returnDataSize)
-        }
+      case 0 {
+        revert(returnDataPosition, returnDataSize)
+      }
+      default {
+        return(returnDataPosition, returnDataSize)
+      }
     }
   }
 
@@ -98,11 +100,10 @@ contract Proxy {
    * @dev If the target contract does not need initialization, use
    * setImplementation instead.
    */
-  function _setAndInitializeImplementation(address implementation, bytes calldata callbackData)
-    external
-    payable
-    onlyOwner
-  {
+  function _setAndInitializeImplementation(
+    address implementation,
+    bytes calldata callbackData
+  ) external payable onlyOwner {
     _setImplementation(implementation);
     bool success;
     bytes memory returnValue;

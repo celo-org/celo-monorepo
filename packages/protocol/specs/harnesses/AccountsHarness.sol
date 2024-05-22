@@ -33,19 +33,19 @@ contract AccountsHarness is Accounts {
     return defaultSigners[account][role];
   }
 
-  function isCompletedSignerAuthorization(address account, bytes32 role, address signer)
-    public
-    view
-    returns (bool)
-  {
+  function isCompletedSignerAuthorization(
+    address account,
+    bytes32 role,
+    address signer
+  ) public view returns (bool) {
     return signerAuthorizations[account][role][signer].completed;
   }
 
-  function isStartedSignerAuthorization(address account, bytes32 role, address signer)
-    public
-    view
-    returns (bool)
-  {
+  function isStartedSignerAuthorization(
+    address account,
+    bytes32 role,
+    address signer
+  ) public view returns (bool) {
     return signerAuthorizations[account][role][signer].started;
   }
 

@@ -5,13 +5,13 @@ import "../common/ExternalCall.sol";
 contract IdentityProxy {
   address public deployer;
 
-  constructor() public {
-    deployer = msg.sender;
-  }
-
   modifier onlyDeployer() {
     require(msg.sender == deployer, "Only callable by original deployer");
     _;
+  }
+
+  constructor() public {
+    deployer = msg.sender;
   }
 
   /**
@@ -22,12 +22,10 @@ contract IdentityProxy {
    * the IdentityProxyHub after it checks the identity heuristic.
    * @return The return value of the external call.
    */
-  function makeCall(address destination, bytes calldata data)
-    external
-    payable
-    onlyDeployer
-    returns (bytes memory)
-  {
+  function makeCall(
+    address destination,
+    bytes calldata data
+  ) external payable onlyDeployer returns (bytes memory) {
     return ExternalCall.execute(destination, msg.value, data);
   }
 }

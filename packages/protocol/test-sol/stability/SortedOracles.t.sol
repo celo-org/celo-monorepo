@@ -4,10 +4,11 @@ pragma experimental ABIEncoderV2;
 
 import { Test } from "celo-foundry/Test.sol";
 import { SortedOracles } from "../../contracts/stability/SortedOracles.sol";
-import "../../contracts/common/FixidityLib.sol";
-import "../../contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol";
-import "../../contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
+import "@celo-contracts/common/FixidityLib.sol";
+import "@celo-contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol";
+import "@celo-contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
 import { Constants } from "../constants.sol";
+import "forge-std/console.sol";
 
 contract SortedOraclesTest is Test, Constants {
   using FixidityLib for FixidityLib.Fraction;
@@ -17,7 +18,7 @@ contract SortedOraclesTest is Test, Constants {
 
   address oracleAccount;
   address aToken = 0x00000000000000000000000000000000DeaDBeef;
-  uint256 reportExpiry = 1 * 60 * 60; // 1 hour
+  uint256 reportExpiry = HOUR;
 
   event OracleAdded(address indexed token, address indexed oracleAddress);
   event OracleRemoved(address indexed token, address indexed oracleAddress);
@@ -31,6 +32,7 @@ contract SortedOraclesTest is Test, Constants {
   event MedianUpdated(address indexed token, uint256 value);
   event ReportExpirySet(uint256 reportExpiry);
   event TokenReportExpirySet(address token, uint256 reportExpiry);
+  event EquivalentTokenSet(address indexed token, address indexed equivalentToken);
 
   function setUp() public {
     warp(0);
@@ -44,7 +46,7 @@ contract SortedOraclesTest is Test, Constants {
   }
 }
 
-contract Initialize is SortedOraclesTest {
+contract SortedOraclesTest_Initialize is SortedOraclesTest {
   function test_ownerSet() public {
     assertEq(sortedOracle.owner(), address(this));
   }
@@ -53,7 +55,7 @@ contract Initialize is SortedOraclesTest {
     assertEq(sortedOracle.reportExpirySeconds(), reportExpiry);
   }
 
-  function test_ShouldRevertWhenCalledAgain() public {
+  function test_ShouldRevert_WhenCalledAgain() public {
     vm.expectRevert("contract already initialized");
     sortedOracle.initialize(reportExpiry);
   }
@@ -66,7 +68,7 @@ contract SetReportExpiry is SortedOraclesTest {
     assertEq(sortedOracle.reportExpirySeconds(), newReportExpiry);
   }
 
-  function test_ShouldEmitReportExpirySetEvent() public {
+  function test_Emits_ReportExpirySetEvent() public {
     uint256 newReportExpiry = reportExpiry * 2;
     vm.expectEmit(true, true, true, true);
     emit ReportExpirySet(newReportExpiry);
@@ -80,6 +82,67 @@ contract SetReportExpiry is SortedOraclesTest {
   }
 }
 
+contract SortedOracles_SetEquivalentToken is SortedOraclesTest {
+  address bToken = actor("bToken");
+
+  function test_ShouldSetReportExpiry() public {
+    sortedOracle.setEquivalentToken(aToken, bToken);
+    address equivalentToken = sortedOracle.getEquivalentToken(aToken);
+    assertEq(equivalentToken, bToken);
+  }
+
+  function test_ShouldRevert_WhenToken0() public {
+    vm.expectRevert("token address cannot be 0");
+    sortedOracle.setEquivalentToken(address(0), bToken);
+  }
+
+  function test_ShouldRevert_WhenEquivalentToken0() public {
+    vm.expectRevert("equivalentToken address cannot be 0");
+    sortedOracle.setEquivalentToken(aToken, address(0));
+  }
+
+  function test_ShouldEmitEquivalentTokenSet() public {
+    vm.expectEmit(true, true, true, true);
+    emit EquivalentTokenSet(aToken, bToken);
+    sortedOracle.setEquivalentToken(aToken, bToken);
+  }
+
+  function test_ShouldRevertWhenNotOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(oracleAccount);
+    sortedOracle.setEquivalentToken(aToken, bToken);
+  }
+}
+
+contract SortedOracles_DeleteEquivalentToken is SortedOraclesTest {
+  address bToken = actor("bToken");
+
+  function test_ShouldDeleteEquivalentToken() public {
+    sortedOracle.setEquivalentToken(aToken, bToken);
+    sortedOracle.deleteEquivalentToken(aToken);
+    address equivalentToken = sortedOracle.getEquivalentToken(aToken);
+    assertEq(equivalentToken, address(0));
+  }
+
+  function test_ShouldRevert_WhenEquivalentToken0() public {
+    vm.expectRevert("token address cannot be 0");
+    sortedOracle.deleteEquivalentToken(address(0));
+  }
+
+  function test_ShouldEmitEquivalentTokenSet() public {
+    sortedOracle.setEquivalentToken(aToken, bToken);
+    vm.expectEmit(true, true, true, true);
+    emit EquivalentTokenSet(aToken, address(0));
+    sortedOracle.deleteEquivalentToken(aToken);
+  }
+
+  function test_ShouldRevertWhenNotOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(oracleAccount);
+    sortedOracle.deleteEquivalentToken(aToken);
+  }
+}
+
 contract SetTokenReportExpiry is SortedOraclesTest {
   function test_ShouldSetTokenReportExpiry() public {
     uint256 newReportExpiry = reportExpiry * 2;
@@ -87,7 +150,7 @@ contract SetTokenReportExpiry is SortedOraclesTest {
     assertEq(sortedOracle.tokenReportExpirySeconds(aToken), newReportExpiry);
   }
 
-  function test_ShouldEmitTokenReportExpirySetEvent() public {
+  function test_Emits_TokenReportExpirySetEvent() public {
     uint256 newReportExpiry = reportExpiry * 2;
     vm.expectEmit(true, true, true, true);
     emit TokenReportExpirySet(aToken, newReportExpiry);
@@ -107,7 +170,7 @@ contract AddOracle is SortedOraclesTest {
     assertEq(sortedOracle.isOracle(aToken, oracleAccount), true);
   }
 
-  function test_ShouldEmitOracleAddedEvent() public {
+  function test_Emits_OracleAddedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit OracleAdded(aToken, oracleAccount);
     sortedOracle.addOracle(aToken, oracleAccount);
@@ -121,17 +184,23 @@ contract AddOracle is SortedOraclesTest {
 
   function test_ShouldRevertWhenAlreadyOracle() public {
     sortedOracle.addOracle(aToken, oracleAccount);
-    vm.expectRevert("oracle addr is not an oracle for token addr");
+    vm.expectRevert(
+      "token addr was null or oracle addr was null or oracle addr is already an oracle for token addr"
+    );
     sortedOracle.addOracle(aToken, oracleAccount);
   }
 
   function test_ShouldRevertWhenOracleIsZeroAddress() public {
-    vm.expectRevert("oracle addr was null");
+    vm.expectRevert(
+      "token addr was null or oracle addr was null or oracle addr is already an oracle for token addr"
+    );
     sortedOracle.addOracle(aToken, address(0));
   }
 
   function test_ShouldRevertWhenTokenIsZeroAddress() public {
-    vm.expectRevert("token addr was null");
+    vm.expectRevert(
+      "token addr was null or oracle addr was null or oracle addr is already an oracle for token addr"
+    );
     sortedOracle.addOracle(address(0), oracleAccount);
   }
 }
@@ -331,6 +400,9 @@ contract RemoveOracle is SortedOraclesTest {
   function test_ShouldRemoveOracle() public {
     sortedOracle.removeOracle(aToken, oracleAccount, 0);
     assertEq(sortedOracle.isOracle(aToken, oracleAccount), false);
+
+    address[] memory oracles = sortedOracle.getOracles(aToken);
+    assertEq(oracles.length, 0);
   }
 
   function helper_WhenThereIsMoreThanOneReportMade() public {
@@ -358,14 +430,14 @@ contract RemoveOracle is SortedOraclesTest {
     assertEq(sortedOracle.numTimestamps(aToken), 1);
   }
 
-  function test_ShouldEmitOracleRemoved_WhenTHereIsMOreThanOneReportMade() public {
+  function test_Emits_OracleRemoved_WhenTHereIsMOreThanOneReportMade() public {
     helper_WhenThereIsMoreThanOneReportMade();
     vm.expectEmit(true, true, true, true);
     emit OracleRemoved(aToken, oracleAccount2);
     sortedOracle.removeOracle(aToken, oracleAccount2, 1);
   }
 
-  function test_ShouldEmitOracleReportRemoved_WhenTHereIsMOreThanOneReportMade() public {
+  function test_Emits_OracleReportRemoved_WhenTHereIsMOreThanOneReportMade() public {
     helper_WhenThereIsMoreThanOneReportMade();
 
     vm.expectEmit(true, true, true, true);
@@ -373,7 +445,7 @@ contract RemoveOracle is SortedOraclesTest {
     sortedOracle.removeOracle(aToken, oracleAccount2, 1);
   }
 
-  function test_ShouldEmitMedianUpdatedEvents_WhenTHereIsMOreThanOneReportMade() public {
+  function test_Emits_MedianUpdatedEvents_WhenTHereIsMOreThanOneReportMade() public {
     helper_WhenThereIsMoreThanOneReportMade();
     vm.expectEmit(true, true, true, true);
     emit MedianUpdated(aToken, FIXED1);
@@ -404,8 +476,11 @@ contract RemoveOracle is SortedOraclesTest {
 
     sortedOracle.removeOracle(aToken, oracleAccount, 0);
     (uint256 newMedianRate, uint256 newNumOfRates) = sortedOracle.medianRate(aToken);
+    (uint256 exchangeRate, uint256 exchangeRateDenominator) = sortedOracle.getExchangeRate(aToken);
     assertEq(originalMedianRate, newMedianRate);
     assertEq(originalNumOfRates, newNumOfRates);
+    assertEq(exchangeRate, newMedianRate);
+    assertEq(exchangeRateDenominator, FIXED1);
   }
 
   function test_ShouldNotDecreaseTheNumberOfTimestamps_WhenThereIsASingleReportLeft() public {
@@ -437,7 +512,7 @@ contract RemoveOracle is SortedOraclesTest {
 
   // TODO: add test for not emitting any of the remove events once we migrate to 0.8
 
-  function test_ShouldEmitOracleRemovedEvent() public {
+  function test_Emits_OracleRemovedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit OracleRemoved(aToken, oracleAccount);
     sortedOracle.removeOracle(aToken, oracleAccount, 0);
@@ -473,6 +548,8 @@ contract Report is SortedOraclesTest {
   uint256 oracleValue2 = FixidityLib.newFixedFraction(3, 1).unwrap();
   uint256 anotherOracleValue = FIXED1;
 
+  address bToken = actor("bToken");
+
   function setUp() public {
     super.setUp();
     sortedOracle.addOracle(aToken, oracleAccount);
@@ -492,20 +569,57 @@ contract Report is SortedOraclesTest {
     assertEq(denominator, FIXED1);
   }
 
+  function test_ShouldReturnTheMedianRate_WhenEquivalentTokenIsSet() public {
+    vm.prank(oracleAccount);
+    sortedOracle.report(aToken, value, address(0), address(0));
+    sortedOracle.setEquivalentToken(bToken, aToken);
+    (uint256 medianRate, uint256 denominator) = sortedOracle.medianRate(bToken);
+    assertEq(medianRate, value);
+    assertEq(denominator, FIXED1);
+  }
+
+  function test_ShouldNotReturnTheMedianRate_WhenEquivalentTokenIsSet() public {
+    vm.prank(oracleAccount);
+    sortedOracle.report(aToken, value, address(0), address(0));
+    sortedOracle.setEquivalentToken(bToken, aToken);
+    (uint256 medianRate, uint256 denominator) = sortedOracle.medianRateWithoutEquivalentMapping(
+      bToken
+    );
+    assertEq(medianRate, 0);
+    assertEq(denominator, 0);
+  }
+
+  function test_ShouldNotReturnTheMedianRateOfEquivalentToken_WhenEquivalentTokenIsSetAndDeleted()
+    public
+  {
+    vm.prank(oracleAccount);
+    sortedOracle.report(aToken, value, address(0), address(0));
+    sortedOracle.setEquivalentToken(bToken, aToken);
+    uint256 medianRate;
+    uint256 denominator;
+    (medianRate, denominator) = sortedOracle.medianRate(bToken);
+    assertEq(medianRate, value);
+    assertEq(denominator, FIXED1);
+    sortedOracle.deleteEquivalentToken(bToken);
+    (medianRate, denominator) = sortedOracle.medianRate(bToken);
+    assertEq(medianRate, 0);
+    assertEq(denominator, 0);
+  }
+
   function test_ShouldIncreaseTheNumberOfTimestamps() public {
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, value, address(0), address(0));
     assertEq(sortedOracle.numTimestamps(aToken), 1);
   }
 
-  function test_ShouldEmitOracleReportedEvent() public {
+  function test_Emits_OracleReportedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit OracleReported(aToken, oracleAccount, now, value);
     vm.prank(oracleAccount);
     sortedOracle.report(aToken, value, address(0), address(0));
   }
 
-  function test_ShouldEmitMedianUpdatedEvent() public {
+  function test_Emits_MedianUpdatedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit MedianUpdated(aToken, value);
     vm.prank(oracleAccount);
@@ -551,7 +665,6 @@ contract Report is SortedOraclesTest {
     (, uint256[] memory rateValues, ) = sortedOracle.getRates(aToken);
     assertEq(rateValues[0], oracleValue1);
     assertEq(rateValues[1], anotherOracleValue);
-
   }
 
   function test_ShouldUpdateTheListOfRatesCorrectly_WhenThereAreMultipleReportsTheMostRecentOneIsDoneByThisOracle()
@@ -582,5 +695,4 @@ contract Report is SortedOraclesTest {
     assertGt(timestampValuesAfter[0], timestampValuesBefore[0]);
     assertEq(timestampValuesBefore[1], timestampValuesAfter[1]);
   }
-
 }

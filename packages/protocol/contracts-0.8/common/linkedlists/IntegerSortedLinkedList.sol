@@ -107,11 +107,9 @@ library IntegerSortedLinkedList {
    * @return Array of all keys in the list.
    * @return Values corresponding to keys, which will be ordered largest to smallest.
    */
-  function getElements(SortedLinkedList.List storage list)
-    public
-    view
-    returns (uint256[] memory, uint256[] memory)
-  {
+  function getElements(
+    SortedLinkedList.List storage list
+  ) public view returns (uint256[] memory, uint256[] memory) {
     bytes32[] memory byteKeys = list.getKeys();
     uint256[] memory keys = new uint256[](byteKeys.length);
     uint256[] memory values = new uint256[](byteKeys.length);

@@ -23,26 +23,21 @@ import "../../lib/mento-core/contracts/interfaces/IStableToken.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 
 contract UsingRegistry is Ownable {
-  event RegistrySet(address indexed registryAddress);
-
   // solhint-disable state-visibility
   bytes32 constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
   bytes32 constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));
   bytes32 constant DOWNTIME_SLASHER_REGISTRY_ID = keccak256(abi.encodePacked("DowntimeSlasher"));
-  bytes32 constant DOUBLE_SIGNING_SLASHER_REGISTRY_ID = keccak256(
-    abi.encodePacked("DoubleSigningSlasher")
-  );
+  bytes32 constant DOUBLE_SIGNING_SLASHER_REGISTRY_ID =
+    keccak256(abi.encodePacked("DoubleSigningSlasher"));
   bytes32 constant ELECTION_REGISTRY_ID = keccak256(abi.encodePacked("Election"));
   bytes32 constant EXCHANGE_REGISTRY_ID = keccak256(abi.encodePacked("Exchange"));
-  bytes32 constant FEE_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
-    abi.encodePacked("FeeCurrencyWhitelist")
-  );
+  bytes32 constant FEE_CURRENCY_WHITELIST_REGISTRY_ID =
+    keccak256(abi.encodePacked("FeeCurrencyWhitelist"));
   bytes32 constant FREEZER_REGISTRY_ID = keccak256(abi.encodePacked("Freezer"));
   bytes32 constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));
   bytes32 constant GOVERNANCE_REGISTRY_ID = keccak256(abi.encodePacked("Governance"));
-  bytes32 constant GOVERNANCE_SLASHER_REGISTRY_ID = keccak256(
-    abi.encodePacked("GovernanceSlasher")
-  );
+  bytes32 constant GOVERNANCE_SLASHER_REGISTRY_ID =
+    keccak256(abi.encodePacked("GovernanceSlasher"));
   bytes32 constant LOCKED_GOLD_REGISTRY_ID = keccak256(abi.encodePacked("LockedGold"));
   bytes32 constant RESERVE_REGISTRY_ID = keccak256(abi.encodePacked("Reserve"));
   bytes32 constant RANDOM_REGISTRY_ID = keccak256(abi.encodePacked("Random"));
@@ -52,6 +47,8 @@ contract UsingRegistry is Ownable {
   // solhint-enable state-visibility
 
   IRegistry public registry;
+
+  event RegistrySet(address indexed registryAddress);
 
   modifier onlyRegisteredContract(bytes32 identifierHash) {
     require(registry.getAddressForOrDie(identifierHash) == msg.sender, "only registered contract");

@@ -26,7 +26,7 @@
     "bip39": "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2",
     "bunyan": "1.8.12",
     "bunyan-gke-stackdriver": "0.1.2",
-    "compare-versions": "^3.5.1",
+    "compare-versions": "^6.0.0",
     "dotenv": "^16.0.3",
     "ecurve": "^1.0.6",
     "eth-lib": "^0.2.8",
@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.3",
+    "@celo/dev-utils":"^0.0.3",
     "@celo/protocol": "1.0.2",
     "@types/bunyan": "1.8.8",
     "@types/chai": "^4.1.3",

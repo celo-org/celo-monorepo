@@ -11,7 +11,7 @@ import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/DoubleSigningSlasher.sol";
 import "@celo-contracts/governance/test/MockUsingPrecompiles.sol";
 
-contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecompiles {
+contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecompiles, Test {
   struct SlashParams {
     address signer;
     uint256 index;
@@ -26,7 +26,13 @@ contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecom
     uint256[] groupElectionIndices;
   }
 
-  function mockSlash(SlashParams calldata slashParams) external {
+  function mockSlash(SlashParams calldata slashParams, address _validator) external {
+    ph.mockReturn(
+      ph.GET_VALIDATOR(),
+      abi.encodePacked(slashParams.index, getBlockNumberFromHeader(slashParams.headerA)),
+      abi.encode(_validator)
+    );
+
     slash(
       slashParams.signer,
       slashParams.index,
@@ -75,6 +81,7 @@ contract DoubleSigningSlasherBaseTest is Test {
   address caller2;
   uint256 caller2PK;
   address public registryAddress = 0x000000000000000000000000000000000000ce10;
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   struct SlashingIncentives {
     // Value of LockedGold to slash from the account.
@@ -93,7 +100,7 @@ contract DoubleSigningSlasherBaseTest is Test {
     (nonOwner, nonOwnerPK) = actorWithPK("nonOwner");
     (validator, validatorPK) = actorWithPK("validator");
     (group, groupPK) = actorWithPK("group");
-    (otherValidator, validatorPK) = actorWithPK("otherValidator");
+    (otherValidator, otherValidatorPK) = actorWithPK("otherValidator");
     (otherGroup, groupPK) = actorWithPK("otherGroup");
     (caller2, caller2PK) = actorWithPK("caller2");
 
@@ -147,6 +154,10 @@ contract DoubleSigningSlasherBaseTest is Test {
     lockedGold.setAccountTotalLockedGold(group, 50000);
     lockedGold.setAccountTotalLockedGold(otherGroup, 50000);
   }
+
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+  }
 }
 
 contract DoubleSigningSlasherInitialize is DoubleSigningSlasherBaseTest {
@@ -193,6 +204,15 @@ contract DoubleSigningSlasherSetSlashingIncentives is DoubleSigningSlasherBaseTe
     uint256 newReward = 67;
     vm.expectEmit(true, true, true, true);
     emit SlashingIncentivesSet(newPenalty, newReward);
+    slasher.setSlashingIncentives(newPenalty, newReward);
+  }
+
+  function test_ShouldRevert_WhenInL2() public {
+    uint256 newPenalty = 123;
+    uint256 newReward = 67;
+
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     slasher.setSlashingIncentives(newPenalty, newReward);
   }
 }
@@ -248,7 +268,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
       groupElectionIndices: groupElectionIndices
     });
     vm.expectRevert("Block headers are from different height");
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, validator);
   }
 
   function test_RevertIf_NotSignedAtIndex() public {
@@ -268,7 +288,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
 
     vm.expectRevert("Didn't sign first block");
 
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, otherValidator);
   }
 
   function test_RevertIf_EpochSignerIsWrong() public {
@@ -287,7 +307,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
     });
 
     vm.expectRevert("Wasn't a signer with given index");
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, validator);
   }
 
   function test_RevertIf_NotEnoughSigners() public {
@@ -308,7 +328,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
     });
 
     vm.expectRevert("Not enough signers in the first block");
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, validator);
   }
 
   function test_Emits_DoubleSigningSlashPerformedEvent() public {
@@ -327,7 +347,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
     });
     vm.expectEmit(true, true, true, true);
     emit DoubleSigningSlashPerformed(validator, blockNumber);
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, validator);
   }
 
   function test_ShouldDecrementCELO() public {
@@ -345,7 +365,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
       groupElectionIndices: groupElectionIndices
     });
 
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, validator);
 
     assertEq(lockedGold.accountTotalLockedGold(validator), 40000);
   }
@@ -365,7 +385,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
       groupElectionIndices: groupElectionIndices
     });
 
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, validator);
     assertEq(lockedGold.accountTotalLockedGold(group), 40000);
   }
 
@@ -383,8 +403,27 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
       groupElectionGreaters: groupElectionGreaters,
       groupElectionIndices: groupElectionIndices
     });
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, validator);
     vm.expectRevert("Already slashed");
-    slasher.mockSlash(params);
+    slasher.mockSlash(params, validator);
+  }
+
+  function test_Reverts_WhenL2() public {
+    _whenL2();
+    params = DoubleSigningSlasherTest.SlashParams({
+      signer: validator,
+      index: validatorIndex,
+      headerA: headerA,
+      headerB: headerC,
+      groupMembershipHistoryIndex: 0,
+      validatorElectionLessers: validatorElectionLessers,
+      validatorElectionGreaters: validatorElectionGreaters,
+      validatorElectionIndices: validatorElectionIndices,
+      groupElectionLessers: groupElectionLessers,
+      groupElectionGreaters: groupElectionGreaters,
+      groupElectionIndices: groupElectionIndices
+    });
+    vm.expectRevert("This method is no longer supported in L2.");
+    slasher.mockSlash(params, validator);
   }
 }

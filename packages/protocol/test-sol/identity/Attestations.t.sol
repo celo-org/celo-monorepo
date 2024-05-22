@@ -144,11 +144,11 @@ contract AttestationsFoundryTest is Test {
     vm.stopPrank();
   }
 
-  function getVerificationCodeSignature(address account, uint256 issuerPK, bytes32 identifier)
-    public
-    pure
-    returns (uint8 v, bytes32 r, bytes32 s)
-  {
+  function getVerificationCodeSignature(
+    address account,
+    uint256 issuerPK,
+    bytes32 identifier
+  ) public pure returns (uint8 v, bytes32 r, bytes32 s) {
     uint256 derivedPK = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, issuerPK);
     bytes32 attestationMessage = keccak256(abi.encodePacked(identifier, account));
     bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(attestationMessage);
@@ -183,11 +183,10 @@ contract AttestationsFoundryTest is Test {
     completeAttestations(account);
   }
 
-  function getParsedSignatureOfAddress(address _address, uint256 privateKey)
-    public
-    pure
-    returns (uint8, bytes32, bytes32)
-  {
+  function getParsedSignatureOfAddress(
+    address _address,
+    uint256 privateKey
+  ) public pure returns (uint8, bytes32, bytes32) {
     bytes32 addressHash = keccak256(abi.encodePacked(_address));
     bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
     return vm.sign(privateKey, prefixedHash);
@@ -221,7 +220,6 @@ contract AttestationsFoundryTest is Test {
     );
     vm.stopPrank();
     return attestationAddress;
-
   }
 
   function unlockDerivedValidator(address account, uint256 accountPK) public returns (address) {
@@ -395,7 +393,7 @@ contract AttestationsSetAttestationsExpirySeconds is AttestationsFoundryTest {
     assertEq(attestationsTest.attestationExpiryBlocks(), newMaxNumBlocksPerAttestation);
   }
 
-  function test_ShouldEmitAttestationExpiryBlocksSetEvent() public {
+  function test_Emits_AttestationExpiryBlocksSetEvent() public {
     vm.expectEmit(true, true, true, true);
     emit AttestationExpiryBlocksSet(newMaxNumBlocksPerAttestation);
     attestationsTest.setAttestationExpiryBlocks(newMaxNumBlocksPerAttestation);
@@ -425,7 +423,7 @@ contract AttestationsSetAttestationsRequestFee is AttestationsFoundryTest {
     attestationsTest.setAttestationRequestFee(address(mockERC20Token), 0);
   }
 
-  function test_ShouldEmitAttestationRequestFeeSetEvent() public {
+  function test_Emits_AttestationRequestFeeSetEvent() public {
     vm.expectEmit(true, true, true, true);
     emit AttestationRequestFeeSet(address(mockERC20Token), newAttestationFee);
     attestationsTest.setAttestationRequestFee(address(mockERC20Token), newAttestationFee);
@@ -450,7 +448,7 @@ contract AttestationsSetSelectedIssuersWaitBlock is AttestationsFoundryTest {
     assertEq(attestationsTest.selectIssuersWaitBlocks(), newSelectIssuersWaitBlocks);
   }
 
-  function test_ShouldEmitAttestationRequestFeeSetEvent() public {
+  function test_Emits_AttestationRequestFeeSetEvent() public {
     vm.expectEmit(true, true, true, true);
     emit SelectIssuersWaitBlocksSet(newSelectIssuersWaitBlocks);
     attestationsTest.setSelectIssuersWaitBlocks(newSelectIssuersWaitBlocks);
@@ -475,7 +473,7 @@ contract AttestationsSetMaxAttestations is AttestationsFoundryTest {
     assertEq(attestationsTest.maxAttestations(), newMaxAttestations);
   }
 
-  function test_ShouldEmitAttestationRequestFeeSetEvent() public {
+  function test_Emits_AttestationRequestFeeSetEvent() public {
     vm.expectEmit(true, true, true, true);
     emit MaxAttestationsSet(newMaxAttestations);
     attestationsTest.setMaxAttestations(newMaxAttestations);
@@ -520,7 +518,7 @@ contract AttestationsWithdraw is AttestationsFoundryTest {
     attestationsTest.withdraw(address(mockERC20Token));
   }
 
-  function test_ShouldEmitTheWithdrawalEvent() public {
+  function test_Emits_TheWithdrawalEvent() public {
     vm.expectEmit(true, true, true, true);
     emit Withdrawal(issuer, address(mockERC20Token), attestationFee);
     vm.prank(issuer);
@@ -600,8 +598,12 @@ contract AttestationsBatchGetAttestationStats is AttestationsFoundryTest {
     identifiers[0] = phoneHash;
 
     vm.prank(caller);
-    (uint256[] memory matches, address[] memory addresses, uint64[] memory completed, uint64[] memory total) = attestationsTest
-      .batchGetAttestationStats(identifiers);
+    (
+      uint256[] memory matches,
+      address[] memory addresses,
+      uint64[] memory completed,
+      uint64[] memory total
+    ) = attestationsTest.batchGetAttestationStats(identifiers);
 
     assertEq(matches[0], 0);
     assertEq(addresses.length, 0);
@@ -619,8 +621,12 @@ contract AttestationsBatchGetAttestationStats is AttestationsFoundryTest {
     identifiers[0] = phoneHash;
 
     vm.prank(caller);
-    (uint256[] memory matches, address[] memory addresses, uint64[] memory completed, uint64[] memory total) = attestationsTest
-      .batchGetAttestationStats(identifiers);
+    (
+      uint256[] memory matches,
+      address[] memory addresses,
+      uint64[] memory completed,
+      uint64[] memory total
+    ) = attestationsTest.batchGetAttestationStats(identifiers);
 
     assertEq(matches.length, 1);
     assertEq(addresses.length, 1);
@@ -645,8 +651,12 @@ contract AttestationsBatchGetAttestationStats is AttestationsFoundryTest {
     bytes32[] memory identifiers = new bytes32[](1);
     identifiers[0] = phoneHash;
 
-    (uint256[] memory matches, address[] memory addresses, uint64[] memory completed, uint64[] memory total) = attestationsTest
-      .batchGetAttestationStats(identifiers);
+    (
+      uint256[] memory matches,
+      address[] memory addresses,
+      uint64[] memory completed,
+      uint64[] memory total
+    ) = attestationsTest.batchGetAttestationStats(identifiers);
 
     assertEq(matches.length, 1);
     assertEq(addresses.length, 2);
@@ -671,8 +681,12 @@ contract AttestationsBatchGetAttestationStats is AttestationsFoundryTest {
     identifiers[0] = phoneHash;
 
     vm.prank(caller);
-    (uint256[] memory matches, address[] memory addresses, uint64[] memory completed, uint64[] memory total) = attestationsTest
-      .batchGetAttestationStats(identifiers);
+    (
+      uint256[] memory matches,
+      address[] memory addresses,
+      uint64[] memory completed,
+      uint64[] memory total
+    ) = attestationsTest.batchGetAttestationStats(identifiers);
 
     assertEq(matches.length, 1);
     assertEq(addresses.length, 1);
@@ -690,8 +704,12 @@ contract AttestationsBatchGetAttestationStats is AttestationsFoundryTest {
     identifiers[0] = phoneHash;
 
     vm.prank(caller);
-    (uint256[] memory matches, address[] memory addresses, uint64[] memory completed, uint64[] memory total) = attestationsTest
-      .batchGetAttestationStats(identifiers);
+    (
+      uint256[] memory matches,
+      address[] memory addresses,
+      uint64[] memory completed,
+      uint64[] memory total
+    ) = attestationsTest.batchGetAttestationStats(identifiers);
 
     assertEq(matches.length, 1);
     assertEq(addresses.length, 0);
@@ -716,8 +734,12 @@ contract AttestationsRevoke is AttestationsFoundryTest {
     bytes32[] memory identifiers = new bytes32[](1);
     identifiers[0] = phoneHash;
 
-    (uint256[] memory matches, address[] memory addresses, uint64[] memory completed, uint64[] memory total) = attestationsTest
-      .batchGetAttestationStats(identifiers);
+    (
+      uint256[] memory matches,
+      address[] memory addresses,
+      uint64[] memory completed,
+      uint64[] memory total
+    ) = attestationsTest.batchGetAttestationStats(identifiers);
 
     assertEq(matches.length, 1);
     assertEq(addresses.length, 0);
@@ -756,5 +778,4 @@ contract AttestationsRequireNAttestationRequests is AttestationsFoundryTest {
     vm.prank(caller);
     attestationsTest.requireNAttestationsRequested(phoneHash, caller, 3);
   }
-
 }

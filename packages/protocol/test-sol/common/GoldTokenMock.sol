@@ -1,12 +1,12 @@
 pragma solidity ^0.5.13;
 // solhint-disable no-unused-vars
 
-import "../GoldToken.sol";
+import "@celo-contracts/common/GoldToken.sol";
 
 /**
  * @title A mock GoldToken for testing.
  */
-contract MockGoldToken is GoldToken(true) {
+contract GoldTokenMock is GoldToken(true) {
   uint8 public constant decimals = 18;
   mapping(address => uint256) balances;
 
@@ -38,5 +38,4 @@ contract MockGoldToken is GoldToken(true) {
   function balanceOf(address a) public view returns (uint256) {
     return balances[a];
   }
-
 }

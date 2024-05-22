@@ -17,9 +17,8 @@ contract IdentityProxyHubTest is Test {
 
   address randomActor = actor("randomActor");
 
-  bytes32 identifier = keccak256(
-    "0x00000000000000000000000000000000000000000000000000000000babecafe"
-  );
+  bytes32 identifier =
+    keccak256("0x00000000000000000000000000000000000000000000000000000000babecafe");
 
   function setUp() public {
     identityProxy = new IdentityProxy();
@@ -235,4 +234,3 @@ contract IdentityProxyTestMakeCall_WhenCalledByContractRelatedToTheIdentifier is
     assertEq(balanceAfter, 100);
   }
 }
-

@@ -140,7 +140,7 @@ contract ProxyTest_transferOwnership is ProxyTest {
     proxy._transferOwnership(nonOwner);
   }
 
-  function test_ShouldEmitOwnerSet() public {
+  function test_Emits_OwnerSet() public {
     vm.expectEmit(true, true, true, true);
     emit OwnerSet(newOwner);
     proxy._transferOwnership(newOwner);
@@ -202,5 +202,4 @@ contract ProxyTest_fallback is ProxyTest {
     assertEq(numberReturn, numberTotest);
     assertEq(stringReturn, "DON'T PANIC");
   }
-
 }

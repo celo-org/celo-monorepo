@@ -18,5 +18,4 @@ contract MethodsAddedContract {
   function newMethod2(uint256 p) public payable returns (uint256) {
     return i + 2 + p;
   }
-
 }

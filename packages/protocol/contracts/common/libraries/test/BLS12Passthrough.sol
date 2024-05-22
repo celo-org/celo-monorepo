@@ -13,7 +13,59 @@ contract Common {
   using TypedMemView for bytes;
   using TypedMemView for bytes29;
 
+  event MEMDUMP(uint256 a, uint256 b, uint256 c, uint256 d);
+
   constructor() public {}
+
+  function fpMulTest(
+    uint256 a1,
+    uint256 a2,
+    uint256 b1,
+    uint256 b2
+  ) external view returns (uint256, uint256) {
+    B12.Fp memory a = B12.Fp(a1, a2);
+    B12.Fp memory b = B12.Fp(b1, b2);
+    B12.Fp memory res = B12.fpMul(a, b);
+    return (res.a, res.b);
+  }
+
+  function fpNormalTest(uint256 a1, uint256 a2) external view returns (uint256, uint256) {
+    B12.Fp memory a = B12.Fp(a1, a2);
+    B12.Fp memory res = B12.fpNormal(a);
+    return (res.a, res.b);
+  }
+
+  function fpNormal2Test(uint256 a, uint256 idx) external view returns (uint256, uint256) {
+    B12.Fp memory res = B12.fpNormal2(B12.Fp(0, a), idx);
+    return (res.a, res.b);
+  }
+
+  function fp2MulTest(
+    uint256[] calldata arr
+  ) external view returns (uint256, uint256, uint256, uint256) {
+    B12.Fp2 memory x = B12.Fp2(B12.Fp(arr[0], arr[1]), B12.Fp(arr[2], arr[3]));
+    B12.Fp2 memory y = B12.Fp2(B12.Fp(arr[4], arr[5]), B12.Fp(arr[6], arr[7]));
+    B12.Fp2 memory res = B12.fp2Mul(x, y);
+    return (res.a.a, res.a.b, res.b.a, res.b.b);
+  }
+
+  function testUncompress() external view returns (uint256, uint256) {
+    B12.Fp memory x = B12.Fp(
+      0x008848defe740a67c8fc6225bf87ff54,
+      0x85951e2caa9d41bb188282c8bd37cb5cd5481512ffcd394eeab9b16eb21be9ef
+    );
+    B12.Fp memory y1 = B12.Fp(
+      0x001cefdc52b4e1eba6d3b6633bf15a76,
+      0x5ca326aa36b6c0b5b1db375b6a5124fa540d200dfb56a6e58785e1aaaa63715b
+    );
+    B12.Fp memory y2 = B12.Fp(
+      0x01914a69c5102eff1f674f5d30afeec4,
+      0xbd7fb348ca3e52d96d182ad44fb82305c2fe3d3634a9591afd82de55559c8ea6
+    );
+    B12.G1Point memory res = B12.mapToG1(x, y2, y1, true);
+    return (res.Y.a, res.Y.b);
+  }
+
   function testParseG1(bytes calldata arg) external pure returns (uint256[4] memory ret) {
     B12.G1Point memory a = arg.parseG1(0);
     ret[0] = a.X.a;
@@ -22,11 +74,12 @@ contract Common {
     ret[3] = a.Y.b;
   }
 
-  function testSerializeG1(uint256 w, uint256 x, uint256 y, uint256 z)
-    external
-    pure
-    returns (bytes memory)
-  {
+  function testSerializeG1(
+    uint256 w,
+    uint256 x,
+    uint256 y,
+    uint256 z
+  ) external pure returns (bytes memory) {
     B12.G1Point memory a;
     a.X.a = w;
     a.X.b = x;
@@ -71,62 +124,10 @@ contract Common {
     return a.serializeG2();
   }
 
-  function fpMulTest(uint256 a1, uint256 a2, uint256 b1, uint256 b2)
-    external
-    view
-    returns (uint256, uint256)
-  {
-    B12.Fp memory a = B12.Fp(a1, a2);
-    B12.Fp memory b = B12.Fp(b1, b2);
-    B12.Fp memory res = B12.fpMul(a, b);
-    return (res.a, res.b);
-  }
-
-  function fpNormalTest(uint256 a1, uint256 a2) external view returns (uint256, uint256) {
-    B12.Fp memory a = B12.Fp(a1, a2);
-    B12.Fp memory res = B12.fpNormal(a);
-    return (res.a, res.b);
-  }
-
-  function fpNormal2Test(uint256 a, uint256 idx) external view returns (uint256, uint256) {
-    B12.Fp memory res = B12.fpNormal2(B12.Fp(0, a), idx);
-    return (res.a, res.b);
-  }
-
-  function fp2MulTest(uint256[] calldata arr)
-    external
-    view
-    returns (uint256, uint256, uint256, uint256)
-  {
-    B12.Fp2 memory x = B12.Fp2(B12.Fp(arr[0], arr[1]), B12.Fp(arr[2], arr[3]));
-    B12.Fp2 memory y = B12.Fp2(B12.Fp(arr[4], arr[5]), B12.Fp(arr[6], arr[7]));
-    B12.Fp2 memory res = B12.fp2Mul(x, y);
-    return (res.a.a, res.a.b, res.b.a, res.b.b);
-  }
-
-  function testUncompress() external view returns (uint256, uint256) {
-    B12.Fp memory x = B12.Fp(
-      0x008848defe740a67c8fc6225bf87ff54,
-      0x85951e2caa9d41bb188282c8bd37cb5cd5481512ffcd394eeab9b16eb21be9ef
-    );
-    B12.Fp memory y1 = B12.Fp(
-      0x001cefdc52b4e1eba6d3b6633bf15a76,
-      0x5ca326aa36b6c0b5b1db375b6a5124fa540d200dfb56a6e58785e1aaaa63715b
-    );
-    B12.Fp memory y2 = B12.Fp(
-      0x01914a69c5102eff1f674f5d30afeec4,
-      0xbd7fb348ca3e52d96d182ad44fb82305c2fe3d3634a9591afd82de55559c8ea6
-    );
-    B12.G1Point memory res = B12.mapToG1(x, y2, y1, true);
-    return (res.Y.a, res.Y.b);
-  }
-
   function testDeserialize(bytes memory h) public pure returns (uint256, uint256, bool) {
     (B12.Fp memory p, bool b) = B12.parsePoint(h);
     return (p.a, p.b, b);
   }
-
-  event MEMDUMP(uint256 a, uint256 b, uint256 c, uint256 d);
 
   function dumpMem(uint256 idx) internal {
     uint256 a;
@@ -143,11 +144,11 @@ contract Common {
     emit MEMDUMP(a, b, c, d);
   }
 
-  function executePrecompile(bytes memory input, uint8 addr, uint256 output_len)
-    internal
-    view
-    returns (bytes memory output)
-  {
+  function executePrecompile(
+    bytes memory input,
+    uint8 addr,
+    uint256 output_len
+  ) internal view returns (bytes memory output) {
     bool success;
     assembly {
       success := staticcall(

@@ -208,11 +208,10 @@ contract IntegerSortedLinkedListTest_PopN is IntegerSortedLinkedListTest {
     integerSortedLinkedListMock.popN(numElements + 1);
   }
 
-  function generateExpectedPopped(uint256 _numElements, uint256 _n)
-    internal
-    pure
-    returns (uint256[] memory)
-  {
+  function generateExpectedPopped(
+    uint256 _numElements,
+    uint256 _n
+  ) internal pure returns (uint256[] memory) {
     require(_n <= _numElements, "Invalid input: _n must be less than or equal to _numElements");
 
     uint256[] memory expectedPopped = new uint256[](_n);

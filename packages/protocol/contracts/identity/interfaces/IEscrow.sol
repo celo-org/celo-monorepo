@@ -1,4 +1,4 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.5.13 <0.9.0;
 
 interface IEscrow {
   function transfer(
@@ -21,14 +21,14 @@ interface IEscrow {
   function withdraw(address paymentID, uint8 v, bytes32 r, bytes32 s) external returns (bool);
   function revoke(address paymentID) external returns (bool);
 
+  // onlyOwner functions
+  function addDefaultTrustedIssuer(address trustedIssuer) external;
+  function removeDefaultTrustedIssuer(address trustedIssuer, uint256 index) external;
+
   // view functions
   function getReceivedPaymentIds(bytes32 identifier) external view returns (address[] memory);
   function getSentPaymentIds(address sender) external view returns (address[] memory);
   function getTrustedIssuersPerPayment(address paymentId) external view returns (address[] memory);
   function getDefaultTrustedIssuers() external view returns (address[] memory);
   function MAX_TRUSTED_ISSUERS_PER_PAYMENT() external view returns (uint256);
-
-  // onlyOwner functions
-  function addDefaultTrustedIssuer(address trustedIssuer) external;
-  function removeDefaultTrustedIssuer(address trustedIssuer, uint256 index) external;
 }

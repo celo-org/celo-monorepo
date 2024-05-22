@@ -92,9 +92,11 @@ contract OdisPaymentsFoundryTest_PayInCUSD is OdisPaymentsFoundryTest {
     assertEq(stableToken.balanceOf(sender), startingBalanceCUSD);
   }
 
-  function checkStatecUSD(address cusdSender, address odisPaymentReceiver, uint256 totalValueSent)
-    public
-  {
+  function checkStatecUSD(
+    address cusdSender,
+    address odisPaymentReceiver,
+    uint256 totalValueSent
+  ) public {
     assertEq(stableToken.balanceOf(cusdSender), startingBalanceCUSD - totalValueSent);
     assertEq(stableToken.balanceOf(address(odisPayments)), totalValueSent);
     assertEq(odisPayments.totalPaidCUSD(odisPaymentReceiver), totalValueSent);
@@ -125,7 +127,7 @@ contract OdisPaymentsFoundryTest_PayInCUSD is OdisPaymentsFoundryTest {
     checkStatecUSD(sender, sender, valueApprovedForTransfer);
   }
 
-  function test_ShouldEmitPaymentMadeEvent() public {
+  function test_Emits_PaymentMadeEvent() public {
     vm.expectEmit(true, true, true, true);
     emit PaymentMade(receiver, valueApprovedForTransfer);
 

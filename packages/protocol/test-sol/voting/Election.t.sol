@@ -15,15 +15,20 @@ import { Constants } from "../constants.sol";
 import "../utils.sol";
 
 contract ElectionMock is Election(true) {
-  function distributeEpochRewards(address group, uint256 value, address lesser, address greater)
-    external
-  {
+  function distributeEpochRewards(
+    address group,
+    uint256 value,
+    address lesser,
+    address greater
+  ) external {
     return _distributeEpochRewards(group, value, lesser, greater);
   }
 }
 
 contract ElectionTest is Utils, Constants {
   using FixidityLib for FixidityLib.Fraction;
+
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   event ElectableValidatorsSet(uint256 min, uint256 max);
   event MaxNumGroupsVotedForSet(uint256 maxNumGroupsVotedFor);
@@ -143,6 +148,10 @@ contract ElectionTest is Utils, Constants {
       electabilityThreshold
     );
   }
+
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+  }
 }
 
 contract ElectionTest_Initialize is ElectionTest {
@@ -187,6 +196,12 @@ contract Election_SetElectabilityThreshold is ElectionTest {
     vm.expectRevert("Electability threshold must be lower than 100%");
     election.setElectabilityThreshold(FixidityLib.fixed1().unwrap() + 1);
   }
+
+  function test_Revert_setElectabilityThreshold_WhenL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    election.setElectabilityThreshold(FixidityLib.fixed1().unwrap() + 1);
+  }
 }
 
 contract Election_SetElectableValidators is ElectionTest {
@@ -197,6 +212,14 @@ contract Election_SetElectableValidators is ElectionTest {
     (uint256 min, uint256 max) = election.getElectableValidators();
     assertEq(min, newElectableValidatorsMin);
     assertEq(max, newElectableValidatorsMax);
+  }
+
+  function test_Reverts_shouldSetElectableValidators_WhenL2() public {
+    _whenL2();
+    uint256 newElectableValidatorsMin = 2;
+    uint256 newElectableValidatorsMax = 4;
+    vm.expectRevert("This method is no longer supported in L2.");
+    election.setElectableValidators(newElectableValidatorsMin, newElectableValidatorsMax);
   }
 
   function test_ShouldEmitTheElectableValidatorsSetEvent() public {
@@ -236,6 +259,13 @@ contract Election_SetMaxNumGroupsVotedFor is ElectionTest {
     assertEq(election.maxNumGroupsVotedFor(), newMaxNumGroupsVotedFor);
   }
 
+  function test_Revert_SetMaxNumGroupsVotedFor_WhenL2() public {
+    _whenL2();
+    uint256 newMaxNumGroupsVotedFor = 4;
+    vm.expectRevert("This method is no longer supported in L2.");
+    election.setMaxNumGroupsVotedFor(newMaxNumGroupsVotedFor);
+  }
+
   function test_ShouldEmitMaxNumGroupsVotedForSetEvent() public {
     uint256 newMaxNumGroupsVotedFor = 4;
     vm.expectEmit(true, false, false, false);
@@ -259,6 +289,12 @@ contract Election_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
   function test_shouldSetAllowedToVoteOverMaxNumberOfGroups() public {
     election.setAllowedToVoteOverMaxNumberOfGroups(true);
     assertEq(election.allowedToVoteOverMaxNumberOfGroups(address(this)), true);
+  }
+
+  function test_Revert_SetAllowedToVoteOverMaxNumberOfGroups_WhenL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    election.setAllowedToVoteOverMaxNumberOfGroups(true);
   }
 
   function test_ShouldRevertWhenCalledByValidator() public {
@@ -292,7 +328,6 @@ contract Election_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
     emit AllowedToVoteOverMaxNumberOfGroups(address(this), false);
     election.setAllowedToVoteOverMaxNumberOfGroups(false);
   }
-
 }
 
 contract Election_MarkGroupEligible is ElectionTest {
@@ -308,6 +343,13 @@ contract Election_MarkGroupEligible is ElectionTest {
     address[] memory eligibleGroups = election.getEligibleValidatorGroups();
     assertEq(eligibleGroups.length, 1);
     assertEq(eligibleGroups[0], group);
+  }
+
+  function test_Revert_MarkGroupEligible_WhenL2() public {
+    _whenL2();
+    address group = address(this);
+    vm.expectRevert("This method is no longer supported in L2.");
+    election.markGroupEligible(group, address(0), address(0));
   }
 
   function test_ShouldEmitValidatorGroupMarkedEligibleEvent() public {
@@ -421,6 +463,13 @@ contract Election_Vote_WhenGroupEligible is ElectionTest {
     emit ValidatorGroupVoteCast(voter, group, value - maxNumGroupsVotedFor);
     election.vote(group, value - maxNumGroupsVotedFor, newGroup, address(0));
     assertEq(election.getPendingVotesForGroupByAccount(group, voter), value - maxNumGroupsVotedFor);
+  }
+
+  function test_Revert_Vote_WhenL2() public {
+    _whenL2();
+
+    vm.expectRevert("This method is no longer supported in L2.");
+    election.vote(group, value - maxNumGroupsVotedFor, address(0), address(0));
   }
 
   function test_ShouldSetTotalVotesByAccount_WhenMaxNumberOfGroupsWasNotReached() public {
@@ -708,7 +757,6 @@ contract Election_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes is ElectionTes
     emit ValidatorGroupVoteCast(voter, group, value);
     election.vote(group, value, address(0), address(0));
   }
-
 }
 
 contract Election_Vote_GroupNotEligible is ElectionTest {
@@ -810,6 +858,13 @@ contract Election_Activate is ElectionTest {
     election.activate(group);
   }
 
+  function test_Revert_Activate_WhenL2() public {
+    WhenVoterHasPendingVotes();
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    election.activate(group);
+  }
+
   address voter2 = account2;
   uint256 value2 = 573;
 
@@ -881,6 +936,12 @@ contract Election_Activate is ElectionTest {
   function test_ShouldRevert_WhenAnEpochBoundaryHadNotPassedSinceThePendingVotesWereMade() public {
     WhenVoterHasPendingVotes();
     vm.expectRevert("Pending vote epoch not passed");
+    election.activateForAccount(group, voter);
+  }
+
+  function test_Revert_ActivateForAccount_WhenL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     election.activateForAccount(group, voter);
   }
 
@@ -1043,7 +1104,6 @@ contract Election_ActivateForAccount is ElectionTest {
     vm.expectRevert("Vote value cannot be zero");
     election.activateForAccount(group, voter);
   }
-
 }
 
 contract Election_RevokePending is ElectionTest {
@@ -1474,7 +1534,6 @@ contract Election_RevokeActive is ElectionTest {
     vm.expectRevert("Vote value larger than active votes");
     election.revokeActive(group, voteValue0 + reward0 + 1, address(0), address(0), index);
   }
-
 }
 
 contract Election_ElectionValidatorSigners is ElectionTest {
@@ -1553,11 +1612,9 @@ contract Election_ElectionValidatorSigners is ElectionTest {
     return data;
   }
 
-  function sortMembersWithVotesDesc(MemberWithVotes[] memory data)
-    internal
-    pure
-    returns (MemberWithVotes[] memory)
-  {
+  function sortMembersWithVotesDesc(
+    MemberWithVotes[] memory data
+  ) internal pure returns (MemberWithVotes[] memory) {
     uint256 length = data.length;
     for (uint256 i = 0; i < length; i++) {
       for (uint256 j = i + 1; j < length; j++) {
@@ -1822,10 +1879,11 @@ contract Election_GetGroupEpochRewards is ElectionTest {
     assertEq(election.getGroupEpochRewards(group2, totalRewardValue, uptimes), 0);
   }
 
-  uint256 expectedGroup1EpochRewards = FixidityLib
-    .newFixedFraction(voteValue1, voteValue1 + voteValue2)
-    .multiply(FixidityLib.newFixed(totalRewardValue))
-    .fromFixed();
+  uint256 expectedGroup1EpochRewards =
+    FixidityLib
+      .newFixedFraction(voteValue1, voteValue1 + voteValue2)
+      .multiply(FixidityLib.newFixed(totalRewardValue))
+      .fromFixed();
 
   function test_ShouldReturnProportionalRewardValueForOtherGroup_WhenOneGroupDoesNotMeetLockedGoldRequirements_WhenTwoGroupsHaveActiveVotes()
     public
@@ -1889,6 +1947,13 @@ contract Election_DistributeEpochRewards is ElectionTest {
     assertEq(election.getActiveVotesForGroupByAccount(group, voter), voteValue + rewardValue);
   }
 
+  function test_Revert_DistributeEpochRewards_WhenL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(address(0));
+    election.distributeEpochRewards(group, rewardValue, address(0), address(0));
+  }
+
   function test_ShouldIncrementAccountTotalVotesForGroup_WhenThereIsSingleGroupWithActiveVotes()
     public
   {
@@ -1912,12 +1977,10 @@ contract Election_DistributeEpochRewards is ElectionTest {
   }
 
   uint256 expectedGroupTotalActiveVotes = voteValue + voteValue2 / 2 + rewardValue;
-  uint256 expectedVoterActiveVotesForGroup = FixidityLib
-    .newFixedFraction(expectedGroupTotalActiveVotes * 2, 3)
-    .fromFixed();
-  uint256 expectedVoter2ActiveVotesForGroup = FixidityLib
-    .newFixedFraction(expectedGroupTotalActiveVotes, 3)
-    .fromFixed();
+  uint256 expectedVoterActiveVotesForGroup =
+    FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes * 2, 3).fromFixed();
+  uint256 expectedVoter2ActiveVotesForGroup =
+    FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes, 3).fromFixed();
   uint256 expectedVoter2ActiveVotesForGroup2 = voteValue / 2 + rewardValue2;
 
   function WhenThereAreTwoGroupsWithActiveVotes() public {
@@ -2025,7 +2088,6 @@ contract Election_ForceDecrementVotes is ElectionTest {
 
   function setUp() public {
     super.setUp();
-
   }
 
   function WhenAccountHasVotedForOneGroup() public {
@@ -2441,7 +2503,12 @@ contract Election_ConsistencyChecks is ElectionTest {
     uint256 nonVoting;
   }
 
-  enum VoteActionType { Vote, Activate, RevokePending, RevokeActive }
+  enum VoteActionType {
+    Vote,
+    Activate,
+    RevokePending,
+    RevokeActive
+  }
 
   function setUp() public {
     super.setUp();
@@ -2639,5 +2706,14 @@ contract Election_ConsistencyChecks is ElectionTest {
       }
     }
     revokeAllAndCheckInvariants(100);
+  }
+}
+
+contract Election_HasActivatablePendingVotes is ElectionTest {
+  function test_Revert_hasActivatablePendingVotes_WhenL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(address(0));
+    election.hasActivatablePendingVotes(address(0), address(0));
   }
 }

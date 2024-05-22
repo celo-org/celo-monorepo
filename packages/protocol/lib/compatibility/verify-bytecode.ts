@@ -1,18 +1,19 @@
 /* eslint-disable no-console: 0 */
 import { ensureLeading0x } from '@celo/base/lib/address'
 import {
-    LibraryAddresses,
-    LibraryPositions,
-    linkLibraries,
-    stripMetadata,
-    verifyAndStripLibraryPrefix,
+  LibraryAddresses,
+  LibraryPositions,
+  linkLibraries,
+  stripMetadata,
+  verifyAndStripLibraryPrefix,
 } from '@celo/protocol/lib/bytecode'
 import { verifyProxyStorageProof } from '@celo/protocol/lib/proxy-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
+import { ZERO_ADDRESS } from '@celo/protocol/test/constants'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { ProxyInstance, RegistryInstance } from 'types'
 import Web3 from 'web3'
-import { ignoredContractsV9 } from './ignored-contracts-v9'
+import { ignoredContractsV9, ignoredContractsV9Only } from './ignored-contracts-v9'
 
 let ignoredContracts = [
   // This contract is not proxied
@@ -24,7 +25,7 @@ let ignoredContracts = [
 ]
 
 interface VerificationContext {
-  artifacts: BuildArtifacts
+  artifacts: BuildArtifacts[]
   libraryAddresses: LibraryAddresses
   registry: RegistryInstance
   governanceAddress: string
@@ -76,8 +77,8 @@ export const getProposedProxyAddress = (contract: string, proposal: ProposalTx[]
   return relevantTx.args[1]
 }
 
-const getSourceBytecodeFromArtifacts = (contract: string, artifacts: BuildArtifacts): string =>
-  stripMetadata(artifacts.getArtifactByName(contract).deployedBytecode)
+const getSourceBytecodeFromArtifacts = (contract: string, artifacts: BuildArtifacts[]): string =>
+  stripMetadata(artifacts.map(a => a.getArtifactByName(contract)).find(a => a).deployedBytecode)
 
 const getSourceBytecode = (contract: string, context: VerificationContext): string =>
   getSourceBytecodeFromArtifacts(contract, context.artifacts)
@@ -110,7 +111,6 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
       throw new Error(`Proposed ${contract}Proxy does not match compiled proxy bytecode`)
     }
 
-    console.log(`Proxy deployed at ${proxyAddress} matches ${contract}Proxy (bytecode and storage)`)
   }
 
   // check implementation deployment
@@ -124,6 +124,10 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
     implementationAddress = ensureLeading0x(context.libraryAddresses.addresses[contract])
   } else {
     const proxyAddress = await context.registry.getAddressForString(contract)
+    if (proxyAddress === ZERO_ADDRESS) {
+      console.log(`Contract ${contract} is not in registry - skipping bytecode verification`)
+      return;
+    }
     const proxy = await context.Proxy.at(proxyAddress) // necessary await
     implementationAddress = await proxy._getImplementation()
   }
@@ -143,8 +147,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
     throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
   } else {
     console.log(
-      `${
-        isLibrary(contract, context) ? 'Library' : 'Contract'
+      `${isLibrary(contract, context) ? 'Library' : 'Contract'
       } deployed at ${implementationAddress} matches ${contract}`
     )
   }
@@ -167,7 +170,7 @@ const assertValidProposalTransactions = (proposal: ProposalTx[]) => {
 }
 
 const assertValidInitializationData = (
-  artifacts: BuildArtifacts,
+  artifacts: BuildArtifacts[],
   proposal: ProposalTx[],
   web3: Web3,
   initializationData: InitializationData
@@ -183,7 +186,7 @@ const assertValidInitializationData = (
       )
     }
 
-    const contract = artifacts.getArtifactByName(contractName)
+    const contract = artifacts.map(a => a.getArtifactByName(contractName)).find(a => a)
     const initializeAbi = contract.abi.find(
       (abi: any) => abi.type === 'function' && abi.name === 'initialize'
     )
@@ -217,7 +220,7 @@ const assertValidInitializationData = (
  */
 export const verifyBytecodes = async (
   contracts: string[],
-  artifacts: BuildArtifacts,
+  artifacts: BuildArtifacts[],
   registry: RegistryInstance,
   proposal: ProposalTx[],
   Proxy: Truffle.Contract<ProxyInstance>,
@@ -229,17 +232,19 @@ export const verifyBytecodes = async (
   assertValidProposalTransactions(proposal)
   assertValidInitializationData(artifacts, proposal, _web3, initializationData)
 
-  const compiledContracts = artifacts.listArtifacts().map((a) => a.contractName)
+  const compiledContracts = Array.prototype.concat.apply([], artifacts.map(a => a.listArtifacts())).map((a) => a.contractName)
 
-  if (version >= 9) {
+  if (version > 9) {
     ignoredContracts = [...ignoredContracts, ...ignoredContractsV9]
+  } else if (version == 9) {
+    ignoredContracts = [...ignoredContracts, ...ignoredContractsV9, ...ignoredContractsV9Only]
   }
 
   const queue = contracts.filter(
     (contract) => !ignoredContracts.includes(contract)
-    ).filter(
-      (contract) => compiledContracts.includes(contract)
-      )
+  ).filter(
+    (contract) => compiledContracts.includes(contract)
+  )
 
   const visited: Set<string> = new Set(queue)
 

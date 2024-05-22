@@ -5,17 +5,7 @@ interface ILockedGold {
   function lock() external payable;
   function incrementNonvotingAccountBalance(address, uint256) external;
   function decrementNonvotingAccountBalance(address, uint256) external;
-  function getAccountTotalLockedGold(address) external view returns (uint256);
-  function getTotalLockedGold() external view returns (uint256);
-  function getPendingWithdrawals(address)
-    external
-    view
-    returns (uint256[] memory, uint256[] memory);
-  function getPendingWithdrawal(address account, uint256 index)
-    external
-    view
-    returns (uint256, uint256);
-  function getTotalPendingWithdrawals(address) external view returns (uint256);
+
   function unlock(uint256) external;
   function relock(uint256, uint256) external;
   function withdraw(uint256) external;
@@ -28,6 +18,18 @@ interface ILockedGold {
     address[] calldata greaters,
     uint256[] calldata indices
   ) external;
+  function addSlasher(string calldata slasherIdentifier) external;
+
+  function getAccountTotalLockedGold(address) external view returns (uint256);
+  function getTotalLockedGold() external view returns (uint256);
+  function getPendingWithdrawals(
+    address
+  ) external view returns (uint256[] memory, uint256[] memory);
+  function getPendingWithdrawal(
+    address account,
+    uint256 index
+  ) external view returns (uint256, uint256);
+  function getTotalPendingWithdrawals(address) external view returns (uint256);
   function isSlasher(address) external view returns (bool);
 
   function getAccountTotalDelegatedFraction(address account) external view returns (uint256);

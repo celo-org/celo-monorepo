@@ -3,18 +3,19 @@ pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
 
-// Contract to test
-import "@celo-contracts/common/test/AddressSortedLinkedListWithMedianTest.sol";
+import "@celo-contracts/common/test/AddressSortedLinkedListWithMedianMock.sol";
 
-contract AddressSortedLinkedListWithMedianInsertTest is Test {
-  AddressSortedLinkedListWithMedianTest sortedList;
-
-  address key = actor("key");
-  uint256 numerator = 2;
+contract AddressSortedLinkedListWithMedianTest is Test {
+  AddressSortedLinkedListWithMedianMock sortedList;
 
   function setUp() public {
-    sortedList = new AddressSortedLinkedListWithMedianTest();
+    sortedList = new AddressSortedLinkedListWithMedianMock();
   }
+}
+
+contract AddressSortedLinkedListWithMedianTest_insert is AddressSortedLinkedListWithMedianTest {
+  address key = actor("key");
+  uint256 numerator = 2;
 
   function test_ShouldAddASingleElementToTheList() public {
     sortedList.insert(key, numerator, address(0), address(0));
@@ -69,16 +70,14 @@ contract AddressSortedLinkedListWithMedianInsertTest is Test {
   }
 }
 
-contract AddressSortedLinkedListWithMedianUpdateTest is Test {
-  AddressSortedLinkedListWithMedianTest sortedList;
-
+contract AddressSortedLinkedListWithMedianTest_update is AddressSortedLinkedListWithMedianTest {
   address key = actor("key");
   address key2 = actor("key2");
   uint256 numerator = 2;
   uint256 newNumerator = 3;
 
   function setUp() public {
-    sortedList = new AddressSortedLinkedListWithMedianTest();
+    super.setUp();
     sortedList.insert(key, numerator, address(0), address(0));
   }
 
@@ -108,15 +107,13 @@ contract AddressSortedLinkedListWithMedianUpdateTest is Test {
   }
 }
 
-contract AddressSortedLinkedListWithMedianRemoveTest is Test {
-  AddressSortedLinkedListWithMedianTest sortedList;
-
+contract AddressSortedLinkedListWithMedianTest_remove is AddressSortedLinkedListWithMedianTest {
   address key = actor("key");
   address key2 = actor("key2");
   uint256 numerator = 2;
 
   function setUp() public {
-    sortedList = new AddressSortedLinkedListWithMedianTest();
+    super.setUp();
     sortedList.insert(key, numerator, address(0), address(0));
   }
 
@@ -151,12 +148,16 @@ contract AddressSortedLinkedListWithMedianRemoveTest is Test {
   }
 }
 
-contract AddressSortedLinkedListWithMedianWhenThereAreMultipleActionsTest is Test {
-  AddressSortedLinkedListWithMedianTest sortedList;
-
+contract AddressSortedLinkedListWithMedianTest_WhenThereAreMultipleActions is
+  AddressSortedLinkedListWithMedianTest
+{
   uint256 nonce = 0;
 
-  enum SortedListActionType { Update, Remove, Insert }
+  enum SortedListActionType {
+    Update,
+    Remove,
+    Insert
+  }
 
   struct SortedElement {
     address key;
@@ -168,15 +169,9 @@ contract AddressSortedLinkedListWithMedianWhenThereAreMultipleActionsTest is Tes
     SortedElement element;
   }
 
-  function setUp() public {
-    sortedList = new AddressSortedLinkedListWithMedianTest();
-  }
-
-  function getLesserAndGreater(uint256 numerator)
-    internal
-    view
-    returns (address lesser, address greater)
-  {
+  function getLesserAndGreater(
+    uint256 numerator
+  ) internal view returns (address lesser, address greater) {
     // Fetch all elements from the list
     (address[] memory keys, uint256[] memory numerators, ) = sortedList.getElements();
     uint256 length = keys.length;
@@ -223,8 +218,11 @@ contract AddressSortedLinkedListWithMedianWhenThereAreMultipleActionsTest is Tes
 
   function assertSortedFractionListInvariants() internal view {
     // Fetch all elements from the list
-    (address[] memory keys, uint256[] memory numerators, SortedLinkedListWithMedian.MedianRelation[] memory relations) = sortedList
-      .getElements();
+    (
+      address[] memory keys,
+      uint256[] memory numerators,
+      SortedLinkedListWithMedian.MedianRelation[] memory relations
+    ) = sortedList.getElements();
     uint256 numElements = sortedList.getNumElements(); // Assuming getNumElements() returns the total number of elements
     address medianKey = sortedList.medianKey(); // Assuming medianKey() returns the key of the median element
 

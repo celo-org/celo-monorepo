@@ -26,6 +26,7 @@ const DAY = 24 * HOUR
 const WEEK = 7 * DAY
 const YEAR = 365 * DAY
 
+// TODO load the migrations config from migrationsConfig.json
 const DefaultConfig = {
   attestations: {
     attestationExpiryBlocks: HOUR / 5, // ~1 hour,
@@ -583,7 +584,7 @@ const linkedLibraries = {
   AddressLinkedList: ['Validators', 'ValidatorsMock'],
   AddressSortedLinkedList: ['Election', 'ElectionTest'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListMock'],
-  AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
+  AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianMock'],
   Signatures: [
     'Accounts',
     'Attestations',

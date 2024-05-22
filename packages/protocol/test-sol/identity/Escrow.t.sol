@@ -136,8 +136,17 @@ contract EscrowTest is Test {
   }
 
   function getEscrowedPayment(address paymentId) public view returns (EscrowedPayment memory) {
-    (bytes32 recipientIdentifier, address _sender, address token, uint256 value, uint256 sentIndex, uint256 receivedIndex, uint256 timestamp, uint256 expirySeconds, uint256 minAttestations) = escrowContract
-      .escrowedPayments(paymentId);
+    (
+      bytes32 recipientIdentifier,
+      address _sender,
+      address token,
+      uint256 value,
+      uint256 sentIndex,
+      uint256 receivedIndex,
+      uint256 timestamp,
+      uint256 expirySeconds,
+      uint256 minAttestations
+    ) = escrowContract.escrowedPayments(paymentId);
     return
       EscrowedPayment(
         recipientIdentifier,
@@ -152,11 +161,10 @@ contract EscrowTest is Test {
       );
   }
 
-  function getParsedSignatureOfAddress(address _address, uint256 privateKey)
-    public
-    pure
-    returns (uint8, bytes32, bytes32)
-  {
+  function getParsedSignatureOfAddress(
+    address _address,
+    uint256 privateKey
+  ) public pure returns (uint8, bytes32, bytes32) {
     bytes32 addressHash = keccak256(abi.encodePacked(_address));
     bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
     return vm.sign(privateKey, prefixedHash);
@@ -186,25 +194,17 @@ contract EscrowTest is Test {
 }
 
 contract EscrowInitialize is EscrowTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_Should_have_set_the_owner() public {
     assertEq(escrowContract.owner(), address(this));
   }
 
-  function testRevertsIf_InitializedAgain() public {
+  function test_Reverts_If_InitializedAgain() public {
     vm.expectRevert("contract already initialized");
     escrowContract.initialize();
   }
 }
 
 contract EscrowAddDefaultTrustedIssuer is EscrowTest {
-  function setUp() public {
-    super.setUp();
-  }
-
   function test_AllowOwnerToAddTrustedIssuer() public {
     address[] memory expected1 = new address[](0);
     assertEq(escrowContract.getDefaultTrustedIssuers(), expected1);
@@ -214,7 +214,7 @@ contract EscrowAddDefaultTrustedIssuer is EscrowTest {
     assertEq(escrowContract.getDefaultTrustedIssuers(), expected2);
   }
 
-  function test_RevertsWhenNonOwnerTriesToAdd() public {
+  function test_Reverts_WhenNonOwnerTriesToAdd() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(sender);
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
@@ -226,7 +226,7 @@ contract EscrowAddDefaultTrustedIssuer is EscrowTest {
     escrowContract.addDefaultTrustedIssuer(trustedIssuer1);
   }
 
-  function test_RevertsWhenEmptyAddress() public {
+  function test_Reverts_WhenEmptyAddress() public {
     vm.expectRevert("trustedIssuer can't be null");
     escrowContract.addDefaultTrustedIssuer(address(0));
   }
@@ -287,24 +287,24 @@ contract EscrowRemoveDefaultTrustedIssuer is EscrowTest {
     assertEq(escrowContract.getDefaultTrustedIssuers(), expected1);
   }
 
-  function test_RevertsWhenNonOwnerTriesToRemoveTrustedIssuer() public {
+  function test_Reverts_WhenNonOwnerTriesToRemoveTrustedIssuer() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(sender);
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 0);
   }
 
-  function test_ShouldEmitTheDefaultTrustedIssuerEvent() public {
+  function test_Emits_TheDefaultTrustedIssuerEvent() public {
     vm.expectEmit(true, false, false, false);
     emit DefaultTrustedIssuerRemoved(trustedIssuer1);
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 0);
   }
 
-  function test_RevertsWhenIndexIsIncorrect() public {
+  function test_Reverts_WhenIndexIsIncorrect() public {
     vm.expectRevert("index is invalid");
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 1);
   }
 
-  function test_RevertsWhenIssuerIsNotOnIndex() public {
+  function test_Reverts_WhenIssuerIsNotOnIndex() public {
     escrowContract.addDefaultTrustedIssuer(trustedIssuer2);
     vm.expectRevert("trustedIssuer does not match address found at defaultTrustedIssuers[index]");
     escrowContract.removeDefaultTrustedIssuer(trustedIssuer1, 1);
@@ -515,7 +515,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     );
   }
 
-  function test_ShouldEmitTheTransferEvent() public {
+  function test_Emits_TheTransferEvent() public {
     vm.expectEmit(true, true, true, true);
     emit Transfer(sender, aPhoneHash, address(mockERC20Token), aValue, withdrawKeyAddress, 2);
 
@@ -531,9 +531,7 @@ contract EscrowTestsWithTokens is EscrowTest {
     );
   }
 
-  function test_ShouldEmitTheTrustedIssuerEvent() public {
-    // should emit the TrustedIssuersSet event
-
+  function test_Emits_TheTrustedIssuerEvent() public {
     address[] memory trustedIssuers = new address[](1);
     trustedIssuers[0] = trustedIssuer1;
 
@@ -833,9 +831,11 @@ contract EscrowWithdrawalTest is EscrowTest {
     mockERC20Token.mint(sender, aValue);
   }
 
-  function completeAttestations(address account, bytes32 identifier, uint256 attestationsToComplete)
-    public
-  {
+  function completeAttestations(
+    address account,
+    bytes32 identifier,
+    uint256 attestationsToComplete
+  ) public {
     for (uint256 i = 0; i < attestationsToComplete; i++) {
       vm.prank(account);
       mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
@@ -915,8 +915,7 @@ contract EscrowWithdrawalTest is EscrowTest {
     );
   }
 
-  function test_ShouldEmitTheTrustedIssuersUnsetEvent() public {
-    // should emit the TrustedIssuersUnset event
+  function test_Emits_TheTrustedIssuersUnsetEvent() public {
     mintAndTransfer(
       sender,
       bytes32(0),
@@ -940,8 +939,7 @@ contract EscrowWithdrawalTest is EscrowTest {
     );
   }
 
-  function test_ShouldEmitWithdwaralEvent() public {
-    // should emit the Withdrawal event
+  function test_Emits_WithdwaralEvent() public {
     mintAndTransfer(
       sender,
       bytes32(0),
@@ -1410,8 +1408,7 @@ contract EscrowRevokeTestIdentifierEmptyMinAttestations0TrustedIssuersEmpty is E
     );
   }
 
-  function test_ShouldEmitTheTrustedIssuersUnsetEvent() public {
-    // should emit the TrustedIssuersUnset event
+  function test_Emits_TheTrustedIssuersUnsetEvent() public {
     vm.warp(oneDayInSecs + 1);
 
     vm.expectEmit(true, true, true, true);
@@ -1421,8 +1418,7 @@ contract EscrowRevokeTestIdentifierEmptyMinAttestations0TrustedIssuersEmpty is E
     escrowContract.revoke(uniquePaymentIDRevoke);
   }
 
-  function test_ShouldEmitRevokationEvent() public {
-    // should emit the Revocation event
+  function test_Emits_RevokationEvent() public {
     vm.warp(oneDayInSecs + 1);
 
     vm.expectEmit(true, true, true, true);
@@ -1563,8 +1559,7 @@ contract EscrowRevokeTestIdentifierNotEmptyMinAttestations0TrustedIssuersEmpty i
     );
   }
 
-  function test_ShouldEmitTheTrustedIssuersUnsetEvent() public {
-    // should emit the TrustedIssuersUnset event
+  function test_Emits_TheTrustedIssuersUnsetEvent() public {
     vm.warp(oneDayInSecs + 1);
 
     vm.expectEmit(true, true, true, true);
@@ -1574,8 +1569,7 @@ contract EscrowRevokeTestIdentifierNotEmptyMinAttestations0TrustedIssuersEmpty i
     escrowContract.revoke(uniquePaymentIDRevoke);
   }
 
-  function test_ShouldEmitRevokationEvent() public {
-    // should emit the Revocation event
+  function test_Emits_RevokationEvent() public {
     vm.warp(oneDayInSecs + 1);
 
     vm.expectEmit(true, true, true, true);
@@ -1718,8 +1712,7 @@ contract EscrowRevokeTestIdentifierNotEmptyMinAttestations1TrustedIssuersNonEmpt
     );
   }
 
-  function test_ShouldEmitTheTrustedIssuersUnsetEvent() public {
-    // should emit the TrustedIssuersUnset event
+  function test_Emits_TheTrustedIssuersUnsetEvent() public {
     vm.warp(oneDayInSecs + 1);
 
     vm.expectEmit(true, true, true, true);
@@ -1729,8 +1722,7 @@ contract EscrowRevokeTestIdentifierNotEmptyMinAttestations1TrustedIssuersNonEmpt
     escrowContract.revoke(uniquePaymentIDRevoke);
   }
 
-  function test_ShouldEmitRevokationEvent() public {
-    // should emit the Revocation event
+  function test_Emits_RevokationEvent() public {
     vm.warp(oneDayInSecs + 1);
 
     vm.expectEmit(true, true, true, true);

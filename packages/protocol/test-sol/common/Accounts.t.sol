@@ -15,6 +15,8 @@ contract AccountsTest is Test {
   Accounts accounts;
   MockValidators validators;
 
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
+
   string constant name = "Account";
   string constant metadataURL = "https://www.celo.org";
   string constant otherMetadataURL = "https://clabs.co";
@@ -22,8 +24,10 @@ contract AccountsTest is Test {
   bytes storageRoot = abi.encodePacked(metadataURL);
   bytes otherStorageRoot = abi.encodePacked(otherMetadataURL);
 
-  bytes constant dataEncryptionKey = hex"02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111";
-  bytes constant longDataEncryptionKey = hex"04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0161111111102f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111";
+  bytes constant dataEncryptionKey =
+    hex"02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111";
+  bytes constant longDataEncryptionKey =
+    hex"04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0161111111102f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111";
 
   address caller;
   uint256 callerPK;
@@ -31,13 +35,11 @@ contract AccountsTest is Test {
   address caller2;
   uint256 caller2PK;
 
-  bytes32 constant EIP712DOMAIN_TYPEHASH = keccak256(
-    "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-  );
+  bytes32 constant EIP712DOMAIN_TYPEHASH =
+    keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
-  bytes32 public constant EIP712_AUTHORIZE_SIGNER_TYPEHASH = keccak256(
-    "AuthorizeSigner(address account,address signer,bytes32 role)"
-  );
+  bytes32 public constant EIP712_AUTHORIZE_SIGNER_TYPEHASH =
+    keccak256("AuthorizeSigner(address account,address signer,bytes32 role)");
 
   struct Domain {
     string name;
@@ -97,11 +99,14 @@ contract AccountsTest is Test {
     (caller2, caller2PK) = actorWithPK("caller2");
   }
 
-  function getParsedSignatureOfAddress(address _address, uint256 privateKey)
-    public
-    pure
-    returns (uint8, bytes32, bytes32)
-  {
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+  }
+
+  function getParsedSignatureOfAddress(
+    address _address,
+    uint256 privateKey
+  ) public pure returns (uint8, bytes32, bytes32) {
     bytes32 addressHash = keccak256(abi.encodePacked(_address));
     bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(addressHash);
     return vm.sign(privateKey, prefixedHash);
@@ -126,11 +131,11 @@ contract AccountsTest is Test {
     assertEq(roots.length, currentIndex);
   }
 
-  function slice(bytes memory data, uint256 start, uint256 end)
-    internal
-    pure
-    returns (bytes memory)
-  {
+  function slice(
+    bytes memory data,
+    uint256 start,
+    uint256 end
+  ) internal pure returns (bytes memory) {
     bytes memory part = new bytes(end - start);
     for (uint256 i = 0; i < part.length; i++) {
       part[i] = data[i + start];
@@ -161,21 +166,18 @@ contract AccountsTest is Test {
     return (v, r, s);
   }
 
-  function generateTypedDataHash(Domain memory domain, AuthorizeSigner memory authorizeSigner)
-    public
-    pure
-    returns (bytes32)
-  {
+  function generateTypedDataHash(
+    Domain memory domain,
+    AuthorizeSigner memory authorizeSigner
+  ) public pure returns (bytes32) {
     bytes32 domainSeparator = structHashEIP712Domain(domain);
     bytes32 authorizeSignerHash = getAuthorizeSigner(authorizeSigner);
     return keccak256(abi.encodePacked("\x19\x01", domainSeparator, authorizeSignerHash));
   }
 
-  function getAuthorizeSigner(AuthorizeSigner memory authorizeSigner)
-    public
-    pure
-    returns (bytes32)
-  {
+  function getAuthorizeSigner(
+    AuthorizeSigner memory authorizeSigner
+  ) public pure returns (bytes32) {
     return
       keccak256(
         abi.encode(
@@ -201,7 +203,7 @@ contract AccountsTest is Test {
   }
 }
 
-contract AccountsCreateAccount is AccountsTest {
+contract AccountsTest_createAccount is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -212,14 +214,14 @@ contract AccountsCreateAccount is AccountsTest {
     assertEq(accounts.isAccount(address(this)), true);
   }
 
-  function test_ShouldEmitAccountCreatedEvent() public {
+  function test_Emits_AccountCreatedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit AccountCreated(address(this));
     accounts.createAccount();
   }
 }
 
-contract AccountsSetAccountDataEncryptionKey is AccountsTest {
+contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -230,7 +232,8 @@ contract AccountsSetAccountDataEncryptionKey is AccountsTest {
   }
 
   function test_ShouldAllowSettingAKeyWithLEadingZeros() public {
-    bytes memory keyWithLeadingZeros = hex"00000000000000000000000000000000000000000000000f2f48ee19680706191111";
+    bytes
+      memory keyWithLeadingZeros = hex"00000000000000000000000000000000000000000000000f2f48ee19680706191111";
     accounts.setAccountDataEncryptionKey(keyWithLeadingZeros);
     assertEq(accounts.getDataEncryptionKey(address(this)), keyWithLeadingZeros);
   }
@@ -246,14 +249,14 @@ contract AccountsSetAccountDataEncryptionKey is AccountsTest {
     assertEq(accounts.getDataEncryptionKey(address(this)), longDataEncryptionKey);
   }
 
-  function test_ShouldEmitAccountDataEncryptionKeySet() public {
+  function test_Emits_AccountDataEncryptionKeySet() public {
     vm.expectEmit(true, true, true, true);
     emit AccountDataEncryptionKeySet(address(this), dataEncryptionKey);
     accounts.setAccountDataEncryptionKey(dataEncryptionKey);
   }
 }
 
-contract AccountsSetAccount is AccountsTest {
+contract AccountsTest_setAccount is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -268,21 +271,21 @@ contract AccountsSetAccount is AccountsTest {
     assertEq(accounts.getWalletAddress(address(this)), address(this));
   }
 
-  function test_ShouldEmitAccountNameSetEvent_WhenTheAccountHasBeenCreated() public {
+  function test_Emits_AccountNameSetEvent_WhenTheAccountHasBeenCreated() public {
     accounts.createAccount();
     vm.expectEmit(true, true, true, true);
     emit AccountNameSet(address(this), name);
     accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
   }
 
-  function test_ShouldEmitAccountDataEncryptionKeySetEvent_WhenTheAccountHasBeenCreated() public {
+  function test_Emits_AccountDataEncryptionKeySetEvent_WhenTheAccountHasBeenCreated() public {
     accounts.createAccount();
     vm.expectEmit(true, true, true, true);
     emit AccountDataEncryptionKeySet(address(this), dataEncryptionKey);
     accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
   }
 
-  function test_ShouldEmitAccountWalletAddressSetEvent_WhenTheAccountHasBeenCreated() public {
+  function test_Emits_AccountWalletAddressSetEvent_WhenTheAccountHasBeenCreated() public {
     accounts.createAccount();
     vm.expectEmit(true, true, true, true);
     emit AccountWalletAddressSet(address(this), address(this));
@@ -307,27 +310,25 @@ contract AccountsSetAccount is AccountsTest {
     assertEq(accounts.isAccount(address(this)), true);
   }
 
-  function test_ShouldEmitAccountCreated_WhenTheAccountHasNotBeenCreated() public {
+  function test_Emits_AccountCreated_WhenTheAccountHasNotBeenCreated() public {
     vm.expectEmit(true, true, true, true);
     emit AccountCreated(address(this));
     accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
   }
 
-  function test_ShouldEmitAccountNameSetEvent_WhenTheAccountHasNotBeenCreated() public {
+  function test_Emits_AccountNameSetEvent_WhenTheAccountHasNotBeenCreated() public {
     vm.expectEmit(true, true, true, true);
     emit AccountNameSet(address(this), name);
     accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
   }
 
-  function test_ShouldEmitAccountDataEncryptionKeySetEvent_WhenTheAccountHasNotBeenCreated()
-    public
-  {
+  function test_Emits_AccountDataEncryptionKeySetEvent_WhenTheAccountHasNotBeenCreated() public {
     vm.expectEmit(true, true, true, true);
     emit AccountDataEncryptionKeySet(address(this), dataEncryptionKey);
     accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
   }
 
-  function test_ShouldEmitAccountWalletAddressSetEvent_WhenTheAccountHasNotBeenCreated() public {
+  function test_Emits_AccountWalletAddressSetEvent_WhenTheAccountHasNotBeenCreated() public {
     vm.expectEmit(true, true, true, true);
     emit AccountWalletAddressSet(address(this), address(this));
     accounts.setAccount(name, dataEncryptionKey, address(this), 0, 0x0, 0x0);
@@ -341,7 +342,7 @@ contract AccountsSetAccount is AccountsTest {
   }
 }
 
-contract AccountsSetWalletAddress is AccountsTest {
+contract AccountsTest_setWalletAddress is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -373,7 +374,7 @@ contract AccountsSetWalletAddress is AccountsTest {
     assertEq(accounts.getWalletAddress(address(this)), address(0));
   }
 
-  function test_ShouldEmitTheAccountWalletAddressSetEvent_WhenAccountHasBeenCreated() public {
+  function test_Emits_TheAccountWalletAddressSetEvent_WhenAccountHasBeenCreated() public {
     accounts.createAccount();
     vm.expectEmit(true, true, true, true);
     emit AccountWalletAddressSet(address(this), address(this));
@@ -391,7 +392,7 @@ contract AccountsSetWalletAddress is AccountsTest {
   }
 }
 
-contract AccountsSetMetadataURL is AccountsTest {
+contract AccountsTest_setMetadataURL is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -407,7 +408,7 @@ contract AccountsSetMetadataURL is AccountsTest {
     assertEq(accounts.getMetadataURL(address(this)), metadataURL);
   }
 
-  function test_ShouldEmitTheAccountMetadataURLSetEvent() public {
+  function test_Emits_TheAccountMetadataURLSetEvent() public {
     accounts.createAccount();
     vm.expectEmit(true, true, true, true);
     emit AccountMetadataURLSet(address(this), metadataURL);
@@ -415,16 +416,15 @@ contract AccountsSetMetadataURL is AccountsTest {
   }
 }
 
-contract AccountsBatchGetMetadataURL is AccountsTest {
+contract AccountsTest_batchGetMetadataURL is AccountsTest {
   function setUp() public {
     super.setUp();
   }
 
-  function parseSolidityStringArray(uint256[] memory stringLengths, bytes memory data)
-    private
-    pure
-    returns (string[] memory)
-  {
+  function parseSolidityStringArray(
+    uint256[] memory stringLengths,
+    bytes memory data
+  ) private pure returns (string[] memory) {
     string[] memory strings = new string[](stringLengths.length);
     uint256 offset = 0;
 
@@ -466,7 +466,7 @@ contract AccountsBatchGetMetadataURL is AccountsTest {
   }
 }
 
-contract AccountsAddStorageRoot is AccountsTest {
+contract AccountsTest_addStorageRoot is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -489,7 +489,7 @@ contract AccountsAddStorageRoot is AccountsTest {
     assertStorageRoots(string(concatenated), length, urls);
   }
 
-  function test_ShouldEmitTheOffchainStorageRootAddedEvent_WhenAccountHasBeenCreated() public {
+  function test_Emits_TheOffchainStorageRootAddedEvent_WhenAccountHasBeenCreated() public {
     accounts.createAccount();
     vm.expectEmit(true, true, true, true);
     emit OffchainStorageRootAdded(address(this), bytes(metadataURL));
@@ -512,7 +512,7 @@ contract AccountsAddStorageRoot is AccountsTest {
   }
 }
 
-contract AccountsRemoveStorageRoot is AccountsTest {
+contract AccountsTest_removeStorageRoot is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -566,7 +566,7 @@ contract AccountsRemoveStorageRoot is AccountsTest {
     assertStorageRoots(string(concatenated), length, urls);
   }
 
-  function test_ShouldEmitOffchainStorageRootRemovedEvent_WhenThereAreStorageRootsAndAccountHasBeenCreated()
+  function test_Emits_OffchainStorageRootRemovedEvent_WhenThereAreStorageRootsAndAccountHasBeenCreated()
     public
   {
     accounts.createAccount();
@@ -588,7 +588,7 @@ contract AccountsRemoveStorageRoot is AccountsTest {
   }
 }
 
-contract AccountsSetPaymentDelegation is AccountsTest {
+contract AccountsTest_setPaymentDelegation is AccountsTest {
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
   uint256 badFraction = FixidityLib.newFixedFraction(12, 10).unwrap();
@@ -610,6 +610,13 @@ contract AccountsSetPaymentDelegation is AccountsTest {
     assertEq(realFraction, fraction);
   }
 
+  function test_Revert_SetPaymentDelegation_WhenL2() public {
+    _whenL2();
+    accounts.createAccount();
+    vm.expectRevert("This method is no longer supported in L2.");
+    accounts.setPaymentDelegation(beneficiary, fraction);
+  }
+
   function test_ShouldNotAllowFractionGreaterThan1() public {
     accounts.createAccount();
     vm.expectRevert("Fraction must not be greater than 1");
@@ -622,7 +629,7 @@ contract AccountsSetPaymentDelegation is AccountsTest {
     accounts.setPaymentDelegation(address(0), badFraction);
   }
 
-  function test_ShouldEmitAPaymentDelegationSetEvent() public {
+  function test_Emits_APaymentDelegationSetEvent() public {
     accounts.createAccount();
     vm.expectEmit(true, true, true, true);
     emit PaymentDelegationSet(beneficiary, fraction);
@@ -630,7 +637,7 @@ contract AccountsSetPaymentDelegation is AccountsTest {
   }
 }
 
-contract AccountsDeletePaymentDelegation is AccountsTest {
+contract AccountsTest_deletePaymentDelegation is AccountsTest {
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
 
@@ -653,14 +660,14 @@ contract AccountsDeletePaymentDelegation is AccountsTest {
     assertEq(realFraction, 0);
   }
 
-  function test_ShouldEmitAPaymentDelegationSetEvent() public {
+  function test_Emits_APaymentDelegationSetEvent() public {
     vm.expectEmit(true, true, true, true);
     emit PaymentDelegationSet(address(0), 0);
     accounts.deletePaymentDelegation();
   }
 }
 
-contract AccountsSetName is AccountsTest {
+contract AccountsTest_setName is AccountsTest {
   function setUp() public {
     super.setUp();
   }
@@ -676,7 +683,7 @@ contract AccountsSetName is AccountsTest {
     assertEq(accounts.getName(address(this)), name);
   }
 
-  function test_ShouldEmitAccountNameSetEvent() public {
+  function test_Emits_AccountNameSetEvent() public {
     accounts.createAccount();
     vm.expectEmit(true, true, true, true);
     emit AccountNameSet(address(this), name);
@@ -684,7 +691,7 @@ contract AccountsSetName is AccountsTest {
   }
 }
 
-contract AccountsGenericAuthorization is AccountsTest {
+contract AccountsTest_GenericAuthorization is AccountsTest {
   address account2 = actor("account2");
   address signer;
   uint256 signerPK;
@@ -747,7 +754,7 @@ contract AccountsGenericAuthorization is AccountsTest {
     assertEq(accounts.isAuthorizedSigner(signer), true);
   }
 
-  function test_ShouldEmitTheRightEvents_WhenSmartContractSigner() public {
+  function test_Emits_TheRightEvents_WhenSmartContractSigner() public {
     vm.expectEmit(true, true, true, true);
     emit SignerAuthorizationStarted(address(this), signer, role);
     accounts.authorizeSigner(signer, role);
@@ -766,7 +773,7 @@ contract AccountsGenericAuthorization is AccountsTest {
     assertEq(accounts.isAuthorizedSigner(signer), true);
   }
 
-  function test_ShouldEmitTheRightEvents_WhenEOASigner() public {
+  function test_Emits_TheRightEvents_WhenEOASigner() public {
     vm.expectEmit(true, true, true, true);
     emit SignerAuthorized(address(this), signer, role);
     accounts.authorizeSignerWithSignature(signer, role, v, r, s);
@@ -868,7 +875,7 @@ contract AccountsGenericAuthorization is AccountsTest {
   }
 }
 
-contract AccountsBackwardCompatibility is AccountsTest {
+contract AccountsTest_BackwardCompatibility is AccountsTest {
   address account = address(this);
   address otherAccount = actor("otherAccount");
 
@@ -877,7 +884,11 @@ contract AccountsBackwardCompatibility is AccountsTest {
   address signer2;
   uint256 signer2PK;
 
-  enum Role { Attestation, Vote, Validator }
+  enum Role {
+    Attestation,
+    Vote,
+    Validator
+  }
 
   function setUp() public {
     super.setUp();
@@ -902,11 +913,12 @@ contract AccountsBackwardCompatibility is AccountsTest {
     }
   }
 
-  function getSignature(address _account, bytes32 role, uint256 _signerPK, bool genericWrite)
-    public
-    view
-    returns (uint8, bytes32, bytes32)
-  {
+  function getSignature(
+    address _account,
+    bytes32 role,
+    uint256 _signerPK,
+    bool genericWrite
+  ) public view returns (uint8, bytes32, bytes32) {
     if (genericWrite) {
       return getSignatureForAuthorization(_account, role, _signerPK, 31337, address(accounts));
     }
@@ -924,11 +936,11 @@ contract AccountsBackwardCompatibility is AccountsTest {
     }
   }
 
-  function hasAuthorizedSigner(Role role, address _signer, bool genericRead)
-    public
-    view
-    returns (bool)
-  {
+  function hasAuthorizedSigner(
+    Role role,
+    address _signer,
+    bool genericRead
+  ) public view returns (bool) {
     bytes32 _role = getRole(role);
     if (genericRead) {
       return accounts.hasIndexedSigner(_signer, _role);
@@ -985,11 +997,11 @@ contract AccountsBackwardCompatibility is AccountsTest {
     vm.stopPrank();
   }
 
-  function getAuthorizedFromAccount(Role role, bool genericRead, address _account)
-    public
-    view
-    returns (address)
-  {
+  function getAuthorizedFromAccount(
+    Role role,
+    bool genericRead,
+    address _account
+  ) public view returns (address) {
     bytes32 _role = getRole(role);
     if (genericRead) {
       return accounts.getIndexedSigner(_account, _role);
@@ -1004,11 +1016,11 @@ contract AccountsBackwardCompatibility is AccountsTest {
     }
   }
 
-  function authorizedSignerToAccount(Role role, bool genericRead, address _signer)
-    public
-    view
-    returns (address)
-  {
+  function authorizedSignerToAccount(
+    Role role,
+    bool genericRead,
+    address _signer
+  ) public view returns (address) {
     if (genericRead) {
       return accounts.signerToAccount(_signer);
     } else {
@@ -1079,37 +1091,37 @@ contract AccountsBackwardCompatibility is AccountsTest {
     helperShouldSetAuthorizedKey(true, true, Role.Validator);
   }
 
-  function test_ShouldEmitRightEventVote_GenericWriteTrue() public {
+  function test_Emits_RightEventVote_GenericWriteTrue() public {
     vm.expectEmit(true, true, true, true);
     emit SignerAuthorized(account, signer, getRole(Role.Vote));
     authorize(Role.Vote, true, account, signer, signerPK);
   }
 
-  function test_ShouldEmitRightEventVote_GenericWriteFalse() public {
+  function test_Emits_RightEventVote_GenericWriteFalse() public {
     vm.expectEmit(true, true, true, true);
     emit VoteSignerAuthorized(account, signer);
     authorize(Role.Vote, false, account, signer, signerPK);
   }
 
-  function test_ShouldEmitRightEventAttestation_GenericWriteTrue() public {
+  function test_Emits_RightEventAttestation_GenericWriteTrue() public {
     vm.expectEmit(true, true, true, true);
     emit SignerAuthorized(account, signer, getRole(Role.Attestation));
     authorize(Role.Attestation, true, account, signer, signerPK);
   }
 
-  function test_ShouldEmitRightEventAttestation_GenericWriteFalse() public {
+  function test_Emits_RightEventAttestation_GenericWriteFalse() public {
     vm.expectEmit(true, true, true, true);
     emit AttestationSignerAuthorized(account, signer);
     authorize(Role.Attestation, false, account, signer, signerPK);
   }
 
-  function test_ShouldEmitRightEventValidator_GenericWriteTrue() public {
+  function test_Emits_RightEventValidator_GenericWriteTrue() public {
     vm.expectEmit(true, true, true, true);
     emit SignerAuthorized(account, signer, getRole(Role.Validator));
     authorize(Role.Validator, true, account, signer, signerPK);
   }
 
-  function test_ShouldEmitRightEventValidator_GenericWriteFalse() public {
+  function test_Emits_RightEventValidator_GenericWriteFalse() public {
     vm.expectEmit(true, true, true, true);
     emit ValidatorSignerAuthorized(account, signer);
     authorize(Role.Validator, false, account, signer, signerPK);
@@ -1335,9 +1347,10 @@ contract AccountsBackwardCompatibility is AccountsTest {
     helperShouldSetTheNewAuthorized(Role.Validator, false, false);
   }
 
-  function helperShouldReturnCorrectValues_WhenAccountHasNotAuthorized(Role role, bool genericRead)
-    public
-  {
+  function helperShouldReturnCorrectValues_WhenAccountHasNotAuthorized(
+    Role role,
+    bool genericRead
+  ) public {
     assertEq(authorizedSignerToAccount(role, genericRead, account), account);
 
     vm.expectRevert("Must first register address with Account.createAccount");

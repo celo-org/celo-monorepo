@@ -11,15 +11,6 @@ import "./LinkedList.sol";
 library AddressLinkedList {
   using LinkedList for LinkedList.List;
   using SafeMath for uint256;
-
-  function toBytes(address a) public pure returns (bytes32) {
-    return bytes32(uint256(a) << 96);
-  }
-
-  function toAddress(bytes32 b) public pure returns (address) {
-    return address(uint256(b) >> 96);
-  }
-
   /**
    * @notice Inserts an element into a doubly linked list.
    * @param list A storage pointer to the underlying list.
@@ -27,9 +18,12 @@ library AddressLinkedList {
    * @param previousKey The key of the element that comes before the element to insert.
    * @param nextKey The key of the element that comes after the element to insert.
    */
-  function insert(LinkedList.List storage list, address key, address previousKey, address nextKey)
-    public
-  {
+  function insert(
+    LinkedList.List storage list,
+    address key,
+    address previousKey,
+    address nextKey
+  ) public {
     list.insert(toBytes(key), toBytes(previousKey), toBytes(nextKey));
   }
 
@@ -58,9 +52,12 @@ library AddressLinkedList {
    * @param previousKey The key of the element that comes before the updated element.
    * @param nextKey The key of the element that comes after the updated element.
    */
-  function update(LinkedList.List storage list, address key, address previousKey, address nextKey)
-    public
-  {
+  function update(
+    LinkedList.List storage list,
+    address key,
+    address previousKey,
+    address nextKey
+  ) public {
     list.update(toBytes(key), toBytes(previousKey), toBytes(nextKey));
   }
 
@@ -97,5 +94,13 @@ library AddressLinkedList {
    */
   function getKeys(LinkedList.List storage list) public view returns (address[] memory) {
     return headN(list, list.numElements);
+  }
+
+  function toBytes(address a) public pure returns (bytes32) {
+    return bytes32(uint256(a) << 96);
+  }
+
+  function toAddress(bytes32 b) public pure returns (address) {
+    return address(uint256(b) >> 96);
   }
 }

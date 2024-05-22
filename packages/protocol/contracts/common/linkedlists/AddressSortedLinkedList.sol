@@ -12,14 +12,6 @@ library AddressSortedLinkedList {
   using SafeMath for uint256;
   using SortedLinkedList for SortedLinkedList.List;
 
-  function toBytes(address a) public pure returns (bytes32) {
-    return bytes32(uint256(a) << 96);
-  }
-
-  function toAddress(bytes32 b) public pure returns (address) {
-    return address(uint256(b) >> 96);
-  }
-
   /**
    * @notice Inserts an element into a doubly linked list.
    * @param list A storage pointer to the underlying list.
@@ -91,11 +83,9 @@ library AddressSortedLinkedList {
    * @return Array of all keys in the list.
    * @return Values corresponding to keys, which will be ordered largest to smallest.
    */
-  function getElements(SortedLinkedList.List storage list)
-    public
-    view
-    returns (address[] memory, uint256[] memory)
-  {
+  function getElements(
+    SortedLinkedList.List storage list
+  ) public view returns (address[] memory, uint256[] memory) {
     bytes32[] memory byteKeys = list.getKeys();
     address[] memory keys = new address[](byteKeys.length);
     uint256[] memory values = new uint256[](byteKeys.length);
@@ -135,11 +125,10 @@ library AddressSortedLinkedList {
    * @param n The number of elements to return.
    * @return The keys of the greatest elements.
    */
-  function headN(SortedLinkedList.List storage list, uint256 n)
-    public
-    view
-    returns (address[] memory)
-  {
+  function headN(
+    SortedLinkedList.List storage list,
+    uint256 n
+  ) public view returns (address[] memory) {
     bytes32[] memory byteKeys = list.headN(n);
     address[] memory keys = new address[](n);
     for (uint256 i = 0; i < n; i = i.add(1)) {
@@ -155,5 +144,13 @@ library AddressSortedLinkedList {
    */
   function getKeys(SortedLinkedList.List storage list) public view returns (address[] memory) {
     return headN(list, list.list.numElements);
+  }
+
+  function toBytes(address a) public pure returns (bytes32) {
+    return bytes32(uint256(a) << 96);
+  }
+
+  function toAddress(bytes32 b) public pure returns (address) {
+    return address(uint256(b) >> 96);
   }
 }

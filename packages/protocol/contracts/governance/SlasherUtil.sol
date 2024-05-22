@@ -7,8 +7,9 @@ import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts-0.8/common/IsL2Check.sol";
 
-contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles {
+contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles, IsL2Check {
   using SafeMath for uint256;
 
   struct SlashingIncentives {
@@ -33,7 +34,7 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
    * @param penalty Penalty for the slashed signer.
    * @param reward Reward that the observer gets.
    */
-  function setSlashingIncentives(uint256 penalty, uint256 reward) public onlyOwner {
+  function setSlashingIncentives(uint256 penalty, uint256 reward) public onlyL1 onlyOwner {
     require(penalty > reward, "Penalty has to be larger than reward");
     slashingIncentives.penalty = penalty;
     slashingIncentives.reward = reward;
@@ -96,5 +97,4 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
     validators.forceDeaffiliateIfValidator(validator);
     validators.halveSlashingMultiplier(group);
   }
-
 }

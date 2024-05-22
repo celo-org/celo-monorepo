@@ -5,18 +5,18 @@ import "celo-foundry/Test.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Freezer.sol";
 
-import { MockElection } from "@celo-contracts/governance/test/MockElection.sol";
-import { EpochRewardsTest } from "@celo-contracts/governance/test/EpochRewardsTest.sol";
+import "@celo-contracts/governance/test/MockElection.sol";
+import { EpochRewardsMock } from "@celo-contracts/governance/test/EpochRewardsMock.sol";
 import { Reserve } from "@lib/mento-core/contracts/Reserve.sol";
 
 import { MockSortedOracles } from "@celo-contracts/stability/test/MockSortedOracles.sol";
 import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.sol";
-import { MockGoldToken } from "@celo-contracts/common/test/MockGoldToken.sol";
+import { GoldTokenMock } from "@test-sol/common/GoldTokenMock.sol";
 
 import { Constants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
 
-contract EpochRewardsFoundryTest is Test, Constants, Utils {
+contract EpochRewardsTest is Test, Constants, Utils {
   event TargetVotingGoldFractionSet(uint256 fraction);
   event CommunityRewardFractionSet(uint256 fraction);
   event TargetValidatorEpochPaymentSet(uint256 payment);
@@ -49,11 +49,11 @@ contract EpochRewardsFoundryTest is Test, Constants, Utils {
   uint256[] initialAssetAllocationWeights;
 
   // Mocked contracts
-  EpochRewardsTest epochRewards;
-  MockElection mockElection;
+  EpochRewardsMock epochRewards;
+  MockElection election;
   MockSortedOracles mockSortedOracles;
   MockStableToken mockStableToken;
-  MockGoldToken mockGoldToken;
+  GoldTokenMock mockGoldToken;
   Reserve reserve;
   Freezer freezer;
 
@@ -69,16 +69,16 @@ contract EpochRewardsFoundryTest is Test, Constants, Utils {
 
   function setUp() public {
     // Mocked contracts
-    epochRewards = new EpochRewardsTest();
-    mockElection = new MockElection();
+    epochRewards = new EpochRewardsMock();
+    election = new MockElection();
     mockSortedOracles = new MockSortedOracles();
     mockStableToken = new MockStableToken();
-    mockGoldToken = new MockGoldToken();
+    mockGoldToken = new GoldTokenMock();
 
     freezer = new Freezer(true);
     registry = new Registry(true);
 
-    registry.setAddressFor(ElectionContract, address(mockElection));
+    registry.setAddressFor(ElectionContract, address(election));
     registry.setAddressFor(SortedOraclesContract, address(mockSortedOracles));
     registry.setAddressFor(StableTokenContract, address(mockStableToken));
     registry.setAddressFor(GoldTokenContract, address(mockGoldToken));
@@ -103,12 +103,10 @@ contract EpochRewardsFoundryTest is Test, Constants, Utils {
       address(0),
       carbonOffsettingFraction
     );
-
   }
-
 }
 
-contract EpochRewardsFoundryTest_Initialize is EpochRewardsFoundryTest {
+contract EpochRewardsTest_initialize is EpochRewardsTest {
   function test_ShouldHaveSetOwner() public {
     assertEq(epochRewards.owner(), caller);
   }
@@ -156,10 +154,9 @@ contract EpochRewardsFoundryTest_Initialize is EpochRewardsFoundryTest {
       carbonOffsettingFraction
     );
   }
-
 }
 
-contract EpochRewardsFoundryTest_SetTargetVotingGoldFraction is EpochRewardsFoundryTest {
+contract EpochRewardsTest_setTargetVotingGoldFraction is EpochRewardsTest {
   uint256 newFraction;
 
   function setUp() public {
@@ -174,7 +171,7 @@ contract EpochRewardsFoundryTest_SetTargetVotingGoldFraction is EpochRewardsFoun
     assertEq(epochRewards.getTargetVotingGoldFraction(), newFraction);
   }
 
-  function test_ShouldEmitTargetVotingGoldFractionSet_WhenFractionIsDifferent_WhenCalledByOwner()
+  function test_Emits_TargetVotingGoldFractionSet_WhenFractionIsDifferent_WhenCalledByOwner()
     public
   {
     vm.expectEmit(true, true, true, true);
@@ -192,10 +189,9 @@ contract EpochRewardsFoundryTest_SetTargetVotingGoldFraction is EpochRewardsFoun
     vm.expectRevert("Target voting gold fraction unchanged");
     epochRewards.setTargetVotingGoldFraction(targetVotingGoldFraction);
   }
-
 }
 
-contract EpochRewardsFoundryTest_SetCommunityRewardFraction is EpochRewardsFoundryTest {
+contract EpochRewardsTest_setCommunityRewardFraction is EpochRewardsTest {
   uint256 newFraction = communityRewardFraction + 1;
 
   function test_ShouldSetTargetVotingGoldFraction_WhenFractionIsDifferent_WhenCalledByOwner()
@@ -205,7 +201,7 @@ contract EpochRewardsFoundryTest_SetCommunityRewardFraction is EpochRewardsFound
     assertEq(epochRewards.getCommunityRewardFraction(), newFraction);
   }
 
-  function test_ShouldEmitCommunityRewardFractionSet_WhenFractionIsDifferent_WhenCalledByOwner()
+  function test_Emits_CommunityRewardFractionSet_WhenFractionIsDifferent_WhenCalledByOwner()
     public
   {
     vm.expectEmit(true, true, true, true);
@@ -234,7 +230,7 @@ contract EpochRewardsFoundryTest_SetCommunityRewardFraction is EpochRewardsFound
   }
 }
 
-contract EpochRewardsFoundryTest_SetTargetValidatorEpochPayment is EpochRewardsFoundryTest {
+contract EpochRewardsTest_setTargetValidatorEpochPayment is EpochRewardsTest {
   uint256 newPayment = targetValidatorEpochPayment + 1;
 
   function test_ShouldSetTargetVotingGoldFraction_WhenPaymentIsDifferent_WhenCalledByOwner()
@@ -244,7 +240,7 @@ contract EpochRewardsFoundryTest_SetTargetValidatorEpochPayment is EpochRewardsF
     assertEq(epochRewards.targetValidatorEpochPayment(), newPayment);
   }
 
-  function test_ShouldEmitTargetValidatorEpochPaymentSet_WhenPaymentIsDifferent_WhenCalledByOwner()
+  function test_Emits_TargetValidatorEpochPaymentSet_WhenPaymentIsDifferent_WhenCalledByOwner()
     public
   {
     vm.expectEmit(true, true, true, true);
@@ -264,7 +260,7 @@ contract EpochRewardsFoundryTest_SetTargetValidatorEpochPayment is EpochRewardsF
   }
 }
 
-contract EpochRewardsFoundryTest_SetRewardsMultiplierParameters is EpochRewardsFoundryTest {
+contract EpochRewardsTest_setRewardsMultiplierParameters is EpochRewardsTest {
   uint256 newRewardsMultiplierAdjustmentsUnderspend = rewardsMultiplierAdjustmentsUnderspend + 1;
 
   function test_ShouldSetNewRewardsMultiplierAdjustmentsOverspend_WhenCalledByOwner() public {
@@ -282,7 +278,7 @@ contract EpochRewardsFoundryTest_SetRewardsMultiplierParameters is EpochRewardsF
     assertEq(overspend, rewardsMultiplierAdjustmentsOverspend);
   }
 
-  function test_ShouldEmitRewardsMultiplierParametersSet_WhenCalledByOwner() public {
+  function test_Emits_RewardsMultiplierParametersSet_WhenCalledByOwner() public {
     vm.expectEmit(true, true, true, true);
     emit RewardsMultiplierParametersSet(
       rewardsMultiplierMax,
@@ -316,7 +312,7 @@ contract EpochRewardsFoundryTest_SetRewardsMultiplierParameters is EpochRewardsF
   }
 }
 
-contract EpochRewardsFoundryTest_SetTargetVotingYieldParameters is EpochRewardsFoundryTest {
+contract EpochRewardsTest_setTargetVotingYieldParameters is EpochRewardsTest {
   uint256 newTargetVotingYieldParamsMax = targetVotingYieldParamsMax + 1;
   uint256 newTargetVotingYieldParamsAdjustmentFactor = targetVotingYieldParamsAdjustmentFactor + 1;
 
@@ -332,7 +328,7 @@ contract EpochRewardsFoundryTest_SetTargetVotingYieldParameters is EpochRewardsF
     assertEq(factor, newTargetVotingYieldParamsAdjustmentFactor);
   }
 
-  function test_ShouldEmitTargetVotingYieldParametersSet_WhenCalledByOwner() public {
+  function test_Emits_TargetVotingYieldParametersSet_WhenCalledByOwner() public {
     vm.expectEmit(true, true, true, true);
     emit TargetVotingYieldParametersSet(
       newTargetVotingYieldParamsMax,
@@ -362,7 +358,7 @@ contract EpochRewardsFoundryTest_SetTargetVotingYieldParameters is EpochRewardsF
   }
 }
 
-contract EpochRewardsFoundryTest_SetTargetVotingYield is EpochRewardsFoundryTest {
+contract EpochRewardsTest_setTargetVotingYield is EpochRewardsTest {
   uint256 constant newTargetVotingYieldParamsInitial = targetVotingYieldParamsInitial + 1;
 
   function test_ShouldSetNewTargetVotingYieldParamsInitial_WhenCalledByOwner() public {
@@ -372,7 +368,7 @@ contract EpochRewardsFoundryTest_SetTargetVotingYield is EpochRewardsFoundryTest
     assertEq(target, newTargetVotingYieldParamsInitial);
   }
 
-  function test_ShouldEmitTargetVotingYieldSet_WhenCalledByOwner() public {
+  function test_Emits_TargetVotingYieldSet_WhenCalledByOwner() public {
     vm.expectEmit(true, true, true, true);
     emit TargetVotingYieldSet(newTargetVotingYieldParamsInitial);
     epochRewards.setTargetVotingYield(newTargetVotingYieldParamsInitial);
@@ -385,27 +381,25 @@ contract EpochRewardsFoundryTest_SetTargetVotingYield is EpochRewardsFoundryTest
   }
 }
 
-contract EpochRewardsFoundryTest_getTargetGoldTotalSupply is EpochRewardsFoundryTest {
+contract EpochRewardsTest_getTargetGoldTotalSupply is EpochRewardsTest {
   function test_ShouldReturn1B_WhenLessThan15YearsSinceGenesis() public {
     uint256 timeDelta = YEAR * 10;
     timeTravel(timeDelta);
     assertEq(epochRewards.getTargetGoldTotalSupply(), getExpectedTargetTotalSupply(timeDelta));
   }
-
 }
 
-contract EpochRewardsFoundryTest_getTargetVoterRewards is EpochRewardsFoundryTest {
+contract EpochRewardsTest_getTargetVoterRewards is EpochRewardsTest {
   function test_ShouldReturnAPercentageOfActiveVotes_WhenThereAreActiveVotes() public {
     uint256 activeVotes = 1000000;
-    mockElection.setActiveVotes(activeVotes);
+    election.setActiveVotes(activeVotes);
 
     uint256 expected = uint256((activeVotes * targetVotingYieldParamsInitial) / FIXED1);
     assertEq(epochRewards.getTargetVoterRewards(), expected);
   }
-
 }
 
-contract EpochRewardsFoundryTest_getTargetTotalEpochPaymentsInGold is EpochRewardsFoundryTest {
+contract EpochRewardsTest_getTargetTotalEpochPaymentsInGold is EpochRewardsTest {
   function test_ShouldgetTargetTotalEpochPaymentsInGold_WhenExchangeRateIsSet() public {
     uint256 numberValidators = 100;
     epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
@@ -413,10 +407,9 @@ contract EpochRewardsFoundryTest_getTargetTotalEpochPaymentsInGold is EpochRewar
     uint256 expected = uint256((targetValidatorEpochPayment * numberValidators) / exchangeRate);
     assertEq(epochRewards.getTargetTotalEpochPaymentsInGold(), expected);
   }
-
 }
 
-contract EpochRewardsFoundryTest_getRewardsMultiplier is EpochRewardsFoundryTest {
+contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
   uint256 constant timeDelta = YEAR * 10;
   uint256 expectedTargetTotalSupply;
   uint256 expectedTargetRemainingSupply;
@@ -459,12 +452,10 @@ contract EpochRewardsFoundryTest_getRewardsMultiplier is EpochRewardsFoundryTest
     uint256 actual = epochRewards.getRewardsMultiplier();
     uint256 expected = uint256((FIXED1 - (rewardsMultiplierAdjustmentsOverspend / 10)));
     assertApproxEqRel(actual, expected, 1e6);
-
   }
-
 }
 
-contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryTest {
+contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
   uint256 constant totalSupply = 6000000 ether;
   uint256 constant reserveBalance = 1000000 ether;
   uint256 constant floatingSupply = totalSupply - reserveBalance;
@@ -498,7 +489,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
   }
 
   function mockVotes(uint256 votes) internal {
-    mockElection.setTotalVotes(votes);
+    election.setTotalVotes(votes);
     vm.prank(address(0));
     epochRewards.updateTargetVotingYield();
   }
@@ -610,7 +601,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
     public
   {
     uint256 totalVotes = (floatingSupply * 98) / 100;
-    mockElection.setTotalVotes(totalVotes);
+    election.setTotalVotes(totalVotes);
     // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
     for (uint256 i = 0; i < 800; i++) {
       vm.prank(address(0));
@@ -625,7 +616,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
     public
   {
     uint256 totalVotes = (floatingSupply * 3) / 10;
-    mockElection.setTotalVotes(totalVotes);
+    election.setTotalVotes(totalVotes);
     // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
     for (uint256 i = 0; i < 5; i++) {
       vm.prank(address(0));
@@ -645,7 +636,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
     public
   {
     uint256 totalVotes = (floatingSupply * 8) / 10;
-    mockElection.setTotalVotes(totalVotes);
+    election.setTotalVotes(totalVotes);
     // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
     for (uint256 i = 0; i < 5; i++) {
       vm.prank(address(0));
@@ -682,8 +673,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
         (targetVotingYieldParamsAdjustmentFactor *
           ((targetVotingGoldFraction /
             FIXED1 -
-            ((votingNumeratorArray[i] * FIXED1) / votingDenominatorArray[i])) /
-            FIXED1));
+            ((votingNumeratorArray[i] * FIXED1) / votingDenominatorArray[i])) / FIXED1));
     }
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
@@ -694,7 +684,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
     public
   {
     uint256 totalVotes = (floatingSupply * (targetVotingGoldFraction - 0.1e24)) / FIXED1;
-    mockElection.setTotalVotes(totalVotes);
+    election.setTotalVotes(totalVotes);
     for (uint256 i = 0; i < 356; i++) {
       vm.prank(address(0));
       epochRewards.updateTargetVotingYield();
@@ -710,7 +700,7 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
     public
   {
     uint256 totalVotes = (floatingSupply * (targetVotingGoldFraction + 0.1e24)) / FIXED1;
-    mockElection.setTotalVotes(totalVotes);
+    election.setTotalVotes(totalVotes);
     for (uint256 i = 0; i < 356; i++) {
       vm.prank(address(0));
       epochRewards.updateTargetVotingYield();
@@ -721,11 +711,10 @@ contract EpochRewardsFoundryTest_updateTargetVotingYield is EpochRewardsFoundryT
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
     assertApproxEqRel(result, expected, 1e16); // TODO I suspect it has a 1% error due rounding errors, but need to double check
   }
-
 }
 
-contract EpochRewardsFoundryTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAndTheActualRemainingSupplyIs10pMoreThanTheTargetRemainingSupplyAfterRewards_calculateTargetEpochRewards is
-  EpochRewardsFoundryTest
+contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAndTheActualRemainingSupplyIs10pMoreThanTheTargetRemainingSupplyAfterRewards_calculateTargetEpochRewards is
+  EpochRewardsTest
 {
   uint256 constant numberValidators = 100;
   uint256 constant activeVotes = 102398474 ether;
@@ -738,17 +727,15 @@ contract EpochRewardsFoundryTest_WhenThereAreActiveVotesAStableTokenExchangeRate
     super.setUp();
 
     epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
-    mockElection.setActiveVotes(activeVotes);
+    election.setActiveVotes(activeVotes);
     uint256 expectedTargetTotalEpochPaymentsInGold = (targetValidatorEpochPayment *
-      numberValidators) /
-      exchangeRate;
+      numberValidators) / exchangeRate;
 
     uint256 expectedTargetEpochRewards = (targetVotingYieldParamsInitial * activeVotes) / FIXED1;
 
     uint256 expectedTargetGoldSupplyIncrease = expectedTargetEpochRewards +
       ((expectedTargetTotalEpochPaymentsInGold /
-        (FIXED1 - communityRewardFraction - carbonOffsettingFraction)) /
-        FIXED1);
+        (FIXED1 - communityRewardFraction - carbonOffsettingFraction)) / FIXED1);
     uint256 expectedTargetTotalSupply = getExpectedTargetTotalSupply(timeDelta);
     uint256 expectedTargetRemainingSupply = SUPPLY_CAP - expectedTargetTotalSupply;
     uint256 actualRemainingSupply = (expectedTargetRemainingSupply * 11) / 10;
@@ -800,10 +787,9 @@ contract EpochRewardsFoundryTest_WhenThereAreActiveVotesAStableTokenExchangeRate
     (, , , uint256 result) = epochRewards.calculateTargetEpochRewards();
     assertApproxEqRel(result, expected, 5e13);
   }
-
 }
 
-contract EpochRewardsFoundryTest_isReserveLow is EpochRewardsFoundryTest {
+contract EpochRewardsTest_isReserveLow is EpochRewardsTest {
   uint256 constant stableBalance = 2397846127684712867321;
 
   function setUp() public {
@@ -835,7 +821,6 @@ contract EpochRewardsFoundryTest_isReserveLow is EpochRewardsFoundryTest {
     reserve.addToken(address(mockStableToken));
     mockGoldToken.setTotalSupply(totalSupply);
     mockStableToken.setTotalSupply(stableBalance);
-
   }
 
   // reserve ratio of 0.5'
@@ -926,5 +911,4 @@ contract EpochRewardsFoundryTest_isReserveLow is EpochRewardsFoundryTest {
     vm.expectRevert("can't call when contract is frozen");
     epochRewards.updateTargetVotingYield();
   }
-
 }

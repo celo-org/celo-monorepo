@@ -5,10 +5,12 @@ pragma solidity >=0.5.13 <0.8.20;
 /// copied from https://github.com/0xcyphered/secp256k1-solidity/blob/main/contracts/SECP256K1.sol
 
 interface ISECP256K1 {
-  function recover(uint256 digest, uint8 v, uint256 r, uint256 s)
-    external
-    pure
-    returns (uint256, uint256);
+  function recover(
+    uint256 digest,
+    uint8 v,
+    uint256 r,
+    uint256 s
+  ) external pure returns (uint256, uint256);
 }
 
 /**
@@ -18,7 +20,8 @@ interface ISECP256K1 {
  */
 library SECP256K1 {
   // Elliptic curve Constants
-  uint256 private constant U255_MAX_PLUS_1 = 57896044618658097711785492504343953926634992332820282019728792003956564819968;
+  uint256 private constant U255_MAX_PLUS_1 =
+    57896044618658097711785492504343953926634992332820282019728792003956564819968;
 
   // Curve Constants
   uint256 private constant A = 0;
@@ -34,11 +37,12 @@ library SECP256K1 {
   /// @param r first 32 bytes of signature
   /// @param v last 32 bytes of signature
   /// @return (x, y) EC point
-  function recover(uint256 digest, uint8 v, uint256 r, uint256 s)
-    public
-    pure
-    returns (uint256, uint256)
-  {
+  function recover(
+    uint256 digest,
+    uint8 v,
+    uint256 r,
+    uint256 s
+  ) public pure returns (uint256, uint256) {
     uint256 x = addmod(r, P * (v >> 1), P);
     if (x > P || s > N || r > N || s == 0 || r == 0 || v > 1) {
       return (0, 0);
@@ -94,11 +98,14 @@ library SECP256K1 {
   /// @param _y2 coordinate y of square
   /// @param _z2 coordinate z of square
   /// @return (qx, qy, qz) P1+square in Jacobian
-  function jacAdd(uint256 _x1, uint256 _y1, uint256 _z1, uint256 _x2, uint256 _y2, uint256 _z2)
-    internal
-    pure
-    returns (uint256, uint256, uint256)
-  {
+  function jacAdd(
+    uint256 _x1,
+    uint256 _y1,
+    uint256 _z1,
+    uint256 _x2,
+    uint256 _y2,
+    uint256 _z2
+  ) internal pure returns (uint256, uint256, uint256) {
     if (_x1 == 0 && _y1 == 0) return (_x2, _y2, _z2);
     if (_x2 == 0 && _y2 == 0) return (_x1, _y1, _z1);
 
@@ -147,11 +154,12 @@ library SECP256K1 {
   /// @param _y coordinate y of P1
   /// @param _z coordinate z of P1
   /// @return (qx, qy, qz) d*P1 in Jacobian
-  function jacMul(uint256 _d, uint256 _x, uint256 _y, uint256 _z)
-    internal
-    pure
-    returns (uint256, uint256, uint256)
-  {
+  function jacMul(
+    uint256 _d,
+    uint256 _x,
+    uint256 _y,
+    uint256 _z
+  ) internal pure returns (uint256, uint256, uint256) {
     // Early return in case that `_d == 0`
     if (_d == 0) {
       return (_x, _y, _z);
@@ -179,11 +187,11 @@ library SECP256K1 {
   /// @param _y coordinate y of P1
   /// @param _z coordinate z of P1
   /// @return (qx, qy, qz) 2P in Jacobian
-  function jacDouble(uint256 _x, uint256 _y, uint256 _z)
-    internal
-    pure
-    returns (uint256, uint256, uint256)
-  {
+  function jacDouble(
+    uint256 _x,
+    uint256 _y,
+    uint256 _z
+  ) internal pure returns (uint256, uint256, uint256) {
     if (_z == 0) return (_x, _y, _z);
 
     // We follow the equations described in https://pdfs.semanticscholar.org/5c64/29952e08025a9649c2b0ba32518e9a7fb5c2.pdf Section 5
@@ -217,11 +225,14 @@ library SECP256K1 {
   /// @param _x2 coordinate x of P2
   /// @param _y2 coordinate y of P2
   /// @return (qx, qy) = P1+P2 in affine coordinates
-  function ecAdd(uint256 _x1, uint256 _y1, uint256 _z1, uint256 _x2, uint256 _y2, uint256 _z2)
-    internal
-    pure
-    returns (uint256, uint256)
-  {
+  function ecAdd(
+    uint256 _x1,
+    uint256 _y1,
+    uint256 _z1,
+    uint256 _x2,
+    uint256 _y2,
+    uint256 _z2
+  ) internal pure returns (uint256, uint256) {
     uint256 x = 0;
     uint256 y = 0;
     uint256 z = 0;

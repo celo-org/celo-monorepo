@@ -47,17 +47,6 @@ contract GoldToken is
   constructor(bool test) public Initializable(test) {}
 
   /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 0);
-  }
-
-  /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress Address of the Registry contract.
    */
@@ -85,10 +74,11 @@ contract GoldToken is
    * @param comment The transfer comment
    * @return True if the transaction succeeds.
    */
-  function transferWithComment(address to, uint256 value, string calldata comment)
-    external
-    returns (bool)
-  {
+  function transferWithComment(
+    address to,
+    uint256 value,
+    string calldata comment
+  ) external returns (bool) {
     bool succeeded = _transferWithCheck(to, value);
     emit TransferComment(comment);
     return succeeded;
@@ -193,6 +183,14 @@ contract GoldToken is
   }
 
   /**
+   * @notice Increases the variable for total amount of CELO in existence.
+   * @param amount The amount to increase counter by
+   */
+  function increaseSupply(uint256 amount) external onlyVm {
+    totalSupply_ = totalSupply_.add(amount);
+  }
+
+  /**
    * @return The name of the CELO token.
    */
   function name() external view returns (string memory) {
@@ -238,11 +236,14 @@ contract GoldToken is
   }
 
   /**
-   * @notice Increases the variable for total amount of CELO in existence.
-   * @param amount The amount to increase counter by
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
-  function increaseSupply(uint256 amount) external onlyVm {
-    totalSupply_ = totalSupply_.add(amount);
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 2, 0);
   }
 
   /**
