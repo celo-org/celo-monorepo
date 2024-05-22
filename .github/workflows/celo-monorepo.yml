@@ -232,7 +232,7 @@ jobs:
           rebuild-package: 'true'
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
       - name: Execute matrix command for test
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 40
           max_attempts: 3
@@ -317,7 +317,7 @@ jobs:
         with:
           artifacts_to_cache: ${{ needs.install-dependencies.outputs.artifacts_to_cache }}
       - name: Execute matrix command for test
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 30
           max_attempts: 3
