@@ -65,6 +65,24 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
   event CanExpireSet(bool canExpire);
   event BeneficiarySet(address indexed beneficiary);
 
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    registry = Registry(proxyAdminAddress);
+    registry.setAddressFor("Accounts", address(accounts));
+    registry.setAddressFor("Election", address(election));
+    registry.setAddressFor("Freezer", address(freezer));
+    registry.setAddressFor("GoldToken", address(goldToken));
+    registry.setAddressFor("Governance", address(governance));
+    registry.setAddressFor("LockedGold", address(lockedGold));
+    registry.setAddressFor("Validators", address(validators));
+    registry.setAddressFor("StableToken", address(stableToken));
+
+    lockedGold.setRegistry(proxyAdminAddress);
+    goldToken.setRegistry(proxyAdminAddress);
+    accounts.setRegistry(proxyAdminAddress);
+  }
+
   function newReleaseGold(bool prefund, bool startReleasing) internal returns (ReleaseGold) {
     releaseGold = new ReleaseGold(true);
 
@@ -149,7 +167,7 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
   }
 }
 
-contract ReleaseGoldTest_ReleaseGoldInitialize is ReleaseGoldTest {
+contract ReleaseGoldTest_Initialize is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
   }
@@ -1105,6 +1123,50 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest {
     assertEq(accounts.authorizedBy(authorized), address(releaseGold));
     assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
     assertEq(accounts.validatorSignerToAccount(authorized), address(releaseGold));
+  }
+
+  function test_Reverts_WhenAuthorizeValidatorSignerWithPublicKeyCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(beneficiary);
+    releaseGold.authorizeValidatorSignerWithPublicKey(
+      address(uint160(authorized)),
+      v,
+      r,
+      s,
+      ecdsaPublicKey
+    );
+  }
+
+  function test_Reverts_WhenAuthorizeValidatorSignerWithKeysCalledOnL2() public {
+    _whenL2();
+    bytes32 newBlsPublicKeyPart1 = _randomBytes32();
+    bytes32 newBlsPublicKeyPart2 = _randomBytes32();
+    bytes32 newBlsPublicKeyPart3 = _randomBytes32();
+    bytes memory newBlsPublicKey = abi.encodePacked(
+      newBlsPublicKeyPart1,
+      newBlsPublicKeyPart2,
+      newBlsPublicKeyPart3
+    );
+    newBlsPublicKey = _truncateBytes(newBlsPublicKey, 96);
+
+    bytes32 newBlsPoPPart1 = _randomBytes32();
+    bytes32 newBlsPoPPart2 = _randomBytes32();
+    bytes memory newBlsPoP = abi.encodePacked(newBlsPoPPart1, newBlsPoPPart2);
+    newBlsPoP = _truncateBytes(newBlsPoP, 48);
+
+    vm.expectRevert("This method is no longer supported in L2.");
+
+    vm.prank(beneficiary);
+    releaseGold.authorizeValidatorSignerWithKeys(
+      address(uint160(authorized)),
+      v,
+      r,
+      s,
+      ecdsaPublicKey,
+      newBlsPublicKey,
+      newBlsPoP
+    );
   }
 }
 
@@ -2067,7 +2129,33 @@ contract ReleaseGoldTest_GetWithdrawableAmount is ReleaseGoldTest {
     assertEq(releaseGold.getWithdrawableAmount(), initialReleaseGoldAmount / 4);
   }
 
-  function test_ShouldReturnOnlyUpToItsOwnBalance() public {
+  function test_ShouldReturnOnlyUpToItsOwnBalanceWhenValidatorSignerAuthorizedWitoutKey() public {
+    vm.prank(releaseOwner);
+    releaseGold.setMaxDistribution(1000);
+
+    vm.prank(beneficiary);
+    releaseGold.createAccount();
+
+    vm.warp(block.timestamp + 6 * MONTH + 1 * DAY);
+
+    uint256 signerFund = 1 ether;
+    uint256 expectedWithdrawalAmount = (initialReleaseGoldAmount - signerFund) / 2;
+
+    (address authorized, uint256 authorizedPK) = actorWithPK("authorized");
+    (uint8 v, bytes32 r, bytes32 s) = getParsedSignatureOfAddress(
+      address(releaseGold),
+      authorizedPK
+    );
+
+    vm.prank(beneficiary);
+    releaseGold.authorizeValidatorSigner(address(uint160(authorized)), v, r, s);
+
+    assertEq(releaseGold.getWithdrawableAmount(), expectedWithdrawalAmount);
+  }
+
+  function test_ShouldReturnOnlyUpToItsOwnBalanceWhenValidatorSignerAuthorizedWithPublicKey()
+    public
+  {
     vm.prank(releaseOwner);
     releaseGold.setMaxDistribution(1000);
 
@@ -2109,5 +2197,141 @@ contract ReleaseGoldTest_GetWithdrawableAmount is ReleaseGoldTest {
 
     vm.warp(block.timestamp + 6 * MONTH + 1 * DAY);
     assertEq(releaseGold.getWithdrawableAmount(), initialReleaseGoldAmount / 4);
+  }
+}
+
+contract ReleaseGoldTest_DeployAndInitializeOnL2 is ReleaseGoldTest {
+  uint256 public maxUint256 = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+  function setUp() public {
+    super.setUp();
+    _whenL2();
+    initParams2.registryAddress = proxyAdminAddress;
+  }
+
+  function test_ShouldIndicateIsFundedIfDeploymentIsPrefunded() public {
+    newReleaseGold(true, false);
+    assertTrue(releaseGold.isFunded());
+  }
+
+  function test_ShouldNotIndicateFundedAndNotRevertIfDeploymentIsNotPrefunded() public {
+    newReleaseGold(false, false);
+    assertFalse(releaseGold.isFunded());
+  }
+
+  function test_ShouldHaveAssociatedFundsWithAScheduleUponCreation() public {
+    newReleaseGold(true, false);
+    assertEq(
+      goldToken.balanceOf(address(releaseGold)),
+      initParams.numReleasePeriods * initParams.amountReleasedPerPeriod
+    );
+  }
+
+  function test_ShouldSetABeneficiaryToReleaseGoldInstance() public {
+    newReleaseGold(true, false);
+    assertEq(releaseGold.beneficiary(), initParams._beneficiary);
+  }
+
+  function test_ShouldSetAReleaseOwnerToReleaseGoldInstance() public {
+    newReleaseGold(true, false);
+    assertEq(releaseGold.releaseOwner(), initParams2._releaseOwner);
+  }
+
+  function test_ShouldSetReleaseGoldNumberOfPeriods() public {
+    newReleaseGold(true, false);
+    (, , uint256 releaseGoldNumPeriods, , ) = releaseGold.releaseSchedule();
+    assertEq(releaseGoldNumPeriods, initParams.numReleasePeriods);
+  }
+
+  function test_ShouldSetReleaseGoldAmountPerPeriod() public {
+    newReleaseGold(true, false);
+    (, , , , uint256 releaseGoldAmountPerPeriod) = releaseGold.releaseSchedule();
+    assertEq(releaseGoldAmountPerPeriod, initParams.amountReleasedPerPeriod);
+  }
+
+  function test_ShouldSetReleaseGoldPeriod() public {
+    newReleaseGold(true, false);
+    (, , , uint256 releaseGoldPeriod, ) = releaseGold.releaseSchedule();
+    assertEq(releaseGoldPeriod, initParams.releasePeriod);
+  }
+
+  function test_ShouldSetReleaseGoldStartTime() public {
+    newReleaseGold(true, false);
+    (uint256 releaseGoldStartTime, , , , ) = releaseGold.releaseSchedule();
+    assertEq(releaseGoldStartTime, initParams.releaseStartTime);
+  }
+
+  function test_ShouldSetReleaseGoldCliffTime() public {
+    newReleaseGold(true, false);
+    (, uint256 releaseGoldCliffTime, , , ) = releaseGold.releaseSchedule();
+    uint256 expectedCliffTime = initParams.releaseStartTime + initParams.releaseCliffTime;
+    assertEq(releaseGoldCliffTime, expectedCliffTime);
+  }
+
+  function test_ShouldSetRevocableFlagToReleaseGoldInstance() public {
+    newReleaseGold(true, false);
+    (bool revocable, , , ) = releaseGold.revocationInfo();
+    assertEq(revocable, initParams.revocable);
+  }
+
+  function test_ShouldSetReleaseOwnerToReleaseGoldInstance() public {
+    newReleaseGold(true, false);
+    assertEq(releaseGold.releaseOwner(), initParams2._releaseOwner);
+  }
+
+  function test_ShouldSetLiquidityProvisionMetToTrue() public {
+    newReleaseGold(true, false);
+    assertEq(releaseGold.liquidityProvisionMet(), true);
+  }
+
+  function test_ShouldHaveZeroTotalWithdrawnOnInit() public {
+    newReleaseGold(true, false);
+    assertEq(releaseGold.totalWithdrawn(), 0);
+  }
+
+  function test_ShouldBeUnrevokedOnInitAndHaveRevokeTimeEqualZero() public {
+    newReleaseGold(true, false);
+    (, , , uint256 revokeTime) = releaseGold.revocationInfo();
+    assertEq(revokeTime, 0);
+    assertEq(releaseGold.isRevoked(), false);
+  }
+
+  function test_ShouldHaveReleaseGoldBalanceAtRevokeOnInitEqualToZero() public {
+    newReleaseGold(true, false);
+    (, , uint256 releasedBalanceAtRevoke, ) = releaseGold.revocationInfo();
+    assertEq(releasedBalanceAtRevoke, 0);
+  }
+
+  function test_ShouldRevertWhenReleaseGoldBeneficiaryIsTheNullAddress() public {
+    releaseGold = new ReleaseGold(true);
+    initParams._beneficiary = address(0);
+    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold));
+    vm.expectRevert("unsuccessful tunnel call");
+    tunnel.MockInitialize(owner, initParams, initParams2);
+  }
+
+  function test_ShouldRevertWhenReleaseGoldPeriodsAreZero() public {
+    releaseGold2 = new ReleaseGold(true);
+    initParams.numReleasePeriods = 0;
+    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold2));
+    vm.expectRevert("unsuccessful tunnel call");
+    tunnel.MockInitialize(owner, initParams, initParams2);
+  }
+
+  function test_ShouldRevertWhenReleasedAmountPerPeriodIsZero() public {
+    releaseGold2 = new ReleaseGold(true);
+    initParams.amountReleasedPerPeriod = 0;
+    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold2));
+    vm.expectRevert("unsuccessful tunnel call");
+    tunnel.MockInitialize(owner, initParams, initParams2);
+  }
+
+  function test_ShouldOverflowForVeryLargeCombinationsOdReleasePeriodsAndAmountPerTime() public {
+    releaseGold = new ReleaseGold(true);
+    initParams.numReleasePeriods = maxUint256;
+    initParams.amountReleasedPerPeriod = maxUint256;
+    initParams2.initialDistributionRatio = 999;
+    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold));
+    vm.expectRevert("unsuccessful tunnel call");
+    tunnel.MockInitialize(owner, initParams, initParams2);
   }
 }
