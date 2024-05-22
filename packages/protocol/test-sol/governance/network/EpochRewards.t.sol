@@ -219,11 +219,11 @@ contract EpochRewardsTest_setCommunityRewardFraction is EpochRewardsTest {
     epochRewards.setCommunityRewardFraction(newFraction);
   }
 
-  function test_ShouldBeLessThan1() public {
+  function test_Reverts_WhenFractionIs1() public {
     vm.expectRevert(
       "Value must be different from existing community reward fraction and less than 1"
     );
-    epochRewards.setCommunityRewardFraction(1000000 ether);
+    epochRewards.setCommunityRewardFraction(FIXED1);
   }
 
   function test_Reverts_WhenFractionIsDifferent_WhenCalledByNonOwner() public {
