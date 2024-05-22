@@ -210,6 +210,7 @@ contract DoubleSigningSlasherSetSlashingIncentives is DoubleSigningSlasherBaseTe
   function test_ShouldRevert_WhenInL2() public {
     uint256 newPenalty = 123;
     uint256 newReward = 67;
+
     _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
     slasher.setSlashingIncentives(newPenalty, newReward);
