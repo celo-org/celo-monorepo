@@ -5,9 +5,8 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./SlasherUtil.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
 
-contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil, IsL2Check {
+contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
   using SafeMath for uint256;
 
   // Maps validator address -> end block of the latest interval for which it has been slashed.

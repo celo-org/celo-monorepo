@@ -6,7 +6,7 @@ import "../common/interfaces/ICeloVersionedContract.sol";
 import "./SlasherUtil.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 
-contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil, IsL2Check {
+contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
   using SafeMath for uint256;
 
   // For each signer address, check if a block header has already been slashed
