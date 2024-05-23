@@ -21,6 +21,7 @@ jobs:
     permissions: 
       contents: read
       pull-requests: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -78,17 +79,7 @@ jobs:
           # Max retention time is 90 days for public repos
           # https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
           retention-days: 90
-  publish:
-    needs: build
-    defaults:
-      run:
-        working-directory: packages/protocol
-    name: Publish npm package
-    runs-on: ubuntu-latest
-    permissions: # Must change the job token permissions to use Akeyless JWT auth
-      id-token: write
-      contents: read
-    steps:
+
       - name: Akeyless Get Secrets
         id: get_auth_token
         uses: docker://us-west1-docker.pkg.dev/devopsre/akeyless-public/akeyless-action:latest
