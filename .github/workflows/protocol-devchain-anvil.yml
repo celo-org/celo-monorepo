@@ -60,7 +60,7 @@ jobs:
 
       - name: Set package.json version based on GitHub ref
         run: |
-          VERSION=${github.ref_name}
+          VERSION=${{ github.ref_name }}
           echo "Setting version to $VERSION"
           jq ".version = \"$VERSION\"" .tmp/package.json > .tmp/temp.json && mv .tmp/temp.json .tmp/package.json
       
