@@ -82,6 +82,9 @@ jobs:
     needs: build
     name: Publish npm package
     runs-on: ubuntu-latest
+    permissions: # Must change the job token permissions to use Akeyless JWT auth
+      id-token: write
+      contents: read
     steps:
       - name: Akeyless Get Secrets
         id: get_auth_token
