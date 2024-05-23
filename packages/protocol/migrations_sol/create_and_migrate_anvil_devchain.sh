@@ -8,58 +8,18 @@ export ANVIL_PORT=8546
 
 # TODO make this configurable
 FROM_ACCOUNT_NO_ZERO="f39Fd6e51aad88F6F4ce6aB8827279cffFb92266" # This is Anvil's default account (1)
-FROM_ACCOUNT="0x$FROM_ACCOUNT_NO_ZERO"
+export FROM_ACCOUNT="0x$FROM_ACCOUNT_NO_ZERO"
 TEMP_FOLDER="$PWD/.tmp"
 
+# Start a local anvil instance
 source $PWD/migrations_sol/start_anvil.sh
 
-# List of libraries
-LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
-                "contracts/common/Signatures.sol:Signatures"
-                "contracts/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
-                "contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList"
-                "contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
-                "contracts/governance/Proposals.sol:Proposals"
-)
+# Deploy libraries to the anvil instance
+source $PWD/migrations_sol/deploy_libraries.sh
 
-LIBRARIES=""
-
-# Create a temporary directory and copy the libraries to the temporary directory.
-# The goal is to only build the libraries and not all smart contracts in the project.
-TEMP_DIR=$(mktemp -d -t forge-libraries-XXXXXX)
-########### DEBUGGING START ##########
-echo "DEBUGGING: TEMP_DIR is ${TEMP_DIR}"
-########### DEBUGGING END ##########
-for LIBRARY in "${LIBRARIES_PATH[@]}"; do
-    IFS=":" read -r SOURCE DEST <<< "$LIBRARY"
-    mkdir -p "$TEMP_DIR/$(dirname "$DEST")"
-    cp "$SOURCE" "$TEMP_DIR/$DEST"
-done
-
-# Ensure the forge.toml exists in the temporary directory for proper forge build
-cp $PWD/foundry.toml "$TEMP_DIR/"
-
-# Build the libraries in the temporary directory.
-echo "Building libraries"
-pushd "$TEMP_DIR"
-forge build --contracts . --out "$PWD/out"
-popd
-
-# Deploy the libraries
-echo "Deploying libraries"
-for library in "${LIBRARIES_PATH[@]}"; do
-    library_name="${library#*:}" 
-    echo "Deploying library: $library_name"
-    create_library_out=`forge create $library --from $FROM_ACCOUNT --rpc-url http://127.0.0.1:$ANVIL_PORT --unlocked --json`
-    library_address=`echo $create_library_out | jq -r '.deployedTo'`
-    
-    LIBRARIES="$LIBRARIES --libraries $library:$library_address"
-done
-
-# Remove the temporary directory
-rm -rf "$TEMP_DIR"
-
-echo "Library flags are: $LIBRARIES"
+# Backing up library flags
+# TODO(Arthur): Check if this is strictly necessary. 
+echo "Library flags are: $LIBRARY_FLAGS"
 echo "Backing up libraries"
 
 mkdir -p $TEMP_FOLDER
@@ -68,7 +28,9 @@ LIBRARIES_FILE="$TEMP_FOLDER/libraries.tx"
 rm -f $LIBRARIES_FILE
 touch $LIBRARIES_FILE
 
-echo "$LIBRARIES" > $LIBRARIES_FILE
+echo "$LIBRARY_FLAGS" > $LIBRARIES_FILE
+
+# Build and deploy all contracts
 
 # helpers to disable broadcast and simulation
 # TODO move to configuration
@@ -77,11 +39,11 @@ SKIP_SIMULATION=""
 # SKIP_SIMULATION="--skip-simulation" 
 # BROADCAST=""
 
-# Build all contracts
+# Build all contracts with deployed libraries
 # Including contracts that depend on libraries. This step replaces the library placeholder
 # in the bytecode with the address of the actually deployed library.
 echo "Compiling with libraries... "
-time forge build $LIBRARIES
+time forge build $LIBRARY_FLAGS
 
 # Deploy precompile contracts
 source $PWD/migrations_sol/deploy_precompiles.sh
@@ -99,7 +61,7 @@ cast rpc anvil_setStorageAt --rpc-url http://127.0.0.1:$ANVIL_PORT $REGISTRY_ADD
 
 # run migrations
 echo "Running migration script... "
-time forge script migrations_sol/Migration.s.sol --tc Migration --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive --sender $FROM_ACCOUNT --unlocked $LIBRARIES || echo "Migration script failed"
+time forge script migrations_sol/Migration.s.sol --tc Migration --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive --sender $FROM_ACCOUNT --unlocked $LIBRARY_FLAGS || echo "Migration script failed"
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
