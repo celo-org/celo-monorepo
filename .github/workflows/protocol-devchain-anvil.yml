@@ -58,16 +58,22 @@ jobs:
       - name: Generate migrations
         run: ./migrations_sol/run_integration_tests_in_anvil.sh
 
+      - name: Sanitize ref name
+        id: sanitize-ref-name
+        run: |
+          sanitized_ref_name=$(echo "${{ github.ref_name }}" | tr -cd '[:alnum:]-_')
+          echo "sanitized_ref_name=${sanitized_ref_name}" >> $GITHUB_ENV
+
       - name: Set package.json version based on GitHub ref
         run: |
-          VERSION=${{ github.ref_name }}
+          VERSION=${{ env.sanitized_ref_name }}
           echo "Setting version to $VERSION"
           jq ".version = \"$VERSION\"" .tmp/package.json > .tmp/temp.json && mv .tmp/temp.json .tmp/package.json
-      
+
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: devchain-${{ github.ref_name }}-${{ steps.date.outputs.date }}
+          name: devchain-${{ env.sanitized_ref_name }}-${{ steps.date.outputs.date }}
           path: packages/protocol/.tmp
           # Max retention time is 90 days for public repos
           # https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
