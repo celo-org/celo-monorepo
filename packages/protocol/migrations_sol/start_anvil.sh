@@ -2,10 +2,13 @@
 set -euo pipefail
 
 timestamp=`date -Iseconds`
-ANVIL_FOLDER="$PWD/.tmp/devchain"
+TMP_FOLDER="$PWD/.tmp"
+ANVIL_FOLDER="$TMP_FOLDER/devchain"
 mkdir -p $ANVIL_FOLDER
-# ANVIL_FILE="$ANVIL_FOLDER/anvil_state-$timestamp.json"
 echo "Anvil state will be saved to $ANVIL_FOLDER"
+
+# create package.json
+echo "{\"name\": \"@celo/devchain-anvil\",\"version\": \"1.0.0\",\"description\": \"Anvil based devchain that contains core smart contracts of celo\",\"author\":\"Celo\",\"license\": \"LGPL-3.0\"}" > $TMP_FOLDER/package.json
 
 if nc -z localhost $ANVIL_PORT; then
   echo "Port already used"
