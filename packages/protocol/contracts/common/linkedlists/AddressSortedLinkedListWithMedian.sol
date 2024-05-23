@@ -2,7 +2,7 @@ pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-import "./SortedLinkedListWithMedian.sol";
+import "@celo-contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
 
 /**
  * @title Maintains a sorted list of unsigned ints keyed by address.
