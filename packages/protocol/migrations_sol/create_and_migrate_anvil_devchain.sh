@@ -10,6 +10,7 @@ export ANVIL_PORT=8546
 FROM_ACCOUNT_NO_ZERO="f39Fd6e51aad88F6F4ce6aB8827279cffFb92266" # This is Anvil's default account (1)
 FROM_ACCOUNT="0x$FROM_ACCOUNT_NO_ZERO"
 TEMP_FOLDER="$PWD/.tmp"
+rm -rf $TEMP_FOLDER
 
 source $PWD/migrations_sol/start_anvil.sh
 
@@ -71,3 +72,6 @@ time forge build $LIBRARIES
 
 # run migrations
 time forge script migrations_sol/Migration.s.sol --tc Migration --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive --sender $FROM_ACCOUNT --unlocked $LIBRARIES || echo "Migration script failed"
+
+mv $TEMP_FOLDER/devchain/state.json $TEMP_FOLDER/devchain.json
+rm -rf $TEMP_FOLDER/devchain
