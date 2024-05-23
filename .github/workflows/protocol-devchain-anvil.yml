@@ -51,6 +51,10 @@ jobs:
       - name: Install forge dependencies
         run: forge install
 
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
       - name: Generate migrations
         run: ./migrations_sol/run_integration_tests_in_anvil.sh
       
