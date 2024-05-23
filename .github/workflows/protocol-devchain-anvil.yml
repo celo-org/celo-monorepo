@@ -16,7 +16,7 @@ jobs:
     defaults:
       run:
         working-directory: packages/protocol
-    name: Run tests
+    name: Generate anvil
     runs-on: ubuntu-latest
     permissions: 
       contents: read
@@ -62,6 +62,10 @@ jobs:
                   repo: context.repo.repo,
                 })
               ).data[0];
+      - name: Pull Request data
+        run: |
+          echo '${{ fromJson(steps.get_pr_data.outputs.result).number }}'
+          echo '${{ fromJson(steps.get_pr_data.outputs.result).title }}'
 
       - name: Generate migrations
         run: ./migrations_sol/run_integration_tests_in_anvil.sh
