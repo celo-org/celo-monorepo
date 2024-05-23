@@ -8,11 +8,10 @@ import { Constants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
 
 contract BlockchainParametersTest is Test, Constants, Utils {
-  // using the mainnet epoch size would not allow to test an edge case
-  uint256 constant EPOCH_SIZE = 100;
   uint256 constant gasLimit = 7000000;
   uint256 constant gasForNonGoldCurrencies = 50000;
   address nonOwner;
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   BlockchainParameters blockchainParameters;
 
@@ -25,6 +24,9 @@ contract BlockchainParametersTest is Test, Constants, Utils {
     nonOwner = actor("nonOwner");
     ph.setEpochSize(EPOCH_SIZE);
     blockchainParameters = new BlockchainParameters(true);
+  }
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
   }
 }
 
@@ -108,6 +110,12 @@ contract BlockchainParametersTest_getUptimeLookbackWindow is BlockchainParameter
     vm.expectRevert("UptimeLookbackWindow is not initialized");
     blockchainParameters.getUptimeLookbackWindow();
   }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    blockchainParameters.getUptimeLookbackWindow();
+  }
 }
 
 contract BlockchainParametersTest_setUptimeLookbackWindow is BlockchainParametersTest {
@@ -139,7 +147,7 @@ contract BlockchainParametersTest_setUptimeLookbackWindow is BlockchainParameter
     blockchainParameters.setUptimeLookbackWindow(newValue);
   }
 
-  function test_Revert_ShouldFail_WhenUsingValueLowerThanSafeMinimum() public {
+  function test_Revert_WhenUsingValueLowerThanSafeMinimum() public {
     vm.expectRevert("UptimeLookbackWindow must be within safe range");
     blockchainParameters.setUptimeLookbackWindow(2);
   }
@@ -149,9 +157,9 @@ contract BlockchainParametersTest_setUptimeLookbackWindow is BlockchainParameter
     blockchainParameters.setUptimeLookbackWindow(721);
   }
 
-  function test_Revert_WhenUsingValueGreaterThanEpochsizeminus2() public {
-    vm.expectRevert("UptimeLookbackWindow must be smaller or equal to epochSize - 2");
-    // 720 is harcoded as maximum in the code
-    blockchainParameters.setUptimeLookbackWindow(EPOCH_SIZE - 1);
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    blockchainParameters.setUptimeLookbackWindow(100);
   }
 }

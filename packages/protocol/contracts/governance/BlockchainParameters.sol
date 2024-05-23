@@ -5,10 +5,12 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingPrecompiles.sol";
 
+import "../../contracts-0.8/common/IsL2Check.sol";
+
 /**
  * @title Contract for storing blockchain parameters that can be set by governance.
  */
-contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
+contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles, IsL2Check {
   using SafeMath for uint256;
 
   // obsolete
@@ -92,7 +94,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
    * @notice Sets the uptime lookback window.
    * @param window New window.
    */
-  function setUptimeLookbackWindow(uint256 window) public onlyOwner {
+  function setUptimeLookbackWindow(uint256 window) public onlyL1 onlyOwner {
     require(window >= 3 && window <= 720, "UptimeLookbackWindow must be within safe range");
     require(
       window <= getEpochSize().sub(2),
@@ -119,7 +121,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   /**
    * @notice Gets the uptime lookback window.
    */
-  function _getUptimeLookbackWindow() internal view returns (uint256 lookbackWindow) {
+  function _getUptimeLookbackWindow() internal view onlyL1 returns (uint256 lookbackWindow) {
     if (getEpochNumber() >= uptimeLookbackWindow.nextValueActivationEpoch) {
       return uptimeLookbackWindow.nextValue;
     } else {
