@@ -80,6 +80,9 @@ jobs:
           retention-days: 90
   publish:
     needs: build
+    defaults:
+      run:
+        working-directory: packages/protocol
     name: Publish npm package
     runs-on: ubuntu-latest
     permissions: # Must change the job token permissions to use Akeyless JWT auth
