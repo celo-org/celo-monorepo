@@ -26,21 +26,19 @@ jobs:
           fi
       - name: Foundry cache
         id: foundry-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./cache
           key: ${{ runner.os }}-foundry-cache-${{ env.FOUNDRY_CACHE_KEY }}
       - name: Foundry out
         id: foundry-out
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./out
           key: ${{ runner.os }}-foundry-out-${{ env.FOUNDRY_CACHE_KEY }}
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: "nightly-f625d0fa7c51e65b4bf1e8f7931cd1c6e2e285e9"
 
       - name: Install forge dependencies
         run: forge install
