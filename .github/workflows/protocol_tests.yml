@@ -50,7 +50,7 @@ jobs:
 
       - name: Run tests common
         # can't use gas limit because some setUp function use more than the limit
-        run: forge test -vvv --match-path "test-sol/common/*" # --block-gas-limit 50000000 
+        run: forge test -vvv --match-path "test-sol/common/*" # --block-gas-limit 50000000
 
       - name: Run tests governance/network
         if: success() || failure()
@@ -59,7 +59,7 @@ jobs:
       - name: Run tests governance/validators
         if: success() || failure()
         run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/governance/validators/*"
-      
+
       - name: Run tests governance/voting
         # can't use gas limit because some setUp function use more than the limit
         if: success() || failure()
@@ -80,7 +80,8 @@ jobs:
             echo "All tests should be in a folder"
             exit 1
           fi
-
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
       - name: Run Everything just in case something was missed
         # can't use gas limit because some setUp function use more than the limit
         run: forge test -vvv #TODO this should ignore integration tests
