@@ -64,8 +64,7 @@ jobs:
               ).data[0];
 
       - name: Generate migrations
-        if: success() || failure()
-        run: ./migrations_sol/create_and_migrate_anvil_devchain.sh
+        run: ./migrations_sol/run_integration_tests_in_anvil.sh
       
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
