@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 env:
   # Increment these to force cache rebuilding
-  FOUNDRY_CACHE_KEY: 1
+  FOUNDRY_CACHE_KEY: 2
 
 jobs:
   check:
