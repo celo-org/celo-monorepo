@@ -58,11 +58,12 @@ done
 # TODO(Arthur): Check if using --config-path $SOURCE_DIR/foundry.toml works instead of copying file
 cp $SOURCE_DIR/foundry.toml $DEST_DIR/foundry.toml
 
-# Build libraries
+# Move into the temporary directory
 pushd $TEMP_DIR
+
+# Build libraries
 echo "Building libraries..."
 forge build
-popd
 
 # Deploy libraries and building library flag
 echo "Deploying libraries..."
@@ -74,11 +75,17 @@ for LIB_PATH in "${LIBRARIES_PATH[@]}"; do
     # For example:
     # LIB_NAME = AddressSortedLinkedListWithMedian
     echo "Deploying library: $LIB_NAME"
+    ############ DEBUGGING START ################
+    echo "forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url http://127.0.0.1:$ANVIL_PORT --unlocked --json"
+    ############ DEBUGGING END ################
     create_library_out=`forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url http://127.0.0.1:$ANVIL_PORT --unlocked --json`
     LIB_ADDRESS=`echo $create_library_out | jq -r '.deployedTo'`
     # Constructing library flag so the remaining contracts can be built and linkeded to these libraries
     LIBRARY_FLAGS="$LIBRARY_FLAGS --libraries $LIB_PATH:$LIB_ADDRESS"
 done
+
+# Move out of the temporary directory
+popd
 
 # Remove the temporary directory
 rm -rf $TEMP_DIR
