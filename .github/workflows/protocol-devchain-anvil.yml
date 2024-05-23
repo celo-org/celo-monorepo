@@ -61,7 +61,7 @@ jobs:
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: devchain-${{ steps.date.outputs.date }}
+          name: devchain-${{ github.sha }}-${{ steps.date.outputs.date }}
           path: packages/protocol/.tmp
           # Max retention time is 90 days for public repos
           # https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
