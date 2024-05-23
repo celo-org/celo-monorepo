@@ -51,11 +51,6 @@ jobs:
       - name: Install forge dependencies
         run: forge install
 
-      # "Run tests" already tries to compile the contracts
-      # Making it explicit here to have easier to read errors
-      - name: Compile Contracts
-        run: forge --version && forge compile
-
       - uses: actions/github-script@v7
         id: get_pr_data
         with:
