@@ -1,8 +1,8 @@
 pragma solidity >=0.8.0 <0.8.20;
 
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
-import "@celo-contracts/common/linkedlists/LinkedList.sol";
-import "@celo-contracts/common/linkedlists/SortedLinkedList.sol";
+import "@celo-contracts-8/common/linkedlists/LinkedList.sol";
+import "@celo-contracts-8/common/linkedlists/SortedLinkedList.sol";
 
 /**
  * @title Maintains a sorted list of unsigned ints keyed by bytes32.
