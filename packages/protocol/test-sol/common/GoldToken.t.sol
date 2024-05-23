@@ -221,7 +221,10 @@ contract GoldTokenTest_mint_l2 is GoldTokenTest {
 
   function test_Reverts_whenCalledByOtherThanOwnerOrMintingSchedule() public {
     vm.prank(address(0));
+    vm.expectRevert("Only owner or goldTokenMintingSchedule can call");
+    goldToken.mint(receiver, ONE_GOLDTOKEN);
 
+    vm.prank(address(9));
     vm.expectRevert("Only owner or goldTokenMintingSchedule can call");
     goldToken.mint(receiver, ONE_GOLDTOKEN);
   }

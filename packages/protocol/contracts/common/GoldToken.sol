@@ -48,14 +48,13 @@ contract GoldToken is
   event SetGoldTokenMintingScheduleAddress(address indexed newScheduleAddress);
 
   modifier isRestricted() {
-    if (!isL2()) {
-      require(msg.sender == address(0), "Only VM can call");
-    } else {
+    if (isL2()) {
       require(
-        (msg.sender == address(goldTokenMintingSchedule) || msg.sender == owner()) ||
-          msg.sender != address(0),
+        (msg.sender == address(goldTokenMintingSchedule) || msg.sender == owner()),
         "Only owner or goldTokenMintingSchedule can call"
       );
+    } else {
+      require(msg.sender == address(0), "Only VM can call");
     }
     _;
   }
