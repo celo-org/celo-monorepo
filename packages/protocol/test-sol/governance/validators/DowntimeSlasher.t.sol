@@ -370,6 +370,14 @@ contract DowntimeSlasherTestSetIncentives is DowntimeSlasherTest {
     assertEq(_reward, _newReward);
   }
 
+  function test_Reverts_WhenInL2() public {
+    uint256 _newPenalty = 123;
+    uint256 _newReward = 67;
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    slasher.setSlashingIncentives(_newPenalty, _newReward);
+  }
+
   function test_Reverts_WhenRewardLargerThanPenalty() public {
     vm.expectRevert("Penalty has to be larger than reward");
     slasher.setSlashingIncentives(123, 678);
@@ -399,6 +407,14 @@ contract DowntimeSlasherTestSetSlashableDowntime is DowntimeSlasherTest {
     uint256 _slashableDowntime = slasher.slashableDowntime();
 
     assertEq(_slashableDowntime, _newSlashableDowntime);
+  }
+
+  function test_Reverts_WhenInL2() public {
+    uint256 _newSlashableDowntime = 23;
+
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    slasher.setSlashableDowntime(_newSlashableDowntime);
   }
 
   function test_Emits_SlashableDowntimeSetEvent() public {
@@ -495,6 +511,12 @@ contract DowntimeSlasherTestSetBitmapForInterval is DowntimeSlasherTest {
       blockNumber.add(1),
       bytes32(0x0000000000000000000000000000000000000000000000000000000000000003)
     );
+    slasher.setBitmapForInterval(blockNumber, blockNumber.add(1));
+  }
+
+  function test_Reverts_WhenInL2_SetBitmapForInterval() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     slasher.setBitmapForInterval(blockNumber, blockNumber.add(1));
   }
 }
@@ -671,7 +693,9 @@ contract DowntimeSlasherTestSlash_WhenIntervalInSameEpoch is DowntimeSlasherTest
     slasher.mockSlash(slashParams, _validatorsList);
   }
 
-   function test_Reverts_WhenL2_IfIntervalsOverlap_WhenIntervalCoverSlashableDowntimeWindow() public {
+  function test_Reverts_WhenL2_IfIntervalsOverlap_WhenIntervalCoverSlashableDowntimeWindow()
+    public
+  {
     uint256 startBlock = _getFirstBlockNumberOfEpoch(epoch);
     _bitmaps0[0] = bitmapWithoutValidator[validatorIndexInEpoch];
     _presetParentSealForBlock(startBlock, slashableDowntime, _bitmaps0);
