@@ -1,0 +1,95 @@
+oracle:
+  currencyPair: CELOPHP
+  overrideOracleCount: 12 # At 5s block time, every client reports once per minute
+  aggregation:
+    mid:
+      maxExchangeVolumeShare: 1
+      maxPercentageDeviation: 0.01
+      maxPercentageBidAskSpread: 0.01
+  metrics:
+    enabled: true
+    prometheusPort: 9090
+  apiRequestTimeoutMs: 5000
+  circuitBreakerPriceChangeThreshold: 0.25
+  gasPriceMultiplier: 1.5
+  priceSources: "[
+      [
+        {exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDTUSD', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'PHPUSD', toInvert: true, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'USDTUSD', toInvert: false},
+        {exchange: 'XIGNITE', symbol: 'USDPHP', toInvert: false, ignoreVolume: true}
+      ],
+
+      [
+        {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'PHPUSD', toInvert: true, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
+        {exchange: 'XIGNITE', symbol: 'USDPHP', toInvert: false, ignoreVolume: true}
+      ],
+
+      [
+        {exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'BITSTAMP', symbol: 'USDTUSD', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'PHPUSD', toInvert: true, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'BITSTAMP', symbol: 'USDTUSD', toInvert: false},
+        {exchange: 'XIGNITE', symbol: 'USDPHP', toInvert: false, ignoreVolume: true}
+      ],
+
+      [
+        {exchange: 'KUCOIN', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'PHPUSD', toInvert: true, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'KUCOIN', symbol: 'CELOUSDT', toInvert: false},
+         {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false},
+        {exchange: 'XIGNITE', symbol: 'USDPHP', toInvert: false, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'BITMART', symbol: 'CELOUSDT', toInvert: false},
+        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false},
+        {exchange: 'ALPHAVANTAGE', symbol: 'PHPUSD', toInvert: true, ignoreVolume: true}
+      ],
+      [
+        {exchange: 'BITMART', symbol: 'CELOUSDT', toInvert: false},
+         {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false},
+        {exchange: 'XIGNITE', symbol: 'USDPHP', toInvert: false, ignoreVolume: true}
+      ],
+      
+
+      
+    ]"
+      # Additional sources missing adapters [
+      #   {exchange: 'GATEIO', symbol: 'CELOUSDT', toInvert: false},
+      #   {exchange: 'BITSTAMP', symbol: 'USDTUSD', toInvert: false},
+      #   {exchange: 'ALPHAVANTAGE', symbol: 'USDKES', toInvert: false, ignoreVolume: true}
+      # ],
+      # [
+      #   {exchange: 'GATEIO', symbol: 'CELOUSDT', toInvert: false},
+      #   {exchange: 'BITSTAMP', symbol: 'USDTUSD', toInvert: false},
+      #   {exchange: 'XIGNITE', symbol: 'USDKES', toInvert: false, ignoreVolume: true}
+      # ],
+      #   {exchange: 'BYBIT', symbol: 'CELOUSDT', toInvert: false},
+      #   {exchange: 'BITSTAMP', symbol: 'USDTUSD', toInvert: false},
+      #   {exchange: 'ALPHAVANTAGE', symbol: 'USDKES', toInvert: false, ignoreVolume: true}
+      # ],
+      # [
+      #   {exchange: 'BYBIT', symbol: 'CELOUSDT', toInvert: false},
+      #   {exchange: 'BITSTAMP', symbol: 'USDTUSD', toInvert: false},
+      #   {exchange: 'XIGNITE', symbol: 'USDKES', toInvert: false, ignoreVolume: true}
+      # ],
+      
+  minPriceSourceCount: 7
+  reportStrategy: BLOCK_BASED
+  reporter:
+    blockBased:
+      mPHPeportPriceChangeThreshold: 0.005
