@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+echo "Forge version: $(forge --version)"
+
 # Compile everything
 forge build
 
