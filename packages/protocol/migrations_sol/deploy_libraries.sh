@@ -55,7 +55,6 @@ for LIB_PATH in "${LIBRARY_DEPENDENCIES_PATH[@]}"; do
 done
 
 # Copy foundry config to the temporary directory
-# TODO(Arthur): Check if using --config-path $SOURCE_DIR/foundry.toml works instead of copying file
 cp $SOURCE_DIR/foundry.toml $DEST_DIR/foundry.toml
 
 # Move into the temporary directory
@@ -69,15 +68,11 @@ forge build
 echo "Deploying libraries..."
 export LIBRARY_FLAGS=""
 for LIB_PATH in "${LIBRARIES_PATH[@]}"; do
-    # For example:
-    # LIB_PATH = "contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
     LIB_NAME="${LIB_PATH#*:}" 
     # For example:
+    # LIB_PATH = "contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
     # LIB_NAME = AddressSortedLinkedListWithMedian
     echo "Deploying library: $LIB_NAME"
-    ############ DEBUGGING START ################
-    echo "forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url http://127.0.0.1:$ANVIL_PORT --unlocked --json"
-    ############ DEBUGGING END ################
     create_library_out=`forge create $LIB_PATH --from $FROM_ACCOUNT --rpc-url http://127.0.0.1:$ANVIL_PORT --unlocked --json`
     LIB_ADDRESS=`echo $create_library_out | jq -r '.deployedTo'`
     # Constructing library flag so the remaining contracts can be built and linkeded to these libraries
