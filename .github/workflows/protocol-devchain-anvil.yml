@@ -59,6 +59,9 @@ jobs:
               ).data[0];
       - name: Pull Request data
         run: |
+          echo '${{context.sha }}'
+          echo '${{context.repo.owner }}'
+          echo '${{context.repo.repo }}'
           echo '${{ steps.get_pr_data.outputs.result }}'
 
       - name: Install Foundry
