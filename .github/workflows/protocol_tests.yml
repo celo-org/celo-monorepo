@@ -18,7 +18,7 @@ jobs:
       run:
         working-directory: packages/protocol
     name: Run tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Set Swap Space
         uses: pierotofy/set-swap-space@49819abfb41bd9b44fb781159c033dba90353a7c
