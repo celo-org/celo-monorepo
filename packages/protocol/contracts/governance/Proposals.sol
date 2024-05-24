@@ -4,7 +4,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/utils/Address.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
-import "@celo-contracts/common/FixidityLib.sol";
+import "../common/FixidityLib.sol";
 
 /**
  * @title A library operating on Celo Governance proposals.
