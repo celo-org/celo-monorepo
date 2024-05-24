@@ -76,9 +76,14 @@ contract BlockchainParametersTest_setBlockGasLimit is BlockchainParametersTest {
     vm.expectRevert("Ownable: caller is not the owner");
     blockchainParameters.setBlockGasLimit(gasLimit);
   }
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    blockchainParameters.setBlockGasLimit(gasLimit);
+  }
 }
 
-contract BlockchainParametersTestSet_intrinsicGasForAlternativeFeeCurrency is
+contract BlockchainParametersTest_setIntrinsicGasForAlternativeFeeCurrency is
   BlockchainParametersTest
 {
   function test_ShouldSetTheVariable() public {
@@ -95,6 +100,12 @@ contract BlockchainParametersTestSet_intrinsicGasForAlternativeFeeCurrency is
   function test_Revert_WhenCalledByNonOwner() public {
     vm.prank(nonOwner);
     vm.expectRevert("Ownable: caller is not the owner");
+    blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(gasForNonGoldCurrencies);
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(gasForNonGoldCurrencies);
   }
 }

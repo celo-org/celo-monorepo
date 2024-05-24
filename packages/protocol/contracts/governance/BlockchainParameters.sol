@@ -76,7 +76,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles, IsL2C
    * @notice Sets the block gas limit.
    * @param gasLimit New block gas limit.
    */
-  function setBlockGasLimit(uint256 gasLimit) public onlyOwner {
+  function setBlockGasLimit(uint256 gasLimit) public onlyOwner onlyL1 {
     blockGasLimit = gasLimit;
     emit BlockGasLimitSet(gasLimit);
   }
@@ -85,7 +85,7 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles, IsL2C
    * @notice Sets the intrinsic gas for non-gold gas currencies.
    * @param gas Intrinsic gas for non-gold gas currencies.
    */
-  function setIntrinsicGasForAlternativeFeeCurrency(uint256 gas) public onlyOwner {
+  function setIntrinsicGasForAlternativeFeeCurrency(uint256 gas) public onlyOwner onlyL1 {
     intrinsicGasForAlternativeFeeCurrency = gas;
     emit IntrinsicGasForAlternativeFeeCurrencySet(gas);
   }
