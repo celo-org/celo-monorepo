@@ -95,7 +95,7 @@ jobs:
       - name: Set package.json version based on GitHub ref
         run: |
           VERSION=${{ env.PR_NUMBER }}
-          echo "Setting version to $VERSION"
+          echo "Setting version to 0.0.$VERSION"
           jq ".version = \"0.0.$VERSION\"" .tmp/package.json > .tmp/temp.json && mv .tmp/temp.json .tmp/package.json
 
       - name: Upload devchain as artifact
@@ -123,8 +123,7 @@ jobs:
       - name: Publish @celo/devchain-anvil
         run: |
           cat package.json
-          npm publish $DRY_RUN
+          npm publish
         working-directory: packages/protocol/.tmp
         env:
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
-          DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
