@@ -52,7 +52,7 @@ jobs:
           script: |
               return (
                 await github.rest.repos.listPullRequestsAssociatedWithCommit({
-                  commit_sha: a0f185004a428a78c6368fe094383c98ec8ccfb6,
+                  commit_sha: 'a0f185004a428a78c6368fe094383c98ec8ccfb6',
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                 })
