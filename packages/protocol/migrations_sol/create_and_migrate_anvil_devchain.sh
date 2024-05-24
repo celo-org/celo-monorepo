@@ -9,7 +9,10 @@ export ANVIL_PORT=8546
 # TODO make this configurable
 FROM_ACCOUNT_NO_ZERO="f39Fd6e51aad88F6F4ce6aB8827279cffFb92266" # This is Anvil's default account (1)
 export FROM_ACCOUNT="0x$FROM_ACCOUNT_NO_ZERO"
+
+# Create temporary directory
 TEMP_FOLDER="$PWD/.tmp"
+mkdir -p $TEMP_FOLDER
 
 # Start a local anvil instance
 source $PWD/migrations_sol/start_anvil.sh
@@ -21,8 +24,6 @@ source $PWD/migrations_sol/deploy_libraries.sh
 # TODO(Arthur): Check if this is strictly necessary. 
 echo "Library flags are: $LIBRARY_FLAGS"
 echo "Backing up libraries"
-
-mkdir -p $TEMP_FOLDER
 
 LIBRARIES_FILE="$TEMP_FOLDER/libraries.tx"
 rm -f $LIBRARIES_FILE
