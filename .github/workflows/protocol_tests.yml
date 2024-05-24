@@ -20,6 +20,10 @@ jobs:
     name: Run tests
     runs-on: ubuntu-20.04
     steps:
+      - name: Set Swap Space
+        uses: pierotofy/set-swap-space@49819abfb41bd9b44fb781159c033dba90353a7c
+        with:
+          swap-size-gb: 16
       - uses: actions/checkout@v4
         with:
           submodules: recursive
