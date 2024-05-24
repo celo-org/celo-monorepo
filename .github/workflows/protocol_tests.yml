@@ -1,9 +1,16 @@
 name: Protocol Foundry tests
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+      - 'release/**'
 
 env:
   # Increment these to force cache rebuilding
-  FOUNDRY_CACHE_KEY: 1
+  FOUNDRY_CACHE_KEY: 2
 
 jobs:
   check:
@@ -13,6 +20,10 @@ jobs:
     name: Run tests
     runs-on: ubuntu-latest
     steps:
+      - name: Set Swap Space
+        uses: pierotofy/set-swap-space@49819abfb41bd9b44fb781159c033dba90353a7c
+        with:
+          swap-size-gb: 32
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -59,7 +70,7 @@ jobs:
       - name: Run tests governance/validators
         if: success() || failure()
         run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/governance/validators/*"
-      
+
       - name: Run tests governance/voting
         # can't use gas limit because some setUp function use more than the limit
         if: success() || failure()
