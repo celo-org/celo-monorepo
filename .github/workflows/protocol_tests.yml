@@ -1,5 +1,12 @@
 name: Protocol Foundry tests
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+      - 'release/**'
 
 env:
   # Increment these to force cache rebuilding
