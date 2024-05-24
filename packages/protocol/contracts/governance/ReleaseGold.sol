@@ -451,6 +451,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
    * @dev The v,r and s signature should be signed by the authorized signer
    *      key, with the ReleaseGold contract address as the message.
+   * @dev Function is deprecated on L2.
    */
   function authorizeValidatorSignerWithPublicKey(
     address payable signer,
@@ -479,6 +480,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    *   account address. 48 bytes.
    * @dev The v,r and s signature should be signed by the authorized signer
    *      key, with the ReleaseGold contract address as the message.
+   * @dev Function is deprecated on L2.
    */
   function authorizeValidatorSignerWithKeys(
     address payable signer,

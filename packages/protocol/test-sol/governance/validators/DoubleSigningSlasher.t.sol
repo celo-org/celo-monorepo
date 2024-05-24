@@ -206,6 +206,15 @@ contract DoubleSigningSlasherSetSlashingIncentives is DoubleSigningSlasherBaseTe
     emit SlashingIncentivesSet(newPenalty, newReward);
     slasher.setSlashingIncentives(newPenalty, newReward);
   }
+
+  function test_ShouldRevert_WhenInL2() public {
+    uint256 newPenalty = 123;
+    uint256 newReward = 67;
+
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    slasher.setSlashingIncentives(newPenalty, newReward);
+  }
 }
 
 contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {

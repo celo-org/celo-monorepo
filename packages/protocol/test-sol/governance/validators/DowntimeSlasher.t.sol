@@ -117,6 +117,7 @@ contract DowntimeSlasherTest is Test, Utils {
   address caller2;
   uint256 caller2PK;
   address public registryAddress = 0x000000000000000000000000000000000000ce10;
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   uint256 epochSize;
   uint256 epoch;
@@ -320,6 +321,10 @@ contract DowntimeSlasherTest is Test, Utils {
     }
     return (_epochNumber.sub(1)).mul(epochSize).add(1);
   }
+
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+  }
 }
 
 contract DowntimeSlasherTestInitialize is DowntimeSlasherTest {
@@ -365,6 +370,14 @@ contract DowntimeSlasherTestSetIncentives is DowntimeSlasherTest {
     assertEq(_reward, _newReward);
   }
 
+  function test_Reverts_WhenInL2() public {
+    uint256 _newPenalty = 123;
+    uint256 _newReward = 67;
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    slasher.setSlashingIncentives(_newPenalty, _newReward);
+  }
+
   function test_Reverts_WhenRewardLargerThanPenalty() public {
     vm.expectRevert("Penalty has to be larger than reward");
     slasher.setSlashingIncentives(123, 678);
@@ -394,6 +407,14 @@ contract DowntimeSlasherTestSetSlashableDowntime is DowntimeSlasherTest {
     uint256 _slashableDowntime = slasher.slashableDowntime();
 
     assertEq(_slashableDowntime, _newSlashableDowntime);
+  }
+
+  function test_Reverts_WhenInL2() public {
+    uint256 _newSlashableDowntime = 23;
+
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    slasher.setSlashableDowntime(_newSlashableDowntime);
   }
 
   function test_Emits_SlashableDowntimeSetEvent() public {
@@ -490,6 +511,12 @@ contract DowntimeSlasherTestSetBitmapForInterval is DowntimeSlasherTest {
       blockNumber.add(1),
       bytes32(0x0000000000000000000000000000000000000000000000000000000000000003)
     );
+    slasher.setBitmapForInterval(blockNumber, blockNumber.add(1));
+  }
+
+  function test_Reverts_WhenInL2_SetBitmapForInterval() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     slasher.setBitmapForInterval(blockNumber, blockNumber.add(1));
   }
 }
@@ -663,6 +690,40 @@ contract DowntimeSlasherTestSlash_WhenIntervalInSameEpoch is DowntimeSlasherTest
 
     vm.expectRevert("not down");
 
+    slasher.mockSlash(slashParams, _validatorsList);
+  }
+
+  function test_Reverts_WhenL2_IfIntervalsOverlap_WhenIntervalCoverSlashableDowntimeWindow()
+    public
+  {
+    uint256 startBlock = _getFirstBlockNumberOfEpoch(epoch);
+    _bitmaps0[0] = bitmapWithoutValidator[validatorIndexInEpoch];
+    _presetParentSealForBlock(startBlock, slashableDowntime, _bitmaps0);
+
+    uint256[] memory _startBlocks = new uint256[](2);
+    uint256[] memory _endBlocks = new uint256[](2);
+    _startBlocks[0] = startBlock;
+    _startBlocks[1] = startBlock.add(2);
+    _endBlocks[0] = startBlock.add(slashableDowntime.sub(3));
+    _endBlocks[1] = startBlock.add(slashableDowntime.sub(1));
+
+    _generateProofs(_startBlocks, _endBlocks);
+
+    slashParams = DowntimeSlasherMock.SlashParams({
+      startBlocks: _startBlocks,
+      endBlocks: _endBlocks,
+      signerIndices: _signerIndices,
+      groupMembershipHistoryIndex: 0,
+      validatorElectionLessers: validatorElectionLessers,
+      validatorElectionGreaters: validatorElectionGreaters,
+      validatorElectionIndices: validatorElectionIndices,
+      groupElectionLessers: groupElectionLessers,
+      groupElectionGreaters: groupElectionGreaters,
+      groupElectionIndices: groupElectionIndices
+    });
+
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     slasher.mockSlash(slashParams, _validatorsList);
   }
 
