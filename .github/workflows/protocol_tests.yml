@@ -19,7 +19,6 @@ jobs:
         working-directory: packages/protocol
     name: Run tests
     runs-on: ubuntu-20.04
-    # runs-on: ['self-hosted', 'monorepo-node18']
     steps:
       - uses: actions/checkout@v4
         with:
@@ -88,11 +87,6 @@ jobs:
             echo "All tests should be in a folder"
             exit 1
           fi
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 30
-        with:
-          limit-access-to-actor: true
 
       - name: Run Everything just in case something was missed
         # can't use gas limit because some setUp function use more than the limit
