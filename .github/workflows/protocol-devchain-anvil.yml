@@ -57,9 +57,9 @@ jobs:
                   repo: context.repo.repo,
                 })
               ).data[0];
+              core.setOutput('result', JSON.stringify(pr));
       - name: Pull Request data
         run: |
-          echo '${{context.sha }}'
           echo '${{ steps.get_pr_data.outputs.result }}'
 
       - name: Install Foundry
