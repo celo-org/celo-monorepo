@@ -59,8 +59,7 @@ jobs:
               ).data[0];
       - name: Pull Request data
         run: |
-          echo '${{ fromJson(steps.get_pr_data.outputs.result).number }}'
-          echo '${{ fromJson(steps.get_pr_data.outputs.result).title }}'
+          echo '${{ steps.get_pr_data.outputs.result }}'
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
