@@ -50,6 +50,10 @@ jobs:
         id: get_pr_data
         with:
           script: |
+            console.log('Commit SHA:', context.sha);
+            console.log('Repository Owner:', context.repo.owner);
+            console.log('Repository:', context.repo.repo);
+
             const prResponse = await github.rest.repos.listPullRequestsAssociatedWithCommit({
               commit_sha: context.sha,
               owner: context.repo.owner,
