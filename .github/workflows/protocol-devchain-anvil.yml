@@ -50,14 +50,19 @@ jobs:
         id: get_pr_data
         with:
           script: |
-              return (
-                await github.rest.repos.listPullRequestsAssociatedWithCommit({
-                  commit_sha: context.sha,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                })
-              ).data[0];
+            const prResponse = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              commit_sha: context.sha,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            console.log('PR Response:', prResponse);
+            const pr = prResponse.data[0];
+            if (pr) {
               core.setOutput('result', JSON.stringify(pr));
+            } else {
+              console.log('No pull request found for this commit.');
+            }
       - name: Pull Request data
         run: |
           echo '${{ steps.get_pr_data.outputs.result }}'
