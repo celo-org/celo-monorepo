@@ -19,26 +19,7 @@ source $PWD/migrations_sol/start_anvil.sh
 
 # Deploy libraries to the anvil instance
 source $PWD/migrations_sol/deploy_libraries.sh
-
-# Backing up library flags
-# TODO(Arthur): Check if this is strictly necessary. 
 echo "Library flags are: $LIBRARY_FLAGS"
-echo "Backing up libraries"
-
-LIBRARIES_FILE="$TEMP_FOLDER/libraries.tx"
-rm -f $LIBRARIES_FILE
-touch $LIBRARIES_FILE
-
-echo "$LIBRARY_FLAGS" > $LIBRARIES_FILE
-
-# Build and deploy all contracts
-
-# helpers to disable broadcast and simulation
-# TODO move to configuration
-BROADCAST="--broadcast"
-SKIP_SIMULATION=""
-# SKIP_SIMULATION="--skip-simulation" 
-# BROADCAST=""
 
 # Build all contracts with deployed libraries
 # Including contracts that depend on libraries. This step replaces the library placeholder
@@ -62,6 +43,12 @@ cast rpc anvil_setStorageAt --rpc-url http://127.0.0.1:$ANVIL_PORT $REGISTRY_ADD
 
 # run migrations
 echo "Running migration script... "
+# helpers to disable broadcast and simulation
+# TODO move to configuration
+BROADCAST="--broadcast"
+SKIP_SIMULATION=""
+# SKIP_SIMULATION="--skip-simulation" 
+# BROADCAST=""
 time forge script migrations_sol/Migration.s.sol --tc Migration --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive --sender $FROM_ACCOUNT --unlocked $LIBRARY_FLAGS || echo "Migration script failed"
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely
