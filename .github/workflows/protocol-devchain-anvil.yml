@@ -123,6 +123,7 @@ jobs:
       - name: Publish @celo/devchain-anvil
         run: |
           cat package.json
+          npm login
           npm publish --access public
         working-directory: packages/protocol/.tmp
         env:
