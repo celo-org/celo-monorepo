@@ -123,7 +123,7 @@ jobs:
       - name: Publish @celo/devchain-anvil
         run: |
           cat package.json
-          npm publish
+          npm publish --access public
         working-directory: packages/protocol/.tmp
         env:
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
