@@ -10,6 +10,7 @@ import "../../contracts/common/FixidityLib.sol";
 import "./UsingRegistry.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
+import "./IsL2Check.sol";
 
 /**
  * @title Stores and provides gas price minimum for various currencies.
@@ -19,6 +20,7 @@ contract GasPriceMinimum is
   Ownable,
   Initializable,
   UsingRegistry,
+  IsL2Check,
   CalledByVm
 {
   // TODO add IGasPriceMinimum
@@ -79,7 +81,7 @@ contract GasPriceMinimum is
    */
   function setBaseFeeOpCodeActivationBlock(
     uint256 _baseFeeOpCodeActivationBlock
-  ) external onlyOwner {
+  ) external onlyOwner onlyL1 {
     _setBaseFeeOpCodeActivationBlock(_baseFeeOpCodeActivationBlock, false);
   }
 
@@ -93,7 +95,7 @@ contract GasPriceMinimum is
   function updateGasPriceMinimum(
     uint256 blockGasTotal,
     uint256 blockGasLimit
-  ) external onlyVm returns (uint256) {
+  ) external onlyVm onlyL1 returns (uint256) {
     deprecated_gasPriceMinimum = getUpdatedGasPriceMinimum(blockGasTotal, blockGasLimit);
     emit GasPriceMinimumUpdated(deprecated_gasPriceMinimum);
     return deprecated_gasPriceMinimum;
@@ -129,7 +131,7 @@ contract GasPriceMinimum is
    * @param _adjustmentSpeed How quickly the minimum changes, expressed as a fixidity fraction.
    * @dev Value is expected to be < 1.
    */
-  function setAdjustmentSpeed(uint256 _adjustmentSpeed) public onlyOwner {
+  function setAdjustmentSpeed(uint256 _adjustmentSpeed) public onlyOwner onlyL1 {
     adjustmentSpeed = FixidityLib.wrap(_adjustmentSpeed);
     require(adjustmentSpeed.lt(FixidityLib.fixed1()), "adjustment speed must be smaller than 1");
     emit AdjustmentSpeedSet(_adjustmentSpeed);
@@ -140,7 +142,7 @@ contract GasPriceMinimum is
    * @param _targetDensity The target gas fullness of blocks, expressed as a fixidity fraction.
    * @dev Value is expected to be < 1.
    */
-  function setTargetDensity(uint256 _targetDensity) public onlyOwner {
+  function setTargetDensity(uint256 _targetDensity) public onlyOwner onlyL1 {
     targetDensity = FixidityLib.wrap(_targetDensity);
     require(targetDensity.lt(FixidityLib.fixed1()), "target density must be smaller than 1");
     emit TargetDensitySet(_targetDensity);
@@ -151,7 +153,7 @@ contract GasPriceMinimum is
    * @param _gasPriceMinimumFloor The lowest value the gas price minimum can be.
    * @dev Value is expected to be > 0.
    */
-  function setGasPriceMinimumFloor(uint256 _gasPriceMinimumFloor) public onlyOwner {
+  function setGasPriceMinimumFloor(uint256 _gasPriceMinimumFloor) public onlyOwner onlyL1 {
     require(_gasPriceMinimumFloor > 0, "gas price minimum floor must be greater than zero");
     gasPriceMinimumFloor = _gasPriceMinimumFloor;
     emit GasPriceMinimumFloorSet(_gasPriceMinimumFloor);
