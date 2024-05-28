@@ -149,10 +149,10 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     uint256 value
   ) public onlyOwner whenDependenciesSet returns (bool) {
     uint256 timeSinceL2Start = block.timestamp - l2StartTime;
-    uint256 linearSecondsLeft = SECONDS_LINEAR - (l2StartTime - genesisStartTime);
+    uint256 totalL2LinearSecondsAvailable = SECONDS_LINEAR - (l2StartTime - genesisStartTime);
     FixidityLib.Fraction memory wrappedValue = FixidityLib.wrap(value);
     require(
-      timeSinceL2Start < linearSecondsLeft,
+      timeSinceL2Start < totalL2LinearSecondsAvailable,
       "Can only update fraction once block reward calculation for years 15-30 has been implemented."
     );
     require(
@@ -180,9 +180,9 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   ) public onlyOwner whenDependenciesSet returns (bool) {
     require(partner != address(0), "Partner cannot be the zero address.");
     uint256 timeSinceL2Start = block.timestamp - l2StartTime;
-    uint256 linearSecondsLeft = SECONDS_LINEAR - (l2StartTime - genesisStartTime);
+    uint256 totalL2LinearSecondsAvailable = SECONDS_LINEAR - (l2StartTime - genesisStartTime);
     require(
-      timeSinceL2Start < linearSecondsLeft,
+      timeSinceL2Start < totalL2LinearSecondsAvailable,
       "Can only update fraction once block reward calculation for years 15-30 has been implemented."
     );
     FixidityLib.Fraction memory wrappedValue = FixidityLib.wrap(value);
@@ -244,7 +244,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     require(block.timestamp > l2StartTime, "l2StartTime has not yet been reached.");
 
     uint256 timeSinceL2Start = block.timestamp - l2StartTime;
-    uint256 linearSecondsLeft = SECONDS_LINEAR - (l2StartTime - genesisStartTime);
+    uint256 totalL2LinearSecondsAvailable = SECONDS_LINEAR - (l2StartTime - genesisStartTime);
     uint256 mintedOnL1 = totalSupplyAtL2Start - GENESIS_GOLD_SUPPLY;
 
     // Pay out half of all block rewards linearly.
@@ -262,18 +262,18 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       carbonOffsettingFraction
     );
 
-    bool isLinearDistribution = timeSinceL2Start < linearSecondsLeft;
+    bool isLinearDistribution = timeSinceL2Start < totalL2LinearSecondsAvailable;
 
     if (isLinearDistribution) {
       communityTargetRewards = (
         linearRewardsToCommunity.multiply(FixidityLib.wrap(timeSinceL2Start)).divide(
-          FixidityLib.wrap(linearSecondsLeft)
+          FixidityLib.wrap(totalL2LinearSecondsAvailable)
         )
       ).fromFixed();
 
       carbonFundTargetRewards = linearRewardsToCarbon
         .multiply(FixidityLib.wrap(timeSinceL2Start))
-        .divide(FixidityLib.wrap(linearSecondsLeft))
+        .divide(FixidityLib.wrap(totalL2LinearSecondsAvailable))
         .fromFixed();
 
       targetGoldTotalSupply =
@@ -285,13 +285,13 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       return (targetGoldTotalSupply, communityTargetRewards, carbonFundTargetRewards);
     } else {
       communityTargetRewards = linearRewardsToCommunity
-        .multiply(FixidityLib.wrap(linearSecondsLeft - 1))
-        .divide(FixidityLib.wrap(linearSecondsLeft))
+        .multiply(FixidityLib.wrap(totalL2LinearSecondsAvailable - 1))
+        .divide(FixidityLib.wrap(totalL2LinearSecondsAvailable))
         .fromFixed();
 
       carbonFundTargetRewards = linearRewardsToCarbon
-        .multiply((FixidityLib.wrap(linearSecondsLeft - 1)))
-        .divide(FixidityLib.wrap(linearSecondsLeft))
+        .multiply((FixidityLib.wrap(totalL2LinearSecondsAvailable - 1)))
+        .divide(FixidityLib.wrap(totalL2LinearSecondsAvailable))
         .fromFixed();
 
       targetGoldTotalSupply =
