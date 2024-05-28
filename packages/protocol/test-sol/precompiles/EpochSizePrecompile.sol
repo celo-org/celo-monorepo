@@ -4,7 +4,7 @@ pragma solidity >=0.8.7 <0.8.20;
 contract EpochSizePrecompile {
   address constant ADDRESS = address(0xff - 7);
 
-  uint256 public constant EPOCH_SIZE = 17280;
+  uint256 public constant EPOCH_SIZE = 100;
 
   receive() external payable {}
 
