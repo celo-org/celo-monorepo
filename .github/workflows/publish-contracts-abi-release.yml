@@ -36,6 +36,10 @@ jobs:
           access-id: p-kf9vjzruht6l
           static-secrets: '{"/static-secrets/NPM/npm-publish-token":"NPM_TOKEN"}'
 
+
+      - name: echo secret
+        run: echo "The var is: ${{ env.$NPM_TOKEN }}"
+
       # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v4
         with:
