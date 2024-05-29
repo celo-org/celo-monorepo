@@ -1,40 +1,60 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 
-import "celo-foundry/Test.sol";
-import "@celo-contracts/common/GoldToken.sol";
-import "forge-std/console.sol";
-import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts/common/GoldToken.sol";
-import "@celo-contracts/common/UsingRegistry.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "forge-std/console2.sol";
 
-contract IntegrationTest is Test, UsingRegistry {
-  address account1 = actor("account1");
-  address account2 = actor("account2");
+import "celo-foundry/Test.sol";
+import { Constants } from "@test-sol/constants.sol";
+
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+
+contract IntegrationTest is Test, Constants {
   address constant registryAddress = address(0x000000000000000000000000000000000000ce10);
   IRegistry registry = IRegistry(registryAddress);
-  GoldToken goldToken;
+
+  address account1 = actor("account1");
+  address account2 = actor("account2");
 
   function setUp() public {}
 }
 
-contract GoldTokenTest_General is IntegrationTest  {
-  function setUp() public {
-    goldToken = GoldToken(registry.getAddressForStringOrDie("GoldToken"));
-    console2.log("GoldToken address is:", address(goldToken));
+contract RegistryIntegrationTest is IntegrationTest {
+  string[23] expectedContractsInRegistry;
+  
+  constructor() public {
+    expectedContractsInRegistry = [
+      "Accounts",
+      "BlockchainParameters",
+      "DoubleSigningSlasher",
+      "DowntimeSlasher",
+      "Election",
+      "EpochRewards",
+      "Escrow",
+      "FederatedAttestations",
+      "FeeCurrencyWhitelist",
+      "FeeCurrencyDirectory",
+      "Freezer",
+      "FeeHandler",
+      "GoldToken",
+      "Governance",
+      "GovernanceSlasher",
+      "LockedGold",
+      "OdisPayments",
+      "Random",
+      "Registry",
+      "SortedOracles",
+      "UniswapFeeHandlerSeller",
+      "MentoFeeHandlerSeller",
+      "Validators"
+    ];
   }
 
-  function test_name() public {
-    assertEq(goldToken.name(), "Celo native asset");
-  }
-
-  function test_symbol() public {
-    assertEq(goldToken.symbol(), "CELO");
-  }
-
-  function test_decimals() public {
-    assertEq(uint256(goldToken.decimals()), 18);
+  function test_shouldHaveAddressInRegistry() public {
+    for (uint256 i = 0; i < expectedContractsInRegistry.length; i++) { 
+      string memory contractName = expectedContractsInRegistry[i];
+      address contractAddress = registry.getAddressFor(keccak256(abi.encodePacked(contractName)));
+      console2.log(contractName, "address in Registry is: ", contractAddress);
+      assert(contractAddress != address(0));
+    }
   }
 }
