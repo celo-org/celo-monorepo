@@ -38,7 +38,7 @@ jobs:
 
 
       - name: echo secret
-        run: echo "The var is: ${{ env.$NPM_TOKEN }}"
+        run: echo "The var is: ${{ env.NPM_TOKEN }}"
 
       # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v4
