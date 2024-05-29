@@ -28,6 +28,7 @@ contract GasPriceMinimumTest is Test {
   uint256 adjustmentSpeed = FixidityLib.newFixedFraction(5, 10).unwrap();
   FixidityLib.Fraction adjustmentSpeedFraction = FixidityLib.newFixedFraction(5, 10);
   address registryAddress = 0x000000000000000000000000000000000000ce10;
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   event TargetDensitySet(uint256 targetDensity);
   event GasPriceMinimumFloorSet(uint256 gasPriceMinimumFloor);
@@ -61,6 +62,10 @@ contract GasPriceMinimumTest is Test {
       adjustmentSpeed,
       0
     );
+  }
+
+  function _whenL2() public {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
   }
 }
 
@@ -120,6 +125,12 @@ contract GasPriceMinimumTest_setAdjustmentSpeed is GasPriceMinimumTest {
     vm.expectRevert("Ownable: caller is not the owner");
     gasPriceMinimum.setAdjustmentSpeed(newAdjustmentSpeed);
   }
+
+  function test_shouldRevertWhenL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    gasPriceMinimum.setAdjustmentSpeed(newAdjustmentSpeed);
+  }
 }
 
 contract GasPriceMinimumTest_setTargetDensity is GasPriceMinimumTest {
@@ -148,6 +159,12 @@ contract GasPriceMinimumTest_setTargetDensity is GasPriceMinimumTest {
     vm.expectRevert("Ownable: caller is not the owner");
     gasPriceMinimum.setTargetDensity(newTargetDensity);
   }
+
+  function test_ShouldRevertWhenL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    gasPriceMinimum.setTargetDensity(newTargetDensity);
+  }
 }
 
 contract GasPriceMinimumTest_setGasPriceMinimumFloor is GasPriceMinimumTest {
@@ -173,6 +190,12 @@ contract GasPriceMinimumTest_setGasPriceMinimumFloor is GasPriceMinimumTest {
   function test_shouldRevertWhenCalledByNonOwner() public {
     vm.prank(nonOwner);
     vm.expectRevert("Ownable: caller is not the owner");
+    gasPriceMinimum.setGasPriceMinimumFloor(newGasPriceMinimumFloor);
+  }
+
+  function test_shouldRevertWhenL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     gasPriceMinimum.setGasPriceMinimumFloor(newGasPriceMinimumFloor);
   }
 }
