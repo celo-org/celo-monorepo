@@ -20,7 +20,9 @@ contract IntegrationTest is Test, Constants {
 
 contract RegistryIntegrationTest is IntegrationTest {
   string[23] expectedContractsInRegistry;
-  
+
+  // TODO(Arthur): Consider moving this to a config file. Perhaps make the migration depend
+  // on that file too?
   constructor() public {
     expectedContractsInRegistry = [
       "Accounts",
