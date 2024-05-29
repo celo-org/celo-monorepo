@@ -22,7 +22,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   uint256 constant SECONDS_LINEAR = YEARS_LINEAR * 365 * 1 days;
 
   bool public areDependenciesSet;
-  uint256 constant genesisStartTime = 1587587214; // Copied over from `EpochRewards().startTime()`.
+  uint256 constant GENESIS_START_TIME = 1587587214; // Copied over from `EpochRewards().startTime()`.
   uint256 public l2StartTime;
   uint256 public totalSupplyAtL2Start;
 
@@ -36,8 +36,8 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   event CommunityRewardFractionSet(uint256 fraction);
   event CarbonOffsettingFundSet(address indexed partner, uint256 fraction);
 
-  modifier whenDependenciesSet() {
-    require(areDependenciesSet, "Minting schedule has not been configured.");
+  modifier whenActivated() {
+    require(areDependenciesSet, "Minting schedule has not been activated.");
     _;
   }
 
@@ -62,14 +62,14 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
    * @param _carbonOffsettingFraction The percentage of rewards going to carbon offsetting partner.
    * @param registryAddress Address of the deployed contracts registry.
    */
-  function setDependecies(
+  function activate(
     uint256 _l2StartTime,
     uint256 _communityRewardFraction,
     address _carbonOffsettingPartner,
     uint256 _carbonOffsettingFraction,
     address registryAddress
   ) external onlyOwner onlyL2 {
-    require(!areDependenciesSet, "Dependencies have already been set.");
+    require(!areDependenciesSet, "Contract has already been activated.");
     require(registryAddress != address(0), "The registry address cannot be the zero address");
     require(block.timestamp > _l2StartTime, "L2 start time cannot be set to a future date.");
     areDependenciesSet = true;
@@ -145,11 +145,9 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
    * @param value The percentage of the total reward to be sent to the community funds as Fixidity fraction.
    * @return True upon success.
    */
-  function setCommunityRewardFraction(
-    uint256 value
-  ) public onlyOwner whenDependenciesSet returns (bool) {
+  function setCommunityRewardFraction(uint256 value) public onlyOwner whenActivated returns (bool) {
     uint256 timeSinceL2Start = block.timestamp - l2StartTime;
-    uint256 totalL2LinearSecondsAvailable = SECONDS_LINEAR - (l2StartTime - genesisStartTime);
+    uint256 totalL2LinearSecondsAvailable = SECONDS_LINEAR - (l2StartTime - GENESIS_START_TIME);
     FixidityLib.Fraction memory wrappedValue = FixidityLib.wrap(value);
     require(
       timeSinceL2Start < totalL2LinearSecondsAvailable,
@@ -177,10 +175,10 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   function setCarbonOffsettingFund(
     address partner,
     uint256 value
-  ) public onlyOwner whenDependenciesSet returns (bool) {
+  ) public onlyOwner whenActivated returns (bool) {
     require(partner != address(0), "Partner cannot be the zero address.");
     uint256 timeSinceL2Start = block.timestamp - l2StartTime;
-    uint256 totalL2LinearSecondsAvailable = SECONDS_LINEAR - (l2StartTime - genesisStartTime);
+    uint256 totalL2LinearSecondsAvailable = SECONDS_LINEAR - (l2StartTime - GENESIS_START_TIME);
     require(
       timeSinceL2Start < totalL2LinearSecondsAvailable,
       "Can only update fraction once block reward calculation for years 15-30 has been implemented."
@@ -233,18 +231,18 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   function getTargetGoldTotalSupply()
     public
     view
-    whenDependenciesSet
+    whenActivated
     returns (
       uint256 targetGoldTotalSupply,
       uint256 communityTargetRewards,
       uint256 carbonFundTargetRewards
     )
   {
-    require(block.timestamp > genesisStartTime, "genesisStartTime has not yet been reached.");
+    require(block.timestamp > GENESIS_START_TIME, "GENESIS_START_TIME has not yet been reached.");
     require(block.timestamp > l2StartTime, "l2StartTime has not yet been reached.");
 
     uint256 timeSinceL2Start = block.timestamp - l2StartTime;
-    uint256 totalL2LinearSecondsAvailable = SECONDS_LINEAR - (l2StartTime - genesisStartTime);
+    uint256 totalL2LinearSecondsAvailable = SECONDS_LINEAR - (l2StartTime - GENESIS_START_TIME);
     uint256 mintedOnL1 = totalSupplyAtL2Start - GENESIS_GOLD_SUPPLY;
 
     // Pay out half of all block rewards linearly.

@@ -13,7 +13,6 @@ import { Constants } from "@test-sol/constants.sol";
 
 import "../governance/mock/MockGovernance.sol";
 
-// TODO(soloseng): use assertApproxEqRel(result, expected, 1e16) for test with approx results.
 contract MintGoldScheduleTest is Test, Constants, IsL2Check {
   using FixidityLib for FixidityLib.Fraction;
 
@@ -113,7 +112,7 @@ contract MintGoldScheduleTest is Test, Constants, IsL2Check {
 
     vm.prank(mintGoldOwner);
 
-    mintGoldSchedule.setDependecies(
+    mintGoldSchedule.activate(
       l2StartTime,
       communityRewardFraction,
       carbonOffsettingPartner,
@@ -165,7 +164,7 @@ contract MintGoldScheduleTest_setDependencies_L1 is MintGoldScheduleTest {
   function test_Reverts_WhenCalledOnL1() public {
     vm.warp(block.timestamp + l2StartTime);
     vm.expectRevert("This method is not supported in L1.");
-    mintGoldSchedule.setDependecies(
+    mintGoldSchedule.activate(
       l2StartTime,
       communityRewardFraction,
       carbonOffsettingPartner,
@@ -195,7 +194,7 @@ contract MintGoldScheduleTest_setDependencies is MintGoldScheduleTest {
     mintGoldSchedule.initialize();
 
     vm.expectRevert("The registry address cannot be the zero address");
-    mintGoldSchedule.setDependecies(
+    mintGoldSchedule.activate(
       l2StartTime,
       communityRewardFraction,
       carbonOffsettingPartner,
@@ -212,7 +211,7 @@ contract MintGoldScheduleTest_setDependencies is MintGoldScheduleTest {
     vm.expectRevert(
       "Value must be different from existing community reward fraction and less than 1."
     );
-    mintGoldSchedule.setDependecies(
+    mintGoldSchedule.activate(
       l2StartTime,
       0,
       carbonOffsettingPartner,
@@ -227,7 +226,7 @@ contract MintGoldScheduleTest_setDependencies is MintGoldScheduleTest {
     mintGoldSchedule.initialize();
 
     vm.expectRevert("Partner cannot be the zero address.");
-    mintGoldSchedule.setDependecies(
+    mintGoldSchedule.activate(
       l2StartTime,
       communityRewardFraction,
       address(0),
@@ -244,7 +243,7 @@ contract MintGoldScheduleTest_setDependencies is MintGoldScheduleTest {
     mintGoldSchedule.initialize();
 
     vm.expectRevert("identifier has no registry entry");
-    mintGoldSchedule.setDependecies(
+    mintGoldSchedule.activate(
       l2StartTime,
       communityRewardFraction,
       carbonOffsettingPartner,
@@ -255,11 +254,11 @@ contract MintGoldScheduleTest_setDependencies is MintGoldScheduleTest {
 
   function test_Reverts_WhenCalledTwice() public {
     newMintGold();
-    vm.expectRevert("Dependencies have already been set.");
+    vm.expectRevert("Contract has already been activated.");
 
     vm.prank(mintGoldOwner);
 
-    mintGoldSchedule.setDependecies(
+    mintGoldSchedule.activate(
       l2StartTime,
       communityRewardFraction,
       carbonOffsettingPartner,
@@ -310,7 +309,7 @@ contract MintGoldScheduleTest_setCommunityRewardFraction is MintGoldScheduleTest
     vm.prank(mintGoldOwner);
     mintGoldSchedule.initialize();
 
-    vm.expectRevert("Minting schedule has not been configured.");
+    vm.expectRevert("Minting schedule has not been activated.");
     vm.prank(mintGoldOwner);
     mintGoldSchedule.setCommunityRewardFraction(communityRewardFraction);
   }
@@ -383,7 +382,7 @@ contract MintGoldScheduleTest_setCarbonOffsettingFund is MintGoldScheduleTest {
     vm.prank(mintGoldOwner);
     mintGoldSchedule.initialize();
 
-    vm.expectRevert("Minting schedule has not been configured.");
+    vm.expectRevert("Minting schedule has not been activated.");
     vm.prank(mintGoldOwner);
     mintGoldSchedule.setCarbonOffsettingFund(carbonOffsettingPartner, carbonOffsettingFraction);
   }
@@ -442,7 +441,7 @@ contract MintGoldScheduleTest_mintAccordingToSchedule is MintGoldScheduleTest {
     vm.prank(mintGoldOwner);
     mintGoldSchedule.initialize();
 
-    vm.expectRevert("Minting schedule has not been configured.");
+    vm.expectRevert("Minting schedule has not been activated.");
     vm.prank(randomAddress);
     mintGoldSchedule.mintAccordingToSchedule();
   }
@@ -606,7 +605,7 @@ contract MintGoldScheduleTest_getMintableAmount is MintGoldScheduleTest {
     vm.prank(mintGoldOwner);
     mintGoldSchedule.initialize();
 
-    vm.expectRevert("Minting schedule has not been configured.");
+    vm.expectRevert("Minting schedule has not been activated.");
 
     mintGoldSchedule.getMintableAmount();
   }
