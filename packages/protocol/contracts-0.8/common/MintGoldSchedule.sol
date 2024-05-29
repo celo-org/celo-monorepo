@@ -8,7 +8,7 @@ import "../common/IsL2Check.sol";
 
 import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/common/Initializable.sol";
-import "../../contracts/common/interfaces/IGoldToken.sol";
+import "../../contracts-0.8/common/interfaces/IGoldToken.sol";
 
 /**
  * @title Contract for minting new CELO token based on a schedule.

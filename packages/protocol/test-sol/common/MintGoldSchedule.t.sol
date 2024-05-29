@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 import "celo-foundry-8/Test.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts/common/interfaces/IGoldToken.sol";
+import "@celo-contracts-8/common/interfaces/IGoldToken.sol";
 import "@celo-contracts/governance/interfaces/IGovernance.sol";
 import "@celo-contracts-8/common/MintGoldSchedule.sol";
 import "@celo-contracts-8/common/IsL2Check.sol";
