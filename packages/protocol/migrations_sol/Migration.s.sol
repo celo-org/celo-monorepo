@@ -876,7 +876,7 @@ contract Migration is Script, UsingRegistry {
   }
 
   function migrateMintGoldSchedule() public {
-    address epochRewardsProxy = deployProxiedContract(
+    deployProxiedContract(
       "MintGoldSchedule",
       abi.encodeWithSelector(IMintGoldScheduleInitializer.initialize.selector)
     );
