@@ -22,7 +22,7 @@ contract BlockchainParametersTest is Test, Constants, Utils {
 
   function setUp() public {
     nonOwner = actor("nonOwner");
-    ph.setEpochSize(100);
+    ph.setEpochSize(DAY / 5);
     blockchainParameters = new BlockchainParameters(true);
   }
   function _whenL2() public {
