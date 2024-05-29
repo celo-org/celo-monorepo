@@ -47,14 +47,11 @@ contract GoldToken is
 
   event SetGoldTokenMintingScheduleAddress(address indexed newScheduleAddress);
 
-  modifier isRestricted() {
+  modifier onlySchedule() {
     if (isL2()) {
-      require(
-        (msg.sender == address(goldTokenMintingSchedule) || msg.sender == owner()),
-        "Only owner or goldTokenMintingSchedule can call"
-      );
+      require(msg.sender == address(goldTokenMintingSchedule), "Only MintGoldSchedule can call.");
     } else {
-      require(msg.sender == address(0), "Only VM can call");
+      require(msg.sender == address(0), "Only VM can call.");
     }
     _;
   }
@@ -202,7 +199,7 @@ contract GoldToken is
    * @param to The account for which to mint tokens.
    * @param value The amount of CELO to mint.
    */
-  function mint(address to, uint256 value) external isRestricted returns (bool) {
+  function mint(address to, uint256 value) external onlySchedule returns (bool) {
     if (value == 0) {
       return true;
     }
