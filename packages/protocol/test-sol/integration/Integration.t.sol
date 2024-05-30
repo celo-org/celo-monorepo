@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.0;
+pragma solidity >=0.5.13 <0.8.20;
 
 // import "forge-std/console2.sol";
 
 // import { Constants } from "@test-sol/constants.sol";
-import "celo-foundry-8/Test.sol";
-
+import "celo-foundry/Test.sol";
+import { Utils } from "@test-sol/utils.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts/common/interfaces/IProxy.sol";
+
 
 contract IntegrationTest is Test {
   address constant registryAddress = address(0x000000000000000000000000000000000000ce10);
@@ -18,12 +20,13 @@ contract IntegrationTest is Test {
   function setUp() public {}
 }
 
-contract RegistryIntegrationTest is IntegrationTest {
+contract RegistryIntegrationTest is IntegrationTest, Utils {
   string[23] expectedContractsInRegistry;
+  IProxy proxy;
 
   // TODO(Arthur): Consider moving this to a config file. Perhaps make the migration depend
   // on that file too?
-  constructor() {
+  constructor() public {
     expectedContractsInRegistry = [
       "Accounts",
       "BlockchainParameters",
@@ -64,12 +67,22 @@ contract RegistryIntegrationTest is IntegrationTest {
     ////////////////////DEBUGGING: START/////////////////////////
     // SPECIFIC EXAMPLE REGISTRY.SOL BEFORE LOOPING OVER ALL CONTRACTS
     string memory contractName = "Registry";
-    address contractAddress = registry.getAddressForStringOrDie(contractName);
+    address proxyAddress = registry.getAddressForStringOrDie(contractName);
+    proxy = IProxy(address(uint160(proxyAddress)));
     ////////////////////DEBUGGING: END///////////////////////////
 
-    // Get the deployed bytecode
-    bytes memory actualBytecode = contractAddress.code;
-    bytes memory expectedBytecode = vm.getDeployedCode(string.concat(contractName, ".sol"));
+    address implementationAddress = proxy._getImplementation();
+    console2.log("Implementation address is :", implementationAddress);
+
+    // Get bytecode from deployed contract (in Solidity 0.5)
+    bytes memory actualBytecode = getCodeAt(implementationAddress); // IProxy.sol and Proxy.sol are 0.5
+    // Get bytecode from build artifacts
+    bytes memory expectedBytecode = vm.getDeployedCode("Registry.sol");
+
+    // // Get bytecode from deployed contract (in Solidity 0.8)
+    // bytes memory actualBytecode = implementationAddress.code;
+    // // Get bytecode from build artifacts (in Solidity 0.8)
+    // bytes memory expectedBytecode = vm.getDeployedCode(string.concat(contractName, ".sol"));
 
     // Compare the bytecodes
     assertEq(actualBytecode, expectedBytecode, "Bytecode does not match");
