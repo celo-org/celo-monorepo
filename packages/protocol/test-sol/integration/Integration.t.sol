@@ -51,7 +51,7 @@ contract RegistryIntegrationTest is IntegrationTest {
     ];
   }
 
-  function test_shouldHaveAddressInRegistry() public {
+  function test_shouldHaveAddressInRegistry() public view {
     for (uint256 i = 0; i < expectedContractsInRegistry.length; i++) { 
       string memory contractName = expectedContractsInRegistry[i];
       address contractAddress = registry.getAddressFor(keccak256(abi.encodePacked(contractName)));
