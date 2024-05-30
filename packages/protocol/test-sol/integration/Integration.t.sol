@@ -23,7 +23,7 @@ contract RegistryIntegrationTest is IntegrationTest {
 
   // TODO(Arthur): Consider moving this to a config file. Perhaps make the migration depend
   // on that file too?
-  constructor() public {
+  constructor() {
     expectedContractsInRegistry = [
       "Accounts",
       "BlockchainParameters",
