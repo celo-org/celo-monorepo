@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import "forge-std/console2.sol";
+// import "forge-std/console2.sol";
 
 // import { Constants } from "@test-sol/constants.sol";
-// import "celo-foundry-8/Test.sol";
+import "celo-foundry-8/Test.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 
-contract IntegrationTest {
+contract IntegrationTest is Test {
   address constant registryAddress = address(0x000000000000000000000000000000000000ce10);
   IRegistry registry = IRegistry(registryAddress);
 
@@ -58,5 +58,20 @@ contract RegistryIntegrationTest is IntegrationTest {
       console2.log(contractName, "address in Registry is: ", contractAddress);
       assert(contractAddress != address(0));
     }
+  }
+
+  function test_shouldHaveCorrectBytecode() public {
+    ////////////////////DEBUGGING: START/////////////////////////
+    // SPECIFIC EXAMPLE REGISTRY.SOL BEFORE LOOPING OVER ALL CONTRACTS
+    string memory contractName = "Registry";
+    address contractAddress = registry.getAddressForStringOrDie(contractName);
+    ////////////////////DEBUGGING: END///////////////////////////
+
+    // Get the deployed bytecode
+    bytes memory actualBytecode = contractAddress.code;
+    bytes memory expectedBytecode = vm.getDeployedCode(string.concat(contractName, ".sol"));
+
+    // Compare the bytecodes
+    assertEq(actualBytecode, expectedBytecode, "Bytecode does not match");
   }
 }
