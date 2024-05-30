@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+pragma solidity ^0.8.0;
 
 import "forge-std/console2.sol";
 
-import "celo-foundry/Test.sol";
-import { Constants } from "@test-sol/constants.sol";
+// import { Constants } from "@test-sol/constants.sol";
+// import "celo-foundry-8/Test.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 
-contract IntegrationTest is Test, Constants {
+contract IntegrationTest {
   address constant registryAddress = address(0x000000000000000000000000000000000000ce10);
   IRegistry registry = IRegistry(registryAddress);
 
-  address account1 = actor("account1");
-  address account2 = actor("account2");
+  // address account1 = actor("account1");
+  // address account2 = actor("account2");
 
   function setUp() public {}
 }
