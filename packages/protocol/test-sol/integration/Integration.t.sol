@@ -2,6 +2,7 @@
 pragma solidity >=0.5.13 <0.8.20;
 
 // import "forge-std/console2.sol";
+import "celo-foundry/Test.sol";
 
 import { Utils } from "@test-sol/utils.sol";
 import { Constants } from "@test-sol/constants.sol";
