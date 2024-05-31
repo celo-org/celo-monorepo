@@ -71,6 +71,7 @@ contract GovernanceTest is Test {
   address accVoter;
   address accOwner;
   address accApprover;
+  address accCouncil;
   uint256 constant DEPOSIT = 5;
   uint256 constant VOTER_GOLD = 100;
   uint256 constant REFERENDUM_STAGE_DURATION = 5 * 60;
@@ -108,6 +109,7 @@ contract GovernanceTest is Test {
     accVoter = actor("voter");
     accOwner = actor("owner");
     accApprover = actor("approver");
+    accCouncil = actor("council");
 
     baselineUpdateFactor = FixidityLib.newFixedFraction(1, 5);
     participationBaseline = FixidityLib.newFixedFraction(5, 10);
@@ -2909,31 +2911,110 @@ contract GovernanceTest_approveHotfix is GovernanceTest {
     assertTrue(approved);
   }
 
-  function test_emitHotfixApprovedEvent() public {
+  function test_Emits_HotfixApprovedEvent() public {
     vm.expectEmit(true, true, true, true);
     emit HotfixApproved(HOTFIX_HASH, accApprover);
     vm.prank(accApprover);
     governance.approveHotfix(HOTFIX_HASH);
   }
 
-  function test_Reverts_WhenCalledByNonApprover() public {
+  function test_Reverts_WhenCalledByNonApproverOrCouncil() public {
     vm.expectRevert("msg.sender not approver or Security Council");
+    governance.approveHotfix(HOTFIX_HASH);
+  }
+
+  function test_Reverts_WhenCalledBySecurityCouncilOnL1() public {
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+
+    vm.prank(accCouncil);
+    vm.expectRevert("Hotfix approval by security council is not available on L1.");
+    governance.approveHotfix(HOTFIX_HASH);
+  }
+
+  function test_Reverts_WhenCalledByZeroAddressOnL1() public {
+    vm.prank(address(0));
+    vm.expectRevert("Hotfix approval by security council is not available on L1.");
+    governance.approveHotfix(HOTFIX_HASH);
+  }
+}
+
+contract GovernanceTest_approveHotfix_L2 is GovernanceTest {
+  bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
+  event HotfixApproved(bytes32 indexed hash, address approver);
+  function setUp() public {
+    super.setUp();
+
+    _whenL2();
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+  }
+
+  function test_markHotfixRecordApprovedWhenCalledByApprover() public {
+    vm.prank(accApprover);
+    governance.approveHotfix(HOTFIX_HASH);
+
+    (bool approved, , ) = governance.getL2HotfixRecord(HOTFIX_HASH);
+    assertTrue(approved);
+  }
+  function test_markHotfixRecordApprovedWhenCalledBySecurityCouncil() public {
+    vm.prank(accCouncil);
+    governance.approveHotfix(HOTFIX_HASH);
+
+    (, bool approved, ) = governance.getL2HotfixRecord(HOTFIX_HASH);
+    assertTrue(approved);
+  }
+
+  function test_Emits_HotfixApprovedEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit HotfixApproved(HOTFIX_HASH, accApprover);
+    vm.prank(accApprover);
+    governance.approveHotfix(HOTFIX_HASH);
+
+    vm.expectEmit(true, true, true, true);
+    emit HotfixApproved(HOTFIX_HASH, accCouncil);
+    vm.prank(accCouncil);
+    governance.approveHotfix(HOTFIX_HASH);
+  }
+
+  function test_Reverts_WhenCalledByNonApproverOrCouncil() public {
+    vm.expectRevert("msg.sender not approver or Security Council");
+    governance.approveHotfix(HOTFIX_HASH);
+
+    vm.expectRevert("msg.sender not approver or Security Council");
+    vm.prank(address(0));
     governance.approveHotfix(HOTFIX_HASH);
   }
 }
 
 contract GovernanceTest_whitelistHotfix is GovernanceTest {
+  bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
   event HotfixWhitelisted(bytes32 indexed hash, address whitelister);
 
-  bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
+  function test_ShouldWhitelistHotfixByValidator() public {
+    address validator = actor("validator1");
+    governance.addValidator(validator);
+    vm.prank(validator);
+    governance.whitelistHotfix(HOTFIX_HASH);
 
-  function test_EmitHotfixWhitelistEvent() public {
+    assertTrue(governance.isHotfixWhitelistedBy(HOTFIX_HASH, validator));
+  }
+  function test_Emits_HotfixWhitelistEvent() public {
     address validator = actor("validator1");
     governance.addValidator(validator);
     governance.addValidator(actor("validator2"));
 
     vm.expectEmit(true, true, true, true);
     emit HotfixWhitelisted(HOTFIX_HASH, validator);
+    vm.prank(validator);
+    governance.whitelistHotfix(HOTFIX_HASH);
+  }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    address validator = actor("validator1");
+    governance.addValidator(validator);
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(validator);
     governance.whitelistHotfix(HOTFIX_HASH);
   }
@@ -3004,6 +3085,14 @@ contract GovernanceTest_hotfixWhitelistValidatorTally is GovernanceTest {
 
     assertEq(governance.hotfixWhitelistValidatorTally(HOTFIX_HASH), 3);
   }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    address validator = actor("validator1");
+    governance.addValidator(validator);
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    governance.hotfixWhitelistValidatorTally(HOTFIX_HASH);
+  }
 }
 
 contract GovernanceTest_isHotfixPassing is GovernanceTest {
@@ -3039,6 +3128,12 @@ contract GovernanceTest_isHotfixPassing is GovernanceTest {
     governance.whitelistHotfix(HOTFIX_HASH);
     assertTrue(governance.isHotfixPassing(HOTFIX_HASH));
   }
+
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
+    governance.isHotfixPassing(HOTFIX_HASH);
+  }
 }
 
 contract GovernanceTest_prepareHotfix is GovernanceTest {
@@ -3051,11 +3146,6 @@ contract GovernanceTest_prepareHotfix is GovernanceTest {
     governance.addValidator(val1);
     vm.prank(val1);
     accounts.createAccount();
-  }
-
-  function test_RevertIf_HotfixIsNotPassing() public {
-    vm.expectRevert("hotfix not whitelisted by 2f+1 validators");
-    governance.prepareHotfix(HOTFIX_HASH);
   }
 
   function test_markHotfixRecordPreparedEpoch_whenHotfixIsPassing() public {
@@ -3079,7 +3169,21 @@ contract GovernanceTest_prepareHotfix is GovernanceTest {
     governance.prepareHotfix(HOTFIX_HASH);
   }
 
-  function test_RevertIf_EpochEqualsPreparedEpoch_whenHotfixIsPassing() public {
+  function test_succeedForEpochDifferentPreparedEpoch_whenHotfixIsPassing() public {
+    vm.roll(block.number + governance.getEpochSize());
+    vm.prank(actor("validator1"));
+    governance.whitelistHotfix(HOTFIX_HASH);
+    governance.prepareHotfix(HOTFIX_HASH);
+    vm.roll(block.number + governance.getEpochSize());
+    governance.prepareHotfix(HOTFIX_HASH);
+  }
+
+  function test_Reverts_IfHotfixIsNotPassing() public {
+    vm.expectRevert("hotfix not whitelisted by 2f+1 validators");
+    governance.prepareHotfix(HOTFIX_HASH);
+  }
+
+  function test_Reverts_IfEpochEqualsPreparedEpoch_whenHotfixIsPassing() public {
     vm.roll(block.number + governance.getEpochSize());
     vm.prank(actor("validator1"));
     governance.whitelistHotfix(HOTFIX_HASH);
@@ -3088,12 +3192,9 @@ contract GovernanceTest_prepareHotfix is GovernanceTest {
     governance.prepareHotfix(HOTFIX_HASH);
   }
 
-  function test_succeedForEpochDifferentPreparedEpoch_whenHotfixIsPassing() public {
-    vm.roll(block.number + governance.getEpochSize());
-    vm.prank(actor("validator1"));
-    governance.whitelistHotfix(HOTFIX_HASH);
-    governance.prepareHotfix(HOTFIX_HASH);
-    vm.roll(block.number + governance.getEpochSize());
+  function test_Reverts_WhenCalledOnL2() public {
+    _whenL2();
+    vm.expectRevert("This method is no longer supported in L2.");
     governance.prepareHotfix(HOTFIX_HASH);
   }
 }
@@ -3123,12 +3224,12 @@ contract GovernanceTest_executeHotfix is GovernanceTest {
     );
   }
 
-  function test_RevertIf_hotfixNotApproved() public {
+  function test_Reverts_IfHotfixNotApproved() public {
     vm.expectRevert("hotfix not approved");
     executeHotfixTx();
   }
 
-  function test_RevertIf_hotfixNotPreparedForCurrentEpoch() public {
+  function test_Reverts_IfHotfixNotPreparedForCurrentEpoch() public {
     vm.roll(block.number + governance.getEpochSize());
     vm.prank(accApprover);
     governance.approveHotfix(hotfixHash);
@@ -3137,7 +3238,7 @@ contract GovernanceTest_executeHotfix is GovernanceTest {
     executeHotfixTx();
   }
 
-  function test_RevertIf_hotfixPreparedButNotForCurrentEpoch() public {
+  function test_Reverts_IfHotfixPreparedButNotForCurrentEpoch() public {
     vm.prank(accApprover);
     governance.approveHotfix(hotfixHash);
     vm.prank(validator);
@@ -3192,6 +3293,96 @@ contract GovernanceTest_executeHotfix is GovernanceTest {
     vm.prank(validator);
     governance.whitelistHotfix(hotfixHash);
     governance.prepareHotfix(hotfixHash);
+  }
+}
+contract GovernanceTest_executeHotfix_L2 is GovernanceTest {
+  bytes32 SALT = 0x657ed9d64e84fa3d1af43b3a307db22aba2d90a158015df1c588c02e24ca08f0;
+  bytes32 hotfixHash;
+
+  address validator;
+
+  event HotfixExecuted(bytes32 indexed hash);
+
+  function setUp() public {
+    super.setUp();
+
+    _whenL2();
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+
+    // call governance test method to generate proper hotfix (needs calldata arguments)
+    hotfixHash = governance.getHotfixHash(
+      okProp.values,
+      okProp.destinations,
+      okProp.data,
+      okProp.dataLengths,
+      SALT
+    );
+  }
+
+  function test_executeHotfix_WhenApprovedByApproverAndSecurityCounsil() public {
+    vm.prank(accApprover);
+    governance.approveHotfix(hotfixHash);
+    vm.prank(accCouncil);
+    governance.approveHotfix(hotfixHash);
+    executeHotfixTx();
+    assertEq(testTransactions.getValue(1), 1);
+  }
+
+  function test_markHotfixAsExecuted_WhenApprovedByApproverAndSecurityCounsil() public {
+    vm.prank(accApprover);
+    governance.approveHotfix(hotfixHash);
+    vm.prank(accCouncil);
+    governance.approveHotfix(hotfixHash);
+
+    executeHotfixTx();
+    (, , bool executed) = governance.getL2HotfixRecord(hotfixHash);
+    assertTrue(executed);
+  }
+
+  function test_Emits_HotfixExecutedEventWhenApprovedByApproverAndSecurityCounsil() public {
+    vm.prank(accApprover);
+    governance.approveHotfix(hotfixHash);
+
+    vm.prank(accCouncil);
+    governance.approveHotfix(hotfixHash);
+
+    vm.expectEmit(true, true, true, true);
+    emit HotfixExecuted(hotfixHash);
+    executeHotfixTx();
+  }
+
+  function test_Reverts_WhenExecutingSameHotfixTwice() public {
+    vm.prank(accApprover);
+    governance.approveHotfix(hotfixHash);
+    vm.prank(accCouncil);
+    governance.approveHotfix(hotfixHash);
+
+    executeHotfixTx();
+    vm.expectRevert("hotfix already executed");
+    executeHotfixTx();
+  }
+
+  function test_Reverts_IfHotfixNotApprovedByApprover() public {
+    vm.expectRevert("hotfix not approved");
+    executeHotfixTx();
+  }
+
+  function test_Reverts_IfHotfixNotApprovedBySecurityCouncil() public {
+    vm.prank(accApprover);
+    governance.approveHotfix(hotfixHash);
+    vm.expectRevert("hotfix not approved by security council");
+    executeHotfixTx();
+  }
+
+  function executeHotfixTx() private {
+    governance.executeHotfix(
+      okProp.values,
+      okProp.destinations,
+      okProp.data,
+      okProp.dataLengths,
+      SALT
+    );
   }
 }
 

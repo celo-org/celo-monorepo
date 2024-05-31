@@ -16,6 +16,7 @@ import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
+import "../../contracts-0.8/common/IsL2Check.sol";
 
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
@@ -27,7 +28,8 @@ contract Governance is
   Initializable,
   ReentrancyGuard,
   UsingRegistry,
-  UsingPrecompiles
+  UsingPrecompiles,
+  IsL2Check
 {
   using Proposals for Proposals.Proposal;
   using FixidityLib for FixidityLib.Fraction;
@@ -74,8 +76,9 @@ contract Governance is
   struct HotfixRecord {
     bool executed;
     bool approved;
-    uint256 preparedEpoch;
-    mapping(address => bool) whitelisted;
+    uint256 deprecated_preparedEpoch; // obsolete
+    mapping(address => bool) deprecated_whitelisted; // obsolete
+    bool counsilApproved;
   }
 
   // The baseline is updated as
@@ -110,6 +113,7 @@ contract Governance is
   uint256[] public dequeued;
   uint256[] public emptyIndices;
   ParticipationParameters private participationParameters;
+  address public securityCouncil;
 
   event ApproverSet(address indexed approver);
 
@@ -191,11 +195,13 @@ contract Governance is
 
   event HotfixWhitelisted(bytes32 indexed hash, address whitelister);
 
-  event HotfixApproved(bytes32 indexed hash);
+  event HotfixApproved(bytes32 indexed hash, address approver);
 
   event HotfixPrepared(bytes32 indexed hash, uint256 indexed epoch);
 
   event HotfixExecuted(bytes32 indexed hash);
+
+  event SecurityCouncilSet(address indexed council);
 
   modifier hotfixNotExecuted(bytes32 hash) {
     require(!hotfixes[hash].executed, "hotfix already executed");
@@ -209,6 +215,14 @@ contract Governance is
 
   modifier onlyLockedGold() {
     require(msg.sender == address(getLockedGold()), "msg.sender not lockedGold");
+    _;
+  }
+
+  modifier onlyApproverOrSecurityCouncil() {
+    require(
+      msg.sender == approver || msg.sender == securityCouncil,
+      "msg.sender not approver or Security Council"
+    );
     _;
   }
 
@@ -615,17 +629,27 @@ contract Governance is
    * @notice Approves the hash of a hotfix transaction(s).
    * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be approved.
    */
-  function approveHotfix(bytes32 hash) external hotfixNotExecuted(hash) onlyApprover {
-    hotfixes[hash].approved = true;
-    emit HotfixApproved(hash);
+  function approveHotfix(
+    bytes32 hash
+  ) external hotfixNotExecuted(hash) onlyApproverOrSecurityCouncil {
+    if (msg.sender == approver) {
+      hotfixes[hash].approved = true;
+    } else {
+      if (isL2()) {
+        hotfixes[hash].counsilApproved = true;
+      } else {
+        revert("Hotfix approval by security council is not available on L1.");
+      }
+    }
+    emit HotfixApproved(hash, msg.sender);
   }
 
   /**
    * @notice Whitelists the hash of a hotfix transaction(s).
    * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
    */
-  function whitelistHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
-    hotfixes[hash].whitelisted[msg.sender] = true;
+  function whitelistHotfix(bytes32 hash) external hotfixNotExecuted(hash) onlyL1 {
+    hotfixes[hash].deprecated_whitelisted[msg.sender] = true;
     emit HotfixWhitelisted(hash, msg.sender);
   }
 
@@ -633,11 +657,14 @@ contract Governance is
    * @notice Gives hotfix a prepared epoch for execution.
    * @param hash The hash of the hotfix to be prepared.
    */
-  function prepareHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
+  function prepareHotfix(bytes32 hash) external hotfixNotExecuted(hash) onlyL1 {
     require(isHotfixPassing(hash), "hotfix not whitelisted by 2f+1 validators");
     uint256 epoch = getEpochNumber();
-    require(hotfixes[hash].preparedEpoch < epoch, "hotfix already prepared for this epoch");
-    hotfixes[hash].preparedEpoch = epoch;
+    require(
+      hotfixes[hash].deprecated_preparedEpoch < epoch,
+      "hotfix already prepared for this epoch"
+    );
+    hotfixes[hash].deprecated_preparedEpoch = epoch;
     emit HotfixPrepared(hash, epoch);
   }
 
@@ -657,17 +684,31 @@ contract Governance is
     uint256[] calldata dataLengths,
     bytes32 salt
   ) external {
-    bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths, salt));
+    if (isL2()) {
+      bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths, salt));
 
-    (bool approved, bool executed, uint256 preparedEpoch) = getHotfixRecord(hash);
-    require(!executed, "hotfix already executed");
-    require(approved, "hotfix not approved");
-    require(preparedEpoch == getEpochNumber(), "hotfix must be prepared for this epoch");
+      (bool approved, bool counsilApproved, bool executed) = getL2HotfixRecord(hash);
+      require(!executed, "hotfix already executed");
+      require(approved, "hotfix not approved");
+      require(counsilApproved, "hotfix not approved by security council");
 
-    Proposals.makeMem(values, destinations, data, dataLengths, msg.sender, 0).executeMem();
+      Proposals.makeMem(values, destinations, data, dataLengths, msg.sender, 0).executeMem();
 
-    hotfixes[hash].executed = true;
-    emit HotfixExecuted(hash);
+      hotfixes[hash].executed = true;
+      emit HotfixExecuted(hash);
+    } else {
+      bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths, salt));
+
+      (bool approved, bool executed, uint256 preparedEpoch) = getL1HotfixRecord(hash);
+      require(!executed, "hotfix already executed");
+      require(approved, "hotfix not approved");
+      require(preparedEpoch == getEpochNumber(), "hotfix must be prepared for this epoch");
+
+      Proposals.makeMem(values, destinations, data, dataLengths, msg.sender, 0).executeMem();
+
+      hotfixes[hash].executed = true;
+      emit HotfixExecuted(hash);
+    }
   }
 
   /**
@@ -963,6 +1004,16 @@ contract Governance is
   }
 
   /**
+   * @notice Updates the address that has permission to whitelist hotfix proposals.
+   * @param _council The address that has permission to whitelist hotfix proposals.
+   */
+  function setSecurityCouncil(address _council) public onlyOwner {
+    require(_council != address(0), "Council cannot be 0");
+    require(_council != approver, "Council unchanged");
+    securityCouncil = _council;
+    emit SecurityCouncilSet(_council);
+  }
+  /**
    * @notice Updates the address that has permission to approve proposals in the approval stage.
    * @param _approver The address that has permission to approve proposals in the approval stage.
    */
@@ -1174,7 +1225,7 @@ contract Governance is
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
    * @return Whitelist tally
    */
-  function hotfixWhitelistValidatorTally(bytes32 hash) public view returns (uint256) {
+  function hotfixWhitelistValidatorTally(bytes32 hash) public view onlyL1 returns (uint256) {
     uint256 tally = 0;
     uint256 n = numberValidatorsInCurrentSet();
     IAccounts accounts = getAccounts();
@@ -1196,19 +1247,32 @@ contract Governance is
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
    * @return Whether validator whitelist tally >= validator byzantine quorum
    */
-  function isHotfixPassing(bytes32 hash) public view returns (bool) {
+  function isHotfixPassing(bytes32 hash) public view onlyL1 returns (bool) {
     return hotfixWhitelistValidatorTally(hash) >= minQuorumSizeInCurrentSet();
   }
 
   /**
-   * @notice Gets information about a hotfix.
+   * @notice Gets information about a L1 hotfix.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
    * @return Hotfix approved.
    * @return Hotfix executed.
    * @return Hotfix preparedEpoch.
    */
-  function getHotfixRecord(bytes32 hash) public view returns (bool, bool, uint256) {
-    return (hotfixes[hash].approved, hotfixes[hash].executed, hotfixes[hash].preparedEpoch);
+  function getL1HotfixRecord(bytes32 hash) public view onlyL1 returns (bool, bool, uint256) {
+    return (
+      hotfixes[hash].approved,
+      hotfixes[hash].executed,
+      hotfixes[hash].deprecated_preparedEpoch
+    );
+  }
+  /**
+   * @notice Gets information about a L2 hotfix.
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
+   * @return Hotfix approved.
+   * @return Hotfix executed.
+   */
+  function getL2HotfixRecord(bytes32 hash) public view onlyL2 returns (bool, bool, bool) {
+    return (hotfixes[hash].approved, hotfixes[hash].counsilApproved, hotfixes[hash].executed);
   }
 
   /**
@@ -1226,8 +1290,11 @@ contract Governance is
    * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be whitelisted.
    * @param whitelister Address to check whitelist status of.
    */
-  function isHotfixWhitelistedBy(bytes32 hash, address whitelister) public view returns (bool) {
-    return hotfixes[hash].whitelisted[whitelister];
+  function isHotfixWhitelistedBy(
+    bytes32 hash,
+    address whitelister
+  ) public view onlyL1 returns (bool) {
+    return hotfixes[hash].deprecated_whitelisted[whitelister];
   }
 
   /**
