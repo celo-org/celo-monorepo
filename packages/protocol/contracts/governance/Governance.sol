@@ -982,7 +982,7 @@ contract Governance is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 4, 1, 1);
+    return (1, 5, 0, 0);
   }
 
   /**
@@ -1013,6 +1013,7 @@ contract Governance is
     securityCouncil = _council;
     emit SecurityCouncilSet(_council);
   }
+
   /**
    * @notice Updates the address that has permission to approve proposals in the approval stage.
    * @param _approver The address that has permission to approve proposals in the approval stage.
@@ -1265,10 +1266,12 @@ contract Governance is
       hotfixes[hash].deprecated_preparedEpoch
     );
   }
+
   /**
    * @notice Gets information about a L2 hotfix.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
-   * @return Hotfix approved.
+   * @return Hotfix approved by approver.
+   * @return Hotfix approved by SecurityCounsil.
    * @return Hotfix executed.
    */
   function getL2HotfixRecord(bytes32 hash) public view onlyL2 returns (bool, bool, bool) {
