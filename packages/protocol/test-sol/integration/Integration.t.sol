@@ -43,18 +43,20 @@ contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
   function test_shouldHaveCorrectBytecode() public {
     ////////////////////DEBUGGING: START/////////////////////////
     // SPECIFIC EXAMPLE REGISTRY.SOL BEFORE LOOPING OVER ALL CONTRACTS
-    string memory contractName = "Registry";
-    address proxyAddress = registry.getAddressForStringOrDie(contractName);
-    proxy = IProxy(address(uint160(proxyAddress)));
+    string memory contractName = "Freezer";
     ////////////////////DEBUGGING: END///////////////////////////
 
+    // Get proxy address registered in the Registry
+    address proxyAddress = registry.getAddressForStringOrDie(contractName);
+    proxy = IProxy(address(uint160(proxyAddress)));
+    // Get implementation address
     address implementationAddress = proxy._getImplementation();
     console2.log("Implementation address is :", implementationAddress);
 
     // Get bytecode from deployed contract (in Solidity 0.5)
     bytes memory actualBytecode = getCodeAt(implementationAddress); // IProxy.sol and Proxy.sol are 0.5
     // Get bytecode from build artifacts
-    bytes memory expectedBytecode = vm.getDeployedCode("Registry.sol");
+    bytes memory expectedBytecode = vm.getDeployedCode(string(abi.encodePacked(contractName, ".sol")));
 
     // // Get bytecode from deployed contract (in Solidity 0.8)
     // bytes memory actualBytecode = implementationAddress.code;
