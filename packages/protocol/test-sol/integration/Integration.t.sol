@@ -37,10 +37,9 @@ contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
     for (uint256 i = 0; i < contractsInRegistry.length; i++) { 
       // Read name from list of core contracts
       string memory contractName = contractsInRegistry[i];
-      console2.log("Contract is:", contractName);
+      console2.log("Checking bytecode of:", contractName);
 
-      /////////// DEBUGGING: Contracts that fail the test ///////////////
-      // Convert strings to hashes for comparison
+      // Converting contract names to hashes for comparison      
       bytes32 hashContractName = keccak256(abi.encodePacked(contractName));
       bytes32 hashAccount = keccak256(abi.encodePacked("Accounts"));
       bytes32 hashElection = keccak256(abi.encodePacked("Election"));
@@ -49,7 +48,10 @@ contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
       bytes32 hashGovernance = keccak256(abi.encodePacked("Governance"));
       bytes32 hashSortedOracles = keccak256(abi.encodePacked("SortedOracles"));
       bytes32 hashValidators = keccak256(abi.encodePacked("Validators"));
-      
+
+      // Skipping test for contracts that depend on linked libraries
+      // This is a known limitation in Foundry at the moment:
+      // Source: https://github.com/foundry-rs/foundry/issues/6120      
       if (hashContractName != hashAccount 
           && hashContractName != hashElection
           && hashContractName != hashEscrow
@@ -58,8 +60,6 @@ contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
           && hashContractName != hashSortedOracles
           && hashContractName != hashValidators
       ) {
-      /////////// DEBUGGING /////////////// /////////////// ///////////////
-        console2.log("Checking bytecode of:", contractName);
         // Get proxy address registered in the Registry
         address proxyAddress = registry.getAddressForStringOrDie(contractName);
         proxy = IProxy(address(uint160(proxyAddress)));
