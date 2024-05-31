@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.5.13 <0.8.20;
 
-// import "forge-std/console2.sol";
 import "celo-foundry/Test.sol";
 
 import { Utils } from "@test-sol/utils.sol";
@@ -14,9 +13,6 @@ import "@celo-contracts/common/interfaces/IProxy.sol";
 contract IntegrationTest is Test {
   address constant registryAddress = address(0x000000000000000000000000000000000000ce10);
   IRegistry registry = IRegistry(registryAddress);
-
-  // address account1 = actor("account1");
-  // address account2 = actor("account2");
 
   function setUp() public {}
 }
@@ -67,18 +63,13 @@ contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
         // Get implementation address
         address implementationAddress = proxy._getImplementation();
 
-        // Get bytecode from deployed contract (in Solidity 0.5) 
-        // Because IProxy.sol and Proxy.sol are 0.5
-        bytes memory actualBytecodeWithMetadata = getCodeAt(implementationAddress); // 
+        // Get bytecode from deployed contract
+        bytes memory actualBytecodeWithMetadata = getCodeAt(implementationAddress);
         bytes memory actualBytecode = removeMetadataFromBytecode(actualBytecodeWithMetadata);
         
         // Get bytecode from build artifacts
         bytes memory expectedBytecodeWithMetadata = vm.getDeployedCode(string(abi.encodePacked(contractName, ".sol")));
         bytes memory expectedBytecode = removeMetadataFromBytecode(expectedBytecodeWithMetadata);
-        
-        //////////////////// DEBUGGING //////////////////////
-        // bool bytecodesMatch = (actualBytecode == expectedBytecode);
-        //////////////////// DEBUGGING //////////////////////
 
         // Compare the bytecodes
         assertEq(actualBytecode, expectedBytecode, "Bytecode does not match");
