@@ -3,9 +3,9 @@ pragma solidity >=0.5.13 <0.8.20;
 
 // import "forge-std/console2.sol";
 
-// import { Constants } from "@test-sol/constants.sol";
-import "celo-foundry/Test.sol";
 import { Utils } from "@test-sol/utils.sol";
+import { Constants } from "@test-sol/constants.sol";
+
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
 
@@ -20,38 +20,14 @@ contract IntegrationTest is Test {
   function setUp() public {}
 }
 
-contract RegistryIntegrationTest is IntegrationTest, Utils {
+contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
   string[23] expectedContractsInRegistry;
   IProxy proxy;
 
   // TODO(Arthur): Consider moving this to a config file. Perhaps make the migration depend
   // on that file too?
   constructor() public {
-    expectedContractsInRegistry = [
-      "Accounts",
-      "BlockchainParameters",
-      "DoubleSigningSlasher",
-      "DowntimeSlasher",
-      "Election",
-      "EpochRewards",
-      "Escrow",
-      "FederatedAttestations",
-      "FeeCurrencyWhitelist",
-      "FeeCurrencyDirectory",
-      "Freezer",
-      "FeeHandler",
-      "GoldToken",
-      "Governance",
-      "GovernanceSlasher",
-      "LockedGold",
-      "OdisPayments",
-      "Random",
-      "Registry",
-      "SortedOracles",
-      "UniswapFeeHandlerSeller",
-      "MentoFeeHandlerSeller",
-      "Validators"
-    ];
+    expectedContractsInRegistry = contractsInRegistry;
   }
 
   function test_shouldHaveAddressInRegistry() public view {

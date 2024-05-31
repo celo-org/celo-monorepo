@@ -1,4 +1,4 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.5.13 <0.8.20;
 
 // This contract is only required for Solidity 0.5
 contract Constants {
@@ -21,4 +21,31 @@ contract Constants {
   string constant LockedGoldContract = "LockedGold";
   string constant ValidatorsContract = "Validators";
   string constant GovernanceContract = "Governance";
+
+  // Contracts in Registry.sol
+  string[23] contractsInRegistry = [
+    "Accounts",
+    "BlockchainParameters",
+    "DoubleSigningSlasher",
+    "DowntimeSlasher",
+    "Election",
+    "EpochRewards",
+    "Escrow",
+    "FederatedAttestations",
+    "FeeCurrencyWhitelist",
+    "FeeCurrencyDirectory",
+    "Freezer",
+    "FeeHandler",
+    "GoldToken",
+    "Governance",
+    "GovernanceSlasher",
+    "LockedGold",
+    "OdisPayments",
+    "Random",
+    "Registry",
+    "SortedOracles",
+    "UniswapFeeHandlerSeller",
+    "MentoFeeHandlerSeller",
+    "Validators"
+  ];
 }
