@@ -61,6 +61,6 @@ time forge script migrations_sol/Migration.s.sol --tc Migration --rpc-url http:/
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
 echo "Total elapsed time: $ELAPSED_TIME seconds"
-
+# Rename devchain artifact and remove unused directory
 mv $TEMP_FOLDER/devchain/state.json $TEMP_FOLDER/devchain.json
 rm -rf $TEMP_FOLDER/devchain
