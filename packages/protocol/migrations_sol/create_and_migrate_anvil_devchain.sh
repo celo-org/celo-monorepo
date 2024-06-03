@@ -14,7 +14,11 @@ export FROM_ACCOUNT="0x$FROM_ACCOUNT_NO_ZERO"
 
 # Create temporary directory
 TEMP_FOLDER="$PWD/.tmp"
-rm -rf $TEMP_FOLDER
+if [ -d "$TEMP_FOLDER" ]; then
+    # Remove temporary directory first it if exists
+    echo "Removing existing temporary folder..."
+    rm -rf $TEMP_FOLDER
+fi
 mkdir -p $TEMP_FOLDER
 
 # Start a local anvil instance
