@@ -749,6 +749,65 @@ contract GovernanceTest_setConstitution is GovernanceTest {
   }
 }
 
+contract GovernanceTest_setSecurityCouncil is GovernanceTest {
+  event SecurityCouncilSet(address indexed council);
+
+  function test_ShouldSetSecurityCouncil() public {
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+
+    assertEq(governance.securityCouncil(), accCouncil);
+  }
+
+  function test_Emits_SecurityCouncilSetEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit SecurityCouncilSet(accCouncil);
+
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+  }
+
+  function test_Reverts_WhenCalledByNonOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    governance.setSecurityCouncil(accCouncil);
+  }
+  function test_Reverts_WhenSetToAddressZero() public {
+    vm.expectRevert("Council cannot be address zero");
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(address(0));
+  }
+}
+
+contract GovernanceTest_setHotfixExecutionTimeWindow is GovernanceTest {
+  event HotfixExecutionTimeWindowSet(uint256 timeDelta);
+
+  function test_ShouldSetHotfixExecutionTimeWindow() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
+    assertEq(governance.hotfixExecutionTimeWindow(), DAY);
+  }
+
+  function test_Emits_HotfixExecutionTimeWindowSetEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit HotfixExecutionTimeWindowSet(DAY);
+
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+  }
+
+  function test_Reverts_WhenCalledByNonOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    governance.setHotfixExecutionTimeWindow(DAY);
+  }
+
+  function test_Reverts_WhenSetToZero() public {
+    vm.expectRevert("Execution time window cannot be zero");
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(0);
+  }
+}
+
 contract GovernanceTest_propose is GovernanceTest {
   event ProposalQueued(
     uint256 indexed proposalId,
@@ -2936,7 +2995,7 @@ contract GovernanceTest_approveHotfix is GovernanceTest {
 
   function test_Reverts_WhenCalledByZeroAddressOnL1() public {
     vm.prank(address(0));
-    vm.expectRevert("Hotfix approval by security council is not available on L1.");
+    vm.expectRevert("msg.sender cannot be address zero");
     governance.approveHotfix(HOTFIX_HASH);
   }
 }
@@ -2949,7 +3008,7 @@ contract GovernanceTest_approveHotfix_L2 is GovernanceTest {
 
     _whenL2();
     vm.prank(accOwner);
-    governance.setSecurityCouncil(accCouncil);
+    governance.setHotfixExecutionTimeWindow(DAY);
   }
 
   function test_markHotfixRecordApprovedWhenCalledByApprover() public {
@@ -2960,6 +3019,9 @@ contract GovernanceTest_approveHotfix_L2 is GovernanceTest {
     assertTrue(approved);
   }
   function test_markHotfixRecordApprovedWhenCalledBySecurityCouncil() public {
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+
     vm.prank(accCouncil);
     governance.approveHotfix(HOTFIX_HASH);
 
@@ -2968,6 +3030,9 @@ contract GovernanceTest_approveHotfix_L2 is GovernanceTest {
   }
 
   function test_Emits_HotfixApprovedEvent() public {
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+
     vm.expectEmit(true, true, true, true);
     emit HotfixApproved(HOTFIX_HASH, accApprover);
     vm.prank(accApprover);
@@ -2982,8 +3047,14 @@ contract GovernanceTest_approveHotfix_L2 is GovernanceTest {
   function test_Reverts_WhenCalledByNonApproverOrCouncil() public {
     vm.expectRevert("msg.sender not approver or Security Council");
     governance.approveHotfix(HOTFIX_HASH);
+  }
 
+  function test_Reverts_WhenSecurityCouncilIsNotSet() public {
+    vm.prank(accCouncil);
     vm.expectRevert("msg.sender not approver or Security Council");
+    governance.approveHotfix(HOTFIX_HASH);
+
+    vm.expectRevert("msg.sender cannot be address zero");
     vm.prank(address(0));
     governance.approveHotfix(HOTFIX_HASH);
   }
@@ -3207,6 +3278,9 @@ contract GovernanceTest_prepareHotfix_L2 is GovernanceTest {
   }
 
   function test_markHotfixRecordExecutionTimeLimit_whenHotfixApproved() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
     vm.prank(accCouncil);
     governance.approveHotfix(HOTFIX_HASH);
     vm.prank(accApprover);
@@ -3218,21 +3292,14 @@ contract GovernanceTest_prepareHotfix_L2 is GovernanceTest {
     assertEq(preparedTimeLimit, block.timestamp + DAY);
   }
 
-  function test_Emits_HotfixPreparedEvent_whenHotfixApproved() public {
-    vm.prank(accCouncil);
-    governance.approveHotfix(HOTFIX_HASH);
-    vm.prank(accApprover);
-    governance.approveHotfix(HOTFIX_HASH);
-
-    vm.expectEmit(true, true, true, true);
-    emit HotfixPrepared(HOTFIX_HASH, block.timestamp + DAY);
-    governance.prepareHotfix(HOTFIX_HASH);
-  }
-
   function test_ShouldUpdateExecutionTimeAfterApproving_WhenExecutionTimeLimitHadElapsed() public {
     uint256 _preparedTimeLimit;
     bool _approved;
     bool _councilApproved;
+
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
     vm.prank(accCouncil);
     governance.approveHotfix(HOTFIX_HASH);
     vm.prank(accApprover);
@@ -3262,6 +3329,9 @@ contract GovernanceTest_prepareHotfix_L2 is GovernanceTest {
   }
 
   function test_ShouldResetHotfixRecordWhenExecutionTimeLimitHasPassed() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
     vm.prank(accCouncil);
     governance.approveHotfix(HOTFIX_HASH);
     vm.prank(accApprover);
@@ -3278,6 +3348,9 @@ contract GovernanceTest_prepareHotfix_L2 is GovernanceTest {
   }
 
   function test_Emits_HotfixRecordResetWhenExecutionTimeLimitWasReached() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
     vm.prank(accCouncil);
     governance.approveHotfix(HOTFIX_HASH);
     vm.prank(accApprover);
@@ -3290,7 +3363,32 @@ contract GovernanceTest_prepareHotfix_L2 is GovernanceTest {
     governance.prepareHotfix(HOTFIX_HASH);
   }
 
+  function test_Emits_HotfixPreparedEvent_whenHotfixApproved() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+    vm.prank(accCouncil);
+    governance.approveHotfix(HOTFIX_HASH);
+    vm.prank(accApprover);
+    governance.approveHotfix(HOTFIX_HASH);
+
+    vm.expectEmit(true, true, true, true);
+    emit HotfixPrepared(HOTFIX_HASH, block.timestamp + DAY);
+    governance.prepareHotfix(HOTFIX_HASH);
+  }
+
+  function test_Reverts_IfHotfixExecutionTimeWindowNotSet() public {
+    vm.prank(accCouncil);
+    governance.approveHotfix(HOTFIX_HASH);
+    vm.prank(accApprover);
+    governance.approveHotfix(HOTFIX_HASH);
+
+    vm.expectRevert("Hotfix execution time window not set");
+    governance.prepareHotfix(HOTFIX_HASH);
+  }
   function test_Reverts_IfHotfixIsNotApproved() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
+
     vm.expectRevert("Hotfix not approved by approvers.");
     governance.prepareHotfix(HOTFIX_HASH);
 
@@ -3301,6 +3399,8 @@ contract GovernanceTest_prepareHotfix_L2 is GovernanceTest {
   }
 
   function test_Reverts_IfPreparedTwiceWithinExecutionTimeLimit() public {
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
     vm.prank(accCouncil);
     governance.approveHotfix(HOTFIX_HASH);
     vm.prank(accApprover);
@@ -3408,6 +3508,7 @@ contract GovernanceTest_executeHotfix is GovernanceTest {
     governance.prepareHotfix(hotfixHash);
   }
 }
+
 contract GovernanceTest_executeHotfix_L2 is GovernanceTest {
   bytes32 SALT = 0x657ed9d64e84fa3d1af43b3a307db22aba2d90a158015df1c588c02e24ca08f0;
   bytes32 hotfixHash;
@@ -3422,6 +3523,8 @@ contract GovernanceTest_executeHotfix_L2 is GovernanceTest {
     _whenL2();
     vm.prank(accOwner);
     governance.setSecurityCouncil(accCouncil);
+    vm.prank(accOwner);
+    governance.setHotfixExecutionTimeWindow(DAY);
 
     hotfixHash = governance.getHotfixHash(
       okProp.values,
@@ -3499,7 +3602,7 @@ contract GovernanceTest_executeHotfix_L2 is GovernanceTest {
     vm.expectRevert("Execution time limit has already been reached.");
     executeHotfixTx();
   }
-  function test_Reverts_WhenExecuteBeyondTheExecutionTimeLimit() public {
+  function test_Reverts_WhenExecutedBeyondTheExecutionTimeLimit() public {
     vm.prank(accApprover);
     governance.approveHotfix(hotfixHash);
     vm.prank(accCouncil);
