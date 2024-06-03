@@ -1,0 +1,126 @@
+name: Protocol Devchain Anvil
+on:
+  push:
+    branches:
+      - master
+
+env:
+  # Increment these to force cache rebuilding
+  FOUNDRY_CACHE_KEY: 1
+
+jobs:
+  build:
+    defaults:
+      run:
+        working-directory: packages/protocol
+    name: Generate anvil
+    runs-on: ["self-hosted", "org", "npm-publish"]
+    permissions: 
+      contents: read
+      pull-requests: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Fail if there are test with wrong extension
+        run: |
+          if  tree test-sol | grep -i ".sol" | grep -v ".sol"; then
+            echo "There are tests with wrong extensions"
+            tree test-sol | grep -i ".sol" | grep -v ".sol"
+            exit 1
+          fi
+      - name: Foundry cache
+        id: foundry-cache
+        uses: actions/cache@v3
+        with:
+          path: ./cache
+          key: ${{ runner.os }}-foundry-cache-${{ env.FOUNDRY_CACHE_KEY }}
+      - name: Foundry out
+        id: foundry-out
+        uses: actions/cache@v3
+        with:
+          path: ./out
+          key: ${{ runner.os }}-foundry-out-${{ env.FOUNDRY_CACHE_KEY }}
+
+      - name: Get Pull Request data
+        id: get_pr_data
+        uses: actions/github-script@v7
+        with:
+          script: |
+              const result = (
+                await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                  commit_sha: context.sha,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                })
+              ).data[0];
+              return result ? { number: result.number } : {};
+
+      - name: Set PR Number
+        id: set_pr_number
+        run: |
+          if [ -z "${{ steps.get_pr_data.outputs.number }}" ]; then
+            echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+          else
+            echo "PR_NUMBER=${{ steps.get_pr_data.outputs.number }}" >> $GITHUB_ENV
+          fi
+
+      - name: Display PR Number
+        run: |
+          echo "Pull Request Number: ${{ env.PR_NUMBER }}"
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Install forge dependencies
+        run: forge install
+
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+      - name: Generate migrations
+        run: ./migrations_sol/run_integration_tests_in_anvil.sh
+
+      - name: Sanitize ref name
+        id: sanitize-ref-name
+        run: |
+          sanitized_ref_name=$(echo "${{ github.ref_name }}" | tr -cd '[:alnum:]-_')
+          echo "sanitized_ref_name=${sanitized_ref_name}" >> $GITHUB_ENV
+
+      - name: Set package.json version based on GitHub ref
+        run: |
+          VERSION=${{ env.PR_NUMBER }}
+          echo "Setting version to 0.0.$VERSION"
+          jq ".version = \"0.0.$VERSION\"" .tmp/package.json > .tmp/temp.json && mv .tmp/temp.json .tmp/package.json
+
+      - name: Upload devchain as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: devchain-${{ env.PR_NUMBER }}-${{ steps.date.outputs.date }}
+          path: packages/protocol/.tmp
+          # Max retention time is 90 days for public repos
+          # https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
+          retention-days: 90
+
+      - name: Akeyless Get Secrets
+        id: get_auth_token
+        uses: docker://us-west1-docker.pkg.dev/devopsre/akeyless-public/akeyless-action:latest
+        with:
+          api-url: https://api.gateway.akeyless.celo-networks-dev.org
+          access-id: p-kf9vjzruht6l
+          static-secrets: '{"/static-secrets/NPM/npm-publish-token":"NPM_TOKEN"}'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Publish @celo/devchain-anvil
+        run: |
+          cat package.json
+          npm publish --access public
+        working-directory: packages/protocol/.tmp
+        env:
+          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
