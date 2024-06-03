@@ -22,7 +22,7 @@ contract Constants {
   string constant ValidatorsContract = "Validators";
   string constant GovernanceContract = "Governance";
 
-  // Contracts in Registry.sol
+  // List of contracts that are expected to be in Registry.sol
   string[23] contractsInRegistry = [
     "Accounts",
     "BlockchainParameters",
