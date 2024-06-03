@@ -115,7 +115,7 @@ contract Governance is
   uint256[] public emptyIndices;
   ParticipationParameters private participationParameters;
   address public securityCouncil;
-  uint256 public constant DAY = 86400;
+  uint256 public hotfixExecutionTimeWindow;
 
   event ApproverSet(address indexed approver);
 
@@ -205,6 +205,8 @@ contract Governance is
 
   event SecurityCouncilSet(address indexed council);
 
+  event HotfixExecutionTimeWindowSet(uint256 timeDelta);
+
   event HotfixRecordReset(bytes32 indexed hash);
 
   modifier hotfixNotExecuted(bytes32 hash) {
@@ -223,6 +225,7 @@ contract Governance is
   }
 
   modifier onlyApproverOrSecurityCouncil() {
+    require(msg.sender != address(0), "msg.sender cannot be address zero");
     require(
       msg.sender == approver || msg.sender == securityCouncil,
       "msg.sender not approver or Security Council"
@@ -314,6 +317,23 @@ contract Governance is
       constitution[destination].functionThresholds[functionId] = FixidityLib.wrap(threshold);
     }
     emit ConstitutionSet(destination, functionId, threshold);
+  }
+
+  /**
+   * @notice Updates the address that has permission to whitelist hotfix proposals.
+   * @param _council The address that has permission to whitelist hotfix proposals.
+   */
+  function setSecurityCouncil(address _council) external onlyOwner {
+    require(_council != address(0), "Council cannot be address zero");
+    require(_council != approver, "Council unchanged");
+    securityCouncil = _council;
+    emit SecurityCouncilSet(_council);
+  }
+
+  function setHotfixExecutionTimeWindow(uint256 timeWindow) external onlyOwner {
+    require(timeWindow > 0, "Execution time window cannot be zero");
+    hotfixExecutionTimeWindow = timeWindow;
+    emit HotfixExecutionTimeWindowSet(timeWindow);
   }
 
   /**
@@ -664,6 +684,7 @@ contract Governance is
   function prepareHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
     if (isL2()) {
       uint256 _currentTime = now;
+      require(hotfixExecutionTimeWindow > 0, "Hotfix execution time window not set");
       require(
         hotfixes[hash].executionTimeLimit < _currentTime,
         "Hotfix already prepared for this timeframe."
@@ -680,8 +701,8 @@ contract Governance is
         emit HotfixRecordReset(hash);
         return;
       }
-      hotfixes[hash].executionTimeLimit = _currentTime.add(DAY);
-      emit HotfixPrepared(hash, _currentTime.add(DAY));
+      hotfixes[hash].executionTimeLimit = _currentTime.add(hotfixExecutionTimeWindow);
+      emit HotfixPrepared(hash, _currentTime.add(hotfixExecutionTimeWindow));
     } else {
       require(isHotfixPassing(hash), "hotfix not whitelisted by 2f+1 validators");
       uint256 epoch = getEpochNumber();
@@ -1032,17 +1053,6 @@ contract Governance is
     bytes32 salt
   ) external pure returns (bytes32) {
     return keccak256(abi.encode(values, destinations, data, dataLengths, salt));
-  }
-
-  /**
-   * @notice Updates the address that has permission to whitelist hotfix proposals.
-   * @param _council The address that has permission to whitelist hotfix proposals.
-   */
-  function setSecurityCouncil(address _council) public onlyOwner {
-    require(_council != address(0), "Council cannot be 0");
-    require(_council != approver, "Council unchanged");
-    securityCouncil = _council;
-    emit SecurityCouncilSet(_council);
   }
 
   /**
