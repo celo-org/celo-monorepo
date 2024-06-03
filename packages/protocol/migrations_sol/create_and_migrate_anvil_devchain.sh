@@ -6,12 +6,19 @@ START_TIME=$SECONDS
 
 export ANVIL_PORT=8546
 
+echo "Forge version: $(forge --version)"
+
 # TODO make this configurable
 FROM_ACCOUNT_NO_ZERO="f39Fd6e51aad88F6F4ce6aB8827279cffFb92266" # This is Anvil's default account (1)
 export FROM_ACCOUNT="0x$FROM_ACCOUNT_NO_ZERO"
 
 # Create temporary directory
 TEMP_FOLDER="$PWD/.tmp"
+if [ -d "$TEMP_FOLDER" ]; then
+    # Remove temporary directory first it if exists
+    echo "Removing existing temporary folder..."
+    rm -rf $TEMP_FOLDER
+fi
 mkdir -p $TEMP_FOLDER
 
 # Start a local anvil instance
@@ -54,3 +61,6 @@ time forge script migrations_sol/Migration.s.sol --tc Migration --rpc-url http:/
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
 echo "Total elapsed time: $ELAPSED_TIME seconds"
+# Rename devchain artifact and remove unused directory
+mv $TEMP_FOLDER/devchain/state.json $TEMP_FOLDER/devchain.json
+rm -rf $TEMP_FOLDER/devchain
