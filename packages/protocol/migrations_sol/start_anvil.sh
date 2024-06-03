@@ -10,13 +10,13 @@ echo "Anvil state will be saved to $ANVIL_FOLDER"
 # create package.json
 echo "{\"name\": \"@celo/devchain-anvil\",\"version\": \"1.0.0\",\"description\": \"Anvil based devchain that contains core smart contracts of celo\",\"author\":\"Celo\",\"license\": \"LGPL-3.0\"}" > $TMP_FOLDER/package.json
 
+cp $PWD/migrations_sol/celo-anvil-README.md $TMP_FOLDER/README.md
+
 if nc -z localhost $ANVIL_PORT; then
   echo "Port already used"
   kill $(lsof -i tcp:$ANVIL_PORT | tail -n 1 | awk '{print $2}')
   echo "Killed previous Anvil"
 fi
-
-
 
 anvil --port $ANVIL_PORT --gas-limit 50000000 --steps-tracing --code-size-limit 245760 --balance 60000 --dump-state $ANVIL_FOLDER --state-interval 1 &
 
