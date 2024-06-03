@@ -78,7 +78,8 @@ contract Governance is
     bool approved;
     uint256 deprecated_preparedEpoch; // obsolete
     mapping(address => bool) deprecated_whitelisted; // obsolete
-    bool counsilApproved;
+    bool councilApproved;
+    uint256 executionTimeLimit;
   }
 
   // The baseline is updated as
@@ -114,6 +115,7 @@ contract Governance is
   uint256[] public emptyIndices;
   ParticipationParameters private participationParameters;
   address public securityCouncil;
+  uint256 public constant DAY = 86400;
 
   event ApproverSet(address indexed approver);
 
@@ -197,11 +199,13 @@ contract Governance is
 
   event HotfixApproved(bytes32 indexed hash, address approver);
 
-  event HotfixPrepared(bytes32 indexed hash, uint256 indexed epoch);
+  event HotfixPrepared(bytes32 indexed hash, uint256 indexed executionLimit);
 
   event HotfixExecuted(bytes32 indexed hash);
 
   event SecurityCouncilSet(address indexed council);
+
+  event HotfixApprovalsReset();
 
   modifier hotfixNotExecuted(bytes32 hash) {
     require(!hotfixes[hash].executed, "hotfix already executed");
@@ -636,7 +640,7 @@ contract Governance is
       hotfixes[hash].approved = true;
     } else {
       if (isL2()) {
-        hotfixes[hash].counsilApproved = true;
+        hotfixes[hash].councilApproved = true;
       } else {
         revert("Hotfix approval by security council is not available on L1.");
       }
@@ -653,21 +657,54 @@ contract Governance is
     emit HotfixWhitelisted(hash, msg.sender);
   }
 
+  //XXX(soloseng): should there be a time limit for it to execute?
   /**
-   * @notice Gives hotfix a prepared epoch for execution.
+   * @notice Gives hotfix a time limit for execution.
    * @param hash The hash of the hotfix to be prepared.
    */
-  function prepareHotfix(bytes32 hash) external hotfixNotExecuted(hash) onlyL1 {
-    require(isHotfixPassing(hash), "hotfix not whitelisted by 2f+1 validators");
-    uint256 epoch = getEpochNumber();
-    require(
-      hotfixes[hash].deprecated_preparedEpoch < epoch,
-      "hotfix already prepared for this epoch"
-    );
-    hotfixes[hash].deprecated_preparedEpoch = epoch;
-    emit HotfixPrepared(hash, epoch);
+  function prepareHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
+    if (isL2()) {
+      // TODO (soloseng): add timeframe for execution.
+      uint256 _currentTime = now;
+      // check that the timelimit has not been set already.
+      require(
+        hotfixes[hash].executionTimeLimit < _currentTime,
+        "Hotfix already prepared for this timeframe."
+      );
+      // requires that approvers have approved.
+      require(hotfixes[hash].approved, "Hotfix not approved by approvers.");
+      // requires that council has approved.
+      require(hotfixes[hash].councilApproved, "Hotfix not approved by security council.");
+
+      // check that timelimit has not passed. If it did, reset the approvals.
+      if (
+        hotfixes[hash].executionTimeLimit > 0 && hotfixes[hash].executionTimeLimit < _currentTime
+      ) {
+        // reset approvals
+        hotfixes[hash].approved = false;
+        hotfixes[hash].councilApproved = false;
+        hotfixes[hash].executionTimeLimit = 0;
+        emit HotfixApprovalsReset();
+        return;
+      }
+
+      // set the time limit for execution.
+      hotfixes[hash].executionTimeLimit = _currentTime.add(DAY);
+      emit HotfixPrepared(hash, _currentTime.add(DAY));
+    } else {
+      require(isHotfixPassing(hash), "hotfix not whitelisted by 2f+1 validators");
+      uint256 epoch = getEpochNumber();
+      require(
+        hotfixes[hash].deprecated_preparedEpoch < epoch,
+        "hotfix already prepared for this epoch"
+      );
+      hotfixes[hash].deprecated_preparedEpoch = epoch;
+      emit HotfixPrepared(hash, epoch);
+    }
   }
 
+  // XXX(soloseng): should this revert if more than 24hrs after it was approved?
+  // would required that the hotfix records are changed to enfore new approval.
   /**
    * @notice Executes a whitelisted proposal.
    * @param values The values of CELO to be sent in the proposed transactions.
@@ -687,11 +724,16 @@ contract Governance is
     if (isL2()) {
       bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths, salt));
 
-      (bool approved, bool counsilApproved, bool executed) = getL2HotfixRecord(hash);
+      (
+        bool approved,
+        bool councilApproved,
+        bool executed,
+        uint256 executionTimeLimit
+      ) = getL2HotfixRecord(hash);
       require(!executed, "hotfix already executed");
       require(approved, "hotfix not approved");
-      require(counsilApproved, "hotfix not approved by security council");
-
+      require(councilApproved, "hotfix not approved by security council");
+      require(executionTimeLimit >= now, "Execution time limit has already been reach.");
       Proposals.makeMem(values, destinations, data, dataLengths, msg.sender, 0).executeMem();
 
       hotfixes[hash].executed = true;
@@ -1271,11 +1313,16 @@ contract Governance is
    * @notice Gets information about a L2 hotfix.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
    * @return Hotfix approved by approver.
-   * @return Hotfix approved by SecurityCounsil.
+   * @return Hotfix approved by SecurityCouncil.
    * @return Hotfix executed.
    */
-  function getL2HotfixRecord(bytes32 hash) public view onlyL2 returns (bool, bool, bool) {
-    return (hotfixes[hash].approved, hotfixes[hash].counsilApproved, hotfixes[hash].executed);
+  function getL2HotfixRecord(bytes32 hash) public view onlyL2 returns (bool, bool, bool, uint256) {
+    return (
+      hotfixes[hash].approved,
+      hotfixes[hash].councilApproved,
+      hotfixes[hash].executed,
+      hotfixes[hash].executionTimeLimit
+    );
   }
 
   /**
