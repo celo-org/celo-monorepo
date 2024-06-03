@@ -205,7 +205,7 @@ contract Governance is
 
   event SecurityCouncilSet(address indexed council);
 
-  event HotfixApprovalsReset();
+  event HotfixRecordReset(bytes32 indexed hash);
 
   modifier hotfixNotExecuted(bytes32 hash) {
     require(!hotfixes[hash].executed, "hotfix already executed");
@@ -657,38 +657,29 @@ contract Governance is
     emit HotfixWhitelisted(hash, msg.sender);
   }
 
-  //XXX(soloseng): should there be a time limit for it to execute?
   /**
    * @notice Gives hotfix a time limit for execution.
    * @param hash The hash of the hotfix to be prepared.
    */
   function prepareHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
     if (isL2()) {
-      // TODO (soloseng): add timeframe for execution.
       uint256 _currentTime = now;
-      // check that the timelimit has not been set already.
       require(
         hotfixes[hash].executionTimeLimit < _currentTime,
         "Hotfix already prepared for this timeframe."
       );
-      // requires that approvers have approved.
       require(hotfixes[hash].approved, "Hotfix not approved by approvers.");
-      // requires that council has approved.
       require(hotfixes[hash].councilApproved, "Hotfix not approved by security council.");
 
-      // check that timelimit has not passed. If it did, reset the approvals.
       if (
         hotfixes[hash].executionTimeLimit > 0 && hotfixes[hash].executionTimeLimit < _currentTime
       ) {
-        // reset approvals
         hotfixes[hash].approved = false;
         hotfixes[hash].councilApproved = false;
         hotfixes[hash].executionTimeLimit = 0;
-        emit HotfixApprovalsReset();
+        emit HotfixRecordReset(hash);
         return;
       }
-
-      // set the time limit for execution.
       hotfixes[hash].executionTimeLimit = _currentTime.add(DAY);
       emit HotfixPrepared(hash, _currentTime.add(DAY));
     } else {
@@ -703,8 +694,6 @@ contract Governance is
     }
   }
 
-  // XXX(soloseng): should this revert if more than 24hrs after it was approved?
-  // would required that the hotfix records are changed to enfore new approval.
   /**
    * @notice Executes a whitelisted proposal.
    * @param values The values of CELO to be sent in the proposed transactions.
@@ -733,7 +722,7 @@ contract Governance is
       require(!executed, "hotfix already executed");
       require(approved, "hotfix not approved");
       require(councilApproved, "hotfix not approved by security council");
-      require(executionTimeLimit >= now, "Execution time limit has already been reach.");
+      require(executionTimeLimit >= now, "Execution time limit has already been reached.");
       Proposals.makeMem(values, destinations, data, dataLengths, msg.sender, 0).executeMem();
 
       hotfixes[hash].executed = true;
