@@ -224,15 +224,6 @@ contract Governance is
     _;
   }
 
-  modifier onlyApproverOrSecurityCouncil() {
-    require(msg.sender != address(0), "msg.sender cannot be address zero");
-    require(
-      msg.sender == approver || msg.sender == securityCouncil,
-      "msg.sender not approver or Security Council"
-    );
-    _;
-  }
-
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -655,9 +646,13 @@ contract Governance is
    * @notice Approves the hash of a hotfix transaction(s).
    * @param hash The abi encoded keccak256 hash of the hotfix transaction(s) to be approved.
    */
-  function approveHotfix(
-    bytes32 hash
-  ) external hotfixNotExecuted(hash) onlyApproverOrSecurityCouncil {
+  function approveHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
+    require(msg.sender != address(0), "msg.sender cannot be address zero");
+    require(
+      msg.sender == approver || msg.sender == securityCouncil,
+      "msg.sender not approver or Security Council"
+    );
+
     if (msg.sender == approver) {
       hotfixes[hash].approved = true;
     } else {
