@@ -64,17 +64,17 @@ contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
         address implementationAddress = proxy._getImplementation();
 
         // Get bytecode from deployed contract
-        bytes memory actualBytecodeWithMetadata = getCodeAt(implementationAddress);
-        bytes memory actualBytecode = removeMetadataFromBytecode(actualBytecodeWithMetadata);
+        bytes memory actualBytecodeWithMetadataOnDevchain = getCodeAt(implementationAddress);
+        bytes memory actualBytecodeOnDevchain = removeMetadataFromBytecode(actualBytecodeWithMetadataOnDevchain);
 
         // Get bytecode from build artifacts
-        bytes memory expectedBytecodeWithMetadata = vm.getDeployedCode(
+        bytes memory expectedBytecodeFromArtifactsWithMetadata = vm.getDeployedCode(
           string(abi.encodePacked(contractName, ".sol"))
         );
-        bytes memory expectedBytecode = removeMetadataFromBytecode(expectedBytecodeWithMetadata);
+        bytes memory expectedBytecodeFromArtifacts = removeMetadataFromBytecode(expectedBytecodeFromArtifactsWithMetadata);
 
         // Compare the bytecodes
-        assertEq(actualBytecode, expectedBytecode, "Bytecode does not match");
+        assertEq(actualBytecodeOnDevchain, expectedBytecodeFromArtifacts, "Bytecode does not match");
       }
     }
   }
