@@ -70,11 +70,11 @@ contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
         );
 
         // Get bytecode from build artifacts
-        bytes memory expectedBytecodeFromArtifactsWithMetadata = vm.getDeployedCode(
+        bytes memory expectedBytecodeWithMetadataFromArtifacts = vm.getDeployedCode(
           string(abi.encodePacked(contractName, ".sol"))
         );
         bytes memory expectedBytecodeFromArtifacts = removeMetadataFromBytecode(
-          expectedBytecodeFromArtifactsWithMetadata
+          expectedBytecodeWithMetadataFromArtifacts
         );
 
         // Compare the bytecodes
