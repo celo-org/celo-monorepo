@@ -343,19 +343,28 @@ contract GovernanceTest_setApprover is GovernanceTest {
     governance.setApprover(NEW_APPROVER);
   }
 
-  function test_RevertIf_NullAddress() public {
+  function test_Reverts_IfNullAddress() public {
     vm.expectRevert("Approver cannot be 0");
     vm.prank(accOwner);
     governance.setApprover(address(0));
   }
 
-  function test_RevertIf_Unchanged() public {
+  function test_Reverts_IfUnchanged() public {
     vm.expectRevert("Approver unchanged");
     vm.prank(accOwner);
     governance.setApprover(accApprover);
   }
 
-  function test_RevertWhen_CalledByNotOwner() public {
+  function test_Reverts_WhenSetToSecurityCouncilAddress() public {
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+
+    vm.expectRevert("Approver cannot be council");
+    vm.prank(accOwner);
+    governance.setApprover(accCouncil);
+  }
+
+  function test_Reverts_WhenCalledByNotOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(address(9999));
     governance.setApprover(NEW_APPROVER);
@@ -771,10 +780,26 @@ contract GovernanceTest_setSecurityCouncil is GovernanceTest {
     vm.expectRevert("Ownable: caller is not the owner");
     governance.setSecurityCouncil(accCouncil);
   }
+
   function test_Reverts_WhenSetToAddressZero() public {
     vm.expectRevert("Council cannot be address zero");
     vm.prank(accOwner);
     governance.setSecurityCouncil(address(0));
+  }
+
+  function test_Reverts_WhenSetToSameAddress() public {
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+
+    vm.expectRevert("Council unchanged");
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accCouncil);
+  }
+
+  function test_Reverts_WhenSetToApproverAddress() public {
+    vm.expectRevert("Council cannot be approver");
+    vm.prank(accOwner);
+    governance.setSecurityCouncil(accApprover);
   }
 }
 

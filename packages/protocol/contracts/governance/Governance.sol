@@ -325,7 +325,9 @@ contract Governance is
    */
   function setSecurityCouncil(address _council) external onlyOwner {
     require(_council != address(0), "Council cannot be address zero");
-    require(_council != approver, "Council unchanged");
+    require(_council != securityCouncil, "Council unchanged");
+    require(_council != approver, "Council cannot be approver");
+
     securityCouncil = _council;
     emit SecurityCouncilSet(_council);
   }
@@ -678,39 +680,41 @@ contract Governance is
   }
 
   /**
-   * @notice Gives hotfix a time limit for execution.
+   * @notice Gives hotfix a prepared epoch for execution on L1.
+   * @notice Gives hotfix a time limit for execution on L2.
    * @param hash The hash of the hotfix to be prepared.
    */
   function prepareHotfix(bytes32 hash) external hotfixNotExecuted(hash) {
+    HotfixRecord storage _currentHotfix = hotfixes[hash];
     if (isL2()) {
       uint256 _currentTime = now;
       require(hotfixExecutionTimeWindow > 0, "Hotfix execution time window not set");
       require(
-        hotfixes[hash].executionTimeLimit < _currentTime,
+        _currentHotfix.executionTimeLimit < _currentTime,
         "Hotfix already prepared for this timeframe."
       );
-      require(hotfixes[hash].approved, "Hotfix not approved by approvers.");
-      require(hotfixes[hash].councilApproved, "Hotfix not approved by security council.");
+      require(_currentHotfix.approved, "Hotfix not approved by approvers.");
+      require(_currentHotfix.councilApproved, "Hotfix not approved by security council.");
 
       if (
-        hotfixes[hash].executionTimeLimit > 0 && hotfixes[hash].executionTimeLimit < _currentTime
+        _currentHotfix.executionTimeLimit > 0 && _currentHotfix.executionTimeLimit < _currentTime
       ) {
-        hotfixes[hash].approved = false;
-        hotfixes[hash].councilApproved = false;
-        hotfixes[hash].executionTimeLimit = 0;
+        _currentHotfix.approved = false;
+        _currentHotfix.councilApproved = false;
+        _currentHotfix.executionTimeLimit = 0;
         emit HotfixRecordReset(hash);
         return;
       }
-      hotfixes[hash].executionTimeLimit = _currentTime.add(hotfixExecutionTimeWindow);
+      _currentHotfix.executionTimeLimit = _currentTime.add(hotfixExecutionTimeWindow);
       emit HotfixPrepared(hash, _currentTime.add(hotfixExecutionTimeWindow));
     } else {
       require(isHotfixPassing(hash), "hotfix not whitelisted by 2f+1 validators");
       uint256 epoch = getEpochNumber();
       require(
-        hotfixes[hash].deprecated_preparedEpoch < epoch,
+        _currentHotfix.deprecated_preparedEpoch < epoch,
         "hotfix already prepared for this epoch"
       );
-      hotfixes[hash].deprecated_preparedEpoch = epoch;
+      _currentHotfix.deprecated_preparedEpoch = epoch;
       emit HotfixPrepared(hash, epoch);
     }
   }
@@ -1062,6 +1066,7 @@ contract Governance is
   function setApprover(address _approver) public onlyOwner {
     require(_approver != address(0), "Approver cannot be 0");
     require(_approver != approver, "Approver unchanged");
+    require(_approver != securityCouncil, "Approver cannot be council");
     approver = _approver;
     emit ApproverSet(_approver);
   }
