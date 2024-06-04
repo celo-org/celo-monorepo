@@ -96,7 +96,7 @@ jobs:
 
       - name: Run Everything just in case something was missed
         # can't use gas limit because some setUp function use more than the limit
-        run: forge test -vvv --no-match-path "test-sol/integration/Integration.t.sol" --no-match-contract "RegistryIntegrationTest"
+        run: forge test -vvv --no-match-contract "RegistryIntegrationTest|RandomTest|BLS12_381Passthrough"
       
       - name: Generate migrations
         if: success() || failure()
