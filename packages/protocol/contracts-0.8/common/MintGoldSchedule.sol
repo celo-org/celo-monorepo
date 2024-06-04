@@ -291,6 +291,10 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       uint256 carbonFundTargetRewards
     )
   {
+    FixidityLib.Fraction memory elapsedTimeFraction = FixidityLib.wrap(elapsedTime);
+    FixidityLib.Fraction memory totalL2LinearSecondsAvailableFraction = FixidityLib.wrap(
+      _totalL2LinearSecondsAvailable
+    );
     // Pay out half of all block rewards linearly.
     uint256 totalLinearRewards = (GOLD_SUPPLY_CAP - GENESIS_GOLD_SUPPLY) / 2; //(200 million) includes validator rewards.
 
@@ -307,14 +311,14 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     );
 
     communityTargetRewards = (
-      linearRewardsToCommunity.multiply(FixidityLib.wrap(elapsedTime)).divide(
-        FixidityLib.wrap(_totalL2LinearSecondsAvailable)
+      linearRewardsToCommunity.multiply(elapsedTimeFraction).divide(
+        totalL2LinearSecondsAvailableFraction
       )
     ).fromFixed();
 
     carbonFundTargetRewards = linearRewardsToCarbon
-      .multiply(FixidityLib.wrap(elapsedTime))
-      .divide(FixidityLib.wrap(_totalL2LinearSecondsAvailable))
+      .multiply(elapsedTimeFraction)
+      .divide(totalL2LinearSecondsAvailableFraction)
       .fromFixed();
 
     targetGoldTotalSupply =
