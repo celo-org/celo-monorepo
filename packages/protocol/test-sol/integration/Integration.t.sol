@@ -9,7 +9,6 @@ import { Constants } from "@test-sol/constants.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
 
-
 contract IntegrationTest is Test {
   address constant registryAddress = address(0x000000000000000000000000000000000000ce10);
   IRegistry registry = IRegistry(registryAddress);
@@ -21,7 +20,7 @@ contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
   IProxy proxy;
 
   function test_shouldHaveAddressInRegistry() public view {
-    for (uint256 i = 0; i < contractsInRegistry.length; i++) { 
+    for (uint256 i = 0; i < contractsInRegistry.length; i++) {
       string memory contractName = contractsInRegistry[i];
       address contractAddress = registry.getAddressFor(keccak256(abi.encodePacked(contractName)));
       console2.log(contractName, "address in Registry is: ", contractAddress);
@@ -29,13 +28,13 @@ contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
     }
   }
 
-  function test_shouldHaveCorrectBytecode() public {    
-    for (uint256 i = 0; i < contractsInRegistry.length; i++) { 
+  function test_shouldHaveCorrectBytecode() public {
+    for (uint256 i = 0; i < contractsInRegistry.length; i++) {
       // Read name from list of core contracts
       string memory contractName = contractsInRegistry[i];
       console2.log("Checking bytecode of:", contractName);
 
-      // Converting contract names to hashes for comparison      
+      // Converting contract names to hashes for comparison
       bytes32 hashContractName = keccak256(abi.encodePacked(contractName));
       bytes32 hashAccount = keccak256(abi.encodePacked("Accounts"));
       bytes32 hashElection = keccak256(abi.encodePacked("Election"));
@@ -47,14 +46,15 @@ contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
 
       // Skipping test for contracts that depend on linked libraries
       // This is a known limitation in Foundry at the moment:
-      // Source: https://github.com/foundry-rs/foundry/issues/6120      
-      if (hashContractName != hashAccount 
-          && hashContractName != hashElection
-          && hashContractName != hashEscrow
-          && hashContractName != hashFederatedAttestations
-          && hashContractName != hashGovernance
-          && hashContractName != hashSortedOracles
-          && hashContractName != hashValidators
+      // Source: https://github.com/foundry-rs/foundry/issues/6120
+      if (
+        hashContractName != hashAccount &&
+        hashContractName != hashElection &&
+        hashContractName != hashEscrow &&
+        hashContractName != hashFederatedAttestations &&
+        hashContractName != hashGovernance &&
+        hashContractName != hashSortedOracles &&
+        hashContractName != hashValidators
       ) {
         // Get proxy address registered in the Registry
         address proxyAddress = registry.getAddressForStringOrDie(contractName);
@@ -66,9 +66,11 @@ contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
         // Get bytecode from deployed contract
         bytes memory actualBytecodeWithMetadata = getCodeAt(implementationAddress);
         bytes memory actualBytecode = removeMetadataFromBytecode(actualBytecodeWithMetadata);
-        
+
         // Get bytecode from build artifacts
-        bytes memory expectedBytecodeWithMetadata = vm.getDeployedCode(string(abi.encodePacked(contractName, ".sol")));
+        bytes memory expectedBytecodeWithMetadata = vm.getDeployedCode(
+          string(abi.encodePacked(contractName, ".sol"))
+        );
         bytes memory expectedBytecode = removeMetadataFromBytecode(expectedBytecodeWithMetadata);
 
         // Compare the bytecodes

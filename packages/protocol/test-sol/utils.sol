@@ -77,14 +77,14 @@ contract Utils is Test {
   }
 
   /**
-    * @notice  Gets runtime code (or "deployedBytecode") at a contract address.
-    *   Using the `.code` or `.runtime` property on a contract is only available in Solidity 0.8.0 and later.
-    *   On Solity <0.8.0, inline assembly is necessary to retrieve the bytecode of a contract.
-    *   This implementation is taken from the Solidity documentation.
-    *   Source: https://docs.soliditylang.org/en/v0.4.24/assembly.html#example
-    * @param _addr Contract address.
-    * @return Runtime bytecode at contract address.
-    */
+   * @notice  Gets runtime code (or "deployedBytecode") at a contract address.
+   *   Using the `.code` or `.runtime` property on a contract is only available in Solidity 0.8.0 and later.
+   *   On Solity <0.8.0, inline assembly is necessary to retrieve the bytecode of a contract.
+   *   This implementation is taken from the Solidity documentation.
+   *   Source: https://docs.soliditylang.org/en/v0.4.24/assembly.html#example
+   * @param _addr Contract address.
+   * @return Runtime bytecode at contract address.
+   */
   function getCodeAt(address _addr) public view returns (bytes memory o_code) {
     assembly {
       // retrieve the size of the code, this needs assembly
@@ -102,16 +102,18 @@ contract Utils is Test {
   }
 
   /**
-    * @notice Removes CBOR encoded metadata from the tail of the deployedBytecode.
-    * @param data Bytecode including the CBOR encoded tail.
-    * @return Bytecode without the CBOR encoded metadata.
-    */
+   * @notice Removes CBOR encoded metadata from the tail of the deployedBytecode.
+   * @param data Bytecode including the CBOR encoded tail.
+   * @return Bytecode without the CBOR encoded metadata.
+   */
   function removeMetadataFromBytecode(bytes memory data) public pure returns (bytes memory) {
     // Ensure the data length is at least enough to contain the length specifier
     require(data.length >= 2, "Data too short to contain a valid CBOR length specifier");
 
     // Calculate the length of the CBOR encoded section from the last two bytes
-    uint16 cborLength = uint16(uint8(data[data.length - 2])) * 256 + uint16(uint8(data[data.length - 1]));
+    uint16 cborLength = uint16(uint8(data[data.length - 2])) *
+      256 +
+      uint16(uint8(data[data.length - 1]));
 
     // Ensure the length is valid (not greater than the data array length minus 2 bytes for the length field)
     require(cborLength <= data.length - 2, "Invalid CBOR length");
@@ -124,7 +126,7 @@ contract Utils is Test {
 
     // Copy data from the original byte array to the new one, excluding the CBOR section and its length field
     for (uint i = 0; i < newLength; i++) {
-        result[i] = data[i];
+      result[i] = data[i];
     }
 
     return result;

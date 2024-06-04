@@ -944,7 +944,7 @@ contract Migration is Script, UsingRegistry, Constants {
       (bool)
     );
     if (!skipTransferOwnership) {
-        // BlockchainParameters ownership transitioned to governance in a follow-up script.?
+      // BlockchainParameters ownership transitioned to governance in a follow-up script.?
       for (uint256 i = 0; i < contractsInRegistry.length; i++) {
         string memory contractToTransfer = contractsInRegistry[i];
         console.log("Transfering ownership of: ", contractToTransfer);
