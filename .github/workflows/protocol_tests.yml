@@ -96,6 +96,11 @@ jobs:
 
       - name: Run Everything just in case something was missed
         # can't use gas limit because some setUp function use more than the limit
+        # Excludes integration tests (`RegistryIntegrationTest`), and other tests that are
+        # excluded globally in `foundry.toml` like `RandomTest` and `BLS12_381Passthrough`.
+        # Unfortunately, when you specify a `--no-match-contract` flag, it overrides any global
+        # exclusions specified in `foundry.toml`. Therefore, somewhat annoyingly, the exclusions here
+        # have to cover all cases, namely the integration tests and the global exclusions.
         run: forge test -vvv --no-match-contract "RegistryIntegrationTest|RandomTest|BLS12_381Passthrough"
       
       - name: Generate migrations
