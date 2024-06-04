@@ -599,6 +599,7 @@ contract MintGoldScheduleTest_getMintableAmount is MintGoldScheduleTest {
     vm.expectRevert("Block reward calculation for years 15-30 unimplemented");
     mintGoldSchedule.getMintableAmount();
   }
+
   function test_Reverts_WhenDependenciesNotSet() public {
     mintGoldSchedule = new MintGoldSchedule(true);
 

@@ -245,11 +245,57 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     uint256 totalL2LinearSecondsAvailable = SECONDS_LINEAR - (l2StartTime - GENESIS_START_TIME);
     uint256 mintedOnL1 = totalSupplyAtL2Start - GENESIS_GOLD_SUPPLY;
 
+    bool isLinearDistribution = timeSinceL2Start < totalL2LinearSecondsAvailable;
+    if (isLinearDistribution) {
+      (
+        targetGoldTotalSupply,
+        communityTargetRewards,
+        carbonFundTargetRewards
+      ) = _calculateTargetReward(timeSinceL2Start, totalL2LinearSecondsAvailable, mintedOnL1);
+
+      return (targetGoldTotalSupply, communityTargetRewards, carbonFundTargetRewards);
+    } else {
+      (
+        targetGoldTotalSupply,
+        communityTargetRewards,
+        carbonFundTargetRewards
+      ) = _calculateTargetReward(
+        totalL2LinearSecondsAvailable - 1,
+        totalL2LinearSecondsAvailable,
+        mintedOnL1
+      );
+
+      bool hasNotYetMintedAllLinearRewards = totalMintedBySchedule +
+        GENESIS_GOLD_SUPPLY +
+        mintedOnL1 <
+        targetGoldTotalSupply;
+
+      if (hasNotYetMintedAllLinearRewards) {
+        return (targetGoldTotalSupply, communityTargetRewards, carbonFundTargetRewards);
+      }
+      revert("Block reward calculation for years 15-30 unimplemented");
+      return (0, 0, 0);
+    }
+  }
+
+  function _calculateTargetReward(
+    uint256 elapsedTime,
+    uint256 _totalL2LinearSecondsAvailable,
+    uint256 _mintedOnL1
+  )
+    internal
+    view
+    returns (
+      uint256 targetGoldTotalSupply,
+      uint256 communityTargetRewards,
+      uint256 carbonFundTargetRewards
+    )
+  {
     // Pay out half of all block rewards linearly.
-    uint256 l1LinearRewards = (GOLD_SUPPLY_CAP - GENESIS_GOLD_SUPPLY) / 2; //(200 million) includes validator rewards.
+    uint256 totalLinearRewards = (GOLD_SUPPLY_CAP - GENESIS_GOLD_SUPPLY) / 2; //(200 million) includes validator rewards.
 
     FixidityLib.Fraction memory l2LinearRewards = FixidityLib.newFixed(
-      l1LinearRewards - mintedOnL1
+      totalLinearRewards - _mintedOnL1
     );
 
     FixidityLib.Fraction memory linearRewardsToCommunity = l2LinearRewards.multiply(
@@ -260,54 +306,21 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       carbonOffsettingFraction
     );
 
-    bool isLinearDistribution = timeSinceL2Start < totalL2LinearSecondsAvailable;
+    communityTargetRewards = (
+      linearRewardsToCommunity.multiply(FixidityLib.wrap(elapsedTime)).divide(
+        FixidityLib.wrap(_totalL2LinearSecondsAvailable)
+      )
+    ).fromFixed();
 
-    if (isLinearDistribution) {
-      communityTargetRewards = (
-        linearRewardsToCommunity.multiply(FixidityLib.wrap(timeSinceL2Start)).divide(
-          FixidityLib.wrap(totalL2LinearSecondsAvailable)
-        )
-      ).fromFixed();
+    carbonFundTargetRewards = linearRewardsToCarbon
+      .multiply(FixidityLib.wrap(elapsedTime))
+      .divide(FixidityLib.wrap(_totalL2LinearSecondsAvailable))
+      .fromFixed();
 
-      carbonFundTargetRewards = linearRewardsToCarbon
-        .multiply(FixidityLib.wrap(timeSinceL2Start))
-        .divide(FixidityLib.wrap(totalL2LinearSecondsAvailable))
-        .fromFixed();
-
-      targetGoldTotalSupply =
-        communityTargetRewards +
-        carbonFundTargetRewards +
-        GENESIS_GOLD_SUPPLY +
-        mintedOnL1;
-
-      return (targetGoldTotalSupply, communityTargetRewards, carbonFundTargetRewards);
-    } else {
-      communityTargetRewards = linearRewardsToCommunity
-        .multiply(FixidityLib.wrap(totalL2LinearSecondsAvailable - 1))
-        .divide(FixidityLib.wrap(totalL2LinearSecondsAvailable))
-        .fromFixed();
-
-      carbonFundTargetRewards = linearRewardsToCarbon
-        .multiply((FixidityLib.wrap(totalL2LinearSecondsAvailable - 1)))
-        .divide(FixidityLib.wrap(totalL2LinearSecondsAvailable))
-        .fromFixed();
-
-      targetGoldTotalSupply =
-        communityTargetRewards +
-        (carbonFundTargetRewards) +
-        (GENESIS_GOLD_SUPPLY) +
-        (mintedOnL1);
-
-      bool hasNotYetMintedAllLinearRewards = totalMintedBySchedule +
-        GENESIS_GOLD_SUPPLY +
-        mintedOnL1 <
-        targetGoldTotalSupply;
-
-      if (hasNotYetMintedAllLinearRewards) {
-        return (targetGoldTotalSupply, communityTargetRewards, carbonFundTargetRewards);
-      }
-      require(false, "Block reward calculation for years 15-30 unimplemented");
-      return (0, 0, 0);
-    }
+    targetGoldTotalSupply =
+      communityTargetRewards +
+      carbonFundTargetRewards +
+      GENESIS_GOLD_SUPPLY +
+      _mintedOnL1;
   }
 }
