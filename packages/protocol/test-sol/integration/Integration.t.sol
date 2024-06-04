@@ -29,20 +29,21 @@ contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
   }
 
   function test_shouldHaveCorrectBytecode() public {
+    // Converting contract names to hashes for comparison
+    bytes32 hashContractName = keccak256(abi.encodePacked(contractName));
+    bytes32 hashAccount = keccak256(abi.encodePacked("Accounts"));
+    bytes32 hashElection = keccak256(abi.encodePacked("Election"));
+    bytes32 hashEscrow = keccak256(abi.encodePacked("Escrow"));
+    bytes32 hashFederatedAttestations = keccak256(abi.encodePacked("FederatedAttestations"));
+    bytes32 hashGovernance = keccak256(abi.encodePacked("Governance"));
+    bytes32 hashSortedOracles = keccak256(abi.encodePacked("SortedOracles"));
+    bytes32 hashValidators = keccak256(abi.encodePacked("Validators"));
+
     for (uint256 i = 0; i < contractsInRegistry.length; i++) {
       // Read name from list of core contracts
       string memory contractName = contractsInRegistry[i];
       console2.log("Checking bytecode of:", contractName);
 
-      // Converting contract names to hashes for comparison
-      bytes32 hashContractName = keccak256(abi.encodePacked(contractName));
-      bytes32 hashAccount = keccak256(abi.encodePacked("Accounts"));
-      bytes32 hashElection = keccak256(abi.encodePacked("Election"));
-      bytes32 hashEscrow = keccak256(abi.encodePacked("Escrow"));
-      bytes32 hashFederatedAttestations = keccak256(abi.encodePacked("FederatedAttestations"));
-      bytes32 hashGovernance = keccak256(abi.encodePacked("Governance"));
-      bytes32 hashSortedOracles = keccak256(abi.encodePacked("SortedOracles"));
-      bytes32 hashValidators = keccak256(abi.encodePacked("Validators"));
 
       // Skipping test for contracts that depend on linked libraries
       // This is a known limitation in Foundry at the moment:
