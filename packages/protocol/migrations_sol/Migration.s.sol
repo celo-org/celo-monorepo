@@ -47,7 +47,7 @@ import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 import "@celo-contracts-8/common/UsingRegistry.sol";
 
-import { Constants } from "@test-sol/constants.sol";
+import { Constants } from "@celo-migrations/constants.sol";
 
 contract ForceTx {
   // event to trigger so a tx can be processed
