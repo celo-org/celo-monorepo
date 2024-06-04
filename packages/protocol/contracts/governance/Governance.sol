@@ -699,10 +699,7 @@ contract Governance is
       if (
         _currentHotfix.executionTimeLimit > 0 && _currentHotfix.executionTimeLimit < _currentTime
       ) {
-        _currentHotfix.approved = false;
-        _currentHotfix.councilApproved = false;
-        _currentHotfix.executionTimeLimit = 0;
-        emit HotfixRecordReset(hash);
+        _resetHotFixRecord(hash);
         return;
       }
       _currentHotfix.executionTimeLimit = _currentTime.add(hotfixExecutionTimeWindow);
@@ -1319,6 +1316,7 @@ contract Governance is
    * @return Hotfix approved by approver.
    * @return Hotfix approved by SecurityCouncil.
    * @return Hotfix executed.
+   * @return Hotfix exection time limit.
    */
   function getL2HotfixRecord(bytes32 hash) public view onlyL2 returns (bool, bool, bool, uint256) {
     return (
@@ -1482,6 +1480,17 @@ contract Governance is
         voteRecord.noVotes = noVotes;
       }
     }
+  }
+
+  /**
+   * @notice Resets the hotfix record when after the execution time limit has elapsed.
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
+   */
+  function _resetHotFixRecord(bytes32 hash) internal hotfixNotExecuted(hash) {
+    hotfixes[hash].approved = false;
+    hotfixes[hash].councilApproved = false;
+    hotfixes[hash].executionTimeLimit = 0;
+    emit HotfixRecordReset(hash);
   }
 
   function _getConstitution(
