@@ -44,7 +44,6 @@ contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
       string memory contractName = contractsInRegistry[i];
       console2.log("Checking bytecode of:", contractName);
 
-
       // Skipping test for contracts that depend on linked libraries
       // This is a known limitation in Foundry at the moment:
       // Source: https://github.com/foundry-rs/foundry/issues/6120
@@ -66,16 +65,24 @@ contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
 
         // Get bytecode from deployed contract
         bytes memory actualBytecodeWithMetadataOnDevchain = getCodeAt(implementationAddress);
-        bytes memory actualBytecodeOnDevchain = removeMetadataFromBytecode(actualBytecodeWithMetadataOnDevchain);
+        bytes memory actualBytecodeOnDevchain = removeMetadataFromBytecode(
+          actualBytecodeWithMetadataOnDevchain
+        );
 
         // Get bytecode from build artifacts
         bytes memory expectedBytecodeFromArtifactsWithMetadata = vm.getDeployedCode(
           string(abi.encodePacked(contractName, ".sol"))
         );
-        bytes memory expectedBytecodeFromArtifacts = removeMetadataFromBytecode(expectedBytecodeFromArtifactsWithMetadata);
+        bytes memory expectedBytecodeFromArtifacts = removeMetadataFromBytecode(
+          expectedBytecodeFromArtifactsWithMetadata
+        );
 
         // Compare the bytecodes
-        assertEq(actualBytecodeOnDevchain, expectedBytecodeFromArtifacts, "Bytecode does not match");
+        assertEq(
+          actualBytecodeOnDevchain,
+          expectedBytecodeFromArtifacts,
+          "Bytecode does not match"
+        );
       }
     }
   }
