@@ -30,7 +30,6 @@ contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
 
   function test_shouldHaveCorrectBytecode() public {
     // Converting contract names to hashes for comparison
-    bytes32 hashContractName = keccak256(abi.encodePacked(contractName));
     bytes32 hashAccount = keccak256(abi.encodePacked("Accounts"));
     bytes32 hashElection = keccak256(abi.encodePacked("Election"));
     bytes32 hashEscrow = keccak256(abi.encodePacked("Escrow"));
@@ -47,6 +46,7 @@ contract RegistryIntegrationTest is IntegrationTest, Utils, Constants {
       // Skipping test for contracts that depend on linked libraries
       // This is a known limitation in Foundry at the moment:
       // Source: https://github.com/foundry-rs/foundry/issues/6120
+      bytes32 hashContractName = keccak256(abi.encodePacked(contractName));
       if (
         hashContractName != hashAccount &&
         hashContractName != hashElection &&
