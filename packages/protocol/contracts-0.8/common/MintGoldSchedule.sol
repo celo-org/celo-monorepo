@@ -2,6 +2,7 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 import "./UsingRegistry.sol";
 import "../common/IsL2Check.sol";
@@ -91,13 +92,12 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       uint256 carbonOffsettingPartnerMintAmount
     ) = getTargetGoldTotalSupply();
 
-    uint256 mintableAmount = targetGoldTotalSupply - getGoldToken().totalSupply();
+    uint256 mintableAmount = Math.min(
+      getRemainingBalanceToMint(),
+      targetGoldTotalSupply - getGoldToken().totalSupply()
+    );
 
     require(mintableAmount > 0, "Mintable amount must be greater than zero");
-    require(
-      getRemainingBalanceToMint() >= mintableAmount,
-      "Insufficient unlocked balance to mint amount"
-    );
     totalMintedBySchedule += mintableAmount;
 
     IGoldToken goldToken = IGoldToken(address(getGoldToken()));
@@ -276,9 +276,9 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
 
       targetGoldTotalSupply =
         communityTargetRewards +
-        (carbonFundTargetRewards) +
-        (GENESIS_GOLD_SUPPLY) +
-        (mintedOnL1);
+        carbonFundTargetRewards +
+        GENESIS_GOLD_SUPPLY +
+        mintedOnL1;
 
       return (targetGoldTotalSupply, communityTargetRewards, carbonFundTargetRewards);
     } else {
