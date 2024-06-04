@@ -224,6 +224,12 @@ contract Governance is
     _;
   }
 
+  modifier hotfixTimedOut(bytes32 hash) {
+    require(hotfixes[hash].executionTimeLimit > 0, "hotfix not prepared");
+    require(hotfixes[hash].executionTimeLimit < now, "hotfix execution time limit not reached");
+    _;
+  }
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -685,18 +691,12 @@ contract Governance is
       uint256 _currentTime = now;
       require(hotfixExecutionTimeWindow > 0, "Hotfix execution time window not set");
       require(
-        _currentHotfix.executionTimeLimit < _currentTime,
+        _currentHotfix.executionTimeLimit == 0,
         "Hotfix already prepared for this timeframe."
       );
       require(_currentHotfix.approved, "Hotfix not approved by approvers.");
       require(_currentHotfix.councilApproved, "Hotfix not approved by security council.");
 
-      if (
-        _currentHotfix.executionTimeLimit > 0 && _currentHotfix.executionTimeLimit < _currentTime
-      ) {
-        _resetHotFixRecord(hash);
-        return;
-      }
       _currentHotfix.executionTimeLimit = _currentTime.add(hotfixExecutionTimeWindow);
       emit HotfixPrepared(hash, _currentTime.add(hotfixExecutionTimeWindow));
     } else {
@@ -1260,6 +1260,17 @@ contract Governance is
   }
 
   /**
+   * @notice Resets the hotfix record when after the execution time limit has elapsed.
+   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
+   */
+  function resetHotFixRecord(bytes32 hash) public hotfixNotExecuted(hash) hotfixTimedOut(hash) {
+    hotfixes[hash].approved = false;
+    hotfixes[hash].councilApproved = false;
+    hotfixes[hash].executionTimeLimit = 0;
+    emit HotfixRecordReset(hash);
+  }
+
+  /**
    * @notice Returns number of validators from current set which have whitelisted the given hotfix.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
    * @return Whitelist tally
@@ -1475,17 +1486,6 @@ contract Governance is
         voteRecord.noVotes = noVotes;
       }
     }
-  }
-
-  /**
-   * @notice Resets the hotfix record when after the execution time limit has elapsed.
-   * @param hash The abi encoded keccak256 hash of the hotfix transaction.
-   */
-  function _resetHotFixRecord(bytes32 hash) internal hotfixNotExecuted(hash) {
-    hotfixes[hash].approved = false;
-    hotfixes[hash].councilApproved = false;
-    hotfixes[hash].executionTimeLimit = 0;
-    emit HotfixRecordReset(hash);
   }
 
   function _getConstitution(
