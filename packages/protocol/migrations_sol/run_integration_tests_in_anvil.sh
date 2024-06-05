@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-
-# generate devchain
+# Generate and run devchain
+echo "Generating and running devchain before running integration tests..."
 source $PWD/migrations_sol/create_and_migrate_anvil_devchain.sh
 
 # Run integration tests
-source $PWD/migrations_sol/integration_tests.sh
-
+echo "Running integration tests..."
+forge test \
+-vvv \
+--match-contract RegistryIntegrationTest \
+--fork-url http://127.0.0.1:$ANVIL_PORT
 
 # helper kill anvil
 # kill $(lsof -i tcp:$ANVIL_PORT | tail -n 1 | awk '{print $2}')
