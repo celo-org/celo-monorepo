@@ -41,6 +41,7 @@ import "@celo-contracts/identity/interfaces/IOdisPaymentsInitializer.sol";
 import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
+import "@celo-contracts-8/common/interfaces/IMintGoldScheduleInitializer.sol";
 
 import "./HelperInterFaces.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
@@ -117,7 +118,7 @@ contract Migration is Script, UsingRegistry, Constants {
       console.log("Can't add to registry because implementation not set");
       return;
     }
-    IRegistry registry = IRegistry(registryAddress);
+    registry = IRegistry(registryAddress);
     console.log(" Setting on the registry contract:", contractName);
     registry.setAddressFor(contractName, proxyAddress);
   }
@@ -233,6 +234,7 @@ contract Migration is Script, UsingRegistry, Constants {
     migrateUniswapFeeHandlerSeller();
     migrateFeeHandler(json);
     migrateOdisPayments();
+    migrateMintGoldSchedule();
     migrateGovernance(json);
 
     vm.stopBroadcast();
@@ -874,6 +876,13 @@ contract Migration is Script, UsingRegistry, Constants {
     deployProxiedContract(
       "OdisPayments",
       abi.encodeWithSelector(IOdisPaymentsInitializer.initialize.selector)
+    );
+  }
+
+  function migrateMintGoldSchedule() public {
+    deployProxiedContract(
+      "MintGoldSchedule",
+      abi.encodeWithSelector(IMintGoldScheduleInitializer.initialize.selector)
     );
   }
 

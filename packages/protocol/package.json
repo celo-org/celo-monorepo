@@ -49,7 +49,7 @@
     "ganache-devchain": "./scripts/bash/ganache_devchain.sh",
     "truffle:migrate": "truffle migrate",
     "devchain": "yarn ts-node scripts/devchain.ts",
-    "devchain:reset": "yarn devchain generate-tar .tmp/devchain.tar.gz --upto 28",
+    "devchain:reset": "yarn devchain generate-tar .tmp/devchain.tar.gz --upto 29",
     "view-tags": "git for-each-ref 'refs/tags/core-contracts.*' --sort=-committerdate --format='%(color:magenta)%(committerdate:short) %(color:blue)%(tree) %(color:green)github.com/celo-org/celo-monorepo/releases/tag/%(color:yellow)%(refname:short)'",
     "generate-stabletoken-files": "yarn ts-node ./scripts/generate-stabletoken-files.ts",
     "truffle-verify": "yarn truffle run verify"
