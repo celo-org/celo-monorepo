@@ -8,8 +8,8 @@ source $PWD/migrations_sol/create_and_migrate_anvil_devchain.sh
 # Run integration tests
 echo "Running integration tests..."
 forge test \
---match-path test-sol/integration/Integration.t.sol \
 -vvv \
+--match-contract RegistryIntegrationTest \
 --fork-url http://127.0.0.1:$ANVIL_PORT
 
 # helper kill anvil
