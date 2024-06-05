@@ -41,6 +41,7 @@ import "@celo-contracts/identity/interfaces/IOdisPaymentsInitializer.sol";
 import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
+import "@celo-contracts-8/common/interfaces/IMintGoldScheduleInitializer.sol";
 
 import "./HelperInterFaces.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
