@@ -4,6 +4,9 @@ pragma solidity >=0.8.7 <0.8.20;
 import "celo-foundry-8/Test.sol";
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/mocks/MockOracle.sol";
+import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
+
+import "@celo-contracts/common/interfaces/IRegistry.sol";
 
 contract FeeCurrencyDirectoryTestBase is Test {
   FeeCurrencyDirectory directory;
@@ -18,6 +21,41 @@ contract FeeCurrencyDirectoryTestBase is Test {
 
     directory = new FeeCurrencyDirectory(true);
     directory.initialize();
+  }
+}
+
+contract FeeCurrencyDirectoryE2ETestBase is Test {
+  FeeCurrencyDirectory directory;
+  ISortedOracles oracle;
+  address nonOwner;
+  address owner;
+
+  address constant registryAddress = address(0x000000000000000000000000000000000000ce10);
+  IRegistry registry = IRegistry(registryAddress);
+
+  function setUp() public virtual {
+    oracle = ISortedOracles(registry.getAddressForStringOrDie("SortedOracles"));
+    console2.log("SortedOracles address is:", address(oracle));
+
+    directory = FeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory"));
+    console2.log("FeeCurrencyDirectory address is:", address(directory));
+    
+    owner = directory.owner();
+    console2.log("FeeCurrencyDirectory owner is:", owner);
+  }
+}
+
+contract TestE2ESetCurrencyConfig is FeeCurrencyDirectoryE2ETestBase {
+  function test_ShouldAllowOwnerSetCurrencyConfig() public {
+    address token = address(1);
+    uint256 intrinsicGas = 21000;
+    vm.prank(owner);
+    directory.setCurrencyConfig(token, address(oracle), intrinsicGas);
+    IFeeCurrencyDirectory.CurrencyConfig memory config = directory.getCurrencyConfig(token);
+
+    // assertEq(directory.getCurrencies().length, 1);
+    assertEq(config.oracle, address(oracle));
+    assertEq(config.intrinsicGas, intrinsicGas);
   }
 }
 
