@@ -9,7 +9,7 @@ source $PWD/migrations_sol/create_and_migrate_anvil_devchain.sh
 echo "Running e2e tests..."
 forge test \
 -vvv \
---match-contract TestE2ESetCurrencyConfig \
+--match-path "*test-sol/e2e/*" \
 --fork-url http://127.0.0.1:$ANVIL_PORT
 
 # helper kill anvil
