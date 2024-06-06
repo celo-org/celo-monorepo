@@ -6,7 +6,7 @@ import { Devchain } from "@test-sol/e2e/utils.sol";
 
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 
-contract E2ETestSetCurrencyConfig is Test, Devchain {
+contract E2EDemo is Test, Devchain {
   function test_ShouldAllowOwnerSetCurrencyConfig() public {
     address token = address(1);
     uint256 intrinsicGas = 21000;
@@ -17,7 +17,6 @@ contract E2ETestSetCurrencyConfig is Test, Devchain {
       token
     );
 
-    // assertEq(feeCurrencyDirectory.getCurrencies().length, 1);
     assertEq(config.oracle, address(sortedOracles));
     assertEq(config.intrinsicGas, intrinsicGas);
   }
