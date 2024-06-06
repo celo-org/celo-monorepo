@@ -6,7 +6,7 @@
  * an environment.
  */
 
-import { ContractPackage, MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from "../contractPackages"
+import { ContractPackage, MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from "../contractPackages";
 
 export const celoRegistryAddress = '0x000000000000000000000000000000000000ce10'
 
@@ -35,6 +35,7 @@ export enum CeloContractName {
   GovernanceApproverMultiSig = 'GovernanceApproverMultiSig',
   GrandaMento = 'GrandaMento',
   LockedGold = 'LockedGold',
+  MintGoldSchedule = 'MintGoldSchedule',
   OdisPayments = 'OdisPayments',
   Random = 'Random',
   Reserve = 'Reserve',

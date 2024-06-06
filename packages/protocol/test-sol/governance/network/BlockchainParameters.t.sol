@@ -22,7 +22,7 @@ contract BlockchainParametersTest is Test, Constants, Utils {
 
   function setUp() public {
     nonOwner = actor("nonOwner");
-    ph.setEpochSize(EPOCH_SIZE);
+    ph.setEpochSize(DAY / 5);
     blockchainParameters = new BlockchainParameters(true);
   }
   function _whenL2() public {
@@ -36,7 +36,7 @@ contract BlockchainParametersTest_initialize is BlockchainParametersTest {
   function test_ShouldSetTheVariables() public {
     blockchainParameters.initialize(gasForNonGoldCurrencies, gasLimit, lookbackWindow);
     assertEq(blockchainParameters.blockGasLimit(), gasLimit);
-    blockTravel(EPOCH_SIZE);
+    blockTravel(ph.epochSize());
     assertEq(blockchainParameters.getUptimeLookbackWindow(), lookbackWindow);
   }
 
@@ -135,14 +135,14 @@ contract BlockchainParametersTest_setUptimeLookbackWindow is BlockchainParameter
 
   function test_ShouldSetTheValueForNextEpoch() public {
     blockchainParameters.setUptimeLookbackWindow(newValue);
-    blockTravel(EPOCH_SIZE);
+    blockTravel(ph.epochSize());
     assertEq(blockchainParameters.getUptimeLookbackWindow(), newValue);
   }
 
   function test_MultipleCallsWithinEpochOnlyAppliesLast() public {
     blockchainParameters.setUptimeLookbackWindow(newValue);
     blockchainParameters.setUptimeLookbackWindow(otherValue);
-    blockTravel(EPOCH_SIZE);
+    blockTravel(ph.epochSize());
     assertEq(blockchainParameters.getUptimeLookbackWindow(), otherValue);
   }
 
