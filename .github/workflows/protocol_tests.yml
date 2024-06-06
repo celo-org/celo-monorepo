@@ -63,28 +63,45 @@ jobs:
 
       - name: Run unit tests common
         # can't use gas limit because some setUp function use more than the limit
-        run: forge test -vvv --match-path "test-sol/unit/common/*" # --block-gas-limit 50000000
+        run: |
+          forge test -vvv \
+          --match-path "test-sol/unit/common/*"
 
       - name: Run unit tests governance/network
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/unit/governance/network/*"
+        run: |
+          forge test -vvv \
+          --match-path "test-sol/unit/governance/network/*" \
+          --block-gas-limit 50000000
 
       - name: Run unit tests governance/validators
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/unit/governance/validators/*"
+        run: | 
+          forge test -vvv \
+          --match-path "test-sol/unit/governance/validators/*" \
+          --block-gas-limit 50000000
 
       - name: Run unit tests governance/voting
         # can't use gas limit because some setUp function use more than the limit
         if: success() || failure()
-        run: forge test -vvv --match-path "test-sol/unit/governance/voting/*" --block-gas-limit 50000000
+        run: | 
+          forge test -vvv \
+          --match-path "test-sol/unit/governance/voting/*" \
+          --block-gas-limit 50000000
 
       - name: Run unit tests stability
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/unit/stability/*"
+        run: |
+          forge test -vvv \
+          --match-path "test-sol/unit/stability/*" \
+          --block-gas-limit 50000000
 
       - name: Run unit tests identity
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/unit/identity/*"
+        run: |
+          forge test -vvv \
+          --match-path "test-sol/unit/identity/*" \
+          --block-gas-limit 50000000
 
       - name: Fail if there are tests without folder
         if: success() || failure()
@@ -97,7 +114,9 @@ jobs:
       - name: Run Everything just in case something was missed
         # can't use gas limit because some setUp function use more than the limit
         # Excludes integration tests, because they require an anvil devchain running on the localhost.
-        run: forge test -vvv --no-match-contract RegistryIntegrationTest
+        run: |
+          forge test -vvv \
+          --no-match-contract RegistryIntegrationTest
       
       - name: Generate migrations and run devchain
         if: success() || failure()
