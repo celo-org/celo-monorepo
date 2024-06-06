@@ -20,16 +20,16 @@ contract Devchain is UsingRegistry {
 
   constructor() {
     // The following line is required by UsingRegistry.sol
-    setRegistry(registryAddress); 
-    
+    setRegistry(registryAddress);
+
     // Fetch all core contracts that are expeceted to be in the Registry on the devchain
     sortedOracles = getSortedOracles();
     feeCurrencyDirectory = FeeCurrencyDirectory(
       devchainRegistry.getAddressForStringOrDie("FeeCurrencyDirectory")
     ); // FeeCurrencyDirectory is not in UsingRegistry.sol
-    
+
     // TODO: Add missing core contracts below (see list in migrations_sol/constants.sol)
-    // TODO: Consider asserting that all contracts we expect are available in the Devchain class 
+    // TODO: Consider asserting that all contracts we expect are available in the Devchain class
     // (see list in migrations_sol/constants.sol)
   }
 }
