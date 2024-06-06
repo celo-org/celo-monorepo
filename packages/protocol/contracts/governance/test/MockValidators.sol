@@ -2,10 +2,12 @@ pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
+import "../../../contracts-0.8/common/IsL2Check.sol";
+
 /**
  * @title Holds a list of addresses of validators
  */
-contract MockValidators {
+contract MockValidators is IsL2Check {
   using SafeMath for uint256;
 
   uint256 private constant FIXED1_UINT = 1000000000000000000000000;
@@ -20,6 +22,7 @@ contract MockValidators {
   uint256 private numRegisteredValidators;
 
   function updateEcdsaPublicKey(address, address, bytes calldata) external returns (bool) {
+    allowOnlyL1();
     return true;
   }
 
@@ -30,6 +33,7 @@ contract MockValidators {
     bytes calldata,
     bytes calldata
   ) external returns (bool) {
+    allowOnlyL1();
     return true;
   }
 
@@ -42,6 +46,7 @@ contract MockValidators {
   }
 
   function affiliate(address group) external returns (bool) {
+    allowOnlyL1();
     affiliations[msg.sender] = group;
     return true;
   }
@@ -62,9 +67,13 @@ contract MockValidators {
     lockedGoldRequirements[account] = value;
   }
 
-  function halveSlashingMultiplier(address) external {}
+  function halveSlashingMultiplier(address) external {
+    allowOnlyL1();
+  }
 
-  function forceDeaffiliateIfValidator(address validator) external {}
+  function forceDeaffiliateIfValidator(address validator) external {
+    allowOnlyL1();
+  }
 
   function getTopGroupValidators(
     address group,
@@ -79,6 +88,7 @@ contract MockValidators {
   }
 
   function getValidatorGroupSlashingMultiplier(address) external view returns (uint256) {
+    allowOnlyL1();
     return FIXED1_UINT;
   }
 
@@ -107,6 +117,7 @@ contract MockValidators {
   }
 
   function groupMembershipInEpoch(address addr, uint256, uint256) external view returns (address) {
+    allowOnlyL1();
     return affiliations[addr];
   }
 

@@ -25,6 +25,7 @@ export const ProxyContracts = [
   'FederatedAttestationsProxy',
   'FeeHandlerProxy',
   'MentoFeeHandlerSellerProxy',
+  'FeeCurrencyDirectoryProxy',
   'FeeCurrencyWhitelistProxy',
   'GoldTokenProxy',
   'GovernanceApproverMultiSigProxy',
@@ -34,6 +35,7 @@ export const ProxyContracts = [
   'RegistryProxy',
   'SortedOraclesProxy',
   'UniswapFeeHandlerSellerProxy',
+  'MintGoldScheduleProxy',
 ]
 
 export const CoreContracts = [
@@ -43,11 +45,13 @@ export const CoreContracts = [
   'FeeHandler',
   'MentoFeeHandlerSeller',
   'UniswapFeeHandlerSeller',
+  'FeeCurrencyDirectory',
   'FeeCurrencyWhitelist',
   'GoldToken',
   'MultiSig',
   'Registry',
   'Freezer',
+  'MintGoldSchedule',
 
   // governance
   'Election',

@@ -3,6 +3,7 @@ pragma solidity >=0.8.7 <0.8.20;
 // Note: This script should not include any cheatcode so that it can run in production
 
 import { Script } from "forge-std-8/Script.sol";
+
 import "forge-std/console.sol";
 import "forge-std/StdJson.sol";
 
@@ -40,11 +41,14 @@ import "@celo-contracts/identity/interfaces/IOdisPaymentsInitializer.sol";
 import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
+import "@celo-contracts-8/common/interfaces/IMintGoldScheduleInitializer.sol";
 
 import "./HelperInterFaces.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 import "@celo-contracts-8/common/UsingRegistry.sol";
+
+import { Constants } from "@celo-migrations/constants.sol";
 
 contract ForceTx {
   // event to trigger so a tx can be processed
@@ -57,7 +61,7 @@ contract ForceTx {
   }
 }
 
-contract Migration is Script, UsingRegistry {
+contract Migration is Script, UsingRegistry, Constants {
   using stdJson for string;
 
   /**
@@ -114,7 +118,7 @@ contract Migration is Script, UsingRegistry {
       console.log("Can't add to registry because implementation not set");
       return;
     }
-    IRegistry registry = IRegistry(registryAddress);
+    registry = IRegistry(registryAddress);
     console.log(" Setting on the registry contract:", contractName);
     registry.setAddressFor(contractName, proxyAddress);
   }
@@ -230,6 +234,7 @@ contract Migration is Script, UsingRegistry {
     migrateUniswapFeeHandlerSeller();
     migrateFeeHandler(json);
     migrateOdisPayments();
+    migrateMintGoldSchedule();
     migrateGovernance(json);
 
     vm.stopBroadcast();
@@ -874,6 +879,13 @@ contract Migration is Script, UsingRegistry {
     );
   }
 
+  function migrateMintGoldSchedule() public {
+    deployProxiedContract(
+      "MintGoldSchedule",
+      abi.encodeWithSelector(IMintGoldScheduleInitializer.initialize.selector)
+    );
+  }
+
   function migrateGovernance(string memory json) public {
     bool useApprover = abi.decode(json.parseRaw(".governanceApproverMultiSig.required"), (bool));
 
@@ -941,38 +953,9 @@ contract Migration is Script, UsingRegistry {
       (bool)
     );
     if (!skipTransferOwnership) {
-      // TODO move this list somewhere else
-
-      string[23] memory fixedStringArray = [
-        "Accounts",
-        // 'Attestations',
-        // BlockchainParameters ownership transitioned to governance in a follow-up script.?
-        "BlockchainParameters",
-        "DoubleSigningSlasher",
-        "DowntimeSlasher",
-        "Election",
-        "EpochRewards",
-        "Escrow",
-        "FederatedAttestations",
-        "FeeCurrencyWhitelist",
-        "FeeCurrencyDirectory",
-        "Freezer",
-        "FeeHandler",
-        "GoldToken",
-        "Governance",
-        "GovernanceSlasher",
-        "LockedGold",
-        "OdisPayments",
-        "Random",
-        "Registry",
-        "SortedOracles",
-        "UniswapFeeHandlerSeller",
-        "MentoFeeHandlerSeller",
-        "Validators"
-      ];
-
-      for (uint256 i = 0; i < fixedStringArray.length; i++) {
-        string memory contractToTransfer = fixedStringArray[i];
+      // BlockchainParameters ownership transitioned to governance in a follow-up script.?
+      for (uint256 i = 0; i < contractsInRegistry.length; i++) {
+        string memory contractToTransfer = contractsInRegistry[i];
         console.log("Transfering ownership of: ", contractToTransfer);
         IProxy proxy = IProxy(registry.getAddressForStringOrDie(contractToTransfer));
         proxy._transferOwnership(governanceAddress);

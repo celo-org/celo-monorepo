@@ -42,7 +42,7 @@ fi
 
 echo "- Verify bytecode of the network"
 
-yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts --branch $BRANCH --librariesFile libraries.json
+yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts --build_artifacts08 $BUILD_DIR/contracts-0.8 --branch $BRANCH --librariesFile libraries.json
 
 echo "- Check versions of current branch"
 # From check-versions.sh

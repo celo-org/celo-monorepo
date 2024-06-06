@@ -14,12 +14,16 @@ remappings = [
     'forge-std-8/=lib/celo-foundry-8/lib/forge-std/src/',
     '@celo-contracts-8=contracts-0.8/',
     '@openzeppelin/contracts8/=lib/openzeppelin-contracts8/contracts/',
-    '@celo-contracts=contracts/'
+    '@celo-contracts/=contracts/',
+    '@celo-migrations/=migrations_sol/'
 ]
 
-no_match_contract = "RandomTest"
 no_match_test = "skip"
-no_match_path = "contracts/common/libraries/test/BLS12Passthrough.sol" # tested from celo-blockain repo
+
+# `BLS12Passthrough.sol` is excluded, because it's tested in the celo-blockain repo as 
+# described here: https://github.com/celo-org/celo-monorepo/pull/10240
+# `Random.sol` is excluded, but I'm not sure why. It was already excluded so I'm leaving it here.
+no_match_path = "*test/{BLS12Passthrough.sol,RandomTest.sol}"
 
 fs_permissions = [{ access = "read", path = "./out"}, { access = "read", path = "./migrations_sol/migrationsConfig.json"}, { access = "read", path = "./governanceConstitution.json"}]
 

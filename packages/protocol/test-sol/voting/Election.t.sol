@@ -106,6 +106,7 @@ contract ElectionTest is Utils, Constants {
   }
 
   function setUp() public {
+    ph.setEpochSize(DAY / 5);
     deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
 
     accounts = new Accounts(true);
@@ -185,7 +186,7 @@ contract ElectionTest_Initialize is ElectionTest {
   }
 }
 
-contract Election_SetElectabilityThreshold is ElectionTest {
+contract ElectionTest_SetElectabilityThreshold is ElectionTest {
   function test_shouldSetElectabilityThreshold() public {
     uint256 newElectabilityThreshold = FixidityLib.newFixedFraction(1, 200).unwrap();
     election.setElectabilityThreshold(newElectabilityThreshold);
@@ -204,7 +205,7 @@ contract Election_SetElectabilityThreshold is ElectionTest {
   }
 }
 
-contract Election_SetElectableValidators is ElectionTest {
+contract ElectionTest_SetElectableValidators is ElectionTest {
   function test_shouldSetElectableValidators() public {
     uint256 newElectableValidatorsMin = 2;
     uint256 newElectableValidatorsMax = 4;
@@ -252,7 +253,7 @@ contract Election_SetElectableValidators is ElectionTest {
   }
 }
 
-contract Election_SetMaxNumGroupsVotedFor is ElectionTest {
+contract ElectionTest_SetMaxNumGroupsVotedFor is ElectionTest {
   function test_shouldSetMaxNumGroupsVotedFor() public {
     uint256 newMaxNumGroupsVotedFor = 4;
     election.setMaxNumGroupsVotedFor(newMaxNumGroupsVotedFor);
@@ -285,7 +286,7 @@ contract Election_SetMaxNumGroupsVotedFor is ElectionTest {
   }
 }
 
-contract Election_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
+contract ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
   function test_shouldSetAllowedToVoteOverMaxNumberOfGroups() public {
     election.setAllowedToVoteOverMaxNumberOfGroups(true);
     assertEq(election.allowedToVoteOverMaxNumberOfGroups(address(this)), true);
@@ -330,7 +331,7 @@ contract Election_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
   }
 }
 
-contract Election_MarkGroupEligible is ElectionTest {
+contract ElectionTest_MarkGroupEligible is ElectionTest {
   function setUp() public {
     super.setUp();
 
@@ -373,7 +374,7 @@ contract Election_MarkGroupEligible is ElectionTest {
   }
 }
 
-contract Election_MarkGroupInEligible is ElectionTest {
+contract ElectionTest_MarkGroupInEligible is ElectionTest {
   function setUp() public {
     super.setUp();
 
@@ -408,7 +409,7 @@ contract Election_MarkGroupInEligible is ElectionTest {
     election.markGroupIneligible(address(this));
   }
 }
-contract Election_Vote_WhenGroupEligible is ElectionTest {
+contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -527,7 +528,7 @@ contract Election_Vote_WhenGroupEligible is ElectionTest {
 
   function WhenVotesAreBeingActivated() public returns (address newGroup) {
     newGroup = WhenVotedForMoreThanMaxNumberOfGroups();
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     election.activateForAccount(group, voter);
   }
 
@@ -604,7 +605,7 @@ contract Election_Vote_WhenGroupEligible is ElectionTest {
   }
 }
 
-contract Election_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes is ElectionTest {
+contract ElectionTest_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -759,7 +760,7 @@ contract Election_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes is ElectionTes
   }
 }
 
-contract Election_Vote_GroupNotEligible is ElectionTest {
+contract ElectionTest_Vote_GroupNotEligible is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -782,7 +783,7 @@ contract Election_Vote_GroupNotEligible is ElectionTest {
   }
 }
 
-contract Election_Activate is ElectionTest {
+contract ElectionTest_Activate is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -810,7 +811,7 @@ contract Election_Activate is ElectionTest {
 
   function WhenEpochBoundaryHasPassed() public {
     WhenVoterHasPendingVotes();
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     election.activate(group);
   }
 
@@ -852,7 +853,7 @@ contract Election_Activate is ElectionTest {
 
   function test_ShouldEmitValidatorGroupVoteActivatedEvent_WhenEpochBoundaryHasPassed() public {
     WhenVoterHasPendingVotes();
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     vm.expectEmit(true, true, true, false);
     emit ValidatorGroupVoteActivated(voter, group, value, value * 100000000000000000000);
     election.activate(group);
@@ -873,7 +874,7 @@ contract Election_Activate is ElectionTest {
     lockedGold.incrementNonvotingAccountBalance(voter2, value2);
     vm.prank(voter2);
     election.vote(group, value2, address(0), address(0));
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     vm.prank(voter2);
     election.activate(group);
   }
@@ -951,7 +952,7 @@ contract Election_Activate is ElectionTest {
   }
 }
 
-contract Election_ActivateForAccount is ElectionTest {
+contract ElectionTest_ActivateForAccount is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -979,7 +980,7 @@ contract Election_ActivateForAccount is ElectionTest {
 
   function WhenEpochBoundaryHasPassed() public {
     WhenVoterHasPendingVotes();
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     election.activateForAccount(group, voter);
   }
 
@@ -1021,7 +1022,7 @@ contract Election_ActivateForAccount is ElectionTest {
 
   function test_ShouldEmitValidatorGroupVoteActivatedEvent_WhenEpochBoundaryHasPassed() public {
     WhenVoterHasPendingVotes();
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     vm.expectEmit(true, true, true, false);
     emit ValidatorGroupVoteActivated(voter, group, value, value * 100000000000000000000);
     election.activate(group);
@@ -1035,7 +1036,7 @@ contract Election_ActivateForAccount is ElectionTest {
     lockedGold.incrementNonvotingAccountBalance(voter2, value2);
     vm.prank(voter2);
     election.vote(group, value2, address(0), address(0));
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     election.activateForAccount(group, voter2);
   }
 
@@ -1106,7 +1107,7 @@ contract Election_ActivateForAccount is ElectionTest {
   }
 }
 
-contract Election_RevokePending is ElectionTest {
+contract ElectionTest_RevokePending is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
@@ -1263,7 +1264,7 @@ contract Election_RevokePending is ElectionTest {
   }
 }
 
-contract Election_RevokeActive is ElectionTest {
+contract ElectionTest_RevokeActive is ElectionTest {
   address voter0 = address(this);
   address voter1 = account1;
   address group = account2;
@@ -1305,7 +1306,7 @@ contract Election_RevokeActive is ElectionTest {
     // Gives 1000 units to voter 0
     election.vote(group, voteValue0, address(0), address(0));
     assertConsistentSums();
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     election.activate(group);
     assertConsistentSums();
 
@@ -1317,7 +1318,7 @@ contract Election_RevokeActive is ElectionTest {
     vm.prank(voter1);
     election.vote(group, voteValue1, address(0), address(0));
     assertConsistentSums();
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     vm.prank(voter1);
     election.activate(group);
     assertConsistentSums();
@@ -1536,7 +1537,7 @@ contract Election_RevokeActive is ElectionTest {
   }
 }
 
-contract Election_ElectionValidatorSigners is ElectionTest {
+contract ElectionTest_ElectionValidatorSigners is ElectionTest {
   address group1 = address(this);
   address group2 = account1;
   address group3 = account2;
@@ -1792,7 +1793,7 @@ contract Election_ElectionValidatorSigners is ElectionTest {
   }
 }
 
-contract Election_GetGroupEpochRewards is ElectionTest {
+contract ElectionTest_GetGroupEpochRewards is ElectionTest {
   address voter = address(this);
   address group1 = account2;
   address group2 = account3;
@@ -1824,7 +1825,7 @@ contract Election_GetGroupEpochRewards is ElectionTest {
   }
 
   function WhenOneGroupHasActiveVotes() public {
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     election.activate(group1);
   }
 
@@ -1863,7 +1864,7 @@ contract Election_GetGroupEpochRewards is ElectionTest {
   }
 
   function WhenTwoGroupsHaveActiveVotes() public {
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     election.activate(group1);
     election.activate(group2);
   }
@@ -1909,7 +1910,7 @@ contract Election_GetGroupEpochRewards is ElectionTest {
   }
 }
 
-contract Election_DistributeEpochRewards is ElectionTest {
+contract ElectionTest_DistributeEpochRewards is ElectionTest {
   address voter = address(this);
   address voter2 = account4;
   address group = account2;
@@ -1936,7 +1937,7 @@ contract Election_DistributeEpochRewards is ElectionTest {
     lockedGold.incrementNonvotingAccountBalance(voter, voteValue);
     election.vote(group, voteValue, address(0), address(0));
 
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     election.activate(group);
   }
 
@@ -1996,7 +1997,7 @@ contract Election_DistributeEpochRewards is ElectionTest {
     // Split voter2's vote between the two groups.
     election.vote(group, voteValue2 / 2, group2, address(0));
     election.vote(group2, voteValue2 / 2, address(0), group);
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     election.activate(group);
     election.activate(group2);
     vm.stopPrank();
@@ -2076,7 +2077,7 @@ contract Election_DistributeEpochRewards is ElectionTest {
   }
 }
 
-contract Election_ForceDecrementVotes is ElectionTest {
+contract ElectionTest_ForceDecrementVotes is ElectionTest {
   address voter = address(this);
   address group = account2;
   address group2 = account7;
@@ -2140,7 +2141,7 @@ contract Election_ForceDecrementVotes is ElectionTest {
 
   function WhenAccountHasOnlyActiveVotes() public {
     WhenAccountHasVotedForOneGroup();
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     election.activate(group);
     vm.prank(account2);
 
@@ -2269,9 +2270,9 @@ contract Election_ForceDecrementVotes is ElectionTest {
     public
   {
     WhenAccountHasVotedForMoreThanOneGroupInequally();
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     election.activate(group);
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     election.activate(group2);
 
     election.vote(group2, value2 / 2, group, address(0));
@@ -2382,9 +2383,9 @@ contract Election_ForceDecrementVotes is ElectionTest {
     group1RemainingActiveVotes = value - slashedValue;
 
     election.vote(group, value / 2, group2, address(0));
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     election.activate(group);
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     election.activate(group2);
 
     (initialOrdering, ) = election.getTotalVotesForEligibleValidatorGroups();
@@ -2489,7 +2490,7 @@ contract Election_ForceDecrementVotes is ElectionTest {
   }
 }
 
-contract Election_ConsistencyChecks is ElectionTest {
+contract ElectionTest_ConsistencyChecks is ElectionTest {
   address voter = address(this);
   address group = account2;
   uint256 rewardValue2 = 10000000;
@@ -2662,7 +2663,7 @@ contract Election_ConsistencyChecks is ElectionTest {
         makeRandomAction(_accounts[j], j);
         checkVoterInvariants(_accounts[j], 0);
         checkGroupInvariants(0);
-        vm.roll((i + 1) * EPOCH_SIZE + (i + 1));
+        vm.roll((i + 1) * ph.epochSize() + (i + 1));
       }
     }
     revokeAllAndCheckInvariants(0);
@@ -2698,7 +2699,7 @@ contract Election_ConsistencyChecks is ElectionTest {
       }
 
       distributeEpochRewards(i);
-      vm.roll((i + 1) * EPOCH_SIZE + (i + 1));
+      vm.roll((i + 1) * ph.epochSize() + (i + 1));
 
       for (uint256 j = 0; j < _accounts.length; j++) {
         checkVoterInvariants(_accounts[j], 100);
@@ -2709,7 +2710,7 @@ contract Election_ConsistencyChecks is ElectionTest {
   }
 }
 
-contract Election_HasActivatablePendingVotes is ElectionTest {
+contract ElectionTest_HasActivatablePendingVotes is ElectionTest {
   function test_Revert_hasActivatablePendingVotes_WhenL2() public {
     _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
