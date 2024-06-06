@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
 import "@celo-contracts/identity/OdisPayments.sol";
-import { StableToken } from "../../lib/mento-core/contracts/StableToken.sol";
+import { StableToken } from "@mento-core/contracts/StableToken.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Freezer.sol";
 
