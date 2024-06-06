@@ -10,6 +10,7 @@ import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import "../../contracts/common/interfaces/IRegistry.sol";
 import "../../contracts/common/interfaces/IAccounts.sol";
 import "../../contracts/common/interfaces/IFreezer.sol";
+import "../../contracts/governance/interfaces/IGovernance.sol";
 import "../../contracts/governance/interfaces/ILockedGold.sol";
 import "../../contracts/governance/interfaces/IValidators.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
@@ -107,5 +108,8 @@ contract UsingRegistry is Ownable {
 
   function getElection() internal view returns (IElection) {
     return IElection(registry.getAddressForOrDie(ELECTION_REGISTRY_ID));
+  }
+  function getGovernance() internal view returns (IGovernance) {
+    return IGovernance(registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
   }
 }

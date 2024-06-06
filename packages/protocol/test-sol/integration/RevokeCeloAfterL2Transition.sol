@@ -122,6 +122,7 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
   uint256 validatorRegistrationEpochNumber;
 
   function setUp() public {
+    ph.setEpochSize(DAY / 5);
     owner = address(this);
     accApprover = actor("approver");
     group = actor("group");
@@ -381,7 +382,7 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
     _registerValidatorGroupWithMembers(group, 1);
 
     election.vote(group, active, address(0), address(0));
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     election.activate(group);
     election.vote(group, pending, address(0), address(0));
 
@@ -515,7 +516,7 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
 
     vm.startPrank(authorizedVoteSigner);
     election.vote(group, active, address(0), address(0));
-    blockTravel(EPOCH_SIZE + 1);
+    blockTravel(ph.epochSize() + 1);
     election.activate(group);
     election.vote(group, pending, address(0), address(0));
     vm.stopPrank();

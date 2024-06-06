@@ -43,6 +43,10 @@ jobs:
           path: ./out
           key: ${{ runner.os }}-foundry-out-${{ env.FOUNDRY_CACHE_KEY }}
 
+      - name: Display SHA
+        run: |
+          echo "SHA: ${{ github.sha }}"
+
       - name: Get Pull Request data
         id: get_pr_data
         uses: actions/github-script@v7
@@ -55,7 +59,7 @@ jobs:
                   repo: context.repo.repo,
                 })
               ).data[0];
-              return result ? { number: result.number } : {};
+              core.setOutput("number", result ? result.number : "");
 
       - name: Set PR Number
         id: set_pr_number
