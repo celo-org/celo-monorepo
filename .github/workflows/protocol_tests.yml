@@ -61,30 +61,30 @@ jobs:
       - name: Compile Contracts
         run: forge --version && forge compile
 
-      - name: Run tests common
+      - name: Run unit tests common
         # can't use gas limit because some setUp function use more than the limit
-        run: forge test -vvv --match-path "test-sol/common/*" # --block-gas-limit 50000000
+        run: forge test -vvv --match-path "test-sol/unit/common/*" # --block-gas-limit 50000000
 
-      - name: Run tests governance/network
+      - name: Run unit tests governance/network
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/governance/network/*"
+        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/unit/governance/network/*"
 
-      - name: Run tests governance/validators
+      - name: Run unit tests governance/validators
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/governance/validators/*"
+        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/unit/governance/validators/*"
 
-      - name: Run tests governance/voting
+      - name: Run unit tests governance/voting
         # can't use gas limit because some setUp function use more than the limit
         if: success() || failure()
-        run: forge test -vvv --match-path "test-sol/governance/voting/*" --block-gas-limit 50000000
+        run: forge test -vvv --match-path "test-sol/unit/governance/voting/*" --block-gas-limit 50000000
 
-      - name: Run tests stability
+      - name: Run unit tests stability
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/stability/*"
+        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/unit/stability/*"
 
-      - name: Run tests identity
+      - name: Run unit tests identity
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/identity/*"
+        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/unit/identity/*"
 
       - name: Fail if there are tests without folder
         if: success() || failure()
