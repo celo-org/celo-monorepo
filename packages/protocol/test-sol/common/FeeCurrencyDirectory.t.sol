@@ -6,7 +6,7 @@ import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/mocks/MockOracle.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 
-import "@celo-contracts/common/interfaces/IRegistry.sol";
+import { Devchain } from "@test-sol/e2e/utils.sol";
 
 contract FeeCurrencyDirectoryTestBase is Test {
   FeeCurrencyDirectory directory;
@@ -24,37 +24,19 @@ contract FeeCurrencyDirectoryTestBase is Test {
   }
 }
 
-contract FeeCurrencyDirectoryE2ETestBase is Test {
-  FeeCurrencyDirectory directory;
-  ISortedOracles oracle;
-  address nonOwner;
-  address owner;
-
-  address constant registryAddress = address(0x000000000000000000000000000000000000ce10);
-  IRegistry registry = IRegistry(registryAddress);
-
-  function setUp() public virtual {
-    oracle = ISortedOracles(registry.getAddressForStringOrDie("SortedOracles"));
-    console2.log("SortedOracles address is:", address(oracle));
-
-    directory = FeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory"));
-    console2.log("FeeCurrencyDirectory address is:", address(directory));
-    
-    owner = directory.owner();
-    console2.log("FeeCurrencyDirectory owner is:", owner);
-  }
-}
-
-contract TestE2ESetCurrencyConfig is FeeCurrencyDirectoryE2ETestBase {
+contract TestE2ESetCurrencyConfig is Test, Devchain {
   function test_ShouldAllowOwnerSetCurrencyConfig() public {
     address token = address(1);
     uint256 intrinsicGas = 21000;
-    vm.prank(owner);
-    directory.setCurrencyConfig(token, address(oracle), intrinsicGas);
-    IFeeCurrencyDirectory.CurrencyConfig memory config = directory.getCurrencyConfig(token);
 
-    // assertEq(directory.getCurrencies().length, 1);
-    assertEq(config.oracle, address(oracle));
+    vm.prank(feeCurrencyDirectory.owner());
+    feeCurrencyDirectory.setCurrencyConfig(token, address(sortedOracles), intrinsicGas);
+    FeeCurrencyDirectory.CurrencyConfig memory config = feeCurrencyDirectory.getCurrencyConfig(
+      token
+    );
+
+    // assertEq(feeCurrencyDirectory.getCurrencies().length, 1);
+    assertEq(config.oracle, address(sortedOracles));
     assertEq(config.intrinsicGas, intrinsicGas);
   }
 }
