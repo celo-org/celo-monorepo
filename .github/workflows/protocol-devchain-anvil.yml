@@ -64,6 +64,7 @@ jobs:
               console.log("owner", context.repo.owner);
               console.log("repo", context.repo.repo);
               console.log("result: ", result);
+              console.log("saving: ", JSON.stringify(result ? { number: result.number } : {}));
               return result ? { number: result.number } : {};
 
       - name: Set PR Number
