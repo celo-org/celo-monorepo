@@ -41,9 +41,7 @@ contract Devchain is Constants, UsingRegistry {
     sortedOracles = getSortedOracles(); // OPTION: UsingRegistry
 
     // Option 2.B: Calling contracts explicitly
-    sortedOracles = ISortedOracles(
-      devchainRegistry.getAddressForStringOrDie("SortedOracles")
-    );
+    sortedOracles = ISortedOracles(devchainRegistry.getAddressForStringOrDie("SortedOracles"));
     feeCurrencyDirectory = FeeCurrencyDirectory(
       devchainRegistry.getAddressForStringOrDie("FeeCurrencyDirectory")
     );
