@@ -6,7 +6,7 @@ import { Devchain } from "@test-sol/e2e/utils.sol";
 
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 
-contract TestSetCurrencyConfig is Test, Devchain {
+contract E2ETestSetCurrencyConfig is Test, Devchain {
   function test_ShouldAllowOwnerSetCurrencyConfig() public {
     address token = address(1);
     uint256 intrinsicGas = 21000;
