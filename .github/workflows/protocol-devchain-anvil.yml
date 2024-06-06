@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - master
-      - pahor/devchainFix
 
 env:
   # Increment these to force cache rebuilding
@@ -60,11 +59,6 @@ jobs:
                   repo: context.repo.repo,
                 })
               ).data[0];
-              console.log("sha: ", context.sha);
-              console.log("owner", context.repo.owner);
-              console.log("repo", context.repo.repo);
-              console.log("result: ", result);
-              console.log("saving: ", JSON.stringify(result ? { number: result.number } : {}));
               core.setOutput("number", result ? result.number : "");
 
       - name: Set PR Number
@@ -129,10 +123,10 @@ jobs:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
 
-      # - name: Publish @celo/devchain-anvil
-      #   run: |
-      #     cat package.json
-      #     npm publish --access public
-      #   working-directory: packages/protocol/.tmp
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
+      - name: Publish @celo/devchain-anvil
+        run: |
+          cat package.json
+          npm publish --access public
+        working-directory: packages/protocol/.tmp
+        env:
+          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
