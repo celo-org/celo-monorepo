@@ -55,11 +55,15 @@ jobs:
           script: |
               const result = (
                 await github.rest.repos.listPullRequestsAssociatedWithCommit({
-                  commit_sha: context.sha,
+                  commit_sha: github.sha,
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                 })
               ).data[0];
+              console.log("sha: ", github.sha);
+              console.log("owner", context.repo.owner);
+              console.log("repo", context.repo.repo);
+              console.log("result: ", result);
               return result ? { number: result.number } : {};
 
       - name: Set PR Number
