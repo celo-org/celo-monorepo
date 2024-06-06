@@ -15,7 +15,7 @@ import "@celo-contracts/governance/LockedGold.sol";
 import "@celo-contracts/stability/test/MockStableToken.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "./mocks/ValidatorsMockTunnel.sol";
+import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 
 import "@celo-contracts/governance/test/ValidatorsMock.sol";
 import "@test-sol/constants.sol";
