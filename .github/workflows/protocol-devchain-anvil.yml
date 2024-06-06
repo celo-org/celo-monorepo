@@ -55,12 +55,12 @@ jobs:
           script: |
               const result = (
                 await github.rest.repos.listPullRequestsAssociatedWithCommit({
-                  commit_sha: github.sha,
+                  commit_sha: context.sha,
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                 })
               ).data[0];
-              console.log("sha: ", github.sha);
+              console.log("sha: ", context.sha);
               console.log("owner", context.repo.owner);
               console.log("repo", context.repo.repo);
               console.log("result: ", result);
