@@ -23,8 +23,8 @@ import "@test-sol/constants.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
 import { Utils } from "@test-sol/utils.sol";
 import { Test as ForgeTest } from "forge-std/Test.sol";
-import "../governance/validators/mocks/ValidatorsMockTunnel.sol";
-import "../governance/voting/mocks/ReleaseGoldMockTunnel.sol";
+import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
+import "@test-sol/unit/governance/voting/mocks/ReleaseGoldMockTunnel.sol";
 
 contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
   using FixidityLib for FixidityLib.Fraction;
