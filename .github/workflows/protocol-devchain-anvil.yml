@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - pahor/devchainFix
 
 env:
   # Increment these to force cache rebuilding
