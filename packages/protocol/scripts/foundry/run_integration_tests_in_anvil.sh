@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Generate and run devchain
 echo "Generating and running devchain before running integration tests..."
-source $PWD/migrations_sol/create_and_migrate_anvil_devchain.sh
+source $PWD/scripts/foundry/create_and_migrate_anvil_devchain.sh
 
 # Run integration tests
 echo "Running integration tests..."

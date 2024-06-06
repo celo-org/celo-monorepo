@@ -87,7 +87,7 @@ jobs:
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
 
       - name: Generate migrations
-        run: ./migrations_sol/run_integration_tests_in_anvil.sh
+        run: ./scripts/foundry/run_integration_tests_in_anvil.sh
 
       - name: Sanitize ref name
         id: sanitize-ref-name

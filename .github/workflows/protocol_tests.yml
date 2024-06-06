@@ -120,7 +120,7 @@ jobs:
       
       - name: Generate migrations and run devchain
         if: success() || failure()
-        run: ./migrations_sol/create_and_migrate_anvil_devchain.sh
+        run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
       
       - name: Run integration tests against devchain
         if: success() || failure()

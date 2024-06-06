@@ -22,10 +22,10 @@ fi
 mkdir -p $TEMP_FOLDER
 
 # Start a local anvil instance
-source $PWD/migrations_sol/start_anvil.sh
+source $PWD/scripts/foundry/start_anvil.sh
 
 # Deploy libraries to the anvil instance
-source $PWD/migrations_sol/deploy_libraries.sh
+source $PWD/scripts/foundry/deploy_libraries.sh
 echo "Library flags are: $LIBRARY_FLAGS"
 
 # Build all contracts with deployed libraries
@@ -35,7 +35,7 @@ echo "Compiling with libraries... "
 time forge build $LIBRARY_FLAGS
 
 # Deploy precompile contracts
-source $PWD/migrations_sol/deploy_precompiles.sh
+source $PWD/scripts/foundry/deploy_precompiles.sh
 
 echo "Setting Registry Proxy"
 REGISTRY_ADDRESS="0x000000000000000000000000000000000000ce10"
