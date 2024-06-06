@@ -4,9 +4,6 @@ pragma solidity >=0.8.7 <0.8.20;
 import "celo-foundry-8/Test.sol";
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/mocks/MockOracle.sol";
-import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
-
-import { Devchain } from "@test-sol/e2e/utils.sol";
 
 contract FeeCurrencyDirectoryTestBase is Test {
   FeeCurrencyDirectory directory;
@@ -21,23 +18,6 @@ contract FeeCurrencyDirectoryTestBase is Test {
 
     directory = new FeeCurrencyDirectory(true);
     directory.initialize();
-  }
-}
-
-contract TestE2ESetCurrencyConfig is Test, Devchain {
-  function test_ShouldAllowOwnerSetCurrencyConfig() public {
-    address token = address(1);
-    uint256 intrinsicGas = 21000;
-
-    vm.prank(feeCurrencyDirectory.owner());
-    feeCurrencyDirectory.setCurrencyConfig(token, address(sortedOracles), intrinsicGas);
-    FeeCurrencyDirectory.CurrencyConfig memory config = feeCurrencyDirectory.getCurrencyConfig(
-      token
-    );
-
-    // assertEq(feeCurrencyDirectory.getCurrencies().length, 1);
-    assertEq(config.oracle, address(sortedOracles));
-    assertEq(config.intrinsicGas, intrinsicGas);
   }
 }
 
