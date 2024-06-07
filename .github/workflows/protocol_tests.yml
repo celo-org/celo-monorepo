@@ -111,25 +111,26 @@ jobs:
             exit 1
           fi
 
-      - name: Run everything just in case something was missed (excl. integration and e2e tests)
+      - name: Run all unit tests in case some were missed (excl. integration and e2e tests)
         # can't use gas limit because some setUp function use more than the limit
-        # Excludes integration tests, because they require an anvil devchain running on the localhost.
+        # Excludes e2e and integration tests, because they require a connection to an anvil devchain
+        # serving at localhost.
         run: |
           forge test -vvv \
-          --no-match-contract "RegistryIntegrationTest|E2EDemo"
+          --match-path "test-sol/unit/*"
       
       - name: Generate migrations and run devchain
         if: success() || failure()
         run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
       
-      - name: Run integration tests against devchain
+      - name: Run integration tests against local anvil devchain
         if: success() || failure()
         run: |
           forge test -vvv \
           --match-path "test-sol/integration/*" \
           --fork-url http://127.0.0.1:$ANVIL_PORT
       
-      - name: Run e2e tests against devchain
+      - name: Run e2e tests against local anvil devchain
         if: success() || failure()
         run: |
           forge test -vvv \
