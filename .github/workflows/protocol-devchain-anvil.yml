@@ -7,6 +7,7 @@ on:
 env:
   # Increment these to force cache rebuilding
   FOUNDRY_CACHE_KEY: 1
+  ANVIL_PORT: 8546
 
 jobs:
   build:
@@ -95,7 +96,7 @@ jobs:
         run: |
           forge test -vvv \
           --match-path "test-sol/integration/*" \
-          --fork-url http://127.0.0.1:$ANVIL_PORT
+          --fork-url http://127.0.0.1:${{ env.ANVIL_PORT }}
 
       - name: Sanitize ref name
         id: sanitize-ref-name
