@@ -15,7 +15,6 @@ import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
 
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
@@ -28,8 +27,7 @@ contract Validators is
   Initializable,
   UsingRegistry,
   UsingPrecompiles,
-  CalledByVm,
-  IsL2Check
+  CalledByVm
 {
   using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;
