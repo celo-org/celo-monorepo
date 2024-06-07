@@ -43,6 +43,9 @@ import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
 import "@celo-contracts-8/common/interfaces/IMintGoldScheduleInitializer.sol";
 
+// TODO(Arthur): refactor to use @mento-core remapping. Waiting to merge PR from `master` that has this.
+import "../../lib/mento-core/contracts/ReserveSpenderMultiSig.sol";
+
 import "./HelperInterFaces.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 
@@ -212,6 +215,7 @@ contract Migration is Script, UsingRegistry, Constants {
     migrateGoldToken(json);
     migrateSortedOracles(json);
     migrateGasPriceMinimum(json);
+    migrateReserveSpenderMultiSig(json);
     migrateReserve(json);
     migrateStableToken(json);
     migrateExchange(json);
@@ -330,8 +334,6 @@ contract Migration is Script, UsingRegistry, Constants {
   }
 
   function migrateReserve(string memory json) public {
-    // Reserve spend multisig not migrated
-
     uint256 tobinTaxStalenessThreshold = abi.decode(
       json.parseRaw(".reserve.tobinTaxStalenessThreshold"),
       (uint256)
@@ -374,9 +376,14 @@ contract Migration is Script, UsingRegistry, Constants {
     // TODO this should be a transfer from the deployer rather than a deal
     vm.deal(reserveProxyAddress, initialBalance);
 
-    address reserveSpenderMultiSig = deployerAccount;
-    IReserve(reserveProxyAddress).addSpender(reserveSpenderMultiSig);
-    console.log("reserveSpenderMultiSig set to:", reserveSpenderMultiSig);
+    // Reserve spend multisig not migrated
+    bool useSpender = abi.decode(json.parseRaw(".reserveSpenderMultiSig.required"), (bool));
+    address spender = useSpender
+      ? registry.getAddressForString("ReserveSpenderMultiSig")
+      : deployerAccount;
+
+    IReserve(reserveProxyAddress).addSpender(spender);
+    console.log("reserveSpenderMultiSig set to:", spender);
   }
 
   function deployStable(
@@ -782,6 +789,30 @@ contract Migration is Script, UsingRegistry, Constants {
     );
 
     getLockedGold().addSlasher("DowntimeSlasher");
+  }
+
+  // TODO(Arthur): Move this up to line 337-ish where `migrateReserve()` is defined.
+  function migrateReserveSpenderMultiSig(string memory json) public {
+    address[] memory owners = new address[](1);
+    owners[0] = deployerAccount;
+
+    uint256 required = abi.decode(json.parseRaw(".reserveSpenderMultiSig.required"), (uint256));
+    uint256 internalRequired = abi.decode(
+      json.parseRaw(".reserveSpenderMultiSig.internalRequired"),
+      (uint256)
+    );
+
+    // This adds the multisig to the registry, which is not a case in mainnet but it's useful to keep a reference
+    // of the deployed contract
+    deployProxiedContract(
+      "ReserveSpenderMultiSig",
+      abi.encodeWithSelector(
+        ReserveSpenderMultiSig.initialize.selector,
+        owners,
+        required,
+        internalRequired
+      )
+    );
   }
 
   function migrateGovernanceApproverMultiSig(string memory json) public {
