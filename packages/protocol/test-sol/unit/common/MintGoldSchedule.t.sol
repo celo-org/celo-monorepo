@@ -11,7 +11,7 @@ import "@celo-contracts-8/common/MintGoldSchedule.sol";
 import "@celo-contracts-8/common/IsL2Check.sol";
 import { Constants } from "@test-sol/constants.sol";
 
-import "../governance/mock/MockGovernance.sol";
+import "@test-sol/unit/governance/mock/MockGovernance.sol";
 
 contract MintGoldScheduleTest is Test, Constants, IsL2Check {
   using FixidityLib for FixidityLib.Fraction;
