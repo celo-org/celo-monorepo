@@ -11,8 +11,8 @@ import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
 import "@celo-contracts/identity/test/MockRandom.sol";
 import "@celo-contracts/common/Freezer.sol";
-import { Constants } from "../constants.sol";
-import "../utils.sol";
+import { Constants } from "../../constants.sol";
+import "../../utils.sol";
 
 contract ElectionMock is Election(true) {
   function distributeEpochRewards(
