@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - 'release/**'
 
 env:
   # Increment these to force cache rebuilding
