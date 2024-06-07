@@ -16,7 +16,8 @@ remappings = [
     'celo-foundry-8/=lib/celo-foundry-8/src/',
     '@celo-contracts/=contracts/',
     '@celo-contracts-8=contracts-0.8/',
-    '@celo-migrations/=migrations_sol/'
+    '@celo-migrations/=migrations_sol/',
+    '@test-sol/=test-sol/'
 ]
 
 no_match_test = "skip"

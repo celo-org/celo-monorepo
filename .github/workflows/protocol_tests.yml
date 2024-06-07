@@ -111,12 +111,12 @@ jobs:
             exit 1
           fi
 
-      - name: Run Everything just in case something was missed
+      - name: Run everything just in case something was missed (excl. integration and e2e tests)
         # can't use gas limit because some setUp function use more than the limit
         # Excludes integration tests, because they require an anvil devchain running on the localhost.
         run: |
           forge test -vvv \
-          --no-match-contract RegistryIntegrationTest
+          --no-match-contract "RegistryIntegrationTest|E2EDemo"
       
       - name: Generate migrations and run devchain
         if: success() || failure()
