@@ -86,8 +86,16 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
 
-      - name: Generate migrations
-        run: ./scripts/foundry/run_integration_tests_in_anvil.sh
+      - name: Generate migrations and run devchain
+        if: success() || failure()
+        run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
+      
+      - name: Run integration tests against local anvil devchain
+        if: success() || failure()
+        run: |
+          forge test -vvv \
+          --match-path "test-sol/integration/*" \
+          --fork-url http://127.0.0.1:$ANVIL_PORT
 
       - name: Sanitize ref name
         id: sanitize-ref-name
