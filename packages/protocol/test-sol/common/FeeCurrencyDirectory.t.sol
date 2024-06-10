@@ -2,8 +2,8 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
-import "../../contracts-0.8/common/FeeCurrencyDirectory.sol";
-import "../../contracts-0.8/common/mocks/MockOracle.sol";
+import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
+import "@celo-contracts-8/common/mocks/MockOracle.sol";
 
 contract FeeCurrencyDirectoryTestBase is Test {
   FeeCurrencyDirectory directory;
