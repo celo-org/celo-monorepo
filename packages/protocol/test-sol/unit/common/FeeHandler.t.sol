@@ -4,10 +4,10 @@ pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
 import "@celo-contracts/common/FeeHandler.sol";
-import "../constants.sol";
+import { Constants } from "@test-sol/constants.sol";
 
-import { Exchange } from "../../lib/mento-core/contracts/Exchange.sol";
-import { StableToken } from "../../lib/mento-core/contracts/StableToken.sol";
+import { Exchange } from "@mento-core/contracts/Exchange.sol";
+import { StableToken } from "@mento-core/contracts/StableToken.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Freezer.sol";
 import "@celo-contracts/common/GoldToken.sol";
@@ -17,8 +17,8 @@ import "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
 import "@celo-contracts/uniswap/test/MockUniswapV2Router02.sol";
 import "@celo-contracts/uniswap/test/MockUniswapV2Factory.sol";
 import "@celo-contracts/uniswap/test/MockERC20.sol";
-import "../../lib/mento-core/test/mocks/MockSortedOracles.sol";
-import "../../lib/mento-core/test/mocks/MockReserve.sol";
+import "@mento-core/test/mocks/MockSortedOracles.sol";
+import "@mento-core/test/mocks/MockReserve.sol";
 
 contract FeeHandlerTest is Test, Constants {
   using FixidityLib for FixidityLib.Fraction;

@@ -7,7 +7,7 @@ import { CommonBase } from "forge-std-8/Base.sol";
 import { StdCheats } from "forge-std-8/StdCheats.sol";
 import { StdUtils } from "forge-std-8/StdUtils.sol";
 
-import "@test-sol/governance/validators/IntegerSortedLinkedListMock-8.sol";
+import "@test-sol/unit/governance/validators/IntegerSortedLinkedListMock-8.sol";
 
 contract IntegerSortedLinkedListTest8 is Test {
   IntegerSortedLinkedListMock public integerSortedLinkedListMock;

@@ -8,8 +8,8 @@ import { Test, console2 as console } from "celo-foundry/Test.sol";
 import { SortedLinkedListWithMedian } from "contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
 import { FixidityLib } from "contracts/common/FixidityLib.sol";
 
-import { IBreakerBox } from "../../contracts/stability/interfaces/IBreakerBox.sol";
-import { SortedOracles } from "../../contracts/stability/SortedOracles.sol";
+import { IBreakerBox } from "@celo-contracts/stability/interfaces/IBreakerBox.sol";
+import { SortedOracles } from "@celo-contracts/stability/SortedOracles.sol";
 
 contract MockBreakerBox is IBreakerBox {
   uint256 public tradingMode;

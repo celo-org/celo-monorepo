@@ -7,7 +7,7 @@ import "celo-foundry/Test.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
-import "@test-sol/common/GoldTokenMock.sol";
+import "@test-sol/unit/common/GoldTokenMock.sol";
 import "@celo-contracts/governance/LockedGold.sol";
 import "@celo-contracts/governance/ReleaseGold.sol";
 import "@celo-contracts/governance/Election.sol";

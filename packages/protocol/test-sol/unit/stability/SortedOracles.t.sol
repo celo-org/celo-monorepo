@@ -3,11 +3,11 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import { Test } from "celo-foundry/Test.sol";
-import { SortedOracles } from "../../contracts/stability/SortedOracles.sol";
+import { SortedOracles } from "@celo-contracts/stability/SortedOracles.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "@celo-contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
-import { Constants } from "../constants.sol";
+import { Constants } from "@test-sol/constants.sol";
 import "forge-std/console.sol";
 
 contract SortedOraclesTest is Test, Constants {

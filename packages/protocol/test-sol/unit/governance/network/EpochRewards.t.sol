@@ -11,7 +11,7 @@ import { Reserve } from "@lib/mento-core/contracts/Reserve.sol";
 
 import { MockSortedOracles } from "@celo-contracts/stability/test/MockSortedOracles.sol";
 import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.sol";
-import { GoldTokenMock } from "@test-sol/common/GoldTokenMock.sol";
+import { GoldTokenMock } from "@test-sol/unit/common/GoldTokenMock.sol";
 
 import { Constants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";

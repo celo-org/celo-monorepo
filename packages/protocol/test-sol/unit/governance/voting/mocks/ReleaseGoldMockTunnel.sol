@@ -2,7 +2,7 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "../../../../contracts/governance/ReleaseGold.sol";
+import "@celo-contracts/governance/ReleaseGold.sol";
 import { Test as ForgeTest } from "forge-std/Test.sol";
 
 contract ReleaseGoldMockTunnel is ForgeTest {

@@ -134,6 +134,10 @@
     "internalRequired": 1,
     "governanceApproverMultiSig": true
   },
+  "reserveSpenderMultiSig": {
+    "required": 1,
+    "internalRequired": 1
+  },
   "feeHandler": {
     "beneficiary": "0x2A486910DBC72cACcbb8d0e1439C96b03B2A4699",
     "burnFraction": 800000000000000000000000
