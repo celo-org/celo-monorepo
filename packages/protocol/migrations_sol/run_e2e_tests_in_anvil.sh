@@ -12,10 +12,6 @@ forge test \
 --match-path "*test-sol/e2e/*" \
 --fork-url http://127.0.0.1:$ANVIL_PORT
 
-# helper kill anvil
-# kill $(lsof -i tcp:$ANVIL_PORT | tail -n 1 | awk '{print $2}')
-
-echo "Killing Anvil"
-if [[ -n $ANVIL_PID ]]; then
-    kill $ANVIL_PID
-fi
+# Stop devchain
+echo "Stopping devchain..."
+source $PWD/scripts/foundry/stop_anvil.sh
