@@ -58,8 +58,8 @@ interface IReserveSpenderMultiSig {
     @param _internalRequired Number of required confirmations for internal transactions. 
   */
   function initialize(
-      address[] calldata _owners,
-      uint256 _required,
-      uint256 _internalRequired
+    address[] calldata _owners,
+    uint256 _required,
+    uint256 _internalRequired
   ) external;
 }

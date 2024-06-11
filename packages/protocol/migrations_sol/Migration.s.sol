@@ -43,7 +43,6 @@ import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
 import "@celo-contracts-8/common/interfaces/IMintGoldScheduleInitializer.sol";
 
-
 import "@celo-migrations/HelperInterFaces.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 
@@ -342,7 +341,7 @@ contract Migration is Script, UsingRegistry, Constants {
     );
 
     // Deploys and adds the ReserveSpenderMultiSig to the Registry for ease of reference.
-    // The ReserveSpenderMultiSig is not in the Registry on Mainnet, but it's useful to keep a 
+    // The ReserveSpenderMultiSig is not in the Registry on Mainnet, but it's useful to keep a
     // reference of the deployed contract, so it's in the Registry on the devchain.
     deployProxiedContract(
       "ReserveSpenderMultiSig",
