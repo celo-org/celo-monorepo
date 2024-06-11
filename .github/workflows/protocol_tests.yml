@@ -87,8 +87,7 @@ jobs:
         if: success() || failure()
         run: | 
           forge test -vvv \
-          --match-path "test-sol/unit/governance/voting/*" \
-          --block-gas-limit 50000000
+          --match-path "test-sol/unit/governance/voting/*"
 
       - name: Run unit tests stability
         if: success() || failure()
