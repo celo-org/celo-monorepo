@@ -30,32 +30,6 @@ contract ElectionTest is Utils, Constants {
 
   address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
-  event ElectableValidatorsSet(uint256 min, uint256 max);
-  event MaxNumGroupsVotedForSet(uint256 maxNumGroupsVotedFor);
-  event ElectabilityThresholdSet(uint256 electabilityThreshold);
-  event AllowedToVoteOverMaxNumberOfGroups(address indexed account, bool flag);
-  event ValidatorGroupMarkedEligible(address indexed group);
-  event ValidatorGroupMarkedIneligible(address indexed group);
-  event ValidatorGroupVoteCast(address indexed account, address indexed group, uint256 value);
-  event ValidatorGroupVoteActivated(
-    address indexed account,
-    address indexed group,
-    uint256 value,
-    uint256 units
-  );
-  event ValidatorGroupPendingVoteRevoked(
-    address indexed account,
-    address indexed group,
-    uint256 value
-  );
-  event ValidatorGroupActiveVoteRevoked(
-    address indexed account,
-    address indexed group,
-    uint256 value,
-    uint256 units
-  );
-  event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
-
   Accounts accounts;
   ElectionMock election;
   Freezer freezer;
@@ -84,6 +58,32 @@ contract ElectionTest is Utils, Constants {
   address account10 = actor("account10");
 
   address[] accountsArray;
+
+  event ElectableValidatorsSet(uint256 min, uint256 max);
+  event MaxNumGroupsVotedForSet(uint256 maxNumGroupsVotedFor);
+  event ElectabilityThresholdSet(uint256 electabilityThreshold);
+  event AllowedToVoteOverMaxNumberOfGroups(address indexed account, bool flag);
+  event ValidatorGroupMarkedEligible(address indexed group);
+  event ValidatorGroupMarkedIneligible(address indexed group);
+  event ValidatorGroupVoteCast(address indexed account, address indexed group, uint256 value);
+  event ValidatorGroupVoteActivated(
+    address indexed account,
+    address indexed group,
+    uint256 value,
+    uint256 units
+  );
+  event ValidatorGroupPendingVoteRevoked(
+    address indexed account,
+    address indexed group,
+    uint256 value
+  );
+  event ValidatorGroupActiveVoteRevoked(
+    address indexed account,
+    address indexed group,
+    uint256 value,
+    uint256 units
+  );
+  event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
 
   function createAccount(address account) public {
     vm.prank(account);
@@ -1111,6 +1111,9 @@ contract ElectionTest_Activate is ElectionTest {
   address group = account1;
   uint256 value = 1000;
 
+  address voter2 = account2;
+  uint256 value2 = 573;
+
   function setUp() public {
     super.setUp();
 
@@ -1181,9 +1184,6 @@ contract ElectionTest_Activate is ElectionTest {
     emit ValidatorGroupVoteActivated(voter, group, value, value * 100000000000000000000);
     election.activate(group);
   }
-
-  address voter2 = account2;
-  uint256 value2 = 573;
 
   function WhenAnotherVoterActivatesVotes() public {
     WhenEpochBoundaryHasPassed();
@@ -1267,6 +1267,9 @@ contract ElectionTest_Activate_L2 is ElectionTest {
   address group = account1;
   uint256 value = 1000;
 
+  address voter2 = account2;
+  uint256 value2 = 573;
+
   function setUp() public {
     super.setUp();
     _whenL2();
@@ -1337,9 +1340,6 @@ contract ElectionTest_Activate_L2 is ElectionTest {
     emit ValidatorGroupVoteActivated(voter, group, value, value * 100000000000000000000);
     election.activate(group);
   }
-
-  address voter2 = account2;
-  uint256 value2 = 573;
 
   function WhenAnotherVoterActivatesVotes() public {
     WhenEpochBoundaryHasPassed();
@@ -1423,6 +1423,9 @@ contract ElectionTest_ActivateForAccount is ElectionTest {
   address group = account1;
   uint256 value = 1000;
 
+  address voter2 = account2;
+  uint256 value2 = 573;
+
   function setUp() public {
     super.setUp();
 
@@ -1493,9 +1496,6 @@ contract ElectionTest_ActivateForAccount is ElectionTest {
     emit ValidatorGroupVoteActivated(voter, group, value, value * 100000000000000000000);
     election.activate(group);
   }
-
-  address voter2 = account2;
-  uint256 value2 = 573;
 
   function WhenAnotherVoterActivatesVotes() public {
     WhenEpochBoundaryHasPassed();
@@ -1578,6 +1578,9 @@ contract ElectionTest_ActivateForAccount_L2 is ElectionTest {
   address group = account1;
   uint256 value = 1000;
 
+  address voter2 = account2;
+  uint256 value2 = 573;
+
   function setUp() public {
     super.setUp();
     _whenL2();
@@ -1648,9 +1651,6 @@ contract ElectionTest_ActivateForAccount_L2 is ElectionTest {
     emit ValidatorGroupVoteActivated(voter, group, value, value * 100000000000000000000);
     election.activate(group);
   }
-
-  address voter2 = account2;
-  uint256 value2 = 573;
 
   function WhenAnotherVoterActivatesVotes() public {
     WhenEpochBoundaryHasPassed();
@@ -2159,6 +2159,11 @@ contract ElectionTest_RevokeActive is ElectionTest {
 }
 
 contract ElectionTest_ElectionValidatorSigners is ElectionTest {
+  struct MemberWithVotes {
+    address member;
+    uint256 votes;
+  }
+
   address group1 = address(this);
   address group2 = account1;
   address group3 = account2;
@@ -2192,11 +2197,6 @@ contract ElectionTest_ElectionValidatorSigners is ElectionTest {
 
   uint256 totalLockedGold = voter1Weight + voter2Weight + voter3Weight;
 
-  struct MemberWithVotes {
-    address member;
-    uint256 votes;
-  }
-
   mapping(address => uint256) votesConsideredForElection;
 
   MemberWithVotes[] membersWithVotes;
@@ -2217,37 +2217,6 @@ contract ElectionTest_ElectionValidatorSigners is ElectionTest {
 
   function setRandomness() public {
     random.addTestRandomness(block.number + 1, hash);
-  }
-
-  // Helper function to sort an array of uint256
-  function sort(uint256[] memory data) internal pure returns (uint256[] memory) {
-    uint256 length = data.length;
-    for (uint256 i = 0; i < length; i++) {
-      for (uint256 j = i + 1; j < length; j++) {
-        if (data[i] > data[j]) {
-          uint256 temp = data[i];
-          data[i] = data[j];
-          data[j] = temp;
-        }
-      }
-    }
-    return data;
-  }
-
-  function sortMembersWithVotesDesc(
-    MemberWithVotes[] memory data
-  ) internal pure returns (MemberWithVotes[] memory) {
-    uint256 length = data.length;
-    for (uint256 i = 0; i < length; i++) {
-      for (uint256 j = i + 1; j < length; j++) {
-        if (data[i].votes < data[j].votes) {
-          MemberWithVotes memory temp = data[i];
-          data[i] = data[j];
-          data[j] = temp;
-        }
-      }
-    }
-    return data;
   }
 
   function WhenThereIsALargeNumberOfGroups() public {
@@ -2412,6 +2381,37 @@ contract ElectionTest_ElectionValidatorSigners is ElectionTest {
     vm.expectRevert("Not enough elected validators");
     election.electValidatorSigners();
   }
+
+  // Helper function to sort an array of uint256
+  function sort(uint256[] memory data) internal pure returns (uint256[] memory) {
+    uint256 length = data.length;
+    for (uint256 i = 0; i < length; i++) {
+      for (uint256 j = i + 1; j < length; j++) {
+        if (data[i] > data[j]) {
+          uint256 temp = data[i];
+          data[i] = data[j];
+          data[j] = temp;
+        }
+      }
+    }
+    return data;
+  }
+
+  function sortMembersWithVotesDesc(
+    MemberWithVotes[] memory data
+  ) internal pure returns (MemberWithVotes[] memory) {
+    uint256 length = data.length;
+    for (uint256 i = 0; i < length; i++) {
+      for (uint256 j = i + 1; j < length; j++) {
+        if (data[i].votes < data[j].votes) {
+          MemberWithVotes memory temp = data[i];
+          data[i] = data[j];
+          data[j] = temp;
+        }
+      }
+    }
+    return data;
+  }
 }
 
 contract ElectionTest_GetGroupEpochRewards is ElectionTest {
@@ -2421,6 +2421,12 @@ contract ElectionTest_GetGroupEpochRewards is ElectionTest {
   uint256 voteValue1 = 2000000000;
   uint256 voteValue2 = 1000000000;
   uint256 totalRewardValue = 3000000000;
+
+  uint256 expectedGroup1EpochRewards =
+    FixidityLib
+      .newFixedFraction(voteValue1, voteValue1 + voteValue2)
+      .multiply(FixidityLib.newFixed(totalRewardValue))
+      .fromFixed();
 
   function setUp() public {
     super.setUp();
@@ -2501,12 +2507,6 @@ contract ElectionTest_GetGroupEpochRewards is ElectionTest {
     assertEq(election.getGroupEpochRewards(group2, totalRewardValue, uptimes), 0);
   }
 
-  uint256 expectedGroup1EpochRewards =
-    FixidityLib
-      .newFixedFraction(voteValue1, voteValue1 + voteValue2)
-      .multiply(FixidityLib.newFixed(totalRewardValue))
-      .fromFixed();
-
   function test_ShouldReturnProportionalRewardValueForOtherGroup_WhenOneGroupDoesNotMeetLockedGoldRequirements_WhenTwoGroupsHaveActiveVotes()
     public
   {
@@ -2540,6 +2540,13 @@ contract ElectionTest_DistributeEpochRewards is ElectionTest {
   uint256 voteValue2 = 1000000;
   uint256 rewardValue = 1000000;
   uint256 rewardValue2 = 10000000;
+
+  uint256 expectedGroupTotalActiveVotes = voteValue + voteValue2 / 2 + rewardValue;
+  uint256 expectedVoterActiveVotesForGroup =
+    FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes * 2, 3).fromFixed();
+  uint256 expectedVoter2ActiveVotesForGroup =
+    FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes, 3).fromFixed();
+  uint256 expectedVoter2ActiveVotesForGroup2 = voteValue / 2 + rewardValue2;
 
   function setUp() public {
     super.setUp();
@@ -2597,13 +2604,6 @@ contract ElectionTest_DistributeEpochRewards is ElectionTest {
     election.distributeEpochRewards(group, rewardValue, address(0), address(0));
     assertEq(election.getTotalVotes(), voteValue + rewardValue);
   }
-
-  uint256 expectedGroupTotalActiveVotes = voteValue + voteValue2 / 2 + rewardValue;
-  uint256 expectedVoterActiveVotesForGroup =
-    FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes * 2, 3).fromFixed();
-  uint256 expectedVoter2ActiveVotesForGroup =
-    FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes, 3).fromFixed();
-  uint256 expectedVoter2ActiveVotesForGroup2 = voteValue / 2 + rewardValue2;
 
   function WhenThereAreTwoGroupsWithActiveVotes() public {
     registry.setAddressFor("Validators", address(this));
@@ -2707,6 +2707,15 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
   uint256 index = 0;
   uint256 slashedValue = value;
   uint256 remaining = value - slashedValue;
+
+  uint256 totalRemaining;
+  uint256 group1Remaining;
+  uint256 group2TotalRemaining;
+  uint256 group2PendingRemaining;
+  uint256 group2ActiveRemaining;
+
+  uint256 group1RemainingActiveVotes;
+  address[] initialOrdering;
 
   function setUp() public {
     super.setUp();
@@ -2952,12 +2961,6 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
     assertEq(election.getActiveVotesForGroupByAccount(group, voter), remaining);
   }
 
-  uint256 totalRemaining;
-  uint256 group1Remaining;
-  uint256 group2TotalRemaining;
-  uint256 group2PendingRemaining;
-  uint256 group2ActiveRemaining;
-
   function WhenWeSlashAllOfGroup1VotesAndSomeOfGroup2__WhenWeSlash1MoreVoteThanGroup1PendingVoteTotal_WhenAccountHasVotedForMoreThanOneGroupInequally()
     public
   {
@@ -2993,9 +2996,6 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
     assertEq(election.getPendingVotesForGroupByAccount(group2, voter), group2PendingRemaining);
     assertEq(election.getActiveVotesForGroupByAccount(group2, voter), group2ActiveRemaining);
   }
-
-  uint256 group1RemainingActiveVotes;
-  address[] initialOrdering;
 
   function WhenSlashAffectsElectionOrder() public {
     WhenAccountHasVotedForMoreThanOneGroupInequally();
@@ -3112,12 +3112,6 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
 }
 
 contract ElectionTest_ConsistencyChecks is ElectionTest {
-  address voter = address(this);
-  address group = account2;
-  uint256 rewardValue2 = 10000000;
-
-  AccountStruct[] _accounts;
-
   struct AccountStruct {
     address account;
     uint256 active;
@@ -3131,6 +3125,12 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
     RevokePending,
     RevokeActive
   }
+
+  address voter = address(this);
+  address group = account2;
+  uint256 rewardValue2 = 10000000;
+
+  AccountStruct[] _accounts;
 
   function setUp() public {
     super.setUp();
@@ -3157,52 +3157,6 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
         )
       );
     }
-  }
-
-  function makeRandomAction(AccountStruct storage account, uint256 salt) internal {
-    VoteActionType[] memory actions = new VoteActionType[](4);
-    uint256 actionCount = 0;
-
-    if (account.nonVoting > 0) {
-      actions[actionCount++] = VoteActionType.Vote;
-    }
-    if (election.hasActivatablePendingVotes(account.account, group)) {
-      // Assuming this is a view function
-      actions[actionCount++] = VoteActionType.Activate;
-    }
-    if (account.pending > 0) {
-      actions[actionCount++] = VoteActionType.RevokePending;
-    }
-    if (account.active > 0) {
-      actions[actionCount++] = VoteActionType.RevokeActive;
-    }
-
-    VoteActionType action = actions[generatePRN(0, actionCount - 1, uint256(account.account))];
-    uint256 value;
-
-    vm.startPrank(account.account);
-    if (action == VoteActionType.Vote) {
-      value = generatePRN(0, account.nonVoting, uint256(account.account) + salt);
-      election.vote(group, value, address(0), address(0));
-      account.nonVoting -= value;
-      account.pending += value;
-    } else if (action == VoteActionType.Activate) {
-      value = account.pending;
-      election.activate(group);
-      account.pending -= value;
-      account.active += value;
-    } else if (action == VoteActionType.RevokePending) {
-      value = generatePRN(0, account.pending, uint256(account.account) + salt);
-      election.revokePending(group, value, address(0), address(0), 0);
-      account.pending -= value;
-      account.nonVoting += value;
-    } else if (action == VoteActionType.RevokeActive) {
-      value = generatePRN(0, account.active, uint256(account.account) + salt);
-      election.revokeActive(group, value, address(0), address(0), 0);
-      account.active -= value;
-      account.nonVoting += value;
-    }
-    vm.stopPrank();
   }
 
   function checkVoterInvariants(AccountStruct memory account, uint256 delta) public {
@@ -3328,6 +3282,52 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
       }
     }
     revokeAllAndCheckInvariants(100);
+  }
+
+  function makeRandomAction(AccountStruct storage account, uint256 salt) internal {
+    VoteActionType[] memory actions = new VoteActionType[](4);
+    uint256 actionCount = 0;
+
+    if (account.nonVoting > 0) {
+      actions[actionCount++] = VoteActionType.Vote;
+    }
+    if (election.hasActivatablePendingVotes(account.account, group)) {
+      // Assuming this is a view function
+      actions[actionCount++] = VoteActionType.Activate;
+    }
+    if (account.pending > 0) {
+      actions[actionCount++] = VoteActionType.RevokePending;
+    }
+    if (account.active > 0) {
+      actions[actionCount++] = VoteActionType.RevokeActive;
+    }
+
+    VoteActionType action = actions[generatePRN(0, actionCount - 1, uint256(account.account))];
+    uint256 value;
+
+    vm.startPrank(account.account);
+    if (action == VoteActionType.Vote) {
+      value = generatePRN(0, account.nonVoting, uint256(account.account) + salt);
+      election.vote(group, value, address(0), address(0));
+      account.nonVoting -= value;
+      account.pending += value;
+    } else if (action == VoteActionType.Activate) {
+      value = account.pending;
+      election.activate(group);
+      account.pending -= value;
+      account.active += value;
+    } else if (action == VoteActionType.RevokePending) {
+      value = generatePRN(0, account.pending, uint256(account.account) + salt);
+      election.revokePending(group, value, address(0), address(0), 0);
+      account.pending -= value;
+      account.nonVoting += value;
+    } else if (action == VoteActionType.RevokeActive) {
+      value = generatePRN(0, account.active, uint256(account.account) + salt);
+      election.revokeActive(group, value, address(0), address(0), 0);
+      account.active -= value;
+      account.nonVoting += value;
+    }
+    vm.stopPrank();
   }
 }
 
