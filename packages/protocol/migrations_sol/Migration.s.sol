@@ -331,6 +331,31 @@ contract Migration is Script, UsingRegistry, Constants {
     );
   }
 
+  function migrateReserveSpenderMultiSig(string memory json) public {
+    address[] memory owners = new address[](1);
+    owners[0] = deployerAccount;
+
+    uint256 required = abi.decode(json.parseRaw(".reserveSpenderMultiSig.required"), (uint256));
+    uint256 internalRequired = abi.decode(
+      json.parseRaw(".reserveSpenderMultiSig.internalRequired"),
+      (uint256)
+    );
+
+    // Deploys and adds the ReserveSpenderMultiSig to the Registry for ease of reference.
+    // The ReserveSpenderMultiSig is not in the Registry on Mainnet, but 
+    // it's useful to keep a reference of the deployed contract, so it's in the Registry
+    // in the devchain.
+    deployProxiedContract(
+      "ReserveSpenderMultiSig",
+      abi.encodeWithSelector(
+        IReserveSpenderMultiSig.initialize.selector,
+        owners,
+        required,
+        internalRequired
+      )
+    );
+  }
+
   function migrateReserve(string memory json) public {
     uint256 tobinTaxStalenessThreshold = abi.decode(
       json.parseRaw(".reserve.tobinTaxStalenessThreshold"),
@@ -787,30 +812,6 @@ contract Migration is Script, UsingRegistry, Constants {
     );
 
     getLockedGold().addSlasher("DowntimeSlasher");
-  }
-
-  // TODO(Arthur): Move this up to line 337-ish where `migrateReserve()` is defined.
-  function migrateReserveSpenderMultiSig(string memory json) public {
-    address[] memory owners = new address[](1);
-    owners[0] = deployerAccount;
-
-    uint256 required = abi.decode(json.parseRaw(".reserveSpenderMultiSig.required"), (uint256));
-    uint256 internalRequired = abi.decode(
-      json.parseRaw(".reserveSpenderMultiSig.internalRequired"),
-      (uint256)
-    );
-
-    // This adds the multisig to the registry, which is not a case in mainnet but it's useful to keep a reference
-    // of the deployed contract
-    deployProxiedContract(
-      "ReserveSpenderMultiSig",
-      abi.encodeWithSelector(
-        IReserveSpenderMultiSig.initialize.selector,
-        owners,
-        required,
-        internalRequired
-      )
-    );
   }
 
   function migrateGovernanceApproverMultiSig(string memory json) public {
