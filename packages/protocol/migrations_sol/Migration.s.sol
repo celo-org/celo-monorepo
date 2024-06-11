@@ -374,7 +374,7 @@ contract Migration is Script, UsingRegistry, Constants {
     // TODO this should be a transfer from the deployer rather than a deal
     vm.deal(reserveProxyAddress, initialBalance);
 
-    // Reserve spend multisig not migrated
+    // Adds ReserveSpenderMultiSig to Reserve
     bool useSpender = abi.decode(json.parseRaw(".reserveSpenderMultiSig.required"), (bool));
     address spender = useSpender
       ? registry.getAddressForString("ReserveSpenderMultiSig")
