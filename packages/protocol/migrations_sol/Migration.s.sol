@@ -342,9 +342,8 @@ contract Migration is Script, UsingRegistry, Constants {
     );
 
     // Deploys and adds the ReserveSpenderMultiSig to the Registry for ease of reference.
-    // The ReserveSpenderMultiSig is not in the Registry on Mainnet, but 
-    // it's useful to keep a reference of the deployed contract, so it's in the Registry
-    // in the devchain.
+    // The ReserveSpenderMultiSig is not in the Registry on Mainnet, but it's useful to keep a 
+    // reference of the deployed contract, so it's in the Registry on the devchain.
     deployProxiedContract(
       "ReserveSpenderMultiSig",
       abi.encodeWithSelector(
