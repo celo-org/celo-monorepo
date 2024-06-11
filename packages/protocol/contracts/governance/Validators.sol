@@ -764,14 +764,10 @@ contract Validators is
    * @param account The group to fetch slashing multiplier for.
    */
   function getValidatorGroupSlashingMultiplier(address account) external view returns (uint256) {
+    allowOnlyL1();
     require(isValidatorGroup(account), "Not a validator group");
-
-    if (isL2()) {
-      return 1;
-    } else {
-      ValidatorGroup storage group = groups[account];
-      return group.slashInfo.multiplier.unwrap();
-    }
+    ValidatorGroup storage group = groups[account];
+    return group.slashInfo.multiplier.unwrap();
   }
 
   /**
