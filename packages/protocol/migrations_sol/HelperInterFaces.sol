@@ -49,3 +49,17 @@ interface IExchangeInitializer {
 interface IExchange {
   function activateStable() external;
 }
+
+interface IReserveSpenderMultiSig {
+  /**
+    @dev Contract constructor sets initial owners and required number of confirmations.
+    @param _owners List of initial owners.
+    @param _required Number of required confirmations for external transactions.
+    @param _internalRequired Number of required confirmations for internal transactions. 
+  */
+  function initialize(
+      address[] calldata _owners,
+      uint256 _required,
+      uint256 _internalRequired
+  ) external;
+}
