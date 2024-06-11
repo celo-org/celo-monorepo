@@ -43,10 +43,8 @@ import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
 import "@celo-contracts-8/common/interfaces/IMintGoldScheduleInitializer.sol";
 
-// TODO(Arthur): refactor to use @mento-core remapping. Waiting to merge PR from `master` that has this.
-import "../../lib/mento-core/contracts/ReserveSpenderMultiSig.sol";
 
-import "./HelperInterFaces.sol";
+import "@celo-migrations/HelperInterFaces.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 import "@celo-contracts-8/common/UsingRegistry.sol";
@@ -383,7 +381,7 @@ contract Migration is Script, UsingRegistry, Constants {
       : deployerAccount;
 
     IReserve(reserveProxyAddress).addSpender(spender);
-    console.log("reserveSpenderMultiSig set to:", spender);
+    console.log("reserveSpenderMultiSig added as Reserve spender");
   }
 
   function deployStable(
@@ -807,7 +805,7 @@ contract Migration is Script, UsingRegistry, Constants {
     deployProxiedContract(
       "ReserveSpenderMultiSig",
       abi.encodeWithSelector(
-        ReserveSpenderMultiSig.initialize.selector,
+        IReserveSpenderMultiSig.initialize.selector,
         owners,
         required,
         internalRequired

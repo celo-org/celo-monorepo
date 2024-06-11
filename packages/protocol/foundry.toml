@@ -16,7 +16,8 @@ remappings = [
     '@openzeppelin/contracts8/=lib/openzeppelin-contracts8/contracts/',
     '@celo-contracts/=contracts/',
     '@celo-migrations/=migrations_sol/',
-    '@test-sol/=test-sol/'
+    '@test-sol/=test-sol/',
+    '@mento-core/=lib/mento-core/'
 ]
 
 no_match_test = "skip"
