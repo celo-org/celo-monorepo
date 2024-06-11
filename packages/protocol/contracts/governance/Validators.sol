@@ -619,7 +619,7 @@ contract Validators is
     group.slashInfo.multiplier = FixidityLib.fixed1();
   }
 
-// XXX: rewards and Slashing not supported on L2
+  // XXX: rewards and Slashing not supported on L2
   /**
    * @notice Halves the group's slashing multiplier.
    * @param account The group being slashed.
@@ -1067,6 +1067,7 @@ contract Validators is
    * @return Fixidity representation of the epoch score between 0 and 1.
    */
   function calculateEpochScore(uint256 uptime) public view returns (uint256) {
+    allowOnlyL1();
     require(uptime <= FixidityLib.fixed1().unwrap(), "Uptime cannot be larger than one");
     uint256 numerator;
     uint256 denominator;

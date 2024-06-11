@@ -539,7 +539,7 @@ contract Election is
     address group,
     uint256 totalEpochRewards,
     uint256[] calldata uptimes
-  ) external view returns (uint256) {
+  ) external view onlyL1 returns (uint256) {
     IValidators validators = getValidators();
     // The group must meet the balance requirements for their voters to receive epoch rewards.
     if (!validators.meetsAccountLockedGoldRequirements(group) || votes.active.total <= 0) {
