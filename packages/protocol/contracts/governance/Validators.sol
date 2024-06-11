@@ -205,6 +205,8 @@ contract Validators is
     setDowntimeGracePeriod(_downtimeGracePeriod);
   }
 
+  // XXX: Unchanged, deals with rewards distribution.
+  // XXX(soloseng): should this set uptime to 1 by default on L2?
   /**
    * @notice Updates a validator's score based on its uptime for the epoch.
    * @param signer The validator signer of the validator account whose score needs updating.
@@ -216,6 +218,7 @@ contract Validators is
     _updateValidatorScoreFromSigner(signer, uptime);
   }
 
+  // XXX: Unchanged, deals with rewards distribution.
   /**
    * @notice Distributes epoch payments to the account associated with `signer` and its group.
    * @param signer The validator signer of the account to distribute the epoch payment to.
@@ -231,6 +234,7 @@ contract Validators is
     return _distributeEpochPaymentsFromSigner(signer, maxPayment);
   }
 
+  // XXX: Unchanged, new registrations require PoP.
   /**
    * @notice Registers a validator unaffiliated with any validator group.
    * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus, should
@@ -303,6 +307,7 @@ contract Validators is
     return true;
   }
 
+  // XXX: Unchanged, deals with Validator/group registration.
   /**
    * @notice Affiliates a validator with a group, allowing it to be added as a member.
    * @param group The validator group with which to affiliate.
@@ -339,6 +344,7 @@ contract Validators is
     return true;
   }
 
+  // XXX: Unchanged, new registrations require PoP.
   /**
    * @notice Updates a validator's BLS key.
    * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
@@ -362,6 +368,7 @@ contract Validators is
     return true;
   }
 
+  // XXX: Unchanged, used only during registration.
   /**
    * @notice Updates a validator's ECDSA key.
    * @param account The address under which the validator is registered.
@@ -410,6 +417,7 @@ contract Validators is
     return true;
   }
 
+  // XXX: Unchanged, require PoP precompile.
   /**
    * @notice Updates a validator's ECDSA and BLS keys.
    * @param account The address under which the validator is registered.
@@ -442,6 +450,7 @@ contract Validators is
     return true;
   }
 
+  // XXX: Unchanged, deals with Validator/group registration.
   /**
    * @notice Registers a validator group with no member validators.
    * @param commission Fixidity representation of the commission this group receives on epoch
@@ -468,6 +477,7 @@ contract Validators is
     return true;
   }
 
+  // XXX: Unchanged, deals with Validator/group registration.
   /**
    * @notice Adds a member to the end of a validator group's list of members.
    * @param validator The validator to add to the group
@@ -482,6 +492,7 @@ contract Validators is
     return _addMember(account, validator, address(0), address(0));
   }
 
+  // XXX: Unchanged, deals with Validator/group registration.
   /**
    * @notice Adds the first member to a group's list of members and marks it eligible for election.
    * @param validator The validator to add to the group
@@ -529,7 +540,6 @@ contract Validators is
     address lesserMember,
     address greaterMember
   ) external nonReentrant returns (bool) {
-    allowOnlyL1();
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account), "Not a group");
     require(isValidator(validator), "Not a validator");
@@ -540,6 +550,7 @@ contract Validators is
     return true;
   }
 
+  //XXX unchanged as rewards are not implemented.
   /**
    * @notice Queues an update to a validator group's commission.
    * If there was a previously scheduled update, that is overwritten.
@@ -558,6 +569,8 @@ contract Validators is
     group.nextCommissionBlock = block.number.add(commissionUpdateDelay);
     emit ValidatorGroupCommissionUpdateQueued(account, commission, group.nextCommissionBlock);
   }
+
+  //XXX unchanged as rewards are not implemented.
   /**
    * @notice Updates a validator group's commission based on the previously queued update
    */
@@ -581,7 +594,6 @@ contract Validators is
    * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
   function forceDeaffiliateIfValidator(address validatorAccount) external nonReentrant onlySlasher {
-    allowOnlyL1();
     if (isValidator(validatorAccount)) {
       Validator storage validator = validators[validatorAccount];
       if (validator.affiliation != address(0)) {
@@ -590,6 +602,7 @@ contract Validators is
     }
   }
 
+  // XXX: rewards and Slashing not supported on L2
   /**
    * @notice Resets a group's slashing multiplier if it has been >= the reset period since
    *         the last time the group was slashed.
@@ -606,6 +619,7 @@ contract Validators is
     group.slashInfo.multiplier = FixidityLib.fixed1();
   }
 
+// XXX: rewards and Slashing not supported on L2
   /**
    * @notice Halves the group's slashing multiplier.
    * @param account The group being slashed.
@@ -651,15 +665,27 @@ contract Validators is
   {
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
-    return (
-      group.members.getKeys(),
-      group.commission.unwrap(),
-      group.nextCommission.unwrap(),
-      group.nextCommissionBlock,
-      group.sizeHistory,
-      group.slashInfo.multiplier.unwrap(),
-      group.slashInfo.lastSlashed
-    );
+    if (isL2()) {
+      return (
+        group.members.getKeys(),
+        group.commission.unwrap(),
+        group.nextCommission.unwrap(),
+        group.nextCommissionBlock,
+        group.sizeHistory,
+        1,
+        group.slashInfo.lastSlashed
+      );
+    } else {
+      return (
+        group.members.getKeys(),
+        group.commission.unwrap(),
+        group.nextCommission.unwrap(),
+        group.nextCommissionBlock,
+        group.sizeHistory,
+        group.slashInfo.multiplier.unwrap(),
+        group.slashInfo.lastSlashed
+      );
+    }
   }
 
   /**
@@ -748,15 +774,20 @@ contract Validators is
     return getMembershipInLastEpoch(account);
   }
 
+  //XXX: should this always return 1?
   /**
    * @notice Getter for a group's slashing multiplier.
    * @param account The group to fetch slashing multiplier for.
    */
   function getValidatorGroupSlashingMultiplier(address account) external view returns (uint256) {
-    allowOnlyL1();
     require(isValidatorGroup(account), "Not a validator group");
-    ValidatorGroup storage group = groups[account];
-    return group.slashInfo.multiplier.unwrap();
+
+    if (isL2()) {
+      return 1;
+    } else {
+      ValidatorGroup storage group = groups[account];
+      return group.slashInfo.multiplier.unwrap();
+    }
   }
 
   /**
@@ -865,6 +896,7 @@ contract Validators is
     emit CommissionUpdateDelaySet(delay);
   }
 
+  //XXX: unchanged, as the validator group constitution should not change on L2
   /**
    * @notice Updates the maximum number of members a group can have.
    * @param size The maximum group size.
@@ -879,6 +911,7 @@ contract Validators is
     return true;
   }
 
+  //XXX: unchanged, as the validator group constitution should not change on L2
   /**
    * @notice Updates the number of validator group membership entries to store.
    * @param length The number of validator group membership entries to store.
@@ -893,6 +926,7 @@ contract Validators is
     return true;
   }
 
+  //XXX: unchanged, as the validator group constitution should not change on L2
   /**
    * @notice Updates the validator score parameters.
    * @param exponent The exponent used in calculating the score.
@@ -961,6 +995,7 @@ contract Validators is
     return true;
   }
 
+  //XXX: unchanged, as rewards are not yet implemented.
   /**
    * @notice Sets the slashingMultiplierRestPeriod property if called by owner.
    * @param value New reset period for slashing multiplier.
@@ -970,6 +1005,7 @@ contract Validators is
     slashingMultiplierResetPeriod = value;
   }
 
+  //XXX: unchanged, as rewards are not yet implemented.
   /**
    * @notice Sets the downtimeGracePeriod property if called by owner.
    * @param value New downtime grace period for calculating epoch scores.
@@ -1003,6 +1039,7 @@ contract Validators is
     return 0;
   }
 
+  //XXX: unchanged, as elections are not yet implemented.
   /**
    * @notice Returns the group that `account` was a member of at the end of the last epoch.
    * @param account The account whose group membership should be returned.

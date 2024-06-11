@@ -2148,15 +2148,53 @@ contract ValidatorsTest_ReorderMember is ValidatorsTest {
     assertEq(expectedMembersList.length, members.length);
   }
 
-  function test_Reverts_ReorderGroupMemberList_WhenL2() public {
+  function test_Emits_ValidatorGroupMemberReorderedEvent() public {
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorGroupMemberReordered(group, vm.addr(1));
+
+    vm.prank(group);
+    validators.reorderMember(vm.addr(1), validator, address(0));
+  }
+
+  function test_Reverts_WhenAccountIsNotRegisteredValidatorGroup() public {
+    vm.expectRevert("Not a group");
+    vm.prank(vm.addr(1));
+    validators.reorderMember(vm.addr(1), validator, address(0));
+  }
+
+  function test_Reverts_WhenMemberNotRegisteredValidator() public {
+    vm.expectRevert("Not a validator");
+    vm.prank(group);
+    validators.reorderMember(nonValidator, validator, address(0));
+  }
+
+  function test_Reverts_WhenValidatorNotMemberOfValidatorGroup() public {
+    vm.prank(vm.addr(1));
+    validators.deaffiliate();
+
+    vm.expectRevert("Not a member of the group");
+    vm.prank(group);
+    validators.reorderMember(vm.addr(1), validator, address(0));
+  }
+}
+contract ValidatorsTest_ReorderMember_L2 is ValidatorsTest {
+  function setUp() public {
+    super.setUp();
+    _registerValidatorGroupWithMembers(group, 2);
     _whenL2();
+  }
+
+  function test_ShouldReorderGroupMemberList() public {
     address[] memory expectedMembersList = new address[](2);
     expectedMembersList[0] = vm.addr(1);
     expectedMembersList[1] = validator;
 
     vm.prank(group);
-    vm.expectRevert("This method is no longer supported in L2.");
     validators.reorderMember(vm.addr(1), validator, address(0));
+    (address[] memory members, , , , , , ) = validators.getValidatorGroup(group);
+
+    assertEq(expectedMembersList, members);
+    assertEq(expectedMembersList.length, members.length);
   }
 
   function test_Emits_ValidatorGroupMemberReorderedEvent() public {
@@ -3159,11 +3197,29 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
     assertEq(affiliation, address(0));
   }
 
-  function test_Reverts_WhenSenderIsWhitelistedSlashingAddress_WhenL2() public {
-    _whenL2();
-    vm.prank(paymentDelegatee);
-    vm.expectRevert("This method is no longer supported in L2.");
+  function test_Reverts_WhenSenderNotApprovedAddress() public {
+    vm.expectRevert("Only registered slasher can call");
     validators.forceDeaffiliateIfValidator(validator);
+  }
+}
+contract ValidatorsTest_ForceDeaffiliateIfValidator_L2 is ValidatorsTest {
+  function setUp() public {
+    super.setUp();
+
+    _registerValidatorHelper(validator, validatorPk);
+    _registerValidatorGroupHelper(group, 1);
+
+    vm.prank(validator);
+    validators.affiliate(group);
+    _whenL2();
+    lockedGold.addSlasherTest(paymentDelegatee);
+  }
+
+  function test_ShouldSucceed_WhenSenderIsWhitelistedSlashingAddress() public {
+    vm.prank(paymentDelegatee);
+    validators.forceDeaffiliateIfValidator(validator);
+    (, , address affiliation, , ) = validators.getValidator(validator);
+    assertEq(affiliation, address(0));
   }
 
   function test_Reverts_WhenSenderNotApprovedAddress() public {
