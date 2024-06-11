@@ -1,4 +1,4 @@
-# celo devchain Anvil
+# @celo/devchain-anvil
 
 Anvil state with Celo core contracts for local testing and development.
 

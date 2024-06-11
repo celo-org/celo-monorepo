@@ -10,7 +10,7 @@ echo "Anvil state will be saved to $ANVIL_FOLDER"
 # create package.json
 echo "{\"name\": \"@celo/devchain-anvil\",\"version\": \"1.0.0\",\"description\": \"Anvil based devchain that contains core smart contracts of celo\",\"author\":\"Celo\",\"license\": \"LGPL-3.0\"}" > $TMP_FOLDER/package.json
 
-cp $PWD/migrations_sol/celo-anvil-README.md $TMP_FOLDER/README.md
+cp $PWD/migrations_sol/README.md $TMP_FOLDER/README.md
 
 if nc -z localhost $ANVIL_PORT; then
   echo "Port already used"
