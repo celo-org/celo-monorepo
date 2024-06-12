@@ -529,6 +529,7 @@ contract Validators is
     address lesserMember,
     address greaterMember
   ) external nonReentrant returns (bool) {
+    allowOnlyL1();
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account), "Not a group");
     require(isValidator(validator), "Not a validator");
@@ -557,7 +558,6 @@ contract Validators is
     group.nextCommissionBlock = block.number.add(commissionUpdateDelay);
     emit ValidatorGroupCommissionUpdateQueued(account, commission, group.nextCommissionBlock);
   }
-
   /**
    * @notice Updates a validator group's commission based on the previously queued update
    */
@@ -581,6 +581,7 @@ contract Validators is
    * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
   function forceDeaffiliateIfValidator(address validatorAccount) external nonReentrant onlySlasher {
+    allowOnlyL1();
     if (isValidator(validatorAccount)) {
       Validator storage validator = validators[validatorAccount];
       if (validator.affiliation != address(0)) {
@@ -650,27 +651,15 @@ contract Validators is
   {
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
-    if (isL2()) {
-      return (
-        group.members.getKeys(),
-        group.commission.unwrap(),
-        group.nextCommission.unwrap(),
-        group.nextCommissionBlock,
-        group.sizeHistory,
-        1,
-        group.slashInfo.lastSlashed
-      );
-    } else {
-      return (
-        group.members.getKeys(),
-        group.commission.unwrap(),
-        group.nextCommission.unwrap(),
-        group.nextCommissionBlock,
-        group.sizeHistory,
-        group.slashInfo.multiplier.unwrap(),
-        group.slashInfo.lastSlashed
-      );
-    }
+    return (
+      group.members.getKeys(),
+      group.commission.unwrap(),
+      group.nextCommission.unwrap(),
+      group.nextCommissionBlock,
+      group.sizeHistory,
+      group.slashInfo.multiplier.unwrap(),
+      group.slashInfo.lastSlashed
+    );
   }
 
   /**
@@ -1041,7 +1030,6 @@ contract Validators is
    * @return Fixidity representation of the epoch score between 0 and 1.
    */
   function calculateEpochScore(uint256 uptime) public view returns (uint256) {
-    allowOnlyL1();
     require(uptime <= FixidityLib.fixed1().unwrap(), "Uptime cannot be larger than one");
     uint256 numerator;
     uint256 denominator;
