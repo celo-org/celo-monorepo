@@ -3459,13 +3459,16 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     assertEq(actualMultiplier, FixidityLib.fixed1().unwrap());
   }
 
-  function test_Reverts_WhenSlashingMultiplierIsResetAfterResetPeriod_WhenL2() public {
+  function test_ShouldReturnToDefault_WhenSlashingMultiplierIsResetAfterResetPeriod_WhenL2()
+    public
+  {
     _whenL2();
     timeTravel(slashingMultiplierResetPeriod);
 
     vm.prank(group);
-    vm.expectRevert("This method is no longer supported in L2.");
     validators.resetSlashingMultiplier();
+    (, , , , , uint256 actualMultiplier, ) = validators.getValidatorGroup(group);
+    assertEq(actualMultiplier, FixidityLib.fixed1().unwrap());
   }
 
   function test_Reverts_WhenSlashingMultiplierIsResetBeforeResetPeriod() public {

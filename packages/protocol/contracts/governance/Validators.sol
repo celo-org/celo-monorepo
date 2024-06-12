@@ -594,7 +594,6 @@ contract Validators is
    *         the last time the group was slashed.
    */
   function resetSlashingMultiplier() external nonReentrant {
-    allowOnlyL1();
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
@@ -752,7 +751,6 @@ contract Validators is
    * @param account The group to fetch slashing multiplier for.
    */
   function getValidatorGroupSlashingMultiplier(address account) external view returns (uint256) {
-    allowOnlyL1();
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     return group.slashInfo.multiplier.unwrap();
