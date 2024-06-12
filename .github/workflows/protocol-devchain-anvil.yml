@@ -4,30 +4,11 @@ on:
     branches:
       - master
       - 'release/**'
-    tags:
-      - core-contracts.v*
-  pull_request:
-    branches: [release/core-contracts/*, master]
-    paths:
-      - 'packages/protocol/**'
-  workflow_dispatch:
-    inputs:
-      npm_tag:
-        description: 'NPM TAG e.g. alpha, pre-merge (default: canary) '
-        required: true
-        type: string
-
-
 
 env:
   # Increment these to force cache rebuilding
   FOUNDRY_CACHE_KEY: 1
-  # Supported Foundry version defined at celo-org (GitHub organisation) level, for consistency across workflows.
-  SUPPORTED_FOUNDRY_VERSION: ${{ vars.SUPPORTED_FOUNDRY_VERSION }}
   ANVIL_PORT: 8546
-
-permissions:
-  contents: read
 
 jobs:
   build:
@@ -35,8 +16,8 @@ jobs:
       run:
         working-directory: packages/protocol
     name: Generate anvil
-    runs-on: ['self-hosted', 'org', 'npm-publish']
-    permissions:
+    runs-on: ["self-hosted", "org", "npm-publish"]
+    permissions: 
       contents: read
       pull-requests: read
       id-token: write
@@ -53,13 +34,13 @@ jobs:
           fi
       - name: Foundry cache
         id: foundry-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           path: ./cache
           key: ${{ runner.os }}-foundry-cache-${{ env.FOUNDRY_CACHE_KEY }}
       - name: Foundry out
         id: foundry-out
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           path: ./out
           key: ${{ runner.os }}-foundry-out-${{ env.FOUNDRY_CACHE_KEY }}
@@ -73,14 +54,14 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const result = (
-              await github.rest.repos.listPullRequestsAssociatedWithCommit({
-                commit_sha: context.sha,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-              })
-            ).data[0];
-            core.setOutput("number", result ? result.number : "");
+              const result = (
+                await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                  commit_sha: context.sha,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                })
+              ).data[0];
+              core.setOutput("number", result ? result.number : "");
 
       - name: Set PR Number
         id: set_pr_number
@@ -96,9 +77,9 @@ jobs:
           echo "Pull Request Number: ${{ env.PR_NUMBER }}"
 
       - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@8f1998e9878d786675189ef566a2e4bf24869773
+        uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: ${{ env.SUPPORTED_FOUNDRY_VERSION }}
+          version: "nightly-f625d0fa7c51e65b4bf1e8f7931cd1c6e2e285e9"
 
       - name: Install forge dependencies
         run: forge install
@@ -106,6 +87,38 @@ jobs:
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+      - name: Generate migrations and run devchain
+        if: success() || failure()
+        run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
+      
+      - name: Run integration tests against local anvil devchain
+        if: success() || failure()
+        run: |
+          forge test -vvv \
+          --match-path "test-sol/integration/*" \
+          --fork-url http://127.0.0.1:${{ env.ANVIL_PORT }}
+
+      - name: Sanitize ref name
+        id: sanitize-ref-name
+        run: |
+          sanitized_ref_name=$(echo "${{ github.ref_name }}" | tr -cd '[:alnum:]-_')
+          echo "sanitized_ref_name=${sanitized_ref_name}" >> $GITHUB_ENV
+
+      - name: Set package.json version based on GitHub ref
+        run: |
+          VERSION=${{ env.PR_NUMBER }}
+          echo "Setting version to 0.0.$VERSION"
+          jq ".version = \"0.0.$VERSION\"" .tmp/package.json > .tmp/temp.json && mv .tmp/temp.json .tmp/package.json
+
+      - name: Upload devchain as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: devchain-${{ env.PR_NUMBER }}-${{ steps.date.outputs.date }}
+          path: packages/protocol/.tmp
+          # Max retention time is 90 days for public repos
+          # https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
+          retention-days: 90
 
       - name: Akeyless Get Secrets
         id: get_auth_token
@@ -120,66 +133,10 @@ jobs:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: 'Setup yarn'
-        shell: bash
-        run: |
-          npm install --global yarn
-          source ~/.bashrc
-
-      - name: 'Install packages'
-        shell: bash
-        run: yarn
-
-      - name: Generate migrations and run devchain
-        if: success() || failure()
-        run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
-
-      - name: Run integration tests against local anvil devchain
-        if: success() || failure()
-        run: |
-          forge test -vvv \
-          --match-path "test-sol/integration/*" \
-          --fork-url http://127.0.0.1:${{ env.ANVIL_PORT }}
-
-      - name: Sanitize ref name
-        id: sanitize-ref-name
-        run: |
-          sanitized_ref_name=$(echo "${{ github.ref_name }}" | tr -cd '[:alnum:]-_')
-          echo "sanitized_ref_name=${sanitized_ref_name}" >> $GITHUB_ENV
-
-      - name:
-          Determine release type and version (or dry run)
-          # This is what sets the RELEASE_TYPE and RELEASE_VERSION env variables
-        run: yarn --silent determine-release-version >> "$GITHUB_ENV"
-        working-directory: packages/protocol
-        env:
-          GITHUB_TAG: ${{ github.ref_name }}
-          NPM_PACKAGE: '@celo/devchain-anvil'
-          NPM_TAG: ${{ inputs.npm_tag }}
-
-      - name: Prepare package for publishing
-        run: yarn prepare_devchain_anvil_publishing
-        working-directory: packages/protocol
-        env:
-          RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
-          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-      
-      - name: Upload devchain as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: devchain-${{ env.PR_NUMBER }}-${{ steps.date.outputs.date }}
-          path: packages/protocol/.tmp
-          # Max retention time is 90 days for public repos
-          # https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
-          retention-days: 90
-
       - name: Publish @celo/devchain-anvil
         run: |
           cat package.json
-          npm publish $RELEASE_TYPE $DRY_RUN --access public
+          npm publish --access public
         working-directory: packages/protocol/.tmp
         env:
-          RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
-          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
-          DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
