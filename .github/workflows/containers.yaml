@@ -8,6 +8,7 @@ on:
       - 'packages/celotool/**'
     branches:
       - master
+      - 'release/**'
   pull_request:
     paths:
       - 'dockerfiles/**'
