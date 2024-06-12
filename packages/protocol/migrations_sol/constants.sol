@@ -2,7 +2,7 @@ pragma solidity >=0.8.7 <0.8.20;
 
 contract Constants {
   // List of contracts that are expected to be in Registry.sol
-  string[23] contractsInRegistry = [
+  string[24] contractsInRegistry = [
     "Accounts",
     "BlockchainParameters",
     "DoubleSigningSlasher",
@@ -19,6 +19,7 @@ contract Constants {
     "Governance",
     "GovernanceSlasher",
     "LockedGold",
+    "MintGoldSchedule",
     "OdisPayments",
     "Random",
     "Registry",

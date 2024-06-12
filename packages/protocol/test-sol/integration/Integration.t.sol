@@ -4,7 +4,7 @@ pragma solidity >=0.8.7 <0.8.20;
 import { Test } from "forge-std-8/Test.sol";
 import "forge-std-8/console2.sol";
 
-import { Constants } from "@celo-migrations/constants.sol";
+import { Constants } from "@migrations-sol/constants.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";

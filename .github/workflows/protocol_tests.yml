@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - 'release/**'
   pull_request:
     branches:
       - master
@@ -11,6 +12,7 @@ on:
 env:
   # Increment these to force cache rebuilding
   FOUNDRY_CACHE_KEY: 2
+  ANVIL_PORT: 8546
 
 jobs:
   check:
@@ -61,30 +63,47 @@ jobs:
       - name: Compile Contracts
         run: forge --version && forge compile
 
-      - name: Run tests common
+      - name: Run unit tests common
         # can't use gas limit because some setUp function use more than the limit
-        run: forge test -vvv --match-path "test-sol/common/*" # --block-gas-limit 50000000
+        run: |
+          forge test -vvv \
+          --match-path "test-sol/unit/common/*"
 
-      - name: Run tests governance/network
+      - name: Run unit tests governance/network
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/governance/network/*"
+        run: |
+          forge test -vvv \
+          --match-path "test-sol/unit/governance/network/*" \
+          --block-gas-limit 50000000
 
-      - name: Run tests governance/validators
+      - name: Run unit tests governance/validators
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/governance/validators/*"
+        run: | 
+          forge test -vvv \
+          --match-path "test-sol/unit/governance/validators/*" \
+          --block-gas-limit 50000000
 
-      - name: Run tests governance/voting
+      - name: Run unit tests governance/voting
         # can't use gas limit because some setUp function use more than the limit
         if: success() || failure()
-        run: forge test -vvv --match-path "test-sol/governance/voting/*" --block-gas-limit 50000000
+        run: | 
+          forge test -vvv \
+          --match-path "test-sol/unit/governance/voting/*" \
+          --block-gas-limit 50000000
 
-      - name: Run tests stability
+      - name: Run unit tests stability
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/stability/*"
+        run: |
+          forge test -vvv \
+          --match-path "test-sol/unit/stability/*" \
+          --block-gas-limit 50000000
 
-      - name: Run tests identity
+      - name: Run unit tests identity
         if: success() || failure()
-        run: forge test -vvv --block-gas-limit 50000000 --match-path "test-sol/identity/*"
+        run: |
+          forge test -vvv \
+          --match-path "test-sol/unit/identity/*" \
+          --block-gas-limit 50000000
 
       - name: Fail if there are tests without folder
         if: success() || failure()
@@ -94,11 +113,28 @@ jobs:
             exit 1
           fi
 
-      - name: Run Everything just in case something was missed
+      - name: Run all unit tests in case some were missed (excl. integration and e2e tests)
         # can't use gas limit because some setUp function use more than the limit
-        # Excludes integration tests, because they require an anvil devchain running on the localhost.
-        run: forge test -vvv --no-match-contract RegistryIntegrationTest
+        # Excludes e2e and integration tests, because they require a connection to an anvil devchain
+        # serving at localhost.
+        run: |
+          forge test -vvv \
+          --match-path "test-sol/unit/*"
       
-      - name: Generate migrations
+      - name: Generate migrations and run devchain
         if: success() || failure()
-        run: ./migrations_sol/run_integration_tests_in_anvil.sh
+        run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
+      
+      - name: Run integration tests against local anvil devchain
+        if: success() || failure()
+        run: |
+          forge test -vvv \
+          --match-path "test-sol/integration/*" \
+          --fork-url http://127.0.0.1:${{ env.ANVIL_PORT }}
+      
+      - name: Run e2e tests against local anvil devchain
+        if: success() || failure()
+        run: |
+          forge test -vvv \
+          --match-path "test-sol/e2e/*" \
+          --fork-url http://127.0.0.1:${{ env.ANVIL_PORT }}
