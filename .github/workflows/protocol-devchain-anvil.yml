@@ -16,8 +16,8 @@ jobs:
       run:
         working-directory: packages/protocol
     name: Generate anvil
-    runs-on: ["self-hosted", "org", "npm-publish"]
-    permissions: 
+    runs-on: ['self-hosted', 'org', 'npm-publish']
+    permissions:
       contents: read
       pull-requests: read
       id-token: write
@@ -54,14 +54,14 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-              const result = (
-                await github.rest.repos.listPullRequestsAssociatedWithCommit({
-                  commit_sha: context.sha,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                })
-              ).data[0];
-              core.setOutput("number", result ? result.number : "");
+            const result = (
+              await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                commit_sha: context.sha,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              })
+            ).data[0];
+            core.setOutput("number", result ? result.number : "");
 
       - name: Set PR Number
         id: set_pr_number
@@ -79,7 +79,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: "nightly-f625d0fa7c51e65b4bf1e8f7931cd1c6e2e285e9"
+          version: 'nightly-f625d0fa7c51e65b4bf1e8f7931cd1c6e2e285e9'
 
       - name: Install forge dependencies
         run: forge install
@@ -91,7 +91,7 @@ jobs:
       - name: Generate migrations and run devchain
         if: success() || failure()
         run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
-      
+
       - name: Run integration tests against local anvil devchain
         if: success() || failure()
         run: |
@@ -105,11 +105,14 @@ jobs:
           sanitized_ref_name=$(echo "${{ github.ref_name }}" | tr -cd '[:alnum:]-_')
           echo "sanitized_ref_name=${sanitized_ref_name}" >> $GITHUB_ENV
 
-      - name: Set package.json version based on GitHub ref
-        run: |
-          VERSION=${{ env.PR_NUMBER }}
-          echo "Setting version to 0.0.$VERSION"
-          jq ".version = \"0.0.$VERSION\"" .tmp/package.json > .tmp/temp.json && mv .tmp/temp.json .tmp/package.json
+      - name:
+          Determine release type and version (or dry run)
+          # This is what sets the RELEASE_TYPE and RELEASE_VERSION env variables
+        run: yarn --silent determine-release-version >> "$GITHUB_ENV"
+        working-directory: packages/protocol
+        env:
+          GITHUB_TAG: ${{ github.ref_name }}
+          NPM_PACKAGE: "@celo/devchain-anvil"
 
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
@@ -136,7 +139,10 @@ jobs:
       - name: Publish @celo/devchain-anvil
         run: |
           cat package.json
-          npm publish --access public
+          npm publish $RELEASE_TYPE $DRY_RUN --access public
         working-directory: packages/protocol/.tmp
         env:
+          RELEASE_TYPE: --tag ${{ env.RELEASE_TYPE != '' && env.RELEASE_TYPE || 'canary' }}
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
+          DRY_RUN: ${{ env.RELEASE_VERSION == '' && '--dry-run' || '' }}
