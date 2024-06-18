@@ -15,7 +15,6 @@ import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
 
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
@@ -28,8 +27,7 @@ contract Validators is
   Initializable,
   UsingRegistry,
   UsingPrecompiles,
-  CalledByVm,
-  IsL2Check
+  CalledByVm
 {
   using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;
@@ -531,7 +529,6 @@ contract Validators is
     address lesserMember,
     address greaterMember
   ) external nonReentrant returns (bool) {
-    allowOnlyL1();
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account), "Not a group");
     require(isValidator(validator), "Not a validator");
@@ -560,6 +557,7 @@ contract Validators is
     group.nextCommissionBlock = block.number.add(commissionUpdateDelay);
     emit ValidatorGroupCommissionUpdateQueued(account, commission, group.nextCommissionBlock);
   }
+
   /**
    * @notice Updates a validator group's commission based on the previously queued update
    */
@@ -583,7 +581,6 @@ contract Validators is
    * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
    */
   function forceDeaffiliateIfValidator(address validatorAccount) external nonReentrant onlySlasher {
-    allowOnlyL1();
     if (isValidator(validatorAccount)) {
       Validator storage validator = validators[validatorAccount];
       if (validator.affiliation != address(0)) {
@@ -597,7 +594,6 @@ contract Validators is
    *         the last time the group was slashed.
    */
   function resetSlashingMultiplier() external nonReentrant {
-    allowOnlyL1();
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
@@ -755,7 +751,6 @@ contract Validators is
    * @param account The group to fetch slashing multiplier for.
    */
   function getValidatorGroupSlashingMultiplier(address account) external view returns (uint256) {
-    allowOnlyL1();
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     return group.slashInfo.multiplier.unwrap();
@@ -1032,6 +1027,7 @@ contract Validators is
    * @return Fixidity representation of the epoch score between 0 and 1.
    */
   function calculateEpochScore(uint256 uptime) public view returns (uint256) {
+    allowOnlyL1();
     require(uptime <= FixidityLib.fixed1().unwrap(), "Uptime cannot be larger than one");
     uint256 numerator;
     uint256 denominator;
