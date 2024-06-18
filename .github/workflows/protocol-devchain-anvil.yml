@@ -91,7 +91,30 @@ jobs:
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+      
+      - name: Akeyless Get Secrets
+        id: get_auth_token
+        uses: docker://us-west1-docker.pkg.dev/devopsre/akeyless-public/akeyless-action:latest
+        with:
+          api-url: https://api.gateway.akeyless.celo-networks-dev.org
+          access-id: p-kf9vjzruht6l
+          static-secrets: '{"/static-secrets/NPM/npm-publish-token":"NPM_TOKEN"}'
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: 'Setup yarn'
+        shell: bash
+        run: |
+          npm install --global yarn
+          source ~/.bashrc
+  
+      - name: 'Install packages'
+        shell: bash
+        run: yarn
+  
       - name: Generate migrations and run devchain
         if: success() || failure()
         run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
@@ -125,21 +148,8 @@ jobs:
           path: packages/protocol/.tmp
           # Max retention time is 90 days for public repos
           # https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
-          retention-days: 90
-
-      - name: Akeyless Get Secrets
-        id: get_auth_token
-        uses: docker://us-west1-docker.pkg.dev/devopsre/akeyless-public/akeyless-action:latest
-        with:
-          api-url: https://api.gateway.akeyless.celo-networks-dev.org
-          access-id: p-kf9vjzruht6l
-          static-secrets: '{"/static-secrets/NPM/npm-publish-token":"NPM_TOKEN"}'
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '18.x'
-          registry-url: 'https://registry.npmjs.org'
-
+          retention-days: 90 
+          
       - name: Publish @celo/devchain-anvil
         run: |
           cat package.json
