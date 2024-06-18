@@ -5,12 +5,10 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingPrecompiles.sol";
 
-import "../../contracts-0.8/common/IsL2Check.sol";
-
 /**
  * @title Contract for storing blockchain parameters that can be set by governance.
  */
-contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles, IsL2Check {
+contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   using SafeMath for uint256;
 
   // obsolete

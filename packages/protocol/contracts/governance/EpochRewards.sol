@@ -10,7 +10,6 @@ import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
 
 /**
  * @title Contract for calculating epoch rewards.
@@ -22,8 +21,7 @@ contract EpochRewards is
   UsingPrecompiles,
   UsingRegistry,
   Freezable,
-  CalledByVm,
-  IsL2Check
+  CalledByVm
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
