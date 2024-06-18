@@ -4,6 +4,10 @@ on:
     branches:
       - master
       - 'release/**'
+  pull_request:
+    branches: [release/core-contracts/*, master]
+    paths:
+      - 'packages/protocol/**'
 
 env:
   # Increment these to force cache rebuilding
