@@ -14,7 +14,7 @@ import "../../contracts-0.8/common/interfaces/IGoldToken.sol";
 /**
  * @title Contract for minting new CELO token based on a schedule.
  */
-contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2Check {
+contract MintCeloSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2Check {
   using FixidityLib for FixidityLib.Fraction;
 
   uint256 constant GENESIS_GOLD_SUPPLY = 600000000 ether; // 600 million Gold
@@ -49,7 +49,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   constructor(bool test) public Initializable(test) {}
 
   /**
-   * @notice A constructor for initialising a new instance of a MintGoldSchedule contract.
+   * @notice A constructor for initialising a new instance of a MintCeloSchedule contract.
    */
   function initialize() external initializer {
     _transferOwnership(msg.sender);
@@ -208,7 +208,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   }
 
   /**
-   * @return The total balance minted by the MintGoldSchedule contract.
+   * @return The total balance minted by the MintCeloSchedule contract.
    */
   function getTotalMintedBySchedule() public view returns (uint256) {
     return totalMintedBySchedule;

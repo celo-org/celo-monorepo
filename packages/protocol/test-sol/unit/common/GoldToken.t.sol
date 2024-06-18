@@ -28,7 +28,7 @@ contract GoldTokenTest is Test, IsL2Check {
     goldTokenMintingSchedule = actor("goldTokenMintingSchedule");
     vm.prank(goldTokenOwner);
     goldToken = new GoldToken(true);
-    deployCodeTo("MintGoldSchedule.sol", abi.encode(false), goldTokenMintingSchedule);
+    deployCodeTo("MintCeloSchedule.sol", abi.encode(false), goldTokenMintingSchedule);
     receiver = actor("receiver");
     sender = actor("sender");
     vm.deal(receiver, ONE_GOLDTOKEN);
@@ -221,15 +221,15 @@ contract GoldTokenTest_mint_l2 is GoldTokenTest {
 
   function test_Reverts_whenCalledByOtherThanMintingSchedule() public {
     vm.prank(address(0));
-    vm.expectRevert("Only MintGoldSchedule can call.");
+    vm.expectRevert("Only MintCeloSchedule can call.");
     goldToken.mint(receiver, ONE_GOLDTOKEN);
 
     vm.prank(address(9));
-    vm.expectRevert("Only MintGoldSchedule can call.");
+    vm.expectRevert("Only MintCeloSchedule can call.");
     goldToken.mint(receiver, ONE_GOLDTOKEN);
 
     vm.prank(goldTokenOwner);
-    vm.expectRevert("Only MintGoldSchedule can call.");
+    vm.expectRevert("Only MintCeloSchedule can call.");
     goldToken.mint(receiver, ONE_GOLDTOKEN);
   }
 
