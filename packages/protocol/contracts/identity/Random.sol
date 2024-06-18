@@ -8,7 +8,6 @@ import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
 
 /**
  * @title Provides randomness for verifier selection
@@ -19,8 +18,7 @@ contract Random is
   Ownable,
   Initializable,
   UsingPrecompiles,
-  CalledByVm,
-  IsL2Check
+  CalledByVm
 {
   using SafeMath for uint256;
 

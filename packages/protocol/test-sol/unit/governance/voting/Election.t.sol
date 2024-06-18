@@ -30,32 +30,6 @@ contract ElectionTest is Utils, Constants {
 
   address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
-  event ElectableValidatorsSet(uint256 min, uint256 max);
-  event MaxNumGroupsVotedForSet(uint256 maxNumGroupsVotedFor);
-  event ElectabilityThresholdSet(uint256 electabilityThreshold);
-  event AllowedToVoteOverMaxNumberOfGroups(address indexed account, bool flag);
-  event ValidatorGroupMarkedEligible(address indexed group);
-  event ValidatorGroupMarkedIneligible(address indexed group);
-  event ValidatorGroupVoteCast(address indexed account, address indexed group, uint256 value);
-  event ValidatorGroupVoteActivated(
-    address indexed account,
-    address indexed group,
-    uint256 value,
-    uint256 units
-  );
-  event ValidatorGroupPendingVoteRevoked(
-    address indexed account,
-    address indexed group,
-    uint256 value
-  );
-  event ValidatorGroupActiveVoteRevoked(
-    address indexed account,
-    address indexed group,
-    uint256 value,
-    uint256 units
-  );
-  event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
-
   Accounts accounts;
   ElectionMock election;
   Freezer freezer;
@@ -84,6 +58,32 @@ contract ElectionTest is Utils, Constants {
   address account10 = actor("account10");
 
   address[] accountsArray;
+
+  event ElectableValidatorsSet(uint256 min, uint256 max);
+  event MaxNumGroupsVotedForSet(uint256 maxNumGroupsVotedFor);
+  event ElectabilityThresholdSet(uint256 electabilityThreshold);
+  event AllowedToVoteOverMaxNumberOfGroups(address indexed account, bool flag);
+  event ValidatorGroupMarkedEligible(address indexed group);
+  event ValidatorGroupMarkedIneligible(address indexed group);
+  event ValidatorGroupVoteCast(address indexed account, address indexed group, uint256 value);
+  event ValidatorGroupVoteActivated(
+    address indexed account,
+    address indexed group,
+    uint256 value,
+    uint256 units
+  );
+  event ValidatorGroupPendingVoteRevoked(
+    address indexed account,
+    address indexed group,
+    uint256 value
+  );
+  event ValidatorGroupActiveVoteRevoked(
+    address indexed account,
+    address indexed group,
+    uint256 value,
+    uint256 units
+  );
+  event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
 
   function createAccount(address account) public {
     vm.prank(account);
@@ -197,10 +197,19 @@ contract ElectionTest_SetElectabilityThreshold is ElectionTest {
     vm.expectRevert("Electability threshold must be lower than 100%");
     election.setElectabilityThreshold(FixidityLib.fixed1().unwrap() + 1);
   }
+}
 
-  function test_Revert_setElectabilityThreshold_WhenL2() public {
+contract ElectionTest_SetElectabilityThreshold_L2 is ElectionTest {
+  function test_shouldSetElectabilityThreshold() public {
     _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
+    uint256 newElectabilityThreshold = FixidityLib.newFixedFraction(1, 200).unwrap();
+    election.setElectabilityThreshold(newElectabilityThreshold);
+    assertEq(election.electabilityThreshold(), newElectabilityThreshold);
+  }
+
+  function test_ShouldRevertWhenThresholdLargerThan100Percent() public {
+    _whenL2();
+    vm.expectRevert("Electability threshold must be lower than 100%");
     election.setElectabilityThreshold(FixidityLib.fixed1().unwrap() + 1);
   }
 }
@@ -215,12 +224,48 @@ contract ElectionTest_SetElectableValidators is ElectionTest {
     assertEq(max, newElectableValidatorsMax);
   }
 
-  function test_Reverts_shouldSetElectableValidators_WhenL2() public {
-    _whenL2();
+  function test_ShouldEmitTheElectableValidatorsSetEvent() public {
     uint256 newElectableValidatorsMin = 2;
     uint256 newElectableValidatorsMax = 4;
-    vm.expectRevert("This method is no longer supported in L2.");
+    vm.expectEmit(true, false, false, false);
+    emit ElectableValidatorsSet(newElectableValidatorsMin, newElectableValidatorsMax);
     election.setElectableValidators(newElectableValidatorsMin, newElectableValidatorsMax);
+  }
+
+  function test_ShouldRevertWhenMinElectableValidatorsIsZero() public {
+    vm.expectRevert("Minimum electable validators cannot be zero");
+    election.setElectableValidators(0, electableValidatorsMax);
+  }
+
+  function test_ShouldRevertWhenTHeminIsGreaterThanMax() public {
+    vm.expectRevert("Maximum electable validators cannot be smaller than minimum");
+    election.setElectableValidators(electableValidatorsMax, electableValidatorsMin);
+  }
+
+  function test_ShouldRevertWhenValuesAreUnchanged() public {
+    vm.expectRevert("Electable validators not changed");
+    election.setElectableValidators(electableValidatorsMin, electableValidatorsMax);
+  }
+
+  function test_ShouldRevertWhenCalledByNonOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(nonOwner);
+    election.setElectableValidators(1, 2);
+  }
+}
+
+contract ElectionTest_SetElectableValidators_L2 is ElectionTest {
+  function setUp() public {
+    super.setUp();
+    _whenL2();
+  }
+  function test_shouldSetElectableValidators() public {
+    uint256 newElectableValidatorsMin = 2;
+    uint256 newElectableValidatorsMax = 4;
+    election.setElectableValidators(newElectableValidatorsMin, newElectableValidatorsMax);
+    (uint256 min, uint256 max) = election.getElectableValidators();
+    assertEq(min, newElectableValidatorsMin);
+    assertEq(max, newElectableValidatorsMax);
   }
 
   function test_ShouldEmitTheElectableValidatorsSetEvent() public {
@@ -260,11 +305,35 @@ contract ElectionTest_SetMaxNumGroupsVotedFor is ElectionTest {
     assertEq(election.maxNumGroupsVotedFor(), newMaxNumGroupsVotedFor);
   }
 
-  function test_Revert_SetMaxNumGroupsVotedFor_WhenL2() public {
-    _whenL2();
+  function test_ShouldEmitMaxNumGroupsVotedForSetEvent() public {
     uint256 newMaxNumGroupsVotedFor = 4;
-    vm.expectRevert("This method is no longer supported in L2.");
+    vm.expectEmit(true, false, false, false);
+    emit MaxNumGroupsVotedForSet(newMaxNumGroupsVotedFor);
     election.setMaxNumGroupsVotedFor(newMaxNumGroupsVotedFor);
+  }
+
+  function test_ShouldRevertWhenCalledByNonOwner() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(nonOwner);
+    election.setMaxNumGroupsVotedFor(1);
+  }
+
+  function test_ShouldRevert_WhenMaxNumGroupsVotedForIsUnchanged() public {
+    vm.expectRevert("Max groups voted for not changed");
+    election.setMaxNumGroupsVotedFor(maxNumGroupsVotedFor);
+  }
+}
+
+contract ElectionTest_SetMaxNumGroupsVotedFor_L2 is ElectionTest {
+  function setUp() public {
+    super.setUp();
+    _whenL2();
+  }
+
+  function test_shouldSetMaxNumGroupsVotedFor() public {
+    uint256 newMaxNumGroupsVotedFor = 4;
+    election.setMaxNumGroupsVotedFor(newMaxNumGroupsVotedFor);
+    assertEq(election.maxNumGroupsVotedFor(), newMaxNumGroupsVotedFor);
   }
 
   function test_ShouldEmitMaxNumGroupsVotedForSetEvent() public {
@@ -292,10 +361,48 @@ contract ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
     assertEq(election.allowedToVoteOverMaxNumberOfGroups(address(this)), true);
   }
 
-  function test_Revert_SetAllowedToVoteOverMaxNumberOfGroups_WhenL2() public {
-    _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
+  function test_ShouldRevertWhenCalledByValidator() public {
+    validators.setValidator(address(this));
+    vm.expectRevert("Validators cannot vote for more than max number of groups");
     election.setAllowedToVoteOverMaxNumberOfGroups(true);
+  }
+
+  function test_ShouldRevertWhenCalledByValidatorGroup() public {
+    validators.setValidatorGroup(address(this));
+    vm.expectRevert("Validator groups cannot vote for more than max number of groups");
+    election.setAllowedToVoteOverMaxNumberOfGroups(true);
+  }
+
+  function test_ShouldEmitAllowedToVoteOverMaxNumberOfGroupsEvent() public {
+    vm.expectEmit(true, false, false, false);
+    emit AllowedToVoteOverMaxNumberOfGroups(address(this), true);
+    election.setAllowedToVoteOverMaxNumberOfGroups(true);
+  }
+
+  function test_ShouldSwitchAllowedToVoteOverMaxNumberOfGroupsOff_WhenTurnedOn() public {
+    election.setAllowedToVoteOverMaxNumberOfGroups(true);
+    assertEq(election.allowedToVoteOverMaxNumberOfGroups(address(this)), true);
+    election.setAllowedToVoteOverMaxNumberOfGroups(false);
+    assertEq(election.allowedToVoteOverMaxNumberOfGroups(address(this)), false);
+  }
+
+  function test_ShouldEmitAllowedToVoteOverMaxNumberOfGroupsEvent_WhenTurnedOn() public {
+    election.setAllowedToVoteOverMaxNumberOfGroups(true);
+    vm.expectEmit(true, false, false, false);
+    emit AllowedToVoteOverMaxNumberOfGroups(address(this), false);
+    election.setAllowedToVoteOverMaxNumberOfGroups(false);
+  }
+}
+
+contract ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups_L2 is ElectionTest {
+  function setUp() public {
+    super.setUp();
+    _whenL2();
+  }
+
+  function test_shouldSetAllowedToVoteOverMaxNumberOfGroups() public {
+    election.setAllowedToVoteOverMaxNumberOfGroups(true);
+    assertEq(election.allowedToVoteOverMaxNumberOfGroups(address(this)), true);
   }
 
   function test_ShouldRevertWhenCalledByValidator() public {
@@ -346,11 +453,40 @@ contract ElectionTest_MarkGroupEligible is ElectionTest {
     assertEq(eligibleGroups[0], group);
   }
 
-  function test_Revert_MarkGroupEligible_WhenL2() public {
-    _whenL2();
+  function test_ShouldEmitValidatorGroupMarkedEligibleEvent() public {
     address group = address(this);
-    vm.expectRevert("This method is no longer supported in L2.");
+    vm.expectEmit(true, false, false, false);
+    emit ValidatorGroupMarkedEligible(group);
     election.markGroupEligible(group, address(0), address(0));
+  }
+
+  function test_ShouldRevertWhenAlreadyMarkedEligible() public {
+    address group = address(this);
+    election.markGroupEligible(group, address(0), address(0));
+    vm.expectRevert("invalid key");
+    election.markGroupEligible(group, address(0), address(0));
+  }
+
+  function test_ShouldRevertWhenCalledByNonValidator() public {
+    vm.expectRevert("only registered contract");
+    vm.prank(nonOwner);
+    election.markGroupEligible(address(this), address(0), address(0));
+  }
+}
+
+contract ElectionTest_MarkGroupEligible_L2 is ElectionTest {
+  function setUp() public {
+    super.setUp();
+    _whenL2();
+    registry.setAddressFor("Validators", address(address(this)));
+  }
+
+  function test_shouldMarkGroupEligible() public {
+    address group = address(this);
+    election.markGroupEligible(group, address(0), address(0));
+    address[] memory eligibleGroups = election.getEligibleValidatorGroups();
+    assertEq(eligibleGroups.length, 1);
+    assertEq(eligibleGroups[0], group);
   }
 
   function test_ShouldEmitValidatorGroupMarkedEligibleEvent() public {
@@ -409,6 +545,7 @@ contract ElectionTest_MarkGroupInEligible is ElectionTest {
     election.markGroupIneligible(address(this));
   }
 }
+
 contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
   address voter = address(this);
   address group = account1;
@@ -464,13 +601,6 @@ contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
     emit ValidatorGroupVoteCast(voter, group, value - maxNumGroupsVotedFor);
     election.vote(group, value - maxNumGroupsVotedFor, newGroup, address(0));
     assertEq(election.getPendingVotesForGroupByAccount(group, voter), value - maxNumGroupsVotedFor);
-  }
-
-  function test_Revert_Vote_WhenL2() public {
-    _whenL2();
-
-    vm.expectRevert("This method is no longer supported in L2.");
-    election.vote(group, value - maxNumGroupsVotedFor, address(0), address(0));
   }
 
   function test_ShouldSetTotalVotesByAccount_WhenMaxNumberOfGroupsWasNotReached() public {
@@ -582,6 +712,199 @@ contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
   }
 
   function test_ShouldIncreaseTotalVotesCountOnceVoted_WhenTotalVotesAreManuallyCountedOnReward_WhenAwardsAreDistributed()
+    public
+  {
+    address newGroup = WhenAwardsAreDistributed();
+    manuallyUpdateTotalVotesForAllGroups(voter);
+
+    election.vote(newGroup, originallyNotVotedWithAmount, account4, group);
+
+    assertEq(election.getTotalVotes(), value + rewardValue);
+  }
+
+  function test_ShouldRevert_WhenTheGroupCannotReceiveVotes() public {
+    lockedGold.setTotalLockedGold(value / 2 - 1);
+    address[] memory members = new address[](1);
+    members[0] = account9;
+    validators.setMembers(group, members);
+    validators.setNumRegisteredValidators(1);
+    assertEq(election.getNumVotesReceivable(group), value - 2);
+
+    vm.expectRevert("Group cannot receive votes");
+    election.vote(group, value, address(0), address(0));
+  }
+}
+
+contract ElectionTest_Vote_WhenGroupEligible_L2 is ElectionTest {
+  address voter = address(this);
+  address group = account1;
+  uint256 value = 1000;
+
+  uint256 originallyNotVotedWithAmount = 1;
+  uint256 voterFirstGroupVote = value - maxNumGroupsVotedFor - originallyNotVotedWithAmount;
+  uint256 rewardValue = 1000000;
+
+  function setUp() public {
+    super.setUp();
+    _whenL2();
+    address[] memory members = new address[](1);
+    members[0] = account9;
+    validators.setMembers(group, members);
+
+    registry.setAddressFor("Validators", address(this));
+    election.markGroupEligible(group, address(0), address(0));
+    registry.setAddressFor("Validators", address(validators));
+  }
+
+  function test_ShouldRevert_WhenTheVoterDoesNotHaveSufficientNonVotingBalance() public {
+    lockedGold.incrementNonvotingAccountBalance(voter, value - 1);
+    vm.expectRevert("SafeMath: subtraction overflow");
+    election.vote(group, value, address(0), address(0));
+  }
+
+  function WhenVotedForMaxNumberOfGroups() public returns (address newGroup) {
+    lockedGold.incrementNonvotingAccountBalance(voter, value);
+
+    for (uint256 i = 0; i < maxNumGroupsVotedFor; i++) {
+      address[] memory members = new address[](1);
+      members[0] = accountsArray[9];
+      newGroup = accountsArray[i + 2];
+      setupGroupAndVote(newGroup, group, members, true);
+    }
+  }
+
+  function test_ShouldRevert_WhenTheVoterCannotVoteForAnAdditionalGroup() public {
+    address newGroup = WhenVotedForMaxNumberOfGroups();
+
+    vm.expectRevert("Voted for too many groups");
+    election.vote(group, value - maxNumGroupsVotedFor, newGroup, address(0));
+  }
+
+  function test_ShouldAllowToVoteForAnotherGroup_WhenTheVoterIsOverMaxNumberGroupsVotedForButCanVoteForAdditionalGroup()
+    public
+  {
+    address newGroup = WhenVotedForMaxNumberOfGroups();
+    election.setAllowedToVoteOverMaxNumberOfGroups(true);
+
+    vm.expectEmit(true, true, true, true);
+    emit ValidatorGroupVoteCast(voter, group, value - maxNumGroupsVotedFor);
+    election.vote(group, value - maxNumGroupsVotedFor, newGroup, address(0));
+    assertEq(election.getPendingVotesForGroupByAccount(group, voter), value - maxNumGroupsVotedFor);
+  }
+
+  function test_ShouldSetTotalVotesByAccount_WhenMaxNumberOfGroupsWasNotReached() public {
+    WhenVotedForMaxNumberOfGroups();
+    assertEq(election.getTotalVotesByAccount(voter), maxNumGroupsVotedFor);
+  }
+
+  function WhenVotedForMoreThanMaxNumberOfGroups() public returns (address newGroup) {
+    newGroup = WhenVotedForMaxNumberOfGroups();
+    election.setAllowedToVoteOverMaxNumberOfGroups(true);
+    election.vote(group, voterFirstGroupVote, newGroup, address(0));
+  }
+
+  function test_ShouldRevert_WhenTurningOffSetAllowedToVoteOverMaxNUmberOfGroups_WhenOverMaximumNumberOfGroupsVoted()
+    public
+  {
+    WhenVotedForMoreThanMaxNumberOfGroups();
+
+    vm.expectRevert("Too many groups voted for!");
+    election.setAllowedToVoteOverMaxNumberOfGroups(false);
+  }
+
+  function test_ShouldReturnOnlyLastVotedWith_WhenVotesWereNotManuallyCounted() public {
+    WhenVotedForMoreThanMaxNumberOfGroups();
+    assertEq(election.getTotalVotesByAccount(voter), voterFirstGroupVote);
+  }
+
+  function manuallyUpdateTotalVotesForAllGroups(address _voter) public {
+    for (uint256 i = 0; i < maxNumGroupsVotedFor; i++) {
+      election.updateTotalVotesByAccountForGroup(_voter, accountsArray[i + 2]);
+    }
+    election.updateTotalVotesByAccountForGroup(_voter, group);
+  }
+
+  function WhenTotalVotesWereManuallyCounted() public {
+    WhenVotedForMoreThanMaxNumberOfGroups();
+    manuallyUpdateTotalVotesForAllGroups(voter);
+  }
+
+  function test_ShouldReturnTotalVotesByAccount_WhenTotalVotesAreManuallyCounted() public {
+    WhenTotalVotesWereManuallyCounted();
+    assertEq(election.getTotalVotesByAccount(voter), value - originallyNotVotedWithAmount);
+  }
+
+  function test_ShouldReturnLoweredTotalNumberOfVotes_WhenVotesRevoked_WhenTotalVotesWereManuallyCounted()
+    public
+  {
+    uint256 revokeDiff = 100;
+    uint256 revokeValue = voterFirstGroupVote - revokeDiff;
+
+    WhenTotalVotesWereManuallyCounted();
+    election.revokePending(group, revokeValue, accountsArray[4], address(0), 3);
+    assertEq(election.getTotalVotesByAccount(voter), maxNumGroupsVotedFor + revokeDiff);
+  }
+
+  function WhenVotesAreBeingActivated() public returns (address newGroup) {
+    newGroup = WhenVotedForMoreThanMaxNumberOfGroups();
+    blockTravel(ph.epochSize() + 1);
+    election.activateForAccount(group, voter);
+  }
+
+  function test_ShouldIncrementTheAccountsActiveVotesForGroup_WhenVotesAreBeingActivated() public {
+    WhenVotesAreBeingActivated();
+    assertEq(election.getActiveVotesForGroupByAccount(group, voter), voterFirstGroupVote);
+  }
+
+  function test_ShouldReturnCorrectValueWhenManuallyCounted_WhenVotesAreBeingActivated() public {
+    WhenVotesAreBeingActivated();
+    manuallyUpdateTotalVotesForAllGroups(voter);
+
+    assertEq(election.getTotalVotesByAccount(voter), value - originallyNotVotedWithAmount);
+  }
+
+  function WhenAwardsAreDistributed() public returns (address newGroup) {
+    newGroup = WhenVotesAreBeingActivated();
+    election.distributeEpochRewards(group, rewardValue, newGroup, address(0));
+  }
+
+  // TODO: Implement when validator L2 rewards mechanism is implemented.
+  function skip_test_ShouldRevokeActiveVotes_WhenAwardsAreDistributed() public {
+    // (more then original votes without rewards)
+    address newGroup = WhenAwardsAreDistributed();
+    election.revokeActive(group, value, newGroup, address(0), 3);
+    assertEq(
+      election.getActiveVotesForGroupByAccount(group, voter),
+      rewardValue - maxNumGroupsVotedFor - originallyNotVotedWithAmount
+    );
+  }
+
+  // TODO: Implement when validator L2 rewards mechanism is implemented.
+  function skip_test_ShouldReturnCorrectValueWhenManuallyCounted_WhenMoreVotesThanActiveIsRevoked_WhenAwardsAreDistributed()
+    public
+  {
+    address newGroup = WhenAwardsAreDistributed();
+    election.revokeActive(group, value, newGroup, address(0), 3);
+    manuallyUpdateTotalVotesForAllGroups(voter);
+
+    assertEq(election.getTotalVotesByAccount(voter), rewardValue - originallyNotVotedWithAmount);
+  }
+
+  // TODO: Implement when validator L2 rewards mechanism is implemented.
+  function skip_test_ShouldReturnTotalVotesByAccount_WhenTotalVotesAreManuallyCountedOnReward_WhenAwardsAreDistributed()
+    public
+  {
+    WhenAwardsAreDistributed();
+    manuallyUpdateTotalVotesForAllGroups(voter);
+
+    assertEq(
+      election.getTotalVotesByAccount(voter),
+      value + rewardValue - originallyNotVotedWithAmount
+    );
+  }
+
+  // TODO: Implement when validator L2 rewards mechanism is implemented.
+  function skip_test_ShouldIncreaseTotalVotesCountOnceVoted_WhenTotalVotesAreManuallyCountedOnReward_WhenAwardsAreDistributed()
     public
   {
     address newGroup = WhenAwardsAreDistributed();
@@ -788,6 +1111,9 @@ contract ElectionTest_Activate is ElectionTest {
   address group = account1;
   uint256 value = 1000;
 
+  address voter2 = account2;
+  uint256 value2 = 573;
+
   function setUp() public {
     super.setUp();
 
@@ -858,16 +1184,6 @@ contract ElectionTest_Activate is ElectionTest {
     emit ValidatorGroupVoteActivated(voter, group, value, value * 100000000000000000000);
     election.activate(group);
   }
-
-  function test_Revert_Activate_WhenL2() public {
-    WhenVoterHasPendingVotes();
-    _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    election.activate(group);
-  }
-
-  address voter2 = account2;
-  uint256 value2 = 573;
 
   function WhenAnotherVoterActivatesVotes() public {
     WhenEpochBoundaryHasPassed();
@@ -940,9 +1256,159 @@ contract ElectionTest_Activate is ElectionTest {
     election.activateForAccount(group, voter);
   }
 
-  function test_Revert_ActivateForAccount_WhenL2() public {
+  function test_ShouldRevert_WhenTheVoterDoesNotHavePendingVotes() public {
+    vm.expectRevert("Vote value cannot be zero");
+    election.activate(group);
+  }
+}
+
+contract ElectionTest_Activate_L2 is ElectionTest {
+  address voter = address(this);
+  address group = account1;
+  uint256 value = 1000;
+
+  address voter2 = account2;
+  uint256 value2 = 573;
+
+  function setUp() public {
+    super.setUp();
     _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
+    address[] memory members = new address[](1);
+    members[0] = account9;
+    validators.setMembers(group, members);
+
+    registry.setAddressFor("Validators", address(this));
+    election.markGroupEligible(group, address(0), address(0));
+    registry.setAddressFor("Validators", address(validators));
+
+    lockedGold.setTotalLockedGold(value);
+    validators.setMembers(group, members);
+    validators.setNumRegisteredValidators(1);
+    lockedGold.incrementNonvotingAccountBalance(voter, value);
+  }
+
+  function WhenVoterHasPendingVotes() public {
+    election.vote(group, value, address(0), address(0));
+  }
+
+  function WhenEpochBoundaryHasPassed() public {
+    WhenVoterHasPendingVotes();
+    blockTravel(ph.epochSize() + 1);
+    election.activate(group);
+  }
+
+  function test_ShouldDecrementTheAccountsPendingVotesForTheGroup_WhenEpochBoundaryHasPassed()
+    public
+  {
+    WhenEpochBoundaryHasPassed();
+    assertEq(election.getPendingVotesForGroupByAccount(group, voter), 0);
+  }
+
+  function test_ShouldIncrementTheAccountsActiveVotesForTheGroup_WhenEpochBoundaryHasPassed()
+    public
+  {
+    WhenEpochBoundaryHasPassed();
+    assertEq(election.getActiveVotesForGroupByAccount(group, voter), value);
+  }
+
+  function test_ShouldNotModifyTheAccountsTotalVotesForTheGroup_WhenEpochBoundaryHasPassed()
+    public
+  {
+    WhenEpochBoundaryHasPassed();
+    assertEq(election.getTotalVotesForGroupByAccount(group, voter), value);
+  }
+
+  function test_ShouldNotModifyTheAccountsTotalVotes_WhenEpochBoundaryHasPassed() public {
+    WhenEpochBoundaryHasPassed();
+    assertEq(election.getTotalVotesByAccount(voter), value);
+  }
+
+  function test_ShouldNotModifyTotalVotesForGroup_WhenEpochBoundaryHasPassed() public {
+    WhenEpochBoundaryHasPassed();
+    assertEq(election.getTotalVotesForGroup(group), value);
+  }
+
+  function test_ShouldNotModifyTotalVotes_WhenEpochBoundaryHasPassed() public {
+    WhenEpochBoundaryHasPassed();
+    assertEq(election.getTotalVotes(), value);
+  }
+
+  function test_ShouldEmitValidatorGroupVoteActivatedEvent_WhenEpochBoundaryHasPassed() public {
+    WhenVoterHasPendingVotes();
+    blockTravel(ph.epochSize() + 1);
+    vm.expectEmit(true, true, true, false);
+    emit ValidatorGroupVoteActivated(voter, group, value, value * 100000000000000000000);
+    election.activate(group);
+  }
+
+  function WhenAnotherVoterActivatesVotes() public {
+    WhenEpochBoundaryHasPassed();
+    lockedGold.incrementNonvotingAccountBalance(voter2, value2);
+    vm.prank(voter2);
+    election.vote(group, value2, address(0), address(0));
+    blockTravel(ph.epochSize() + 1);
+    vm.prank(voter2);
+    election.activate(group);
+  }
+
+  function test_ShouldNotModifyTheFirstAccountActiveVotesForTheGroup_WhenAnotherVoterActivatesVotes()
+    public
+  {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getActiveVotesForGroupByAccount(group, voter), value);
+  }
+
+  function test_ShouldNotModifyTheFirstAccountTotalVotesForTheGroup_WhenAnotherVoterActivatesVotes()
+    public
+  {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getTotalVotesForGroupByAccount(group, voter), value);
+  }
+
+  function test_ShouldNotModifyTheFirstAccountTotalVotes_WhenAnotherVoterActivatesVotes() public {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getTotalVotesByAccount(voter), value);
+  }
+
+  function test_ShouldDecrementTheSecondAccountsPendingVotesFOrTheGroup_WhenAnotherVoterActivatesVotes()
+    public
+  {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getPendingVotesForGroupByAccount(group, voter2), 0);
+  }
+
+  function test_ShouldIncrementTheSecondAccountActiveVotesForTheGroup_WhenAnotherVoterActivatesVotes()
+    public
+  {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getActiveVotesForGroupByAccount(group, voter2), value2);
+  }
+
+  function test_ShouldNotModifyTheSecondsAccountTotalVotesForTheGroup_WhenAnotherVoterActivatesVotes()
+    public
+  {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getTotalVotesForGroupByAccount(group, voter2), value2);
+  }
+
+  function test_ShouldNotMOdifyTheSecondAccountTotalVotes_WhenAnotherVoterActivatesVotes() public {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getTotalVotesByAccount(voter2), value2);
+  }
+
+  function test_ShouldNotModifyTotalVotesForGroup_WhenAnotherVoterActivatesVotes() public {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getTotalVotesForGroup(group), value + value2);
+  }
+
+  function test_ShouldNotModifyTotalVotes_WhenAnotherVoterActivatesVotes() public {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getTotalVotes(), value + value2);
+  }
+
+  function test_ShouldRevert_WhenAnEpochBoundaryHadNotPassedSinceThePendingVotesWereMade() public {
+    WhenVoterHasPendingVotes();
+    vm.expectRevert("Pending vote epoch not passed");
     election.activateForAccount(group, voter);
   }
 
@@ -956,6 +1422,9 @@ contract ElectionTest_ActivateForAccount is ElectionTest {
   address voter = address(this);
   address group = account1;
   uint256 value = 1000;
+
+  address voter2 = account2;
+  uint256 value2 = 573;
 
   function setUp() public {
     super.setUp();
@@ -1028,8 +1497,160 @@ contract ElectionTest_ActivateForAccount is ElectionTest {
     election.activate(group);
   }
 
+  function WhenAnotherVoterActivatesVotes() public {
+    WhenEpochBoundaryHasPassed();
+    lockedGold.incrementNonvotingAccountBalance(voter2, value2);
+    vm.prank(voter2);
+    election.vote(group, value2, address(0), address(0));
+    blockTravel(ph.epochSize() + 1);
+    election.activateForAccount(group, voter2);
+  }
+
+  function test_ShouldNotModifyTheFirstAccountActiveVotesForTheGroup_WhenAnotherVoterActivatesVotes()
+    public
+  {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getActiveVotesForGroupByAccount(group, voter), value);
+  }
+
+  function test_ShouldNotModifyTheFirstAccountTotalVotesForTheGroup_WhenAnotherVoterActivatesVotes()
+    public
+  {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getTotalVotesForGroupByAccount(group, voter), value);
+  }
+
+  function test_ShouldNotModifyTheFirstAccountTotalVotes_WhenAnotherVoterActivatesVotes() public {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getTotalVotesByAccount(voter), value);
+  }
+
+  function test_ShouldDecrementTheSecondAccountsPendingVotesFOrTheGroup_WhenAnotherVoterActivatesVotes()
+    public
+  {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getPendingVotesForGroupByAccount(group, voter2), 0);
+  }
+
+  function test_ShouldIncrementTheSecondAccountActiveVotesForTheGroup_WhenAnotherVoterActivatesVotes()
+    public
+  {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getActiveVotesForGroupByAccount(group, voter2), value2);
+  }
+
+  function test_ShouldNotModifyTheSecondsAccountTotalVotesForTheGroup_WhenAnotherVoterActivatesVotes()
+    public
+  {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getTotalVotesForGroupByAccount(group, voter2), value2);
+  }
+
+  function test_ShouldNotMOdifyTheSecondAccountTotalVotes_WhenAnotherVoterActivatesVotes() public {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getTotalVotesByAccount(voter2), value2);
+  }
+
+  function test_ShouldNotModifyTotalVotesForGroup_WhenAnotherVoterActivatesVotes() public {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getTotalVotesForGroup(group), value + value2);
+  }
+
+  function test_ShouldNotModifyTotalVotes_WhenAnotherVoterActivatesVotes() public {
+    WhenAnotherVoterActivatesVotes();
+    assertEq(election.getTotalVotes(), value + value2);
+  }
+
+  function test_ShouldRevert_WhenEpochBoundaryHasNotPassedSinceThePendingVotesWereMade() public {
+    WhenVoterHasPendingVotes();
+    vm.expectRevert("Pending vote epoch not passed");
+    election.activateForAccount(group, voter);
+  }
+
+  function test_ShouldRevert_WhenTheVoterDoesNotHavePendingVotes() public {
+    vm.expectRevert("Vote value cannot be zero");
+    election.activateForAccount(group, voter);
+  }
+}
+
+contract ElectionTest_ActivateForAccount_L2 is ElectionTest {
+  address voter = address(this);
+  address group = account1;
+  uint256 value = 1000;
+
   address voter2 = account2;
   uint256 value2 = 573;
+
+  function setUp() public {
+    super.setUp();
+    _whenL2();
+    address[] memory members = new address[](1);
+    members[0] = account9;
+    validators.setMembers(group, members);
+
+    registry.setAddressFor("Validators", address(this));
+    election.markGroupEligible(group, address(0), address(0));
+    registry.setAddressFor("Validators", address(validators));
+
+    lockedGold.setTotalLockedGold(value);
+    validators.setMembers(group, members);
+    validators.setNumRegisteredValidators(1);
+    lockedGold.incrementNonvotingAccountBalance(voter, value);
+  }
+
+  function WhenVoterHasPendingVotes() public {
+    election.vote(group, value, address(0), address(0));
+  }
+
+  function WhenEpochBoundaryHasPassed() public {
+    WhenVoterHasPendingVotes();
+    blockTravel(ph.epochSize() + 1);
+    election.activateForAccount(group, voter);
+  }
+
+  function test_ShouldDecrementTheAccountsPendingVotesForTheGroup_WhenEpochBoundaryHasPassed()
+    public
+  {
+    WhenEpochBoundaryHasPassed();
+    assertEq(election.getPendingVotesForGroupByAccount(group, voter), 0);
+  }
+
+  function test_ShouldIncrementTheAccountsActiveVotesForTheGroup_WhenEpochBoundaryHasPassed()
+    public
+  {
+    WhenEpochBoundaryHasPassed();
+    assertEq(election.getActiveVotesForGroupByAccount(group, voter), value);
+  }
+
+  function test_ShouldNotModifyTheAccountsTotalVotesForTheGroup_WhenEpochBoundaryHasPassed()
+    public
+  {
+    WhenEpochBoundaryHasPassed();
+    assertEq(election.getTotalVotesForGroupByAccount(group, voter), value);
+  }
+
+  function test_ShouldNotModifyTheAccountsTotalVotes_WhenEpochBoundaryHasPassed() public {
+    WhenEpochBoundaryHasPassed();
+    assertEq(election.getTotalVotesByAccount(voter), value);
+  }
+
+  function test_ShouldNotModifyTotalVotesForGroup_WhenEpochBoundaryHasPassed() public {
+    WhenEpochBoundaryHasPassed();
+    assertEq(election.getTotalVotesForGroup(group), value);
+  }
+
+  function test_ShouldNotModifyTotalVotes_WhenEpochBoundaryHasPassed() public {
+    WhenEpochBoundaryHasPassed();
+    assertEq(election.getTotalVotes(), value);
+  }
+
+  function test_ShouldEmitValidatorGroupVoteActivatedEvent_WhenEpochBoundaryHasPassed() public {
+    WhenVoterHasPendingVotes();
+    blockTravel(ph.epochSize() + 1);
+    vm.expectEmit(true, true, true, false);
+    emit ValidatorGroupVoteActivated(voter, group, value, value * 100000000000000000000);
+    election.activate(group);
+  }
 
   function WhenAnotherVoterActivatesVotes() public {
     WhenEpochBoundaryHasPassed();
@@ -1538,6 +2159,11 @@ contract ElectionTest_RevokeActive is ElectionTest {
 }
 
 contract ElectionTest_ElectionValidatorSigners is ElectionTest {
+  struct MemberWithVotes {
+    address member;
+    uint256 votes;
+  }
+
   address group1 = address(this);
   address group2 = account1;
   address group3 = account2;
@@ -1571,11 +2197,6 @@ contract ElectionTest_ElectionValidatorSigners is ElectionTest {
 
   uint256 totalLockedGold = voter1Weight + voter2Weight + voter3Weight;
 
-  struct MemberWithVotes {
-    address member;
-    uint256 votes;
-  }
-
   mapping(address => uint256) votesConsideredForElection;
 
   MemberWithVotes[] membersWithVotes;
@@ -1596,37 +2217,6 @@ contract ElectionTest_ElectionValidatorSigners is ElectionTest {
 
   function setRandomness() public {
     random.addTestRandomness(block.number + 1, hash);
-  }
-
-  // Helper function to sort an array of uint256
-  function sort(uint256[] memory data) internal pure returns (uint256[] memory) {
-    uint256 length = data.length;
-    for (uint256 i = 0; i < length; i++) {
-      for (uint256 j = i + 1; j < length; j++) {
-        if (data[i] > data[j]) {
-          uint256 temp = data[i];
-          data[i] = data[j];
-          data[j] = temp;
-        }
-      }
-    }
-    return data;
-  }
-
-  function sortMembersWithVotesDesc(
-    MemberWithVotes[] memory data
-  ) internal pure returns (MemberWithVotes[] memory) {
-    uint256 length = data.length;
-    for (uint256 i = 0; i < length; i++) {
-      for (uint256 j = i + 1; j < length; j++) {
-        if (data[i].votes < data[j].votes) {
-          MemberWithVotes memory temp = data[i];
-          data[i] = data[j];
-          data[j] = temp;
-        }
-      }
-    }
-    return data;
   }
 
   function WhenThereIsALargeNumberOfGroups() public {
@@ -1791,6 +2381,37 @@ contract ElectionTest_ElectionValidatorSigners is ElectionTest {
     vm.expectRevert("Not enough elected validators");
     election.electValidatorSigners();
   }
+
+  // Helper function to sort an array of uint256
+  function sort(uint256[] memory data) internal pure returns (uint256[] memory) {
+    uint256 length = data.length;
+    for (uint256 i = 0; i < length; i++) {
+      for (uint256 j = i + 1; j < length; j++) {
+        if (data[i] > data[j]) {
+          uint256 temp = data[i];
+          data[i] = data[j];
+          data[j] = temp;
+        }
+      }
+    }
+    return data;
+  }
+
+  function sortMembersWithVotesDesc(
+    MemberWithVotes[] memory data
+  ) internal pure returns (MemberWithVotes[] memory) {
+    uint256 length = data.length;
+    for (uint256 i = 0; i < length; i++) {
+      for (uint256 j = i + 1; j < length; j++) {
+        if (data[i].votes < data[j].votes) {
+          MemberWithVotes memory temp = data[i];
+          data[i] = data[j];
+          data[j] = temp;
+        }
+      }
+    }
+    return data;
+  }
 }
 
 contract ElectionTest_GetGroupEpochRewards is ElectionTest {
@@ -1800,6 +2421,12 @@ contract ElectionTest_GetGroupEpochRewards is ElectionTest {
   uint256 voteValue1 = 2000000000;
   uint256 voteValue2 = 1000000000;
   uint256 totalRewardValue = 3000000000;
+
+  uint256 expectedGroup1EpochRewards =
+    FixidityLib
+      .newFixedFraction(voteValue1, voteValue1 + voteValue2)
+      .multiply(FixidityLib.newFixed(totalRewardValue))
+      .fromFixed();
 
   function setUp() public {
     super.setUp();
@@ -1880,12 +2507,6 @@ contract ElectionTest_GetGroupEpochRewards is ElectionTest {
     assertEq(election.getGroupEpochRewards(group2, totalRewardValue, uptimes), 0);
   }
 
-  uint256 expectedGroup1EpochRewards =
-    FixidityLib
-      .newFixedFraction(voteValue1, voteValue1 + voteValue2)
-      .multiply(FixidityLib.newFixed(totalRewardValue))
-      .fromFixed();
-
   function test_ShouldReturnProportionalRewardValueForOtherGroup_WhenOneGroupDoesNotMeetLockedGoldRequirements_WhenTwoGroupsHaveActiveVotes()
     public
   {
@@ -1919,6 +2540,13 @@ contract ElectionTest_DistributeEpochRewards is ElectionTest {
   uint256 voteValue2 = 1000000;
   uint256 rewardValue = 1000000;
   uint256 rewardValue2 = 10000000;
+
+  uint256 expectedGroupTotalActiveVotes = voteValue + voteValue2 / 2 + rewardValue;
+  uint256 expectedVoterActiveVotesForGroup =
+    FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes * 2, 3).fromFixed();
+  uint256 expectedVoter2ActiveVotesForGroup =
+    FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes, 3).fromFixed();
+  uint256 expectedVoter2ActiveVotesForGroup2 = voteValue / 2 + rewardValue2;
 
   function setUp() public {
     super.setUp();
@@ -1976,13 +2604,6 @@ contract ElectionTest_DistributeEpochRewards is ElectionTest {
     election.distributeEpochRewards(group, rewardValue, address(0), address(0));
     assertEq(election.getTotalVotes(), voteValue + rewardValue);
   }
-
-  uint256 expectedGroupTotalActiveVotes = voteValue + voteValue2 / 2 + rewardValue;
-  uint256 expectedVoterActiveVotesForGroup =
-    FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes * 2, 3).fromFixed();
-  uint256 expectedVoter2ActiveVotesForGroup =
-    FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes, 3).fromFixed();
-  uint256 expectedVoter2ActiveVotesForGroup2 = voteValue / 2 + rewardValue2;
 
   function WhenThereAreTwoGroupsWithActiveVotes() public {
     registry.setAddressFor("Validators", address(this));
@@ -2086,6 +2707,15 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
   uint256 index = 0;
   uint256 slashedValue = value;
   uint256 remaining = value - slashedValue;
+
+  uint256 totalRemaining;
+  uint256 group1Remaining;
+  uint256 group2TotalRemaining;
+  uint256 group2PendingRemaining;
+  uint256 group2ActiveRemaining;
+
+  uint256 group1RemainingActiveVotes;
+  address[] initialOrdering;
 
   function setUp() public {
     super.setUp();
@@ -2331,12 +2961,6 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
     assertEq(election.getActiveVotesForGroupByAccount(group, voter), remaining);
   }
 
-  uint256 totalRemaining;
-  uint256 group1Remaining;
-  uint256 group2TotalRemaining;
-  uint256 group2PendingRemaining;
-  uint256 group2ActiveRemaining;
-
   function WhenWeSlashAllOfGroup1VotesAndSomeOfGroup2__WhenWeSlash1MoreVoteThanGroup1PendingVoteTotal_WhenAccountHasVotedForMoreThanOneGroupInequally()
     public
   {
@@ -2372,9 +2996,6 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
     assertEq(election.getPendingVotesForGroupByAccount(group2, voter), group2PendingRemaining);
     assertEq(election.getActiveVotesForGroupByAccount(group2, voter), group2ActiveRemaining);
   }
-
-  uint256 group1RemainingActiveVotes;
-  address[] initialOrdering;
 
   function WhenSlashAffectsElectionOrder() public {
     WhenAccountHasVotedForMoreThanOneGroupInequally();
@@ -2491,12 +3112,6 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
 }
 
 contract ElectionTest_ConsistencyChecks is ElectionTest {
-  address voter = address(this);
-  address group = account2;
-  uint256 rewardValue2 = 10000000;
-
-  AccountStruct[] _accounts;
-
   struct AccountStruct {
     address account;
     uint256 active;
@@ -2510,6 +3125,12 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
     RevokePending,
     RevokeActive
   }
+
+  address voter = address(this);
+  address group = account2;
+  uint256 rewardValue2 = 10000000;
+
+  AccountStruct[] _accounts;
 
   function setUp() public {
     super.setUp();
@@ -2536,52 +3157,6 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
         )
       );
     }
-  }
-
-  function makeRandomAction(AccountStruct storage account, uint256 salt) internal {
-    VoteActionType[] memory actions = new VoteActionType[](4);
-    uint256 actionCount = 0;
-
-    if (account.nonVoting > 0) {
-      actions[actionCount++] = VoteActionType.Vote;
-    }
-    if (election.hasActivatablePendingVotes(account.account, group)) {
-      // Assuming this is a view function
-      actions[actionCount++] = VoteActionType.Activate;
-    }
-    if (account.pending > 0) {
-      actions[actionCount++] = VoteActionType.RevokePending;
-    }
-    if (account.active > 0) {
-      actions[actionCount++] = VoteActionType.RevokeActive;
-    }
-
-    VoteActionType action = actions[generatePRN(0, actionCount - 1, uint256(account.account))];
-    uint256 value;
-
-    vm.startPrank(account.account);
-    if (action == VoteActionType.Vote) {
-      value = generatePRN(0, account.nonVoting, uint256(account.account) + salt);
-      election.vote(group, value, address(0), address(0));
-      account.nonVoting -= value;
-      account.pending += value;
-    } else if (action == VoteActionType.Activate) {
-      value = account.pending;
-      election.activate(group);
-      account.pending -= value;
-      account.active += value;
-    } else if (action == VoteActionType.RevokePending) {
-      value = generatePRN(0, account.pending, uint256(account.account) + salt);
-      election.revokePending(group, value, address(0), address(0), 0);
-      account.pending -= value;
-      account.nonVoting += value;
-    } else if (action == VoteActionType.RevokeActive) {
-      value = generatePRN(0, account.active, uint256(account.account) + salt);
-      election.revokeActive(group, value, address(0), address(0), 0);
-      account.active -= value;
-      account.nonVoting += value;
-    }
-    vm.stopPrank();
   }
 
   function checkVoterInvariants(AccountStruct memory account, uint256 delta) public {
@@ -2708,13 +3283,84 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
     }
     revokeAllAndCheckInvariants(100);
   }
+
+  function makeRandomAction(AccountStruct storage account, uint256 salt) internal {
+    VoteActionType[] memory actions = new VoteActionType[](4);
+    uint256 actionCount = 0;
+
+    if (account.nonVoting > 0) {
+      actions[actionCount++] = VoteActionType.Vote;
+    }
+    if (election.hasActivatablePendingVotes(account.account, group)) {
+      // Assuming this is a view function
+      actions[actionCount++] = VoteActionType.Activate;
+    }
+    if (account.pending > 0) {
+      actions[actionCount++] = VoteActionType.RevokePending;
+    }
+    if (account.active > 0) {
+      actions[actionCount++] = VoteActionType.RevokeActive;
+    }
+
+    VoteActionType action = actions[generatePRN(0, actionCount - 1, uint256(account.account))];
+    uint256 value;
+
+    vm.startPrank(account.account);
+    if (action == VoteActionType.Vote) {
+      value = generatePRN(0, account.nonVoting, uint256(account.account) + salt);
+      election.vote(group, value, address(0), address(0));
+      account.nonVoting -= value;
+      account.pending += value;
+    } else if (action == VoteActionType.Activate) {
+      value = account.pending;
+      election.activate(group);
+      account.pending -= value;
+      account.active += value;
+    } else if (action == VoteActionType.RevokePending) {
+      value = generatePRN(0, account.pending, uint256(account.account) + salt);
+      election.revokePending(group, value, address(0), address(0), 0);
+      account.pending -= value;
+      account.nonVoting += value;
+    } else if (action == VoteActionType.RevokeActive) {
+      value = generatePRN(0, account.active, uint256(account.account) + salt);
+      election.revokeActive(group, value, address(0), address(0), 0);
+      account.active -= value;
+      account.nonVoting += value;
+    }
+    vm.stopPrank();
+  }
 }
 
 contract ElectionTest_HasActivatablePendingVotes is ElectionTest {
-  function test_Revert_hasActivatablePendingVotes_WhenL2() public {
+  address voter = address(this);
+  address group = account1;
+  uint256 value = 1000;
+
+  function setUp() public {
+    super.setUp();
+    address[] memory members = new address[](1);
+    members[0] = account9;
+    validators.setMembers(group, members);
+
+    registry.setAddressFor("Validators", address(this));
+    election.markGroupEligible(group, address(0), address(0));
+    registry.setAddressFor("Validators", address(validators));
+
+    lockedGold.setTotalLockedGold(value);
+    validators.setMembers(group, members);
+    validators.setNumRegisteredValidators(1);
+
+    lockedGold.incrementNonvotingAccountBalance(voter, value);
+    election.vote(group, value, address(0), address(0));
+    blockTravel(ph.epochSize() + 1);
+  }
+  function test_ReturnsTrue_WhenUserHasVoted() public {
+    assertTrue(election.hasActivatablePendingVotes(voter, group));
+  }
+
+  function test_ReturnsTrue_WhenUserHasVotedOnL2() public {
     _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    vm.prank(address(0));
-    election.hasActivatablePendingVotes(address(0), address(0));
+
+    assertTrue(election.hasActivatablePendingVotes(voter, group));
   }
 }
