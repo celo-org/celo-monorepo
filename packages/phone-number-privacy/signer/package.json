@@ -51,7 +51,7 @@
     "express": "^4.17.1",
     "knex": "^2.1.0",
     "mssql": "^6.3.1",
-    "mysql2": "^2.1.0",
+    "mysql2": "^3.0.0",
     "pg": "^8.2.1",
     "prom-client": "12.0.0",
     "promise.allsettled": "^1.0.2"
