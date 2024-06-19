@@ -37,7 +37,7 @@ contract GoldToken is
   // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
   address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
 
-  IMintGoldSchedule public celoTokenDistributionSchedule;
+  ICeloDistributionSchedule public celoTokenDistributionSchedule;
 
   event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -87,7 +87,7 @@ contract GoldToken is
         celoTokenDistributionScheduleAddress != address(celoTokenDistributionSchedule),
       "Invalid address."
     );
-    celoTokenDistributionSchedule = IMintGoldSchedule(celoTokenDistributionScheduleAddress);
+    celoTokenDistributionSchedule = ICeloDistributionSchedule(celoTokenDistributionScheduleAddress);
 
     emit SetCeloTokenDistributionScheduleAddress(celoTokenDistributionScheduleAddress);
   }

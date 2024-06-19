@@ -28,7 +28,7 @@ contract GoldTokenTest is Test, IsL2Check {
     celoTokenDistributionSchedule = actor("celoTokenDistributionSchedule");
     vm.prank(celoTokenOwner);
     celoToken = new GoldToken(true);
-    deployCodeTo("MintGoldSchedule.sol", abi.encode(false), celoTokenDistributionSchedule);
+    deployCodeTo("CeloDistributionSchedule.sol", abi.encode(false), celoTokenDistributionSchedule);
     receiver = actor("receiver");
     sender = actor("sender");
     vm.deal(receiver, ONE_CELOTOKEN);
