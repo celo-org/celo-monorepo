@@ -1391,7 +1391,7 @@
     source-map-support "0.5.12"
     yargs "13.2.4"
 
-"@celo/ganache-core@git+https://github.com/celo-org/ganache-core.git#d1d179769edb71d910aab1423b7778f7b3e047a0", ganache-core@^2.6.0, "ganache-core@git+https://github.com/celo-org/ganache-core.git#d1d179769edb71d910aab1423b7778f7b3e047a0":
+"@celo/ganache-core@git+https://github.com/celo-org/ganache-core.git#d1d179769edb71d910aab1423b7778f7b3e047a0":
   version "2.10.2"
   resolved "git+https://github.com/celo-org/ganache-core.git#d1d179769edb71d910aab1423b7778f7b3e047a0"
   dependencies:
@@ -13431,6 +13431,40 @@ futoin-hkdf@^1.0.3:
   resolved "https://registry.yarnpkg.com/futoin-hkdf/-/futoin-hkdf-1.0.3.tgz#c62f0279503e01545d64925c2752b482ed78485c"
   integrity sha512-z/zwCHxtjKJfPGaebSmA5B/tfEB6uw5C4Fwgc68XculpqKp9fRE2nVY2D7Mcx6V3s3AQOHz9OAx28DNUlWGokg==
 
+ganache-core@^2.6.0, "ganache-core@git+https://github.com/celo-org/ganache-core.git#d1d179769edb71d910aab1423b7778f7b3e047a0":
+  version "2.10.2"
+  resolved "git+https://github.com/celo-org/ganache-core.git#d1d179769edb71d910aab1423b7778f7b3e047a0"
+  dependencies:
+    "@celo/utils" "0.1.17"
+    abstract-leveldown "3.0.0"
+    async "2.6.2"
+    bip39 "2.5.0"
+    cachedown "1.0.0"
+    clone "2.1.2"
+    debug "3.2.6"
+    encoding-down "5.0.4"
+    eth-sig-util "2.3.0"
+    ethereumjs-abi "0.6.7"
+    ethereumjs-account "3.0.0"
+    ethereumjs-block "2.2.2"
+    ethereumjs-common "1.5.0"
+    ethereumjs-tx "2.1.2"
+    ethereumjs-util "6.2.0"
+    ethereumjs-vm "git+https://github.com/celo-org/celo-monorepo.git#ethereumjs-vm-v4.1.3-celo3-gitpkg"
+    heap "0.2.6"
+    level-sublevel "6.6.4"
+    levelup "3.1.1"
+    lodash "4.17.14"
+    merkle-patricia-tree "2.3.2"
+    seedrandom "3.0.1"
+    source-map-support "0.5.12"
+    tmp "0.1.0"
+    web3-provider-engine "14.2.1"
+    websocket "1.0.29"
+  optionalDependencies:
+    ethereumjs-wallet "0.6.4"
+    web3 "1.2.4"
+
 gauge@~2.7.3:
   version "2.7.4"
   resolved "https://registry.yarnpkg.com/gauge/-/gauge-2.7.4.tgz#2c03405c7538c39d7eb37b317022e325fb018bf7"
@@ -19014,9 +19048,9 @@ minimist-options@^3.0.1:
     is-plain-obj "^1.1.0"
 
 minimist@0.0.5, minimist@0.0.8, minimist@^1.1.0, minimist@^1.1.1, minimist@^1.1.3, minimist@^1.2.0, minimist@^1.2.5, minimist@~1.2.0:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
-  integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.8.tgz#c1a464e7693302e082a075cee0c057741ac4772c"
+  integrity sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==
 
 minipass@^2.3.3, minipass@^2.3.5, minipass@^2.6.0, minipass@^2.8.6, minipass@^2.9.0:
   version "2.9.0"
