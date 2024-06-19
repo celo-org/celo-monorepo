@@ -70,6 +70,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     uint256 _carbonOffsettingFraction,
     address registryAddress
   ) external onlyOwner onlyL2 {
+    require(address(this).balance > 0, "Contract does not have CELO balance.");
     require(!areDependenciesSet, "Contract has already been activated.");
     require(registryAddress != address(0), "The registry address cannot be the zero address");
     require(block.timestamp > _l2StartTime, "L2 start time cannot be set to a future date.");
@@ -97,18 +98,23 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       targetGoldTotalSupply - getGoldToken().totalSupply()
     );
 
-    require(mintableAmount > 0, "Mintable amount must be greater than zero");
+    require(mintableAmount > 0, "Mintable amount must be greater than zero.");
+    require(address(this).balance > mintableAmount, "Contract balance is insufficient.");
+
     totalMintedBySchedule += mintableAmount;
 
     IGoldToken goldToken = IGoldToken(address(getGoldToken()));
+
+    // if what needs to be minted is greater than what we have , transfer the rest.
+    goldToken.increaseSupply(communityRewardFundMintAmount + carbonOffsettingPartnerMintAmount);
     require(
-      goldToken.mint(communityRewardFund, communityRewardFundMintAmount),
-      "Failed to mint to community partner."
+      goldToken.transfer(communityRewardFund, communityRewardFundMintAmount),
+      "Failed to transfer to community partner."
     );
 
     require(
-      goldToken.mint(carbonOffsettingPartner, carbonOffsettingPartnerMintAmount),
-      "Failed to mint to carbon offsetting partner."
+      goldToken.transfer(carbonOffsettingPartner, carbonOffsettingPartnerMintAmount),
+      "Failed to transfer to carbon offsetting partner."
     );
     return true;
   }

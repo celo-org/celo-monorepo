@@ -32,4 +32,10 @@ interface IGoldToken is IERC20 {
    * @param value The amount of token to be minted.
    */
   function mint(address to, uint256 value) external returns (bool);
+
+  /**
+   * @notice Increases the variable for total amount of CELO in existence.
+   * @param amount The amount to increase counter by.
+   */
+  function increaseSupply(uint256 amount) external;
 }

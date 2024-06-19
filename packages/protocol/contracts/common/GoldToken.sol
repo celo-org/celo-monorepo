@@ -198,8 +198,9 @@ contract GoldToken is
    * @notice Mints new CELO and gives it to 'to'.
    * @param to The account for which to mint tokens.
    * @param value The amount of CELO to mint.
+   * @dev This function will be deprecated in L2.
    */
-  function mint(address to, uint256 value) external onlySchedule returns (bool) {
+  function mint(address to, uint256 value) external onlyL1 onlyVm returns (bool) {
     if (value == 0) {
       return true;
     }
@@ -221,7 +222,7 @@ contract GoldToken is
    * @dev This function will be deprecated in L2. The onlyway to increase
    * the supply is with the mint function.
    */
-  function increaseSupply(uint256 amount) external onlyL1 onlyVm {
+  function increaseSupply(uint256 amount) external onlySchedule {
     totalSupply_ = totalSupply_.add(amount);
   }
 

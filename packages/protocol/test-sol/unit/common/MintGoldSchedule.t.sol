@@ -44,9 +44,13 @@ contract MintGoldScheduleTest is Test, Constants, IsL2Check {
   uint256 constant GENESIS_GOLD_SUPPLY = 600000000 ether; // 600 million Gold
 
   uint256 constant FIFTEEN_YEAR_LINEAR_REWARD = (GOLD_SUPPLY_CAP - GENESIS_GOLD_SUPPLY) / 2; // 200 million Gold
+
   uint256 constant FIFTEEN_YEAR_GOLD_SUPPLY = GENESIS_GOLD_SUPPLY + FIFTEEN_YEAR_LINEAR_REWARD; // 800 million Gold (includes GENESIS_GOLD_SUPPLY)
 
   uint256 constant MAX_L2_DISTRIBUTION = FIFTEEN_YEAR_GOLD_SUPPLY - L1_MINTED_GOLD_SUPPLY; // 107.2 million Gold
+
+  uint256 constant L2_INITIAL_STASH_BALANCE = FIFTEEN_YEAR_LINEAR_REWARD + MAX_L2_DISTRIBUTION; // leftover from L1 minted plus the 2nd 15 year term.
+
   uint256 constant MAX_L2_COMMUNITY_DISTRIBUTION = MAX_L2_DISTRIBUTION / 4; // 26.8 million Gold
   uint256 constant MAX_L2_CARBON_FUND_DISTRIBUTION = MAX_L2_DISTRIBUTION / 1000; // 107,297 Gold
 
@@ -105,6 +109,8 @@ contract MintGoldScheduleTest is Test, Constants, IsL2Check {
     vm.prank(mintGoldOwner);
     mintGoldSchedule = new MintGoldSchedule(true);
 
+    vm.deal(address(mintGoldSchedule), L2_INITIAL_STASH_BALANCE);
+
     goldToken.setGoldTokenMintingScheduleAddress(address(mintGoldSchedule));
 
     vm.prank(mintGoldOwner);
@@ -129,6 +135,7 @@ contract MintGoldScheduleTest_initialize is MintGoldScheduleTest {
 
     vm.prank(mintGoldOwner);
     mintGoldSchedule = new MintGoldSchedule(true);
+
     goldToken.setGoldTokenMintingScheduleAddress(address(mintGoldSchedule));
 
     vm.prank(mintGoldOwner);
@@ -153,7 +160,7 @@ contract MintGoldScheduleTest_initialize is MintGoldScheduleTest {
   }
 }
 
-contract MintGoldScheduleTest_setDependencies_L1 is MintGoldScheduleTest {
+contract MintGoldScheduleTest_activate_L1 is MintGoldScheduleTest {
   function setUp() public override {
     super.setUpL1();
 
@@ -173,7 +180,8 @@ contract MintGoldScheduleTest_setDependencies_L1 is MintGoldScheduleTest {
     );
   }
 }
-contract MintGoldScheduleTest_setDependencies is MintGoldScheduleTest {
+
+contract MintGoldScheduleTest_activate is MintGoldScheduleTest {
   function test_ShouldHaveZeroTotalMintedByScheduleOnInit() public {
     newMintGold();
     assertEq(mintGoldSchedule.totalMintedBySchedule(), 0);
@@ -192,7 +200,7 @@ contract MintGoldScheduleTest_setDependencies is MintGoldScheduleTest {
     vm.warp(block.timestamp + l2StartTime);
     mintGoldSchedule = new MintGoldSchedule(true);
     mintGoldSchedule.initialize();
-
+    vm.deal(address(mintGoldSchedule), L2_INITIAL_STASH_BALANCE);
     vm.expectRevert("The registry address cannot be the zero address");
     mintGoldSchedule.activate(
       l2StartTime,
@@ -207,7 +215,7 @@ contract MintGoldScheduleTest_setDependencies is MintGoldScheduleTest {
     vm.warp(block.timestamp + l2StartTime);
     mintGoldSchedule = new MintGoldSchedule(true);
     mintGoldSchedule.initialize();
-
+    vm.deal(address(mintGoldSchedule), L2_INITIAL_STASH_BALANCE);
     vm.expectRevert(
       "Value must be different from existing community reward fraction and less than 1."
     );
@@ -224,6 +232,7 @@ contract MintGoldScheduleTest_setDependencies is MintGoldScheduleTest {
     vm.warp(block.timestamp + l2StartTime);
     mintGoldSchedule = new MintGoldSchedule(true);
     mintGoldSchedule.initialize();
+    vm.deal(address(mintGoldSchedule), L2_INITIAL_STASH_BALANCE);
 
     vm.expectRevert("Partner cannot be the zero address.");
     mintGoldSchedule.activate(
@@ -239,7 +248,7 @@ contract MintGoldScheduleTest_setDependencies is MintGoldScheduleTest {
     vm.warp(block.timestamp + l2StartTime);
     registry.setAddressFor("Governance", address(0));
     mintGoldSchedule = new MintGoldSchedule(true);
-
+    vm.deal(address(mintGoldSchedule), L2_INITIAL_STASH_BALANCE);
     mintGoldSchedule.initialize();
 
     vm.expectRevert("identifier has no registry entry");
@@ -258,6 +267,31 @@ contract MintGoldScheduleTest_setDependencies is MintGoldScheduleTest {
 
     vm.prank(mintGoldOwner);
 
+    mintGoldSchedule.activate(
+      l2StartTime,
+      communityRewardFraction,
+      carbonOffsettingPartner,
+      carbonOffsettingFraction,
+      registryAddress
+    );
+  }
+
+  function test_Reverts_WhenTheContractDoesNotHaveBalance() public {
+    vm.warp(block.timestamp + l2StartTime);
+    vm.prank(mintGoldOwner);
+    mintGoldSchedule = new MintGoldSchedule(true);
+
+    vm.deal(address(mintGoldSchedule), L2_INITIAL_STASH_BALANCE);
+
+    goldToken.setGoldTokenMintingScheduleAddress(address(mintGoldSchedule));
+
+    vm.prank(mintGoldOwner);
+    mintGoldSchedule.initialize();
+
+    vm.deal(address(mintGoldSchedule), 0);
+
+    vm.expectRevert("Contract does not have CELO balance.");
+    vm.prank(mintGoldOwner);
     mintGoldSchedule.activate(
       l2StartTime,
       communityRewardFraction,
@@ -458,7 +492,7 @@ contract MintGoldScheduleTest_mintAccordingToSchedule is MintGoldScheduleTest {
     vm.prank(randomAddress);
     mintGoldSchedule.mintAccordingToSchedule();
 
-    vm.expectRevert("Mintable amount must be greater than zero");
+    vm.expectRevert("Mintable amount must be greater than zero.");
     vm.prank(randomAddress);
     mintGoldSchedule.mintAccordingToSchedule();
   }
@@ -553,9 +587,34 @@ contract MintGoldScheduleTest_mintAccordingToSchedule is MintGoldScheduleTest {
     );
 
     vm.expectRevert("Block reward calculation for years 15-30 unimplemented");
-
     vm.prank(randomAddress);
     mintGoldSchedule.mintAccordingToSchedule();
+  }
+
+  function test_Reverts_WhenTheContractBalanceIsLowerExpected() public {
+    vm.deal(address(mintGoldSchedule), 0);
+    vm.prank(address(mintGoldSchedule));
+
+    vm.expectRevert("Contract balance is insufficient.");
+    mintGoldSchedule.mintAccordingToSchedule();
+  }
+
+  function test_ShouldTransferbalanceFromThisContract() public {
+    uint256 initialStashBalance = goldToken.balanceOf(address(mintGoldSchedule));
+
+    vm.warp(block.timestamp + (15 * YEAR));
+
+    mintGoldSchedule.mintAccordingToSchedule();
+
+    uint256 finalStashBalance = goldToken.balanceOf(address(mintGoldSchedule));
+
+    assertLt(finalStashBalance, initialStashBalance);
+
+    assertApproxEqRel(
+      goldToken.balanceOf(address(mintGoldSchedule)),
+      L2_INITIAL_STASH_BALANCE - (MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION),
+      1e10
+    );
   }
 }
 
