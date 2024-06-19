@@ -85,7 +85,7 @@
     "@celo/ganache-core": "git+https://github.com/celo-org/ganache-core.git#d1d179769edb71d910aab1423b7778f7b3e047a0",
     "@grpc/grpc-js": "^1.1.8",
     "@types/prettier": "^2.2.1",
-    "**/axios": "0.21.1",
+    "**/axios": "0.28.0",
     "**/cross-fetch": "^3.0.2",
     "**/deep-extend": "^0.5.1",
     "**/extend": "^3.0.2",
