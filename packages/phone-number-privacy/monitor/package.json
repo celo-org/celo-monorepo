@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "firebase-functions-test": "^0.3.3",
-    "firebase-tools": "9.20.0"
+    "firebase-tools": "13.6.0"
   },
   "engines": {
     "node": ">=14"

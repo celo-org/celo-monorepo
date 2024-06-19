@@ -52,7 +52,7 @@
     "@types/supertest": "^2.0.12",
     "@types/uuid": "^7.0.3",
     "firebase-functions-test": "^0.3.3",
-    "firebase-tools": "9.20.0"
+    "firebase-tools": "13.6.0"
   },
   "peerDependencies": {
     "@celo/phone-number-privacy-signer": "^2.0.2",
