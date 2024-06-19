@@ -22,7 +22,7 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@azure/identity": "^1.1.0",
+    "@azure/identity": "^4.0.0",
     "@azure/keyvault-keys": "^4.1.0",
     "@azure/keyvault-secrets": "^4.1.0",
     "@celo/utils": "4.1.1-dev",
