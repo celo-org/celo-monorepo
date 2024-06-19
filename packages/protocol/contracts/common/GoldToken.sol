@@ -51,7 +51,7 @@ contract GoldToken is
     if (isL2()) {
       require(
         msg.sender == address(celoTokenDistributionSchedule),
-        "Only MintGoldSchedule can call."
+        "Only CeloDistributionSchedule can call."
       );
     } else {
       require(msg.sender == address(0), "Only VM can call.");
