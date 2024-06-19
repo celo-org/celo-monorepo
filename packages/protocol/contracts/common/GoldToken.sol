@@ -37,7 +37,7 @@ contract GoldToken is
   // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
   address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
 
-  IMintGoldSchedule public goldTokenMintingSchedule;
+  IMintGoldSchedule public celoTokenDistributionSchedule;
 
   event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -45,11 +45,14 @@ contract GoldToken is
 
   event Approval(address indexed owner, address indexed spender, uint256 value);
 
-  event SetGoldTokenMintingScheduleAddress(address indexed newScheduleAddress);
+  event SetCeloTokenDistributionScheduleAddress(address indexed newScheduleAddress);
 
   modifier onlySchedule() {
     if (isL2()) {
-      require(msg.sender == address(goldTokenMintingSchedule), "Only MintGoldSchedule can call.");
+      require(
+        msg.sender == address(celoTokenDistributionSchedule),
+        "Only MintGoldSchedule can call."
+      );
     } else {
       require(msg.sender == address(0), "Only VM can call.");
     }
@@ -73,20 +76,20 @@ contract GoldToken is
   }
 
   /**
-   * @notice Used set the address of the MintGoldSchedule contract.
-   * @param goldTokenMintingScheduleAddress The address of the MintGoldSchedule contract.
+   * @notice Used set the address of the CeloDistributionSchedule contract.
+   * @param celoTokenDistributionScheduleAddress The address of the CeloDistributionSchedule contract.
    */
-  function setGoldTokenMintingScheduleAddress(
-    address goldTokenMintingScheduleAddress
+  function setCeloTokenDistributionScheduleAddress(
+    address celoTokenDistributionScheduleAddress
   ) external onlyOwner {
     require(
-      goldTokenMintingScheduleAddress != address(0) ||
-        goldTokenMintingScheduleAddress != address(goldTokenMintingSchedule),
+      celoTokenDistributionScheduleAddress != address(0) ||
+        celoTokenDistributionScheduleAddress != address(celoTokenDistributionSchedule),
       "Invalid address."
     );
-    goldTokenMintingSchedule = IMintGoldSchedule(goldTokenMintingScheduleAddress);
+    celoTokenDistributionSchedule = IMintGoldSchedule(celoTokenDistributionScheduleAddress);
 
-    emit SetGoldTokenMintingScheduleAddress(goldTokenMintingScheduleAddress);
+    emit SetCeloTokenDistributionScheduleAddress(celoTokenDistributionScheduleAddress);
   }
 
   /**

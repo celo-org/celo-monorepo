@@ -21,10 +21,12 @@ interface IGoldToken is IERC20 {
   function setRegistry(address registryAddress) external;
 
   /**
-   * @notice Used set the address of the MintGoldSchedule contract.
-   * @param goldTokenMintingScheduleAddress The address of the MintGoldSchedule contract.
+   * @notice Used set the address of the CeloDistributionSchedule contract.
+   * @param celoTokenDistributionScheduleAddress The address of the CeloDistributionSchedule contract.
    */
-  function setGoldTokenMintingScheduleAddress(address goldTokenMintingScheduleAddress) external;
+  function setCeloTokenDistributionScheduleAddress(
+    address celoTokenDistributionScheduleAddress
+  ) external;
 
   /**
    * @dev Mints a new token.

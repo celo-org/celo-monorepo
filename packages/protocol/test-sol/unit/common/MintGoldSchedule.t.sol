@@ -110,7 +110,7 @@ contract MintGoldScheduleTest is Test, Constants, IsL2Check {
 
     vm.deal(address(mintGoldSchedule), L2_INITIAL_STASH_BALANCE);
 
-    goldToken.setGoldTokenMintingScheduleAddress(address(mintGoldSchedule));
+    goldToken.setCeloTokenDistributionScheduleAddress(address(mintGoldSchedule));
 
     vm.prank(mintGoldOwner);
     mintGoldSchedule.initialize();
@@ -135,7 +135,7 @@ contract MintGoldScheduleTest_initialize is MintGoldScheduleTest {
     vm.prank(mintGoldOwner);
     mintGoldSchedule = new MintGoldSchedule(true);
 
-    goldToken.setGoldTokenMintingScheduleAddress(address(mintGoldSchedule));
+    goldToken.setCeloTokenDistributionScheduleAddress(address(mintGoldSchedule));
 
     vm.prank(mintGoldOwner);
     mintGoldSchedule.initialize();
@@ -282,7 +282,7 @@ contract MintGoldScheduleTest_activate is MintGoldScheduleTest {
 
     vm.deal(address(mintGoldSchedule), L2_INITIAL_STASH_BALANCE);
 
-    goldToken.setGoldTokenMintingScheduleAddress(address(mintGoldSchedule));
+    goldToken.setCeloTokenDistributionScheduleAddress(address(mintGoldSchedule));
 
     vm.prank(mintGoldOwner);
     mintGoldSchedule.initialize();
@@ -337,7 +337,7 @@ contract MintGoldScheduleTest_setCommunityRewardFraction is MintGoldScheduleTest
   function test_Reverts_WhenDependenciesNotSet() public {
     mintGoldSchedule = new MintGoldSchedule(true);
 
-    goldToken.setGoldTokenMintingScheduleAddress(address(mintGoldSchedule));
+    goldToken.setCeloTokenDistributionScheduleAddress(address(mintGoldSchedule));
 
     vm.prank(mintGoldOwner);
     mintGoldSchedule.initialize();
@@ -410,7 +410,7 @@ contract MintGoldScheduleTest_setCarbonOffsettingFund is MintGoldScheduleTest {
   function test_Reverts_WhenDependenciesNotSet() public {
     mintGoldSchedule = new MintGoldSchedule(true);
 
-    goldToken.setGoldTokenMintingScheduleAddress(address(mintGoldSchedule));
+    goldToken.setCeloTokenDistributionScheduleAddress(address(mintGoldSchedule));
 
     vm.prank(mintGoldOwner);
     mintGoldSchedule.initialize();

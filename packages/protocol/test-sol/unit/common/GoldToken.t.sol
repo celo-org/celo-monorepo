@@ -12,11 +12,11 @@ contract GoldTokenTest is Test, IsL2Check {
   address receiver;
   address sender;
   address goldTokenOwner;
-  address goldTokenMintingSchedule;
+  address celoTokenDistributionSchedule;
 
   event Transfer(address indexed from, address indexed to, uint256 value);
   event TransferComment(string comment);
-  event SetGoldTokenMintingScheduleAddress(address indexed newScheduleAddress);
+  event SetCeloTokenDistributionScheduleAddress(address indexed newScheduleAddress);
 
   modifier _whenL2() {
     deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
@@ -25,10 +25,10 @@ contract GoldTokenTest is Test, IsL2Check {
 
   function setUp() public {
     goldTokenOwner = actor("goldTokenOwner");
-    goldTokenMintingSchedule = actor("goldTokenMintingSchedule");
+    celoTokenDistributionSchedule = actor("celoTokenDistributionSchedule");
     vm.prank(goldTokenOwner);
     goldToken = new GoldToken(true);
-    deployCodeTo("MintGoldSchedule.sol", abi.encode(false), goldTokenMintingSchedule);
+    deployCodeTo("MintGoldSchedule.sol", abi.encode(false), celoTokenDistributionSchedule);
     receiver = actor("receiver");
     sender = actor("sender");
     vm.deal(receiver, ONE_GOLDTOKEN);
@@ -191,7 +191,7 @@ contract GoldTokenTest_mint is GoldTokenTest {
     vm.expectRevert("Only VM can call");
     goldToken.mint(receiver, ONE_GOLDTOKEN);
 
-    vm.prank(goldTokenMintingSchedule);
+    vm.prank(celoTokenDistributionSchedule);
     vm.expectRevert("Only VM can call");
     goldToken.mint(receiver, ONE_GOLDTOKEN);
   }
@@ -213,7 +213,7 @@ contract GoldTokenTest_mint is GoldTokenTest {
 
   function test_Reverts_whenL2() public _whenL2 {
     vm.expectRevert("This method is no longer supported in L2.");
-    vm.prank(goldTokenMintingSchedule);
+    vm.prank(celoTokenDistributionSchedule);
     goldToken.mint(receiver, ONE_GOLDTOKEN);
     vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(address(0));
@@ -221,32 +221,32 @@ contract GoldTokenTest_mint is GoldTokenTest {
   }
 }
 
-contract GoldTokenTest_setGoldTokenMintingScheduleAddress is GoldTokenTest {
+contract GoldTokenTest_setCeloTokenDistributionScheduleAddress is GoldTokenTest {
   function test_Reverts_whenCalledByOtherThanL2Governance() public _whenL2 {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(address(0));
-    goldToken.setGoldTokenMintingScheduleAddress(goldTokenMintingSchedule);
+    goldToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
   }
 
   function test_ShouldSucceedWhenCalledByOwner() public {
     vm.prank(goldTokenOwner);
-    goldToken.setGoldTokenMintingScheduleAddress(goldTokenMintingSchedule);
+    goldToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
 
-    assertEq(address(goldToken.goldTokenMintingSchedule()), goldTokenMintingSchedule);
+    assertEq(address(goldToken.celoTokenDistributionSchedule()), celoTokenDistributionSchedule);
   }
 
   function test_ShouldSucceedWhenCalledByL2Governance() public _whenL2 {
     vm.prank(goldTokenOwner);
-    goldToken.setGoldTokenMintingScheduleAddress(goldTokenMintingSchedule);
+    goldToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
 
-    assertEq(address(goldToken.goldTokenMintingSchedule()), goldTokenMintingSchedule);
+    assertEq(address(goldToken.celoTokenDistributionSchedule()), celoTokenDistributionSchedule);
   }
 
-  function test_Emits_SetGoldTokenMintingScheduleAddressEvent() public {
+  function test_Emits_SetCeloTokenDistributionScheduleAddressEvent() public {
     vm.expectEmit(true, true, true, true);
-    emit SetGoldTokenMintingScheduleAddress(goldTokenMintingSchedule);
+    emit SetCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
     vm.prank(goldTokenOwner);
-    goldToken.setGoldTokenMintingScheduleAddress(goldTokenMintingSchedule);
+    goldToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
   }
 }
 
@@ -263,7 +263,7 @@ contract GoldTokenTest_increaseSupply is GoldTokenTest {
     vm.prank(goldTokenOwner);
     vm.expectRevert("Only VM can call.");
     goldToken.increaseSupply(ONE_GOLDTOKEN);
-    vm.prank(goldTokenMintingSchedule);
+    vm.prank(celoTokenDistributionSchedule);
     vm.expectRevert("Only VM can call.");
     goldToken.increaseSupply(ONE_GOLDTOKEN);
   }
@@ -273,12 +273,12 @@ contract GoldTokenTest_increaseSupply_L2 is GoldTokenTest {
   function setUp() public _whenL2 {
     super.setUp();
     vm.prank(goldTokenOwner);
-    goldToken.setGoldTokenMintingScheduleAddress(goldTokenMintingSchedule);
+    goldToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
   }
 
   function test_ShouldIncreaseTotalSupply() public {
     uint256 goldTokenSupplyBefore = goldToken.totalSupply();
-    vm.prank(address(goldTokenMintingSchedule));
+    vm.prank(address(celoTokenDistributionSchedule));
     goldToken.increaseSupply(ONE_GOLDTOKEN);
     uint256 goldTokenSupplyAfter = goldToken.totalSupply();
     assertGt(goldTokenSupplyAfter, goldTokenSupplyBefore);
