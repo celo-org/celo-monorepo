@@ -49,7 +49,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   constructor(bool test) public Initializable(test) {}
 
   /**
-   * @notice A constructor for initialising a new instance of a MintGoldSchedule contract.
+   * @notice A constructor for initialising a new instance of a CeloDistributionSchedule contract.
    */
   function initialize() external initializer {
     _transferOwnership(msg.sender);
@@ -89,8 +89,8 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   function distributeAccordingToSchedule() external nonReentrant onlyL2 returns (bool) {
     (
       uint256 targetGoldTotalSupply,
-      uint256 communityRewardFundMintAmount,
-      uint256 carbonOffsettingPartnerMintAmount
+      uint256 communityRewardFundDistributionAmount,
+      uint256 carbonOffsettingPartnerDistributionAmount
     ) = getTargetGoldTotalSupply();
 
     uint256 distributableAmount = Math.min(
@@ -105,14 +105,16 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
 
     IGoldToken goldToken = IGoldToken(address(getGoldToken()));
 
-    goldToken.increaseSupply(communityRewardFundMintAmount + carbonOffsettingPartnerMintAmount);
+    goldToken.increaseSupply(
+      communityRewardFundDistributionAmount + carbonOffsettingPartnerDistributionAmount
+    );
     require(
-      goldToken.transfer(communityRewardFund, communityRewardFundMintAmount),
+      goldToken.transfer(communityRewardFund, communityRewardFundDistributionAmount),
       "Failed to transfer to community partner."
     );
 
     require(
-      goldToken.transfer(carbonOffsettingPartner, carbonOffsettingPartnerMintAmount),
+      goldToken.transfer(carbonOffsettingPartner, carbonOffsettingPartnerDistributionAmount),
       "Failed to transfer to carbon offsetting partner."
     );
     return true;
@@ -135,7 +137,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   }
 
   /**
-   * @return The total balance distributed by the MintGoldSchedule contract.
+   * @return The total balance distributed by the CeloDistributionSchedule contract.
    */
   function getTotalDistributedBySchedule() external view returns (uint256) {
     return totalDistributedBySchedule;
