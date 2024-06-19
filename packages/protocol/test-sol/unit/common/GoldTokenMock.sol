@@ -14,6 +14,10 @@ contract GoldTokenMock is GoldToken(true) {
     totalSupply_ = value;
   }
 
+  function setWithdrawn(uint256 value) external {
+    withdrawn = value;
+  }
+
   function transfer(address to, uint256 amount) external returns (bool) {
     return _transfer(msg.sender, to, amount);
   }

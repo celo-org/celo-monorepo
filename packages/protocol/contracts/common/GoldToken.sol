@@ -29,7 +29,11 @@ contract GoldToken is
   string constant NAME = "Celo native asset";
   string constant SYMBOL = "CELO";
   uint8 constant DECIMALS = 18;
+  uint256 constant TOTAL_MARKET_CAP = 1000000000e18; // 1 billion CELO
   uint256 internal totalSupply_;
+  // Total amount that was withdrawn from L2 (Celo) to L1 (Ethereum)
+  uint256 public withdrawn;
+  address public l2ToL1MessagePasser;
   // solhint-enable state-visibility
 
   mapping(address => mapping(address => uint256)) internal allowed;
@@ -53,6 +57,11 @@ contract GoldToken is
     } else {
       require(msg.sender == address(0), "Only VM can call.");
     }
+    _;
+  }
+
+  modifier onlyL2ToL1MessagePasser {
+    require(msg.sender == l2ToL1MessagePasser, "Only L2ToL1MessagePasser can call.");
     _;
   }
 
@@ -226,6 +235,30 @@ contract GoldToken is
   }
 
   /**
+    * @notice Decreases the variable for total amount of CELO in existence.
+    * @param _withdrawAmount The amount to decrease counter by
+   */
+  function withdrawAmount(uint256 _withdrawAmount) external onlyL2 onlyL2ToL1MessagePasser {
+    withdrawn = withdrawn.add(_withdrawAmount);
+  }
+
+  /**
+   * @notice Decreases the variable for total amount of CELO in existence.
+   * @param _depositAmount The amount to decrease counter by
+   */
+  function depositAmount(uint256 _depositAmount) external onlyVm onlyL2 {
+    withdrawn = withdrawn.sub(_depositAmount);
+  }
+
+  /**
+   * @notice Sets the address of the L2ToL1MessagePasser contract.
+   * @param _l2ToL1MessagePasser The address of the L2ToL1MessagePasser contract.
+   */
+  function setL2ToL1MessagePasser(address _l2ToL1MessagePasser) external onlyOwner {
+    l2ToL1MessagePasser = _l2ToL1MessagePasser;
+  }
+
+  /**
    * @return The name of the CELO token.
    */
   function name() external view returns (string memory) {
@@ -250,7 +283,11 @@ contract GoldToken is
    * @return The total amount of CELO in existence, including what the burn address holds.
    */
   function totalSupply() external view returns (uint256) {
-    return totalSupply_;
+    if (isL2()) {
+      return TOTAL_MARKET_CAP.sub(withdrawn);
+    } else {
+      return totalSupply_;
+    }
   }
 
   /**

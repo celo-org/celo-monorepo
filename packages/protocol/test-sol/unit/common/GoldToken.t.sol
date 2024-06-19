@@ -334,10 +334,16 @@ contract GoldTokenMockTest is Test {
   GoldTokenMock mockGoldToken;
   uint256 ONE_GOLDTOKEN = 1000000000000000000;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   function setUp() public {
     mockGoldToken = new GoldTokenMock();
     mockGoldToken.setTotalSupply(ONE_GOLDTOKEN * 1000);
+  }
+
+  modifier _whenL2() {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    _;
   }
 }
 
@@ -354,5 +360,85 @@ contract GoldTokenMock_circulatingSupply is GoldTokenMockTest {
     mockGoldToken.setBalanceOf(burnAddress, ONE_GOLDTOKEN);
     assertEq(mockGoldToken.circulatingSupply(), ONE_GOLDTOKEN * 999);
     assertEq(mockGoldToken.circulatingSupply(), mockGoldToken.totalSupply() - ONE_GOLDTOKEN);
+  }
+}
+
+contract GoldToken_WithdrawAmount is GoldTokenMockTest {
+  function setUp() public {
+    super.setUp();
+  }
+
+  function test_WithdrawAmount_Reverts_whenNotL2() public {
+    vm.prank(address(0));
+    vm.expectRevert("This method is not supported in L1.");
+    mockGoldToken.withdrawAmount(ONE_GOLDTOKEN);
+  }
+
+  function test_WithdrawAmount_Reverts_whenCalledByOtherThanL2ToL1MessagePasser() public _whenL2 {
+    vm.expectRevert("Only L2ToL1MessagePasser can call.");
+    mockGoldToken.withdrawAmount(ONE_GOLDTOKEN);
+  }
+
+  function test_WithdrawAmount_ShouldIncreaseWithdrawn() public _whenL2 {
+    mockGoldToken.setWithdrawn(2 * ONE_GOLDTOKEN);
+    mockGoldToken.setL2ToL1MessagePasser(address(this));
+    uint256 withdrawnBefore = mockGoldToken.withdrawn();
+    mockGoldToken.withdrawAmount(ONE_GOLDTOKEN);
+    uint256 withdrawnAfter = mockGoldToken.withdrawn();
+    assertEq(withdrawnAfter, withdrawnBefore + ONE_GOLDTOKEN);
+  }
+}
+
+contract GoldToken_DepositAmount is GoldTokenMockTest {
+
+  function test_DepositAmount_Reverts_whenNotL2() public {
+    vm.prank(address(0));
+    vm.expectRevert("This method is not supported in L1.");
+    mockGoldToken.depositAmount(ONE_GOLDTOKEN);
+  }
+
+  function test_DepositAmount_Reverts_whenCalledByOtherVm() public _whenL2 {
+    vm.expectRevert("Only VM can call");
+    mockGoldToken.depositAmount(ONE_GOLDTOKEN);
+  }
+
+  function test_DepositAmount_ShouldDecreaseWithdrawn() public _whenL2 {
+    mockGoldToken.setWithdrawn(2 * ONE_GOLDTOKEN);
+    mockGoldToken.setL2ToL1MessagePasser(address(this));
+    uint256 withdrawnBefore = mockGoldToken.withdrawn();
+    vm.prank(address(0));
+    mockGoldToken.depositAmount(ONE_GOLDTOKEN);
+    uint256 withdrawnAfter = mockGoldToken.withdrawn();
+    assertEq(withdrawnAfter, withdrawnBefore - ONE_GOLDTOKEN);
+  }
+}
+
+contract GoldToken_SetL2ToL1MessagePasser is GoldTokenMockTest {
+
+  function test_SetL2ToL1MessagePasser_Reverts_whenCalledByOtherOwner() public _whenL2 {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(address(0));
+    mockGoldToken.setL2ToL1MessagePasser(address(this));
+  }
+
+  function test_SetL2ToL1MessagePasser_ShouldSetL2ToL1MessagePasser() public _whenL2 {
+    address newL2ToL1MessagePasser = address(0x1);
+    mockGoldToken.setL2ToL1MessagePasser(address(this));
+    assertEq(mockGoldToken.l2ToL1MessagePasser(), address(this));
+  }
+}
+
+contract GoldToken_TotalSupply is GoldTokenMockTest {
+   uint256 constant TOTAL_MARKET_CAP = 1000000000e18; // 1 billion CELO
+
+  function test_TotalSupply_ShouldReturnTotalSupply_WhenL2() public _whenL2 {
+    assertEq(mockGoldToken.totalSupply(), 1000000000e18);
+  }
+
+  function test_TotalSupply_ShouldReturnTotalSupplyWhenWithdrawn_WhenL2() public _whenL2 {
+    uint256 _withdrawAmount = ONE_GOLDTOKEN;
+    mockGoldToken.setL2ToL1MessagePasser(address(this));
+    mockGoldToken.withdrawAmount(_withdrawAmount);
+    assertEq(mockGoldToken.totalSupply(), 1000000000e18 - ONE_GOLDTOKEN);
   }
 }
