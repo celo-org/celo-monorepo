@@ -36,7 +36,7 @@
     "@types/bn.js": "^5.1.0",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
-    "cross-fetch": "3.0.6",
+    "cross-fetch": "3.1.5",
     "debug": "^4.1.1",
     "fp-ts": "2.1.1",
     "io-ts": "2.0.1",

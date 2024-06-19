@@ -27,7 +27,7 @@
     "@celo/contractkit": "4.1.1-dev",
     "@celo/utils": "4.1.1-dev",
     "@types/debug": "^4.1.5",
-    "cross-fetch": "3.0.6",
+    "cross-fetch": "3.1.5",
     "debug": "^4.1.1"
   },
   "devDependencies": {
