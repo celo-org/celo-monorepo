@@ -411,7 +411,7 @@ contract EpochRewards is
    * @notice Returns the target Gold supply according to the epoch rewards target schedule.
    * @return The target Gold supply according to the epoch rewards target schedule.
    */
-  function getTargetGoldTotalSupply() public view returns (uint256) {
+  function getTargetCeloTotalSupply() public view returns (uint256) {
     uint256 timeSinceInitialization = now.sub(startTime);
     if (timeSinceInitialization < SECONDS_LINEAR) {
       // Pay out half of all block rewards linearly.
@@ -502,7 +502,7 @@ contract EpochRewards is
   function _getRewardsMultiplier(
     uint256 targetGoldSupplyIncrease
   ) internal view returns (FixidityLib.Fraction memory) {
-    uint256 targetSupply = getTargetGoldTotalSupply();
+    uint256 targetSupply = getTargetCeloTotalSupply();
     uint256 totalSupply = getGoldToken().totalSupply();
     uint256 remainingSupply = GOLD_SUPPLY_CAP.sub(totalSupply.add(targetGoldSupplyIncrease));
     uint256 targetRemainingSupply = GOLD_SUPPLY_CAP.sub(targetSupply);

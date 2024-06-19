@@ -428,11 +428,11 @@ contract EpochRewardsTest_setTargetVotingYield is EpochRewardsTest {
   }
 }
 
-contract EpochRewardsTest_getTargetGoldTotalSupply is EpochRewardsTest {
+contract EpochRewardsTest_getTargetCeloTotalSupply is EpochRewardsTest {
   function test_ShouldReturn1B_WhenLessThan15YearsSinceGenesis() public {
     uint256 timeDelta = YEAR * 10;
     timeTravel(timeDelta);
-    assertEq(epochRewards.getTargetGoldTotalSupply(), getExpectedTargetTotalSupply(timeDelta));
+    assertEq(epochRewards.getTargetCeloTotalSupply(), getExpectedTargetTotalSupply(timeDelta));
   }
 }
 
