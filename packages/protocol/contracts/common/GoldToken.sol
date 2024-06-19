@@ -9,7 +9,7 @@ import "./CalledByVm.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
 import "./interfaces/ICeloVersionedContract.sol";
-import "./interfaces/IMintGoldSchedule.sol";
+import "./interfaces/ICeloDistributionSchedule.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 
 contract GoldToken is

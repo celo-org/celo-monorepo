@@ -7,13 +7,13 @@ import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts-8/common/interfaces/IGoldToken.sol";
 import "@celo-contracts/governance/interfaces/IGovernance.sol";
-import "@celo-contracts-8/common/MintGoldSchedule.sol";
+import "@celo-contracts-8/common/CeloDistributionSchedule.sol";
 import "@celo-contracts-8/common/IsL2Check.sol";
 import { Constants } from "@test-sol/constants.sol";
 
 import "@test-sol/unit/governance/mock/MockGovernance.sol";
 
-contract MintCeloScheduleTest is Test, Constants, IsL2Check {
+contract CeloDistributionScheduleTest is Test, Constants, IsL2Check {
   using FixidityLib for FixidityLib.Fraction;
 
   IRegistry registry;
@@ -127,7 +127,7 @@ contract MintCeloScheduleTest is Test, Constants, IsL2Check {
   }
 }
 
-contract MintCeloScheduleTest_initialize is MintCeloScheduleTest {
+contract CeloDistributionScheduleTest_initialize is CeloDistributionScheduleTest {
   function setUp() public override {
     super.setUp();
     vm.warp(block.timestamp + l2StartTime);
@@ -159,7 +159,7 @@ contract MintCeloScheduleTest_initialize is MintCeloScheduleTest {
   }
 }
 
-contract MintCeloScheduleTest_activate_L1 is MintCeloScheduleTest {
+contract CeloDistributionScheduleTest_activate_L1 is CeloDistributionScheduleTest {
   function setUp() public override {
     super.setUpL1();
 
@@ -180,7 +180,7 @@ contract MintCeloScheduleTest_activate_L1 is MintCeloScheduleTest {
   }
 }
 
-contract MintCeloScheduleTest_activate is MintCeloScheduleTest {
+contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
   function test_ShouldHaveZeroTotalDistributedByScheduleOnInit() public {
     newMintCelo();
     assertEq(mintCeloSchedule.totalDistributedBySchedule(), 0);
@@ -301,7 +301,7 @@ contract MintCeloScheduleTest_activate is MintCeloScheduleTest {
   }
 }
 
-contract MintCeloScheduleTest_setCommunityRewardFraction is MintCeloScheduleTest {
+contract CeloDistributionScheduleTest_setCommunityRewardFraction is CeloDistributionScheduleTest {
   function setUp() public override {
     super.setUp();
     newMintCelo();
@@ -365,7 +365,7 @@ contract MintCeloScheduleTest_setCommunityRewardFraction is MintCeloScheduleTest
   }
 }
 
-contract MintCeloScheduleTest_setCarbonOffsettingFund is MintCeloScheduleTest {
+contract CeloDistributionScheduleTest_setCarbonOffsettingFund is CeloDistributionScheduleTest {
   function setUp() public override {
     super.setUp();
     newMintCelo();
@@ -439,7 +439,9 @@ contract MintCeloScheduleTest_setCarbonOffsettingFund is MintCeloScheduleTest {
   }
 }
 
-contract MintCeloScheduleTest_distributeAccordingToSchedule_L1 is MintCeloScheduleTest {
+contract CeloDistributionScheduleTest_distributeAccordingToSchedule_L1 is
+  CeloDistributionScheduleTest
+{
   uint256 initialMintCeloAmount;
 
   function setUp() public override {
@@ -458,7 +460,9 @@ contract MintCeloScheduleTest_distributeAccordingToSchedule_L1 is MintCeloSchedu
   }
 }
 
-contract MintCeloScheduleTest_distributeAccordingToSchedule is MintCeloScheduleTest {
+contract CeloDistributionScheduleTest_distributeAccordingToSchedule is
+  CeloDistributionScheduleTest
+{
   uint256 initialMintCeloAmount;
   uint256 mintPerPeriod;
 
@@ -630,7 +634,7 @@ contract MintCeloScheduleTest_distributeAccordingToSchedule is MintCeloScheduleT
   }
 }
 
-contract MintCeloScheduleTest_getDistributableAmount is MintCeloScheduleTest {
+contract CeloDistributionScheduleTest_getDistributableAmount is CeloDistributionScheduleTest {
   uint256 initialMintCeloAmount;
 
   function setUp() public override {
