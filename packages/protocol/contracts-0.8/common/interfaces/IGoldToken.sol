@@ -21,10 +21,12 @@ interface IGoldToken is IERC20 {
   function setRegistry(address registryAddress) external;
 
   /**
-   * @notice Used set the address of the MintGoldSchedule contract.
-   * @param goldTokenMintingScheduleAddress The address of the MintGoldSchedule contract.
+   * @notice Used set the address of the CeloDistributionSchedule contract.
+   * @param celoTokenDistributionScheduleAddress The address of the CeloDistributionSchedule contract.
    */
-  function setGoldTokenMintingScheduleAddress(address goldTokenMintingScheduleAddress) external;
+  function setCeloTokenDistributionScheduleAddress(
+    address celoTokenDistributionScheduleAddress
+  ) external;
 
   /**
    * @dev Mints a new token.
@@ -37,4 +39,10 @@ interface IGoldToken is IERC20 {
    * @dev Returns amount of tokens that were allocated.
    */
   function allocatedSupply() external view returns (uint256);
+
+  /**
+   * @notice Increases the variable for total amount of CELO in existence.
+   * @param amount The amount to increase counter by.
+   */
+  function increaseSupply(uint256 amount) external;
 }

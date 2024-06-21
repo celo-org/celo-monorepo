@@ -9,7 +9,7 @@ import "./CalledByVm.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
 import "./interfaces/ICeloVersionedContract.sol";
-import "./interfaces/IMintGoldSchedule.sol";
+import "./interfaces/ICeloDistributionSchedule.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 
 contract GoldToken is
@@ -41,7 +41,7 @@ contract GoldToken is
   // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
   address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
 
-  IMintGoldSchedule public goldTokenMintingSchedule;
+  ICeloDistributionSchedule public celoTokenDistributionSchedule;
 
   event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -49,11 +49,14 @@ contract GoldToken is
 
   event Approval(address indexed owner, address indexed spender, uint256 value);
 
-  event SetGoldTokenMintingScheduleAddress(address indexed newScheduleAddress);
+  event SetCeloTokenDistributionScheduleAddress(address indexed newScheduleAddress);
 
   modifier onlySchedule() {
     if (isL2()) {
-      require(msg.sender == address(goldTokenMintingSchedule), "Only MintGoldSchedule can call.");
+      require(
+        msg.sender == address(celoTokenDistributionSchedule),
+        "Only CeloDistributionSchedule can call."
+      );
     } else {
       require(msg.sender == address(0), "Only VM can call.");
     }
@@ -82,20 +85,20 @@ contract GoldToken is
   }
 
   /**
-   * @notice Used set the address of the MintGoldSchedule contract.
-   * @param goldTokenMintingScheduleAddress The address of the MintGoldSchedule contract.
+   * @notice Used set the address of the CeloDistributionSchedule contract.
+   * @param celoTokenDistributionScheduleAddress The address of the CeloDistributionSchedule contract.
    */
-  function setGoldTokenMintingScheduleAddress(
-    address goldTokenMintingScheduleAddress
+  function setCeloTokenDistributionScheduleAddress(
+    address celoTokenDistributionScheduleAddress
   ) external onlyOwner {
     require(
-      goldTokenMintingScheduleAddress != address(0) ||
-        goldTokenMintingScheduleAddress != address(goldTokenMintingSchedule),
+      celoTokenDistributionScheduleAddress != address(0) ||
+        celoTokenDistributionScheduleAddress != address(celoTokenDistributionSchedule),
       "Invalid address."
     );
-    goldTokenMintingSchedule = IMintGoldSchedule(goldTokenMintingScheduleAddress);
+    celoTokenDistributionSchedule = ICeloDistributionSchedule(celoTokenDistributionScheduleAddress);
 
-    emit SetGoldTokenMintingScheduleAddress(goldTokenMintingScheduleAddress);
+    emit SetCeloTokenDistributionScheduleAddress(celoTokenDistributionScheduleAddress);
   }
 
   /**
@@ -207,8 +210,9 @@ contract GoldToken is
    * @notice Mints new CELO and gives it to 'to'.
    * @param to The account for which to mint tokens.
    * @param value The amount of CELO to mint.
+   * @dev This function will be deprecated in L2.
    */
-  function mint(address to, uint256 value) external onlySchedule returns (bool) {
+  function mint(address to, uint256 value) external onlyL1 onlyVm returns (bool) {
     if (value == 0) {
       return true;
     }
@@ -230,7 +234,7 @@ contract GoldToken is
    * @dev This function will be deprecated in L2. The onlyway to increase
    * the supply is with the mint function.
    */
-  function increaseSupply(uint256 amount) external onlyL1 onlyVm {
+  function increaseSupply(uint256 amount) external onlySchedule {
     totalSupply_ = totalSupply_.add(amount);
   }
 

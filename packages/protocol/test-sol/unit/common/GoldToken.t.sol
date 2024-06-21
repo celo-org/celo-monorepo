@@ -6,17 +6,17 @@ import "@celo-contracts/common/GoldToken.sol";
 import "@test-sol/unit/common/GoldTokenMock.sol";
 
 contract GoldTokenTest is Test, IsL2Check {
-  GoldToken goldToken;
+  GoldToken celoToken;
 
-  uint256 constant ONE_GOLDTOKEN = 1000000000000000000;
+  uint256 constant ONE_CELOTOKEN = 1000000000000000000;
   address receiver;
   address sender;
-  address goldTokenOwner;
-  address goldTokenMintingSchedule;
+  address celoTokenOwner;
+  address celoTokenDistributionSchedule;
 
   event Transfer(address indexed from, address indexed to, uint256 value);
   event TransferComment(string comment);
-  event SetGoldTokenMintingScheduleAddress(address indexed newScheduleAddress);
+  event SetCeloTokenDistributionScheduleAddress(address indexed newScheduleAddress);
 
   modifier _whenL2() {
     deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
@@ -24,15 +24,15 @@ contract GoldTokenTest is Test, IsL2Check {
   }
 
   function setUp() public {
-    goldTokenOwner = actor("goldTokenOwner");
-    goldTokenMintingSchedule = actor("goldTokenMintingSchedule");
-    vm.prank(goldTokenOwner);
-    goldToken = new GoldToken(true);
-    deployCodeTo("MintGoldSchedule.sol", abi.encode(false), goldTokenMintingSchedule);
+    celoTokenOwner = actor("celoTokenOwner");
+    celoTokenDistributionSchedule = actor("celoTokenDistributionSchedule");
+    vm.prank(celoTokenOwner);
+    celoToken = new GoldToken(true);
+    deployCodeTo("CeloDistributionSchedule.sol", abi.encode(false), celoTokenDistributionSchedule);
     receiver = actor("receiver");
     sender = actor("sender");
-    vm.deal(receiver, ONE_GOLDTOKEN);
-    vm.deal(sender, ONE_GOLDTOKEN);
+    vm.deal(receiver, ONE_CELOTOKEN);
+    vm.deal(sender, ONE_CELOTOKEN);
   }
 }
 
@@ -42,47 +42,47 @@ contract GoldTokenTest_general is GoldTokenTest {
   }
 
   function test_name() public {
-    assertEq(goldToken.name(), "Celo native asset");
+    assertEq(celoToken.name(), "Celo native asset");
   }
 
   function test_symbol() public {
-    assertEq(goldToken.symbol(), "CELO");
+    assertEq(celoToken.symbol(), "CELO");
   }
 
   function test_decimals() public {
-    assertEq(uint256(goldToken.decimals()), 18);
+    assertEq(uint256(celoToken.decimals()), 18);
   }
 
   function test_balanceOf() public {
-    assertEq(goldToken.balanceOf(receiver), receiver.balance);
+    assertEq(celoToken.balanceOf(receiver), receiver.balance);
   }
 
   function test_approve() public {
     vm.prank(sender);
-    goldToken.approve(receiver, ONE_GOLDTOKEN);
-    assertEq(goldToken.allowance(sender, receiver), ONE_GOLDTOKEN);
+    celoToken.approve(receiver, ONE_CELOTOKEN);
+    assertEq(celoToken.allowance(sender, receiver), ONE_CELOTOKEN);
   }
 
   function test_increaseAllowance() public {
     vm.prank(sender);
-    goldToken.increaseAllowance(receiver, ONE_GOLDTOKEN);
+    celoToken.increaseAllowance(receiver, ONE_CELOTOKEN);
     vm.prank(sender);
-    goldToken.increaseAllowance(receiver, ONE_GOLDTOKEN);
-    assertEq(goldToken.allowance(sender, receiver), ONE_GOLDTOKEN * 2);
+    celoToken.increaseAllowance(receiver, ONE_CELOTOKEN);
+    assertEq(celoToken.allowance(sender, receiver), ONE_CELOTOKEN * 2);
   }
 
   function test_decreaseAllowance() public {
     vm.prank(sender);
-    goldToken.approve(receiver, ONE_GOLDTOKEN * 2);
+    celoToken.approve(receiver, ONE_CELOTOKEN * 2);
     vm.prank(sender);
-    goldToken.decreaseAllowance(receiver, ONE_GOLDTOKEN);
-    assertEq(goldToken.allowance(sender, receiver), ONE_GOLDTOKEN);
+    celoToken.decreaseAllowance(receiver, ONE_CELOTOKEN);
+    assertEq(celoToken.allowance(sender, receiver), ONE_CELOTOKEN);
   }
 
   function test_allowance() public {
     vm.prank(sender);
-    goldToken.approve(receiver, ONE_GOLDTOKEN);
-    assertEq(goldToken.allowance(sender, receiver), ONE_GOLDTOKEN);
+    celoToken.approve(receiver, ONE_CELOTOKEN);
+    assertEq(celoToken.allowance(sender, receiver), ONE_CELOTOKEN);
   }
 }
 
@@ -92,32 +92,32 @@ contract GoldTokenTest_transfer is GoldTokenTest {
   }
 
   function test_ShouldTransferBalanceFromOneUserToAnother() public {
-    uint256 startBalanceFrom = goldToken.balanceOf(sender);
-    uint256 startBalanceTo = goldToken.balanceOf(receiver);
+    uint256 startBalanceFrom = celoToken.balanceOf(sender);
+    uint256 startBalanceTo = celoToken.balanceOf(receiver);
     vm.prank(sender);
-    goldToken.transfer(receiver, ONE_GOLDTOKEN);
-    assertEq(sender.balance, startBalanceFrom - ONE_GOLDTOKEN);
-    assertEq(receiver.balance, startBalanceTo + ONE_GOLDTOKEN);
+    celoToken.transfer(receiver, ONE_CELOTOKEN);
+    assertEq(sender.balance, startBalanceFrom - ONE_CELOTOKEN);
+    assertEq(receiver.balance, startBalanceTo + ONE_CELOTOKEN);
   }
 
   function test_ShouldTransferBalanceWithAComment() public {
     string memory comment = "tacos at lunch";
-    uint256 startBalanceFrom = goldToken.balanceOf(sender);
-    uint256 startBalanceTo = goldToken.balanceOf(receiver);
+    uint256 startBalanceFrom = celoToken.balanceOf(sender);
+    uint256 startBalanceTo = celoToken.balanceOf(receiver);
     vm.prank(sender);
     vm.expectEmit(true, true, true, true);
-    emit Transfer(sender, receiver, ONE_GOLDTOKEN);
+    emit Transfer(sender, receiver, ONE_CELOTOKEN);
     vm.expectEmit(true, true, true, true);
     emit TransferComment(comment);
-    goldToken.transferWithComment(receiver, ONE_GOLDTOKEN, comment);
-    assertEq(sender.balance, startBalanceFrom - ONE_GOLDTOKEN);
-    assertEq(receiver.balance, startBalanceTo + ONE_GOLDTOKEN);
+    celoToken.transferWithComment(receiver, ONE_CELOTOKEN, comment);
+    assertEq(sender.balance, startBalanceFrom - ONE_CELOTOKEN);
+    assertEq(receiver.balance, startBalanceTo + ONE_CELOTOKEN);
   }
 
   function test_ShouldNotAllowToTransferToNullAddress() public {
     vm.prank(sender);
     vm.expectRevert();
-    goldToken.transfer(address(0), ONE_GOLDTOKEN);
+    celoToken.transfer(address(0), ONE_CELOTOKEN);
   }
 }
 
@@ -125,36 +125,36 @@ contract GoldTokenTest_transferFrom is GoldTokenTest {
   function setUp() public {
     super.setUp();
     vm.prank(sender);
-    goldToken.approve(receiver, ONE_GOLDTOKEN);
+    celoToken.approve(receiver, ONE_CELOTOKEN);
   }
 
   function test_ShouldTransferBalanceFromOneUserToAnother() public {
-    uint256 startBalanceFrom = goldToken.balanceOf(sender);
-    uint256 startBalanceTo = goldToken.balanceOf(receiver);
+    uint256 startBalanceFrom = celoToken.balanceOf(sender);
+    uint256 startBalanceTo = celoToken.balanceOf(receiver);
     vm.prank(receiver);
-    goldToken.transferFrom(sender, receiver, ONE_GOLDTOKEN);
-    assertEq(sender.balance, startBalanceFrom - ONE_GOLDTOKEN);
-    assertEq(receiver.balance, startBalanceTo + ONE_GOLDTOKEN);
+    celoToken.transferFrom(sender, receiver, ONE_CELOTOKEN);
+    assertEq(sender.balance, startBalanceFrom - ONE_CELOTOKEN);
+    assertEq(receiver.balance, startBalanceTo + ONE_CELOTOKEN);
   }
 
   function test_ShouldNotAllowToTransferToNullAddress() public {
     vm.prank(receiver);
     vm.expectRevert();
-    goldToken.transferFrom(sender, address(0), ONE_GOLDTOKEN);
+    celoToken.transferFrom(sender, address(0), ONE_CELOTOKEN);
   }
 
   function test_ShouldNotAllowTransferMoreThanSenderHas() public {
-    uint256 value = sender.balance + ONE_GOLDTOKEN * 4;
+    uint256 value = sender.balance + ONE_CELOTOKEN * 4;
 
     vm.prank(receiver);
     vm.expectRevert();
-    goldToken.transferFrom(sender, receiver, value);
+    celoToken.transferFrom(sender, receiver, value);
   }
 
   function test_ShouldNotAllowTransferringMoreThanTheSpenderIsAllowed() public {
     vm.prank(receiver);
     vm.expectRevert();
-    goldToken.transferFrom(sender, receiver, ONE_GOLDTOKEN + 1);
+    celoToken.transferFrom(sender, receiver, ONE_CELOTOKEN + 1);
   }
 }
 
@@ -164,202 +164,176 @@ contract GoldTokenTest_burn is GoldTokenTest {
 
   function setUp() public {
     super.setUp();
-    startBurn = goldToken.getBurnedAmount();
+    startBurn = celoToken.getBurnedAmount();
   }
 
   function test_burn_address_starts_with_zero_balance() public {
-    assertEq(goldToken.balanceOf(burnAddress), 0);
+    assertEq(celoToken.balanceOf(burnAddress), 0);
   }
 
   function test_burn_starts_as_start_burn_amount() public {
-    assertEq(goldToken.getBurnedAmount(), startBurn);
+    assertEq(celoToken.getBurnedAmount(), startBurn);
   }
 
   function test_burn_amount_eq_the_balance_of_the_burn_address() public {
-    assertEq(goldToken.getBurnedAmount(), goldToken.balanceOf(burnAddress));
+    assertEq(celoToken.getBurnedAmount(), celoToken.balanceOf(burnAddress));
   }
 
   function test_returns_right_burn_amount() public {
-    goldToken.burn(ONE_GOLDTOKEN);
-    assertEq(goldToken.getBurnedAmount(), ONE_GOLDTOKEN + startBurn);
+    celoToken.burn(ONE_CELOTOKEN);
+    assertEq(celoToken.getBurnedAmount(), ONE_CELOTOKEN + startBurn);
   }
 }
 
 contract GoldTokenTest_mint is GoldTokenTest {
   function test_Reverts_whenCalledByOtherThanVm() public {
-    vm.prank(goldTokenOwner);
-    vm.expectRevert("Only VM can call.");
-    goldToken.mint(receiver, ONE_GOLDTOKEN);
+    vm.prank(celoTokenOwner);
+    vm.expectRevert("Only VM can call");
+    celoToken.mint(receiver, ONE_CELOTOKEN);
 
-    vm.prank(goldTokenMintingSchedule);
-    vm.expectRevert("Only VM can call.");
-    goldToken.mint(receiver, ONE_GOLDTOKEN);
+    vm.prank(celoTokenDistributionSchedule);
+    vm.expectRevert("Only VM can call");
+    celoToken.mint(receiver, ONE_CELOTOKEN);
   }
 
-  function test_Should_increaseGoldTokenTotalSupplyWhencalledByVm() public {
-    uint256 goldTokenSupplyBefore = goldToken.totalSupply();
+  function test_Should_increaseCeloTokenTotalSupplyWhencalledByVm() public {
+    uint256 celoTokenSupplyBefore = celoToken.totalSupply();
     vm.prank(address(0));
-    goldToken.mint(receiver, ONE_GOLDTOKEN);
-    uint256 goldTokenSupplyAfter = goldToken.totalSupply();
-    assertGt(goldTokenSupplyAfter, goldTokenSupplyBefore);
+    celoToken.mint(receiver, ONE_CELOTOKEN);
+    uint256 celoTokenSupplyAfter = celoToken.totalSupply();
+    assertGt(celoTokenSupplyAfter, celoTokenSupplyBefore);
   }
 
   function test_Emits_TransferEvent() public {
     vm.prank(address(0));
     vm.expectEmit(true, true, true, true);
-    emit Transfer(address(0), receiver, ONE_GOLDTOKEN);
-    goldToken.mint(receiver, ONE_GOLDTOKEN);
-  }
-}
-
-contract GoldTokenTest_mint_l2 is GoldTokenTest {
-  function setUp() public _whenL2 {
-    super.setUp();
-    vm.prank(goldTokenOwner);
-    goldToken.setGoldTokenMintingScheduleAddress(goldTokenMintingSchedule);
+    emit Transfer(address(0), receiver, ONE_CELOTOKEN);
+    celoToken.mint(receiver, ONE_CELOTOKEN);
   }
 
-  function test_Reverts_whenCalledByOtherThanMintingSchedule() public {
+  function test_Reverts_whenL2() public _whenL2 {
+    vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(celoTokenDistributionSchedule);
+    celoToken.mint(receiver, ONE_CELOTOKEN);
+    vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(address(0));
-    vm.expectRevert("Only MintGoldSchedule can call.");
-    goldToken.mint(receiver, ONE_GOLDTOKEN);
-
-    vm.prank(address(9));
-    vm.expectRevert("Only MintGoldSchedule can call.");
-    goldToken.mint(receiver, ONE_GOLDTOKEN);
-
-    vm.prank(goldTokenOwner);
-    vm.expectRevert("Only MintGoldSchedule can call.");
-    goldToken.mint(receiver, ONE_GOLDTOKEN);
-  }
-
-  function test_Should_increaseGoldTokenTotalSupply() public {
-    uint256 goldTokenSupplyBefore = goldToken.totalSupply();
-    vm.prank(goldTokenMintingSchedule);
-    goldToken.mint(receiver, ONE_GOLDTOKEN);
-    uint256 goldTokenSupplyAfter = goldToken.totalSupply();
-    assertGt(goldTokenSupplyAfter, goldTokenSupplyBefore);
-  }
-
-  function test_Should_increaseGoldTokenBalanceWhenMintedByGoldTokenMintingSchedule() public {
-    uint256 originalBalance = goldToken.balanceOf(receiver);
-    vm.prank(goldTokenMintingSchedule);
-    goldToken.mint(receiver, ONE_GOLDTOKEN);
-    uint256 balanceAfterMint = goldToken.balanceOf(receiver);
-    assertGt(balanceAfterMint, originalBalance);
-  }
-
-  function test_Emits_TransferEvent() public {
-    vm.prank(goldTokenMintingSchedule);
-    vm.expectEmit(true, true, true, true);
-    emit Transfer(address(0), receiver, ONE_GOLDTOKEN);
-    goldToken.mint(receiver, ONE_GOLDTOKEN);
+    celoToken.mint(receiver, ONE_CELOTOKEN);
   }
 }
 
-contract GoldTokenTest_setGoldTokenMintingScheduleAddress is GoldTokenTest {
+contract GoldTokenTest_setCeloTokenDistributionScheduleAddress is GoldTokenTest {
   function test_Reverts_whenCalledByOtherThanL2Governance() public _whenL2 {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(address(0));
-    goldToken.setGoldTokenMintingScheduleAddress(goldTokenMintingSchedule);
+    celoToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
   }
 
   function test_ShouldSucceedWhenCalledByOwner() public {
-    vm.prank(goldTokenOwner);
-    goldToken.setGoldTokenMintingScheduleAddress(goldTokenMintingSchedule);
+    vm.prank(celoTokenOwner);
+    celoToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
 
-    assertEq(address(goldToken.goldTokenMintingSchedule()), goldTokenMintingSchedule);
+    assertEq(address(celoToken.celoTokenDistributionSchedule()), celoTokenDistributionSchedule);
   }
+
   function test_ShouldSucceedWhenCalledByL2Governance() public _whenL2 {
-    vm.prank(goldTokenOwner);
-    goldToken.setGoldTokenMintingScheduleAddress(goldTokenMintingSchedule);
+    vm.prank(celoTokenOwner);
+    celoToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
 
-    assertEq(address(goldToken.goldTokenMintingSchedule()), goldTokenMintingSchedule);
+    assertEq(address(celoToken.celoTokenDistributionSchedule()), celoTokenDistributionSchedule);
   }
-  function test_Emits_SetGoldTokenMintingScheduleAddressEvent() public {
+
+  function test_Emits_SetCeloTokenDistributionScheduleAddressEvent() public {
     vm.expectEmit(true, true, true, true);
-    emit SetGoldTokenMintingScheduleAddress(goldTokenMintingSchedule);
-    vm.prank(goldTokenOwner);
-    goldToken.setGoldTokenMintingScheduleAddress(goldTokenMintingSchedule);
+    emit SetCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
+    vm.prank(celoTokenOwner);
+    celoToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
   }
 }
 
 contract GoldTokenTest_increaseSupply is GoldTokenTest {
   function test_ShouldIncreaseTotalSupply() public {
-    uint256 goldTokenSupplyBefore = goldToken.totalSupply();
+    uint256 celoTokenSupplyBefore = celoToken.totalSupply();
     vm.prank(address(0));
-    goldToken.increaseSupply(ONE_GOLDTOKEN);
-    uint256 goldTokenSupplyAfter = goldToken.totalSupply();
-    assertGt(goldTokenSupplyAfter, goldTokenSupplyBefore);
+    celoToken.increaseSupply(ONE_CELOTOKEN);
+    uint256 celoTokenSupplyAfter = celoToken.totalSupply();
+    assertGt(celoTokenSupplyAfter, celoTokenSupplyBefore);
   }
 
   function test_Reverts_WhenCalledByOtherThanVm() public {
-    vm.prank(goldTokenOwner);
-    vm.expectRevert("Only VM can call");
-    goldToken.increaseSupply(ONE_GOLDTOKEN);
-    vm.prank(goldTokenMintingSchedule);
-    vm.expectRevert("Only VM can call");
-    goldToken.increaseSupply(ONE_GOLDTOKEN);
+    vm.prank(celoTokenOwner);
+    vm.expectRevert("Only VM can call.");
+    celoToken.increaseSupply(ONE_CELOTOKEN);
+    vm.prank(celoTokenDistributionSchedule);
+    vm.expectRevert("Only VM can call.");
+    celoToken.increaseSupply(ONE_CELOTOKEN);
   }
 }
 
-contract GoldTokenTest_increaseSupply_l2 is GoldTokenTest {
+contract GoldTokenTest_increaseSupply_L2 is GoldTokenTest {
   function setUp() public _whenL2 {
     super.setUp();
-    vm.prank(goldTokenOwner);
-    goldToken.setGoldTokenMintingScheduleAddress(goldTokenMintingSchedule);
+    vm.prank(celoTokenOwner);
+    celoToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
   }
 
-  function test_Reverts_WhenCalledByAnyone() public {
+  function test_ShouldIncreaseTotalSupply() public {
+    uint256 celoTokenSupplyBefore = celoToken.totalSupply();
+    vm.prank(address(celoTokenDistributionSchedule));
+    celoToken.increaseSupply(ONE_CELOTOKEN);
+    uint256 celoTokenSupplyAfter = celoToken.totalSupply();
+    assertGt(celoTokenSupplyAfter, celoTokenSupplyBefore);
+  }
+
+  function test_Reverts_WhenCalledByOtherThanSchedule() public {
     vm.prank(address(0));
-    vm.expectRevert("This method is no longer supported in L2.");
-    goldToken.increaseSupply(ONE_GOLDTOKEN);
-    vm.prank(goldTokenMintingSchedule);
-    vm.expectRevert("This method is no longer supported in L2.");
-    goldToken.increaseSupply(ONE_GOLDTOKEN);
+    vm.expectRevert("Only CeloDistributionSchedule can call.");
+    celoToken.increaseSupply(ONE_CELOTOKEN);
+    vm.prank(celoTokenOwner);
+    vm.expectRevert("Only CeloDistributionSchedule can call.");
+    celoToken.increaseSupply(ONE_CELOTOKEN);
   }
 
   function test_ShouldNotIncreaseTotalSupply() public {
-    uint256 goldTokenSupplyBefore = goldToken.totalSupply();
-    vm.expectRevert("This method is no longer supported in L2.");
-    vm.prank(goldTokenOwner);
-    goldToken.increaseSupply(ONE_GOLDTOKEN);
+    uint256 celoTokenSupplyBefore = celoToken.totalSupply();
+    vm.expectRevert("Only CeloDistributionSchedule can call.");
+    vm.prank(celoTokenOwner);
+    celoToken.increaseSupply(ONE_CELOTOKEN);
 
-    uint256 goldTokenSupplyAfter = goldToken.totalSupply();
-    assertEq(goldTokenSupplyAfter, goldTokenSupplyBefore);
+    uint256 celoTokenSupplyAfter = celoToken.totalSupply();
+    assertEq(celoTokenSupplyAfter, celoTokenSupplyBefore);
   }
 }
 
-contract GoldTokenMockTest is Test {
-  GoldTokenMock mockGoldToken;
-  uint256 ONE_GOLDTOKEN = 1000000000000000000;
+contract CeloTokenMockTest is Test {
+  GoldTokenMock mockCeloToken;
+  uint256 ONE_CELOTOKEN = 1000000000000000000;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
   address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   function setUp() public {
-    mockGoldToken = new GoldTokenMock();
-    mockGoldToken.setTotalSupply(ONE_GOLDTOKEN * 1000);
-  }
-
-  modifier _whenL2() {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
-    _;
+    mockCeloToken = new GoldTokenMock();
+    mockCeloToken.setTotalSupply(ONE_CELOTOKEN * 1000);
   }
 }
 
-contract GoldTokenMock_circulatingSupply is GoldTokenMockTest {
+contract CeloTokenMock_circulatingSupply is CeloTokenMockTest {
   function setUp() public {
     super.setUp();
   }
 
   function test_ShouldMatchCirculationSupply_WhenNoBurn() public {
-    assertEq(mockGoldToken.circulatingSupply(), mockGoldToken.totalSupply());
+    assertEq(mockCeloToken.circulatingSupply(), mockCeloToken.totalSupply());
   }
 
   function test_ShouldDecreaseCirculatingSupply_WhenThereWasBurn() public {
-    mockGoldToken.setBalanceOf(burnAddress, ONE_GOLDTOKEN);
-    assertEq(mockGoldToken.circulatingSupply(), ONE_GOLDTOKEN * 999);
-    assertEq(mockGoldToken.circulatingSupply(), mockGoldToken.totalSupply() - ONE_GOLDTOKEN);
+    mockCeloToken.setBalanceOf(burnAddress, ONE_CELOTOKEN);
+    assertEq(mockCeloToken.circulatingSupply(), ONE_CELOTOKEN * 999);
+    assertEq(mockCeloToken.circulatingSupply(), mockCeloToken.totalSupply() - ONE_CELOTOKEN);
+  }
+
+  modifier _whenL2() {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    _;
   }
 }
 
