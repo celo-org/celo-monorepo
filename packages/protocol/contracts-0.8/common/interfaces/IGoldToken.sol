@@ -36,8 +36,7 @@ interface IGoldToken is IERC20 {
   function mint(address to, uint256 value) external returns (bool);
 
   /**
-   * @notice Increases the variable for total amount of CELO in existence.
-   * @param amount The amount to increase counter by.
+   * @notice Returns amount of CELO that has been allocated.
    */
-  function increaseSupply(uint256 amount) external;
+  function allocatedSupply() external view returns (uint256);
 }
