@@ -12,8 +12,9 @@ import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
-import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
-import "@celo-contracts/common/interfaces/ICeloToken.sol"; // TODO move these to Initializer
+import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
+import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectoryInitializer.sol";
+import "@celo-contracts/common/interfaces/ICeloTokenInitializer.sol";
 import "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
 import "@celo-contracts/governance/interfaces/LockedGoldfunctionInitializer.sol";
@@ -274,7 +275,7 @@ contract Migration is Script, UsingRegistry, Constants {
     // TODO migrate the initializations interface
     deployProxiedContract(
       "FeeCurrencyDirectory",
-      abi.encodeWithSelector(FeeCurrencyDirectory.initialize.selector)
+      abi.encodeWithSelector(IFeeCurrencyDirectoryInitializer.initialize.selector)
     );
   }
 
@@ -282,7 +283,7 @@ contract Migration is Script, UsingRegistry, Constants {
     // TODO change pre-funded addresses to make it match circulation supply
     address goldProxyAddress = deployProxiedContract(
       "GoldToken",
-      abi.encodeWithSelector(ICeloToken.initialize.selector, registryAddress)
+      abi.encodeWithSelector(ICeloTokenInitializer.initialize.selector, registryAddress)
     );
 
     bool frozen = abi.decode(json.parseRaw(".goldToken.frozen"), (bool));
@@ -459,7 +460,7 @@ contract Migration is Script, UsingRegistry, Constants {
     */
     uint256 mockIntrinsicGas = 21000;
 
-    FeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory"))
+    IFeeCurrencyDirectory(registry.getAddressForStringOrDie("FeeCurrencyDirectory"))
       .setCurrencyConfig(stableTokenProxyAddress, address(getSortedOracles()), mockIntrinsicGas);
   }
 
