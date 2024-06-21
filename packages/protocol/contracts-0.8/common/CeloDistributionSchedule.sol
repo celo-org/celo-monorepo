@@ -12,13 +12,13 @@ import "../../contracts/common/Initializable.sol";
 import "../../contracts-0.8/common/interfaces/IGoldToken.sol";
 
 /**
- * @title Contract for minting new CELO token based on a schedule.
+ * @title Contract for distributing CELO token based on a schedule.
  */
-contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2Check {
+contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2Check {
   using FixidityLib for FixidityLib.Fraction;
 
-  uint256 constant GENESIS_GOLD_SUPPLY = 600000000 ether; // 600 million Gold
-  uint256 constant GOLD_SUPPLY_CAP = 1000000000 ether; // 1 billion Gold
+  uint256 constant GENESIS_CELO_SUPPLY = 600000000 ether; // 600 million Celo
+  uint256 constant CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion Celo
   uint256 constant YEARS_LINEAR = 15;
   uint256 constant SECONDS_LINEAR = YEARS_LINEAR * 365 * 1 days;
 
@@ -27,7 +27,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   uint256 public l2StartTime;
   uint256 public totalSupplyAtL2Start;
 
-  uint256 public totalMintedBySchedule;
+  uint256 public totalDistributedBySchedule;
   address public communityRewardFund;
   address public carbonOffsettingPartner;
 
@@ -38,7 +38,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   event CarbonOffsettingFundSet(address indexed partner, uint256 fraction);
 
   modifier whenActivated() {
-    require(areDependenciesSet, "Minting schedule has not been activated.");
+    require(areDependenciesSet, "Distribution schedule has not been activated.");
     _;
   }
 
@@ -49,14 +49,14 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   constructor(bool test) public Initializable(test) {}
 
   /**
-   * @notice A constructor for initialising a new instance of a MintGoldSchedule contract.
+   * @notice A constructor for initialising a new instance of a CeloDistributionSchedule contract.
    */
   function initialize() external initializer {
     _transferOwnership(msg.sender);
   }
 
   /**
-   * @notice Sets the minting schedule dependencies during L2 transition.
+   * @notice Sets the distribution schedule dependencies during L2 transition.
    * @param _l2StartTime The timestamp of L1 to L2 transition.
    * @param _communityRewardFraction The percentage of rewards that go the community funds.
    * @param _carbonOffsettingPartner The address of the carbon offsetting partner.
@@ -70,6 +70,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     uint256 _carbonOffsettingFraction,
     address registryAddress
   ) external onlyOwner onlyL2 {
+    require(address(this).balance > 0, "Contract does not have CELO balance.");
     require(!areDependenciesSet, "Contract has already been activated.");
     require(registryAddress != address(0), "The registry address cannot be the zero address");
     require(block.timestamp > _l2StartTime, "L2 start time cannot be set to a future date.");
@@ -83,32 +84,38 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   }
 
   /**
-   * @notice Mints CELO to the community and carbon offsetting funds according to the predefined schedule.
+   * @notice Distributes CELO to the community and carbon offsetting funds according to the predefined schedule.
    */
-  function mintAccordingToSchedule() external nonReentrant onlyL2 returns (bool) {
+  function distributeAccordingToSchedule() external nonReentrant onlyL2 returns (bool) {
     (
-      uint256 targetGoldTotalSupply,
-      uint256 communityRewardFundMintAmount,
-      uint256 carbonOffsettingPartnerMintAmount
-    ) = getTargetGoldTotalSupply();
+      uint256 targetCeloTotalSupply,
+      uint256 communityRewardFundDistributionAmount,
+      uint256 carbonOffsettingPartnerDistributionAmount
+    ) = getTargetCeloTotalSupply();
 
-    uint256 mintableAmount = Math.min(
-      getRemainingBalanceToMint(),
-      targetGoldTotalSupply - getGoldToken().totalSupply()
+    uint256 distributableAmount = Math.min(
+      getRemainingBalanceToDistribute(),
+      targetCeloTotalSupply - getGoldToken().totalSupply()
     );
 
-    require(mintableAmount > 0, "Mintable amount must be greater than zero");
-    totalMintedBySchedule += mintableAmount;
+    require(distributableAmount > 0, "Distributable amount must be greater than zero.");
+    require(address(this).balance > distributableAmount, "Contract balance is insufficient.");
 
-    IGoldToken goldToken = IGoldToken(address(getGoldToken()));
+    totalDistributedBySchedule += distributableAmount;
+
+    IGoldToken celoToken = IGoldToken(address(getGoldToken()));
+
+    celoToken.increaseSupply(
+      communityRewardFundDistributionAmount + carbonOffsettingPartnerDistributionAmount
+    );
     require(
-      goldToken.mint(communityRewardFund, communityRewardFundMintAmount),
-      "Failed to mint to community partner."
+      celoToken.transfer(communityRewardFund, communityRewardFundDistributionAmount),
+      "Failed to transfer to community partner."
     );
 
     require(
-      goldToken.mint(carbonOffsettingPartner, carbonOffsettingPartnerMintAmount),
-      "Failed to mint to carbon offsetting partner."
+      celoToken.transfer(carbonOffsettingPartner, carbonOffsettingPartnerDistributionAmount),
+      "Failed to transfer to carbon offsetting partner."
     );
     return true;
   }
@@ -127,6 +134,13 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
    */
   function getCarbonOffsettingFraction() external view returns (uint256) {
     return carbonOffsettingFraction.unwrap();
+  }
+
+  /**
+   * @return The total balance distributed by the CeloDistributionSchedule contract.
+   */
+  function getTotalDistributedBySchedule() external view returns (uint256) {
+    return totalDistributedBySchedule;
   }
 
   /**
@@ -200,40 +214,33 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
   }
 
   /**
-   * @notice Calculates remaining CELO balance to mint.
-   * @return The remaining CELO balance to mint.
+   * @notice Calculates remaining CELO balance to distribute.
+   * @return The remaining CELO balance to distribute.
    */
-  function getRemainingBalanceToMint() public view returns (uint256) {
-    return GOLD_SUPPLY_CAP - getGoldToken().totalSupply();
+  function getRemainingBalanceToDistribute() public view returns (uint256) {
+    return CELO_SUPPLY_CAP - getGoldToken().totalSupply();
   }
 
   /**
-   * @return The total balance minted by the MintGoldSchedule contract.
+   * @return The currently distributable amount.
    */
-  function getTotalMintedBySchedule() public view returns (uint256) {
-    return totalMintedBySchedule;
-  }
-
-  /**
-   * @return The currently mintable amount.
-   */
-  function getMintableAmount() public view returns (uint256) {
-    (uint256 targetGoldTotalSupply, , ) = getTargetGoldTotalSupply();
-    return targetGoldTotalSupply - getGoldToken().totalSupply();
+  function getDistributableAmount() public view returns (uint256) {
+    (uint256 targetCeloTotalSupply, , ) = getTargetCeloTotalSupply();
+    return targetCeloTotalSupply - getGoldToken().totalSupply();
   }
 
   /**
    * @notice Returns the target CELO supply according to the target schedule.
-   * @return targetGoldTotalSupply The target total CELO supply according to the target schedule.
-   * @return communityTargetRewards The community reward that can be minted according to the target schedule.
-   * @return carbonFundTargetRewards The carbon offsetting reward that can be minted according to the target schedule.
+   * @return targetCeloTotalSupply The target total CELO supply according to the target schedule.
+   * @return communityTargetRewards The community reward that can be distributed according to the target schedule.
+   * @return carbonFundTargetRewards The carbon offsetting reward that can be distributed according to the target schedule.
    */
-  function getTargetGoldTotalSupply()
+  function getTargetCeloTotalSupply()
     public
     view
     whenActivated
     returns (
-      uint256 targetGoldTotalSupply,
+      uint256 targetCeloTotalSupply,
       uint256 communityTargetRewards,
       uint256 carbonFundTargetRewards
     )
@@ -243,20 +250,20 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
 
     uint256 timeSinceL2Start = block.timestamp - l2StartTime;
     uint256 totalL2LinearSecondsAvailable = SECONDS_LINEAR - (l2StartTime - GENESIS_START_TIME);
-    uint256 mintedOnL1 = totalSupplyAtL2Start - GENESIS_GOLD_SUPPLY;
+    uint256 mintedOnL1 = totalSupplyAtL2Start - GENESIS_CELO_SUPPLY;
 
     bool isLinearDistribution = timeSinceL2Start < totalL2LinearSecondsAvailable;
     if (isLinearDistribution) {
       (
-        targetGoldTotalSupply,
+        targetCeloTotalSupply,
         communityTargetRewards,
         carbonFundTargetRewards
       ) = _calculateTargetReward(timeSinceL2Start, totalL2LinearSecondsAvailable, mintedOnL1);
 
-      return (targetGoldTotalSupply, communityTargetRewards, carbonFundTargetRewards);
+      return (targetCeloTotalSupply, communityTargetRewards, carbonFundTargetRewards);
     } else {
       (
-        targetGoldTotalSupply,
+        targetCeloTotalSupply,
         communityTargetRewards,
         carbonFundTargetRewards
       ) = _calculateTargetReward(
@@ -265,13 +272,13 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
         mintedOnL1
       );
 
-      bool hasNotYetMintedAllLinearRewards = totalMintedBySchedule +
-        GENESIS_GOLD_SUPPLY +
+      bool hasNotYetDistributedAllLinearRewards = totalDistributedBySchedule +
+        GENESIS_CELO_SUPPLY +
         mintedOnL1 <
-        targetGoldTotalSupply;
+        targetCeloTotalSupply;
 
-      if (hasNotYetMintedAllLinearRewards) {
-        return (targetGoldTotalSupply, communityTargetRewards, carbonFundTargetRewards);
+      if (hasNotYetDistributedAllLinearRewards) {
+        return (targetCeloTotalSupply, communityTargetRewards, carbonFundTargetRewards);
       }
       revert("Block reward calculation for years 15-30 unimplemented");
       return (0, 0, 0);
@@ -286,7 +293,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
     internal
     view
     returns (
-      uint256 targetGoldTotalSupply,
+      uint256 targetCeloTotalSupply,
       uint256 communityTargetRewards,
       uint256 carbonFundTargetRewards
     )
@@ -296,7 +303,7 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       _totalL2LinearSecondsAvailable
     );
     // Pay out half of all block rewards linearly.
-    uint256 totalLinearRewards = (GOLD_SUPPLY_CAP - GENESIS_GOLD_SUPPLY) / 2; //(200 million) includes validator rewards.
+    uint256 totalLinearRewards = (CELO_SUPPLY_CAP - GENESIS_CELO_SUPPLY) / 2; //(200 million) includes validator rewards.
 
     FixidityLib.Fraction memory l2LinearRewards = FixidityLib.newFixed(
       totalLinearRewards - _mintedOnL1
@@ -321,10 +328,10 @@ contract MintGoldSchedule is UsingRegistry, ReentrancyGuard, Initializable, IsL2
       .divide(totalL2LinearSecondsAvailableFraction)
       .fromFixed();
 
-    targetGoldTotalSupply =
+    targetCeloTotalSupply =
       communityTargetRewards +
       carbonFundTargetRewards +
-      GENESIS_GOLD_SUPPLY +
+      GENESIS_CELO_SUPPLY +
       _mintedOnL1;
   }
 }
