@@ -301,8 +301,8 @@ contract CeloToken_WithdrawAmount is CeloTokenMockTest {
 
   function test_WithdrawAmount_ShouldIncreaseWithdrawn() public _whenL2 {
     mockCeloToken.setWithdrawn(2 * ONE_CELOTOKEN);
-    mockCeloToken.setL2ToL1MessagePasser(address(this));
     uint256 withdrawnBefore = mockCeloToken.withdrawn();
+    vm.prank(0x4200000000000000000000000000000000000016);
     mockCeloToken.withdrawAmount(ONE_CELOTOKEN);
     uint256 withdrawnAfter = mockCeloToken.withdrawn();
     assertEq(withdrawnAfter, withdrawnBefore + ONE_CELOTOKEN);
@@ -323,26 +323,12 @@ contract CeloToken_DepositAmount is CeloTokenMockTest {
 
   function test_DepositAmount_ShouldDecreaseWithdrawn() public _whenL2 {
     mockCeloToken.setWithdrawn(2 * ONE_CELOTOKEN);
-    mockCeloToken.setL2ToL1MessagePasser(address(this));
+    vm.prank(0x4200000000000000000000000000000000000016);
     uint256 withdrawnBefore = mockCeloToken.withdrawn();
     vm.prank(address(0));
     mockCeloToken.depositAmount(ONE_CELOTOKEN);
     uint256 withdrawnAfter = mockCeloToken.withdrawn();
     assertEq(withdrawnAfter, withdrawnBefore - ONE_CELOTOKEN);
-  }
-}
-
-contract CeloToken_SetL2ToL1MessagePasser is CeloTokenMockTest {
-  function test_SetL2ToL1MessagePasser_Reverts_whenCalledByOtherOwner() public _whenL2 {
-    vm.expectRevert("Ownable: caller is not the owner");
-    vm.prank(address(0));
-    mockCeloToken.setL2ToL1MessagePasser(address(this));
-  }
-
-  function test_SetL2ToL1MessagePasser_ShouldSetL2ToL1MessagePasser() public _whenL2 {
-    address newL2ToL1MessagePasser = address(0x1);
-    mockCeloToken.setL2ToL1MessagePasser(address(this));
-    assertEq(mockCeloToken.l2ToL1MessagePasser(), address(this));
   }
 }
 
@@ -355,7 +341,7 @@ contract CeloToken_TotalSupply is CeloTokenMockTest {
 
   function test_TotalSupply_ShouldReturnTotalSupplyWhenWithdrawn_WhenL2() public _whenL2 {
     uint256 _withdrawAmount = ONE_CELOTOKEN;
-    mockCeloToken.setL2ToL1MessagePasser(address(this));
+    vm.prank(0x4200000000000000000000000000000000000016);
     mockCeloToken.withdrawAmount(_withdrawAmount);
     assertEq(mockCeloToken.totalSupply(), 1000000000e18 - ONE_CELOTOKEN);
   }

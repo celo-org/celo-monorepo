@@ -33,7 +33,6 @@ contract GoldToken is
   uint256 constant CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion Celo
   // Total amount that was withdrawn from L2 (Celo) to L1 (Ethereum)
   uint256 public withdrawn;
-  address public l2ToL1MessagePasser;
   // solhint-enable state-visibility
 
   mapping(address => mapping(address => uint256)) internal allowed;
@@ -64,7 +63,10 @@ contract GoldToken is
   }
 
   modifier onlyL2ToL1MessagePasser() {
-    require(msg.sender == l2ToL1MessagePasser, "Only L2ToL1MessagePasser can call.");
+    require(
+      msg.sender == 0x4200000000000000000000000000000000000016,
+      "Only L2ToL1MessagePasser can call."
+    );
     _;
   }
 
@@ -242,14 +244,6 @@ contract GoldToken is
    */
   function depositAmount(uint256 _depositAmount) external onlyVm onlyL2 {
     withdrawn = withdrawn.sub(_depositAmount);
-  }
-
-  /**
-   * @notice Sets the address of the L2ToL1MessagePasser contract.
-   * @param _l2ToL1MessagePasser The address of the L2ToL1MessagePasser contract.
-   */
-  function setL2ToL1MessagePasser(address _l2ToL1MessagePasser) external onlyOwner {
-    l2ToL1MessagePasser = _l2ToL1MessagePasser;
   }
 
   /**
