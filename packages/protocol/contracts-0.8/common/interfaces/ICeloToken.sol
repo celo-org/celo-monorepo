@@ -7,7 +7,7 @@ import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
  * @dev Interface of the ERC20 standard as defined in the EIP. Does not include
  * the optional functions; to access them see {ERC20Detailed}.
  */
-interface IGoldToken is IERC20 {
+interface ICeloToken is IERC20 {
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress Address of the Registry contract.

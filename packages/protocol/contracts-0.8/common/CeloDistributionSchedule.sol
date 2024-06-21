@@ -9,7 +9,7 @@ import "../common/IsL2Check.sol";
 
 import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/common/Initializable.sol";
-import "../../contracts-0.8/common/interfaces/IGoldToken.sol";
+import "../../contracts-0.8/common/interfaces/ICeloToken.sol";
 
 /**
  * @title Contract for distributing CELO token based on a schedule.
@@ -78,7 +78,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
     l2StartTime = _l2StartTime;
     setRegistry(registryAddress);
     communityRewardFund = address(getGovernance());
-    totalSupplyAtL2Start = getGoldToken().totalSupply();
+    totalSupplyAtL2Start = getCeloToken().totalSupply();
     setCommunityRewardFraction(_communityRewardFraction);
     setCarbonOffsettingFund(_carbonOffsettingPartner, _carbonOffsettingFraction);
   }
@@ -95,7 +95,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
 
     uint256 distributableAmount = Math.min(
       getRemainingBalanceToDistribute(),
-      targetCeloTotalSupply - getGoldToken().totalSupply()
+      targetCeloTotalSupply - getCeloToken().totalSupply()
     );
 
     require(distributableAmount > 0, "Distributable amount must be greater than zero.");
@@ -103,7 +103,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
 
     totalDistributedBySchedule += distributableAmount;
 
-    IGoldToken celoToken = IGoldToken(address(getGoldToken()));
+    ICeloToken celoToken = ICeloToken(address(getCeloToken()));
 
     celoToken.increaseSupply(
       communityRewardFundDistributionAmount + carbonOffsettingPartnerDistributionAmount
@@ -218,7 +218,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
    * @return The remaining CELO balance to distribute.
    */
   function getRemainingBalanceToDistribute() public view returns (uint256) {
-    return CELO_SUPPLY_CAP - getGoldToken().totalSupply();
+    return CELO_SUPPLY_CAP - getCeloToken().totalSupply();
   }
 
   /**
@@ -226,7 +226,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
    */
   function getDistributableAmount() public view returns (uint256) {
     (uint256 targetCeloTotalSupply, , ) = getTargetCeloTotalSupply();
-    return targetCeloTotalSupply - getGoldToken().totalSupply();
+    return targetCeloTotalSupply - getCeloToken().totalSupply();
   }
 
   /**
