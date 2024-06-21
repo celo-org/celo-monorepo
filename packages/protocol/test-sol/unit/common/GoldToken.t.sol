@@ -250,64 +250,16 @@ contract GoldTokenTest_setCeloTokenDistributionScheduleAddress is GoldTokenTest 
   }
 }
 
-contract GoldTokenTest_increaseSupply is GoldTokenTest {
-  function test_ShouldIncreaseTotalSupply() public {
-    uint256 celoTokenSupplyBefore = celoToken.totalSupply();
-    vm.prank(address(0));
-    celoToken.increaseSupply(ONE_CELOTOKEN);
-    uint256 celoTokenSupplyAfter = celoToken.totalSupply();
-    assertGt(celoTokenSupplyAfter, celoTokenSupplyBefore);
-  }
-
-  function test_Reverts_WhenCalledByOtherThanVm() public {
-    vm.prank(celoTokenOwner);
-    vm.expectRevert("Only VM can call.");
-    celoToken.increaseSupply(ONE_CELOTOKEN);
-    vm.prank(celoTokenDistributionSchedule);
-    vm.expectRevert("Only VM can call.");
-    celoToken.increaseSupply(ONE_CELOTOKEN);
-  }
-}
-
-contract GoldTokenTest_increaseSupply_L2 is GoldTokenTest {
-  function setUp() public _whenL2 {
-    super.setUp();
-    vm.prank(celoTokenOwner);
-    celoToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
-  }
-
-  function test_ShouldIncreaseTotalSupply() public {
-    uint256 celoTokenSupplyBefore = celoToken.totalSupply();
-    vm.prank(address(celoTokenDistributionSchedule));
-    celoToken.increaseSupply(ONE_CELOTOKEN);
-    uint256 celoTokenSupplyAfter = celoToken.totalSupply();
-    assertGt(celoTokenSupplyAfter, celoTokenSupplyBefore);
-  }
-
-  function test_Reverts_WhenCalledByOtherThanSchedule() public {
-    vm.prank(address(0));
-    vm.expectRevert("Only CeloDistributionSchedule can call.");
-    celoToken.increaseSupply(ONE_CELOTOKEN);
-    vm.prank(celoTokenOwner);
-    vm.expectRevert("Only CeloDistributionSchedule can call.");
-    celoToken.increaseSupply(ONE_CELOTOKEN);
-  }
-
-  function test_ShouldNotIncreaseTotalSupply() public {
-    uint256 celoTokenSupplyBefore = celoToken.totalSupply();
-    vm.expectRevert("Only CeloDistributionSchedule can call.");
-    vm.prank(celoTokenOwner);
-    celoToken.increaseSupply(ONE_CELOTOKEN);
-
-    uint256 celoTokenSupplyAfter = celoToken.totalSupply();
-    assertEq(celoTokenSupplyAfter, celoTokenSupplyBefore);
-  }
-}
-
 contract CeloTokenMockTest is Test {
   GoldTokenMock mockCeloToken;
   uint256 ONE_CELOTOKEN = 1000000000000000000;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
+  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
+
+  modifier _whenL2() {
+    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    _;
+  }
 
   function setUp() public {
     mockCeloToken = new GoldTokenMock();
@@ -328,5 +280,85 @@ contract CeloTokenMock_circulatingSupply is CeloTokenMockTest {
     mockCeloToken.setBalanceOf(burnAddress, ONE_CELOTOKEN);
     assertEq(mockCeloToken.circulatingSupply(), ONE_CELOTOKEN * 999);
     assertEq(mockCeloToken.circulatingSupply(), mockCeloToken.totalSupply() - ONE_CELOTOKEN);
+  }
+}
+
+contract CeloToken_WithdrawAmount is CeloTokenMockTest {
+  function setUp() public {
+    super.setUp();
+  }
+
+  function test_WithdrawAmount_Reverts_whenNotL2() public {
+    vm.prank(address(0));
+    vm.expectRevert("This method is not supported in L1.");
+    mockCeloToken.withdrawAmount(ONE_CELOTOKEN);
+  }
+
+  function test_WithdrawAmount_Reverts_whenCalledByOtherThanL2ToL1MessagePasser() public _whenL2 {
+    vm.expectRevert("Only L2ToL1MessagePasser can call.");
+    mockCeloToken.withdrawAmount(ONE_CELOTOKEN);
+  }
+
+  function test_WithdrawAmount_ShouldIncreaseWithdrawn() public _whenL2 {
+    mockCeloToken.setWithdrawn(2 * ONE_CELOTOKEN);
+    mockCeloToken.setL2ToL1MessagePasser(address(this));
+    uint256 withdrawnBefore = mockCeloToken.withdrawn();
+    mockCeloToken.withdrawAmount(ONE_CELOTOKEN);
+    uint256 withdrawnAfter = mockCeloToken.withdrawn();
+    assertEq(withdrawnAfter, withdrawnBefore + ONE_CELOTOKEN);
+  }
+}
+
+contract CeloToken_DepositAmount is CeloTokenMockTest {
+
+  function test_DepositAmount_Reverts_whenNotL2() public {
+    vm.prank(address(0));
+    vm.expectRevert("This method is not supported in L1.");
+    mockCeloToken.depositAmount(ONE_CELOTOKEN);
+  }
+
+  function test_DepositAmount_Reverts_whenCalledByOtherVm() public _whenL2 {
+    vm.expectRevert("Only VM can call");
+    mockCeloToken.depositAmount(ONE_CELOTOKEN);
+  }
+
+  function test_DepositAmount_ShouldDecreaseWithdrawn() public _whenL2 {
+    mockCeloToken.setWithdrawn(2 * ONE_CELOTOKEN);
+    mockCeloToken.setL2ToL1MessagePasser(address(this));
+    uint256 withdrawnBefore = mockCeloToken.withdrawn();
+    vm.prank(address(0));
+    mockCeloToken.depositAmount(ONE_CELOTOKEN);
+    uint256 withdrawnAfter = mockCeloToken.withdrawn();
+    assertEq(withdrawnAfter, withdrawnBefore - ONE_CELOTOKEN);
+  }
+}
+
+contract CeloToken_SetL2ToL1MessagePasser is CeloTokenMockTest {
+
+  function test_SetL2ToL1MessagePasser_Reverts_whenCalledByOtherOwner() public _whenL2 {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(address(0));
+    mockCeloToken.setL2ToL1MessagePasser(address(this));
+  }
+
+  function test_SetL2ToL1MessagePasser_ShouldSetL2ToL1MessagePasser() public _whenL2 {
+    address newL2ToL1MessagePasser = address(0x1);
+    mockCeloToken.setL2ToL1MessagePasser(address(this));
+    assertEq(mockCeloToken.l2ToL1MessagePasser(), address(this));
+  }
+}
+
+contract CeloToken_TotalSupply is CeloTokenMockTest {
+   uint256 constant TOTAL_MARKET_CAP = 1000000000e18; // 1 billion CELO
+
+  function test_TotalSupply_ShouldReturnTotalSupply_WhenL2() public _whenL2 {
+    assertEq(mockCeloToken.totalSupply(), 1000000000e18);
+  }
+
+  function test_TotalSupply_ShouldReturnTotalSupplyWhenWithdrawn_WhenL2() public _whenL2 {
+    uint256 _withdrawAmount = ONE_CELOTOKEN;
+    mockCeloToken.setL2ToL1MessagePasser(address(this));
+    mockCeloToken.withdrawAmount(_withdrawAmount);
+    assertEq(mockCeloToken.totalSupply(), 1000000000e18 - ONE_CELOTOKEN);
   }
 }

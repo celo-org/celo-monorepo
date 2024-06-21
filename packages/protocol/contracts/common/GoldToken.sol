@@ -30,6 +30,10 @@ contract GoldToken is
   string constant SYMBOL = "CELO";
   uint8 constant DECIMALS = 18;
   uint256 internal totalSupply_;
+  uint256 constant CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion Celo
+  // Total amount that was withdrawn from L2 (Celo) to L1 (Ethereum)
+  uint256 public withdrawn;
+  address public l2ToL1MessagePasser;
   // solhint-enable state-visibility
 
   mapping(address => mapping(address => uint256)) internal allowed;
@@ -56,6 +60,11 @@ contract GoldToken is
     } else {
       require(msg.sender == address(0), "Only VM can call.");
     }
+    _;
+  }
+
+  modifier onlyL2ToL1MessagePasser {
+    require(msg.sender == l2ToL1MessagePasser, "Only L2ToL1MessagePasser can call.");
     _;
   }
 
@@ -220,13 +229,27 @@ contract GoldToken is
   }
 
   /**
-   * @notice Increases the variable for total amount of CELO in existence.
-   * @param amount The amount to increase counter by
-   * @dev This function will be deprecated in L2. The onlyway to increase
-   * the supply is with the mint function.
+    * @notice Increases the total withdrawn CELO from L2 to L1.
+    * @param _withdrawAmount The amount to decrease counter by
    */
-  function increaseSupply(uint256 amount) external onlySchedule {
-    totalSupply_ = totalSupply_.add(amount);
+  function withdrawAmount(uint256 _withdrawAmount) external onlyL2 onlyL2ToL1MessagePasser {
+    withdrawn = withdrawn.add(_withdrawAmount);
+  }
+
+  /**
+   * @notice Decreases the total withdrawn CELO from L2 to L1.
+   * @param _depositAmount The amount to decrease counter by
+   */
+  function depositAmount(uint256 _depositAmount) external onlyVm onlyL2 {
+    withdrawn = withdrawn.sub(_depositAmount);
+  }
+
+  /**
+   * @notice Sets the address of the L2ToL1MessagePasser contract.
+   * @param _l2ToL1MessagePasser The address of the L2ToL1MessagePasser contract.
+   */
+  function setL2ToL1MessagePasser(address _l2ToL1MessagePasser) external onlyOwner {
+    l2ToL1MessagePasser = _l2ToL1MessagePasser;
   }
 
   /**
@@ -254,7 +277,15 @@ contract GoldToken is
    * @return The total amount of CELO in existence, including what the burn address holds.
    */
   function totalSupply() external view returns (uint256) {
-    return totalSupply_;
+    if (isL2()) {
+      return CELO_SUPPLY_CAP.sub(withdrawn);
+    } else {
+      return totalSupply_;
+    }
+  }
+
+  function allocatedSupply() external view returns (uint256) {
+    return CELO_SUPPLY_CAP - address(celoTokenDistributionSchedule).balance;
   }
 
   /**

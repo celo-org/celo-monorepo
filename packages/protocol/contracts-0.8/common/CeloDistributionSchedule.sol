@@ -10,6 +10,7 @@ import "../common/IsL2Check.sol";
 import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/common/Initializable.sol";
 import "../../contracts-0.8/common/interfaces/IGoldToken.sol";
+import "forge-std/console.sol";
 
 /**
  * @title Contract for distributing CELO token based on a schedule.
@@ -78,7 +79,8 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
     l2StartTime = _l2StartTime;
     setRegistry(registryAddress);
     communityRewardFund = address(getGovernance());
-    totalSupplyAtL2Start = getGoldToken().totalSupply();
+    IGoldToken celoToken = IGoldToken(address(getGoldToken()));
+    totalSupplyAtL2Start = celoToken.allocatedSupply();
     setCommunityRewardFraction(_communityRewardFraction);
     setCarbonOffsettingFund(_carbonOffsettingPartner, _carbonOffsettingFraction);
   }
@@ -93,21 +95,19 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
       uint256 carbonOffsettingPartnerDistributionAmount
     ) = getTargetCeloTotalSupply();
 
+    IGoldToken celoToken = IGoldToken(address(getGoldToken()));
+
+    require(targetCeloTotalSupply >= celoToken.allocatedSupply(), "Contract balance is insufficient.");
+
     uint256 distributableAmount = Math.min(
       getRemainingBalanceToDistribute(),
-      targetCeloTotalSupply - getGoldToken().totalSupply()
+      targetCeloTotalSupply - celoToken.allocatedSupply()
     );
 
     require(distributableAmount > 0, "Distributable amount must be greater than zero.");
-    require(address(this).balance > distributableAmount, "Contract balance is insufficient.");
 
     totalDistributedBySchedule += distributableAmount;
 
-    IGoldToken celoToken = IGoldToken(address(getGoldToken()));
-
-    celoToken.increaseSupply(
-      communityRewardFundDistributionAmount + carbonOffsettingPartnerDistributionAmount
-    );
     require(
       celoToken.transfer(communityRewardFund, communityRewardFundDistributionAmount),
       "Failed to transfer to community partner."
@@ -218,7 +218,8 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
    * @return The remaining CELO balance to distribute.
    */
   function getRemainingBalanceToDistribute() public view returns (uint256) {
-    return CELO_SUPPLY_CAP - getGoldToken().totalSupply();
+    IGoldToken celoToken = IGoldToken(address(getGoldToken()));
+    return CELO_SUPPLY_CAP - celoToken.allocatedSupply();
   }
 
   /**
@@ -226,7 +227,8 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
    */
   function getDistributableAmount() public view returns (uint256) {
     (uint256 targetCeloTotalSupply, , ) = getTargetCeloTotalSupply();
-    return targetCeloTotalSupply - getGoldToken().totalSupply();
+    IGoldToken celoToken = IGoldToken(address(getGoldToken()));
+    return targetCeloTotalSupply - celoToken.allocatedSupply();
   }
 
   /**
