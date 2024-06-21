@@ -70,8 +70,8 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     uint256 maxSlippage // as fraction,
   ) external returns (uint256) {
     require(
-      buyTokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
-      "Buy token can only be gold token"
+      buyTokenAddress == registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID),
+      "Buy token can only be CELO token"
     );
 
     require(
