@@ -83,7 +83,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     // and if it generates a better outcome that the ones enabled that gets used
     // and the user gets a reward
 
-    IERC20 celoToken = getGoldToken();
+    IERC20 celoToken = getCeloToken();
 
     IUniswapV2RouterMin bestRouter;
     uint256 bestRouterQuote = 0;
@@ -196,7 +196,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
       );
     }
 
-    IERC20 celoToken = getGoldToken();
+    IERC20 celoToken = getCeloToken();
     address pair = IUniswapV2FactoryMin(bestRouter.factory()).getPair(
       sellTokenAddress,
       address(celoToken)

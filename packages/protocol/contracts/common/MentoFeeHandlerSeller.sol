@@ -64,7 +64,7 @@ contract MentoFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     stableToken.approve(exchangeAddress, amount);
     exchange.sell(amount, minAmount, false);
 
-    IERC20 goldToken = getGoldToken();
+    IERC20 goldToken = getCeloToken();
     uint256 celoAmount = goldToken.balanceOf(address(this));
     goldToken.transfer(msg.sender, celoAmount);
 

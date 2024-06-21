@@ -15,9 +15,11 @@ contract Constants {
   string constant SortedOraclesContract = "SortedOracles";
   string constant StableTokenContract = "StableToken";
   string constant GoldTokenContract = "GoldToken";
+  string constant CeloTokenContract = "CeloToken";
   string constant FreezerContract = "Freezer";
   string constant AccountsContract = "Accounts";
   string constant LockedGoldContract = "LockedGold";
+  string constant LockedCeloContract = "LockedCelo";
   string constant ValidatorsContract = "Validators";
   string constant GovernanceContract = "Governance";
 }
