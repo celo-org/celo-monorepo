@@ -31,11 +31,12 @@ contract GoldToken is
   uint8 constant DECIMALS = 18;
   uint256 constant CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion Celo
   uint256 internal totalSupply_;
-  // Total amount that was withdrawn from L2 (Celo) to L1 (Ethereum)
-  uint256 public withdrawn;
   // solhint-enable state-visibility
 
   mapping(address => mapping(address => uint256)) internal allowed;
+
+  // Total amount that was withdrawn from L2 (Celo) to L1 (Ethereum)
+  uint256 public withdrawn;
 
   // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
   address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
