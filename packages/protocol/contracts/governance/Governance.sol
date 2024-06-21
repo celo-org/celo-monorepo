@@ -16,7 +16,6 @@ import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
-import "../../contracts-0.8/common/IsL2Check.sol";
 
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
@@ -28,8 +27,7 @@ contract Governance is
   Initializable,
   ReentrancyGuard,
   UsingRegistry,
-  UsingPrecompiles,
-  IsL2Check
+  UsingPrecompiles
 {
   using Proposals for Proposals.Proposal;
   using FixidityLib for FixidityLib.Fraction;
