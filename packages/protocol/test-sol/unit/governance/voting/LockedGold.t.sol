@@ -78,7 +78,6 @@ contract LockedGoldTest is Test {
 
     registry.setAddressFor("Accounts", address(accounts));
     registry.setAddressFor("Election", address(election));
-    registry.setAddressFor("GoldToken", address(goldToken));
     registry.setAddressFor("Governance", address(governance));
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
