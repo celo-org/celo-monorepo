@@ -271,6 +271,7 @@ contract CeloTokenMockTest is Test {
   uint256 ONE_CELOTOKEN = 1000000000000000000;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
   address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
+  address celoTokenDistributionSchedule;
 
   modifier _whenL2() {
     deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
@@ -280,6 +281,8 @@ contract CeloTokenMockTest is Test {
   function setUp() public {
     mockCeloToken = new GoldTokenMock();
     mockCeloToken.setTotalSupply(ONE_CELOTOKEN * 1000);
+    celoTokenDistributionSchedule = actor("celoTokenDistributionSchedule");
+    mockCeloToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
   }
 }
 
@@ -296,6 +299,33 @@ contract CeloTokenMock_circulatingSupply is CeloTokenMockTest {
     mockCeloToken.setBalanceOf(burnAddress, ONE_CELOTOKEN);
     assertEq(mockCeloToken.circulatingSupply(), ONE_CELOTOKEN * 999);
     assertEq(mockCeloToken.circulatingSupply(), mockCeloToken.totalSupply() - ONE_CELOTOKEN);
+  }
+
+  function test_ShouldMatchCirculationSupply_WhenNoBurn_WhenL2() public _whenL2 {
+    assertEq(mockCeloToken.circulatingSupply(), mockCeloToken.totalSupply());
+  }
+
+  function test_ShouldDecreaseCirculatingSupply_WhenThereWasBurn_WhenL2() public _whenL2 {
+    uint256 CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion Celo
+    mockCeloToken.setBalanceOf(burnAddress, ONE_CELOTOKEN);
+    assertEq(mockCeloToken.circulatingSupply(), CELO_SUPPLY_CAP - ONE_CELOTOKEN);
+    assertEq(mockCeloToken.circulatingSupply(), mockCeloToken.allocatedSupply() - ONE_CELOTOKEN);
+  }
+}
+
+contract CeloToken_AllocatedSupply is CeloTokenMockTest {
+  function test_ShouldRevert_WhenL1() public {
+    vm.expectRevert("This method is not supported in L1.");
+    mockCeloToken.allocatedSupply();
+  }
+
+  function test_ShouldReturn_WhenInL2() public _whenL2 {
+    assertEq(mockCeloToken.allocatedSupply(), mockCeloToken.totalSupply());
+  }
+
+  function test_ShouldReturn_WhenWithdrawn_WhenInL2() public _whenL2 {
+    deal(address(celoTokenDistributionSchedule), ONE_CELOTOKEN);
+    assertEq(mockCeloToken.allocatedSupply(), mockCeloToken.totalSupply() - ONE_CELOTOKEN);
   }
 }
 

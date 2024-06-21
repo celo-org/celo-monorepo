@@ -266,17 +266,9 @@ contract GoldToken is
   }
 
   /**
-   * @return The total amount of CELO in existence, including what the burn address holds.
+   * @return The total amount of allocated CELO.
    */
-  function totalSupply() external view returns (uint256) {
-    if (isL2()) {
-      return CELO_SUPPLY_CAP.sub(withdrawn);
-    } else {
-      return totalSupply_;
-    }
-  }
-
-  function allocatedSupply() external view returns (uint256) {
+  function allocatedSupply() external view onlyL2 returns (uint256) {
     return CELO_SUPPLY_CAP - address(celoTokenDistributionSchedule).balance;
   }
 
@@ -284,7 +276,7 @@ contract GoldToken is
    * @return The total amount of CELO in existence, not including what the burn address holds.
    */
   function circulatingSupply() external view returns (uint256) {
-    return totalSupply_.sub(getBurnedAmount()).sub(balanceOf(address(0)));
+    return totalSupply().sub(getBurnedAmount()).sub(balanceOf(address(0)));
   }
 
   /**
@@ -323,6 +315,17 @@ contract GoldToken is
    */
   function balanceOf(address _owner) public view returns (uint256) {
     return _owner.balance;
+  }
+
+  /**
+   * @return The total amount of CELO in existence, including what the burn address holds.
+   */
+  function totalSupply() public view returns (uint256) {
+    if (isL2()) {
+      return CELO_SUPPLY_CAP.sub(withdrawn);
+    } else {
+      return totalSupply_;
+    }
   }
 
   /**
