@@ -235,7 +235,7 @@ contract GoldToken is
   }
 
   /**
-    * @notice Decreases the variable for total amount of CELO in existence.
+    * @notice Increases the total withdrawn CELO from L2 to L1.
     * @param _withdrawAmount The amount to decrease counter by
    */
   function withdrawAmount(uint256 _withdrawAmount) external onlyL2 onlyL2ToL1MessagePasser {
@@ -243,7 +243,7 @@ contract GoldToken is
   }
 
   /**
-   * @notice Decreases the variable for total amount of CELO in existence.
+   * @notice Decreases the total withdrawn CELO from L2 to L1.
    * @param _depositAmount The amount to decrease counter by
    */
   function depositAmount(uint256 _depositAmount) external onlyVm onlyL2 {
@@ -288,6 +288,10 @@ contract GoldToken is
     } else {
       return totalSupply_;
     }
+  }
+
+  function allocatedSupply() external view returns (uint256) {
+    return TOTAL_MARKET_CAP - address(goldTokenMintingSchedule).balance;
   }
 
   /**

@@ -32,4 +32,9 @@ interface IGoldToken is IERC20 {
    * @param value The amount of token to be minted.
    */
   function mint(address to, uint256 value) external returns (bool);
+
+  /**
+   * @dev Returns amount of tokens that were allocated.
+   */
+  function allocatedSupply() external view returns (uint256);
 }
