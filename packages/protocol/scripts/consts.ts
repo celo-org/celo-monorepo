@@ -35,7 +35,7 @@ export const ProxyContracts = [
   'RegistryProxy',
   'SortedOraclesProxy',
   'UniswapFeeHandlerSellerProxy',
-  'MintGoldScheduleProxy',
+  'CeloDistributionScheduleProxy',
 ]
 
 export const CoreContracts = [
@@ -51,7 +51,7 @@ export const CoreContracts = [
   'MultiSig',
   'Registry',
   'Freezer',
-  'MintGoldSchedule',
+  'CeloDistributionSchedule',
 
   // governance
   'Election',
