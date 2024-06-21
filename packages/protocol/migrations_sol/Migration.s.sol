@@ -217,7 +217,7 @@ contract Migration is Script, UsingRegistry, Constants {
     migrateStableToken(json);
     migrateExchange(json);
     migrateAccount();
-    migrateLockedGold(json);
+    migrateLockedCelo(json);
     migrateValidators(json); // this triggers a revert, the deploy after the json reads
     migrateElection(json);
     migrateEpochRewards(json);
