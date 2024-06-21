@@ -29,8 +29,8 @@ contract GoldToken is
   string constant NAME = "Celo native asset";
   string constant SYMBOL = "CELO";
   uint8 constant DECIMALS = 18;
-  uint256 internal totalSupply_;
   uint256 constant CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion Celo
+  uint256 internal totalSupply_;
   // Total amount that was withdrawn from L2 (Celo) to L1 (Ethereum)
   uint256 public withdrawn;
   // solhint-enable state-visibility
