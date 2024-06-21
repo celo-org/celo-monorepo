@@ -50,18 +50,6 @@ contract GoldToken is
 
   event SetCeloTokenDistributionScheduleAddress(address indexed newScheduleAddress);
 
-  modifier onlySchedule() {
-    if (isL2()) {
-      require(
-        msg.sender == address(celoTokenDistributionSchedule),
-        "Only CeloDistributionSchedule can call."
-      );
-    } else {
-      require(msg.sender == address(0), "Only VM can call.");
-    }
-    _;
-  }
-
   modifier onlyL2ToL1MessagePasser() {
     require(
       msg.sender == 0x4200000000000000000000000000000000000016,
@@ -244,6 +232,16 @@ contract GoldToken is
    */
   function depositAmount(uint256 _depositAmount) external onlyVm onlyL2 {
     withdrawn = withdrawn.sub(_depositAmount);
+  }
+
+  /**
+   * @notice Increases the variable for total amount of CELO in existence.
+   * @param amount The amount to increase counter by
+   * @dev This function will be deprecated in L2. The onlyway to increase
+   * the supply is with the mint function.
+   */
+  function increaseSupply(uint256 amount) external onlyL1 onlyVm {
+    totalSupply_ = totalSupply_.add(amount);
   }
 
   /**

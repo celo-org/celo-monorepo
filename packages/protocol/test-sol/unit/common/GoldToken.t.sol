@@ -250,6 +250,22 @@ contract GoldTokenTest_setCeloTokenDistributionScheduleAddress is GoldTokenTest 
   }
 }
 
+contract GoldTokenTest_increaseSupply is GoldTokenTest {
+  function test_ShouldIncreaseTotalSupply() public {
+    uint256 celoTokenSupplyBefore = celoToken.totalSupply();
+    vm.prank(address(0));
+    celoToken.increaseSupply(ONE_CELOTOKEN);
+    uint256 celoTokenSupplyAfter = celoToken.totalSupply();
+    assertGt(celoTokenSupplyAfter, celoTokenSupplyBefore);
+  }
+
+  function test_Reverts_WhenCalledByOtherThanVm() public {
+    vm.prank(celoTokenOwner);
+    vm.expectRevert("Only VM can call");
+    celoToken.increaseSupply(ONE_CELOTOKEN);
+  }
+}
+
 contract CeloTokenMockTest is Test {
   GoldTokenMock mockCeloToken;
   uint256 ONE_CELOTOKEN = 1000000000000000000;
