@@ -13,6 +13,7 @@ import "@openzeppelin/contracts8/token/ERC20/ERC20.sol";
 import "forge-std/console.sol";
 
 contract FeeCurrency6DecimalsTest is ERC20, IFeeCurrency {
+  // TODO(Arthur): Refactor this test to use `ExampleFeeCurrency.sol`
   uint256 debited;
 
   constructor(uint256 initialSupply) ERC20("ExampleFeeCurrency", "EFC") {
