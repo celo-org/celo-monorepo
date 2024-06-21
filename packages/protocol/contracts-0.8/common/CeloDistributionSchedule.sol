@@ -10,7 +10,6 @@ import "../common/IsL2Check.sol";
 import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/common/Initializable.sol";
 import "../../contracts-0.8/common/interfaces/IGoldToken.sol";
-import "forge-std/console.sol";
 
 /**
  * @title Contract for distributing CELO token based on a schedule.
