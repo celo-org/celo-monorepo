@@ -2,8 +2,9 @@ pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts-0.8/common/IsL2Check.sol";
 
-contract UsingPrecompiles {
+contract UsingPrecompiles is IsL2Check {
   using SafeMath for uint256;
 
   address constant TRANSFER = address(0xff - 2);
@@ -16,6 +17,7 @@ contract UsingPrecompiles {
   address constant HASH_HEADER = address(0xff - 9);
   address constant GET_PARENT_SEAL_BITMAP = address(0xff - 10);
   address constant GET_VERIFIED_SEAL_BITMAP = address(0xff - 11);
+  uint256 constant DAY = 86400;
 
   /**
    * @notice calculate a * b^x for fractions a, b to `decimals` precision
@@ -55,11 +57,15 @@ contract UsingPrecompiles {
    * @return The current epoch size in blocks.
    */
   function getEpochSize() public view returns (uint256) {
-    bytes memory out;
-    bool success;
-    (success, out) = EPOCH_SIZE.staticcall(abi.encodePacked(true));
-    require(success, "error calling getEpochSize precompile");
-    return getUint256FromBytes(out, 0);
+    if (isL2()) {
+      return DAY.div(5);
+    } else {
+      bytes memory out;
+      bool success;
+      (success, out) = EPOCH_SIZE.staticcall(abi.encodePacked(true));
+      require(success, "error calling getEpochSize precompile");
+      return getUint256FromBytes(out, 0);
+    }
   }
 
   /**
