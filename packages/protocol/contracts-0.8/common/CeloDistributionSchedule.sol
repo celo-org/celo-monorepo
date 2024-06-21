@@ -96,7 +96,10 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
 
     IGoldToken celoToken = IGoldToken(address(getGoldToken()));
 
-    require(targetCeloTotalSupply >= celoToken.allocatedSupply(), "Contract balance is insufficient.");
+    require(
+      targetCeloTotalSupply >= celoToken.allocatedSupply(),
+      "Contract balance is insufficient."
+    );
 
     uint256 distributableAmount = Math.min(
       getRemainingBalanceToDistribute(),

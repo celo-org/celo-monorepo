@@ -310,7 +310,6 @@ contract CeloToken_WithdrawAmount is CeloTokenMockTest {
 }
 
 contract CeloToken_DepositAmount is CeloTokenMockTest {
-
   function test_DepositAmount_Reverts_whenNotL2() public {
     vm.prank(address(0));
     vm.expectRevert("This method is not supported in L1.");
@@ -334,7 +333,6 @@ contract CeloToken_DepositAmount is CeloTokenMockTest {
 }
 
 contract CeloToken_SetL2ToL1MessagePasser is CeloTokenMockTest {
-
   function test_SetL2ToL1MessagePasser_Reverts_whenCalledByOtherOwner() public _whenL2 {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(address(0));
@@ -349,7 +347,7 @@ contract CeloToken_SetL2ToL1MessagePasser is CeloTokenMockTest {
 }
 
 contract CeloToken_TotalSupply is CeloTokenMockTest {
-   uint256 constant TOTAL_MARKET_CAP = 1000000000e18; // 1 billion CELO
+  uint256 constant TOTAL_MARKET_CAP = 1000000000e18; // 1 billion CELO
 
   function test_TotalSupply_ShouldReturnTotalSupply_WhenL2() public _whenL2 {
     assertEq(mockCeloToken.totalSupply(), 1000000000e18);

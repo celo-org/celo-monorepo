@@ -63,7 +63,7 @@ contract GoldToken is
     _;
   }
 
-  modifier onlyL2ToL1MessagePasser {
+  modifier onlyL2ToL1MessagePasser() {
     require(msg.sender == l2ToL1MessagePasser, "Only L2ToL1MessagePasser can call.");
     _;
   }
@@ -229,8 +229,8 @@ contract GoldToken is
   }
 
   /**
-    * @notice Increases the total withdrawn CELO from L2 to L1.
-    * @param _withdrawAmount The amount to decrease counter by
+   * @notice Increases the total withdrawn CELO from L2 to L1.
+   * @param _withdrawAmount The amount to decrease counter by
    */
   function withdrawAmount(uint256 _withdrawAmount) external onlyL2 onlyL2ToL1MessagePasser {
     withdrawn = withdrawn.add(_withdrawAmount);
