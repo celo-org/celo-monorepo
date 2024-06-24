@@ -59,6 +59,7 @@ jobs:
         working-directory: packages/protocol
         env:
           GITHUB_TAG: ${{ github.ref_name }}
+          NPM_PACKAGE: "@celo/contracts"
           NPM_TAG: ${{ inputs.npm_tag }}
       - name: 'Build packages'
         shell: bash
