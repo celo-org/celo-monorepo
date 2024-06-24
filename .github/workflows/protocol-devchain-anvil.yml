@@ -4,10 +4,18 @@ on:
     branches:
       - master
       - 'release/**'
+    tags:
+      - core-contracts.v*
   pull_request:
     branches: [release/core-contracts/*, master]
     paths:
       - 'packages/protocol/**'
+  workflow_dispatch:
+    inputs:
+      npm_tag:
+        description: 'NPM TAG e.g. alpha, pre-merge (default: canary) '
+        required: true
+        type: string
 
 env:
   # Increment these to force cache rebuilding
@@ -91,7 +99,7 @@ jobs:
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
-      
+
       - name: Akeyless Get Secrets
         id: get_auth_token
         uses: docker://us-west1-docker.pkg.dev/devopsre/akeyless-public/akeyless-action:latest
@@ -104,17 +112,17 @@ jobs:
         with:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
-      
+
       - name: 'Setup yarn'
         shell: bash
         run: |
           npm install --global yarn
           source ~/.bashrc
-  
+
       - name: 'Install packages'
         shell: bash
         run: yarn
-  
+
       - name: Generate migrations and run devchain
         if: success() || failure()
         run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
@@ -139,7 +147,7 @@ jobs:
         working-directory: packages/protocol
         env:
           GITHUB_TAG: ${{ github.ref_name }}
-          NPM_PACKAGE: "@celo/devchain-anvil"
+          NPM_PACKAGE: '@celo/devchain-anvil'
 
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
@@ -148,8 +156,8 @@ jobs:
           path: packages/protocol/.tmp
           # Max retention time is 90 days for public repos
           # https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
-          retention-days: 90 
-          
+          retention-days: 90
+
       - name: Publish @celo/devchain-anvil
         run: |
           cat package.json
