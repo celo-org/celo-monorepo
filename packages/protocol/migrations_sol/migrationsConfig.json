@@ -37,6 +37,13 @@
     "initialBalance": 5000000000000000000000000,
     "frozen": false
   },
+  "exampleSixDecimalFeeCurrency": {
+    "name": "ExampleSixDecimalFeeCurrency", 
+    "symbols": "SIXDECIMAL",
+    "decimals": 6,
+    "celoPrice": 1,
+    "initialBalance": 5000000000000000000000000
+  },
   "exchange": {
     "spread": 5000000000000000000000,
     "reserveFraction": 10000000000000000000000, 
