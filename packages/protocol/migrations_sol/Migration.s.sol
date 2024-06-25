@@ -17,7 +17,7 @@ import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectoryInitializer.sol
 import "@celo-contracts/common/interfaces/ICeloTokenInitializer.sol";
 import "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
 import "@celo-contracts/common/interfaces/IAccounts.sol";
-import "@celo-contracts/governance/interfaces/LockedGoldfunctionInitializer.sol";
+import "@celo-contracts/governance/interfaces/ILockedGoldInitializer.sol";
 import "@celo-contracts/governance/interfaces/IValidatorsInitializer.sol";
 import "@celo-contracts/governance/interfaces/IElectionInitializer.sol";
 import "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
