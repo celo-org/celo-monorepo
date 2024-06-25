@@ -7,7 +7,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { LockedGoldInstance, RegistryInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
-  return []
+  return [config.registry.predeployedProxyAddress, config.lockedGold.unlockingPeriod]
 }
 
 module.exports = deploymentForCoreContract<LockedGoldInstance>(
@@ -18,6 +18,5 @@ module.exports = deploymentForCoreContract<LockedGoldInstance>(
   async (lockedGold: LockedGoldInstance) => {
     const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
     await registry.setAddressFor(CeloContractName.LockedCelo, lockedGold.address)
-    return [config.registry.predeployedProxyAddress, config.lockedGold.unlockingPeriod]
   }
 )
