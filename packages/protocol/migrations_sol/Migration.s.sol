@@ -42,6 +42,7 @@ import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.so
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
 import "@celo-contracts-8/common/interfaces/IMintGoldScheduleInitializer.sol";
+import "@celo-contracts-8/stability/ExampleSixDecimalFeeCurrency.sol";
 
 import "@migrations-sol/HelperInterFaces.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
@@ -215,6 +216,7 @@ contract Migration is Script, UsingRegistry, Constants {
     migrateReserveSpenderMultiSig(json);
     migrateReserve(json);
     migrateStableToken(json);
+    migrateExampleSixDecimalFeeCurrency(json);
     migrateExchange(json);
     migrateAccount();
     migrateLockedGold(json);
@@ -506,6 +508,35 @@ contract Migration is Script, UsingRegistry, Constants {
         celoPrice
       );
     }
+  }
+
+  function migrateExampleSixDecimalFeeCurrency(string memory json) public {
+    string memory _name = "ExampleSixDecimalFeeCurrency";
+    string memory _symbol = "SIXDECIMAL";
+    uint256 _decimals = 6;
+
+    // TODO(Arthur): Deploy proxied ExampleAdaptedFeeCurrency
+    address exampleSixDecimalFeeCurrencyProxyAddress = deployProxiedContract(
+      "ExampleSixDecimalFeeCurrency",
+      abi.encodeWithSelector(
+        ExampleSixDecimalFeeCurrency.initialize.selector,
+        _name,
+        _symbol,
+        _decimals
+      )
+    );
+
+    // TODO(Arthur): Initialized ExampleAdaptedFeeCurrency with supply
+
+    // TODO(Arthur): Deploy proxied FeeCurrencyAdapter
+
+    // TODO(Arthur): Initialize FeeCurrencyAdapter with link to ExampleAdaptedFeeCurrency
+
+    // TODO(Arthur): Set feeCaller in ExampleAdaptedFeeCurrency to FeeCurrencyAdapter
+
+    // TODO(Arthur): Add FeeCurrencyAdapter to FeeCurrencyDirectory (using cUSD oracle)
+
+    // TODO(Arthur): Note No need to add to Registry, since token and adapter can be found in the FeeCurrencyDirectory
   }
 
   function migrateExchange(string memory json) public {
