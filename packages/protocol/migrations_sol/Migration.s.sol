@@ -22,7 +22,6 @@ import "@celo-contracts/governance/interfaces/IElectionInitializer.sol";
 import "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
 import "@celo-contracts/governance/interfaces/IBlockchainParametersInitializer.sol";
 import "@celo-contracts/governance/interfaces/ILockedGold.sol";
-import "@celo-contracts/common/interfaces/IAccounts.sol";
 import "@celo-contracts/governance/interfaces/IGovernanceSlasherInitializer.sol";
 import "@celo-contracts/governance/interfaces/IDoubleSigningSlasherInitializer.sol";
 import "@celo-contracts/governance/interfaces/IDowntimeSlasherInitializer.sol";
