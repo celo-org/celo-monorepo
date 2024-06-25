@@ -10,6 +10,7 @@ import "../common/IsL2Check.sol";
 import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/common/Initializable.sol";
 import "../../contracts-0.8/common/interfaces/IGoldToken.sol";
+import "forge-std-8/console2.sol";
 
 /**
  * @title Contract for distributing CELO token based on a schedule.
@@ -92,6 +93,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
       uint256 communityRewardFundDistributionAmount,
       uint256 carbonOffsettingPartnerDistributionAmount
     ) = getTargetCeloDistribution();
+    console2.log("### cont target", targetCeloDistribution);
 
     IGoldToken celoToken = IGoldToken(address(getGoldToken()));
 
@@ -102,8 +104,10 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
 
     uint256 distributableAmount = Math.min(
       getRemainingBalanceToDistribute(),
-      targetCeloDistribution - celoToken.allocatedSupply()
+      targetCeloDistribution - celoToken.allocatedSupply() //TODO(soloseng): this line is causing some accounting issues. the actual amount that is distributed is incorrect
     );
+
+    console2.log("### cont distributableAmount", distributableAmount);
 
     require(distributableAmount > 0, "Distributable amount must be greater than zero.");
 
@@ -335,5 +339,11 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
       carbonFundTargetRewards +
       GENESIS_CELO_SUPPLY +
       _mintedOnL1;
+
+    console2.log("targetCeloDistribution", targetCeloDistribution);
+    // console2.log("communityTargetRewards", communityTargetRewards);
+    // console2.log("carbonFundTargetRewards", carbonFundTargetRewards);
+    // console2.log("GENESIS_CELO_SUPPLY", GENESIS_CELO_SUPPLY);
+    // console2.log("_mintedOnL1", _mintedOnL1);
   }
 }
