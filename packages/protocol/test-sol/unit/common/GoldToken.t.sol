@@ -329,66 +329,10 @@ contract CeloToken_AllocatedSupply is CeloTokenMockTest {
   }
 }
 
-contract CeloToken_WithdrawAmount is CeloTokenMockTest {
-  function setUp() public {
-    super.setUp();
-  }
-
-  function test_WithdrawAmount_Reverts_whenNotL2() public {
-    vm.prank(address(0));
-    vm.expectRevert("This method is not supported in L1.");
-    mockCeloToken.withdrawAmount(ONE_CELOTOKEN);
-  }
-
-  function test_WithdrawAmount_Reverts_whenCalledByOtherThanL2ToL1MessagePasser() public _whenL2 {
-    vm.expectRevert("Only L2ToL1MessagePasser can call.");
-    mockCeloToken.withdrawAmount(ONE_CELOTOKEN);
-  }
-
-  function test_WithdrawAmount_ShouldIncreaseWithdrawn() public _whenL2 {
-    mockCeloToken.setWithdrawn(2 * ONE_CELOTOKEN);
-    uint256 withdrawnBefore = mockCeloToken.withdrawn();
-    vm.prank(0x4200000000000000000000000000000000000016);
-    mockCeloToken.withdrawAmount(ONE_CELOTOKEN);
-    uint256 withdrawnAfter = mockCeloToken.withdrawn();
-    assertEq(withdrawnAfter, withdrawnBefore + ONE_CELOTOKEN);
-  }
-}
-
-contract CeloToken_DepositAmount is CeloTokenMockTest {
-  function test_DepositAmount_Reverts_whenNotL2() public {
-    vm.prank(address(0));
-    vm.expectRevert("This method is not supported in L1.");
-    mockCeloToken.depositAmount(ONE_CELOTOKEN);
-  }
-
-  function test_DepositAmount_Reverts_whenCalledByOtherVm() public _whenL2 {
-    vm.expectRevert("Only VM can call");
-    mockCeloToken.depositAmount(ONE_CELOTOKEN);
-  }
-
-  function test_DepositAmount_ShouldDecreaseWithdrawn() public _whenL2 {
-    mockCeloToken.setWithdrawn(2 * ONE_CELOTOKEN);
-    vm.prank(0x4200000000000000000000000000000000000016);
-    uint256 withdrawnBefore = mockCeloToken.withdrawn();
-    vm.prank(address(0));
-    mockCeloToken.depositAmount(ONE_CELOTOKEN);
-    uint256 withdrawnAfter = mockCeloToken.withdrawn();
-    assertEq(withdrawnAfter, withdrawnBefore - ONE_CELOTOKEN);
-  }
-}
-
 contract CeloToken_TotalSupply is CeloTokenMockTest {
   uint256 constant TOTAL_MARKET_CAP = 1000000000e18; // 1 billion CELO
 
   function test_TotalSupply_ShouldReturnTotalSupply_WhenL2() public _whenL2 {
     assertEq(mockCeloToken.totalSupply(), 1000000000e18);
-  }
-
-  function test_TotalSupply_ShouldReturnTotalSupplyWhenWithdrawn_WhenL2() public _whenL2 {
-    uint256 _withdrawAmount = ONE_CELOTOKEN;
-    vm.prank(0x4200000000000000000000000000000000000016);
-    mockCeloToken.withdrawAmount(_withdrawAmount);
-    assertEq(mockCeloToken.totalSupply(), 1000000000e18 - ONE_CELOTOKEN);
   }
 }

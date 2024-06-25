@@ -18,14 +18,13 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
   using FixidityLib for FixidityLib.Fraction;
 
   uint256 constant GENESIS_CELO_SUPPLY = 600000000 ether; // 600 million Celo
-  uint256 constant CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion Celo
   uint256 constant YEARS_LINEAR = 15;
   uint256 constant SECONDS_LINEAR = YEARS_LINEAR * 365 * 1 days;
 
   bool public areDependenciesSet;
   uint256 constant GENESIS_START_TIME = 1587587214; // Copied over from `EpochRewards().startTime()`.
   uint256 public l2StartTime;
-  uint256 public totalSupplyAtL2Start;
+  uint256 public totalDistributedAtL2Start;
 
   uint256 public totalDistributedBySchedule;
   address public communityRewardFund;
@@ -79,7 +78,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
     setRegistry(registryAddress);
     communityRewardFund = address(getGovernance());
     IGoldToken celoToken = IGoldToken(address(getGoldToken()));
-    totalSupplyAtL2Start = celoToken.allocatedSupply();
+    totalDistributedAtL2Start = celoToken.allocatedSupply();
     setCommunityRewardFraction(_communityRewardFraction);
     setCarbonOffsettingFund(_carbonOffsettingPartner, _carbonOffsettingFraction);
   }
@@ -89,21 +88,21 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
    */
   function distributeAccordingToSchedule() external nonReentrant onlyL2 returns (bool) {
     (
-      uint256 targetCeloTotalSupply,
+      uint256 targetCeloDistribution,
       uint256 communityRewardFundDistributionAmount,
       uint256 carbonOffsettingPartnerDistributionAmount
-    ) = getTargetCeloTotalSupply();
+    ) = getTargetCeloDistribution();
 
     IGoldToken celoToken = IGoldToken(address(getGoldToken()));
 
     require(
-      targetCeloTotalSupply >= celoToken.allocatedSupply(),
+      targetCeloDistribution >= celoToken.allocatedSupply(),
       "Contract balance is insufficient."
     );
 
     uint256 distributableAmount = Math.min(
       getRemainingBalanceToDistribute(),
-      targetCeloTotalSupply - celoToken.allocatedSupply()
+      targetCeloDistribution - celoToken.allocatedSupply()
     );
 
     require(distributableAmount > 0, "Distributable amount must be greater than zero.");
@@ -216,35 +215,33 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
   }
 
   /**
-   * @notice Calculates remaining CELO balance to distribute.
    * @return The remaining CELO balance to distribute.
    */
   function getRemainingBalanceToDistribute() public view returns (uint256) {
-    IGoldToken celoToken = IGoldToken(address(getGoldToken()));
-    return CELO_SUPPLY_CAP - celoToken.allocatedSupply();
+    return address(this).balance;
   }
 
   /**
    * @return The currently distributable amount.
    */
   function getDistributableAmount() public view returns (uint256) {
-    (uint256 targetCeloTotalSupply, , ) = getTargetCeloTotalSupply();
+    (uint256 targetCeloDistribution, , ) = getTargetCeloDistribution();
     IGoldToken celoToken = IGoldToken(address(getGoldToken()));
-    return targetCeloTotalSupply - celoToken.allocatedSupply();
+    return targetCeloDistribution - celoToken.allocatedSupply();
   }
 
   /**
    * @notice Returns the target CELO supply according to the target schedule.
-   * @return targetCeloTotalSupply The target total CELO supply according to the target schedule.
+   * @return targetCeloDistribution The target total CELO supply according to the target schedule.
    * @return communityTargetRewards The community reward that can be distributed according to the target schedule.
    * @return carbonFundTargetRewards The carbon offsetting reward that can be distributed according to the target schedule.
    */
-  function getTargetCeloTotalSupply()
+  function getTargetCeloDistribution()
     public
     view
     whenActivated
     returns (
-      uint256 targetCeloTotalSupply,
+      uint256 targetCeloDistribution,
       uint256 communityTargetRewards,
       uint256 carbonFundTargetRewards
     )
@@ -254,20 +251,20 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
 
     uint256 timeSinceL2Start = block.timestamp - l2StartTime;
     uint256 totalL2LinearSecondsAvailable = SECONDS_LINEAR - (l2StartTime - GENESIS_START_TIME);
-    uint256 mintedOnL1 = totalSupplyAtL2Start - GENESIS_CELO_SUPPLY;
+    uint256 mintedOnL1 = totalDistributedAtL2Start - GENESIS_CELO_SUPPLY;
 
     bool isLinearDistribution = timeSinceL2Start < totalL2LinearSecondsAvailable;
     if (isLinearDistribution) {
       (
-        targetCeloTotalSupply,
+        targetCeloDistribution,
         communityTargetRewards,
         carbonFundTargetRewards
       ) = _calculateTargetReward(timeSinceL2Start, totalL2LinearSecondsAvailable, mintedOnL1);
 
-      return (targetCeloTotalSupply, communityTargetRewards, carbonFundTargetRewards);
+      return (targetCeloDistribution, communityTargetRewards, carbonFundTargetRewards);
     } else {
       (
-        targetCeloTotalSupply,
+        targetCeloDistribution,
         communityTargetRewards,
         carbonFundTargetRewards
       ) = _calculateTargetReward(
@@ -279,10 +276,10 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
       bool hasNotYetDistributedAllLinearRewards = totalDistributedBySchedule +
         GENESIS_CELO_SUPPLY +
         mintedOnL1 <
-        targetCeloTotalSupply;
+        targetCeloDistribution;
 
       if (hasNotYetDistributedAllLinearRewards) {
-        return (targetCeloTotalSupply, communityTargetRewards, carbonFundTargetRewards);
+        return (targetCeloDistribution, communityTargetRewards, carbonFundTargetRewards);
       }
       revert("Block reward calculation for years 15-30 unimplemented");
       return (0, 0, 0);
@@ -297,7 +294,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
     internal
     view
     returns (
-      uint256 targetCeloTotalSupply,
+      uint256 targetCeloDistribution,
       uint256 communityTargetRewards,
       uint256 carbonFundTargetRewards
     )
@@ -307,7 +304,8 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
       _totalL2LinearSecondsAvailable
     );
     // Pay out half of all block rewards linearly.
-    uint256 totalLinearRewards = (CELO_SUPPLY_CAP - GENESIS_CELO_SUPPLY) / 2; //(200 million) includes validator rewards.
+    IGoldToken celoToken = IGoldToken(address(getGoldToken()));
+    uint256 totalLinearRewards = (celoToken.totalSupply() - GENESIS_CELO_SUPPLY) / 2; //(200 million) includes validator rewards.
 
     FixidityLib.Fraction memory l2LinearRewards = FixidityLib.newFixed(
       totalLinearRewards - _mintedOnL1
@@ -332,7 +330,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
       .divide(totalL2LinearSecondsAvailableFraction)
       .fromFixed();
 
-    targetCeloTotalSupply =
+    targetCeloDistribution =
       communityTargetRewards +
       carbonFundTargetRewards +
       GENESIS_CELO_SUPPLY +

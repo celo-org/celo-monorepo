@@ -35,9 +35,6 @@ contract GoldToken is
 
   mapping(address => mapping(address => uint256)) internal allowed;
 
-  // Total amount that was withdrawn from L2 (Celo) to L1 (Ethereum)
-  uint256 public withdrawn;
-
   // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
   address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
 
@@ -50,14 +47,6 @@ contract GoldToken is
   event Approval(address indexed owner, address indexed spender, uint256 value);
 
   event SetCeloTokenDistributionScheduleAddress(address indexed newScheduleAddress);
-
-  modifier onlyL2ToL1MessagePasser() {
-    require(
-      msg.sender == 0x4200000000000000000000000000000000000016,
-      "Only L2ToL1MessagePasser can call."
-    );
-    _;
-  }
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -220,22 +209,6 @@ contract GoldToken is
   }
 
   /**
-   * @notice Increases the total withdrawn CELO from L2 to L1.
-   * @param _withdrawAmount The amount to decrease counter by
-   */
-  function withdrawAmount(uint256 _withdrawAmount) external onlyL2 onlyL2ToL1MessagePasser {
-    withdrawn = withdrawn.add(_withdrawAmount);
-  }
-
-  /**
-   * @notice Decreases the total withdrawn CELO from L2 to L1.
-   * @param _depositAmount The amount to decrease counter by
-   */
-  function depositAmount(uint256 _depositAmount) external onlyVm onlyL2 {
-    withdrawn = withdrawn.sub(_depositAmount);
-  }
-
-  /**
    * @notice Increases the variable for total amount of CELO in existence.
    * @param amount The amount to increase counter by
    * @dev This function will be deprecated in L2. The onlyway to increase
@@ -323,7 +296,7 @@ contract GoldToken is
    */
   function totalSupply() public view returns (uint256) {
     if (isL2()) {
-      return CELO_SUPPLY_CAP.sub(withdrawn);
+      return CELO_SUPPLY_CAP;
     } else {
       return totalSupply_;
     }
