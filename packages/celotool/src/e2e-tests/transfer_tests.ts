@@ -466,7 +466,10 @@ describe('Transfer tests', function (this: any) {
     const txFeeBase = new BigNumber(gasVal).times(minGasPrice)
     const txFeeTip = txFee.minus(txFeeBase)
     const gatewayFee = new BigNumber(tx.gatewayFee || 0)
-    assert.equal(tx.gatewayFeeRecipient === null, gatewayFee.eq(0))
+    assert.equal(
+      tx.gatewayFeeRecipient === null || tx.gatewayFeeRecipient === undefined,
+      gatewayFee.eq(0)
+    )
 
     const fees: Fees = {
       total: txFee.plus(gatewayFee),
