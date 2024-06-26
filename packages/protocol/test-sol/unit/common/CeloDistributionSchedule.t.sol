@@ -185,6 +185,7 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
     newMintCelo();
     assertEq(mintCeloSchedule.totalDistributedBySchedule(), 0);
   }
+
   function test_ShouldUpdateDependencies() public {
     newMintCelo();
     assertEq(mintCeloSchedule.l2StartTime(), l2StartTime);

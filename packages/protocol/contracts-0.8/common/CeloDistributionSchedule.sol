@@ -78,7 +78,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
     l2StartTime = _l2StartTime;
     setRegistry(registryAddress);
     communityRewardFund = address(getGovernance());
-    ICeloToken celoToken = ICeloToken(address(getGoldToken()));
+    ICeloToken celoToken = ICeloToken(address(getCeloToken()));
     totalSupplyAtL2Start = celoToken.allocatedSupply();
     setCommunityRewardFraction(_communityRewardFraction);
     setCarbonOffsettingFund(_carbonOffsettingPartner, _carbonOffsettingFraction);
@@ -94,7 +94,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
       uint256 carbonOffsettingPartnerDistributionAmount
     ) = getTargetCeloTotalSupply();
 
-    ICeloToken celoToken = ICeloToken(address(getGoldToken()));
+    ICeloToken celoToken = ICeloToken(address(getCeloToken()));
 
     require(
       targetCeloTotalSupply >= celoToken.allocatedSupply(),
@@ -220,7 +220,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
    * @return The remaining CELO balance to distribute.
    */
   function getRemainingBalanceToDistribute() public view returns (uint256) {
-    ICeloToken celoToken = ICeloToken(address(getGoldToken()));
+    ICeloToken celoToken = ICeloToken(address(getCeloToken()));
     return CELO_SUPPLY_CAP - celoToken.allocatedSupply();
   }
 
@@ -229,7 +229,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
    */
   function getDistributableAmount() public view returns (uint256) {
     (uint256 targetCeloTotalSupply, , ) = getTargetCeloTotalSupply();
-    ICeloToken celoToken = ICeloToken(address(getGoldToken()));
+    ICeloToken celoToken = ICeloToken(address(getCeloToken()));
     return targetCeloTotalSupply - celoToken.allocatedSupply();
   }
 
