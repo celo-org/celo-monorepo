@@ -499,46 +499,6 @@ contract CeloDistributionScheduleTest_distributeAccordingToSchedule is
     vm.prank(randomAddress);
     mintCeloSchedule.distributeAccordingToSchedule();
   }
-  function test_Reverts_WhenMintableAmountIsZero2() public {
-    uint256 communityFundBalanceBefore = celoToken.balanceOf(address(governance));
-    // console2.log("### communityFundBalanceBefore", communityFundBalanceBefore);
-    // console2.log("### dist amount0", mintCeloSchedule.getDistributableAmount());
-    vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
-
-    // console2.log("### stash balance0", address(mintCeloSchedule).balance);
-    console2.log("### allocated supply0", celoToken.allocatedSupply());
-    // (uint256 amount0, , ) = mintCeloSchedule.getTargetCeloDistribution();
-    // console2.log("### target dist amount0", amount0);
-
-    uint256 communityFundBalanceAfter = celoToken.balanceOf(address(governance));
-    // console2.log("### communityFundBalanceAfter", communityFundBalanceAfter);
-    assertGt(communityFundBalanceAfter, communityFundBalanceBefore);
-    console2.log("### dist amount0.1", mintCeloSchedule.getDistributableAmount());
-    vm.prank(randomAddress);
-    celoToken.transfer(address(mintCeloSchedule), 15 ether);
-
-    console2.log("### stash balance1", address(mintCeloSchedule).balance);
-    console2.log("### dist amount1", mintCeloSchedule.getDistributableAmount());
-    console2.log("#### allocated supply1", celoToken.allocatedSupply());
-    (uint256 amount1, , ) = mintCeloSchedule.getTargetCeloDistribution();
-    console2.log("### target dist amount1", amount1);
-
-    vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
-
-    uint256 communityFundBalanceLater = celoToken.balanceOf(address(governance));
-    // console2.log("### communityFundBalanceLater", communityFundBalanceLater);
-    console2.log("### dist amount", mintCeloSchedule.getDistributableAmount());
-
-    assertGt(communityFundBalanceLater, communityFundBalanceAfter);
-
-    vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
-    (uint256 amount, , ) = mintCeloSchedule.getTargetCeloDistribution();
-    console2.log("### target dist amount", amount);
-    console2.log("### dist amount", mintCeloSchedule.getDistributableAmount());
-  }
 
   function test_ShouldAllowToMint25Percent2years9MonthsPostL2Launch() public {
     vm.warp(block.timestamp + 2 * YEAR + 267 * DAY + 63868); // 25% time since L2

@@ -89,6 +89,8 @@ contract GoldTokenTest_general is GoldTokenTest {
 contract GoldTokenTest_transfer is GoldTokenTest {
   function setUp() public {
     super.setUp();
+    vm.prank(celoTokenOwner);
+    celoToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
   }
 
   function test_ShouldTransferBalanceFromOneUserToAnother() public {
@@ -119,11 +121,18 @@ contract GoldTokenTest_transfer is GoldTokenTest {
     vm.expectRevert();
     celoToken.transfer(address(0), ONE_CELOTOKEN);
   }
+  function test_Reverts_WhenTransferingToCeloDistributionSchedule() public {
+    vm.prank(sender);
+    vm.expectRevert("transfer attempted to reserved celoTokenDistributionSchedule address");
+    celoToken.transfer(celoTokenDistributionSchedule, ONE_CELOTOKEN);
+  }
 }
 
 contract GoldTokenTest_transferFrom is GoldTokenTest {
   function setUp() public {
     super.setUp();
+    vm.prank(celoTokenOwner);
+    celoToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
     vm.prank(sender);
     celoToken.approve(receiver, ONE_CELOTOKEN);
   }
@@ -137,6 +146,11 @@ contract GoldTokenTest_transferFrom is GoldTokenTest {
     assertEq(receiver.balance, startBalanceTo + ONE_CELOTOKEN);
   }
 
+  function test_Reverts_WhenTransferingToCeloDistributionSchedule() public {
+    vm.prank(receiver);
+    vm.expectRevert("transfer attempted to reserved celoTokenDistributionSchedule address");
+    celoToken.transferFrom(sender, celoTokenDistributionSchedule, ONE_CELOTOKEN);
+  }
   function test_ShouldNotAllowToTransferToNullAddress() public {
     vm.prank(receiver);
     vm.expectRevert();

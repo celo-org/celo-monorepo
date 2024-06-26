@@ -171,6 +171,10 @@ contract GoldToken is
    */
   function transferFrom(address from, address to, uint256 value) external returns (bool) {
     require(to != address(0), "transfer attempted to reserved address 0x0");
+    require(
+      to != address(celoTokenDistributionSchedule),
+      "transfer attempted to reserved celoTokenDistributionSchedule address"
+    );
     require(value <= balanceOf(from), "transfer value exceeded balance of sender");
     require(
       value <= allowed[from][msg.sender],
@@ -309,6 +313,10 @@ contract GoldToken is
    * @return True if the transaction succeeds.
    */
   function _transfer(address to, uint256 value) internal returns (bool) {
+    require(
+      to != address(celoTokenDistributionSchedule),
+      "transfer attempted to reserved celoTokenDistributionSchedule address"
+    );
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
 
     bool success;
