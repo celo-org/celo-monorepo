@@ -63,7 +63,6 @@ export const hasEntryInRegistry: ContractPackage[] = [
       CeloContractName.Accounts,
       CeloContractName.Attestations,
       CeloContractName.BlockchainParameters,
-      CeloContractName.CeloToken,
       CeloContractName.DoubleSigningSlasher,
       CeloContractName.DowntimeSlasher,
       CeloContractName.Election,
@@ -71,7 +70,7 @@ export const hasEntryInRegistry: ContractPackage[] = [
       CeloContractName.FederatedAttestations,
       CeloContractName.FeeCurrencyWhitelist,
       CeloContractName.Freezer,
-      CeloContractName.GoldToken,
+      CeloContractName.GoldToken, //TODO: Update when contract name is changed.
       CeloContractName.GovernanceSlasher,
       CeloContractName.OdisPayments,
       CeloContractName.Random,
