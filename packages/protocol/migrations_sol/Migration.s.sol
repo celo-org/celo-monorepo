@@ -8,45 +8,46 @@ import "forge-std/console.sol";
 import "forge-std/StdJson.sol";
 
 import "@celo-contracts/common/interfaces/IProxyFactory.sol";
-import "@celo-contracts/common/interfaces/IProxy.sol";
-import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts/common/interfaces/IFreezer.sol";
-import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
-import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
+
+// Initializer of the core contracts
+import "@celo-contracts/common/interfaces/IRegistryInitializer.sol";
+import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
 import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectoryInitializer.sol";
 import "@celo-contracts/common/interfaces/ICeloTokenInitializer.sol";
-import "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
-import "@celo-contracts/common/interfaces/IAccounts.sol";
 import "@celo-contracts/governance/interfaces/ILockedGoldInitializer.sol";
 import "@celo-contracts/governance/interfaces/IValidatorsInitializer.sol";
 import "@celo-contracts/governance/interfaces/IElectionInitializer.sol";
 import "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
 import "@celo-contracts/governance/interfaces/IBlockchainParametersInitializer.sol";
-import "@celo-contracts/governance/interfaces/ILockedGold.sol";
-import "@celo-contracts/common/interfaces/IAccounts.sol";
 import "@celo-contracts/governance/interfaces/IGovernanceSlasherInitializer.sol";
 import "@celo-contracts/governance/interfaces/IDoubleSigningSlasherInitializer.sol";
 import "@celo-contracts/governance/interfaces/IDowntimeSlasherInitializer.sol";
 import "@celo-contracts/governance/interfaces/IGovernanceApproverMultiSigInitializer.sol";
 import "@celo-contracts/governance/interfaces/IGovernanceInitializer.sol";
-
-import "@celo-contracts/governance/interfaces/IGovernance.sol";
-
+import "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
 import "@celo-contracts/common/interfaces/IFeeHandlerSellerInitializer.sol";
 import "@celo-contracts/common/interfaces/IFeeHandlerInitializer.sol";
-import "@celo-contracts/common/interfaces/IFeeHandler.sol";
-
 import "@celo-contracts/identity/interfaces/IRandomInitializer.sol";
 import "@celo-contracts/identity/interfaces/IEscrowInitializer.sol";
 import "@celo-contracts/identity/interfaces/IOdisPaymentsInitializer.sol";
 import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
-import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
+import "@celo-contracts/stability/interfaces/ISortedOraclesInitializer.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
 import "@celo-contracts-8/common/interfaces/ICeloDistributionScheduleInitializer.sol";
 
+import "@celo-contracts/common/interfaces/IProxy.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts/common/interfaces/IFreezer.sol";
+import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
+import "@celo-contracts/common/interfaces/IAccounts.sol";
+import "@celo-contracts/governance/interfaces/ILockedGold.sol";
+import "@celo-contracts/governance/interfaces/IGovernance.sol";
+import "@celo-contracts/common/interfaces/IFeeHandler.sol";
+import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
+
 import "@migrations-sol/HelperInterFaces.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
-
 import "@celo-contracts-8/common/UsingRegistry.sol";
 
 import { Constants } from "@migrations-sol/constants.sol";
@@ -250,7 +251,7 @@ contract Migration is Script, UsingRegistry, Constants {
     setImplementationOnProxy(
       IProxy(registryAddress),
       "Registry",
-      abi.encodeWithSelector(IRegistry.initialize.selector)
+      abi.encodeWithSelector(IRegistryInitializer.initialize.selector)
     );
     // set registry in registry itself
     console.log("Owner of the Registry Proxy is", IProxy(registryAddress)._getOwner());
@@ -259,12 +260,13 @@ contract Migration is Script, UsingRegistry, Constants {
   }
 
   function migrateFreezer() public {
-    // TODO migrate the initializations interface
-    deployProxiedContract("Freezer", abi.encodeWithSelector(IFreezer.initialize.selector));
+    deployProxiedContract(
+      "Freezer",
+      abi.encodeWithSelector(IFreezerInitializer.initialize.selector)
+    );
   }
 
   function migrateFeeCurrencyWhitelist() public {
-    // TODO migrate the initializations interface
     deployProxiedContract(
       "FeeCurrencyWhitelist",
       abi.encodeWithSelector(IFeeCurrencyWhitelist.initialize.selector)
@@ -272,7 +274,6 @@ contract Migration is Script, UsingRegistry, Constants {
   }
 
   function migrateFeeCurrencyDirectory() public {
-    // TODO migrate the initializations interface
     deployProxiedContract(
       "FeeCurrencyDirectory",
       abi.encodeWithSelector(IFeeCurrencyDirectoryInitializer.initialize.selector)
@@ -299,7 +300,7 @@ contract Migration is Script, UsingRegistry, Constants {
     );
     deployProxiedContract(
       "SortedOracles",
-      abi.encodeWithSelector(ISortedOracles.initialize.selector, reportExpirySeconds)
+      abi.encodeWithSelector(ISortedOraclesInitializer.initialize.selector, reportExpirySeconds)
     );
   }
 
