@@ -286,3 +286,25 @@ How it works:
 7.  It calculates the size of the bytecode in kilobytes and appends the contract name, address, and size to the output file.
 
 Output: The output is a CSV file named `onchain_bytecode_sizes_<timestamp>.csv` in the `out` directory. Each line in the file contains a contract name, its implementation address, and its size in kilobytes.
+
+
+# Compare releases and get PRs changing smart contracts
+
+To get the list of PRs that changed smart contracts between two releases, run:
+
+```sh
+yarn compare-git-tags [git_tag/branch] [git_tag/branch]
+```
+
+Example:
+
+```sh
+yarn compare-git-tags release/core-contracts/11 release/core-contracts/12
+```
+
+Example output:
+
+PRs that made these changes:
+
+16442165a Deactivate BlochainParameters Contract on L2 (#11008)
+198f6215a SortedLinkedList Foundry Migration (#10846)
