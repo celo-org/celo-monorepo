@@ -36,8 +36,8 @@ const argv = require('minimist')(process.argv.slice(2), {
 })
 
 const artifactsDirectory = argv.build_artifacts ? argv.build_artifacts : './build/contracts'
-const artifacts08Directory = argv.build_artifacts08
-  ? argv.build_artifacts08
+const artifacts08Directory = argv.build_artifacts
+  ? `${argv.build_artifacts}-0.8`
   : './build/contracts-0.8'
 const branch = (argv.branch ? argv.branch : '') as string
 const network = argv.network ?? 'development'
