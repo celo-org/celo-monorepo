@@ -1,7 +1,7 @@
 pragma solidity ^0.8.15;
 
 import "celo-foundry-8/Test.sol";
-import "@celo-contracts/common/ProxyFactory08.sol";
+import "@celo-contracts-8/common/ProxyFactory08.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
 
 import { Utils08 } from "@test-sol/utils08.sol";
