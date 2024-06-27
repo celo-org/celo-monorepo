@@ -137,7 +137,7 @@ contract GoldTokenTest_transferFrom is GoldTokenTest {
     assertEq(receiver.balance, startBalanceTo + ONE_CELOTOKEN);
   }
 
-  function test_ShouldNotAllowToTransferToNullAddress() public {
+  function test_Reverts_WhenTransferToNullAddress() public {
     vm.prank(receiver);
     vm.expectRevert();
     celoToken.transferFrom(sender, address(0), ONE_CELOTOKEN);
