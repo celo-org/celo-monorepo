@@ -75,4 +75,9 @@ contract Utils is Test {
       (uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, msg.sender, salt))) %
         (max - min + 1)) + min;
   }
+
+  // This function can be also found in OpenZeppelin's library, but in a newer version than the one
+  function compareStrings(string memory a, string memory b) public pure returns (bool) {
+    return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
+  }
 }
