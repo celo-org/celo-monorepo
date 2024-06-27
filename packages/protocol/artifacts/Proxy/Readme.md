@@ -1,2 +1,3 @@
-Proxy in commit X compiled with Solidity...
-0.5.17+commit.d19bba13
+# About this folder
+
+This folder has files for the init code and bytecode used with the Celo smart contracts.
