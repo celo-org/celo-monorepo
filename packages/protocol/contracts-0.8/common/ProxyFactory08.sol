@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import "@celo-contracts/common/interfaces/IProxy.sol";
+import "../../contracts/common/interfaces/IProxy.sol";
 
 import "@openzeppelin/contracts8/utils/Create2.sol";
 
