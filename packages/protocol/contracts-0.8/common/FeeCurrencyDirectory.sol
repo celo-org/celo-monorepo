@@ -4,9 +4,15 @@ pragma solidity ^0.8.0;
 import "../../contracts/common/Initializable.sol";
 import "./interfaces/IOracle.sol";
 import "./interfaces/IFeeCurrencyDirectory.sol";
+import "./interfaces/IFeeCurrencyDirectoryInitializer.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
-contract FeeCurrencyDirectory is IFeeCurrencyDirectory, Initializable, Ownable {
+contract FeeCurrencyDirectory is
+  IFeeCurrencyDirectory,
+  IFeeCurrencyDirectoryInitializer,
+  Initializable,
+  Ownable
+{
   mapping(address => CurrencyConfig) public currencies;
   address[] private currencyList;
 
