@@ -52,8 +52,8 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
    * @param registryAddress The address of the registry core smart contract.
    */
   function initialize(address registryAddress) external initializer {
-    setRegistry(registryAddress);
     _transferOwnership(msg.sender);
+    setRegistry(registryAddress);
   }
 
   /**
