@@ -198,7 +198,7 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
   function test_ShouldUpdateDependencies() public {
     newCeloDistibutionSchedule();
     assertEq(celoDistributionSchedule.l2StartTime(), l2StartTime);
-    assertEq(celoDistributionSchedule.totalDistributedAtL2Start(), L1_MINTED_CELO_SUPPLY);
+    assertEq(celoDistributionSchedule.totalAllocatedAtL2Start(), L1_MINTED_CELO_SUPPLY);
     assertEq(celoDistributionSchedule.communityRewardFund(), address(governance));
     assertEq(celoDistributionSchedule.carbonOffsettingPartner(), carbonOffsettingPartner);
     assertEq(celoDistributionSchedule.getCarbonOffsettingFraction(), carbonOffsettingFraction);
