@@ -9,7 +9,7 @@ import "../common/IsL2Check.sol";
 
 import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/common/Initializable.sol";
-import "../../contracts-0.8/common/interfaces/IGoldToken.sol";
+import "../../contracts-0.8/common/interfaces/ICeloToken.sol";
 
 /**
  * @title Contract for distributing CELO token based on a schedule.
@@ -24,7 +24,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
   bool public areDependenciesSet;
   uint256 constant GENESIS_START_TIME = 1587587214; // Copied over from `EpochRewards().startTime()`.
   uint256 public l2StartTime;
-  uint256 public totalDistributedAtL2Start;
+  uint256 public totalAllocatedAtL2Start;
 
   uint256 public totalDistributedBySchedule;
   address public communityRewardFund;
@@ -75,8 +75,8 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
     areDependenciesSet = true;
     l2StartTime = _l2StartTime;
     communityRewardFund = address(getGovernance());
-    IGoldToken celoToken = IGoldToken(address(getGoldToken()));
-    totalDistributedAtL2Start = celoToken.allocatedSupply();
+    ICeloToken celoToken = ICeloToken(address(getCeloToken()));
+    totalAllocatedAtL2Start = celoToken.allocatedSupply();
     setCommunityRewardFraction(_communityRewardFraction);
     setCarbonOffsettingFund(_carbonOffsettingPartner, _carbonOffsettingFraction);
   }
@@ -91,7 +91,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
       uint256 carbonOffsettingPartnerDistributionAmount
     ) = getTargetCeloDistribution();
 
-    IGoldToken celoToken = IGoldToken(address(getGoldToken()));
+    ICeloToken celoToken = ICeloToken(address(getCeloToken()));
 
     require(
       targetCeloDistribution >= celoToken.allocatedSupply(),
@@ -224,7 +224,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
    */
   function getDistributableAmount() public view returns (uint256) {
     (uint256 targetCeloDistribution, , ) = getTargetCeloDistribution();
-    IGoldToken celoToken = IGoldToken(address(getGoldToken()));
+    ICeloToken celoToken = ICeloToken(address(getCeloToken()));
     return targetCeloDistribution - celoToken.allocatedSupply();
   }
 
@@ -249,7 +249,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
 
     uint256 timeSinceL2Start = block.timestamp - l2StartTime;
     uint256 totalL2LinearSecondsAvailable = SECONDS_LINEAR - (l2StartTime - GENESIS_START_TIME);
-    uint256 mintedOnL1 = totalDistributedAtL2Start - GENESIS_CELO_SUPPLY;
+    uint256 mintedOnL1 = totalAllocatedAtL2Start - GENESIS_CELO_SUPPLY;
 
     bool isLinearDistribution = timeSinceL2Start < totalL2LinearSecondsAvailable;
     if (isLinearDistribution) {
@@ -302,7 +302,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
       _totalL2LinearSecondsAvailable
     );
     // Pay out half of all block rewards linearly.
-    IGoldToken celoToken = IGoldToken(address(getGoldToken()));
+    ICeloToken celoToken = ICeloToken(address(getCeloToken()));
     uint256 totalLinearRewards = (celoToken.totalSupply() - GENESIS_CELO_SUPPLY) / 2; //(200 million) includes validator rewards.
 
     FixidityLib.Fraction memory l2LinearRewards = FixidityLib.newFixed(

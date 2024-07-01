@@ -452,7 +452,7 @@ contract EpochRewards is
    * @return The fraction of floating Gold being used for voting in validator elections.
    */
   function getVotingGoldFraction() public view returns (uint256) {
-    uint256 liquidGold = getGoldToken().totalSupply().sub(getReserve().getReserveGoldBalance());
+    uint256 liquidGold = getCeloToken().totalSupply().sub(getReserve().getReserveGoldBalance());
     uint256 votingGold = getElection().getTotalVotes();
     return FixidityLib.newFixed(votingGold).divide(FixidityLib.newFixed(liquidGold)).unwrap();
   }
@@ -501,7 +501,7 @@ contract EpochRewards is
     uint256 targetGoldSupplyIncrease
   ) internal view returns (FixidityLib.Fraction memory) {
     uint256 targetSupply = getTargetGoldTotalSupply();
-    uint256 totalSupply = getGoldToken().totalSupply();
+    uint256 totalSupply = getCeloToken().totalSupply();
     uint256 remainingSupply = GOLD_SUPPLY_CAP.sub(totalSupply.add(targetGoldSupplyIncrease));
     uint256 targetRemainingSupply = GOLD_SUPPLY_CAP.sub(targetSupply);
     FixidityLib.Fraction memory remainingToTargetRatio = FixidityLib

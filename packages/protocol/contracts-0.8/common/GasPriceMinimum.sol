@@ -220,7 +220,7 @@ contract GasPriceMinimum is
   function _getGasPriceMinimum(address tokenAddress) private view returns (uint256) {
     if (
       tokenAddress == address(0) ||
-      tokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)
+      tokenAddress == registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID)
     ) {
       return gasPriceMinimum();
     } else {

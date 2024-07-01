@@ -18,8 +18,8 @@ interface ICeloDistributionSchedule {
   function getMintableAmount() external returns (uint256);
 
   /**
-   * @notice Returns the target Gold supply according to the target schedule.
-   * @return The target Gold supply according to the target schedule.
+   * @notice Returns the target CELO supply according to the target schedule.
+   * @return The target CELO supply according to the target schedule.
    */
-  function getTargetGoldTotalSupply() external returns (uint256, uint256, uint256);
+  function getTargetCeloTotalSupply() external returns (uint256, uint256, uint256);
 }

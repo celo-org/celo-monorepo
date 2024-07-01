@@ -12,6 +12,7 @@ import "./interfaces/ICeloDistributionSchedule.sol";
 import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IGovernance.sol";
 import "../governance/interfaces/ILockedGold.sol";
+import "../governance/interfaces/ILockedCelo.sol";
 import "../governance/interfaces/IValidators.sol";
 
 import "../identity/interfaces/IRandom.sol";
@@ -60,6 +61,9 @@ contract UsingRegistryV2 {
   bytes32 internal constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
   bytes32 constant CELO_DISTRIBUTION_SCHEDULE_ID =
     keccak256(abi.encodePacked("CeloDistributionSchedule"));
+
+  bytes32 internal constant CELO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("CeloToken"));
+  bytes32 internal constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
 
   modifier onlyRegisteredContract(bytes32 identifierHash) {
     require(
@@ -124,12 +128,20 @@ contract UsingRegistryV2 {
     return IERC20(registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 
+  function getCeloToken() internal view returns (IERC20) {
+    return IERC20(registryContract.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID));
+  }
+
   function getGovernance() internal view returns (IGovernance) {
     return IGovernance(registryContract.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
   }
 
   function getLockedGold() internal view returns (ILockedGold) {
     return ILockedGold(registryContract.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
+  }
+
+  function getLockedCelo() internal view returns (ILockedCelo) {
+    return ILockedCelo(registryContract.getAddressForOrDie(LOCKED_CELO_REGISTRY_ID));
   }
 
   function getRandom() internal view returns (IRandom) {

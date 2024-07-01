@@ -70,8 +70,8 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     uint256 maxSlippage // as fraction,
   ) external returns (uint256) {
     require(
-      buyTokenAddress == registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
-      "Buy token can only be gold token"
+      buyTokenAddress == registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID),
+      "Buy token can only be CELO token"
     );
 
     require(
@@ -83,7 +83,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     // and if it generates a better outcome that the ones enabled that gets used
     // and the user gets a reward
 
-    IERC20 celoToken = getGoldToken();
+    IERC20 celoToken = getCeloToken();
 
     IUniswapV2RouterMin bestRouter;
     uint256 bestRouterQuote = 0;
@@ -147,7 +147,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
+    return (1, 1, 0, 1);
   }
 
   function _setRouter(address token, address router) private {
@@ -196,7 +196,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
       );
     }
 
-    IERC20 celoToken = getGoldToken();
+    IERC20 celoToken = getCeloToken();
     address pair = IUniswapV2FactoryMin(bestRouter.factory()).getPair(
       sellTokenAddress,
       address(celoToken)
