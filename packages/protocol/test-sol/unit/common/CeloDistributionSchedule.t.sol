@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 import "celo-foundry-8/Test.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts-8/common/interfaces/IGoldToken.sol";
+import "@celo-contracts-8/common/interfaces/ICeloToken.sol";
 import "@celo-contracts/governance/interfaces/IGovernance.sol";
 import "@celo-contracts-8/common/CeloDistributionSchedule.sol";
 import "@celo-contracts-8/common/IsL2Check.sol";
@@ -17,7 +17,7 @@ contract CeloDistributionScheduleTest is Test, Constants, IsL2Check {
   using FixidityLib for FixidityLib.Fraction;
 
   IRegistry registry;
-  IGoldToken celoToken;
+  ICeloToken celoToken;
   MockGovernance governance;
 
   CeloDistributionSchedule mintCeloSchedule;
@@ -73,7 +73,7 @@ contract CeloDistributionScheduleTest is Test, Constants, IsL2Check {
     deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
     registry = IRegistry(registryAddress);
 
-    registry.setAddressFor("GoldToken", address(celoToken));
+    registry.setAddressFor("CeloToken", address(celoToken));
     registry.setAddressFor("Governance", address(governance));
 
     celoToken.setRegistry(registryAddress);
@@ -86,12 +86,12 @@ contract CeloDistributionScheduleTest is Test, Constants, IsL2Check {
     registry = IRegistry(registryAddress);
 
     deployCodeTo("GoldToken.sol", abi.encode(false), celoTokenAddress);
-    celoToken = IGoldToken(celoTokenAddress);
+    celoToken = ICeloToken(celoTokenAddress);
 
     // Using a mock contract, as foundry does not allow for library linking when using deployCodeTo
     governance = new MockGovernance();
 
-    registry.setAddressFor("GoldToken", address(celoToken));
+    registry.setAddressFor("CeloToken", address(celoToken));
 
     registry.setAddressFor("Governance", address(governance));
 
@@ -185,6 +185,7 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
     newMintCelo();
     assertEq(mintCeloSchedule.totalDistributedBySchedule(), 0);
   }
+
   function test_ShouldUpdateDependencies() public {
     newMintCelo();
     assertEq(mintCeloSchedule.l2StartTime(), l2StartTime);

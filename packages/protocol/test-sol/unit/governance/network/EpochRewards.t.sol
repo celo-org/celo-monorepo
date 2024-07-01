@@ -76,7 +76,7 @@ contract EpochRewardsTest is Test, Constants, Utils {
     registry.setAddressFor(ElectionContract, address(election));
     registry.setAddressFor(SortedOraclesContract, address(mockSortedOracles));
     registry.setAddressFor(StableTokenContract, address(mockStableToken));
-    registry.setAddressFor(GoldTokenContract, address(mockGoldToken));
+    registry.setAddressFor(CeloTokenContract, address(mockGoldToken));
     registry.setAddressFor(FreezerContract, address(freezer));
 
     mockSortedOracles.setMedianRate(

@@ -198,7 +198,7 @@ jobs:
     timeout-minutes: 60
     needs: [install-dependencies, lint-checks]
     if: |
-      github.base_ref == 'master' || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
+      github.base_ref == 'master' || contains(github.base_ref, 'release') || contains(github.base_ref, 'staging') || contains(github.base_ref, 'production') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/protocol') ||
       contains(needs.install-dependencies.outputs.all_modified_files, 'packages/typescript') ||
       contains(needs.install-dependencies.outputs.all_modified_files, ',package.json') ||

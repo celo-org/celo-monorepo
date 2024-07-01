@@ -211,7 +211,7 @@ contract Migration is Script, UsingRegistry, Constants {
     migrateFreezer();
     migrateFeeCurrencyWhitelist();
     migrateFeeCurrencyDirectory();
-    migrateGoldToken(json);
+    migrateCeloToken(json);
     migrateSortedOracles(json);
     migrateGasPriceMinimum(json);
     migrateReserveSpenderMultiSig(json);
@@ -219,7 +219,7 @@ contract Migration is Script, UsingRegistry, Constants {
     migrateStableToken(json);
     migrateExchange(json);
     migrateAccount();
-    migrateLockedGold(json);
+    migrateLockedCelo(json);
     migrateValidators(json); // this triggers a revert, the deploy after the json reads
     migrateElection(json);
     migrateEpochRewards(json);
@@ -280,16 +280,17 @@ contract Migration is Script, UsingRegistry, Constants {
     );
   }
 
-  function migrateGoldToken(string memory json) public {
+  function migrateCeloToken(string memory json) public {
     // TODO change pre-funded addresses to make it match circulation supply
-    address goldProxyAddress = deployProxiedContract(
+    address celoProxyAddress = deployProxiedContract(
       "GoldToken",
       abi.encodeWithSelector(ICeloTokenInitializer.initialize.selector, registryAddress)
     );
 
+    addToRegistry("CeloToken", celoProxyAddress);
     bool frozen = abi.decode(json.parseRaw(".goldToken.frozen"), (bool));
     if (frozen) {
-      getFreezer().freeze(goldProxyAddress);
+      getFreezer().freeze(celoProxyAddress);
     }
   }
 
@@ -549,10 +550,10 @@ contract Migration is Script, UsingRegistry, Constants {
     IAccounts(accountsProxyAddress).setEip712DomainSeparator();
   }
 
-  function migrateLockedGold(string memory json) public {
+  function migrateLockedCelo(string memory json) public {
     uint256 unlockingPeriod = abi.decode(json.parseRaw(".lockedGold.unlockingPeriod"), (uint256));
 
-    deployProxiedContract(
+    address LockedCeloProxyAddress = deployProxiedContract(
       "LockedGold",
       abi.encodeWithSelector(
         ILockedGoldInitializer.initialize.selector,
@@ -560,6 +561,8 @@ contract Migration is Script, UsingRegistry, Constants {
         unlockingPeriod
       )
     );
+
+    addToRegistry("LockedCelo", LockedCeloProxyAddress);
   }
 
   function migrateValidators(string memory json) public {

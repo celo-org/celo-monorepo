@@ -12,6 +12,7 @@ import "./interfaces/IRegistry.sol";
 import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IGovernance.sol";
 import "../governance/interfaces/ILockedGold.sol";
+import "../governance/interfaces/ILockedCelo.sol";
 import "../governance/interfaces/IValidators.sol";
 
 import "../identity/interfaces/IRandom.sol";
@@ -44,6 +45,9 @@ contract UsingRegistry is Ownable {
   bytes32 constant SORTED_ORACLES_REGISTRY_ID = keccak256(abi.encodePacked("SortedOracles"));
   bytes32 constant STABLE_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableToken"));
   bytes32 constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
+
+  bytes32 constant CELO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("CeloToken"));
+  bytes32 constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
   // solhint-enable state-visibility
 
   IRegistry public registry;
@@ -97,6 +101,9 @@ contract UsingRegistry is Ownable {
   function getGoldToken() internal view returns (IERC20) {
     return IERC20(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
+  function getCeloToken() internal view returns (IERC20) {
+    return IERC20(registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID));
+  }
 
   function getGovernance() internal view returns (IGovernance) {
     return IGovernance(registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
@@ -104,6 +111,9 @@ contract UsingRegistry is Ownable {
 
   function getLockedGold() internal view returns (ILockedGold) {
     return ILockedGold(registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
+  }
+  function getLockedCelo() internal view returns (ILockedCelo) {
+    return ILockedCelo(registry.getAddressForOrDie(LOCKED_CELO_REGISTRY_ID));
   }
 
   function getRandom() internal view returns (IRandom) {
