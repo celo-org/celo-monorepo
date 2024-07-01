@@ -2,5 +2,5 @@
 pragma solidity >=0.5.13 <0.9.0;
 
 interface ICeloDistributionScheduleInitializer {
-  function initialize() external;
+  function initialize(address registryAddress) external;
 }

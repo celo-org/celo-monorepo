@@ -912,7 +912,10 @@ contract Migration is Script, UsingRegistry, Constants {
   function migrateCeloDistributionSchedule() public {
     deployProxiedContract(
       "CeloDistributionSchedule",
-      abi.encodeWithSelector(ICeloDistributionScheduleInitializer.initialize.selector)
+      abi.encodeWithSelector(
+        ICeloDistributionScheduleInitializer.initialize.selector,
+        registryAddress
+      )
     );
   }
 

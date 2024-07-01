@@ -49,8 +49,10 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
 
   /**
    * @notice A constructor for initialising a new instance of a CeloDistributionSchedule contract.
+   * @param registryAddress The address of the registry core smart contract.
    */
-  function initialize() external initializer {
+  function initialize(address registryAddress) external initializer {
+    setRegistry(registryAddress);
     _transferOwnership(msg.sender);
   }
 
@@ -60,22 +62,18 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
    * @param _communityRewardFraction The percentage of rewards that go the community funds.
    * @param _carbonOffsettingPartner The address of the carbon offsetting partner.
    * @param _carbonOffsettingFraction The percentage of rewards going to carbon offsetting partner.
-   * @param registryAddress Address of the deployed contracts registry.
    */
   function activate(
     uint256 _l2StartTime,
     uint256 _communityRewardFraction,
     address _carbonOffsettingPartner,
-    uint256 _carbonOffsettingFraction,
-    address registryAddress
+    uint256 _carbonOffsettingFraction
   ) external onlyOwner onlyL2 {
     require(address(this).balance > 0, "Contract does not have CELO balance.");
     require(!areDependenciesSet, "Contract has already been activated.");
-    require(registryAddress != address(0), "The registry address cannot be the zero address");
     require(block.timestamp > _l2StartTime, "L2 start time cannot be set to a future date.");
     areDependenciesSet = true;
     l2StartTime = _l2StartTime;
-    setRegistry(registryAddress);
     communityRewardFund = address(getGovernance());
     IGoldToken celoToken = IGoldToken(address(getGoldToken()));
     totalDistributedAtL2Start = celoToken.allocatedSupply();
