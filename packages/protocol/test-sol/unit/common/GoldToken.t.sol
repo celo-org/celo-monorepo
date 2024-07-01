@@ -151,13 +151,14 @@ contract GoldTokenTest_transferFrom is GoldTokenTest {
     vm.expectRevert("transfer attempted to reserved celoTokenDistributionSchedule address");
     celoToken.transferFrom(sender, celoTokenDistributionSchedule, ONE_CELOTOKEN);
   }
-  function test_ShouldNotAllowToTransferToNullAddress() public {
+
+  function test_Reverts_WhenTransferToNullAddress() public {
     vm.prank(receiver);
     vm.expectRevert();
     celoToken.transferFrom(sender, address(0), ONE_CELOTOKEN);
   }
 
-  function test_ShouldNotAllowTransferMoreThanSenderHas() public {
+  function test_Reverts_WhenTransferMoreThanSenderHas() public {
     uint256 value = sender.balance + ONE_CELOTOKEN * 4;
 
     vm.prank(receiver);
@@ -165,7 +166,7 @@ contract GoldTokenTest_transferFrom is GoldTokenTest {
     celoToken.transferFrom(sender, receiver, value);
   }
 
-  function test_ShouldNotAllowTransferringMoreThanTheSpenderIsAllowed() public {
+  function test_Reverts_WhenTransferringMoreThanTheSpenderIsAllowed() public {
     vm.prank(receiver);
     vm.expectRevert();
     celoToken.transferFrom(sender, receiver, ONE_CELOTOKEN + 1);
