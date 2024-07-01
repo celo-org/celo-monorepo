@@ -72,7 +72,7 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
     registry.setAddressFor("Accounts", address(accounts));
     registry.setAddressFor("Election", address(election));
     registry.setAddressFor("Freezer", address(freezer));
-    registry.setAddressFor("GoldToken", address(goldToken));
+    registry.setAddressFor("CeloToken", address(goldToken));
     registry.setAddressFor("Governance", address(governance));
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
@@ -93,7 +93,6 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
       );
     }
 
-    // releaseGold.initialize(config);
     ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold));
     tunnel.MockInitialize(owner, initParams, initParams2);
 
@@ -132,6 +131,7 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
     registry.setAddressFor("Election", address(election));
     registry.setAddressFor("Freezer", address(freezer));
     registry.setAddressFor("GoldToken", address(goldToken));
+    registry.setAddressFor("CeloToken", address(goldToken));
     registry.setAddressFor("Governance", address(governance));
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));

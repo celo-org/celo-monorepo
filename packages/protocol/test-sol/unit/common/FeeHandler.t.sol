@@ -100,6 +100,7 @@ contract FeeHandlerTest is Test, Constants {
     registry.setAddressFor("FeeCurrencyWhitelist", address(feeCurrencyWhitelist));
     registry.setAddressFor("Freezer", address(freezer));
     registry.setAddressFor("GoldToken", address(celoToken));
+    registry.setAddressFor("CeloToken", address(celoToken));
     registry.setAddressFor("Reserve", address(mockReserve));
 
     mockReserve.setGoldToken(address(celoToken));

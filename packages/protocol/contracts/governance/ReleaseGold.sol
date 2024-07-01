@@ -268,7 +268,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     uint256 value
   ) external onlyWhenInProperState {
     require(
-      erc20 != registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
+      erc20 != registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID),
       "Transfer must not target celo balance"
     );
     SafeERC20.safeTransfer(IERC20(erc20), to, value);
