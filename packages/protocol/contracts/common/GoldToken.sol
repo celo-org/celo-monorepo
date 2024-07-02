@@ -37,9 +37,6 @@ contract GoldToken is
 
   mapping(address => mapping(address => uint256)) internal allowed;
 
-  // Total amount that was withdrawn from L2 (Celo) to L1 (Ethereum)
-  uint256 public withdrawn;
-
   // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
   address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
 
@@ -52,14 +49,6 @@ contract GoldToken is
   event Approval(address indexed owner, address indexed spender, uint256 value);
 
   event SetCeloTokenDistributionScheduleAddress(address indexed newScheduleAddress);
-
-  modifier onlyL2ToL1MessagePasser() {
-    require(
-      msg.sender == 0x4200000000000000000000000000000000000016,
-      "Only L2ToL1MessagePasser can call."
-    );
-    _;
-  }
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -184,6 +173,10 @@ contract GoldToken is
    */
   function transferFrom(address from, address to, uint256 value) external returns (bool) {
     require(to != address(0), "transfer attempted to reserved address 0x0");
+    require(
+      to != address(celoTokenDistributionSchedule),
+      "transfer attempted to reserved celoTokenDistributionSchedule address"
+    );
     require(value <= balanceOf(from), "transfer value exceeded balance of sender");
     require(
       value <= allowed[from][msg.sender],
@@ -219,22 +212,6 @@ contract GoldToken is
 
     emit Transfer(address(0), to, value);
     return true;
-  }
-
-  /**
-   * @notice Increases the total withdrawn CELO from L2 to L1.
-   * @param _withdrawAmount The amount to decrease counter by
-   */
-  function withdrawAmount(uint256 _withdrawAmount) external onlyL2 onlyL2ToL1MessagePasser {
-    withdrawn = withdrawn.add(_withdrawAmount);
-  }
-
-  /**
-   * @notice Decreases the total withdrawn CELO from L2 to L1.
-   * @param _depositAmount The amount to decrease counter by
-   */
-  function depositAmount(uint256 _depositAmount) external onlyVm onlyL2 {
-    withdrawn = withdrawn.sub(_depositAmount);
   }
 
   /**
@@ -325,7 +302,7 @@ contract GoldToken is
    */
   function totalSupply() public view returns (uint256) {
     if (isL2()) {
-      return CELO_SUPPLY_CAP.sub(withdrawn);
+      return CELO_SUPPLY_CAP;
     } else {
       return totalSupply_;
     }
@@ -338,6 +315,10 @@ contract GoldToken is
    * @return True if the transaction succeeds.
    */
   function _transfer(address to, uint256 value) internal returns (bool) {
+    require(
+      to != address(celoTokenDistributionSchedule),
+      "transfer attempted to reserved celoTokenDistributionSchedule address"
+    );
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
 
     bool success;
