@@ -10,8 +10,10 @@ import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import "../../contracts/common/interfaces/IRegistry.sol";
 import "../../contracts/common/interfaces/IAccounts.sol";
 import "../../contracts/common/interfaces/IFreezer.sol";
+import "../../contracts/common/interfaces/ICeloDistributionSchedule.sol";
 import "../../contracts/governance/interfaces/IGovernance.sol";
 import "../../contracts/governance/interfaces/ILockedGold.sol";
+import "../../contracts/governance/interfaces/ILockedCelo.sol";
 import "../../contracts/governance/interfaces/IValidators.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
 import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
@@ -43,6 +45,10 @@ contract UsingRegistry is Ownable {
   bytes32 constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
   bytes32 constant MENTOFEEHANDLERSELLER_REGISTRY_ID =
     keccak256(abi.encodePacked("MentoFeeHandlerSeller"));
+  bytes32 constant CELO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("CeloToken"));
+  bytes32 constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
+  bytes32 constant CELO_DISTRIBUTION_SCHEDULE_ID =
+    keccak256(abi.encodePacked("CeloDistributionSchedule"));
   // solhint-enable state-visibility
 
   IRegistry public registry;
@@ -73,6 +79,10 @@ contract UsingRegistry is Ownable {
     return IERC20(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 
+  function getCeloToken() internal view returns (IERC20) {
+    return IERC20(registry.getAddressForOrDie(CELO_TOKEN_REGISTRY_ID));
+  }
+
   function getFreezer() internal view returns (IFreezer) {
     return IFreezer(registry.getAddressForOrDie(FREEZER_REGISTRY_ID));
   }
@@ -87,6 +97,10 @@ contract UsingRegistry is Ownable {
 
   function getLockedGold() internal view returns (ILockedGold) {
     return ILockedGold(registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
+  }
+
+  function getLockedCelo() internal view returns (ILockedCelo) {
+    return ILockedCelo(registry.getAddressForOrDie(LOCKED_CELO_REGISTRY_ID));
   }
 
   // Current version of Mento doesn't support 0.8
@@ -111,5 +125,9 @@ contract UsingRegistry is Ownable {
   }
   function getGovernance() internal view returns (IGovernance) {
     return IGovernance(registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
+  }
+
+  function getCeloDistributionSchedule() internal view returns (ICeloDistributionSchedule) {
+    return ICeloDistributionSchedule(registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID));
   }
 }

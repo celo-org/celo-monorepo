@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+### This scripts sets up a local Anvil instance, deploys libraries, precompiles, and runs migrations
+
 # Keeping track of start time to measure how long it takes to run the script entirely
 START_TIME=$SECONDS
 

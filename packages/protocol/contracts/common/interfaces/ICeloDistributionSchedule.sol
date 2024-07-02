@@ -3,6 +3,11 @@ pragma solidity >=0.5.13 <0.9.0;
 
 interface ICeloDistributionSchedule {
   /**
+   * @notice Sets the distribution schedule dependencies during L2 transition.
+   */
+  function activate(uint256, uint256, address, uint256, address) external;
+
+  /**
    * @notice Mints CELO to the beneficiaries according to the predefined schedule.
    */
   function mintAccordingToSchedule() external returns (bool);
@@ -13,8 +18,8 @@ interface ICeloDistributionSchedule {
   function getMintableAmount() external returns (uint256);
 
   /**
-   * @notice Returns the target Gold supply according to the target schedule.
-   * @return The target Gold supply according to the target schedule.
+   * @notice Returns the target CELO supply according to the target schedule.
+   * @return The target CELO supply according to the target schedule.
    */
-  function getTargetGoldTotalSupply() external returns (uint256, uint256, uint256);
+  function getTargetCeloTotalSupply() external returns (uint256, uint256, uint256);
 }
