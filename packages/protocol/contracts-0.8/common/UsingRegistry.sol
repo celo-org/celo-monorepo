@@ -10,6 +10,7 @@ import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import "../../contracts/common/interfaces/IRegistry.sol";
 import "../../contracts/common/interfaces/IAccounts.sol";
 import "../../contracts/common/interfaces/IFreezer.sol";
+import "../../contracts/common/interfaces/ICeloDistributionSchedule.sol";
 import "../../contracts/governance/interfaces/IGovernance.sol";
 import "../../contracts/governance/interfaces/ILockedGold.sol";
 import "../../contracts/governance/interfaces/ILockedCelo.sol";
@@ -44,9 +45,10 @@ contract UsingRegistry is Ownable {
   bytes32 constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
   bytes32 constant MENTOFEEHANDLERSELLER_REGISTRY_ID =
     keccak256(abi.encodePacked("MentoFeeHandlerSeller"));
-
   bytes32 constant CELO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("CeloToken"));
   bytes32 constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
+  bytes32 constant CELO_DISTRIBUTION_SCHEDULE_ID =
+    keccak256(abi.encodePacked("CeloDistributionSchedule"));
   // solhint-enable state-visibility
 
   IRegistry public registry;
@@ -123,5 +125,9 @@ contract UsingRegistry is Ownable {
   }
   function getGovernance() internal view returns (IGovernance) {
     return IGovernance(registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
+  }
+
+  function getCeloDistributionSchedule() internal view returns (ICeloDistributionSchedule) {
+    return ICeloDistributionSchedule(registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID));
   }
 }
