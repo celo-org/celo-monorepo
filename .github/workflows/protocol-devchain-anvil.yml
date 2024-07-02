@@ -148,6 +148,7 @@ jobs:
         env:
           GITHUB_TAG: ${{ github.ref_name }}
           NPM_PACKAGE: '@celo/devchain-anvil'
+          NPM_TAG: ${{ inputs.npm_tag }}
 
       - name: Prepare package for publishing
         run: yarn prepare_devchain_anvil_publishing
