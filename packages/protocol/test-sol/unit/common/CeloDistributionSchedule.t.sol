@@ -20,14 +20,14 @@ contract CeloDistributionScheduleTest is Test, Constants, IsL2Check {
   ICeloToken celoToken;
   MockGovernance governance;
 
-  CeloDistributionSchedule mintCeloSchedule;
+  CeloDistributionSchedule celoDistributionSchedule;
 
   address owner = address(this);
 
   address registryAddress;
   address celoTokenAddress = actor("celoTokenAddress");
 
-  address mintCeloOwner = actor("mintCeloOwner");
+  address celoDistributionOwner = actor("celoDistributionOwner");
   address communityRewardFund = actor("communityRewardFund");
   address carbonOffsettingPartner = actor("carbonOffsettingPartner");
 
@@ -103,26 +103,25 @@ contract CeloDistributionScheduleTest is Test, Constants, IsL2Check {
     assertEq(celoToken.totalSupply(), L1_MINTED_CELO_SUPPLY, "total supply incorrect.");
   }
 
-  function newMintCelo() internal returns (CeloDistributionSchedule) {
+  function newCeloDistibutionSchedule() internal returns (CeloDistributionSchedule) {
     vm.warp(block.timestamp + l2StartTime);
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule = new CeloDistributionSchedule(true);
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule = new CeloDistributionSchedule(true);
 
-    vm.deal(address(mintCeloSchedule), L2_INITIAL_STASH_BALANCE);
+    vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
 
-    celoToken.setCeloTokenDistributionScheduleAddress(address(mintCeloSchedule));
+    celoToken.setCeloTokenDistributionScheduleAddress(address(celoDistributionSchedule));
 
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.initialize();
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.initialize(registryAddress);
 
-    vm.prank(mintCeloOwner);
+    vm.prank(celoDistributionOwner);
 
-    mintCeloSchedule.activate(
+    celoDistributionSchedule.activate(
       l2StartTime,
       communityRewardFraction,
       carbonOffsettingPartner,
-      carbonOffsettingFraction,
-      registryAddress
+      carbonOffsettingFraction
     );
   }
 }
@@ -132,30 +131,54 @@ contract CeloDistributionScheduleTest_initialize is CeloDistributionScheduleTest
     super.setUp();
     vm.warp(block.timestamp + l2StartTime);
 
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule = new CeloDistributionSchedule(true);
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule = new CeloDistributionSchedule(true);
 
-    celoToken.setCeloTokenDistributionScheduleAddress(address(mintCeloSchedule));
+    celoToken.setCeloTokenDistributionScheduleAddress(address(celoDistributionSchedule));
 
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.initialize();
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.initialize(registryAddress);
   }
 
-  function test_ShouldSetAOwnerToMintCeloScheduleInstance() public {
-    assertEq(mintCeloSchedule.owner(), mintCeloOwner);
+  function test_ShouldSetAOwnerToCeloDistributionScheduleInstance() public {
+    assertEq(celoDistributionSchedule.owner(), celoDistributionOwner);
   }
 
-  function test_ShouldNotSetBeneficiariesToMintCeloScheduleInstance() public {
-    assertEq(mintCeloSchedule.communityRewardFund(), address(0));
-    assertEq(mintCeloSchedule.carbonOffsettingPartner(), address(0));
+  function test_ShouldSetRegistryAddressToCeloDistributionScheduleInstance() public {
+    assertEq(address(celoDistributionSchedule.registry()), proxyAdminAddress);
+  }
+
+  function test_ShouldNotSetBeneficiariesToCeloDistributionScheduleInstance() public {
+    assertEq(celoDistributionSchedule.communityRewardFund(), address(0));
+    assertEq(celoDistributionSchedule.carbonOffsettingPartner(), address(0));
   }
 
   function test_ShouldHaveZeroTotalDistributedByScheduleOnInit() public {
-    assertEq(mintCeloSchedule.totalDistributedBySchedule(), 0);
+    assertEq(celoDistributionSchedule.totalDistributedBySchedule(), 0);
   }
 
   function test_ShouldNotSetTheL2StartTime() public {
-    assertEq(mintCeloSchedule.l2StartTime(), 0);
+    assertEq(celoDistributionSchedule.l2StartTime(), 0);
+  }
+
+  function test_Reverts_WhenRegistryIsTheNullAddress() public {
+    celoDistributionSchedule = new CeloDistributionSchedule(true);
+
+    vm.expectRevert("Cannot register the null address");
+    celoDistributionSchedule.initialize(address(0));
+  }
+
+  function test_Reverts_WhenReceivingNativeTokens() public {
+    (bool success, ) = address(celoDistributionSchedule).call{ value: 1 ether }("");
+    assertFalse(success);
+
+    address payable payableAddress = payable((address(celoDistributionSchedule)));
+
+    bool success2 = payableAddress.send(1 ether);
+    assertFalse(success2);
+
+    vm.expectRevert();
+    payableAddress.transfer(1 ether);
   }
 }
 
@@ -163,141 +186,120 @@ contract CeloDistributionScheduleTest_activate_L1 is CeloDistributionScheduleTes
   function setUp() public override {
     super.setUpL1();
 
-    mintCeloSchedule = new CeloDistributionSchedule(true);
-    mintCeloSchedule.initialize();
+    celoDistributionSchedule = new CeloDistributionSchedule(true);
+    celoDistributionSchedule.initialize(registryAddress);
   }
 
   function test_Reverts_WhenCalledOnL1() public {
     vm.warp(block.timestamp + l2StartTime);
     vm.expectRevert("This method is not supported in L1.");
-    mintCeloSchedule.activate(
+    celoDistributionSchedule.activate(
       l2StartTime,
       communityRewardFraction,
       carbonOffsettingPartner,
-      carbonOffsettingFraction,
-      registryAddress
+      carbonOffsettingFraction
     );
   }
 }
 
 contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
   function test_ShouldHaveZeroTotalDistributedByScheduleOnInit() public {
-    newMintCelo();
-    assertEq(mintCeloSchedule.totalDistributedBySchedule(), 0);
+    newCeloDistibutionSchedule();
+    assertEq(celoDistributionSchedule.totalDistributedBySchedule(), 0);
   }
 
   function test_ShouldUpdateDependencies() public {
-    newMintCelo();
-    assertEq(mintCeloSchedule.l2StartTime(), l2StartTime);
-    assertEq(mintCeloSchedule.totalSupplyAtL2Start(), L1_MINTED_CELO_SUPPLY);
-    assertEq(mintCeloSchedule.communityRewardFund(), address(governance));
-    assertEq(mintCeloSchedule.carbonOffsettingPartner(), carbonOffsettingPartner);
-    assertEq(mintCeloSchedule.getCarbonOffsettingFraction(), carbonOffsettingFraction);
-    assertEq(mintCeloSchedule.getCommunityRewardFraction(), communityRewardFraction);
-  }
-
-  function test_Reverts_WhenRegistryIsTheNullAddress() public {
-    vm.warp(block.timestamp + l2StartTime);
-    mintCeloSchedule = new CeloDistributionSchedule(true);
-    mintCeloSchedule.initialize();
-    vm.deal(address(mintCeloSchedule), L2_INITIAL_STASH_BALANCE);
-    vm.expectRevert("The registry address cannot be the zero address");
-    mintCeloSchedule.activate(
-      l2StartTime,
-      communityRewardFraction,
-      carbonOffsettingPartner,
-      carbonOffsettingFraction,
-      address(0)
-    );
+    newCeloDistibutionSchedule();
+    assertEq(celoDistributionSchedule.l2StartTime(), l2StartTime);
+    assertEq(celoDistributionSchedule.totalAllocatedAtL2Start(), L1_MINTED_CELO_SUPPLY);
+    assertEq(celoDistributionSchedule.communityRewardFund(), address(governance));
+    assertEq(celoDistributionSchedule.carbonOffsettingPartner(), carbonOffsettingPartner);
+    assertEq(celoDistributionSchedule.getCarbonOffsettingFraction(), carbonOffsettingFraction);
+    assertEq(celoDistributionSchedule.getCommunityRewardFraction(), communityRewardFraction);
   }
 
   function test_Reverts_WhenCommunityFractionIsZero() public {
     vm.warp(block.timestamp + l2StartTime);
-    mintCeloSchedule = new CeloDistributionSchedule(true);
-    mintCeloSchedule.initialize();
-    vm.deal(address(mintCeloSchedule), L2_INITIAL_STASH_BALANCE);
+    celoDistributionSchedule = new CeloDistributionSchedule(true);
+    celoDistributionSchedule.initialize(registryAddress);
+    vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
     vm.expectRevert(
       "Value must be different from existing community reward fraction and less than 1."
     );
-    mintCeloSchedule.activate(
+    celoDistributionSchedule.activate(
       l2StartTime,
       0,
       carbonOffsettingPartner,
-      carbonOffsettingFraction,
-      registryAddress
+      carbonOffsettingFraction
     );
   }
 
   function test_Reverts_WhenCarbonOffsettingPartnerIsNullAddress() public {
     vm.warp(block.timestamp + l2StartTime);
-    mintCeloSchedule = new CeloDistributionSchedule(true);
-    mintCeloSchedule.initialize();
-    vm.deal(address(mintCeloSchedule), L2_INITIAL_STASH_BALANCE);
+    celoDistributionSchedule = new CeloDistributionSchedule(true);
+    celoDistributionSchedule.initialize(registryAddress);
+    vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
 
     vm.expectRevert("Partner cannot be the zero address.");
-    mintCeloSchedule.activate(
+    celoDistributionSchedule.activate(
       l2StartTime,
       communityRewardFraction,
       address(0),
-      carbonOffsettingFraction,
-      registryAddress
+      carbonOffsettingFraction
     );
   }
 
   function test_Reverts_WhenRegistryNotUpdated() public {
     vm.warp(block.timestamp + l2StartTime);
     registry.setAddressFor("Governance", address(0));
-    mintCeloSchedule = new CeloDistributionSchedule(true);
-    vm.deal(address(mintCeloSchedule), L2_INITIAL_STASH_BALANCE);
-    mintCeloSchedule.initialize();
+    celoDistributionSchedule = new CeloDistributionSchedule(true);
+    vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
+    celoDistributionSchedule.initialize(registryAddress);
 
     vm.expectRevert("identifier has no registry entry");
-    mintCeloSchedule.activate(
+    celoDistributionSchedule.activate(
       l2StartTime,
       communityRewardFraction,
       carbonOffsettingPartner,
-      carbonOffsettingFraction,
-      registryAddress
+      carbonOffsettingFraction
     );
   }
 
   function test_Reverts_WhenCalledTwice() public {
-    newMintCelo();
+    newCeloDistibutionSchedule();
     vm.expectRevert("Contract has already been activated.");
 
-    vm.prank(mintCeloOwner);
+    vm.prank(celoDistributionOwner);
 
-    mintCeloSchedule.activate(
+    celoDistributionSchedule.activate(
       l2StartTime,
       communityRewardFraction,
       carbonOffsettingPartner,
-      carbonOffsettingFraction,
-      registryAddress
+      carbonOffsettingFraction
     );
   }
 
   function test_Reverts_WhenTheContractDoesNotHaveBalance() public {
     vm.warp(block.timestamp + l2StartTime);
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule = new CeloDistributionSchedule(true);
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule = new CeloDistributionSchedule(true);
 
-    vm.deal(address(mintCeloSchedule), L2_INITIAL_STASH_BALANCE);
+    vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
 
-    celoToken.setCeloTokenDistributionScheduleAddress(address(mintCeloSchedule));
+    celoToken.setCeloTokenDistributionScheduleAddress(address(celoDistributionSchedule));
 
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.initialize();
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.initialize(registryAddress);
 
-    vm.deal(address(mintCeloSchedule), 0);
+    vm.deal(address(celoDistributionSchedule), 0);
 
     vm.expectRevert("Contract does not have CELO balance.");
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.activate(
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.activate(
       l2StartTime,
       communityRewardFraction,
       carbonOffsettingPartner,
-      carbonOffsettingFraction,
-      registryAddress
+      carbonOffsettingFraction
     );
   }
 }
@@ -305,55 +307,60 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
 contract CeloDistributionScheduleTest_setCommunityRewardFraction is CeloDistributionScheduleTest {
   function setUp() public override {
     super.setUp();
-    newMintCelo();
+    newCeloDistibutionSchedule();
   }
   function test_ShouldSetNewFraction() public {
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.setCommunityRewardFraction(newCommunityRewardFraction);
-    assertEq(mintCeloSchedule.getCommunityRewardFraction(), newCommunityRewardFraction);
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.setCommunityRewardFraction(newCommunityRewardFraction);
+    assertEq(celoDistributionSchedule.getCommunityRewardFraction(), newCommunityRewardFraction);
   }
   function test_Emits_CommunityRewardFractionSetEvent() public {
     vm.expectEmit(true, true, true, true);
     emit CommunityRewardFractionSet(newCommunityRewardFraction);
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.setCommunityRewardFraction(newCommunityRewardFraction);
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.setCommunityRewardFraction(newCommunityRewardFraction);
   }
   function test_Reverts_WhenCalledByOtherThanOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(randomAddress);
-    mintCeloSchedule.setCommunityRewardFraction(newCommunityRewardFraction);
+    celoDistributionSchedule.setCommunityRewardFraction(newCommunityRewardFraction);
   }
   function test_Reverts_WhenFractionIsTheSame() public {
     vm.expectRevert(
       "Value must be different from existing community reward fraction and less than 1."
     );
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.setCommunityRewardFraction(communityRewardFraction);
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.setCommunityRewardFraction(communityRewardFraction);
   }
   function test_Reverts_WhenSumOfFractionsGtOne() public {
     vm.expectRevert("Sum of partner fractions must be less than or equal to 1.");
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.setCommunityRewardFraction((FIXED1 - 1));
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.setCommunityRewardFraction((FIXED1 - 1));
   }
   function test_Reverts_WhenDependenciesNotSet() public {
-    mintCeloSchedule = new CeloDistributionSchedule(true);
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule = new CeloDistributionSchedule(true);
 
-    celoToken.setCeloTokenDistributionScheduleAddress(address(mintCeloSchedule));
+    celoToken.setCeloTokenDistributionScheduleAddress(address(celoDistributionSchedule));
 
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.initialize();
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.initialize(registryAddress);
 
     vm.expectRevert("Distribution schedule has not been activated.");
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.setCommunityRewardFraction(communityRewardFraction);
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.setCommunityRewardFraction(communityRewardFraction);
   }
   function test_Reverts_WhenFractionChangesAfter15Years() public {
     vm.warp(block.timestamp + (15 * YEAR + 4 * DAY));
 
-    assertEq(mintCeloSchedule.totalDistributedBySchedule(), 0, "Incorrect mintableAmount");
+    assertEq(
+      celoDistributionSchedule.totalDistributedBySchedule(),
+      0,
+      "Incorrect distributableAmount"
+    );
 
     vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
 
     vm.warp(block.timestamp + (15 * YEAR) + (4 * DAY));
 
@@ -361,73 +368,87 @@ contract CeloDistributionScheduleTest_setCommunityRewardFraction is CeloDistribu
       "Can only update fraction once block reward calculation for years 15-30 has been implemented."
     );
 
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.setCommunityRewardFraction(((FIXED1 / 4) * 3));
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.setCommunityRewardFraction(((FIXED1 / 4) * 3));
   }
 }
 
 contract CeloDistributionScheduleTest_setCarbonOffsettingFund is CeloDistributionScheduleTest {
   function setUp() public override {
     super.setUp();
-    newMintCelo();
+    newCeloDistibutionSchedule();
   }
 
   function test_ShouldSetNewPartner() public {
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.setCarbonOffsettingFund(newPartner, carbonOffsettingFraction);
-    assertEq(mintCeloSchedule.carbonOffsettingPartner(), newPartner);
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.setCarbonOffsettingFund(newPartner, carbonOffsettingFraction);
+    assertEq(celoDistributionSchedule.carbonOffsettingPartner(), newPartner);
   }
   function test_ShouldSetNewFraction() public {
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.setCarbonOffsettingFund(carbonOffsettingPartner, newCarbonOffsettingFraction);
-    assertEq(mintCeloSchedule.getCarbonOffsettingFraction(), newCarbonOffsettingFraction);
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.setCarbonOffsettingFund(
+      carbonOffsettingPartner,
+      newCarbonOffsettingFraction
+    );
+    assertEq(celoDistributionSchedule.getCarbonOffsettingFraction(), newCarbonOffsettingFraction);
   }
 
   function test_Emits_CarbonOffsettingFundSetEvent() public {
     vm.expectEmit(true, true, true, true);
     emit CarbonOffsettingFundSet(newPartner, carbonOffsettingFraction);
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.setCarbonOffsettingFund(newPartner, carbonOffsettingFraction);
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.setCarbonOffsettingFund(newPartner, carbonOffsettingFraction);
   }
 
   function test_Reverts_WhenCalledByOtherThanOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(randomAddress);
-    mintCeloSchedule.setCarbonOffsettingFund(newPartner, carbonOffsettingFraction);
+    celoDistributionSchedule.setCarbonOffsettingFund(newPartner, carbonOffsettingFraction);
   }
 
   function test_Reverts_WhenPartnerAndFractionAreTheSame() public {
     vm.expectRevert("Partner and value must be different from existing carbon offsetting fund.");
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.setCarbonOffsettingFund(carbonOffsettingPartner, carbonOffsettingFraction);
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.setCarbonOffsettingFund(
+      carbonOffsettingPartner,
+      carbonOffsettingFraction
+    );
   }
 
   function test_Reverts_WhenSumOfFractionsGtOne() public {
     vm.expectRevert("Sum of partner fractions must be less than or equal to 1.");
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.setCarbonOffsettingFund(carbonOffsettingPartner, (FIXED1 - 1));
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.setCarbonOffsettingFund(carbonOffsettingPartner, (FIXED1 - 1));
   }
 
   function test_Reverts_WhenDependenciesNotSet() public {
-    mintCeloSchedule = new CeloDistributionSchedule(true);
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule = new CeloDistributionSchedule(true);
 
-    celoToken.setCeloTokenDistributionScheduleAddress(address(mintCeloSchedule));
+    celoToken.setCeloTokenDistributionScheduleAddress(address(celoDistributionSchedule));
 
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.initialize();
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.initialize(registryAddress);
 
     vm.expectRevert("Distribution schedule has not been activated.");
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.setCarbonOffsettingFund(carbonOffsettingPartner, carbonOffsettingFraction);
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.setCarbonOffsettingFund(
+      carbonOffsettingPartner,
+      carbonOffsettingFraction
+    );
   }
 
   function test_Reverts_WhenFractionChangesAfter15Years() public {
     vm.warp(block.timestamp + (15 * YEAR + 4 * DAY));
 
-    assertEq(mintCeloSchedule.totalDistributedBySchedule(), 0, "Incorrect mintableAmount");
+    assertEq(
+      celoDistributionSchedule.totalDistributedBySchedule(),
+      0,
+      "Incorrect distributableAmount"
+    );
 
     vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
 
     vm.warp(block.timestamp + (15 * YEAR) + (4 * DAY));
 
@@ -435,127 +456,121 @@ contract CeloDistributionScheduleTest_setCarbonOffsettingFund is CeloDistributio
       "Can only update fraction once block reward calculation for years 15-30 has been implemented."
     );
 
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.setCarbonOffsettingFund(carbonOffsettingPartner, ((FIXED1 / 4) * 3));
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.setCarbonOffsettingFund(carbonOffsettingPartner, ((FIXED1 / 4) * 3));
   }
 }
 
 contract CeloDistributionScheduleTest_distributeAccordingToSchedule_L1 is
   CeloDistributionScheduleTest
 {
-  uint256 initialMintCeloAmount;
-
   function setUp() public override {
     super.setUpL1();
 
-    mintCeloSchedule = new CeloDistributionSchedule(true);
-    mintCeloSchedule.initialize();
+    celoDistributionSchedule = new CeloDistributionSchedule(true);
+    celoDistributionSchedule.initialize(registryAddress);
   }
 
-  function test_Reverts_WhenMintingOnL1() public {
+  function test_Reverts_WhenDistributingOnL1() public {
     vm.warp(block.timestamp + 3 * MONTH + 1 * DAY);
 
     vm.expectRevert("This method is not supported in L1.");
     vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
   }
 }
 
 contract CeloDistributionScheduleTest_distributeAccordingToSchedule is
   CeloDistributionScheduleTest
 {
-  uint256 initialMintCeloAmount;
-  uint256 mintPerPeriod;
-
   function setUp() public override {
     super.setUp();
 
-    newMintCelo();
+    newCeloDistibutionSchedule();
   }
 
   function test_Reverts_WhenDependenciesAreNotSet() public {
-    mintCeloSchedule = new CeloDistributionSchedule(true);
+    celoDistributionSchedule = new CeloDistributionSchedule(true);
 
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.initialize();
+    celoDistributionSchedule.initialize(registryAddress);
 
     vm.expectRevert("Distribution schedule has not been activated.");
     vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
   }
 
-  function test_ShouldAllowMintingAsSoon1SecondAfterSettingDependencies() public {
+  function test_ShouldAllowDistributingAsSoon1SecondAfterSettingDependencies() public {
     uint256 communityFundBalanceBefore = celoToken.balanceOf(address(governance));
     vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
     uint256 communityFundBalanceAfter = celoToken.balanceOf(address(governance));
     assertGt(communityFundBalanceAfter, communityFundBalanceBefore);
   }
 
-  function test_Reverts_WhenMintableAmountIsZero() public {
+  function test_Reverts_WhenDistributableAmountIsZero() public {
     vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
 
     vm.expectRevert("Distributable amount must be greater than zero.");
     vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
   }
 
-  function test_ShouldAllowToMint25Percent2years9MonthsPostL2Launch() public {
+  function test_ShouldAllowToDistribute25Percent2years9MonthsPostL2Launch() public {
     vm.warp(block.timestamp + 2 * YEAR + 267 * DAY + 63868); // 25% time since L2
 
     uint256 expectedDistributedAmount = (L2_FIFTEEN_YEAR_CELO_SUPPLY - L1_MINTED_CELO_SUPPLY) / 4;
 
     vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
 
     assertApproxEqRel(
-      mintCeloSchedule.totalDistributedBySchedule(),
+      celoDistributionSchedule.totalDistributedBySchedule(),
       expectedDistributedAmount,
       1e10
     );
   }
 
-  function test_ShouldAllowToMint50Percent5AndHalfYearsPostL2Launch() public {
+  function test_ShouldAllowToDistribute50Percent5AndHalfYearsPostL2Launch() public {
     vm.warp(block.timestamp + (5 * YEAR) + (170 * DAY) + 41338);
 
     uint256 expectedDistributedAmount = (L2_FIFTEEN_YEAR_CELO_SUPPLY - L1_MINTED_CELO_SUPPLY) / 2;
     vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
 
     assertApproxEqRel(
-      mintCeloSchedule.totalDistributedBySchedule(),
+      celoDistributionSchedule.totalDistributedBySchedule(),
       expectedDistributedAmount,
       1e10
     );
   }
 
-  function test_ShouldAllowToMint75Percent11YearsAnd3MonthsPostL2Launch() public {
+  function test_ShouldAllowToDistribute75Percent11YearsAnd3MonthsPostL2Launch() public {
     vm.warp(block.timestamp + 8 * YEAR + 73 * DAY + 18807);
 
     uint256 expectedDistributedAmount = ((L2_FIFTEEN_YEAR_CELO_SUPPLY - L1_MINTED_CELO_SUPPLY) /
       4) * 3;
 
     vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
 
     assertApproxEqRel(
-      mintCeloSchedule.totalDistributedBySchedule(),
+      celoDistributionSchedule.totalDistributedBySchedule(),
       expectedDistributedAmount,
       1e10
     );
   }
 
-  function test_ShouldAllowToMint100Percent11YearsPostL2Launch() public {
+  function test_ShouldAllowToDistribute100Percent11YearsPostL2Launch() public {
     uint256 communityFundBalanceBefore = celoToken.balanceOf(address(governance));
     uint256 carbonOffsettingPartnerBalanceBefore = celoToken.balanceOf(carbonOffsettingPartner);
     vm.warp(block.timestamp + (11 * YEAR));
 
     vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
 
     assertApproxEqRel(
-      mintCeloSchedule.totalDistributedBySchedule(),
+      celoDistributionSchedule.totalDistributedBySchedule(),
       MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION,
       1e10
     );
@@ -576,59 +591,63 @@ contract CeloDistributionScheduleTest_distributeAccordingToSchedule is
     );
   }
 
-  function test_ShouldMintUpToLinearSuppplyAfter15Years() public {
+  function test_ShouldDistributeUpToLinearSuppplyAfter15Years() public {
     vm.warp(block.timestamp + (15 * YEAR) + (4 * DAY));
 
-    assertEq(mintCeloSchedule.totalDistributedBySchedule(), 0, "Incorrect mintableAmount");
+    assertEq(
+      celoDistributionSchedule.totalDistributedBySchedule(),
+      0,
+      "Incorrect distributableAmount"
+    );
 
     vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
 
     assertApproxEqRel(
-      mintCeloSchedule.totalDistributedBySchedule(),
+      celoDistributionSchedule.totalDistributedBySchedule(),
       MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION,
       1e10
     );
   }
 
-  function test_Reverts_WhenMintingSecondTimeAfter15Years() public {
+  function test_Reverts_WhenDistributingSecondTimeAfter15Years() public {
     vm.warp(block.timestamp + (15 * YEAR) + (1 * DAY));
 
     vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
 
     assertApproxEqRel(
-      mintCeloSchedule.totalDistributedBySchedule(),
+      celoDistributionSchedule.totalDistributedBySchedule(),
       MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION,
       1e10
     );
 
     vm.expectRevert("Block reward calculation for years 15-30 unimplemented");
     vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
   }
 
   function test_Reverts_WhenTheContractBalanceIsLowerExpected() public {
-    vm.deal(address(mintCeloSchedule), 0);
-    vm.prank(address(mintCeloSchedule));
+    vm.deal(address(celoDistributionSchedule), 0);
+    vm.prank(address(celoDistributionSchedule));
 
     vm.expectRevert("Contract balance is insufficient.");
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
   }
 
   function test_ShouldTransferbalanceFromThisContract() public {
-    uint256 initialStashBalance = celoToken.balanceOf(address(mintCeloSchedule));
+    uint256 initialStashBalance = celoToken.balanceOf(address(celoDistributionSchedule));
 
     vm.warp(block.timestamp + (15 * YEAR));
 
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
 
-    uint256 finalStashBalance = celoToken.balanceOf(address(mintCeloSchedule));
+    uint256 finalStashBalance = celoToken.balanceOf(address(celoDistributionSchedule));
 
     assertLt(finalStashBalance, initialStashBalance);
 
     assertApproxEqRel(
-      celoToken.balanceOf(address(mintCeloSchedule)),
+      celoToken.balanceOf(address(celoDistributionSchedule)),
       L2_INITIAL_STASH_BALANCE - (MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION),
       1e10
     );
@@ -636,32 +655,38 @@ contract CeloDistributionScheduleTest_distributeAccordingToSchedule is
 }
 
 contract CeloDistributionScheduleTest_getDistributableAmount is CeloDistributionScheduleTest {
-  uint256 initialMintCeloAmount;
-
   function setUp() public override {
     super.setUp();
 
-    newMintCelo();
+    newCeloDistibutionSchedule();
   }
 
   function test_ShouldReturnFullAmountAvailableForThisReleasePeriod() public {
     vm.warp(block.timestamp + 1 * DAY);
-    assertApproxEqRel(mintCeloSchedule.getDistributableAmount(), DAILY_DISTRIBUTION_AMOUNT, 1e10);
+    assertApproxEqRel(
+      celoDistributionSchedule.getDistributableAmount(),
+      DAILY_DISTRIBUTION_AMOUNT,
+      1e10
+    );
   }
 
   function test_ShouldReturnOnlyAmountNotYetDistributed() public {
     vm.warp(block.timestamp + 1 * DAY);
     vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
 
     vm.warp(block.timestamp + 1 * DAY + 1);
-    assertApproxEqRel(mintCeloSchedule.getDistributableAmount(), DAILY_DISTRIBUTION_AMOUNT, 1e10);
+    assertApproxEqRel(
+      celoDistributionSchedule.getDistributableAmount(),
+      DAILY_DISTRIBUTION_AMOUNT,
+      1e10
+    );
   }
 
   function test_ShouldReturnOnlyUpToMaxL2DistributionBeforeItIsDistributed() public {
     vm.warp(block.timestamp + 16 * YEAR);
     assertApproxEqRel(
-      mintCeloSchedule.getDistributableAmount(),
+      celoDistributionSchedule.getDistributableAmount(),
       MAX_L2_COMMUNITY_DISTRIBUTION + MAX_L2_CARBON_FUND_DISTRIBUTION,
       1e10
     );
@@ -671,19 +696,18 @@ contract CeloDistributionScheduleTest_getDistributableAmount is CeloDistribution
     vm.warp(block.timestamp + 15 * YEAR);
 
     vm.prank(randomAddress);
-    mintCeloSchedule.distributeAccordingToSchedule();
+    celoDistributionSchedule.distributeAccordingToSchedule();
     vm.expectRevert("Block reward calculation for years 15-30 unimplemented");
-    mintCeloSchedule.getDistributableAmount();
+    celoDistributionSchedule.getDistributableAmount();
   }
 
   function test_Reverts_WhenDependenciesNotSet() public {
-    mintCeloSchedule = new CeloDistributionSchedule(true);
+    celoDistributionSchedule = new CeloDistributionSchedule(true);
 
-    vm.prank(mintCeloOwner);
-    mintCeloSchedule.initialize();
+    celoDistributionSchedule.initialize(registryAddress);
 
     vm.expectRevert("Distribution schedule has not been activated.");
 
-    mintCeloSchedule.getDistributableAmount();
+    celoDistributionSchedule.getDistributableAmount();
   }
 }
