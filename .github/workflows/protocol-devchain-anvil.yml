@@ -149,6 +149,14 @@ jobs:
           GITHUB_TAG: ${{ github.ref_name }}
           NPM_PACKAGE: '@celo/devchain-anvil'
 
+      - name: Prepare package for publishing
+        run: yarn prepare_devchain_anvil_publishing
+        working-directory: packages/protocol
+        env:
+          RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+        # a safety check especially useful if some package is upgraded
+      
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
         with:
