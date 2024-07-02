@@ -167,6 +167,19 @@ contract CeloDistributionScheduleTest_initialize is CeloDistributionScheduleTest
     vm.expectRevert("Cannot register the null address");
     celoDistributionSchedule.initialize(address(0));
   }
+
+  function test_Reverts_WhenReceivingNativeTokens() public {
+    (bool success, ) = address(celoDistributionSchedule).call{ value: 1 ether }("");
+    assertFalse(success);
+
+    address payable payableAddress = payable((address(celoDistributionSchedule)));
+
+    bool success2 = payableAddress.send(1 ether);
+    assertFalse(success2);
+
+    vm.expectRevert();
+    payableAddress.transfer(1 ether);
+  }
 }
 
 contract CeloDistributionScheduleTest_activate_L1 is CeloDistributionScheduleTest {
