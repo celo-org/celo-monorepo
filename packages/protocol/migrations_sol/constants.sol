@@ -19,7 +19,7 @@ contract Constants {
     "Governance",
     "GovernanceSlasher",
     "LockedGold",
-    "MintGoldSchedule",
+    "MintCeloSchedule",
     "OdisPayments",
     "Random",
     "Registry",

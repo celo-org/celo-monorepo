@@ -41,7 +41,7 @@ import "@celo-contracts/identity/interfaces/IOdisPaymentsInitializer.sol";
 import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
-import "@celo-contracts-8/common/interfaces/IMintGoldScheduleInitializer.sol";
+import "@celo-contracts-8/common/interfaces/IMintCeloScheduleInitializer.sol";
 
 import "@migrations-sol/HelperInterFaces.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
@@ -235,7 +235,7 @@ contract Migration is Script, UsingRegistry, Constants {
     migrateUniswapFeeHandlerSeller();
     migrateFeeHandler(json);
     migrateOdisPayments();
-    migrateMintGoldSchedule();
+    migrateMintCeloSchedule();
     migrateGovernance(json);
 
     vm.stopBroadcast();
@@ -907,10 +907,10 @@ contract Migration is Script, UsingRegistry, Constants {
     );
   }
 
-  function migrateMintGoldSchedule() public {
+  function migrateMintCeloSchedule() public {
     deployProxiedContract(
-      "MintGoldSchedule",
-      abi.encodeWithSelector(IMintGoldScheduleInitializer.initialize.selector)
+      "MintCeloSchedule",
+      abi.encodeWithSelector(IMintCeloScheduleInitializer.initialize.selector)
     );
   }
 

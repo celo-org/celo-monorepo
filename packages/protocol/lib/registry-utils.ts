@@ -35,7 +35,7 @@ export enum CeloContractName {
   GovernanceApproverMultiSig = 'GovernanceApproverMultiSig',
   GrandaMento = 'GrandaMento',
   LockedGold = 'LockedGold',
-  MintGoldSchedule = 'MintGoldSchedule',
+  MintCeloSchedule = 'MintCeloSchedule',
   OdisPayments = 'OdisPayments',
   Random = 'Random',
   Reserve = 'Reserve',
