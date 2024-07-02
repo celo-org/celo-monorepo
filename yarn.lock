@@ -802,6 +802,11 @@
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-6.0.0.tgz#23811b0bc8730a0d13fa90df55a7ec0e90d370cd"
   integrity sha512-z29p7glyh69R4tKSbZuomEvnAihmzgQKxmGoqt/4S6zSx6uOjTILUlhqlcDl2Wbkd+V0h85ft14nui2HXY2Lsg==
 
+"@celo/base@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@celo/base/-/base-6.0.1.tgz#99fe1c97766502a6ae7807ea10865e5728ec1932"
+  integrity sha512-pjZkKfPpX4k2WldPCM8uzHG1MpMs2NmVXu+2CCnrBVmRxYoupWraxKIsVFUtopfts8Ohtx2A+HJKXqie2+Fovg==
+
 "@celo/bls12377js@0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@celo/bls12377js/-/bls12377js-0.1.1.tgz#ba3574f41697cdba96c10ae96bb1aac057285798"
@@ -849,13 +854,13 @@
     web3-core-helpers "1.10.0"
 
 "@celo/cryptographic-utils@^5.0.7":
-  version "5.0.7"
-  resolved "https://registry.yarnpkg.com/@celo/cryptographic-utils/-/cryptographic-utils-5.0.7.tgz#0e8ae2f1e3902dbdd680531ecfa51f85629a6367"
-  integrity sha512-1svm1tRFbAeCrXu2Ux1Cfu3wz7jJsAz35ffkGdRjW8qfPHrHsxU0kamu9bLbmbwMzmB7sN4jarCMxsTHp8IjVA==
+  version "5.0.8"
+  resolved "https://registry.yarnpkg.com/@celo/cryptographic-utils/-/cryptographic-utils-5.0.8.tgz#17a2fb3724688edce1aa48395d0d70cf38337e47"
+  integrity sha512-uz/vyc+xTZIQIAY/WA6HDu4/TAyhneUjievwqg4ErmYiYptUYND35tooSzMPoLRq/13NLDYqldT3Ms43PdlwKw==
   dependencies:
-    "@celo/base" "^6.0.0"
+    "@celo/base" "^6.0.1"
     "@celo/bls12377js" "0.1.1"
-    "@celo/utils" "^6.0.0"
+    "@celo/utils" "^6.0.1"
     "@ethereumjs/util" "8.0.5"
     "@types/bn.js" "^5.1.0"
     "@types/elliptic" "^6.4.9"
@@ -863,7 +868,7 @@
     "@types/randombytes" "^2.0.0"
     bigi "^1.4.2"
     bip32 "^3.1.0"
-    bip39 "https://github.com/bitcoinjs/bip39#a7ecbfe2e60d0214ce17163d610cad9f7b23140c"
+    bip39 "git+https://github.com/bitcoinjs/bip39.git#a7ecbfe2e60d0214ce17163d610cad9f7b23140c"
     buffer-reverse "^1.0.1"
     elliptic "^6.5.4"
     ethereum-cryptography "1.2.0"
@@ -979,6 +984,24 @@
     rlp "^2.2.4"
     web3-eth-abi "1.10.0"
     web3-utils "1.10.0"
+
+"@celo/utils@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-6.0.1.tgz#07dea921cb091af20f9c37250bd1ad24b9e7e151"
+  integrity sha512-X9iK4R4USSgHG87PxpLGHqgKL33bKtBiKZGgPwx4gMM7X+nwpB6Ify/YO1/I+mt9+NN9epPb8/kmYYoWOPYShw==
+  dependencies:
+    "@celo/base" "^6.0.1"
+    "@ethereumjs/util" "8.0.5"
+    "@types/elliptic" "^6.4.9"
+    "@types/node" "^18.7.16"
+    bignumber.js "^9.0.0"
+    elliptic "^6.5.4"
+    ethereum-cryptography "1.2.0"
+    fp-ts "2.1.1"
+    io-ts "2.0.1"
+    rlp "^2.2.4"
+    web3-eth-abi "1.10.4"
+    web3-utils "1.10.4"
 
 "@celo/wallet-base@^5.1.2":
   version "5.1.2"
@@ -6625,7 +6648,7 @@ bip32@3.1.0, bip32@^3.1.0:
     typeforce "^1.11.5"
     wif "^2.0.6"
 
-bip39@2.5.0, bip39@^2.2.0, bip39@^2.5.0, "bip39@https://github.com/bitcoinjs/bip39#a7ecbfe2e60d0214ce17163d610cad9f7b23140c", "bip39@https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2":
+bip39@2.5.0, bip39@^2.2.0, bip39@^2.5.0, "bip39@git+https://github.com/bitcoinjs/bip39.git#a7ecbfe2e60d0214ce17163d610cad9f7b23140c", "bip39@https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2":
   version "3.0.3"
   resolved "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2"
   dependencies:
