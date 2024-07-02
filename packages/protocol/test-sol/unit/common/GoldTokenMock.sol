@@ -38,8 +38,4 @@ contract GoldTokenMock is GoldToken(true) {
   function balanceOf(address a) public view returns (uint256) {
     return balances[a];
   }
-
-  function setWithdrawn(uint256 value) external {
-    withdrawn = value;
-  }
 }
