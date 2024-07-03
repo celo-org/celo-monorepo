@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Generate and run devchain
 echo "Generating and running devchain before running e2e tests..."
-source $PWD/migrations_sol/create_and_migrate_anvil_devchain.sh
+source $PWD/scripts/foundry/create_and_migrate_anvil_devchain.sh
 
 # Run e2e tests
 echo "Running e2e tests..."
