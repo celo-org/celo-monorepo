@@ -27,6 +27,7 @@
     "prebuild": "rm -rf ./build",
     "determine-release-version": "yarn --silent ts-node --preferTsExts ./scripts/determine-release-version.ts",
     "prepare_contracts_and_abis_publishing": "yarn ts-node --preferTsExts ./scripts/prepare-contracts-and-abis-publishing.ts",
+    "prepare_devchain_anvil_publishing": "yarn ts-node --preferTsExts ./scripts/change-anvil-devchain-package-version.ts",
     "validate_abis_exports": "yarn ts-node --preferTsExts ./scripts/validate-abis-package.ts",
     "sourcify-publish": "yarn ts-node ./scripts/sourcify-publish.ts",
     "migrate": "./scripts/bash/migrate.sh",
