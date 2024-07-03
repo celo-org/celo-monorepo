@@ -48,13 +48,13 @@ jobs:
           fi
       - name: Foundry cache
         id: foundry-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./cache
           key: ${{ runner.os }}-foundry-cache-${{ env.FOUNDRY_CACHE_KEY }}
       - name: Foundry out
         id: foundry-out
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./out
           key: ${{ runner.os }}-foundry-out-${{ env.FOUNDRY_CACHE_KEY }}
@@ -150,7 +150,15 @@ jobs:
         env:
           GITHUB_TAG: ${{ github.ref_name }}
           NPM_PACKAGE: '@celo/devchain-anvil'
+          NPM_TAG: ${{ inputs.npm_tag }}
 
+      - name: Prepare package for publishing
+        run: yarn prepare_devchain_anvil_publishing
+        working-directory: packages/protocol
+        env:
+          RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+      
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
         with:
