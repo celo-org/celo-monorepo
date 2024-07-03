@@ -982,10 +982,10 @@ contract Migration is Script, UsingRegistry, Constants {
     );
 
     _setConstitution(governanceProxyAddress, json);
-    _transferOwnerShipCoreContact(governanceProxyAddress, json);
+    _transferOwnerShipCoreContract(governanceProxyAddress, json);
   }
 
-  function _transferOwnerShipCoreContact(address governanceAddress, string memory json) public {
+  function _transferOwnerShipCoreContract(address governanceAddress, string memory json) public {
     bool skipTransferOwnership = abi.decode(
       json.parseRaw(".governance.skipTransferOwnership"),
       (bool)
