@@ -51,6 +51,8 @@
     "devchain": "yarn ts-node scripts/devchain.ts",
     "devchain:reset": "yarn devchain generate-tar .tmp/devchain.tar.gz --upto 29",
     "anvil-devchain:start": "./scripts/foundry/create_and_migrate_anvil_devchain.sh",
+    "anvil-devchain:start-L2": "./scripts/foundry/load_and_migrate_l2_anvil_devchain.sh",
+    "anvil-devchain:check-is-running": "nc -z localhost 8546",
     "anvil-devchain:stop": "./scripts/foundry/stop_anvil.sh",
     "anvil-devchain:e2e-tests": "./scripts/foundry/run_e2e_tests_in_anvil.sh",
     "anvil-devchain:integration-tests": "./scripts/foundry/run_integration_tests_in_anvil.sh",
