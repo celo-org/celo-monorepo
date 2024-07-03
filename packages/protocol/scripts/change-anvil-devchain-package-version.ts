@@ -1,4 +1,5 @@
 import { replacePackageVersionAndMakePublic } from '@celo/protocol/scripts/utils'
+import * as child_process from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 import { DEVCHAIN_ANVIL_PACKAGE_SRC_DIR, TSCONFIG_PATH } from './consts'
@@ -16,13 +17,13 @@ try {
 
   prepareAnvilDevchainPackage()
 } finally {
-  // Cleanup
   log('Cleaning up')
+  child_process.execSync(`git checkout ${TSCONFIG_PATH}`, { stdio: 'inherit' })
 }
 
 function prepareAnvilDevchainPackage() {
   if (process.env.RELEASE_VERSION) {
-    log('Replacing @celo/contracts version with RELEASE_VERSION)')
+    log('Replacing @celo/devchain-anvil version with RELEASE_VERSION)')
 
     const packageJsonPath = path.join(DEVCHAIN_ANVIL_PACKAGE_SRC_DIR, 'package.json')
     replacePackageVersionAndMakePublic(packageJsonPath)

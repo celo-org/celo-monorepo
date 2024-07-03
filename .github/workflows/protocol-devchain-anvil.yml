@@ -156,7 +156,6 @@ jobs:
         env:
           RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
           RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-        # a safety check especially useful if some package is upgraded
       
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4
