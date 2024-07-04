@@ -34,8 +34,7 @@ export PROXY_ADMIN_ADDRESS='0x4200000000000000000000000000000000000018' # This a
 
 # Contract bytecode from the Foundry build artifacts
 export REGISTRY_BYTECODE=$(jq -r '.bytecode' build/contracts/Registry.json)
-export PROXY_DEPLOYED_BYTECODE=`cat ./out/Proxy.sol/Proxy.json | jq -r '.deployedBytecode.object'`
-# export PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode' build/contracts/Proxy.json)
+export PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode' build/contracts/Proxy.json)
 
 # Contract configurations
 export COMMUNITY_REWARD_FRACTION="100000000000000000000" # 0.01 in fixidity format
