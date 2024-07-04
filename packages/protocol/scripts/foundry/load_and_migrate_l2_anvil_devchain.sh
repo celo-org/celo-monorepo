@@ -8,6 +8,13 @@ source $PWD/scripts/foundry/constants.sh
 echo "Generating and running L1 devchain before activating L2..."
 source $PWD/scripts/foundry/create_and_migrate_anvil_devchain.sh
 
+# DEBUGGING
+# anvil \
+# --port $ANVIL_PORT \
+# --state $TMP_FOLDER/$DEVCHAIN_FILE_NAME \
+# --dump-state $ANVIL_FOLDER
+# DEBUGGING
+
 # In this instance, we're arbitrarily using the bytecode of Registry.sol, but we could have used any 
 # other arbitary bytecode.
 ARBITRARY_BYTECODE=$REGISTRY_BYTECODE
@@ -64,5 +71,6 @@ $L2_START_TIME $COMMUNITY_REWARD_FRACTION $CARBON_OFFSETTING_PARTNER $CARBON_OFF
 --gas-limit 10000000 \
 --rpc-url http://127.0.0.1:$ANVIL_PORT
 
-# Export L2 state to `l2-state.json`
-# TODO(Arthur): Check that I'm not mixing up state.json in `--dump-state $ANVIL_FOLDER`
+# Save and rename L2 devchain state
+# mv $ANVIL_FOLDER/state.json $TMP_FOLDER/l2-devchain.json
+# rm -rf $ANVIL_FOLDER
