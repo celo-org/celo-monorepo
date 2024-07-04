@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Read environment variables and constants
+source $PWD/scripts/foundry/constants.sh
+
 timestamp=`date -Iseconds`
-TMP_FOLDER="$PWD/.tmp"
-ANVIL_FOLDER="$TMP_FOLDER/devchain"
+
 mkdir -p $ANVIL_FOLDER
 echo "Anvil state will be saved to $ANVIL_FOLDER"
 

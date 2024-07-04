@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # Name of temporary directory
-TEMP_DIR_NAME=".tmp/libraries"
-TEMP_DIR="$PWD/$TEMP_DIR_NAME"
+# TEMP_DIR_NAME=".tmp/libraries"
+TEMP_DIR="$PWD/.tmp/libraries"
 
 # Create a temporary directory or remove it first it if exists
 if [ -d "$TEMP_DIR" ]; then
