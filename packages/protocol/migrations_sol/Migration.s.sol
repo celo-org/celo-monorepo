@@ -68,9 +68,7 @@ contract ForceTx {
 contract Migration is Script, UsingRegistry, Constants {
   using stdJson for string;
 
-  /**
-   * This is Anvil's default account
-   */
+  // This is Anvil's default account
   address constant deployerAccount = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
   IProxyFactory proxyFactory;
