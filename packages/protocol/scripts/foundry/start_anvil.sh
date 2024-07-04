@@ -20,7 +20,17 @@ if nc -z localhost $ANVIL_PORT; then
   echo "Killed previous Anvil"
 fi
 
-anvil --port $ANVIL_PORT --gas-limit 50000000 --steps-tracing --code-size-limit 245760 --balance 60000 --dump-state $ANVIL_FOLDER --state-interval 1 &
+# Start anvil
+anvil \
+--port $ANVIL_PORT \
+--dump-state $ANVIL_FOLDER \
+--state-interval $STATE_INTERVAL \
+--gas-limit $GAS_LIMIT \
+--code-size-limit $CODE_SIZE_LIMIT \
+--balance $BALANCE \
+--steps-tracing &
+# For context "&" tells the shell to start a command as a background process.
+# This allows you to continue executing other commands without waiting for the background command to finish.
 
 # alternatively:
 # ANVIL_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
@@ -28,7 +38,6 @@ anvil --port $ANVIL_PORT --gas-limit 50000000 --steps-tracing --code-size-limit 
 export ANVIL_PID=$!
 
 echo "Waiting Anvil to launch on $ANVIL_PORT..."
-
 
 while ! nc -z localhost $ANVIL_PORT; do
   sleep 0.1 # wait for 1/10 of the second before check again

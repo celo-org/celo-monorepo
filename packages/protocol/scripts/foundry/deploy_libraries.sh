@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Name of temporary directory
-# TEMP_DIR_NAME=".tmp/libraries"
-TEMP_DIR="$PWD/.tmp/libraries"
-
 # Create a temporary directory or remove it first it if exists
 if [ -d "$TEMP_DIR" ]; then
     echo "Removing existing temporary folder..."

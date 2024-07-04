@@ -35,26 +35,38 @@ time forge build $LIBRARY_FLAGS
 # Deploy precompile contracts
 source $PWD/scripts/foundry/deploy_precompiles.sh
 
+echo "Debugging $REGISTRY_ADDRESS ${PROXY_DEPLOYED_BYTECODE:0:10}"
+
 echo "Setting Registry Proxy"
+cast rpc anvil_setCode $REGISTRY_ADDRESS $PROXY_DEPLOYED_BYTECODE --rpc-url http://127.0.0.1:$ANVIL_PORT
 
+echo "Debugging"
 
-cast rpc anvil_setCode --rpc-url http://127.0.0.1:$ANVIL_PORT $REGISTRY_ADDRESS $PROXY_BYTECODE
-
-echo "Setting Registry owner"
 # Sets the storage of the registry so that it has an owner we control
-# position is bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1);
+echo "Setting Registry owner"
 cast rpc \
 anvil_setStorageAt \
-$REGISTRY_ADDRESS 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 "0x000000000000000000000000$REGISTRY_OWNER_ADDRESS" \
+$REGISTRY_ADDRESS $REGISTRY_STORAGE_LOCATION "0x000000000000000000000000$REGISTRY_OWNER_ADDRESS" \
 --rpc-url http://127.0.0.1:$ANVIL_PORT
 
-# run migrations
+# Run migrations
 echo "Running migration script... "
-time forge script migrations_sol/Migration.s.sol --tc Migration --rpc-url http://127.0.0.1:$ANVIL_PORT -vvv $BROADCAST --non-interactive --sender $FROM_ACCOUNT --unlocked $LIBRARY_FLAGS || echo "Migration script failed"
+forge script \
+$MIGRATION_SCRIPT_PATH \
+--target-contract $TARGET_CONTRACT \
+--sender $FROM_ACCOUNT \
+--unlocked \
+$VERBOSITY_LEVEL \
+$BROADCAST \
+$SKIP_SIMULATION \
+$NON_INTERACTIVE \
+$LIBRARY_FLAGS \
+--rpc-url http://127.0.0.1:$ANVIL_PORT || echo "Migration script failed"
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
 echo "Total elapsed time: $ELAPSED_TIME seconds"
+
 # Rename devchain artifact and remove unused directory
-mv $TMP_FOLDER/devchain/state.json $TMP_FOLDER/devchain.json
-rm -rf $TMP_FOLDER/devchain
+mv $ANVIL_FOLDER/state.json $TMP_FOLDER/$DEVCHAIN_FILE_NAME
+rm -rf $ANVIL_FOLDER
