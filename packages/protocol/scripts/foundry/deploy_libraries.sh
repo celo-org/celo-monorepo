@@ -12,14 +12,6 @@ fi
 mkdir $TEMP_DIR
 
 # Copy libraries to the directory
-LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
-                "contracts/common/Signatures.sol:Signatures"
-                "contracts/common/linkedlists/AddressLinkedList.sol:AddressLinkedList"
-                "contracts/common/linkedlists/AddressSortedLinkedList.sol:AddressSortedLinkedList"
-                "contracts/common/linkedlists/IntegerSortedLinkedList.sol:IntegerSortedLinkedList"
-                "contracts/governance/Proposals.sol:Proposals"
-)
-
 for LIB_PATH in "${LIBRARIES_PATH[@]}"; do
     IFS=":" read -r SOURCE DEST <<< "$LIB_PATH"
     DEST_FILE="$TEMP_DIR/$SOURCE"
@@ -29,23 +21,11 @@ for LIB_PATH in "${LIBRARIES_PATH[@]}"; do
     cp "$SOURCE" "$DEST_FILE"
 done
 
-# Copy dependencies of the libraries to the directory
-LIBRARY_DEPENDENCIES_PATH=(
-    "contracts/common/FixidityLib.sol"
-    "contracts/common/linkedlists/LinkedList.sol"
-    "contracts/common/linkedlists/SortedLinkedList.sol"
-    "contracts/common/linkedlists/SortedLinkedListWithMedian.sol"
-    "lib/openzeppelin-contracts/contracts/math/SafeMath.sol"
-    "lib/openzeppelin-contracts/contracts/math/Math.sol"
-    "lib/openzeppelin-contracts/contracts/cryptography/ECDSA.sol"   
-    "lib/openzeppelin-contracts/contracts/utils/Address.sol"
-    "lib/solidity-bytes-utils/contracts/BytesLib.sol"
-)
-
 # Creating two variables for better readability
 SOURCE_DIR=$PWD
 DEST_DIR=$TEMP_DIR
 
+# Copy dependencies of the libraries to the directory
 for LIB_PATH in "${LIBRARY_DEPENDENCIES_PATH[@]}"; do
     # Creates directory for the dependency, including any necessary parent directories
     mkdir -p $DEST_DIR/$(dirname $LIB_PATH)
