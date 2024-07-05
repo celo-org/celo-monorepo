@@ -8,12 +8,6 @@ source $PWD/scripts/foundry/constants.sh
 echo "Generating and running L1 devchain before activating L2..."
 source $PWD/scripts/foundry/create_and_migrate_anvil_devchain.sh
 
-# DEBUGGING
-# anvil \
-# --port $ANVIL_PORT \
-# --state $TMP_FOLDER/$DEVCHAIN_FILE_NAME \
-# --dump-state $ANVIL_FOLDER
-# DEBUGGING
 
 # In this instance, we're arbitrarily using the bytecode of Registry.sol, but we could have used any 
 # other arbitary bytecode.
