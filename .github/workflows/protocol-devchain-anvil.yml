@@ -125,13 +125,25 @@ jobs:
         shell: bash
         run: yarn
 
-      - name: Generate migrations and run devchain
+      - name: Generate L1 and L2 migrations
         if: success() || failure()
-        run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
-
-      - name: Run integration tests against local anvil devchain
+        run: ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
+          
+      # TODO(Arthur): Try to replace ${{ env.ANVIL_PORT }} with $ANVIL_PORT
+      - name: Run integration tests against L1 devchain
         if: success() || failure()
         run: |
+          source ./scripts/foundry/constants.sh
+          
+          anvil \
+          --port ${{ env.ANVIL_PORT }} \
+          --state $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME \
+          --state-interval $STATE_INTERVAL \
+          --gas-limit $GAS_LIMIT \
+          --code-size-limit $CODE_SIZE_LIMIT \
+          --balance $BALANCE \
+          --steps-tracing &
+
           forge test -vvv \
           --match-path "test-sol/integration/*" \
           --fork-url http://127.0.0.1:${{ env.ANVIL_PORT }}
