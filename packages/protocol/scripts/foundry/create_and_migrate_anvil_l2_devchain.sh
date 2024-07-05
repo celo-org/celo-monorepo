@@ -4,12 +4,9 @@ set -euo pipefail
 # Read environment variables and constants
 source $PWD/scripts/foundry/constants.sh
 
-# Generate and run L1 devchain
+# Generate L1 devchain
 echo "Generating and running L1 devchain before activating L2..."
 source $PWD/scripts/foundry/create_and_migrate_anvil_devchain.sh
-
-# Stop L1 devchain
-source $PWD/scripts/foundry/stop_anvil.sh
 
 # Duplicate L1 state
 cp $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME
