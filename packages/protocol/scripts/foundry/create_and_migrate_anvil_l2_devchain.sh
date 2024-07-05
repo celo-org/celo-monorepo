@@ -25,15 +25,14 @@ anvil \
 --balance $BALANCE \
 --steps-tracing &
 
+# Activate the L2 on the devchain by deploying arbitrary bytecode to the PROXY_ADMIN_ADDRESS
 # Arbitrarily using Registry.sol bytcode, but we could have used any 
 # other arbitary bytecode of length > 0. See `isL2()` implementation in IsL2Check.sol.
-ARBITRARY_BYTECODE=$REGISTRY_BYTECODE
-
-# Activate the L2 on the devchain by deploying arbitrary bytecode to the PROXY_ADMIN_ADDRESS
 echo "Activating L2 on the devchain..."
+REGISTRY_BYTECODE=$(jq -r '.bytecode' $PWD/build/contracts/Registry.json)
 cast rpc anvil_setCode \
 $PROXY_ADMIN_ADDRESS \
-$ARBITRARY_BYTECODE \
+$REGISTRY_BYTECODE \
 --rpc-url $ANVIL_RPC_URL
 
 # Fetch address of Celo distribution 

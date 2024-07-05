@@ -36,6 +36,7 @@ time forge build $LIBRARY_FLAGS
 source $PWD/scripts/foundry/deploy_precompiles.sh
 
 echo "Setting Registry Proxy"
+PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode' $PWD/build/contracts/Proxy.json)
 cast rpc anvil_setCode $REGISTRY_ADDRESS $PROXY_DEPLOYED_BYTECODE --rpc-url $ANVIL_RPC_URL
 
 # Sets the storage of the registry so that it has an owner we control
