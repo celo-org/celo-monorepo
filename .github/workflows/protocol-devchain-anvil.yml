@@ -120,14 +120,15 @@ jobs:
         run: |
           npm install --global yarn
           source ~/.bashrc
+      
+      # TODO(Arthur): Any reason we need to install NPM packages in this workflow? They take 5min or so to install
+      # - name: 'Install packages'
+      #   shell: bash
+      #   run: yarn
 
-      - name: 'Install packages'
-        shell: bash
-        run: yarn
+      # - name: Read constants
+      #   run: source ./scripts/foundry/constants.sh
 
-      - name: Read constants
-        run: source ./scripts/foundry/constants.sh
-        
       - name: Generate migrations and run devchain
         if: success() || failure()
         run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh

@@ -65,8 +65,8 @@ jobs:
       - name: Compile Contracts
         run: forge --version && forge compile
 
-      - name: Read constants
-        run: source ./scripts/foundry/constants.sh
+      # - name: Read constants
+        # run: source ./scripts/foundry/constants.sh
 
       - name: Run unit tests common
         # can't use gas limit because some setUp function use more than the limit
