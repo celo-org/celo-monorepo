@@ -272,7 +272,7 @@ contract GoldToken is
   /**
    * @return The address of the CeloTokenDistributionSchedule contract.
    */
-  function getCeloTokenDistributionSchedule() external view returns (address) {
+  function getCeloTokenDistributionScheduleAddress() external view returns (address) {
     return address(celoTokenDistributionSchedule);
   }
 

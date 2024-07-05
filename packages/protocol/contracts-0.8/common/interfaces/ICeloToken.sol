@@ -28,7 +28,10 @@ interface ICeloToken is IERC20 {
     address celoTokenDistributionScheduleAddress
   ) external;
 
-  function getCeloTokenDistributionSchedule() external returns (address);
+  /**
+   * @return The address of the CeloTokenDistributionSchedule contract.
+   */
+  function getCeloTokenDistributionScheduleAddress() external returns (address);
 
   /**
    * @dev Mints a new token.

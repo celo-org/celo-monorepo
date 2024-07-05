@@ -307,7 +307,6 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
   }
 
   function test_Reverts_WhenCeloDistributionAddressNotSetInCeloTokenContract() public {
-    //setUp
     vm.warp(block.timestamp + l2StartTime);
     vm.prank(celoDistributionOwner);
     celoDistributionSchedule = new CeloDistributionSchedule(true);
