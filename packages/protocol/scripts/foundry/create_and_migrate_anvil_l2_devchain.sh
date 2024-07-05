@@ -29,7 +29,7 @@ anvil \
 # Arbitrarily using Registry.sol bytcode, but we could have used any 
 # other arbitary bytecode of length > 0. See `isL2()` implementation in IsL2Check.sol.
 echo "Activating L2 on the devchain..."
-REGISTRY_BYTECODE=$(jq -r '.bytecode' $PWD/build/contracts/Registry.json)
+REGISTRY_BYTECODE=$(jq -r '.bytecode.object' ./out/Registry.sol/Registry.json)
 cast rpc anvil_setCode \
 $PROXY_ADMIN_ADDRESS \
 $REGISTRY_BYTECODE \
