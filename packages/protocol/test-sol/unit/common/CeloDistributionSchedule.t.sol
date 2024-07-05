@@ -223,6 +223,7 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
     celoDistributionSchedule = new CeloDistributionSchedule(true);
     celoDistributionSchedule.initialize(registryAddress);
     vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
+    celoToken.setCeloTokenDistributionScheduleAddress(address(celoDistributionSchedule));
     vm.expectRevert(
       "Value must be different from existing community reward fraction and less than 1."
     );
@@ -239,6 +240,7 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
     celoDistributionSchedule = new CeloDistributionSchedule(true);
     celoDistributionSchedule.initialize(registryAddress);
     vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
+    celoToken.setCeloTokenDistributionScheduleAddress(address(celoDistributionSchedule));
 
     vm.expectRevert("Partner cannot be the zero address.");
     celoDistributionSchedule.activate(
@@ -254,6 +256,7 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
     registry.setAddressFor("Governance", address(0));
     celoDistributionSchedule = new CeloDistributionSchedule(true);
     vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
+    celoToken.setCeloTokenDistributionScheduleAddress(address(celoDistributionSchedule));
     celoDistributionSchedule.initialize(registryAddress);
 
     vm.expectRevert("identifier has no registry entry");
@@ -295,6 +298,29 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
 
     vm.expectRevert("Contract does not have CELO balance.");
     vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.activate(
+      l2StartTime,
+      communityRewardFraction,
+      carbonOffsettingPartner,
+      carbonOffsettingFraction
+    );
+  }
+
+  function test_Reverts_WhenCeloDistributionAddressNotSetInCeloTokenContract() public {
+    //setUp
+    vm.warp(block.timestamp + l2StartTime);
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule = new CeloDistributionSchedule(true);
+
+    vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
+
+    vm.prank(celoDistributionOwner);
+    celoDistributionSchedule.initialize(registryAddress);
+
+    vm.expectRevert("CeloDistributionSchedule address has not been set in CELO token contract.");
+
+    vm.prank(celoDistributionOwner);
+
     celoDistributionSchedule.activate(
       l2StartTime,
       communityRewardFraction,

@@ -270,6 +270,13 @@ contract GoldToken is
   }
 
   /**
+   * @return The address of the CeloTokenDistributionSchedule contract.
+   */
+  function getCeloTokenDistributionSchedule() external view returns (address) {
+    return address(celoTokenDistributionSchedule);
+  }
+
+  /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return Storage version of the contract.
    * @return Major version of the contract.
