@@ -64,5 +64,5 @@ ELAPSED_TIME=$(($SECONDS - $START_TIME))
 echo "Total elapsed time: $ELAPSED_TIME seconds"
 
 # Rename devchain artifact and remove unused directory
-mv $ANVIL_FOLDER/state.json $TMP_FOLDER/$DEVCHAIN_FILE_NAME
+mv $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME
 rm -rf $ANVIL_FOLDER

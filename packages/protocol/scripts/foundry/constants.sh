@@ -23,7 +23,8 @@ export VERBOSITY_LEVEL="-vvv" # Pass multiple times to increase the verbosity (e
 export REGISTRY_OWNER_ADDRESS=$FROM_ACCOUNT_NO_ZERO
 
 # Foundry directories and file names
-export DEVCHAIN_FILE_NAME="devchain.json" # Name of the file that will be published to NPM
+export L1_DEVCHAIN_FILE_NAME="devchain.json" # Name of the file that will be published to NPM
+export L2_DEVCHAIN_FILE_NAME="l2-devchain.json" # Name of the file that will be published to NPM
 export TMP_FOLDER="$PWD/.tmp"
 export TEMP_DIR="$PWD/.tmp/libraries"
 export ANVIL_FOLDER="$TMP_FOLDER/devchain"
