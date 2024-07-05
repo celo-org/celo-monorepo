@@ -36,14 +36,14 @@ time forge build $LIBRARY_FLAGS
 source $PWD/scripts/foundry/deploy_precompiles.sh
 
 echo "Setting Registry Proxy"
-cast rpc anvil_setCode $REGISTRY_ADDRESS $PROXY_DEPLOYED_BYTECODE --rpc-url http://127.0.0.1:$ANVIL_PORT
+cast rpc anvil_setCode $REGISTRY_ADDRESS $PROXY_DEPLOYED_BYTECODE --rpc-url $ANVIL_RPC_URL
 
 # Sets the storage of the registry so that it has an owner we control
 echo "Setting Registry owner"
 cast rpc \
 anvil_setStorageAt \
 $REGISTRY_ADDRESS $REGISTRY_STORAGE_LOCATION "0x000000000000000000000000$REGISTRY_OWNER_ADDRESS" \
---rpc-url http://127.0.0.1:$ANVIL_PORT
+--rpc-url $ANVIL_RPC_URL
 
 # Run migrations
 echo "Running migration script... "
@@ -57,7 +57,7 @@ $BROADCAST \
 $SKIP_SIMULATION \
 $NON_INTERACTIVE \
 $LIBRARY_FLAGS \
---rpc-url http://127.0.0.1:$ANVIL_PORT || echo "Migration script failed"
+--rpc-url $ANVIL_RPC_URL || echo "Migration script failed"
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))

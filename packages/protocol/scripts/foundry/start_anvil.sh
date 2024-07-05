@@ -44,7 +44,7 @@ while ! nc -z localhost $ANVIL_PORT; do
 done
 
 # enabled logging
-cast rpc anvil_setLoggingEnabled true --rpc-url http://127.0.0.1:$ANVIL_PORT
+cast rpc anvil_setLoggingEnabled true --rpc-url $ANVIL_RPC_URL
 
 echo "Anvil launched"
 sleep 1

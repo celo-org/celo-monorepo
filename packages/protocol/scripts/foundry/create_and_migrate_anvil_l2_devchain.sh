@@ -34,7 +34,7 @@ echo "Activating L2 on the devchain..."
 cast rpc anvil_setCode \
 $PROXY_ADMIN_ADDRESS \
 $ARBITRARY_BYTECODE \
---rpc-url http://127.0.0.1:$ANVIL_PORT
+--rpc-url $ANVIL_RPC_URL
 
 # Fetch address of Celo distribution 
 CELO_DISTRIBUTION_SCHEDULE_ADDRESS=$(
@@ -42,11 +42,8 @@ CELO_DISTRIBUTION_SCHEDULE_ADDRESS=$(
   $REGISTRY_ADDRESS \
   "getAddressForStringOrDie(string calldata identifier)(address)" \
   "CeloDistributionSchedule" \
-  --rpc-url http://127.0.0.1:$ANVIL_PORT
+  --rpc-url $ANVIL_RPC_URL
 )
-
-# Arbitrary balance
-ARBITRARY_BALANCE='10000'
 
 # Set the balance of the CeloDistributionSchedule (like the Celo client would do during L2 genesis)
 # This cannot be done during the migrations, because CeloDistributionSchedule.sol does not
@@ -55,15 +52,15 @@ ARBITRARY_BALANCE='10000'
 echo "Setting CeloDistributionSchedule balance..."
 cast rpc \
 anvil_setBalance \
-$CELO_DISTRIBUTION_SCHEDULE_ADDRESS $ARBITRARY_BALANCE \
---rpc-url http://127.0.0.1:$ANVIL_PORT
+$CELO_DISTRIBUTION_SCHEDULE_ADDRESS $CELO_DISTRIBUTION_SCHEDULE_INITIAL_BALANCE \
+--rpc-url $ANVIL_RPC_URL
 
 # Fetch timestamp of the latest block
 LATEST_BLOCK_TIMESTAMP=$(
     cast block \
     latest \
     --field timestamp \
-    --rpc-url http://127.0.0.1:$ANVIL_PORT
+    --rpc-url $ANVIL_RPC_URL
 )
 
 # Arbitrarily set L2 start time at 5 seconds before the latest block. The L2 start time can be any 
@@ -79,7 +76,7 @@ $L2_START_TIME $COMMUNITY_REWARD_FRACTION $CARBON_OFFSETTING_PARTNER $CARBON_OFF
 --from $FROM_ACCOUNT \
 --private-key $FROM_ACCOUNT_PRIVATE_KEY \
 --gas-limit 10000000 \
---rpc-url http://127.0.0.1:$ANVIL_PORT
+--rpc-url $ANVIL_RPC_URL
 
 # Save and rename L2 devchain state
 # mv $ANVIL_FOLDER/$L2_DEVCHAIN_FILE_NAME $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME
