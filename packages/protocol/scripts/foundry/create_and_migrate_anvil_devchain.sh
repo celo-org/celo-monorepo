@@ -35,12 +35,8 @@ time forge build $LIBRARY_FLAGS
 # Deploy precompile contracts
 source $PWD/scripts/foundry/deploy_precompiles.sh
 
-echo "Debugging $REGISTRY_ADDRESS ${PROXY_DEPLOYED_BYTECODE:0:10}"
-
 echo "Setting Registry Proxy"
 cast rpc anvil_setCode $REGISTRY_ADDRESS $PROXY_DEPLOYED_BYTECODE --rpc-url http://127.0.0.1:$ANVIL_PORT
-
-echo "Debugging"
 
 # Sets the storage of the registry so that it has an owner we control
 echo "Setting Registry owner"
