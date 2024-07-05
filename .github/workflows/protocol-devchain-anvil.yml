@@ -125,6 +125,9 @@ jobs:
         shell: bash
         run: yarn
 
+      - name: Read constants
+        run: source ./scripts/foundry/constants.sh
+        
       - name: Generate migrations and run devchain
         if: success() || failure()
         run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh

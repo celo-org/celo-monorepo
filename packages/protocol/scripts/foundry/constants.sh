@@ -35,6 +35,7 @@ export PROXY_ADMIN_ADDRESS='0x4200000000000000000000000000000000000018' # This a
 
 # Contract bytecode (from Foundry artifacts)
 export REGISTRY_BYTECODE=$(jq -r '.bytecode' $PWD/build/contracts/Registry.json)
+echo "DEBUGGING REGISTRY_BYTECODE: ${REGISTRY_BYTECODE:0:10}"
 export PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode' $PWD/build/contracts/Proxy.json)
 
 # Contract configurations
