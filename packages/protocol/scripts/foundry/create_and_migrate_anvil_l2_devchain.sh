@@ -8,9 +8,25 @@ source $PWD/scripts/foundry/constants.sh
 echo "Generating and running L1 devchain before activating L2..."
 source $PWD/scripts/foundry/create_and_migrate_anvil_devchain.sh
 
+# Stop L1 devchain
+source $PWD/scripts/foundry/stop_anvil.sh
 
-# In this instance, we're arbitrarily using the bytecode of Registry.sol, but we could have used any 
-# other arbitary bytecode.
+# Duplicate L1 state
+cp $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME
+
+# Start L2 devchain from L1 state and apply L2 migrations
+echo "Anvil L2 state will be saved to $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME"
+anvil \
+--port $ANVIL_PORT \
+--state $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME \
+--state-interval $STATE_INTERVAL \
+--gas-limit $GAS_LIMIT \
+--code-size-limit $CODE_SIZE_LIMIT \
+--balance $BALANCE \
+--steps-tracing &
+
+# Arbitrarily using Registry.sol bytcode, but we could have used any 
+# other arbitary bytecode of length > 0. See `isL2()` implementation in IsL2Check.sol.
 ARBITRARY_BYTECODE=$REGISTRY_BYTECODE
 
 # Activate the L2 on the devchain by deploying arbitrary bytecode to the PROXY_ADMIN_ADDRESS
@@ -66,5 +82,5 @@ $L2_START_TIME $COMMUNITY_REWARD_FRACTION $CARBON_OFFSETTING_PARTNER $CARBON_OFF
 --rpc-url http://127.0.0.1:$ANVIL_PORT
 
 # Save and rename L2 devchain state
-# mv $ANVIL_FOLDER/state.json $TMP_FOLDER/l2-devchain.json
+# mv $ANVIL_FOLDER/$L2_DEVCHAIN_FILE_NAME $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME
 # rm -rf $ANVIL_FOLDER
