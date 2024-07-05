@@ -53,7 +53,6 @@ import "@celo-contracts-8/common/interfaces/ICeloDistributionScheduleInitializer
 import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/UsingRegistry.sol";
 
-
 contract ForceTx {
   // event to trigger so a tx can be processed
   event VanillaEvent(string);
