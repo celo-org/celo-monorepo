@@ -124,15 +124,22 @@ jobs:
         shell: bash
         run: yarn
 
+      # `lsof` is not readily available on CI, but is required by `create_and_migrate_anvil_l2_devchain.sh`,
+      # which uses `stop_anvil.sh` to kill existing anvil servers.
+      - name: Install lsof
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lsof
+
       - name: Generate L1 and L2 migrations
         if: success() || failure()
         run: ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
-          
+
       - name: Run integration tests against L1 devchain
         if: success() || failure()
         run: |
           source ./scripts/foundry/constants.sh
-          
+
           anvil \
           --port $ANVIL_PORT \
           --state $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME \
