@@ -33,9 +33,9 @@ export ANVIL_FOLDER="$TMP_FOLDER/devchain"
 export REGISTRY_ADDRESS="0x000000000000000000000000000000000000ce10"
 export PROXY_ADMIN_ADDRESS='0x4200000000000000000000000000000000000018' # This address is defined in `IsL2Check.sol`
 
-# Contract bytecode from the Foundry build artifacts
-export REGISTRY_BYTECODE=$(jq -r '.bytecode' build/contracts/Registry.json)
-export PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode' build/contracts/Proxy.json)
+# Contract bytecode (from Foundry artifacts)
+export REGISTRY_BYTECODE=$(jq -r '.bytecode' $PWD/build/contracts/Registry.json)
+export PROXY_DEPLOYED_BYTECODE=$(jq -r '.deployedBytecode' $PWD/build/contracts/Proxy.json)
 
 # Contract configurations
 export COMMUNITY_REWARD_FRACTION="100000000000000000000" # 0.01 in fixidity format
