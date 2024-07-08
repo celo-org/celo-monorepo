@@ -141,7 +141,7 @@ jobs:
           source ./scripts/foundry/constants.sh
 
           anvil \
-          --port $ANVIL_PORT \
+          --port 8547 \
           --state $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME \
           --state-interval $STATE_INTERVAL \
           --gas-limit $GAS_LIMIT \
@@ -151,7 +151,7 @@ jobs:
 
           forge test -vvv \
           --match-path "test-sol/integration/*" \
-          --fork-url $ANVIL_RPC_URL
+          --fork-url http://127.0.0.1:8547
 
       - name: Sanitize ref name
         id: sanitize-ref-name
