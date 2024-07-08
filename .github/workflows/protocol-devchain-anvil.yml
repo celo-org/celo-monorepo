@@ -123,39 +123,31 @@ jobs:
       - name: 'Install packages'
         shell: bash
         run: yarn
-          
+      
+      # Starting L1 from scratch instead of JSON state to circumvent this Anvil bug https://github.com/foundry-rs/foundry/issues/7502
       # Install `lsof` dependency, because it's not readily available on CI, but is required by 
       # `create_and_migrate_anvil_l2_devchain.sh`, because it uses `stop_anvil.sh` to kill 
       # existing anvil servers.
-      - name: Generate L1 and L2 migrations
+      - name: Run integration tests against L1 devchain
         if: success() || failure()
         run: |
           sudo apt-get update
           sudo apt-get install -y lsof
-          
-          ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
 
-          ./scripts/foundry/stop_anvil.sh
-
-      - name: Run integration tests against L1 devchain
-        if: success() || failure()
-        run: |
           source ./scripts/foundry/constants.sh
 
-          echo "Starting L1 from JSON state"
-          
-          anvil \
-          --port $ANVIL_PORT \
-          --state $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME \
-          --state-interval $STATE_INTERVAL \
-          --gas-limit $GAS_LIMIT \
-          --code-size-limit $CODE_SIZE_LIMIT \
-          --balance $BALANCE \
-          --steps-tracing &
+          echo "Starting L1 from scratch to circumvent Anvil bug"
+          source ./scripts/foundry/create_and_migrate_anvil_devchain.sh
 
           forge test -vvv \
           --match-path "test-sol/integration/*" \
           --fork-url $ANVIL_RPC_URL
+
+          ./scripts/foundry/stop_anvil.sh
+          
+      - name: Generate L1 and L2 migrations
+        if: success() || failure()
+        run: ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
 
       - name: Sanitize ref name
         id: sanitize-ref-name
