@@ -7,6 +7,6 @@ set -euo pipefail
 source $PWD/scripts/foundry/constants.sh
 
 if nc -z localhost $ANVIL_PORT; then
-  kill $(lsof -i tcp:$ANVIL_PORT | tail -n 1 | awk '{print $2}')
+  kill $(lsof -t -i:$ANVIL_PORT)
   echo "Killed Anvil"
 fi

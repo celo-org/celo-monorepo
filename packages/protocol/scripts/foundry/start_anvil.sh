@@ -16,7 +16,7 @@ cp $PWD/migrations_sol/README.md $TMP_FOLDER/README.md
 
 if nc -z localhost $ANVIL_PORT; then
   echo "Port already used"
-  kill $(lsof -i tcp:$ANVIL_PORT | tail -n 1 | awk '{print $2}')
+  kill $(lsof -t -i:$ANVIL_PORT)
   echo "Killed previous Anvil"
 fi
 
