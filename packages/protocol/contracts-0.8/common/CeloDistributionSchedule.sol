@@ -74,7 +74,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
     require(block.timestamp > _l2StartTime, "L2 start time cannot be set to a future date.");
     ICeloToken celoToken = ICeloToken(address(getCeloToken()));
     require(
-      celoToken.getCeloTokenDistributionScheduleAddress() != address(0),
+      celoToken.getCeloTokenDistributionScheduleAddress() == address(this),
       "CeloDistributionSchedule address has not been set in CELO token contract."
     );
     areDependenciesSet = true;
