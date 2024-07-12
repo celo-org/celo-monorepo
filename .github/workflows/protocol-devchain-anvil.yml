@@ -128,7 +128,7 @@ jobs:
       # Install `lsof` dependency, because it's not readily available on CI, but is required by 
       # `create_and_migrate_anvil_l2_devchain.sh`, because it uses `stop_anvil.sh` to kill 
       # existing anvil servers.
-      - name: Run integration tests against L1 devchain
+      - name: Generate L1 migrations and run integration tests against L1 devchain
         if: success() || failure()
         run: |
           sudo apt-get update
