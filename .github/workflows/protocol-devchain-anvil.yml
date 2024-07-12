@@ -145,7 +145,7 @@ jobs:
 
           ./scripts/foundry/stop_anvil.sh
           
-      - name: Generate L1 and L2 migrations
+      - name: Generate L2 migration
         if: success() || failure()
         run: ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
 
