@@ -38,7 +38,9 @@ export COMMUNITY_REWARD_FRACTION="100000000000000000000" # 0.01 in fixidity form
 export CARBON_OFFSETTING_PARTNER="0x22579CA45eE22E2E16dDF72D955D6cf4c767B0eF"
 export CARBON_OFFSETTING_FRACTION="10000000000000000000" # 0.001 in fixidity format
 export REGISTRY_STORAGE_LOCATION="0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103" # Position is bytes32(uint256(keccak256("eip1967.proxy.admin")) - 1);
-export CELO_DISTRIBUTION_SCHEDULE_INITIAL_BALANCE="700000000" # Arbitrary amount chosen to be approximately equal to `GoldToken.totalSupply()` on the L1 Mainnet (695,313,643 CELO as of this commit). During the real L2 genesis, the VM will calculate and set an appropriate balance.
+GOLD_TOKEN_CELO_SUPPLY_CAP=1000000000 # `GoldToken.CELO_SUPPLY_CAP()`
+GOLD_TOKEN_TOTAL_SUPPLY=700000000 # Arbitrary amount chosen to be approximately equal to `GoldToken.totalSupply()` on the L1 Mainnet (695,313,643 CELO as of this commit).
+export CELO_DISTRIBUTION_SCHEDULE_INITIAL_BALANCE="$(($GOLD_TOKEN_CELO_SUPPLY_CAP - $GOLD_TOKEN_TOTAL_SUPPLY))" # During the real L2 genesis, the VM will calculate and set an appropriate balance.
 
 # Contract libraries
 export LIBRARIES_PATH=("contracts/common/linkedlists/AddressSortedLinkedListWithMedian.sol:AddressSortedLinkedListWithMedian"
