@@ -4,14 +4,14 @@ pragma solidity >=0.8.7 <0.8.20;
 import { Test } from "forge-std-8/Test.sol";
 import "forge-std-8/console2.sol";
 
+import { TestConstants } from "@test-sol/constants.sol";
 import { MigrationsConstants } from "@migrations-sol/constants.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
 
-contract IntegrationTest is Test {
-  address constant registryAddress = address(0x000000000000000000000000000000000000ce10);
-  IRegistry registry = IRegistry(registryAddress);
+contract IntegrationTest is Test, TestConstants {
+  IRegistry registry = IRegistry(REGISTRY_ADDRESS);
 
   function setUp() public {}
 
