@@ -19,14 +19,14 @@ import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/governance/Governance.sol";
 
 import "@celo-contracts/governance/test/ValidatorsMock.sol";
-import "@test-sol/constants.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
 import { Utils } from "@test-sol/utils.sol";
 import { Test as ForgeTest } from "forge-std/Test.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 import "@test-sol/unit/governance/voting/mocks/ReleaseGoldMockTunnel.sol";
 
-contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
+contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils {
   using FixidityLib for FixidityLib.Fraction;
 
   address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;

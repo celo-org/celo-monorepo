@@ -11,7 +11,7 @@ import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
 import "@celo-contracts/identity/test/MockRandom.sol";
 import "@celo-contracts/common/Freezer.sol";
-import { Constants } from "@test-sol/constants.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 import "@test-sol/utils.sol";
 
 contract ElectionMock is Election(true) {
@@ -25,7 +25,7 @@ contract ElectionMock is Election(true) {
   }
 }
 
-contract ElectionTest is Utils, Constants {
+contract ElectionTest is Utils, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
   address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;

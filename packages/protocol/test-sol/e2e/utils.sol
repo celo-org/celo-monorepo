@@ -8,9 +8,9 @@ import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 
-import { Constants } from "@test-sol/constants.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 
-contract Devchain is UsingRegistry, Constants {
+contract Devchain is UsingRegistry, TestConstants {
   // Used in exceptional circumstances when a contract is not in UsingRegistry.sol
   IRegistry devchainRegistry = IRegistry(REGISTRY_ADDRESS);
 

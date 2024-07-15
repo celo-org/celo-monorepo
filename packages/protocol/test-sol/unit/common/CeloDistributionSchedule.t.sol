@@ -9,11 +9,11 @@ import "@celo-contracts-8/common/interfaces/ICeloToken.sol";
 import "@celo-contracts/governance/interfaces/IGovernance.sol";
 import "@celo-contracts-8/common/CeloDistributionSchedule.sol";
 import "@celo-contracts-8/common/IsL2Check.sol";
-import { Constants } from "@test-sol/constants.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 
 import "@test-sol/unit/governance/mock/MockGovernance.sol";
 
-contract CeloDistributionScheduleTest is Test, Constants, IsL2Check {
+contract CeloDistributionScheduleTest is Test, TestConstants, IsL2Check {
   using FixidityLib for FixidityLib.Fraction;
 
   IRegistry registry;

@@ -13,10 +13,10 @@ import { MockSortedOracles } from "@celo-contracts/stability/test/MockSortedOrac
 import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.sol";
 import { GoldTokenMock } from "@test-sol/unit/common/GoldTokenMock.sol";
 
-import { Constants } from "@test-sol/constants.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
 
-contract EpochRewardsTest is Test, Constants, Utils {
+contract EpochRewardsTest is Test, TestConstants, Utils {
   uint256 constant targetVotingYieldParamsInitial = 0.00016e24; // 0.00016
   uint256 constant targetVotingYieldParamsMax = 0.0005e24; // 0.0005
   uint256 constant targetVotingYieldParamsAdjustmentFactor = 1127990000000000000; // 0.00000112799
