@@ -1166,7 +1166,6 @@ contract Validators is
    * @param signer The validator signer of the validator whose score needs updating.
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
    * @dev new_score = uptime ** exponent * adjustmentSpeed + old_score * (1 - adjustmentSpeed)
-   * @return True upon success.
    */
   function _updateValidatorScoreFromSigner(address signer, uint256 uptime) internal {
     address account = getAccounts().signerToAccount(signer);
