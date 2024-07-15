@@ -2,6 +2,7 @@
 pragma solidity >=0.5.13 <0.8.20;
 
 contract Constants {
+  // Units
   uint256 public constant FIXED1 = 1e24;
   uint256 public constant MINUTE = 60;
   uint256 public constant HOUR = 60 * MINUTE;
@@ -10,7 +11,7 @@ contract Constants {
   uint256 constant WEEK = 7 * DAY;
   uint256 public constant YEAR = 365 * DAY;
 
-  // contract names
+  // Contract names
   string constant ElectionContract = "Election";
   string constant SortedOraclesContract = "SortedOracles";
   string constant StableTokenContract = "StableToken";
