@@ -269,7 +269,7 @@ contract Governance is
     lastDequeue = now;
   }
 
-  function() external payable {
+  receive() external payable {
     require(msg.data.length == 0, "unknown method");
   }
 

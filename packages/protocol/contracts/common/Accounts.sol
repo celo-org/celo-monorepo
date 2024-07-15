@@ -1,15 +1,16 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "./interfaces/IAccounts.sol";
 
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/Signatures.sol";
-import "../common/UsingRegistry.sol";
+import "../../contracts-0.8/common/Signatures.sol";
+import "../../contracts-0.8/common/UsingRegistry.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";
 
