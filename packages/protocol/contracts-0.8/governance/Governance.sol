@@ -1,21 +1,22 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/utils/Address.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/Address.sol";
 
-import "./interfaces/IGovernance.sol";
+
+import "../../contracts/governance/interfaces/IGovernance.sol";
 import "./Proposals.sol";
-import "../common/interfaces/IAccounts.sol";
-import "../common/ExtractFunctionSignature.sol";
-import "../common/Initializable.sol";
-import "../common/FixidityLib.sol";
-import "../common/linkedlists/IntegerSortedLinkedList.sol";
+import "../../contracts/common/interfaces/IAccounts.sol";
+import "../../contracts/common/ExtractFunctionSignature.sol";
+import "../../contracts/common/Initializable.sol";
+import "../../contracts/common/FixidityLib.sol";
+import "../../contracts/common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
-import "../common/UsingPrecompiles.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/libraries/ReentrancyGuard.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.

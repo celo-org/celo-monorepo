@@ -1,10 +1,11 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/utils/Address.sol";
-import "solidity-bytes-utils/contracts/BytesLib.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/Address.sol";
 
-import "../common/FixidityLib.sol";
+
+import "../../contracts/common/FixidityLib.sol";
 
 /**
  * @title A library operating on Celo Governance proposals.
@@ -87,7 +88,7 @@ library Proposals {
     proposal.proposer = proposer;
     proposal.deposit = deposit;
     // solhint-disable-next-line not-rely-on-time
-    proposal.timestamp = now;
+    proposal.timestamp = block.timestamp;
 
     uint256 dataPosition = 0;
     delete proposal.transactions;
@@ -346,7 +347,7 @@ library Proposals {
       let x := mload(0x40) // "Allocate" memory for output (0x40 is where "free memory" pointer is stored by convention)
       let d := add(data, 32) // First 32 bytes are the padded length of data, so exclude that
       result := call(
-        sub(gas, 34710), // 34710 is the value that solidity is currently emitting
+        sub(gas(), 34710), // 34710 is the value that solidity is currently emitting
         // It includes callGas (700) + callVeryLow (3, to pay for SUB) + callValueTransferGas (9000) +
         // callNewAccountGas (25000, in case the destination address does not exist and needs creating)
         destination,
