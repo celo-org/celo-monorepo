@@ -1,8 +1,16 @@
 import { execSync } from 'child_process'
+import * as fs from 'fs'
 import { SemVer } from 'semver'
 
 const DAILY_RELEASE_TAG = 'canary'
 const WORKING_RELEASE_BRANCH_PREFIX = 'release/core-contracts/'
+
+export type Exports = Record<
+  string,
+  { import?: string; require?: string; types?: string; default?: string }
+>
+
+export type JSON = Record<string, string | boolean | Exports>
 
 export const determineNextVersion = (
   gitTag: string,
@@ -77,4 +85,26 @@ export function getVersionFromGitTag(matchedTag: RegExpMatchArray) {
 
 export function getReleaseTypeFromSemVer(version: SemVer): string | number {
   return version.prerelease.length ? version.prerelease[0] : 'latest'
+}
+
+export function replacePackageVersionAndMakePublic(
+  packageJsonPath: string,
+  onDone?: (json: JSON) => void
+) {
+  const json: JSON = JSON.parse(fs.readFileSync(packageJsonPath).toString())
+
+  if (process.env.RELEASE_VERSION) {
+    console.info(`Replacing ${json.name as string} version with provided RELEASE_VERSION`)
+
+    json.version = process.env.RELEASE_VERSION
+    json.private = false
+  } else {
+    console.info('No RELEASE_VERSION provided')
+  }
+
+  if (onDone !== undefined) {
+    onDone(json)
+  }
+
+  fs.writeFileSync(packageJsonPath, JSON.stringify(json, null, 2))
 }

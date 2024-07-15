@@ -20,7 +20,8 @@ on:
 env:
   # Increment these to force cache rebuilding
   FOUNDRY_CACHE_KEY: 1
-  ANVIL_PORT: 8546
+  # Supported Foundry version defined at celo-org (GitHub organisation) level, for consistency across workflows.
+  SUPPORTED_FOUNDRY_VERSION: ${{ vars.SUPPORTED_FOUNDRY_VERSION }}
 
 jobs:
   build:
@@ -46,13 +47,13 @@ jobs:
           fi
       - name: Foundry cache
         id: foundry-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./cache
           key: ${{ runner.os }}-foundry-cache-${{ env.FOUNDRY_CACHE_KEY }}
       - name: Foundry out
         id: foundry-out
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./out
           key: ${{ runner.os }}-foundry-out-${{ env.FOUNDRY_CACHE_KEY }}
@@ -91,7 +92,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: 'nightly-f625d0fa7c51e65b4bf1e8f7931cd1c6e2e285e9'
+          version: ${{ env.SUPPORTED_FOUNDRY_VERSION }}
 
       - name: Install forge dependencies
         run: forge install
@@ -122,17 +123,31 @@ jobs:
       - name: 'Install packages'
         shell: bash
         run: yarn
-
-      - name: Generate migrations and run devchain
-        if: success() || failure()
-        run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
-
-      - name: Run integration tests against local anvil devchain
+      
+      # Starting L1 from scratch instead of JSON state to circumvent this Anvil bug https://github.com/foundry-rs/foundry/issues/7502
+      # Install `lsof` dependency, because it's not readily available on CI, but is required by 
+      # `create_and_migrate_anvil_l2_devchain.sh`, because it uses `stop_anvil.sh` to kill 
+      # existing anvil servers.
+      - name: Generate L1 migrations and run integration tests against L1 devchain
         if: success() || failure()
         run: |
+          sudo apt-get update
+          sudo apt-get install -y lsof
+
+          source ./scripts/foundry/constants.sh
+
+          echo "Starting L1 from scratch to circumvent Anvil bug"
+          source ./scripts/foundry/create_and_migrate_anvil_devchain.sh
+
           forge test -vvv \
           --match-path "test-sol/integration/*" \
-          --fork-url http://127.0.0.1:${{ env.ANVIL_PORT }}
+          --fork-url $ANVIL_RPC_URL
+
+          ./scripts/foundry/stop_anvil.sh
+          
+      - name: Generate L2 migration
+        if: success() || failure()
+        run: ./scripts/foundry/create_and_migrate_anvil_l2_devchain.sh
 
       - name: Sanitize ref name
         id: sanitize-ref-name
@@ -148,6 +163,14 @@ jobs:
         env:
           GITHUB_TAG: ${{ github.ref_name }}
           NPM_PACKAGE: '@celo/devchain-anvil'
+          NPM_TAG: ${{ inputs.npm_tag }}
+
+      - name: Prepare package for publishing
+        run: yarn prepare_devchain_anvil_publishing
+        working-directory: packages/protocol
+        env:
+          RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
 
       - name: Upload devchain as artifact
         uses: actions/upload-artifact@v4

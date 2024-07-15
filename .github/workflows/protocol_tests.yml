@@ -12,7 +12,8 @@ on:
 env:
   # Increment these to force cache rebuilding
   FOUNDRY_CACHE_KEY: 2
-  ANVIL_PORT: 8546
+  # Supported Foundry version defined at celo-org (GitHub organisation) level, for consistency across workflows.
+  SUPPORTED_FOUNDRY_VERSION: ${{ vars.SUPPORTED_FOUNDRY_VERSION }}
 
 jobs:
   check:
@@ -53,7 +54,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: "nightly-f625d0fa7c51e65b4bf1e8f7931cd1c6e2e285e9"
+          version: ${{ env.SUPPORTED_FOUNDRY_VERSION }}
 
       - name: Install forge dependencies
         run: forge install
@@ -127,13 +128,17 @@ jobs:
       - name: Run integration tests against local anvil devchain
         if: success() || failure()
         run: |
+          source ./scripts/foundry/constants.sh
+
           forge test -vvv \
           --match-path "test-sol/integration/*" \
-          --fork-url http://127.0.0.1:${{ env.ANVIL_PORT }}
+          --fork-url $ANVIL_RPC_URL
       
       - name: Run e2e tests against local anvil devchain
         if: success() || failure()
         run: |
+          source ./scripts/foundry/constants.sh
+
           forge test -vvv \
           --match-path "test-sol/e2e/*" \
-          --fork-url http://127.0.0.1:${{ env.ANVIL_PORT }}
+          --fork-url $ANVIL_RPC_URL

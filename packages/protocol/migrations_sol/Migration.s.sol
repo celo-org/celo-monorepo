@@ -4,16 +4,29 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import { Script } from "forge-std-8/Script.sol";
 
+// Foundry imports
 import "forge-std/console.sol";
 import "forge-std/StdJson.sol";
 
-import "@celo-contracts/common/interfaces/IProxyFactory.sol";
+// Helper contract imports
+import "@migrations-sol/HelperInterFaces.sol";
+import { Constants } from "@migrations-sol/constants.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
 
-// Initializer of the core contracts
+// Core contract imports on Solidity 0.5
+import "@celo-contracts/common/interfaces/IProxy.sol";
+import "@celo-contracts/common/interfaces/IProxyFactory.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IRegistryInitializer.sol";
+import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/common/interfaces/IFreezerInitializer.sol";
-import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectoryInitializer.sol";
 import "@celo-contracts/common/interfaces/ICeloTokenInitializer.sol";
+import "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
+import "@celo-contracts/common/interfaces/IFeeHandlerSellerInitializer.sol";
+import "@celo-contracts/common/interfaces/IFeeHandler.sol";
+import "@celo-contracts/common/interfaces/IFeeHandlerInitializer.sol";
+import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+import "@celo-contracts/common/interfaces/IAccounts.sol";
 import "@celo-contracts/governance/interfaces/ILockedGoldInitializer.sol";
 import "@celo-contracts/governance/interfaces/IValidatorsInitializer.sol";
 import "@celo-contracts/governance/interfaces/IElectionInitializer.sol";
@@ -24,33 +37,21 @@ import "@celo-contracts/governance/interfaces/IDoubleSigningSlasherInitializer.s
 import "@celo-contracts/governance/interfaces/IDowntimeSlasherInitializer.sol";
 import "@celo-contracts/governance/interfaces/IGovernanceApproverMultiSigInitializer.sol";
 import "@celo-contracts/governance/interfaces/IGovernanceInitializer.sol";
-import "@celo-contracts/common/interfaces/IAccountsInitializer.sol";
-import "@celo-contracts/common/interfaces/IFeeHandlerSellerInitializer.sol";
-import "@celo-contracts/common/interfaces/IFeeHandlerInitializer.sol";
+import "@celo-contracts/governance/interfaces/ILockedGold.sol";
+import "@celo-contracts/governance/interfaces/IGovernance.sol";
 import "@celo-contracts/identity/interfaces/IRandomInitializer.sol";
 import "@celo-contracts/identity/interfaces/IEscrowInitializer.sol";
 import "@celo-contracts/identity/interfaces/IOdisPaymentsInitializer.sol";
 import "@celo-contracts/identity/interfaces/IFederatedAttestationsInitializer.sol";
 import "@celo-contracts/stability/interfaces/ISortedOraclesInitializer.sol";
-import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
-import "@celo-contracts-8/common/interfaces/ICeloDistributionScheduleInitializer.sol";
-
-import "@celo-contracts/common/interfaces/IProxy.sol";
-import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts/common/interfaces/IFreezer.sol";
-import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
-import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
-import "@celo-contracts/common/interfaces/IAccounts.sol";
-import "@celo-contracts/governance/interfaces/ILockedGold.sol";
-import "@celo-contracts/governance/interfaces/IGovernance.sol";
-import "@celo-contracts/common/interfaces/IFeeHandler.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 
-import "@migrations-sol/HelperInterFaces.sol";
-import "@openzeppelin/contracts8/utils/math/Math.sol";
+// Core contract imports on Solidity 0.8
+import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectoryInitializer.sol";
+import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
+import "@celo-contracts-8/common/interfaces/ICeloDistributionScheduleInitializer.sol";
+import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/UsingRegistry.sol";
-
-import { Constants } from "@migrations-sol/constants.sol";
 
 contract ForceTx {
   // event to trigger so a tx can be processed
@@ -66,9 +67,7 @@ contract ForceTx {
 contract Migration is Script, UsingRegistry, Constants {
   using stdJson for string;
 
-  /**
-   * This is Anvil's default account
-   */
+  // This is Anvil's default account
   address constant deployerAccount = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
   IProxyFactory proxyFactory;
@@ -980,10 +979,10 @@ contract Migration is Script, UsingRegistry, Constants {
     );
 
     _setConstitution(governanceProxyAddress, json);
-    _transferOwnerShipCoreContact(governanceProxyAddress, json);
+    _transferOwnerShipCoreContract(governanceProxyAddress, json);
   }
 
-  function _transferOwnerShipCoreContact(address governanceAddress, string memory json) public {
+  function _transferOwnerShipCoreContract(address governanceAddress, string memory json) public {
     bool skipTransferOwnership = abi.decode(
       json.parseRaw(".governance.skipTransferOwnership"),
       (bool)

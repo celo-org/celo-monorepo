@@ -1,3 +1,4 @@
+import { Exports, replacePackageVersionAndMakePublic } from '@celo/protocol/scripts/utils'
 import * as child_process from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -116,11 +117,6 @@ function createIndex() {
   fs.writeFileSync(path.join(ABIS_BUILD_DIR, 'index.ts'), reExports.join('\n'))
 }
 
-type Exports = Record<
-  string,
-  { import?: string; require?: string; types?: string; default?: string }
->
-
 // Helper functions
 function prepareTargetTypesExports() {
   const exports: Exports = {}
@@ -238,38 +234,22 @@ function processRawJsonsAndPrepareExports() {
   return exports
 }
 
-type JSON = Record<string, string | boolean | Exports>
-
-function replacePackageVersionAndMakePublic(
-  packageJsonPath: string,
-  onDone?: (json: JSON) => void
-) {
-  const json: JSON = JSON.parse(fs.readFileSync(packageJsonPath).toString())
-
-  if (process.env.RELEASE_VERSION) {
-    log(`Replacing ${json.name as string} version with provided RELEASE_VERSION`)
-
-    json.version = process.env.RELEASE_VERSION
-    json.private = false
-  } else {
-    log('No RELEASE_VERSION provided')
-  }
-
-  if (onDone !== undefined) {
-    onDone(json)
-  }
-
-  fs.writeFileSync(packageJsonPath, JSON.stringify(json, null, 2))
-}
-
 function prepareAbisPackageJson(exports: Exports) {
   log('Preparing @celo/abis package.json')
   const packageJsonPath = path.join(ABIS_PACKAGE_SRC_DIR, 'package.json')
 
-  replacePackageVersionAndMakePublic(packageJsonPath, (json) => {
-    log('Setting @celo/abis exports')
-    json.exports = exports
-  })
+  if (process.env.RELEASE_VERSION) {
+    log('Replacing @celo/abis version with RELEASE_VERSION)')
+
+    replacePackageVersionAndMakePublic(packageJsonPath, (json) => {
+      log('Setting @celo/abis exports')
+      json.exports = exports
+    })
+
+    return
+  }
+
+  log('Skipping @celo/abis package.json preparation (no RELEASE_VERSION provided)')
 }
 
 function prepareContractsPackage() {

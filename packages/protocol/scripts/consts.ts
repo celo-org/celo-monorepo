@@ -8,6 +8,7 @@ export const CONTRACTS_08_PACKAGE_DESTINATION_DIR = path.join(CONTRACTS_PACKAGE_
 export const ABIS_PACKAGE_SRC_DIR = path.join(__dirname, '../abis')
 export const ABIS_BUILD_DIR = path.join(ABIS_PACKAGE_SRC_DIR, 'src-generated')
 export const ABIS_DIST_DIR = path.join(ABIS_PACKAGE_SRC_DIR, 'dist')
+export const DEVCHAIN_ANVIL_PACKAGE_SRC_DIR = path.join(__dirname, '../.tmp')
 export const BUILD_EXECUTABLE = path.join(__dirname, 'build.ts')
 export const TSCONFIG_PATH = path.join(ROOT_DIR, 'tsconfig.json')
 
