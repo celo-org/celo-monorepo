@@ -6,16 +6,17 @@ import "@openzeppelin/contracts8/utils/math/Math.sol";
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
-import "./interfaces/IValidators.sol";
+import "../../contracts/governance/interfaces/IValidators.sol";
 
-import "../common/CalledByVm.sol";
-import "../common/Initializable.sol";
-import "../common/FixidityLib.sol";
+import "../../contracts/common/CalledByVm.sol";
+import "../../contracts/common/Initializable.sol";
+import "../../contracts/common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/libraries/ReentrancyGuard.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
+import "../common/interfaces/IStableToken.sol";
 
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
@@ -210,9 +211,8 @@ contract Validators is
    * @notice Updates a validator's score based on its uptime for the epoch.
    * @param signer The validator signer of the validator account whose score needs updating.
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
-   * @return True upon success.
    */
-  function updateValidatorScoreFromSigner(address signer, uint256 uptime) external onlyVm {
+  function updateValidatorScoreFromSigner(address signer, uint256 uptime) virtual external onlyVm {
     allowOnlyL1();
     _updateValidatorScoreFromSigner(signer, uptime);
   }
@@ -222,12 +222,12 @@ contract Validators is
    * @param signer The validator signer of the account to distribute the epoch payment to.
    * @param maxPayment The maximum payment to the validator. Actual payment is based on score and
    *   group commission.
-   * @return The total payment paid to the validator and their group.
+   * @return distributeEpochPaymentsFromSigner The total payment paid to the validator and their group.
    */
   function distributeEpochPaymentsFromSigner(
     address signer,
     uint256 maxPayment
-  ) external onlyVm returns (uint256) {
+  ) external virtual onlyVm returns (uint256) {
     allowOnlyL1();
     return _distributeEpochPaymentsFromSigner(signer, maxPayment);
   }
@@ -295,7 +295,7 @@ contract Validators is
     uint256 requirementEndTime = validator.membershipHistory.lastRemovedFromGroupTimestamp.add(
       validatorLockedGoldRequirements.duration
     );
-    require(requirementEndTime < now, "Not yet requirement end time");
+    require(requirementEndTime < block.timestamp, "Not yet requirement end time");
 
     // Remove the validator.
     deleteElement(registeredValidators, account, index);
@@ -401,7 +401,7 @@ contract Validators is
     uint256[] storage sizeHistory = groups[account].sizeHistory;
     if (sizeHistory.length > 1) {
       require(
-        sizeHistory[1].add(groupLockedGoldRequirements.duration) < now,
+        sizeHistory[1].add(groupLockedGoldRequirements.duration) < block.timestamp,
         "Hasn't been empty for long enough"
       );
     }
@@ -599,7 +599,7 @@ contract Validators is
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     require(
-      now >= group.slashInfo.lastSlashed.add(slashingMultiplierResetPeriod),
+      block.timestamp >= group.slashInfo.lastSlashed.add(slashingMultiplierResetPeriod),
       "`resetSlashingMultiplier` called before resetPeriod expired"
     );
     group.slashInfo.multiplier = FixidityLib.fixed1();
@@ -614,13 +614,13 @@ contract Validators is
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     group.slashInfo.multiplier = FixidityLib.wrap(group.slashInfo.multiplier.unwrap().div(2));
-    group.slashInfo.lastSlashed = now;
+    group.slashInfo.lastSlashed = block.timestamp;
   }
 
   /**
    * @notice Returns the validator BLS key.
    * @param signer The account that registered the validator or its authorized signing address.
-   * @return The validator BLS key.
+   * @return blsPublicKey The validator BLS key.
    */
   function getValidatorBlsPublicKeyFromSigner(
     address signer
@@ -990,7 +990,7 @@ contract Validators is
       uint256[] storage sizeHistory = groups[account].sizeHistory;
       if (sizeHistory.length > 0) {
         for (uint256 i = sizeHistory.length.sub(1); i > 0; i = i.sub(1)) {
-          if (sizeHistory[i].add(groupLockedGoldRequirements.duration) >= now) {
+          if (sizeHistory[i].add(groupLockedGoldRequirements.duration) >= block.timestamp) {
             multiplier = Math.max(i, multiplier);
             break;
           }
@@ -1057,9 +1057,13 @@ contract Validators is
   }
 
   /**
-   * @notice Returns validator information.
-   * @param account The account that registered the validator.
-   * @return The unpacked validator struct.
+    * @notice Returns validator information.
+    * @param account The account that registered the validator.
+    * @return ecdsaPublicKey The ECDSA public key.
+    * @return blsPublicKey The BLS public key.
+    * @return affiliation The address of the validator group the validator is a member of.
+    * @return score The validator's score.
+    * @return signer The address of the validator's signer.
    */
   function getValidator(
     address account
@@ -1144,7 +1148,7 @@ contract Validators is
       (address beneficiary, uint256 fraction) = getAccounts().getPaymentDelegation(account);
       uint256 delegatedPayment = remainingPayment.multiply(FixidityLib.wrap(fraction)).fromFixed();
       uint256 validatorPayment = remainingPayment.fromFixed().sub(delegatedPayment);
-      IStableToken stableToken = getStableToken();
+      IStableToken stableToken = IStableToken(getStableToken());
       require(stableToken.mint(group, groupPayment), "mint failed to validator group");
       require(stableToken.mint(account, validatorPayment), "mint failed to validator account");
       if (fraction != 0) {
@@ -1289,7 +1293,7 @@ contract Validators is
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
     delete list[lastIndex];
-    list.length = lastIndex;
+    list.pop();
   }
 
   /**
@@ -1330,7 +1334,7 @@ contract Validators is
     uint256 head = history.numEntries == 0 ? 0 : history.tail.add(history.numEntries.sub(1));
 
     if (history.numEntries > 0 && group == address(0)) {
-      history.lastRemovedFromGroupTimestamp = now;
+      history.lastRemovedFromGroupTimestamp = block.timestamp;
     }
 
     if (history.numEntries > 0 && history.entries[head].epochNumber == epochNumber) {
@@ -1369,9 +1373,9 @@ contract Validators is
   function updateSizeHistory(address group, uint256 size) private {
     uint256[] storage sizeHistory = groups[group].sizeHistory;
     if (size == sizeHistory.length) {
-      sizeHistory.push(now);
+      sizeHistory.push(block.timestamp);
     } else if (size < sizeHistory.length) {
-      sizeHistory[size] = now;
+      sizeHistory[size] = block.timestamp;
     } else {
       require(false, "Unable to update size history");
     }

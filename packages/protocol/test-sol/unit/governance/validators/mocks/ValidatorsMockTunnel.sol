@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "@celo-contracts/governance/test/ValidatorsMock.sol";
+import "@celo-contracts-8/governance/test/ValidatorsMock.sol";
 import { Test as ForgeTest } from "forge-std/Test.sol";
 
 contract ValidatorsMockTunnel is ForgeTest {

@@ -1,4 +1,4 @@
-pragma solidity >=0.5.13 <0.8.20;;
+pragma solidity >=0.5.13 <0.8.20;
 
 /**
  * @title Helps contracts guard against reentrancy attacks.
@@ -24,7 +24,7 @@ contract ReentrancyGuard {
     require(localCounter == _guardCounter, "reentrant call");
   }
 
-  constructor() internal {
+  constructor() public {
     // The counter starts at one to prevent changing it from zero to a non-zero
     // value, which is a more expensive operation.
     _guardCounter = 1;

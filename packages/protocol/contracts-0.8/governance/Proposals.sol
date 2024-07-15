@@ -240,7 +240,7 @@ library Proposals {
     proposal.proposer = proposer;
     proposal.deposit = deposit;
     // solhint-disable-next-line not-rely-on-time
-    proposal.timestamp = now;
+    proposal.timestamp = block.timestamp;
 
     uint256 dataPosition = 0;
     proposal.transactions = new Transaction[](transactionCount);
