@@ -21,11 +21,6 @@ interface ICeloToken is IERC20 {
   function setRegistry(address registryAddress) external;
 
   /**
-   * @return The address of the CeloTokenDistributionSchedule contract.
-   */
-  function getCeloTokenDistributionScheduleAddress() external returns (address);
-
-  /**
    * @dev Mints a new token.
    * @param to The address that will own the minted token.
    * @param value The amount of token to be minted.

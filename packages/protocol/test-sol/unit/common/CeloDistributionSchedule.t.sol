@@ -323,7 +323,7 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
     vm.warp(block.timestamp + l2StartTime);
     vm.prank(celoDistributionOwner);
     celoDistributionSchedule = new CeloDistributionSchedule(true);
-    registry.setAddressFor("CeloDistributionSchedule", celoTokenAddress);
+    registry.setAddressFor("CeloDistributionSchedule", randomAddress);
     vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
 
     vm.prank(celoDistributionOwner);

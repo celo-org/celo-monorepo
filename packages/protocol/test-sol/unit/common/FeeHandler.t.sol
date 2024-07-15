@@ -103,7 +103,7 @@ contract FeeHandlerTest is Test, Constants {
     registry.setAddressFor("GoldToken", address(celoToken));
     registry.setAddressFor("CeloToken", address(celoToken));
     registry.setAddressFor("Reserve", address(mockReserve));
-    registry.setAddressFor("CeloDistributionSchedule", address(celoDistributionSchedule));
+    registry.setAddressFor("CeloDistributionSchedule", celoDistributionSchedule);
 
     mockReserve.setGoldToken(address(celoToken));
     mockReserve.addToken(address(stableToken));

@@ -124,7 +124,7 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("StableToken", address(stableToken));
-    registry.setAddressFor("CeloDistributionSchedule", address(celoDistributionSchedule));
+    registry.setAddressFor("CeloDistributionSchedule", celoDistributionSchedule);
 
     lockedGold.initialize(registryAddress, UNLOCKING_PERIOD);
     goldToken.initialize(registryAddress);
