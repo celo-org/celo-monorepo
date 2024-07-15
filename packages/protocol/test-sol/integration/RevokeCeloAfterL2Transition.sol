@@ -168,9 +168,8 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
       )
       .unwrap();
 
-    address registryAddress = 0x000000000000000000000000000000000000ce10;
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-    registry = Registry(registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    registry = Registry(REGISTRY_ADDRESS);
 
     accounts = new Accounts(true);
     stableToken = new MockStableToken();
@@ -192,7 +191,7 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
 
     goldToken.initialize(address(registry));
 
-    accounts.initialize(registryAddress);
+    accounts.initialize(REGISTRY_ADDRESS);
 
     releaseGold = new ReleaseGold(true);
 
@@ -213,14 +212,14 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
       initialDistributionRatio: 1000,
       _canValidate: true,
       _canVote: true,
-      registryAddress: registryAddress
+      registryAddress: REGISTRY_ADDRESS
     });
 
     ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold));
     tunnel.MockInitialize(owner, releaseGoldInitParams, releaseGoldInitParams2);
 
     election.initialize(
-      registryAddress,
+      REGISTRY_ADDRESS,
       electableValidatorsMin,
       electableValidatorsMax,
       maxNumGroupsVotedFor,
@@ -245,7 +244,7 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
     });
 
     initParams = ValidatorsMockTunnel.InitParams({
-      registryAddress: registryAddress,
+      registryAddress: REGISTRY_ADDRESS,
       groupRequirementValue: originalGroupLockedGoldRequirements.value,
       groupRequirementDuration: originalGroupLockedGoldRequirements.duration,
       validatorRequirementValue: originalValidatorLockedGoldRequirements.value,
