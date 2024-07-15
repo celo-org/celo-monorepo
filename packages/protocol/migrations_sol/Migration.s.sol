@@ -10,7 +10,7 @@ import "forge-std/StdJson.sol";
 
 // Helper contract imports
 import "@migrations-sol/HelperInterFaces.sol";
-import { Constants } from "@migrations-sol/constants.sol";
+import { MigrationsConstants } from "@migrations-sol/constants.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 
 // Core contract imports on Solidity 0.5
@@ -64,7 +64,7 @@ contract ForceTx {
   }
 }
 
-contract Migration is Script, UsingRegistry, Constants {
+contract Migration is Script, UsingRegistry, MigrationsConstants {
   using stdJson for string;
 
   // This is Anvil's default account

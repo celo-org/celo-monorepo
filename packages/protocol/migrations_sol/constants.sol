@@ -1,6 +1,6 @@
 pragma solidity >=0.8.7 <0.8.20;
 
-contract Constants {
+contract MigrationsConstants {
   // List of contracts that are expected to be in Registry.sol
   string[24] contractsInRegistry = [
     "Accounts",
