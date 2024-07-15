@@ -22,4 +22,8 @@ contract Constants {
   string constant LockedCeloContract = "LockedCelo";
   string constant ValidatorsContract = "Validators";
   string constant GovernanceContract = "Governance";
+
+  // Constant addresses
+  address constant REGISTRY_ADDRESS = 0x000000000000000000000000000000000000ce10;
+  address constant PROXY_ADMIN_ADDRESS = 0x4200000000000000000000000000000000000018;
 }
