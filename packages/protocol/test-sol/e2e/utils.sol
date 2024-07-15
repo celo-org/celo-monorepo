@@ -8,11 +8,11 @@ import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 
-contract Devchain is UsingRegistry {
-  address constant registryAddress = address(0x000000000000000000000000000000000000ce10);
+import { Constants } from "@test-sol/constants.sol";
 
+contract Devchain is UsingRegistry, Constants {
   // Used in exceptional circumstances when a contract is not in UsingRegistry.sol
-  IRegistry devchainRegistry = IRegistry(registryAddress);
+  IRegistry devchainRegistry = IRegistry(REGISTRY_ADDRESS);
 
   // All core contracts that are expected to be in the Registry on the devchain
   ISortedOracles sortedOracles;
@@ -20,7 +20,7 @@ contract Devchain is UsingRegistry {
 
   constructor() {
     // The following line is required by UsingRegistry.sol
-    setRegistry(registryAddress);
+    setRegistry(REGISTRY_ADDRESS);
 
     // Fetch all core contracts that are expeceted to be in the Registry on the devchain
     sortedOracles = getSortedOracles();
