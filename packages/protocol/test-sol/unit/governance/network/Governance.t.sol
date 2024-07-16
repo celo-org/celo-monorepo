@@ -3430,13 +3430,17 @@ contract GovernanceTest_resetHotfix is GovernanceTest {
     governance.approveHotfix(HOTFIX_HASH);
     vm.prank(accApprover);
     governance.approveHotfix(HOTFIX_HASH);
+    (bool approved, bool councilApproved, , uint256 _preparedTimeLimit) = governance
+      .getL2HotfixRecord(HOTFIX_HASH);
+
+    assertTrue(approved);
+    assertTrue(councilApproved);
 
     governance.prepareHotfix(HOTFIX_HASH);
     timeTravel(DAY + 1);
     governance.resetHotFixRecord(HOTFIX_HASH);
 
-    (bool approved, bool councilApproved, , uint256 _preparedTimeLimit) = governance
-      .getL2HotfixRecord(HOTFIX_HASH);
+    (approved, councilApproved, , _preparedTimeLimit) = governance.getL2HotfixRecord(HOTFIX_HASH);
     assertFalse(approved);
     assertFalse(councilApproved);
   }
