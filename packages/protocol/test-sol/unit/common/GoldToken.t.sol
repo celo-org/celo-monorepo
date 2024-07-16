@@ -5,7 +5,9 @@ import "celo-foundry/Test.sol";
 import "@celo-contracts/common/GoldToken.sol";
 import "@test-sol/unit/common/GoldTokenMock.sol";
 
-contract GoldTokenTest is Test, IsL2Check {
+import { TestConstants } from "@test-sol/constants.sol";
+
+contract GoldTokenTest is Test, TestConstants, IsL2Check {
   GoldToken celoToken;
 
   uint256 constant ONE_CELOTOKEN = 1000000000000000000;
@@ -281,7 +283,7 @@ contract GoldTokenTest_increaseSupply is GoldTokenTest {
   }
 }
 
-contract CeloTokenMockTest is Test {
+contract CeloTokenMockTest is Test, TestConstants {
   GoldTokenMock mockCeloToken;
   uint256 ONE_CELOTOKEN = 1000000000000000000;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);

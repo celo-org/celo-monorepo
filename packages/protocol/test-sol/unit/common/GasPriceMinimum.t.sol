@@ -11,7 +11,9 @@ import "@celo-contracts/stability/test/MockSortedOracles.sol";
 
 import "@celo-contracts-8/common/GasPriceMinimum.sol";
 
-contract GasPriceMinimumTest is Test {
+import { TestConstants } from "@test-sol/constants.sol";
+
+contract GasPriceMinimumTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
   IRegistry registry;
