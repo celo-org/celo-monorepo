@@ -19,7 +19,7 @@ contract GoldTokenTest is Test, IsL2Check {
   event SetCeloTokenDistributionScheduleAddress(address indexed newScheduleAddress);
 
   modifier _whenL2() {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
     _;
   }
 
@@ -285,11 +285,10 @@ contract CeloTokenMockTest is Test {
   GoldTokenMock mockCeloToken;
   uint256 ONE_CELOTOKEN = 1000000000000000000;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
   address celoTokenDistributionSchedule;
 
   modifier _whenL2() {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
     _;
   }
 
