@@ -28,8 +28,6 @@ contract ElectionMock is Election(true) {
 contract ElectionTest is Utils, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
-
   Accounts accounts;
   ElectionMock election;
   Freezer freezer;
@@ -38,7 +36,6 @@ contract ElectionTest is Utils, TestConstants {
   MockRandom random;
   IRegistry registry;
 
-  address registryAddress = 0x000000000000000000000000000000000000ce10;
   address nonOwner = actor("nonOwner");
   address owner = address(this);
   uint256 electableValidatorsMin = 4;
@@ -107,7 +104,7 @@ contract ElectionTest is Utils, TestConstants {
 
   function setUp() public {
     ph.setEpochSize(DAY / 5);
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
     accounts = new Accounts(true);
 
@@ -132,7 +129,7 @@ contract ElectionTest is Utils, TestConstants {
     freezer = new Freezer(true);
     lockedGold = new MockLockedGold();
     validators = new MockValidators();
-    registry = IRegistry(registryAddress);
+    registry = IRegistry(REGISTRY_ADDRESS);
     random = new MockRandom();
 
     registry.setAddressFor("Accounts", address(accounts));
@@ -142,7 +139,7 @@ contract ElectionTest is Utils, TestConstants {
     registry.setAddressFor("Random", address(random));
 
     election.initialize(
-      registryAddress,
+      REGISTRY_ADDRESS,
       electableValidatorsMin,
       electableValidatorsMax,
       maxNumGroupsVotedFor,
@@ -151,7 +148,7 @@ contract ElectionTest is Utils, TestConstants {
   }
 
   function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 }
 
@@ -177,7 +174,7 @@ contract ElectionTest_Initialize is ElectionTest {
   function test_shouldRevertWhenCalledAgain() public {
     vm.expectRevert("contract already initialized");
     election.initialize(
-      registryAddress,
+      REGISTRY_ADDRESS,
       electableValidatorsMin,
       electableValidatorsMax,
       maxNumGroupsVotedFor,
