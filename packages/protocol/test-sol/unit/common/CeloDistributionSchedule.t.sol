@@ -69,14 +69,13 @@ contract CeloDistributionScheduleTest is Test, TestConstants, IsL2Check {
     setUpL1();
 
     // Setup L2 after minting L1 supply.
-    registryAddress = proxyAdminAddress;
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-    registry = IRegistry(registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+    registry = IRegistry(PROXY_ADMIN_ADDRESS);
 
     registry.setAddressFor("CeloToken", address(celoToken));
     registry.setAddressFor("Governance", address(governance));
 
-    celoToken.setRegistry(registryAddress);
+    celoToken.setRegistry(PROXY_ADMIN_ADDRESS);
   }
 
   function setUpL1() public {
