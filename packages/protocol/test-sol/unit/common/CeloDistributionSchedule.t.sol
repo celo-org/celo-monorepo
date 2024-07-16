@@ -248,7 +248,7 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
     registry.setAddressFor("Governance", address(0));
     celoDistributionSchedule = new CeloDistributionSchedule(true);
     vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
-    celoDistributionSchedule.initialize(REGISTRY_ADDRESS);
+    celoDistributionSchedule.initialize(PROXY_ADMIN_ADDRESS);
 
     vm.expectRevert("identifier has no registry entry");
     celoDistributionSchedule.activate(
