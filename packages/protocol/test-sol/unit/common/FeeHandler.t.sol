@@ -49,7 +49,6 @@ contract FeeHandlerTest is Test, TestConstants {
 
   address EXAMPLE_BENEFICIARY_ADDRESS = 0x2A486910DBC72cACcbb8d0e1439C96b03B2A4699;
 
-  address registryAddress = 0x000000000000000000000000000000000000ce10;
   address owner = address(this);
   address user = actor("user");
 
@@ -81,13 +80,13 @@ contract FeeHandlerTest is Test, TestConstants {
     reserveFraction = FixidityLib.newFixedFraction(5, 100).unwrap();
     maxSlippage = FixidityLib.newFixedFraction(1, 100).unwrap();
 
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
     celoToken = new GoldToken(true);
     mockReserve = new MockReserve();
     stableToken = new StableToken(true);
     stableTokenEUR = new StableToken(true);
-    registry = IRegistry(registryAddress);
+    registry = IRegistry(REGISTRY_ADDRESS);
     feeHandler = new FeeHandler(true);
     freezer = new Freezer(true);
     feeCurrencyWhitelist = new FeeCurrencyWhitelist(true);
@@ -178,7 +177,7 @@ contract FeeHandlerTest is Test, TestConstants {
     exchangeEUR.activateStable();
 
     feeHandler.initialize(
-      registryAddress,
+      REGISTRY_ADDRESS,
       EXAMPLE_BENEFICIARY_ADDRESS,
       0,
       new address[](0),
