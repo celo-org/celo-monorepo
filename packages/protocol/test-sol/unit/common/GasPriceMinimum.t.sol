@@ -27,8 +27,6 @@ contract GasPriceMinimumTest is Test {
   FixidityLib.Fraction targetDensityFraction = FixidityLib.newFixedFraction(5, 10);
   uint256 adjustmentSpeed = FixidityLib.newFixedFraction(5, 10).unwrap();
   FixidityLib.Fraction adjustmentSpeedFraction = FixidityLib.newFixedFraction(5, 10);
-  address registryAddress = 0x000000000000000000000000000000000000ce10;
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   event TargetDensitySet(uint256 targetDensity);
   event GasPriceMinimumFloorSet(uint256 gasPriceMinimumFloor);
@@ -41,7 +39,7 @@ contract GasPriceMinimumTest is Test {
     nonOwner = actor("nonOwner");
     celoToken = actor("CeloToken");
 
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
     // deployCodeTo("SortedOracles.sol", abi.encode(true), sortedOracleAddress);
     // fails with `data did not match any variant of untagged enum Bytecode at line 822 column 3]`
@@ -49,14 +47,14 @@ contract GasPriceMinimumTest is Test {
 
     gasPriceMinimum = new GasPriceMinimum(true);
 
-    registry = IRegistry(registryAddress);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     registry.setAddressFor("GasPriceMinimum", address(gasPriceMinimum));
     registry.setAddressFor("SortedOracles", address(sortedOracles));
     registry.setAddressFor("GoldToken", celoToken);
 
     gasPriceMinimum.initialize(
-      registryAddress,
+      REGISTRY_ADDRESS,
       gasPriceMinimumFloor,
       targetDensity,
       adjustmentSpeed,
@@ -65,7 +63,7 @@ contract GasPriceMinimumTest is Test {
   }
 
   function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 }
 
@@ -89,7 +87,7 @@ contract GasPriceMinimumTest_initialize is GasPriceMinimumTest {
   function test_shouldRevertWhenCalledAgain() public {
     vm.expectRevert("contract already initialized");
     gasPriceMinimum.initialize(
-      registryAddress,
+      REGISTRY_ADDRESS,
       gasPriceMinimumFloor,
       targetDensity,
       adjustmentSpeed,
