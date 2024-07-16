@@ -73,7 +73,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   IProxyFactory proxyFactory;
 
   uint256 proxyNonce = 0;
-  address constant registryAddress = address(0x000000000000000000000000000000000000ce10);
 
   event Result(bytes);
 
@@ -114,12 +113,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   }
 
   function addToRegistry(string memory contractName, address proxyAddress) public {
-    IProxy proxy = IProxy(registryAddress);
+    IProxy proxy = IProxy(REGISTRY_ADDRESS);
     if (proxy._getImplementation() == address(0)) {
       console.log("Can't add to registry because implementation not set");
       return;
     }
-    registry = IRegistry(registryAddress);
+    registry = IRegistry(REGISTRY_ADDRESS);
     console.log(" Setting on the registry contract:", contractName);
     registry.setAddressFor(contractName, proxyAddress);
   }
@@ -203,7 +202,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     // Foloowing  lines required by parent UsingRegistry
     _transferOwnership(deployerAccount);
-    setRegistry(registryAddress);
+    setRegistry(REGISTRY_ADDRESS);
 
     // End UsingRegistry setup
 
@@ -248,13 +247,13 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function migrateRegistry() public {
     setImplementationOnProxy(
-      IProxy(registryAddress),
+      IProxy(REGISTRY_ADDRESS),
       "Registry",
       abi.encodeWithSelector(IRegistryInitializer.initialize.selector)
     );
     // set registry in registry itself
-    console.log("Owner of the Registry Proxy is", IProxy(registryAddress)._getOwner());
-    addToRegistry("Registry", registryAddress);
+    console.log("Owner of the Registry Proxy is", IProxy(REGISTRY_ADDRESS)._getOwner());
+    addToRegistry("Registry", REGISTRY_ADDRESS);
     console.log("Done migration registry");
   }
 
@@ -283,7 +282,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // TODO change pre-funded addresses to make it match circulation supply
     address celoProxyAddress = deployProxiedContract(
       "GoldToken",
-      abi.encodeWithSelector(ICeloTokenInitializer.initialize.selector, registryAddress)
+      abi.encodeWithSelector(ICeloTokenInitializer.initialize.selector, REGISTRY_ADDRESS)
     );
 
     addToRegistry("CeloToken", celoProxyAddress);
@@ -323,7 +322,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "GasPriceMinimum",
       abi.encodeWithSelector(
         IGasPriceMinimumInitializer.initialize.selector,
-        registryAddress,
+        REGISTRY_ADDRESS,
         gasPriceMinimumFloor,
         targetDensity,
         adjustmentSpeed,
@@ -384,7 +383,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "Reserve",
       abi.encodeWithSelector(
         IReserveInitializer.initialize.selector,
-        registryAddress,
+        REGISTRY_ADDRESS,
         tobinTaxStalenessThreshold,
         spendingRatio,
         frozenGold,
@@ -429,7 +428,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         name,
         symbol,
         decimals,
-        registryAddress,
+        REGISTRY_ADDRESS,
         inflationRate,
         inflationFactorUpdatePeriod,
         initialBalanceAddresses,
@@ -523,7 +522,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "Exchange",
       abi.encodeWithSelector(
         IExchangeInitializer.initialize.selector,
-        registryAddress,
+        REGISTRY_ADDRESS,
         stableTokenIdentifier,
         spread,
         reserveFraction,
@@ -543,7 +542,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function migrateAccount() public {
     address accountsProxyAddress = deployProxiedContract(
       "Accounts",
-      abi.encodeWithSelector(IAccountsInitializer.initialize.selector, registryAddress)
+      abi.encodeWithSelector(IAccountsInitializer.initialize.selector, REGISTRY_ADDRESS)
     );
 
     IAccounts(accountsProxyAddress).setEip712DomainSeparator();
@@ -556,7 +555,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "LockedGold",
       abi.encodeWithSelector(
         ILockedGoldInitializer.initialize.selector,
-        registryAddress,
+        REGISTRY_ADDRESS,
         unlockingPeriod
       )
     );
@@ -611,7 +610,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "Validators",
       abi.encodeWithSelector(
         IValidatorsInitializer.initialize.selector,
-        registryAddress,
+        REGISTRY_ADDRESS,
         groupRequirementValue,
         groupRequirementDuration,
         validatorRequirementValue,
@@ -649,7 +648,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "Election",
       abi.encodeWithSelector(
         IElectionInitializer.initialize.selector,
-        registryAddress,
+        REGISTRY_ADDRESS,
         minElectableValidators,
         maxElectableValidators,
         maxNumGroupsVotedFor,
@@ -708,7 +707,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "EpochRewards",
       abi.encodeWithSelector(
         IEpochRewardsInitializer.initialize.selector,
-        registryAddress,
+        REGISTRY_ADDRESS,
         targetVotingYieldInitial,
         targetVotingYieldMax,
         targetVotingYieldAdjustmentFactor,
@@ -771,7 +770,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
   function migrateGovernanceSlasher() public {
     deployProxiedContract(
       "GovernanceSlasher",
-      abi.encodeWithSelector(IGovernanceSlasherInitializer.initialize.selector, registryAddress)
+      abi.encodeWithSelector(IGovernanceSlasherInitializer.initialize.selector, REGISTRY_ADDRESS)
     );
 
     getLockedGold().addSlasher("GovernanceSlasher");
@@ -785,7 +784,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "DoubleSigningSlasher",
       abi.encodeWithSelector(
         IDoubleSigningSlasherInitializer.initialize.selector,
-        registryAddress,
+        REGISTRY_ADDRESS,
         penalty,
         reward
       )
@@ -806,7 +805,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "DowntimeSlasher",
       abi.encodeWithSelector(
         IDowntimeSlasherInitializer.initialize.selector,
-        registryAddress,
+        REGISTRY_ADDRESS,
         penalty,
         reward,
         slashableDowntime
@@ -854,7 +853,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "MentoFeeHandlerSeller",
       abi.encodeWithSelector(
         IFeeHandlerSellerInitializer.initialize.selector,
-        registryAddress,
+        REGISTRY_ADDRESS,
         tokenAddresses,
         minimumReports
       )
@@ -869,7 +868,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "UniswapFeeHandlerSeller",
       abi.encodeWithSelector(
         IFeeHandlerSellerInitializer.initialize.selector,
-        registryAddress,
+        REGISTRY_ADDRESS,
         tokenAddresses,
         minimumReports
       )
@@ -888,7 +887,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "FeeHandler",
       abi.encodeWithSelector(
         IFeeHandlerInitializer.initialize.selector,
-        registryAddress,
+        REGISTRY_ADDRESS,
         newFeeBeneficiary,
         newBurnFraction,
         tokens,
@@ -916,7 +915,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "CeloDistributionSchedule",
       abi.encodeWithSelector(
         ICeloDistributionScheduleInitializer.initialize.selector,
-        registryAddress
+        REGISTRY_ADDRESS
       )
     );
   }
@@ -963,7 +962,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       "Governance",
       abi.encodeWithSelector(
         IGovernanceInitializer.initialize.selector,
-        registryAddress,
+        REGISTRY_ADDRESS,
         approver,
         concurrentProposals,
         minDeposit,
@@ -1015,7 +1014,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         }
 
         console.log(string.concat("Setting constitution thresholds for: ", contractName));
-        IRegistry registry = IRegistry(registryAddress);
+        IRegistry registry = IRegistry(REGISTRY_ADDRESS);
 
         address contractAddress = registry.getAddressForString(contractName);
 
