@@ -11,7 +11,6 @@ contract BlockchainParametersTest is Test, TestConstants, Utils {
   uint256 constant gasLimit = 7000000;
   uint256 constant gasForNonGoldCurrencies = 50000;
   address nonOwner;
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   BlockchainParameters blockchainParameters;
 
@@ -26,7 +25,7 @@ contract BlockchainParametersTest is Test, TestConstants, Utils {
     blockchainParameters = new BlockchainParameters(true);
   }
   function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 }
 
