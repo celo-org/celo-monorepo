@@ -34,7 +34,6 @@ contract EpochRewardsTest is Test, TestConstants, Utils {
   uint256 constant sortedOraclesDenominator = FIXED1;
 
   uint256 constant SUPPLY_CAP = 1e9 ether;
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
   bytes32[] initialAssetAllocationSymbols;
   uint256[] initialAssetAllocationWeights;
 
@@ -101,7 +100,7 @@ contract EpochRewardsTest is Test, TestConstants, Utils {
   }
 
   function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
   function getExpectedTargetTotalSupply(uint256 timeDelta) internal pure returns (uint256) {
     uint256 genesisSupply = 600000000 ether;
