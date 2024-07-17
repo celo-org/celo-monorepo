@@ -3,6 +3,9 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import { Test } from "celo-foundry/Test.sol";
+import { TestConstants } from "@test-sol/constants.sol";
+import { Utils } from "@test-sol/utils.sol";
+
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
@@ -11,8 +14,6 @@ import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
 import "@celo-contracts/identity/test/MockRandom.sol";
 import "@celo-contracts/common/Freezer.sol";
-import { TestConstants } from "@test-sol/constants.sol";
-import "@test-sol/utils.sol";
 
 contract ElectionMock is Election(true) {
   function distributeEpochRewards(
