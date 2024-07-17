@@ -59,7 +59,7 @@ contract GovernanceMock is Governance(true) {
   }
 }
 
-contract GovernanceTest is Test, Constants, Utils {
+contract GovernanceTest is Test, TestConstants, Utils {
   using FixidityLib for FixidityLib.Fraction;
   using BytesLib for bytes;
 
