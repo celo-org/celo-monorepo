@@ -3,7 +3,6 @@
 import { recoverFunds } from '@celo/protocol/lib/recover-funds'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { expectBigNumberInRange } from '@celo/protocol/lib/test-utils'
-import { CeloDistributionScheduleContract } from '@celo/protocol/types/08'
 import { BigNumber } from 'bignumber.js'
 import {
   FreezerContract,
@@ -12,6 +11,7 @@ import {
   ProxyInstance,
   RegistryContract,
 } from 'types'
+import { CeloDistributionScheduleContract } from 'types/08'
 
 const GetSetV0: Truffle.Contract<GetSetV0Instance> = artifacts.require('GetSetV0')
 const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
