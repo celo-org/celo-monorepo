@@ -7,8 +7,6 @@ import { TestConstants } from "@test-sol/constants.sol";
 // Contract to test
 import "@celo-contracts-8/common/IsL2Check.sol";
 
-
-
 contract IsL2Test is IsL2Check {
   function onlyL1Function() public view onlyL1 returns (bool) {
     return true;

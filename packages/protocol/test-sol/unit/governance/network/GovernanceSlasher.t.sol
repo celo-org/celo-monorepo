@@ -12,7 +12,6 @@ import "@celo-contracts/governance/test/MockLockedGold.sol";
 
 import "@celo-contracts/governance/GovernanceSlasher.sol";
 
-
 contract GovernanceSlasherTest is Test, TestConstants {
   event SlashingApproved(address indexed account, uint256 amount);
   event GovernanceSlashPerformed(address indexed account, uint256 amount);
