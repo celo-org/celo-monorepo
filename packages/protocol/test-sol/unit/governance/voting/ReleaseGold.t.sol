@@ -45,6 +45,7 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
   address refundAddress = actor("refundAddress");
   address newBeneficiary = actor("newBeneficiary");
   address randomAddress = actor("randomAddress");
+  address celoDistributionSchedule = actor("CeloDistributionSchedule");
 
   uint256 constant TOTAL_AMOUNT = 1 ether * 10;
 
@@ -68,19 +69,6 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
   address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
   function _whenL2() public {
     deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
-    registry = Registry(proxyAdminAddress);
-    registry.setAddressFor("Accounts", address(accounts));
-    registry.setAddressFor("Election", address(election));
-    registry.setAddressFor("Freezer", address(freezer));
-    registry.setAddressFor("CeloToken", address(goldToken));
-    registry.setAddressFor("Governance", address(governance));
-    registry.setAddressFor("LockedGold", address(lockedGold));
-    registry.setAddressFor("Validators", address(validators));
-    registry.setAddressFor("StableToken", address(stableToken));
-
-    lockedGold.setRegistry(proxyAdminAddress);
-    goldToken.setRegistry(proxyAdminAddress);
-    accounts.setRegistry(proxyAdminAddress);
   }
 
   function newReleaseGold(bool prefund, bool startReleasing) internal returns (ReleaseGold) {
@@ -136,6 +124,7 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("StableToken", address(stableToken));
+    registry.setAddressFor("CeloDistributionSchedule", celoDistributionSchedule);
 
     lockedGold.initialize(registryAddress, UNLOCKING_PERIOD);
     goldToken.initialize(registryAddress);
