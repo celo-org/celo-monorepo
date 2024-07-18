@@ -24,7 +24,7 @@ no_match_test = "skip"
 
 # 1. `BLS12Passthrough.sol` is excluded, because it's tested in the celo-blockain repo as described here: https://github.com/celo-org/celo-monorepo/pull/10240
 # 2. `Random.sol` is excluded, but I'm not sure why. It was already excluded so I'm leaving it here.
-# 3. `test-sol/devchain/` is excluded because all its tests require an anvil devchain to be serving at a localhost
+# 3. `test-sol/devchain/` tests are excluded because they require an anvil devchain to be serving at a localhost
 # Helper: Test glob patterns here: https://globster.xyz/
 no_match_path = "{**/test/BLS12Passthrough.sol,**/test/RandomTest.sol,**/test-sol/devchain/**}"
 
@@ -34,5 +34,9 @@ fs_permissions = [
     { access = "read", path = "./governanceConstitution.json"},
     { access = "read", path = "./artifacts/"}
     ]
+
+[profile.devchain] # Special profile for the tests that require an anvil devchain
+match_path = "**/test-sol/devchain/**"
+no_match_path = "{**/test/BLS12Passthrough.sol,**/test/RandomTest.sol}"
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
