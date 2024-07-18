@@ -72,10 +72,14 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
     require(address(this).balance > 0, "Contract does not have CELO balance.");
     require(!areDependenciesSet, "Contract has already been activated.");
     require(block.timestamp > _l2StartTime, "L2 start time cannot be set to a future date.");
+    ICeloToken celoToken = ICeloToken(address(getCeloToken()));
+    require(
+      registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID) == address(this),
+      "CeloDistributionSchedule address is incorrectly set in Registry."
+    );
     areDependenciesSet = true;
     l2StartTime = _l2StartTime;
     communityRewardFund = address(getGovernance());
-    ICeloToken celoToken = ICeloToken(address(getCeloToken()));
     totalAllocatedAtL2Start = celoToken.allocatedSupply();
     setCommunityRewardFraction(_communityRewardFraction);
     setCarbonOffsettingFund(_carbonOffsettingPartner, _carbonOffsettingFraction);

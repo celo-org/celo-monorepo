@@ -7,7 +7,9 @@ import "@test-sol/unit/common/GoldTokenMock.sol";
 
 contract GoldTokenTest is Test, IsL2Check {
   GoldToken celoToken;
+  IRegistry registry;
 
+  address constant registryAddress = 0x000000000000000000000000000000000000ce10;
   uint256 constant ONE_CELOTOKEN = 1000000000000000000;
   address receiver;
   address sender;
@@ -16,7 +18,6 @@ contract GoldTokenTest is Test, IsL2Check {
 
   event Transfer(address indexed from, address indexed to, uint256 value);
   event TransferComment(string comment);
-  event SetCeloTokenDistributionScheduleAddress(address indexed newScheduleAddress);
 
   modifier _whenL2() {
     deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
@@ -24,11 +25,16 @@ contract GoldTokenTest is Test, IsL2Check {
   }
 
   function setUp() public {
+    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    registry = IRegistry(registryAddress);
+
     celoTokenOwner = actor("celoTokenOwner");
     celoTokenDistributionSchedule = actor("celoTokenDistributionSchedule");
     vm.prank(celoTokenOwner);
     celoToken = new GoldToken(true);
-    deployCodeTo("CeloDistributionSchedule.sol", abi.encode(false), celoTokenDistributionSchedule);
+    vm.prank(celoTokenOwner);
+    celoToken.setRegistry(registryAddress);
+    registry.setAddressFor("CeloDistributionSchedule", celoTokenDistributionSchedule);
     receiver = actor("receiver");
     sender = actor("sender");
     vm.deal(receiver, ONE_CELOTOKEN);
@@ -89,8 +95,6 @@ contract GoldTokenTest_general is GoldTokenTest {
 contract GoldTokenTest_transfer is GoldTokenTest {
   function setUp() public {
     super.setUp();
-    vm.prank(celoTokenOwner);
-    celoToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
   }
 
   function test_ShouldTransferBalanceFromOneUserToAnother() public {
@@ -123,7 +127,7 @@ contract GoldTokenTest_transfer is GoldTokenTest {
   }
   function test_Reverts_WhenTransferingToCeloDistributionSchedule() public {
     vm.prank(sender);
-    vm.expectRevert("transfer attempted to reserved celoTokenDistributionSchedule address");
+    vm.expectRevert("transfer attempted to reserved CeloDistributionSchedule address");
     celoToken.transfer(celoTokenDistributionSchedule, ONE_CELOTOKEN);
   }
 }
@@ -131,8 +135,6 @@ contract GoldTokenTest_transfer is GoldTokenTest {
 contract GoldTokenTest_transferFrom is GoldTokenTest {
   function setUp() public {
     super.setUp();
-    vm.prank(celoTokenOwner);
-    celoToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
     vm.prank(sender);
     celoToken.approve(receiver, ONE_CELOTOKEN);
   }
@@ -148,7 +150,7 @@ contract GoldTokenTest_transferFrom is GoldTokenTest {
 
   function test_Reverts_WhenTransferingToCeloDistributionSchedule() public {
     vm.prank(receiver);
-    vm.expectRevert("transfer attempted to reserved celoTokenDistributionSchedule address");
+    vm.expectRevert("transfer attempted to reserved CeloDistributionSchedule address");
     celoToken.transferFrom(sender, celoTokenDistributionSchedule, ONE_CELOTOKEN);
   }
 
@@ -236,35 +238,6 @@ contract GoldTokenTest_mint is GoldTokenTest {
   }
 }
 
-contract GoldTokenTest_setCeloTokenDistributionScheduleAddress is GoldTokenTest {
-  function test_Reverts_whenCalledByOtherThanL2Governance() public _whenL2 {
-    vm.expectRevert("Ownable: caller is not the owner");
-    vm.prank(address(0));
-    celoToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
-  }
-
-  function test_ShouldSucceedWhenCalledByOwner() public {
-    vm.prank(celoTokenOwner);
-    celoToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
-
-    assertEq(address(celoToken.celoTokenDistributionSchedule()), celoTokenDistributionSchedule);
-  }
-
-  function test_ShouldSucceedWhenCalledByL2Governance() public _whenL2 {
-    vm.prank(celoTokenOwner);
-    celoToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
-
-    assertEq(address(celoToken.celoTokenDistributionSchedule()), celoTokenDistributionSchedule);
-  }
-
-  function test_Emits_SetCeloTokenDistributionScheduleAddressEvent() public {
-    vm.expectEmit(true, true, true, true);
-    emit SetCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
-    vm.prank(celoTokenOwner);
-    celoToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
-  }
-}
-
 contract GoldTokenTest_increaseSupply is GoldTokenTest {
   function test_ShouldIncreaseTotalSupply() public {
     uint256 celoTokenSupplyBefore = celoToken.totalSupply();
@@ -282,9 +255,11 @@ contract GoldTokenTest_increaseSupply is GoldTokenTest {
 }
 
 contract CeloTokenMockTest is Test {
+  IRegistry registry;
   GoldTokenMock mockCeloToken;
   uint256 ONE_CELOTOKEN = 1000000000000000000;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
+  address constant registryAddress = 0x000000000000000000000000000000000000ce10;
   address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
   address celoTokenDistributionSchedule;
 
@@ -294,10 +269,14 @@ contract CeloTokenMockTest is Test {
   }
 
   function setUp() public {
+    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    registry = IRegistry(registryAddress);
+
     mockCeloToken = new GoldTokenMock();
+    mockCeloToken.setRegistry(registryAddress);
     mockCeloToken.setTotalSupply(ONE_CELOTOKEN * 1000);
     celoTokenDistributionSchedule = actor("celoTokenDistributionSchedule");
-    mockCeloToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
+    registry.setAddressFor("CeloDistributionSchedule", celoTokenDistributionSchedule);
   }
 }
 
@@ -328,7 +307,7 @@ contract CeloTokenMock_circulatingSupply is CeloTokenMockTest {
   }
 }
 
-contract CeloToken_AllocatedSupply is CeloTokenMockTest {
+contract GoldTokenTest_AllocatedSupply is CeloTokenMockTest {
   function test_ShouldRevert_WhenL1() public {
     vm.expectRevert("This method is not supported in L1.");
     mockCeloToken.allocatedSupply();
@@ -344,7 +323,7 @@ contract CeloToken_AllocatedSupply is CeloTokenMockTest {
   }
 }
 
-contract CeloToken_TotalSupply is CeloTokenMockTest {
+contract GoldTokenTest_TotalSupply is CeloTokenMockTest {
   uint256 constant TOTAL_MARKET_CAP = 1000000000e18; // 1 billion CELO
 
   function test_TotalSupply_ShouldReturnTotalSupply_WhenL2() public _whenL2 {

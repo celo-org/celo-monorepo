@@ -8,6 +8,7 @@ import "./interfaces/IAccounts.sol";
 import "./interfaces/IFeeCurrencyWhitelist.sol";
 import "./interfaces/IFreezer.sol";
 import "./interfaces/IRegistry.sol";
+import "./interfaces/ICeloDistributionSchedule.sol";
 
 import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IGovernance.sol";
@@ -48,6 +49,8 @@ contract UsingRegistry is Ownable {
 
   bytes32 constant CELO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("CeloToken"));
   bytes32 constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
+  bytes32 constant CELO_DISTRIBUTION_SCHEDULE_ID =
+    keccak256(abi.encodePacked("CeloDistributionSchedule"));
   // solhint-enable state-visibility
 
   IRegistry public registry;
@@ -134,5 +137,9 @@ contract UsingRegistry is Ownable {
 
   function getValidators() internal view returns (IValidators) {
     return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
+  }
+
+  function getCeloDistributionSchedule() internal view returns (ICeloDistributionSchedule) {
+    return ICeloDistributionSchedule(registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID));
   }
 }
