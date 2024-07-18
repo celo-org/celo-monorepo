@@ -15,6 +15,8 @@ import {
   UniswapFeeHandlerSellerInstance,
 } from 'types'
 import { CeloDistributionScheduleContract, CeloDistributionScheduleInstance } from 'types/08'
+import { SOLIDITY_08_PACKAGE } from '../../contractPackages'
+import { ArtifactsSingleton } from '../../lib/artifactsSingleton'
 
 const MentoFeeHandlerSeller: MentoFeeHandlerSellerContract =
   artifacts.require('MentoFeeHandlerSeller')
@@ -24,9 +26,9 @@ const UniswapFeeHandlerSeller: UniswapFeeHandlerSellerContract =
 
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
 const Registry: RegistryContract = artifacts.require('Registry')
-const CeloDistributionSchedule: CeloDistributionScheduleContract = artifacts.require(
-  'CeloDistributionSchedule'
-)
+const CeloDistributionSchedule: CeloDistributionScheduleContract = ArtifactsSingleton.getInstance(
+  SOLIDITY_08_PACKAGE
+).require('CeloDistributionSchedule')
 const oneCelo = new BigNumber('1e18')
 
 contract('FeeHandlerSeller', (accounts: string[]) => {

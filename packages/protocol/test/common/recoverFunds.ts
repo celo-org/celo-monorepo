@@ -12,6 +12,8 @@ import {
   RegistryContract,
 } from 'types'
 import { CeloDistributionScheduleContract } from 'types/08'
+import { SOLIDITY_08_PACKAGE } from '../../contractPackages'
+import { ArtifactsSingleton } from '../../lib/artifactsSingleton'
 
 const GetSetV0: Truffle.Contract<GetSetV0Instance> = artifacts.require('GetSetV0')
 const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
@@ -35,9 +37,8 @@ contract('Proxy', (accounts: string[]) => {
     it('recovers funds from an incorrectly intialized implementation', async () => {
       const Freezer: FreezerContract = artifacts.require('Freezer')
       const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
-      const CeloDistributionSchedule: CeloDistributionScheduleContract = artifacts.require(
-        'CeloDistributionSchedule'
-      )
+      const CeloDistributionSchedule: CeloDistributionScheduleContract =
+        ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE).require('CeloDistributionSchedule')
       // @ts-ignore
       GoldToken.numberFormat = 'BigNumber'
       const Registry: RegistryContract = artifacts.require('Registry')
