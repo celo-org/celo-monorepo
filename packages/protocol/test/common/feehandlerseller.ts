@@ -51,7 +51,7 @@ contract('FeeHandlerSeller', (accounts: string[]) => {
     await registry.setAddressFor(
       CeloContractName.CeloDistributionSchedule,
       celoDistributionSchedule.address
-    )
+    ) // Added because the CeloToken `_transfer` prevents transfers to the celoDistributionSchedule.
 
     uniswapFeeHandlerSeller = await UniswapFeeHandlerSeller.new(true)
     mentoFeeHandlerSeller = await MentoFeeHandlerSeller.new(true)

@@ -38,7 +38,7 @@ contract('Proxy', (accounts: string[]) => {
       const Freezer: FreezerContract = artifacts.require('Freezer')
       const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
       const CeloDistributionSchedule: CeloDistributionScheduleContract =
-        ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE).require('CeloDistributionSchedule')
+        ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE).require('CeloDistributionSchedule') // Added because the CeloToken `_transfer` prevents transfers to the celoDistributionSchedule.
       // @ts-ignore
       GoldToken.numberFormat = 'BigNumber'
       const Registry: RegistryContract = artifacts.require('Registry')
