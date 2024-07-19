@@ -51,6 +51,7 @@ contract FeeHandlerTest is Test, TestConstants {
 
   address owner = address(this);
   address user = actor("user");
+  address celoDistributionSchedule = actor("CeloDistributionSchedule");
 
   uint256 celoAmountForRate = 1e24;
   uint256 stableAmountForRate = 2 * celoAmountForRate;
@@ -101,6 +102,7 @@ contract FeeHandlerTest is Test, TestConstants {
     registry.setAddressFor("GoldToken", address(celoToken));
     registry.setAddressFor("CeloToken", address(celoToken));
     registry.setAddressFor("Reserve", address(mockReserve));
+    registry.setAddressFor("CeloDistributionSchedule", celoDistributionSchedule);
 
     mockReserve.setGoldToken(address(celoToken));
     mockReserve.addToken(address(stableToken));

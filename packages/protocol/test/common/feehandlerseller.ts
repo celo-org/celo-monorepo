@@ -14,6 +14,9 @@ import {
   UniswapFeeHandlerSellerContract,
   UniswapFeeHandlerSellerInstance,
 } from 'types'
+import { CeloDistributionScheduleContract, CeloDistributionScheduleInstance } from 'types/08'
+import { SOLIDITY_08_PACKAGE } from '../../contractPackages'
+import { ArtifactsSingleton } from '../../lib/artifactsSingleton'
 
 const MentoFeeHandlerSeller: MentoFeeHandlerSellerContract =
   artifacts.require('MentoFeeHandlerSeller')
@@ -23,7 +26,9 @@ const UniswapFeeHandlerSeller: UniswapFeeHandlerSellerContract =
 
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
 const Registry: RegistryContract = artifacts.require('Registry')
-
+const CeloDistributionSchedule: CeloDistributionScheduleContract = ArtifactsSingleton.getInstance(
+  SOLIDITY_08_PACKAGE
+).require('CeloDistributionSchedule')
 const oneCelo = new BigNumber('1e18')
 
 contract('FeeHandlerSeller', (accounts: string[]) => {
@@ -31,16 +36,22 @@ contract('FeeHandlerSeller', (accounts: string[]) => {
   let mentoFeeHandlerSeller: MentoFeeHandlerSellerInstance
   let goldToken: GoldTokenInstance
   let registry: RegistryInstance
+  let celoDistributionSchedule: CeloDistributionScheduleInstance
 
   let contractsToTest
   const user = accounts[1]
 
   beforeEach(async () => {
     registry = await Registry.new(true)
+    celoDistributionSchedule = await CeloDistributionSchedule.new(true)
 
     goldToken = await GoldToken.new(true)
     await goldToken.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.GoldToken, goldToken.address)
+    await registry.setAddressFor(
+      CeloContractName.CeloDistributionSchedule,
+      celoDistributionSchedule.address
+    ) // Added because the CeloToken `_transfer` prevents transfers to the celoDistributionSchedule.
 
     uniswapFeeHandlerSeller = await UniswapFeeHandlerSeller.new(true)
     mentoFeeHandlerSeller = await MentoFeeHandlerSeller.new(true)
