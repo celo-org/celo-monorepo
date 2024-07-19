@@ -23,7 +23,7 @@ import "@test-sol/utils/ECDSAHelper.sol";
 import { Utils } from "@test-sol/utils.sol";
 import { Test as ForgeTest } from "forge-std/Test.sol";
 
-contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
+contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -41,8 +41,6 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     uint256 exponent;
     FixidityLib.Fraction adjustmentSpeed;
   }
-
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   Registry registry;
   Accounts accounts;
@@ -159,12 +157,11 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
       adjustmentSpeed: FixidityLib.newFixedFraction(5, 20)
     });
 
-    address registryAddress = 0x000000000000000000000000000000000000ce10;
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-    registry = Registry(registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    registry = Registry(REGISTRY_ADDRESS);
 
     accounts = new Accounts(true);
-    accounts.initialize(registryAddress);
+    accounts.initialize(REGISTRY_ADDRESS);
 
     lockedGold = new MockLockedGold();
     election = new MockElection();
@@ -180,7 +177,7 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
     registry.setAddressFor(StableTokenContract, address(stableToken));
 
     initParams = ValidatorsMockTunnel.InitParams({
-      registryAddress: registryAddress,
+      registryAddress: REGISTRY_ADDRESS,
       groupRequirementValue: originalGroupLockedGoldRequirements.value,
       groupRequirementDuration: originalGroupLockedGoldRequirements.duration,
       validatorRequirementValue: originalValidatorLockedGoldRequirements.value,
@@ -212,7 +209,7 @@ contract ValidatorsTest is Test, Constants, Utils, ECDSAHelper {
   }
 
   function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 
   function _registerValidatorGroupWithMembers(address _group, uint256 _numMembers) public {
