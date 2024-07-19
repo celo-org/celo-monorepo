@@ -5,11 +5,12 @@ import "celo-foundry/Test.sol";
 import "@celo-contracts/common/GoldToken.sol";
 import "@test-sol/unit/common/GoldTokenMock.sol";
 
-contract GoldTokenTest is Test, IsL2Check {
+import { TestConstants } from "@test-sol/constants.sol";
+
+contract GoldTokenTest is Test, TestConstants, IsL2Check {
   GoldToken celoToken;
   IRegistry registry;
 
-  address constant registryAddress = 0x000000000000000000000000000000000000ce10;
   uint256 constant ONE_CELOTOKEN = 1000000000000000000;
   address receiver;
   address sender;
@@ -20,20 +21,20 @@ contract GoldTokenTest is Test, IsL2Check {
   event TransferComment(string comment);
 
   modifier _whenL2() {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
     _;
   }
 
   function setUp() public {
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-    registry = IRegistry(registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     celoTokenOwner = actor("celoTokenOwner");
     celoTokenDistributionSchedule = actor("celoTokenDistributionSchedule");
     vm.prank(celoTokenOwner);
     celoToken = new GoldToken(true);
     vm.prank(celoTokenOwner);
-    celoToken.setRegistry(registryAddress);
+    celoToken.setRegistry(REGISTRY_ADDRESS);
     registry.setAddressFor("CeloDistributionSchedule", celoTokenDistributionSchedule);
     receiver = actor("receiver");
     sender = actor("sender");
@@ -254,26 +255,24 @@ contract GoldTokenTest_increaseSupply is GoldTokenTest {
   }
 }
 
-contract CeloTokenMockTest is Test {
+contract CeloTokenMockTest is Test, TestConstants {
   IRegistry registry;
   GoldTokenMock mockCeloToken;
   uint256 ONE_CELOTOKEN = 1000000000000000000;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
-  address constant registryAddress = 0x000000000000000000000000000000000000ce10;
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
   address celoTokenDistributionSchedule;
 
   modifier _whenL2() {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
     _;
   }
 
   function setUp() public {
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-    registry = IRegistry(registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     mockCeloToken = new GoldTokenMock();
-    mockCeloToken.setRegistry(registryAddress);
+    mockCeloToken.setRegistry(REGISTRY_ADDRESS);
     mockCeloToken.setTotalSupply(ONE_CELOTOKEN * 1000);
     celoTokenDistributionSchedule = actor("celoTokenDistributionSchedule");
     registry.setAddressFor("CeloDistributionSchedule", celoTokenDistributionSchedule);
