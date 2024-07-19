@@ -82,7 +82,7 @@ contract CeloDistributionScheduleTest is Test, TestConstants, IsL2Check {
 
     deployCodeTo("GoldToken.sol", abi.encode(false), celoTokenAddress);
     celoToken = ICeloToken(celoTokenAddress);
-    celoToken.setRegistry(registryAddress);
+    celoToken.setRegistry(REGISTRY_ADDRESS);
     // Using a mock contract, as foundry does not allow for library linking when using deployCodeTo
     governance = new MockGovernance();
 
@@ -306,7 +306,7 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
     vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
 
     vm.prank(celoDistributionOwner);
-    celoDistributionSchedule.initialize(registryAddress);
+    celoDistributionSchedule.initialize(REGISTRY_ADDRESS);
 
     vm.expectRevert("identifier has no registry entry");
 
@@ -328,7 +328,7 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
     vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
 
     vm.prank(celoDistributionOwner);
-    celoDistributionSchedule.initialize(registryAddress);
+    celoDistributionSchedule.initialize(REGISTRY_ADDRESS);
 
     vm.expectRevert("CeloDistributionSchedule address is incorrectly set in Registry.");
 
