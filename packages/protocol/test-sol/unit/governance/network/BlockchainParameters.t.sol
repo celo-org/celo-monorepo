@@ -4,14 +4,13 @@ import "@celo-contracts/governance/BlockchainParameters.sol";
 
 import "celo-foundry/Test.sol";
 
-import { Constants } from "@test-sol/constants.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
 
-contract BlockchainParametersTest is Test, Constants, Utils {
+contract BlockchainParametersTest is Test, TestConstants, Utils {
   uint256 constant gasLimit = 7000000;
   uint256 constant gasForNonGoldCurrencies = 50000;
   address nonOwner;
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   BlockchainParameters blockchainParameters;
 
@@ -26,7 +25,7 @@ contract BlockchainParametersTest is Test, Constants, Utils {
     blockchainParameters = new BlockchainParameters(true);
   }
   function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 }
 

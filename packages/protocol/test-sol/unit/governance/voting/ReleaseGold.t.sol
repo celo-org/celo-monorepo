@@ -3,6 +3,10 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
+
+import { TestConstants } from "@test-sol/constants.sol";
+import { ECDSAHelper } from "@test-sol/utils/ECDSAHelper.sol";
+
 import "@celo-contracts/identity/Escrow.sol";
 import "@celo-contracts/identity/FederatedAttestations.sol";
 import "@celo-contracts/identity/test/MockAttestations.sol";
@@ -20,9 +24,8 @@ import "@celo-contracts/stability/test/MockStableToken.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockGovernance.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
-import "@test-sol/utils/ECDSAHelper.sol";
 
-contract ReleaseGoldTest is Test, ECDSAHelper {
+contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
 
   Registry registry;
@@ -66,9 +69,8 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
   event CanExpireSet(bool canExpire);
   event BeneficiarySet(address indexed beneficiary);
 
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
   function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 
   function newReleaseGold(bool prefund, bool startReleasing) internal returns (ReleaseGold) {
@@ -102,9 +104,8 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
     (beneficiary, beneficiaryPrivateKey) = actorWithPK("beneficiary");
     walletAddress = beneficiary;
 
-    address registryAddress = 0x000000000000000000000000000000000000ce10;
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-    registry = Registry(registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    registry = Registry(REGISTRY_ADDRESS);
 
     accounts = new Accounts(true);
     freezer = new Freezer(true);
@@ -126,9 +127,9 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
     registry.setAddressFor("StableToken", address(stableToken));
     registry.setAddressFor("CeloDistributionSchedule", celoDistributionSchedule);
 
-    lockedGold.initialize(registryAddress, UNLOCKING_PERIOD);
-    goldToken.initialize(registryAddress);
-    accounts.initialize(registryAddress);
+    lockedGold.initialize(REGISTRY_ADDRESS, UNLOCKING_PERIOD);
+    goldToken.initialize(REGISTRY_ADDRESS);
+    accounts.initialize(REGISTRY_ADDRESS);
     vm.prank(beneficiary);
     accounts.createAccount();
 
@@ -149,7 +150,7 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
       initialDistributionRatio: 1000,
       _canValidate: false,
       _canVote: true,
-      registryAddress: registryAddress
+      registryAddress: REGISTRY_ADDRESS
     });
 
     vm.deal(randomAddress, 1000 ether);
@@ -2194,7 +2195,7 @@ contract ReleaseGoldTest_DeployAndInitializeOnL2 is ReleaseGoldTest {
   function setUp() public {
     super.setUp();
     _whenL2();
-    initParams2.registryAddress = proxyAdminAddress;
+    initParams2.registryAddress = PROXY_ADMIN_ADDRESS;
   }
 
   function test_ShouldIndicateIsFundedIfDeploymentIsPrefunded() public {

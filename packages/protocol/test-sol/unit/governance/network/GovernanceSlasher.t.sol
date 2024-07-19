@@ -2,6 +2,7 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/FixidityLib.sol";
@@ -11,7 +12,7 @@ import "@celo-contracts/governance/test/MockLockedGold.sol";
 
 import "@celo-contracts/governance/GovernanceSlasher.sol";
 
-contract GovernanceSlasherTest is Test {
+contract GovernanceSlasherTest is Test, TestConstants {
   event SlashingApproved(address indexed account, uint256 amount);
   event GovernanceSlashPerformed(address indexed account, uint256 amount);
 
@@ -24,7 +25,6 @@ contract GovernanceSlasherTest is Test {
   address nonOwner;
   address validator;
   address slashedAddress;
-  address registryAddress = 0x000000000000000000000000000000000000ce10;
 
   function setUp() public {
     owner = address(this);
@@ -36,12 +36,12 @@ contract GovernanceSlasherTest is Test {
     mockLockedGold = new MockLockedGold();
     governanceSlasher = new GovernanceSlasher(true);
 
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-    registry = IRegistry(registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
     registry.setAddressFor("Accounts", address(accounts));
     registry.setAddressFor("LockedGold", address(mockLockedGold));
 
-    governanceSlasher.initialize(registryAddress);
+    governanceSlasher.initialize(REGISTRY_ADDRESS);
     mockLockedGold.setAccountTotalLockedGold(validator, 5000);
   }
 }
@@ -53,7 +53,7 @@ contract GovernanceSlasherTest_initialize is GovernanceSlasherTest {
 
   function test_CanOnlyBeCalledOnce() public {
     vm.expectRevert("contract already initialized");
-    governanceSlasher.initialize(registryAddress);
+    governanceSlasher.initialize(REGISTRY_ADDRESS);
   }
 }
 

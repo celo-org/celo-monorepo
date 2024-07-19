@@ -19,17 +19,16 @@ import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/governance/Governance.sol";
 
 import "@celo-contracts/governance/test/ValidatorsMock.sol";
-import "@test-sol/constants.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
 import { Utils } from "@test-sol/utils.sol";
 import { Test as ForgeTest } from "forge-std/Test.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 import "@test-sol/unit/governance/voting/mocks/ReleaseGoldMockTunnel.sol";
 
-contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
+contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils {
   using FixidityLib for FixidityLib.Fraction;
 
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
   uint256 constant TOTAL_AMOUNT = 1 ether * 1_000_000;
 
   Registry registry;
@@ -168,9 +167,8 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
       )
       .unwrap();
 
-    address registryAddress = 0x000000000000000000000000000000000000ce10;
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-    registry = Registry(registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    registry = Registry(REGISTRY_ADDRESS);
 
     accounts = new Accounts(true);
     stableToken = new MockStableToken();
@@ -192,7 +190,7 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
 
     goldToken.initialize(address(registry));
 
-    accounts.initialize(registryAddress);
+    accounts.initialize(REGISTRY_ADDRESS);
 
     releaseGold = new ReleaseGold(true);
 
@@ -213,14 +211,14 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
       initialDistributionRatio: 1000,
       _canValidate: true,
       _canVote: true,
-      registryAddress: registryAddress
+      registryAddress: REGISTRY_ADDRESS
     });
 
     ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold));
     tunnel.MockInitialize(owner, releaseGoldInitParams, releaseGoldInitParams2);
 
     election.initialize(
-      registryAddress,
+      REGISTRY_ADDRESS,
       electableValidatorsMin,
       electableValidatorsMax,
       maxNumGroupsVotedFor,
@@ -245,7 +243,7 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
     });
 
     initParams = ValidatorsMockTunnel.InitParams({
-      registryAddress: registryAddress,
+      registryAddress: REGISTRY_ADDRESS,
       groupRequirementValue: originalGroupLockedGoldRequirements.value,
       groupRequirementDuration: originalGroupLockedGoldRequirements.duration,
       validatorRequirementValue: originalValidatorLockedGoldRequirements.value,
@@ -284,7 +282,7 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils {
   }
 
   function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 
   function _registerValidatorGroupHelper(address _group, uint256 numMembers) internal {
