@@ -6,6 +6,8 @@ commands in this directory, consume the `[profile.devchain]` defined in
 [passing the profile as an environment variable](https://book.getfoundry.sh/config/#configuring-with-foundrytoml),
 and use the `--fork-url` flag to point to the anvil devchain.
 
+These tests are supposed to test the integrity of a chain after it was migrated.
+
 For example:
 
 1.  Start a local devchain (check latest scripts in [package.json](../../package.json) in
