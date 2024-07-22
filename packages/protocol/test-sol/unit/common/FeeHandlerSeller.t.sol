@@ -5,14 +5,8 @@ pragma experimental ABIEncoderV2;
 // Helper contracts
 import { Test } from "celo-foundry/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
+
 import { GoldTokenMock } from "@test-sol/unit/common/GoldTokenMock.sol";
-
-// Contract to test
-import "@celo-contracts/common/FeeHandler.sol";
-
-// Dependencies
-import { IRegistry } from "@celo-contracts/common/interfaces/IRegistry.sol";
-import { GoldToken } from "@celo-contracts/common/GoldToken.sol";
 import { FeeHandlerSeller } from "@celo-contracts/common/FeeHandlerSeller.sol";
 import { MentoFeeHandlerSeller } from "@celo-contracts/common/MentoFeeHandlerSeller.sol";
 import { UniswapFeeHandlerSeller } from "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
