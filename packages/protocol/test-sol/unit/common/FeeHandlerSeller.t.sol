@@ -49,7 +49,7 @@ contract FeeHandlerSellerTest is Test, TestConstants {
 }
 
 contract FeeHandlerSellerTest_Transfer is FeeHandlerSellerTest {
-  function test_ShouldTransfer() public {
+  function test_FeeHandlerSeller_ShouldTransfer_WhenCalledByOwner() public {
     for (uint256 i = 0; i < contractsToTest.length; i++) {
       celoToken.setBalanceOf(receiver, 0); // Reset balance of receiver
       assertEq(celoToken.balanceOf(receiver), 0, "Balance of receiver should be 0 at start");
@@ -64,7 +64,7 @@ contract FeeHandlerSellerTest_Transfer is FeeHandlerSellerTest {
     }
   }
 
-  function test_ShouldRevert_WhenNotOwner() public {
+  function test_FeeHandlerSeller_ShouldRevert_WhenCalledByNonOwner() public {
     for (uint256 i = 0; i < contractsToTest.length; i++) {
       vm.prank(actor("arbitrary address"));
 
