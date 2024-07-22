@@ -73,3 +73,40 @@ contract FeeHandlerSellerTest_Transfer is FeeHandlerSellerTest {
     }
   }
 }
+
+contract FeeHandlerSellerTest_SetMinimumReports is FeeHandlerSellerTest {
+  function test_SetMinimumReports_ShouldSucceedWhen_CalledByOwner() public {
+    address ARBITRARY_TOKEN_ADDRESS = address(celoToken);
+    uint256 ARBITRARY_NR_OF_MINIMUM_REPORTS = 15;
+
+    for (uint256 i = 0; i < contractsToTest.length; i++) {
+      vm.prank(contractsToTest[i].owner());
+
+      contractsToTest[i].setMinimumReports(
+        ARBITRARY_TOKEN_ADDRESS,
+        ARBITRARY_NR_OF_MINIMUM_REPORTS
+      );
+
+      assertEq(
+        contractsToTest[i].minimumReports(ARBITRARY_TOKEN_ADDRESS),
+        ARBITRARY_NR_OF_MINIMUM_REPORTS,
+        "Number of minimum reports don't match"
+      );
+    }
+  }
+
+  function test_SetMinimumReports_ShouldRevertWhen_CalledByNonOwner() public {
+    address ARBITRARY_TOKEN_ADDRESS = address(celoToken);
+    uint256 ARBITRARY_NR_OF_MINIMUM_REPORTS = 15;
+
+    for (uint256 i = 0; i < contractsToTest.length; i++) {
+      vm.prank(actor("arbitrary address"));
+
+      vm.expectRevert("Ownable: caller is not the owner");
+      contractsToTest[i].setMinimumReports(
+        ARBITRARY_TOKEN_ADDRESS,
+        ARBITRARY_NR_OF_MINIMUM_REPORTS
+      );
+    }
+  }
+}
