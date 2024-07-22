@@ -18,77 +18,101 @@ import { MentoFeeHandlerSeller } from "@celo-contracts/common/MentoFeeHandlerSel
 import { UniswapFeeHandlerSeller } from "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
 
 contract FeeHandlerSellerTest is Test, TestConstants {
-  // Constants
-  uint256 constant ONE_CELOTOKEN = 1000000000000000000;
-
   // Actors
-  address receiver = actor("receiver");
+  address RECEIVER_ADDRESS = actor("Arbitrary Receiver");
+  address NON_OWNER_ADDRESS = actor("Arbitrary Non-Owner");
 
   // Contract instances
-  IRegistry registry;
   GoldTokenMock celoToken; // Using mock token to work around missing transfer precompile
   FeeHandlerSeller mentoFeeHandlerSeller;
   FeeHandlerSeller uniswapFeeHandlerSeller;
 
+  // Contract addresses
+  address MOCK_CELO_TOKEN_ADDRESS;
+
   // Helper data structures
-  FeeHandlerSeller[] contractsToTest;
+  FeeHandlerSeller[] feeHandlerSellerInstances;
 
   function setUp() public {
-    // Boilerplate
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
-    registry = IRegistry(REGISTRY_ADDRESS);
     celoToken = new GoldTokenMock();
+    MOCK_CELO_TOKEN_ADDRESS = address(celoToken);
 
-    // Contracts to be tested
     mentoFeeHandlerSeller = new MentoFeeHandlerSeller(true);
     uniswapFeeHandlerSeller = new UniswapFeeHandlerSeller(true);
 
-    contractsToTest.push(mentoFeeHandlerSeller);
-    contractsToTest.push(uniswapFeeHandlerSeller);
+    feeHandlerSellerInstances.push(mentoFeeHandlerSeller);
+    feeHandlerSellerInstances.push(uniswapFeeHandlerSeller);
   }
 }
 
 contract FeeHandlerSellerTest_Transfer is FeeHandlerSellerTest {
+  uint256 constant ZERO_CELOTOKEN = 0;
+  uint256 constant ONE_CELOTOKEN = 1000000000000000000;
+
   function test_FeeHandlerSeller_ShouldTransfer_WhenCalledByOwner() public {
-    for (uint256 i = 0; i < contractsToTest.length; i++) {
-      celoToken.setBalanceOf(receiver, 0); // Reset balance of receiver
-      assertEq(celoToken.balanceOf(receiver), 0, "Balance of receiver should be 0 at start");
-      celoToken.setBalanceOf(address(contractsToTest[i]), ONE_CELOTOKEN); // Faucet contract
-      assertEq(celoToken.balanceOf(address(contractsToTest[i])), ONE_CELOTOKEN, "Balance of contract should be 1 at start");
+    for (uint256 i = 0; i < feeHandlerSellerInstances.length; i++) {
+      celoToken.setBalanceOf(RECEIVER_ADDRESS, ZERO_CELOTOKEN); // Reset balance of receiver
+      assertEq(
+        celoToken.balanceOf(RECEIVER_ADDRESS),
+        ZERO_CELOTOKEN,
+        "Balance of receiver should be 0 at start"
+      );
+      celoToken.setBalanceOf(address(feeHandlerSellerInstances[i]), ONE_CELOTOKEN); // Faucet contract
+      assertEq(
+        celoToken.balanceOf(address(feeHandlerSellerInstances[i])),
+        ONE_CELOTOKEN,
+        "Balance of contract should be 1 at start"
+      );
 
-      vm.prank(contractsToTest[i].owner());
-      contractsToTest[i].transfer(address(celoToken), ONE_CELOTOKEN, receiver);
+      vm.prank(feeHandlerSellerInstances[i].owner());
+      feeHandlerSellerInstances[i].transfer(
+        MOCK_CELO_TOKEN_ADDRESS,
+        ONE_CELOTOKEN,
+        RECEIVER_ADDRESS
+      );
 
-      assertEq(celoToken.balanceOf(receiver), ONE_CELOTOKEN, "Balance of receiver should be 1 after transfer");
-      assertEq(celoToken.balanceOf(address(contractsToTest[i])), 0, "Balance of contract should be 0 after transfer");
+      assertEq(
+        celoToken.balanceOf(RECEIVER_ADDRESS),
+        ONE_CELOTOKEN,
+        "Balance of receiver should be 1 after transfer"
+      );
+      assertEq(
+        celoToken.balanceOf(address(feeHandlerSellerInstances[i])),
+        ZERO_CELOTOKEN,
+        "Balance of contract should be 0 after transfer"
+      );
     }
   }
 
   function test_FeeHandlerSeller_ShouldRevert_WhenCalledByNonOwner() public {
-    for (uint256 i = 0; i < contractsToTest.length; i++) {
-      vm.prank(actor("arbitrary address"));
+    for (uint256 i = 0; i < feeHandlerSellerInstances.length; i++) {
+      vm.prank(NON_OWNER_ADDRESS);
 
       vm.expectRevert("Ownable: caller is not the owner");
-      contractsToTest[i].transfer(address(celoToken), ONE_CELOTOKEN, receiver);
+      feeHandlerSellerInstances[i].transfer(
+        MOCK_CELO_TOKEN_ADDRESS,
+        ONE_CELOTOKEN,
+        RECEIVER_ADDRESS
+      );
     }
   }
 }
 
 contract FeeHandlerSellerTest_SetMinimumReports is FeeHandlerSellerTest {
+  address ARBITRARY_TOKEN_ADDRESS = MOCK_CELO_TOKEN_ADDRESS;
+  uint256 constant ARBITRARY_NR_OF_MINIMUM_REPORTS = 15;
+
   function test_SetMinimumReports_ShouldSucceedWhen_CalledByOwner() public {
-    address ARBITRARY_TOKEN_ADDRESS = address(celoToken);
-    uint256 ARBITRARY_NR_OF_MINIMUM_REPORTS = 15;
+    for (uint256 i = 0; i < feeHandlerSellerInstances.length; i++) {
+      vm.prank(feeHandlerSellerInstances[i].owner());
 
-    for (uint256 i = 0; i < contractsToTest.length; i++) {
-      vm.prank(contractsToTest[i].owner());
-
-      contractsToTest[i].setMinimumReports(
+      feeHandlerSellerInstances[i].setMinimumReports(
         ARBITRARY_TOKEN_ADDRESS,
         ARBITRARY_NR_OF_MINIMUM_REPORTS
       );
 
       assertEq(
-        contractsToTest[i].minimumReports(ARBITRARY_TOKEN_ADDRESS),
+        feeHandlerSellerInstances[i].minimumReports(ARBITRARY_TOKEN_ADDRESS),
         ARBITRARY_NR_OF_MINIMUM_REPORTS,
         "Number of minimum reports don't match"
       );
@@ -96,14 +120,11 @@ contract FeeHandlerSellerTest_SetMinimumReports is FeeHandlerSellerTest {
   }
 
   function test_SetMinimumReports_ShouldRevertWhen_CalledByNonOwner() public {
-    address ARBITRARY_TOKEN_ADDRESS = address(celoToken);
-    uint256 ARBITRARY_NR_OF_MINIMUM_REPORTS = 15;
-
-    for (uint256 i = 0; i < contractsToTest.length; i++) {
-      vm.prank(actor("arbitrary address"));
+    for (uint256 i = 0; i < feeHandlerSellerInstances.length; i++) {
+      vm.prank(NON_OWNER_ADDRESS);
 
       vm.expectRevert("Ownable: caller is not the owner");
-      contractsToTest[i].setMinimumReports(
+      feeHandlerSellerInstances[i].setMinimumReports(
         ARBITRARY_TOKEN_ADDRESS,
         ARBITRARY_NR_OF_MINIMUM_REPORTS
       );
