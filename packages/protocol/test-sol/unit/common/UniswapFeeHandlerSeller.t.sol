@@ -12,6 +12,7 @@ contract UniswapFeeHandlerSellerTest is Test, TestConstants {
   // Actors
   address TOKEN_ADDRESS = actor("Arbitrary Token Address");
   address ROUTER_ADDRESS = actor("Arbitrary Router Address");
+  address NON_OWNER_ADDRESS = actor("Arbitrary Non-Owner");
 
   // Contract instance
   UniswapFeeHandlerSeller uniswapFeeHandlerSeller;
@@ -27,5 +28,12 @@ contract UniswapFeeHandlerSellerTest_SetRouter is UniswapFeeHandlerSellerTest {
     uniswapFeeHandlerSeller.setRouter(TOKEN_ADDRESS, ROUTER_ADDRESS);
 
     assertEq(uniswapFeeHandlerSeller.getRoutersForToken(TOKEN_ADDRESS)[0], ROUTER_ADDRESS);
+  }
+
+  function test_SetRouter_ShouldRevertWhen_CalledByNonOwner() public {
+    vm.prank(NON_OWNER_ADDRESS);
+
+    vm.expectRevert("Ownable: caller is not the owner");
+    uniswapFeeHandlerSeller.setRouter(TOKEN_ADDRESS, ROUTER_ADDRESS);
   }
 }
