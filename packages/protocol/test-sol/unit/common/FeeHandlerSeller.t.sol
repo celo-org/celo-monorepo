@@ -51,19 +51,25 @@ contract FeeHandlerSellerTest is Test, TestConstants {
 contract FeeHandlerSellerTest_Transfer is FeeHandlerSellerTest {
   function test_ShouldTransfer() public {
     for (uint256 i = 0; i < contractsToTest.length; i++) {
-      // Given...
       celoToken.setBalanceOf(receiver, 0); // Reset balance of receiver
       assertEq(celoToken.balanceOf(receiver), 0, "Balance of receiver should be 0 at start");
       celoToken.setBalanceOf(address(contractsToTest[i]), ONE_CELOTOKEN); // Faucet contract
       assertEq(celoToken.balanceOf(address(contractsToTest[i])), ONE_CELOTOKEN, "Balance of contract should be 1 at start");
 
-      // When...
       vm.prank(contractsToTest[i].owner());
       contractsToTest[i].transfer(address(celoToken), ONE_CELOTOKEN, receiver);
 
-      // Then...
       assertEq(celoToken.balanceOf(receiver), ONE_CELOTOKEN, "Balance of receiver should be 1 after transfer");
       assertEq(celoToken.balanceOf(address(contractsToTest[i])), 0, "Balance of contract should be 0 after transfer");
+    }
+  }
+
+  function test_ShouldRevert_WhenNotOwner() public {
+    for (uint256 i = 0; i < contractsToTest.length; i++) {
+      vm.prank(actor("arbitrary address"));
+
+      vm.expectRevert("Ownable: caller is not the owner");
+      contractsToTest[i].transfer(address(celoToken), ONE_CELOTOKEN, receiver);
     }
   }
 }
