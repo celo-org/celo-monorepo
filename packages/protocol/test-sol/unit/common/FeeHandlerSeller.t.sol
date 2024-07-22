@@ -13,15 +13,9 @@ import "@celo-contracts/common/FeeHandler.sol";
 // Dependencies
 import { IRegistry } from "@celo-contracts/common/interfaces/IRegistry.sol";
 import { GoldToken } from "@celo-contracts/common/GoldToken.sol";
-
-// import { IFeeHandlerSeller } from "@celo-contracts/common/interfaces/IFeeHandlerSeller.sol";
 import { FeeHandlerSeller } from "@celo-contracts/common/FeeHandlerSeller.sol";
 import { MentoFeeHandlerSeller } from "@celo-contracts/common/MentoFeeHandlerSeller.sol";
 import { UniswapFeeHandlerSeller } from "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
-
-/////// DEBUGGING ///// TODO: Delete before merging PR
-import { console2 as console } from "forge-std-8/console2.sol";
-/////// DEBUGGING /////
 
 contract FeeHandlerSellerTest is Test, TestConstants {
   // Constants
@@ -32,7 +26,7 @@ contract FeeHandlerSellerTest is Test, TestConstants {
 
   // Contract instances
   IRegistry registry;
-  GoldTokenMock celoToken;
+  GoldTokenMock celoToken; // Using mock token to work around missing transfer precompile
   FeeHandlerSeller mentoFeeHandlerSeller;
   FeeHandlerSeller uniswapFeeHandlerSeller;
 
@@ -40,9 +34,6 @@ contract FeeHandlerSellerTest is Test, TestConstants {
   FeeHandlerSeller[] contractsToTest;
 
   function setUp() public {
-    // owner = address(this);
-    // vm.prank(owner);
-
     // Boilerplate
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
     registry = IRegistry(REGISTRY_ADDRESS);
@@ -54,9 +45,6 @@ contract FeeHandlerSellerTest is Test, TestConstants {
 
     contractsToTest.push(mentoFeeHandlerSeller);
     contractsToTest.push(uniswapFeeHandlerSeller);
-
-    // registry.setAddressFor("GoldToken", address(celoToken));
-    // registry.setAddressFor("CeloToken", address(celoToken));
   }
 }
 
