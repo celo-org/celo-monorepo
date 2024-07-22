@@ -5,15 +5,23 @@ pragma experimental ABIEncoderV2;
 // Helper contracts
 import { Test } from "celo-foundry/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
+import { GoldTokenMock } from "@test-sol/unit/common/GoldTokenMock.sol";
 
 // Contract to test
 import "@celo-contracts/common/FeeHandler.sol";
 
 // Dependencies
+import { IRegistry } from "@celo-contracts/common/interfaces/IRegistry.sol";
 import { GoldToken } from "@celo-contracts/common/GoldToken.sol";
-import { IFeeHandlerSeller } from "@celo-contracts/common/interfaces/IFeeHandlerSeller.sol";
+
+// import { IFeeHandlerSeller } from "@celo-contracts/common/interfaces/IFeeHandlerSeller.sol";
+import { FeeHandlerSeller } from "@celo-contracts/common/FeeHandlerSeller.sol";
 import { MentoFeeHandlerSeller } from "@celo-contracts/common/MentoFeeHandlerSeller.sol";
 import { UniswapFeeHandlerSeller } from "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
+
+/////// DEBUGGING ///// TODO: Delete before merging PR
+import { console2 as console } from "forge-std-8/console2.sol";
+/////// DEBUGGING /////
 
 contract FeeHandlerSellerTest is Test, TestConstants {
   // Constants
@@ -24,12 +32,12 @@ contract FeeHandlerSellerTest is Test, TestConstants {
 
   // Contract instances
   IRegistry registry;
-  GoldToken celoToken;
-  IFeeHandlerSeller mentoFeeHandlerSeller;
-  IFeeHandlerSeller uniswapFeeHandlerSeller;
+  GoldTokenMock celoToken;
+  FeeHandlerSeller mentoFeeHandlerSeller;
+  FeeHandlerSeller uniswapFeeHandlerSeller;
 
   // Helper data structures
-  IFeeHandlerSeller[] contractsToTest;
+  FeeHandlerSeller[] contractsToTest;
 
   function setUp() public {
     // owner = address(this);
@@ -38,7 +46,7 @@ contract FeeHandlerSellerTest is Test, TestConstants {
     // Boilerplate
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
     registry = IRegistry(REGISTRY_ADDRESS);
-    celoToken = new GoldToken(true);
+    celoToken = new GoldTokenMock();
 
     // Contracts to be tested
     mentoFeeHandlerSeller = new MentoFeeHandlerSeller(true);
@@ -54,27 +62,20 @@ contract FeeHandlerSellerTest is Test, TestConstants {
 
 contract FeeHandlerSellerTest_Transfer is FeeHandlerSellerTest {
   function test_ShouldTransfer() public {
-    /* 
-      for (const contract of contractsToTest) {
-        const receiver = web3.eth.accounts.create().address
-        assertEqualBN(await goldToken.balanceOf(receiver), new BigNumber(0))
-
-        await goldToken.transfer(contract.address, oneCelo)
-        await contract.transfer(goldToken.address, oneCelo, receiver)
-        assertEqualBN(await goldToken.balanceOf(receiver), oneCelo)
-        assertEqualBN(await goldToken.balanceOf(contract.address), new BigNumber(0))
-      }
-      */
     for (uint256 i = 0; i < contractsToTest.length; i++) {
+      // Given...
+      celoToken.setBalanceOf(receiver, 0); // Reset balance of receiver
       assertEq(celoToken.balanceOf(receiver), 0, "Balance of receiver should be 0 at start");
-      vm.deal(address(contractsToTest[i]), ONE_CELOTOKEN); // Faucet contract
+      celoToken.setBalanceOf(address(contractsToTest[i]), ONE_CELOTOKEN); // Faucet contract
+      assertEq(celoToken.balanceOf(address(contractsToTest[i])), ONE_CELOTOKEN, "Balance of contract should be 1 at start");
 
-      vm.prank(address(this));
-      contractsToTest[i].transfer(address(celoToken), ONE_CELOTOKEN, receiver); // Transfer from contract
-      assertEq(celoToken.balanceOf(receiver), 0, "Balance of receiver should be 1 after transfer");
-      assertEq(celoToken.balanceOf(address(contractsToTest[i])), 0, "Balance of contract should be 0");
+      // When...
+      vm.prank(contractsToTest[i].owner());
+      contractsToTest[i].transfer(address(celoToken), ONE_CELOTOKEN, receiver);
+
+      // Then...
+      assertEq(celoToken.balanceOf(receiver), ONE_CELOTOKEN, "Balance of receiver should be 1 after transfer");
+      assertEq(celoToken.balanceOf(address(contractsToTest[i])), 0, "Balance of contract should be 0 after transfer");
     }
-
-    
   }
 }
