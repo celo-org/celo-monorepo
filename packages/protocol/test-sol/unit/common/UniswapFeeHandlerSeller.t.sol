@@ -66,16 +66,11 @@ contract UniswapFeeHandlerSellerTest_SetRouter is UniswapFeeHandlerSellerTest {
 }
 
 contract UniswapFeeHandlerSellerTest_RemoveRouter is UniswapFeeHandlerSellerTest {
-  function setUp() public {
-    super.setUp();
-
-    vm.prank(UNISWAP_FEE_HANDLER_SELLER_OWNER_ADDRESS);
-    uniswapFeeHandlerSeller.setRouter(ARBITRARY_TOKEN_ADDRESS, ARBITRARY_ROUTER_ADDRESS_A);
-  }
-
   function test_RemoveRouter_ShouldSucceedWhen_CalledByOwner() public {
-    vm.prank(UNISWAP_FEE_HANDLER_SELLER_OWNER_ADDRESS);
+    vm.startPrank(UNISWAP_FEE_HANDLER_SELLER_OWNER_ADDRESS);
+    uniswapFeeHandlerSeller.setRouter(ARBITRARY_TOKEN_ADDRESS, ARBITRARY_ROUTER_ADDRESS_A);
     uniswapFeeHandlerSeller.removeRouter(ARBITRARY_TOKEN_ADDRESS, ARBITRARY_ROUTER_ADDRESS_A);
+    vm.stopPrank();
 
     assertEq(uniswapFeeHandlerSeller.getRoutersForToken(ARBITRARY_TOKEN_ADDRESS).length, 0);
   }
