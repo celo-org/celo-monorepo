@@ -57,7 +57,7 @@ contract UniswapFeeHandlerSellerTest_SetRouter is UniswapFeeHandlerSellerTest {
     vm.startPrank(UNISWAP_FEE_HANDLER_SELLER_OWNER_ADDRESS);
     uniswapFeeHandlerSeller.setRouter(ARBITRARY_TOKEN_ADDRESS, ARBITRARY_ROUTER_ADDRESS_A);
     uniswapFeeHandlerSeller.setRouter(ARBITRARY_TOKEN_ADDRESS, ARBITRARY_ROUTER_ADDRESS_B);
-    uniswapFeeHandlerSeller.setRouter(ARBITRARY_TOKEN_ADDRESS, ARBITRARY_ROUTER_ADDRESS_C); // Max number of routers
+    uniswapFeeHandlerSeller.setRouter(ARBITRARY_TOKEN_ADDRESS, ARBITRARY_ROUTER_ADDRESS_C); // Max number of routers defined in contract
 
     vm.expectRevert("Max number of routers reached");
     uniswapFeeHandlerSeller.setRouter(ARBITRARY_TOKEN_ADDRESS, ARBITRARY_ROUTER_ADDRESS_D); // Attempt to set one more router
