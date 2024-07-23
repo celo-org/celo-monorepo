@@ -93,7 +93,7 @@ contract FeeHandlerSellerTest_Transfer is FeeHandlerSellerTest {
 }
 
 contract FeeHandlerSellerTest_SetMinimumReports is FeeHandlerSellerTest {
-  address ARBITRARY_TOKEN_ADDRESS = MOCK_CELO_TOKEN_ADDRESS;
+  address ARBITRARY_TOKEN_ADDRESS = actor("Arbitrary Token Address");
   uint256 constant ARBITRARY_NR_OF_MINIMUM_REPORTS = 15;
 
   function test_SetMinimumReports_ShouldSucceedWhen_CalledByOwner() public {
