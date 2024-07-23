@@ -35,7 +35,10 @@ contract UniswapFeeHandlerSellerTest_SetRouter is UniswapFeeHandlerSellerTest {
     vm.prank(UNISWAP_FEE_HANDLER_SELLER_OWNER_ADDRESS);
     uniswapFeeHandlerSeller.setRouter(TOKEN_ADDRESS, ARBITRARY_ROUTER_ADDRESS_A);
 
-    assertEq(uniswapFeeHandlerSeller.getRoutersForToken(TOKEN_ADDRESS)[0], ARBITRARY_ROUTER_ADDRESS_A);
+    assertEq(
+      uniswapFeeHandlerSeller.getRoutersForToken(TOKEN_ADDRESS)[0],
+      ARBITRARY_ROUTER_ADDRESS_A
+    );
   }
 
   function test_SetRouter_ShouldRevertWhen_CalledByNonOwner() public {
