@@ -5,7 +5,7 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
-import "../../common/FixidityLib.sol";
+import "../../../contracts/common/FixidityLib.sol";
 
 /**
  * @title A mock StableToken for testing.

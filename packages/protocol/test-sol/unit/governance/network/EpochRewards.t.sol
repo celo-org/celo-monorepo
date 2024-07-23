@@ -1,22 +1,23 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
-import "@celo-contracts/common/Registry.sol";
-import "@celo-contracts/common/Freezer.sol";
+import "celo-foundry-8/Test.sol";
+
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts/common/interfaces/IReserve.sol";
+import "@celo-contracts-8/common/Freezer.sol";
 
 import "@celo-contracts/governance/test/MockElection.sol";
 import { EpochRewardsMock } from "@celo-contracts/governance/test/EpochRewardsMock.sol";
-import { Reserve } from "@lib/mento-core/contracts/Reserve.sol";
 
 import { MockSortedOracles } from "@celo-contracts/stability/test/MockSortedOracles.sol";
 import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.sol";
 import { GoldTokenMock } from "@test-sol/unit/common/GoldTokenMock.sol";
 
 import { Constants } from "@test-sol/constants.sol";
-import { Utils } from "@test-sol/utils.sol";
+import { Utils08 } from "@test-sol/utils08.sol";
 
-contract EpochRewardsTest is Test, Constants, Utils {
+contract EpochRewardsTest is Test, Constants, Utils08 {
   uint256 constant targetVotingYieldParamsInitial = 0.00016e24; // 0.00016
   uint256 constant targetVotingYieldParamsMax = 0.0005e24; // 0.0005
   uint256 constant targetVotingYieldParamsAdjustmentFactor = 1127990000000000000; // 0.00000112799
@@ -44,10 +45,10 @@ contract EpochRewardsTest is Test, Constants, Utils {
   MockSortedOracles mockSortedOracles;
   MockStableToken mockStableToken;
   GoldTokenMock mockGoldToken;
-  Reserve reserve;
+  IReserve reserve;
   Freezer freezer;
 
-  Registry registry;
+  IRegistry registry;
 
   address caller = address(this);
 
@@ -62,7 +63,7 @@ contract EpochRewardsTest is Test, Constants, Utils {
   event TargetVotingYieldParametersSet(uint256 max, uint256 adjustmentFactor);
   event TargetVotingYieldSet(uint256 target);
 
-  function setUp() public {
+  function setUp() public virtual {
     // Mocked contracts
     epochRewards = new EpochRewardsMock();
     election = new MockElection();
@@ -71,7 +72,10 @@ contract EpochRewardsTest is Test, Constants, Utils {
     mockGoldToken = new GoldTokenMock();
 
     freezer = new Freezer(true);
-    registry = new Registry(true);
+
+    address registryAddress = 0x000000000000000000000000000000000000ce10;
+    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    registry = IRegistry(registryAddress);
 
     registry.setAddressFor(ElectionContract, address(election));
     registry.setAddressFor(SortedOraclesContract, address(mockSortedOracles));
@@ -163,7 +167,7 @@ contract EpochRewardsTest_initialize is EpochRewardsTest {
 contract EpochRewardsTest_setTargetVotingGoldFraction is EpochRewardsTest {
   uint256 newFraction;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newFraction = targetVotingGoldFraction + 1;
   }
@@ -462,7 +466,7 @@ contract EpochRewardsTest_getRewardsMultiplier is EpochRewardsTest {
   uint256 expectedTargetRemainingSupply;
   uint256 targetEpochReward;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     expectedTargetTotalSupply = getExpectedTargetTotalSupply(timeDelta);
     expectedTargetRemainingSupply = SUPPLY_CAP - expectedTargetTotalSupply;
@@ -507,9 +511,12 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
   uint256 constant reserveBalance = 1000000 ether;
   uint256 constant floatingSupply = totalSupply - reserveBalance;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
-    reserve = new Reserve(true);
+
+    address reserveAddress = 0x9380fA34Fd9e4Fd14c06305fd7B6199089eD4eb9;
+    deployCodeTo("Reserve.sol", abi.encode(false), reserveAddress);
+    reserve = IReserve(reserveAddress);
 
     registry.setAddressFor("Reserve", address(reserve));
 
@@ -777,7 +784,7 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
   uint256 validatorReward;
   uint256 votingReward;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     epochRewards.setNumberValidatorsInCurrentSet(numberValidators);
@@ -846,12 +853,10 @@ contract EpochRewardsTest_WhenThereAreActiveVotesAStableTokenExchangeRateIsSetAn
 contract EpochRewardsTest_isReserveLow is EpochRewardsTest {
   uint256 constant stableBalance = 2397846127684712867321;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     uint256 totalSupply = 129762987346298761037469283746;
-    reserve = new Reserve(true);
-    registry.setAddressFor("Reserve", address(reserve));
 
     initialAssetAllocationWeights = new uint256[](2);
     initialAssetAllocationWeights[0] = FIXED1 / 2;

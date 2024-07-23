@@ -1,7 +1,7 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
 import "@celo-contracts/common/GoldToken.sol";
 import "@test-sol/unit/common/GoldTokenMock.sol";
 
@@ -23,7 +23,7 @@ contract GoldTokenTest is Test, IsL2Check {
     _;
   }
 
-  function setUp() public {
+  function setUp() public virtual {
     celoTokenOwner = actor("celoTokenOwner");
     celoTokenDistributionSchedule = actor("celoTokenDistributionSchedule");
     vm.prank(celoTokenOwner);
@@ -37,7 +37,7 @@ contract GoldTokenTest is Test, IsL2Check {
 }
 
 contract GoldTokenTest_general is GoldTokenTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -87,7 +87,7 @@ contract GoldTokenTest_general is GoldTokenTest {
 }
 
 contract GoldTokenTest_transfer is GoldTokenTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     vm.prank(celoTokenOwner);
     celoToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
@@ -129,7 +129,7 @@ contract GoldTokenTest_transfer is GoldTokenTest {
 }
 
 contract GoldTokenTest_transferFrom is GoldTokenTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     vm.prank(celoTokenOwner);
     celoToken.setCeloTokenDistributionScheduleAddress(celoTokenDistributionSchedule);
@@ -177,7 +177,7 @@ contract GoldTokenTest_burn is GoldTokenTest {
   uint256 startBurn;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     startBurn = celoToken.getBurnedAmount();
   }
@@ -293,7 +293,7 @@ contract CeloTokenMockTest is Test {
     _;
   }
 
-  function setUp() public {
+  function setUp() public virtual {
     mockCeloToken = new GoldTokenMock();
     mockCeloToken.setTotalSupply(ONE_CELOTOKEN * 1000);
     celoTokenDistributionSchedule = actor("celoTokenDistributionSchedule");
@@ -302,7 +302,7 @@ contract CeloTokenMockTest is Test {
 }
 
 contract CeloTokenMock_circulatingSupply is CeloTokenMockTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 

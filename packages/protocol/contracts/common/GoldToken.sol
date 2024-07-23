@@ -1,10 +1,11 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/interfaces/IERC20.sol";
 
-import "./UsingRegistry.sol";
+import "../../contracts-0.8/common/UsingRegistry.sol";
 import "./CalledByVm.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
@@ -42,11 +43,7 @@ contract GoldToken is
 
   ICeloDistributionSchedule public celoTokenDistributionSchedule;
 
-  event Transfer(address indexed from, address indexed to, uint256 value);
-
   event TransferComment(string comment);
-
-  event Approval(address indexed owner, address indexed spender, uint256 value);
 
   event SetCeloTokenDistributionScheduleAddress(address indexed newScheduleAddress);
 
@@ -90,7 +87,7 @@ contract GoldToken is
    * @return True if the transaction succeeds.
    */
   // solhint-disable-next-line no-simple-event-func-name
-  function transfer(address to, uint256 value) external returns (bool) {
+  function transfer(address to, uint256 value) external virtual returns (bool) {
     return _transferWithCheck(to, value);
   }
 
@@ -171,7 +168,7 @@ contract GoldToken is
    * @param value The amount of CELO to transfer.
    * @return True if the transaction succeeds.
    */
-  function transferFrom(address from, address to, uint256 value) external returns (bool) {
+  function transferFrom(address from, address to, uint256 value) external virtual returns (bool) {
     require(to != address(0), "transfer attempted to reserved address 0x0");
     require(
       to != address(celoTokenDistributionSchedule),
@@ -184,7 +181,7 @@ contract GoldToken is
     );
 
     bool success;
-    (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(from, to, value));
+    (success, ) = TRANSFER.call{value: value, gas: gasleft()}(abi.encode(from, to, value));
     require(success, "CELO transfer failed");
 
     allowed[from][msg.sender] = allowed[from][msg.sender].sub(value);
@@ -207,7 +204,7 @@ contract GoldToken is
     totalSupply_ = totalSupply_.add(value);
 
     bool success;
-    (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(address(0), to, value));
+    (success, ) = TRANSFER.call{value: value, gas: gasleft()}(abi.encode(address(0), to, value));
     require(success, "CELO transfer failed");
 
     emit Transfer(address(0), to, value);
@@ -241,7 +238,7 @@ contract GoldToken is
   /**
    * @return The number of decimal places to which CELO is divisible.
    */
-  function decimals() external view returns (uint8) {
+  function decimals() external virtual view returns (uint8) {
     return DECIMALS;
   }
 
@@ -293,7 +290,7 @@ contract GoldToken is
    * @param _owner The address to query the balance of.
    * @return The balance of the specified address.
    */
-  function balanceOf(address _owner) public view returns (uint256) {
+  function balanceOf(address _owner) public virtual view returns (uint256) {
     return _owner.balance;
   }
 
@@ -322,7 +319,7 @@ contract GoldToken is
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
 
     bool success;
-    (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(msg.sender, to, value));
+    (success, ) = TRANSFER.call{value: value, gas: gasleft()}(abi.encode(msg.sender, to, value));
     require(success, "CELO transfer failed");
     emit Transfer(msg.sender, to, value);
     return true;

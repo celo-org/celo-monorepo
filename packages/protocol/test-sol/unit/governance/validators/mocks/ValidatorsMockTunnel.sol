@@ -1,10 +1,10 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.8.20;
 
 import "@celo-contracts-8/governance/test/ValidatorsMock.sol";
-import { Test as ForgeTest } from "forge-std/Test.sol";
+import "celo-foundry-8/Test.sol";
 
-contract ValidatorsMockTunnel is ForgeTest {
+contract ValidatorsMockTunnel is Test {
   ValidatorsMock private tunnelValidators;
   address validatorContractAddress;
 

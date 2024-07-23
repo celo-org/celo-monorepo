@@ -1,6 +1,7 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "./SlasherUtil.sol";
@@ -12,7 +13,6 @@ contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
   // For each signer address, check if a block header has already been slashed
   mapping(address => mapping(bytes32 => bool)) isSlashed;
 
-  event SlashingIncentivesSet(uint256 penalty, uint256 reward);
   event DoubleSigningSlashPerformed(address indexed validator, uint256 indexed blockNumber);
 
   /**

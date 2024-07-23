@@ -1,4 +1,5 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.5.13 <0.8.20;
 
 contract MockUsingPrecompiles {
   mapping(bytes32 => bytes32) verifiedSealBitmap;
@@ -29,23 +30,23 @@ contract MockUsingPrecompiles {
     blockNumbers[keccak256(abi.encodePacked(header))] = number;
   }
 
-  function numberValidatorsInSet(uint256) public view returns (uint256) {
+  function numberValidatorsInSet(uint256) public view virtual returns (uint256) {
     return numValidators;
   }
 
-  function getBlockNumberFromHeader(bytes memory header) public view returns (uint256) {
+  function getBlockNumberFromHeader(bytes memory header) public view virtual returns (uint256) {
     return blockNumbers[keccak256(abi.encodePacked(header))];
   }
 
-  function hashHeader(bytes memory header) public view returns (bytes32) {
+  function hashHeader(bytes memory header) public view virtual returns (bytes32) {
     return keccak256(header);
   }
 
-  function getVerifiedSealBitmapFromHeader(bytes memory header) public view returns (bytes32) {
+  function getVerifiedSealBitmapFromHeader(bytes memory header) public view virtual returns (bytes32) {
     return verifiedSealBitmap[keccak256(abi.encodePacked(header))];
   }
 
-  function getParentSealBitmap(uint256 blockNumber) public view returns (bytes32) {
+  function getParentSealBitmap(uint256 blockNumber) public view virtual returns (bytes32) {
     return parentSealBitmap[blockNumber];
   }
 }

@@ -1,19 +1,20 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/utils/Address.sol";
-import "openzeppelin-solidity/contracts/utils/EnumerableSet.sol";
+import "@openzeppelin/contracts8/utils/Address.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
 
-import "./interfaces/ILockedGold.sol";
+import "../../contracts/governance/interfaces/ILockedGold.sol";
 
-import "../common/FixidityLib.sol";
-import "../common/Initializable.sol";
+import "../../contracts/common/FixidityLib.sol";
+import "../../contracts/common/Initializable.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/libraries/ReentrancyGuard.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
 
 contract LockedGold is
   ILockedGold,
@@ -203,7 +204,7 @@ contract LockedGold is
       "Either account doesn't have enough locked Celo or locked Celo is being used for voting."
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
-    uint256 available = now.add(unlockingPeriod);
+    uint256 available = block.timestamp.add(unlockingPeriod);
     // CERTORA: the slot containing the length could be MAX_UINT
     account.pendingWithdrawals.push(PendingWithdrawal(value, available));
     emit GoldUnlocked(msg.sender, value, available);
@@ -245,11 +246,12 @@ contract LockedGold is
     Balances storage account = balances[msg.sender];
     require(index < account.pendingWithdrawals.length, "Bad pending withdrawal index");
     PendingWithdrawal storage pendingWithdrawal = account.pendingWithdrawals[index];
-    require(now >= pendingWithdrawal.timestamp, "Pending withdrawal not available");
+    require(block.timestamp >= pendingWithdrawal.timestamp, "Pending withdrawal not available");
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.pendingWithdrawals, index);
     require(value <= address(this).balance, "Inconsistent balance");
-    msg.sender.sendValue(value);
+    (bool success, ) = msg.sender.call{value: value}("");
+    require(success, "Transfer failed.");
     emit GoldWithdrawn(msg.sender, value);
   }
 
@@ -496,7 +498,7 @@ contract LockedGold is
       _incrementNonvotingAccountBalance(reporter, reward);
     }
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
-    address payable communityFundPayable = address(uint160(communityFund));
+    address payable communityFundPayable = payable(communityFund);
     require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
     communityFundPayable.sendValue(maxSlash.sub(reward));
     emit AccountSlashed(account, maxSlash, reporter, reward);
@@ -672,7 +674,7 @@ contract LockedGold is
    * @param delegator The delegator address.
    */
   function getDelegateesOfDelegator(address delegator) public view returns (address[] memory) {
-    address[] memory values = delegatorInfo[delegator].delegatees.enumerate();
+    address[] memory values = delegatorInfo[delegator].delegatees.values();
     return values;
   }
 
@@ -874,7 +876,7 @@ contract LockedGold is
     address delegatorAccount = getAccounts().voteSignerToAccount(delegator);
     EnumerableSet.AddressSet storage delegatees = delegatorInfo[delegatorAccount].delegatees;
     for (uint256 i = 0; i < delegatees.length(); i = i.add(1)) {
-      _updateDelegatedAmount(delegatorAccount, delegatees.get(i));
+      _updateDelegatedAmount(delegatorAccount, delegatees.at(i));
     }
   }
 
@@ -886,7 +888,7 @@ contract LockedGold is
   function deletePendingWithdrawal(PendingWithdrawal[] storage list, uint256 index) private {
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
-    list.length = lastIndex;
+    list.pop();
   }
 
   /**

@@ -1,12 +1,14 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
 import "./interfaces/IRandom.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+
 
 import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
-import "../common/UsingPrecompiles.sol";
+import "../../contracts-0.8/common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 /**
@@ -83,7 +85,7 @@ contract Random is
    * @return The associated randomness value.
    * @dev Only available on L1.
    */
-  function getBlockRandomness(uint256 blockNumber) external view onlyL1 returns (bytes32) {
+  function getBlockRandomness(uint256 blockNumber) external view virtual onlyL1 returns (bytes32) {
     return _getBlockRandomness(blockNumber, block.number);
   }
 

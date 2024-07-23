@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
@@ -199,7 +199,7 @@ contract Accounts is
     uint256 lastIndex = offchainStorageRoots[msg.sender].length - 1;
     bytes memory url = offchainStorageRoots[msg.sender][index];
     offchainStorageRoots[msg.sender][index] = offchainStorageRoots[msg.sender][lastIndex];
-    offchainStorageRoots[msg.sender].length--;
+    offchainStorageRoots[msg.sender].pop();
     emit OffchainStorageRootRemoved(msg.sender, url, index);
   }
 
@@ -987,7 +987,7 @@ contract Accounts is
   function _setEip712DomainSeparator() internal {
     uint256 chainId;
     assembly {
-      chainId := chainid
+      chainId := chainid()
     }
 
     eip712DomainSeparator = keccak256(

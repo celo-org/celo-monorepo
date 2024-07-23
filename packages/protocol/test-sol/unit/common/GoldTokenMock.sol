@@ -1,4 +1,6 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
+
 // solhint-disable no-unused-vars
 
 import "@celo-contracts/common/GoldToken.sol";
@@ -7,18 +9,18 @@ import "@celo-contracts/common/GoldToken.sol";
  * @title A mock GoldToken for testing.
  */
 contract GoldTokenMock is GoldToken(true) {
-  uint8 public constant decimals = 18;
+  uint8 public override constant decimals = 18;
   mapping(address => uint256) balances;
 
   function setTotalSupply(uint256 value) external {
     totalSupply_ = value;
   }
 
-  function transfer(address to, uint256 amount) external returns (bool) {
+  function transfer(address to, uint256 amount) external override returns (bool) {
     return _transfer(msg.sender, to, amount);
   }
 
-  function transferFrom(address from, address to, uint256 amount) external returns (bool) {
+  function transferFrom(address from, address to, uint256 amount) external override returns (bool) {
     return _transfer(from, to, amount);
   }
 
@@ -35,7 +37,7 @@ contract GoldTokenMock is GoldToken(true) {
     balances[a] = value;
   }
 
-  function balanceOf(address a) public view returns (uint256) {
+  function balanceOf(address a) public override view returns (uint256) {
     return balances[a];
   }
 }

@@ -1,11 +1,13 @@
-pragma solidity ^0.5.13;
-
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 import "../EpochRewards.sol";
 
 /**
  * @title A wrapper around EpochRewards that exposes internal functions for testing.
  */
 contract EpochRewardsMock is EpochRewards(true) {
+  using FixidityLib for FixidityLib.Fraction;
+
   uint256 private numValidatorsInCurrentSet;
 
   function setNumberValidatorsInCurrentSet(uint256 value) external {
@@ -19,7 +21,7 @@ contract EpochRewardsMock is EpochRewards(true) {
   }
 
   // mocks the precompile
-  function numberValidatorsInCurrentSet() public view returns (uint256) {
+  function numberValidatorsInCurrentSet() public view override returns (uint256) {
     return numValidatorsInCurrentSet;
   }
 }

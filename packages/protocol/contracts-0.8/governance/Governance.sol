@@ -1,22 +1,24 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/utils/Address.sol";
+import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 
-import "../../contracts/governance/interfaces/IGovernance.sol";
-import "./Proposals.sol";
-import "../../contracts/common/interfaces/IAccounts.sol";
-import "../../contracts/common/ExtractFunctionSignature.sol";
-import "../../contracts/common/Initializable.sol";
-import "../../contracts/common/FixidityLib.sol";
-import "../../contracts/common/linkedlists/IntegerSortedLinkedList.sol";
-import "../common/UsingRegistry.sol";
-import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
-import "../../contracts/common/libraries/ReentrancyGuard.sol";
+import { IGovernance } from "../../contracts/governance/interfaces/IGovernance.sol";
+import { Proposals } from "./Proposals.sol";
+import { UsingPrecompiles } from "../common/UsingPrecompiles.sol";
+import { IAccounts } from "../../contracts/common/interfaces/IAccounts.sol";
+import { ExtractFunctionSignature } from "../../contracts/common/ExtractFunctionSignature.sol";
+import { Initializable } from "../../contracts/common/Initializable.sol";
+import { FixidityLib } from "../../contracts/common/FixidityLib.sol";
+import "../common/linkedlists/IntegerSortedLinkedList.sol";
+import { UsingRegistry } from "../common/UsingRegistry.sol";
+import { ICeloVersionedContract } from "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import { ReentrancyGuard } from "../../contracts/common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
@@ -266,10 +268,13 @@ contract Governance is
     setBaselineUpdateFactor(baselineUpdateFactor);
     setBaselineQuorumFactor(baselineQuorumFactor);
     // solhint-disable-next-line not-rely-on-time
-    lastDequeue = now;
+    lastDequeue = block.timestamp;
   }
 
   receive() external payable {
+  }
+
+  fallback() external payable {
     require(msg.data.length == 0, "unknown method");
   }
 
@@ -325,7 +330,7 @@ contract Governance is
     proposal.setDescriptionUrl(descriptionUrl);
     queue.push(proposalCount);
     // solhint-disable-next-line not-rely-on-time
-    emit ProposalQueued(proposalCount, msg.sender, proposal.transactions.length, msg.value, now);
+    emit ProposalQueued(proposalCount, msg.sender, proposal.transactions.length, msg.value, block.timestamp);
     return proposalCount;
   }
 
@@ -680,7 +685,8 @@ contract Governance is
     require(value != 0, "Nothing to withdraw");
     require(value <= address(this).balance, "Inconsistent balance");
     refundedDeposits[msg.sender] = 0;
-    msg.sender.sendValue(value);
+    bool success = payable(msg.sender).send(value);
+    require(success, "Transfer failed using send.");
     return true;
   }
 
@@ -1121,7 +1127,7 @@ contract Governance is
    */
   function dequeueProposalsIfReady() public {
     // solhint-disable-next-line not-rely-on-time
-    if (now >= lastDequeue.add(dequeueFrequency)) {
+    if (block.timestamp >= lastDequeue.add(dequeueFrequency)) {
       uint256 numProposalsToDequeue = Math.min(concurrentProposals, queue.list.numElements);
       uint256[] memory dequeuedIds = queue.popN(numProposalsToDequeue);
 
@@ -1137,22 +1143,22 @@ contract Governance is
           proposal.deposit
         );
         // solhint-disable-next-line not-rely-on-time
-        proposal.timestamp = now;
+        proposal.timestamp = block.timestamp;
         if (emptyIndices.length != 0) {
           uint256 indexOfLastEmptyIndex = emptyIndices.length.sub(1);
           dequeued[emptyIndices[indexOfLastEmptyIndex]] = proposalId;
           delete emptyIndices[indexOfLastEmptyIndex];
-          emptyIndices.length = indexOfLastEmptyIndex;
+          emptyIndices.pop();
         } else {
           dequeued.push(proposalId);
         }
         // solhint-disable-next-line not-rely-on-time
-        emit ProposalDequeued(proposalId, now);
+        emit ProposalDequeued(proposalId, block.timestamp);
         wasAnyProposalDequeued = true;
       }
       if (wasAnyProposalDequeued) {
         // solhint-disable-next-line not-rely-on-time
-        lastDequeue = now;
+        lastDequeue = block.timestamp;
       }
     }
   }
@@ -1392,7 +1398,7 @@ contract Governance is
     );
     // solhint-disable-next-line not-rely-on-time
     if (
-      now >= stageStartTime &&
+      block.timestamp >= stageStartTime &&
       (proposal.transactions.length != 0 ||
         // proposals with 0 transactions can expire only when not approved or not passing
         !proposal.isApproved() ||
@@ -1402,7 +1408,7 @@ contract Governance is
     }
     stageStartTime = stageStartTime.sub(stageDurations.execution);
     // solhint-disable-next-line not-rely-on-time
-    if (now >= stageStartTime) {
+    if (block.timestamp >= stageStartTime) {
       return Proposals.Stage.Execution;
     }
     return Proposals.Stage.Referendum;
@@ -1451,7 +1457,6 @@ contract Governance is
    * @param yesVotes The yes votes weight.
    * @param noVotes The no votes weight.
    * @param abstainVotes The abstain votes weight.
-   * @return Whether or not the proposal is passing.
    */
   function _vote(
     Proposals.Proposal storage proposal,
@@ -1630,7 +1635,7 @@ contract Governance is
     Proposals.Proposal storage proposal
   ) private view returns (bool) {
     // solhint-disable-next-line not-rely-on-time
-    return now >= proposal.timestamp.add(queueExpiry);
+    return block.timestamp >= proposal.timestamp.add(queueExpiry);
   }
 
   /**

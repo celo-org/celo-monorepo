@@ -1,4 +1,5 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
 import "../interfaces/IGovernance.sol";
 
@@ -10,7 +11,7 @@ contract MockGovernance is IGovernance {
   mapping(address => uint256) public totalVotes;
   mapping(address => uint256) public removeVotesCalledFor;
 
-  function() external payable {} // solhint-disable no-empty-blocks
+  receive() external payable {} // solhint-disable no-empty-blocks
 
   function setVoting(address voter) external {
     isVoting[voter] = true;

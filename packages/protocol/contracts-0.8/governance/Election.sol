@@ -1,20 +1,21 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
-import "./interfaces/IElection.sol";
-import "./interfaces/IValidators.sol";
-import "../common/CalledByVm.sol";
-import "../common/Initializable.sol";
-import "../common/FixidityLib.sol";
+import "../../contracts/governance/interfaces/IElection.sol";
+import "../../contracts/governance/interfaces/IValidators.sol";
+import "../../contracts/common/CalledByVm.sol";
+import "../../contracts/common/Initializable.sol";
+import "../../contracts/common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/libraries/Heap.sol";
-import "../common/libraries/ReentrancyGuard.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/libraries/Heap.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
 
 contract Election is
   IElection,
@@ -338,7 +339,7 @@ contract Election is
     uint256 value,
     address lesser,
     address greater
-  ) external onlyVm onlyL1 {
+  ) external virtual onlyVm onlyL1 {
     _distributeEpochRewards(group, value, lesser, greater);
   }
 
@@ -457,8 +458,8 @@ contract Election is
 
   /**
    * @notice Returns list of all validator groups and the number of votes they've received.
-   * @return List of all validator groups
-   * @return Number of votes each validator group received.
+   * @return groups List of all validator groups
+   * @return values Number of votes each validator group received.
    */
   function getTotalVotesForEligibleValidatorGroups()
     external
@@ -808,6 +809,17 @@ contract Election is
     return electedValidators;
   }
 
+  // Override the conflicting function
+  function numberValidatorsInCurrentSet() public view override(UsingPrecompiles, IElection) returns (uint256) {
+      // Specify the base contract's implementation to use
+      return UsingPrecompiles.numberValidatorsInCurrentSet();
+  }
+
+  function validatorSignerAddressFromCurrentSet(uint256 index) public view override(UsingPrecompiles, IElection) returns (address) {
+      // Specify the base contract's implementation to use
+      return UsingPrecompiles.validatorSignerAddressFromCurrentSet(index);
+    }
+
   /**
    * @notice Returns get current validator signers using the precompiles.
    * @return List of current validator signers.
@@ -1150,7 +1162,7 @@ contract Election is
     require(index < list.length && list[index] == element, "Bad index");
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
-    list.length = lastIndex;
+    list.pop();
   }
 
   /**

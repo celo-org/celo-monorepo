@@ -1,13 +1,14 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/utils/EnumerableSet.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
+import "@openzeppelin/contracts8/interfaces/IERC20.sol";
 
-import "./UsingRegistry.sol";
-import "../common/Freezable.sol";
+import "../../contracts-0.8/common/UsingRegistry.sol";
+import "../../contracts-0.8/common/Freezable.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 
@@ -119,7 +120,7 @@ contract FeeHandler is
   }
 
   // Without this the contract cant receive Celo as native transfer
-  function() external payable {}
+  receive() external payable {}
 
   /**
     @dev Sets the fee beneficiary address to the specified address.
@@ -342,7 +343,7 @@ contract FeeHandler is
       return false;
     }
 
-    uint256 currentDay = now / 1 days;
+    uint256 currentDay = block.timestamp / 1 days;
     // Pattern borrowed from Reserve.sol
     if (currentDay > lastLimitDay) {
       lastLimitDay = currentDay;
@@ -353,7 +354,7 @@ contract FeeHandler is
   }
 
   function getActiveTokens() public view returns (address[] memory) {
-    return activeTokens.values;
+    return activeTokens.values();
   }
 
   function _setFeeBeneficiary(address beneficiary) private {
@@ -497,7 +498,7 @@ contract FeeHandler is
 
   function _distributeAll() private {
     for (uint256 i = 0; i < EnumerableSet.length(activeTokens); i++) {
-      address token = activeTokens.get(i);
+      address token = activeTokens.at(i);
       _distribute(token);
     }
     // distribute Celo
@@ -508,7 +509,7 @@ contract FeeHandler is
     for (uint256 i = 0; i < EnumerableSet.length(activeTokens); i++) {
       // calling _handle would trigger may burn Celo and distributions
       // that can be just batched at the end
-      address token = activeTokens.get(i);
+      address token = activeTokens.at(i);
       _sell(token);
     }
     _distributeAll(); // distributes Celo as well

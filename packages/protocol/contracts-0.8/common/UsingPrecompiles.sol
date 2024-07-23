@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
@@ -91,7 +91,7 @@ contract UsingPrecompiles is IsL2Check {
    * @param index Index of requested validator in the validator set.
    * @return Address of validator at the requested index.
    */
-  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
+  function validatorSignerAddressFromCurrentSet(uint256 index) public virtual view returns (address) {
     bytes memory out;
     bool success;
     (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, uint256(block.number)));
@@ -120,7 +120,7 @@ contract UsingPrecompiles is IsL2Check {
    * @notice Gets the size of the current elected validator set.
    * @return Size of the current elected validator set.
    */
-  function numberValidatorsInCurrentSet() public view returns (uint256) {
+  function numberValidatorsInCurrentSet() public view virtual returns (uint256) {
     bytes memory out;
     bool success;
     (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(uint256(block.number)));
@@ -133,7 +133,7 @@ contract UsingPrecompiles is IsL2Check {
    * @param blockNumber Block number to retrieve the validator set from.
    * @return Size of the validator set.
    */
-  function numberValidatorsInSet(uint256 blockNumber) public view returns (uint256) {
+  function numberValidatorsInSet(uint256 blockNumber) public view virtual returns (uint256) {
     bytes memory out;
     bool success;
     (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(blockNumber));
@@ -165,7 +165,7 @@ contract UsingPrecompiles is IsL2Check {
    * @param header RLP encoded header
    * @return Block number.
    */
-  function getBlockNumberFromHeader(bytes memory header) public view returns (uint256) {
+  function getBlockNumberFromHeader(bytes memory header) public view virtual returns (uint256) {
     bytes memory out;
     bool success;
     (success, out) = BLOCK_NUMBER_FROM_HEADER.staticcall(abi.encodePacked(header));
@@ -178,7 +178,7 @@ contract UsingPrecompiles is IsL2Check {
    * @param header RLP encoded header
    * @return Header hash.
    */
-  function hashHeader(bytes memory header) public view returns (bytes32) {
+  function hashHeader(bytes memory header) public view virtual returns (bytes32) {
     bytes memory out;
     bool success;
     (success, out) = HASH_HEADER.staticcall(abi.encodePacked(header));
@@ -191,7 +191,7 @@ contract UsingPrecompiles is IsL2Check {
    * @param blockNumber Block number to retrieve. Must be within 4 epochs of the current number.
    * @return Bitmap parent seal with set bits at indices corresponding to signing validators.
    */
-  function getParentSealBitmap(uint256 blockNumber) public view returns (bytes32) {
+  function getParentSealBitmap(uint256 blockNumber) public view virtual returns (bytes32) {
     bytes memory out;
     bool success;
     (success, out) = GET_PARENT_SEAL_BITMAP.staticcall(abi.encodePacked(blockNumber));
@@ -206,7 +206,7 @@ contract UsingPrecompiles is IsL2Check {
    * @param header RLP encoded header
    * @return Bitmap parent seal with set bits at indices correspoinding to signing validators.
    */
-  function getVerifiedSealBitmapFromHeader(bytes memory header) public view returns (bytes32) {
+  function getVerifiedSealBitmapFromHeader(bytes memory header) public view virtual returns (bytes32) {
     bytes memory out;
     bool success;
     (success, out) = GET_VERIFIED_SEAL_BITMAP.staticcall(abi.encodePacked(header));

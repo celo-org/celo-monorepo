@@ -1,14 +1,15 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
 import "../common/CalledByVm.sol";
 import "../common/FixidityLib.sol";
-import "../common/Freezable.sol";
+import "../../contracts-0.8/common/Freezable.sol";
 import "../common/Initializable.sol";
-import "../common/UsingRegistry.sol";
-import "../common/UsingPrecompiles.sol";
+import "../../contracts-0.8/common/UsingRegistry.sol";
+import "../../contracts-0.8/common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 /**
@@ -135,7 +136,7 @@ contract EpochRewards is
     setCommunityRewardFraction(_communityRewardFraction);
     setCarbonOffsettingFund(_carbonOffsettingPartner, _carbonOffsettingFraction);
     setTargetVotingYield(targetVotingYieldInitial);
-    startTime = now;
+    startTime = block.timestamp;
   }
 
   /**
@@ -154,7 +155,7 @@ contract EpochRewards is
    */
   function isReserveLow() external view returns (bool) {
     // critical reserve ratio = 2 - time in second / 25 years
-    FixidityLib.Fraction memory timeSinceInitialization = FixidityLib.newFixed(now.sub(startTime));
+    FixidityLib.Fraction memory timeSinceInitialization = FixidityLib.newFixed(block.timestamp.sub(startTime));
     FixidityLib.Fraction memory m = FixidityLib.newFixed(25 * 365 * 1 days);
     FixidityLib.Fraction memory b = FixidityLib.newFixed(2);
     FixidityLib.Fraction memory criticalRatio;
@@ -216,7 +217,7 @@ contract EpochRewards is
    * @return The underspend adjustment factors.
    * @return The overspend adjustment factors.
    */
-  function getRewardsMultiplierParameters() external view returns (uint256, uint256, uint256) {
+  function getRewardsMultiplierParameters() external view virtual returns (uint256, uint256, uint256) {
     RewardsMultiplierParameters storage params = rewardsMultiplierParams;
     return (
       params.max.unwrap(),
@@ -253,7 +254,7 @@ contract EpochRewards is
    * @notice Returns the rewards multiplier based on the current and target Gold supplies.
    * @return The rewards multiplier based on the current and target Gold supplies.
    */
-  function getRewardsMultiplier() external view returns (uint256) {
+  function getRewardsMultiplier() external view virtual returns (uint256) {
     return _getRewardsMultiplier(_getTargetGoldSupplyIncrease()).unwrap();
   }
 
@@ -410,7 +411,7 @@ contract EpochRewards is
    * @return The target Gold supply according to the epoch rewards target schedule.
    */
   function getTargetGoldTotalSupply() public view returns (uint256) {
-    uint256 timeSinceInitialization = now.sub(startTime);
+    uint256 timeSinceInitialization = block.timestamp.sub(startTime);
     if (timeSinceInitialization < SECONDS_LINEAR) {
       // Pay out half of all block rewards linearly.
       uint256 linearRewards = GOLD_SUPPLY_CAP.sub(GENESIS_GOLD_SUPPLY).div(2);

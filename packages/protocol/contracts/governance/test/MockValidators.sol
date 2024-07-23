@@ -1,6 +1,6 @@
 pragma solidity >=0.5.13 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
 import "../../../contracts-0.8/common/IsL2Check.sol";
 
