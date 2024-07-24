@@ -50,7 +50,7 @@ $REGISTRY_ADDRESS $REGISTRY_STORAGE_LOCATION "0x000000000000000000000000$REGISTR
 echo "Running migration script... "
 forge script \
 $MIGRATION_SCRIPT_PATH \
---target-contract $TARGET_CONTRACT \
+--target-contract $MIGRATION_TARGET_CONTRACT \
 --sender $FROM_ACCOUNT \
 --unlocked \
 $VERBOSITY_LEVEL \
