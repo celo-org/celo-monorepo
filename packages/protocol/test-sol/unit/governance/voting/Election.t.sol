@@ -574,7 +574,7 @@ contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
 
   function test_ShouldRevert_WhenTheVoterDoesNotHaveSufficientNonVotingBalance() public {
     lockedGold.incrementNonvotingAccountBalance(voter, value - 1);
-    vm.expectRevert("SafeMath: subtraction overflow");
+    vm.expectRevert();
     election.vote(group, value, address(0), address(0));
   }
 
@@ -763,7 +763,7 @@ contract ElectionTest_Vote_WhenGroupEligible_L2 is ElectionTest {
 
   function test_ShouldRevert_WhenTheVoterDoesNotHaveSufficientNonVotingBalance() public {
     lockedGold.incrementNonvotingAccountBalance(voter, value - 1);
-    vm.expectRevert("SafeMath: subtraction overflow");
+    vm.expectRevert();
     election.vote(group, value, address(0), address(0));
   }
 

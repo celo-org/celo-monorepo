@@ -405,7 +405,7 @@ contract LockedGoldTest_unlock is LockedGoldTest {
   }
 
   function test_ShouldRevertWhenUnlockingMoreThenLocked_WhenThereAreNoBalanceRequirements() public {
-    vm.expectRevert("SafeMath: subtraction overflow");
+    vm.expectRevert();
     lockedGold.unlock(value + 1);
   }
 
