@@ -1,15 +1,17 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/interfaces/IERC20.sol";
+
 import "../common/FixidityLib.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "./UsingRegistry.sol";
+import "../../contracts-0.8/common/UsingRegistry.sol";
 import "../common/Initializable.sol";
 
 // Abstract class for a FeeHandlerSeller, as defined in CIP-52
 // https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md
-contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
+abstract contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -41,7 +43,7 @@ contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
     @param to The address of the recipient to transfer the tokens to.
     @return A boolean indicating whether the transfer was successful or not.
   */
-  function transfer(address token, uint256 amount, address to) external onlyOwner returns (bool) {
+  function transfer(address token, uint256 amount, address to) external onlyOwner virtual returns (bool) {
     return IERC20(token).transfer(to, amount);
   }
 

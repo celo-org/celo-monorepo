@@ -1,14 +1,14 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/utils/EnumerableSet.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/math/Math.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/interfaces/IERC20.sol";
+import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
 
-import "./UsingRegistry.sol";
+import "../../contracts-0.8/common/UsingRegistry.sol";
 
-import "../common/interfaces/IFeeHandlerSeller.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
@@ -20,7 +20,7 @@ import "../uniswap/interfaces/IUniswapV2FactoryMin.sol";
 // An implementation of FeeHandlerSeller supporting interfaces compatible with
 // Uniswap V2 API
 // See https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md
-contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
+contract UniswapFeeHandlerSeller is FeeHandlerSeller {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
   using EnumerableSet for EnumerableSet.AddressSet;
@@ -41,7 +41,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
   constructor(bool test) public Initializable(test) {}
 
   // without this line the contract can't receive native Celo transfers
-  function() external payable {}
+  receive() external payable {}
 
   /**
    * @notice Allows owner to set the router for a token.
@@ -75,7 +75,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     );
 
     require(
-      routerAddresses[sellTokenAddress].values.length > 0,
+      routerAddresses[sellTokenAddress].values().length > 0,
       "routerAddresses should be non empty"
     );
 
@@ -93,8 +93,8 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     path[0] = sellTokenAddress;
     path[1] = address(celoToken);
 
-    for (uint256 i = 0; i < routerAddresses[sellTokenAddress].values.length; i++) {
-      address poolAddress = routerAddresses[sellTokenAddress].get(i);
+    for (uint256 i = 0; i < routerAddresses[sellTokenAddress].values().length; i++) {
+      address poolAddress = routerAddresses[sellTokenAddress].at(i);
       IUniswapV2RouterMin router = IUniswapV2RouterMin(poolAddress);
 
       // Using the second return value becuase it's the last argument,
@@ -136,7 +136,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
    * @return An array of all the allowed router.
    */
   function getRoutersForToken(address token) external view returns (address[] memory) {
-    return routerAddresses[token].values;
+    return routerAddresses[token].values();
   }
 
   /**
@@ -154,7 +154,7 @@ contract UniswapFeeHandlerSeller is IFeeHandlerSeller, FeeHandlerSeller {
     require(router != address(0), "Router can't be address zero");
     routerAddresses[token].add(router);
     require(
-      routerAddresses[token].values.length <= MAX_NUMBER_ROUTERS_PER_TOKEN,
+      routerAddresses[token].values().length <= MAX_NUMBER_ROUTERS_PER_TOKEN,
       "Max number of routers reached"
     );
     emit RouterAddressSet(token, router);
