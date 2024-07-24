@@ -25,21 +25,10 @@ contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecom
     uint256[] groupElectionIndices;
   }
 
-      function bytesToBytes32(bytes memory source) public pure returns (bytes32 result) {
-      if (source.length == 0) {
-          return 0x0;
-      }
-      require(source.length <= 32, "Source bytes array too long");
-      
-      assembly {
-          result := mload(add(source, 32))
-      }
-  }
-
   function mockSlash(SlashParams calldata slashParams, address _validator) external {
     ph.mockReturn(
       ph.GET_VALIDATOR(),
-      bytesToBytes32(abi.encodePacked(slashParams.index, getBlockNumberFromHeader(slashParams.headerA))),
+      abi.encodePacked(slashParams.index, getBlockNumberFromHeader(slashParams.headerA)),
       abi.encode(_validator)
     );
 

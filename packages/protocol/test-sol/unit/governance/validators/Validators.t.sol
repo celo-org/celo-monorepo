@@ -269,7 +269,7 @@ contract ValidatorsTest is Test, Constants, Utils08, ECDSAHelper {
       signerPk
     );
 
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), bytesToBytes32(abi.encodePacked(validator, blsPublicKey, blsPop)));
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
 
     vm.prank(validator);
     accounts.authorizeValidatorSigner(signer, v, r, s);
@@ -279,17 +279,6 @@ contract ValidatorsTest is Test, Constants, Utils08, ECDSAHelper {
     validatorRegistrationEpochNumber = validators.getEpochNumber();
     return _ecdsaPubKey;
   }
-
-  function bytesToBytes32(bytes memory source) public pure returns (bytes32 result) {
-        if (source.length == 0) {
-            return 0x0;
-        }
-        require(source.length <= 32, "Source bytes array too long");
-        
-        assembly {
-            result := mload(add(source, 32))
-        }
-    }
 
   function _generateEcdsaPubKey(
     address _account,
@@ -313,7 +302,7 @@ contract ValidatorsTest is Test, Constants, Utils08, ECDSAHelper {
     lockedGold.setAccountTotalLockedGold(_validator, originalValidatorLockedGoldRequirements.value);
     bytes memory _ecdsaPubKey = _generateEcdsaPubKey(_validator, _validatorPk);
 
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), bytesToBytes32(abi.encodePacked(_validator, blsPublicKey, blsPop)));
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(_validator, blsPublicKey, blsPop));
 
     vm.prank(_validator);
     validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
@@ -683,7 +672,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
       signerPk
     );
 
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), bytesToBytes32(abi.encodePacked(validator, blsPublicKey, blsPop)));
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
 
     vm.prank(validator);
     accounts.authorizeValidatorSigner(signer, v, r, s);
@@ -757,7 +746,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
     vm.prank(validator);
     accounts.authorizeValidatorSigner(signer, v, r, s);
 
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), bytesToBytes32(abi.encodePacked(validator, blsPublicKey, blsPop)));
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
 
     vm.expectEmit(true, true, true, true);
     emit ValidatorBlsPublicKeyUpdated(validator, blsPublicKey);
@@ -775,7 +764,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
     vm.prank(validator);
     accounts.authorizeValidatorSigner(signer, v, r, s);
 
-    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), bytesToBytes32(abi.encodePacked(validator, blsPublicKey, blsPop)));
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(validator, blsPublicKey, blsPop));
 
     vm.expectEmit(true, true, true, true);
     emit ValidatorRegistered(validator);
@@ -1414,7 +1403,7 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
 
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
-      bytesToBytes32(abi.encodePacked(validator, newBlsPublicKey, newBlsPop))
+      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
     );
 
     vm.prank(address(accounts));
@@ -1438,7 +1427,7 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
 
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
-      bytesToBytes32(abi.encodePacked(validator, newBlsPublicKey, newBlsPop))
+      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
     );
 
     vm.prank(address(accounts));
@@ -1456,7 +1445,7 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
 
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
-      bytesToBytes32(abi.encodePacked(validator, newBlsPublicKey, newBlsPop))
+      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
     );
 
     vm.expectEmit(true, true, true, true);
@@ -1479,7 +1468,7 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
 
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
-      bytesToBytes32(abi.encodePacked(validator, newBlsPublicKey, newBlsPop))
+      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
     );
 
     vm.expectRevert("ECDSA key does not match signer");
@@ -1540,7 +1529,7 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
   function test_ShouldSetNewValidatorBlsPubKey() public {
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
-      bytesToBytes32(abi.encodePacked(validator, newBlsPublicKey, newBlsPop))
+      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
     );
 
     vm.prank(validator);
@@ -1555,7 +1544,7 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
     _whenL2();
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
-      bytesToBytes32(abi.encodePacked(validator, newBlsPublicKey, newBlsPop))
+      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
     );
 
     vm.prank(validator);
@@ -1566,7 +1555,7 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
   function test_Emits_ValidatorValidatorBlsPublicKeyUpdatedEvent() public {
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
-      bytesToBytes32(abi.encodePacked(validator, newBlsPublicKey, newBlsPop))
+      abi.encodePacked(validator, newBlsPublicKey, newBlsPop)
     );
 
     vm.expectEmit(true, true, true, true);
@@ -1579,7 +1568,7 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
   function test_Reverts_WhenPublicKeyIsNot96Bytes() public {
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
-      bytesToBytes32(abi.encodePacked(validator, wrongBlsPublicKey, newBlsPop))
+      abi.encodePacked(validator, wrongBlsPublicKey, newBlsPop)
     );
 
     vm.expectRevert("Wrong BLS public key length");
@@ -1590,7 +1579,7 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
   function test_Reverts_WhenProofOfPossessionIsNot48Bytes() public {
     ph.mockSuccess(
       ph.PROOF_OF_POSSESSION(),
-      bytesToBytes32(abi.encodePacked(validator, newBlsPublicKey, wrongBlsPop))
+      abi.encodePacked(validator, newBlsPublicKey, wrongBlsPop)
     );
 
     vm.expectRevert("Wrong BLS PoP length");
@@ -2413,14 +2402,14 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
 
     ph.mockReturn(
       ph.FRACTION_MUL(),
-      bytesToBytes32(abi.encodePacked(
+      abi.encodePacked(
         FixidityLib.fixed1().unwrap(),
         FixidityLib.fixed1().unwrap(),
         uptime.unwrap(),
         FixidityLib.fixed1().unwrap(),
         originalValidatorScoreParameters.exponent,
         uint256(18)
-      )),
+      ),
       abi.encodePacked(uint256(950990049900000000000000), FixidityLib.fixed1().unwrap())
     );
     uint256 _score0 = validators.calculateEpochScore(uptime.unwrap());
@@ -2430,14 +2419,14 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
 
     ph.mockReturn(
       ph.FRACTION_MUL(),
-      bytesToBytes32(abi.encodePacked(
+      abi.encodePacked(
         FixidityLib.fixed1().unwrap(),
         FixidityLib.fixed1().unwrap(),
         uint256(0),
         FixidityLib.fixed1().unwrap(),
         originalValidatorScoreParameters.exponent,
         uint256(18)
-      )),
+      ),
       abi.encodePacked(uint256(0), FixidityLib.fixed1().unwrap())
     );
 
@@ -2445,14 +2434,14 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
 
     ph.mockReturn(
       ph.FRACTION_MUL(),
-      bytesToBytes32(abi.encodePacked(
+      abi.encodePacked(
         FixidityLib.fixed1().unwrap(),
         FixidityLib.fixed1().unwrap(),
         FixidityLib.fixed1().unwrap(),
         FixidityLib.fixed1().unwrap(),
         originalValidatorScoreParameters.exponent,
         uint256(18)
-      )),
+      ),
       abi.encodePacked(uint256(1), FixidityLib.fixed1().unwrap())
     );
 
@@ -2471,14 +2460,14 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
 
     ph.mockRevert(
       ph.FRACTION_MUL(),
-      bytesToBytes32(abi.encodePacked(
+      abi.encodePacked(
         FixidityLib.fixed1().unwrap(),
         FixidityLib.fixed1().unwrap(),
         uptime.unwrap(),
         FixidityLib.fixed1().unwrap(),
         originalValidatorScoreParameters.exponent,
         uint256(18)
-      ))
+      )
     );
 
     vm.expectRevert("Uptime cannot be larger than one");
@@ -2521,14 +2510,14 @@ contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
 
       ph.mockReturn(
         ph.FRACTION_MUL(),
-        bytesToBytes32(abi.encodePacked(
+        abi.encodePacked(
           FixidityLib.fixed1().unwrap(),
           FixidityLib.fixed1().unwrap(),
           _uptimes[i].unwrap(),
           FixidityLib.fixed1().unwrap(),
           originalValidatorScoreParameters.exponent,
           uint256(18)
-        )),
+        ),
         abi.encodePacked(_currentscore, FixidityLib.fixed1().unwrap())
       );
       unwrapedUptimes[i] = _uptimes[i].unwrap();
@@ -2675,14 +2664,14 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
 
     ph.mockReturn(
       ph.FRACTION_MUL(),
-      bytesToBytes32(abi.encodePacked(
+      abi.encodePacked(
         FixidityLib.fixed1().unwrap(),
         FixidityLib.fixed1().unwrap(),
         uptime.unwrap(),
         FixidityLib.fixed1().unwrap(),
         originalValidatorScoreParameters.exponent,
         uint256(18)
-      )),
+      ),
       abi.encodePacked(_epochScore, FixidityLib.fixed1().unwrap())
     );
   }
@@ -3048,14 +3037,14 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
 
     ph.mockReturn(
       ph.FRACTION_MUL(),
-      bytesToBytes32(abi.encodePacked(
+      abi.encodePacked(
         FixidityLib.fixed1().unwrap(),
         FixidityLib.fixed1().unwrap(),
         uptime.unwrap(),
         FixidityLib.fixed1().unwrap(),
         originalValidatorScoreParameters.exponent,
         uint256(18)
-      )),
+      ),
       abi.encodePacked(
         _calculateScore(uptime.unwrap(), validators.downtimeGracePeriod()),
         FixidityLib.fixed1().unwrap()

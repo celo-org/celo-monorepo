@@ -29,17 +29,6 @@ contract DowntimeSlasherMock is DowntimeSlasher(true), MockUsingPrecompiles, Tes
     uint256[] groupElectionIndices;
   }
 
-  function bytesToBytes32(bytes memory source) public pure returns (bytes32 result) {
-      if (source.length == 0) {
-          return 0x0;
-      }
-      require(source.length <= 32, "Source bytes array too long");
-      
-      assembly {
-          result := mload(add(source, 32))
-      }
-  }
-
    // Override the conflicting function
   function getVerifiedSealBitmapFromHeader(bytes memory header) 
       public 
@@ -103,7 +92,7 @@ contract DowntimeSlasherMock is DowntimeSlasher(true), MockUsingPrecompiles, Tes
 
     ph.mockReturn(
       ph.GET_VALIDATOR(),
-      bytesToBytes32(abi.encodePacked(slashParams.signerIndices[0], slashParams.startBlocks[0])),
+      abi.encodePacked(slashParams.signerIndices[0], slashParams.startBlocks[0]),
       abi.encode(_validators[0])
     );
 
@@ -113,15 +102,15 @@ contract DowntimeSlasherMock is DowntimeSlasher(true), MockUsingPrecompiles, Tes
           if (slashParams.startBlocks[i].mod(17280) == 1) {
             ph.mockReturn(
               ph.GET_VALIDATOR(),
-              bytesToBytes32(abi.encodePacked(
+              abi.encodePacked(
                 slashParams.signerIndices[i.sub(1)],
                 slashParams.startBlocks[i].sub(1)
-              )),
+              ),
               abi.encode(_validators[0])
             );
             ph.mockReturn(
               ph.GET_VALIDATOR(),
-              bytesToBytes32(abi.encodePacked(slashParams.signerIndices[i], slashParams.startBlocks[i])),
+              abi.encodePacked(slashParams.signerIndices[i], slashParams.startBlocks[i]),
               abi.encode(_validators[1])
             );
           }
