@@ -1,11 +1,14 @@
 pragma solidity >=0.5.13 <0.9.0;
 
 import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
+import "@openzeppelin/contracts8/utils/Strings.sol";
 
 import "celo-foundry-8/Test.sol";
 
 contract Utils08 is Test {
-   using EnumerableSet for EnumerableSet.AddressSet;
+  using EnumerableSet for EnumerableSet.AddressSet;
+  using Strings for uint256;
+
 
   EnumerableSet.AddressSet addressSet;
 
@@ -19,27 +22,7 @@ contract Utils08 is Test {
 
   function assertAlmostEqual(uint256 actual, uint256 expected, uint256 margin) public {
     uint256 diff = actual > expected ? actual - expected : expected - actual;
-    assertTrue(diff <= margin, string(abi.encodePacked("Difference is ", uintToStr(diff))));
-  }
-
-  function uintToStr(uint256 _i) internal pure returns (string memory _uintAsString) {
-    uint256 number = _i;
-    if (number == 0) {
-      return "0";
-    }
-    uint256 j = number;
-    uint256 len;
-    while (j != 0) {
-      len++;
-      j /= 10;
-    }
-    bytes memory bstr = new bytes(len);
-    uint256 k = len - 1;
-    while (number != 0) {
-      bstr[k--] = bytes1(uint8(48 + (number % 10)));
-      number /= 10;
-    }
-    return string(bstr);
+    assertTrue(diff <= margin, string(abi.encodePacked("Difference is ", diff.toString())));
   }
 
   function arraysEqual(address[] memory arr1, address[] memory arr2) public returns (bool) {
