@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+
+import "celo-foundry-8/Test.sol";
 import "@celo-contracts/common/FeeCurrencyWhitelist.sol";
 
 contract FeeCurrencyWhitelistTest is Test {
@@ -9,7 +10,7 @@ contract FeeCurrencyWhitelistTest is Test {
   address nonOwner;
   address owner;
 
-  function setUp() public {
+  function setUp() public virtual {
     owner = address(this);
     nonOwner = actor("nonOwner");
 
@@ -20,7 +21,6 @@ contract FeeCurrencyWhitelistTest is Test {
 
 contract FeeCurrencyWhitelistInitialize is FeeCurrencyWhitelistTest {
   function test_InitializeOwner() public {
-    assertTrue(feeCurrencyWhitelist.isOwner());
     assertEq(feeCurrencyWhitelist.owner(), address(this));
   }
 
@@ -46,7 +46,7 @@ contract FeeCurrencyWhitelistAddToken is FeeCurrencyWhitelistTest {
 }
 
 contract FeeCurrencyWhitelistRemoveToken is FeeCurrencyWhitelistTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     feeCurrencyWhitelist.addToken(address(1));
     feeCurrencyWhitelist.addToken(address(2));
