@@ -581,8 +581,10 @@ contract LockedGold is
   function getPendingWithdrawals(
     address account
   ) external view returns (uint256[] memory, uint256[] memory) {
+    uint256 to = balances[account].pendingWithdrawals.length > 0 ? balances[account]
+      .pendingWithdrawals.length - 1 : 0; 
     return
-      getPendingWithdrawalsInBatch(account, 0, balances[account].pendingWithdrawals.length - 1);
+      getPendingWithdrawalsInBatch(account, 0, to);
   }
 
   /**
