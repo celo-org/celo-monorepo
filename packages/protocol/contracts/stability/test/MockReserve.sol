@@ -1,7 +1,7 @@
-pragma solidity ^0.5.13;
-// solhint-disable no-unused-vars
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts8/interfaces/IERC20.sol";
 
 /**
  * @title A mock Reserve for testing.
@@ -12,7 +12,7 @@ contract MockReserve {
   IERC20 public goldToken;
 
   // solhint-disable-next-line no-empty-blocks
-  function() external payable {}
+  receive() external payable {}
 
   function setGoldToken(address goldTokenAddress) external {
     goldToken = IERC20(goldTokenAddress);
