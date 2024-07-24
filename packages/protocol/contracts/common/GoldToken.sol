@@ -181,7 +181,7 @@ contract GoldToken is
     );
 
     bool success;
-    (success, ) = TRANSFER.call{value: value, gas: gasleft()}(abi.encode(from, to, value));
+    (success, ) = TRANSFER.call{value: 0, gas: gasleft()}(abi.encode(from, to, value));
     require(success, "CELO transfer failed");
 
     allowed[from][msg.sender] = allowed[from][msg.sender].sub(value);
@@ -204,7 +204,7 @@ contract GoldToken is
     totalSupply_ = totalSupply_.add(value);
 
     bool success;
-    (success, ) = TRANSFER.call{value: value, gas: gasleft()}(abi.encode(address(0), to, value));
+    (success, ) = TRANSFER.call{value: 0, gas: gasleft()}(abi.encode(address(0), to, value));
     require(success, "CELO transfer failed");
 
     emit Transfer(address(0), to, value);
@@ -319,7 +319,7 @@ contract GoldToken is
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
 
     bool success;
-    (success, ) = TRANSFER.call{value: value, gas: gasleft()}(abi.encode(msg.sender, to, value));
+    (success, ) = TRANSFER.call{value: 0, gas: gasleft()}(abi.encode(msg.sender, to, value));
     require(success, "CELO transfer failed");
     emit Transfer(msg.sender, to, value);
     return true;

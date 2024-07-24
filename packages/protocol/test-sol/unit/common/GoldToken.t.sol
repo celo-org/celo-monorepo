@@ -3,10 +3,12 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
 import "@celo-contracts/common/GoldToken.sol";
+import { CeloDistributionSchedule } from "@celo-contracts-8/common/CeloDistributionSchedule.sol";
 import "@test-sol/unit/common/GoldTokenMock.sol";
 
 contract GoldTokenTest is Test, IsL2Check {
   GoldToken celoToken;
+  CeloDistributionSchedule celoDistributionSchedule;
 
   uint256 constant ONE_CELOTOKEN = 1000000000000000000;
   address receiver;
@@ -25,10 +27,10 @@ contract GoldTokenTest is Test, IsL2Check {
 
   function setUp() public virtual {
     celoTokenOwner = actor("celoTokenOwner");
-    celoTokenDistributionSchedule = actor("celoTokenDistributionSchedule");
     vm.prank(celoTokenOwner);
     celoToken = new GoldToken(true);
-    deployCodeTo("CeloDistributionSchedule.sol", abi.encode(false), celoTokenDistributionSchedule);
+    celoDistributionSchedule = new CeloDistributionSchedule(false);
+    celoTokenDistributionSchedule = address(celoDistributionSchedule);
     receiver = actor("receiver");
     sender = actor("sender");
     vm.deal(receiver, ONE_CELOTOKEN);
