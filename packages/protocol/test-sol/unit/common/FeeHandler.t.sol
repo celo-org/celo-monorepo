@@ -18,7 +18,7 @@ import "@celo-contracts/uniswap/interfaces/IUniswapV2Router02.sol";
 import "@celo-contracts/uniswap/interfaces/IUniswapV2Factory.sol";
 import "@celo-contracts/uniswap/test/MockERC20.sol";
 import "@celo-contracts/stability/test/MockSortedOracles.sol";
-import "@celo-contracts/stability/test/MockReserve.sol";
+import "@celo-contracts-8/stability/test/MockReserve.sol";
 
 contract FeeHandlerTest is Test, Constants {
   using FixidityLib for FixidityLib.Fraction;
