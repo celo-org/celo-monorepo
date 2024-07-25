@@ -275,7 +275,31 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils08 {
       _downtimeGracePeriod: downtimeGracePeriod
     });
 
-    validatorsMockTunnel.mockInitialize(initParams, initParams2);
+
+    Validators.InitParams memory initParamsStruct = Validators.InitParams({
+      commissionUpdateDelay: initParams2._commissionUpdateDelay,
+      downtimeGracePeriod: initParams2._downtimeGracePeriod
+    });
+
+    validators.initialize(
+      initParams.registryAddress,
+      initParams.groupRequirementValue,
+      initParams.groupRequirementDuration,
+      initParams.validatorRequirementValue,
+      initParams.validatorRequirementDuration,
+      initParams.validatorScoreExponent,
+      initParams.validatorScoreAdjustmentSpeed,
+      initParams2._membershipHistoryLength,
+      initParams2._slashingMultiplierResetPeriod,
+      initParams2._maxGroupSize,
+      initParamsStruct
+    );
+
+
+    Governance.InitParams memory initParams = Governance.InitParams({
+       baselineUpdateFactor: baselineUpdateFactor.unwrap(),
+       baselineQuorumFactor: baselineQuorumFactor.unwrap()
+    });
 
     governance.initialize(
       address(registry),
@@ -288,8 +312,7 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils08 {
       EXECUTION_STAGE_DURATION,
       participationBaseline.unwrap(),
       participationFloor.unwrap(),
-      baselineUpdateFactor.unwrap(),
-      baselineQuorumFactor.unwrap()
+      initParams
     );
 
     accounts.createAccount();
@@ -309,12 +332,12 @@ contract RevokeCeloAfterL2Transition is Test, Constants, ECDSAHelper, Utils08 {
       releaseGoldInitParams._beneficiary,
       releaseGoldInitParams2._releaseOwner,
       releaseGoldInitParams2._refundAddress,
-      releaseGoldInitParams2.subjectToLiquidityProvision,
       releaseGoldInitParams2.initialDistributionRatio,
-      ReleaseGold.CanVoteValidate(
+      ReleaseGold.ReleaseGoldInitParams(
         releaseGoldInitParams2._canValidate,
         releaseGoldInitParams2._canVote,
-        releaseGoldInitParams2.registryAddress
+        releaseGoldInitParams2.registryAddress,
+        releaseGoldInitParams2.subjectToLiquidityProvision
       )
     );
   }

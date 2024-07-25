@@ -81,6 +81,13 @@ contract Governance is
     mapping(address => bool) whitelisted;
   }
 
+  struct InitParams {
+    // The weight of the new participation in the baseline update rule.
+    uint256 baselineUpdateFactor;
+    // The proportion of the baseline that constitutes quorum.
+    uint256 baselineQuorumFactor;
+  }
+
   // The baseline is updated as
   // max{floor, (1 - baselineUpdateFactor) * baseline + baselineUpdateFactor * participation}
   struct ParticipationParameters {
@@ -236,8 +243,7 @@ contract Governance is
    *   after the referendum stage ends.
    * @param participationBaseline The initial value of the participation baseline.
    * @param participationFloor The participation floor.
-   * @param baselineUpdateFactor The weight of the new participation in the baseline update rule.
-   * @param baselineQuorumFactor The proportion of the baseline that constitutes quorum.
+    * @param initParams The init parameters.
    * @dev Should be called only once.
    */
   function initialize(
@@ -251,8 +257,7 @@ contract Governance is
     uint256 executionStageDuration,
     uint256 participationBaseline,
     uint256 participationFloor,
-    uint256 baselineUpdateFactor,
-    uint256 baselineQuorumFactor
+    InitParams memory initParams
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -265,8 +270,8 @@ contract Governance is
     setExecutionStageDuration(executionStageDuration);
     setParticipationBaseline(participationBaseline);
     setParticipationFloor(participationFloor);
-    setBaselineUpdateFactor(baselineUpdateFactor);
-    setBaselineQuorumFactor(baselineQuorumFactor);
+    setBaselineUpdateFactor(initParams.baselineUpdateFactor);
+    setBaselineQuorumFactor(initParams.baselineQuorumFactor);
     // solhint-disable-next-line not-rely-on-time
     lastDequeue = block.timestamp;
   }

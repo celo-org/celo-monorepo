@@ -34,6 +34,12 @@ contract EpochRewards is
     FixidityLib.Fraction overspend;
   }
 
+  struct InitParams {
+    uint256 targetVotingGoldFraction;
+    uint256 communityRewardFraction;
+    uint256 carbonOffsettingFraction;
+  }
+
   // This struct governs the multiplier on the target rewards to give out in a given epoch due to
   // potential deviations in the actual Gold total supply from the target total supply.
   // In the case where the actual exceeds the target (i.e. the protocol has "overspent" with
@@ -102,11 +108,12 @@ contract EpochRewards is
    *   rewards when the protocol is running behind the target Gold supply.
    * @param rewardsMultiplierOverspendAdjustmentFactor Adjusts the multiplier on target epoch
    *   rewards when the protocol is running ahead of the target Gold supply.
-   * @param _targetVotingGoldFraction The percentage of floating Gold voting to target.
    * @param _targetValidatorEpochPayment The target validator epoch payment.
-   * @param _communityRewardFraction The percentage of rewards that go the community funds.
    * @param _carbonOffsettingPartner The address of the carbon offsetting partner.
-   * @param _carbonOffsettingFraction The percentage of rewards going to carbon offsetting partner.
+   * @param initParams The initial fractions.
+          targetVotingGoldFraction The percentage of floating Gold voting to target.
+          communityRewardFraction The percentage of rewards that go the community funds.
+          carbonOffsettingFraction The percentage of rewards going to carbon offsetting partner.
    * @dev Should be called only once.
    */
   function initialize(
@@ -117,11 +124,9 @@ contract EpochRewards is
     uint256 rewardsMultiplierMax,
     uint256 rewardsMultiplierUnderspendAdjustmentFactor,
     uint256 rewardsMultiplierOverspendAdjustmentFactor,
-    uint256 _targetVotingGoldFraction,
     uint256 _targetValidatorEpochPayment,
-    uint256 _communityRewardFraction,
     address _carbonOffsettingPartner,
-    uint256 _carbonOffsettingFraction
+    InitParams memory initParams
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -131,10 +136,10 @@ contract EpochRewards is
       rewardsMultiplierUnderspendAdjustmentFactor,
       rewardsMultiplierOverspendAdjustmentFactor
     );
-    setTargetVotingGoldFraction(_targetVotingGoldFraction);
+    setTargetVotingGoldFraction(initParams.targetVotingGoldFraction);
     setTargetValidatorEpochPayment(_targetValidatorEpochPayment);
-    setCommunityRewardFraction(_communityRewardFraction);
-    setCarbonOffsettingFund(_carbonOffsettingPartner, _carbonOffsettingFraction);
+    setCommunityRewardFraction(initParams.communityRewardFraction);
+    setCarbonOffsettingFund(_carbonOffsettingPartner, initParams.carbonOffsettingFraction);
     setTargetVotingYield(targetVotingYieldInitial);
     startTime = block.timestamp;
   }

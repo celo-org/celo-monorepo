@@ -110,6 +110,12 @@ contract Validators is
     FixidityLib.Fraction adjustmentSpeed;
   }
 
+  struct InitParams {
+    // The number of blocks to delay a ValidatorGroup's commission
+    uint256 commissionUpdateDelay;
+    uint256 downtimeGracePeriod;
+  }
+
   mapping(address => ValidatorGroup) private groups;
   mapping(address => Validator) private validators;
   address[] private registeredGroups;
@@ -177,7 +183,6 @@ contract Validators is
    * @param validatorScoreAdjustmentSpeed The speed at which validator scores are adjusted.
    * @param _membershipHistoryLength The max number of entries for validator membership history.
    * @param _maxGroupSize The maximum group size.
-   * @param _commissionUpdateDelay The number of blocks to delay a ValidatorGroup's commission
    * update.
    * @dev Should be called only once.
    */
@@ -192,8 +197,8 @@ contract Validators is
     uint256 _membershipHistoryLength,
     uint256 _slashingMultiplierResetPeriod,
     uint256 _maxGroupSize,
-    uint256 _commissionUpdateDelay,
-    uint256 _downtimeGracePeriod
+    InitParams calldata initParams
+ 
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -201,10 +206,10 @@ contract Validators is
     setValidatorLockedGoldRequirements(validatorRequirementValue, validatorRequirementDuration);
     setValidatorScoreParameters(validatorScoreExponent, validatorScoreAdjustmentSpeed);
     setMaxGroupSize(_maxGroupSize);
-    setCommissionUpdateDelay(_commissionUpdateDelay);
+    setCommissionUpdateDelay(initParams.commissionUpdateDelay);
     setMembershipHistoryLength(_membershipHistoryLength);
     setSlashingMultiplierResetPeriod(_slashingMultiplierResetPeriod);
-    setDowntimeGracePeriod(_downtimeGracePeriod);
+    setDowntimeGracePeriod(initParams.downtimeGracePeriod);
   }
 
   /**

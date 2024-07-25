@@ -95,13 +95,13 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
       initParams._beneficiary,
       initParams2._releaseOwner,
       initParams2._refundAddress,
-      initParams2.subjectToLiquidityProvision,
       initParams2.initialDistributionRatio,
-      ReleaseGold.CanVoteValidate(
-        initParams2._canValidate,
-        initParams2._canVote,
-        initParams2.registryAddress
-      )
+      ReleaseGold.ReleaseGoldInitParams({
+        canValidate: initParams2._canValidate,
+        canVote: initParams2._canVote,
+        registryAddress: initParams2.registryAddress,
+        subjectToLiquidityProvision: initParams2.subjectToLiquidityProvision
+    })
     );
   }
 

@@ -9,6 +9,7 @@ import "@celo-contracts-8/common/Freezer.sol";
 
 import "@celo-contracts-8/governance/test/MockElection.sol";
 import { EpochRewardsMock } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
+import { EpochRewards } from "@celo-contracts-8/governance/EpochRewards.sol";
 
 import { MockSortedOracles } from "@celo-contracts/stability/test/MockSortedOracles.sol";
 import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.sol";
@@ -88,6 +89,12 @@ contract EpochRewardsTest is Test, Constants, Utils08 {
       sortedOraclesDenominator * exchangeRate
     );
 
+    EpochRewards.InitParams memory initParams = EpochRewards.InitParams({
+        targetVotingGoldFraction: targetVotingGoldFraction,
+        communityRewardFraction: communityRewardFraction,
+        carbonOffsettingFraction: carbonOffsettingFraction
+  });
+
     epochRewards.initialize(
       address(registry),
       targetVotingYieldParamsInitial,
@@ -96,11 +103,9 @@ contract EpochRewardsTest is Test, Constants, Utils08 {
       rewardsMultiplierMax,
       rewardsMultiplierAdjustmentsUnderspend,
       rewardsMultiplierAdjustmentsOverspend,
-      targetVotingGoldFraction,
       targetValidatorEpochPayment,
-      communityRewardFraction,
       address(0),
-      carbonOffsettingFraction
+      initParams
     );
 
     address reserveAddress = 0x9380fA34Fd9e4Fd14c06305fd7B6199089eD4eb9;
@@ -153,6 +158,13 @@ contract EpochRewardsTest_initialize is EpochRewardsTest {
 
   function test_shouldNotBeCallableAgain() public {
     vm.expectRevert("contract already initialized");
+
+    EpochRewards.InitParams memory initParams = EpochRewards.InitParams({
+        targetVotingGoldFraction: targetVotingGoldFraction,
+        communityRewardFraction: communityRewardFraction,
+        carbonOffsettingFraction: carbonOffsettingFraction
+  });
+
     epochRewards.initialize(
       address(registry),
       targetVotingYieldParamsInitial,
@@ -161,11 +173,9 @@ contract EpochRewardsTest_initialize is EpochRewardsTest {
       rewardsMultiplierMax,
       rewardsMultiplierAdjustmentsUnderspend,
       rewardsMultiplierAdjustmentsOverspend,
-      targetVotingGoldFraction,
       targetValidatorEpochPayment,
-      communityRewardFraction,
       address(0),
-      carbonOffsettingFraction
+      initParams
     );
   }
 }

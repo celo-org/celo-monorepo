@@ -210,9 +210,24 @@ contract ValidatorsTest is Test, Constants, Utils08, ECDSAHelper {
       _downtimeGracePeriod: downtimeGracePeriod
     });
 
-    vm.startPrank(owner);
-    validatorsMockTunnel.mockInitialize(initParams, initParams2);
-    vm.stopPrank();
+    Validators.InitParams memory initParamsStruct = Validators.InitParams({
+      commissionUpdateDelay: initParams2._commissionUpdateDelay,
+      downtimeGracePeriod: initParams2._downtimeGracePeriod
+    });
+
+    validators.initialize(
+      initParams.registryAddress,
+      initParams.groupRequirementValue,
+      initParams.groupRequirementDuration,
+      initParams.validatorRequirementValue,
+      initParams.validatorRequirementDuration,
+      initParams.validatorScoreExponent,
+      initParams.validatorScoreAdjustmentSpeed,
+      initParams2._membershipHistoryLength,
+      initParams2._slashingMultiplierResetPeriod,
+      initParams2._maxGroupSize,
+      initParamsStruct
+    );
 
     owner = validators.owner();
 
@@ -394,9 +409,25 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
 
   function test_Reverts_WhenCalledMoreThanOnce() public {
     vm.expectRevert();
-    vm.startPrank(owner);
-    validatorsMockTunnel.mockInitialize(initParams, initParams2);
-    vm.stopPrank();
+
+    Validators.InitParams memory initParamsStruct = Validators.InitParams({
+      commissionUpdateDelay: initParams2._commissionUpdateDelay,
+      downtimeGracePeriod: initParams2._downtimeGracePeriod
+    });
+
+    validators.initialize(
+      initParams.registryAddress,
+      initParams.groupRequirementValue,
+      initParams.groupRequirementDuration,
+      initParams.validatorRequirementValue,
+      initParams.validatorRequirementDuration,
+      initParams.validatorScoreExponent,
+      initParams.validatorScoreAdjustmentSpeed,
+      initParams2._membershipHistoryLength,
+      initParams2._slashingMultiplierResetPeriod,
+      initParams2._maxGroupSize,
+      initParamsStruct
+    );
   }
 
   function test_shouldHaveSetGroupLockedGoldRequirements() public {

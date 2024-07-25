@@ -59,10 +59,11 @@ contract ReleaseGoldMockTunnel is ForgeTest {
       );
     }
 
-    ReleaseGold.CanVoteValidate memory canVoteValidate = ReleaseGold.CanVoteValidate(
+    ReleaseGold.ReleaseGoldInitParams memory canVoteValidate = ReleaseGold.ReleaseGoldInitParams(
       params2._canValidate,
       params2._canVote,
-      params2.registryAddress
+      params2.registryAddress,
+      params2.subjectToLiquidityProvision
     );
 
     bytes memory dataSecondHalf;
@@ -71,7 +72,6 @@ contract ReleaseGoldMockTunnel is ForgeTest {
       dataSecondHalf = abi.encode(
         params2._releaseOwner,
         params2._refundAddress,
-        params2.subjectToLiquidityProvision,
         params2.initialDistributionRatio,
         canVoteValidate
       );

@@ -43,13 +43,15 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     uint256 revokeTime;
   }
 
-  struct CanVoteValidate {
+  struct ReleaseGoldInitParams {
     // Indicates if this schedule's unreleased gold can be used for validating.
     bool canValidate;
     // Indicates if this schedule's unreleased gold can be used for voting.
     bool canVote;
     // registry address
     address registryAddress;
+    // If this schedule is subject to a liquidity provision.
+    bool subjectToLiquidityProvision;
   }
 
   // uint256(-1) == 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
@@ -188,10 +190,9 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    *                      0x0 if grant is not subject to these operations.
    * @param _refundAddress Address that receives refunded funds if contract is revoked.
    *                       0x0 if contract is not revocable.
-   * @param subjectToLiquidityProvision If this schedule is subject to a liquidity provision.
    * @param initialDistributionRatio Amount in range [0, 1000] (3 significant figures)
    *                                 indicating % of total balance available for distribution.¨
-    * @param canVoteValidate Struct containing the canVote and canValidate and registry params.
+    * @param initParams Struct containing the canVote and canValidate and registry params.
    */
   function initialize(
     uint256 releaseStartTime,
@@ -203,9 +204,8 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     address payable _beneficiary,
     address _releaseOwner,
     address payable _refundAddress,
-    bool subjectToLiquidityProvision,
     uint256 initialDistributionRatio,
-    CanVoteValidate memory canVoteValidate
+    ReleaseGoldInitParams memory initParams
   ) external initializer {
     _transferOwnership(msg.sender);
     releaseSchedule.numReleasePeriods = numReleasePeriods;
@@ -226,13 +226,13 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       _beneficiary != address(0),
       "The release schedule beneficiary cannot be the zero addresss"
     );
-    require(!(revocable && canVoteValidate.canValidate), "Revocable contracts cannot validate");
+    require(!(revocable && initParams.canValidate), "Revocable contracts cannot validate");
     require(initialDistributionRatio <= 1000, "Initial distribution ratio out of bounds");
     require(
       (revocable && _refundAddress != address(0)) || (!revocable && _refundAddress == address(0)),
       "If contract is revocable there must be an address to refund"
     );
-    setRegistry(canVoteValidate.registryAddress);
+    setRegistry(initParams.registryAddress);
     _setBeneficiary(_beneficiary);
     revocationInfo.revocable = revocable;
     releaseOwner = _releaseOwner;
@@ -248,9 +248,9 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     } else {
       maxDistribution = MAX_UINT;
     }
-    liquidityProvisionMet = (subjectToLiquidityProvision) ? false : true;
-    canValidate = canVoteValidate.canValidate;
-    canVote = canVoteValidate.canVote;
+    liquidityProvisionMet = (initParams.subjectToLiquidityProvision) ? false : true;
+    canValidate = initParams.canValidate;
+    canVote = initParams.canVote;
     emit ReleaseGoldInstanceCreated(beneficiary, address(this));
   }
 

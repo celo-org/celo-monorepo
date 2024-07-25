@@ -153,6 +153,12 @@ contract GovernanceTest is Test {
     registry.setAddressFor("Accounts", address(accounts));
 
     governance = new GovernanceMock();
+
+    Governance.InitParams memory initParams = Governance.InitParams({
+       baselineUpdateFactor: baselineUpdateFactor.unwrap(),
+       baselineQuorumFactor: baselineQuorumFactor.unwrap()
+    });
+
     governance.initialize(
       address(registry),
       accApprover,
@@ -164,8 +170,7 @@ contract GovernanceTest is Test {
       EXECUTION_STAGE_DURATION,
       participationBaseline.unwrap(),
       participationFloor.unwrap(),
-      baselineUpdateFactor.unwrap(),
-      baselineQuorumFactor.unwrap()
+     initParams
     );
     vm.stopPrank();
   }
@@ -304,6 +309,12 @@ contract GovernanceTest_initialize is GovernanceTest {
   // TODO: Consider testing reversion when 0 values provided
   function test_RevertIf_CalledAgain() public {
     vm.expectRevert("contract already initialized");
+
+    Governance.InitParams memory initParams = Governance.InitParams({
+       baselineUpdateFactor: FixidityLib.newFixed(1).unwrap(),
+       baselineQuorumFactor: FixidityLib.newFixed(1).unwrap()
+    });
+
     governance.initialize(
       address(1),
       accApprover,
@@ -315,8 +326,7 @@ contract GovernanceTest_initialize is GovernanceTest {
       1,
       FixidityLib.newFixed(1).unwrap(),
       FixidityLib.newFixed(1).unwrap(),
-      FixidityLib.newFixed(1).unwrap(),
-      FixidityLib.newFixed(1).unwrap()
+      initParams
     );
   }
 }
