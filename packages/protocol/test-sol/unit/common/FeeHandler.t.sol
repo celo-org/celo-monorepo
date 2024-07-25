@@ -6,8 +6,6 @@ import "celo-foundry-8/Test.sol";
 import "@celo-contracts/common/FeeHandler.sol";
 import { Constants } from "@test-sol/constants.sol";
 
-// import { Exchange } from "@mento-core/contracts/Exchange.sol";
-// import { StableToken } from "@mento-core/contracts/StableToken.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts-8/common/Freezer.sol";
 import "@celo-contracts/common/GoldToken.sol";
@@ -17,9 +15,7 @@ import "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
 import "@celo-contracts/common/interfaces/IExchange.sol";
 import "@celo-contracts-8/common/interfaces/IStableToken.sol";
 import "@celo-contracts/uniswap/interfaces/IUniswapV2Router02.sol";
-// import "@celo-contracts/uniswap/test/MockUniswapV2Router02.sol";
 import "@celo-contracts/uniswap/interfaces/IUniswapV2Factory.sol";
-// import "@celo-contracts/uniswap/test/MockUniswapV2Factory.sol";
 import "@celo-contracts/uniswap/test/MockERC20.sol";
 import "@celo-contracts/stability/test/MockSortedOracles.sol";
 import "@celo-contracts/stability/test/MockReserve.sol";
