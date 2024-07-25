@@ -1,17 +1,18 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
-import "openzeppelin-solidity/contracts/utils/Address.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/math/Math.sol";
+import "@openzeppelin/contracts8/interfaces/IERC20.sol";
+import "@openzeppelin/contracts8/utils/Address.sol";
+import "@openzeppelin/contracts8/token/ERC20/utils/SafeERC20.sol";
 
 import "./interfaces/IReleaseGold.sol";
 
 import "../common/FixidityLib.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 import "../common/Initializable.sol";
-import "../common/UsingRegistry.sol";
+import "../../contracts-0.8/common/UsingRegistry.sol";
 
 contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializable {
   using SafeMath for uint256;
@@ -42,8 +43,17 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     uint256 revokeTime;
   }
 
+  struct CanVoteValidate {
+    // Indicates if this schedule's unreleased gold can be used for validating.
+    bool canValidate;
+    // Indicates if this schedule's unreleased gold can be used for voting.
+    bool canVote;
+    // registry address
+    address registryAddress;
+  }
+
   // uint256(-1) == 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-  uint256 internal constant MAX_UINT = uint256(-1);
+  uint256 internal constant MAX_UINT = type(uint256).max;
 
   // Duration (in seconds) after gold is fully released
   // when gold should be switched back to control of releaseOwner.
@@ -180,10 +190,8 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    *                       0x0 if contract is not revocable.
    * @param subjectToLiquidityProvision If this schedule is subject to a liquidity provision.
    * @param initialDistributionRatio Amount in range [0, 1000] (3 significant figures)
-   *                                 indicating % of total balance available for distribution.
-   * @param _canValidate If this schedule's gold can be used for validating.
-   * @param _canVote If this schedule's gold can be used for voting.
-   * @param registryAddress Address of the deployed contracts registry.
+   *                                 indicating % of total balance available for distribution.¨
+    * @param canVoteValidate Struct containing the canVote and canValidate and registry params.
    */
   function initialize(
     uint256 releaseStartTime,
@@ -197,9 +205,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     address payable _refundAddress,
     bool subjectToLiquidityProvision,
     uint256 initialDistributionRatio,
-    bool _canValidate,
-    bool _canVote,
-    address registryAddress
+    CanVoteValidate memory canVoteValidate
   ) external initializer {
     _transferOwnership(msg.sender);
     releaseSchedule.numReleasePeriods = numReleasePeriods;
@@ -220,14 +226,13 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       _beneficiary != address(0),
       "The release schedule beneficiary cannot be the zero addresss"
     );
-    require(registryAddress != address(0), "The registry address cannot be the zero address");
-    require(!(revocable && _canValidate), "Revocable contracts cannot validate");
+    require(!(revocable && canVoteValidate.canValidate), "Revocable contracts cannot validate");
     require(initialDistributionRatio <= 1000, "Initial distribution ratio out of bounds");
     require(
       (revocable && _refundAddress != address(0)) || (!revocable && _refundAddress == address(0)),
       "If contract is revocable there must be an address to refund"
     );
-    setRegistry(registryAddress);
+    setRegistry(canVoteValidate.registryAddress);
     _setBeneficiary(_beneficiary);
     revocationInfo.revocable = revocable;
     releaseOwner = _releaseOwner;
@@ -244,12 +249,12 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       maxDistribution = MAX_UINT;
     }
     liquidityProvisionMet = (subjectToLiquidityProvision) ? false : true;
-    canValidate = _canValidate;
-    canVote = _canVote;
+    canValidate = canVoteValidate.canValidate;
+    canVote = canVoteValidate.canVote;
     emit ReleaseGoldInstanceCreated(beneficiary, address(this));
   }
 
-  function() external payable {}
+  receive() external payable {}
 
   /**
    * @notice Wrapper function for stable token transfer function.
@@ -634,7 +639,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @param value The value of gold to be locked.
    */
   function lockGold(uint256 value) external nonReentrant onlyBeneficiaryAndNotRevoked {
-    getLockedGold().lock.gas(gasleft()).value(value)();
+    getLockedGold().lock{gas:gasleft(), value: value}();
   }
 
   /**

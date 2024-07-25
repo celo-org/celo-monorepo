@@ -1,17 +1,18 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts8/token/ERC20/utils/SafeERC20.sol";
 
 import "./interfaces/IAttestations.sol";
 import "./interfaces/IFederatedAttestations.sol";
 import "./interfaces/IEscrow.sol";
 import "../common/Initializable.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/UsingRegistryV2BackwardsCompatible.sol";
-import "../common/Signatures.sol";
+import "../../contracts-0.8/common/UsingRegistryV2BackwardsCompatible.sol";
+import "../../contracts-0.8/common/Signatures.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 contract Escrow is
@@ -312,7 +313,7 @@ contract Escrow is
     EscrowedPayment memory payment = escrowedPayments[paymentId];
     require(payment.sender == msg.sender, "Only sender of payment can attempt to revoke payment.");
     require(
-      now >= (payment.timestamp.add(payment.expirySeconds)),
+      block.timestamp >= (payment.timestamp.add(payment.expirySeconds)),
       "Transaction not redeemable for sender yet."
     );
 
@@ -511,8 +512,11 @@ contract Escrow is
       "minAttestations larger than limit"
     );
 
-    uint256 sentIndex = sentPaymentIds[msg.sender].push(paymentId).sub(1);
-    uint256 receivedIndex = receivedPaymentIds[identifier].push(paymentId).sub(1);
+    sentPaymentIds[msg.sender].push(paymentId);
+    receivedPaymentIds[identifier].push(paymentId);
+
+    uint256 sentIndex = sentPaymentIds[msg.sender].length - 1;
+    uint256 receivedIndex = receivedPaymentIds[identifier].length - 1;
 
     EscrowedPayment storage newPayment = escrowedPayments[paymentId];
     require(newPayment.timestamp == 0, "paymentId already used");
@@ -550,11 +554,11 @@ contract Escrow is
 
     escrowedPayments[received[received.length - 1]].receivedIndex = payment.receivedIndex;
     received[payment.receivedIndex] = received[received.length - 1];
-    received.length = received.length.sub(1);
+    received.pop();
 
     escrowedPayments[sent[sent.length - 1]].sentIndex = payment.sentIndex;
     sent[payment.sentIndex] = sent[sent.length - 1];
-    sent.length = sent.length.sub(1);
+    sent.pop();
 
     delete escrowedPayments[paymentId];
     delete trustedIssuersPerPayment[paymentId];

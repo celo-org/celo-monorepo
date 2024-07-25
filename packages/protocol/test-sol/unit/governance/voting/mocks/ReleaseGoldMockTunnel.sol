@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+pragma solidity >=0.8.7 <0.8.20;
+
 
 import "@celo-contracts/governance/ReleaseGold.sol";
-import { Test as ForgeTest } from "forge-std/Test.sol";
+import { Test as ForgeTest } from "celo-foundry-8/Test.sol";
 
 contract ReleaseGoldMockTunnel is ForgeTest {
   ReleaseGold private releaseGoldTunnel;
@@ -30,7 +30,7 @@ contract ReleaseGoldMockTunnel is ForgeTest {
   }
 
   constructor(address _releaseGoldContractAddress) public {
-    releaseGoldContractAddress = address(uint160(_releaseGoldContractAddress));
+    releaseGoldContractAddress = payable(_releaseGoldContractAddress);
     releaseGoldTunnel = ReleaseGold(releaseGoldContractAddress);
   }
 

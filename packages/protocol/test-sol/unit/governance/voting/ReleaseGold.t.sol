@@ -1,19 +1,19 @@
 // // SPDX-License-Identifier: LGPL-3.0-only
-// pragma solidity ^0.5.13;
-// pragma experimental ABIEncoderV2;
+// pragma solidity >=0.8.7 <0.8.20;
 
-// import "celo-foundry/Test.sol";
+// import "celo-foundry-8/Test.sol";
+
 // import "@celo-contracts/identity/Escrow.sol";
 // import "@celo-contracts/identity/FederatedAttestations.sol";
 // import "@celo-contracts/identity/test/MockAttestations.sol";
 // import "@celo-contracts/identity/test/MockERC20Token.sol";
 // import "@celo-contracts/common/FixidityLib.sol";
 
-// import "@celo-contracts/common/Registry.sol";
-// import "@celo-contracts/common/Accounts.sol";
-// import "@celo-contracts/common/Freezer.sol";
+// import "@celo-contracts-8/common/Registry.sol";
+// import "@celo-contracts-8/governance/Accounts.sol";
+// import "@celo-contracts-8/common/Freezer.sol";
 // import "@celo-contracts/common/GoldToken.sol";
-// import "@celo-contracts/governance/LockedGold.sol";
+// import "@celo-contracts-8/governance/LockedGold.sol";
 // import "@celo-contracts/governance/ReleaseGold.sol";
 // import "./mocks/ReleaseGoldMockTunnel.sol";
 // import "@celo-contracts/stability/test/MockStableToken.sol";

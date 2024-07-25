@@ -1,17 +1,18 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/utils/SafeCast.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/math/SafeCast.sol";
+import "@openzeppelin/contracts8/interfaces/IERC20.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "./interfaces/IFederatedAttestations.sol";
 import "../common/interfaces/IAccounts.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "../common/Initializable.sol";
-import "../common/UsingRegistryV2.sol";
-import "../common/Signatures.sol";
+import "../../contracts-0.8/common/UsingRegistryV2.sol";
+import "../../contracts-0.8/common/Signatures.sol";
 
 /**
  * @title Contract mapping identifiers to accounts
@@ -336,7 +337,7 @@ contract FederatedAttestations is
   function setEip712DomainSeparator() internal {
     uint256 chainId;
     assembly {
-      chainId := chainid
+      chainId := chainid()
     }
 
     eip712DomainSeparator = keccak256(
