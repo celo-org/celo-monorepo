@@ -88,10 +88,10 @@ contract FeeHandlerTest is Test, Constants {
     address exchangeUSDAddress = actor("exchangeUSD");
     address exchangeEURAddress = actor("exchange");
 
-    deployCodeTo("StableToken.sol", abi.encode(false), stableTokenAddress);
-    deployCodeTo("StableToken.sol", abi.encode(false), stableTokenEURAddress);
-    deployCodeTo("Exchange.sol", abi.encode(false), exchangeUSDAddress);
-    deployCodeTo("Exchange.sol", abi.encode(false), exchangeEURAddress);
+    deployCodeTo("StableToken.sol", abi.encode(true), stableTokenAddress);
+    deployCodeTo("StableToken.sol", abi.encode(true), stableTokenEURAddress);
+    deployCodeTo("Exchange.sol", abi.encode(true), exchangeUSDAddress);
+    deployCodeTo("Exchange.sol", abi.encode(true), exchangeEURAddress);
 
     celoToken = new GoldToken(true);
     mockReserve = new MockReserve();

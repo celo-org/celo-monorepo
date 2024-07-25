@@ -14,7 +14,7 @@ contract ECDSAHelper is Test {
     bytes32 _s
   ) public returns (bytes memory) {
     address SECP256K1Address = actor("SECP256K1Address");
-    deployCodeTo("out/SECP256K1.sol/SECP256K1.0.5.17.json", SECP256K1Address);
+    deployCodeTo("out/SECP256K1.sol/SECP256K1.json", SECP256K1Address);
     sECP256K1 = ISECP256K1(SECP256K1Address);
 
     string memory header = "\x19Ethereum Signed Message:\n32";

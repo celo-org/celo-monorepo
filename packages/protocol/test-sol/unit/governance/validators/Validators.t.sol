@@ -3,6 +3,7 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
 
+
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
@@ -16,10 +17,26 @@ import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts-8/governance/test/MockLockedGold.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 
-import "@celo-contracts-8/governance/test/ValidatorsMock.sol";
+import "@celo-contracts-8/governance/Validators.sol";
 import "@test-sol/constants.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
 import { Utils08 } from "@test-sol/utils08.sol";
+
+import "forge-std/console.sol";
+
+
+contract ValidatorsMock is Validators(true) {
+  function updateValidatorScoreFromSigner(address signer, uint256 uptime) override external {
+    return _updateValidatorScoreFromSigner(signer, uptime);
+  }
+
+  function distributeEpochPaymentsFromSigner(
+    address signer,
+    uint256 maxPayment
+  ) external override returns (uint256) {
+    return _distributeEpochPaymentsFromSigner(signer, maxPayment);
+  }
+}
 
 contract ValidatorsTest is Test, Constants, Utils08, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
@@ -132,7 +149,6 @@ contract ValidatorsTest is Test, Constants, Utils08, ECDSAHelper {
   );
 
   function setUp() virtual public {
-    owner = address(this);
     group = actor("group");
     nonValidator = actor("nonValidator");
     nonOwner = actor("nonOwner");
@@ -194,7 +210,11 @@ contract ValidatorsTest is Test, Constants, Utils08, ECDSAHelper {
       _downtimeGracePeriod: downtimeGracePeriod
     });
 
-    validatorsMockTunnel.MockInitialize(owner, initParams, initParams2);
+    vm.startPrank(owner);
+    validatorsMockTunnel.mockInitialize(initParams, initParams2);
+    vm.stopPrank();
+
+    owner = validators.owner();
 
     vm.prank(validator);
     accounts.createAccount();
@@ -374,7 +394,9 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
 
   function test_Reverts_WhenCalledMoreThanOnce() public {
     vm.expectRevert();
-    validatorsMockTunnel.MockInitialize(owner, initParams, initParams2);
+    vm.startPrank(owner);
+    validatorsMockTunnel.mockInitialize(initParams, initParams2);
+    vm.stopPrank();
   }
 
   function test_shouldHaveSetGroupLockedGoldRequirements() public {
@@ -437,6 +459,7 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
   function test_Reverts_setCommissionUpdateDelay_WhenL2() public {
     _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(owner);
     validators.setCommissionUpdateDelay(commissionUpdateDelay);
   }
 
@@ -448,6 +471,7 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
   function test_Reverts_SetDowntimeGracePeriod_WhenL2() public {
     _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(owner);
     validators.setDowntimeGracePeriod(downtimeGracePeriod);
   }
 }
@@ -457,10 +481,12 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
 
   function test_Reverts_WhenLengthIsSame() public {
     vm.expectRevert("Membership history length not changed");
+    vm.prank(owner);
     validators.setMembershipHistoryLength(membershipHistoryLength);
   }
 
   function test_shouldSetTheMembershipHistoryLength() public {
+    vm.prank(owner);
     validators.setMembershipHistoryLength(newLength);
     assertEq(validators.membershipHistoryLength(), newLength);
   }
@@ -468,12 +494,14 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
   function test_Reverts_SetTheMembershipHistoryLength_WhenL2() public {
     _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(owner);
     validators.setMembershipHistoryLength(newLength);
   }
 
   function test_Emits_MembershipHistoryLengthSet() public {
     vm.expectEmit(true, true, true, true);
     emit MembershipHistoryLengthSet(newLength);
+    vm.prank(owner);
     validators.setMembershipHistoryLength(newLength);
   }
 
@@ -489,6 +517,7 @@ contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
 
   function test_Reverts_SetMaxGroupSize_WhenL2() public {
     _whenL2();
+    vm.prank(owner);
     vm.expectRevert("This method is no longer supported in L2.");
     validators.setMaxGroupSize(newSize);
   }
@@ -496,6 +525,7 @@ contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
   function test_Emits_MaxGroupSizeSet() public {
     vm.expectEmit(true, true, true, true);
     emit MaxGroupSizeSet(newSize);
+    vm.prank(owner);
     validators.setMaxGroupSize(newSize);
   }
 
@@ -507,6 +537,7 @@ contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
 
   function test_Reverts_WhenSizeIsSame() public {
     vm.expectRevert("Max group size not changed");
+    vm.prank(owner);
     validators.setMaxGroupSize(maxGroupSize);
   }
 }
@@ -519,6 +550,7 @@ contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
     });
 
   function test_ShouldHaveSetGroupLockedGoldRequirements() public {
+    vm.prank(owner);
     validators.setGroupLockedGoldRequirements(newRequirements.value, newRequirements.duration);
     (uint256 _value, uint256 _duration) = validators.getGroupLockedGoldRequirements();
     assertEq(_value, newRequirements.value);
@@ -528,6 +560,7 @@ contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
   function test_Emits_GroupLockedGoldRequirementsSet() public {
     vm.expectEmit(true, true, true, true);
     emit GroupLockedGoldRequirementsSet(newRequirements.value, newRequirements.duration);
+    vm.prank(owner);
     validators.setGroupLockedGoldRequirements(newRequirements.value, newRequirements.duration);
   }
 
@@ -539,6 +572,7 @@ contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
 
   function test_Reverts_WhenRequirementsAreUnchanged() public {
     vm.expectRevert("Group requirements not changed");
+    vm.prank(owner);
     validators.setGroupLockedGoldRequirements(
       originalGroupLockedGoldRequirements.value,
       originalGroupLockedGoldRequirements.duration
@@ -554,6 +588,7 @@ contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
     });
 
   function test_ShouldHaveSetValidatorLockedGoldRequirements() public {
+    vm.prank(owner);
     validators.setValidatorLockedGoldRequirements(newRequirements.value, newRequirements.duration);
     (uint256 _value, uint256 _duration) = validators.getValidatorLockedGoldRequirements();
     assertEq(_value, newRequirements.value);
@@ -563,6 +598,7 @@ contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
   function test_Emits_ValidatorLockedGoldRequirementsSet() public {
     vm.expectEmit(true, true, true, true);
     emit ValidatorLockedGoldRequirementsSet(newRequirements.value, newRequirements.duration);
+    vm.prank(owner);
     validators.setValidatorLockedGoldRequirements(newRequirements.value, newRequirements.duration);
   }
 
@@ -574,6 +610,7 @@ contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
 
   function test_Reverts_WhenRequirementsAreUnchanged() public {
     vm.expectRevert("Validator requirements not changed");
+    vm.prank(owner);
     validators.setValidatorLockedGoldRequirements(
       originalValidatorLockedGoldRequirements.value,
       originalValidatorLockedGoldRequirements.duration
@@ -591,6 +628,7 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
     });
 
   function test_ShouldSetExponentAndAdjustmentSpeed() public {
+    vm.prank(owner);
     validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
     (uint256 _exponent, uint256 _adjustmentSpeed) = validators.getValidatorScoreParameters();
     assertEq(_exponent, newParams.exponent, "Incorrect Exponent");
@@ -600,12 +638,14 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
   function test_Reverts_SetExponentAndAdjustmentSpeed_WhenL2() public {
     _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(owner);
     validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
   }
 
   function test_Emits_ValidatorScoreParametersSet() public {
     vm.expectEmit(true, true, true, true);
     emit ValidatorScoreParametersSet(newParams.exponent, newParams.adjustmentSpeed.unwrap());
+    vm.prank(owner);
     validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
   }
 
@@ -617,6 +657,7 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
 
   function test_Reverts_WhenLockupsAreUnchanged() public {
     vm.expectRevert("Adjustment speed and exponent not changed");
+    vm.prank(owner);
     validators.setValidatorScoreParameters(
       originalValidatorScoreParameters.exponent,
       originalValidatorScoreParameters.adjustmentSpeed.unwrap()
@@ -1942,6 +1983,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
 
+    vm.prank(owner);
     validators.setMaxGroupSize(1);
     _registerValidatorHelper(otherValidator, otherValidatorPk);
 
@@ -3534,6 +3576,7 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
 
   function test_ShouldReadProperly_WhenSlashingResetPeriosIsUpdated() public {
     uint256 newResetPeriod = 10 * DAY;
+    vm.prank(owner);
     validators.setSlashingMultiplierResetPeriod(newResetPeriod);
     timeTravel(newResetPeriod);
     vm.prank(group);
@@ -3546,6 +3589,7 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     _whenL2();
     uint256 newResetPeriod = 10 * DAY;
     vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(owner);
     validators.setSlashingMultiplierResetPeriod(newResetPeriod);
   }
 }
