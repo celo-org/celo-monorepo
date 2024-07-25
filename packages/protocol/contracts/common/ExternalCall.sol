@@ -1,6 +1,7 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/utils/Address.sol";
+import "@openzeppelin/contracts8/utils/Address.sol";
 
 library ExternalCall {
   /**
@@ -18,7 +19,7 @@ library ExternalCall {
     if (data.length > 0) require(Address.isContract(destination), "Invalid contract address");
     bool success;
     bytes memory returnData;
-    (success, returnData) = destination.call.value(value)(data);
+    (success, returnData) = destination.call{value:value}(data);
     require(success, "Transaction execution failed.");
     return returnData;
   }

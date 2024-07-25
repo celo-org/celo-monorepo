@@ -1,237 +1,241 @@
-// // SPDX-License-Identifier: LGPL-3.0-only
-// pragma solidity >=0.8.7 <0.8.20;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-// import "celo-foundry-8/Test.sol";
+import "celo-foundry-8/Test.sol";
 
-// import "@celo-contracts/identity/IdentityProxy.sol";
-// import "@celo-contracts/identity/IdentityProxyHub.sol";
-// import "@celo-contracts/identity/test/IdentityProxyTest.sol";
-// import "@celo-contracts/identity/test/MockAttestations.sol";
-// import "@celo-contracts/common/Registry.sol";
+import "@celo-contracts/identity/IdentityProxy.sol";
+import "@celo-contracts/identity/IdentityProxyHub.sol";
+import "@celo-contracts/identity/test/IdentityProxyTest.sol";
+import "@celo-contracts/identity/test/MockAttestations.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
 
-// contract IdentityProxyHubTest is Test {
-//   IdentityProxy identityProxy;
-//   IdentityProxyTest identityProxyTest;
-//   IdentityProxyHub identityProxyHub;
-//   MockAttestations mockAttestations;
-//   Registry registry;
+contract IdentityProxyHubTest is Test {
+  IdentityProxy identityProxy;
+  IdentityProxyTest identityProxyTest;
+  IdentityProxyHub identityProxyHub;
+  MockAttestations mockAttestations;
+  IRegistry registry;
 
-//   address randomActor = actor("randomActor");
+  address randomActor = actor("randomActor");
 
-//   bytes32 identifier =
-//     keccak256("0x00000000000000000000000000000000000000000000000000000000babecafe");
+  bytes32 identifier =
+    keccak256("0x00000000000000000000000000000000000000000000000000000000babecafe");
 
-//   function setUp() public {
-//     identityProxy = new IdentityProxy();
-//     identityProxyTest = new IdentityProxyTest();
-//     identityProxyHub = new IdentityProxyHub();
-//     mockAttestations = new MockAttestations();
-//     registry = new Registry(true);
-//     registry.initialize();
-//     registry.setAddressFor("Attestations", address(mockAttestations));
-//     identityProxyHub.setRegistry(address(registry));
-//   }
+  function setUp() public virtual {
+    identityProxy = new IdentityProxy();
+    identityProxyTest = new IdentityProxyTest();
+    identityProxyHub = new IdentityProxyHub();
+    mockAttestations = new MockAttestations();
 
-//   function computeCreate2Address(
-//     bytes32 salt,
-//     address deployerAddress,
-//     bytes memory contractBytecode
-//   ) public pure returns (address) {
-//     bytes32 bytecodeHash = keccak256(contractBytecode);
-//     bytes32 hash = keccak256(abi.encodePacked(bytes1(0xff), deployerAddress, salt, bytecodeHash));
+    address registryAddress = 0x000000000000000000000000000000000000ce10;
+    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    registry = IRegistry(registryAddress);
 
-//     return
-//       address(
-//         uint160(uint256(hash) & 0x000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
-//       );
-//   }
+    // registry.initialize();
+    registry.setAddressFor("Attestations", address(mockAttestations));
+    identityProxyHub.setRegistry(address(registry));
+  }
 
-//   /**
-//    * Returns bytecode at address
-//    * @param _addr The address to get the code from
-//    */
-//   function at(address _addr) public view returns (bytes memory o_code) {
-//     assembly {
-//       // retrieve the size of the code
-//       let size := extcodesize(_addr)
-//       // allocate output byte array
-//       // by using o_code = new bytes(size)
-//       o_code := mload(0x40)
-//       // new "memory end" including padding
-//       mstore(0x40, add(o_code, and(add(add(size, 0x20), 0x1f), not(0x1f))))
-//       // store length in memory
-//       mstore(o_code, size)
-//       // actually retrieve the code, this needs assembly
-//       extcodecopy(_addr, add(o_code, 0x20), 0, size)
-//     }
-//   }
-// }
+  function computeCreate2Address(
+    bytes32 salt,
+    address deployerAddress,
+    bytes memory contractBytecode
+  ) public pure returns (address) {
+    bytes32 bytecodeHash = keccak256(contractBytecode);
+    bytes32 hash = keccak256(abi.encodePacked(bytes1(0xff), deployerAddress, salt, bytecodeHash));
 
-// contract IdentityProxyTestGetIdenityProxy is IdentityProxyHubTest {
-//   function setUp() public {
-//     super.setUp();
-//   }
+    return
+      address(
+        uint160(uint256(hash) & 0x000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+      );
+  }
 
-//   function test_ReturnsTheCorrectCREATE2Address() public {
-//     bytes memory bytecode = type(IdentityProxy).creationCode;
-//     address expectedAddress = computeCreate2Address(
-//       identifier,
-//       address(identityProxyHub),
-//       bytecode
-//     );
-//     IdentityProxy identityProxyReturned = identityProxyHub.getOrDeployIdentityProxy(identifier);
-//     assertEq(expectedAddress, address(identityProxyReturned));
-//   }
+  /**
+   * Returns bytecode at address
+   * @param _addr The address to get the code from
+   */
+  function at(address _addr) public view returns (bytes memory o_code) {
+    assembly {
+      // retrieve the size of the code
+      let size := extcodesize(_addr)
+      // allocate output byte array
+      // by using o_code = new bytes(size)
+      o_code := mload(0x40)
+      // new "memory end" including padding
+      mstore(0x40, add(o_code, and(add(add(size, 0x20), 0x1f), not(0x1f))))
+      // store length in memory
+      mstore(o_code, size)
+      // actually retrieve the code, this needs assembly
+      extcodecopy(_addr, add(o_code, 0x20), 0, size)
+    }
+  }
+}
 
-//   function test_ReturnsTheAddressOfAnIdentityProxy() public {
-//     IdentityProxy identityProxyReturned = identityProxyHub.getOrDeployIdentityProxy(identifier);
-//     identityProxyHub.getOrDeployIdentityProxy(identifier);
+contract IdentityProxyTestGetIdenityProxy is IdentityProxyHubTest {
+  function setUp() public override {
+    super.setUp();
+  }
 
-//     bytes memory deployedCode = vm.getDeployedCode("IdentityProxy.sol:IdentityProxy");
-//     assertEq(deployedCode, at(address(identityProxyReturned)));
-//   }
-// }
+  function test_ReturnsTheCorrectCREATE2Address() public {
+    bytes memory bytecode = type(IdentityProxy).creationCode;
+    address expectedAddress = computeCreate2Address(
+      identifier,
+      address(identityProxyHub),
+      bytecode
+    );
+    IdentityProxy identityProxyReturned = identityProxyHub.getOrDeployIdentityProxy(identifier);
+    assertEq(expectedAddress, address(identityProxyReturned));
+  }
 
-// contract IdentityProxyTestMakeCall_Failures is IdentityProxyHubTest {
-//   address identityProxyAddress;
+  function test_ReturnsTheAddressOfAnIdentityProxy() public {
+    IdentityProxy identityProxyReturned = identityProxyHub.getOrDeployIdentityProxy(identifier);
+    identityProxyHub.getOrDeployIdentityProxy(identifier);
 
-//   function setUp() public {
-//     super.setUp();
-//     identityProxyAddress = address(identityProxyHub.getOrDeployIdentityProxy(identifier));
-//   }
+    bytes memory deployedCode = vm.getDeployedCode("IdentityProxy.sol:IdentityProxy");
+    assertEq(deployedCode, at(address(identityProxyReturned)));
+  }
+}
 
-//   function test_FailsToCallIfSenderDoesNotHaveAtLeast3AttestationCompletions() public {
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+contract IdentityProxyTestMakeCall_Failures is IdentityProxyHubTest {
+  address identityProxyAddress;
 
-//     bytes memory txData = abi.encodeWithSignature("callMe()");
-//     vm.expectRevert("does not pass identity heuristic");
-//     identityProxyHub.makeCall(identifier, address(identityProxyTest), txData);
-//   }
+  function setUp() public override {
+    super.setUp();
+    identityProxyAddress = address(identityProxyHub.getOrDeployIdentityProxy(identifier));
+  }
 
-//   function test_FailsToCallIfSenderDoesNotHaveMoreThan50PercentAttestationCompletions() public {
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+  function test_FailsToCallIfSenderDoesNotHaveAtLeast3AttestationCompletions() public {
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
 
-//     mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
+    bytes memory txData = abi.encodeWithSignature("callMe()");
+    vm.expectRevert("does not pass identity heuristic");
+    identityProxyHub.makeCall(identifier, address(identityProxyTest), txData);
+  }
 
-//     bytes memory txData = abi.encodeWithSignature("callMe()");
-//     vm.expectRevert("does not pass identity heuristic");
-//     identityProxyHub.makeCall(identifier, address(identityProxyTest), txData);
-//   }
+  function test_FailsToCallIfSenderDoesNotHaveMoreThan50PercentAttestationCompletions() public {
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
 
-//   function test_FailsToCallIfAnotherAddressHasMoreAttestationsCompleted() public {
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
 
-//     vm.prank(randomActor);
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
-//     vm.prank(randomActor);
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
-//     vm.prank(randomActor);
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
-//     vm.prank(randomActor);
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+    bytes memory txData = abi.encodeWithSignature("callMe()");
+    vm.expectRevert("does not pass identity heuristic");
+    identityProxyHub.makeCall(identifier, address(identityProxyTest), txData);
+  }
 
-//     bytes memory txData = abi.encodeWithSignature("callMe()");
-//     vm.expectRevert("does not pass identity heuristic");
-//     identityProxyHub.makeCall(identifier, address(identityProxyTest), txData);
-//   }
-// }
+  function test_FailsToCallIfAnotherAddressHasMoreAttestationsCompleted() public {
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
 
-// contract IdentityProxyTestMakeCall_WhenCalledByContractRelatedToTheIdentifier is
-//   IdentityProxyHubTest
-// {
-//   address identityProxyAddress;
+    vm.prank(randomActor);
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+    vm.prank(randomActor);
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+    vm.prank(randomActor);
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+    vm.prank(randomActor);
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
 
-//   function setUp() public {
-//     super.setUp();
+    bytes memory txData = abi.encodeWithSignature("callMe()");
+    vm.expectRevert("does not pass identity heuristic");
+    identityProxyHub.makeCall(identifier, address(identityProxyTest), txData);
+  }
+}
 
-//     identityProxyAddress = address(identityProxyHub.getOrDeployIdentityProxy(identifier));
+contract IdentityProxyTestMakeCall_WhenCalledByContractRelatedToTheIdentifier is
+  IdentityProxyHubTest
+{
+  address identityProxyAddress;
 
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
-//   }
+  function setUp() public override {
+    super.setUp();
 
-//   function test_ForwardsCallToTheDestination() public {
-//     uint256 value = 42;
-//     identityProxyHub.makeCall(
-//       identifier,
-//       address(identityProxyTest),
-//       abi.encodeWithSignature("setX(uint256)", value)
-//     );
+    identityProxyAddress = address(identityProxyHub.getOrDeployIdentityProxy(identifier));
 
-//     assertEq(identityProxyTest.x(), value);
-//   }
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+  }
 
-//   function test_ForwardsCallToEvenWhenCompletedRationIsCloseTo50Percent() public {
-//     mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
-//     mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
+  function test_ForwardsCallToTheDestination() public {
+    uint256 value = 42;
+    identityProxyHub.makeCall(
+      identifier,
+      address(identityProxyTest),
+      abi.encodeWithSignature("setX(uint256)", value)
+    );
 
-//     uint256 value = 42;
-//     identityProxyHub.makeCall(
-//       identifier,
-//       address(identityProxyTest),
-//       abi.encodeWithSignature("setX(uint256)", value)
-//     );
+    assertEq(identityProxyTest.x(), value);
+  }
 
-//     assertEq(identityProxyTest.x(), value);
-//   }
+  function test_ForwardsCallToEvenWhenCompletedRationIsCloseTo50Percent() public {
+    mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
+    mockAttestations.request(identifier, 0, bytes32(0), bytes32(0));
 
-//   function test_ForwardsCallAsLongAsNoOtherAddressHasMoreCompletions() public {
-//     vm.prank(randomActor);
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
-//     vm.prank(randomActor);
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
-//     vm.prank(randomActor);
-//     mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+    uint256 value = 42;
+    identityProxyHub.makeCall(
+      identifier,
+      address(identityProxyTest),
+      abi.encodeWithSignature("setX(uint256)", value)
+    );
 
-//     uint256 value = 42;
-//     identityProxyHub.makeCall(
-//       identifier,
-//       address(identityProxyTest),
-//       abi.encodeWithSignature("setX(uint256)", value)
-//     );
+    assertEq(identityProxyTest.x(), value);
+  }
 
-//     assertEq(identityProxyTest.x(), value);
-//   }
+  function test_ForwardsCallAsLongAsNoOtherAddressHasMoreCompletions() public {
+    vm.prank(randomActor);
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+    vm.prank(randomActor);
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
+    vm.prank(randomActor);
+    mockAttestations.complete(identifier, 0, bytes32(0), bytes32(0));
 
-//   function test_ForwardsCallToProxyRelatedToIdentifier() public {
-//     uint256 value = 42;
-//     identityProxyHub.makeCall(
-//       identifier,
-//       address(identityProxyTest),
-//       abi.encodeWithSignature("callMe()", value)
-//     );
+    uint256 value = 42;
+    identityProxyHub.makeCall(
+      identifier,
+      address(identityProxyTest),
+      abi.encodeWithSignature("setX(uint256)", value)
+    );
 
-//     assertEq(identityProxyTest.lastAddress(), identityProxyAddress);
-//   }
+    assertEq(identityProxyTest.x(), value);
+  }
 
-//   function test_CanSendAPayment() public {
-//     uint256 balanceBefore = address(identityProxyTest).balance;
-//     identityProxyHub.makeCall.value(100)(
-//       identifier,
-//       address(identityProxyTest),
-//       abi.encodeWithSignature("payMe()")
-//     );
+  function test_ForwardsCallToProxyRelatedToIdentifier() public {
+    uint256 value = 42;
+    identityProxyHub.makeCall(
+      identifier,
+      address(identityProxyTest),
+      abi.encodeWithSignature("callMe()", value)
+    );
 
-//     uint256 proxyBalance = identityProxyAddress.balance;
-//     uint256 balanceAfter = address(identityProxyTest).balance;
+    assertEq(identityProxyTest.lastAddress(), identityProxyAddress);
+  }
 
-//     assertEq(balanceBefore, 0);
-//     assertEq(proxyBalance, 0);
-//     assertEq(balanceAfter, 100);
-//   }
-// }
+  function test_CanSendAPayment() public {
+    uint256 balanceBefore = address(identityProxyTest).balance;
+    identityProxyHub.makeCall{value:100}(
+      identifier,
+      address(identityProxyTest),
+      abi.encodeWithSignature("payMe()")
+    );
+
+    uint256 proxyBalance = identityProxyAddress.balance;
+    uint256 balanceAfter = address(identityProxyTest).balance;
+
+    assertEq(balanceBefore, 0);
+    assertEq(proxyBalance, 0);
+    assertEq(balanceAfter, 100);
+  }
+}

@@ -1,7 +1,7 @@
-pragma solidity ^0.5.13;
-/* solhint-disable no-inline-assembly, avoid-low-level-calls, func-name-mixedcase, func-order */
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
 import "./ExternalCall.sol";
 import "./Initializable.sol";
@@ -152,7 +152,7 @@ contract MultiSig is Initializable {
   }
 
   /// @dev Fallback function allows to deposit ether.
-  function() external payable {
+  receive() external payable {
     if (msg.value > 0) emit Deposit(msg.sender, msg.value);
   }
 
@@ -181,7 +181,7 @@ contract MultiSig is Initializable {
         owners[i] = owners[owners.length.sub(1)];
         break;
       }
-    owners.length = owners.length.sub(1);
+    owners.pop();
     if (required > owners.length) changeRequirement(owners.length);
     if (internalRequired > owners.length) changeInternalRequirement(owners.length);
     emit OwnerRemoval(owner);
@@ -223,7 +223,7 @@ contract MultiSig is Initializable {
   /// @param destination Transaction target address.
   /// @param value Transaction ether value.
   /// @param data Transaction data payload.
-  /// @return Returns transaction ID.
+  /// @return transactionId Returns transaction ID.
   function submitTransaction(
     address destination,
     uint256 value,
@@ -238,7 +238,7 @@ contract MultiSig is Initializable {
    */
   /// @dev Returns number of confirmations of a transaction.
   /// @param transactionId Transaction ID.
-  /// @return Number of confirmations.
+  /// @return count Number of confirmations.
   function getConfirmationCount(uint256 transactionId) external view returns (uint256 count) {
     for (uint256 i = 0; i < owners.length; i = i.add(1))
       if (confirmations[transactionId][owners[i]]) count = count.add(1);
@@ -247,7 +247,7 @@ contract MultiSig is Initializable {
   /// @dev Returns total number of transactions after filters are applied.
   /// @param pending Include pending transactions.
   /// @param executed Include executed transactions.
-  /// @return Total number of transactions after filters are applied.
+  /// @return count Total number of transactions after filters are applied.
   function getTransactionCount(bool pending, bool executed) external view returns (uint256 count) {
     for (uint256 i = 0; i < transactionCount; i = i.add(1))
       if ((pending && !transactions[i].executed) || (executed && transactions[i].executed))
@@ -262,7 +262,7 @@ contract MultiSig is Initializable {
 
   /// @dev Returns array with owner addresses, which confirmed transaction.
   /// @param transactionId Transaction ID.
-  /// @return Returns array of owner addresses.
+  /// @return _confirmations Returns array of owner addresses.
   function getConfirmations(
     uint256 transactionId
   ) external view returns (address[] memory _confirmations) {
@@ -283,7 +283,7 @@ contract MultiSig is Initializable {
   /// @param to Index end position of transaction array.
   /// @param pending Include pending transactions.
   /// @param executed Include executed transactions.
-  /// @return Returns array of transaction IDs.
+  /// @return _transactionIds Returns array of transaction IDs.
   function getTransactionIds(
     uint256 from,
     uint256 to,
@@ -372,7 +372,7 @@ contract MultiSig is Initializable {
   /// @param destination Transaction target address.
   /// @param value Transaction ether value.
   /// @param data Transaction data payload.
-  /// @return Returns transaction ID.
+  /// @return transactionId Returns transaction ID.
   function addTransaction(
     address destination,
     uint256 value,

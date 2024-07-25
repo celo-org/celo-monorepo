@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
+
 import "@celo-contracts/identity/IdentityProxy.sol";
 import "@celo-contracts/identity/test/IdentityProxyTest.sol";
 
@@ -11,14 +12,14 @@ contract IdentityProxyTestFoundry is Test {
 
   address randomActor = actor("randomActor");
 
-  function setUp() public {
+  function setUp() public virtual {
     identityProxy = new IdentityProxy();
     identityProxyTest = new IdentityProxyTest();
   }
 }
 
 contract IdentityProxyTestMakeCall is IdentityProxyTestFoundry {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 

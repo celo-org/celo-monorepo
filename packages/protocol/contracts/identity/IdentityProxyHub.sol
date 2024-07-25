@@ -1,8 +1,10 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
 import "../common/Create2.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/UsingRegistry.sol";
+import { UsingRegistry } from "../../contracts-0.8/common/UsingRegistry.sol";
+import { IAttestations } from "../identity/interfaces/IAttestations.sol";
 import "./IdentityProxy.sol";
 
 contract IdentityProxyHub is UsingRegistry, ICeloVersionedContract {
@@ -26,7 +28,7 @@ contract IdentityProxyHub is UsingRegistry, ICeloVersionedContract {
     bytes calldata data
   ) external payable returns (bytes memory) {
     require(passesIdentityHeuristic(msg.sender, identifier), "does not pass identity heuristic");
-    return getOrDeployIdentityProxy(identifier).makeCall.value(msg.value)(destination, data);
+    return getOrDeployIdentityProxy(identifier).makeCall{value:msg.value}(destination, data);
   }
 
   /**
