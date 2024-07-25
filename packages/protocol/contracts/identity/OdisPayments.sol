@@ -1,15 +1,16 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/interfaces/IERC20.sol";
+import "@openzeppelin/contracts8/token/ERC20/utils/SafeERC20.sol";
 
 import "./interfaces/IOdisPayments.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "../common/Initializable.sol";
-import "../common/UsingRegistryV2.sol";
+import "../../contracts-0.8/common/UsingRegistryV2.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 /**
