@@ -14,7 +14,7 @@ import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
-import "../../contracts/common/libraries/Heap.sol";
+import "../../contracts-0.8/common/libraries/Heap.sol";
 import "../../contracts/common/libraries/ReentrancyGuard.sol";
 
 contract Election is
