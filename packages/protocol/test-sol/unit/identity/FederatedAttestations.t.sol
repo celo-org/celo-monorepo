@@ -12,8 +12,9 @@ import "@celo-contracts-8/governance/test/MockLockedGold.sol";
 import "@celo-contracts-8/governance/test/MockValidators.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts-8/common/Accounts.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 
-contract FederatedAttestationsFoundryTest is Test {
+contract FederatedAttestationsFoundryTest is Test, TestConstants {
   enum KeyOffsets {
     NO_OFFSET,
     VALIDATING_KEY_OFFSET,
@@ -326,8 +327,6 @@ contract FederatedAttestationsFoundryTest is Test {
     phoneHash = keccak256(abi.encodePacked(phoneNumber));
     phoneHash2 = keccak256(abi.encodePacked(phoneNumber2));
 
-    address registryAddress = 0x000000000000000000000000000000000000ce10;
-
     attestationsTest = new AttestationsTest();
     mockERC20Token = new MockERC20Token();
     otherMockERC20Token = new MockERC20Token();
@@ -336,8 +335,8 @@ contract FederatedAttestationsFoundryTest is Test {
     mockValidators = new MockValidators();
     random = new MockRandom();
 
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-    registry = IRegistry(registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     accounts = new Accounts(true);
     federatedAttestations = new FederatedAttestations(true);

@@ -7,14 +7,14 @@ import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts-8/common/Accounts.sol";
 import "@celo-contracts-8/governance/test/MockValidators.sol";
 
-contract AccountsTest is Test {
+import { TestConstants } from "@test-sol/constants.sol";
+
+contract AccountsTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
   IRegistry registry;
   Accounts accounts;
   MockValidators validators;
-
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   string constant name = "Account";
   string constant metadataURL = "https://www.celo.org";
@@ -79,14 +79,12 @@ contract AccountsTest is Test {
   event PaymentDelegationSet(address indexed beneficiary, uint256 fraction);
 
   function setUp() public virtual {
-    address registryAddress = 0x000000000000000000000000000000000000ce10;
-
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
     accounts = new Accounts(true);
     validators = new MockValidators();
 
-    registry = IRegistry(registryAddress);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("Accounts", address(accounts));
@@ -99,7 +97,7 @@ contract AccountsTest is Test {
   }
 
   function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 
   function getParsedSignatureOfAddress(

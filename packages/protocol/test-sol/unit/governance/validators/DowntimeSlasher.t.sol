@@ -12,6 +12,7 @@ import "@celo-contracts-8/governance/test/MockLockedGold.sol";
 import "@celo-contracts-8/governance/DowntimeSlasher.sol";
 import "@celo-contracts-8/governance/test/MockUsingPrecompiles.sol";
 import { Utils08 } from "@test-sol/utils08.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 
 contract DowntimeSlasherMock is DowntimeSlasher(true), MockUsingPrecompiles, TestWithoutPrecompiles {
   using SafeMath for uint256;
@@ -132,7 +133,7 @@ contract DowntimeSlasherMock is DowntimeSlasher(true), MockUsingPrecompiles, Tes
   }
 }
 
-contract DowntimeSlasherTest is TestWithoutPrecompiles, Utils08 {
+contract DowntimeSlasherTest is TestWithoutPrecompiles, Utils08, TestConstants{
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -173,8 +174,6 @@ contract DowntimeSlasherTest is TestWithoutPrecompiles, Utils08 {
 
   address caller2;
   uint256 caller2PK;
-  address public registryAddress = 0x000000000000000000000000000000000000ce10;
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   uint256 epochSize;
   uint256 epoch;
@@ -235,8 +234,8 @@ contract DowntimeSlasherTest is TestWithoutPrecompiles, Utils08 {
     lockedGold = new MockLockedGold();
     slasher = new DowntimeSlasherMock();
 
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-    registry = IRegistry(registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     accounts.createAccount();
 
@@ -257,7 +256,7 @@ contract DowntimeSlasherTest is TestWithoutPrecompiles, Utils08 {
     vm.prank(otherGroup);
     accounts.createAccount();
 
-    accounts.initialize(registryAddress);
+    accounts.initialize(REGISTRY_ADDRESS);
 
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
@@ -275,7 +274,7 @@ contract DowntimeSlasherTest is TestWithoutPrecompiles, Utils08 {
     expectedSlashingIncentives.penalty = slashingPenalty;
     expectedSlashingIncentives.reward = slashingReward;
 
-    slasher.initialize(registryAddress, slashingPenalty, slashingReward, slashableDowntime);
+    slasher.initialize(REGISTRY_ADDRESS, slashingPenalty, slashingReward, slashableDowntime);
 
     lockedGold.setAccountTotalLockedGold(address(this), 50000);
     lockedGold.setAccountTotalLockedGold(nonOwner, 50000);
@@ -380,7 +379,7 @@ contract DowntimeSlasherTest is TestWithoutPrecompiles, Utils08 {
   }
 
   function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 }
 
@@ -404,7 +403,7 @@ contract DowntimeSlasherTestInitialize is DowntimeSlasherTest {
 
   function test_Reverts_WhenCalledTwice() public {
     vm.expectRevert("contract already initialized");
-    slasher.initialize(registryAddress, slashingPenalty, slashingReward, slashableDowntime);
+    slasher.initialize(REGISTRY_ADDRESS, slashingPenalty, slashingReward, slashableDowntime);
   }
 }
 

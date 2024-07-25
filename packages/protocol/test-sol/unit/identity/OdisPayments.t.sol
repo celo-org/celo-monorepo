@@ -8,9 +8,9 @@ import "@celo-contracts-8/common/interfaces/IStableToken.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts-8/common/Freezer.sol";
 import "@openzeppelin/contracts8/interfaces/IERC20.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 
-contract OdisPaymentsFoundryTest is Test {
-  uint256 FIXED1 = 1000000000000000000000000;
+contract OdisPaymentsFoundryTest is Test, TestConstants {
   uint256 SECONDS_IN_A_DAY = 60 * 60 * 24;
   uint256 startingBalanceCUSD = 1000;
 
@@ -25,11 +25,9 @@ contract OdisPaymentsFoundryTest is Test {
   event PaymentMade(address indexed account, uint256 valueInCUSD);
 
   function setUp() public virtual {
-    address registryAddress = 0x000000000000000000000000000000000000ce10;
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-
-    registry = IRegistry(registryAddress);
+    registry = IRegistry(REGISTRY_ADDRESS);
     freezer = new Freezer(true);
     odisPayments = new OdisPayments(true);
 

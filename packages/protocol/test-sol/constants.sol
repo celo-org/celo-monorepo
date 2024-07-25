@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.5.13 <0.8.20;
 
-contract Constants {
+contract TestConstants {
+  // Units
   uint256 public constant FIXED1 = 1e24;
   uint256 public constant MINUTE = 60;
   uint256 public constant HOUR = 60 * MINUTE;
@@ -10,7 +11,7 @@ contract Constants {
   uint256 constant WEEK = 7 * DAY;
   uint256 public constant YEAR = 365 * DAY;
 
-  // contract names
+  // Contract names
   string constant ElectionContract = "Election";
   string constant SortedOraclesContract = "SortedOracles";
   string constant StableTokenContract = "StableToken";
@@ -22,4 +23,8 @@ contract Constants {
   string constant LockedCeloContract = "LockedCelo";
   string constant ValidatorsContract = "Validators";
   string constant GovernanceContract = "Governance";
+
+  // Constant addresses
+  address constant REGISTRY_ADDRESS = 0x000000000000000000000000000000000000ce10;
+  address constant PROXY_ADMIN_ADDRESS = 0x4200000000000000000000000000000000000018;
 }

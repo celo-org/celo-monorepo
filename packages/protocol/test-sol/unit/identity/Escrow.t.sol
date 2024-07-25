@@ -11,7 +11,9 @@ import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts-8/common/Signatures.sol";
 
-contract EscrowTest is Test {
+import { TestConstants } from "@test-sol/constants.sol";
+
+contract EscrowTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
   Escrow escrowContract;
@@ -74,14 +76,12 @@ contract EscrowTest is Test {
   address trustedIssuer2;
 
   function setUp() virtual public {
-    address registryAddress = 0x000000000000000000000000000000000000ce10;
-
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
     mockERC20Token = new MockERC20Token();
     escrowContract = new Escrow(true);
     escrowContract.initialize();
-    registry = IRegistry(registryAddress);
+    registry = IRegistry(REGISTRY_ADDRESS);
     (receiver, receiverPK) = actorWithPK("receiver");
     (sender, senderPK) = actorWithPK("sender");
     trustedIssuer1 = actor("trustedIssuer1");

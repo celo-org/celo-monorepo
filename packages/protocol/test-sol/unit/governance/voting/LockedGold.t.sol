@@ -3,6 +3,7 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
 
+import { TestConstants } from "@test-sol/constants.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts-8/common/Accounts.sol";
@@ -14,7 +15,7 @@ import "@celo-contracts-8/governance/test/MockElection.sol";
 import "@celo-contracts-8/governance/test/MockGovernance.sol";
 import "@celo-contracts-8/governance/test/MockValidators.sol";
 
-contract LockedGoldTest is Test {
+contract LockedGoldTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
   IRegistry registry;
@@ -26,8 +27,6 @@ contract LockedGoldTest is Test {
   MockValidators validators;
   LockedGold lockedGold;
 
-  uint256 HOUR = 60 * 60;
-  uint256 DAY = 24 * HOUR;
   uint256 unlockingPeriod = 3 * DAY;
 
   address randomAddress = actor("randomAddress");
@@ -61,9 +60,8 @@ contract LockedGoldTest is Test {
   event MaxDelegateesCountSet(uint256 value);
 
   function setUp() public virtual {
-    address registryAddress = 0x000000000000000000000000000000000000ce10;
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-    registry = IRegistry(registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     goldToken = new GoldTokenMock();
     accounts = new Accounts(true);

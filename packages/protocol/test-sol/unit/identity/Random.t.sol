@@ -7,8 +7,9 @@ import { Random } from "@celo-contracts-8/identity/Random.sol";
 import { RandomTest } from "@celo-contracts-8/identity/test/RandomTest.sol";
 import { IsL2Check } from "@celo-contracts-8/common/IsL2Check.sol";
 import { Utils08 } from "@test-sol/utils08.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 
-contract RandomnessTest_SetRandomnessRetentionWindow is Test, IsL2Check {
+contract RandomnessTest_SetRandomnessRetentionWindow is Test, TestConstants, IsL2Check {
   event RandomnessBlockRetentionWindowSet(uint256 value);
 
   RandomTest random;
@@ -36,13 +37,13 @@ contract RandomnessTest_SetRandomnessRetentionWindow is Test, IsL2Check {
   }
 
   function test_Reverts_WhenCalledOnL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
     vm.expectRevert("This method is no longer supported in L2.");
     random.setRandomnessBlockRetentionWindow(1000);
   }
 }
 
-contract RandomnessTest_AddTestRandomness is Test, Utils08, IsL2Check {
+contract RandomnessTest_AddTestRandomness is Test, TestConstants, Utils08, IsL2Check {
   uint256 constant RETENTION_WINDOW = 5;
   uint256 constant EPOCH_SIZE_NUMBER = 10;
 
@@ -217,7 +218,7 @@ contract RandomnessTest_AddTestRandomness is Test, Utils08, IsL2Check {
   }
 
   function test_Reverts_WhenCalledOnL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
     vm.expectRevert("This method is no longer supported in L2.");
     random.addTestRandomness(1, 0x0000000000000000000000000000000000000000000000000000000000000001);
     vm.expectRevert("This method is no longer supported in L2.");
@@ -225,7 +226,7 @@ contract RandomnessTest_AddTestRandomness is Test, Utils08, IsL2Check {
   }
 }
 
-contract RandomnessTest_RevealAndCommit is Test, Utils08, IsL2Check {
+contract RandomnessTest_RevealAndCommit is Test, TestConstants, Utils08, IsL2Check {
   address constant ACCOUNT = address(0x01);
   bytes32 constant RANDONMESS = bytes32(uint256(0x00));
 
@@ -263,7 +264,7 @@ contract RandomnessTest_RevealAndCommit is Test, Utils08, IsL2Check {
   }
 
   function test_Reverts_WhenCalledOnL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
     vm.expectRevert("This method is no longer supported in L2.");
     blockTravel(2);
     random.testRevealAndCommit(RANDONMESS, commitmentFor(0x01), ACCOUNT);

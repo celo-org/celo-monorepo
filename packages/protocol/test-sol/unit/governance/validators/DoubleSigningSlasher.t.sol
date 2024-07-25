@@ -2,6 +2,7 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 import {TestWithoutPrecompiles} from "celo-foundry-8/TestWithoutPrecompiles.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts-8/common/Accounts.sol";
@@ -105,7 +106,7 @@ contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecom
 
 }
 
-contract DoubleSigningSlasherBaseTest is TestWithoutPrecompiles {
+contract DoubleSigningSlasherBaseTest is TestWithoutPrecompiles, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
   SlashingIncentives public expectedSlashingIncentives;
@@ -136,8 +137,6 @@ contract DoubleSigningSlasherBaseTest is TestWithoutPrecompiles {
 
   address caller2;
   uint256 caller2PK;
-  address public registryAddress = 0x000000000000000000000000000000000000ce10;
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
 
   struct SlashingIncentives {
     // Value of LockedGold to slash from the account.
@@ -160,14 +159,14 @@ contract DoubleSigningSlasherBaseTest is TestWithoutPrecompiles {
     (otherGroup, groupPK) = actorWithPK("otherGroup");
     (caller2, caller2PK) = actorWithPK("caller2");
 
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
     accounts = new Accounts(true);
     validators = new MockValidators();
     lockedGold = new MockLockedGold();
     slasher = new DoubleSigningSlasherTest();
 
-    registry = IRegistry(registryAddress);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     accounts.createAccount();
 
@@ -186,7 +185,7 @@ contract DoubleSigningSlasherBaseTest is TestWithoutPrecompiles {
     vm.prank(otherGroup);
     accounts.createAccount();
 
-    accounts.initialize(registryAddress);
+    accounts.initialize(REGISTRY_ADDRESS);
 
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
@@ -201,7 +200,7 @@ contract DoubleSigningSlasherBaseTest is TestWithoutPrecompiles {
     expectedSlashingIncentives.penalty = slashingPenalty;
     expectedSlashingIncentives.reward = slashingReward;
 
-    slasher.initialize(registryAddress, slashingPenalty, slashingReward);
+    slasher.initialize(REGISTRY_ADDRESS, slashingPenalty, slashingReward);
 
     lockedGold.setAccountTotalLockedGold(address(this), 50000);
     lockedGold.setAccountTotalLockedGold(nonOwner, 50000);
@@ -212,7 +211,7 @@ contract DoubleSigningSlasherBaseTest is TestWithoutPrecompiles {
   }
 
   function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 }
 
@@ -229,7 +228,7 @@ contract DoubleSigningSlasherInitialize is DoubleSigningSlasherBaseTest {
 
   function test_RevertWhen_CalledTwice() public {
     vm.expectRevert("contract already initialized");
-    slasher.initialize(registryAddress, slashingPenalty, slashingReward);
+    slasher.initialize(REGISTRY_ADDRESS, slashingPenalty, slashingReward);
   }
 }
 

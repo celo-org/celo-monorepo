@@ -44,11 +44,7 @@ contract GoldToken is
   // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
   address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
 
-  ICeloDistributionSchedule public celoTokenDistributionSchedule;
-
   event TransferComment(string comment);
-
-  event SetCeloTokenDistributionScheduleAddress(address indexed newScheduleAddress);
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -64,23 +60,6 @@ contract GoldToken is
     totalSupply_ = 0;
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-  }
-
-  /**
-   * @notice Used set the address of the CeloDistributionSchedule contract.
-   * @param celoTokenDistributionScheduleAddress The address of the CeloDistributionSchedule contract.
-   */
-  function setCeloTokenDistributionScheduleAddress(
-    address celoTokenDistributionScheduleAddress
-  ) external onlyOwner {
-    require(
-      celoTokenDistributionScheduleAddress != address(0) ||
-        celoTokenDistributionScheduleAddress != address(celoTokenDistributionSchedule),
-      "Invalid address."
-    );
-    celoTokenDistributionSchedule = ICeloDistributionSchedule(celoTokenDistributionScheduleAddress);
-
-    emit SetCeloTokenDistributionScheduleAddress(celoTokenDistributionScheduleAddress);
   }
 
   /**
@@ -174,8 +153,8 @@ contract GoldToken is
   function transferFrom(address from, address to, uint256 value) external virtual returns (bool) {
     require(to != address(0), "transfer attempted to reserved address 0x0");
     require(
-      to != address(celoTokenDistributionSchedule),
-      "transfer attempted to reserved celoTokenDistributionSchedule address"
+      to != registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID),
+      "transfer attempted to reserved CeloDistributionSchedule address"
     );
     require(value <= balanceOf(from), "transfer value exceeded balance of sender");
     require(
@@ -249,7 +228,7 @@ contract GoldToken is
    * @return The total amount of allocated CELO.
    */
   function allocatedSupply() external view onlyL2 returns (uint256) {
-    return CELO_SUPPLY_CAP - address(celoTokenDistributionSchedule).balance;
+    return CELO_SUPPLY_CAP - registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID).balance;
   }
 
   /**
@@ -316,8 +295,8 @@ contract GoldToken is
    */
   function _transfer(address to, uint256 value) internal returns (bool) {
     require(
-      to != address(celoTokenDistributionSchedule),
-      "transfer attempted to reserved celoTokenDistributionSchedule address"
+      to != registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID),
+      "transfer attempted to reserved CeloDistributionSchedule address"
     );
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
 

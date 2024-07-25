@@ -4,7 +4,7 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
 import "@celo-contracts-8/common/FeeHandler.sol";
-import { Constants } from "@test-sol/constants.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts-8/common/Freezer.sol";
@@ -20,7 +20,7 @@ import "@test-sol/mocks/MockERC20.sol";
 import "@celo-contracts/stability/test/MockSortedOracles.sol";
 import "@celo-contracts-8/stability/test/MockReserve.sol";
 
-contract FeeHandlerTest is Test, Constants {
+contract FeeHandlerTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
   FeeHandler feeHandler;
@@ -49,9 +49,9 @@ contract FeeHandlerTest is Test, Constants {
 
   address EXAMPLE_BENEFICIARY_ADDRESS = 0x2A486910DBC72cACcbb8d0e1439C96b03B2A4699;
 
-  address registryAddress = 0x000000000000000000000000000000000000ce10;
   address owner = address(this);
   address user = actor("user");
+  address celoDistributionSchedule = actor("CeloDistributionSchedule");
 
   uint256 celoAmountForRate = 1e24;
   uint256 stableAmountForRate = 2 * celoAmountForRate;
@@ -81,7 +81,7 @@ contract FeeHandlerTest is Test, Constants {
     reserveFraction = FixidityLib.newFixedFraction(5, 100).unwrap();
     maxSlippage = FixidityLib.newFixedFraction(1, 100).unwrap();
 
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
     
     address stableTokenAddress = actor("stableToken");
     address stableTokenEURAddress = actor("stableTokenEUR");
@@ -97,7 +97,7 @@ contract FeeHandlerTest is Test, Constants {
     mockReserve = new MockReserve();
     stableToken = IStableToken(stableTokenAddress);
     stableTokenEUR = IStableToken(stableTokenEURAddress);
-    registry = IRegistry(registryAddress);
+    registry = IRegistry(REGISTRY_ADDRESS);
     feeHandler = new FeeHandler(true);
     freezer = new Freezer(true);
     feeCurrencyWhitelist = new FeeCurrencyWhitelist(true);
@@ -112,6 +112,7 @@ contract FeeHandlerTest is Test, Constants {
     registry.setAddressFor("GoldToken", address(celoToken));
     registry.setAddressFor("CeloToken", address(celoToken));
     registry.setAddressFor("Reserve", address(mockReserve));
+    registry.setAddressFor("CeloDistributionSchedule", celoDistributionSchedule);
 
     mockReserve.setGoldToken(address(celoToken));
     mockReserve.addToken(address(stableToken));
@@ -188,7 +189,7 @@ contract FeeHandlerTest is Test, Constants {
     exchangeEUR.activateStable();
 
     feeHandler.initialize(
-      registryAddress,
+      REGISTRY_ADDRESS,
       EXAMPLE_BENEFICIARY_ADDRESS,
       0,
       new address[](0),

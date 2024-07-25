@@ -22,7 +22,9 @@ import "@celo-contracts-8/governance/test/MockGovernance.sol";
 import "@celo-contracts-8/governance/test/MockValidators.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
 
-contract ReleaseGoldTest is Test, ECDSAHelper {
+import { TestConstants } from "@test-sol/constants.sol";
+
+contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
 
   IRegistry registry;
@@ -45,13 +47,10 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
   address refundAddress = actor("refundAddress");
   address newBeneficiary = actor("newBeneficiary");
   address randomAddress = actor("randomAddress");
+  address celoDistributionSchedule = actor("CeloDistributionSchedule");
 
   uint256 constant TOTAL_AMOUNT = 1 ether * 10;
 
-  uint256 constant MINUTE = 60;
-  uint256 constant HOUR = 60 * 60;
-  uint256 constant DAY = 24 * HOUR;
-  uint256 constant MONTH = 30 * DAY;
   uint256 constant UNLOCKING_PERIOD = 3 * DAY;
 
   ReleaseGoldMockTunnel.InitParams initParams;
@@ -65,22 +64,8 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
   event CanExpireSet(bool canExpire);
   event BeneficiarySet(address indexed beneficiary);
 
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
   function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
-    registry = IRegistry(proxyAdminAddress);
-    registry.setAddressFor("Accounts", address(accounts));
-    registry.setAddressFor("Election", address(election));
-    registry.setAddressFor("Freezer", address(freezer));
-    registry.setAddressFor("CeloToken", address(goldToken));
-    registry.setAddressFor("Governance", address(governance));
-    registry.setAddressFor("LockedGold", address(lockedGold));
-    registry.setAddressFor("Validators", address(validators));
-    registry.setAddressFor("StableToken", address(stableToken));
-
-    lockedGold.setRegistry(proxyAdminAddress);
-    goldToken.setRegistry(proxyAdminAddress);
-    accounts.setRegistry(proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 
   function initializeReleaseGold(address releaseGoldAddress) public {
@@ -135,9 +120,8 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
     (beneficiary, beneficiaryPrivateKey) = actorWithPK("beneficiary");
     walletAddress = beneficiary;
 
-    address registryAddress = 0x000000000000000000000000000000000000ce10;
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-    registry = IRegistry(registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     accounts = new Accounts(true);
     freezer = new Freezer(true);
@@ -157,10 +141,11 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("StableToken", address(stableToken));
+    registry.setAddressFor("CeloDistributionSchedule", celoDistributionSchedule);
 
-    lockedGold.initialize(registryAddress, UNLOCKING_PERIOD);
-    goldToken.initialize(registryAddress);
-    accounts.initialize(registryAddress);
+    lockedGold.initialize(REGISTRY_ADDRESS, UNLOCKING_PERIOD);
+    goldToken.initialize(REGISTRY_ADDRESS);
+    accounts.initialize(REGISTRY_ADDRESS);
     vm.prank(beneficiary);
     accounts.createAccount();
 
@@ -181,7 +166,7 @@ contract ReleaseGoldTest is Test, ECDSAHelper {
       initialDistributionRatio: 1000,
       _canValidate: false,
       _canVote: true,
-      registryAddress: registryAddress
+      registryAddress: REGISTRY_ADDRESS
     });
 
     vm.deal(randomAddress, 1000 ether);
@@ -2224,10 +2209,10 @@ contract ReleaseGoldTest_DeployAndInitializeOnL2 is ReleaseGoldTest {
   function setUp() public override {
     super.setUp();
     _whenL2();
-    initParams2.registryAddress = proxyAdminAddress;
+    initParams2.registryAddress = REGISTRY_ADDRESS;
   }
 
-  function test_ShouldIndicateIsFundedIfDeploymentIsPrefunded() public {
+  function test_ShouldIndicateIsFundedIfDeploymentIsPrefundedL2() public {
     newReleaseGold(true, false);
     assertTrue(releaseGold.isFunded());
   }
