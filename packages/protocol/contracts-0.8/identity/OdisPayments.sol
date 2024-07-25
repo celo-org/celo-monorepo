@@ -6,12 +6,12 @@ import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/interfaces/IERC20.sol";
 import "@openzeppelin/contracts8/token/ERC20/utils/SafeERC20.sol";
 
-import "@celo-contracts/identity/interfaces/IOdisPayments.sol";
-import "@celo-contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/identity/interfaces/IOdisPayments.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
-import "@celo-contracts/common/Initializable.sol";
+import "../../contracts/common/Initializable.sol";
 import "../../contracts-0.8/common/UsingRegistryV2.sol";
-import "@celo-contracts/common/libraries/ReentrancyGuard.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title Stores balance to be used for ODIS quota calculation.

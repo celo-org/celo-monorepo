@@ -5,10 +5,10 @@ import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
 
-import "@celo-contracts/identity/interfaces/IRandom.sol";
-import "@celo-contracts/common/CalledByVm.sol";
-import "@celo-contracts/common/interfaces/ICeloVersionedContract.sol";
-import "@celo-contracts/common/Initializable.sol";
+import "../../contracts/identity/interfaces/IRandom.sol";
+import "../../contracts/common/CalledByVm.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/Initializable.sol";
 import "../../contracts-0.8/common/UsingPrecompiles.sol";
 
 /**

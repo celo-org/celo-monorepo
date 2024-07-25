@@ -6,13 +6,13 @@ import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts8/token/ERC20/utils/SafeERC20.sol";
 
-import "@celo-contracts/identity/interfaces/IAttestations.sol";
-import "@celo-contracts/identity/interfaces/IFederatedAttestations.sol";
-import "@celo-contracts/identity/interfaces/IEscrow.sol";
-import "@celo-contracts/common/interfaces/ICeloVersionedContract.sol";
-import "@celo-contracts/common/libraries/ReentrancyGuard.sol";
+import "../../contracts/identity/interfaces/IAttestations.sol";
+import "../../contracts/identity/interfaces/IFederatedAttestations.sol";
+import "../../contracts/identity/interfaces/IEscrow.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
 
-import "@celo-contracts/common/Initializable.sol";
+import "../../contracts/common/Initializable.sol";
 import "../../contracts-0.8/common/UsingRegistryV2BackwardsCompatible.sol";
 import "../../contracts-0.8/common/Signatures.sol";
 

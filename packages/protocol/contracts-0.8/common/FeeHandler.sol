@@ -9,19 +9,19 @@ import "@openzeppelin/contracts8/interfaces/IERC20.sol";
 
 import "../../contracts-0.8/common/UsingRegistry.sol";
 import "../../contracts-0.8/common/Freezable.sol";
-import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Initializable.sol";
-import "@celo-contracts/common/interfaces/IFeeHandler.sol";
-import "@celo-contracts/common/interfaces/IFeeHandlerSeller.sol";
-import "@celo-contracts/common/interfaces/ICeloVersionedContract.sol";
-import "@celo-contracts/common/interfaces/IStableTokenMento.sol";
-import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
+import "../../contracts/common/FixidityLib.sol";
+import "../../contracts/common/Initializable.sol";
+import "../../contracts/common/interfaces/IFeeHandler.sol";
+import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/interfaces/IStableTokenMento.sol";
+import "../../contracts/stability/interfaces/ISortedOracles.sol";
 
 // TODO move to IStableToken when it adds method getExchangeRegistryId
-import "@celo-contracts/common/interfaces/ICeloToken.sol";
+import "../../contracts/common/interfaces/ICeloToken.sol";
 
 // Using the minimal required signatures in the interfaces so more contracts could be compatible
-import "@celo-contracts/common/libraries/ReentrancyGuard.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
 
 // An implementation of FeeHandler as described in CIP-52
 // See https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md

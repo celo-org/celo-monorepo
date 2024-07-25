@@ -3,10 +3,10 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
-import "@celo-contracts/common/Initializable.sol";
+import "../../contracts/common/Initializable.sol";
 
-import "@celo-contracts/common/interfaces/ICeloVersionedContract.sol";
-import "@celo-contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 
 /**
  * @title Holds a whitelist of the ERC20+ tokens that can be used to pay for gas

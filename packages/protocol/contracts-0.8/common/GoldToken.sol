@@ -7,13 +7,13 @@ import "@openzeppelin/contracts8/interfaces/IERC20.sol";
 
 import "../../contracts-0.8/common/UsingRegistry.sol";
 
-import "@celo-contracts/common/interfaces/ICeloVersionedContract.sol";
-import "@celo-contracts/common/interfaces/ICeloDistributionSchedule.sol";
-import "@celo-contracts/common/interfaces/ICeloTokenInitializer.sol";
-import "@celo-contracts/common/interfaces/ICeloToken.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/interfaces/ICeloDistributionSchedule.sol";
+import "../../contracts/common/interfaces/ICeloTokenInitializer.sol";
+import "../../contracts/common/interfaces/ICeloToken.sol";
 
-import "@celo-contracts/common/CalledByVm.sol";
-import "@celo-contracts/common/Initializable.sol";
+import "../../contracts/common/CalledByVm.sol";
+import "../../contracts/common/Initializable.sol";
 
 import "../../contracts-0.8/common/IsL2Check.sol";
 

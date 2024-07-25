@@ -9,13 +9,13 @@ import "@openzeppelin/contracts8/utils/structs/EnumerableSet.sol";
 
 import "../../contracts-0.8/common/UsingRegistry.sol";
 
-import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
-import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Initializable.sol";
+import "../../contracts/stability/interfaces/ISortedOracles.sol";
+import "../../contracts/common/FixidityLib.sol";
+import "../../contracts/common/Initializable.sol";
 import "./FeeHandlerSeller.sol";
 
-import "@celo-contracts/uniswap/interfaces/IUniswapV2RouterMin.sol";
-import "@celo-contracts/uniswap/interfaces/IUniswapV2FactoryMin.sol";
+import "../../contracts/uniswap/interfaces/IUniswapV2RouterMin.sol";
+import "../../contracts/uniswap/interfaces/IUniswapV2FactoryMin.sol";
 
 // An implementation of FeeHandlerSeller supporting interfaces compatible with
 // Uniswap V2 API

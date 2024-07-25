@@ -2,10 +2,10 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 
-import "@celo-contracts/common/interfaces/ICeloVersionedContract.sol";
-import { IAttestations } from "@celo-contracts/identity/interfaces/IAttestations.sol";
-import "@celo-contracts/common/Create2.sol";
-import "@celo-contracts-8/identity/IdentityProxy.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import { IAttestations } from "../../contracts/identity/interfaces/IAttestations.sol";
+import "../../contracts/common/Create2.sol";
+import "./IdentityProxy.sol";
 
 import { UsingRegistry } from "../../contracts-0.8/common/UsingRegistry.sol";
 

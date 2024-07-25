@@ -6,13 +6,12 @@ import "@openzeppelin/contracts8/utils/math/Math.sol";
 import "@openzeppelin/contracts8/interfaces/IERC20.sol";
 import "@openzeppelin/contracts8/utils/Address.sol";
 import "@openzeppelin/contracts8/token/ERC20/utils/SafeERC20.sol";
-import "forge-std/console.sol";
 
-import "@celo-contracts/governance/interfaces/IReleaseGold.sol";
+import "../../contracts/governance/interfaces/IReleaseGold.sol";
 
-import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/libraries/ReentrancyGuard.sol";
-import "@celo-contracts/common/Initializable.sol";
+import "../../contracts/common/FixidityLib.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
+import "../../contracts/common/Initializable.sol";
 import "../../contracts-0.8/common/UsingRegistry.sol";
 
 contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializable {
@@ -380,9 +379,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     uint256 revokerAmount = getRemainingUnlockedBalance();
     refundAddress.sendValue(revokerAmount);
     emit ReleaseGoldInstanceDestroyed(beneficiary, address(this));
-    console.log("before self destruct");
     selfdestruct(refundAddress);
-    console.log("after self destruct");
   }
 
   /**

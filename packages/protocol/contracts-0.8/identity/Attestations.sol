@@ -6,15 +6,15 @@ import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/interfaces/IERC20.sol";
 import "@openzeppelin/contracts8/utils/math/SafeCast.sol";
 
-import "@celo-contracts/identity/interfaces/IAttestations.sol";
-import "@celo-contracts/common/interfaces/IAccounts.sol";
-import "@celo-contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/identity/interfaces/IAttestations.sol";
+import "../../contracts/common/interfaces/IAccounts.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
-import "@celo-contracts/common/Initializable.sol";
+import "../../contracts/common/Initializable.sol";
 import "../../contracts-0.8/common/UsingRegistry.sol";
 import "../../contracts-0.8/common/Signatures.sol";
 import "../../contracts-0.8/common/UsingPrecompiles.sol";
-import "@celo-contracts/common/libraries/ReentrancyGuard.sol";
+import "../../contracts/common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title Contract mapping identifiers to accounts

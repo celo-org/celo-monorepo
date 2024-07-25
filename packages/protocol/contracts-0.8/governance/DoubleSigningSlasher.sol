@@ -2,7 +2,7 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
-import "@celo-contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
 import "./SlasherUtil.sol";
 import "../../contracts-0.8/common/IsL2Check.sol";

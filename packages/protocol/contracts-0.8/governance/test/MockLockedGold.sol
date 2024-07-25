@@ -3,7 +3,7 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
-import "@celo-contracts/governance/interfaces/ILockedGold.sol";
+import "../../../contracts/governance/interfaces/ILockedGold.sol";
 
 /**
  * @title A mock LockedGold for testing.
