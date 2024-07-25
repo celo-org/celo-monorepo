@@ -3,7 +3,7 @@ pragma solidity >=0.8.7 <0.8.20;
 
 
 import "celo-foundry-8/Test.sol";
-import "@celo-contracts/common/FeeCurrencyWhitelist.sol";
+import "@celo-contracts-8/common/FeeCurrencyWhitelist.sol";
 
 contract FeeCurrencyWhitelistTest is Test {
   FeeCurrencyWhitelist feeCurrencyWhitelist;

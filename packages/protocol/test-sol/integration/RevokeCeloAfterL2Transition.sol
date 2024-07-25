@@ -6,12 +6,12 @@ import "celo-foundry-8/Test.sol";
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts-8/governance/Accounts.sol";
-import "@celo-contracts/common/GoldToken.sol";
+import "@celo-contracts-8/common/Accounts.sol";
+import "@celo-contracts-8/common/GoldToken.sol";
 
 import "@celo-contracts-8/governance/Election.sol";
 import "@celo-contracts-8/governance/LockedGold.sol";
-import "@celo-contracts/governance/ReleaseGold.sol";
+import "@celo-contracts-8/governance/ReleaseGold.sol";
 
 import "@celo-contracts/stability/test/MockStableToken.sol";
 import "@celo-contracts-8/governance/Election.sol";

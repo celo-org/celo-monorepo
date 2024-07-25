@@ -4,11 +4,11 @@ pragma solidity >=0.8.7 <0.8.20;
 import {TestWithoutPrecompiles} from "celo-foundry-8/TestWithoutPrecompiles.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts-8/governance/Accounts.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
+import "@celo-contracts-8/common/Accounts.sol";
+import "@celo-contracts-8/governance/test/MockValidators.sol";
 import "@celo-contracts-8/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/DoubleSigningSlasher.sol";
-import "@celo-contracts/governance/test/MockUsingPrecompiles.sol";
+import "@celo-contracts-8/governance/DoubleSigningSlasher.sol";
+import "@celo-contracts-8/governance/test/MockUsingPrecompiles.sol";
 
 contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecompiles, TestWithoutPrecompiles {
   struct SlashParams {

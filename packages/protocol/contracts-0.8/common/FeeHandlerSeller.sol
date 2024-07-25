@@ -5,9 +5,9 @@ import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/interfaces/IERC20.sol";
 
-import "../common/FixidityLib.sol";
+import "@celo-contracts/common/FixidityLib.sol";
 import "../../contracts-0.8/common/UsingRegistry.sol";
-import "../common/Initializable.sol";
+import "@celo-contracts/common/Initializable.sol";
 
 // Abstract class for a FeeHandlerSeller, as defined in CIP-52
 // https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0052.md

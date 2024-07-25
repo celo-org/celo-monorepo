@@ -6,11 +6,11 @@ import {TestWithoutPrecompiles} from "celo-foundry-8/TestWithoutPrecompiles.sol"
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts-8/governance/Accounts.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
+import "@celo-contracts-8/common/Accounts.sol";
+import "@celo-contracts-8/governance/test/MockValidators.sol";
 import "@celo-contracts-8/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/DowntimeSlasher.sol";
-import "@celo-contracts/governance/test/MockUsingPrecompiles.sol";
+import "@celo-contracts-8/governance/DowntimeSlasher.sol";
+import "@celo-contracts-8/governance/test/MockUsingPrecompiles.sol";
 import { Utils08 } from "@test-sol/utils08.sol";
 
 contract DowntimeSlasherMock is DowntimeSlasher(true), MockUsingPrecompiles, TestWithoutPrecompiles {

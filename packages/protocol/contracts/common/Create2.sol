@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity >=0.8.7 <0.8.20;
+pragma solidity >=0.5.13 <0.9.0;
 
 library Create2 {
   function deploy(bytes32 salt, bytes memory initCode) internal returns (address) {

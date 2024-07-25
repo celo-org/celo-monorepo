@@ -8,11 +8,11 @@ import "@openzeppelin/contracts8/utils/Address.sol";
 import "@openzeppelin/contracts8/token/ERC20/utils/SafeERC20.sol";
 import "forge-std/console.sol";
 
-import "./interfaces/IReleaseGold.sol";
+import "@celo-contracts/governance/interfaces/IReleaseGold.sol";
 
-import "../common/FixidityLib.sol";
-import "../common/libraries/ReentrancyGuard.sol";
-import "../common/Initializable.sol";
+import "@celo-contracts/common/FixidityLib.sol";
+import "@celo-contracts/common/libraries/ReentrancyGuard.sol";
+import "@celo-contracts/common/Initializable.sol";
 import "../../contracts-0.8/common/UsingRegistry.sol";
 
 contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializable {

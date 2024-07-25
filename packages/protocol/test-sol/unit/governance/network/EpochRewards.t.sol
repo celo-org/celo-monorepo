@@ -7,8 +7,8 @@ import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IReserve.sol";
 import "@celo-contracts-8/common/Freezer.sol";
 
-import "@celo-contracts/governance/test/MockElection.sol";
-import { EpochRewardsMock } from "@celo-contracts/governance/test/EpochRewardsMock.sol";
+import "@celo-contracts-8/governance/test/MockElection.sol";
+import { EpochRewardsMock } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
 
 import { MockSortedOracles } from "@celo-contracts/stability/test/MockSortedOracles.sol";
 import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.sol";

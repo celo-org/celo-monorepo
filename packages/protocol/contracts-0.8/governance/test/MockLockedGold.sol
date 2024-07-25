@@ -3,12 +3,12 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
-import "../../../contracts/governance/interfaces/ILockedCelo.sol";
+import "@celo-contracts/governance/interfaces/ILockedGold.sol";
 
 /**
  * @title A mock LockedGold for testing.
  */
-contract MockLockedGold is ILockedCelo {
+contract MockLockedGold is ILockedGold {
   using SafeMath for uint256;
 
   struct Authorizations {
@@ -134,17 +134,4 @@ contract MockLockedGold is ILockedCelo {
   function decrementNonvotingAccountBalance(address account, uint256 value) public {
     nonvotingAccountBalance[account] = nonvotingAccountBalance[account].sub(value);
   }
-
-
-  function getAccountTotalLockedCelo(address) external view returns (uint256) {
-    return 0;
-  }
-
-  function getTotalLockedCelo() external view returns (uint256) {
-    return 0;
-  }
-  function getAccountNonvotingLockedCelo(address account) external view returns (uint256) {
-    return 0;
-  }
-
 }

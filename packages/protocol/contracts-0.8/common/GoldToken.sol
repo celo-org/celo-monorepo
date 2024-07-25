@@ -6,12 +6,15 @@ import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/interfaces/IERC20.sol";
 
 import "../../contracts-0.8/common/UsingRegistry.sol";
-import "./CalledByVm.sol";
-import "./Initializable.sol";
-import "./interfaces/ICeloToken.sol";
-import "./interfaces/ICeloTokenInitializer.sol";
-import "./interfaces/ICeloVersionedContract.sol";
-import "./interfaces/ICeloDistributionSchedule.sol";
+
+import "@celo-contracts/common/interfaces/ICeloVersionedContract.sol";
+import "@celo-contracts/common/interfaces/ICeloDistributionSchedule.sol";
+import "@celo-contracts/common/interfaces/ICeloTokenInitializer.sol";
+import "@celo-contracts/common/interfaces/ICeloToken.sol";
+
+import "@celo-contracts/common/CalledByVm.sol";
+import "@celo-contracts/common/Initializable.sol";
+
 import "../../contracts-0.8/common/IsL2Check.sol";
 
 contract GoldToken is

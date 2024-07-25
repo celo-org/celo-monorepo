@@ -3,14 +3,14 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
 
-import "@celo-contracts/identity/test/AttestationsTest.sol";
-import "@celo-contracts/identity/test/MockERC20Token.sol";
-import "@celo-contracts/identity/test/MockRandom.sol";
-import "@celo-contracts/governance/test/MockElection.sol";
-import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
+import "@celo-contracts-8/identity/test/AttestationsTest.sol";
+import "@celo-contracts-8/identity/test/MockERC20Token.sol";
+import "@celo-contracts-8/identity/test/MockRandom.sol";
+import "@celo-contracts-8/governance/test/MockElection.sol";
+import "@celo-contracts-8/governance/test/MockLockedGold.sol";
+import "@celo-contracts-8/governance/test/MockValidators.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts-8/governance/Accounts.sol";
+import "@celo-contracts-8/common/Accounts.sol";
 
 contract AttestationsFoundryTest is Test {
   enum KeyOffsets {

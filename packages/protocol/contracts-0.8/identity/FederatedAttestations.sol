@@ -6,11 +6,11 @@ import "@openzeppelin/contracts8/utils/math/SafeCast.sol";
 import "@openzeppelin/contracts8/interfaces/IERC20.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
-import "./interfaces/IFederatedAttestations.sol";
-import "../common/interfaces/IAccounts.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
+import "@celo-contracts/identity/interfaces/IFederatedAttestations.sol";
+import "@celo-contracts/common/interfaces/IAccounts.sol";
+import "@celo-contracts/common/interfaces/ICeloVersionedContract.sol";
 
-import "../common/Initializable.sol";
+import "@celo-contracts/common/Initializable.sol";
 import "../../contracts-0.8/common/UsingRegistryV2.sol";
 import "../../contracts-0.8/common/Signatures.sol";
 

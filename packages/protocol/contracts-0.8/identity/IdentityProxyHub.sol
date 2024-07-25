@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.8.20;
 
-import "../common/Create2.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
+
+import "@celo-contracts/common/interfaces/ICeloVersionedContract.sol";
+import { IAttestations } from "@celo-contracts/identity/interfaces/IAttestations.sol";
+import "@celo-contracts/common/Create2.sol";
+import "@celo-contracts-8/identity/IdentityProxy.sol";
+
 import { UsingRegistry } from "../../contracts-0.8/common/UsingRegistry.sol";
-import { IAttestations } from "../identity/interfaces/IAttestations.sol";
-import "./IdentityProxy.sol";
 
 contract IdentityProxyHub is UsingRegistry, ICeloVersionedContract {
   bytes32 public constant identityProxyCodeHash =

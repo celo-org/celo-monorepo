@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.8.20;
 
-import "./interfaces/IRandom.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
 
-import "../common/CalledByVm.sol";
-import "../common/Initializable.sol";
+import "@celo-contracts/identity/interfaces/IRandom.sol";
+import "@celo-contracts/common/CalledByVm.sol";
+import "@celo-contracts/common/interfaces/ICeloVersionedContract.sol";
+import "@celo-contracts/common/Initializable.sol";
 import "../../contracts-0.8/common/UsingPrecompiles.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
 
 /**
  * @title Provides randomness for verifier selection

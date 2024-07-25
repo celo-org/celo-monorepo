@@ -3,23 +3,23 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
 
-import "@celo-contracts/identity/Escrow.sol";
-import "@celo-contracts/identity/FederatedAttestations.sol";
-import "@celo-contracts/identity/test/MockAttestations.sol";
-import "@celo-contracts/identity/test/MockERC20Token.sol";
+import "@celo-contracts-8/identity/Escrow.sol";
+import "@celo-contracts-8/identity/FederatedAttestations.sol";
+import "@celo-contracts-8/identity/test/MockAttestations.sol";
+import "@celo-contracts-8/identity/test/MockERC20Token.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts-8/governance/Accounts.sol";
+import "@celo-contracts-8/common/Accounts.sol";
 import "@celo-contracts-8/common/Freezer.sol";
-import "@celo-contracts/common/GoldToken.sol";
+import "@celo-contracts-8/common/GoldToken.sol";
 import "@celo-contracts-8/governance/LockedGold.sol";
-import "@celo-contracts/governance/ReleaseGold.sol";
+import "@celo-contracts-8/governance/ReleaseGold.sol";
 import "./mocks/ReleaseGoldMockTunnel.sol";
 import "@celo-contracts/stability/test/MockStableToken.sol";
-import "@celo-contracts/governance/test/MockElection.sol";
-import "@celo-contracts/governance/test/MockGovernance.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
+import "@celo-contracts-8/governance/test/MockElection.sol";
+import "@celo-contracts-8/governance/test/MockGovernance.sol";
+import "@celo-contracts-8/governance/test/MockValidators.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
 
 contract ReleaseGoldTest is Test, ECDSAHelper {

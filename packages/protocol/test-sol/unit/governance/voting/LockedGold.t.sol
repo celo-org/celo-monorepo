@@ -5,14 +5,14 @@ import "celo-foundry-8/Test.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts-8/governance/Accounts.sol";
+import "@celo-contracts-8/common/Accounts.sol";
 import "@test-sol/unit/common/GoldTokenMock.sol";
 import "@celo-contracts-8/governance/LockedGold.sol";
 import "@celo-contracts-8/governance/Election.sol";
 import "@celo-contracts/stability/test/MockStableToken.sol";
-import "@celo-contracts/governance/test/MockElection.sol";
-import "@celo-contracts/governance/test/MockGovernance.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
+import "@celo-contracts-8/governance/test/MockElection.sol";
+import "@celo-contracts-8/governance/test/MockGovernance.sol";
+import "@celo-contracts-8/governance/test/MockValidators.sol";
 
 contract LockedGoldTest is Test {
   using FixidityLib for FixidityLib.Fraction;

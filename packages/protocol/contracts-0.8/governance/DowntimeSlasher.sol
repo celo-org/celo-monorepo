@@ -5,7 +5,8 @@ import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
 import "./SlasherUtil.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
+
+import "@celo-contracts/common/interfaces/ICeloVersionedContract.sol";
 
 contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
   using SafeMath for uint256;

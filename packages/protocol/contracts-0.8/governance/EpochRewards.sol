@@ -4,13 +4,13 @@ pragma solidity >=0.8.7 <0.8.20;
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
-import "../common/CalledByVm.sol";
-import "../common/FixidityLib.sol";
+import "@celo-contracts/common/CalledByVm.sol";
+import "@celo-contracts/common/FixidityLib.sol";
 import "../../contracts-0.8/common/Freezable.sol";
-import "../common/Initializable.sol";
+import "@celo-contracts/common/Initializable.sol";
 import "../../contracts-0.8/common/UsingRegistry.sol";
 import "../../contracts-0.8/common/UsingPrecompiles.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
+import "@celo-contracts/common/interfaces/ICeloVersionedContract.sol";
 
 /**
  * @title Contract for calculating epoch rewards.

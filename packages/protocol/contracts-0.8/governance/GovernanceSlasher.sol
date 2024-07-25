@@ -4,7 +4,7 @@ pragma solidity >=0.8.7 <0.8.20;
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
-import "../common/Initializable.sol";
+import "@celo-contracts/common/Initializable.sol";
 import "../../contracts-0.8/common/UsingRegistry.sol";
 
 contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {

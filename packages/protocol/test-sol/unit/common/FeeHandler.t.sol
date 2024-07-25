@@ -3,15 +3,15 @@ pragma solidity >=0.8.7 <0.8.20;
 
 
 import "celo-foundry-8/Test.sol";
-import "@celo-contracts/common/FeeHandler.sol";
+import "@celo-contracts-8/common/FeeHandler.sol";
 import { Constants } from "@test-sol/constants.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts-8/common/Freezer.sol";
-import "@celo-contracts/common/GoldToken.sol";
-import "@celo-contracts/common/FeeCurrencyWhitelist.sol";
-import "@celo-contracts/common/MentoFeeHandlerSeller.sol";
-import "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
+import "@celo-contracts-8/common/GoldToken.sol";
+import "@celo-contracts-8/common/FeeCurrencyWhitelist.sol";
+import "@celo-contracts-8/common/MentoFeeHandlerSeller.sol";
+import "@celo-contracts-8/common/UniswapFeeHandlerSeller.sol";
 import "@celo-contracts/common/interfaces/IExchange.sol";
 import "@celo-contracts-8/common/interfaces/IStableToken.sol";
 import "@celo-contracts/uniswap/interfaces/IUniswapV2Router02.sol";

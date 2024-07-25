@@ -4,10 +4,10 @@ pragma solidity >=0.8.7 <0.8.20;
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
-import "../common/Initializable.sol";
+import "@celo-contracts/common/Initializable.sol";
 import "../../contracts-0.8/common/UsingRegistry.sol";
 import "../../contracts-0.8/common/UsingPrecompiles.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
+import "@celo-contracts/common/interfaces/ICeloVersionedContract.sol";
 
 contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles {
   using SafeMath for uint256;

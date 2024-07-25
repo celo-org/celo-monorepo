@@ -3,8 +3,8 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
-import "./ExternalCall.sol";
-import "./Initializable.sol";
+import "@celo-contracts-8/common/ExternalCall.sol";
+import "@celo-contracts/common/Initializable.sol";
 
 /**
  * @title Multisignature wallet - Allows multiple parties to agree on transactions before

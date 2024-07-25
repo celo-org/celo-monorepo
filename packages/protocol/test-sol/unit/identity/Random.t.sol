@@ -3,8 +3,8 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
 
-import { Random } from "@celo-contracts/identity/Random.sol";
-import { RandomTest } from "@celo-contracts/identity/test/RandomTest.sol";
+import { Random } from "@celo-contracts-8/identity/Random.sol";
+import { RandomTest } from "@celo-contracts-8/identity/test/RandomTest.sol";
 import { IsL2Check } from "@celo-contracts-8/common/IsL2Check.sol";
 import { Utils08 } from "@test-sol/utils08.sol";
 

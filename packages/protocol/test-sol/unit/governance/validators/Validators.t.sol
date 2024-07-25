@@ -7,13 +7,13 @@ import "celo-foundry-8/Test.sol";
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts-8/governance/Accounts.sol";
+import "@celo-contracts-8/common/Accounts.sol";
 
 import "@celo-contracts-8/governance/Election.sol";
 import "@celo-contracts-8/governance/LockedGold.sol";
 
 import "@celo-contracts-8/stability/test/MockStableToken.sol";
-import "@celo-contracts/governance/test/MockElection.sol";
+import "@celo-contracts-8/governance/test/MockElection.sol";
 import "@celo-contracts-8/governance/test/MockLockedGold.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 

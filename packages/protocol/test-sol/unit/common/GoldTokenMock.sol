@@ -3,7 +3,7 @@ pragma solidity >=0.8.7 <0.8.20;
 
 // solhint-disable no-unused-vars
 
-import "@celo-contracts/common/GoldToken.sol";
+import "@celo-contracts-8/common/GoldToken.sol";
 
 /**
  * @title A mock GoldToken for testing.

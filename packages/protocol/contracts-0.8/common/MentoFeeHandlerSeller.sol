@@ -5,13 +5,13 @@ import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/interfaces/IERC20.sol";
 
-import "./interfaces/IExchange.sol";
-import "./interfaces/IStableTokenMento.sol";
+import "@celo-contracts/common/interfaces/IExchange.sol";
+import "@celo-contracts/common/interfaces/IStableTokenMento.sol";
+import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 
 import "../../contracts-0.8/common/UsingRegistry.sol";
-import "../stability/interfaces/ISortedOracles.sol";
-import "../common/FixidityLib.sol";
-import "../common/Initializable.sol";
+import "@celo-contracts/common/FixidityLib.sol";
+import "@celo-contracts/common/Initializable.sol";
 import "./FeeHandlerSeller.sol";
 
 // An implementation of FeeHandlerSeller supporting interfaces compatible with

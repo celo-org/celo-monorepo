@@ -9,7 +9,7 @@ import "./interfaces/ISortedOraclesInitializer.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IBreakerBox.sol";
 
-import "../common/FixidityLib.sol";
+import "@celo-contracts/common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
