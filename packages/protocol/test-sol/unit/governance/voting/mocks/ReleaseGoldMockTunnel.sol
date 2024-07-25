@@ -59,6 +59,12 @@ contract ReleaseGoldMockTunnel is ForgeTest {
       );
     }
 
+    ReleaseGold.CanVoteValidate memory canVoteValidate = ReleaseGold.CanVoteValidate(
+      params2._canValidate,
+      params2._canVote,
+      params2.registryAddress
+    );
+
     bytes memory dataSecondHalf;
     {
       // Encode the second half of the parameters
@@ -67,9 +73,7 @@ contract ReleaseGoldMockTunnel is ForgeTest {
         params2._refundAddress,
         params2.subjectToLiquidityProvision,
         params2.initialDistributionRatio,
-        params2._canValidate,
-        params2._canVote,
-        params2.registryAddress
+        canVoteValidate
       );
     }
 
