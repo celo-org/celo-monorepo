@@ -16,7 +16,7 @@ import "@celo-contracts-8/common/GoldToken.sol";
 import "@celo-contracts-8/governance/LockedGold.sol";
 import "@celo-contracts-8/governance/ReleaseGold.sol";
 import "./mocks/ReleaseGoldMockTunnel.sol";
-import "@celo-contracts/stability/test/MockStableToken.sol";
+import "@celo-contracts-8/stability/test/MockStableToken.sol";
 import "@celo-contracts-8/governance/test/MockElection.sol";
 import "@celo-contracts-8/governance/test/MockGovernance.sol";
 import "@celo-contracts-8/governance/test/MockValidators.sol";

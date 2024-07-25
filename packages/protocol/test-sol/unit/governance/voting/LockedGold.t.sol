@@ -9,7 +9,7 @@ import "@celo-contracts-8/common/Accounts.sol";
 import "@test-sol/unit/common/GoldTokenMock.sol";
 import "@celo-contracts-8/governance/LockedGold.sol";
 import "@celo-contracts-8/governance/Election.sol";
-import "@celo-contracts/stability/test/MockStableToken.sol";
+import "@celo-contracts-8/stability/test/MockStableToken.sol";
 import "@celo-contracts-8/governance/test/MockElection.sol";
 import "@celo-contracts-8/governance/test/MockGovernance.sol";
 import "@celo-contracts-8/governance/test/MockValidators.sol";

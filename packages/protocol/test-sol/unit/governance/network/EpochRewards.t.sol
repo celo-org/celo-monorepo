@@ -12,7 +12,7 @@ import { EpochRewardsMock } from "@celo-contracts-8/governance/test/EpochRewards
 import { EpochRewards } from "@celo-contracts-8/governance/EpochRewards.sol";
 
 import { MockSortedOracles } from "@celo-contracts/stability/test/MockSortedOracles.sol";
-import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.sol";
+import { MockStableToken } from "@celo-contracts-8/stability/test/MockStableToken.sol";
 import { GoldTokenMock } from "@test-sol/unit/common/GoldTokenMock.sol";
 
 import { Constants } from "@test-sol/constants.sol";
