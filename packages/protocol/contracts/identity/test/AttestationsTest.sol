@@ -1,13 +1,18 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
 import "../Attestations.sol";
-
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/math/SafeCast.sol";
 /*
  * We need a test contract that behaves like the actual Attestations contract,
  * but mocks the implementations of the validator set getters. Otherwise we
  * couldn't test `request` with the current ganache local testnet.
  */
 contract AttestationsTest is Attestations(true) {
+  using SafeMath for uint256;
+  using SafeCast for uint256;
+
   address[] private __testValidators;
 
   // some deprecated functions are mocked here to ensure that the tests for
