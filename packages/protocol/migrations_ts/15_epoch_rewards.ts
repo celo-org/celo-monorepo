@@ -5,7 +5,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { EpochRewardsInstance, FreezerInstance } from 'types'
+import { EpochRewardsInstance, FreezerInstance } from 'types/08'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [

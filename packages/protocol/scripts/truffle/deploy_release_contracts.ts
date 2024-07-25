@@ -6,11 +6,13 @@ import chalk from 'chalk'
 import fs from 'fs'
 import prompts from 'prompts'
 import {
-  ReleaseGoldContract,
-  ReleaseGoldMultiSigContract,
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
+import {
+  ReleaseGoldContract,
+  ReleaseGoldMultiSigContract,
+} from 'types/08'
 
 let argv: any
 let releases: any
@@ -242,9 +244,9 @@ async function checkBalance(config: ReleaseGoldConfig) {
     console.info(
       chalk.yellow(
         fromAddress +
-          "'s balance will not cover the next grant with identifier " +
-          config.identifier +
-          '.'
+        "'s balance will not cover the next grant with identifier " +
+        config.identifier +
+        '.'
       )
     )
     const addressResponse = await prompts({
@@ -270,10 +272,10 @@ async function checkBalance(config: ReleaseGoldConfig) {
     if (fromBalance.gt(TWO_CELO)) {
       console.info(
         '\nSending 1 CELO as a test from ' +
-          fromAddress +
-          ' to ' +
-          addressResponse.newFromAddress +
-          ' to verify ownership.\n'
+        fromAddress +
+        ' to ' +
+        addressResponse.newFromAddress +
+        ' to verify ownership.\n'
       )
       await retryTx(web3.eth.sendTransaction, [
         {
@@ -497,10 +499,10 @@ async function handleJSONFile(data) {
       console.info(
         chalk.red(
           'Provided grant file ' +
-            argv.grants +
-            ' contains a duplicate identifier: ' +
-            grant.identifier +
-            '.\nExiting.'
+          argv.grants +
+          ' contains a duplicate identifier: ' +
+          grant.identifier +
+          '.\nExiting.'
         )
       )
       process.exit(0)
@@ -560,12 +562,12 @@ async function handleJSONFile(data) {
     console.info(
       chalk.yellow(
         '\nError: The provided `from` address ' +
-          fromAddress +
-          "'s balance of " +
-          fromBalance +
-          ' is not sufficient to cover all of the grants specified in ' +
-          argv.grants +
-          '.\nYou will need to provide supplementary addresses (additional shards) to fund these grants.'
+        fromAddress +
+        "'s balance of " +
+        fromBalance +
+        ' is not sufficient to cover all of the grants specified in ' +
+        argv.grants +
+        '.\nYou will need to provide supplementary addresses (additional shards) to fund these grants.'
       )
     )
     const response = await prompts({

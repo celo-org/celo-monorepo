@@ -1,6 +1,6 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
-import { OdisPaymentsInstance } from 'types'
+import { OdisPaymentsInstance } from 'types/08'
 
 const initializeArgs = async () => {
   return []

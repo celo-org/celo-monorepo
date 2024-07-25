@@ -38,6 +38,8 @@ function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
       continue
     }
 
+    console.info(`yarn run truffle compile --silent --contracts_directory=${contractPath} --contracts_build_directory=${outdir}/contracts-${contractPackage.name} --config ${contractPackage.truffleConfig}`);
+
     exec(
       `yarn run truffle compile --silent --contracts_directory=${contractPath} --contracts_build_directory=${outdir}/contracts-${contractPackage.name} --config ${contractPackage.truffleConfig}` // todo change to outdir
     )
@@ -154,9 +156,8 @@ async function generateFilesForContractKit({ coreContractsOnly, web3Types: outdi
       new Web3V1Celo({
         cwd,
         rawConfig: {
-          files: `${BUILD_DIR}/contracts-${
-            externalContractPackage.name
-          }/@(${externalContractPackage.contracts.join('|')}).json`,
+          files: `${BUILD_DIR}/contracts-${externalContractPackage.name
+            }/@(${externalContractPackage.contracts.join('|')}).json`,
           outDir: path.join(relativePath, externalContractPackage.name),
         },
       })

@@ -1,5 +1,6 @@
 import { _setInitialProxyImplementation, retryTx } from '@celo/protocol/lib/web3-utils'
-import { MultiSigContract, ProxyContract } from 'types'
+import { ProxyContract } from 'types'
+import { MultiSigContract } from 'types/08'
 
 /*
  * A simple script to deploy a multisig contract.

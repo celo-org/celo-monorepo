@@ -5,7 +5,7 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { AttestationsInstance } from 'types'
+import { AttestationsInstance } from 'types/08'
 import { StableTokenInstance } from 'types/mento'
 import { MENTO_PACKAGE } from '../contractPackages'
 import { ArtifactsSingleton } from '../lib/artifactsSingleton'

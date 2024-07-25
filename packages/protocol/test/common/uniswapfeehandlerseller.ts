@@ -4,13 +4,15 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertTransactionRevertWithReason } from '@celo/protocol/lib/test-utils'
 import {
-  GoldTokenContract,
-  GoldTokenInstance,
   RegistryContract,
   RegistryInstance,
+} from 'types'
+import {
+  GoldTokenContract,
+  GoldTokenInstance,
   UniswapFeeHandlerSellerContract,
   UniswapFeeHandlerSellerInstance,
-} from 'types'
+} from 'types/08'
 
 const UniswapFeeHandlerSeller: UniswapFeeHandlerSellerContract =
   artifacts.require('UniswapFeeHandlerSeller')

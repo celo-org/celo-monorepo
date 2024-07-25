@@ -1,11 +1,13 @@
 import chalk from 'chalk'
-import fs = require('fs')
 import {
-  ReleaseGoldContract,
-  ReleaseGoldMultiSigContract,
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
+import {
+  ReleaseGoldContract,
+  ReleaseGoldMultiSigContract,
+} from 'types/08'
+import fs = require('fs')
 
 let argv: any
 let contracts: any
@@ -143,7 +145,7 @@ module.exports = async (callback: (error?: any) => number) => {
     if (failures.length > 0) {
       console.info(
         failures.length +
-          ' mismatches were identified, please review the output identifiers above.\nOutputting failures to `failureOutput.json`.'
+        ' mismatches were identified, please review the output identifiers above.\nOutputting failures to `failureOutput.json`.'
       )
       fs.writeFileSync('failureOutput.json', JSON.stringify(failures, null, 2))
     }

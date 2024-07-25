@@ -5,15 +5,17 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertEqualBN, assertTransactionRevertWithReason } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
+  RegistryContract,
+  RegistryInstance,
+} from 'types'
+import {
   GoldTokenContract,
   GoldTokenInstance,
   MentoFeeHandlerSellerContract,
   MentoFeeHandlerSellerInstance,
-  RegistryContract,
-  RegistryInstance,
   UniswapFeeHandlerSellerContract,
   UniswapFeeHandlerSellerInstance,
-} from 'types'
+} from 'types/08'
 
 const MentoFeeHandlerSeller: MentoFeeHandlerSellerContract =
   artifacts.require('MentoFeeHandlerSeller')

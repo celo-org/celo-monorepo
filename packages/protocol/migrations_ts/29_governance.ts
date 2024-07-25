@@ -8,7 +8,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { GovernanceApproverMultiSigInstance, GovernanceInstance } from 'types'
+import { GovernanceApproverMultiSigInstance, GovernanceInstance } from 'types/08'
 import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 
 import { ArtifactsSingleton } from '../lib/artifactsSingleton'

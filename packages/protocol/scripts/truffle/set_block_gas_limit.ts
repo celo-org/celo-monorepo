@@ -3,7 +3,8 @@ import {
   transferOwnershipOfProxyAndImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { BlockchainParametersInstance, GovernanceInstance } from 'types'
+import { BlockchainParametersInstance } from 'types'
+import { GovernanceInstance } from 'types/08'
 
 /*
  * A simple script to set the block gas limit after migrations

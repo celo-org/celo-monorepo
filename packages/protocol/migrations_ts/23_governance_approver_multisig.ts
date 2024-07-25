@@ -4,7 +4,7 @@ import {
   transferOwnershipOfProxy,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { GovernanceApproverMultiSigInstance } from 'types'
+import { GovernanceApproverMultiSigInstance } from 'types/08'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [
