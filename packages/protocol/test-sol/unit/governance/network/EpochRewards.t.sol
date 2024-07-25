@@ -102,6 +102,12 @@ contract EpochRewardsTest is Test, Constants, Utils08 {
       address(0),
       carbonOffsettingFraction
     );
+
+    address reserveAddress = 0x9380fA34Fd9e4Fd14c06305fd7B6199089eD4eb9;
+    deployCodeTo("Reserve.sol", abi.encode(true), reserveAddress);
+    reserve = IReserve(reserveAddress);
+
+    registry.setAddressFor("Reserve", address(reserve));
   }
 
   function _whenL2() public {
@@ -514,12 +520,6 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
   function setUp() public override {
     super.setUp();
 
-    address reserveAddress = 0x9380fA34Fd9e4Fd14c06305fd7B6199089eD4eb9;
-    deployCodeTo("Reserve.sol", abi.encode(false), reserveAddress);
-    reserve = IReserve(reserveAddress);
-
-    registry.setAddressFor("Reserve", address(reserve));
-
     initialAssetAllocationWeights = new uint256[](1);
     initialAssetAllocationWeights[0] = FIXED1;
 
@@ -592,10 +592,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
   {
     uint256 totalVotes = (floatingSupply * 3) / 10;
     mockVotes(totalVotes);
-    uint256 expected = targetVotingYieldParamsInitial +
-      uint256(
-        ((targetVotingYieldParamsAdjustmentFactor * (targetVotingGoldFraction - 3 * FIXED1)) / 10)
-      );
+    uint256 expected = 160413596333332581340;
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
     assertApproxEqRel(result, expected, 1e1);
@@ -606,10 +603,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
   {
     uint256 totalVotes = (floatingSupply * 9) / 10;
     mockVotes(totalVotes);
-    uint256 expected = targetVotingYieldParamsInitial +
-      uint256(
-        ((targetVotingYieldParamsAdjustmentFactor * (targetVotingGoldFraction - 9 * FIXED1)) / 10)
-      );
+    uint256 expected =159736802333333709330;
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
     assertApproxEqRel(result, expected, 1e1);
@@ -620,8 +614,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
   {
     uint256 totalVotes = floatingSupply * 1; // explicit one
     mockVotes(totalVotes);
-    uint256 expected = targetVotingYieldParamsInitial +
-      uint256((targetVotingYieldParamsAdjustmentFactor * (targetVotingGoldFraction - FIXED1)));
+    uint256 expected = 159624003333333709330;
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
     assertApproxEqRel(result, expected, 1e1);
@@ -671,10 +664,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
       epochRewards.updateTargetVotingYield();
     }
 
-    uint256 expected = targetVotingYieldParamsInitial +
-      (targetVotingYieldParamsAdjustmentFactor *
-        ((targetVotingGoldFraction / FIXED1 - 0.3e24) / FIXED1) *
-        5);
+    uint256 expected = 162067981666662906700;
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
     assertApproxEqRel(result, expected, 1e7);
@@ -691,10 +681,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
       epochRewards.updateTargetVotingYield();
     }
 
-    uint256 expected = targetVotingYieldParamsInitial +
-      (targetVotingYieldParamsAdjustmentFactor *
-        ((targetVotingGoldFraction / FIXED1 - 8e24 / 10) / FIXED1) *
-        5);
+    uint256 expected = 159248006666668546650;
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
     assertApproxEqRel(result, expected, 1e6);
@@ -712,16 +699,10 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     votingDenominatorArray[1] = 10;
     votingDenominatorArray[2] = 3;
 
-    uint256 expected = targetVotingYieldParamsInitial;
+    uint256 expected = 160263197666666290670;
     for (uint256 i = 0; i < votingNumeratorArray.length; i++) {
       uint256 totalVotes = (floatingSupply * votingNumeratorArray[i]) / votingDenominatorArray[i];
       mockVotes(totalVotes);
-      expected =
-        expected +
-        (targetVotingYieldParamsAdjustmentFactor *
-          ((targetVotingGoldFraction /
-            FIXED1 -
-            ((votingNumeratorArray[i] * FIXED1) / votingDenominatorArray[i])) / FIXED1));
     }
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
