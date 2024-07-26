@@ -75,7 +75,7 @@ contract EscrowTest is Test, TestConstants {
   address trustedIssuer1;
   address trustedIssuer2;
 
-  function setUp() virtual public {
+  function setUp() public virtual {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
     mockERC20Token = new MockERC20Token();

@@ -2,8 +2,7 @@
 pragma solidity >=0.5.13 <0.9.0;
 
 interface IReserve {
-
-   function initialize(
+  function initialize(
     address registryAddress,
     uint256 _tobinTaxStalenessThreshold,
     uint256 _spendingRatio,
@@ -15,31 +14,31 @@ interface IReserve {
     uint256 _tobinTaxReserveRatio
   ) external;
 
-    function setTobinTaxStalenessThreshold(uint256) external;
+  function setTobinTaxStalenessThreshold(uint256) external;
 
-    function addToken(address) external returns (bool);
+  function addToken(address) external returns (bool);
 
-    function removeToken(address, uint256) external returns (bool);
+  function removeToken(address, uint256) external returns (bool);
 
-    function transferGold(address payable, uint256) external returns (bool);
+  function transferGold(address payable, uint256) external returns (bool);
 
-    function transferExchangeGold(address payable, uint256) external returns (bool);
+  function transferExchangeGold(address payable, uint256) external returns (bool);
 
-    function getOrComputeTobinTax() external returns (uint256, uint256);
+  function getOrComputeTobinTax() external returns (uint256, uint256);
 
-    function addExchangeSpender(address) external;
+  function addExchangeSpender(address) external;
 
-    function removeExchangeSpender(address, uint256) external;
+  function removeExchangeSpender(address, uint256) external;
 
-    function addSpender(address) external;
+  function addSpender(address) external;
 
-    function removeSpender(address) external;
+  function removeSpender(address) external;
 
-    function getReserveGoldBalance() external view returns (uint256);
+  function getReserveGoldBalance() external view returns (uint256);
 
-    function getUnfrozenReserveGoldBalance() external view returns (uint256);
+  function getUnfrozenReserveGoldBalance() external view returns (uint256);
 
-    function getTokens() external view returns (address[] memory);
+  function getTokens() external view returns (address[] memory);
 
-    function getReserveRatio() external view returns (uint256);
+  function getReserveRatio() external view returns (uint256);
 }

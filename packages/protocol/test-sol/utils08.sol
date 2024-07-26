@@ -9,7 +9,6 @@ contract Utils08 is Test {
   using EnumerableSet for EnumerableSet.AddressSet;
   using Strings for uint256;
 
-
   EnumerableSet.AddressSet addressSet;
 
   function timeTravel(uint256 timeDelta) public {

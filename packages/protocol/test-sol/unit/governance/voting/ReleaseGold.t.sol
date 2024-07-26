@@ -86,7 +86,7 @@ contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
         canVote: initParams2._canVote,
         registryAddress: initParams2.registryAddress,
         subjectToLiquidityProvision: initParams2.subjectToLiquidityProvision
-    })
+      })
     );
   }
 
@@ -828,7 +828,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     accounts.createAccount();
     vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
     vm.prank(beneficiary);
-    releaseGold.authorizeVoteSigner(payable(address(uint160(otherAccount))), otherV, otherR, otherS);
+    releaseGold.authorizeVoteSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
   }
 
   function test_ShouldRevertIfTheValidatorSignerIsAlreadyAuthorized() public {
@@ -841,7 +846,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     accounts.createAccount();
     vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
     vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSigner(payable(address(uint160(otherAccount))), otherV, otherR, otherS);
+    releaseGold.authorizeValidatorSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
   }
 
   function test_ShouldRevertIfTheAttestationSignerIsAlreadyAuthorized() public {
@@ -854,7 +864,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     accounts.createAccount();
     vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
     vm.prank(beneficiary);
-    releaseGold.authorizeAttestationSigner(payable(address(uint160(otherAccount))), otherV, otherR, otherS);
+    releaseGold.authorizeAttestationSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
   }
 
   function test_ShouldRevertIfTheSignatureIsIncorrect() public {
@@ -879,7 +894,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeVoteSigner(payable(address(uint160(otherAccount))), otherV, otherR, otherS);
+    releaseGold.authorizeVoteSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     assertEq(accounts.authorizedBy(otherAccount), address(releaseGold));
     assertEq(accounts.getVoteSigner(address(releaseGold)), otherAccount);
@@ -899,7 +919,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSigner(payable(address(uint160(otherAccount))), otherV, otherR, otherS);
+    releaseGold.authorizeValidatorSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     assertEq(accounts.authorizedBy(otherAccount), address(releaseGold));
     assertEq(accounts.getValidatorSigner(address(releaseGold)), otherAccount);
@@ -919,7 +944,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeAttestationSigner(payable(address(uint160(otherAccount))), otherV, otherR, otherS);
+    releaseGold.authorizeAttestationSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     assertEq(accounts.authorizedBy(otherAccount), address(releaseGold));
     assertEq(accounts.getAttestationSigner(address(releaseGold)), otherAccount);
@@ -940,7 +970,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeVoteSigner(payable(address(uint160(otherAccount))), otherV, otherR, otherS);
+    releaseGold.authorizeVoteSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     uint256 otherAccountBalanceAfter = goldToken.balanceOf(otherAccount);
     assertEq(otherAccountBalanceAfter - otherAccountBalanceBefore, 0);
@@ -960,7 +995,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSigner(payable(address(uint160(otherAccount))), otherV, otherR, otherS);
+    releaseGold.authorizeValidatorSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     uint256 otherAccountBalanceAfter = goldToken.balanceOf(otherAccount);
     assertEq(otherAccountBalanceAfter - otherAccountBalanceBefore, 0);
@@ -980,7 +1020,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeAttestationSigner(payable(address(uint160(otherAccount))), otherV, otherR, otherS);
+    releaseGold.authorizeAttestationSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     uint256 otherAccountBalanceAfter = goldToken.balanceOf(otherAccount);
     assertEq(otherAccountBalanceAfter - otherAccountBalanceBefore, 0);
@@ -999,7 +1044,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeVoteSigner(payable(address(uint160(otherAccount))), otherV, otherR, otherS);
+    releaseGold.authorizeVoteSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     assertEq(accounts.authorizedBy(authorized), address(releaseGold));
   }
@@ -1017,7 +1067,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSigner(payable(address(uint160(otherAccount))), otherV, otherR, otherS);
+    releaseGold.authorizeValidatorSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     assertEq(accounts.authorizedBy(authorized), address(releaseGold));
   }
@@ -1035,7 +1090,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeAttestationSigner(payable(address(uint160(otherAccount))), otherV, otherR, otherS);
+    releaseGold.authorizeAttestationSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     assertEq(accounts.authorizedBy(authorized), address(releaseGold));
   }
@@ -2024,7 +2084,7 @@ contract ReleaseGoldTest_WithdrawSelfDestruct_WhenNotRevoked is ReleaseGoldTest 
 
   function test_ShouldSelfDestructIfBeneficiaryWithdrawsTheEntireAmount() public {
     vm.expectRevert();
-     vm.prank(beneficiary);
+    vm.prank(beneficiary);
     releaseGold.withdraw(initialReleaseGoldAmount);
   }
 }

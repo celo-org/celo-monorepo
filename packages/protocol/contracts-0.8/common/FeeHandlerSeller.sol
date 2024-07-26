@@ -43,7 +43,11 @@ abstract contract FeeHandlerSeller is Ownable, Initializable, UsingRegistry {
     @param to The address of the recipient to transfer the tokens to.
     @return A boolean indicating whether the transfer was successful or not.
   */
-  function transfer(address token, uint256 amount, address to) external onlyOwner virtual returns (bool) {
+  function transfer(
+    address token,
+    uint256 amount,
+    address to
+  ) external virtual onlyOwner returns (bool) {
     return IERC20(token).transfer(to, amount);
   }
 

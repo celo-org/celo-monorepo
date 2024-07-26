@@ -1,6 +1,5 @@
 pragma solidity >=0.5.13 <0.8.20;
 
-
 import "celo-foundry-8/Test.sol";
 import "@test-sol/utils/SECP256K1.sol";
 

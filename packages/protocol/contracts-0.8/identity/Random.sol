@@ -4,7 +4,6 @@ pragma solidity >=0.8.7 <0.8.20;
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 
-
 import "../../contracts/identity/interfaces/IRandom.sol";
 import "../../contracts/common/CalledByVm.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";

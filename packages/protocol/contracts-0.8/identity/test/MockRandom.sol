@@ -9,7 +9,7 @@ contract MockRandom is Random(true) {
   function addTestRandomness(uint256 blockNumber, bytes32 randomness) external {
     history[blockNumber] = randomness;
   }
-  function getBlockRandomness(uint256 blockNumber) external override view returns (bytes32) {
+  function getBlockRandomness(uint256 blockNumber) external view override returns (bytes32) {
     require(history[blockNumber] != 0x0, "No randomness found");
     return history[blockNumber];
   }

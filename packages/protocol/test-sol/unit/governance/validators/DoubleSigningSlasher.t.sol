@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.8.20;
 
-import {TestWithoutPrecompiles} from "celo-foundry-8/TestWithoutPrecompiles.sol";
+import { TestWithoutPrecompiles } from "celo-foundry-8/TestWithoutPrecompiles.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
@@ -11,7 +11,11 @@ import "@celo-contracts-8/governance/test/MockLockedGold.sol";
 import "@celo-contracts-8/governance/DoubleSigningSlasher.sol";
 import "@celo-contracts-8/governance/test/MockUsingPrecompiles.sol";
 
-contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecompiles, TestWithoutPrecompiles {
+contract DoubleSigningSlasherTest is
+  DoubleSigningSlasher(true),
+  MockUsingPrecompiles,
+  TestWithoutPrecompiles
+{
   struct SlashParams {
     address signer;
     uint256 index;
@@ -48,62 +52,45 @@ contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecom
     );
   }
 
-  
-   // Override the conflicting function
-  function getVerifiedSealBitmapFromHeader(bytes memory header) 
-      public 
-      view 
-      override(UsingPrecompiles, MockUsingPrecompiles) 
-      returns (bytes32) 
-  {
-      return MockUsingPrecompiles.getVerifiedSealBitmapFromHeader(header);
+  // Override the conflicting function
+  function getVerifiedSealBitmapFromHeader(
+    bytes memory header
+  ) public view override(UsingPrecompiles, MockUsingPrecompiles) returns (bytes32) {
+    return MockUsingPrecompiles.getVerifiedSealBitmapFromHeader(header);
   }
 
-   function numberValidatorsInSet(uint256 blockNumber) 
-        public 
-        view 
-        override(UsingPrecompiles, MockUsingPrecompiles) 
-        returns (uint256) 
-    {
-        // Choose which base contract's implementation to use
-        return MockUsingPrecompiles.numberValidatorsInSet(blockNumber);
-        // or return UsingPrecompiles.numberValidatorsInSet(blockNumber);
-    }
+  function numberValidatorsInSet(
+    uint256 blockNumber
+  ) public view override(UsingPrecompiles, MockUsingPrecompiles) returns (uint256) {
+    // Choose which base contract's implementation to use
+    return MockUsingPrecompiles.numberValidatorsInSet(blockNumber);
+    // or return UsingPrecompiles.numberValidatorsInSet(blockNumber);
+  }
 
-      // Override the conflicting function
-    function getBlockNumberFromHeader(bytes memory header) 
-        public 
-        view 
-        override(UsingPrecompiles, MockUsingPrecompiles) 
-        returns (uint256) 
-    {
-        // Choose which base contract's implementation to use
-        return MockUsingPrecompiles.getBlockNumberFromHeader(header);
-        // or return UsingPrecompiles.getBlockNumberFromHeader(header);
-    }
+  // Override the conflicting function
+  function getBlockNumberFromHeader(
+    bytes memory header
+  ) public view override(UsingPrecompiles, MockUsingPrecompiles) returns (uint256) {
+    // Choose which base contract's implementation to use
+    return MockUsingPrecompiles.getBlockNumberFromHeader(header);
+    // or return UsingPrecompiles.getBlockNumberFromHeader(header);
+  }
 
-     function getParentSealBitmap(uint256 blockNumber) 
-        public 
-        view 
-        override(UsingPrecompiles, MockUsingPrecompiles) 
-        returns (bytes32) 
-    {
-        // Choose which base contract's implementation to use
-        return MockUsingPrecompiles.getParentSealBitmap(blockNumber);
-        // or return UsingPrecompiles.getParentSealBitmap(blockNumber);
-    }
+  function getParentSealBitmap(
+    uint256 blockNumber
+  ) public view override(UsingPrecompiles, MockUsingPrecompiles) returns (bytes32) {
+    // Choose which base contract's implementation to use
+    return MockUsingPrecompiles.getParentSealBitmap(blockNumber);
+    // or return UsingPrecompiles.getParentSealBitmap(blockNumber);
+  }
 
-    function hashHeader(bytes memory header) 
-        public 
-        view 
-        override(UsingPrecompiles, MockUsingPrecompiles) 
-        returns (bytes32) 
-    {
-        // Choose which base contract's implementation to use
-        return MockUsingPrecompiles.hashHeader(header);
-        // or return UsingPrecompiles.hashHeader(header);
-    }
-
+  function hashHeader(
+    bytes memory header
+  ) public view override(UsingPrecompiles, MockUsingPrecompiles) returns (bytes32) {
+    // Choose which base contract's implementation to use
+    return MockUsingPrecompiles.hashHeader(header);
+    // or return UsingPrecompiles.hashHeader(header);
+  }
 }
 
 contract DoubleSigningSlasherBaseTest is TestWithoutPrecompiles, TestConstants {

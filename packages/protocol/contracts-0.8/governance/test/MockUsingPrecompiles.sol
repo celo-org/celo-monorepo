@@ -42,7 +42,9 @@ contract MockUsingPrecompiles {
     return keccak256(header);
   }
 
-  function getVerifiedSealBitmapFromHeader(bytes memory header) public view virtual returns (bytes32) {
+  function getVerifiedSealBitmapFromHeader(
+    bytes memory header
+  ) public view virtual returns (bytes32) {
     return verifiedSealBitmap[keccak256(abi.encodePacked(header))];
   }
 

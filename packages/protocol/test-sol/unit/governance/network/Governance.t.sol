@@ -21,15 +21,17 @@ contract GovernanceMock is Governance(true) {
   address[] validatorSet;
 
   // Minimally override core functions from UsingPrecompiles
-  function numberValidatorsInCurrentSet() public override view returns (uint256) {
+  function numberValidatorsInCurrentSet() public view override returns (uint256) {
     return validatorSet.length;
   }
 
-  function numberValidatorsInSet(uint256) public override view returns (uint256) {
+  function numberValidatorsInSet(uint256) public view override returns (uint256) {
     return validatorSet.length;
   }
 
-  function validatorSignerAddressFromCurrentSet(uint256 index) public override view returns (address) {
+  function validatorSignerAddressFromCurrentSet(
+    uint256 index
+  ) public view override returns (address) {
     return validatorSet[index];
   }
 
@@ -137,7 +139,7 @@ contract GovernanceTest is Test, TestConstants, Utils08 {
 
   function makeValidProposal() internal returns (uint256 proposalId) {
     return
-      governance.propose{value:DEPOSIT}(
+      governance.propose{ value: DEPOSIT }(
         okProp.values,
         okProp.destinations,
         okProp.data,
@@ -149,7 +151,7 @@ contract GovernanceTest is Test, TestConstants, Utils08 {
   function makeEmptyProposal() internal returns (uint256 proposalId) {
     Proposal memory emptyProposal;
     return
-      governance.propose{value:DEPOSIT}(
+      governance.propose{ value: DEPOSIT }(
         emptyProposal.values,
         emptyProposal.destinations,
         emptyProposal.data,
@@ -193,8 +195,8 @@ contract GovernanceTest is Test, TestConstants, Utils08 {
     governance = new GovernanceMock();
 
     Governance.InitParams memory initParams = Governance.InitParams({
-       baselineUpdateFactor: baselineUpdateFactor.unwrap(),
-       baselineQuorumFactor: baselineQuorumFactor.unwrap()
+      baselineUpdateFactor: baselineUpdateFactor.unwrap(),
+      baselineQuorumFactor: baselineQuorumFactor.unwrap()
     });
 
     governance.initialize(
@@ -208,7 +210,7 @@ contract GovernanceTest is Test, TestConstants, Utils08 {
       EXECUTION_STAGE_DURATION,
       participationBaseline.unwrap(),
       participationFloor.unwrap(),
-     initParams
+      initParams
     );
     vm.stopPrank();
   }
@@ -318,8 +320,8 @@ contract GovernanceTest_initialize is GovernanceTest {
     vm.expectRevert("contract already initialized");
 
     Governance.InitParams memory initParams = Governance.InitParams({
-       baselineUpdateFactor: FixidityLib.newFixed(1).unwrap(),
-       baselineQuorumFactor: FixidityLib.newFixed(1).unwrap()
+      baselineUpdateFactor: FixidityLib.newFixed(1).unwrap(),
+      baselineQuorumFactor: FixidityLib.newFixed(1).unwrap()
     });
 
     governance.initialize(
@@ -890,7 +892,7 @@ contract GovernanceTest_propose is GovernanceTest {
   function check_emitsProposalQueuedEvents(Proposal memory proposal) private {
     vm.expectEmit(true, true, true, true);
     emit ProposalQueued(1, address(this), proposal.values.length, DEPOSIT, block.timestamp);
-    governance.propose{value: DEPOSIT}(
+    governance.propose{ value: DEPOSIT }(
       proposal.values,
       proposal.destinations,
       proposal.data,
@@ -925,7 +927,7 @@ contract GovernanceTest_propose is GovernanceTest {
 
   function test_RevertIf_descriptionIsEmtpy_whenProposalWithOneTransaction() public {
     vm.expectRevert("Description url must have non-zero length");
-    governance.propose{value: DEPOSIT}(
+    governance.propose{ value: DEPOSIT }(
       okProp.values,
       okProp.destinations,
       okProp.data,
@@ -953,7 +955,7 @@ contract GovernanceTest_propose is GovernanceTest {
     // wait "dequeueFrequency"
     vm.warp(block.timestamp + DEQUEUE_FREQUENCY);
 
-    governance.propose{value: DEPOSIT}(
+    governance.propose{ value: DEPOSIT }(
       okProp.values,
       okProp.destinations,
       okProp.data,
@@ -979,7 +981,7 @@ contract GovernanceTest_propose is GovernanceTest {
   }
 
   function check_registerProposal(Proposal memory proposal) private {
-    uint256 id = governance.propose{value:DEPOSIT}(
+    uint256 id = governance.propose{ value: DEPOSIT }(
       proposal.values,
       proposal.destinations,
       proposal.data,
@@ -1007,7 +1009,7 @@ contract GovernanceTest_propose is GovernanceTest {
   }
 
   function check_registerProposalTransactions(Proposal memory proposal) private {
-    uint256 id = governance.propose{value:DEPOSIT}(
+    uint256 id = governance.propose{ value: DEPOSIT }(
       proposal.values,
       proposal.destinations,
       proposal.data,
@@ -2602,7 +2604,7 @@ contract GovernanceTest_execute is GovernanceTest {
   using BytesLib for bytes;
 
   uint256 proposalId;
-  
+
   event ParticipationBaselineUpdated(uint256 participationBaseline);
   event ProposalExecuted(uint256 indexed proposalId);
 
@@ -2709,7 +2711,7 @@ contract GovernanceTest_execute is GovernanceTest {
   }
 
   function test_RevertIf_ProposalCannotExecuteSuccessfully() public {
-    proposalId = governance.propose{value: DEPOSIT}(
+    proposalId = governance.propose{ value: DEPOSIT }(
       failingProp.values,
       failingProp.destinations,
       failingProp.data,
@@ -2730,7 +2732,7 @@ contract GovernanceTest_execute is GovernanceTest {
 
   function test_RevertIf_ProposalCannotExecuteBecauseInvalidContractAddress() public {
     okProp.destinations[0] = actor("someAddress");
-    proposalId = governance.propose{value: DEPOSIT}(
+    proposalId = governance.propose{ value: DEPOSIT }(
       okProp.values,
       okProp.destinations,
       okProp.data,
@@ -2800,7 +2802,7 @@ contract GovernanceTest_execute is GovernanceTest {
     bytes memory txDataSecond = abi.encodeWithSignature(setValueSignature, 2, 1, true);
     twoTxProp.data = txDataFirst.concat(txDataSecond);
 
-    proposalId = governance.propose{value: DEPOSIT}(
+    proposalId = governance.propose{ value: DEPOSIT }(
       twoTxProp.values,
       twoTxProp.destinations,
       twoTxProp.data,
@@ -2825,7 +2827,7 @@ contract GovernanceTest_execute is GovernanceTest {
     bytes memory txDataSecond = abi.encodeWithSignature(setValueSignature, 2, 1, false); // fails
     twoTxProp.data = txDataFirst.concat(txDataSecond);
 
-    proposalId = governance.propose{value: DEPOSIT}(
+    proposalId = governance.propose{ value: DEPOSIT }(
       twoTxProp.values,
       twoTxProp.destinations,
       twoTxProp.data,
@@ -2886,7 +2888,7 @@ contract GovernanceTest_execute is GovernanceTest {
 
   // TODO fix when migrate to 0.8
   function SKIPtest_NoEmitProposalExecutedWhenEmptyProposalNotApproved() public {
-    proposalId = governance.propose{value: DEPOSIT}(
+    proposalId = governance.propose{ value: DEPOSIT }(
       emptyProp.values,
       emptyProp.destinations,
       emptyProp.data,
@@ -2909,7 +2911,7 @@ contract GovernanceTest_execute is GovernanceTest {
 
   // TODO fix when migrate to 0.8
   function SKIPtest_NoEmitProposalExecutedWhenEmptyProposalNotPassing() public {
-    proposalId = governance.propose{value: DEPOSIT}(
+    proposalId = governance.propose{ value: DEPOSIT }(
       emptyProp.values,
       emptyProp.destinations,
       emptyProp.data,
@@ -2931,7 +2933,7 @@ contract GovernanceTest_execute is GovernanceTest {
   }
 
   function setUpEmptyProposalReadyForExecution() public {
-    proposalId = governance.propose{value: DEPOSIT}(
+    proposalId = governance.propose{ value: DEPOSIT }(
       emptyProp.values,
       emptyProp.destinations,
       emptyProp.data,
@@ -2999,7 +3001,7 @@ contract GovernanceTest_execute is GovernanceTest {
   }
 
   function setup2TxProposal() private {
-    proposalId = governance.propose{value:DEPOSIT}(
+    proposalId = governance.propose{ value: DEPOSIT }(
       twoTxProp.values,
       twoTxProp.destinations,
       twoTxProp.data,

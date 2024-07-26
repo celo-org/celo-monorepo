@@ -250,7 +250,7 @@ contract LockedGold is
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.pendingWithdrawals, index);
     require(value <= address(this).balance, "Inconsistent balance");
-    (bool success, ) = msg.sender.call{value: value}("");
+    (bool success, ) = msg.sender.call{ value: value }("");
     require(success, "Transfer failed.");
     emit GoldWithdrawn(msg.sender, value);
   }
@@ -581,10 +581,10 @@ contract LockedGold is
   function getPendingWithdrawals(
     address account
   ) external view returns (uint256[] memory, uint256[] memory) {
-    uint256 to = balances[account].pendingWithdrawals.length > 0 ? balances[account]
-      .pendingWithdrawals.length - 1 : 0; 
-    return
-      getPendingWithdrawalsInBatch(account, 0, to);
+    uint256 to = balances[account].pendingWithdrawals.length > 0
+      ? balances[account].pendingWithdrawals.length - 1
+      : 0;
+    return getPendingWithdrawalsInBatch(account, 0, to);
   }
 
   /**

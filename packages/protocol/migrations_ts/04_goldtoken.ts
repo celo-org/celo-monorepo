@@ -1,10 +1,10 @@
-import { CeloContractName } from '@celo/protocol/lib/registry-utils';
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
   getDeployedProxiedContract,
-} from '@celo/protocol/lib/web3-utils';
-import { config } from '@celo/protocol/migrationsConfig';
-import { FreezerInstance, GoldTokenInstance, IRegistryInstance } from 'types/08';
+} from '@celo/protocol/lib/web3-utils'
+import { config } from '@celo/protocol/migrationsConfig'
+import { FreezerInstance, GoldTokenInstance, IRegistryInstance } from 'types/08'
 
 const initializeArgs = async () => {
   return [config.registry.predeployedProxyAddress]

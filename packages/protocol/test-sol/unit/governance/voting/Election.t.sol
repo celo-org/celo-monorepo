@@ -7,7 +7,7 @@ import "@celo-contracts/common/FixidityLib.sol";
 import { Election } from "@celo-contracts-8/governance/Election.sol";
 import { MockLockedGold } from "@celo-contracts-8/governance/test/MockLockedGold.sol";
 import { MockValidators } from "@celo-contracts-8/governance/test/MockValidators.sol";
-import { Accounts } from  "@celo-contracts-8/common/Accounts.sol";
+import { Accounts } from "@celo-contracts-8/common/Accounts.sol";
 import "@celo-contracts-8/common/linkedlists/AddressSortedLinkedList.sol";
 import { MockRandom } from "@celo-contracts-8/identity/test/MockRandom.sol";
 import { Freezer } from "@celo-contracts-8/common/Freezer.sol";
@@ -3309,7 +3309,9 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
       actions[actionCount++] = VoteActionType.RevokeActive;
     }
 
-    VoteActionType action = actions[generatePRN(0, actionCount - 1, uint256(uint160(account.account)))];
+    VoteActionType action = actions[
+      generatePRN(0, actionCount - 1, uint256(uint160(account.account)))
+    ];
     uint256 value;
 
     vm.startPrank(account.account);

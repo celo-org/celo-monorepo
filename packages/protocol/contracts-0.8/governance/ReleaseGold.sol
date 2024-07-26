@@ -192,7 +192,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    *                       0x0 if contract is not revocable.
    * @param initialDistributionRatio Amount in range [0, 1000] (3 significant figures)
    *                                 indicating % of total balance available for distribution.¨
-    * @param initParams Struct containing the canVote and canValidate and registry params.
+   * @param initParams Struct containing the canVote and canValidate and registry params.
    */
   function initialize(
     uint256 releaseStartTime,
@@ -639,7 +639,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @param value The value of gold to be locked.
    */
   function lockGold(uint256 value) external nonReentrant onlyBeneficiaryAndNotRevoked {
-    getLockedGold().lock{gas:gasleft(), value: value}();
+    getLockedGold().lock{ gas: gasleft(), value: value }();
   }
 
   /**

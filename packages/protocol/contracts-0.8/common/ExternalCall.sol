@@ -19,7 +19,7 @@ library ExternalCall {
     if (data.length > 0) require(Address.isContract(destination), "Invalid contract address");
     bool success;
     bytes memory returnData;
-    (success, returnData) = destination.call{value:value}(data);
+    (success, returnData) = destination.call{ value: value }(data);
     require(success, "Transaction execution failed.");
     return returnData;
   }

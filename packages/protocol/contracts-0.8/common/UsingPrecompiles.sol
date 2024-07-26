@@ -91,7 +91,9 @@ contract UsingPrecompiles is IsL2Check {
    * @param index Index of requested validator in the validator set.
    * @return Address of validator at the requested index.
    */
-  function validatorSignerAddressFromCurrentSet(uint256 index) public virtual view returns (address) {
+  function validatorSignerAddressFromCurrentSet(
+    uint256 index
+  ) public view virtual returns (address) {
     bytes memory out;
     bool success;
     (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, uint256(block.number)));
@@ -206,7 +208,9 @@ contract UsingPrecompiles is IsL2Check {
    * @param header RLP encoded header
    * @return Bitmap parent seal with set bits at indices correspoinding to signing validators.
    */
-  function getVerifiedSealBitmapFromHeader(bytes memory header) public view virtual returns (bytes32) {
+  function getVerifiedSealBitmapFromHeader(
+    bytes memory header
+  ) public view virtual returns (bytes32) {
     bytes memory out;
     bool success;
     (success, out) = GET_VERIFIED_SEAL_BITMAP.staticcall(abi.encodePacked(header));

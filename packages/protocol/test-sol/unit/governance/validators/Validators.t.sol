@@ -3,7 +3,6 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
 
-
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
@@ -24,9 +23,8 @@ import { Utils08 } from "@test-sol/utils08.sol";
 
 import "forge-std/console.sol";
 
-
 contract ValidatorsMock is Validators(true) {
-  function updateValidatorScoreFromSigner(address signer, uint256 uptime) override external {
+  function updateValidatorScoreFromSigner(address signer, uint256 uptime) external override {
     return _updateValidatorScoreFromSigner(signer, uptime);
   }
 
@@ -146,7 +144,7 @@ contract ValidatorsTest is Test, Utils08, ECDSAHelper, TestConstants {
     uint256 groupPayment
   );
 
-  function setUp() virtual public {
+  function setUp() public virtual {
     group = actor("group");
     nonValidator = actor("nonValidator");
     nonOwner = actor("nonOwner");
@@ -694,7 +692,7 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
 }
 
 contract ValidatorsTest_RegisterValidator is ValidatorsTest {
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
@@ -880,7 +878,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValid
 {
   uint256 public constant INDEX = 0;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -949,7 +947,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
 
   uint256 public constant INDEX = 0;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -1046,7 +1044,7 @@ contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirement
 
   address nonRegisteredGroup;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
     nonRegisteredGroup = actor("nonRegisteredGroup");
 
@@ -1119,7 +1117,7 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
   uint256 validatorAffiliationEpochNumber;
   uint256 validatorAdditionEpochNumber;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     otherGroup = actor("otherGroup");
@@ -1241,7 +1239,7 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
   uint256 additionEpoch;
   uint256 deaffiliationEpoch;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -1365,7 +1363,7 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
 contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
   bytes validatorEcdsaPubKey;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     vm.prank(address(accounts));
@@ -1453,7 +1451,7 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
       bytes16(0x06060606060606060606060606060607)
     );
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     vm.prank(address(accounts));
@@ -1589,7 +1587,7 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
       bytes16(0x06060606060606060606060606060607)
     );
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     validatorEcdsaPubKey = _registerValidatorHelper(validator, validatorPk);
@@ -1661,7 +1659,7 @@ contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -1756,10 +1754,9 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers is 
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-
   uint256 public constant INDEX = 0;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -1812,10 +1809,9 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-
   uint256 public constant INDEX = 0;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -1915,7 +1911,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
 
   uint256[] expectedSizeHistory;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -2130,7 +2126,7 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
   uint256 _registrationEpoch;
   uint256 _additionEpoch;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorGroupWithMembers(group, 1);
   }
@@ -2216,7 +2212,7 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
 }
 
 contract ValidatorsTest_ReorderMember is ValidatorsTest {
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorGroupWithMembers(group, 2);
   }
@@ -2264,7 +2260,7 @@ contract ValidatorsTest_ReorderMember is ValidatorsTest {
   }
 }
 contract ValidatorsTest_ReorderMember_L2 is ValidatorsTest {
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorGroupWithMembers(group, 2);
     _whenL2();
@@ -2319,7 +2315,7 @@ contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
 
   uint256 newCommission = commission.unwrap().add(1);
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorGroupHelper(group, 1);
   }
@@ -2380,7 +2376,7 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
 
   uint256 newCommission = commission.unwrap().add(1);
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -2455,7 +2451,7 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -2556,7 +2552,7 @@ contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -2722,7 +2718,7 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
 
   uint256 public _epochScore;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -2807,7 +2803,7 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
   address[] public actualMembershipHistoryGroups;
   uint256[] public actualMembershipHistoryEpochs;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorHelper(validator, validatorPk);
 
@@ -2909,7 +2905,7 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -2967,7 +2963,7 @@ contract ValidatorsTest_GetAccountLockedGoldRequirement is ValidatorsTest {
   uint256[] public actualRequirements;
   uint256[] removalTimestamps;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -3046,7 +3042,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   FixidityLib.Fraction public uptime;
   FixidityLib.Fraction public delegatedFraction;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     delegatedFraction = FixidityLib.newFixedFraction(10, 100);
@@ -3312,7 +3308,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
 }
 
 contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -3337,7 +3333,7 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
   }
 }
 contract ValidatorsTest_ForceDeaffiliateIfValidator_L2 is ValidatorsTest {
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -3377,7 +3373,7 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
 
   EpochInfo[] public epochInfoList;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -3506,7 +3502,7 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  function setUp() override public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -3553,8 +3549,8 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
 contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
-  
-  function setUp() override public {
+
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);

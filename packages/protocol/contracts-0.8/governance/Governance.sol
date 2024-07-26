@@ -7,7 +7,6 @@ import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts8/utils/Address.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
-
 import { IGovernance } from "../../contracts/governance/interfaces/IGovernance.sol";
 import { Proposals } from "./Proposals.sol";
 import { UsingPrecompiles } from "../common/UsingPrecompiles.sol";
@@ -234,7 +233,10 @@ contract Governance is
 
   modifier hotfixTimedOut(bytes32 hash) {
     require(hotfixes[hash].executionTimeLimit > 0, "hotfix not prepared");
-    require(hotfixes[hash].executionTimeLimit < block.timestamp, "hotfix execution time limit not reached");
+    require(
+      hotfixes[hash].executionTimeLimit < block.timestamp,
+      "hotfix execution time limit not reached"
+    );
     _;
   }
 
@@ -259,7 +261,7 @@ contract Governance is
    *   after the referendum stage ends.
    * @param participationBaseline The initial value of the participation baseline.
    * @param participationFloor The participation floor.
-    * @param initParams The init parameters.
+   * @param initParams The init parameters.
    * @dev Should be called only once.
    */
   function initialize(
@@ -292,8 +294,7 @@ contract Governance is
     lastDequeue = block.timestamp;
   }
 
-  receive() external payable {
-  }
+  receive() external payable {}
 
   fallback() external payable {
     require(msg.data.length == 0, "unknown method");
@@ -370,7 +371,13 @@ contract Governance is
     proposal.setDescriptionUrl(descriptionUrl);
     queue.push(proposalCount);
     // solhint-disable-next-line not-rely-on-time
-    emit ProposalQueued(proposalCount, msg.sender, proposal.transactions.length, msg.value, block.timestamp);
+    emit ProposalQueued(
+      proposalCount,
+      msg.sender,
+      proposal.transactions.length,
+      msg.value,
+      block.timestamp
+    );
     return proposalCount;
   }
 
@@ -748,7 +755,10 @@ contract Governance is
       require(!executed, "hotfix already executed");
       require(approved, "hotfix not approved");
       require(councilApproved, "hotfix not approved by security council");
-      require(executionTimeLimit >= block.timestamp, "Execution time limit has already been reached.");
+      require(
+        executionTimeLimit >= block.timestamp,
+        "Execution time limit has already been reached."
+      );
       Proposals.makeMem(values, destinations, data, dataLengths, msg.sender, 0).executeMem();
 
       hotfixes[hash].executed = true;

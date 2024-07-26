@@ -198,7 +198,6 @@ contract Validators is
     uint256 _slashingMultiplierResetPeriod,
     uint256 _maxGroupSize,
     InitParams calldata initParams
- 
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -217,7 +216,7 @@ contract Validators is
    * @param signer The validator signer of the validator account whose score needs updating.
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
    */
-  function updateValidatorScoreFromSigner(address signer, uint256 uptime) virtual external onlyVm {
+  function updateValidatorScoreFromSigner(address signer, uint256 uptime) external virtual onlyVm {
     allowOnlyL1();
     _updateValidatorScoreFromSigner(signer, uptime);
   }
@@ -1062,13 +1061,13 @@ contract Validators is
   }
 
   /**
-    * @notice Returns validator information.
-    * @param account The account that registered the validator.
-    * @return ecdsaPublicKey The ECDSA public key.
-    * @return blsPublicKey The BLS public key.
-    * @return affiliation The address of the validator group the validator is a member of.
-    * @return score The validator's score.
-    * @return signer The address of the validator's signer.
+   * @notice Returns validator information.
+   * @param account The account that registered the validator.
+   * @return ecdsaPublicKey The ECDSA public key.
+   * @return blsPublicKey The BLS public key.
+   * @return affiliation The address of the validator group the validator is a member of.
+   * @return score The validator's score.
+   * @return signer The address of the validator's signer.
    */
   function getValidator(
     address account

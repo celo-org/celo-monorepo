@@ -160,7 +160,9 @@ contract EpochRewards is
    */
   function isReserveLow() external view returns (bool) {
     // critical reserve ratio = 2 - time in second / 25 years
-    FixidityLib.Fraction memory timeSinceInitialization = FixidityLib.newFixed(block.timestamp.sub(startTime));
+    FixidityLib.Fraction memory timeSinceInitialization = FixidityLib.newFixed(
+      block.timestamp.sub(startTime)
+    );
     FixidityLib.Fraction memory m = FixidityLib.newFixed(25 * 365 * 1 days);
     FixidityLib.Fraction memory b = FixidityLib.newFixed(2);
     FixidityLib.Fraction memory criticalRatio;
@@ -222,7 +224,12 @@ contract EpochRewards is
    * @return The underspend adjustment factors.
    * @return The overspend adjustment factors.
    */
-  function getRewardsMultiplierParameters() external view virtual returns (uint256, uint256, uint256) {
+  function getRewardsMultiplierParameters()
+    external
+    view
+    virtual
+    returns (uint256, uint256, uint256)
+  {
     RewardsMultiplierParameters storage params = rewardsMultiplierParams;
     return (
       params.max.unwrap(),

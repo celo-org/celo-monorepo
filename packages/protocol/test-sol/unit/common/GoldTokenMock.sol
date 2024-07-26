@@ -9,7 +9,7 @@ import "@celo-contracts-8/common/GoldToken.sol";
  * @title A mock GoldToken for testing.
  */
 contract GoldTokenMock is GoldToken(true) {
-  uint8 public override constant decimals = 18;
+  uint8 public constant override decimals = 18;
   mapping(address => uint256) balances;
 
   function setTotalSupply(uint256 value) external {
@@ -37,7 +37,7 @@ contract GoldTokenMock is GoldToken(true) {
     balances[a] = value;
   }
 
-  function balanceOf(address a) public override view returns (uint256) {
+  function balanceOf(address a) public view override returns (uint256) {
     return balances[a];
   }
 }

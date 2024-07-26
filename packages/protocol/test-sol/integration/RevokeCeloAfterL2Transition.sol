@@ -27,7 +27,7 @@ import "@celo-contracts-8/governance/Validators.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
 contract ValidatorsMock is Validators(true) {
-  function updateValidatorScoreFromSigner(address signer, uint256 uptime) override external {
+  function updateValidatorScoreFromSigner(address signer, uint256 uptime) external override {
     return _updateValidatorScoreFromSigner(signer, uptime);
   }
 
@@ -274,7 +274,6 @@ contract RevokeCeloAfterL2Transition is Test, ECDSAHelper, Utils08, TestConstant
       _downtimeGracePeriod: downtimeGracePeriod
     });
 
-
     Validators.InitParams memory initParamsStruct = Validators.InitParams({
       commissionUpdateDelay: initParams2._commissionUpdateDelay,
       downtimeGracePeriod: initParams2._downtimeGracePeriod
@@ -294,10 +293,9 @@ contract RevokeCeloAfterL2Transition is Test, ECDSAHelper, Utils08, TestConstant
       initParamsStruct
     );
 
-
     Governance.InitParams memory initParams = Governance.InitParams({
-       baselineUpdateFactor: baselineUpdateFactor.unwrap(),
-       baselineQuorumFactor: baselineQuorumFactor.unwrap()
+      baselineUpdateFactor: baselineUpdateFactor.unwrap(),
+      baselineQuorumFactor: baselineQuorumFactor.unwrap()
     });
 
     governance.initialize(
@@ -351,7 +349,7 @@ contract RevokeCeloAfterL2Transition is Test, ECDSAHelper, Utils08, TestConstant
       accounts.createAccount();
     }
     vm.deal(_group, 10000e18);
-    lockedGold.lock{value:10000e18}();
+    lockedGold.lock{ value: 10000e18 }();
     validators.registerValidatorGroup(commission.unwrap());
     vm.stopPrank();
   }
@@ -395,7 +393,7 @@ contract RevokeCeloAfterL2Transition is Test, ECDSAHelper, Utils08, TestConstant
 
     vm.deal(_validator, 10000e18);
     vm.prank(_validator);
-    lockedGold.lock{value: 10000e18}();
+    lockedGold.lock{ value: 10000e18 }();
 
     bytes memory _ecdsaPubKey = _generateEcdsaPubKey(_validator, _validatorPk);
 
@@ -436,7 +434,7 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
     uint256 pending = 11;
 
     deal(address(this), lockedGoldValue);
-    lockedGold.lock{value:lockedGoldValue}();
+    lockedGold.lock{ value: lockedGoldValue }();
     _registerValidatorGroupWithMembers(group, 1);
 
     election.vote(group, active, address(0), address(0));
@@ -561,7 +559,12 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
       rValidator,
       sValidator
     );
-    releaseGold.authorizeVoteSigner(payable(address(uint160(authorizedVoteSigner))), vVote, rVote, sVote);
+    releaseGold.authorizeVoteSigner(
+      payable(address(uint160(authorizedVoteSigner))),
+      vVote,
+      rVote,
+      sVote
+    );
     releaseGold.lockGold(TOTAL_AMOUNT - 10 ether);
     vm.stopPrank();
 

@@ -10,6 +10,5 @@ import "@mento-core/test/mocks/MockReserve.sol";
 
 // dummy test for artifacts to be generated (for FeeHandler test)
 contract FeeHandlerDummy {
-  function test_Reverts_WhenOracleSlippageIsHigh() public {
-  }
+  function test_Reverts_WhenOracleSlippageIsHigh() public {}
 }

@@ -89,10 +89,10 @@ contract EpochRewardsTest is Test, TestConstants, Utils08 {
     );
 
     EpochRewards.InitParams memory initParams = EpochRewards.InitParams({
-        targetVotingGoldFraction: targetVotingGoldFraction,
-        communityRewardFraction: communityRewardFraction,
-        carbonOffsettingFraction: carbonOffsettingFraction
-  });
+      targetVotingGoldFraction: targetVotingGoldFraction,
+      communityRewardFraction: communityRewardFraction,
+      carbonOffsettingFraction: carbonOffsettingFraction
+    });
 
     epochRewards.initialize(
       address(registry),
@@ -159,10 +159,10 @@ contract EpochRewardsTest_initialize is EpochRewardsTest {
     vm.expectRevert("contract already initialized");
 
     EpochRewards.InitParams memory initParams = EpochRewards.InitParams({
-        targetVotingGoldFraction: targetVotingGoldFraction,
-        communityRewardFraction: communityRewardFraction,
-        carbonOffsettingFraction: carbonOffsettingFraction
-  });
+      targetVotingGoldFraction: targetVotingGoldFraction,
+      communityRewardFraction: communityRewardFraction,
+      carbonOffsettingFraction: carbonOffsettingFraction
+    });
 
     epochRewards.initialize(
       address(registry),
@@ -612,7 +612,7 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
   {
     uint256 totalVotes = (floatingSupply * 9) / 10;
     mockVotes(totalVotes);
-    uint256 expected =159736802333333709330;
+    uint256 expected = 159736802333333709330;
 
     (uint256 result, , ) = epochRewards.getTargetVotingYieldParameters();
     assertApproxEqRel(result, expected, 1e1);

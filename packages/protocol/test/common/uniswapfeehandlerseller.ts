@@ -3,10 +3,7 @@
 // TODO remove magic numbers
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertTransactionRevertWithReason } from '@celo/protocol/lib/test-utils'
-import {
-  RegistryContract,
-  RegistryInstance,
-} from 'types'
+import { RegistryContract, RegistryInstance } from 'types'
 import {
   GoldTokenContract,
   GoldTokenInstance,

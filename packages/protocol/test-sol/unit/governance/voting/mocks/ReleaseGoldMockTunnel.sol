@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.8.20;
 
-
 import "@celo-contracts-8/governance/ReleaseGold.sol";
 import { Test as ForgeTest } from "celo-foundry-8/Test.sol";
 

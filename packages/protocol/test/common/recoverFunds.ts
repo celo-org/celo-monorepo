@@ -4,16 +4,8 @@ import { recoverFunds } from '@celo/protocol/lib/recover-funds'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { expectBigNumberInRange } from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
-import {
-  GetSetV0Instance,
-  ProxyInstance,
-  RegistryContract,
-} from 'types'
-import {
-  CeloDistributionScheduleContract,
-  FreezerContract,
-  GoldTokenContract,
-} from 'types/08'
+import { GetSetV0Instance, ProxyInstance, RegistryContract } from 'types'
+import { CeloDistributionScheduleContract, FreezerContract, GoldTokenContract } from 'types/08'
 import { SOLIDITY_08_PACKAGE } from '../../contractPackages'
 import { ArtifactsSingleton } from '../../lib/artifactsSingleton'
 

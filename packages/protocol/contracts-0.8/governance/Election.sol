@@ -810,15 +810,22 @@ contract Election is
   }
 
   // Override the conflicting function
-  function numberValidatorsInCurrentSet() public view override(UsingPrecompiles, IElection) returns (uint256) {
-      // Specify the base contract's implementation to use
-      return UsingPrecompiles.numberValidatorsInCurrentSet();
+  function numberValidatorsInCurrentSet()
+    public
+    view
+    override(UsingPrecompiles, IElection)
+    returns (uint256)
+  {
+    // Specify the base contract's implementation to use
+    return UsingPrecompiles.numberValidatorsInCurrentSet();
   }
 
-  function validatorSignerAddressFromCurrentSet(uint256 index) public view override(UsingPrecompiles, IElection) returns (address) {
-      // Specify the base contract's implementation to use
-      return UsingPrecompiles.validatorSignerAddressFromCurrentSet(index);
-    }
+  function validatorSignerAddressFromCurrentSet(
+    uint256 index
+  ) public view override(UsingPrecompiles, IElection) returns (address) {
+    // Specify the base contract's implementation to use
+    return UsingPrecompiles.validatorSignerAddressFromCurrentSet(index);
+  }
 
   /**
    * @notice Returns get current validator signers using the precompiles.

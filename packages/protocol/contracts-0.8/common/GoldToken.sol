@@ -163,7 +163,7 @@ contract GoldToken is
     );
 
     bool success;
-    (success, ) = TRANSFER.call{value: 0, gas: gasleft()}(abi.encode(from, to, value));
+    (success, ) = TRANSFER.call{ value: 0, gas: gasleft() }(abi.encode(from, to, value));
     require(success, "CELO transfer failed");
 
     allowed[from][msg.sender] = allowed[from][msg.sender].sub(value);
@@ -186,7 +186,7 @@ contract GoldToken is
     totalSupply_ = totalSupply_.add(value);
 
     bool success;
-    (success, ) = TRANSFER.call{value: 0, gas: gasleft()}(abi.encode(address(0), to, value));
+    (success, ) = TRANSFER.call{ value: 0, gas: gasleft() }(abi.encode(address(0), to, value));
     require(success, "CELO transfer failed");
 
     emit Transfer(address(0), to, value);
@@ -220,7 +220,7 @@ contract GoldToken is
   /**
    * @return The number of decimal places to which CELO is divisible.
    */
-  function decimals() external virtual view returns (uint8) {
+  function decimals() external view virtual returns (uint8) {
     return DECIMALS;
   }
 
@@ -272,7 +272,7 @@ contract GoldToken is
    * @param _owner The address to query the balance of.
    * @return The balance of the specified address.
    */
-  function balanceOf(address _owner) public virtual view returns (uint256) {
+  function balanceOf(address _owner) public view virtual returns (uint256) {
     return _owner.balance;
   }
 
@@ -301,7 +301,7 @@ contract GoldToken is
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
 
     bool success;
-    (success, ) = TRANSFER.call{value: 0, gas: gasleft()}(abi.encode(msg.sender, to, value));
+    (success, ) = TRANSFER.call{ value: 0, gas: gasleft() }(abi.encode(msg.sender, to, value));
     require(success, "CELO transfer failed");
     emit Transfer(msg.sender, to, value);
     return true;

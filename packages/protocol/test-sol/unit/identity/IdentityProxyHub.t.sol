@@ -225,7 +225,7 @@ contract IdentityProxyTestMakeCall_WhenCalledByContractRelatedToTheIdentifier is
 
   function test_CanSendAPayment() public {
     uint256 balanceBefore = address(identityProxyTest).balance;
-    identityProxyHub.makeCall{value:100}(
+    identityProxyHub.makeCall{ value: 100 }(
       identifier,
       address(identityProxyTest),
       abi.encodeWithSignature("payMe()")

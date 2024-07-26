@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.7 <0.8.20;
 
-
 import "celo-foundry-8/Test.sol";
 import "@celo-contracts-8/common/FeeHandler.sol";
 import { TestConstants } from "@test-sol/constants.sol";
@@ -82,7 +81,7 @@ contract FeeHandlerTest is Test, TestConstants {
     maxSlippage = FixidityLib.newFixedFraction(1, 100).unwrap();
 
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
-    
+
     address stableTokenAddress = actor("stableToken");
     address stableTokenEURAddress = actor("stableTokenEUR");
     address exchangeUSDAddress = actor("exchangeUSD");
@@ -638,7 +637,7 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTest {
 
     deployCodeTo("MockUniswapV2Factory.sol", abi.encode(address(0)), uniswapFactoryAddress);
     deployCodeTo("MockUniswapV2Factory.sol", abi.encode(address(0)), uniswapFactory2Address);
-    
+
     address uniswapRouterAddress = actor("uniswapRouter");
     address uniswapRouter2Address = actor("uniswapRouter2");
 
@@ -646,9 +645,17 @@ contract FeeHandlerTest_SellNonMentoTokens is FeeHandlerTest {
     uniswapFactory2 = IUniswapV2Factory(uniswapFactory2Address);
 
     bytes32 initCodePairHash = uniswapFactory.INIT_CODE_PAIR_HASH();
-    deployCodeTo("MockUniswapV2Router02.sol", abi.encode(uniswapFactoryAddress, address(0), initCodePairHash), uniswapRouterAddress);
-    deployCodeTo("MockUniswapV2Router02.sol", abi.encode(uniswapFactory2Address, address(0), initCodePairHash), uniswapRouter2Address);
-    
+    deployCodeTo(
+      "MockUniswapV2Router02.sol",
+      abi.encode(uniswapFactoryAddress, address(0), initCodePairHash),
+      uniswapRouterAddress
+    );
+    deployCodeTo(
+      "MockUniswapV2Router02.sol",
+      abi.encode(uniswapFactory2Address, address(0), initCodePairHash),
+      uniswapRouter2Address
+    );
+
     uniswapRouter = IUniswapV2Router02(uniswapRouterAddress);
 
     uniswapRouter2 = IUniswapV2Router02(uniswapRouter2Address);
@@ -885,7 +892,7 @@ contract FeeHandlerTest_HandleMentoTokens is FeeHandlerTest {
 
 contract FeeHandlerTest_HandleAll is FeeHandlerTest {
   using FixidityLib for FixidityLib.Fraction;
-  
+
   modifier setBurnFraction() {
     feeHandler.setBurnFraction(FixidityLib.newFixedFraction(80, 100).unwrap());
     _;

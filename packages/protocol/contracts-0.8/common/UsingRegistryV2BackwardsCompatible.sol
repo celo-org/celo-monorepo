@@ -4,7 +4,6 @@ pragma solidity >=0.8.0 <0.8.20;
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
-
 import "./UsingRegistryV2.sol";
 
 contract UsingRegistryV2BackwardsCompatible is UsingRegistryV2 {

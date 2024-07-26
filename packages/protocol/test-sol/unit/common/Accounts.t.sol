@@ -638,7 +638,7 @@ contract AccountsTest_setPaymentDelegation is AccountsTest {
 
 contract AccountsTest_deletePaymentDelegation is AccountsTest {
   using FixidityLib for FixidityLib.Fraction;
-  
+
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
 
