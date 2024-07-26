@@ -15,7 +15,9 @@ export STEPS_TRACING="--steps-tracing" #  Steps tracing used for debug calls ret
 
 # Forge migration script configurations (Source: https://book.getfoundry.sh/reference/forge/forge-script)
 export MIGRATION_SCRIPT_PATH="migrations_sol/Migration.s.sol" # Path to migration script
+export MIGRATION_L2_SCRIPT_PATH="migrations_sol/MigrationL2.s.sol" # Path to L2 migration script
 export MIGRATION_TARGET_CONTRACT="Migration" #  The name of the contract you want to run.
+export MIGRATION_L2_TARGET_CONTRACT="MigrationL2" #  The name of the contract you want to run.
 export BROADCAST="--broadcast" # Broadcasts the transactions. Enable: "--broadcast" / Disable: ""
 export SKIP_SIMULATION="" # Skips on-chain simulation. Enable: "--skip-simulation" / Disable: ""
 export NON_INTERACTIVE="--non-interactive" # Remove interactive prompts which appear if the contract is near the EIP-170 size limit.
