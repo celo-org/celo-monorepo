@@ -108,7 +108,7 @@
     "prompts": "^2.0.1",
     "solhint": "^4.5.4",
     "semver": "^7.5.4",
-    "solidity-bytes-utils": "0.0.7",
+    "solidity-bytes-utils": "0.8.2",
     "truffle": "5.9.0",
     "truffle-security": "^1.7.3",
     "weak-map": "^1.0.5",

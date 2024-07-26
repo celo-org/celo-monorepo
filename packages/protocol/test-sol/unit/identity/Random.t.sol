@@ -1,12 +1,13 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
-import { Utils } from "@test-sol/utils.sol";
+import "celo-foundry-8/Test.sol";
+
+import { Random } from "@celo-contracts-8/identity/Random.sol";
+import { RandomTest } from "@celo-contracts-8/identity/test/RandomTest.sol";
+import { IsL2Check } from "@celo-contracts-8/common/IsL2Check.sol";
+import { Utils08 } from "@test-sol/utils08.sol";
 import { TestConstants } from "@test-sol/constants.sol";
-
-import "@celo-contracts/identity/Random.sol";
-import "@celo-contracts/identity/test/RandomTest.sol";
 
 contract RandomnessTest_SetRandomnessRetentionWindow is Test, TestConstants, IsL2Check {
   event RandomnessBlockRetentionWindowSet(uint256 value);
@@ -42,9 +43,9 @@ contract RandomnessTest_SetRandomnessRetentionWindow is Test, TestConstants, IsL
   }
 }
 
-contract RandomnessTest_AddTestRandomness is Test, TestConstants, Utils, IsL2Check {
+contract RandomnessTest_AddTestRandomness is Test, TestConstants, Utils08, IsL2Check {
   uint256 constant RETENTION_WINDOW = 5;
-  uint256 constant EPOCH_SIZE = 10;
+  uint256 constant EPOCH_SIZE_NUMBER = 10;
 
   RandomTest random;
 
@@ -140,21 +141,21 @@ contract RandomnessTest_AddTestRandomness is Test, TestConstants, Utils, IsL2Che
     bytes32 defaultValue = 0x0000000000000000000000000000000000000000000000000000000000000002;
     bytes32 valueForLastBlockOfEpoch = 0x0000000000000000000000000000000000000000000000000000000000000001;
 
-    ph.setEpochSize(EPOCH_SIZE);
+    ph.setEpochSize(EPOCH_SIZE_NUMBER);
     random.setRandomnessBlockRetentionWindow(RETENTION_WINDOW);
 
     // Epoch
     // [1         , 2                           , 2             , 3                                                        ]
     // Blocks
-    // [EPOCH_SIZE, EPOCH_SIZE+1... EPOCH_SIZE+n, 2 * EPOCH_SIZE, 2 * EPOCH_SIZE + 1... 2 * EPOCH_SIZE + RETENTION_WINDOW-1]
+    // [EPOCH_SIZE_NUMBER, EPOCH_SIZE_NUMBER+1... EPOCH_SIZE_NUMBER+n, 2 * EPOCH_SIZE_NUMBER, 2 * EPOCH_SIZE_NUMBER + 1... 2 * EPOCH_SIZE_NUMBER + RETENTION_WINDOW-1]
 
     // go to last block of epoch 1
-    vm.roll(EPOCH_SIZE);
+    vm.roll(EPOCH_SIZE_NUMBER);
     // Add randomness to epoch's last block
     random.addTestRandomness(block.number, valueForLastBlockOfEpoch);
 
     // Add a different randomness to all but last epoch blocks
-    for (uint256 i = 0; i < EPOCH_SIZE - 1; i++) {
+    for (uint256 i = 0; i < EPOCH_SIZE_NUMBER - 1; i++) {
       blockTravel(1);
       random.addTestRandomness(block.number, defaultValue);
     }
@@ -171,7 +172,7 @@ contract RandomnessTest_AddTestRandomness is Test, TestConstants, Utils, IsL2Che
       random.addTestRandomness(block.number, defaultValue);
     }
 
-    return EPOCH_SIZE * 2;
+    return EPOCH_SIZE_NUMBER * 2;
   }
 
   function test_shouldRetainTheLastEpochBlocksRandomness_WhenRelyingOnTheLastBlockOfEachEpochsRandomness()
@@ -213,7 +214,7 @@ contract RandomnessTest_AddTestRandomness is Test, TestConstants, Utils, IsL2Che
     uint256 lastBlockOfEpoch = setUpWhenRelyingOnTheLastBlockOfEachEpochsRandomness();
 
     vm.expectRevert("Cannot query randomness older than the stored history");
-    random.getTestRandomness(lastBlockOfEpoch - EPOCH_SIZE, block.number);
+    random.getTestRandomness(lastBlockOfEpoch - EPOCH_SIZE_NUMBER, block.number);
   }
 
   function test_Reverts_WhenCalledOnL2() public {
@@ -225,7 +226,7 @@ contract RandomnessTest_AddTestRandomness is Test, TestConstants, Utils, IsL2Che
   }
 }
 
-contract RandomnessTest_RevealAndCommit is Test, TestConstants, Utils, IsL2Check {
+contract RandomnessTest_RevealAndCommit is Test, TestConstants, Utils08, IsL2Check {
   address constant ACCOUNT = address(0x01);
   bytes32 constant RANDONMESS = bytes32(uint256(0x00));
 

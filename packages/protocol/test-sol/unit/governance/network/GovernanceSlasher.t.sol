@@ -1,16 +1,16 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
-import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts-8/common/Accounts.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts/governance/Proposals.sol";
-import "@celo-contracts/governance/test/MockLockedGold.sol";
+import "@celo-contracts-8/governance/Proposals.sol";
+import "@celo-contracts-8/governance/test/MockLockedGold.sol";
 
-import "@celo-contracts/governance/GovernanceSlasher.sol";
+import "@celo-contracts-8/governance/GovernanceSlasher.sol";
 
 contract GovernanceSlasherTest is Test, TestConstants {
   event SlashingApproved(address indexed account, uint256 amount);

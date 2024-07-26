@@ -18,6 +18,9 @@ import "../../contracts/governance/interfaces/IValidators.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
 import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import "../../contracts/governance/interfaces/IElection.sol";
+import "../../contracts/common/interfaces/IReserve.sol";
+import "../../contracts/identity/interfaces/IAttestations.sol";
+import "../../contracts/identity/interfaces/IRandom.sol";
 
 import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
 
@@ -129,5 +132,17 @@ contract UsingRegistry is Ownable {
 
   function getCeloDistributionSchedule() internal view returns (ICeloDistributionSchedule) {
     return ICeloDistributionSchedule(registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID));
+  }
+
+  function getReserve() internal view returns (IReserve) {
+    return IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
+  }
+
+  function getAttestations() internal view returns (IAttestations) {
+    return IAttestations(registry.getAddressForOrDie(ATTESTATIONS_REGISTRY_ID));
+  }
+
+  function getRandom() internal view returns (IRandom) {
+    return IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
   }
 }

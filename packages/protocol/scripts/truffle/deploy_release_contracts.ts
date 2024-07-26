@@ -5,12 +5,8 @@ import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import fs from 'fs'
 import prompts from 'prompts'
-import {
-  ReleaseGoldContract,
-  ReleaseGoldMultiSigContract,
-  ReleaseGoldMultiSigProxyContract,
-  ReleaseGoldProxyContract,
-} from 'types'
+import { ReleaseGoldMultiSigProxyContract, ReleaseGoldProxyContract } from 'types'
+import { ReleaseGoldContract, ReleaseGoldMultiSigContract } from 'types/08'
 
 let argv: any
 let releases: any

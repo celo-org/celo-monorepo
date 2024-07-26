@@ -1,15 +1,14 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
 // Helper contracts
-import { Test } from "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
 import { GoldTokenMock } from "@test-sol/unit/common/GoldTokenMock.sol";
-import { FeeHandlerSeller } from "@celo-contracts/common/FeeHandlerSeller.sol";
-import { MentoFeeHandlerSeller } from "@celo-contracts/common/MentoFeeHandlerSeller.sol";
-import { UniswapFeeHandlerSeller } from "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
+import { FeeHandlerSeller } from "@celo-contracts-8/common/FeeHandlerSeller.sol";
+import { MentoFeeHandlerSeller } from "@celo-contracts-8/common/MentoFeeHandlerSeller.sol";
+import { UniswapFeeHandlerSeller } from "@celo-contracts-8/common/UniswapFeeHandlerSeller.sol";
 
 contract FeeHandlerSellerTest is Test, TestConstants {
   // Actors

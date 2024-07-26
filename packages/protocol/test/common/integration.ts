@@ -17,6 +17,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { linkedListChanges, zip } from '@celo/utils/lib/collections'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
+import { RegistryInstance } from 'types'
 import {
   ElectionInstance,
   FeeCurrencyWhitelistInstance,
@@ -26,8 +27,7 @@ import {
   GovernanceInstance,
   GovernanceSlasherInstance,
   LockedGoldInstance,
-  RegistryInstance,
-} from 'types'
+} from 'types/08'
 import {
   ExchangeContract,
   ExchangeInstance,

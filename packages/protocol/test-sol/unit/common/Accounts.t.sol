@@ -1,19 +1,18 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Registry.sol";
-import "@celo-contracts/common/Accounts.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts-8/common/Accounts.sol";
+import "@celo-contracts-8/governance/test/MockValidators.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
 
 contract AccountsTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
-  Registry registry;
+  IRegistry registry;
   Accounts accounts;
   MockValidators validators;
 
@@ -79,13 +78,13 @@ contract AccountsTest is Test, TestConstants {
   event OffchainStorageRootRemoved(address indexed account, bytes url, uint256 index);
   event PaymentDelegationSet(address indexed beneficiary, uint256 fraction);
 
-  function setUp() public {
+  function setUp() public virtual {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
     accounts = new Accounts(true);
     validators = new MockValidators();
 
-    registry = Registry(REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("Accounts", address(accounts));
@@ -202,7 +201,7 @@ contract AccountsTest is Test, TestConstants {
 }
 
 contract AccountsTest_createAccount is AccountsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -220,7 +219,7 @@ contract AccountsTest_createAccount is AccountsTest {
 }
 
 contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -255,7 +254,7 @@ contract AccountsTest_setAccountDataEncryptionKey is AccountsTest {
 }
 
 contract AccountsTest_setAccount is AccountsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -341,7 +340,7 @@ contract AccountsTest_setAccount is AccountsTest {
 }
 
 contract AccountsTest_setWalletAddress is AccountsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -391,7 +390,7 @@ contract AccountsTest_setWalletAddress is AccountsTest {
 }
 
 contract AccountsTest_setMetadataURL is AccountsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -415,7 +414,7 @@ contract AccountsTest_setMetadataURL is AccountsTest {
 }
 
 contract AccountsTest_batchGetMetadataURL is AccountsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -465,7 +464,7 @@ contract AccountsTest_batchGetMetadataURL is AccountsTest {
 }
 
 contract AccountsTest_addStorageRoot is AccountsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -511,7 +510,7 @@ contract AccountsTest_addStorageRoot is AccountsTest {
 }
 
 contract AccountsTest_removeStorageRoot is AccountsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -587,11 +586,13 @@ contract AccountsTest_removeStorageRoot is AccountsTest {
 }
 
 contract AccountsTest_setPaymentDelegation is AccountsTest {
+  using FixidityLib for FixidityLib.Fraction;
+
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
   uint256 badFraction = FixidityLib.newFixedFraction(12, 10).unwrap();
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -636,10 +637,12 @@ contract AccountsTest_setPaymentDelegation is AccountsTest {
 }
 
 contract AccountsTest_deletePaymentDelegation is AccountsTest {
+  using FixidityLib for FixidityLib.Fraction;
+
   address beneficiary = actor("beneficiary");
   uint256 fraction = FixidityLib.newFixedFraction(2, 10).unwrap();
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     accounts.createAccount();
     accounts.setPaymentDelegation(beneficiary, fraction);
@@ -666,7 +669,7 @@ contract AccountsTest_deletePaymentDelegation is AccountsTest {
 }
 
 contract AccountsTest_setName is AccountsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -702,7 +705,7 @@ contract AccountsTest_GenericAuthorization is AccountsTest {
   bytes32 r;
   bytes32 s;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     (signer, signerPK) = actorWithPK("signer");
     (signer2, signer2PK) = actorWithPK("signer2");
@@ -888,7 +891,7 @@ contract AccountsTest_BackwardCompatibility is AccountsTest {
     Validator
   }
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     (signer, signerPK) = actorWithPK("signer");

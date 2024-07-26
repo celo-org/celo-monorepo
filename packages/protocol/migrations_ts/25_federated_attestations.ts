@@ -1,6 +1,6 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
-import { FederatedAttestationsInstance } from 'types'
+import { FederatedAttestationsInstance } from 'types/08'
 
 const initializeArgs = async () => {
   return []

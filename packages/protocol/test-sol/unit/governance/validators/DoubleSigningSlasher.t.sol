@@ -1,19 +1,21 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import { TestWithoutPrecompiles } from "celo-foundry-8/TestWithoutPrecompiles.sol";
 import { TestConstants } from "@test-sol/constants.sol";
-
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Registry.sol";
-import "@celo-contracts/common/Accounts.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
-import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/DoubleSigningSlasher.sol";
-import "@celo-contracts/governance/test/MockUsingPrecompiles.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts-8/common/Accounts.sol";
+import "@celo-contracts-8/governance/test/MockValidators.sol";
+import "@celo-contracts-8/governance/test/MockLockedGold.sol";
+import "@celo-contracts-8/governance/DoubleSigningSlasher.sol";
+import "@celo-contracts-8/governance/test/MockUsingPrecompiles.sol";
 
-contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecompiles, Test {
+contract DoubleSigningSlasherTest is
+  DoubleSigningSlasher(true),
+  MockUsingPrecompiles,
+  TestWithoutPrecompiles
+{
   struct SlashParams {
     address signer;
     uint256 index;
@@ -49,14 +51,54 @@ contract DoubleSigningSlasherTest is DoubleSigningSlasher(true), MockUsingPrecom
       slashParams.groupElectionIndices
     );
   }
+
+  // Override the conflicting function
+  function getVerifiedSealBitmapFromHeader(
+    bytes memory header
+  ) public view override(UsingPrecompiles, MockUsingPrecompiles) returns (bytes32) {
+    return MockUsingPrecompiles.getVerifiedSealBitmapFromHeader(header);
+  }
+
+  function numberValidatorsInSet(
+    uint256 blockNumber
+  ) public view override(UsingPrecompiles, MockUsingPrecompiles) returns (uint256) {
+    // Choose which base contract's implementation to use
+    return MockUsingPrecompiles.numberValidatorsInSet(blockNumber);
+    // or return UsingPrecompiles.numberValidatorsInSet(blockNumber);
+  }
+
+  // Override the conflicting function
+  function getBlockNumberFromHeader(
+    bytes memory header
+  ) public view override(UsingPrecompiles, MockUsingPrecompiles) returns (uint256) {
+    // Choose which base contract's implementation to use
+    return MockUsingPrecompiles.getBlockNumberFromHeader(header);
+    // or return UsingPrecompiles.getBlockNumberFromHeader(header);
+  }
+
+  function getParentSealBitmap(
+    uint256 blockNumber
+  ) public view override(UsingPrecompiles, MockUsingPrecompiles) returns (bytes32) {
+    // Choose which base contract's implementation to use
+    return MockUsingPrecompiles.getParentSealBitmap(blockNumber);
+    // or return UsingPrecompiles.getParentSealBitmap(blockNumber);
+  }
+
+  function hashHeader(
+    bytes memory header
+  ) public view override(UsingPrecompiles, MockUsingPrecompiles) returns (bytes32) {
+    // Choose which base contract's implementation to use
+    return MockUsingPrecompiles.hashHeader(header);
+    // or return UsingPrecompiles.hashHeader(header);
+  }
 }
 
-contract DoubleSigningSlasherBaseTest is Test, TestConstants {
+contract DoubleSigningSlasherBaseTest is TestWithoutPrecompiles, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
   SlashingIncentives public expectedSlashingIncentives;
 
-  Registry registry;
+  IRegistry registry;
   Accounts accounts;
   MockValidators validators;
   MockLockedGold lockedGold;
@@ -95,7 +137,7 @@ contract DoubleSigningSlasherBaseTest is Test, TestConstants {
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
   event DoubleSigningSlashPerformed(address indexed validator, uint256 indexed blockNumber);
 
-  function setUp() public {
+  function setUp() public virtual {
     ph.setEpochSize(100);
     (nonOwner, nonOwnerPK) = actorWithPK("nonOwner");
     (validator, validatorPK) = actorWithPK("validator");
@@ -111,7 +153,7 @@ contract DoubleSigningSlasherBaseTest is Test, TestConstants {
     lockedGold = new MockLockedGold();
     slasher = new DoubleSigningSlasherTest();
 
-    registry = Registry(REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     accounts.createAccount();
 
@@ -235,7 +277,7 @@ contract DoubleSigningSlasherSlash is DoubleSigningSlasherBaseTest {
   address[] groupElectionGreaters = new address[](0);
   uint256[] groupElectionIndices = new uint256[](0);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     slasher.setBlockNumber(headerA, blockNumber);

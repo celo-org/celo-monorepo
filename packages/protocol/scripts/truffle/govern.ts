@@ -4,8 +4,7 @@ import {
   getDeployedProxiedContract,
   submitMultiSigTransaction,
 } from '@celo/protocol/lib/web3-utils'
-import { MultiSigInstance } from 'types'
-
+import { MultiSigInstance } from 'types/08'
 /*
  * A simple script to process transactions via a MultiSig
  *

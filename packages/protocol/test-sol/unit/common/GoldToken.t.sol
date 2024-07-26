@@ -1,14 +1,16 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
-import "@celo-contracts/common/GoldToken.sol";
+import "celo-foundry-8/Test.sol";
+import "@celo-contracts-8/common/GoldToken.sol";
+import { CeloDistributionSchedule } from "@celo-contracts-8/common/CeloDistributionSchedule.sol";
 import "@test-sol/unit/common/GoldTokenMock.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
 
 contract GoldTokenTest is Test, TestConstants, IsL2Check {
   GoldToken celoToken;
+  CeloDistributionSchedule celoDistributionSchedule;
   IRegistry registry;
 
   uint256 constant ONE_CELOTOKEN = 1000000000000000000;
@@ -25,14 +27,15 @@ contract GoldTokenTest is Test, TestConstants, IsL2Check {
     _;
   }
 
-  function setUp() public {
+  function setUp() public virtual {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
     registry = IRegistry(REGISTRY_ADDRESS);
 
     celoTokenOwner = actor("celoTokenOwner");
-    celoTokenDistributionSchedule = actor("celoTokenDistributionSchedule");
     vm.prank(celoTokenOwner);
     celoToken = new GoldToken(true);
+    celoDistributionSchedule = new CeloDistributionSchedule(false);
+    celoTokenDistributionSchedule = address(celoDistributionSchedule);
     vm.prank(celoTokenOwner);
     celoToken.setRegistry(REGISTRY_ADDRESS);
     registry.setAddressFor("CeloDistributionSchedule", celoTokenDistributionSchedule);
@@ -44,7 +47,7 @@ contract GoldTokenTest is Test, TestConstants, IsL2Check {
 }
 
 contract GoldTokenTest_general is GoldTokenTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -94,7 +97,7 @@ contract GoldTokenTest_general is GoldTokenTest {
 }
 
 contract GoldTokenTest_transfer is GoldTokenTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -134,7 +137,7 @@ contract GoldTokenTest_transfer is GoldTokenTest {
 }
 
 contract GoldTokenTest_transferFrom is GoldTokenTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     vm.prank(sender);
     celoToken.approve(receiver, ONE_CELOTOKEN);
@@ -180,7 +183,7 @@ contract GoldTokenTest_burn is GoldTokenTest {
   uint256 startBurn;
   address burnAddress = address(0x000000000000000000000000000000000000dEaD);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     startBurn = celoToken.getBurnedAmount();
   }
@@ -267,7 +270,7 @@ contract CeloTokenMockTest is Test, TestConstants {
     _;
   }
 
-  function setUp() public {
+  function setUp() public virtual {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
     registry = IRegistry(REGISTRY_ADDRESS);
 
@@ -280,7 +283,7 @@ contract CeloTokenMockTest is Test, TestConstants {
 }
 
 contract CeloTokenMock_circulatingSupply is CeloTokenMockTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 

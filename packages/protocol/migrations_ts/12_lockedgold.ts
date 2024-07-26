@@ -4,7 +4,7 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { LockedGoldInstance, RegistryInstance } from 'types'
+import { IRegistryInstance, LockedGoldInstance } from 'types/08'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [config.registry.predeployedProxyAddress, config.lockedGold.unlockingPeriod]
@@ -16,7 +16,7 @@ module.exports = deploymentForCoreContract<LockedGoldInstance>(
   CeloContractName.LockedGold,
   initializeArgs,
   async (lockedGold: LockedGoldInstance) => {
-    const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
+    const registry = await getDeployedProxiedContract<IRegistryInstance>('Registry', artifacts)
     await registry.setAddressFor(CeloContractName.LockedCelo, lockedGold.address)
   }
 )

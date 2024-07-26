@@ -4,7 +4,7 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { DowntimeSlasherInstance, LockedGoldInstance } from 'types'
+import { DowntimeSlasherInstance, LockedGoldInstance } from 'types/08'
 
 const initializeArgs = async (_: string): Promise<any[]> => {
   return [

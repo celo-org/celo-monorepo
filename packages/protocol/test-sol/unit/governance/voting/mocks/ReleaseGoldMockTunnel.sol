@@ -1,9 +1,8 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "@celo-contracts/governance/ReleaseGold.sol";
-import { Test as ForgeTest } from "forge-std/Test.sol";
+import "@celo-contracts-8/governance/ReleaseGold.sol";
+import { Test as ForgeTest } from "celo-foundry-8/Test.sol";
 
 contract ReleaseGoldMockTunnel is ForgeTest {
   ReleaseGold private releaseGoldTunnel;
@@ -30,7 +29,7 @@ contract ReleaseGoldMockTunnel is ForgeTest {
   }
 
   constructor(address _releaseGoldContractAddress) public {
-    releaseGoldContractAddress = address(uint160(_releaseGoldContractAddress));
+    releaseGoldContractAddress = payable(_releaseGoldContractAddress);
     releaseGoldTunnel = ReleaseGold(releaseGoldContractAddress);
   }
 
@@ -59,17 +58,21 @@ contract ReleaseGoldMockTunnel is ForgeTest {
       );
     }
 
+    ReleaseGold.ReleaseGoldInitParams memory canVoteValidate = ReleaseGold.ReleaseGoldInitParams(
+      params2._canValidate,
+      params2._canVote,
+      params2.registryAddress,
+      params2.subjectToLiquidityProvision
+    );
+
     bytes memory dataSecondHalf;
     {
       // Encode the second half of the parameters
       dataSecondHalf = abi.encode(
         params2._releaseOwner,
         params2._refundAddress,
-        params2.subjectToLiquidityProvision,
         params2.initialDistributionRatio,
-        params2._canValidate,
-        params2._canVote,
-        params2.registryAddress
+        canVoteValidate
       );
     }
 

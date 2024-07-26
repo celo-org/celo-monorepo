@@ -3,7 +3,8 @@ import {
   deploymentForCoreContract,
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
-import { AccountsInstance, RegistryInstance } from 'types'
+import { RegistryInstance } from 'types'
+import { AccountsInstance } from 'types/08'
 
 const initializeArgs = async (): Promise<[string]> => {
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
