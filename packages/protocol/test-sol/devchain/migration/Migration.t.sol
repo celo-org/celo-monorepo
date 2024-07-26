@@ -9,7 +9,7 @@ import { MigrationsConstants } from "@migrations-sol/constants.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
-import "@celo-contracts/common/interfaces/ICeloToken.sol";
+// import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts-8/common/UsingRegistry.sol";
 
 contract MigrationTest is Test, TestConstants, UsingRegistry {
@@ -127,7 +127,7 @@ contract RegistryMigrationTest is MigrationTest, MigrationsConstants {
 
 contract RegistryMigrationTest is MigrationTest, MigrationsConstants {
   function test_CeloSupplyNonZero() public {
-    uint256 celoSupply = ICeloToken(address(getCeloToken())).totalSupply();
+    uint256 celoSupply = getCeloToken().totalSupply();
     assert(celoSupply > 0, "Celo supply is non-zero");
   }
 }
