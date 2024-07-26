@@ -120,11 +120,13 @@ contract UsingPrecompiles is IsL2Check {
    * @return Size of the current elected validator set.
    */
   function numberValidatorsInCurrentSet() public view returns (uint256) {
-    bytes memory out;
-    bool success;
-    (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(uint256(block.number)));
-    require(success, "error calling numberValidatorsInCurrentSet precompile");
-    return getUint256FromBytes(out, 0);
+    // TODO make this a governable parameter on validator on L2
+    return 110;
+    // bytes memory out;
+    // bool success;
+    // (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(uint256(block.number)));
+    // require(success, "error calling numberValidatorsInCurrentSet precompile");
+    // return getUint256FromBytes(out, 0);
   }
 
   /**

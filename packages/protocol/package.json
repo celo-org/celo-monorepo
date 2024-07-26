@@ -13,6 +13,8 @@
     "clean:foundry": "rm -rf cache out",
     "test": "rm test/**/*.js ; node runTests.js",
     "test:scripts": "yarn ts-node scripts/run-scripts-tests.ts --testPathPattern=scripts/",
+    "test:epoch": "forge test  --match-contract ValidatorIntegrationTest --fork-url localhost:8546 --gas-report",
+    "test:forge": "forge test",
     "quicktest": "./scripts/bash/quicktest.sh",
     "test:coverage": "yarn run test --coverage",
     "ci:test-make-release": "./scripts/bash/release-on-devchain.sh",

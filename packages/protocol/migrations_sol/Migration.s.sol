@@ -13,6 +13,8 @@ import "@migrations-sol/HelperInterFaces.sol";
 import { Constants } from "@migrations-sol/constants.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 
+import "@celo-contracts/common/interfaces/ICeloToken.sol"; // TODO right order for this
+
 // Core contract imports on Solidity 0.5
 import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts/common/interfaces/IProxyFactory.sol";
@@ -287,6 +289,10 @@ contract Migration is Script, UsingRegistry, Constants {
     );
 
     addToRegistry("CeloToken", celoProxyAddress);
+
+    // TODO make this number dynamic and right
+    // ICeloToken(celoProxyAddress).increaseSupply(60e3 * 1e18 * 9); // anvil has 9 address by default
+
     bool frozen = abi.decode(json.parseRaw(".goldToken.frozen"), (bool));
     if (frozen) {
       getFreezer().freeze(celoProxyAddress);

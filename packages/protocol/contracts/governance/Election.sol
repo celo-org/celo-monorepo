@@ -16,6 +16,8 @@ import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/Heap.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
+import "forge-std/console.sol";
+
 contract Election is
   IElection,
   ICeloVersionedContract,
@@ -732,6 +734,14 @@ contract Election is
     return votes.active.total;
   }
 
+  function getRequiredVotes() external view returns (uint256) {
+    return electabilityThreshold.multiply(FixidityLib.newFixed(getTotalVotes())).fromFixed();
+  }
+
+  function _getRequiredVotes() internal view returns (uint256) {
+    return electabilityThreshold.multiply(FixidityLib.newFixed(getTotalVotes())).fromFixed();
+  }
+
   /**
    * @notice Returns a list of elected validators with seats allocated to groups via the D'Hondt
    *   method.
@@ -744,9 +754,7 @@ contract Election is
   ) public view returns (address[] memory) {
     // Groups must have at least `electabilityThreshold` proportion of the total votes to be
     // considered for the election.
-    uint256 requiredVotes = electabilityThreshold
-      .multiply(FixidityLib.newFixed(getTotalVotes()))
-      .fromFixed();
+    uint256 requiredVotes = _getRequiredVotes();
     // Only consider groups with at least `requiredVotes` but do not consider more groups than the
     // max number of electable validators.
     uint256 numElectionGroups = votes.total.eligible.numElementsGreaterThan(

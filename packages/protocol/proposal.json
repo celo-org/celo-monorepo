@@ -1,0 +1,152 @@
+[
+  {
+    "contract": "AccountsProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0xe88b686d624F09eD8B84DaCDdF9288A911f768Ad"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "AttestationsProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x65F80ad5023aE2d641173798d960811fD0F2860B"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "BlockchainParametersProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x426A60929276198505d62A305758EDaFBB545021"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "DoubleSigningSlasherProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0xf750986359e73874832F761ac6ab0c1533Cda95A"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "DowntimeSlasherProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0xB93e25B99C2A5a5CC94d432F0D2BE3B76043562F"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "ElectionProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x90B45fdddDe85257dB0774d51800d894293D9B65"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "EpochRewardsProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x61Cb33d93549D9bC1c1E522c1aE6893f59aE1039"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "GoldTokenProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0xC3AF2A532E26239488f9bfa90fF201359b21fc4b"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "GovernanceProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x2E873dd0382E3764338204a88c1B35631685D7a3"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "LockedGoldProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0xb7d5f192943e8d2DEd401cD1fB43b8F0C6c96f1F"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "RandomProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x0fF509f320334121689Bf98d447bbA9E7B8175E1"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "SortedOraclesProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x03e85F79F378a9426443bDb7a157167f7b008513"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "ValidatorsProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0xC779219b6069c186B8f6C79e023dE2A219Ba239A"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "Registry",
+    "function": "setAddressFor",
+    "args": [
+      "FeeCurrencyDirectory",
+      "0x71ffbd48e34bdd5a87c3c683e866dc63b8b2a685"
+    ],
+    "value": "0",
+    "description": "Registry: FeeCurrencyDirectory -> 0x71ffbd48e34bdd5a87c3c683e866dc63b8b2a685"
+  },
+  {
+    "contract": "FeeCurrencyDirectoryProxy",
+    "function": "_setAndInitializeImplementation",
+    "args": [
+      "0x8cb3d4481c55fd4e4EAe3C6431aAd94b94347b7A",
+      "0x8129fc1c"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "GasPriceMinimumProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x36af705fb09de507BA963fD5B76e975F82e2Ec6a"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "Registry",
+    "function": "setAddressFor",
+    "args": [
+      "CeloDistributionSchedule",
+      "0x78af211ad79bce6bf636640ce8c2c2b29e02365a"
+    ],
+    "value": "0",
+    "description": "Registry: CeloDistributionSchedule -> 0x78af211ad79bce6bf636640ce8c2c2b29e02365a"
+  },
+  {
+    "contract": "CeloDistributionScheduleProxy",
+    "function": "_setAndInitializeImplementation",
+    "args": [
+      "0xD48Dd2f57a0ba00E88CA6c9ee35aF074afA79CA8",
+      "0x8129fc1c"
+    ],
+    "value": "0"
+  }
+]

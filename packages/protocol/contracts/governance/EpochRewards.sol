@@ -10,6 +10,9 @@ import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
+import "./interfaces/IEpochRewardsInitializer.sol";
+import "./interfaces/IEpochRewards.sol";
+import "forge-std/console.sol";
 
 /**
  * @title Contract for calculating epoch rewards.
@@ -21,7 +24,8 @@ contract EpochRewards is
   UsingPrecompiles,
   UsingRegistry,
   Freezable,
-  CalledByVm
+  CalledByVm,
+  IEpochRewardsInitializer
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -144,6 +148,16 @@ contract EpochRewards is
    * @dev Only called directly by the protocol.
    */
   function updateTargetVotingYield() external onlyVm onlyWhenNotFrozen onlyL1 {
+    _updateTargetVotingYield();
+  }
+
+  /**
+   * @notice Updates the target voting yield based on the difference between the target and current
+   *   voting Gold fraction.
+   * @dev Only called directly by the protocol.
+   */
+  function updateTargetVotingYieldCel2() external onlyWhenNotFrozen {
+    // TODO add permissions so that correct contract can call it
     _updateTargetVotingYield();
   }
 
@@ -462,33 +476,48 @@ contract EpochRewards is
    *   voting Gold fraction.
    */
   function _updateTargetVotingYield() internal onlyWhenNotFrozen {
+    console.log("EpochRewards1");
     FixidityLib.Fraction memory votingGoldFraction = FixidityLib.wrap(getVotingGoldFraction());
     if (votingGoldFraction.gt(targetVotingGoldFraction)) {
+      console.log("EpochRewards2");
       FixidityLib.Fraction memory votingGoldFractionDelta = votingGoldFraction.subtract(
         targetVotingGoldFraction
       );
+      console.log("EpochRewards3");
       FixidityLib.Fraction memory targetVotingYieldDelta = votingGoldFractionDelta.multiply(
         targetVotingYieldParams.adjustmentFactor
       );
+      console.log("EpochRewards4");
       if (targetVotingYieldDelta.gte(targetVotingYieldParams.target)) {
+        console.log("EpochReward5");
         targetVotingYieldParams.target = FixidityLib.newFixed(0);
+        console.log("EpochRewards6");
       } else {
+        console.log("EpochRewards7");
         targetVotingYieldParams.target = targetVotingYieldParams.target.subtract(
           targetVotingYieldDelta
         );
+        console.log("EpochRewards8");
       }
     } else if (votingGoldFraction.lt(targetVotingGoldFraction)) {
+      console.log("EpochRewards9");
       FixidityLib.Fraction memory votingGoldFractionDelta = targetVotingGoldFraction.subtract(
         votingGoldFraction
       );
+      console.log("EpochRewards10");
       FixidityLib.Fraction memory targetVotingYieldDelta = votingGoldFractionDelta.multiply(
         targetVotingYieldParams.adjustmentFactor
       );
+      console.log("EpochRewards11");
       targetVotingYieldParams.target = targetVotingYieldParams.target.add(targetVotingYieldDelta);
+      console.log("EpochRewards12");
       if (targetVotingYieldParams.target.gt(targetVotingYieldParams.max)) {
+        console.log("EpochRewards13");
         targetVotingYieldParams.target = targetVotingYieldParams.max;
+        console.log("EpochRewards14");
       }
     }
+    console.log("EpochRewards15");
     emit TargetVotingYieldUpdated(targetVotingYieldParams.target.unwrap());
   }
 

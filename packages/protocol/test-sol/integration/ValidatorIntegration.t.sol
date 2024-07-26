@@ -1,3 +1,5 @@
+// THIS TEST IS RUN IN A FORKED ENVIRONMENT FROM DEVCHAIN
+
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
@@ -24,6 +26,12 @@ import "@test-sol/constants.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
 import { Utils } from "@test-sol/utils.sol";
 import { Test as ForgeTest } from "forge-std/Test.sol";
+
+import "@celo-contracts/common/interfaces/IProxy.sol";
+import "@celo-contracts/governance/EpochRewards.sol";
+import "@celo-contracts/common/interfaces/ICeloToken.sol"; // TODO right order for this
+
+import "./POSEntryPointContract.sol";
 
 import "@celo-contracts/common/UsingRegistry.sol";
 
@@ -196,15 +204,18 @@ contract ValidatorIntegrationTest is Test, Constants, Utils, ECDSAHelper, UsingR
 
     (uint256 requirements, uint256 _) = getValidators().getGroupLockedGoldRequirements();
     requirements = requirements * numMembers;
-    console.log("requirements:", requirements);
+    // console.log("requirements:", requirements);
 
-    vm.deal(_group, requirements);
+    vm.deal(_group, requirements); // TODO add this balance to the supply as well
+    vm.startPrank(address(0));
+    ICeloToken(address(getGoldToken())).increaseSupply(requirements);
+    vm.stopPrank();
 
     vm.startPrank(_group);
     getLockedGold().lock.value(requirements)();
     vm.stopPrank(); // for some reason vm.prank doesn't work
 
-    console.log("locked:", getLockedGold().getAccountTotalLockedGold(_group));
+    // console.log("locked:", getLockedGold().getAccountTotalLockedGold(_group));
 
     // lockedGold.setAccountTotalLockedGold(
     //   _group,
@@ -249,12 +260,14 @@ contract ValidatorIntegrationTest is Test, Constants, Utils, ECDSAHelper, UsingR
     }
 
     vm.startPrank(_group);
+    // TODO add vote activation
     getElection().vote(
       group,
       getLockedGold().getAccountNonvotingLockedGold(group),
       leaser,
       greater
     );
+
     vm.stopPrank();
   }
 
@@ -281,7 +294,10 @@ contract ValidatorIntegrationTest is Test, Constants, Utils, ECDSAHelper, UsingR
     // lockedGold.setAccountTotalLockedGold(_validator, originalValidatorLockedGoldRequirements.value);
     (uint256 requirements, uint256 _) = getValidators().getValidatorLockedGoldRequirements();
     requirements = requirements;
-    vm.deal(_validator, requirements);
+    vm.deal(_validator, requirements); // TODO add this balance to the supply as well
+    vm.startPrank(address(0));
+    ICeloToken(address(getGoldToken())).increaseSupply(requirements);
+    vm.stopPrank();
 
     vm.startPrank(_validator);
     getLockedGold().lock.value(requirements)();
@@ -316,17 +332,21 @@ contract ValidatorIntegrationTest is Test, Constants, Utils, ECDSAHelper, UsingR
     ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
   }
 
+  // function _expensiveCall() private {
+  //   validators.entryPointElectAndDistribute(); // FIXME gasSnapshot doesn't how this as it's in the already deployed contact
+  // }
+
   function test_hello() public {
     address[] memory registeredGroups = validators.getRegisteredValidatorGroups();
-    console.log("Validators already registered:", registeredGroups.length);
+    // console.log("Validators already registered:", registeredGroups.length);
+    POSEntryPointContract entryPoint = new POSEntryPointContract(registryAddress);
 
-    // election.electValidatorSigners(); // TODO this needs to be called form an empty migration
+    // election.electValidatorSigners(); // TODO this needs to be possible to be called form a fresh migration
 
     // register 110 validator groups (one is already added)
     address greater = registeredGroups[0];
-    address leaser = address(0);
-
     uint8 numMembers = 109;
+    address leaser = address(0);
 
     for (uint8 i = 0; i < numMembers; i++) {
       group = actor(string(abi.encodePacked("group", string(abi.encode(i)))));
@@ -335,10 +355,31 @@ contract ValidatorIntegrationTest is Test, Constants, Utils, ECDSAHelper, UsingR
         string(abi.encodePacked("validator", string(abi.encode(i))))
       );
       _registerValidatorGroupWithMembers(group, 1, leaser, greater);
-      leaser = address(0);
+      // the loop is made such that new group always has the less votes
       greater = group;
     }
 
-    // validators.entryPointElectAndDistribute();
+    // upgrade epoch rewards to avoid recreate the chain after each change
+    address implementation = address(new EpochRewards(false));
+    vm.startPrank(IProxy(address(getEpochRewards()))._getOwner());
+    IProxy(address(getEpochRewards()))._setImplementation(implementation);
+    vm.stopPrank();
+
+    console.log(
+      "elections.getRequiredVotes()",
+      Election(address(getElection())).getRequiredVotes()
+    );
+
+    // try to change for Eelection instead of IElection to get a trace.
+    // IElection(address(getElection())).electValidatorSigners(); // This call reverts, figure out why
+    // Election(address(getElection())).electValidatorSigners(); // This call reverts, figure out why
+
+    // TODO when I do getElection().electValidatorSigners() for some reason this doesn't work. maybe gas limit?
+    address[] memory electedFew = Election(address(getElection())).electValidatorSigners();
+    for (uint256 i = 0; i < electedFew.length; i++) {
+      console.log("electedFew[i]", electedFew[i]);
+    }
+
+    entryPoint._expensiveCall();
   }
 }

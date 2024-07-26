@@ -86,4 +86,5 @@ interface IValidators {
   function getMembershipInLastEpoch(address) external view returns (address);
   function getMembershipInLastEpochFromSigner(address) external view returns (address);
   function getMaxGroupSize() external view returns (uint256);
+  function entryPointElectAndDistribute() external; // TODO only for testing
 }
