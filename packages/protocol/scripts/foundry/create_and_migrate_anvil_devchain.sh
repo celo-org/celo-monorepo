@@ -26,6 +26,10 @@ source $PWD/scripts/foundry/start_anvil.sh
 source $PWD/scripts/foundry/deploy_libraries.sh
 echo "Library flags are: $LIBRARY_FLAGS"
 
+# Before running the migration script, check that the scripts compile
+# This will avoid having to wait for the whole chain to start just to realize theres a compilation error at the end
+forge build --contracts $PWD/test-sol/devchain
+
 # Build all contracts with deployed libraries
 # Including contracts that depend on libraries. This step replaces the library placeholder
 # in the bytecode with the address of the actually deployed library.
