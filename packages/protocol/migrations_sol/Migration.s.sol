@@ -546,7 +546,6 @@ contract Migration is Script, UsingRegistry, Constants {
       abi.encodeWithSelector(IAccountsInitializer.initialize.selector, registryAddress)
     );
 
-    // can be replaced with getAccounts() and remove the interface import?
     IAccounts(accountsProxyAddress).setEip712DomainSeparator();
   }
 
@@ -1125,8 +1124,6 @@ contract Migration is Script, UsingRegistry, Constants {
     );
     uint256[] memory valKeys = abi.decode(json.parseRaw(".validators.valKeys"), (uint256[]));
     uint256 maxGroupSize = abi.decode(json.parseRaw(".validators.maxGroupSize"), (uint256));
-
-    // todo this can be get from the validator contract
     uint256 validatorLockedGoldRequirements = abi.decode(
       json.parseRaw(".validators.validatorLockedGoldRequirements.value"),
       (uint256)

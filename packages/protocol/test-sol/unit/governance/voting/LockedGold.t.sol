@@ -282,6 +282,9 @@ contract LockedGoldTest_setUnlockingPeriod is LockedGoldTest {
 
 contract LockedGoldTest_lock is LockedGoldTest {
   uint256 value = 1000;
+  function setUp() public {
+    super.setUp();
+  }
 
   function test_ShouldIncreaseTheAccountsNonVotingLockedGoldBalance() public {
     lockedGold.lock.value(value)();

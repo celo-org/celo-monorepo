@@ -9,7 +9,7 @@ import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 
-// import "@celo-contracts/governance/Election.sol";
+import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/governance/LockedGold.sol";
 
 import "@celo-contracts/stability/test/MockStableToken.sol";
