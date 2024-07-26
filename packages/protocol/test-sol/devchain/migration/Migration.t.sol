@@ -13,9 +13,9 @@ import "@celo-contracts/common/interfaces/IProxy.sol";
 import "@celo-contracts-8/common/UsingRegistry.sol";
 
 contract MigrationTest is Test, TestConstants, UsingRegistry {
-  IRegistry registry = IRegistry(REGISTRY_ADDRESS);
-
-  function setUp() public {}
+  function setUp() public {
+    registry = IRegistry(REGISTRY_ADDRESS);
+  }
 
   /**
    * @notice Removes CBOR encoded metadata from the tail of the deployedBytecode.
@@ -125,9 +125,9 @@ contract RegistryMigrationTest is MigrationTest, MigrationsConstants {
   }
 }
 
-contract RegistryMigrationTest is MigrationTest, MigrationsConstants {
+contract CeloMigrationTest is MigrationTest, MigrationsConstants {
   function test_CeloSupplyNonZero() public {
     uint256 celoSupply = getCeloToken().totalSupply();
-    assert(celoSupply > 0, "Celo supply is non-zero");
+    require(celoSupply > 0, "Celo supply is non-zero");
   }
 }
