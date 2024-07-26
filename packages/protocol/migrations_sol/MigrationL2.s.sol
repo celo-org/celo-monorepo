@@ -10,14 +10,11 @@ import "@celo-contracts-8/common/UsingRegistry.sol";
 contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
   using FixidityLib for FixidityLib.Fraction;
 
-  // This is Anvil's default account
-  address constant deployerAccount = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266; // TODO: Move this to MigrationsConstants
-
   /**
    * Entry point of the script
    */
   function run() external {
-    vm.startBroadcast(deployerAccount);
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
 
     setupUsingRegistry();
     activateCeloDistributionSchedule();
@@ -26,7 +23,7 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
   }
 
   function setupUsingRegistry() public {
-    _transferOwnership(deployerAccount);
+    _transferOwnership(DEPLOYER_ACCOUNT);
     setRegistry(REGISTRY_ADDRESS);
   }
 
