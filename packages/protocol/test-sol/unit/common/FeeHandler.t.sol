@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
 import "@celo-contracts/common/FeeHandler.sol";
-import { Constants } from "@test-sol/constants.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 
 import { Exchange } from "@mento-core/contracts/Exchange.sol";
 import { StableToken } from "@mento-core/contracts/StableToken.sol";
@@ -20,7 +20,7 @@ import "@celo-contracts/uniswap/test/MockERC20.sol";
 import "@mento-core/test/mocks/MockSortedOracles.sol";
 import "@mento-core/test/mocks/MockReserve.sol";
 
-contract FeeHandlerTest is Test, Constants {
+contract FeeHandlerTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
   FeeHandler feeHandler;
@@ -49,7 +49,6 @@ contract FeeHandlerTest is Test, Constants {
 
   address EXAMPLE_BENEFICIARY_ADDRESS = 0x2A486910DBC72cACcbb8d0e1439C96b03B2A4699;
 
-  address registryAddress = 0x000000000000000000000000000000000000ce10;
   address owner = address(this);
   address user = actor("user");
   address celoDistributionSchedule = actor("CeloDistributionSchedule");
@@ -82,13 +81,13 @@ contract FeeHandlerTest is Test, Constants {
     reserveFraction = FixidityLib.newFixedFraction(5, 100).unwrap();
     maxSlippage = FixidityLib.newFixedFraction(1, 100).unwrap();
 
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
     celoToken = new GoldToken(true);
     mockReserve = new MockReserve();
     stableToken = new StableToken(true);
     stableTokenEUR = new StableToken(true);
-    registry = IRegistry(registryAddress);
+    registry = IRegistry(REGISTRY_ADDRESS);
     feeHandler = new FeeHandler(true);
     freezer = new Freezer(true);
     feeCurrencyWhitelist = new FeeCurrencyWhitelist(true);
@@ -180,7 +179,7 @@ contract FeeHandlerTest is Test, Constants {
     exchangeEUR.activateStable();
 
     feeHandler.initialize(
-      registryAddress,
+      REGISTRY_ADDRESS,
       EXAMPLE_BENEFICIARY_ADDRESS,
       0,
       new address[](0),

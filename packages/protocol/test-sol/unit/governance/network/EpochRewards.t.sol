@@ -13,10 +13,10 @@ import { MockSortedOracles } from "@celo-contracts/stability/test/MockSortedOrac
 import { MockStableToken } from "@celo-contracts/stability/test/MockStableToken.sol";
 import { GoldTokenMock } from "@test-sol/unit/common/GoldTokenMock.sol";
 
-import { Constants } from "@test-sol/constants.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
 
-contract EpochRewardsTest is Test, Constants, Utils {
+contract EpochRewardsTest is Test, TestConstants, Utils {
   uint256 constant targetVotingYieldParamsInitial = 0.00016e24; // 0.00016
   uint256 constant targetVotingYieldParamsMax = 0.0005e24; // 0.0005
   uint256 constant targetVotingYieldParamsAdjustmentFactor = 1127990000000000000; // 0.00000112799
@@ -34,7 +34,6 @@ contract EpochRewardsTest is Test, Constants, Utils {
   uint256 constant sortedOraclesDenominator = FIXED1;
 
   uint256 constant SUPPLY_CAP = 1e9 ether;
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
   bytes32[] initialAssetAllocationSymbols;
   uint256[] initialAssetAllocationWeights;
 
@@ -101,7 +100,7 @@ contract EpochRewardsTest is Test, Constants, Utils {
   }
 
   function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
   function getExpectedTargetTotalSupply(uint256 timeDelta) internal pure returns (uint256) {
     uint256 genesisSupply = 600000000 ether;

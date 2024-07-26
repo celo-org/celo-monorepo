@@ -4,7 +4,7 @@ import "@celo-contracts/common/Proxy.sol";
 
 import "celo-foundry/Test.sol";
 
-import { Constants } from "@test-sol/constants.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
 
 import "@celo-contracts/common/test/GetSetV0.sol";
@@ -12,7 +12,7 @@ import "@celo-contracts/common/test/GetSetV1.sol";
 import "@celo-contracts/common/test/HasInitializer.sol";
 import "@celo-contracts/common/test/MsgSenderCheck.sol";
 
-contract ProxyTest is Test, Constants, Utils {
+contract ProxyTest is Test, TestConstants, Utils {
   Proxy proxy;
   GetSetV0 getSet;
   GetSetV0 proxiedGetSet;

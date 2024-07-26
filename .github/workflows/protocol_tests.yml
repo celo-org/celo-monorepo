@@ -121,17 +121,23 @@ jobs:
           forge test -vvv \
           --match-path "test-sol/unit/*"
       
+      - name: Run integration tests (that don't require an anvil devchain)
+        if: success() || failure()
+        run: |
+          forge test -vvv \
+          --match-path "test-sol/integration/*" \
+
       - name: Generate migrations and run devchain
         if: success() || failure()
         run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
       
-      - name: Run integration tests against local anvil devchain
+      - name: Run migration tests against local anvil devchain
         if: success() || failure()
         run: |
           source ./scripts/foundry/constants.sh
 
-          forge test -vvv \
-          --match-path "test-sol/integration/*" \
+          FOUNDRY_PROFILE=devchain forge test -vvv \
+          --match-path "test-sol/devchain/migration/*" \
           --fork-url $ANVIL_RPC_URL
       
       - name: Run e2e tests against local anvil devchain
@@ -139,6 +145,6 @@ jobs:
         run: |
           source ./scripts/foundry/constants.sh
 
-          forge test -vvv \
-          --match-path "test-sol/e2e/*" \
+          FOUNDRY_PROFILE=devchain forge test -vvv \
+          --match-path "test-sol/devchain/e2e/*" \
           --fork-url $ANVIL_RPC_URL

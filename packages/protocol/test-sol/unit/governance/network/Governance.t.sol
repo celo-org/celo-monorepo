@@ -1,6 +1,9 @@
 pragma solidity ^0.5.13;
 
 import "celo-foundry/Test.sol";
+import { TestConstants } from "@test-sol/constants.sol";
+import { Utils } from "@test-sol/utils.sol";
+
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 
@@ -13,8 +16,6 @@ import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/Signatures.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@test-sol/constants.sol";
-import "@test-sol/utils.sol";
 
 contract GovernanceMock is Governance(true) {
   address[] validatorSet;
@@ -58,7 +59,7 @@ contract GovernanceMock is Governance(true) {
   }
 }
 
-contract GovernanceTest is Test, Constants, Utils {
+contract GovernanceTest is Test, TestConstants, Utils {
   using FixidityLib for FixidityLib.Fraction;
   using BytesLib for bytes;
 
