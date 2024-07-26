@@ -9,8 +9,9 @@ import { MigrationsConstants } from "@migrations-sol/constants.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
+import "@celo-contracts/common/UsingRegistry.sol";
 
-contract IntegrationTest is Test, TestConstants {
+contract MigrationTest is Test, TestConstants, UsingRegistry {
   IRegistry registry = IRegistry(REGISTRY_ADDRESS);
 
   function setUp() public {}
@@ -47,7 +48,7 @@ contract IntegrationTest is Test, TestConstants {
   }
 }
 
-contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
+contract RegistryMigrationTest is MigrationTest, MigrationsConstants {
   IProxy proxy;
 
   function test_shouldHaveAddressInRegistry() public view {
@@ -120,5 +121,12 @@ contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
         );
       }
     }
+  }
+}
+
+contract RegistryMigrationTest is MigrationTest, MigrationsConstants {
+  function test_CeloSupplyNonZero() public {
+    uint256 celoSupply = getCeloToken.totalSupply();
+    assert(celoSupply > 0, "Celo supply is non-zero");
   }
 }
