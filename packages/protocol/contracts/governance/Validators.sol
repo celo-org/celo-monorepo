@@ -226,7 +226,14 @@ contract Validators is
   function distributeEpochPaymentsFromSigner(
     address signer,
     uint256 maxPayment
-  ) external onlyVm returns (uint256) {
+  )
+    external
+    returns (
+      // TODO FIXME this should be allowed only to X smart contract
+      // onlyVm
+      uint256
+    )
+  {
     allowOnlyL1();
     return _distributeEpochPaymentsFromSigner(signer, maxPayment);
   }
