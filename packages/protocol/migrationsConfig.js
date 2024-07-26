@@ -581,8 +581,8 @@ NetworkConfigs.mainnet = NetworkConfigs.rc1
 
 const linkedLibraries = {
   Proposals: ['Governance'],
-  AddressLinkedList: ['Validators', 'ValidatorsMock'],
-  AddressSortedLinkedList: ['Election', 'ElectionTest'],
+  AddressLinkedList: ['Validators'],
+  AddressSortedLinkedList: ['Election'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListMock'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianMock'],
   Signatures: [

@@ -1,3 +1,4 @@
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
@@ -21,5 +22,6 @@ module.exports = deploymentForCoreContract<AccountsInstance>(
   initializeArgs,
   async (accounts: AccountsInstance) => {
     await accounts.setEip712DomainSeparator()
-  }
+  },
+  SOLIDITY_08_PACKAGE
 )

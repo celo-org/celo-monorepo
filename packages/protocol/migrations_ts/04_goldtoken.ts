@@ -1,3 +1,4 @@
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
@@ -25,5 +26,6 @@ module.exports = deploymentForCoreContract<GoldTokenInstance>(
     }
     const registry = await getDeployedProxiedContract<IRegistryInstance>('Registry', artifacts)
     await registry.setAddressFor(CeloContractName.CeloToken, goldToken.address)
-  }
+  },
+  SOLIDITY_08_PACKAGE
 )

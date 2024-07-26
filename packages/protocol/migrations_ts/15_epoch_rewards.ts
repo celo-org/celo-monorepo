@@ -1,3 +1,4 @@
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
@@ -37,5 +38,6 @@ module.exports = deploymentForCoreContract<EpochRewardsInstance>(
       )
       await freezer.freeze(epochRewards.address)
     }
-  }
+  },
+  SOLIDITY_08_PACKAGE
 )

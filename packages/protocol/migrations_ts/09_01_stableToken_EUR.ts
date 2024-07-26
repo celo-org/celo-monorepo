@@ -10,7 +10,7 @@ import { SortedOraclesInstance } from 'types'
 import { FeeCurrencyWhitelistInstance, FreezerInstance } from 'types/08'
 import { ReserveInstance, StableTokenEURInstance } from 'types/mento'
 import Web3 from 'web3'
-import { MENTO_PACKAGE } from '../contractPackages'
+import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 import { ArtifactsSingleton } from '../lib/artifactsSingleton'
 
 const truffle = require('@celo/protocol/truffle-config.js')
@@ -77,11 +77,13 @@ module.exports = deploymentForCoreContract<StableTokenEURInstance>(
       await reserve.addToken(stableToken.address)
     }
 
+    const artifacts08 = ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE, artifacts);
+
     console.info('Whitelisting StableToken (EUR) as a fee currency')
     const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance =
       await getDeployedProxiedContract<FeeCurrencyWhitelistInstance>(
         'FeeCurrencyWhitelist',
-        artifacts
+        artifacts08
       )
     await feeCurrencyWhitelist.addToken(stableToken.address)
   },

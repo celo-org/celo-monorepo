@@ -7,7 +7,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { FreezerInstance } from 'types'
 import { ExchangeBRLInstance, ReserveInstance } from 'types/mento'
-import { MENTO_PACKAGE } from '../contractPackages'
+import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 import { ArtifactsSingleton } from '../lib/artifactsSingleton'
 
 const initializeArgs = async (): Promise<any[]> => {
@@ -28,9 +28,11 @@ module.exports = deploymentForCoreContract<ExchangeBRLInstance>(
   initializeArgs,
   async (exchange: ExchangeBRLInstance) => {
     if (config.exchange.frozen) {
+      const artifacts08 = ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE, artifacts);
+
       const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
         'Freezer',
-        artifacts
+        artifacts08
       )
       await freezer.freeze(exchange.address)
     }

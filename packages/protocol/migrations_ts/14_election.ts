@@ -1,3 +1,4 @@
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
@@ -18,5 +19,7 @@ module.exports = deploymentForCoreContract<ElectionInstance>(
   web3,
   artifacts,
   CeloContractName.Election,
-  initializeArgs
+  initializeArgs,
+  undefined,
+  SOLIDITY_08_PACKAGE
 )
