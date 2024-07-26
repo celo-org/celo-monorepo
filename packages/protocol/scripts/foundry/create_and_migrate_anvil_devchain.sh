@@ -32,7 +32,7 @@ echo "Library flags are: $LIBRARY_FLAGS"
 echo "Compiling with libraries... "
 time forge build $LIBRARY_FLAGS
 
-# Deploy precompile contracts
+# Deploy precompile contractsnotion://www.notion.so/Notas-random-34caab801fbb45f19beb6489b0b14ece?pvs=18
 source $PWD/scripts/foundry/deploy_precompiles.sh
 
 echo "Setting Registry Proxy"
@@ -59,6 +59,25 @@ $SKIP_SIMULATION \
 $NON_INTERACTIVE \
 $LIBRARY_FLAGS \
 --rpc-url $ANVIL_RPC_URL || echo "Migration script failed"
+
+# Set the supply for Celo:
+# This supply is just an approximation, but it's importat that this number is non-zero.
+
+# get celo contract address
+CELO_ADDRESS=`cast call $REGISTRY_ADDRESS "getAddressForStringOrDie(string calldata identifier) returns (address)" "CeloToken" --rpc-url $ANVIL_RPC_URL`
+
+# interpersonate the VM, this can't be done from the migration script
+cast rpc anvil_impersonateAccount $CELO_VM_ADDRESS --rpc-url $ANVIL_RPC_URL
+
+# set the balance of the vm address so that it can send a tx
+cast rpc anvil_setBalance $CELO_VM_ADDRESS 1000000000000000000 --rpc-url $ANVIL_RPC_URL
+
+# increase the supply
+# 540001000000000000000000 = (60e3 + 1) * 9 * 10^18
+cast send --from $CELO_VM_ADDRESS --unlocked $CELO_ADDRESS "increaseSupply(uint256)" 540001000000000000000000 --rpc-url $ANVIL_RPC_URL
+
+# stop impersonating the VM address
+cast rpc anvil_stopImpersonatingAccount $CELO_VM_ADDRESS --rpc-url $ANVIL_RPC_URL
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
