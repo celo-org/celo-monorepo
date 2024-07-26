@@ -4,14 +4,16 @@ pragma solidity >=0.8.7 <0.8.20;
 import { Test } from "forge-std-8/Test.sol";
 import "forge-std-8/console2.sol";
 
-import { Constants } from "@migrations-sol/constants.sol";
+import { TestConstants } from "@test-sol/constants.sol";
+import { MigrationsConstants } from "@migrations-sol/constants.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
+// import "@celo-contracts/common/interfaces/ICeloToken.sol";
+import "@celo-contracts-8/common/UsingRegistry.sol";
 
-contract IntegrationTest is Test {
-  address constant registryAddress = address(0x000000000000000000000000000000000000ce10);
-  IRegistry registry = IRegistry(registryAddress);
+contract MigrationTest is Test, TestConstants, UsingRegistry {
+  IRegistry registry = IRegistry(REGISTRY_ADDRESS);
 
   function setUp() public {}
 
@@ -47,7 +49,7 @@ contract IntegrationTest is Test {
   }
 }
 
-contract RegistryIntegrationTest is IntegrationTest, Constants {
+contract RegistryMigrationTest is MigrationTest, MigrationsConstants {
   IProxy proxy;
 
   function test_shouldHaveAddressInRegistry() public view {
@@ -120,5 +122,12 @@ contract RegistryIntegrationTest is IntegrationTest, Constants {
         );
       }
     }
+  }
+}
+
+contract RegistryMigrationTest is MigrationTest, MigrationsConstants {
+  function test_CeloSupplyNonZero() public {
+    uint256 celoSupply = getCeloToken().totalSupply();
+    assert(celoSupply > 0, "Celo supply is non-zero");
   }
 }

@@ -718,7 +718,7 @@ contract Validators is
   }
 
   /**
-   * @notice Returns the Locked Gold requirements for validator groups. (TODO per validator?)
+   * @notice Returns the Locked Gold requirements for validator groups.
    * @return The Locked Gold value.
    * @return The Locked Gold duration.
    */
@@ -881,10 +881,6 @@ contract Validators is
     maxGroupSize = size;
     emit MaxGroupSizeSet(size);
     return true;
-  }
-
-  function getMaxGroupSize() external view returns (uint256) {
-    return maxGroupSize;
   }
 
   /**
@@ -1405,9 +1401,5 @@ contract Validators is
     validator.affiliation = address(0);
     emit ValidatorDeaffiliated(validatorAccount, affiliation);
     return true;
-  }
-
-  function entryPointElectAndDistribute() external {
-    return;
   }
 }

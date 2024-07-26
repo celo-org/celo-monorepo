@@ -9,11 +9,11 @@ import "@celo-contracts-8/common/interfaces/ICeloToken.sol";
 import "@celo-contracts/governance/interfaces/IGovernance.sol";
 import "@celo-contracts-8/common/CeloDistributionSchedule.sol";
 import "@celo-contracts-8/common/IsL2Check.sol";
-import { Constants } from "@test-sol/constants.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 
 import "@test-sol/unit/governance/mock/MockGovernance.sol";
 
-contract CeloDistributionScheduleTest is Test, Constants, IsL2Check {
+contract CeloDistributionScheduleTest is Test, TestConstants, IsL2Check {
   using FixidityLib for FixidityLib.Fraction;
 
   IRegistry registry;
@@ -24,7 +24,6 @@ contract CeloDistributionScheduleTest is Test, Constants, IsL2Check {
 
   address owner = address(this);
 
-  address registryAddress;
   address celoTokenAddress = actor("celoTokenAddress");
 
   address celoDistributionOwner = actor("celoDistributionOwner");
@@ -33,8 +32,6 @@ contract CeloDistributionScheduleTest is Test, Constants, IsL2Check {
 
   address newPartner = actor("newPartner");
   address randomAddress = actor("randomAddress");
-
-  address constant l1RegistryAddress = 0x000000000000000000000000000000000000ce10;
 
   uint256 constant DAILY_DISTRIBUTION_AMOUNT = 6748256563599655349558; // 6,748 Celo
   uint256 constant L1_MINTED_CELO_SUPPLY = 692702432463315819704447326; // as of May 15 2024
@@ -69,19 +66,16 @@ contract CeloDistributionScheduleTest is Test, Constants, IsL2Check {
     setUpL1();
 
     // Setup L2 after minting L1 supply.
-
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 
   function setUpL1() public {
-    registryAddress = l1RegistryAddress;
-
-    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
-    registry = IRegistry(registryAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     deployCodeTo("GoldToken.sol", abi.encode(false), celoTokenAddress);
     celoToken = ICeloToken(celoTokenAddress);
-    celoToken.setRegistry(registryAddress);
+    celoToken.setRegistry(REGISTRY_ADDRESS);
     // Using a mock contract, as foundry does not allow for library linking when using deployCodeTo
     governance = new MockGovernance();
 
@@ -106,7 +100,7 @@ contract CeloDistributionScheduleTest is Test, Constants, IsL2Check {
     vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
 
     vm.prank(celoDistributionOwner);
-    celoDistributionSchedule.initialize(registryAddress);
+    celoDistributionSchedule.initialize(REGISTRY_ADDRESS);
 
     vm.prank(celoDistributionOwner);
 
@@ -128,7 +122,7 @@ contract CeloDistributionScheduleTest_initialize is CeloDistributionScheduleTest
     celoDistributionSchedule = new CeloDistributionSchedule(true);
     registry.setAddressFor("CeloDistributionSchedule", address(celoDistributionSchedule));
     vm.prank(celoDistributionOwner);
-    celoDistributionSchedule.initialize(registryAddress);
+    celoDistributionSchedule.initialize(REGISTRY_ADDRESS);
   }
 
   function test_ShouldSetAnOwnerToCeloDistributionScheduleInstance() public {
@@ -136,7 +130,7 @@ contract CeloDistributionScheduleTest_initialize is CeloDistributionScheduleTest
   }
 
   function test_ShouldSetRegistryAddressToCeloDistributionScheduleInstance() public {
-    assertEq(address(celoDistributionSchedule.registry()), l1RegistryAddress);
+    assertEq(address(celoDistributionSchedule.registry()), REGISTRY_ADDRESS);
   }
 
   function test_ShouldNotSetBeneficiariesToCeloDistributionScheduleInstance() public {
@@ -179,7 +173,7 @@ contract CeloDistributionScheduleTest_activate_L1 is CeloDistributionScheduleTes
 
     celoDistributionSchedule = new CeloDistributionSchedule(true);
     registry.setAddressFor("CeloDistributionSchedule", address(celoDistributionSchedule));
-    celoDistributionSchedule.initialize(registryAddress);
+    celoDistributionSchedule.initialize(REGISTRY_ADDRESS);
   }
 
   function test_Reverts_WhenCalledOnL1() public {
@@ -214,7 +208,7 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
     vm.warp(block.timestamp + l2StartTime);
     celoDistributionSchedule = new CeloDistributionSchedule(true);
     registry.setAddressFor("CeloDistributionSchedule", address(celoDistributionSchedule));
-    celoDistributionSchedule.initialize(registryAddress);
+    celoDistributionSchedule.initialize(REGISTRY_ADDRESS);
     vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
 
     vm.expectRevert(
@@ -232,7 +226,7 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
     vm.warp(block.timestamp + l2StartTime);
     celoDistributionSchedule = new CeloDistributionSchedule(true);
     registry.setAddressFor("CeloDistributionSchedule", address(celoDistributionSchedule));
-    celoDistributionSchedule.initialize(registryAddress);
+    celoDistributionSchedule.initialize(REGISTRY_ADDRESS);
     vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
 
     vm.expectRevert("Partner cannot be the zero address.");
@@ -250,7 +244,7 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
     celoDistributionSchedule = new CeloDistributionSchedule(true);
     registry.setAddressFor("CeloDistributionSchedule", address(celoDistributionSchedule));
     vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
-    celoDistributionSchedule.initialize(registryAddress);
+    celoDistributionSchedule.initialize(PROXY_ADMIN_ADDRESS);
 
     vm.expectRevert("identifier has no registry entry");
     celoDistributionSchedule.activate(
@@ -283,7 +277,7 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
     vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
 
     vm.prank(celoDistributionOwner);
-    celoDistributionSchedule.initialize(registryAddress);
+    celoDistributionSchedule.initialize(REGISTRY_ADDRESS);
 
     vm.deal(address(celoDistributionSchedule), 0);
 
@@ -305,7 +299,7 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
     vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
 
     vm.prank(celoDistributionOwner);
-    celoDistributionSchedule.initialize(registryAddress);
+    celoDistributionSchedule.initialize(REGISTRY_ADDRESS);
 
     vm.expectRevert("identifier has no registry entry");
 
@@ -327,7 +321,7 @@ contract CeloDistributionScheduleTest_activate is CeloDistributionScheduleTest {
     vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
 
     vm.prank(celoDistributionOwner);
-    celoDistributionSchedule.initialize(registryAddress);
+    celoDistributionSchedule.initialize(REGISTRY_ADDRESS);
 
     vm.expectRevert("CeloDistributionSchedule address is incorrectly set in Registry.");
 
@@ -380,7 +374,7 @@ contract CeloDistributionScheduleTest_setCommunityRewardFraction is CeloDistribu
     celoDistributionSchedule = new CeloDistributionSchedule(true);
     registry.setAddressFor("CeloDistributionSchedule", address(celoDistributionSchedule));
     vm.prank(celoDistributionOwner);
-    celoDistributionSchedule.initialize(registryAddress);
+    celoDistributionSchedule.initialize(REGISTRY_ADDRESS);
 
     vm.expectRevert("Distribution schedule has not been activated.");
     vm.prank(celoDistributionOwner);
@@ -462,7 +456,7 @@ contract CeloDistributionScheduleTest_setCarbonOffsettingFund is CeloDistributio
     celoDistributionSchedule = new CeloDistributionSchedule(true);
     registry.setAddressFor("CeloDistributionSchedule", address(celoDistributionSchedule));
     vm.prank(celoDistributionOwner);
-    celoDistributionSchedule.initialize(registryAddress);
+    celoDistributionSchedule.initialize(REGISTRY_ADDRESS);
 
     vm.expectRevert("Distribution schedule has not been activated.");
     vm.prank(celoDistributionOwner);
@@ -503,7 +497,7 @@ contract CeloDistributionScheduleTest_distributeAccordingToSchedule_L1 is
 
     celoDistributionSchedule = new CeloDistributionSchedule(true);
     registry.setAddressFor("CeloDistributionSchedule", address(celoDistributionSchedule));
-    celoDistributionSchedule.initialize(registryAddress);
+    celoDistributionSchedule.initialize(REGISTRY_ADDRESS);
   }
 
   function test_Reverts_WhenDistributingOnL1() public {
@@ -527,7 +521,7 @@ contract CeloDistributionScheduleTest_distributeAccordingToSchedule is
   function test_Reverts_WhenDependenciesAreNotSet() public {
     celoDistributionSchedule = new CeloDistributionSchedule(true);
     registry.setAddressFor("CeloDistributionSchedule", address(celoDistributionSchedule));
-    celoDistributionSchedule.initialize(registryAddress);
+    celoDistributionSchedule.initialize(REGISTRY_ADDRESS);
 
     vm.expectRevert("Distribution schedule has not been activated.");
     vm.prank(randomAddress);
@@ -739,7 +733,7 @@ contract CeloDistributionScheduleTest_getDistributableAmount is CeloDistribution
   function test_Reverts_WhenDependenciesNotSet() public {
     celoDistributionSchedule = new CeloDistributionSchedule(true);
     registry.setAddressFor("CeloDistributionSchedule", address(celoDistributionSchedule));
-    celoDistributionSchedule.initialize(registryAddress);
+    celoDistributionSchedule.initialize(REGISTRY_ADDRESS);
 
     vm.expectRevert("Distribution schedule has not been activated.");
 

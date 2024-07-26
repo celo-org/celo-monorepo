@@ -32,7 +32,7 @@ echo "Library flags are: $LIBRARY_FLAGS"
 echo "Compiling with libraries... "
 time forge build $LIBRARY_FLAGS
 
-# Deploy precompile contractsnotion://www.notion.so/Notas-random-34caab801fbb45f19beb6489b0b14ece?pvs=18
+# Deploy precompile contracts
 source $PWD/scripts/foundry/deploy_precompiles.sh
 
 echo "Setting Registry Proxy"
