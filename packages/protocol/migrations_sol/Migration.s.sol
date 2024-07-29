@@ -196,12 +196,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     // Proxy for Registry is already set, just deploy implementation
     migrateRegistry();
-
-    // Foloowing  lines required by parent UsingRegistry
-    _transferOwnership(DEPLOYER_ACCOUNT);
-    setRegistry(REGISTRY_ADDRESS);
-
-    // End UsingRegistry setup
+    setupUsingRegistry();
 
     migrateFreezer();
     migrateFeeCurrencyWhitelist();
@@ -240,6 +235,14 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // Functions with broadcast with different addresses
     // Validators needs to lock, which can be only used by the msg.sender
     electValidators(json);
+  }
+
+  /**
+   * The function calls defined here are required by the parent UsingRegistry.sol contract.
+   */
+  function setupUsingRegistry() public {
+    _transferOwnership(DEPLOYER_ACCOUNT);
+    setRegistry(REGISTRY_ADDRESS);
   }
 
   function migrateRegistry() public {
