@@ -1402,4 +1402,6 @@ contract Validators is
     emit ValidatorDeaffiliated(validatorAccount, affiliation);
     return true;
   }
+
+  function entryPointElectAndDistribute() external {}
 }

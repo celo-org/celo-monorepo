@@ -22,7 +22,7 @@ import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 
 import "@celo-contracts/governance/test/ValidatorsMock.sol";
-import "@test-sol/constants.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
 import { Utils } from "@test-sol/utils.sol";
 import { Test as ForgeTest } from "forge-std/Test.sol";
@@ -35,7 +35,7 @@ import "./POSEntryPointContract.sol";
 
 import "@celo-contracts/common/UsingRegistry.sol";
 
-contract ValidatorIntegrationTest is Test, Constants, Utils, ECDSAHelper, UsingRegistry {
+contract ValidatorIntegrationTest is Test, TestConstants, Utils, ECDSAHelper, UsingRegistry {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
