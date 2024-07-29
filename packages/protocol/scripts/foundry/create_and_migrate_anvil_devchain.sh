@@ -74,14 +74,22 @@ CELO_ADDRESS=`cast call $REGISTRY_ADDRESS "getAddressForStringOrDie(string calld
 cast rpc anvil_impersonateAccount $CELO_VM_ADDRESS --rpc-url $ANVIL_RPC_URL
 
 # set the balance of the vm address so that it can send a tx
-cast rpc anvil_setBalance $CELO_VM_ADDRESS 1000000000000000000 --rpc-url $ANVIL_RPC_URL
+cast rpc anvil_setBalance $CELO_VM_ADDRESS $ETHER_IN_WEI --rpc-url $ANVIL_RPC_URL
 
-# increase the supply
-# 540001000000000000000000 = (60e3 + 1) * 9 * 10^18
-cast send --from $CELO_VM_ADDRESS --unlocked $CELO_ADDRESS "increaseSupply(uint256)" 540001000000000000000000 --rpc-url $ANVIL_RPC_URL
+# increase the supply (it is harcoded as bash overflows)
+# ideally this number should come from the amount of address funded when Anvil loads
+# 540001000000000000000000 = (60e3 * 9 + 1) * 10^18 60K per account * 9 accounts + 1 for the VM (gas)
+INITIAL_SUPPLY="540001000000000000000000"
+cast send \
+--from $CELO_VM_ADDRESS \
+--unlocked $CELO_ADDRESS "increaseSupply(uint256)" $INITIAL_SUPPLY \
+--rpc-url $ANVIL_RPC_URL
 
 # stop impersonating the VM address
-cast rpc anvil_stopImpersonatingAccount $CELO_VM_ADDRESS --rpc-url $ANVIL_RPC_URL
+cast rpc \
+anvil_stopImpersonatingAccount \
+$CELO_VM_ADDRESS \
+--rpc-url $ANVIL_RPC_URL
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
