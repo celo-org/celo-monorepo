@@ -200,6 +200,7 @@ contract GoldToken is
    * the supply is with the mint function.
    */
   function increaseSupply(uint256 amount) external onlyL1 onlyVm {
+    // is this right onlyL1?
     totalSupply_ = totalSupply_.add(amount);
   }
 

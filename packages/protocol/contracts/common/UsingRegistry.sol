@@ -24,6 +24,8 @@ import "../../lib/mento-core/contracts/interfaces/IReserve.sol";
 import "../../lib/mento-core/contracts/interfaces/IStableToken.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 
+import "../governance/interfaces/IEpochRewards.sol";
+
 contract UsingRegistry is Ownable {
   // solhint-disable state-visibility
   bytes32 constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
@@ -52,6 +54,8 @@ contract UsingRegistry is Ownable {
   bytes32 constant CELO_DISTRIBUTION_SCHEDULE_ID =
     keccak256(abi.encodePacked("CeloDistributionSchedule"));
   // solhint-enable state-visibility
+
+  bytes32 constant CELO_DISTRIBUTION_EPOCHREWARDS_ID = keccak256(abi.encodePacked("EpochRewards"));
 
   IRegistry public registry;
 
@@ -141,5 +145,9 @@ contract UsingRegistry is Ownable {
 
   function getCeloDistributionSchedule() internal view returns (ICeloDistributionSchedule) {
     return ICeloDistributionSchedule(registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID));
+  }
+
+  function getEpochRewards() internal view returns (IEpochRewards) {
+    return IEpochRewards(registry.getAddressForOrDie(CELO_DISTRIBUTION_EPOCHREWARDS_ID));
   }
 }
