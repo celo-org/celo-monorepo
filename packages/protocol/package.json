@@ -77,7 +77,7 @@
     "@openzeppelin/upgrades": "^2.8.0",
     "@summa-tx/memview.sol": "^1.1.0",
     "@truffle/artifactor": "4.0.180",
-    "@truffle/contract": "4.6.10",
+    "@truffle/contract": "4.6.31",
     "@truffle/resolver": "9.0.53",
     "bignumber.js": "9.1.0",
     "bip39": "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2",
