@@ -792,10 +792,20 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@celo/abis-12@npm:@celo/abis@12.0.0-canary.16":
+  version "12.0.0-canary.16"
+  resolved "https://registry.yarnpkg.com/@celo/abis/-/abis-12.0.0-canary.16.tgz#9f043c2032f41f60d28b33bd2b79c62e857d0f9a"
+  integrity sha512-nbynuyhXUZKQTEUlkvQaWI7y4lPXa5xuVLJDLqzNfWbF27E6V1xGoMNUK4XxzmTC161VOPp18Guah2C49kXQ0w==
+
 "@celo/abis@10.0.0":
   version "10.0.0"
   resolved "https://registry.yarnpkg.com/@celo/abis/-/abis-10.0.0.tgz#2c1002f2e82b29ca22cec70c988bf90d26fadc68"
   integrity sha512-DC8UAEz89+1yEQqKzkxOWLYGUv/XWaqPAOkU0lKuQzhvN25ndP3fitawQl53WYn8i3ZPfRWfLO4w75l//tDSbg==
+
+"@celo/abis@11.0.0":
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/@celo/abis/-/abis-11.0.0.tgz#7f96b6142498662fdf36427afc8a4539c6db50e4"
+  integrity sha512-rPjHQxHbWaKQU3MX6hE3A3xRkBFBphjFvfCs4t+19dqPPys6Q+cneHmRWGBX4NLiBh5BLZcNZjQoMf2jxRLMpg==
 
 "@celo/base@^6.0.0":
   version "6.0.0"
@@ -832,6 +842,23 @@
     web3-eth "1.10.0"
     web3-eth-contract "1.10.0"
 
+"@celo/connect@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@celo/connect/-/connect-6.0.0.tgz#5544fae41de9fe7aacac7217c7959cca0ed6222a"
+  integrity sha512-gUovHc74Z42WWu38M7gye4sHf3H4JocYqctc4c973GGkWriwjrzTz81rLOevXwaMLgBKAWNhBuolBGclOeomAQ==
+  dependencies:
+    "@celo/base" "^6.1.0"
+    "@celo/utils" "^7.0.0"
+    "@ethereumjs/util" "8.0.5"
+    "@types/debug" "^4.1.5"
+    "@types/utf8" "^2.1.6"
+    bignumber.js "^9.0.0"
+    debug "^4.1.1"
+    utf8 "3.0.0"
+    web3-core "1.10.4"
+    web3-eth "1.10.4"
+    web3-eth-contract "1.10.4"
+
 "@celo/contractkit@^7.0.0":
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-7.0.0.tgz#6878ce9c2b0c381703cfc26195db0678f50b6854"
@@ -852,6 +879,28 @@
     semver "^7.3.5"
     web3 "1.10.0"
     web3-core-helpers "1.10.0"
+
+"@celo/contractkit@^8.1.0":
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-8.1.0.tgz#0cca3df2687e294743619afce51252e4aa059043"
+  integrity sha512-EMwRf8RVRZbrz7APNhvgWiCPoQz6EPKZI5fm6I3tGaA7NqpZ2ByfYNpnPQnToijIrY4vHwqwn1ZBhyonSC6IUw==
+  dependencies:
+    "@celo/abis" "11.0.0"
+    "@celo/abis-12" "npm:@celo/abis@12.0.0-canary.16"
+    "@celo/base" "^6.1.0"
+    "@celo/connect" "^6.0.0"
+    "@celo/utils" "^7.0.0"
+    "@celo/wallet-local" "^6.0.0"
+    "@types/bn.js" "^5.1.0"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^9.0.0"
+    cross-fetch "3.1.5"
+    debug "^4.1.1"
+    fp-ts "2.1.1"
+    io-ts "2.0.1"
+    semver "^7.3.5"
+    web3 "1.10.4"
+    web3-core-helpers "1.10.4"
 
 "@celo/cryptographic-utils@^5.0.7":
   version "5.1.0"
@@ -883,17 +932,17 @@
     web3-core-helpers "1.10.4"
 
 "@celo/explorer@^5.0.8":
-  version "5.0.8"
-  resolved "https://registry.yarnpkg.com/@celo/explorer/-/explorer-5.0.8.tgz#48e7ec3867f3a82318b66038c1e546ab279a710a"
-  integrity sha512-2Qadubg9Cs33Vp8y8m2dAj4iTnL5dKgu9u3p+uacrGjWG48tax1hMU+9hpmaR0/Hc/gONNjdK3WzuqfnH02rKQ==
+  version "5.0.11"
+  resolved "https://registry.yarnpkg.com/@celo/explorer/-/explorer-5.0.11.tgz#e9e6369e9d0d216f75d029d529029529bf3785e1"
+  integrity sha512-3GWrbNuO7WEWyS3v1OY7mZf4cF3cZEUNMkiA5EOqplI7zXAz0VHF7gCpylRUls5TJdCvIoy41gHwIemS3DLKEg==
   dependencies:
-    "@celo/base" "^6.0.0"
-    "@celo/connect" "^5.1.2"
-    "@celo/contractkit" "^7.0.0"
-    "@celo/utils" "^6.0.0"
+    "@celo/base" "^6.1.0"
+    "@celo/connect" "^6.0.0"
+    "@celo/contractkit" "^8.1.0"
+    "@celo/utils" "^7.0.0"
     "@types/debug" "^4.1.5"
     bignumber.js "9.0.0"
-    cross-fetch "3.0.6"
+    cross-fetch "3.1.5"
     debug "^4.1.1"
 
 "@celo/governance@^5.0.9":
@@ -1016,6 +1065,24 @@
     web3 "1.10.0"
     web3-eth-accounts "1.10.0"
 
+"@celo/wallet-base@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@celo/wallet-base/-/wallet-base-6.0.0.tgz#1e24a13aaaa89fba7fc5bb2bfd7cf0bd54190c31"
+  integrity sha512-OcwlLcCr0sTssqfeukZHoSsF0a+5QZDlZKqLsCC7YyACo43GVmPOLBg46RHUE1Z9oxByXAVwwrfWH20rWxSQog==
+  dependencies:
+    "@celo/base" "^6.1.0"
+    "@celo/connect" "^6.0.0"
+    "@celo/utils" "^7.0.0"
+    "@ethereumjs/rlp" "^5.0.2"
+    "@ethereumjs/util" "8.0.5"
+    "@noble/curves" "^1.3.0"
+    "@noble/hashes" "^1.3.3"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^9.0.0"
+    debug "^4.1.1"
+    web3 "1.10.4"
+    web3-eth-accounts "1.10.4"
+
 "@celo/wallet-local@^5.1.2":
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/@celo/wallet-local/-/wallet-local-5.1.2.tgz#c295793c634cb690423c3e858da1fa55ef61462e"
@@ -1026,6 +1093,17 @@
     "@celo/wallet-base" "^5.1.2"
     "@ethereumjs/util" "8.0.5"
     eth-lib "^0.2.8"
+
+"@celo/wallet-local@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@celo/wallet-local/-/wallet-local-6.0.0.tgz#bee7e978fabb9c87b54364d3119d5a35afcafdeb"
+  integrity sha512-XzciNg5hrqh2+13yaMEpUQutMWLTJHkRpG3ZmnoCrADwhqPPoGAnqIXJQi68lf5+gE5W8PHoU29XWLkwL7+Pcw==
+  dependencies:
+    "@celo/base" "^6.1.0"
+    "@celo/connect" "^6.0.0"
+    "@celo/utils" "^7.0.0"
+    "@celo/wallet-base" "^6.0.0"
+    "@ethereumjs/util" "8.0.5"
 
 "@chainsafe/as-sha256@^0.3.1":
   version "0.3.1"
@@ -3143,7 +3221,7 @@
   dependencies:
     "@noble/hashes" "1.3.3"
 
-"@noble/curves@~1.4.0":
+"@noble/curves@^1.3.0", "@noble/curves@~1.4.0":
   version "1.4.2"
   resolved "https://registry.yarnpkg.com/@noble/curves/-/curves-1.4.2.tgz#40309198c76ed71bc6dbf7ba24e81ceb4d0d1fe9"
   integrity sha512-TavHr8qycMChk8UwMld0ZDRvatedkzWfH8IiaeGCfymOP5i0hSCozz9vHOL0nkwk7HRMlFnAiKpS2jrUmSybcw==
@@ -3170,7 +3248,7 @@
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.3.tgz#39908da56a4adc270147bb07968bf3b16cfe1699"
   integrity sha512-V7/fPHgl+jsVPXqqeOzT8egNj2iBIVt+ECeMMG8TdcnTikP3oaBtUVqpT/gYCR68aEBJSF+XbYUxStjbFMqIIA==
 
-"@noble/hashes@1.4.0", "@noble/hashes@~1.4.0":
+"@noble/hashes@1.4.0", "@noble/hashes@^1.3.3", "@noble/hashes@~1.4.0":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.4.0.tgz#45814aa329f30e4fe0ba49426f49dfccdd066426"
   integrity sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==
@@ -8134,7 +8212,7 @@ cross-fetch@3.0.6:
   dependencies:
     node-fetch "2.6.1"
 
-cross-fetch@^3.1.4:
+cross-fetch@3.1.5, cross-fetch@^3.1.4:
   version "3.1.5"
   resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-3.1.5.tgz#e1389f44d9e7ba767907f7af8454787952ab534f"
   integrity sha512-lvb1SBsI0Z7GDwmuid+mU3kWVBwTVUbe7S0H52yaaAdQOXq2YktTCZdlAcNKFzE6QtRz0snpw9bNiPeOIkkQvw==
