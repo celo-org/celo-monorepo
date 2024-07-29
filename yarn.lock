@@ -3953,12 +3953,12 @@
     fast-check "3.1.1"
     web3-utils "1.10.0"
 
-"@truffle/artifactor@4.0.180":
-  version "4.0.180"
-  resolved "https://registry.yarnpkg.com/@truffle/artifactor/-/artifactor-4.0.180.tgz#5dded58d923d5c2e6442d09d4d3d3d9b10646c05"
-  integrity sha512-XWY1w5KMYsYQ9XN+QbR5W95HXLKumxdi3so70SRUkmmEx9+vTlvhzJ/aeyCtuOzRO6WjdZ6pOaUxMNcW5BqQDg==
+"@truffle/artifactor@4.0.199":
+  version "4.0.199"
+  resolved "https://registry.yarnpkg.com/@truffle/artifactor/-/artifactor-4.0.199.tgz#030ad7053635bfd0b4caee08495bdf800131e9d8"
+  integrity sha512-3FTWsf2WQi4kl7QYAOmmTXwo6kySBax4Jgjo+153l3NdEATjSnvevVJzw4dTSfdWfMw1sSwFPEfisQ6illrKYg==
   dependencies:
-    "@truffle/contract-schema" "^3.4.11"
+    "@truffle/contract-schema" "^3.4.16"
     fs-extra "^9.1.0"
     lodash "^4.17.21"
 
