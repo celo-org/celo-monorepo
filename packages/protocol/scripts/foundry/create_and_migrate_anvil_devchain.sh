@@ -67,8 +67,14 @@ $LIBRARY_FLAGS \
 # Set the supply for Celo:
 # This supply is just an approximation, but it's importat that this number is non-zero.
 
-# get celo contract address
-CELO_ADDRESS=`cast call $REGISTRY_ADDRESS "getAddressForStringOrDie(string calldata identifier) returns (address)" "CeloToken" --rpc-url $ANVIL_RPC_URL`
+# Get CeloToken contract address
+CELO_ADDRESS=$(
+  cast call \
+  $REGISTRY_ADDRESS \
+  "getAddressForStringOrDie(string calldata identifier)(address)" \
+  "CeloToken" \
+  --rpc-url $ANVIL_RPC_URL
+)
 
 # interpersonate the VM, this can't be done from the migration script
 cast rpc anvil_impersonateAccount $CELO_VM_ADDRESS --rpc-url $ANVIL_RPC_URL
