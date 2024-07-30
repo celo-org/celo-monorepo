@@ -13,7 +13,7 @@ contract ProxyFactoryTest is Test, Utils08 {
 
   function setUp() public {
     proxyFactory08 = new ProxyFactory08();
-    proxyInitCode = vm.getCode(string.concat("out/Proxy.sol/Proxy.json"));
+    proxyInitCode = vm.getCode("Proxy.sol");
   }
 
   function test_deployProxy() public {
