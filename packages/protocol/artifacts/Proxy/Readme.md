@@ -9,4 +9,4 @@ Leaving a note for future reference:
 
 Unless the bytecodes in these manual artifacts matches the actual Foundry artifacts, the `test_verifyArtifacts()` test in [`ProxyFactory08.t.sol`](packages/protocol/test-sol/unit/common/ProxyFactory08.t.sol) will fail.
 
-I didn't have time to investigate this further or question why manual artifacts are needed in the first place. But, I'm ju leaving a note here for future reference.
+I didn't have time to investigate this further or question why manual artifacts are needed in the first place. But, I'm leaving a note here for future reference.
