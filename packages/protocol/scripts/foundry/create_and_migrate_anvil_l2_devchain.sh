@@ -15,16 +15,16 @@ cp $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME $TMP_FOLDER/backup_$L1_DEVCHAIN_FILE_NAME
 # Note: This can't be done from the migration script
 ARBITRARY_BYTECODE=$(cast format-bytes32-string "L2 is activated")
 cast rpc anvil_setCode \
-$PROXY_ADMIN_ADDRESS $ARBITRARY_BYTECODE \
---rpc-url $ANVIL_RPC_URL
+  $PROXY_ADMIN_ADDRESS $ARBITRARY_BYTECODE \
+  --rpc-url $ANVIL_RPC_URL
 
 # Fetch address of Celo distribution 
 CELO_DISTRIBUTION_SCHEDULE_ADDRESS=$(
   cast call \
-  $REGISTRY_ADDRESS \
-  "getAddressForStringOrDie(string calldata identifier)(address)" \
-  "CeloDistributionSchedule" \
-  --rpc-url $ANVIL_RPC_URL
+    $REGISTRY_ADDRESS \
+    "getAddressForStringOrDie(string calldata identifier)(address)" \
+    "CeloDistributionSchedule" \
+    --rpc-url $ANVIL_RPC_URL
 )
 
 # Set the balance of the CeloDistributionSchedule (like the Celo client would do during L2 genesis)
@@ -33,22 +33,22 @@ CELO_DISTRIBUTION_SCHEDULE_ADDRESS=$(
 # managed to give the CeloDistributionSchedule a balance.
 echo "Setting CeloDistributionSchedule balance..."
 cast rpc \
-anvil_setBalance \
-$CELO_DISTRIBUTION_SCHEDULE_ADDRESS $CELO_DISTRIBUTION_SCHEDULE_INITIAL_BALANCE \
---rpc-url $ANVIL_RPC_URL
+  anvil_setBalance \
+  $CELO_DISTRIBUTION_SCHEDULE_ADDRESS $CELO_DISTRIBUTION_SCHEDULE_INITIAL_BALANCE \
+  --rpc-url $ANVIL_RPC_URL
 
 # Run L2 migrations
 echo "Running L2 migration script... "
 forge script \
-$MIGRATION_L2_SCRIPT_PATH \
---target-contract $MIGRATION_L2_TARGET_CONTRACT \
---sender $FROM_ACCOUNT \
---unlocked \
-$VERBOSITY_LEVEL \
-$BROADCAST \
-$SKIP_SIMULATION \
-$NON_INTERACTIVE \
---rpc-url $ANVIL_RPC_URL || echo "L2 Migration script failed"
+  $MIGRATION_L2_SCRIPT_PATH \
+  --target-contract $MIGRATION_L2_TARGET_CONTRACT \
+  --sender $FROM_ACCOUNT \
+  --unlocked \
+  $VERBOSITY_LEVEL \
+  $BROADCAST \
+  $SKIP_SIMULATION \
+  $NON_INTERACTIVE \
+  --rpc-url $ANVIL_RPC_URL || echo "L2 Migration script failed"
 
 # Save L2 state so it can published to NPM
 cp $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME

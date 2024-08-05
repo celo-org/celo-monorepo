@@ -49,16 +49,16 @@ $REGISTRY_ADDRESS $REGISTRY_STORAGE_LOCATION "0x000000000000000000000000$REGISTR
 # Run migrations
 echo "Running migration script... "
 forge script \
-$MIGRATION_SCRIPT_PATH \
---target-contract $MIGRATION_TARGET_CONTRACT \
---sender $FROM_ACCOUNT \
---unlocked \
-$VERBOSITY_LEVEL \
-$BROADCAST \
-$SKIP_SIMULATION \
-$NON_INTERACTIVE \
-$LIBRARY_FLAGS \
---rpc-url $ANVIL_RPC_URL || echo "Migration script failed"
+  $MIGRATION_SCRIPT_PATH \
+  --target-contract $MIGRATION_TARGET_CONTRACT \
+  --sender $FROM_ACCOUNT \
+  --unlocked \
+  $VERBOSITY_LEVEL \
+  $BROADCAST \
+  $SKIP_SIMULATION \
+  $NON_INTERACTIVE \
+  $LIBRARY_FLAGS \
+  --rpc-url $ANVIL_RPC_URL || echo "Migration script failed"
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
