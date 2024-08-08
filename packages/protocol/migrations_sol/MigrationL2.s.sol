@@ -2,7 +2,6 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import { Script } from "forge-std-8/Script.sol";
 import { MigrationsConstants } from "@migrations-sol/constants.sol";
-import "forge-std/console.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts-8/common/UsingRegistry.sol";
