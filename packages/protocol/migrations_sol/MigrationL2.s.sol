@@ -27,7 +27,6 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
   }
 
   function activateCeloDistributionSchedule() public {
-    // TODO: Move this to MigrationsConstants
     uint256 l2StartTime = 1721909903 - 5; // Arbitrarily 5 seconds before last black
     uint256 communityRewardFraction = getEpochRewards().getCommunityRewardFraction();
     address carbonOffsettingPartner = 0x22579CA45eE22E2E16dDF72D955D6cf4c767B0eF;
