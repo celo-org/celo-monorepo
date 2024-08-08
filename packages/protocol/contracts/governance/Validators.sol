@@ -242,6 +242,7 @@ contract Validators is
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient Locked Gold.
+   * @dev Fails after L2 activation, but see registerValidator(bytes) below.
    */
   function registerValidator(
     bytes calldata ecdsaPublicKey,
@@ -264,6 +265,34 @@ contract Validators is
     require(
       _updateBlsPublicKey(validator, account, blsPublicKey, blsPop),
       "Error updating BLS public key"
+    );
+    registeredValidators.push(account);
+    updateMembershipHistory(account, address(0));
+    emit ValidatorRegistered(account);
+    return true;
+  }
+
+  /**
+   * @notice Registers a validator unaffiliated with any validator group.
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus, should
+   *   match the validator signer. 64 bytes.
+   * @return True upon success.
+   * @dev Fails if the account is already a validator or validator group.
+   * @dev Fails if the account does not have sufficient Locked Gold.
+   */
+  function registerValidator(
+    bytes calldata ecdsaPublicKey
+  ) external nonReentrant onlyL2 returns (bool) {
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
+    _isRegistrationAllowed(account);
+    require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
+    uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
+    require(lockedGoldBalance >= validatorLockedGoldRequirements.value, "Deposit too small");
+    Validator storage validator = validators[account];
+    address signer = getAccounts().getValidatorSigner(account);
+    require(
+      _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey),
+      "Error updating ECDSA public key"
     );
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
@@ -451,7 +480,6 @@ contract Validators is
    * @dev Fails if the account does not have sufficient weight.
    */
   function registerValidatorGroup(uint256 commission) external nonReentrant returns (bool) {
-    allowOnlyL1();
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     _isRegistrationAllowed(account);
@@ -1109,7 +1137,7 @@ contract Validators is
    * @return Whether a particular address is a registered validator.
    */
   function isValidator(address account) public view returns (bool) {
-    return validators[account].publicKeys.bls.length > 0;
+    return validators[account].publicKeys.ecdsa.length > 0;
   }
 
   /**
