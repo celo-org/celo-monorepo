@@ -1,10 +1,7 @@
-// TODO make Iproxy
-
 pragma solidity ^0.5.13;
 /* solhint-disable no-inline-assembly, no-complex-fallback, avoid-low-level-calls */
 
 import "openzeppelin-solidity/contracts/utils/Address.sol";
-// import "forge-std/console.sol";
 
 /**
  * @title A Proxy utilizing the Unstructured Storage pattern.
