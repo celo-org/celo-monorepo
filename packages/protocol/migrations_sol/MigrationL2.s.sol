@@ -30,15 +30,15 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
   function activateCeloDistributionSchedule() public {
     // TODO: Move this to MigrationsConstants
     uint256 l2StartTime = 1721909903 - 5; // Arbitrarily 5 seconds before last black
-    FixidityLib.Fraction memory communityRewardFraction = FixidityLib.newFixedFraction(1, 100); // 0.01
-    FixidityLib.Fraction memory carbonOffsettingFraction = FixidityLib.newFixedFraction(1, 1000); // 0.001
+    uint256 communityRewardFraction = getEpochRewards().getCommunityRewardFraction();
     address carbonOffsettingPartner = 0x22579CA45eE22E2E16dDF72D955D6cf4c767B0eF;
+    uint256 carbonOffsettingFraction = getEpochRewards().getCarbonOffsettingFraction();
 
     getCeloDistributionSchedule().activate(
       l2StartTime,
-      FixidityLib.unwrap(communityRewardFraction),
+      communityRewardFraction,
       carbonOffsettingPartner,
-      FixidityLib.unwrap(carbonOffsettingFraction)
+      carbonOffsettingFraction
     );
   }
 }
