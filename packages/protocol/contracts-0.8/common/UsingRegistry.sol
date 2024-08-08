@@ -21,7 +21,6 @@ import "../../contracts/governance/interfaces/IElection.sol";
 import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
 import "../../contracts/governance/interfaces/IEpochRewards.sol";
 
-
 contract UsingRegistry is Ownable {
   // solhint-disable state-visibility
   bytes32 constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
