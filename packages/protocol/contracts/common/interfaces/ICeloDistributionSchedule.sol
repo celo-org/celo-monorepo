@@ -5,7 +5,7 @@ interface ICeloDistributionSchedule {
   /**
    * @notice Sets the distribution schedule dependencies during L2 transition.
    */
-  function activate(uint256, uint256, address, uint256, address) external;
+  function activate(uint256, uint256, address, uint256) external;
 
   /**
    * @notice Mints CELO to the beneficiaries according to the predefined schedule.
