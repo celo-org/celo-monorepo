@@ -9,11 +9,13 @@ import { MigrationsConstants } from "@migrations-sol/constants.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
+// import "@celo-contracts/common/interfaces/ICeloToken.sol";
+import "@celo-contracts-8/common/UsingRegistry.sol";
 
-contract IntegrationTest is Test, TestConstants {
-  IRegistry registry = IRegistry(REGISTRY_ADDRESS);
-
-  function setUp() public {}
+contract MigrationTest is Test, TestConstants, UsingRegistry {
+  function setUp() public {
+    registry = IRegistry(REGISTRY_ADDRESS);
+  }
 
   /**
    * @notice Removes CBOR encoded metadata from the tail of the deployedBytecode.
@@ -47,7 +49,7 @@ contract IntegrationTest is Test, TestConstants {
   }
 }
 
-contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
+contract RegistryMigrationTest is MigrationTest, MigrationsConstants {
   IProxy proxy;
 
   function test_shouldHaveAddressInRegistry() public view {
@@ -120,5 +122,12 @@ contract RegistryIntegrationTest is IntegrationTest, MigrationsConstants {
         );
       }
     }
+  }
+}
+
+contract CeloMigrationTest is MigrationTest, MigrationsConstants {
+  function test_CeloSupplyNonZero() public {
+    uint256 celoSupply = getCeloToken().totalSupply();
+    require(celoSupply > 0, "Celo supply is non-zero");
   }
 }
