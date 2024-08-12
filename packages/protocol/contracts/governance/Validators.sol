@@ -403,7 +403,6 @@ contract Validators is
     address signer,
     bytes calldata ecdsaPublicKey
   ) external onlyRegisteredContract(ACCOUNTS_REGISTRY_ID) returns (bool) {
-    allowOnlyL1();
     require(isValidator(account), "Not a validator");
     Validator storage validator = validators[account];
     require(
