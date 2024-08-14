@@ -10,16 +10,18 @@ import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 import "../../contracts/common/interfaces/IRegistry.sol";
 import "../../contracts/common/interfaces/IAccounts.sol";
 import "../../contracts/common/interfaces/IFreezer.sol";
+import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
 import "../../contracts/common/interfaces/ICeloDistributionSchedule.sol";
+import "../../contracts/common/interfaces/IEpochManager.sol";
+
 import "../../contracts/governance/interfaces/IGovernance.sol";
 import "../../contracts/governance/interfaces/ILockedGold.sol";
 import "../../contracts/governance/interfaces/ILockedCelo.sol";
 import "../../contracts/governance/interfaces/IValidators.sol";
-import "../../contracts/stability/interfaces/ISortedOracles.sol";
-import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
 import "../../contracts/governance/interfaces/IElection.sol";
 
-import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
+import "../../contracts/stability/interfaces/ISortedOracles.sol";
 
 contract UsingRegistry is Ownable {
   // solhint-disable state-visibility
@@ -132,10 +134,11 @@ contract UsingRegistry is Ownable {
   function getCeloDistributionSchedule() internal view returns (ICeloDistributionSchedule) {
     return ICeloDistributionSchedule(registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID));
   }
+  // TODO: add interface
   function getEpochInitializer() internal view returns (IEpochInitializer) {
     return IEpochInitializer(registry.getAddressForOrDie(EPOCH_INITIALIZER_ID));
   }
-  function getCeloDistributionSchedule() internal view returns (IEpochManager) {
+  function getEpochManager() internal view returns (IEpochManager) {
     return IEpochManager(registry.getAddressForOrDie(EPOCH_MANAGER_ID));
   }
 }

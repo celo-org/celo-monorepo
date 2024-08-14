@@ -3,10 +3,10 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "../common/UsingRegistry.sol";
 import "../../contracts/common/Initializable.sol";
+import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
 // XXX(soloseng): If I know a block, how do I get the epoch? => not supported. DC with Mariano
-
-contract EpochManager is Initializable, UsingRegistry, UsingPrecompiles {
+contract EpochManager is Initializable, UsingRegistry, ICeloVersionedContract {
   enum EpochStatus {
     NotStarted,
     Processing,
@@ -86,7 +86,7 @@ contract EpochManager is Initializable, UsingRegistry, UsingPrecompiles {
   }
 
   /**
-   * @notice Used to set the duration of an epoch.
+   * @notice Sets the time duration of an epoch.
    * @param newEpochDuration The duration of an epoch in seconds.
    * @dev Can only be set by owner.
    */
@@ -131,13 +131,24 @@ contract EpochManager is Initializable, UsingRegistry, UsingPrecompiles {
   /**
    * @notice Marks the end of the previous epoch processing.
    */
-  function finishProcessingEpoch() public {
+  function finishProcessingEpoch() external onlyCeloDistributionSchedule {
     EpochHistory storage previousEpochHistory = epochHistory[epochNumber - 1];
 
     previousEpochHistory.processingEndedTimestamp = block.timestamp;
     previousEpochHistory.processingEndedBlock = block.number;
 
     emit EpochProcessingEnded(epochNumber - 1);
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 0, 0);
   }
 
   /**
@@ -160,7 +171,7 @@ contract EpochManager is Initializable, UsingRegistry, UsingPrecompiles {
   /**
    * @notice Marks the start of a new epoch.
    */
-  function startNewEpoch() internal {
+  function startNewEpoch() private {
     epochNumber++;
 
     EpochHistory storage newEpochHistory = epochHistory[epochNumber];

@@ -8,6 +8,7 @@ import "./interfaces/IFeeCurrencyWhitelist.sol";
 import "./interfaces/IFreezer.sol";
 import "./interfaces/IRegistry.sol";
 import "./interfaces/ICeloDistributionSchedule.sol";
+import "./interfaces/IEpochManager.sol";
 
 import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IGovernance.sol";
@@ -182,11 +183,11 @@ contract UsingRegistryV2 {
     return
       ICeloDistributionSchedule(registryContract.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID));
   }
-
+  // TODO(soloseng): add interface
   function getEpochInitializer() internal view returns (IEpochInitializer) {
     return IEpochInitializer(registry.getAddressForOrDie(EPOCH_INITIALIZER_ID));
   }
-  function getCeloDistributionSchedule() internal view returns (IEpochManager) {
+  function getEpochManager() internal view returns (IEpochManager) {
     return IEpochManager(registry.getAddressForOrDie(EPOCH_MANAGER_ID));
   }
 }
