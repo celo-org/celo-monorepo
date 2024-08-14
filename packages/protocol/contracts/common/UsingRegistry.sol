@@ -51,6 +51,8 @@ contract UsingRegistry is Ownable {
   bytes32 constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
   bytes32 constant CELO_DISTRIBUTION_SCHEDULE_ID =
     keccak256(abi.encodePacked("CeloDistributionSchedule"));
+  bytes32 constant EPOCH_INITIALIZER_ID = keccak256(abi.encodePacked("EpochInitializer"));
+  bytes32 constant EPOCH_MANAGER_ID = keccak256(abi.encodePacked("EpochManager"));
   // solhint-enable state-visibility
 
   IRegistry public registry;
@@ -141,5 +143,11 @@ contract UsingRegistry is Ownable {
 
   function getCeloDistributionSchedule() internal view returns (ICeloDistributionSchedule) {
     return ICeloDistributionSchedule(registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID));
+  }
+  function getEpochInitializer() internal view returns (IEpochInitializer) {
+    return IEpochInitializer(registry.getAddressForOrDie(EPOCH_INITIALIZER_ID));
+  }
+  function getCeloDistributionSchedule() internal view returns (IEpochManager) {
+    return IEpochManager(registry.getAddressForOrDie(EPOCH_MANAGER_ID));
   }
 }
