@@ -68,5 +68,6 @@
     "blind-threshold-bls": "npm:@celo/blind-threshold-bls@1.0.0-beta",
     "@types/bn.js": "4.11.6",
     "bignumber.js": "9.0.0"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }
