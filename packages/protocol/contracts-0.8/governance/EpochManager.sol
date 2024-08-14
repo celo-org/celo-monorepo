@@ -5,23 +5,26 @@ import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
 import "../../contracts/common/Initializable.sol";
 
-// XXX(soloseng): think about the difference between epochEndBlock && epochProcessingEndBlock
+// XXX(soloseng): think about the difference between `epochEndBlock` && `epochProcessingEndBlock`
 // which one marks the end of the epoch?
 // in the case that the epoch is processed late (e.g.: 1 week later).
 // does the new epoch start once the old epoch is processed, regardless of time delay?
 
+// start new epoch at the start of processing plus 1 block, because rewards are frozen when processing starts.
+
+// epochProcessingEndBlock == epochStartingBlock of following epoch
+// epochEndBlock == epochProcessingEndBlock == new epochStartingBlock
+// XXX(soloseng): If I know a block, how do I get the epoch? => not supported. DC with Mariano
+
 contract EpochManager is Initializable, UsingRegistry, UsingPrecompiles {
   enum EpochStatus {
-    Ongoing,
+    NotStarted,
     Processing,
-    Finished
+    Ongoing
   }
 
   // XXX(soloseng): create view functions for current epoch history params.
   struct EpochHistory {
-    // XXX: (soloseng) not sure this is needed,
-    // XXX: since we already have a public getter and we need the number to access the history.
-    uint256 number;
     // block at which an epoch is started
     uint256 epochStartingBlock; // XXX:(soloseng) this should be set every new epoch
     // block at which an epoch is ended
@@ -35,26 +38,16 @@ contract EpochManager is Initializable, UsingRegistry, UsingPrecompiles {
     // block at which epoch processing ended
     uint256 processingEndedBlock;
     // timestamp at which epoch processing started.
-    uint256 timestampProcessingStarted;
+    uint256 processingStartedTimestamp;
     // timestamp at which epoch processing ended.
-    uint256 timestampProcessingFinished;
+    uint256 processingEndedTimestamp;
     // status of the epoch.
-    EpochStatus status; // ENUM (processing=0, finished=1)
-    // validator set not needed as they never change in Valdiators
-    // address[] validatorSet, // TODO change to groups
-
-    // XXX: (soloseng) shouldnt these be handled by EpochReward contract?
-    uint256 maxRewardsValidator; // target MAX validator rewards
-    uint256 rewardsVoter; // how much to give to voters (or is it Max?)
-    // it could be that there's no need to save these nex two
-    uint256 rewardsCommunity; // how much to give community fund
-    uint256 rewardsCarbonFund; // how much to give to carbon offset fund
-    // TODO what happens to the storage if this struct adds data
+    EpochStatus status;
   }
 
   // current chain epoch number
-  uint256 public epochNumber; // (brought from geth)
-  unit256 public firstL2EpochNumber;
+  uint256 public epochNumber;
+  uint256 public firstL2EpochNumber;
 
   // The lenght of time of an epoch
   uint256 public epochDuration;
@@ -62,6 +55,13 @@ contract EpochManager is Initializable, UsingRegistry, UsingPrecompiles {
   // epochnumber => epochProcessing
   mapping(uint256 => EpochHistory) public epochHistory;
 
+  event EpochProcessingStarted(uint256 epochNumber);
+  event EpochProcessingEnded(uint256 epochNumber);
+
+  modifier onlyEpochInitializer() {
+    require(msg.sender == registry.getAddressForOrDie(EPOCH_INITIALIZER_ID));
+    _;
+  }
   modifier onlyCeloDistributionSchedule() {
     require(msg.sender == registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID));
     _;
@@ -93,48 +93,59 @@ contract EpochManager is Initializable, UsingRegistry, UsingPrecompiles {
     epochDuration = newEpochDuration;
   }
 
-  // this needs to be called before the transition
+  // XXX: this needs to be called before the transition at the start of a new epoch
   // so the blockchain can know the current epoch number
-  // XXX: (soloseng) is there a way to do this automatically on every L1 epoch? maybe add a call in epoch rewards?
+
+  // move this function to an initializer contract, and pass the values to the epochManager by calling the kickoff function.
+  // this kickoff function is only calleable by initializer contract.
 
   /**
    * @notice Used to migrate the current epoch number to solidity from precompile.
    * @dev Can only be called prior to the L2 migration.
    */
-  function migrateEpochNumberToSolidity() external onlyL1 {
-    epochNumber = getEpochNumber();
+  function migrateEpochNumberToSolidity() external onlyEpochInitializer {
     firstL2EpochNumber = epochNumber;
     EpochHistory storage currentEpochHistory = epochHistory[epochNumber];
+
+    currentEpochHistory.epochStartingBlock = block.number;
+    currentEpochHistory.epochStartTimestamp = block.timestamp;
     currentEpochHistory.epochEndTimestamp = block.timestamp + epochDuration;
-    // XXX:(soloseng) should this update the epoch history so that we know what the first L2 epoch was?
+    currentEpochHistory.status = EpochStatus.Ongoing;
   }
 
-  // TODO come up with better name, it's dublicated
+  // freezes rewards here. marking end of epoch.
   function startProcessingEpoch(
+    //XXX: this is the epoch end block, then what is the epoch of the the block during processing?
     uint256 maxRewardsValidator,
     uint256 rewardsVoter,
     uint256 rewardsCommunity,
     uint256 rewardsCarbonFund
   ) external onlyCeloDistributionSchedule {
+    require(checkReadyStartProcessingEpoch(), "Epoch not ready to be processed.");
     EpochHistory storage currentEpochHistory = epochHistory[epochNumber];
+    currentEpochHistory.epochEndingBlock = block.number;
     currentEpochHistory.processingStartedBlock = block.number;
-    currentEpochHistory.timestampProcessingStarted = block.timestamp;
-    currentEpochHistory.status = Processing;
+    currentEpochHistory.processingStartedTimestamp = block.timestamp;
+    currentEpochHistory.status = EpochStatus.Processing;
 
-    // XXX:(soloseng) save the expected rewards at time of processing?
-
-    // epoch.maxRewardsValidator = maxRewardsValidator
-    // epoch.rewardsVoter = rewardsVoter
-    // epoch.rewardsCommunity = rewardsCommunity
-    // epoch.rewardsCarbonFund = rewardsCarbonFund
+    emit EpochProcessingStarted();
   }
 
-  // XXX: (soloseng) no need to check if finished since once finished, a new epoch is started.
+  function finishProcessingEpoch() public {
+    EpochHistory storage currentEpochHistory = epochHistory[epochNumber];
+
+    currentEpochHistory.processingEndedTimestamp = block.timestamp;
+    // currentEpochHistory.epochEndingBlock = block.number;
+
+    emit EpochProcessingEnded();
+    startNewEpoch();
+  }
+
   function checkReadyStartProcessingEpoch() public view returns (bool) {
-    EpochHistory storage currentEpoch = epochHistory[epochNumber];
+    EpochHistory storage currentEpochHistory = epochHistory[epochNumber];
     if (
-      block.timestamp >= currentEpoch.epochEndTimestamp &&
-      currentEpoch.status == EpochStatus.Ongoing
+      block.timestamp >= currentEpochHistory.epochEndTimestamp &&
+      currentEpochHistory.status == EpochStatus.Ongoing
     ) {
       return true;
     } else {
@@ -142,40 +153,15 @@ contract EpochManager is Initializable, UsingRegistry, UsingPrecompiles {
     }
   }
 
-  // function currentEpochProcessing()public{
-  //   EpochHistory storage currentEpochHistory = epochHistory[epochNumber];
-  // // uint256	currentEpoch = epochHistory[epochNumber]
-  // 	if currentEpochHistory.number != 0:
-  // 	return epoch.status == PROCESSING
-  // }
-
   function startNewEpoch() internal {
     epochNumber++;
 
-    epochStartTimestamp = epochHistory[epochNumber - 1].timestampProcessingFinished;
-    epochEndTimestamp = epochHistory[epochNumber - 1].timestampProcessingFinished + epochDuration;
+    EpochHistory memory previousEpochHistory = epochHistory[epochNumber - 1];
 
     EpochHistory storage newEpochHistory = epochHistory[epochNumber];
-    newEpochHistory.epochStartingBlock = block.number;
+    newEpochHistory.epochStartingBlock = previousEpochHistory.epochEndingBlock + 1;
     newEpochHistory.epochStartTimestamp = block.timestamp;
-    newEpochHistory.status = Ongoing;
-    // lastBlockEpochFinished = previousEpochHistory.processingStartedBlock
-    // epochFinishesAfter = previousEpochProcessing.timestampProcessingStarted + timestampProcessingStarted
-  }
-
-  // XXX:(soloseng) not sure why freeing the struct storage is needed.
-  // Do we need to allow a multisig/governance to set this?
-  function finishProcessingEpoch() private {
-    EpochHistory storage currentEpochHistory = epochHistory[epochNumber];
-    currentEpochHistory.status = Finished;
-    currentEpochHistory.timestampProcessingFinished = block.timestamp;
-    // currentEpochHistory.epochEndTimestamp = block.timestamp;
-    currentEpochHistory.epochEndingBlock = block.number;
-
-    // optional free the storage from the previous unfinished epoch
-    // if "epochNumber-2" in epochHistory:
-    //   delete epochHistory[epochNumber-2]
-
-    startNewEpoch();
+    newEpochHistory.epochEndTimestamp = block.timestamp + epochDuration;
+    newEpochHistory.status = EpochStatus.Ongoing;
   }
 }
