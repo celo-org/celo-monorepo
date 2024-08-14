@@ -2,18 +2,8 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 import "../common/UsingRegistry.sol";
-import "../common/UsingPrecompiles.sol";
 import "../../contracts/common/Initializable.sol";
 
-// XXX(soloseng): think about the difference between `epochEndBlock` && `epochProcessingEndBlock`
-// which one marks the end of the epoch?
-// in the case that the epoch is processed late (e.g.: 1 week later).
-// does the new epoch start once the old epoch is processed, regardless of time delay?
-
-// start new epoch at the start of processing plus 1 block, because rewards are frozen when processing starts.
-
-// epochProcessingEndBlock == epochStartingBlock of following epoch
-// epochEndBlock == epochProcessingEndBlock == new epochStartingBlock
 // XXX(soloseng): If I know a block, how do I get the epoch? => not supported. DC with Mariano
 
 contract EpochManager is Initializable, UsingRegistry, UsingPrecompiles {
@@ -25,43 +15,54 @@ contract EpochManager is Initializable, UsingRegistry, UsingPrecompiles {
 
   // XXX(soloseng): create view functions for current epoch history params.
   struct EpochHistory {
-    // block at which an epoch is started
-    uint256 epochStartingBlock; // XXX:(soloseng) this should be set every new epoch
-    // block at which an epoch is ended
-    uint256 epochEndingBlock; // XXX:(soloseng) this should be set every new epoch
-    // timestamp at which an epoch started
-    uint256 epochStartTimestamp; // XXX:(soloseng) this should be set every new epoch
-    // timestamp at which an epoch ended
-    uint256 epochEndTimestamp; // XXX:(soloseng) this should be set every new epoch
-    // block at which epoch processing started
+    /// The block at which an epoch is considered started.
+    uint256 epochStartingBlock;
+    /// The block at which an epoch is considered ended.
+    uint256 epochEndingBlock;
+    /// The timestamp at which an epoch started.
+    uint256 epochStartTimestamp;
+    /// The minimum required time that an epoch should last.
+    uint256 epochEndTimestamp;
+    /// The block at which the epoch processing started.
     uint256 processingStartedBlock;
-    // block at which epoch processing ended
+    /// The block at which the epoch processing ended.
     uint256 processingEndedBlock;
-    // timestamp at which epoch processing started.
+    /// The timestamp at which the epoch processing started.
     uint256 processingStartedTimestamp;
-    // timestamp at which epoch processing ended.
+    /// The timestamp at which the epoch processing ended.
     uint256 processingEndedTimestamp;
-    // status of the epoch.
+    /// The status of the epoch.
     EpochStatus status;
   }
 
-  // current chain epoch number
+  /// The current epoch number.
   uint256 public epochNumber;
+  /// The epoch number at which L2 started.
   uint256 public firstL2EpochNumber;
 
-  // The lenght of time of an epoch
+  /// The minimum required lenght of time of an epoch.
   uint256 public epochDuration;
 
-  // epochnumber => epochProcessing
+  /// Maps and epoch number to the EpochHistory struct.
   mapping(uint256 => EpochHistory) public epochHistory;
 
-  event EpochProcessingStarted(uint256 epochNumber);
-  event EpochProcessingEnded(uint256 epochNumber);
+  /**
+   * @notice Event emited when epochProcessing has begun.
+   * @param epochNumber The epoch number that is being processed.
+   */
+  event EpochProcessingStarted(uint256 indexed epochNumber);
+
+  /**
+   * @notice Event emited when epochProcessing has ended.
+   * @param epochNumber The epoch number that is finished being processed.
+   */
+  event EpochProcessingEnded(uint256 indexed epochNumber);
 
   modifier onlyEpochInitializer() {
     require(msg.sender == registry.getAddressForOrDie(EPOCH_INITIALIZER_ID));
     _;
   }
+
   modifier onlyCeloDistributionSchedule() {
     require(msg.sender == registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID));
     _;
@@ -93,9 +94,7 @@ contract EpochManager is Initializable, UsingRegistry, UsingPrecompiles {
     epochDuration = newEpochDuration;
   }
 
-  // XXX: this needs to be called before the transition at the start of a new epoch
-  // so the blockchain can know the current epoch number
-
+  // TODO(soloseng):
   // move this function to an initializer contract, and pass the values to the epochManager by calling the kickoff function.
   // this kickoff function is only calleable by initializer contract.
 
@@ -113,38 +112,43 @@ contract EpochManager is Initializable, UsingRegistry, UsingPrecompiles {
     currentEpochHistory.status = EpochStatus.Ongoing;
   }
 
-  // freezes rewards here. marking end of epoch.
-  function startProcessingEpoch(
-    //XXX: this is the epoch end block, then what is the epoch of the the block during processing?
-    uint256 maxRewardsValidator,
-    uint256 rewardsVoter,
-    uint256 rewardsCommunity,
-    uint256 rewardsCarbonFund
-  ) external onlyCeloDistributionSchedule {
+  /**
+   * @notice Starts the processing of the previous epoch.
+   * @dev Previous epoch always end 1 block before processing is started.
+   */
+  function startProcessingEpoch() external onlyCeloDistributionSchedule {
     require(checkReadyStartProcessingEpoch(), "Epoch not ready to be processed.");
     EpochHistory storage currentEpochHistory = epochHistory[epochNumber];
-    currentEpochHistory.epochEndingBlock = block.number;
+    currentEpochHistory.epochEndingBlock = block.number - 1;
     currentEpochHistory.processingStartedBlock = block.number;
     currentEpochHistory.processingStartedTimestamp = block.timestamp;
     currentEpochHistory.status = EpochStatus.Processing;
 
-    emit EpochProcessingStarted();
-  }
-
-  function finishProcessingEpoch() public {
-    EpochHistory storage currentEpochHistory = epochHistory[epochNumber];
-
-    currentEpochHistory.processingEndedTimestamp = block.timestamp;
-    // currentEpochHistory.epochEndingBlock = block.number;
-
-    emit EpochProcessingEnded();
+    emit EpochProcessingStarted(epochNumber);
     startNewEpoch();
   }
 
+  /**
+   * @notice Marks the end of the previous epoch processing.
+   */
+  function finishProcessingEpoch() public {
+    EpochHistory storage previousEpochHistory = epochHistory[epochNumber - 1];
+
+    previousEpochHistory.processingEndedTimestamp = block.timestamp;
+    previousEpochHistory.processingEndedBlock = block.number;
+
+    emit EpochProcessingEnded(epochNumber - 1);
+  }
+
+  /**
+   * @return Whether or not an epoch is ready for processing.
+   * @dev Can only start processing an epoch if the current timestamp is strictly
+   * greater than `currentEpochHistory.epochEndTimestamp`
+   */
   function checkReadyStartProcessingEpoch() public view returns (bool) {
     EpochHistory storage currentEpochHistory = epochHistory[epochNumber];
     if (
-      block.timestamp >= currentEpochHistory.epochEndTimestamp &&
+      block.timestamp > currentEpochHistory.epochEndTimestamp &&
       currentEpochHistory.status == EpochStatus.Ongoing
     ) {
       return true;
@@ -153,13 +157,14 @@ contract EpochManager is Initializable, UsingRegistry, UsingPrecompiles {
     }
   }
 
+  /**
+   * @notice Marks the start of a new epoch.
+   */
   function startNewEpoch() internal {
     epochNumber++;
 
-    EpochHistory memory previousEpochHistory = epochHistory[epochNumber - 1];
-
     EpochHistory storage newEpochHistory = epochHistory[epochNumber];
-    newEpochHistory.epochStartingBlock = previousEpochHistory.epochEndingBlock + 1;
+    newEpochHistory.epochStartingBlock = block.number;
     newEpochHistory.epochStartTimestamp = block.timestamp;
     newEpochHistory.epochEndTimestamp = block.timestamp + epochDuration;
     newEpochHistory.status = EpochStatus.Ongoing;
