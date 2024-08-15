@@ -133,6 +133,7 @@ contract EpochManager is IEpochManager {
         require(isOnEpochProcess(), "Epoch process is not started");
 
         // finalize epoch
+        // TODO last block should be the block before and timestamp from previous block
         epochs[currentEpoch].endTimestamp = block.timestamp;
         epochs[currentEpoch].lastBlock = block.number;
 
@@ -141,7 +142,7 @@ contract EpochManager is IEpochManager {
         epochs[currentEpoch].firstBlock = block.number;
         epochs[currentEpoch].startTimestamp = block.timestamp;
 
-
+        // O(elected)
         for (uint i =0; i < elected.length; i++) {
             address group = validators.getGroup(elected[i]);
             if (epochProcessing.processedGroups[group] == 0) {
@@ -152,6 +153,7 @@ contract EpochManager is IEpochManager {
 
         require(epochProcessing.toProcessGroups == groups.length, "number of groups does not match")
 
+        // O(groups)
         for (uint i = 0; i < groups.length; i++) {
             // checks that group is acutally from elected group
             require(epochProcessing.processedGroups[groups[i]] == 1, "group not processed")
@@ -159,6 +161,7 @@ contract EpochManager is IEpochManager {
             delete epochProcessing.processedGroups[groups[i]];
             
             // TODO what happens to uptime?
+            
 		    uint256 epochRewards = getElection().getGroupEpochRewards(groups[i], epochProcessing.rewardsVoter, uptimes);
 		    getElection().distributeEpochRewards(groups[i], epochRewards, lessers[i] , greaters[i]);
         }
@@ -168,7 +171,7 @@ contract EpochManager is IEpochManager {
 
 
         // run elections
-        elected = electValidatorSigners();
+        elected = getElection().electValidators()
 
         // TODO check how to nullify stuct
         epochProcesssing.started = false;
@@ -178,7 +181,8 @@ contract EpochManager is IEpochManager {
     function allocateValidatorsRewards() {
         uint256 totalRewards = 0;
         for (uint i = 0; i < elected.length; i++) {
-            uint256 validatorReward = validators.computeEpochReward(elected[i], epochProcessing.maxRewardsValidator);
+            uint256 validatorScore = scoreManager.getValidatorScore(elected[i]);
+            uint256 validatorReward = validators.computeEpochReward(elected[i], validatorScore, epochProcessing.maxRewardsValidator);
             validatorPendingPayments[elected[i]] += validatorReward;
             totalRewards += validatorReward;
         }
@@ -195,59 +199,3 @@ contract EpochManager is IEpochManager {
 
 
 
-// providers a list of addresses to receive rewards (groups with zero can not be ignored as we have to verify them anyway)
-// this list should be done in an order that created the less amout of changes of pointers possible (to save gas)
-// leaser and greaters are the index of the lesser greaters in the signer list for the call distributeEpochRewards
-// having uint8 here limits to max 256 validators
-// TODO instead of addresses, it can be a index to the epoch's validator group set
-function distributeCeloEpochPayments(address[] groups, uint16[] leassers, uint16 greaters) noReentrancy:
-	epochManager.checkReadyDistributeCeloEpochPayments()
-	uint256 epochNumber = epochRewards.getEpochNumber();
-	rewardsVoter = epochProcessing[epochNumber].rewardsVoter
-
-    // iterate over elected and populate electedGroupProcessed with their group
-    electedGroupLength = 0
-    for (uint i = 0; i < elected.length; i++) {
-        if (!electedGroupProcessed[validators.getGroup(elected[i])]) {
-            electedGroupLength++;
-        }
-        address group = validators.getGroup(elected[i])
-        electedGroupProcessed[group] = false;
-    }
-
-    require(electedGroupLength == groups.length, "number of groups does not match")
-
-
-    require(getGroupSet(elected).isEqual(setFrom(groups))
-	
-	require(groups.length == epoch.validatorSet.length, "number does not match")
-	
-	// gas: 110 storage writes
-	for group in groups:
-        require(electedGroupProcessed[group] == 0, "group already processed")
-		// TODO: verify that group is in this epoch's elected set
-		// TODO: verify that the group is not repeated
-
-        
-		// TODO: where do we get uptimes (or "score") for each validator
-
-		// score can be harcoded in another contract (set by governance)
-		// uptime can get rid
-		uint256 epochRewards = getElection().getGroupEpochRewards(group, rewardsVoter, uptimes);
-		getElection().distributeEpochRewards(group, epochRewards, lesser , greather);
-
-	GoldToken.mint(address(CommunityFund), communityReward)
-	GoldToken.mint(address(Carbon), carbonReward)
-	
-	// run the election
-	// TODO maybe it goes to another tx?
-	elections.electValidators()
-
-	// re-enable everything
-
-	lockedGold.unblockChanges()
-	validators.unblockChanges()
-	
-	// wrap up the epoch change
-	epochManager.finishProcessingEpoch(epoch)
-	emit EpochProcessingFinished(epochNumber)

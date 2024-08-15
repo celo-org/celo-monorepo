@@ -543,7 +543,7 @@ contract Election is
   function getGroupEpochRewards(
     address group,
     uint256 totalEpochRewards,
-    uint256[] calldata uptimes
+    uint256[] calldata currentEpochScores
   ) external view returns (uint256) {
     IValidators validators = getValidators();
     // The group must meet the balance requirements for their voters to receive epoch rewards.
