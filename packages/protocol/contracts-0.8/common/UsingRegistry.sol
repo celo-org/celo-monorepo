@@ -7,17 +7,21 @@ pragma solidity >=0.8.0 <0.8.20;
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
+import "./interfaces/IEpochManager.sol";
+
 import "../../contracts/common/interfaces/IRegistry.sol";
 import "../../contracts/common/interfaces/IAccounts.sol";
 import "../../contracts/common/interfaces/IFreezer.sol";
 import "../../contracts/common/interfaces/ICeloDistributionSchedule.sol";
+import "../../contracts/common/interfaces/IEpochManagerInitializer.sol";
 import "../../contracts/governance/interfaces/IGovernance.sol";
 import "../../contracts/governance/interfaces/ILockedGold.sol";
 import "../../contracts/governance/interfaces/ILockedCelo.sol";
 import "../../contracts/governance/interfaces/IValidators.sol";
+import "../../contracts/governance/interfaces/IElection.sol";
+import "../../contracts/governance/interfaces/IEpochRewards.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
 import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
-import "../../contracts/governance/interfaces/IElection.sol";
 
 import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
 
@@ -49,6 +53,10 @@ contract UsingRegistry is Ownable {
   bytes32 constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
   bytes32 constant CELO_DISTRIBUTION_SCHEDULE_ID =
     keccak256(abi.encodePacked("CeloDistributionSchedule"));
+  bytes32 constant EPOCH_REWARDS_ID = keccak256(abi.encodePacked("EpochRewards"));
+  bytes32 constant EPOCH_MANAGER_INITIALIZER_ID =
+    keccak256(abi.encodePacked("EpochManagerInitializer"));
+  bytes32 constant EPOCH_MANAGER_ID = keccak256(abi.encodePacked("EpochManager"));
   // solhint-enable state-visibility
 
   IRegistry public registry;
@@ -129,5 +137,17 @@ contract UsingRegistry is Ownable {
 
   function getCeloDistributionSchedule() internal view returns (ICeloDistributionSchedule) {
     return ICeloDistributionSchedule(registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID));
+  }
+
+  function getEpochRewards() internal view returns (IEpochRewards) {
+    return IEpochRewards(registry.getAddressForOrDie(EPOCH_REWARDS_ID));
+  }
+
+  function getEpochManagerInitializer() internal view returns (IEpochManagerInitializer) {
+    return IEpochManagerInitializer(registry.getAddressForOrDie(EPOCH_MANAGER_INITIALIZER_ID));
+  }
+
+  function getEpochManager() internal view returns (IEpochManager) {
+    return IEpochManager(registry.getAddressForOrDie(EPOCH_MANAGER_ID));
   }
 }

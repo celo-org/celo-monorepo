@@ -3,7 +3,7 @@ pragma solidity ^0.5.13;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-import "../common/CalledByVm.sol";
+import "./interfaces/IEpochRewards.sol";
 import "../common/FixidityLib.sol";
 import "../common/Freezable.sol";
 import "../common/Initializable.sol";
@@ -16,12 +16,12 @@ import "../common/interfaces/ICeloVersionedContract.sol";
  */
 contract EpochRewards is
   ICeloVersionedContract,
+  IEpochRewards,
   Ownable,
   Initializable,
   UsingPrecompiles,
   UsingRegistry,
-  Freezable,
-  CalledByVm
+  Freezable
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -84,6 +84,14 @@ contract EpochRewards is
 
   event TargetVotingYieldUpdated(uint256 fraction);
 
+  modifier onlyVmOrEpochManager() {
+    require(
+      msg.sender == address(0) || msg.sender == registry.getAddressForOrDie(EPOCH_MANAGER_ID),
+      "Only VM or Epoch Manager can call"
+    );
+    _;
+  }
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -143,7 +151,7 @@ contract EpochRewards is
    *   voting Gold fraction.
    * @dev Only called directly by the protocol.
    */
-  function updateTargetVotingYield() external onlyVm onlyWhenNotFrozen onlyL1 {
+  function updateTargetVotingYield() external onlyVmOrEpochManager onlyWhenNotFrozen {
     _updateTargetVotingYield();
   }
 
