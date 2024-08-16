@@ -12,13 +12,17 @@ interface IEpochManager is IBlocker {
     // uint256 firstEpochTimestamp, // TODO: do we need END timestamp?
     address[] calldata firstElected
   ) external;
-  function startNextEpochProcess() external;
-  function finishNextEpochProcess() external;
-  function getCurrentEpoch() external view returns (uint256);
-  function getElected() external view returns (address[] memory);
-  function getElectedAtEpoch(uint256 epoch) external view returns (address[] memory);
-  function getFirstBlockAtEpoch(uint256 epoch) external view returns (uint256);
-  function getLastBlockAtEpoch(uint256 epoch) external view returns (uint256);
+  // function startNextEpochProcess() external;
+  // function finishNextEpochProcess(
+  //   address[] calldata groups,
+  //   uint16[] calldata lessers,
+  //   uint16 greaters
+  // ) external;
+  // function getCurrentEpoch() external view returns (uint256);
+  // function getElected() external view returns (address[] memory);
+  // // function getElectedAtEpoch(uint256 epoch) external view returns (address[] memory);
+  // function getFirstBlockAtEpoch(uint256 epoch) external view returns (uint256);
+  // function getLastBlockAtEpoch(uint256 epoch) external view returns (uint256);
 
-  function isOnEpochProcess() external view returns (bool);
+  // function isOnEpochProcess() external view returns (bool);
 }

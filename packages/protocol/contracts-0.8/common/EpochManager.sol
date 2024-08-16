@@ -2,12 +2,15 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 import "@openzeppelin/contracts8/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "./interfaces/IEpochManager.sol";
 import "../common/UsingRegistry.sol";
 
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+
+import "./ScoreManager.sol";
 
 contract EpochManager is
   Initializable,
@@ -24,8 +27,13 @@ contract EpochManager is
     uint256 rewardsBlock;
   }
 
+  enum EpochProcessStatus {
+    NotStarted,
+    Started
+  }
+
   struct EpochProcessState {
-    bool started; // TODO maybe a enum for future updates
+    EpochProcessStatus status; // TODO maybe a enum for future updates
     uint256 perValidatorReward; // The per validator epoch reward.
     uint256 totalRewardsVoter; // The total rewards to voters.
     uint256 totalRewardsCommunity; // The total community reward.
@@ -44,11 +52,14 @@ contract EpochManager is
 
   // TODO this should be able to get deleted easily
   // maybe even having it in a stadalone contract
-  mapping(address => uint256) public processedGroups;
+  mapping(address => bool) public processedGroups;
 
   EpochProcessState public epochProcessing;
   mapping(uint256 => Epoch) public epochs;
   mapping(address => uint256) public validatorPendingPayments;
+
+  address public communityRewardFund;
+  address public carbonOffsettingPartner;
 
   /**
    * @notice Event emited when epochProcessing has begun.
@@ -82,10 +93,12 @@ contract EpochManager is
    * @param registryAddress The address of the registry core smart contract.
    * @param newEpochDuration The duration of an epoch in seconds.
    */
-  function initialize(address registryAddress, uint256 newEpochDuration) external initializer {
+  function initialize(address registryAddress, uint256 newEpochDuration, address _carbonOffsettingPartner, address _communityRewardFund) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setEpochDuration(newEpochDuration);
+    carbonOffsettingPartner = _carbonOffsettingPartner;
+    communityRewardFund = _communityRewardFund;
   }
 
   // DESIGNDESICION(XXX): we assume that the first epoch on the L2 starts as soon as the system is initialized
@@ -112,7 +125,7 @@ contract EpochManager is
   function startNextEpochProcess() external nonReentrant {
     require(isReadyToStartEpoch(), "Epoch is not ready to start");
     require(!isOnEpochProcess(), "Epoch process is already started");
-    epochProcessing.started = true;
+    epochProcessing.status = EpochProcessStatus.Started;
 
     epochs[currentEpoch].rewardsBlock = block.number;
 
@@ -140,45 +153,46 @@ contract EpochManager is
 
   function finishNextEpochProcess(
     address[] calldata groups,
-    uint16[] calldata lessers,
-    uint16 greaters
+    address[] calldata lessers,
+    address[] calldata greaters
   ) external nonReentrant {
     // TODO complete this function
-    //   require(isOnEpochProcess(), "Epoch process is not started");
-    //   // finalize epoch
-    //   // TODO last block should be the block before and timestamp from previous block
-    //   epochs[currentEpoch].endTimestamp = block.timestamp;
-    //   epochs[currentEpoch].lastBlock = block.number;
-    //   // start new epoch
-    //   currentEpoch++;
-    //   epochs[currentEpoch].firstBlock = block.number;
-    //   epochs[currentEpoch].startTimestamp = block.timestamp;
-    //   // O(elected)
-    //   for (uint i =0; i < elected.length; i++) {
-    //       address group = validators.getGroup(elected[i]);
-    //       if (epochProcessing.processedGroups[group] == 0) {
-    //           epochProcessing.toProcessGroups++;
-    //           epochProcessing.processedGroups[group] = 1;
-    //       }
-    //   }
-    //   require(epochProcessing.toProcessGroups == groups.length, "number of groups does not match")
-    //   // O(groups)
-    //   for (uint i = 0; i < groups.length; i++) {
-    //       // checks that group is acutally from elected group
-    //       require(epochProcessing.processedGroups[groups[i]] == 1, "group not processed")
-    //       // by doing this, we avoid processing a group twice
-    //       delete epochProcessing.processedGroups[groups[i]];
-    //       // TODO what happens to uptime?
-    //   uint256 epochRewards = getElection().getGroupEpochRewards(groups[i], epochProcessing.rewardsVoter, uptimes);
-    //   getElection().distributeEpochRewards(groups[i], epochRewards, lessers[i] , greaters[i]);
-    //   }
-    //   celoDistributionSchedule.mint(address(CommunityFund), epochProcessing.rewardsCommunity)
-    // celoDistributionSchedule.mint(address(Carbon), epochProcessing.rewardsCarbonFund)
-    //   // run elections
-    //   elected = getElection().electValidators()
-    //   // TODO check how to nullify stuct
-    //   epochProcesssing.started = false;
-    //   epochProcessing = new epochProcessState();
+      require(isOnEpochProcess(), "Epoch process is not started");
+      // finalize epoch
+      // TODO last block should be the block before and timestamp from previous block
+      epochs[currentEpoch].endTimestamp = block.timestamp;
+      epochs[currentEpoch].lastBlock = block.number - 1;
+      // start new epoch
+      currentEpoch++;
+      epochs[currentEpoch].firstBlock = block.number;
+      epochs[currentEpoch].startTimestamp = block.timestamp;
+
+      for (uint i =0; i < elected.length; i++) {
+          (,,address group,,) = getValidators().getValidator(elected[i]);
+          if (!processedGroups[group]) {
+              epochProcessing.toProcessGroups++;
+              processedGroups[group] = true;
+          }
+      }
+
+      require(epochProcessing.toProcessGroups == groups.length, "number of groups does not match");
+
+      for (uint i = 0; i < groups.length; i++) {
+          // checks that group is acutally from elected group
+          require(processedGroups[groups[i]], "group not processed");
+          // by doing this, we avoid processing a group twice
+          delete processedGroups[groups[i]];
+          // TODO what happens to uptime?
+          uint256[] memory uptimes = getScoreManager().getUptimes(groups[i]);
+          uint256 epochRewards = getElection().getGroupEpochRewards(groups[i], epochProcessing.totalRewardsVoter, uptimes);
+          getElection().distributeEpochRewards(groups[i], epochRewards, lessers[i] , greaters[i]);
+      }
+      getCeloDistributionSchedule().transfer(communityRewardFund, epochProcessing.totalRewardsCommunity);
+      getCeloDistributionSchedule().transfer(carbonOffsettingPartner, epochProcessing.totalRewardsCarbonFund);
+      // run elections
+      elected = getElection().electNValidatorSigners(10, 20);
+      // TODO check how to nullify stuct
+      epochProcessing.status = EpochProcessStatus.NotStarted;
   }
 
   function getCurrentEpoch() external view returns (uint256) {
@@ -197,8 +211,8 @@ contract EpochManager is
     return epochs[epoch].lastBlock;
   }
 
-  function isOnEpochProcess() external view returns (bool) {
-    return epochProcessing.started;
+  function isOnEpochProcess() public view returns (bool) {
+    return epochProcessing.status == EpochProcessStatus.Started;
   }
 
   function isTimeForNextEpoch() external view returns (bool) {
@@ -232,14 +246,17 @@ contract EpochManager is
     }
   }
 
-  // checks if process has started
-  function isOnEpochProcess() public view returns (bool) {
-    if (epochProcessing.started) {
-      return true;
-    } else {
-      return false;
-    }
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 0, 0);
   }
+
 
   function allocateValidatorsRewards() internal {
     // TODO complete this function

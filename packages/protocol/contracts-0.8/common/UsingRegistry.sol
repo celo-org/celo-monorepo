@@ -22,6 +22,7 @@ import "../../contracts/governance/interfaces/IElection.sol";
 import "../../contracts/governance/interfaces/IEpochRewards.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
 import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
+import "./interfaces/IScoreManager.sol";
 
 import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
 
@@ -57,6 +58,8 @@ contract UsingRegistry is Ownable {
   bytes32 constant EPOCH_MANAGER_INITIALIZER_ID =
     keccak256(abi.encodePacked("EpochManagerInitializer"));
   bytes32 constant EPOCH_MANAGER_ID = keccak256(abi.encodePacked("EpochManager"));
+  bytes32 constant SCORE_MANAGER_ID =
+    keccak256(abi.encodePacked("ScoreManager"));
   // solhint-enable state-visibility
 
   IRegistry public registry;
@@ -149,5 +152,9 @@ contract UsingRegistry is Ownable {
 
   function getEpochManager() internal view returns (IEpochManager) {
     return IEpochManager(registry.getAddressForOrDie(EPOCH_MANAGER_ID));
+  }
+
+  function getScoreManager() internal view returns (IScoreManager) {
+    return IScoreManager(registry.getAddressForOrDie(SCORE_MANAGER_ID));
   }
 }
