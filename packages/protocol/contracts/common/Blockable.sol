@@ -22,7 +22,7 @@ contract Blockable is IBlockable, Ownable {
   }
 
   modifier onlyWhenNotBlocked() {
-    require(!_isBlocked(), "Contract is blocked from performin this action");
+    require(!_isBlocked(), "Contract is blocked from performing this action");
     _;
   }
 

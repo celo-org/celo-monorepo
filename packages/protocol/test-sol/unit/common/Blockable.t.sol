@@ -81,7 +81,7 @@ contract BlockableTest_onlyWhenNotBlocked is BlockableTest {
 
   function test_Reverts_WhenBlocked() public {
     blocker.mockSetBlocked(true);
-    vm.expectRevert("Contract is blocked from performin this action");
+    vm.expectRevert("Contract is blocked from performing this action");
     blockableWithFunction.funtionToBeBlocked();
   }
 
