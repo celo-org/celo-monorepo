@@ -61,15 +61,15 @@ contract UsingRegistryV2 {
   bytes32 internal constant STABLE_REAL_TOKEN_REGISTRY_ID =
     keccak256(abi.encodePacked("StableTokenBRL"));
   bytes32 internal constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
-  bytes32 internal constant CELO_DISTRIBUTION_SCHEDULE_ID =
+  bytes32 internal constant CELO_DISTRIBUTION_SCHEDULE_REGISTRY_ID =
     keccak256(abi.encodePacked("CeloDistributionSchedule"));
 
   bytes32 internal constant CELO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("CeloToken"));
   bytes32 internal constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
-  bytes32 internal constant EPOCH_REWARDS_ID = keccak256(abi.encodePacked("EpochRewards"));
-  bytes32 internal constant EPOCH_MANAGER_INITIALIZER_ID =
+  bytes32 internal constant EPOCH_REWARDS_REGISTRY_ID = keccak256(abi.encodePacked("EpochRewards"));
+  bytes32 internal constant EPOCH_MANAGER_INITIALIZER_REGISTRY_ID =_REGISTRY
     keccak256(abi.encodePacked("EpochManagerInitializer"));
-  bytes32 internal constant EPOCH_MANAGER_ID = keccak256(abi.encodePacked("EpochManager"));
+  bytes32 internal constant EPOCH_MANAGER_REGISTRY_ID = keccak256(abi.encodePacked("EpochManager"));
 
   modifier onlyRegisteredContract(bytes32 identifierHash) {
     require(
@@ -184,15 +184,15 @@ contract UsingRegistryV2 {
 
   function getCeloDistributionSchedule() internal view returns (ICeloDistributionSchedule) {
     return
-      ICeloDistributionSchedule(registryContract.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID));
+      ICeloDistributionSchedule(registryContract.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_REGISTRY_ID));
   }
 
   function getEpochRewards() internal view returns (IEpochRewards) {
-    return IEpochRewards(registryContract.getAddressForOrDie(EPOCH_REWARDS_ID));
+    return IEpochRewards(registryContract.getAddressForOrDie(EPOCH_REWARDS_REGISTRY_ID));
   }
 
   function getEpochManagerInitializer() internal view returns (IEpochManagerInitializer) {
     return
-      IEpochManagerInitializer(registryContract.getAddressForOrDie(EPOCH_MANAGER_INITIALIZER_ID));
+      IEpochManagerInitializer(registryContract.getAddressForOrDie(EPOCH_MANAGER_INITIALIZER_REGISTRY_ID));
   }
 }

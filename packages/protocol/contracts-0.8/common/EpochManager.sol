@@ -75,7 +75,7 @@ contract EpochManager is
 
   modifier onlyEpochManagerInitializer() {
     require(
-      msg.sender == registry.getAddressForOrDie(EPOCH_MANAGER_INITIALIZER_ID),
+      msg.sender == registry.getAddressForOrDie(EPOCH_MANAGER_INITIALIZER_REGISTRY_ID),
       "msg.sender is not Initializer"
     );
 
@@ -93,12 +93,17 @@ contract EpochManager is
    * @param registryAddress The address of the registry core smart contract.
    * @param newEpochDuration The duration of an epoch in seconds.
    */
-  function initialize(address registryAddress, uint256 newEpochDuration, address _carbonOffsettingPartner, address _communityRewardFund) external initializer {
+  function initialize(
+    address registryAddress,
+    uint256 newEpochDuration,
+    address _carbonOffsettingPartner,
+    address _communityRewardFund
+  ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setEpochDuration(newEpochDuration);
     carbonOffsettingPartner = _carbonOffsettingPartner;
-    communityRewardFund = _communityRewardFund;
+    communityRewardFund = _communityRewardFund; // governance address
   }
 
   // DESIGNDESICION(XXX): we assume that the first epoch on the L2 starts as soon as the system is initialized
@@ -130,9 +135,7 @@ contract EpochManager is
     epochs[currentEpoch].rewardsBlock = block.number;
 
     // calculate rewards
-    // TODO: update function to allow epochManager to call.
     getEpochRewards().updateTargetVotingYield();
-    // distributeCeloEpochPayments();
 
     (
       uint256 perValidatorReward,
@@ -157,42 +160,52 @@ contract EpochManager is
     address[] calldata greaters
   ) external nonReentrant {
     // TODO complete this function
-      require(isOnEpochProcess(), "Epoch process is not started");
-      // finalize epoch
-      // TODO last block should be the block before and timestamp from previous block
-      epochs[currentEpoch].endTimestamp = block.timestamp;
-      epochs[currentEpoch].lastBlock = block.number - 1;
-      // start new epoch
-      currentEpoch++;
-      epochs[currentEpoch].firstBlock = block.number;
-      epochs[currentEpoch].startTimestamp = block.timestamp;
+    require(isOnEpochProcess(), "Epoch process is not started");
+    // finalize epoch
+    // TODO last block should be the block before and timestamp from previous block
+    epochs[currentEpoch].endTimestamp = block.timestamp;
+    epochs[currentEpoch].lastBlock = block.number - 1;
+    // start new epoch
+    currentEpoch++;
+    epochs[currentEpoch].firstBlock = block.number;
+    epochs[currentEpoch].startTimestamp = block.timestamp;
 
-      for (uint i =0; i < elected.length; i++) {
-          (,,address group,,) = getValidators().getValidator(elected[i]);
-          if (!processedGroups[group]) {
-              epochProcessing.toProcessGroups++;
-              processedGroups[group] = true;
-          }
+    for (uint i = 0; i < elected.length; i++) {
+      (, , address group, , ) = getValidators().getValidator(elected[i]);
+      if (!processedGroups[group]) {
+        epochProcessing.toProcessGroups++;
+        processedGroups[group] = true;
       }
+    }
 
-      require(epochProcessing.toProcessGroups == groups.length, "number of groups does not match");
+    require(epochProcessing.toProcessGroups == groups.length, "number of groups does not match");
 
-      for (uint i = 0; i < groups.length; i++) {
-          // checks that group is acutally from elected group
-          require(processedGroups[groups[i]], "group not processed");
-          // by doing this, we avoid processing a group twice
-          delete processedGroups[groups[i]];
-          // TODO what happens to uptime?
-          uint256[] memory uptimes = getScoreManager().getUptimes(groups[i]);
-          uint256 epochRewards = getElection().getGroupEpochRewards(groups[i], epochProcessing.totalRewardsVoter, uptimes);
-          getElection().distributeEpochRewards(groups[i], epochRewards, lessers[i] , greaters[i]);
-      }
-      getCeloDistributionSchedule().transfer(communityRewardFund, epochProcessing.totalRewardsCommunity);
-      getCeloDistributionSchedule().transfer(carbonOffsettingPartner, epochProcessing.totalRewardsCarbonFund);
-      // run elections
-      elected = getElection().electNValidatorSigners(10, 20);
-      // TODO check how to nullify stuct
-      epochProcessing.status = EpochProcessStatus.NotStarted;
+    for (uint i = 0; i < groups.length; i++) {
+      // checks that group is acutally from elected group
+      require(processedGroups[groups[i]], "group not processed");
+      // by doing this, we avoid processing a group twice
+      delete processedGroups[groups[i]];
+      // TODO what happens to uptime?
+      uint256[] memory uptimes = getScoreManager().getUptimes(groups[i]);
+      uint256 epochRewards = getElection().getGroupEpochRewards(
+        groups[i],
+        epochProcessing.totalRewardsVoter,
+        uptimes
+      );
+      getElection().distributeEpochRewards(groups[i], epochRewards, lessers[i], greaters[i]);
+    }
+    getCeloDistributionSchedule().transfer(
+      communityRewardFund,
+      epochProcessing.totalRewardsCommunity
+    );
+    getCeloDistributionSchedule().transfer(
+      carbonOffsettingPartner,
+      epochProcessing.totalRewardsCarbonFund
+    );
+    // run elections
+    elected = getElection().electNValidatorSigners(10, 20);
+    // TODO check how to nullify stuct
+    epochProcessing.status = EpochProcessStatus.NotStarted;
   }
 
   function getCurrentEpoch() external view returns (uint256) {
@@ -257,24 +270,32 @@ contract EpochManager is
     return (1, 1, 0, 0);
   }
 
-
   function allocateValidatorsRewards() internal {
     // TODO complete this function
     uint256 totalRewards = 0;
     for (uint i = 0; i < elected.length; i++) {
-        uint256 validatorScore = getScoreManager().getValidatorScore(elected[i]);
-        uint256 validatorReward = getValidators().computeEpochReward(elected[i], validatorScore, epochProcessing.perValidatorReward);
-        validatorPendingPayments[elected[i]] += validatorReward;
-        totalRewards += validatorReward;
+      uint256 validatorScore = getScoreManager().getValidatorScore(elected[i]);
+      uint256 validatorReward = getValidators().computeEpochReward(
+        elected[i],
+        validatorScore,
+        epochProcessing.perValidatorReward
+      );
+      validatorPendingPayments[elected[i]] += validatorReward;
+      totalRewards += validatorReward;
     }
     // Mint all cUSD required for payment and the corresponding CELO
     IStableToken(getStableToken()).mint(address(this), totalRewards);
     // this should have a setter for the oracle.
 
-    (uint256 numerator, uint256 denominator) = IOracle(address(getSortedOracles())).getExchangeRate(address(getStableToken()));
+    (uint256 numerator, uint256 denominator) = IOracle(address(getSortedOracles())).getExchangeRate(
+      address(getStableToken())
+    );
 
-    uint256 CELOequivalent = numerator*totalRewards / denominator;
+    uint256 CELOequivalent = (numerator * totalRewards) / denominator;
     // this is not a mint anymore
-    getCeloDistributionSchedule().transfer(registry.getAddressForOrDie(RESERVE_REGISTRY_ID), CELOequivalent);
+    getCeloDistributionSchedule().transfer(
+      registry.getAddressForOrDie(RESERVE_REGISTRY_ID),
+      CELOequivalent
+    );
   }
 }

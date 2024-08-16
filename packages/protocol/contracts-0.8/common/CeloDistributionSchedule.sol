@@ -30,7 +30,6 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
   address public communityRewardFund;
   address public carbonOffsettingPartner;
 
-
   FixidityLib.Fraction private communityRewardFraction;
   FixidityLib.Fraction private carbonOffsettingFraction;
 
@@ -44,7 +43,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
 
   modifier onlyEpochManager() {
     require(
-      msg.sender == registry.getAddressForOrDie(EPOCH_MANAGER_ID),
+      msg.sender == registry.getAddressForOrDie(EPOCH_MANAGER_REGISTRY_ID),
       "Only the EpochManager contract can call this function."
     );
     _;
@@ -84,7 +83,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
     require(block.timestamp > _l2StartTime, "L2 start time cannot be set to a future date.");
     ICeloToken celoToken = ICeloToken(address(getCeloToken()));
     require(
-      registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID) == address(this),
+      registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_REGISTRY_ID) == address(this),
       "CeloDistributionSchedule address is incorrectly set in Registry."
     );
     areDependenciesSet = true;

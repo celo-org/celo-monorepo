@@ -86,7 +86,7 @@ contract EpochRewards is
 
   modifier onlyVmOrEpochManager() {
     require(
-      msg.sender == address(0) || msg.sender == registry.getAddressForOrDie(EPOCH_MANAGER_ID),
+      msg.sender == address(0) || msg.sender == registry.getAddressForOrDie(EPOCH_MANAGER_REGISTRY_ID),
       "Only VM or Epoch Manager can call"
     );
     _;

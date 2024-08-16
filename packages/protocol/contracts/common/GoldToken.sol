@@ -153,7 +153,7 @@ contract GoldToken is
   function transferFrom(address from, address to, uint256 value) external returns (bool) {
     require(to != address(0), "transfer attempted to reserved address 0x0");
     require(
-      to != registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID),
+      to != registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_REGISTRY_ID),
       "transfer attempted to reserved CeloDistributionSchedule address"
     );
     require(value <= balanceOf(from), "transfer value exceeded balance of sender");
@@ -228,7 +228,8 @@ contract GoldToken is
    * @return The total amount of allocated CELO.
    */
   function allocatedSupply() external view onlyL2 returns (uint256) {
-    return CELO_SUPPLY_CAP - registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID).balance;
+    return
+      CELO_SUPPLY_CAP - registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_REGISTRY_ID).balance;
   }
 
   /**
@@ -295,7 +296,7 @@ contract GoldToken is
    */
   function _transfer(address to, uint256 value) internal returns (bool) {
     require(
-      to != registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID),
+      to != registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_REGISTRY_ID),
       "transfer attempted to reserved CeloDistributionSchedule address"
     );
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
