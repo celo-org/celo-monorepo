@@ -161,13 +161,13 @@ contract EpochManager is IEpochManager {
             delete epochProcessing.processedGroups[groups[i]];
             
             // TODO what happens to uptime?
-            
+            // TODO when checking what group the validator is member off, it should be done using membershipHistory, with function getMembershipInLastEpoch or similar
 		    uint256 epochRewards = getElection().getGroupEpochRewards(groups[i], epochProcessing.rewardsVoter, uptimes);
 		    getElection().distributeEpochRewards(groups[i], epochRewards, lessers[i] , greaters[i]);
         }
 
         celoDistributionSchedule.mint(address(CommunityFund), epochProcessing.rewardsCommunity)
-	    celoDistributionSchedule.mint(address(Carbon), epochProcessing.rewardsCarbonFund)
+	celoDistributionSchedule.mint(address(Carbon), epochProcessing.rewardsCarbonFund)
 
 
         // run elections
