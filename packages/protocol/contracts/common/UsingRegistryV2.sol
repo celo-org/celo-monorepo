@@ -67,7 +67,7 @@ contract UsingRegistryV2 {
   bytes32 internal constant CELO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("CeloToken"));
   bytes32 internal constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
   bytes32 internal constant EPOCH_REWARDS_REGISTRY_ID = keccak256(abi.encodePacked("EpochRewards"));
-  bytes32 internal constant EPOCH_MANAGER_INITIALIZER_REGISTRY_ID =_REGISTRY
+  bytes32 internal constant EPOCH_MANAGER_INITIALIZER_REGISTRY_ID =
     keccak256(abi.encodePacked("EpochManagerInitializer"));
   bytes32 internal constant EPOCH_MANAGER_REGISTRY_ID = keccak256(abi.encodePacked("EpochManager"));
 
