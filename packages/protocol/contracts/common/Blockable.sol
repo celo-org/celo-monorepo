@@ -7,6 +7,8 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 contract Blockable is IBlockable, Ownable {
   IBlocker blockedBy;
 
+  event BlockedBySet(address indexed _blockedBy);
+
   // isBlocked will default to false if blockable not set
   function isBlocked() external view returns (bool) {
     return _isBlocked();
@@ -30,6 +32,7 @@ contract Blockable is IBlockable, Ownable {
 
   function _setBlockedBy(address _blockedBy) internal {
     blockedBy = IBlocker(_blockedBy);
+    emit BlockedBySet(_blockedBy);
   }
 
   function setBlockedByContract(address _blockedBy) external onlyOwner {

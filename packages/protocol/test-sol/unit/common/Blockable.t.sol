@@ -29,6 +29,8 @@ contract BlockableTest is Test {
   TestBlocker blocker;
   address notOwner;
 
+  event BlockedBySet(address indexed _blockedBy);
+
   function setUp() public {
     blockable = new Blockable();
     blocker = new TestBlocker();
@@ -45,6 +47,12 @@ contract BlockableTest_setBlockable is BlockableTest {
   function test_Reverts_WhenNotCalledByOwner() public {
     vm.prank(notOwner);
     vm.expectRevert("Ownable: caller is not the owner");
+    blockable.setBlockedByContract(address(blocker));
+  }
+
+  function test_Emits_BlockedBySet() public {
+    vm.expectEmit(false, false, false, true);
+    emit BlockedBySet(address(blocker));
     blockable.setBlockedByContract(address(blocker));
   }
 }
