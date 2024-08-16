@@ -15,6 +15,7 @@ import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
+import "../common/Blockable.sol";
 
 contract LockedGold is
   ILockedGold,
@@ -22,7 +23,8 @@ contract LockedGold is
   ICeloVersionedContract,
   ReentrancyGuard,
   Initializable,
-  UsingRegistry
+  UsingRegistry,
+  Blockable
 {
   using SafeMath for uint256;
   using Address for address payable; // prettier-ignore
@@ -470,7 +472,7 @@ contract LockedGold is
     address[] calldata lessers,
     address[] calldata greaters,
     uint256[] calldata indices
-  ) external onlySlasher {
+  ) external onlySlasher onlyWhenNotBlocked {
     uint256 maxSlash = Math.min(penalty, getAccountTotalLockedGold(account));
     require(maxSlash >= reward, "reward cannot exceed penalty.");
     // `reporter` receives the reward in locked CELO, so it must be given to an account
