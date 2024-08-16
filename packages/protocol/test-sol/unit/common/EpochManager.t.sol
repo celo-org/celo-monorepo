@@ -44,6 +44,20 @@ contract EpochManagerTest is Test, TestConstants {
   }
 }
 
+contract EpochManagerInitialize is EpochManagerTest {
+  function test_initialize() public virtual {
+    assertEq(address(epochManager.registry()), REGISTRY_ADDRESS);
+    assertEq(epochManager.epochDuration(), 10);
+    assertEq(epochManager.carbonOffsettingPartner(), carbonOffsettingPartner);
+    assertEq(epochManager.communityRewardFund(), communityRewardFund);
+  }
+
+  function test_Reverts_WhenAlreadyInitialized() public virtual {
+    vm.expectRevert("contract already initialized");
+    epochManager.initialize(REGISTRY_ADDRESS, 10, carbonOffsettingPartner, communityRewardFund);
+  }
+}
+
 contract EpochManagerinitializeSystem is EpochManagerTest {
 
   function test_processCanBeStarted() public virtual{
@@ -56,12 +70,10 @@ contract EpochManagerinitializeSystem is EpochManagerTest {
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
     vm.expectRevert("Epoch system already initialized");
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
-
   }
 
   function test_Reverts_WhenSystemInitializedByOtherContract() public virtual {
     vm.expectRevert("msg.sender is not Initializer");
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
-
   }
 }

@@ -109,7 +109,7 @@ contract EpochManager is
     uint256 firstEpochBlock,
     address[] memory firstElected
   ) external onlyEpochManagerInitializer {
-    require(systemAlreadyInitialized(), "Epoch system already initialized");
+    require(!systemAlreadyInitialized(), "Epoch system already initialized");
     firstKnownEpoch = firstEpochNumber;
     currentEpoch = firstEpochNumber;
 
