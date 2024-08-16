@@ -7,6 +7,7 @@ import "openzeppelin-solidity/contracts/utils/Address.sol";
 import "openzeppelin-solidity/contracts/utils/EnumerableSet.sol";
 
 import "./interfaces/ILockedGold.sol";
+import "./interfaces/ILockedGoldInitializer.sol";
 
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
@@ -17,12 +18,12 @@ import "../common/libraries/ReentrancyGuard.sol";
 
 contract LockedGold is
   ILockedGold,
+  ILockedGoldInitializer,
   ICeloVersionedContract,
   ReentrancyGuard,
   Initializable,
   UsingRegistry
 {
-  // TODO add initializer
   using SafeMath for uint256;
   using Address for address payable; // prettier-ignore
   using FixidityLib for FixidityLib.Fraction;

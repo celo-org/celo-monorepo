@@ -9,7 +9,6 @@ contract Blockable is IBlockable, Ownable {
 
   // isBlocked will default to false if blockable not set
   function isBlocked() external view returns (bool) {
-    // require(address(blockedBy) != address(0), "Blocker contract not set");
     return _isBlocked();
   }
 
