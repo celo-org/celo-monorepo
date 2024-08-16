@@ -85,4 +85,9 @@ interface IValidators {
   function getValidatorGroupSlashingMultiplier(address) external view returns (uint256);
   function getMembershipInLastEpoch(address) external view returns (address);
   function getMembershipInLastEpochFromSigner(address) external view returns (address);
+  function computeEpochReward(
+    address account,
+    uint256 score,
+    uint256 maxPayment
+  ) external view returns (uint256);
 }

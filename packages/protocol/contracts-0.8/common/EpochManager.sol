@@ -5,12 +5,12 @@ import "@openzeppelin/contracts8/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
 import "./interfaces/IEpochManager.sol";
+import "./interfaces/IOracle.sol";
+import "./interfaces/IStableToken.sol";
 import "../common/UsingRegistry.sol";
 
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
-
-import "./ScoreManager.sol";
 
 contract EpochManager is
   Initializable,
@@ -260,18 +260,21 @@ contract EpochManager is
 
   function allocateValidatorsRewards() internal {
     // TODO complete this function
-    //   uint256 totalRewards = 0;
-    //   for (uint i = 0; i < elected.length; i++) {
-    //       uint256 validatorScore = scoreManager.getValidatorScore(elected[i]);
-    //       uint256 validatorReward = validators.computeEpochReward(elected[i], validatorScore, epochProcessing.maxRewardsValidator);
-    //       validatorPendingPayments[elected[i]] += validatorReward;
-    //       totalRewards += validatorReward;
-    //   }
-    // // Mint all cUSD required for payment and the corresponding CELO
-    // StablToken.mint(address(this), totalRewards)
-    // // this should have a setter for the oracle.
-    // CELOequivalent = IOracle(oracleAddress).getRate()*totalRewards
-    // // this is not a mint anymore
-    //   distributionSchedule.mintCelo(address(reserve), CELOequivalent)
+    uint256 totalRewards = 0;
+    for (uint i = 0; i < elected.length; i++) {
+        uint256 validatorScore = getScoreManager().getValidatorScore(elected[i]);
+        uint256 validatorReward = getValidators().computeEpochReward(elected[i], validatorScore, epochProcessing.perValidatorReward);
+        validatorPendingPayments[elected[i]] += validatorReward;
+        totalRewards += validatorReward;
+    }
+    // Mint all cUSD required for payment and the corresponding CELO
+    IStableToken(getStableToken()).mint(address(this), totalRewards);
+    // this should have a setter for the oracle.
+
+    (uint256 numerator, uint256 denominator) = IOracle(address(getSortedOracles())).getExchangeRate(address(getStableToken()));
+
+    uint256 CELOequivalent = numerator*totalRewards / denominator;
+    // this is not a mint anymore
+    getCeloDistributionSchedule().transfer(registry.getAddressForOrDie(RESERVE_REGISTRY_ID), CELOequivalent);
   }
 }
