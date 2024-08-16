@@ -30,7 +30,6 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
   address public communityRewardFund;
   address public carbonOffsettingPartner;
 
-  address public epochManagerAddress;
 
   FixidityLib.Fraction private communityRewardFraction;
   FixidityLib.Fraction private carbonOffsettingFraction;
@@ -45,7 +44,7 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
 
   modifier onlyEpochManager() {
     require(
-      msg.sender == epochManagerAddress,
+      msg.sender == registry.getAddressForOrDie(EPOCH_MANAGER_ID),
       "Only the EpochManager contract can call this function."
     );
     _;
@@ -60,12 +59,11 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
   /**
    * @notice A constructor for initialising a new instance of a CeloDistributionSchedule contract.
    * @param registryAddress The address of the registry core smart contract.
-   * @param _epochManagerAddress The address of the EpochManager contract.
+   
    */
-  function initialize(address registryAddress, address _epochManagerAddress) external initializer {
+  function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    epochManagerAddress = _epochManagerAddress;
   }
 
   /**
@@ -133,6 +131,17 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
       "Failed to transfer to carbon offsetting partner."
     );
     return true;
+  }
+
+  /**
+   * @notice Transfers the Celo to the specified address.
+   * @param to The address to transfer the amount to.
+   * @param amount The amount to transfer.
+   */
+  function transfer(address to, uint256 amount) external onlyEpochManager {
+    require(address(this).balance >= amount, "Insufficient balance.");
+    ICeloToken celoToken = ICeloToken(address(getCeloToken()));
+    celoToken.transfer(to, amount);
   }
 
   /**
@@ -226,17 +235,6 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
     );
     emit CarbonOffsettingFundSet(partner, value);
     return true;
-  }
-
-  /**
-   * @notice Transfers the Celo to the specified address.
-   * @param to The address to transfer the amount to.
-   * @param amount The amount to transfer.
-   */
-  function transfer(address to, uint256 amount) external onlyEpochManager {
-    require(address(this).balance >= amount, "Insufficient balance.");
-    ICeloToken celoToken = ICeloToken(address(getCeloToken()));
-    celoToken.transfer(to, amount);
   }
 
   /**
