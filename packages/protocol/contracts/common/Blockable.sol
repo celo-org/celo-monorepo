@@ -9,7 +9,7 @@ contract Blockable is IBlockable, Ownable {
 
   event BlockedBySet(address indexed _blockedBy);
 
-  // isBlocked will default to false if blockable not set
+  // isBlocked will default to false if blockedBy not set
   function isBlocked() external view returns (bool) {
     return _isBlocked();
   }
