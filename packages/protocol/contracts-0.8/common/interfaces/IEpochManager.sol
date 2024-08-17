@@ -18,7 +18,8 @@ interface IEpochManager is IBlocker {
   //   uint16[] calldata lessers,
   //   uint16 greaters
   // ) external;
-  // function getCurrentEpoch() external view returns (uint256);
+  function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256, uint256);
+  function getCurrentEpochNumber() external view returns (uint256);
   // function getElected() external view returns (address[] memory);
   // // function getElectedAtEpoch(uint256 epoch) external view returns (address[] memory);
   // function getFirstBlockAtEpoch(uint256 epoch) external view returns (uint256);

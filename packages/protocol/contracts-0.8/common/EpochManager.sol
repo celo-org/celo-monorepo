@@ -47,7 +47,7 @@ contract EpochManager is
   uint256 public epochDuration;
 
   uint256 public firstKnownEpoch;
-  uint256 public currentEpoch;
+  uint256 public currentEpochNumber;
   address[] public elected;
 
   // TODO this should be able to get deleted easily
@@ -55,10 +55,9 @@ contract EpochManager is
   mapping(address => bool) public processedGroups;
 
   EpochProcessState public epochProcessing;
-  mapping(uint256 => Epoch) public epochs;
+  mapping(uint256 => Epoch) private epochs;
   mapping(address => uint256) public validatorPendingPayments;
 
-  address public communityRewardFund;
   address public carbonOffsettingPartner;
 
   /**
@@ -96,14 +95,12 @@ contract EpochManager is
   function initialize(
     address registryAddress,
     uint256 newEpochDuration,
-    address _carbonOffsettingPartner,
-    address _communityRewardFund
+    address _carbonOffsettingPartner
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setEpochDuration(newEpochDuration);
     carbonOffsettingPartner = _carbonOffsettingPartner;
-    communityRewardFund = _communityRewardFund; // governance address
   }
 
   // DESIGNDESICION(XXX): we assume that the first epoch on the L2 starts as soon as the system is initialized
@@ -116,9 +113,9 @@ contract EpochManager is
   ) external onlyEpochManagerInitializer {
     require(!systemAlreadyInitialized(), "Epoch system already initialized");
     firstKnownEpoch = firstEpochNumber;
-    currentEpoch = firstEpochNumber;
+    currentEpochNumber = firstEpochNumber;
 
-    Epoch storage _currentEpoch = epochs[currentEpoch];
+    Epoch storage _currentEpoch = epochs[currentEpochNumber];
     _currentEpoch.firstBlock = firstEpochBlock;
     _currentEpoch.startTimestamp = block.timestamp;
     _currentEpoch.endTimestamp = block.timestamp + epochDuration;
@@ -127,12 +124,17 @@ contract EpochManager is
   }
 
   // TODO maybe "freezeEpochRewards" "prepareForNextEpoch"
+
+  /// start next epoch process.
+  /// it freezes the epochrewards at the time of execution,
+  /// and starts the distribution of the rewards.
   function startNextEpochProcess() external nonReentrant {
     require(isReadyToStartEpoch(), "Epoch is not ready to start");
     require(!isOnEpochProcess(), "Epoch process is already started");
+    require(elected.length > 0, "Elected length must be greater than 0.");
     epochProcessing.status = EpochProcessStatus.Started;
 
-    epochs[currentEpoch].rewardsBlock = block.number;
+    epochs[currentEpochNumber].rewardsBlock = block.number;
 
     // calculate rewards
     getEpochRewards().updateTargetVotingYield();
@@ -151,7 +153,7 @@ contract EpochManager is
 
     allocateValidatorsRewards();
 
-    emit EpochProcessingStarted(currentEpoch);
+    emit EpochProcessingStarted(currentEpochNumber);
   }
 
   function finishNextEpochProcess(
@@ -163,12 +165,12 @@ contract EpochManager is
     require(isOnEpochProcess(), "Epoch process is not started");
     // finalize epoch
     // TODO last block should be the block before and timestamp from previous block
-    epochs[currentEpoch].endTimestamp = block.timestamp;
-    epochs[currentEpoch].lastBlock = block.number - 1;
+    epochs[currentEpochNumber].endTimestamp = block.timestamp;
+    epochs[currentEpochNumber].lastBlock = block.number - 1;
     // start new epoch
-    currentEpoch++;
-    epochs[currentEpoch].firstBlock = block.number;
-    epochs[currentEpoch].startTimestamp = block.timestamp;
+    currentEpochNumber++;
+    epochs[currentEpochNumber].firstBlock = block.number;
+    epochs[currentEpochNumber].startTimestamp = block.timestamp;
 
     for (uint i = 0; i < elected.length; i++) {
       (, , address group, , ) = getValidators().getValidator(elected[i]);
@@ -195,7 +197,7 @@ contract EpochManager is
       getElection().distributeEpochRewards(groups[i], epochRewards, lessers[i], greaters[i]);
     }
     getCeloDistributionSchedule().transfer(
-      communityRewardFund,
+      registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
       epochProcessing.totalRewardsCommunity
     );
     getCeloDistributionSchedule().transfer(
@@ -208,8 +210,22 @@ contract EpochManager is
     epochProcessing.status = EpochProcessStatus.NotStarted;
   }
 
-  function getCurrentEpoch() external view returns (uint256) {
-    return currentEpoch;
+  /// returns the current epoch Info
+  function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256, uint256) {
+    Epoch storage _epoch = epochs[currentEpochNumber];
+
+    return (
+      _epoch.firstBlock,
+      _epoch.lastBlock,
+      _epoch.startTimestamp,
+      _epoch.endTimestamp,
+      _epoch.rewardsBlock
+    );
+  }
+
+  /// returns the current epoch number.
+  function getCurrentEpochNumber() external view returns (uint256) {
+    return currentEpochNumber;
   }
 
   function getElected() external view returns (address[] memory) {
@@ -224,39 +240,12 @@ contract EpochManager is
     return epochs[epoch].lastBlock;
   }
 
-  function isOnEpochProcess() public view returns (bool) {
-    return epochProcessing.status == EpochProcessStatus.Started;
-  }
-
   function isTimeForNextEpoch() external view returns (bool) {
-    return block.timestamp >= epochs[currentEpoch].startTimestamp + epochDuration;
+    return block.timestamp >= epochs[currentEpochNumber].startTimestamp + epochDuration;
   }
 
   function isBlocked() external view returns (bool) {
     return isOnEpochProcess();
-  }
-
-  /**
-   * @notice Sets the time duration of an epoch.
-   * @param newEpochDuration The duration of an epoch in seconds.
-   * @dev Can only be set by owner.
-   */
-  function setEpochDuration(uint256 newEpochDuration) public onlyOwner {
-    epochDuration = newEpochDuration;
-  }
-
-  function systemAlreadyInitialized() public view returns (bool) {
-    return firstKnownEpoch != 0;
-  }
-
-  // checks if end of epoch has been reached based on timestamp
-  function isReadyToStartEpoch() public view returns (bool) {
-    Epoch memory _currentEpoch = epochs[currentEpoch];
-    if (block.timestamp > _currentEpoch.endTimestamp) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   /**
@@ -268,6 +257,33 @@ contract EpochManager is
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 0, 0);
+  }
+
+  /**
+   * @notice Sets the time duration of an epoch.
+   * @param newEpochDuration The duration of an epoch in seconds.
+   * @dev Can only be set by owner.
+   */
+  function setEpochDuration(uint256 newEpochDuration) public onlyOwner {
+    epochDuration = newEpochDuration;
+  }
+
+  function isOnEpochProcess() public view returns (bool) {
+    return epochProcessing.status == EpochProcessStatus.Started;
+  }
+
+  function systemAlreadyInitialized() public view returns (bool) {
+    return firstKnownEpoch != 0;
+  }
+
+  // checks if end of epoch has been reached based on timestamp
+  function isReadyToStartEpoch() public view returns (bool) {
+    Epoch memory _currentEpoch = epochs[currentEpochNumber];
+    if (block.timestamp > _currentEpoch.endTimestamp) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   function allocateValidatorsRewards() internal {

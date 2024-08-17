@@ -740,3 +740,7 @@ contract CeloDistributionScheduleTest_getDistributableAmount is CeloDistribution
     celoDistributionSchedule.getDistributableAmount();
   }
 }
+
+contract CeloDistributionScheduleTest_transfer is CeloDistributionScheduleTest {
+  // TODO: implement
+}
