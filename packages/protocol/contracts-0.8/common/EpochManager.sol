@@ -59,6 +59,7 @@ contract EpochManager is
   mapping(address => uint256) public validatorPendingPayments;
 
   address public carbonOffsettingPartner;
+  address public epochManagerInitializer;
 
   /**
    * @notice Event emited when epochProcessing has begun.
@@ -74,10 +75,9 @@ contract EpochManager is
 
   modifier onlyEpochManagerInitializer() {
     require(
-      msg.sender == registry.getAddressForOrDie(EPOCH_MANAGER_INITIALIZER_REGISTRY_ID),
+      msg.sender == epochManagerInitializer,
       "msg.sender is not Initializer"
     );
-
     _;
   }
 
@@ -95,12 +95,14 @@ contract EpochManager is
   function initialize(
     address registryAddress,
     uint256 newEpochDuration,
-    address _carbonOffsettingPartner
+    address _carbonOffsettingPartner,
+    address _epochManagerInitializer
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setEpochDuration(newEpochDuration);
     carbonOffsettingPartner = _carbonOffsettingPartner;
+    epochManagerInitializer = _epochManagerInitializer;
   }
 
   // DESIGNDESICION(XXX): we assume that the first epoch on the L2 starts as soon as the system is initialized
@@ -121,6 +123,7 @@ contract EpochManager is
     _currentEpoch.endTimestamp = block.timestamp + epochDuration;
 
     elected = firstElected;
+    epochManagerInitializer = address(0);
   }
 
   // TODO maybe "freezeEpochRewards" "prepareForNextEpoch"

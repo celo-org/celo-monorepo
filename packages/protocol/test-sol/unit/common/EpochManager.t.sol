@@ -87,7 +87,6 @@ contract EpochManagerTest is Test, TestConstants {
     celoDistributionSchedule = ICeloDistributionSchedule(celoDistributionScheduleAddress);
     scoreManager = ScoreManager(scoreManagerAddress);
 
-    registry.setAddressFor(EpochManagerInitializerContract, epochManagerInitializer);
     registry.setAddressFor(EpochManagerContract, address(epochManager));
     registry.setAddressFor(SortedOraclesContract, address(sortedOracles));
     registry.setAddressFor(GovernanceContract, communityRewardFund);
@@ -108,7 +107,7 @@ contract EpochManagerTest is Test, TestConstants {
     uint256 res = scoreManager.getValidatorScore(actor("validator1"));
     uint256 res2 = epochRewards.getCommunityRewardFraction();
 
-    epochManager.initialize(REGISTRY_ADDRESS, 10, carbonOffsettingPartner);
+    epochManager.initialize(REGISTRY_ADDRESS, 10, carbonOffsettingPartner, epochManagerInitializer);
   }
 }
 
@@ -121,7 +120,7 @@ contract EpochManagerTest_initialize is EpochManagerTest {
 
   function test_Reverts_WhenAlreadyInitialized() public virtual {
     vm.expectRevert("contract already initialized");
-    epochManager.initialize(REGISTRY_ADDRESS, 10, carbonOffsettingPartner);
+    epochManager.initialize(REGISTRY_ADDRESS, 10, carbonOffsettingPartner, epochManagerInitializer);
   }
 }
 
@@ -132,8 +131,9 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
   }
 
   function test_Reverts_processCannotBeStartedAgain() public virtual {
-    vm.startPrank(epochManagerInitializer);
+    vm.prank(epochManagerInitializer);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
+    vm.prank(address(0));
     vm.expectRevert("Epoch system already initialized");
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
   }
