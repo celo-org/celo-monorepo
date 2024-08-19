@@ -80,7 +80,7 @@ contract MockElection is IsL2Check {
     return electedValidators;
   }
 
-  function setAllowedToVoteOverMaxNumberOfGroups(address account, bool flag) public onlyL1 {
+  function setAllowedToVoteOverMaxNumberOfGroups(address account, bool flag) public {
     allowedToVoteOverMaxNumberOfGroups[account] = flag;
   }
 }
