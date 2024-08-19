@@ -9,7 +9,7 @@ on:
     branches:
       - master
       - 'release/**'
-      - 'feat/l2-epoch-system
+      - 'feat/l2-epoch-system'
   pull_request:
     branches:
       - master
