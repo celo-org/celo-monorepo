@@ -49,6 +49,11 @@ interface IElection {
     uint256,
     uint256[] calldata
   ) external view returns (uint256);
+  function getGroupEpochRewards(
+    address group,
+    uint256 totalEpochRewards,
+    uint256 groupScore
+  ) external view returns (uint256);
   function getGroupsVotedForByAccount(address) external view returns (address[] memory);
   function getEligibleValidatorGroups() external view returns (address[] memory);
   function getTotalVotesForEligibleValidatorGroups()

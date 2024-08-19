@@ -195,11 +195,11 @@ contract EpochManager is
       // by doing this, we avoid processing a group twice
       delete processedGroups[groups[i]];
       // TODO what happens to uptime?
-      uint256[] memory uptimes = getScoreReader().getUptimes(groups[i]);
+      uint256 groupScore = getScoreReader().getGroupScore(groups[i]);
       uint256 epochRewards = getElection().getGroupEpochRewards(
         groups[i],
         epochProcessing.totalRewardsVoter,
-        uptimes
+        groupScore
       );
       getElection().distributeEpochRewards(groups[i], epochRewards, lessers[i], greaters[i]);
     }

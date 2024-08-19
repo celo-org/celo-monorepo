@@ -7,7 +7,6 @@ import "@openzeppelin/contracts8/access/Ownable.sol";
 
 contract ScoreManager is Initializable, Ownable {
 
-  mapping (address => uint256[]) public uptimes;
   mapping (address => uint256) public scores;
 
   /**
@@ -36,22 +35,12 @@ contract ScoreManager is Initializable, Ownable {
     return (1, 1, 0, 0);
   }
 
-  /**
-   * @notice Sets the uptimes for the given addresses.
-   * @param _uptimes The uptimes to set.
-   */
-  function setUptimes(address group, uint256[] calldata _uptimes) external onlyOwner {
-    for (uint256 i = 0; i < _uptimes.length; i++) {
-      uptimes[group][i] = _uptimes[i];
-    }
+  function setGroupScore(address group, uint256 score) external onlyOwner {
+    scores[group] = score;
   }
 
-  function getUptimes(address group) external view returns (uint256[] memory) {
-    uint256[] memory result = new uint256[](uptimes[group].length);
-    for (uint256 i = 0; i < uptimes[group].length; i++) {
-      result[i] = uptimes[group][i];
-    }
-    return result;
+  function getGroupScore(address group) external view returns (uint256) {
+    return scores[group];
   }
 
   function getValidatorScore(address validator) external view returns (uint256) {
