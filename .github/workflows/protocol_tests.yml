@@ -132,7 +132,6 @@ jobs:
         run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
       
       - name: Run migration tests against local anvil devchain
-        if: success() || failure()
         run: |
           source ./scripts/foundry/constants.sh
 
@@ -141,7 +140,6 @@ jobs:
           --fork-url $ANVIL_RPC_URL
       
       - name: Run e2e tests against local anvil devchain
-        if: success() || failure()
         run: |
           source ./scripts/foundry/constants.sh
 
