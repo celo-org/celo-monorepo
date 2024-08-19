@@ -1112,6 +1112,17 @@ contract Validators is
   }
 
   /**
+   * @notice Returns affiliated group to validator.
+   * @param account The account that registered the validator.
+   * @return The validator group.
+   */
+  function getValidatorsGroup(address account) public view returns (address affiliation) {
+    require(isValidator(account), "Not a validator");
+    Validator storage validator = validators[account];
+    return validator.affiliation;
+  }
+
+  /**
    * @notice Returns the number of members in a validator group.
    * @param account The address of the validator group.
    * @return The number of members in a validator group.
@@ -1421,5 +1432,38 @@ contract Validators is
     validator.affiliation = address(0);
     emit ValidatorDeaffiliated(validatorAccount, affiliation);
     return true;
+  }
+
+  /**
+   * @notice Computes epoch payments to the account
+   * @param account The validator signer of the validator to distribute the epoch payment to.
+   * @param maxPayment The maximum payment to the validator. Actual payment is based on score and
+   *   group commission.
+   * @return The total payment paid to the validator and their group.
+   */
+  function computeEpochReward(
+    address account,
+    uint256 score,
+    uint256 maxPayment
+  ) external view returns (uint256) {
+    require(isValidator(account), "Not a validator");
+    FixidityLib.Fraction memory scoreFraction = FixidityLib.wrap(score);
+    require(scoreFraction.lte(FixidityLib.fixed1()), "Score must be <= 1");
+
+    // The group that should be paid is the group that the validator was a member of at the
+    // time it was elected.
+    address group = getMembershipInLastEpoch(account);
+    require(group != address(0), "Validator not registered with a group");
+    // Both the validator and the group must maintain the minimum locked gold balance in order to
+    // receive epoch payments.
+    if (meetsAccountLockedGoldRequirements(account) && meetsAccountLockedGoldRequirements(group)) {
+      FixidityLib.Fraction memory totalPayment = FixidityLib
+        .newFixed(maxPayment)
+        .multiply(scoreFraction)
+        .multiply(groups[group].slashInfo.multiplier);
+      return totalPayment.fromFixed();
+    } else {
+      return 0;
+    }
   }
 }
