@@ -3,13 +3,10 @@ pragma solidity >=0.8.0 <0.8.20;
 
 // Note: This is not an exact copy of UsingPrecompiles in the contract's folder, but in solidity 0.8
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "../common/IsL2Check.sol";
 
 contract UsingPrecompiles is IsL2Check {
-  using SafeMath for uint256;
-
   address constant TRANSFER = address(0xff - 2);
   address constant FRACTION_MUL = address(0xff - 3);
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
@@ -27,15 +24,17 @@ contract UsingPrecompiles is IsL2Check {
    * @return The current epoch size in blocks.
    */
   function getEpochSize() public view returns (uint256) {
-    if (isL2()) {
-      return DAY.div(5);
-    } else {
-      bytes memory out;
-      bool success;
-      (success, out) = EPOCH_SIZE.staticcall(abi.encodePacked(true));
-      require(success, "error calling getEpochSize precompile");
-      return getUint256FromBytes(out, 0);
-    }
+    // FIXME
+    return 0;
+    // if (isL2()) {
+    //   return DAY.div(5);
+    // } else {
+    //   bytes memory out;
+    //   bool success;
+    //   (success, out) = EPOCH_SIZE.staticcall(abi.encodePacked(true));
+    //   require(success, "error calling getEpochSize precompile");
+    //   return getUint256FromBytes(out, 0);
+    // }
   }
 
   /**
@@ -44,7 +43,9 @@ contract UsingPrecompiles is IsL2Check {
    * @return Epoch number.
    */
   function getEpochNumberOfBlock(uint256 blockNumber) public view returns (uint256) {
-    return epochNumberOfBlock(blockNumber, getEpochSize());
+    return 0;
+    // FIXME
+    // return epochNumberOfBlock(blockNumber, getEpochSize());
   }
 
   /**

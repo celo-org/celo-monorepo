@@ -18,7 +18,6 @@ contract EpochManagerInitializer is initializable, UsingPrecompiles, UsingRegist
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
-   * @param newEpochDuration The duration of an epoch in seconds.
    */
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
