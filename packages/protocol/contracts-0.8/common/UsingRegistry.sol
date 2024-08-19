@@ -150,7 +150,7 @@ contract UsingRegistry is Ownable {
     return IEpochManager(registry.getAddressForOrDie(EPOCH_MANAGER_REGISTRY_ID));
   }
 
-  function getScoreManager() internal view returns (IScoreReader) {
+  function getScoreReader() internal view returns (IScoreReader) {
     return IScoreReader(registry.getAddressForOrDie(SCORE_MANAGER_REGISTRY_ID));
   }
 }

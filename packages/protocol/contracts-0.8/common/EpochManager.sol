@@ -118,6 +118,7 @@ contract EpochManager is
     require(!systemAlreadyInitialized(), "Epoch system already initialized");
     require(firstEpochNumber > 0, "First epoch number must be greater than 0");
     require(firstEpochBlock > 0, "First epoch block must be greater than 0");
+    require(firstElected.length > 0, "First elected validators must be greater than 0");
     firstKnownEpoch = firstEpochNumber;
     currentEpochNumber = firstEpochNumber;
 
@@ -189,12 +190,12 @@ contract EpochManager is
     require(epochProcessing.toProcessGroups == groups.length, "number of groups does not match");
 
     for (uint i = 0; i < groups.length; i++) {
-      // checks that group is acutally from elected group
+      // checks that group is actually from elected group
       require(processedGroups[groups[i]], "group not processed");
       // by doing this, we avoid processing a group twice
       delete processedGroups[groups[i]];
       // TODO what happens to uptime?
-      uint256[] memory uptimes = getScoreManager().getUptimes(groups[i]);
+      uint256[] memory uptimes = getScoreReader().getUptimes(groups[i]);
       uint256 epochRewards = getElection().getGroupEpochRewards(
         groups[i],
         epochProcessing.totalRewardsVoter,
@@ -289,9 +290,12 @@ contract EpochManager is
   function allocateValidatorsRewards() internal {
     // TODO complete this function
     uint256 totalRewards = 0;
+    IScoreReader scoreReader = getScoreReader();
+    IValidators validators = getValidators();
+
     for (uint i = 0; i < elected.length; i++) {
-      uint256 validatorScore = getScoreManager().getValidatorScore(elected[i]);
-      uint256 validatorReward = getValidators().computeEpochReward(
+      uint256 validatorScore = scoreReader.getValidatorScore(elected[i]);
+      uint256 validatorReward = validators.computeEpochReward(
         elected[i],
         validatorScore,
         epochProcessing.perValidatorReward
