@@ -235,6 +235,21 @@ contract EpochManager is
     return currentEpochNumber;
   }
 
+/// returns epoch processing state
+  function getEpochProcessingState()
+    external
+    view
+    returns (uint256, uint256, uint256, uint256, uint256)
+  {
+    return (
+      uint256(epochProcessing.status),
+      epochProcessing.perValidatorReward,
+      epochProcessing.totalRewardsVoter,
+      epochProcessing.totalRewardsCommunity,
+      epochProcessing.totalRewardsCarbonFund
+    );
+  }
+
   function getElected() external view returns (address[] memory) {
     return elected;
   }

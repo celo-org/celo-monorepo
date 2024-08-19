@@ -18,6 +18,7 @@ import "@celo-contracts/common/interfaces/IRegistry.sol";
 
 import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
 import { ValidatorsMock08 } from "@celo-contracts-8/governance/test/ValidatorsMock.sol";
+import { MockCeloUnreleasedTreasure } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasure.sol";
 
 contract EpochManagerTest is Test, TestConstants, Utils08 {
   EpochManager epochManager;
@@ -33,11 +34,12 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
   uint256 firstEpochNumber = 100;
   uint256 firstEpochBlock = 100;
+  uint256 epochDuration = DAY;
   address[] firstElected;
 
   IRegistry registry;
   ICeloToken celoToken;
-  CeloUnreleasedTreasure celoUnreleasedTreasure;
+  MockCeloUnreleasedTreasure celoUnreleasedTreasure;
   ScoreManager scoreManager;
 
   uint256 celoAmountForRate = 1e24;
@@ -62,13 +64,14 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     epochRewards = new EpochRewardsMock08();
     validators = new ValidatorsMock08();
     stableToken = new MockStableToken08();
-    celoUnreleasedTreasure = new CeloUnreleasedTreasure(false);
+    celoUnreleasedTreasure = new MockCeloUnreleasedTreasure();
 
     firstElected.push(actor("validator1"));
     firstElected.push(actor("validator2"));
 
     address celoTokenAddress = actor("celoTokenAddress");
     address scoreManagerAddress = actor("scoreManagerAddress");
+    address celoUnreleasedTreasureAddress = actor("celoUnreleasedTreasureAddress");
     address reserveAddress = actor("reserve");
 
     epochManagerInitializer = actor("initializer");
@@ -100,10 +103,13 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     (uint256 res0, uint256 res00) = sortedOracles.medianRate(address(stableToken));
 
     scoreManager.setValidatorScore(actor("validator1"), 1);
-    uint256 res = scoreManager.getValidatorScore(actor("validator1"));
-    uint256 res2 = epochRewards.getCommunityRewardFraction();
 
-    epochManager.initialize(REGISTRY_ADDRESS, 10, carbonOffsettingPartner, epochManagerInitializer);
+    epochManager.initialize(
+      REGISTRY_ADDRESS,
+      epochDuration,
+      carbonOffsettingPartner,
+      epochManagerInitializer
+    );
 
     blockTravel(vm, firstEpochBlock);
   }
@@ -112,8 +118,9 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 contract EpochManagerTest_initialize is EpochManagerTest {
   function test_initialize() public virtual {
     assertEq(address(epochManager.registry()), REGISTRY_ADDRESS);
-    assertEq(epochManager.epochDuration(), 10);
+    assertEq(epochManager.epochDuration(), epochDuration);
     assertEq(epochManager.carbonOffsettingPartner(), carbonOffsettingPartner);
+    assertEq(epochManager.epochManagerInitializer(), epochManagerInitializer);
   }
 
   function test_Reverts_WhenAlreadyInitialized() public virtual {
@@ -126,6 +133,21 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
   function test_processCanBeStarted() public virtual {
     vm.prank(epochManagerInitializer);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
+    (
+      uint256 _firstEpochBlock,
+      uint256 _lastEpochBlock,
+      uint256 _startTimestamp,
+      uint256 _currentEpochEndTimestamp,
+      uint256 _currentRewardsBlock
+    ) = epochManager.getCurrentEpoch();
+    assertEq(epochManager.epochManagerInitializer(), address(0));
+    assertEq(epochManager.firstKnownEpoch(), firstEpochNumber);
+    assertEq(_firstEpochBlock, firstEpochBlock);
+    assertEq(_lastEpochBlock, 0);
+    assertEq(_startTimestamp, block.timestamp);
+    assertEq(_currentEpochEndTimestamp, 0);
+    assertEq(_currentRewardsBlock, 0);
+    assertEq(epochManager.getElected(), firstElected);
   }
 
   function test_Reverts_processCannotBeStartedAgain() public virtual {
@@ -160,5 +182,52 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
 
     vm.expectRevert("Epoch is not ready to start");
     epochManager.startNextEpochProcess();
+  }
+
+  function test_Reverts_WhenEpochProcessingAlreadyStarted() public {
+    vm.prank(epochManagerInitializer);
+    epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
+
+    blockTravel(vm, 43200);
+    timeTravel(vm, DAY);
+
+    epochManager.startNextEpochProcess();
+    vm.expectRevert("Epoch process is already started");
+    epochManager.startNextEpochProcess();
+  }
+
+  function test_SetsTheEpochRewardBlockAndRewardAmounts() public {
+    vm.prank(epochManagerInitializer);
+    epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
+
+    blockTravel(vm, 43200);
+    timeTravel(vm, DAY);
+
+    epochManager.startNextEpochProcess();
+    (, , , uint256 _currentEpochEndTimestamp, uint256 _currentRewardsBlock) = epochManager
+      .getCurrentEpoch();
+    assertEq(_currentRewardsBlock, block.number);
+  }
+
+  function test_SetsTheEpochRewardBlock() public {
+    vm.prank(epochManagerInitializer);
+    epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
+
+    blockTravel(vm, 43200);
+    timeTravel(vm, DAY);
+
+    epochManager.startNextEpochProcess();
+    (
+      uint256 status,
+      uint256 perValidatorReward,
+      uint256 totalRewardsVoter,
+      uint256 totalRewardsCommunity,
+      uint256 totalRewardsCarbonFund
+    ) = epochManager.getEpochProcessingState();
+    assertEq(status, 1);
+    assertEq(perValidatorReward, 5);
+    assertEq(totalRewardsVoter, 5);
+    assertEq(totalRewardsCommunity, 5);
+    assertEq(totalRewardsCarbonFund, 5);
   }
 }
