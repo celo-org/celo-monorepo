@@ -240,10 +240,14 @@ contract EpochManager is
   }
 
   function getFirstBlockAtEpoch(uint256 epoch) external view returns (uint256) {
+    require(epoch >= firstKnownEpoch, "Epoch not known");
+    require(epoch <= currentEpochNumber, "Epoch not created yet");
     return epochs[epoch].firstBlock;
   }
 
   function getLastBlockAtEpoch(uint256 epoch) external view returns (uint256) {
+    require(epoch >= firstKnownEpoch, "Epoch not known");
+    require(epoch < currentEpochNumber, "Epoch not finished yet");
     return epochs[epoch].lastBlock;
   }
 
