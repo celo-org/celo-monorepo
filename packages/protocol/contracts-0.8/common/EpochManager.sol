@@ -12,6 +12,8 @@ import "../common/UsingRegistry.sol";
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
+import "forge-std/console.sol";
+
 contract EpochManager is
   Initializable,
   UsingRegistry,
@@ -133,9 +135,9 @@ contract EpochManager is
   /// it freezes the epochrewards at the time of execution,
   /// and starts the distribution of the rewards.
   function startNextEpochProcess() external nonReentrant {
-    require(isReadyToStartEpoch(), "Epoch is not ready to start");
+    require(epochManagerInitializer == address(0), "Epoch system not initialized");
+    require(isTimeForNextEpoch(), "Epoch is not ready to start");
     require(!isOnEpochProcess(), "Epoch process is already started");
-    require(elected.length > 0, "Elected length must be greater than 0.");
     epochProcessing.status = EpochProcessStatus.Started;
 
     epochs[currentEpochNumber].rewardsBlock = block.number;
@@ -244,7 +246,11 @@ contract EpochManager is
     return epochs[epoch].lastBlock;
   }
 
-  function isTimeForNextEpoch() external view returns (bool) {
+  function isTimeForNextEpoch() public view returns (bool) {
+    console.log("block.timestamp", block.timestamp);
+    console.log("epochs[currentEpochNumber].startTimestamp", epochs[currentEpochNumber].startTimestamp);
+    console.log("epochDuration", epochDuration);
+    console.log("block.timestamp >= epochs[currentEpochNumber].startTimestamp + epochDuration;", block.timestamp >= epochs[currentEpochNumber].startTimestamp + epochDuration);
     return block.timestamp >= epochs[currentEpochNumber].startTimestamp + epochDuration;
   }
 
@@ -278,12 +284,6 @@ contract EpochManager is
 
   function systemAlreadyInitialized() public view returns (bool) {
     return firstKnownEpoch != 0;
-  }
-
-  // checks if end of epoch has been reached based on timestamp
-  function isReadyToStartEpoch() public view returns (bool) {
-    Epoch memory _currentEpoch = epochs[currentEpochNumber];
-    return block.timestamp > _currentEpoch.startTimestamp + epochDuration;
   }
 
   function allocateValidatorsRewards() internal {

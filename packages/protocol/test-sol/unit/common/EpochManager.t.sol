@@ -144,7 +144,7 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     uint256 _currentEpoch = epochManager.currentEpochNumber();
     (, , , uint256 _currentEpochEndTimestamp, ) = epochManager.getCurrentEpoch();
 
-    vm.expectRevert("Elected length must be greater than 0.");
+    vm.expectRevert("Epoch system not initialized");
     epochManager.startNextEpochProcess();
   }
 
