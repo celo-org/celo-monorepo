@@ -98,6 +98,7 @@ contract EpochManager is
     address _carbonOffsettingPartner,
     address _epochManagerInitializer
   ) external initializer {
+    require(_epochManagerInitializer != address(0), "EpochManagerInitializer address is required");
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setEpochDuration(newEpochDuration);
@@ -135,7 +136,7 @@ contract EpochManager is
   /// it freezes the epochrewards at the time of execution,
   /// and starts the distribution of the rewards.
   function startNextEpochProcess() external nonReentrant {
-    require(epochManagerInitializer == address(0), "Epoch system not initialized");
+    require(systemAlreadyInitialized(), "Epoch system not initialized");
     require(isTimeForNextEpoch(), "Epoch is not ready to start");
     require(!isOnEpochProcess(), "Epoch process is already started");
     epochProcessing.status = EpochProcessStatus.Started;
@@ -283,7 +284,7 @@ contract EpochManager is
   }
 
   function systemAlreadyInitialized() public view returns (bool) {
-    return firstKnownEpoch != 0;
+    return initialized && epochManagerInitializer == address(0);
   }
 
   function allocateValidatorsRewards() internal {
