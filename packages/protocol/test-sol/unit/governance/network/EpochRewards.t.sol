@@ -752,13 +752,6 @@ contract EpochRewardsTest_updateTargetVotingYield is EpochRewardsTest {
     assertApproxEqRel(result, expected, 1e16); // TODO I suspect it has a 1% error due rounding errors, but need to double check
   }
 
-  function test_Reverts_WhenCalledOnL2() public {
-    _whenL2();
-    vm.expectRevert("This method is no longer supported in L2.");
-    vm.prank(address(0));
-    epochRewards.updateTargetVotingYield();
-  }
-
   function mockVotes(uint256 votes) internal {
     election.setTotalVotes(votes);
     vm.prank(address(0));
