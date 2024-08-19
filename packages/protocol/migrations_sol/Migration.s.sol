@@ -49,7 +49,7 @@ import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 // Core contract imports on Solidity 0.8
 import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectoryInitializer.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
-import "@celo-contracts-8/common/interfaces/ICeloDistributionScheduleInitializer.sol";
+import "@celo-contracts-8/common/interfaces/ICeloUnreleasedTreasureInitializer.sol";
 import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/UsingRegistry.sol";
 
@@ -66,9 +66,6 @@ contract ForceTx {
 
 contract Migration is Script, UsingRegistry, MigrationsConstants {
   using stdJson for string;
-
-  // This is Anvil's default account
-  address constant deployerAccount = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
   IProxyFactory proxyFactory;
 
@@ -188,8 +185,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
    * Entry point of the script
    */
   function run() external {
-    // TODO check that this matches deployerAccount and the pK can be avoided with --unlock
-    vm.startBroadcast(deployerAccount);
+    // TODO check that this matches DEPLOYER_ACCOUNT and the pK can be avoided with --unlock
+    vm.startBroadcast(DEPLOYER_ACCOUNT);
 
     string memory json = vm.readFile("./migrations_sol/migrationsConfig.json");
 
@@ -199,12 +196,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     // Proxy for Registry is already set, just deploy implementation
     migrateRegistry();
-
-    // Foloowing  lines required by parent UsingRegistry
-    _transferOwnership(deployerAccount);
-    setRegistry(REGISTRY_ADDRESS);
-
-    // End UsingRegistry setup
+    setupUsingRegistry();
 
     migrateFreezer();
     migrateFeeCurrencyWhitelist();
@@ -235,7 +227,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateUniswapFeeHandlerSeller();
     migrateFeeHandler(json);
     migrateOdisPayments();
-    migrateCeloDistributionSchedule();
+    migrateCeloUnreleasedTreasure();
     migrateGovernance(json);
 
     vm.stopBroadcast();
@@ -243,6 +235,14 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     // Functions with broadcast with different addresses
     // Validators needs to lock, which can be only used by the msg.sender
     electValidators(json);
+  }
+
+  /**
+   * The function calls defined here are required by the parent UsingRegistry.sol contract.
+   */
+  function setupUsingRegistry() public {
+    _transferOwnership(DEPLOYER_ACCOUNT);
+    setRegistry(REGISTRY_ADDRESS);
   }
 
   function migrateRegistry() public {
@@ -333,7 +333,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function migrateReserveSpenderMultiSig(string memory json) public {
     address[] memory owners = new address[](1);
-    owners[0] = deployerAccount;
+    owners[0] = DEPLOYER_ACCOUNT;
 
     uint256 required = abi.decode(json.parseRaw(".reserveSpenderMultiSig.required"), (uint256));
     uint256 internalRequired = abi.decode(
@@ -402,7 +402,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     bool useSpender = abi.decode(json.parseRaw(".reserveSpenderMultiSig.required"), (bool));
     address spender = useSpender
       ? registry.getAddressForString("ReserveSpenderMultiSig")
-      : deployerAccount;
+      : DEPLOYER_ACCOUNT;
 
     IReserve(reserveProxyAddress).addSpender(spender);
     console.log("reserveSpenderMultiSig added as Reserve spender");
@@ -442,7 +442,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     }
 
     // TODO add more configurable oracles from the json
-    getSortedOracles().addOracle(stableTokenProxyAddress, deployerAccount);
+    getSortedOracles().addOracle(stableTokenProxyAddress, DEPLOYER_ACCOUNT);
 
     if (celoPrice != 0) {
       console.log("before report");
@@ -488,7 +488,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     uint256 celoPrice = abi.decode(json.parseRaw(".stableTokens.celoPrice"), (uint256));
 
     address[] memory initialBalanceAddresses = new address[](1);
-    initialBalanceAddresses[0] = deployerAccount;
+    initialBalanceAddresses[0] = DEPLOYER_ACCOUNT;
 
     uint256[] memory initialBalanceValues = new uint256[](1);
     initialBalanceValues[0] = initialBalanceValue;
@@ -817,7 +817,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function migrateGovernanceApproverMultiSig(string memory json) public {
     address[] memory owners = new address[](1);
-    owners[0] = deployerAccount;
+    owners[0] = DEPLOYER_ACCOUNT;
 
     uint256 required = abi.decode(json.parseRaw(".governanceApproverMultiSig.required"), (uint256));
     uint256 internalRequired = abi.decode(
@@ -910,11 +910,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     );
   }
 
-  function migrateCeloDistributionSchedule() public {
+  function migrateCeloUnreleasedTreasure() public {
     deployProxiedContract(
-      "CeloDistributionSchedule",
+      "CeloUnreleasedTreasure",
       abi.encodeWithSelector(
-        ICeloDistributionScheduleInitializer.initialize.selector,
+        ICeloUnreleasedTreasureInitializer.initialize.selector,
         REGISTRY_ADDRESS
       )
     );
@@ -925,7 +925,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
     address approver = useApprover
       ? registry.getAddressForString("GovernanceApproverMultiSig")
-      : deployerAccount;
+      : DEPLOYER_ACCOUNT;
     uint256 concurrentProposals = abi.decode(
       json.parseRaw(".governance.concurrentProposals"),
       (uint256)
