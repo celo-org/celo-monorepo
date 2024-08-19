@@ -5,7 +5,7 @@ import "celo-foundry-8/Test.sol";
 import "@celo-contracts-8/common/EpochManager.sol";
 import "@celo-contracts-8/stability/test/MockStableToken.sol";
 import "@celo-contracts-8/common/interfaces/ICeloToken.sol";
-import "@celo-contracts-8/common/interfaces/IScoreManager.sol";
+import "@celo-contracts-8/common/ScoreManager.sol";
 import "@celo-contracts/common/interfaces/ICeloDistributionSchedule.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
@@ -36,7 +36,7 @@ contract EpochManagerTest is Test, TestConstants {
   IRegistry registry;
   ICeloToken celoToken;
   ICeloDistributionSchedule celoDistributionSchedule;
-  IScoreManager scoreManager;
+  ScoreManager scoreManager;
 
   uint256 celoAmountForRate = 1e24;
   uint256 stableAmountForRate = 2 * celoAmountForRate;
@@ -85,7 +85,7 @@ contract EpochManagerTest is Test, TestConstants {
     registry = IRegistry(REGISTRY_ADDRESS);
     celoToken = ICeloToken(celoTokenAddress);
     celoDistributionSchedule = ICeloDistributionSchedule(celoDistributionScheduleAddress);
-    scoreManager = IScoreManager(scoreManagerAddress);
+    scoreManager = ScoreManager(scoreManagerAddress);
 
     registry.setAddressFor(EpochManagerInitializerContract, epochManagerInitializer);
     registry.setAddressFor(EpochManagerContract, address(epochManager));

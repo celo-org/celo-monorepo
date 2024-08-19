@@ -54,11 +54,11 @@ contract ScoreManager is Initializable, Ownable {
     return result;
   }
 
-  function getValidatorScore(address group) external view returns (uint256) {
-    return scores[group];
+  function getValidatorScore(address validator) external view returns (uint256) {
+    return scores[validator];
   }
 
-  function setValidatorScore(address group, uint256 score) external onlyOwner {
-    scores[group] = score;
+  function setValidatorScore(address validator, uint256 score) external onlyOwner {
+    scores[validator] = score;
   }
 }

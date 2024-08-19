@@ -22,7 +22,7 @@ import "../../contracts/governance/interfaces/IElection.sol";
 import "../../contracts/governance/interfaces/IEpochRewards.sol";
 import "../../contracts/stability/interfaces/ISortedOracles.sol";
 import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";
-import "./interfaces/IScoreManager.sol";
+import "./interfaces/IScoreReader.sol";
 
 import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
 
@@ -157,7 +157,7 @@ contract UsingRegistry is Ownable {
     return IEpochManager(registry.getAddressForOrDie(EPOCH_MANAGER_REGISTRY_ID));
   }
 
-  function getScoreManager() internal view returns (IScoreManager) {
-    return IScoreManager(registry.getAddressForOrDie(SCORE_MANAGER_REGISTRY_ID));
+  function getScoreManager() internal view returns (IScoreReader) {
+    return IScoreReader(registry.getAddressForOrDie(SCORE_MANAGER_REGISTRY_ID));
   }
 }
