@@ -9,10 +9,12 @@ on:
     branches:
       - master
       - 'release/**'
+      - 'feat/epoch-manager'
   pull_request:
     branches:
       - master
       - 'release/**'
+      - 'feat/epoch-manager'
 
 concurrency:
   group: celo-monorepo-${{ github.ref }}
