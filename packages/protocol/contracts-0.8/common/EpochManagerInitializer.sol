@@ -39,6 +39,17 @@ contract EpochManagerInitializer is initializable, UsingPrecompiles, UsingRegist
       validatorSignerAddressFromCurrentSet(i);
       electedValidatorAddresses[i] = validatorAddress;
     }
-    getEpochManager().initializeSystem(currentEpoch, block.number, electedValidatorAddresses);
+    getEpochManager().initializeSystem(currentEpoch, getFirstBlockOfEpoch(currentEpoch), electedValidatorAddresses);
+  }
+
+  function getFirstBlockOfEpoch(uint256 currentEpoch) external view returns (uint256) {
+    uint256 blockToCheck = block.number - 1;
+    uint256 blockEpochNumber = getEpochNumberOfBlock(blocktoCheck);
+
+    while (blockEpochNumber == currentEpoch) {
+      blockToCheck--;
+      blockEpochNumber = getEpochNumberOfBlock(blockToCheck);
+    }
+    return blockToCheck;
   }
 }
