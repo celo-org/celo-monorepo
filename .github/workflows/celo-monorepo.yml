@@ -11,12 +11,16 @@ on:
       - 'release/**'
       - 'feat/l2-epoch-system'
       - 'martinvol/**'
+      - 'pahor167/**'
+      - 'soloseng/**'
   pull_request:
     branches:
       - master
       - 'release/**'
       - 'feat/l2-epoch-system'
       - 'martinvol/**'
+      - 'pahor167/**'
+      - 'soloseng/**'
 
 concurrency:
   group: celo-monorepo-${{ github.ref }}
