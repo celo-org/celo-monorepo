@@ -8,7 +8,7 @@ import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "../../contracts/governance/interfaces/IEpochRewards.sol";
 
-contract EpochManagerInitializer is initializable, UsingPrecompiles, UsingRegistry {
+contract EpochManagerInitializer is Initializable, UsingPrecompiles, UsingRegistry {
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -24,6 +24,16 @@ contract EpochManagerInitializer is initializable, UsingPrecompiles, UsingRegist
     setRegistry(registryAddress);
   }
 
+  function numberValidatorsInCurrentSet() public view returns (uint256) {
+    // FIXME
+    return 0;
+  }
+
+  function validatorSignerAddressFromCurrentSet(uint256 i) public view returns (address) {
+    // FIXME
+    return address(0);
+  }
+
   /**
    * @notice initializes the epochManager contract during L2 transition.
    */
@@ -35,24 +45,28 @@ contract EpochManagerInitializer is initializable, UsingPrecompiles, UsingRegist
     address[] memory electedValidatorAddresses = new address[](numberElectedValidators);
 
     for (uint256 i = 0; i < numberElectedValidators; i++) {
-      validatorSignerAddressFromCurrentSet(i);
+      address validatorAddress = validatorSignerAddressFromCurrentSet(i);
       electedValidatorAddresses[i] = validatorAddress;
     }
     getEpochManager().initializeSystem(
       currentEpoch,
-      getFirstBlockOfEpoch(currentEpoch),
+      _getFirstBlockOfEpoch(currentEpoch),
       electedValidatorAddresses
     );
   }
 
-  function getFirstBlockOfEpoch(uint256 currentEpoch) external view returns (uint256) {
+  function _getFirstBlockOfEpoch(uint256 currentEpoch) private view returns (uint256) {
     uint256 blockToCheck = block.number - 1;
-    uint256 blockEpochNumber = getEpochNumberOfBlock(blocktoCheck);
+    uint256 blockEpochNumber = getEpochNumberOfBlock(blockToCheck);
 
     while (blockEpochNumber == currentEpoch) {
       blockToCheck--;
       blockEpochNumber = getEpochNumberOfBlock(blockToCheck);
     }
     return blockToCheck;
+  }
+
+  function getFirstBlockOfEpoch(uint256 currentEpoch) external view returns (uint256) {
+    return _getFirstBlockOfEpoch(currentEpoch);
   }
 }
