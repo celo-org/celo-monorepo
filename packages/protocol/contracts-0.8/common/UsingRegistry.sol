@@ -56,7 +56,6 @@ contract UsingRegistry is Ownable {
   bytes32 constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
   bytes32 constant CELO_UNRELEASED_TREASURE_REGISTRY_ID =
     keccak256(abi.encodePacked("CeloUnreleasedTreasure"));
-  bytes32 constant EPOCH_REWARDS_REGISTRY_ID = keccak256(abi.encodePacked("EpochRewards"));
   bytes32 constant EPOCH_MANAGER_REGISTRY_ID = keccak256(abi.encodePacked("EpochManager"));
   bytes32 constant SCORE_MANAGER_REGISTRY_ID = keccak256(abi.encodePacked("ScoreManager"));
   // solhint-enable state-visibility
@@ -147,10 +146,6 @@ contract UsingRegistry is Ownable {
       ICeloUnreleasedTreasure(
         registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID)
       );
-  }
-
-  function getEpochRewards() internal view returns (IEpochRewards) {
-    return IEpochRewards(registry.getAddressForOrDie(EPOCH_REWARDS_REGISTRY_ID));
   }
 
   function getEpochManager() internal view returns (IEpochManager) {
