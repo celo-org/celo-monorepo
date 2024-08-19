@@ -6,6 +6,7 @@ import "@celo-contracts-8/common/EpochManager.sol";
 import "@celo-contracts-8/stability/test/MockStableToken.sol";
 import "@celo-contracts-8/common/interfaces/ICeloToken.sol";
 import "@celo-contracts-8/common/ScoreManager.sol";
+import "@celo-contracts-8/common/CeloDistributionSchedule.sol";
 import "@celo-contracts/common/interfaces/ICeloDistributionSchedule.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
@@ -35,7 +36,7 @@ contract EpochManagerTest is Test, TestConstants {
 
   IRegistry registry;
   ICeloToken celoToken;
-  ICeloDistributionSchedule celoDistributionSchedule;
+  CeloDistributionSchedule celoDistributionSchedule;
   ScoreManager scoreManager;
 
   uint256 celoAmountForRate = 1e24;
@@ -60,12 +61,12 @@ contract EpochManagerTest is Test, TestConstants {
     epochRewards = new EpochRewardsMock08();
     validators = new ValidatorsMock08();
     stableToken = new MockStableToken08();
+    celoDistributionSchedule = new CeloDistributionSchedule(false);
 
     firstElected.push(actor("validator1"));
     firstElected.push(actor("validator2"));
 
     address celoTokenAddress = actor("celoTokenAddress");
-    address celoDistributionScheduleAddress = actor("celoDistributionScheduleAddress");
     address scoreManagerAddress = actor("scoreManagerAddress");
     address reserveAddress = actor("reserve");
 
@@ -75,16 +76,10 @@ contract EpochManagerTest is Test, TestConstants {
 
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
     deployCodeTo("GoldToken.sol", abi.encode(false), celoTokenAddress);
-    deployCodeTo(
-      "CeloDistributionSchedule.sol",
-      abi.encode(false),
-      celoDistributionScheduleAddress
-    );
     deployCodeTo("ScoreManager.sol", abi.encode(false), scoreManagerAddress);
 
     registry = IRegistry(REGISTRY_ADDRESS);
     celoToken = ICeloToken(celoTokenAddress);
-    celoDistributionSchedule = ICeloDistributionSchedule(celoDistributionScheduleAddress);
     scoreManager = ScoreManager(scoreManagerAddress);
 
     registry.setAddressFor(EpochManagerContract, address(epochManager));

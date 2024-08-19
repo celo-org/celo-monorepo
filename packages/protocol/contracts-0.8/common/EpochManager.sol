@@ -114,13 +114,14 @@ contract EpochManager is
     address[] memory firstElected
   ) external onlyEpochManagerInitializer {
     require(!systemAlreadyInitialized(), "Epoch system already initialized");
+    require(firstEpochNumber > 0, "First epoch number must be greater than 0");
+    require(firstEpochBlock > 0, "First epoch block must be greater than 0");
     firstKnownEpoch = firstEpochNumber;
     currentEpochNumber = firstEpochNumber;
 
     Epoch storage _currentEpoch = epochs[currentEpochNumber];
     _currentEpoch.firstBlock = firstEpochBlock;
     _currentEpoch.startTimestamp = block.timestamp;
-    _currentEpoch.endTimestamp = block.timestamp + epochDuration;
 
     elected = firstElected;
     epochManagerInitializer = address(0);
@@ -282,11 +283,7 @@ contract EpochManager is
   // checks if end of epoch has been reached based on timestamp
   function isReadyToStartEpoch() public view returns (bool) {
     Epoch memory _currentEpoch = epochs[currentEpochNumber];
-    if (block.timestamp > _currentEpoch.endTimestamp) {
-      return true;
-    } else {
-      return false;
-    }
+    return block.timestamp > _currentEpoch.startTimestamp + epochDuration;
   }
 
   function allocateValidatorsRewards() internal {
