@@ -13,7 +13,6 @@ import "../../contracts/common/interfaces/IRegistry.sol";
 import "../../contracts/common/interfaces/IAccounts.sol";
 import "../../contracts/common/interfaces/IFreezer.sol";
 import "../../contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
-import "../../contracts/common/interfaces/IEpochManagerInitializer.sol";
 import "../../contracts/governance/interfaces/IGovernance.sol";
 import "../../contracts/governance/interfaces/ILockedGold.sol";
 import "../../contracts/governance/interfaces/ILockedCelo.sol";
