@@ -466,7 +466,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function migrateStableToken(string memory json) public {
     string[] memory names = abi.decode(json.parseRaw(".stableTokens.names"), (string[]));
-    string[] memory symbols = abi.decode(json.parseRaw(".stableTokens.names"), (string[]));
+    string[] memory symbols = abi.decode(json.parseRaw(".stableTokens.symbols"), (string[]));
     string[] memory contractSufixs = abi.decode(
       json.parseRaw(".stableTokens.contractSufixs"),
       (string[])
