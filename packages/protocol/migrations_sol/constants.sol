@@ -7,7 +7,7 @@ contract MigrationsConstants is TestConstants {
   string[24] contractsInRegistry = [
     "Accounts",
     "BlockchainParameters",
-    "CeloDistributionSchedule",
+    "CeloUnreleasedTreasure",
     "CeloToken",
     "DoubleSigningSlasher",
     "DowntimeSlasher",

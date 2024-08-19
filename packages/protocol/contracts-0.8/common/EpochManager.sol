@@ -203,11 +203,11 @@ contract EpochManager is
       );
       getElection().distributeEpochRewards(groups[i], epochRewards, lessers[i], greaters[i]);
     }
-    getCeloDistributionSchedule().release(
+    getCeloUnreleasedTreasure().release(
       registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID),
       epochProcessing.totalRewardsCommunity
     );
-    getCeloDistributionSchedule().release(
+    getCeloUnreleasedTreasure().release(
       carbonOffsettingPartner,
       epochProcessing.totalRewardsCarbonFund
     );
@@ -313,7 +313,7 @@ contract EpochManager is
 
     uint256 CELOequivalent = (numerator * totalRewards) / denominator;
     // this is not a mint anymore
-    getCeloDistributionSchedule().release(
+    getCeloUnreleasedTreasure().release(
       registry.getAddressForOrDie(RESERVE_REGISTRY_ID),
       CELOequivalent
     );

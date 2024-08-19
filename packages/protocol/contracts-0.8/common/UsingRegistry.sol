@@ -12,7 +12,7 @@ import "./interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/IRegistry.sol";
 import "../../contracts/common/interfaces/IAccounts.sol";
 import "../../contracts/common/interfaces/IFreezer.sol";
-import "../../contracts/common/interfaces/ICeloDistributionSchedule.sol";
+import "../../contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
 import "../../contracts/common/interfaces/IEpochManagerInitializer.sol";
 import "../../contracts/governance/interfaces/IGovernance.sol";
 import "../../contracts/governance/interfaces/ILockedGold.sol";
@@ -52,8 +52,8 @@ contract UsingRegistry is Ownable {
     keccak256(abi.encodePacked("MentoFeeHandlerSeller"));
   bytes32 constant CELO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("CeloToken"));
   bytes32 constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
-  bytes32 constant CELO_DISTRIBUTION_SCHEDULE_REGISTRY_ID =
-    keccak256(abi.encodePacked("CeloDistributionSchedule"));
+  bytes32 constant CELO_UNRELEASED_TREASURE_REGISTRY_ID =
+    keccak256(abi.encodePacked("CeloUnreleasedTreasure"));
   bytes32 constant EPOCH_REWARDS_REGISTRY_ID = keccak256(abi.encodePacked("EpochRewards"));
   bytes32 constant EPOCH_MANAGER_REGISTRY_ID = keccak256(abi.encodePacked("EpochManager"));
   bytes32 constant SCORE_MANAGER_REGISTRY_ID = keccak256(abi.encodePacked("ScoreManager"));
@@ -135,10 +135,10 @@ contract UsingRegistry is Ownable {
     return IGovernance(registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
   }
 
-  function getCeloDistributionSchedule() internal view returns (ICeloDistributionSchedule) {
+  function getCeloUnreleasedTreasure() internal view returns (ICeloUnreleasedTreasure) {
     return
-      ICeloDistributionSchedule(
-        registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_REGISTRY_ID)
+      ICeloUnreleasedTreasure(
+        registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID)
       );
   }
 

@@ -6,8 +6,8 @@ import "@celo-contracts-8/common/EpochManager.sol";
 import "@celo-contracts-8/stability/test/MockStableToken.sol";
 import "@celo-contracts-8/common/interfaces/ICeloToken.sol";
 import "@celo-contracts-8/common/ScoreManager.sol";
-import "@celo-contracts-8/common/CeloDistributionSchedule.sol";
-import "@celo-contracts/common/interfaces/ICeloDistributionSchedule.sol";
+import "@celo-contracts-8/common/CeloUnreleasedTreasure.sol";
+import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
 
@@ -36,7 +36,7 @@ contract EpochManagerTest is Test, TestConstants {
 
   IRegistry registry;
   ICeloToken celoToken;
-  CeloDistributionSchedule celoDistributionSchedule;
+  CeloUnreleasedTreasure celoUnreleasedTreasure;
   ScoreManager scoreManager;
 
   uint256 celoAmountForRate = 1e24;
@@ -61,7 +61,7 @@ contract EpochManagerTest is Test, TestConstants {
     epochRewards = new EpochRewardsMock08();
     validators = new ValidatorsMock08();
     stableToken = new MockStableToken08();
-    celoDistributionSchedule = new CeloDistributionSchedule(false);
+    celoUnreleasedTreasure = new CeloUnreleasedTreasure(false);
 
     firstElected.push(actor("validator1"));
     firstElected.push(actor("validator2"));
@@ -89,11 +89,11 @@ contract EpochManagerTest is Test, TestConstants {
     registry.setAddressFor(ValidatorsContract, address(validators));
     registry.setAddressFor(ScoreManagerContract, address(scoreManager));
     registry.setAddressFor(StableTokenContract, address(stableToken));
-    registry.setAddressFor(CeloDistributionScheduleContract, address(celoDistributionSchedule));
+    registry.setAddressFor(CeloUnreleasedTreasureContract, address(celoUnreleasedTreasure));
     registry.setAddressFor(CeloTokenContract, address(celoToken));
     registry.setAddressFor(ReserveContract, reserveAddress);
 
-    vm.deal(address(celoDistributionSchedule), L2_INITIAL_STASH_BALANCE);
+    vm.deal(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
 
     bool res1 = sortedOracles.setMedianRate(address(stableToken), stableAmountForRate);
     (uint256 res0, uint256 res00) = sortedOracles.medianRate(address(stableToken));

@@ -28,7 +28,7 @@ contract TestConstants {
   string constant EpochManagerInitializerContract = "EpochManagerInitializer";
   string constant ScoreManagerContract = "ScoreManager";
   string constant ReserveContract = "Reserve";
-  string constant CeloDistributionScheduleContract = "CeloDistributionSchedule";
+  string constant CeloUnreleasedTreasureContract = "CeloUnreleasedTreasure";
 
   // Constant addresses
   address constant REGISTRY_ADDRESS = 0x000000000000000000000000000000000000ce10;

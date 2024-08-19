@@ -48,7 +48,7 @@ contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
   address refundAddress = actor("refundAddress");
   address newBeneficiary = actor("newBeneficiary");
   address randomAddress = actor("randomAddress");
-  address celoDistributionSchedule = actor("CeloDistributionSchedule");
+  address celoUnreleasedTreasure = actor("CeloUnreleasedTreasure");
 
   uint256 constant TOTAL_AMOUNT = 1 ether * 10;
 
@@ -125,7 +125,7 @@ contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("StableToken", address(stableToken));
-    registry.setAddressFor("CeloDistributionSchedule", celoDistributionSchedule);
+    registry.setAddressFor("CeloUnreleasedTreasure", celoUnreleasedTreasure);
 
     lockedGold.initialize(REGISTRY_ADDRESS, UNLOCKING_PERIOD);
     goldToken.initialize(REGISTRY_ADDRESS);

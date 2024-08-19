@@ -35,7 +35,7 @@ contract GoldTokenTest is Test, TestConstants, IsL2Check {
     celoToken = new GoldToken(true);
     vm.prank(celoTokenOwner);
     celoToken.setRegistry(REGISTRY_ADDRESS);
-    registry.setAddressFor("CeloDistributionSchedule", celoTokenDistributionSchedule);
+    registry.setAddressFor("CeloUnreleasedTreasure", celoTokenDistributionSchedule);
     receiver = actor("receiver");
     sender = actor("sender");
     vm.deal(receiver, ONE_CELOTOKEN);
@@ -126,11 +126,6 @@ contract GoldTokenTest_transfer is GoldTokenTest {
     vm.expectRevert();
     celoToken.transfer(address(0), ONE_CELOTOKEN);
   }
-  function test_Reverts_WhenTransferingToCeloDistributionSchedule() public {
-    vm.prank(sender);
-    vm.expectRevert("transfer attempted to reserved CeloDistributionSchedule address");
-    celoToken.transfer(celoTokenDistributionSchedule, ONE_CELOTOKEN);
-  }
 }
 
 contract GoldTokenTest_transferFrom is GoldTokenTest {
@@ -147,12 +142,6 @@ contract GoldTokenTest_transferFrom is GoldTokenTest {
     celoToken.transferFrom(sender, receiver, ONE_CELOTOKEN);
     assertEq(sender.balance, startBalanceFrom - ONE_CELOTOKEN);
     assertEq(receiver.balance, startBalanceTo + ONE_CELOTOKEN);
-  }
-
-  function test_Reverts_WhenTransferingToCeloDistributionSchedule() public {
-    vm.prank(receiver);
-    vm.expectRevert("transfer attempted to reserved CeloDistributionSchedule address");
-    celoToken.transferFrom(sender, celoTokenDistributionSchedule, ONE_CELOTOKEN);
   }
 
   function test_Reverts_WhenTransferToNullAddress() public {
@@ -275,7 +264,7 @@ contract CeloTokenMockTest is Test, TestConstants {
     mockCeloToken.setRegistry(REGISTRY_ADDRESS);
     mockCeloToken.setTotalSupply(ONE_CELOTOKEN * 1000);
     celoTokenDistributionSchedule = actor("celoTokenDistributionSchedule");
-    registry.setAddressFor("CeloDistributionSchedule", celoTokenDistributionSchedule);
+    registry.setAddressFor("CeloUnreleasedTreasure", celoTokenDistributionSchedule);
   }
 }
 

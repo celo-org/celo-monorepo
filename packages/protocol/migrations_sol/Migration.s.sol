@@ -49,7 +49,7 @@ import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 // Core contract imports on Solidity 0.8
 import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectoryInitializer.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
-import "@celo-contracts-8/common/interfaces/ICeloDistributionScheduleInitializer.sol";
+import "@celo-contracts-8/common/interfaces/ICeloUnreleasedTreasureInitializer.sol";
 import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/UsingRegistry.sol";
 
@@ -235,7 +235,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateUniswapFeeHandlerSeller();
     migrateFeeHandler(json);
     migrateOdisPayments();
-    migrateCeloDistributionSchedule();
+    migrateCeloUnreleasedTreasure();
     migrateGovernance(json);
 
     vm.stopBroadcast();
@@ -910,11 +910,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     );
   }
 
-  function migrateCeloDistributionSchedule() public {
+  function migrateCeloUnreleasedTreasure() public {
     deployProxiedContract(
-      "CeloDistributionSchedule",
+      "CeloUnreleasedTreasure",
       abi.encodeWithSelector(
-        ICeloDistributionScheduleInitializer.initialize.selector,
+        ICeloUnreleasedTreasureInitializer.initialize.selector,
         REGISTRY_ADDRESS
       )
     );

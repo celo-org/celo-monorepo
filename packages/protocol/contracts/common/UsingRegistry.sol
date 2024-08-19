@@ -8,7 +8,7 @@ import "./interfaces/IAccounts.sol";
 import "./interfaces/IFeeCurrencyWhitelist.sol";
 import "./interfaces/IFreezer.sol";
 import "./interfaces/IRegistry.sol";
-import "./interfaces/ICeloDistributionSchedule.sol";
+import "./interfaces/ICeloUnreleasedTreasure.sol";
 import "./interfaces/IEpochManagerInitializer.sol";
 
 import "../governance/interfaces/IElection.sol";
@@ -51,8 +51,8 @@ contract UsingRegistry is Ownable {
 
   bytes32 constant CELO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("CeloToken"));
   bytes32 constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
-  bytes32 constant CELO_DISTRIBUTION_SCHEDULE_REGISTRY_ID =
-    keccak256(abi.encodePacked("CeloDistributionSchedule"));
+  bytes32 constant CELO_UNRELEASED_TREASURE_REGISTRY_ID =
+    keccak256(abi.encodePacked("CeloUnreleasedTreasure"));
   bytes32 constant EPOCH_REWARDS_REGISTRY_ID = keccak256(abi.encodePacked("EpochRewards"));
   bytes32 constant EPOCH_MANAGER_INITIALIZER_REGISTRY_ID =
     keccak256(abi.encodePacked("EpochManagerInitializer"));
@@ -145,10 +145,10 @@ contract UsingRegistry is Ownable {
     return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
   }
 
-  function getCeloDistributionSchedule() internal view returns (ICeloDistributionSchedule) {
+  function getCeloUnreleasedTreasure() internal view returns (ICeloUnreleasedTreasure) {
     return
-      ICeloDistributionSchedule(
-        registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_REGISTRY_ID)
+      ICeloUnreleasedTreasure(
+        registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID)
       );
   }
 
