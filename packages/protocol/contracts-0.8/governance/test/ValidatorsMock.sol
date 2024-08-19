@@ -159,6 +159,16 @@ contract ValidatorsMock08 is IValidators {
   ) external view returns (bytes memory, bytes memory, address, uint256, address) {
     return ("0x", "0x", address(0), 0, address(0));
   }
+   function getValidatorsGroup(
+    address account
+  )
+    external
+    view
+    returns (
+      address affiliation
+  ) {
+    affiliation = address(0);
+  }
   function getValidatorGroup(
     address account
   )

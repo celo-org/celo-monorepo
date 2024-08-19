@@ -10,6 +10,7 @@ import "@celo-contracts-8/common/CeloUnreleasedTreasure.sol";
 import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
+import { Utils08 } from "@test-sol/utils08.sol";
 
 import "@celo-contracts/stability/test/MockSortedOracles.sol";
 
@@ -18,7 +19,7 @@ import "@celo-contracts/common/interfaces/IRegistry.sol";
 import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
 import { ValidatorsMock08 } from "@celo-contracts-8/governance/test/ValidatorsMock.sol";
 
-contract EpochManagerTest is Test, TestConstants {
+contract EpochManagerTest is Test, TestConstants, Utils08 {
   EpochManager epochManager;
   MockSortedOracles sortedOracles;
 
@@ -103,6 +104,8 @@ contract EpochManagerTest is Test, TestConstants {
     uint256 res2 = epochRewards.getCommunityRewardFraction();
 
     epochManager.initialize(REGISTRY_ADDRESS, 10, carbonOffsettingPartner, epochManagerInitializer);
+
+    blockTravel(vm, firstEpochBlock);
   }
 }
 

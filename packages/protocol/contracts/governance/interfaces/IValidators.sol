@@ -62,6 +62,14 @@ interface IValidators {
   function getValidator(
     address account
   ) external view returns (bytes memory, bytes memory, address, uint256, address);
+   function getValidatorsGroup(
+    address account
+  )
+    external
+    view
+    returns (
+      address affiliation
+  );
   function getValidatorGroup(
     address
   )

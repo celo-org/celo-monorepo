@@ -12,8 +12,6 @@ import "../common/UsingRegistry.sol";
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
-import "forge-std/console.sol";
-
 contract EpochManager is
   Initializable,
   UsingRegistry,
@@ -181,7 +179,7 @@ contract EpochManager is
     epochs[currentEpochNumber].startTimestamp = block.timestamp;
 
     for (uint i = 0; i < elected.length; i++) {
-      (, , address group, , ) = getValidators().getValidator(elected[i]);
+      address group = getValidators().getValidatorsGroup(elected[i]);
       if (!processedGroups[group]) {
         epochProcessing.toProcessGroups++;
         processedGroups[group] = true;
@@ -253,10 +251,6 @@ contract EpochManager is
   }
 
   function isTimeForNextEpoch() public view returns (bool) {
-    console.log("block.timestamp", block.timestamp);
-    console.log("epochs[currentEpochNumber].startTimestamp", epochs[currentEpochNumber].startTimestamp);
-    console.log("epochDuration", epochDuration);
-    console.log("block.timestamp >= epochs[currentEpochNumber].startTimestamp + epochDuration;", block.timestamp >= epochs[currentEpochNumber].startTimestamp + epochDuration);
     return block.timestamp >= epochs[currentEpochNumber].startTimestamp + epochDuration;
   }
 

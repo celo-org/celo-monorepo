@@ -1084,6 +1084,25 @@ contract Validators is
     );
   }
 
+    /**
+   * @notice Returns affiliated group to validator.
+   * @param account The account that registered the validator.
+   * @return The validator group.
+   */
+  function getValidatorsGroup(
+    address account
+  )
+    public
+    view
+    returns (
+      address affiliation
+    )
+  {
+    require(isValidator(account), "Not a validator");
+    Validator storage validator = validators[account];
+    return validator.affiliation;
+  }
+
   /**
    * @notice Returns the number of members in a validator group.
    * @param account The address of the validator group.
