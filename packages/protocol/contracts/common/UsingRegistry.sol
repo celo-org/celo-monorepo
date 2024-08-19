@@ -8,9 +8,10 @@ import "./interfaces/IAccounts.sol";
 import "./interfaces/IFeeCurrencyWhitelist.sol";
 import "./interfaces/IFreezer.sol";
 import "./interfaces/IRegistry.sol";
-import "./interfaces/ICeloDistributionSchedule.sol";
+import "./interfaces/ICeloUnreleasedTreasure.sol";
 
 import "../governance/interfaces/IElection.sol";
+import "../governance/interfaces/IEpochRewards.sol";
 import "../governance/interfaces/IGovernance.sol";
 import "../governance/interfaces/ILockedGold.sol";
 import "../governance/interfaces/ILockedCelo.sol";
@@ -49,8 +50,12 @@ contract UsingRegistry is Ownable {
 
   bytes32 constant CELO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("CeloToken"));
   bytes32 constant LOCKED_CELO_REGISTRY_ID = keccak256(abi.encodePacked("LockedCelo"));
-  bytes32 constant CELO_DISTRIBUTION_SCHEDULE_ID =
-    keccak256(abi.encodePacked("CeloDistributionSchedule"));
+  bytes32 constant CELO_UNRELEASED_TREASURE_REGISTRY_ID =
+    keccak256(abi.encodePacked("CeloUnreleasedTreasure"));
+  bytes32 constant EPOCH_REWARDS_REGISTRY_ID = keccak256(abi.encodePacked("EpochRewards"));
+  bytes32 constant EPOCH_MANAGER_INITIALIZER_REGISTRY_ID =
+    keccak256(abi.encodePacked("EpochManagerInitializer"));
+  bytes32 constant EPOCH_MANAGER_REGISTRY_ID = keccak256(abi.encodePacked("EpochManager"));
   // solhint-enable state-visibility
 
   IRegistry public registry;
@@ -139,7 +144,12 @@ contract UsingRegistry is Ownable {
     return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
   }
 
-  function getCeloDistributionSchedule() internal view returns (ICeloDistributionSchedule) {
-    return ICeloDistributionSchedule(registry.getAddressForOrDie(CELO_DISTRIBUTION_SCHEDULE_ID));
+  function getCeloUnreleasedTreasure() internal view returns (ICeloUnreleasedTreasure) {
+    return
+      ICeloUnreleasedTreasure(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID));
+  }
+
+  function getEpochRewards() internal view returns (IEpochRewards) {
+    return IEpochRewards(registry.getAddressForOrDie(EPOCH_REWARDS_REGISTRY_ID));
   }
 }
