@@ -118,6 +118,7 @@ contract EpochManager is
     require(!systemAlreadyInitialized(), "Epoch system already initialized");
     require(firstEpochNumber > 0, "First epoch number must be greater than 0");
     require(firstEpochBlock > 0, "First epoch block must be greater than 0");
+    require(firstEpochBlock <= block.number, "First epoch block must be less or equal than current block");
     require(firstElected.length > 0, "First elected validators must be greater than 0");
     firstKnownEpoch = firstEpochNumber;
     currentEpochNumber = firstEpochNumber;
