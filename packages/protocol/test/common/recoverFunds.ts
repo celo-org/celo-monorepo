@@ -11,7 +11,7 @@ import {
   ProxyInstance,
   RegistryContract,
 } from 'types'
-import { CeloDistributionScheduleContract } from 'types/08'
+import { CeloUnreleasedTreasureContract } from 'types/08'
 import { SOLIDITY_08_PACKAGE } from '../../contractPackages'
 import { ArtifactsSingleton } from '../../lib/artifactsSingleton'
 
@@ -37,21 +37,21 @@ contract('Proxy', (accounts: string[]) => {
     it('recovers funds from an incorrectly intialized implementation', async () => {
       const Freezer: FreezerContract = artifacts.require('Freezer')
       const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
-      const CeloDistributionSchedule: CeloDistributionScheduleContract =
-        ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE).require('CeloDistributionSchedule') // Added because the CeloToken `_transfer` prevents transfers to the celoDistributionSchedule.
+      const CeloUnreleasedTreasure: CeloUnreleasedTreasureContract =
+        ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE).require('CeloUnreleasedTreasure') // Added because the CeloToken `_transfer` prevents transfers to the celoUnreleasedTreasure.
       // @ts-ignore
       GoldToken.numberFormat = 'BigNumber'
       const Registry: RegistryContract = artifacts.require('Registry')
 
       const freezer = await Freezer.new(true)
       const goldToken = await GoldToken.new(true)
-      const celoDistributionSchedule = await CeloDistributionSchedule.new(true)
+      const celoUnreleasedTreasure = await CeloUnreleasedTreasure.new(true)
 
       const registry = await Registry.new(true)
       await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
       await registry.setAddressFor(
-        CeloContractName.CeloDistributionSchedule,
-        celoDistributionSchedule.address
+        CeloContractName.CeloUnreleasedTreasure,
+        celoUnreleasedTreasure.address
       )
       await goldToken.initialize(registry.address)
 
