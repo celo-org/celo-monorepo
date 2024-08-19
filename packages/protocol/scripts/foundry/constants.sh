@@ -1,8 +1,6 @@
 # Anvil accounts
 export FROM_ACCOUNT_NO_ZERO="f39Fd6e51aad88F6F4ce6aB8827279cffFb92266" # Anvil default account (1)
 export FROM_ACCOUNT="0x$FROM_ACCOUNT_NO_ZERO" # Anvil default account (1)
-export FROM_ACCOUNT_PRIVATE_KEY_NO_ZERO="ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80" # Anvil default account (1)
-export FROM_ACCOUNT_PRIVATE_KEY="0x$FROM_ACCOUNT_PRIVATE_KEY_NO_ZERO" # Anvil default account (1)
 
 # Anvil configurations (Source: https://book.getfoundry.sh/reference/anvil/)
 export ANVIL_PORT=8546
@@ -15,7 +13,9 @@ export STEPS_TRACING="--steps-tracing" #  Steps tracing used for debug calls ret
 
 # Forge migration script configurations (Source: https://book.getfoundry.sh/reference/forge/forge-script)
 export MIGRATION_SCRIPT_PATH="migrations_sol/Migration.s.sol" # Path to migration script
-export TARGET_CONTRACT="Migration" #  The name of the contract you want to run.
+export MIGRATION_L2_SCRIPT_PATH="migrations_sol/MigrationL2.s.sol" # Path to L2 migration script
+export MIGRATION_TARGET_CONTRACT="Migration" #  The name of the contract you want to run.
+export MIGRATION_L2_TARGET_CONTRACT="MigrationL2" #  The name of the contract you want to run.
 export BROADCAST="--broadcast" # Broadcasts the transactions. Enable: "--broadcast" / Disable: ""
 export SKIP_SIMULATION="" # Skips on-chain simulation. Enable: "--skip-simulation" / Disable: ""
 export NON_INTERACTIVE="--non-interactive" # Remove interactive prompts which appear if the contract is near the EIP-170 size limit.
