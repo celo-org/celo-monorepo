@@ -23,10 +23,10 @@ interface ICeloDistributionSchedule {
    */
   function getTargetCeloTotalSupply() external returns (uint256, uint256, uint256);
 
-    /**
-   * @notice Transfers the Celo to the specified address.
-   * @param to The address to transfer the amount to.
-   * @param amount The amount to transfer.
+  /**
+   * @notice Releases the Celo to the specified address.
+   * @param to The address to release the amount to.
+   * @param amount The amount to release.
    */
-  function transfer(address to, uint256 amount) external ;
+  function release(address to, uint256 amount) external ;
 }

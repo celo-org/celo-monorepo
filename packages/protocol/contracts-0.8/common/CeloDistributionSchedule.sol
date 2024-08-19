@@ -133,11 +133,11 @@ contract CeloDistributionSchedule is UsingRegistry, ReentrancyGuard, Initializab
   }
 
   /**
-   * @notice Transfers the Celo to the specified address.
-   * @param to The address to transfer the amount to.
-   * @param amount The amount to transfer.
+   * @notice Releases the Celo to the specified address.
+   * @param to The address to release the amount to.
+   * @param amount The amount to release.
    */
-  function transfer(address to, uint256 amount) external onlyEpochManager {
+  function release(address to, uint256 amount) external onlyEpochManager {
     require(address(this).balance >= amount, "Insufficient balance.");
     ICeloToken celoToken = ICeloToken(address(getCeloToken()));
     celoToken.transfer(to, amount);
