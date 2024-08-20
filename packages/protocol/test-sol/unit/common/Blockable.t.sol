@@ -19,7 +19,7 @@ contract TestBlocker is IBlocker {
 }
 
 contract TestBlockable is Blockable {
-  function funtionToBeBlocked() public onlyWhenNotBlocked {
+  function functionToBeBlocked() public onlyWhenNotBlocked {
     return;
   }
 }
@@ -82,10 +82,10 @@ contract BlockableTest_onlyWhenNotBlocked is BlockableTest {
   function test_Reverts_WhenBlocked() public {
     blocker.mockSetBlocked(true);
     vm.expectRevert("Contract is blocked from performing this action");
-    blockableWithFunction.funtionToBeBlocked();
+    blockableWithFunction.functionToBeBlocked();
   }
 
   function test_callsucceeds_WhenNotBlocked() public {
-    blockableWithFunction.funtionToBeBlocked();
+    blockableWithFunction.functionToBeBlocked();
   }
 }
