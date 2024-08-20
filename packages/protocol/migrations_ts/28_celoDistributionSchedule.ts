@@ -4,7 +4,7 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { RegistryInstance } from '@celo/protocol/types'
-import { CeloDistributionScheduleInstance } from 'types/08'
+import { CeloUnreleasedTreasureInstance } from 'types/08'
 import { SOLIDITY_08_PACKAGE } from '../contractPackages'
 
 const initializeArgs = async (): Promise<[string]> => {
@@ -15,10 +15,10 @@ const initializeArgs = async (): Promise<[string]> => {
   return [registry.address]
 }
 
-module.exports = deploymentForCoreContract<CeloDistributionScheduleInstance>(
+module.exports = deploymentForCoreContract<CeloUnreleasedTreasureInstance>(
   web3,
   artifacts,
-  CeloContractName.CeloDistributionSchedule,
+  CeloContractName.CeloUnreleasedTreasure,
   initializeArgs,
   undefined,
   SOLIDITY_08_PACKAGE

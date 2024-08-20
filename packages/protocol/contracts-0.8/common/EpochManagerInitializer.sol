@@ -8,7 +8,7 @@ import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "../../contracts/governance/interfaces/IEpochRewards.sol";
 
-contract EpochManagerInitializer is initializable, UsingPrecompiles, UsingRegistry {
+contract EpochManagerInitializer is Initializable, UsingPrecompiles, UsingRegistry {
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -18,7 +18,6 @@ contract EpochManagerInitializer is initializable, UsingPrecompiles, UsingRegist
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
-   * @param newEpochDuration The duration of an epoch in seconds.
    */
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
@@ -36,7 +35,7 @@ contract EpochManagerInitializer is initializable, UsingPrecompiles, UsingRegist
     address[] memory electedValidatorAddresses = new address[](numberElectedValidators);
 
     for (uint256 i = 0; i < numberElectedValidators; i++) {
-      validatorSignerAddressFromCurrentSet(i);
+      address validatorAddress = validatorSignerAddressFromCurrentSet(i);
       electedValidatorAddresses[i] = validatorAddress;
     }
     getEpochManager().initializeSystem(
@@ -46,9 +45,9 @@ contract EpochManagerInitializer is initializable, UsingPrecompiles, UsingRegist
     );
   }
 
-  function getFirstBlockOfEpoch(uint256 currentEpoch) external view returns (uint256) {
+  function getFirstBlockOfEpoch(uint256 currentEpoch) internal view returns (uint256) {
     uint256 blockToCheck = block.number - 1;
-    uint256 blockEpochNumber = getEpochNumberOfBlock(blocktoCheck);
+    uint256 blockEpochNumber = getEpochNumberOfBlock(blockToCheck);
 
     while (blockEpochNumber == currentEpoch) {
       blockToCheck--;
