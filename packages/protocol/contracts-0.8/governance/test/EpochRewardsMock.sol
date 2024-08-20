@@ -13,21 +13,16 @@ contract EpochRewardsMock08 is IEpochRewards {
     numValidatorsInCurrentSet = value;
   }
 
-  function getRewardsMultiplier(
-    uint256 targetGoldTotalSupplyIncrease
-  ) external view returns (uint256) {
-    // return _getRewardsMultiplier(targetGoldTotalSupplyIncrease).unwrap();
-    return 0;
-  }
-
   // TODO: (soloseng) implement mock
   function updateTargetVotingYield() external {
     // console2.log("### Updating Target Voting Yield");
   }
 
-  // mocks the precompile
-  function numberValidatorsInCurrentSet() public view returns (uint256) {
-    return numValidatorsInCurrentSet;
+  function getRewardsMultiplier(
+    uint256 targetGoldTotalSupplyIncrease
+  ) external view returns (uint256) {
+    // return _getRewardsMultiplier(targetGoldTotalSupplyIncrease).unwrap();
+    return 0;
   }
 
   function isReserveLow() external view returns (bool) {
@@ -58,5 +53,10 @@ contract EpochRewardsMock08 is IEpochRewards {
   }
   function getRewardsMultiplier() external view returns (uint256) {
     return 0;
+  }
+
+  // mocks the precompile
+  function numberValidatorsInCurrentSet() public view returns (uint256) {
+    return numValidatorsInCurrentSet;
   }
 }

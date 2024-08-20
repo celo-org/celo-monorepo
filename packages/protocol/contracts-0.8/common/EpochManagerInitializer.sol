@@ -55,7 +55,7 @@ contract EpochManagerInitializer is Initializable, UsingPrecompiles, UsingRegist
     );
   }
 
-  function _getFirstBlockOfEpoch(uint256 currentEpoch) private view returns (uint256) {
+  function getFirstBlockOfEpoch(uint256 currentEpoch) internal view returns (uint256) {
     uint256 blockToCheck = block.number - 1;
     uint256 blockEpochNumber = getEpochNumberOfBlock(blockToCheck);
 
