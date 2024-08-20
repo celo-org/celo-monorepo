@@ -9,21 +9,13 @@ contract Blockable is IBlockable, Ownable {
 
   event BlockedBySet(address indexed _blockedBy);
 
-  // isBlocked will default to false if blockedBy not set
-  function isBlocked() external view returns (bool) {
-    return _isBlocked();
-  }
-
-  function _isBlocked() internal view returns (bool) {
-    if (address(blockedBy) == address(0)) {
-      return false;
-    }
-    return blockedBy.isBlocked();
-  }
-
   modifier onlyWhenNotBlocked() {
     require(!_isBlocked(), "Contract is blocked from performing this action");
     _;
+  }
+
+  function setBlockedByContract(address _blockedBy) external onlyOwner {
+    _setBlockedBy(_blockedBy);
   }
 
   function getBlockedbyContract() external view returns (address) {
@@ -35,7 +27,15 @@ contract Blockable is IBlockable, Ownable {
     emit BlockedBySet(_blockedBy);
   }
 
-  function setBlockedByContract(address _blockedBy) external onlyOwner {
-    _setBlockedBy(_blockedBy);
+  // isBlocked will default to false if blockedBy not set
+  function isBlocked() external view returns (bool) {
+    return _isBlocked();
+  }
+
+  function _isBlocked() internal view returns (bool) {
+    if (address(blockedBy) == address(0)) {
+      return false;
+    }
+    return blockedBy.isBlocked();
   }
 }
