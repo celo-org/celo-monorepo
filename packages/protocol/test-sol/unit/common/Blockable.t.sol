@@ -19,7 +19,7 @@ contract TestBlocker is IBlocker {
 }
 
 contract TestBlockable is Blockable {
-  function funtionToBeBlocked() public onlyWhenNotBlocked {
+  function functionToBeBlocked() public onlyWhenNotBlocked {
     return;
   }
 }
