@@ -8,6 +8,15 @@ interface IFeeCurrencyDirectory {
   }
 
   /**
+   * @notice Sets the currency configuration for a token.
+   * @dev This action can only be performed by the contract owner.
+   * @param token The token address.
+   * @param oracle The oracle address for price fetching.
+   * @param intrinsicGas The intrinsic gas value for transactions.
+   */
+  function setCurrencyConfig(address token, address oracle, uint256 intrinsicGas) external;
+
+  /**
    * @notice Returns the list of all currency addresses.
    * @return An array of addresses.
    */
@@ -28,13 +37,4 @@ interface IFeeCurrencyDirectory {
   function getExchangeRate(
     address token
   ) external view returns (uint256 numerator, uint256 denominator);
-
-  /**
-   * @notice Sets the currency configuration for a token.
-   * @dev This action can only be performed by the contract owner.
-   * @param token The token address.
-   * @param oracle The oracle address for price fetching.
-   * @param intrinsicGas The intrinsic gas value for transactions.
-   */
-  function setCurrencyConfig(address token, address oracle, uint256 intrinsicGas) external;
 }

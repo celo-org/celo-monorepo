@@ -23,19 +23,12 @@ contract ScoreManager is Initializable, Ownable {
     _transferOwnership(msg.sender);
   }
 
-  /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return Storage version of the contract.
-   * @return Major version of the contract.
-   * @return Minor version of the contract.
-   * @return Patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
-  }
-
   function setGroupScore(address group, uint256 score) external onlyOwner {
     scores[group] = score;
+  }
+
+  function setValidatorScore(address validator, uint256 score) external onlyOwner {
+    scores[validator] = score;
   }
 
   function getGroupScore(address group) external view returns (uint256) {
@@ -46,7 +39,14 @@ contract ScoreManager is Initializable, Ownable {
     return scores[validator];
   }
 
-  function setValidatorScore(address validator, uint256 score) external onlyOwner {
-    scores[validator] = score;
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 0, 0);
   }
 }
