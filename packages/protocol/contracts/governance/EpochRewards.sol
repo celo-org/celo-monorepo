@@ -9,6 +9,7 @@ import "../common/Freezable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/interfaces/ICeloToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 /**
@@ -450,6 +451,12 @@ contract EpochRewards is
   function getTargetTotalEpochPaymentsInGold() public view returns (uint256) {
     address stableTokenAddress = registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID);
     (uint256 numerator, uint256 denominator) = getSortedOracles().medianRate(stableTokenAddress);
+    if (isL2()) {
+      return
+        getEpochManager().getElected().length.mul(targetValidatorEpochPayment).mul(denominator).div(
+          numerator
+        );
+    }
     return
       numberValidatorsInCurrentSet().mul(targetValidatorEpochPayment).mul(denominator).div(
         numerator
@@ -461,7 +468,16 @@ contract EpochRewards is
    * @return The fraction of floating Gold being used for voting in validator elections.
    */
   function getVotingGoldFraction() public view returns (uint256) {
-    uint256 liquidGold = getCeloToken().totalSupply().sub(getReserve().getReserveGoldBalance());
+    uint256 liquidGold;
+    if (isL2()) {
+      liquidGold = ICeloToken(address(getCeloToken())).allocatedSupply().sub(
+        getReserve().getReserveGoldBalance()
+      );
+    } else {
+      liquidGold = ICeloToken(address(getCeloToken())).totalSupply().sub(
+        getReserve().getReserveGoldBalance()
+      );
+    }
     uint256 votingGold = getElection().getTotalVotes();
     return FixidityLib.newFixed(votingGold).divide(FixidityLib.newFixed(liquidGold)).unwrap();
   }
