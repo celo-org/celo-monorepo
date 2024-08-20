@@ -1,11 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity >=0.8.0 <0.9.0;
+pragma solidity >=0.5.13 <0.9.0;
 
-interface IBlocker {
-  function isBlocked() external view returns (bool);
-}
 
-interface IEpochManager is IBlocker {
+interface IEpochManager{
   function initializeSystem(
     uint256 firstEpochNumber,
     uint256 firstEpochBlock,
@@ -20,7 +17,7 @@ interface IEpochManager is IBlocker {
   // ) external;
   function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256);
   function getCurrentEpochNumber() external view returns (uint256);
-  // function getElected() external view returns (address[] memory);
+  function getElected() external view returns (address[] memory);
   // // function getElectedAtEpoch(uint256 epoch) external view returns (address[] memory);
   // function getFirstBlockAtEpoch(uint256 epoch) external view returns (uint256);
   // function getLastBlockAtEpoch(uint256 epoch) external view returns (uint256);

@@ -4,13 +4,13 @@ pragma solidity >=0.8.7 <0.8.20;
 import "@openzeppelin/contracts8/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
-import "./interfaces/IEpochManager.sol";
 import "./interfaces/IOracle.sol";
 import "./interfaces/IStableToken.sol";
 import "../common/UsingRegistry.sol";
 
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
+import "../../contracts/common/interfaces/IEpochManager.sol";
 
 contract EpochManager is
   Initializable,
@@ -218,7 +218,6 @@ contract EpochManager is
   /// returns the current epoch Info
   function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256) {
     Epoch storage _epoch = epochs[currentEpochNumber];
-
     return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
   }
 

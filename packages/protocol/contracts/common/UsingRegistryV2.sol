@@ -8,6 +8,7 @@ import "./interfaces/IFeeCurrencyWhitelist.sol";
 import "./interfaces/IFreezer.sol";
 import "./interfaces/IRegistry.sol";
 import "./interfaces/ICeloUnreleasedTreasure.sol";
+import "./interfaces/IEpochManager.sol";
 
 import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IEpochRewards.sol";
@@ -190,5 +191,9 @@ contract UsingRegistryV2 {
 
   function getEpochRewards() internal view returns (IEpochRewards) {
     return IEpochRewards(registryContract.getAddressForOrDie(EPOCH_REWARDS_REGISTRY_ID));
+  }
+
+   function getEpochManager() internal view returns (IEpochManager) {
+    return IEpochManager(registryContract.getAddressForOrDie(EPOCH_MANAGER_REGISTRY_ID));
   }
 }
