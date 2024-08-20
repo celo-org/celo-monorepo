@@ -23,12 +23,14 @@ import { ValidatorsMock08 } from "@celo-contracts-8/governance/test/ValidatorsMo
 import { MockElection08 } from "@celo-contracts-8/governance/test/MockElection.sol";
 import { MockReserve08 } from "@celo-contracts-8/stability/test/MockReserve.sol";
 import { MockStableToken08 } from "@celo-contracts-8/stability/test/MockStableToken.sol";
+import { MockCeloToken08 } from "@celo-contracts-8/common/test/MockCeloToken.sol";
 
 contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
   EpochManager epochManager;
   MockSortedOracles sortedOracles;
 
   MockStableToken08 stableToken;
+  MockCeloToken08 celoToken;
   MockReserve08 reserve;
 
   ValidatorsMock08 validators;
@@ -43,7 +45,6 @@ contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
   address[] firstElected;
 
   IRegistry registry;
-  IERC20 celoToken;
   IEpochRewards epochRewards;
   IEpochRewardsInitializer epochRewardsInitializer;
   IFreezer freezer;
@@ -87,13 +88,14 @@ contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
     validators = new ValidatorsMock08();
     reserve = new MockReserve08();
     stableToken = new MockStableToken08();
+    celoToken = new MockCeloToken08();
 
     celoUnreleasedTreasure = new CeloUnreleasedTreasure(false);
 
     firstElected.push(actor("validator1"));
     firstElected.push(actor("validator2"));
 
-    address celoTokenAddress = actor("celoTokenAddress");
+    // address celoTokenAddress = actor("celoTokenAddress");
     address scoreManagerAddress = actor("scoreManagerAddress");
     address epochRewardsAddress = actor("epochRewardsAddress");
     address freezerAddress = actor("freezerAddress");
@@ -103,13 +105,13 @@ contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
     communityRewardFund = actor("communityRewardFund");
 
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
-    deployCodeTo("GoldToken.sol", abi.encode(false), celoTokenAddress);
+    // deployCodeTo("GoldToken.sol", abi.encode(false), celoTokenAddress);
     deployCodeTo("ScoreManager.sol", abi.encode(false), scoreManagerAddress);
     deployCodeTo("Freezer.sol", abi.encode(false), freezerAddress);
     deployCodeTo("EpochRewards.sol", abi.encode(true), epochRewardsAddress);
 
     registry = IRegistry(REGISTRY_ADDRESS);
-    celoToken = IERC20(celoTokenAddress);
+    // celoToken = IERC20(celoTokenAddress);
     epochRewardsInitializer = IEpochRewardsInitializer(epochRewardsAddress);
     epochRewards = IEpochRewards(epochRewardsAddress);
     freezer = IFreezer(freezerAddress);
@@ -122,15 +124,14 @@ contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
     registry.setAddressFor(ValidatorsContract, address(validators));
     registry.setAddressFor(ScoreManagerContract, address(scoreManager));
     registry.setAddressFor(StableTokenContract, address(stableToken));
-    registry.setAddressFor(CeloUnreleasedTreasureContract, address(celoUnreleasedTreasure));
     registry.setAddressFor(CeloTokenContract, address(celoToken));
+    registry.setAddressFor(CeloUnreleasedTreasureContract, address(celoUnreleasedTreasure));
     registry.setAddressFor(ReserveContract, address(reserve));
-
     registry.setAddressFor(ElectionContract, address(election));
     registry.setAddressFor(FreezerContract, address(freezer));
 
+    celoToken.setTotalSupply(CELO_SUPPLY_CAP);
     vm.deal(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
-    vm.deal(address(reserve), L1_MINTED_CELO_SUPPLY);
     vm.deal(address(reserve), L1_MINTED_CELO_SUPPLY);
 
     bool res1 = sortedOracles.setMedianRate(address(stableToken), stableAmountForRate);
@@ -138,9 +139,6 @@ contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
 
     scoreManager.setValidatorScore(actor("validator1"), 1);
     uint256 res = scoreManager.getValidatorScore(actor("validator1"));
-    uint256 res2 = epochRewards.getCommunityRewardFraction();
-
-    console2.log("### res2", res2);
 
     epochRewardsInitializer.initialize(
       address(registry),
@@ -157,6 +155,10 @@ contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
       carbonOffsettingFraction
     );
 
+    uint256 res2 = epochRewards.getCommunityRewardFraction();
+
+    console2.log("### res2", res2);
+
     epochManager.initialize(
       REGISTRY_ADDRESS,
       DAY,
@@ -165,8 +167,8 @@ contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
     );
 
     blockTravel(vm, firstEpochBlock);
-
-    
+    // makes sure test know this is L2.
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 }
 
@@ -232,10 +234,12 @@ contract EpochManagerIntegrationTest_startNextEpochProcess is EpochManagerIntegr
 
     uint256 _currentEpoch = epochManager.currentEpochNumber();
     console2.log("### Current epoch duration:", epochManager.epochDuration());
+
+    epochManager.startNextEpochProcess();
+
     (, , , uint256 _currentEpochEndTimestamp, uint256 _currentRewardsBlock) = epochManager
       .getCurrentEpoch();
 
-    epochManager.startNextEpochProcess();
     console2.log("### Done");
     assertEq(_currentRewardsBlock, block.number - 1);
   }
