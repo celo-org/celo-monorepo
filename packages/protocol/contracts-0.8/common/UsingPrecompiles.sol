@@ -2,7 +2,6 @@
 pragma solidity >=0.8.0 <0.8.20;
 
 // Note: This is not an exact copy of UsingPrecompiles in the contract's folder, but in solidity 0.8
-
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "../common/IsL2Check.sol";

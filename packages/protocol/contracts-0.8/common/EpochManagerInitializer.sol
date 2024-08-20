@@ -40,12 +40,12 @@ contract EpochManagerInitializer is Initializable, UsingPrecompiles, UsingRegist
     }
     getEpochManager().initializeSystem(
       currentEpoch,
-      getFirstBlockOfEpoch(currentEpoch),
+      _getFirstBlockOfEpoch(currentEpoch),
       electedValidatorAddresses
     );
   }
 
-  function getFirstBlockOfEpoch(uint256 currentEpoch) internal view returns (uint256) {
+  function _getFirstBlockOfEpoch(uint256 currentEpoch) internal view returns (uint256) {
     uint256 blockToCheck = block.number - 1;
     uint256 blockEpochNumber = getEpochNumberOfBlock(blockToCheck);
 
@@ -54,5 +54,9 @@ contract EpochManagerInitializer is Initializable, UsingPrecompiles, UsingRegist
       blockEpochNumber = getEpochNumberOfBlock(blockToCheck);
     }
     return blockToCheck;
+  }
+
+  function getFirstBlockOfEpoch(uint256 currentEpoch) external view returns (uint256) {
+    return _getFirstBlockOfEpoch(currentEpoch);
   }
 }
