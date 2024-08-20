@@ -24,16 +24,6 @@ contract EpochManagerInitializer is Initializable, UsingPrecompiles, UsingRegist
     setRegistry(registryAddress);
   }
 
-  function numberValidatorsInCurrentSet() public view returns (uint256) {
-    // FIXME
-    return 0;
-  }
-
-  function validatorSignerAddressFromCurrentSet(uint256 i) public view returns (address) {
-    // FIXME
-    return address(0);
-  }
-
   /**
    * @notice initializes the epochManager contract during L2 transition.
    */
@@ -55,7 +45,7 @@ contract EpochManagerInitializer is Initializable, UsingPrecompiles, UsingRegist
     );
   }
 
-  function getFirstBlockOfEpoch(uint256 currentEpoch) internal view returns (uint256) {
+  function _getFirstBlockOfEpoch(uint256 currentEpoch) internal view returns (uint256) {
     uint256 blockToCheck = block.number - 1;
     uint256 blockEpochNumber = getEpochNumberOfBlock(blockToCheck);
 

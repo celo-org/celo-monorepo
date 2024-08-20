@@ -26,17 +26,15 @@ contract UsingPrecompiles is IsL2Check {
    * @return The current epoch size in blocks.
    */
   function getEpochSize() public view returns (uint256) {
-    // FIXME
-    return 0;
-    // if (isL2()) {
-    //   return DAY.div(5);
-    // } else {
-    //   bytes memory out;
-    //   bool success;
-    //   (success, out) = EPOCH_SIZE.staticcall(abi.encodePacked(true));
-    //   require(success, "error calling getEpochSize precompile");
-    //   return getUint256FromBytes(out, 0);
-    // }
+    if (isL2()) {
+      return DAY.div(5);
+    } else {
+      bytes memory out;
+      bool success;
+      (success, out) = EPOCH_SIZE.staticcall(abi.encodePacked(true));
+      require(success, "error calling getEpochSize precompile");
+      return getUint256FromBytes(out, 0);
+    }
   }
 
   /**
@@ -45,9 +43,7 @@ contract UsingPrecompiles is IsL2Check {
    * @return Epoch number.
    */
   function getEpochNumberOfBlock(uint256 blockNumber) public view returns (uint256) {
-    return 0;
-    // FIXME
-    // return epochNumberOfBlock(blockNumber, getEpochSize());
+    return epochNumberOfBlock(blockNumber, getEpochSize());
   }
 
   /**
