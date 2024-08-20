@@ -82,12 +82,11 @@ contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
   function setUp() public virtual {
     epochManager = new EpochManager(true);
     sortedOracles = new MockSortedOracles();
-    // epochRewards = new EpochRewardsMock08();
+
     election = new MockElection08();
     validators = new ValidatorsMock08();
     reserve = new MockReserve08();
     stableToken = new MockStableToken08();
-    // stableToken = new MockCeloToken();
 
     celoUnreleasedTreasure = new CeloUnreleasedTreasure(false);
 
@@ -98,7 +97,6 @@ contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
     address scoreManagerAddress = actor("scoreManagerAddress");
     address epochRewardsAddress = actor("epochRewardsAddress");
     address freezerAddress = actor("freezerAddress");
-    // address reserveAddress = actor("reserve");
 
     epochManagerInitializer = actor("initializer");
     carbonOffsettingPartner = actor("carbonOffsettingPartner");
@@ -129,9 +127,6 @@ contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
     registry.setAddressFor(ReserveContract, address(reserve));
 
     registry.setAddressFor(ElectionContract, address(election));
-    // registry.setAddressFor(SortedOraclesContract, address(mockSortedOracles));
-    // registry.setAddressFor(StableTokenContract, address(mockStableToken));
-    // registry.setAddressFor(CeloTokenContract, address(mockGoldToken));
     registry.setAddressFor(FreezerContract, address(freezer));
 
     vm.deal(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
@@ -171,7 +166,7 @@ contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
 
     blockTravel(vm, firstEpochBlock);
 
-    // epochManager.
+    
   }
 }
 
