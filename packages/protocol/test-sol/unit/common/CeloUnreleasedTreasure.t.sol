@@ -7,7 +7,7 @@ import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts-8/common/interfaces/ICeloToken.sol";
 import "@celo-contracts/governance/interfaces/IGovernance.sol";
-import "@celo-contracts-8/common/CeloUnreleasedTreasure.sol";
+import { CeloUnreleasedTreasure } from "@celo-contracts-8/common/CeloUnreleasedTreasure.sol";
 import "@celo-contracts-8/common/IsL2Check.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 

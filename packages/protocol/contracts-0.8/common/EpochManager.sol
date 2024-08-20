@@ -251,10 +251,6 @@ contract EpochManager is
     return epochs[epoch].lastBlock;
   }
 
-  function isTimeForNextEpoch() public view returns (bool) {
-    return block.timestamp >= epochs[currentEpochNumber].startTimestamp + epochDuration;
-  }
-
   function isBlocked() external view returns (bool) {
     return isOnEpochProcess();
   }
@@ -277,6 +273,10 @@ contract EpochManager is
    */
   function setEpochDuration(uint256 newEpochDuration) public onlyOwner {
     epochDuration = newEpochDuration;
+  }
+
+  function isTimeForNextEpoch() public view returns (bool) {
+    return block.timestamp >= epochs[currentEpochNumber].startTimestamp + epochDuration;
   }
 
   function isOnEpochProcess() public view returns (bool) {

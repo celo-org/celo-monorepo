@@ -48,12 +48,12 @@ export const SOLIDITY_08_PACKAGE = {
   proxiesPath: '/', // Proxies are still with 0.5 contracts
   // Proxies shouldn't have to be added to a list manually
   // https://github.com/celo-org/celo-monorepo/issues/10555
-  contracts: ['GasPriceMinimum', 'FeeCurrencyDirectory', 'CeloDistributionSchedule'],
+  contracts: ['GasPriceMinimum', 'FeeCurrencyDirectory', 'CeloUnreleasedTreasure'],
   proxyContracts: [
     'GasPriceMinimumProxy',
     'FeeCurrencyDirectoryProxy',
     'MentoFeeCurrencyAdapterV1',
-    'CeloDistributionScheduleProxy',
+    'CeloUnreleasedTreasureProxy',
   ],
   truffleConfig: 'truffle-config0.8.js',
 } satisfies ContractPackage
