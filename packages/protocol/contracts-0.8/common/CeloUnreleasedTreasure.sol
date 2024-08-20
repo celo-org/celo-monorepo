@@ -8,7 +8,6 @@ import "./UsingRegistry.sol";
 import "../common/IsL2Check.sol";
 
 import "../../contracts/common/Initializable.sol";
-import "../../contracts/common/interfaces/ICeloToken.sol";
 import "./interfaces/ICeloUnreleasedTreasureInitializer.sol";
 import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 

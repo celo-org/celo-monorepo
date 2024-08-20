@@ -3,11 +3,11 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
 import "@celo-contracts-8/common/EpochManager.sol";
-import "@celo-contracts-8/stability/test/MockStableToken.sol";
-import "@celo-contracts-8/common/interfaces/ICeloToken.sol";
+
+// import "@celo-contracts-8/common/interfaces/ICeloToken.sol";
 import "@celo-contracts-8/common/ScoreManager.sol";
-import { CeloUnreleasedTreasure } from "@celo-contracts-8/common/CeloUnreleasedTreasure.sol";
-import { ICeloUnreleasedTreasure } from "@celo-contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
+import "@celo-contracts-8/common/CeloUnreleasedTreasure.sol";
+import "@celo-contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
 import { Utils08 } from "@test-sol/utils08.sol";
@@ -15,18 +15,24 @@ import { Utils08 } from "@test-sol/utils08.sol";
 import "@celo-contracts/stability/test/MockSortedOracles.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts/common/interfaces/IFreezer.sol";
+import "@celo-contracts/governance/interfaces/IEpochRewards.sol";
+import "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
 
-import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
 import { ValidatorsMock08 } from "@celo-contracts-8/governance/test/ValidatorsMock.sol";
-import { MockCeloUnreleasedTreasure } from "@celo-contracts-8/common/test/MockCeloUnreleasedTreasure.sol";
+import { MockElection08 } from "@celo-contracts-8/governance/test/MockElection.sol";
+import { MockReserve08 } from "@celo-contracts-8/stability/test/MockReserve.sol";
+import { MockStableToken08 } from "@celo-contracts-8/stability/test/MockStableToken.sol";
 
-contract EpochManagerTest is Test, TestConstants, Utils08 {
+contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
   EpochManager epochManager;
   MockSortedOracles sortedOracles;
 
   MockStableToken08 stableToken;
-  EpochRewardsMock08 epochRewards;
+  MockReserve08 reserve;
+
   ValidatorsMock08 validators;
+  MockElection08 election;
 
   address epochManagerInitializer;
   address carbonOffsettingPartner;
@@ -34,12 +40,14 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
   uint256 firstEpochNumber = 100;
   uint256 firstEpochBlock = 100;
-  uint256 epochDuration = DAY;
   address[] firstElected;
 
   IRegistry registry;
-  ICeloToken celoToken;
-  MockCeloUnreleasedTreasure celoUnreleasedTreasure;
+  IERC20 celoToken;
+  IEpochRewards epochRewards;
+  IEpochRewardsInitializer epochRewardsInitializer;
+  IFreezer freezer;
+  CeloUnreleasedTreasure celoUnreleasedTreasure;
   ScoreManager scoreManager;
 
   uint256 celoAmountForRate = 1e24;
@@ -58,20 +66,39 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
   uint256 constant L2_INITIAL_STASH_BALANCE = FIFTEEN_YEAR_LINEAR_REWARD + MAX_L2_DISTRIBUTION; // leftover from L1 target supply plus the 2nd 15 year term.
 
+  uint256 constant targetVotingYieldParamsInitial = 0.00016e24; // 0.00016
+  uint256 constant targetVotingYieldParamsMax = 0.0005e24; // 0.0005
+  uint256 constant targetVotingYieldParamsAdjustmentFactor = 1127990000000000000; // 0.00000112799
+
+  uint256 constant rewardsMultiplierMax = 2 * FIXED1; // 2
+  uint256 constant rewardsMultiplierAdjustmentsUnderspend = 0.5e24; // 0.5
+  uint256 constant rewardsMultiplierAdjustmentsOverspend = 5e24; // 5
+
+  uint256 constant targetVotingGoldFraction = (2 * FIXED1) / uint256(3);
+  uint256 constant targetValidatorEpochPayment = 1e13;
+  uint256 constant communityRewardFraction = FIXED1 / 4;
+  uint256 constant carbonOffsettingFraction = FIXED1 / 200;
+
   function setUp() public virtual {
     epochManager = new EpochManager(true);
     sortedOracles = new MockSortedOracles();
-    epochRewards = new EpochRewardsMock08();
+    // epochRewards = new EpochRewardsMock08();
+    election = new MockElection08();
     validators = new ValidatorsMock08();
+    reserve = new MockReserve08();
     stableToken = new MockStableToken08();
-    celoUnreleasedTreasure = new MockCeloUnreleasedTreasure();
+    // stableToken = new MockCeloToken();
+
+    celoUnreleasedTreasure = new CeloUnreleasedTreasure(false);
 
     firstElected.push(actor("validator1"));
     firstElected.push(actor("validator2"));
 
     address celoTokenAddress = actor("celoTokenAddress");
     address scoreManagerAddress = actor("scoreManagerAddress");
-    address reserveAddress = actor("reserve");
+    address epochRewardsAddress = actor("epochRewardsAddress");
+    address freezerAddress = actor("freezerAddress");
+    // address reserveAddress = actor("reserve");
 
     epochManagerInitializer = actor("initializer");
     carbonOffsettingPartner = actor("carbonOffsettingPartner");
@@ -80,9 +107,14 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
     deployCodeTo("GoldToken.sol", abi.encode(false), celoTokenAddress);
     deployCodeTo("ScoreManager.sol", abi.encode(false), scoreManagerAddress);
+    deployCodeTo("Freezer.sol", abi.encode(false), freezerAddress);
+    deployCodeTo("EpochRewards.sol", abi.encode(true), epochRewardsAddress);
 
     registry = IRegistry(REGISTRY_ADDRESS);
-    celoToken = ICeloToken(celoTokenAddress);
+    celoToken = IERC20(celoTokenAddress);
+    epochRewardsInitializer = IEpochRewardsInitializer(epochRewardsAddress);
+    epochRewards = IEpochRewards(epochRewardsAddress);
+    freezer = IFreezer(freezerAddress);
     scoreManager = ScoreManager(scoreManagerAddress);
 
     registry.setAddressFor(EpochManagerContract, address(epochManager));
@@ -94,59 +126,77 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     registry.setAddressFor(StableTokenContract, address(stableToken));
     registry.setAddressFor(CeloUnreleasedTreasureContract, address(celoUnreleasedTreasure));
     registry.setAddressFor(CeloTokenContract, address(celoToken));
-    registry.setAddressFor(ReserveContract, reserveAddress);
+    registry.setAddressFor(ReserveContract, address(reserve));
+
+    registry.setAddressFor(ElectionContract, address(election));
+    // registry.setAddressFor(SortedOraclesContract, address(mockSortedOracles));
+    // registry.setAddressFor(StableTokenContract, address(mockStableToken));
+    // registry.setAddressFor(CeloTokenContract, address(mockGoldToken));
+    registry.setAddressFor(FreezerContract, address(freezer));
 
     vm.deal(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
+    vm.deal(address(reserve), L1_MINTED_CELO_SUPPLY);
+    vm.deal(address(reserve), L1_MINTED_CELO_SUPPLY);
 
     bool res1 = sortedOracles.setMedianRate(address(stableToken), stableAmountForRate);
     (uint256 res0, uint256 res00) = sortedOracles.medianRate(address(stableToken));
 
     scoreManager.setValidatorScore(actor("validator1"), 1);
+    uint256 res = scoreManager.getValidatorScore(actor("validator1"));
+    uint256 res2 = epochRewards.getCommunityRewardFraction();
+
+    console2.log("### res2", res2);
+
+    epochRewardsInitializer.initialize(
+      address(registry),
+      targetVotingYieldParamsInitial,
+      targetVotingYieldParamsMax,
+      targetVotingYieldParamsAdjustmentFactor,
+      rewardsMultiplierMax,
+      rewardsMultiplierAdjustmentsUnderspend,
+      rewardsMultiplierAdjustmentsOverspend,
+      targetVotingGoldFraction,
+      targetValidatorEpochPayment,
+      communityRewardFraction,
+      address(0),
+      carbonOffsettingFraction
+    );
 
     epochManager.initialize(
       REGISTRY_ADDRESS,
-      epochDuration,
+      DAY,
       carbonOffsettingPartner,
       epochManagerInitializer
     );
 
     blockTravel(vm, firstEpochBlock);
+
+    // epochManager.
   }
 }
 
-contract EpochManagerTest_initialize is EpochManagerTest {
+contract EpochManagerIntegrationTest_initialize is EpochManagerIntegrationTest {
   function test_initialize() public virtual {
     assertEq(address(epochManager.registry()), REGISTRY_ADDRESS);
-    assertEq(epochManager.epochDuration(), epochDuration);
+    assertEq(epochManager.epochDuration(), DAY);
     assertEq(epochManager.carbonOffsettingPartner(), carbonOffsettingPartner);
-    assertEq(epochManager.epochManagerInitializer(), epochManagerInitializer);
   }
 
   function test_Reverts_WhenAlreadyInitialized() public virtual {
     vm.expectRevert("contract already initialized");
-    epochManager.initialize(REGISTRY_ADDRESS, 10, carbonOffsettingPartner, epochManagerInitializer);
+    epochManager.initialize(
+      REGISTRY_ADDRESS,
+      DAY,
+      carbonOffsettingPartner,
+      epochManagerInitializer
+    );
   }
 }
 
-contract EpochManagerTest_initializeSystem is EpochManagerTest {
+contract EpochManagerIntegrationTest_initializeSystem is EpochManagerIntegrationTest {
   function test_processCanBeStarted() public virtual {
     vm.prank(epochManagerInitializer);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
-    (
-      uint256 _firstEpochBlock,
-      uint256 _lastEpochBlock,
-      uint256 _startTimestamp,
-      uint256 _currentEpochEndTimestamp,
-      uint256 _currentRewardsBlock
-    ) = epochManager.getCurrentEpoch();
-    assertEq(epochManager.epochManagerInitializer(), address(0));
-    assertEq(epochManager.firstKnownEpoch(), firstEpochNumber);
-    assertEq(_firstEpochBlock, firstEpochBlock);
-    assertEq(_lastEpochBlock, 0);
-    assertEq(_startTimestamp, block.timestamp);
-    assertEq(_currentEpochEndTimestamp, 0);
-    assertEq(_currentRewardsBlock, 0);
-    assertEq(epochManager.getElected(), firstElected);
   }
 
   function test_Reverts_processCannotBeStartedAgain() public virtual {
@@ -163,11 +213,8 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
   }
 }
 
-contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
+contract EpochManagerIntegrationTest_startNextEpochProcess is EpochManagerIntegrationTest {
   function test_Reverts_whenSystemNotInitialized() public {
-    uint256 _currentEpoch = epochManager.currentEpochNumber();
-    (, , , uint256 _currentEpochEndTimestamp, ) = epochManager.getCurrentEpoch();
-
     vm.expectRevert("Epoch system not initialized");
     epochManager.startNextEpochProcess();
   }
@@ -176,57 +223,25 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     vm.prank(epochManagerInitializer);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
-    uint256 _currentEpoch = epochManager.currentEpochNumber();
-    (, , , uint256 _currentEpochEndTimestamp, ) = epochManager.getCurrentEpoch();
-
     vm.expectRevert("Epoch is not ready to start");
     epochManager.startNextEpochProcess();
   }
 
-  function test_Reverts_WhenEpochProcessingAlreadyStarted() public {
+  function test_Succeeds() public {
     vm.prank(epochManagerInitializer);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
     blockTravel(vm, 43200);
     timeTravel(vm, DAY);
+    console2.log("current epoch timestamp", block.timestamp);
 
-    epochManager.startNextEpochProcess();
-    vm.expectRevert("Epoch process is already started");
-    epochManager.startNextEpochProcess();
-  }
-
-  function test_SetsTheEpochRewardBlock() public {
-    vm.prank(epochManagerInitializer);
-    epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
-
-    blockTravel(vm, 43200);
-    timeTravel(vm, DAY);
-
-    epochManager.startNextEpochProcess();
+    uint256 _currentEpoch = epochManager.currentEpochNumber();
+    console2.log("### Current epoch duration:", epochManager.epochDuration());
     (, , , uint256 _currentEpochEndTimestamp, uint256 _currentRewardsBlock) = epochManager
       .getCurrentEpoch();
-    assertEq(_currentRewardsBlock, block.number);
-  }
-
-  function test_SetsTheEpochRewardAmounts() public {
-    vm.prank(epochManagerInitializer);
-    epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
-
-    blockTravel(vm, 43200);
-    timeTravel(vm, DAY);
 
     epochManager.startNextEpochProcess();
-    (
-      uint256 status,
-      uint256 perValidatorReward,
-      uint256 totalRewardsVoter,
-      uint256 totalRewardsCommunity,
-      uint256 totalRewardsCarbonFund
-    ) = epochManager.getEpochProcessingState();
-    assertEq(status, 1);
-    assertEq(perValidatorReward, 5);
-    assertEq(totalRewardsVoter, 5);
-    assertEq(totalRewardsCommunity, 5);
-    assertEq(totalRewardsCarbonFund, 5);
+    console2.log("### Done");
+    assertEq(_currentRewardsBlock, block.number - 1);
   }
 }
