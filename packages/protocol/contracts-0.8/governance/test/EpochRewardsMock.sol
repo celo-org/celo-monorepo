@@ -25,7 +25,6 @@ contract EpochRewardsMock08 is IEpochRewards {
     return 0;
   }
 
-
   function isReserveLow() external view returns (bool) {
     return false;
   }

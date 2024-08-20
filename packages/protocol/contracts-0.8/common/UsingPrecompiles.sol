@@ -80,7 +80,7 @@ contract UsingPrecompiles is IsL2Check {
     return address(uint160(getUint256FromBytes(out, 0)));
   }
 
-    /**
+  /**
    * @notice Returns the epoch number at a block.
    * @param blockNumber Block number where epoch number is calculated.
    * @param epochSize The epoch size in blocks.
@@ -99,7 +99,7 @@ contract UsingPrecompiles is IsL2Check {
     }
   }
 
-   /**
+  /**
    * @notice Converts bytes to uint256.
    * @param bs byte[] data
    * @param start offset into byte data to convert

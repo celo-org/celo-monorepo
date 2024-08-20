@@ -867,7 +867,6 @@ contract Validators is
     return commissionUpdateDelay;
   }
 
-
   /**
    * @notice Computes epoch payments to the account
    * @param account The validator signer of the validator to distribute the epoch payment to.

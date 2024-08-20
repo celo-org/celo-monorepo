@@ -255,7 +255,6 @@ contract EpochManager is
     return isOnEpochProcess();
   }
 
-
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return Storage version of the contract.
