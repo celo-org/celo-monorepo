@@ -4,7 +4,7 @@ pragma solidity >=0.8.7 <0.8.20;
 import "celo-foundry-8/Test.sol";
 import "@celo-contracts-8/common/EpochManager.sol";
 import "@celo-contracts-8/stability/test/MockStableToken.sol";
-import "@celo-contracts-8/common/interfaces/ICeloToken.sol";
+import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts-8/common/ScoreManager.sol";
 import { CeloUnreleasedTreasure } from "@celo-contracts-8/common/CeloUnreleasedTreasure.sol";
 import { ICeloUnreleasedTreasure } from "@celo-contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
@@ -136,7 +136,6 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
       uint256 _firstEpochBlock,
       uint256 _lastEpochBlock,
       uint256 _startTimestamp,
-      uint256 _currentEpochEndTimestamp,
       uint256 _currentRewardsBlock
     ) = epochManager.getCurrentEpoch();
     assertEq(epochManager.epochManagerInitializer(), address(0));
@@ -144,7 +143,6 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
     assertEq(_firstEpochBlock, firstEpochBlock);
     assertEq(_lastEpochBlock, 0);
     assertEq(_startTimestamp, block.timestamp);
-    assertEq(_currentEpochEndTimestamp, 0);
     assertEq(_currentRewardsBlock, 0);
     assertEq(epochManager.getElected(), firstElected);
   }
@@ -166,7 +164,6 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
 contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
   function test_Reverts_whenSystemNotInitialized() public {
     uint256 _currentEpoch = epochManager.currentEpochNumber();
-    (, , , uint256 _currentEpochEndTimestamp, ) = epochManager.getCurrentEpoch();
 
     vm.expectRevert("Epoch system not initialized");
     epochManager.startNextEpochProcess();
@@ -177,7 +174,6 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
     uint256 _currentEpoch = epochManager.currentEpochNumber();
-    (, , , uint256 _currentEpochEndTimestamp, ) = epochManager.getCurrentEpoch();
 
     vm.expectRevert("Epoch is not ready to start");
     epochManager.startNextEpochProcess();
@@ -203,8 +199,7 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     timeTravel(vm, DAY);
 
     epochManager.startNextEpochProcess();
-    (, , , uint256 _currentEpochEndTimestamp, uint256 _currentRewardsBlock) = epochManager
-      .getCurrentEpoch();
+    (, , , uint256 _currentRewardsBlock) = epochManager.getCurrentEpoch();
     assertEq(_currentRewardsBlock, block.number);
   }
 

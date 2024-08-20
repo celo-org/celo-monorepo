@@ -23,7 +23,6 @@ contract EpochManager is
     uint256 firstBlock;
     uint256 lastBlock;
     uint256 startTimestamp;
-    uint256 endTimestamp;
     uint256 rewardsBlock;
   }
 
@@ -172,7 +171,6 @@ contract EpochManager is
     require(isOnEpochProcess(), "Epoch process is not started");
     // finalize epoch
     // TODO last block should be the block before and timestamp from previous block
-    epochs[currentEpochNumber].endTimestamp = block.timestamp;
     epochs[currentEpochNumber].lastBlock = block.number - 1;
     // start new epoch
     currentEpochNumber++;
@@ -218,16 +216,10 @@ contract EpochManager is
   }
 
   /// returns the current epoch Info
-  function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256, uint256) {
+  function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256) {
     Epoch storage _epoch = epochs[currentEpochNumber];
 
-    return (
-      _epoch.firstBlock,
-      _epoch.lastBlock,
-      _epoch.startTimestamp,
-      _epoch.endTimestamp,
-      _epoch.rewardsBlock
-    );
+    return (_epoch.firstBlock, _epoch.lastBlock, _epoch.startTimestamp, _epoch.rewardsBlock);
   }
 
   /// returns the current epoch number.
@@ -235,7 +227,7 @@ contract EpochManager is
     return currentEpochNumber;
   }
 
-/// returns epoch processing state
+  /// returns epoch processing state
   function getEpochProcessingState()
     external
     view

@@ -237,7 +237,7 @@ contract EpochManagerIntegrationTest_startNextEpochProcess is EpochManagerIntegr
 
     epochManager.startNextEpochProcess();
 
-    (, , , uint256 _currentEpochEndTimestamp, uint256 _currentRewardsBlock) = epochManager
+    (, , , uint256 _currentRewardsBlock) = epochManager
       .getCurrentEpoch();
 
     console2.log("### Done");
