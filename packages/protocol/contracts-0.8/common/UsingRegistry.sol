@@ -23,6 +23,7 @@ import "../../contracts/identity/interfaces/IAttestations.sol";
 import "../../contracts/identity/interfaces/IRandom.sol";
 
 import "../../contracts/common/interfaces/IFeeHandlerSeller.sol";
+import "../../contracts/governance/interfaces/IEpochRewards.sol";
 
 contract UsingRegistry is Ownable {
   // solhint-disable state-visibility
@@ -32,6 +33,7 @@ contract UsingRegistry is Ownable {
   bytes32 constant DOUBLE_SIGNING_SLASHER_REGISTRY_ID =
     keccak256(abi.encodePacked("DoubleSigningSlasher"));
   bytes32 constant ELECTION_REGISTRY_ID = keccak256(abi.encodePacked("Election"));
+  bytes32 constant EPOCH_REWARDS_REGISTRY_ID = keccak256(abi.encodePacked("EpochRewards"));
   bytes32 constant EXCHANGE_REGISTRY_ID = keccak256(abi.encodePacked("Exchange"));
   bytes32 constant FEE_CURRENCY_WHITELIST_REGISTRY_ID =
     keccak256(abi.encodePacked("FeeCurrencyWhitelist"));
@@ -126,6 +128,11 @@ contract UsingRegistry is Ownable {
   function getElection() internal view returns (IElection) {
     return IElection(registry.getAddressForOrDie(ELECTION_REGISTRY_ID));
   }
+
+  function getEpochRewards() internal view returns (IEpochRewards) {
+    return IEpochRewards(registry.getAddressForOrDie(EPOCH_REWARDS_REGISTRY_ID));
+  }
+
   function getGovernance() internal view returns (IGovernance) {
     return IGovernance(registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
   }
