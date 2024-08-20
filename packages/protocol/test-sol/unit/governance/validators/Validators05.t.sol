@@ -3,6 +3,7 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "celo-foundry/Test.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
@@ -11,13 +12,14 @@ import "@celo-contracts/common/Accounts.sol";
 
 import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/governance/LockedGold.sol";
+import "@celo-contracts/governance/interfaces/IValidators.sol";
 
 import "@celo-contracts/stability/test/MockStableToken.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 
-import "@celo-contracts/governance/test/ValidatorsMock.sol";
+// import "@celo-contracts-8/governance/test/ValidatorsMock08.sol";
 import "@test-sol/constants.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
 import { Utils } from "@test-sol/utils.sol";
@@ -47,7 +49,7 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
   MockStableToken stableToken;
   MockElection election;
   ValidatorsMockTunnel public validatorsMockTunnel;
-  ValidatorsMock public validators;
+  IValidators public validators;
   MockLockedGold lockedGold;
 
   address owner;
@@ -165,7 +167,8 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
 
     lockedGold = new MockLockedGold();
     election = new MockElection();
-    validators = new ValidatorsMock();
+    // validators = new ValidatorsMock();
+    // TODO move to create2
     validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
 
     stableToken = new MockStableToken();
@@ -275,7 +278,8 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
 
     vm.prank(validator);
     validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
-    validatorRegistrationEpochNumber = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // validatorRegistrationEpochNumber = validators.getEpochNumber();
     return _ecdsaPubKey;
   }
 
@@ -292,7 +296,8 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
 
     vm.prank(validator);
     validators.registerValidator(_ecdsaPubKey);
-    validatorRegistrationEpochNumber = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // validatorRegistrationEpochNumber = validators.getEpochNumber();
     return _ecdsaPubKey;
   }
 
@@ -322,7 +327,8 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
 
     vm.prank(_validator);
     validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
-    validatorRegistrationEpochNumber = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // validatorRegistrationEpochNumber = validators.getEpochNumber();
     return _ecdsaPubKey;
   }
 
@@ -383,7 +389,7 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
 
 contract ValidatorsTest_Initialize is ValidatorsTest {
   function test_ShouldhaveSetTheOwner() public {
-    assertEq(validators.owner(), owner, "Incorrect Owner.");
+    assertEq(Ownable(address(validators)).owner(), owner, "Incorrect Owner.");
   }
 
   function test_Reverts_WhenCalledMoreThanOnce() public {
@@ -434,7 +440,7 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
   }
 
   function test_shouldHaveSetMembershipHistory() public {
-    uint256 actual = validators.membershipHistoryLength();
+    uint256 actual = validators.getMembershipHistoryLength();
     assertEq(actual, membershipHistoryLength, "Wrong membershipHistoryLength.");
   }
 
@@ -476,7 +482,7 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
 
   function test_shouldSetTheMembershipHistoryLength() public {
     validators.setMembershipHistoryLength(newLength);
-    assertEq(validators.membershipHistoryLength(), newLength);
+    assertEq(validators.getMembershipHistoryLength(), newLength);
   }
 
   function test_Reverts_SetTheMembershipHistoryLength_WhenL2() public {
@@ -698,7 +704,8 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
     vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(validator);
     validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
-    validatorRegistrationEpochNumber = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // validatorRegistrationEpochNumber = validators.getEpochNumber();
   }
 
   function test_ShouldAddAccountToValidatorList_WhenAccountHasAuthorizedValidatorSigner() public {
@@ -880,7 +887,8 @@ contract ValidatorsTest_RegisterValidator_NoBls is ValidatorsTest {
     vm.expectRevert("This method is not supported in L1.");
     vm.prank(validator);
     validators.registerValidator(_ecdsaPubKey);
-    validatorRegistrationEpochNumber = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // validatorRegistrationEpochNumber = validators.getEpochNumber();
   }
 
   function test_ShouldAddAccountToValidatorList_WhenAccountHasAuthorizedValidatorSigner() public {
@@ -1312,13 +1320,15 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
 
-    validatorAdditionEpochNumber = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // validatorAdditionEpochNumber = validators.getEpochNumber();
 
     timeTravel(10);
 
     vm.prank(validator);
     validators.affiliate(otherGroup);
-    validatorAffiliationEpochNumber = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // validatorAffiliationEpochNumber = validators.getEpochNumber();
 
     (
       uint256[] memory epochs,
@@ -1419,11 +1429,13 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
 
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
-    additionEpoch = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // additionEpoch = validators.getEpochNumber();
 
     vm.prank(validator);
     validators.deaffiliate();
-    deaffiliationEpoch = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // deaffiliationEpoch = validators.getEpochNumber();
 
     (address[] memory members, , , , , , ) = validators.getValidatorGroup(group);
     assertEq(members, expectedMembersList);
@@ -1435,13 +1447,15 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
 
-    additionEpoch = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // additionEpoch = validators.getEpochNumber();
 
     timeTravel(10);
 
     vm.prank(validator);
     validators.deaffiliate();
-    deaffiliationEpoch = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // deaffiliationEpoch = validators.getEpochNumber();
 
     (
       uint256[] memory epochs,
@@ -1469,7 +1483,8 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
 
-    additionEpoch = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // additionEpoch = validators.getEpochNumber();
 
     timeTravel(10);
 
@@ -2042,7 +2057,8 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
     _registerValidatorGroupHelper(group, 1);
 
     _registerValidatorHelper(validator, validatorPk);
-    _registrationEpoch = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // _registrationEpoch = validators.getEpochNumber();
 
     vm.prank(validator);
     validators.affiliate(group);
@@ -2056,7 +2072,8 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
 
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
-    _additionEpoch = validators.getEpochNumber();
+    // _additionEpoch = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
 
     (address[] memory members, , , , , , ) = validators.getValidatorGroup(group);
 
@@ -2086,7 +2103,9 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
   function test_ShouldUpdateGroupSizeHistory() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
-    _additionEpoch = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // _additionEpoch = validators.getEpochNumber();
+
     (, , , , uint256[] memory _sizeHistory, , ) = validators.getValidatorGroup(group);
 
     assertEq(_sizeHistory.length, 1);
@@ -2096,7 +2115,8 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
   function test_ShouldUpdateMembershipHistoryOfMember() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
-    _additionEpoch = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // _additionEpoch = validators.getEpochNumber();
 
     uint256 expectedEntries = 1;
 
@@ -2116,7 +2136,8 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
   function test_ShouldMarkGroupAsEligible() public {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
-    _additionEpoch = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // _additionEpoch = validators.getEpochNumber();
     assertTrue(election.isEligible(group));
   }
 
@@ -2270,8 +2291,9 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
   function test_ShouldUpdateMemberMembershipHistory() public {
     vm.prank(group);
     validators.removeMember(validator);
-    uint256 _expectedEpoch = validators.getEpochNumber();
-
+    // uint256 _expectedEpoch = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    uint256 _expectedEpoch;
     (
       uint256[] memory _epochs,
       address[] memory _membershipGroups,
@@ -2926,7 +2948,9 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
 
     for (uint256 i = 0; i < numTest; i++) {
       blockTravel(ph.epochSize());
-      uint256 epochNumber = validators.getEpochNumber();
+      // TODO figure out where this getEpochNumber was coming from
+      // uint256 epochNumber = validators.getEpochNumber();
+      uint256 epochNumber;
 
       vm.prank(validator);
       validators.affiliate(group);
@@ -2976,8 +3000,9 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
 
     for (uint256 i = 0; i < membershipHistoryLength.add(1); i++) {
       blockTravel(ph.epochSize());
-      uint256 epochNumber = validators.getEpochNumber();
-
+      // TODO figure out where this getEpochNumber was coming from
+      // uint256 epochNumber = validators.getEpochNumber();
+      uint256 epochNumber;
       vm.prank(validator);
       validators.affiliate(vm.addr(i + 1));
       vm.prank(vm.addr(i + 1));
@@ -3479,7 +3504,9 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
     for (uint256 i = 1; i < totalEpochs; i++) {
       blockTravel(ph.epochSize());
 
-      uint256 epochNumber = validators.getEpochNumber();
+      // TODO figure out where this getEpochNumber was coming from
+      // uint256 epochNumber = validators.getEpochNumber();
+      uint256 epochNumber;
 
       if (i % gapSize == 0) {
         address _group = (i % gapSize.mul(gapSize)) != 0
@@ -3570,13 +3597,17 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
   }
 
   function test_Reverts_WhenProvidedEpochNumberGreaterThanCurrentEpochNumber() public {
-    uint256 _epochNumber = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // uint256 _epochNumber = validators.getEpochNumber();
+    uint256 _epochNumber;
     vm.expectRevert("Epoch cannot be larger than current");
     validators.groupMembershipInEpoch(validator, _epochNumber.add(1), contractIndex);
   }
 
   function test_Reverts_WhenProvidedIndexGreaterThanIndexOnChain() public {
-    uint256 _epochNumber = validators.getEpochNumber();
+    // TODO figure out where this getEpochNumber was coming from
+    // uint256 _epochNumber = validators.getEpochNumber();
+    uint256 _epochNumber;
     vm.expectRevert("index out of bounds");
     validators.groupMembershipInEpoch(validator, _epochNumber, contractIndex.add(1));
   }

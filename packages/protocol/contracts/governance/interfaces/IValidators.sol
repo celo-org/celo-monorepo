@@ -91,4 +91,5 @@ interface IValidators {
     uint256 score,
     uint256 maxPayment
   ) external view returns (uint256);
+  function getMembershipHistoryLength() external view returns (uint256);
 }

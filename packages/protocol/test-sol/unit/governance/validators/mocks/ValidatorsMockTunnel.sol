@@ -2,16 +2,16 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "@celo-contracts/governance/test/ValidatorsMock.sol";
+import "@celo-contracts/governance/interfaces/IValidators.sol";
 import { Test as ForgeTest } from "forge-std/Test.sol";
 
 contract ValidatorsMockTunnel is ForgeTest {
-  ValidatorsMock private tunnelValidators;
+  IValidators private tunnelValidators;
   address validatorContractAddress;
 
   constructor(address _validatorContractAddress) public {
     validatorContractAddress = _validatorContractAddress;
-    tunnelValidators = ValidatorsMock(validatorContractAddress);
+    tunnelValidators = IValidators(validatorContractAddress);
   }
 
   struct InitParams {
