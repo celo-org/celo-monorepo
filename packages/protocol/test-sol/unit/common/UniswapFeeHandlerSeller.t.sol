@@ -6,7 +6,7 @@ pragma experimental ABIEncoderV2;
 import { Test } from "celo-foundry/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
-import { UniswapFeeHandlerSeller } from "@celo-contracts/common/UniswapFeeHandlerSeller.sol";
+import { UniswapFeeHandlerSeller } from "@celo-contracts-8/common/UniswapFeeHandlerSeller.sol";
 
 contract UniswapFeeHandlerSellerTest is Test, TestConstants {
   // Actors
