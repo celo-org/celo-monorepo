@@ -154,8 +154,9 @@ async function generateFilesForContractKit({ coreContractsOnly, web3Types: outdi
       new Web3V1Celo({
         cwd,
         rawConfig: {
-          files: `${BUILD_DIR}/contracts-${externalContractPackage.name
-            }/@(${externalContractPackage.contracts.join('|')}).json`,
+          files: `${BUILD_DIR}/contracts-${
+            externalContractPackage.name
+          }/@(${externalContractPackage.contracts.join('|')}).json`,
           outDir: path.join(relativePath, externalContractPackage.name),
         },
       })
