@@ -17,8 +17,8 @@ module.exports = {
       settings: {
         metadata: { useLiteralContent: true },
         optimizer: {
-            enabled: true, // Enable optimization
-            runs: 200      // Optimize for how many times you intend to run the code
+          enabled: true, // Enable optimization
+          runs: 200, // Optimize for how many times you intend to run the code
         },
       },
     },
