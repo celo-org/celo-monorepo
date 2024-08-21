@@ -3,6 +3,8 @@ pragma solidity ^0.8.15;
 import "celo-foundry-8/Test.sol";
 import "@celo-contracts-8/common/ProxyFactory08.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
+import "forge-std/console.sol";
+
 
 import { Utils08 } from "@test-sol/utils08.sol";
 
@@ -12,8 +14,11 @@ contract ProxyFactoryTest is Test, Utils08 {
   address constant owner = address(0xAA963FC97281d9632d96700aB62A4D1340F9a28a);
 
   function setUp() public {
+    console.log("setuup");
     proxyFactory08 = new ProxyFactory08();
+    console.log("1");
     proxyInitCode = vm.getCode("Proxy.sol");
+    console.log("2");
   }
 
   function test_deployProxy() public {
@@ -38,6 +43,7 @@ contract ProxyFactoryTest is Test, Utils08 {
   }
 
   function test_verifyArtifacts() public {
+    console.log("ahoj");
     string memory compiler = "0.5.17+commit.d19bba13";
 
     checkbytecode(compiler, proxyInitCode, "./artifacts/Proxy/proxyInitCode");
@@ -51,6 +57,7 @@ contract ProxyFactoryTest is Test, Utils08 {
     bytes memory bytecode,
     string memory artifactPath
   ) public {
+    console.log("checkbytecode", artifactPath);
     string memory bytecodeBackUp = vm.readFile(string.concat(artifactPath, compiler, ".hex"));
     assert(compareStrings(bytecodeBackUp, vm.toString(bytecode)));
   }

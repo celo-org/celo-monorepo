@@ -10,7 +10,8 @@ import { privateKeyToAddress, privateKeyToPublicKey } from '@celo/utils/lib/addr
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { signMessage } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
-import { AccountsInstance, ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
+import { AccountsInstance, ElectionInstance, LockedGoldInstance } from 'types'
+import { ValidatorsInstance } from 'types/08'
 import Web3 from 'web3'
 
 const truffle = require('@celo/protocol/truffle-config.js')
