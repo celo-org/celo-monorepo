@@ -23,15 +23,15 @@ CELO_DISTRIBUTION_SCHEDULE_ADDRESS=$(
   cast call \
     $REGISTRY_ADDRESS \
     "getAddressForStringOrDie(string calldata identifier)(address)" \
-    "CeloDistributionSchedule" \
+    "CeloUnreleasedTreasure" \
     --rpc-url $ANVIL_RPC_URL
 )
 
-# Set the balance of the CeloDistributionSchedule (like the Celo client would do during L2 genesis)
-# Note: This can't be done from the migration script, because CeloDistributionSchedule.sol does not
+# Set the balance of the CeloUnreleasedTreasure (like the Celo client would do during L2 genesis)
+# Note: This can't be done from the migration script, because CeloUnreleasedTreasure.sol does not
 # implement the receive function nor does it allow ERC20 transfers. This is the only way I 
-# managed to give the CeloDistributionSchedule a balance.
-echo "Setting CeloDistributionSchedule balance..."
+# managed to give the CeloUnreleasedTreasure a balance.
+echo "Setting CeloUnreleasedTreasure balance..."
 cast rpc \
   anvil_setBalance \
   $CELO_DISTRIBUTION_SCHEDULE_ADDRESS $CELO_DISTRIBUTION_SCHEDULE_INITIAL_BALANCE \
