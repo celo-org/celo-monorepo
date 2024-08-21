@@ -9,6 +9,7 @@ import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/GoldToken.sol";
+import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts/governance/interfaces/IValidators.sol";
 
 import "@celo-contracts/governance/Election.sol";
@@ -175,6 +176,9 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
     election = new Election(true);
     lockedGold = new LockedGold(true);
     // validators = new Validators(true);
+    address validatorsAddress = actor("Validators");
+    deployCodeTo("ValidatorsMock08.sol", validatorsAddress);
+    validators = IValidators(validatorsAddress);
     // TODO move to create2
     validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
     governance = new Governance(true);
@@ -344,8 +348,7 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
 
     vm.prank(_validator);
     validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
-    // TODO figure out where this getEpochNumber was coming from
-    // validatorRegistrationEpochNumber = validators.getEpochNumber();
+    validatorRegistrationEpochNumber = IPrecompiles(address(validators)).getEpochNumber();
     return _ecdsaPubKey;
   }
 
@@ -479,8 +482,7 @@ contract RevokeCeloAfterL2TransitionTest is RevokeCeloAfterL2Transition {
 
     vm.prank(_validator);
     validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
-    // TODO figure out where this getEpochNumber was coming from
-    // validatorRegistrationEpochNumber = validators.getEpochNumber();
+    validatorRegistrationEpochNumber = IPrecompiles(address(validators)).getEpochNumber();
     return _ecdsaPubKey;
   }
 
