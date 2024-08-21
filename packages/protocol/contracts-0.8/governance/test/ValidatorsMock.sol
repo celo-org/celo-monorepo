@@ -31,9 +31,7 @@ contract ValidatorsMock08 is IValidators {
     return true;
   }
 
-  function registerValidator(
-    bytes calldata ecdsaPublicKey
-  ) external returns (bool) {
+  function registerValidator(bytes calldata ecdsaPublicKey) external returns (bool) {
     return true;
   }
 
@@ -246,7 +244,7 @@ contract ValidatorsMock08 is IValidators {
   ) external view returns (uint256) {
     return 1;
   }
-    function getMembershipHistoryLength() external view returns (uint256) {
-      return 0;
-    }
+  function getMembershipHistoryLength() external view returns (uint256) {
+    return 0;
+  }
 }

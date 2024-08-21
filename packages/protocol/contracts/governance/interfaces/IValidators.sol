@@ -7,9 +7,7 @@ interface IValidators {
     bytes calldata,
     bytes calldata
   ) external returns (bool);
-  function registerValidator(
-    bytes calldata ecdsaPublicKey
-  ) external returns (bool);
+  function registerValidator(bytes calldata ecdsaPublicKey) external returns (bool);
   function deregisterValidator(uint256) external returns (bool);
   function affiliate(address) external returns (bool);
   function deaffiliate() external returns (bool);
@@ -32,7 +30,7 @@ interface IValidators {
   function setGroupLockedGoldRequirements(uint256, uint256) external returns (bool);
   function setValidatorLockedGoldRequirements(uint256, uint256) external returns (bool);
   function setSlashingMultiplierResetPeriod(uint256) external;
-  function setDowntimeGracePeriod(uint256 value) external; 
+  function setDowntimeGracePeriod(uint256 value) external;
 
   // only registered contract
   function updateEcdsaPublicKey(address, address, bytes calldata) external returns (bool);

@@ -10,7 +10,7 @@ import "../common/IsL2Check.sol";
 contract UsingPrecompiles is IsL2Check {
   using SafeMath for uint256;
 
-   address constant TRANSFER = address(0xff - 2);
+  address constant TRANSFER = address(0xff - 2);
   address constant FRACTION_MUL = address(0xff - 3);
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
   address constant GET_VALIDATOR = address(0xff - 5);

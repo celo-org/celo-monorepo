@@ -43,12 +43,10 @@ contract ValidatorsMockTunnel is ForgeTest {
     InitParams calldata params,
     InitParams2 calldata params2
   ) external returns (bool, bytes memory) {
-
     InitParamsTunnel memory initParamsTunnel = InitParamsTunnel({
-       commissionUpdateDelay: params2._commissionUpdateDelay,
-       downtimeGracePeriod: params2._downtimeGracePeriod
+      commissionUpdateDelay: params2._commissionUpdateDelay,
+      downtimeGracePeriod: params2._downtimeGracePeriod
     });
-
 
     bytes memory data = abi.encodeWithSignature(
       "initialize(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,(uint256,uint256))",

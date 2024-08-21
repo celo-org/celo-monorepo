@@ -211,10 +211,6 @@ contract Validators is
     setDowntimeGracePeriod(initParams.downtimeGracePeriod);
   }
 
-  function getMembershipHistoryLength() external view returns (uint256) {
-    return membershipHistoryLength;
-  }
-
   /**
    * @notice Updates a validator's score based on its uptime for the epoch.
    * @param signer The validator signer of the validator account whose score needs updating.
@@ -662,6 +658,10 @@ contract Validators is
     address account = getAccounts().signerToAccount(signer);
     require(isValidator(account), "Not a validator");
     return validators[account].publicKeys.bls;
+  }
+
+  function getMembershipHistoryLength() external view returns (uint256) {
+    return membershipHistoryLength;
   }
 
   /**
