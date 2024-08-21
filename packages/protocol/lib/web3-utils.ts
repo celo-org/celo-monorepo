@@ -271,10 +271,10 @@ export const makeTruffleContractForMigrationWithoutSingleton = (contractName: st
 
   const artifact = require(`${path.join(__dirname, "..")}/build/contracts-${contractPath}/${contractName}.json`)
   const Contract = truffleContract({
+    contractName: artifact.contractName,
     abi: artifact.abi,
     unlinked_binary: artifact.bytecode,
   })
-
 
   Contract.setProvider(web3.currentProvider)
   Contract.setNetwork(network.network_id)
