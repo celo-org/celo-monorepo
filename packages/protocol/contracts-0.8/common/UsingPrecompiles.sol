@@ -10,7 +10,7 @@ import "../common/IsL2Check.sol";
 contract UsingPrecompiles is IsL2Check {
   using SafeMath for uint256;
 
-  address constant TRANSFER = address(0xff - 2);
+   address constant TRANSFER = address(0xff - 2);
   address constant FRACTION_MUL = address(0xff - 3);
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
   address constant GET_VALIDATOR = address(0xff - 5);
@@ -21,6 +21,39 @@ contract UsingPrecompiles is IsL2Check {
   address constant GET_PARENT_SEAL_BITMAP = address(0xff - 10);
   address constant GET_VERIFIED_SEAL_BITMAP = address(0xff - 11);
   uint256 constant DAY = 86400;
+
+  /**
+   * @notice calculate a * b^x for fractions a, b to `decimals` precision
+   * @param aNumerator Numerator of first fraction
+   * @param aDenominator Denominator of first fraction
+   * @param bNumerator Numerator of exponentiated fraction
+   * @param bDenominator Denominator of exponentiated fraction
+   * @param exponent exponent to raise b to
+   * @param _decimals precision
+   * @return Numerator of the computed quantity (not reduced).
+   * @return Denominator of the computed quantity (not reduced).
+   */
+  function fractionMulExp(
+    uint256 aNumerator,
+    uint256 aDenominator,
+    uint256 bNumerator,
+    uint256 bDenominator,
+    uint256 exponent,
+    uint256 _decimals
+  ) public view returns (uint256, uint256) {
+    require(aDenominator != 0 && bDenominator != 0, "a denominator is zero");
+    uint256 returnNumerator;
+    uint256 returnDenominator;
+    bool success;
+    bytes memory out;
+    (success, out) = FRACTION_MUL.staticcall(
+      abi.encodePacked(aNumerator, aDenominator, bNumerator, bDenominator, exponent, _decimals)
+    );
+    require(success, "error calling fractionMulExp precompile");
+    returnNumerator = getUint256FromBytes(out, 0);
+    returnDenominator = getUint256FromBytes(out, 32);
+    return (returnNumerator, returnDenominator);
+  }
 
   /**
    * @notice Returns the current epoch size in blocks.
@@ -56,6 +89,36 @@ contract UsingPrecompiles is IsL2Check {
   }
 
   /**
+   * @notice Gets a validator address from the current validator set.
+   * @param index Index of requested validator in the validator set.
+   * @return Address of validator at the requested index.
+   */
+  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
+    bytes memory out;
+    bool success;
+    (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, uint256(block.number)));
+    require(success, "error calling validatorSignerAddressFromCurrentSet precompile");
+    return address(uint160(getUint256FromBytes(out, 0)));
+  }
+
+  /**
+   * @notice Gets a validator address from the validator set at the given block number.
+   * @param index Index of requested validator in the validator set.
+   * @param blockNumber Block number to retrieve the validator set from.
+   * @return Address of validator at the requested index.
+   */
+  function validatorSignerAddressFromSet(
+    uint256 index,
+    uint256 blockNumber
+  ) public view returns (address) {
+    bytes memory out;
+    bool success;
+    (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, blockNumber));
+    require(success, "error calling validatorSignerAddressFromSet precompile");
+    return address(uint160(getUint256FromBytes(out, 0)));
+  }
+
+  /**
    * @notice Gets the size of the current elected validator set.
    * @return Size of the current elected validator set.
    */
@@ -68,16 +131,105 @@ contract UsingPrecompiles is IsL2Check {
   }
 
   /**
-   * @notice Gets a validator address from the current validator set.
-   * @param index Index of requested validator in the validator set.
-   * @return Address of validator at the requested index.
+   * @notice Gets the size of the validator set that must sign the given block number.
+   * @param blockNumber Block number to retrieve the validator set from.
+   * @return Size of the validator set.
    */
-  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
+  function numberValidatorsInSet(uint256 blockNumber) public view returns (uint256) {
     bytes memory out;
     bool success;
-    (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, uint256(block.number)));
-    require(success, "error calling validatorSignerAddressFromCurrentSet precompile");
-    return address(uint160(getUint256FromBytes(out, 0)));
+    (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(blockNumber));
+    require(success, "error calling numberValidatorsInSet precompile");
+    return getUint256FromBytes(out, 0);
+  }
+
+  /**
+   * @notice Checks a BLS proof of possession.
+   * @param sender The address signed by the BLS key to generate the proof of possession.
+   * @param blsKey The BLS public key that the validator is using for consensus, should pass proof
+   *   of possession. 48 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 96 bytes.
+   * @return True upon success.
+   */
+  function checkProofOfPossession(
+    address sender,
+    bytes memory blsKey,
+    bytes memory blsPop
+  ) public view returns (bool) {
+    bool success;
+    (success, ) = PROOF_OF_POSSESSION.staticcall(abi.encodePacked(sender, blsKey, blsPop));
+    return success;
+  }
+
+  /**
+   * @notice Parses block number out of header.
+   * @param header RLP encoded header
+   * @return Block number.
+   */
+  function getBlockNumberFromHeader(bytes memory header) public view returns (uint256) {
+    bytes memory out;
+    bool success;
+    (success, out) = BLOCK_NUMBER_FROM_HEADER.staticcall(abi.encodePacked(header));
+    require(success, "error calling getBlockNumberFromHeader precompile");
+    return getUint256FromBytes(out, 0);
+  }
+
+  /**
+   * @notice Computes hash of header.
+   * @param header RLP encoded header
+   * @return Header hash.
+   */
+  function hashHeader(bytes memory header) public view returns (bytes32) {
+    bytes memory out;
+    bool success;
+    (success, out) = HASH_HEADER.staticcall(abi.encodePacked(header));
+    require(success, "error calling hashHeader precompile");
+    return getBytes32FromBytes(out, 0);
+  }
+
+  /**
+   * @notice Gets the parent seal bitmap from the header at the given block number.
+   * @param blockNumber Block number to retrieve. Must be within 4 epochs of the current number.
+   * @return Bitmap parent seal with set bits at indices corresponding to signing validators.
+   */
+  function getParentSealBitmap(uint256 blockNumber) public view returns (bytes32) {
+    bytes memory out;
+    bool success;
+    (success, out) = GET_PARENT_SEAL_BITMAP.staticcall(abi.encodePacked(blockNumber));
+    require(success, "error calling getParentSealBitmap precompile");
+    return getBytes32FromBytes(out, 0);
+  }
+
+  /**
+   * @notice Verifies the BLS signature on the header and returns the seal bitmap.
+   * The validator set used for verification is retrieved based on the parent hash field of the
+   * header.  If the parent hash is not in the blockchain, verification fails.
+   * @param header RLP encoded header
+   * @return Bitmap parent seal with set bits at indices correspoinding to signing validators.
+   */
+  function getVerifiedSealBitmapFromHeader(bytes memory header) public view returns (bytes32) {
+    bytes memory out;
+    bool success;
+    (success, out) = GET_VERIFIED_SEAL_BITMAP.staticcall(abi.encodePacked(header));
+    require(success, "error calling getVerifiedSealBitmapFromHeader precompile");
+    return getBytes32FromBytes(out, 0);
+  }
+
+  /**
+   * @notice Returns the minimum number of required signers for a given block number.
+   * @dev Computed in celo-blockchain as int(math.Ceil(float64(2*valSet.Size()) / 3))
+   */
+  function minQuorumSize(uint256 blockNumber) public view returns (uint256) {
+    return numberValidatorsInSet(blockNumber).mul(2).add(2).div(3);
+  }
+
+  /**
+   * @notice Computes byzantine quorum from current validator set size
+   * @return Byzantine quorum of validators.
+   */
+  function minQuorumSizeInCurrentSet() public view returns (uint256) {
+    return minQuorumSize(block.number);
   }
 
   /**

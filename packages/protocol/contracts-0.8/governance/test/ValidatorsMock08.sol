@@ -7,14 +7,14 @@ import "../../../contracts/common/FixidityLib.sol";
  * @title A wrapper around Validators that exposes onlyVm functions for testing.
  */
 contract ValidatorsMock is Validators(true) {
-  function updateValidatorScoreFromSigner(address signer, uint256 uptime) external {
+  function updateValidatorScoreFromSigner(address signer, uint256 uptime) external override {
     return _updateValidatorScoreFromSigner(signer, uptime);
   }
 
   function distributeEpochPaymentsFromSigner(
     address signer,
     uint256 maxPayment
-  ) external returns (uint256) {
+  ) external override returns (uint256) {
     return _distributeEpochPaymentsFromSigner(signer, maxPayment);
   }
 }

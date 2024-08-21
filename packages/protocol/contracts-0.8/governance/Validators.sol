@@ -4,7 +4,7 @@ pragma solidity >=0.8.7 <0.8.20;
 import "@openzeppelin/contracts8/access/Ownable.sol";
 import "@openzeppelin/contracts8/utils/math/Math.sol";
 import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
-import "solidity-bytes-utils/contracts/BytesLib.sol";
+import "solidity-bytes-utils-8/contracts/BytesLib.sol";
 
 import "../../contracts/governance/interfaces/IValidators.sol";
 
@@ -211,6 +211,39 @@ contract Validators is
     setDowntimeGracePeriod(initParams.downtimeGracePeriod);
   }
 
+  /**
+   * @notice Computes epoch payments to the account
+   * @param account The validator signer of the validator to distribute the epoch payment to.
+   * @param maxPayment The maximum payment to the validator. Actual payment is based on score and
+   *   group commission.
+   * @return The total payment paid to the validator and their group.
+   */
+  function computeEpochReward(
+    address account,
+    uint256 score,
+    uint256 maxPayment
+  ) external view returns (uint256) {
+    require(isValidator(account), "Not a validator");
+    FixidityLib.Fraction memory scoreFraction = FixidityLib.wrap(score);
+    require(scoreFraction.lte(FixidityLib.fixed1()), "Score must be <= 1");
+
+    // The group that should be paid is the group that the validator was a member of at the
+    // time it was elected.
+    address group = getMembershipInLastEpoch(account);
+    require(group != address(0), "Validator not registered with a group");
+    // Both the validator and the group must maintain the minimum locked gold balance in order to
+    // receive epoch payments.
+    if (meetsAccountLockedGoldRequirements(account) && meetsAccountLockedGoldRequirements(group)) {
+      FixidityLib.Fraction memory totalPayment = FixidityLib
+        .newFixed(maxPayment)
+        .multiply(scoreFraction)
+        .multiply(groups[group].slashInfo.multiplier);
+      return totalPayment.fromFixed();
+    } else {
+      return 0;
+    }
+  }
+
   function getMembershipHistoryLength() external view returns (uint256) {
     return membershipHistoryLength;
   }
@@ -273,6 +306,35 @@ contract Validators is
     require(
       _updateBlsPublicKey(validator, account, blsPublicKey, blsPop),
       "Error updating BLS public key"
+    );
+    registeredValidators.push(account);
+    updateMembershipHistory(account, address(0));
+    emit ValidatorRegistered(account);
+    return true;
+  }
+
+
+  /**
+   * @notice Registers a validator unaffiliated with any validator group.
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus, should
+   *   match the validator signer. 64 bytes.
+   * @return True upon success.
+   * @dev Fails if the account is already a validator or validator group.
+   * @dev Fails if the account does not have sufficient Locked Gold.
+   */
+  function registerValidator(
+    bytes calldata ecdsaPublicKey
+  ) external nonReentrant onlyL2 returns (bool) {
+    address account = getAccounts().validatorSignerToAccount(msg.sender);
+    _isRegistrationAllowed(account);
+    require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
+    uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
+    require(lockedGoldBalance >= validatorLockedGoldRequirements.value, "Deposit too small");
+    Validator storage validator = validators[account];
+    address signer = getAccounts().getValidatorSigner(account);
+    require(
+      _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey),
+      "Error updating ECDSA public key"
     );
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
@@ -1095,6 +1157,17 @@ contract Validators is
       validator.score.unwrap(),
       getAccounts().getValidatorSigner(account)
     );
+  }
+
+  /**
+   * @notice Returns affiliated group to validator.
+   * @param account The account that registered the validator.
+   * @return group The validator group.
+   */
+  function getValidatorsGroup(address account) public view returns (address group) {
+    require(isValidator(account), "Not a validator");
+    Validator storage validator = validators[account];
+    return validator.affiliation;
   }
 
   /**

@@ -7,6 +7,9 @@ interface IValidators {
     bytes calldata,
     bytes calldata
   ) external returns (bool);
+  function registerValidator(
+    bytes calldata ecdsaPublicKey
+  ) external returns (bool);
   function deregisterValidator(uint256) external returns (bool);
   function affiliate(address) external returns (bool);
   function deaffiliate() external returns (bool);
@@ -29,6 +32,7 @@ interface IValidators {
   function setGroupLockedGoldRequirements(uint256, uint256) external returns (bool);
   function setValidatorLockedGoldRequirements(uint256, uint256) external returns (bool);
   function setSlashingMultiplierResetPeriod(uint256) external;
+  function setDowntimeGracePeriod(uint256 value) external; 
 
   // only registered contract
   function updateEcdsaPublicKey(address, address, bytes calldata) external returns (bool);
@@ -49,6 +53,8 @@ interface IValidators {
   function halveSlashingMultiplier(address) external;
 
   // view functions
+  function maxGroupSize() external view returns (uint256);
+  function downtimeGracePeriod() external view returns (uint256);
   function getCommissionUpdateDelay() external view returns (uint256);
   function getValidatorScoreParameters() external view returns (uint256, uint256);
   function getMembershipHistory(

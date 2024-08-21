@@ -31,6 +31,12 @@ contract ValidatorsMock08 is IValidators {
     return true;
   }
 
+  function registerValidator(
+    bytes calldata ecdsaPublicKey
+  ) external returns (bool) {
+    return true;
+  }
+
   function deregisterValidator(uint256 index) external returns (bool) {
     return true;
   }
@@ -100,6 +106,7 @@ contract ValidatorsMock08 is IValidators {
     return true;
   }
   function setSlashingMultiplierResetPeriod(uint256 value) external {}
+  function setDowntimeGracePeriod(uint256 value) external {}
 
   // only registered contract
   function updateEcdsaPublicKey(
@@ -124,6 +131,12 @@ contract ValidatorsMock08 is IValidators {
   function halveSlashingMultiplier(address account) external {}
 
   // view functions
+  function maxGroupSize() external view returns (uint256) {
+    return 0;
+  }
+  function downtimeGracePeriod() external view returns (uint256) {
+    return 0;
+  }
   function getCommissionUpdateDelay() external view returns (uint256) {
     return 0;
   }
@@ -233,4 +246,7 @@ contract ValidatorsMock08 is IValidators {
   ) external view returns (uint256) {
     return 1;
   }
+    function getMembershipHistoryLength() external view returns (uint256) {
+      return 0;
+    }
 }

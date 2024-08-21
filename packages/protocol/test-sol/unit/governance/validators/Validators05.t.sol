@@ -9,6 +9,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 
 import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/governance/LockedGold.sol";
@@ -3078,7 +3079,8 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
 
 contract ValidatorsTest_GetEpochSize is ValidatorsTest {
   function test_ShouldReturn17280() public {
-    assertEq(validators.getEpochSize(), 17280);
+
+    assertEq(IPrecompiles(address(validators)).getEpochSize(), 17280);
   }
 }
 
