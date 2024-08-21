@@ -18,7 +18,7 @@ module.exports = {
         metadata: { useLiteralContent: true },
         optimizer: {
           enabled: true,
-          runs: 200,
+          runs: 200, // default foundry behavior
         },
       },
     },
