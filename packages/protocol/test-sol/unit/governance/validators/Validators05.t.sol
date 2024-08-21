@@ -170,9 +170,8 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     lockedGold = new MockLockedGold();
     election = new MockElection();
     address validatorsAddress = actor("Validators");
-    deployCodeTo("ValidatorsMock08.sol", validatorsAddress);
+    deployCodeTo("ValidatorsMock.sol", validatorsAddress);
     validators = IValidators(validatorsAddress);
-    // TODO move to create2
     validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
 
     stableToken = new MockStableToken();
