@@ -8,7 +8,7 @@ import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 import "../../contracts/governance/interfaces/IEpochRewards.sol";
 
-contract EpochManagerInitializer is Initializable, UsingPrecompiles, UsingRegistry {
+contract EpochManagerSystemInitializer is Initializable, UsingPrecompiles, UsingRegistry {
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization

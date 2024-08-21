@@ -25,7 +25,6 @@ contract TestConstants {
   string constant GovernanceContract = "Governance";
   string constant EpochRewardsContract = "EpochRewards";
   string constant EpochManagerContract = "EpochManager";
-  string constant EpochManagerInitializerContract = "EpochManagerInitializer";
   string constant ScoreManagerContract = "ScoreManager";
   string constant ReserveContract = "Reserve";
   string constant CeloUnreleasedTreasureContract = "CeloUnreleasedTreasure";

@@ -36,7 +36,7 @@ contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
   ValidatorsMock08 validators;
   MockElection08 election;
 
-  address epochManagerInitializer;
+  address epochManagerSystemInitializer;
   address carbonOffsettingPartner;
   address communityRewardFund;
 
@@ -100,7 +100,7 @@ contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
     address epochRewardsAddress = actor("epochRewardsAddress");
     address freezerAddress = actor("freezerAddress");
 
-    epochManagerInitializer = actor("initializer");
+    epochManagerSystemInitializer = actor("epochManagerSystemInitializer");
     carbonOffsettingPartner = actor("carbonOffsettingPartner");
     communityRewardFund = actor("communityRewardFund");
 
@@ -131,8 +131,9 @@ contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
     registry.setAddressFor(FreezerContract, address(freezer));
 
     celoToken.setTotalSupply(CELO_SUPPLY_CAP);
+    // election.setTotalVotes(5);
     vm.deal(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
-    vm.deal(address(reserve), L1_MINTED_CELO_SUPPLY);
+    // vm.deal(address(reserve), 69411663406170917420347916); // current as of 08/20/24
 
     bool res1 = sortedOracles.setMedianRate(address(stableToken), stableAmountForRate);
     (uint256 res0, uint256 res00) = sortedOracles.medianRate(address(stableToken));
@@ -163,7 +164,7 @@ contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
       REGISTRY_ADDRESS,
       DAY,
       carbonOffsettingPartner,
-      epochManagerInitializer
+      epochManagerSystemInitializer
     );
 
     blockTravel(vm, firstEpochBlock);
@@ -185,19 +186,19 @@ contract EpochManagerIntegrationTest_initialize is EpochManagerIntegrationTest {
       REGISTRY_ADDRESS,
       DAY,
       carbonOffsettingPartner,
-      epochManagerInitializer
+      epochManagerSystemInitializer
     );
   }
 }
 
 contract EpochManagerIntegrationTest_initializeSystem is EpochManagerIntegrationTest {
   function test_processCanBeStarted() public virtual {
-    vm.prank(epochManagerInitializer);
+    vm.prank(epochManagerSystemInitializer);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
   }
 
   function test_Reverts_processCannotBeStartedAgain() public virtual {
-    vm.prank(epochManagerInitializer);
+    vm.prank(epochManagerSystemInitializer);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
     vm.prank(address(0));
     vm.expectRevert("Epoch system already initialized");
@@ -217,7 +218,7 @@ contract EpochManagerIntegrationTest_startNextEpochProcess is EpochManagerIntegr
   }
 
   function test_Reverts_WhenEndOfEpochHasNotBeenReached() public {
-    vm.prank(epochManagerInitializer);
+    vm.prank(epochManagerSystemInitializer);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
     vm.expectRevert("Epoch is not ready to start");
@@ -225,7 +226,7 @@ contract EpochManagerIntegrationTest_startNextEpochProcess is EpochManagerIntegr
   }
 
   function test_Succeeds() public {
-    vm.prank(epochManagerInitializer);
+    vm.prank(epochManagerSystemInitializer);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
     blockTravel(vm, 43200);
