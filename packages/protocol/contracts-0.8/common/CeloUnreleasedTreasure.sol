@@ -48,8 +48,8 @@ contract CeloUnreleasedTreasure is UsingRegistry, ReentrancyGuard, Initializable
    */
   function release(address to, uint256 amount) external onlyEpochManager {
     require(address(this).balance >= amount, "Insufficient balance.");
-    IERC20 celoToken = IERC20(address(getCeloToken()));
-    celoToken.transfer(to, amount);
+    IERC20 celoToken = getCeloToken();
+    require(celoToken.transfer(to, amount), "CELO transfer failed.");
     emit Released(to, amount);
   }
 

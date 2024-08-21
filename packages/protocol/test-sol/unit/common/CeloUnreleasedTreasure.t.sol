@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 import "celo-foundry-8/Test.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/interfaces/IRegistry.sol";
-import "@celo-contracts-8/common/interfaces/ICeloToken.sol";
+import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts/governance/interfaces/IGovernance.sol";
 import { CeloUnreleasedTreasure } from "@celo-contracts-8/common/CeloUnreleasedTreasure.sol";
 import "@celo-contracts-8/common/IsL2Check.sol";
@@ -76,7 +76,6 @@ contract CeloUnreleasedTreasureTest is Test, TestConstants, IsL2Check {
 
     deployCodeTo("GoldToken.sol", abi.encode(false), celoTokenAddress);
     celoToken = ICeloToken(celoTokenAddress);
-    celoToken.setRegistry(REGISTRY_ADDRESS);
     // Using a mock contract, as foundry does not allow for library linking when using deployCodeTo
     governance = new MockGovernance();
 
@@ -153,7 +152,7 @@ contract CeloUnreleasedTreasureTest_release is CeloUnreleasedTreasureTest {
     newCeloUnreleasedTreasure();
   }
 
-  function test_ShouldTrasferToRecepientAddress() public {
+  function test_ShouldTransferToRecepientAddress() public {
     uint256 _balanceBefore = randomAddress.balance;
     vm.prank(epochManagerAddress);
 

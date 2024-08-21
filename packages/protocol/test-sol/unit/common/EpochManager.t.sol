@@ -4,6 +4,7 @@ pragma solidity >=0.8.7 <0.8.20;
 import "celo-foundry-8/Test.sol";
 import "@celo-contracts-8/common/EpochManager.sol";
 import "@celo-contracts-8/stability/test/MockStableToken.sol";
+import "@celo-contracts-8/common/test/MockCeloToken.sol";
 import "@celo-contracts/common/interfaces/ICeloToken.sol";
 import "@celo-contracts-8/common/ScoreManager.sol";
 import { CeloUnreleasedTreasure } from "@celo-contracts-8/common/CeloUnreleasedTreasure.sol";
@@ -31,6 +32,8 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   address epochManagerSystemInitializer;
   address carbonOffsettingPartner;
   address communityRewardFund;
+  address reserveAddress;
+  address scoreManagerAddress;
 
   uint256 firstEpochNumber = 100;
   uint256 firstEpochBlock = 100;
@@ -38,7 +41,8 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   address[] firstElected;
 
   IRegistry registry;
-  ICeloToken celoToken;
+  MockCeloToken08 celoToken;
+  // CeloUnreleasedTreasure celoUnreleasedTreasure;
   MockCeloUnreleasedTreasure celoUnreleasedTreasure;
   ScoreManager scoreManager;
 
@@ -58,31 +62,34 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
   uint256 constant L2_INITIAL_STASH_BALANCE = FIFTEEN_YEAR_LINEAR_REWARD + MAX_L2_DISTRIBUTION; // leftover from L1 target supply plus the 2nd 15 year term.
 
+  event EpochProcessingStarted(uint256 indexed epochNumber);
+
   function setUp() public virtual {
     epochManager = new EpochManager(true);
     sortedOracles = new MockSortedOracles();
     epochRewards = new EpochRewardsMock08();
     validators = new ValidatorsMock08();
     stableToken = new MockStableToken08();
+    celoToken = new MockCeloToken08();
+    // celoUnreleasedTreasure = new CeloUnreleasedTreasure(true);
     celoUnreleasedTreasure = new MockCeloUnreleasedTreasure();
 
     firstElected.push(actor("validator1"));
     firstElected.push(actor("validator2"));
 
-    address celoTokenAddress = actor("celoTokenAddress");
-    address scoreManagerAddress = actor("scoreManagerAddress");
-    address reserveAddress = actor("reserve");
+    scoreManagerAddress = actor("scoreManagerAddress");
+
+    reserveAddress = actor("reserve");
 
     epochManagerSystemInitializer = actor("epochManagerSystemInitializer");
     carbonOffsettingPartner = actor("carbonOffsettingPartner");
     communityRewardFund = actor("communityRewardFund");
 
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
-    deployCodeTo("GoldToken.sol", abi.encode(false), celoTokenAddress);
+
     deployCodeTo("ScoreManager.sol", abi.encode(false), scoreManagerAddress);
 
     registry = IRegistry(REGISTRY_ADDRESS);
-    celoToken = ICeloToken(celoTokenAddress);
     scoreManager = ScoreManager(scoreManagerAddress);
 
     registry.setAddressFor(EpochManagerContract, address(epochManager));
@@ -96,10 +103,11 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     registry.setAddressFor(CeloTokenContract, address(celoToken));
     registry.setAddressFor(ReserveContract, reserveAddress);
 
+    celoToken.setTotalSupply(CELO_SUPPLY_CAP);
     vm.deal(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
+    celoToken.setBalanceOf(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
 
-    bool res1 = sortedOracles.setMedianRate(address(stableToken), stableAmountForRate);
-    (uint256 res0, uint256 res00) = sortedOracles.medianRate(address(stableToken));
+    sortedOracles.setMedianRate(address(stableToken), stableAmountForRate);
 
     scoreManager.setValidatorScore(actor("validator1"), 1);
 
@@ -111,6 +119,14 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     );
 
     blockTravel(vm, firstEpochBlock);
+  }
+
+  function initializeEpochManagerSystem() public {
+    vm.prank(epochManagerSystemInitializer);
+    epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
+
+    blockTravel(vm, 43200);
+    timeTravel(vm, DAY);
   }
 }
 
@@ -124,7 +140,12 @@ contract EpochManagerTest_initialize is EpochManagerTest {
 
   function test_Reverts_WhenAlreadyInitialized() public virtual {
     vm.expectRevert("contract already initialized");
-    epochManager.initialize(REGISTRY_ADDRESS, 10, carbonOffsettingPartner, epochManagerSystemInitializer);
+    epochManager.initialize(
+      REGISTRY_ADDRESS,
+      10,
+      carbonOffsettingPartner,
+      epochManagerSystemInitializer
+    );
   }
 }
 
@@ -180,23 +201,28 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
   }
 
   function test_Reverts_WhenEpochProcessingAlreadyStarted() public {
-    vm.prank(epochManagerSystemInitializer);
-    epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
+    // vm.prank(epochManagerSystemInitializer);
+    // epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
-    blockTravel(vm, 43200);
-    timeTravel(vm, DAY);
+    // blockTravel(vm, 43200);
+    // timeTravel(vm, DAY);
+    initializeEpochManagerSystem();
 
     epochManager.startNextEpochProcess();
     vm.expectRevert("Epoch process is already started");
     epochManager.startNextEpochProcess();
   }
 
-  function test_SetsTheEpochRewardBlock() public {
-    vm.prank(epochManagerSystemInitializer);
-    epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
+  function test_Emits_EpochProcessingStartedEvent() public {
+    initializeEpochManagerSystem();
 
-    blockTravel(vm, 43200);
-    timeTravel(vm, DAY);
+    vm.expectEmit(true, true, true, true);
+    emit EpochProcessingStarted(firstEpochNumber);
+    epochManager.startNextEpochProcess();
+  }
+
+  function test_SetsTheEpochRewardBlock() public {
+    initializeEpochManagerSystem();
 
     epochManager.startNextEpochProcess();
     (, , , uint256 _currentRewardsBlock) = epochManager.getCurrentEpoch();
@@ -204,11 +230,7 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
   }
 
   function test_SetsTheEpochRewardAmounts() public {
-    vm.prank(epochManagerSystemInitializer);
-    epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
-
-    blockTravel(vm, 43200);
-    timeTravel(vm, DAY);
+    initializeEpochManagerSystem();
 
     epochManager.startNextEpochProcess();
     (
@@ -223,5 +245,26 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     assertEq(totalRewardsVoter, 5);
     assertEq(totalRewardsCommunity, 5);
     assertEq(totalRewardsCarbonFund, 5);
+  }
+
+  function test_ShouldMintTotalValidatorStableRewardsToEpochManager() public {
+    initializeEpochManagerSystem();
+    uint256 beforeBalance = stableToken.balanceOf(address(epochManager));
+    epochManager.startNextEpochProcess();
+
+    uint256 afterBalance = stableToken.balanceOf(address(epochManager));
+    assertEq(afterBalance, 2);
+  }
+
+  //XXX(soloseng):This test fails because the mock doesnt actually mint.
+  // if the actual contract is deployed for testing, the function reverts when calling `getCeloUnreleasedTreasure().release()`
+  // after getting the celoToken interface from registry
+
+  function skip_test_ShouldReleaseCorrectAmountToReserve() public {
+    initializeEpochManagerSystem();
+    uint256 reserveBalanceBefore = celoToken.balanceOf(reserveAddress);
+    epochManager.startNextEpochProcess();
+    uint256 reserveBalanceAfter = celoToken.balanceOf(reserveAddress);
+    assertEq(reserveBalanceAfter, reserveBalanceBefore + 4);
   }
 }
