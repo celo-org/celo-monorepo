@@ -2,4 +2,3 @@
 @celo-contracts-8=contracts-0.8/
 @test-sol=test-sol
 @lib=lib
-solidity-bytes-utils-8/=packages/protocol/lib/solidity-bytes-utils-8/
