@@ -9,6 +9,12 @@ contract ValidatorsMockTunnel is ForgeTest {
   IValidators private tunnelValidators;
   address validatorContractAddress;
 
+  struct InitParamsTunnel {
+    // The number of blocks to delay a ValidatorGroup's commission
+    uint256 commissionUpdateDelay;
+    uint256 downtimeGracePeriod;
+  }
+
   constructor(address _validatorContractAddress) public {
     validatorContractAddress = _validatorContractAddress;
     tunnelValidators = IValidators(validatorContractAddress);
@@ -37,8 +43,15 @@ contract ValidatorsMockTunnel is ForgeTest {
     InitParams calldata params,
     InitParams2 calldata params2
   ) external returns (bool, bytes memory) {
+
+    InitParamsTunnel memory initParamsTunnel = InitParamsTunnel({
+       commissionUpdateDelay: params2._commissionUpdateDelay,
+       downtimeGracePeriod: params2._downtimeGracePeriod
+    });
+
+
     bytes memory data = abi.encodeWithSignature(
-      "initialize(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)",
+      "initialize(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,(uint256,uint256))",
       params.registryAddress,
       params.groupRequirementValue,
       params.groupRequirementDuration,
@@ -49,8 +62,7 @@ contract ValidatorsMockTunnel is ForgeTest {
       params2._membershipHistoryLength,
       params2._slashingMultiplierResetPeriod,
       params2._maxGroupSize,
-      params2._commissionUpdateDelay,
-      params2._downtimeGracePeriod
+      initParamsTunnel
     );
     vm.prank(sender);
     (bool success, ) = address(tunnelValidators).call(data);

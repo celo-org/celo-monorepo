@@ -2,6 +2,7 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
+import "forge-std/console.sol";
 import "celo-foundry/Test.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -168,7 +169,9 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
 
     lockedGold = new MockLockedGold();
     election = new MockElection();
-    // validators = new ValidatorsMock();
+    address validatorsAddress = actor("Validators");
+    deployCodeTo("ValidatorsMock08.sol", validatorsAddress);
+    validators = IValidators(validatorsAddress);
     // TODO move to create2
     validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
 
