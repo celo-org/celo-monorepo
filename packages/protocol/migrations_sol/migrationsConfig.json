@@ -110,6 +110,10 @@
     "carbonOffsettingFraction": 1000000000000000000000,
     "frozen": false
   },
+  "epochManager": {
+   "newEpochDuration":86400,
+    "carbonOffsettingPartner": "0x0000000000000000000000000000000000000000"
+  },
   "random": {
     "randomnessBlockRetentionWindow": "720",
     "randomnessBlockRetentionWindow_helper": "HOUR / 5"

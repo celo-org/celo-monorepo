@@ -29,7 +29,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   EpochRewardsMock08 epochRewards;
   ValidatorsMock08 validators;
 
-  address epochManagerSystemInitializer;
+  address epochManagerEnabler;
   address carbonOffsettingPartner;
   address communityRewardFund;
   address reserveAddress;
@@ -81,7 +81,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
     reserveAddress = actor("reserve");
 
-    epochManagerSystemInitializer = actor("epochManagerSystemInitializer");
+    epochManagerEnabler = actor("epochManagerEnabler");
     carbonOffsettingPartner = actor("carbonOffsettingPartner");
     communityRewardFund = actor("communityRewardFund");
 
@@ -115,14 +115,14 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
       REGISTRY_ADDRESS,
       epochDuration,
       carbonOffsettingPartner,
-      epochManagerSystemInitializer
+      epochManagerEnabler
     );
 
     blockTravel(vm, firstEpochBlock);
   }
 
   function initializeEpochManagerSystem() public {
-    vm.prank(epochManagerSystemInitializer);
+    vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
     blockTravel(vm, 43200);
@@ -135,23 +135,18 @@ contract EpochManagerTest_initialize is EpochManagerTest {
     assertEq(address(epochManager.registry()), REGISTRY_ADDRESS);
     assertEq(epochManager.epochDuration(), epochDuration);
     assertEq(epochManager.carbonOffsettingPartner(), carbonOffsettingPartner);
-    assertEq(epochManager.epochManagerSystemInitializer(), epochManagerSystemInitializer);
+    assertEq(epochManager.epochManagerEnabler(), epochManagerEnabler);
   }
 
   function test_Reverts_WhenAlreadyInitialized() public virtual {
     vm.expectRevert("contract already initialized");
-    epochManager.initialize(
-      REGISTRY_ADDRESS,
-      10,
-      carbonOffsettingPartner,
-      epochManagerSystemInitializer
-    );
+    epochManager.initialize(REGISTRY_ADDRESS, 10, carbonOffsettingPartner, epochManagerEnabler);
   }
 }
 
 contract EpochManagerTest_initializeSystem is EpochManagerTest {
   function test_processCanBeStarted() public virtual {
-    vm.prank(epochManagerSystemInitializer);
+    vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
     (
       uint256 _firstEpochBlock,
@@ -159,7 +154,7 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
       uint256 _startTimestamp,
       uint256 _currentRewardsBlock
     ) = epochManager.getCurrentEpoch();
-    assertEq(epochManager.epochManagerSystemInitializer(), address(0));
+    assertEq(epochManager.epochManagerEnabler(), address(0));
     assertEq(epochManager.firstKnownEpoch(), firstEpochNumber);
     assertEq(_firstEpochBlock, firstEpochBlock);
     assertEq(_lastEpochBlock, 0);
@@ -169,7 +164,7 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
   }
 
   function test_Reverts_processCannotBeStartedAgain() public virtual {
-    vm.prank(epochManagerSystemInitializer);
+    vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
     vm.prank(address(0));
     vm.expectRevert("Epoch system already initialized");
@@ -191,7 +186,7 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
   }
 
   function test_Reverts_WhenEndOfEpochHasNotBeenReached() public {
-    vm.prank(epochManagerSystemInitializer);
+    vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
     uint256 _currentEpoch = epochManager.currentEpochNumber();
@@ -201,11 +196,6 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
   }
 
   function test_Reverts_WhenEpochProcessingAlreadyStarted() public {
-    // vm.prank(epochManagerSystemInitializer);
-    // epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
-
-    // blockTravel(vm, 43200);
-    // timeTravel(vm, DAY);
     initializeEpochManagerSystem();
 
     epochManager.startNextEpochProcess();

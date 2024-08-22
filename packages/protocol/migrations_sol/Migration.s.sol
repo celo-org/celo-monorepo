@@ -50,6 +50,9 @@ import "@celo-contracts/stability/interfaces/ISortedOracles.sol";
 import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectoryInitializer.sol";
 import "@celo-contracts-8/common/interfaces/IGasPriceMinimumInitializer.sol";
 import "@celo-contracts-8/common/interfaces/ICeloUnreleasedTreasureInitializer.sol";
+import "@celo-contracts-8/common/interfaces/IEpochManagerEnablerInitializer.sol";
+import "@celo-contracts-8/common/interfaces/IEpochManagerInitializer.sol";
+import "@celo-contracts-8/common/interfaces/IScoreManagerInitializer.sol";
 import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/UsingRegistry.sol";
 
@@ -228,6 +231,9 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     migrateFeeHandler(json);
     migrateOdisPayments();
     migrateCeloUnreleasedTreasure();
+    migrateEpochManagerEnabler();
+    migrateEpochManager(json);
+    migrateScoreManager();
     migrateGovernance(json);
 
     vm.stopBroadcast();
@@ -916,6 +922,41 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       abi.encodeWithSelector(
         ICeloUnreleasedTreasureInitializer.initialize.selector,
         REGISTRY_ADDRESS
+      )
+    );
+  }
+
+  function migrateEpochManagerEnabler() public {
+    deployProxiedContract(
+      "EpochManagerEnabler",
+      abi.encodeWithSelector(IEpochManagerEnablerInitializer.initialize.selector, REGISTRY_ADDRESS)
+    );
+  }
+  function migrateScoreManager() public {
+    deployProxiedContract(
+      "ScoreManager",
+      abi.encodeWithSelector(IScoreManagerInitializer.initialize.selector)
+    );
+  }
+
+  function migrateEpochManager(string memory json) public {
+    address carbonOffsettingPartner = abi.decode(
+      json.parseRaw(".epochManager.carbonOffsettingPartner"),
+      (address)
+    );
+    address newEpochDuration = abi.decode(
+      json.parseRaw(".epochManager.newEpochDuration"),
+      (address)
+    );
+
+    deployProxiedContract(
+      "EpochManager",
+      abi.encodeWithSelector(
+        IEpochManagerInitializer.initialize.selector,
+        REGISTRY_ADDRESS,
+        newEpochDuration,
+        carbonOffsettingPartner,
+        registry.getAddressForString("EpochManagerEnabler")
       )
     );
   }

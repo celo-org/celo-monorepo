@@ -58,7 +58,7 @@ contract EpochManager is
   mapping(address => uint256) public validatorPendingPayments;
 
   address public carbonOffsettingPartner;
-  address public EpochManagerSystemInitializer;
+  address public epochManagerEnabler;
 
   /**
    * @notice Event emited when epochProcessing has begun.
@@ -72,8 +72,8 @@ contract EpochManager is
    */
   event EpochProcessingEnded(uint256 indexed epochNumber);
 
-  modifier onlyEpochManagerSystemInitializer() {
-    require(msg.sender == epochManagerSystemInitializer, "msg.sender is not Initializer");
+  modifier onlyEpochManagerEnabler() {
+    require(msg.sender == epochManagerEnabler, "msg.sender is not Initializer");
     _;
   }
 
@@ -92,14 +92,14 @@ contract EpochManager is
     address registryAddress,
     uint256 newEpochDuration,
     address _carbonOffsettingPartner,
-    address _epochManagerSystemInitializer
+    address _epochManagerEnabler
   ) external initializer {
-    require(_epochManagerSystemInitializer != address(0), "EpochManagerSystemInitializer address is required");
+    require(_epochManagerEnabler != address(0), "EpochManagerEnabler address is required");
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setEpochDuration(newEpochDuration);
     carbonOffsettingPartner = _carbonOffsettingPartner;
-    epochManagerSystemInitializer = _epochManagerSystemInitializer;
+    epochManagerEnabler = _epochManagerEnabler;
   }
 
   // DESIGNDESICION(XXX): we assume that the first epoch on the L2 starts as soon as the system is initialized
@@ -109,7 +109,7 @@ contract EpochManager is
     uint256 firstEpochNumber,
     uint256 firstEpochBlock,
     address[] memory firstElected
-  ) external onlyEpochManagerSystemInitializer {
+  ) external onlyEpochManagerEnabler {
     require(!systemAlreadyInitialized(), "Epoch system already initialized");
     require(firstEpochNumber > 0, "First epoch number must be greater than 0");
     require(firstEpochBlock > 0, "First epoch block must be greater than 0");
@@ -126,7 +126,7 @@ contract EpochManager is
     _currentEpoch.startTimestamp = block.timestamp;
 
     elected = firstElected;
-    epochManagerSystemInitializer = address(0);
+    epochManagerEnabler = address(0);
   }
 
   // TODO maybe "freezeEpochRewards" "prepareForNextEpoch"
@@ -290,7 +290,7 @@ contract EpochManager is
   }
 
   function systemAlreadyInitialized() public view returns (bool) {
-    return initialized && epochManagerSystemInitializer == address(0);
+    return initialized && epochManagerEnabler == address(0);
   }
 
   function allocateValidatorsRewards() internal {
@@ -318,7 +318,6 @@ contract EpochManager is
     );
 
     uint256 CELOequivalent = (numerator * totalRewards) / denominator;
-    // this is not a mint anymore
     getCeloUnreleasedTreasure().release(
       registry.getAddressForOrDie(RESERVE_REGISTRY_ID),
       CELOequivalent
