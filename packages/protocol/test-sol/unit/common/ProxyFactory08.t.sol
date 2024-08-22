@@ -38,7 +38,6 @@ contract ProxyFactoryTest is Test, Utils08 {
   }
 
   function test_verifyArtifacts() public {
-    console.log("ahoj");
     string memory compiler = "0.5.17+commit.d19bba13";
 
     checkbytecode(compiler, proxyInitCode, "./artifacts/Proxy/proxyInitCode");
@@ -51,9 +50,8 @@ contract ProxyFactoryTest is Test, Utils08 {
     bytes memory bytecode,
     string memory artifactPath
   ) public {
-    console.log("checkbytecode", artifactPath);
     string memory bytecodeBackUp = vm.readFile(string.concat(artifactPath, compiler, ".hex"));
-     string memory bytecodeString = vm.toString(bytecode);
+    string memory bytecodeString = vm.toString(bytecode);
 
     // Calculate the length of the bytecode to compare (ignoring the last 43 bytes for Swarm hash)
     uint compareLength = bytes(bytecodeBackUp).length - 86; // 43 bytes in hex is 86 characters
@@ -66,12 +64,16 @@ contract ProxyFactoryTest is Test, Utils08 {
     assert(compareStrings(bytecodeBackUpToCompare, bytecodeToCompare));
   }
 
-function substring(string memory str, uint startIndex, uint endIndex) internal pure returns (string memory) {
+  function substring(
+    string memory str,
+    uint startIndex,
+    uint endIndex
+  ) internal pure returns (string memory) {
     bytes memory strBytes = bytes(str);
     bytes memory result = new bytes(endIndex - startIndex);
     for (uint i = startIndex; i < endIndex; i++) {
-        result[i - startIndex] = strBytes[i];
+      result[i - startIndex] = strBytes[i];
     }
     return string(result);
-}
+  }
 }

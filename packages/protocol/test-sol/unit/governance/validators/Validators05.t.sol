@@ -1518,9 +1518,7 @@ contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
     // );
     // vm.prank(address(accounts));
     // validators.updateEcdsaPublicKey(validator, signer, _newEcdsaPubKey);
-
     // (bytes memory actualEcdsaPubKey, , , , ) = validators.getValidator(validator);
-
     // assertEq(actualEcdsaPubKey, _newEcdsaPubKey);
   }
 
