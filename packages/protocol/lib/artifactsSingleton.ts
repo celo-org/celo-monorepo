@@ -28,6 +28,10 @@ export class DefaultArtifact implements ArtifactSet {
     return this.require(getProxyName(key))
   }
 
+  public contains(key: string) {
+    return this.artifacts.require(key) !== undefined
+  }
+
 }
 
 // This objects replicates a Truffle `artifacts.require` singleton
@@ -82,6 +86,10 @@ export class ArtifactsSingleton implements ArtifactSet {
       return this.artifacts[key]
     }
     return defaultArtifacts?.require(key)
+  }
+
+  public contains(key: string) {
+    return key in this.artifacts
   }
 
   public getProxy(key: string, defaultArtifacts?: any) {

@@ -1,6 +1,8 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloTxObject } from '@celo/connect'
 import { getBlsPoP, getBlsPublicKey } from '@celo/cryptographic-utils/lib/bls'
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
+import { ArtifactsSingleton } from '@celo/protocol/lib/artifactsSingleton'
 import {
   getDeployedProxiedContract,
   sendTransactionWithPrivateKey,
@@ -222,6 +224,8 @@ async function registerValidator(
 }
 
 module.exports = async (_deployer: any, networkName: string) => {
+  const artifacts08 = ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE, artifacts);
+
   const accounts: AccountsInstance = await getDeployedProxiedContract<AccountsInstance>(
     'Accounts',
     artifacts
@@ -229,7 +233,7 @@ module.exports = async (_deployer: any, networkName: string) => {
 
   const validators: ValidatorsInstance = await getDeployedProxiedContract<ValidatorsInstance>(
     'Validators',
-    artifacts
+    artifacts08
   )
 
   const lockedGold: LockedGoldInstance = await getDeployedProxiedContract<LockedGoldInstance>(
