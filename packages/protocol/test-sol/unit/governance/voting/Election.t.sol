@@ -14,6 +14,7 @@ import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
 import "@celo-contracts/identity/test/MockRandom.sol";
 import "@celo-contracts/common/Freezer.sol";
+import "@celo-contracts/common/interfaces/IEpochManager.sol";
 
 import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
 
@@ -38,6 +39,7 @@ contract ElectionTest is Utils, TestConstants {
   MockValidators validators;
   MockRandom random;
   IRegistry registry;
+  IEpochManager epochManager;
 
   address nonOwner = actor("nonOwner");
   address owner = address(this);
@@ -56,6 +58,8 @@ contract ElectionTest is Utils, TestConstants {
   address account8 = actor("account8");
   address account9 = actor("account9");
   address account10 = actor("account10");
+
+  address epochManagerAddress = actor("epochManagerAddress");
 
   address[] accountsArray;
 
@@ -137,11 +141,15 @@ contract ElectionTest is Utils, TestConstants {
     registry = IRegistry(REGISTRY_ADDRESS);
     random = new MockRandom();
 
+    deployCodeTo("EpochManager.sol", abi.encode(true), epochManagerAddress);
+    epochManager = IEpochManager(epochManagerAddress);
+
     registry.setAddressFor("Accounts", address(accounts));
     registry.setAddressFor("Freezer", address(freezer));
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("Random", address(random));
+    registry.setAddressFor("EpochManager", address(epochManagerAddress));
 
     election.initialize(
       REGISTRY_ADDRESS,

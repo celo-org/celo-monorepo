@@ -17,6 +17,8 @@ import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 
+import "@celo-contracts/common/interfaces/IEpochManager.sol";
+
 import "@celo-contracts/governance/test/ValidatorsMock.sol";
 import "@test-sol/constants.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
@@ -50,6 +52,8 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
   ValidatorsMock public validators;
   MockLockedGold lockedGold;
 
+  IEpochManager epochManager;
+
   address owner;
   address nonValidator;
   address validator;
@@ -63,6 +67,7 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
   uint256 otherValidatorPk;
   address group;
   uint256 validatorRegistrationEpochNumber;
+  address epochManagerAddress = actor("epochManagerAddress");
 
   uint256 groupLength = 8;
 
@@ -169,12 +174,15 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
 
     stableToken = new MockStableToken();
+    deployCodeTo("EpochManager.sol", abi.encode(true), epochManagerAddress);
+    epochManager = IEpochManager(epochManagerAddress);
 
     registry.setAddressFor(AccountsContract, address(accounts));
     registry.setAddressFor(ElectionContract, address(election));
     registry.setAddressFor(LockedGoldContract, address(lockedGold));
     registry.setAddressFor(ValidatorsContract, address(validators));
     registry.setAddressFor(StableTokenContract, address(stableToken));
+    registry.setAddressFor(EpochManagerContract, address(epochManagerAddress));
 
     initParams = ValidatorsMockTunnel.InitParams({
       registryAddress: REGISTRY_ADDRESS,
@@ -292,7 +300,7 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
 
     vm.prank(validator);
     validators.registerValidator(_ecdsaPubKey);
-    validatorRegistrationEpochNumber = validators.getEpochNumber();
+    // validatorRegistrationEpochNumber = validators.getEpochNumber();
     return _ecdsaPubKey;
   }
 
@@ -695,10 +703,9 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
 
     _whenL2();
 
-    vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(validator);
+    vm.expectRevert("This method is no longer supported in L2.");
     validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
-    validatorRegistrationEpochNumber = validators.getEpochNumber();
   }
 
   function test_ShouldAddAccountToValidatorList_WhenAccountHasAuthorizedValidatorSigner() public {
@@ -978,16 +985,16 @@ contract ValidatorsTest_RegisterValidator_NoBls is ValidatorsTest {
   function test_Reverts_WhenAccountAlreadyRegisteredAsValidator() public {
     _whenL2();
     bytes memory _registeredEcdsaPubKey = _registerValidatorWithSignerHelper_noBls();
-    vm.expectRevert("Already registered");
     vm.prank(validator);
+    vm.expectRevert("Already registered");
     validators.registerValidator(_registeredEcdsaPubKey);
   }
 
   function test_Reverts_WhenAccountAlreadyRegisteredAsValidatorGroup() public {
     _whenL2();
     _registerValidatorGroupHelper(validator, 1);
-    vm.expectRevert("Already registered");
     vm.prank(validator);
+    vm.expectRevert("Already registered");
     validators.registerValidator(
       abi.encodePacked(bytes32(0x0101010101010101010101010101010101010101010101010101010101010101))
     );

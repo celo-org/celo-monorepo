@@ -9,6 +9,7 @@ import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/GoldToken.sol";
+import "@celo-contracts/common/interfaces/IEpochManager.sol";
 
 import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/governance/LockedGold.sol";
@@ -41,6 +42,7 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
   Governance governance;
   GoldToken goldToken;
   ReleaseGold releaseGold;
+  IEpochManager epochManager;
 
   address owner;
   address accApprover;
@@ -52,6 +54,7 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
   address beneficiary;
   address refundAddress;
   address releaseOwner;
+  address epochManagerAddress = actor("epochManagerAddress");
 
   address authorizedValidatorSigner;
   uint256 authorizedValidatorSignerPK;
@@ -180,6 +183,9 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
     goldToken = new GoldToken(true);
     releaseGold = new ReleaseGold(true);
 
+    deployCodeTo("EpochManager.sol", abi.encode(true), epochManagerAddress);
+    epochManager = IEpochManager(epochManagerAddress);
+
     registry.setAddressFor(AccountsContract, address(accounts));
     registry.setAddressFor(ElectionContract, address(election));
     registry.setAddressFor(StableTokenContract, address(stableToken));
@@ -187,6 +193,7 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
     registry.setAddressFor(ValidatorsContract, address(validators));
     registry.setAddressFor(GovernanceContract, address(governance));
     registry.setAddressFor(GoldTokenContract, address(goldToken));
+    registry.setAddressFor(EpochManagerContract, address(epochManagerAddress));
 
     goldToken.initialize(address(registry));
 
