@@ -3,7 +3,6 @@ pragma solidity ^0.8.15;
 import "celo-foundry-8/Test.sol";
 import "@celo-contracts-8/common/ProxyFactory08.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
-import "forge-std/console.sol";
 
 import { Utils08 } from "@test-sol/utils08.sol";
 
@@ -13,11 +12,8 @@ contract ProxyFactoryTest is Test, Utils08 {
   address constant owner = address(0xAA963FC97281d9632d96700aB62A4D1340F9a28a);
 
   function setUp() public {
-    console.log("setuup");
     proxyFactory08 = new ProxyFactory08();
-    console.log("1");
     proxyInitCode = vm.getCode("Proxy.sol");
-    console.log("2");
   }
 
   function test_deployProxy() public {
@@ -46,7 +42,6 @@ contract ProxyFactoryTest is Test, Utils08 {
     string memory compiler = "0.5.17+commit.d19bba13";
 
     checkbytecode(compiler, proxyInitCode, "./artifacts/Proxy/proxyInitCode");
-
     address deployedAddress = proxyFactory08.deployArbitraryByteCode(0, owner, 0, proxyInitCode);
     checkbytecode(compiler, deployedAddress.code, "./artifacts/Proxy/proxyBytecode");
   }
@@ -58,6 +53,25 @@ contract ProxyFactoryTest is Test, Utils08 {
   ) public {
     console.log("checkbytecode", artifactPath);
     string memory bytecodeBackUp = vm.readFile(string.concat(artifactPath, compiler, ".hex"));
-    assert(compareStrings(bytecodeBackUp, vm.toString(bytecode)));
+     string memory bytecodeString = vm.toString(bytecode);
+
+    // Calculate the length of the bytecode to compare (ignoring the last 43 bytes for Swarm hash)
+    uint compareLength = bytes(bytecodeBackUp).length - 86; // 43 bytes in hex is 86 characters
+
+    // Slice the strings to exclude the Swarm hash
+    string memory bytecodeBackUpToCompare = substring(bytecodeBackUp, 0, compareLength);
+    string memory bytecodeToCompare = substring(bytecodeString, 0, compareLength);
+
+    // Assert that the truncated bytecode matches
+    assert(compareStrings(bytecodeBackUpToCompare, bytecodeToCompare));
   }
+
+function substring(string memory str, uint startIndex, uint endIndex) internal pure returns (string memory) {
+    bytes memory strBytes = bytes(str);
+    bytes memory result = new bytes(endIndex - startIndex);
+    for (uint i = startIndex; i < endIndex; i++) {
+        result[i - startIndex] = strBytes[i];
+    }
+    return string(result);
+}
 }
