@@ -212,6 +212,7 @@ contract ElectionTest_SetElectabilityThreshold is ElectionTest {
   }
 }
 
+// TODO(soloseng): need to update epochNumber for L2, to make it !=0
 contract ElectionTest_SetElectabilityThreshold_L2 is ElectionTest {
   function test_shouldSetElectabilityThreshold() public {
     _whenL2();

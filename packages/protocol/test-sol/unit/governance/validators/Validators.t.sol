@@ -3053,6 +3053,7 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
     validators.addFirstMember(validator, address(0), address(0));
 
     _whenL2();
+    // TODO(soloseng): need to update epochNumber for L2, to make it !=0
     vm.expectRevert("This method is no longer supported in L2.");
     validators.getMembershipInLastEpoch(validator);
   }
