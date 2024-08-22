@@ -12,7 +12,14 @@ interface IValidatorsInitializer {
     uint256 _membershipHistoryLength,
     uint256 _slashingMultiplierResetPeriod,
     uint256 _maxGroupSize,
-    uint256 _commissionUpdateDelay,
-    uint256 _downtimeGracePeriod
+    InitParamsLib.InitParams calldata initParams
   ) external;
+}
+
+library InitParamsLib {
+   struct InitParams {
+    // The number of blocks to delay a ValidatorGroup's commission
+    uint256 commissionUpdateDelay;
+    uint256 downtimeGracePeriod;
+  }
 }
