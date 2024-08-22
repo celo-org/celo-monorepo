@@ -141,13 +141,19 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           artifacts
         )
         for (const contractName of contractPackage.contracts) {
-          console.log("transfer ownership offff contract package:", contractName, contractPackage.__contractPackage?.path, "contains artifact", artifactsInstance.contains(contractName));
+          console.log(
+            'transfer ownership offff contract package:',
+            contractName,
+            contractPackage.__contractPackage?.path,
+            'contains artifact',
+            artifactsInstance.contains(contractName)
+          )
           await transferOwnershipOfProxyAndImplementation(
             contractName,
             governance.address,
             artifactsInstance
           )
-          console.log("finish transfer ownership offff");
+          console.log('finish transfer ownership offff')
         }
       }
     }

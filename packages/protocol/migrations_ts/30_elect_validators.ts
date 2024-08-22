@@ -224,7 +224,7 @@ async function registerValidator(
 }
 
 module.exports = async (_deployer: any, networkName: string) => {
-  const artifacts08 = ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE, artifacts);
+  const artifacts08 = ArtifactsSingleton.getInstance(SOLIDITY_08_PACKAGE, artifacts)
 
   const accounts: AccountsInstance = await getDeployedProxiedContract<AccountsInstance>(
     'Accounts',
