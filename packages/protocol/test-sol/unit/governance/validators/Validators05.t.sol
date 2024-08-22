@@ -15,6 +15,8 @@ import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/governance/LockedGold.sol";
 import "@celo-contracts/governance/interfaces/IValidators.sol";
+// import "./ValidatorsMockFactory.sol";
+import "@celo-contracts-8/governance/test/IValidatorsMock.sol";
 
 import "@celo-contracts/stability/test/MockStableToken.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
@@ -169,8 +171,14 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
 
     lockedGold = new MockLockedGold();
     election = new MockElection();
-    address validatorsAddress = actor("Validators");
-    deployCodeTo("ValidatorsMock.sol", validatorsAddress);
+    // address validatorsAddress = actor("Validators");
+    address validatorsMockFactoryAddress = actor("validatorsMockFactory");
+    deployCodeTo("ValidatorsMockFactory.sol", validatorsMockFactoryAddress);
+
+    address validatorsAddress = IValidatorsMockFactory(validatorsMockFactoryAddress)
+      .deployValidatorsMock(false);
+
+    // deployCodeTo("ValidatorsMock.sol", validatorsAddress);
     validators = IValidators(validatorsAddress);
     validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
 
