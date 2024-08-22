@@ -17,8 +17,6 @@ import "@celo-contracts-8/common/interfaces/IPrecompiles.sol";
 import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/governance/LockedGold.sol";
 import "@celo-contracts/governance/interfaces/IValidators.sol";
-// import "./ValidatorsMockFactory.sol";
-import "@celo-contracts-8/governance/test/IValidatorsMock.sol";
 
 import "@celo-contracts/stability/test/MockStableToken.sol";
 import "@celo-contracts/governance/test/MockElection.sol";
