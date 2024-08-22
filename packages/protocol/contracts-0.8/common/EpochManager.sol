@@ -4,12 +4,12 @@ pragma solidity >=0.8.7 <0.8.20;
 import "@openzeppelin/contracts8/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
-import "./interfaces/IEpochManager.sol";
 import "./interfaces/IOracle.sol";
 import "./interfaces/IStableToken.sol";
 import "../common/UsingRegistry.sol";
 
 import "../../contracts/common/Initializable.sol";
+import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
 contract EpochManager is
