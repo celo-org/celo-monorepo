@@ -2,6 +2,8 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
+// This test file is in 0.5 although the contract is in 0.8
+
 import "forge-std/console.sol";
 import "celo-foundry/Test.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
