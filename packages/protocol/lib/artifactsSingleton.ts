@@ -77,7 +77,6 @@ export class ArtifactsSingleton implements ArtifactSet {
   private constructor() { }
 
   public addArtifact(key: string, value: any) {
-    console.log("adding artifact ", key, "value null ", value == null);
     this.artifacts[key] = value
   }
 
