@@ -177,7 +177,7 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
     lockedGold = new LockedGold(true);
     // validators = new Validators(true);
     address validatorsAddress = actor("Validators");
-    deployCodeTo("ValidatorsMock08.sol", validatorsAddress);
+    deployCodeTo("ValidatorsMock.sol", validatorsAddress);
     validators = IValidators(validatorsAddress);
     // TODO move to create2
     validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
