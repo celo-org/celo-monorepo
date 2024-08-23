@@ -68,7 +68,6 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
   uint256 otherValidatorPk;
   address group;
   uint256 validatorRegistrationEpochNumber;
-  address epochManagerAddress = actor("epochManagerAddress");
 
   uint256 groupLength = 8;
 
