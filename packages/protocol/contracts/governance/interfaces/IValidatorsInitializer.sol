@@ -1,4 +1,5 @@
 pragma solidity >=0.5.13 <0.9.0;
+pragma experimental ABIEncoderV2;
 
 interface IValidatorsInitializer {
   function initialize(
@@ -17,7 +18,7 @@ interface IValidatorsInitializer {
 }
 
 library InitParamsLib {
-   struct InitParams {
+  struct InitParams {
     // The number of blocks to delay a ValidatorGroup's commission
     uint256 commissionUpdateDelay;
     uint256 downtimeGracePeriod;
