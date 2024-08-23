@@ -253,10 +253,6 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
 
   function test_sendsCUsdFromEpochManagerToValidatorAndGroupAndBeneficiary() public {}
 
-  function test_sendsCUsdFromEpochManagerToValidatorAndGroupAndBeneficiary_whenAggregatedOverMultipleEpochs()
-    public
-  {}
-
   function test_worksWhenCalledByAnyone() public {}
 
   function test_doesNothingIfNotAllocated() public {}
