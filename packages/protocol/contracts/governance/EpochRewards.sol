@@ -468,14 +468,9 @@ contract EpochRewards is
    * @return The fraction of floating Gold being used for voting in validator elections.
    */
   function getVotingGoldFraction() public view returns (uint256) {
-    uint256 liquidGold;
-    if (isL2()) {
-      liquidGold = ICeloToken(address(getCeloToken())).allocatedSupply().sub(
-        getReserve().getReserveGoldBalance()
-      );
-    } else {
-      liquidGold = getCeloToken().totalSupply().sub(getReserve().getReserveGoldBalance());
-    }
+    uint256 liquidGold = ICeloToken(address(getCeloToken())).allocatedSupply().sub(
+      getReserve().getReserveGoldBalance()
+    );
     uint256 votingGold = getElection().getTotalVotes();
     return FixidityLib.newFixed(votingGold).divide(FixidityLib.newFixed(liquidGold)).unwrap();
   }
@@ -524,14 +519,7 @@ contract EpochRewards is
     uint256 targetGoldSupplyIncrease
   ) internal view returns (FixidityLib.Fraction memory) {
     uint256 targetSupply = getTargetGoldTotalSupply();
-    uint256 allocatedSupply;
-
-    if (isL2()) {
-      allocatedSupply = ICeloToken(address(getCeloToken())).allocatedSupply();
-    } else {
-      allocatedSupply = getCeloToken().totalSupply();
-    }
-
+    uint256 allocatedSupply = ICeloToken(address(getCeloToken())).allocatedSupply();
     uint256 remainingSupply = GOLD_SUPPLY_CAP.sub(allocatedSupply.add(targetGoldSupplyIncrease));
     uint256 targetRemainingSupply = GOLD_SUPPLY_CAP.sub(targetSupply);
     FixidityLib.Fraction memory remainingToTargetRatio = FixidityLib

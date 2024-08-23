@@ -223,9 +223,13 @@ contract GoldToken is
   /**
    * @return The total amount of allocated CELO.
    */
-  function allocatedSupply() external view onlyL2 returns (uint256) {
-    return
-      CELO_SUPPLY_CAP - registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID).balance;
+  function allocatedSupply() external view returns (uint256) {
+    if (isL2()) {
+      return
+        CELO_SUPPLY_CAP - registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID).balance;
+    } else {
+      return totalSupply();
+    }
   }
 
   /**
