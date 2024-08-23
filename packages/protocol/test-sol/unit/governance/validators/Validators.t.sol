@@ -20,6 +20,7 @@ import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 import "@celo-contracts/common/interfaces/IEpochManager.sol";
 
 import "@celo-contracts/governance/test/ValidatorsMock.sol";
+import "@celo-contracts-8/common/test/MockEpochManager.sol";
 import "@test-sol/constants.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
 import { Utils } from "@test-sol/utils.sol";
@@ -52,7 +53,7 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
   ValidatorsMock public validators;
   MockLockedGold lockedGold;
 
-  IEpochManager epochManager;
+  MockEpochManager epochManager;
 
   address owner;
   address nonValidator;
@@ -174,15 +175,14 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     validatorsMockTunnel = new ValidatorsMockTunnel(address(validators));
 
     stableToken = new MockStableToken();
-    deployCodeTo("EpochManager.sol", abi.encode(true), epochManagerAddress);
-    epochManager = IEpochManager(epochManagerAddress);
+    epochManager = new MockEpochManager();
 
     registry.setAddressFor(AccountsContract, address(accounts));
     registry.setAddressFor(ElectionContract, address(election));
     registry.setAddressFor(LockedGoldContract, address(lockedGold));
     registry.setAddressFor(ValidatorsContract, address(validators));
     registry.setAddressFor(StableTokenContract, address(stableToken));
-    registry.setAddressFor(EpochManagerContract, address(epochManagerAddress));
+    registry.setAddressFor(EpochManagerContract, address(epochManager));
 
     initParams = ValidatorsMockTunnel.InitParams({
       registryAddress: REGISTRY_ADDRESS,
@@ -217,7 +217,13 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
   }
 
   function _whenL2() public {
+    uint256 l1EpochNumber = validators.getEpochNumber();
     deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+
+    address[] memory _elected = new address[](2);
+    _elected[0] = validator;
+    _elected[1] = otherValidator;
+    epochManager.initializeSystem(l1EpochNumber, block.number, _elected);
   }
 
   function _registerValidatorGroupWithMembers(address _group, uint256 _numMembers) public {
@@ -300,7 +306,7 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
 
     vm.prank(validator);
     validators.registerValidator(_ecdsaPubKey);
-    // validatorRegistrationEpochNumber = validators.getEpochNumber();
+    validatorRegistrationEpochNumber = epochManager.getCurrentEpochNumber();
     return _ecdsaPubKey;
   }
 
@@ -3044,18 +3050,30 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
     }
   }
 
-  function test_Reverts_getMembershipInLastEpoch_WhenL2() public {
-    blockTravel(ph.epochSize());
+  function test_MaintainsMembershipAfterL2Transition() public {
+    address lastValidatorGroup;
+    address nextValidatorGroup;
+    for (uint256 i = 0; i < membershipHistoryLength.add(1); i++) {
+      blockTravel(ph.epochSize());
 
-    vm.prank(validator);
-    validators.affiliate(vm.addr(1));
-    vm.prank(vm.addr(1));
-    validators.addFirstMember(validator, address(0), address(0));
+      vm.prank(validator);
+      validators.affiliate(vm.addr(i + 1));
+      vm.prank(vm.addr(i + 1));
+      validators.addFirstMember(validator, address(0), address(0));
+
+      if (i == 0) {
+        assertEq(validators.getMembershipInLastEpoch(validator), address(0));
+      } else {
+        lastValidatorGroup = vm.addr(i);
+        nextValidatorGroup = vm.addr(i + 1);
+        assertEq(validators.getMembershipInLastEpoch(validator), vm.addr(i));
+      }
+    }
 
     _whenL2();
-    // TODO(soloseng): need to update epochNumber for L2, to make it !=0
-    vm.expectRevert("This method is no longer supported in L2.");
-    validators.getMembershipInLastEpoch(validator);
+    assertEq(validators.getMembershipInLastEpoch(validator), lastValidatorGroup);
+    epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + 1);
+    assertEq(validators.getMembershipInLastEpoch(validator), nextValidatorGroup);
   }
 }
 
@@ -3224,7 +3242,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
     validators.updateValidatorScoreFromSigner(validator, uptime.unwrap());
   }
 
-  function test_Reverts_WhenL2_WhenValidatorAndGroupMeetBalanceRequirements() public {
+  function test_Reverts_WhenValidatorAndGroupMeetBalanceRequirements_WhenL2() public {
     _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
     validators.distributeEpochPaymentsFromSigner(validator, maxPayment);

@@ -15,6 +15,7 @@ contract ValidatorsMock is Validators(true) {
     address signer,
     uint256 maxPayment
   ) external returns (uint256) {
+    allowOnlyL1();
     return _distributeEpochPaymentsFromSigner(signer, maxPayment);
   }
 }
