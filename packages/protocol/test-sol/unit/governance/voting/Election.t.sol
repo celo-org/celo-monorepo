@@ -15,6 +15,8 @@ import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
 import "@celo-contracts/identity/test/MockRandom.sol";
 import "@celo-contracts/common/Freezer.sol";
 
+import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
+
 contract ElectionMock is Election(true) {
   function distributeEpochRewards(
     address group,
@@ -56,6 +58,8 @@ contract ElectionTest is Utils, TestConstants {
   address account10 = actor("account10");
 
   address[] accountsArray;
+
+  TestBlocker blocker;
 
   event ElectableValidatorsSet(uint256 min, uint256 max);
   event MaxNumGroupsVotedForSet(uint256 maxNumGroupsVotedFor);
@@ -146,6 +150,9 @@ contract ElectionTest is Utils, TestConstants {
       maxNumGroupsVotedFor,
       electabilityThreshold
     );
+
+    blocker = new TestBlocker();
+    election.setBlockedByContract(address(blocker));
   }
 
   function _whenL2() public {
@@ -599,6 +606,16 @@ contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
     emit ValidatorGroupVoteCast(voter, group, value - maxNumGroupsVotedFor);
     election.vote(group, value - maxNumGroupsVotedFor, newGroup, address(0));
     assertEq(election.getPendingVotesForGroupByAccount(group, voter), value - maxNumGroupsVotedFor);
+  }
+
+  function test_Reverts_WhenBlocked_WhenTheVoterIsOverMaxNumberGroupsVotedForButCanVoteForAdditionalGroup()
+    public
+  {
+    address newGroup = WhenVotedForMaxNumberOfGroups();
+    election.setAllowedToVoteOverMaxNumberOfGroups(true);
+    blocker.mockSetBlocked(true);
+    vm.expectRevert("Contract is blocked from performing this action");
+    election.vote(group, value - maxNumGroupsVotedFor, newGroup, address(0));
   }
 
   function test_ShouldSetTotalVotesByAccount_WhenMaxNumberOfGroupsWasNotReached() public {
@@ -1180,6 +1197,15 @@ contract ElectionTest_Activate is ElectionTest {
     blockTravel(ph.epochSize() + 1);
     vm.expectEmit(true, true, true, false);
     emit ValidatorGroupVoteActivated(voter, group, value, value * 100000000000000000000);
+    election.activate(group);
+  }
+
+  function test_Reverts_WhenBlocked() public {
+    WhenVoterHasPendingVotes();
+    blockTravel(ph.epochSize() + 1);
+
+    blocker.mockSetBlocked(true);
+    vm.expectRevert("Contract is blocked from performing this action");
     election.activate(group);
   }
 
@@ -2012,6 +2038,12 @@ contract ElectionTest_RevokeActive is ElectionTest {
     election.revokeActive(group, revokedValue, address(0), address(0), 0);
   }
 
+  function test_Reverts_WhenBlocked() public {
+    blocker.mockSetBlocked(true);
+    vm.expectRevert("Contract is blocked from performing this action");
+    election.revokeAllActive(group, address(0), address(0), 0);
+  }
+
   function WhenRevokedValueIsLessThanTheActiveVotesButGroupIsEligible() public {
     election.revokeActive(group, revokedValue, address(0), address(0), 0);
   }
@@ -2715,10 +2747,6 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
   uint256 group1RemainingActiveVotes;
   address[] initialOrdering;
 
-  function setUp() public {
-    super.setUp();
-  }
-
   function WhenAccountHasVotedForOneGroup() public {
     address[] memory membersGroup = new address[](1);
     membersGroup[0] = account8;
@@ -2746,6 +2774,21 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
     indices[0] = index;
 
     vm.prank(account2);
+    election.forceDecrementVotes(voter, slashedValue, lessers, greaters, indices);
+  }
+
+  function test_Reverts_WhenBlocked() public {
+    WhenAccountHasVotedForOneGroup();
+    address[] memory lessers = new address[](1);
+    lessers[0] = address(0);
+    address[] memory greaters = new address[](1);
+    greaters[0] = address(0);
+    uint256[] memory indices = new uint256[](1);
+    indices[0] = index;
+
+    blocker.mockSetBlocked(true);
+    vm.prank(account2);
+    vm.expectRevert("Contract is blocked from performing this action");
     election.forceDecrementVotes(voter, slashedValue, lessers, greaters, indices);
   }
 
