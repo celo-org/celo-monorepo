@@ -269,7 +269,20 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
     assertEq(epochManagerBalanceAfter, epochManagerBalanceBefore - paymentAmount);
   }
 
-  function test_worksWhenCalledByAnyone() public {}
+  function test_doesNothingIfNotAllocated() public {
+    mockValidators.setCommission(group, fiftyPercent);
+    accounts.setPaymentDelegationFor(validator2, beneficiary, fiftyPercent);
 
-  function test_doesNothingIfNotAllocated() public {}
+    epochManager.sendValidatorPayment(validator2);
+
+    uint256 validatorBalanceAfter = stableToken.balanceOf(validator1);
+    uint256 groupBalanceAfter = stableToken.balanceOf(group);
+    uint256 beneficiaryBalanceAfter = stableToken.balanceOf(beneficiary);
+    uint256 epochManagerBalanceAfter = stableToken.balanceOf(address(epochManager));
+
+    assertEq(validatorBalanceAfter, 0);
+    assertEq(groupBalanceAfter, 0);
+    assertEq(beneficiaryBalanceAfter, 0);
+    assertEq(epochManagerBalanceAfter, epochManagerBalanceBefore);
+  }
 }
