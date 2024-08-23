@@ -173,6 +173,8 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
   address validator2 = actor("validator2");
   address validator3 = actor("validator3");
 
+  address beneficiary = actor("beneficiary");
+
   uint256 paymentAmount = 4 ether;
   uint256 quarterOfPayment = paymentAmount / 4;
   uint256 halfOfPayment = paymentAmount / 2;
@@ -235,7 +237,19 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
     assertEq(epochManagerBalanceAfter, epochManagerBalanceBefore - paymentAmount);
   }
 
-  function test_sendsCUsdFromEpochManagerToValidatorAndBeneficiary() public {}
+  function test_sendsCUsdFromEpochManagerToValidatorAndBeneficiary() public {
+    accounts.setPaymentDelegationFor(validator1, beneficiary, twentyFivePercent);
+
+    epochManager.sendValidatorPayment(validator1);
+
+    uint256 validatorBalanceAfter = stableToken.balanceOf(validator1);
+    uint256 beneficiaryBalanceAfter = stableToken.balanceOf(beneficiary);
+    uint256 epochManagerBalanceAfter = stableToken.balanceOf(address(epochManager));
+
+    assertEq(validatorBalanceAfter, threeQuartersOfPayment);
+    assertEq(beneficiaryBalanceAfter, quarterOfPayment);
+    assertEq(epochManagerBalanceAfter, epochManagerBalanceBefore - paymentAmount);
+  }
 
   function test_sendsCUsdFromEpochManagerToValidatorAndGroupAndBeneficiary() public {}
 

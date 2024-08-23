@@ -323,25 +323,30 @@ contract EpochManager is
   }
 
   function sendValidatorPayment(address validator) external {
-    FixidityLib.Fraction memory paymentAmount = FixidityLib.newFixed(
+    FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
       validatorPendingPayments[validator]
     );
 
     IValidators validators = getValidators();
     address group = validators.getValidatorsGroup(validator);
     (, uint256 commissionUnwrapped, , , , , ) = validators.getValidatorGroup(group);
-    FixidityLib.Fraction memory groupPortion = FixidityLib.newFixed(0);
-    if (commissionUnwrapped > 0) {
-      FixidityLib.Fraction memory commission = FixidityLib.wrap(commissionUnwrapped);
-      groupPortion = paymentAmount.multiply(commission);
+
+    uint256 groupPayment = totalPayment.multiply(FixidityLib.wrap(commissionUnwrapped)).fromFixed();
+    FixidityLib.Fraction memory remainingPayment = FixidityLib.newFixed(
+      totalPayment.fromFixed() - groupPayment
+    );
+    (address beneficiary, uint256 fraction) = getAccounts().getPaymentDelegation(validator);
+    uint256 delegatedPayment = remainingPayment.multiply(FixidityLib.wrap(fraction)).fromFixed();
+    uint256 validatorPayment = remainingPayment.fromFixed() - delegatedPayment;
+
+    IStableToken stableToken = IStableToken(getStableToken());
+
+    stableToken.transfer(validator, validatorPayment);
+    if (groupPayment > 0) {
+      stableToken.transfer(group, groupPayment);
     }
-
-    FixidityLib.Fraction memory validatorPortion = paymentAmount.subtract(groupPortion);
-
-    IStableToken(getStableToken()).transfer(validator, validatorPortion.fromFixed());
-
-    if (groupPortion.unwrap() > 0) {
-      IStableToken(getStableToken()).transfer(group, groupPortion.fromFixed());
+    if (delegatedPayment > 0) {
+      stableToken.transfer(beneficiary, delegatedPayment);
     }
   }
 }
