@@ -9,6 +9,7 @@ import "./interfaces/IOracle.sol";
 import "./interfaces/IStableToken.sol";
 import "../common/UsingRegistry.sol";
 
+import "../../contracts/common/FixidityLib.sol";
 import "../../contracts/common/Initializable.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
@@ -19,6 +20,8 @@ contract EpochManager is
   ReentrancyGuard,
   ICeloVersionedContract
 {
+  using FixidityLib for FixidityLib.Fraction;
+
   struct Epoch {
     uint256 firstBlock;
     uint256 lastBlock;
@@ -320,6 +323,25 @@ contract EpochManager is
   }
 
   function sendValidatorPayment(address validator) external {
-    IStableToken(getStableToken()).transfer(validator, validatorPendingPayments[validator]);
+    FixidityLib.Fraction memory paymentAmount = FixidityLib.newFixed(
+      validatorPendingPayments[validator]
+    );
+
+    IValidators validators = getValidators();
+    address group = validators.getValidatorsGroup(validator);
+    (, uint256 commissionUnwrapped, , , , , ) = validators.getValidatorGroup(group);
+    FixidityLib.Fraction memory groupPortion = FixidityLib.newFixed(0);
+    if (commissionUnwrapped > 0) {
+      FixidityLib.Fraction memory commission = FixidityLib.wrap(commissionUnwrapped);
+      groupPortion = paymentAmount.multiply(commission);
+    }
+
+    FixidityLib.Fraction memory validatorPortion = paymentAmount.subtract(groupPortion);
+
+    IStableToken(getStableToken()).transfer(validator, validatorPortion.fromFixed());
+
+    if (groupPortion.unwrap() > 0) {
+      IStableToken(getStableToken()).transfer(group, groupPortion.fromFixed());
+    }
   }
 }

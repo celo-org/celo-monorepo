@@ -221,7 +221,19 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
     assertEq(epochManagerBalanceAfter, epochManagerBalanceBefore - paymentAmount);
   }
 
-  function test_sendsCUsdFromEpochManagerToValidatorAndGroup() public {}
+  function test_sendsCUsdFromEpochManagerToValidatorAndGroup() public {
+    mockValidators.setCommission(group, twentyFivePercent);
+
+    epochManager.sendValidatorPayment(validator1);
+
+    uint256 validatorBalanceAfter = stableToken.balanceOf(validator1);
+    uint256 groupBalanceAfter = stableToken.balanceOf(group);
+    uint256 epochManagerBalanceAfter = stableToken.balanceOf(address(epochManager));
+
+    assertEq(validatorBalanceAfter, threeQuartersOfPayment);
+    assertEq(groupBalanceAfter, quarterOfPayment);
+    assertEq(epochManagerBalanceAfter, epochManagerBalanceBefore - paymentAmount);
+  }
 
   function test_sendsCUsdFromEpochManagerToValidatorAndBeneficiary() public {}
 

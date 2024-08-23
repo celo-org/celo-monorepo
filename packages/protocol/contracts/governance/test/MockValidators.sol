@@ -46,6 +46,10 @@ contract MockValidators is IsL2Check {
     isValidatorGroup[group] = true;
   }
 
+  function getValidatorsGroup(address validator) external returns (address) {
+    return affiliations[validator];
+  }
+
   function affiliate(address group) external returns (bool) {
     allowOnlyL1();
     affiliations[msg.sender] = group;
@@ -62,6 +66,9 @@ contract MockValidators is IsL2Check {
 
   function setMembers(address group, address[] calldata _members) external {
     members[group] = _members;
+    for (uint256 i; i < _members.length; i++) {
+      affiliations[_members[i]] = group;
+    }
   }
 
   function setCommission(address group, uint256 commission) external {
