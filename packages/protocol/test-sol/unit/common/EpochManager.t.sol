@@ -165,3 +165,73 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     epochManager.startNextEpochProcess();
   }
 }
+
+contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
+  address group = actor("group");
+
+  address validator1 = actor("validator1");
+  address validator2 = actor("validator2");
+  address validator3 = actor("validator3");
+
+  uint256 paymentAmount = 4 ether;
+  uint256 quarterOfPayment = paymentAmount / 4;
+  uint256 halfOfPayment = paymentAmount / 2;
+  uint256 threeQuartersOfPayment = (paymentAmount / 4) * 3;
+  uint256 twentyFivePercent = 250000000000000000000000;
+  uint256 epochManagerBalanceBefore;
+
+  // TODO: unify mocks
+  IMockValidators mockValidators = IMockValidators(actor("MockValidators05"));
+
+  MockAccounts accounts;
+
+  function setUp() public override {
+    super.setUp();
+
+    deployCodeTo("MockValidators.sol", abi.encode(false), address(mockValidators));
+    registry.setAddressFor(ValidatorsContract, address(mockValidators));
+
+    accounts = new MockAccounts();
+    registry.setAddressFor(AccountsContract, address(accounts));
+
+    mockValidators.setValidatorGroup(group);
+    mockValidators.setValidator(validator1);
+    mockValidators.setValidator(validator2);
+    mockValidators.setValidator(validator3);
+
+    address[] memory members = new address[](3);
+    members[0] = validator1;
+    members[1] = validator2;
+    members[2] = validator3;
+    mockValidators.setMembers(group, members);
+
+    stableToken.mint(address(epochManager), paymentAmount * 2);
+    epochManagerBalanceBefore = stableToken.balanceOf(address(epochManager));
+    epochManager._setPaymentAllocation(validator1, paymentAmount);
+    epochManager._setPaymentAllocation(validator3, paymentAmount);
+  }
+
+  function test_sendsCUsdFromEpochManagerToValidator() public {
+    epochManager.sendValidatorPayment(validator1);
+
+    uint256 validatorBalanceAfter = stableToken.balanceOf(validator1);
+    uint256 epochManagerBalanceAfter = stableToken.balanceOf(address(epochManager));
+
+    assertEq(validatorBalanceAfter, paymentAmount);
+    assertEq(epochManagerBalanceAfter, epochManagerBalanceBefore - paymentAmount);
+  }
+
+  function test_sendsCUsdFromEpochManagerToValidatorAndGroup() public {}
+
+  function test_sendsCUsdFromEpochManagerToValidatorAndBeneficiary() public {}
+
+  function test_sendsCUsdFromEpochManagerToValidatorAndGroupAndBeneficiary() public {}
+
+  function test_sendsCUsdFromEpochManagerToValidatorAndGroupAndBeneficiary_whenAggregatedOverMultipleEpochs()
+    public
+  {}
+
+  function test_worksWhenCalledByAnyone() public {}
+
+  function test_doesNothingIfNotAllocated() public {}
+}
