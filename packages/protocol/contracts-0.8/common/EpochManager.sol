@@ -47,7 +47,7 @@ contract EpochManager is
   uint256 public epochDuration;
 
   uint256 public firstKnownEpoch;
-  uint256 public currentEpochNumber;
+  uint256 private currentEpochNumber;
   address[] public elected;
 
   // TODO this should be able to get deleted easily
@@ -232,6 +232,7 @@ contract EpochManager is
 
   /// returns the current epoch number.
   function getCurrentEpochNumber() external view returns (uint256) {
+    require(systemAlreadyInitialized(), "EpochManager system not yet initialized.");
     return currentEpochNumber;
   }
 

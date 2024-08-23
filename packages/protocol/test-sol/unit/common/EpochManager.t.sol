@@ -131,7 +131,7 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
 
 contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
   function test_Reverts_whenSystemNotInitialized() public {
-    uint256 _currentEpoch = epochManager.currentEpochNumber();
+    uint256 _currentEpoch = epochManager.getCurrentEpochNumber();
     (, , , uint256 _currentEpochEndTimestamp, ) = epochManager.getCurrentEpoch();
 
     vm.expectRevert("Epoch system not initialized");
@@ -142,7 +142,7 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     vm.prank(epochManagerInitializer);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
-    uint256 _currentEpoch = epochManager.currentEpochNumber();
+    uint256 _currentEpoch = epochManager.getCurrentEpochNumber();
     (, , , uint256 _currentEpochEndTimestamp, ) = epochManager.getCurrentEpoch();
 
     vm.expectRevert("Epoch is not ready to start");
