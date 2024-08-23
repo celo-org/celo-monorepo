@@ -180,6 +180,7 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
   uint256 halfOfPayment = paymentAmount / 2;
   uint256 threeQuartersOfPayment = (paymentAmount / 4) * 3;
   uint256 twentyFivePercent = 250000000000000000000000;
+  uint256 fiftyPercent = 500000000000000000000000;
   uint256 epochManagerBalanceBefore;
 
   // TODO: unify mocks
@@ -251,7 +252,22 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
     assertEq(epochManagerBalanceAfter, epochManagerBalanceBefore - paymentAmount);
   }
 
-  function test_sendsCUsdFromEpochManagerToValidatorAndGroupAndBeneficiary() public {}
+  function test_sendsCUsdFromEpochManagerToValidatorAndGroupAndBeneficiary() public {
+    mockValidators.setCommission(group, fiftyPercent);
+    accounts.setPaymentDelegationFor(validator1, beneficiary, fiftyPercent);
+
+    epochManager.sendValidatorPayment(validator1);
+
+    uint256 validatorBalanceAfter = stableToken.balanceOf(validator1);
+    uint256 groupBalanceAfter = stableToken.balanceOf(group);
+    uint256 beneficiaryBalanceAfter = stableToken.balanceOf(beneficiary);
+    uint256 epochManagerBalanceAfter = stableToken.balanceOf(address(epochManager));
+
+    assertEq(validatorBalanceAfter, quarterOfPayment);
+    assertEq(groupBalanceAfter, halfOfPayment);
+    assertEq(beneficiaryBalanceAfter, quarterOfPayment);
+    assertEq(epochManagerBalanceAfter, epochManagerBalanceBefore - paymentAmount);
+  }
 
   function test_worksWhenCalledByAnyone() public {}
 
