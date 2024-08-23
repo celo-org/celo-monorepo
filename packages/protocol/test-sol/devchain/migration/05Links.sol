@@ -22,6 +22,5 @@ import { TestConstants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
 
 contract BlockchainParametersTest is Test, TestConstants, Utils {
-  function test_dummy_test() public {
-  }
+  function test_dummy_test() public {}
 }
