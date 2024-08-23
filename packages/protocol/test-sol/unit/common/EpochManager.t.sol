@@ -2,7 +2,7 @@
 pragma solidity >=0.8.7 <0.8.20;
 
 import "celo-foundry-8/Test.sol";
-import "@celo-contracts-8/common/EpochManager.sol";
+import "@celo-contracts-8/common/mocks/EpochManager_WithMocks.sol";
 import "@celo-contracts-8/stability/test/MockStableToken.sol";
 import "@celo-contracts-8/common/interfaces/ICeloToken.sol";
 import "@celo-contracts-8/common/ScoreManager.sol";
@@ -16,11 +16,14 @@ import "@celo-contracts/stability/test/MockSortedOracles.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 
+import { IMockValidators } from "@celo-contracts/governance/test/IMockValidators.sol";
+
 import { EpochRewardsMock08 } from "@celo-contracts-8/governance/test/EpochRewardsMock.sol";
 import { ValidatorsMock08 } from "@celo-contracts-8/governance/test/ValidatorsMock.sol";
+import { MockAccounts } from "@celo-contracts-8/common/mocks/MockAccounts.sol";
 
 contract EpochManagerTest is Test, TestConstants, Utils08 {
-  EpochManager epochManager;
+  EpochManager_WithMocks epochManager;
   MockSortedOracles sortedOracles;
 
   MockStableToken08 stableToken;
@@ -57,7 +60,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   uint256 constant L2_INITIAL_STASH_BALANCE = FIFTEEN_YEAR_LINEAR_REWARD + MAX_L2_DISTRIBUTION; // leftover from L1 target supply plus the 2nd 15 year term.
 
   function setUp() public virtual {
-    epochManager = new EpochManager(true);
+    epochManager = new EpochManager_WithMocks();
     sortedOracles = new MockSortedOracles();
     epochRewards = new EpochRewardsMock08();
     validators = new ValidatorsMock08();

@@ -318,4 +318,8 @@ contract EpochManager is
       CELOequivalent
     );
   }
+
+  function sendValidatorPayment(address validator) external {
+    IStableToken(getStableToken()).transfer(validator, validatorPendingPayments[validator]);
+  }
 }

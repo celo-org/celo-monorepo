@@ -19,6 +19,7 @@ contract MockValidators is IsL2Check {
   mapping(address => bool) private doesNotMeetAccountLockedGoldRequirements;
   mapping(address => address[]) private members;
   mapping(address => address) private affiliations;
+  mapping(address => uint256) private commissions;
   uint256 private numRegisteredValidators;
 
   function updateEcdsaPublicKey(address, address, bytes calldata) external returns (bool) {
@@ -63,6 +64,10 @@ contract MockValidators is IsL2Check {
     members[group] = _members;
   }
 
+  function setCommission(address group, uint256 commission) external {
+    commissions[group] = commission;
+  }
+
   function setAccountLockedGoldRequirement(address account, uint256 value) external {
     lockedGoldRequirements[account] = value;
   }
@@ -85,6 +90,17 @@ contract MockValidators is IsL2Check {
       validators[i] = members[group][i];
     }
     return validators;
+  }
+
+  function getValidatorGroup(
+    address group
+  )
+    external
+    view
+    returns (address[] memory, uint256, uint256, uint256, uint256[] memory, uint256, uint256)
+  {
+    uint256[] memory sizeHistory;
+    return (members[group], commissions[group], 0, 0, sizeHistory, 0, 0);
   }
 
   function getValidatorGroupSlashingMultiplier(address) external view returns (uint256) {
