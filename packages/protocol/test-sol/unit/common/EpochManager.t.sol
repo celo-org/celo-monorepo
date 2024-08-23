@@ -168,11 +168,8 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
 
 contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
   address group = actor("group");
-
   address validator1 = actor("validator1");
   address validator2 = actor("validator2");
-  address validator3 = actor("validator3");
-
   address beneficiary = actor("beneficiary");
 
   uint256 paymentAmount = 4 ether;
@@ -181,6 +178,7 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
   uint256 threeQuartersOfPayment = (paymentAmount / 4) * 3;
   uint256 twentyFivePercent = 250000000000000000000000;
   uint256 fiftyPercent = 500000000000000000000000;
+
   uint256 epochManagerBalanceBefore;
 
   // TODO: unify mocks
@@ -200,18 +198,15 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
     mockValidators.setValidatorGroup(group);
     mockValidators.setValidator(validator1);
     mockValidators.setValidator(validator2);
-    mockValidators.setValidator(validator3);
 
     address[] memory members = new address[](3);
     members[0] = validator1;
     members[1] = validator2;
-    members[2] = validator3;
     mockValidators.setMembers(group, members);
 
     stableToken.mint(address(epochManager), paymentAmount * 2);
     epochManagerBalanceBefore = stableToken.balanceOf(address(epochManager));
     epochManager._setPaymentAllocation(validator1, paymentAmount);
-    epochManager._setPaymentAllocation(validator3, paymentAmount);
   }
 
   function test_sendsCUsdFromEpochManagerToValidator() public {
