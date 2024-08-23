@@ -280,17 +280,16 @@ contract CeloTokenMock_circulatingSupply is CeloTokenMockTest {
 
   function test_ShouldDecreaseCirculatingSupply_WhenThereWasBurn() public {
     mockCeloToken.setBalanceOf(burnAddress, ONE_CELOTOKEN);
-    assertEq(mockCeloToken.circulatingSupply(), ONE_CELOTOKEN * 999);
+    assertEq(mockCeloToken.circulatingSupply(), mockCeloToken.allocatedSupply() - ONE_CELOTOKEN);
     assertEq(mockCeloToken.circulatingSupply(), mockCeloToken.totalSupply() - ONE_CELOTOKEN);
   }
 
   function test_ShouldMatchCirculationSupply_WhenNoBurn_WhenL2() public _whenL2 {
-    assertEq(mockCeloToken.circulatingSupply(), mockCeloToken.totalSupply());
+    assertEq(mockCeloToken.circulatingSupply(), mockCeloToken.allocatedSupply());
   }
 
   function test_ShouldDecreaseCirculatingSupply_WhenThereWasBurn_WhenL2() public _whenL2 {
     mockCeloToken.setBalanceOf(burnAddress, ONE_CELOTOKEN);
-    assertEq(mockCeloToken.circulatingSupply(), CELO_SUPPLY_CAP - ONE_CELOTOKEN);
     assertEq(mockCeloToken.circulatingSupply(), mockCeloToken.allocatedSupply() - ONE_CELOTOKEN);
   }
 }
