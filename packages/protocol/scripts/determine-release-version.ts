@@ -13,7 +13,7 @@ const branchName = execSync('git branch --show-current').toString().trim()
 // if not on a release branch a dry-run will be done unless an NPM_TAG is provided
 // in which case we will try to fetch the last published version with that tag and bump or use the canary to get major and start versioning from there the new tag at 0
 //  (e.g. `@celo/contracts@11.0.0@custom-tag.0`)
-const nextVersion = determineNextVersion(gitTag, branchName, npmPackage, "epoch-manager")
+const nextVersion = determineNextVersion(gitTag, branchName, npmPackage, 'epoch-manager')
 
 if (nextVersion === null) {
   // dry-run will build the package but not publish it
