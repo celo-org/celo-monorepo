@@ -1081,18 +1081,6 @@ contract Validators is
   }
 
   /**
-   * @notice Returns the epoch number.
-   * @return Current epoch number.
-   */
-  function _getEpochNumber() private view returns (uint256) {
-    if (isL2()) {
-      return getEpochManager().getCurrentEpochNumber();
-    } else {
-      return getEpochNumber();
-    }
-  }
-
-  /**
    * @notice Calculates the validator score for an epoch from the uptime value for the epoch.
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
    * @dev epoch_score = uptime ** exponent
@@ -1483,5 +1471,17 @@ contract Validators is
     validator.affiliation = address(0);
     emit ValidatorDeaffiliated(validatorAccount, affiliation);
     return true;
+  }
+
+  /**
+   * @notice Returns the epoch number.
+   * @return Current epoch number.
+   */
+  function _getEpochNumber() private view returns (uint256) {
+    if (isL2()) {
+      return getEpochManager().getCurrentEpochNumber();
+    } else {
+      return getEpochNumber();
+    }
   }
 }

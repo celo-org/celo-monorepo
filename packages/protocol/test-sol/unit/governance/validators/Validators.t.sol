@@ -17,8 +17,6 @@ import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 
-import "@celo-contracts/common/interfaces/IEpochManager.sol";
-
 import "@celo-contracts/governance/test/ValidatorsMock.sol";
 import "@celo-contracts-8/common/test/MockEpochManager.sol";
 import "@test-sol/constants.sol";
@@ -52,7 +50,6 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
   ValidatorsMockTunnel public validatorsMockTunnel;
   ValidatorsMock public validators;
   MockLockedGold lockedGold;
-
   MockEpochManager epochManager;
 
   address owner;

@@ -9,7 +9,7 @@ import "@celo-contracts/common/FixidityLib.sol";
 import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/GoldToken.sol";
-import "@celo-contracts/common/interfaces/IEpochManager.sol";
+import "@celo-contracts-8/common/test/MockEpochManager.sol";
 
 import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/governance/LockedGold.sol";
@@ -42,7 +42,7 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
   Governance governance;
   GoldToken goldToken;
   ReleaseGold releaseGold;
-  IEpochManager epochManager;
+  MockEpochManager epochManager;
 
   address owner;
   address accApprover;
@@ -183,8 +183,7 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
     goldToken = new GoldToken(true);
     releaseGold = new ReleaseGold(true);
 
-    deployCodeTo("EpochManager.sol", abi.encode(true), epochManagerAddress);
-    epochManager = IEpochManager(epochManagerAddress);
+    epochManager = new MockEpochManager();
 
     registry.setAddressFor(AccountsContract, address(accounts));
     registry.setAddressFor(ElectionContract, address(election));
@@ -193,7 +192,7 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
     registry.setAddressFor(ValidatorsContract, address(validators));
     registry.setAddressFor(GovernanceContract, address(governance));
     registry.setAddressFor(GoldTokenContract, address(goldToken));
-    registry.setAddressFor(EpochManagerContract, address(epochManagerAddress));
+    registry.setAddressFor(EpochManagerContract, address(epochManager));
 
     goldToken.initialize(address(registry));
 
@@ -289,7 +288,13 @@ contract RevokeCeloAfterL2Transition is Test, TestConstants, ECDSAHelper, Utils 
   }
 
   function _whenL2() public {
+    uint256 l1EpochNumber = validators.getEpochNumber();
     deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+
+    address[] memory _elected = new address[](2);
+    _elected[0] = actor("firstElected");
+    _elected[1] = actor("secondElected");
+    epochManager.initializeSystem(l1EpochNumber, block.number, _elected);
   }
 
   function _registerValidatorGroupHelper(address _group, uint256 numMembers) internal {
