@@ -76,6 +76,13 @@ contract EpochManager is
    */
   event EpochProcessingEnded(uint256 indexed epochNumber);
 
+  event ValidatorEpochPaymentDistributed(
+    address indexed validator,
+    uint256 validatorPayment,
+    address indexed group,
+    uint256 groupPayment
+  );
+
   modifier onlyEpochManagerInitializer() {
     require(msg.sender == epochManagerInitializer, "msg.sender is not Initializer");
     _;
@@ -348,5 +355,7 @@ contract EpochManager is
     if (delegatedPayment > 0) {
       require(stableToken.transfer(beneficiary, delegatedPayment), "mint failed to delegatee");
     }
+
+    emit ValidatorEpochPaymentDistributed(validator, validatorPayment, group, groupPayment);
   }
 }

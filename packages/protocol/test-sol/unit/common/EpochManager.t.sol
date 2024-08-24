@@ -59,6 +59,13 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
   uint256 constant L2_INITIAL_STASH_BALANCE = FIFTEEN_YEAR_LINEAR_REWARD + MAX_L2_DISTRIBUTION; // leftover from L1 target supply plus the 2nd 15 year term.
 
+  event ValidatorEpochPaymentDistributed(
+    address indexed validator,
+    uint256 validatorPayment,
+    address indexed group,
+    uint256 groupPayment
+  );
+
   function setUp() public virtual {
     epochManager = new EpochManager_WithMocks();
     sortedOracles = new MockSortedOracles();
@@ -262,6 +269,15 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
     assertEq(groupBalanceAfter, halfOfPayment);
     assertEq(beneficiaryBalanceAfter, quarterOfPayment);
     assertEq(epochManagerBalanceAfter, epochManagerBalanceBefore - paymentAmount);
+  }
+
+  function test_emitsAValidatorEpochPaymentDistributedEvent() public {
+    mockValidators.setCommission(group, fiftyPercent);
+    accounts.setPaymentDelegationFor(validator1, beneficiary, fiftyPercent);
+
+    vm.expectEmit(true, true, true, true, address(epochManager));
+    emit ValidatorEpochPaymentDistributed(validator1, quarterOfPayment, group, halfOfPayment);
+    epochManager.sendValidatorPayment(validator1);
   }
 
   function test_doesNothingIfNotAllocated() public {
