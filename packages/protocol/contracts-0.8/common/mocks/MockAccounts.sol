@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.7 <0.8.20;
 
-import "@celo-contracts/common/FixidityLib.sol";
+import "../../../contracts/common/FixidityLib.sol";
 
 contract MockAccounts {
   using FixidityLib for FixidityLib.Fraction;
