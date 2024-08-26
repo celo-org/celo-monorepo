@@ -5,6 +5,7 @@ import "celo-foundry/Test.sol";
 import "@celo-contracts/common/Blockable.sol";
 import "@celo-contracts/common/interfaces/IBlockable.sol";
 import "@celo-contracts/common/interfaces/IBlocker.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract TestBlocker is IBlocker {
   bool public blocked;
@@ -18,7 +19,13 @@ contract TestBlocker is IBlocker {
   }
 }
 
-contract TestBlockable is Blockable {
+contract BlockableMock is Blockable, Ownable {
+  function setBlockedByContract(address _blockedBy) public onlyOwner {
+    _setBlockedBy(_blockedBy);
+  }
+}
+
+contract TestBlockable is BlockableMock {
   function functionToBeBlocked() public onlyWhenNotBlocked {
     return;
   }
@@ -32,7 +39,7 @@ contract BlockableTest is Test {
   event BlockedBySet(address indexed _blockedBy);
 
   function setUp() public {
-    blockable = new Blockable();
+    blockable = new BlockableMock();
     blocker = new TestBlocker();
     notOwner = actor("notOwner");
   }
