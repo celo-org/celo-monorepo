@@ -16,7 +16,7 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
     vm.startBroadcast(DEPLOYER_ACCOUNT);
 
     setupUsingRegistry();
-    activateCeloDistributionSchedule();
+    activateCeloUnreleasedTreasure();
 
     vm.stopBroadcast();
   }
@@ -26,13 +26,13 @@ contract MigrationL2 is Script, MigrationsConstants, UsingRegistry {
     setRegistry(REGISTRY_ADDRESS);
   }
 
-  function activateCeloDistributionSchedule() public {
+  function activateCeloUnreleasedTreasure() public {
     uint256 l2StartTime = 1721909903 - 5; // Arbitrarily 5 seconds before last black
     uint256 communityRewardFraction = getEpochRewards().getCommunityRewardFraction();
     address carbonOffsettingPartner = 0x22579CA45eE22E2E16dDF72D955D6cf4c767B0eF;
     uint256 carbonOffsettingFraction = getEpochRewards().getCarbonOffsettingFraction();
 
-    getCeloDistributionSchedule().activate(
+    getCeloUnreleasedTreasure().activate(
       l2StartTime,
       communityRewardFraction,
       carbonOffsettingPartner,

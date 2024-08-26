@@ -9,6 +9,7 @@ import "@openzeppelin/contracts8/token/ERC20/IERC20.sol";
 
 import "../../contracts/common/interfaces/IRegistry.sol";
 import "../../contracts/common/interfaces/IAccounts.sol";
+import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/IFreezer.sol";
 import "../../contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
 import "../../contracts/common/interfaces/IFeeCurrencyWhitelist.sol";

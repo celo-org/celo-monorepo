@@ -16,6 +16,10 @@ module.exports = {
       version: SOLC_VERSION,
       settings: {
         metadata: { useLiteralContent: true },
+        optimizer: {
+          enabled: true,
+          runs: 200,
+        },
       },
     },
   },

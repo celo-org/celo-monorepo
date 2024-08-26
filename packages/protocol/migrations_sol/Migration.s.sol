@@ -70,6 +70,12 @@ contract ForceTx {
 contract Migration is Script, UsingRegistry, MigrationsConstants {
   using stdJson for string;
 
+  struct InitParamsTunnel {
+    // The number of blocks to delay a ValidatorGroup's commission
+    uint256 commissionUpdateDelay;
+    uint256 downtimeGracePeriod;
+  }
+
   IProxyFactory proxyFactory;
 
   uint256 proxyNonce = 0;
@@ -612,6 +618,11 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       (uint256)
     );
 
+    InitParamsTunnel memory initParamsTunnel = InitParamsTunnel({
+      commissionUpdateDelay: commissionUpdateDelay,
+      downtimeGracePeriod: downtimeGracePeriod
+    });
+
     deployProxiedContract(
       "Validators",
       abi.encodeWithSelector(
@@ -626,8 +637,7 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
         membershipHistoryLength,
         slashingMultiplierResetPeriod,
         maxGroupSize,
-        commissionUpdateDelay,
-        downtimeGracePeriod
+        initParamsTunnel
       )
     );
   }

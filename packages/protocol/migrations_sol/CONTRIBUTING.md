@@ -32,7 +32,7 @@ Starts a new anvil devchain serving at localhost (default port 8546).
 You can now run commands against the local devchain. For example:
 
 ```sh
-# Call `isL2()` on `CeloDistributionSchedule.sol`
+# Call `isL2()` on `CeloUnreleasedTreasure.sol`
 cast call \
 0xA16cF67AFa80BB9Ce7a325597F80057c6B290fD4 \
 "isL2()(bool)" \

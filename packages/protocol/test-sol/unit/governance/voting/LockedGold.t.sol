@@ -17,6 +17,8 @@ import "@celo-contracts/governance/test/MockElection.sol";
 import "@celo-contracts/governance/test/MockGovernance.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
 
+import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
+
 contract LockedGoldTest is Test, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
@@ -36,6 +38,7 @@ contract LockedGoldTest is Test, TestConstants {
 
   address randomAddress = actor("randomAddress");
   address caller = address(this);
+  TestBlocker blocker;
 
   event UnlockingPeriodSet(uint256 period);
   event GoldLocked(address indexed account, uint256 value);
@@ -84,6 +87,10 @@ contract LockedGoldTest is Test, TestConstants {
     registry.setAddressFor("StableToken", address(stableToken));
     lockedGold.initialize(address(registry), unlockingPeriod);
     accounts.createAccount();
+
+    blocker = new TestBlocker();
+
+    lockedGold.setBlockedByContract(address(blocker));
   }
 
   function getParsedSignatureOfAddress(
@@ -1107,6 +1114,14 @@ contract LockedGoldTest_slash is LockedGoldTest {
 
     vm.prank(downtimeSlasher);
     lockedGold.slash(caller, penalty, reporter, reward, lessers, greaters, indices);
+  }
+
+  function test_Reverts_WhenBlocked() public {
+    uint256 penalty = value;
+    uint256 reward = value / 2;
+    blocker.mockSetBlocked(true);
+    vm.expectRevert("Contract is blocked from performing this action");
+    helper_WhenAccountIsSlashedForAllOfItsLockedGold(penalty, reward);
   }
 
   function test_ShouldReduceAccountsLockedGoldBalance_WhenAccountIsSlashedForAllOfItsLockedGold()

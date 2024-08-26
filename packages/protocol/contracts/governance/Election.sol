@@ -15,6 +15,7 @@ import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/Heap.sol";
 import "../common/libraries/ReentrancyGuard.sol";
+import "../common/Blockable.sol";
 
 contract Election is
   IElection,
@@ -24,7 +25,8 @@ contract Election is
   Initializable,
   UsingRegistry,
   UsingPrecompiles,
-  CalledByVm
+  CalledByVm,
+  Blockable
 {
   using AddressSortedLinkedList for SortedLinkedList.List;
   using FixidityLib for FixidityLib.Fraction;
@@ -196,7 +198,7 @@ contract Election is
     uint256 value,
     address lesser,
     address greater
-  ) external nonReentrant returns (bool) {
+  ) external nonReentrant onlyWhenNotBlocked returns (bool) {
     require(votes.total.eligible.contains(group), "Group not eligible");
     require(0 < value, "Vote value cannot be zero");
     require(canReceiveVotes(group, value), "Group cannot receive votes");
@@ -418,6 +420,13 @@ contract Election is
     return value;
   }
 
+  /// @notice Sets the address of the blocking contract.
+  /// @param _blockedBy The address of the contract that will determine if this contract is blocked.
+  /// @dev Can only be called by the owner of the contract.
+  function setBlockedByContract(address _blockedBy) external onlyOwner {
+    _setBlockedBy(_blockedBy);
+  }
+
   /**
    * @notice Returns the groups that `account` has voted for.
    * @param account The address of the account casting votes.
@@ -611,6 +620,9 @@ contract Election is
    */
   function hasActivatablePendingVotes(address account, address group) external view returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
+    if (isL2()) {
+      return pendingVote.epoch < getEpochManager().getCurrentEpochNumber() && pendingVote.value > 0;
+    }
     return pendingVote.epoch < getEpochNumber() && pendingVote.value > 0;
   }
 
@@ -948,9 +960,16 @@ contract Election is
     emit EpochRewardsDistributedToVoters(group, value);
   }
 
-  function _activate(address group, address account) internal returns (bool) {
+  function _activate(address group, address account) internal onlyWhenNotBlocked returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
-    require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
+    if (isL2()) {
+      require(
+        pendingVote.epoch < getEpochManager().getCurrentEpochNumber(),
+        "Pending vote epoch not passed"
+      );
+    } else {
+      require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
+    }
     uint256 value = pendingVote.value;
     require(value > 0, "Vote value cannot be zero");
     decrementPendingVotes(group, account, value);
@@ -965,7 +984,7 @@ contract Election is
     address lesser,
     address greater,
     uint256 index
-  ) internal returns (bool) {
+  ) internal onlyWhenNotBlocked returns (bool) {
     // TODO(asa): Dedup with revokePending.
     require(group != address(0), "Group address zero");
     address account = getAccounts().voteSignerToAccount(msg.sender);
@@ -1006,7 +1025,7 @@ contract Election is
     address lesser,
     address greater,
     uint256 index
-  ) internal returns (uint256) {
+  ) internal onlyWhenNotBlocked returns (uint256) {
     uint256 remainingValue = maxValue;
     uint256 pendingVotes = getPendingVotesForGroupByAccount(group, account);
     if (pendingVotes > 0) {
@@ -1098,7 +1117,11 @@ contract Election is
 
     PendingVote storage pendingVote = groupPending.byAccount[account];
     pendingVote.value = pendingVote.value.add(value);
-    pendingVote.epoch = getEpochNumber();
+    if (isL2()) {
+      pendingVote.epoch = getEpochManager().getCurrentEpochNumber();
+    } else {
+      pendingVote.epoch = getEpochNumber();
+    }
   }
 
   /**

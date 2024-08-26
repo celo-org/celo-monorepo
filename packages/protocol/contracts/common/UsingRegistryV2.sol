@@ -4,6 +4,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IAccounts.sol";
+import "./interfaces/IEpochManager.sol";
 import "./interfaces/IFeeCurrencyWhitelist.sol";
 import "./interfaces/IFreezer.sol";
 import "./interfaces/IRegistry.sol";
@@ -193,7 +194,7 @@ contract UsingRegistryV2 {
     return IEpochRewards(registryContract.getAddressForOrDie(EPOCH_REWARDS_REGISTRY_ID));
   }
 
-   function getEpochManager() internal view returns (IEpochManager) {
+  function getEpochManager() internal view returns (IEpochManager) {
     return IEpochManager(registryContract.getAddressForOrDie(EPOCH_MANAGER_REGISTRY_ID));
   }
 }
