@@ -76,6 +76,13 @@ contract EpochManager is
    */
   event EpochProcessingEnded(uint256 indexed epochNumber);
 
+  /**
+   * @notice Emitted when an epoch payment is sent.
+   * @param validator Address of the validator.
+   * @param validatorPayment Amount of cUSD sent to the validator.
+   * @param group Address of the validator's group.
+   * @param groupPayment Amount of cUSD sent to the group.
+   */
   event ValidatorEpochPaymentDistributed(
     address indexed validator,
     uint256 validatorPayment,
@@ -329,6 +336,11 @@ contract EpochManager is
     );
   }
 
+  /**
+   * @notice Sends the allocated epoch payment to a validator, their group, and
+   *   delegation beneficiary.
+   * @param validator Address of the validator.
+   */
   function sendValidatorPayment(address validator) external {
     FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
       validatorPendingPayments[validator]
