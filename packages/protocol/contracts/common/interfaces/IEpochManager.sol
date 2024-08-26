@@ -14,9 +14,9 @@ interface IEpochManager {
     address[] calldata lessers,
     address[] calldata greaters
   ) external;
-  function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256, uint256);
+  function getCurrentEpoch() external view returns (uint256, uint256, uint256, uint256);
   function getCurrentEpochNumber() external view returns (uint256);
   function getElected() external view returns (address[] memory);
-  function epochManagerInitializer() external view returns (address);
+  function epochManagerEnabler() external view returns (address);
   function epochDuration() external view returns (uint256);
 }

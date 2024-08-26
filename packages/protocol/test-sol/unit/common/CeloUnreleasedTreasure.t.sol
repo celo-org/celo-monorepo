@@ -73,11 +73,11 @@ contract CeloUnreleasedTreasureTest is Test, TestConstants, IsL2Check {
     registry.setAddressFor("EpochManager", address(epochManagerAddress));
 
     vm.deal(address(0), CELO_SUPPLY_CAP);
-    assertEq(celoToken.totalSupply(), 0, "starting total supply not zero.");
+    assertEq(celoToken.allocatedSupply(), 0, "starting total supply not zero.");
     // Mint L1 supply
     vm.prank(address(0));
     celoToken.mint(randomAddress, L1_MINTED_CELO_SUPPLY);
-    assertEq(celoToken.totalSupply(), L1_MINTED_CELO_SUPPLY, "total supply incorrect.");
+    assertEq(celoToken.allocatedSupply(), L1_MINTED_CELO_SUPPLY, "total supply incorrect.");
   }
 
   function newCeloUnreleasedTreasure() internal returns (CeloUnreleasedTreasure) {

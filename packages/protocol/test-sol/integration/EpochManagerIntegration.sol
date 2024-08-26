@@ -20,7 +20,7 @@ import "@celo-contracts/common/interfaces/IFreezer.sol";
 import "@celo-contracts/governance/interfaces/IEpochRewards.sol";
 import "@celo-contracts/governance/interfaces/IEpochRewardsInitializer.sol";
 
-import { ValidatorsMock08 } from "@celo-contracts-8/governance/test/ValidatorsMock.sol";
+import { ValidatorsMock08 } from "@celo-contracts-8/governance/test/ValidatorsMock08.sol";
 import { MockElection08 } from "@celo-contracts-8/governance/test/MockElection.sol";
 import { MockReserve08 } from "@celo-contracts-8/stability/test/MockReserve.sol";
 import { MockStableToken08 } from "@celo-contracts-8/stability/test/MockStableToken.sol";
@@ -55,19 +55,6 @@ contract EpochManagerIntegrationTest is Test, TestConstants, Utils08 {
 
   uint256 celoAmountForRate = 1e24;
   uint256 stableAmountForRate = 2 * celoAmountForRate;
-
-  uint256 constant L1_MINTED_CELO_SUPPLY = 692702432463315819704447326; // as of May 15 2024
-
-  uint256 constant CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion Celo
-  uint256 constant GENESIS_CELO_SUPPLY = 600000000 ether; // 600 million Celo
-
-  uint256 constant FIFTEEN_YEAR_LINEAR_REWARD = (CELO_SUPPLY_CAP - GENESIS_CELO_SUPPLY) / 2; // 200 million Celo
-
-  uint256 constant FIFTEEN_YEAR_CELO_SUPPLY = GENESIS_CELO_SUPPLY + FIFTEEN_YEAR_LINEAR_REWARD; // 800 million Celo (includes GENESIS_CELO_SUPPLY)
-
-  uint256 constant MAX_L2_DISTRIBUTION = FIFTEEN_YEAR_CELO_SUPPLY - L1_MINTED_CELO_SUPPLY; // 107.2 million Celo
-
-  uint256 constant L2_INITIAL_STASH_BALANCE = FIFTEEN_YEAR_LINEAR_REWARD + MAX_L2_DISTRIBUTION; // leftover from L1 target supply plus the 2nd 15 year term.
 
   uint256 constant targetVotingYieldParamsInitial = 0.00016e24; // 0.00016
   uint256 constant targetVotingYieldParamsMax = 0.0005e24; // 0.0005
@@ -237,7 +224,7 @@ contract EpochManagerIntegrationTest_startNextEpochProcess is EpochManagerIntegr
     timeTravel(vm, DAY);
     console2.log("current epoch timestamp", block.timestamp);
 
-    uint256 _currentEpoch = epochManager.currentEpochNumber();
+    uint256 _currentEpoch = epochManager.getCurrentEpochNumber();
     console2.log("### Current epoch duration:", epochManager.epochDuration());
 
     epochManager.startNextEpochProcess();
