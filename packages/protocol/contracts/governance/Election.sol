@@ -420,6 +420,13 @@ contract Election is
     return value;
   }
 
+  /// @notice Sets the address of the blocking contract.
+  /// @param _blockedBy The address of the contract that will determine if this contract is blocked.
+  /// @dev Can only be called by the owner of the contract.
+  function setBlockedByContract(address _blockedBy) external onlyOwner {
+    _setBlockedBy(_blockedBy);
+  }
+
   /**
    * @notice Returns the groups that `account` has voted for.
    * @param account The address of the account casting votes.
