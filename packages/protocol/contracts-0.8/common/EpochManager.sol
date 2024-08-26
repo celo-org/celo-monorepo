@@ -340,11 +340,14 @@ contract EpochManager is
   /**
    * @notice Sends the allocated epoch payment to a validator, their group, and
    *   delegation beneficiary.
-   * @param validator Address of the validator.
+   * @param validator Account of the validator.
    */
   function sendValidatorPayment(address validator) external {
+    IAccounts accounts = IAccounts(getAccounts());
+    address signer = accounts.getValidatorSigner(validator);
+
     FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
-      validatorPendingPayments[validator]
+      validatorPendingPayments[signer]
     );
 
     IValidators validators = getValidators();

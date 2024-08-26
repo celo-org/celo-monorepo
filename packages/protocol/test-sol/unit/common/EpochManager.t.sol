@@ -160,7 +160,9 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
 contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
   address group = actor("group");
   address validator1 = actor("validator1");
+  address signer1 = actor("signer1");
   address validator2 = actor("validator2");
+  address signer2 = actor("signer2");
   address beneficiary = actor("beneficiary");
 
   uint256 paymentAmount = 4 ether;
@@ -188,7 +190,9 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
 
     mockValidators.setValidatorGroup(group);
     mockValidators.setValidator(validator1);
+    accounts.setValidatorSigner(validator1, signer1);
     mockValidators.setValidator(validator2);
+    accounts.setValidatorSigner(validator2, signer2);
 
     address[] memory members = new address[](3);
     members[0] = validator1;
@@ -197,7 +201,7 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
 
     stableToken.mint(address(epochManager), paymentAmount * 2);
     epochManagerBalanceBefore = stableToken.balanceOf(address(epochManager));
-    epochManager._setPaymentAllocation(validator1, paymentAmount);
+    epochManager._setPaymentAllocation(signer1, paymentAmount);
   }
 
   function test_sendsCUsdFromEpochManagerToValidator() public {

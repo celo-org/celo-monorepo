@@ -14,6 +14,7 @@ contract MockAccounts {
   }
 
   mapping(address => PaymentDelegation) delegations;
+  mapping(address => address) accountToSigner;
 
   function setPaymentDelegationFor(
     address validator,
@@ -30,5 +31,13 @@ contract MockAccounts {
   function getPaymentDelegation(address account) external view returns (address, uint256) {
     PaymentDelegation storage delegation = delegations[account];
     return (delegation.beneficiary, delegation.fraction.unwrap());
+  }
+
+  function setValidatorSigner(address account, address signer) external {
+    accountToSigner[account] = signer;
+  }
+
+  function getValidatorSigner(address account) external returns (address) {
+    return accountToSigner[account];
   }
 }
