@@ -57,6 +57,7 @@ export const CoreContracts = [
   // governance
   'Election',
   'EpochRewards',
+  'EpochManager',
   'Governance',
   'GovernanceApproverMultiSig',
   'BlockchainParameters',

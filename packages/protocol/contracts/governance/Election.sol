@@ -15,6 +15,7 @@ import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/Heap.sol";
 import "../common/libraries/ReentrancyGuard.sol";
+import "../common/Blockable.sol";
 
 contract Election is
   IElection,
@@ -24,7 +25,8 @@ contract Election is
   Initializable,
   UsingRegistry,
   UsingPrecompiles,
-  CalledByVm
+  CalledByVm,
+  Blockable
 {
   using AddressSortedLinkedList for SortedLinkedList.List;
   using FixidityLib for FixidityLib.Fraction;
@@ -196,7 +198,7 @@ contract Election is
     uint256 value,
     address lesser,
     address greater
-  ) external nonReentrant returns (bool) {
+  ) external nonReentrant onlyWhenNotBlocked returns (bool) {
     require(votes.total.eligible.contains(group), "Group not eligible");
     require(0 < value, "Vote value cannot be zero");
     require(canReceiveVotes(group, value), "Group cannot receive votes");
@@ -948,7 +950,7 @@ contract Election is
     emit EpochRewardsDistributedToVoters(group, value);
   }
 
-  function _activate(address group, address account) internal returns (bool) {
+  function _activate(address group, address account) internal onlyWhenNotBlocked returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
     require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
     uint256 value = pendingVote.value;
@@ -965,7 +967,7 @@ contract Election is
     address lesser,
     address greater,
     uint256 index
-  ) internal returns (bool) {
+  ) internal onlyWhenNotBlocked returns (bool) {
     // TODO(asa): Dedup with revokePending.
     require(group != address(0), "Group address zero");
     address account = getAccounts().voteSignerToAccount(msg.sender);
@@ -1006,7 +1008,7 @@ contract Election is
     address lesser,
     address greater,
     uint256 index
-  ) internal returns (uint256) {
+  ) internal onlyWhenNotBlocked returns (uint256) {
     uint256 remainingValue = maxValue;
     uint256 pendingVotes = getPendingVotesForGroupByAccount(group, account);
     if (pendingVotes > 0) {
