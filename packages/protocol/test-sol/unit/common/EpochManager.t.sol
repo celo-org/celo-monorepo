@@ -43,19 +43,6 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   uint256 celoAmountForRate = 1e24;
   uint256 stableAmountForRate = 2 * celoAmountForRate;
 
-  uint256 constant L1_MINTED_CELO_SUPPLY = 692702432463315819704447326; // as of May 15 2024
-
-  uint256 constant CELO_SUPPLY_CAP = 1000000000 ether; // 1 billion Celo
-  uint256 constant GENESIS_CELO_SUPPLY = 600000000 ether; // 600 million Celo
-
-  uint256 constant FIFTEEN_YEAR_LINEAR_REWARD = (CELO_SUPPLY_CAP - GENESIS_CELO_SUPPLY) / 2; // 200 million Celo
-
-  uint256 constant FIFTEEN_YEAR_CELO_SUPPLY = GENESIS_CELO_SUPPLY + FIFTEEN_YEAR_LINEAR_REWARD; // 800 million Celo (includes GENESIS_CELO_SUPPLY)
-
-  uint256 constant MAX_L2_DISTRIBUTION = FIFTEEN_YEAR_CELO_SUPPLY - L1_MINTED_CELO_SUPPLY; // 107.2 million Celo
-
-  uint256 constant L2_INITIAL_STASH_BALANCE = FIFTEEN_YEAR_LINEAR_REWARD + MAX_L2_DISTRIBUTION; // leftover from L1 target supply plus the 2nd 15 year term.
-
   function setUp() public virtual {
     epochManager = new EpochManager(true);
     sortedOracles = new MockSortedOracles();
@@ -144,9 +131,6 @@ contract EpochManagerTest_initializeSystem is EpochManagerTest {
 
 contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
   function test_Reverts_whenSystemNotInitialized() public {
-    uint256 _currentEpoch = epochManager.currentEpochNumber();
-    (, , , uint256 _currentEpochEndTimestamp, ) = epochManager.getCurrentEpoch();
-
     vm.expectRevert("Epoch system not initialized");
     epochManager.startNextEpochProcess();
   }
@@ -155,7 +139,7 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     vm.prank(epochManagerInitializer);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
 
-    uint256 _currentEpoch = epochManager.currentEpochNumber();
+    uint256 _currentEpoch = epochManager.getCurrentEpochNumber();
     (, , , uint256 _currentEpochEndTimestamp, ) = epochManager.getCurrentEpoch();
 
     vm.expectRevert("Epoch is not ready to start");

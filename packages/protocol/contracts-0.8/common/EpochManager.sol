@@ -4,12 +4,12 @@ pragma solidity >=0.8.7 <0.8.20;
 import "@openzeppelin/contracts8/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts8/access/Ownable.sol";
 
-import "./interfaces/IEpochManager.sol";
 import "./interfaces/IOracle.sol";
 import "./interfaces/IStableToken.sol";
 import "../common/UsingRegistry.sol";
 
 import "../../contracts/common/Initializable.sol";
+import "../../contracts/common/interfaces/IEpochManager.sol";
 import "../../contracts/common/interfaces/ICeloVersionedContract.sol";
 
 contract EpochManager is
@@ -47,7 +47,7 @@ contract EpochManager is
   uint256 public epochDuration;
 
   uint256 public firstKnownEpoch;
-  uint256 public currentEpochNumber;
+  uint256 private currentEpochNumber;
   address[] public elected;
 
   // TODO this should be able to get deleted easily
@@ -232,6 +232,7 @@ contract EpochManager is
 
   /// returns the current epoch number.
   function getCurrentEpochNumber() external view returns (uint256) {
+    require(systemAlreadyInitialized(), "EpochManager system not yet initialized.");
     return currentEpochNumber;
   }
 

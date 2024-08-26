@@ -2,7 +2,7 @@ import { execSync } from 'child_process'
 import { determineNextVersion, getReleaseTypeFromSemVer } from './utils'
 
 const npmPackage = process.env.NPM_PACKAGE?.trim() || ''
-// const npmTag = process.env.NPM_TAG?.trim() || ''
+const npmTag = process.env.NPM_TAG?.trim() || ''
 const gitTag = process.env.GITHUB_TAG || ''
 const branchName = execSync('git branch --show-current').toString().trim()
 
