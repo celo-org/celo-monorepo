@@ -505,6 +505,13 @@ contract LockedGold is
     emit AccountSlashed(account, maxSlash, reporter, reward);
   }
 
+  /// @notice Sets the address of the blocking contract.
+  /// @param _blockedBy The address of the contract that will determine if this contract is blocked.
+  /// @dev Can only be called by the owner of the contract.
+  function setBlockedByContract(address _blockedBy) external onlyOwner {
+    _setBlockedBy(_blockedBy);
+  }
+
   /**
    * @notice Returns the total amount of locked gold in the system. Note that this does not include
    *   gold that has been unlocked but not yet withdrawn.
