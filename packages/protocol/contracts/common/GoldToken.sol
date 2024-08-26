@@ -221,18 +221,10 @@ contract GoldToken is
   }
 
   /**
-   * @return The total amount of allocated CELO.
-   */
-  function allocatedSupply() external view onlyL2 returns (uint256) {
-    return
-      CELO_SUPPLY_CAP - registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID).balance;
-  }
-
-  /**
    * @return The total amount of CELO in existence, not including what the burn address holds.
    */
   function circulatingSupply() external view returns (uint256) {
-    return totalSupply().sub(getBurnedAmount()).sub(balanceOf(address(0)));
+    return allocatedSupply().sub(getBurnedAmount()).sub(balanceOf(address(0)));
   }
 
   /**
@@ -271,6 +263,18 @@ contract GoldToken is
    */
   function balanceOf(address _owner) public view returns (uint256) {
     return _owner.balance;
+  }
+
+  /**
+   * @return The total amount of allocated CELO.
+   */
+  function allocatedSupply() public view returns (uint256) {
+    if (isL2()) {
+      return
+        CELO_SUPPLY_CAP - registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID).balance;
+    } else {
+      return totalSupply();
+    }
   }
 
   /**

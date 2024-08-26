@@ -5,6 +5,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IAccounts.sol";
+import "./interfaces/IEpochManager.sol";
 import "./interfaces/IFeeCurrencyWhitelist.sol";
 import "./interfaces/IFreezer.sol";
 import "./interfaces/IRegistry.sol";
@@ -151,5 +152,9 @@ contract UsingRegistry is Ownable {
 
   function getEpochRewards() internal view returns (IEpochRewards) {
     return IEpochRewards(registry.getAddressForOrDie(EPOCH_REWARDS_REGISTRY_ID));
+  }
+
+  function getEpochManager() internal view returns (IEpochManager) {
+    return IEpochManager(registry.getAddressForOrDie(EPOCH_MANAGER_REGISTRY_ID));
   }
 }

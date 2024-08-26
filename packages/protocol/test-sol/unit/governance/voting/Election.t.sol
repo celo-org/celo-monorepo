@@ -2,7 +2,7 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import { Test } from "celo-foundry/Test.sol";
+import "celo-foundry/Test.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
 
@@ -14,6 +14,7 @@ import "@celo-contracts/common/Accounts.sol";
 import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
 import "@celo-contracts/identity/test/MockRandom.sol";
 import "@celo-contracts/common/Freezer.sol";
+import "@celo-contracts-8/common/test/MockEpochManager.sol";
 
 import { TestBlocker } from "@test-sol/unit/common/Blockable.t.sol";
 
@@ -38,6 +39,7 @@ contract ElectionTest is Utils, TestConstants {
   MockValidators validators;
   MockRandom random;
   IRegistry registry;
+  MockEpochManager epochManager;
 
   address nonOwner = actor("nonOwner");
   address owner = address(this);
@@ -56,6 +58,8 @@ contract ElectionTest is Utils, TestConstants {
   address account8 = actor("account8");
   address account9 = actor("account9");
   address account10 = actor("account10");
+
+  address epochManagerAddress = actor("epochManagerAddress");
 
   address[] accountsArray;
 
@@ -136,12 +140,14 @@ contract ElectionTest is Utils, TestConstants {
     validators = new MockValidators();
     registry = IRegistry(REGISTRY_ADDRESS);
     random = new MockRandom();
+    epochManager = new MockEpochManager();
 
     registry.setAddressFor("Accounts", address(accounts));
     registry.setAddressFor("Freezer", address(freezer));
     registry.setAddressFor("LockedGold", address(lockedGold));
     registry.setAddressFor("Validators", address(validators));
     registry.setAddressFor("Random", address(random));
+    registry.setAddressFor("EpochManager", address(epochManager));
 
     election.initialize(
       REGISTRY_ADDRESS,
@@ -156,7 +162,14 @@ contract ElectionTest is Utils, TestConstants {
   }
 
   function _whenL2() public {
+    uint256 l1EpochNumber = election.getEpochNumber();
+
+    address[] memory _elected = new address[](2);
+    _elected[0] = actor("validator");
+    _elected[1] = actor("otherValidator");
+
     deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+    epochManager.initializeSystem(l1EpochNumber, block.number, _elected);
   }
 }
 
@@ -204,6 +217,7 @@ contract ElectionTest_SetElectabilityThreshold is ElectionTest {
   }
 }
 
+// TODO(soloseng): need to update epochNumber for L2, to make it !=0
 contract ElectionTest_SetElectabilityThreshold_L2 is ElectionTest {
   function test_shouldSetElectabilityThreshold() public {
     _whenL2();
@@ -862,7 +876,7 @@ contract ElectionTest_Vote_WhenGroupEligible_L2 is ElectionTest {
 
   function WhenVotesAreBeingActivated() public returns (address newGroup) {
     newGroup = WhenVotedForMoreThanMaxNumberOfGroups();
-    blockTravel(ph.epochSize() + 1);
+    epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + 1);
     election.activateForAccount(group, voter);
   }
 
@@ -1317,7 +1331,7 @@ contract ElectionTest_Activate_L2 is ElectionTest {
 
   function WhenEpochBoundaryHasPassed() public {
     WhenVoterHasPendingVotes();
-    blockTravel(ph.epochSize() + 1);
+    epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + 1);
     election.activate(group);
   }
 
@@ -1359,7 +1373,7 @@ contract ElectionTest_Activate_L2 is ElectionTest {
 
   function test_ShouldEmitValidatorGroupVoteActivatedEvent_WhenEpochBoundaryHasPassed() public {
     WhenVoterHasPendingVotes();
-    blockTravel(ph.epochSize() + 1);
+    epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + 1);
     vm.expectEmit(true, true, true, false);
     emit ValidatorGroupVoteActivated(voter, group, value, value * 100000000000000000000);
     election.activate(group);
@@ -1370,7 +1384,7 @@ contract ElectionTest_Activate_L2 is ElectionTest {
     lockedGold.incrementNonvotingAccountBalance(voter2, value2);
     vm.prank(voter2);
     election.vote(group, value2, address(0), address(0));
-    blockTravel(ph.epochSize() + 1);
+    epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + 1);
     vm.prank(voter2);
     election.activate(group);
   }
@@ -1628,7 +1642,7 @@ contract ElectionTest_ActivateForAccount_L2 is ElectionTest {
 
   function WhenEpochBoundaryHasPassed() public {
     WhenVoterHasPendingVotes();
-    blockTravel(ph.epochSize() + 1);
+    epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + 1);
     election.activateForAccount(group, voter);
   }
 
@@ -1670,7 +1684,7 @@ contract ElectionTest_ActivateForAccount_L2 is ElectionTest {
 
   function test_ShouldEmitValidatorGroupVoteActivatedEvent_WhenEpochBoundaryHasPassed() public {
     WhenVoterHasPendingVotes();
-    blockTravel(ph.epochSize() + 1);
+    epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + 1);
     vm.expectEmit(true, true, true, false);
     emit ValidatorGroupVoteActivated(voter, group, value, value * 100000000000000000000);
     election.activate(group);
@@ -1681,7 +1695,7 @@ contract ElectionTest_ActivateForAccount_L2 is ElectionTest {
     lockedGold.incrementNonvotingAccountBalance(voter2, value2);
     vm.prank(voter2);
     election.vote(group, value2, address(0), address(0));
-    blockTravel(ph.epochSize() + 1);
+    epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + 1);
     election.activateForAccount(group, voter2);
   }
 

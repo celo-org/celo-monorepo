@@ -420,6 +420,13 @@ contract Election is
     return value;
   }
 
+  /// @notice Sets the address of the blocking contract.
+  /// @param _blockedBy The address of the contract that will determine if this contract is blocked.
+  /// @dev Can only be called by the owner of the contract.
+  function setBlockedByContract(address _blockedBy) external onlyOwner {
+    _setBlockedBy(_blockedBy);
+  }
+
   /**
    * @notice Returns the groups that `account` has voted for.
    * @param account The address of the account casting votes.
@@ -613,6 +620,9 @@ contract Election is
    */
   function hasActivatablePendingVotes(address account, address group) external view returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
+    if (isL2()) {
+      return pendingVote.epoch < getEpochManager().getCurrentEpochNumber() && pendingVote.value > 0;
+    }
     return pendingVote.epoch < getEpochNumber() && pendingVote.value > 0;
   }
 
@@ -952,7 +962,14 @@ contract Election is
 
   function _activate(address group, address account) internal onlyWhenNotBlocked returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
-    require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
+    if (isL2()) {
+      require(
+        pendingVote.epoch < getEpochManager().getCurrentEpochNumber(),
+        "Pending vote epoch not passed"
+      );
+    } else {
+      require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
+    }
     uint256 value = pendingVote.value;
     require(value > 0, "Vote value cannot be zero");
     decrementPendingVotes(group, account, value);
@@ -1100,7 +1117,11 @@ contract Election is
 
     PendingVote storage pendingVote = groupPending.byAccount[account];
     pendingVote.value = pendingVote.value.add(value);
-    pendingVote.epoch = getEpochNumber();
+    if (isL2()) {
+      pendingVote.epoch = getEpochManager().getCurrentEpochNumber();
+    } else {
+      pendingVote.epoch = getEpochNumber();
+    }
   }
 
   /**
