@@ -218,6 +218,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     epochManager.initializeSystem(100, block.number, firstElected);
   }
 
+  // XXX(soloseng): fails because EpochManager is not yet permissioned by stableToken to mint
   function test_SetsCurrentRewardBlock() public {
     _MockL2Migration(validatorsList);
 
