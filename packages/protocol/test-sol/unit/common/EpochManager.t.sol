@@ -92,6 +92,8 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     vm.deal(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
     celoToken.setBalanceOf(address(celoUnreleasedTreasure), L2_INITIAL_STASH_BALANCE);
 
+    celoUnreleasedTreasure.setRegistry(REGISTRY_ADDRESS);
+
     sortedOracles.setMedianRate(address(stableToken), stableAmountForRate);
 
     scoreManager.setValidatorScore(actor("validator1"), 1);
@@ -227,11 +229,7 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     assertEq(afterBalance, 2);
   }
 
-  //XXX(soloseng):This test fails because the mock doesnt actually mint.
-  // if the actual contract is deployed for testing, the function reverts when calling `getCeloUnreleasedTreasure().release()`
-  // after getting the celoToken interface from registry
-
-  function skip_test_ShouldReleaseCorrectAmountToReserve() public {
+  function test_ShouldReleaseCorrectAmountToReserve() public {
     initializeEpochManagerSystem();
     uint256 reserveBalanceBefore = celoToken.balanceOf(reserveAddress);
     epochManager.startNextEpochProcess();
