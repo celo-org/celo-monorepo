@@ -42,7 +42,6 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
 
   IRegistry registry;
   MockCeloToken08 celoToken;
-  // CeloUnreleasedTreasure celoUnreleasedTreasure;
   MockCeloUnreleasedTreasure celoUnreleasedTreasure;
   ScoreManager scoreManager;
 
@@ -58,7 +57,6 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     validators = new ValidatorsMock08();
     stableToken = new MockStableToken08();
     celoToken = new MockCeloToken08();
-    // celoUnreleasedTreasure = new CeloUnreleasedTreasure(true);
     celoUnreleasedTreasure = new MockCeloUnreleasedTreasure();
 
     firstElected.push(actor("validator1"));
@@ -173,9 +171,6 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
   function test_Reverts_WhenEndOfEpochHasNotBeenReached() public {
     vm.prank(epochManagerEnabler);
     epochManager.initializeSystem(firstEpochNumber, firstEpochBlock, firstElected);
-
-    // uint256 _currentEpoch = epochManager.getCurrentEpochNumber();
-    // (, , , uint256 _currentEpochEndTimestamp, ) = epochManager.getCurrentEpoch();
 
     vm.expectRevert("Epoch is not ready to start");
     epochManager.startNextEpochProcess();
