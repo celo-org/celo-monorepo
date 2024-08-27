@@ -66,6 +66,7 @@ export const CoreContracts = [
   'LockedGold',
   'Validators',
   'ReleaseGold',
+  'ScoreManager',
 
   // identity
   'Attestations',
