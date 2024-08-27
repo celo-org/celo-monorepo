@@ -1074,8 +1074,8 @@ contract Validators is
    * @return The group that `account` was a member of at the end of the last epoch.
    */
   function getMembershipInLastEpoch(address account) public view returns (address) {
-    allowOnlyL1();
-    uint256 epochNumber = getEpochNumber();
+    uint256 epochNumber = _getEpochNumber();
+
     MembershipHistory storage history = validators[account].membershipHistory;
     uint256 head = history.numEntries == 0 ? 0 : history.tail.add(history.numEntries.sub(1));
     // If the most recent entry in the membership history is for the current epoch number, we need
@@ -1407,7 +1407,13 @@ contract Validators is
    */
   function updateMembershipHistory(address account, address group) private returns (bool) {
     MembershipHistory storage history = validators[account].membershipHistory;
-    uint256 epochNumber = getEpochNumber();
+    uint256 epochNumber;
+    if (isL2()) {
+      epochNumber = getEpochManager().getCurrentEpochNumber();
+    } else {
+      epochNumber = getEpochNumber();
+    }
+
     uint256 head = history.numEntries == 0 ? 0 : history.tail.add(history.numEntries.sub(1));
 
     if (history.numEntries > 0 && group == address(0)) {
@@ -1476,5 +1482,17 @@ contract Validators is
     validator.affiliation = address(0);
     emit ValidatorDeaffiliated(validatorAccount, affiliation);
     return true;
+  }
+
+  /**
+   * @notice Returns the epoch number.
+   * @return Current epoch number.
+   */
+  function _getEpochNumber() private view returns (uint256) {
+    if (isL2()) {
+      return getEpochManager().getCurrentEpochNumber();
+    } else {
+      return getEpochNumber();
+    }
   }
 }
