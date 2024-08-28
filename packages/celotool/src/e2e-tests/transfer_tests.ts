@@ -1,8 +1,8 @@
+import { StrongAddress } from '@celo/base'
 import { CeloTxPending, CeloTxReceipt, TransactionResult } from '@celo/connect'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { CeloTokenType, EachCeloToken, StableToken, Token } from '@celo/contractkit/lib/celo-tokens'
 import { eqAddress, toChecksumAddress } from '@celo/utils/lib/address'
-import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
@@ -12,67 +12,6 @@ import { getHooks, initAndSyncGethWithRetry, killInstance, sleep } from './utils
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
-
-/**
- * Helper Class to change StableToken Inflation in tests
- */
-class InflationManager {
-  private kit: ContractKit
-  private readonly minUpdateDelay = 10
-
-  constructor(
-    readonly validatorUri: string,
-    readonly validatorAddress: string,
-    readonly token: StableToken
-  ) {
-    this.kit = newKitFromWeb3(new Web3(validatorUri))
-    this.kit.connection.defaultAccount = validatorAddress
-  }
-
-  now = async (): Promise<number> => {
-    return Number((await this.kit.connection.getBlock('pending')).timestamp)
-  }
-
-  getNextUpdateRate = async (): Promise<number> => {
-    const stableToken = await this.getStableToken()
-    // Compute necessary `updateRate` so inflationFactor adjusment takes place on next operation
-    const { factorLastUpdated } = await stableToken.getInflationParameters()
-
-    // Wait until the minimum update delay has passed so we can set a rate that gives us some
-    // buffer time to make the transaction in the next availiable update window.
-    let timeSinceLastUpdated = (await this.now()) - factorLastUpdated.toNumber()
-    while (timeSinceLastUpdated < this.minUpdateDelay) {
-      await sleep(this.minUpdateDelay - timeSinceLastUpdated)
-      timeSinceLastUpdated = (await this.now()) - factorLastUpdated.toNumber()
-    }
-
-    return timeSinceLastUpdated
-  }
-
-  getParameters = async () => {
-    const stableToken = await this.getStableToken()
-    return stableToken.getInflationParameters()
-  }
-
-  setInflationRateForNextTransfer = async (rate: BigNumber) => {
-    // Possibly update the inflation factor and ensure it won't update again.
-    await this.setInflationParameters(new BigNumber(1), Number.MAX_SAFE_INTEGER)
-
-    const updateRate = await this.getNextUpdateRate()
-    await this.setInflationParameters(rate, updateRate)
-  }
-
-  setInflationParameters = async (rate: BigNumber, updatePeriod: number) => {
-    const stableToken = await this.getStableToken()
-    await stableToken
-      .setInflationParameters(toFixed(rate).toFixed(), updatePeriod.toFixed())
-      .sendAndWaitForReceipt({ from: this.validatorAddress })
-  }
-
-  getStableToken = async () => {
-    return this.kit.celoTokens.getWrapper(this.token)
-  }
-}
 
 const setIntrinsicGas = async (validatorUri: string, validatorAddress: string, gasCost: number) => {
   const kit = newKitFromWeb3(new Web3(validatorUri))
@@ -205,7 +144,7 @@ describe('Transfer tests', function (this: any) {
   // Arbitrary addresses.
   const txFeeRecipientAddress = '0x5555555555555555555555555555555555555555'
   const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
-  const gatewayFeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
+  const someOtherAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
 
   const syncModes = ['full', 'fast', 'light', 'lightest']
   const gethConfig: GethRunConfig = {
@@ -250,13 +189,12 @@ describe('Transfer tests', function (this: any) {
     validating: false,
     syncmode: 'full',
     lightserv: true,
-    gatewayFee: new BigNumber(10000),
     port: 30305,
     rpcport: 8547,
     // We need to set an etherbase here so that the full node will accept transactions from
     // light clients.
-    minerValidator: gatewayFeeRecipientAddress,
-    txFeeRecipient: gatewayFeeRecipientAddress,
+    minerValidator: someOtherAddress,
+    txFeeRecipient: someOtherAddress,
   }
 
   const restartWithCleanNodes = async () => {
@@ -311,8 +249,6 @@ describe('Transfer tests', function (this: any) {
       port: 30307,
       rpcport: 8549,
       lightserv: !light,
-      // TODO(nategraf): Remove this when light clients can query for gateway fee.
-      gatewayFee: light ? new BigNumber(10000) : undefined,
       privateKey: DEF_FROM_PK,
     }
 
@@ -346,9 +282,7 @@ describe('Transfer tests', function (this: any) {
     txOptions: {
       gas?: number
       gasPrice?: string
-      feeCurrency?: string
-      gatewayFeeRecipient?: string
-      gatewayFee?: string
+      feeCurrency?: StrongAddress
     } = {}
   ) => {
     const res = await kit.connection.sendTransaction({
@@ -367,9 +301,7 @@ describe('Transfer tests', function (this: any) {
     txOptions: {
       gas?: number
       gasPrice?: string
-      feeCurrency?: string
-      gatewayFeeRecipient?: string
-      gatewayFee?: string
+      feeCurrency?: StrongAddress
     } = {}
   ) => {
     const kitStableToken = await kit.contracts.getStableToken()
@@ -394,7 +326,6 @@ describe('Transfer tests', function (this: any) {
     total: BigNumber
     tip: BigNumber
     base: BigNumber
-    gateway: BigNumber
   }
 
   interface GasUsage {
@@ -465,17 +396,11 @@ describe('Transfer tests', function (this: any) {
     const txFee = new BigNumber(gasVal).times(tx.gasPrice)
     const txFeeBase = new BigNumber(gasVal).times(minGasPrice)
     const txFeeTip = txFee.minus(txFeeBase)
-    const gatewayFee = new BigNumber(tx.gatewayFee || 0)
-    assert.equal(
-      tx.gatewayFeeRecipient === null || tx.gatewayFeeRecipient === undefined,
-      gatewayFee.eq(0)
-    )
 
     const fees: Fees = {
-      total: txFee.plus(gatewayFee),
+      total: txFee,
       base: txFeeBase,
       tip: txFeeTip,
-      gateway: gatewayFee,
     }
     const gas: GasUsage = {
       used: receipt && receipt.gasUsed,
@@ -528,8 +453,6 @@ describe('Transfer tests', function (this: any) {
     expectSuccess?: boolean
     txOptions?: {
       gas?: number
-      gatewayFeeRecipient?: string
-      gatewayFee?: string
     }
     fromAddress?: string
     toAddress?: string
@@ -562,8 +485,6 @@ describe('Transfer tests', function (this: any) {
     expectSuccess?: boolean
     txOptions?: {
       gas?: number
-      gatewayFeeRecipient?: string
-      gatewayFee?: string
     }
     fromAddress?: string
     toAddress?: string
@@ -578,7 +499,7 @@ describe('Transfer tests', function (this: any) {
         fromAddress,
         toAddress,
         txFeeRecipientAddress,
-        gatewayFeeRecipientAddress,
+        someOtherAddress,
         governanceAddress,
       ]
       balances = await newBalanceWatcher(kit, accounts)
@@ -648,9 +569,6 @@ describe('Transfer tests', function (this: any) {
       }
     }
 
-    it(`should increment the gateway fee recipient's ${feeToken} balance by the gateway fee`, () =>
-      assertEqualBN(balances.delta(gatewayFeeRecipientAddress, feeToken), txRes.fees.gateway))
-
     it(`should increment the infrastructure fund's ${feeToken} balance by the base portion of the gas fee`, () =>
       assertEqualBN(balances.delta(governanceAddress, feeToken), txRes.fees.base))
 
@@ -667,73 +585,11 @@ describe('Transfer tests', function (this: any) {
 
         describe('Transfer CeloGold >', () => {
           describe('with feeCurrency = CeloGold >', () => {
-            if (syncMode === 'light' || syncMode === 'lightest') {
-              describe('when running in light/lightest sync mode', () => {
-                const recipient = (choice: string) => {
-                  switch (choice) {
-                    case 'peer':
-                      return gatewayFeeRecipientAddress
-                    case 'random':
-                      return Web3.utils.randomHex(20)
-                    default:
-                      // unset
-                      return undefined
-                  }
-                }
-                const feeValue = (choice: string) => {
-                  switch (choice) {
-                    case 'sufficient':
-                      return '0x10000'
-                    case 'insufficient':
-                      return '0x1'
-                    default:
-                      // unset
-                      return undefined
-                  }
-                }
-                for (const recipientChoice of ['peer', 'random', 'unset']) {
-                  describe(`when the gateway fee recipient is ${recipientChoice}`, () => {
-                    for (const feeValueChoice of ['sufficient', 'insufficient', 'unset']) {
-                      describe(`when the gateway fee value is ${feeValueChoice}`, () => {
-                        const txOptions = {
-                          gatewayFeeRecipient: recipient(recipientChoice),
-                          gatewayFee: feeValue(feeValueChoice),
-                        }
-                        if (recipientChoice === 'random' || feeValueChoice === 'insufficient') {
-                          it('should get rejected by the sending node before being added to the tx pool', async () => {
-                            try {
-                              const res = await transferCeloGold(
-                                FromAddress,
-                                ToAddress,
-                                TransferAmount,
-                                txOptions
-                              )
-                              await res.waitReceipt()
-                              assert.fail('no error was thrown')
-                            } catch (error: any) {
-                              assert.include(error.toString(), `Error: no suitable peers available`)
-                            }
-                          })
-                        } else {
-                          testTransferToken({
-                            expectedGas: INTRINSIC_TX_GAS_COST,
-                            transferToken: Token.CELO,
-                            feeToken: Token.CELO,
-                            txOptions,
-                          })
-                        }
-                      })
-                    }
-                  })
-                }
-              })
-            } else {
-              testTransferToken({
-                expectedGas: INTRINSIC_TX_GAS_COST,
-                transferToken: Token.CELO,
-                feeToken: Token.CELO,
-              })
-            }
+            testTransferToken({
+              expectedGas: INTRINSIC_TX_GAS_COST,
+              transferToken: Token.CELO,
+              feeToken: Token.CELO,
+            })
           })
 
           describe('feeCurrency = CeloDollars >', () => {
@@ -845,94 +701,6 @@ describe('Transfer tests', function (this: any) {
                 savingGasStableTokenTransferPaidWithSameStable,
               transferToken: StableToken.cUSD,
               feeToken: StableToken.cUSD,
-            })
-          })
-        })
-      })
-    }
-  })
-
-  describe('Transfer with Demurrage >', () => {
-    for (const syncMode of syncModes) {
-      describe(`${syncMode} Node >`, () => {
-        let inflationManager: InflationManager
-        before(`start geth on sync: ${syncMode}`, async () => {
-          await restartWithCleanNodes()
-          inflationManager = new InflationManager(
-            'http://localhost:8545',
-            validatorAddress,
-            StableToken.cUSD
-          )
-          await startSyncNode(syncMode)
-        })
-
-        describe('when there is demurrage of 50% applied', () => {
-          describe('when setting a gas amount greater than the amount of gas necessary', () => {
-            let balances: BalanceWatcher
-            let expectedFees: Fees
-            let txRes: TestTxResults
-
-            before(async () => {
-              balances = await newBalanceWatcher(kit, [
-                FromAddress,
-                ToAddress,
-                gatewayFeeRecipientAddress,
-                governanceAddress,
-              ])
-
-              await inflationManager.setInflationRateForNextTransfer(new BigNumber(2))
-              const feeCurrency = await kit.celoTokens.getFeeCurrencyAddress(StableToken.cUSD)
-              txRes = await runTestTransaction(
-                await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
-                  feeCurrency,
-                }),
-                INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
-                feeCurrency
-              )
-
-              await balances.update()
-              expectedFees = txRes.fees
-            })
-
-            it('should succeed', () => assert.isTrue(txRes.ok))
-
-            it('should use the expected amount of gas', () =>
-              assert.equal(txRes.gas.used, txRes.gas.expected))
-
-            it("should decrement the sender's Celo Gold balance by the transfer amount", () => {
-              assertEqualBN(balances.delta(FromAddress, Token.CELO).negated(), TransferAmount)
-            })
-
-            it("should increment the receiver's Celo Gold balance by the transfer amount", () => {
-              assertEqualBN(balances.delta(ToAddress, Token.CELO), TransferAmount)
-            })
-
-            it("should halve the sender's Celo Dollar balance due to demurrage and decrement it by the total fees", () => {
-              assertEqualBN(
-                balances
-                  .initial(FromAddress, StableToken.cUSD)
-                  .idiv(2)
-                  .minus(balances.current(FromAddress, StableToken.cUSD)),
-                expectedFees.total
-              )
-            })
-
-            it("should halve the gateway fee recipient's Celo Dollar balance then increase it by the gateway fee", () => {
-              assertEqualBN(
-                balances
-                  .current(gatewayFeeRecipientAddress, StableToken.cUSD)
-                  .minus(balances.initial(gatewayFeeRecipientAddress, StableToken.cUSD).idiv(2)),
-                expectedFees.gateway
-              )
-            })
-
-            it("should halve the infrastructure fund's Celo Dollar balance then increment it by the base portion of the gas fees", () => {
-              assertEqualBN(
-                balances
-                  .current(governanceAddress, StableToken.cUSD)
-                  .minus(balances.initial(governanceAddress, StableToken.cUSD).idiv(2)),
-                expectedFees.base
-              )
             })
           })
         })

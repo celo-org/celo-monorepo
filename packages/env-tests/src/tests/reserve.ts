@@ -36,7 +36,7 @@ export function runReserveTest(context: EnvTestContext) {
       expect(custodians).toContain(custodian.address)
 
       const spenderMultiSig = await context.kit.contracts.getMultiSig(spenderMultiSigAddress)
-      const isOwner = await spenderMultiSig.isowner(spender.address)
+      const isOwner = await spenderMultiSig.isOwner(spender.address)
       expect(isOwner).toBeTruthy()
 
       const reserveValue = await reserve.getReserveGoldBalance()

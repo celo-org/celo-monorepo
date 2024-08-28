@@ -1,5 +1,6 @@
+/* eslint-disable import/no-extraneous-dependencies */
+import { StrongAddress } from '@celo/base'
 import { CeloContract } from '@celo/contractkit'
-// eslint-disable-next-line  import/no-extraneous-dependencies
 import { describe, expect, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
 import { EnvTestContext } from '../context'
@@ -16,7 +17,7 @@ export function runOracleTest(context: EnvTestContext) {
     test('report a rate', async () => {
       const from = await getKey(context.mnemonic, TestAccounts.Oracle)
       context.kit.connection.addAccount(from.privateKey)
-      context.kit.defaultAccount = from.address
+      context.kit.defaultAccount = from.address as StrongAddress
       const stableToken = await context.kit.contracts.getStableToken()
       context.kit.defaultFeeCurrency = stableToken.address
 

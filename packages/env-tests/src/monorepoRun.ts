@@ -17,6 +17,8 @@ function runTests() {
   if (!process.env.MNEMONIC) {
     throw new Error('No MNEMONIC was set, envName was parsed as ' + envName)
   }
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
   const kit = newKitFromWeb3(new Web3(process.env.CELO_PROVIDER || 'http://localhost:8545'))
   const mnemonic: string = process.env.MNEMONIC
   const reserveSpenderMultiSigAddress = process.env.RESERVE_SPENDER_MULTISIG_ADDRESS

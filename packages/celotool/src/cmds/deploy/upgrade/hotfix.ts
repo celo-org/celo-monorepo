@@ -1,6 +1,7 @@
 // This is a more unusual Celotool command. It basically helps you to execute Hotfixes on testnets. Because constructing proposals is difficult to do via a CLI, you should define them here in code. There are two examples below that you can start from.
 
 import { newKitFromWeb3 } from '@celo/contractkit'
+import { L1HotfixRecord } from '@celo/contractkit/lib/wrappers/Governance'
 import { hotfixToHash, ProposalBuilder, proposalToJSON } from '@celo/governance'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
@@ -121,7 +122,9 @@ export const handler = async (argv: EthstatsArgv) => {
     hotfixRecord = await governance.getHotfixRecord(proposalHash)
     console.info('\nHotfix Record: ', hotfixRecord)
 
-    if (hotfixRecord.preparedEpoch.toNumber() === 0) {
+    // if this is actually used we need to handle the L2 case but that is out of scope for just upgrading ck
+
+    if ((hotfixRecord as L1HotfixRecord).preparedEpoch?.toNumber() === 0) {
       console.error('Hotfix could not be prepared')
       throw new Error()
     }

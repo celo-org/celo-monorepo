@@ -14,12 +14,12 @@ import { dataLogger, logger, operationalLogger } from './logger'
 
 const CONCURRENCY = 10
 
-const PGUSER = process.env['PGUSER'] || 'postgres'
-const PGPASSWORD = process.env['PGPASSWORD'] || ''
-const PGHOST = process.env['PGHOST'] || '127.0.0.1'
-const PGPORT = process.env['PGPORT'] || '5432'
-const PGDATABASE = process.env['PGDATABASE'] || 'blockscout'
-const PROVIDER_URL = process.env['PROVIDER_URL'] || 'http://localhost:8545'
+const PGUSER = process.env.PGUSER || 'postgres'
+const PGPASSWORD = process.env.PGPASSWORD || ''
+const PGHOST = process.env.PGHOST || '127.0.0.1'
+const PGPORT = process.env.PGPORT || '5432'
+const PGDATABASE = process.env.PGDATABASE || 'blockscout'
+const PROVIDER_URL = process.env.PROVIDER_URL || 'http://localhost:8545'
 
 const client = new Client({
   user: PGUSER,
@@ -28,11 +28,13 @@ const client = new Client({
   port: Number(PGPORT),
   database: PGDATABASE,
 })
-
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
 const kit = newKitFromWeb3(new Web3(PROVIDER_URL))
 
 async function jsonQuery(query: string) {
-  let res = await client.query(`SELECT json_agg(t) FROM (${query}) t`)
+  const res = await client.query(`SELECT json_agg(t) FROM (${query}) t`)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return res.rows[0].json_agg
 }
 
@@ -40,7 +42,7 @@ async function createVerificationClaims(
   address: string,
   domain: string,
   verified: boolean,
-  accounts: Array<Address>
+  accounts: Address[]
 ) {
   await addDatabaseVerificationClaims(address, domain, verified)
   await concurrentMap(CONCURRENCY, accounts, (account) =>
@@ -84,20 +86,20 @@ async function getVerifiedAccounts(metadata: IdentityMetadataWrapper, address: A
 async function getVerifiedDomains(
   metadata: IdentityMetadataWrapper,
   address: Address,
-  logger: Logger
+  loggerParam: Logger
 ) {
   const unverifiedDomains = metadata.filterClaims(ClaimTypes.DOMAIN)
 
   const domainVerification = await concurrentMap(CONCURRENCY, unverifiedDomains, async (claim) => {
     try {
       const verificationStatus = await verifyDomainRecord(kit, claim, address)
-      logger.debug({ claim, verificationStatus }, `verified_domain`)
+      loggerParam.debug({ claim, verificationStatus }, `verified_domain`)
       return {
         claim,
         verified: verificationStatus === undefined,
       }
     } catch (err) {
-      logger.error({ err, claim })
+      loggerParam.error({ err, claim })
       return {
         claim,
         verified: false,

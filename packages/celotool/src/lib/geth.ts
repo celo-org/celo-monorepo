@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { StrongAddress } from '@celo/base'
 import { CeloTxReceipt, TransactionResult } from '@celo/connect'
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
@@ -452,9 +453,7 @@ export const transferCalldata = async (
     chainId?: number
     gas?: number
     gasPrice?: string
-    feeCurrency?: string
-    gatewayFeeRecipient?: string
-    gatewayFee?: string
+    feeCurrency?: StrongAddress
     nonce?: number
   } = {}
 ) => {
@@ -466,8 +465,6 @@ export const transferCalldata = async (
     data: dataStr,
     gas: txOptions.gas,
     gasPrice: txOptions.gasPrice,
-    gatewayFeeRecipient: txOptions.gatewayFeeRecipient,
-    gatewayFee: txOptions.gatewayFee,
     nonce: txOptions.nonce,
   })
 }
@@ -484,8 +481,6 @@ export const transferOrdinals = async (
     gas?: number
     gasPrice?: string
     feeCurrency?: string
-    gatewayFeeRecipient?: string
-    gatewayFee?: string
     nonce?: number
   } = {}
 ) => {
@@ -514,9 +509,7 @@ export const transferCeloGold = async (
     chainId?: number
     gas?: number
     gasPrice?: string
-    feeCurrency?: string
-    gatewayFeeRecipient?: string
-    gatewayFee?: string
+    feeCurrency?: StrongAddress
     nonce?: number
   } = {}
 ) => {
@@ -527,8 +520,6 @@ export const transferCeloGold = async (
     gas: txOptions.gas,
     gasPrice: txOptions.gasPrice,
     feeCurrency: txOptions.feeCurrency || undefined,
-    gatewayFeeRecipient: txOptions.gatewayFeeRecipient,
-    gatewayFee: txOptions.gatewayFee,
     nonce: txOptions.nonce,
   })
 }
@@ -543,9 +534,7 @@ export const transferCeloDollars = async (
     chainId?: number
     gas?: number
     gasPrice?: string
-    feeCurrency?: string
-    gatewayFeeRecipient?: string
-    gatewayFee?: string
+    feeCurrency?: StrongAddress
     nonce?: number
   } = {}
 ) => {
@@ -556,8 +545,6 @@ export const transferCeloDollars = async (
     gas: txOptions.gas,
     gasPrice: txOptions.gasPrice,
     feeCurrency: txOptions.feeCurrency || undefined,
-    gatewayFeeRecipient: txOptions.gatewayFeeRecipient,
-    gatewayFee: txOptions.gatewayFee,
     nonce: txOptions.nonce,
   })
 }
@@ -1238,7 +1225,6 @@ export async function startGeth(
     isProxied,
     proxyport,
     ethstats,
-    gatewayFee,
   } = instance
 
   const privateKey = instance.privateKey || ''
@@ -1307,10 +1293,6 @@ export async function startGeth(
     instance.args.push(`--nodekeyhex=${instance.nodekey}`)
   } else if (!validating || !replica) {
     instance.args.push(`--nodekeyhex=${privateKey}`)
-  }
-
-  if (gatewayFee) {
-    instance.args.push(`--light.gatewayfee=${gatewayFee.toString()}`)
   }
 
   if (validating) {
