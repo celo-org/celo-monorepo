@@ -3,8 +3,6 @@ pragma solidity >=0.8.7 <0.8.20;
 
 import "../../../contracts-0.8/common/IsL2Check.sol";
 
-
-
 /**
  * @title Holds a list of addresses of validators
  */
