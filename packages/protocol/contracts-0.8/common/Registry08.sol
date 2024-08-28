@@ -11,7 +11,7 @@ import "../../contracts/common/Initializable.sol";
 /**
  * @title Routes identifiers to addresses.
  */
-contract Registry is IRegistry, IRegistryInitializer, Ownable, Initializable {
+contract Registry08 is IRegistry, IRegistryInitializer, Ownable, Initializable {
   using SafeMath for uint256;
 
   mapping(bytes32 => address) public registry;

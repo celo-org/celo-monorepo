@@ -244,7 +244,7 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     vm.prank(address(0));
     celoToken.mint(unreleasedTreasury, L2_INITIAL_STASH_BALANCE);
 
-    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
+    deployCodeTo("Registry08.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
 
     vm.prank(address(epochManagerEnabler));
 

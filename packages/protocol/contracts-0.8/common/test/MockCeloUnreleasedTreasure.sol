@@ -5,7 +5,7 @@ import "../../../contracts/common/interfaces/ICeloUnreleasedTreasure.sol";
 import "../UsingRegistry.sol";
 
 /**
- * @title A mock CeloDistributionSchedule for testing.
+ * @title A mock CeloUnreleasedTreasure for testing.
  */
 contract MockCeloUnreleasedTreasure is ICeloUnreleasedTreasure, UsingRegistry {
   function release(address to, uint256 amount) external {
