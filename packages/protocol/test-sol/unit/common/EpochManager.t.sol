@@ -34,6 +34,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
   address communityRewardFund;
   address reserveAddress;
   address scoreManagerAddress;
+  address nonOwner;
 
   uint256 firstEpochNumber = 100;
   uint256 firstEpochBlock = 100;
@@ -69,6 +70,7 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     epochManagerEnabler = actor("epochManagerEnabler");
     carbonOffsettingPartner = actor("carbonOffsettingPartner");
     communityRewardFund = actor("communityRewardFund");
+    nonOwner = actor("nonOwner");
 
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
@@ -235,5 +237,21 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
     epochManager.startNextEpochProcess();
     uint256 reserveBalanceAfter = celoToken.balanceOf(reserveAddress);
     assertEq(reserveBalanceAfter, reserveBalanceBefore + 4);
+  }
+}
+
+
+contract EpochManagerTest_setEpochMangerEnabler is EpochManagerTest {
+  function test_setEpochMangerEnabler() public {
+    vm.prank(epochManager.owner());
+    address newEpochManagerEnabler = actor("newEpochManagerEnabler"); 
+    epochManager.setEpochMangerEnabler(newEpochManagerEnabler);
+    assertEq(epochManager.epochManagerEnabler(), newEpochManagerEnabler);
+  }
+
+  function test_Reverts_WhenNotCalledByEpochManagerEnabler() public {
+    vm.expectRevert("Ownable: caller is not the owner");
+    vm.prank(nonOwner);
+    epochManager.setEpochMangerEnabler(actor("newEpochManagerEnabler"));
   }
 }
