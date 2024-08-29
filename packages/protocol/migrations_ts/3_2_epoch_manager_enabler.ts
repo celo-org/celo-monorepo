@@ -5,9 +5,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { EpochManagerEnablerInstance } from 'types/08'
 
 const initializeArgs = async (): Promise<any[]> => {
-  return [
-    config.registry.predeployedProxyAddress,
-  ]
+  return [config.registry.predeployedProxyAddress]
 }
 
 module.exports = deploymentForCoreContract<EpochManagerEnablerInstance>(

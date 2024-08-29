@@ -48,7 +48,15 @@ export const SOLIDITY_08_PACKAGE = {
   proxiesPath: '/', // Proxies are still with 0.5 contracts
   // Proxies shouldn't have to be added to a list manually
   // https://github.com/celo-org/celo-monorepo/issues/10555
-  contracts: ['GasPriceMinimum', 'FeeCurrencyDirectory', 'CeloUnreleasedTreasure', 'Validators', 'EpochManager', 'EpochManagerEnabler', 'ScoreManager'],
+  contracts: [
+    'GasPriceMinimum',
+    'FeeCurrencyDirectory',
+    'CeloUnreleasedTreasure',
+    'Validators',
+    'EpochManager',
+    'EpochManagerEnabler',
+    'ScoreManager',
+  ],
   proxyContracts: [
     'GasPriceMinimumProxy',
     'FeeCurrencyDirectoryProxy',

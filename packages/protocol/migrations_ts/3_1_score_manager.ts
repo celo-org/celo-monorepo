@@ -4,8 +4,7 @@ import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
 import { ScoreManagerInstance } from 'types/08'
 
 const initializeArgs = async (): Promise<any[]> => {
-  return [
-  ]
+  return []
 }
 
 module.exports = deploymentForCoreContract<ScoreManagerInstance>(

@@ -37,6 +37,7 @@ fs_permissions = [
     ]
 
 [profile.devchain] # Special profile for the tests that require an anvil devchain
+test = 'test-sol/devchain'
 match_path = "**/test-sol/devchain/**"
 no_match_path = "{**/test/BLS12Passthrough.sol,**/test/RandomTest.sol}"
 

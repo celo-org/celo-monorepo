@@ -14,7 +14,7 @@ const initializeArgs = async (): Promise<any[]> => {
     config.registry.predeployedProxyAddress,
     config.epochManager.newEpochDuration,
     config.epochManager.carbonOffsettingPartner,
-    epochManagerInitializer.address
+    epochManagerInitializer.address,
   ]
 }
 

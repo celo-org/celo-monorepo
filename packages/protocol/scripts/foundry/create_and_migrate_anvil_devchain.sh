@@ -29,8 +29,8 @@ echo "Library flags are: $LIBRARY_FLAGS"
 # Build all contracts with deployed libraries
 # Including contracts that depend on libraries. This step replaces the library placeholder
 # in the bytecode with the address of the actually deployed library.
-echo "Compiling with libraries... "
-time forge build $LIBRARY_FLAGS
+echo "Compiling with libraries..."
+time FOUNDRY_PROFILE=devchain forge build $LIBRARY_FLAGS
 
 # Deploy precompile contracts
 source $PWD/scripts/foundry/deploy_precompiles.sh
