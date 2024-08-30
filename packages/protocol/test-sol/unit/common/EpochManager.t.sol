@@ -50,7 +50,9 @@ contract EpochManagerTest is Test, TestConstants, Utils08 {
     address indexed validator,
     uint256 validatorPayment,
     address indexed group,
-    uint256 groupPayment
+    uint256 groupPayment,
+    address indexed beneficiary,
+    uint256 delegatedPayment
   );
 
   function setUp() public virtual {
@@ -264,7 +266,14 @@ contract EpochManagerTest_sendValidatorPayment is EpochManagerTest {
     accounts.setPaymentDelegationFor(validator1, beneficiary, fiftyPercent);
 
     vm.expectEmit(true, true, true, true, address(epochManager));
-    emit ValidatorEpochPaymentDistributed(validator1, quarterOfPayment, group, halfOfPayment);
+    emit ValidatorEpochPaymentDistributed(
+      validator1,
+      quarterOfPayment,
+      group,
+      halfOfPayment,
+      beneficiary,
+      quarterOfPayment
+    );
     epochManager.sendValidatorPayment(validator1);
   }
 

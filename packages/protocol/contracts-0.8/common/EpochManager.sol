@@ -87,7 +87,9 @@ contract EpochManager is
     address indexed validator,
     uint256 validatorPayment,
     address indexed group,
-    uint256 groupPayment
+    uint256 groupPayment,
+    address indexed beneficiary,
+    uint256 delegatedPayment
   );
 
   modifier onlyEpochManagerInitializer() {
@@ -372,6 +374,13 @@ contract EpochManager is
       require(stableToken.transfer(beneficiary, delegatedPayment), "transfer failed to delegatee");
     }
 
-    emit ValidatorEpochPaymentDistributed(validator, validatorPayment, group, groupPayment);
+    emit ValidatorEpochPaymentDistributed(
+      validator,
+      validatorPayment,
+      group,
+      groupPayment,
+      beneficiary,
+      delegatedPayment
+    );
   }
 }
