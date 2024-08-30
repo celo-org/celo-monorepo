@@ -366,10 +366,14 @@ contract EpochManager is
 
     IStableToken stableToken = IStableToken(getStableToken());
 
-    require(stableToken.transfer(validator, validatorPayment), "transfer failed to validator");
+    if (validatorPayment > 0) {
+      require(stableToken.transfer(validator, validatorPayment), "transfer failed to validator");
+    }
+
     if (groupPayment > 0) {
       require(stableToken.transfer(group, groupPayment), "transfer failed to validator group");
     }
+
     if (delegatedPayment > 0) {
       require(stableToken.transfer(beneficiary, delegatedPayment), "transfer failed to delegatee");
     }
