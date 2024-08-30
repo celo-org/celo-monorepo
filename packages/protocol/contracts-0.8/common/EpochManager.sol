@@ -364,12 +364,12 @@ contract EpochManager is
 
     IStableToken stableToken = IStableToken(getStableToken());
 
-    require(stableToken.transfer(validator, validatorPayment), "mint failed to validator");
+    require(stableToken.transfer(validator, validatorPayment), "transfer failed to validator");
     if (groupPayment > 0) {
-      require(stableToken.transfer(group, groupPayment), "mint failed to validator group");
+      require(stableToken.transfer(group, groupPayment), "transfer failed to validator group");
     }
     if (delegatedPayment > 0) {
-      require(stableToken.transfer(beneficiary, delegatedPayment), "mint failed to delegatee");
+      require(stableToken.transfer(beneficiary, delegatedPayment), "transfer failed to delegatee");
     }
 
     emit ValidatorEpochPaymentDistributed(validator, validatorPayment, group, groupPayment);
