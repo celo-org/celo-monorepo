@@ -62,7 +62,10 @@ forge script \
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
-echo "Total elapsed time: $ELAPSED_TIME seconds"
+echo "Migration script total elapsed time: $ELAPSED_TIME seconds"
+
+# this helps to make sure that devchain state is actually being saved
+sleep 1
 
 # Rename devchain artifact and remove unused directory
 mv $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME

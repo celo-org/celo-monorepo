@@ -106,6 +106,8 @@ contract ValidatorsMock08 is IValidators {
   function setSlashingMultiplierResetPeriod(uint256 value) external {}
   function setDowntimeGracePeriod(uint256 value) external {}
 
+  function mintStableToken(address beneficiary, uint256 amount) external {}
+
   // only registered contract
   function updateEcdsaPublicKey(
     address account,

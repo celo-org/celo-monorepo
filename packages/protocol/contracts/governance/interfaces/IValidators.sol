@@ -50,6 +50,9 @@ interface IValidators {
   function forceDeaffiliateIfValidator(address) external;
   function halveSlashingMultiplier(address) external;
 
+  // only EpochManager
+  function mintStableToken(address beneficiary, uint256 amount) external;
+
   // view functions
   function maxGroupSize() external view returns (uint256);
   function downtimeGracePeriod() external view returns (uint256);

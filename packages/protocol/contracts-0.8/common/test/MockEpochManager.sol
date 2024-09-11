@@ -67,4 +67,11 @@ contract MockEpochManager is IEpochManager {
   function getElected() external view returns (address[] memory) {
     return elected;
   }
+
+  function getEpochProcessingState()
+    external
+    view
+    returns (uint256, uint256, uint256, uint256, uint256) {
+    return (0, 0, 0, 0, 0);
+    }
 }

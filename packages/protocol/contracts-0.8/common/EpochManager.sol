@@ -225,7 +225,7 @@ contract EpochManager is
       epochProcessing.totalRewardsCarbonFund
     );
     // run elections
-    elected = getElection().electNValidatorSigners(10, 20);
+    elected = getElection().electValidatorSigners();
     // TODO check how to nullify stuct
     epochProcessing.status = EpochProcessStatus.NotStarted;
   }
@@ -326,7 +326,7 @@ contract EpochManager is
       totalRewards += validatorReward;
     }
     // Mint all cUSD required for payment and the corresponding CELO
-    IStableToken(getStableToken()).mint(address(this), totalRewards);
+    getValidators().mintStableToken(address(this), totalRewards);
     // this should have a setter for the oracle.
 
     (uint256 numerator, uint256 denominator) = IOracle(address(getSortedOracles())).getExchangeRate(

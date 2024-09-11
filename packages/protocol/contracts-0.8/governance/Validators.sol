@@ -166,6 +166,11 @@ contract Validators is
     _;
   }
 
+  modifier onlyEpochManager() {
+    require(msg.sender == address(getEpochManager()), "Only epoch manager can call");
+    _;
+  }
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -209,6 +214,17 @@ contract Validators is
     setMembershipHistoryLength(_membershipHistoryLength);
     setSlashingMultiplierResetPeriod(_slashingMultiplierResetPeriod);
     setDowntimeGracePeriod(initParams.downtimeGracePeriod);
+  }
+
+   /**
+   * @notice Mints stable token to the beneficiary.
+   * @dev Callable only by epoch manager.
+   * @param beneficiary The address to mint the stable token to.
+   * @param amount The amount of stable token to mint.
+   */
+  function mintStableToken(address beneficiary, uint256 amount) external onlyEpochManager {
+    IStableToken stableToken = IStableToken(getStableToken());
+    stableToken.mint(beneficiary, amount);
   }
 
   /**
