@@ -311,6 +311,7 @@ contract EpochManager is
     IValidators validators = getValidators();
 
     for (uint i = 0; i < elected.length; i++) {
+      console2.log("### index:", i);
       uint256 validatorScore = scoreReader.getValidatorScore(elected[i]);
       uint256 validatorReward = validators.computeEpochReward(
         elected[i],
@@ -321,7 +322,8 @@ contract EpochManager is
       totalRewards += validatorReward;
     }
     // Mint all cUSD required for payment and the corresponding CELO
-    IStableToken(getStableToken()).mint(address(this), totalRewards);
+    // TODO(soloseng): add test to check that epoch manager received funds.
+    validators.mintStableToEpochManager(totalRewards);
     // this should have a setter for the oracle.
 
     (uint256 numerator, uint256 denominator) = IOracle(address(getSortedOracles())).getExchangeRate(

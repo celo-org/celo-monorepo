@@ -647,6 +647,20 @@ contract Validators is
     group.slashInfo.lastSlashed = block.timestamp;
   }
 
+  // TODO(soloseng): add test to check that this function can only mint to epoch manager.
+  function mintStableToEpochManager(
+    uint256 amount
+  ) external onlyL2 nonReentrant onlyRegisteredContract(EPOCH_MANAGER_REGISTRY_ID) {
+    require(amount > 0, "mint amount is zero.");
+    require(
+      IStableToken(getStableToken()).mint(
+        registry.getAddressForOrDie(EPOCH_MANAGER_REGISTRY_ID),
+        amount
+      ),
+      "mint failed to epoch manager"
+    );
+  }
+
   /**
    * @notice Returns the validator BLS key.
    * @param signer The account that registered the validator or its authorized signing address.

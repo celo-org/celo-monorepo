@@ -23,6 +23,8 @@ contract ValidatorsMock08 is IValidators {
     // return _distributeEpochPaymentsFromSigner(signer, maxPayment);
   }
 
+  function mintStableToEpochManager(uint256 amount) external {}
+
   function registerValidator(
     bytes calldata ecdsaPublicKey,
     bytes calldata blsPublicKey,

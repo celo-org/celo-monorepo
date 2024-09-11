@@ -41,6 +41,7 @@ interface IValidators {
     bytes calldata,
     bytes calldata
   ) external returns (bool);
+  function mintStableToEpochManager(uint256 amount) external;
 
   // only VM
   function updateValidatorScoreFromSigner(address, uint256) external;
