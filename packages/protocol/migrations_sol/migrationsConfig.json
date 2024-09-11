@@ -112,7 +112,7 @@
   },
   "epochManager": {
    "newEpochDuration":86400,
-    "carbonOffsettingPartner": "0x0000000000000000000000000000000000000001"
+    "carbonOffsettingPartner": "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"
   },
   "random": {
     "randomnessBlockRetentionWindow": "720",

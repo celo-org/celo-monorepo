@@ -153,10 +153,9 @@ contract Election is
   );
   event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
 
-  modifier onlyVmOrEpochManager() {
-    if (isL2()) {
-      require(msg.sender == address(getEpochManager()), "Only EpochManager can call");
-    } else {
+ modifier onlyVmOrPermitted(address permittedAddress) {
+    if (isL2()) require(msg.sender == permittedAddress, "Only permitted address can call");
+    else {
       require(msg.sender == address(0), "Only VM can call");
     }
     _;
@@ -349,7 +348,7 @@ contract Election is
     uint256 value,
     address lesser,
     address greater
-  ) external onlyVmOrEpochManager {
+  ) external onlyVmOrPermitted(registry.getAddressFor(EPOCH_MANAGER_REGISTRY_ID)) {
     _distributeEpochRewards(group, value, lesser, greater);
   }
 

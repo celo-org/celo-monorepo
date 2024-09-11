@@ -95,6 +95,7 @@ contract EpochManager is
     address _carbonOffsettingPartner,
     address _epochManagerEnabler
   ) external initializer {
+    require(_carbonOffsettingPartner != address(0), "carbonOffsettingPartner address is required");
     require(_epochManagerEnabler != address(0), "EpochManagerEnabler address is required");
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -120,6 +121,10 @@ contract EpochManager is
     uint256 firstEpochBlock,
     address[] memory firstElected
   ) external onlyEpochManagerEnabler {
+    require(
+      address(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID)).balance > 0,
+      "CeloUnreleasedTreasury not yet funded."
+    );
     require(
       getCeloToken().balanceOf(registry.getAddressForOrDie(CELO_UNRELEASED_TREASURE_REGISTRY_ID)) >
         0,
@@ -310,7 +315,6 @@ contract EpochManager is
   }
 
   function allocateValidatorsRewards() internal {
-    // TODO complete this function
     uint256 totalRewards = 0;
     IScoreReader scoreReader = getScoreReader();
     IValidators validators = getValidators();
