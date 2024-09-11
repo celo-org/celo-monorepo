@@ -2,7 +2,7 @@ pragma solidity >=0.5.13 <0.8.20;
 import "celo-foundry-8/Test.sol";
 import "@test-sol/utils/SECP256K1.sol";
 
-contract ECDSAHelper08 is Test{
+contract ECDSAHelper08 is Test {
   ISECP256K1 sECP256K1;
 
   function addressToPublicKey(
@@ -26,9 +26,9 @@ contract ECDSAHelper08 is Test{
     return abi.encodePacked(x, y);
   }
 
-    function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32) {
-        // 32 is the length in bytes of hash,
-        // enforced by the type signature above
-        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
-    }
+  function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32) {
+    // 32 is the length in bytes of hash,
+    // enforced by the type signature above
+    return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
+  }
 }

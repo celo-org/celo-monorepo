@@ -3,8 +3,7 @@ pragma solidity >=0.5.13 <0.9.0;
 import "celo-foundry-8/Test.sol";
 
 contract Utils08 {
-
-  uint256 constant public secondsInOneBlock = 5;
+  uint256 public constant secondsInOneBlock = 5;
 
   function timeTravel(Vm vm, uint256 timeDelta) public {
     vm.warp(block.timestamp + timeDelta);
@@ -27,6 +26,6 @@ contract Utils08 {
   }
 
   function whenL2(Vm vm) public {
-     vm.etch(0x4200000000000000000000000000000000000018, abi.encodePacked(bytes1(0x01)));
+    vm.etch(0x4200000000000000000000000000000000000018, abi.encodePacked(bytes1(0x01)));
   }
 }

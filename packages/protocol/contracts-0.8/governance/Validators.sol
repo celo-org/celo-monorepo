@@ -216,7 +216,7 @@ contract Validators is
     setDowntimeGracePeriod(initParams.downtimeGracePeriod);
   }
 
-   /**
+  /**
    * @notice Mints stable token to the beneficiary.
    * @dev Callable only by epoch manager.
    * @param beneficiary The address to mint the stable token to.

@@ -240,11 +240,10 @@ contract EpochManagerTest_startNextEpochProcess is EpochManagerTest {
   }
 }
 
-
 contract EpochManagerTest_setEpochMangerEnabler is EpochManagerTest {
   function test_setEpochMangerEnabler() public {
     vm.prank(epochManager.owner());
-    address newEpochManagerEnabler = actor("newEpochManagerEnabler"); 
+    address newEpochManagerEnabler = actor("newEpochManagerEnabler");
     epochManager.setEpochMangerEnabler(newEpochManagerEnabler);
     assertEq(epochManager.epochManagerEnabler(), newEpochManagerEnabler);
   }

@@ -6,5 +6,5 @@ interface IScoreManager {
   function setValidatorScore(address validator, uint256 score) external;
   function getValidatorScore(address validator) external view returns (uint256);
   function getGroupScore(address validator) external view returns (uint256);
-  function owner() external view  returns (address);
+  function owner() external view returns (address);
 }
