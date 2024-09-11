@@ -15,4 +15,8 @@ contract Utils08 {
   function compareStrings(string memory a, string memory b) public pure returns (bool) {
     return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
   }
+
+  function whenL2(Vm vm) public {
+    vm.etch(0x4200000000000000000000000000000000000018, abi.encodePacked(bytes1(0x01)));
+  }
 }
