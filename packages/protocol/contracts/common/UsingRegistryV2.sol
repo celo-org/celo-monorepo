@@ -9,7 +9,6 @@ import "./interfaces/IFeeCurrencyWhitelist.sol";
 import "./interfaces/IFreezer.sol";
 import "./interfaces/IRegistry.sol";
 import "./interfaces/ICeloUnreleasedTreasure.sol";
-import "./interfaces/IEpochManager.sol";
 
 import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IEpochRewards.sol";
