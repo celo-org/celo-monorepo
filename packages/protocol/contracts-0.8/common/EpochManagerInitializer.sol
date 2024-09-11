@@ -51,6 +51,7 @@ contract EpochManagerInitializer is Initializable, UsingPrecompiles, UsingRegist
     lastKnownElectedAccounts = new address[](numberElectedValidators);
 
     for (uint256 i = 0; i < numberElectedValidators; i++) {
+      // TODO: document how much gas this takes for 110 signers
       address validatorAccountAddress = getAccounts().validatorSignerToAccount(
         validatorSignerAddressFromCurrentSet(i)
       );
