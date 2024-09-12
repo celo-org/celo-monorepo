@@ -6,6 +6,8 @@ import "forge-std-8/console2.sol";
 
 import { TestConstants } from "@test-sol/constants.sol";
 import { MigrationsConstants } from "@migrations-sol/constants.sol";
+import { CeloDistributionSchedule } from "@celo-contracts-8/common/CeloDistributionSchedule.sol";
+import { FeeCurrencyDirectory } from "@celo-contracts-8/common/FeeCurrencyDirectory.sol";
 
 import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/interfaces/IProxy.sol";
