@@ -60,6 +60,17 @@ contract EpochManagerEnabler is Initializable, UsingPrecompiles, UsingRegistry {
     }
   }
 
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 0, 0);
+  }
+
   function getFirstBlockOfEpoch(uint256 currentEpoch) external view returns (uint256) {
     return _getFirstBlockOfEpoch(currentEpoch);
   }
