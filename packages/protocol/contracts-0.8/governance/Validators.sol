@@ -900,7 +900,7 @@ contract Validators is
     address account,
     uint256 score,
     uint256 maxPayment
-  ) external view returns (uint256) {
+  ) external view virtual returns (uint256) {
     require(isValidator(account), "Not a validator");
     FixidityLib.Fraction memory scoreFraction = FixidityLib.wrap(score);
     require(scoreFraction.lte(FixidityLib.fixed1()), "Score must be <= 1");
