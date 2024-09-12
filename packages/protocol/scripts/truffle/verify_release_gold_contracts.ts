@@ -1,11 +1,7 @@
 import chalk from 'chalk'
+import { ReleaseGoldMultiSigProxyContract, ReleaseGoldProxyContract } from 'types'
+import { ReleaseGoldContract, ReleaseGoldMultiSigContract } from 'types/08'
 import fs = require('fs')
-import {
-  ReleaseGoldContract,
-  ReleaseGoldMultiSigContract,
-  ReleaseGoldMultiSigProxyContract,
-  ReleaseGoldProxyContract,
-} from 'types'
 
 let argv: any
 let contracts: any

@@ -11,7 +11,8 @@ import chaiSubset from 'chai-subset';
 // eslint-disable-next-line: ordered-imports
 import { spawn, SpawnOptions } from 'child_process';
 import { keccak256 } from 'ethereum-cryptography/keccak';
-import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types';
+import { ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types';
+import { AccountsInstance, GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance } from 'types/08';
 import Web3 from 'web3';
 import { ContractPackage, MENTO_PACKAGE } from '../contractPackages';
 
@@ -19,7 +20,6 @@ import { ContractPackage, MENTO_PACKAGE } from '../contractPackages';
 import { fromFixed } from '@celo/utils/lib/fixidity';
 import { bufferToHex, toBuffer } from '@ethereumjs/util';
 import { utf8ToBytes } from 'ethereum-cryptography/utils';
-import { AccountsInstance } from 'types';
 
 
 import BN = require('bn.js')
@@ -134,7 +134,7 @@ export const assertThrowsAsync = async (promise: any, errorMessage: string = '')
 
 export async function assertTransactionRevertWithReason(promise: any, expectedRevertReason: string = '') {
   try {
-   await promise
+    await promise
     assert.fail('Expected transaction to revert')
   } catch (error) {
     // Only ever tested with ganache.
@@ -142,9 +142,9 @@ export async function assertTransactionRevertWithReason(promise: any, expectedRe
     // 'StatusError: Transaction: ${transactionHash} exited with an error (status 0). Reason given: ${revertMessage}.'
     // Therefore we try to search for `${expectedRevertReason}`.
     const revertFound: boolean =
-    error.message.search(expectedRevertReason) >= 0
+      error.message.search(expectedRevertReason) >= 0
     const msg: string =
-    expectedRevertReason === '' ? `Expected "StatusError", got ${error} instead` : `Expected ${expectedRevertReason}, got ${error} instead`
+      expectedRevertReason === '' ? `Expected "StatusError", got ${error} instead` : `Expected ${expectedRevertReason}, got ${error} instead`
     assert(revertFound, msg)
   }
 }
@@ -201,7 +201,7 @@ export async function exec(command: string, args: string[]) {
 
     proc.on('exit', (code: any) => {
       if (code !== 0) {
-        reject({code, stout: dataGlobal.join(" ")})
+        reject({ code, stout: dataGlobal.join(" ") })
       } else {
         resolve()
       }
@@ -252,12 +252,12 @@ type ProxiedContractGetter = (
   contractName: string,
   type: string,
   contractPackage: ContractPackage,
-  ) => Promise<any>
+) => Promise<any>
 
 type ContractGetter = (
   contractName: string,
   contractPackage?: ContractPackage,
-  ) => Promise<any>
+) => Promise<any>
 
 
 export const assertProxiesSet = async (getContract: ProxiedContractGetter) => {
@@ -314,7 +314,8 @@ export const assertContractsOwnedByMultiSig = async (getContract: any) => {
     for (const contractName of contractList.contracts) {
       const proxyOwner = await (await getContract(contractName, 'proxy', contractList.__contractPackage))._getOwner()
       assert.strictEqual(proxyOwner, multiSigAddress, contractName + 'Proxy is not owned by the MultiSig')
-    }}
+    }
+  }
 }
 
 export const assertFloatEquality = (
@@ -371,7 +372,7 @@ export function assertObjectWithBNEqual(
         for (let i = 0; i < actualArray.length; i++) {
           assertEqualBN(actualArray[i], expectedArray[i], fieldErrorMsg(k))
         }
-      } else  {
+      } else {
         assert.deepStrictEqual(actual[k], expected[k], fieldErrorMsg(k))
       }
     }
@@ -389,8 +390,8 @@ export function assertBNArrayEqual(
   assert(Array.isArray(expectedArray), `Expected is not an array`)
   assert(actualArray.length === expectedArray.length, `Different array sizes; actual: ${actualArray.length} expected: ${expectedArray.length}`)
   assert(actualArray.every(actualValue => isNumber(actualValue))
-      && expectedArray.every(expectedValue => isNumber(expectedValue)),
-      `Expected all elements to be numbers`)
+    && expectedArray.every(expectedValue => isNumber(expectedValue)),
+    `Expected all elements to be numbers`)
 
   for (let i = 0; i < actualArray.length; i++) {
     assertEqualBN(actualArray[i], expectedArray[i])
@@ -455,7 +456,7 @@ export function assertGtBN(
   assert(
     web3.utils.toBN(value).gt(web3.utils.toBN(expected)),
     `expected ${value.toString()} to be greater than to ${expected.toString()}. ${msg ||
-      ''}`
+    ''}`
   )
 }
 
@@ -466,8 +467,7 @@ export function assertGteBN(
 ) {
   assert(
     web3.utils.toBN(value).gte(web3.utils.toBN(expected)),
-    `expected ${value.toString()} to be greater than or equal to ${expected.toString()}. ${
-      msg || ''
+    `expected ${value.toString()} to be greater than or equal to ${expected.toString()}. ${msg || ''
     }`
   )
 }
@@ -486,14 +486,14 @@ const proxiedContracts = [{
     'SortedOracles',
 
   ]
-  },
-  {
-    contracts: [
-      'Reserve',
-      'StableToken',
-    ],
-    __contractPackage: MENTO_PACKAGE
- }
+},
+{
+  contracts: [
+    'Reserve',
+    'StableToken',
+  ],
+  __contractPackage: MENTO_PACKAGE
+}
 ]
 
 // TODO(asa): Pull this list from the build artifacts instead
@@ -504,14 +504,14 @@ const ownedContracts = [{
     'Registry',
     'SortedOracles',
   ]
-  },{
+}, {
   contracts: [
     'Reserve',
     'Exchange',
     'StableToken'
   ],
   __contractPackage: MENTO_PACKAGE
- }
+}
 ]
 
 export function getOffsetForMinerSelection(
@@ -572,7 +572,7 @@ enum VoteValue {
   Yes,
 }
 
-export async function assumeOwnershipWithTruffle(contractsToOwn: string[], to: string, dequeuedIndex: number = 0, contractPackage?:ContractPackage) {
+export async function assumeOwnershipWithTruffle(contractsToOwn: string[], to: string, dequeuedIndex: number = 0, contractPackage?: ContractPackage) {
   const governance: GovernanceInstance = await getDeployedProxiedContract('Governance', artifacts)
   const lockedGold: LockedGoldInstance = await getDeployedProxiedContract('LockedGold', artifacts)
   const multiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract(
@@ -687,10 +687,10 @@ export const authorizeAndGenerateVoteSigner = async (accountsInstance: AccountsI
   )
   // fund singer
   await web3.eth.sendTransaction({
-      from: accounts[9],
-      to: signer,
-      value:  web3.utils.toWei('1', 'ether'),
-    })
+    from: accounts[9],
+    to: signer,
+    value: web3.utils.toWei('1', 'ether'),
+  })
 
   await accountsInstance.completeSignerAuthorization(account, role, { from: signer })
 
@@ -706,7 +706,7 @@ export async function createAndAssertDelegatorDelegateeSigners(accountsInstance:
       accountsInstance,
       delegator,
       accounts
-      )
+    )
     assert.notEqual(delegator, delegatorSigner)
     assert.equal(await accountsInstance.voteSignerToAccount(delegatorSigner), delegator)
   }
@@ -716,7 +716,7 @@ export async function createAndAssertDelegatorDelegateeSigners(accountsInstance:
       accountsInstance,
       delegatee,
       accounts
-      )
+    )
     assert.notEqual(delegatee, delegateeSigner)
     assert.equal(await accountsInstance.voteSignerToAccount(delegateeSigner), delegatee)
   }
@@ -741,7 +741,7 @@ export async function assertDelegatorDelegateeAmounts(
 export function expectBigNumberInRange(real: BigNumber,
   expected: BigNumber,
   range: BigNumber = new BigNumber("10000000000000000") // gas
-  ) {
+) {
   expect(
     real.plus(range).gte(expected),
     `Number ${real.toString()} is not in range <${expected.minus(range).toString()}, ${expected

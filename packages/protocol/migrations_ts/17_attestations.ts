@@ -5,9 +5,9 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { AttestationsInstance } from 'types'
+import { AttestationsInstance } from 'types/08'
 import { StableTokenInstance } from 'types/mento'
-import { MENTO_PACKAGE } from '../contractPackages'
+import { MENTO_PACKAGE, SOLIDITY_08_PACKAGE } from '../contractPackages'
 import { ArtifactsSingleton } from '../lib/artifactsSingleton'
 
 const initializeArgs = async (): Promise<[string, string, string, string, string[], string[]]> => {
@@ -34,5 +34,7 @@ module.exports = deploymentForCoreContract<AttestationsInstance>(
   web3,
   artifacts,
   CeloContractName.Attestations,
-  initializeArgs
+  initializeArgs,
+  undefined,
+  SOLIDITY_08_PACKAGE
 )

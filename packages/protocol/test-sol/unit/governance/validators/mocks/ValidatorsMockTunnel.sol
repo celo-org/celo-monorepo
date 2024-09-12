@@ -1,17 +1,16 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "@celo-contracts/governance/test/ValidatorsMock.sol";
-import { Test as ForgeTest } from "forge-std/Test.sol";
+import "@celo-contracts/governance/interfaces/IValidatorsInitializer.sol";
+import "celo-foundry-8/Test.sol";
 
-contract ValidatorsMockTunnel is ForgeTest {
-  ValidatorsMock private tunnelValidators;
+contract ValidatorsMockTunnel {
+  IValidatorsInitializer private tunnelValidators;
   address validatorContractAddress;
 
   constructor(address _validatorContractAddress) public {
     validatorContractAddress = _validatorContractAddress;
-    tunnelValidators = ValidatorsMock(validatorContractAddress);
+    tunnelValidators = IValidatorsInitializer(validatorContractAddress);
   }
 
   struct InitParams {
@@ -32,8 +31,7 @@ contract ValidatorsMockTunnel is ForgeTest {
     uint256 _downtimeGracePeriod;
   }
 
-  function MockInitialize(
-    address sender,
+  function mockInitialize(
     InitParams calldata params,
     InitParams2 calldata params2
   ) external returns (bool, bytes memory) {
@@ -52,7 +50,6 @@ contract ValidatorsMockTunnel is ForgeTest {
       params2._commissionUpdateDelay,
       params2._downtimeGracePeriod
     );
-    vm.prank(sender);
     (bool success, ) = address(tunnelValidators).call(data);
     require(success, "unsuccessful tunnel call");
   }

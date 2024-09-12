@@ -1,32 +1,37 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
-import "@celo-contracts/identity/IdentityProxy.sol";
-import "@celo-contracts/identity/IdentityProxyHub.sol";
-import "@celo-contracts/identity/test/IdentityProxyTest.sol";
-import "@celo-contracts/identity/test/MockAttestations.sol";
-import "@celo-contracts/common/Registry.sol";
+import "celo-foundry-8/Test.sol";
+
+import "@celo-contracts-8/identity/IdentityProxy.sol";
+import "@celo-contracts-8/identity/IdentityProxyHub.sol";
+import "@celo-contracts-8/identity/test/IdentityProxyTest.sol";
+import "@celo-contracts-8/identity/test/MockAttestations.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
 
 contract IdentityProxyHubTest is Test {
   IdentityProxy identityProxy;
   IdentityProxyTest identityProxyTest;
   IdentityProxyHub identityProxyHub;
   MockAttestations mockAttestations;
-  Registry registry;
+  IRegistry registry;
 
   address randomActor = actor("randomActor");
 
   bytes32 identifier =
     keccak256("0x00000000000000000000000000000000000000000000000000000000babecafe");
 
-  function setUp() public {
+  function setUp() public virtual {
     identityProxy = new IdentityProxy();
     identityProxyTest = new IdentityProxyTest();
     identityProxyHub = new IdentityProxyHub();
     mockAttestations = new MockAttestations();
-    registry = new Registry(true);
-    registry.initialize();
+
+    address registryAddress = 0x000000000000000000000000000000000000ce10;
+    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    registry = IRegistry(registryAddress);
+
+    // registry.initialize();
     registry.setAddressFor("Attestations", address(mockAttestations));
     identityProxyHub.setRegistry(address(registry));
   }
@@ -67,7 +72,7 @@ contract IdentityProxyHubTest is Test {
 }
 
 contract IdentityProxyTestGetIdenityProxy is IdentityProxyHubTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -94,7 +99,7 @@ contract IdentityProxyTestGetIdenityProxy is IdentityProxyHubTest {
 contract IdentityProxyTestMakeCall_Failures is IdentityProxyHubTest {
   address identityProxyAddress;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     identityProxyAddress = address(identityProxyHub.getOrDeployIdentityProxy(identifier));
   }
@@ -151,7 +156,7 @@ contract IdentityProxyTestMakeCall_WhenCalledByContractRelatedToTheIdentifier is
 {
   address identityProxyAddress;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     identityProxyAddress = address(identityProxyHub.getOrDeployIdentityProxy(identifier));
@@ -220,7 +225,7 @@ contract IdentityProxyTestMakeCall_WhenCalledByContractRelatedToTheIdentifier is
 
   function test_CanSendAPayment() public {
     uint256 balanceBefore = address(identityProxyTest).balance;
-    identityProxyHub.makeCall.value(100)(
+    identityProxyHub.makeCall{ value: 100 }(
       identifier,
       address(identityProxyTest),
       abi.encodeWithSignature("payMe()")

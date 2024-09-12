@@ -6,33 +6,33 @@ export interface ArtifactSet {
   getProxy(key: string): any;
 }
 
-function getProxyName(contractName:string){
+function getProxyName(contractName: string) {
   return contractName + "Proxy";
 }
 
 // This class is meant to be used to wrap truffle artifacts
 // and extend its interface.
 // ArtifactsSingleton.wrap returns an instance of DefaultArtifact
-export class DefaultArtifact implements ArtifactSet{
+export class DefaultArtifact implements ArtifactSet {
   public artifacts: any
-  
+
   public constructor(artifacts) {
     this.artifacts = artifacts
   }
-  
+
   public require(key: string) {
     return this.artifacts.require(key)
   }
-  
+
   public getProxy(key: string) {
     return this.require(getProxyName(key))
   }
-  
+
 }
 
 // This objects replicates a Truffle `artifacts.require` singleton
 // but constructed manually
-export class ArtifactsSingleton implements ArtifactSet{
+export class ArtifactsSingleton implements ArtifactSet {
   public static setNetwork(network: any) {
     this.network = network
   }
@@ -56,8 +56,8 @@ export class ArtifactsSingleton implements ArtifactSet{
     return ArtifactsSingleton.instances[namespace]
   }
 
-  public static wrap(artifacts:any){
-    if (artifacts instanceof ArtifactsSingleton || artifacts instanceof DefaultArtifact){
+  public static wrap(artifacts: any) {
+    if (artifacts instanceof ArtifactsSingleton || artifacts instanceof DefaultArtifact) {
       return artifacts
     }
 
@@ -70,22 +70,26 @@ export class ArtifactsSingleton implements ArtifactSet{
 
   public artifacts: { [key: string]: any } = {}
 
-  private constructor() {}
+  private constructor() { }
 
   public addArtifact(key: string, value: any) {
     this.artifacts[key] = value
   }
 
-  public require(key: string) {
-    return this.artifacts[key]
+  public require(key: string, defaultArtifacts?: any) {
+    if (key in this.artifacts) {
+      return this.artifacts[key]
+    }
+
+    return defaultArtifacts?.require(key)
   }
 
-  public getProxy(key: string, defaultArtifacts?:any) {
+  public getProxy(key: string, defaultArtifacts?: any) {
     const proxyArtifactName = getProxyName(key)
 
     const toReturn = this.require(proxyArtifactName)
 
-    if (toReturn === undefined){
+    if (toReturn === undefined) {
       // in case the package of this artifact has proxiesPath set
       // this needs to be changed to support it, now only "/" path is supported
       return defaultArtifacts?.require(proxyArtifactName)

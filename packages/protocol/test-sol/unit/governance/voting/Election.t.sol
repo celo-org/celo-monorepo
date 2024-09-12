@@ -1,19 +1,20 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import { Test } from "celo-foundry/Test.sol";
-import { TestConstants } from "@test-sol/constants.sol";
-import { Utils } from "@test-sol/utils.sol";
+import "celo-foundry-8/Test.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/governance/Election.sol";
-import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
-import "@celo-contracts/common/Accounts.sol";
-import "@celo-contracts/common/linkedlists/AddressSortedLinkedList.sol";
-import "@celo-contracts/identity/test/MockRandom.sol";
-import "@celo-contracts/common/Freezer.sol";
+import { Election } from "@celo-contracts-8/governance/Election.sol";
+import { MockLockedGold } from "@celo-contracts-8/governance/test/MockLockedGold.sol";
+import { MockValidators } from "@celo-contracts-8/governance/test/MockValidators.sol";
+import { Accounts } from "@celo-contracts-8/common/Accounts.sol";
+import "@celo-contracts-8/common/linkedlists/AddressSortedLinkedList.sol";
+import { MockRandom } from "@celo-contracts-8/identity/test/MockRandom.sol";
+import { Freezer } from "@celo-contracts-8/common/Freezer.sol";
+import { IRegistry } from "@celo-contracts/common/interfaces/IRegistry.sol";
+import { Utils08 } from "@test-sol/utils08.sol";
+
+import { TestConstants } from "@test-sol/constants.sol";
 
 contract ElectionMock is Election(true) {
   function distributeEpochRewards(
@@ -21,12 +22,12 @@ contract ElectionMock is Election(true) {
     uint256 value,
     address lesser,
     address greater
-  ) external {
+  ) external override {
     return _distributeEpochRewards(group, value, lesser, greater);
   }
 }
 
-contract ElectionTest is Utils, TestConstants {
+contract ElectionTest is Utils08, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
 
   Accounts accounts;
@@ -103,7 +104,7 @@ contract ElectionTest is Utils, TestConstants {
     }
   }
 
-  function setUp() public {
+  function setUp() public virtual {
     ph.setEpochSize(DAY / 5);
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
@@ -185,6 +186,8 @@ contract ElectionTest_Initialize is ElectionTest {
 }
 
 contract ElectionTest_SetElectabilityThreshold is ElectionTest {
+  using FixidityLib for FixidityLib.Fraction;
+
   function test_shouldSetElectabilityThreshold() public {
     uint256 newElectabilityThreshold = FixidityLib.newFixedFraction(1, 200).unwrap();
     election.setElectabilityThreshold(newElectabilityThreshold);
@@ -198,6 +201,8 @@ contract ElectionTest_SetElectabilityThreshold is ElectionTest {
 }
 
 contract ElectionTest_SetElectabilityThreshold_L2 is ElectionTest {
+  using FixidityLib for FixidityLib.Fraction;
+
   function test_shouldSetElectabilityThreshold() public {
     _whenL2();
     uint256 newElectabilityThreshold = FixidityLib.newFixedFraction(1, 200).unwrap();
@@ -253,7 +258,7 @@ contract ElectionTest_SetElectableValidators is ElectionTest {
 }
 
 contract ElectionTest_SetElectableValidators_L2 is ElectionTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _whenL2();
   }
@@ -323,7 +328,7 @@ contract ElectionTest_SetMaxNumGroupsVotedFor is ElectionTest {
 }
 
 contract ElectionTest_SetMaxNumGroupsVotedFor_L2 is ElectionTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _whenL2();
   }
@@ -393,7 +398,7 @@ contract ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups is ElectionTest {
 }
 
 contract ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups_L2 is ElectionTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _whenL2();
   }
@@ -437,7 +442,7 @@ contract ElectionTest_SetAllowedToVoteOverMaxNumberOfGroups_L2 is ElectionTest {
 }
 
 contract ElectionTest_MarkGroupEligible is ElectionTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     registry.setAddressFor("Validators", address(address(this)));
@@ -473,7 +478,7 @@ contract ElectionTest_MarkGroupEligible is ElectionTest {
 }
 
 contract ElectionTest_MarkGroupEligible_L2 is ElectionTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _whenL2();
     registry.setAddressFor("Validators", address(address(this)));
@@ -509,7 +514,7 @@ contract ElectionTest_MarkGroupEligible_L2 is ElectionTest {
 }
 
 contract ElectionTest_MarkGroupInEligible is ElectionTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     registry.setAddressFor("Validators", address(address(this)));
@@ -553,7 +558,7 @@ contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
   uint256 voterFirstGroupVote = value - maxNumGroupsVotedFor - originallyNotVotedWithAmount;
   uint256 rewardValue = 1000000;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     address[] memory members = new address[](1);
@@ -567,7 +572,7 @@ contract ElectionTest_Vote_WhenGroupEligible is ElectionTest {
 
   function test_ShouldRevert_WhenTheVoterDoesNotHaveSufficientNonVotingBalance() public {
     lockedGold.incrementNonvotingAccountBalance(voter, value - 1);
-    vm.expectRevert("SafeMath: subtraction overflow");
+    vm.expectRevert();
     election.vote(group, value, address(0), address(0));
   }
 
@@ -742,7 +747,7 @@ contract ElectionTest_Vote_WhenGroupEligible_L2 is ElectionTest {
   uint256 voterFirstGroupVote = value - maxNumGroupsVotedFor - originallyNotVotedWithAmount;
   uint256 rewardValue = 1000000;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _whenL2();
     address[] memory members = new address[](1);
@@ -756,7 +761,7 @@ contract ElectionTest_Vote_WhenGroupEligible_L2 is ElectionTest {
 
   function test_ShouldRevert_WhenTheVoterDoesNotHaveSufficientNonVotingBalance() public {
     lockedGold.incrementNonvotingAccountBalance(voter, value - 1);
-    vm.expectRevert("SafeMath: subtraction overflow");
+    vm.expectRevert();
     election.vote(group, value, address(0), address(0));
   }
 
@@ -935,7 +940,7 @@ contract ElectionTest_Vote_WhenGroupEligible_WhenGroupCanReceiveVotes is Electio
   uint256 voterFirstGroupVote = value - maxNumGroupsVotedFor - originallyNotVotedWithAmount;
   uint256 rewardValue = 1000000;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     address[] memory members = new address[](1);
@@ -1090,7 +1095,7 @@ contract ElectionTest_Vote_GroupNotEligible is ElectionTest {
   uint256 voterFirstGroupVote = value - maxNumGroupsVotedFor - originallyNotVotedWithAmount;
   uint256 rewardValue = 1000000;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     address[] memory members = new address[](1);
@@ -1112,7 +1117,7 @@ contract ElectionTest_Activate is ElectionTest {
   address voter2 = account2;
   uint256 value2 = 573;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     address[] memory members = new address[](1);
@@ -1268,7 +1273,7 @@ contract ElectionTest_Activate_L2 is ElectionTest {
   address voter2 = account2;
   uint256 value2 = 573;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _whenL2();
     address[] memory members = new address[](1);
@@ -1424,7 +1429,7 @@ contract ElectionTest_ActivateForAccount is ElectionTest {
   address voter2 = account2;
   uint256 value2 = 573;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     address[] memory members = new address[](1);
@@ -1579,7 +1584,7 @@ contract ElectionTest_ActivateForAccount_L2 is ElectionTest {
   address voter2 = account2;
   uint256 value2 = 573;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _whenL2();
     address[] memory members = new address[](1);
@@ -1735,7 +1740,7 @@ contract ElectionTest_RevokePending is ElectionTest {
   uint256 revokedValue = value - 1;
   uint256 remaining = value - revokedValue;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     address[] memory members = new address[](1);
@@ -1906,7 +1911,7 @@ contract ElectionTest_RevokeActive is ElectionTest {
     assertEq(election.getTotalVotes(), totalGroup);
   }
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     address[] memory members = new address[](1);
@@ -2199,7 +2204,7 @@ contract ElectionTest_ElectionValidatorSigners is ElectionTest {
 
   MemberWithVotes[] membersWithVotes;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     group1Members[0] = validator1;
@@ -2413,6 +2418,8 @@ contract ElectionTest_ElectionValidatorSigners is ElectionTest {
 }
 
 contract ElectionTest_GetGroupEpochRewards is ElectionTest {
+  using FixidityLib for FixidityLib.Fraction;
+
   address voter = address(this);
   address group1 = account2;
   address group2 = account3;
@@ -2426,7 +2433,7 @@ contract ElectionTest_GetGroupEpochRewards is ElectionTest {
       .multiply(FixidityLib.newFixed(totalRewardValue))
       .fromFixed();
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     registry.setAddressFor("Validators", address(this));
@@ -2530,6 +2537,8 @@ contract ElectionTest_GetGroupEpochRewards is ElectionTest {
 }
 
 contract ElectionTest_DistributeEpochRewards is ElectionTest {
+  using FixidityLib for FixidityLib.Fraction;
+
   address voter = address(this);
   address voter2 = account4;
   address group = account2;
@@ -2546,7 +2555,7 @@ contract ElectionTest_DistributeEpochRewards is ElectionTest {
     FixidityLib.newFixedFraction(expectedGroupTotalActiveVotes, 3).fromFixed();
   uint256 expectedVoter2ActiveVotesForGroup2 = voteValue / 2 + rewardValue2;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     registry.setAddressFor("Validators", address(this));
@@ -2715,7 +2724,7 @@ contract ElectionTest_ForceDecrementVotes is ElectionTest {
   uint256 group1RemainingActiveVotes;
   address[] initialOrdering;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -3130,7 +3139,7 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
 
   AccountStruct[] _accounts;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     // 50M gives us 500M total locked gold
@@ -3300,12 +3309,14 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
       actions[actionCount++] = VoteActionType.RevokeActive;
     }
 
-    VoteActionType action = actions[generatePRN(0, actionCount - 1, uint256(account.account))];
+    VoteActionType action = actions[
+      generatePRN(0, actionCount - 1, uint256(uint160(account.account)))
+    ];
     uint256 value;
 
     vm.startPrank(account.account);
     if (action == VoteActionType.Vote) {
-      value = generatePRN(0, account.nonVoting, uint256(account.account) + salt);
+      value = generatePRN(0, account.nonVoting, uint256(uint160(account.account)) + salt);
       election.vote(group, value, address(0), address(0));
       account.nonVoting -= value;
       account.pending += value;
@@ -3315,12 +3326,12 @@ contract ElectionTest_ConsistencyChecks is ElectionTest {
       account.pending -= value;
       account.active += value;
     } else if (action == VoteActionType.RevokePending) {
-      value = generatePRN(0, account.pending, uint256(account.account) + salt);
+      value = generatePRN(0, account.pending, uint256(uint160(account.account)) + salt);
       election.revokePending(group, value, address(0), address(0), 0);
       account.pending -= value;
       account.nonVoting += value;
     } else if (action == VoteActionType.RevokeActive) {
-      value = generatePRN(0, account.active, uint256(account.account) + salt);
+      value = generatePRN(0, account.active, uint256(uint160(account.account)) + salt);
       election.revokeActive(group, value, address(0), address(0), 0);
       account.active -= value;
       account.nonVoting += value;
@@ -3334,7 +3345,7 @@ contract ElectionTest_HasActivatablePendingVotes is ElectionTest {
   address group = account1;
   uint256 value = 1000;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     address[] memory members = new address[](1);
     members[0] = account9;

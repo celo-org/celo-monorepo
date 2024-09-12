@@ -1,24 +1,39 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
-import { TestConstants } from "@test-sol/constants.sol";
-import { Utils } from "@test-sol/utils.sol";
+import "celo-foundry-8/Test.sol";
 
 import "solidity-bytes-utils/contracts/BytesLib.sol";
-import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts8/utils/cryptography/ECDSA.sol";
+import { TestConstants } from "@test-sol/constants.sol";
 
-import "@celo-contracts/governance/Governance.sol";
-import "@celo-contracts/governance/Proposals.sol";
-import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
-import "@celo-contracts/governance/test/TestTransactions.sol";
-import "@celo-contracts/common/Accounts.sol";
-import "@celo-contracts/common/Signatures.sol";
-import "@celo-contracts/common/Registry.sol";
+import "@celo-contracts-8/governance/Governance.sol";
+import "@celo-contracts-8/governance/Proposals.sol";
+import "@celo-contracts-8/governance/test/MockLockedGold.sol";
+import "@celo-contracts-8/governance/test/MockValidators.sol";
+import "@celo-contracts-8/governance/test/TestTransactions.sol";
+import "@celo-contracts-8/common/Accounts.sol";
+import "@celo-contracts-8/common/Signatures.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
 import "@celo-contracts/common/FixidityLib.sol";
+import { Utils08 } from "@test-sol/utils08.sol";
 
 contract GovernanceMock is Governance(true) {
   address[] validatorSet;
+
+  // Minimally override core functions from UsingPrecompiles
+  function numberValidatorsInCurrentSet() public view override returns (uint256) {
+    return validatorSet.length;
+  }
+
+  function numberValidatorsInSet(uint256) public view override returns (uint256) {
+    return validatorSet.length;
+  }
+
+  function validatorSignerAddressFromCurrentSet(
+    uint256 index
+  ) public view override returns (address) {
+    return validatorSet[index];
+  }
 
   // Expose test utilities
   function addValidator(address validator) external {
@@ -44,22 +59,9 @@ contract GovernanceMock is Governance(true) {
   ) public {
     _removeVotesWhenRevokingDelegatedVotes(account, maxAmountAllowed);
   }
-
-  // Minimally override core functions from UsingPrecompiles
-  function numberValidatorsInCurrentSet() public view returns (uint256) {
-    return validatorSet.length;
-  }
-
-  function numberValidatorsInSet(uint256) public view returns (uint256) {
-    return validatorSet.length;
-  }
-
-  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
-    return validatorSet[index];
-  }
 }
 
-contract GovernanceTest is Test, TestConstants, Utils {
+contract GovernanceTest is Test, TestConstants, Utils08 {
   using FixidityLib for FixidityLib.Fraction;
   using BytesLib for bytes;
 
@@ -83,6 +85,8 @@ contract GovernanceTest is Test, TestConstants, Utils {
   uint256 constant QUERY_EXPIRY = 60 * 60;
   uint256 constant EXECUTION_STAGE_DURATION = 1 * 60;
 
+  address internal constant registryAddress = 0x000000000000000000000000000000000000ce10;
+
   GovernanceMock governance;
   Accounts accounts;
   MockLockedGold mockLockedGold;
@@ -100,14 +104,11 @@ contract GovernanceTest is Test, TestConstants, Utils {
   FixidityLib.Fraction participationFloor;
   FixidityLib.Fraction baselineQuorumFactor;
   uint256 NEW_VALUE = 45;
-  uint256 proposalId;
-  address constant proxyAdminAddress = 0x4200000000000000000000000000000000000018;
-
   function _whenL2() public {
-    deployCodeTo("Registry.sol", abi.encode(false), proxyAdminAddress);
+    deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 
-  function setUp() public {
+  function setUp() public virtual {
     // Define Accounts
     accVoter = actor("voter");
     accOwner = actor("owner");
@@ -136,18 +137,9 @@ contract GovernanceTest is Test, TestConstants, Utils {
     setUpProposalStubs();
   }
 
-  function assertNotEq(uint256 a, uint256 b) internal {
-    if (a == b) {
-      emit log("Error: a != b not satisfied [uint]");
-      emit log_named_uint("      Left", a);
-      emit log_named_uint("     Right", b);
-      fail();
-    }
-  }
-
   function makeValidProposal() internal returns (uint256 proposalId) {
     return
-      governance.propose.value(DEPOSIT)(
+      governance.propose{ value: DEPOSIT }(
         okProp.values,
         okProp.destinations,
         okProp.data,
@@ -159,29 +151,13 @@ contract GovernanceTest is Test, TestConstants, Utils {
   function makeEmptyProposal() internal returns (uint256 proposalId) {
     Proposal memory emptyProposal;
     return
-      governance.propose.value(DEPOSIT)(
+      governance.propose{ value: DEPOSIT }(
         emptyProposal.values,
         emptyProposal.destinations,
         emptyProposal.data,
         emptyProposal.dataLengths,
         "empty proposal"
       );
-  }
-
-  function makeAndApproveProposal(uint256 index) internal returns (uint256 id) {
-    id = makeValidProposal();
-    vm.warp(block.timestamp + governance.dequeueFrequency());
-
-    vm.prank(accApprover);
-    governance.approve(id, index);
-  }
-
-  function authorizeValidatorSigner(uint256 signerPk, address account) internal {
-    bytes32 messageHash = keccak256(abi.encodePacked(account));
-    bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(messageHash);
-    (uint8 v, bytes32 r, bytes32 s) = vm.sign(signerPk, prefixedHash);
-    vm.prank(account);
-    accounts.authorizeValidatorSigner(vm.addr(signerPk), v, r, s);
   }
 
   function authorizeVoteSigner(uint256 signerPk, address account) internal {
@@ -202,7 +178,8 @@ contract GovernanceTest is Test, TestConstants, Utils {
   function setUpContracts() private {
     vm.startPrank(accOwner);
 
-    Registry registry = new Registry(true);
+    deployCodeTo("Registry.sol", abi.encode(false), registryAddress);
+    IRegistry registry = IRegistry(registryAddress);
 
     mockValidators = new MockValidators();
     registry.setAddressFor("Validators", address(mockValidators));
@@ -216,6 +193,12 @@ contract GovernanceTest is Test, TestConstants, Utils {
     registry.setAddressFor("Accounts", address(accounts));
 
     governance = new GovernanceMock();
+
+    Governance.InitParams memory initParams = Governance.InitParams({
+      baselineUpdateFactor: baselineUpdateFactor.unwrap(),
+      baselineQuorumFactor: baselineQuorumFactor.unwrap()
+    });
+
     governance.initialize(
       address(registry),
       accApprover,
@@ -227,8 +210,7 @@ contract GovernanceTest is Test, TestConstants, Utils {
       EXECUTION_STAGE_DURATION,
       participationBaseline.unwrap(),
       participationFloor.unwrap(),
-      baselineUpdateFactor.unwrap(),
-      baselineQuorumFactor.unwrap()
+      initParams
     );
     vm.stopPrank();
   }
@@ -265,9 +247,36 @@ contract GovernanceTest is Test, TestConstants, Utils {
     failingProp.destinations.push(address(testTransactions));
     failingProp.description = "failing proposal";
   }
+
+  function assertNotEq(uint256 a, uint256 b) internal {
+    if (a == b) {
+      emit log("Error: a != b not satisfied [uint]");
+      emit log_named_uint("      Left", a);
+      emit log_named_uint("     Right", b);
+      fail();
+    }
+  }
+
+  function makeAndApproveProposal(uint256 index) internal returns (uint256 id) {
+    id = makeValidProposal();
+    vm.warp(block.timestamp + governance.dequeueFrequency());
+
+    vm.prank(accApprover);
+    governance.approve(id, index);
+  }
+
+  function authorizeValidatorSigner(uint256 signerPk, address account) internal {
+    bytes32 messageHash = keccak256(abi.encodePacked(account));
+    bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(messageHash);
+    (uint8 v, bytes32 r, bytes32 s) = vm.sign(signerPk, prefixedHash);
+    vm.prank(account);
+    accounts.authorizeValidatorSigner(vm.addr(signerPk), v, r, s);
+  }
 }
 
 contract GovernanceTest_initialize is GovernanceTest {
+  using FixidityLib for FixidityLib.Fraction;
+
   function test_SetsTheOwner() public {
     assertEq(governance.owner(), accOwner);
   }
@@ -309,6 +318,12 @@ contract GovernanceTest_initialize is GovernanceTest {
   // TODO: Consider testing reversion when 0 values provided
   function test_RevertIf_CalledAgain() public {
     vm.expectRevert("contract already initialized");
+
+    Governance.InitParams memory initParams = Governance.InitParams({
+      baselineUpdateFactor: FixidityLib.newFixed(1).unwrap(),
+      baselineQuorumFactor: FixidityLib.newFixed(1).unwrap()
+    });
+
     governance.initialize(
       address(1),
       accApprover,
@@ -320,8 +335,7 @@ contract GovernanceTest_initialize is GovernanceTest {
       1,
       FixidityLib.newFixed(1).unwrap(),
       FixidityLib.newFixed(1).unwrap(),
-      FixidityLib.newFixed(1).unwrap(),
-      FixidityLib.newFixed(1).unwrap()
+      initParams
     );
   }
 }
@@ -579,6 +593,8 @@ contract GovernanceTest_setExecutionStageDuration is GovernanceTest {
 }
 
 contract GovernanceTest_setParticipationFloor is GovernanceTest {
+  using FixidityLib for FixidityLib.Fraction;
+
   event ParticipationFloorSet(uint256 value);
 
   function test_SetsValue() public {
@@ -614,6 +630,8 @@ contract GovernanceTest_setParticipationFloor is GovernanceTest {
 }
 
 contract GovernanceTest_setBaselineUpdateFactor is GovernanceTest {
+  using FixidityLib for FixidityLib.Fraction;
+
   event ParticipationBaselineUpdateFactorSet(uint256 value);
 
   function test_SetsValue() public {
@@ -649,6 +667,8 @@ contract GovernanceTest_setBaselineUpdateFactor is GovernanceTest {
 }
 
 contract GovernanceTest_setBaselineQuorumFactor is GovernanceTest {
+  using FixidityLib for FixidityLib.Fraction;
+
   event ParticipationBaselineQuorumFactorSet(uint256 value);
 
   function test_SetsValue() public {
@@ -684,6 +704,8 @@ contract GovernanceTest_setBaselineQuorumFactor is GovernanceTest {
 }
 
 contract GovernanceTest_setConstitution is GovernanceTest {
+  using FixidityLib for FixidityLib.Fraction;
+
   event ConstitutionSet(address indexed destination, bytes4 indexed functionId, uint256 threshold);
 
   function test_RevertIf_DestinationIsZeroAddress() public {
@@ -835,6 +857,8 @@ contract GovernanceTest_setHotfixExecutionTimeWindow is GovernanceTest {
 }
 
 contract GovernanceTest_propose is GovernanceTest {
+  using BytesLib for bytes;
+
   event ProposalQueued(
     uint256 indexed proposalId,
     address indexed proposer,
@@ -865,6 +889,18 @@ contract GovernanceTest_propose is GovernanceTest {
     assertEq(upVotes[0], 0);
   }
 
+  function check_emitsProposalQueuedEvents(Proposal memory proposal) private {
+    vm.expectEmit(true, true, true, true);
+    emit ProposalQueued(1, address(this), proposal.values.length, DEPOSIT, block.timestamp);
+    governance.propose{ value: DEPOSIT }(
+      proposal.values,
+      proposal.destinations,
+      proposal.data,
+      proposal.dataLengths,
+      proposal.description
+    );
+  }
+
   function test_registerTheProposal_whenProposalHasZeroTransactions() public {
     Proposal memory zeroProp;
     zeroProp.description = "zero tx proposal";
@@ -891,7 +927,7 @@ contract GovernanceTest_propose is GovernanceTest {
 
   function test_RevertIf_descriptionIsEmtpy_whenProposalWithOneTransaction() public {
     vm.expectRevert("Description url must have non-zero length");
-    governance.propose.value(DEPOSIT)(
+    governance.propose{ value: DEPOSIT }(
       okProp.values,
       okProp.destinations,
       okProp.data,
@@ -919,7 +955,7 @@ contract GovernanceTest_propose is GovernanceTest {
     // wait "dequeueFrequency"
     vm.warp(block.timestamp + DEQUEUE_FREQUENCY);
 
-    governance.propose.value(DEPOSIT)(
+    governance.propose{ value: DEPOSIT }(
       okProp.values,
       okProp.destinations,
       okProp.data,
@@ -945,7 +981,7 @@ contract GovernanceTest_propose is GovernanceTest {
   }
 
   function check_registerProposal(Proposal memory proposal) private {
-    uint256 id = governance.propose.value(DEPOSIT)(
+    uint256 id = governance.propose{ value: DEPOSIT }(
       proposal.values,
       proposal.destinations,
       proposal.data,
@@ -973,7 +1009,7 @@ contract GovernanceTest_propose is GovernanceTest {
   }
 
   function check_registerProposalTransactions(Proposal memory proposal) private {
-    uint256 id = governance.propose.value(DEPOSIT)(
+    uint256 id = governance.propose{ value: DEPOSIT }(
       proposal.values,
       proposal.destinations,
       proposal.data,
@@ -994,25 +1030,15 @@ contract GovernanceTest_propose is GovernanceTest {
       dataPosition = dataPosition + proposal.dataLengths[i];
     }
   }
-
-  function check_emitsProposalQueuedEvents(Proposal memory proposal) private {
-    vm.expectEmit(true, true, true, true);
-    emit ProposalQueued(1, address(this), proposal.values.length, DEPOSIT, block.timestamp);
-    governance.propose.value(DEPOSIT)(
-      proposal.values,
-      proposal.destinations,
-      proposal.data,
-      proposal.dataLengths,
-      proposal.description
-    );
-  }
 }
 
 contract GovernanceTest_upvote is GovernanceTest {
   event ProposalUpvoted(uint256 indexed proposalId, address indexed account, uint256 upvotes);
   event ProposalExpired(uint256 indexed proposalId);
 
-  function setUp() public {
+  uint256 proposalId;
+
+  function setUp() public override {
     super.setUp();
     proposalId = makeValidProposal();
   }
@@ -1215,7 +1241,9 @@ contract GovernanceTest_revokeUpvote is GovernanceTest {
     uint256 revokedUpvotes
   );
 
-  function setUp() public {
+  uint256 proposalId;
+
+  function setUp() public override {
     super.setUp();
     proposalId = makeValidProposal();
     vm.startPrank(accVoter);
@@ -1300,7 +1328,9 @@ contract GovernanceTest_revokeUpvote is GovernanceTest {
 contract GovernanceTest_withdraw is GovernanceTest {
   address accProposer;
 
-  function setUp() public {
+  uint256 proposalId;
+
+  function setUp() public override {
     super.setUp();
     accProposer = actor("proposer");
     vm.deal(accProposer, DEPOSIT * 2);
@@ -1340,7 +1370,9 @@ contract GovernanceTest_approve is GovernanceTest {
   event ProposalDequeued(uint256 indexed proposalId, uint256 timestamp);
   event ProposalApproved(uint256 indexed proposalId);
 
-  function setUp() public {
+  uint256 proposalId;
+
+  function setUp() public override {
     super.setUp();
     proposalId = makeValidProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
@@ -1547,7 +1579,7 @@ contract GovernanceTest_revokeVotes is GovernanceTest {
     }
   }
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     vm.prank(accOwner);
     governance.setConcurrentProposals(3);
@@ -1646,7 +1678,9 @@ contract GovernanceTest_vote_WhenProposalIsApproved is GovernanceTest {
   );
   event ParticipationBaselineUpdated(uint256 participationBaseline);
 
-  function setUp() public {
+  uint256 proposalId;
+
+  function setUp() public override {
     super.setUp();
     proposalId = makeValidProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
@@ -1888,7 +1922,9 @@ contract GovernanceTest_vote_WhenProposalIsApprovedAndHaveSigner is GovernanceTe
     uint256 abstainVotes
   );
 
-  function setUp() public {
+  uint256 proposalId;
+
+  function setUp() public override {
     super.setUp();
     bytes32 voteSignerRole = keccak256(abi.encodePacked("celo.org/core/vote"));
 
@@ -1965,7 +2001,9 @@ contract GovernanceTest_vote_WhenProposalIsNotApproved is GovernanceTest {
     uint256 abstainVotes
   );
 
-  function setUp() public {
+  uint256 proposalId;
+
+  function setUp() public override {
     super.setUp();
     proposalId = makeValidProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
@@ -2097,7 +2135,9 @@ contract GovernanceTest_vote_PartiallyWhenProposalIsApproved is GovernanceTest {
 
   event ParticipationBaselineUpdated(uint256 participationBaseline);
 
-  function setUp() public {
+  uint256 proposalId;
+
+  function setUp() public override {
     super.setUp();
     proposalId = makeValidProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
@@ -2323,7 +2363,9 @@ contract GovernanceTest_votePartially_WhenProposalIsApprovedAndHaveSigner is Gov
     uint256 abstainVotes
   );
 
-  function setUp() public {
+  uint256 proposalId;
+
+  function setUp() public override {
     super.setUp();
     bytes32 voteSignerRole = keccak256(abi.encodePacked("celo.org/core/vote"));
 
@@ -2435,7 +2477,9 @@ contract GovernanceTest_votePartially_WhenProposalIsNotApproved is GovernanceTes
     uint256 abstainVotes
   );
 
-  function setUp() public {
+  uint256 proposalId;
+
+  function setUp() public override {
     super.setUp();
     proposalId = makeValidProposal();
     vm.warp(block.timestamp + governance.dequeueFrequency());
@@ -2557,6 +2601,10 @@ contract GovernanceTest_votePartially_WhenVotingOnDifferentProposalWithSameIndex
 }
 
 contract GovernanceTest_execute is GovernanceTest {
+  using BytesLib for bytes;
+
+  uint256 proposalId;
+
   event ParticipationBaselineUpdated(uint256 participationBaseline);
   event ProposalExecuted(uint256 indexed proposalId);
 
@@ -2663,7 +2711,7 @@ contract GovernanceTest_execute is GovernanceTest {
   }
 
   function test_RevertIf_ProposalCannotExecuteSuccessfully() public {
-    proposalId = governance.propose.value(DEPOSIT)(
+    proposalId = governance.propose{ value: DEPOSIT }(
       failingProp.values,
       failingProp.destinations,
       failingProp.data,
@@ -2684,7 +2732,7 @@ contract GovernanceTest_execute is GovernanceTest {
 
   function test_RevertIf_ProposalCannotExecuteBecauseInvalidContractAddress() public {
     okProp.destinations[0] = actor("someAddress");
-    proposalId = governance.propose.value(DEPOSIT)(
+    proposalId = governance.propose{ value: DEPOSIT }(
       okProp.values,
       okProp.destinations,
       okProp.data,
@@ -2754,7 +2802,7 @@ contract GovernanceTest_execute is GovernanceTest {
     bytes memory txDataSecond = abi.encodeWithSignature(setValueSignature, 2, 1, true);
     twoTxProp.data = txDataFirst.concat(txDataSecond);
 
-    proposalId = governance.propose.value(DEPOSIT)(
+    proposalId = governance.propose{ value: DEPOSIT }(
       twoTxProp.values,
       twoTxProp.destinations,
       twoTxProp.data,
@@ -2779,7 +2827,7 @@ contract GovernanceTest_execute is GovernanceTest {
     bytes memory txDataSecond = abi.encodeWithSignature(setValueSignature, 2, 1, false); // fails
     twoTxProp.data = txDataFirst.concat(txDataSecond);
 
-    proposalId = governance.propose.value(DEPOSIT)(
+    proposalId = governance.propose{ value: DEPOSIT }(
       twoTxProp.values,
       twoTxProp.destinations,
       twoTxProp.data,
@@ -2840,7 +2888,7 @@ contract GovernanceTest_execute is GovernanceTest {
 
   // TODO fix when migrate to 0.8
   function SKIPtest_NoEmitProposalExecutedWhenEmptyProposalNotApproved() public {
-    proposalId = governance.propose.value(DEPOSIT)(
+    proposalId = governance.propose{ value: DEPOSIT }(
       emptyProp.values,
       emptyProp.destinations,
       emptyProp.data,
@@ -2863,7 +2911,7 @@ contract GovernanceTest_execute is GovernanceTest {
 
   // TODO fix when migrate to 0.8
   function SKIPtest_NoEmitProposalExecutedWhenEmptyProposalNotPassing() public {
-    proposalId = governance.propose.value(DEPOSIT)(
+    proposalId = governance.propose{ value: DEPOSIT }(
       emptyProp.values,
       emptyProp.destinations,
       emptyProp.data,
@@ -2885,7 +2933,7 @@ contract GovernanceTest_execute is GovernanceTest {
   }
 
   function setUpEmptyProposalReadyForExecution() public {
-    proposalId = governance.propose.value(DEPOSIT)(
+    proposalId = governance.propose{ value: DEPOSIT }(
       emptyProp.values,
       emptyProp.destinations,
       emptyProp.data,
@@ -2953,7 +3001,7 @@ contract GovernanceTest_execute is GovernanceTest {
   }
 
   function setup2TxProposal() private {
-    proposalId = governance.propose.value(DEPOSIT)(
+    proposalId = governance.propose{ value: DEPOSIT }(
       twoTxProp.values,
       twoTxProp.destinations,
       twoTxProp.data,
@@ -3029,7 +3077,7 @@ contract GovernanceTest_approveHotfix is GovernanceTest {
 contract GovernanceTest_approveHotfix_L2 is GovernanceTest {
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
   event HotfixApproved(bytes32 indexed hash, address approver);
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _whenL2();
@@ -3125,7 +3173,7 @@ contract GovernanceTest_hotfixWhitelistValidatorTally is GovernanceTest {
   address[] validators;
   address[] signers;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     for (uint256 i = 1; i < 4; i++) {
       address validator = vm.addr(i);
@@ -3197,7 +3245,7 @@ contract GovernanceTest_hotfixWhitelistValidatorTally is GovernanceTest {
 contract GovernanceTest_isHotfixPassing is GovernanceTest {
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     address val1 = actor("validator1");
     governance.addValidator(val1);
@@ -3239,7 +3287,7 @@ contract GovernanceTest_prepareHotfix is GovernanceTest {
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
   event HotfixPrepared(bytes32 indexed hash, uint256 indexed epoch);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     address val1 = actor("validator1");
     governance.addValidator(val1);
@@ -3296,7 +3344,7 @@ contract GovernanceTest_prepareHotfix_L2 is GovernanceTest {
   bytes32 constant HOTFIX_HASH = bytes32(uint256(0x123456789));
   event HotfixPrepared(bytes32 indexed hash, uint256 indexed epoch);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _whenL2();
     vm.prank(accOwner);
@@ -3409,7 +3457,7 @@ contract GovernanceTest_resetHotfix is GovernanceTest {
   bytes32 hotfixHash;
   event HotfixRecordReset(bytes32 indexed hash);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _whenL2();
     vm.prank(accOwner);
@@ -3517,7 +3565,7 @@ contract GovernanceTest_executeHotfix is GovernanceTest {
 
   event HotfixExecuted(bytes32 indexed hash);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     validator = actor("validator");
     vm.prank(validator);
@@ -3614,7 +3662,7 @@ contract GovernanceTest_executeHotfix_L2 is GovernanceTest {
 
   event HotfixExecuted(bytes32 indexed hash);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _whenL2();
@@ -3722,7 +3770,9 @@ contract GovernanceTest_executeHotfix_L2 is GovernanceTest {
 }
 
 contract GovernanceTest_isVoting is GovernanceTest {
-  function setUp() public {
+  uint256 proposalId;
+
+  function setUp() public override {
     super.setUp();
     proposalId = makeValidProposal();
   }
@@ -3778,7 +3828,9 @@ contract GovernanceTest_isVoting is GovernanceTest {
 contract GovernanceTest_isProposalPassing is GovernanceTest {
   address accSndVoter;
 
-  function setUp() public {
+  uint256 proposalId;
+
+  function setUp() public override {
     super.setUp();
     accSndVoter = actor("sndVoter");
     vm.prank(accSndVoter);
@@ -3851,6 +3903,8 @@ contract GovernanceTest_dequeueProposalsIfReady is GovernanceTest {
 }
 
 contract GovernanceTest_getProposalStage is GovernanceTest {
+  uint256 proposalId;
+
   function test_returnNoneStageWhenProposalDoesNotExists() public {
     assertEq(uint256(governance.getProposalStage(0)), uint256(Proposals.Stage.None));
     assertEq(uint256(governance.getProposalStage(1)), uint256(Proposals.Stage.None));
@@ -3983,6 +4037,8 @@ contract GovernanceTest_getProposalStage is GovernanceTest {
 }
 
 contract GovernanceTest_getAmountOfGoldUsedForVoting is GovernanceTest {
+  uint256 proposalId;
+
   function test_showCorrectNumberOfVotes_whenVotingOn1ConcurrentProposal() public {
     makeAndApprove3ConcurrentProposals();
 

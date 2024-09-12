@@ -38,6 +38,10 @@ function compile({ coreContractsOnly, solidity: outdir }: BuildTargets) {
       continue
     }
 
+    console.info(
+      `yarn run truffle compile --silent --contracts_directory=${contractPath} --contracts_build_directory=${outdir}/contracts-${contractPackage.name} --config ${contractPackage.truffleConfig}`
+    )
+
     exec(
       `yarn run truffle compile --silent --contracts_directory=${contractPath} --contracts_build_directory=${outdir}/contracts-${contractPackage.name} --config ${contractPackage.truffleConfig}` // todo change to outdir
     )

@@ -1,37 +1,39 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
+
+import "@celo-contracts-8/identity/OdisPayments.sol";
+import "@celo-contracts-8/common/interfaces/IStableToken.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts-8/common/Freezer.sol";
+import "@openzeppelin/contracts8/interfaces/IERC20.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
-import "@celo-contracts/identity/OdisPayments.sol";
-import { StableToken } from "@mento-core/contracts/StableToken.sol";
-import "@celo-contracts/common/Registry.sol";
-import "@celo-contracts/common/Freezer.sol";
-
 contract OdisPaymentsFoundryTest is Test, TestConstants {
-  uint256 FIXED1 = 1000000000000000000000000;
   uint256 SECONDS_IN_A_DAY = 60 * 60 * 24;
   uint256 startingBalanceCUSD = 1000;
 
-  Registry registry;
+  IRegistry registry;
   Freezer freezer;
   OdisPayments odisPayments;
-  StableToken stableToken;
+  IStableToken stableToken;
 
   address sender;
   address receiver;
 
   event PaymentMade(address indexed account, uint256 valueInCUSD);
 
-  function setUp() public {
+  function setUp() public virtual {
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
 
-    registry = Registry(REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
     freezer = new Freezer(true);
     odisPayments = new OdisPayments(true);
-    stableToken = new StableToken(true);
+
+    address stableTokenAddress = actor("stableToken");
+    deployCodeTo("StableToken.sol", abi.encode(true), stableTokenAddress);
+    stableToken = IStableToken(stableTokenAddress);
 
     sender = actor("sender");
     receiver = actor("receiver");
@@ -66,7 +68,7 @@ contract OdisPaymentsFoundryTest is Test, TestConstants {
 }
 
 contract OdisPaymentsFoundryTest_Initialize is OdisPaymentsFoundryTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -83,11 +85,11 @@ contract OdisPaymentsFoundryTest_Initialize is OdisPaymentsFoundryTest {
 contract OdisPaymentsFoundryTest_PayInCUSD is OdisPaymentsFoundryTest {
   uint256 valueApprovedForTransfer = 10;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     vm.prank(sender);
-    stableToken.approve(address(odisPayments), valueApprovedForTransfer);
+    IERC20(address(stableToken)).approve(address(odisPayments), valueApprovedForTransfer);
 
     assertEq(stableToken.balanceOf(sender), startingBalanceCUSD);
   }
@@ -136,7 +138,7 @@ contract OdisPaymentsFoundryTest_PayInCUSD is OdisPaymentsFoundryTest {
   }
 
   function test_ShouldRevertIfTransferFails() public {
-    vm.expectRevert("SafeERC20: low-level call failed");
+    vm.expectRevert("transfer value exceeded sender's allowance for recipient");
     vm.prank(sender);
     odisPayments.payInCUSD(sender, valueApprovedForTransfer + 1);
 

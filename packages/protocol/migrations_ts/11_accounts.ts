@@ -1,9 +1,11 @@
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
-import { AccountsInstance, RegistryInstance } from 'types'
+import { RegistryInstance } from 'types'
+import { AccountsInstance } from 'types/08'
 
 const initializeArgs = async (): Promise<[string]> => {
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
@@ -20,5 +22,6 @@ module.exports = deploymentForCoreContract<AccountsInstance>(
   initializeArgs,
   async (accounts: AccountsInstance) => {
     await accounts.setEip712DomainSeparator()
-  }
+  },
+  SOLIDITY_08_PACKAGE
 )

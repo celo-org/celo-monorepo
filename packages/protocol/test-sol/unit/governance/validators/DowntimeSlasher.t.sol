@@ -1,21 +1,25 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import { TestWithoutPrecompiles } from "celo-foundry-8/TestWithoutPrecompiles.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
+import "@celo-contracts/common/FixidityLib.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts-8/common/Accounts.sol";
+import "@celo-contracts-8/governance/test/MockValidators.sol";
+import "@celo-contracts-8/governance/test/MockLockedGold.sol";
+import "@celo-contracts-8/governance/DowntimeSlasher.sol";
+import "@celo-contracts-8/governance/test/MockUsingPrecompiles.sol";
+import { Utils08 } from "@test-sol/utils08.sol";
 import { TestConstants } from "@test-sol/constants.sol";
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Registry.sol";
-import "@celo-contracts/common/Accounts.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
-import "@celo-contracts/governance/test/MockLockedGold.sol";
-import "@celo-contracts/governance/DowntimeSlasher.sol";
-import "@celo-contracts/governance/test/MockUsingPrecompiles.sol";
-import { Utils } from "@test-sol/utils.sol";
+contract DowntimeSlasherMock is
+  DowntimeSlasher(true),
+  MockUsingPrecompiles,
+  TestWithoutPrecompiles
+{
+  using SafeMath for uint256;
 
-contract DowntimeSlasherMock is DowntimeSlasher(true), MockUsingPrecompiles, Test {
   struct SlashParams {
     uint256[] startBlocks;
     uint256[] endBlocks;
@@ -27,6 +31,46 @@ contract DowntimeSlasherMock is DowntimeSlasher(true), MockUsingPrecompiles, Tes
     address[] groupElectionLessers;
     address[] groupElectionGreaters;
     uint256[] groupElectionIndices;
+  }
+
+  // Override the conflicting function
+  function getVerifiedSealBitmapFromHeader(
+    bytes memory header
+  ) public view override(UsingPrecompiles, MockUsingPrecompiles) returns (bytes32) {
+    return MockUsingPrecompiles.getVerifiedSealBitmapFromHeader(header);
+  }
+
+  function numberValidatorsInSet(
+    uint256 blockNumber
+  ) public view override(UsingPrecompiles, MockUsingPrecompiles) returns (uint256) {
+    // Choose which base contract's implementation to use
+    return MockUsingPrecompiles.numberValidatorsInSet(blockNumber);
+    // or return UsingPrecompiles.numberValidatorsInSet(blockNumber);
+  }
+
+  // Override the conflicting function
+  function getBlockNumberFromHeader(
+    bytes memory header
+  ) public view override(UsingPrecompiles, MockUsingPrecompiles) returns (uint256) {
+    // Choose which base contract's implementation to use
+    return MockUsingPrecompiles.getBlockNumberFromHeader(header);
+    // or return UsingPrecompiles.getBlockNumberFromHeader(header);
+  }
+
+  function getParentSealBitmap(
+    uint256 blockNumber
+  ) public view override(UsingPrecompiles, MockUsingPrecompiles) returns (bytes32) {
+    // Choose which base contract's implementation to use
+    return MockUsingPrecompiles.getParentSealBitmap(blockNumber);
+    // or return UsingPrecompiles.getParentSealBitmap(blockNumber);
+  }
+
+  function hashHeader(
+    bytes memory header
+  ) public view override(UsingPrecompiles, MockUsingPrecompiles) returns (bytes32) {
+    // Choose which base contract's implementation to use
+    return MockUsingPrecompiles.hashHeader(header);
+    // or return UsingPrecompiles.hashHeader(header);
   }
 
   function mockSlash(SlashParams calldata slashParams, address[] calldata _validators) external {
@@ -77,7 +121,7 @@ contract DowntimeSlasherMock is DowntimeSlasher(true), MockUsingPrecompiles, Tes
   }
 }
 
-contract DowntimeSlasherTest is Test, TestConstants, Utils {
+contract DowntimeSlasherTest is TestWithoutPrecompiles, Utils08, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -88,7 +132,7 @@ contract DowntimeSlasherTest is Test, TestConstants, Utils {
     uint256 reward;
   }
 
-  Registry registry;
+  IRegistry registry;
   Accounts accounts;
   MockValidators validators;
   MockLockedGold lockedGold;
@@ -162,7 +206,7 @@ contract DowntimeSlasherTest is Test, TestConstants, Utils {
     bytes32 bitmap
   );
 
-  function setUp() public {
+  function setUp() public virtual {
     ph.setEpochSize(100);
     (nonOwner, nonOwnerPK) = actorWithPK("nonOwner");
     (validator, validatorPK) = actorWithPK("validator");
@@ -172,14 +216,13 @@ contract DowntimeSlasherTest is Test, TestConstants, Utils {
     (otherGroup, groupPK) = actorWithPK("otherGroup");
     (caller2, caller2PK) = actorWithPK("caller2");
 
-    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
-
     accounts = new Accounts(true);
     validators = new MockValidators();
     lockedGold = new MockLockedGold();
     slasher = new DowntimeSlasherMock();
 
-    registry = Registry(REGISTRY_ADDRESS);
+    deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     accounts.createAccount();
 
@@ -426,7 +469,9 @@ contract DowntimeSlasherTestSetSlashableDowntime is DowntimeSlasherTest {
 }
 
 contract DowntimeSlasherTestGetBitmapForInterval is DowntimeSlasherTest {
-  function setUp() public {
+  using SafeMath for uint256;
+
+  function setUp() public override {
     super.setUp();
 
     ph.setEpochSize(17280);
@@ -469,7 +514,9 @@ contract DowntimeSlasherTestGetBitmapForInterval is DowntimeSlasherTest {
 }
 
 contract DowntimeSlasherTestSetBitmapForInterval is DowntimeSlasherTest {
-  function setUp() public {
+  using SafeMath for uint256;
+
+  function setUp() public override {
     super.setUp();
 
     ph.setEpochSize(17280);
@@ -522,12 +569,14 @@ contract DowntimeSlasherTestSetBitmapForInterval is DowntimeSlasherTest {
 }
 
 contract DowntimeSlasherTestSlash_WhenIntervalInSameEpoch is DowntimeSlasherTest {
+  using SafeMath for uint256;
+
   uint256[] private _signerIndices = new uint256[](1);
   address[] private _validatorsList = new address[](1);
   bytes32[] private _bitmaps0 = new bytes32[](1);
   bytes32[] private _bitmaps1 = new bytes32[](1);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _signerIndices[0] = validatorIndexInEpoch;
@@ -959,6 +1008,8 @@ contract DowntimeSlasherTestSlash_WhenIntervalInSameEpoch is DowntimeSlasherTest
 }
 
 contract DowntimeSlasherTestSlash_WhenIntervalCrossingEpoch is DowntimeSlasherTest {
+  using SafeMath for uint256;
+
   uint256 startBlock;
 
   uint256[] private _signerIndices = new uint256[](2);
@@ -966,7 +1017,7 @@ contract DowntimeSlasherTestSlash_WhenIntervalCrossingEpoch is DowntimeSlasherTe
   bytes32[] private _bitmaps1 = new bytes32[](1);
   address[] private _validatorsList = new address[](2);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _signerIndices[0] = validatorIndexInEpoch;

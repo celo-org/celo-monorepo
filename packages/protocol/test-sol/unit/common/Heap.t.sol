@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
-import "@celo-contracts/common/libraries/Heap.sol";
+import "celo-foundry-8/Test.sol";
+import "@celo-contracts-8/common/libraries/Heap.sol";
 
 contract HeapMock {
   using FixidityLib for FixidityLib.Fraction;

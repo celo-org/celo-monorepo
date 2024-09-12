@@ -1,3 +1,4 @@
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
@@ -5,7 +6,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { EpochRewardsInstance, FreezerInstance } from 'types'
+import { EpochRewardsInstance, FreezerInstance } from 'types/08'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [
@@ -37,5 +38,6 @@ module.exports = deploymentForCoreContract<EpochRewardsInstance>(
       )
       await freezer.freeze(epochRewards.address)
     }
-  }
+  },
+  SOLIDITY_08_PACKAGE
 )

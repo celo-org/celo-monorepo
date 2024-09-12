@@ -1,8 +1,9 @@
+import { SOLIDITY_08_PACKAGE } from '@celo/protocol/contractPackages'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { ValidatorsInstance } from 'types'
+import { ValidatorsInstance } from 'types/08'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [
@@ -25,5 +26,7 @@ module.exports = deploymentForCoreContract<ValidatorsInstance>(
   web3,
   artifacts,
   CeloContractName.Validators,
-  initializeArgs
+  initializeArgs,
+  undefined,
+  SOLIDITY_08_PACKAGE
 )

@@ -5,7 +5,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { FeeHandlerInstance, MentoFeeHandlerSellerInstance } from 'types'
+import { FeeHandlerInstance, MentoFeeHandlerSellerInstance } from 'types/08'
 import { StableTokenInstance } from 'types/mento'
 import { MENTO_PACKAGE } from '../contractPackages'
 import { ArtifactsSingleton } from '../lib/artifactsSingleton'

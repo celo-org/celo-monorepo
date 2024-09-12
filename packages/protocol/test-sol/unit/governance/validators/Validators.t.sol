@@ -1,29 +1,42 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts8/utils/math/SafeMath.sol";
 import "@celo-contracts/common/FixidityLib.sol";
-import "@celo-contracts/common/Registry.sol";
-import "@celo-contracts/common/Accounts.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts-8/common/Accounts.sol";
 
-import "@celo-contracts/governance/Election.sol";
-import "@celo-contracts/governance/LockedGold.sol";
+import "@celo-contracts-8/governance/Election.sol";
+import "@celo-contracts-8/governance/LockedGold.sol";
 
-import "@celo-contracts/stability/test/MockStableToken.sol";
-import "@celo-contracts/governance/test/MockElection.sol";
-import "@celo-contracts/governance/test/MockLockedGold.sol";
+import "@celo-contracts-8/stability/test/MockStableToken.sol";
+import "@celo-contracts-8/governance/test/MockElection.sol";
+import "@celo-contracts-8/governance/test/MockLockedGold.sol";
 import "@test-sol/unit/governance/validators/mocks/ValidatorsMockTunnel.sol";
 
-import "@celo-contracts/governance/test/ValidatorsMock.sol";
+import "@celo-contracts-8/governance/Validators.sol";
 import "@test-sol/constants.sol";
 import "@test-sol/utils/ECDSAHelper.sol";
-import { Utils } from "@test-sol/utils.sol";
-import { Test as ForgeTest } from "forge-std/Test.sol";
+import { Utils08 } from "@test-sol/utils08.sol";
 
-contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
+import "forge-std/console.sol";
+
+contract ValidatorsMock is Validators(true) {
+  function updateValidatorScoreFromSigner(address signer, uint256 uptime) external override {
+    return _updateValidatorScoreFromSigner(signer, uptime);
+  }
+
+  function distributeEpochPaymentsFromSigner(
+    address signer,
+    uint256 maxPayment
+  ) external override returns (uint256) {
+    return _distributeEpochPaymentsFromSigner(signer, maxPayment);
+  }
+}
+
+contract ValidatorsTest is Test, Utils08, ECDSAHelper, TestConstants {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -42,7 +55,7 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     FixidityLib.Fraction adjustmentSpeed;
   }
 
-  Registry registry;
+  IRegistry registry;
   Accounts accounts;
   MockStableToken stableToken;
   MockElection election;
@@ -131,8 +144,7 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     uint256 groupPayment
   );
 
-  function setUp() public {
-    owner = address(this);
+  function setUp() public virtual {
     group = actor("group");
     nonValidator = actor("nonValidator");
     nonOwner = actor("nonOwner");
@@ -158,7 +170,7 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     });
 
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
-    registry = Registry(REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     accounts = new Accounts(true);
     accounts.initialize(REGISTRY_ADDRESS);
@@ -193,7 +205,26 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
       _downtimeGracePeriod: downtimeGracePeriod
     });
 
-    validatorsMockTunnel.MockInitialize(owner, initParams, initParams2);
+    Validators.InitParams memory initParamsStruct = Validators.InitParams({
+      commissionUpdateDelay: initParams2._commissionUpdateDelay,
+      downtimeGracePeriod: initParams2._downtimeGracePeriod
+    });
+
+    validators.initialize(
+      initParams.registryAddress,
+      initParams.groupRequirementValue,
+      initParams.groupRequirementDuration,
+      initParams.validatorRequirementValue,
+      initParams.validatorRequirementDuration,
+      initParams.validatorScoreExponent,
+      initParams.validatorScoreAdjustmentSpeed,
+      initParams2._membershipHistoryLength,
+      initParams2._slashingMultiplierResetPeriod,
+      initParams2._maxGroupSize,
+      initParamsStruct
+    );
+
+    owner = validators.owner();
 
     vm.prank(validator);
     accounts.createAccount();
@@ -365,13 +396,33 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
 }
 
 contract ValidatorsTest_Initialize is ValidatorsTest {
+  using FixidityLib for FixidityLib.Fraction;
+
   function test_ShouldhaveSetTheOwner() public {
     assertEq(validators.owner(), owner, "Incorrect Owner.");
   }
 
   function test_Reverts_WhenCalledMoreThanOnce() public {
     vm.expectRevert();
-    validatorsMockTunnel.MockInitialize(owner, initParams, initParams2);
+
+    Validators.InitParams memory initParamsStruct = Validators.InitParams({
+      commissionUpdateDelay: initParams2._commissionUpdateDelay,
+      downtimeGracePeriod: initParams2._downtimeGracePeriod
+    });
+
+    validators.initialize(
+      initParams.registryAddress,
+      initParams.groupRequirementValue,
+      initParams.groupRequirementDuration,
+      initParams.validatorRequirementValue,
+      initParams.validatorRequirementDuration,
+      initParams.validatorScoreExponent,
+      initParams.validatorScoreAdjustmentSpeed,
+      initParams2._membershipHistoryLength,
+      initParams2._slashingMultiplierResetPeriod,
+      initParams2._maxGroupSize,
+      initParamsStruct
+    );
   }
 
   function test_shouldHaveSetGroupLockedGoldRequirements() public {
@@ -434,6 +485,7 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
   function test_Reverts_setCommissionUpdateDelay_WhenL2() public {
     _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(owner);
     validators.setCommissionUpdateDelay(commissionUpdateDelay);
   }
 
@@ -445,6 +497,7 @@ contract ValidatorsTest_Initialize is ValidatorsTest {
   function test_Reverts_SetDowntimeGracePeriod_WhenL2() public {
     _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(owner);
     validators.setDowntimeGracePeriod(downtimeGracePeriod);
   }
 }
@@ -454,10 +507,12 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
 
   function test_Reverts_WhenLengthIsSame() public {
     vm.expectRevert("Membership history length not changed");
+    vm.prank(owner);
     validators.setMembershipHistoryLength(membershipHistoryLength);
   }
 
   function test_shouldSetTheMembershipHistoryLength() public {
+    vm.prank(owner);
     validators.setMembershipHistoryLength(newLength);
     assertEq(validators.membershipHistoryLength(), newLength);
   }
@@ -465,12 +520,14 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
   function test_Reverts_SetTheMembershipHistoryLength_WhenL2() public {
     _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(owner);
     validators.setMembershipHistoryLength(newLength);
   }
 
   function test_Emits_MembershipHistoryLengthSet() public {
     vm.expectEmit(true, true, true, true);
     emit MembershipHistoryLengthSet(newLength);
+    vm.prank(owner);
     validators.setMembershipHistoryLength(newLength);
   }
 
@@ -484,10 +541,9 @@ contract ValidatorsTest_SetMembershipHistoryLength is ValidatorsTest {
 contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
   uint256 newSize = maxGroupSize + 1;
 
-  event MaxGroupSizeSet(uint256 size);
-
   function test_Reverts_SetMaxGroupSize_WhenL2() public {
     _whenL2();
+    vm.prank(owner);
     vm.expectRevert("This method is no longer supported in L2.");
     validators.setMaxGroupSize(newSize);
   }
@@ -495,6 +551,7 @@ contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
   function test_Emits_MaxGroupSizeSet() public {
     vm.expectEmit(true, true, true, true);
     emit MaxGroupSizeSet(newSize);
+    vm.prank(owner);
     validators.setMaxGroupSize(newSize);
   }
 
@@ -506,6 +563,7 @@ contract ValidatorsTest_SetMaxGroupSize is ValidatorsTest {
 
   function test_Reverts_WhenSizeIsSame() public {
     vm.expectRevert("Max group size not changed");
+    vm.prank(owner);
     validators.setMaxGroupSize(maxGroupSize);
   }
 }
@@ -518,6 +576,7 @@ contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
     });
 
   function test_ShouldHaveSetGroupLockedGoldRequirements() public {
+    vm.prank(owner);
     validators.setGroupLockedGoldRequirements(newRequirements.value, newRequirements.duration);
     (uint256 _value, uint256 _duration) = validators.getGroupLockedGoldRequirements();
     assertEq(_value, newRequirements.value);
@@ -527,6 +586,7 @@ contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
   function test_Emits_GroupLockedGoldRequirementsSet() public {
     vm.expectEmit(true, true, true, true);
     emit GroupLockedGoldRequirementsSet(newRequirements.value, newRequirements.duration);
+    vm.prank(owner);
     validators.setGroupLockedGoldRequirements(newRequirements.value, newRequirements.duration);
   }
 
@@ -538,6 +598,7 @@ contract ValidatorsTest_SetGroupLockedGoldRequirements is ValidatorsTest {
 
   function test_Reverts_WhenRequirementsAreUnchanged() public {
     vm.expectRevert("Group requirements not changed");
+    vm.prank(owner);
     validators.setGroupLockedGoldRequirements(
       originalGroupLockedGoldRequirements.value,
       originalGroupLockedGoldRequirements.duration
@@ -553,6 +614,7 @@ contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
     });
 
   function test_ShouldHaveSetValidatorLockedGoldRequirements() public {
+    vm.prank(owner);
     validators.setValidatorLockedGoldRequirements(newRequirements.value, newRequirements.duration);
     (uint256 _value, uint256 _duration) = validators.getValidatorLockedGoldRequirements();
     assertEq(_value, newRequirements.value);
@@ -562,6 +624,7 @@ contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
   function test_Emits_ValidatorLockedGoldRequirementsSet() public {
     vm.expectEmit(true, true, true, true);
     emit ValidatorLockedGoldRequirementsSet(newRequirements.value, newRequirements.duration);
+    vm.prank(owner);
     validators.setValidatorLockedGoldRequirements(newRequirements.value, newRequirements.duration);
   }
 
@@ -573,6 +636,7 @@ contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
 
   function test_Reverts_WhenRequirementsAreUnchanged() public {
     vm.expectRevert("Validator requirements not changed");
+    vm.prank(owner);
     validators.setValidatorLockedGoldRequirements(
       originalValidatorLockedGoldRequirements.value,
       originalValidatorLockedGoldRequirements.duration
@@ -581,15 +645,16 @@ contract ValidatorsTest_SetValidatorLockedGoldRequirements is ValidatorsTest {
 }
 
 contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
+  using FixidityLib for FixidityLib.Fraction;
+
   ValidatorScoreParameters newParams =
     ValidatorScoreParameters({
       exponent: originalValidatorScoreParameters.exponent + 1,
       adjustmentSpeed: FixidityLib.newFixedFraction(6, 20)
     });
 
-  event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
-
   function test_ShouldSetExponentAndAdjustmentSpeed() public {
+    vm.prank(owner);
     validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
     (uint256 _exponent, uint256 _adjustmentSpeed) = validators.getValidatorScoreParameters();
     assertEq(_exponent, newParams.exponent, "Incorrect Exponent");
@@ -599,12 +664,14 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
   function test_Reverts_SetExponentAndAdjustmentSpeed_WhenL2() public {
     _whenL2();
     vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(owner);
     validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
   }
 
   function test_Emits_ValidatorScoreParametersSet() public {
     vm.expectEmit(true, true, true, true);
     emit ValidatorScoreParametersSet(newParams.exponent, newParams.adjustmentSpeed.unwrap());
+    vm.prank(owner);
     validators.setValidatorScoreParameters(newParams.exponent, newParams.adjustmentSpeed.unwrap());
   }
 
@@ -616,6 +683,7 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
 
   function test_Reverts_WhenLockupsAreUnchanged() public {
     vm.expectRevert("Adjustment speed and exponent not changed");
+    vm.prank(owner);
     validators.setValidatorScoreParameters(
       originalValidatorScoreParameters.exponent,
       originalValidatorScoreParameters.adjustmentSpeed.unwrap()
@@ -624,7 +692,7 @@ contract ValidatorsTest_SetValidatorScoreParameters is ValidatorsTest {
 }
 
 contract ValidatorsTest_RegisterValidator is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     lockedGold.setAccountTotalLockedGold(validator, originalValidatorLockedGoldRequirements.value);
@@ -793,7 +861,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
   function test_Reverts_WhenAccountDoesNotMeetLockedGoldRequirements() public {
     lockedGold.setAccountTotalLockedGold(
       validator,
-      originalValidatorLockedGoldRequirements.value.sub(11)
+      originalValidatorLockedGoldRequirements.value - 11
     );
     vm.expectRevert("Deposit too small");
     vm.prank(validator);
@@ -810,7 +878,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValid
 {
   uint256 public constant INDEX = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -875,9 +943,11 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasNeverBeenMemberOfValid
 contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorGroup is
   ValidatorsTest
 {
+  using SafeMath for uint256;
+
   uint256 public constant INDEX = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -897,7 +967,7 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
     _removeMemberAndTimeTravel(
       group,
       validator,
-      originalValidatorLockedGoldRequirements.duration.add(1)
+      originalValidatorLockedGoldRequirements.duration + 1
     );
     assertTrue(validators.isValidator(validator));
     _deregisterValidator(validator);
@@ -970,9 +1040,11 @@ contract ValidatorsTest_DeregisterValidator_WhenAccountHasBeenMemberOfValidatorG
 contract ValidatorsTest_Affiliate_WhenGroupAndValidatorMeetLockedGoldRequirements is
   ValidatorsTest
 {
+  using SafeMath for uint256;
+
   address nonRegisteredGroup;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     nonRegisteredGroup = actor("nonRegisteredGroup");
 
@@ -1045,7 +1117,7 @@ contract ValidatorsTest_Affiliate_WhenValidatorIsAlreadyAffiliatedWithValidatorG
   uint256 validatorAffiliationEpochNumber;
   uint256 validatorAdditionEpochNumber;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     otherGroup = actor("otherGroup");
@@ -1167,7 +1239,7 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
   uint256 additionEpoch;
   uint256 deaffiliationEpoch;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -1291,7 +1363,7 @@ contract ValidatorsTest_Deaffiliate is ValidatorsTest {
 contract ValidatorsTest_UpdateEcdsaPublicKey is ValidatorsTest {
   bytes validatorEcdsaPubKey;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     vm.prank(address(accounts));
@@ -1379,7 +1451,7 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
       bytes16(0x06060606060606060606060606060607)
     );
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     vm.prank(address(accounts));
@@ -1483,6 +1555,8 @@ contract ValidatorsTest_UpdatePublicKeys is ValidatorsTest {
 }
 
 contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
+  using FixidityLib for FixidityLib.Fraction;
+
   bytes validatorEcdsaPubKey;
 
   bytes public constant newBlsPublicKey =
@@ -1513,7 +1587,7 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
       bytes16(0x06060606060606060606060606060607)
     );
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     validatorEcdsaPubKey = _registerValidatorHelper(validator, validatorPk);
@@ -1582,7 +1656,10 @@ contract ValidatorsTest_UpdateBlsPublicKey is ValidatorsTest {
 }
 
 contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
-  function setUp() public {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
+  function setUp() public override {
     super.setUp();
   }
 
@@ -1674,9 +1751,12 @@ contract ValidatorsTest_RegisterValidatorGroup is ValidatorsTest {
 }
 
 contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers is ValidatorsTest {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
   uint256 public constant INDEX = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -1726,9 +1806,12 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasNeverHadMembers is 
 }
 
 contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is ValidatorsTest {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
   uint256 public constant INDEX = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -1820,12 +1903,15 @@ contract ValidatorsTest_DeregisterValidatorGroup_WhenGroupHasHadMembers is Valid
 }
 
 contract ValidatorsTest_AddMember is ValidatorsTest {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
   uint256 _registrationEpoch;
   uint256 _additionEpoch;
 
   uint256[] expectedSizeHistory;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -1921,6 +2007,7 @@ contract ValidatorsTest_AddMember is ValidatorsTest {
     vm.prank(group);
     validators.addFirstMember(validator, address(0), address(0));
 
+    vm.prank(owner);
     validators.setMaxGroupSize(1);
     _registerValidatorHelper(otherValidator, otherValidatorPk);
 
@@ -2039,7 +2126,7 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
   uint256 _registrationEpoch;
   uint256 _additionEpoch;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorGroupWithMembers(group, 1);
   }
@@ -2125,7 +2212,7 @@ contract ValidatorsTest_RemoveMember is ValidatorsTest {
 }
 
 contract ValidatorsTest_ReorderMember is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorGroupWithMembers(group, 2);
   }
@@ -2173,7 +2260,7 @@ contract ValidatorsTest_ReorderMember is ValidatorsTest {
   }
 }
 contract ValidatorsTest_ReorderMember_L2 is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorGroupWithMembers(group, 2);
     _whenL2();
@@ -2223,9 +2310,12 @@ contract ValidatorsTest_ReorderMember_L2 is ValidatorsTest {
 }
 
 contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
   uint256 newCommission = commission.unwrap().add(1);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorGroupHelper(group, 1);
   }
@@ -2281,9 +2371,12 @@ contract ValidatorsTest_SetNextCommissionUpdate is ValidatorsTest {
 }
 
 contract ValidatorsTest_UpdateCommission is ValidatorsTest {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
   uint256 newCommission = commission.unwrap().add(1);
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -2355,7 +2448,10 @@ contract ValidatorsTest_UpdateCommission is ValidatorsTest {
 }
 
 contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
-  function setUp() public {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -2453,7 +2549,10 @@ contract ValidatorsTest_CalculateEpochScore is ValidatorsTest {
 }
 
 contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
-  function setUp() public {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -2611,11 +2710,15 @@ contract ValidatorsTest_CalculateGroupEpochScore is ValidatorsTest {
 }
 
 contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
   FixidityLib.Fraction public gracePeriod;
   FixidityLib.Fraction public uptime;
+
   uint256 public _epochScore;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -2691,13 +2794,16 @@ contract ValidatorsTest_UpdateValidatorScoreFromSigner is ValidatorsTest {
 }
 
 contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
   address[] public expectedMembershipHistoryGroups;
   uint256[] public expectedMembershipHistoryEpochs;
 
   address[] public actualMembershipHistoryGroups;
   uint256[] public actualMembershipHistoryEpochs;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _registerValidatorHelper(validator, validatorPk);
 
@@ -2796,7 +2902,10 @@ contract ValidatorsTest_UpdateMembershipHistory is ValidatorsTest {
 }
 
 contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
-  function setUp() public {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -2847,11 +2956,14 @@ contract ValidatorsTest_GetEpochSize is ValidatorsTest {
 }
 
 contract ValidatorsTest_GetAccountLockedGoldRequirement is ValidatorsTest {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
   uint256 public numMembers = 5;
   uint256[] public actualRequirements;
   uint256[] removalTimestamps;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -2908,6 +3020,9 @@ contract ValidatorsTest_GetAccountLockedGoldRequirement is ValidatorsTest {
 }
 
 contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
   uint256 public numMembers = 5;
   uint256 public maxPayment = 20122394876;
   uint256 public expectedTotalPayment;
@@ -2927,7 +3042,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
   FixidityLib.Fraction public uptime;
   FixidityLib.Fraction public delegatedFraction;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     delegatedFraction = FixidityLib.newFixedFraction(10, 100);
@@ -3193,7 +3308,7 @@ contract ValidatorsTest_DistributeEpochPaymentsFromSigner is ValidatorsTest {
 }
 
 contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -3218,7 +3333,7 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator is ValidatorsTest {
   }
 }
 contract ValidatorsTest_ForceDeaffiliateIfValidator_L2 is ValidatorsTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -3244,6 +3359,9 @@ contract ValidatorsTest_ForceDeaffiliateIfValidator_L2 is ValidatorsTest {
 }
 
 contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
   struct EpochInfo {
     uint256 epochNumber;
     address groupy;
@@ -3255,7 +3373,7 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
 
   EpochInfo[] public epochInfoList;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -3381,7 +3499,10 @@ contract ValidatorsTest_GroupMembershipInEpoch is ValidatorsTest {
 }
 
 contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
-  function setUp() public {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorGroupHelper(group, 1);
@@ -3426,7 +3547,10 @@ contract ValidatorsTest_HalveSlashingMultiplier is ValidatorsTest {
 }
 
 contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
-  function setUp() public {
+  using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
+
+  function setUp() public override {
     super.setUp();
 
     _registerValidatorHelper(validator, validatorPk);
@@ -3476,6 +3600,7 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
 
   function test_ShouldReadProperly_WhenSlashingResetPeriosIsUpdated() public {
     uint256 newResetPeriod = 10 * DAY;
+    vm.prank(owner);
     validators.setSlashingMultiplierResetPeriod(newResetPeriod);
     timeTravel(newResetPeriod);
     vm.prank(group);
@@ -3488,6 +3613,7 @@ contract ValidatorsTest_ResetSlashingMultiplier is ValidatorsTest {
     _whenL2();
     uint256 newResetPeriod = 10 * DAY;
     vm.expectRevert("This method is no longer supported in L2.");
+    vm.prank(owner);
     validators.setSlashingMultiplierResetPeriod(newResetPeriod);
   }
 }

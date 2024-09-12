@@ -1,34 +1,33 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.7 <0.8.20;
 
-import "celo-foundry/Test.sol";
+import "celo-foundry-8/Test.sol";
 
-import { TestConstants } from "@test-sol/constants.sol";
-import { ECDSAHelper } from "@test-sol/utils/ECDSAHelper.sol";
-
-import "@celo-contracts/identity/Escrow.sol";
-import "@celo-contracts/identity/FederatedAttestations.sol";
-import "@celo-contracts/identity/test/MockAttestations.sol";
-import "@celo-contracts/identity/test/MockERC20Token.sol";
+import "@celo-contracts-8/identity/Escrow.sol";
+import "@celo-contracts-8/identity/FederatedAttestations.sol";
+import "@celo-contracts-8/identity/test/MockAttestations.sol";
+import "@celo-contracts-8/identity/test/MockERC20Token.sol";
 import "@celo-contracts/common/FixidityLib.sol";
 
-import "@celo-contracts/common/Registry.sol";
-import "@celo-contracts/common/Accounts.sol";
-import "@celo-contracts/common/Freezer.sol";
-import "@celo-contracts/common/GoldToken.sol";
-import "@celo-contracts/governance/LockedGold.sol";
-import "@celo-contracts/governance/ReleaseGold.sol";
+import "@celo-contracts/common/interfaces/IRegistry.sol";
+import "@celo-contracts-8/common/Accounts.sol";
+import "@celo-contracts-8/common/Freezer.sol";
+import "@celo-contracts-8/common/GoldToken.sol";
+import "@celo-contracts-8/governance/LockedGold.sol";
+import "@celo-contracts-8/governance/ReleaseGold.sol";
 import "./mocks/ReleaseGoldMockTunnel.sol";
-import "@celo-contracts/stability/test/MockStableToken.sol";
-import "@celo-contracts/governance/test/MockElection.sol";
-import "@celo-contracts/governance/test/MockGovernance.sol";
-import "@celo-contracts/governance/test/MockValidators.sol";
+import "@celo-contracts-8/stability/test/MockStableToken.sol";
+import "@celo-contracts-8/governance/test/MockElection.sol";
+import "@celo-contracts-8/governance/test/MockGovernance.sol";
+import "@celo-contracts-8/governance/test/MockValidators.sol";
+import "@test-sol/utils/ECDSAHelper.sol";
+
+import { TestConstants } from "@test-sol/constants.sol";
 
 contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
   using FixidityLib for FixidityLib.Fraction;
 
-  Registry registry;
+  IRegistry registry;
   Accounts accounts;
   Freezer freezer;
   GoldToken goldToken;
@@ -52,10 +51,6 @@ contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
 
   uint256 constant TOTAL_AMOUNT = 1 ether * 10;
 
-  uint256 constant MINUTE = 60;
-  uint256 constant HOUR = 60 * 60;
-  uint256 constant DAY = 24 * HOUR;
-  uint256 constant MONTH = 30 * DAY;
   uint256 constant UNLOCKING_PERIOD = 3 * DAY;
 
   ReleaseGoldMockTunnel.InitParams initParams;
@@ -73,6 +68,28 @@ contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
     deployCodeTo("Registry.sol", abi.encode(false), PROXY_ADMIN_ADDRESS);
   }
 
+  function initializeReleaseGold(address releaseGoldAddress) public {
+    ReleaseGold _releaseGold = ReleaseGold(payable(releaseGoldAddress));
+    _releaseGold.initialize(
+      initParams.releaseStartTime,
+      initParams.releaseCliffTime,
+      initParams.numReleasePeriods,
+      initParams.releasePeriod,
+      initParams.amountReleasedPerPeriod,
+      initParams.revocable,
+      initParams._beneficiary,
+      initParams2._releaseOwner,
+      initParams2._refundAddress,
+      initParams2.initialDistributionRatio,
+      ReleaseGold.ReleaseGoldInitParams({
+        canValidate: initParams2._canValidate,
+        canVote: initParams2._canVote,
+        registryAddress: initParams2.registryAddress,
+        subjectToLiquidityProvision: initParams2.subjectToLiquidityProvision
+      })
+    );
+  }
+
   function newReleaseGold(bool prefund, bool startReleasing) internal returns (ReleaseGold) {
     releaseGold = new ReleaseGold(true);
 
@@ -83,8 +100,7 @@ contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
       );
     }
 
-    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold));
-    tunnel.MockInitialize(owner, initParams, initParams2);
+    initializeReleaseGold(address(releaseGold));
 
     if (startReleasing) {
       vm.warp(block.timestamp + initParams.releaseCliffTime + initParams.releasePeriod + 1);
@@ -100,12 +116,12 @@ contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
     return vm.sign(privateKey, prefixedHash);
   }
 
-  function setUp() public {
+  function setUp() public virtual {
     (beneficiary, beneficiaryPrivateKey) = actorWithPK("beneficiary");
     walletAddress = beneficiary;
 
     deployCodeTo("Registry.sol", abi.encode(false), REGISTRY_ADDRESS);
-    registry = Registry(REGISTRY_ADDRESS);
+    registry = IRegistry(REGISTRY_ADDRESS);
 
     accounts = new Accounts(true);
     freezer = new Freezer(true);
@@ -140,12 +156,12 @@ contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
       releasePeriod: 3 * MONTH,
       amountReleasedPerPeriod: TOTAL_AMOUNT / 4,
       revocable: true,
-      _beneficiary: address(uint160(beneficiary))
+      _beneficiary: payable(address(uint160(beneficiary)))
     });
 
     initParams2 = ReleaseGoldMockTunnel.InitParams2({
       _releaseOwner: releaseOwner,
-      _refundAddress: address(uint160(refundAddress)),
+      _refundAddress: payable(address(uint160(refundAddress))),
       subjectToLiquidityProvision: false,
       initialDistributionRatio: 1000,
       _canValidate: false,
@@ -158,7 +174,7 @@ contract ReleaseGoldTest is Test, TestConstants, ECDSAHelper {
 }
 
 contract ReleaseGoldTest_Initialize is ReleaseGoldTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -174,7 +190,7 @@ contract ReleaseGoldTest_Initialize is ReleaseGoldTest {
 }
 
 contract ReleaseGoldTest_Payable is ReleaseGoldTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -216,7 +232,7 @@ contract ReleaseGoldTest_Transfer is ReleaseGoldTest {
   address receiver = actor("receiver");
   uint256 transferAmount = 10;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
     stableToken.mint(address(releaseGold), transferAmount);
@@ -234,7 +250,7 @@ contract ReleaseGoldTest_GenericTransfer is ReleaseGoldTest {
   address receiver = actor("receiver");
   uint256 transferAmount = 10;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
     stableToken.mint(address(releaseGold), transferAmount);
@@ -266,7 +282,7 @@ contract ReleaseGoldTest_GenericTransfer is ReleaseGoldTest {
 contract ReleaseGoldTest_Creation is ReleaseGoldTest {
   uint256 public maxUint256 = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -355,26 +371,23 @@ contract ReleaseGoldTest_Creation is ReleaseGoldTest {
 
   function test_ShouldRevertWhenReleaseGoldBeneficiaryIsTheNullAddress() public {
     releaseGold = new ReleaseGold(true);
-    initParams._beneficiary = address(0);
-    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold));
-    vm.expectRevert("unsuccessful tunnel call");
-    tunnel.MockInitialize(owner, initParams, initParams2);
+    initParams._beneficiary = payable(address(0));
+    vm.expectRevert("The release schedule beneficiary cannot be the zero addresss");
+    initializeReleaseGold(address(releaseGold));
   }
 
   function test_ShouldRevertWhenReleaseGoldPeriodsAreZero() public {
     releaseGold2 = new ReleaseGold(true);
     initParams.numReleasePeriods = 0;
-    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold2));
-    vm.expectRevert("unsuccessful tunnel call");
-    tunnel.MockInitialize(owner, initParams, initParams2);
+    vm.expectRevert();
+    initializeReleaseGold(address(releaseGold));
   }
 
   function test_ShouldRevertWhenReleasedAmountPerPeriodIsZero() public {
     releaseGold2 = new ReleaseGold(true);
     initParams.amountReleasedPerPeriod = 0;
-    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold2));
-    vm.expectRevert("unsuccessful tunnel call");
-    tunnel.MockInitialize(owner, initParams, initParams2);
+    vm.expectRevert();
+    initializeReleaseGold(address(releaseGold));
   }
 
   function test_ShouldOverflowForVeryLargeCombinationsOdReleasePeriodsAndAmountPerTime() public {
@@ -382,38 +395,37 @@ contract ReleaseGoldTest_Creation is ReleaseGoldTest {
     initParams.numReleasePeriods = maxUint256;
     initParams.amountReleasedPerPeriod = maxUint256;
     initParams2.initialDistributionRatio = 999;
-    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold));
-    vm.expectRevert("unsuccessful tunnel call");
-    tunnel.MockInitialize(owner, initParams, initParams2);
+    vm.expectRevert();
+    initializeReleaseGold(address(releaseGold));
   }
 }
 
 contract ReleaseGoldTest_SetBeneficiary is ReleaseGoldTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
   }
 
   function test_ShouldSetBeneficiary() public {
-    releaseGold.setBeneficiary(address(uint160((newBeneficiary))));
+    releaseGold.setBeneficiary(payable(address(uint160((newBeneficiary)))));
     assertEq(releaseGold.beneficiary(), newBeneficiary);
   }
 
   function test_ShouldRevertWhenSettingNewBeneficiaryFromTheReleaseOwner() public {
     vm.expectRevert("Ownable: caller is not the owner");
     vm.prank(releaseOwner);
-    releaseGold.setBeneficiary(address(uint160((newBeneficiary))));
+    releaseGold.setBeneficiary(payable(address(uint160((newBeneficiary)))));
   }
 
   function test_ShouldEmitBeneficiarySetEvent() public {
     vm.expectEmit(true, true, true, true);
     emit BeneficiarySet(newBeneficiary);
-    releaseGold.setBeneficiary(address(uint160((newBeneficiary))));
+    releaseGold.setBeneficiary(payable(address(uint160((newBeneficiary)))));
   }
 }
 
 contract ReleaseGoldTest_CreateAccount is ReleaseGoldTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
   }
@@ -448,7 +460,7 @@ contract SetAccount is ReleaseGoldTest {
   string accountName = "name";
   bytes dataEncryptionKey = hex"02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111";
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
     (v, r, s) = getParsedSignatureOfAddress(address(releaseGold), beneficiaryPrivateKey);
@@ -487,7 +499,7 @@ contract SetAccount is ReleaseGoldTest {
 }
 
 contract ReleaseGoldTest_SetAccountName is ReleaseGoldTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
   }
@@ -532,7 +544,7 @@ contract ReleaseGoldTest_SetAccountWalletAddress is ReleaseGoldTest {
   bytes32 r;
   bytes32 s;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
     (v, r, s) = getParsedSignatureOfAddress(address(releaseGold), beneficiaryPrivateKey);
@@ -586,7 +598,7 @@ contract ReleaseGoldTest_SetAccountWalletAddress is ReleaseGoldTest {
 }
 
 contract ReleaseGoldTest_SetAccountMetadataURL is ReleaseGoldTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
   }
@@ -635,7 +647,7 @@ contract ReleaseGoldTest_SetAccountDataEncryptionKey is ReleaseGoldTest {
   bytes longDataEncryptionKey =
     hex"04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0161111111102f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111";
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
     vm.prank(beneficiary);
@@ -681,7 +693,7 @@ contract ReleaseGoldTest_SetAccountDataEncryptionKey is ReleaseGoldTest {
 }
 
 contract ReleaseGoldTest_SetMaxDistribution is ReleaseGoldTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     initParams2.initialDistributionRatio = 0;
     newReleaseGold(true, false);
@@ -720,10 +732,10 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
   address authorized;
   uint256 authorizedPK;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     initParams.revocable = false;
-    initParams2._refundAddress = address(0);
+    initParams2._refundAddress = payable(address(0));
     initParams2._canValidate = true;
     newReleaseGold(true, false);
     vm.prank(beneficiary);
@@ -736,7 +748,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
 
   function test_ShouldSetTheAuthorizedVoteSigner() public {
     vm.prank(beneficiary);
-    releaseGold.authorizeVoteSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeVoteSigner(payable(address(uint160(authorized))), v, r, s);
     assertEq(accounts.authorizedBy(authorized), address(releaseGold));
     assertEq(accounts.getVoteSigner(address(releaseGold)), authorized);
     assertEq(accounts.voteSignerToAccount(authorized), address(releaseGold));
@@ -744,7 +756,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
 
   function test_ShouldSetTheAuthorizedValidatorSigner() public {
     vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeValidatorSigner(payable(address(uint160(authorized))), v, r, s);
     assertEq(accounts.authorizedBy(authorized), address(releaseGold));
     assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
     assertEq(accounts.validatorSignerToAccount(authorized), address(releaseGold));
@@ -752,7 +764,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
 
   function test_ShouldSetTheAuthorizedAttestationSigner() public {
     vm.prank(beneficiary);
-    releaseGold.authorizeAttestationSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeAttestationSigner(payable(address(uint160(authorized))), v, r, s);
     assertEq(accounts.authorizedBy(authorized), address(releaseGold));
     assertEq(accounts.getAttestationSigner(address(releaseGold)), authorized);
     assertEq(accounts.attestationSignerToAccount(authorized), address(releaseGold));
@@ -761,7 +773,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
   function test_ShouldTransfer1CELOToVoteSigner() public {
     uint256 authorizedBalanceBefore = goldToken.balanceOf(authorized);
     vm.prank(beneficiary);
-    releaseGold.authorizeVoteSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeVoteSigner(payable(address(uint160(authorized))), v, r, s);
     uint256 authorizedBalanceAfter = goldToken.balanceOf(authorized);
     assertEq(authorizedBalanceAfter - authorizedBalanceBefore, 1 ether);
   }
@@ -769,7 +781,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
   function test_ShouldTransfer1CELOToValidatorSigner() public {
     uint256 authorizedBalanceBefore = goldToken.balanceOf(authorized);
     vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeValidatorSigner(payable(address(uint160(authorized))), v, r, s);
     uint256 authorizedBalanceAfter = goldToken.balanceOf(authorized);
     assertEq(authorizedBalanceAfter - authorizedBalanceBefore, 1 ether);
   }
@@ -777,7 +789,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
   function test_ShouldNotTransfer1CELOToAttestationSigner() public {
     uint256 authorizedBalanceBefore = goldToken.balanceOf(authorized);
     vm.prank(beneficiary);
-    releaseGold.authorizeAttestationSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeAttestationSigner(payable(address(uint160(authorized))), v, r, s);
     uint256 authorizedBalanceAfter = goldToken.balanceOf(authorized);
     assertEq(authorizedBalanceAfter - authorizedBalanceBefore, 0);
   }
@@ -787,7 +799,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     accounts.createAccount();
     vm.prank(beneficiary);
     vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
-    releaseGold.authorizeVoteSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeVoteSigner(payable(address(uint160(authorized))), v, r, s);
   }
 
   function test_ShouldRevertIfValidatorSignerIsAnAccount() public {
@@ -795,7 +807,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     accounts.createAccount();
     vm.prank(beneficiary);
     vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
-    releaseGold.authorizeValidatorSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeValidatorSigner(payable(address(uint160(authorized))), v, r, s);
   }
 
   function test_ShouldRevertIfAttestationSignerIsAnAccount() public {
@@ -803,7 +815,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     accounts.createAccount();
     vm.prank(beneficiary);
     vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
-    releaseGold.authorizeAttestationSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeAttestationSigner(payable(address(uint160(authorized))), v, r, s);
   }
 
   function test_ShouldRevertIfTheVoteSignerIsAlreadyAuthorized() public {
@@ -816,7 +828,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     accounts.createAccount();
     vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
     vm.prank(beneficiary);
-    releaseGold.authorizeVoteSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+    releaseGold.authorizeVoteSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
   }
 
   function test_ShouldRevertIfTheValidatorSignerIsAlreadyAuthorized() public {
@@ -829,7 +846,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     accounts.createAccount();
     vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
     vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+    releaseGold.authorizeValidatorSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
   }
 
   function test_ShouldRevertIfTheAttestationSignerIsAlreadyAuthorized() public {
@@ -842,7 +864,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     accounts.createAccount();
     vm.expectRevert("Cannot re-authorize address or locked gold account for another account");
     vm.prank(beneficiary);
-    releaseGold.authorizeAttestationSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+    releaseGold.authorizeAttestationSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
   }
 
   function test_ShouldRevertIfTheSignatureIsIncorrect() public {
@@ -853,12 +880,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     );
     vm.prank(beneficiary);
     vm.expectRevert("Invalid signature");
-    releaseGold.authorizeVoteSigner(address(uint160(authorized)), otherV, otherR, otherS);
+    releaseGold.authorizeVoteSigner(payable(address(uint160(authorized))), otherV, otherR, otherS);
   }
 
   function test_ShouldSetTheNewAuthorizedVoteSigner_WhenPreviousAuthorizationHasBeenMade() public {
     vm.prank(beneficiary);
-    releaseGold.authorizeVoteSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeVoteSigner(payable(address(uint160(authorized))), v, r, s);
     assertEq(accounts.getVoteSigner(address(releaseGold)), authorized);
 
     (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
@@ -867,7 +894,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeVoteSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+    releaseGold.authorizeVoteSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     assertEq(accounts.authorizedBy(otherAccount), address(releaseGold));
     assertEq(accounts.getVoteSigner(address(releaseGold)), otherAccount);
@@ -878,7 +910,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     public
   {
     vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeValidatorSigner(payable(address(uint160(authorized))), v, r, s);
     assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
 
     (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
@@ -887,7 +919,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+    releaseGold.authorizeValidatorSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     assertEq(accounts.authorizedBy(otherAccount), address(releaseGold));
     assertEq(accounts.getValidatorSigner(address(releaseGold)), otherAccount);
@@ -898,7 +935,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     public
   {
     vm.prank(beneficiary);
-    releaseGold.authorizeAttestationSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeAttestationSigner(payable(address(uint160(authorized))), v, r, s);
     assertEq(accounts.getAttestationSigner(address(releaseGold)), authorized);
 
     (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
@@ -907,7 +944,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeAttestationSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+    releaseGold.authorizeAttestationSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     assertEq(accounts.authorizedBy(otherAccount), address(releaseGold));
     assertEq(accounts.getAttestationSigner(address(releaseGold)), otherAccount);
@@ -918,7 +960,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     public
   {
     vm.prank(beneficiary);
-    releaseGold.authorizeVoteSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeVoteSigner(payable(address(uint160(authorized))), v, r, s);
     assertEq(accounts.getVoteSigner(address(releaseGold)), authorized);
 
     (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
@@ -928,7 +970,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeVoteSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+    releaseGold.authorizeVoteSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     uint256 otherAccountBalanceAfter = goldToken.balanceOf(otherAccount);
     assertEq(otherAccountBalanceAfter - otherAccountBalanceBefore, 0);
@@ -938,7 +985,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     public
   {
     vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeValidatorSigner(payable(address(uint160(authorized))), v, r, s);
     assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
 
     (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
@@ -948,7 +995,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+    releaseGold.authorizeValidatorSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     uint256 otherAccountBalanceAfter = goldToken.balanceOf(otherAccount);
     assertEq(otherAccountBalanceAfter - otherAccountBalanceBefore, 0);
@@ -958,7 +1010,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     public
   {
     vm.prank(beneficiary);
-    releaseGold.authorizeAttestationSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeAttestationSigner(payable(address(uint160(authorized))), v, r, s);
     assertEq(accounts.getAttestationSigner(address(releaseGold)), authorized);
 
     (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
@@ -968,7 +1020,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeAttestationSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+    releaseGold.authorizeAttestationSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     uint256 otherAccountBalanceAfter = goldToken.balanceOf(otherAccount);
     assertEq(otherAccountBalanceAfter - otherAccountBalanceBefore, 0);
@@ -978,7 +1035,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     public
   {
     vm.prank(beneficiary);
-    releaseGold.authorizeVoteSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeVoteSigner(payable(address(uint160(authorized))), v, r, s);
     assertEq(accounts.getVoteSigner(address(releaseGold)), authorized);
 
     (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
@@ -987,7 +1044,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeVoteSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+    releaseGold.authorizeVoteSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     assertEq(accounts.authorizedBy(authorized), address(releaseGold));
   }
@@ -996,7 +1058,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     public
   {
     vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeValidatorSigner(payable(address(uint160(authorized))), v, r, s);
     assertEq(accounts.getValidatorSigner(address(releaseGold)), authorized);
 
     (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
@@ -1005,7 +1067,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+    releaseGold.authorizeValidatorSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     assertEq(accounts.authorizedBy(authorized), address(releaseGold));
   }
@@ -1014,7 +1081,7 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
     public
   {
     vm.prank(beneficiary);
-    releaseGold.authorizeAttestationSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeAttestationSigner(payable(address(uint160(authorized))), v, r, s);
     assertEq(accounts.getAttestationSigner(address(releaseGold)), authorized);
 
     (address otherAccount, uint256 otherAccountPK) = actorWithPK("otherAccount2");
@@ -1023,7 +1090,12 @@ contract ReleaseGoldTest_AuthorizationTests is ReleaseGoldTest {
       otherAccountPK
     );
     vm.prank(beneficiary);
-    releaseGold.authorizeAttestationSigner(address(uint160(otherAccount)), otherV, otherR, otherS);
+    releaseGold.authorizeAttestationSigner(
+      payable(address(uint160(otherAccount))),
+      otherV,
+      otherR,
+      otherS
+    );
 
     assertEq(accounts.authorizedBy(authorized), address(releaseGold));
   }
@@ -1052,12 +1124,12 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest {
     return result;
   }
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     initParams.revocable = false;
     initParams2._canValidate = true;
-    initParams2._refundAddress = address(0);
+    initParams2._refundAddress = payable(address(0));
     newReleaseGold(true, false);
 
     vm.prank(beneficiary);
@@ -1071,7 +1143,7 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest {
   function test_ShouldSetTheAuthorizedKeys_WhenUsingECDSAPublickKey() public {
     vm.prank(beneficiary);
     releaseGold.authorizeValidatorSignerWithPublicKey(
-      address(uint160(authorized)),
+      payable(address(uint160(authorized))),
       v,
       r,
       s,
@@ -1101,7 +1173,7 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest {
 
     vm.prank(beneficiary);
     releaseGold.authorizeValidatorSignerWithKeys(
-      address(uint160(authorized)),
+      payable(address(uint160(authorized))),
       v,
       r,
       s,
@@ -1120,7 +1192,7 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest {
     vm.expectRevert("This method is no longer supported in L2.");
     vm.prank(beneficiary);
     releaseGold.authorizeValidatorSignerWithPublicKey(
-      address(uint160(authorized)),
+      payable(address(uint160(authorized))),
       v,
       r,
       s,
@@ -1149,7 +1221,7 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest {
 
     vm.prank(beneficiary);
     releaseGold.authorizeValidatorSignerWithKeys(
-      address(uint160(authorized)),
+      payable(address(uint160(authorized))),
       v,
       r,
       s,
@@ -1161,7 +1233,7 @@ contract ReleaseGoldTest_AuthorizeWithPublicKeys is ReleaseGoldTest {
 }
 
 contract ReleaseGoldTest_Revoke is ReleaseGoldTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
   }
 
@@ -1194,7 +1266,7 @@ contract ReleaseGoldTest_Revoke is ReleaseGoldTest {
 
   function test_ShouldRevertIfReleaseGoldIsNonRevocable() public {
     initParams.revocable = false;
-    initParams2._refundAddress = address(0);
+    initParams2._refundAddress = payable(address(0));
     newReleaseGold(true, false);
     vm.expectRevert("Release schedule instance must be revocable");
     vm.prank(releaseOwner);
@@ -1203,7 +1275,7 @@ contract ReleaseGoldTest_Revoke is ReleaseGoldTest {
 }
 
 contract ReleaseGoldTest_Expire is ReleaseGoldTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
   }
@@ -1338,7 +1410,7 @@ contract ReleaseGoldTest_Expire is ReleaseGoldTest {
 }
 
 contract ReleaseGoldTest_RefundAndFinalize is ReleaseGoldTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
 
@@ -1394,7 +1466,7 @@ contract ReleaseGoldTest_RefundAndFinalize is ReleaseGoldTest {
 }
 
 contract ReleaseGoldTest_ExpireSelfDestructTest is ReleaseGoldTest {
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
 
@@ -1409,13 +1481,13 @@ contract ReleaseGoldTest_ExpireSelfDestructTest is ReleaseGoldTest {
     public
   {
     vm.expectRevert();
-    releaseGold.getRemainingUnlockedBalance();
+    releaseGold.refundAndFinalize();
   }
 }
 
 contract ReleaseGoldTest_LockGold is ReleaseGoldTest {
   uint256 lockAmount;
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
     lockAmount = initParams.amountReleasedPerPeriod * initParams.numReleasePeriods;
@@ -1457,7 +1529,7 @@ contract ReleaseGoldTest_LockGold is ReleaseGoldTest {
 
 contract ReleaseGoldTest_UnlockGold is ReleaseGoldTest {
   uint256 lockAmount;
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
     vm.prank(beneficiary);
@@ -1522,7 +1594,7 @@ contract ReleaseGoldTest_WithdrawLockedGold is ReleaseGoldTest {
   uint256 value = 1000;
   uint256 index = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
   }
@@ -1592,7 +1664,7 @@ contract ReleaseGoldTest_RelockGold is ReleaseGoldTest {
   uint256 pendingWithdrawalValue = 1000;
   uint256 index = 0;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
     vm.startPrank(beneficiary);
@@ -1697,7 +1769,7 @@ contract ReleaseGoldTest_RelockGold is ReleaseGoldTest {
 contract ReleaseGoldTest_Withdraw is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     initParams2.initialDistributionRatio = 0;
@@ -1993,7 +2065,7 @@ contract ReleaseGoldTest_Withdraw is ReleaseGoldTest {
 contract ReleaseGoldTest_WithdrawSelfDestruct_WhenNotRevoked is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     initParams2.initialDistributionRatio = 0;
@@ -2012,14 +2084,15 @@ contract ReleaseGoldTest_WithdrawSelfDestruct_WhenNotRevoked is ReleaseGoldTest 
 
   function test_ShouldSelfDestructIfBeneficiaryWithdrawsTheEntireAmount() public {
     vm.expectRevert();
-    releaseGold.totalWithdrawn();
+    vm.prank(beneficiary);
+    releaseGold.withdraw(initialReleaseGoldAmount);
   }
 }
 
 contract ReleaseGoldTest_WithdrawSelfDestruct_WhenRevoked is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
 
     initParams2.initialDistributionRatio = 0;
@@ -2040,14 +2113,15 @@ contract ReleaseGoldTest_WithdrawSelfDestruct_WhenRevoked is ReleaseGoldTest {
 
   function test_ShouldSelfDestructIfBeneficiaryWithdrawsTheEntireAmount() public {
     vm.expectRevert();
-    releaseGold.totalWithdrawn();
+    vm.prank(beneficiary);
+    releaseGold.withdraw(0);
   }
 }
 
 contract ReleaseGoldTest_GetCurrentReleasedTotalAmount is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     newReleaseGold(true, false);
     initialReleaseGoldAmount = initParams.amountReleasedPerPeriod * initParams.numReleasePeriods;
@@ -2090,11 +2164,11 @@ contract ReleaseGoldTest_GetCurrentReleasedTotalAmount is ReleaseGoldTest {
 contract ReleaseGoldTest_GetWithdrawableAmount is ReleaseGoldTest {
   uint256 initialReleaseGoldAmount;
 
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     initParams2._canValidate = true;
     initParams.revocable = false;
-    initParams2._refundAddress = address(0);
+    initParams2._refundAddress = payable(address(0));
     initParams2.initialDistributionRatio = 500;
 
     newReleaseGold(true, false);
@@ -2138,7 +2212,7 @@ contract ReleaseGoldTest_GetWithdrawableAmount is ReleaseGoldTest {
     );
 
     vm.prank(beneficiary);
-    releaseGold.authorizeValidatorSigner(address(uint160(authorized)), v, r, s);
+    releaseGold.authorizeValidatorSigner(payable(address(uint160(authorized))), v, r, s);
 
     assertEq(releaseGold.getWithdrawableAmount(), expectedWithdrawalAmount);
   }
@@ -2171,7 +2245,7 @@ contract ReleaseGoldTest_GetWithdrawableAmount is ReleaseGoldTest {
 
     vm.prank(beneficiary);
     releaseGold.authorizeValidatorSignerWithPublicKey(
-      address(uint160(authorized)),
+      payable(address(uint160(authorized))),
       v,
       r,
       s,
@@ -2192,13 +2266,13 @@ contract ReleaseGoldTest_GetWithdrawableAmount is ReleaseGoldTest {
 
 contract ReleaseGoldTest_DeployAndInitializeOnL2 is ReleaseGoldTest {
   uint256 public maxUint256 = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
-  function setUp() public {
+  function setUp() public override {
     super.setUp();
     _whenL2();
-    initParams2.registryAddress = PROXY_ADMIN_ADDRESS;
+    initParams2.registryAddress = REGISTRY_ADDRESS;
   }
 
-  function test_ShouldIndicateIsFundedIfDeploymentIsPrefunded() public {
+  function test_ShouldIndicateIsFundedIfDeploymentIsPrefundedL2() public {
     newReleaseGold(true, false);
     assertTrue(releaseGold.isFunded());
   }
@@ -2293,26 +2367,23 @@ contract ReleaseGoldTest_DeployAndInitializeOnL2 is ReleaseGoldTest {
 
   function test_ShouldRevertWhenReleaseGoldBeneficiaryIsTheNullAddress() public {
     releaseGold = new ReleaseGold(true);
-    initParams._beneficiary = address(0);
-    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold));
-    vm.expectRevert("unsuccessful tunnel call");
-    tunnel.MockInitialize(owner, initParams, initParams2);
+    initParams._beneficiary = payable(address(0));
+    vm.expectRevert("The release schedule beneficiary cannot be the zero addresss");
+    initializeReleaseGold(address(releaseGold));
   }
 
   function test_ShouldRevertWhenReleaseGoldPeriodsAreZero() public {
     releaseGold2 = new ReleaseGold(true);
     initParams.numReleasePeriods = 0;
-    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold2));
-    vm.expectRevert("unsuccessful tunnel call");
-    tunnel.MockInitialize(owner, initParams, initParams2);
+    vm.expectRevert("There must be at least one releasing period");
+    initializeReleaseGold(address(releaseGold2));
   }
 
   function test_ShouldRevertWhenReleasedAmountPerPeriodIsZero() public {
     releaseGold2 = new ReleaseGold(true);
     initParams.amountReleasedPerPeriod = 0;
-    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold2));
-    vm.expectRevert("unsuccessful tunnel call");
-    tunnel.MockInitialize(owner, initParams, initParams2);
+    vm.expectRevert("The released amount per period must be greater than zero");
+    initializeReleaseGold(address(releaseGold2));
   }
 
   function test_ShouldOverflowForVeryLargeCombinationsOdReleasePeriodsAndAmountPerTime() public {
@@ -2320,8 +2391,7 @@ contract ReleaseGoldTest_DeployAndInitializeOnL2 is ReleaseGoldTest {
     initParams.numReleasePeriods = maxUint256;
     initParams.amountReleasedPerPeriod = maxUint256;
     initParams2.initialDistributionRatio = 999;
-    ReleaseGoldMockTunnel tunnel = new ReleaseGoldMockTunnel(address(releaseGold));
-    vm.expectRevert("unsuccessful tunnel call");
-    tunnel.MockInitialize(owner, initParams, initParams2);
+    vm.expectRevert();
+    initializeReleaseGold(address(releaseGold));
   }
 }
