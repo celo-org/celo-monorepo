@@ -48,7 +48,7 @@ forge script \
   $BROADCAST \
   $SKIP_SIMULATION \
   $NON_INTERACTIVE \
-  --rpc-url $ANVIL_RPC_URL || echo "L2 Migration script failed"
+  --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
 
 # Save L2 state so it can published to NPM
 cp $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME $TMP_FOLDER/$L2_DEVCHAIN_FILE_NAME

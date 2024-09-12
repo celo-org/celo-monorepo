@@ -58,7 +58,7 @@ forge script \
   $SKIP_SIMULATION \
   $NON_INTERACTIVE \
   $LIBRARY_FLAGS \
-  --rpc-url $ANVIL_RPC_URL || echo "Migration script failed"
+  --rpc-url $ANVIL_RPC_URL || { echo "Migration script failed"; exit 1; }
 
 # Keeping track of the finish time to measure how long it takes to run the script entirely
 ELAPSED_TIME=$(($SECONDS - $START_TIME))

@@ -56,6 +56,8 @@ import "@celo-contracts-8/common/interfaces/IScoreManagerInitializer.sol";
 import "@celo-contracts-8/common/interfaces/IFeeCurrencyDirectory.sol";
 import "@celo-contracts-8/common/UsingRegistry.sol";
 
+import "@test-sol/utils/SECP256K1.sol";
+
 contract ForceTx {
   // event to trigger so a tx can be processed
   event VanillaEvent(string);
@@ -1101,14 +1103,12 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
 
   function registerValidator(
     uint256 validatorIndex,
-    bytes memory ecdsaPubKey,
     uint256 validatorKey,
     uint256 amountToLock,
     address groupToAffiliate
   ) public returns (address) {
     vm.startBroadcast(validatorKey);
     lockGold(amountToLock);
-    bytes memory _ecdsaPubKey = ecdsaPubKey;
     address accountAddress = (new ForceTx()).identity();
 
     // these blobs are not checked in the contract
@@ -1123,6 +1123,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       bytes16(0x05050505050505050505050505050506),
       bytes16(0x06060606060606060606060606060607)
     );
+
+    (bytes memory ecdsaPubKey, , , ) = _generateEcdsaPubKeyWithSigner(accountAddress, validatorKey);
     getValidators().registerValidator(ecdsaPubKey, newBlsPublicKey, newBlsPop);
     getValidators().affiliate(groupToAffiliate);
     console.log("Done registering validatora");
@@ -1164,6 +1166,57 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     vm.stopBroadcast();
   }
 
+    function _generateEcdsaPubKeyWithSigner(
+    address _validator,
+    uint256 _signerPk
+  ) internal returns (bytes memory ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) {
+    (v, r, s) = getParsedSignatureOfAddress(_validator, _signerPk);
+
+    bytes32 addressHash = keccak256(abi.encodePacked(_validator));
+
+    ecdsaPubKey = addressToPublicKey(addressHash, v, r, s);
+  }
+
+   function addressToPublicKey(
+    bytes32 message,
+    uint8 _v,
+    bytes32 _r,
+    bytes32 _s
+  ) public returns (bytes memory) {
+    address SECP256K1Address = actor("SECP256K1Address");
+    deployCodeTo("SECP256K1.sol:SECP256K1", SECP256K1Address);
+    ISECP256K1 sECP256K1 = ISECP256K1(SECP256K1Address);
+
+    string memory header = "\x19Ethereum Signed Message:\n32";
+    bytes32 _message = keccak256(abi.encodePacked(header, message));
+    (uint256 x, uint256 y) = sECP256K1.recover(
+      uint256(_message),
+      _v - 27,
+      uint256(_r),
+      uint256(_s)
+    );
+    return abi.encodePacked(x, y);
+  }
+
+  function actor(string memory name) internal returns (address) {
+    return vm.addr(uint256(keccak256(abi.encodePacked(name))));
+  }
+
+  function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32) {
+    // 32 is the length in bytes of hash,
+    // enforced by the type signature above
+    return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
+  }
+
+  function getParsedSignatureOfAddress(
+    address _address,
+    uint256 privateKey
+  ) public pure returns (uint8, bytes32, bytes32) {
+    bytes32 addressHash = keccak256(abi.encodePacked(_address));
+    bytes32 prefixedHash = toEthSignedMessageHash(addressHash);
+    return vm.sign(privateKey, prefixedHash);
+  }
+
   function electValidators(string memory json) public {
     console.log("Electing validators: ");
 
@@ -1178,7 +1231,6 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
       json.parseRaw(".validators.validatorLockedGoldRequirements.value"),
       (uint256)
     );
-    bytes[] memory ecdsaPubKeys = abi.decode(json.parseRaw(".validators.ecdsaPubKeys"), (bytes[]));
     // attestationKeys not migrated
 
     if (valKeys.length == 0) {
@@ -1208,12 +1260,8 @@ contract Migration is Script, UsingRegistry, MigrationsConstants {
     for (uint256 validatorIndex = 0; validatorIndex < amountOfGroups; validatorIndex++) {
       console.log("Validator key index", getValidatorKeyIndex(0, validatorIndex, maxGroupSize));
       console.log("Registering validator #: ", validatorIndex);
-      bytes memory ecdsaPubKey = ecdsaPubKeys[
-        getValidatorKeyIndex(0, validatorIndex, maxGroupSize)
-      ];
       address validator = registerValidator(
         validatorIndex,
-        ecdsaPubKey,
         getValidatorKeyFromGroupGroup(valKeys, 0, validatorIndex, maxGroupSize),
         validatorLockedGoldRequirements,
         groupAddress
