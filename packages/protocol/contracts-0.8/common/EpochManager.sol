@@ -311,7 +311,6 @@ contract EpochManager is
     IValidators validators = getValidators();
 
     for (uint i = 0; i < elected.length; i++) {
-      console2.log("### index:", i);
       uint256 validatorScore = scoreReader.getValidatorScore(elected[i]);
       uint256 validatorReward = validators.computeEpochReward(
         elected[i],
