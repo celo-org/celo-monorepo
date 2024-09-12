@@ -700,6 +700,7 @@ contract Validators is
    * @param account The address of the validator group.
    * @param n The number of members to return.
    * @return The top n group members for a particular group.
+   * @dev Returns the account instead of signer on L2.
    */
   function getTopGroupValidators(
     address account,
@@ -707,10 +708,15 @@ contract Validators is
   ) external view returns (address[] memory) {
     address[] memory topAccounts = groups[account].members.headN(n);
     address[] memory topValidators = new address[](n);
-    for (uint256 i = 0; i < n; i = i.add(1)) {
-      topValidators[i] = getAccounts().getValidatorSigner(topAccounts[i]);
+
+    if (isL2()) {
+      return topAccounts;
+    } else {
+      for (uint256 i = 0; i < n; i = i.add(1)) {
+        topValidators[i] = getAccounts().getValidatorSigner(topAccounts[i]);
+      }
+      return topValidators;
     }
-    return topValidators;
   }
 
   /**
@@ -877,7 +883,7 @@ contract Validators is
 
   /**
    * @notice Computes epoch payments to the account
-   * @param account The validator signer of the validator to distribute the epoch payment to.
+   * @param account The validator account of the validator to distribute the epoch payment to.
    * @param maxPayment The maximum payment to the validator. Actual payment is based on score and
    *   group commission.
    * @return The total payment paid to the validator and their group.

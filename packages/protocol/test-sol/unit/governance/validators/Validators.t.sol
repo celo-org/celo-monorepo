@@ -259,6 +259,39 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     }
   }
 
+  function _registerValidatorGroupWithMembersHavingSigners(
+    address _group,
+    uint256 _numMembers
+  ) public {
+    _registerValidatorGroupHelper(_group, _numMembers);
+
+    for (uint256 i = 0; i < _numMembers; i++) {
+      if (i == 0) {
+        _registerValidatorWithSignerHelper_2(validator, signer, signerPk);
+
+        vm.prank(validator);
+        validators.affiliate(_group);
+
+        vm.prank(_group);
+        validators.addFirstMember(validator, address(0), address(0));
+      } else {
+        uint256 _validator1Pk = i;
+        address _validator1 = vm.addr(_validator1Pk);
+        uint256 _signer1Pk = i + _numMembers;
+        address _signer1 = vm.addr(_signer1Pk);
+
+        vm.prank(_validator1);
+        accounts.createAccount();
+        _registerValidatorWithSignerHelper_2(_validator1, _signer1, _signer1Pk);
+        vm.prank(_validator1);
+        validators.affiliate(_group);
+
+        vm.prank(_group);
+        validators.addMember(_validator1);
+      }
+    }
+  }
+
   function getParsedSignatureOfAddress(
     address _address,
     uint256 privateKey
@@ -293,6 +326,29 @@ contract ValidatorsTest is Test, TestConstants, Utils, ECDSAHelper {
     accounts.authorizeValidatorSigner(signer, v, r, s);
 
     vm.prank(validator);
+    validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
+    validatorRegistrationEpochNumber = IPrecompiles(address(validators)).getEpochNumber();
+    return _ecdsaPubKey;
+  }
+
+  function _registerValidatorWithSignerHelper_2(
+    address _validator,
+    address _signer,
+    uint256 _signerPk
+  ) internal returns (bytes memory) {
+    lockedGold.setAccountTotalLockedGold(_validator, originalValidatorLockedGoldRequirements.value);
+
+    (bytes memory _ecdsaPubKey, uint8 v, bytes32 r, bytes32 s) = _generateEcdsaPubKeyWithSigner(
+      _validator,
+      _signerPk
+    );
+
+    ph.mockSuccess(ph.PROOF_OF_POSSESSION(), abi.encodePacked(_validator, blsPublicKey, blsPop));
+
+    vm.prank(_validator);
+    accounts.authorizeValidatorSigner(_signer, v, r, s);
+
+    vm.prank(_validator);
     validators.registerValidator(_ecdsaPubKey, blsPublicKey, blsPop);
     validatorRegistrationEpochNumber = IPrecompiles(address(validators)).getEpochNumber();
     return _ecdsaPubKey;
@@ -839,6 +895,7 @@ contract ValidatorsTest_RegisterValidator is ValidatorsTest {
     );
   }
 }
+
 contract ValidatorsTest_RegisterValidator_NoBls is ValidatorsTest {
   function setUp() public {
     super.setUp();
@@ -3075,6 +3132,30 @@ contract ValidatorsTest_GetMembershipInLastEpoch is ValidatorsTest {
     assertEq(validators.getMembershipInLastEpoch(validator), lastValidatorGroup);
     epochManager.setCurrentEpochNumber(epochManager.getCurrentEpochNumber() + 1);
     assertEq(validators.getMembershipInLastEpoch(validator), nextValidatorGroup);
+  }
+}
+
+contract ValidatorsTest_GetTopGroupValidators is ValidatorsTest {
+  function setUp() public {
+    super.setUp();
+
+    _registerValidatorGroupWithMembersHavingSigners(group, 5);
+  }
+
+  function test_ShouldReturnTheSigner() public {
+    address[] memory _validatorSigner = validators.getTopGroupValidators(group, 3);
+    assertEq(_validatorSigner[0], accounts.getValidatorSigner(validator));
+    assertEq(_validatorSigner[1], accounts.getValidatorSigner(vm.addr(1)));
+    assertFalse(_validatorSigner[0] == validator);
+  }
+
+  function test_ShouldReturnTheAccount_WhenL2() public {
+    _whenL2();
+    address[] memory validatorAccount = validators.getTopGroupValidators(group, 3);
+
+    assertEq(validatorAccount[0], validator);
+    assertEq(validatorAccount[1], vm.addr(1));
+    assertFalse(validatorAccount[0] == accounts.getValidatorSigner(validator));
   }
 }
 

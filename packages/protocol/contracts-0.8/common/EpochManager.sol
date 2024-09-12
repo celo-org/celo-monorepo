@@ -288,8 +288,10 @@ contract EpochManager is
     return initialized && epochManagerInitializer == address(0);
   }
 
+  /**
+   * @notice Allocates rewards to elected validator accounts.
+   */
   function allocateValidatorsRewards() internal {
-    // TODO complete this function
     uint256 totalRewards = 0;
     IScoreReader scoreReader = getScoreReader();
     IValidators validators = getValidators();
@@ -313,7 +315,7 @@ contract EpochManager is
     );
 
     uint256 CELOequivalent = (numerator * totalRewards) / denominator;
-    // this is not a mint anymore
+
     getCeloUnreleasedTreasure().release(
       registry.getAddressForOrDie(RESERVE_REGISTRY_ID),
       CELOequivalent
