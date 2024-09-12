@@ -321,7 +321,6 @@ contract EpochManager is
       totalRewards += validatorReward;
     }
     // Mint all cUSD required for payment and the corresponding CELO
-    // TODO(soloseng): add test to check that epoch manager received funds.
     validators.mintStableToEpochManager(totalRewards);
     // this should have a setter for the oracle.
 

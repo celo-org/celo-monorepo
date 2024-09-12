@@ -7,6 +7,7 @@ import { TestConstants } from "@test-sol/constants.sol";
 import { Utils } from "@test-sol/utils.sol";
 
 import "@celo-contracts/common/FixidityLib.sol";
+import "@celo-contracts/common/Registry.sol";
 import "@celo-contracts/governance/Election.sol";
 import "@celo-contracts/governance/test/MockLockedGold.sol";
 import "@celo-contracts/governance/test/MockValidators.sol";
@@ -162,6 +163,7 @@ contract ElectionTest is Utils, TestConstants {
   }
 
   function _whenL2() public {
+    blockTravel(ph.epochSize() + 1);
     uint256 l1EpochNumber = election.getEpochNumber();
 
     address[] memory _elected = new address[](2);
@@ -217,7 +219,6 @@ contract ElectionTest_SetElectabilityThreshold is ElectionTest {
   }
 }
 
-// TODO(soloseng): need to update epochNumber for L2, to make it !=0
 contract ElectionTest_SetElectabilityThreshold_L2 is ElectionTest {
   function test_shouldSetElectabilityThreshold() public {
     _whenL2();

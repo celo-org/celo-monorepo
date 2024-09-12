@@ -647,7 +647,6 @@ contract Validators is
     group.slashInfo.lastSlashed = block.timestamp;
   }
 
-  // TODO(soloseng): add test to check that this function can only mint to epoch manager.
   function mintStableToEpochManager(
     uint256 amount
   ) external onlyL2 nonReentrant onlyRegisteredContract(EPOCH_MANAGER_REGISTRY_ID) {
