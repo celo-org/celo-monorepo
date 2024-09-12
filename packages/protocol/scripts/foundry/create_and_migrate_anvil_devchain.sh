@@ -64,7 +64,7 @@ forge script \
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
 echo "Total elapsed time: $ELAPSED_TIME seconds"
 
-if [[ ${KEEP_DEVCHAIN_FOLDER} == true ]]; then
+if [[ "${KEEP_DEVCHAIN_FOLDER:-}" == "true" ]]; then
     cp $ANVIL_FOLDER/state.json $TMP_FOLDER/$L1_DEVCHAIN_FILE_NAME
     echo "Keeping devchain folder as per flag."
 else
