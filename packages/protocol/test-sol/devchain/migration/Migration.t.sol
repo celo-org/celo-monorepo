@@ -225,8 +225,6 @@ contract EpochManagerIntegrationTest is IntegrationTest, MigrationsConstants {
     blockTravel(vm, 43200);
     timeTravel(vm, DAY);
 
-    uint256 _currentEpoch = epochManager.getCurrentEpochNumber();
-
     epochManager.startNextEpochProcess();
 
     (, , , uint256 _currentRewardsBlock) = epochManager.getCurrentEpoch();
